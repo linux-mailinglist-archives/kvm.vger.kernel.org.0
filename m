@@ -1,220 +1,126 @@
-Return-Path: <kvm+bounces-9576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C977861D7F
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 21:23:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EF8E861DEB
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 21:45:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BF891C23BD2
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 20:23:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C92DC1F24B99
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 20:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE4514DFC2;
-	Fri, 23 Feb 2024 20:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD9414939B;
+	Fri, 23 Feb 2024 20:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wk+bWj8T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NXcNC4yv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3399B14CAB4
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 20:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427CF148FF7
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 20:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708719674; cv=none; b=IuvUk/CvIP1uby1j4p3DqxIbQi4AMfSP01F+BcK+wtVKpaivqg+ztR4dHlvok4r39sf9cvIrx4OM4Yzm3VvdyV5kL3Y6TwN0wk4VCFqJ2Lh5QW8EBIBB1OGbeZR02VtwCEj25I89J0swLqgbDjLGeFIsHY7O//zoQl1EXa6Zo4U=
+	t=1708720957; cv=none; b=fRzkp5U4vqfeeHNlmX2vAnvV0oRz4dvqbNfug03CnVAf1Mk/AblucvJMUdvXO4vhehag2F52voERZlv/+Ko+Ej37bexE5xfUJ3v1aDQAse2jcTqw0kudHASDBAIv4PpW/pnxQ/ZZ5re0nHXd/unM4ETvlj1xJseJ0SCxGNHevEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708719674; c=relaxed/simple;
-	bh=+lJk5AK8dlVL05cps/qThtV9mpJgp251EZLu0QB3UtM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iy4i8nFGow/ESP3VwB3FK2PEzVzklyN4wRpi6vcD0Yp+TLX2Maem49+nHDkE9t4QIO19n7vpC8rXVyN8g5SvRDOedc8UeWKtyK5mAsMASxWkojRf8IYSplJyc82iJ3a3zBIETex0ehqBAuHJZ2KL7YD004BaoVg9VyBYSpTBItc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wk+bWj8T; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1708720957; c=relaxed/simple;
+	bh=03LEbyvlPP9ONJFI36nX6ThJGYS2WW2I5IdwOVy46dc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NEImd5pJDx+9YMc3GWpZoxtfMuwWqT1ggFI3Vv9M9/ztKn9IUQXdjw8QK33vlRZdZ+ZtD/HuoXi925K9dsw/KhOOyugEd3e6I7U+/LaMmfcK/9RkAD8L96wdVNh6dL3FGRUUAmi2M27G/hf8JCd5zwOnPkk811SRjs0zFbUIosk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NXcNC4yv; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2993efc802dso337184a91.1
-        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 12:21:12 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6047fed0132so18966097b3.1
+        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 12:42:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708719672; x=1709324472; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=4AhBqaFKsEgrMMKsPnTb4KDGMvhddDO4DQwV/SsUl6M=;
-        b=wk+bWj8T05NuASRY4t99y3sPoOQodcX+XY5Y/efVhoDnzqIR/gZsEv/FDad1IUMNdw
-         TqZFbnNwa5YOi2aVNeWL/Nly6lvl8U2+QMHAyotSt6cRhSRe0HSzIWyz6GPEmCw2sqPg
-         5LPOUmooA8UHT5pa0Lq3csjGLkSSZocnMFOlbm3ZK3wkalpEJCo158N2xoiQcB17ChXu
-         utjpYd4SOdO4I+TTJCCQdG4WJNPHOgxHitNsbIMv+AAjk9Kdo1GXlkK8w+JQMmQZaivR
-         nGIj+UD5DhwNbAjMp1w72XoZLDKWudIHnhkF5qNYKEVogbsFaMiRtPivNLEltiHN6DdO
-         Idsw==
+        d=google.com; s=20230601; t=1708720955; x=1709325755; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ShNOY58sLrgiK0CyMcd0tgKu75G8ItZGdxtrhL1QiTw=;
+        b=NXcNC4yvBSojEOhdBPeqmOYyaLpS6LHPYdR9TXfiGZysYo/eC+UXBHBz5TIC/odLWO
+         iDKtfF0OoWP+T5WhGkVkELigMfn+ObPpA6npomvxSUWqKpjEKfY44VWMwvyDBlMGExTu
+         0JU11ednM1kBl7Dc0gwU9QhLAl40t3J7Rd+c7OzB7UvrZxFGNpASCQUH+YJNJ5mEwaHL
+         DNf/N1S0JzcKf5xEETB7ThBlIdWP5wtSrHkJJr66lWcG5TuMdVvYdVrMho4/dyDSeZ7S
+         ikwl6TygulnSN5rJAoLGSPZtaWclQxzarJ/RXo9bqULjfJAYnaH8waF8i15XUJJGUaC3
+         vObg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708719672; x=1709324472;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4AhBqaFKsEgrMMKsPnTb4KDGMvhddDO4DQwV/SsUl6M=;
-        b=XJouwUqU4Qy+gc+QTPeMzhiVwkZHg1WdqmxSmGTp6qJZD7fM9l0bcOylJX5So+ALqr
-         Ai75SvTCa5ZLY3DU2/6sjarehPAzIJxzWi616GOg9VfDVFKtjVA+DF+DFKuoTPeEAi33
-         VzQ2Tm0nmOqne2aHIMBRHMoGnnNy0ze5qwAyeIr21lWX24z0UUkI6pEAaWznoRCM6Ztg
-         PqQPGuDn+zn+/NHVEds9tWOmQU/zsPVkaJjJ45mjTa98h+UlR3jMInyeoRTaMoP+KSKI
-         Uh2S+lJ/bmxoxCqRSbxzPbMDo37fB/mHZvsLA2TzCZa45B49ioIT/e2SndFasu3uuIm/
-         Cktg==
-X-Gm-Message-State: AOJu0YwwY/m6U92gDcq+7quSZxz7ElYc9buqJ1U074l4iTZL8HWuFOQt
-	0EJFYhvDK+x5We4JGWi7LxpGZigc7nTLdGLO8YH1/goCncoWHhPLUKQMovk0DHTnSCnIvYLR6Ue
-	eag==
-X-Google-Smtp-Source: AGHT+IGpWKvmDN9UJOkoRROg6YO/V3Lnx0DBSYyghLMqb2TYzKIvdjMkbunbt1ZlwLgd5KXFqE87krbBLRc=
+        d=1e100.net; s=20230601; t=1708720955; x=1709325755;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ShNOY58sLrgiK0CyMcd0tgKu75G8ItZGdxtrhL1QiTw=;
+        b=samam3FVhOjr3hx76FNLLL6VkgZF4Wi7Ui6X0lYbzpUref1uYaukrKG0bPWS8O64KM
+         fHQbIkPLi4+V5VJ/DA5APPqsVVso9MmOc3gnr36yoNMjTKyWu1vr9XTrlnxeNPgN4zQP
+         S4p+jzr8BDB6q+vHjMx+vb6Z2Ae8ZfDkHjtfVN/gl0U6rNuzcNLWmC0cyDJysZDmenqF
+         UjRlFq9tCb86sg8Usy//xn571VlNHDPJXqwiGxkheo6cCuW6AYwpm02iN/xt2eEBZXjZ
+         /M0RM+dMzvi+Dsc6IMo/atvmVowBOckIWVHFZH+KukLKlWovU77zkeWGJjH3XPYun2RI
+         +o1g==
+X-Gm-Message-State: AOJu0YyHEFMUxL4BvwNXH7Xo/tDO+sYE9QOjKWlXWFEYfNm3vZAJtrQo
+	9eHTJQbBjy1M7+jUW/lJGVJaIE+OV9L3M93sZKKB96zk6e41cA2ft7JLG0Dd5XgmpzgY76ZToFu
+	nbQ==
+X-Google-Smtp-Source: AGHT+IGLTkDREk76fxqLRWWwPxQvD2uw/rOzHnJxjZGQMqJNtQJt92M/64u6CKyUs8ejq/smEmVkfaw48NA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:2d89:b0:299:4395:a21c with SMTP id
- sj9-20020a17090b2d8900b002994395a21cmr2519pjb.7.1708719672505; Fri, 23 Feb
- 2024 12:21:12 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a81:6d8d:0:b0:608:801a:e66e with SMTP id
+ i135-20020a816d8d000000b00608801ae66emr185636ywc.3.1708720955355; Fri, 23 Feb
+ 2024 12:42:35 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 23 Feb 2024 12:21:04 -0800
-In-Reply-To: <20240223202104.3330974-1-seanjc@google.com>
+Date: Fri, 23 Feb 2024 12:42:25 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240223202104.3330974-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240223202104.3330974-4-seanjc@google.com>
-Subject: [PATCH v2 3/3] KVM: VMX: Combine "check" and "get" APIs for
- passthrough MSR lookups
+Message-ID: <20240223204233.3337324-1-seanjc@google.com>
+Subject: [PATCH 0/8] KVM: SVM: Clean up VMRUN=>#VMEXIT assembly
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Dongli Zhang <dongli.zhang@oracle.com>
+	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, 
+	Alexey Kardashevskiy <aik@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Combine possible_passthrough_msr_slot() and is_valid_passthrough_msr()
-into a single function, vmx_get_passthrough_msr_slot(), and have the
-combined helper return the slot on success, using a negative value to
-indicate "failure".
+Clean up SVM's enter/exit assembly code so that it can be compiled
+without OBJECT_FILES_NON_STANDARD.  The "standard" __svm_vcpu_run() can't
+be made 100% bulletproof, as RBP isn't restored on #VMEXIT, but that's
+also the case for __vmx_vcpu_run(), and getting "close enough" is better
+than not even trying.
 
-Combining the operations avoids iterating over the array of passthrough
-MSRs twice for relevant MSRs.
+As for SEV-ES, after yet another refresher on swap types, I realized KVM
+can simply let the hardware restore registers after #VMEXIT, all that's
+missing is storing the current values to the host save area (I learned the
+hard way that they are swap Type B, *sigh*).  Unless I'm missing something,
+this provides 100% accuracy when using stack frames for unwinding, and
+requires less assembly (though probably not fewer code bytes; I didn't check).
 
-Suggested-by: Dongli Zhang <dongli.zhang@oracle.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 63 +++++++++++++++++-------------------------
- 1 file changed, 25 insertions(+), 38 deletions(-)
+In between, build the SEV-ES code iff CONFIG_KVM_AMD_SEV=y, and yank out
+"support" for 32-bit kernels, which was unncessarily polluting the code.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 014cf47dc66b..969fd3aa0da3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -658,25 +658,14 @@ static inline bool cpu_need_virtualize_apic_accesses(struct kvm_vcpu *vcpu)
- 	return flexpriority_enabled && lapic_in_kernel(vcpu);
- }
- 
--static int possible_passthrough_msr_slot(u32 msr)
-+static int vmx_get_passthrough_msr_slot(u32 msr)
- {
--	u32 i;
--
--	for (i = 0; i < ARRAY_SIZE(vmx_possible_passthrough_msrs); i++)
--		if (vmx_possible_passthrough_msrs[i] == msr)
--			return i;
--
--	return -ENOENT;
--}
--
--static bool is_valid_passthrough_msr(u32 msr)
--{
--	bool r;
-+	int i;
- 
- 	switch (msr) {
- 	case 0x800 ... 0x8ff:
- 		/* x2APIC MSRs. These are handled in vmx_update_msr_bitmap_x2apic() */
--		return true;
-+		return -ENOENT;
- 	case MSR_IA32_RTIT_STATUS:
- 	case MSR_IA32_RTIT_OUTPUT_BASE:
- 	case MSR_IA32_RTIT_OUTPUT_MASK:
-@@ -691,14 +680,16 @@ static bool is_valid_passthrough_msr(u32 msr)
- 	case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
- 	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
- 		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
--		return true;
-+		return -ENOENT;
- 	}
- 
--	r = possible_passthrough_msr_slot(msr) != -ENOENT;
--
--	WARN(!r, "Invalid MSR %x, please adapt vmx_possible_passthrough_msrs[]", msr);
-+	for (i = 0; i < ARRAY_SIZE(vmx_possible_passthrough_msrs); i++) {
-+		if (vmx_possible_passthrough_msrs[i] == msr)
-+			return i;
-+	}
- 
--	return r;
-+	WARN(1, "Invalid MSR %x, please adapt vmx_possible_passthrough_msrs[]", msr);
-+	return -ENOENT;
- }
- 
- struct vmx_uret_msr *vmx_find_uret_msr(struct vcpu_vmx *vmx, u32 msr)
-@@ -3954,6 +3945,7 @@ void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
-+	int idx;
- 
- 	if (!cpu_has_vmx_msr_bitmap())
- 		return;
-@@ -3963,16 +3955,13 @@ void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
- 	/*
- 	 * Mark the desired intercept state in shadow bitmap, this is needed
- 	 * for resync when the MSR filters change.
--	*/
--	if (is_valid_passthrough_msr(msr)) {
--		int idx = possible_passthrough_msr_slot(msr);
--
--		if (idx != -ENOENT) {
--			if (type & MSR_TYPE_R)
--				clear_bit(idx, vmx->shadow_msr_intercept.read);
--			if (type & MSR_TYPE_W)
--				clear_bit(idx, vmx->shadow_msr_intercept.write);
--		}
-+	 */
-+	idx = vmx_get_passthrough_msr_slot(msr);
-+	if (idx >= 0) {
-+		if (type & MSR_TYPE_R)
-+			clear_bit(idx, vmx->shadow_msr_intercept.read);
-+		if (type & MSR_TYPE_W)
-+			clear_bit(idx, vmx->shadow_msr_intercept.write);
- 	}
- 
- 	if ((type & MSR_TYPE_R) &&
-@@ -3998,6 +3987,7 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
-+	int idx;
- 
- 	if (!cpu_has_vmx_msr_bitmap())
- 		return;
-@@ -4008,15 +3998,12 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
- 	 * Mark the desired intercept state in shadow bitmap, this is needed
- 	 * for resync when the MSR filter changes.
- 	*/
--	if (is_valid_passthrough_msr(msr)) {
--		int idx = possible_passthrough_msr_slot(msr);
--
--		if (idx != -ENOENT) {
--			if (type & MSR_TYPE_R)
--				set_bit(idx, vmx->shadow_msr_intercept.read);
--			if (type & MSR_TYPE_W)
--				set_bit(idx, vmx->shadow_msr_intercept.write);
--		}
-+	idx = vmx_get_passthrough_msr_slot(msr);
-+	if (idx >= 0) {
-+		if (type & MSR_TYPE_R)
-+			set_bit(idx, vmx->shadow_msr_intercept.read);
-+		if (type & MSR_TYPE_W)
-+			set_bit(idx, vmx->shadow_msr_intercept.write);
- 	}
- 
- 	if (type & MSR_TYPE_R)
+I'm pretty sure I actually managed to test all of this, thanks to the SEV-ES
+smoke selftests, and a bit of hacking to disable V_SPEC_CTRL, passthrough
+SPEC_CTRL unconditionally, and have the selftests W/R SPEC_CTRL from its
+guest.
+
+Sean Christopherson (8):
+  KVM: SVM: Create a stack frame in __svm_vcpu_run() for unwinding
+  KVM: SVM: Wrap __svm_sev_es_vcpu_run() with #ifdef CONFIG_KVM_AMD_SEV
+  KVM: SVM: Drop 32-bit "support" from __svm_sev_es_vcpu_run()
+  KVM: SVM: Clobber RAX instead of RBX when discarding
+    spec_ctrl_intercepted
+  KVM: SVM: Save/restore non-volatile GPRs in SEV-ES VMRUN via host save
+    area
+  KVM: SVM: Save/restore args across SEV-ES VMRUN via host save area
+  KVM: SVM: Create a stack frame in __svm_sev_es_vcpu_run()
+  KVM: x86: Stop compiling vmenter.S with OBJECT_FILES_NON_STANDARD
+
+ arch/x86/kvm/Makefile      |  4 --
+ arch/x86/kvm/svm/svm.c     | 17 ++++---
+ arch/x86/kvm/svm/svm.h     |  3 +-
+ arch/x86/kvm/svm/vmenter.S | 97 +++++++++++++++++---------------------
+ 4 files changed, 56 insertions(+), 65 deletions(-)
+
+
+base-commit: ec1e3d33557babed2c2c2c7da6e84293c2f56f58
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
