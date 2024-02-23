@@ -1,115 +1,114 @@
-Return-Path: <kvm+bounces-9529-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9530-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC0B28615DD
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 16:32:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F3AF86164D
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 16:51:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 435E31F256E9
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 15:32:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E5B11C216DB
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 15:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DEC82897;
-	Fri, 23 Feb 2024 15:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5DA405C7;
+	Fri, 23 Feb 2024 15:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wdja1/in"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SMu7yjw3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F1F81AC6
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 15:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81A68288F
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 15:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708702334; cv=none; b=bFytEaVw1ibbwcRslt/0iLXVPJbouvtDZlpoJ6nwj7LQCu2v652eVvLfYIg7uP+LI0WkuGXJpommIBMes9myzXHt0X05EEyb7llUKPV72/Ix7G7fm9UDaEk9WkXTBWq7IfONy7e/rCyR6W4K/mGsbNS47tX5QK1SMsqiH+Jy+xc=
+	t=1708703495; cv=none; b=Dk7P9+5q7qFaAB6eU6ejwHojgrhiyTwFQ3UT7TTUYonEd9Lw3oymHJ/m4I6AN/w7VqrqVzzky+5p4GgT9uIqfROMt/FU0vDTev9IPbat3poZW78D0Qn3WrswpGDrtNaQ2zSYZssxuc/sLQUH/nGeXFFF3ige4EHmOMQ+tptL42w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708702334; c=relaxed/simple;
-	bh=ltXfiFuoTEtZlQ375zaRTODYeS+HobqFtlM+RXnHddQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AIJk7XtaC5NeXdZw9wBvGgZfKQo1jcfMNJJZBbUx7YdMWkZgrqa/5h1Cw0o0+pUadMaPPMRsfgB1v7wR40C8dI8l353ueBGUVSglptRMGVCzcCJ5X1UhO42Hug/keSPlApx5cuWUVKXfSe7eCYstBdbtU/Wb5DKCZ1dqvWm6C9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wdja1/in; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708702331;
+	s=arc-20240116; t=1708703495; c=relaxed/simple;
+	bh=h0zA9WdQU74HCMfHbY1PNi3WkSqUAxRSW4xoqvVnwQw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=dlr+kk2PRlPExd0tLEY4SRy3lOoQ16ACN8WK2Ds/JQIG84Zo6zZK16gkW26qLvYxsPB8axrnZlQxKD+H6r89kNZBycghB1+UGerqgAwvuSx/XIV6e1USnI9vHFGyHmnKU7Wg/jHmbCHueAZ8ZW8B8vm2KgxxVwRhPlhnDk9EFak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SMu7yjw3; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708703490;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ltXfiFuoTEtZlQ375zaRTODYeS+HobqFtlM+RXnHddQ=;
-	b=Wdja1/inM4QaLMLmP/B8dNsQKBEkCFbfIWl+djAp2J7Y9fhTJ+sbwnBm964VGBfy+rEcLs
-	AYr4dpXO9YVqwMq/hH5oHr+Pdk/PA2jUWhy4RMnEZpDgU09rQH3vHMIg+R6oy93fA8I1A+
-	jRKuPd62a3iZzW1ERDl7XiN24ICYHF8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-r5AyQHCRMOysG55kobEtYw-1; Fri, 23 Feb 2024 10:32:08 -0500
-X-MC-Unique: r5AyQHCRMOysG55kobEtYw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33d9fe87c4aso473720f8f.1
-        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 07:32:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708702327; x=1709307127;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ltXfiFuoTEtZlQ375zaRTODYeS+HobqFtlM+RXnHddQ=;
-        b=wUFPGEOq8LGE2q3zSmbJ/8mToNVQthJKvYWwQgEA+e5smZh7bkCPq0CkKVUsF4aAVu
-         MENZnTNPWfKUPEiS5RHCl0cq9k5NJkYe94u7VbmXW6gwMTF0EBwD8Mv0OlbBvntSrSOb
-         1H2L14tFEO+LURSd2q1MI4IbZoPlPi+9cxC+y7zhe77Pbl1P+tXf81D3LlXqMSUKsFVw
-         /Nbh/yLtsYODtoMb6RPXFI21ISu79MoJK5Duml3E0Z2LhMJ2UC//Jwzygalyc5ZjnUbK
-         m0bD73w042YPO0J0CBiyAdIl2bJf32XV1yu87JdK0EiHXNhhyenXhYYP3gW8DWr7iVNP
-         Wi2A==
-X-Gm-Message-State: AOJu0YzfL02wTLhAbwYbCXuxPN77tiLmxWCgWdH5+zkuvRPbtDzHRsai
-	6TCF9+wKSiVCuKLtXGiANsYztaZtTzDQQydtXWTqiLNGoiyp9d2LpyJveVR/o+ijCsHDiIzrcbu
-	/815r5xiN6Y+gp+qwWC4lWMQ5zzB2TUQt1KzMcbsmDLpw6LYmKwPqrWTQxGpqwJsHc8oHwL4798
-	1H1THBKrVY/TN3TY9nEyaSxWm0
-X-Received: by 2002:adf:e511:0:b0:33d:5ae5:f356 with SMTP id j17-20020adfe511000000b0033d5ae5f356mr94657wrm.20.1708702327598;
-        Fri, 23 Feb 2024 07:32:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGLm2G66Tw4sgodVUIb9Jzv+TjNHaof3FgriahBQfesSvJsXof4hqEVZ82kEIdVUXv/1jq4kYYkRea+6qJNwbM=
-X-Received: by 2002:adf:e511:0:b0:33d:5ae5:f356 with SMTP id
- j17-20020adfe511000000b0033d5ae5f356mr94647wrm.20.1708702327323; Fri, 23 Feb
- 2024 07:32:07 -0800 (PST)
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=o+jaWAifqARW9h/jbOW/BR9w2AzoLYKV+yoHHEw++Hw=;
+	b=SMu7yjw3rzx0a5YNl0TjMpOhPVWStiYBeIxdTzOvK5yoXxTsDGzE5+k7MjydoHGob6H2bK
+	kVI365vOYhrGL9CTxn6Zn5KpSuNahZQUop61BhzfbiOc4tM6b/92UxidCfC3ArQKoscru0
+	n8EZnK1nE7rrX6S/Q79G7RTtVh/cWZo=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: alexandru.elisei@arm.com,
+	eric.auger@redhat.com,
+	nikos.nikoleris@arm.com,
+	shahuang@redhat.com,
+	pbonzini@redhat.com,
+	thuth@redhat.com
+Subject: [kvm-unit-tests PATCH 00/14] arm64: EFI improvements
+Date: Fri, 23 Feb 2024 16:51:26 +0100
+Message-ID: <20240223155125.368512-16-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216155941.2029458-1-oliver.upton@linux.dev>
-In-Reply-To: <20240216155941.2029458-1-oliver.upton@linux.dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 23 Feb 2024 16:31:55 +0100
-Message-ID: <CABgObfYZBnTjXh4TqH77HjO3zTMRfekaorTUVqQoFOMPJLjJTg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: Get rid of return value from kvm_arch_create_vm_debugfs()
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, 
-	Sean Christopherson <seanjc@google.com>, linuxppc-dev@lists.ozlabs.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Marc Zyngier <maz@kernel.org>, Sebastian Ene <sebastianene@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Feb 16, 2024 at 5:00=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> The general expectation with debugfs is that any initialization failure
-> is nonfatal. Nevertheless, kvm_arch_create_vm_debugfs() allows
-> implementations to return an error and kvm_create_vm_debugfs() allows
-> that to fail VM creation.
->
-> Change to a void return to discourage architectures from making debugfs
-> failures fatal for the VM. Seems like everyone already had the right
-> idea, as all implementations already return 0 unconditionally.
->
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+This series collects one fix ("Update MAX_SMP probe") with a bunch of
+improvements to the EFI setup code and run script. With the series
+applied one can add --enable-efi-direct when configuring and then
+run the EFI tests on QEMU much, much faster by using direct kernel
+boot for them (and environment variables will work too). The non-
+direct (original) way of running the EFI tests has also been sped up
+a bit by not running the dummy test and not generating the dtb twice.
+The cleanups in the setup code allow duplicated code to be removed
+(by sharing with the non-EFI setup code) and eventually for riscv
+to share some code too with the introduction of memregions_efi_init().
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Thanks,
+drew
 
-Feel free to place it in kvm-arm.
 
-Paolo
+Andrew Jones (13):
+  runtime: Update MAX_SMP probe
+  runtime: Add yet another 'no kernel' error message
+  arm64: efi: Don't create dummy test
+  arm64: efi: Remove redundant dtb generation
+  arm64: efi: Move run code into a function
+  arm64: efi: Remove EFI_USE_DTB
+  arm64: efi: Improve device tree discovery
+  lib/efi: Add support for loading the initrd
+  arm64: efi: Allow running tests directly
+  arm/arm64: Factor out some initial setup
+  arm/arm64: Factor out allocator init from mem_init
+  arm64: Simplify efi_mem_init
+  arm64: Add memregions_efi_init
+
+Shaoqin Huang (1):
+  arm64: efi: Make running tests on EFI can be parallel
+
+ arm/efi/run          |  65 ++++++++-----
+ arm/run              |   6 +-
+ configure            |  17 ++++
+ lib/arm/setup.c      | 223 +++++++++++++++++--------------------------
+ lib/efi.c            |  93 +++++++++++++++---
+ lib/efi.h            |   3 +-
+ lib/linux/efi.h      |  29 ++++++
+ lib/memregions.c     |  57 +++++++++++
+ lib/memregions.h     |   5 +
+ run_tests.sh         |   5 +-
+ scripts/runtime.bash |  21 ++--
+ 11 files changed, 343 insertions(+), 181 deletions(-)
+
+-- 
+2.43.0
 
 
