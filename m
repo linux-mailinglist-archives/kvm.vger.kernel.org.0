@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-9537-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9538-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AEEB861656
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 16:52:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6F2861657
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 16:52:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAC2F1F25FAA
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 15:52:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA45E1C2495B
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 15:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B724882D84;
-	Fri, 23 Feb 2024 15:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC0C83CA8;
+	Fri, 23 Feb 2024 15:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XpIEBOdb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tIsZsxx1"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508F682D6D
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 15:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6160583A0F
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 15:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708703535; cv=none; b=PmrZr1BD3BpYcq6wXSkeWLBlUsloA1O/X0MiUgjlo6bhN2MQm5aefupvl406A/FQsRG4F0XMVkokD5BMT+kLHI4OmKclYyE+wKoAsMaf54JPe0vS0Rpvz6w+b/J0FDBRQQnshu0Zgi+h5kqjlVwuRWo+qCnP9SqIpGkbftxa1ws=
+	t=1708703539; cv=none; b=adyap6Rb8M1czrnus/cQY2OqUIuNWgBmpd+AgIgDqrjiQpdLuJnsvwEmXDXq+Z2VOfcAFuKuLnED03Zd/0UFqB2DHZqo04cVIi/NkawuyLJ1SHZuleTPSJuIhvHxO+kozUL41l+b4xS1OWH3fm1ciwBStLRPUEI1KoILSxBP0ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708703535; c=relaxed/simple;
-	bh=pbhRCFWKrwLmCtktpDAGcl7va/xUmhq1PnDLXV/IAw4=;
+	s=arc-20240116; t=1708703539; c=relaxed/simple;
+	bh=mXnxA8GpBHOStiU9ED8il/47Ba3BP3xeZUtQkc10dcQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=QgmX7Nnd2FGUbnUu1uFKwbTAegBvOgA+kRTwDq0OY7FvbkntXZhdfG+UTUL3cVkAxosSuLTp7vgO6zf+3HO5XYQ0gAVOe3iFw25Zc79TPyj2G0ZxS9hdy3Yszr825/AbTreKyXIl10UMT1Gv06fRgz3Nb0TU13GQqo5Hm8CfZRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XpIEBOdb; arc=none smtp.client-ip=91.218.175.189
+	 MIME-Version:Content-type; b=EUcRTz0FmrUqvvk9pMjMtBt8994fwle6LG70Yn6GErbtqOubzzxageuMCGroW88Kk2D8kpYbuU1syuA/FCuGToaKKh89pAXNCNq/sW8BQY8Zdr3k5eoNH41EfZV+7FXf4ei0Ir7GvOHLk80jxbs8Yul85dJNVaohTxBE4FQSYvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tIsZsxx1; arc=none smtp.client-ip=95.215.58.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708703531;
+	t=1708703534;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RhisSx5x/V7b9Y0kHLu8YVQTirjJ97CAwr4agFIIB1Y=;
-	b=XpIEBOdbXXUZz9GBnf+YnwPnuelMz0R6AIyG3MoHt6rcR3vOruHZCgq7ZXWFwRyXA6J31l
-	6WfVy31xHZfbN/A02bnGHDwTJw9KPGGX+BA8IIy0eM3m5RBq15e0+8KC2EIYSJGrdOl9WW
-	1MOO9/gx9NfcHxTjJezk2bi8tnPaQ+0=
+	bh=dIhBoE+ztxgrIn9LX6XotPKIWxQt8o1cjxufO8kGC80=;
+	b=tIsZsxx1YDpyhEv348ww4GOLdc/GMnYpTLb3ZZ6ydraBUG5cjzw5yBk5tgnIfU7ACM5WKb
+	i5DwqE4vNJdW2suldTQ7DOikWBMhL8VIPbO1kzgyfuMZsazBJcbMvSmDtl/PuTLiswFQKT
+	1VTyMKYTj/MTCe2VTZ8m7LPWaNYIPQw=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -51,9 +51,9 @@ Cc: alexandru.elisei@arm.com,
 	shahuang@redhat.com,
 	pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH 07/14] arm64: efi: Remove EFI_USE_DTB
-Date: Fri, 23 Feb 2024 16:51:33 +0100
-Message-ID: <20240223155125.368512-23-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 08/14] arm64: efi: Improve device tree discovery
+Date: Fri, 23 Feb 2024 16:51:34 +0100
+Message-ID: <20240223155125.368512-24-andrew.jones@linux.dev>
 In-Reply-To: <20240223155125.368512-16-andrew.jones@linux.dev>
 References: <20240223155125.368512-16-andrew.jones@linux.dev>
 Precedence: bulk
@@ -66,36 +66,124 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-We don't need two variables for one boolean property. Just use
-!EFI_USE_ACPI to infer efi-use-dtb.
+Zero is a valid address for the device tree so add an fdt_valid data
+member to determine when the address is valid or not. Also, check the
+device tree GUID when the environment variable is missing. The latter
+change allows directly loading the unit test with QEMU's '-kernel'
+command line parameter, which is much faster than putting the test
+in the EFI file system and then running it from the UEFI shell.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- arm/efi/run | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ lib/arm/setup.c |  3 ++-
+ lib/efi.c       | 28 +++++++++++++++++-----------
+ lib/efi.h       |  3 ++-
+ lib/linux/efi.h |  2 ++
+ 4 files changed, 23 insertions(+), 13 deletions(-)
 
-diff --git a/arm/efi/run b/arm/efi/run
-index 494ba9e7efe7..b7a8418a07f8 100755
---- a/arm/efi/run
-+++ b/arm/efi/run
-@@ -27,8 +27,6 @@ fi
- : "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
- : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
- 
--[ "$EFI_USE_ACPI" = "y" ] || EFI_USE_DTB=y
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 0382cbdaf5a1..76aae4627a7b 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -342,7 +342,8 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+ 		}
+ 		memregions_add(&r);
+ 	}
+-	if (fdt) {
++
++	if (efi_bootinfo->fdt_valid) {
+ 		/* Move the FDT to the base of free memory */
+ 		fdt_size = fdt_totalsize(fdt);
+ 		ret = fdt_move(fdt, (void *)free_mem_start, fdt_size);
+diff --git a/lib/efi.c b/lib/efi.c
+index d94f0fa16fc0..0785bd3e8916 100644
+--- a/lib/efi.c
++++ b/lib/efi.c
+@@ -6,13 +6,13 @@
+  *
+  * SPDX-License-Identifier: LGPL-2.0-or-later
+  */
 -
- if [ ! -f "$EFI_UEFI" ]; then
- 	echo "UEFI firmware not found."
- 	echo "Please specify the path with the env variable EFI_UEFI"
-@@ -68,7 +66,7 @@ uefi_shell_run()
- 	mkdir -p "$EFI_CASE_DIR"
- 	cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
- 	echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
--	if [ "$EFI_USE_DTB" = "y" ]; then
-+	if [ "$EFI_USE_ACPI" != "y" ]; then
- 		qemu_args+=(-machine acpi=off)
- 		FDT_BASENAME="dtb"
- 		UEFI_SHELL_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}"
+-#include "efi.h"
++#include <libcflat.h>
+ #include <argv.h>
+-#include <stdlib.h>
+ #include <ctype.h>
+-#include <libcflat.h>
++#include <stdlib.h>
+ #include <asm/setup.h>
++#include "efi.h"
++#include "libfdt/libfdt.h"
+ 
+ /* From lib/argv.c */
+ extern int __argc, __envc;
+@@ -283,18 +283,24 @@ static void* efi_get_var(efi_handle_t handle, struct efi_loaded_image_64 *image,
+ 	return val;
+ }
+ 
+-static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
++static bool efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image, void **fdt)
+ {
+ 	efi_char16_t var[] = ENV_VARNAME_DTBFILE;
+ 	efi_char16_t *val;
+-	void *fdt = NULL;
+-	int fdtsize;
++	int fdtsize = 0;
++
++	*fdt = NULL;
+ 
+ 	val = efi_get_var(handle, image, var);
+-	if (val)
+-		efi_load_image(handle, image, &fdt, &fdtsize, val);
++	if (val) {
++		efi_load_image(handle, image, fdt, &fdtsize, val);
++		if (fdtsize == 0)
++			return false;
++	} else if (efi_get_system_config_table(DEVICE_TREE_GUID, fdt) != EFI_SUCCESS) {
++		return false;
++	}
+ 
+-	return fdt;
++	return fdt_check_header(*fdt) == 0;
+ }
+ 
+ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+@@ -335,7 +341,7 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+ 	}
+ 	setup_args(cmdline_ptr);
+ 
+-	efi_bootinfo.fdt = efi_get_fdt(handle, image);
++	efi_bootinfo.fdt_valid = efi_get_fdt(handle, image, &efi_bootinfo.fdt);
+ 	/* Set up efi_bootinfo */
+ 	efi_bootinfo.mem_map.map = &map;
+ 	efi_bootinfo.mem_map.map_size = &map_size;
+diff --git a/lib/efi.h b/lib/efi.h
+index db46d45068ee..4bd01f7199ce 100644
+--- a/lib/efi.h
++++ b/lib/efi.h
+@@ -30,7 +30,8 @@
+  */
+ typedef struct {
+ 	struct efi_boot_memmap mem_map;
+-	const void *fdt;
++	void *fdt;
++	bool fdt_valid;
+ } efi_bootinfo_t;
+ 
+ efi_status_t _relocate(long ldbase, Elf64_Dyn *dyn, efi_handle_t handle,
+diff --git a/lib/linux/efi.h b/lib/linux/efi.h
+index 410f0b1a0da1..92d798f79767 100644
+--- a/lib/linux/efi.h
++++ b/lib/linux/efi.h
+@@ -66,6 +66,8 @@ typedef guid_t efi_guid_t;
+ #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+ #define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
+ 
++#define DEVICE_TREE_GUID EFI_GUID(0xb1b621d5, 0xf19c, 0x41a5,  0x83, 0x0b, 0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0)
++
+ #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
+ 
+ typedef struct {
 -- 
 2.43.0
 
