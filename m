@@ -1,71 +1,112 @@
-Return-Path: <kvm+bounces-9603-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73BE86261F
-	for <lists+kvm@lfdr.de>; Sat, 24 Feb 2024 17:49:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF5C8629BB
+	for <lists+kvm@lfdr.de>; Sun, 25 Feb 2024 09:39:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24BCA1C20E19
-	for <lists+kvm@lfdr.de>; Sat, 24 Feb 2024 16:49:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F37E1C20C23
+	for <lists+kvm@lfdr.de>; Sun, 25 Feb 2024 08:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B3F41A87;
-	Sat, 24 Feb 2024 16:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B255EF4E2;
+	Sun, 25 Feb 2024 08:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HudwQ5Er"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BQEM2CEG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1E612B69;
-	Sat, 24 Feb 2024 16:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1622BDF4E
+	for <kvm@vger.kernel.org>; Sun, 25 Feb 2024 08:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708793340; cv=none; b=PLyhDPT5xOLhmgR03oTLHk7LlyY2Bz1vanQUXOD8dmembe9Y/ueCukNTf8IoabYNnBby4SCFq3mNkft2lFhWcwZ3UMuoZCjPT5zXvx4exTGF0sxdxtsJ+Haj3wztkK8S+GF+XvN2wIx17wCEnSXvdT4ncxKD8qRHmyC/1bSFxFE=
+	t=1708850341; cv=none; b=U3z2A+aAeavECoqayPMKSda7fPI+ngjWp/HxM8BBDEBep9UUOlCV+SmuPp6I2dhRm3sToAa7Cjug76reU/92tZcTwLvrDdggSQbuyAEeaKmfFyLQpOEyowUP+hiBSiHd85E45AIAD7K3ZWHM89nBbRXWDSk5KYb6DeYiQ8kyzqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708793340; c=relaxed/simple;
-	bh=F6MSB9VABa4MbtFG0Ul6QlwES73vt/bIlHb9ZQ2Si5I=;
+	s=arc-20240116; t=1708850341; c=relaxed/simple;
+	bh=XwoBp/lZSU/lG0USQah8IAohQuQR3IGwBy6XblKxmT0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z9AlS4zZ6WYJMxZN50uW9CbNs5FKVu6aCd95g+vDzTTxTB0lUJ1NHwCv2hemEJ+54wT/sgsqrGZ7PPpOJBW246im2a2r0vMdFPfYjpXpdIT1JdaCpevkmrpHPVIIZFb257hzmh2uC3JufQUy8NX1cAjIH/cxC37dZE9Y+ZwOONY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HudwQ5Er; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708793338; x=1740329338;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=F6MSB9VABa4MbtFG0Ul6QlwES73vt/bIlHb9ZQ2Si5I=;
-  b=HudwQ5ErbwujZVtVe3CLBJB2s4Qdzrupl9ZCmmVjN1BLi/2Rl6NVabpj
-   a/8VuNubrRPQ4LLsE9JWVlMh79jg6e5QnecikYpJRCfN0uh4jDihRirdD
-   UELfjHZVTxPFl8m3Q2Ul2GpHzPhGl4MpV9KZ4CamvReLDNLGyaYpxrIhm
-   XoQSwiMAdfWlirPUkZdJgy64xDgoG7V84qLPbSkffjiwlZ8VnSLe1O0px
-   zrCqwj5ALPYG8NC+6lgaAV+mbAbkGim1tnPni51raheYmNbsAmAqWn4sm
-   4amWg+yQH6R57rpA0JyHGvBs5kzLEdZx786iN6M9ic4d2qjknoQsX8lhT
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10994"; a="6064434"
-X-IronPort-AV: E=Sophos;i="6.06,181,1705392000"; 
-   d="scan'208";a="6064434"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2024 08:48:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,181,1705392000"; 
-   d="scan'208";a="43682090"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa001.jf.intel.com with ESMTP; 24 Feb 2024 08:48:55 -0800
-Date: Sun, 25 Feb 2024 00:44:55 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>,
-	Friedrich Weber <f.weber@proxmox.com>,
-	Kai Huang <kai.huang@intel.com>,
-	Yuan Yao <yuan.yao@linux.intel.com>
-Subject: Re: [PATCH v5] KVM: x86/mmu: Retry fault before acquiring mmu_lock
- if mapping is changing
-Message-ID: <ZdodB3YbM1bJm+wQ@yilunxu-OptiPlex-7050>
-References: <20240222012640.2820927-1-seanjc@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TY161nivAftj1TJMdmoLJ3vPypRu0Mgcc/TNbCXI/RKy6oqdvl8GCLHd/CCFpvP9we+5Kyy/B/wH89FQeFtYTlluc0ACQD5PyR/tDoT4RNRaRbgP3Xt/cZcGq2EOKmsqHPu1srJAj2lZGzp12qX6l/G8ItRYL0TrB52Hs8RDnng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BQEM2CEG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708850338;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EOMCrVzOmp4RbossCfe+/kCrx/xWG8OsrWuMVOuxeWU=;
+	b=BQEM2CEGCzKmpLYQUjwcXYhiOLkKw8KgLXzFfsHacxXs+41tDp5D5F9np96PK3v+DeAlT5
+	4lUCVyH6mxrnltkK0vbYnOvW3RxAMrxCDyeGv+zlzmfplauycxdOCDMAsjGGpCfIpBUO46
+	PAjG4wnqKUB/zGaoMBLvQ8uaQ/pTun4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-0zWGaBNoON2uuETVLdv4WQ-1; Sun, 25 Feb 2024 03:38:57 -0500
+X-MC-Unique: 0zWGaBNoON2uuETVLdv4WQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33d39bc6bf4so1193121f8f.0
+        for <kvm@vger.kernel.org>; Sun, 25 Feb 2024 00:38:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708850336; x=1709455136;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EOMCrVzOmp4RbossCfe+/kCrx/xWG8OsrWuMVOuxeWU=;
+        b=I464ATqJKSqfeuvxG5iMLrPDW0+gY8Yv9foCT9holUuSZc1xfcmRECn+ZVqSgKf1wp
+         9lG2ZMjnRYawFXr1d2r9it/38p2QXXQN2nIl78PWdl5xS/yV32LJQXC7aU9FhK89YdIN
+         UKlI0lxtYeuNpdqsCfyO+2PbFxl5wpAdt6DKpWcNPXOSXyvP2+1lsJz4hp+I74geTnwW
+         PpLSbIG+2TI7Mb3+jVQEe38hH4vn2oOOjYj3oL5Mgp9dwLkhVVf2XONRhto3ZBSL2fQc
+         3INNiNLsfxnplx4p/ZbysUnuD/BM3Lkyi2x5jux39MdK1uYJy1VQmpkmdHuypESnOZwK
+         9jpg==
+X-Forwarded-Encrypted: i=1; AJvYcCWnRsy1zOXxXSnrlthQAHEEaImNflwn7gX8LZYFDxcUGjurg3AtoOoE+Fva1U8rzsEZg2ribxvSYbmGMNdsvwxy5Pka
+X-Gm-Message-State: AOJu0YxssBNclHrnx5lJ7krRl/eZP3Hm2gxRtq3f4VhgbbWrswbMP4i2
+	H6a3dWtNkKL2sKEu+d2YEqaNnN0YWdF+B7rjegt0ZgozSaHpy5P3ns1Mc5K9Y9bpoUJoAkFmWGX
+	gmaxqxVj/YW7Oep56MSjvAVYiXouWtCifyIN2F2yxQqgCoGC+jg==
+X-Received: by 2002:adf:e9cb:0:b0:33d:9d49:cfd1 with SMTP id l11-20020adfe9cb000000b0033d9d49cfd1mr3666329wrn.34.1708850336192;
+        Sun, 25 Feb 2024 00:38:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEhK28+oXcoeTRfiKdRQ9r84bfxBvSjdNy60lSOACL0i+/V47ase4Z2bcj3vqDRsDCm11uahQ==
+X-Received: by 2002:adf:e9cb:0:b0:33d:9d49:cfd1 with SMTP id l11-20020adfe9cb000000b0033d9d49cfd1mr3666304wrn.34.1708850335736;
+        Sun, 25 Feb 2024 00:38:55 -0800 (PST)
+Received: from redhat.com ([2.52.10.44])
+        by smtp.gmail.com with ESMTPSA id bv20-20020a0560001f1400b0033d73e1505bsm4513271wrb.18.2024.02.25.00.38.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Feb 2024 00:38:54 -0800 (PST)
+Date: Sun, 25 Feb 2024 03:38:48 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-um@lists.infradead.org, netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH vhost v2 19/19] virtio_net: sq support premapped mode
+Message-ID: <20240225032330-mutt-send-email-mst@kernel.org>
+References: <20240223082726.52915-1-xuanzhuo@linux.alibaba.com>
+ <20240223082726.52915-20-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,69 +115,267 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240222012640.2820927-1-seanjc@google.com>
+In-Reply-To: <20240223082726.52915-20-xuanzhuo@linux.alibaba.com>
 
-On Wed, Feb 21, 2024 at 05:26:40PM -0800, Sean Christopherson wrote:
-> Retry page faults without acquiring mmu_lock, and without even faulting
-> the page into the primary MMU, if the resolved gfn is covered by an active
-> invalidation.  Contending for mmu_lock is especially problematic on
-> preemptible kernels as the mmu_notifier invalidation task will yield
-> mmu_lock (see rwlock_needbreak()), delay the in-progress invalidation, and
-> ultimately increase the latency of resolving the page fault.  And in the
-> worst case scenario, yielding will be accompanied by a remote TLB flush,
-> e.g. if the invalidation covers a large range of memory and vCPUs are
-> accessing addresses that were already zapped.
+On Fri, Feb 23, 2024 at 04:27:26PM +0800, Xuan Zhuo wrote:
+> If the xsk is enabling, the xsk tx will share the send queue.
+> But the xsk requires that the send queue use the premapped mode.
+> So the send queue must support premapped mode.
 > 
-> Faulting the page into the primary MMU is similarly problematic, as doing
-> so may acquire locks that need to be taken for the invalidation to
-> complete (the primary MMU has finer grained locks than KVM's MMU), and/or
-> may cause unnecessary churn (getting/putting pages, marking them accessed,
-> etc).
+> cmd:
+>     sh samples/pktgen/pktgen_sample01_simple.sh -i eth0 \
+>         -s 16 -d 10.0.0.128 -m 00:16:3e:2c:c8:2e -n 0 -p 100
+> CPU:
+>     Intel(R) Xeon(R) Platinum 8369B CPU @ 2.70GHz
 > 
-> Alternatively, the yielding issue could be mitigated by teaching KVM's MMU
-> iterators to perform more work before yielding, but that wouldn't solve
-> the lock contention and would negatively affect scenarios where a vCPU is
-> trying to fault in an address that is NOT covered by the in-progress
-> invalidation.
+> Machine:
+>     ecs.g7.2xlarge(Aliyun)
 > 
-> Add a dedicated lockess version of the range-based retry check to avoid
-> false positives on the sanity check on start+end WARN, and so that it's
-> super obvious that checking for a racing invalidation without holding
-> mmu_lock is unsafe (though obviously useful).
+> before:              1600010.00
+> after(no-premapped): 1599966.00
+> after(premapped):    1600014.00
 > 
-> Wrap mmu_invalidate_in_progress in READ_ONCE() to ensure that pre-checking
-> invalidation in a loop won't put KVM into an infinite loop, e.g. due to
-> caching the in-progress flag and never seeing it go to '0'.
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/net/virtio_net.c | 136 +++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 132 insertions(+), 4 deletions(-)
 > 
-> Force a load of mmu_invalidate_seq as well, even though it isn't strictly
-> necessary to avoid an infinite loop, as doing so improves the probability
-> that KVM will detect an invalidation that already completed before
-> acquiring mmu_lock and bailing anyways.
-> 
-> Do the pre-check even for non-preemptible kernels, as waiting to detect
-> the invalidation until mmu_lock is held guarantees the vCPU will observe
-> the worst case latency in terms of handling the fault, and can generate
-> even more mmu_lock contention.  E.g. the vCPU will acquire mmu_lock,
-> detect retry, drop mmu_lock, re-enter the guest, retake the fault, and
-> eventually re-acquire mmu_lock.  This behavior is also why there are no
-> new starvation issues due to losing the fairness guarantees provided by
-> rwlocks: if the vCPU needs to retry, it _must_ drop mmu_lock, i.e. waiting
-> on mmu_lock doesn't guarantee forward progress in the face of _another_
-> mmu_notifier invalidation event.
-> 
-> Note, adding READ_ONCE() isn't entirely free, e.g. on x86, the READ_ONCE()
-> may generate a load into a register instead of doing a direct comparison
-> (MOV+TEST+Jcc instead of CMP+Jcc), but practically speaking the added cost
-> is a few bytes of code and maaaaybe a cycle or three.
-> 
-> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-> Closes: https://lore.kernel.org/all/ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.com
-> Reported-by: Friedrich Weber <f.weber@proxmox.com>
-> Cc: Kai Huang <kai.huang@intel.com>
-> Cc: Yan Zhao <yan.y.zhao@intel.com>
-> Cc: Yuan Yao <yuan.yao@linux.intel.com>
-> Cc: Xu Yilun <yilun.xu@linux.intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 7715bb7032ec..b83ef6afc4fb 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -146,6 +146,25 @@ struct virtnet_rq_dma {
+>  	u16 need_sync;
+>  };
+>  
+> +struct virtnet_sq_dma {
+> +	union {
+> +		struct virtnet_sq_dma *next;
+> +		void *data;
+> +	};
+> +
+> +	u32 num;
+> +
+> +	dma_addr_t addr[MAX_SKB_FRAGS + 2];
+> +	u32 len[MAX_SKB_FRAGS + 2];
+> +};
+> +
+> +struct virtnet_sq_dma_head {
+> +	/* record for kfree */
+> +	void *p;
+> +
+> +	struct virtnet_sq_dma *free;
+> +};
+> +
+>  /* Internal representation of a send virtqueue */
+>  struct send_queue {
+>  	/* Virtqueue associated with this send _queue */
+> @@ -165,6 +184,8 @@ struct send_queue {
+>  
+>  	/* Record whether sq is in reset state. */
+>  	bool reset;
+> +
+> +	struct virtnet_sq_dma_head dmainfo;
+>  };
+>  
+>  /* Internal representation of a receive virtqueue */
+> @@ -368,6 +389,95 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
+>  	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
+>  }
+>  
+> +static struct virtnet_sq_dma *virtnet_sq_unmap(struct send_queue *sq, void **data)
+> +{
+> +	struct virtnet_sq_dma *d;
+> +	int i;
+> +
+> +	d = *data;
+> +	*data = d->data;
+> +
+> +	for (i = 0; i < d->num; ++i)
+> +		virtqueue_dma_unmap_page_attrs(sq->vq, d->addr[i], d->len[i],
+> +					       DMA_TO_DEVICE, 0);
+> +
+> +	d->next = sq->dmainfo.free;
+> +	sq->dmainfo.free = d;
+> +
+> +	return d;
+> +}
+> +
+> +static struct virtnet_sq_dma *virtnet_sq_map_sg(struct send_queue *sq,
+> +						int nents, void *data)
+> +{
+> +	struct virtnet_sq_dma *d;
+> +	struct scatterlist *sg;
+> +	int i;
+> +
+> +	if (!sq->dmainfo.free)
+> +		return NULL;
+> +
+> +	d = sq->dmainfo.free;
+> +	sq->dmainfo.free = d->next;
+> +
+> +	for_each_sg(sq->sg, sg, nents, i) {
+> +		if (virtqueue_dma_map_sg_attrs(sq->vq, sg, DMA_TO_DEVICE, 0))
+> +			goto err;
+> +
+> +		d->addr[i] = sg->dma_address;
+> +		d->len[i] = sg->length;
+> +	}
+> +
+> +	d->data = data;
+> +	d->num = i;
+> +	return d;
+> +
+> +err:
+> +	d->num = i;
+> +	virtnet_sq_unmap(sq, (void **)&d);
+> +	return NULL;
+> +}
 
-Reviewed-by: Xu Yilun <yilun.xu@linux.intel.com>
+
+Do I see a reimplementation of linux/llist.h here?
+
+
+> +
+> +static int virtnet_add_outbuf(struct send_queue *sq, u32 num, void *data)
+> +{
+> +	int ret;
+> +
+> +	if (sq->vq->premapped) {
+> +		data = virtnet_sq_map_sg(sq, num, data);
+> +		if (!data)
+> +			return -ENOMEM;
+> +	}
+> +
+> +	ret = virtqueue_add_outbuf(sq->vq, sq->sg, num, data, GFP_ATOMIC);
+> +	if (ret && sq->vq->premapped)
+> +		virtnet_sq_unmap(sq, &data);
+> +
+> +	return ret;
+> +}
+> +
+> +static int virtnet_sq_init_dma_mate(struct send_queue *sq)
+
+Mate? The popular south african drink?
+
+> +{
+> +	struct virtnet_sq_dma *d;
+> +	int num, i;
+> +
+> +	num = virtqueue_get_vring_size(sq->vq);
+> +
+> +	sq->dmainfo.free = kcalloc(num, sizeof(*sq->dmainfo.free), GFP_KERNEL);
+> +	if (!sq->dmainfo.free)
+> +		return -ENOMEM;
+
+
+This could be quite a bit of memory for a large queue.  And for a bunch
+of common cases where unmap is a nop (e.g. iommu pt) this does nothing
+useful at all.  And also, this does nothing useful if PLATFORM_ACCESS is off
+which is super common.
+
+A while ago I proposed:
+- extend DMA APIs so one can query whether unmap is a nop
+  and whether sync is a nop
+- virtio wrapper taking into account PLATFORM_ACCESS too
+
+then we can save all this work and memory when not needed.
+
+
+
+> +
+> +	sq->dmainfo.p = sq->dmainfo.free;
+> +
+> +	for (i = 0; i < num; ++i) {
+> +		d = &sq->dmainfo.free[i];
+> +		d->next = d + 1;
+> +	}
+> +
+> +	d->next = NULL;
+> +
+> +	return 0;
+> +}
+> +
+>  static void __free_old_xmit(struct send_queue *sq, bool in_napi,
+>  			    struct virtnet_sq_free_stats *stats)
+>  {
+> @@ -377,6 +487,9 @@ static void __free_old_xmit(struct send_queue *sq, bool in_napi,
+>  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
+>  		++stats->packets;
+>  
+> +		if (sq->vq->premapped)
+> +			virtnet_sq_unmap(sq, &ptr);
+> +
+>  		if (!is_xdp_frame(ptr)) {
+>  			struct sk_buff *skb = ptr;
+>  
+> @@ -890,8 +1003,7 @@ static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
+>  			    skb_frag_size(frag), skb_frag_off(frag));
+>  	}
+>  
+> -	err = virtqueue_add_outbuf(sq->vq, sq->sg, nr_frags + 1,
+> -				   xdp_to_ptr(xdpf), GFP_ATOMIC);
+> +	err = virtnet_add_outbuf(sq, nr_frags + 1, xdp_to_ptr(xdpf));
+>  	if (unlikely(err))
+>  		return -ENOSPC; /* Caller handle free/refcnt */
+>  
+> @@ -2357,7 +2469,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
+>  			return num_sg;
+>  		num_sg++;
+>  	}
+> -	return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_ATOMIC);
+> +	return virtnet_add_outbuf(sq, num_sg, skb);
+>  }
+>  
+>  static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+> @@ -4166,6 +4278,8 @@ static void virtnet_free_queues(struct virtnet_info *vi)
+>  	for (i = 0; i < vi->max_queue_pairs; i++) {
+>  		__netif_napi_del(&vi->rq[i].napi);
+>  		__netif_napi_del(&vi->sq[i].napi);
+> +
+> +		kfree(vi->sq[i].dmainfo.p);
+>  	}
+>  
+>  	/* We called __netif_napi_del(),
+> @@ -4214,6 +4328,15 @@ static void free_receive_page_frags(struct virtnet_info *vi)
+>  
+>  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
+>  {
+> +	struct virtnet_info *vi = vq->vdev->priv;
+> +	struct send_queue *sq;
+> +	int i = vq2rxq(vq);
+> +
+> +	sq = &vi->sq[i];
+> +
+> +	if (sq->vq->premapped)
+> +		virtnet_sq_unmap(sq, &buf);
+> +
+>  	if (!is_xdp_frame(buf))
+>  		dev_kfree_skb(buf);
+>  	else
+> @@ -4327,8 +4450,10 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>  		if (ctx)
+>  			ctx[rxq2vq(i)] = true;
+>  
+> -		if (premapped)
+> +		if (premapped) {
+>  			premapped[rxq2vq(i)] = true;
+> +			premapped[txq2vq(i)] = true;
+> +		}
+>  	}
+>  
+>  	cfg.nvqs      = total_vqs;
+> @@ -4352,6 +4477,9 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>  		vi->rq[i].vq = vqs[rxq2vq(i)];
+>  		vi->rq[i].min_buf_len = mergeable_min_buf_len(vi, vi->rq[i].vq);
+>  		vi->sq[i].vq = vqs[txq2vq(i)];
+> +
+> +		if (vi->sq[i].vq->premapped)
+> +			virtnet_sq_init_dma_mate(&vi->sq[i]);
+>  	}
+>  
+>  	/* run here: ret == 0. */
+> -- 
+> 2.32.0.3.g01195cf9f
+
 
