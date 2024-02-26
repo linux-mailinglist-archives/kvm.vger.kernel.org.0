@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10768678DF
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:44:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 789F28678E0
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3F831C221A7
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E343296752
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72434133291;
-	Mon, 26 Feb 2024 14:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D779A132C2C;
+	Mon, 26 Feb 2024 14:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EZuFFqiG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4xF3pKa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F27132C2C;
-	Mon, 26 Feb 2024 14:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2C21332A7;
+	Mon, 26 Feb 2024 14:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958152; cv=none; b=DwVlYYMeVTac20peuS1RYMITc9EDCMxnvmxIb5ZA+oifKX8O2uOKd8qnk8HnzSiGkLmcrc2wCX6tk3xalBZBbUjp09W2y7bIqvuSnL2eL0uHlW0LEBfY58VAd2FNcKdbpMA5SUAUIC+X3K6cz6PBxKyP6U0dJ3PBJWrKCjd2+h8=
+	t=1708958156; cv=none; b=ZD0LEtp3qWJ3LSJdEb54Rbf1SyZgxF1omT/NkGHHwQ/RkAA2Z5QdVSdElEyvHcrktOyyPofpsaGj8LnovblkETH6leCTlfS/ebyviOGcZBMvhkokX4khAWOH3//aPkbSyKaTVMp+uNTZKGhsjlkIfeVSf7E0NujnmlJ+sHI7N+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958152; c=relaxed/simple;
-	bh=1vEfezG9QmRjQ8J3U1Aysh33N+lTsittc0ac1Dd6Rxg=;
+	s=arc-20240116; t=1708958156; c=relaxed/simple;
+	bh=9aG0oEAda+9fcYOpzWdcAOx4WxIAEu+MaKCQRMdSxNo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eJirbmJJ+75WzxUb3E+cUNliqaelPGwDI9GA5tSCc97cbrQTH6Db1JQm2KuwcYbM7tD0d+rbr7q80eD7xL/qIQ6fwY28X3t/HiM+6XTFLCFj2hLKCV7y3dVuTAyuvp605OnEfSw3Rh19urkzq3JXEWnZY7OKCOzVaratRFQx0R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EZuFFqiG; arc=none smtp.client-ip=209.85.215.171
+	 MIME-Version; b=JdMdsSk06omHL61p6oAF+j/Bv0o6NTCHSoFROLAPuE+GS922oFv0UnmGxLvRoaxOGIjOn2ARlkdcvXq2UuhLm1hJTkcXsK+++Vwe3xLhbEkMlmfTkl/vYuT8/DRlt2J0GZkYe9FJL5a4RyVDCgI89UN7YDXKpIUiudUhMc/cmNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X4xF3pKa; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5e42b4bbfa4so2299073a12.1;
-        Mon, 26 Feb 2024 06:35:50 -0800 (PST)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e4c359e48aso1842629b3a.1;
+        Mon, 26 Feb 2024 06:35:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958150; x=1709562950; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958153; x=1709562953; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GEYgEPxnIogvnB7Zjz1HomLlX+OknwZSPNHHST0cuPA=;
-        b=EZuFFqiGBF1LnvyJWBASWUZ/gpOEn8ZODCE2XB4VmTWRIb/rRBCoyC+QXhHKZe7rwx
-         +8nSur37gYI+VZlMfNB3bAnJCPx9F7q9NhEmM9bT0GBj/czYJD8yin8B9Ov+yHEM4HUX
-         hAdI6MqR10D55hKHPI/7aVwhXBCrD6jTLvYS5zCXD12DZuPLIX0BkBpiu1/tQkHMI9ot
-         BD7uPBHaCzTYwU5u6s4819x0eYSTfUJclHXk/pRVtKr0EBljSfh1pkJwrCiPVQ0SZcv6
-         GC9ET7wLThsTb+z2/IkJ8dgdF0OnPyjdGuFWXlJPP1FHfBp3E/+19kst9/NC+Bzo6VVk
-         BAWQ==
+        bh=MSMVlWy0KU4egESPyBq9idmlDCEcQCFrMSnFvIksvNM=;
+        b=X4xF3pKalRSFaOWUZ5cXitBnfkz+uFG5SC4675fR2dA/bXf4wymCHW90a1WjY9MwEO
+         pbXR8ZY54J+NR+ij3Hm4ctgzf1X7LDVtKgH103O+Z6yXG0NKPBh/dB9UD+ABxg6FsiVQ
+         JK6CKRZdSDA6N2jPB0N6XVs3by3z4vWc4jrafYhETthY09tdhmevtjHwNkc1gVGrSG8H
+         55+y4UA6m8jdSJONb/B3BQCJWXn83yorp3BGnW7sS1gUpTXXo4utpLe1SSgI0bx0pnVf
+         JBCVPoyI82sLtQMlrrovILPTUacy1Am8jBFbwnnRoahsPzO7bp5HDJpvAe4UqnmI3EjL
+         ZJDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958150; x=1709562950;
+        d=1e100.net; s=20230601; t=1708958153; x=1709562953;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GEYgEPxnIogvnB7Zjz1HomLlX+OknwZSPNHHST0cuPA=;
-        b=VbbShAuxKhYXUA7Wphj49zd7JMp79f1oQlWJHNMtiHDJgQl82iVUvGrMfM59KXi5LE
-         UA6VnvKNIqBqyrwawA4mm9A5f+c7ps7xSu1aAPwrHUlwdUkfBfA+QoInP57sL7yi/WvE
-         vWMhXXR3BSxUipocZrZMrIwKEEofzz8fvWMdZxqLxtlVb/L2/ROw3rCxDfapzOLhs7jy
-         QVa0ySqAjI1nENGu1u2iFpv/WM3dPXihTNxy4cZZXAbdrBkV/gKNAgQAD9QP0zMvM+h8
-         tf8aacDGkfjZpPwMRsBZ2WceK9b1nVizj5LEcWVkYsJOMImi22nZdu68DbdO+JTxGKss
-         Z8VQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXv/lQGFw7iFTMBmQGUHz4hGfDCAZsFhkp3Zk21m31iN5iB6b088bHq6aX0CH9dFPy3VLsFGFAMhArp9vR4S/YOTG/G
-X-Gm-Message-State: AOJu0YyECQf1EtaBFtGNolqlcN3mlfSmI+7+UeYbGPbpiK3baTM6Zy8z
-	TESDaqlmG16ZwewVdjFjicOBibkclk1RitDvlGkEUU2OtgMGE6kB0bxbn3yR
-X-Google-Smtp-Source: AGHT+IGXuqJi3oC1P9HsXiXL3F0CcvclMb8/tyAsW4SrKL+SdfZxtrL7dAPtTXQRkM5ULNQY0enwQw==
-X-Received: by 2002:a17:90a:68c8:b0:299:42d1:91df with SMTP id q8-20020a17090a68c800b0029942d191dfmr5769463pjj.14.1708958150219;
-        Mon, 26 Feb 2024 06:35:50 -0800 (PST)
-Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id t20-20020a17090ad15400b00299101c1341sm4541312pjw.18.2024.02.26.06.35.49
+        bh=MSMVlWy0KU4egESPyBq9idmlDCEcQCFrMSnFvIksvNM=;
+        b=VnKgojeCcKkrmpPZYb4TyvZv0UaGnxfBySnNDwRuOxSNg/MgGgC3piHk5ohR03OY1N
+         GI5yXLPaspVJOYyGyAt8Ysxz2ctG9QAb86dJk92yEagj+b2//Yy/h8kCHY4o/5+dalxT
+         2fqikUwwOdqmqIZdJi1u4V85gdsN9OnYLJnUAkcXc0yc5V8y+qVNMEznIuDjzGNZTiT8
+         d8k2uyNL+EALQWPAa2kAZxm+hM687n4sj8tTXy0mWdQz8dn2ry5TI1rTvWlbQtfpYOxV
+         XgTgAxTUEQqoyDB/TUJA1VJZGfUTEeo+rTAdBgLhmKeIX3BJnPQOwpSq8kf3620RV6Zo
+         uAGw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDn1Ae3IVqv9vNT/oCyehBakOiQgKnTzx4XngajNPuRpdWFXXREyh853Kx/1BFOtu7PQ/1kaZgnSdnx8aEJrx0OhtX
+X-Gm-Message-State: AOJu0YyRdepaFN/LOrBv+bhJ0ryph6183IeojQytb61rGoWIBLL3Uuhz
+	1EfuJ3BvVvBdqSCJijgDK4gbK1/qdGc/KZcZ9uU3OSLtINeGi/T6xpKU0K88
+X-Google-Smtp-Source: AGHT+IGfErTmpaFA2eYvcZFrMIpLzD4mTN8y9z8Ngw++N10rufjVVfzsKy/Kc0ONU+UwZK+9HN/8yg==
+X-Received: by 2002:a05:6a21:3a81:b0:1a0:f5e6:1115 with SMTP id zv1-20020a056a213a8100b001a0f5e61115mr7515293pzb.2.1708958153458;
+        Mon, 26 Feb 2024 06:35:53 -0800 (PST)
+Received: from localhost ([47.89.225.180])
+        by smtp.gmail.com with ESMTPSA id e2-20020a170902f1c200b001d9a40f50c4sm4046718plc.301.2024.02.26.06.35.52
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:35:49 -0800 (PST)
+        Mon, 26 Feb 2024 06:35:53 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -84,9 +84,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 22/73] KVM: x86/PVM: Handle some VM exits before enable interrupts
-Date: Mon, 26 Feb 2024 22:35:39 +0800
-Message-Id: <20240226143630.33643-23-jiangshanlai@gmail.com>
+Subject: [RFC PATCH 23/73] KVM: x86/PVM: Handle event handling related MSR read/write operation
+Date: Mon, 26 Feb 2024 22:35:40 +0800
+Message-Id: <20240226143630.33643-24-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -100,161 +100,258 @@ Content-Transfer-Encoding: 8bit
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Similar to VMX, NMI should be handled in non-instrumented code early
-after VM exit. Additionally, #PF, #VE, #VC, and #DB need early handling
-in non-instrumented code as well. Host interrupts and #MC need to be
-handled before enabling interrupts.
+In the PVM event handling specification, the guest needs to register the
+event entry into the associated MSRs before delivering the event.
+Therefore, handling them in the get_msr()/set_msr() callbacks is
+necessary to prepare for event delivery later. Additionally, the user
+mode syscall event still uses the original syscall event entry, but only
+MSR_LSTAR is used; other MSRs are ignored.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/pvm/pvm.c | 89 ++++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/pvm/pvm.h |  8 ++++
- 2 files changed, 97 insertions(+)
+ arch/x86/kvm/pvm/pvm.c | 188 +++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/pvm/pvm.h |   7 ++
+ 2 files changed, 195 insertions(+)
 
 diff --git a/arch/x86/kvm/pvm/pvm.c b/arch/x86/kvm/pvm/pvm.c
-index 00a50ed0c118..29c6d8da7c19 100644
+index 29c6d8da7c19..69f8fbbb6176 100644
 --- a/arch/x86/kvm/pvm/pvm.c
 +++ b/arch/x86/kvm/pvm/pvm.c
-@@ -265,6 +265,58 @@ static void pvm_setup_mce(struct kvm_vcpu *vcpu)
+@@ -31,6 +31,33 @@ static bool __read_mostly is_intel;
+ 
+ static unsigned long host_idt_base;
+ 
++static inline u16 kernel_cs_by_msr(u64 msr_star)
++{
++	// [47..32]
++	// and force rpl=0
++	return ((msr_star >> 32) & ~0x3);
++}
++
++static inline u16 kernel_ds_by_msr(u64 msr_star)
++{
++	// [47..32] + 8
++	// and force rpl=0
++	return ((msr_star >> 32) & ~0x3) + 8;
++}
++
++static inline u16 user_cs32_by_msr(u64 msr_star)
++{
++	// [63..48] is user_cs32 and force rpl=3
++	return ((msr_star >> 48) | 0x3);
++}
++
++static inline u16 user_cs_by_msr(u64 msr_star)
++{
++	// [63..48] is user_cs32, and [63..48] + 16 is user_cs
++	// and force rpl=3
++	return ((msr_star >> 48) | 0x3) + 16;
++}
++
+ static inline void __save_gs_base(struct vcpu_pvm *pvm)
+ {
+ 	// switcher will do a real hw swapgs, so use hw MSR_KERNEL_GS_BASE
+@@ -261,6 +288,161 @@ static void pvm_sched_in(struct kvm_vcpu *vcpu, int cpu)
  {
  }
  
-+static int handle_exit_external_interrupt(struct kvm_vcpu *vcpu)
++static int pvm_get_msr_feature(struct kvm_msr_entry *msr)
 +{
-+	++vcpu->stat.irq_exits;
 +	return 1;
 +}
 +
-+static int handle_exit_failed_vmentry(struct kvm_vcpu *vcpu)
++static void pvm_msr_filter_changed(struct kvm_vcpu *vcpu)
 +{
-+	struct vcpu_pvm *pvm = to_pvm(vcpu);
-+	u32 error_code = pvm->exit_error_code;
-+
-+	kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
-+	return 1;
++	/* Accesses to MSRs are emulated in hypervisor, nothing to do here. */
 +}
 +
 +/*
-+ * The guest has exited.  See if we can fix it or if we need userspace
-+ * assistance.
++ * Reads an msr value (of 'msr_index') into 'msr_info'.
++ * Returns 0 on success, non-0 otherwise.
++ * Assumes vcpu_load() was already called.
 + */
-+static int pvm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
++static int pvm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 +{
 +	struct vcpu_pvm *pvm = to_pvm(vcpu);
-+	u32 exit_reason = pvm->exit_vector;
++	int ret = 0;
 +
-+	if (exit_reason >= FIRST_EXTERNAL_VECTOR && exit_reason < NR_VECTORS)
-+		return handle_exit_external_interrupt(vcpu);
-+	else if (exit_reason == PVM_FAILED_VMENTRY_VECTOR)
-+		return handle_exit_failed_vmentry(vcpu);
-+
-+	vcpu_unimpl(vcpu, "pvm: unexpected exit reason 0x%x\n", exit_reason);
-+	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-+	vcpu->run->internal.suberror =
-+		KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-+	vcpu->run->internal.ndata = 2;
-+	vcpu->run->internal.data[0] = exit_reason;
-+	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-+	return 0;
-+}
-+
-+static void pvm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_pvm *pvm = to_pvm(vcpu);
-+	u32 vector = pvm->exit_vector;
-+	gate_desc *desc = (gate_desc *)host_idt_base + vector;
-+
-+	if (vector >= FIRST_EXTERNAL_VECTOR && vector < NR_VECTORS &&
-+	    vector != IA32_SYSCALL_VECTOR)
-+		kvm_do_interrupt_irqoff(vcpu, gate_offset(desc));
-+	else if (vector == MC_VECTOR)
-+		kvm_machine_check();
-+}
-+
- static bool pvm_has_emulated_msr(struct kvm *kvm, u32 index)
- {
- 	switch (index) {
-@@ -369,6 +421,40 @@ static noinstr void pvm_vcpu_run_noinstr(struct kvm_vcpu *vcpu)
- 	pvm->exit_vector = (ret_regs->orig_ax >> 32);
- 	pvm->exit_error_code = (u32)ret_regs->orig_ax;
- 
-+	// handle noinstr vmexits reasons.
-+	switch (pvm->exit_vector) {
-+	case PF_VECTOR:
-+		// if the exit due to #PF, check for async #PF.
-+		pvm->exit_cr2 = read_cr2();
-+		vcpu->arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
++	switch (msr_info->index) {
++	case MSR_STAR:
++		msr_info->data = pvm->msr_star;
 +		break;
-+	case NMI_VECTOR:
-+		kvm_do_nmi_irqoff(vcpu);
++	case MSR_LSTAR:
++		msr_info->data = pvm->msr_lstar;
 +		break;
-+	case VE_VECTOR:
-+		// TODO: pvm host is TDX guest.
-+		// tdx_get_ve_info(&pvm->host_ve);
++	case MSR_SYSCALL_MASK:
++		msr_info->data = pvm->msr_syscall_mask;
 +		break;
-+	case X86_TRAP_VC:
-+		/*
-+		 * TODO: pvm host is SEV guest.
-+		 * if (!vc_is_db(error_code)) {
-+		 *      collect info and handle the first part for #VC
-+		 *      break;
-+		 * } else {
-+		 *      get_debugreg(pvm->exit_dr6, 6);
-+		 *      set_debugreg(DR6_RESERVED, 6);
-+		 * }
-+		 */
++	case MSR_CSTAR:
++		msr_info->data = pvm->unused_MSR_CSTAR;
 +		break;
-+	case DB_VECTOR:
-+		get_debugreg(pvm->exit_dr6, 6);
-+		set_debugreg(DR6_RESERVED, 6);
++	/*
++	 * Since SYSENTER is not supported for the guest, we return a bad
++	 * segment to the emulator when emulating the instruction for #GP.
++	 */
++	case MSR_IA32_SYSENTER_CS:
++		msr_info->data = GDT_ENTRY_INVALID_SEG;
++		break;
++	case MSR_IA32_SYSENTER_EIP:
++		msr_info->data = pvm->unused_MSR_IA32_SYSENTER_EIP;
++		break;
++	case MSR_IA32_SYSENTER_ESP:
++		msr_info->data = pvm->unused_MSR_IA32_SYSENTER_ESP;
++		break;
++	case MSR_PVM_VCPU_STRUCT:
++		msr_info->data = pvm->msr_vcpu_struct;
++		break;
++	case MSR_PVM_SUPERVISOR_RSP:
++		msr_info->data = pvm->msr_supervisor_rsp;
++		break;
++	case MSR_PVM_SUPERVISOR_REDZONE:
++		msr_info->data = pvm->msr_supervisor_redzone;
++		break;
++	case MSR_PVM_EVENT_ENTRY:
++		msr_info->data = pvm->msr_event_entry;
++		break;
++	case MSR_PVM_RETU_RIP:
++		msr_info->data = pvm->msr_retu_rip_plus2 - 2;
++		break;
++	case MSR_PVM_RETS_RIP:
++		msr_info->data = pvm->msr_rets_rip_plus2 - 2;
 +		break;
 +	default:
-+		break;
++		ret = kvm_get_msr_common(vcpu, msr_info);
 +	}
 +
- 	guest_state_exit_irqoff();
++	return ret;
++}
++
++/*
++ * Writes msr value into the appropriate "register".
++ * Returns 0 on success, non-0 otherwise.
++ * Assumes vcpu_load() was already called.
++ */
++static int pvm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
++{
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
++	int ret = 0;
++	u32 msr_index = msr_info->index;
++	u64 data = msr_info->data;
++
++	switch (msr_index) {
++	case MSR_STAR:
++		/*
++		 * Guest KERNEL_CS/DS shouldn't be NULL and guest USER_CS/DS
++		 * must be the same as the host USER_CS/DS.
++		 */
++		if (!msr_info->host_initiated) {
++			if (!kernel_cs_by_msr(data))
++				return 1;
++			if (user_cs_by_msr(data) != __USER_CS)
++				return 1;
++		}
++		pvm->msr_star = data;
++		break;
++	case MSR_LSTAR:
++		if (is_noncanonical_address(msr_info->data, vcpu))
++			return 1;
++		pvm->msr_lstar = data;
++		break;
++	case MSR_SYSCALL_MASK:
++		pvm->msr_syscall_mask = data;
++		break;
++	case MSR_CSTAR:
++		pvm->unused_MSR_CSTAR = data;
++		break;
++	case MSR_IA32_SYSENTER_CS:
++		pvm->unused_MSR_IA32_SYSENTER_CS = data;
++		break;
++	case MSR_IA32_SYSENTER_EIP:
++		pvm->unused_MSR_IA32_SYSENTER_EIP = data;
++		break;
++	case MSR_IA32_SYSENTER_ESP:
++		pvm->unused_MSR_IA32_SYSENTER_ESP = data;
++		break;
++	case MSR_PVM_VCPU_STRUCT:
++		if (!PAGE_ALIGNED(data))
++			return 1;
++		if (!data)
++			kvm_gpc_deactivate(&pvm->pvcs_gpc);
++		else if (kvm_gpc_activate(&pvm->pvcs_gpc, data, PAGE_SIZE))
++			return 1;
++
++		pvm->msr_vcpu_struct = data;
++		break;
++	case MSR_PVM_SUPERVISOR_RSP:
++		pvm->msr_supervisor_rsp = msr_info->data;
++		break;
++	case MSR_PVM_SUPERVISOR_REDZONE:
++		pvm->msr_supervisor_redzone = msr_info->data;
++		break;
++	case MSR_PVM_EVENT_ENTRY:
++		if (is_noncanonical_address(data, vcpu) ||
++		    is_noncanonical_address(data + 256, vcpu) ||
++		    is_noncanonical_address(data + 512, vcpu)) {
++			kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
++			return 1;
++		}
++		pvm->msr_event_entry = msr_info->data;
++		break;
++	case MSR_PVM_RETU_RIP:
++		pvm->msr_retu_rip_plus2 = msr_info->data + 2;
++		break;
++	case MSR_PVM_RETS_RIP:
++		pvm->msr_rets_rip_plus2 = msr_info->data + 2;
++		break;
++	default:
++		ret = kvm_set_msr_common(vcpu, msr_info);
++	}
++
++	return ret;
++}
++
+ static void pvm_setup_mce(struct kvm_vcpu *vcpu)
+ {
  }
+@@ -764,6 +946,9 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
+ 	.vcpu_load = pvm_vcpu_load,
+ 	.vcpu_put = pvm_vcpu_put,
  
-@@ -682,9 +768,12 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
++	.get_msr_feature = pvm_get_msr_feature,
++	.get_msr = pvm_get_msr,
++	.set_msr = pvm_set_msr,
+ 	.load_mmu_pgd = pvm_load_mmu_pgd,
  
  	.vcpu_pre_run = pvm_vcpu_pre_run,
- 	.vcpu_run = pvm_vcpu_run,
-+	.handle_exit = pvm_handle_exit,
- 
- 	.vcpu_after_set_cpuid = pvm_vcpu_after_set_cpuid,
- 
-+	.handle_exit_irqoff = pvm_handle_exit_irqoff,
-+
- 	.sched_in = pvm_sched_in,
- 
+@@ -779,6 +964,9 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
  	.nested_ops = &pvm_nested_ops,
+ 
+ 	.setup_mce = pvm_setup_mce,
++
++	.msr_filter_changed = pvm_msr_filter_changed,
++	.complete_emulated_msr = kvm_complete_insn_gp,
+ };
+ 
+ static struct kvm_x86_init_ops pvm_init_ops __initdata = {
 diff --git a/arch/x86/kvm/pvm/pvm.h b/arch/x86/kvm/pvm/pvm.h
-index 349f4eac98ec..123cfe1c3c6a 100644
+index 123cfe1c3c6a..57ca2e901e0d 100644
 --- a/arch/x86/kvm/pvm/pvm.h
 +++ b/arch/x86/kvm/pvm/pvm.h
-@@ -7,6 +7,8 @@
+@@ -54,6 +54,13 @@ struct vcpu_pvm {
+ 	struct gfn_to_pfn_cache pvcs_gpc;
  
- #define SWITCH_FLAGS_INIT	(SWITCH_FLAGS_SMOD)
- 
-+#define PVM_FAILED_VMENTRY_VECTOR	SWITCH_EXIT_REASONS_FAILED_VMETNRY
-+
- #define PT_L4_SHIFT		39
- #define PT_L4_SIZE		(1UL << PT_L4_SHIFT)
- #define DEFAULT_RANGE_L4_SIZE	(32 * PT_L4_SIZE)
-@@ -35,6 +37,12 @@ struct vcpu_pvm {
- 
- 	u16 host_ds_sel, host_es_sel;
- 
-+	union {
-+		unsigned long exit_extra;
-+		unsigned long exit_cr2;
-+		unsigned long exit_dr6;
-+		struct ve_info exit_ve;
-+	};
- 	u32 exit_vector;
- 	u32 exit_error_code;
- 	u32 hw_cs, hw_ss;
+ 	// emulated x86 msrs
++	u64 msr_lstar;
++	u64 msr_syscall_mask;
++	u64 msr_star;
++	u64 unused_MSR_CSTAR;
++	u64 unused_MSR_IA32_SYSENTER_CS;
++	u64 unused_MSR_IA32_SYSENTER_EIP;
++	u64 unused_MSR_IA32_SYSENTER_ESP;
+ 	u64 msr_tsc_aux;
+ 	/*
+ 	 * Only bits masked by msr_ia32_feature_control_valid_bits can be set in
 -- 
 2.19.1.6.gb485710b
 
