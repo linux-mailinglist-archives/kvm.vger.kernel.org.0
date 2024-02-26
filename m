@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-9969-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9971-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08A8986805A
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:03:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF83F86805C
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:04:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 393291C25291
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:03:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D9D61F2610D
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A86312F5A2;
-	Mon, 26 Feb 2024 19:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED4C12FF6A;
+	Mon, 26 Feb 2024 19:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hc9frAMK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GnceSHWr"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2A012DDAB
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 19:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DD112EBF6
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 19:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708974230; cv=none; b=Yt+4JDCIYVwfWADcg77tuK/4VRg9pyF9ACc5UupmFiVIIOBppqAsIfNWPY9BBUmgYLL04sveVkSHCDSPnULz86lVMym4wDVXUTNbk0QKuxlFJJ56MQYgosYSlTmNPXn0GzoLzBWTpyDqDya3B3P6hj0UC3zopQ0h0+n/2szuOa0=
+	t=1708974231; cv=none; b=KV/syPoF87rGnkYpW69nqB6WVa9OUjyUNKVvoSccQymFqvQ1Dak2Og9hhorP79deG5L+6zM1hvZNSgfVuU9dIAy10oj0cLPqAYPwM7FPLboZRHgEYYJ2AzLwcQfihzNoDz9m34/6HuFjIwl+gzJ+aTZcu+LHgnVBOAesOuWsywQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708974230; c=relaxed/simple;
-	bh=JP2AhCp0qhW1Bb/uQ0B1c8bqZUtYcKr6siTzy/oGLZg=;
+	s=arc-20240116; t=1708974231; c=relaxed/simple;
+	bh=BcyNPcEjNpDKmi3eYP5q+XdH/eR7f5WZMjnLtuWyvjc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DV3XJvyPKDZROKWil9kW/NtOsLNsK77Oc3grDc2E5h71sjfxxOVhx141O8UJhPyJfhDcrg0akuGdOKDNKVAIstuvpuZ/q8fwwEGspFKVcUx9dq1fZIW2IsjMMEmNRqqrJbiI2XLmsaWN+hJ5okfJEZXNjiR7kWn/ZI9Wj9j7V3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hc9frAMK; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=Yp9UdOwTsuLX5uB1aY+Vd+PnZuOtNJ8WtlVOmBgZ138cT8fwt5mkMnDmtQfB9f3o6yxt1YrRiwnhbNK6NgGp05iCiZ8qZiObD0ROBZmgPM2l1L/r9lt079Qn9M6ilHVrIpjjkYSa1TzymG3yYY5IkYJUScgRIjY2s/BWu4U6Nuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GnceSHWr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708974227;
+	s=mimecast20190719; t=1708974228;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/9RYhzIp/TSoYRODHKhiSBAhYa7Kz0V7a3mnNRHaZ14=;
-	b=hc9frAMKmZhjaK2+hmkQ4FhC/UaqdUL/9hL7N0jwzGTHjnQIlMtuNVdxbdX75cV8V5/wau
-	zy3dHr2lf+ngYrYmH5YiuXD2L6ByFOtmx2b1m/lgUexjSiQTxuufCEsQYMGdihxS+KZDms
-	SKLYX6SQoGoHqq1EaBMhDXhY5OYt0rc=
+	bh=CWYUyy6QSMyEARa+J67wigDGH6VAlgHZBuIPAO+RHiQ=;
+	b=GnceSHWrkfO1kxIyXO4/t41PjPBiapI/vGyhTN+IdepvFw3+1oXzO8F9DQBjK6Bh6uwQs6
+	+7a5czy4ORzZBU7lJKsVAVX217Ag/i4SBrKM6Vay1lGu9UJpKDg6b67ASjlWpb2OTEkcuD
+	PBZksavu+Qa2XI/48OCKOSAtiqIGpSI=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-479-pkuqUmQqP12Cr7DiNuPSug-1; Mon,
- 26 Feb 2024 14:03:46 -0500
-X-MC-Unique: pkuqUmQqP12Cr7DiNuPSug-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-191-DqbIcuQjPouthjs0p7X-1w-1; Mon,
+ 26 Feb 2024 14:03:47 -0500
+X-MC-Unique: DqbIcuQjPouthjs0p7X-1w-1
 Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D4D133C14940;
-	Mon, 26 Feb 2024 19:03:45 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A80D938212D4;
+	Mon, 26 Feb 2024 19:03:46 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AD491492BC6;
-	Mon, 26 Feb 2024 19:03:45 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7F719492BC6;
+	Mon, 26 Feb 2024 19:03:46 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
 Cc: seanjc@google.com,
 	michael.roth@amd.com,
 	aik@amd.com
-Subject: [PATCH v3 01/15] KVM: SEV: fix compat ABI for KVM_MEMORY_ENCRYPT_OP
-Date: Mon, 26 Feb 2024 14:03:30 -0500
-Message-Id: <20240226190344.787149-2-pbonzini@redhat.com>
+Subject: [PATCH v3 05/15] Documentation: kvm/sev: separate description of firmware
+Date: Mon, 26 Feb 2024 14:03:34 -0500
+Message-Id: <20240226190344.787149-6-pbonzini@redhat.com>
 In-Reply-To: <20240226190344.787149-1-pbonzini@redhat.com>
 References: <20240226190344.787149-1-pbonzini@redhat.com>
 Precedence: bulk
@@ -76,137 +76,71 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-The data structs for KVM_MEMORY_ENCRYPT_OP have different sizes for 32- and 64-bit
-userspace, but they do not make any attempt to convert from one ABI to the other
-when 32-bit userspace is running on 64-bit kernels.  This configuration never
-worked, and SEV is only for 64-bit kernels so we're not breaking ABI on 32-bit
-kernels.
-
-Fix this by adding the appropriate padding; no functional change intended
-for 64-bit userspace.
+The description of firmware is included part under the "SEV Key Management"
+header, part under the KVM_SEV_INIT ioctl.  Put these two bits together and
+and rename "SEV Key Management" to what it actually is, namely a description
+of the KVM_MEMORY_ENCRYPT_OP API.
 
 Reviewed-by: Michael Roth <michael.roth@amd.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/uapi/asm/kvm.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 29 +++++++++++--------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index ad29984d5e39..ef11aa4cab42 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -694,6 +694,7 @@ enum sev_cmd_id {
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index 995780088eb2..37c5c37f4f6e 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -46,14 +46,8 @@ SEV hardware uses ASIDs to associate a memory encryption key with a VM.
+ Hence, the ASID for the SEV-enabled guests must be from 1 to a maximum value
+ defined in the CPUID 0x8000001f[ecx] field.
  
- struct kvm_sev_cmd {
- 	__u32 id;
-+	__u32 pad0;
- 	__u64 data;
- 	__u32 error;
- 	__u32 sev_fd;
-@@ -704,28 +705,35 @@ struct kvm_sev_launch_start {
- 	__u32 policy;
- 	__u64 dh_uaddr;
- 	__u32 dh_len;
-+	__u32 pad0;
- 	__u64 session_uaddr;
- 	__u32 session_len;
-+	__u32 pad1;
- };
+-SEV Key Management
+-==================
+-
+-The SEV guest key management is handled by a separate processor called the AMD
+-Secure Processor (AMD-SP). Firmware running inside the AMD-SP provides a secure
+-key management interface to perform common hypervisor activities such as
+-encrypting bootstrap code, snapshot, migrating and debugging the guest. For more
+-information, see the SEV Key Management spec [api-spec]_
++``KVM_MEMORY_ENCRYPT_OP`` API
++=============================
  
- struct kvm_sev_launch_update_data {
- 	__u64 uaddr;
- 	__u32 len;
-+	__u32 pad0;
- };
+ The main ioctl to access SEV is KVM_MEMORY_ENCRYPT_OP.  If the argument
+ to KVM_MEMORY_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
+@@ -87,10 +81,6 @@ guests, such as launching, running, snapshotting, migrating and decommissioning.
+ The KVM_SEV_INIT command is used by the hypervisor to initialize the SEV platform
+ context. In a typical workflow, this command should be the first command issued.
  
+-The firmware can be initialized either by using its own non-volatile storage or
+-the OS can manage the NV storage for the firmware using the module parameter
+-``init_ex_path``. If the file specified by ``init_ex_path`` does not exist or
+-is invalid, the OS will create or override the file with output from PSP.
  
- struct kvm_sev_launch_secret {
- 	__u64 hdr_uaddr;
- 	__u32 hdr_len;
-+	__u32 pad0;
- 	__u64 guest_uaddr;
- 	__u32 guest_len;
-+	__u32 pad1;
- 	__u64 trans_uaddr;
- 	__u32 trans_len;
-+	__u32 pad2;
- };
+ Returns: 0 on success, -negative on error
  
- struct kvm_sev_launch_measure {
- 	__u64 uaddr;
- 	__u32 len;
-+	__u32 pad0;
- };
+@@ -434,6 +424,21 @@ issued by the hypervisor to make the guest ready for execution.
  
- struct kvm_sev_guest_status {
-@@ -738,33 +746,43 @@ struct kvm_sev_dbg {
- 	__u64 src_uaddr;
- 	__u64 dst_uaddr;
- 	__u32 len;
-+	__u32 pad0;
- };
+ Returns: 0 on success, -negative on error
  
- struct kvm_sev_attestation_report {
- 	__u8 mnonce[16];
- 	__u64 uaddr;
- 	__u32 len;
-+	__u32 pad0;
- };
++Firmware Management
++===================
++
++The SEV guest key management is handled by a separate processor called the AMD
++Secure Processor (AMD-SP). Firmware running inside the AMD-SP provides a secure
++key management interface to perform common hypervisor activities such as
++encrypting bootstrap code, snapshot, migrating and debugging the guest. For more
++information, see the SEV Key Management spec [api-spec]_
++
++The AMD-SP firmware can be initialized either by using its own non-volatile
++storage or the OS can manage the NV storage for the firmware using
++parameter ``init_ex_path`` of the ``ccp`` module. If the file specified
++by ``init_ex_path`` does not exist or is invalid, the OS will create or
++override the file with PSP non-volatile storage.
++
+ References
+ ==========
  
- struct kvm_sev_send_start {
- 	__u32 policy;
-+	__u32 pad0;
- 	__u64 pdh_cert_uaddr;
- 	__u32 pdh_cert_len;
-+	__u32 pad1;
- 	__u64 plat_certs_uaddr;
- 	__u32 plat_certs_len;
-+	__u32 pad2;
- 	__u64 amd_certs_uaddr;
- 	__u32 amd_certs_len;
-+	__u32 pad3;
- 	__u64 session_uaddr;
- 	__u32 session_len;
-+	__u32 pad4;
- };
- 
- struct kvm_sev_send_update_data {
- 	__u64 hdr_uaddr;
- 	__u32 hdr_len;
-+	__u32 pad0;
- 	__u64 guest_uaddr;
- 	__u32 guest_len;
-+	__u32 pad1;
- 	__u64 trans_uaddr;
- 	__u32 trans_len;
-+	__u32 pad2;
- };
- 
- struct kvm_sev_receive_start {
-@@ -772,17 +790,22 @@ struct kvm_sev_receive_start {
- 	__u32 policy;
- 	__u64 pdh_uaddr;
- 	__u32 pdh_len;
-+	__u32 pad0;
- 	__u64 session_uaddr;
- 	__u32 session_len;
-+	__u32 pad1;
- };
- 
- struct kvm_sev_receive_update_data {
- 	__u64 hdr_uaddr;
- 	__u32 hdr_len;
-+	__u32 pad0;
- 	__u64 guest_uaddr;
- 	__u32 guest_len;
-+	__u32 pad1;
- 	__u64 trans_uaddr;
- 	__u32 trans_len;
-+	__u32 pad2;
- };
- 
- #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
 -- 
 2.39.1
 
