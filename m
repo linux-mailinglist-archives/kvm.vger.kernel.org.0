@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-9737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3331C866D91
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:05:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAE4A866D95
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:06:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4A9F1F24F22
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:05:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4C652849B0
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891AC12C555;
-	Mon, 26 Feb 2024 08:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680A412C80E;
+	Mon, 26 Feb 2024 08:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uf3z1wew"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ECTrG1hH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (unknown [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF3312B15D;
-	Mon, 26 Feb 2024 08:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF0F12BEAB;
+	Mon, 26 Feb 2024 08:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936151; cv=none; b=Siga6QaZoDpEK8cp+OBGz+6R1W+xQ56Sfg9viNz/RoO/sTV+iiTKJGHYRfoSr0G4YEnozZ/5Wo7RCVFw5uSMX1GGxyXaKuf7Xi8icJ3SqFVZG67VditYJRsDeY4mH17fRrMbVoVpMdwuToAgQxOMSzjRQVMazXrB+aPIN+ThWEA=
+	t=1708936152; cv=none; b=qS4LzccXx67XqJds192r6MYkhU04eLE7FANV6CbSClIo22vrg5Ank5QOiB4XGOmaQ2HGXv935AZNsleIlTgehaxqVzmJPlqB8fNbi1F8yKfXtqIXavV6Wo90rDuoN5NogG6V4QPkz/9+SS1abgLuENIvjgclBy37HBBmT3jfWZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936151; c=relaxed/simple;
-	bh=XAPqg9P4ovUdN9yysJhqj4R/8c0qj5T2TQ9C6uUUWv0=;
+	s=arc-20240116; t=1708936152; c=relaxed/simple;
+	bh=MzeWQckTmtJUMXlbAxLBuko2QU4/xgbu5cjp+acvzuc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GpBmXTl1sn+dZ0Pm0TSA+hBcsXZVBAHHkdzzsCBddNO4btFZ0tzp1+NJTYi0sN/ZuoC+bmlyhpOrIzzSXgacxbFLd7KpHaCWSfxBKKRCLNPfLl5xYN9/tG6BbXJ3+DMs6LeS7qfolfaSHVBZZpFtF4oJqCwfK+rFOFA8ifNjPJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com; spf=fail smtp.mailfrom=intel.com; dkim=fail (0-bit key) header.d=intel.com header.i=@intel.com header.b=Uf3z1wew reason="key not found in DNS"; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=intel.com
+	 MIME-Version; b=JeN0InB/riy1DMbVoVqmvDcW0Jm0yGjZhSNwtmL1MbPMKF1uhMNv9Lp31rdpAdbfi7Kd0KXEyjMMA421oTBLsxlnDZCPOfGwEWkYsaUsRqeNSfFnjlNsWU4CPGM39SLNni8F2ERbDfpmB6wwQ0pOZ+UtHeWkm2GJpZCYWJUDNvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ECTrG1hH; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708936149; x=1740472149;
+  t=1708936150; x=1740472150;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=XAPqg9P4ovUdN9yysJhqj4R/8c0qj5T2TQ9C6uUUWv0=;
-  b=Uf3z1wewYIk9yE0vPZhK5DDDgrNNwmHAXPwQcWmZ+nRYslBBeW+QOOp8
-   WH8z2UGFzD36bNMYoHcg5N2XGHDZSs+X/rAn0YKlLsxv3z9nVbMK9BdjS
-   IRVpUYMza7FHckszSKLOug9VKQN1JDeLnP/NHlz8+gemlXRucOIVLxIco
-   msoB4dhK1N/2nzSlEW27LtHDItCjNRVdvD3enAP2TQT1CElvbL4G9L+kj
-   kU9ZJUWKX/Dlv1As0EHBMTQ9v9cXHEPoDw+NASUSlHYVzl2ajnJrOz13H
-   uw3Y39Vku1ULmyr3RSbxhy70+KMnnujgBm7zPuxxa/cjfkGdCeOkq9DCh
+  bh=MzeWQckTmtJUMXlbAxLBuko2QU4/xgbu5cjp+acvzuc=;
+  b=ECTrG1hH65XwTxYmuPJ0R6vzP74EA4asV6C/ZX7YBXHYVaPug4CtCib+
+   R71oUMOuxrc6XT+4XBmRViLTeH2d51v8S8djiMg8X0aGmz4G2LVU2MoAP
+   jUYL5v2U42axq/L7NfjxbZ+IRImUvpNgyXA1J5CsiW2U1EFUjiNqQ0NVR
+   PCrhYMpsQBFgSkl6LfdwYxvr9V74sr+7yKm24AMC0kWoQYp66Fjj+9Zgp
+   /kNRx7EALaq4PDLSJIOR8SYU2yHDsYNbdQLUwYLwy0nAGNQGNvN6vIyy0
+   YSV38uxPoafrb93arsT+eMf6byezpv/um3DPrSzSWiwAXwYfLya9tWom8
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="20751356"
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="20751361"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="20751356"
+   d="scan'208";a="20751361"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:06 -0800
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:07 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6735084"
+   d="scan'208";a="6735087"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:06 -0800
 From: isaku.yamahata@intel.com
@@ -67,9 +67,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v19 113/130] KVM: TDX: Handle MSR MTRRCap and MTRRDefType access
-Date: Mon, 26 Feb 2024 00:26:55 -0800
-Message-Id: <81119d66392bc9446340a16f8a532c7e1b2665a2.1708933498.git.isaku.yamahata@intel.com>
+Subject: [PATCH v19 114/130] KVM: TDX: Handle MSR IA32_FEAT_CTL MSR and IA32_MCG_EXT_CTL
+Date: Mon, 26 Feb 2024 00:26:56 -0800
+Message-Id: <747b9360695a54e096cdb929139dc930da81b8c8.1708933498.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933498.git.isaku.yamahata@intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
@@ -83,165 +83,65 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Handle MTRRCap RO MSR to return all features are unsupported and handle
-MTRRDefType MSR to accept only E=1,FE=0,type=writeback.
-enable MTRR, disable Fixed range MTRRs, default memory type=writeback
+MCE and MCA is advertised via cpuid based on the TDX module spec.  Guest
+kernel can access IA32_FEAT_CTL for checking if LMCE is enabled by platform
+and IA32_MCG_EXT_CTL to enable LMCE.  Make TDX KVM handle them.  Otherwise
+guest MSR access to them with TDG.VP.VMCALL<MSR> on VE results in GP in
+guest.
 
-TDX virtualizes that cpuid to report MTRR to guest TD and TDX enforces
-guest CR0.CD=0. If guest tries to set CR0.CD=1, it results in #GP.  While
-updating MTRR requires to set CR0.CD=1 (and other cache flushing
-operations).  It means guest TD can't update MTRR.  Virtualize MTRR as
-all features disabled and default memory type as writeback.
+Because LMCE is disabled with qemu by default, "-cpu lmce=on" to qemu
+command line is needed to reproduce it.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 99 ++++++++++++++++++++++++++++++++++--------
- 1 file changed, 82 insertions(+), 17 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 4c635bfcaf7a..2bddaef495d1 100644
+index 2bddaef495d1..3481c0b6ef2c 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -611,18 +611,7 @@ u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- 	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
- 		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
- 
--	/*
--	 * TDX enforces CR0.CD = 0 and KVM MTRR emulation enforces writeback.
--	 * TODO: implement MTRR MSR emulation so that
--	 * MTRRCap: SMRR=0: SMRR interface unsupported
--	 *          WC=0: write combining unsupported
--	 *          FIX=0: Fixed range registers unsupported
--	 *          VCNT=0: number of variable range regitsers = 0
--	 * MTRRDefType: E=1, FE=0, type=writeback only. Don't allow other value.
--	 *              E=1: enable MTRR
--	 *              FE=0: disable fixed range MTRRs
--	 *              type: default memory type=writeback
--	 */
-+	/* TDX enforces CR0.CD = 0 and KVM MTRR emulation enforces writeback. */
- 	return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
- }
- 
-@@ -1932,7 +1921,9 @@ bool tdx_has_emulated_msr(u32 index, bool write)
- 	case MSR_IA32_UCODE_REV:
- 	case MSR_IA32_ARCH_CAPABILITIES:
- 	case MSR_IA32_POWER_CTL:
-+	case MSR_MTRRcap:
- 	case MSR_IA32_CR_PAT:
-+	case MSR_MTRRdefType:
- 	case MSR_IA32_TSC_DEADLINE:
- 	case MSR_IA32_MISC_ENABLE:
- 	case MSR_PLATFORM_INFO:
-@@ -1974,16 +1965,47 @@ bool tdx_has_emulated_msr(u32 index, bool write)
- 
+@@ -1952,6 +1952,7 @@ bool tdx_has_emulated_msr(u32 index, bool write)
+ 		default:
+ 			return true;
+ 		}
++	case MSR_IA32_FEAT_CTL:
+ 	case MSR_IA32_APICBASE:
+ 	case MSR_EFER:
+ 		return !write;
+@@ -1966,6 +1967,20 @@ bool tdx_has_emulated_msr(u32 index, bool write)
  int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
  {
--	if (tdx_has_emulated_msr(msr->index, false))
--		return kvm_get_msr_common(vcpu, msr);
--	return 1;
-+	switch (msr->index) {
-+	case MSR_MTRRcap:
+ 	switch (msr->index) {
++	case MSR_IA32_FEAT_CTL:
 +		/*
-+		 * Override kvm_mtrr_get_msr() which hardcodes the value.
-+		 * Report SMRR = 0, WC = 0, FIX = 0 VCNT = 0 to disable MTRR
-+		 * effectively.
++		 * MCE and MCA are advertised via cpuid. guest kernel could
++		 * check if LMCE is enabled or not.
 +		 */
-+		msr->data = 0;
++		msr->data = FEAT_CTL_LOCKED;
++		if (vcpu->arch.mcg_cap & MCG_LMCE_P)
++			msr->data |= FEAT_CTL_LMCE_ENABLED;
 +		return 0;
-+	default:
-+		if (tdx_has_emulated_msr(msr->index, false))
-+			return kvm_get_msr_common(vcpu, msr);
-+		return 1;
-+	}
- }
- 
++	case MSR_IA32_MCG_EXT_CTL:
++		if (!msr->host_initiated && !(vcpu->arch.mcg_cap & MCG_LMCE_P))
++			return 1;
++		msr->data = vcpu->arch.mcg_ext_ctl;
++		return 0;
+ 	case MSR_MTRRcap:
+ 		/*
+ 		 * Override kvm_mtrr_get_msr() which hardcodes the value.
+@@ -1984,6 +1999,11 @@ int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
  int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
  {
--	if (tdx_has_emulated_msr(msr->index, true))
-+	switch (msr->index) {
-+	case MSR_MTRRdefType:
-+		/*
-+		 * Allow writeback only for all memory.
-+		 * Because it's reported that fixed range MTRR isn't supported
-+		 * and VCNT=0, enforce MTRRDefType.FE = 0 and don't care
-+		 * variable range MTRRs. Only default memory type matters.
-+		 *
-+		 * bit 11 E: MTRR enable/disable
-+		 * bit 12 FE: Fixed-range MTRRs enable/disable
-+		 * (E, FE) = (1, 1): enable MTRR and Fixed range MTRR
-+		 * (E, FE) = (1, 0): enable MTRR, disable Fixed range MTRR
-+		 * (E, FE) = (0, *): disable all MTRRs.  all physical memory
-+		 *                   is UC
-+		 */
-+		if (msr->data != ((1 << 11) | MTRR_TYPE_WRBACK))
+ 	switch (msr->index) {
++	case MSR_IA32_MCG_EXT_CTL:
++		if (!msr->host_initiated && !(vcpu->arch.mcg_cap & MCG_LMCE_P))
 +			return 1;
- 		return kvm_set_msr_common(vcpu, msr);
--	return 1;
-+	default:
-+		if (tdx_has_emulated_msr(msr->index, true))
-+			return kvm_set_msr_common(vcpu, msr);
-+		return 1;
-+	}
- }
- 
- static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
-@@ -2704,6 +2726,45 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
- 	return ret;
- }
- 
-+static int tdx_vcpu_init_mtrr(struct kvm_vcpu *vcpu)
-+{
-+	struct msr_data msr;
-+	int ret;
-+	int i;
-+
-+	/*
-+	 * To avoid confusion with reporting VNCT = 0, explicitly disable
-+	 * vaiale-range reisters.
-+	 */
-+	for (i = 0; i < KVM_NR_VAR_MTRR; i++) {
-+		/* phymask */
-+		msr = (struct msr_data) {
-+			.host_initiated = true,
-+			.index = 0x200 + 2 * i + 1,
-+			.data = 0,	/* valid = 0 to disable. */
-+		};
-+		ret = kvm_set_msr_common(vcpu, &msr);
-+		if (ret)
-+			return -EINVAL;
-+	}
-+
-+	/* Set MTRR to use writeback on reset. */
-+	msr = (struct msr_data) {
-+		.host_initiated = true,
-+		.index = MSR_MTRRdefType,
-+		/*
-+		 * Set E(enable MTRR)=1, FE(enable fixed range MTRR)=0, default
-+		 * type=writeback on reset to avoid UC.  Note E=0 means all
-+		 * memory is UC.
-+		 */
-+		.data = (1 << 11) | MTRR_TYPE_WRBACK,
-+	};
-+	ret = kvm_set_msr_common(vcpu, &msr);
-+	if (ret)
-+		return -EINVAL;
-+	return 0;
-+}
-+
- int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- {
- 	struct msr_data apic_base_msr;
-@@ -2741,6 +2802,10 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 	if (kvm_set_apic_base(vcpu, &apic_base_msr))
- 		return -EINVAL;
- 
-+	ret = tdx_vcpu_init_mtrr(vcpu);
-+	if (ret)
-+		return ret;
-+
- 	ret = tdx_td_vcpu_init(vcpu, (u64)cmd.data);
- 	if (ret)
- 		return ret;
++		vcpu->arch.mcg_ext_ctl = msr->data;
++		return 0;
+ 	case MSR_MTRRdefType:
+ 		/*
+ 		 * Allow writeback only for all memory.
 -- 
 2.25.1
 
