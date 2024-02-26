@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-9932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8A7A867957
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:02:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E6A86795A
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:03:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A3361F2DC78
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:02:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBDFB28DB49
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8814614F986;
-	Mon, 26 Feb 2024 14:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1C714F9EA;
+	Mon, 26 Feb 2024 14:39:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="baCu8jxg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AW4B7y+r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5796B14F975;
-	Mon, 26 Feb 2024 14:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF5414F99A;
+	Mon, 26 Feb 2024 14:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958384; cv=none; b=PNk6giOU5Us8xKasPHFblfCJzl/+aJsYOM0gy9MWcAgzxHM/aNB/aIUe8jpk39rtzkpXOpcQErRCjSUN6S5YCDSy9GLOwtu7nUw2iTLfRi/GYLZn/teVT/KcJWetgK8bEAwpuXdyAblVTDwXElIqzfvdaT3xyzemd53vJ9wkNow=
+	t=1708958388; cv=none; b=Xtt9UbHpH6P/p4wOwKgkeCFWkrmr1ejVFlabPwgL4Y9Is6R1f0X2Rbdxmf8Zly9c1c45mmXKsTTMD26yEwMsVvJMP/VkBpx0Xw7c+34GooGpy9x/DlmyljwnR6Vnrl6t63s7b8LpQDDinC/7wAdWANts93BxslQcNbTnc5LHGh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958384; c=relaxed/simple;
-	bh=QoH9b93OPUhcL2ymZ5y++6zNb6PgFanAxGJWrP1JJ0U=;
+	s=arc-20240116; t=1708958388; c=relaxed/simple;
+	bh=pVj+O/nc8ZTcYQP0Pc8FIf1e7FsTCb44SoV4NEs/Y14=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=crBDLbEH3oQ2qnu+bec/j/m/cNoeOlI4dZP5O78mxtxh3Er1R+Kw54UFaHwKPAf/pbbkeehwYWbywNBsE/GwafMo2brx6VKJU/YjdKyL4mao1zkely1/osvWZ6r0SIIIu5V2w7BA4VJ9ZGkVJD/Mr3fsQdA0AUtRzov/qJxrK1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=baCu8jxg; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=C1pjGSqrARbMeo95uO18j1GSKPOkwJZ8uECl1Dw/BSrsvzm9TMlRYCfLH13oJP2Yv5LRaRBeraznBOtir3LcoZpBFSTKVOnVcKVW/PRSkgHpTbuO+AGC5g4PsmIBBAM7kA5aZLTqWuhgp4Bk+40p+vsNsxLEls1F14Vqhtxp0xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AW4B7y+r; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1dcad814986so4575105ad.0;
-        Mon, 26 Feb 2024 06:39:43 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1dc139ed11fso20145375ad.0;
+        Mon, 26 Feb 2024 06:39:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958382; x=1709563182; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958386; x=1709563186; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XyUwxtfxrCb1Y6YMuPhhZhGxcT5rupSBWwJ7nh5wrj4=;
-        b=baCu8jxggOlFmm32ZNTeTq/kh3WFkP0czlhly5opQogjyr0JRVQeOQk9sURG2mJapy
-         4V+tYza4FsgD4jFoEkSyc5CpqCobD8PA/6cewMx2OurmV/ZawSEIaTT+jKmIU/mlNDs6
-         DBTGc1AdIntbZDEAFCjG5YQ2zlzHs1A13VZfCRusGOD9Z7iuodQwaGZdOvZbMiX+sDMk
-         zALizPMe5+BZMeaKmGHZBdiGUwOPIqE+N4IEH73wRPbyXv3yFH6j2pg/VJMNNz2lbWhS
-         0dPfcL0r+5JlNLEmfAQTNCQ/N0OSUgSjgrF1sQR2bV5/wSosfyxjpmu152GveVT2JhEl
-         N0Og==
+        bh=9QI/Y1kNMrQvMG7JUt6H0OqHjkXiCz72P215jqTcUcU=;
+        b=AW4B7y+rghpeQAyzXcXbndgLtRl7Xk0kB94Rrs2BoPDJssOJFonAJtAF2sGkbkrI8B
+         Y7LMbnnGWOdUMtDOQQXnV3lNGHf9EJtTJIBWXaGMWr3Ao+gVAsPlk0xqKkKCmn2S71gX
+         dJlPKwaPXre+Ac9lBn+Zk3p6D4jWzSqoS8CtUolqR+1zRKqQ+p7okihu4PbbsMR4sGXT
+         qDifUEWK53SwSwxIhPbt5iSrC2pw7ymVPWJjlik+Ef89MzW5v9I5vyl6MNqEromADrV4
+         Y7mcYyjqdiOkm9LxvugUidtd/lCUXE1J+bgl6vOzzpjmW6fyWJknJELc9BTkET3IjItD
+         xvtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958382; x=1709563182;
+        d=1e100.net; s=20230601; t=1708958386; x=1709563186;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XyUwxtfxrCb1Y6YMuPhhZhGxcT5rupSBWwJ7nh5wrj4=;
-        b=cD0lIJ6kdxAVqtnQakxzVGuTxL+db2cmFiIeMo7UmEVxfpqkqZqgIfI92Wf8DSx3+t
-         FZrTvOSktcgAnF/q++UK+P4YYG6grhkl0a4VtSWWISqwwiOWkQ0vYhvUpvKGM2uIjLwl
-         /1Y+oSNsCtCrWn5jrZgSDErKMyh8QBgVuBiusrom3fS47HRYpoWZInu/yYTnaR4h39in
-         9+EKVb/BrAuIRtrFzUeBnLfNSsq0lcl1f5pR8qRd1it/m1Y6ORenIB35oT/2pWl+Uzn+
-         SB5sz+emaidss7b4I+YebbAnCeAMMXMqls0ifgYrzO/gVqeGbKjyCXalou4EJsP42+mS
-         9jfg==
-X-Forwarded-Encrypted: i=1; AJvYcCXM3kD1MrVOf2G20ASCSTpbO380nStnmZ2jynQyAY2L8rCPKEAgtSireh5swqrwYFdjc3NNHc/hNUa2sgeZdGJnTe2q
-X-Gm-Message-State: AOJu0Ywt2qghaUN6qZkzPjyEwn9aqVtUfnNaX1BCbwp0X2Rr3fvfPY3Y
-	Oe0s4o8cY1HKp2CNi+7NURLkWVv+mVJBBYC/AnI38XHSxVicq+b/zQnNwd4u
-X-Google-Smtp-Source: AGHT+IEn1oqsBh4RGj9UVLCZqdOuZh4zIFwWm/F6YVc6bX7bWgQDy8/p7G+ALzLCY13ngxYKBB6tVw==
-X-Received: by 2002:a17:903:2281:b0:1db:35b5:7e37 with SMTP id b1-20020a170903228100b001db35b57e37mr9442029plh.50.1708958382541;
-        Mon, 26 Feb 2024 06:39:42 -0800 (PST)
-Received: from localhost ([47.88.5.130])
-        by smtp.gmail.com with ESMTPSA id ix14-20020a170902f80e00b001dbcb39dd7dsm3992856plb.125.2024.02.26.06.39.41
+        bh=9QI/Y1kNMrQvMG7JUt6H0OqHjkXiCz72P215jqTcUcU=;
+        b=JzRpcs8o90som9KMzub/eUKa+APJsLvrbq2WYjBHYuYnAz4XWoZ8yxk6hVaGu7WjCt
+         L/3E00LlgqFDpaG1OcNTbAJIikMtuQ2vj8JkGFEdyHYOfqNv1PH7qL3/gVXbvB55SzK6
+         UZB3BDhE90dgRU5A4zZ9kas8pBfqoyUQQfpGgOmhEnS3Na8F0LW55rIf5PIrq7J/X3tL
+         FbnHEkkzcQ+DTIYHFMJjEOx31mZAv90AzrFDe8DOq6L71vOhyQEiqdt0Ny9dJpzjbQlo
+         xmbpIFuo6VHfD6utL3EMkE00l6TIpZNK+rdQYiDTUpp3BSiyesZaycLkrFY01B8hLQAL
+         ontQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4VZCyjBJkJJZJmxn6potz7Y4rvMe/78tgwhtJNCTHnjD1vty7UcKSlem25E7Drl6YunslDCxFQo+lejv990+wR5qy
+X-Gm-Message-State: AOJu0YxnTF1cfeTA1KEuOSAMTjmLxCt/oVBxX2PsM7A8UQcc5KH5h6V9
+	ikKFXVdDZLsDX8u1+EoMHm3tp2T15ZszClW8HV95qVvjDeBZQfhAasBPbnSf
+X-Google-Smtp-Source: AGHT+IHy8ONH+IR/CrprMSlLNr66EQ8UbtExowfbbOUGEyBdvChuDg4mhNFNKU725s1aIh6O+0Jq+w==
+X-Received: by 2002:a17:902:e806:b0:1dc:6e06:7685 with SMTP id u6-20020a170902e80600b001dc6e067685mr9416736plg.29.1708958386631;
+        Mon, 26 Feb 2024 06:39:46 -0800 (PST)
+Received: from localhost ([198.11.176.14])
+        by smtp.gmail.com with ESMTPSA id g12-20020a170902fe0c00b001dc91b4081dsm2841692plj.271.2024.02.26.06.39.45
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:39:42 -0800 (PST)
+        Mon, 26 Feb 2024 06:39:46 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
-Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-	Hou Wenlong <houwenlong.hwl@antgroup.com>,
+Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>,
+	Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Sean Christopherson <seanjc@google.com>,
@@ -83,10 +83,13 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Kees Cook <keescook@chromium.org>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 69/73] x86/pvm: Implement mmu related PVOPS
-Date: Mon, 26 Feb 2024 22:36:26 +0800
-Message-Id: <20240226143630.33643-70-jiangshanlai@gmail.com>
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>
+Subject: [RFC PATCH 70/73] x86/pvm: Don't use SWAPGS for gsbase read/write
+Date: Mon, 26 Feb 2024 22:36:27 +0800
+Message-Id: <20240226143630.33643-71-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -98,100 +101,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+From: Hou Wenlong <houwenlong.hwl@antgroup.com>
 
-CR2 is passed directly in the event entry, allowing it to be read
-directly in PVOPS. Additionally, write_cr3() for context switch needs to
-notify the hypervisor in its PVOPS. For performance reasons, TLB-related
-PVOPS utilize hypercalls.
+On PVM guest, SWAPGS doesn't work. So let __rdgsbase_inactive() and
+__wrgsbase_inactive() to use rdmsrl()/wrmsrl() on PVM guest.
 
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kernel/pvm.c | 56 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ arch/x86/kernel/process_64.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kernel/pvm.c b/arch/x86/kernel/pvm.c
-index b4522947374d..1dc2c0fb7daa 100644
---- a/arch/x86/kernel/pvm.c
-+++ b/arch/x86/kernel/pvm.c
-@@ -21,6 +21,7 @@
- #include <asm/traps.h>
+diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
+index 33b268747bb7..9a56bcef515e 100644
+--- a/arch/x86/kernel/process_64.c
++++ b/arch/x86/kernel/process_64.c
+@@ -157,7 +157,7 @@ enum which_selector {
+  * traced or probed than any access to a per CPU variable happens with
+  * the wrong GS.
+  *
+- * It is not used on Xen paravirt. When paravirt support is needed, it
++ * It is not used on Xen/PVM paravirt. When paravirt support is needed, it
+  * needs to be renamed with native_ prefix.
+  */
+ static noinstr unsigned long __rdgsbase_inactive(void)
+@@ -166,7 +166,8 @@ static noinstr unsigned long __rdgsbase_inactive(void)
  
- DEFINE_PER_CPU_PAGE_ALIGNED(struct pvm_vcpu_struct, pvm_vcpu_struct);
-+static DEFINE_PER_CPU(unsigned long, pvm_guest_cr3);
+ 	lockdep_assert_irqs_disabled();
  
- unsigned long pvm_range_start __initdata;
- unsigned long pvm_range_end __initdata;
-@@ -153,6 +154,52 @@ static noinstr void pvm_safe_halt(void)
- 	pvm_hypercall0(PVM_HC_IRQ_HALT);
- }
- 
-+static noinstr unsigned long pvm_read_cr2(void)
-+{
-+	return this_cpu_read(pvm_vcpu_struct.cr2);
-+}
-+
-+static noinstr void pvm_write_cr2(unsigned long cr2)
-+{
-+	native_write_cr2(cr2);
-+	this_cpu_write(pvm_vcpu_struct.cr2, cr2);
-+}
-+
-+static unsigned long pvm_read_cr3(void)
-+{
-+	return this_cpu_read(pvm_guest_cr3);
-+}
-+
-+static unsigned long pvm_user_pgd(unsigned long pgd)
-+{
-+	return pgd | BIT(PTI_PGTABLE_SWITCH_BIT) | BIT(X86_CR3_PTI_PCID_USER_BIT);
-+}
-+
-+static void pvm_write_cr3(unsigned long val)
-+{
-+	/* Convert CR3_NO_FLUSH bit to hypercall flags. */
-+	unsigned long flags = ~val >> 63;
-+	unsigned long pgd = val & ~X86_CR3_PCID_NOFLUSH;
-+
-+	this_cpu_write(pvm_guest_cr3, pgd);
-+	pvm_hypercall3(PVM_HC_LOAD_PGTBL, flags, pgd, pvm_user_pgd(pgd));
-+}
-+
-+static void pvm_flush_tlb_user(void)
-+{
-+	pvm_hypercall0(PVM_HC_TLB_FLUSH_CURRENT);
-+}
-+
-+static void pvm_flush_tlb_kernel(void)
-+{
-+	pvm_hypercall0(PVM_HC_TLB_FLUSH);
-+}
-+
-+static void pvm_flush_tlb_one_user(unsigned long addr)
-+{
-+	pvm_hypercall1(PVM_HC_TLB_INVLPG, addr);
-+}
-+
- void __init pvm_early_event(struct pt_regs *regs)
+-	if (!cpu_feature_enabled(X86_FEATURE_XENPV)) {
++	if (!cpu_feature_enabled(X86_FEATURE_XENPV) &&
++	    !cpu_feature_enabled(X86_FEATURE_KVM_PVM_GUEST)) {
+ 		native_swapgs();
+ 		gsbase = rdgsbase();
+ 		native_swapgs();
+@@ -184,14 +185,15 @@ static noinstr unsigned long __rdgsbase_inactive(void)
+  * traced or probed than any access to a per CPU variable happens with
+  * the wrong GS.
+  *
+- * It is not used on Xen paravirt. When paravirt support is needed, it
++ * It is not used on Xen/PVM paravirt. When paravirt support is needed, it
+  * needs to be renamed with native_ prefix.
+  */
+ static noinstr void __wrgsbase_inactive(unsigned long gsbase)
  {
- 	int vector = regs->orig_ax >> 32;
-@@ -397,6 +444,15 @@ void __init pvm_early_setup(void)
- 	pv_ops.irq.irq_enable = __PV_IS_CALLEE_SAVE(pvm_irq_enable);
- 	pv_ops.irq.safe_halt = pvm_safe_halt;
+ 	lockdep_assert_irqs_disabled();
  
-+	this_cpu_write(pvm_guest_cr3, __native_read_cr3());
-+	pv_ops.mmu.read_cr2 = __PV_IS_CALLEE_SAVE(pvm_read_cr2);
-+	pv_ops.mmu.write_cr2 = pvm_write_cr2;
-+	pv_ops.mmu.read_cr3 = pvm_read_cr3;
-+	pv_ops.mmu.write_cr3 = pvm_write_cr3;
-+	pv_ops.mmu.flush_tlb_user = pvm_flush_tlb_user;
-+	pv_ops.mmu.flush_tlb_kernel = pvm_flush_tlb_kernel;
-+	pv_ops.mmu.flush_tlb_one_user = pvm_flush_tlb_one_user;
-+
- 	wrmsrl(MSR_PVM_VCPU_STRUCT, __pa(this_cpu_ptr(&pvm_vcpu_struct)));
- 	wrmsrl(MSR_PVM_EVENT_ENTRY, (unsigned long)(void *)pvm_early_kernel_event_entry - 256);
- 	wrmsrl(MSR_PVM_SUPERVISOR_REDZONE, PVM_SUPERVISOR_REDZONE_SIZE);
+-	if (!cpu_feature_enabled(X86_FEATURE_XENPV)) {
++	if (!cpu_feature_enabled(X86_FEATURE_XENPV) &&
++	    !cpu_feature_enabled(X86_FEATURE_KVM_PVM_GUEST)) {
+ 		native_swapgs();
+ 		wrgsbase(gsbase);
+ 		native_swapgs();
 -- 
 2.19.1.6.gb485710b
 
