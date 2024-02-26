@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9891-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9892-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A688678ED
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:47:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6917C8678F2
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A17811C255F6
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:47:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBCBF1F2E6DF
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2345F135402;
-	Mon, 26 Feb 2024 14:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD39135A7D;
+	Mon, 26 Feb 2024 14:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqaCwwb5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jVSJjN6R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5C91350F6;
-	Mon, 26 Feb 2024 14:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6499135A4E;
+	Mon, 26 Feb 2024 14:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958171; cv=none; b=LJzv5AYaJ3+PbAxwo3gfesIJKzgJDP01XD5bkyIYhQq3T4XhaxSizcyEm3K2HcmxYDePe4OtmOGDIMvNo6oa/iv7QLD+IWRN1uOZEUZaMU5Vodb6PiVQISCTdu2160p2Tv2M2K5tJPdEs+RQP9jP9sfFyMyqXuh4b8smtJYskn4=
+	t=1708958175; cv=none; b=HvZxQQ4k+U2L3hlsQZC2E9YAwIzOh9hct6EFs26PuLCer4kvCHBaarLVeJlFLQWqqwScNdhkZMB5q+eW3N5PsynHKwbiEab9B8t1n3RU7/bLJI5eXlGtGjPUDXTAj7uGALlgH0V0zcXGJizXprbFVT/6kxNbY77K/O8p2JIlIvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958171; c=relaxed/simple;
-	bh=S9RepT6PoqM2S+OMOYJJ6Pjp/uzBUojYH/rcTDukdCQ=;
+	s=arc-20240116; t=1708958175; c=relaxed/simple;
+	bh=s8BFiuzUQau5p+yaQ0/fjHGiJ1v48d8tcf7X9leFdDk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qWYNDgFSiQiMjWAIAY3VzgkNi1hLIxX6nuduNnlerujGwjlTZMZuWg/lTizTvRNCgqEUY4tzIIXaMi3k0r9/A/9OuEs/xuZxLj7fjYrycLBErDsuaoxJWWQZEYeVCvB5VG+eBocbWpUrCRscldZhdu9QSoC/FzoJvKU3M7K24YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mqaCwwb5; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=IGAnKKbC+wowGBCSQmM81Ju1K8ke+RsPW8twRijgZr4/HaHn6+raKKKtsAzEiJSp/P8Q/3NPXIGSZ+ji+3MRLMBZF6byy4Ck0M2QUJsaCqK1PbdTrTnl2e8VSE3hAc1SVexqxmMd1wfYMVc3FoMab7gNg6OK+J+VsgTMSdv4h2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jVSJjN6R; arc=none smtp.client-ip=209.85.166.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6e46dcd8feaso827390b3a.2;
-        Mon, 26 Feb 2024 06:36:09 -0800 (PST)
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7c78573f31aso149892139f.3;
+        Mon, 26 Feb 2024 06:36:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958169; x=1709562969; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958172; x=1709562972; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Yal7PqZq3fB2N6wNdWSs550cQCs0YFhnt+trBoKCwic=;
-        b=mqaCwwb5Zz1bN5TZhSCrivH4/roxBTSRSkWnKuPEmibM1bBYQLNLc55TbYpTktPSj2
-         4EYZ63zJ/vig54AOwqmAK9uwKPw7KeEs3NnxFZfp91cfgkBuSzBUUR3WFAdWVz0RD3yj
-         +PVv5N+O1aoBWYgLVM8e/5KwfO8quJ2iMhcXdwsIh8PNpkPm4/MEjNH8nlTqpvbM7Lfk
-         bScgKGAOH6h1LkRNF+enS8LIfrOTCg0JMMcJnTD/HKDV7UrXEz43tPKTa5MRvtlFhPvi
-         gwk6JNt+kUnHk/xlndOMNMjCkKFQifA513I3baCkKqo4VpxFNeqHQR8UZAUIPOcoGqo8
-         YcRw==
+        bh=UtUkxsopGOuyKL99aD2RpbSsknxN3/UH+bUJznUscCw=;
+        b=jVSJjN6RAGsTofl+30a2DdIfw9wj3m5ZRsCEJMr7Gaq2/lsNAO1tRkNZRV3LeX9/5d
+         0A8x9mDQkaZfDPKGBbJmZWoLV1g9csSsyd5gAjHNm82G/ztVPGzf62S2ILd0s38vRXF2
+         +isNQobyi0UYJcmI5KIR16Qumv+zv7LSBO/Tzxa9XGen6Vzj9mLmmSqQQ5Es0ZKLUFq9
+         BJ2Bgr7zny56w9Oov0TiHwCKAGy8FMXIFAE141A9YFGBd2e8c54GirqhPFHD+K1flmrW
+         OJpvcFULu8ANJ/z7m6FpX6tInWcAJcCeTFWCs9j3gZ/MqL6qPP0tL5JYLLSsjt+X8JXP
+         4ftQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958169; x=1709562969;
+        d=1e100.net; s=20230601; t=1708958172; x=1709562972;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Yal7PqZq3fB2N6wNdWSs550cQCs0YFhnt+trBoKCwic=;
-        b=TQU6AOUeilZNPVH0zwq0IhM/1MFdu5ExqE7earjqHJH5ZCHpshxE9/5b3xpr238+UX
-         5oVmG465D2DuP2uLzd9YO2HLMYqYgnhU9I0sHsd/yhr8679zTtiHi9CiHdNjStZSintm
-         vlxfRh8OUIPsYQogxR63jAH4IJhwzR88i29RUDi08ADA2qS3kAYG0O0+GiMbxCS3iR5Q
-         9do6YWPNrBsOOrCaU8Zawh0XuKj+b9CC6s8DGFsHzl9Lx+Vp8LFprv1B6ld6G0gD/hV4
-         MDgkM7jhqk4vjsMnQLsQcBuzsk7sV2ors6oYXmague2O/xzxi4y/iWdRusxdnQsL4a4J
-         qGBg==
-X-Forwarded-Encrypted: i=1; AJvYcCU116GiRuihyfzo+QKBvt1ooeBbt40+UhLyDMq1jnz52mzzeSVnal+GPVA4bt5YXpf8ebGnhnCQkzFk6f8It8RMxVXx
-X-Gm-Message-State: AOJu0YzA5LsMQGMS/7BahaV4PCmkXkKjcOIDx0S/2Wjye3gK7+wkesF8
-	65rsMesRX7ExhOHCOgTJ48Wl4bwgLsO7qL1oB7hFp/LR9uEsywLrO7m2td1s
-X-Google-Smtp-Source: AGHT+IHB4Cu1aKHNfPZa42dZ40xlkovy8vQGKuBOn8Bof5eHWznKUcKJ+HGxXyIylbQxXjd/SAnndQ==
-X-Received: by 2002:a62:be06:0:b0:6e5:d7:e27a with SMTP id l6-20020a62be06000000b006e500d7e27amr4502659pff.5.1708958169213;
-        Mon, 26 Feb 2024 06:36:09 -0800 (PST)
-Received: from localhost ([47.89.225.180])
-        by smtp.gmail.com with ESMTPSA id y10-20020a62f24a000000b006e467935c58sm4033353pfl.89.2024.02.26.06.36.08
+        bh=UtUkxsopGOuyKL99aD2RpbSsknxN3/UH+bUJznUscCw=;
+        b=SrW+3iOUoMqF4et23l5LqGs6vGW3/8uhK71TfSV3iOa7nrLmnpxB46wus16g8q+0b6
+         7Sr1LqohqXEjpisF7zXgiygQnNRQ6Vn+n8eJ8cPhqCCNAu61fX4D+3oGaPQWAyhQ9Kd7
+         ojXYvVgEOfR6pDGuce/b69u9giE5c76xMKurZK13nEEI+41RWRkAJHDn/tRDajCl+r5r
+         3FBzgwV/sgA7kFmlIpirJIDd35fCrdglJ29WhIH3JyvQpcEhSQlW2DPWBfCgAuDkSu1x
+         YE1pjibJWzR9fJ94aeDC9W2nsrzmd2B1HB4BD6+GsHjdDhTAmZPGsCtPJx3Gl/H3o3Dg
+         0Q7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX6sgo9YpJVvEQM8cLJhYD46VFHyvfBJO2T4EfdXawyyky2ywCGMQzF1HsPyWncbEyvfBviXwUgOWB2KLq/ixKoN/Ng
+X-Gm-Message-State: AOJu0Yzs1YvZdGtBeYqAG1aY6Nb8sb/bNhOBKTEnUaf3NtOBw90VTSjy
+	P67ckPmqT/0P7OC8m40Q0rvxSTdFOWX8BN0PRSgUYC9o6MrKHIABCcm6ZRgi
+X-Google-Smtp-Source: AGHT+IFQeXNAab//9PiSgKBW3UP1nqq/u+J5D/SgwtYsUNu1ZEVUWMN2GeFBx3/XMSHtKBNQ5klvEw==
+X-Received: by 2002:a92:d588:0:b0:365:1305:fac5 with SMTP id a8-20020a92d588000000b003651305fac5mr7579709iln.0.1708958172552;
+        Mon, 26 Feb 2024 06:36:12 -0800 (PST)
+Received: from localhost ([47.88.5.130])
+        by smtp.gmail.com with ESMTPSA id l64-20020a638843000000b005dccf9e3b74sm4047652pgd.92.2024.02.26.06.36.11
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:36:08 -0800 (PST)
+        Mon, 26 Feb 2024 06:36:12 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -84,9 +84,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 28/73] KVM: x86/PVM: Handle syscall from user mode
-Date: Mon, 26 Feb 2024 22:35:45 +0800
-Message-Id: <20240226143630.33643-29-jiangshanlai@gmail.com>
+Subject: [RFC PATCH 29/73] KVM: x86/PVM: Implement allowed range checking for #PF
+Date: Mon, 26 Feb 2024 22:35:46 +0800
+Message-Id: <20240226143630.33643-30-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -100,49 +100,154 @@ Content-Transfer-Encoding: 8bit
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Similar to the vector event from user mode, the syscall event from user
-mode follows the PVM event delivery ABI. Additionally, the 32-bit user
-mode can only use "INT 0x80" for syscall.
+In PVM, guest is only allowed to be running in the reserved virtual
+address range provided by the hypervisor. So guest needs to get the
+allowed range information from the MSR and the hypervisor needs to check
+the fault address and prevent install mapping in the #PF handler.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/pvm/pvm.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ arch/x86/kvm/pvm/pvm.c | 74 ++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/pvm/pvm.h |  5 +++
+ 2 files changed, 79 insertions(+)
 
 diff --git a/arch/x86/kvm/pvm/pvm.c b/arch/x86/kvm/pvm/pvm.c
-index 57d987903791..92eef226df28 100644
+index 92eef226df28..26b2201f7dde 100644
 --- a/arch/x86/kvm/pvm/pvm.c
 +++ b/arch/x86/kvm/pvm/pvm.c
-@@ -915,6 +915,15 @@ static void pvm_setup_mce(struct kvm_vcpu *vcpu)
- {
+@@ -144,6 +144,28 @@ static void pvm_write_guest_kernel_gs_base(struct vcpu_pvm *pvm, u64 data)
+ 	pvm->msr_kernel_gs_base = data;
  }
  
-+static int handle_exit_syscall(struct kvm_vcpu *vcpu)
++static __always_inline bool pvm_guest_allowed_va(struct kvm_vcpu *vcpu, u64 va)
 +{
 +	struct vcpu_pvm *pvm = to_pvm(vcpu);
 +
-+	if (!is_smod(pvm))
-+		return do_pvm_user_event(vcpu, PVM_SYSCALL_VECTOR, false, 0);
-+	return 1;
++	if ((s64)va > 0)
++		return true;
++	if (pvm->l4_range_start <= va && va < pvm->l4_range_end)
++		return true;
++	if (pvm->l5_range_start <= va && va < pvm->l5_range_end)
++		return true;
++
++	return false;
 +}
 +
- static int handle_exit_external_interrupt(struct kvm_vcpu *vcpu)
++static bool pvm_disallowed_va(struct kvm_vcpu *vcpu, u64 va)
++{
++	if (is_noncanonical_address(va, vcpu))
++		return true;
++
++	return !pvm_guest_allowed_va(vcpu, va);
++}
++
+ // switch_to_smod() and switch_to_umod() switch the mode (smod/umod) and
+ // the CR3.  No vTLB flushing when switching the CR3 per PVM Spec.
+ static inline void switch_to_smod(struct kvm_vcpu *vcpu)
+@@ -380,6 +402,48 @@ static void pvm_sched_in(struct kvm_vcpu *vcpu, int cpu)
  {
- 	++vcpu->stat.irq_exits;
-@@ -939,7 +948,11 @@ static int pvm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	struct vcpu_pvm *pvm = to_pvm(vcpu);
- 	u32 exit_reason = pvm->exit_vector;
+ }
  
--	if (exit_reason >= FIRST_EXTERNAL_VECTOR && exit_reason < NR_VECTORS)
-+	if (exit_reason == PVM_SYSCALL_VECTOR)
-+		return handle_exit_syscall(vcpu);
-+	else if (exit_reason == IA32_SYSCALL_VECTOR)
-+		return do_pvm_event(vcpu, IA32_SYSCALL_VECTOR, false, 0);
-+	else if (exit_reason >= FIRST_EXTERNAL_VECTOR && exit_reason < NR_VECTORS)
- 		return handle_exit_external_interrupt(vcpu);
- 	else if (exit_reason == PVM_FAILED_VMENTRY_VECTOR)
- 		return handle_exit_failed_vmentry(vcpu);
++static void pvm_set_msr_linear_address_range(struct vcpu_pvm *pvm,
++					     u64 pml4_i_s, u64 pml4_i_e,
++					     u64 pml5_i_s, u64 pml5_i_e)
++{
++	pvm->msr_linear_address_range = ((0xfe00 | pml4_i_s) << 0) |
++					((0xfe00 | pml4_i_e) << 16) |
++					((0xfe00 | pml5_i_s) << 32) |
++					((0xfe00 | pml5_i_e) << 48);
++
++	pvm->l4_range_start = (0x1fffe00 | pml4_i_s) * PT_L4_SIZE;
++	pvm->l4_range_end = (0x1fffe00 | pml4_i_e) * PT_L4_SIZE;
++	pvm->l5_range_start = (0xfe00 | pml5_i_s) * PT_L5_SIZE;
++	pvm->l5_range_end = (0xfe00 | pml5_i_e) * PT_L5_SIZE;
++}
++
++static void pvm_set_default_msr_linear_address_range(struct vcpu_pvm *pvm)
++{
++	pvm_set_msr_linear_address_range(pvm, pml4_index_start, pml4_index_end,
++					 pml5_index_start, pml5_index_end);
++}
++
++static bool pvm_check_and_set_msr_linear_address_range(struct vcpu_pvm *pvm, u64 msr)
++{
++	u64 pml4_i_s = (msr >> 0) & 0x1ff;
++	u64 pml4_i_e = (msr >> 16) & 0x1ff;
++	u64 pml5_i_s = (msr >> 32) & 0x1ff;
++	u64 pml5_i_e = (msr >> 48) & 0x1ff;
++
++	/* PVM specification requires those bits to be all set. */
++	if ((msr & 0xff00ff00ff00ff00) != 0xff00ff00ff00ff00)
++		return false;
++
++	/* Guest ranges should be inside what the hypervisor can provide. */
++	if (pml4_i_s < pml4_index_start || pml4_i_e > pml4_index_end ||
++	    pml5_i_s < pml5_index_start || pml5_i_e > pml5_index_end)
++		return false;
++
++	pvm_set_msr_linear_address_range(pvm, pml4_i_s, pml4_i_e, pml5_i_s, pml5_i_e);
++
++	return true;
++}
++
+ static int pvm_get_msr_feature(struct kvm_msr_entry *msr)
+ {
+ 	return 1;
+@@ -456,6 +520,9 @@ static int pvm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_PVM_SWITCH_CR3:
+ 		msr_info->data = pvm->msr_switch_cr3;
+ 		break;
++	case MSR_PVM_LINEAR_ADDRESS_RANGE:
++		msr_info->data = pvm->msr_linear_address_range;
++		break;
+ 	default:
+ 		ret = kvm_get_msr_common(vcpu, msr_info);
+ 	}
+@@ -552,6 +619,10 @@ static int pvm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_PVM_SWITCH_CR3:
+ 		pvm->msr_switch_cr3 = msr_info->data;
+ 		break;
++	case MSR_PVM_LINEAR_ADDRESS_RANGE:
++		if (!pvm_check_and_set_msr_linear_address_range(pvm, msr_info->data))
++			return 1;
++		break;
+ 	default:
+ 		ret = kvm_set_msr_common(vcpu, msr_info);
+ 	}
+@@ -1273,6 +1344,7 @@ static void pvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	pvm->msr_retu_rip_plus2 = 0;
+ 	pvm->msr_rets_rip_plus2 = 0;
+ 	pvm->msr_switch_cr3 = 0;
++	pvm_set_default_msr_linear_address_range(pvm);
+ }
+ 
+ static int pvm_vcpu_create(struct kvm_vcpu *vcpu)
+@@ -1520,6 +1592,8 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
+ 	.msr_filter_changed = pvm_msr_filter_changed,
+ 	.complete_emulated_msr = kvm_complete_insn_gp,
+ 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
++
++	.disallowed_va = pvm_disallowed_va,
+ 	.vcpu_gpc_refresh = pvm_vcpu_gpc_refresh,
+ };
+ 
+diff --git a/arch/x86/kvm/pvm/pvm.h b/arch/x86/kvm/pvm/pvm.h
+index 39506ddbe5c5..bf3a6a1837c0 100644
+--- a/arch/x86/kvm/pvm/pvm.h
++++ b/arch/x86/kvm/pvm/pvm.h
+@@ -82,6 +82,11 @@ struct vcpu_pvm {
+ 	unsigned long msr_switch_cr3;
+ 	unsigned long msr_linear_address_range;
+ 
++	u64 l4_range_start;
++	u64 l4_range_end;
++	u64 l5_range_start;
++	u64 l5_range_end;
++
+ 	struct kvm_segment segments[NR_VCPU_SREG];
+ 	struct desc_ptr idt_ptr;
+ 	struct desc_ptr gdt_ptr;
 -- 
 2.19.1.6.gb485710b
 
