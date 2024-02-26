@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9920-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2943786793A
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:58:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B642486793D
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BAC31F27212
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:58:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D64391C290F7
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C49412AAFF;
-	Mon, 26 Feb 2024 14:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B610A12F382;
+	Mon, 26 Feb 2024 14:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BVB9AbnQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C2Jo9S4P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9C712F36A;
-	Mon, 26 Feb 2024 14:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752C712AAC8;
+	Mon, 26 Feb 2024 14:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958300; cv=none; b=LWfSxdPljejcs5mYH/tuH9aPUDbUM/Tyfoj0+C75QAWaDF7M1AG9SLff3Kukxd4ja/5dojonDP5Kvqk9XN3ciE8pEK7TGfU8MqdoVlRXHbXv4r2fstChYQcp2gyFVlbl0IZW9sntdsNQmQRxfUzeHT4X6Cu7ZJsBkKvmWD5UgMw=
+	t=1708958313; cv=none; b=GrRW3lwLVW2lk/lcCeqsZCFUS/g3TunBjlJCNp/70ZwNbZ4ukK23DndQua6HK86O5fOseFtO6+PcD0wDc6S1ECyCLQ+Dotc2AleDv8OL18PPHpXAsRJoRhFF+14vfFaA+82n8a4v15TxpxBINxEQrBzH0+X1LEsekZ19d1CNODo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958300; c=relaxed/simple;
-	bh=wQWJDRe13cC/lAPr09l+aehtvQPpP+T7S4UcqUaG0oM=;
+	s=arc-20240116; t=1708958313; c=relaxed/simple;
+	bh=RuI+mIXFCnHTy2O7ADohtxpMA+EmOljcf64cLsOTZSQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kN1KBNUUp58lHx0Xyc8I03vA0luST7lV6BzYhgywUAfhFJ/UeDffwiynTr4cyf8IyA2weCDOb3puqrnHNCXSNeUWHJlyp3T0PKgxUV9R+4naqHLervOw/W4jaYGZxEKz3qpJFvdolmcyKNmNWmv3lyt7UxJoXcX9FDqQV1CTWRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BVB9AbnQ; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version; b=We+evRHZIgnzuDUm0vuV6wLp8qjHW5tZJyOPJN8q1giKWYXQuonhhVsvc+fGVC3oxLDpjvZdnUyX61D+GkiIZXH4NeEgKhklhsRj/XPRfZQVufTvJlIBy50/gmF7qQM+jtxyxjse+QDBbZKNdhGzUwLiEStziwwXCkYi59cIdn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C2Jo9S4P; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso2387589a12.3;
-        Mon, 26 Feb 2024 06:38:18 -0800 (PST)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5d4d15ec7c5so2457731a12.1;
+        Mon, 26 Feb 2024 06:38:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958298; x=1709563098; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958310; x=1709563110; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+RiTkMvyx33Aqiv75PkY1cAw5jxjHAa5YAVlUH/MwnE=;
-        b=BVB9AbnQhzoWZYiW2pKJcB+Ah+Jgn1j1IluP9iWWRzUZH/UrL6wTMndJtEvJBU0j+w
-         oUO9tN09s9x5MHAYrvgyGKkKa4rJrQVirm1jHhanH83reBlqljxN88DMCGT4CDhPK+WJ
-         qPcdjF4+IFEp+SXhdA5SH6voduX3SAO6G8OYrkiyF2k4XsfbsPoD8hcmyw0M5sq8a0kM
-         clqoYsOE9ZGlcOfRTwwof27AgkCAQ2T4bRWvvUc8XMKB4lCwZImxBfNlSkiT8TmvL3Gy
-         yXRPUKEfhTXByDlSnsZ1MOS+aRnP0CZVulRfnHFp6qORSMFM7K9bwbBKKGVJvRO5VBZ9
-         RTJQ==
+        bh=4nV4uIyJE1TrPKasp5oCdCMedKEyqDIAzttVGmNtNdU=;
+        b=C2Jo9S4PWO0hcbh3EZ6O88rV5fPrwLWx5dMjRmwlmEbGg4YJrH4Ywr7O557B1nkg+v
+         QRuZQMLQFKmIQ4Nnm0SzTjRSiBoPBd2YupctGLn8UXXZvSWZ9i4sdQwU3rcfVv3pRtU0
+         FFOVcUI0TWhLIX7ip57vxpGr4oo6aLG2oLYCDkQN6roz2YyEsePSq3Ov/AYfV0weZxLg
+         t61wI55LieyTWd15boX8W18X/VCxLGA6ulFl76T4H+FyBUoC6zz5+KL8N5l/WIhHRgiK
+         zhhRfXAfAJwsLrgGUNbqCRulJyc54oodRiVOUCT2cqr0dAYbVSV9RzpGXJxBTlGobubh
+         t+CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958298; x=1709563098;
+        d=1e100.net; s=20230601; t=1708958310; x=1709563110;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+RiTkMvyx33Aqiv75PkY1cAw5jxjHAa5YAVlUH/MwnE=;
-        b=ElefZ8huafonUv/Bh9GE44aRKeTXva33cN9akYm68Kkq6C5Nf4GlIzo6EQSZQd81L/
-         NnbTrbwwrZavPYZ/hG5l6dSzBZOoN8+vqV2drG8rq9r1OqCAuE6eBZAKaLrEcq3As2mf
-         yA5gvmOYciA+HcZ1etBIbL8kEPeSDOtgbJ5nCgCtAkgbK0ao0NdrABVqYN3roqcDy1qy
-         DgYX0LXv1IIjz5p4DFxzA+QeZZp6tfLyERux5F9si2SEIN1L8+rCepSpFbUkxnR3xB5m
-         TkCuz/L+IXMvT49sWEvqQ3wcm473Krs3yUgh3bOM43eWN4gGqKSHmSVsGy/504wvvR8c
-         TdJw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkNPHbNSvNdSgpicPZGVUxcw9mPnCR7zDfsYgf03soHroCLkb38gz1ZNAdpEAp2x3HrihyNEZuo0i+RiqpMNFr3qNe
-X-Gm-Message-State: AOJu0YzIfuRSolwoiRBk2AOOVf8O/ODjpPrfLRXjBlNu+fd03FjfAvju
-	pPainCMWRg7Z4BZNW5fVYjDPEg8FxkDU9MkolkPEiHpJ5ipKnCl56vfCPuYf
-X-Google-Smtp-Source: AGHT+IGS7+CQrWPm6z5nP1RqkHXHHk4aPrrGAQAjzn0ILkLtPs+kVghGUmCwm0mOuOTFyjaUkqS3Ww==
-X-Received: by 2002:a05:6a20:12cb:b0:1a0:e089:e25e with SMTP id v11-20020a056a2012cb00b001a0e089e25emr6228306pzg.46.1708958297873;
-        Mon, 26 Feb 2024 06:38:17 -0800 (PST)
+        bh=4nV4uIyJE1TrPKasp5oCdCMedKEyqDIAzttVGmNtNdU=;
+        b=rp2HFagYjPJDkP4dYfbsqGx1vMPqxhbHLjzlHoZOp1ovRW7Ej358CWrB4W5iaAkQcm
+         kLTpBb9gdA1ZuUJhJ7sAqRszxWP8HRkIG04S6xpKvOgX1AkGqCzalwvCj/U+qHQVC4uc
+         veK4LH/BJk59/GpbyK2hKAGMILGPlIkgpVa683lefq/0MTymLUmZ4nzuyECPdi2CiN1g
+         GU/7ecKpGkd2d0/NYcLZqYOGde0lRuz1umxVA8pApUs9K6YdDWNuQAvX0GZbGqrm8M6a
+         jiBZ+LZhoNH0i/YnIhD2JVuoWttx7SjBAu2uWEjw1PQKcXI0MyNaRawUzXMLLBqoVmMZ
+         iDnA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnV60xfyPX9Y1aJFp+qtib5CP1xgXxmvkfAGk8oJ01EcQfK0vCCC/w2wK5hOIg2+jBB6BYTxSpcVEEkoHGedaxSeBv
+X-Gm-Message-State: AOJu0YyLgIfk9K3jrQuDgqlNprny21sQ98xriW/aQ/hFgb5VmUWLmga9
+	iNAMISpJ5Lh9e5BZYbXH2DfnUExOE4zsZ8WJSNMb771uEZz3LKaQr4SvOg6/
+X-Google-Smtp-Source: AGHT+IHFApyYJLTpQNsPa0O7HI/vb7qEUTPGVhU45NHrc+zPxscyqHazTshcu7JFv6FdR+LjDyPZrw==
+X-Received: by 2002:a05:6a20:d486:b0:1a0:ee99:5d07 with SMTP id im6-20020a056a20d48600b001a0ee995d07mr7764444pzb.62.1708958309874;
+        Mon, 26 Feb 2024 06:38:29 -0800 (PST)
 Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id g11-20020a63e60b000000b005dbd0facb4dsm3930417pgh.61.2024.02.26.06.38.17
+        by smtp.gmail.com with ESMTPSA id e6-20020a63ee06000000b005dc491ccdcesm4053747pgi.14.2024.02.26.06.38.29
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:38:17 -0800 (PST)
+        Mon, 26 Feb 2024 06:38:29 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>,
@@ -84,14 +84,10 @@ Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Yuntao Wang <ytcoode@gmail.com>,
-	Wang Jinchao <wangjinchao@xfusion.com>
-Subject: [RFC PATCH 57/73] x86/pvm: Make cpu entry area and vmalloc area variable
-Date: Mon, 26 Feb 2024 22:36:14 +0800
-Message-Id: <20240226143630.33643-58-jiangshanlai@gmail.com>
+	Andy Lutomirski <luto@kernel.org>
+Subject: [RFC PATCH 58/73] x86/pvm: Relocate kernel address space layout
+Date: Mon, 26 Feb 2024 22:36:15 +0800
+Message-Id: <20240226143630.33643-59-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -105,142 +101,178 @@ Content-Transfer-Encoding: 8bit
 
 From: Hou Wenlong <houwenlong.hwl@antgroup.com>
 
-For the PVM guest, the entire kernel layout should be within the allowed
-virtual address range. Therefore, establish CPU_ENTRY_AREA_BASE and
-VMEMORY_END as a variable for the PVM guest, allowing it to be
-modified as necessary for the PVM guest.
+Relocate the kernel address space layout to a specific range, which is
+similar to KASLR. Since there is not enough room for KASAN, KASAN is not
+supported for PVM guest.
 
+Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/include/asm/page_64.h          |  3 +++
- arch/x86/include/asm/pgtable_64_types.h | 14 ++++++++++++--
- arch/x86/kernel/head64.c                |  7 +++++++
- arch/x86/mm/dump_pagetables.c           |  3 ++-
- arch/x86/mm/kaslr.c                     |  4 ++--
- 5 files changed, 26 insertions(+), 5 deletions(-)
+ arch/x86/Kconfig                  |  3 +-
+ arch/x86/include/asm/pvm_para.h   |  6 +++
+ arch/x86/kernel/head64_identity.c |  6 +++
+ arch/x86/kernel/pvm.c             | 64 +++++++++++++++++++++++++++++++
+ arch/x86/mm/kaslr.c               |  4 ++
+ 5 files changed, 82 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/page_64.h b/arch/x86/include/asm/page_64.h
-index b8692e6cc939..4f64f049f3d0 100644
---- a/arch/x86/include/asm/page_64.h
-+++ b/arch/x86/include/asm/page_64.h
-@@ -18,6 +18,9 @@ extern unsigned long page_offset_base;
- extern unsigned long vmalloc_base;
- extern unsigned long vmemmap_base;
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 1b4bea3db53d..ded687cc23ad 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -853,7 +853,8 @@ config KVM_GUEST
  
-+extern unsigned long cpu_entry_area_base;
-+extern unsigned long vmemory_end;
-+
- static __always_inline unsigned long __phys_addr_nodebug(unsigned long x)
+ config PVM_GUEST
+ 	bool "PVM Guest support"
+-	depends on X86_64 && KVM_GUEST && X86_PIE
++	depends on X86_64 && KVM_GUEST && X86_PIE && !KASAN
++	select RANDOMIZE_MEMORY
+ 	select RELOCATABLE_UNCOMPRESSED_KERNEL
+ 	default n
+ 	help
+diff --git a/arch/x86/include/asm/pvm_para.h b/arch/x86/include/asm/pvm_para.h
+index efd7afdf9be9..ff0bf0fe7dc4 100644
+--- a/arch/x86/include/asm/pvm_para.h
++++ b/arch/x86/include/asm/pvm_para.h
+@@ -10,6 +10,7 @@
+ #include <uapi/asm/kvm_para.h>
+ 
+ void __init pvm_early_setup(void);
++bool __init pvm_kernel_layout_relocate(void);
+ 
+ static inline void pvm_cpuid(unsigned int *eax, unsigned int *ebx,
+ 			     unsigned int *ecx, unsigned int *edx)
+@@ -64,6 +65,11 @@ static inline bool pvm_detect(void)
+ static inline void pvm_early_setup(void)
  {
- 	unsigned long y = x - KERNEL_MAP_BASE;
-diff --git a/arch/x86/include/asm/pgtable_64_types.h b/arch/x86/include/asm/pgtable_64_types.h
-index 6780f2e63717..66c8e7325d27 100644
---- a/arch/x86/include/asm/pgtable_64_types.h
-+++ b/arch/x86/include/asm/pgtable_64_types.h
-@@ -140,6 +140,7 @@ extern unsigned int ptrs_per_p4d;
- # define VMEMMAP_START		__VMEMMAP_BASE_L4
- #endif /* CONFIG_DYNAMIC_MEMORY_LAYOUT */
- 
-+#ifndef CONFIG_PVM_GUEST
- /*
-  * End of the region for which vmalloc page tables are pre-allocated.
-  * For non-KMSAN builds, this is the same as VMALLOC_END.
-@@ -147,6 +148,10 @@ extern unsigned int ptrs_per_p4d;
-  * VMALLOC_START..VMALLOC_END (see below).
-  */
- #define VMEMORY_END		(VMALLOC_START + (VMALLOC_SIZE_TB << 40) - 1)
-+#else
-+#define RAW_VMEMORY_END		(__VMALLOC_BASE_L4 + (VMALLOC_SIZE_TB_L4 << 40) - 1)
-+#define VMEMORY_END		vmemory_end
-+#endif /* CONFIG_PVM_GUEST */
- 
- #ifndef CONFIG_KMSAN
- #define VMALLOC_END		VMEMORY_END
-@@ -166,7 +171,7 @@ extern unsigned int ptrs_per_p4d;
-  *              KMSAN_MODULES_ORIGIN_START to
-  *              KMSAN_MODULES_ORIGIN_START + MODULES_LEN - origins for modules.
-  */
--#define VMALLOC_QUARTER_SIZE	((VMALLOC_SIZE_TB << 40) >> 2)
-+#define VMALLOC_QUARTER_SIZE	((VMEMORY_END + 1 - VMALLOC_START) >> 2)
- #define VMALLOC_END		(VMALLOC_START + VMALLOC_QUARTER_SIZE - 1)
- 
- /*
-@@ -202,7 +207,12 @@ extern unsigned int ptrs_per_p4d;
- #define ESPFIX_BASE_ADDR	(ESPFIX_PGD_ENTRY << P4D_SHIFT)
- 
- #define CPU_ENTRY_AREA_PGD	_AC(-4, UL)
--#define CPU_ENTRY_AREA_BASE	(CPU_ENTRY_AREA_PGD << P4D_SHIFT)
-+#define RAW_CPU_ENTRY_AREA_BASE	(CPU_ENTRY_AREA_PGD << P4D_SHIFT)
-+#ifdef CONFIG_PVM_GUEST
-+#define CPU_ENTRY_AREA_BASE	cpu_entry_area_base
-+#else
-+#define CPU_ENTRY_AREA_BASE	RAW_CPU_ENTRY_AREA_BASE
-+#endif
- 
- #define EFI_VA_START		( -4 * (_AC(1, UL) << 30))
- #define EFI_VA_END		(-68 * (_AC(1, UL) << 30))
-diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-index 0b0e460609e5..d0e8d648bd38 100644
---- a/arch/x86/kernel/head64.c
-+++ b/arch/x86/kernel/head64.c
-@@ -72,6 +72,13 @@ unsigned long kernel_map_base __ro_after_init = __START_KERNEL_map;
- EXPORT_SYMBOL(kernel_map_base);
- #endif
- 
-+#ifdef CONFIG_PVM_GUEST
-+unsigned long cpu_entry_area_base __ro_after_init = RAW_CPU_ENTRY_AREA_BASE;
-+EXPORT_SYMBOL(cpu_entry_area_base);
-+unsigned long vmemory_end __ro_after_init = RAW_VMEMORY_END;
-+EXPORT_SYMBOL(vmemory_end);
-+#endif
+ }
 +
- /* Wipe all early page tables except for the kernel symbol map */
- static void __init reset_early_page_tables(void)
- {
-diff --git a/arch/x86/mm/dump_pagetables.c b/arch/x86/mm/dump_pagetables.c
-index d5c6f61242aa..166c7d36d8ff 100644
---- a/arch/x86/mm/dump_pagetables.c
-+++ b/arch/x86/mm/dump_pagetables.c
-@@ -95,7 +95,7 @@ static struct addr_marker address_markers[] = {
- #ifdef CONFIG_MODIFY_LDT_SYSCALL
- 	[LDT_NR]		= { 0UL,		"LDT remap" },
- #endif
--	[CPU_ENTRY_AREA_NR]	= { CPU_ENTRY_AREA_BASE,"CPU entry Area" },
-+	[CPU_ENTRY_AREA_NR]	= { 0UL,		"CPU entry Area" },
- #ifdef CONFIG_X86_ESPFIX64
- 	[ESPFIX_START_NR]	= { ESPFIX_BASE_ADDR,	"ESPfix Area", 16 },
- #endif
-@@ -479,6 +479,7 @@ static int __init pt_dump_init(void)
- 	address_markers[MODULES_VADDR_NR].start_address = MODULES_VADDR;
- 	address_markers[MODULES_END_NR].start_address = MODULES_END;
- 	address_markers[FIXADDR_START_NR].start_address = FIXADDR_START;
-+	address_markers[CPU_ENTRY_AREA_NR].start_address = CPU_ENTRY_AREA_BASE;
- #endif
- #ifdef CONFIG_X86_32
- 	address_markers[VMALLOC_START_NR].start_address = VMALLOC_START;
++static inline bool pvm_kernel_layout_relocate(void)
++{
++	return false;
++}
+ #endif /* CONFIG_PVM_GUEST */
+ 
+ #endif /* _ASM_X86_PVM_PARA_H */
+diff --git a/arch/x86/kernel/head64_identity.c b/arch/x86/kernel/head64_identity.c
+index f69f9904003c..467fe493c9ba 100644
+--- a/arch/x86/kernel/head64_identity.c
++++ b/arch/x86/kernel/head64_identity.c
+@@ -396,6 +396,12 @@ static void __head detect_pvm_range(void)
+ 	pml4_index_end = (msr_val >> 16) & 0x1ff;
+ 	pvm_range_start = (0x1fffe00 | pml4_index_start) * P4D_SIZE;
+ 	pvm_range_end = (0x1fffe00 | pml4_index_end) * P4D_SIZE;
++
++	/*
++	 * early page fault would map page into directing mapping area,
++	 * so we should modify 'page_offset_base' here early.
++	 */
++	page_offset_base = pvm_range_start;
+ }
+ 
+ void __head pvm_relocate_kernel(unsigned long physbase)
+diff --git a/arch/x86/kernel/pvm.c b/arch/x86/kernel/pvm.c
+index fc82c71b305b..9cdfbaa15dbb 100644
+--- a/arch/x86/kernel/pvm.c
++++ b/arch/x86/kernel/pvm.c
+@@ -10,7 +10,10 @@
+  */
+ #define pr_fmt(fmt) "pvm-guest: " fmt
+ 
++#include <linux/mm_types.h>
++
+ #include <asm/cpufeature.h>
++#include <asm/cpu_entry_area.h>
+ #include <asm/pvm_para.h>
+ 
+ unsigned long pvm_range_start __initdata;
+@@ -23,3 +26,64 @@ void __init pvm_early_setup(void)
+ 
+ 	setup_force_cpu_cap(X86_FEATURE_KVM_PVM_GUEST);
+ }
++
++#define TB_SHIFT	40
++#define HOLE_SIZE	(1UL << 39)
++
++#define PVM_DIRECT_MAPPING_SIZE		(8UL << TB_SHIFT)
++#define PVM_VMALLOC_SIZE		(5UL << TB_SHIFT)
++#define PVM_VMEM_MAPPING_SIZE		(1UL << TB_SHIFT)
++
++/*
++ * For a PVM guest, the hypervisor would provide one valid virtual address
++ * range for the guest kernel. The guest kernel needs to adjust its layout,
++ * including the direct mapping area, vmalloc area, vmemmap area, and CPU entry
++ * area, to be within this range. If the range start is 0xffffd90000000000, the
++ * PVM guest kernel with 4-level page tables could arrange its layout as
++ * follows:
++ *
++ * ffff800000000000 - ffff87ffffffffff (=43 bits) guard hole, reserved for hypervisor
++ * ... host kernel used ...  guest kernel range start
++ * ffffd90000000000 - ffffe0ffffffffff (=8 TB) directing mapping of all physical memory
++ * ffffe10000000000 - ffffe17fffffffff (=39 bit) hole
++ * ffffe18000000000 - ffffe67fffffffff (=5 TB) vmalloc/ioremap space
++ * ffffe68000000000 - ffffe6ffffffffff (=39 bit) hole
++ * ffffe70000000000 - ffffe7ffffffffff (=40 bit) virtual memory map (1TB)
++ * ffffe80000000000 - ffffe87fffffffff (=39 bit) cpu_entry_area mapping
++ * ffffe88000000000 - ffffe8ff7fffffff (=510 G) hole
++ * ffffe8ff80000000 - ffffe8ffffffffff (=2 G) kernel image
++ * ... host kernel used ... guest kernel range end
++ *
++ */
++bool __init pvm_kernel_layout_relocate(void)
++{
++	unsigned long area_size;
++
++	if (!boot_cpu_has(X86_FEATURE_KVM_PVM_GUEST)) {
++		vmemory_end = VMALLOC_START + (VMALLOC_SIZE_TB << 40) - 1;
++		return false;
++	}
++
++	if (!IS_ALIGNED(pvm_range_start, PGDIR_SIZE))
++		panic("The start of the allowed range is not aligned");
++
++	area_size = max_pfn << PAGE_SHIFT;
++	if (area_size > PVM_DIRECT_MAPPING_SIZE)
++		panic("The memory size is too large for directing mapping area");
++
++	vmalloc_base = page_offset_base + PVM_DIRECT_MAPPING_SIZE + HOLE_SIZE;
++	vmemory_end = vmalloc_base + PVM_VMALLOC_SIZE;
++
++	vmemmap_base = vmemory_end + HOLE_SIZE;
++	area_size = max_pfn * sizeof(struct page);
++	if (area_size > PVM_VMEM_MAPPING_SIZE)
++		panic("The memory size is too large for virtual memory mapping area");
++
++	cpu_entry_area_base = vmemmap_base + PVM_VMEM_MAPPING_SIZE;
++	BUILD_BUG_ON(CPU_ENTRY_AREA_MAP_SIZE > (1UL << 39));
++
++	if (cpu_entry_area_base + (2UL << 39) > pvm_range_end)
++		panic("The size of the allowed range is too small");
++
++	return true;
++}
 diff --git a/arch/x86/mm/kaslr.c b/arch/x86/mm/kaslr.c
-index 37db264866b6..e3825c7542a3 100644
+index e3825c7542a3..f6f332abf515 100644
 --- a/arch/x86/mm/kaslr.c
 +++ b/arch/x86/mm/kaslr.c
-@@ -38,7 +38,7 @@
-  * highest amount of space for randomization available, but that's too hard
-  * to keep straight and caused issues already.
-  */
--static const unsigned long vaddr_end = CPU_ENTRY_AREA_BASE;
-+static const unsigned long vaddr_end = RAW_CPU_ENTRY_AREA_BASE;
+@@ -28,6 +28,7 @@
  
- /*
-  * Memory regions randomized by KASLR (except modules that use a separate logic
-@@ -79,7 +79,7 @@ void __init kernel_randomize_memory(void)
- 	 * limited....
- 	 */
- 	BUILD_BUG_ON(vaddr_start >= vaddr_end);
--	BUILD_BUG_ON(vaddr_end != CPU_ENTRY_AREA_BASE);
-+	BUILD_BUG_ON(vaddr_end != RAW_CPU_ENTRY_AREA_BASE);
+ #include <asm/setup.h>
+ #include <asm/kaslr.h>
++#include <asm/pvm_para.h>
+ 
+ #include "mm_internal.h"
+ 
+@@ -82,6 +83,9 @@ void __init kernel_randomize_memory(void)
+ 	BUILD_BUG_ON(vaddr_end != RAW_CPU_ENTRY_AREA_BASE);
  	BUILD_BUG_ON(vaddr_end > __START_KERNEL_map);
  
++	if (pvm_kernel_layout_relocate())
++		return;
++
  	if (!kaslr_memory_enabled())
+ 		return;
+ 
 -- 
 2.19.1.6.gb485710b
 
