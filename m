@@ -1,323 +1,246 @@
-Return-Path: <kvm+bounces-9617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9616-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7DA866A3F
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 07:47:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B8928669EB
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 07:13:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3035B282A6A
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 06:47:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 889981C20853
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 06:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7361BDCB;
-	Mon, 26 Feb 2024 06:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D7C1BC4C;
+	Mon, 26 Feb 2024 06:13:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NiG9q+O3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iUGSlrfp"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDDF1BDC3;
-	Mon, 26 Feb 2024 06:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022871B968;
+	Mon, 26 Feb 2024 06:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708930047; cv=none; b=u30wVM1pRrI7JmSNwLXfkgbd/h7AnevrgOm13T5LoxzEj6SFRSz5OlbpQtIf1jiigPS517SXEHQSBolDiBnb33GifpkOmObANdZQiGZ4DtRa7Eru3MNwyeaqT9hUi66dsUuWEcj7TK9BX8OOZctWLbi9LR+4JeyZuCTiMGVfv5k=
+	t=1708927981; cv=none; b=h6QVvlr42c6pslx55DLCfzYTiELSn6RYynizdB4KKIa5oGoLRZlO2Z/MFnQRssnHCPzlOEqgnKuVfIcTGiBlliaWP7HRr/sNbWJgBKhL5V3du2Y4Kr3VRBLJ3i3nq3IIDNvOBDP+nHbbD5OH4mFRaGsy8VRhYNiyna5/VSWfdXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708930047; c=relaxed/simple;
-	bh=r+YRIokGyqR9X8s9S5ioq/Xrj7AOa13EKl+Y0GQmDFk=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=HbUinRLWub6I5w3jRjXsv3tQTy3tYYK9Nn+gJms8FvG5LLZ4YEu5l+NPj1ecohdMxAqIqlUasFPXMup1nLre9mCNUUwEk7IftQe9wO5BN1QV9g+N9yG1VX1bi4iqrwcgWqy+Ij7OIRaEOv5bcx7INPuOmmdeW5FHt6GvNNnOSHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NiG9q+O3; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708930036; h=Message-ID:Subject:Date:From:To;
-	bh=zqZsfZ/qluUEW7qkID/ee5gWeGwmJGn3HGM5FIAvvSM=;
-	b=NiG9q+O39eHStuM8y8B1udACnITePfJKKGw2Ll8ljZALTMgpu0a+NdGnMfL6ZtMDtabKgOfh0aVod/qFUUHoC0StBwLKl7sGvsMOka0ZTtaHq2NdET55fDmavQ/jnQk7EfHcaK5ad16ZIb9pM9H0e7+uv6UPb/xVlSAl7Js4Tbg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R781e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0W1Cedgm_1708930033;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W1Cedgm_1708930033)
-          by smtp.aliyun-inc.com;
-          Mon, 26 Feb 2024 14:47:14 +0800
-Message-ID: <1708927861.8802218-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v2 19/19] virtio_net: sq support premapped mode
-Date: Mon, 26 Feb 2024 14:11:01 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240223082726.52915-1-xuanzhuo@linux.alibaba.com>
- <20240223082726.52915-20-xuanzhuo@linux.alibaba.com>
- <20240225032330-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240225032330-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1708927981; c=relaxed/simple;
+	bh=veta97L3ID3YoBQ1toWeRCzS2ZbdS3Bqd91mRo/FXzQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CPqitDYNmFL7pK1NZcciNPQndOzYKK6gXCp4FHdM8wi65i9YeghcShv0pJD2FDMysEdfvaJytVcFRHyIMK8+/XCVoaKNS0bTslrzj9zrPOhxCf3tolLQ70KWk1L5h0vbQAJr3xdQXNk42j97Unfyi5ThiOr0L0jAlUleRHo/6Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iUGSlrfp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8227CC433C7;
+	Mon, 26 Feb 2024 06:13:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708927980;
+	bh=veta97L3ID3YoBQ1toWeRCzS2ZbdS3Bqd91mRo/FXzQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=iUGSlrfp+wGy5nEZNmrjYIOfJDv4kW8Sr4uFCIrX1DM6/tYuRcGRLGr0EVpIuZPNO
+	 WpWtF/H2SHnqF85ulOQSZjzo1ldZkkPL0YovwP4Zp8cjlh3gvo4yW4+mRgnd7jaNGq
+	 VTzQGId1urXXOR7OBRWq78jX9CTWKvSIQt76Q9Sj8lAP6ejkHL3s+byO17Cg/kddFl
+	 URCkgmgKRpubWI/neyhC2zfn48hiS0o3Y63m6xAY7jZ08Q4pC0/XEBr2osu9Y0wKDZ
+	 qxijQJY82W4rgljpsDG1+O/sDwwS2j2/QyaTA32qAEjl3ZDA8OdN7ttKwyyC6pMuHl
+	 vBfiGRAbY4S+A==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a3ddc13bbb3so389018466b.0;
+        Sun, 25 Feb 2024 22:13:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUna2ZnwvIZ5ZS5cqoYuDjYRSBvWB08Cfq57vbBGVJOg0P9La5zdQatg7C0CepuohFLWX2kUR+VORBfsPD8BcWHoQFusUwPx5LjUilhqYaHDMe2qKr9YBmOAujP0I7IuJTG
+X-Gm-Message-State: AOJu0Yyv1JayS9khC1QcHUOxD/nzA0stQyR0NAWxMiEjj7bjYWgfN5Zc
+	JGrp5XOykfYe3ENELcyaHv27x7luLQS3nRnaYBWTJGMEWr7yg3j32OozSqKy6WSFFkDTq19UCtD
+	8KS3/v6DehkSd7mjnrWnxxz83vMM=
+X-Google-Smtp-Source: AGHT+IHD5xYoZZP56DdPlwvxfM+tSalcdEJDk27CoMnchaqYVBCCJdjScbiPHJ2xCvQqzhCCMI++wLrccA+EFzHQvrg=
+X-Received: by 2002:a17:906:d923:b0:a3f:1139:5a6b with SMTP id
+ rn3-20020a170906d92300b00a3f11395a6bmr4636609ejb.32.1708927978885; Sun, 25
+ Feb 2024 22:12:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240222032803.2177856-1-maobibo@loongson.cn> <20240222032803.2177856-4-maobibo@loongson.cn>
+ <CAAhV-H5eqXMqTYVb6cAVqOsDNcEDeP9HzaMKw69KFQeVaAYEdA@mail.gmail.com> <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
+In-Reply-To: <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Mon, 26 Feb 2024 14:12:49 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
+Message-ID: <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
+Subject: Re: [PATCH v5 3/6] LoongArch: KVM: Add cpucfg area for kvm hypervisor
+To: maobibo <maobibo@loongson.cn>, Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 25 Feb 2024 03:38:48 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Fri, Feb 23, 2024 at 04:27:26PM +0800, Xuan Zhuo wrote:
-> > If the xsk is enabling, the xsk tx will share the send queue.
-> > But the xsk requires that the send queue use the premapped mode.
-> > So the send queue must support premapped mode.
-> >
-> > cmd:
-> >     sh samples/pktgen/pktgen_sample01_simple.sh -i eth0 \
-> >         -s 16 -d 10.0.0.128 -m 00:16:3e:2c:c8:2e -n 0 -p 100
-> > CPU:
-> >     Intel(R) Xeon(R) Platinum 8369B CPU @ 2.70GHz
-> >
-> > Machine:
-> >     ecs.g7.2xlarge(Aliyun)
-> >
-> > before:              1600010.00
-> > after(no-premapped): 1599966.00
-> > after(premapped):    1600014.00
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 136 +++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 132 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 7715bb7032ec..b83ef6afc4fb 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -146,6 +146,25 @@ struct virtnet_rq_dma {
-> >  	u16 need_sync;
-> >  };
-> >
-> > +
-
-[...]
-
-> > +static struct virtnet_sq_dma *virtnet_sq_map_sg(struct send_queue *sq,
-> > +						int nents, void *data)
-> > +{
-> > +	struct virtnet_sq_dma *d;
-> > +	struct scatterlist *sg;
-> > +	int i;
-> > +
-> > +	if (!sq->dmainfo.free)
-> > +		return NULL;
-> > +
-> > +	d = sq->dmainfo.free;
-> > +	sq->dmainfo.free = d->next;
-> > +
-> > +	for_each_sg(sq->sg, sg, nents, i) {
-> > +		if (virtqueue_dma_map_sg_attrs(sq->vq, sg, DMA_TO_DEVICE, 0))
-> > +			goto err;
-> > +
-> > +		d->addr[i] = sg->dma_address;
-> > +		d->len[i] = sg->length;
-> > +	}
-> > +
-> > +	d->data = data;
-> > +	d->num = i;
-> > +	return d;
-> > +
-> > +err:
-> > +	d->num = i;
-> > +	virtnet_sq_unmap(sq, (void **)&d);
-> > +	return NULL;
-> > +}
->
->
-> Do I see a reimplementation of linux/llist.h here?
-
-YES. This can be done by the APIs of linux/lllist.h.
-
-But now, there is not __llist_del_first() (That will be used by
-virtnet_sq_map_sg()).
-And that is simple and just two places may use the APIs, so I implement it
-directly.
-
->
->
-> > +
-> > +static int virtnet_add_outbuf(struct send_queue *sq, u32 num, void *data)
-> > +{
-> > +	int ret;
-> > +
-> > +	if (sq->vq->premapped) {
-> > +		data = virtnet_sq_map_sg(sq, num, data);
-> > +		if (!data)
-> > +			return -ENOMEM;
-> > +	}
-> > +
-> > +	ret = virtqueue_add_outbuf(sq->vq, sq->sg, num, data, GFP_ATOMIC);
-> > +	if (ret && sq->vq->premapped)
-> > +		virtnet_sq_unmap(sq, &data);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int virtnet_sq_init_dma_mate(struct send_queue *sq)
->
-> Mate? The popular south african drink?
-
-Sorry, should be meta, I mean metadata.
-
->
-> > +{
-> > +	struct virtnet_sq_dma *d;
-> > +	int num, i;
-> > +
-> > +	num = virtqueue_get_vring_size(sq->vq);
-> > +
-> > +	sq->dmainfo.free = kcalloc(num, sizeof(*sq->dmainfo.free), GFP_KERNEL);
-> > +	if (!sq->dmainfo.free)
-> > +		return -ENOMEM;
->
->
-> This could be quite a bit of memory for a large queue.  And for a bunch
-> of common cases where unmap is a nop (e.g. iommu pt) this does nothing
-> useful at all.
-
-Then can we skip the unmap api, so pass a zero to the unmap api?
-
-> And also, this does nothing useful if PLATFORM_ACCESS is off
-> which is super common.
-
-That is ok. That just work when PLATFORM_ACCESS is on.
-
-Thanks.
-
->
-> A while ago I proposed:
-> - extend DMA APIs so one can query whether unmap is a nop
->   and whether sync is a nop
-> - virtio wrapper taking into account PLATFORM_ACCESS too
->
-> then we can save all this work and memory when not needed.
+On Mon, Feb 26, 2024 at 10:04=E2=80=AFAM maobibo <maobibo@loongson.cn> wrot=
+e:
 >
 >
 >
-> > +
-> > +	sq->dmainfo.p = sq->dmainfo.free;
-> > +
-> > +	for (i = 0; i < num; ++i) {
-> > +		d = &sq->dmainfo.free[i];
-> > +		d->next = d + 1;
-> > +	}
-> > +
-> > +	d->next = NULL;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static void __free_old_xmit(struct send_queue *sq, bool in_napi,
-> >  			    struct virtnet_sq_free_stats *stats)
-> >  {
-> > @@ -377,6 +487,9 @@ static void __free_old_xmit(struct send_queue *sq, bool in_napi,
-> >  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
-> >  		++stats->packets;
+> On 2024/2/24 =E4=B8=8B=E5=8D=885:13, Huacai Chen wrote:
+> > Hi, Bibo,
 > >
-> > +		if (sq->vq->premapped)
-> > +			virtnet_sq_unmap(sq, &ptr);
-> > +
-> >  		if (!is_xdp_frame(ptr)) {
-> >  			struct sk_buff *skb = ptr;
+> > On Thu, Feb 22, 2024 at 11:28=E2=80=AFAM Bibo Mao <maobibo@loongson.cn>=
+ wrote:
+> >>
+> >> Instruction cpucfg can be used to get processor features. And there
+> >> is trap exception when it is executed in VM mode, and also it is
+> >> to provide cpu features to VM. On real hardware cpucfg area 0 - 20
+> >> is used.  Here one specified area 0x40000000 -- 0x400000ff is used
+> >> for KVM hypervisor to privide PV features, and the area can be extende=
+d
+> >> for other hypervisors in future. This area will never be used for
+> >> real HW, it is only used by software.
+> > After reading and thinking, I find that the hypercall method which is
+> > used in our productive kernel is better than this cpucfg method.
+> > Because hypercall is more simple and straightforward, plus we don't
+> > worry about conflicting with the real hardware.
+> No, I do not think so. cpucfg is simper than hypercall, hypercall can
+> be in effect when system runs in guest mode. In some scenario like TCG
+> mode, hypercall is illegal intruction, however cpucfg can work.
+Nearly all architectures use hypercall except x86 for its historical
+reasons. If we use CPUCFG, then the hypervisor information is
+unnecessarily leaked to userspace, and this may be a security issue.
+Meanwhile, I don't think TCG mode needs PV features.
+
+I consulted with Jiaxun before, and maybe he can give some more comments.
+
+>
+> Extioi virtualization extension will be added later, cpucfg can be used
+> to get extioi features. It is unlikely that extioi driver depends on
+> PARA_VIRT macro if hypercall is used to get features.
+CPUCFG is per-core information, if we really need something about
+extioi, it should be in iocsr (LOONGARCH_IOCSR_FEATURES).
+
+
+Huacai
+
+>
+> Regards
+> Bibo Mao
+>
 > >
-> > @@ -890,8 +1003,7 @@ static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
-> >  			    skb_frag_size(frag), skb_frag_off(frag));
-> >  	}
+> > Huacai
 > >
-> > -	err = virtqueue_add_outbuf(sq->vq, sq->sg, nr_frags + 1,
-> > -				   xdp_to_ptr(xdpf), GFP_ATOMIC);
-> > +	err = virtnet_add_outbuf(sq, nr_frags + 1, xdp_to_ptr(xdpf));
-> >  	if (unlikely(err))
-> >  		return -ENOSPC; /* Caller handle free/refcnt */
-> >
-> > @@ -2357,7 +2469,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
-> >  			return num_sg;
-> >  		num_sg++;
-> >  	}
-> > -	return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_ATOMIC);
-> > +	return virtnet_add_outbuf(sq, num_sg, skb);
-> >  }
-> >
-> >  static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
-> > @@ -4166,6 +4278,8 @@ static void virtnet_free_queues(struct virtnet_info *vi)
-> >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> >  		__netif_napi_del(&vi->rq[i].napi);
-> >  		__netif_napi_del(&vi->sq[i].napi);
-> > +
-> > +		kfree(vi->sq[i].dmainfo.p);
-> >  	}
-> >
-> >  	/* We called __netif_napi_del(),
-> > @@ -4214,6 +4328,15 @@ static void free_receive_page_frags(struct virtnet_info *vi)
-> >
-> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
-> >  {
-> > +	struct virtnet_info *vi = vq->vdev->priv;
-> > +	struct send_queue *sq;
-> > +	int i = vq2rxq(vq);
-> > +
-> > +	sq = &vi->sq[i];
-> > +
-> > +	if (sq->vq->premapped)
-> > +		virtnet_sq_unmap(sq, &buf);
-> > +
-> >  	if (!is_xdp_frame(buf))
-> >  		dev_kfree_skb(buf);
-> >  	else
-> > @@ -4327,8 +4450,10 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
-> >  		if (ctx)
-> >  			ctx[rxq2vq(i)] = true;
-> >
-> > -		if (premapped)
-> > +		if (premapped) {
-> >  			premapped[rxq2vq(i)] = true;
-> > +			premapped[txq2vq(i)] = true;
-> > +		}
-> >  	}
-> >
-> >  	cfg.nvqs      = total_vqs;
-> > @@ -4352,6 +4477,9 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
-> >  		vi->rq[i].vq = vqs[rxq2vq(i)];
-> >  		vi->rq[i].min_buf_len = mergeable_min_buf_len(vi, vi->rq[i].vq);
-> >  		vi->sq[i].vq = vqs[txq2vq(i)];
-> > +
-> > +		if (vi->sq[i].vq->premapped)
-> > +			virtnet_sq_init_dma_mate(&vi->sq[i]);
-> >  	}
-> >
-> >  	/* run here: ret == 0. */
-> > --
-> > 2.32.0.3.g01195cf9f
+> >>
+> >> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> >> ---
+> >>   arch/loongarch/include/asm/inst.h      |  1 +
+> >>   arch/loongarch/include/asm/loongarch.h | 10 ++++++
+> >>   arch/loongarch/kvm/exit.c              | 46 +++++++++++++++++-------=
+--
+> >>   3 files changed, 41 insertions(+), 16 deletions(-)
+> >>
+> >> diff --git a/arch/loongarch/include/asm/inst.h b/arch/loongarch/includ=
+e/asm/inst.h
+> >> index d8f637f9e400..ad120f924905 100644
+> >> --- a/arch/loongarch/include/asm/inst.h
+> >> +++ b/arch/loongarch/include/asm/inst.h
+> >> @@ -67,6 +67,7 @@ enum reg2_op {
+> >>          revhd_op        =3D 0x11,
+> >>          extwh_op        =3D 0x16,
+> >>          extwb_op        =3D 0x17,
+> >> +       cpucfg_op       =3D 0x1b,
+> >>          iocsrrdb_op     =3D 0x19200,
+> >>          iocsrrdh_op     =3D 0x19201,
+> >>          iocsrrdw_op     =3D 0x19202,
+> >> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/i=
+nclude/asm/loongarch.h
+> >> index 46366e783c84..a1d22e8b6f94 100644
+> >> --- a/arch/loongarch/include/asm/loongarch.h
+> >> +++ b/arch/loongarch/include/asm/loongarch.h
+> >> @@ -158,6 +158,16 @@
+> >>   #define  CPUCFG48_VFPU_CG              BIT(2)
+> >>   #define  CPUCFG48_RAM_CG               BIT(3)
+> >>
+> >> +/*
+> >> + * cpucfg index area: 0x40000000 -- 0x400000ff
+> >> + * SW emulation for KVM hypervirsor
+> >> + */
+> >> +#define CPUCFG_KVM_BASE                        0x40000000UL
+> >> +#define CPUCFG_KVM_SIZE                        0x100
+> >> +#define CPUCFG_KVM_SIG                 CPUCFG_KVM_BASE
+> >> +#define  KVM_SIGNATURE                 "KVM\0"
+> >> +#define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
+> >> +
+> >>   #ifndef __ASSEMBLY__
+> >>
+> >>   /* CSR */
+> >> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> >> index 923bbca9bd22..6a38fd59d86d 100644
+> >> --- a/arch/loongarch/kvm/exit.c
+> >> +++ b/arch/loongarch/kvm/exit.c
+> >> @@ -206,10 +206,37 @@ int kvm_emu_idle(struct kvm_vcpu *vcpu)
+> >>          return EMULATE_DONE;
+> >>   }
+> >>
+> >> -static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
+> >> +static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst inst)
+> >>   {
+> >>          int rd, rj;
+> >>          unsigned int index;
+> >> +
+> >> +       rd =3D inst.reg2_format.rd;
+> >> +       rj =3D inst.reg2_format.rj;
+> >> +       ++vcpu->stat.cpucfg_exits;
+> >> +       index =3D vcpu->arch.gprs[rj];
+> >> +
+> >> +       /*
+> >> +        * By LoongArch Reference Manual 2.2.10.5
+> >> +        * Return value is 0 for undefined cpucfg index
+> >> +        */
+> >> +       switch (index) {
+> >> +       case 0 ... (KVM_MAX_CPUCFG_REGS - 1):
+> >> +               vcpu->arch.gprs[rd] =3D vcpu->arch.cpucfg[index];
+> >> +               break;
+> >> +       case CPUCFG_KVM_SIG:
+> >> +               vcpu->arch.gprs[rd] =3D *(unsigned int *)KVM_SIGNATURE=
+;
+> >> +               break;
+> >> +       default:
+> >> +               vcpu->arch.gprs[rd] =3D 0;
+> >> +               break;
+> >> +       }
+> >> +
+> >> +       return EMULATE_DONE;
+> >> +}
+> >> +
+> >> +static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
+> >> +{
+> >>          unsigned long curr_pc;
+> >>          larch_inst inst;
+> >>          enum emulation_result er =3D EMULATE_DONE;
+> >> @@ -224,21 +251,8 @@ static int kvm_trap_handle_gspr(struct kvm_vcpu *=
+vcpu)
+> >>          er =3D EMULATE_FAIL;
+> >>          switch (((inst.word >> 24) & 0xff)) {
+> >>          case 0x0: /* CPUCFG GSPR */
+> >> -               if (inst.reg2_format.opcode =3D=3D 0x1B) {
+> >> -                       rd =3D inst.reg2_format.rd;
+> >> -                       rj =3D inst.reg2_format.rj;
+> >> -                       ++vcpu->stat.cpucfg_exits;
+> >> -                       index =3D vcpu->arch.gprs[rj];
+> >> -                       er =3D EMULATE_DONE;
+> >> -                       /*
+> >> -                        * By LoongArch Reference Manual 2.2.10.5
+> >> -                        * return value is 0 for undefined cpucfg inde=
+x
+> >> -                        */
+> >> -                       if (index < KVM_MAX_CPUCFG_REGS)
+> >> -                               vcpu->arch.gprs[rd] =3D vcpu->arch.cpu=
+cfg[index];
+> >> -                       else
+> >> -                               vcpu->arch.gprs[rd] =3D 0;
+> >> -               }
+> >> +               if (inst.reg2_format.opcode =3D=3D cpucfg_op)
+> >> +                       er =3D kvm_emu_cpucfg(vcpu, inst);
+> >>                  break;
+> >>          case 0x4: /* CSR{RD,WR,XCHG} GSPR */
+> >>                  er =3D kvm_handle_csr(vcpu, inst);
+> >> --
+> >> 2.39.3
+> >>
+>
 >
 
