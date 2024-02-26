@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9865-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9866-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 270B98678AF
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:36:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 337998678B3
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:36:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADE9F290919
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:36:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 505031C2B184
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1451112C81A;
-	Mon, 26 Feb 2024 14:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFD512CDB1;
+	Mon, 26 Feb 2024 14:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzQ+G6t0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MX3bk4qC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C183112C531;
-	Mon, 26 Feb 2024 14:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7725812CDA4;
+	Mon, 26 Feb 2024 14:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958071; cv=none; b=UuBl+k8kDk7z2DNV711xaKHHB9ZIV1LboVpUTPOAJBhhUigmJPKvCel+mBcGMWXLxV37lhyDfKeU7TYTrkKLc6q7IwDRh4ecQ3dimCuc/oOvkHLWXHz2f6jxx5NR173uUq58xEhnOTHI/4PVcu49vtz24hw4o4t7+nmt/DEiT3Y=
+	t=1708958082; cv=none; b=TRewOTn8VNC9s/CG/ITxvGXybIHV5+LIaQ78Zxxjkh0y5mgx62fSvTstm+Z3tDpamTd3c1c1U8zWZ+F9F95om30deBNByR5MGISumU6oIfV6ycjktaM44HKwJgeljK85IXovnMcRyTIQHFn57ovP47zUdssLL4Kn5H5Oo6g02E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958071; c=relaxed/simple;
-	bh=EyCcBxyA0tF+AnNctevxSb8iobYKpoudiJi6zYhw30M=;
+	s=arc-20240116; t=1708958082; c=relaxed/simple;
+	bh=71RmCF0I5O9+DUkzTlfx4tfYMIMIEldy34Q0i64VxNA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KYhC4fxviUSjemXg+/yjTsFB3GD1YxVvynkiKRxflATqoWGGS+k0aIT8QYsEGn0TMvRHVQSYLE0aKSds+f/ZnGurOpdPZ5A92UdNpRaSNFkugoWwU7JH6yYWU1Vz187AdMdOTsDAS86nuKtT/Gle6G/55UHsxX1I5BIRBXQS90Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzQ+G6t0; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=BGYvAkEEC1NFuY8sSSYjlKbnLsQM6X6GdAJGBL8H2y4oQxEB8lGczf5VZe8MEZeRuZS/CZwTvUMjKPRujzXKPfgZbzgpFlNEYetKY9Up158DTSPbSKEdFbFTC/8+QkJsFx3/bqNVzd+FkITWP/Douo7dLVH1SmjS0Z1ZNMOrHu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MX3bk4qC; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1dc13fb0133so22428045ad.3;
-        Mon, 26 Feb 2024 06:34:29 -0800 (PST)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6e4670921a4so1635800b3a.0;
+        Mon, 26 Feb 2024 06:34:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958069; x=1709562869; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958079; x=1709562879; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HuI5MqcIFWjqUYnfThcFZp4aPT3F8UKxd0R0fmplqnQ=;
-        b=IzQ+G6t0mYr29jS4Q1GSMRfpfgVwnNTBV9lmBw3Hiia/6VrqS5aZcWEnwrI4YvlGL9
-         tExqkTam+iSlSIcsCJdkpZA0ujw83l/zcqkSvXV2OxhI3Vr9V2RnpgKMUrEjUnbfhBbw
-         YlwOt6iHf7KyeqVDzLPy1TxyuwIB39CRhY57JoB2Mj2+zKCXzZX6MVCMuVjc6Sx+U1e+
-         jqXmS+zbIb0rO2G8ldWochMaxB9eRp3i4hPoSgw0b+myAPCt+p9bIsn75NO4m/M4M7Ww
-         Wx4tCZj2tuJ4VDexY3P11VC/i2CrS6QP9W9JZmEkjizmt9ATP1TTnOE47eqQcHk1UyGk
-         cF0w==
+        bh=W29a9mqzu8vfy19euofChocK8qRaZXs4J5qOV1uE9JI=;
+        b=MX3bk4qCC9uhO1qQvhnqqoqLl2K6xXTRX3clq8Cu7K75irm/F8rYaIVEdoYGsB+WR0
+         DO2yZ5plz+Y0Ah9ZpqEuYqHzl/mKF1vu31cImcE20iyTnyHPNPHKpmoPmIRtEPZbwKdN
+         1NdzUL4xrRpjR8AZSKmVOOo+JGbcABkhkbNdb7xs/HeMLYj5X4pnxD0+yFgzyOOHukE7
+         1kCw9Q5Kny+xl7ox9YKjQSf+iGk/hnLBRyEsYngPW0IffOifxe+gajBsXchfE0tplSs/
+         ePM+htcLAlUyBdGpupkL22Y2KIyz0TPV6oTTYut0qvutSnV87Z0J0d6FWDHw10J4N8hG
+         Bk5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958069; x=1709562869;
+        d=1e100.net; s=20230601; t=1708958079; x=1709562879;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HuI5MqcIFWjqUYnfThcFZp4aPT3F8UKxd0R0fmplqnQ=;
-        b=mdW00zKJGNLMkrbRA5gjeZIzDniLHg1jmMu3Vcpi3XvMg/pFwPTzgWV8a1W5IEp684
-         5nni4vo8HdCBlwll3Uc69wWxcsONqMwYMpybfq0ZeY2DDhP3Co6PvM43GnyJZQ37Nkuo
-         pdaEIOHtJBC6PkIkai2c/dwnkGXh2oKuJ5PMDYgitIA/fcki3NCWbXfoBy0XswS/gWdg
-         /a9t3h16gTHWUtY0ggl+dYs6vDpsf9VSyPmh+ld0rJwKW+SKp1h0wte6lGt9auSfugpo
-         F3nsaTG4eR2CgvMwsW3L2FO/tyHycxlAd4OVWvgQrwuTS20hURHBVg5Ty4WLilTQcsKu
-         iF1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVa8O31U9w1FzDG/2G4DMF7cviODfD/u1JXtcI13jCyorLXjVn1kcGNMfo2A3KSHOlrY1I6StKitRDzM5wtTdcWiPXE
-X-Gm-Message-State: AOJu0YwzDLceHjpTpANhgRVqDa79Y3/DspeJ9cKIt92LNvzIg5I4e+GC
-	FFsGHGyPbhxKB5m3Nm+X3V4RU8yPjn37LuG5etagpNRvphnH3UardSVHlNI3
-X-Google-Smtp-Source: AGHT+IFW+jKydClu9ScBCGN8mKskTXeGieKmJE+3Qx4uz16yZSsE1D8n78in3nG7xJ/WBYdrpfORSA==
-X-Received: by 2002:a17:902:d506:b0:1dc:91da:a1c with SMTP id b6-20020a170902d50600b001dc91da0a1cmr4411430plg.50.1708958068799;
-        Mon, 26 Feb 2024 06:34:28 -0800 (PST)
+        bh=W29a9mqzu8vfy19euofChocK8qRaZXs4J5qOV1uE9JI=;
+        b=vUG5Xf9UiSer9fK5bz6O0aR74CkQ8TvOPaqBBrsylO0/uhgJ+2hK9wFdcaIyjwanDq
+         Pbc3Pu5uUkgCyfjwmqujIVEF6r2RZ0LQFhdCod18cm3S1ZZ9leAUhO8Cmnnzn16Nz/mf
+         urHrzcmrauHQVdI45A3pbrb8sCXGCU//0k6in4P6LripQLLUXrQuOQmpGjQzSWCk7CnY
+         5c+T2xMjdlbYvQvlX3gAV8z3lEnS9bwy9AnQ5TCGVdFM4gYheZCSoA6nt0aZn6Ft+aYd
+         gDCcQGidBSbcz4OhMgPnBUP4O0oCNeD/XtjmjsOP8KEVcNMXx48FF7r3E/hWN1+2zvJr
+         jT0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWZxjwo9lfMSHwDVW5UUfo5/0yD30Du1ADFGna04kRhzlPIbOlsd9ZzD+cBoWnbEkoxhYKIaQkOrxuHBlm2didv4xWe
+X-Gm-Message-State: AOJu0Yye016zPDhn/m3Gq+ALP5zGDD2wXSqjLdHXQhS46dc8HPyxXBCC
+	cGCzEyHcAPrmV/LjPyA8H2EMma0uUAinqHjUvHbrsjEyiDGe8yVAli/520wj
+X-Google-Smtp-Source: AGHT+IF2wWZka0uY5mUOiFNqhGVsgbvVnqy5j8m1PdDgUuKtDBcxMJ01/THsuR4Kwz+eCftlt3cqqg==
+X-Received: by 2002:a05:6a20:9f03:b0:1a0:c470:aacc with SMTP id mk3-20020a056a209f0300b001a0c470aaccmr9918044pzb.21.1708958079333;
+        Mon, 26 Feb 2024 06:34:39 -0800 (PST)
 Received: from localhost ([47.89.225.180])
-        by smtp.gmail.com with ESMTPSA id ji22-20020a170903325600b001dc23e877bfsm4012888plb.268.2024.02.26.06.34.28
+        by smtp.gmail.com with ESMTPSA id bw11-20020a17090af60b00b0029937256b91sm4562679pjb.7.2024.02.26.06.34.38
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:34:28 -0800 (PST)
+        Mon, 26 Feb 2024 06:34:39 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -82,11 +82,20 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	x86@kernel.org,
 	Kees Cook <keescook@chromium.org>,
 	Juergen Gross <jgross@suse.com>,
+	Andy Lutomirski <luto@kernel.org>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 02/73] x86/ABI/PVM: Add PVM-specific ABI header file
-Date: Mon, 26 Feb 2024 22:35:19 +0800
-Message-Id: <20240226143630.33643-3-jiangshanlai@gmail.com>
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Oleg Nesterov <oleg@redhat.com>,
+	"Mike Rapoport (IBM)" <rppt@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Brian Gerst <brgerst@gmail.com>,
+	Mateusz Guzik <mjguzik@gmail.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: [RFC PATCH 03/73] x86/entry: Implement switcher for PVM VM enter/exit
+Date: Mon, 26 Feb 2024 22:35:20 +0800
+Message-Id: <20240226143630.33643-4-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -100,168 +109,541 @@ Content-Transfer-Encoding: 8bit
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Add a PVM-specific ABI header file to describe the ABI between the guest
-and hypervisor, which contains the hypercall numbers, virtual MSRS
-index, and event data structure definitions. This is in preparation for
-PVM.
+Since the PVM guest runs in hardware CPL3, the host/guest world
+switching is similar to userspace/kernelspace switching. Therefore, PVM
+has decided to reuse the host entries for host/guest world switching. In
+order to differentiate PVM guests from normal userspace processes, a new
+flag is introduced to mark that the guest is active. The host entries
+are then modified to use this flag for handling forwarding. The modified
+host entries and VM enter path are collectively called the "switcher."
+
+In the host entries, if from CPL3 and the flag is set, then it is
+regarded as VM exit and the handling will be forwarded to the
+hypervisor.  Otherwise, the handling belongs to the host like before. If
+from CPL0, the handling belongs to the host too. Paranoid entries should
+save and restore the guest CR3, similar to the save and restore
+procedure for user CR3 in KPTI.
+
+So the switcher is not compatiable with KPTI currently.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/include/uapi/asm/pvm_para.h | 131 +++++++++++++++++++++++++++
- include/uapi/Kbuild                  |   4 +
- 2 files changed, 135 insertions(+)
- create mode 100644 arch/x86/include/uapi/asm/pvm_para.h
+ arch/x86/entry/Makefile            |   3 +
+ arch/x86/entry/calling.h           |  47 ++++++++++-
+ arch/x86/entry/entry_64.S          |  68 ++++++++++++++-
+ arch/x86/entry/entry_64_switcher.S | 127 +++++++++++++++++++++++++++++
+ arch/x86/include/asm/processor.h   |   5 ++
+ arch/x86/include/asm/ptrace.h      |   3 +
+ arch/x86/include/asm/switcher.h    |  59 ++++++++++++++
+ arch/x86/kernel/asm-offsets_64.c   |   8 ++
+ arch/x86/kernel/traps.c            |   3 +
+ 9 files changed, 315 insertions(+), 8 deletions(-)
+ create mode 100644 arch/x86/entry/entry_64_switcher.S
+ create mode 100644 arch/x86/include/asm/switcher.h
 
-diff --git a/arch/x86/include/uapi/asm/pvm_para.h b/arch/x86/include/uapi/asm/pvm_para.h
+diff --git a/arch/x86/entry/Makefile b/arch/x86/entry/Makefile
+index ca2fe186994b..55dd3f193d99 100644
+--- a/arch/x86/entry/Makefile
++++ b/arch/x86/entry/Makefile
+@@ -21,3 +21,6 @@ obj-$(CONFIG_PREEMPTION)	+= thunk_$(BITS).o
+ obj-$(CONFIG_IA32_EMULATION)	+= entry_64_compat.o syscall_32.o
+ obj-$(CONFIG_X86_X32_ABI)	+= syscall_x32.o
+ 
++ifeq ($(CONFIG_X86_64),y)
++	obj-y += 		entry_64_switcher.o
++endif
+diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
+index c99f36339236..83758019162d 100644
+--- a/arch/x86/entry/calling.h
++++ b/arch/x86/entry/calling.h
+@@ -142,6 +142,10 @@ For 32-bit we have the following conventions - kernel is built with
+ 	.endif
+ .endm
+ 
++.macro SET_NOFLUSH_BIT	reg:req
++	bts	$X86_CR3_PCID_NOFLUSH_BIT, \reg
++.endm
++
+ #ifdef CONFIG_PAGE_TABLE_ISOLATION
+ 
+ /*
+@@ -154,10 +158,6 @@ For 32-bit we have the following conventions - kernel is built with
+ #define PTI_USER_PCID_MASK		(1 << PTI_USER_PCID_BIT)
+ #define PTI_USER_PGTABLE_AND_PCID_MASK  (PTI_USER_PCID_MASK | PTI_USER_PGTABLE_MASK)
+ 
+-.macro SET_NOFLUSH_BIT	reg:req
+-	bts	$X86_CR3_PCID_NOFLUSH_BIT, \reg
+-.endm
+-
+ .macro ADJUST_KERNEL_CR3 reg:req
+ 	ALTERNATIVE "", "SET_NOFLUSH_BIT \reg", X86_FEATURE_PCID
+ 	/* Clear PCID and "PAGE_TABLE_ISOLATION bit", point CR3 at kernel pagetables: */
+@@ -284,6 +284,45 @@ For 32-bit we have the following conventions - kernel is built with
+ 
+ #endif
+ 
++#define TSS_extra(field) PER_CPU_VAR(cpu_tss_rw+TSS_EX_##field)
++
++/*
++ * Switcher would be disabled when KPTI is enabled.
++ *
++ * Ideally, switcher would switch to HOST_CR3 in IST before gsbase is fixed,
++ * in which case it would use the offset from the IST stack top to the TSS
++ * in CEA to get the pointer of the TSS.  But SEV guest modifies TSS.IST on
++ * the fly and makes the code non-workable in SEV guest even the switcher
++ * is not used.
++ *
++ * So switcher is marked disabled when KPTI is enabled rather than when
++ * in SEV guest.
++ *
++ * To enable switcher with KPTI, something like Integrated Entry code with
++ * atomic-IST-entry has to be introduced beforehand.
++ *
++ * The current SWITCHER_SAVE_AND_SWITCH_TO_HOST_CR3 is called after gsbase
++ * is fixed.
++ */
++.macro SWITCHER_SAVE_AND_SWITCH_TO_HOST_CR3 scratch_reg:req save_reg:req
++	ALTERNATIVE "", "jmp .Lend_\@", X86_FEATURE_PTI
++	cmpq	$0, TSS_extra(host_rsp)
++	jz	.Lend_\@
++	movq	%cr3, \save_reg
++	movq	TSS_extra(host_cr3), \scratch_reg
++	movq	\scratch_reg, %cr3
++.Lend_\@:
++.endm
++
++.macro SWITCHER_RESTORE_CR3 scratch_reg:req save_reg:req
++	ALTERNATIVE "", "jmp .Lend_\@", X86_FEATURE_PTI
++	cmpq	$0, TSS_extra(host_rsp)
++	jz	.Lend_\@
++	ALTERNATIVE "", "SET_NOFLUSH_BIT \save_reg", X86_FEATURE_PCID
++	movq	\save_reg, %cr3
++.Lend_\@:
++.endm
++
+ /*
+  * IBRS kernel mitigation for Spectre_v2.
+  *
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index 57fae15b3136..65bfebebeab6 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -278,10 +278,11 @@ SYM_CODE_END(xen_error_entry)
+ 
+ /**
+  * idtentry_body - Macro to emit code calling the C function
++ * @vector:		Vector number
+  * @cfunc:		C function to be called
+  * @has_error_code:	Hardware pushed error code on stack
+  */
+-.macro idtentry_body cfunc has_error_code:req
++.macro idtentry_body vector cfunc has_error_code:req
+ 
+ 	/*
+ 	 * Call error_entry() and switch to the task stack if from userspace.
+@@ -297,6 +298,10 @@ SYM_CODE_END(xen_error_entry)
+ 	ENCODE_FRAME_POINTER
+ 	UNWIND_HINT_REGS
+ 
++	cmpq	$0, TSS_extra(host_rsp)
++	jne	.Lpvm_idtentry_body_\@
++.L_host_idtenrty_\@:
++
+ 	movq	%rsp, %rdi			/* pt_regs pointer into 1st argument*/
+ 
+ 	.if \has_error_code == 1
+@@ -310,6 +315,25 @@ SYM_CODE_END(xen_error_entry)
+ 	REACHABLE
+ 
+ 	jmp	error_return
++
++.Lpvm_idtentry_body_\@:
++	testb	$3, CS(%rsp)
++	/* host exception nested in IST handler while the switcher is active */
++	jz	.L_host_idtenrty_\@
++
++	.if \vector < 256
++	movl	$\vector, ORIG_RAX+4(%rsp)
++	.else // X86_TRAP_OTHER
++	/*
++	 * Here are the macros for common_interrupt(), spurious_interrupt(),
++	 * and XENPV entries with the titular vector X86_TRAP_OTHER. XENPV
++	 * entries can't reach here while common_interrupt() and
++	 * spurious_interrupt() have the real vector at ORIG_RAX.
++	 */
++	movl	ORIG_RAX(%rsp), %eax
++	movl	%eax, ORIG_RAX+4(%rsp)
++	.endif
++	jmp	switcher_return_from_guest
+ .endm
+ 
+ /**
+@@ -354,7 +378,7 @@ SYM_CODE_START(\asmsym)
+ .Lfrom_usermode_no_gap_\@:
+ 	.endif
+ 
+-	idtentry_body \cfunc \has_error_code
++	idtentry_body \vector \cfunc \has_error_code
+ 
+ _ASM_NOKPROBE(\asmsym)
+ SYM_CODE_END(\asmsym)
+@@ -427,7 +451,7 @@ SYM_CODE_START(\asmsym)
+ 
+ 	/* Switch to the regular task stack and use the noist entry point */
+ .Lfrom_usermode_switch_stack_\@:
+-	idtentry_body noist_\cfunc, has_error_code=0
++	idtentry_body \vector, noist_\cfunc, has_error_code=0
+ 
+ _ASM_NOKPROBE(\asmsym)
+ SYM_CODE_END(\asmsym)
+@@ -507,7 +531,7 @@ SYM_CODE_START(\asmsym)
+ 
+ 	/* Switch to the regular task stack */
+ .Lfrom_usermode_switch_stack_\@:
+-	idtentry_body user_\cfunc, has_error_code=1
++	idtentry_body \vector, user_\cfunc, has_error_code=1
+ 
+ _ASM_NOKPROBE(\asmsym)
+ SYM_CODE_END(\asmsym)
+@@ -919,6 +943,16 @@ SYM_CODE_START(paranoid_entry)
+ 	FENCE_SWAPGS_KERNEL_ENTRY
+ .Lparanoid_gsbase_done:
+ 
++	/*
++	 * Switch back to kernel cr3 when switcher is active.
++	 * Switcher can't be used when KPTI is enabled by far, so only one of
++	 * SAVE_AND_SWITCH_TO_KERNEL_CR3 and SWITCHER_SAVE_AND_SWITCH_TO_KERNEL_CR3
++	 * takes effect.  SWITCHER_SAVE_AND_SWITCH_TO_KERNEL_CR3 requires
++	 * kernel GSBASE.
++	 * See the comments above SWITCHER_SAVE_AND_SWITCH_TO_HOST_CR3.
++	 */
++	SWITCHER_SAVE_AND_SWITCH_TO_HOST_CR3 scratch_reg=%rax save_reg=%r14
++
+ 	/*
+ 	 * Once we have CR3 and %GS setup save and set SPEC_CTRL. Just like
+ 	 * CR3 above, keep the old value in a callee saved register.
+@@ -970,6 +1004,15 @@ SYM_CODE_START_LOCAL(paranoid_exit)
+ 	 */
+ 	RESTORE_CR3	scratch_reg=%rax save_reg=%r14
+ 
++	/*
++	 * Switch back to origin cr3 when switcher is active.
++	 * Switcher can't be used when KPTI is enabled by far, so only
++	 * one of RESTORE_CR3 and SWITCHER_RESTORE_CR3 takes effect.
++	 *
++	 * See the comments above SWITCHER_SAVE_AND_SWITCH_TO_HOST_CR3.
++	 */
++	SWITCHER_RESTORE_CR3 scratch_reg=%rax save_reg=%r14
++
+ 	/* Handle the three GSBASE cases */
+ 	ALTERNATIVE "jmp .Lparanoid_exit_checkgs", "", X86_FEATURE_FSGSBASE
+ 
+@@ -1158,6 +1201,8 @@ SYM_CODE_START(asm_exc_nmi)
+ 	FENCE_SWAPGS_USER_ENTRY
+ 	SWITCH_TO_KERNEL_CR3 scratch_reg=%rdx
+ 	movq	%rsp, %rdx
++	cmpq	$0, TSS_extra(host_rsp)
++	jne	.Lnmi_from_pvm_guest
+ 	movq	PER_CPU_VAR(pcpu_hot + X86_top_of_stack), %rsp
+ 	UNWIND_HINT_IRET_REGS base=%rdx offset=8
+ 	pushq	5*8(%rdx)	/* pt_regs->ss */
+@@ -1188,6 +1233,21 @@ SYM_CODE_START(asm_exc_nmi)
+ 	 */
+ 	jmp	swapgs_restore_regs_and_return_to_usermode
+ 
++.Lnmi_from_pvm_guest:
++	movq	PER_CPU_VAR(cpu_tss_rw + TSS_sp0), %rsp
++	UNWIND_HINT_IRET_REGS base=%rdx offset=8
++	pushq	5*8(%rdx)	/* pt_regs->ss */
++	pushq	4*8(%rdx)	/* pt_regs->rsp */
++	pushq	3*8(%rdx)	/* pt_regs->flags */
++	pushq	2*8(%rdx)	/* pt_regs->cs */
++	pushq	1*8(%rdx)	/* pt_regs->rip */
++	UNWIND_HINT_IRET_REGS
++	pushq	$0		/* pt_regs->orig_ax */
++	movl	$2, 4(%rsp)	/* pt_regs->orig_ax, pvm vector */
++	PUSH_AND_CLEAR_REGS rdx=(%rdx)
++	ENCODE_FRAME_POINTER
++	jmp	switcher_return_from_guest
++
+ .Lnmi_from_kernel:
+ 	/*
+ 	 * Here's what our stack frame will look like:
+diff --git a/arch/x86/entry/entry_64_switcher.S b/arch/x86/entry/entry_64_switcher.S
 new file mode 100644
-index 000000000000..36aedfa2cabd
+index 000000000000..2b99a46421cc
 --- /dev/null
-+++ b/arch/x86/include/uapi/asm/pvm_para.h
-@@ -0,0 +1,131 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef _UAPI_ASM_X86_PVM_PARA_H
-+#define _UAPI_ASM_X86_PVM_PARA_H
++++ b/arch/x86/entry/entry_64_switcher.S
+@@ -0,0 +1,127 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#include <linux/linkage.h>
++#include <linux/export.h>
++#include <asm/segment.h>
++#include <asm/asm-offsets.h>
++#include <asm/msr.h>
++#include <asm/percpu.h>
++#include <asm/asm.h>
++#include <asm/nospec-branch.h>
++#include <asm/switcher.h>
 +
-+#include <linux/const.h>
++#include "calling.h"
++
++.code64
++.section .entry.text, "ax"
++
++.macro MITIGATION_EXIT
++	/* Same as user entry. */
++	IBRS_EXIT
++.endm
++
++.macro MITIGATION_ENTER
++	/*
++	 * IMPORTANT: RSB filling and SPEC_CTRL handling must be done before
++	 * the first unbalanced RET after vmexit!
++	 *
++	 * For retpoline or IBRS, RSB filling is needed to prevent poisoned RSB
++	 * entries and (in some cases) RSB underflow.
++	 *
++	 * eIBRS has its own protection against poisoned RSB, so it doesn't
++	 * need the RSB filling sequence.  But it does need to be enabled, and a
++	 * single call to retire, before the first unbalanced RET.
++	 */
++	FILL_RETURN_BUFFER %rcx, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT, \
++			   X86_FEATURE_RSB_VMEXIT_LITE
++
++	IBRS_ENTER
++.endm
 +
 +/*
-+ * The CPUID instruction in PVM guest can't be trapped and emulated,
-+ * so PVM guest should use the following two instructions instead:
-+ * "invlpg 0xffffffffff4d5650; cpuid;"
++ * switcher_enter_guest - Do a transition to guest mode
 + *
-+ * PVM_SYNTHETIC_CPUID is supposed to not trigger any trap in the real or
-+ * virtual x86 kernel mode and is also guaranteed to trigger a trap in the
-+ * underlying hardware user mode for the hypervisor emulating it. The
-+ * hypervisor emulates both of the basic instructions, while the INVLPG is
-+ * often emulated as an NOP since 0xffffffffff4d5650 is normally out of the
-+ * allowed linear address ranges.
-+ */
-+#define PVM_SYNTHETIC_CPUID		0x0f,0x01,0x3c,0x25,0x50, \
-+					0x56,0x4d,0xff,0x0f,0xa2
-+#define PVM_SYNTHETIC_CPUID_ADDRESS	0xffffffffff4d5650
-+
-+/*
-+ * The vendor signature 'PVM' is returned in ebx. It should be used to
-+ * determine that a VM is running under PVM.
-+ */
-+#define PVM_CPUID_SIGNATURE		0x4d5650
-+
-+/*
-+ * PVM virtual MSRS falls in the range 0x4b564df0-0x4b564dff, and it should not
-+ * conflict with KVM, see arch/x86/include/uapi/asm/kvm_para.h
-+ */
-+#define PVM_VIRTUAL_MSR_MAX_NR		15
-+#define PVM_VIRTUAL_MSR_BASE		0x4b564df0
-+#define PVM_VIRTUAL_MSR_MAX		(PVM_VIRTUAL_MSR_BASE+PVM_VIRTUAL_MSR_MAX_NR)
-+
-+#define MSR_PVM_LINEAR_ADDRESS_RANGE	0x4b564df0
-+#define MSR_PVM_VCPU_STRUCT		0x4b564df1
-+#define MSR_PVM_SUPERVISOR_RSP		0x4b564df2
-+#define MSR_PVM_SUPERVISOR_REDZONE	0x4b564df3
-+#define MSR_PVM_EVENT_ENTRY		0x4b564df4
-+#define MSR_PVM_RETU_RIP		0x4b564df5
-+#define MSR_PVM_RETS_RIP		0x4b564df6
-+#define MSR_PVM_SWITCH_CR3		0x4b564df7
-+
-+#define PVM_HC_SPECIAL_MAX_NR		(256)
-+#define PVM_HC_SPECIAL_BASE		(0x17088200)
-+#define PVM_HC_SPECIAL_MAX		(PVM_HC_SPECIAL_BASE+PVM_HC_SPECIAL_MAX_NR)
-+
-+#define PVM_HC_LOAD_PGTBL		(PVM_HC_SPECIAL_BASE+0)
-+#define PVM_HC_IRQ_WIN			(PVM_HC_SPECIAL_BASE+1)
-+#define PVM_HC_IRQ_HALT			(PVM_HC_SPECIAL_BASE+2)
-+#define PVM_HC_TLB_FLUSH		(PVM_HC_SPECIAL_BASE+3)
-+#define PVM_HC_TLB_FLUSH_CURRENT	(PVM_HC_SPECIAL_BASE+4)
-+#define PVM_HC_TLB_INVLPG		(PVM_HC_SPECIAL_BASE+5)
-+#define PVM_HC_LOAD_GS			(PVM_HC_SPECIAL_BASE+6)
-+#define PVM_HC_RDMSR			(PVM_HC_SPECIAL_BASE+7)
-+#define PVM_HC_WRMSR			(PVM_HC_SPECIAL_BASE+8)
-+#define PVM_HC_LOAD_TLS			(PVM_HC_SPECIAL_BASE+9)
-+
-+/*
-+ * PVM_EVENT_FLAGS_IP
-+ *	- Interrupt enable flag. The flag is set to respond to maskable
-+ *	  external interrupts; and cleared to inhibit maskable external
-+ *	  interrupts.
++ * Called with guest registers on the top of the sp0 stack and the switcher
++ * states on cpu_tss_rw.tss_ex.
 + *
-+ * PVM_EVENT_FLAGS_IF
-+ *	- interrupt pending flag. The hypervisor sets it if it fails to inject
-+ *	  a maskable event to the VCPU due to the interrupt-enable flag being
-+ *	  cleared in supervisor mode.
++ * Returns:
++ *	pointer to pt_regs (on top of sp0 or IST stack) with guest registers.
 + */
-+#define PVM_EVENT_FLAGS_IP_BIT		8
-+#define PVM_EVENT_FLAGS_IP		_BITUL(PVM_EVENT_FLAGS_IP_BIT)
-+#define PVM_EVENT_FLAGS_IF_BIT		9
-+#define PVM_EVENT_FLAGS_IF		_BITUL(PVM_EVENT_FLAGS_IF_BIT)
++SYM_FUNC_START(switcher_enter_guest)
++	pushq	%rbp
++	pushq	%r15
++	pushq	%r14
++	pushq	%r13
++	pushq	%r12
++	pushq	%rbx
++
++	/* Save host RSP and mark the switcher active */
++	movq	%rsp, TSS_extra(host_rsp)
++
++	/* Switch to host sp0  */
++	movq	PER_CPU_VAR(cpu_tss_rw + TSS_sp0), %rdi
++	subq	$FRAME_SIZE, %rdi
++	movq	%rdi, %rsp
++
++	UNWIND_HINT_REGS
++
++	MITIGATION_EXIT
++
++	/* switch to guest cr3 on sp0 stack */
++	movq	TSS_extra(enter_cr3), %rax
++	movq	%rax, %cr3
++	/* Load guest registers. */
++	POP_REGS
++	addq	$8, %rsp
++
++	/* Switch to guest GSBASE and return to guest */
++	swapgs
++	jmp	native_irq_return_iret
++
++SYM_INNER_LABEL(switcher_return_from_guest, SYM_L_GLOBAL)
++	/* switch back to host cr3 when still on sp0/ist stack */
++	movq	TSS_extra(host_cr3), %rax
++	movq	%rax, %cr3
++
++	MITIGATION_ENTER
++
++	/* Restore to host RSP and mark the switcher inactive */
++	movq	%rsp, %rax
++	movq	TSS_extra(host_rsp), %rsp
++	movq	$0, TSS_extra(host_rsp)
++
++	popq	%rbx
++	popq	%r12
++	popq	%r13
++	popq	%r14
++	popq	%r15
++	popq	%rbp
++	RET
++SYM_FUNC_END(switcher_enter_guest)
++EXPORT_SYMBOL_GPL(switcher_enter_guest)
++
++SYM_CODE_START(entry_SYSCALL_64_switcher)
++	UNWIND_HINT_ENTRY
++	ENDBR
++
++	swapgs
++	/* tss.sp2 is scratch space. */
++	movq	%rsp, PER_CPU_VAR(cpu_tss_rw + TSS_sp2)
++	movq	PER_CPU_VAR(cpu_tss_rw + TSS_sp0), %rsp
++
++SYM_INNER_LABEL(entry_SYSCALL_64_switcher_safe_stack, SYM_L_GLOBAL)
++	ANNOTATE_NOENDBR
++
++	/* Construct struct pt_regs on stack */
++	pushq	$__USER_DS				/* pt_regs->ss */
++	pushq	PER_CPU_VAR(cpu_tss_rw + TSS_sp2)	/* pt_regs->sp */
++	pushq	%r11					/* pt_regs->flags */
++	pushq	$__USER_CS				/* pt_regs->cs */
++	pushq	%rcx					/* pt_regs->ip */
++
++	pushq	$0					/* pt_regs->orig_ax */
++	movl	$SWITCH_EXIT_REASONS_SYSCALL, 4(%rsp)
++
++	PUSH_AND_CLEAR_REGS
++	jmp	switcher_return_from_guest
++SYM_CODE_END(entry_SYSCALL_64_switcher)
++EXPORT_SYMBOL_GPL(entry_SYSCALL_64_switcher)
+diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+index 83dc4122c38d..4115267e7a3e 100644
+--- a/arch/x86/include/asm/processor.h
++++ b/arch/x86/include/asm/processor.h
+@@ -29,6 +29,7 @@ struct vm86;
+ #include <asm/vmxfeatures.h>
+ #include <asm/vdso/processor.h>
+ #include <asm/shstk.h>
++#include <asm/switcher.h>
+ 
+ #include <linux/personality.h>
+ #include <linux/cache.h>
+@@ -382,6 +383,10 @@ struct tss_struct {
+ 	 */
+ 	struct x86_hw_tss	x86_tss;
+ 
++#ifdef CONFIG_X86_64
++	struct tss_extra	tss_ex;
++#endif
++
+ 	struct x86_io_bitmap	io_bitmap;
+ } __aligned(PAGE_SIZE);
+ 
+diff --git a/arch/x86/include/asm/ptrace.h b/arch/x86/include/asm/ptrace.h
+index f4db78b09c8f..9eeeb5fdd387 100644
+--- a/arch/x86/include/asm/ptrace.h
++++ b/arch/x86/include/asm/ptrace.h
+@@ -5,6 +5,7 @@
+ #include <asm/segment.h>
+ #include <asm/page_types.h>
+ #include <uapi/asm/ptrace.h>
++#include <asm/switcher.h>
+ 
+ #ifndef __ASSEMBLY__
+ #ifdef __i386__
+@@ -194,6 +195,8 @@ static __always_inline bool ip_within_syscall_gap(struct pt_regs *regs)
+ 	ret = ret || (regs->ip >= (unsigned long)entry_SYSRETL_compat_unsafe_stack &&
+ 		      regs->ip <  (unsigned long)entry_SYSRETL_compat_end);
+ #endif
++	ret = ret || (regs->ip >= (unsigned long)entry_SYSCALL_64_switcher &&
++		      regs->ip <  (unsigned long)entry_SYSCALL_64_switcher_safe_stack);
+ 
+ 	return ret;
+ }
+diff --git a/arch/x86/include/asm/switcher.h b/arch/x86/include/asm/switcher.h
+new file mode 100644
+index 000000000000..dbf1970ca62f
+--- /dev/null
++++ b/arch/x86/include/asm/switcher.h
+@@ -0,0 +1,59 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_X86_SWITCHER_H
++#define _ASM_X86_SWITCHER_H
++
++#ifdef CONFIG_X86_64
++#include <asm/processor-flags.h>
++
++#define SWITCH_EXIT_REASONS_SYSCALL		1024
++#define SWITCH_EXIT_REASONS_FAILED_VMETNRY	1025
++
++/* Bits allowed to be set in the underlying eflags */
++#define SWITCH_ENTER_EFLAGS_ALLOWED	(X86_EFLAGS_FIXED | X86_EFLAGS_IF |\
++					 X86_EFLAGS_TF | X86_EFLAGS_RF |\
++					 X86_EFLAGS_AC | X86_EFLAGS_OF | \
++					 X86_EFLAGS_DF | X86_EFLAGS_SF | \
++					 X86_EFLAGS_ZF | X86_EFLAGS_AF | \
++					 X86_EFLAGS_PF | X86_EFLAGS_CF | \
++					 X86_EFLAGS_ID | X86_EFLAGS_NT)
++
++/* Bits must be set in the underlying eflags */
++#define SWITCH_ENTER_EFLAGS_FIXED	(X86_EFLAGS_FIXED | X86_EFLAGS_IF)
 +
 +#ifndef __ASSEMBLY__
++#include <linux/cache.h>
++
++struct pt_regs;
 +
 +/*
-+ * PVM event delivery saves the information about the event and the old context
-+ * into the PVCS structure if the event is from user mode or from supervisor
-+ * mode with vector >=32. And ERETU synthetic instruction reads the return
-+ * state from the PVCS structure to restore the old context.
++ * Extra per CPU control structure lives in the struct tss_struct.
++ *
++ * The page-size-aligned struct tss_struct has enough room to accommodate
++ * this extra data without increasing its size.
++ *
++ * The extra data is also in the first page of struct tss_struct whose
++ * read-write mapping (percpu cpu_tss_rw) is in the KPTI's user pagetable,
++ * so that it can even be accessible via cpu_tss_rw in the entry code.
 + */
-+struct pvm_vcpu_struct {
++struct tss_extra {
++	/* Saved host CR3 to be loaded after VM exit. */
++	unsigned long host_cr3;
 +	/*
-+	 * This flag is only used in supervisor mode, with only bit 8 and
-+	 * bit 9 being valid. The other bits are reserved.
++	 * Saved host stack to be loaded after VM exit. This also serves as a
++	 * flag to indicate that it is entering the guest world in the switcher
++	 * or has been in the guest world in the host entries.
 +	 */
-+	u64 event_flags;
-+	u32 event_errcode;
-+	u32 event_vector;
-+	u64 cr2;
-+	u64 reserved0[5];
++	unsigned long host_rsp;
++	/* Prepared guest CR3 to be loaded before VM enter. */
++	unsigned long enter_cr3;
++} ____cacheline_aligned;
 +
-+	/*
-+	 * For the event from supervisor mode with vector >=32, only eflags,
-+	 * rip, rsp, rcx and r11 are saved, and others keep untouched.
-+	 */
-+	u16 user_cs, user_ss;
-+	u32 reserved1;
-+	u64 reserved2;
-+	u64 user_gsbase;
-+	u32 eflags;
-+	u32 pkru;
-+	u64 rip;
-+	u64 rsp;
-+	u64 rcx;
-+	u64 r11;
-+};
-+
-+/*
-+ * PVM event delivery saves the information about the event and the old context
-+ * on the stack with the following frame format if the event is from supervisor
-+ * mode with vector <32. And ERETS synthetic instruction reads the return state
-+ * with the following frame format from the stack to restore the old context.
-+ */
-+struct pvm_supervisor_event {
-+	unsigned long errcode; // vector in high32
-+	unsigned long rip;
-+	unsigned long cs;
-+	unsigned long rflags;
-+	unsigned long rsp;
-+	unsigned long ss;
-+	unsigned long rcx;
-+	unsigned long r11;
-+};
-+
++extern struct pt_regs *switcher_enter_guest(void);
++extern const char entry_SYSCALL_64_switcher[];
++extern const char entry_SYSCALL_64_switcher_safe_stack[];
++extern const char entry_SYSRETQ_switcher_unsafe_stack[];
 +#endif /* __ASSEMBLY__ */
 +
-+#endif /* _UAPI_ASM_X86_PVM_PARA_H */
-diff --git a/include/uapi/Kbuild b/include/uapi/Kbuild
-index 61ee6e59c930..991848db246b 100644
---- a/include/uapi/Kbuild
-+++ b/include/uapi/Kbuild
-@@ -12,3 +12,7 @@ ifeq ($(wildcard $(objtree)/arch/$(SRCARCH)/include/generated/uapi/asm/kvm_para.
- no-export-headers += linux/kvm_para.h
- endif
- endif
++#endif /* CONFIG_X86_64 */
 +
-+ifeq ($(wildcard $(srctree)/arch/$(SRCARCH)/include/uapi/asm/pvm_para.h),)
-+no-export-headers += pvm_para.h
-+endif
++#endif /* _ASM_X86_SWITCHER_H */
+diff --git a/arch/x86/kernel/asm-offsets_64.c b/arch/x86/kernel/asm-offsets_64.c
+index f39baf90126c..1485cbda6dc4 100644
+--- a/arch/x86/kernel/asm-offsets_64.c
++++ b/arch/x86/kernel/asm-offsets_64.c
+@@ -60,5 +60,13 @@ int main(void)
+ 	OFFSET(FIXED_stack_canary, fixed_percpu_data, stack_canary);
+ 	BLANK();
+ #endif
++
++#define ENTRY(entry) OFFSET(TSS_EX_ ## entry, tss_struct, tss_ex.entry)
++	ENTRY(host_cr3);
++	ENTRY(host_rsp);
++	ENTRY(enter_cr3);
++	BLANK();
++#undef ENTRY
++
+ 	return 0;
+ }
+diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+index c876f1d36a81..c4f2b629b422 100644
+--- a/arch/x86/kernel/traps.c
++++ b/arch/x86/kernel/traps.c
+@@ -773,6 +773,9 @@ DEFINE_IDTENTRY_RAW(exc_int3)
+ asmlinkage __visible noinstr struct pt_regs *sync_regs(struct pt_regs *eregs)
+ {
+ 	struct pt_regs *regs = (struct pt_regs *)this_cpu_read(pcpu_hot.top_of_stack) - 1;
++
++	if (this_cpu_read(cpu_tss_rw.tss_ex.host_rsp))
++		return eregs;
+ 	if (regs != eregs)
+ 		*regs = *eregs;
+ 	return regs;
 -- 
 2.19.1.6.gb485710b
 
