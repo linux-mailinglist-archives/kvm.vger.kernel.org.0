@@ -1,127 +1,107 @@
-Return-Path: <kvm+bounces-9937-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9938-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525D1867988
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:09:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D42A58679B9
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:13:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07A531F24EF6
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:09:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B6A8B35EC8
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103B0133411;
-	Mon, 26 Feb 2024 14:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED0E134722;
+	Mon, 26 Feb 2024 14:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QF+Gbx4K"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="IIKbD6Gp"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C5D604DA
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 14:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FAC5605C8
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 14:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708959000; cv=none; b=h2ggTarv73v6+kuiIicF1qgIPT4WxoAgzpBCHySO6kjotK0EMDZZJv2xKIQIwRj5isQ2Npw+Wgq7sZ9rKeTtU7tpiJ6Fe2fhIWDn687nFiPU4MK/uTnY4i09kmgwXaeHrVuyIV5z7E60OaEq6dwKjcsT2PTrqQyBogOEZMRWFao=
+	t=1708959259; cv=none; b=NH1sM9MEddBlaVvz5uY4KrqKqtUrpOGwql/Ck00HPMdEYo36sZ7zzw+HzGgrt4yCu3ESWFmjfgEp6GcbApi4wWdE5130PwjtvR4a9038toLerod5P6qs2/KtH+GLvFz3AdIoVhBKVqK87LD8o5w0LC17ksEj6ACD79b/7MlcgWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708959000; c=relaxed/simple;
-	bh=4h1uS0OB13pX9giRpnNIP+0vjTvNS7C6s/4bG7aHMC4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rdk4HRo+0nQJiJJ9hP/H6DWUM5SuigR2xAj0am4XXA7tYnpT65Go05SRm52/XEjo8OtY3X/aidUNXsziiVOyqqMPH0pGK3plAfEqkKwKCy3sLXDnxAiDzFvJrFwFH1yBF3sig98rwShTzLIshdd5dR09sDX3NybhIJ/Dr5809XA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QF+Gbx4K; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708958997;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oATdMi/DAQW7XnfLe/Ii99PaynQWsTmEg5BInunlmU4=;
-	b=QF+Gbx4K5mogkEIW1Pp6ei16tU1GcimrnoL4+FfNd5Y9qt2AssognxKX8Be+3zdr0TChFY
-	KqRc7N0RGcw4qS/QdVnJuOfvhUUrpvuGqH7K3h6idmgkVg/g7ARfkgXpD85+1UBJXIj50V
-	OKgrKdYX1wzXv2n0ytcRE6CRWXz5xuc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-0GAlBIh1PjieN-Uf9B1rzw-1; Mon, 26 Feb 2024 09:49:48 -0500
-X-MC-Unique: 0GAlBIh1PjieN-Uf9B1rzw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33de2d9bc74so269900f8f.1
-        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 06:49:48 -0800 (PST)
+	s=arc-20240116; t=1708959259; c=relaxed/simple;
+	bh=+/3x0KqyHOPTRYlw4GtUE9dLmWgAf0LHJfu8+hfKIZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dcnE8u+CcqpNJYWzBUOhZR0r7J3Bzw/TAjYQURi//VpvLrV1lCL8kCvHMwv2e6sWgPP3HBXL4+AZPfkfnXtZptojpsjvFSYK6vAOAEPOjSXOsbgNJL58/LuY9ZI6n8if8cWPG7Y7Pgbm5cQqMBbdbiT4E3UnyxC/g1i94B5zHIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=IIKbD6Gp; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-68f41af71ebso34269676d6.1
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 06:54:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1708959255; x=1709564055; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PhKx5RN8BGOt7qaJdVuPeh1gBcvVzdbEvZwAOUpborE=;
+        b=IIKbD6Gpk6tLnl6A2U/g/Y8jzffN05jPhtiTP3e4dxaHKPNjxnSuxw/pfZXMO97ybH
+         rcSB/CzJg5DDG/htzgxnjDEEBaxLgnMLWBEvAdEBrI+DYdfUabdS695WV3Wlqm4SUAoL
+         8Oajb2NQbY7hNcXfm844kdsWP3WdGSQUP+qc/+Yi/7GHl+/d5/ujtgRGx8wpSghBxp6E
+         yZEOb0nSNLOrcAXX08iYED+lpVJ6K/hDL5kzG2EMUtx3L24bg33YR9q5RuXmHsE5ckmk
+         7ORbU74eu/lyqYWBDbObYLkPrkrwHb5bbV4lmqSV1x2r7iIuZjMQi/FQeqDMOflHafCx
+         E4OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958987; x=1709563787;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oATdMi/DAQW7XnfLe/Ii99PaynQWsTmEg5BInunlmU4=;
-        b=KBUMcKqkwIXVBs9YSUtEc2tIuwCPaP27JXll5flT2ryP9uOsZR//dMMtyrk2KBjE4N
-         QEvZFofD3sr0NrCkpVLSYcTWNO/I2cjl71dT37cfGN+LHk2kQmAewxDw4/wIEo47yqFL
-         EHj6zTMH+SH0wQAMcyBy0gvFGDQ9HLUTLtYFf4uTilxIO8uxkzXmz7h7PShD+snVE5Ll
-         eJOc9BqeMEFdxIQF0VcObrfa3FdtnDoou6SZaACVYSrMOt+Lti9pyw3nB+68/1tibwFo
-         gjHz8pcAcpidViRtny6TPpyYeXbCOdmZMuYAR+8Ck2116UP+GfyyLABVXC+okNG9GARb
-         Krew==
-X-Forwarded-Encrypted: i=1; AJvYcCU3O8RCPXu1ixGsLm6Q6duB8TLWMsDgoNjqWkLu3LRnHp8ynYUy39gAxdNE7SHbpv7fNHJuicrEqnymEaWGzK0ThX2E
-X-Gm-Message-State: AOJu0YyILGbRoJNIoTTpbrDxXoUULmTqRKuUqGBRjHWqevJQ5N0xUB6s
-	znPcjFJmLskT/J4Go/DbJxZi5smOCVBrvdZaPEl2NdQvx9UgH/Pb5vdWpPTqOCdM5xL4vCxRyYr
-	WXqU1WK7DDpTsCugmHjurKayr60fq119qKfs/FQDD/WyDuhrKr63J0Xvfk/w3B2A2wyQwxu14gY
-	3zZodB9YXw0RAj3QrgKn0ji28V
-X-Received: by 2002:a05:6000:542:b0:33d:222d:f380 with SMTP id b2-20020a056000054200b0033d222df380mr4786193wrf.0.1708958987318;
-        Mon, 26 Feb 2024 06:49:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEh1Jo6dbimJnw7JwSkOJS+Z5z3FdkvM8eJF2SdeZSsY3mQqYpqZsnBJ6rTceTsgNv069XIT5VJPEbSzHHuOsY=
-X-Received: by 2002:a05:6000:542:b0:33d:222d:f380 with SMTP id
- b2-20020a056000054200b0033d222df380mr4786172wrf.0.1708958987010; Mon, 26 Feb
- 2024 06:49:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708959255; x=1709564055;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PhKx5RN8BGOt7qaJdVuPeh1gBcvVzdbEvZwAOUpborE=;
+        b=puCLlPba5g4VWK8oAP4woHr6tdicy9irnOMxoqzODrOEtxs+tE+hbzlracp4Okk8v/
+         M7nH7Z+OntHU3n2q3qQBIAHEiWbT8Qi3lggz/xeMIv05LfK4Wo4jr61CY/jm8xBJU6E2
+         NtBtIFvTBo08HA32oC/q0eC+MZ7RqnAZJ5BJztm8yPFe8lwHI80tXaEpBC4jHMW3ekeM
+         /szDkqKXFd3OQ51eBB/Q8aTVu1sBOfsLH/ylv2eTf+cEQqxDeyWGlxLxpCLD5mH7/vfv
+         T7ti0pLgDj1a0PvaymnCaLEHnjtwLqCL727+zx0XNEVXMMyUUvIt/ULMuG/46innQomb
+         35iA==
+X-Forwarded-Encrypted: i=1; AJvYcCXxrJX4agsuJHvoPJa88M3+UxdiqVrx1dIhVKdt4BnrLize6IU/XEBCWZkPGkEEmBHRfKqgxRgk53uVgMiVG8sCj5W0
+X-Gm-Message-State: AOJu0Yy0HgfqwVZaWLRoHuOmNgUtSljOrfD6RPyGi7aU5yLdoxRp31mM
+	WdiUT69OTdYMg+QlqQFN73if+otjTnAJvchXImpSdawGMAa7KhMOhqDcj9KHNeHi/b5TBbnICbn
+	Q
+X-Google-Smtp-Source: AGHT+IFG8IA1MhzDu5mBfgrDa5+jfgySxX44NFn5JkVLCjSLzcXdc4sTcq8nfBI/KeHX+xqovKkBfg==
+X-Received: by 2002:ad4:4ead:0:b0:690:1829:55c4 with SMTP id ed13-20020ad44ead000000b00690182955c4mr751409qvb.22.1708959255274;
+        Mon, 26 Feb 2024 06:54:15 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id mf2-20020a0562145d8200b0068fef2bc3a6sm2774652qvb.135.2024.02.26.06.54.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Feb 2024 06:54:14 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1recMw-00HS9Y-0p;
+	Mon, 26 Feb 2024 10:54:14 -0400
+Date: Mon, 26 Feb 2024 10:54:14 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Antonios Motakis <a.motakis@virtualopensystems.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio: amba: Rename pl330_ids[] to vfio_amba_ids[]
+Message-ID: <20240226145414.GC3220539@ziepe.ca>
+References: <1d1b873b59b208547439225aee1f24d6f2512a1f.1708945194.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240226143630.33643-1-jiangshanlai@gmail.com>
-In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 26 Feb 2024 15:49:34 +0100
-Message-ID: <CABgObfaSGOt4AKRF5WEJt2fGMj_hLXd7J2x2etce2ymvT4HkpA@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/73] KVM: x86/PVM: Introduce a new hypervisor
-To: Lai Jiangshan <jiangshanlai@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Lai Jiangshan <jiangshan.ljs@antgroup.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
-	Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org, x86@kernel.org, 
-	Kees Cook <keescook@chromium.org>, Juergen Gross <jgross@suse.com>, 
-	Hou Wenlong <houwenlong.hwl@antgroup.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1d1b873b59b208547439225aee1f24d6f2512a1f.1708945194.git.geert+renesas@glider.be>
 
-On Mon, Feb 26, 2024 at 3:34=E2=80=AFPM Lai Jiangshan <jiangshanlai@gmail.c=
-om> wrote:
-> - Full control: In XENPV/Lguest, the host Linux (dom0) entry code is
->   subordinate to the hypervisor/switcher, and the host Linux kernel
->   loses control over the entry code. This can cause inconvenience if
->   there is a need to update something when there is a bug in the
->   switcher or hardware.  Integral entry gives the control back to the
->   host kernel.
->
-> - Zero overhead incurred: The integrated entry code doesn't cause any
->   overhead in host Linux entry path, thanks to the discreet design with
->   PVM code in the switcher, where the PVM path is bypassed on host events=
-.
->   While in XENPV/Lguest, host events must be handled by the
->   hypervisor/switcher before being processed.
+On Mon, Feb 26, 2024 at 12:09:26PM +0100, Geert Uytterhoeven wrote:
+> Obviously drivers/vfio/platform/vfio_amba.c started its life as a
+> simplified copy of drivers/dma/pl330.c, but not all variable names were
+> updated.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+>  drivers/vfio/platform/vfio_amba.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-Lguest... Now that's a name I haven't heard in a long time. :)  To be
-honest, it's a bit weird to see yet another PV hypervisor. I think
-what really killed Xen PV was the impossibility to protect from
-various speculation side channel attacks, and I would like to
-understand how PVM fares here.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-You obviously did a great job in implementing this within the KVM
-framework; the changes in arch/x86/ are impressively small. On the
-other hand this means it's also not really my call to decide whether
-this is suitable for merging upstream. The bulk of the changes are
-really in arch/x86/kernel/ and arch/x86/entry/, and those are well
-outside my maintenance area.
-
-Paolo
-
+Jason
 
