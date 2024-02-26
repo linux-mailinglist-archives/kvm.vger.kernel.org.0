@@ -1,182 +1,173 @@
-Return-Path: <kvm+bounces-9963-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9964-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460ED868028
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:56:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0D9686802C
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:56:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 699311C23F2E
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 18:56:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801211F23072
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 18:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDAAD12F39F;
-	Mon, 26 Feb 2024 18:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE6712F583;
+	Mon, 26 Feb 2024 18:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ImaO8gPH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hBDh4B6g"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B7012E1D5
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 18:56:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F220E12E1D5;
+	Mon, 26 Feb 2024 18:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708973764; cv=none; b=EUBqhtBc7qv42sfLvMYx/LaZaAecstQMQyb2PkYnoIcdGr+uYrgmjGijt5aS8RUG6XDyZPuzDZRHywzLTIel2sH8Rcv8zAHbbeOxhin0JU3S8OQ3HNGY9Eu4ZqWGMiZN6BfA+ApBIkU8+zm0qPyAIY2nqEilYV3tHMke+WbJimU=
+	t=1708973796; cv=none; b=DF7QtoWEUhFlyDNVxNhUw4tozPNu2k2p8TSXHbMeWTUEjECDPwsJB4rTjwiTVIZPj4kTEXhwU51OuLH2wH3EO+9wAcetpJjlmNE/2JUiR6401hW0KDnzFN/R+YSuEebjIFkeRUVDeDX22zAQ6r3AUkpqk7eZ9ELSqK68GHxE25Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708973764; c=relaxed/simple;
-	bh=Hky7ScwvprYvyvPsvvnUnTHqJwElNbJ7fw1O/KrHbRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uh2W9McFF2lYJMCqVISN9ACJiL0P3oYEJ29HQOACifB0zgN8Jf3TpM3yXHIBLJbvFLzlU9x+9l7ImA7ae6eMwvV8NaVH//idkchfsAV13fOZD/DJWkpeeKE3WB6jPrCwog73yGgqpD0VxU3gtUAholcrJajRsUC2ExCN51/9dSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ImaO8gPH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708973761;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FMl14UBC0wFtsSRs7CXZ1lEAQzA5s3cCQgMHboCVWvc=;
-	b=ImaO8gPHGBKBZiGST2PAlnlC1jMtTf/PxlKIRlaCVmAsXFEkEDjn454ZyvmpgNMjXvh+Q9
-	WXqhcSwu6OPKQMEg+Wjx0WVXVCe5L71wKdsnO00pYUr6cXSQnfuQ4TFY7cwWjJUMMa0N35
-	BsaiV70QNr4KUMdAlpCYAqhgxAlZHbc=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-sLW9r8_ON_yvswUslia8Ug-1; Mon, 26 Feb 2024 13:55:59 -0500
-X-MC-Unique: sLW9r8_ON_yvswUslia8Ug-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c7c9831579so120679539f.0
-        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 10:55:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708973759; x=1709578559;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FMl14UBC0wFtsSRs7CXZ1lEAQzA5s3cCQgMHboCVWvc=;
-        b=lUriHBGVCdFfxO5G64AyypVBUNrAxLJR0NwkXkHKUYvaPfxmV4j924gyANTaTlFGig
-         uAZiwvUmOPhb8d3QqCeCf4a/9uACOdZlkFHsN+uLVNyJenCzq1tDW0q9UfDsrxokJrjs
-         GfZV/l4bqCpi8j/RwqaSGjXYrS3kwtYBqKbZNLWPHj2KVEvRR/G910JL70jNb9dRn0wC
-         Z4pMQGw1QsEOH3hrKcD+Rr4CS9xLHUgys/2SlvyVhhmzKQrmlR/lZainrsObrdsReJlI
-         xs8Zv3FVd2zqpxW8jno6rhl7w4pNyvfJ8KgifmEZ3s0S5oFmvf9UPHsKS0Z+fbpaRdqT
-         gnKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXazSpK/gkr5vW1bCt2PDrbDjLZ03dtvIdPt2VKg8kPKKe754MtusS+mDpMvUlSuykSJRMRfD7wG+wsHPFvxhdRLa+6
-X-Gm-Message-State: AOJu0YznuVFYKZB8MAHigX2KbhbQp9QPW6rn6WGUA/Fpoqd8XdjL5awl
-	GvfGf+g2R/kBMART/EBP/ZI2vRmUYycN5ToiOGU86HBhnQezrb5Uew588R24p335wvYLmT1HyCo
-	QXKhpz3agSvPjsdln3BEg+pTkGdJ2cAInYvRXSRm8P7FJVX0kkw==
-X-Received: by 2002:a5e:a81a:0:b0:7c4:19c7:646a with SMTP id c26-20020a5ea81a000000b007c419c7646amr9384939ioa.19.1708973758888;
-        Mon, 26 Feb 2024 10:55:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFdFByuu/xMUKArc3Uub3jOwAvoWwpkqkD5yTxzJdHimpXozAU0C2doX7+xr7iDIcC6QcfNGg==
-X-Received: by 2002:a5e:a81a:0:b0:7c4:19c7:646a with SMTP id c26-20020a5ea81a000000b007c419c7646amr9384924ioa.19.1708973758518;
-        Mon, 26 Feb 2024 10:55:58 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id b20-20020a5ea714000000b007c79a708e73sm1357541iod.35.2024.02.26.10.55.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 10:55:57 -0800 (PST)
-Date: Mon, 26 Feb 2024 11:55:56 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Xin Zeng <xin.zeng@intel.com>, jgg@nvidia.com
-Cc: herbert@gondor.apana.org.au, yishaih@nvidia.com,
- shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, qat-linux@intel.com,
- Yahui Cao <yahui.cao@intel.com>
-Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Message-ID: <20240226115556.3f494157.alex.williamson@redhat.com>
-In-Reply-To: <20240221155008.960369-11-xin.zeng@intel.com>
-References: <20240221155008.960369-1-xin.zeng@intel.com>
- <20240221155008.960369-11-xin.zeng@intel.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708973796; c=relaxed/simple;
+	bh=LHD+JDEOdVWmiSEIxtQemrQnvU3P82mWYGpIuPIt0XY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DIMO6z2Nq7F9XwK1mKq0+tybJ9vvvCWQPxS3Dw07m05Z2he6htDchEJVC0SUGybDqvWnVFMp5Er1erAHodeJB2WlLGxASWIkFK/dnaouGKpWgGBg83CUvmGsCCRN7de+s33LXYIgyJFj6nbZoKhxkPv6fTqEk1GNS2ArNx8OPPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hBDh4B6g; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708973794; x=1740509794;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LHD+JDEOdVWmiSEIxtQemrQnvU3P82mWYGpIuPIt0XY=;
+  b=hBDh4B6gjaZrgSufEtAB4JhwjF/lA2j9FiFROtOnIo6dXP+vRwYIBCsW
+   3Hw9uUAwtxlaq7d6BTdk2br96A/VUhnYtFd672YiVIzzn6bnwkrG3iidb
+   6q2Jh3CH5894Kn5wLJsyByrHb0+3rIx6aqGfXZ3qVGuqHn7gWTsSkjOYf
+   9iWW9fXGS8NG7paEP7Vl3V1mH4BUU1jJ33BVlR8KPQFY89c9Srfsi/HSa
+   hP0EiROWRsjKIQE+T96mHCvdvNueeJU85yskVFVFfPu+WvXwFWbFKgspf
+   GLwKZxUtGys5nQXbPxt0xhvTJdi7j0rx8W7RSomtpE9sC4bsaTw6x/8uI
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="14719198"
+X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
+   d="scan'208";a="14719198"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 10:56:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
+   d="scan'208";a="6909793"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 10:56:33 -0800
+Date: Mon, 26 Feb 2024 10:56:32 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: Yuan Yao <yuan.yao@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v18 024/121] KVM: TDX: create/destroy VM structure
+Message-ID: <20240226185632.GJ177224@ls.amr.corp.intel.com>
+References: <cover.1705965634.git.isaku.yamahata@intel.com>
+ <167b3797f5928c580526f388761dcfb342626ad2.1705965634.git.isaku.yamahata@intel.com>
+ <20240201083227.vwyqlptrr3bdwr7m@yy-desk-7060>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240201083227.vwyqlptrr3bdwr7m@yy-desk-7060>
 
-On Wed, 21 Feb 2024 23:50:08 +0800
-Xin Zeng <xin.zeng@intel.com> wrote:
+On Thu, Feb 01, 2024 at 04:32:27PM +0800,
+Yuan Yao <yuan.yao@linux.intel.com> wrote:
 
-> Add vfio pci driver for Intel QAT VF devices.
+...
+> > +static int __tdx_reclaim_page(hpa_t pa)
+> > +{
+> > +	struct tdx_module_args out;
+> > +	u64 err;
+> > +
+> > +	do {
+> > +		err = tdh_phymem_page_reclaim(pa, &out);
+> > +		/*
+> > +		 * TDH.PHYMEM.PAGE.RECLAIM is allowed only when TD is shutdown.
+> > +		 * state.  i.e. destructing TD.
+> > +		 * TDH.PHYMEM.PAGE.RECLAIM requires TDR and target page.
+> > +		 * Because we're destructing TD, it's rare to contend with TDR.
+> > +		 */
+> > +	} while (unlikely(err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX)));
 > 
-> This driver uses vfio_pci_core to register to the VFIO subsystem. It
-> acts as a vfio agent and interacts with the QAT PF driver to implement
-> VF live migration.
+> v16 changed to tdx module 1.5, so here should be TDX_OPERAND_ID_TDR, value 128ULL.
+
+We should handle both RCX(SEPT) and TDR. So I make it err == RCX || err == TDR.
+
+...
+
+> > +static int __tdx_td_init(struct kvm *kvm)
+> > +{
+> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > +	cpumask_var_t packages;
+> > +	unsigned long *tdcs_pa = NULL;
+> > +	unsigned long tdr_pa = 0;
+> > +	unsigned long va;
+> > +	int ret, i;
+> > +	u64 err;
+> > +
+> > +	ret = tdx_guest_keyid_alloc();
+> > +	if (ret < 0)
+> > +		return ret;
+> > +	kvm_tdx->hkid = ret;
+> > +
+> > +	va = __get_free_page(GFP_KERNEL_ACCOUNT);
+> > +	if (!va)
+> > +		goto free_hkid;
+> > +	tdr_pa = __pa(va);
+> > +
+> > +	tdcs_pa = kcalloc(tdx_info->nr_tdcs_pages, sizeof(*kvm_tdx->tdcs_pa),
+> > +			  GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> > +	if (!tdcs_pa)
+> > +		goto free_tdr;
+> > +	for (i = 0; i < tdx_info->nr_tdcs_pages; i++) {
+> > +		va = __get_free_page(GFP_KERNEL_ACCOUNT);
+> > +		if (!va)
+> > +			goto free_tdcs;
+> > +		tdcs_pa[i] = __pa(va);
+> > +	}
+> > +
+> > +	if (!zalloc_cpumask_var(&packages, GFP_KERNEL)) {
+> > +		ret = -ENOMEM;
+> > +		goto free_tdcs;
+> > +	}
+> > +	cpus_read_lock();
+> > +	/*
+> > +	 * Need at least one CPU of the package to be online in order to
+> > +	 * program all packages for host key id.  Check it.
+> > +	 */
+> > +	for_each_present_cpu(i)
+> > +		cpumask_set_cpu(topology_physical_package_id(i), packages);
+> > +	for_each_online_cpu(i)
+> > +		cpumask_clear_cpu(topology_physical_package_id(i), packages);
+> > +	if (!cpumask_empty(packages)) {
+> > +		ret = -EIO;
+> > +		/*
+> > +		 * Because it's hard for human operator to figure out the
+> > +		 * reason, warn it.
+> > +		 */
+> > +#define MSG_ALLPKG	"All packages need to have online CPU to create TD. Online CPU and retry.\n"
+> > +		pr_warn_ratelimited(MSG_ALLPKG);
+> > +		goto free_packages;
+> > +	}
 > 
-> Co-developed-by: Yahui Cao <yahui.cao@intel.com>
-> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  MAINTAINERS                         |   8 +
->  drivers/vfio/pci/Kconfig            |   2 +
->  drivers/vfio/pci/Makefile           |   2 +
->  drivers/vfio/pci/intel/qat/Kconfig  |  12 +
->  drivers/vfio/pci/intel/qat/Makefile |   3 +
->  drivers/vfio/pci/intel/qat/main.c   | 663 ++++++++++++++++++++++++++++
->  6 files changed, 690 insertions(+)
->  create mode 100644 drivers/vfio/pci/intel/qat/Kconfig
->  create mode 100644 drivers/vfio/pci/intel/qat/Makefile
->  create mode 100644 drivers/vfio/pci/intel/qat/main.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 5a4051996f1e..8961c7033b31 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -23099,6 +23099,14 @@ S:	Maintained
->  F:	Documentation/networking/device_drivers/ethernet/amd/pds_vfio_pci.rst
->  F:	drivers/vfio/pci/pds/
->  
-> +VFIO QAT PCI DRIVER
-> +M:	Xin Zeng <xin.zeng@intel.com>
-> +M:	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> +L:	kvm@vger.kernel.org
-> +L:	qat-linux@intel.com
-> +S:	Supported
-> +F:	drivers/vfio/pci/intel/qat/
-> +
+> Generate/release hkid both requests to have "cpumask of at least 1
+> cpu per each node", how about add one helper for this ? The helper also
+> checks the cpus_read_lock() is held and return the cpumask if at least
+> 1 cpu is online per node, thus this init funciotn can be simplified and
+> become more easy to review.
 
-Alphabetical please.
-
->  VFIO PLATFORM DRIVER
->  M:	Eric Auger <eric.auger@redhat.com>
->  L:	kvm@vger.kernel.org
-> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> index 18c397df566d..329d25c53274 100644
-> --- a/drivers/vfio/pci/Kconfig
-> +++ b/drivers/vfio/pci/Kconfig
-> @@ -67,4 +67,6 @@ source "drivers/vfio/pci/pds/Kconfig"
->  
->  source "drivers/vfio/pci/virtio/Kconfig"
->  
-> +source "drivers/vfio/pci/intel/qat/Kconfig"
-
-This will be the first intel vfio-pci variant driver, I don't think we
-need an intel sub-directory just yet.
-
-Tangentially, I think an issue we're running into with
-PCI_DRIVER_OVERRIDE_DEVICE_VFIO is that we require driver_override to
-bind the device and therefore the id_table becomes little more than a
-suggestion.  Our QE is already asking, for example, if they should use
-mlx5-vfio-pci for all mlx5 compatible devices.
-
-I wonder if all vfio-pci variant drivers that specify an id_table
-shouldn't include in their probe function:
-
-	if (!pci_match_id(pdev, id)) {
-		pci_info(pdev, "Incompatible device, disallowing driver_override\n");
-		return -ENODEV;
-	}
-
-(And yes, I see the irony that vfio introduced driver_override and
-we've created variant drivers that require driver_override and now we
-want to prevent driver_overrides)
-
-Jason, are you seeing any of this as well and do you have a better
-suggestion how we might address the issue?  Thanks,
-
-Alex
-
+We don't need cpumask to release hkid. So only tdx_td_init() needs cpumask
+allocation. So I didn't to bother create a helper function with v19.
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
