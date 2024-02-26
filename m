@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-9765-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9766-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE5A866DDB
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:14:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79D1866DDD
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:14:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63007283F3F
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:14:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 063D01C232A6
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1841353E6;
-	Mon, 26 Feb 2024 08:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F656135417;
+	Mon, 26 Feb 2024 08:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B3lUEs4L"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h4ssgUZN"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C452E3E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A2413473E;
 	Mon, 26 Feb 2024 08:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936194; cv=none; b=t+VE/3SgSAjXUHoJ+iXL4T/JlG5XKET1r2HmK8vpWRd35eznlfCadOEnGBwVY8jd+bK3/P1BxJZEXhSi5fO/GK/5ov7DlMIpI/GOxUCaapleniYDBiCwRK3fHG30XQydHM4bpb72tDAWC1AKG2cf9Xl9glRIYPLki9acRme0enc=
+	t=1708936195; cv=none; b=sqEInd7qTEAXhBKK/AxhsI95Fz7KtFjPrhc+IqMNKXKpGekBeSoMZ9RTDMkxRe+YM+jBSQnPKUIzKidu7pIXdCtA/A2MAh6uIJE6NUo4XjU8zZXV2NfbkradlHsvMFdGGS7sjvDS+4IcYOlOGCS793m+P739mv3GIPvVRsUHmzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936194; c=relaxed/simple;
-	bh=bl9k+dlnXJduQusfWfzV1yxMDCOOObFRijgwH0XuSM0=;
+	s=arc-20240116; t=1708936195; c=relaxed/simple;
+	bh=oeAEv4Gf0Qi57KYsvGTkKhwlHrVtXMsAmWfuZLQ9wrM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L02AD6XoMdSu/LqbFShwfKGyb1SvTKrnfPyGEV+XrvKJo5+bXBX+7cWlHBiSdfucYCOq9GvpODqkjzm1fyw1Vj8p0JCvgFWCWrK4cZqjpmzGx9Gt1pcvXtZGAWEZbCBEjsXbnawTcDUMuQ65+VLCKyRnW7uf84zTGuUsOnaeQ+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B3lUEs4L; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=rFfl8dlnreWLByN+3+zqqla+exmv/dzpZ/VNi6B5FJMOfu8iq/SfeCc4tWF03wKyrUzQFahnBoUT6nhdhEIdpzrNkJZs02i2W04a7RnAPEPaPQlpZHj9vcw8MSoay2TtQSCrQ9WUVPa6UZa+DvyGyqfa9xWt5pnrSycWDqYLyL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h4ssgUZN; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,24 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1708936193; x=1740472193;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bl9k+dlnXJduQusfWfzV1yxMDCOOObFRijgwH0XuSM0=;
-  b=B3lUEs4LKGivOcp7I4hXL8xiz0Y0gnDYBgpc4EZPRvMok5HEHfqTuPGx
-   bSLWRjlFfPR6Zn8oNhZW8u60INDSk1+Xg9gjCz50JhpX2Aiy5TPM8SSbb
-   Og+i1mM9PmY8fn9R5R9VGDQ0Md09fFMJe8SGnDUmC3jmjtivn5Jesu+G7
-   vbvuueFSN18Y1iaxixOsrxdW8fIYxtBPK91aGzRDsVS11fs3LyaWpOzCo
-   +piZrRLKEIPwnO9osSr/vxNoPK4UmbjEHVvfhm9wDXjVA16xPoM/Etcb+
-   XPEjgMzqumyWITHiNk8D4ADMzWYKay0nUeM/j1eeO6TCuqZaqif35pN/w
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="14623321"
+  bh=oeAEv4Gf0Qi57KYsvGTkKhwlHrVtXMsAmWfuZLQ9wrM=;
+  b=h4ssgUZNo37U6sabKJKqxnF2azUOS0D10lmEtbZyoCR24bN2uZXUmTxl
+   qX+uM2q1ol5kMsuB9ooZidpRNeI21LwiKptrAOQLINUSA048B9Gk75vR2
+   VVGcPI3TyM8bXvwHP86VVWeS1biRea+OQahf9/qs/pJSM4cXu8rcQjpwB
+   TMIhvz9b/Uz0buZ2AgTcvFCB4yXQsKSqGEhm1RRCVLUO2jCPGlwrLCyWF
+   9aBUvrr14PaRCDNP7bhsbY08iH80iMXrS8JKQR3uoleo9yg6D+1V981l7
+   ZE8B50cPbL2N02bVoF9xpFRaRXYpmUGcVnKUhVH4J9jS3DCBuHQSpJYoU
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="14623328"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="14623321"
+   d="scan'208";a="14623328"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:34 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:36 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6519419"
+   d="scan'208";a="6519429"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:34 -0800
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:36 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -66,11 +66,10 @@ Cc: isaku.yamahata@intel.com,
 	Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
-	tina.zhang@intel.com,
-	Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v8 10/14] KVM: x86/tdp_mmu, TDX: Split a large page when 4KB page within it converted to shared
-Date: Mon, 26 Feb 2024 00:29:24 -0800
-Message-Id: <b387dcfc499d2f17e448cd4574115d1fd2437921.1708933624.git.isaku.yamahata@intel.com>
+	tina.zhang@intel.com
+Subject: [PATCH v8 11/14] KVM: x86/tdp_mmu: Try to merge pages into a large page
+Date: Mon, 26 Feb 2024 00:29:25 -0800
+Message-Id: <fed13988718f66cdf24e5bb6479fa2281961e82f.1708933624.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933624.git.isaku.yamahata@intel.com>
 References: <cover.1708933624.git.isaku.yamahata@intel.com>
@@ -82,209 +81,360 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Xiaoyao Li <xiaoyao.li@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-When mapping the shared page for TDX, it needs to zap private alias.
+When a large page is passed to the KVM page fault handler and some of sub
+pages are already populated, try to merge sub pages into a large page.
+This situation can happen when the guest converts small pages into shared
+and convert it back into private.
 
-In the case that private page is mapped as large page (2MB), it can be
-removed directly only when the whole 2MB is converted to shared.
-Otherwise, it has to split 2MB page into 512 4KB page, and only remove
-the pages that converted to shared.
+When a large page is passed to KVM mmu page fault handler and the spte
+corresponding to the page is non-leaf (one or more of sub pages are already
+populated at lower page level), the current kvm mmu zaps non-leaf spte at a
+large page level, and populate a leaf spte at that level.  Thus small pages
+are converted into a large page.  However, it doesn't work for TDX because
+zapping and re-populating results in zeroing page content.  Instead,
+populate all small pages and merge them into a large page.
 
-When a present large leaf spte switches to present non-leaf spte, TDX needs
-to split the corresponding SEPT page to reflect it.
+Merging pages into a large page can fail when some sub pages are accepted
+and some are not.  In such case, with the assumption that guest tries to
+accept at large page size for performance when possible, don't try to be
+smart to identify which page is still pending, map all pages at lower page
+level, and let vcpu re-execute.
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
 v7:
-- catch up for tdx_seamcall() change
-- typo in a comment of __set_private_spte_present()
-- improved a comment in tdx_sept_split_private_spt()
+- typo freezed => frozen
+- return 0 when page is merged into 2M large page instead of -EAGAIN
 
-v6:
-- repeat TDH.MEM.PAGE.DEMOTE on TDX_INTERRUPTED_RESTARTABLE
+v5:
+- Fix memory leak
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h |  1 +
- arch/x86/include/asm/kvm_host.h    |  2 ++
- arch/x86/kvm/mmu/tdp_mmu.c         | 21 ++++++++++++++++-----
- arch/x86/kvm/vmx/tdx.c             | 27 +++++++++++++++++++++++++--
- arch/x86/kvm/vmx/tdx_arch.h        |  1 +
- arch/x86/kvm/vmx/tdx_errno.h       |  1 +
- arch/x86/kvm/vmx/tdx_ops.h         | 13 +++++++++++++
- 7 files changed, 59 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |   2 +
+ arch/x86/include/asm/kvm_host.h    |   4 +
+ arch/x86/kvm/mmu/tdp_iter.c        |  37 ++++--
+ arch/x86/kvm/mmu/tdp_iter.h        |   2 +
+ arch/x86/kvm/mmu/tdp_mmu.c         | 176 ++++++++++++++++++++++++++++-
+ 5 files changed, 211 insertions(+), 10 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 3a7140129855..ada6865100ee 100644
+index ada6865100ee..6741cc518dae 100644
 --- a/arch/x86/include/asm/kvm-x86-ops.h
 +++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -105,6 +105,7 @@ KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
- KVM_X86_OP(load_mmu_pgd)
+@@ -106,9 +106,11 @@ KVM_X86_OP(load_mmu_pgd)
  KVM_X86_OP_OPTIONAL(link_private_spt)
  KVM_X86_OP_OPTIONAL(free_private_spt)
-+KVM_X86_OP_OPTIONAL(split_private_spt)
+ KVM_X86_OP_OPTIONAL(split_private_spt)
++KVM_X86_OP_OPTIONAL(merge_private_spt)
  KVM_X86_OP_OPTIONAL(set_private_spte)
  KVM_X86_OP_OPTIONAL(remove_private_spte)
  KVM_X86_OP_OPTIONAL(zap_private_spte)
++KVM_X86_OP_OPTIONAL(unzap_private_spte)
+ KVM_X86_OP(has_wbinvd_exit)
+ KVM_X86_OP(get_l2_tsc_offset)
+ KVM_X86_OP(get_l2_tsc_multiplier)
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c864a1ff2eb1..9c9742cc469c 100644
+index 9c9742cc469c..a02b14be186c 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1766,6 +1766,8 @@ struct kvm_x86_ops {
+@@ -147,6 +147,7 @@
+ #define KVM_MAX_HUGEPAGE_LEVEL	PG_LEVEL_1G
+ #define KVM_NR_PAGE_SIZES	(KVM_MAX_HUGEPAGE_LEVEL - PG_LEVEL_4K + 1)
+ #define KVM_HPAGE_GFN_SHIFT(x)	(((x) - 1) * 9)
++#define KVM_HPAGE_GFN_MASK(x)	(~((1UL << KVM_HPAGE_GFN_SHIFT(x)) - 1))
+ #define KVM_HPAGE_SHIFT(x)	(PAGE_SHIFT + KVM_HPAGE_GFN_SHIFT(x))
+ #define KVM_HPAGE_SIZE(x)	(1UL << KVM_HPAGE_SHIFT(x))
+ #define KVM_HPAGE_MASK(x)	(~(KVM_HPAGE_SIZE(x) - 1))
+@@ -1768,11 +1769,14 @@ struct kvm_x86_ops {
  				void *private_spt);
- 	int (*free_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
- 				void *private_spt);
-+	int (*split_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
-+				  void *private_spt);
+ 	int (*split_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+ 				  void *private_spt);
++	int (*merge_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
++				 void *private_spt);
  	int (*set_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
  				 kvm_pfn_t pfn);
  	int (*remove_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+ 				    kvm_pfn_t pfn);
+ 	int (*zap_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level);
++	int (*unzap_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level);
+ 
+ 	bool (*has_wbinvd_exit)(void);
+ 
+diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
+index 04c247bfe318..c4a18703f88a 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.c
++++ b/arch/x86/kvm/mmu/tdp_iter.c
+@@ -71,6 +71,14 @@ tdp_ptep_t spte_to_child_pt(u64 spte, int level)
+ 	return (tdp_ptep_t)__va(spte_to_pfn(spte) << PAGE_SHIFT);
+ }
+ 
++static void step_down(struct tdp_iter *iter, tdp_ptep_t child_pt)
++{
++	iter->level--;
++	iter->pt_path[iter->level - 1] = child_pt;
++	iter->gfn = gfn_round_for_level(iter->next_last_level_gfn, iter->level);
++	tdp_iter_refresh_sptep(iter);
++}
++
+ /*
+  * Steps down one level in the paging structure towards the goal GFN. Returns
+  * true if the iterator was able to step down a level, false otherwise.
+@@ -92,14 +100,28 @@ static bool try_step_down(struct tdp_iter *iter)
+ 	if (!child_pt)
+ 		return false;
+ 
+-	iter->level--;
+-	iter->pt_path[iter->level - 1] = child_pt;
+-	iter->gfn = gfn_round_for_level(iter->next_last_level_gfn, iter->level);
+-	tdp_iter_refresh_sptep(iter);
+-
++	step_down(iter, child_pt);
+ 	return true;
+ }
+ 
++/* Steps down for frozen spte.  Don't re-read sptep because it was frozen. */
++void tdp_iter_step_down(struct tdp_iter *iter, tdp_ptep_t child_pt)
++{
++	WARN_ON_ONCE(!child_pt);
++	WARN_ON_ONCE(iter->yielded);
++	WARN_ON_ONCE(iter->level == iter->min_level);
++
++	step_down(iter, child_pt);
++}
++
++void tdp_iter_step_side(struct tdp_iter *iter)
++{
++	iter->gfn += KVM_PAGES_PER_HPAGE(iter->level);
++	iter->next_last_level_gfn = iter->gfn;
++	iter->sptep++;
++	iter->old_spte = kvm_tdp_mmu_read_spte(iter->sptep);
++}
++
+ /*
+  * Steps to the next entry in the current page table, at the current page table
+  * level. The next entry could point to a page backing guest memory or another
+@@ -117,10 +139,7 @@ static bool try_step_side(struct tdp_iter *iter)
+ 	    (SPTE_ENT_PER_PAGE - 1))
+ 		return false;
+ 
+-	iter->gfn += KVM_PAGES_PER_HPAGE(iter->level);
+-	iter->next_last_level_gfn = iter->gfn;
+-	iter->sptep++;
+-	iter->old_spte = kvm_tdp_mmu_read_spte(iter->sptep);
++	tdp_iter_step_side(iter);
+ 
+ 	return true;
+ }
+diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
+index a9c9cd0db20a..ca00db799a50 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.h
++++ b/arch/x86/kvm/mmu/tdp_iter.h
+@@ -134,6 +134,8 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
+ 		    int min_level, gfn_t next_last_level_gfn);
+ void tdp_iter_next(struct tdp_iter *iter);
+ void tdp_iter_restart(struct tdp_iter *iter);
++void tdp_iter_step_side(struct tdp_iter *iter);
++void tdp_iter_step_down(struct tdp_iter *iter, tdp_ptep_t child_pt);
+ 
+ static inline union kvm_mmu_page_role tdp_iter_child_role(struct tdp_iter *iter)
+ {
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index e3682794adda..0ac2a4911fd1 100644
+index 0ac2a4911fd1..556974361d36 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -588,23 +588,34 @@ static int __must_check __set_private_spte_present(struct kvm *kvm, tdp_ptep_t s
- {
- 	bool was_present = is_shadow_present_pte(old_spte);
- 	bool is_present = is_shadow_present_pte(new_spte);
-+	bool was_leaf = was_present && is_last_spte(old_spte, level);
- 	bool is_leaf = is_present && is_last_spte(new_spte, level);
- 	kvm_pfn_t new_pfn = spte_to_pfn(new_spte);
-+	void *private_spt;
- 	int ret = 0;
- 
- 	lockdep_assert_held(&kvm->mmu_lock);
--	/* TDP MMU doesn't change present -> present */
--	KVM_BUG_ON(was_present, kvm);
- 
- 	/*
- 	 * Use different call to either set up middle level
- 	 * private page table, or leaf.
- 	 */
--	if (is_leaf)
-+	if (level > PG_LEVEL_4K && was_leaf && !is_leaf) {
-+		/*
-+		 * splitting large page into 4KB.
-+		 * tdp_mmu_split_huge_page() => tdp_mmu_link_sp()
-+		 */
-+		private_spt = get_private_spt(gfn, new_spte, level);
-+		KVM_BUG_ON(!private_spt, kvm);
-+		ret = static_call(kvm_x86_zap_private_spte)(kvm, gfn, level);
-+		kvm_flush_remote_tlbs(kvm);
-+		if (!ret)
-+			ret = static_call(kvm_x86_split_private_spt)(kvm, gfn,
-+								     level, private_spt);
-+	} else if (is_leaf)
- 		ret = static_call(kvm_x86_set_private_spte)(kvm, gfn, level, new_pfn);
- 	else {
--		void *private_spt = get_private_spt(gfn, new_spte, level);
--
-+		private_spt = get_private_spt(gfn, new_spte, level);
- 		KVM_BUG_ON(!private_spt, kvm);
- 		ret = static_call(kvm_x86_link_private_spt)(kvm, gfn, level, private_spt);
+@@ -1205,6 +1205,180 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm, bool skip_private)
  	}
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 6941e9483e7e..88af64658a9c 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1650,6 +1650,30 @@ static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
- 	return 0;
  }
  
-+static int tdx_sept_split_private_spt(struct kvm *kvm, gfn_t gfn,
-+				      enum pg_level level, void *private_spt)
++static int tdp_mmu_iter_step_side(int i, struct tdp_iter *iter)
 +{
-+	int tdx_level = pg_level_to_tdx_sept_level(level);
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	gpa_t gpa = gfn_to_gpa(gfn) & KVM_HPAGE_MASK(level);
-+	hpa_t hpa = __pa(private_spt);
-+	struct tdx_module_args out;
-+	u64 err;
++	i++;
 +
-+	/* See comment in tdx_sept_set_private_spte() to pin pages. */
-+	do {
-+		err = tdh_mem_page_demote(kvm_tdx->tdr_pa, gpa, tdx_level, hpa, &out);
-+	} while (err == TDX_INTERRUPTED_RESTARTABLE);
-+	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
-+		return -EAGAIN;
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error(TDH_MEM_PAGE_DEMOTE, err, &out);
-+		return -EIO;
++	/*
++	 * if i = SPTE_ENT_PER_PAGE, tdp_iter_step_side() results
++	 * in reading the entry beyond the last entry.
++	 */
++	if (i < SPTE_ENT_PER_PAGE)
++		tdp_iter_step_side(iter);
++
++	return i;
++}
++
++static int tdp_mmu_merge_private_spt(struct kvm_vcpu *vcpu,
++				     struct kvm_page_fault *fault,
++				     struct tdp_iter *iter, u64 new_spte)
++{
++	u64 *sptep = rcu_dereference(iter->sptep);
++	u64 old_spte = iter->old_spte;
++	struct kvm_mmu_page *child_sp;
++	struct kvm *kvm = vcpu->kvm;
++	struct tdp_iter child_iter;
++	int level = iter->level;
++	gfn_t gfn = iter->gfn;
++	tdp_ptep_t child_pt;
++	u64 child_spte;
++	int ret = 0;
++	int i;
++
++	/*
++	 * TDX KVM supports only 2MB large page.  It's not supported to merge
++	 * 2MB pages into 1GB page at the moment.
++	 */
++	WARN_ON_ONCE(fault->goal_level != PG_LEVEL_2M);
++	WARN_ON_ONCE(iter->level != PG_LEVEL_2M);
++	WARN_ON_ONCE(!is_large_pte(new_spte));
++
++	/* Freeze the spte to prevent other threads from working spte. */
++	if (!try_cmpxchg64(sptep, &iter->old_spte, REMOVED_SPTE))
++		return -EBUSY;
++
++	/*
++	 * Step down to the child spte.  Because tdp_iter_next() assumes the
++	 * parent spte isn't frozen, do it manually.
++	 */
++	child_pt = spte_to_child_pt(iter->old_spte, iter->level);
++	child_sp = sptep_to_sp(child_pt);
++	WARN_ON_ONCE(child_sp->role.level != PG_LEVEL_4K);
++	WARN_ON_ONCE(!kvm_mmu_page_role_is_private(child_sp->role));
++
++	/* Don't modify iter as the caller will use iter after this function. */
++	child_iter = *iter;
++	/* Adjust the target gfn to the head gfn of the large page. */
++	child_iter.next_last_level_gfn &= -KVM_PAGES_PER_HPAGE(level);
++	tdp_iter_step_down(&child_iter, child_pt);
++
++	/*
++	 * All child pages are required to be populated for merging them into a
++	 * large page.  Populate all child spte.
++	 */
++	for (i = 0; i < SPTE_ENT_PER_PAGE; i = tdp_mmu_iter_step_side(i, &child_iter)) {
++		int tmp;
++
++		WARN_ON_ONCE(child_iter.level != PG_LEVEL_4K);
++
++		if (is_shadow_present_pte(child_iter.old_spte)) {
++			/* TODO: relocate page for huge page. */
++			if (WARN_ON_ONCE(spte_to_pfn(child_iter.old_spte) !=
++					 spte_to_pfn(new_spte) + i)) {
++				if (!ret)
++					ret = -EAGAIN;
++				continue;
++			}
++			/*
++			 * When SEPT_VE_DISABLE=true and the page state is
++			 * pending, this case can happen.  Just resume the vcpu
++			 * again with the expectation for other vcpu to accept
++			 * this page.
++			 */
++			if (child_iter.gfn == fault->gfn) {
++				if (!ret)
++					ret = -EAGAIN;
++			}
++			continue;
++		}
++
++		child_spte = make_huge_page_split_spte(kvm, new_spte, child_sp->role, i);
++		/*
++		 * Because other thread may have started to operate on this spte
++		 * before freezing the parent spte,  Use atomic version to
++		 * prevent race.
++		 */
++		tmp = tdp_mmu_set_spte_atomic(vcpu->kvm, &child_iter, child_spte);
++		if (tmp == -EBUSY || tmp == -EAGAIN) {
++			/*
++			 * There was a race condition.  Populate remaining 4K
++			 * spte to resolve fault->gfn to guarantee the forward
++			 * progress.
++			 */
++			if (!ret)
++				ret = tmp;
++		} else if (tmp) {
++			ret = tmp;
++			goto out;
++		}
++	}
++	if (ret)
++		goto out;
++
++	/* Prevent the Secure-EPT entry from being used. */
++	ret = static_call(kvm_x86_zap_private_spte)(kvm, gfn, level);
++	if (ret)
++		goto out;
++	kvm_flush_remote_tlbs_range(kvm, gfn & KVM_HPAGE_GFN_MASK(level),
++				    KVM_PAGES_PER_HPAGE(level));
++
++	/* Merge pages into a large page. */
++	ret = static_call(kvm_x86_merge_private_spt)(kvm, gfn, level,
++						     kvm_mmu_private_spt(child_sp));
++	/*
++	 * Failed to merge pages because some pages are accepted and some are
++	 * pending.  Since the child page was mapped above, let vcpu run.
++	 */
++	if (ret) {
++		if (static_call(kvm_x86_unzap_private_spte)(kvm, gfn, level))
++			old_spte = SHADOW_NONPRESENT_VALUE |
++				(spte_to_pfn(old_spte) << PAGE_SHIFT) |
++				PT_PAGE_SIZE_MASK;
++		goto out;
 +	}
 +
++	/* Update stats manually as we don't use tdp_mmu_set_spte{, _atomic}(). */
++	kvm_update_page_stats(kvm, level - 1, -SPTE_ENT_PER_PAGE);
++	kvm_update_page_stats(kvm, level, 1);
++
++	/* Unfreeze spte. */
++	iter->old_spte = new_spte;
++	__kvm_tdp_mmu_write_spte(sptep, new_spte);
++
++	/*
++	 * Free unused child sp.  Secure-EPT page was already freed at TDX level
++	 * by kvm_x86_merge_private_spt().
++	 */
++	tdp_unaccount_mmu_page(kvm, child_sp);
++	tdp_mmu_free_sp(child_sp);
 +	return 0;
++
++out:
++	iter->old_spte = old_spte;
++	__kvm_tdp_mmu_write_spte(sptep, old_spte);
++	return ret;
 +}
 +
- static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
- 				      enum pg_level level)
- {
-@@ -1663,8 +1687,6 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (unlikely(!is_hkid_assigned(kvm_tdx)))
- 		return 0;
- 
--	/* For now large page isn't supported yet. */
--	WARN_ON_ONCE(level != PG_LEVEL_4K);
- 	err = tdh_mem_range_block(kvm_tdx->tdr_pa, gpa, tdx_level, &out);
- 	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
- 		return -EAGAIN;
-@@ -3308,6 +3330,7 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
- 
- 	x86_ops->link_private_spt = tdx_sept_link_private_spt;
- 	x86_ops->free_private_spt = tdx_sept_free_private_spt;
-+	x86_ops->split_private_spt = tdx_sept_split_private_spt;
- 	x86_ops->set_private_spte = tdx_sept_set_private_spte;
- 	x86_ops->remove_private_spte = tdx_sept_remove_private_spte;
- 	x86_ops->zap_private_spte = tdx_sept_zap_private_spte;
-diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
-index 19f2deafde5b..bb324f744bbf 100644
---- a/arch/x86/kvm/vmx/tdx_arch.h
-+++ b/arch/x86/kvm/vmx/tdx_arch.h
-@@ -21,6 +21,7 @@
- #define TDH_MNG_CREATE			9
- #define TDH_VP_CREATE			10
- #define TDH_MNG_RD			11
-+#define TDH_MEM_PAGE_DEMOTE		15
- #define TDH_MR_EXTEND			16
- #define TDH_MR_FINALIZE			17
- #define TDH_VP_FLUSH			18
-diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
-index 5366bf476d2c..416708e6cbb7 100644
---- a/arch/x86/kvm/vmx/tdx_errno.h
-+++ b/arch/x86/kvm/vmx/tdx_errno.h
-@@ -11,6 +11,7 @@
-  */
- #define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
- #define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
-+#define TDX_INTERRUPTED_RESTARTABLE		0x8000000400000000ULL
- #define TDX_OPERAND_INVALID			0xC000010000000000ULL
- #define TDX_OPERAND_BUSY			0x8000020000000000ULL
- #define TDX_PREVIOUS_TLB_EPOCH_BUSY		0x8000020100000000ULL
-diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
-index ef4748943ac7..d8f0d9aa7439 100644
---- a/arch/x86/kvm/vmx/tdx_ops.h
-+++ b/arch/x86/kvm/vmx/tdx_ops.h
-@@ -241,6 +241,19 @@ static inline u64 tdh_mng_rd(hpa_t tdr, u64 field, struct tdx_module_args *out)
- 	return tdx_seamcall(TDH_MNG_RD, &in, out);
- }
- 
-+static inline u64 tdh_mem_page_demote(hpa_t tdr, gpa_t gpa, int level, hpa_t page,
-+				      struct tdx_module_args *out)
++static int __tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
++					     struct kvm_page_fault *fault,
++					     struct tdp_iter *iter, u64 new_spte)
 +{
-+	struct tdx_module_args in = {
-+		.rcx = gpa | level,
-+		.rdx = tdr,
-+		.r8 = page,
-+	};
++	/*
++	 * The private page has smaller-size pages.  For example, the child
++	 * pages was converted from shared to page, and now it can be mapped as
++	 * a large page.  Try to merge small pages into a large page.
++	 */
++	if (fault->slot &&
++	    kvm_gfn_shared_mask(vcpu->kvm) &&
++	    iter->level > PG_LEVEL_4K &&
++	    kvm_is_private_gpa(vcpu->kvm, fault->addr) &&
++	    is_shadow_present_pte(iter->old_spte) &&
++	    !is_large_pte(iter->old_spte))
++		return tdp_mmu_merge_private_spt(vcpu, fault, iter, new_spte);
 +
-+	tdx_clflush_page(page, PG_LEVEL_4K);
-+	return tdx_seamcall_sept(TDH_MEM_PAGE_DEMOTE, &in, out);
++	return tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte);
 +}
 +
- static inline u64 tdh_mr_extend(hpa_t tdr, gpa_t gpa,
- 				struct tdx_module_args *out)
- {
+ /*
+  * Installs a last-level SPTE to handle a TDP page fault.
+  * (NPT/EPT violation/misconfiguration)
+@@ -1246,7 +1420,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 
+ 	if (new_spte == iter->old_spte)
+ 		ret = RET_PF_SPURIOUS;
+-	else if (tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
++	else if (__tdp_mmu_map_handle_target_level(vcpu, fault, iter, new_spte))
+ 		return RET_PF_RETRY;
+ 	else if (is_shadow_present_pte(iter->old_spte) &&
+ 		 !is_last_spte(iter->old_spte, iter->level))
 -- 
 2.25.1
 
