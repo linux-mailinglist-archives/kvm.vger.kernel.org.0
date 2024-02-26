@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-9721-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9722-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8C6A866D61
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:00:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFF49866D63
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E90228373F
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:00:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2E1C1C22E84
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDD47E76A;
-	Mon, 26 Feb 2024 08:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441D17F470;
+	Mon, 26 Feb 2024 08:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iZnzHOCJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cGkAQ9ms"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021F97D3F6;
-	Mon, 26 Feb 2024 08:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E62F7D416;
+	Mon, 26 Feb 2024 08:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936137; cv=none; b=gNXLaorXzCRaWXBH6/SK6Jr8Z5znR1BOVE/4zoUdK9oXPQpwlhMGp+QZ8ZcvEaLFUJ2HO5iFGSSL5DT8i39Z8nUdF6tUt5Azs5xXK9rwL78jmzNxbKXLR9GzE+ngcJRmOtAl4QZpZPk6hyOlNxjQ//zOidlfnQU1YRzW/J4V2Tk=
+	t=1708936138; cv=none; b=Zz/ZMj5glKFe79NdgfoycIlmc02B5s9ohcp6/FJGSl/wi8KOlTgKbtk/zkShOmd/Gwlrwo6kQT+kkHcgJH3N23sNKT2cpy3t8YiIBA65QLPvnrs2gRqZjienp8N5FmtobpjUOgdY/dwVDcZAFE8rd4e3txmffa2Lt4TElnSAD3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936137; c=relaxed/simple;
-	bh=b4MOR2zOZ9SOVUfbFZBno3QMxpOn32TQq9uMQ+RFtDc=;
+	s=arc-20240116; t=1708936138; c=relaxed/simple;
+	bh=jlMt0YZGqlLhw75ET618T3F67gddxPyZ/5Jwlzv59nw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sbhVtEU0ipFOPBJL4OK8H5fv5BuOwpb+z8955emYspZwHjFsgKi3A9+nb+5+y+eX1UeVup5HqmS6kZ/z/G6TtEteSRc+mG3NBR/TFURJtdTIHgDvfAS4ve0XxfE6hINKTo/7WCAvCzS5LujrnMW2TJM8Nu9Dv8dac+y1K2VHFNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iZnzHOCJ; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=iadIr7V5RbLgPbQGYCwch82zgoExb7Q1P/QFx8jQ++BkjrSaG7MuXwp9UyY0niGjSvLfL5fVgecw1j6/GKGIbx6LdNaudckn8FbF/qp3BV9uvDGtxGHwZwtpgytm2ESbvKndCS63JpcZoswbBdmoww9m5IyIePXRqxFCdtItfZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cGkAQ9ms; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708936136; x=1740472136;
+  t=1708936137; x=1740472137;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=b4MOR2zOZ9SOVUfbFZBno3QMxpOn32TQq9uMQ+RFtDc=;
-  b=iZnzHOCJAptIv+69i4+O4FlGt27KNka/KyTHnizhoSA/0oVCnH4JjXsu
-   xZXO1Buc4ngB8E63rMt96tw3O4j+PgquzIZvm35SpJABaZ3wTNk1LrexY
-   0ok7ffgAVJjQqakGrTrewUMD5Dm3Nmp7chqf1S06yuMmJvayMHt/dBJ6T
-   2DaBDP3shZnSoXnT41Ypx1rF/JRkPCORSSTst+MVPIDIFYbA0aX6UkhOG
-   CMJCVBm1GBv0khSMWhKLkMLgGjktfNT+do4nSMWViQpRYydAGsHowWEec
-   dKtfVNGYFEPR/Qe22RANlhqeBC+ALPYRWcubUWqzGbKCuo/Zz4KUJEMVA
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="3069586"
+  bh=jlMt0YZGqlLhw75ET618T3F67gddxPyZ/5Jwlzv59nw=;
+  b=cGkAQ9ms0LIaYgN+LrulLEO+ifwpcfeTIJ4A2BJ7DjO4tTN9YW0cBZXd
+   b7C7CJVhmUY8frdKvfcfPoZnTfomyPbnhAJ9Eo8uats3WON0W/hXoTFqM
+   e8NsFVyL3gGqOTpJj37KwLBc29sUKXSFbiHVaxGpJgdRsnV7GwP+oR3Q6
+   pqe2GlEfnanTx0kDpUNY7TS/WJySAm36asxZGNdbI+QsJxNLixOG91dKe
+   c+Z2o94GNWToAkFQdGwQJK+qeNTveCiqnJjloW0AseuGr66NfR16WMUup
+   qTJbFXCONsmBdtbBZPEe8D7ampnUixLdLMmu9mX8BCcZiANV0N9ex/Kzi
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="3069588"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="3069586"
+   d="scan'208";a="3069588"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:28:56 -0800
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:28:57 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="11272673"
+   d="scan'208";a="11272676"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:28:55 -0800
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:28:56 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -66,11 +66,10 @@ Cc: isaku.yamahata@intel.com,
 	Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
-	tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v19 097/130] KVM: x86: Split core of hypercall emulation to helper function
-Date: Mon, 26 Feb 2024 00:26:39 -0800
-Message-Id: <d6547bd0c1eccdfb4a4908e330cc56ad39535f5e.1708933498.git.isaku.yamahata@intel.com>
+	tina.zhang@intel.com
+Subject: [PATCH v19 098/130] KVM: TDX: Add a place holder to handle TDX VM exit
+Date: Mon, 26 Feb 2024 00:26:40 -0800
+Message-Id: <88920c598dcb55c15219642f27d0781af6d0c044.1708933498.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933498.git.isaku.yamahata@intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
@@ -82,129 +81,276 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-By necessity, TDX will use a different register ABI for hypercalls.
-Break out the core functionality so that it may be reused for TDX.
+Wire up handle_exit and handle_exit_irqoff methods and add a place holder
+to handle VM exit.  Add helper functions to get exit info, exit
+qualification, etc.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  4 +++
- arch/x86/kvm/x86.c              | 56 ++++++++++++++++++++++-----------
- 2 files changed, 42 insertions(+), 18 deletions(-)
+ arch/x86/kvm/vmx/main.c    |  37 ++++++++++++-
+ arch/x86/kvm/vmx/tdx.c     | 110 +++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h |  10 ++++
+ 3 files changed, 154 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e0ffef1d377d..bb8be091f996 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2177,6 +2177,10 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
- 	kvm_set_or_clear_apicv_inhibit(kvm, reason, false);
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 6d6d443a2bbd..c9a40456d965 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -228,6 +228,25 @@ static bool vt_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
+ 	return tdx_protected_apic_has_interrupt(vcpu);
  }
  
-+unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-+				      unsigned long a0, unsigned long a1,
-+				      unsigned long a2, unsigned long a3,
-+				      int op_64_bit, int cpl);
- int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
- 
- int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fb7597c22f31..03950368d8db 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10073,26 +10073,15 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
- 	return kvm_skip_emulated_instruction(vcpu);
- }
- 
--int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-+unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-+				      unsigned long a0, unsigned long a1,
-+				      unsigned long a2, unsigned long a3,
-+				      int op_64_bit, int cpl)
- {
--	unsigned long nr, a0, a1, a2, a3, ret;
--	int op_64_bit;
--
--	if (kvm_xen_hypercall_enabled(vcpu->kvm))
--		return kvm_xen_hypercall(vcpu);
--
--	if (kvm_hv_hypercall_enabled(vcpu))
--		return kvm_hv_hypercall(vcpu);
--
--	nr = kvm_rax_read(vcpu);
--	a0 = kvm_rbx_read(vcpu);
--	a1 = kvm_rcx_read(vcpu);
--	a2 = kvm_rdx_read(vcpu);
--	a3 = kvm_rsi_read(vcpu);
-+	unsigned long ret;
- 
- 	trace_kvm_hypercall(nr, a0, a1, a2, a3);
- 
--	op_64_bit = is_64_bit_hypercall(vcpu);
- 	if (!op_64_bit) {
- 		nr &= 0xFFFFFFFF;
- 		a0 &= 0xFFFFFFFF;
-@@ -10101,7 +10090,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		a3 &= 0xFFFFFFFF;
- 	}
- 
--	if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
-+	if (cpl) {
- 		ret = -KVM_EPERM;
- 		goto out;
- 	}
-@@ -10162,18 +10151,49 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 
- 		WARN_ON_ONCE(vcpu->run->hypercall.flags & KVM_EXIT_HYPERCALL_MBZ);
- 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
-+		/* stat is incremented on completion. */
- 		return 0;
- 	}
- 	default:
- 		ret = -KVM_ENOSYS;
- 		break;
- 	}
-+
- out:
-+	++vcpu->stat.hypercalls;
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
-+
-+int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
++static int vt_handle_exit(struct kvm_vcpu *vcpu,
++			  enum exit_fastpath_completion fastpath)
 +{
-+	unsigned long nr, a0, a1, a2, a3, ret;
-+	int op_64_bit;
-+	int cpl;
++	if (is_td_vcpu(vcpu))
++		return tdx_handle_exit(vcpu, fastpath);
 +
-+	if (kvm_xen_hypercall_enabled(vcpu->kvm))
-+		return kvm_xen_hypercall(vcpu);
++	return vmx_handle_exit(vcpu, fastpath);
++}
 +
-+	if (kvm_hv_hypercall_enabled(vcpu))
-+		return kvm_hv_hypercall(vcpu);
++static void vt_handle_exit_irqoff(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu)) {
++		tdx_handle_exit_irqoff(vcpu);
++		return;
++	}
 +
-+	nr = kvm_rax_read(vcpu);
-+	a0 = kvm_rbx_read(vcpu);
-+	a1 = kvm_rcx_read(vcpu);
-+	a2 = kvm_rdx_read(vcpu);
-+	a3 = kvm_rsi_read(vcpu);
-+	op_64_bit = is_64_bit_hypercall(vcpu);
-+	cpl = static_call(kvm_x86_get_cpl)(vcpu);
++	vmx_handle_exit_irqoff(vcpu);
++}
 +
-+	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
-+	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
-+		/* MAP_GPA tosses the request to the user space. */
-+		return 0;
-+
- 	if (!op_64_bit)
- 		ret = (u32)ret;
- 	kvm_rax_write(vcpu, ret);
- 
--	++vcpu->stat.hypercalls;
- 	return kvm_skip_emulated_instruction(vcpu);
+ static void vt_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
+ {
+ 	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
+@@ -436,6 +455,18 @@ static void vt_request_immediate_exit(struct kvm_vcpu *vcpu)
+ 	vmx_request_immediate_exit(vcpu);
  }
- EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
+ 
++static void vt_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
++			u64 *info1, u64 *info2, u32 *intr_info, u32 *error_code)
++{
++	if (is_td_vcpu(vcpu)) {
++		tdx_get_exit_info(vcpu, reason, info1, info2, intr_info,
++				  error_code);
++		return;
++	}
++
++	vmx_get_exit_info(vcpu, reason, info1, info2, intr_info, error_code);
++}
++
+ static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ {
+ 	if (is_td_vcpu(vcpu))
+@@ -562,7 +593,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 
+ 	.vcpu_pre_run = vt_vcpu_pre_run,
+ 	.vcpu_run = vt_vcpu_run,
+-	.handle_exit = vmx_handle_exit,
++	.handle_exit = vt_handle_exit,
+ 	.skip_emulated_instruction = vmx_skip_emulated_instruction,
+ 	.update_emulated_instruction = vmx_update_emulated_instruction,
+ 	.set_interrupt_shadow = vt_set_interrupt_shadow,
+@@ -597,7 +628,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.set_identity_map_addr = vmx_set_identity_map_addr,
+ 	.get_mt_mask = vt_get_mt_mask,
+ 
+-	.get_exit_info = vmx_get_exit_info,
++	.get_exit_info = vt_get_exit_info,
+ 
+ 	.vcpu_after_set_cpuid = vmx_vcpu_after_set_cpuid,
+ 
+@@ -611,7 +642,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.load_mmu_pgd = vt_load_mmu_pgd,
+ 
+ 	.check_intercept = vmx_check_intercept,
+-	.handle_exit_irqoff = vmx_handle_exit_irqoff,
++	.handle_exit_irqoff = vt_handle_exit_irqoff,
+ 
+ 	.request_immediate_exit = vt_request_immediate_exit,
+ 
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index be21dca47992..71ab48cf72ba 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -120,6 +120,26 @@ static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
+ 	return pa | ((hpa_t)hkid << boot_cpu_data.x86_phys_bits);
+ }
+ 
++static __always_inline unsigned long tdexit_exit_qual(struct kvm_vcpu *vcpu)
++{
++	return kvm_rcx_read(vcpu);
++}
++
++static __always_inline unsigned long tdexit_ext_exit_qual(struct kvm_vcpu *vcpu)
++{
++	return kvm_rdx_read(vcpu);
++}
++
++static __always_inline unsigned long tdexit_gpa(struct kvm_vcpu *vcpu)
++{
++	return kvm_r8_read(vcpu);
++}
++
++static __always_inline unsigned long tdexit_intr_info(struct kvm_vcpu *vcpu)
++{
++	return kvm_r9_read(vcpu);
++}
++
+ static inline bool is_td_vcpu_created(struct vcpu_tdx *tdx)
+ {
+ 	return tdx->td_vcpu_created;
+@@ -837,6 +857,12 @@ static noinstr void tdx_vcpu_enter_exit(struct vcpu_tdx *tdx)
+ 	WARN_ON_ONCE(!kvm_rebooting &&
+ 		     (tdx->exit_reason.full & TDX_SW_ERROR) == TDX_SW_ERROR);
+ 
++	if ((u16)tdx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
++	    is_nmi(tdexit_intr_info(vcpu))) {
++		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
++		vmx_do_nmi_irqoff();
++		kvm_after_interrupt(vcpu);
++	}
+ 	guest_state_exit_irqoff();
+ }
+ 
+@@ -880,6 +906,25 @@ void tdx_inject_nmi(struct kvm_vcpu *vcpu)
+ 	td_management_write8(to_tdx(vcpu), TD_VCPU_PEND_NMI, 1);
+ }
+ 
++void tdx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_tdx *tdx = to_tdx(vcpu);
++	u16 exit_reason = tdx->exit_reason.basic;
++
++	if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
++		vmx_handle_external_interrupt_irqoff(vcpu,
++						     tdexit_intr_info(vcpu));
++	else if (exit_reason == EXIT_REASON_EXCEPTION_NMI)
++		vmx_handle_exception_irqoff(vcpu, tdexit_intr_info(vcpu));
++}
++
++static int tdx_handle_triple_fault(struct kvm_vcpu *vcpu)
++{
++	vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
++	vcpu->mmio_needed = 0;
++	return 0;
++}
++
+ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+ {
+ 	WARN_ON_ONCE(root_hpa & ~PAGE_MASK);
+@@ -1240,6 +1285,71 @@ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ 	__vmx_deliver_posted_interrupt(vcpu, &tdx->pi_desc, vector);
+ }
+ 
++int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
++{
++	union tdx_exit_reason exit_reason = to_tdx(vcpu)->exit_reason;
++
++	/* See the comment of tdh_sept_seamcall(). */
++	if (unlikely(exit_reason.full == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT)))
++		return 1;
++
++	/*
++	 * TDH.VP.ENTRY checks TD EPOCH which contend with TDH.MEM.TRACK and
++	 * vcpu TDH.VP.ENTER.
++	 */
++	if (unlikely(exit_reason.full == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_TD_EPOCH)))
++		return 1;
++
++	if (unlikely(exit_reason.full == TDX_SEAMCALL_UD)) {
++		kvm_spurious_fault();
++		/*
++		 * In the case of reboot or kexec, loop with TDH.VP.ENTER and
++		 * TDX_SEAMCALL_UD to avoid unnecessarily activity.
++		 */
++		return 1;
++	}
++
++	if (unlikely(exit_reason.non_recoverable || exit_reason.error)) {
++		if (unlikely(exit_reason.basic == EXIT_REASON_TRIPLE_FAULT))
++			return tdx_handle_triple_fault(vcpu);
++
++		kvm_pr_unimpl("TD exit 0x%llx, %d hkid 0x%x hkid pa 0x%llx\n",
++			      exit_reason.full, exit_reason.basic,
++			      to_kvm_tdx(vcpu->kvm)->hkid,
++			      set_hkid_to_hpa(0, to_kvm_tdx(vcpu->kvm)->hkid));
++		goto unhandled_exit;
++	}
++
++	WARN_ON_ONCE(fastpath != EXIT_FASTPATH_NONE);
++
++	switch (exit_reason.basic) {
++	default:
++		break;
++	}
++
++unhandled_exit:
++	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
++	vcpu->run->internal.ndata = 2;
++	vcpu->run->internal.data[0] = exit_reason.full;
++	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++	return 0;
++}
++
++void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
++		u64 *info1, u64 *info2, u32 *intr_info, u32 *error_code)
++{
++	struct vcpu_tdx *tdx = to_tdx(vcpu);
++
++	*reason = tdx->exit_reason.full;
++
++	*info1 = tdexit_exit_qual(vcpu);
++	*info2 = tdexit_ext_exit_qual(vcpu);
++
++	*intr_info = tdexit_intr_info(vcpu);
++	*error_code = 0;
++}
++
+ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+ {
+ 	struct kvm_tdx_capabilities __user *user_caps;
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 539f3f9686fe..a12e3bfc96dd 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -155,11 +155,16 @@ void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_put(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+ bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu);
++void tdx_handle_exit_irqoff(struct kvm_vcpu *vcpu);
++int tdx_handle_exit(struct kvm_vcpu *vcpu,
++		enum exit_fastpath_completion fastpath);
+ u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
+ 
+ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ 			   int trig_mode, int vector);
+ void tdx_inject_nmi(struct kvm_vcpu *vcpu);
++void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
++		u64 *info1, u64 *info2, u32 *intr_info, u32 *error_code);
+ 
+ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+ 
+@@ -199,11 +204,16 @@ static inline void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_vcpu_put(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
+ static inline bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu) { return false; }
++static inline void tdx_handle_exit_irqoff(struct kvm_vcpu *vcpu) {}
++static inline int tdx_handle_exit(struct kvm_vcpu *vcpu,
++		enum exit_fastpath_completion fastpath) { return 0; }
+ static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
+ 
+ static inline void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ 					 int trig_mode, int vector) {}
+ static inline void tdx_inject_nmi(struct kvm_vcpu *vcpu) {}
++static inline void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason, u64 *info1,
++				     u64 *info2, u32 *intr_info, u32 *error_code) {}
+ 
+ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+ 
 -- 
 2.25.1
 
