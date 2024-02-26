@@ -1,168 +1,154 @@
-Return-Path: <kvm+bounces-9944-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9945-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 227BC867B68
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 17:15:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE583867C32
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 17:40:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B0CF1F2D607
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:15:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 568ECB27981
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5D212C80F;
-	Mon, 26 Feb 2024 16:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CFC12C803;
+	Mon, 26 Feb 2024 16:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EXQiRXnM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iUdIC7l5"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72EF12C819
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 16:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C783412BEA1;
+	Mon, 26 Feb 2024 16:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708964089; cv=none; b=bq5FmA2yFXVHha8Z6GfMOa2jCwx/A2PNlkQ3poAMoTa58c1hMwFEpLvsr2/ZPcnqCbbJW6e9P4Ieet97BQPCHbYeID9NnpR4A+ZTb67uH+0XjhV3QcE+p5iWZP/1IOMwwpteQwqx/SENvAAxOG+JEdAo1tR+4xGwYkCSP2/g8/k=
+	t=1708964490; cv=none; b=NGEOSQ/p9XqwuGgHu6u7VxbV977OZp45i2hDp0rgZCa0T/5CcZvARz20RgXqqhg4oPYuHlTYeR5iYeSptFV4PoWoKgXK7rgMy6H/BLhyWjGm/ndaegze8EcptnZQcBt7tZ+l8jtGtyjcz2IXU7q7CgiwX5WYv5tZgWYuJSXChTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708964089; c=relaxed/simple;
-	bh=zj0XwpMIin7pGrxcYK98c2JcaJFWjsXaHOvdPbxbwpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=frAFYG0PAZqmepp3tAFgTlBUmLjf6Dfwdyobxhb4j0DDF5LORHwA8g9bq7zzRs7utpUrgnxCHl7vNKknUhfHRBuuDMXt2v5ToII60WsLv5aOkr7oJJx8LWiBH32nzu6Yxf0cDi3ZucxSTz9mEwGVq1mUapYlUnEdJnVEu7mFlP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EXQiRXnM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708964086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zh3mDtCIv3auLG9zPOiKdCdk64UMolNzMr0oDDvC2P8=;
-	b=EXQiRXnM1D8XHZSCt+qJ/LijwK9uMlep2ni30Id6eaWCc7NSGFSW06FKOlUmi7xCw7Dnjg
-	g8JPJS4YfYlhxBh/apqr87xYlhQbQlOUnazR+/WZ+8cDti/+swOi7yqNOByuRrJgzrRb+V
-	peUvBhw94n9A8maIW3q5v2JyxZ5KXsA=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-139-Zr07GbzTPq6nTTuyfNAtcA-1; Mon, 26 Feb 2024 11:14:44 -0500
-X-MC-Unique: Zr07GbzTPq6nTTuyfNAtcA-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c78573f2e9so352418539f.2
-        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 08:14:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708964083; x=1709568883;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zh3mDtCIv3auLG9zPOiKdCdk64UMolNzMr0oDDvC2P8=;
-        b=aK6Pkrcpt6jhv9Pgp34abysWt5xDaoE9kLhKnjv9Qf3zbLxUyW8CqZQfDp1hb+lcNC
-         Ycf28IkRKg4GG4nYVlvnBvkdr30iN/Jrz6uA8SttKF3xIoQ8TPlBrRBSSPXMA0YRJlfI
-         g4Fo/aluMIZHtUKmNYZ0iMv3vSNse0zGXPuBjLuP+Bi1hxP5T4miy8OOBN+sz4TM1oqB
-         SaU2pQ60Yg1Rcii/4mCYFpV6m6BQTUVuBmGSf4ShX5IY9OIPN01JtUOfLIIQY98hTkqF
-         RDay1X1f6T3XNT/WbazPB0P0fKxcThDf8S7ZVpnkWRtch+cOKuY72hJKPoMXGJgxkVB5
-         ESUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUExOMrDsngI5IBnPI7ocaRsGme22oILjs8b7na2CkbyF6f5KRyGVcs2aDvx4B+iSReHRMssYJZ4QfDyCB/JT9Jr/bA
-X-Gm-Message-State: AOJu0YzYGw8xHtfH41Vo5lj1Aj5CjvfP0C4GAj1GletI3HZ9cz0Z/eEN
-	UHGGjAwVMH1DMj/zfhMwC+1hJiwYhY5p2BIIuhPsOliS2CPoWZeAgtV3dzZXmjBcu6eZ91v5ZD5
-	QSs0fg3kzTD3uFDCUuqA+uozZiyz+X2r6qSapXYFFcRkod5B9oA==
-X-Received: by 2002:a5d:83c3:0:b0:7c7:ba20:5590 with SMTP id u3-20020a5d83c3000000b007c7ba205590mr5460960ior.14.1708964082707;
-        Mon, 26 Feb 2024 08:14:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEGEOWu1T2z+J1Gp1UZDUyQh8NW65H7pvXhZJgZkO41DXiNpZ6UF/UvqLLU6+ypJXEHMrDXlQ==
-X-Received: by 2002:a5d:83c3:0:b0:7c7:ba20:5590 with SMTP id u3-20020a5d83c3000000b007c7ba205590mr5460947ior.14.1708964082433;
-        Mon, 26 Feb 2024 08:14:42 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id fj33-20020a056638636100b004747eb13d6fsm915292jab.41.2024.02.26.08.14.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 08:14:41 -0800 (PST)
-Date: Mon, 26 Feb 2024 09:14:38 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yisheng Xie <ethan.xys@linux.alibaba.com>
-Cc: akpm@linux-foundation.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH] vfio/type1: unpin PageReserved page
-Message-ID: <20240226091438.1fc37957.alex.williamson@redhat.com>
-In-Reply-To: <20240226160106.24222-1-ethan.xys@linux.alibaba.com>
-References: <20240226160106.24222-1-ethan.xys@linux.alibaba.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708964490; c=relaxed/simple;
+	bh=/EHIikTMWeOS0ZuaWwLi00khF35uJieHD8tZwTSpUD0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S6o2nCwjOonuM61LWkwFwCWyG073hjvMI2BkUUeSwg85yuelnCHbtwG+KlvBXccK85cQNjr8t4ayjnA5c1NQGI6pLqS4yreSxTLmtwpdWX6MfR9YnONdBFoLaBwNicWZ0Sjt8Gn3w0bqMwKeH3jldHICI+nJrMVc+T0FYuOd9VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iUdIC7l5; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708964486; x=1740500486;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=/EHIikTMWeOS0ZuaWwLi00khF35uJieHD8tZwTSpUD0=;
+  b=iUdIC7l5fudfQwkhG6GfZc/SyxkzEswt+DhYO92D34wBaR4ODY7kYl4d
+   OwGw2nWRZ+pHy3Gz+3qOXtwImVWozDT/mHGbHuiyf2bXHVqm+l0PheApx
+   3HJ+PrfxJ2uVgiuYy1Ekke7+ThSARHj08H9O9h1Y9193XEmCwW0M8qf21
+   Z3RF8wE3VzDJYoAFuwTOsD70rO1led6m9Q5DtkD6TGKLnU13AqEF0o1uJ
+   ijMoe/DpMjK8hV9Kp2y0cvq4+5nQ30WnS3igpoxMU1x/dXbrXIbXwdEb/
+   LJgXFj9I+aZcDNSQYhfRDUAppJbhghYXQ5JS8c6KdkRzAcGaOjhIwTfmk
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="3373739"
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="3373739"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 08:21:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="6652281"
+Received: from dukhanki-mobl.amr.corp.intel.com (HELO [10.209.30.102]) ([10.209.30.102])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 08:21:24 -0800
+Message-ID: <3807c397-2eef-4f1d-ae85-4259f061f08e@intel.com>
+Date: Mon, 26 Feb 2024 08:21:23 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/2] x86/cpu: fix invalid MTRR mask values for SEV or
+ TME
+Content-Language: en-US
+To: Yin Fengwei <fengwei.yin@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Zixi Chen <zixchen@redhat.com>, Adam Dunlap <acdunlap@google.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Kai Huang <kai.huang@intel.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
+ x86@kernel.org, stable@vger.kernel.org
+References: <20240131230902.1867092-1-pbonzini@redhat.com>
+ <2b5e6d68-007e-48bd-be61-9a354be2ccbf@intel.com>
+ <CABgObfa_7ZAq1Kb9G=ehkzHfc5if3wnFi-kj3MZLE3oYLrArdQ@mail.gmail.com>
+ <CABgObfbetwO=4whrCE+cFfCPJa0nsK=h6sQAaoamJH=UqaJqTg@mail.gmail.com>
+ <CABgObfbUcG5NyKhLOnihWKNVM0OZ7zb9R=ADzq7mjbyOCg3tUw@mail.gmail.com>
+ <eefbce80-18c5-42e7-8cde-3a352d5811de@intel.com>
+ <CABgObfY=3msvJ2M-gHMqawcoaW5CDVDVxCO0jWi+6wrcrsEtAw@mail.gmail.com>
+ <9c4ee2ca-007d-42f3-b23d-c8e67a103ad8@intel.com>
+ <CABgObfYttER8yZBTReO+Cd5VqQCpEY9UdHH5E8BKuA1+2CsimA@mail.gmail.com>
+ <7e118d89-3b7a-4e13-b3de-2acfbf712ad5@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <7e118d89-3b7a-4e13-b3de-2acfbf712ad5@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, 27 Feb 2024 00:01:06 +0800
-Yisheng Xie <ethan.xys@linux.alibaba.com> wrote:
+On 2/25/24 17:57, Yin Fengwei wrote:
+> On 2/23/24 02:08, Paolo Bonzini wrote:
+>> On Thu, Feb 22, 2024 at 7:07 PM Dave Hansen <dave.hansen@intel.com> wrote:
+>>>> Ping, in the end are we applying these patches for either 6.8 or 6.9?
+>>> Let me poke at them and see if we can stick them in x86/urgent early
+>>> next week.  They do fix an actual bug that's biting people, right?
+>> Yes, I have gotten reports of {Sapphire,Emerald} Rapids machines that
+>> don't boot at all without either these patches or
+>> "disable_mtrr_cleanup".
+> We tried platform other than Sapphire and Emerald. This patchset can fix
+> boot issues on that platform also.
 
-> We meet a warning as following:
->  WARNING: CPU: 99 PID: 1766859 at mm/gup.c:209 try_grab_page.part.0+0xe8/0x1b0
->  CPU: 99 PID: 1766859 Comm: qemu-kvm Kdump: loaded Tainted: GOE  5.10.134-008.2.x86_64 #1
-                                                                   ^^^^^^^^
+Fengwei, could you also test this series on the troublesome hardware,
+please?
 
-Does this issue reproduce on mainline?  Thanks,
+> https://lore.kernel.org/all/20240222183926.517AFCD2@davehans-spike.ostc.intel.com/
 
-Alex
-
->  Hardware name: Foxconn AliServer-Thor-04-12U-v2/Thunder2, BIOS 1.0.PL.FC.P.031.00 05/18/2022
->  RIP: 0010:try_grab_page.part.0+0xe8/0x1b0
->  Code: b9 00 04 00 00 83 e6 01 74 ca 48 8b 32 b9 00 04 00 00 f7 c6 00 00 01 00 74 ba eb 91 8b 57 34 48 89 f8 85 d2 0f 8f 48 ff ff ff <0f> 0b 31 c0 c3 48 89 fa 48 8b 0a f7 c1 00 00 01 00 0f 85 5c ff ff
->  RSP: 0018:ffffc900b1a63b98 EFLAGS: 00010282
->  RAX: ffffea00000e4580 RBX: 0000000000052202 RCX: ffffea00000e4580
->  RDX: 0000000080000001 RSI: 0000000000052202 RDI: ffffea00000e4580
->  RBP: ffff88efa5d3d860 R08: 0000000000000000 R09: 0000000000000002
->  R10: 0000000000000008 R11: ffff89403fff7000 R12: ffff88f589165818
->  R13: 00007f1320600000 R14: ffffea0181296ca8 R15: ffffea00000e4580
->  FS:  00007f1324f93e00(0000) GS:ffff893ebfb80000(0000) knlGS:0000000000000000
->  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->  CR2: 00007f1321694070 CR3: 0000006046014004 CR4: 00000000007726e0
->  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->  PKRU: 55555554
->  Call Trace:
->   follow_page_pte+0x64b/0x800
->   __get_user_pages+0x228/0x560
->   __gup_longterm_locked+0xa0/0x2f0
->   vaddr_get_pfns+0x67/0x100 [vfio_iommu_type1]
->   vfio_pin_pages_remote+0x30b/0x460 [vfio_iommu_type1]
->   vfio_pin_map_dma+0xd4/0x2e0 [vfio_iommu_type1]
->   vfio_dma_do_map+0x21e/0x340 [vfio_iommu_type1]
->   vfio_iommu_type1_ioctl+0xdd/0x170 [vfio_iommu_type1]
->   ? __fget_files+0x79/0xb0
->   ksys_ioctl+0x7b/0xb0
->   ? ksys_write+0xc4/0xe0
->   __x64_sys_ioctl+0x16/0x20
->   do_syscall_64+0x2d/0x40
->   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> 
-> After add dumppage, it shows that it is a PageReserved page(e.g. zero page),
-> whoes refcount is just overflow:
->  page:00000000b0504535 refcount:-2147483647 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x3916
->  flags: 0xffffc000001002(referenced|reserved)
->  raw: 00ffffc000001002 ffffea00000e4588 ffffea00000e4588 0000000000000000
->  raw: 0000000000000000 0000000000000000 80000001ffffffff 0000000000000000
-> 
-> gup will _pin_ a page which is PageReserved, however, put_pfn in vfio will
-> skip unpin page which is PageReserved. So use pfn_valid in put_pfn
-> instead of !is_invalid_reserved_pfn to unpin PageReserved page.
-> 
-> Signed-off-by: Yisheng Xie <ethan.xys@linux.alibaba.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index b2854d7939ce..12775bab27ee 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -461,7 +461,7 @@ static bool is_invalid_reserved_pfn(unsigned long pfn)
->  
->  static int put_pfn(unsigned long pfn, int prot)
->  {
-> -	if (!is_invalid_reserved_pfn(pfn)) {
-> +	if (pfn_valid(pfn)) {
->  		struct page *page = pfn_to_page(pfn);
->  
->  		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
-
+If it _also_ fixes the problem, it'll be a strong indication that it's
+the right long-term approach.
 
