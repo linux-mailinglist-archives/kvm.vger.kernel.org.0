@@ -1,160 +1,127 @@
-Return-Path: <kvm+bounces-9942-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9943-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB2BD867AA7
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:47:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A16F4867C1C
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 17:33:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 186C31C21676
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:47:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D956B2ADCF
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0556212BEBF;
-	Mon, 26 Feb 2024 15:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1497812C81B;
+	Mon, 26 Feb 2024 16:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vQ5v3SWJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DB012B159
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 15:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555C612C55D;
+	Mon, 26 Feb 2024 16:01:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708962461; cv=none; b=FdWUKPfu61Bf36lJlX2sVBPMtyX+wnIEEUUaiEMmm/m65KBMJXIfX9E3ztLamFijs/1DZGe+Od2TIX6c+08URyyaid8Dz56zeMlWcsQADWxldWQJL+A+z3D+zJBsIcvU5hy8AvtDz3S0M32kL33poUy88Zm2azRu0nYOdOtMhI4=
+	t=1708963284; cv=none; b=h1p4GFz8PrnnR9KwleQ2DuV50aSqZpPpHTDqyEqI+CUPSm0hnD8IGFD22Xwq1OKu2mhkpxbirKqqE03Vhf6eraM0kYbnnKKIPl6S2TJCfBoQ8IlpMsjTYJFXyA6eje6ZZ6YLuGwxBKR6aww+yPpOkC0Y9SWcf+H0GTpsC3cmKkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708962461; c=relaxed/simple;
-	bh=+XAnqyHPO44Sk+87TS4soUnmmFPeOnxtZV1T7yT68Mw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ry8rxBfHQ0TOrwZx8cW5/O3mktlyDfrmB1WaXMXC+4MCY5DolsXd4vJ6Kv33zASsSPCk7qB85NF+Uobk+iArn7hTSxgwRXHp+meNT5DoTap0oSekwJlsMfJWW9coY8dzNDvygrpuoTI1eFwSXo8NGqvuLd0bq9CNc+ynwGcVp94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Tk4dK68jwz6JBV6;
-	Mon, 26 Feb 2024 23:43:01 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id DF0BE140DAF;
-	Mon, 26 Feb 2024 23:47:35 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 26 Feb
- 2024 15:47:35 +0000
-Date: Mon, 26 Feb 2024 15:47:34 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Zhao Liu <zhao1.liu@linux.intel.com>
-CC: "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>, "Eduardo
- Habkost" <eduardo@habkost.net>, Marcel Apfelbaum
-	<marcel.apfelbaum@gmail.com>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?=
-	<philmd@linaro.org>, Yanan Wang <wangyanan55@huawei.com>, "Michael S .
- Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Richard
- Henderson" <richard.henderson@linaro.org>, Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
-	Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell
-	<peter.maydell@linaro.org>, "Sia Jee Heng" <jeeheng.sia@starfivetech.com>,
-	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-riscv@nongnu.org>,
-	<qemu-arm@nongnu.org>, "Zhenyu Wang" <zhenyu.z.wang@intel.com>, Dapeng Mi
-	<dapeng1.mi@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu
-	<zhao1.liu@intel.com>
-Subject: Re: [RFC 8/8] qemu-options: Add the cache topology description of
- -smp
-Message-ID: <20240226154734.00000d6e@Huawei.com>
-In-Reply-To: <20240220092504.726064-9-zhao1.liu@linux.intel.com>
-References: <20240220092504.726064-1-zhao1.liu@linux.intel.com>
-	<20240220092504.726064-9-zhao1.liu@linux.intel.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1708963284; c=relaxed/simple;
+	bh=dMr2bgmwiVOt4TcUYH1qJC2vLb4zsG+TYAOHrr5w6YA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Hb6CDIDlmGzmFCZGzMSzFf3xPvtccx40u4wxQ1kTd2sKlJBr2ALObaSIrP8Bw6ZFqp9ix8VxrtA48+VRSP1zQcAMdZDYuURrhrqUdVqmbd1E8NZZQoWl9UCJDXZx91UjOh5Mxdznz9HSoI+E2e35+gAkCBDklCVnINNATXlGAAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vQ5v3SWJ; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708963277; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=uO744AgFJT3omawn12Dq7uRsOiSEoPU3Y3gdcHNc6O4=;
+	b=vQ5v3SWJWiveFSM6sRgM1wiJ7b+QcsZOklVJwqrHFyw7Sueu4h7VQ1KksBE28OS6aPT98tgX5ARgSQ0W1KpLhlQ68q5EO5RXAxrBj1lkLrWpahzDscjYo5xJjMwmHvxdXJ/CDuSjL8zJoVyaKeyj8ZGzjHhKipxmrxFzP4MS2ZU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ethan.xys@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0W1K5SSG_1708963266;
+Received: from localhost(mailfrom:ethan.xys@linux.alibaba.com fp:SMTPD_---0W1K5SSG_1708963266)
+          by smtp.aliyun-inc.com;
+          Tue, 27 Feb 2024 00:01:17 +0800
+From: Yisheng Xie <ethan.xys@linux.alibaba.com>
+To: alex.williamson@redhat.com
+Cc: akpm@linux-foundation.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	ethan.xys@linux.alibaba.com
+Subject: [PATCH] vfio/type1: unpin PageReserved page
+Date: Tue, 27 Feb 2024 00:01:06 +0800
+Message-Id: <20240226160106.24222-1-ethan.xys@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Transfer-Encoding: 8bit
 
-On Tue, 20 Feb 2024 17:25:04 +0800
-Zhao Liu <zhao1.liu@linux.intel.com> wrote:
+We meet a warning as following:
+ WARNING: CPU: 99 PID: 1766859 at mm/gup.c:209 try_grab_page.part.0+0xe8/0x1b0
+ CPU: 99 PID: 1766859 Comm: qemu-kvm Kdump: loaded Tainted: GOE  5.10.134-008.2.x86_64 #1
+ Hardware name: Foxconn AliServer-Thor-04-12U-v2/Thunder2, BIOS 1.0.PL.FC.P.031.00 05/18/2022
+ RIP: 0010:try_grab_page.part.0+0xe8/0x1b0
+ Code: b9 00 04 00 00 83 e6 01 74 ca 48 8b 32 b9 00 04 00 00 f7 c6 00 00 01 00 74 ba eb 91 8b 57 34 48 89 f8 85 d2 0f 8f 48 ff ff ff <0f> 0b 31 c0 c3 48 89 fa 48 8b 0a f7 c1 00 00 01 00 0f 85 5c ff ff
+ RSP: 0018:ffffc900b1a63b98 EFLAGS: 00010282
+ RAX: ffffea00000e4580 RBX: 0000000000052202 RCX: ffffea00000e4580
+ RDX: 0000000080000001 RSI: 0000000000052202 RDI: ffffea00000e4580
+ RBP: ffff88efa5d3d860 R08: 0000000000000000 R09: 0000000000000002
+ R10: 0000000000000008 R11: ffff89403fff7000 R12: ffff88f589165818
+ R13: 00007f1320600000 R14: ffffea0181296ca8 R15: ffffea00000e4580
+ FS:  00007f1324f93e00(0000) GS:ffff893ebfb80000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 00007f1321694070 CR3: 0000006046014004 CR4: 00000000007726e0
+ DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ PKRU: 55555554
+ Call Trace:
+  follow_page_pte+0x64b/0x800
+  __get_user_pages+0x228/0x560
+  __gup_longterm_locked+0xa0/0x2f0
+  vaddr_get_pfns+0x67/0x100 [vfio_iommu_type1]
+  vfio_pin_pages_remote+0x30b/0x460 [vfio_iommu_type1]
+  vfio_pin_map_dma+0xd4/0x2e0 [vfio_iommu_type1]
+  vfio_dma_do_map+0x21e/0x340 [vfio_iommu_type1]
+  vfio_iommu_type1_ioctl+0xdd/0x170 [vfio_iommu_type1]
+  ? __fget_files+0x79/0xb0
+  ksys_ioctl+0x7b/0xb0
+  ? ksys_write+0xc4/0xe0
+  __x64_sys_ioctl+0x16/0x20
+  do_syscall_64+0x2d/0x40
+  entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
-> From: Zhao Liu <zhao1.liu@intel.com>
-> 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+After add dumppage, it shows that it is a PageReserved page(e.g. zero page),
+whoes refcount is just overflow:
+ page:00000000b0504535 refcount:-2147483647 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x3916
+ flags: 0xffffc000001002(referenced|reserved)
+ raw: 00ffffc000001002 ffffea00000e4588 ffffea00000e4588 0000000000000000
+ raw: 0000000000000000 0000000000000000 80000001ffffffff 0000000000000000
 
-Hi,
+gup will _pin_ a page which is PageReserved, however, put_pfn in vfio will
+skip unpin page which is PageReserved. So use pfn_valid in put_pfn
+instead of !is_invalid_reserved_pfn to unpin PageReserved page.
 
-A trivial comment, but also a possibly more significant one about
-whether the defaults are correctly verified.
+Signed-off-by: Yisheng Xie <ethan.xys@linux.alibaba.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Jonathan
-> ---
->  qemu-options.hx | 54 ++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 47 insertions(+), 7 deletions(-)
-> 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 70eaf3256685..85c78c99a3b0 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -281,7 +281,9 @@ ERST
->  
->  DEF("smp", HAS_ARG, QEMU_OPTION_smp,
->      "-smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books][,sockets=sockets]\n"
-> -    "               [,dies=dies][,clusters=clusters][,cores=cores][,threads=threads]\n"
-> +    "               [,dies=dies][,clusters=clusters][,modules=modules][,cores=cores]\n"
-> +    "               [,threads=threads][,l1d-cache=level][,l1i-cache=level][,l2-cache=level]\n"
-burns more characters but I'd go with
-l1d->cache=topo_level
-
-As level for a cache has a totally different meaning!
-
-> +    "               [,l3-cache=level]\n"
->      "                set the number of initial CPUs to 'n' [default=1]\n"
->      "                maxcpus= maximum number of total CPUs, including\n"
->      "                offline CPUs for hotplug, etc\n"
-> @@ -290,9 +292,14 @@ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
->      "                sockets= number of sockets in one book\n"
->      "                dies= number of dies in one socket\n"
->      "                clusters= number of clusters in one die\n"
-> -    "                cores= number of cores in one cluster\n"
-> +    "                modules= number of modules in one cluster\n"
-> +    "                cores= number of cores in one module\n"
->      "                threads= number of threads in one core\n"
-> -    "Note: Different machines may have different subsets of the CPU topology\n"
-> +    "                l1d-cache= topology level of L1 D-cache\n"
-> +    "                l1i-cache= topology level of L1 I-cache\n"
-> +    "                l2-cache= topology level of L2 cache\n"
-> +    "                l3-cache= topology level of L3 cache\n"
-> +    "Note: Different machines may have different subsets of the CPU and cache topology\n"
-
->  
->          -smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32
->  
-> +    The following sub-option defines a CPU topology hierarchy (2 sockets
-> +    totally on the machine, 2 dies per socket, 2 modules per die, 2 cores per
-> +    module, 2 threads per core) with 3-level cache topology hierarchy (L1
-> +    D-cache per core, L1 I-cache per core, L2 cache per core and L3 cache per
-> +    die) for PC machines which support sockets/dies/modules/cores/threads.
-> +    Some members of the CPU topology option can be omitted but their values
-> +    will be automatically computed. Some members of the cache topology
-> +    option can also be omitted and target CPU will use the default topology.:
-
-Given the default could be inconsistent I wonder if we should 'push' levels
-up.  So if L2 not defined it is set either to default of equal to max of
-l1i and l1d level. L3 either default or same level as l2.
-
-Won't always correspond to a sensible system so maybe just rejecting
-cases where default isn't possible is the best plan.  However I don't
-see that verification as the checks on higher levels are gated on them
-being specified.
-
-> +
-> +    ::
-> +
-> +        -smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32,\
-> +             l1d-cache=core,l1i-cache=core,l2-cache=core,l3-cache=die
-> +
->      The following sub-option defines a CPU topology hierarchy (2 sockets
->      totally on the machine, 2 clusters per socket, 2 cores per cluster,
->      2 threads per core) for ARM virt machines which support sockets/clusters
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index b2854d7939ce..12775bab27ee 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -461,7 +461,7 @@ static bool is_invalid_reserved_pfn(unsigned long pfn)
+ 
+ static int put_pfn(unsigned long pfn, int prot)
+ {
+-	if (!is_invalid_reserved_pfn(pfn)) {
++	if (pfn_valid(pfn)) {
+ 		struct page *page = pfn_to_page(pfn);
+ 
+ 		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
+-- 
+2.39.1
 
 
