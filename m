@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-9917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B4AD867932
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:57:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D561867934
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:57:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E8E7292F98
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:57:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 938821F25777
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2AE12EBDE;
-	Mon, 26 Feb 2024 14:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EE41474AE;
+	Mon, 26 Feb 2024 14:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gv8zeCts"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WSaROuhD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA351474AE;
-	Mon, 26 Feb 2024 14:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D656712AAFF;
+	Mon, 26 Feb 2024 14:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958275; cv=none; b=H59LIbYReXOOxZa6CFfa06vs1eTCeykqPBnGjd3MqVJIxxtnzkY96gUuDAukmAQE44EKlIPTnM/np5zthZrD3CFObrSjrMPWEuZ8uqfEizI5yiggziB64iTuDcwbU4Qltn8KVfxy5jVTDKqQVHIHZhOVZqWeKXITqn3eYokwKVw=
+	t=1708958285; cv=none; b=gpbry4X6FuzNjq2DM2VVBMaP4JRzVEGTNVo5fUOzuhGMC8cgk3x8fKroffXy/0r201Ov7yR4k5Xvhy4EK5DXO6+IiKpaADDpsNCV5kD66FoY7jEopjoNW7u0r+3ZW+EUOXlGMNdu9XemXfj8DWtWfy2G6cFX+pKf508ZytPo/3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958275; c=relaxed/simple;
-	bh=iF+u/pfN6Z+LC5rl3PmX0bCf9rpWWKCNx9V96EJqjYQ=;
+	s=arc-20240116; t=1708958285; c=relaxed/simple;
+	bh=kcNZ0lhM9kk5ZqiWC7oiKK6STog5OGE3f4B2GekF4Ys=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RQ39hGtv5Zmz+kpM3jUuwRGUFmRnbyPNBMr/kc2DVcobHFIwnamzWfaArshQkWzMqsmOB788WVa2Z6KrBHNJuhOCXuN//gdgYtZbJmXHMaKSwWXP96aSsOzeT7YdWd308B58ef8i19kfQpfppBSjqokgYq9oXmc3Fq4PU100VJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gv8zeCts; arc=none smtp.client-ip=209.85.161.50
+	 MIME-Version; b=laVEKoVkM/M6HaFJd3rLs2Ch566I9c7JWWkAmSSkq4G0mbzDS798ps9dHnKpsLSqyupgAjNF2jU+1kF4UwGBKQsj+25B/DrgFncraUjRrh49/+kV5NiogCM4smxtg8ZSj2Ol3rXmst5RoE7esou/nXcKyXo9FkMdWBlCTs71id8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WSaROuhD; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5a04fb5e689so1598809eaf.1;
-        Mon, 26 Feb 2024 06:37:54 -0800 (PST)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dc3b4b9b62so26756195ad.1;
+        Mon, 26 Feb 2024 06:38:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958273; x=1709563073; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958283; x=1709563083; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j3F50O3ylG3ZskDRT0xmw8UdB0U5PMTg1O+LfmHJzgw=;
-        b=gv8zeCtsq2M6LddJ3hVu/JOGKJ76Kd5zhChWtb4fjuvoBJhaCx1wk4RBLhnrA4oTQE
-         ub1DP4v3QfGcDpBRxkLjCalAsEqB+mKaKKHCfvCZVdgnSH4oPkdB46LwKM9gHFBgblqL
-         CO5xQ0BlyRyqyYR5jKnU8a9ZsahFPUMASPgt6Rx9KkK2jJTOTJ5TXkWyzVwCKoOP8172
-         ocxbVBPn6YqboT0femcO67wZw8m9szL8ppw9oq7Sf4NH8pMk2LAXKL4yE//nS95Dvxsp
-         j4MqOO62Rw+wNNRm6Ksr1a/ZF9xBpf3AZhUtrGeDO8f3eWCFNZs1TjUjj281ubX0RkY/
-         Yu2A==
+        bh=wF5I3QGcDe499zvzwDfAHdHqAxG40+9SQfq6UFOiBbY=;
+        b=WSaROuhD9PpSiFeIhsaXzJ4U2q7+OoEyKLiw/VpecKjuf+6Hy2fPROGGc6nahG1Dc2
+         xjNZrkCd4wTSOoO7Ak9c94KR3sAkpwu6/avT8e5M+i1r4Ij7nRymqn6xdLgaaml/rfq7
+         BCohSMGUT2mG1XeEsIcnpL+RHxzU1nAc/q9jxKNT/2RaDqiz7FfGAxomRP7rlXrMzqcs
+         sObS/4vX8gNzzwdD7q5cX3Otrsn4NxNKChWlt7dJ0IxudnSgndrHj3XRPndaygfllkXk
+         y1JMxUdHPJk7K06rB69zvHc0oWygJ2aGjEhscwXaCKmso6QL3Bhx7lWbKAZ3jPHUxNfn
+         VJ5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958273; x=1709563073;
+        d=1e100.net; s=20230601; t=1708958283; x=1709563083;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j3F50O3ylG3ZskDRT0xmw8UdB0U5PMTg1O+LfmHJzgw=;
-        b=KNn7mBOGnn5nFQ7smH1HBQqotAJy1b4kxLrwPzlA/WhEmpWqJM1hr88cFgEs97xaCY
-         YHxBxSMppMjuRdDwOcGk8uMumKdEeB4oJD0Zi7W21xiUifZ5o++u4Ztni35sFg3zw4lm
-         jJCc3YIuiN5f9WQSE0NCKximHNereuGvGPmHUmg/V4ZvA76tyeEBC/ApcSAyNMchV4Cw
-         c4i/fdIwZbTcFtCEANkSW58a5/lfg14itKJa+qgbogzlYvpysjKodGHtzD1R7uMQFzyC
-         Qu/71ymSqBQ18y/TViJXivnufOitfmxwPxdrjEJSRA+LUc06km+wCFJ+hntD61Gm7Vme
-         gKag==
-X-Forwarded-Encrypted: i=1; AJvYcCWAx0aVb+lDrGMiWVV0SkjGrDzHBxXpXtxMwrgBOrjmpPgCTTaPbemBe+xD4ha5RI+aBEPGMcP9+O6sMZRR8NtXyWG2
-X-Gm-Message-State: AOJu0YxdSR73sgIU2uKzi72ZoEbnyFpwLXEXujMkmoimUh2rBkGMbLFj
-	BZ5QX43iXMxHBj05hWERQi9RmJTYpCKEFEEqrNeM2JDZG6XgUje12AO9VgQC
-X-Google-Smtp-Source: AGHT+IFPVhu8MaUL4U9TiSoKfpjFwi5MzWPuMosqmec6SO4g8BFH6Kp+bCxObLQ7ckCBnTySm25wpA==
-X-Received: by 2002:a05:6358:286:b0:17a:f91c:825b with SMTP id w6-20020a056358028600b0017af91c825bmr8812523rwj.5.1708958273041;
-        Mon, 26 Feb 2024 06:37:53 -0800 (PST)
-Received: from localhost ([47.254.32.37])
-        by smtp.gmail.com with ESMTPSA id v4-20020aa78504000000b006e4e557346esm4114190pfn.28.2024.02.26.06.37.52
+        bh=wF5I3QGcDe499zvzwDfAHdHqAxG40+9SQfq6UFOiBbY=;
+        b=HC5urZi5V2vmO1Y1igWOSdoQcqmcTeLIlgw2Tn94ZUCmLkuaEB2rho8fUllzhpE9FA
+         0c8NT0tvQ8jxP0IZCVmh/UOBUg1QZHkROHtqPfkHF0D1c+sDXesWcGKKqo7R0OcT86T9
+         ETNl/7DNtCbVXaby4qps/if8ADkPbCDby3SoUcwx98T8miKXXNkhQQeW1iHXxJk+lIZv
+         Cc5hJLZYZTZBU5rxFw7lHB7McYnoHS6G3JRVx5YDY8KP+ASktkoAcolbOjPSH4n/trcq
+         GIXMC5Hsl4xQKTXTjro3hcuAWodGmtOrfUuz+twBN6WXjP2Q0WWJvC8D7dnKAhJFc0il
+         uONQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVkkeLVEYBWI4ia/swGVVVR56dQ3Vqe2gYXfUXDe9tb+ZqaNulhh2VUYuuUVau+6aYM/dfhcB7Hsdh71bv4snlx3++X
+X-Gm-Message-State: AOJu0YwKFr+YczyNt3kDD3eQHeDOJ4FbC38JNy3AWtJ05kDPhwfSQRTA
+	l9GFLA9MXn+xKJIta+WzQOdRrBB8sxk8gPzScHZv7wb8QlI4HV5oTKPJkoti
+X-Google-Smtp-Source: AGHT+IEBOatbi0zsLKeC/BI5oxkPGQKl9gN+gvqMHyn8obAn/tdzQdkUPLAn2vjrNgBgJiRxD1DwBw==
+X-Received: by 2002:a17:902:c404:b0:1d7:836d:7b3f with SMTP id k4-20020a170902c40400b001d7836d7b3fmr9974536plk.9.1708958283008;
+        Mon, 26 Feb 2024 06:38:03 -0800 (PST)
+Received: from localhost ([47.88.5.130])
+        by smtp.gmail.com with ESMTPSA id ks14-20020a170903084e00b001dc30f13e6asm4018049plb.137.2024.02.26.06.38.02
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:37:52 -0800 (PST)
+        Mon, 26 Feb 2024 06:38:02 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
-Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-	Hou Wenlong <houwenlong.hwl@antgroup.com>,
+Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>,
+	Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Sean Christopherson <seanjc@google.com>,
@@ -84,14 +84,15 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>,
-	"Mike Rapoport (IBM)" <rppt@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Pengfei Xu <pengfei.xu@intel.com>,
-	Ze Gao <zegao2021@gmail.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>
-Subject: [RFC PATCH 54/73] x86/pvm: Detect PVM hypervisor support
-Date: Mon, 26 Feb 2024 22:36:11 +0800
-Message-Id: <20240226143630.33643-55-jiangshanlai@gmail.com>
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Brian Gerst <brgerst@gmail.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Thomas Garnier <thgarnie@chromium.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [RFC PATCH 55/73] x86/pvm: Relocate kernel image to specific virtual address range
+Date: Mon, 26 Feb 2024 22:36:12 +0800
+Message-Id: <20240226143630.33643-56-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -103,137 +104,121 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+From: Hou Wenlong <houwenlong.hwl@antgroup.com>
 
-Detect PVM hypervisor support through the use of the PVM synthetic
-instruction 'PVM_SYNTHETIC_CPUID'. This is a necessary step in preparing
-to initialize the PVM guest during booting.
+For a PVM guest, it is only allowed to run in the specific virtual
+address range provided by the hypervisor. Therefore, the PVM guest needs
+to be a PIE kernel and perform relocation during the booting process.
+Additionally, for a compressed kernel image, kaslr needs to be disabled;
+otherwise, it will fail to boot.
 
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/include/asm/pvm_para.h | 69 +++++++++++++++++++++++++++++++++
- arch/x86/kernel/Makefile        |  1 +
- arch/x86/kernel/pvm.c           | 22 +++++++++++
- 3 files changed, 92 insertions(+)
- create mode 100644 arch/x86/include/asm/pvm_para.h
- create mode 100644 arch/x86/kernel/pvm.c
+ arch/x86/Kconfig                  |  3 ++-
+ arch/x86/kernel/head64_identity.c | 27 +++++++++++++++++++++++++++
+ arch/x86/kernel/head_64.S         | 13 +++++++++++++
+ arch/x86/kernel/pvm.c             |  5 ++++-
+ 4 files changed, 46 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/pvm_para.h b/arch/x86/include/asm/pvm_para.h
-new file mode 100644
-index 000000000000..efd7afdf9be9
---- /dev/null
-+++ b/arch/x86/include/asm/pvm_para.h
-@@ -0,0 +1,69 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_X86_PVM_PARA_H
-+#define _ASM_X86_PVM_PARA_H
-+
-+#include <linux/init.h>
-+#include <uapi/asm/pvm_para.h>
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 2ccc8a27e081..1b4bea3db53d 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -853,7 +853,8 @@ config KVM_GUEST
+ 
+ config PVM_GUEST
+ 	bool "PVM Guest support"
+-	depends on X86_64 && KVM_GUEST
++	depends on X86_64 && KVM_GUEST && X86_PIE
++	select RELOCATABLE_UNCOMPRESSED_KERNEL
+ 	default n
+ 	help
+ 	  This option enables the kernel to run as a PVM guest under the PVM
+diff --git a/arch/x86/kernel/head64_identity.c b/arch/x86/kernel/head64_identity.c
+index 4548ad615ecf..4e6a073d9e6c 100644
+--- a/arch/x86/kernel/head64_identity.c
++++ b/arch/x86/kernel/head64_identity.c
+@@ -20,6 +20,7 @@
+ #include <asm/trapnr.h>
+ #include <asm/sev.h>
+ #include <asm/init.h>
++#include <asm/pvm_para.h>
+ 
+ extern pmd_t early_dynamic_pgts[EARLY_DYNAMIC_PAGE_TABLES][PTRS_PER_PMD];
+ extern unsigned int next_early_pgt;
+@@ -385,3 +386,29 @@ void __head __relocate_kernel(unsigned long physbase, unsigned long virtbase)
+ 	}
+ }
+ #endif
 +
 +#ifdef CONFIG_PVM_GUEST
-+#include <asm/irqflags.h>
-+#include <uapi/asm/kvm_para.h>
++extern unsigned long pvm_range_start;
++extern unsigned long pvm_range_end;
 +
-+void __init pvm_early_setup(void);
-+
-+static inline void pvm_cpuid(unsigned int *eax, unsigned int *ebx,
-+			     unsigned int *ecx, unsigned int *edx)
++static void __head detect_pvm_range(void)
 +{
-+	asm(__ASM_FORM(.byte PVM_SYNTHETIC_CPUID ;)
-+		: "=a" (*eax),
-+		  "=b" (*ebx),
-+		  "=c" (*ecx),
-+		  "=d" (*edx)
-+		: "0" (*eax), "2" (*ecx));
++	unsigned long msr_val;
++	unsigned long pml4_index_start, pml4_index_end;
++
++	msr_val = __rdmsr(MSR_PVM_LINEAR_ADDRESS_RANGE);
++	pml4_index_start = msr_val & 0x1ff;
++	pml4_index_end = (msr_val >> 16) & 0x1ff;
++	pvm_range_start = (0x1fffe00 | pml4_index_start) * P4D_SIZE;
++	pvm_range_end = (0x1fffe00 | pml4_index_end) * P4D_SIZE;
 +}
 +
-+/*
-+ * pvm_detect() is called before event handling is set up and it might be
-+ * possibly called under any hypervisor other than PVM, so it should not
-+ * trigger any trap in all possible scenarios. PVM_SYNTHETIC_CPUID is supposed
-+ * to not trigger any trap in the real or virtual x86 kernel mode and is also
-+ * guaranteed to trigger a trap in the underlying hardware user mode for the
-+ * hypervisor emulating it.
-+ */
-+static inline bool pvm_detect(void)
-+{
-+	unsigned long cs;
-+	uint32_t eax, signature[3];
-+
-+	/* check underlying interrupt flags */
-+	if (arch_irqs_disabled_flags(native_save_fl()))
-+		return false;
-+
-+	/* check underlying CS */
-+	asm volatile("mov %%cs,%0\n\t" : "=r" (cs) : );
-+	if ((cs & 3) != 3)
-+		return false;
-+
-+	/* check KVM_SIGNATURE and KVM_CPUID_VENDOR_FEATURES */
-+	eax = KVM_CPUID_SIGNATURE;
-+	pvm_cpuid(&eax, &signature[0], &signature[1], &signature[2]);
-+	if (memcmp(KVM_SIGNATURE, signature, 12))
-+		return false;
-+	if (eax < KVM_CPUID_VENDOR_FEATURES)
-+		return false;
-+
-+	/* check PVM_CPUID_SIGNATURE */
-+	eax = KVM_CPUID_VENDOR_FEATURES;
-+	pvm_cpuid(&eax, &signature[0], &signature[1], &signature[2]);
-+	if (signature[0] != PVM_CPUID_SIGNATURE)
-+		return false;
-+
-+	return true;
-+}
-+#else
-+static inline void pvm_early_setup(void)
-+{
-+}
-+#endif /* CONFIG_PVM_GUEST */
-+
-+#endif /* _ASM_X86_PVM_PARA_H */
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index dc1f5a303e9b..67f11f7d5c88 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -129,6 +129,7 @@ obj-$(CONFIG_AMD_NB)		+= amd_nb.o
- obj-$(CONFIG_DEBUG_NMI_SELFTEST) += nmi_selftest.o
- 
- obj-$(CONFIG_KVM_GUEST)		+= kvm.o kvmclock.o
-+obj-$(CONFIG_PVM_GUEST)		+= pvm.o
- obj-$(CONFIG_PARAVIRT)		+= paravirt.o
- obj-$(CONFIG_PARAVIRT_SPINLOCKS)+= paravirt-spinlocks.o
- obj-$(CONFIG_PARAVIRT_CLOCK)	+= pvclock.o
-diff --git a/arch/x86/kernel/pvm.c b/arch/x86/kernel/pvm.c
-new file mode 100644
-index 000000000000..2d27044eaf25
---- /dev/null
-+++ b/arch/x86/kernel/pvm.c
-@@ -0,0 +1,22 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * KVM PVM paravirt_ops implementation
-+ *
-+ * Copyright (C) 2020 Ant Group
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+#define pr_fmt(fmt) "pvm-guest: " fmt
-+
-+#include <asm/cpufeature.h>
-+#include <asm/pvm_para.h>
-+
-+void __init pvm_early_setup(void)
++void __head pvm_relocate_kernel(unsigned long physbase)
 +{
 +	if (!pvm_detect())
 +		return;
 +
-+	setup_force_cpu_cap(X86_FEATURE_KVM_PVM_GUEST);
++	detect_pvm_range();
++	__relocate_kernel(physbase, pvm_range_end - (2UL << 30));
 +}
++#endif
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index b8278f05bbd0..1d931bab4393 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -91,6 +91,19 @@ SYM_CODE_START_NOALIGN(startup_64)
+ 	movq	%rdx, PER_CPU_VAR(this_cpu_off)
+ #endif
+ 
++#ifdef CONFIG_PVM_GUEST
++	leaq	_text(%rip), %rdi
++	call	pvm_relocate_kernel
++#ifdef CONFIG_SMP
++	/* Fill __per_cpu_offset[0] again, because it got relocated. */
++	movabs	$__per_cpu_load, %rdx
++	movabs	$__per_cpu_start, %rax
++	subq	%rax, %rdx
++	movq	%rdx, __per_cpu_offset(%rip)
++	movq	%rdx, PER_CPU_VAR(this_cpu_off)
++#endif
++#endif
++
+ 	call	startup_64_setup_env
+ 
+ 	/* Now switch to __KERNEL_CS so IRET works reliably */
+diff --git a/arch/x86/kernel/pvm.c b/arch/x86/kernel/pvm.c
+index 2d27044eaf25..fc82c71b305b 100644
+--- a/arch/x86/kernel/pvm.c
++++ b/arch/x86/kernel/pvm.c
+@@ -13,9 +13,12 @@
+ #include <asm/cpufeature.h>
+ #include <asm/pvm_para.h>
+ 
++unsigned long pvm_range_start __initdata;
++unsigned long pvm_range_end __initdata;
++
+ void __init pvm_early_setup(void)
+ {
+-	if (!pvm_detect())
++	if (!pvm_range_end)
+ 		return;
+ 
+ 	setup_force_cpu_cap(X86_FEATURE_KVM_PVM_GUEST);
 -- 
 2.19.1.6.gb485710b
 
