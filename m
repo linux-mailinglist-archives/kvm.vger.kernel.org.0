@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-9631-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9632-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28063866C3D
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:30:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2D5866C3F
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:30:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD68CB2344E
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:30:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C19CE1F24341
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DAC247F4A;
-	Mon, 26 Feb 2024 08:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8414CB55;
+	Mon, 26 Feb 2024 08:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VwLS2EQl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WGwzpJXw"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064DA219FD;
-	Mon, 26 Feb 2024 08:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2A72576D;
+	Mon, 26 Feb 2024 08:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936062; cv=none; b=QFT12y6QG2nHYsGQhNv/fbiwqqSQA/1mR4aq+lXeyjfSVOFE8aAZGIpOlR9YgHWUBukXKA7k1NYqn+Y//A0GiRlhZ5KxuWdFwQKneCvooJq5jvJIU8apStEMHGcvPFEMqglthbtJGPXFjrip6Athm1gHwO9+nkpW/FlsS5acDIg=
+	t=1708936063; cv=none; b=O+AE/ZpQ1xouLjRqgScAyXtpI20QTAl9//cEnfXY8Th+5vplYerD8GqjvQin4HFJ0JMpqKrKCGtv5/yfAt+rwXHs3UfDkMRsi58CMjOATvjwC1gnSDOeG5dRphW/Mc23XfSdWU0RqkC3fC7DyRvUy2mbV8AzReUB5P1GI28pn9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936062; c=relaxed/simple;
-	bh=jlfMA54rdGG+IPOKGOPLVKDQtiL3/PSTjptpBZUxEnw=;
+	s=arc-20240116; t=1708936063; c=relaxed/simple;
+	bh=xIS0IEpU4jLV8PiHi+HchMYIeNnm0fFPNPHfNFUxmaM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=N2DpACiIFUnOrKHlPyLMt2r1o+1vtoi62te3UUrVY7L5kukc0krhHyMBnYAqxVqyx5LIQWNilUkoK42/APWXbyL1/yM61XqZevPtWUwScA4hk7b6MHarnrEgN+TifgttvPjND1rQSu/vy5XqHRLOlC4XRSQ6sq/zcVQFVu4EpV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VwLS2EQl; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=UEhwOwvOd/UgI7Hs3zJ7AFzlYt/bM+/NJnzqRqJgFx0EiELstCuGiGtGTXNIL6Fn/fpSmDSt9B2SjkOS27lKvyG7etXX5qXR2plQ/R6dPuZZrQDrAj4Yk4FZlYyh65TuUoW0sEPamtiDQq2y4aoMk9eSdzjODDfqcQ5rW6ociD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WGwzpJXw; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708936060; x=1740472060;
+  t=1708936061; x=1740472061;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=jlfMA54rdGG+IPOKGOPLVKDQtiL3/PSTjptpBZUxEnw=;
-  b=VwLS2EQlknHA1ShFnNsgAuvgmOM3dSUKMujoqfDPG1+ILG+vLryL5QXf
-   aOkpbIG3vqUhTpqQwgszKeN7EoE6xGuyS3zZksIEpz4JWQQdu1T/p564I
-   ooiqkIcWMs6wYlJ8rW9sQln++97hv34Eps4WB9Ys7afkQKG/VMuTOtrNe
-   ssYa3kTCm5ydEyk99ywfAVo36P1I7At8I72tM61ecpoi+MHhEgNkkkmlJ
-   RYQs2xRHsiFuiyCyvqaXs0vbYmJbYxx0gemOUrd2TVf4OruT2rIPoY9dQ
-   +6TvoaG/WgpyY+pWTncVoI8uteUXc7V+1rS3RJ2U2lEcRon0JgRWZbX2W
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="28631452"
+  bh=xIS0IEpU4jLV8PiHi+HchMYIeNnm0fFPNPHfNFUxmaM=;
+  b=WGwzpJXwqFrom4jDm3BFVTCqX7uiDXqoq3mIwbVakbW6l008gXz/RNix
+   BjCZzENr5zbRYZSarOCuEeMpH2DMa70c66bMVCLEn8xReOwqwqo6xJHAF
+   R9NUK9bug+GKGKhcT9xQNyUJZgj6QWQtONP91mCBUyaA9q4WqcP0T4bRq
+   CwhXLzMyizBc+12weAZyofPl98hrEDGzrkld3wb2utTQrYbDsWFEXlUXo
+   S4fUrNx8zIYnHXDiyJFl19/OJ8dGHuSQWQ8uvruMzWg0yw+/g78iHc0mX
+   d4I9nzkgEaULD9vjkPmfnAVAkV151qVeAw3+TPff69H+5M5NejDwLSsU9
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="28631456"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="28631452"
+   d="scan'208";a="28631456"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:27:39 -0800
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:27:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6474307"
+   d="scan'208";a="6474311"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:27:39 -0800
 From: isaku.yamahata@intel.com
@@ -67,9 +67,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v19 007/130] x86/virt/tdx: Export SEAMCALL functions
-Date: Mon, 26 Feb 2024 00:25:09 -0800
-Message-Id: <8f64043a6c393c017347bf8954d92b84b58603ec.1708933498.git.isaku.yamahata@intel.com>
+Subject: [PATCH v19 008/130] x86/tdx: Warning with 32bit build shift-count-overflow
+Date: Mon, 26 Feb 2024 00:25:10 -0800
+Message-Id: <a50918ba3415be4186a91161fe3bbd839153d8b2.1708933498.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933498.git.isaku.yamahata@intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
@@ -81,65 +81,41 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Kai Huang <kai.huang@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-KVM will need to make SEAMCALLs to create and run TDX guests.  Export
-SEAMCALL functions for KVM to use.
+This patch fixes the following warnings.
 
-Also add declaration of SEAMCALL functions to <asm/asm-prototypes.h> to
-support CONFIG_MODVERSIONS=y.
+   In file included from arch/x86/kernel/asm-offsets.c:22:
+   arch/x86/include/asm/tdx.h:92:87: warning: shift count >= width of type [-Wshift-count-overflow]
+   arch/x86/include/asm/tdx.h:20:21: note: expanded from macro 'TDX_ERROR'
+   #define TDX_ERROR                       _BITUL(63)
 
-Signed-off-by: Kai Huang <kai.huang@intel.com>
+                                           ^~~~~~~~~~
+
+Also consistently use ULL for TDX_SEAMCALL_VMFAILINVALID.
+
+Fixes: 527a534c7326 ("x86/tdx: Provide common base for SEAMCALL and TDCALL C wrappers")
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/asm-prototypes.h | 1 +
- arch/x86/virt/vmx/tdx/seamcall.S      | 4 ++++
- 2 files changed, 5 insertions(+)
+ arch/x86/include/asm/tdx.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/asm-prototypes.h b/arch/x86/include/asm/asm-prototypes.h
-index b1a98fa38828..0ec572ad75f1 100644
---- a/arch/x86/include/asm/asm-prototypes.h
-+++ b/arch/x86/include/asm/asm-prototypes.h
-@@ -13,6 +13,7 @@
- #include <asm/preempt.h>
- #include <asm/asm.h>
- #include <asm/gsseg.h>
-+#include <asm/tdx.h>
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 16be3a1e4916..1e9dcdf9912b 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -17,9 +17,9 @@
+  * Bits 47:40 == 0xFF indicate Reserved status code class that never used by
+  * TDX module.
+  */
+-#define TDX_ERROR			_BITUL(63)
++#define TDX_ERROR			_BITULL(63)
+ #define TDX_SW_ERROR			(TDX_ERROR | GENMASK_ULL(47, 40))
+-#define TDX_SEAMCALL_VMFAILINVALID	(TDX_SW_ERROR | _UL(0xFFFF0000))
++#define TDX_SEAMCALL_VMFAILINVALID	(TDX_SW_ERROR | _ULL(0xFFFF0000))
  
- #ifndef CONFIG_X86_CMPXCHG64
- extern void cmpxchg8b_emu(void);
-diff --git a/arch/x86/virt/vmx/tdx/seamcall.S b/arch/x86/virt/vmx/tdx/seamcall.S
-index 5b1f2286aea9..e32cf82ed47e 100644
---- a/arch/x86/virt/vmx/tdx/seamcall.S
-+++ b/arch/x86/virt/vmx/tdx/seamcall.S
-@@ -1,5 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <linux/linkage.h>
-+#include <linux/export.h>
- #include <asm/frame.h>
- 
- #include "tdxcall.S"
-@@ -21,6 +22,7 @@
- SYM_FUNC_START(__seamcall)
- 	TDX_MODULE_CALL host=1
- SYM_FUNC_END(__seamcall)
-+EXPORT_SYMBOL_GPL(__seamcall);
- 
- /*
-  * __seamcall_ret() - Host-side interface functions to SEAM software
-@@ -40,6 +42,7 @@ SYM_FUNC_END(__seamcall)
- SYM_FUNC_START(__seamcall_ret)
- 	TDX_MODULE_CALL host=1 ret=1
- SYM_FUNC_END(__seamcall_ret)
-+EXPORT_SYMBOL_GPL(__seamcall_ret);
- 
- /*
-  * __seamcall_saved_ret() - Host-side interface functions to SEAM software
-@@ -59,3 +62,4 @@ SYM_FUNC_END(__seamcall_ret)
- SYM_FUNC_START(__seamcall_saved_ret)
- 	TDX_MODULE_CALL host=1 ret=1 saved=1
- SYM_FUNC_END(__seamcall_saved_ret)
-+EXPORT_SYMBOL_GPL(__seamcall_saved_ret);
+ #define TDX_SEAMCALL_GP			(TDX_SW_ERROR | X86_TRAP_GP)
+ #define TDX_SEAMCALL_UD			(TDX_SW_ERROR | X86_TRAP_UD)
 -- 
 2.25.1
 
