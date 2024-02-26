@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-9964-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9965-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0D9686802C
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:56:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE72F868032
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:57:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801211F23072
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 18:56:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DA0D28F8FA
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 18:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE6712F583;
-	Mon, 26 Feb 2024 18:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB1412FF69;
+	Mon, 26 Feb 2024 18:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hBDh4B6g"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MYcOGbK9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F220E12E1D5;
-	Mon, 26 Feb 2024 18:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4939F12E1F0;
+	Mon, 26 Feb 2024 18:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708973796; cv=none; b=DF7QtoWEUhFlyDNVxNhUw4tozPNu2k2p8TSXHbMeWTUEjECDPwsJB4rTjwiTVIZPj4kTEXhwU51OuLH2wH3EO+9wAcetpJjlmNE/2JUiR6401hW0KDnzFN/R+YSuEebjIFkeRUVDeDX22zAQ6r3AUkpqk7eZ9ELSqK68GHxE25Y=
+	t=1708973844; cv=none; b=atd/pWxk92SjifchLYzBZv5EKWhuBrejPOj2inmPqWvw7xXArTS0iIOcBZRI/sd84EiZHy1K0H5A2jRvueD4Q40gBIhCElXXnE4AqSEApx67YQP55+QKGCPL0PSnvUkLlNYo/u/HdPyHRmZ4UGtPLUC7WReoL48ou6X3bFE3NrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708973796; c=relaxed/simple;
-	bh=LHD+JDEOdVWmiSEIxtQemrQnvU3P82mWYGpIuPIt0XY=;
+	s=arc-20240116; t=1708973844; c=relaxed/simple;
+	bh=nJFSrLqJiwp8ithW3MjfceFdjdGmcRw4CXHZqvKmUPI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DIMO6z2Nq7F9XwK1mKq0+tybJ9vvvCWQPxS3Dw07m05Z2he6htDchEJVC0SUGybDqvWnVFMp5Er1erAHodeJB2WlLGxASWIkFK/dnaouGKpWgGBg83CUvmGsCCRN7de+s33LXYIgyJFj6nbZoKhxkPv6fTqEk1GNS2ArNx8OPPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hBDh4B6g; arc=none smtp.client-ip=198.175.65.12
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xbs40pbK+T6hDFOch1V/eHKQxU0AbSHSIKERFqR6PfmB7H3KfRlzzNLRZMfPHa/lMgeyRiYjZBLdqHF5JvoiWVQeCuGjdr1UWlUsDQeDnW4FfMccvkD2aietctKqWaXdicbP3t8yDRNv2CeG8C8CIkCwbioPpqGUh4qTBDwmKTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MYcOGbK9; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708973794; x=1740509794;
+  t=1708973842; x=1740509842;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=LHD+JDEOdVWmiSEIxtQemrQnvU3P82mWYGpIuPIt0XY=;
-  b=hBDh4B6gjaZrgSufEtAB4JhwjF/lA2j9FiFROtOnIo6dXP+vRwYIBCsW
-   3Hw9uUAwtxlaq7d6BTdk2br96A/VUhnYtFd672YiVIzzn6bnwkrG3iidb
-   6q2Jh3CH5894Kn5wLJsyByrHb0+3rIx6aqGfXZ3qVGuqHn7gWTsSkjOYf
-   9iWW9fXGS8NG7paEP7Vl3V1mH4BUU1jJ33BVlR8KPQFY89c9Srfsi/HSa
-   hP0EiROWRsjKIQE+T96mHCvdvNueeJU85yskVFVFfPu+WvXwFWbFKgspf
-   GLwKZxUtGys5nQXbPxt0xhvTJdi7j0rx8W7RSomtpE9sC4bsaTw6x/8uI
+  bh=nJFSrLqJiwp8ithW3MjfceFdjdGmcRw4CXHZqvKmUPI=;
+  b=MYcOGbK9YqBhGXmsRJWhkL3jfAoDx8HWo3zItdv4V2YLHyrVPIkHI6hN
+   9arFmG6e2ID10vC/3xKaxNMr3V+4ClFRd92V9lXB7fx1H9I5EEqvC3VxL
+   IhtulB8UNdMjAycjQLdkPQIqBQgFlEnuzf8T56N0GGJp9NTks7WqXyc0+
+   It9tAKhi/E6m8DIQAj1en8Aeh4bvGauBIBIGYhMQsZxMOeH9nPiMXRRFv
+   OACgzrSx8d4OQoKjIpyIJv0NnDHC67QYuKzuvXnT/4xkjpTxRB1Qr8Bgk
+   HbkYLCMq6MkIriJBf6JqbXJg7ROtr2OglEA2DjJwntIZcG4qIE+XxNYeH
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="14719198"
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="7107236"
 X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="14719198"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 10:56:33 -0800
+   d="scan'208";a="7107236"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 10:57:22 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="6909793"
+   d="scan'208";a="6977793"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 10:56:33 -0800
-Date: Mon, 26 Feb 2024 10:56:32 -0800
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 10:57:21 -0800
+Date: Mon, 26 Feb 2024 10:57:20 -0800
 From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-To: Yuan Yao <yuan.yao@linux.intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
 	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
 	Sean Christopherson <seanjc@google.com>,
 	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v18 024/121] KVM: TDX: create/destroy VM structure
-Message-ID: <20240226185632.GJ177224@ls.amr.corp.intel.com>
+	Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v18 025/121] KVM: TDX: initialize VM with TDX specific
+ parameters
+Message-ID: <20240226185720.GK177224@ls.amr.corp.intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <167b3797f5928c580526f388761dcfb342626ad2.1705965634.git.isaku.yamahata@intel.com>
- <20240201083227.vwyqlptrr3bdwr7m@yy-desk-7060>
+ <af0e1a82fdf797a7fffc9d08141d15037ed8537b.1705965634.git.isaku.yamahata@intel.com>
+ <6e517d2e-45ae-46ec-8067-c3e7eb1b2afa@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,96 +78,135 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240201083227.vwyqlptrr3bdwr7m@yy-desk-7060>
+In-Reply-To: <6e517d2e-45ae-46ec-8067-c3e7eb1b2afa@linux.intel.com>
 
-On Thu, Feb 01, 2024 at 04:32:27PM +0800,
-Yuan Yao <yuan.yao@linux.intel.com> wrote:
+On Thu, Jan 25, 2024 at 10:19:30AM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-...
-> > +static int __tdx_reclaim_page(hpa_t pa)
-> > +{
-> > +	struct tdx_module_args out;
-> > +	u64 err;
-> > +
-> > +	do {
-> > +		err = tdh_phymem_page_reclaim(pa, &out);
-> > +		/*
-> > +		 * TDH.PHYMEM.PAGE.RECLAIM is allowed only when TD is shutdown.
-> > +		 * state.  i.e. destructing TD.
-> > +		 * TDH.PHYMEM.PAGE.RECLAIM requires TDR and target page.
-> > +		 * Because we're destructing TD, it's rare to contend with TDR.
-> > +		 */
-> > +	} while (unlikely(err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX)));
 > 
-> v16 changed to tdx module 1.5, so here should be TDX_OPERAND_ID_TDR, value 128ULL.
-
-We should handle both RCX(SEPT) and TDR. So I make it err == RCX || err == TDR.
-
-...
-
-> > +static int __tdx_td_init(struct kvm *kvm)
+> 
+> On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > TDX requires additional parameters for TDX VM for confidential execution to
+> > protect the confidentiality of its memory contents and CPU state from any
+> > other software, including VMM.  When creating a guest TD VM before creating
+> > vcpu, the number of vcpu, TSC frequency (the values are the same among
+> > vcpus, and it can't change.)  CPUIDs which the TDX module emulates.  Guest
+> > TDs can trust those CPUIDs and sha384 values for measurement.
+> > 
+> > Add a new subcommand, KVM_TDX_INIT_VM, to pass parameters for the TDX
+> > guest.  It assigns an encryption key to the TDX guest for memory
+> > encryption.  TDX encrypts memory per guest basis.  The device model, say
+> > qemu, passes per-VM parameters for the TDX guest.  The maximum number of
+> > vcpus, TSC frequency (TDX guest has fixed VM-wide TSC frequency, not per
+> > vcpu.  The TDX guest can not change it.), attributes (production or debug),
+> > available extended features (which configure guest XCR0, IA32_XSS MSR),
+> > CPUIDs, sha384 measurements, etc.
+> > 
+> > Call this subcommand before creating vcpu and KVM_SET_CPUID2, i.e.  CPUID
+> > configurations aren't available yet.  So CPUIDs configuration values need
+> > to be passed in struct kvm_tdx_init_vm.  The device model's responsibility
+> > to make this CPUID config for KVM_TDX_INIT_VM and KVM_SET_CPUID2.
+> > 
+> > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > ---
+> > v18:
+> > - remove the change of tools/arch/x86/include/uapi/asm/kvm.h
+> > - typo in comment. sha348 => sha384
+> > - updated comment in setup_tdparams_xfam()
+> > - fix setup_tdparams_xfam() to use init_vm instead of td_params
+> > 
+> > v15 -> v16:
+> > - Removed AMX check as the KVM upstream supports AMX.
+> > - Added CET flag to guest supported xss
+> > 
+> > v14 -> v15:
+> > - add check if the reserved area of init_vm is zero
+> > ---
+> >   arch/x86/include/uapi/asm/kvm.h |  27 ++++
+> >   arch/x86/kvm/cpuid.c            |   7 +
+> >   arch/x86/kvm/cpuid.h            |   2 +
+> >   arch/x86/kvm/vmx/tdx.c          | 261 ++++++++++++++++++++++++++++++--
+> >   arch/x86/kvm/vmx/tdx.h          |  18 +++
+> >   arch/x86/kvm/vmx/tdx_arch.h     |   6 +
+> >   6 files changed, 311 insertions(+), 10 deletions(-)
+> > 
+> [...]
+> > +
+> > +static int setup_tdparams_xfam(struct kvm_cpuid2 *cpuid, struct td_params *td_params)
 > > +{
-> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> > +	cpumask_var_t packages;
-> > +	unsigned long *tdcs_pa = NULL;
-> > +	unsigned long tdr_pa = 0;
-> > +	unsigned long va;
-> > +	int ret, i;
-> > +	u64 err;
+> > +	const struct kvm_cpuid_entry2 *entry;
+> > +	u64 guest_supported_xcr0;
+> > +	u64 guest_supported_xss;
 > > +
-> > +	ret = tdx_guest_keyid_alloc();
-> > +	if (ret < 0)
-> > +		return ret;
-> > +	kvm_tdx->hkid = ret;
+> > +	/* Setup td_params.xfam */
+> > +	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0xd, 0);
+> > +	if (entry)
+> > +		guest_supported_xcr0 = (entry->eax | ((u64)entry->edx << 32));
+> > +	else
+> > +		guest_supported_xcr0 = 0;
+> > +	guest_supported_xcr0 &= kvm_caps.supported_xcr0;
 > > +
-> > +	va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> > +	if (!va)
-> > +		goto free_hkid;
-> > +	tdr_pa = __pa(va);
+> > +	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0xd, 1);
+> > +	if (entry)
+> > +		guest_supported_xss = (entry->ecx | ((u64)entry->edx << 32));
+> > +	else
+> > +		guest_supported_xss = 0;
 > > +
-> > +	tdcs_pa = kcalloc(tdx_info->nr_tdcs_pages, sizeof(*kvm_tdx->tdcs_pa),
-> > +			  GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> > +	if (!tdcs_pa)
-> > +		goto free_tdr;
-> > +	for (i = 0; i < tdx_info->nr_tdcs_pages; i++) {
-> > +		va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> > +		if (!va)
-> > +			goto free_tdcs;
-> > +		tdcs_pa[i] = __pa(va);
-> > +	}
-> > +
-> > +	if (!zalloc_cpumask_var(&packages, GFP_KERNEL)) {
-> > +		ret = -ENOMEM;
-> > +		goto free_tdcs;
-> > +	}
-> > +	cpus_read_lock();
 > > +	/*
-> > +	 * Need at least one CPU of the package to be online in order to
-> > +	 * program all packages for host key id.  Check it.
+> > +	 * PT can be exposed to TD guest regardless of KVM's XSS and CET
+> > +	 * support.
 > > +	 */
-> > +	for_each_present_cpu(i)
-> > +		cpumask_set_cpu(topology_physical_package_id(i), packages);
-> > +	for_each_online_cpu(i)
-> > +		cpumask_clear_cpu(topology_physical_package_id(i), packages);
-> > +	if (!cpumask_empty(packages)) {
-> > +		ret = -EIO;
-> > +		/*
-> > +		 * Because it's hard for human operator to figure out the
-> > +		 * reason, warn it.
-> > +		 */
-> > +#define MSG_ALLPKG	"All packages need to have online CPU to create TD. Online CPU and retry.\n"
-> > +		pr_warn_ratelimited(MSG_ALLPKG);
-> > +		goto free_packages;
-> > +	}
-> 
-> Generate/release hkid both requests to have "cpumask of at least 1
-> cpu per each node", how about add one helper for this ? The helper also
-> checks the cpus_read_lock() is held and return the cpumask if at least
-> 1 cpu is online per node, thus this init funciotn can be simplified and
-> become more easy to review.
+> According to the code below, it seems that both PT and CET can be exposed to
+> TD
+> guest regardless of KVM's XSS support?
 
-We don't need cpumask to release hkid. So only tdx_td_init() needs cpumask
-allocation. So I didn't to bother create a helper function with v19.
+Yes, updated the comment.
+
+> > +	guest_supported_xss &=
+> > +		(kvm_caps.supported_xss | XFEATURE_MASK_PT | TDX_TD_XFAM_CET);
+> > +
+> > +	td_params->xfam = guest_supported_xcr0 | guest_supported_xss;
+> > +	if (td_params->xfam & XFEATURE_MASK_LBR) {
+> > +		/*
+> > +		 * TODO: once KVM supports LBR(save/restore LBR related
+> > +		 * registers around TDENTER), remove this guard.
+> > +		 */
+> > +#define MSG_LBR	"TD doesn't support LBR yet. KVM needs to save/restore IA32_LBR_DEPTH properly.\n"
+> > +		pr_warn(MSG_LBR);
+> > +		return -EOPNOTSUPP;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
+> > +			struct kvm_tdx_init_vm *init_vm)
+> > +{
+> > +	struct kvm_cpuid2 *cpuid = &init_vm->cpuid;
+> > +	int ret;
+> > +
+> > +	if (kvm->created_vcpus)
+> > +		return -EBUSY;
+> > +
+> > +	if (init_vm->attributes & TDX_TD_ATTRIBUTE_PERFMON) {
+> > +		/*
+> > +		 * TODO: save/restore PMU related registers around TDENTER.
+> > +		 * Once it's done, remove this guard.
+> > +		 */
+> > +#define MSG_PERFMON	"TD doesn't support perfmon yet. KVM needs to save/restore host perf registers properly.\n"
+> > +		pr_warn(MSG_PERFMON);
+> > +		return -EOPNOTSUPP;
+> > +	}
+> > +
+> > +	td_params->max_vcpus = kvm->max_vcpus;
+> Can the max vcpu number be passed by KVM_TDX_INIT_VM?
+> So that no need to add KVM_CAP_MAX_VCPUS in patch 23/121.
+
+Please see the comment there.
 -- 
 Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
