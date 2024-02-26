@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-9843-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9844-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FD68867334
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 12:35:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 565EF867349
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 12:37:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAC8228975A
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:35:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10581283865
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:37:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523F5381A1;
-	Mon, 26 Feb 2024 11:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39422557F;
+	Mon, 26 Feb 2024 11:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PN0ic6+N"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fD8m1rPj"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F081E1DA24
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 11:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF1E21A0D
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 11:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708947247; cv=none; b=s573kHHqj4jUQ2fB092xYK33hEd2BuDQq+A69hiZLNvOTlaUI9TcyBNTU1cQ9vaRfkzErFkNtBu1/1QYBB/WEc1E5HghjVJQ0zeqoQgqGB2+Hlf4mQtPeIyubNjKfQpes3BX7dR4YAClfEzYnOU46i8ExG7s88+gNEE/ok2Uolg=
+	t=1708947361; cv=none; b=bD3kH5c/W+alxukXt09h1LuS/ei0rAGMLuQAug7E8P31+JtMdJBK7OFgSmUInonlymjdVTH8K+BHccZ/hDdT1+q68PKKUAnqtWQGmBEh9BFem5MnQlNSSUh6a5jRITjto7LOiVmevnPbNG3xVQ42/qroLhqneXwL6y26NCJPc5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708947247; c=relaxed/simple;
-	bh=+MjSgiwj5ResJF/Wp9XXR2mXK6nNnG8RpG4DFs2algg=;
+	s=arc-20240116; t=1708947361; c=relaxed/simple;
+	bh=2jPsxnp8+FNTIYq4ljBTKZjIpt/TCWslTM/XvwhVmg0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uH1VZ1/zLoZnqJliieT0vbbR1K9bgLZtoKCRNp0KaZb4ycnIdpZzf93/amxHWSL6zZiLg1Obu574ZTEoGuw1HU6QPJVtri6t+fCI/+3S/32DuYkRZmm1A/4aHyDW8jPXwjLIuiTZwjYyHXEz+uFWTgwLTq1AcRI5Y5Ou6Uzk7xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PN0ic6+N; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=kmVIaEGSQBhjzMnpkhzcNJwj3tk6xWTxGMEoYlMoIusumSjYozGWc8zXPyR+GL+lzw4YdHs3yyU0shdL2GwduGYi8GzjG7kJXyjxi/X/R++hE7YgGhHLKqLur1ZU6pCaOXv1f55SlS8x+VpOD1jY4kSA/DkJTkJHZp8nmeTI3ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fD8m1rPj; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708947245;
+	s=mimecast20190719; t=1708947358;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ZOaJdE8PeYEjIrCUWsmLxfgMZZ6msDvRYam8ZbRXslw=;
-	b=PN0ic6+Nm/Y+rivjEwF4sPvbImC0T7Ysnp+of9BJnY7slvhO3T5wefyqnzQWujKFdfaX2V
-	hwTl5CdxpzdkP+9Xae4PTjoBouFAHf1gnpMubMLNfTlHNkOwDbKO3SqJSUi/LqlYUOdn7l
-	HLctU/u16rGYY7/o5hmU9Q/JJrqBVzw=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=nLV9mtpVkZr3zVwNful7hoIpZ+cz6YUR/Wsl1FJnKmc=;
+	b=fD8m1rPjUvY0tbONzcZBqAM8BASWnu55Ve3m7upz+fwQKkHrWlPSAr6jk/NPLHPq3zKLgZ
+	DnKWhbwz8dkGJPVW2W6zM+aeRWH4olVoT2C+B6T0dkfsr9vUX0ykKjfuxKeEmy2edIbRDg
+	kXuoELLfTscepfIT5hd+38KD6wXEKn8=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-qC_A9uOkOhS9xa_1nMc5qA-1; Mon, 26 Feb 2024 06:34:03 -0500
-X-MC-Unique: qC_A9uOkOhS9xa_1nMc5qA-1
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-60915c6685aso4110777b3.3
-        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 03:34:03 -0800 (PST)
+ us-mta-641-FrLr-2LeOaOUoMqPn6RFGQ-1; Mon, 26 Feb 2024 06:35:57 -0500
+X-MC-Unique: FrLr-2LeOaOUoMqPn6RFGQ-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6901234f078so3927446d6.0
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 03:35:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708947243; x=1709552043;
+        d=1e100.net; s=20230601; t=1708947356; x=1709552156;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOaJdE8PeYEjIrCUWsmLxfgMZZ6msDvRYam8ZbRXslw=;
-        b=WdrLMoQsr0335tcDXydGMr0nz5wUrelQ3YKfLHC1VDmSlsjWeHgtwIw8IuqxZ++kKp
-         Hg6lFSFTQRmUHBE9uGrU4z/geaxFkVvcBkUz0sU7yhtdoAiFXTNg6FTNd2a4k3+GLdAI
-         RNy9K0yqfsMXBocBdRkL8k1S3oXZGONyin9Zr/3fh3gbkfFQ4acLSxe2pTh/iTTqlo5N
-         LnJh4Et+D5TAJ7W01Gbr9wvDKsz310D144YlXKp0dSMCUMYoEEkGTEPV9yJJqoas970J
-         ICdK9GRtoMZBsl9ZZL80WTwaLZ+nBI+FfKMaMvYQmr+x2DYiqHEZ8dXH4muiNrfF/JVw
-         5j3w==
-X-Forwarded-Encrypted: i=1; AJvYcCVh4+kS5nMkOFv/UI891vqAngDvoCi5V4qV5Y2UqIeUXfMVGTSCrbVL5yknRgG54oatfnhozNEQ5bZVSh3++9jdVUul
-X-Gm-Message-State: AOJu0YyyQR+wmDolG3bUa2syLv2rqrYk6WtTd76Njv1NHpyjFvCTBIIE
-	JKQULFhEVXbaCOHLxSJ0eu+MwwcapzXx8z7zMK2J4iK9gHBa131vc0d9VDZcDhFjciFblvoPGqA
-	wFfu7fKZL7odI188ogsc+jdQ9C/VLK15vEnJ//9ckp/803SdN9A==
-X-Received: by 2002:a25:f306:0:b0:dcc:693e:b396 with SMTP id c6-20020a25f306000000b00dcc693eb396mr4104825ybs.2.1708947243395;
-        Mon, 26 Feb 2024 03:34:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHVfqVKS4F7BNE8Uq25y4OH59TTel/eaKivzXTgKLUGXdDfhzOnbhVGquOdGmRVkT2ExNTCUQ==
-X-Received: by 2002:a25:f306:0:b0:dcc:693e:b396 with SMTP id c6-20020a25f306000000b00dcc693eb396mr4104813ybs.2.1708947243129;
-        Mon, 26 Feb 2024 03:34:03 -0800 (PST)
+        bh=nLV9mtpVkZr3zVwNful7hoIpZ+cz6YUR/Wsl1FJnKmc=;
+        b=NyVnmYQF1VF8oACeuY3mBUko7m/xtnyPsHLusJT2PSHkqCuiFozt24E2fNuUg8WICV
+         YGbOOMatQkt1ljbv7v2Jpdiw38JBCptutcvcM5SpeZdLpafOYhg97DhnePsa261V+vTI
+         QthmFy4djYrpt0QAkRex4oyA7e/MZX5JG4dAriquM+oxBXKWalKfbEQPQaPYBBiqDhk+
+         rIddOWdNG0179mcf1FmB7ZZZd67g1oN/jNB7LBQC3mJ7Uhy3h9lA8AyUD52HKe7r3DA6
+         UO7O1xLZrk+0Jgsh0HJtprXqQv2KYXS1ZxUEzO0efYn7D9TW3s4b5bjjAkdgEIsHA34o
+         oF/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXLNcnB/r3TlDIlaDn19PSIi2PUVUwT+YlQQavFyE3T8WynlCT/1H7CO+vQJAM7oIhyyCaE95Qfp7beOjGj0ipgtN4J
+X-Gm-Message-State: AOJu0YyxbLWkpd0BKr4Lfma+aOXXfp26+0lgQsJN2g2kwboZfvw+/hbM
+	bsFwQEHtgrcJKTFT+Hm2qzkFCENcuE48mnpMbQwCD3g41JdzQDYgtEnXqwkOPl/NcOTjWMJLY81
+	VD7tsidssRU2lvQpB+aelsclFsPbyezBQ2G7f7+qWUJt04NqVJA==
+X-Received: by 2002:a0c:f2ca:0:b0:68f:ab60:785d with SMTP id c10-20020a0cf2ca000000b0068fab60785dmr6480374qvm.11.1708947356785;
+        Mon, 26 Feb 2024 03:35:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFjuwtmpBRlPkgdcmp7lRxEx7lALjlGE01hfMLKCdUwKk5bHL1lesfeK5TI+OaaKLBbJR0jlQ==
+X-Received: by 2002:a0c:f2ca:0:b0:68f:ab60:785d with SMTP id c10-20020a0cf2ca000000b0068fab60785dmr6480363qvm.11.1708947356524;
+        Mon, 26 Feb 2024 03:35:56 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-176-215.web.vodafone.de. [109.43.176.215])
-        by smtp.gmail.com with ESMTPSA id a13-20020a05622a02cd00b0042dac47e9b4sm2344880qtx.5.2024.02.26.03.34.00
+        by smtp.gmail.com with ESMTPSA id f30-20020a0caa9e000000b0068fc83bb48fsm2817441qvb.105.2024.02.26.03.35.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Feb 2024 03:34:02 -0800 (PST)
-Message-ID: <c05354c4-4130-4a55-8725-86fe9b676d75@redhat.com>
-Date: Mon, 26 Feb 2024 12:33:59 +0100
+        Mon, 26 Feb 2024 03:35:56 -0800 (PST)
+Message-ID: <269ec33f-e2ad-4f55-b3e8-52ce88f966c5@redhat.com>
+Date: Mon, 26 Feb 2024 12:35:52 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 01/32] powerpc: Fix KVM caps on POWER9
- hosts
+Subject: Re: [kvm-unit-tests PATCH 02/32] powerpc: Fix pseries getchar return
+ value
 Content-Language: en-US
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
@@ -91,7 +91,7 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
  Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org,
  kvm@vger.kernel.org
 References: <20240226101218.1472843-1-npiggin@gmail.com>
- <20240226101218.1472843-2-npiggin@gmail.com>
+ <20240226101218.1472843-3-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -135,34 +135,33 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240226101218.1472843-2-npiggin@gmail.com>
+In-Reply-To: <20240226101218.1472843-3-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 26/02/2024 11.11, Nicholas Piggin wrote:
-> KVM does not like to run on POWER9 hosts without cap-ccf-assist=off.
+> getchar() didn't get the shift value correct and never returned the
+> first character. This never really mattered since it was only ever
+> used for press-a-key-to-continue prompts. but it tripped me up when
+> debugging a QEMU console output problem.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   powerpc/run | 2 ++
->   1 file changed, 2 insertions(+)
+>   lib/powerpc/hcall.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/powerpc/run b/powerpc/run
-> index e469f1eb3..5cdb94194 100755
-> --- a/powerpc/run
-> +++ b/powerpc/run
-> @@ -24,6 +24,8 @@ M+=",accel=$ACCEL$ACCEL_PROPS"
+> diff --git a/lib/powerpc/hcall.c b/lib/powerpc/hcall.c
+> index 711cb1b0f..b4d39ac65 100644
+> --- a/lib/powerpc/hcall.c
+> +++ b/lib/powerpc/hcall.c
+> @@ -43,5 +43,5 @@ int __getchar(void)
+>   	asm volatile (" sc 1 "  : "+r"(r3), "+r"(r4), "=r"(r5)
+>   				: "r"(r3),  "r"(r4));
 >   
->   if [[ "$ACCEL" == "tcg" ]] ; then
->   	M+=",cap-cfpc=broken,cap-sbbc=broken,cap-ibs=broken,cap-ccf-assist=off"
-> +elif [[ "$ACCEL" == "kvm" ]] ; then
-> +	M+=",cap-ccf-assist=off"
->   fi
+> -	return r3 == H_SUCCESS && r4 > 0 ? r5 >> 48 : -1;
+> +	return r3 == H_SUCCESS && r4 > 0 ? r5 >> 56 : -1;
+>   }
 
-Since it is needed in both cases, you could also move it out of the 
-if-statement and remove it from the tcg part.
-
-Anyway,
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
