@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-9764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10773866DD8
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:14:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE5A866DDB
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:14:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 414F21C23A72
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:14:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63007283F3F
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C101350CB;
-	Mon, 26 Feb 2024 08:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1841353E6;
+	Mon, 26 Feb 2024 08:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LvseQIsL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B3lUEs4L"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6252C869;
-	Mon, 26 Feb 2024 08:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C452E3E4;
+	Mon, 26 Feb 2024 08:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936193; cv=none; b=HQcbV6G+XCUqXuBVf+nbcfaJZs5LSC3zg30aWyQYm6Z8DbL1nfqmmojfjOxRetZMbMRoTbl2FfsM9+3ySk/qFKxIPjsJYoF/O68Ha6S8XZS1Letmz73E1LrkFMpegUqFmktvOePLy/ocixaWrzq7cPUScOLVElAODE3visjl2LQ=
+	t=1708936194; cv=none; b=t+VE/3SgSAjXUHoJ+iXL4T/JlG5XKET1r2HmK8vpWRd35eznlfCadOEnGBwVY8jd+bK3/P1BxJZEXhSi5fO/GK/5ov7DlMIpI/GOxUCaapleniYDBiCwRK3fHG30XQydHM4bpb72tDAWC1AKG2cf9Xl9glRIYPLki9acRme0enc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936193; c=relaxed/simple;
-	bh=GFnsETiyt8aTwReB6nymWxtwd83xZREOfV3VdIkGX1o=;
+	s=arc-20240116; t=1708936194; c=relaxed/simple;
+	bh=bl9k+dlnXJduQusfWfzV1yxMDCOOObFRijgwH0XuSM0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ejCR9iL6JettLRk+34A+unPpn5/BoSwCwGH6BZdfg4hROAy9qmo5NtVmKZsiruo10Tz7wW1SQqPgrVIrhvmPPMsnLJvR5WXdDpFGK4Z6oI153J9FlZ0ICr9Q0oYQqKEw5VYfJo+kADgFA4tuAEiGv9tm4QDYK/7pg2URLjBdJxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LvseQIsL; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=L02AD6XoMdSu/LqbFShwfKGyb1SvTKrnfPyGEV+XrvKJo5+bXBX+7cWlHBiSdfucYCOq9GvpODqkjzm1fyw1Vj8p0JCvgFWCWrK4cZqjpmzGx9Gt1pcvXtZGAWEZbCBEjsXbnawTcDUMuQ65+VLCKyRnW7uf84zTGuUsOnaeQ+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B3lUEs4L; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708936191; x=1740472191;
+  t=1708936193; x=1740472193;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GFnsETiyt8aTwReB6nymWxtwd83xZREOfV3VdIkGX1o=;
-  b=LvseQIsLYZpxaD+f0I8wYIOZFWOShfE27jHlyEnm1mZpXsiNsZD+nLU1
-   GotXaCp6ZcrOYp6JEvKKEwgWiLcjj22Ts2ExQzceVHEggE0UR8dMDnAPg
-   aSvDBjplpcReo9eATt7gswytpWBBCfXPt2rZ7LTbTakUn6BEzTRcoHYkj
-   80FSmGiw6oIwWzFzU9w+8o6YAQCnvlu+Z3ogNax8BO1Y0QpoiWLbxoGcW
-   wMljCkb8Yf4o+eUV8OgZpC4xF/72gZ0yhk8zzt84vXFsDVUAmcDoXh6Yl
-   HWDMPJh6nGpa4Mc02tEbIGAfBb2R3pBK0RZQDEJERWpUweHJVPZ5FQBNv
+  bh=bl9k+dlnXJduQusfWfzV1yxMDCOOObFRijgwH0XuSM0=;
+  b=B3lUEs4LKGivOcp7I4hXL8xiz0Y0gnDYBgpc4EZPRvMok5HEHfqTuPGx
+   bSLWRjlFfPR6Zn8oNhZW8u60INDSk1+Xg9gjCz50JhpX2Aiy5TPM8SSbb
+   Og+i1mM9PmY8fn9R5R9VGDQ0Md09fFMJe8SGnDUmC3jmjtivn5Jesu+G7
+   vbvuueFSN18Y1iaxixOsrxdW8fIYxtBPK91aGzRDsVS11fs3LyaWpOzCo
+   +piZrRLKEIPwnO9osSr/vxNoPK4UmbjEHVvfhm9wDXjVA16xPoM/Etcb+
+   XPEjgMzqumyWITHiNk8D4ADMzWYKay0nUeM/j1eeO6TCuqZaqif35pN/w
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="14623317"
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="14623321"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="14623317"
+   d="scan'208";a="14623321"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
   by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:34 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6519414"
+   d="scan'208";a="6519419"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:33 -0800
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:34 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -68,9 +68,9 @@ Cc: isaku.yamahata@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com,
 	Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v8 09/14] KVM: x86/tdp_mmu: Split the large page when zap leaf
-Date: Mon, 26 Feb 2024 00:29:23 -0800
-Message-Id: <c656573ccc68e212416d323d35f884bff25e6e2d.1708933624.git.isaku.yamahata@intel.com>
+Subject: [PATCH v8 10/14] KVM: x86/tdp_mmu, TDX: Split a large page when 4KB page within it converted to shared
+Date: Mon, 26 Feb 2024 00:29:24 -0800
+Message-Id: <b387dcfc499d2f17e448cd4574115d1fd2437921.1708933624.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933624.git.isaku.yamahata@intel.com>
 References: <cover.1708933624.git.isaku.yamahata@intel.com>
@@ -84,167 +84,207 @@ Content-Transfer-Encoding: 8bit
 
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 
-When TDX enabled, a large page cannot be zapped if it contains mixed
-pages. In this case, it has to split the large page.
+When mapping the shared page for TDX, it needs to zap private alias.
+
+In the case that private page is mapped as large page (2MB), it can be
+removed directly only when the whole 2MB is converted to shared.
+Otherwise, it has to split 2MB page into 512 4KB page, and only remove
+the pages that converted to shared.
+
+When a present large leaf spte switches to present non-leaf spte, TDX needs
+to split the corresponding SEPT page to reflect it.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
-v7:
-- remote unnecessary tlb shoot down in tdp_mmu_zap_leafs() to free unused
-  split_sp.
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c          |  6 ++--
- arch/x86/kvm/mmu/mmu_internal.h |  9 +++++
- arch/x86/kvm/mmu/tdp_mmu.c      | 60 ++++++++++++++++++++++++++++++---
- 3 files changed, 68 insertions(+), 7 deletions(-)
+v7:
+- catch up for tdx_seamcall() change
+- typo in a comment of __set_private_spte_present()
+- improved a comment in tdx_sept_split_private_spt()
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 081df7855065..fa7fabc410c4 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -7473,8 +7473,8 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
- 	return kvm_unmap_gfn_range(kvm, range);
- }
- 
--static bool hugepage_test_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
--				int level)
-+bool kvm_hugepage_test_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
-+			     int level)
- {
- 	return lpage_info_slot(gfn, slot, level)->disallow_lpage & KVM_LPAGE_MIXED_FLAG;
- }
-@@ -7501,7 +7501,7 @@ static bool hugepage_has_attrs(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		return kvm_range_has_memory_attributes(kvm, start, end, attrs);
- 
- 	for (gfn = start; gfn < end; gfn += KVM_PAGES_PER_HPAGE(level - 1)) {
--		if (hugepage_test_mixed(slot, gfn, level - 1) ||
-+		if (kvm_hugepage_test_mixed(slot, gfn, level - 1) ||
- 		    attrs != kvm_get_memory_attributes(kvm, gfn))
- 			return false;
- 	}
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 9aa4c6ffa207..315c123affaf 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -430,4 +430,13 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
- void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
- void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
- 
-+#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-+bool kvm_hugepage_test_mixed(struct kvm_memory_slot *slot, gfn_t gfn, int level);
-+#else
-+static inline bool kvm_hugepage_test_mixed(struct kvm_memory_slot *slot, gfn_t gfn, int level)
-+{
-+	return false;
-+}
-+#endif
-+
- #endif /* __KVM_X86_MMU_INTERNAL_H */
+v6:
+- repeat TDH.MEM.PAGE.DEMOTE on TDX_INTERRUPTED_RESTARTABLE
+
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+---
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  2 ++
+ arch/x86/kvm/mmu/tdp_mmu.c         | 21 ++++++++++++++++-----
+ arch/x86/kvm/vmx/tdx.c             | 27 +++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/tdx_arch.h        |  1 +
+ arch/x86/kvm/vmx/tdx_errno.h       |  1 +
+ arch/x86/kvm/vmx/tdx_ops.h         | 13 +++++++++++++
+ 7 files changed, 59 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 3a7140129855..ada6865100ee 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -105,6 +105,7 @@ KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
+ KVM_X86_OP(load_mmu_pgd)
+ KVM_X86_OP_OPTIONAL(link_private_spt)
+ KVM_X86_OP_OPTIONAL(free_private_spt)
++KVM_X86_OP_OPTIONAL(split_private_spt)
+ KVM_X86_OP_OPTIONAL(set_private_spte)
+ KVM_X86_OP_OPTIONAL(remove_private_spte)
+ KVM_X86_OP_OPTIONAL(zap_private_spte)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index c864a1ff2eb1..9c9742cc469c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1766,6 +1766,8 @@ struct kvm_x86_ops {
+ 				void *private_spt);
+ 	int (*free_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+ 				void *private_spt);
++	int (*split_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
++				  void *private_spt);
+ 	int (*set_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+ 				 kvm_pfn_t pfn);
+ 	int (*remove_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 66de875d3de1..e3682794adda 100644
+index e3682794adda..0ac2a4911fd1 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -953,6 +953,14 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- 	return true;
+@@ -588,23 +588,34 @@ static int __must_check __set_private_spte_present(struct kvm *kvm, tdp_ptep_t s
+ {
+ 	bool was_present = is_shadow_present_pte(old_spte);
+ 	bool is_present = is_shadow_present_pte(new_spte);
++	bool was_leaf = was_present && is_last_spte(old_spte, level);
+ 	bool is_leaf = is_present && is_last_spte(new_spte, level);
+ 	kvm_pfn_t new_pfn = spte_to_pfn(new_spte);
++	void *private_spt;
+ 	int ret = 0;
+ 
+ 	lockdep_assert_held(&kvm->mmu_lock);
+-	/* TDP MMU doesn't change present -> present */
+-	KVM_BUG_ON(was_present, kvm);
+ 
+ 	/*
+ 	 * Use different call to either set up middle level
+ 	 * private page table, or leaf.
+ 	 */
+-	if (is_leaf)
++	if (level > PG_LEVEL_4K && was_leaf && !is_leaf) {
++		/*
++		 * splitting large page into 4KB.
++		 * tdp_mmu_split_huge_page() => tdp_mmu_link_sp()
++		 */
++		private_spt = get_private_spt(gfn, new_spte, level);
++		KVM_BUG_ON(!private_spt, kvm);
++		ret = static_call(kvm_x86_zap_private_spte)(kvm, gfn, level);
++		kvm_flush_remote_tlbs(kvm);
++		if (!ret)
++			ret = static_call(kvm_x86_split_private_spt)(kvm, gfn,
++								     level, private_spt);
++	} else if (is_leaf)
+ 		ret = static_call(kvm_x86_set_private_spte)(kvm, gfn, level, new_pfn);
+ 	else {
+-		void *private_spt = get_private_spt(gfn, new_spte, level);
+-
++		private_spt = get_private_spt(gfn, new_spte, level);
+ 		KVM_BUG_ON(!private_spt, kvm);
+ 		ret = static_call(kvm_x86_link_private_spt)(kvm, gfn, level, private_spt);
+ 	}
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 6941e9483e7e..88af64658a9c 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -1650,6 +1650,30 @@ static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
+ 	return 0;
  }
  
++static int tdx_sept_split_private_spt(struct kvm *kvm, gfn_t gfn,
++				      enum pg_level level, void *private_spt)
++{
++	int tdx_level = pg_level_to_tdx_sept_level(level);
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++	gpa_t gpa = gfn_to_gpa(gfn) & KVM_HPAGE_MASK(level);
++	hpa_t hpa = __pa(private_spt);
++	struct tdx_module_args out;
++	u64 err;
 +
-+static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
-+						       struct tdp_iter *iter,
-+						       bool shared);
++	/* See comment in tdx_sept_set_private_spte() to pin pages. */
++	do {
++		err = tdh_mem_page_demote(kvm_tdx->tdr_pa, gpa, tdx_level, hpa, &out);
++	} while (err == TDX_INTERRUPTED_RESTARTABLE);
++	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
++		return -EAGAIN;
++	if (KVM_BUG_ON(err, kvm)) {
++		pr_tdx_error(TDH_MEM_PAGE_DEMOTE, err, &out);
++		return -EIO;
++	}
 +
-+static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
-+				   struct kvm_mmu_page *sp, bool shared);
++	return 0;
++}
 +
- /*
-  * If can_yield is true, will release the MMU lock and reschedule if the
-  * scheduler needs the CPU or there is contention on the MMU lock. If this
-@@ -964,14 +972,16 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- 			      gfn_t start, gfn_t end, bool can_yield, bool flush,
- 			      bool zap_private)
+ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
+ 				      enum pg_level level)
  {
-+	bool is_private = is_private_sp(root);
-+	struct kvm_mmu_page *split_sp = NULL;
- 	struct tdp_iter iter;
+@@ -1663,8 +1687,6 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	if (unlikely(!is_hkid_assigned(kvm_tdx)))
+ 		return 0;
  
- 	end = min(end, tdp_mmu_max_gfn_exclusive());
+-	/* For now large page isn't supported yet. */
+-	WARN_ON_ONCE(level != PG_LEVEL_4K);
+ 	err = tdh_mem_range_block(kvm_tdx->tdr_pa, gpa, tdx_level, &out);
+ 	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
+ 		return -EAGAIN;
+@@ -3308,6 +3330,7 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
  
- 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 	x86_ops->link_private_spt = tdx_sept_link_private_spt;
+ 	x86_ops->free_private_spt = tdx_sept_free_private_spt;
++	x86_ops->split_private_spt = tdx_sept_split_private_spt;
+ 	x86_ops->set_private_spte = tdx_sept_set_private_spte;
+ 	x86_ops->remove_private_spte = tdx_sept_remove_private_spte;
+ 	x86_ops->zap_private_spte = tdx_sept_zap_private_spte;
+diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+index 19f2deafde5b..bb324f744bbf 100644
+--- a/arch/x86/kvm/vmx/tdx_arch.h
++++ b/arch/x86/kvm/vmx/tdx_arch.h
+@@ -21,6 +21,7 @@
+ #define TDH_MNG_CREATE			9
+ #define TDH_VP_CREATE			10
+ #define TDH_MNG_RD			11
++#define TDH_MEM_PAGE_DEMOTE		15
+ #define TDH_MR_EXTEND			16
+ #define TDH_MR_FINALIZE			17
+ #define TDH_VP_FLUSH			18
+diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
+index 5366bf476d2c..416708e6cbb7 100644
+--- a/arch/x86/kvm/vmx/tdx_errno.h
++++ b/arch/x86/kvm/vmx/tdx_errno.h
+@@ -11,6 +11,7 @@
+  */
+ #define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
+ #define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
++#define TDX_INTERRUPTED_RESTARTABLE		0x8000000400000000ULL
+ #define TDX_OPERAND_INVALID			0xC000010000000000ULL
+ #define TDX_OPERAND_BUSY			0x8000020000000000ULL
+ #define TDX_PREVIOUS_TLB_EPOCH_BUSY		0x8000020100000000ULL
+diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
+index ef4748943ac7..d8f0d9aa7439 100644
+--- a/arch/x86/kvm/vmx/tdx_ops.h
++++ b/arch/x86/kvm/vmx/tdx_ops.h
+@@ -241,6 +241,19 @@ static inline u64 tdh_mng_rd(hpa_t tdr, u64 field, struct tdx_module_args *out)
+ 	return tdx_seamcall(TDH_MNG_RD, &in, out);
+ }
  
--	WARN_ON_ONCE(zap_private && !is_private_sp(root));
--	if (!zap_private && is_private_sp(root))
-+	WARN_ON_ONCE(zap_private && !is_private);
-+	if (!zap_private && is_private)
- 		return false;
- 
- 	/*
-@@ -995,12 +1005,56 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- 		    !is_last_spte(iter.old_spte, iter.level))
- 			continue;
- 
-+		if (is_private && kvm_gfn_shared_mask(kvm) &&
-+		    is_large_pte(iter.old_spte)) {
-+			gfn_t gfn = iter.gfn & ~kvm_gfn_shared_mask(kvm);
-+			gfn_t mask = KVM_PAGES_PER_HPAGE(iter.level) - 1;
-+			struct kvm_memory_slot *slot;
-+			struct kvm_mmu_page *sp;
++static inline u64 tdh_mem_page_demote(hpa_t tdr, gpa_t gpa, int level, hpa_t page,
++				      struct tdx_module_args *out)
++{
++	struct tdx_module_args in = {
++		.rcx = gpa | level,
++		.rdx = tdr,
++		.r8 = page,
++	};
 +
-+			slot = gfn_to_memslot(kvm, gfn);
-+			if (kvm_hugepage_test_mixed(slot, gfn, iter.level) ||
-+			    (gfn & mask) < start ||
-+			    end < (gfn & mask) + KVM_PAGES_PER_HPAGE(iter.level)) {
-+				WARN_ON_ONCE(!can_yield);
-+				if (split_sp) {
-+					sp = split_sp;
-+					split_sp = NULL;
-+					sp->role = tdp_iter_child_role(&iter);
-+				} else {
-+					WARN_ON(iter.yielded);
-+					if (flush && can_yield) {
-+						kvm_flush_remote_tlbs(kvm);
-+						flush = false;
-+					}
-+					sp = tdp_mmu_alloc_sp_for_split(kvm, &iter, false);
-+					if (iter.yielded) {
-+						split_sp = sp;
-+						continue;
-+					}
-+				}
-+				KVM_BUG_ON(!sp, kvm);
++	tdx_clflush_page(page, PG_LEVEL_4K);
++	return tdx_seamcall_sept(TDH_MEM_PAGE_DEMOTE, &in, out);
++}
 +
-+				tdp_mmu_init_sp(sp, iter.sptep, iter.gfn);
-+				if (tdp_mmu_split_huge_page(kvm, &iter, sp, false)) {
-+					/* force retry on this gfn. */
-+					iter.yielded = true;
-+					split_sp = sp;
-+				} else
-+					flush = true;
-+				continue;
-+			}
-+		}
-+
- 		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
- 		flush = true;
- 	}
- 
- 	rcu_read_unlock();
- 
-+	if (split_sp)
-+		tdp_mmu_free_sp(split_sp);
-+
- 	/*
- 	 * Because this flow zaps _only_ leaf SPTEs, the caller doesn't need
- 	 * to provide RCU protection as no 'struct kvm_mmu_page' will be freed.
-@@ -1617,8 +1671,6 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
- 	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
- 	KVM_BUG_ON(kvm_mmu_page_role_is_private(role) !=
- 		   is_private_sptep(iter->sptep), kvm);
--	/* TODO: Large page isn't supported for private SPTE yet. */
--	KVM_BUG_ON(kvm_mmu_page_role_is_private(role), kvm);
- 
- 	/*
- 	 * Since we are allocating while under the MMU lock we have to be
+ static inline u64 tdh_mr_extend(hpa_t tdr, gpa_t gpa,
+ 				struct tdx_module_args *out)
+ {
 -- 
 2.25.1
 
