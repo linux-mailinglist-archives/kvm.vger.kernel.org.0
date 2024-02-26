@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9902-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9910-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90F198679D0
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:15:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DE9D867A39
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 16:28:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43D48B30500
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:51:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FCFBB31EF6
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C7613959D;
-	Mon, 26 Feb 2024 14:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A416213F001;
+	Mon, 26 Feb 2024 14:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NT6QslRW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iaUtwL3H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0D013957D;
-	Mon, 26 Feb 2024 14:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E24C13DB90;
+	Mon, 26 Feb 2024 14:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958207; cv=none; b=b/7STdHRXFy652//vztELCH3Qw6jsI9hECkMwqQbn08JoukQinEoXj1soY2/X3/gx4POJsKjDtjjHtOIHCz5ZEfIAGtQFVgLzaEjIJC7OKKdY/2UwBBJ8b4irTYCfDqQM8gT4S975vZ4TkJ99xXGBeTRTDTjQ9U3iS2EjE7Q/ec=
+	t=1708958232; cv=none; b=YpOYci3PazI3ktCmaYD6Y01eRCZ/esQ5abmVZqX1ox/fLM785zIKlI6PIWWQO5Jj+L/R4rSeMjA0RHBNTtg0pAxavDFZcFttsLfiB2pZsR2cb29VBUpw/Eq+Jd9BaWXEThTIpOCUe/+v/yMgAQp+8hONHvdIVPNju6BB+plWUT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958207; c=relaxed/simple;
-	bh=2EvDgfFMmHJpG+Kyi4MXHgiwVk6T3MZMRKHRe3Ga2WY=;
+	s=arc-20240116; t=1708958232; c=relaxed/simple;
+	bh=dbue2J2vSwgwnN6frugUZa4aGyoh+CRYUv+AVhY+tPQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WDorP+ey4u5aQH85A8Jd6ey6kiWRmI2mBbLzDbW1R9RT+G3hf4KBmHYVNQAJHsvZJpYEz9wS4vSNtEnBN7ep8wm7sL5wGyfZfz/VTmLhY1lJFiYSqGlWnypkHvT+F5rOubzJ3naY6WnRezuMMTgjQKenyo6gC0jYbH1Lg+IO00g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NT6QslRW; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=EGZBVyMSUb4LBTqpvxC+cwtmf2E4WNO3NVmY8v9pNJEyAINaX4euqgjZyHP70xBJ2fDQEk0l0K0XQ3WJMo3pI77IPvvw2WcCwm5cXAqHKrEJ7HckSLXwhC8NYg2WKhJy73REtk0GhNU6Fao16w3RTUuhvRCvpcIhuz+2axkxDdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iaUtwL3H; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6e4c359e48aso1843557b3a.1;
-        Mon, 26 Feb 2024 06:36:45 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1dc91d2384cso10130245ad.1;
+        Mon, 26 Feb 2024 06:37:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958205; x=1709563005; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958230; x=1709563030; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DkYvm4imcF9izb+MCYYTd7W/K0PihGpy1Nsmpgapn0o=;
-        b=NT6QslRWtANR2d4Ug4ofmXD5nRqzASuXvikBU1TIpT2OpKX6UWg9EiYVVjL5PbbD5C
-         TmDjfFRCi9ihAiQz0yQjgWoB5O8ZsWSKfEE8DLPrrRI2BBzyZ44fkQ1i6V0naBhtDRQk
-         XI8cZWYbYccN21jAocswxBqj7P6WRFoOrEgg4apn4XGavX7/Qiv48rRizzyD4KC7WVf3
-         a7eHw+hYUqHMgjw4mlKL4dDOMyXmMX3iV75zWU8qdhshTLt3751Z4dGSlq1YHFcb1nzB
-         b/vttIIBM1TcRiWRbuUEmMpXbgKqwc6lbWpn/bX7JZqiTwGHMr1rYzK6eaDYJiPpADf6
-         KcnQ==
+        bh=O/RvrWbn9sfOzdiVMPXkxTdPgTjoBGXeTTjPXRznq0o=;
+        b=iaUtwL3HBWkfZLhgia7eVWky2Bt1q+VRnkOI03i6l4+Kq6Tbt+ov80oSUJ9w/l5lAw
+         vgYUdRcSbxj1qb6fZaalm0yBeLchpfEkOjqrFCw7sJPJms55QV+IqhRXrE+YSgtBuQOs
+         IrSDpDpdZQOL9gl0gJu9S3+wQmj7yuMOGePnz09jU79JhEH448YOW6EC5J3biu1BI6q8
+         a3JO5ea47znvj2Vwja+A2m+2cqUNFemKfPIs3wwE/lINLv/teIpP4otQQMHaWioWpjZZ
+         QT1sF5UpDGR0NHqHFDvZ8tQCSk5TtGPdFRfc13XcX2A0BFnbcSUPNoXRBcMqgvSPDpXq
+         eYfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958205; x=1709563005;
+        d=1e100.net; s=20230601; t=1708958230; x=1709563030;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DkYvm4imcF9izb+MCYYTd7W/K0PihGpy1Nsmpgapn0o=;
-        b=SM0XOtLqaTy9zRyiMZieLvhZxb3TwajhG33Ukng6jDN18slGQP/7qa2BlAW9DSMnIU
-         kmrDKAUraeLSfGRqrZBb06yPYEE6MFgQij6TMmYy+GFJI3jE0Upgaq0aMVnXu3RzKseE
-         mgp3909Y24qsMzWtCYqSU4rVobTRXgnkw/wrM8nM8FeEjGsr0CU3cheQtufW01Qv3zYj
-         JgrzkL2F4k9j8T6D3lh3RV3Tgle0XPT5BaJuaBzf2nxXF+TiqjfWGkZpfITyRSvg17gZ
-         1V3ddRMMw+2fT2nj8HLitv9uiZFWz3ixAiGNV9EIZZftT/ZJzgdKILsCft8sT4m72IPR
-         qpvg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPgUcagAo/w1WfEhvtN0NyhoyCwivUduOkJ6LZkRkLYX21xTMJfTFw67XDORRpBB+ep0Fpama2QZru/P10GOgHPaXf
-X-Gm-Message-State: AOJu0YyjWBePJ+n776zMwA57o7a0UmGshCvXvUXg95Hbk+8bEgGHZ1ku
-	opF4g5Knga6khk6ZM7KVw/yx/55/R3qTkuPn4XUjDW7kHsILJ+aBGoUawmjL
-X-Google-Smtp-Source: AGHT+IFX6Q1PAX5b88PnbLkr1fmmS4bOoCFR7ZFSnjGP+cqhwuCSK+KLG6OQGg7tbsK8DsGnXYHjxA==
-X-Received: by 2002:a05:6a20:2114:b0:1a0:e4a6:2d86 with SMTP id y20-20020a056a20211400b001a0e4a62d86mr6549874pzy.59.1708958204920;
-        Mon, 26 Feb 2024 06:36:44 -0800 (PST)
-Received: from localhost ([47.89.225.180])
-        by smtp.gmail.com with ESMTPSA id n7-20020aa78a47000000b006e50bbf4e71sm2634040pfa.9.2024.02.26.06.36.44
+        bh=O/RvrWbn9sfOzdiVMPXkxTdPgTjoBGXeTTjPXRznq0o=;
+        b=nT1hYfKW/lVFbcnyFPIcv8nYRiImdWtwpm6IOcnxNGxSxvvFWEMplAYHmg3wlBN/IV
+         QjYx5CCH85Cf5NLOhAj6Bg8Gdj9GJ7W70CuwGA5/Bm8mLjBtuCSKmBXCBy5yrRADgaGT
+         QJ9bng1DjQ69GatF63ItbfFeflZnSJdsKzVzd7Iqo3DNpyW4r+V/c5jhQXyuE4n3aSjw
+         I72BdXn48j59lsmghwnr9EuUesjPTOuzWDmZPLC2Zq3IgwHbiq4B5szfGgQFlk6pZCRB
+         Per7py1tFz3tvELGZepHrbAFk+ubswtS7zYjpKGP6HP2Et2jKfbRlhtEZX/xN+q2Qm/x
+         5PPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUIrqEFkrH/cH9XnRc6uQQ6YAl5xwWKqdHXbsAIevstkU9i3luGfYcUjJn3qlPXZpv4F/WGFn7D6FT9/xyUwKzzNOZ
+X-Gm-Message-State: AOJu0YyFE59fUxicBFi0VSx63hP0KY2/9AAem1wMT88xeE818ZkFskzQ
+	rztK6tHqcWToPy5kU17LoTGUteH3lHDWihkeRpxYozskGg5So2VBXwirA2/T
+X-Google-Smtp-Source: AGHT+IE0Yc9xW1Lt/LivWzFFfjqGKYtZxLFt9+CYuEpG7BYUPujv+WKZLnxBBFYicjNxCLlGbqrD0w==
+X-Received: by 2002:a17:902:ec85:b0:1dc:652d:708f with SMTP id x5-20020a170902ec8500b001dc652d708fmr8356122plg.15.1708958230553;
+        Mon, 26 Feb 2024 06:37:10 -0800 (PST)
+Received: from localhost ([47.254.32.37])
+        by smtp.gmail.com with ESMTPSA id i6-20020a170902eb4600b001dc3c3be4a4sm4031243pli.304.2024.02.26.06.37.09
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:36:44 -0800 (PST)
+        Mon, 26 Feb 2024 06:37:10 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -84,9 +84,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 39/73] KVM: x86/PVM: Handle hypercall for CR3 switching
-Date: Mon, 26 Feb 2024 22:35:56 +0800
-Message-Id: <20240226143630.33643-40-jiangshanlai@gmail.com>
+Subject: [RFC PATCH 47/73] KVM: x86/PVM: Handle the left supported MSRs in msrs_to_save_base[]
+Date: Mon, 26 Feb 2024 22:36:04 +0800
+Message-Id: <20240226143630.33643-48-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -100,94 +100,89 @@ Content-Transfer-Encoding: 8bit
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-If the guest uses the same page table for supervisor mode and user mode,
-then the user mode can access the supervisor mode address space.
-Therefore, for safety, the guest needs to provide two different page
-tables for one process, which is similar to KPTI. When switching CR3
-during the process switching, the guest uses the hypercall to provide
-the two page tables for the hypervisor, and then the hypervisor can
-switch CR3 during the mode switch automatically. Additionally, an extra
-flag is introduced to perform TLB flushing at the same time.
+The MSR_TSC_AUX is allowed to be modified by the guest to support
+RDTSCP/RDPID in the guest. However, the MSR_IA32_FEAT_CTRL is not fully
+supported for the guest at this time; only the FEAT_CTL_LOCKED bit is
+valid for the guest.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/pvm/pvm.c | 41 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 40 insertions(+), 1 deletion(-)
+ arch/x86/kvm/pvm/pvm.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/arch/x86/kvm/pvm/pvm.c b/arch/x86/kvm/pvm/pvm.c
-index 8d8c783c72b5..ad08643c098a 100644
+index fd3d6f7301af..a32d2728eb02 100644
 --- a/arch/x86/kvm/pvm/pvm.c
 +++ b/arch/x86/kvm/pvm/pvm.c
-@@ -1459,6 +1459,42 @@ static void pvm_flush_tlb_guest_current_kernel_user(struct kvm_vcpu *vcpu)
- 	kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
+@@ -854,6 +854,32 @@ static void pvm_msr_filter_changed(struct kvm_vcpu *vcpu)
+ 	/* Accesses to MSRs are emulated in hypervisor, nothing to do here. */
  }
  
-+/*
-+ * Hypercall: PVM_HC_LOAD_PGTBL
-+ *	Load two PGDs into the current CR3 and MSR_PVM_SWITCH_CR3.
-+ *
-+ * Arguments:
-+ *	flags:	bit0: flush the TLBs tagged with @pgd and @user_pgd.
-+ *		bit1: 4 (bit1=0) or 5 (bit1=1 && cpuid_has(LA57)) level paging.
-+ *	pgd: to be loaded into CR3.
-+ *	user_pgd: to be loaded into MSR_PVM_SWITCH_CR3.
-+ */
-+static int handle_hc_load_pagetables(struct kvm_vcpu *vcpu, unsigned long flags,
-+				     unsigned long pgd, unsigned long user_pgd)
++static inline bool is_pvm_feature_control_msr_valid(struct vcpu_pvm *pvm,
++						    struct msr_data *msr_info)
 +{
-+	struct vcpu_pvm *pvm = to_pvm(vcpu);
-+	unsigned long cr4 = vcpu->arch.cr4;
++	/*
++	 * currently only FEAT_CTL_LOCKED bit is valid, maybe
++	 * vmx, sgx and mce associated bits can be valid when those features
++	 * are supported for guest.
++	 */
++	u64 valid_bits = pvm->msr_ia32_feature_control_valid_bits;
 +
-+	if (!(flags & 2))
-+		cr4 &= ~X86_CR4_LA57;
-+	else if (guest_cpuid_has(vcpu, X86_FEATURE_LA57))
-+		cr4 |= X86_CR4_LA57;
++	if (!msr_info->host_initiated &&
++	    (pvm->msr_ia32_feature_control & FEAT_CTL_LOCKED))
++		return false;
 +
-+	if (cr4 != vcpu->arch.cr4) {
-+		vcpu->arch.cr4 = cr4;
-+		kvm_mmu_reset_context(vcpu);
-+	}
++	return !(msr_info->data & ~valid_bits);
++}
 +
-+	kvm_mmu_new_pgd(vcpu, pgd);
-+	vcpu->arch.cr3 = pgd;
-+	pvm->msr_switch_cr3 = user_pgd;
-+
-+	if (flags & 1)
-+		pvm_flush_tlb_guest_current_kernel_user(vcpu);
-+
-+	return 1;
++static void pvm_update_uret_msr(struct vcpu_pvm *pvm, unsigned int slot,
++				u64 data, u64 mask)
++{
++	preempt_disable();
++	if (pvm->loaded_cpu_state)
++		kvm_set_user_return_msr(slot, data, mask);
++	preempt_enable();
 +}
 +
  /*
-  * Hypercall: PVM_HC_TLB_FLUSH
-  *	Flush all TLBs.
-@@ -1540,7 +1576,7 @@ static int handle_exit_syscall(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_pvm *pvm = to_pvm(vcpu);
- 	unsigned long rip = kvm_rip_read(vcpu);
--	unsigned long a0, a1;
-+	unsigned long a0, a1, a2;
- 
- 	if (!is_smod(pvm))
- 		return do_pvm_user_event(vcpu, PVM_SYSCALL_VECTOR, false, 0);
-@@ -1552,6 +1588,7 @@ static int handle_exit_syscall(struct kvm_vcpu *vcpu)
- 
- 	a0 = kvm_rbx_read(vcpu);
- 	a1 = kvm_r10_read(vcpu);
-+	a2 = kvm_rdx_read(vcpu);
- 
- 	// handle hypercall, check it for pvm hypercall and then kvm hypercall
- 	switch (kvm_rax_read(vcpu)) {
-@@ -1559,6 +1596,8 @@ static int handle_exit_syscall(struct kvm_vcpu *vcpu)
- 		return handle_hc_interrupt_window(vcpu);
- 	case PVM_HC_IRQ_HALT:
- 		return handle_hc_irq_halt(vcpu);
-+	case PVM_HC_LOAD_PGTBL:
-+		return handle_hc_load_pagetables(vcpu, a0, a1, a2);
- 	case PVM_HC_TLB_FLUSH:
- 		return handle_hc_flush_tlb_all(vcpu);
- 	case PVM_HC_TLB_FLUSH_CURRENT:
+  * Reads an msr value (of 'msr_index') into 'msr_info'.
+  * Returns 0 on success, non-0 otherwise.
+@@ -899,9 +925,15 @@ static int pvm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_SYSENTER_ESP:
+ 		msr_info->data = pvm->unused_MSR_IA32_SYSENTER_ESP;
+ 		break;
++	case MSR_TSC_AUX:
++		msr_info->data = pvm->msr_tsc_aux;
++		break;
+ 	case MSR_IA32_DEBUGCTLMSR:
+ 		msr_info->data = 0;
+ 		break;
++	case MSR_IA32_FEAT_CTL:
++		msr_info->data = pvm->msr_ia32_feature_control;
++		break;
+ 	case MSR_PVM_VCPU_STRUCT:
+ 		msr_info->data = pvm->msr_vcpu_struct;
+ 		break;
+@@ -988,9 +1020,18 @@ static int pvm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_SYSENTER_ESP:
+ 		pvm->unused_MSR_IA32_SYSENTER_ESP = data;
+ 		break;
++	case MSR_TSC_AUX:
++		pvm->msr_tsc_aux = data;
++		pvm_update_uret_msr(pvm, 1, data, -1ull);
++		break;
+ 	case MSR_IA32_DEBUGCTLMSR:
+ 		/* It is ignored now. */
+ 		break;
++	case MSR_IA32_FEAT_CTL:
++		if (!is_intel || !is_pvm_feature_control_msr_valid(pvm, msr_info))
++			return 1;
++		pvm->msr_ia32_feature_control = data;
++		break;
+ 	case MSR_MISC_FEATURES_ENABLES:
+ 		ret = kvm_set_msr_common(vcpu, msr_info);
+ 		if (!ret)
 -- 
 2.19.1.6.gb485710b
 
