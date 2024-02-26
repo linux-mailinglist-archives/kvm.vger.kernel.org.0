@@ -1,334 +1,126 @@
-Return-Path: <kvm+bounces-9613-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9614-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18FE86699C
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 06:20:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F0248669AD
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 06:26:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 072F7B20E8B
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 05:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B9441C21586
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 05:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328721BC20;
-	Mon, 26 Feb 2024 05:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F041BC20;
+	Mon, 26 Feb 2024 05:25:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="QEJQDf37"
+	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="VwgvDp6S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC871B800
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 05:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1F61B7E5;
+	Mon, 26 Feb 2024 05:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708924804; cv=none; b=PvHuUK4yZ8AcmNeKzGSLMP8x4fCSynqanxkEpGRUYEFANYsD6dBYMDIum879/fY8keCh8woO9k7H84BcvEuK4yE/c5m1OE5Us2D4q+D8gWV0eotFXSN2jMIb0EXMuLPukS/y2XCwpkYT0b5l1Nd67K3bazqb8fsT4ZPkd+ls/Ls=
+	t=1708925158; cv=none; b=P8E0QzGNQXcc7nieGAtkt+V0wRxNEs0hvpm3Xv92ZupdoYj2Q3bQSgroxu9PdvPXNVYdcJa9xGVUjkwmGisi7WX4tf2FQ90bG7Qd9svPv++Hv/yTQZET5KwKsDRjAFogQexmgD7v1hLBf776EB7n6eHkWhq/fWguOtiuhQVpC4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708924804; c=relaxed/simple;
-	bh=/PgP2P0hX/+bEV3aU0WEL7b5JNAP3+sF8FKj2czw6Ho=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B5jjgsIvWFB9SHFkU9v8TpW/wH/z3LDktnsx3f+a7PTuYX7jMgLYVSl4jeNprR9vqYghnljLpt9ZLoBqHrmZGHik/0cINwL8KbvXbk0mt+fCcF8PSxwyjq3addpvyPMVYmTqggSdeLS2Q3UlJY49/TV9wicI0hGyvf1xEn9YMkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=QEJQDf37; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7c7c984699fso31935639f.1
-        for <kvm@vger.kernel.org>; Sun, 25 Feb 2024 21:20:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1708924800; x=1709529600; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fvD9c59bJDsB22IC2oo8c8Y8bED38e+VeFaxxSdJnPM=;
-        b=QEJQDf37iHkMJROnf8Q+UJvZI2C6Gz2ji+uywr0fhIn0r5dSI+gmdu8ASiO/xjaUOL
-         ofb8cf0m9VUhr1yydEqCgmV4C13HKUNBy462EOYNnfiW6+p8f482qYid3PxV6+L74NDb
-         7yfAX20A61KtkADDIpewZYTeZlxq1BuYAQLgNzHtS1CQRg6aXH7Lm6N6TM6pzNcELU4f
-         quXzvcDiK7vhZsJ9/Jts6kux1AOJ+Vg2kpCKTAfUNJHcAOyg+13r8gGwGkHW1X0QjZTb
-         Kk66QkPNl92PD0EL7lApa+SkD6QXRyuZ0G4KeKqJnnUX6gU44Weqk/HC3f6uCRdYJmi+
-         N8/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708924800; x=1709529600;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fvD9c59bJDsB22IC2oo8c8Y8bED38e+VeFaxxSdJnPM=;
-        b=waPoywolwfA0LWav9H8uJDieDFv72RAIr+m+Litb12slD3c17gGnAarn3fqJB1ztAz
-         yH+HadkXVvL7ih48rWNqtD1K20gFQfCz7tOaOa1jqfltzyThRN09f2PkCAgqjUIKYCxH
-         FVMQjz+6O3WpHeSBVsKiNF/XVjeqK0UlmpQh0YnIrmepipsBB8hEjECfP7OcHKawNC6i
-         0MGI3VfI6A95LYiHYoWfaicPYiDcNRJlG6+/QJ45TdcZFScA7h8rRjg7sbk/zscH3hNl
-         tXDKZEP0kjrGrDZmq8bRzZhjJ4fAzuFDrZZIlz6YxLpzONAzi8jEb6EGJln4ApGSeRZa
-         sDcA==
-X-Forwarded-Encrypted: i=1; AJvYcCXMHqs5Heil7bLrtrc4eo7zivog4FVMNstqkP+1+1gViOXZY/jW57oyRVFVSwn4prHNKgdHkyXM5h9sEZ2AUioA6WJK
-X-Gm-Message-State: AOJu0YzYoT1DGTXBw1GYJZoUP7NaP+v2oc2WXR+mQby2Z8/YzCETeqAT
-	lO7Gf+MB+uD3LOr2CR3aAlT45zMvL+VFkPDDpeINRfyG6VrZ/ZJouhRwKo8G7S68O4H2gW3q543
-	LJL4o9HuJpKvv5zHwvh2U4bG36NGHVqj9CvT2kg==
-X-Google-Smtp-Source: AGHT+IFhPWWZbPSpZ41rJEGw9JQOC3MSyyZstWUE8ZQsGCxE1OndwcIjQLNxLORidft8I/HoA5DyZytqJFxaLx8Id3o=
-X-Received: by 2002:a05:6e02:d0d:b0:364:216e:d1dc with SMTP id
- g13-20020a056e020d0d00b00364216ed1dcmr6656541ilj.22.1708924800237; Sun, 25
- Feb 2024 21:20:00 -0800 (PST)
+	s=arc-20240116; t=1708925158; c=relaxed/simple;
+	bh=unQ2LQsYSP+PhMQIlc9dBDKLvTxY8sUnH0tFh+ISuH0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tbka5yPIv93mCf6sa5J0fdKJvISoIoU4e5pFfaDmbbPXDoKXapjFNyN/ZZLXaPtmRreZkT1KJJqLj+qUGxPmBvAUodgbmqqLarFnn/32Y1o4PvXxgNgegYoAxb7YQLnRGXZapBFx2bB2lcQprdNa6v6kdHJALtK2ErbSg31N8ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=VwgvDp6S; arc=none smtp.client-ip=115.28.160.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
+	t=1708925147; bh=unQ2LQsYSP+PhMQIlc9dBDKLvTxY8sUnH0tFh+ISuH0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VwgvDp6SUHfPOigpuhE1gpc9zmD7L8Ki4mPHj0Aa6Fk6HhSyNB+aF4vyQP2c629Lc
+	 DqaOuHpjb3R4vLU7nPILjQgz3zVoi04gxYQ2m0t3LBQhvJrWezX32liQzCeITwrB4d
+	 /3PMn1gvzMwvq1zEWUCp69t/bdu8qmT3ZSH6B+uQ=
+Received: from [IPV6:240e:388:8d00:6500:68e:73ae:46e1:716] (unknown [IPv6:240e:388:8d00:6500:68e:73ae:46e1:716])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 7EDB26006F;
+	Mon, 26 Feb 2024 13:25:47 +0800 (CST)
+Message-ID: <d8994f0f-d789-46d2-bc4d-f9b37fb396ff@xen0n.name>
+Date: Mon, 26 Feb 2024 13:25:47 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1705916069.git.haibo1.xu@intel.com> <68856b86a93a4188558e5d0ebac0dd6aac8e404c.1705916069.git.haibo1.xu@intel.com>
- <CAOnJCULwRTSnrQkR2o1P53R=tJ3TAxX+y+XRBesW6OFEzgFv2g@mail.gmail.com>
- <CAJve8om2oOLg5-wKX7m7cBTgzwqiMcb35x=nDi1edY8evXjyMw@mail.gmail.com> <2c96c61a-2685-4cee-9cef-963ed833bf92@rivosinc.com>
-In-Reply-To: <2c96c61a-2685-4cee-9cef-963ed833bf92@rivosinc.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Mon, 26 Feb 2024 10:49:48 +0530
-Message-ID: <CAAhSdy2TVSt=gCJRf78AzXNVFKy8MGJ+QspSEHeedT7GPAYkUQ@mail.gmail.com>
-Subject: Re: [PATCH v5 11/12] KVM: riscv: selftests: Change vcpu_has_ext to a
- common function
-To: Atish Patra <atishp@rivosinc.com>
-Cc: Haibo Xu <xiaobo55x@gmail.com>, Atish Patra <atishp@atishpatra.org>, 
-	Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Guo Ren <guoren@kernel.org>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>, 
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Conor Dooley <conor.dooley@microchip.com>, 
-	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
-	Jisheng Zhang <jszhang@kernel.org>, Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, 
-	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
-	Aaron Lewis <aaronlewis@google.com>, 
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 3/6] LoongArch: KVM: Add cpucfg area for kvm hypervisor
+Content-Language: en-US
+To: maobibo <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org
+References: <20240222032803.2177856-1-maobibo@loongson.cn>
+ <20240222032803.2177856-4-maobibo@loongson.cn>
+ <CAAhV-H5eqXMqTYVb6cAVqOsDNcEDeP9HzaMKw69KFQeVaAYEdA@mail.gmail.com>
+ <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
+From: WANG Xuerui <kernel@xen0n.name>
+In-Reply-To: <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 21, 2024 at 2:07=E2=80=AFPM Atish Patra <atishp@rivosinc.com> w=
-rote:
->
-> On 2/20/24 18:13, Haibo Xu wrote:
-> > On Wed, Feb 21, 2024 at 7:03=E2=80=AFAM Atish Patra <atishp@atishpatra.=
-org> wrote:
-> >>
-> >> On Mon, Jan 22, 2024 at 1:48=E2=80=AFAM Haibo Xu <haibo1.xu@intel.com>=
- wrote:
-> >>>
-> >>> Move vcpu_has_ext to the processor.c and rename it to __vcpu_has_ext
-> >>> so that other test cases can use it for vCPU extension check.
-> >>>
-> >>> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> >>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> >>> ---
-> >>>   tools/testing/selftests/kvm/include/riscv/processor.h |  2 ++
-> >>>   tools/testing/selftests/kvm/lib/riscv/processor.c     | 10 ++++++++=
-++
-> >>>   tools/testing/selftests/kvm/riscv/get-reg-list.c      | 11 +-------=
----
-> >>>   3 files changed, 13 insertions(+), 10 deletions(-)
-> >>>
-> >>> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/=
-tools/testing/selftests/kvm/include/riscv/processor.h
-> >>> index b68b1b731a34..bd27e1c67579 100644
-> >>> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> >>> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> >>> @@ -42,6 +42,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type, =
-uint64_t idx,
-> >>>   #define RISCV_ISA_EXT_REG(idx) __kvm_reg_id(KVM_REG_RISCV_ISA_EXT, =
-\
-> >>>                                               idx, KVM_REG_SIZE_ULONG=
-)
-> >>>
-> >>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
-> >>> +
-> >>>   struct ex_regs {
-> >>>          unsigned long ra;
-> >>>          unsigned long sp;
-> >>> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tool=
-s/testing/selftests/kvm/lib/riscv/processor.c
-> >>> index 39a1e9902dec..dad73ce18164 100644
-> >>> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> >>> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> >>> @@ -15,6 +15,16 @@
-> >>>
-> >>>   static vm_vaddr_t exception_handlers;
-> >>>
-> >>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> >>> +{
-> >>> +       unsigned long value =3D 0;
-> >>> +       int ret;
-> >>> +
-> >>> +       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> >>> +
-> >>> +       return !ret && !!value;
-> >>> +}
-> >>> +
-> >>
-> >> Not sure what was the base patch on which this was rebased. The actual
-> >> commit in the queue branch looks different.
-> >>
-> >
-> > This patch set was based on 6.7-rc8.
-> >
-> >> https://github.com/kvm-riscv/linux/commit/5563517cc2012e3326411b360c99=
-24d3f2706c8d
-> >>
-> >> Both seem to have the same bug though the tests fail now and require
-> >> the following fix.
-> >> The ext id should be uint64_t and we need to pass ext directly so that
-> >> SBI extension tests can also pass.
-> >>
-> >
-> > It's weird that 6.7-rc8 has already included Andrew's change on the ISA=
- ext reg,
-> > but this patch was not generated against his change.
-> >
-> > commit bdf6aa328f137e184b0fce607fd585354c3742f1
-> > Author: Andrew Jones <ajones@ventanamicro.com>
-> > Date:   Wed Dec 13 18:09:58 2023 +0100
-> >
-> >      RISC-V: KVM: selftests: Treat SBI ext regs like ISA ext regs
-> >
-> > Anyway, your changes were right. Please go ahead to include them when m=
-erging.
-> >
->
-> I am not sure what happened. Probably, a merge conflict issue.
->
-> I just realized I forgot to copy paste another fix in arch timer
->
-> +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
-> @@ -85,7 +85,7 @@ struct kvm_vm *test_vm_create(void)
->          int nr_vcpus =3D test_args.nr_vcpus;
->
->          vm =3D vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
-> -       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0], KVM_RISCV_ISA_EXT_SSTC),
-> +       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0],
-> RISCV_ISA_EXT_REG(KVM_RISCV_ISA_EXT_SSTC)),
+Hi,
 
-I have squashed this change into an existing commit in riscv_kvm_queue.
+On 2/26/24 10:04, maobibo wrote:
+> On 2024/2/24 下午5:13, Huacai Chen wrote:
+>> Hi, Bibo,
+>>
+>> On Thu, Feb 22, 2024 at 11:28 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>
+>>> Instruction cpucfg can be used to get processor features. And there
+>>> is trap exception when it is executed in VM mode, and also it is
+>>> to provide cpu features to VM. On real hardware cpucfg area 0 - 20
+>>> is used.  Here one specified area 0x40000000 -- 0x400000ff is used
+>>> for KVM hypervisor to privide PV features, and the area can be extended
+>>> for other hypervisors in future. This area will never be used for
+>>> real HW, it is only used by software.
+>> After reading and thinking, I find that the hypercall method which is
+>> used in our productive kernel is better than this cpucfg method.
+>> Because hypercall is more simple and straightforward, plus we don't
+>> worry about conflicting with the real hardware.
+> No, I do not think so. cpucfg is simper than hypercall, hypercall can
+> be in effect when system runs in guest mode. In some scenario like TCG 
+> mode, hypercall is illegal intruction, however cpucfg can work.
 
-Thanks,
-Anup
+While the CPUCFG instruction is universally available, it's also 
+unprivileged, so any additional CPUCFG behavior also automatically 
+becomes UAPI, which likely isn't what you expect. Hypervisor 
+implementation details shouldn't be leaked to userland because it has no 
+reason to care -- even though userland learns about the capabilities, it 
+cannot actually access the resources, because relevant CSRs and/or 
+instructions are privileged. Worse, the unnecessary exposure of 
+information could be a problem security-wise.
 
->
->
-> > Thanks,
-> > Haibo
-> >
-> >>
-> >> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> >> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> >> @@ -48,7 +48,7 @@ static inline uint64_t __kvm_reg_id(uint64_t type,
-> >> uint64_t subtype,
-> >> KVM_REG_RISCV_SBI_SINGLE, \
-> >> idx, KVM_REG_SIZE_ULONG)
-> >>
-> >> -bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
-> >> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext);
-> >>
-> >> struct ex_regs {
-> >> unsigned long ra;
-> >> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> >> b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> >> index 282587cd4bbc..ec66d331a127 100644
-> >> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> >> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> >> @@ -15,12 +15,12 @@
-> >>
-> >> static vm_vaddr_t exception_handlers;
-> >>
-> >> -bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> >> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext)
-> >> {
-> >> unsigned long value =3D 0;
-> >> int ret;
-> >>
-> >> - ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> >> + ret =3D __vcpu_get_reg(vcpu, ext, &value);
-> >>
-> >> return !ret && !!value;
-> >> }
-> >>
-> >> With the above the fix, Both SBI/ISA extension tests pass.
-> >> # ./get-reg-list
-> >> sbi-base: PASS
-> >> sbi-sta: PASS
-> >> sbi-pmu: PASS
-> >> sbi-dbcn: PASS
-> >> aia: PASS
-> >> fp_f: PASS
-> >> fp_d: PASS
-> >> 1..0 # SKIP - h not available, skipping tests
-> >> smstateen: PASS
-> >> sscofpmf: PASS
-> >> sstc: PASS
-> >> 1..0 # SKIP - svinval not available, skipping tests
-> >> 1..0 # SKIP - svnapot not available, skipping tests
-> >> 1..0 # SKIP - svpbmt not available, skipping tests
-> >> zba: PASS
-> >> zbb: PASS
-> >> zbc: PASS
-> >> 1..0 # SKIP - zbkb not available, skipping tests
-> >> 1..0 # SKIP - zbkc not available, skipping tests
-> >> 1..0 # SKIP - zbkx not available, skipping tests
-> >> zbs: PASS
-> >> zfa: PASS
-> >> 1..0 # SKIP - zfh not available, skipping tests
-> >> 1..0 # SKIP - zfhmin not available, skipping tests
-> >> zicbom: PASS
-> >> zicboz: PASS
-> >> zicntr: PASS
-> >> 1..0 # SKIP - zicond not available, skipping tests
-> >> zicsr: PASS
-> >> zifencei: PASS
-> >> zihintntl: PASS
-> >> zihintpause: PASS
-> >> zihpm: PASS
-> >>
-> >>
-> >>>   static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
-> >>>   {
-> >>>          return (v + vm->page_size) & ~(vm->page_size - 1);
-> >>> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools=
-/testing/selftests/kvm/riscv/get-reg-list.c
-> >>> index 25de4b8bc347..ed29ba45588c 100644
-> >>> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> >>> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> >>> @@ -75,15 +75,6 @@ bool check_reject_set(int err)
-> >>>          return err =3D=3D EINVAL;
-> >>>   }
-> >>>
-> >>> -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> >>> -{
-> >>> -       int ret;
-> >>> -       unsigned long value;
-> >>> -
-> >>> -       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> >>> -       return (ret) ? false : !!value;
-> >>> -}
-> >>> -
-> >>>   void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
-> >>>   {
-> >>>          unsigned long isa_ext_state[KVM_RISCV_ISA_EXT_MAX] =3D { 0 }=
-;
-> >>> @@ -111,7 +102,7 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct =
-vcpu_reg_list *c)
-> >>>                  __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(s->feature), =
-1);
-> >>>
-> >>>                  /* Double check whether the desired extension was en=
-abled */
-> >>> -               __TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
-> >>> +               __TEST_REQUIRE(__vcpu_has_ext(vcpu, s->feature),
-> >>>                                 "%s not available, skipping tests\n",=
- s->name);
-> >>>          }
-> >>>   }
-> >>> --
-> >>> 2.34.1
-> >>>
-> >>
-> >>
-> >> --
-> >> Regards,
-> >> Atish
->
+A possible way to preserve the unprivileged CPUCFG behavior would be 
+acting differently based on guest CSR.CRMD.PLV: only returning data for 
+the new configuration space when guest is not in PLV3. But this behavior 
+isn't explicitly allowed nor disallowed in the LoongArch manuals, and is 
+in my opinion unnecessarily complex.
+
+And regarding the lack of hypcall support from QEMU system mode 
+emulation on TCG, I'd argue it's simply a matter of adding support in 
+target/loongarch64. This would be attractive because it will enable easy 
+development and testing of hypervisor software with QEMU -- both locally 
+and in CI.
+
+> Extioi virtualization extension will be added later, cpucfg can be 
+> used to get extioi features. It is unlikely that extioi driver depends 
+> on PARA_VIRT macro if hypercall is used to get features.
+And the EXTIOI feature too isn't something usable from unprivileged 
+code, so I don't think it will affect the conclusions above.
+
+-- 
+WANG "xen0n" Xuerui
+
+Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+
 
