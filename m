@@ -1,202 +1,140 @@
-Return-Path: <kvm+bounces-9836-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9837-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6673886710A
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:30:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DBE286716D
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:39:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18A65287019
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:30:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEF1D1F27100
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B3B5FBB9;
-	Mon, 26 Feb 2024 10:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274AE56763;
+	Mon, 26 Feb 2024 10:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l0hSZJIN"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="LD9y0C60"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECF75FBA0
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 10:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9995456742
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 10:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942496; cv=none; b=qASY+Oyu4rfHTQwktDdkotA3uwrh0OL/HRrWlHnX2FcjZz+sx2qF6vL0rBjXmVwrRvItLU6Vz4WfQChJUMEB/0yV53OET+dsIvU+JeEDuZ1TJ09DXy0MZWEw8Jb2Xn4tQCnBmlevfEJjiy8wLxn8jZarlA3L8FqWB04Vqj6rzfo=
+	t=1708943441; cv=none; b=JZeTDWW3pZFc6er0//DQUgasxAfBX12qX09nzgPys3hnVURGqv/yfGX4Q2hjBwTbH9rU+X/a96ZeDppvdnmv/OPQeJTZn+0j1+tcAh1set0UiI3Hir5I4tfmCsYCF34ZzzLJN6x6/DR+U1fySv95A6Z7itOC19Fqah31ewE5Sec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708942496; c=relaxed/simple;
-	bh=I2a/TP7g1GppWyjQzPyGXpoOO9wJLxVvHSCZCHZQpdo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m7zDomdROhrsTmuNdkYQ8pWLSCPeUGVON5ZgIxW5+jCRpP6YmWM0e5Q2ESz1NRUqpln30JXLpabyaN4AP7b7Iq+IauTZfNk3alCDtsGT8egnT2swyHabnv7IKNyX0r9Dzr8Zi9heLAUZQnBOD3WkqbqaXozy6UcgzkdoScrxQdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l0hSZJIN; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e435542d41so1651752b3a.1
-        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 02:14:54 -0800 (PST)
+	s=arc-20240116; t=1708943441; c=relaxed/simple;
+	bh=3AEg61c9t2RdSbrA3SOYlabwim+w14UVA/dDDZpqvZs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oILfmONbvBMM5qlkG559FweClga5dpoH1P8ExCszkrN+jEYa2ZN4qhtGGCRrCRZ+nYmKtSyPbuNDulF4YVGTb3euVnrN5BANIjEoMYBrHX1mBz0gFqIJHFDs5v74CNIcWBx00zwkgAMZAjs3SUe5jNU2vsbITDhMwZBo2bRU4tY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=LD9y0C60; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3e550ef31cso313417066b.3
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 02:30:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708942494; x=1709547294; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1708943438; x=1709548238; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8oiwxTGWU6IUJhXbPXi9jlCFl9jNsVOAORO/dFL4KH8=;
-        b=l0hSZJINukdfRcQQwS4nbsUhsq19PiH0gXN3TB1IgdyqmtmC+nfYBzT/aFQ9Pae4Vd
-         +QDlZxmHbWk8xIuawvLeVCybc68uKb5SG/HC0CiHyUATf8ASajVRo24mK+9xT6SqnxZJ
-         lu8kAn3Zvg9JMR5qOe+b8TFStuWu/oPEUYk/V8emm6P5i9WnORhJxWXLzVFGWCu6Q7PR
-         IXj/Q076FP2ZpsJ5DJwNIKtelqmz56oyylJdVC0z4bFUR1cA/3RPYQK6Vb9Wr0SWXren
-         GuuGhZwZ3mod/E/sbhFeSUy2SWK7BLITNHPnkR9PGoM5LBVCPl6SgG43G0t4eO0O+0DN
-         JRlQ==
+        bh=Bz6b+eCtgnaUFENSuU3KdIVlMwnoCTOF+cGcVtN0DkI=;
+        b=LD9y0C60HOh1RKDhvMKmtT2nQe+qq2hbqV2q0nc9XCGhJ2wEJ5KveN6fMOpovGmq5C
+         i5dPH6raI2NaBnEG5ymEiHTsrVbSf7bQ0w5lW/VMxst3jZy6alVWpyyCvnpsXHeSJukD
+         hV6TjnjL/fm3eRWGZ8dR+lkgiqzKZOUBDjBhxtQiEXGrV8MOcfgB/ho5m/jsYSa+8cI5
+         nhycQDBOFyooPAbnZhyh9XFncW367sg5bBjf1ByZRWloVxIsa6V8+iGs0tAnMJ+hs4IY
+         0HJ0uAxdsG2TrwXvoDeuvAKIITjPlKU5AMALDEttgL9162t+u7ptmm5Q9ewpGa7Ebpgv
+         TrDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708942494; x=1709547294;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1708943438; x=1709548238;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8oiwxTGWU6IUJhXbPXi9jlCFl9jNsVOAORO/dFL4KH8=;
-        b=q0yFFsebG1fMBEyOEYIFXAfDxclR8Idhbsiw4qxijKKx3cWkiIu2hGsHraUSCn4fmY
-         wMak+SYCalnDcv2751l8kLntHn7Ic5eQdzqbv65Lxz2znMVPwdLwS/BLwE0Up/9UHLNS
-         CBqr8ia4fOOfOHQIdIQbIynXb+NdcYX3/VZ6/n757OO71sygY9cteLlcgsLn02afhZIb
-         2Wed3KR6XQhO+9YnjNo4CfFoo8vqZ4u4ZjPbgAgQccoO4+ZwVczYhScMMl9KFkVepN4i
-         kBIYNN/qzJ5WbrSe3GhB5gQU7lWnEp1ZH2j58tAJJunSXkMv9L1sN79HJu1eYfktmhff
-         0ErQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXiCMeiPrZhtKh/BsU2aQYr1vHWRZSp7UwnlDfQxV2CnPDzm3zBT0A9RJLZmMa5zbkKoet61jR5P8YdDTam9pdxCnhc
-X-Gm-Message-State: AOJu0YxeTDpEGD/rGDQP5SR79i/nHARyJpTOgxAEE2XUwqWVQhF3Xr9y
-	tKHc7MWVlwJ0h3RB73LHKvgHWtTsa+SmkL1SmOwUkRLBHbWo/TNm
-X-Google-Smtp-Source: AGHT+IEdmNJCAyNnb0OHlETxiDPkAQRNZ6Rj92dODzdJv+fmEZif4N25wNv6OUOT4lP8rkt8ITdgiA==
-X-Received: by 2002:a05:6a00:3c86:b0:6e1:3cdb:76f1 with SMTP id lm6-20020a056a003c8600b006e13cdb76f1mr9030138pfb.20.1708942493857;
-        Mon, 26 Feb 2024 02:14:53 -0800 (PST)
-Received: from wheely.local0.net (220-235-194-103.tpgi.com.au. [220.235.194.103])
-        by smtp.gmail.com with ESMTPSA id x24-20020aa784d8000000b006e463414493sm3626693pfn.105.2024.02.26.02.14.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 02:14:53 -0800 (PST)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Joel Stanley <joel@jms.id.au>,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 32/32] powerpc: gitlab CI update
-Date: Mon, 26 Feb 2024 20:12:18 +1000
-Message-ID: <20240226101218.1472843-33-npiggin@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240226101218.1472843-1-npiggin@gmail.com>
-References: <20240226101218.1472843-1-npiggin@gmail.com>
+        bh=Bz6b+eCtgnaUFENSuU3KdIVlMwnoCTOF+cGcVtN0DkI=;
+        b=CQkBH/fgDFqwm69GSjmKJDIkCIyJoDXUG1FWYbgOXqXV8j2xz+S0z+PTbOGTvasGX2
+         2Mi0UbCbzSclZY5FTGD+K9+DKfDdT/sYEvL8k1tBa6V/uZbpTJFVT/kRlAMNNENWWdAN
+         yPJYYb7V3TNwHPCoQumUqWvDTbJ7yUhwQ4D+K65DQYA/hMVPddnLwzbvGWt7cc54E2Xr
+         g256uTPutxpJkvNFYTdzaa3ndsI1Ne+RLo5rKYZ6Hh1Z7GSMTB6q/zbAHXRlKvL88Rdb
+         E3eP5u7unL5TyX4ZAjG1MWYFflxYPlus6JnrRHtuy6+LYfJG28Y5arhKLl+YsdOL8N++
+         4wsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcySoAn96QjzyXlsFa7P0RCHibGe/GekQwP4evI5aNMA11gbIVKWrqxk5sCHz8mN+ERUK6o9Wah4G7S4hb6/ntU3OQ
+X-Gm-Message-State: AOJu0YzsYnnPJYCKJkaP1wJaYlL4zTmjNxw64QvbXaGOEt1q1sR72lo6
+	mE2IgxDotLdN68VrCV1Ha5aWk5l3tdPX6qPKseCQXrgF3u2I1L0tvhUMv9XeyzXBceV2Tsu0/sw
+	BGDw4t/hKE0LpgTPDobmTF9ey5YGk1jn5HJAe+A==
+X-Google-Smtp-Source: AGHT+IFRPov8/cpih2mq251F4b8kRlFyC5NNX1J7o+YMmyopd5NzNTlRC1I0AnsNzV9tfVe1KWjRjh446NXfYck2paE=
+X-Received: by 2002:a17:906:68d2:b0:a3e:5b7f:6d31 with SMTP id
+ y18-20020a17090668d200b00a3e5b7f6d31mr3616604ejr.5.1708943437867; Mon, 26 Feb
+ 2024 02:30:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240115194840.1183077-1-andrew@daynix.com> <20240115172837-mutt-send-email-mst@kernel.org>
+ <20240222150212-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240222150212-mutt-send-email-mst@kernel.org>
+From: Andrew Melnichenko <andrew@daynix.com>
+Date: Mon, 26 Feb 2024 12:30:27 +0200
+Message-ID: <CABcq3pEtW4j60n3jJgkSUDy=VbcfzAbS_4eYMHpEPR2bYU9aww@mail.gmail.com>
+Subject: Re: [PATCH 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yuri.benditovich@daynix.com, yan@daynix.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This adds testing for the powernv machine, and adds a gitlab-ci test
-group instead of specifying all tests in .gitlab-ci.yml.
+Hi all,
+Ok, let me prepare a new patch v2, where I'll write a
+description/analysis of the issue in the commit message.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- .gitlab-ci.yml        | 16 ++++++----------
- powerpc/unittests.cfg | 15 ++++++++-------
- 2 files changed, 14 insertions(+), 17 deletions(-)
-
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 61f196d5d..51a593021 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -69,11 +69,9 @@ build-ppc64be:
-  - cd build
-  - ../configure --arch=ppc64 --endian=big --cross-prefix=powerpc64-linux-gnu-
-  - make -j2
-- - ACCEL=tcg ./run_tests.sh
--     selftest-setup selftest-migration selftest-migration-skip spapr_hcall
--     rtas-get-time-of-day rtas-get-time-of-day-base rtas-set-time-of-day
--     emulator
--     | tee results.txt
-+ - ACCEL=tcg MAX_SMP=8 ./run_tests.sh -g gitlab-ci | tee results.txt
-+ - if grep -q FAIL results.txt ; then exit 1 ; fi
-+ - ACCEL=tcg MAX_SMP=8 MACHINE=powernv ./run_tests.sh -g gitlab-ci | tee results.txt
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- build-ppc64le:
-@@ -82,11 +80,9 @@ build-ppc64le:
-  - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
-  - ./configure --arch=ppc64 --endian=little --cross-prefix=powerpc64-linux-gnu-
-  - make -j2
-- - ACCEL=tcg ./run_tests.sh
--     selftest-setup selftest-migration selftest-migration-skip spapr_hcall
--     rtas-get-time-of-day rtas-get-time-of-day-base rtas-set-time-of-day
--     emulator
--     | tee results.txt
-+ - ACCEL=tcg MAX_SMP=8 ./run_tests.sh -g gitlab-ci | tee results.txt
-+ - if grep -q FAIL results.txt ; then exit 1 ; fi
-+ - ACCEL=tcg MAX_SMP=8 MACHINE=powernv ./run_tests.sh -g gitlab-ci | tee results.txt
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- # build-riscv32:
-diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-index e275f389b..21071a1a1 100644
---- a/powerpc/unittests.cfg
-+++ b/powerpc/unittests.cfg
-@@ -34,17 +34,17 @@
- file = selftest.elf
- smp = 2
- extra_params = -m 1g -append 'setup smp=2 mem=1024'
--groups = selftest
-+groups = selftest gitlab-ci
- 
- [selftest-migration]
- file = selftest-migration.elf
- machine = pseries
--groups = selftest migration
-+groups = selftest migration gitlab-ci
- 
- [selftest-migration-skip]
- file = selftest-migration.elf
- machine = pseries
--groups = selftest migration
-+groups = selftest migration gitlab-ci
- extra_params = -append "skip"
- 
- # This fails due to a QEMU TCG bug so KVM-only until QEMU is fixed upstream
-@@ -56,7 +56,7 @@ groups = migration
- 
- [spapr_hcall]
- file = spapr_hcall.elf
--machine = pseries
-+machine = pseries gitlab-ci
- 
- [spapr_vpa]
- file = spapr_vpa.elf
-@@ -67,24 +67,25 @@ file = rtas.elf
- machine = pseries
- timeout = 5
- extra_params = -append "get-time-of-day date=$(date +%s)"
--groups = rtas
-+groups = rtas gitlab-ci
- 
- [rtas-get-time-of-day-base]
- file = rtas.elf
- machine = pseries
- timeout = 5
- extra_params = -rtc base="2006-06-17" -append "get-time-of-day date=$(date --date="2006-06-17 UTC" +%s)"
--groups = rtas
-+groups = rtas gitlab-ci
- 
- [rtas-set-time-of-day]
- file = rtas.elf
- machine = pseries
- extra_params = -append "set-time-of-day"
- timeout = 5
--groups = rtas
-+groups = rtas gitlab-ci
- 
- [emulator]
- file = emulator.elf
-+groups = gitlab-ci
- 
- [interrupts]
- file = interrupts.elf
--- 
-2.42.0
-
+On Thu, Feb 22, 2024 at 10:02=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
+> wrote:
+>
+> On Mon, Jan 15, 2024 at 05:32:25PM -0500, Michael S. Tsirkin wrote:
+> > On Mon, Jan 15, 2024 at 09:48:40PM +0200, Andrew Melnychenko wrote:
+> > > When the Qemu launched with vhost but without tap vnet_hdr,
+> > > vhost tries to copy vnet_hdr from socket iter with size 0
+> > > to the page that may contain some trash.
+> > > That trash can be interpreted as unpredictable values for
+> > > vnet_hdr.
+> > > That leads to dropping some packets and in some cases to
+> > > stalling vhost routine when the vhost_net tries to process
+> > > packets and fails in a loop.
+> > >
+> > > Qemu options:
+> > >   -netdev tap,vhost=3Don,vnet_hdr=3Doff,...
+> > >
+> > > Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> > > ---
+> > >  drivers/vhost/net.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > > index f2ed7167c848..57411ac2d08b 100644
+> > > --- a/drivers/vhost/net.c
+> > > +++ b/drivers/vhost/net.c
+> > > @@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_v=
+irtqueue *nvq,
+> > >     hdr =3D buf;
+> > >     gso =3D &hdr->gso;
+> > >
+> > > +   if (!sock_hlen)
+> > > +           memset(buf, 0, pad);
+> > > +
+> > >     if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+> > >         vhost16_to_cpu(vq, gso->csum_start) +
+> > >         vhost16_to_cpu(vq, gso->csum_offset) + 2 >
+> >
+> >
+> > Hmm need to analyse it to make sure there are no cases where we leak
+> > some data to guest here in case where sock_hlen is set ...
+>
+>
+> Could you post this analysis pls?
+>
+> > > --
+> > > 2.43.0
+>
 
