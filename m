@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9900-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9901-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE76867908
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:50:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 580FF86790C
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:51:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E9891C28D51
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:50:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 024A3290AC7
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70961386D0;
-	Mon, 26 Feb 2024 14:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202001386D9;
+	Mon, 26 Feb 2024 14:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GB1Mcbht"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eflfwOSF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCDA12CD9D;
-	Mon, 26 Feb 2024 14:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9351386D8;
+	Mon, 26 Feb 2024 14:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958201; cv=none; b=rdt0UKqa0NKfjO+7tZdr9qM40Gn3DCesCiPIawPR4bOkG9nwcvDOYKFU/1lCL4tkVL3IKNekJXTj/6mupN7MhuRtbE89mRY3bZVpEGTvKGJ4UgS0GV4XgvLEXNaimYumupT0x4VkN3GI34GjXL+RBY4zJLY00AFxsmyVcA11WhI=
+	t=1708958204; cv=none; b=Eado+H3YMW6cdMS0OgXnXwBdXjl0hDPmVNDe7VTtjE/kxdG+7iBvg+/I6JUE/x4EzEtf+wUqMvDhLW2V6myem+13N2uDT9b3xlV5muRmfVnNQI9TaNe7eZMhIIliA4n7388MDcjxEqMHU2DRjotDyXiQhIzA/2Zm30ZwqBA+nlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958201; c=relaxed/simple;
-	bh=Pc+HjLDfkMboz1gri9VqQXOqgPnZdAnlcdum7tFbpTQ=;
+	s=arc-20240116; t=1708958204; c=relaxed/simple;
+	bh=l2h4Uf1QXsvH+X3OivH8HCuXCYpvpQ9MT+dXZ1HPxRU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JuLZ64R2Nl5Kh0TWd8FpglwPPvcDWvyLGh9EJgJBcLFqCLlycQfucH95yU8AvNS5gSkfzVwGGSKA3EAcc//7ZCDXbjcCLjqSBVXQQ3O4x+qavZI53YZe33gRMflhXARKsfZnU8TmHyT3BpOUmQ3mi9tupKC8xwdlhNSbApl3m/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GB1Mcbht; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version; b=tzsruJDOY6T8liDuXGFQIyJkOdOmNm+27O5zCdLi9ea+d1/qTP5kE9TfrQcnDRMDAT2x5eDhwtOJW8NHEQ7kJlYJ2+vJNWu8lRLe4UCB1YMRnFAaaTJLC3ZgEMvL96ciliHaEzuTYDACtoF8OMH00wSlFAjvscEyXcSZNZ1b5jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eflfwOSF; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e54451edc6so9825b3a.1;
-        Mon, 26 Feb 2024 06:36:39 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dcb3e6ff3fso732925ad.2;
+        Mon, 26 Feb 2024 06:36:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958198; x=1709562998; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958202; x=1709563002; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PuLDsBuYqqEPmR/eGtiQciHTrvGTXGMZNjGacLqQFso=;
-        b=GB1McbhtC3WDTZqvffoHZUu4vQ0W5EPZ25bpbIvK6jEwxnCZTl3eV/XjdXzGE0VwLH
-         xXliAadMbDVB/3F/DdirwBEoPULAKReZqpbo+95gvLW80yWonnOnzJH/56yv9exjgSua
-         0pCXTb8GR30jS8oSugX8GPh+lJ9KMpGnHLhmz7oxlnTInNEMjevLOlsPCGCWPN89eD1W
-         JeoOlLpQMCnm9vyF5yW0U42qIBCFBWc3DDqxuPhiK/Oly8iX6bbEdfTnBHegvmVdX3ue
-         XUcE91U7Gfh+kPpKtK4o+XqdP+Ml4Wcz4NOVHsNYEb5b3EpTaCtcZYEbI3hR7leXqkfT
-         ygCg==
+        bh=vE7TUqSC7cygcOHG2v4FLYxkyOZYozS8dRRg73DCalE=;
+        b=eflfwOSFX0JBTEgRDJ2aEmSryMAjCO8a4x9oVLL4x4WFrb42kALxfdv1vIAKuOm1nj
+         EYnUad5dl8qMZdDun9jYqTRpaBAsnKWaiT2NrKJg+izvicYGBFEYXsQ2r5JpnAW6A8tx
+         r4r7+Gu85qQR5eux0BsAdOhuKjQ71R7i3FemLnFkG6aiIBCmpRBwiUpe8y70b+/UozgA
+         sSPC8048Khk9HHph1sdpGS/RCj6Vs1QZcD5uAjoa5GbaRuSZTMHwZuUh5AaBv0xFs8Lt
+         rnJRO9hajnTNIIHxXGiHl0JZDPpa8Pugz/4Qa9rLmXIi82h058KYpie0fR3LiVXQrSMU
+         9sYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958198; x=1709562998;
+        d=1e100.net; s=20230601; t=1708958202; x=1709563002;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PuLDsBuYqqEPmR/eGtiQciHTrvGTXGMZNjGacLqQFso=;
-        b=HQzPTfEKceOolE8GlYfXlmHtFhbP6Jc7KM0HCWLhnaaeChi/ooMEd89xs9G/zKWpiy
-         grmy5vivXXyBck+bKCEIqhTtN5Lv3TyydNnNunwa+5Npv9FZA79om+eKvpQhJsRaQ4Xx
-         9rbHz409ORP4rcc7ADNV+D5nf4/+TKWBBerGY7zeBJLjlKxRPMLUBcDIz0lMTLL69LUN
-         4rDVWCjVWBZJvcWeqPY1Bu5agyZHFnPERNVCkDdpDh/bec+Blp4X04m9VkM2qrNr/yLz
-         0U6sty+xVUCEmC2yFyS0Pd0qoHcAnjdAfnDEkQnwryTNvQOQbyx78l5Lfy5OW/FPIsS5
-         ck/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUjK5wCiuC/CytL0CXjUC/pH1EqMf7PPtcBEbv72rxcIPdrhOZfeu916c40rm5pehYkl6RP7opu4MC7Qrb1kytMn7lf
-X-Gm-Message-State: AOJu0YxZfxLyRNuMgHFamxJ2hRPIhF69i5R3PPC4sFtcIcIfHp4QwSXM
-	Cue5npnLZJDERbeZ31kOSjiVoNj3ptQP8+K2mTlCW/tvn50Uil+3wA12QhS2
-X-Google-Smtp-Source: AGHT+IFQ/3bBQbOGHcBQV+UZbU9IzhmalAj69TR3Xp69m0QhVzQTXpB57NuE5HaVWReOIpYQxxz5xg==
-X-Received: by 2002:a05:6a21:2d09:b0:1a0:fd3e:532c with SMTP id tw9-20020a056a212d0900b001a0fd3e532cmr4098092pzb.17.1708958198571;
-        Mon, 26 Feb 2024 06:36:38 -0800 (PST)
-Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id c9-20020a056a00008900b006e4452bd4c6sm4114532pfj.157.2024.02.26.06.36.37
+        bh=vE7TUqSC7cygcOHG2v4FLYxkyOZYozS8dRRg73DCalE=;
+        b=RYhyc+XCq2Qr+7WRvo3PKIi0C5bI+y/qwXlVlfYCuN30FC4sHesFzlUbX4Ui/RUjAR
+         MMX3u4iqzXbs/v0kpRAtwimG/kWljjFjvdqQ60pzvM6XC1vihohh6nIv9/7qkYyGU1tA
+         +D2rqkhxUtTBZYENzC0C6TXOo6TWh2U0VGCD5Tl/D/GkcW7YBZbZIWgCM2SoGQF32aIw
+         qevBQE2P6K+P1PPwmNZ8bfLArLRoYXzscUhwhZcPoTVKfeYXik0C6XnJljAJlL9tXya3
+         tiOgVMImfB6sniEY2TnaB7AW3MG2Kk9CJs/E4Mh2GZyXvq3ibNoi8B6tyDEv6ojCo1jP
+         UFOg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIXVZPW6o3S31OnzNqX0EnZ5zrtyZEA8zGxOczdNhkrfwhujB4XnBU1MkOu1JI53NkHWyaueVnTydGz9uYJKGn7zpG
+X-Gm-Message-State: AOJu0YxlJyreDthb8GsrKgo/QafP0XB/KFZkO52VE0pXKZfesRAw+izP
+	pJZQ51n3owCP7ZWSB+XmhMMGTWD0WeTeeNsp3aT6gmmvChmRDrlaV0JZY2lK
+X-Google-Smtp-Source: AGHT+IFk3I4v14i2M5tN+kC8DAwFWEOf84zfaUbuMiHnbH8kQScS7ykZALTJJr9O2miKstRcIrHpXw==
+X-Received: by 2002:a17:902:e545:b0:1db:7052:2f62 with SMTP id n5-20020a170902e54500b001db70522f62mr7606398plf.50.1708958201844;
+        Mon, 26 Feb 2024 06:36:41 -0800 (PST)
+Received: from localhost ([47.88.5.130])
+        by smtp.gmail.com with ESMTPSA id x2-20020a170902820200b001da34166cd2sm4013128pln.180.2024.02.26.06.36.41
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:36:38 -0800 (PST)
+        Mon, 26 Feb 2024 06:36:41 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -84,9 +84,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 37/73] KVM: x86/PVM: Use host PCID to reduce guest TLB flushing
-Date: Mon, 26 Feb 2024 22:35:54 +0800
-Message-Id: <20240226143630.33643-38-jiangshanlai@gmail.com>
+Subject: [RFC PATCH 38/73] KVM: x86/PVM: Handle hypercalls for privilege instruction emulation
+Date: Mon, 26 Feb 2024 22:35:55 +0800
+Message-Id: <20240226143630.33643-39-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -100,309 +100,158 @@ Content-Transfer-Encoding: 8bit
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Since the host doesn't use all PCIDs, PVM can utilize the host PCID to
-reduce guest TLB flushing. The PCID allocation algorithm in PVM is
-similar to that of the host.
+The privileged instructions in the PVM guest will be trapped and
+emulated. To reduce the emulation overhead, some privileged instructions
+in the hot path, such as RDMSR/WRMSR and TLB flushing related
+instructions, will be replaced by hypercalls to improve performance.
+The handling of those hypercalls is the same as the associated
+privileged instruction emulation.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/pvm/pvm.c | 228 ++++++++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/pvm/pvm.h |   5 +
- 2 files changed, 232 insertions(+), 1 deletion(-)
+ arch/x86/kvm/pvm/pvm.c | 114 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 113 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/pvm/pvm.c b/arch/x86/kvm/pvm/pvm.c
-index 242c355fda8f..2d3785e7f2f3 100644
+index 2d3785e7f2f3..8d8c783c72b5 100644
 --- a/arch/x86/kvm/pvm/pvm.c
 +++ b/arch/x86/kvm/pvm/pvm.c
-@@ -349,6 +349,211 @@ static void pvm_switch_to_host(struct vcpu_pvm *pvm)
- 	preempt_enable();
+@@ -1434,6 +1434,96 @@ static int handle_synthetic_instruction_return_supervisor(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
-+struct host_pcid_one {
++static int handle_hc_interrupt_window(struct kvm_vcpu *vcpu)
++{
++	kvm_make_request(KVM_REQ_EVENT, vcpu);
++	pvm_event_flags_update(vcpu, 0, PVM_EVENT_FLAGS_IP);
++
++	++vcpu->stat.irq_window_exits;
++	return 1;
++}
++
++static int handle_hc_irq_halt(struct kvm_vcpu *vcpu)
++{
++	kvm_set_rflags(vcpu, kvm_get_rflags(vcpu) | X86_EFLAGS_IF);
++
++	return kvm_emulate_halt_noskip(vcpu);
++}
++
++static void pvm_flush_tlb_guest_current_kernel_user(struct kvm_vcpu *vcpu)
++{
 +	/*
-+	 * It is struct vcpu_pvm *pvm, but it is not allowed to be
-+	 * dereferenced since it might be freed.
++	 * sync the current pgd and user_pgd (pvm->msr_switch_cr3)
++	 * which is a subset work of KVM_REQ_TLB_FLUSH_GUEST.
 +	 */
-+	void *pvm;
-+	u64 root_hpa;
-+};
-+
-+struct host_pcid_state {
-+	struct host_pcid_one pairs[NUM_HOST_PCID_FOR_GUEST];
-+	int evict_next_round_robin;
-+};
-+
-+static DEFINE_PER_CPU(struct host_pcid_state, pvm_tlb_state);
-+
-+static void host_pcid_flush_all(struct vcpu_pvm *pvm)
-+{
-+	struct host_pcid_state *tlb_state = this_cpu_ptr(&pvm_tlb_state);
-+	int i;
-+
-+	for (i = 0; i < NUM_HOST_PCID_FOR_GUEST; i++) {
-+		if (tlb_state->pairs[i].pvm == pvm)
-+			tlb_state->pairs[i].pvm = NULL;
-+	}
-+}
-+
-+static inline unsigned int host_pcid_to_index(unsigned int host_pcid)
-+{
-+	return host_pcid & ~HOST_PCID_TAG_FOR_GUEST;
-+}
-+
-+static inline int index_to_host_pcid(int index)
-+{
-+	return index | HOST_PCID_TAG_FOR_GUEST;
++	kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
 +}
 +
 +/*
-+ * Free the uncached guest pcid (not in mmu->root nor mmu->prev_root), so
-+ * that the next allocation would not evict a clean one.
-+ *
-+ * It would be better if kvm.ko notifies us when a root_pgd is freed
-+ * from the cache.
-+ *
-+ * Returns a freed index or -1 if nothing is freed.
++ * Hypercall: PVM_HC_TLB_FLUSH
++ *	Flush all TLBs.
 + */
-+static int host_pcid_free_uncached(struct vcpu_pvm *pvm)
++static int handle_hc_flush_tlb_all(struct kvm_vcpu *vcpu)
 +{
-+	/* It is allowed to do nothing. */
-+	return -1;
++	kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
++
++	return 1;
 +}
 +
 +/*
-+ * Get a host pcid of the current pCPU for the specific guest pgd.
-+ * PVM vTLB is guest pgd tagged.
++ * Hypercall: PVM_HC_TLB_FLUSH_CURRENT
++ *	Flush all TLBs tagged with the current CR3 and MSR_PVM_SWITCH_CR3.
 + */
-+static int host_pcid_get(struct vcpu_pvm *pvm, u64 root_hpa, bool *flush)
++static int handle_hc_flush_tlb_current_kernel_user(struct kvm_vcpu *vcpu)
 +{
-+	struct host_pcid_state *tlb_state = this_cpu_ptr(&pvm_tlb_state);
-+	int i, j = -1;
++	pvm_flush_tlb_guest_current_kernel_user(vcpu);
 +
-+	/* find if it is allocated. */
-+	for (i = 0; i < NUM_HOST_PCID_FOR_GUEST; i++) {
-+		struct host_pcid_one *tlb = &tlb_state->pairs[i];
-+
-+		if (tlb->root_hpa == root_hpa && tlb->pvm == pvm)
-+			return index_to_host_pcid(i);
-+
-+		/* if it has no owner, allocate it if not found. */
-+		if (!tlb->pvm)
-+			j = i;
-+	}
-+
-+	/*
-+	 * Fallback to:
-+	 *    use the fallback recorded in the above loop.
-+	 *    use a freed uncached.
-+	 *    evict one (which might be still usable) by round-robin policy.
-+	 */
-+	if (j < 0)
-+		j = host_pcid_free_uncached(pvm);
-+	if (j < 0) {
-+		j = tlb_state->evict_next_round_robin;
-+		if (++tlb_state->evict_next_round_robin == NUM_HOST_PCID_FOR_GUEST)
-+			tlb_state->evict_next_round_robin = 0;
-+	}
-+
-+	/* associate the host pcid to the guest */
-+	tlb_state->pairs[j].pvm = pvm;
-+	tlb_state->pairs[j].root_hpa = root_hpa;
-+
-+	*flush = true;
-+	return index_to_host_pcid(j);
++	return 1;
 +}
 +
-+static void host_pcid_free(struct vcpu_pvm *pvm, u64 root_hpa)
++/*
++ * Hypercall: PVM_HC_TLB_INVLPG
++ *	Flush TLBs associated with a single address for all tags.
++ */
++static int handle_hc_invlpg(struct kvm_vcpu *vcpu, unsigned long addr)
 +{
-+	struct host_pcid_state *tlb_state = this_cpu_ptr(&pvm_tlb_state);
-+	int i;
++	kvm_mmu_invlpg(vcpu, addr);
 +
-+	for (i = 0; i < NUM_HOST_PCID_FOR_GUEST; i++) {
-+		struct host_pcid_one *tlb = &tlb_state->pairs[i];
-+
-+		if (tlb->root_hpa == root_hpa && tlb->pvm == pvm) {
-+			tlb->pvm = NULL;
-+			return;
-+		}
-+	}
++	return 1;
 +}
 +
-+static inline void *host_pcid_owner(int host_pcid)
++/*
++ * Hypercall: PVM_HC_RDMSR
++ *	Write MSR.
++ *	Return with RAX = the MSR value if succeeded.
++ *	Return with RAX = 0 if it failed.
++ */
++static int handle_hc_rdmsr(struct kvm_vcpu *vcpu, u32 index)
 +{
-+	return this_cpu_read(pvm_tlb_state.pairs[host_pcid_to_index(host_pcid)].pvm);
++	u64 value = 0;
++
++	kvm_get_msr(vcpu, index, &value);
++	kvm_rax_write(vcpu, value);
++
++	return 1;
 +}
 +
-+static inline u64 host_pcid_root(int host_pcid)
++/*
++ * Hypercall: PVM_HC_WRMSR
++ *	Write MSR.
++ *	Return with RAX = 0 if succeeded.
++ *	Return with RAX = -EIO if it failed
++ */
++static int handle_hc_wrmsr(struct kvm_vcpu *vcpu, u32 index, u64 value)
 +{
-+	return this_cpu_read(pvm_tlb_state.pairs[host_pcid_to_index(host_pcid)].root_hpa);
-+}
-+
-+static void __pvm_hwtlb_flush_all(struct vcpu_pvm *pvm)
-+{
-+	if (static_cpu_has(X86_FEATURE_PCID))
-+		host_pcid_flush_all(pvm);
-+}
-+
-+static void pvm_flush_hwtlb(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_pvm *pvm = to_pvm(vcpu);
-+
-+	get_cpu();
-+	__pvm_hwtlb_flush_all(pvm);
-+	put_cpu();
-+}
-+
-+static void pvm_flush_hwtlb_guest(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * flushing hwtlb for guest only when:
-+	 *	change to the shadow page table.
-+	 *	reused an used (guest) pcid.
-+	 * change to the shadow page table always results flushing hwtlb
-+	 * and PVM uses pgd tagged tlb.
-+	 *
-+	 * So no hwtlb needs to be flushed here.
-+	 */
-+}
-+
-+static void pvm_flush_hwtlb_current(struct kvm_vcpu *vcpu)
-+{
-+	/* No flush required if the current context is invalid. */
-+	if (!VALID_PAGE(vcpu->arch.mmu->root.hpa))
-+		return;
-+
-+	if (static_cpu_has(X86_FEATURE_PCID)) {
-+		get_cpu();
-+		host_pcid_free(to_pvm(vcpu), vcpu->arch.mmu->root.hpa);
-+		put_cpu();
-+	}
-+}
-+
-+static void pvm_flush_hwtlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
-+{
-+	struct vcpu_pvm *pvm = to_pvm(vcpu);
-+	int max = MIN_HOST_PCID_FOR_GUEST + NUM_HOST_PCID_FOR_GUEST;
-+	int i;
-+
-+	if (!static_cpu_has(X86_FEATURE_PCID))
-+		return;
-+
-+	get_cpu();
-+	if (!this_cpu_has(X86_FEATURE_INVPCID)) {
-+		host_pcid_flush_all(pvm);
-+		put_cpu();
-+		return;
-+	}
-+
-+	host_pcid_free_uncached(pvm);
-+	for (i = MIN_HOST_PCID_FOR_GUEST; i < max; i++) {
-+		if (host_pcid_owner(i) == pvm)
-+			invpcid_flush_one(i, addr);
-+	}
-+
-+	put_cpu();
-+}
-+
-+static void pvm_set_host_cr3_for_guest_with_host_pcid(struct vcpu_pvm *pvm)
-+{
-+	u64 root_hpa = pvm->vcpu.arch.mmu->root.hpa;
-+	bool flush = false;
-+	u32 host_pcid = host_pcid_get(pvm, root_hpa, &flush);
-+	u64 hw_cr3 = root_hpa | host_pcid;
-+
-+	if (!flush)
-+		hw_cr3 |= CR3_NOFLUSH;
-+	this_cpu_write(cpu_tss_rw.tss_ex.enter_cr3, hw_cr3);
-+}
-+
-+static void pvm_set_host_cr3_for_guest_without_host_pcid(struct vcpu_pvm *pvm)
-+{
-+	u64 root_hpa = pvm->vcpu.arch.mmu->root.hpa;
-+
-+	this_cpu_write(cpu_tss_rw.tss_ex.enter_cr3, root_hpa);
-+}
-+
- static void pvm_set_host_cr3_for_hypervisor(struct vcpu_pvm *pvm)
- {
- 	unsigned long cr3;
-@@ -365,7 +570,11 @@ static void pvm_set_host_cr3_for_hypervisor(struct vcpu_pvm *pvm)
- static void pvm_set_host_cr3(struct vcpu_pvm *pvm)
- {
- 	pvm_set_host_cr3_for_hypervisor(pvm);
--	this_cpu_write(cpu_tss_rw.tss_ex.enter_cr3, pvm->vcpu.arch.mmu->root.hpa);
-+
-+	if (static_cpu_has(X86_FEATURE_PCID))
-+		pvm_set_host_cr3_for_guest_with_host_pcid(pvm);
++	if (kvm_set_msr(vcpu, index, value))
++		kvm_rax_write(vcpu, -EIO);
 +	else
-+		pvm_set_host_cr3_for_guest_without_host_pcid(pvm);
- }
- 
- static void pvm_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
-@@ -391,6 +600,9 @@ static void pvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 
- 	__this_cpu_write(active_pvm_vcpu, pvm);
- 
-+	if (vcpu->cpu != cpu)
-+		__pvm_hwtlb_flush_all(pvm);
++		kvm_rax_write(vcpu, 0);
 +
- 	indirect_branch_prediction_barrier();
- }
- 
-@@ -398,6 +610,7 @@ static void pvm_vcpu_put(struct kvm_vcpu *vcpu)
++	return 1;
++}
++
+ static int handle_kvm_hypercall(struct kvm_vcpu *vcpu)
+ {
+ 	int r;
+@@ -1450,6 +1540,7 @@ static int handle_exit_syscall(struct kvm_vcpu *vcpu)
  {
  	struct vcpu_pvm *pvm = to_pvm(vcpu);
+ 	unsigned long rip = kvm_rip_read(vcpu);
++	unsigned long a0, a1;
  
-+	host_pcid_free_uncached(pvm);
- 	pvm_prepare_switch_to_host(pvm);
+ 	if (!is_smod(pvm))
+ 		return do_pvm_user_event(vcpu, PVM_SYSCALL_VECTOR, false, 0);
+@@ -1459,7 +1550,28 @@ static int handle_exit_syscall(struct kvm_vcpu *vcpu)
+ 	if (rip == pvm->msr_rets_rip_plus2)
+ 		return handle_synthetic_instruction_return_supervisor(vcpu);
+ 
+-	return handle_kvm_hypercall(vcpu);
++	a0 = kvm_rbx_read(vcpu);
++	a1 = kvm_r10_read(vcpu);
++
++	// handle hypercall, check it for pvm hypercall and then kvm hypercall
++	switch (kvm_rax_read(vcpu)) {
++	case PVM_HC_IRQ_WIN:
++		return handle_hc_interrupt_window(vcpu);
++	case PVM_HC_IRQ_HALT:
++		return handle_hc_irq_halt(vcpu);
++	case PVM_HC_TLB_FLUSH:
++		return handle_hc_flush_tlb_all(vcpu);
++	case PVM_HC_TLB_FLUSH_CURRENT:
++		return handle_hc_flush_tlb_current_kernel_user(vcpu);
++	case PVM_HC_TLB_INVLPG:
++		return handle_hc_invlpg(vcpu, a0);
++	case PVM_HC_RDMSR:
++		return handle_hc_rdmsr(vcpu, a0);
++	case PVM_HC_WRMSR:
++		return handle_hc_wrmsr(vcpu, a0, a1);
++	default:
++		return handle_kvm_hypercall(vcpu);
++	}
  }
  
-@@ -2086,6 +2299,11 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
- 	.set_rflags = pvm_set_rflags,
- 	.get_if_flag = pvm_get_if_flag,
- 
-+	.flush_tlb_all = pvm_flush_hwtlb,
-+	.flush_tlb_current = pvm_flush_hwtlb_current,
-+	.flush_tlb_gva = pvm_flush_hwtlb_gva,
-+	.flush_tlb_guest = pvm_flush_hwtlb_guest,
-+
- 	.vcpu_pre_run = pvm_vcpu_pre_run,
- 	.vcpu_run = pvm_vcpu_run,
- 	.handle_exit = pvm_handle_exit,
-@@ -2152,8 +2370,16 @@ static void pvm_exit(void)
- }
- module_exit(pvm_exit);
- 
-+#define TLB_NR_DYN_ASIDS	6
-+
- static int __init hardware_cap_check(void)
- {
-+	BUILD_BUG_ON(MIN_HOST_PCID_FOR_GUEST <= TLB_NR_DYN_ASIDS);
-+#ifdef CONFIG_PAGE_TABLE_ISOLATION
-+	BUILD_BUG_ON((MIN_HOST_PCID_FOR_GUEST + NUM_HOST_PCID_FOR_GUEST) >=
-+		     (1 << X86_CR3_PTI_PCID_USER_BIT));
-+#endif
-+
- 	/*
- 	 * switcher can't be used when KPTI. See the comments above
- 	 * SWITCHER_SAVE_AND_SWITCH_TO_HOST_CR3
-diff --git a/arch/x86/kvm/pvm/pvm.h b/arch/x86/kvm/pvm/pvm.h
-index 4cdcbed1c813..31060831e009 100644
---- a/arch/x86/kvm/pvm/pvm.h
-+++ b/arch/x86/kvm/pvm/pvm.h
-@@ -28,6 +28,11 @@ extern u64 *host_mmu_root_pgd;
- void host_mmu_destroy(void);
- int host_mmu_init(void);
- 
-+#define HOST_PCID_TAG_FOR_GUEST			(32)
-+
-+#define MIN_HOST_PCID_FOR_GUEST			HOST_PCID_TAG_FOR_GUEST
-+#define NUM_HOST_PCID_FOR_GUEST			HOST_PCID_TAG_FOR_GUEST
-+
- struct vcpu_pvm {
- 	struct kvm_vcpu vcpu;
- 
+ static int handle_exit_debug(struct kvm_vcpu *vcpu)
 -- 
 2.19.1.6.gb485710b
 
