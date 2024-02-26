@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-9698-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9699-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B90E9866D13
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:51:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05720866D1F
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F11D1F2100B
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:51:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE07128367F
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B60A69D3F;
-	Mon, 26 Feb 2024 08:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C82C1CAAE;
+	Mon, 26 Feb 2024 08:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8UzlLYl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mn9Rlq5/"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622CC65BD8;
-	Mon, 26 Feb 2024 08:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E29692E8;
+	Mon, 26 Feb 2024 08:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936114; cv=none; b=fi+AvL+LZDB63FCwiO+nfbcFP+wINKU3cLrKlgxIMYCjqbJOr68qlAJ/SxStKpSW9yiV8veMk9qsW9DSe+cHFWtLot89s34kIKZX8CR7HReZvzjINmOFQav7PleglOH/iNwl+Qq3rkMLKf7uiGJhH0RconR5UkMQJ15RHxduwno=
+	t=1708936115; cv=none; b=d9L+eKTP792pbFzCaiJvLGa7VDjEY7rBotYwv4VJ5HHwoMYPVRI4OYqXoVVYE9G0q0Urk50ypNSe+QSsfW3NTVPJ3EgIfA8O/kQV5cWaQkPnxd682v1ro3UK92iTMNKuiwKWucf9rOxxdZyVepnnyrROmQGMg2HeDYEWaNkJq6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936114; c=relaxed/simple;
-	bh=25C879RC4XCDozj4CupsIuo0NDO0r8Kx5QkcO4HDod8=;
+	s=arc-20240116; t=1708936115; c=relaxed/simple;
+	bh=WRkO1YUitiN/S3sFKUXbIqDdVI858msvJkdcbzWDebk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NlaWEmBy7fRpg0oPZo7cvJOhBSvkewtueowc5/GzhvZqh3ya6+UrqihNKJyMnwzkxgxC5sC75WGUbBcyrtmxyqp2/N7z/ekKiomVnuvcpTASgaaRNw1wfMNYdSwacYsiaOZZ+wMnsp0kXZcaGkQ3qDoIXc6+BLu05d1zZg0bixw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z8UzlLYl; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=hR4goN0BYE5c81ecOatLcbffezkfgxYA2MOqWLk1NR07hVxVZSZH77MAmQhAfGPGuTiySbI9e5XHbl1ao6lcq7pgIbbahIlI+nPISvCWXqgTKS4nvm+nzt6OB90v0UfQpKCWFenM076UlvF3uFNIP8xc/3atQykrH/M23vqqIlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mn9Rlq5/; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708936113; x=1740472113;
+  t=1708936114; x=1740472114;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=25C879RC4XCDozj4CupsIuo0NDO0r8Kx5QkcO4HDod8=;
-  b=Z8UzlLYlxoCAbVxVkWufi7J+AJqDBmsxdqHiKphHcbZPKdBApgQ5JUlT
-   iqONuLrbzvVL0BtTSqb8JLHPFbvhZ+qBrbQshiiGt8unPIaR+i4wD6zbF
-   bht7QaaZRqAujTaXeaUWshtTQRHV4cCZdW/xScC0ZdZEQwl0mh1XWXZKN
-   5bqBLjGRrJCyg7a9gMRWHlIlJWNYEGnOxC13+LysGFnt8c/rz/mo4S7R2
-   T+3+MVmUx+UErx+KaNEPga4Ujyk82t32j4zKlVj4P8hAJJAzuNsbT2jMh
-   T6YmohGkQbZBHPLdMUjVX9F2iiOCZc77ix3yWe+hY2u8kpMWVa7i40jzm
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="3069484"
+  bh=WRkO1YUitiN/S3sFKUXbIqDdVI858msvJkdcbzWDebk=;
+  b=Mn9Rlq5/8AJ2Nv56ZkMlKpMEvr3k1OefYg5jM0bXaxR7oTyFYHe/G7Si
+   vzbngtkR3zODUo6tTHLDtCsn2EIvR7IqKJbuLiidSgZ+8TLstoa3SlYNa
+   zJGNJTtaQuBZj+IlOwF0JhpQmJopF8aaxt9W1HZxEoBRF4MvSbanefEuM
+   2IM4XYlTvrUBzC8qgsKygjhlflLVr1Tifl7yHxNvhLixE4YREKLw0KbeT
+   gsAzHpjYxq5hsGjtgs1bqQyaT0vtxH2Chz1nIxIlisdoi+pqU7dCDiJyT
+   zzXfkRy0Oc9VRM3AGOhnGCa45RLmHjCKGIzPWq+9+Kur+gO5f/qC10lN5
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="3069485"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="3069484"
+   d="scan'208";a="3069485"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:28:32 -0800
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:28:33 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="11272466"
+   d="scan'208";a="11272476"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:28:32 -0800
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:28:33 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -67,9 +67,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v19 074/130] KVM: TDX: Create initial guest memory
-Date: Mon, 26 Feb 2024 00:26:16 -0800
-Message-Id: <bbac4998cfb34da496646491038b03f501964cbd.1708933498.git.isaku.yamahata@intel.com>
+Subject: [PATCH v19 075/130] KVM: TDX: Extend memory measurement with initial guest memory
+Date: Mon, 26 Feb 2024 00:26:17 -0800
+Message-Id: <c4a905d3245bc20ae1bf0cf2bc8f66816c81466c.1708933498.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933498.git.isaku.yamahata@intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
@@ -83,239 +83,115 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Because the guest memory is protected in TDX, the creation of the initial
-guest memory requires a dedicated TDX module API, tdh_mem_page_add, instead
-of directly copying the memory contents into the guest memory in the case
-of the default VM type.  KVM MMU page fault handler callback,
-set_private_spte, handles it.
-
-Implement the hooks for KVM_MEMORY_MAPPING, pre_memory_mapping() and
-post_memory_mapping() to handle it.
+TDX allows to extned memory measurement with the initial memory.  Define
+new subcommand, KVM_TDX_EXTEND_MEMORY, of VM-scoped KVM_MEMORY_ENCRYPT_OP.
+it extends memory measurement of the TDX guest.  The memory region must
+be populated with KVM_MEMORY_MAPPING command.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
 v19:
-- Switched to use KVM_MEMORY_MAPPING
-- Dropped measurement extension
-- updated commit message. private_page_add() => set_private_spte()
+- newly added
+- Split KVM_TDX_INIT_MEM_REGION into only extension function
 ---
- arch/x86/kvm/vmx/main.c    | 23 ++++++++++
- arch/x86/kvm/vmx/tdx.c     | 93 ++++++++++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/tdx.h     |  4 ++
- arch/x86/kvm/vmx/x86_ops.h | 12 +++++
- 4 files changed, 129 insertions(+), 3 deletions(-)
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/vmx/tdx.c          | 64 +++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index c5672909fdae..7258a6304b4b 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -252,6 +252,27 @@ static int vt_gmem_max_level(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn,
- 	return 0;
- }
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 4000a2e087a8..34167404020c 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -572,6 +572,7 @@ enum kvm_tdx_cmd_id {
+ 	KVM_TDX_CAPABILITIES = 0,
+ 	KVM_TDX_INIT_VM,
+ 	KVM_TDX_INIT_VCPU,
++	KVM_TDX_EXTEND_MEMORY,
  
-+static int vt_pre_memory_mapping(struct kvm_vcpu *vcpu,
-+				 struct kvm_memory_mapping *mapping,
-+				 u64 *error_code, u8 *max_level)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return tdx_pre_memory_mapping(vcpu, mapping, error_code, max_level);
-+
-+	if (mapping->source)
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static void vt_post_memory_mapping(struct kvm_vcpu *vcpu,
-+				   struct kvm_memory_mapping *mapping)
-+{
-+	if (!is_td_vcpu(vcpu))
-+		return;
-+
-+	tdx_post_memory_mapping(vcpu, mapping);
-+}
-+
- #define VMX_REQUIRED_APICV_INHIBITS				\
- 	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
- 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
-@@ -415,6 +436,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.vcpu_mem_enc_ioctl = vt_vcpu_mem_enc_ioctl,
- 
- 	.gmem_max_level = vt_gmem_max_level,
-+	.pre_memory_mapping = vt_pre_memory_mapping,
-+	.post_memory_mapping = vt_post_memory_mapping,
+ 	KVM_TDX_CMD_NR_MAX,
  };
- 
- struct kvm_x86_init_ops vt_init_ops __initdata = {
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index e65fff43cb1b..8cf6e5dab3e9 100644
+index 8cf6e5dab3e9..3cfba63a7762 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -390,6 +390,7 @@ int tdx_vm_init(struct kvm *kvm)
- 	 */
- 	kvm->max_vcpus = min(kvm->max_vcpus, TDX_MAX_VCPUS);
- 
-+	mutex_init(&to_kvm_tdx(kvm)->source_lock);
- 	return 0;
+@@ -1339,6 +1339,67 @@ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu)
+ 	tdx_track(vcpu->kvm);
  }
  
-@@ -541,6 +542,51 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
- 	return 0;
- }
- 
-+static int tdx_mem_page_add(struct kvm *kvm, gfn_t gfn,
-+			    enum pg_level level, kvm_pfn_t pfn)
++static int tdx_extend_memory(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
 +{
 +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	hpa_t hpa = pfn_to_hpa(pfn);
-+	gpa_t gpa = gfn_to_gpa(gfn);
++	struct kvm_memory_mapping mapping;
 +	struct tdx_module_args out;
-+	hpa_t source_pa;
++	bool extended = false;
++	int idx, ret = 0;
++	gpa_t gpa;
 +	u64 err;
-+
-+	lockdep_assert_held(&kvm_tdx->source_lock);
-+
-+	/*
-+	 * KVM_MEMORY_MAPPING for TD supports only 4K page because
-+	 * tdh_mem_page_add() supports only 4K page.
-+	 */
-+	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-+		return -EINVAL;
-+
-+	if (KVM_BUG_ON(!kvm_tdx->source_page, kvm)) {
-+		tdx_unpin(kvm, pfn);
-+		return -EINVAL;
-+	}
-+
-+	source_pa = pfn_to_hpa(page_to_pfn(kvm_tdx->source_page));
-+	do {
-+		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, hpa, source_pa,
-+				       &out);
-+		/*
-+		 * This path is executed during populating initial guest memory
-+		 * image. i.e. before running any vcpu.  Race is rare.
-+		 */
-+	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
-+	/*
-+	 * Don't warn: This is for KVM_MEMORY_MAPPING. So tdh_mem_page_add() can
-+	 * fail with parameters user provided.
-+	 */
-+	if (err) {
-+		tdx_unpin(kvm, pfn);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
- static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 				     enum pg_level level, kvm_pfn_t pfn)
- {
-@@ -563,9 +609,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (likely(is_td_finalized(kvm_tdx)))
- 		return tdx_mem_page_aug(kvm, gfn, level, pfn);
- 
--	/* TODO: tdh_mem_page_add() comes here for the initial memory. */
--
--	return 0;
-+	return tdx_mem_page_add(kvm, gfn, level, pfn);
- }
- 
- static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
-@@ -1469,6 +1513,49 @@ int tdx_gmem_max_level(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn,
- 	return 0;
- }
- 
-+#define TDX_SEPT_PFERR	(PFERR_WRITE_MASK | PFERR_GUEST_ENC_MASK)
-+
-+int tdx_pre_memory_mapping(struct kvm_vcpu *vcpu,
-+			   struct kvm_memory_mapping *mapping,
-+			   u64 *error_code, u8 *max_level)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+	struct page *page;
-+	int r = 0;
-+
-+	/* memory contents is needed for encryption. */
-+	if (!mapping->source)
-+		return -EINVAL;
++	int i;
 +
 +	/* Once TD is finalized, the initial guest memory is fixed. */
-+	if (is_td_finalized(to_kvm_tdx(vcpu->kvm)))
++	if (is_td_finalized(kvm_tdx))
 +		return -EINVAL;
 +
-+	/* TDX supports only 4K to pre-populate. */
-+	*max_level = PG_LEVEL_4K;
-+	*error_code = TDX_SEPT_PFERR;
++	if (cmd->flags)
++		return -EINVAL;
 +
-+	r = get_user_pages_fast(mapping->source, 1, 0, &page);
-+	if (r < 0)
-+		return r;
-+	if (r != 1)
-+		return -ENOMEM;
++	if (copy_from_user(&mapping, (void __user *)cmd->data, sizeof(mapping)))
++		return -EFAULT;
 +
-+	mutex_lock(&kvm_tdx->source_lock);
-+	kvm_tdx->source_page = page;
-+	return 0;
++	/* Sanity check */
++	if (mapping.source || !mapping.nr_pages ||
++	    mapping.nr_pages & GENMASK_ULL(63, 63 - PAGE_SHIFT) ||
++	    mapping.base_gfn + (mapping.nr_pages << PAGE_SHIFT) <= mapping.base_gfn ||
++	    !kvm_is_private_gpa(kvm, mapping.base_gfn) ||
++	    !kvm_is_private_gpa(kvm, mapping.base_gfn + (mapping.nr_pages << PAGE_SHIFT)))
++		return -EINVAL;
++
++	idx = srcu_read_lock(&kvm->srcu);
++	while (mapping.nr_pages) {
++		if (signal_pending(current)) {
++			ret = -ERESTARTSYS;
++			break;
++		}
++
++		if (need_resched())
++			cond_resched();
++
++		gpa = gfn_to_gpa(mapping.base_gfn);
++		for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
++			err = tdh_mr_extend(kvm_tdx->tdr_pa, gpa + i, &out);
++			if (err) {
++				ret = -EIO;
++				break;
++			}
++		}
++		mapping.base_gfn++;
++		mapping.nr_pages--;
++		extended = true;
++	}
++	srcu_read_unlock(&kvm->srcu, idx);
++
++	if (extended && mapping.nr_pages > 0)
++		ret = -EAGAIN;
++	if (copy_to_user((void __user *)cmd->data, &mapping, sizeof(mapping)))
++		ret = -EFAULT;
++
++	return ret;
 +}
 +
-+void tdx_post_memory_mapping(struct kvm_vcpu *vcpu,
-+			     struct kvm_memory_mapping *mapping)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+
-+	put_page(kvm_tdx->source_page);
-+	kvm_tdx->source_page = NULL;
-+	mutex_unlock(&kvm_tdx->source_lock);
-+}
-+
- #define TDX_MD_MAP(_fid, _ptr)			\
- 	{ .fid = MD_FIELD_ID_##_fid,		\
- 	  .ptr = (_ptr), }
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 75596b9dcf3f..d822e790e3e5 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -21,6 +21,10 @@ struct kvm_tdx {
- 	atomic_t tdh_mem_track;
- 
- 	u64 tsc_offset;
-+
-+	/* For KVM_MEMORY_MAPPING */
-+	struct mutex source_lock;
-+	struct page *source_page;
- };
- 
- struct vcpu_tdx {
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 5335d35bc655..191f2964ec8e 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -160,6 +160,11 @@ int tdx_sept_flush_remote_tlbs(struct kvm *kvm);
- void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
- int tdx_gmem_max_level(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn,
- 		       bool is_private, u8 *max_level);
-+int tdx_pre_memory_mapping(struct kvm_vcpu *vcpu,
-+			   struct kvm_memory_mapping *mapping,
-+			   u64 *error_code, u8 *max_level);
-+void tdx_post_memory_mapping(struct kvm_vcpu *vcpu,
-+			     struct kvm_memory_mapping *mapping);
- #else
- static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
- static inline void tdx_hardware_unsetup(void) {}
-@@ -192,6 +197,13 @@ static inline int tdx_gmem_max_level(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn,
+ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	return -EOPNOTSUPP;
- }
-+int tdx_pre_memory_mapping(struct kvm_vcpu *vcpu,
-+			   struct kvm_memory_mapping *mapping,
-+			   u64 *error_code, u8 *max_level)
-+{
-+	return -EOPNOTSUPP;
-+}
-+void tdx_post_memory_mapping(struct kvm_vcpu *vcpu, struct kvm_memory_mapping *mapping) {}
- #endif
- 
- #endif /* __KVM_X86_VMX_X86_OPS_H */
+ 	struct kvm_tdx_cmd tdx_cmd;
+@@ -1358,6 +1419,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_TDX_INIT_VM:
+ 		r = tdx_td_init(kvm, &tdx_cmd);
+ 		break;
++	case KVM_TDX_EXTEND_MEMORY:
++		r = tdx_extend_memory(kvm, &tdx_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
 -- 
 2.25.1
 
