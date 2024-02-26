@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9881-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCFA98678D5
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:42:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C51A8678D6
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:42:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 543D11F2DE19
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:42:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8ABC1F2578C
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513E0131E25;
-	Mon, 26 Feb 2024 14:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFFA131E4F;
+	Mon, 26 Feb 2024 14:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lU9RktdC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fJum386X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0048412B15B;
-	Mon, 26 Feb 2024 14:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC1A131E34;
+	Mon, 26 Feb 2024 14:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958136; cv=none; b=gnGaL2Oh/8smFhZ3K6VEWTUiEznU5IVgVO2lSywG1jPmns3rggYZLkNOr1FNV3CFoH+jd46o/15UulAP+B2QhqWE8HlNyGuCtNxw0WH5Orcd6etOQTiIzu294Dp+P7uKdhvQIIvxOq/AomDguwdCIn4EktXaIgXFDk8J5tfSmOU=
+	t=1708958139; cv=none; b=hl4CmGfl1Lsgen9ro8bRxgxzzqIN17tbJ1jAmpkOtxHQRM/HtQ+CwlF1lB+VsJFwm3ipcxhs6pGNtMpwszQ9F3ciD815KsigbfCL1Xh75Hgi8SGV4O3V0N3YZJ7iliY3QUxgC4gsd1TTcrBMvIafq55IRmk0r/sjzPo4TtStc+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958136; c=relaxed/simple;
-	bh=A91XOAPWlG4UQM4/y3mhJgJbexBv/5cbd9ybcfuxCMU=;
+	s=arc-20240116; t=1708958139; c=relaxed/simple;
+	bh=iwftWf46wOnpswtTJOCMVHOfuKM+8gHZWJ2C/CjfvgU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BtzYmFQroxggWxInA49bk95iHynjORLYKCVCxvcGlznChpKdu7n532VDWiaVjNBa3YiCvuOSQwtMhZMYc83o3J2njo0pWmAiKgVhNr/etS/RKJF/IlBoEsOTi8JKq3kpG44vkfkZfBoWrnJplN4vBnIGWqSfFjuevWrrQrSC8eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lU9RktdC; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=OZ3GyT6eyLvjlhXv/NQ9sm5ktzDLVprskqOX2u0NF/fVfZYf6MxBtFnpFxm8r/4/Fw/Fu+WPzYE3BLmgil6IMQrh9LuQ1WSpusDvqiwuIdbym8KtvDm4oa23uM71QDRyEgUXpJgz8a+ru2W5AiyA3HbmsWJOph7mjgHbgGwiGzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fJum386X; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1dc9222b337so12871425ad.2;
-        Mon, 26 Feb 2024 06:35:34 -0800 (PST)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e43ee3f6fbso2829528b3a.3;
+        Mon, 26 Feb 2024 06:35:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958134; x=1709562934; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958137; x=1709562937; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=riQZ9ZpwPxz2QrssKIMSS0JXLxPFIoRiOKE+eD6KDsw=;
-        b=lU9RktdCkXFgRdwP8zBrXTb5xpHvjpOyGWzjRHapsvywg/i3XXSBiqxmXXeM8v+o4Q
-         PdhLDERYpqLpZUvTHUktdsinfoNtAkyDgKtqs8aI+s+a/k9BH0LwkCQPrFxzaHrnQFfV
-         RoqWFiHdgEU2gx0rceEdp5IgbZGJzzZHkI9klPBg7vtu0QZ3Kg2dSM9cn9lxbSq6Mb+U
-         bmiW8Z+3kjT1YwlRzzd2u0ZW4MDm6IEWKTx2z/eTzTCJIfAHAYWJiH2NIzabZiDN++iZ
-         QqD7w5dKrrP6TWFNXVk9IYhssrsYXnxVO9LtTizjYwIqj4do3dRNGAMVyZWnifTkqPgS
-         G/iw==
+        bh=Ui4nV+xW+CAuqp8t7yR+nLCmWIr4uDNM8z/IC9GYkUg=;
+        b=fJum386XeS2js/BrOdhAcagZ2WbwaehatTS+qxOgRDIjaGgtdPtmqxYFryiGVHZ2aq
+         x5TbbY7EHL/2RSEwMzDtLMdYFbO0rVrQQbBHLcLLFr/MtWNRdCtGU2/TJ9OwrPqmhS7R
+         KrRMEVuki7P2P74SIMqpS3W2PKyFHm/vKNWm7NtQR3knB22zk7s/bom1gXRImFeCGVro
+         gO6DAVpm3EH+JTeYRZ1BwNCxcqLpfaYHJUB+vp9o4RQkGfqSSpvoUTIYGTj3G5gLg4zm
+         cqILY2Ob+cxNruCqxW8yXzoSS0Ce0Xgp9F28S87VR+Xf870uZmI10VhoQf/sJJt98DCy
+         t/kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958134; x=1709562934;
+        d=1e100.net; s=20230601; t=1708958137; x=1709562937;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=riQZ9ZpwPxz2QrssKIMSS0JXLxPFIoRiOKE+eD6KDsw=;
-        b=hRRagJP6FHWW8b6Ck9Bi37IUpMOB5oWsBWUlPvJSaEyK51AdFF/PVhBnLHRkZcMrQ6
-         EBZOG6jrcnouuZql9Qkj2bN/Lx4a3HgOGf6gFwFDrZg+M6gZ0S9JqHyrtxZuzmnGkjXa
-         CwZab6larCDKTqkcVtDZZPiD89klUDEiaYBcywmBc5+Fy4CcYCYQSvimCgP/ZraurWin
-         Nq9fpNPoJomQQlrzLbdy2j+5ct0qJai8c6cSeMPTRbnDUkxT3sU67aBciXnt9frikX3p
-         8ryO3Ykzg4VkbXyzJuwVtKTvYQ5VuwPihi4ZJLWdgZYXWUET0lrlKSwMA6k9aHzE7iSD
-         yhCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWbgvqPA2HnGrWMOUoaraEJRBWdIHJ1EdlPoS3P9/wDpNDCJwuK7vt6neeLH/X7Zj5rcGhupEFMevF6z874OYfGPQJK
-X-Gm-Message-State: AOJu0YwMY21xl5OYs+UTYfUSM7mttVR6LP46aZX8ReuoySZL+d6a8NGM
-	tGYWepY3v/pH7FMe6zgwhNcLeOZZrdbkai5YV+r+3EMOPPPLhx3KZCtp/5XV
-X-Google-Smtp-Source: AGHT+IHECtnuYEhCc+LtTSqZFq0GvsQFgPnhhCjRj5C7penoqaGkEFA3+9fJ+eNcu8ruHubMNcBCaQ==
-X-Received: by 2002:a17:903:1111:b0:1db:9a7d:2e6 with SMTP id n17-20020a170903111100b001db9a7d02e6mr7701854plh.48.1708958133971;
-        Mon, 26 Feb 2024 06:35:33 -0800 (PST)
-Received: from localhost ([47.254.32.37])
-        by smtp.gmail.com with ESMTPSA id d20-20020a170902c19400b001db9fa23407sm4000701pld.195.2024.02.26.06.35.33
+        bh=Ui4nV+xW+CAuqp8t7yR+nLCmWIr4uDNM8z/IC9GYkUg=;
+        b=lFXFL807BtXzK9QA8t8NJePBW8Kqfy1AG7nr9xT+QzTFZqaN5wFkhlgHBvON7JYQ/e
+         3fiWx4oj5HIkL+yx4cSCl6Uw2D6mzvXFtY0FG+HOcsECBaqAcqQktYhyRltM1hmLytF1
+         dw1GbwRgJlHBKM11bRs2oN3renKI4K0gA5pXvT0lOhyO8un2tzwUuDsnVWx3zEdWq8NK
+         vBLGenY0xHP0faPNpJX9wQRwjYVFFEf9qZWVnpYf91icKjlynwzW1Gt9JVUmeuJRcN7A
+         gjWA06yyAaYZkW6Qv8exAawD4BqSx/qKBLk5EB8VtQVGd5RHUfxu+OX/HmJ0WvEabAmx
+         43rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXTp+KyU8m+oQnuNqVHrs3qxm+b+sg6VHmkCTbHlD9XboS2pBndNl+iwEpV0sP6Q9Emjvav6+AAskpRo33kTPZqc/71
+X-Gm-Message-State: AOJu0Yyq7DswNDyok0GXXEG4B6H3BY70kYxBQka/4ZgTCvzlrVIhWaBp
+	H6C6wS/3urb4kDdbYbOcKSqsQeSwjGxqxhvn4ygvpHqI6CEbxgexgwDkWsIh
+X-Google-Smtp-Source: AGHT+IF4Q1Dv0wbolFf05KnWD0z8wS1wGRKSqhBnMZon9r60ioyBfE2I77T9HPMxwLMDV0uNyNdWWQ==
+X-Received: by 2002:a05:6a21:1518:b0:19e:3a94:6309 with SMTP id nq24-20020a056a21151800b0019e3a946309mr11225761pzb.5.1708958137168;
+        Mon, 26 Feb 2024 06:35:37 -0800 (PST)
+Received: from localhost ([198.11.178.15])
+        by smtp.gmail.com with ESMTPSA id it8-20020a056a00458800b006e05c801748sm4103970pfb.199.2024.02.26.06.35.36
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:35:33 -0800 (PST)
+        Mon, 26 Feb 2024 06:35:36 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -84,9 +84,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 17/73] KVM: x86/PVM: Implement module initialization related callbacks
-Date: Mon, 26 Feb 2024 22:35:34 +0800
-Message-Id: <20240226143630.33643-18-jiangshanlai@gmail.com>
+Subject: [RFC PATCH 18/73] KVM: x86/PVM: Implement VM/VCPU initialization related callbacks
+Date: Mon, 26 Feb 2024 22:35:35 +0800
+Message-Id: <20240226143630.33643-19-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -100,301 +100,210 @@ Content-Transfer-Encoding: 8bit
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Implement hardware enable/disable and setup/unsetup callbacks for PVM
-module initialization.
+In the vm_init() callback, the cloned host root page table is recorded
+into the 'kvm' structure, allowing for the cloning of host PGD entries
+during SP allocation. In the vcpu_create() callback, the pfn cache for
+'PVCS' is initialized and deactivated in the vcpu_free() callback.
+Additionally, the vcpu_reset() callback needs to perform a common x86
+reset and specific PVM reset.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/pvm/pvm.c | 226 +++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/pvm/pvm.h |  20 ++++
- 2 files changed, 246 insertions(+)
+ arch/x86/kvm/pvm/pvm.c | 120 +++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/pvm/pvm.h |  34 ++++++++++++
+ 2 files changed, 154 insertions(+)
 
 diff --git a/arch/x86/kvm/pvm/pvm.c b/arch/x86/kvm/pvm/pvm.c
-index 1dfa1ae57c8c..83aa2c9f42f6 100644
+index 83aa2c9f42f6..d4cc52bf6b3f 100644
 --- a/arch/x86/kvm/pvm/pvm.c
 +++ b/arch/x86/kvm/pvm/pvm.c
-@@ -9,18 +9,244 @@
-  * the COPYING file in the top-level directory.
-  *
-  */
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
- #include <linux/module.h>
+@@ -55,6 +55,117 @@ static bool cpu_has_pvm_wbinvd_exit(void)
+ 	return true;
+ }
  
-+#include <asm/pvm_para.h>
-+
-+#include "cpuid.h"
-+#include "x86.h"
-+#include "pvm.h"
-+
- MODULE_AUTHOR("AntGroup");
- MODULE_LICENSE("GPL");
- 
-+static bool __read_mostly is_intel;
-+
-+static unsigned long host_idt_base;
-+
-+static void pvm_setup_mce(struct kvm_vcpu *vcpu)
++static void reset_segment(struct kvm_segment *var, int seg)
 +{
-+}
++	memset(var, 0, sizeof(*var));
++	var->limit = 0xffff;
++	var->present = 1;
 +
-+static bool pvm_has_emulated_msr(struct kvm *kvm, u32 index)
-+{
-+	switch (index) {
-+	case MSR_IA32_MCG_EXT_CTL:
-+	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
-+		return false;
-+	case MSR_AMD64_VIRT_SPEC_CTRL:
-+	case MSR_AMD64_TSC_RATIO:
-+		/* This is AMD SVM only. */
-+		return false;
-+	case MSR_IA32_SMBASE:
-+		/* Currenlty we only run guest in long mode. */
-+		return false;
++	switch (seg) {
++	case VCPU_SREG_CS:
++		var->s = 1;
++		var->type = 0xb; /* Code Segment */
++		var->selector = 0xf000;
++		var->base = 0xffff0000;
++		break;
++	case VCPU_SREG_LDTR:
++		var->s = 0;
++		var->type = DESC_LDT;
++		break;
++	case VCPU_SREG_TR:
++		var->s = 0;
++		var->type = DESC_TSS | 0x2; // TSS32 busy
++		break;
 +	default:
++		var->s = 1;
++		var->type = 3; /* Read/Write Data Segment */
 +		break;
 +	}
-+
-+	return true;
 +}
 +
-+static bool cpu_has_pvm_wbinvd_exit(void)
++static void __pvm_vcpu_reset(struct kvm_vcpu *vcpu)
 +{
-+	return true;
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
++
++	if (is_intel)
++		vcpu->arch.microcode_version = 0x100000000ULL;
++	else
++		vcpu->arch.microcode_version = 0x01000065;
++
++	pvm->msr_ia32_feature_control_valid_bits = FEAT_CTL_LOCKED;
 +}
 +
-+static int hardware_enable(void)
++static void pvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 +{
-+	/* Nothing to do */
-+	return 0;
-+}
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
++	int i;
 +
-+static void hardware_disable(void)
-+{
-+	/* Nothing to do */
-+}
++	kvm_gpc_deactivate(&pvm->pvcs_gpc);
 +
-+static int pvm_check_processor_compat(void)
-+{
-+	/* Nothing to do */
-+	return 0;
-+}
-+
-+static __init void pvm_set_cpu_caps(void)
-+{
-+	if (boot_cpu_has(X86_FEATURE_NX))
-+		kvm_enable_efer_bits(EFER_NX);
-+	if (boot_cpu_has(X86_FEATURE_FXSR_OPT))
-+		kvm_enable_efer_bits(EFER_FFXSR);
-+
-+	kvm_set_cpu_caps();
-+
-+	/* Unloading kvm-intel.ko doesn't clean up kvm_caps.supported_mce_cap. */
-+	kvm_caps.supported_mce_cap = MCG_CTL_P | MCG_SER_P;
-+
-+	kvm_caps.supported_xss = 0;
-+
-+	/* PVM supervisor mode runs on hardware ring3, so no xsaves. */
-+	kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
++	if (!init_event)
++		__pvm_vcpu_reset(vcpu);
 +
 +	/*
-+	 * PVM supervisor mode runs on hardware ring3, so SMEP and SMAP can not
-+	 * be supported directly through hardware.  But they can be emulated
-+	 * through other hardware feature when needed.
++	 * For PVM, cpuid faulting relies on hardware capability, but it is set
++	 * as supported by default in kvm_arch_vcpu_create(). Therefore, it
++	 * should be cleared if the host doesn't support it.
 +	 */
++	if (!boot_cpu_has(X86_FEATURE_CPUID_FAULT))
++		vcpu->arch.msr_platform_info &= ~MSR_PLATFORM_INFO_CPUID_FAULT;
 +
-+	/*
-+	 * PVM doesn't support SMAP, but the similar protection might be
-+	 * emulated via PKU in the future.
-+	 */
-+	kvm_cpu_cap_clear(X86_FEATURE_SMAP);
++	// X86 resets
++	for (i = 0; i < ARRAY_SIZE(pvm->segments); i++)
++		reset_segment(&pvm->segments[i], i);
++	kvm_set_cr8(vcpu, 0);
++	pvm->idt_ptr.address = 0;
++	pvm->idt_ptr.size = 0xffff;
++	pvm->gdt_ptr.address = 0;
++	pvm->gdt_ptr.size = 0xffff;
 +
-+	/*
-+	 * PVM doesn't support SMEP.  When NX is supported and the guest can
-+	 * use NX on the user pagetable to emulate the same protection as SMEP.
-+	 */
-+	kvm_cpu_cap_clear(X86_FEATURE_SMEP);
++	// PVM resets
++	pvm->switch_flags = SWITCH_FLAGS_INIT;
++	pvm->hw_cs = __USER_CS;
++	pvm->hw_ss = __USER_DS;
++	pvm->int_shadow = 0;
++	pvm->nmi_mask = false;
 +
-+	/*
-+	 * Unlike VMX/SVM which can switches paging mode atomically, PVM
-+	 * implements guest LA57 through host LA57 shadow paging.
-+	 */
-+	if (!pgtable_l5_enabled())
-+		kvm_cpu_cap_clear(X86_FEATURE_LA57);
-+
-+	/*
-+	 * Even host pcid is not enabled, guest pcid can be enabled to reduce
-+	 * the heavy guest tlb flushing.  Guest CR4.PCIDE is not directly
-+	 * mapped to the hardware and is virtualized by PVM so that it can be
-+	 * enabled unconditionally.
-+	 */
-+	kvm_cpu_cap_set(X86_FEATURE_PCID);
-+
-+	/* Don't expose MSR_IA32_SPEC_CTRL to guest */
-+	kvm_cpu_cap_clear(X86_FEATURE_SPEC_CTRL);
-+	kvm_cpu_cap_clear(X86_FEATURE_AMD_STIBP);
-+	kvm_cpu_cap_clear(X86_FEATURE_AMD_IBRS);
-+	kvm_cpu_cap_clear(X86_FEATURE_AMD_SSBD);
-+
-+	/* PVM hypervisor hasn't implemented LAM so far */
-+	kvm_cpu_cap_clear(X86_FEATURE_LAM);
-+
-+	/* Don't expose MSR_IA32_DEBUGCTLMSR related features. */
-+	kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
++	pvm->msr_vcpu_struct = 0;
++	pvm->msr_supervisor_rsp = 0;
++	pvm->msr_event_entry = 0;
++	pvm->msr_retu_rip_plus2 = 0;
++	pvm->msr_rets_rip_plus2 = 0;
++	pvm->msr_switch_cr3 = 0;
 +}
 +
-+static __init int hardware_setup(void)
++static int pvm_vcpu_create(struct kvm_vcpu *vcpu)
 +{
-+	struct desc_ptr dt;
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
 +
-+	store_idt(&dt);
-+	host_idt_base = dt.address;
++	BUILD_BUG_ON(offsetof(struct vcpu_pvm, vcpu) != 0);
 +
-+	pvm_set_cpu_caps();
-+
-+	kvm_configure_mmu(false, 0, 0, 0);
-+
-+	enable_apicv = 0;
++	pvm->switch_flags = SWITCH_FLAGS_INIT;
++	kvm_gpc_init(&pvm->pvcs_gpc, vcpu->kvm, vcpu, KVM_GUEST_AND_HOST_USE_PFN);
 +
 +	return 0;
 +}
 +
-+static void hardware_unsetup(void)
++static void pvm_vcpu_free(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
++
++	kvm_gpc_deactivate(&pvm->pvcs_gpc);
++}
++
++static void pvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
 +{
 +}
 +
-+struct kvm_x86_nested_ops pvm_nested_ops = {};
++static int pvm_vm_init(struct kvm *kvm)
++{
++	kvm->arch.host_mmu_root_pgd = host_mmu_root_pgd;
++	return 0;
++}
 +
-+static struct kvm_x86_ops pvm_x86_ops __initdata = {
-+	.name = KBUILD_MODNAME,
-+
-+	.check_processor_compatibility = pvm_check_processor_compat,
-+
-+	.hardware_unsetup = hardware_unsetup,
-+	.hardware_enable = hardware_enable,
-+	.hardware_disable = hardware_disable,
-+	.has_emulated_msr = pvm_has_emulated_msr,
-+
-+	.has_wbinvd_exit = cpu_has_pvm_wbinvd_exit,
-+
-+	.nested_ops = &pvm_nested_ops,
-+
-+	.setup_mce = pvm_setup_mce,
-+};
-+
-+static struct kvm_x86_init_ops pvm_init_ops __initdata = {
-+	.hardware_setup = hardware_setup,
-+
-+	.runtime_ops = &pvm_x86_ops,
-+};
-+
- static void pvm_exit(void)
+ static int hardware_enable(void)
  {
-+	kvm_exit();
-+	kvm_x86_vendor_exit();
-+	host_mmu_destroy();
-+	allow_smaller_maxphyaddr = false;
-+	kvm_cpuid_vendor_signature = 0;
- }
- module_exit(pvm_exit);
+ 	/* Nothing to do */
+@@ -169,6 +280,15 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
  
-+static int __init hardware_cap_check(void)
-+{
-+	/*
-+	 * switcher can't be used when KPTI. See the comments above
-+	 * SWITCHER_SAVE_AND_SWITCH_TO_HOST_CR3
-+	 */
-+	if (boot_cpu_has(X86_FEATURE_PTI)) {
-+		pr_warn("Support for host KPTI is not included yet.\n");
-+		return -EOPNOTSUPP;
-+	}
-+	if (!boot_cpu_has(X86_FEATURE_FSGSBASE)) {
-+		pr_warn("FSGSBASE is required per PVM specification.\n");
-+		return -EOPNOTSUPP;
-+	}
-+	if (!boot_cpu_has(X86_FEATURE_RDTSCP)) {
-+		pr_warn("RDTSCP is required to support for getcpu in guest vdso.\n");
-+		return -EOPNOTSUPP;
-+	}
-+	if (!boot_cpu_has(X86_FEATURE_CX16)) {
-+		pr_warn("CMPXCHG16B is required for guest.\n");
-+		return -EOPNOTSUPP;
-+	}
+ 	.has_wbinvd_exit = cpu_has_pvm_wbinvd_exit,
+ 
++	.vm_size = sizeof(struct kvm_pvm),
++	.vm_init = pvm_vm_init,
 +
-+	return 0;
-+}
++	.vcpu_create = pvm_vcpu_create,
++	.vcpu_free = pvm_vcpu_free,
++	.vcpu_reset = pvm_vcpu_reset,
 +
- static int __init pvm_init(void)
- {
-+	int r;
++	.vcpu_after_set_cpuid = pvm_vcpu_after_set_cpuid,
 +
-+	r = hardware_cap_check();
-+	if (r)
-+		return r;
-+
-+	r = host_mmu_init();
-+	if (r)
-+		return r;
-+
-+	is_intel = boot_cpu_data.x86_vendor == X86_VENDOR_INTEL;
-+
-+	r = kvm_x86_vendor_init(&pvm_init_ops);
-+	if (r)
-+		goto exit_host_mmu;
-+
-+	r = kvm_init(sizeof(struct vcpu_pvm), __alignof__(struct vcpu_pvm), THIS_MODULE);
-+	if (r)
-+		goto exit_vendor;
-+
-+	allow_smaller_maxphyaddr = true;
-+	kvm_cpuid_vendor_signature = PVM_CPUID_SIGNATURE;
-+
- 	return 0;
-+
-+exit_vendor:
-+	kvm_x86_vendor_exit();
-+exit_host_mmu:
-+	host_mmu_destroy();
-+	return r;
- }
- module_init(pvm_init);
+ 	.nested_ops = &pvm_nested_ops,
+ 
+ 	.setup_mce = pvm_setup_mce,
 diff --git a/arch/x86/kvm/pvm/pvm.h b/arch/x86/kvm/pvm/pvm.h
-index 7a3732986a6d..6149cf5975a4 100644
+index 6149cf5975a4..599bbbb284dc 100644
 --- a/arch/x86/kvm/pvm/pvm.h
 +++ b/arch/x86/kvm/pvm/pvm.h
-@@ -2,6 +2,8 @@
- #ifndef __KVM_X86_PVM_H
+@@ -3,6 +3,9 @@
  #define __KVM_X86_PVM_H
  
-+#include <linux/kvm_host.h>
+ #include <linux/kvm_host.h>
++#include <asm/switcher.h>
 +
++#define SWITCH_FLAGS_INIT	(SWITCH_FLAGS_SMOD)
+ 
  #define PT_L4_SHIFT		39
  #define PT_L4_SIZE		(1UL << PT_L4_SHIFT)
- #define DEFAULT_RANGE_L4_SIZE	(32 * PT_L4_SIZE)
-@@ -20,4 +22,22 @@ extern u64 *host_mmu_root_pgd;
- void host_mmu_destroy(void);
- int host_mmu_init(void);
+@@ -24,6 +27,37 @@ int host_mmu_init(void);
  
-+struct vcpu_pvm {
-+	struct kvm_vcpu vcpu;
-+};
+ struct vcpu_pvm {
+ 	struct kvm_vcpu vcpu;
 +
-+struct kvm_pvm {
-+	struct kvm kvm;
-+};
++	unsigned long switch_flags;
 +
-+static __always_inline struct kvm_pvm *to_kvm_pvm(struct kvm *kvm)
-+{
-+	return container_of(kvm, struct kvm_pvm, kvm);
-+}
++	u32 hw_cs, hw_ss;
 +
-+static __always_inline struct vcpu_pvm *to_pvm(struct kvm_vcpu *vcpu)
-+{
-+	return container_of(vcpu, struct vcpu_pvm, vcpu);
-+}
++	int int_shadow;
++	bool nmi_mask;
 +
- #endif /* __KVM_X86_PVM_H */
++	struct gfn_to_pfn_cache pvcs_gpc;
++
++	/*
++	 * Only bits masked by msr_ia32_feature_control_valid_bits can be set in
++	 * msr_ia32_feature_control. FEAT_CTL_LOCKED is always included
++	 * in msr_ia32_feature_control_valid_bits.
++	 */
++	u64 msr_ia32_feature_control;
++	u64 msr_ia32_feature_control_valid_bits;
++
++	// PVM paravirt MSRs
++	unsigned long msr_vcpu_struct;
++	unsigned long msr_supervisor_rsp;
++	unsigned long msr_supervisor_redzone;
++	unsigned long msr_event_entry;
++	unsigned long msr_retu_rip_plus2;
++	unsigned long msr_rets_rip_plus2;
++	unsigned long msr_switch_cr3;
++	unsigned long msr_linear_address_range;
++
++	struct kvm_segment segments[NR_VCPU_SREG];
++	struct desc_ptr idt_ptr;
++	struct desc_ptr gdt_ptr;
+ };
+ 
+ struct kvm_pvm {
 -- 
 2.19.1.6.gb485710b
 
