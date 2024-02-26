@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9895-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9896-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E8048678FD
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:48:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 048518678FF
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 322191C22212
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:48:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 838701F26535
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4EC61369AB;
-	Mon, 26 Feb 2024 14:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56575137C3F;
+	Mon, 26 Feb 2024 14:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fBkD0NRP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cRfO21ku"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C709136679;
-	Mon, 26 Feb 2024 14:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042AA1369B8;
+	Mon, 26 Feb 2024 14:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958185; cv=none; b=oZiREmpsrTYm5+0lJBNgx9N/vizmDntzhk4+YzuwHFqnl9DtyKWycgtW7gyYCgN60OG/YlgYeAu+X0DdddHlPgesRjX/93vKbZyN3WFbraunfuEOqUkJse6xTzVMVPyZS6r+7w8IzdkOCxeQxLQF/GEju8qhmAeRxlweKKa7NZ8=
+	t=1708958188; cv=none; b=S/G6GVlAyLN2+0JsAfwDQ5hFDuYBGHmERGAOL2Xvf6RHS/Tq8/bx4597zNgNiX6qN82AOkvYjheqPEfQifNILnbtfgGmWPiQftfvkDqTEFwPKNJnSXcuOUGvLo6Bd5wkDIac6C68XK6O/DuqFuBenFzTWJ88+xUO8EoeCCfAmNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958185; c=relaxed/simple;
-	bh=FSCeMybtjLkWOcvn1/oPwqYyDuFS9jfLHr/iI3/35J4=;
+	s=arc-20240116; t=1708958188; c=relaxed/simple;
+	bh=FqG+PShZWy3cSlJS3qEDXedk0RFcNd6z6U1V+6nl3B8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cibUgOoHSHa3jwbuXLcocq8MCclDZ67GUZsIClOkd3kZ6EhdaTf9LsmzisOOaWc9iwrC0mBwsM6cdtvzJkrMHIUfTc12pQkpKcge+HCmUOXzCxAfS+RdQIw04Gjr7fY5jco1tZRIqquT90NvLHbkxGMjVeF3zPvj5UsMa6ib+MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fBkD0NRP; arc=none smtp.client-ip=209.85.216.48
+	 MIME-Version; b=n5+MwEZqRcLM4lxDZVboLkH4+VVz5KJ7PJBY1WE81iVxISNNZjMsOEwqvOCo5Vw6Lu5Lg2O4gEKL5N92fF6zrJJO8752O7gHNegmZVLQRUiihe57LczbPw1tKg86IvjmdQwCXCn8k9VAJ0cb6XXc5iEfgQr1ILx7bLfFQP9qRjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cRfO21ku; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-29ab78237d2so549898a91.1;
-        Mon, 26 Feb 2024 06:36:23 -0800 (PST)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dc1ff3ba1aso25326715ad.3;
+        Mon, 26 Feb 2024 06:36:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958182; x=1709562982; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958186; x=1709562986; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y7bwJTFGuFIC+k+OLuNRGTvG01rlJOsBv/cJ09NssQo=;
-        b=fBkD0NRPw4AGY3YXrHNWWtI42PIFEEkn5wKbwArZSgYMkBVvYVd7om/top6bbFAgz4
-         5F/b17qDkquMppAwXit4mXEh4YxrNo7lzE162Yf8kKmiGpE5lmhYbxa/T184OQwjNu8d
-         xZ9eLaaGSsjlZTehGE9UxJxt1Aam02S9hivlsQFV/AAwVba0InMQcbc+wezckpYV/emF
-         Y5PtGyItg+QEblMS+xxV+PtdW/LByiG5C+M6K9IAvDG0LNrCIIt2gVLLWXFDvnJF5TgD
-         c9nSCtMKOL6+JCIn3tcZxCll6ybsexTN9FB4BLIAbfSTL2ySCqfwRYyFvT2pgcd7sajP
-         Dj3g==
+        bh=h/GP0KqLiQo98vwHDOjndhSbhcZ2rln4TVJt6Ie5g30=;
+        b=cRfO21kuPaMtiH7S2C5gbeshHNiYpLy+BbUc1xYjM5vx23faOppFqYm//5BGiIjVIK
+         uSMFGQqM8fb/NwzaCxkrTqChfGbh2pnQIi+pJwuBBboCCr+nzw33nXKo49VC3ZgeFa3K
+         i0iAdDi9io+zJW9RShFT35yArr2WxzJW2/Dbki6+P2q59HSnk2xDbrACsLTrKqMNKlUa
+         J6VNB22y4jjrovq6F0a5CeuG8Mu8y2TJvV3tmheMTzV21WdHCuumL8l/V3xxzSUvwpYE
+         5OCjyfN99HUv5d/OAL2NrgIqfHR6Npboi8mbzNy1PgFBU4UMWVmkJoDF0CUmnkNWYevA
+         uK5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958182; x=1709562982;
+        d=1e100.net; s=20230601; t=1708958186; x=1709562986;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y7bwJTFGuFIC+k+OLuNRGTvG01rlJOsBv/cJ09NssQo=;
-        b=Kvcebnit4V0I81TxrkGG3PjDSULGVcCDoM8dvusHBOrvbmSKImWhjIDxpaP0Lp3kSF
-         me17vdL23OUnL73ETi/cw0ndTB0OgMhP8rXX5D9CFM2dXUzAmeU+8eqShh+jdT37RWe0
-         6sDHlhiyQpd9iMxtMlNn3Euu88v4rzZM+fxsiIAoE0uameoWZ7piZxXO3T5n55KJoHKx
-         Qvu3KJrsJBEfnkXg9cGkobQX08PEyiJvX+IYWooRiEKpKfoidv0iVAfWKaS79I+tL4PE
-         jx4nfx/KFA/tlpSZpLQcEFl5r2grNlpDcEOu5NqOP30Ahkb1tyzffAlecidqS6RorHJk
-         1lLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3ofhI5ahyvp8i1MH6ErFjEmyNpvqXNm7QrWsdV7F5/4l4TzPo6kTS1FnbNKE4ZFxyv7ShiJ9A1/q1hq3wDc7Za9Au
-X-Gm-Message-State: AOJu0YwEiYOrpaj/UND34JIsSJfwMbx4+OPZN2E/KiP7pe6FgEPq4Xox
-	7bhnP62BH6BD8/IF7KJ1fzR4+h9lvl5oDGkjoDen5wy/OTEN+c0o3d7H0+nk
-X-Google-Smtp-Source: AGHT+IG3z1woxkp3HjHcu/cKR62RacPqwF1XKXl10J4SM9h9SBQY/rrOhEnQy0WWaLka6uM1LzHAOg==
-X-Received: by 2002:a17:90a:bd09:b0:29a:8b1b:1f61 with SMTP id y9-20020a17090abd0900b0029a8b1b1f61mr3842116pjr.17.1708958182556;
-        Mon, 26 Feb 2024 06:36:22 -0800 (PST)
-Received: from localhost ([47.254.32.37])
-        by smtp.gmail.com with ESMTPSA id n15-20020a17090ade8f00b002995e9aca72sm4579874pjv.29.2024.02.26.06.36.21
+        bh=h/GP0KqLiQo98vwHDOjndhSbhcZ2rln4TVJt6Ie5g30=;
+        b=MjSVIH5OUt2enxBW+kBtbGw6JsmPQAOvjc65z3LhP/XHxsCExXmnBHH6UEBKp8R/uX
+         Vdrvz7dzxZzolwtQmO1F+tm4YLdfqQ35uJiyygiKnIsP1JQydeCNyo9miWbOZVOP3j3x
+         ZPBGY8woAabG8r/SsZkGp3ZMkI6B4tb02fu7m5jZAH4FCqZKDeHholDtT5CbaL6eoQXJ
+         D3B/PFz4gLfqvLrq7ciBS8bXvMizo2Lu4LHMAE3DnVdW8rzXybzZ1fQsx1X5m/B4NSVe
+         HUQNNkR/0nOMYhFX2tD83Ymdd8vWLc1bhwaUlwJhZdBlOwqWGEfliMeBjR81kJwB/9rn
+         uKTw==
+X-Forwarded-Encrypted: i=1; AJvYcCXFfVkmAraO09A5WKS+6ZMEpzmZS82+7mazVi6BwKSWkQvoUVILU2aZcy043fas9MGURSZpinQGhdzB9aRalgJjuNd1
+X-Gm-Message-State: AOJu0YwOro6pZeQxHzqhrzboxYG76WxYkE8dPOTmHZUpmUA8kn3073+t
+	FgSIikdGibEEFfMupythdmAJWqLEzt8zL+gKBplKUcnAlLNfis5hcfrqD/kz
+X-Google-Smtp-Source: AGHT+IEMuwRtiAJXeXANhaAHgTUUopEhhNurxT2IDkexHNjvTyx0eaYlmjpPJEMP+wZaJcr/GimM2A==
+X-Received: by 2002:a17:902:ea12:b0:1dc:90c0:1e6a with SMTP id s18-20020a170902ea1200b001dc90c01e6amr5660164plg.45.1708958185760;
+        Mon, 26 Feb 2024 06:36:25 -0800 (PST)
+Received: from localhost ([47.88.5.130])
+        by smtp.gmail.com with ESMTPSA id u11-20020a170902e20b00b001dc9422891esm2650104plb.30.2024.02.26.06.36.24
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:36:22 -0800 (PST)
+        Mon, 26 Feb 2024 06:36:25 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -84,9 +84,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 32/73] KVM: x86/PVM: Enable guest debugging functions
-Date: Mon, 26 Feb 2024 22:35:49 +0800
-Message-Id: <20240226143630.33643-33-jiangshanlai@gmail.com>
+Subject: [RFC PATCH 33/73] KVM: x86/PVM: Handle VM-exit due to hardware exceptions
+Date: Mon, 26 Feb 2024 22:35:50 +0800
+Message-Id: <20240226143630.33643-34-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -100,219 +100,201 @@ Content-Transfer-Encoding: 8bit
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-The guest DR7 is loaded before VM enter to enable debugging functions
-for the guest. If guest debugging is not enabled, the #DB and #BP
-exceptions are reinjected into the guest directly; otherwise, they are
-handled by the hypervisor.
-
-However, DR7_GD is cleared since debug register read/write is a
-privileged instruction, which always leads to a VM exit for #GP. The
-address of breakpoints is limited to the allowed address range, similar
-to the check in the #PF path.  Guest DR7 is loaded before VM enter to
-enable debug function for guest.  If guest debug is not enabled, the #DB
-and #BP are reinjected into guest directly, otherwise, they are handled
-by hypervisor similar to VMX.
+When the exceptions are of interest to the hypervisor for emulation or
+debugging, they should be handled by the hypervisor first, for example,
+handling #PF for shadow page table. If the exceptions are pure guest
+exceptions, they should be reinjected into the guest directly. If the
+exceptions belong to the host, they should already have been handled in
+an atomic way before enabling interrupts.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/pvm/pvm.c | 96 ++++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/pvm/pvm.h |  3 ++
- 2 files changed, 99 insertions(+)
+ arch/x86/kvm/pvm/pvm.c | 157 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 157 insertions(+)
 
 diff --git a/arch/x86/kvm/pvm/pvm.c b/arch/x86/kvm/pvm/pvm.c
-index 4ec8c2c514ca..299305903005 100644
+index 299305903005..c6fd01c19c3e 100644
 --- a/arch/x86/kvm/pvm/pvm.c
 +++ b/arch/x86/kvm/pvm/pvm.c
-@@ -383,6 +383,8 @@ static void pvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct vcpu_pvm *pvm = to_pvm(vcpu);
+@@ -20,6 +20,7 @@
  
-+	pvm->host_debugctlmsr = get_debugctlmsr();
-+
- 	if (__this_cpu_read(active_pvm_vcpu) == pvm && vcpu->cpu == cpu)
- 		return;
- 
-@@ -533,6 +535,9 @@ static int pvm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_SYSENTER_ESP:
- 		msr_info->data = pvm->unused_MSR_IA32_SYSENTER_ESP;
- 		break;
-+	case MSR_IA32_DEBUGCTLMSR:
-+		msr_info->data = 0;
-+		break;
- 	case MSR_PVM_VCPU_STRUCT:
- 		msr_info->data = pvm->msr_vcpu_struct;
- 		break;
-@@ -619,6 +624,9 @@ static int pvm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_SYSENTER_ESP:
- 		pvm->unused_MSR_IA32_SYSENTER_ESP = data;
- 		break;
-+	case MSR_IA32_DEBUGCTLMSR:
-+		/* It is ignored now. */
-+		break;
- 	case MSR_PVM_VCPU_STRUCT:
- 		if (!PAGE_ALIGNED(data))
- 			return 1;
-@@ -810,6 +818,10 @@ static bool pvm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
- 	return false;
- }
- 
-+static void update_exception_bitmap(struct kvm_vcpu *vcpu)
-+{
-+}
-+
- static struct pvm_vcpu_struct *pvm_get_vcpu_struct(struct vcpu_pvm *pvm)
- {
- 	struct gfn_to_pfn_cache *gpc = &pvm->pvcs_gpc;
-@@ -1235,6 +1247,72 @@ static int pvm_vcpu_pre_run(struct kvm_vcpu *vcpu)
+ #include "cpuid.h"
+ #include "lapic.h"
++#include "mmu.h"
+ #include "trace.h"
+ #include "x86.h"
+ #include "pvm.h"
+@@ -1161,6 +1162,160 @@ static int handle_exit_syscall(struct kvm_vcpu *vcpu)
  	return 1;
  }
  
-+static void pvm_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
++static int handle_exit_debug(struct kvm_vcpu *vcpu)
 +{
-+	WARN_ONCE(1, "pvm never sets KVM_DEBUGREG_WONT_EXIT\n");
-+}
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
++	struct kvm_run *kvm_run = pvm->vcpu.run;
 +
-+static void pvm_set_dr7(struct kvm_vcpu *vcpu, unsigned long val)
-+{
-+	to_pvm(vcpu)->guest_dr7 = val;
-+}
-+
-+static __always_inline unsigned long __dr7_enable_mask(int drnum)
-+{
-+	unsigned long bp_mask = 0;
-+
-+	bp_mask |= (DR_LOCAL_ENABLE << (drnum * DR_ENABLE_SIZE));
-+	bp_mask |= (DR_GLOBAL_ENABLE << (drnum * DR_ENABLE_SIZE));
-+
-+	return bp_mask;
-+}
-+
-+static __always_inline unsigned long __dr7_mask(int drnum)
-+{
-+	unsigned long bp_mask = 0xf;
-+
-+	bp_mask <<= (DR_CONTROL_SHIFT + drnum * DR_CONTROL_SIZE);
-+	bp_mask |= __dr7_enable_mask(drnum);
-+
-+	return bp_mask;
-+}
-+
-+/*
-+ * Calculate the correct dr7 for the hardware to avoid the host
-+ * being watched.
-+ *
-+ * It only needs to be calculated each time when vcpu->arch.eff_db or
-+ * pvm->guest_dr7 is changed.  But now it is calculated each time on
-+ * VM-enter since there is no proper callback for vcpu->arch.eff_db and
-+ * it is slow path.
-+ */
-+static __always_inline unsigned long pvm_eff_dr7(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long eff_dr7 = to_pvm(vcpu)->guest_dr7;
-+	int i;
-+
-+	/*
-+	 * DR7_GD should not be set to hardware. And it doesn't need to be
-+	 * set to hardware since PVM guest is running on hardware ring3.
-+	 * All access to debug registers will be trapped and the emulation
-+	 * code can handle DR7_GD correctly for PVM.
-+	 */
-+	eff_dr7 &= ~DR7_GD;
-+
-+	/*
-+	 * Disallow addresses that are not for the guest, especially addresses
-+	 * on the host entry code.
-+	 */
-+	for (i = 0; i < KVM_NR_DB_REGS; i++) {
-+		if (!pvm_guest_allowed_va(vcpu, vcpu->arch.eff_db[i]))
-+			eff_dr7 &= ~__dr7_mask(i);
-+		if (!pvm_guest_allowed_va(vcpu, vcpu->arch.eff_db[i] + 7))
-+			eff_dr7 &= ~__dr7_mask(i);
++	if (pvm->vcpu.guest_debug &
++	    (KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP)) {
++		kvm_run->exit_reason = KVM_EXIT_DEBUG;
++		kvm_run->debug.arch.dr6 = pvm->exit_dr6 | DR6_FIXED_1 | DR6_RTM;
++		kvm_run->debug.arch.dr7 = vcpu->arch.guest_debug_dr7;
++		kvm_run->debug.arch.pc = kvm_rip_read(vcpu);
++		kvm_run->debug.arch.exception = DB_VECTOR;
++		return 0;
 +	}
 +
-+	return eff_dr7;
++	kvm_queue_exception_p(vcpu, DB_VECTOR, pvm->exit_dr6);
++	return 1;
 +}
 +
- // Save guest registers from host sp0 or IST stack.
- static __always_inline void save_regs(struct kvm_vcpu *vcpu, struct pt_regs *guest)
++/* check if the previous instruction is "int3" on receiving #BP */
++static bool is_bp_trap(struct kvm_vcpu *vcpu)
++{
++	u8 byte = 0;
++	unsigned long rip;
++	struct x86_exception exception;
++	int r;
++
++	rip = kvm_rip_read(vcpu) - 1;
++	r = kvm_read_guest_virt(vcpu, rip, &byte, 1, &exception);
++
++	/* Just assume it to be int3 when failed to fetch the instruction. */
++	if (r)
++		return true;
++
++	return byte == 0xcc;
++}
++
++static int handle_exit_breakpoint(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
++	struct kvm_run *kvm_run = pvm->vcpu.run;
++
++	/*
++	 * Breakpoint exception can be caused by int3 or int 3.  While "int3"
++	 * participates in guest debug, but "int 3" should not.
++	 */
++	if ((vcpu->guest_debug & KVM_GUESTDBG_USE_SW_BP) && is_bp_trap(vcpu)) {
++		kvm_rip_write(vcpu, kvm_rip_read(vcpu) - 1);
++		kvm_run->exit_reason = KVM_EXIT_DEBUG;
++		kvm_run->debug.arch.pc = kvm_rip_read(vcpu);
++		kvm_run->debug.arch.exception = BP_VECTOR;
++		return 0;
++	}
++
++	kvm_queue_exception(vcpu, BP_VECTOR);
++	return 1;
++}
++
++static int handle_exit_exception(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
++	struct kvm_run *kvm_run = vcpu->run;
++	u32 vector, error_code;
++	int err;
++
++	vector = pvm->exit_vector;
++	error_code = pvm->exit_error_code;
++
++	switch (vector) {
++	// #PF, #GP, #UD, #DB and #BP are guest exceptions or hypervisor
++	// interested exceptions for emulation or debugging.
++	case PF_VECTOR:
++		// Remove hardware generated PFERR_USER_MASK when in supervisor
++		// mode to reflect the real mode in PVM.
++		if (is_smod(pvm))
++			error_code &= ~PFERR_USER_MASK;
++
++		// If it is a PK fault, set pkru=0 and re-enter the guest silently.
++		// See the comment before pvm_load_guest_xsave_state().
++		if (cpu_feature_enabled(X86_FEATURE_PKU) && (error_code & PFERR_PK_MASK))
++			return 1;
++
++		return kvm_handle_page_fault(vcpu, error_code, pvm->exit_cr2,
++					     NULL, 0);
++	case GP_VECTOR:
++		err = kvm_emulate_instruction(vcpu, EMULTYPE_PVM_GP);
++		if (!err)
++			return 0;
++
++		if (vcpu->arch.halt_request) {
++			vcpu->arch.halt_request = 0;
++			return kvm_emulate_halt_noskip(vcpu);
++		}
++		return 1;
++	case UD_VECTOR:
++		if (!is_smod(pvm)) {
++			kvm_queue_exception(vcpu, UD_VECTOR);
++			return 1;
++		}
++		return handle_ud(vcpu);
++	case DB_VECTOR:
++		return handle_exit_debug(vcpu);
++	case BP_VECTOR:
++		return handle_exit_breakpoint(vcpu);
++
++	// #DE, #OF, #BR, #NM, #MF, #XM, #TS, #NP, #SS and #AC are pure guest
++	// exceptions.
++	case DE_VECTOR:
++	case OF_VECTOR:
++	case BR_VECTOR:
++	case NM_VECTOR:
++	case MF_VECTOR:
++	case XM_VECTOR:
++		kvm_queue_exception(vcpu, vector);
++		return 1;
++	case AC_VECTOR:
++	case TS_VECTOR:
++	case NP_VECTOR:
++	case SS_VECTOR:
++		kvm_queue_exception_e(vcpu, vector, error_code);
++		return 1;
++
++	// #NMI, #VE, #VC, #MC and #DF are exceptions that belong to host.
++	// They should have been handled in atomic way when vmexit.
++	case NMI_VECTOR:
++		// NMI is handled by pvm_vcpu_run_noinstr().
++		return 1;
++	case VE_VECTOR:
++		// TODO: tdx_handle_virt_exception(regs, &pvm->exit_ve); break;
++		goto unknown_exit_reason;
++	case X86_TRAP_VC:
++		// TODO: handle the second part for #VC.
++		goto unknown_exit_reason;
++	case MC_VECTOR:
++		// MC is handled by pvm_handle_exit_irqoff().
++		// TODO: split kvm_machine_check() to avoid irq-enabled or
++		// schedule code (thread dead) in pvm_handle_exit_irqoff().
++		return 1;
++	case DF_VECTOR:
++		// DF is handled when exiting and can't reach here.
++		pr_warn_once("host bug, can't reach here");
++		break;
++	default:
++unknown_exit_reason:
++		pr_warn_once("unknown exit_reason vector:%d, error_code:%x, rip:0x%lx\n",
++			      vector, pvm->exit_error_code, kvm_rip_read(vcpu));
++		kvm_run->exit_reason = KVM_EXIT_EXCEPTION;
++		kvm_run->ex.exception = vector;
++		kvm_run->ex.error_code = error_code;
++		break;
++	}
++	return 0;
++}
++
+ static int handle_exit_external_interrupt(struct kvm_vcpu *vcpu)
  {
-@@ -1301,6 +1379,9 @@ static noinstr void pvm_vcpu_run_noinstr(struct kvm_vcpu *vcpu)
- 	// Load guest registers into the host sp0 stack for switcher.
- 	load_regs(vcpu, sp0_regs);
+ 	++vcpu->stat.irq_exits;
+@@ -1187,6 +1342,8 @@ static int pvm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
  
-+	if (unlikely(pvm->guest_dr7 & DR7_BP_EN_MASK))
-+		set_debugreg(pvm_eff_dr7(vcpu), 7);
-+
- 	// Call into switcher and enter guest.
- 	ret_regs = switcher_enter_guest();
- 
-@@ -1309,6 +1390,11 @@ static noinstr void pvm_vcpu_run_noinstr(struct kvm_vcpu *vcpu)
- 	pvm->exit_vector = (ret_regs->orig_ax >> 32);
- 	pvm->exit_error_code = (u32)ret_regs->orig_ax;
- 
-+	// dr7 requires to be zero when the controling of debug registers
-+	// passes back to the host.
-+	if (unlikely(pvm->guest_dr7 & DR7_BP_EN_MASK))
-+		set_debugreg(0, 7);
-+
- 	// handle noinstr vmexits reasons.
- 	switch (pvm->exit_vector) {
- 	case PF_VECTOR:
-@@ -1387,8 +1473,15 @@ static fastpath_t pvm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	pvm_set_host_cr3(pvm);
- 
-+	if (pvm->host_debugctlmsr)
-+		update_debugctlmsr(0);
-+
- 	pvm_vcpu_run_noinstr(vcpu);
- 
-+	/* MSR_IA32_DEBUGCTLMSR is zeroed before vmenter. Restore it if needed */
-+	if (pvm->host_debugctlmsr)
-+		update_debugctlmsr(pvm->host_debugctlmsr);
-+
- 	if (is_smod(pvm)) {
- 		struct pvm_vcpu_struct *pvcs = pvm->pvcs_gpc.khva;
- 
-@@ -1696,6 +1789,7 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
- 	.vcpu_load = pvm_vcpu_load,
- 	.vcpu_put = pvm_vcpu_put,
- 
-+	.update_exception_bitmap = update_exception_bitmap,
- 	.get_msr_feature = pvm_get_msr_feature,
- 	.get_msr = pvm_get_msr,
- 	.set_msr = pvm_set_msr,
-@@ -1709,6 +1803,8 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
- 	.set_gdt = pvm_set_gdt,
- 	.get_idt = pvm_get_idt,
- 	.set_idt = pvm_set_idt,
-+	.set_dr7 = pvm_set_dr7,
-+	.sync_dirty_debug_regs = pvm_sync_dirty_debug_regs,
- 	.get_rflags = pvm_get_rflags,
- 	.set_rflags = pvm_set_rflags,
- 	.get_if_flag = pvm_get_if_flag,
-diff --git a/arch/x86/kvm/pvm/pvm.h b/arch/x86/kvm/pvm/pvm.h
-index bf3a6a1837c0..4cdcbed1c813 100644
---- a/arch/x86/kvm/pvm/pvm.h
-+++ b/arch/x86/kvm/pvm/pvm.h
-@@ -37,6 +37,7 @@ struct vcpu_pvm {
- 	unsigned long switch_flags;
- 
- 	u16 host_ds_sel, host_es_sel;
-+	u64 host_debugctlmsr;
- 
- 	union {
- 		unsigned long exit_extra;
-@@ -52,6 +53,8 @@ struct vcpu_pvm {
- 	int int_shadow;
- 	bool nmi_mask;
- 
-+	unsigned long guest_dr7;
-+
- 	struct gfn_to_pfn_cache pvcs_gpc;
- 
- 	// emulated x86 msrs
+ 	if (exit_reason == PVM_SYSCALL_VECTOR)
+ 		return handle_exit_syscall(vcpu);
++	else if (exit_reason >= 0 && exit_reason < FIRST_EXTERNAL_VECTOR)
++		return handle_exit_exception(vcpu);
+ 	else if (exit_reason == IA32_SYSCALL_VECTOR)
+ 		return do_pvm_event(vcpu, IA32_SYSCALL_VECTOR, false, 0);
+ 	else if (exit_reason >= FIRST_EXTERNAL_VECTOR && exit_reason < NR_VECTORS)
 -- 
 2.19.1.6.gb485710b
 
