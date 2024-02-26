@@ -1,164 +1,196 @@
-Return-Path: <kvm+bounces-9995-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9996-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF4168681AF
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 21:04:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D43BE8681FE
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 21:39:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A301F27ECE
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:04:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89B6D28EC23
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E3F130AFB;
-	Mon, 26 Feb 2024 20:04:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80C4130E39;
+	Mon, 26 Feb 2024 20:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JoSwcdz9"
 X-Original-To: kvm@vger.kernel.org
-Received: from zero.eik.bme.hu (zero.eik.bme.hu [152.66.115.2])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0643130ADB
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 20:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.66.115.2
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708977860; cv=none; b=D19BlkIqfCADgxGll9H83MVdIWC66AeRnD0iFkK7bfzn0Rp9NOmAtf8R59YrAArnp8sO/wHo+35w+Io7mG+4EXxM8iHOwoYa0yfyY6sBtA3xRmra27Ehb61xhsxyAhc2B+au0YERBko1B5F33iCikwkkbegdTg8CQk/8L0OypcM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708977860; c=relaxed/simple;
-	bh=OM5yEvjLqCASQyyyq6ESNY+qU3ZtdETPEs2un++CTiU=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=UWzUJseLvVQpT4QNcpXTPopI0elfCqs491dii3Zt5KrTfh6QObz5PtwoER3ptZdgXeUmUMAoZwcDhMCi39X6ErYiqfZn0xISTOlftmBaQojaRDU+bb8YBxUzQuDpsgWQDfoprnhPsOlllsS/5+yLxSOkb7uVrh561vxb+zq1dQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu; spf=pass smtp.mailfrom=eik.bme.hu; arc=none smtp.client-ip=152.66.115.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eik.bme.hu
-Received: from zero.eik.bme.hu (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id 9BD1F4E601E;
-	Mon, 26 Feb 2024 21:04:08 +0100 (CET)
-X-Virus-Scanned: amavisd-new at eik.bme.hu
-Received: from zero.eik.bme.hu ([127.0.0.1])
-	by zero.eik.bme.hu (zero.eik.bme.hu [127.0.0.1]) (amavisd-new, port 10028)
-	with ESMTP id wLBUWJt-thNp; Mon, 26 Feb 2024 21:04:06 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
-	id 9F81E4E6005; Mon, 26 Feb 2024 21:04:06 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id 9D6CA7456B4;
-	Mon, 26 Feb 2024 21:04:06 +0100 (CET)
-Date: Mon, 26 Feb 2024 21:04:06 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>
-cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, 
-    Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, 
-    =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>, 
-    Eduardo Habkost <eduardo@habkost.net>, qemu-arm@nongnu.org, 
-    kvm@vger.kernel.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, 
-    "Michael S. Tsirkin" <mst@redhat.com>, 
-    Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
-    Paolo Bonzini <pbonzini@redhat.com>, 
-    Richard Henderson <richard.henderson@linaro.org>, 
-    Markus Armbruster <armbru@redhat.com>, 
-    Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
-Subject: Re: [PATCH 1/6] hw/arm: Inline sysbus_create_simple(PL110 / PL111)
-In-Reply-To: <c5d5f835-5b7f-46bb-8393-6d638cbad012@linaro.org>
-Message-ID: <14dc34ed-be4a-e3d1-dfae-95d141519d3f@eik.bme.hu>
-References: <20240216153517.49422-1-philmd@linaro.org> <20240216153517.49422-2-philmd@linaro.org> <bcfd3f9d-04e3-79c9-c15f-c3c8d7669bdb@eik.bme.hu> <2f8ec2e2-c4c7-48c3-9c3d-3e20bc3d6b9b@linaro.org> <b40fd79f-4d41-4e04-90c1-6f4b2fde811d@linaro.org>
- <00e2b898-3c5f-d19c-fddc-e657306e071f@eik.bme.hu> <2b9ea923-c4f9-4ee4-8ed2-ba9f62c15579@linaro.org> <6b5758d6-f464-2461-f9dd-71d2e15b610a@eik.bme.hu> <bc5929e4-1782-4719-8231-fe04a9719c40@ilande.co.uk> <CAFEAcA-Mvd4NVY2yDgNEdjZ_YPrN93PDZRyfCi7JyCjmPs4gAQ@mail.gmail.com>
- <0a31f410-415d-474b-bcea-9cb18f41aeb2@ilande.co.uk> <9ef2075b-b26b-41d2-a7d0-456cec3b104a@eik.bme.hu> <c5d5f835-5b7f-46bb-8393-6d638cbad012@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB3712C55D;
+	Mon, 26 Feb 2024 20:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708979952; cv=fail; b=CxMYAmMS2p/NfbgeuZDUMhRucPElB1FwGGdZt787IcnnEub05R5pKnjESO97FndxjKLTVWDDuy/nmR7/bWRYNbfdfP+uMovxtv3dWw6l4LqFCPm0W+2R13Ro62Y1xZAUPeTc+FzRTd4eSfuFdIIYCyJm3G6LOo2FsN2HEnllWgY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708979952; c=relaxed/simple;
+	bh=tLyyQnGlSGNWsqz8G2K2bJxrJpFj8+pElUd/lCehEyE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=iZ5nnDDGpSytKm6eUDbm+lWx2hjgIA+WyENJgii/BMB2ZUwiOsSboJSHlbKkX79+AWxQEcq5XpC3NIl8C0lePqsgo2gvTH89obDPTegKYix9HYyIle2c1R+ep+EH2DxWhdMhsyPPetc2cwSomhVvQZG3ynpbMKz3I/57HTels44=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JoSwcdz9; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708979951; x=1740515951;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=tLyyQnGlSGNWsqz8G2K2bJxrJpFj8+pElUd/lCehEyE=;
+  b=JoSwcdz9IZAux3TBgOjMRXY+R2dOaCCQCPhzqEWU5Dj/SWjM5wCRcSOr
+   sWroBVMhJuL6ZcLQ5tEmzbH7GGm3Vbi7fpf594WzYz+lQXgH2yWU27ZWA
+   K9sN5bghCSPN1fd2C8RRhJPmzzn/vrp6wEsCo6pUraslDmBD8IQZEIQYo
+   Bhe6jFjsncn6Ye/dmFEDvrQZGPvJC7jxmLkaeXLPPKfZp7veGAdX+9oK/
+   0uT6VKH7rBLloN8cxvJNlmThhciHMPmbcmdkQI4vs3BoVAAN7AOQl7ecU
+   9v6mxJoJouHRwk1qgJlawb3ASXxlKpqzqAQhynmSF9w6E3H0zwAVFY9H2
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="25761093"
+X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
+   d="scan'208";a="25761093"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 12:39:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
+   d="scan'208";a="7014625"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Feb 2024 12:37:27 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 26 Feb 2024 12:37:26 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 26 Feb 2024 12:37:26 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 26 Feb 2024 12:37:26 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 26 Feb 2024 12:37:25 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HJAMuE2Vo0p1L0/xQUCdDwHJjRDbxOg+R8qCuhTydH2bw7oHbY9whnsmq2DNFoYmHPs8baS8cG17NiT5PvpwhkRgehArJ+JJfc9ow0X89muFSJSkZPu/ER88adHr3SE0gA84xg+VL1yzar4dHzu9TMlWw6RNTnY7m85W1RHmS2TJVBTRwJMx2FuE8vP6ribig0egczQG4Hg1QrtvmiXvaWoSVzTj9vOb9/Aw8vQABuARNeQZ5zNIVuR1+n28P+rl7zGlwFf/9PIyeLNskgp1ABW2F1BArHyYpnE3bsjtDK49A3UW8gSzxTkqBfyLBLmRxAiosw3eWLQGfAfVdnkB0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cvn80HNqyUBIOvGaPnJPWqtQfd2XaOMul9yKqutB2k4=;
+ b=ns0c+zHZJBQEY6LJKeKaJy1KABktwlYLmNi+MWcDWSZ9QgCr6U2w3s/E8b73MabsYy4sQZHMHK1RxoWjU90GsT3bjpRwzDuR1rO+eq9CzBslK6DzR9aRT5AdLhA9adVMsyAObdM16Y6w5FOYj3Lfu0GQbPsHhGrKhEdVnLdSQ52NMLaP3557S879upqjxyOhIX2tyLBTB91XXQ9Fyg1b6CNj643+KEiNE1d+AxTpHQz1nqCROH/h32nbgVHlgjT4bVshKfgPm2pMUHcHeKffXE9xr0kdWDsz+4EWAfJWpFXFNG3+A8hn2y5lGA6ZQvr65dwm7QONpYAWSNG46JHwbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by DM4PR11MB5246.namprd11.prod.outlook.com (2603:10b6:5:389::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.25; Mon, 26 Feb
+ 2024 20:37:22 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::90e5:7578:2fbf:b7c4]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::90e5:7578:2fbf:b7c4%4]) with mapi id 15.20.7339.009; Mon, 26 Feb 2024
+ 20:37:22 +0000
+Date: Mon, 26 Feb 2024 20:25:00 +0000
+From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: Xin Zeng <xin.zeng@intel.com>, <jgg@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <yishaih@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>, <qat-linux@intel.com>,
+	Yahui Cao <yahui.cao@intel.com>
+Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Message-ID: <ZdzznEkWExQXYj1k@gcabiddu-mobl.ger.corp.intel.com>
+References: <20240221155008.960369-1-xin.zeng@intel.com>
+ <20240221155008.960369-11-xin.zeng@intel.com>
+ <20240226115556.3f494157.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240226115556.3f494157.alex.williamson@redhat.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: DBBPR09CA0036.eurprd09.prod.outlook.com
+ (2603:10a6:10:d4::24) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="3866299591-2026228376-1708977846=:54539"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|DM4PR11MB5246:EE_
+X-MS-Office365-Filtering-Correlation-Id: 94e7f714-e319-4a08-5578-08dc370abbf4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IgTo/94Mki4Gqlnil2n59Hh6AJW8S3edJFZo0WhJg6iQRMDwrITd1RRE4FMg0sm1knJP7EWhj0hIUfp8TELHUx/OCTgoVH2Zs1U1W5CA1fY8n03VAmy2Icc1PCMtN+8Icg2SIPMJH8GOs/U2HlhWJMJn+gY8bA8TcrN+2Xch5XOT2yWAI08M/1hN+k2LsUhzaKUgPmt7XGYZhjuQBbLSYOV73b9/usXb8GbW29bifEdrWJPfvIKTRSSA7RTIcjlW8SziPd6csLAXsdOAknqNxryhuu7P/pE5L3fmx4vQYQT7p/jZ/y5QZRjl08ecoWgyoHr9HoLBIJnumt13BGXQRpa+vbZVINWga6JJDcYgUkRtwkSKQcfQXPQU3cHsVlToYYrxEni/UDzWxFglQkODK7vlDKYSuoONHqlK+R9r0CdCcLbMW8Da4b97ZveNvNC0DINuhmzl4WOhPI0RTyHJ0FTisyGAwYZX+LRPL1UOFitnN1P1vG1xSfk79Q48w6mspXaCsGRWiM+CpyYzXKmEah6DhH3SAlTCCuX99bZHcU/Di2e/CnMlegRIp1wzkA5cs6iRKcFZyYwAhfnrP2uwAsPmV51KlIpIwY3CE5qXtdR0+P6O6yegvImikzh+PjnT
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TDTQC9Eusd5H28JuhmNyDcC76CwW+Avtwel9xwK7unOmOJrEyv+nu5R65M1d?=
+ =?us-ascii?Q?/VKJyRg/ECS8Hk4LpyaXCkJqVxaRy3RxQOA01I3MfI/OFcdZrxnCKmmSuVna?=
+ =?us-ascii?Q?JrdtT2Q3Q7gEUdU3B8m9yYXXXV71pLbqvrUkLaxBq8HXXmMp/VqG45fzO8KT?=
+ =?us-ascii?Q?Y5ajYYkr1tKRpNBJ/uKgpgh2/GCZlryTWKofu8K5cjSmUQvqqQ//eMfM0Eh4?=
+ =?us-ascii?Q?4d6AX0i6iHPwfO7z4Ci/mUP2g6QpXupno/Mgc+70m3g7+8lyNNdY40c6VFmf?=
+ =?us-ascii?Q?dw30SEyaBT21+7h4TxkXdpSznh6VdSyDTPWzpWKsAe1KIbAoUK1iaxq+rJNB?=
+ =?us-ascii?Q?sdgJwjN0MxSOtVqxC8KQxwIONGanar1bL/m2v1Tnimi02imSCBc99IKxkYnj?=
+ =?us-ascii?Q?PnTQFH/jqDp3xKH5uBawwQkW/zWhFwy0rUr/DR9SZ3eZzTvV1qZvlH+q62Gj?=
+ =?us-ascii?Q?uLAAqNrk/qAk2C8fsIZvLoNaxS91SRIz0Bxg0563LYfr1z6e193JnPMOlWgo?=
+ =?us-ascii?Q?HsU8g+tEJMBkyMyyEcZILw/jr5X20NICcyR18J+556OSWJT++1cxKBw9HXwU?=
+ =?us-ascii?Q?Q4W34PycmWpZ18mbGupTb64A/XkdsvNVMOgJ+4+0ibufsEC2WITzpYajYIsI?=
+ =?us-ascii?Q?CqWHvT7S6995QiAWDw3zdV78NBbbpz6e6oyE+GnkXvMA9OMvoanjuRIP7ysG?=
+ =?us-ascii?Q?a/WiNDgjpdiz+suHT03NlNhmo7FX+ki8fhWU5z+V4Iokjeb5Imh04bkdGDE5?=
+ =?us-ascii?Q?ebmpesh2IYWZUS1vzMlcZFWHAkDdxzeLZ3Z+fqhEA+rOHH9BajJxxF6QvlXg?=
+ =?us-ascii?Q?6o5FLnTiOjA5AGGrMgrfwPreJhRG9Pl+UtzVK0Om2Lk7D0ry9PI1HCJqtW+0?=
+ =?us-ascii?Q?LisjHrGklooQUrRSKpPpMlLbaBRYX5/qS0AlIv4BkvGK6y4EcKd6kywlfWfa?=
+ =?us-ascii?Q?4rCHZwMbqzA37vLQ3kTyOz/obY0L1G0DqbZB6X3LGzSHNsDHEFaIo1h359zD?=
+ =?us-ascii?Q?3V5vVfXmckiOusd9SMQ28al1eTCSTeDtIJktAee8w2J1Yd6IuYrpU5+kOsGw?=
+ =?us-ascii?Q?VAHE3pyCUE9RNstU+EHzlb/QFcekAlOIdHmdlObXMBfgqA252Y82mfBAXosN?=
+ =?us-ascii?Q?gr3ZYzFkd/KSB4Dz/fGSskxoFxeqf7FijmxdVS0EKn70CVARD+ID94rM03oS?=
+ =?us-ascii?Q?aQka4SxJtXCyNCSwM8bpC4OrQO82NbKRBuwNwuuW1zWN9fYbFnHvyqH6561c?=
+ =?us-ascii?Q?DhgcoES7tDH7GUeKJ8OpM959zh5hyGh8Ni/W52KkwSCzUYsOKxvoRmumkECr?=
+ =?us-ascii?Q?dNA4atKfGaO3kokjECWtuR0p4nfSKYOH8qx8oUh3OYr4c4ajI/PQb2I/yd+o?=
+ =?us-ascii?Q?3o19WsQSWzZw3Hm/C24kc74P6DKMARNzDjtSyq40Omdc1NfNAXObhnKcIuPD?=
+ =?us-ascii?Q?bk/OESGHqNYCegkyMvpqYTxJI4ETKNxg/TPKrexULfFcxRUmt+vegSoMcZhV?=
+ =?us-ascii?Q?x+DUxZoTRg98KGZ2MTib6SjT2ZDqACDqkUhDWzZxP4LWAk+kymAqaXFmf4RH?=
+ =?us-ascii?Q?UD2iATqXfISmU4XpFaWqb+/HFUG6x14zPA1ZHSxt2X3CLcXvgezfMZLBwOgK?=
+ =?us-ascii?Q?DQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94e7f714-e319-4a08-5578-08dc370abbf4
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2024 20:37:22.4851
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4y+NIEPMbRHfRByDuzjql2VSrEgowNyu1dVVj+NjzNHjctVZXmV1P+x4R3qwWzxSAUI3IvPYU5bNxONznjbuCtAHIYxP1SK7nFrHMv3hTpQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5246
+X-OriginatorOrg: intel.com
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---3866299591-2026228376-1708977846=:54539
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
-
-On Mon, 26 Feb 2024, Philippe Mathieu-Daudé wrote:
-> On 19/2/24 15:05, BALATON Zoltan wrote:
->> On Mon, 19 Feb 2024, Mark Cave-Ayland wrote:
->>> On 19/02/2024 13:05, Peter Maydell wrote:
->>>> On Mon, 19 Feb 2024 at 12:49, Mark Cave-Ayland
->>>> <mark.cave-ayland@ilande.co.uk> wrote:
->>>>> 
->>>>> On 19/02/2024 12:00, BALATON Zoltan wrote:
->>>>>> For new people trying to contribute to QEMU QDev is overwhelming so 
->>>>>> having some way
->>>>>> to need less of it to do simple things would help them to get started.
->>>>> 
->>>>> It depends what how you define "simple": for QEMU developers most people 
->>>>> search for
->>>>> similar examples in the codebase and copy/paste them. I'd much rather 
->>>>> have a slightly
->>>>> longer, but consistent API for setting properties rather than coming up 
->>>>> with many
->>>>> special case wrappers that need to be maintained just to keep the line 
->>>>> count down for
->>>>> "simplicity".
->>>>> 
->>>>> I think that Phil's approach here is the best one for now, particularly 
->>>>> given that it
->>>>> allows us to take another step towards heterogeneous machines. As the 
->>>>> work in this
->>>>> area matures it might be that we can consider other approaches, but 
->>>>> that's not a
->>>>> decision that can be made right now and so shouldn't be a reason to 
->>>>> block this change.
->>>> 
->>>> Mmm. It's unfortunate that we're working with C, so we're a bit limited
->>>> in what tools we have to try to make a better and lower-boilerplate
->>>> interface for the "create, configure, realize and wire up devices" task.
->>>> (I think you could do much better in a higher level language...)
->>>> sysbus_create_simple() was handy at the time, but it doesn't work so
->>>> well for more complicated SoC-based boards. It's noticeable that
->>>> if you look at the code that uses it, it's almost entirely the older
->>>> and less maintained board models, especially those which don't actually
->>>> model an SoC and just have the board code create all the devices.
->>> 
->>> Yeah I was thinking that you'd use the DSL (e.g. YAML templates or 
->>> similar) to provide some of the boilerplating around common actions, 
->>> rather than the C API itself. Even better, once everything has been moved 
->>> to use a DSL then the C API shouldn't really matter so much as it is no 
->>> longer directly exposed to the user.
->> 
->> That may be a few more releases away (although Philippe is doing an 
->> excellent job with doing this all alone and as efficient as he is it might 
->> be reached sooner). So I think board code will stay for a while therefore 
->> if something can be done to keep it simple with not much work then maybe 
->> that's worth considering. That's why I did not propose to keep 
->> sysbus_create_simple and add properties to it because that might need 
->> something like a properties array with values that's hard to describe in C 
->> so it would be a bit more involved to implement and defining such arrays 
->> would only make it a litle less cluttered. So just keeping the parts that 
->> work for simple devices in sysbus_realize_simple and also keep 
->> sysbus_create_simple where it's already used is probably enough now rather 
->> than converting those to low level calls everywhere now.
->> 
->> Then we'll see how well the declarative machines will turn out and then if 
->> we no longer need to write board code these wrappers could go away then but 
->> for now it may be too early when we still have a lot of board code to 
->> maintain.
->
-> I'll keep forward with this patch inlining sysbus_create_simple();
-> if we notice in few releases the DSL experiment is a failure, I don't
-> mind going back reverting it.
-
-I'm OK with that. Just thought that keeping a sysbus_realize_simple 
-function that's the same as sysbus_create simple minus creating the device 
-would not be a big change and cause less churn. But if you plan te remove 
-this completely in near future so another API would be needed anyway then 
-maybe not worth keeping it. Having only low level functions to create and 
-wire devices seems impractical for writing boeards in C so eventually some 
-replacement will be needed. I doubt every board can be quickly converted 
-to a new declarative way soon but you can prove me wrong. If this helps 
-you to progress to that direction then I'm not attached to it to much but 
-would like to keep some simplicity in board code wherever possible as it's 
-already quite complex to do simple things with low level APIs so I'd 
-prefer if convenience APIs don't go away.
+On Mon, Feb 26, 2024 at 11:55:56AM -0700, Alex Williamson wrote:
+> On Wed, 21 Feb 2024 23:50:08 +0800
+> Xin Zeng <xin.zeng@intel.com> wrote:
+> > diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> > index 18c397df566d..329d25c53274 100644
+> > --- a/drivers/vfio/pci/Kconfig
+> > +++ b/drivers/vfio/pci/Kconfig
+> > @@ -67,4 +67,6 @@ source "drivers/vfio/pci/pds/Kconfig"
+> >  
+> >  source "drivers/vfio/pci/virtio/Kconfig"
+> >  
+> > +source "drivers/vfio/pci/intel/qat/Kconfig"
+> 
+> This will be the first intel vfio-pci variant driver, I don't think we
+> need an intel sub-directory just yet.
+I made that suggestion since there is another vfio-pci variant driver
+for an Intel device in development that will be sent soon. I wanted to
+avoid patch that moves paths.
+Anyway, we can move this driver to a subdirectory whenever the new driver
+will be sent out or keep both driver in the main directory, driver/vfio/pci.
 
 Regards,
-BALATON Zoltan
---3866299591-2026228376-1708977846=:54539--
+
+-- 
+Giovanni
 
