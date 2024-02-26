@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-9967-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9968-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7976B868045
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:01:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B47868054
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:03:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44067B28B87
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:01:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A51ED1C23366
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B85512F59E;
-	Mon, 26 Feb 2024 19:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B378F12F59F;
+	Mon, 26 Feb 2024 19:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cny+eNz8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KE66Pesh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C321E866;
-	Mon, 26 Feb 2024 19:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C2B12C815;
+	Mon, 26 Feb 2024 19:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708974083; cv=none; b=Cah14Xo0ogwrNMp2WCdIRknag62BT9PVyCq00Cb4jvCtOIxs+PMN8/4nONQp+sBd9zeR/3NT6LN8pUxyVljYnlD4gx3k5dcuSBxmdo/3fMQ9g9FqoeI1g+jlaeRaBZIzC5+ssuDD2GhLonjzausg+uiHmFRAqc4peWlKcvr8mBw=
+	t=1708974185; cv=none; b=tP30+/8G/HaRhbjpYCpoRuOT8UU/Hxiv+JgdSUNobde8wIXy259orjIpiVE4Pf2CzuD7Oh+W7e5oLPuG0rmkGm6SG9yyzUouu+HSnoJlaOxD7XTyTNT9oqxh48G7jpHi0nifVkVJOAprlwvT4piJPGy96nMQM+tWcjkBd9aHL5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708974083; c=relaxed/simple;
-	bh=yOFcvLPco3wQISY5eg48pUdY5mUUXeOE0Rt33co90sU=;
+	s=arc-20240116; t=1708974185; c=relaxed/simple;
+	bh=Bn5ZICiOrzowTp93LG/Tvy9uAU1imSLSi4jPVGHq5JI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tx0eZALfdGIuOjuvP21knOUk38mW2OHdzVLVXBzebntYECIIsjJYRYKyqIgWO1erASCJJV4mZ7Juf/jkSoPdk+GzX/Y4k5KpUswrjg7QrruKiG4btMTEu+NTD1imsmm8cO/Plj1j/xjZTOyGSjraLc7SgAaoxTUvBRXaDMBaMG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cny+eNz8; arc=none smtp.client-ip=198.175.65.21
+	 Content-Type:Content-Disposition:In-Reply-To; b=INAqKv/xNsSHklQfzT4xfHUNenLkJpQxOtzzOGR78/QHobtMV3RZ3PYMeHqJInuiRCynIvAGoe4yvXvOzKGG0zFBVTCJGBTeg05NgFu2jK2qW5HthnKIBnBl8AW2SziYmedVa/n71hcyKOI3gqAGe6W3WpFQrjQj0ONruVR1rS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KE66Pesh; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708974082; x=1740510082;
+  t=1708974184; x=1740510184;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=yOFcvLPco3wQISY5eg48pUdY5mUUXeOE0Rt33co90sU=;
-  b=cny+eNz8d/q3mNrwUhQho3yIF/HfClJ62O5fzhGxtYc6h5hziNcq7JOM
-   RrY0PjV6KdbUw1Bvi+5kJfA/ZCtwKSK0ZZnhY1Jnm43+S4Q27YmshRHFo
-   cgs/D0TxHnVw+mPihHnFaVxWhZYRXJ7cARZU0pZwVNcbYBR/rNRBrqpm5
-   LZkDa4nStiUvdA68YyDJC3Ys4cfMQkcc5UnoCuv5qrUOAETcy/unHsEHW
-   5/3oesLQPmjdtG2aTalE/VpfSX4la29vIV9cwPHqr8r/TbpzdW0X7Wa8k
-   SDwh46TM2Nw4U2DQBAajb/8GIhIUQ/chftdJZh/RSVf/g10y9RCqma6Ta
+  bh=Bn5ZICiOrzowTp93LG/Tvy9uAU1imSLSi4jPVGHq5JI=;
+  b=KE66PeshzluR3kM7eciTSwExtBVszZFR551J+lNfg6qSX6Bqvxt9JMfn
+   ekGYaoxJcnEnL5s/rSk/UUuZiPW0fAxlhowI/jxuDKrVIuICTOXdaDLYk
+   pbpeUtY4lXRBfjuJQVLdfSrRs2qSoVn5NIRbTSw2mMca5xGaer7wA6wdP
+   BgizpE6Vexteo9iNLkBjFmURk65229haBykK/OjX4wvPXFDdb01jUBsVZ
+   12m4AnJSuehHftPjkRG4KIYLxp+wOWLiLIOECMJ8M/ZFkUtYkjdnhkKUU
+   skPEelhxEA9SH1lLX1aaRqy9eq2uU5U+8CvgDoChAGiMF4bxVLzUr3zfy
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="3208044"
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="14720135"
 X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="3208044"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:01:21 -0800
+   d="scan'208";a="14720135"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:03:02 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="6793381"
+   d="scan'208";a="6911024"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:01:21 -0800
-Date: Mon, 26 Feb 2024 11:01:20 -0800
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:03:02 -0800
+Date: Mon, 26 Feb 2024 11:03:01 -0800
 From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
 To: Binbin Wu <binbin.wu@linux.intel.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
@@ -65,11 +65,12 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
 	Sean Christopherson <sean.j.christopherson@intel.com>,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v18 030/121] KVM: TDX: Do TDX specific vcpu initialization
-Message-ID: <20240226190120.GM177224@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v18 039/121] KVM: x86/mmu: Track shadow MMIO value on a
+ per-VM basis
+Message-ID: <20240226190301.GN177224@ls.amr.corp.intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <9ac6ab3979a477d4a40e0655208248b70bb43ebb.1705965635.git.isaku.yamahata@intel.com>
- <f3321756-95f1-4532-b1de-42b334b684ba@linux.intel.com>
+ <229a18434e5d83f45b1fcd7bf1544d79db1becb6.1705965635.git.isaku.yamahata@intel.com>
+ <05db1988-fad8-458a-8132-7dbe0f1a3ffa@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,90 +79,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <f3321756-95f1-4532-b1de-42b334b684ba@linux.intel.com>
+In-Reply-To: <05db1988-fad8-458a-8132-7dbe0f1a3ffa@linux.intel.com>
 
-On Thu, Jan 25, 2024 at 03:56:53PM +0800,
+On Sun, Jan 28, 2024 at 09:50:16PM +0800,
 Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 8330f448ab8e..245be29721b4 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-...
-> > @@ -951,15 +992,147 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
-> >   	return r;
+> > diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> > index 02a466de2991..318135daf685 100644
+> > --- a/arch/x86/kvm/mmu/spte.c
+> > +++ b/arch/x86/kvm/mmu/spte.c
+> > @@ -74,10 +74,10 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
+> >   	u64 spte = generation_mmio_spte_mask(gen);
+> >   	u64 gpa = gfn << PAGE_SHIFT;
+> > -	WARN_ON_ONCE(!shadow_mmio_value);
+> > +	WARN_ON_ONCE(!vcpu->kvm->arch.shadow_mmio_value);
+> >   	access &= shadow_mmio_access_mask;
+> > -	spte |= shadow_mmio_value | access;
+> > +	spte |= vcpu->kvm->arch.shadow_mmio_value | access;
+> >   	spte |= gpa | shadow_nonpresent_or_rsvd_mask;
+> >   	spte |= (gpa & shadow_nonpresent_or_rsvd_mask)
+> >   		<< SHADOW_NONPRESENT_OR_RSVD_MASK_LEN;
+> > @@ -411,6 +411,12 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
 > >   }
-> > +/* VMM can pass one 64bit auxiliary data to vcpu via RCX for guest BIOS. */
-> > +static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+> >   EXPORT_SYMBOL_GPL(kvm_mmu_set_mmio_spte_mask);
+> > +void kvm_mmu_set_mmio_spte_value(struct kvm *kvm, u64 mmio_value)
 > > +{
-> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> > +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> > +	unsigned long *tdvpx_pa = NULL;
-> > +	unsigned long tdvpr_pa;
-> > +	unsigned long va;
-> > +	int ret, i;
-> > +	u64 err;
-> > +
-> > +	if (is_td_vcpu_created(tdx))
-> > +		return -EINVAL;
-> > +
-> > +	/*
-> > +	 * vcpu_free method frees allocated pages.  Avoid partial setup so
-> > +	 * that the method can't handle it.
-> > +	 */
-> > +	va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> > +	if (!va)
-> > +		return -ENOMEM;
-> > +	tdvpr_pa = __pa(va);
-> > +
-> > +	tdvpx_pa = kcalloc(tdx_info->nr_tdvpx_pages, sizeof(*tdx->tdvpx_pa),
-> > +			   GFP_KERNEL_ACCOUNT);
-> > +	if (!tdvpx_pa) {
-> > +		ret = -ENOMEM;
-> > +		goto free_tdvpr;
-> > +	}
-> > +	for (i = 0; i < tdx_info->nr_tdvpx_pages; i++) {
-> > +		va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> > +		if (!va) {
-> > +			ret = -ENOMEM;
-> > +			goto free_tdvpx;
-> > +		}
-> > +		tdvpx_pa[i] = __pa(va);
-> > +	}
-> > +
-> > +	err = tdh_vp_create(kvm_tdx->tdr_pa, tdvpr_pa);
-> > +	if (KVM_BUG_ON(err, vcpu->kvm)) {
-> > +		ret = -EIO;
-> > +		pr_tdx_error(TDH_VP_CREATE, err, NULL);
-> > +		goto free_tdvpx;
-> > +	}
-> > +	tdx->tdvpr_pa = tdvpr_pa;
-> > +
-> > +	tdx->tdvpx_pa = tdvpx_pa;
-> > +	for (i = 0; i < tdx_info->nr_tdvpx_pages; i++) {
-> > +		err = tdh_vp_addcx(tdx->tdvpr_pa, tdvpx_pa[i]);
-> > +		if (KVM_BUG_ON(err, vcpu->kvm)) {
-> > +			pr_tdx_error(TDH_VP_ADDCX, err, NULL);
-> > +			for (; i < tdx_info->nr_tdvpx_pages; i++) {
-> > +				free_page((unsigned long)__va(tdvpx_pa[i]));
-> > +				tdvpx_pa[i] = 0;
-> > +			}
-> > +			/* vcpu_free method frees TDVPX and TDR donated to TDX */
-> vcpu_free() interface is called by two sites.
-> One is the error handling path of kvm_vm_ioctl_create_vcpu() when vcpu
-> creation.
-> The other is during kvm_destroy_vm().
 > 
-> What about the error occurs in KVM_TDX_INIT_VCPU?
-> Let's assume TDR and some of tdvpx pages are donated to TDX, and the next
-> call of tdh_vp_addcx() failed. The comment says "vcpu_free method frees
-> TDVPX
-> and TDR donated to TDX", but if it happens, it seems that vcpu_free() would
-> not be called? Memory leakage?
+> Is it better to do some check on the mmio_value and warns if the value
+> is illegal?
 
-vcpu_free() is called because we already created vcpu with KVM_VCPU_CREATE
-irrelevant of the result of TDX_VCPU_INIT.
-tdx_vcpu_free() handles error case of TDX_VCPU_INIT. So no leakage.
+I don't think so because the only caller is kvm_mmu_set_mmio_spte_value(kvm, 0)
+in tdx_vm_init().  I don't expect other caller.
 -- 
 Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
