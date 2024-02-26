@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15D708678BB
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:37:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80D6E8678BD
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:38:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB3FB2933F3
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:37:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3423B293E25
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3567A12AAFF;
-	Mon, 26 Feb 2024 14:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8E412F368;
+	Mon, 26 Feb 2024 14:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bKDaXNJq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JaiUA9Os"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E5612EBE4;
-	Mon, 26 Feb 2024 14:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0860012EBF1;
+	Mon, 26 Feb 2024 14:35:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958099; cv=none; b=d4ttrkBHZz8M8kSTc4ahwu6oOv+N/jIQyDGTyUNl0i29efuJnd6rcPI/zBLEuxcxs9I78+VsEmnsH/uT8CYf8PB5L8NhFHMJ1DN4psYJ5YmowhkXOBlxdWwXdBdC0SuElPNGsKrQDqSWHckMhThC4+LqsBFMYRl9T6iVN8hGRsY=
+	t=1708958102; cv=none; b=ks3hdiBlvHT22cXVkHdYNAsHsabmTlbXwmZ5IZCtNfM9MPcYcnIKVX5Ne07Rm/39b6grTC7GSDlddXvhBVhiFm2IXlfZoS9ii47f+G+MhKv55QlHArcyAgah71SLj1QWg21bB0iOfR1e0E5dtZq3m+a3l8iTNYHN+8uwXHpukiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958099; c=relaxed/simple;
-	bh=v3oWR+P39CKvhNF+pOmX56rjrg+9Z/2sF3YtAzYOJl8=;
+	s=arc-20240116; t=1708958102; c=relaxed/simple;
+	bh=mp4bIEVXnnIUzxsDHcmVT4EyPtcJSElBPfc+LZawrHk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qYHTNQGD6VV5n5htWP/OSITzCPlOaLnYhCxhuo+Q6/mqsqj9fDuC6ibJoKW+ZqXFBFEm7QESJ+AGGYdHBDhu2HhGaOB8Matz0q74C6tLhMOadUh89IONSD/iHc64/6O28y+jMy/H9Cl/cwFLh280b6m2n67Z5Ul2rUJBgg/jaiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bKDaXNJq; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=Dn8IPm82lxPy417X+GYEPZd0/o/Ubr72U9C0+6rw2asD+HEm2UNixuUgxKOMNLBvaP1CxV+gBclETNNDqlJbKUEBuyOnl0Y+rAYcE70z7mfIf/GCfJ3L6f08yaUSax/6GL8S22PMCbFsB0IvKClnpALFZNcT4ltpNa1hwrdH0Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JaiUA9Os; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6e4f49c5632so593126b3a.0;
-        Mon, 26 Feb 2024 06:34:57 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6e4f49c5632so593160b3a.0;
+        Mon, 26 Feb 2024 06:35:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958097; x=1709562897; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958100; x=1709562900; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KvdApW2xM6ZV/9SNM/xsyM+VYex7z3fSCZ3wCP7fJoU=;
-        b=bKDaXNJq7EZijQfePY8pdbChonxnJZrUtjA8Eg6xXe7t3LL3/2HtTyKrnxBuUBFjB/
-         oWpAkCamh1/obaWlHfXuL/lbAQi4LRxYlHpBdVmU78Wm7WLdKu99Js9Ehqs8POIS9ziM
-         2Xf9K/reTpKvk5IJBvGBZYbdYknJlsupmVExwdXH+mKh8Z4FVXItg8hq9veOz6cV2CPI
-         DsAmm7P+47UPU62opQNM9w2V1E0+BiX9ECD8Q6Y3x9li1OP32xEUx/kl7VClvvfL89pJ
-         NXrEX5EV1iTPL4LSKnhP7txqWnyTDdsJ2/JhU6Q+uFMtlAoZdK/9nnO7IKkr0T+Ih9hh
-         ktGQ==
+        bh=xGcizR5RhJyAZaF61CVdloVSq2PxTGm8Bnu+7WmTNJg=;
+        b=JaiUA9OstKah3JAP40jBp3Ftu3TGLqF+Xr1kXv3+SKImIaqe+BvycZ1DKWjH/Y0kiJ
+         gfU8bvoNd3SyawEMImClrHqiZqTQ1TF5IhAJmjFy1bz4ABJ/KL7goTSbtb6FBbOFxWgr
+         pnF3Xb76va9t633C4l0qiWJZlhT/NyYv+7mWDseUEsq5Kznb/ZbAxlR+NBodD1dnDKX8
+         vmz5Kzwm2ipDH0sA2q65s7yZIJ17aRdJ/KqnPX79PnMUTJPz2ErdCtA/G56I0gJtijYw
+         8FJjSzcuLq1zf0iWvJ4hdt6xgzjrSzV2wUpFegEK1XgFMb4Y5sY1Q+//oBwsRoL0oF4x
+         yBiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958097; x=1709562897;
+        d=1e100.net; s=20230601; t=1708958100; x=1709562900;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KvdApW2xM6ZV/9SNM/xsyM+VYex7z3fSCZ3wCP7fJoU=;
-        b=L4WDLmKr/0XylKU/9bH7fVYR/FWb/OcwR0HHK1LOwC2NgGKiR9AllFwHteY3pi9w2c
-         qRQAm2Ds2VES7dHYdU1kUYW2joWS80tESUPSxWvOPFxnkGqG1JJqzYNKr87vqqUxnYYE
-         t5IImaCN4IZt0MWAIg6GBCM4rtj1kaVB8HqaG0gukYu3GPUgYD2o0cU5J0voZLRYpu1e
-         JEMSpwtKKyURVJht1BaPE48D/aas8NTyPj4zuft8HIPimI9xEdCAalKhQIr92G/6QBZg
-         m6nFZ5CzUusesQZ9kTXI4MDsB0Qc5uEvK4lbX38mjrSlBUSMC5EwuushxvZbJ4+9c7Lh
-         SZCA==
-X-Forwarded-Encrypted: i=1; AJvYcCXewQWiTFJTUbU8uaC8B7JsGESz/WbFOo/vYGL6/4Cx86QlzR0H7w1N+5tAqJ8w+N8oQFXxnFu4gakY8qmvaXScWCWE
-X-Gm-Message-State: AOJu0Yw5UA/p5XpUEKFFT5Cpvp1lBsmvxm6sgm+s3Qg9MOYoes7xeo00
-	VGySRCKtdW0bPzlPLYR9OB3NArdjJlXKuOnlH1tP+y6fCfYP3TNy12gpKXHJ
-X-Google-Smtp-Source: AGHT+IF1HWQpwmNIokh+etIWHwc/ZM1A5RDLvvVbDiJng+VTsHDOjSVxGJxiTaxlg0eYbwbQ7MaxYw==
-X-Received: by 2002:a05:6a20:d80f:b0:1a0:a882:950c with SMTP id iv15-20020a056a20d80f00b001a0a882950cmr7295333pzb.18.1708958096561;
-        Mon, 26 Feb 2024 06:34:56 -0800 (PST)
-Received: from localhost ([198.11.176.14])
-        by smtp.gmail.com with ESMTPSA id t5-20020a170902dcc500b001dc6b99af70sm4008687pll.108.2024.02.26.06.34.55
+        bh=xGcizR5RhJyAZaF61CVdloVSq2PxTGm8Bnu+7WmTNJg=;
+        b=te1+KLHPNfOK+NXIF/i8XuZPszyp1pKoWzSkglIVds+DwuUe2l84CDgJVVAi5XEqyd
+         OrgsyJkaoCS3QvztLrtRor9A9L8DLMXafvkQgiQ2tPP8+rraujppSU/AfufEQNt1oVHC
+         O9/ghD7nP2J5KQny6ae2Xqg+ApMeg1/a7FTI8Tkx2b5h48TQGMX8SLxH3xalYylhuXxR
+         jZ/cGHRigytSd6thCWfzf0zxEMnpY4oLTN8+Pv7zMNTHC5S7DIYnba8bBSpvWDQa541H
+         ykvjHKl2tYa1IMDh456iXKdRh3y5pcvPPuCviir0pJOC0EzqC9LDmCzclntyGpDkm+rg
+         mh2g==
+X-Forwarded-Encrypted: i=1; AJvYcCXxHT2Cd1zhnERzs/7i0Sk9iI+OMqVLLZkClItcp6kVDteAn4xQTuW8nS2GfCWox4Z6aIbBp09YdinjwpGuOEdz5o4L
+X-Gm-Message-State: AOJu0Yx/X6xL+ZmblyVv5SMPjtUAr8IY5Hpy0SNvlpDuRTPYWszgNoQ4
+	WGMu9uU3sV8G3bos0ArObBbJtYOM/VE3VekMT2TOiVe74HcKzdbeJQkzU6d/
+X-Google-Smtp-Source: AGHT+IEQ5ZAAPokPrEcDDW70e6Lag98en0XxkSEwYRvhdcHIwCUTOJilf0F9mb76AEaNtv2jcqpTtw==
+X-Received: by 2002:a05:6a00:1397:b0:6e4:f761:1a4c with SMTP id t23-20020a056a00139700b006e4f7611a4cmr6338374pfg.12.1708958099979;
+        Mon, 26 Feb 2024 06:34:59 -0800 (PST)
+Received: from localhost ([47.88.5.130])
+        by smtp.gmail.com with ESMTPSA id it8-20020a056a00458800b006e05c801748sm4103087pfb.199.2024.02.26.06.34.59
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:34:56 -0800 (PST)
+        Mon, 26 Feb 2024 06:34:59 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -83,15 +83,10 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Kees Cook <keescook@chromium.org>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"Mike Rapoport (IBM)" <rppt@kernel.org>,
-	Yu-cheng Yu <yu-cheng.yu@intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: [RFC PATCH 06/73] KVM: x86: Move VMX interrupt/nmi handling into kvm.ko
-Date: Mon, 26 Feb 2024 22:35:23 +0800
-Message-Id: <20240226143630.33643-7-jiangshanlai@gmail.com>
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: [RFC PATCH 07/73] KVM: x86/mmu: Adapt shadow MMU for PVM
+Date: Mon, 26 Feb 2024 22:35:24 +0800
+Message-Id: <20240226143630.33643-8-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -105,288 +100,192 @@ Content-Transfer-Encoding: 8bit
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Similar to VMX, hardware interrupts/NMI during guest running in PVM will
-trigger VM exit and should be handled by host interrupt/NMI handlers.
-Therefore, move VMX interrupt/NMI handling into kvm.ko for common usage.
+In PVM, shadow MMU is used for guest MMU virtualization. However, it
+needs some changes to adapt for PVM:
+
+1. In PVM, hardware CR4.LA57 is not changed, so the paging level of
+   shadow MMU should be same as host. If the guest paging level is 4 and
+   host paging level is 5, then it performs like shadow NPT MMU and
+   'root_role.passthrough' is set as true.
+
+2. PVM guest needs to access the host switcher, so some host mapping PGD
+   entries will be cloned into the guest shadow paging table during the
+   root SP allocation. These cloned host PGD entries are not marked as MMU
+   present, so they can't be cleared by write-protecting. Additionally, in
+   order to avoid modifying those cloned host PGD entries in the #PF
+   handling path, a new callback is introduced to check the fault of the
+   guest virtual address before walking the guest page table. This ensures
+   that the guest cannot overwrite the host entries in the root SP.
+
+3. If the guest paging level is 4 and the host paging level is 5, then the
+   last PGD entry in the root SP is allowed to be overwritten if the guest
+   tries to build a new allowed mapping under this PGD entry. In this case,
+   the host P4D entries in the table pointed to by the last PGD entry
+   should also be cloned during the new P4D SP allocation. These cloned P4D
+   entries are also not marked as MMU present. A new bit in the
+   'kvm_mmu_page_role' is used to mark this special SP. When zapping this
+   SP, its parent PTE will be set to the original host PGD PTEs instead of
+   clearing it.
+
+4. The user bit in the SPTE of guest mapping should be forced to be set
+   for PVM, as the guest is always running in hardware CPL3.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Co-developed-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/include/asm/idtentry.h | 12 ++++----
- arch/x86/kernel/nmi.c           |  8 +++---
- arch/x86/kvm/Makefile           |  2 +-
- arch/x86/kvm/host_entry.S       | 50 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmenter.S      | 43 ----------------------------
- arch/x86/kvm/vmx/vmx.c          | 14 ++-------
- arch/x86/kvm/x86.c              |  3 ++
- arch/x86/kvm/x86.h              | 18 ++++++++++++
- 8 files changed, 85 insertions(+), 65 deletions(-)
- create mode 100644 arch/x86/kvm/host_entry.S
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  6 ++++-
+ arch/x86/kvm/mmu/mmu.c             | 35 +++++++++++++++++++++++++++++-
+ arch/x86/kvm/mmu/paging_tmpl.h     |  3 +++
+ arch/x86/kvm/mmu/spte.c            |  4 ++++
+ 5 files changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-index 13639e57e1f8..8aab0b50431a 100644
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -586,14 +586,14 @@ DECLARE_IDTENTRY_RAW(X86_TRAP_MC,	xenpv_exc_machine_check);
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 26b628d84594..32e5473b499d 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -93,6 +93,7 @@ KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
+ KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
+ KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
+ KVM_X86_OP(load_mmu_pgd)
++KVM_X86_OP_OPTIONAL_RET0(disallowed_va)
+ KVM_X86_OP(has_wbinvd_exit)
+ KVM_X86_OP(get_l2_tsc_offset)
+ KVM_X86_OP(get_l2_tsc_multiplier)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index d7036982332e..c76bafe9c7e2 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -346,7 +346,8 @@ union kvm_mmu_page_role {
+ 		unsigned ad_disabled:1;
+ 		unsigned guest_mode:1;
+ 		unsigned passthrough:1;
+-		unsigned :5;
++		unsigned host_mmu_la57_top_p4d:1;
++		unsigned :4;
  
- /* NMI */
+ 		/*
+ 		 * This is left at the top of the word so that
+@@ -1429,6 +1430,7 @@ struct kvm_arch {
+ 	 * the thread holds the MMU lock in write mode.
+ 	 */
+ 	spinlock_t tdp_mmu_pages_lock;
++	u64 *host_mmu_root_pgd;
+ #endif /* CONFIG_X86_64 */
  
--#if IS_ENABLED(CONFIG_KVM_INTEL)
-+#if IS_ENABLED(CONFIG_KVM)
- /*
-- * Special entry point for VMX which invokes this on the kernel stack, even for
-- * 64-bit, i.e. without using an IST.  asm_exc_nmi() requires an IST to work
-- * correctly vs. the NMI 'executing' marker.  Used for 32-bit kernels as well
-- * to avoid more ifdeffery.
-+ * Special entry point for VMX/PVM which invokes this on the kernel stack, even
-+ * for 64-bit, i.e. without using an IST.  asm_exc_nmi() requires an IST to
-+ * work correctly vs. the NMI 'executing' marker.  Used for 32-bit kernels as
-+ * well to avoid more ifdeffery.
-  */
--DECLARE_IDTENTRY(X86_TRAP_NMI,		exc_nmi_kvm_vmx);
-+DECLARE_IDTENTRY(X86_TRAP_NMI,		exc_nmi_kvm);
- #endif
- 
- DECLARE_IDTENTRY_NMI(X86_TRAP_NMI,	exc_nmi);
-diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
-index 17e955ab69fe..265e6b38cc58 100644
---- a/arch/x86/kernel/nmi.c
-+++ b/arch/x86/kernel/nmi.c
-@@ -568,13 +568,13 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
- 		mds_user_clear_cpu_buffers();
- }
- 
--#if IS_ENABLED(CONFIG_KVM_INTEL)
--DEFINE_IDTENTRY_RAW(exc_nmi_kvm_vmx)
-+#if IS_ENABLED(CONFIG_KVM)
-+DEFINE_IDTENTRY_RAW(exc_nmi_kvm)
- {
- 	exc_nmi(regs);
- }
--#if IS_MODULE(CONFIG_KVM_INTEL)
--EXPORT_SYMBOL_GPL(asm_exc_nmi_kvm_vmx);
-+#if IS_MODULE(CONFIG_KVM)
-+EXPORT_SYMBOL_GPL(asm_exc_nmi_kvm);
- #endif
- #endif
- 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 80e3fe184d17..97bad203b1b1 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -9,7 +9,7 @@ endif
- 
- include $(srctree)/virt/kvm/Makefile.kvm
- 
--kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
-+kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o host_entry.o \
- 			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
- 			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
- 			   mmu/spte.o
-diff --git a/arch/x86/kvm/host_entry.S b/arch/x86/kvm/host_entry.S
-new file mode 100644
-index 000000000000..6bdf0df06eb0
---- /dev/null
-+++ b/arch/x86/kvm/host_entry.S
-@@ -0,0 +1,50 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#include <linux/linkage.h>
-+#include <asm/asm.h>
-+#include <asm/nospec-branch.h>
-+#include <asm/segment.h>
-+
-+.macro KVM_DO_EVENT_IRQOFF call_insn call_target
-+	/*
-+	 * Unconditionally create a stack frame, getting the correct RSP on the
-+	 * stack (for x86-64) would take two instructions anyways, and RBP can
-+	 * be used to restore RSP to make objtool happy (see below).
-+	 */
-+	push %_ASM_BP
-+	mov %_ASM_SP, %_ASM_BP
-+
-+#ifdef CONFIG_X86_64
-+	/*
-+	 * Align RSP to a 16-byte boundary (to emulate CPU behavior) before
-+	 * creating the synthetic interrupt stack frame for the IRQ/NMI.
-+	 */
-+	and  $-16, %rsp
-+	push $__KERNEL_DS
-+	push %rbp
-+#endif
-+	pushf
-+	push $__KERNEL_CS
-+	\call_insn \call_target
-+
-+	/*
-+	 * "Restore" RSP from RBP, even though IRET has already unwound RSP to
-+	 * the correct value.  objtool doesn't know the callee will IRET and,
-+	 * without the explicit restore, thinks the stack is getting walloped.
-+	 * Using an unwind hint is problematic due to x86-64's dynamic alignment.
-+	 */
-+	mov %_ASM_BP, %_ASM_SP
-+	pop %_ASM_BP
-+	RET
-+.endm
-+
-+.section .noinstr.text, "ax"
-+
-+SYM_FUNC_START(kvm_do_host_nmi_irqoff)
-+	KVM_DO_EVENT_IRQOFF call asm_exc_nmi_kvm
-+SYM_FUNC_END(kvm_do_host_nmi_irqoff)
-+
-+.section .text, "ax"
-+
-+SYM_FUNC_START(kvm_do_host_interrupt_irqoff)
-+	KVM_DO_EVENT_IRQOFF CALL_NOSPEC _ASM_ARG1
-+SYM_FUNC_END(kvm_do_host_interrupt_irqoff)
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 906ecd001511..12b7b99a9dd8 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -31,39 +31,6 @@
- #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
- #endif
- 
--.macro VMX_DO_EVENT_IRQOFF call_insn call_target
--	/*
--	 * Unconditionally create a stack frame, getting the correct RSP on the
--	 * stack (for x86-64) would take two instructions anyways, and RBP can
--	 * be used to restore RSP to make objtool happy (see below).
--	 */
--	push %_ASM_BP
--	mov %_ASM_SP, %_ASM_BP
--
--#ifdef CONFIG_X86_64
--	/*
--	 * Align RSP to a 16-byte boundary (to emulate CPU behavior) before
--	 * creating the synthetic interrupt stack frame for the IRQ/NMI.
--	 */
--	and  $-16, %rsp
--	push $__KERNEL_DS
--	push %rbp
--#endif
--	pushf
--	push $__KERNEL_CS
--	\call_insn \call_target
--
--	/*
--	 * "Restore" RSP from RBP, even though IRET has already unwound RSP to
--	 * the correct value.  objtool doesn't know the callee will IRET and,
--	 * without the explicit restore, thinks the stack is getting walloped.
--	 * Using an unwind hint is problematic due to x86-64's dynamic alignment.
--	 */
--	mov %_ASM_BP, %_ASM_SP
--	pop %_ASM_BP
--	RET
--.endm
--
- .section .noinstr.text, "ax"
- 
- /**
-@@ -299,10 +266,6 @@ SYM_INNER_LABEL_ALIGN(vmx_vmexit, SYM_L_GLOBAL)
- 
- SYM_FUNC_END(__vmx_vcpu_run)
- 
--SYM_FUNC_START(vmx_do_nmi_irqoff)
--	VMX_DO_EVENT_IRQOFF call asm_exc_nmi_kvm_vmx
--SYM_FUNC_END(vmx_do_nmi_irqoff)
--
- #ifndef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
- 
- /**
-@@ -354,9 +317,3 @@ SYM_FUNC_START(vmread_error_trampoline)
- 	RET
- SYM_FUNC_END(vmread_error_trampoline)
- #endif
--
--.section .text, "ax"
--
--SYM_FUNC_START(vmx_do_interrupt_irqoff)
--	VMX_DO_EVENT_IRQOFF CALL_NOSPEC _ASM_ARG1
--SYM_FUNC_END(vmx_do_interrupt_irqoff)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index be20a60047b1..fca47304506e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6920,9 +6920,6 @@ static void vmx_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
- 	memset(vmx->pi_desc.pir, 0, sizeof(vmx->pi_desc.pir));
- }
- 
--void vmx_do_interrupt_irqoff(unsigned long entry);
--void vmx_do_nmi_irqoff(void);
--
- static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
- {
  	/*
-@@ -6968,9 +6965,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- 	    "unexpected VM-Exit interrupt info: 0x%x", intr_info))
- 		return;
+@@ -1679,6 +1681,8 @@ struct kvm_x86_ops {
+ 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 			     int root_level);
  
--	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
--	vmx_do_interrupt_irqoff(gate_offset(desc));
--	kvm_after_interrupt(vcpu);
-+	kvm_do_interrupt_irqoff(vcpu, gate_offset(desc));
- 
- 	vcpu->arch.at_instruction_boundary = true;
- }
-@@ -7260,11 +7255,8 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 		vmx->idt_vectoring_info = vmcs_read32(IDT_VECTORING_INFO_FIELD);
- 
- 	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
--	    is_nmi(vmx_get_intr_info(vcpu))) {
--		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
--		vmx_do_nmi_irqoff();
--		kvm_after_interrupt(vcpu);
--	}
-+	    is_nmi(vmx_get_intr_info(vcpu)))
-+		kvm_do_nmi_irqoff(vcpu);
- 
- out:
- 	guest_state_exit_irqoff();
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 35ad6dd5eaf6..96f3913f7fc5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13784,6 +13784,9 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
- }
- EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
- 
-+EXPORT_SYMBOL_GPL(kvm_do_host_nmi_irqoff);
-+EXPORT_SYMBOL_GPL(kvm_do_host_interrupt_irqoff);
++	bool (*disallowed_va)(struct kvm_vcpu *vcpu, u64 la);
 +
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 5184fde1dc54..4d1430f8874b 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -491,6 +491,24 @@ static inline void kvm_machine_check(void)
+ 	bool (*has_wbinvd_exit)(void);
+ 
+ 	u64 (*get_l2_tsc_offset)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c57e181bba21..80406666d7da 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1745,6 +1745,18 @@ static unsigned kvm_page_table_hashfn(gfn_t gfn)
+ 	return hash_64(gfn, KVM_MMU_HASH_SHIFT);
+ }
+ 
++#define HOST_ROOT_LEVEL (pgtable_l5_enabled() ? PT64_ROOT_5LEVEL : PT64_ROOT_4LEVEL)
++
++static inline bool pvm_mmu_p4d_at_la57_pgd511(struct kvm *kvm, u64 *sptep)
++{
++	if (!pgtable_l5_enabled())
++		return false;
++	if (!kvm->arch.host_mmu_root_pgd)
++		return false;
++
++	return sptep_to_sp(sptep)->role.level == 5 && spte_index(sptep) == 511;
++}
++
+ static void mmu_page_add_parent_pte(struct kvm_mmu_memory_cache *cache,
+ 				    struct kvm_mmu_page *sp, u64 *parent_pte)
+ {
+@@ -1764,7 +1776,10 @@ static void drop_parent_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
+ 			    u64 *parent_pte)
+ {
+ 	mmu_page_remove_parent_pte(kvm, sp, parent_pte);
+-	mmu_spte_clear_no_track(parent_pte);
++	if (!unlikely(sp->role.host_mmu_la57_top_p4d))
++		mmu_spte_clear_no_track(parent_pte);
++	else
++		__update_clear_spte_fast(parent_pte, kvm->arch.host_mmu_root_pgd[511]);
+ }
+ 
+ static void mark_unsync(u64 *spte);
+@@ -2253,6 +2268,15 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+ 	list_add(&sp->link, &kvm->arch.active_mmu_pages);
+ 	kvm_account_mmu_page(kvm, sp);
+ 
++	/* install host mmu entries when PVM */
++	if (kvm->arch.host_mmu_root_pgd && role.level == HOST_ROOT_LEVEL) {
++		memcpy(sp->spt, kvm->arch.host_mmu_root_pgd, PAGE_SIZE);
++	} else if (role.host_mmu_la57_top_p4d) {
++		u64 *p4d = __va(kvm->arch.host_mmu_root_pgd[511] & SPTE_BASE_ADDR_MASK);
++
++		memcpy(sp->spt, p4d, PAGE_SIZE);
++	}
++
+ 	sp->gfn = gfn;
+ 	sp->role = role;
+ 	hlist_add_head(&sp->hash_link, sp_list);
+@@ -2354,6 +2378,9 @@ static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
+ 		return ERR_PTR(-EEXIST);
+ 
+ 	role = kvm_mmu_child_role(sptep, direct, access);
++	if (unlikely(pvm_mmu_p4d_at_la57_pgd511(vcpu->kvm, sptep)))
++		role.host_mmu_la57_top_p4d = 1;
++
+ 	return kvm_mmu_get_shadow_page(vcpu, gfn, role);
+ }
+ 
+@@ -5271,6 +5298,12 @@ static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
+ 	/* KVM uses PAE paging whenever the guest isn't using 64-bit paging. */
+ 	root_role.level = max_t(u32, root_role.level, PT32E_ROOT_LEVEL);
+ 
++	/* Shadow MMU level should be the same as host for PVM */
++	if (vcpu->kvm->arch.host_mmu_root_pgd && root_role.level != HOST_ROOT_LEVEL) {
++		root_role.level = HOST_ROOT_LEVEL;
++		root_role.passthrough = 1;
++	}
++
+ 	/*
+ 	 * KVM forces EFER.NX=1 when TDP is disabled, reflect it in the MMU role.
+ 	 * KVM uses NX when TDP is disabled to handle a variety of scenarios,
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index c85255073f67..8ea3dca940ad 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -336,6 +336,9 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 			goto error;
+ 		--walker->level;
+ 	}
++
++	if (static_call(kvm_x86_disallowed_va)(vcpu, addr))
++		goto error;
  #endif
- }
+ 	walker->max_level = walker->level;
  
-+void kvm_do_host_nmi_irqoff(void);
-+void kvm_do_host_interrupt_irqoff(unsigned long entry);
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 4a599130e9c9..e302f7b5c696 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -186,6 +186,10 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	if (pte_access & ACC_USER_MASK)
+ 		spte |= shadow_user_mask;
+ 
++	/* PVM guest is always running in hardware CPL3. */
++	if (vcpu->kvm->arch.host_mmu_root_pgd)
++		spte |= shadow_user_mask;
 +
-+static __always_inline void kvm_do_nmi_irqoff(struct kvm_vcpu *vcpu)
-+{
-+	kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
-+	kvm_do_host_nmi_irqoff();
-+	kvm_after_interrupt(vcpu);
-+}
-+
-+static inline void kvm_do_interrupt_irqoff(struct kvm_vcpu *vcpu,
-+					   unsigned long entry)
-+{
-+	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
-+	kvm_do_host_interrupt_irqoff(entry);
-+	kvm_after_interrupt(vcpu);
-+}
-+
- void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
- void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
- int kvm_spec_ctrl_test_value(u64 value);
+ 	if (level > PG_LEVEL_4K)
+ 		spte |= PT_PAGE_SIZE_MASK;
+ 
 -- 
 2.19.1.6.gb485710b
 
