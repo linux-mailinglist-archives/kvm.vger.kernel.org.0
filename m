@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-9650-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9651-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3848866C73
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:36:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD0A3866C75
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D4A4283443
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:36:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BE421F2388F
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E2B57875;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C837757895;
 	Mon, 26 Feb 2024 08:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a75rByFQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b4lz2/6L"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F2F55E5F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91A855E68;
 	Mon, 26 Feb 2024 08:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936077; cv=none; b=M5W4RcYXV60xWe5YpqXvvLaj4J7PXXBhFCwMbdwwEOtwpBXy1ehiicmd9Uy8zpiHMqL+ueKq4FSFPz/iOW/qZXgUu7YD92Dx+eOkrqQMU654i+xGMnSKzTwoZti/GMLCYSkmc1jvvupirjEE+yO3tyqxnOlr7uK0uRaF5rpfoFY=
+	t=1708936077; cv=none; b=WP8ZQ+Qu4Q7PVzkYVoTEER5AEQXPGcmwV/JS6b3C9L4dnHmdKizETD4vXpdi5t7aOJ9+ZOcRXx/VwV/6nCYqS2QRjlq0xq6S2vabHNLZzRLVG/GYiTqChaTwMZ/+o7T86/Jg9pdKC9HuaUuBlF96OjFTXbyPhsfYwnV22sFYHYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708936077; c=relaxed/simple;
-	bh=gZq/xU5HPMr+7bL2m3UNHQGfAGkvgf+PBtN9vzhZEYs=;
+	bh=tNU7BzaaqXHHxYsiLqg4zyO+pCGDtgdoU5GDQGjv/KY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EScouAOd+8TsQOh7x/H3efLGNy+kPmse+jcWNBxldS/h6/S1KEXpZBACopXYjnGeNIl1KrSJgEV3kQvJzPupQdIOu4LCiWlN0y5ye3Hl8/B1ujKnazjGF1V/w/OSJQMFc6edjDxM1gQu4a88BYjtnKuYFpYQ+FUYSI0CJjDFZPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a75rByFQ; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=Isj8wsq3FzHM6r/pW5e/LY3IHHEFLDNKhQp3Ki+B+m110zZvo1mbc1S+EcfrwRApbkaEAIGx5vs608ZNIP22plRobmt5kBxnUsknLy1moo4+mHZjJmGPvD24O4eljCjEpe7mHtt8s0yUpcHOn56dHrhoulaOJH1KRzeE7Vt2J64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b4lz2/6L; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,22 +36,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1708936075; x=1740472075;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gZq/xU5HPMr+7bL2m3UNHQGfAGkvgf+PBtN9vzhZEYs=;
-  b=a75rByFQrOok+2Uguyju8s4RZ2M0psBa1EfZe3UwyyPQzYl39gyJxcTZ
-   gLzaFJH/+1PPfy5tsAo0C9GPSeicze3GWDC0CQiE6pR0wtRGnnJuTKKAU
-   IlemdrV9sFgSRya26WExpxtvC2+70YXqe5rB//qILLgsTedVhWfMMc3+8
-   x2JcnJb2biJaIslyqajdgb8I5ACrivgehrMyC7Fo66STy7wqtCvCTkK1I
-   xIeXpMD7kVVebBCWTkhBJBtlc7PcUEtXc7FsDJQGHLBEae+P2vXa+J4HF
-   kO6NbVAKs6EBuehAN7b/kVI1olUIj6butUH5GMoMOCljWaL/DG5LgYUMb
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="6155250"
+  bh=tNU7BzaaqXHHxYsiLqg4zyO+pCGDtgdoU5GDQGjv/KY=;
+  b=b4lz2/6LMldaO/UukIgc/8YES6Ba5C0+hjSGG7j9p32xiiNcidu/F1BK
+   yYiS8yX9cr+AeVxQzMICPq1HOFqgo4suRo77W3p2LD650wDgHMS4eNbDx
+   +enee+e2K0UE+M1BRFbIqZU8RkzAkeiFBtZHPxuJxbfLIljiHB3Uk4b8P
+   xvJP6Og6ny2CpUOB/renM61xQeHTfEHoY+O+nRKcpkzhPi6YgxZhilwLe
+   m018K2RxdHlRt/4vAUn6wAOfZK5+8kt9W6jfbajxc+QxOob5bc8dZbZxu
+   CeL7kKHZr/eP6hHwIN9/VpXu5mzK3Ntdy+AwggMSrnNFpcnwo5YCD38mr
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="6155254"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6155250"
+   d="scan'208";a="6155254"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
   by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:27:53 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6615480"
+   d="scan'208";a="6615488"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:27:53 -0800
 From: isaku.yamahata@intel.com
@@ -66,10 +66,12 @@ Cc: isaku.yamahata@intel.com,
 	Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
-	tina.zhang@intel.com
-Subject: [PATCH v19 026/130] [MARKER] The start of TDX KVM patch series: TDX architectural definitions
-Date: Mon, 26 Feb 2024 00:25:28 -0800
-Message-Id: <ac565b402f534478f09d5aaba7a73021c1703d34.1708933498.git.isaku.yamahata@intel.com>
+	tina.zhang@intel.com,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH v19 027/130] KVM: TDX: Define TDX architectural definitions
+Date: Mon, 26 Feb 2024 00:25:29 -0800
+Message-Id: <522cbfe6e5a351f88480790fe3c3be36c82ca4b1.1708933498.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933498.git.isaku.yamahata@intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
@@ -83,61 +85,300 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This empty commit is to mark the start of patch series of TDX architectural
-definitions.
+Define architectural definitions for KVM to issue the TDX SEAMCALLs.
+
+Structures and values that are architecturally defined in the TDX module
+specifications the chapter of ABI Reference.
+
+Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+v19:
+- drop tdvmcall constants by Xiaoyao
+
+v18:
+- Add metadata field id
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/index.rst              |  2 ++
- .../virt/kvm/intel-tdx-layer-status.rst       | 29 +++++++++++++++++++
- 2 files changed, 31 insertions(+)
- create mode 100644 Documentation/virt/kvm/intel-tdx-layer-status.rst
+ arch/x86/kvm/vmx/tdx_arch.h | 265 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 265 insertions(+)
+ create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
 
-diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
-index ad13ec55ddfe..ccff56dca2b1 100644
---- a/Documentation/virt/kvm/index.rst
-+++ b/Documentation/virt/kvm/index.rst
-@@ -19,3 +19,5 @@ KVM
-    vcpu-requests
-    halt-polling
-    review-checklist
-+
-+   intel-tdx-layer-status
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
 new file mode 100644
-index 000000000000..f11ea701dc19
+index 000000000000..e2c1a6f429d7
 --- /dev/null
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -0,0 +1,29 @@
-+.. SPDX-License-Identifier: GPL-2.0
++++ b/arch/x86/kvm/vmx/tdx_arch.h
+@@ -0,0 +1,265 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* architectural constants/data definitions for TDX SEAMCALLs */
 +
-+===================================
-+Intel Trust Dodmain Extensions(TDX)
-+===================================
++#ifndef __KVM_X86_TDX_ARCH_H
++#define __KVM_X86_TDX_ARCH_H
 +
-+Layer status
-+============
-+What qemu can do
-+----------------
-+- TDX VM TYPE is exposed to Qemu.
-+- Qemu can try to create VM of TDX VM type and then fails.
++#include <linux/types.h>
 +
-+Patch Layer status
-+------------------
-+  Patch layer                          Status
++/*
++ * TDX SEAMCALL API function leaves
++ */
++#define TDH_VP_ENTER			0
++#define TDH_MNG_ADDCX			1
++#define TDH_MEM_PAGE_ADD		2
++#define TDH_MEM_SEPT_ADD		3
++#define TDH_VP_ADDCX			4
++#define TDH_MEM_PAGE_RELOCATE		5
++#define TDH_MEM_PAGE_AUG		6
++#define TDH_MEM_RANGE_BLOCK		7
++#define TDH_MNG_KEY_CONFIG		8
++#define TDH_MNG_CREATE			9
++#define TDH_VP_CREATE			10
++#define TDH_MNG_RD			11
++#define TDH_MR_EXTEND			16
++#define TDH_MR_FINALIZE			17
++#define TDH_VP_FLUSH			18
++#define TDH_MNG_VPFLUSHDONE		19
++#define TDH_MNG_KEY_FREEID		20
++#define TDH_MNG_INIT			21
++#define TDH_VP_INIT			22
++#define TDH_MEM_SEPT_RD			25
++#define TDH_VP_RD			26
++#define TDH_MNG_KEY_RECLAIMID		27
++#define TDH_PHYMEM_PAGE_RECLAIM		28
++#define TDH_MEM_PAGE_REMOVE		29
++#define TDH_MEM_SEPT_REMOVE		30
++#define TDH_SYS_RD			34
++#define TDH_MEM_TRACK			38
++#define TDH_MEM_RANGE_UNBLOCK		39
++#define TDH_PHYMEM_CACHE_WB		40
++#define TDH_PHYMEM_PAGE_WBINVD		41
++#define TDH_VP_WR			43
++#define TDH_SYS_LP_SHUTDOWN		44
 +
-+* TDX, VMX coexistence:                 Applied
-+* TDX architectural definitions:        Applying
-+* TD VM creation/destruction:           Not yet
-+* TD vcpu creation/destruction:         Not yet
-+* TDX EPT violation:                    Not yet
-+* TD finalization:                      Not yet
-+* TD vcpu enter/exit:                   Not yet
-+* TD vcpu interrupts/exit/hypercall:    Not yet
++/* TDX control structure (TDR/TDCS/TDVPS) field access codes */
++#define TDX_NON_ARCH			BIT_ULL(63)
++#define TDX_CLASS_SHIFT			56
++#define TDX_FIELD_MASK			GENMASK_ULL(31, 0)
 +
-+* KVM MMU GPA shared bits:              Not yet
-+* KVM TDP refactoring for TDX:          Not yet
-+* KVM TDP MMU hooks:                    Not yet
++#define __BUILD_TDX_FIELD(non_arch, class, field)	\
++	(((non_arch) ? TDX_NON_ARCH : 0) |		\
++	 ((u64)(class) << TDX_CLASS_SHIFT) |		\
++	 ((u64)(field) & TDX_FIELD_MASK))
++
++#define BUILD_TDX_FIELD(class, field)			\
++	__BUILD_TDX_FIELD(false, (class), (field))
++
++#define BUILD_TDX_FIELD_NON_ARCH(class, field)		\
++	__BUILD_TDX_FIELD(true, (class), (field))
++
++
++/* Class code for TD */
++#define TD_CLASS_EXECUTION_CONTROLS	17ULL
++
++/* Class code for TDVPS */
++#define TDVPS_CLASS_VMCS		0ULL
++#define TDVPS_CLASS_GUEST_GPR		16ULL
++#define TDVPS_CLASS_OTHER_GUEST		17ULL
++#define TDVPS_CLASS_MANAGEMENT		32ULL
++
++enum tdx_tdcs_execution_control {
++	TD_TDCS_EXEC_TSC_OFFSET = 10,
++};
++
++/* @field is any of enum tdx_tdcs_execution_control */
++#define TDCS_EXEC(field)		BUILD_TDX_FIELD(TD_CLASS_EXECUTION_CONTROLS, (field))
++
++/* @field is the VMCS field encoding */
++#define TDVPS_VMCS(field)		BUILD_TDX_FIELD(TDVPS_CLASS_VMCS, (field))
++
++enum tdx_vcpu_guest_other_state {
++	TD_VCPU_STATE_DETAILS_NON_ARCH = 0x100,
++};
++
++union tdx_vcpu_state_details {
++	struct {
++		u64 vmxip	: 1;
++		u64 reserved	: 63;
++	};
++	u64 full;
++};
++
++/* @field is any of enum tdx_guest_other_state */
++#define TDVPS_STATE(field)		BUILD_TDX_FIELD(TDVPS_CLASS_OTHER_GUEST, (field))
++#define TDVPS_STATE_NON_ARCH(field)	BUILD_TDX_FIELD_NON_ARCH(TDVPS_CLASS_OTHER_GUEST, (field))
++
++/* Management class fields */
++enum tdx_vcpu_guest_management {
++	TD_VCPU_PEND_NMI = 11,
++};
++
++/* @field is any of enum tdx_vcpu_guest_management */
++#define TDVPS_MANAGEMENT(field)		BUILD_TDX_FIELD(TDVPS_CLASS_MANAGEMENT, (field))
++
++#define TDX_EXTENDMR_CHUNKSIZE		256
++
++struct tdx_cpuid_value {
++	u32 eax;
++	u32 ebx;
++	u32 ecx;
++	u32 edx;
++} __packed;
++
++#define TDX_TD_ATTRIBUTE_DEBUG		BIT_ULL(0)
++#define TDX_TD_ATTR_SEPT_VE_DISABLE	BIT_ULL(28)
++#define TDX_TD_ATTRIBUTE_PKS		BIT_ULL(30)
++#define TDX_TD_ATTRIBUTE_KL		BIT_ULL(31)
++#define TDX_TD_ATTRIBUTE_PERFMON	BIT_ULL(63)
++
++/*
++ * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
++ */
++#define TDX_MAX_VCPUS	(~(u16)0)
++
++struct td_params {
++	u64 attributes;
++	u64 xfam;
++	u16 max_vcpus;
++	u8 reserved0[6];
++
++	u64 eptp_controls;
++	u64 exec_controls;
++	u16 tsc_frequency;
++	u8  reserved1[38];
++
++	u64 mrconfigid[6];
++	u64 mrowner[6];
++	u64 mrownerconfig[6];
++	u64 reserved2[4];
++
++	union {
++		DECLARE_FLEX_ARRAY(struct tdx_cpuid_value, cpuid_values);
++		u8 reserved3[768];
++	};
++} __packed __aligned(1024);
++
++/*
++ * Guest uses MAX_PA for GPAW when set.
++ * 0: GPA.SHARED bit is GPA[47]
++ * 1: GPA.SHARED bit is GPA[51]
++ */
++#define TDX_EXEC_CONTROL_MAX_GPAW      BIT_ULL(0)
++
++/*
++ * TDH.VP.ENTER, TDG.VP.VMCALL preserves RBP
++ * 0: RBP can be used for TDG.VP.VMCALL input. RBP is clobbered.
++ * 1: RBP can't be used for TDG.VP.VMCALL input. RBP is preserved.
++ */
++#define TDX_CONTROL_FLAG_NO_RBP_MOD	BIT_ULL(2)
++
++
++/*
++ * TDX requires the frequency to be defined in units of 25MHz, which is the
++ * frequency of the core crystal clock on TDX-capable platforms, i.e. the TDX
++ * module can only program frequencies that are multiples of 25MHz.  The
++ * frequency must be between 100mhz and 10ghz (inclusive).
++ */
++#define TDX_TSC_KHZ_TO_25MHZ(tsc_in_khz)	((tsc_in_khz) / (25 * 1000))
++#define TDX_TSC_25MHZ_TO_KHZ(tsc_in_25mhz)	((tsc_in_25mhz) * (25 * 1000))
++#define TDX_MIN_TSC_FREQUENCY_KHZ		(100 * 1000)
++#define TDX_MAX_TSC_FREQUENCY_KHZ		(10 * 1000 * 1000)
++
++union tdx_sept_entry {
++	struct {
++		u64 r		:  1;
++		u64 w		:  1;
++		u64 x		:  1;
++		u64 mt		:  3;
++		u64 ipat	:  1;
++		u64 leaf	:  1;
++		u64 a		:  1;
++		u64 d		:  1;
++		u64 xu		:  1;
++		u64 ignored0	:  1;
++		u64 pfn		: 40;
++		u64 reserved	:  5;
++		u64 vgp		:  1;
++		u64 pwa		:  1;
++		u64 ignored1	:  1;
++		u64 sss		:  1;
++		u64 spp		:  1;
++		u64 ignored2	:  1;
++		u64 sve		:  1;
++	};
++	u64 raw;
++};
++
++enum tdx_sept_entry_state {
++	TDX_SEPT_FREE = 0,
++	TDX_SEPT_BLOCKED = 1,
++	TDX_SEPT_PENDING = 2,
++	TDX_SEPT_PENDING_BLOCKED = 3,
++	TDX_SEPT_PRESENT = 4,
++};
++
++union tdx_sept_level_state {
++	struct {
++		u64 level	:  3;
++		u64 reserved0	:  5;
++		u64 state	:  8;
++		u64 reserved1	: 48;
++	};
++	u64 raw;
++};
++
++/*
++ * Global scope metadata field ID.
++ * See Table "Global Scope Metadata", TDX module 1.5 ABI spec.
++ */
++#define MD_FIELD_ID_SYS_ATTRIBUTES		0x0A00000200000000ULL
++#define MD_FIELD_ID_FEATURES0			0x0A00000300000008ULL
++#define MD_FIELD_ID_ATTRS_FIXED0		0x1900000300000000ULL
++#define MD_FIELD_ID_ATTRS_FIXED1		0x1900000300000001ULL
++#define MD_FIELD_ID_XFAM_FIXED0			0x1900000300000002ULL
++#define MD_FIELD_ID_XFAM_FIXED1			0x1900000300000003ULL
++
++#define MD_FIELD_ID_TDCS_BASE_SIZE		0x9800000100000100ULL
++#define MD_FIELD_ID_TDVPS_BASE_SIZE		0x9800000100000200ULL
++
++#define MD_FIELD_ID_NUM_CPUID_CONFIG		0x9900000100000004ULL
++#define MD_FIELD_ID_CPUID_CONFIG_LEAVES		0x9900000300000400ULL
++#define MD_FIELD_ID_CPUID_CONFIG_VALUES		0x9900000300000500ULL
++
++#define MD_FIELD_ID_FEATURES0_NO_RBP_MOD	BIT_ULL(18)
++
++#define TDX_MAX_NR_CPUID_CONFIGS       37
++
++#define TDX_MD_ELEMENT_SIZE_8BITS      0
++#define TDX_MD_ELEMENT_SIZE_16BITS     1
++#define TDX_MD_ELEMENT_SIZE_32BITS     2
++#define TDX_MD_ELEMENT_SIZE_64BITS     3
++
++union tdx_md_field_id {
++	struct {
++		u64 field                       : 24;
++		u64 reserved0                   : 8;
++		u64 element_size_code           : 2;
++		u64 last_element_in_field       : 4;
++		u64 reserved1                   : 3;
++		u64 inc_size                    : 1;
++		u64 write_mask_valid            : 1;
++		u64 context                     : 3;
++		u64 reserved2                   : 1;
++		u64 class                       : 6;
++		u64 reserved3                   : 1;
++		u64 non_arch                    : 1;
++	};
++	u64 raw;
++};
++
++#define TDX_MD_ELEMENT_SIZE_CODE(_field_id)			\
++	({ union tdx_md_field_id _fid = { .raw = (_field_id)};  \
++		_fid.element_size_code; })
++
++#endif /* __KVM_X86_TDX_ARCH_H */
 -- 
 2.25.1
 
