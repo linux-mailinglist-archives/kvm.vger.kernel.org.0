@@ -1,40 +1,59 @@
-Return-Path: <kvm+bounces-9621-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9622-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AB0F866BB0
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:04:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 675E3866BB7
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:07:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74557B20BA4
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:04:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B1E11C215AD
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690681C6A7;
-	Mon, 26 Feb 2024 08:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AED71C6B9;
+	Mon, 26 Feb 2024 08:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="fEEdMIEu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8481BF35;
-	Mon, 26 Feb 2024 08:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA8D1C686;
+	Mon, 26 Feb 2024 08:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708934674; cv=none; b=YTPyZWAU5GIGS5eJHMbsqX2o/2u6qkvSO4cDLhnqpGqouElOs5SRZiIUzpEKK8jfPm07MsO4wYvksfH5NFhmmNSArVfNaGgV1y3VIpCAXWTtl+/fKEC5I0cgfzsUjYTc44VUEnJeA/4Yf7xKYMgaIQ3QBfgjsjVPRMSY7hXuUbo=
+	t=1708934842; cv=none; b=GrqijzWijuibYDp1tOD41SpTaACCUXraR38Z9imok+xCDjUTNewGoQLhc+krx4F+O6NVRpFOLKt4I7Dns2lbs2ox0igcUAyIRLAPPb9K+pTxj4GAclBBV3fE3Kh/jWPz664eHSHiXDpcnVltmpRcOOMi/aKzG1eLS+VqmlvfUxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708934674; c=relaxed/simple;
-	bh=XJ4kpdrFdiZ48xWLB3xMDiKG2tdt4tA1O9QyzHtZkOc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=XuTGaO4Zjn7ig9FHlhoxyZaR8pXUQe5+wPdSzmMI0z3O0yuRbgzIfQBkujxT7bg0u4hzXvCG835wkQUVkN4jEm2Qj1c9Z/ZjAFnlaKHgg4zrk6NqjGMGjlPhJClAJ57E/D8oRiSOMKEpNAGyg101vYe12K0ejGztIXi1hpHFnzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.173])
-	by gateway (Coremail) with SMTP id _____8DxK+kNRtxlJYIRAA--.26034S3;
-	Mon, 26 Feb 2024 16:04:29 +0800 (CST)
-Received: from [10.20.42.173] (unknown [10.20.42.173])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxbs0JRtxl0NZEAA--.47790S3;
-	Mon, 26 Feb 2024 16:04:27 +0800 (CST)
+	s=arc-20240116; t=1708934842; c=relaxed/simple;
+	bh=BdJKa40zvLo1lKD1wA98PMD1d9vAA8KjsTeiEusFwbY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XLZ344tSsQQ9XxATBs767MAU68NqSLY51IAKAZOozlMnuoZ/itY2YL3uWh9x0qwuuRyZhyjZyoi3nMY22765sASecBcRBZOTDrquZCMd2AtA58WTIsvVB/Jrlfw2Ugh0l2wvH+gDp6KTV95A1olAtyc5mw3HDVTGamyAcpYZ81g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=fEEdMIEu; arc=none smtp.client-ip=115.28.160.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
+	t=1708934837; bh=BdJKa40zvLo1lKD1wA98PMD1d9vAA8KjsTeiEusFwbY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fEEdMIEu8ctBtnEMUbUHo4wLchcss85VZ+PzON08zglwDaUvXylLcoYivW2bJbu0l
+	 L1NizWea9ynARlB69vLBpXvk+qjl8tXtALKVESi7GGd8lIUmeSEGCGHUik1/E1T+lu
+	 AtarTBfq+OIgmbLph4GNNN5FoGBEhGFRloHs9UYs=
+Received: from [28.0.0.1] (unknown [101.230.251.34])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id CAFD860120;
+	Mon, 26 Feb 2024 16:07:16 +0800 (CST)
+Message-ID: <704f58e2-f7ce-4d8d-b40d-52d773d13220@xen0n.name>
+Date: Mon, 26 Feb 2024 16:07:16 +0800
+Precedence: bulk
+X-Mailing-List: kvm@vger.kernel.org
+List-Id: <kvm.vger.kernel.org>
+List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v5 3/6] LoongArch: KVM: Add cpucfg area for kvm hypervisor
-To: Huacai Chen <chenhuacai@kernel.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>
+To: maobibo <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>
 Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
  Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev,
  linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
@@ -43,214 +62,97 @@ References: <20240222032803.2177856-1-maobibo@loongson.cn>
  <20240222032803.2177856-4-maobibo@loongson.cn>
  <CAAhV-H5eqXMqTYVb6cAVqOsDNcEDeP9HzaMKw69KFQeVaAYEdA@mail.gmail.com>
  <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
- <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <06647e4a-0027-9c9f-f3bd-cd525d37b6d8@loongson.cn>
-Date: Mon, 26 Feb 2024 16:04:50 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-Precedence: bulk
-X-Mailing-List: kvm@vger.kernel.org
-List-Id: <kvm.vger.kernel.org>
-List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ <d8994f0f-d789-46d2-bc4d-f9b37fb396ff@xen0n.name>
+ <0fa41323-0071-aa97-21fb-3ad859d0a9b4@loongson.cn>
 Content-Language: en-US
+From: WANG Xuerui <kernel@xen0n.name>
+In-Reply-To: <0fa41323-0071-aa97-21fb-3ad859d0a9b4@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Cxbs0JRtxl0NZEAA--.47790S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxuw43AFy5try5ur4kAF1DJwc_yoW7KFW5pF
-	W8AF1kuF48JrySy3y2qw15WrnFvrWkKr1xXFyfJa4UCFZ0qr1xJr10krWqkFyktw4kCF10
-	qF4Utry3uFn8A3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4Xo7DU
-	UUU
 
-
-
-On 2024/2/26 下午2:12, Huacai Chen wrote:
-> On Mon, Feb 26, 2024 at 10:04 AM maobibo <maobibo@loongson.cn> wrote:
->>
->>
->>
->> On 2024/2/24 下午5:13, Huacai Chen wrote:
->>> Hi, Bibo,
->>>
->>> On Thu, Feb 22, 2024 at 11:28 AM Bibo Mao <maobibo@loongson.cn> wrote:
->>>>
->>>> Instruction cpucfg can be used to get processor features. And there
->>>> is trap exception when it is executed in VM mode, and also it is
->>>> to provide cpu features to VM. On real hardware cpucfg area 0 - 20
->>>> is used.  Here one specified area 0x40000000 -- 0x400000ff is used
->>>> for KVM hypervisor to privide PV features, and the area can be extended
->>>> for other hypervisors in future. This area will never be used for
->>>> real HW, it is only used by software.
->>> After reading and thinking, I find that the hypercall method which is
->>> used in our productive kernel is better than this cpucfg method.
->>> Because hypercall is more simple and straightforward, plus we don't
->>> worry about conflicting with the real hardware.
->> No, I do not think so. cpucfg is simper than hypercall, hypercall can
->> be in effect when system runs in guest mode. In some scenario like TCG
->> mode, hypercall is illegal intruction, however cpucfg can work.
-> Nearly all architectures use hypercall except x86 for its historical
-Only x86 support multiple hypervisors and there is multiple hypervisor 
-in x86 only. It is an advantage, not historical reason.
-
-> reasons. If we use CPUCFG, then the hypervisor information is
-> unnecessarily leaked to userspace, and this may be a security issue.
-> Meanwhile, I don't think TCG mode needs PV features.
-Besides PV features, there is other features different with real hw such 
-as virtio device, virtual interrupt controller.
-
-Regards
-Bibo Mao
-
-> 
-> I consulted with Jiaxun before, and maybe he can give some more comments.
-> 
->>
->> Extioi virtualization extension will be added later, cpucfg can be used
->> to get extioi features. It is unlikely that extioi driver depends on
->> PARA_VIRT macro if hypercall is used to get features.
-> CPUCFG is per-core information, if we really need something about
-> extioi, it should be in iocsr (LOONGARCH_IOCSR_FEATURES).
+On 2/26/24 16:00, maobibo wrote:
 > 
 > 
-> Huacai
+> On 2024/2/26 下午1:25, WANG Xuerui wrote:
+>> Hi,
+>>
+>> On 2/26/24 10:04, maobibo wrote:
+>>> On 2024/2/24 下午5:13, Huacai Chen wrote:
+>>>> Hi, Bibo,
+>>>>
+>>>> On Thu, Feb 22, 2024 at 11:28 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>>
+>>>>> Instruction cpucfg can be used to get processor features. And there
+>>>>> is trap exception when it is executed in VM mode, and also it is
+>>>>> to provide cpu features to VM. On real hardware cpucfg area 0 - 20
+>>>>> is used.  Here one specified area 0x40000000 -- 0x400000ff is used
+>>>>> for KVM hypervisor to privide PV features, and the area can be 
+>>>>> extended
+>>>>> for other hypervisors in future. This area will never be used for
+>>>>> real HW, it is only used by software.
+>>>> After reading and thinking, I find that the hypercall method which is
+>>>> used in our productive kernel is better than this cpucfg method.
+>>>> Because hypercall is more simple and straightforward, plus we don't
+>>>> worry about conflicting with the real hardware.
+>>> No, I do not think so. cpucfg is simper than hypercall, hypercall can
+>>> be in effect when system runs in guest mode. In some scenario like 
+>>> TCG mode, hypercall is illegal intruction, however cpucfg can work.
+>>
+>> While the CPUCFG instruction is universally available, it's also 
+>> unprivileged, so any additional CPUCFG behavior also automatically 
+>> becomes UAPI, which likely isn't what you expect. Hypervisor 
+>> implementation details shouldn't be leaked to userland because it has 
+>> no reason to care -- even though userland learns about the 
+>> capabilities, it cannot actually access the resources, because 
+>> relevant CSRs and/or instructions are privileged. Worse, the 
+>> unnecessary exposure of information could be a problem security-wise.
+> cpucfg is read-only and used to represent current hw cpu features,
+> why do you think there is security issue?  Is there security issue about 
+> cpucfg2 and cpucfg6 since it can be accessed in user space also?
 > 
+> PMU feature is defined in cpucfg6, PMU driver is written in kernel mode.
+
+These CPUCFG leaves were added before existence of LoongArch were 
+publicized, without community review. If early drafts of the manual were 
+available to community reviewers, at least I would strongly NAK it.
+
 >>
->> Regards
->> Bibo Mao
+>> A possible way to preserve the unprivileged CPUCFG behavior would be 
+>> acting differently based on guest CSR.CRMD.PLV: only returning data 
+>> for the new configuration space when guest is not in PLV3. But this 
+>> behavior isn't explicitly allowed nor disallowed in the LoongArch 
+>> manuals, and is in my opinion unnecessarily complex.
 >>
->>>
->>> Huacai
->>>
->>>>
->>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>>> ---
->>>>    arch/loongarch/include/asm/inst.h      |  1 +
->>>>    arch/loongarch/include/asm/loongarch.h | 10 ++++++
->>>>    arch/loongarch/kvm/exit.c              | 46 +++++++++++++++++---------
->>>>    3 files changed, 41 insertions(+), 16 deletions(-)
->>>>
->>>> diff --git a/arch/loongarch/include/asm/inst.h b/arch/loongarch/include/asm/inst.h
->>>> index d8f637f9e400..ad120f924905 100644
->>>> --- a/arch/loongarch/include/asm/inst.h
->>>> +++ b/arch/loongarch/include/asm/inst.h
->>>> @@ -67,6 +67,7 @@ enum reg2_op {
->>>>           revhd_op        = 0x11,
->>>>           extwh_op        = 0x16,
->>>>           extwb_op        = 0x17,
->>>> +       cpucfg_op       = 0x1b,
->>>>           iocsrrdb_op     = 0x19200,
->>>>           iocsrrdh_op     = 0x19201,
->>>>           iocsrrdw_op     = 0x19202,
->>>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
->>>> index 46366e783c84..a1d22e8b6f94 100644
->>>> --- a/arch/loongarch/include/asm/loongarch.h
->>>> +++ b/arch/loongarch/include/asm/loongarch.h
->>>> @@ -158,6 +158,16 @@
->>>>    #define  CPUCFG48_VFPU_CG              BIT(2)
->>>>    #define  CPUCFG48_RAM_CG               BIT(3)
->>>>
->>>> +/*
->>>> + * cpucfg index area: 0x40000000 -- 0x400000ff
->>>> + * SW emulation for KVM hypervirsor
->>>> + */
->>>> +#define CPUCFG_KVM_BASE                        0x40000000UL
->>>> +#define CPUCFG_KVM_SIZE                        0x100
->>>> +#define CPUCFG_KVM_SIG                 CPUCFG_KVM_BASE
->>>> +#define  KVM_SIGNATURE                 "KVM\0"
->>>> +#define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
->>>> +
->>>>    #ifndef __ASSEMBLY__
->>>>
->>>>    /* CSR */
->>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
->>>> index 923bbca9bd22..6a38fd59d86d 100644
->>>> --- a/arch/loongarch/kvm/exit.c
->>>> +++ b/arch/loongarch/kvm/exit.c
->>>> @@ -206,10 +206,37 @@ int kvm_emu_idle(struct kvm_vcpu *vcpu)
->>>>           return EMULATE_DONE;
->>>>    }
->>>>
->>>> -static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
->>>> +static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst inst)
->>>>    {
->>>>           int rd, rj;
->>>>           unsigned int index;
->>>> +
->>>> +       rd = inst.reg2_format.rd;
->>>> +       rj = inst.reg2_format.rj;
->>>> +       ++vcpu->stat.cpucfg_exits;
->>>> +       index = vcpu->arch.gprs[rj];
->>>> +
->>>> +       /*
->>>> +        * By LoongArch Reference Manual 2.2.10.5
->>>> +        * Return value is 0 for undefined cpucfg index
->>>> +        */
->>>> +       switch (index) {
->>>> +       case 0 ... (KVM_MAX_CPUCFG_REGS - 1):
->>>> +               vcpu->arch.gprs[rd] = vcpu->arch.cpucfg[index];
->>>> +               break;
->>>> +       case CPUCFG_KVM_SIG:
->>>> +               vcpu->arch.gprs[rd] = *(unsigned int *)KVM_SIGNATURE;
->>>> +               break;
->>>> +       default:
->>>> +               vcpu->arch.gprs[rd] = 0;
->>>> +               break;
->>>> +       }
->>>> +
->>>> +       return EMULATE_DONE;
->>>> +}
->>>> +
->>>> +static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
->>>> +{
->>>>           unsigned long curr_pc;
->>>>           larch_inst inst;
->>>>           enum emulation_result er = EMULATE_DONE;
->>>> @@ -224,21 +251,8 @@ static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
->>>>           er = EMULATE_FAIL;
->>>>           switch (((inst.word >> 24) & 0xff)) {
->>>>           case 0x0: /* CPUCFG GSPR */
->>>> -               if (inst.reg2_format.opcode == 0x1B) {
->>>> -                       rd = inst.reg2_format.rd;
->>>> -                       rj = inst.reg2_format.rj;
->>>> -                       ++vcpu->stat.cpucfg_exits;
->>>> -                       index = vcpu->arch.gprs[rj];
->>>> -                       er = EMULATE_DONE;
->>>> -                       /*
->>>> -                        * By LoongArch Reference Manual 2.2.10.5
->>>> -                        * return value is 0 for undefined cpucfg index
->>>> -                        */
->>>> -                       if (index < KVM_MAX_CPUCFG_REGS)
->>>> -                               vcpu->arch.gprs[rd] = vcpu->arch.cpucfg[index];
->>>> -                       else
->>>> -                               vcpu->arch.gprs[rd] = 0;
->>>> -               }
->>>> +               if (inst.reg2_format.opcode == cpucfg_op)
->>>> +                       er = kvm_emu_cpucfg(vcpu, inst);
->>>>                   break;
->>>>           case 0x4: /* CSR{RD,WR,XCHG} GSPR */
->>>>                   er = kvm_handle_csr(vcpu, inst);
->>>> --
->>>> 2.39.3
->>>>
->>
->>
+>> And regarding the lack of hypcall support from QEMU system mode 
+>> emulation on TCG, I'd argue it's simply a matter of adding support in 
+>> target/loongarch64. This would be attractive because it will enable 
+>> easy development and testing of hypervisor software with QEMU -- both 
+>> locally and in CI.
+> Hypercall is part of hardware assisted virtualization LVZ, do you think
+> only adding hypercall instruction withou LVZ is possible?
+
+I cannot comment on the actual feasibility of doing so, because I don't 
+have access to the LVZ manuals which *still* isn't publicly available. 
+But from my intuition it should be a more-or-less trivial processor mode 
+transition like with syscall -- whether that's indeed the case I can't 
+(dis)prove.
+
+>>> Extioi virtualization extension will be added later, cpucfg can be 
+>>> used to get extioi features. It is unlikely that extioi driver 
+>>> depends on PARA_VIRT macro if hypercall is used to get features.
+>> And the EXTIOI feature too isn't something usable from unprivileged 
+>> code, so I don't think it will affect the conclusions above.
+> Sorry, I do not know what do you mean.
+
+I was just saying this example provided no additional information at 
+least for me -- while it's appreciated that you informed the community 
+of your intended future use case, like what I stated in the first 
+paragraph in my reply, it looked essentially the same because both PV 
+and EXTIOI are privileged things.
+
+-- 
+WANG "xen0n" Xuerui
+
+Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
 
 
