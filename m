@@ -1,123 +1,189 @@
-Return-Path: <kvm+bounces-9957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 451A4867F8C
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:07:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E31F867FEB
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:39:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 765471C2BCC4
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 18:07:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF3B41F25AE2
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 18:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA3412F361;
-	Mon, 26 Feb 2024 18:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA27012EBE8;
+	Mon, 26 Feb 2024 18:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fvBEiuVT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s9GyUYEo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEFE1292FF;
-	Mon, 26 Feb 2024 18:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7E01E500
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 18:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708970835; cv=none; b=ssG1FU8VXYO8nP6NbJzAPOZIwbU5Zwa2/OFiUt437aKKNze/QMWr/jNjfWHbRBv2w+nUWSFyftPf5Bd7l9MHWGxqxEV7KBE15A4mXcRcMxdnpFfdxwSXT5nAIYTV2TNJGctvddLdkAQ/MsOEZEgeeFxKVtTd4jb4c9ZVFZr4R6U=
+	t=1708972763; cv=none; b=diQd5Vj2cI7IpIGinmIcgPBsULptm5bCSQEgdpjToWMwhxRiOrfCdruf5EspVXiMIhlJ9hKr9RVhbXOsSawk73aLYEj839l87WRpEERDuiy2eo2QdGn3ldL5Vx/GY8rQ4vMR5a2qE1vkzPLOp0MRpfpyRvtVinUOjyYTvI59TnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708970835; c=relaxed/simple;
-	bh=Ah4K95o9NohIieqV9hLq8pAEFQiM8C/l4p3fKUsB1Ts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PP5+zTXmkXmFWh5mByxaIY5g2X8KwSUKVEW9Y+AJh87zklXupN4kqp+Wag0xH/NDwscAb6B/ednLqi/H0p+1beqKqFBQNCdiFvljv5GsThZrX74735e3o4CCg1oIuAH1Ct9GK2PRircGI7Y+BbD+LHZUT8twiUJwd9pVCXh+SIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fvBEiuVT; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708970834; x=1740506834;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Ah4K95o9NohIieqV9hLq8pAEFQiM8C/l4p3fKUsB1Ts=;
-  b=fvBEiuVTXYhlQ4UzO7+DIUYX2N1EPXi/fg9jANJxGv7ZFemOT7pBdE+N
-   vi30mvW4qSI5f/M8vQdsZHJ5Eb6dLdKrCDY7+6KjRRlPONDqPCViPjT/r
-   5fIbGSs58u8nv0BNjuiDsF4WjpxmFiQLqUrNUmGssdTc1qsztZYNpIW5m
-   0dLZJmUrgmJSNUb1/PBBGy8HK6z6vJIXOmNuyVxStAbrt+RT8FJbCNlYN
-   9U3BirY+XmkqJd6zFSFghLCpQwtn+lgE7KQfTcimGZ6zB8VXZfiniMuTV
-   DX66uUqh6FZMnFyMH2fAng6odZPl74Johx19xXUPw8hfL3I2++WH4mjtl
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="13913522"
-X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="13913522"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 10:07:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="29927118"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 10:07:12 -0800
-Date: Mon, 26 Feb 2024 10:07:12 -0800
-From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, isaku.yamahata@intel.com,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-	erdemaktas@google.com, Sagi Shahar <sagis@google.com>,
-	Kai Huang <kai.huang@intel.com>, chen.bo@intel.com,
-	hang.yuan@intel.com, tina.zhang@intel.com, gkirkpatrick@google.com,
-	Vipin Sharma <vipinsh@google.com>, isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v18 064/121] KVM: TDX: Create initial guest memory
-Message-ID: <20240226180712.GF177224@ls.amr.corp.intel.com>
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <97bb1f2996d8a7b828cd9e3309380d1a86ca681b.1705965635.git.isaku.yamahata@intel.com>
- <Zbrj5WKVgMsUFDtb@google.com>
- <CALzav=diVvCJnJpuKQc7-KeogZw3cTFkzuSWu6PLAHCONJBwhg@mail.gmail.com>
+	s=arc-20240116; t=1708972763; c=relaxed/simple;
+	bh=gs/FzsEiJZfJd8QE8n9+L+e5mLQcXVpJxk1gMIJOmQA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Twee6jgHc4TbrFgGKWWSI6Y7ISa1bbLPAUwyU6LSqZL4OFaHyJBhzDMn1szPK8nCLlbn2nXCn3pw44NcyqLoAJKL60XX8n069fJavszM9AWDXgTHr9tILdotYAqWI9dfgnshKGevEGQz7OINpbaxYMMxmzwolJdMcJfkGcXEgzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s9GyUYEo; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5efe82b835fso66787317b3.0
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 10:39:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708972761; x=1709577561; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SLbLVcdqhNcaIUlfiXVe1bY8Ut+IvQsXIOAAJ+eMeLQ=;
+        b=s9GyUYEo72FYlEl2QNs5jJAumgBGOLJOYgCFi8GlZF6W44dNgwisKCEep6NcxcytPh
+         ZKFsgUpBqXN9GinTH3QhFG8Uk2HORZiaKYsCxKZs20ChMkNcFXEd4wsulQJy2JK8bARA
+         2ktidZ3JGeo8265PqsMj2JD30rxktDRXyjholKENmFWmhayp4vuNMyN/hyr6oLNooKwq
+         ZuXL9Rgc6neZHiZy5HpYnu/doGM/JNiEsdwbDOjkgVx73RbqwVFp5pVhNBpzGjYteQ3B
+         y5cGtFmzJ2Uh2YS2nb138IC7Qz+Q9AAnPxI2dRObsULKDbp6kcoQ56wocH7dipI+f2RR
+         hsRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708972761; x=1709577561;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SLbLVcdqhNcaIUlfiXVe1bY8Ut+IvQsXIOAAJ+eMeLQ=;
+        b=Q8ocsZcI/LrIppTGDANuiTeBZBoQ20p69UDKMarb/ModCx3aNLbwREJFFh9ys/duzc
+         kErjDF/ZUorHQVUBB/QH3c2dn94idAUGiSlrJod15W3xJFmlPXQTcmRWf4ATNS9i3mVY
+         /mBYsHVb6f0JvEUgY3+cCALmgYYzYWbv3JvUAwuTU+QvWqKn7zCmWB4K373//VP1SG3V
+         GyKT7G86AT7P4Wjdb0b6UktmsoyWDKHh/FyCHp7plN0onft1xnGY03Hco6wI8ac0p+bd
+         YwAkAmTRLLEexeCiGhgCey2VegiVU4im7v8o9cNgwqtxBRkn3h2YoicZi7HCHRQr9RV+
+         bAZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXfSCWAdK+09jIDLQNssm6aEbFfjUn4xdsGahqSoitK0XkfY6RGYsNBqP4XvOehNMwhC3nWZ0bD2dMVHqrWLmNDrXuz
+X-Gm-Message-State: AOJu0Yzka4UrVOBxcpWHJUsVnviS4yPudTXbd0JvL0jDBS+2O2lqEkUB
+	fmzAN/YX/gshY+CFoSBmamUMXeKcJQUC8ivUhDc5Jv5Q3q0zFujWX8g2wPHY8Bzu0BZ4cApQctd
+	o8w==
+X-Google-Smtp-Source: AGHT+IGCThJQCfs7KDv+Xut3WTHl2kJbZYnP3+aS3gnJmsKwwJWxJXDJIJte5MMSdzV66oyvp4V8QZqAJXQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:524c:0:b0:608:e4fc:aada with SMTP id
+ g73-20020a81524c000000b00608e4fcaadamr1335722ywb.8.1708972761409; Mon, 26 Feb
+ 2024 10:39:21 -0800 (PST)
+Date: Mon, 26 Feb 2024 10:39:19 -0800
+In-Reply-To: <20240226180626.GE177224@ls.amr.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALzav=diVvCJnJpuKQc7-KeogZw3cTFkzuSWu6PLAHCONJBwhg@mail.gmail.com>
+Mime-Version: 1.0
+References: <cover.1705965634.git.isaku.yamahata@intel.com>
+ <cce34006a4db0e1995ce007c917f834b117b12af.1705965635.git.isaku.yamahata@intel.com>
+ <CABgObfbZRO3yiXoHAoHSsBp4sKQY9r4GTLt-SRqevz2c8wOqbQ@mail.gmail.com> <20240226180626.GE177224@ls.amr.corp.intel.com>
+Message-ID: <Zdza1xJNlvhl8OZb@google.com>
+Subject: Re: [PATCH v18 044/121] KVM: x86/mmu: Assume guest MMIOs are shared
+From: Sean Christopherson <seanjc@google.com>
+To: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com, erdemaktas@google.com, 
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
+	hang.yuan@intel.com, tina.zhang@intel.com, Chao Gao <chao.gao@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 01, 2024 at 03:06:46PM -0800,
-David Matlack <dmatlack@google.com> wrote:
+On Mon, Feb 26, 2024, Isaku Yamahata wrote:
+> On Mon, Feb 12, 2024 at 11:29:51AM +0100,
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> > On Tue, Jan 23, 2024 at 12:55=E2=80=AFAM <isaku.yamahata@intel.com> wro=
+te:
+> > >
+> > > From: Chao Gao <chao.gao@intel.com>
+> > >
+> > > Guest TD doesn't necessarily invoke MAP_GPA to convert the virtual MM=
+IO
+> > > range to shared before accessing it.  When TD tries to access the vir=
+tual
+> > > device's MMIO as shared, an EPT violation is raised first.
+> > > kvm_mem_is_private() checks whether the GFN is shared or private.  If
+> > > MAP_GPA is not called for the GPA, KVM thinks the GPA is private and
+> > > refuses shared access, and doesn't set up shared EPT entry.  The gues=
+t
+> > > can't make progress.
+> > >
+> > > Instead of requiring the guest to invoke MAP_GPA for regions of virtu=
+al
+> > > MMIOs assume regions of virtual MMIOs are shared in KVM as well (i.e.=
+, GPAs
+> > > either have no kvm_memory_slot or are backed by host MMIOs). So that =
+guests
+> > > can access those MMIO regions.
+> >=20
+> > I'm not sure how the patch below deals with host MMIOs?
+>=20
+> It falls back to shared case to hit KVM_PFN_NOSLOT. It will be handled as
+> MMIO.
+>=20
+> Anyway I found it breaks SW_PROTECTED case.  So I came up with the follow=
+ing.
+> I think we'd like to handle as
+>   - SW_PROTECTED =3D> KVM_EXIT_MEMORY_FAULT
+>   - SNP, TDX =3D> MMIO.
+>  =20
 
-> +Vipin Sharma
-> 
-> On Wed, Jan 31, 2024 at 4:21 PM Sean Christopherson <seanjc@google.com> wrote:
-> > On Mon, Jan 22, 2024, isaku.yamahata@intel.com wrote:
-> >
-> > The real reason for this drive-by pseudo-review is that I am hoping/wishing we
-> > can turn this into a generic KVM ioctl() to allow userspace to pre-map guest
-> > memory[*].
-> >
-> > If we're going to carry non-trivial code, we might as well squeeze as much use
-> > out of it as we can.
-> >
-> > Beyond wanting to shove this into KVM_MEMORY_ENCRYPT_OP, is there any reason why
-> > this is a VM ioctl() and not a vCPU ioctl()?  Very roughly, couldn't we use a
-> > struct like this as input to a vCPU ioctl() that maps memory, and optionally
-> > initializes memory from @source?
-> >
-> >         struct kvm_memory_mapping {
-> >                 __u64 base_gfn;
-> >                 __u64 nr_pages;
-> >                 __u64 flags;
-> >                 __u64 source;
-> >         }
-> >
-> > TDX would need to do special things for copying the source, but beyond that most
-> > of the code in this function is generic.
-> >
-> > [*] https://lore.kernel.org/all/65262e67-7885-971a-896d-ad9c0a760907@polito.it
-> 
-> We would also be interested in such an API to reduce the guest
-> performance impact of intra-host migration.
+FFS.  Stop lobbing patch bombs and start having actual conversations.
 
-I introduce KVM_MEMORY_MAPPING and KVM_CAP_MEMORY_MAPPING with v19.
-We can continue the discussion there.
--- 
-Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Seriously, the whole point of using mailing lists is to have *discussions* =
+and
+to coordinate development.  Throwing patches at kvm@ and then walking away =
+DOES
+NOT WORK.
+
+Putting a "TODO: Drop this patch once the common patch is merged." in the
+changelog[1] is not helpful.
+
+Dropping a proposed common uAPI[2] into a 121 patch series without even *ac=
+knowledging*
+that you received the message DOES NOT WORK.  You didn't even add a Suggest=
+ed-by
+or Cc: the people who expressed interest.  I can't read minds, and AFAIK no=
+ one
+else working on KVM is a telepath either.
+
+I do not know to make it any clearer: for TDX support to go anywhere, there=
+ needs
+to be a _lot_ more communication.
+
+[1] https://lore.kernel.org/all/b2e5c92fd66a0113b472dd602220346d3d435732.17=
+08933498.git.isaku.yamahata@intel.com
+[2] https://lore.kernel.org/all/8b7380f1b02f8e3995f18bebb085e43165d5d682.17=
+08933498.git.isaku.yamahata@intel.com
+
+> -       if (fault->is_private !=3D kvm_mem_is_private(vcpu->kvm, fault->g=
+fn)) {
+> +       /*
+> +        * !fault->slot means MMIO for SNP and TDX.  Don't require explic=
+it GPA
+> +        * conversion for MMIO because MMIO is assigned at the boot time.=
+  Fall
+> +        * to !is_private case to get pfn =3D KVM_PFN_NOSLOT.
+> +        */
+> +       force_mmio =3D !slot &&
+
+NAK, this already got shot down.
+
+https://lore.kernel.org/all/ZcUO5sFEAIH68JIA@google.com
+
+> +               vcpu->kvm->arch.vm_type !=3D KVM_X86_DEFAULT_VM &&
+> +               vcpu->kvm->arch.vm_type !=3D KVM_X86_SW_PROTECTED_VM;
+> +       if (!force_mmio &&
+> +           fault->is_private !=3D kvm_mem_is_private(vcpu->kvm, fault->g=
+fn)) {
+>                 kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+>                 return -EFAULT;
+>         }
+> =20
+> -       if (fault->is_private)
+> +       if (!force_mmio && fault->is_private)
+>                 return kvm_faultin_pfn_private(vcpu, fault);
+>=20
+> --=20
+> Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
