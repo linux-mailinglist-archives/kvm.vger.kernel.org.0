@@ -1,195 +1,183 @@
-Return-Path: <kvm+bounces-9949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D23B3867E96
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 18:33:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CF50867EBE
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 18:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 473B01F2507E
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 17:33:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13F1E286B69
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 17:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3646A12D751;
-	Mon, 26 Feb 2024 17:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6468B12F383;
+	Mon, 26 Feb 2024 17:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E7DRkw44"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y4JyJZBX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8755212EBE8
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 17:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947D81292FF
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 17:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708968768; cv=none; b=r1cf1IJIJwMnx+sVSdql27yL3HG3xl+3XxxX9kk87DNhauOmh5bV4Ma2bN/DKpzSW0R7AENYSHe1+CezvNVFanfc8bb3R53W8yOi2LuDob2J0EoW62LcxUu+7+YvLnKfZ2TP9nM8ktCxuqIPwwrubBMzb+ib5TtXdQgE9G9JRjo=
+	t=1708969048; cv=none; b=ncM6MazLn/e81rebn8lYo1ZsUX2du61kJBrsum/Jk5qHZ+V93sI0a4a2bf5kVW7iQs3bk1py7aPTg90sGNmRHmCc9gxju64mwNmReF8kw1SORt0Mj6Ze/mA9sNl6VvPpcQD5EhSzUJvZu6KyBy6TXxtE/R/n5q3a8QcoTSpmD90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708968768; c=relaxed/simple;
-	bh=0Ba/9K2KuoV40sLwpd8cP9hSr5/ntf0VbGqvJ6RC6ug=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cjjdr7wLDdNvDWwr88I72t+pal+KphlE9OmxrE0z/f7+Wf+/ocnR4Ea0PmnPf0DJJPQ7LWtDRQwYJdqzn9Cfq/QZsddbP6gEZXtCfsbTyU1IR49DJ4oy26UA7RCNs1JRzoYOfna3H3tfPcIcgMATF7ZcOgHqGrMxNYhFWxQjxCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E7DRkw44; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708968765;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jjX5ODwMNKFdWrkJxr6VORv+MaO7Rg0pnbcoAEeofYk=;
-	b=E7DRkw44e/srfSFnPGV3hcE6CGDFEba7QIJlakwkqqJuWevFGqzJrcZtt3w3UEY4gxnZcS
-	TwRK4CCOn4LX3QzYHlhsDU7bzgYYFjb367p3VLZkrciUTopWat/EFZEh8a0Gah9hmnvLMM
-	+3t9NOkMkWR2/uOmiSFkpFcJANfn7XM=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-450-8EHFCyTbN4ay8IU7ThlUJg-1; Mon, 26 Feb 2024 12:32:44 -0500
-X-MC-Unique: 8EHFCyTbN4ay8IU7ThlUJg-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c7a2788749so198280539f.0
-        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 09:32:43 -0800 (PST)
+	s=arc-20240116; t=1708969048; c=relaxed/simple;
+	bh=qruZYQ8U3OtRKaG5ahQ+XCEbOjNKS/W5Vtc1DQ+jG24=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QuuS0eSFnDnAW+toPrBTLozpXI6SMWiAI/PZgOfbTfb0rek7qaUb70APDHpsX82/tZ2ym+79mgA8gk7GRk5aW1jm+lUszb6joySezXQNFOl4n+G5+gSqGaJ5XCWGraaEb34ceAU8UFVwJtaIGKFhkyIgAkM5TmjqmPPWRHi2Wkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Y4JyJZBX; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-563bb51c36eso3530755a12.2
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 09:37:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708969045; x=1709573845; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=m77qrk6Qff2gXkBKjtrp1WyNIuR8YB6oHKyVJarj7i0=;
+        b=Y4JyJZBX3NTxUZo1Imeoyv50uBcMl0H5LVjUmiqAjBK2e69yE1Ys7uLZvGnhOvAOft
+         Q7sP1AloTvNZdBg1ARlsRrB6+zaRuPs63LaTiottNjCckTKogOIAcwj7phTFAmRsti8E
+         MzUieQ48jGyqASNY8JNVhgLJwjFUIXUo+ZsN4aM4t0ckdLZI0Tw2oH8MvGfOkVZ9QymD
+         b/i1IpGBtfuuVa18eoJOVYYyOTsLks8V99cbPSxGsBEQuhcejHPsnEbecL4IQRxFvv9I
+         SxYF/YOo0mnPL7gO0PyAU4ggQjuDNXux33bIN7GqAnTUUJ+tmGRvoLejL2dNTQ+E6iA7
+         PE/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708968762; x=1709573562;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jjX5ODwMNKFdWrkJxr6VORv+MaO7Rg0pnbcoAEeofYk=;
-        b=wliTqyqN9AsYeHoAe7yD+kMd1BHTv6AbyqDOBPShsrEMk1RSHJOYyThqIKMJn69srF
-         zRSWnCNGKh1zLdXg0mTlkCUWh7IJ8uae4Dx4Ggg1b3CWa3qZlhRRKijMSsGnTejgyVAd
-         2nSMUKDmD3rI3Ehe26SCyoKTgE2wDPQICMmhYdh41nQkgpusA0FaYrQ0WkXb93gtA/jy
-         WtfNlk582iv0ppC7w41xzGLfXxhj/G9ZLO2J/sf7g8GQ41h+B6SH1LNrW91v1JzEnaaQ
-         jinj56ocICAeVts9ccDDglfwemtNbgngTLNXYBmoidbWFKQj1YW+CuO5Zjlre+qy3jL8
-         C8lg==
-X-Gm-Message-State: AOJu0YxvNGpKoF2iD7u+iIJNCntjq5Y9+kyFJzofThiM0MPe2YspTrt/
-	Bv7O6lm+aDQGCz6/m6+WvHOXLhyd6oIiozLdHwYZdmgv33rpCsqwN/0Ls1XI1VnDGFKG7Tn3CaA
-	W6MVJCqLMdRj4+l3bcFc+UzSF0K4Ord1CttRbAXIbgjaSNe5cVg==
-X-Received: by 2002:a5e:9918:0:b0:7c7:ddef:e11c with SMTP id t24-20020a5e9918000000b007c7ddefe11cmr1182614ioj.13.1708968762172;
-        Mon, 26 Feb 2024 09:32:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE3PtDchAWOks2wYjwP0Dxg5ziZwMLLpYh1GoHJItPvKLJWbBcCVrM6sR+YAQ8RAultSmbccg==
-X-Received: by 2002:a5e:9918:0:b0:7c7:ddef:e11c with SMTP id t24-20020a5e9918000000b007c7ddefe11cmr1182575ioj.13.1708968761491;
-        Mon, 26 Feb 2024 09:32:41 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id r17-20020a6b4411000000b007c7a2b8ee98sm1356778ioa.2.2024.02.26.09.32.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 09:32:41 -0800 (PST)
-Date: Mon, 26 Feb 2024 10:32:38 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yisheng Xie <ethan.xys@linux.alibaba.com>, akpm@linux-foundation.org
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH] vfio/type1: unpin PageReserved page
-Message-ID: <20240226103238.75ad4b24.alex.williamson@redhat.com>
-In-Reply-To: <e10ace3f-78d3-4843-8028-a0e1cd107c15@linux.alibaba.com>
-References: <20240226160106.24222-1-ethan.xys@linux.alibaba.com>
-	<20240226091438.1fc37957.alex.williamson@redhat.com>
-	<e10ace3f-78d3-4843-8028-a0e1cd107c15@linux.alibaba.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1708969045; x=1709573845;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m77qrk6Qff2gXkBKjtrp1WyNIuR8YB6oHKyVJarj7i0=;
+        b=PJ61IpF7vJTM7ciO6Jj7FEOrU1eYnOt66v7gUaN0wNirteuXyncw6cYwJT0//3CUho
+         wpYpCRT7coO3B6CPVBa/07Q4VfjS392wMzd3nAdpu7PHrD7GFTJDvOU4EgGXAvlvfZiD
+         cUewON5uDDnywTI1bJjA7yQHCpUsRXrUJyzSqL/k6KOHR1WEb7SY6100OFjOjgQv6jvF
+         PWFsgnF7Bjlf3QNU5emlkg95RJFTjB07QpCm4TACg3TY2M0v/C1J1aHghZW631Zqzw0I
+         7saGX0xazqkRTagtwljiHe6SJyf1GAjhyENB0DhefqFeyzeKgv+dAOr2fA+tbUEq5092
+         hoqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWMPo2Spf7DkPOeyxfWXKj1T0DbEGG69t2VusuzTl8xG4EIPglEAv8ODRgXsCBaP2OKMJ5UMV0eeGPUYL6bp57KOwld
+X-Gm-Message-State: AOJu0YxRDb+y/s/dpB6doNYt6cgf2xWntHSbDEpMywdF4mVNyUuY+WyN
+	o+mreKGMWZ3SP6TOZW+GZ566k9TMuMUB2FzEyhu37Z3zDHmzg8DofoyetclfX04=
+X-Google-Smtp-Source: AGHT+IFGXBzF4RsP0r6hOzWjx6NVz650C+MO/PSYTkFPWzBZc890v54JFq4zQgLJPt1QZPAaUVEEHQ==
+X-Received: by 2002:a17:906:1b4a:b0:a43:4675:631b with SMTP id p10-20020a1709061b4a00b00a434675631bmr2299525ejg.49.1708969044848;
+        Mon, 26 Feb 2024 09:37:24 -0800 (PST)
+Received: from [192.168.69.100] ([176.187.223.153])
+        by smtp.gmail.com with ESMTPSA id d25-20020a170906305900b00a3eb1b1896bsm2579408ejd.58.2024.02.26.09.37.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Feb 2024 09:37:24 -0800 (PST)
+Message-ID: <c5d5f835-5b7f-46bb-8393-6d638cbad012@linaro.org>
+Date: Mon, 26 Feb 2024 18:37:21 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/6] hw/arm: Inline sysbus_create_simple(PL110 / PL111)
+Content-Language: en-US
+To: BALATON Zoltan <balaton@eik.bme.hu>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>, qemu-arm@nongnu.org,
+ kvm@vger.kernel.org, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+References: <20240216153517.49422-1-philmd@linaro.org>
+ <20240216153517.49422-2-philmd@linaro.org>
+ <bcfd3f9d-04e3-79c9-c15f-c3c8d7669bdb@eik.bme.hu>
+ <2f8ec2e2-c4c7-48c3-9c3d-3e20bc3d6b9b@linaro.org>
+ <b40fd79f-4d41-4e04-90c1-6f4b2fde811d@linaro.org>
+ <00e2b898-3c5f-d19c-fddc-e657306e071f@eik.bme.hu>
+ <2b9ea923-c4f9-4ee4-8ed2-ba9f62c15579@linaro.org>
+ <6b5758d6-f464-2461-f9dd-71d2e15b610a@eik.bme.hu>
+ <bc5929e4-1782-4719-8231-fe04a9719c40@ilande.co.uk>
+ <CAFEAcA-Mvd4NVY2yDgNEdjZ_YPrN93PDZRyfCi7JyCjmPs4gAQ@mail.gmail.com>
+ <0a31f410-415d-474b-bcea-9cb18f41aeb2@ilande.co.uk>
+ <9ef2075b-b26b-41d2-a7d0-456cec3b104a@eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <9ef2075b-b26b-41d2-a7d0-456cec3b104a@eik.bme.hu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 27 Feb 2024 01:14:54 +0800
-Yisheng Xie <ethan.xys@linux.alibaba.com> wrote:
+Hi,
 
-> =E5=9C=A8 2024/2/27 00:14, Alex Williamson =E5=86=99=E9=81=93:
-> > On Tue, 27 Feb 2024 00:01:06 +0800
-> > Yisheng Xie<ethan.xys@linux.alibaba.com>  wrote:
-> > =20
-> >> We meet a warning as following:
-> >>   WARNING: CPU: 99 PID: 1766859 at mm/gup.c:209 try_grab_page.part.0+0=
-xe8/0x1b0
-> >>   CPU: 99 PID: 1766859 Comm: qemu-kvm Kdump: loaded Tainted: GOE  5.10=
-.134-008.2.x86_64 #1 =20
-> >                                                                     ^^^=
-^^^^^
-> >
-> > Does this issue reproduce on mainline?  Thanks, =20
->=20
-> I have check the code of mainline, the logical seems the same as my=20
-> version.
->=20
-> so I think it can reproduce if i understand correctly.
+On 19/2/24 15:05, BALATON Zoltan wrote:
+> On Mon, 19 Feb 2024, Mark Cave-Ayland wrote:
+>> On 19/02/2024 13:05, Peter Maydell wrote:
+>>> On Mon, 19 Feb 2024 at 12:49, Mark Cave-Ayland
+>>> <mark.cave-ayland@ilande.co.uk> wrote:
+>>>>
+>>>> On 19/02/2024 12:00, BALATON Zoltan wrote:
+>>>>> For new people trying to contribute to QEMU QDev is overwhelming so 
+>>>>> having some way
+>>>>> to need less of it to do simple things would help them to get started.
+>>>>
+>>>> It depends what how you define "simple": for QEMU developers most 
+>>>> people search for
+>>>> similar examples in the codebase and copy/paste them. I'd much 
+>>>> rather have a slightly
+>>>> longer, but consistent API for setting properties rather than coming 
+>>>> up with many
+>>>> special case wrappers that need to be maintained just to keep the 
+>>>> line count down for
+>>>> "simplicity".
+>>>>
+>>>> I think that Phil's approach here is the best one for now, 
+>>>> particularly given that it
+>>>> allows us to take another step towards heterogeneous machines. As 
+>>>> the work in this
+>>>> area matures it might be that we can consider other approaches, but 
+>>>> that's not a
+>>>> decision that can be made right now and so shouldn't be a reason to 
+>>>> block this change.
+>>>
+>>> Mmm. It's unfortunate that we're working with C, so we're a bit limited
+>>> in what tools we have to try to make a better and lower-boilerplate
+>>> interface for the "create, configure, realize and wire up devices" task.
+>>> (I think you could do much better in a higher level language...)
+>>> sysbus_create_simple() was handy at the time, but it doesn't work so
+>>> well for more complicated SoC-based boards. It's noticeable that
+>>> if you look at the code that uses it, it's almost entirely the older
+>>> and less maintained board models, especially those which don't actually
+>>> model an SoC and just have the board code create all the devices.
+>>
+>> Yeah I was thinking that you'd use the DSL (e.g. YAML templates or 
+>> similar) to provide some of the boilerplating around common actions, 
+>> rather than the C API itself. Even better, once everything has been 
+>> moved to use a DSL then the C API shouldn't really matter so much as 
+>> it is no longer directly exposed to the user.
+> 
+> That may be a few more releases away (although Philippe is doing an 
+> excellent job with doing this all alone and as efficient as he is it 
+> might be reached sooner). So I think board code will stay for a while 
+> therefore if something can be done to keep it simple with not much work 
+> then maybe that's worth considering. That's why I did not propose to 
+> keep sysbus_create_simple and add properties to it because that might 
+> need something like a properties array with values that's hard to 
+> describe in C so it would be a bit more involved to implement and 
+> defining such arrays would only make it a litle less cluttered. So just 
+> keeping the parts that work for simple devices in sysbus_realize_simple 
+> and also keep sysbus_create_simple where it's already used is probably 
+> enough now rather than converting those to low level calls everywhere now.
+> 
+> Then we'll see how well the declarative machines will turn out and then 
+> if we no longer need to write board code these wrappers could go away 
+> then but for now it may be too early when we still have a lot of board 
+> code to maintain.
 
-I obviously can't speak to what's in your 5.10.134-008.2 kernel, but I
-do know there's a very similar issue resolved in v6.0 mainline and
-included in v5.10.146 of the stable tree.  Please test.  Thanks,
+I'll keep forward with this patch inlining sysbus_create_simple();
+if we notice in few releases the DSL experiment is a failure, I don't
+mind going back reverting it.
 
-Alex
+Regards,
 
-> >>   Hardware name: Foxconn AliServer-Thor-04-12U-v2/Thunder2, BIOS 1.0.P=
-L.FC.P.031.00 05/18/2022
-> >>   RIP: 0010:try_grab_page.part.0+0xe8/0x1b0
-> >>   Code: b9 00 04 00 00 83 e6 01 74 ca 48 8b 32 b9 00 04 00 00 f7 c6 00=
- 00 01 00 74 ba eb 91 8b 57 34 48 89 f8 85 d2 0f 8f 48 ff ff ff <0f> 0b 31 =
-c0 c3 48 89 fa 48 8b 0a f7 c1 00 00 01 00 0f 85 5c ff ff
-> >>   RSP: 0018:ffffc900b1a63b98 EFLAGS: 00010282
-> >>   RAX: ffffea00000e4580 RBX: 0000000000052202 RCX: ffffea00000e4580
-> >>   RDX: 0000000080000001 RSI: 0000000000052202 RDI: ffffea00000e4580
-> >>   RBP: ffff88efa5d3d860 R08: 0000000000000000 R09: 0000000000000002
-> >>   R10: 0000000000000008 R11: ffff89403fff7000 R12: ffff88f589165818
-> >>   R13: 00007f1320600000 R14: ffffea0181296ca8 R15: ffffea00000e4580
-> >>   FS:  00007f1324f93e00(0000) GS:ffff893ebfb80000(0000) knlGS:00000000=
-00000000
-> >>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >>   CR2: 00007f1321694070 CR3: 0000006046014004 CR4: 00000000007726e0
-> >>   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> >>   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> >>   PKRU: 55555554
-> >>   Call Trace:
-> >>    follow_page_pte+0x64b/0x800
-> >>    __get_user_pages+0x228/0x560
-> >>    __gup_longterm_locked+0xa0/0x2f0
-> >>    vaddr_get_pfns+0x67/0x100 [vfio_iommu_type1]
-> >>    vfio_pin_pages_remote+0x30b/0x460 [vfio_iommu_type1]
-> >>    vfio_pin_map_dma+0xd4/0x2e0 [vfio_iommu_type1]
-> >>    vfio_dma_do_map+0x21e/0x340 [vfio_iommu_type1]
-> >>    vfio_iommu_type1_ioctl+0xdd/0x170 [vfio_iommu_type1]
-> >>    ? __fget_files+0x79/0xb0
-> >>    ksys_ioctl+0x7b/0xb0
-> >>    ? ksys_write+0xc4/0xe0
-> >>    __x64_sys_ioctl+0x16/0x20
-> >>    do_syscall_64+0x2d/0x40
-> >>    entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> >>
-> >> After add dumppage, it shows that it is a PageReserved page(e.g. zero =
-page),
-> >> whoes refcount is just overflow:
-> >>   page:00000000b0504535 refcount:-2147483647 mapcount:0 mapping:000000=
-0000000000 index:0x0 pfn:0x3916
-> >>   flags: 0xffffc000001002(referenced|reserved)
-> >>   raw: 00ffffc000001002 ffffea00000e4588 ffffea00000e4588 000000000000=
-0000
-> >>   raw: 0000000000000000 0000000000000000 80000001ffffffff 000000000000=
-0000
-> >>
-> >> gup will _pin_ a page which is PageReserved, however, put_pfn in vfio =
-will
-> >> skip unpin page which is PageReserved. So use pfn_valid in put_pfn
-> >> instead of !is_invalid_reserved_pfn to unpin PageReserved page.
-> >>
-> >> Signed-off-by: Yisheng Xie<ethan.xys@linux.alibaba.com>
-> >> ---
-> >>   drivers/vfio/vfio_iommu_type1.c | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu=
-_type1.c
-> >> index b2854d7939ce..12775bab27ee 100644
-> >> --- a/drivers/vfio/vfio_iommu_type1.c
-> >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >> @@ -461,7 +461,7 @@ static bool is_invalid_reserved_pfn(unsigned long =
-pfn)
-> >>  =20
-> >>   static int put_pfn(unsigned long pfn, int prot)
-> >>   {
-> >> -	if (!is_invalid_reserved_pfn(pfn)) {
-> >> +	if (pfn_valid(pfn)) {
-> >>   		struct page *page =3D pfn_to_page(pfn);
-> >>  =20
-> >>   		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE); =20
-
+Phil.
 
