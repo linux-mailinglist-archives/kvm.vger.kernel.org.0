@@ -1,250 +1,199 @@
-Return-Path: <kvm+bounces-9787-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF620866FCD
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:03:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9BC68670AC
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:24:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D243D1C25DC2
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:03:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD3B4B2C3DB
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56795EE91;
-	Mon, 26 Feb 2024 09:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36EA6629E3;
+	Mon, 26 Feb 2024 09:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/7XguAy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4PQcyE5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38EF5EE8D;
-	Mon, 26 Feb 2024 09:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5682C6A8
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 09:47:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708940374; cv=none; b=izFTKr9GPY7nCVjphtmZE2S9YY9Sspg3Cv5epSIUvh83LAV9RNnQDW2yrkFBsQTCrL5F6XVfqv3g4/oTZtHvwCqOQMC6OInvZ0XX0N2Kc2Yj8NhHt9RhqN3b7xAqrRyBIFUv7pgcgpIB3+F5sXooDn26GeiDKj/CoXOPLvcobUI=
+	t=1708940856; cv=none; b=HfT2zlaiNV8g1l7m8vtiqAuwduCzoISovM/AUXsczi/trdXEZmlguWeC9XWeCzJ1Uw5vn6MD3KuqKaRn+EuSsHqVfzU6r+b8wxVMNEB+HzlSTuuG43euB8/GDalx5LXopTYClJ8hSzcTOQ2C5H+ol1hNCdZJQ+l/SdO4w0Mscxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708940374; c=relaxed/simple;
-	bh=6xXLshEGv1+dS4Oj7TAl6ErQq+s8Er+4C8JK210EwGg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TI9/wWrqMFJ27wQcW1Lx/bWVL0r1miwz9LCnJE0rn4bmKOzRbyRBWoGF76ZUXagB+MfUCikJjsaYvb8pqgdnxJuaA62poYLE0UKQ5A3L/r7Lk8R2rAg9/JDjHXLEc98s3VvV3P6bODf1mZqA9NOfLRffXuoXxFRrjTDW4UGcCiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J/7XguAy; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-29a430c3057so1251399a91.1;
-        Mon, 26 Feb 2024 01:39:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708940372; x=1709545172; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4C3sdt0JsWbryl8xk4OG1WbSXlpSqNkR+NKIJMu9X/I=;
-        b=J/7XguAycQkkAx7Q+ZResC0A7e/Wkwe51PvjpEXbPK/YuTIXrGDOUlkEYjjsmz3jce
-         tChYhoN0RCphjGL/rKGwY2dWf7gjsrJuvzwIVnEgiw2gWrDo10Lscm8UkGddnkPJUYuz
-         DbcxFlzbu3cbwAVmZ/SrztffYKqdpr9v4jaEbRcLLMkRBzAO7mNz1PzE729i0fKVLoh2
-         RboLii5YVy9rG3+z4kjh7yyFaWXnSgz2mQezWO9wMq9MfkF5zhtyIsTFUGRWj3MLHOcV
-         I/o1guiEr+ZfMGIXAfuZqT+sF6BZaXkrI/e6lqqntBKtUb97SeYgaQzl9emgClXIxw3m
-         A84A==
+	s=arc-20240116; t=1708940856; c=relaxed/simple;
+	bh=5Wf7H81GlIOvk5qmre9pm+TCznwRkuERxX6YnoQ3FRc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FdYWA00JyV6VAzumTTTUuaxpEMovN8vMcFd2aBpvoIvw43XFqZ0qtBKiwZ5EaPWrsnobYuOi3R7/5orP6sVrfyWnkZnq3zTdxpfEmqphJSU/kWlYTqLEKvhLX6ZZHu23zXfY0zfQpW8pCBzbGBSs+vhiZvC0ePfeomX3JGd3cOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S4PQcyE5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708940853;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=6+zFtJC/a8/spEP7x6+UKSXwE1+CzSPt4+YKrSqfJlo=;
+	b=S4PQcyE5pIMtdpxFQSGqcassXAlUETPhLD2ieBZfv8w7WD48gV6D3tphVqItKfKyF4GJis
+	/0B80TBswG4geBPsSaH0viOL0SmRe58hGpQVtkxFLSkgasYQu35ZepAqR0ualjEuY6+cpQ
+	Gf/ibiiO2YC1bXH8UYuOh37uDRjPi/o=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-98-TIY7PMB3PM25YMZUMgSLRA-1; Mon, 26 Feb 2024 04:47:32 -0500
+X-MC-Unique: TIY7PMB3PM25YMZUMgSLRA-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-512fd8ae3f5so700724e87.1
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 01:47:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708940372; x=1709545172;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4C3sdt0JsWbryl8xk4OG1WbSXlpSqNkR+NKIJMu9X/I=;
-        b=cz0R3TwIFxaLfu3+ik2ZlK52vA++TpTbw4c9+USc+bj38kuwmGbA9vUM42ol5iUiLp
-         1KI6dlJszj1fRsE5FaUbixW2w5WVm4uE9pCLaVzN2eWCsiHop9ogNttkhlUqgVZBfC0T
-         6ulnCEPxR8GOA6yfQCd+MiLhEkSRNn5y92/QqyWzJhOuFpoGRbRgQp6qNKWFvLNo3g7G
-         sHbvMyiWcy9KtwtGogSSGtpJVjlELRzR1K7d040btEXkYfm4y0z8dCrHXRajnTKQ3Fdq
-         HU9CYEleFBfhpV7LHFoYvfgoCLGLXPef06KBkp7dylS0BiRkbpLa+wgXc/CkM4yYBYsa
-         r7hQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQJklkgp8jqoIRVkTZgVIB34Coxo/sNISyN5GPkzGRa2I7B5O0u/ubd1rzJ0RJBcekAVZGM7WwUD3WzYAbMaT/StYHySMTOvTqrVXYMW4fNsSMuedgJdcgFRK/+VfvLw==
-X-Gm-Message-State: AOJu0YyMgDX9xFD6R0ZYHPMdaPk3XAuV6hz4V4Kbjpqo118Lk2vIUQc8
-	93d3MDhxhE7U85fyKWmgB7287XBHOGheLDXiyYCR5vwEbt/WPy9CQIbl90CG
-X-Google-Smtp-Source: AGHT+IFXLyYXdyP2UAckhzh+BDfRTP5s86iCzOS+vBsDRJEkc8Q8vEMkpMw7UMDXxznIh8HlHNlNaA==
-X-Received: by 2002:a17:90a:db03:b0:29a:59a7:951d with SMTP id g3-20020a17090adb0300b0029a59a7951dmr3903944pjv.5.1708940372072;
-        Mon, 26 Feb 2024 01:39:32 -0800 (PST)
-Received: from wheely.local0.net (220-235-194-103.tpgi.com.au. [220.235.194.103])
-        by smtp.gmail.com with ESMTPSA id pa3-20020a17090b264300b0029929ec25fesm6036782pjb.27.2024.02.26.01.39.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 01:39:31 -0800 (PST)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-	kvm@vger.kernel.org,
-	Laurent Vivier <lvivier@redhat.com>,
-	"Shaoqin Huang" <shahuang@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Marc Hartmayer <mhartmay@linux.ibm.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 7/7] common: add memory dirtying vs migration test
-Date: Mon, 26 Feb 2024 19:38:32 +1000
-Message-ID: <20240226093832.1468383-8-npiggin@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240226093832.1468383-1-npiggin@gmail.com>
-References: <20240226093832.1468383-1-npiggin@gmail.com>
+        d=1e100.net; s=20230601; t=1708940850; x=1709545650;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6+zFtJC/a8/spEP7x6+UKSXwE1+CzSPt4+YKrSqfJlo=;
+        b=DDvxdpvkg8fGvXl05iB0mcAHrcD1ILW7wirxJTnA7YGXphyLt2kOHFsFSgY4smTqRC
+         /rC5WOb7aYsnpXWvi4x9+U4JxDYiua0bezkQkplHCCr/IdlS8ETEU2XOB0u3fc4jzR0a
+         /caH9vnvFv6MnCi8qFzvIKPsxbBQ2lposowSqph0jtVGTyUCf15YStuCnUtVe9UplBZm
+         4PMATcE8TP1L8xbEaGGMtjzs4CxxztM35EH+uFaCmywpuNdHUXC4cfB7S8BU/X9nFPFK
+         8T/RfX7DWDE9rd5EXlwRKMgb11wKAwZb3cUhsk5hV+p/pz3b1Pq8CrXkivkTh6BuPaRv
+         t6CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+oMZ8NVAZmLUQnh7yDT6GDSl+nXngQ8bJe4SMpIRKNOjBt0PoWV5i738wVKTlib1M8GSNiRdof569P4niIbbG0coW
+X-Gm-Message-State: AOJu0YzcFP1GJPY7Mv4GNx3jFyAxwkTNdNx+M2vI+aCPevQu1aXao5GX
+	Ppl7ZqS+U5PksfLC7r5QmTzHF6ETIwxnAU4uNMTpJX89ttW9Nqz0yAmGzC1AtPHO+Jim4rFKEiq
+	Q6A06A+21ZvcLtELjVnczQDgeYJ5Zc2C/I5tUvxKVRZyDMoufuQ==
+X-Received: by 2002:a05:6512:3104:b0:512:d5ff:1bcf with SMTP id n4-20020a056512310400b00512d5ff1bcfmr4207220lfb.19.1708940850651;
+        Mon, 26 Feb 2024 01:47:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF7MuuzRsag8u6BSuJDHkSoqtjdhb2i2DhgeyURk12De7YvjAowld6gsPKTT3J1aVU9dQN5fw==
+X-Received: by 2002:a05:6512:3104:b0:512:d5ff:1bcf with SMTP id n4-20020a056512310400b00512d5ff1bcfmr4207213lfb.19.1708940850247;
+        Mon, 26 Feb 2024 01:47:30 -0800 (PST)
+Received: from ?IPV6:2003:cb:c72f:f700:104b:9184:1b45:1898? (p200300cbc72ff700104b91841b451898.dip0.t-ipconnect.de. [2003:cb:c72f:f700:104b:9184:1b45:1898])
+        by smtp.gmail.com with ESMTPSA id m9-20020a05600c4f4900b00412a013817esm5696665wmq.7.2024.02.26.01.47.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Feb 2024 01:47:29 -0800 (PST)
+Message-ID: <9e983090-f336-43b9-8f2b-5dabe7e73b72@redhat.com>
+Date: Mon, 26 Feb 2024 10:47:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 00/26] KVM: Restricted mapping of guest_memfd at
+ the host and pKVM/arm64 support
+Content-Language: en-US
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com
+References: <20240222161047.402609-1-tabba@google.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240222161047.402609-1-tabba@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This test stores to a bunch of pages and verifies previous stores,
-while being continually migrated. This can fail due to a QEMU TCG
-physical memory dirty bitmap bug.
+On 22.02.24 17:10, Fuad Tabba wrote:
+> This series adds restricted mmap() support to guest_memfd [1], as
+> well as support guest_memfd on pKVM/arm64.
+> 
+> This series is based on Linux 6.8-rc4 + our pKVM core series [2].
+> The KVM core patches apply to Linux 6.8-rc4 (patches 1-6), but
+> the remainder (patches 7-26) require the pKVM core series. A git
+> repo with this series applied can be found here [3]. We have a
+> (WIP) kvmtool port capable of running the code in this series
+> [4]. For a technical deep dive into pKVM, please refer to Quentin
+> Perret's KVM Forum Presentation [5, 6].
+> 
+> I've covered some of the issues presented here in my LPC 2023
+> presentation [7].
+> 
+> We haven't started using this in Android yet, but we aim to move
+> away from anonymous memory to guest_memfd once we have the
+> necessary support merged upstream. Others (e.g., Gunyah [8]) are
+> also looking into guest_memfd for similar reasons as us.
+> 
+> By design, guest_memfd cannot be mapped, read, or written by the
+> host userspace. In pKVM, memory shared between a protected guest
+> and the host is shared in-place, unlike the other confidential
+> computing solutions that guest_memfd was originally envisaged for
+> (e.g, TDX).
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- common/memory-verify.c  | 48 +++++++++++++++++++++++++++++++++++++++++
- powerpc/Makefile.common |  1 +
- powerpc/memory-verify.c |  1 +
- powerpc/unittests.cfg   |  7 ++++++
- s390x/Makefile          |  1 +
- s390x/memory-verify.c   |  1 +
- s390x/unittests.cfg     |  6 ++++++
- 7 files changed, 65 insertions(+)
- create mode 100644 common/memory-verify.c
- create mode 120000 powerpc/memory-verify.c
- create mode 120000 s390x/memory-verify.c
+Can you elaborate (or point to a summary) why pKVM has to be special 
+here? Why can't you use guest_memfd only for private memory and another 
+(ordinary) memfd for shared memory, like the other confidential 
+computing technologies are planning to?
 
-diff --git a/common/memory-verify.c b/common/memory-verify.c
-new file mode 100644
-index 000000000..7c4ec087b
---- /dev/null
-+++ b/common/memory-verify.c
-@@ -0,0 +1,48 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Simple memory verification test, used to exercise dirty memory migration.
-+ *
-+ */
-+#include <libcflat.h>
-+#include <migrate.h>
-+#include <alloc.h>
-+#include <asm/page.h>
-+#include <asm/time.h>
-+
-+#define NR_PAGES 32
-+
-+int main(int argc, char **argv)
-+{
-+	void *mem = malloc(NR_PAGES*PAGE_SIZE);
-+	bool success = true;
-+	uint64_t ms;
-+	long i;
-+
-+	report_prefix_push("memory");
-+
-+	memset(mem, 0, NR_PAGES*PAGE_SIZE);
-+
-+	migrate_begin_continuous();
-+	ms = get_clock_ms();
-+	i = 0;
-+	do {
-+		int j;
-+
-+		for (j = 0; j < NR_PAGES*PAGE_SIZE; j += PAGE_SIZE) {
-+			if (*(volatile long *)(mem + j) != i) {
-+				success = false;
-+				goto out;
-+			}
-+			*(volatile long *)(mem + j) = i + 1;
-+		}
-+		i++;
-+	} while (get_clock_ms() - ms < 5000);
-+out:
-+	migrate_end_continuous();
-+
-+	report(success, "memory verification stress test");
-+
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-index da4a7bbb8..1e181da69 100644
---- a/powerpc/Makefile.common
-+++ b/powerpc/Makefile.common
-@@ -7,6 +7,7 @@
- tests-common = \
- 	$(TEST_DIR)/selftest.elf \
- 	$(TEST_DIR)/selftest-migration.elf \
-+	$(TEST_DIR)/memory-verify.elf \
- 	$(TEST_DIR)/spapr_hcall.elf \
- 	$(TEST_DIR)/rtas.elf \
- 	$(TEST_DIR)/emulator.elf \
-diff --git a/powerpc/memory-verify.c b/powerpc/memory-verify.c
-new file mode 120000
-index 000000000..5985c730f
---- /dev/null
-+++ b/powerpc/memory-verify.c
-@@ -0,0 +1 @@
-+../common/memory-verify.c
-\ No newline at end of file
-diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-index 89abf2095..fadd8dde6 100644
---- a/powerpc/unittests.cfg
-+++ b/powerpc/unittests.cfg
-@@ -46,6 +46,13 @@ machine = pseries
- groups = selftest migration
- extra_params = -append "skip"
- 
-+# This fails due to a QEMU TCG bug so KVM-only until QEMU is fixed upstream
-+[migration-memory]
-+file = memory-verify.elf
-+accel = kvm
-+machine = pseries
-+groups = migration
-+
- [spapr_hcall]
- file = spapr_hcall.elf
- 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 344d46d68..ddc0969f3 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -1,5 +1,6 @@
- tests = $(TEST_DIR)/selftest.elf
- tests += $(TEST_DIR)/selftest-migration.elf
-+tests += $(TEST_DIR)/memory-verify.elf
- tests += $(TEST_DIR)/intercept.elf
- tests += $(TEST_DIR)/emulator.elf
- tests += $(TEST_DIR)/sieve.elf
-diff --git a/s390x/memory-verify.c b/s390x/memory-verify.c
-new file mode 120000
-index 000000000..5985c730f
---- /dev/null
-+++ b/s390x/memory-verify.c
-@@ -0,0 +1 @@
-+../common/memory-verify.c
-\ No newline at end of file
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index f613602d3..a88fe9e79 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -33,6 +33,12 @@ file = selftest-migration.elf
- groups = selftest migration
- extra_params = -append "skip"
- 
-+# This fails due to a QEMU TCG bug so KVM-only until QEMU is fixed upstream
-+[migration-memory]
-+file = memory-verify.elf
-+accel = kvm
-+groups = migration
-+
- [intercept]
- file = intercept.elf
- 
+What's the main reason for that decision and can it be avoided?
+
+(s390x also shares in-place, but doesn't need any special-casing like 
+guest_memfd provides)
+
 -- 
-2.42.0
+Cheers,
+
+David / dhildenb
 
 
