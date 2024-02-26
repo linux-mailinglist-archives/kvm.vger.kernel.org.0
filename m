@@ -1,115 +1,182 @@
-Return-Path: <kvm+bounces-9968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76B47868054
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:03:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 709C586805B
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:04:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A51ED1C23366
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:03:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2656C28E2D0
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B378F12F59F;
-	Mon, 26 Feb 2024 19:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B8012FF65;
+	Mon, 26 Feb 2024 19:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KE66Pesh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BRwECDY0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C2B12C815;
-	Mon, 26 Feb 2024 19:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2FA12EBE8
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 19:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708974185; cv=none; b=tP30+/8G/HaRhbjpYCpoRuOT8UU/Hxiv+JgdSUNobde8wIXy259orjIpiVE4Pf2CzuD7Oh+W7e5oLPuG0rmkGm6SG9yyzUouu+HSnoJlaOxD7XTyTNT9oqxh48G7jpHi0nifVkVJOAprlwvT4piJPGy96nMQM+tWcjkBd9aHL5o=
+	t=1708974231; cv=none; b=QmRVI/nLApYlDnN63GbDX+teTUW6Wry7tn/QN3EiLeycZADZVoWRRzDQU4GBl448Nk+1vaOWd6ADKeNH6i29udxAKH2YP7U3yNEHrdnV+21kqx+Lgm6LoI3XdAvHeP+Oyvi3D4hdeH5exEFjsIcA9XjOmd9RrLf9VWOVAQsaoo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708974185; c=relaxed/simple;
-	bh=Bn5ZICiOrzowTp93LG/Tvy9uAU1imSLSi4jPVGHq5JI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INAqKv/xNsSHklQfzT4xfHUNenLkJpQxOtzzOGR78/QHobtMV3RZ3PYMeHqJInuiRCynIvAGoe4yvXvOzKGG0zFBVTCJGBTeg05NgFu2jK2qW5HthnKIBnBl8AW2SziYmedVa/n71hcyKOI3gqAGe6W3WpFQrjQj0ONruVR1rS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KE66Pesh; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708974184; x=1740510184;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Bn5ZICiOrzowTp93LG/Tvy9uAU1imSLSi4jPVGHq5JI=;
-  b=KE66PeshzluR3kM7eciTSwExtBVszZFR551J+lNfg6qSX6Bqvxt9JMfn
-   ekGYaoxJcnEnL5s/rSk/UUuZiPW0fAxlhowI/jxuDKrVIuICTOXdaDLYk
-   pbpeUtY4lXRBfjuJQVLdfSrRs2qSoVn5NIRbTSw2mMca5xGaer7wA6wdP
-   BgizpE6Vexteo9iNLkBjFmURk65229haBykK/OjX4wvPXFDdb01jUBsVZ
-   12m4AnJSuehHftPjkRG4KIYLxp+wOWLiLIOECMJ8M/ZFkUtYkjdnhkKUU
-   skPEelhxEA9SH1lLX1aaRqy9eq2uU5U+8CvgDoChAGiMF4bxVLzUr3zfy
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="14720135"
-X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="14720135"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:03:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="6911024"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:03:02 -0800
-Date: Mon, 26 Feb 2024 11:03:01 -0800
-From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v18 039/121] KVM: x86/mmu: Track shadow MMIO value on a
- per-VM basis
-Message-ID: <20240226190301.GN177224@ls.amr.corp.intel.com>
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <229a18434e5d83f45b1fcd7bf1544d79db1becb6.1705965635.git.isaku.yamahata@intel.com>
- <05db1988-fad8-458a-8132-7dbe0f1a3ffa@linux.intel.com>
+	s=arc-20240116; t=1708974231; c=relaxed/simple;
+	bh=vcWBExDmv7RSnhov0HUdDRLdvfeRiov5FYh3uXoteKs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=HoFcec3hla60u5GXmcJcSb44n1r8JoXB3MeVuGSdZj42EcaKw8rrj4BH+7S+RiSgf5KDm5NJNgLwPZseWZTI/TN/ktZD2g+8Np4k/jONC7EmdHQM5BWD4QgbL29+sRpOXCRfW43nLdCWgvCVEXy42ZKFnQXnmA5AbAbFRE/XTbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BRwECDY0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708974227;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kdJK5BZbFMC4q1Whv/dgfBTc0g21lAY+xCZH4PpiiFk=;
+	b=BRwECDY0do/7s/Mg5HuWaNGlXanRzbxm+zm9T4vAt3dwluBqv146QQTuXboUbQCsG9BOK6
+	iwfaVmoQJXQZ7iJgTwKlazisHCoE+QmNgr71LppKwu8HNh7Smm732xio/7GBQiU0bVm+r/
+	q5MM5pFY14tT0neWSMFXDZYdyJRBqHo=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-522-TihFUZmjNjCqo770pI-c4A-1; Mon,
+ 26 Feb 2024 14:03:46 -0500
+X-MC-Unique: TihFUZmjNjCqo770pI-c4A-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A3AF7285F988;
+	Mon, 26 Feb 2024 19:03:45 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7773D492BC6;
+	Mon, 26 Feb 2024 19:03:45 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	michael.roth@amd.com,
+	aik@amd.com
+Subject: [PATCH v3 00/15] KVM: SEV: allow customizing VMSA features
+Date: Mon, 26 Feb 2024 14:03:29 -0500
+Message-Id: <20240226190344.787149-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <05db1988-fad8-458a-8132-7dbe0f1a3ffa@linux.intel.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Sun, Jan 28, 2024 at 09:50:16PM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
+The idea that no parameter would ever be necessary when enabling SEV or
+SEV-ES for a VM was decidedly optimistic.  The first source of variability
+that was encountered is the desired set of VMSA features, as that affects
+the measurement of the VM's initial state and cannot be changed
+arbitrarily by the hypervisor.
 
-> > diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> > index 02a466de2991..318135daf685 100644
-> > --- a/arch/x86/kvm/mmu/spte.c
-> > +++ b/arch/x86/kvm/mmu/spte.c
-> > @@ -74,10 +74,10 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
-> >   	u64 spte = generation_mmio_spte_mask(gen);
-> >   	u64 gpa = gfn << PAGE_SHIFT;
-> > -	WARN_ON_ONCE(!shadow_mmio_value);
-> > +	WARN_ON_ONCE(!vcpu->kvm->arch.shadow_mmio_value);
-> >   	access &= shadow_mmio_access_mask;
-> > -	spte |= shadow_mmio_value | access;
-> > +	spte |= vcpu->kvm->arch.shadow_mmio_value | access;
-> >   	spte |= gpa | shadow_nonpresent_or_rsvd_mask;
-> >   	spte |= (gpa & shadow_nonpresent_or_rsvd_mask)
-> >   		<< SHADOW_NONPRESENT_OR_RSVD_MASK_LEN;
-> > @@ -411,6 +411,12 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
-> >   }
-> >   EXPORT_SYMBOL_GPL(kvm_mmu_set_mmio_spte_mask);
-> > +void kvm_mmu_set_mmio_spte_value(struct kvm *kvm, u64 mmio_value)
-> > +{
-> 
-> Is it better to do some check on the mmio_value and warns if the value
-> is illegal?
+This series adds all the APIs that are needed to customize the features,
+with room for future enhancements:
 
-I don't think so because the only caller is kvm_mmu_set_mmio_spte_value(kvm, 0)
-in tdx_vm_init().  I don't expect other caller.
+- a new /dev/kvm device attribute to retrieve the set of supported
+  features (right now, only debug swap)
+
+- a new sub-operation for KVM_MEM_ENCRYPT_OP that can take a struct,
+  replacing the existing KVM_SEV_INIT and KVM_SEV_ES_INIT
+
+It then puts the new op to work by including the VMSA features as a field
+of the The existing KVM_SEV_INIT and KVM_SEV_ES_INIT use the full set of
+supported VMSA features for backwards compatibility; but I am considering
+also making them use zero as the feature mask, and will gladly adjust the
+patches if so requested.
+
+In order to avoid creating *two* new KVM_MEM_ENCRYPT_OPs, I decided that
+I could as well make SEV and SEV-ES use VM types.  And then, why not make
+a SEV-ES VM, when created with the new VM type instead of KVM_SEV_ES_INIT,
+reject KVM_GET_REGS/KVM_SET_REGS and friends on the vCPU file descriptor
+once the VMSA has been encrypted...  Which is how the API should have
+always behaved.
+
+The series is structured as follows:
+
+- patches 1 to 5 are unrelated fixes and improvements for the SEV code
+  and documentation.  In particular they change sev.c so that it is
+  compiled only if SEV is enabled in kconfig
+
+- patches 6 to 8 introduce the new device attribute to retrieve supported
+  VMSA features
+
+- patch 9 disables DEBUG_SWAP by default
+
+- patches 10 and 11 introduce new infrastructure for VM types, replacing
+  the similar code in the TDX patches
+
+- patches 12 to 14 introduce the new VM types for SEV and
+  SEV-ES, and KVM_SEV_INIT2 as a new sub-operation for KVM_MEM_ENCRYPT_OP.
+
+- patch 15 tests the new ioctl.
+
+The idea is that SEV SNP will only ever support KVM_SEV_INIT2.  I have
+patches in progress for QEMU to support this new API.
+
+Thanks,
+
+Paolo
+
+
+v2->v3:
+- use u64_to_user_addr()
+- Compile sev.c if and only if CONFIG_KVM_AMD_SEV=y
+- remove double signoffs
+- rebase on top of kvm-x86/next
+- no bit masking hacks; store CoCo features in kvm_arch
+- store supported VM types in kvm_caps
+- introduce to_kvm_sev_info
+- clearer output messages for failed assertions
+- remove broken test
+
+Paolo Bonzini (14):
+  KVM: SEV: fix compat ABI for KVM_MEMORY_ENCRYPT_OP
+  KVM: x86: use u64_to_user_addr()
+  KVM: SVM: Compile sev.c if and only if CONFIG_KVM_AMD_SEV=y
+  Documentation: kvm/sev: separate description of firmware
+  KVM: introduce new vendor op for KVM_GET_DEVICE_ATTR
+  KVM: SEV: publish supported VMSA features
+  KVM: SEV: store VMSA features in kvm_sev_info
+  KVM: SEV: disable DEBUG_SWAP by default
+  KVM: x86: add fields to struct kvm_arch for CoCo features
+  KVM: x86: Add supported_vm_types to kvm_caps
+  KVM: SEV: introduce to_kvm_sev_info
+  KVM: SEV: define VM types for SEV and SEV-ES
+  KVM: SEV: introduce KVM_SEV_INIT2 operation
+  selftests: kvm: add tests for KVM_SEV_INIT2
+
+Sean Christopherson (1):
+  KVM: SVM: Invert handling of SEV and SEV_ES feature flags
+
+ Documentation/virt/kvm/api.rst                |   2 +
+ .../virt/kvm/x86/amd-memory-encryption.rst    |  81 ++++++--
+ arch/x86/include/asm/kvm-x86-ops.h            |   1 +
+ arch/x86/include/asm/kvm_host.h               |   8 +-
+ arch/x86/include/uapi/asm/kvm.h               |  35 ++++
+ arch/x86/kvm/Makefile                         |   7 +-
+ arch/x86/kvm/cpuid.c                          |   2 +-
+ arch/x86/kvm/svm/sev.c                        | 133 +++++++++----
+ arch/x86/kvm/svm/svm.c                        |  15 +-
+ arch/x86/kvm/svm/svm.h                        |  37 +++-
+ arch/x86/kvm/x86.c                            | 174 ++++++++++++------
+ arch/x86/kvm/x86.h                            |   2 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/kvm_util_base.h     |   6 +-
+ .../selftests/kvm/set_memory_region_test.c    |   8 +-
+ .../selftests/kvm/x86_64/sev_init2_tests.c    | 149 +++++++++++++++
+ 16 files changed, 527 insertions(+), 134 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_init2_tests.c
+
 -- 
-Isaku Yamahata <isaku.yamahata@linux.intel.com>
+2.39.1
+
 
