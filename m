@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9816-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9817-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114AA8670E8
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:28:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF6F8670EA
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:28:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFC2028C3D1
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:28:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70B3D1C26BA5
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE4C5D467;
-	Mon, 26 Feb 2024 10:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668C95D72B;
+	Mon, 26 Feb 2024 10:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EOJ/to7h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d8A7Evuu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38B221A0D
-	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 10:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291D35D46A
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 10:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942407; cv=none; b=Uv0mluFnORWnT4FHG99/6s8OEZ1yLm7aYV+NPvidYP+9wxckdHR8dXqBhdjaIoG0ayn1UouQHDhtAOJyCI2QSXJ9b6ipGyN2j0EZlFO0SSNcEt2uebury+AO+rmuucCYHn6GvTbDkfa0/y1RfKe4VXHMLhfBShnmaQSmrHsySW4=
+	t=1708942409; cv=none; b=Bcgoa29r6MxrWDFu3uafcpMwF9hc4QGTwD4BOn+m1+QXsgNnsxc5fe3+SzDKj7nanqZu6oMTii/qt8qzDdwpthaeFrzqEQTGAYRNh//FZqt7taJ65MKVqku5fgiliN2kWqXr94C7dzk+6pKCPToFuKhysb9G2YAOiA3jWnIOF1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708942407; c=relaxed/simple;
-	bh=1HIj971k+sRTL9Ja9lOpDQSqDhT6SYaqAUl8uDhn3hQ=;
+	s=arc-20240116; t=1708942409; c=relaxed/simple;
+	bh=fHxPWifiBlMDHDN66yCuD/ls2/UF7jWTcC7A9sa7i74=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y+G6i8UaGk8fVHbjAzAZ2mMi6+89p420Bdp1waQSNPkyhhDVS7vf1U1vpA2kjaLOOnqMU4KjGlJjXBeBtIexoklSG0ZXo3qkELy54geESc6hGOS0RNQFJCONBJmCwa38ybsPfq6+14qjEU4FB7CEnaZav3SraOg8d/cHp/66hDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EOJ/to7h; arc=none smtp.client-ip=209.85.210.180
+	 MIME-Version; b=Io5l/i0bATjzxrPLkAd83mAn1++McdTFF9RlYrGHg+toVCN1Nr5KNZxo/7/BB/Nop2F9y49jjXISPQOzV/czCmsRkO/0cmdZ12HeK9Ag/QZFPuXVVUfDipgxIflRX2rSbV7b+XDIl04nMUyjWBJ0F/FqitcMBzGNh+Z67y6SqZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d8A7Evuu; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6e332bc65b3so1375653b3a.3
-        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 02:13:25 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6da202aa138so1790029b3a.2
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 02:13:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708942405; x=1709547205; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708942407; x=1709547207; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OTzHwVrlhJ44ljTP4egNfnM7a2uSQKeiI4yRLVlcvdA=;
-        b=EOJ/to7hWkcj53MMjd53VBBxU1tvhGWFdR5EVOlcjWYGWI5w5HpO42dGl8myuE56Yg
-         IMK618nYCfUMHGgruzsQFFeENKgodeFa2TSm84d6GMCA4+7XTXmZQK7EXroaszaU1TV4
-         kYo4HtD/H2CGcpUMK+QusvYfEpSEey2J35CMVVz+V6Qo/mJjCW5Cj9ts+To2MSJqbUmI
-         +RcgRcGbafzLXa6rvHV1YKTXls30p3pbi07euLj9paXIwQc0zYk7vUWY+lrssYLhANJQ
-         1lasa7NgbqUVjE8tW2us8rVB5n2T+tiMYdZRUkHVDYrJM8g7bHr6zjH+GhMJoQOAo6tz
-         3cqw==
+        bh=56iBudlm9U8d1gus42bi1dKHG12FVRnvk/I1w3JRqyc=;
+        b=d8A7Evuu8ANkDWJGpTKJwelQA3yFH2U+1+MRlJ7+PTyMHr8tyKGXhFnUKSzATzPDaR
+         Amw5ZynDEqHuVGrWuBnb0/xhA3UKHQs8git2VNpgYRbPpc1RZiuyGS/WMXKHqsrwB9YZ
+         tpZIgr0bfqGD+NC0grnrw+lUYNnsQOh9T5x09eu3/54hm8LAeVBljcyzpHQy0fngwSRC
+         otongLFqpLNhcPmBhuwZdy2yKOcqEvbuHZEu6jOPFzfKjC6Mggztdq8lmIr9fMfncRQh
+         rFUUd6N/bM4kh/eS+Lqsf9xti8cuis4vmuhliRzbQaIyfPp9TN7RB0x2MXsADubfdklx
+         +xNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708942405; x=1709547205;
+        d=1e100.net; s=20230601; t=1708942407; x=1709547207;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OTzHwVrlhJ44ljTP4egNfnM7a2uSQKeiI4yRLVlcvdA=;
-        b=fN6Ite7znv24o4sBPmN1xuv+KjQpVQKyiIiZa3uE2WIBCKPuASqihw9jWrfqFskGNZ
-         CsSGy+X5FHA59o30wkzrcqhaFO2dKzbVlBSIovOWE9xAEKHuuMS8g7OBw4JpUbBOnJhh
-         MDDrqSslvxESUS/zWXq7i+IiBkQennX1RjiYSqEkGQpUCyHzk/mNG31VRKpuZUC80j5F
-         d4vRekvNWunHQq2yY0cjEZwjM9o2fOrSzsteqA8roeS0HqtjECXYNjmff+x32ZmIuo+W
-         WPPZVuvo3XymC6qOYgJ5svbmJO0W8cUIpX2kpENv+VTaUwOfUiQb2iU3HYz5KfyXa0bz
-         NaLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqb+1B4Zef14zZUhYXOIeT8K7+OiYmXUxQyH5ey14q65yz0zrimnLC5XXjwJFJqL1Ro6wKCtHwhP/aF/yVL9wEp6TJ
-X-Gm-Message-State: AOJu0YwUXDw7/cf75m/EqGxFaEtu+lDxQV6wmuAY7xll2sJzcN0jKWRD
-	BxqIu3pgiExS0u3p5pQs6To13bzgeZbRXOZ594PB5Dn1If8bO6jP
-X-Google-Smtp-Source: AGHT+IHoxB0TT29CakpeaPt9N9d/U7ozjzGJCW6J9X08YRZJcOR/GfOl6GcVNLtrGGGJNpj3R1sE0g==
-X-Received: by 2002:aa7:8c06:0:b0:6e5:3dea:dde9 with SMTP id c6-20020aa78c06000000b006e53deadde9mr208073pfd.1.1708942403334;
-        Mon, 26 Feb 2024 02:13:23 -0800 (PST)
+        bh=56iBudlm9U8d1gus42bi1dKHG12FVRnvk/I1w3JRqyc=;
+        b=gWhDW7M2ORV7JvC7OFk81abLT+dvQok6++oUQL21hid9bV7Tmr4p3l8i0rglbUJjco
+         IpYgVOVDedSKkQz6FAyi2jL8Mg/LY8r23ST/RyKoPIO1qo0urWUxdCPVhX5Ih7XC7qgM
+         fYaGUHvykJbuEs60Smg1mGLxxykKvFLWU1ArhuetnbXwm6Yx57rlpUPorlkSau0Zbf3a
+         mKEQSkJHLaLepIJf9/kQcVHZYYPcoap4NwNZBIOE78DweaVotSIz2XEFk9SEfvVIZY7T
+         oiHRfSIz1ijpqL0UnC2vSWsOLxad7xIZ8MjMyM4twzIn2KYpwCZv9+ZZSRBFDQAIX2/0
+         0XsA==
+X-Forwarded-Encrypted: i=1; AJvYcCXW/+xiAQXac1vlNDYbahv7C4uxeTrxKRRK9Ep7b+zspBM7IkWAWikoWH2s/rv4+Z5/03kfHomjABHVCsf8TsmtNBXd
+X-Gm-Message-State: AOJu0YwqBX2zIIREGEFtr7lbRgk24YS9/dHN6VyEEWwZHh0wvEqhrkg+
+	H0kpAIA4zPenWwGMSHSSkcXRdC4LZELbX1xAz5l3WTyjJ1bPaUyI
+X-Google-Smtp-Source: AGHT+IFCEmru53h8ykn6ZFvyv19vcFj2ApRKFuuSf+y+EfsDSVWG/xsHvEixEPxFldkroBR47nCwmA==
+X-Received: by 2002:a05:6a20:9e4b:b0:1a0:e13f:c69 with SMTP id mt11-20020a056a209e4b00b001a0e13f0c69mr9729563pzb.8.1708942407554;
+        Mon, 26 Feb 2024 02:13:27 -0800 (PST)
 Received: from wheely.local0.net (220-235-194-103.tpgi.com.au. [220.235.194.103])
-        by smtp.gmail.com with ESMTPSA id x24-20020aa784d8000000b006e463414493sm3626693pfn.105.2024.02.26.02.13.19
+        by smtp.gmail.com with ESMTPSA id x24-20020aa784d8000000b006e463414493sm3626693pfn.105.2024.02.26.02.13.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 02:13:23 -0800 (PST)
+        Mon, 26 Feb 2024 02:13:27 -0800 (PST)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -76,9 +76,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Joel Stanley <joel@jms.id.au>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 12/32] powerpc: Fix emulator illegal instruction test for powernv
-Date: Mon, 26 Feb 2024 20:11:58 +1000
-Message-ID: <20240226101218.1472843-13-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH 13/32] powerpc/sprs: Test hypervisor registers on powernv machine
+Date: Mon, 26 Feb 2024 20:11:59 +1000
+Message-ID: <20240226101218.1472843-14-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240226101218.1472843-1-npiggin@gmail.com>
 References: <20240226101218.1472843-1-npiggin@gmail.com>
@@ -90,99 +90,101 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Illegal instructions cause 0xe40 (HEAI) interrupts rather
-than program interrupts.
+This enables HV privilege registers to be tested with the powernv
+machine.
 
 Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- lib/powerpc/asm/processor.h |  1 +
- lib/powerpc/setup.c         | 13 +++++++++++++
- powerpc/emulator.c          | 21 ++++++++++++++++++++-
- 3 files changed, 34 insertions(+), 1 deletion(-)
+ powerpc/sprs.c | 33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
 
-diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
-index 9d8061962..cf1b9d8ff 100644
---- a/lib/powerpc/asm/processor.h
-+++ b/lib/powerpc/asm/processor.h
-@@ -11,6 +11,7 @@ void do_handle_exception(struct pt_regs *regs);
- #endif /* __ASSEMBLY__ */
+diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+index cb1d6c980..0a82418d6 100644
+--- a/powerpc/sprs.c
++++ b/powerpc/sprs.c
+@@ -199,16 +199,16 @@ static const struct spr sprs_power_common[1024] = {
+ [190] = { "HFSCR",	64,	HV_RW, },
+ [256] = { "VRSAVE",	32,	RW, },
+ [259] = { "SPRG3",	64,	RO, },
+-[284] = { "TBL",	32,	HV_WO, },
+-[285] = { "TBU",	32,	HV_WO, },
+-[286] = { "TBU40",	64,	HV_WO, },
++[284] = { "TBL",	32,	HV_WO, }, /* Things can go a bit wonky with */
++[285] = { "TBU",	32,	HV_WO, }, /* Timebase changing. Should save */
++[286] = { "TBU40",	64,	HV_WO, }, /* and restore it. */
+ [304] = { "HSPRG0",	64,	HV_RW, },
+ [305] = { "HSPRG1",	64,	HV_RW, },
+ [306] = { "HDSISR",	32,	HV_RW,		SPR_INT, },
+ [307] = { "HDAR",	64,	HV_RW,		SPR_INT, },
+ [308] = { "SPURR",	64,	HV_RW | OS_RO,	SPR_ASYNC, },
+ [309] = { "PURR",	64,	HV_RW | OS_RO,	SPR_ASYNC, },
+-[313] = { "HRMOR",	64,	HV_RW, },
++[313] = { "HRMOR",	64,	HV_RW,		SPR_HARNESS, }, /* Harness can't cope with HRMOR changing */
+ [314] = { "HSRR0",	64,	HV_RW,		SPR_INT, },
+ [315] = { "HSRR1",	64,	HV_RW,		SPR_INT, },
+ [318] = { "LPCR",	64,	HV_RW, },
+@@ -306,7 +306,7 @@ static const struct spr sprs_power9_10[1024] = {
+ [921] = { "TSCR",	32,	HV_RW, },
+ [922] = { "TTR",	64,	HV_RW, },
+ [1006]= { "TRACE",	64,	WO, },
+-[1008]= { "HID",	64,	HV_RW, },
++[1008]= { "HID",	64,	HV_RW,		SPR_HARNESS, }, /* HILE would be unhelpful to change */
+ };
  
- extern bool cpu_has_hv;
-+extern bool cpu_has_heai;
+ /* This covers POWER8 and POWER9 PMUs */
+@@ -350,6 +350,22 @@ static const struct spr sprs_power10_pmu[1024] = {
  
- static inline uint64_t mfspr(int nr)
- {
-diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
-index 89e5157f2..3c81aee9e 100644
---- a/lib/powerpc/setup.c
-+++ b/lib/powerpc/setup.c
-@@ -87,6 +87,7 @@ static void cpu_set(int fdtnode, u64 regval, void *info)
- }
+ static struct spr sprs[1024];
  
- bool cpu_has_hv;
-+bool cpu_has_heai;
- 
- static void cpu_init(void)
- {
-@@ -108,6 +109,18 @@ static void cpu_init(void)
- 		hcall(H_SET_MODE, 0, 4, 0, 0);
- #endif
- 	}
-+
-+	switch (mfspr(SPR_PVR) & PVR_VERSION_MASK) {
-+	case PVR_VER_POWER10:
-+	case PVR_VER_POWER9:
-+	case PVR_VER_POWER8E:
-+	case PVR_VER_POWER8NVL:
-+	case PVR_VER_POWER8:
-+		cpu_has_heai = true;
-+		break;
-+	default:
-+		break;
-+	}
- }
- 
- static void mem_init(phys_addr_t freemem_start)
-diff --git a/powerpc/emulator.c b/powerpc/emulator.c
-index 39dd59645..c9b17f742 100644
---- a/powerpc/emulator.c
-+++ b/powerpc/emulator.c
-@@ -31,6 +31,20 @@ static void program_check_handler(struct pt_regs *regs, void *opaque)
- 	regs->nip += 4;
- }
- 
-+static void heai_handler(struct pt_regs *regs, void *opaque)
++static bool spr_read_perms(int spr)
 +{
-+	int *data = opaque;
-+
-+	if (verbose) {
-+		printf("Detected invalid instruction %#018lx: %08x\n",
-+		       regs->nip, *(uint32_t*)regs->nip);
-+	}
-+
-+	*data = 8; /* Illegal instruction */
-+
-+	regs->nip += 4;
++	if (cpu_has_hv)
++		return !!(sprs[spr].access & SPR_HV_READ);
++	else
++		return !!(sprs[spr].access & SPR_OS_READ);
 +}
 +
- static void alignment_handler(struct pt_regs *regs, void *opaque)
- {
- 	int *data = opaque;
-@@ -362,7 +376,12 @@ int main(int argc, char **argv)
++static bool spr_write_perms(int spr)
++{
++	if (cpu_has_hv)
++		return !!(sprs[spr].access & SPR_HV_WRITE);
++	else
++		return !!(sprs[spr].access & SPR_OS_WRITE);
++}
++
+ static void setup_sprs(void)
  {
  	int i;
+@@ -461,7 +477,7 @@ static void get_sprs(uint64_t *v)
+ 	int i;
  
--	handle_exception(0x700, program_check_handler, (void *)&is_invalid);
-+	if (cpu_has_heai) {
-+		handle_exception(0xe40, heai_handler, (void *)&is_invalid);
-+		handle_exception(0x700, program_check_handler, (void *)&is_invalid);
-+	} else {
-+		handle_exception(0x700, program_check_handler, (void *)&is_invalid);
-+	}
- 	handle_exception(0x600, alignment_handler, (void *)&alignment);
+ 	for (i = 0; i < 1024; i++) {
+-		if (!(sprs[i].access & SPR_OS_READ))
++		if (!spr_read_perms(i))
+ 			continue;
+ 		v[i] = __mfspr(i);
+ 	}
+@@ -472,8 +488,9 @@ static void set_sprs(uint64_t val)
+ 	int i;
  
- 	for (i = 1; i < argc; i++) {
+ 	for (i = 0; i < 1024; i++) {
+-		if (!(sprs[i].access & SPR_OS_WRITE))
++		if (!spr_write_perms(i))
+ 			continue;
++
+ 		if (sprs[i].type & SPR_HARNESS)
+ 			continue;
+ 		__mtspr(i, val);
+@@ -561,7 +578,7 @@ int main(int argc, char **argv)
+ 	for (i = 0; i < 1024; i++) {
+ 		bool pass = true;
+ 
+-		if (!(sprs[i].access & SPR_OS_READ))
++		if (!spr_read_perms(i))
+ 			continue;
+ 
+ 		if (sprs[i].width == 32) {
 -- 
 2.42.0
 
