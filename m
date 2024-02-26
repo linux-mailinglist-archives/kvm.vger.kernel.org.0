@@ -1,51 +1,52 @@
-Return-Path: <kvm+bounces-9790-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9791-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999B68670AB
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:23:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DED4F867111
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:31:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38D691F2C1AB
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:23:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DEDFB20C97
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD05B56447;
-	Mon, 26 Feb 2024 10:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FC7EADD;
+	Mon, 26 Feb 2024 10:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BHi3uVIG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q2FMuR3r"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27C755E71;
-	Mon, 26 Feb 2024 10:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E09655E7C;
+	Mon, 26 Feb 2024 10:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942055; cv=none; b=DUzpbq4PZknds+OaW7NpSRUPLMdRSxXXaNJzaKVHnYuVg27VnFIwDM9FicDcVVrLe6J8wfjuK4k5MpiPN4Sgs7UyXWLy2+hYv/eR4vjfrgJvb1ARCA+AS1uwxfpC0nKzlJ18ZZ3/aCgN3A3hm35nX2URS3nhh5ZihCRQnjZ4Skc=
+	t=1708942055; cv=none; b=sNzF3RA4dYps51EEQN1cjX+qSdCm6T10T3UwHvyNfclxfmleWtMC66juNl6RHLySr3spP8+/imeSfGxSopsMQbsal6MC1RMgkYUKBUKNOtIkWZ44k6vuM/81G1ZrItedd0qGOEXpp3oneglnvzfaZpBniWO8wD325mKhOe40z3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708942055; c=relaxed/simple;
-	bh=pSxd2T2vDb9x73UvU6amuiiCQzcThADNLivPMyVtvaw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nDv1y3ZJUTEYzfvpFKeyDh1yv7PHDRzNu9bz2TA6asHIE+hPeG0f5qf8d/ScgBR2A5CsJqYcy1bI8xdZo2t3Y+w00mQ6UyClN4S5ds6HhsD1P+b2NoIJthG1KVQaR9VnZy6oIuwhpFg9uw/oqkNBXnDwnzwuEhdp14lT/0Im5sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BHi3uVIG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B71BC433F1;
+	bh=I/0qcEQ1vzLU0qnD+UitYiE6zuVdPy7kzlaKwTqcXrA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DxBiinstkCjBkboq8fG5FEMI3FIEpcbTHxH3n4Fi5bRaU92BZfC8uWzah1VRmThmbh+mUZJpspTEBRn2VQrI/NlVTzlDwIneqUsgjuI5VVKXXUEzTC1e+997ZW6ZWK/vALM2jjplICqtioJeo/SuXhSyMQDHmY9nFgtvMnT13mA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q2FMuR3r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC41C43394;
 	Mon, 26 Feb 2024 10:07:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708942054;
-	bh=pSxd2T2vDb9x73UvU6amuiiCQzcThADNLivPMyVtvaw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BHi3uVIGX3h3AoxthnABevCOjkJDSWjdPU9RC+TIq/oT2sWcLPGCEQsGoJl4C/P+E
-	 wWF/UjvGTCqOGHYkX5nG+U0pZqKlYJjQkjy1/f7DehJB0fQfu38hNzhXuC3CVQGJEo
-	 jH5bD6/KaHP6HVB1AKo9nqKzT6gqeYv0Wf5Kgi2tZz+VBEoBL6XOXZHu4FTEmc3bOB
-	 EM/R2ggHNwUhMSqsvB0naX+nhzxQi4gpexPcKIXgZKBUZZMMw29c9wKzjGW2l0X6iy
-	 Pk8+W+4LL74tlwdZTWjgUPmp6Dg8g/+BXel+JjBZnWmybtXgg6bi4x3g9vI/CCijm0
-	 XjxsFHd57ekhw==
+	bh=I/0qcEQ1vzLU0qnD+UitYiE6zuVdPy7kzlaKwTqcXrA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Q2FMuR3r7I/RNuP/7IOwXDtKN4w/bfDTf5wIRPNklx9KbFyFMZRmBXkKnCooXZATr
+	 1IGreiHzyQYyJ5qqgf4nRlay7pc9MWV1dX5s8HNtH4dOYp2gtF9mujiOCHb6yjkeLu
+	 CNzmTS5QU5om9pkmxty2BzqFdUl4CAEWNEk+/dDLlFnnbdLTbchybtoQINb1dxt2Ri
+	 wpkPbKs9epkC+dHJeHmgYhKcDVDiF9MQi/sDaCleh59jzQOSOi6aiZXzEHQ/ne137H
+	 pdsCHJ5e5dIIVj6j4fpGqfZN8we2mIVHSi1j6LpMi2vD90EH3ZgM3lBbt1EWawkNfo
+	 ZwBuXo3W/0okA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1reXsB-006nQ5-5Z;
-	Mon, 26 Feb 2024 10:07:31 +0000
+	id 1reXtU-006nQ5-4h;
+	Mon, 26 Feb 2024 10:07:32 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -57,10 +58,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v2 00/13] KVM/arm64: Add NV support for ERET and PAuth
-Date: Mon, 26 Feb 2024 10:05:48 +0000
-Message-Id: <20240226100601.2379693-1-maz@kernel.org>
+Subject: [PATCH v2 01/13] KVM: arm64: Harden __ctxt_sys_reg() against out-of-range values
+Date: Mon, 26 Feb 2024 10:05:49 +0000
+Message-Id: <20240226100601.2379693-2-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240226100601.2379693-1-maz@kernel.org>
+References: <20240226100601.2379693-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,53 +76,56 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This is the second version of this series introducing ERET and PAuth
-support for NV guests, and now the base prefix for the NV support
-series.
+The unsuspecting kernel tinkerer can be easily confused into
+writing something that looks like this:
 
-Thanks to Joey for reviewing the first half of the series and
-providing valuable suggestions, much appreciated!
+	ikey.lo = __vcpu_sys_reg(vcpu, SYS_APIAKEYLO_EL1);
 
-* From v1 [1]:
+which seems vaguely sensible, until you realise that the second
+parameter is the encoding of a sysreg, and not the index into
+the vcpu sysreg file... Debugging what happens in this case is
+an interesting exercise in head<->wall interactions.
 
-  - Don't repaint the ISS_ERET* definitions, but provide reasonable
-    helpers instead
-  - Dropped superfluous VNCR_EL2 definition
-  - Amended comments and creative spelling
+As they often say: "Any resemblance to actual persons, living
+or dead, or actual events is purely coincidental".
 
-[1] https://lore.kernel.org/r/20240219092014.783809-1-maz@kernel.org
+In order to save people's time, add some compile-time hardening
+that will at least weed out the "stupidly out of range" values.
+This will *not* catch anything that isn't a compile-time constant.
 
-Marc Zyngier (13):
-  KVM: arm64: Harden __ctxt_sys_reg() against out-of-range values
-  KVM: arm64: Add helpers for ESR_ELx_ERET_ISS_ERET*
-  KVM: arm64: nv: Drop VCPU_HYP_CONTEXT flag
-  KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
-  KVM: arm64: nv: Add trap forwarding for ERET and SMC
-  KVM: arm64: nv: Fast-track 'InHost' exception returns
-  KVM: arm64: nv: Honor HFGITR_EL2.ERET being set
-  KVM: arm64: nv: Handle HCR_EL2.{API,APK} independently
-  KVM: arm64: nv: Reinject PAC exceptions caused by HCR_EL2.API==0
-  KVM: arm64: nv: Add kvm_has_pauth() helper
-  KVM: arm64: nv: Add emulation for ERETAx instructions
-  KVM: arm64: nv: Handle ERETA[AB] instructions
-  KVM: arm64: nv: Advertise support for PAuth
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
- arch/arm64/include/asm/esr.h            |  12 ++
- arch/arm64/include/asm/kvm_emulate.h    |   5 -
- arch/arm64/include/asm/kvm_host.h       |  26 +++-
- arch/arm64/include/asm/kvm_nested.h     |  13 ++
- arch/arm64/include/asm/pgtable-hwdef.h  |   1 +
- arch/arm64/kvm/Makefile                 |   1 +
- arch/arm64/kvm/emulate-nested.c         |  66 +++++---
- arch/arm64/kvm/handle_exit.c            |  38 ++++-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  36 ++++-
- arch/arm64/kvm/hyp/nvhe/switch.c        |   2 +-
- arch/arm64/kvm/hyp/vhe/switch.c         |  96 +++++++++++-
- arch/arm64/kvm/nested.c                 |   8 +-
- arch/arm64/kvm/pauth.c                  | 196 ++++++++++++++++++++++++
- 13 files changed, 444 insertions(+), 56 deletions(-)
- create mode 100644 arch/arm64/kvm/pauth.c
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 181fef12e8e8..a5ec4c7d3966 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -895,7 +895,7 @@ struct kvm_vcpu_arch {
+  * Don't bother with VNCR-based accesses in the nVHE code, it has no
+  * business dealing with NV.
+  */
+-static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
++static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+ {
+ #if !defined (__KVM_NVHE_HYPERVISOR__)
+ 	if (unlikely(cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
+@@ -905,6 +905,13 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+ 	return (u64 *)&ctxt->sys_regs[r];
+ }
+ 
++#define __ctxt_sys_reg(c,r)						\
++	({								\
++	    	BUILD_BUG_ON(__builtin_constant_p(r) &&			\
++			     (r) >= NR_SYS_REGS);			\
++		___ctxt_sys_reg(c, r);					\
++	})
++
+ #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+ 
+ u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
 -- 
 2.39.2
 
