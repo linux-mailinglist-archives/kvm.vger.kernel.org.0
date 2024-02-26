@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-9828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C35E86712D
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:34:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0353867100
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:29:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A06B3B26719
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:29:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E35451C23128
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC8F5F547;
-	Mon, 26 Feb 2024 10:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BA45F560;
+	Mon, 26 Feb 2024 10:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHE7Krd0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k36dKL+S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95A95F546;
-	Mon, 26 Feb 2024 10:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD58D5F546
+	for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 10:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942457; cv=none; b=Hahg8MkvmnRqp64Gt6xWukuHB3kv3tKr1yQRvKW18pTONvaXGSNeeXz0nQFEKl7++p1fD/a23pdz2a5opXCysI7NnOhTqaAW07zZNigPn3+i96U2OunznZvw+avpy8OiBZHhfIMiBmPVthsUHGoqR0ZKboCfv/bjbcaAChvRxQA=
+	t=1708942461; cv=none; b=edWZg8C8nyzVTjZ7OsF64uvzw5ntw5sSQpGgtiMFcVTrBi4MPwZO1A2rIuTTGFM6EQdJjvOyUZxyjiOx5HpCr7JSK7yzL5YbjuJ11XtBTsMvjNJKREO/20zuUY8H1Wg3b4vpkotns0ipgIOGVUEcN9g3R6PeFt3JK5O1OSwi6p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708942457; c=relaxed/simple;
-	bh=4HO2YbCBf38koFt0D4q9xHiwnrlGQRLYP+Gs/ryYuwI=;
+	s=arc-20240116; t=1708942461; c=relaxed/simple;
+	bh=FRJJHt94iccIvBXcGKBzRbphZ4fMzsT0WXVvvV3GAKg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hOc11gpt9QgoEbMVOXFE++A6/6lqrQ7smN1x5cqPtd1I61fPW16uTiFRVDR2hjZnmlIEBTvlUBfnKTEz7TQK8dyGfwQr/aF7XUvCjq+Lm79wBL227xuyTZy66HtfavzoJJCbflXtT7HnFb8bLO5PN1DenlQGQcOq6b0eveyIVOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kHE7Krd0; arc=none smtp.client-ip=209.85.215.172
+	 MIME-Version; b=GoS/70X+6rUDXMm8Nv5WlV5oMNcCSTmtJqUogTClQTuY26/rw7TSyGg1Xa8KOb7eM+g+HDjJSlPF6wy6HnqbNoo0BRLSE5kocGGvRj+XibsCyWQDQwEMxy5ywcCz7mv1kihNQPdDxG4pzMSdYn2CmuwvIcAox0CjeUuPy/BeYKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k36dKL+S; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5ce6b5e3c4eso2169888a12.2;
-        Mon, 26 Feb 2024 02:14:15 -0800 (PST)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e46db0cf82so1819066b3a.0
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 02:14:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708942455; x=1709547255; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708942459; x=1709547259; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DOXWXZAlVMmgv+nlo/ME4zbq3RxmSf+X/02kI8VKNHE=;
-        b=kHE7Krd0DldXec5soT3YTnGYepclrwirkRJE8GbTE8dsGchTrsPjUJhZdGQ3dx96zg
-         Zmvn0CPMIBjkKuk9ZEl9fpXYPnlyAV9njwIVo72xQj/R8xJ7BxauqumRyh1j3wEV6rB/
-         W/CMu1cTZAWvd9bkNl/md+LQtLLiaKTo79jtV8MLbshYzGX4vRfrsPRWfRCkLE9QY3zI
-         KUr+MWAcC1nLASYs4NacZPPAGuqg0gNl2Frqs5tAVr+BQIlGUKWd7+LiIOkMqjxCttD1
-         Wq866AjjhpNFfqdPs5UHw4wqGGKTIErua3YJyYcRKL90r6xLWS7jxbf+DL6UQ4XCNAKf
-         5fwg==
+        bh=EfwcDBIoywwZNy1awe5blDTng5UqVAab7H/ucqIcyI8=;
+        b=k36dKL+SEwBvxLyNVqhHTq78zRmhWjD4esIXDULzEvCk9NPspi3BTTgxXh6lb+HENz
+         xqjXQkVu+/0R+lTd6JHntQky1oilRsoNEq0yvxWS0NfEw2F9eD6Bjkv5rmsficNs+i0y
+         rPSJL76eOY+pOpBoeqDUKp9YyRl3ExcDiMG5hJpZq5LfVlWtulGvenGw8E5BijNoVeL/
+         pSNBkReM6z92TDTU6BBRD+0b6JC3DeupTKaBCU9ZFBM8jINRT19SoxYUs2QhVXSwnHhP
+         VwJy1dZbIqhzva++srh1lJbCvwgK+u4mUxfK1v0c1rc7N1FWmJ3ZLN/l4+iup3hpWPGH
+         8xRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708942455; x=1709547255;
+        d=1e100.net; s=20230601; t=1708942459; x=1709547259;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DOXWXZAlVMmgv+nlo/ME4zbq3RxmSf+X/02kI8VKNHE=;
-        b=UBNAW6DQxCizuaz61njliEVHQtKZpX6c8l9OnZfx1CUN+x8ZE9fbHHds0e8rtQ2e25
-         RkViBTMJp1DM+LwRdy13kug+wog59VVN/fy6oF/xfKTfUSYR0SAjKd/QdHnyTbJFhDrx
-         sPD2mMXV0pS3skKTZ25Hboyp3AorfXYo3wxhUfezmjBdIVE6f2v3z0xT2P27uIUChloH
-         eOpwl/oJ6fsUMilXBH3bURzOZ2DdeKNJRDGF7SrEgRf/SOj1g3HQs/2DwXbTfXSGsiB9
-         9Hpc0eYMzVoqzvC9mBqltZ2JlrJJFAKxTc+DonKJGYkGCauVR2cI6CbUmFiXAYi7LyWc
-         oPrA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGkEEWRr/WYmo5FMpBDU7ncWXhWYlELf6eAPhiPR2Xj5zm8Tb3r1kZDupcQVf2DqUakId6Gch7eP6hdXtlEvDyuwHE8ZGKIN5FMGa8EtjU/8ACpUfYUwzRGMnhbStLzA==
-X-Gm-Message-State: AOJu0YyDrSKpe7zDlCfRzQYIuFZ3+wJIHSkmltaIeDXbjpqGNDGH/nPf
-	JlAc930a+WAkjwIw4B5dmeKU1A2tt2R16vyekTSIAPHk5N+5N3Cn
-X-Google-Smtp-Source: AGHT+IGZFM7dgLGrchRDSThij/2RiAP6ZqQkCJf+/PUO3rYWGrtCe99Rp9Xn3bFCq/rwBOgNB/6P5Q==
-X-Received: by 2002:a05:6a20:9598:b0:1a0:e234:bc79 with SMTP id iu24-20020a056a20959800b001a0e234bc79mr6198058pzb.0.1708942455281;
-        Mon, 26 Feb 2024 02:14:15 -0800 (PST)
+        bh=EfwcDBIoywwZNy1awe5blDTng5UqVAab7H/ucqIcyI8=;
+        b=BIXPl257MzyvG+3av9t6XelFux7x6iFlhLDjSi3z91PsrQhS6bOFwedZyRQdW7aBCg
+         ARC6u2bQoIPcWbaFbk5lC4QFvHEmmi/HBiHL+oyy4Zkh343yaKqTrQ7ZpsOpyRqHBlBd
+         cdZ95qUsnkkplnBGRcqDbAvnVCt5jyDPBrmI7wqcmOXDw2F7SoM3yzVXji2LwGfo7hPH
+         TXsKId4wetCEu7zY3Onip73B+DLf4I/Aym9K0oRNC6mRExIxG7ciqJGzBCYQo2BfYlhf
+         cXHIHtqwx8mdcE9VCeae2GAHUFSzFZzYwzCs627tI5X3FwPVKAWpxXN/c3J7qzJg9RuI
+         Ji+A==
+X-Forwarded-Encrypted: i=1; AJvYcCVobOV6pznCKl3B753E+HR27T7GgWHVCMlzXBZrI5b3tKvlhDJ3mmAMfmvicAOZPlKvJ3O6qxdaazSIx0p+W275dB4h
+X-Gm-Message-State: AOJu0Yyso55ZqQXxWrDiuQf7PsO9Pk8/dvTNykwR1RM1k0C3d1HIXE0I
+	WagXUNXiI2FiAupgHD4GqjIdXWZ1Dsp1TuHQoMk59qi2SqBxyGnp
+X-Google-Smtp-Source: AGHT+IFFwkunH0uAN31qvc46kWCxjAGYqWfk/p1PpoOp8Y4nUVYJ+dKIxLsEVlzJYo7rVd0OC9gKyw==
+X-Received: by 2002:a05:6a00:2d05:b0:6e5:3e11:d7f7 with SMTP id fa5-20020a056a002d0500b006e53e11d7f7mr195499pfb.6.1708942459205;
+        Mon, 26 Feb 2024 02:14:19 -0800 (PST)
 Received: from wheely.local0.net (220-235-194-103.tpgi.com.au. [220.235.194.103])
-        by smtp.gmail.com with ESMTPSA id x24-20020aa784d8000000b006e463414493sm3626693pfn.105.2024.02.26.02.14.10
+        by smtp.gmail.com with ESMTPSA id x24-20020aa784d8000000b006e463414493sm3626693pfn.105.2024.02.26.02.14.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 02:14:15 -0800 (PST)
+        Mon, 26 Feb 2024 02:14:19 -0800 (PST)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -75,15 +75,10 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Joel Stanley <joel@jms.id.au>,
 	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 24/32] common/sieve: Use vmalloc.h for setup_mmu definition
-Date: Mon, 26 Feb 2024 20:12:10 +1000
-Message-ID: <20240226101218.1472843-25-npiggin@gmail.com>
+	kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH 25/32] common/sieve: Support machines without MMU
+Date: Mon, 26 Feb 2024 20:12:11 +1000
+Message-ID: <20240226101218.1472843-26-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240226101218.1472843-1-npiggin@gmail.com>
 References: <20240226101218.1472843-1-npiggin@gmail.com>
@@ -93,168 +88,109 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-There is no good reason to put setup_vm in libcflat.h when it's
-defined in vmalloc.h.
+Not all powerpc CPUs provide MMU support. Define vm_available() that is
+true by default but archs can override it. Use this to run VM tests.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Thomas Huth <thuth@redhat.com>
 Cc: Andrew Jones <andrew.jones@linux.dev>
-Cc: Janosch Frank <frankja@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Nico Böhr <nrb@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>
 Cc: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- common/sieve.c         | 1 +
- lib/libcflat.h         | 2 --
- lib/s390x/io.c         | 1 +
- lib/s390x/uv.h         | 1 +
- lib/x86/vm.h           | 1 +
- s390x/mvpg.c           | 1 +
- s390x/selftest.c       | 1 +
- x86/pmu.c              | 1 +
- x86/pmu_lbr.c          | 1 +
- x86/vmexit.c           | 1 +
- x86/vmware_backdoors.c | 1 +
- 11 files changed, 10 insertions(+), 2 deletions(-)
+ common/sieve.c      | 14 ++++++++------
+ lib/ppc64/asm/mmu.h |  1 -
+ lib/ppc64/mmu.c     |  2 +-
+ lib/vmalloc.c       |  7 +++++++
+ lib/vmalloc.h       |  2 ++
+ 5 files changed, 18 insertions(+), 8 deletions(-)
 
 diff --git a/common/sieve.c b/common/sieve.c
-index 8150f2d98..8fe05ef13 100644
+index 8fe05ef13..db084691a 100644
 --- a/common/sieve.c
 +++ b/common/sieve.c
-@@ -1,5 +1,6 @@
- #include "alloc.h"
- #include "libcflat.h"
-+#include "vmalloc.h"
+@@ -40,12 +40,14 @@ int main(void)
  
- static int sieve(char* data, int size)
+     printf("starting sieve\n");
+     test_sieve("static", static_data, STATIC_SIZE);
+-    setup_vm();
+-    test_sieve("mapped", static_data, STATIC_SIZE);
+-    for (i = 0; i < 3; ++i) {
+-	v = malloc(VSIZE);
+-	test_sieve("virtual", v, VSIZE);
+-	free(v);
++    if (vm_available()) {
++	    setup_vm();
++	    test_sieve("mapped", static_data, STATIC_SIZE);
++	    for (i = 0; i < 3; ++i) {
++		v = malloc(VSIZE);
++		test_sieve("virtual", v, VSIZE);
++		free(v);
++	    }
+     }
+ 
+     return 0;
+diff --git a/lib/ppc64/asm/mmu.h b/lib/ppc64/asm/mmu.h
+index fadeee4bc..eaff0f1f7 100644
+--- a/lib/ppc64/asm/mmu.h
++++ b/lib/ppc64/asm/mmu.h
+@@ -3,7 +3,6 @@
+ 
+ #include <asm/pgtable.h>
+ 
+-bool vm_available(void);
+ bool mmu_enabled(void);
+ void mmu_enable(pgd_t *pgtable);
+ void mmu_disable(void);
+diff --git a/lib/ppc64/mmu.c b/lib/ppc64/mmu.c
+index 6adf94151..f1219033a 100644
+--- a/lib/ppc64/mmu.c
++++ b/lib/ppc64/mmu.c
+@@ -24,7 +24,7 @@
+ 
+ static pgd_t *identity_pgd;
+ 
+-bool vm_available(void)
++bool vm_available(void) /* weak override */
  {
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index 700f43527..8c8dd0286 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -152,8 +152,6 @@ do {									\
- void binstr(unsigned long x, char out[BINSTR_SZ]);
- void print_binstr(unsigned long x);
+ 	return cpu_has_radix;
+ }
+diff --git a/lib/vmalloc.c b/lib/vmalloc.c
+index 572682576..cf2ef7a70 100644
+--- a/lib/vmalloc.c
++++ b/lib/vmalloc.c
+@@ -206,10 +206,17 @@ void init_alloc_vpage(void *top)
+ 	spin_unlock(&lock);
+ }
  
--extern void setup_vm(void);
--
- #endif /* !__ASSEMBLY__ */
++bool __attribute__((__weak__)) vm_available(void)
++{
++	return true;
++}
++
+ void __setup_vm(void *opaque)
+ {
+ 	phys_addr_t base, top;
  
- #define SZ_256			(1 << 8)
-diff --git a/lib/s390x/io.c b/lib/s390x/io.c
-index fb7b7ddaa..2b28ccaa0 100644
---- a/lib/s390x/io.c
-+++ b/lib/s390x/io.c
-@@ -10,6 +10,7 @@
-  */
- #include <libcflat.h>
- #include <argv.h>
-+#include <vmalloc.h>
- #include <asm/spinlock.h>
- #include <asm/facility.h>
- #include <asm/sigp.h>
-diff --git a/lib/s390x/uv.h b/lib/s390x/uv.h
-index 286933caa..00a370410 100644
---- a/lib/s390x/uv.h
-+++ b/lib/s390x/uv.h
-@@ -4,6 +4,7 @@
++	assert_msg(vm_available(), "Virtual memory not available. Must check vm_available() before calling setup_vm()");
++
+ 	if (alloc_ops == &vmalloc_ops)
+ 		return;
  
- #include <sie.h>
- #include <asm/pgtable.h>
-+#include <vmalloc.h>
+diff --git a/lib/vmalloc.h b/lib/vmalloc.h
+index 0269fdde9..e81be39f4 100644
+--- a/lib/vmalloc.h
++++ b/lib/vmalloc.h
+@@ -17,6 +17,8 @@ extern void setup_vm(void);
+ /* As above, plus passes an opaque value to setup_mmu(). */
+ extern void __setup_vm(void *opaque);
  
- bool uv_os_is_guest(void);
- bool uv_os_is_host(void);
-diff --git a/lib/x86/vm.h b/lib/x86/vm.h
-index 4b714bad7..cf39787aa 100644
---- a/lib/x86/vm.h
-+++ b/lib/x86/vm.h
-@@ -2,6 +2,7 @@
- #define _X86_VM_H_
- 
- #include "processor.h"
-+#include "vmalloc.h"
- #include "asm/page.h"
- #include "asm/io.h"
- #include "asm/bitops.h"
-diff --git a/s390x/mvpg.c b/s390x/mvpg.c
-index 296338d4f..a0cfc575a 100644
---- a/s390x/mvpg.c
-+++ b/s390x/mvpg.c
-@@ -15,6 +15,7 @@
- #include <asm/page.h>
- #include <asm/facility.h>
- #include <asm/mem.h>
-+#include <vmalloc.h>
- #include <alloc_page.h>
- #include <bitops.h>
- #include <hardware.h>
-diff --git a/s390x/selftest.c b/s390x/selftest.c
-index 92ed4e5d3..3eaae9b06 100644
---- a/s390x/selftest.c
-+++ b/s390x/selftest.c
-@@ -9,6 +9,7 @@
- #include <libcflat.h>
- #include <util.h>
- #include <alloc.h>
-+#include <vmalloc.h>
- #include <asm/interrupt.h>
- #include <asm/barrier.h>
- #include <asm/pgtable.h>
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 47a1a602a..7062c1ad9 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -6,6 +6,7 @@
- #include "x86/apic.h"
- #include "x86/desc.h"
- #include "x86/isr.h"
-+#include "vmalloc.h"
- #include "alloc.h"
- 
- #include "libcflat.h"
-diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
-index 40b63fa3d..c6f010847 100644
---- a/x86/pmu_lbr.c
-+++ b/x86/pmu_lbr.c
-@@ -2,6 +2,7 @@
- #include "x86/processor.h"
- #include "x86/pmu.h"
- #include "x86/desc.h"
-+#include "vmalloc.h"
- 
- #define N 1000000
- 
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index eb5d3023a..48a38f60f 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -1,6 +1,7 @@
- #include "libcflat.h"
- #include "acpi.h"
- #include "smp.h"
-+#include "vmalloc.h"
- #include "pci.h"
- #include "x86/vm.h"
- #include "x86/desc.h"
-diff --git a/x86/vmware_backdoors.c b/x86/vmware_backdoors.c
-index bc1002056..f8cf7ecb1 100644
---- a/x86/vmware_backdoors.c
-+++ b/x86/vmware_backdoors.c
-@@ -6,6 +6,7 @@
- #include "x86/desc.h"
- #include "x86/isr.h"
- #include "alloc.h"
-+#include "vmalloc.h"
- #include "setjmp.h"
- #include "usermode.h"
- #include "fault_test.h"
++/* common/ tests must check availability before calling setup_vm() */
++extern bool vm_available(void);
+ /* Set up paging */
+ extern void *setup_mmu(phys_addr_t top, void *opaque);
+ /* Walk the page table and resolve the virtual address to a physical address */
 -- 
 2.42.0
 
