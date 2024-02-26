@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-9905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C657867913
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:52:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3C7F867914
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:53:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 321E5293F7C
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:52:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A08E294382
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0603913AA23;
-	Mon, 26 Feb 2024 14:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FCB13A879;
+	Mon, 26 Feb 2024 14:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PDNLVYDu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bt25SjoV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A449E13A879;
-	Mon, 26 Feb 2024 14:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F8D13AA33;
+	Mon, 26 Feb 2024 14:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958217; cv=none; b=KKtPaSOE8hm5oU0gYUGXf7KIvZpYVe+alI5sKA7xlmpmMjp9GkBGEKADinXKPSz8/3K5fqx8GwkWRP2B2906UZO/gK8uWQG0wWwBWpHXAI2gFB5ZGJp95IhFojynXhaGR2R4NTXg/Wz3Ta1d7APLpV+9HDcIf8EKBn+4F+ts+74=
+	t=1708958220; cv=none; b=CUrTDHyQPZ+LR01kJwDyblFPR2RvlSTScdKzS38wfXSv07nObiy26GMwAXgy2N/lnuoYJjKcBJlTxrfDuvXkAREDO5LXWnwbJoMHhF2A4hagDYrFtyB1ak12RwnWPaPjY7iZZ0xXlxyTQqPK5dja8AXchoNNUABcGdFm8Y6WGWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958217; c=relaxed/simple;
-	bh=QvIfkotJQxMfa11Ye+5Mx3wJUOol1gW3+VkFSNADlgU=;
+	s=arc-20240116; t=1708958220; c=relaxed/simple;
+	bh=VFpQkf0DwaMmnSB2prKBrCNuNiYKSSA7i3bHq/5WTHg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=M29P2vdem1OjHlksJjqjywDbtnQZrUDmhm1qKcvm1LEyfDFt7hOKJ4IvNWFUp96CGXh7LPyd3XzLqaMR61U9keQRh7Yg/u4S3BQ6T8F1ZdHGyZpXLDBfGiXHX2J6KHKKos2zjzDjA1wQ1Cnrz4s0O4ywyyMXYt39PBF0ZsuCRkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PDNLVYDu; arc=none smtp.client-ip=209.85.210.49
+	 MIME-Version; b=Kcbo/votl7IOUP3ReU0V4I1af8f2yCHnXeNP0qLXGHAhJApi9Fi1iAa6k6gLzKuQbG0IYk8CRIrd9O1BaIPssxW941RknyPLWfHo8TaGG2U8Fxi2Npqr7kZiws1iwJLlzctof4iSpEoBFlLKAHP1zDNNufvDv+KA3vcvhOhzw98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bt25SjoV; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6e0f43074edso2168511a34.1;
-        Mon, 26 Feb 2024 06:36:55 -0800 (PST)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e53f3f1f82so216233b3a.2;
+        Mon, 26 Feb 2024 06:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958214; x=1709563014; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958218; x=1709563018; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HdqH8jVNXmEu4zs1zan2Z9bnYeRZlguwUihIbfO84eA=;
-        b=PDNLVYDuhvgcfAQ5VsTHEfTR5kK26G412sx+wCWD6+hkKZ8441GE6au7P4C5lozW+Y
-         ffjIA8e18VL9SnNmE8IitGQFu4bBGiK3W6+9Zgvclo39zcmpprr2zny9Om/viMQqmB/G
-         roGDmCk2bXF94wDcawunQECGhZeKbjO0zinG3wb3BBwMJ+OYFHNzbRXt2LVsrK9A8i9L
-         7V/ZdlGhKAXRIPdh7jWXIr5rht3FNOXvTl3l9ddHJmbuxTxHmP5IMsEpxBpAgmGjAUJ0
-         nxiYr6M4/qsutgzgBXumth6iJSSZ2Z3CUM7HKDplkzfKbxCX6Iu+WFbZBL0EhuexUI/r
-         MpqQ==
+        bh=BcAOo2JYDa9YbLmrgou0VrWmz7Zj4ViKVXNN4Wof/Rw=;
+        b=bt25SjoViGK+IvJiU9EifeZog6vpvDggZnoCDOoSBhkGIXkCVmpGgSU9m27XNqaRX0
+         461rotuEdCbU6x1VGm20mpGo7++FeEa20w5Scq24ajj4rBGtfyLmLi21wu6nk7yfbjl9
+         LS9dk7bzFVD+3kd3xrWOkBiK2F5shpe9ZhtZkHasS04G8yzJ6y01an9UCuDWGItq05sR
+         2i/AtgiLZrATgZc0LPfkQs8lpNSQ4HK1ellZLVz7PfCrtq2XGisi2LmyuR6lgUHN4ibX
+         DdbLoHU/pgDdBspiJP5U9lhGbOV4st+OBcbZ4wJLdDtxZQurA0VCp5G00u9ZPjwI3stD
+         6oeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958214; x=1709563014;
+        d=1e100.net; s=20230601; t=1708958218; x=1709563018;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HdqH8jVNXmEu4zs1zan2Z9bnYeRZlguwUihIbfO84eA=;
-        b=YvdHQHsVs9fAZpfSJqOJk0c4Mn+HRlH8Gu8S829qVHgjze/Bw7ghU0TZ0qOHYztZQk
-         1TcjwWH7WKLFITdADMSTGBUWHMECpRD4xnQZsSOKsu1+C59wjbYc64AA6HRCEiXai37i
-         5rYbxbuP75CNiC9aRkWeT5bItQ/bFzIfBNKh6ZIoqkKriLkxmvrv2W5GJBDP9rLtYRGB
-         UXv92AAWWR3QYbN5Qct/bxbteX9RLZdEGwLDT/wvwcjxexowUt3SKHaTi5oR2X5pOmwH
-         kl6m1vRjjZ+oh5tTX98F3yg8TPV8Otol51iDRUfGl7gRSRniSIgNEp5ixoP9GAXiI0CF
-         TRKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlmXSvpFPrNAWQsMOk668SDXDCHAm9uCEWYMfDLU8JR83KDdJEH/FFtyXlbTrZqcYfE1obsgSN5c3ipWLT90pOht+M
-X-Gm-Message-State: AOJu0YxS8PhHJ3IF327hVzN5iQmAwP8Ufmy76/XL2R7kimau2aWYbp6g
-	ubYtREn2G7TAT3LEweqqvchAYj8Hix9XZ9Cf4xtnMRaMn1kR0Q7FyMaLmmFw
-X-Google-Smtp-Source: AGHT+IGzhilLnOqDnW8DtlnwMh+tC9Pj86iMFec5r5I9e0Ve/nJKQ5bcBi6m3xQOLVYQTSM7JwtmLA==
-X-Received: by 2002:a05:6358:4428:b0:17a:def8:5687 with SMTP id z40-20020a056358442800b0017adef85687mr5692172rwc.27.1708958214434;
-        Mon, 26 Feb 2024 06:36:54 -0800 (PST)
-Received: from localhost ([47.254.32.37])
-        by smtp.gmail.com with ESMTPSA id d4-20020a634f04000000b005d8b2f04eb7sm3922538pgb.62.2024.02.26.06.36.53
+        bh=BcAOo2JYDa9YbLmrgou0VrWmz7Zj4ViKVXNN4Wof/Rw=;
+        b=IeliWwrJp9dtiHTCQ+Cc4bQQUXsXdyrfr6Dp39ZProTdV+F+0l24Cj9KVvjtCHFIEp
+         KmzHcZnAa988hV11TYbJ8gx8usiUgq3W4BK6nkbcnZ2aP1Rw4jU8nmSwR92Wt8AKkG41
+         90bY70GQenmrluljmwIIi4sANIwm48MDRGxp8pkYtsWBtsC04ANZlTMHXhJz+AHA4Ku2
+         9rqAu3DlDhn5Ix8Zn48qbW0FeseizmKVu1FVkx0S1bMP5LYjZc8qxs4NC+K15Va/33ez
+         q8WYqkKCOUUCxpIFXeP2uZIOCa/4JXg6mxK5ylCv5eZyPaGX83UPNF6KoVYDkVDh9fME
+         XL0g==
+X-Forwarded-Encrypted: i=1; AJvYcCW/MIJQL2d+PnQ0vYBuuKx++FTkxMP0zXH/SyvFdV2h3yf7PcYMMshlfmNdfdHp+6Q3fEeBZZHvzOc+9ZxPPFeeAE8P
+X-Gm-Message-State: AOJu0YwuJxaByjhWUzM+UNHkqLUhctCL+OW5Ps55NtUOLMIN8Db4+9oA
+	Q9+6NBP5zok7wMKCtHRkpr1kMdqMjgeF6IOlNsQJZUBu2WqsKZpKmm+pbGuM
+X-Google-Smtp-Source: AGHT+IGqZOMLFmNX0VMVhFOqOC3rTr2ifATiXER7sN1I6LWQ9jctmC5a0wu07Wfb4xHqxl9VB/CzYQ==
+X-Received: by 2002:a05:6a20:2c92:b0:1a0:817d:80d with SMTP id g18-20020a056a202c9200b001a0817d080dmr4230103pzj.45.1708958218030;
+        Mon, 26 Feb 2024 06:36:58 -0800 (PST)
+Received: from localhost ([47.88.5.130])
+        by smtp.gmail.com with ESMTPSA id r23-20020a17090a941700b0029942a73eaesm4505516pjo.9.2024.02.26.06.36.57
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:36:54 -0800 (PST)
+        Mon, 26 Feb 2024 06:36:57 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
-Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>,
-	Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+	Hou Wenlong <houwenlong.hwl@antgroup.com>,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Sean Christopherson <seanjc@google.com>,
@@ -84,9 +84,9 @@ Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 42/73] KVM: x86/PVM: Support for kvm_exit() tracepoint
-Date: Mon, 26 Feb 2024 22:35:59 +0800
-Message-Id: <20240226143630.33643-43-jiangshanlai@gmail.com>
+Subject: [RFC PATCH 43/73] KVM: x86/PVM: Enable direct switching
+Date: Mon, 26 Feb 2024 22:36:00 +0800
+Message-Id: <20240226143630.33643-44-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -98,161 +98,261 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Hou Wenlong <houwenlong.hwl@antgroup.com>
+From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Similar to VMX/SVM, add necessary information to support kvm_exit()
-tracepoint.
+To enable direct switching, certain necessary information needs to be
+prepared in TSS for the switcher. Since only syscall and RETU hypercalls
+are allowed for now, CPL switching-related information is needed before
+VM enters. Additionally, after VM exit, the states in the hypervisor
+should be updated if direct switching has occurred.
 
-Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/pvm/pvm.c | 41 +++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/pvm/pvm.h | 35 +++++++++++++++++++++++++++++++++++
- arch/x86/kvm/trace.h   |  7 ++++++-
- 3 files changed, 82 insertions(+), 1 deletion(-)
+ arch/x86/kvm/pvm/pvm.c | 87 +++++++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/pvm/pvm.h | 15 ++++++++
+ 2 files changed, 100 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/pvm/pvm.c b/arch/x86/kvm/pvm/pvm.c
-index e68052f33186..6ac599587567 100644
+index 6ac599587567..138d0c255cb8 100644
 --- a/arch/x86/kvm/pvm/pvm.c
 +++ b/arch/x86/kvm/pvm/pvm.c
-@@ -1996,6 +1996,43 @@ static int pvm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	return 0;
+@@ -559,23 +559,70 @@ static void pvm_flush_hwtlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
+ 	put_cpu();
  }
  
-+static u32 pvm_get_syscall_exit_reason(struct kvm_vcpu *vcpu)
++static bool check_switch_cr3(struct vcpu_pvm *pvm, u64 switch_host_cr3)
 +{
-+	struct vcpu_pvm *pvm = to_pvm(vcpu);
-+	unsigned long rip = kvm_rip_read(vcpu);
++	u64 root = pvm->vcpu.arch.mmu->prev_roots[0].hpa;
++
++	if (pvm->vcpu.arch.mmu->prev_roots[0].pgd != pvm->msr_switch_cr3)
++		return false;
++	if (!VALID_PAGE(root))
++		return false;
++	if (host_pcid_owner(switch_host_cr3 & X86_CR3_PCID_MASK) != pvm)
++		return false;
++	if (host_pcid_root(switch_host_cr3 & X86_CR3_PCID_MASK) != root)
++		return false;
++	if (root != (switch_host_cr3 & CR3_ADDR_MASK))
++		return false;
++
++	return true;
++}
++
+ static void pvm_set_host_cr3_for_guest_with_host_pcid(struct vcpu_pvm *pvm)
+ {
+ 	u64 root_hpa = pvm->vcpu.arch.mmu->root.hpa;
+ 	bool flush = false;
+ 	u32 host_pcid = host_pcid_get(pvm, root_hpa, &flush);
+ 	u64 hw_cr3 = root_hpa | host_pcid;
++	u64 switch_host_cr3;
+ 
+ 	if (!flush)
+ 		hw_cr3 |= CR3_NOFLUSH;
+ 	this_cpu_write(cpu_tss_rw.tss_ex.enter_cr3, hw_cr3);
 +
 +	if (is_smod(pvm)) {
-+		if (rip == pvm->msr_retu_rip_plus2)
-+			return PVM_EXIT_REASONS_ERETU;
-+		else if (rip == pvm->msr_rets_rip_plus2)
-+			return PVM_EXIT_REASONS_ERETS;
-+		else
-+			return PVM_EXIT_REASONS_HYPERCALL;
++		this_cpu_write(cpu_tss_rw.tss_ex.smod_cr3, hw_cr3 | CR3_NOFLUSH);
++		switch_host_cr3 = this_cpu_read(cpu_tss_rw.tss_ex.umod_cr3);
++	} else {
++		this_cpu_write(cpu_tss_rw.tss_ex.umod_cr3, hw_cr3 | CR3_NOFLUSH);
++		switch_host_cr3 = this_cpu_read(cpu_tss_rw.tss_ex.smod_cr3);
 +	}
 +
-+	return PVM_EXIT_REASONS_SYSCALL;
-+}
-+
-+static void pvm_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason, u64 *info1, u64 *info2,
-+			      u32 *intr_info, u32 *error_code)
-+{
-+	struct vcpu_pvm *pvm = to_pvm(vcpu);
-+
-+	if (pvm->exit_vector == PVM_SYSCALL_VECTOR)
-+		*reason = pvm_get_syscall_exit_reason(vcpu);
-+	else if (pvm->exit_vector == IA32_SYSCALL_VECTOR)
-+		*reason = PVM_EXIT_REASONS_INT80;
-+	else if (pvm->exit_vector >= FIRST_EXTERNAL_VECTOR &&
-+		 pvm->exit_vector < NR_VECTORS)
-+		*reason = PVM_EXIT_REASONS_INTERRUPT;
++	if (check_switch_cr3(pvm, switch_host_cr3))
++		pvm->switch_flags &= ~SWITCH_FLAGS_NO_DS_CR3;
 +	else
-+		*reason = pvm->exit_vector;
-+	*info1 = pvm->exit_vector;
-+	*info2 = pvm->exit_error_code;
-+	*intr_info = pvm->exit_vector;
-+	*error_code = pvm->exit_error_code;
-+}
-+
- static void pvm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_pvm *pvm = to_pvm(vcpu);
-@@ -2298,6 +2335,8 @@ static fastpath_t pvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	mark_page_dirty_in_slot(vcpu->kvm, pvm->pvcs_gpc.memslot,
- 				pvm->pvcs_gpc.gpa >> PAGE_SHIFT);
- 
-+	trace_kvm_exit(vcpu, KVM_ISA_PVM);
-+
- 	return EXIT_FASTPATH_NONE;
++		pvm->switch_flags |= SWITCH_FLAGS_NO_DS_CR3;
  }
  
-@@ -2627,6 +2666,8 @@ static struct kvm_x86_ops pvm_x86_ops __initdata = {
- 	.refresh_apicv_exec_ctrl = pvm_refresh_apicv_exec_ctrl,
- 	.deliver_interrupt = pvm_deliver_interrupt,
- 
-+	.get_exit_info = pvm_get_exit_info,
+ static void pvm_set_host_cr3_for_guest_without_host_pcid(struct vcpu_pvm *pvm)
+ {
+ 	u64 root_hpa = pvm->vcpu.arch.mmu->root.hpa;
++	u64 switch_root = 0;
 +
- 	.vcpu_after_set_cpuid = pvm_vcpu_after_set_cpuid,
++	if (pvm->vcpu.arch.mmu->prev_roots[0].pgd == pvm->msr_switch_cr3) {
++		switch_root = pvm->vcpu.arch.mmu->prev_roots[0].hpa;
++		pvm->switch_flags &= ~SWITCH_FLAGS_NO_DS_CR3;
++	} else {
++		pvm->switch_flags |= SWITCH_FLAGS_NO_DS_CR3;
++	}
  
- 	.check_intercept = pvm_check_intercept,
+ 	this_cpu_write(cpu_tss_rw.tss_ex.enter_cr3, root_hpa);
++	if (is_smod(pvm)) {
++		this_cpu_write(cpu_tss_rw.tss_ex.smod_cr3, root_hpa);
++		this_cpu_write(cpu_tss_rw.tss_ex.umod_cr3, switch_root);
++	} else {
++		this_cpu_write(cpu_tss_rw.tss_ex.umod_cr3, root_hpa);
++		this_cpu_write(cpu_tss_rw.tss_ex.smod_cr3, switch_root);
++	}
+ }
+ 
+ static void pvm_set_host_cr3_for_hypervisor(struct vcpu_pvm *pvm)
+@@ -591,6 +638,8 @@ static void pvm_set_host_cr3_for_hypervisor(struct vcpu_pvm *pvm)
+ 
+ // Set tss_ex.host_cr3 for VMExit.
+ // Set tss_ex.enter_cr3 for VMEnter.
++// Set tss_ex.smod_cr3 and tss_ex.umod_cr3 and set or clear
++// SWITCH_FLAGS_NO_DS_CR3 for direct switching.
+ static void pvm_set_host_cr3(struct vcpu_pvm *pvm)
+ {
+ 	pvm_set_host_cr3_for_hypervisor(pvm);
+@@ -1058,6 +1107,11 @@ static bool pvm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ 
+ static void update_exception_bitmap(struct kvm_vcpu *vcpu)
+ {
++	/* disable direct switch when single step debugging */
++	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
++		to_pvm(vcpu)->switch_flags |= SWITCH_FLAGS_SINGLE_STEP;
++	else
++		to_pvm(vcpu)->switch_flags &= ~SWITCH_FLAGS_SINGLE_STEP;
+ }
+ 
+ static struct pvm_vcpu_struct *pvm_get_vcpu_struct(struct vcpu_pvm *pvm)
+@@ -1288,10 +1342,12 @@ static void pvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
+ 	if (!need_update || !is_smod(pvm))
+ 		return;
+ 
+-	if (rflags & X86_EFLAGS_IF)
++	if (rflags & X86_EFLAGS_IF) {
++		pvm->switch_flags &= ~SWITCH_FLAGS_IRQ_WIN;
+ 		pvm_event_flags_update(vcpu, X86_EFLAGS_IF, PVM_EVENT_FLAGS_IP);
+-	else
++	} else {
+ 		pvm_event_flags_update(vcpu, 0, X86_EFLAGS_IF);
++	}
+ }
+ 
+ static bool pvm_get_if_flag(struct kvm_vcpu *vcpu)
+@@ -1311,6 +1367,7 @@ static void pvm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
+ 
+ static void enable_irq_window(struct kvm_vcpu *vcpu)
+ {
++	to_pvm(vcpu)->switch_flags |= SWITCH_FLAGS_IRQ_WIN;
+ 	pvm_event_flags_update(vcpu, PVM_EVENT_FLAGS_IP, 0);
+ }
+ 
+@@ -1332,6 +1389,7 @@ static void pvm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
+ 
+ static void enable_nmi_window(struct kvm_vcpu *vcpu)
+ {
++	to_pvm(vcpu)->switch_flags |= SWITCH_FLAGS_NMI_WIN;
+ }
+ 
+ static int pvm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+@@ -1361,6 +1419,8 @@ static void pvm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
+ 
+ 	trace_kvm_inj_virq(irq, vcpu->arch.interrupt.soft, false);
+ 
++	to_pvm(vcpu)->switch_flags &= ~SWITCH_FLAGS_IRQ_WIN;
++
+ 	if (do_pvm_event(vcpu, irq, false, 0))
+ 		kvm_clear_interrupt_queue(vcpu);
+ 
+@@ -1397,6 +1457,7 @@ static int handle_synthetic_instruction_return_user(struct kvm_vcpu *vcpu)
+ 
+ 	// instruction to return user means nmi allowed.
+ 	pvm->nmi_mask = false;
++	pvm->switch_flags &= ~(SWITCH_FLAGS_IRQ_WIN | SWITCH_FLAGS_NMI_WIN);
+ 
+ 	/*
+ 	 * switch to user mode before kvm_set_rflags() to avoid PVM_EVENT_FLAGS_IF
+@@ -1448,6 +1509,7 @@ static int handle_synthetic_instruction_return_supervisor(struct kvm_vcpu *vcpu)
+ 
+ 	// instruction to return supervisor means nmi allowed.
+ 	pvm->nmi_mask = false;
++	pvm->switch_flags &= ~SWITCH_FLAGS_NMI_WIN;
+ 
+ 	kvm_set_rflags(vcpu, frame.rflags);
+ 	kvm_rip_write(vcpu, frame.rip);
+@@ -1461,6 +1523,7 @@ static int handle_synthetic_instruction_return_supervisor(struct kvm_vcpu *vcpu)
+ static int handle_hc_interrupt_window(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_make_request(KVM_REQ_EVENT, vcpu);
++	to_pvm(vcpu)->switch_flags &= ~SWITCH_FLAGS_IRQ_WIN;
+ 	pvm_event_flags_update(vcpu, 0, PVM_EVENT_FLAGS_IP);
+ 
+ 	++vcpu->stat.irq_window_exits;
+@@ -2199,6 +2262,7 @@ static __always_inline void load_regs(struct kvm_vcpu *vcpu, struct pt_regs *gue
+ 
+ static noinstr void pvm_vcpu_run_noinstr(struct kvm_vcpu *vcpu)
+ {
++	struct tss_extra *tss_ex = this_cpu_ptr(&cpu_tss_rw.tss_ex);
+ 	struct vcpu_pvm *pvm = to_pvm(vcpu);
+ 	struct pt_regs *sp0_regs = (struct pt_regs *)this_cpu_read(cpu_tss_rw.x86_tss.sp0) - 1;
+ 	struct pt_regs *ret_regs;
+@@ -2208,12 +2272,25 @@ static noinstr void pvm_vcpu_run_noinstr(struct kvm_vcpu *vcpu)
+ 	// Load guest registers into the host sp0 stack for switcher.
+ 	load_regs(vcpu, sp0_regs);
+ 
++	// Prepare context for direct switching.
++	tss_ex->switch_flags = pvm->switch_flags;
++	tss_ex->pvcs = pvm->pvcs_gpc.khva;
++	tss_ex->retu_rip = pvm->msr_retu_rip_plus2;
++	tss_ex->smod_entry = pvm->msr_lstar;
++	tss_ex->smod_gsbase = pvm->msr_kernel_gs_base;
++	tss_ex->smod_rsp = pvm->msr_supervisor_rsp;
++
+ 	if (unlikely(pvm->guest_dr7 & DR7_BP_EN_MASK))
+ 		set_debugreg(pvm_eff_dr7(vcpu), 7);
+ 
+ 	// Call into switcher and enter guest.
+ 	ret_regs = switcher_enter_guest();
+ 
++	// Get the resulted mode and PVM MSRs which might be changed
++	// when direct switching.
++	pvm->switch_flags = tss_ex->switch_flags;
++	pvm->msr_supervisor_rsp = tss_ex->smod_rsp;
++
+ 	// Get the guest registers from the host sp0 stack.
+ 	save_regs(vcpu, ret_regs);
+ 	pvm->exit_vector = (ret_regs->orig_ax >> 32);
+@@ -2293,6 +2370,7 @@ static inline void pvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
+ static fastpath_t pvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_pvm *pvm = to_pvm(vcpu);
++	bool is_smod_befor_run = is_smod(pvm);
+ 
+ 	trace_kvm_entry(vcpu);
+ 
+@@ -2307,6 +2385,11 @@ static fastpath_t pvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	pvm_vcpu_run_noinstr(vcpu);
+ 
++	if (is_smod_befor_run != is_smod(pvm)) {
++		swap(pvm->vcpu.arch.mmu->root, pvm->vcpu.arch.mmu->prev_roots[0]);
++		swap(pvm->msr_switch_cr3, pvm->vcpu.arch.cr3);
++	}
++
+ 	/* MSR_IA32_DEBUGCTLMSR is zeroed before vmenter. Restore it if needed */
+ 	if (pvm->host_debugctlmsr)
+ 		update_debugctlmsr(pvm->host_debugctlmsr);
 diff --git a/arch/x86/kvm/pvm/pvm.h b/arch/x86/kvm/pvm/pvm.h
-index f28ab0b48f40..2f8fdb0ae3df 100644
+index 2f8fdb0ae3df..e49d9dc70a94 100644
 --- a/arch/x86/kvm/pvm/pvm.h
 +++ b/arch/x86/kvm/pvm/pvm.h
-@@ -10,6 +10,41 @@
+@@ -5,6 +5,21 @@
+ #include <linux/kvm_host.h>
+ #include <asm/switcher.h>
+ 
++/*
++ * Extra switch flags:
++ *
++ * IRQ_WIN:
++ *	There is an irq window request, and the vcpu should not directly
++ *	switch to context with IRQ enabled, e.g. user mode.
++ * NMI_WIN:
++ *	There is an NMI window request.
++ * SINGLE_STEP:
++ *	KVM_GUESTDBG_SINGLESTEP is set.
++ */
++#define SWITCH_FLAGS_IRQ_WIN				_BITULL(8)
++#define SWITCH_FLAGS_NMI_WIN				_BITULL(9)
++#define SWITCH_FLAGS_SINGLE_STEP			_BITULL(10)
++
+ #define SWITCH_FLAGS_INIT	(SWITCH_FLAGS_SMOD)
+ 
  #define PVM_SYSCALL_VECTOR		SWITCH_EXIT_REASONS_SYSCALL
- #define PVM_FAILED_VMENTRY_VECTOR	SWITCH_EXIT_REASONS_FAILED_VMETNRY
- 
-+#define PVM_EXIT_REASONS_SHIFT		16
-+#define PVM_EXIT_REASONS_SYSCALL	(1UL << PVM_EXIT_REASONS_SHIFT)
-+#define PVM_EXIT_REASONS_HYPERCALL	(2UL << PVM_EXIT_REASONS_SHIFT)
-+#define PVM_EXIT_REASONS_ERETU		(3UL << PVM_EXIT_REASONS_SHIFT)
-+#define PVM_EXIT_REASONS_ERETS		(4UL << PVM_EXIT_REASONS_SHIFT)
-+#define PVM_EXIT_REASONS_INTERRUPT	(5UL << PVM_EXIT_REASONS_SHIFT)
-+#define PVM_EXIT_REASONS_INT80		(6UL << PVM_EXIT_REASONS_SHIFT)
-+
-+#define PVM_EXIT_REASONS		\
-+	{ DE_VECTOR, "DE excp" },	\
-+	{ DB_VECTOR, "DB excp" },	\
-+	{ NMI_VECTOR, "NMI excp" },	\
-+	{ BP_VECTOR, "BP excp" },	\
-+	{ OF_VECTOR, "OF excp" },	\
-+	{ BR_VECTOR, "BR excp" },	\
-+	{ UD_VECTOR, "UD excp" },	\
-+	{ NM_VECTOR, "NM excp" },	\
-+	{ DF_VECTOR, "DF excp" },	\
-+	{ TS_VECTOR, "TS excp" },	\
-+	{ SS_VECTOR, "SS excp" },	\
-+	{ GP_VECTOR, "GP excp" },	\
-+	{ PF_VECTOR, "PF excp" },	\
-+	{ MF_VECTOR, "MF excp" },	\
-+	{ AC_VECTOR, "AC excp" },	\
-+	{ MC_VECTOR, "MC excp" },	\
-+	{ XM_VECTOR, "XM excp" },	\
-+	{ VE_VECTOR, "VE excp" },	\
-+	{ PVM_EXIT_REASONS_SYSCALL, "SYSCALL" },	\
-+	{ PVM_EXIT_REASONS_HYPERCALL, "HYPERCALL" },	\
-+	{ PVM_EXIT_REASONS_ERETU, "ERETU" },		\
-+	{ PVM_EXIT_REASONS_ERETS, "ERETS" },		\
-+	{ PVM_EXIT_REASONS_INTERRUPT, "INTERRUPT" },	\
-+	{ PVM_EXIT_REASONS_INT80, "INT80" },		\
-+	{ PVM_FAILED_VMENTRY_VECTOR, "FAILED_VMENTRY" }
-+
- #define PT_L4_SHIFT		39
- #define PT_L4_SIZE		(1UL << PT_L4_SHIFT)
- #define DEFAULT_RANGE_L4_SIZE	(32 * PT_L4_SIZE)
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 83843379813e..3d6549679e98 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -8,6 +8,8 @@
- #include <asm/clocksource.h>
- #include <asm/pvclock-abi.h>
- 
-+#include "pvm/pvm.h"
-+
- #undef TRACE_SYSTEM
- #define TRACE_SYSTEM kvm
- 
-@@ -282,11 +284,14 @@ TRACE_EVENT(kvm_apic,
- 
- #define KVM_ISA_VMX   1
- #define KVM_ISA_SVM   2
-+#define KVM_ISA_PVM   3
- 
- #define kvm_print_exit_reason(exit_reason, isa)				\
- 	(isa == KVM_ISA_VMX) ?						\
- 	__print_symbolic(exit_reason & 0xffff, VMX_EXIT_REASONS) :	\
--	__print_symbolic(exit_reason, SVM_EXIT_REASONS),		\
-+	((isa == KVM_ISA_SVM) ?						\
-+	__print_symbolic(exit_reason, SVM_EXIT_REASONS) :		\
-+	__print_symbolic(exit_reason, PVM_EXIT_REASONS)),		\
- 	(isa == KVM_ISA_VMX && exit_reason & ~0xffff) ? " " : "",	\
- 	(isa == KVM_ISA_VMX) ?						\
- 	__print_flags(exit_reason & ~0xffff, " ", VMX_EXIT_REASON_FLAGS) : ""
 -- 
 2.19.1.6.gb485710b
 
