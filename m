@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-9734-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9735-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E13A1866D89
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:05:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93514866D8C
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:05:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95FAC285028
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:04:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B58D11C23682
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321D912BEA5;
-	Mon, 26 Feb 2024 08:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47A9224CE;
+	Mon, 26 Feb 2024 08:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ho0fjsl4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mQ1AM6Sd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (unknown [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C70219EB;
-	Mon, 26 Feb 2024 08:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3033F12A15E;
+	Mon, 26 Feb 2024 08:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936149; cv=none; b=X35YErc6RIv6K0r4tArGVQMbexyaXF05bh6wiV7uNDLU1nUJ3qWe+LznZBg/difeqwg/UrByb0ydnJOyYcv3SOAl/MXi7UXQ2Rrl8rbbP02DJbewGk3BnvmBWx1yE3FRC5prU+FM9MBn2+MD9s8xOShSj0mqWzjlJ+WPuRIkf08=
+	t=1708936150; cv=none; b=CPd9c6/fPrDYNH5QWoAkFMhTe54T0zJRi1QUnZrfjqPMzZbHjALfhj3OoMyxw6tF1XpXGlzzP/NjOH3A0FR9MXnW+XAJx6eapPZFXs2oSscCE6EczT36sJUgoI/9AiAmvYzwhAg3bkHot6fDWBGGs/DpoM1moi5ZfZD2Se4TWbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936149; c=relaxed/simple;
-	bh=QnWGRm/Bs2Ha4+9BL7xtnfj7c9Dq5ASvmvWattRSzvY=;
+	s=arc-20240116; t=1708936150; c=relaxed/simple;
+	bh=gelDu1xjsgqIRauLE8EobxA3kCvyXLgLpgUUyecgcS4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GMoqSWuONNDPOiLIfoV/UnO3s2o8ikSjI9C4dxdZa0Fi501W1Pmsko+BnFa7YzSdajD6twFGKZJObBFvZLiSOZ7LC00kU06iQcOhW7++qwN2A1LjI5/bR5LfrvHVCqtZcLr7wbUNZTN80v8ScIJSkqVqjjNTdW4WutmJ/lrSyCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ho0fjsl4; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=Z7WvDfrjY+we4I14ggExV6RePvGv6NVkrc435B48V2YwyIYaVKffO1DqfvNjW3p1Sxw7KV1w50zV1UICapEiPL50UKgC0z0e8/4g7kNrunOwaZKtfk6H4LjXl+5QQYY4Qc65fW7JfxjJY44eJp400PYA0WlSsb1OldRfXsVl/kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mQ1AM6Sd; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708936147; x=1740472147;
+  t=1708936148; x=1740472148;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QnWGRm/Bs2Ha4+9BL7xtnfj7c9Dq5ASvmvWattRSzvY=;
-  b=ho0fjsl4g874J2qgHwTIgutlJBQQ5i6C5PKEzoeLVFobT9wrpVNjLhw3
-   hf0isHcd7RQTrTX6U+U9yeqsbfPvUy3pbfbkeNQsIrCQnRTzBBbGwPLY6
-   W2DMCk1bk6PUmrP5g/DJRd5dJchaagaEo/5Tjx5NF6pYUhJCKQphM0GjQ
-   NXM/tOLOxmnU70Berd5wzpj9TZWXYyClhGNwfqlRcPL9OOdpl+M3EJUFR
-   si3tkPhONHuyf/a9VQ8dEuJusiak3TU+3fFgwsCnyZLpE3MRkLLejgLP3
-   MiSsq5MEWSTrI5tK4uJyuAeSgUpV9zlbtjqWf6lSUGzk/urNuioZt11/L
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="20751341"
+  bh=gelDu1xjsgqIRauLE8EobxA3kCvyXLgLpgUUyecgcS4=;
+  b=mQ1AM6SdHxSjdKPWai3O8kfX6PQ1cqWEKN5hlL6CpCJtK8WTZ/Lvqs8q
+   qp6B46xwhiPrUa2r1eQqwf9uWeeiGKD9Tng/94ajgvG6aHq/Ssgpagda9
+   Ql3Gxj3FgOBvJpmb/ymNWCV8twR8uCEQJciSNBuHu1lQM9BJNVr89axhh
+   yGGkIQmyMe0+dq+gMkDin6DAhezAlD+4QOtIoQJ36O4cXWz7C5j8PJZqc
+   IOwiSzUrlC5ewkHHJb6XcEbihH9npJzEjWRU5TqlF/XOwciHS0u39hVbD
+   Tde13/B9gXrG54tFnNmA620bs9COnWk9mySF0UOIrH6/UTAAJz+cqWt7K
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="20751346"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="20751341"
+   d="scan'208";a="20751346"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:05 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6735074"
+   d="scan'208";a="6735077"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:05 -0800
 From: isaku.yamahata@intel.com
@@ -66,11 +66,10 @@ Cc: isaku.yamahata@intel.com,
 	Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
-	tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v19 110/130] KVM: TDX: Handle TDX PV MMIO hypercall
-Date: Mon, 26 Feb 2024 00:26:52 -0800
-Message-Id: <a4421e0f2eafc17b4703c920936e32489d2382a3.1708933498.git.isaku.yamahata@intel.com>
+	tina.zhang@intel.com
+Subject: [PATCH v19 111/130] KVM: TDX: Implement callbacks for MSR operations for TDX
+Date: Mon, 26 Feb 2024 00:26:53 -0800
+Message-Id: <62f8890cb90e49a3e0b0d5946318c0267b80c540.1708933498.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933498.git.isaku.yamahata@intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
@@ -82,190 +81,244 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Export kvm_io_bus_read and kvm_mmio tracepoint and wire up TDX PV MMIO
-hypercall to the KVM backend functions.
+Implements set_msr/get_msr/has_emulated_msr methods for TDX to handle
+hypercall from guest TD for paravirtualized rdmsr and wrmsr.  The TDX
+module virtualizes MSRs.  For some MSRs, it injects #VE to the guest TD
+upon RDMSR or WRMSR.  The exact list of such MSRs are defined in the spec.
 
-kvm_io_bus_read/write() searches KVM device emulated in kernel of the given
-MMIO address and emulates the MMIO.  As TDX PV MMIO also needs it, export
-kvm_io_bus_read().  kvm_io_bus_write() is already exported.  TDX PV MMIO
-emulates some of MMIO itself.  To add trace point consistently with x86
-kvm, export kvm_mmio tracepoint.
+Upon #VE, the guest TD may execute hypercalls,
+TDG.VP.VMCALL<INSTRUCTION.RDMSR> and TDG.VP.VMCALL<INSTRUCTION.WRMSR>,
+which are defined in GHCI (Guest-Host Communication Interface) so that the
+host VMM (e.g. KVM) can virtualize the MSRs.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+There are three classes of MSRs virtualization.
+- non-configurable: TDX module directly virtualizes it. VMM can't
+  configure. the value set by KVM_SET_MSR_INDEX_LIST is ignored.
+- configurable: TDX module directly virtualizes it. VMM can configure at
+  the VM creation time.  The value set by KVM_SET_MSR_INDEX_LIST is used.
+- #VE case
+  Guest TD would issue TDG.VP.VMCALL<INSTRUCTION.{WRMSR,RDMSR> and
+  VMM handles the MSR hypercall. The value set by KVM_SET_MSR_INDEX_LIST
+  is used.
+
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c     |   1 +
- virt/kvm/kvm_main.c    |   2 +
- 3 files changed, 117 insertions(+)
+ arch/x86/kvm/vmx/main.c    | 44 +++++++++++++++++++++---
+ arch/x86/kvm/vmx/tdx.c     | 70 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h |  6 ++++
+ arch/x86/kvm/x86.c         |  1 -
+ arch/x86/kvm/x86.h         |  2 ++
+ 5 files changed, 118 insertions(+), 5 deletions(-)
 
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index c9a40456d965..ed46e7e57c18 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -247,6 +247,42 @@ static void vt_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ 	vmx_handle_exit_irqoff(vcpu);
+ }
+ 
++static int vt_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
++{
++	if (unlikely(is_td_vcpu(vcpu)))
++		return tdx_set_msr(vcpu, msr_info);
++
++	return vmx_set_msr(vcpu, msr_info);
++}
++
++/*
++ * The kvm parameter can be NULL (module initialization, or invocation before
++ * VM creation). Be sure to check the kvm parameter before using it.
++ */
++static bool vt_has_emulated_msr(struct kvm *kvm, u32 index)
++{
++	if (kvm && is_td(kvm))
++		return tdx_has_emulated_msr(index, true);
++
++	return vmx_has_emulated_msr(kvm, index);
++}
++
++static int vt_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
++{
++	if (unlikely(is_td_vcpu(vcpu)))
++		return tdx_get_msr(vcpu, msr_info);
++
++	return vmx_get_msr(vcpu, msr_info);
++}
++
++static void vt_msr_filter_changed(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_msr_filter_changed(vcpu);
++}
++
+ static void vt_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
+ {
+ 	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
+@@ -541,7 +577,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	/* TDX cpu enablement is done by tdx_hardware_setup(). */
+ 	.hardware_enable = vmx_hardware_enable,
+ 	.hardware_disable = vt_hardware_disable,
+-	.has_emulated_msr = vmx_has_emulated_msr,
++	.has_emulated_msr = vt_has_emulated_msr,
+ 
+ 	.is_vm_type_supported = vt_is_vm_type_supported,
+ 	.max_vcpus = vt_max_vcpus,
+@@ -563,8 +599,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 
+ 	.update_exception_bitmap = vmx_update_exception_bitmap,
+ 	.get_msr_feature = vmx_get_msr_feature,
+-	.get_msr = vmx_get_msr,
+-	.set_msr = vmx_set_msr,
++	.get_msr = vt_get_msr,
++	.set_msr = vt_set_msr,
+ 	.get_segment_base = vmx_get_segment_base,
+ 	.get_segment = vmx_get_segment,
+ 	.set_segment = vmx_set_segment,
+@@ -674,7 +710,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
+ 	.migrate_timers = vmx_migrate_timers,
+ 
+-	.msr_filter_changed = vmx_msr_filter_changed,
++	.msr_filter_changed = vt_msr_filter_changed,
+ 	.complete_emulated_msr = kvm_complete_insn_gp,
+ 
+ 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 55fc6cc6c816..389bb95d2af0 100644
+index 389bb95d2af0..c8f991b69720 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1217,6 +1217,118 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
- 	return ret;
+@@ -1877,6 +1877,76 @@ void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
+ 	*error_code = 0;
  }
  
-+static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
++static bool tdx_is_emulated_kvm_msr(u32 index, bool write)
 +{
-+	unsigned long val = 0;
-+	gpa_t gpa;
-+	int size;
-+
-+	KVM_BUG_ON(vcpu->mmio_needed != 1, vcpu->kvm);
-+	vcpu->mmio_needed = 0;
-+
-+	if (!vcpu->mmio_is_write) {
-+		gpa = vcpu->mmio_fragments[0].gpa;
-+		size = vcpu->mmio_fragments[0].len;
-+
-+		memcpy(&val, vcpu->run->mmio.data, size);
-+		tdvmcall_set_return_val(vcpu, val);
-+		trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
++	switch (index) {
++	case MSR_KVM_POLL_CONTROL:
++		return true;
++	default:
++		return false;
 +	}
++}
++
++bool tdx_has_emulated_msr(u32 index, bool write)
++{
++	switch (index) {
++	case MSR_IA32_UCODE_REV:
++	case MSR_IA32_ARCH_CAPABILITIES:
++	case MSR_IA32_POWER_CTL:
++	case MSR_IA32_CR_PAT:
++	case MSR_IA32_TSC_DEADLINE:
++	case MSR_IA32_MISC_ENABLE:
++	case MSR_PLATFORM_INFO:
++	case MSR_MISC_FEATURES_ENABLES:
++	case MSR_IA32_MCG_CAP:
++	case MSR_IA32_MCG_STATUS:
++	case MSR_IA32_MCG_CTL:
++	case MSR_IA32_MCG_EXT_CTL:
++	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
++	case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
++		/* MSR_IA32_MCx_{CTL, STATUS, ADDR, MISC, CTL2} */
++		return true;
++	case APIC_BASE_MSR ... APIC_BASE_MSR + 0xff:
++		/*
++		 * x2APIC registers that are virtualized by the CPU can't be
++		 * emulated, KVM doesn't have access to the virtual APIC page.
++		 */
++		switch (index) {
++		case X2APIC_MSR(APIC_TASKPRI):
++		case X2APIC_MSR(APIC_PROCPRI):
++		case X2APIC_MSR(APIC_EOI):
++		case X2APIC_MSR(APIC_ISR) ... X2APIC_MSR(APIC_ISR + APIC_ISR_NR):
++		case X2APIC_MSR(APIC_TMR) ... X2APIC_MSR(APIC_TMR + APIC_ISR_NR):
++		case X2APIC_MSR(APIC_IRR) ... X2APIC_MSR(APIC_IRR + APIC_ISR_NR):
++			return false;
++		default:
++			return true;
++		}
++	case MSR_IA32_APICBASE:
++	case MSR_EFER:
++		return !write;
++	case 0x4b564d00 ... 0x4b564dff:
++		/* KVM custom MSRs */
++		return tdx_is_emulated_kvm_msr(index, write);
++	default:
++		return false;
++	}
++}
++
++int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
++{
++	if (tdx_has_emulated_msr(msr->index, false))
++		return kvm_get_msr_common(vcpu, msr);
 +	return 1;
 +}
 +
-+static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, int size,
-+				 unsigned long val)
++int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
 +{
-+	if (kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
-+	    kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-+		return -EOPNOTSUPP;
-+
-+	trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
-+	return 0;
-+}
-+
-+static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, int size)
-+{
-+	unsigned long val;
-+
-+	if (kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
-+	    kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-+		return -EOPNOTSUPP;
-+
-+	tdvmcall_set_return_val(vcpu, val);
-+	trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-+	return 0;
-+}
-+
-+static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_memory_slot *slot;
-+	int size, write, r;
-+	unsigned long val;
-+	gpa_t gpa;
-+
-+	KVM_BUG_ON(vcpu->mmio_needed, vcpu->kvm);
-+
-+	size = tdvmcall_a0_read(vcpu);
-+	write = tdvmcall_a1_read(vcpu);
-+	gpa = tdvmcall_a2_read(vcpu);
-+	val = write ? tdvmcall_a3_read(vcpu) : 0;
-+
-+	if (size != 1 && size != 2 && size != 4 && size != 8)
-+		goto error;
-+	if (write != 0 && write != 1)
-+		goto error;
-+
-+	/* Strip the shared bit, allow MMIO with and without it set. */
-+	gpa = gpa & ~gfn_to_gpa(kvm_gfn_shared_mask(vcpu->kvm));
-+
-+	if (size > 8u || ((gpa + size - 1) ^ gpa) & PAGE_MASK)
-+		goto error;
-+
-+	slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(gpa));
-+	if (slot && !(slot->flags & KVM_MEMSLOT_INVALID))
-+		goto error;
-+
-+	if (!kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
-+		trace_kvm_fast_mmio(gpa);
-+		return 1;
-+	}
-+
-+	if (write)
-+		r = tdx_mmio_write(vcpu, gpa, size, val);
-+	else
-+		r = tdx_mmio_read(vcpu, gpa, size);
-+	if (!r) {
-+		/* Kernel completed device emulation. */
-+		tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS);
-+		return 1;
-+	}
-+
-+	/* Request the device emulation to userspace device model. */
-+	vcpu->mmio_needed = 1;
-+	vcpu->mmio_is_write = write;
-+	vcpu->arch.complete_userspace_io = tdx_complete_mmio;
-+
-+	vcpu->run->mmio.phys_addr = gpa;
-+	vcpu->run->mmio.len = size;
-+	vcpu->run->mmio.is_write = write;
-+	vcpu->run->exit_reason = KVM_EXIT_MMIO;
-+
-+	if (write) {
-+		memcpy(vcpu->run->mmio.data, &val, size);
-+	} else {
-+		vcpu->mmio_fragments[0].gpa = gpa;
-+		vcpu->mmio_fragments[0].len = size;
-+		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
-+	}
-+	return 0;
-+
-+error:
-+	tdvmcall_set_return_code(vcpu, TDVMCALL_INVALID_OPERAND);
++	if (tdx_has_emulated_msr(msr->index, true))
++		return kvm_set_msr_common(vcpu, msr);
 +	return 1;
 +}
 +
- static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
  {
- 	if (tdvmcall_exit_type(vcpu))
-@@ -1229,6 +1341,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 		return tdx_emulate_hlt(vcpu);
- 	case EXIT_REASON_IO_INSTRUCTION:
- 		return tdx_emulate_io(vcpu);
-+	case EXIT_REASON_EPT_VIOLATION:
-+		return tdx_emulate_mmio(vcpu);
- 	default:
- 		break;
- 	}
+ 	struct kvm_tdx_capabilities __user *user_caps;
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index a12e3bfc96dd..017a73ab34bb 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -165,6 +165,9 @@ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ void tdx_inject_nmi(struct kvm_vcpu *vcpu);
+ void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
+ 		u64 *info1, u64 *info2, u32 *intr_info, u32 *error_code);
++bool tdx_has_emulated_msr(u32 index, bool write);
++int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
++int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
+ 
+ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+ 
+@@ -214,6 +217,9 @@ static inline void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mo
+ static inline void tdx_inject_nmi(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason, u64 *info1,
+ 				     u64 *info2, u32 *intr_info, u32 *error_code) {}
++static inline bool tdx_has_emulated_msr(u32 index, bool write) { return false; }
++static inline int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
++static inline int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
+ 
+ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+ 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 03950368d8db..d5b18cad9dcd 100644
+index d5b18cad9dcd..0e1d3853eeb4 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -13975,6 +13975,7 @@ EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
+@@ -90,7 +90,6 @@
+ #include "trace.h"
  
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_mmio);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index e27c22449d85..bc14e1f2610c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2689,6 +2689,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
+ #define MAX_IO_MSRS 256
+-#define KVM_MAX_MCE_BANKS 32
  
- 	return NULL;
- }
-+EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
+ struct kvm_caps kvm_caps __read_mostly = {
+ 	.supported_mce_cap = MCG_CTL_P | MCG_SER_P,
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 4e40c23d66ed..c87b7a777b67 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -9,6 +9,8 @@
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
  
- bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
- {
-@@ -5992,6 +5993,7 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
- 	r = __kvm_io_bus_read(vcpu, bus, &range, val);
- 	return r < 0 ? r : 0;
- }
-+EXPORT_SYMBOL_GPL(kvm_io_bus_read);
++#define KVM_MAX_MCE_BANKS 32
++
+ bool __kvm_is_vm_type_supported(unsigned long type);
  
- int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 			    int len, struct kvm_io_device *dev)
+ struct kvm_caps {
 -- 
 2.25.1
 
