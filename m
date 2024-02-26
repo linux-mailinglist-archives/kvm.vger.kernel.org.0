@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-9798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9799-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C368670B6
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:24:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D293F8670B7
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 11:24:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 226CA28D169
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:24:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01C411C23095
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB84C5787D;
-	Mon, 26 Feb 2024 10:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BA35788B;
+	Mon, 26 Feb 2024 10:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqiaLEid"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nf/uT4p9"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023CB57326;
-	Mon, 26 Feb 2024 10:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9D357865;
+	Mon, 26 Feb 2024 10:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942059; cv=none; b=T25/41m1fp0/bKIPtQa20N0jLGuTRwUH4Ml6Jxj3zf92MoncFy+t7gCSz6JbaS0T7Ixi5VrwNysuqRIt/lEApusWoq+gJvnCJivQYwmnMPIT35DaC1s1aNOAhm2QFT5GfDTrX+P6q1mNl4SNfVIV5vKOl5kEU15ojZ1ZkMpjwLk=
+	t=1708942059; cv=none; b=JqENrL4Q+/bvo6zXdfesWjg0bO0i8azbdl4vg734CXQh7d2+ox6wMYctn4HcbOZVhf08iRfQr4/Dqe4qHxgWPjbvbQPECOCUPSnxym+T7V6eVdDdD2807yrfLhNLyEVr6Gw3+LwxVsE9IPg1RO1dMBHLge4cXiYuotQ3CgAwY84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708942059; c=relaxed/simple;
-	bh=7C5CxShIb90FIcj1HvMjXXqSaIzOIJ4A2beNQdhUrY0=;
+	bh=Alk8DkWcPcruQ5um5KDrpSCEo4m97neZZIMYfFIrE54=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PBTwqD553VVCEYxcSYAzpDBYukVgMGd1JWVI46w1YuKzx+JBl0L036o/m9tDTXVW0VLpHvr7/CsBWWibuDov5p25zzzibUFrCX/3JIYNjM5b/hykusZh8Ovor/yHsM6pFY4+q/5EcFsL/cwTzdHHTJw3aMmqatx0KldhYtAjuK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqiaLEid; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95503C43394;
-	Mon, 26 Feb 2024 10:07:38 +0000 (UTC)
+	 MIME-Version; b=YY2a4UC9fpNDBPeWAmU0Uw317BRhyuvWxsvYhyS97otdmn0Fd2S7Tne/vrN9xggO2wBrmX1+ZeZy24zREo0IzT6f8wCQ/aUyCpWc1VJfiZevS+7niu+FZuPU0Rcf5WIk+b0wA8WgeeBddVQSDrG4CVrziAPuw4tymkBT2sFSi7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nf/uT4p9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1684EC433C7;
+	Mon, 26 Feb 2024 10:07:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708942058;
-	bh=7C5CxShIb90FIcj1HvMjXXqSaIzOIJ4A2beNQdhUrY0=;
+	s=k20201202; t=1708942059;
+	bh=Alk8DkWcPcruQ5um5KDrpSCEo4m97neZZIMYfFIrE54=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZqiaLEidx8KjceyHOtxegkXaFO87KByVbiDjQcn5/DtloBuLa2L5uideS/gOojR5U
-	 4AwNBe4rr8h7BtLPQeugP4BG1JcL78jrh2wNt3gGjrocfVxNqoOgXQ9epR7QzM5ao3
-	 evFlYJNBsRVkNlxGTRF+D9GTo/+rQp34I7SDW7WozauLD9YlDMTAtIkSgFtx0UIajS
-	 vV+bn6FA6enMmbADW4o8Lk42bMEGHBAXdfPZYjbfsbFJqPLPaacxiWz047fyLt8s+m
-	 ame6vGiaQ4T6+XKRq53cLGS2mcTVMTWVtBw/rSIBxdc5TNY6AH3fV6EwfO0MyCJml8
-	 QjFrk9Fhor51A==
+	b=nf/uT4p9ryqSnx1s8LF/2/lSMt+CdFhw1PXcwaEpe1ezcf/aWMGzrxkaRPwf/HvXb
+	 Y9jh+2HmImSqKyWM1RQCTBnMkCFRLguLdKOUsCI3RSyng9t9p2N9581tlxEo2h3ltZ
+	 FYERoGSdELZGKSzV08WoDwjmh9hTRJFFbVgVPKhiIrIUFkC0m8eDfv2Hsf+Va+5WGI
+	 fRWLBD47DUveJDny8EqjTApCJeHcGEANbR5bTGAwvD6ypWxeMlicdhED6O9tx/DaOc
+	 HD6WFiHs3NEFJlIRs1VwB8vPizduPYkl+HgALYYXYGrwVFX4ph1j24IxUljgtrmyvC
+	 nhBTVe/TRcupw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1reXtY-006nQ5-J7;
-	Mon, 26 Feb 2024 10:07:36 +0000
+	id 1reXtY-006nQ5-VC;
+	Mon, 26 Feb 2024 10:07:37 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v2 08/13] KVM: arm64: nv: Handle HCR_EL2.{API,APK} independently
-Date: Mon, 26 Feb 2024 10:05:56 +0000
-Message-Id: <20240226100601.2379693-9-maz@kernel.org>
+Subject: [PATCH v2 09/13] KVM: arm64: nv: Reinject PAC exceptions caused by HCR_EL2.API==0
+Date: Mon, 26 Feb 2024 10:05:57 +0000
+Message-Id: <20240226100601.2379693-10-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240226100601.2379693-1-maz@kernel.org>
 References: <20240226100601.2379693-1-maz@kernel.org>
@@ -76,98 +76,61 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Although KVM couples API and APK for simplicity, the architecture
-makes no such requirement, and the two can be independently set or
-cleared.
+In order for a L1 hypervisor to correctly handle PAuth instructions,
+it must observe traps caused by a L1 PAuth instruction when
+HCR_EL2.API==0. Since we already handle the case for API==1 as
+a fixup, only the exception injection case needs to be handled.
 
-Check for which of the two possible reasons we have trapped here,
-and if the corresponding L1 control bit isn't set, delegate the
-handling for forwarding.
-
-Otherwise, set this exact bit in HCR_EL2 and resume the guest.
-Of course, in the non-NV case, we keep setting both bits and
-be done with it. Note that the entry core already saves/restores
-the keys should any of the two control bits be set.
-
-This results in a bit of rework, and the removal of the (trivial)
-vcpu_ptrauth_enable() helper.
+Rework the kvm_handle_ptrauth() callback to reinject the trap
+in this case. Note that APK==0 is already handled by the exising
+triage_sysreg_trap() helper.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h    |  5 ----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 32 +++++++++++++++++++++----
- 2 files changed, 27 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/handle_exit.c | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index debc3753d2ef..d2177bc77844 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -125,11 +125,6 @@ static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
- 	vcpu->arch.hcr_el2 |= HCR_TWI;
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 6a88ec024e2f..1ba2f788b2c3 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -214,12 +214,34 @@ static int handle_sve(struct kvm_vcpu *vcpu)
  }
  
--static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
--{
--	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
--}
--
- static inline void vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
+ /*
+- * Guest usage of a ptrauth instruction (which the guest EL1 did not turn into
+- * a NOP). If we get here, it is that we didn't fixup ptrauth on exit, and all
+- * that we can do is give the guest an UNDEF.
++ * Two possibilities to handle a trapping ptrauth instruction:
++ *
++ * - Guest usage of a ptrauth instruction (which the guest EL1 did not
++ *   turn into a NOP). If we get here, it is that we didn't fixup
++ *   ptrauth on exit, and all that we can do is give the guest an
++ *   UNDEF (as the guest isn't supposed to use ptrauth without being
++ *   told it could).
++ *
++ * - Running an L2 NV guest while L1 has left HCR_EL2.API==0, and for
++ *   which we reinject the exception into L1. API==1 is handled as a
++ *   fixup so the only way to get here is when API==0.
++ *
++ * Anything else is an emulation bug (hence the WARN_ON + UNDEF).
+  */
+ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
  {
- 	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index f5f701f309a9..a0908d7a8f56 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -480,11 +480,35 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	struct kvm_cpu_context *ctxt;
--	u64 val;
-+	u64 enable = 0;
- 
- 	if (!vcpu_has_ptrauth(vcpu))
- 		return false;
- 
-+	/*
-+	 * NV requires us to handle API and APK independently, just in
-+	 * case the hypervisor is totally nuts. Please barf >here<.
-+	 */
-+	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-+		switch (ESR_ELx_EC(kvm_vcpu_get_esr(vcpu))) {
-+		case ESR_ELx_EC_PAC:
-+			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_API))
-+				return false;
-+
-+			enable |= HCR_API;
-+			break;
-+
-+		case ESR_ELx_EC_SYS64:
-+			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_APK))
-+				return false;
-+
-+			enable |= HCR_APK;
-+			break;
-+		}
-+	} else {
-+		enable = HCR_API | HCR_APK;
++	if (!vcpu_has_ptrauth(vcpu)) {
++		kvm_inject_undefined(vcpu);
++		return 1;
 +	}
 +
- 	ctxt = this_cpu_ptr(&kvm_hyp_ctxt);
- 	__ptrauth_save_key(ctxt, APIA);
- 	__ptrauth_save_key(ctxt, APIB);
-@@ -492,11 +516,9 @@ static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	__ptrauth_save_key(ctxt, APDB);
- 	__ptrauth_save_key(ctxt, APGA);
- 
--	vcpu_ptrauth_enable(vcpu);
- 
--	val = read_sysreg(hcr_el2);
--	val |= (HCR_API | HCR_APK);
--	write_sysreg(val, hcr_el2);
-+	vcpu->arch.hcr_el2 |= enable;
-+	sysreg_clear_set(hcr_el2, 0, enable);
- 
- 	return true;
++	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
++		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++		return 1;
++	}
++
++	/* Really shouldn't be here! */
++	WARN_ON_ONCE(1);
+ 	kvm_inject_undefined(vcpu);
+ 	return 1;
  }
 -- 
 2.39.2
