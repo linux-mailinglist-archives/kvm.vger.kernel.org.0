@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-9744-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9747-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7331866DA9
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:08:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A58A866DAE
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 10:08:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 038921C234B0
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:08:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD5D11C236CE
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D34812F36C;
-	Mon, 26 Feb 2024 08:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F31112FB05;
+	Mon, 26 Feb 2024 08:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UIza5fJt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hSLTQWfo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (unknown [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328C712D75C;
-	Mon, 26 Feb 2024 08:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E591912EBC9;
+	Mon, 26 Feb 2024 08:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936157; cv=none; b=HAYSw9L3xvvtn7J/Ty0JyqmgPGDUs0VxPc4x7hsypVZqFEFI2m02hY/83WXW/X/lin6f9oBUFPTBa/Rthgj3URsZHGlXwiYs7Pwjra4MFOFOaCmxknruNHvREg55I17S62241UJwOBKSZn3VhaGspJceTo7PwOlwoUtDjr9temc=
+	t=1708936159; cv=none; b=SwR0F63Ihq7Yh44armnywC0qpynOCi1xgAM+BSEtSpgCuxw9hBWoew+VeOezOzPydgmJjXXEgo24tlcGGhr+NgshlL6FwPrJHCw7ynI0QH+AKy/Pu1r37p97TfiqPTb7jr4x3pokuIh5GcdPyTW/nEDl/k5vjC7KGNvgDGJ9MGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936157; c=relaxed/simple;
-	bh=0yh1shLe8hwMZzN1bzwtQ5WkdmEz/o+wucegI0YBDwc=;
+	s=arc-20240116; t=1708936159; c=relaxed/simple;
+	bh=m7n7i1eS4On2R241lFqJmq0+vkwcQBjfN5ADiMO6W+o=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HfExOVqAdJY5zDQPlZgVoCZMekCNM1rTmMMu2H0oZmTC+ySJan8ZIH2r0OQFzOZd0z/wpJ966RlmXYSzlxW37iaX+gIVbLqpa/YsN4w1llo7BAuHXgZdVkrsJ+1oXccyy60+rmoggVp4oZ3gr0ctWVQEuOraywVAhkjccQB3B/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UIza5fJt; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=JiuN+Fyf2t/OP9h62xhwW7pBUy55Akea2xDSp/VJfZDF66hxaA1Mf7IqIp9DKhQgC6MsNj8Zn1A3NgWzHdNMDaQKJMTd7Q7hzqj8B7qJ9R83v1UT32rxX+zFvYlLwumxuafbPuDJbS8FGIY2XxQWtOOi62uPP1rdD9lAEEzD7Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hSLTQWfo; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708936155; x=1740472155;
+  t=1708936157; x=1740472157;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0yh1shLe8hwMZzN1bzwtQ5WkdmEz/o+wucegI0YBDwc=;
-  b=UIza5fJtF+MSSSNWEh+XJEcn10Yx+Unzbgm57cTWtbhiQQe/fmj4Q6r0
-   IFPYOpRu9f+t1l+SIY5TmM4FdgNH8DTBCuLEU+0Sfr2VgrNqBt7wuNDwy
-   REo/m09TP3ydaojs3gvZu+M6vQhAmHA9FZEObN4AYwf9MLLbbMqgVQ1qi
-   lmTq6eyYJAg0oDvBSizYNEzo62MXw7XMuiiV2Kh5AZhEnBQTJ9HzWdb9q
-   BC7OeSGs980gUoIxyKheOiyXETtW/J5VOfoQS7DdwW7d6+b/DxfIpLccD
-   2d3cj0NqHypbx6shOuEuCp4yDCQzVTJFnuZ9QIGhVfgko2aqlNORMrIHp
+  bh=m7n7i1eS4On2R241lFqJmq0+vkwcQBjfN5ADiMO6W+o=;
+  b=hSLTQWfojQc90/ad0OUazIBxZqbpipGJT4vsEsZ3pmh5yvyf3Twyb8aN
+   XC0kXtFBlrNdQgt0HUKxt/88To1/5Os85T3O8EhAZLbTbyTzGk7entFAC
+   OgVbu1Cxk0QYcvRLMma6OYBFiLstzpVYAOibZU8m1gQTDYQp0575mUkIL
+   CpZc9plHOR2oFxLWRwbsfXfrQX96rw+vrylrYqFLDEmL8nzK3svAdj9Yq
+   Q4/v5ZY0TPjlWlGcx+Zmn0WvwxlRmN6ASZZ4PwDmdsclI1sgUEYiWMxEM
+   IhrKkzpnLNYoJlC2cNmaSsZVm6zzunUtoOSONzm7EcUCfj+yIjXCjJTRE
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="20751391"
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="20751396"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="20751391"
+   d="scan'208";a="20751396"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:10 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6735123"
+   d="scan'208";a="6735128"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:29:10 -0800
 From: isaku.yamahata@intel.com
@@ -67,9 +67,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v19 121/130] KVM: TDX: Add methods to ignore VMX preemption timer
-Date: Mon, 26 Feb 2024 00:27:03 -0800
-Message-Id: <30cd8696d4c6ab2e909b9ded93049ab217c713f8.1708933498.git.isaku.yamahata@intel.com>
+Subject: [PATCH v19 122/130] KVM: TDX: Add methods to ignore accesses to TSC
+Date: Mon, 26 Feb 2024 00:27:04 -0800
+Message-Id: <59ff42a2dd3769de6127fde30c9b2b355a1a4c17.1708933498.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933498.git.isaku.yamahata@intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
@@ -83,57 +83,76 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX doesn't support VMX preemption timer.  Implement access methods for VMM
-to ignore VMX preemption timer.
+TDX protects TDX guest TSC state from VMM.  Implement access methods to
+ignore guest TSC.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/main.c | 44 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 991bfdecaed2..ec5c0fda92e9 100644
+index ec5c0fda92e9..9fcd71999bba 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -842,6 +842,27 @@ static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
- 	vmx_update_cpu_dirty_logging(vcpu);
+@@ -834,6 +834,42 @@ static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ 	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
  }
  
-+#ifdef CONFIG_X86_64
-+static int vt_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
-+			      bool *expired)
++static u64 vt_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
 +{
-+	/* VMX-preemption timer isn't available for TDX. */
-+	if (is_td_vcpu(vcpu))
-+		return -EINVAL;
++	/* TDX doesn't support L2 guest at the moment. */
++	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
++		return 0;
 +
-+	return vmx_set_hv_timer(vcpu, guest_deadline_tsc, expired);
++	return vmx_get_l2_tsc_offset(vcpu);
 +}
 +
-+static void vt_cancel_hv_timer(struct kvm_vcpu *vcpu)
++static u64 vt_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
 +{
-+	/* VMX-preemption timer can't be set.  See vt_set_hv_timer(). */
++	/* TDX doesn't support L2 guest at the moment. */
 +	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
++		return 0;
++
++	return vmx_get_l2_tsc_multiplier(vcpu);
++}
++
++static void vt_write_tsc_offset(struct kvm_vcpu *vcpu)
++{
++	/* In TDX, tsc offset can't be changed. */
++	if (is_td_vcpu(vcpu))
 +		return;
 +
-+	vmx_cancel_hv_timer(vcpu);
++	vmx_write_tsc_offset(vcpu);
 +}
-+#endif
 +
- static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
++static void vt_write_tsc_multiplier(struct kvm_vcpu *vcpu)
++{
++	/* In TDX, tsc multiplier can't be changed. */
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_write_tsc_multiplier(vcpu);
++}
++
+ static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
  {
- 	if (!is_td(kvm))
-@@ -1024,8 +1045,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.pi_start_assignment = vmx_pi_start_assignment,
+ 	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
+@@ -1022,10 +1058,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
  
- #ifdef CONFIG_X86_64
--	.set_hv_timer = vmx_set_hv_timer,
--	.cancel_hv_timer = vmx_cancel_hv_timer,
-+	.set_hv_timer = vt_set_hv_timer,
-+	.cancel_hv_timer = vt_cancel_hv_timer,
- #endif
+ 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
  
- 	.setup_mce = vmx_setup_mce,
+-	.get_l2_tsc_offset = vmx_get_l2_tsc_offset,
+-	.get_l2_tsc_multiplier = vmx_get_l2_tsc_multiplier,
+-	.write_tsc_offset = vmx_write_tsc_offset,
+-	.write_tsc_multiplier = vmx_write_tsc_multiplier,
++	.get_l2_tsc_offset = vt_get_l2_tsc_offset,
++	.get_l2_tsc_multiplier = vt_get_l2_tsc_multiplier,
++	.write_tsc_offset = vt_write_tsc_offset,
++	.write_tsc_multiplier = vt_write_tsc_multiplier,
+ 
+ 	.load_mmu_pgd = vt_load_mmu_pgd,
+ 
 -- 
 2.25.1
 
