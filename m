@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-9640-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9641-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E228D866C55
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:33:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C944A866C59
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 09:33:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FA2A1C21D0D
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:33:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695B81F221A5
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 08:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B638C535C8;
-	Mon, 26 Feb 2024 08:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF3753E01;
+	Mon, 26 Feb 2024 08:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hffJbi5x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aj5qsrUs"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB6E50A68;
-	Mon, 26 Feb 2024 08:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7010951C4C;
+	Mon, 26 Feb 2024 08:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936069; cv=none; b=mqaolWkBKHTkWGBS+VHTcwPlXd+AckwWLGYaMSq7GynlsmAzwthbQkyeQ8zMoheXfNdBycCNoq6hhAy3YNS+NDSghzNXFqKpBBI4gwEEbVJyQSUCQXDmOQ3g6YE04EWdc4kkfR2BXoR5MRuEcb5/Fr3au1CxQl9ETk3yZOexXr4=
+	t=1708936070; cv=none; b=WYQTY+BDKmL9DtW3m6Ui+zw9b0+77douwVH3Bwc97w4YarW0/ke7fOf0MWFwFtdMJP+LvqzVM1XvbNQuOd2x7h3DeiEp4o5pqRvtvv1Jx88SRnV0QGeSMNDK6fTx9PGH1Zc/WjivMTkllaEFuSMsOOT2vO45GiRdMjTNosuKHg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936069; c=relaxed/simple;
-	bh=GqHoLR8nZGd0nBBjdIPWykKQiMpqYqCouXVMjthiwa8=;
+	s=arc-20240116; t=1708936070; c=relaxed/simple;
+	bh=o8YPZiq6LeeZQGwQQQuIE5wqxkP0AxPJNMylilPEjus=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JFePOq7ChUDEcekOi3iewSjsOsB5n3RBaGvhXt/N1z2ECwFvAS0SAQ8qKbqaCmrpOn3cjE6O1zPClBJ5xCpk4MGD1/yz0FHDsE72+oGGgv5gCX+LRUeGuoEpTHQGy992blD8dv5vDkiic5S/ZecaMYgDg43iFXuZD+8wWA8INOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hffJbi5x; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=POK9SGWXNt5Pwsg8gV1AZkU3XtTILmPlmFpI5BibedFfnK1JgWj7qyIDW9FAyMC9JjODoEGmUe+cF0zj+ajF5vJNGbtzMzWM1wzv7OrNxyCaFTgAfFLpuLVSqwRv574d0gCiPNaLHUASTiaUGniGbXPwwczEw3+ju6hsnOrMilk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aj5qsrUs; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,22 +36,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1708936068; x=1740472068;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GqHoLR8nZGd0nBBjdIPWykKQiMpqYqCouXVMjthiwa8=;
-  b=hffJbi5x2K/2siNEXQ1FVjo2ysr0bPi9K2Df481tpULsmHv/EWg0J7S6
-   tuRzhg0Eo8pz2mc5ql5oAA+cBb5fYGVbnNH9gTINHMM/Ze/DYURmmC9vT
-   /LtPuP/HhaNLfORLkycSUunGQDFGpaM60hQNTccnGaCPT8zPgyCoDbn7I
-   j2pZqcgAx3eatwrrPrMNTVcIuodzzOgBVG50Z1ZGzter9ZuOpCKjs3NjR
-   mR2v33sblytVbMxOmvc1WsW5jY20vMS36sHnDxWTkLdU2LVN16I8Cas9G
-   WsyakamYJ1yPI3XqY+tzT33WhsIwRarQYj/POhsZpubc2286ZiXc4vD8j
+  bh=o8YPZiq6LeeZQGwQQQuIE5wqxkP0AxPJNMylilPEjus=;
+  b=aj5qsrUsb0uB8pdy59w+SY8cx0gRe8kKqrf8ZYPVrwbz9hnCAOmktJmO
+   kTXuh3VyIqc1hgpzb5sDU+hAtP9mDnWEoS21FYufyDUPq6bcjHOtYONl3
+   +QQFzsm/1KWbp/HOMtQ+pw03csWPVaFzC1K/+VFdho9uz5KzmzYdchFi1
+   QjS3i8FKtjYafwk86Rk44pHbvVk6SIeQuOVYsG6f6nLnQCJwsItL5XuUq
+   4XUVnRSGWuJhL46IFluOpZQAQIT12Exjg/KHVmDmtpYslZboM1c8tBFJJ
+   mn1MpLOQX3+gMUclX71+AKnrIItX5lpK9hNJtacZUUQ6Nm12yUZ4PQ7Ge
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="28631493"
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="28631497"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="28631493"
+   d="scan'208";a="28631497"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
   by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:27:43 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6474345"
+   d="scan'208";a="6474348"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 00:27:43 -0800
 From: isaku.yamahata@intel.com
@@ -66,11 +66,10 @@ Cc: isaku.yamahata@intel.com,
 	Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
-	tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v19 016/130] KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
-Date: Mon, 26 Feb 2024 00:25:18 -0800
-Message-Id: <b2b7eeb1bab4cbf5421bf18647357a59b472dabe.1708933498.git.isaku.yamahata@intel.com>
+	tina.zhang@intel.com
+Subject: [PATCH v19 017/130] KVM: x86: Implement kvm_arch_{, pre_}vcpu_memory_mapping()
+Date: Mon, 26 Feb 2024 00:25:19 -0800
+Message-Id: <b61447f906e77f64bd1ddc5389408b901ac20046.1708933498.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1708933498.git.isaku.yamahata@intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
@@ -82,114 +81,63 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Introduce a helper to directly (pun intended) fault-in a TDP page
-without having to go through the full page fault path.  This allows
-TDX to get the resulting pfn and also allows the RET_PF_* enums to
-stay in mmu.c where they belong.
+Wire KVM_MEMORY_MAPPING ioctl to kvm_mmu_map_tdp_page() to populate
+guest memory.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
 v19:
-- Move up for KVM_MEMORY_MAPPING.
-- Add goal_level for the caller to know how many pages are mapped.
-
-v14 -> v15:
-- Remove loop in kvm_mmu_map_tdp_page() and return error code based on
-  RET_FP_xxx value to avoid potential infinite loop.  The caller should
-  loop on -EAGAIN instead now.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+- newly added
 ---
- arch/x86/kvm/mmu.h     |  3 +++
- arch/x86/kvm/mmu/mmu.c | 58 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 61 insertions(+)
+ arch/x86/kvm/x86.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 60f21bb4c27b..d96c93a25b3b 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -183,6 +183,9 @@ static inline void kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
- 	__kvm_mmu_refresh_passthrough_bits(vcpu, mmu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 48a61d283406..03dab4266172 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4663,6 +4663,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+ 	case KVM_CAP_IRQFD_RESAMPLE:
+ 	case KVM_CAP_MEMORY_FAULT_INFO:
++	case KVM_CAP_MEMORY_MAPPING:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+@@ -5801,6 +5802,31 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ 	}
  }
  
-+int kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
-+			 u8 max_level, u8 *goal_level);
-+
- /*
-  * Check if a given access (described through the I/D, W/R and U/S bits of a
-  * page fault error code pfec) causes a permission fault with the given PTE
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 61674d6b17aa..ca0c91f14063 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4615,6 +4615,64 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	return direct_page_fault(vcpu, fault);
- }
- 
-+int kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
-+			 u8 max_level, u8 *goal_level)
++void kvm_arch_vcpu_pre_memory_mapping(struct kvm_vcpu *vcpu)
 +{
++	kvm_mmu_reload(vcpu);
++}
++
++int kvm_arch_vcpu_memory_mapping(struct kvm_vcpu *vcpu,
++				 struct kvm_memory_mapping *mapping)
++{
++	u8 max_level = KVM_MAX_HUGEPAGE_LEVEL;
++	u64 error_code = PFERR_WRITE_MASK;
++	u8 goal_level = PG_LEVEL_4K;
 +	int r;
-+	struct kvm_page_fault fault = (struct kvm_page_fault) {
-+		.addr = gpa,
-+		.error_code = error_code,
-+		.exec = error_code & PFERR_FETCH_MASK,
-+		.write = error_code & PFERR_WRITE_MASK,
-+		.present = error_code & PFERR_PRESENT_MASK,
-+		.rsvd = error_code & PFERR_RSVD_MASK,
-+		.user = error_code & PFERR_USER_MASK,
-+		.prefetch = false,
-+		.is_tdp = true,
-+		.is_private = error_code & PFERR_GUEST_ENC_MASK,
-+		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(vcpu->kvm),
-+	};
 +
-+	WARN_ON_ONCE(!vcpu->arch.mmu->root_role.direct);
-+	fault.slot = kvm_vcpu_gfn_to_memslot(vcpu, fault.gfn);
-+
-+	r = mmu_topup_memory_caches(vcpu, false);
++	r = kvm_mmu_map_tdp_page(vcpu, gfn_to_gpa(mapping->base_gfn), error_code,
++				 max_level, &goal_level);
 +	if (r)
 +		return r;
 +
-+	fault.max_level = max_level;
-+	fault.req_level = PG_LEVEL_4K;
-+	fault.goal_level = PG_LEVEL_4K;
-+
-+#ifdef CONFIG_X86_64
-+	if (tdp_mmu_enabled)
-+		r = kvm_tdp_mmu_page_fault(vcpu, &fault);
-+	else
-+#endif
-+		r = direct_page_fault(vcpu, &fault);
-+
-+	if (is_error_noslot_pfn(fault.pfn) || vcpu->kvm->vm_bugged)
-+		return -EFAULT;
-+
-+	switch (r) {
-+	case RET_PF_RETRY:
-+		return -EAGAIN;
-+
-+	case RET_PF_FIXED:
-+	case RET_PF_SPURIOUS:
-+		if (goal_level)
-+			*goal_level = fault.goal_level;
-+		return 0;
-+
-+	case RET_PF_CONTINUE:
-+	case RET_PF_EMULATE:
-+	case RET_PF_INVALID:
-+	default:
-+		return -EIO;
-+	}
++	if (mapping->source)
++		mapping->source += KVM_HPAGE_SIZE(goal_level);
++	mapping->base_gfn += KVM_PAGES_PER_HPAGE(goal_level);
++	mapping->nr_pages -= KVM_PAGES_PER_HPAGE(goal_level);
++	return r;
 +}
-+EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
 +
- static void nonpaging_init_context(struct kvm_mmu *context)
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg)
  {
- 	context->page_fault = nonpaging_page_fault;
 -- 
 2.25.1
 
