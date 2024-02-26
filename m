@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-9987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 095938680D4
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:21:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B42618680DF
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 20:22:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67EB21F23865
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:21:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F1321F257DE
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 19:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383DF12F5A0;
-	Mon, 26 Feb 2024 19:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2F1130AC0;
+	Mon, 26 Feb 2024 19:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i/rGofxx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XDXGrffo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BEE12DDAB;
-	Mon, 26 Feb 2024 19:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A53612F586;
+	Mon, 26 Feb 2024 19:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708975301; cv=none; b=ct4uIiPheXS8KGgKSMKX2IyQbBPDnUPE9gC/ZALzfEk8t7OzuFdkpNwtiinY86itYTnFoNkaMOlpV/PcgJPj1eLB99QAsdBmNFwYfKPR121yg5cjfWEs3zYgsQwX0U+Hpgnua+hGfX6rxQ9vmH/JlBfa/ICu1Hs9IoQW7n1LYsY=
+	t=1708975353; cv=none; b=EzMuPpklCaCGp0ouEc7TT8ZxBi7N1NzDxL9e0GCiKE3hpk1OBBSNLm/m9HqEia8MFnJ4Va19I7BSQeuvPrUyYoRJ+XmTXy2B8oZaV3PcBdh1uSh1nmqOSIX8gOD34/s4rjB5ml03NBcPFvY00z9m7KzyU25Cvh8rLBnqpJw7XNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708975301; c=relaxed/simple;
-	bh=BhwZDP9hYJk+cNxTWcvUP6DCeBXECSJ839dFR9fsm+0=;
+	s=arc-20240116; t=1708975353; c=relaxed/simple;
+	bh=FqFNb4x/x8qbqyzr7+3dDomy9topMozI5OvKyn3dnFg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UzxshBbMM0hq51+KA84EWMx0JADYz/+OGTgFjnvRbi2UyGiQ2fQAdFJ+fK6egkTXT3Buiw+0zSYrP02FhPXb0BB/q1E+8ap+Eg7DYUnfnnBH/n0K+7q829ZJLcTjtAgDxISo+f2QnE/WSG1jsQP+BrIkqi1N1Cp/A/MPyu4EHXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i/rGofxx; arc=none smtp.client-ip=198.175.65.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=As7R28CjDofQouy3yn7Sukdg1hf4oVmeYNnTJ3NrZl/7w+I71MHUGt4klqyapNWiOwVvOcWOST55a93IkeHIEindjaLkSgxHug5bRkuwFXGnmve0DV3fCOJTL/UDM6htVteu3IlzNFNDx6F/rdTS8fDg40a0H2LyC5h9WbfRGqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XDXGrffo; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708975301; x=1740511301;
+  t=1708975352; x=1740511352;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=BhwZDP9hYJk+cNxTWcvUP6DCeBXECSJ839dFR9fsm+0=;
-  b=i/rGofxxyW+jvY6VwQ0y6CB7GqSvxPRHSMZVWACITy0axE9FT49LDAJo
-   D1pDibMZgSKDu/xLqcgB0X5V73B/9okNyWLXjlP5D0vh7fWzSQfw0f/8a
-   iXG462b/nloL7zMJ6k6RyT6dgUsVQBfF1IcYA8U0V78NqdnOiyN3LXw+U
-   KQW8i5xIh5kCL+6qs7h/QuOuIo4Xcru5/3RdJQ6wl3RULAvjMMIFOx8Wq
-   qnfE+xW4agRlp7aL0qGII/ncP/mrtYTfkpfKIUc1Dc/an8/L9Gh3BSZJf
-   D0XgX0iwU5aOXpynrGqmLUvbkqzGJEvAk2iVpE/hlRekwo++Rq16kTRDN
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="25752823"
+  bh=FqFNb4x/x8qbqyzr7+3dDomy9topMozI5OvKyn3dnFg=;
+  b=XDXGrffox5NmD0a0frbMlImf5lOCLusfq2JscRxcZp8jJdmitUFJQxFK
+   YGnVWjcEWkT8CUlWpdQV0krCHdjYFeBXjV9pFz/HA0+IpHN5Pk+KtjGkL
+   aoW5Aztyvusm/qNkrRIC/aeG+fMlga8sASRRLAvZN8HaAMyquDoeOhKc8
+   XnUCpLMBMvJ8p5e1VfADKfUwfYUQKwAEQE4FICU40nS5ivtvgQlyVcQMP
+   wjn7wmolyJevW2BSGwAY+IklAtyS5ssnjXB1ke0gLEIHDpGj/b9hPTQup
+   nmCxzxGhwTLd3rB8P0wObTsjKfWxW+sI0bhwmdOA2dCx05XsIkgbO5adz
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="14723327"
 X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="25752823"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:21:39 -0800
+   d="scan'208";a="14723327"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:22:31 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="11448181"
+   d="scan'208";a="6715471"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:21:38 -0800
-Date: Mon, 26 Feb 2024 11:21:37 -0800
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 11:22:28 -0800
+Date: Mon, 26 Feb 2024 11:22:24 -0800
 From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
 To: Binbin Wu <binbin.wu@linux.intel.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
@@ -64,11 +64,12 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v18 060/121] KVM: TDX: TDP MMU TDX support
-Message-ID: <20240226192137.GP177224@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v18 061/121] KVM: TDX: MTRR: implement get_mt_mask() for
+ TDX
+Message-ID: <20240226192224.GQ177224@ls.amr.corp.intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <a47c5a9442130f45fc09c1d4ae0e4352054be636.1705965635.git.isaku.yamahata@intel.com>
- <9da45a6a-a40b-4768-90d0-d7de674baec1@linux.intel.com>
+ <83048a3bba898a4a81215f3c62489b03e307d180.1705965635.git.isaku.yamahata@intel.com>
+ <b676c8f7-fa3c-44f7-bfbf-0f28d46a7576@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,62 +78,32 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <9da45a6a-a40b-4768-90d0-d7de674baec1@linux.intel.com>
+In-Reply-To: <b676c8f7-fa3c-44f7-bfbf-0f28d46a7576@linux.intel.com>
 
-On Tue, Jan 30, 2024 at 11:31:22PM +0800,
+On Mon, Feb 19, 2024 at 01:20:58PM +0800,
 Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-> > +
-> > +/*
-> > + * TLB shoot down procedure:
-> > + * There is a global epoch counter and each vcpu has local epoch counter.
-> > + * - TDH.MEM.RANGE.BLOCK(TDR. level, range) on one vcpu
-> > + *   This blocks the subsequenct creation of TLB translation on that range.
-> > + *   This corresponds to clear the present bit(all RXW) in EPT entry
-> > + * - TDH.MEM.TRACK(TDR): advances the epoch counter which is global.
-> > + * - IPI to remote vcpus
-> > + * - TDExit and re-entry with TDH.VP.ENTER on remote vcpus
-> > + * - On re-entry, TDX module compares the local epoch counter with the global
-> > + *   epoch counter.  If the local epoch counter is older than the global epoch
-> > + *   counter, update the local epoch counter and flushes TLB.
-> > + */
-> > +static void tdx_track(struct kvm *kvm)
-> > +{
-> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> > +	u64 err;
-> > +
-> > +	KVM_BUG_ON(!is_hkid_assigned(kvm_tdx), kvm);
-> > +	/* If TD isn't finalized, it's before any vcpu running. */
-> > +	if (unlikely(!is_td_finalized(kvm_tdx)))
-> > +		return;
-> > +
-> > +	/*
-> > +	 * tdx_flush_tlb() waits for this function to issue TDH.MEM.TRACK() by
-> > +	 * the counter.  The counter is used instead of bool because multiple
-> > +	 * TDH_MEM_TRACK() can be issued concurrently by multiple vcpus.
-> > +	 */
-> > +	atomic_inc(&kvm_tdx->tdh_mem_track);
-> > +	/*
-> > +	 * KVM_REQ_TLB_FLUSH waits for the empty IPI handler, ack_flush(), with
-> > +	 * KVM_REQUEST_WAIT.
-> > +	 */
-> > +	kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH);
-> > +
-> > +	do {
-> > +		/*
-> > +		 * kvm_flush_remote_tlbs() doesn't allow to return error and
-> > +		 * retry.
-> > +		 */
-> > +		err = tdh_mem_track(kvm_tdx->tdr_pa);
-> > +	} while (unlikely((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY));
 > 
-> Why the sequence of the code is different from the description of the
-> function.
-> In the description, do the TDH.MEM.TRACK before IPIs.
-> But in the code, do TDH.MEM.TRACK after IPIs?
+> 
+> On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > Because TDX virtualize cpuid[0x1].EDX[MTRR: bit 12] to fixed 1, guest TD
+> > thinks MTRR is supported.  Although TDX supports only WB for private GPA,
+> > it's desirable to support MTRR for shared GPA.  As guest access to MTRR
+> > MSRs causes #VE and KVM/x86 tracks the values of MTRR MSRs, the remining
+> 
+> s/remining/remaining
+> 
+> > part is to implement get_mt_mask method for TDX for shared GPA.
+> > 
+> > Pass around shared bit from kvm fault handler to get_mt_mask method so that
+> > it can determine if the gfn is shared or private.  Implement get_mt_mask()
+> > following vmx case for shared GPA and return WB for private GPA.
+> 
+> But the shared bit is not consumed in get_mt_mask()?
 
-It's intentional to handle IPI in parallel as we already introduced
-tdh_mem_track.
+This paragraph became stale. I eliminated this paragraph.
 -- 
 Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
