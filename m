@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-9908-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9909-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AA77867919
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:53:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E2C86791A
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 15:54:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D545B1F239A0
-	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:53:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 757D71F26FFA
+	for <lists+kvm@lfdr.de>; Mon, 26 Feb 2024 14:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA2813B2B3;
-	Mon, 26 Feb 2024 14:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B408212D766;
+	Mon, 26 Feb 2024 14:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aKsId2Gs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iLckvUP1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806A213B29C;
-	Mon, 26 Feb 2024 14:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B51313B2BE;
+	Mon, 26 Feb 2024 14:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958227; cv=none; b=WhW7qYrt152b87Uhm6bH9eq1ohdSXmiQpv4/m8Umw4XvBidlSj+LMSKxnT3kofmEhmLcwEG5+nhDzp0uVj13aPhHwmSy52AzU3lrzZP7YYT+KciFSScoBcOi3OuHesQylMZbdmKL3Q4QqhFvr7GaL86oStuX7+Kt7sc9g5SLPVs=
+	t=1708958230; cv=none; b=GepthXsp7w27LghAs+v9/AErriKw+FhZsHuoZ1fAUEHciWF1R9jYmzgRhKDgCoHYij4R/2vaBgd7HXyXt/JS4JCOW/xmBiHNxk9y4WHBFIn0wg/fwlpgxJv3agccA7c+dIruK4wl6Pdtd7ELzhkaZYzVU9Bctr+LkyfJuYhDJM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958227; c=relaxed/simple;
-	bh=8YaAHnt0AiEYAzbERIaHQQ44YFwc8NdXJM54PxTApI0=;
+	s=arc-20240116; t=1708958230; c=relaxed/simple;
+	bh=oFLpUu2MeS6BRZ/Jxq6k+lA8YlZJnhVOkKcRl5d5Fow=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F724fmq7JWRFYvExTxOq6duP80Ue7zwK6VcKoF6CQcJzB8AD1949nEqV0bz/9R92p+TQu61KIXLAXi7V2GLCa5zRFI07hK/nBGUuxO0fRBb5mBECrXIWwiM7cKet9bAkc0c1KyRKK0hyxGNSSV6oxF9CkcBAVurkLYtg/jIxYRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aKsId2Gs; arc=none smtp.client-ip=209.85.210.172
+	 MIME-Version; b=GV+ylua7fheFl3uRfLZcrDXnNr0XnBg4iqiT/1iKtcLwlWSCX2swWux7PfmjYg2hQ4Lyz9cfAn9wItS79Zm+btr+RUjHndks7tUeGFUxrnyeMLlriBS+o65CqV7BOXxHoSZ8dNU04c0qzQ2+qg7r42sJtVWi0tlgqgNy65vuHyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iLckvUP1; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e54451edc6so10405b3a.1;
-        Mon, 26 Feb 2024 06:37:05 -0800 (PST)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1db6e0996ceso23695275ad.2;
+        Mon, 26 Feb 2024 06:37:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708958224; x=1709563024; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708958227; x=1709563027; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h+dxYsygiG51aGauEBa8dsdGiX2H9H8gIcL8GbhB21k=;
-        b=aKsId2Gsr9e8pFkRotuG6bpVriIyAbkkoniIDKGk6P4tdW925U1noPGghJJPvezqC6
-         PzWw8c6PbMfx+hIcLeDnMUFt/LyV2VZJyYze3wf4cADsTIpQyCztQeGzNPC41yUBKgz3
-         N3cmOU0bynH6Ns6TGWmrfvcDug0kQXXKBHrqkFO+9XAwwRABo7p16zDfagk3+hDRayX9
-         23ICBkMU6ZWu7o/Eeah6v7o5rOYg6lqGnpEKcrXZIdC0z9+V0zkT5yOHcWX3Mma8S4nM
-         TZU3Oc1mKMI+mpI2ZkbAPs+zTE2QriQSsorkRD6Xs7vuNysCXGFTW/D8rzdRHbNVEu5k
-         mJ4g==
+        bh=aUYgIc9I0TbzhgfqqzmtJ/r7wde5wI9PGH/CYLTDvPE=;
+        b=iLckvUP15BVLyuUhvdIyi+ZB/uypMJv+NuNqi9LjlgpBsXZJB+vTCb/h2+7KLZ/8/S
+         XJHCDX3O1UtfIuoyn6uPQCMluaVjLnL3SkiqEj+07ATztrV2JID6l6nphZ5fvzKP/jdk
+         tGt8vrZeNjaAweKJjcOEjWUXIaEHhucykgiAi7Fs51uGU98jcCeNQ4/AWNOyAfyXgbex
+         dwYBBsWsJcVXl8kKtKnWkiRR0xL8d1/0qBbt48KRMbLmDCBgvWC7FCaSRRMjlmfDlQ61
+         2upN6PqvRPUW4I93K6lIqvheZMzMbkFVqQSchM8oPWAsu5di6K99VfcOMLpMrTK3biSw
+         JTJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708958224; x=1709563024;
+        d=1e100.net; s=20230601; t=1708958227; x=1709563027;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h+dxYsygiG51aGauEBa8dsdGiX2H9H8gIcL8GbhB21k=;
-        b=ltoAzF2DVB4cq8GT/VPoTfIATdGKasPboATewXvrwsgtuDeyGajc7KH0z9/R/cZfpT
-         LcT3Ck/G/fxRcXO0me/7mbzY8/vUHdrmQqrRrzf36C5PqtZeOFICE9vJ7C1qQK9aEOLI
-         N02EVckT5li6dApDm+wxoFFvWapMOmeRvI8ICoEeeeQXOd+fUPgonamewK4IfBw8M9dV
-         6cWp/ICZl4i6ugUPgqu8Q6KTYJ8sbOBjteBi2W5s2jCPZZI5r2bVhFhF+KbNg5CxRt36
-         9rrX2iW/NeLLBcIP+BMa681F4A0P5g8J2kSQS0xd53aw1VssToh3zcSL5zlUbPgWss9u
-         kHXg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJZRkTkIT+/t3ADKXd1f73WGwAFQDw47gbMulUwP5KvU3BTUzwtIl0fHVHu4oa2cjd/uIswvv7wbLlBNT9LocszM0Z
-X-Gm-Message-State: AOJu0YyiNl4cCHDQxk8v3sx+QN0ELD5EWMYqpEw0xLw3xzfxwFw6rgrH
-	aSFjFwDV7eMJVkZtpB5AJAm27Y32uoi1McrX83Onzs71Fa1KV//PCtNcZSHt
-X-Google-Smtp-Source: AGHT+IF4OCEZJFmMPMviijl3yGOrjNcy7E8v6oBWvvHaH9EDSCrEI/ACp3ji29GenWVxL6k1nUVRJg==
-X-Received: by 2002:a05:6a20:438f:b0:1a0:f096:5022 with SMTP id i15-20020a056a20438f00b001a0f0965022mr8595562pzl.46.1708958224431;
-        Mon, 26 Feb 2024 06:37:04 -0800 (PST)
-Received: from localhost ([47.89.225.180])
-        by smtp.gmail.com with ESMTPSA id p11-20020a170902eacb00b001d706e373a9sm4001330pld.292.2024.02.26.06.37.03
+        bh=aUYgIc9I0TbzhgfqqzmtJ/r7wde5wI9PGH/CYLTDvPE=;
+        b=fPg2fPWROG4TKCsMV7ZYijn+2rYKvg4+Hzpx2555qL0tMHChqimWbhumwhZWumqrKB
+         C0l1OJXKlPZjMwWwnC9rQZ4Fx5NVM2ErkFgWg0aPaiFW28Q7iwukB00EZOQFPTVqTgZ/
+         uIWU9zOShK/U/mXthXVuLRiCDps+ErnSlMcHwmJmiHjBOj7rEetg+yh81TIUe6Z0TAwU
+         iXSkDeYto/SYKXxCq+Df1y/xzvTLFeyqCzTmY0vV33yJDwQDG72DXcvJodYqDNKWyAmC
+         X1Hojv1qh/AwoEP0BJIXeNcQZZ4blVFGjGcDwpcoxq0WIyGHlBO07yHhE6jt5VjFDrO8
+         kP0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXATpXRsbkHv5jwinxVDbyuXtU0JXvwuWrp2BYRny3NEd8OZ5IrNwmKw4FtDvuNVGMG7SZ7pdBPuNADrTPXyACx8j3F
+X-Gm-Message-State: AOJu0YzDSVgwMTJckG/haZamQ2hsWW+vXijmQJaU1fKIE0KeX+Qb1oH0
+	2F1mA724CFrW8WX7pDVxkuAZkVV3TFnugYmQSKC2joGcPkx6GN1G1D59jM0S
+X-Google-Smtp-Source: AGHT+IFJaJHhws5Iu1WFFipNsAdqIIPIxk4VjyF0aTOqhtII3ndXXVxgujlU2qF2jxijoIMCL/nFaw==
+X-Received: by 2002:a17:903:2343:b0:1db:d256:9327 with SMTP id c3-20020a170903234300b001dbd2569327mr8634686plh.19.1708958227515;
+        Mon, 26 Feb 2024 06:37:07 -0800 (PST)
+Received: from localhost ([47.254.32.37])
+        by smtp.gmail.com with ESMTPSA id li6-20020a170903294600b001dc94fde843sm2603712plb.177.2024.02.26.06.37.06
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Feb 2024 06:37:04 -0800 (PST)
+        Mon, 26 Feb 2024 06:37:07 -0800 (PST)
 From: Lai Jiangshan <jiangshanlai@gmail.com>
 To: linux-kernel@vger.kernel.org
-Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-	Hou Wenlong <houwenlong.hwl@antgroup.com>,
+Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>,
+	Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Sean Christopherson <seanjc@google.com>,
@@ -84,9 +84,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Juergen Gross <jgross@suse.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH 45/73] KVM: x86/PVM: Add dummy PMU related callbacks
-Date: Mon, 26 Feb 2024 22:36:02 +0800
-Message-Id: <20240226143630.33643-46-jiangshanlai@gmail.com>
+Subject: [RFC PATCH 46/73] KVM: x86/PVM: Support for CPUID faulting
+Date: Mon, 26 Feb 2024 22:36:03 +0800
+Message-Id: <20240226143630.33643-47-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20240226143630.33643-1-jiangshanlai@gmail.com>
 References: <20240226143630.33643-1-jiangshanlai@gmail.com>
@@ -98,116 +98,135 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+From: Hou Wenlong <houwenlong.hwl@antgroup.com>
 
-Currently, PMU virtualization is not implemented, so dummy PMU related
-callbacks are added to make PVM work. In the future, the existing code
-in pmu_intel.c and pmu_amd.c will be reused to implement PMU
-virtualization for PVM.
+For PVM, CPUID faulting relies on hardware, so the guest could access
+the host CPUID information if CPUID faulting is not enabled. To enable
+the guest to access its own CPUID information, introduce a module
+parameter to force enable CPUID faulting for the guest.
 
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/pvm/pvm.c | 72 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ arch/x86/kvm/pvm/pvm.c | 69 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
 diff --git a/arch/x86/kvm/pvm/pvm.c b/arch/x86/kvm/pvm/pvm.c
-index f2cd1a1c199d..e6464095d40b 100644
+index e6464095d40b..fd3d6f7301af 100644
 --- a/arch/x86/kvm/pvm/pvm.c
 +++ b/arch/x86/kvm/pvm/pvm.c
-@@ -21,6 +21,7 @@
- #include "cpuid.h"
- #include "lapic.h"
- #include "mmu.h"
-+#include "pmu.h"
- #include "trace.h"
- #include "x86.h"
- #include "pvm.h"
-@@ -2701,6 +2702,76 @@ static void hardware_unsetup(void)
- {
+@@ -29,6 +29,9 @@
+ MODULE_AUTHOR("AntGroup");
+ MODULE_LICENSE("GPL");
+ 
++static bool __read_mostly enable_cpuid_intercept = 0;
++module_param_named(cpuid_intercept, enable_cpuid_intercept, bool, 0444);
++
+ static bool __read_mostly is_intel;
+ 
+ static unsigned long host_idt_base;
+@@ -168,6 +171,53 @@ static bool pvm_disallowed_va(struct kvm_vcpu *vcpu, u64 va)
+ 	return !pvm_guest_allowed_va(vcpu, va);
  }
  
-+//====== start of dummy pmu ===========
-+//TODO: split kvm-pmu-intel.ko & kvm-pmu-amd.ko from kvm-intel.ko & kvm-amd.ko.
-+static bool dummy_pmu_hw_event_available(struct kvm_pmc *pmc)
++static void __set_cpuid_faulting(bool on)
 +{
-+	return true;
++	u64 msrval;
++
++	rdmsrl_safe(MSR_MISC_FEATURES_ENABLES, &msrval);
++	msrval &= ~MSR_MISC_FEATURES_ENABLES_CPUID_FAULT;
++	msrval |= (on << MSR_MISC_FEATURES_ENABLES_CPUID_FAULT_BIT);
++	wrmsrl(MSR_MISC_FEATURES_ENABLES, msrval);
 +}
 +
-+static struct kvm_pmc *dummy_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
++static void reset_cpuid_intercept(struct kvm_vcpu *vcpu)
 +{
-+	return NULL;
++	if (test_thread_flag(TIF_NOCPUID))
++		return;
++
++	if (enable_cpuid_intercept || cpuid_fault_enabled(vcpu))
++		__set_cpuid_faulting(false);
 +}
 +
-+static struct kvm_pmc *dummy_pmu_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
-+						  unsigned int idx, u64 *mask)
++static void set_cpuid_intercept(struct kvm_vcpu *vcpu)
 +{
-+	return NULL;
++	if (test_thread_flag(TIF_NOCPUID))
++		return;
++
++	if (enable_cpuid_intercept || cpuid_fault_enabled(vcpu))
++		__set_cpuid_faulting(true);
 +}
 +
-+static bool dummy_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
++static void pvm_update_guest_cpuid_faulting(struct kvm_vcpu *vcpu, u64 data)
 +{
-+	return false;
++	bool guest_enabled = cpuid_fault_enabled(vcpu);
++	bool set_enabled = data & MSR_MISC_FEATURES_ENABLES_CPUID_FAULT;
++	struct vcpu_pvm *pvm = to_pvm(vcpu);
++
++	if (!(guest_enabled ^ set_enabled))
++		return;
++	if (enable_cpuid_intercept)
++		return;
++	if (test_thread_flag(TIF_NOCPUID))
++		return;
++
++	preempt_disable();
++	if (pvm->loaded_cpu_state)
++		__set_cpuid_faulting(set_enabled);
++	preempt_enable();
 +}
 +
-+static struct kvm_pmc *dummy_pmu_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
-+{
-+	return NULL;
-+}
-+
-+static bool dummy_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
-+{
-+	return 0;
-+}
-+
-+static int dummy_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-+{
-+	return 1;
-+}
-+
-+static int dummy_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-+{
-+	return 1;
-+}
-+
-+static void dummy_pmu_refresh(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-+static void dummy_pmu_init(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-+static void dummy_pmu_reset(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-+struct kvm_pmu_ops dummy_pmu_ops = {
-+	.hw_event_available = dummy_pmu_hw_event_available,
-+	.pmc_idx_to_pmc = dummy_pmc_idx_to_pmc,
-+	.rdpmc_ecx_to_pmc = dummy_pmu_rdpmc_ecx_to_pmc,
-+	.msr_idx_to_pmc = dummy_pmu_msr_idx_to_pmc,
-+	.is_valid_rdpmc_ecx = dummy_pmu_is_valid_rdpmc_ecx,
-+	.is_valid_msr = dummy_pmu_is_valid_msr,
-+	.get_msr = dummy_pmu_get_msr,
-+	.set_msr = dummy_pmu_set_msr,
-+	.refresh = dummy_pmu_refresh,
-+	.init = dummy_pmu_init,
-+	.reset = dummy_pmu_reset,
-+};
-+//========== end of dummy pmu =============
-+
- struct kvm_x86_nested_ops pvm_nested_ops = {};
+ // switch_to_smod() and switch_to_umod() switch the mode (smod/umod) and
+ // the CR3.  No vTLB flushing when switching the CR3 per PVM Spec.
+ static inline void switch_to_smod(struct kvm_vcpu *vcpu)
+@@ -335,6 +385,8 @@ static void pvm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
  
- static struct kvm_x86_ops pvm_x86_ops __initdata = {
-@@ -2811,6 +2882,7 @@ static struct kvm_x86_init_ops pvm_init_ops __initdata = {
- 	.hardware_setup = hardware_setup,
+ 	segments_save_host_and_switch_to_guest(pvm);
  
- 	.runtime_ops = &pvm_x86_ops,
-+	.pmu_ops = &dummy_pmu_ops,
- };
++	set_cpuid_intercept(vcpu);
++
+ 	kvm_set_user_return_msr(0, (u64)entry_SYSCALL_64_switcher, -1ull);
+ 	kvm_set_user_return_msr(1, pvm->msr_tsc_aux, -1ull);
+ 	if (ia32_enabled()) {
+@@ -352,6 +404,8 @@ static void pvm_prepare_switch_to_host(struct vcpu_pvm *pvm)
  
- static void pvm_exit(void)
+ 	++pvm->vcpu.stat.host_state_reload;
+ 
++	reset_cpuid_intercept(&pvm->vcpu);
++
+ #ifdef CONFIG_MODIFY_LDT_SYSCALL
+ 	if (unlikely(current->mm->context.ldt))
+ 		kvm_load_ldt(GDT_ENTRY_LDT*8);
+@@ -937,6 +991,17 @@ static int pvm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_DEBUGCTLMSR:
+ 		/* It is ignored now. */
+ 		break;
++	case MSR_MISC_FEATURES_ENABLES:
++		ret = kvm_set_msr_common(vcpu, msr_info);
++		if (!ret)
++			pvm_update_guest_cpuid_faulting(vcpu, data);
++		break;
++	case MSR_PLATFORM_INFO:
++		if ((data & MSR_PLATFORM_INFO_CPUID_FAULT) &&
++		     !boot_cpu_has(X86_FEATURE_CPUID_FAULT))
++			return 1;
++		ret = kvm_set_msr_common(vcpu, msr_info);
++		break;
+ 	case MSR_PVM_VCPU_STRUCT:
+ 		if (!PAGE_ALIGNED(data))
+ 			return 1;
+@@ -2925,6 +2990,10 @@ static int __init hardware_cap_check(void)
+ 		pr_warn("CMPXCHG16B is required for guest.\n");
+ 		return -EOPNOTSUPP;
+ 	}
++	if (!boot_cpu_has(X86_FEATURE_CPUID_FAULT) && enable_cpuid_intercept) {
++		pr_warn("Host doesn't support cpuid faulting.\n");
++		return -EOPNOTSUPP;
++	}
+ 
+ 	return 0;
+ }
 -- 
 2.19.1.6.gb485710b
 
