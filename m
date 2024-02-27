@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-10120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE6B86A012
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 20:22:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74B2386A08D
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 20:53:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA9F11C28F75
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 19:22:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2777BB31550
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 19:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31B91487E2;
-	Tue, 27 Feb 2024 19:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2776713AA27;
+	Tue, 27 Feb 2024 19:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cLy3zRtg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Tax/0tEk"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3C61487DC
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 19:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900CB51C33
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 19:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709061696; cv=none; b=eIvvges4mLbececQLGDPoOv8UfdeyWSf/b/ylinxc+S26GUT5wbIGum5RLQhOhLEXEfC2egFFZGblVGumTfRkY5cyiijV8XGlt+kttOFsuHQEHD8opPmoPTO/AkVwZsqWeMTuauUr25FeO60ui4ms7BykW9+JeCz7Sjrr8D7dms=
+	t=1709061701; cv=none; b=nKCauwqKhOM+o9mtKR2j7Z0dry8dybHsSTJ2Gh49452HpXPniCbH58eyH074qukWqY+Xb8nVEfhZUwz3BdjEw7Gj0rzPzcOytCZEMQQlm5joOi3g7xmjVP4nmK3xqy2Eu38tdnU+2Tv0IaJg2bxyYGs8/DVEEy6FmU+Apt7oriM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709061696; c=relaxed/simple;
-	bh=BoBz/S/wtgNn0b2w3x5Xyyoegeq7eW2pC44M0/GD4LM=;
+	s=arc-20240116; t=1709061701; c=relaxed/simple;
+	bh=DY31vysK7cGz6Q2P/b3MdEQHR+Sh51exbDF6lXeYq3o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=LF3an2dC2sFZfH5HUoO+roFBXd3BnOliam5DFoDYm0ejkhsFkFFE2pvyIgGRg2etsBW6FMkzI7eGyVbKmishY0jzz3H7NB7DO/7PwpniwMd/uIOZ8sAdC7Frsb0Xxv1Ac9TMHuvh2Z3FgB7zeb8b9P24T5ZxGEZX0/WGh4HkOIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cLy3zRtg; arc=none smtp.client-ip=95.215.58.172
+	 MIME-Version:Content-type; b=VfYtN2KW9wRPzKlfCmqO2BK7dEN3m0wIAXWsw6VRAkuRSS0mFkMHfpmwQ06sBeNaw5BxWf4a+PkzrOjvNWTfcVAO2Ezxwt2eIrrHnzw0/cFiwEuKM2AaBhL8o8oq/6Q/0eTG5pvBnyjFLrDSvX0DZe409+WQ/nBjZGdeTaMGTME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Tax/0tEk; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709061692;
+	t=1709061698;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ulzjyiK3ZcBO8GfguKNO7JW+HXX1i+VA6rmcrThM2TI=;
-	b=cLy3zRtgI3njJbUroUMxK6mb79iKZZXETKp9d4+r99Fo4WlcgJndPwNiIMiiY0eo6FdsPi
-	KFvOLD9zPVIDP36kcQQyThwSUSu2FL0aAY6EGRoUJnW3ftyeNGNHsxugvr6a2gkKT1Oyac
-	zPC+YgYDJxzwoUndA2ND3iaz07zV3Ac=
+	bh=6q8qa7mmXpxaf2/inv83q75exjACEJX7PdelrGH+xj4=;
+	b=Tax/0tEkxqkywUFYUkJb5yT11wQH62k2qmGai1OJ6wAkDRGg1LORAoAFRMJncbwnBJ8pjX
+	Nwmt/wWCKDnqUAvh0VjRUJSZFvKcQRkbzixwQeZZDjSrxDJ90yMspsx8/q9krgQQo8cJ3i
+	J+U8AJrvmzyEBNHdoNPX67m4bFz+HRQ=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -51,9 +51,9 @@ Cc: alexandru.elisei@arm.com,
 	shahuang@redhat.com,
 	pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 05/18] arm64: efi: Remove redundant dtb generation
-Date: Tue, 27 Feb 2024 20:21:15 +0100
-Message-ID: <20240227192109.487402-25-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 06/18] arm64: efi: Move run code into a function
+Date: Tue, 27 Feb 2024 20:21:16 +0100
+Message-ID: <20240227192109.487402-26-andrew.jones@linux.dev>
 In-Reply-To: <20240227192109.487402-20-andrew.jones@linux.dev>
 References: <20240227192109.487402-20-andrew.jones@linux.dev>
 Precedence: bulk
@@ -66,82 +66,85 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-When a line in bash is written as
+Push the run code in arm/efi/run into a function named
+uefi_shell_run() since it will create an EFI file system, copy
+the test and possibly the DTB there, and create a startup.nsh
+which executes the test from the UEFI shell. Pushing this
+code into a function allows additional execution paths to be
+created in the script. Also rename EFI_RUN to UEFI_SHELL_RUN
+to pass the information on to arm/run that it's being called
+from uefi_shell_run().
 
- $(some-line)
-
-Then 'some-line' will be evaluated and then whatever some-line outputs
-will be evaluated. The dtb is getting generated twice since the line
-that should generate it is within $() and the output of that is the
-command itself (since arm/run outputs its command), so the command
-gets executed again. Remove the $() to just execute dtb generation
-once.
-
-While mucking with arm/efi/run tidy it a bit by by removing the unused
-sourcing of common.bash and the unnecessary 'set -e' (we check for and
-propagate errors ourselves). Finally, make one reorganization change
-and some whitespace fixes.
-
-Fixes: 2607d2d6946a ("arm64: Add an efi/run script")
-Fixes: 2e080dafec2a ("arm64: Use the provided fdt when booting through EFI")
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- arm/efi/run | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ arm/efi/run | 33 +++++++++++++++++++--------------
+ arm/run     |  4 ++--
+ 2 files changed, 21 insertions(+), 16 deletions(-)
 
 diff --git a/arm/efi/run b/arm/efi/run
-index 8b6512520026..e45cecfa3265 100755
+index e45cecfa3265..494ba9e7efe7 100755
 --- a/arm/efi/run
 +++ b/arm/efi/run
-@@ -1,7 +1,5 @@
- #!/bin/bash
- 
--set -e
--
- if [ $# -eq 0 ]; then
- 	echo "Usage $0 TEST_CASE [QEMU_ARGS]"
- 	exit 2
-@@ -13,7 +11,6 @@ if [ ! -f config.mak ]; then
- fi
- source config.mak
- source scripts/arch-run.bash
--source scripts/common.bash
- 
- if [ -f /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ]; then
- 	DEFAULT_UEFI=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd
-@@ -27,6 +24,7 @@ fi
- : "${EFI_CASE:=$(basename $1 .efi)}"
- : "${EFI_TESTNAME:=$TESTNAME}"
- : "${EFI_TESTNAME:=$EFI_CASE}"
-+: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
- : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
- 
- [ "$EFI_USE_ACPI" = "y" ] || EFI_USE_DTB=y
-@@ -65,20 +63,18 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
+@@ -63,18 +63,23 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
  	exit
  fi
  
--: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
- mkdir -p "$EFI_CASE_DIR"
--
- cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
- echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
- if [ "$EFI_USE_DTB" = "y" ]; then
- 	qemu_args+=(-machine acpi=off)
- 	FDT_BASENAME="dtb"
--	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}")
-+	EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}"
- 	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
- fi
- echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
+-mkdir -p "$EFI_CASE_DIR"
+-cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
+-echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
+-if [ "$EFI_USE_DTB" = "y" ]; then
+-	qemu_args+=(-machine acpi=off)
+-	FDT_BASENAME="dtb"
+-	EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}"
+-	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
+-fi
+-echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
++uefi_shell_run()
++{
++	mkdir -p "$EFI_CASE_DIR"
++	cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
++	echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
++	if [ "$EFI_USE_DTB" = "y" ]; then
++		qemu_args+=(-machine acpi=off)
++		FDT_BASENAME="dtb"
++		UEFI_SHELL_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}"
++		echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
++	fi
++	echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
++
++	UEFI_SHELL_RUN=y $TEST_DIR/run \
++		-bios "$EFI_UEFI" \
++		-drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
++		"${qemu_args[@]}"
++}
  
- EFI_RUN=y $TEST_DIR/run \
--       -bios "$EFI_UEFI" \
--       -drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
--       "${qemu_args[@]}"
-+	-bios "$EFI_UEFI" \
-+	-drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
-+	"${qemu_args[@]}"
+-EFI_RUN=y $TEST_DIR/run \
+-	-bios "$EFI_UEFI" \
+-	-drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+-	"${qemu_args[@]}"
++uefi_shell_run
+diff --git a/arm/run b/arm/run
+index ac64b3b461a2..40c2ca66ba7e 100755
+--- a/arm/run
++++ b/arm/run
+@@ -60,7 +60,7 @@ if ! $qemu $M -chardev '?' | grep -q testdev; then
+ 	exit 2
+ fi
+ 
+-if [ "$EFI_RUN" != "y" ]; then
++if [ "$UEFI_SHELL_RUN" != "y" ]; then
+ 	chr_testdev='-device virtio-serial-device'
+ 	chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
+ fi
+@@ -75,7 +75,7 @@ command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+ command+=" -display none -serial stdio"
+ command="$(migration_cmd) $(timeout_cmd) $command"
+ 
+-if [ "$EFI_RUN" = "y" ]; then
++if [ "$UEFI_SHELL_RUN" = "y" ]; then
+ 	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
+ else
+ 	run_qemu $command -kernel "$@"
 -- 
 2.43.0
 
