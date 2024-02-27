@@ -1,196 +1,119 @@
-Return-Path: <kvm+bounces-10042-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10043-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D999C868CAD
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:51:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF33E868CB4
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:52:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0953C1C2109B
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 09:51:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C75E1C21090
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 09:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB05A137C3F;
-	Tue, 27 Feb 2024 09:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f2WS0+7n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 545DF137C32;
+	Tue, 27 Feb 2024 09:52:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A263613698B
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 09:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14997BAE7;
+	Tue, 27 Feb 2024 09:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709027478; cv=none; b=Nk40MdWagsebgSGg+m4hKVaMh+U5Mn7GYFq6A8ZbpRsLEt0NG4wrRByPETU5r7HZDZNpErksgvd+KJ91G/7Kugrs0zzJ94/PuWY+S6llZLnbTrMoClBaKFWXKiX/wk0HD2w+TWQt6tSbGPIg+lcqlfuJzHX2cIIOw2FFI7EpTSo=
+	t=1709027535; cv=none; b=b+D9Rh6yVoMuweKenvFuULByrZ5mjhsB1qUWq91lGjSp0evC91vlMTtOUJMXiny++6syQqeVb3B+b3fJV8MdkzDEBHxpaNdYMct7FJizumEfK9J0Gm8VD10wKZLSJ5TtDRS+/sQ73q96KMKVHEVSbW9LfP6B1yVr/oNwDv00y1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709027478; c=relaxed/simple;
-	bh=zqNzZxK5kJTKvJ+QklHiadEBpHT0kyIhtbdJ39re5U4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EmETLXN/073DR9/+6ciK+DX966ZZ29QeD8VZ/uTa4ApiQoSi0q7ijyK3vWbJvjuyYHa1imQ9ogH4junguzXnXZPrVD/HBApybKq2849PxvgOJ4ZUWg21V1jyGU1V9n9u0jD8Rfj+qYeCCSk3pfFMin7qy29A5khfhT2az6cL9tA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f2WS0+7n; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709027476; x=1740563476;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=zqNzZxK5kJTKvJ+QklHiadEBpHT0kyIhtbdJ39re5U4=;
-  b=f2WS0+7nT0lKC5LxZIN5+uIeJcCt88oyK5i5/rbc2mk8Rs7fGK9VCjEH
-   QoyBmsgT6DmmKmFzG0ShYxNOKFVgd/FZQBWOMKXn7K9WsW58lNrCzKigN
-   p7wf9aXVy2H1vyRwIGMWMW/mSCTR14xXNLT5FpO33jk/Ts+kXZfxiwqSI
-   63qVZNt8Bf0lmjycAGmR12QLvKoADP4Kqa9GuejO0i3NZo734lX/kIWgp
-   X4KP35CWQHkGaMlIYwAjn6/kWMlF0JgwjNL3JrLD7B1YIX4uhTgjjcUgD
-   OYdJf3cUwziUaKT8v7zUsSLlVY23n/J18O2EkSzJfOj/CRYrgL+21l7mW
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="3218523"
-X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
-   d="scan'208";a="3218523"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 01:51:15 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
-   d="scan'208";a="7192358"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.125.243.127]) ([10.125.243.127])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 01:51:07 -0800
-Message-ID: <1d7f7c1b-cfaa-4de6-80a0-8d1104440f54@intel.com>
-Date: Tue, 27 Feb 2024 17:51:05 +0800
+	s=arc-20240116; t=1709027535; c=relaxed/simple;
+	bh=Cqn5IP45YhhILCijJAtbO8jWBeRWihbMdcIirdKca3Y=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=mq0bKWtEGutt3mxh566diGaVL9hq0f85KMVNTImoJJ9uaAG5+urcHTBrYdsX0WA8a+Ho2BSmHN+xje6gm2KnbvZIw0yIvik1GuQoF7VfCao7ACjbBMSQ8Y2VIsHCqYmpXmtbvB8qITLsKBl+23qJs5z8XrB0WL7SixyPZkaz3b8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8CxLOvKsN1lgeYRAA--.35251S3;
+	Tue, 27 Feb 2024 17:52:10 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfRPJsN1l2LZHAA--.26685S3;
+	Tue, 27 Feb 2024 17:52:10 +0800 (CST)
+Subject: Re: [PATCH v5 3/6] LoongArch: KVM: Add cpucfg area for kvm hypervisor
+To: Xi Ruoyao <xry111@xry111.site>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org
+References: <20240222032803.2177856-1-maobibo@loongson.cn>
+ <20240222032803.2177856-4-maobibo@loongson.cn>
+ <CAAhV-H5eqXMqTYVb6cAVqOsDNcEDeP9HzaMKw69KFQeVaAYEdA@mail.gmail.com>
+ <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
+ <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
+ <06647e4a-0027-9c9f-f3bd-cd525d37b6d8@loongson.cn>
+ <85781278-f3e9-4755-8715-3b9ff714fb20@app.fastmail.com>
+ <0d428e30-07a8-5a91-a20c-c2469adbf613@loongson.cn>
+ <09c5af9b-cc79-4cf2-84f7-276bb188754a@app.fastmail.com>
+ <fc05cf09-bf53-158a-3cc9-eff6f06a220a@loongson.cn>
+ <f1ba53fd2a99949187ca392c6d4488d3d5aeaf88.camel@xry111.site>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <e04a527b-2d9d-cfcd-e6ed-e8bd390649dd@loongson.cn>
+Date: Tue, 27 Feb 2024 17:52:33 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 53/66] i386/tdx: Wire TDX_REPORT_FATAL_ERROR with
- GuestPanic facility
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
- <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P=2EBerrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Michael Roth <michael.roth@amd.com>, Sean Christopherson
- <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
- <20240125032328.2522472-54-xiaoyao.li@intel.com>
- <87v86kehts.fsf@pond.sub.org>
+In-Reply-To: <f1ba53fd2a99949187ca392c6d4488d3d5aeaf88.camel@xry111.site>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <87v86kehts.fsf@pond.sub.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxfRPJsN1l2LZHAA--.26685S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7XrW7tryxtw4kAF48uF4kGrX_yoWfAwbE9r
+	47tr9xAw1qyr4xG3y2y3y7CFW3Ga1DCFyqv3yxGas3W345JFyUWF1xuF1fA3WIqa4UZrn3
+	CF1qq3yaqa4avosvyTuYvTs0mTUanT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbqkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
+	6r1DMcIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+	1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxG
+	rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j7BMNUUU
+	UU=
 
-On 2/19/2024 8:53 PM, Markus Armbruster wrote:
-> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+
+
+On 2024/2/27 下午5:05, Xi Ruoyao wrote:
+> On Tue, 2024-02-27 at 15:09 +0800, maobibo wrote:
 > 
->> Integrate TDX's TDX_REPORT_FATAL_ERROR into QEMU GuestPanic facility
->>
->> Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->> Changes in v4:
->> - refine the documentation; (Markus)
->>
->> Changes in v3:
->> - Add docmentation of new type and struct; (Daniel)
->> - refine the error message handling; (Daniel)
->> ---
->>   qapi/run-state.json   | 28 ++++++++++++++++++++--
->>   system/runstate.c     | 54 +++++++++++++++++++++++++++++++++++++++++++
->>   target/i386/kvm/tdx.c | 24 ++++++++++++++++++-
->>   3 files changed, 103 insertions(+), 3 deletions(-)
->>
->> diff --git a/qapi/run-state.json b/qapi/run-state.json
->> index 08bc99cb8561..5429116679e3 100644
->> --- a/qapi/run-state.json
->> +++ b/qapi/run-state.json
->> @@ -485,10 +485,12 @@
->>   #
->>   # @s390: s390 guest panic information type (Since: 2.12)
->>   #
->> +# @tdx: tdx guest panic information type (Since: 8.2)
->> +#
->>   # Since: 2.9
->>   ##
->>   { 'enum': 'GuestPanicInformationType',
->> -  'data': [ 'hyper-v', 's390' ] }
->> +  'data': [ 'hyper-v', 's390', 'tdx' ] }
->>   
->>   ##
->>   # @GuestPanicInformation:
->> @@ -503,7 +505,8 @@
->>    'base': {'type': 'GuestPanicInformationType'},
->>    'discriminator': 'type',
->>    'data': {'hyper-v': 'GuestPanicInformationHyperV',
->> -          's390': 'GuestPanicInformationS390'}}
->> +          's390': 'GuestPanicInformationS390',
->> +          'tdx' : 'GuestPanicInformationTdx'}}
->>   
->>   ##
->>   # @GuestPanicInformationHyperV:
->> @@ -566,6 +569,27 @@
->>             'psw-addr': 'uint64',
->>             'reason': 'S390CrashReason'}}
->>   
->> +##
->> +# @GuestPanicInformationTdx:
->> +#
->> +# TDX Guest panic information specific to TDX GCHI
->> +# TDG.VP.VMCALL<ReportFatalError>.
->> +#
->> +# @error-code: TD-specific error code
+>> It is difficult to find an area unused by HW for CSR method since the
+>> small CSR ID range.
 > 
-> Where could a user find information on these error codes?
+> We may use IOCSR instead.  In kernel/cpu-probe.c there are already some
+> IOCSR reads.
 
-TDX GHCI (Guset-host-communication-Interface)spec. It defines all the 
-TDVMCALL leaves.
+yes, IOCSR can be used and one IOCSR area will be reserved for software. 
+In general CSR/CPUCFG is to describe CPU features and IOCSR is to 
+describe board/device features.
 
-0: panic;
-0x1 - 0xffffffff: reserved.
+CSR area is limited to 16K, it is difficult for HW guys to reserve 
+special area for software usage. IOCSR/CPUCFG is possible however.
 
->> +#
->> +# @gpa: guest-physical address of a page that contains additional
->> +#     error data, in forms of zero-terminated string.
+Regards
+Bibo Mao
 > 
-> "in the form of a zero-terminated string"
-
-fixed.
-
->> +#
->> +# @message: Human-readable error message provided by the guest. Not
->> +#     to be trusted.
+>> It is difficult to find an area unused by HW for CSR method since the
+>> small CSR ID range. However it is easy for cpucfg. Here I doubt whether
+>> you really know about LoongArch LVZ.
 > 
-> How is this message related to the one pointed to by @gpa?
-
-In general, @message contains a brief message of the error. While @gpa 
-(when valid) contains a verbose message.
-
-The reason why we need both is because sometime when TD guest hits a 
-fatal error, its memory may get corrupted so we cannot pass information 
-via @gpa. Information in @message is passed through GPRs.
-
->> +#
->> +# Since: 9.0
->> +##
->> +{'struct': 'GuestPanicInformationTdx',
->> + 'data': {'error-code': 'uint64',
->> +          'gpa': 'uint64',
->> +          'message': 'str'}}
->> +
->>   ##
->>   # @MEMORY_FAILURE:
->>   #
-> 
-> [...]
+> It's unfair to accuse the others for not knowing about LVZ considering
+> the lack of public documentation.
 > 
 
 
