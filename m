@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-10124-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10125-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 720C186A016
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 20:22:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D437686A05A
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 20:39:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D7562911A5
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 19:22:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B595B31BD7
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 19:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48799149E0B;
-	Tue, 27 Feb 2024 19:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF171487D1;
+	Tue, 27 Feb 2024 19:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WvwK7E47"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ocF1YLtd"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00C3149E04
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 19:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB1451C4C
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 19:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709061711; cv=none; b=Sx4UxFZkSxLZVRCy5nT2JWv4/etfwQuW2Ir4Pki3gLRL+0xuCD1qvJp7d/RHQoSlQIU47/ub4FRekdP6BVCqOdcpkJHA70DmhMWYm74cMbQGkmz/HTCNXswUZy1HfVdRDO+RHz1HhGHT65WDg3DDFU83i/QMRT8EKB1Odiks7/Q=
+	t=1709061717; cv=none; b=etX1wsK/ZyftSr0GBu1kpyYzogGgdD8ugsVx52K4YoEIXG8u8gIPMp+Q1dgXF+y0e0PN9JX19cp7+r8/c/Cs5O3QRgsQ8Hn0aa7sTqDYZkyAze04et5zqFYsr8gELrQglPbjhOJxj3Yk1k/2bv5wPCNn4JirvtRS/Oh3siutRpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709061711; c=relaxed/simple;
-	bh=xin4Ma602BK3JDlW/sBwEZSrxoI+t+Q1OLYq70BO+co=;
+	s=arc-20240116; t=1709061717; c=relaxed/simple;
+	bh=+87A1CLuPYmWQv1oUGPFcYv3qb+kFj+nzjulbjt00DI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=KhNF9Zj4FHBDRD25K/390YZZ9x8xHD5jA3e7dnlRx8izK/9LDvUBscwvV57I4NmjnNjKoG8wnJqcxV4xiNsDMvvRNpLB86a0X7xW3pAap0oo5QjH5w8g8XO5/zsSnfh2yGi75P3dvXsKIv2DWpEXVLGpvCi8oearUb99J95Qo6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WvwK7E47; arc=none smtp.client-ip=95.215.58.172
+	 MIME-Version:Content-type; b=GJsKoFQYD1ABdU6FLqIfg69kbws5sA9ezHOSRLfp2UvAMV0U1VhAgDUbOrWOjvEHR1SijgRaAEEpDWMTCHQETd1ndb0Jk1RNpUDkKRDF8Mrkt5lGIjKpvgVyERLMmBmpfd7EizFYh0frLs1nnfc9FfAPscUe+IrcxQGgXIPoERs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ocF1YLtd; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709061707;
+	t=1709061713;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JqRuCfOS78D2tqOlNEUkzy1K+Rijz3OoIyyC33mXe98=;
-	b=WvwK7E47nHtFqpWc3Gvfs3PfeTJD+m1haY+Dt7ISSyxHrUyUDLJb5ljTMqc102DY1K8pHB
-	MGPC9tIqlRIoRyfc0q4X1bz9zR77aac1d20WXk7che09ABpqCf3Ly6D6RTZeqgDZED2SWV
-	x6glOvoW9GH3tcUmdmrAIyg3rNjbb2s=
+	bh=kYIGX75dQSVnqZLE7dR9AMY2g18MgSVcQmfFU0atTE4=;
+	b=ocF1YLtdHZW7DoF7gYiErUsRABFl0/HntJy6vnKdt6/q5cYM+/zTE4421DL3qzyejFWcPV
+	D8NoZi8KQuD7iIjhzEPKsuTfV/BfvPWtELJXjiPAsB8CfSYu7Uty6DrbIunU4bLZJFVCas
+	zcCH2DIPXsupYsoPlUQvl+1aPzeD0QA=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -51,9 +51,9 @@ Cc: alexandru.elisei@arm.com,
 	shahuang@redhat.com,
 	pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 09/18] lib/efi: Add support for loading the initrd
-Date: Tue, 27 Feb 2024 20:21:19 +0100
-Message-ID: <20240227192109.487402-29-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 10/18] arm64: efi: Allow running tests directly
+Date: Tue, 27 Feb 2024 20:21:20 +0100
+Message-ID: <20240227192109.487402-30-andrew.jones@linux.dev>
 In-Reply-To: <20240227192109.487402-20-andrew.jones@linux.dev>
 References: <20240227192109.487402-20-andrew.jones@linux.dev>
 Precedence: bulk
@@ -66,171 +66,135 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-When loading non-efi tests with QEMU's '-kernel' option we also load
-an environ with the '-initrd' option. Now that efi tests can also be
-loaded with the '-kernel' option also provide the '-initrd' environ.
-For EFI, we use the EFI_LOAD_FILE2_PROTOCOL_GUID protocol to load
-LINUX_EFI_INITRD_MEDIA_GUID. Each architecture which wants to use the
-initrd for the environ will need to call setup_env() on the initrd
-data. As usual, the new efi function is heavily influenced by Linux's
-implementation.
+Since it's possible to run tests with UEFI and the QEMU -kernel
+option (and now the DTB will be found and even the environ will
+be set up from an initrd if given with the -initrd option), then
+we can skip the loading of EFI tests into a file system and booting
+to the shell to run them. Just run them directly. Running directly
+is waaaaaay faster than booting the shell first. We keep the UEFI
+shell as the default behavior, though, and provide a new configure
+option to enable the direct running.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/efi.c       | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
- lib/linux/efi.h | 27 ++++++++++++++++++++
- 2 files changed, 92 insertions(+)
+ arm/efi/run | 17 +++++++++++++++--
+ arm/run     |  4 +++-
+ configure   | 17 +++++++++++++++++
+ 3 files changed, 35 insertions(+), 3 deletions(-)
 
-diff --git a/lib/efi.c b/lib/efi.c
-index 0785bd3e8916..edfcc80ef114 100644
---- a/lib/efi.c
-+++ b/lib/efi.c
-@@ -14,6 +14,10 @@
- #include "efi.h"
- #include "libfdt/libfdt.h"
+diff --git a/arm/efi/run b/arm/efi/run
+index b7a8418a07f8..af7b593c2bb8 100755
+--- a/arm/efi/run
++++ b/arm/efi/run
+@@ -18,10 +18,12 @@ elif [ -f /usr/share/edk2/aarch64/QEMU_EFI.silent.fd ]; then
+ 	DEFAULT_UEFI=/usr/share/edk2/aarch64/QEMU_EFI.silent.fd
+ fi
  
-+/* From each arch */
-+extern char *initrd;
-+extern u32 initrd_size;
++KERNEL_NAME=$1
 +
- /* From lib/argv.c */
- extern int __argc, __envc;
- extern char *__argv[100];
-@@ -303,6 +307,65 @@ static bool efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image,
- 	return fdt_check_header(*fdt) == 0;
+ : "${EFI_SRC:=$TEST_DIR}"
+ : "${EFI_UEFI:=$DEFAULT_UEFI}"
+ : "${EFI_TEST:=efi-tests}"
+-: "${EFI_CASE:=$(basename $1 .efi)}"
++: "${EFI_CASE:=$(basename $KERNEL_NAME .efi)}"
+ : "${EFI_TESTNAME:=$TESTNAME}"
+ : "${EFI_TESTNAME:=$EFI_CASE}"
+ : "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
+@@ -80,4 +82,15 @@ uefi_shell_run()
+ 		"${qemu_args[@]}"
  }
  
-+static const struct {
-+	struct efi_vendor_dev_path	vendor;
-+	struct efi_generic_dev_path	end;
-+} __packed initrd_dev_path = {
-+	{
-+		{
-+			EFI_DEV_MEDIA,
-+			EFI_DEV_MEDIA_VENDOR,
-+			sizeof(struct efi_vendor_dev_path),
-+		},
-+		LINUX_EFI_INITRD_MEDIA_GUID
-+	}, {
-+		EFI_DEV_END_PATH,
-+		EFI_DEV_END_ENTIRE,
-+		sizeof(struct efi_generic_dev_path)
-+	}
-+};
-+
-+static void efi_load_initrd(void)
-+{
-+	efi_guid_t lf2_proto_guid = EFI_LOAD_FILE2_PROTOCOL_GUID;
-+	efi_device_path_protocol_t *dp;
-+	efi_load_file2_protocol_t *lf2;
-+	efi_handle_t handle;
-+	efi_status_t status;
-+	unsigned long file_size = 0;
-+
-+	initrd = NULL;
-+	initrd_size = 0;
-+
-+	dp = (efi_device_path_protocol_t *)&initrd_dev_path;
-+	status = efi_bs_call(locate_device_path, &lf2_proto_guid, &dp, &handle);
-+	if (status != EFI_SUCCESS)
-+		return;
-+
-+	status = efi_bs_call(handle_protocol, handle, &lf2_proto_guid, (void **)&lf2);
-+	assert(status == EFI_SUCCESS);
-+
-+	status = efi_call_proto(lf2, load_file, dp, false, &file_size, NULL);
-+	assert(status == EFI_BUFFER_TOO_SMALL);
-+
-+	status = efi_bs_call(allocate_pool, EFI_LOADER_DATA, file_size, (void **)&initrd);
-+	assert(status == EFI_SUCCESS);
-+
-+	status = efi_call_proto(lf2, load_file, dp, false, &file_size, (void *)initrd);
-+	assert(status == EFI_SUCCESS);
-+
-+	initrd_size = (u32)file_size;
-+
-+	/*
-+	 * UEFI appends initrd=initrd to the command line when an initrd is present.
-+	 * Remove it in order to avoid confusing unit tests.
-+	 */
-+	if (!strcmp(__argv[__argc - 1], "initrd=initrd")) {
-+		__argv[__argc - 1] = NULL;
-+		__argc -= 1;
-+	}
-+}
-+
- efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- {
- 	int ret;
-@@ -341,6 +404,8 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- 	}
- 	setup_args(cmdline_ptr);
+-uefi_shell_run
++if [ "$EFI_DIRECT" = "y" ]; then
++	if [ "$EFI_USE_ACPI" != "y" ]; then
++		qemu_args+=(-machine acpi=off)
++	fi
++	$TEST_DIR/run \
++		$KERNEL_NAME \
++		-append "$(basename $KERNEL_NAME) ${cmd_args[@]}" \
++		-bios "$EFI_UEFI" \
++		"${qemu_args[@]}"
++else
++	uefi_shell_run
++fi
+diff --git a/arm/run b/arm/run
+index 40c2ca66ba7e..efdd44ce86a7 100755
+--- a/arm/run
++++ b/arm/run
+@@ -60,7 +60,7 @@ if ! $qemu $M -chardev '?' | grep -q testdev; then
+ 	exit 2
+ fi
  
-+	efi_load_initrd();
+-if [ "$UEFI_SHELL_RUN" != "y" ]; then
++if [ "$UEFI_SHELL_RUN" != "y" ] && [ "$EFI_USE_ACPI" != "y" ]; then
+ 	chr_testdev='-device virtio-serial-device'
+ 	chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
+ fi
+@@ -77,6 +77,8 @@ command="$(migration_cmd) $(timeout_cmd) $command"
+ 
+ if [ "$UEFI_SHELL_RUN" = "y" ]; then
+ 	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
++elif [ "$EFI_USE_ACPI" = "y" ]; then
++	run_qemu_status $command -kernel "$@"
+ else
+ 	run_qemu $command -kernel "$@"
+ fi
+diff --git a/configure b/configure
+index 05e6702eab06..283c959973fd 100755
+--- a/configure
++++ b/configure
+@@ -32,6 +32,7 @@ enable_dump=no
+ page_size=
+ earlycon=
+ efi=
++efi_direct=
+ 
+ # Enable -Werror by default for git repositories only (i.e. developer builds)
+ if [ -e "$srcdir"/.git ]; then
+@@ -89,6 +90,11 @@ usage() {
+ 	    --[enable|disable]-efi Boot and run from UEFI (disabled by default, x86_64 and arm64 only)
+ 	    --[enable|disable]-werror
+ 	                           Select whether to compile with the -Werror compiler flag
++	    --[enable|disable]-efi-direct
++	                           Select whether to run EFI tests directly with QEMU's -kernel
++	                           option. When not enabled, tests will be placed in an EFI file
++	                           system and run from the UEFI shell. Ignored when efi isn't enabled.
++	                           (arm64 only)
+ EOF
+     exit 1
+ }
+@@ -168,6 +174,12 @@ while [[ "$1" = -* ]]; do
+ 	--disable-efi)
+ 	    efi=n
+ 	    ;;
++	--enable-efi-direct)
++	    efi_direct=y
++	    ;;
++	--disable-efi-direct)
++	    efi_direct=n
++	    ;;
+ 	--enable-werror)
+ 	    werror=-Werror
+ 	    ;;
+@@ -185,6 +197,10 @@ while [[ "$1" = -* ]]; do
+     esac
+ done
+ 
++if [ -z "$efi" ] || [ "$efi" = "n" ]; then
++    [ "$efi_direct" = "y" ] && efi_direct=
++fi
 +
- 	efi_bootinfo.fdt_valid = efi_get_fdt(handle, image, &efi_bootinfo.fdt);
- 	/* Set up efi_bootinfo */
- 	efi_bootinfo.mem_map.map = &map;
-diff --git a/lib/linux/efi.h b/lib/linux/efi.h
-index 92d798f79767..8fa23ad078ce 100644
---- a/lib/linux/efi.h
-+++ b/lib/linux/efi.h
-@@ -70,6 +70,9 @@ typedef guid_t efi_guid_t;
- 
- #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
- 
-+#define EFI_LOAD_FILE2_PROTOCOL_GUID EFI_GUID(0x4006c0c1, 0xfcb3, 0x403e,  0x99, 0x6d, 0x4a, 0x6c, 0x87, 0x24, 0xe0, 0x6d)
-+#define LINUX_EFI_INITRD_MEDIA_GUID EFI_GUID(0x5568e427, 0x68fc, 0x4f3d,  0xac, 0x74, 0xca, 0x55, 0x52, 0x31, 0xcc, 0x68)
-+
- typedef struct {
- 	efi_guid_t guid;
- 	void *table;
-@@ -248,6 +251,12 @@ struct efi_generic_dev_path {
- 	u16				length;
- } __packed;
- 
-+struct efi_vendor_dev_path {
-+	struct efi_generic_dev_path	header;
-+	efi_guid_t			vendorguid;
-+	u8				vendordata[];
-+} __packed;
-+
- typedef struct efi_generic_dev_path efi_device_path_protocol_t;
- 
- /*
-@@ -449,6 +458,19 @@ typedef struct _efi_simple_file_system_protocol efi_simple_file_system_protocol_
- typedef struct _efi_file_protocol efi_file_protocol_t;
- typedef efi_simple_file_system_protocol_t efi_file_io_interface_t;
- typedef efi_file_protocol_t efi_file_t;
-+typedef union efi_load_file_protocol efi_load_file_protocol_t;
-+typedef union efi_load_file_protocol efi_load_file2_protocol_t;
-+
-+union efi_load_file_protocol {
-+	struct {
-+		efi_status_t (__efiapi *load_file)(efi_load_file_protocol_t *,
-+						   efi_device_path_protocol_t *,
-+						   bool, unsigned long *, void *);
-+	};
-+	struct {
-+		u32 load_file;
-+	} mixed_mode;
-+};
- 
- typedef efi_status_t efi_simple_file_system_protocol_open_volume(
- 	efi_simple_file_system_protocol_t *this,
-@@ -544,7 +566,12 @@ typedef struct {
- 	efi_char16_t	file_name[1];
- } efi_file_info_t;
- 
-+#define efi_fn_call(inst, func, ...) (inst)->func(__VA_ARGS__)
- #define efi_bs_call(func, ...) efi_system_table->boottime->func(__VA_ARGS__)
- #define efi_rs_call(func, ...) efi_system_table->runtime->func(__VA_ARGS__)
-+#define efi_call_proto(inst, func, ...) ({				\
-+		__typeof__(inst) __inst = (inst);			\
-+		efi_fn_call(__inst, func, __inst, ##__VA_ARGS__);	\
-+})
- 
- #endif /* __LINUX_UEFI_H */
+ if [ -n "$host_key_document" ] && [ ! -f "$host_key_document" ]; then
+     echo "Host key document doesn't exist at the specified location."
+     exit 1
+@@ -423,6 +439,7 @@ GENPROTIMG=${GENPROTIMG-genprotimg}
+ HOST_KEY_DOCUMENT=$host_key_document
+ CONFIG_DUMP=$enable_dump
+ CONFIG_EFI=$efi
++EFI_DIRECT=$efi_direct
+ CONFIG_WERROR=$werror
+ GEN_SE_HEADER=$gen_se_header
+ EOF
 -- 
 2.43.0
 
