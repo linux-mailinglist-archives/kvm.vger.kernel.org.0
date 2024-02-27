@@ -1,137 +1,279 @@
-Return-Path: <kvm+bounces-10100-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8FC1869D27
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 18:08:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FBBC869D49
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 18:13:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64AA228D96F
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 17:08:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E452A1F25DBB
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 17:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDE4481BD;
-	Tue, 27 Feb 2024 17:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657734CB20;
+	Tue, 27 Feb 2024 17:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jbKvmj1z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fj9QyAmS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841FD2032D;
-	Tue, 27 Feb 2024 17:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084A3249EB
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 17:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709053673; cv=none; b=BPgxJ12Pwc2ozZcFOh41YKfklaP91zZbE4tU4xywCp3pvjZz1lFCJ93xAv1VyVyFy59ZEUOLtZYhtRfktQ7+jq//SqXBzFEGBLh70a+NsTAZVknPlA4nFJuSMADErKKZhCUWKLx6dA6dwJOeiqdO72nybuRBFP6VRn15liCE964=
+	t=1709053991; cv=none; b=KgmEC+uPxxZHuV09d1trnz9U2ikqyYDO3SZOH3ChBvnIDZtLCBu+/qeOV79EzDKkyK5sR3g89i94VzrhulWD9MwT1caqUx3ZBZaF4Q6qi/sRGgO+J+k3C+wzLOoTbCewni1IVsS4rjU74wvSen6qQmJZfzJF4afbNr6YeIF6rUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709053673; c=relaxed/simple;
-	bh=ZeJc8F1uJuWbjXK4VVGQdxZ+8idBvr+K++iQcOg5o38=;
+	s=arc-20240116; t=1709053991; c=relaxed/simple;
+	bh=SWlb2BlxVRz858KyACzU9TGdZmZCIXkEAFtIFfCbVDQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q4pBYH+z0fvlA6l3nznE/12nU/2Kjju8EfF7bdR751jv0V71VMf0/dK4oCGv3Jm/5pePSTZOjzaTMjh6G+htd4C+bdOqmvyCjr3F8wGdrAOrJYLYVJcjihAVbIfGfmotDYvg2xwTdyFRspUOCTOyAGQdPFoiSaVsg9aSsFHzv8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jbKvmj1z; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5dbd519bde6so3707427a12.1;
-        Tue, 27 Feb 2024 09:07:52 -0800 (PST)
+	 To:Cc:Content-Type; b=eHd5I/NIkE4HT1jp+mv5J6JzM/9v2M6emcvZeZwTubDxvRpzG7JJEVgQ70On9j2QM06aRelFIcYDKPF/CgtBJbmV1JOJGw4uLhmEhKGP3FBnHbVmFWaUZBQzujldSatqTpCy+AQL1uff36EgZRH6oGD2Ns86ScTkoJ4WdGluY3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fj9QyAmS; arc=none smtp.client-ip=209.85.161.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5a054fa636eso2524690eaf.0
+        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 09:13:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709053672; x=1709658472; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709053988; x=1709658788; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=99jfUjuSInpmxbhq4i5jzlqwDHbrA15fgcjI2V7Oals=;
-        b=jbKvmj1zc9qWpdruJudh/hR+hxG3T9Bn4wnJi5RoUW4LWDrg+zZe3VIfvoCHx72TM6
-         lzwe/jJqkppP7fOBoXuIFKNYyHWfzLxEusLGFSodTPM8UDFh4A3IZXw1IFwijZ+Xub3S
-         yp+WpwUccC0e7XAOgGAtEqf/gRd3Eb2LhAtYnQF79z3hTEIpLF1uauoY4yqxYIggrlTI
-         87JgK01u9N+n9emYQQdyQLZAu5Tzx/5laG7nOREaS4hFFAN1P3wsuNt61kjf2VuTMOh2
-         baQc9y9zaPryCxdmKR8kNpo0Ar3gOhyV2bVl/5kRIjSWkJ0WB4q5Id8dk6+8LV5XgNxB
-         Dl2w==
+        bh=l4w4THpRXMgaO2N+PLLuITl0YtMqqfXqaqVn9NdnEso=;
+        b=Fj9QyAmSsTiuHqlNFVYfzvBqc2Snd/wc5S3SGSU2tr5rQCtTCiVCDVkl7MdXYGi+/i
+         sb/wPQQl7o/vcO9D0dgFqnETzRU81nHyFvcH+yZQcFqOaK0oSegjpJybrGLlQ0ZmSRH6
+         JsSuiEdx5BA1wfI5OJb40K+WbUdxUuuwbgUKO7Br74zzXA3vLmqpwzHT8Uj/szi0Uj1b
+         7OAxUpzsojhdvR94ZPSIrenKmA+EuJVxBf0Rt1IYC/WwEggfx+A9ksZORXvFW9N2EJkJ
+         p85RkFOfHdmQSfl5LfKvBhTzXtR7YhB9ffofZ7FjT8yyUFEmKugFMZrObHf8jN/CKoRj
+         CkjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709053672; x=1709658472;
+        d=1e100.net; s=20230601; t=1709053988; x=1709658788;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=99jfUjuSInpmxbhq4i5jzlqwDHbrA15fgcjI2V7Oals=;
-        b=P/UE8tUrqz8ltYFQFRdVTUKvSzcUD0/QvSXh82hqwp4uJA+qpyRH0JkFz/uTYmxNWb
-         XPXbZSUoGLYdpSFxQv7XdrHMNQw40qjG/Di4uGSRYgMVqskWJa6Mm8GJoHShn+qTJVtq
-         dZu24JbAOCQKQuaRHkHMkUYeKhLv1Gnr3WhWDDW7e6u/kHw+CdruoBF1t4v5YR9S/XjF
-         bdq/+IzelOXOpihwqSD0Y4BNj8lDZn0VW9GlPg8Uty/KmNxY32w4a9T3CTjzvabz7B3O
-         /SvRVv1UaLgPmtwPVH+BPkeRt70o1mVvtPdnxvW0fGze3W8iFdNQiZ6Q62PfV54yGFKx
-         rlmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVxYddWJDt3H2/qSLI2DDqF22A+rAWDMEyXmZ3pqFXjg/P+h7WgXFrfBpR4K/RS4hkg+jskgs3Jg3rNHOEKmF2Q04A9
-X-Gm-Message-State: AOJu0YyzIRFlEH62VCPlrjqEgAM7zRnpjCl3bipcAOest1p0etXE2La1
-	AO6uvY8yIIw5WZOjOKId3raRLY3JYgFlOfl+TZww1CTlu4Cwe9TfJW/z34EoCtJp3lcZuyhEpbq
-	EFJVz/Q9q+7IWjQolH6Bo7aGjlUs=
-X-Google-Smtp-Source: AGHT+IHTBLSoZTfa3M5/2UvGsTYIpeCfQhJ06lMLp5v4/09xfG85K0T6kpDQRVpfBDGQ03DtwlARkFL1clgMtD/yIFY=
-X-Received: by 2002:a17:90b:8d8:b0:299:3e54:83fe with SMTP id
- ds24-20020a17090b08d800b002993e5483femr8471960pjb.36.1709053671772; Tue, 27
- Feb 2024 09:07:51 -0800 (PST)
+        bh=l4w4THpRXMgaO2N+PLLuITl0YtMqqfXqaqVn9NdnEso=;
+        b=IA1mKA8lN8y3HAenwPy6OiwoH2DqLjUMJGkEmOT1yjgu4L1Z3Y5JydDYxBC1tjDkyb
+         qzLzZ+1xnRFNTbDSVKQ2HOlXyYn+QkztjbFBvxveq7dfdswasNUQvPp6vToDdXDCE179
+         4wu9MAA0cZWT/DYOWuJf3NZk+eqrtGM5aBf+K2+HP8qtmKxySOqoB4X+tCS4Ew5iRQRV
+         eRzUrCuYpu6c0VPmY86MFJs8i5Pk72yLrkbZ4mNcgzCg0TOoNKkfdGmJ58giWPfP9I/m
+         1aO363VXVoKuq/Bdlk4auuyrQx3MAEfAEdkSZ1cBSoX/xIB0ES9jF52SlOHsO4A/rB3P
+         Lbog==
+X-Forwarded-Encrypted: i=1; AJvYcCVZK4rtN5nxRTF+bAPuxotIP3XPbrWDMPRmCg0u+lf5LNZB6TQ6WYdRsN94ceP0IQ5tfH4KBFegc/uUS1jGE55DnIUU
+X-Gm-Message-State: AOJu0YyIn7xdj97TmyvejhN8M0h3uB5PLsn9kX4o0ovna/HmGzZS7NHp
+	eP2jLQMiVEsyfjD4E7mdswUrvFJRtsbESGHV+uIYfB+jgStSIzHKJmmfiDFiQBgimxQoLqwNHUx
+	iyl5BI+kjIlGP7nBb9/1RRn6+DG7FNK3/EZ5U
+X-Google-Smtp-Source: AGHT+IG4NLP9w08aTBX6ChmfOuNBrO//8IOWcDelgzmmzT45Z6RFkmBGUjqHH2I7/3vyEZJraFaKzHOfDRMNSwwlpGI=
+X-Received: by 2002:a05:6820:2c07:b0:5a0:651d:4238 with SMTP id
+ dw7-20020a0568202c0700b005a0651d4238mr7449063oob.2.1709053988360; Tue, 27 Feb
+ 2024 09:13:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240226143630.33643-1-jiangshanlai@gmail.com>
- <20240226143630.33643-16-jiangshanlai@gmail.com> <Zd34GHtHlnpPtg5v@infradead.org>
-In-Reply-To: <Zd34GHtHlnpPtg5v@infradead.org>
-From: Lai Jiangshan <jiangshanlai@gmail.com>
-Date: Wed, 28 Feb 2024 01:07:40 +0800
-Message-ID: <CAJhGHyDdsm3BT4fL3Z_H5-_m4VpDi9FnG6GCcrup6YfMr_MBCw@mail.gmail.com>
-Subject: Re: [RFC PATCH 15/73] mm/vmalloc: Add a helper to reserve a
- contiguous and aligned kernel virtual area
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
-	Lai Jiangshan <jiangshan.ljs@antgroup.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Sean Christopherson <seanjc@google.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
-	kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org, 
-	Kees Cook <keescook@chromium.org>, Juergen Gross <jgross@suse.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>, 
-	Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org
+References: <20240213192340.2023366-1-avagin@google.com>
+In-Reply-To: <20240213192340.2023366-1-avagin@google.com>
+From: Andrei Vagin <avagin@google.com>
+Date: Tue, 27 Feb 2024 09:12:55 -0800
+Message-ID: <CAEWA0a6rxNsX6t+Fj_UOKPEZP1g1ePAL8QqZCSMmE0_nc_RFWw@mail.gmail.com>
+Subject: Re: [PATCH v3] kvm/x86: allocate the write-tracking metadata on-demand
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hello
+Hi Paolo and Sean,
 
-On Tue, Feb 27, 2024 at 10:56=E2=80=AFPM Christoph Hellwig <hch@infradead.o=
-rg> wrote:
+Can we move forward with this version? Do you have any other comments,
+suggestions?
+
+Thanks,
+Andrrei
+
+On Tue, Feb 13, 2024 at 11:23=E2=80=AFAM Andrei Vagin <avagin@google.com> w=
+rote:
 >
-> On Mon, Feb 26, 2024 at 10:35:32PM +0800, Lai Jiangshan wrote:
-> > From: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> >
-> > PVM needs to reserve a contiguous and aligned kernel virtual area for
+> The write-track is used externally only by the gpu/drm/i915 driver.
+> Currently, it is always enabled, if a kernel has been compiled with this
+> driver.
 >
-> Who is "PVM", and why does it need aligned virtual memory space?
-
-PVM stands for Pagetable-based Virtual Machine. It is a new pure
-software-implemented virtualization solution. The details are in the
-cover letter:
-https://lore.kernel.org/lkml/20240226143630.33643-1-jiangshanlai@gmail.com/
-
-I'm sorry for not CC'ing you on the cover letter (I haven't made/found a pr=
-oper
-script to generate all cc-recipients for the cover letter.) nor elaborating
-the reason in the changelog.
-
-One of the core designs in PVM is the "Exclusive address space separation",
-with which in the higher half of the address spaces (where the most signifi=
-cant
-bits in the addresses are 1s), the address ranges that a PVM guest is
-allowed are exclusive from the host kernel.  So PVM hypervisor has to use
-get_vm_area_align() to reserve a huge range (normally 16T) with the
-alignment 512G (PGDIR_SIZE) for all the guests to accommodate the
-whole guest kernel space. The reserved range cannot be used by the
-host.
-
-The rationale of this core design is also in the cover letter.
-
-Thanks
-Lai
-
+> Enabling the write-track mechanism adds a two-byte overhead per page acro=
+ss
+> all memory slots. It isn't significant for regular VMs. However in gVisor=
+,
+> where the entire process virtual address space is mapped into the VM, eve=
+n
+> with a 39-bit address space, the overhead amounts to 256MB.
 >
-> > +extern struct vm_struct *get_vm_area_align(unsigned long size, unsigne=
-d long align,
+> Rework the write-tracking mechanism to enable it on-demand in
+> kvm_page_track_register_notifier.
 >
-> No need for the extern here.
+> Here is Sean's comment about the locking scheme:
+>
+> The only potential hiccup would be if taking slots_arch_lock would
+> deadlock, but it should be impossible for slots_arch_lock to be taken in
+> any other path that involves VFIO and/or KVMGT *and* can be coincident.
+> Except for kvm_arch_destroy_vm() (which deletes KVM's internal
+> memslots), slots_arch_lock is taken only through KVM ioctls(), and the
+> caller of kvm_page_track_register_notifier() *must* hold a reference to
+> the VM.
+>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Andrei Vagin <avagin@google.com>
+> ---
+> v1: https://lore.kernel.org/lkml/ZcErs9rPqT09nNge@google.com/T/
+> v2: allocate the write-tracking metadata on-demand
+>     https://lore.kernel.org/kvm/20240206153405.489531-1-avagin@google.com=
+/
+> v3: explicitly track if there are *external* write tracking users.
+>
+>  arch/x86/include/asm/kvm_host.h |  9 +++++
+>  arch/x86/kvm/mmu/page_track.c   | 68 ++++++++++++++++++++++++++++++++-
+>  2 files changed, 75 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index d271ba20a0b2..a777ac77b3ea 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1468,6 +1468,15 @@ struct kvm_arch {
+>          */
+>         bool shadow_root_allocated;
+>
+> +#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
+> +       /*
+> +        * If set, the VM has (or had) an external write tracking user, a=
+nd
+> +        * thus all write tracking metadata has been allocated, even if K=
+VM
+> +        * itself isn't using write tracking.
+> +        */
+> +       bool external_write_tracking_enabled;
+> +#endif
+> +
+>  #if IS_ENABLED(CONFIG_HYPERV)
+>         hpa_t   hv_root_tdp;
+>         spinlock_t hv_root_tdp_lock;
+> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.=
+c
+> index c87da11f3a04..f6448284c18e 100644
+> --- a/arch/x86/kvm/mmu/page_track.c
+> +++ b/arch/x86/kvm/mmu/page_track.c
+> @@ -20,10 +20,23 @@
+>  #include "mmu_internal.h"
+>  #include "page_track.h"
+>
+> +static bool kvm_external_write_tracking_enabled(struct kvm *kvm)
+> +{
+> +#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
+> +       /*
+> +        * Read external_write_tracking_enabled before related pointers. =
+ Pairs
+> +        * with the smp_store_release in kvm_page_track_write_tracking_en=
+able().
+> +        */
+> +       return smp_load_acquire(&kvm->arch.external_write_tracking_enable=
+d);
+> +#else
+> +       return false;
+> +#endif
+> +}
+> +
+>  bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
+>  {
+> -       return IS_ENABLED(CONFIG_KVM_EXTERNAL_WRITE_TRACKING) ||
+> -              !tdp_enabled || kvm_shadow_root_allocated(kvm);
+> +       return kvm_external_write_tracking_enabled(kvm) ||
+> +              kvm_shadow_root_allocated(kvm) || !tdp_enabled;
+>  }
+>
+>  void kvm_page_track_free_memslot(struct kvm_memory_slot *slot)
+> @@ -153,6 +166,50 @@ int kvm_page_track_init(struct kvm *kvm)
+>         return init_srcu_struct(&head->track_srcu);
+>  }
+>
+> +static int kvm_enable_external_write_tracking(struct kvm *kvm)
+> +{
+> +       struct kvm_memslots *slots;
+> +       struct kvm_memory_slot *slot;
+> +       int r =3D 0, i, bkt;
+> +
+> +       mutex_lock(&kvm->slots_arch_lock);
+> +
+> +       /*
+> +        * Check for *any* write tracking user (not just external users) =
+under
+> +        * lock.  This avoids unnecessary work, e.g. if KVM itself is usi=
+ng
+> +        * write tracking, or if two external users raced when registerin=
+g.
+> +        */
+> +       if (kvm_page_track_write_tracking_enabled(kvm))
+> +               goto out_success;
+> +
+> +       for (i =3D 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
+> +               slots =3D __kvm_memslots(kvm, i);
+> +               kvm_for_each_memslot(slot, bkt, slots) {
+> +                       /*
+> +                        * Intentionally do NOT free allocations on failu=
+re to
+> +                        * avoid having to track which allocations were m=
+ade
+> +                        * now versus when the memslot was created.  The
+> +                        * metadata is guaranteed to be freed when the sl=
+ot is
+> +                        * freed, and will be kept/used if userspace retr=
+ies
+> +                        * the failed ioctl() instead of killing the VM.
+> +                        */
+> +                       r =3D kvm_page_track_write_tracking_alloc(slot);
+> +                       if (r)
+> +                               goto out_unlock;
+> +               }
+> +       }
+> +
+> +out_success:
+> +       /*
+> +        * Ensure that external_write_tracking_enabled becomes true stric=
+tly
+> +        * after all the related pointers are set.
+> +        */
+> +       smp_store_release(&kvm->arch.external_write_tracking_enabled, tru=
+e);
+> +out_unlock:
+> +       mutex_unlock(&kvm->slots_arch_lock);
+> +       return r;
+> +}
+> +
+>  /*
+>   * register the notifier so that event interception for the tracked gues=
+t
+>   * pages can be received.
+> @@ -161,10 +218,17 @@ int kvm_page_track_register_notifier(struct kvm *kv=
+m,
+>                                      struct kvm_page_track_notifier_node =
+*n)
+>  {
+>         struct kvm_page_track_notifier_head *head;
+> +       int r;
+>
+>         if (!kvm || kvm->mm !=3D current->mm)
+>                 return -ESRCH;
+>
+> +       if (!kvm_external_write_tracking_enabled(kvm)) {
+> +               r =3D kvm_enable_external_write_tracking(kvm);
+> +               if (r)
+> +                       return r;
+> +       }
+> +
+>         kvm_get_kvm(kvm);
+>
+>         head =3D &kvm->arch.track_notifier_head;
+> --
+> 2.43.0.687.g38aa6559b0-goog
 >
 
