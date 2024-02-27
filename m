@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-10084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0679886904A
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 13:22:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91020869044
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 13:22:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 383521C219BF
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 12:22:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4184C28463C
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 12:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC4B13A868;
-	Tue, 27 Feb 2024 12:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8CC145B2B;
+	Tue, 27 Feb 2024 12:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D+czIVKD"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="R4erJRk7"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061711386D3
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 12:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818F2145B07
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 12:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709036390; cv=none; b=YFoYCZTLZrQ4PnktoNxVjpVPtwhJTuUuXt7rNgxApSiDfjYCrHRoBv6d2Bt0+3zkHXfl0Jdf57GmBWlpGLC6TsUKfKd5xfdw0jb/n2cZ7bEdtr0M3cqzhdOfSgVTMrYKR8T808FCMCNGx67iolfREif2SutaMt+4H+4ZSaTjKQY=
+	t=1709036358; cv=none; b=AnKMtpDdqP/d44+7e8aTDn3aNlpEl0Nyo1ZMP37ZmtYhHRdV0u/+28l8854HBXtuM52CZaG23mhSvCMdG5zee3yolXXctvM7Af+VevyjTeYXAht9hUQ/NN7UdfTw8+vN9WK3ZfAtNUBK2DKJRaYr4qwyrBsV/pvaRE+qfoRAKmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709036390; c=relaxed/simple;
-	bh=cK4ZYPeNuqSd4KDdQmrAG2cSPx+DFJ+DIf7eKq+TO1k=;
+	s=arc-20240116; t=1709036358; c=relaxed/simple;
+	bh=zUP4W9ocOf2QlPtwjYEiJOKLkNkU9oBTZFc27GWQhAQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UcamX8t50LeuGoielU9Pqu4yQKrCRbZw/f28vvxCTOOhhVby7akiAqWU+y9SjVFFw0FErJfqjzm+YrmvGk88XgmsBkPJoQzi7x7tR9CnDS9EkaQTDDNU/Y0J56xb7PCEUcUq/Zr+49KuUGcBsDMysIURBi8rNIKeLzgjsM/L7pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=D+czIVKD; arc=none smtp.client-ip=90.155.50.34
+	 MIME-Version:Content-Type; b=e1gC0Jv1QjPg8aPXAYFLCMvUYsN2e1zmFzPY7XVFQdkv0ywOQzHX2DFP0BZ0VV0q/eh7Cd2GGfLm28ORyzPuREQwAf15hPnhmFrMqD/KrbI+ItcIHLT+lbXQki86g4O0qMLqjOENFwGvPixJfdPmcqYjVOXV+kyGmuackYisBL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=R4erJRk7; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=XNBfqYR7DvaesoFseEK2MShJiW1gZ9BnBHd/r+Q+vG4=; b=D+czIVKDgheRW8/qaguCkQf2MO
-	vmQSWll4utFGPoNi74xzHgAdQZ9V6UEd32MzBtsisxivTyKPTa6M9DnB4GJer8W4Dly4IcD7K2He3
-	Da+eWqEBMOksciF2V1H1BQuFfAImCnmO7r3/yq+wt9yByqT8ADA8/8VOHo20zsjRTOZeihuoHExlV
-	FDq7xiDCrSwOm2ck+8mAAKxfFvGjLTe5AlJmTaE2SgqkMI8+XhfE1/24Wa0Sa15c8H3XKzIOVecM3
-	Rb05FPJK+3UWzsA0EdYSEl/LaCuKCm71HPcmzRMxBhUVfUmvXxikq+fW7GQDbLWGUHjBHexUG3kKa
-	D8y61lZQ==;
+	Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:
+	To:From:Reply-To:Content-ID:Content-Description;
+	bh=vFgdx1YhFNLyaO06G93phjZWUsQaEpwpJ51a+zXlhfs=; b=R4erJRk7sHah8+pqXn+YrNJ9/p
+	0TFXmU+/V6f6a6CHq38u/q7DJ6VsHfetogQoCuE+cXRgFouxZnouzm56cN2cIYAP9lvxu5p6BauGk
+	fVzpZd0QJIwh/vuptIoclXzfQZwabWbf3XqhRZcnmq+7gDSC1xcXU6yG/2TYmWjxzUTkCNuCE28cp
+	BKEGA0ja53pjTIwquIorx3udMESdGKdetLQVwI78V+/4O13iGcsUwdvU8gErHImi2mIRQQN17ehGx
+	EqtiPha5T/+qHabFtIiDRFqF/xucaO3Jsz6xenjyNBT0Q6mcpBAkZgl5mXwKJUxEdbe9kgPIUGhOQ
+	0JJmmAwg==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
 	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rew4p-00000002JfN-3INx;
+	id 1rew4p-00000002JfM-3LC1;
 	Tue, 27 Feb 2024 11:56:51 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rew4n-000000000wU-3r3j;
+	id 1rew4n-000000000wX-4409;
 	Tue, 27 Feb 2024 11:56:49 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: kvm@vger.kernel.org
@@ -55,9 +55,9 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Michal Luczaj <mhal@rbox.co>,
 	David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH v2 3/8] KVM: x86/xen: remove WARN_ON_ONCE() with false positives in evtchn delivery
-Date: Tue, 27 Feb 2024 11:49:17 +0000
-Message-ID: <20240227115648.3104-4-dwmw2@infradead.org>
+Subject: [PATCH v2 4/8] KVM: pfncache: simplify locking and make more self-contained
+Date: Tue, 27 Feb 2024 11:49:18 +0000
+Message-ID: <20240227115648.3104-5-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240227115648.3104-1-dwmw2@infradead.org>
 References: <20240227115648.3104-1-dwmw2@infradead.org>
@@ -67,60 +67,177 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-The kvm_xen_inject_vcpu_vector() function has a comment saying "the fast
-version will always work for physical unicast", justifying its use of
-kvm_irq_delivery_to_apic_fast() and the WARN_ON_ONCE() when that fails.
+The locking on the gfn_to_pfn_cache is... interesting. And awful.
 
-In fact that assumption isn't true if X2APIC isn't in use by the guest
-and there is (8-bit x)APIC ID aliasing. A single "unicast" destination
-APIC ID *may* then be delivered to multiple vCPUs. Remove the warning,
-and in fact it might as well just call kvm_irq_delivery_to_apic().
+There is a rwlock in ->lock which readers take to ensure protection
+against concurrent changes. But __kvm_gpc_refresh() makes assumptions
+that certain fields will not change even while it drops the write lock
+and performs MM operations to revalidate the target PFN and kernel
+mapping.
 
-Reported-by: Michal Luczaj <mhal@rbox.co>
-Fixes: fde0451be8fb3 ("KVM: x86/xen: Support per-vCPU event channel upcall via local APIC")
+Commit 93984f19e7bc ("KVM: Fully serialize gfn=>pfn cache refresh via
+mutex") partly addressed that — not by fixing it, but by adding a new
+mutex, ->refresh_lock. This prevented concurrent __kvm_gpc_refresh()
+calls on a given gfn_to_pfn_cache, but is still only a partial solution.
+
+There is still a theoretical race where __kvm_gpc_refresh() runs in
+parallel with kvm_gpc_deactivate(). While __kvm_gpc_refresh() has
+dropped the write lock, kvm_gpc_deactivate() clears the ->active flag
+and unmaps ->khva. Then __kvm_gpc_refresh() determines that the previous
+->pfn and ->khva are still valid, and reinstalls those values into the
+structure. This leaves the gfn_to_pfn_cache with the ->valid bit set,
+but ->active clear. And a ->khva which looks like a reasonable kernel
+address but is actually unmapped.
+
+All it takes is a subsequent reactivation to cause that ->khva to be
+dereferenced. This would theoretically cause an oops which would look
+something like this:
+
+[1724749.564994] BUG: unable to handle page fault for address: ffffaa3540ace0e0
+[1724749.565039] RIP: 0010:__kvm_xen_has_interrupt+0x8b/0xb0
+
+I say "theoretically" because theoretically, that oops that was seen in
+production cannot happen. The code which uses the gfn_to_pfn_cache is
+supposed to have its *own* locking, to further paper over the fact that
+the gfn_to_pfn_cache's own papering-over (->refresh_lock) of its own
+rwlock abuse is not sufficient.
+
+For the Xen vcpu_info that external lock is the vcpu->mutex, and for the
+shared info it's kvm->arch.xen.xen_lock. Those locks ought to protect
+the gfn_to_pfn_cache against concurrent deactivation vs. refresh in all
+but the cases where the vcpu or kvm object is being *destroyed*, in
+which case the subsequent reactivation should never happen.
+
+Theoretically.
+
+Nevertheless, this locking abuse is awful and should be fixed, even if
+no clear explanation can be found for how the oops happened. So expand
+the use of the ->refresh_lock mutex to ensure serialization of
+activate/deactivate vs. refresh and make the pfncache locking entirely
+self-sufficient.
+
+This means that a future commit can simplify the locking in the callers,
+such as the Xen emulation code which has an outstanding problem with
+recursive locking of kvm->arch.xen.xen_lock, which will no longer be
+necessary.
+
+The rwlock abuse described above is still not best practice, although
+it's harmless now that the ->refresh_lock is held for the entire duration
+while the offending code drops the write lock, does some other stuff,
+then takes the write lock again and assumes nothing changed. That can
+also be fixed^W cleaned up in a subsequent commit, but this commit is
+a simpler basis for the Xen deadlock fix mentioned above.
+
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 Reviewed-by: Paul Durrant <paul@xen.org>
 ---
- arch/x86/kvm/xen.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ virt/kvm/pfncache.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 06904696759c..54a4bdb63b17 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -10,7 +10,7 @@
- #include "x86.h"
- #include "xen.h"
- #include "hyperv.h"
--#include "lapic.h"
-+#include "irq.h"
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 9ac8c9da4eda..43d67f8f064e 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -256,12 +256,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 	if (page_offset + len > PAGE_SIZE)
+ 		return -EINVAL;
  
- #include <linux/eventfd.h>
- #include <linux/kvm_host.h>
-@@ -571,7 +571,6 @@ void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
- void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
+-	/*
+-	 * If another task is refreshing the cache, wait for it to complete.
+-	 * There is no guarantee that concurrent refreshes will see the same
+-	 * gpa, memslots generation, etc..., so they must be fully serialized.
+-	 */
+-	mutex_lock(&gpc->refresh_lock);
++	lockdep_assert_held(&gpc->refresh_lock);
+ 
+ 	write_lock_irq(&gpc->lock);
+ 
+@@ -347,8 +342,6 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ out_unlock:
+ 	write_unlock_irq(&gpc->lock);
+ 
+-	mutex_unlock(&gpc->refresh_lock);
+-
+ 	if (unmap_old)
+ 		gpc_unmap(old_pfn, old_khva);
+ 
+@@ -357,15 +350,23 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 
+ int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len)
  {
- 	struct kvm_lapic_irq irq = { };
--	int r;
++	unsigned long uhva;
++	int ret;
++
++	mutex_lock(&gpc->refresh_lock);
++
+ 	/*
+ 	 * If the GPA is valid then ignore the HVA, as a cache can be GPA-based
+ 	 * or HVA-based, not both.  For GPA-based caches, the HVA will be
+ 	 * recomputed during refresh if necessary.
+ 	 */
+-	unsigned long uhva = kvm_is_error_gpa(gpc->gpa) ? gpc->uhva :
+-							  KVM_HVA_ERR_BAD;
++	uhva = kvm_is_error_gpa(gpc->gpa) ? gpc->uhva : KVM_HVA_ERR_BAD;
++
++	ret = __kvm_gpc_refresh(gpc, gpc->gpa, uhva, len);
  
- 	irq.dest_id = v->vcpu_id;
- 	irq.vector = v->arch.xen.upcall_vector;
-@@ -580,8 +579,7 @@ void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
- 	irq.delivery_mode = APIC_DM_FIXED;
- 	irq.level = 1;
- 
--	/* The fast version will always work for physical unicast */
--	WARN_ON_ONCE(!kvm_irq_delivery_to_apic_fast(v->kvm, NULL, &irq, &r, NULL));
-+	kvm_irq_delivery_to_apic(v->kvm, NULL, &irq, NULL);
+-	return __kvm_gpc_refresh(gpc, gpc->gpa, uhva, len);
++	mutex_unlock(&gpc->refresh_lock);
++
++	return ret;
  }
  
- /*
+ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+@@ -377,12 +378,16 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+ 	gpc->pfn = KVM_PFN_ERR_FAULT;
+ 	gpc->gpa = INVALID_GPA;
+ 	gpc->uhva = KVM_HVA_ERR_BAD;
++	gpc->active = gpc->valid = false;
+ }
+ 
+ static int __kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long uhva,
+ 			      unsigned long len)
+ {
+ 	struct kvm *kvm = gpc->kvm;
++	int ret;
++
++	mutex_lock(&gpc->refresh_lock);
+ 
+ 	if (!gpc->active) {
+ 		if (KVM_BUG_ON(gpc->valid, kvm))
+@@ -401,7 +406,10 @@ static int __kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned
+ 		gpc->active = true;
+ 		write_unlock_irq(&gpc->lock);
+ 	}
+-	return __kvm_gpc_refresh(gpc, gpa, uhva, len);
++	ret = __kvm_gpc_refresh(gpc, gpa, uhva, len);
++	mutex_unlock(&gpc->refresh_lock);
++
++	return ret;
+ }
+ 
+ int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
+@@ -420,6 +428,7 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+ 	kvm_pfn_t old_pfn;
+ 	void *old_khva;
+ 
++	mutex_lock(&gpc->refresh_lock);
+ 	if (gpc->active) {
+ 		/*
+ 		 * Deactivate the cache before removing it from the list, KVM
+@@ -449,4 +458,5 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+ 
+ 		gpc_unmap(old_pfn, old_khva);
+ 	}
++	mutex_unlock(&gpc->refresh_lock);
+ }
 -- 
 2.43.0
 
