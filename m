@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-10050-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E6C5868D35
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 11:19:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43EB3868D3D
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 11:20:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18597288365
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:19:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDC5A1F276F6
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286121384BB;
-	Tue, 27 Feb 2024 10:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E62CD139568;
+	Tue, 27 Feb 2024 10:19:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iEYhbfdC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i5LkO0yx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BB01384AF
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 10:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0D11386CF
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 10:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709029156; cv=none; b=pAufMcfhwMgkpSXN67roLOSjH5j7TDaGgovO7GeAkyby3/L7gkvd4Tovx4IbTnjON3h8UZqKJlanFdRCYGYaUcXmomBlK0W4/HTH78+bqvJZ/UajtTaY0Oo21ohsK4JES/l3j1n7cSONkTkqh0lli7MKMauG4jKaP1CwzK/Rj0I=
+	t=1709029161; cv=none; b=UjHUWHENEWQwT9wB6n55e4LKTA7dLUX85U79uhLXxQ0ztOh++97VxnSphzviLdzpTdmrUQ7g24nP3f+pA1v4S7uavHDn2pOyLQ87suDLgHOz+9gO5Tw62tQ2ozCZffh4EEq8SSiP3JQMIjj8oWlxm+fLfHlfkR28y5IKaHnhI+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709029156; c=relaxed/simple;
-	bh=P75hIY8ln1D9u2W+mLieQMGqsvAMwEhg8IjnXVe3yso=;
+	s=arc-20240116; t=1709029161; c=relaxed/simple;
+	bh=+D0kFbwk/6uu2utuPjUeCfJFwddDsRc/EgoeBeVWwmA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OifiyM3yJW1wJ+yWyBqIHtndAsdejLR5bDs49DYM/RjfWAa2VFRcLuadrdZvySxaaxCNgd0UuymN8ll1aoj7EOj+B80b9TLYVOD3qLctXY/AK7n1bZV6IWWX9TZGPWdAi5rSIYLoXLklHG1eKABPMtMYn722wdqqp+xVdYL6/Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iEYhbfdC; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=rWzwDfzU1lH0RLI/8NnNfwnIfjD9iOEi7MgRMxRtvPmcGTsjjpjbVHxo4lp1jKSiW5ak3FFQd07JFQJCxYJSrl65YPuRU81zOEaLCAKy96B2l/C9mqKr66yk0EhWNrb1Z4jLUuKo1Hce9/aBy5EXbEXQ6ILLI3BXh3Ia4b2pWuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i5LkO0yx; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709029154; x=1740565154;
+  t=1709029159; x=1740565159;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=P75hIY8ln1D9u2W+mLieQMGqsvAMwEhg8IjnXVe3yso=;
-  b=iEYhbfdCedqKtjzW48kbRwpjrCKxfUWl9wyVpMV9ryFKCf7K3ehiBL1T
-   P2X8qW+eLgQsM+/gpWUlccqhVdRfvnAhzcjmlu4xX+RAOsctes5ti31c4
-   CWLreva+tIOSVvc5SHOz7YpiJjSqwughSOw7IeffTPEeRVKB/I1JMikh7
-   wBVCDoLsyVKCYUTqOoc6yTFpro+Io+I/C7of85m1eFOm/FzuA40/Qg8Pv
-   l4VmxthBbY4CWSHYrcNCETW6COFisg8X3TqxGHAs01HFzkIDRfoXZlQgL
-   0Z2GQNnS/yo0y+WAMywogv32yNJrNYca/yO1fks/iSfZa/ue3p1mJW3Al
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="6310233"
+  bh=+D0kFbwk/6uu2utuPjUeCfJFwddDsRc/EgoeBeVWwmA=;
+  b=i5LkO0yxr+po52mjFxFs9iIrN7lWj4ccs5VcWiZd8kK6YgfSSjJyEfre
+   sZlCBsqpcMnS1ZU6COsMJADpIJ2fbeB8M4WDUbfqM5a7dIri7+y70G1oy
+   DHJ6qjgfe7cIPeSIlLy0RZ+WqM0OSNPi7Ty2V9N7iUf29RtZyLxxiq0if
+   vP+e6W2C9UwE3nSDo81HjQkVoSCbImjhAsVagjZOwmt6U5FwRmSppnoO/
+   7c33gPQASOzugcRcksKsfSrd0yvKyhH4zKPqSmrV28HBNGcln+9LtkRvp
+   t127kuny0YinO4QwnnIuwnzwobeupwsmsu2J7suWNs+Ke1r3HUR3T3LBV
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="6310246"
 X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
-   d="scan'208";a="6310233"
+   d="scan'208";a="6310246"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 02:19:14 -0800
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 02:19:19 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
-   d="scan'208";a="6954771"
+   d="scan'208";a="6954774"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa010.fm.intel.com with ESMTP; 27 Feb 2024 02:19:10 -0800
+  by fmviesa010.fm.intel.com with ESMTP; 27 Feb 2024 02:19:14 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Eduardo Habkost <eduardo@habkost.net>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -73,10 +73,11 @@ Cc: qemu-devel@nongnu.org,
 	Zhuocheng Ding <zhuocheng.ding@intel.com>,
 	Babu Moger <babu.moger@amd.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v9 04/21] hw/core: Support module-id in numa configuration
-Date: Tue, 27 Feb 2024 18:32:14 +0800
-Message-Id: <20240227103231.1556302-5-zhao1.liu@linux.intel.com>
+	Zhao Liu <zhao1.liu@intel.com>,
+	Robert Hoo <robert.hu@linux.intel.com>
+Subject: [PATCH v9 05/21] i386/cpu: Fix i/d-cache topology to core level for Intel CPU
+Date: Tue, 27 Feb 2024 18:32:15 +0800
+Message-Id: <20240227103231.1556302-6-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240227103231.1556302-1-zhao1.liu@linux.intel.com>
 References: <20240227103231.1556302-1-zhao1.liu@linux.intel.com>
@@ -90,63 +91,70 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-Module is a level above the core, thereby supporting numa
-configuration on the module level can bring user more numa flexibility.
+For i-cache and d-cache, current QEMU hardcodes the maximum IDs for CPUs
+sharing cache (CPUID.04H.00H:EAX[bits 25:14] and CPUID.04H.01H:EAX[bits
+25:14]) to 0, and this means i-cache and d-cache are shared in the SMT
+level.
 
-This is the natural further support for module level.
+This is correct if there's single thread per core, but is wrong for the
+hyper threading case (one core contains multiple threads) since the
+i-cache and d-cache are shared in the core level other than SMT level.
 
-Add module level support in numa configuration.
+For AMD CPU, commit 8f4202fb1080 ("i386: Populate AMD Processor Cache
+Information for cpuid 0x8000001D") has already introduced i/d cache
+topology as core level by default.
 
-Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+Therefore, in order to be compatible with both multi-threaded and
+single-threaded situations, we should set i-cache and d-cache be shared
+at the core level by default.
+
+This fix changes the default i/d cache topology from per-thread to
+per-core. Potentially, this change in L1 cache topology may affect the
+performance of the VM if the user does not specifically specify the
+topology or bind the vCPU. However, the way to achieve optimal
+performance should be to create a reasonable topology and set the
+appropriate vCPU affinity without relying on QEMU's default topology
+structure.
+
+Fixes: 7e3482f82480 ("i386: Helpers to encode cache information consistently")
+Suggested-by: Robert Hoo <robert.hu@linux.intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Tested-by: Babu Moger <babu.moger@amd.com>
+Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 ---
-Changes since v7:
- * New commit to support module level.
----
- hw/core/machine.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Changes since v3:
+ * Changed the description of current i/d cache encoding status to avoid
+   misleading to "architectural rules". (Xiaoyao)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 030b7e250ac5..b3199c710194 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -791,6 +791,11 @@ void machine_set_cpu_numa_node(MachineState *machine,
-             return;
-         }
- 
-+        if (props->has_module_id && !slot->props.has_module_id) {
-+            error_setg(errp, "module-id is not supported");
-+            return;
-+        }
-+
-         if (props->has_cluster_id && !slot->props.has_cluster_id) {
-             error_setg(errp, "cluster-id is not supported");
-             return;
-@@ -815,6 +820,11 @@ void machine_set_cpu_numa_node(MachineState *machine,
-                 continue;
-         }
- 
-+        if (props->has_module_id &&
-+            props->module_id != slot->props.module_id) {
-+                continue;
-+        }
-+
-         if (props->has_cluster_id &&
-             props->cluster_id != slot->props.cluster_id) {
-                 continue;
-@@ -1212,6 +1222,12 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
-         }
-         g_string_append_printf(s, "cluster-id: %"PRId64, cpu->props.cluster_id);
-     }
-+    if (cpu->props.has_module_id) {
-+        if (s->len) {
-+            g_string_append_printf(s, ", ");
-+        }
-+        g_string_append_printf(s, "module-id: %"PRId64, cpu->props.module_id);
-+    }
-     if (cpu->props.has_core_id) {
-         if (s->len) {
-             g_string_append_printf(s, ", ");
+Changes since v1:
+ * Split this fix from the patch named "i386/cpu: Fix number of
+   addressable IDs in CPUID.04H".
+ * Added the explanation of the impact on performance. (Xiaoyao)
+---
+ target/i386/cpu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 7f9082367672..81d9046167e8 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6113,12 +6113,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             switch (count) {
+             case 0: /* L1 dcache info */
+                 encode_cache_cpuid4(env->cache_info_cpuid4.l1d_cache,
+-                                    1, cs->nr_cores,
++                                    cs->nr_threads, cs->nr_cores,
+                                     eax, ebx, ecx, edx);
+                 break;
+             case 1: /* L1 icache info */
+                 encode_cache_cpuid4(env->cache_info_cpuid4.l1i_cache,
+-                                    1, cs->nr_cores,
++                                    cs->nr_threads, cs->nr_cores,
+                                     eax, ebx, ecx, edx);
+                 break;
+             case 2: /* L2 cache info */
 -- 
 2.34.1
 
