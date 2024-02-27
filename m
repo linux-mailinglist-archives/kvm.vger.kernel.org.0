@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-10132-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10133-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03F3686A06B
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 20:43:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4B986A05C
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 20:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DE3BB28EDC
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 19:23:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22B48B32884
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 19:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C3214C59D;
-	Tue, 27 Feb 2024 19:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E5514CAC8;
+	Tue, 27 Feb 2024 19:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f0npfFUK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F43c8lAb"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF231149006
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 19:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EBCF14C5A4
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 19:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709061749; cv=none; b=IYBikwny9zfTzR5abiyATsmm0oiEu8ztJgu7RSGa7KYUuSw+4V9d+uUvx7c+78qhg8uDlBmzGTH4U5+22djsZITXhdMBCk7SsfCQ0mnIt1ULXhhqY0aQBc3G3vB/n0QWEuhsgN1GxKpx9bA9E/ZSdql8Y/jrbCu55HuyiAAom7g=
+	t=1709061752; cv=none; b=EtfMB3qdWD4XvJkISXzQFKkxu8pMdzePLTX4+R8pW38HjPSKFB33IQmp1bMOQLN1RHrOslJXbAoPSJtZa36PBagQmihREsrmRnP+nKfNKoxkNcGAuUKwE5XT7smZ75zQ2ADSLXgN/364FGJ8X0poA8kflnDsreZAK499tDElrNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709061749; c=relaxed/simple;
-	bh=sYSzcCPH3WC/Py513oWIu5gKNuvLyHifgfpc/YcrWG0=;
+	s=arc-20240116; t=1709061752; c=relaxed/simple;
+	bh=rKneMKwXwUgk1Mn1AIOl3+psPJPKzWKDROU/ARqeloE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=P4ybSjyiLqBfwJyH5PWTLPRj0MR04N2ykDX5Q+ChMYsq/NBIzHrdQoOan/elYLP3P2buWsss14gGqRAJm11ddLpQcCyAv3krNbwOoMrf000T7FuazO9SGWmtGkzqHkcypEWPa6VMMjkSnd/6XfFhkp8XaUpoClQAdGUdlrz8ynQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f0npfFUK; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version:Content-type; b=t7U3OjSegdAYgUgKGG9I6sgE5ppOurgTGJMKjGRkIFkWDKO1pI7r7P6aMFiVhdbweM6wgnmhHt19pdbUQ4StizRFZjD3Bfjy+8RPjXeWHTAYWFm3p+h7/QxNHF9X1dk2sk2lbT5uv2PMUqh65hBDs4wYKJ8A7d+CwdSbNsXxv4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F43c8lAb; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709061746;
+	t=1709061748;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=E4VmXpp/S0durPWGOUW6Aj9isjNBsL2T9t1N6WIKxsc=;
-	b=f0npfFUK+I1f1S5+QfaXqGz7I4yUd88EvWmIAI3wLKvL/OyWyje+esDAH7QcQlOHqfbnAT
-	G+Tg4HoePvuFFat2jT/WKDcRyG1w4gcMgK2aZa/awDlPiNGb3YGekN53jPMkwOgHyyANVV
-	gGjFprycv4k+uO4p8LN8M8CSgA8sq+A=
+	bh=gXnFBLWmHRwxeKkAlTPnozCwE2flSxAbIMfA6Fsg1qM=;
+	b=F43c8lAbSDPQTd1AS/sc7YsIV+k9uh1UVHknp2HBMGUiuRwI05SNg1b3Ha/G/3aL0++KBI
+	/KkqcLI0s/HxG3fTdiB6dINx9FWJ3sV8FHGvcR7OaQSgGVTONgxc6MoxlGuuFDobqHGZ4e
+	wB8FQOznpc+2DOGalTJiuekIBzfi92E=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -51,9 +51,9 @@ Cc: alexandru.elisei@arm.com,
 	shahuang@redhat.com,
 	pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 17/18] arm64: efi: Switch to our own stack
-Date: Tue, 27 Feb 2024 20:21:27 +0100
-Message-ID: <20240227192109.487402-37-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 18/18] arm64: efi: Add gitlab CI
+Date: Tue, 27 Feb 2024 20:21:28 +0100
+Message-ID: <20240227192109.487402-38-andrew.jones@linux.dev>
 In-Reply-To: <20240227192109.487402-20-andrew.jones@linux.dev>
 References: <20240227192109.487402-20-andrew.jones@linux.dev>
 Precedence: bulk
@@ -66,89 +66,66 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-We don't want to map EFI_BOOT_SERVICES_DATA regions, so move the
-stack from its EFI_BOOT_SERVICES_DATA region to EFI_LOADER_CODE,
-which we always map. We'll still map the stack as R/W instead of
-R/X because we split EFI_LOADER_CODE regions on the _etext boundary
-and map addresses before _etext as R/X and the rest as R/W.
+Now that we have efi-direct and tests run much faster, add a few
+(just selftests) to the CI. Test with both DT and ACPI. While
+touching the file update arm and arm64's pass/fail criteria to
+the new style that ensures they're not all skips.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- arm/efi/crt0-efi-aarch64.S | 22 +++++++++++++++++-----
- lib/arm/setup.c            |  4 ----
- lib/memregions.c           |  6 ------
- 3 files changed, 17 insertions(+), 15 deletions(-)
+ .gitlab-ci.yml | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
-index 5fd3dc94dae8..71ce2794f059 100644
---- a/arm/efi/crt0-efi-aarch64.S
-+++ b/arm/efi/crt0-efi-aarch64.S
-@@ -125,12 +125,18 @@ _start:
- 
- 	ldp		x0, x1, [sp, #16]
- 
--	/* Align sp; this is necessary due to way we store cpu0's thread_info */
-+	/*
-+	 * Switch to our own stack and align sp; this is necessary due
-+	 * to way we store cpu0's thread_info
-+	 */
-+	adrp		x2, stacktop
-+	add		x2, x2, :lo12:stacktop
-+	and		x2, x2, #THREAD_MASK
-+	mov		x3, sp
-+	mov		sp, x2
-+	stp		xzr, xzr, [sp, #-16]!
- 	mov		x29, sp
--	mov		x30, sp
--	and		x30, x30, #THREAD_MASK
--	mov		sp, x30
--	str		x29, [sp, #-16]!
-+	str		x3, [sp, #-16]!
- 
- 	bl		efi_main
- 
-@@ -140,3 +146,9 @@ _start:
- 
- 0:	ldp		x29, x30, [sp], #32
- 	ret
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 71d986e9884e..ff34b1f5062e 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -44,7 +44,35 @@ build-aarch64:
+       selftest-vectors-user
+       timer
+       | tee results.txt
+- - if grep -q FAIL results.txt ; then exit 1 ; fi
++ - grep -q PASS results.txt && ! grep -q FAIL results.txt
 +
-+	.section	.data
++build-aarch64-efi:
++ extends: .intree_template
++ script:
++ - dnf install -y qemu-system-aarch64 gcc-aarch64-linux-gnu edk2-aarch64
++ - ./configure --arch=aarch64 --cross-prefix=aarch64-linux-gnu- --enable-efi --enable-efi-direct
++ - make -j2
++ - ACCEL=tcg MAX_SMP=8 ./run_tests.sh
++      selftest-setup
++      selftest-smp
++      selftest-vectors-kernel
++      selftest-vectors-user
++      | tee results.txt
++ - grep -q PASS results.txt && ! grep -q FAIL results.txt
 +
-+.balign 65536
-+.space 65536
-+stacktop:
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 08658b9a222b..d535cec88709 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -340,10 +340,6 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- {
- 	efi_status_t status;
++build-aarch64-efi-acpi:
++ extends: .intree_template
++ script:
++ - dnf install -y qemu-system-aarch64 gcc-aarch64-linux-gnu edk2-aarch64
++ - ./configure --arch=aarch64 --cross-prefix=aarch64-linux-gnu- --enable-efi --enable-efi-direct
++ - make -j2
++ - EFI_USE_ACPI=y ACCEL=tcg MAX_SMP=8 ./run_tests.sh
++      selftest-setup
++      selftest-smp
++      selftest-vectors-kernel
++      selftest-vectors-user
++      | tee results.txt
++ - grep -q PASS results.txt && ! grep -q FAIL results.txt
  
--	struct thread_info *ti = current_thread_info();
--
--	memset(ti, 0, sizeof(*ti));
--
- 	exceptions_init();
+ build-arm:
+  extends: .outoftree_template
+@@ -59,7 +87,7 @@ build-arm:
+      pci-test pmu-cycle-counter gicv2-ipi gicv2-mmio gicv3-ipi gicv2-active
+      gicv3-active
+      | tee results.txt
+- - if grep -q FAIL results.txt ; then exit 1 ; fi
++ - grep -q PASS results.txt && ! grep -q FAIL results.txt
  
- 	memregions_init(arm_mem_regions, NR_MEM_REGIONS);
-diff --git a/lib/memregions.c b/lib/memregions.c
-index 3c6f751eb4f2..53fc0c7cfc58 100644
---- a/lib/memregions.c
-+++ b/lib/memregions.c
-@@ -114,12 +114,6 @@ void memregions_efi_init(struct efi_boot_memmap *mem_map,
- 			break;
- 		case EFI_LOADER_DATA:
- 			break;
--		case EFI_BOOT_SERVICES_DATA:
--			/*
--			 * FIXME: This would ideally be MR_F_RESERVED, but the
--			 * primary stack is in a region of this EFI type.
--			 */
--			break;
- 		case EFI_PERSISTENT_MEMORY:
- 			r.flags = MR_F_PERSISTENT;
- 			break;
+ build-ppc64be:
+  extends: .outoftree_template
 -- 
 2.43.0
 
