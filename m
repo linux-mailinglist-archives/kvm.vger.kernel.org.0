@@ -1,218 +1,309 @@
-Return-Path: <kvm+bounces-10070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10046-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3E83868D89
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 11:27:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CE2E868D30
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 11:19:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4236DB264B9
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:27:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 131302878E8
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6EC1384A7;
-	Tue, 27 Feb 2024 10:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA0A138493;
+	Tue, 27 Feb 2024 10:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B9p0gjWx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WBw0glVD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2AB137C5E
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 10:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F381384BA
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 10:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709029637; cv=none; b=IGa0dpGSyLC/86ICf8yPAfZQzPaUZwLDsIr/yw41uvOlz6o6arJk19ELFXasIkYCuJu1aW5FpPq8b/TfdY15tgEDN6gsVQQBx+K27CcMp//7mXmbDSGzs80OKGMBaef3+DcQ3eDondmOimf7kBwadZfEKxsMh03XX4xJTmXcRJE=
+	t=1709029139; cv=none; b=Gq43A6vCMPfFEkTIYi2vnuA/2KkzWygCZxBQIuUu0hvuk2cOubjE2P0VMy42aDQgYprQB5BCS3EBq++M98FJgTZiz1qYt9exlw+G0LCZVOh4ObgZO/xwEoKfvkbrmw7JN/YDilgQORf/evr1jAUsKKNi8mBInQKgIZwbEjIEoJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709029637; c=relaxed/simple;
-	bh=9oQUf5HtHLbBgNp93aBOqPZ+Lw8npwFe56RH4fdl4fM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jQKB2pBO6pW2XXNYXrQZu1KunoIMsnYsMA8NpSmxA59Pl01p2p8OC6MnHpc4m18ZdlH+4whQtxDM6+Gt7x83RTa1hRe1itGIbUfif027+lp+XVDHBMHwVWTHisuCbSX9aH/+T6eXlqiHLXr/c9kASE8I0XWxT5qjukU2vurQt9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B9p0gjWx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709029635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gQu9FLk/3cBXcFdzQEmdwe1pIwKjfdRR38sSE0OqhrQ=;
-	b=B9p0gjWx+cKVY+ic7nMCR1IcW/JraU77EafwVwXEK+YXH6b/w51j1ASxBw+Q8nXRKNSPPT
-	O+TXtpvmo3hguezujj5RsjoMN9rcRdXyPj/x8RHo3u6/yuFJ9Fg5clPLYoJTjiHHB1oCP9
-	jnk79TpE9Q8XwusKwbdEdZiD8GX67TU=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-454-PaQSDP4xPXaZixOImGMWaw-1; Tue, 27 Feb 2024 05:27:14 -0500
-X-MC-Unique: PaQSDP4xPXaZixOImGMWaw-1
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6e46420dca9so3111991a34.3
-        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 02:27:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709029633; x=1709634433;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gQu9FLk/3cBXcFdzQEmdwe1pIwKjfdRR38sSE0OqhrQ=;
-        b=iBuySH3VL8DXm0A+MXHsuUZk4AkYY82ZCRPwFL2tLLIDhIxxPws3KAjITbKkXdOmk/
-         rABnUQOty7HoR/X54eK5Tgv6k9fgxXf1fv1M4kpvYmYCRJ1y8lqee5voZySxnPikfaCG
-         JrVwXr4nM8LtTXynDQik8GdnTU9Xg/pEeEQLRBxxuo/Ob9R+fIa00wQWYaeuYL6igH6T
-         SUXshmierG9ZHN9/pIQWlHjB9P80KX+WLxiGMbM+chppJLWlrQtiocLu81CB09VgGekm
-         63KJpyAAq7suCmXrDvqubkqgj5+8n7xCJK34DvJgudP7Fjn1Jp4HvYhrjuiZ4P5APCjc
-         dLWA==
-X-Gm-Message-State: AOJu0YwTuSGmcQY1oGTcKq0jhGEEtObZdyiqxCytO/IjvK2zn+SZnKiR
-	A7bX4tJWQzV6FwOvmAQ9T4k+WpepP3osx91A3cRAwIL+/pnuytJ9gXirIBXz5mTNRo69ZBQwZiw
-	kbgGx2N62HD+HuCHndlu9xKUTPnY6YeDkv27ejq6DoYVxsGnsiD3HJjFk+w==
-X-Received: by 2002:a05:6871:152:b0:21e:95dd:b212 with SMTP id z18-20020a056871015200b0021e95ddb212mr10831630oab.57.1709029633188;
-        Tue, 27 Feb 2024 02:27:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEuYm+F2VGPZSJNEZUnoABzHJO2xHUmHprAk8tZITwrmte+ZXCg73IBeXoBZXMsTUu67pLzeA==
-X-Received: by 2002:a05:6871:152:b0:21e:95dd:b212 with SMTP id z18-20020a056871015200b0021e95ddb212mr10831622oab.57.1709029632857;
-        Tue, 27 Feb 2024 02:27:12 -0800 (PST)
-Received: from ?IPV6:2003:cb:c707:7600:5c18:5a7d:c5b7:e7a9? (p200300cbc70776005c185a7dc5b7e7a9.dip0.t-ipconnect.de. [2003:cb:c707:7600:5c18:5a7d:c5b7:e7a9])
-        by smtp.gmail.com with ESMTPSA id z20-20020aa785d4000000b006e4c3a6da36sm5546717pfn.202.2024.02.27.02.27.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Feb 2024 02:27:12 -0800 (PST)
-Message-ID: <abb00aef-378c-481a-a885-327a99aa7b09@redhat.com>
-Date: Tue, 27 Feb 2024 11:27:08 +0100
+	s=arc-20240116; t=1709029139; c=relaxed/simple;
+	bh=CegDiQCuDflnw5EfhaP8t6vKadYhecx20VlSVm3W5B0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ZNSMl0DEO47iVZPzckOgF2r4cWw1YQMmTYIxrb1s3IOJUDkkfqN5Qw87IIRHIsBCeKeBV/Tg9o234pXbR3HbOhB0//y/sYVDvWAcBeP+rrx4IR22t3IHKvFEcTzzleiRZVxwYUDvLMtIz0ZssbETIWOMbpJd+t+aEB1q1W8HCDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WBw0glVD; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709029137; x=1740565137;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CegDiQCuDflnw5EfhaP8t6vKadYhecx20VlSVm3W5B0=;
+  b=WBw0glVDI6eDjXNNHpeYGmG0hCAGH55OnJGbt2TRyZDF77yZ/al3IxFp
+   VZEkmNlxxBpJLyjCJw4LuJewFyz1IYozpNjMNqblDvS1DJlMU4uPRcgvV
+   Re802M9RFr0mHvixqF6z7o7CZic/7mQjw5Ljsltcf1RA1AoR2EZJnyZGe
+   v8en1EvAczSvAY49zDbUdT7/BEpINi3RBiNBmyi33i3kSGLNZxw72/Npp
+   Dk7bHETYo/FCEYAYVBZA3Vg74gjQ8Oge8nRj5EbSIZplnJJb0S0uO2OFs
+   aMbxboVgO2+28D9fv+XppiT2bEADjmDGoCLExZJQr0CErRi6IKAZxdSXL
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="6310194"
+X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
+   d="scan'208";a="6310194"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 02:18:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
+   d="scan'208";a="6954736"
+Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
+  by fmviesa010.fm.intel.com with ESMTP; 27 Feb 2024 02:18:51 -0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Zhuocheng Ding <zhuocheng.ding@intel.com>,
+	Babu Moger <babu.moger@amd.com>,
+	Yongwei Ma <yongwei.ma@intel.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v9 00/21] Introduce smp.modules for x86 in QEMU
+Date: Tue, 27 Feb 2024 18:32:10 +0800
+Message-Id: <20240227103231.1556302-1-zhao1.liu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vfio/type1: unpin PageReserved page
-Content-Language: en-US
-To: Alex Williamson <alex.williamson@redhat.com>,
- Yisheng Xie <ethan.xys@linux.alibaba.com>, akpm@linux-foundation.org
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-References: <20240226160106.24222-1-ethan.xys@linux.alibaba.com>
- <20240226091438.1fc37957.alex.williamson@redhat.com>
- <e10ace3f-78d3-4843-8028-a0e1cd107c15@linux.alibaba.com>
- <20240226103238.75ad4b24.alex.williamson@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240226103238.75ad4b24.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 26.02.24 18:32, Alex Williamson wrote:
-> On Tue, 27 Feb 2024 01:14:54 +0800
-> Yisheng Xie <ethan.xys@linux.alibaba.com> wrote:
-> 
->> 在 2024/2/27 00:14, Alex Williamson 写道:
->>> On Tue, 27 Feb 2024 00:01:06 +0800
->>> Yisheng Xie<ethan.xys@linux.alibaba.com>  wrote:
->>>   
->>>> We meet a warning as following:
->>>>    WARNING: CPU: 99 PID: 1766859 at mm/gup.c:209 try_grab_page.part.0+0xe8/0x1b0
->>>>    CPU: 99 PID: 1766859 Comm: qemu-kvm Kdump: loaded Tainted: GOE  5.10.134-008.2.x86_64 #1
->>>                                                                      ^^^^^^^^
->>>
->>> Does this issue reproduce on mainline?  Thanks,
->>
->> I have check the code of mainline, the logical seems the same as my
->> version.
->>
->> so I think it can reproduce if i understand correctly.
-> 
-> I obviously can't speak to what's in your 5.10.134-008.2 kernel, but I
-> do know there's a very similar issue resolved in v6.0 mainline and
-> included in v5.10.146 of the stable tree.  Please test.  Thanks,
+From: Zhao Liu <zhao1.liu@intel.com>
 
-This commit, to be precise:
+Hi list,
 
-commit 873aefb376bbc0ed1dd2381ea1d6ec88106fdbd4
-Author: Alex Williamson <alex.williamson@redhat.com>
-Date:   Mon Aug 29 21:05:40 2022 -0600
+This is the our v9 patch series, rebased on the master branch at the
+commit 03d496a992d9 ("Merge tag 'pull-qapi-2024-02-26' of
+https://repo.or.cz/qemu/armbru into staging").
 
-     vfio/type1: Unpin zero pages
-     
-     There's currently a reference count leak on the zero page.  We increment
-     the reference via pin_user_pages_remote(), but the page is later handled
-     as an invalid/reserved page, therefore it's not accounted against the
-     user and not unpinned by our put_pfn().
-     
-     Introducing special zero page handling in put_pfn() would resolve the
-     leak, but without accounting of the zero page, a single user could
-     still create enough mappings to generate a reference count overflow.
-     
-     The zero page is always resident, so for our purposes there's no reason
-     to keep it pinned.  Therefore, add a loop to walk pages returned from
-     pin_user_pages_remote() and unpin any zero pages.
+Compared with v8 [1], v9 mainly added more module description in commit
+message and added missing smp.modules description/documentation.
+
+With the general introduction (with origial cluster level) of this
+secries in v7 [2] cover letter, the following sections are mainly about
+the description of the newly added smp.modules (since v8, changed x86
+cluster support to module) as supplement.
+
+Since v4 [3], we've dropped the original L2 cache command line option
+(to configure L2 cache topology) and now we have the new RFC [4] to
+support the general cache topology configuration (as the supplement to
+this series).
+
+Welcome your comments!
 
 
-BUT
+Why We Need a New CPU Topology Level
+====================================
 
-in the meantime, we also have
+For the discussion in v7 about whether we should reuse current
+smp.clusters for x86 module, the core point is what's the essential
+differences between x86 module and general cluster.
 
-commit c8070b78751955e59b42457b974bea4a4fe00187
-Author: David Howells <dhowells@redhat.com>
-Date:   Fri May 26 22:41:40 2023 +0100
+Since, cluster (for ARM/riscv) lacks a comprehensive and rigorous
+hardware definition, and judging from the description of smp.clusters
+[5] when it was introduced by QEMU, x86 module is very similar to
+general smp.clusters: they are all a layer above existing core level
+to organize the physical cores and share L2 cache.
 
-     mm: Don't pin ZERO_PAGE in pin_user_pages()
-     
-     Make pin_user_pages*() leave a ZERO_PAGE unpinned if it extracts a pointer
-     to it from the page tables and make unpin_user_page*() correspondingly
-     ignore a ZERO_PAGE when unpinning.  We don't want to risk overrunning a
-     zero page's refcount as we're only allowed ~2 million pins on it -
-     something that userspace can conceivably trigger.
-     
-     Add a pair of functions to test whether a page or a folio is a ZERO_PAGE.
+But there are following reasons that drive us to introduce the new
+smp.modules:
+
+  * As the CPU topology abstraction in device tree [6], cluster supports
+    nesting (though currently QEMU hasn't support that). In contrast,
+    (x86) module does not support nesting.
+
+  * Due to nesting, there is great flexibility in sharing resources
+    on cluster, rather than narrowing cluster down to sharing L2 (and
+    L3 tags) as the lowest topology level that contains cores.
+
+  * Flexible nesting of cluster allows it to correspond to any level
+    between the x86 package and core.
+
+  * In Linux kernel, x86's cluster only represents the L2 cache domain
+    but QEMU's smp.clusters is the CPU topology level. Linux kernel will
+    also expose module level topology information in sysfs for x86. To
+    avoid cluster ambiguity and keep a consistent CPU topology naming
+    style with the Linux kernel, we introduce module level for x86.
+
+Based on the above considerations, and in order to eliminate the naming
+confusion caused by the mapping between general cluster and x86 module,
+we now formally introduce smp.modules as the new topology level.
 
 
-So the unpin_user_page_* won't do anything with the shared zeropage.
+Where to Place Module in Existing Topology Levels
+=================================================
 
-(likely, we could revert 873aefb376bbc0ed1dd2381ea1d6ec88106fdbd4)
+The module is, in existing hardware practice, the lowest layer that
+contains the core, while the cluster is able to have a higher topological
+scope than the module due to its nesting.
+
+Therefore, we place the module between the cluster and the core:
+
+    drawer/book/socket/die/cluster/module/core/thread
+
+
+Additional Consideration on CPU Topology
+========================================
+
+Beyond this patchset, nowadays, different arches have different topology
+requirements, and maintaining arch-agnostic general topology in SMP
+becomes to be an increasingly difficult thing due to differences in
+sharing resources and special flexibility (e.g., nesting):
+
+  * It becomes difficult to put together all CPU topology hierarchies of
+    different arches to define complete topology order.
+
+  * It also becomes complex to ensure the correctness of the topology
+    calculations.
+      - Now the max_cpus is calculated by multiplying all topology
+        levels, and too many topology levels can easily cause omissions.
+
+Maybe we should consider implementing arch-specfic topology hierarchies.
+
+
+[1]: https://lore.kernel.org/qemu-devel/20240131101350.109512-1-zhao1.liu@linux.intel.com/
+[2]: https://lore.kernel.org/qemu-devel/20240108082727.420817-1-zhao1.liu@linux.intel.com/
+[3]: https://lore.kernel.org/qemu-devel/20231003085516-mutt-send-email-mst@kernel.org/
+[4]: https://lore.kernel.org/qemu-devel/20240220092504.726064-1-zhao1.liu@linux.intel.com/
+[5]: https://lore.kernel.org/qemu-devel/c3d68005-54e0-b8fe-8dc1-5989fe3c7e69@huawei.com/
+[6]: https://www.kernel.org/doc/Documentation/devicetree/bindings/cpu/cpu-topology.txt
+
+Thanks and Best Regards,
+Zhao
+---
+Changelog:
+
+Changes since v8:
+ * Add the reason of why a new module level is needed in commit message.
+   (Markus).
+ * Add the description about how Linux kernel supports x86 module level
+   in commit message. (Daniel)
+ * Add module description in qemu_smp_opts.
+ * Add missing "modules" parameter of -smp example in documentation.
+ * Add Philippe's reviewed-by tag.
+
+Changes since v7 (main changes):
+ * Introduced smp.modules as a new CPU topology level. (Xiaoyao)
+ * Fixed calculations of cache_info_passthrough case in the
+   patch "i386/cpu: Use APIC ID info to encode cache topo in
+   CPUID[4]". (Xiaoyao)
+ * Moved the patch "i386/cpu: Use APIC ID info get NumSharingCache
+   for CPUID[0x8000001D].EAX[bits 25:14]" after CPUID[4]'s similar
+   change ("i386/cpu: Use APIC ID offset to encode cache topo in
+   CPUID[4]"). (Xiaoyao)
+ * Introduced a bitmap in CPUX86State to cache available CPU topology
+   levels.
+ * Refactored the encode_topo_cpuid1f() to use traversal to search the
+   encoded level and avoid using static variables.
+ * Mapped x86 module to smp module instead of cluster.
+ * Dropped Michael/Babu's ACKed/Tested tags for most patches since the
+   code change.
+
+Changes since v6:
+ * Updated the comment when check cluster-id. Since there's no
+   v8.2, the cluster-id support should at least start from v9.0.
+ * Rebased on commit d328fef93ae7 ("Merge tag 'pull-20231230' of
+   https://gitlab.com/rth7680/qemu into staging").
+
+Changes since v5:
+ * The first four patches of v5 [1] have been merged, v6 contains
+   the remaining patches.
+ * Reabsed on the latest master.
+ * Updated the comment when check cluster-id. Since current QEMU is
+   v8.2, the cluster-id support should at least start from v8.3.
+
+Changes since v4:
+ * Dropped the "x-l2-cache-topo" option. (Michael)
+ * Added A/R/T tags.
+
+Changes since v3 (main changes):
+ * Exposed module level in CPUID[0x1F].
+ * Fixed compile warnings. (Babu)
+ * Fixed cache topology uninitialization bugs for some AMD CPUs. (Babu)
+
+Changes since v2:
+ * Added "Tested-by", "Reviewed-by" and "ACKed-by" tags.
+ * Used newly added wrapped helper to get cores per socket in
+   qemu_init_vcpu().
+
+Changes since v1:
+ * Reordered patches. (Yanan)
+ * Deprecated the patch to fix comment of machine_parse_smp_config().
+   (Yanan)
+ * Renamed test-x86-cpuid.c to test-x86-topo.c. (Yanan)
+ * Split the intel's l1 cache topology fix into a new separate patch.
+   (Yanan)
+ * Combined module_id and APIC ID for module level support into one
+   patch. (Yanan)
+ * Made cache_into_passthrough case of cpuid 0x04 leaf in
+ * cpu_x86_cpuid() used max_processor_ids_for_cache() and
+   max_core_ids_in_package() to encode CPUID[4]. (Yanan)
+ * Added the prefix "CPU_TOPO_LEVEL_*" for CPU topology level names.
+   (Yanan)
+---
+Zhao Liu (20):
+  hw/core/machine: Introduce the module as a CPU topology level
+  hw/core/machine: Support modules in -smp
+  hw/core: Introduce module-id as the topology subindex
+  hw/core: Support module-id in numa configuration
+  i386/cpu: Fix i/d-cache topology to core level for Intel CPU
+  i386/cpu: Use APIC ID info to encode cache topo in CPUID[4]
+  i386/cpu: Use APIC ID info get NumSharingCache for
+    CPUID[0x8000001D].EAX[bits 25:14]
+  i386/cpu: Consolidate the use of topo_info in cpu_x86_cpuid()
+  i386/cpu: Introduce bitmap to cache available CPU topology levels
+  i386: Split topology types of CPUID[0x1F] from the definitions of
+    CPUID[0xB]
+  i386/cpu: Decouple CPUID[0x1F] subleaf with specific topology level
+  i386: Introduce module level cpu topology to CPUX86State
+  i386: Support modules_per_die in X86CPUTopoInfo
+  i386: Expose module level in CPUID[0x1F]
+  i386: Support module_id in X86CPUTopoIDs
+  i386/cpu: Introduce module-id to X86CPU
+  hw/i386/pc: Support smp.modules for x86 PC machine
+  i386: Add cache topology info in CPUCacheInfo
+  i386/cpu: Use CPUCacheInfo.share_level to encode CPUID[4]
+  i386/cpu: Use CPUCacheInfo.share_level to encode
+    CPUID[0x8000001D].EAX[bits 25:14]
+
+Zhuocheng Ding (1):
+  tests: Add test case of APIC ID for module level parsing
+
+ hw/core/machine-hmp-cmds.c |   4 +
+ hw/core/machine-smp.c      |  41 +++--
+ hw/core/machine.c          |  18 +++
+ hw/i386/pc.c               |   1 +
+ hw/i386/x86.c              |  67 ++++++--
+ include/hw/boards.h        |   4 +
+ include/hw/i386/topology.h |  60 +++++++-
+ qapi/machine.json          |   7 +
+ qemu-options.hx            |  18 ++-
+ system/vl.c                |   3 +
+ target/i386/cpu.c          | 304 +++++++++++++++++++++++++++++--------
+ target/i386/cpu.h          |  29 +++-
+ target/i386/kvm/kvm.c      |   3 +-
+ tests/unit/test-x86-topo.c |  56 ++++---
+ 14 files changed, 489 insertions(+), 126 deletions(-)
 
 -- 
-Cheers,
-
-David / dhildenb
+2.34.1
 
 
