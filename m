@@ -1,50 +1,80 @@
-Return-Path: <kvm+bounces-10051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10070-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33758868D37
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 11:19:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E83868D89
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 11:27:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E8C71C2275B
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:19:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4236DB264B9
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9651386CB;
-	Tue, 27 Feb 2024 10:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6EC1384A7;
+	Tue, 27 Feb 2024 10:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="tffeR8d1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B9p0gjWx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC621384B2;
-	Tue, 27 Feb 2024 10:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2AB137C5E
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 10:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709029158; cv=none; b=ffRYTdBoLVJ6led6zz6jLFRsc6fSMpyXb1IrrnZifbC5KWoTtNo6A4+lL46iiePNIqHFv78TzPI1bCkjm8APMmCQcmUSmEWhJaHHK5bAFuUVGEVZAFgXa8FsfdPM2UnOAKWxLtE6Rb7PkM8CY2hypYLiNyxgEFL1FWsDBsN/XbY=
+	t=1709029637; cv=none; b=IGa0dpGSyLC/86ICf8yPAfZQzPaUZwLDsIr/yw41uvOlz6o6arJk19ELFXasIkYCuJu1aW5FpPq8b/TfdY15tgEDN6gsVQQBx+K27CcMp//7mXmbDSGzs80OKGMBaef3+DcQ3eDondmOimf7kBwadZfEKxsMh03XX4xJTmXcRJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709029158; c=relaxed/simple;
-	bh=5sc9exolwsywzwMysiUeFzXsXrPi7FzwPMd2B6e7iUY=;
+	s=arc-20240116; t=1709029637; c=relaxed/simple;
+	bh=9oQUf5HtHLbBgNp93aBOqPZ+Lw8npwFe56RH4fdl4fM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i3Oy4B7t0wTEQ/wwXw4vzQyoRnFY0IvljJdkxiqli88+B13wi3Il0rPnMxs7oWC0FSPrOndVMjFKr5F4dhs2EWkvh7kmT044QSRdg0a2AAtIOPGUyo6V43owv+Si3g0NuDAMciu9ZkGfpgBFW9oc23vCDC9MqvTHTHGnZfQvsKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=tffeR8d1; arc=none smtp.client-ip=115.28.160.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1709029150; bh=5sc9exolwsywzwMysiUeFzXsXrPi7FzwPMd2B6e7iUY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tffeR8d1ZzdwRnjSiWrkYFvpX3d4HLSjHQ3sTPsEVs8BVq9o/Y1zdlByr5Z/hdKAT
-	 n/2hX6ox08LvFhIwV5llcB2iIro+K/jAiVXOEm9QZiJETQ6UyAS/tHnJdpEQJbnn3v
-	 hdlrI2QJ4mTlPtVm3UdAARIg1qEF3AhBTDQ92vMc=
-Received: from [28.0.0.1] (unknown [101.230.251.34])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 3489160121;
-	Tue, 27 Feb 2024 18:19:10 +0800 (CST)
-Message-ID: <431111f3-d84a-4311-986d-eebd91559cd3@xen0n.name>
-Date: Tue, 27 Feb 2024 18:19:09 +0800
+	 In-Reply-To:Content-Type; b=jQKB2pBO6pW2XXNYXrQZu1KunoIMsnYsMA8NpSmxA59Pl01p2p8OC6MnHpc4m18ZdlH+4whQtxDM6+Gt7x83RTa1hRe1itGIbUfif027+lp+XVDHBMHwVWTHisuCbSX9aH/+T6eXlqiHLXr/c9kASE8I0XWxT5qjukU2vurQt9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B9p0gjWx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709029635;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=gQu9FLk/3cBXcFdzQEmdwe1pIwKjfdRR38sSE0OqhrQ=;
+	b=B9p0gjWx+cKVY+ic7nMCR1IcW/JraU77EafwVwXEK+YXH6b/w51j1ASxBw+Q8nXRKNSPPT
+	O+TXtpvmo3hguezujj5RsjoMN9rcRdXyPj/x8RHo3u6/yuFJ9Fg5clPLYoJTjiHHB1oCP9
+	jnk79TpE9Q8XwusKwbdEdZiD8GX67TU=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-454-PaQSDP4xPXaZixOImGMWaw-1; Tue, 27 Feb 2024 05:27:14 -0500
+X-MC-Unique: PaQSDP4xPXaZixOImGMWaw-1
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6e46420dca9so3111991a34.3
+        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 02:27:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709029633; x=1709634433;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gQu9FLk/3cBXcFdzQEmdwe1pIwKjfdRR38sSE0OqhrQ=;
+        b=iBuySH3VL8DXm0A+MXHsuUZk4AkYY82ZCRPwFL2tLLIDhIxxPws3KAjITbKkXdOmk/
+         rABnUQOty7HoR/X54eK5Tgv6k9fgxXf1fv1M4kpvYmYCRJ1y8lqee5voZySxnPikfaCG
+         JrVwXr4nM8LtTXynDQik8GdnTU9Xg/pEeEQLRBxxuo/Ob9R+fIa00wQWYaeuYL6igH6T
+         SUXshmierG9ZHN9/pIQWlHjB9P80KX+WLxiGMbM+chppJLWlrQtiocLu81CB09VgGekm
+         63KJpyAAq7suCmXrDvqubkqgj5+8n7xCJK34DvJgudP7Fjn1Jp4HvYhrjuiZ4P5APCjc
+         dLWA==
+X-Gm-Message-State: AOJu0YwTuSGmcQY1oGTcKq0jhGEEtObZdyiqxCytO/IjvK2zn+SZnKiR
+	A7bX4tJWQzV6FwOvmAQ9T4k+WpepP3osx91A3cRAwIL+/pnuytJ9gXirIBXz5mTNRo69ZBQwZiw
+	kbgGx2N62HD+HuCHndlu9xKUTPnY6YeDkv27ejq6DoYVxsGnsiD3HJjFk+w==
+X-Received: by 2002:a05:6871:152:b0:21e:95dd:b212 with SMTP id z18-20020a056871015200b0021e95ddb212mr10831630oab.57.1709029633188;
+        Tue, 27 Feb 2024 02:27:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEuYm+F2VGPZSJNEZUnoABzHJO2xHUmHprAk8tZITwrmte+ZXCg73IBeXoBZXMsTUu67pLzeA==
+X-Received: by 2002:a05:6871:152:b0:21e:95dd:b212 with SMTP id z18-20020a056871015200b0021e95ddb212mr10831622oab.57.1709029632857;
+        Tue, 27 Feb 2024 02:27:12 -0800 (PST)
+Received: from ?IPV6:2003:cb:c707:7600:5c18:5a7d:c5b7:e7a9? (p200300cbc70776005c185a7dc5b7e7a9.dip0.t-ipconnect.de. [2003:cb:c707:7600:5c18:5a7d:c5b7:e7a9])
+        by smtp.gmail.com with ESMTPSA id z20-20020aa785d4000000b006e4c3a6da36sm5546717pfn.202.2024.02.27.02.27.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Feb 2024 02:27:12 -0800 (PST)
+Message-ID: <abb00aef-378c-481a-a885-327a99aa7b09@redhat.com>
+Date: Tue, 27 Feb 2024 11:27:08 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -52,135 +82,137 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 3/6] LoongArch: KVM: Add cpucfg area for kvm hypervisor
+Subject: Re: [PATCH] vfio/type1: unpin PageReserved page
 Content-Language: en-US
-To: maobibo <maobibo@loongson.cn>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
- Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org
-References: <20240222032803.2177856-1-maobibo@loongson.cn>
- <20240222032803.2177856-4-maobibo@loongson.cn>
- <CAAhV-H5eqXMqTYVb6cAVqOsDNcEDeP9HzaMKw69KFQeVaAYEdA@mail.gmail.com>
- <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
- <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
- <06647e4a-0027-9c9f-f3bd-cd525d37b6d8@loongson.cn>
- <85781278-f3e9-4755-8715-3b9ff714fb20@app.fastmail.com>
- <0d428e30-07a8-5a91-a20c-c2469adbf613@loongson.cn>
- <327808dd-ac34-4c61-9992-38642acc9419@xen0n.name>
- <62cc24fd-025a-53c6-1c8e-2d20de54d297@loongson.cn>
-From: WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <62cc24fd-025a-53c6-1c8e-2d20de54d297@loongson.cn>
+To: Alex Williamson <alex.williamson@redhat.com>,
+ Yisheng Xie <ethan.xys@linux.alibaba.com>, akpm@linux-foundation.org
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+References: <20240226160106.24222-1-ethan.xys@linux.alibaba.com>
+ <20240226091438.1fc37957.alex.williamson@redhat.com>
+ <e10ace3f-78d3-4843-8028-a0e1cd107c15@linux.alibaba.com>
+ <20240226103238.75ad4b24.alex.williamson@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240226103238.75ad4b24.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2/27/24 18:12, maobibo wrote:
+On 26.02.24 18:32, Alex Williamson wrote:
+> On Tue, 27 Feb 2024 01:14:54 +0800
+> Yisheng Xie <ethan.xys@linux.alibaba.com> wrote:
 > 
-> 
-> On 2024/2/27 下午5:10, WANG Xuerui wrote:
->> On 2/27/24 11:14, maobibo wrote:
+>> 在 2024/2/27 00:14, Alex Williamson 写道:
+>>> On Tue, 27 Feb 2024 00:01:06 +0800
+>>> Yisheng Xie<ethan.xys@linux.alibaba.com>  wrote:
+>>>   
+>>>> We meet a warning as following:
+>>>>    WARNING: CPU: 99 PID: 1766859 at mm/gup.c:209 try_grab_page.part.0+0xe8/0x1b0
+>>>>    CPU: 99 PID: 1766859 Comm: qemu-kvm Kdump: loaded Tainted: GOE  5.10.134-008.2.x86_64 #1
+>>>                                                                      ^^^^^^^^
 >>>
->>>
->>> On 2024/2/27 上午4:02, Jiaxun Yang wrote:
->>>>
->>>>
->>>> 在2024年2月26日二月 上午8:04，maobibo写道：
->>>>> On 2024/2/26 下午2:12, Huacai Chen wrote:
->>>>>> On Mon, Feb 26, 2024 at 10:04 AM maobibo <maobibo@loongson.cn> wrote:
->>>>>>>
->>>>>>>
->>>>>>>
->>>>>>> On 2024/2/24 下午5:13, Huacai Chen wrote:
->>>>>>>> Hi, Bibo,
->>>>>>>>
->>>>>>>> On Thu, Feb 22, 2024 at 11:28 AM Bibo Mao <maobibo@loongson.cn> 
->>>>>>>> wrote:
->>>>>>>>>
->>>>>>>>> Instruction cpucfg can be used to get processor features. And 
->>>>>>>>> there
->>>>>>>>> is trap exception when it is executed in VM mode, and also it is
->>>>>>>>> to provide cpu features to VM. On real hardware cpucfg area 0 - 20
->>>>>>>>> is used.  Here one specified area 0x40000000 -- 0x400000ff is used
->>>>>>>>> for KVM hypervisor to privide PV features, and the area can be 
->>>>>>>>> extended
->>>>>>>>> for other hypervisors in future. This area will never be used for
->>>>>>>>> real HW, it is only used by software.
->>>>>>>> After reading and thinking, I find that the hypercall method 
->>>>>>>> which is
->>>>>>>> used in our productive kernel is better than this cpucfg method.
->>>>>>>> Because hypercall is more simple and straightforward, plus we don't
->>>>>>>> worry about conflicting with the real hardware.
->>>>>>> No, I do not think so. cpucfg is simper than hypercall, hypercall 
->>>>>>> can
->>>>>>> be in effect when system runs in guest mode. In some scenario 
->>>>>>> like TCG
->>>>>>> mode, hypercall is illegal intruction, however cpucfg can work.
->>>>>> Nearly all architectures use hypercall except x86 for its historical
->>>>> Only x86 support multiple hypervisors and there is multiple hypervisor
->>>>> in x86 only. It is an advantage, not historical reason.
->>>>
->>>> I do believe that all those stuff should not be exposed to guest 
->>>> user space
->>>> for security reasons.
->>> Can you add PLV checking when cpucfg 0x40000000-0x400000FF is 
->>> emulated? if it is user mode return value is zero and it is kernel 
->>> mode emulated value will be returned. It can avoid information leaking.
+>>> Does this issue reproduce on mainline?  Thanks,
 >>
->> I've suggested this approach in another reply [1], but I've rechecked 
->> the manual, and it turns out this behavior is not permitted by the 
->> current wording. See LoongArch Reference Manual v1.10, Volume 1, 
->> Section 2.2.10.5 "CPUCFG":
+>> I have check the code of mainline, the logical seems the same as my
+>> version.
 >>
->>  > CPUCFG 访问未定义的配置字将读回全 0 值。
->>  >
->>  > Reads of undefined CPUCFG configuration words shall return all-zeroes.
->>
->> This sentence mentions no distinction based on privilege modes, so it 
->> can only mean the behavior applies universally regardless of privilege 
->> modes.
->>
->> I think if you want to make CPUCFG behavior PLV-dependent, you may 
->> have to ask the LoongArch spec editors, internally or in public, for a 
->> new spec revision.
-> No, CPUCFG behavior between CPUCFG0-CPUCFG21 is unchanged, only that it 
-> can be defined by software since CPUCFG 0x400000000 is used by software.
-
-The 0x40000000 range is not mentioned in the manuals. I know you've 
-confirmed privately with HW team but this needs to be properly 
-documented for public projects to properly rely on.
-
->> (There are already multiple third-party LoongArch implementers as of 
->> late 2023, so any ISA-level change like this would best be 
->> coordinated, to minimize surprises.)
-> With document Vol 4-23
-> https://www.intel.com/content/dam/develop/external/us/en/documents/335592-sdm-vol-4.pdf
+>> so I think it can reproduce if i understand correctly.
 > 
-> There is one line "MSR address range between 40000000H - 400000FFH is 
-> marked as a specially reserved range. All existing and
-> future processors will not implement any features using any MSR in this 
-> range."
+> I obviously can't speak to what's in your 5.10.134-008.2 kernel, but I
+> do know there's a very similar issue resolved in v6.0 mainline and
+> included in v5.10.146 of the stable tree.  Please test.  Thanks,
 
-Thanks for providing this info, now at least we know why it's this 
-specific range of 0x400000XX that's chosen.
+This commit, to be precise:
 
-> 
-> It only says that it is reserved, it does not say detailed software 
-> behavior. Software behavior is defined in hypervisor such as:
-> https://github.com/MicrosoftDocs/Virtualization-Documentation/blob/main/tlfs/Requirements%20for%20Implementing%20the%20Microsoft%20Hypervisor%20Interface.pdf
-> https://kb.vmware.com/s/article/1009458
-> 
-> If hypercall method is used, there should be ABI also like aarch64:
-> https://documentation-service.arm.com/static/6013e5faeee5236980d08619
+commit 873aefb376bbc0ed1dd2381ea1d6ec88106fdbd4
+Author: Alex Williamson <alex.williamson@redhat.com>
+Date:   Mon Aug 29 21:05:40 2022 -0600
 
-Yes proper documentation of public API surface is always necessary 
-*before* doing real work. Because right now the hypercall provider is 
-Linux KVM, maybe we can document the existing and planned hypercall 
-usage and ABI in the kernel docs along with code changes.
+     vfio/type1: Unpin zero pages
+     
+     There's currently a reference count leak on the zero page.  We increment
+     the reference via pin_user_pages_remote(), but the page is later handled
+     as an invalid/reserved page, therefore it's not accounted against the
+     user and not unpinned by our put_pfn().
+     
+     Introducing special zero page handling in put_pfn() would resolve the
+     leak, but without accounting of the zero page, a single user could
+     still create enough mappings to generate a reference count overflow.
+     
+     The zero page is always resident, so for our purposes there's no reason
+     to keep it pinned.  Therefore, add a loop to walk pages returned from
+     pin_user_pages_remote() and unpin any zero pages.
+
+
+BUT
+
+in the meantime, we also have
+
+commit c8070b78751955e59b42457b974bea4a4fe00187
+Author: David Howells <dhowells@redhat.com>
+Date:   Fri May 26 22:41:40 2023 +0100
+
+     mm: Don't pin ZERO_PAGE in pin_user_pages()
+     
+     Make pin_user_pages*() leave a ZERO_PAGE unpinned if it extracts a pointer
+     to it from the page tables and make unpin_user_page*() correspondingly
+     ignore a ZERO_PAGE when unpinning.  We don't want to risk overrunning a
+     zero page's refcount as we're only allowed ~2 million pins on it -
+     something that userspace can conceivably trigger.
+     
+     Add a pair of functions to test whether a page or a folio is a ZERO_PAGE.
+
+
+So the unpin_user_page_* won't do anything with the shared zeropage.
+
+(likely, we could revert 873aefb376bbc0ed1dd2381ea1d6ec88106fdbd4)
 
 -- 
-WANG "xen0n" Xuerui
+Cheers,
 
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+David / dhildenb
 
 
