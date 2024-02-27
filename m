@@ -1,159 +1,192 @@
-Return-Path: <kvm+bounces-10037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08655868BAF
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:07:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF1CC868C65
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84B18B2886E
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 09:07:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A7CA1F219AC
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 09:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0D7131734;
-	Tue, 27 Feb 2024 09:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE69136993;
+	Tue, 27 Feb 2024 09:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bpnpKk3f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SIlVNR8D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAFB136658
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 09:06:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5503E135A75
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 09:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709024811; cv=none; b=M2OLri9kOMgpMalNTFUMuwp7R61vjo9XnSXG4ypExqxmC63+USjF0fsG8Lwx+oJUcrmFbwcrRRj41V4T7TupS+0KOYhjlvgETKr5uOk/HGbQ9Uor8DXZ4k9hkUGh8RdASMH7gEEuNT6u1bVW50XacuzKX+1xDJMTol3XMsXjZh4=
+	t=1709026705; cv=none; b=AXQxK15lCK7D8XDAJhHRngq234B1/22+6Bb/n3SEw5so3H10oF8fzuwTvaquHXDtOycQExM1B0sUyDEntzGFo3ov6Eka7aUNISx6rZ9ymLc0lsWTGBGqZcoFUfVF4c1pzNLwhoKZK62blNsw3JuOyinakeCk8k4ExpUZapc8JVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709024811; c=relaxed/simple;
-	bh=/tjKuEbL0I0vIZe6oBP5MOkBmS0O+e/IjNu+fKHM/go=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eXeK2nHh0EfK74OzRhRr85CLP7ddxLs7I2W/O741pJvaeg9ZHQTUrZP0RXdIDK3yRwJV6SLv5qisqpMRhTC9DQUaOGTicP2mAYROxL+HQODuVmyAn0CtybHte1EKulbPOByK1/QlptKVNBPxoURNoFlQ5r6od697Sx5RMbiLT0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bpnpKk3f; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709024810; x=1740560810;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/tjKuEbL0I0vIZe6oBP5MOkBmS0O+e/IjNu+fKHM/go=;
-  b=bpnpKk3fDFLtcB0jvGt+OCme6Ja/3dxjC9Vrm+Vf7CfLSPQVzsDGrvbI
-   8UN1/ZqQX+wdx5mIJzCd31NXX5erA2ANX5WnaAScHNNEfeZCOlwf36QFu
-   zRKhLzrWL16kHBEiYEjzNXVfuqnujGPxoqMejqXx0qVnPkjDYhLJbVhZz
-   eYUOP9+JB9cQZv9Zuw35SS46DwEH1MHvjX1StDAKs9gyYGw58M8fajiJ8
-   keaT14gldG/3oPFnXUwilDaVh9SQTq9nGKoFcRohvdBOicFCVfunKM2gA
-   esBFFo9OftiIMBB4UVVmN4ekZ201jqHdokhkAcB4oKK4iU3v6aTNaXT+U
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="25818612"
-X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
-   d="scan'208";a="25818612"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 01:06:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
-   d="scan'208";a="6839753"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmviesa007.fm.intel.com with ESMTP; 27 Feb 2024 01:06:42 -0800
-Date: Tue, 27 Feb 2024 17:20:25 +0800
-From: Zhao Liu <zhao1.liu@linux.intel.com>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Daniel P =?utf-8?B?LiBCZXJyYW5n77+9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?utf-8?B?TWF0aGlldS1EYXVk77+9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Alex =?utf-8?B?QmVubu+/vWU=?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [RFC 4/8] hw/core: Add cache topology options in -smp
-Message-ID: <Zd2pWVH4/eo3HM8j@intel.com>
-References: <20240220092504.726064-1-zhao1.liu@linux.intel.com>
- <20240220092504.726064-5-zhao1.liu@linux.intel.com>
- <20240226153947.00006fd6@Huawei.com>
+	s=arc-20240116; t=1709026705; c=relaxed/simple;
+	bh=lITNheftSYMR04YfLtv3K2IE6PAf+peApENOiHb/BYE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lVvQ5iXW6LLNO90UFw00z4QBJhKvT3jVDzhPz55mc8nyC0Fn7uxQkr8wdiy+r4x51LAc26Tb+/pZRdGQ/N7Ao/hQ3EX5ZrxaQg2uJaF8mW85AcgsQDEPze8U0jn2cZIU/Nnx3vy67Ga33DvAakiLZipTUYPQ87/447PPV4+MW00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SIlVNR8D; arc=none smtp.client-ip=209.85.217.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-47051c7635dso630219137.1
+        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 01:38:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709026702; x=1709631502; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lITNheftSYMR04YfLtv3K2IE6PAf+peApENOiHb/BYE=;
+        b=SIlVNR8DBOq/cb1yv1OP8OSqzxIk3+XhkCqnMummpIfwTxMGjdWP1nuygQWM1nAes+
+         TLQnXSy9vCuMakfZ9EnlcHAMkUMuryWuAGZbXfqEJ6blkcsVmuKn0zYSm0jmVAp75VlL
+         9OYcPBlZ1SJbaMGjH0SVGq+9krKXC8weFx9X45oy+324YEMOlPdaqXRE9FpF6Fd2Opkb
+         DiJR8UPLyo8VC6FJTUSchFUTuYfCYApaLaHr37oIUlwL8h4pI318U5ZXLGMQdN4ewecg
+         Vv023kcZy5MeDIeHkgs/JnM6baeHdNVQpTWLiAaMwVgB7Bdt6ymNHxnB03DAYoWn4xVM
+         VLxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709026702; x=1709631502;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lITNheftSYMR04YfLtv3K2IE6PAf+peApENOiHb/BYE=;
+        b=JQ+7vPkLqd9f4ExyrRoPxrVXWavMiPzHkLt+yPHsK0aO6ub9BGib+eVsdCh0JlPOmG
+         zypWNgKEC3RZI1630izU2Sn6gZyFmLZw7dhW5a2IMTEEf8LKuXOKWAwkbJ3ygs8ARRWv
+         COWfSJ9kvyvggjudJUiBi3Y9k4OrX4kBgCjlb3jPaiPG//ax3oblCKS7bWNPZuc1Q8Qo
+         +gw/yv5v8+KUhPbXv5jXiLhOBq3UhD/Ei1en8MWNF4eK0eUpPij8QZlXb98FvoIjq52H
+         YBEwvmF93D/84LLq/iQbzJ9B51As7IqWbTtDWgMUzkxu9WVpCEgFjTjAWTB7ulpFhRfG
+         UyQQ==
+X-Gm-Message-State: AOJu0YyohJSQdHhBMvyFTTddRwLawgUT/NThk+wJNOWvTn2VS88N5QNF
+	vmQbAflgYn9l2ywBbIQ11QDldFsENcnkfrxBQAA++/veYsgmNso87/CKOmLpsdDYUJ7snBGxzOG
+	/X/asJvXoJ/g+Gll0nrsIs2htTujfKmaNb4la
+X-Google-Smtp-Source: AGHT+IGtUSpwVCXklISxbQaZarJMI7q14JSgkprPOp6y3p4Ot6amI6BiQXX96hlj61rZiLNkfUPjDqMpwEnxXQpNCPo=
+X-Received: by 2002:a67:ed57:0:b0:471:e15d:71bf with SMTP id
+ m23-20020a67ed57000000b00471e15d71bfmr4819795vsp.30.1709026702061; Tue, 27
+ Feb 2024 01:38:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226153947.00006fd6@Huawei.com>
+References: <20240222161047.402609-1-tabba@google.com> <9e983090-f336-43b9-8f2b-5dabe7e73b72@redhat.com>
+In-Reply-To: <9e983090-f336-43b9-8f2b-5dabe7e73b72@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 27 Feb 2024 09:37:44 +0000
+Message-ID: <CA+EHjTyGDv0z=X_EN5NAv3ZuqHkPw0rPtGmxjmkc21JqZ+oJLw@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 00/26] KVM: Restricted mapping of guest_memfd at
+ the host and pKVM/arm64 support
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jonathan,
+Hi David,
 
-> Hi Zhao Liu
-> 
-> I like the scheme.  Strikes a good balance between complexity of description
-> and systems that actually exist. Sure there are systems with more cache
-> levels etc but they are rare and support can be easily added later
-> if people want to model them.
+On Mon, Feb 26, 2024 at 9:47=E2=80=AFAM David Hildenbrand <david@redhat.com=
+> wrote:
+>
+> On 22.02.24 17:10, Fuad Tabba wrote:
+> > This series adds restricted mmap() support to guest_memfd [1], as
+> > well as support guest_memfd on pKVM/arm64.
+> >
+> > This series is based on Linux 6.8-rc4 + our pKVM core series [2].
+> > The KVM core patches apply to Linux 6.8-rc4 (patches 1-6), but
+> > the remainder (patches 7-26) require the pKVM core series. A git
+> > repo with this series applied can be found here [3]. We have a
+> > (WIP) kvmtool port capable of running the code in this series
+> > [4]. For a technical deep dive into pKVM, please refer to Quentin
+> > Perret's KVM Forum Presentation [5, 6].
+> >
+> > I've covered some of the issues presented here in my LPC 2023
+> > presentation [7].
+> >
+> > We haven't started using this in Android yet, but we aim to move
+> > away from anonymous memory to guest_memfd once we have the
+> > necessary support merged upstream. Others (e.g., Gunyah [8]) are
+> > also looking into guest_memfd for similar reasons as us.
+> >
+> > By design, guest_memfd cannot be mapped, read, or written by the
+> > host userspace. In pKVM, memory shared between a protected guest
+> > and the host is shared in-place, unlike the other confidential
+> > computing solutions that guest_memfd was originally envisaged for
+> > (e.g, TDX).
+>
+> Can you elaborate (or point to a summary) why pKVM has to be special
+> here? Why can't you use guest_memfd only for private memory and another
+> (ordinary) memfd for shared memory, like the other confidential
+> computing technologies are planning to?
 
-Thanks for your support!
+Because the same memory location can switch back and forth between
+being shared and private in-place. The host/vmm doesn't know
+beforehand which parts of the guest's private memory might be shared
+with it later, therefore, it cannot use guest_memfd() for the private
+memory and anonymous memory for the shared memory without resorting to
+copying. Even if it did know beforehand, it wouldn't help much since
+that memory can change back to being private later on. Other
+confidential computing proposals like TDX and Arm CCA don't share in
+place, and need to copy shared data between private and shared memory.
 
-[snip]
+If you're interested, there was also a more detailed discussion about
+this in an earlier guest_memfd() thread [1]
 
-> > +static int smp_cache_string_to_topology(MachineState *ms,
-> 
-> Not a good name for a function that does rather more than that.
+> What's the main reason for that decision and can it be avoided?
+> (s390x also shares in-place, but doesn't need any special-casing like
+> guest_memfd provides)
 
-What about "smp_cache_get_valid_topology()"?
+In our current implementation of pKVM, we use anonymous memory with a
+long-term gup, and the host ends up with valid mappings. This isn't
+just a problem for pKVM, but also for TDX and Gunyah [2, 3]. In TDX,
+accessing guest private memory can be fatal to the host and the system
+as a whole since it could result in a machine check. In arm64 it's not
+necessarily fatal to the system as a whole if a userspace process were
+to attempt the access. However, a userspace process could trick the
+host kernel to try to access the protected guest memory, e.g., by
+having a process A strace a malicious process B which passes protected
+guest memory as argument to a syscall.
 
-> 
-> > +                                        char *topo_str,
-> > +                                        CPUTopoLevel *topo,
-> > +                                        Error **errp)
-> > +{
-> > +    *topo = string_to_cpu_topo(topo_str);
-> > +
-> > +    if (*topo == CPU_TOPO_LEVEL_MAX || *topo == CPU_TOPO_LEVEL_INVALID) {
-> > +        error_setg(errp, "Invalid cache topology level: %s. The cache "
-> > +                   "topology should match the CPU topology level", topo_str);
-> > +        return -1;
-> > +    }
-> > +
-> > +    if (!machine_check_topo_support(ms, *topo)) {
-> > +        error_setg(errp, "Invalid cache topology level: %s. The topology "
-> > +                   "level is not supported by this machine", topo_str);
-> > +        return -1;
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static void machine_parse_smp_cache_config(MachineState *ms,
-> > +                                           const SMPConfiguration *config,
-> > +                                           Error **errp)
-> > +{
-> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> > +
-> > +    if (config->l1d_cache) {
-> > +        if (!mc->smp_props.l1_separated_cache_supported) {
-> > +            error_setg(errp, "L1 D-cache topology not "
-> > +                       "supported by this machine");
-> > +            return;
-> > +        }
-> > +
-> > +        if (smp_cache_string_to_topology(ms, config->l1d_cache,
-> > +            &ms->smp_cache.l1d, errp)) {
-> 
-> Indent is to wrong opening bracket.
-> Same for other cases.
+What makes pKVM and Gunyah special is that both can easily share
+memory (and its contents) in place, since it's not encrypted, and
+convert memory locations between shared/unshared. I'm not familiar
+with how s390x handles sharing in place, or how it handles memory
+donated to the guest. I assume it's by donating anonymous memory. I
+would be also interested to know how it handles and recovers from
+similar situations, i.e., host (userspace or kernel) trying to access
+guest protected memory.
 
-Could you please educate me about the correct style here?
-I'm unsure if it should be indented by 4 spaces.
+Thank you,
+/fuad
 
-Thanks,
-Zhao
+[1] https://lore.kernel.org/all/YkcTTY4YjQs5BRhE@google.com/
 
+[2] https://lore.kernel.org/all/20231105163040.14904-1-pbonzini@redhat.com/
+
+[3] https://lore.kernel.org/all/20240222-gunyah-v17-0-1e9da6763d38@quicinc.=
+com/
+
+
+
+>
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
