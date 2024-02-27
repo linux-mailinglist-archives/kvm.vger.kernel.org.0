@@ -1,333 +1,247 @@
-Return-Path: <kvm+bounces-10027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BDEB86899A
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 08:09:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 076FB868A05
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 08:40:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CF181C217B5
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 07:09:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B7321C2263B
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 07:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E23653E38;
-	Tue, 27 Feb 2024 07:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B6AF54F91;
+	Tue, 27 Feb 2024 07:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X0BfVv1v"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3186553E02;
-	Tue, 27 Feb 2024 07:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C357954BE3
+	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 07:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709017741; cv=none; b=mmr9IltrFspMtP1gjfzFpIPNdjcQ0htgpZa+TPfRaGZrNucslel53X9+fygMANoZoKjHau138O6OMI0ju+fm++KJhmng/uVv7WvMjUrRHZsqkduQrSk4NOJ09IlapuxSmIya8x3tjVVCKSdVdzo34dJi7iXVuFVCTiRoenOVk7s=
+	t=1709019632; cv=none; b=DtwLdE6JpQnQ9Ju3fwQ2CazWhpGj2fJLJqf5Dm/D7yDda0QPW2AGoKW6908AoePfnsJJNukqhfYoWyAQE1S7JTeiJeF/nhA6Lm0pSYAn6grCHpUZBM98+aihT/VHIglcmJesFTeG7+6QEtZj/MJwm45zP+eqZ9+5ePcbymUUJf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709017741; c=relaxed/simple;
-	bh=tZglC7d8hBqUGbzIh2ATwwNtFTM7TeSlFuGICt6EA04=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=PMSHJb8mE1YVA6GiFUWsK9fKT1aBzT52GAtlnbT3aywxCjhAof8tt+Fncs4x1XiY9JsRc30dMWpw8vgFfi3zuEvoaKvVlLGns4b67u7qjs51djpszBQZSq2iov/4bT3Prc0hisqhxph4qBxg4W/5LPoROm5fpYhLJ8mLNpmDgBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.173])
-	by gateway (Coremail) with SMTP id _____8BxnuuGit1lQdoRAA--.44900S3;
-	Tue, 27 Feb 2024 15:08:54 +0800 (CST)
-Received: from [10.20.42.173] (unknown [10.20.42.173])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxVMyDit1lv2tHAA--.61830S3;
-	Tue, 27 Feb 2024 15:08:51 +0800 (CST)
-Subject: Re: [PATCH v5 3/6] LoongArch: KVM: Add cpucfg area for kvm hypervisor
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
- Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org
-References: <20240222032803.2177856-1-maobibo@loongson.cn>
- <20240222032803.2177856-4-maobibo@loongson.cn>
- <CAAhV-H5eqXMqTYVb6cAVqOsDNcEDeP9HzaMKw69KFQeVaAYEdA@mail.gmail.com>
- <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
- <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
- <06647e4a-0027-9c9f-f3bd-cd525d37b6d8@loongson.cn>
- <85781278-f3e9-4755-8715-3b9ff714fb20@app.fastmail.com>
- <0d428e30-07a8-5a91-a20c-c2469adbf613@loongson.cn>
- <09c5af9b-cc79-4cf2-84f7-276bb188754a@app.fastmail.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <fc05cf09-bf53-158a-3cc9-eff6f06a220a@loongson.cn>
-Date: Tue, 27 Feb 2024 15:09:15 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1709019632; c=relaxed/simple;
+	bh=GzzxhdQpnwLwxs8w95eaSA26dcqErhEF/JdmHnbq4GQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hc9pxYIKsZqDrFYfTl3AAZw8T19dOr4jP1R+SSRGJYClSTTKjguPpgRbb2CwDZ7kDgOwnbKMqKDbQW+WUXL2jiQHkxUIe024WiFX3bOM5w/39hwFoQygJ/klZLhxpaDVkR/Gtk93dUzqcpNZ1oxfiLRPvvXw1ZouEKpeVPvNLwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X0BfVv1v; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709019629;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=488T45k9s4fXxqiaoayV/5rP9Q/Srzb8zs2DRkXpEfQ=;
+	b=X0BfVv1vjm4vn/+taPasdySazIWS9tlVM/9LrOkbfidL7tPJd/0LlhWrqXtJXDGYYNwukD
+	tuMyTcVIR3aAf6p+I5cOkLVaQnYA5wwHHVJumq/iLImAa6f9I1pYG8wVrwtgn2J46SPfWl
+	mu2OhqgQUn9wTpHGm30Px/UWPAEfm7U=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-508-s_nUXHZ9NVuLqXGghRFMzQ-1; Tue, 27 Feb 2024 02:40:27 -0500
+X-MC-Unique: s_nUXHZ9NVuLqXGghRFMzQ-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d23143f4a1so39291031fa.1
+        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 23:40:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709019626; x=1709624426;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=488T45k9s4fXxqiaoayV/5rP9Q/Srzb8zs2DRkXpEfQ=;
+        b=A0rNXuSJu5OojhS0GwDUnkbGwtq+G8exaMty/9MIRnNrqQnawIb4q4DBYsHTyLbnji
+         8vAosDQKgp+pPci0WBcMO1/5y26B9VtTo+clvwZT6wuJR8e3CScVJiFAINv8sOJE8Jif
+         Ar6jgxIuiuMO0Y8q8uOam9bjAfK1ZYdRiGBoIbyFuqYoME2pZ4cxSbIkSP20rt+IR/G4
+         GpK5R0spJZNDFYf5+0DYQE6ZvcB1cWlg0yOMcmb/Anz3Iuv/YP1KkleqpfUdSrfuaKIV
+         6kqFgbxzg33DyjLHkLHCPFRBqLS3ikgG8f3Fq+/K7ShDBOeVtZZXINCv6GL7F2QK8NdN
+         zdZg==
+X-Gm-Message-State: AOJu0Ywmo3kRWfxpVZ4AmA6/bli/U3zuulNshQWgr2Oy7RxngnAy7Q05
+	qE4Cd3k0uXB/JNdjghLL0mxqOrB/TfNrElgRKoUY/iR6i1S8n7fbQQcB+05zdfEXRLXosMPBDCa
+	7mRNlFsgAkvwLc8+r0Zs5/0wQ69Ciwewn8CM19w1TP1IoDqvch6F4NLOu+Q==
+X-Received: by 2002:a2e:be07:0:b0:2d2:8767:3175 with SMTP id z7-20020a2ebe07000000b002d287673175mr4780353ljq.24.1709019626129;
+        Mon, 26 Feb 2024 23:40:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEPcdJfY8t4PrOiGW6VUeQhZm2d69TblXO7A98l8xTnAQSjDW8u3wWQenhACNoHM/TFC9wumg==
+X-Received: by 2002:a2e:be07:0:b0:2d2:8767:3175 with SMTP id z7-20020a2ebe07000000b002d287673175mr4780313ljq.24.1709019625657;
+        Mon, 26 Feb 2024 23:40:25 -0800 (PST)
+Received: from ?IPV6:2003:cb:c707:7600:5c18:5a7d:c5b7:e7a9? (p200300cbc70776005c185a7dc5b7e7a9.dip0.t-ipconnect.de. [2003:cb:c707:7600:5c18:5a7d:c5b7:e7a9])
+        by smtp.gmail.com with ESMTPSA id v6-20020a5d59c6000000b0033b47ee01f1sm10751259wry.49.2024.02.26.23.40.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Feb 2024 23:40:25 -0800 (PST)
+Message-ID: <4a0fd313-4423-496d-aec1-d25707a89288@redhat.com>
+Date: Tue, 27 Feb 2024 08:40:23 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <09c5af9b-cc79-4cf2-84f7-276bb188754a@app.fastmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 03/26] KVM: Add restricted support for mapping
+ guestmem by the host
 Content-Language: en-US
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+ willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com,
+ yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
+ amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com
+References: <20240222161047.402609-1-tabba@google.com>
+ <20240222161047.402609-4-tabba@google.com>
+ <86461043-fa5b-405d-bd2e-dc1aba9977c5@redhat.com>
+ <CA+EHjTyYQWdc14kFiQs0Ous2Hnep88v9-Us9m68TneLm9Eqvzw@mail.gmail.com>
+ <83d6edb8-bfd0-4233-a4cf-b573fa62c8d9@redhat.com>
+ <CA+EHjTwtWiCML0X_4Erx5m__DE1Ja4i5BBZtLQRn9dnLWFahPQ@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CA+EHjTwtWiCML0X_4Erx5m__DE1Ja4i5BBZtLQRn9dnLWFahPQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxVMyDit1lv2tHAA--.61830S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3ArWUCr43GrW8Zw43tFyDtwc_yoWftFy3pF
-	WUAF1UGr48Jr1xAw1jqw1UXrnxtr4kGr1xXry5Jw1UAr1Dtr1xJr18Kr4jkFykJw18CF10
-	qF1UJry3uF1UA3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
-	Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU466zUUUUU
 
-
-
-On 2024/2/27 下午1:23, Jiaxun Yang wrote:
+On 26.02.24 18:30, Fuad Tabba wrote:
+> Hi David,
 > 
+> Thank you very much for reviewing this.
 > 
-> 在2024年2月27日二月 上午3:14，maobibo写道：
->> On 2024/2/27 上午4:02, Jiaxun Yang wrote:
->>>
->>>
->>> 在2024年2月26日二月 上午8:04，maobibo写道：
->>>> On 2024/2/26 下午2:12, Huacai Chen wrote:
->>>>> On Mon, Feb 26, 2024 at 10:04 AM maobibo <maobibo@loongson.cn> wrote:
->>>>>>
->>>>>>
->>>>>>
->>>>>> On 2024/2/24 下午5:13, Huacai Chen wrote:
->>>>>>> Hi, Bibo,
->>>>>>>
->>>>>>> On Thu, Feb 22, 2024 at 11:28 AM Bibo Mao <maobibo@loongson.cn> wrote:
->>>>>>>>
->>>>>>>> Instruction cpucfg can be used to get processor features. And there
->>>>>>>> is trap exception when it is executed in VM mode, and also it is
->>>>>>>> to provide cpu features to VM. On real hardware cpucfg area 0 - 20
->>>>>>>> is used.  Here one specified area 0x40000000 -- 0x400000ff is used
->>>>>>>> for KVM hypervisor to privide PV features, and the area can be extended
->>>>>>>> for other hypervisors in future. This area will never be used for
->>>>>>>> real HW, it is only used by software.
->>>>>>> After reading and thinking, I find that the hypercall method which is
->>>>>>> used in our productive kernel is better than this cpucfg method.
->>>>>>> Because hypercall is more simple and straightforward, plus we don't
->>>>>>> worry about conflicting with the real hardware.
->>>>>> No, I do not think so. cpucfg is simper than hypercall, hypercall can
->>>>>> be in effect when system runs in guest mode. In some scenario like TCG
->>>>>> mode, hypercall is illegal intruction, however cpucfg can work.
->>>>> Nearly all architectures use hypercall except x86 for its historical
->>>> Only x86 support multiple hypervisors and there is multiple hypervisor
->>>> in x86 only. It is an advantage, not historical reason.
->>>
->>> I do believe that all those stuff should not be exposed to guest user space
->>> for security reasons.
->> Can you add PLV checking when cpucfg 0x40000000-0x400000FF is emulated?
->> if it is user mode return value is zero and it is kernel mode emulated
->> value will be returned. It can avoid information leaking.
-> 
-> Please don’t do insane stuff here, applications are not expecting exception from
-> cpucfg.
-Sorry, I do not understand. Can you describe the behavior about cpucfg 
-instruction from applications? Why is there no exception for cpucfg.
-> 
+> On Mon, Feb 26, 2024 at 9:58 AM David Hildenbrand <david@redhat.com> wrote:
 >>
+>> On 26.02.24 09:58, Fuad Tabba wrote:
+>>> Hi David,
 >>>
->>> Also for different implementations of hypervisors they may have different
->>> PV features behavior, using hypcall to perform feature detection
->>> can pass more information to help us cope with hypervisor diversity.
->> How do different hypervisors can be detected firstly?  On x86 MSR is
->> used for all hypervisors detection and on ARM64 hyperv used
->> acpi_gbl_FADT and kvm use smc forcely, host mode can execute smc
->> instruction without exception on ARM64.
-> 
-> That’s hypcall ABI design choices, those information can come from firmware
-> or privileged CSRs on LoongArch.
-Firstly the firmware or privileged CSRs is not relative with hypcall ABI 
-design choices.  With CSR instruction, CSR ID is encoded in CSR 
-instruction, range about CSR ID is 16K; for cpucfg instruction, cpucfg 
-area is passed with register, range is UINT_MAX at least.
-
-It is difficult to find an area unused by HW for CSR method since the 
-small CSR ID range. However it is easy for cpucfg. Here I doubt whether 
-you really know about LoongArch LVZ.
-
-> 
->>
->> I do not know why hypercall is better than cpucfg on LoongArch, cpucfg
->> is basic intruction however hypercall is not, it is part of LVZ feature.
-> 
-> KVM can only work with LVZ right?
-Linux kernel need boot well with TCG and KVM mode, hypercall is illegal 
-instruction with TCG mode.
-
-Regards
-Bibo Mao
-> 
->>
+>>> On Thu, Feb 22, 2024 at 4:28 PM David Hildenbrand <david@redhat.com> wrote:
 >>>>
->>>>> reasons. If we use CPUCFG, then the hypervisor information is
->>>>> unnecessarily leaked to userspace, and this may be a security issue.
->>>>> Meanwhile, I don't think TCG mode needs PV features.
->>>> Besides PV features, there is other features different with real hw such
->>>> as virtio device, virtual interrupt controller.
+>>>>> +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
+>>>>> +{
+>>>>> +     struct folio *folio;
+>>>>> +
+>>>>> +     folio = kvm_gmem_get_folio(file_inode(vmf->vma->vm_file), vmf->pgoff);
+>>>>> +     if (!folio)
+>>>>> +             return VM_FAULT_SIGBUS;
+>>>>> +
+>>>>> +     /*
+>>>>> +      * Check if the page is allowed to be faulted to the host, with the
+>>>>> +      * folio lock held to ensure that the check and incrementing the page
+>>>>> +      * count are protected by the same folio lock.
+>>>>> +      */
+>>>>> +     if (!kvm_gmem_isfaultable(vmf)) {
+>>>>> +             folio_unlock(folio);
+>>>>> +             return VM_FAULT_SIGBUS;
+>>>>> +     }
+>>>>> +
+>>>>> +     vmf->page = folio_file_page(folio, vmf->pgoff);
+>>>>
+>>>> We won't currently get hugetlb (or even THP) here. It mimics what shmem
+>>>> would do.
 >>>
->>> Those are *device* level information, they must be passed in firmware
->>> interfaces to keep processor emulation sane.
->> File arch/x86/hyperv/hv_apic.c can be referenced, apic features comes
->> from ms_hyperv.hints and HYPERV_CPUID_ENLIGHTMENT_INFO cpuid info, not
->> must be passed by firmware interface.
-> 
-> That’s not KVM, that’s Hyper V. At Linux Kernel we enjoy the benefits of better
-> modularity on device abstractions, please don’t break it.
-> 
-> Thanks
-> 
+>>> At the moment there isn't hugetlb support in guest_memfd(), and
+>>> neither in pKVM. Although we do plan on supporting it.
+>>>
+>>>> finish_fault->set_pte_range() will call folio_add_file_rmap_ptes(),
+>>>> getting the rmap involved.
+>>>>
+>>>> Do we have some tests in place that make sure that
+>>>> fallocate(FALLOC_FL_PUNCH_HOLE|FALLOC_FL_KEEP_SIZE) will properly unmap
+>>>> the page again (IOW, that the rmap does indeed work?).
+>>>
+>>> I'm not sure if you mean kernel tests, or if I've tested it. There are
+>>> guest_memfd() tests for
+>>> fallocate(FALLOC_FL_PUNCH_HOLE|FALLOC_FL_KEEP_SIZE) , which I have
+>>> run. I've also tested it manually with sample programs, and it behaves
+>>> as expected.
 >>
->> Regards
->> Bibo Mao
->>>
->>> Thanks
->>>
->>>>
->>>> Regards
->>>> Bibo Mao
->>>>
->>>>>
->>>>> I consulted with Jiaxun before, and maybe he can give some more comments.
->>>>>
->>>>>>
->>>>>> Extioi virtualization extension will be added later, cpucfg can be used
->>>>>> to get extioi features. It is unlikely that extioi driver depends on
->>>>>> PARA_VIRT macro if hypercall is used to get features.
->>>>> CPUCFG is per-core information, if we really need something about
->>>>> extioi, it should be in iocsr (LOONGARCH_IOCSR_FEATURES).
->>>>>
->>>>>
->>>>> Huacai
->>>>>
->>>>>>
->>>>>> Regards
->>>>>> Bibo Mao
->>>>>>
->>>>>>>
->>>>>>> Huacai
->>>>>>>
->>>>>>>>
->>>>>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>>>>>>> ---
->>>>>>>>      arch/loongarch/include/asm/inst.h      |  1 +
->>>>>>>>      arch/loongarch/include/asm/loongarch.h | 10 ++++++
->>>>>>>>      arch/loongarch/kvm/exit.c              | 46 +++++++++++++++++---------
->>>>>>>>      3 files changed, 41 insertions(+), 16 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/arch/loongarch/include/asm/inst.h b/arch/loongarch/include/asm/inst.h
->>>>>>>> index d8f637f9e400..ad120f924905 100644
->>>>>>>> --- a/arch/loongarch/include/asm/inst.h
->>>>>>>> +++ b/arch/loongarch/include/asm/inst.h
->>>>>>>> @@ -67,6 +67,7 @@ enum reg2_op {
->>>>>>>>             revhd_op        = 0x11,
->>>>>>>>             extwh_op        = 0x16,
->>>>>>>>             extwb_op        = 0x17,
->>>>>>>> +       cpucfg_op       = 0x1b,
->>>>>>>>             iocsrrdb_op     = 0x19200,
->>>>>>>>             iocsrrdh_op     = 0x19201,
->>>>>>>>             iocsrrdw_op     = 0x19202,
->>>>>>>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
->>>>>>>> index 46366e783c84..a1d22e8b6f94 100644
->>>>>>>> --- a/arch/loongarch/include/asm/loongarch.h
->>>>>>>> +++ b/arch/loongarch/include/asm/loongarch.h
->>>>>>>> @@ -158,6 +158,16 @@
->>>>>>>>      #define  CPUCFG48_VFPU_CG              BIT(2)
->>>>>>>>      #define  CPUCFG48_RAM_CG               BIT(3)
->>>>>>>>
->>>>>>>> +/*
->>>>>>>> + * cpucfg index area: 0x40000000 -- 0x400000ff
->>>>>>>> + * SW emulation for KVM hypervirsor
->>>>>>>> + */
->>>>>>>> +#define CPUCFG_KVM_BASE                        0x40000000UL
->>>>>>>> +#define CPUCFG_KVM_SIZE                        0x100
->>>>>>>> +#define CPUCFG_KVM_SIG                 CPUCFG_KVM_BASE
->>>>>>>> +#define  KVM_SIGNATURE                 "KVM\0"
->>>>>>>> +#define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
->>>>>>>> +
->>>>>>>>      #ifndef __ASSEMBLY__
->>>>>>>>
->>>>>>>>      /* CSR */
->>>>>>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
->>>>>>>> index 923bbca9bd22..6a38fd59d86d 100644
->>>>>>>> --- a/arch/loongarch/kvm/exit.c
->>>>>>>> +++ b/arch/loongarch/kvm/exit.c
->>>>>>>> @@ -206,10 +206,37 @@ int kvm_emu_idle(struct kvm_vcpu *vcpu)
->>>>>>>>             return EMULATE_DONE;
->>>>>>>>      }
->>>>>>>>
->>>>>>>> -static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
->>>>>>>> +static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst inst)
->>>>>>>>      {
->>>>>>>>             int rd, rj;
->>>>>>>>             unsigned int index;
->>>>>>>> +
->>>>>>>> +       rd = inst.reg2_format.rd;
->>>>>>>> +       rj = inst.reg2_format.rj;
->>>>>>>> +       ++vcpu->stat.cpucfg_exits;
->>>>>>>> +       index = vcpu->arch.gprs[rj];
->>>>>>>> +
->>>>>>>> +       /*
->>>>>>>> +        * By LoongArch Reference Manual 2.2.10.5
->>>>>>>> +        * Return value is 0 for undefined cpucfg index
->>>>>>>> +        */
->>>>>>>> +       switch (index) {
->>>>>>>> +       case 0 ... (KVM_MAX_CPUCFG_REGS - 1):
->>>>>>>> +               vcpu->arch.gprs[rd] = vcpu->arch.cpucfg[index];
->>>>>>>> +               break;
->>>>>>>> +       case CPUCFG_KVM_SIG:
->>>>>>>> +               vcpu->arch.gprs[rd] = *(unsigned int *)KVM_SIGNATURE;
->>>>>>>> +               break;
->>>>>>>> +       default:
->>>>>>>> +               vcpu->arch.gprs[rd] = 0;
->>>>>>>> +               break;
->>>>>>>> +       }
->>>>>>>> +
->>>>>>>> +       return EMULATE_DONE;
->>>>>>>> +}
->>>>>>>> +
->>>>>>>> +static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
->>>>>>>> +{
->>>>>>>>             unsigned long curr_pc;
->>>>>>>>             larch_inst inst;
->>>>>>>>             enum emulation_result er = EMULATE_DONE;
->>>>>>>> @@ -224,21 +251,8 @@ static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
->>>>>>>>             er = EMULATE_FAIL;
->>>>>>>>             switch (((inst.word >> 24) & 0xff)) {
->>>>>>>>             case 0x0: /* CPUCFG GSPR */
->>>>>>>> -               if (inst.reg2_format.opcode == 0x1B) {
->>>>>>>> -                       rd = inst.reg2_format.rd;
->>>>>>>> -                       rj = inst.reg2_format.rj;
->>>>>>>> -                       ++vcpu->stat.cpucfg_exits;
->>>>>>>> -                       index = vcpu->arch.gprs[rj];
->>>>>>>> -                       er = EMULATE_DONE;
->>>>>>>> -                       /*
->>>>>>>> -                        * By LoongArch Reference Manual 2.2.10.5
->>>>>>>> -                        * return value is 0 for undefined cpucfg index
->>>>>>>> -                        */
->>>>>>>> -                       if (index < KVM_MAX_CPUCFG_REGS)
->>>>>>>> -                               vcpu->arch.gprs[rd] = vcpu->arch.cpucfg[index];
->>>>>>>> -                       else
->>>>>>>> -                               vcpu->arch.gprs[rd] = 0;
->>>>>>>> -               }
->>>>>>>> +               if (inst.reg2_format.opcode == cpucfg_op)
->>>>>>>> +                       er = kvm_emu_cpucfg(vcpu, inst);
->>>>>>>>                     break;
->>>>>>>>             case 0x4: /* CSR{RD,WR,XCHG} GSPR */
->>>>>>>>                     er = kvm_handle_csr(vcpu, inst);
->>>>>>>> --
->>>>>>>> 2.39.3
->>>>>>>>
->>>>>>
->>>>>>
->>>
+>> Can you point me at the existing tests? I'm interested in
+>> mmap()-specific guest_memfd tests.
+>>
+>> A test that would make sense to me:
+>>
+>> 1) Create guest_memfd() and size it to contain at least one page.
+>>
+>> 2) mmap() it
+>>
+>> 3) Write some pattern (e.g., all 1's) to the first page using the mmap
+>>
+>> 4) fallocate(FALLOC_FL_PUNCH_HOLE|FALLOC_FL_KEEP_SIZE) the first page
+>>
+>> 5) Make sure reading from the first page using the mmap reads all 0's
+>>
+>> IOW, during 4) we properly unmapped (via rmap) and discarded the page,
+>> such that 5) will populate a fresh page in the page cache filled with
+>> 0's and map that one.
 > 
+> The existing tests don't test mmap (or rather, they test the inability
+> to mmap). They do test FALLOC_FL_PUNCH_HOLE. [1]
+> 
+> The tests for mmap() are ones that I wrote myself. I will write a test
+> like the one you mentioned, and send it with V2, or earlier if you
+> prefer.
+
+Thanks, no need to rush. As long as we have some simple test for that 
+scenario at some point, all good!
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
