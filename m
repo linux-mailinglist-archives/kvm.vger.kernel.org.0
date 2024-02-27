@@ -1,235 +1,148 @@
-Return-Path: <kvm+bounces-10086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04A6869166
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 14:09:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3FD88691F8
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 14:31:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 557961F252AB
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 13:09:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6719293947
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 13:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293C013AA59;
-	Tue, 27 Feb 2024 13:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F07713A87C;
+	Tue, 27 Feb 2024 13:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FznDZiGt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AKUiUF3v"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7931332A7
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 13:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C41E13B7AA;
+	Tue, 27 Feb 2024 13:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709039391; cv=none; b=fAZbRdPuPuSkd9bUG1luaBk6WjB4ivrjc4NAY/wT3TeNsEHeP9KGtsRJK8p56yscjfuGrUT3bsMW9/YNtA32YKOjTp9SYUHss8xuwNoLhvKikpd0VHHVqosqOwwk3cwofSukb2yJd01q2Z6RFNx+1++v5S08n2Jy0NAf5jP7ajo=
+	t=1709040617; cv=none; b=VqCwOKU5mKwj+eeJUz3qAe6L8E3MXU7NlWg5Z3de8PpQ8Pz5qHV6LKg3IXhrphVRZWUur3qIgHqoSeJouKsmfbERrWid4Fk72qMEbl61Bvaho8wpil1Lq4nuKgNDA/s/kWx7yf9KQViIN9TERJzmmqiK5Jq8G7HaEwLrs8JRZP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709039391; c=relaxed/simple;
-	bh=BLY4etjbmQkfQHGdPfpf/g4JZGr7fibyT5+pPpsDCb4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=pbh6Vk6dYqQehPtIF5eqtTlR7OvZFpjNZqts2fGG1tLUDd8ZvY787Qay7mGXBgR6Jx/Q0NaafY8CplWp1UEuFRIUxqA+x3bQS1vMpUP6XsKY5gJQURVZxPKUAym9H5MVSV5M/jZ5ImvLx4ZRsC+1eAvPuCccWMl4VI5eg7SDM34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FznDZiGt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709039388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y9rPD00F7OIDy6VyYPXw2CahA2P7o8tC42UrT8Kk1Ds=;
-	b=FznDZiGto6JPIYbVmzLzANfTZaS5iwAb0rMT6RToxU3O2OdkUV1rxyDMC5yIiSZrH9xJTn
-	/j57bK4dCgq4GqujLbuHddIi3ZXlIO5NG7Rhqhdp5t0YeLLhC9eKzvp0bYWvGopW8hDoOO
-	xnaDurcydj+KRgTYZkXFQ/roTs8XtFI=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-475-rWDsa9VKPLqNx6Z2cH-3Xw-1; Tue,
- 27 Feb 2024 08:09:44 -0500
-X-MC-Unique: rWDsa9VKPLqNx6Z2cH-3Xw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 281A73C0F185;
-	Tue, 27 Feb 2024 13:09:44 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.193.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 96C3F40166A5;
-	Tue, 27 Feb 2024 13:09:43 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 7D82D21E6740; Tue, 27 Feb 2024 14:09:41 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  David Hildenbrand
- <david@redhat.com>,  Igor Mammedov <imammedo@redhat.com>,  "Michael S .
- Tsirkin" <mst@redhat.com>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-  Richard Henderson <richard.henderson@linaro.org>,  Peter Xu
- <peterx@redhat.com>,  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>,
-  Cornelia Huck <cohuck@redhat.com>,  Daniel =?utf-8?Q?P=2EBerrang=C3=A9?=
- <berrange@redhat.com>,  Eric Blake <eblake@redhat.com>,  Marcelo Tosatti
- <mtosatti@redhat.com>,  qemu-devel@nongnu.org,  kvm@vger.kernel.org,
-  Michael Roth <michael.roth@amd.com>,  Sean Christopherson
- <seanjc@google.com>,  Claudio Fontana <cfontana@suse.de>,  Gerd Hoffmann
- <kraxel@redhat.com>,  Isaku Yamahata <isaku.yamahata@gmail.com>,  Chenyi
- Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v4 53/66] i386/tdx: Wire TDX_REPORT_FATAL_ERROR with
- GuestPanic facility
-In-Reply-To: <09c5fd9b-be96-45b6-b48e-772d5b5aad16@intel.com> (Xiaoyao Li's
-	message of "Tue, 27 Feb 2024 20:09:41 +0800")
-References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
-	<20240125032328.2522472-54-xiaoyao.li@intel.com>
-	<87v86kehts.fsf@pond.sub.org>
-	<1d7f7c1b-cfaa-4de6-80a0-8d1104440f54@intel.com>
-	<87le76dt1g.fsf@pond.sub.org>
-	<09c5fd9b-be96-45b6-b48e-772d5b5aad16@intel.com>
-Date: Tue, 27 Feb 2024 14:09:41 +0100
-Message-ID: <87wmqqawa2.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1709040617; c=relaxed/simple;
+	bh=JZfFgS/yM3rcBZz8uNFnHv1QVr+urhx1jnrRRLWNqdM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hGl/+p9A98kIt0TZYnLi57CtC5Yv1NEdi0VMdaLm/+Y+7v+CYJP68IFu9jz5FfLtaQ30rH81YCUTwfcxHwmck3a4uPvn5fQlZvuKIKldE1HH0xhuk4CRTdTJCQ8dPid32GdFoDwdD33xKqvr3lnzY1YNp82gqs/pA5ZHO/33bMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AKUiUF3v; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709040615; x=1740576615;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JZfFgS/yM3rcBZz8uNFnHv1QVr+urhx1jnrRRLWNqdM=;
+  b=AKUiUF3vX+OcbKvBhe65bjuecrao+AzjM87ydNr8I/Lu8zShYkTKlAxB
+   urnvJ5NdWEbHcfspu2S05wmy0HPuLZzaI1TrFbzcBr2GSnXlfTc7+cP1l
+   UWbY0wnXAM8ouWxx/tJIMzVily0DZEqSEKq4+gdd1DVR+PxA+Zw527LvP
+   +doFPY2fyuHCiQAtSMv8IH5WS0au3E5SgsF+tzUs0ZdYacy2qYzj3ltOO
+   gsIEhj464083QO7Lb48wB20CCZ+L73UIwBAE8DxMRjkG3O3Oxk69hCotx
+   64Doyxn94pXyBFlRwUlNvL4r/IB4VaJeajd50nm2I3a0QMe9FQlwfnqVa
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="3250812"
+X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
+   d="scan'208";a="3250812"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 05:30:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,187,1705392000"; 
+   d="scan'208";a="7391016"
+Received: from yrasheed-mobl.amr.corp.intel.com (HELO [10.209.51.241]) ([10.209.51.241])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 05:30:14 -0800
+Message-ID: <97b66d4d-f520-46c9-8164-ce5b2e4d5642@intel.com>
+Date: Tue, 27 Feb 2024 05:30:13 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/2] x86/cpu: fix invalid MTRR mask values for SEV or
+ TME
+Content-Language: en-US
+To: Yin Fengwei <fengwei.yin@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Zixi Chen <zixchen@redhat.com>, Adam Dunlap <acdunlap@google.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Kai Huang <kai.huang@intel.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
+ x86@kernel.org, stable@vger.kernel.org
+References: <20240131230902.1867092-1-pbonzini@redhat.com>
+ <2b5e6d68-007e-48bd-be61-9a354be2ccbf@intel.com>
+ <CABgObfa_7ZAq1Kb9G=ehkzHfc5if3wnFi-kj3MZLE3oYLrArdQ@mail.gmail.com>
+ <CABgObfbetwO=4whrCE+cFfCPJa0nsK=h6sQAaoamJH=UqaJqTg@mail.gmail.com>
+ <CABgObfbUcG5NyKhLOnihWKNVM0OZ7zb9R=ADzq7mjbyOCg3tUw@mail.gmail.com>
+ <eefbce80-18c5-42e7-8cde-3a352d5811de@intel.com>
+ <CABgObfY=3msvJ2M-gHMqawcoaW5CDVDVxCO0jWi+6wrcrsEtAw@mail.gmail.com>
+ <9c4ee2ca-007d-42f3-b23d-c8e67a103ad8@intel.com>
+ <CABgObfYttER8yZBTReO+Cd5VqQCpEY9UdHH5E8BKuA1+2CsimA@mail.gmail.com>
+ <7e118d89-3b7a-4e13-b3de-2acfbf712ad5@intel.com>
+ <3807c397-2eef-4f1d-ae85-4259f061f08e@intel.com>
+ <eff34df2-fdc1-4ee0-bb8d-90da386b7cb6@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <eff34df2-fdc1-4ee0-bb8d-90da386b7cb6@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
+On 2/26/24 22:08, Yin Fengwei wrote:
+>>> https://lore.kernel.org/all/20240222183926.517AFCD2@davehans-spike.ostc.intel.com/
+>> If it _also_ fixes the problem, it'll be a strong indication that it's
+>> the right long-term approach.
+> I tried your patchset on a Sapphire machine which is the only one broken machine
+> I can access today. The base commit is 45ec2f5f6ed3 from the latest linus tree.
+> 
+> Without your patchset, the system boot hang.
+> With your patchset, the system boot successfully.
 
-> On 2/27/2024 7:51 PM, Markus Armbruster wrote:
->> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->> 
->>> On 2/19/2024 8:53 PM, Markus Armbruster wrote:
->>>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->>>>
->>>>> Integrate TDX's TDX_REPORT_FATAL_ERROR into QEMU GuestPanic facility
->>>>>
->>>>> Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
->>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>>>> ---
->>>>> Changes in v4:
->>>>> - refine the documentation; (Markus)
->>>>>
->>>>> Changes in v3:
->>>>> - Add docmentation of new type and struct; (Daniel)
->>>>> - refine the error message handling; (Daniel)
->>>>> ---
->>>>>    qapi/run-state.json   | 28 ++++++++++++++++++++--
->>>>>    system/runstate.c     | 54 +++++++++++++++++++++++++++++++++++++++++++
->>>>>    target/i386/kvm/tdx.c | 24 ++++++++++++++++++-
->>>>>    3 files changed, 103 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/qapi/run-state.json b/qapi/run-state.json
->>>>> index 08bc99cb8561..5429116679e3 100644
->>>>> --- a/qapi/run-state.json
->>>>> +++ b/qapi/run-state.json
-
-[...]
-
->>>>> @@ -566,6 +569,27 @@
->>>>>              'psw-addr': 'uint64',
->>>>>              'reason': 'S390CrashReason'}}
->>>>>    
->>>>> +##
->>>>> +# @GuestPanicInformationTdx:
->>>>> +#
->>>>> +# TDX Guest panic information specific to TDX GCHI
->>>>> +# TDG.VP.VMCALL<ReportFatalError>.
->>>>> +#
->>>>> +# @error-code: TD-specific error code
->>>>
->>>> Where could a user find information on these error codes?
->>>
->>> TDX GHCI (Guset-host-communication-Interface)spec. It defines all the
->>> TDVMCALL leaves.
->>>
->>> 0: panic;
->>> 0x1 - 0xffffffff: reserved.
->> 
->> Would it make sense to add a reference?
->
-> https://cdrdv2.intel.com/v1/dl/getContent/726792
-
-URLs have this annoying tendency to rot.
-
-What about
-
-# @error-code: Error code as defined in "Guest-Hypervisor Communication
-#     Interface (GHCI) Specification for Intel TDX 1.5"
-
->>>>> +#
->>>>> +# @gpa: guest-physical address of a page that contains additional
->>>>> +#     error data, in forms of zero-terminated string.
->>>>
->>>> "in the form of a zero-terminated string"
->>>
->>> fixed.
->>>
->>>>> +#
->>>>> +# @message: Human-readable error message provided by the guest. Not
->>>>> +#     to be trusted.
->>>>
->>>> How is this message related to the one pointed to by @gpa?
->>>
->>> In general, @message contains a brief message of the error. While @gpa
->>> (when valid) contains a verbose message.
->>>
->>> The reason why we need both is because sometime when TD guest hits a
->>> fatal error, its memory may get corrupted so we cannot pass information
->>> via @gpa. Information in @message is passed through GPRs.
->> 
->> Well, we do pass information via @gpa, always.  I guess it page's
->> contents can be corrupted.
->
-> No. It's not always. the bit 63 of the error code is "GPA valid" bit. 
-> @gpa is valid only when bit 63 of error code is 1.
->
-> And current Linux TD guest implementation doesn't use @gpa at all.
-> https://github.com/torvalds/linux/blob/45ec2f5f6ed3ec3a79ba1329ad585497cdcbe663/arch/x86/coco/tdx/tdx.c#L131 
-
-Aha!
-
-Why would we want to include @gpa when the "GPA valid" bit is off?
-
-If we do want it, then
-
-# @gpa: guest-physical address of a page that contains more verbose
-#     error information, as zero-terminated string.  Valid when the
-#     "GPA valid" bit is set in @error-code.
-
-If we don't, then make @gpa optional, present when valid, and document
-it like this:
-
-# @gpa: guest-physical address of a page that contains more verbose
-#     error information, as zero-terminated string.  Present when the
-#     "GPA valid" bit is set in @error-code.
-
->> Perhaps something like
->> 
->>      # @message: Human-readable error message provided by the guest.  Not
->>      #     to be trusted.
->>      #
->>      # @gpa: guest-physical address of a page that contains more verbose
->>      #     error information, as zero-terminated string.  Note that guest
->>      #     memory corruption can corrupt the page's contents.
->> 
->>>>> +#
->>>>> +# Since: 9.0
->>>>> +##
->>>>> +{'struct': 'GuestPanicInformationTdx',
->>>>> + 'data': {'error-code': 'uint64',
->>>>> +          'gpa': 'uint64',
->>>>> +          'message': 'str'}}
->> 
->> Note that my proposed doc string has the members in a different order.
->> Recommend to use the same order here.
->> 
->>>>> +
->>>>>    ##
->>>>>    # @MEMORY_FAILURE:
->>>>>    #
->>>>
->>>> [...]
->>>>
->> 
-
+Yay!  Thanks for testing.
 
