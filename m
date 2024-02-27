@@ -1,134 +1,183 @@
-Return-Path: <kvm+bounces-10044-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10045-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8698A868CB8
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:55:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A6D868D0F
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 11:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B20291C216AB
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 09:55:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2449281B2E
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 10:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549E0137C20;
-	Tue, 27 Feb 2024 09:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WnqLUCUl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60504138490;
+	Tue, 27 Feb 2024 10:12:05 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEFD135A68
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 09:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204EA137C21;
+	Tue, 27 Feb 2024 10:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709027698; cv=none; b=pPudNv9OritWYVgpHNQatjzU3putNGuFCI/j4BkTKsgfdY6dXn6MU2HSQp6MMxyCJhnbbEjTKmEmk4T5b6FfIXJBunbOYJtrWkPxislMZJmtZyRjuGT35QrOQXj64+nh4Ktm+3zeugcVmwcpBUjKw1iwrRQ5Dt2LIg/UJELlFxI=
+	t=1709028724; cv=none; b=ZbNi++gcEaHuapdIJX9scUzJ0QfVz8iEBDjsZIiIEXkJVAxP1eitJI5+ks2LbsyelKmdxRsBWcnvjktZ3qnB9fnoZ597XTAtywYj5lVu3yCss/8rn8Pq5R5poM3xl2yxIuvH+eKwjGBKXXUEQBtvT6raBQXcmlPIxkH+4wOQaJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709027698; c=relaxed/simple;
-	bh=Zk7o7sUzRba0JQK3Ym72GL+cw8hLT3hXk9Ws635mKEQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FSkG4BuQnJOvKOwfr/68iDUsaVWjpYYKkTiYv4jpsAzSuxcxZEyyTPVcDIcSyIF1WBiLBkZ3CTdRspBPZM/HkyswNp7GzUVf/J7jb/AvJsrs/gSS/Nvqhq83Lt/TOHMqgqkLNPxeODaWbzeeNLWDZEKNOC11ZZOwGdf87oI2iTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnqLUCUl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 623E6C43390;
-	Tue, 27 Feb 2024 09:54:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709027698;
-	bh=Zk7o7sUzRba0JQK3Ym72GL+cw8hLT3hXk9Ws635mKEQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WnqLUCUl8/K487MIrzz6ZMjwOJrCDyZ+ZKed0dZ8lbi9ByvdpCTV4qRNapB3cgQPb
-	 R56gPXIPaTd/AY9R//tx+p9WgeSpvC7fTCFYarkQfIHkQ9UW8Jc6vfLCBYfkLIGvdP
-	 GtTOOgAYH0UjQeoZtaUSzKLRL/GQt8xRsf32dctZDqMJXsMvV7WMSH8d61pAj8edLJ
-	 MfVdj+yHBHb3I2z5f1TDaEUxZYuAzMZfH0/IndhewiZayhZovRCFHms7zU900Q9lVa
-	 Zil4mteaMTaJ0vcmxUNczErm6TFXg6vsppK5Q5XVZRcm6lxxa4FFoOAMX1oKW0JJD/
-	 rpr6wSNKqVDuQ==
-Date: Tue, 27 Feb 2024 09:54:53 +0000
-From: Will Deacon <will@kernel.org>
-To: Mr-Mr-key <2087905531@qq.com>
-Cc: kvm@vger.kernel.org
-Subject: Re: [PATCH kvmtool] Fix 9pfs open device file security flaw
-Message-ID: <20240227095453.GB13551@willie-the-truck>
-References: <tencent_3FBF289C57BD1C8C31601110D5726C3E380A@qq.com>
+	s=arc-20240116; t=1709028724; c=relaxed/simple;
+	bh=yvo/znSVftTP+XSaKaQEJ14+kGB/7U2oUxek34UNtRo=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=PTLr9J6zwNm9A/IK3BHOLWmZwPDQkSjzOWyvQFCOEiyvsQrDIvbGrZW/Uwr97FmCG1fWWv3r2CpIx2t0h2uhYOm6SgJEeuIiCbu3dniZyC0eeHg4wTvkQNDpxLGcKER9IcMxjzRqUOv8yYJt3VCx48JDJaZob1YpfN3P/etGGAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8Cx77twtd1lTegRAA--.25993S3;
+	Tue, 27 Feb 2024 18:12:00 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxX89ntd1lCcBHAA--.58294S3;
+	Tue, 27 Feb 2024 18:11:53 +0800 (CST)
+Subject: Re: [PATCH v5 3/6] LoongArch: KVM: Add cpucfg area for kvm hypervisor
+To: WANG Xuerui <kernel@xen0n.name>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org
+References: <20240222032803.2177856-1-maobibo@loongson.cn>
+ <20240222032803.2177856-4-maobibo@loongson.cn>
+ <CAAhV-H5eqXMqTYVb6cAVqOsDNcEDeP9HzaMKw69KFQeVaAYEdA@mail.gmail.com>
+ <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
+ <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
+ <06647e4a-0027-9c9f-f3bd-cd525d37b6d8@loongson.cn>
+ <85781278-f3e9-4755-8715-3b9ff714fb20@app.fastmail.com>
+ <0d428e30-07a8-5a91-a20c-c2469adbf613@loongson.cn>
+ <327808dd-ac34-4c61-9992-38642acc9419@xen0n.name>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <62cc24fd-025a-53c6-1c8e-2d20de54d297@loongson.cn>
+Date: Tue, 27 Feb 2024 18:12:15 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <327808dd-ac34-4c61-9992-38642acc9419@xen0n.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <tencent_3FBF289C57BD1C8C31601110D5726C3E380A@qq.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-CM-TRANSID:AQAAf8AxX89ntd1lCcBHAA--.58294S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxZw1rCFy7Xw18urWUXryDXFc_yoWrArykpF
+	W8AF47KF48tFs2yw4ktw17Xr4ayrW8CF4xXFn8Ar1DArs0yr1ftr40yr4YkF9rJr18CF15
+	Zr42qFy7Zw1DA3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDU
+	UUU
 
-Hi,
 
-On Mon, Feb 26, 2024 at 12:31:55AM +0800, Mr-Mr-key wrote:
-> Our team found that a public QEMU's 9pfs security issue[1] also exists in
-> upstream kvmtool's 9pfs device. A privileged guest user can create and
-> access the special device file(e.g., block files) in the shared folder,
-> allowing the malicious user to access the host device and acheive
-> privileged escalation. And I have sent the reproduction steps to Will.
-> [1] https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-2861
+
+On 2024/2/27 下午5:10, WANG Xuerui wrote:
+> On 2/27/24 11:14, maobibo wrote:
+>>
+>>
+>> On 2024/2/27 上午4:02, Jiaxun Yang wrote:
+>>>
+>>>
+>>> 在2024年2月26日二月 上午8:04，maobibo写道：
+>>>> On 2024/2/26 下午2:12, Huacai Chen wrote:
+>>>>> On Mon, Feb 26, 2024 at 10:04 AM maobibo <maobibo@loongson.cn> wrote:
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> On 2024/2/24 下午5:13, Huacai Chen wrote:
+>>>>>>> Hi, Bibo,
+>>>>>>>
+>>>>>>> On Thu, Feb 22, 2024 at 11:28 AM Bibo Mao <maobibo@loongson.cn> 
+>>>>>>> wrote:
+>>>>>>>>
+>>>>>>>> Instruction cpucfg can be used to get processor features. And there
+>>>>>>>> is trap exception when it is executed in VM mode, and also it is
+>>>>>>>> to provide cpu features to VM. On real hardware cpucfg area 0 - 20
+>>>>>>>> is used.  Here one specified area 0x40000000 -- 0x400000ff is used
+>>>>>>>> for KVM hypervisor to privide PV features, and the area can be 
+>>>>>>>> extended
+>>>>>>>> for other hypervisors in future. This area will never be used for
+>>>>>>>> real HW, it is only used by software.
+>>>>>>> After reading and thinking, I find that the hypercall method 
+>>>>>>> which is
+>>>>>>> used in our productive kernel is better than this cpucfg method.
+>>>>>>> Because hypercall is more simple and straightforward, plus we don't
+>>>>>>> worry about conflicting with the real hardware.
+>>>>>> No, I do not think so. cpucfg is simper than hypercall, hypercall can
+>>>>>> be in effect when system runs in guest mode. In some scenario like 
+>>>>>> TCG
+>>>>>> mode, hypercall is illegal intruction, however cpucfg can work.
+>>>>> Nearly all architectures use hypercall except x86 for its historical
+>>>> Only x86 support multiple hypervisors and there is multiple hypervisor
+>>>> in x86 only. It is an advantage, not historical reason.
+>>>
+>>> I do believe that all those stuff should not be exposed to guest user 
+>>> space
+>>> for security reasons.
+>> Can you add PLV checking when cpucfg 0x40000000-0x400000FF is 
+>> emulated? if it is user mode return value is zero and it is kernel 
+>> mode emulated value will be returned. It can avoid information leaking.
 > 
-> Root cause && fix suggestions：
-> The virtio_p9_open function code on the 9p.c only checks file directory attributes, but does not check special files.
-> Special device files can be filtered on the device through the S_IFREG and
-> S_IFDIR flag bits. A possible patch is as follows, and I have verified
-> that it does make a difference.
+> I've suggested this approach in another reply [1], but I've rechecked 
+> the manual, and it turns out this behavior is not permitted by the 
+> current wording. See LoongArch Reference Manual v1.10, Volume 1, Section 
+> 2.2.10.5 "CPUCFG":
+> 
+>  > CPUCFG 访问未定义的配置字将读回全 0 值。
+>  >
+>  > Reads of undefined CPUCFG configuration words shall return all-zeroes.
+> 
+> This sentence mentions no distinction based on privilege modes, so it 
+> can only mean the behavior applies universally regardless of privilege 
+> modes.
+> 
+> I think if you want to make CPUCFG behavior PLV-dependent, you may have 
+> to ask the LoongArch spec editors, internally or in public, for a new 
+> spec revision.
+No, CPUCFG behavior between CPUCFG0-CPUCFG21 is unchanged, only that it 
+can be defined by software since CPUCFG 0x400000000 is used by software. >
+> (There are already multiple third-party LoongArch implementers as of 
+> late 2023, so any ISA-level change like this would best be coordinated, 
+> to minimize surprises.)
+With document Vol 4-23
+https://www.intel.com/content/dam/develop/external/us/en/documents/335592-sdm-vol-4.pdf
 
-Missing Signed-off-by line.
+There is one line "MSR address range between 40000000H - 400000FFH is 
+marked as a specially reserved range. All existing and
+future processors will not implement any features using any MSR in this 
+range."
 
->  ...n-kernel-irqchip-before-creating-PIT.patch | 45 +++++++++++++++++++
->  virtio/9p.c                                   | 15 ++++++-
->  2 files changed, 59 insertions(+), 1 deletion(-)
->  create mode 100644 0001-x86-Enable-in-kernel-irqchip-before-creating-PIT.patch
+It only says that it is reserved, it does not say detailed software 
+behavior. Software behavior is defined in hypervisor such as:
+https://github.com/MicrosoftDocs/Virtualization-Documentation/blob/main/tlfs/Requirements%20for%20Implementing%20the%20Microsoft%20Hypervisor%20Interface.pdf
+https://kb.vmware.com/s/article/1009458
 
-(aside: I think you've accidentally included another patch here)
+If hypercall method is used, there should be ABI also like aarch64:
+https://documentation-service.arm.com/static/6013e5faeee5236980d08619
 
-> diff --git a/virtio/9p.c b/virtio/9p.c
-> index 2fa6f28..902da90 100644
-> --- a/virtio/9p.c
-> +++ b/virtio/9p.c
-> @@ -221,6 +221,15 @@ static bool is_dir(struct p9_fid *fid)
->  	return S_ISDIR(st.st_mode);
->  }
->  
-> +static bool is_reg(struct p9_fid *fid)
-> +{
-> +	struct stat st;
-> +
-> +	stat(fid->abs_path, &st);
-> +
-> +	return S_ISREG(st.st_mode);
-> +}
-> +
->  /* path is always absolute */
->  static bool path_is_illegal(const char *path)
->  {
-> @@ -290,7 +299,11 @@ static void virtio_p9_open(struct p9_dev *p9dev,
->  		goto err_out;
->  
->  	stat2qid(&st, &qid);
-> -
-> +	
-> +	if (!is_dir(new_fid) && !is_reg(new_fid)){
-> +		goto err_out;
-> +	}
+Regards
+Bibo Mao
 
-We already check is_dir() immediately below, so I think you can rewrite
-this as:
+> 
+> [1]: 
+> https://lore.kernel.org/loongarch/d8994f0f-d789-46d2-bc4d-f9b37fb396ff@xen0n.name/ 
+> 
+> 
 
-  if (is_dir(new_fid)) {
-	...
-  } else if (is_reg(new_fid)) {
-	...
-  } else {
-	goto err_out;
-  }
-
-I was also wondering whether we care about symlinks, but I couldn't get
-S_ISLNK to do anything useful in my local testing as I think stat() is
-always following them. So that should mean that we're ok.
-
-Will
 
