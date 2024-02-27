@@ -1,499 +1,373 @@
-Return-Path: <kvm+bounces-10021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F348E868832
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 05:25:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8951B868893
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 06:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9BF1285A4C
-	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 04:25:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9E6A1C210F9
+	for <lists+kvm@lfdr.de>; Tue, 27 Feb 2024 05:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEBC4D9E4;
-	Tue, 27 Feb 2024 04:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9F752F8B;
+	Tue, 27 Feb 2024 05:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O5jM9w59"
+	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="rsmjLhHN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EBJ7ruCR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fhigh1-smtp.messagingengine.com (fhigh1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A144D131
-	for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 04:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E2852F77;
+	Tue, 27 Feb 2024 05:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709007900; cv=none; b=Wks05CURlTpLU+pp+i5myanUWKd0vVv9/lYkrUu6ceXYU/tYMUiCzE9OaAPspb+McI8aoi7wZj4cRpZFB8MZ6trCX+guTqzd7l26LA7VsOPNGP516/3xk+6T59BiBmt3K0CIuTXzaEafyo6kWwhLI7/kWbSFm8wI/SX3U68pgRo=
+	t=1709011448; cv=none; b=QJSqdeYOO+dhQEIrM8OPrR6ss7uX+EWLMl6WIclqii0UQHMusiDVmrfhvHt+c/2+ekpPDy4FoRv1AVE5Zq4z3gwerOwSFmJ+hgG94XIfk+UVTYnMduKpif4dwiBlqnK1IKNtZoYX6AgFFZzXQhkq23xnqzhGZLBkYfpWZdzUxwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709007900; c=relaxed/simple;
-	bh=SAGkTvFc9MFPIj1FbE0nWxUs9VOcspJm0tS+h6honf8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fxbK7Lk03PaamUgq2RGfIHueMNLldpJ7Kc7ypSGC1mzKVc6GHENMD8id0QMkwWnBFPWpJ0s51bUchoeJfMWcji/WeoL8wD7u3DQfv9oH3PU2M2g5qZqxRqpnSkkPVAyqfYWP12mJ7QQJBscQ4Rx3/XAL8itaTp8KWzjknfSd+CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O5jM9w59; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709007896;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wocaQci0H8ZTuqRVNTzwftkHm1yC6L2JcX2khIjUmVo=;
-	b=O5jM9w599xNjmsV7Cb5Yv7X9l4b7S/ZV33Nz7SSQ4TqY/MprsxRgHr8b0ZXjv2Xhho26Hr
-	ZzAHf4qxX8H5DMtP2HxydtKkWQ1e+1vzoSg16gDht4Ikrwm2mFojU5eDZKLU4B+pqPim2P
-	s+YQKgBZWRr23zXec3B3VMyQ//DNRrk=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-JO-22keSND2npzLqY5WHsQ-1; Mon, 26 Feb 2024 23:24:54 -0500
-X-MC-Unique: JO-22keSND2npzLqY5WHsQ-1
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6dde25ac92fso1944759a34.0
-        for <kvm@vger.kernel.org>; Mon, 26 Feb 2024 20:24:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709007894; x=1709612694;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wocaQci0H8ZTuqRVNTzwftkHm1yC6L2JcX2khIjUmVo=;
-        b=YDQztJgJrhimyw6+w9AVJo8ci3Zykx5WTEHYoecW2rTQPj9kvSfLTKOi2TVwx4d7JY
-         OWDkHQDjY6NfOVd8m+7dwgbeePd9nQziO5e8kY1gz7i28uY+anM/kA+GaBZ1CwQH03T3
-         AmDDmq6Jt8ltKbyaJnbVGj3jsbBarWOpjzsUHBo9LKwD5IIYyN6mlTMxCpdmwpDHJY/v
-         +eGX0GdxUTiL+cuWYZUZib46ex+xSBwGZ8+MTn1vrBgTLFwTXC+6lGLG121u4uAEyHQg
-         mO7j5H7xihgoCSCi8FjPGdtySFJ8TXSzYuU/UA4IDBA/lf0h5jDCF7CllRqHMti8e17Z
-         3Q0A==
-X-Forwarded-Encrypted: i=1; AJvYcCXGMoK/zd/oI5EsMU2+SSSbJHL00qyRFeguTS9oxRV9GTFYFp7dJ/3WJI0SWsE3O0NnowKYmJdUZnFm8c+oIeO44w3C
-X-Gm-Message-State: AOJu0YzeEVD2FUYNR5BQ9Te6IGRYqpLrce15ha+/rU/2I3KFOdjsG9p5
-	xb+jPsPm9VoaUvf8evbRkjlwliFR3V1brpuoX22s3JCXowVnXlxvpApV9yvii4/y44msFDXkCGc
-	coWJcn01mENScxkj8gZKyD/j1BshmryopKdKmYKY23S1czBNsYg==
-X-Received: by 2002:a05:6830:1082:b0:6e4:9608:2236 with SMTP id y2-20020a056830108200b006e496082236mr6681879oto.2.1709007893800;
-        Mon, 26 Feb 2024 20:24:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGHj2Y8QFwZ4y+Zg/vr5e2fqBG+8Xmu2RKbf/1cLf+wVGRrCuhPJDudzJ7btoYWGhLeDdJSdg==
-X-Received: by 2002:a05:6830:1082:b0:6e4:9608:2236 with SMTP id y2-20020a056830108200b006e496082236mr6681869oto.2.1709007893401;
-        Mon, 26 Feb 2024 20:24:53 -0800 (PST)
-Received: from [10.72.116.113] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d18-20020a639752000000b005d8e30897e4sm4006713pgo.69.2024.02.26.20.24.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Feb 2024 20:24:52 -0800 (PST)
-Message-ID: <25ecc166-44be-40fb-b676-767d6da020aa@redhat.com>
-Date: Tue, 27 Feb 2024 12:24:46 +0800
+	s=arc-20240116; t=1709011448; c=relaxed/simple;
+	bh=u4qQkPHQmIhMRJxmqmu5QD2BAGK772thENCJm+b3kno=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=N1eDzbdAm4je9dORGXzCwVKR7hGB6z9MLJHVN4GCYgKYwVBsH8P4UZoyrmmD+8CC0AsNCNFO8B2D0cbAI41Xga9UT5X7/frrMqZnQKr4Trk2fZaX8d/HDRfLgeYw8Irb/NjfFvu2/mUayR8aLbZ6R0+YzvZVs0JGON7om1nBVHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=rsmjLhHN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EBJ7ruCR; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flygoat.com
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id 59B9211400D7;
+	Tue, 27 Feb 2024 00:24:05 -0500 (EST)
+Received: from imap44 ([10.202.2.94])
+  by compute3.internal (MEProxy); Tue, 27 Feb 2024 00:24:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1709011445;
+	 x=1709097845; bh=ZAscQhN7898Hcp6Y20dtK5VfrswD/2iy7Gi5PEhuA+A=; b=
+	rsmjLhHNkmdfGEdtxrBZPJR4K5rkmKvR9NJlyUn/ZyMtMC32KiSIhiS0bgByYvgV
+	N8iEIuks+EE8tpB417AJ6FREuJwZHQoCxB3HlhvhznZPB5SBn34WVK6EWrNkbqf3
+	ONbWx8xAAwyR3yW+MQzPyNN33lGFq46yIAwaXWhj5ZLIP7qdPmQtDHWcBFWe602/
+	Tajgdc1ktdicGYaz50pBzoS86QrQcaT2ajQGNdNlRuxqcIWbo6tzJ/9nekkc+JxQ
+	ApivTWzMKZ5+BfOflZvWo99hI36RrF/XHohJYnV/+wTYyVNnVRn8HMSrYpQ2YTq4
+	/eQbfNycHH2Jh2A0mtpiYQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1709011445; x=
+	1709097845; bh=ZAscQhN7898Hcp6Y20dtK5VfrswD/2iy7Gi5PEhuA+A=; b=E
+	BJ7ruCRk8Ym0vAj538sBHBp3z9aAesQvacvuY4Cuq9r3touHEaGhFBX8Fu2n23r7
+	gZw1iOwTVmUGsBDabm7rewd1pA7KDldfNFbg5ZsmSUw0tI1Xo+CPFglNmQXZCiqL
+	B0qxUjteUjAA27yzyN/3lx/tadjFSmvnMK9mlTQoVLL/FuKwq38IuRaOo8z2xzvi
+	z7YBkmsWX8iDDzfqeMvGZ+FUlqclXAUAlmABW48dD50c7WdgwyQGZVAOK7cIGOf+
+	ey/BA+NR8WXX/UyklAuTiv5q3Yw/JLbNrdGoUBya6E+KJ9bc1mjDqre90DwUVNyv
+	ixHnHm7jgBbhHS/FtviOw==
+X-ME-Sender: <xms:9HHdZbihNyeo0I0rnOBp7YMeER8bqOir_kMyyjjIlbU2eDzz9XdQew>
+    <xme:9HHdZYBHkZtQc7B89zTyRTG2OkdxwV8t5IC9-CcqLZ_L1YJQ_zwY9oUhoZ2T6jE5x
+    LygKr0SfFnR9qgEuhU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrgeefgdekvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedflfhi
+    rgiguhhnucgjrghnghdfuceojhhirgiguhhnrdihrghnghesfhhlhihgohgrthdrtghomh
+    eqnecuggftrfgrthhtvghrnhepudefgeeftedugeehffdtheefgfevffelfefghefhjeeu
+    geevtefhudduvdeihefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    hilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihgohgrthdrtghomh
+X-ME-Proxy: <xmx:9HHdZbHJeKQodrWd7R7L8SwjUbwjoVtiMq7oIe7y9DUC7vsp2N9GGA>
+    <xmx:9HHdZYRSsj6fvdROoUtgYpJ_7u7FsWR-BIyANC5gebdKqYArlAgdGw>
+    <xmx:9HHdZYx-A64J2UeUR7MsFM22D1dwo9p2v4ceI3vcFx6Mgw7ECtvDWA>
+    <xmx:9XHdZXmAIbDK470CkMwBHI-r2bZG6a5m7Tz53umSchh31rE5X8gAiw>
+Feedback-ID: ifd894703:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id C8F0736A0076; Tue, 27 Feb 2024 00:24:04 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-153-g7e3bb84806-fm-20240215.007-g7e3bb848
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/5] KVM: selftests: aarch64: Introduce
- pmu_event_filter_test
-Content-Language: en-US
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- Eric Auger <eauger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20240202025659.5065-1-shahuang@redhat.com>
- <20240202025659.5065-5-shahuang@redhat.com> <ZbypAAFEHweTDUJK@linux.dev>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <ZbypAAFEHweTDUJK@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-Id: <09c5af9b-cc79-4cf2-84f7-276bb188754a@app.fastmail.com>
+In-Reply-To: <0d428e30-07a8-5a91-a20c-c2469adbf613@loongson.cn>
+References: <20240222032803.2177856-1-maobibo@loongson.cn>
+ <20240222032803.2177856-4-maobibo@loongson.cn>
+ <CAAhV-H5eqXMqTYVb6cAVqOsDNcEDeP9HzaMKw69KFQeVaAYEdA@mail.gmail.com>
+ <d1a6c424-b710-74d6-29f6-e0d8e597e1fb@loongson.cn>
+ <CAAhV-H7p114hWUVrYRfKiBX3teG8sG7xmEW-Q-QT3i+xdLqDEA@mail.gmail.com>
+ <06647e4a-0027-9c9f-f3bd-cd525d37b6d8@loongson.cn>
+ <85781278-f3e9-4755-8715-3b9ff714fb20@app.fastmail.com>
+ <0d428e30-07a8-5a91-a20c-c2469adbf613@loongson.cn>
+Date: Tue, 27 Feb 2024 05:23:31 +0000
+From: "Jiaxun Yang" <jiaxun.yang@flygoat.com>
+To: "Bibo Mao" <maobibo@loongson.cn>, "Huacai Chen" <chenhuacai@kernel.org>
+Cc: "Tianrui Zhao" <zhaotianrui@loongson.cn>,
+ "Juergen Gross" <jgross@suse.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v5 3/6] LoongArch: KVM: Add cpucfg area for kvm hypervisor
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Oliver,
 
-On 2/2/24 16:34, Oliver Upton wrote:
-> On Thu, Feb 01, 2024 at 09:56:53PM -0500, Shaoqin Huang wrote:
->> Introduce pmu_event_filter_test for arm64 platforms. The test configures
->> PMUv3 for a vCPU, and sets different pmu event filters for the vCPU, and
->> check if the guest can see those events which user allow and can't use
->> those events which use deny.
+
+=E5=9C=A82024=E5=B9=B42=E6=9C=8827=E6=97=A5=E4=BA=8C=E6=9C=88 =E4=B8=8A=E5=
+=8D=883:14=EF=BC=8Cmaobibo=E5=86=99=E9=81=93=EF=BC=9A
+> On 2024/2/27 =E4=B8=8A=E5=8D=884:02, Jiaxun Yang wrote:
+>>=20
+>>=20
+>> =E5=9C=A82024=E5=B9=B42=E6=9C=8826=E6=97=A5=E4=BA=8C=E6=9C=88 =E4=B8=8A=
+=E5=8D=888:04=EF=BC=8Cmaobibo=E5=86=99=E9=81=93=EF=BC=9A
+>>> On 2024/2/26 =E4=B8=8B=E5=8D=882:12, Huacai Chen wrote:
+>>>> On Mon, Feb 26, 2024 at 10:04=E2=80=AFAM maobibo <maobibo@loongson.=
+cn> wrote:
+>>>>>
+>>>>>
+>>>>>
+>>>>> On 2024/2/24 =E4=B8=8B=E5=8D=885:13, Huacai Chen wrote:
+>>>>>> Hi, Bibo,
+>>>>>>
+>>>>>> On Thu, Feb 22, 2024 at 11:28=E2=80=AFAM Bibo Mao <maobibo@loongs=
+on.cn> wrote:
+>>>>>>>
+>>>>>>> Instruction cpucfg can be used to get processor features. And th=
+ere
+>>>>>>> is trap exception when it is executed in VM mode, and also it is
+>>>>>>> to provide cpu features to VM. On real hardware cpucfg area 0 - =
+20
+>>>>>>> is used.  Here one specified area 0x40000000 -- 0x400000ff is us=
+ed
+>>>>>>> for KVM hypervisor to privide PV features, and the area can be e=
+xtended
+>>>>>>> for other hypervisors in future. This area will never be used for
+>>>>>>> real HW, it is only used by software.
+>>>>>> After reading and thinking, I find that the hypercall method whic=
+h is
+>>>>>> used in our productive kernel is better than this cpucfg method.
+>>>>>> Because hypercall is more simple and straightforward, plus we don=
+'t
+>>>>>> worry about conflicting with the real hardware.
+>>>>> No, I do not think so. cpucfg is simper than hypercall, hypercall =
+can
+>>>>> be in effect when system runs in guest mode. In some scenario like=
+ TCG
+>>>>> mode, hypercall is illegal intruction, however cpucfg can work.
+>>>> Nearly all architectures use hypercall except x86 for its historical
+>>> Only x86 support multiple hypervisors and there is multiple hypervis=
+or
+>>> in x86 only. It is an advantage, not historical reason.
+>>=20
+>> I do believe that all those stuff should not be exposed to guest user=
+ space
+>> for security reasons.
+> Can you add PLV checking when cpucfg 0x40000000-0x400000FF is emulated=
+?=20
+> if it is user mode return value is zero and it is kernel mode emulated=20
+> value will be returned. It can avoid information leaking.
+
+Please don=E2=80=99t do insane stuff here, applications are not expectin=
+g exception from
+cpucfg.
+
+>
+>>=20
+>> Also for different implementations of hypervisors they may have diffe=
+rent
+>> PV features behavior, using hypcall to perform feature detection
+>> can pass more information to help us cope with hypervisor diversity.
+> How do different hypervisors can be detected firstly?  On x86 MSR is=20
+> used for all hypervisors detection and on ARM64 hyperv used=20
+> acpi_gbl_FADT and kvm use smc forcely, host mode can execute smc=20
+> instruction without exception on ARM64.
+
+That=E2=80=99s hypcall ABI design choices, those information can come fr=
+om firmware
+or privileged CSRs on LoongArch.
+
+>
+> I do not know why hypercall is better than cpucfg on LoongArch, cpucfg=20
+> is basic intruction however hypercall is not, it is part of LVZ featur=
+e.
+
+KVM can only work with LVZ right?
+
+>
+>>>
+>>>> reasons. If we use CPUCFG, then the hypervisor information is
+>>>> unnecessarily leaked to userspace, and this may be a security issue.
+>>>> Meanwhile, I don't think TCG mode needs PV features.
+>>> Besides PV features, there is other features different with real hw =
+such
+>>> as virtio device, virtual interrupt controller.
+>>=20
+>> Those are *device* level information, they must be passed in firmware
+>> interfaces to keep processor emulation sane.
+> File arch/x86/hyperv/hv_apic.c can be referenced, apic features comes=20
+> from ms_hyperv.hints and HYPERV_CPUID_ENLIGHTMENT_INFO cpuid info, not=20
+> must be passed by firmware interface.
+
+That=E2=80=99s not KVM, that=E2=80=99s Hyper V. At Linux Kernel we enjoy=
+ the benefits of better
+modularity on device abstractions, please don=E2=80=99t break it.
+
+Thanks
+
+>
+> Regards
+> Bibo Mao
+>>=20
+>> Thanks
+>>=20
+>>>
+>>> Regards
+>>> Bibo Mao
+>>>
+>>>>
+>>>> I consulted with Jiaxun before, and maybe he can give some more com=
+ments.
+>>>>
+>>>>>
+>>>>> Extioi virtualization extension will be added later, cpucfg can be=
+ used
+>>>>> to get extioi features. It is unlikely that extioi driver depends =
+on
+>>>>> PARA_VIRT macro if hypercall is used to get features.
+>>>> CPUCFG is per-core information, if we really need something about
+>>>> extioi, it should be in iocsr (LOONGARCH_IOCSR_FEATURES).
+>>>>
+>>>>
+>>>> Huacai
+>>>>
+>>>>>
+>>>>> Regards
+>>>>> Bibo Mao
+>>>>>
+>>>>>>
+>>>>>> Huacai
+>>>>>>
+>>>>>>>
+>>>>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>>>>>> ---
+>>>>>>>     arch/loongarch/include/asm/inst.h      |  1 +
+>>>>>>>     arch/loongarch/include/asm/loongarch.h | 10 ++++++
+>>>>>>>     arch/loongarch/kvm/exit.c              | 46 ++++++++++++++++=
++---------
+>>>>>>>     3 files changed, 41 insertions(+), 16 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/arch/loongarch/include/asm/inst.h b/arch/loongarch/=
+include/asm/inst.h
+>>>>>>> index d8f637f9e400..ad120f924905 100644
+>>>>>>> --- a/arch/loongarch/include/asm/inst.h
+>>>>>>> +++ b/arch/loongarch/include/asm/inst.h
+>>>>>>> @@ -67,6 +67,7 @@ enum reg2_op {
+>>>>>>>            revhd_op        =3D 0x11,
+>>>>>>>            extwh_op        =3D 0x16,
+>>>>>>>            extwb_op        =3D 0x17,
+>>>>>>> +       cpucfg_op       =3D 0x1b,
+>>>>>>>            iocsrrdb_op     =3D 0x19200,
+>>>>>>>            iocsrrdh_op     =3D 0x19201,
+>>>>>>>            iocsrrdw_op     =3D 0x19202,
+>>>>>>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loong=
+arch/include/asm/loongarch.h
+>>>>>>> index 46366e783c84..a1d22e8b6f94 100644
+>>>>>>> --- a/arch/loongarch/include/asm/loongarch.h
+>>>>>>> +++ b/arch/loongarch/include/asm/loongarch.h
+>>>>>>> @@ -158,6 +158,16 @@
+>>>>>>>     #define  CPUCFG48_VFPU_CG              BIT(2)
+>>>>>>>     #define  CPUCFG48_RAM_CG               BIT(3)
+>>>>>>>
+>>>>>>> +/*
+>>>>>>> + * cpucfg index area: 0x40000000 -- 0x400000ff
+>>>>>>> + * SW emulation for KVM hypervirsor
+>>>>>>> + */
+>>>>>>> +#define CPUCFG_KVM_BASE                        0x40000000UL
+>>>>>>> +#define CPUCFG_KVM_SIZE                        0x100
+>>>>>>> +#define CPUCFG_KVM_SIG                 CPUCFG_KVM_BASE
+>>>>>>> +#define  KVM_SIGNATURE                 "KVM\0"
+>>>>>>> +#define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
+>>>>>>> +
+>>>>>>>     #ifndef __ASSEMBLY__
+>>>>>>>
+>>>>>>>     /* CSR */
+>>>>>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit=
+.c
+>>>>>>> index 923bbca9bd22..6a38fd59d86d 100644
+>>>>>>> --- a/arch/loongarch/kvm/exit.c
+>>>>>>> +++ b/arch/loongarch/kvm/exit.c
+>>>>>>> @@ -206,10 +206,37 @@ int kvm_emu_idle(struct kvm_vcpu *vcpu)
+>>>>>>>            return EMULATE_DONE;
+>>>>>>>     }
+>>>>>>>
+>>>>>>> -static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
+>>>>>>> +static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst ins=
+t)
+>>>>>>>     {
+>>>>>>>            int rd, rj;
+>>>>>>>            unsigned int index;
+>>>>>>> +
+>>>>>>> +       rd =3D inst.reg2_format.rd;
+>>>>>>> +       rj =3D inst.reg2_format.rj;
+>>>>>>> +       ++vcpu->stat.cpucfg_exits;
+>>>>>>> +       index =3D vcpu->arch.gprs[rj];
+>>>>>>> +
+>>>>>>> +       /*
+>>>>>>> +        * By LoongArch Reference Manual 2.2.10.5
+>>>>>>> +        * Return value is 0 for undefined cpucfg index
+>>>>>>> +        */
+>>>>>>> +       switch (index) {
+>>>>>>> +       case 0 ... (KVM_MAX_CPUCFG_REGS - 1):
+>>>>>>> +               vcpu->arch.gprs[rd] =3D vcpu->arch.cpucfg[index];
+>>>>>>> +               break;
+>>>>>>> +       case CPUCFG_KVM_SIG:
+>>>>>>> +               vcpu->arch.gprs[rd] =3D *(unsigned int *)KVM_SIG=
+NATURE;
+>>>>>>> +               break;
+>>>>>>> +       default:
+>>>>>>> +               vcpu->arch.gprs[rd] =3D 0;
+>>>>>>> +               break;
+>>>>>>> +       }
+>>>>>>> +
+>>>>>>> +       return EMULATE_DONE;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
+>>>>>>> +{
+>>>>>>>            unsigned long curr_pc;
+>>>>>>>            larch_inst inst;
+>>>>>>>            enum emulation_result er =3D EMULATE_DONE;
+>>>>>>> @@ -224,21 +251,8 @@ static int kvm_trap_handle_gspr(struct kvm_=
+vcpu *vcpu)
+>>>>>>>            er =3D EMULATE_FAIL;
+>>>>>>>            switch (((inst.word >> 24) & 0xff)) {
+>>>>>>>            case 0x0: /* CPUCFG GSPR */
+>>>>>>> -               if (inst.reg2_format.opcode =3D=3D 0x1B) {
+>>>>>>> -                       rd =3D inst.reg2_format.rd;
+>>>>>>> -                       rj =3D inst.reg2_format.rj;
+>>>>>>> -                       ++vcpu->stat.cpucfg_exits;
+>>>>>>> -                       index =3D vcpu->arch.gprs[rj];
+>>>>>>> -                       er =3D EMULATE_DONE;
+>>>>>>> -                       /*
+>>>>>>> -                        * By LoongArch Reference Manual 2.2.10.5
+>>>>>>> -                        * return value is 0 for undefined cpucf=
+g index
+>>>>>>> -                        */
+>>>>>>> -                       if (index < KVM_MAX_CPUCFG_REGS)
+>>>>>>> -                               vcpu->arch.gprs[rd] =3D vcpu->ar=
+ch.cpucfg[index];
+>>>>>>> -                       else
+>>>>>>> -                               vcpu->arch.gprs[rd] =3D 0;
+>>>>>>> -               }
+>>>>>>> +               if (inst.reg2_format.opcode =3D=3D cpucfg_op)
+>>>>>>> +                       er =3D kvm_emu_cpucfg(vcpu, inst);
+>>>>>>>                    break;
+>>>>>>>            case 0x4: /* CSR{RD,WR,XCHG} GSPR */
+>>>>>>>                    er =3D kvm_handle_csr(vcpu, inst);
+>>>>>>> --
+>>>>>>> 2.39.3
+>>>>>>>
+>>>>>
+>>>>>
 >>
->> This test refactor the create_vpmu_vm() and make it a wrapper for
->> __create_vpmu_vm(), which allows some extra init code before
->> KVM_ARM_VCPU_PMU_V3_INIT.
->>
->> And this test use the KVM_ARM_VCPU_PMU_V3_FILTER attribute to set the
->> pmu event filter in KVM. And choose to filter two common event
->> branches_retired and instructions_retired, and let the guest to check if
->> it see the right pmceid register.
->>
->> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->> ---
->>   tools/testing/selftests/kvm/Makefile          |   1 +
->>   .../kvm/aarch64/pmu_event_filter_test.c       | 219 ++++++++++++++++++
->>   .../selftests/kvm/include/aarch64/vpmu.h      |   4 +
->>   .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  14 +-
->>   4 files changed, 236 insertions(+), 2 deletions(-)
->>   create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->>
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index 709a70b31ca2..733ec86a3385 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -148,6 +148,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
->>   TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->>   TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
->>   TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
->> +TEST_GEN_PROGS_aarch64 += aarch64/pmu_event_filter_test
->>   TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->>   TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
->>   TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
->> diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->> new file mode 100644
->> index 000000000000..d280382f362f
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->> @@ -0,0 +1,219 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * pmu_event_filter_test - Test user limit pmu event for guest.
->> + *
->> + * Copyright (c) 2023 Red Hat, Inc.
->> + *
->> + * This test checks if the guest only see the limited pmu event that userspace
->> + * sets, if the guest can use those events which user allow, and if the guest
->> + * can't use those events which user deny.
->> + * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
->> + * is supported on the host.
->> + */
->> +#include <kvm_util.h>
->> +#include <processor.h>
->> +#include <vgic.h>
->> +#include <vpmu.h>
->> +#include <test_util.h>
->> +#include <perf/arm_pmuv3.h>
->> +
->> +struct pmce{
-> 
-> Missing whitespace before curly brace.
-> 
-> Also -- pmce is an odd name. Maybe common_event_ids or pmu_id_regs.
 
-Thanks for pointing this out. I would choose pmu_common_event_ids as its 
-name.
-
-> 
->> +	uint64_t pmceid0;
->> +	uint64_t pmceid1;
->> +} supported_pmce, guest_pmce;
-> 
-> maybe "max_*" and "expected_*". It took me a bit to understand that
-> guest_pmce feeds in your expected PMCEID values.
-> 
-
-The "max_* and "expected_*" is more clear, I would use it.
-
->> +static struct vpmu_vm *vpmu_vm;
->> +
->> +#define FILTER_NR 10
->> +
->> +struct test_desc {
->> +	const char *name;
->> +	struct kvm_pmu_event_filter filter[FILTER_NR];
->> +};
->> +
->> +#define __DEFINE_FILTER(base, num, act)		\
->> +	((struct kvm_pmu_event_filter) {	\
->> +		.base_event	= base,		\
->> +		.nevents	= num,		\
->> +		.action		= act,		\
->> +	})
->> +
->> +#define DEFINE_FILTER(base, act) __DEFINE_FILTER(base, 1, act)
->> +
->> +#define EMPTY_FILTER	{ 0 }
->> +
->> +#define SW_INCR		0x0
->> +#define INST_RETIRED	0x8
->> +#define BR_RETIRED	0x21
-> 
-> These event numbers are already defined in tools/include/perf/arm_pmuv3.h,
-> use those instead.
-> 
-
-Sure. I would use those defined macro.
-
->> +static void guest_code(void)
->> +{
->> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
->> +	uint64_t pmceid1 = read_sysreg(pmceid1_el0);
->> +
->> +	GUEST_ASSERT_EQ(guest_pmce.pmceid0, pmceid0);
->> +	GUEST_ASSERT_EQ(guest_pmce.pmceid1, pmceid1);
->> +
->> +	GUEST_DONE();
->> +}
->> +
->> +static void guest_get_pmceid(void)
->> +{
->> +	supported_pmce.pmceid0 = read_sysreg(pmceid0_el0);
->> +	supported_pmce.pmceid1 = read_sysreg(pmceid1_el0);
->> +
->> +	GUEST_DONE();
->> +}
->> +
->> +static void pmu_event_filter_init(struct vpmu_vm *vm, void *arg)
-> 
-> Why are you obfuscating the pointer to the filter array?
-> 
->> +{
->> +	struct kvm_device_attr attr = {
->> +		.group	= KVM_ARM_VCPU_PMU_V3_CTRL,
->> +		.attr	= KVM_ARM_VCPU_PMU_V3_FILTER,
->> +	};
->> +	struct kvm_pmu_event_filter *filter = (struct kvm_pmu_event_filter *)arg;
->> +
->> +	while (filter && filter->nevents != 0) {
->> +		attr.addr = (uint64_t)filter;
->> +		vcpu_ioctl(vm->vcpu, KVM_SET_DEVICE_ATTR, &attr);
-> 
-> Again, kvm_device_attr_set() the right helper to use.
-> 
->> +static void set_pmce(struct pmce *pmce, int action, int event)
->> +{
->> +	int base = 0;
->> +	uint64_t *pmceid = NULL;
->> +
->> +	if (event >= 0x4000) {
->> +		event -= 0x4000;
->> +		base = 32;
->> +	}
->> +
->> +	if (event >= 0 && event <= 0x1F) {
->> +		pmceid = &pmce->pmceid0;
->> +	} else if (event >= 0x20 && event <= 0x3F) {
->> +		event -= 0x20;
->> +		pmceid = &pmce->pmceid1;
->> +	} else {
->> +		return;
->> +	}
->> +
->> +	event += base;
->> +	if (action == KVM_PMU_EVENT_ALLOW)
->> +		*pmceid |= BIT(event);
->> +	else
->> +		*pmceid &= ~BIT(event);
->> +}
->> +
->> +static void prepare_guest_pmce(struct kvm_pmu_event_filter *filter)
->> +{
->> +	struct pmce pmce_mask = { ~0, ~0 };
->> +	bool first_filter = true;
->> +
->> +	while (filter && filter->nevents != 0) {
->> +		if (first_filter) {
->> +			if (filter->action == KVM_PMU_EVENT_ALLOW)
->> +				memset(&pmce_mask, 0, sizeof(pmce_mask));
->> +			first_filter = false;
->> +		}
->> +
->> +		set_pmce(&pmce_mask, filter->action, filter->base_event);
->> +		filter++;
->> +	}
->> +
->> +	guest_pmce.pmceid0 = supported_pmce.pmceid0 & pmce_mask.pmceid0;
->> +	guest_pmce.pmceid1 = supported_pmce.pmceid1 & pmce_mask.pmceid1;
->> +}
-> 
-> Why do you need to do this? Can't you tell the guests what events to
-> expect and have it make sense of the PMCEID values it sees?
-
-At here, I prepare the pmceid value which the guest should see, and pass 
-it to the guest by sync the global variable. And guest compare this 
-value with the value it read through pmu common event register.
-
-Why I don't put the process of generating expected_pmce into the guest 
-code is that I want to make sure this value computed in host is totally 
-correct, so the guest code is pretty simple, it only needs to compare 
-the two value.
-
-> 
-> You could, for example, pass in a pointer to the test descriptor as an
-> argument.
-> 
->> +static void run_test(struct test_desc *t)
->> +{
->> +	pr_debug("Test: %s\n", t->name);
-> 
-> You may as well just pr_info() this thing.
-> 
-
-Ok. I can change it to pr_info().
-
->> +	create_vpmu_vm_with_filter(guest_code, t->filter);
->> +	prepare_guest_pmce(t->filter);
->> +	sync_global_to_guest(vpmu_vm->vm, guest_pmce);
->> +
->> +	run_vcpu(vpmu_vm->vcpu);
->> +
->> +	destroy_vpmu_vm(vpmu_vm);
->> +}
->> +
->> +static struct test_desc tests[] = {
->> +	{"without_filter", { EMPTY_FILTER }},
->> +	{"member_allow_filter",
->> +	 {DEFINE_FILTER(SW_INCR, 0), DEFINE_FILTER(INST_RETIRED, 0),
->> +	  DEFINE_FILTER(BR_RETIRED, 0), EMPTY_FILTER}},
->> +	{"member_deny_filter",
->> +	 {DEFINE_FILTER(SW_INCR, 1), DEFINE_FILTER(INST_RETIRED, 1),
->> +	  DEFINE_FILTER(BR_RETIRED, 1), EMPTY_FILTER}},
->> +	{"not_member_deny_filter",
->> +	 {DEFINE_FILTER(SW_INCR, 1), EMPTY_FILTER}},
->> +	{"not_member_allow_filter",
->> +	 {DEFINE_FILTER(SW_INCR, 0), EMPTY_FILTER}},
-> 
-> Why is the filter array special enough to get its own sentinel macro
-> but...
-> 
->> +	{ 0 }
-> 
-> ... the test descriptor array is okay to use a 'raw' initialization. My
-> vote is to drop the macro, zero-initializing a struct in an array is an
-> extremely common pattern in the kernel.
-> 
-> Also, these descriptors are dense and hard to read. Working with an
-> example:
-> 
-> 	{
-> 		.name = "member_allow_filter",
-> 		.filter = {
-> 			DEFINE_FILTER(SW_INCR, 0),
-> 			DEFINE_FILTER(INST_RETIRED, 0),
-> 			DEFINE_FILTER(BR_RETIRED, 0),
-> 			{ 0 }
-> 		},
-> 	}
-> 
-> See how much more readable that is?
-> 
-
-It's more clear and readable, thanks for your advice. I will change the 
-array definition to the beautiful format.
-
->> +};
->> +
->> +static void for_each_test(void)
->> +{
->> +	struct test_desc *t;
->> +
->> +	for (t = &tests[0]; t->name; t++)
->> +		run_test(t);
->> +}
-> 
-> for_each_test() sounds like an iterator, but this is not. Call it
-> run_tests()
-> 
-
-Ok. Will call it run_tests().
-
->> +static bool kvm_supports_pmu_event_filter(void)
->> +{
->> +	int r;
->> +
->> +	vpmu_vm = create_vpmu_vm(guest_code);
->> +
->> +	r = __kvm_has_device_attr(vpmu_vm->vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
->> +				  KVM_ARM_VCPU_PMU_V3_FILTER);
->> +
->> +	destroy_vpmu_vm(vpmu_vm);
->> +	return !r;
->> +}
-> 
-> TBH, I don't really care much about the test probing for the event
-> filter UAPI. It has been upstream for a while, and if folks are trying
-> to run selftests at HEAD on an old kernel then that's their business.
-> 
-> The other prerequisites make more sense since they actually check if HW
-> features are present.
-> 
-
-If no one cares it, I will delete this function.
-
->> +static bool host_pmu_supports_events(void)
->> +{
->> +	vpmu_vm = create_vpmu_vm(guest_get_pmceid);
->> +
->> +	memset(&supported_pmce, 0, sizeof(supported_pmce));
->> +	sync_global_to_guest(vpmu_vm->vm, supported_pmce);
->> +	run_vcpu(vpmu_vm->vcpu);
->> +	sync_global_from_guest(vpmu_vm->vm, supported_pmce);
->> +	destroy_vpmu_vm(vpmu_vm);
->> +
->> +	return supported_pmce.pmceid0 & (BR_RETIRED | INST_RETIRED);
->> +}
-> 
-> This helper says its probing the host PMU, but you're actually firing up a
-> VM to do it.
-> 
-> The events supported by a particular PMU instance are readily available
-> in sysfs. Furthermore, you can tell KVM to select the exact host PMU
-> instance you probe.
-
-It should call kvm_pmu_support_events, because I want to get the default 
-pmce without any filter in the kvm. So I run a guest and get that value 
-in the guest.
-
-I've tried get the pmceid0 through the
-
-vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCEID0_EL0), &val);
-
-But it always return the -ENOENT, I'm not sure if this is expected. 
-Could I can use the KVM interface to get the pmceid0?
-
-> 
->> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> index b3de8fdc555e..76ea03d607f1 100644
->> --- a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> +++ b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> @@ -7,8 +7,9 @@
->>   #include <vpmu.h>
->>   #include <perf/arm_pmuv3.h>
->>   
->> -/* Create a VM that has one vCPU with PMUv3 configured. */
->> -struct vpmu_vm *create_vpmu_vm(void *guest_code)
->> +struct vpmu_vm *__create_vpmu_vm(void *guest_code,
->> +				 void (*init_pmu)(struct vpmu_vm *vm, void *arg),
->> +				 void *arg)
->>   {
->>   	struct kvm_vcpu_init init;
->>   	uint8_t pmuver;
->> @@ -50,12 +51,21 @@ struct vpmu_vm *create_vpmu_vm(void *guest_code)
->>   		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
->>   
->>   	/* Initialize vPMU */
->> +	if (init_pmu)
->> +		init_pmu(vpmu_vm, arg);
->> +
->>   	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
->>   	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
->>   
->>   	return vpmu_vm;
->>   }
->>   
->> +/* Create a VM that has one vCPU with PMUv3 configured. */
->> +struct vpmu_vm *create_vpmu_vm(void *guest_code)
->> +{
->> +	return __create_vpmu_vm(guest_code, NULL, NULL);
->> +}
->> +
-> 
-> Ok. This completely proves my point in the other patch. You already need
-> to refactor this helper to cram in what you're trying to do. Think of
-> ways to move the code that is actually common into libraries and leave
-> the rest to the tests themselves.
-> 
-> Some slight code duplication isn't the end of the world if it avoids
-> churning libraries every time someone wants to add a widget.
-
-Thanks for your opinion. I'm thinking about refactor the helper to make 
-it can be reuseable by further tests.
-
-Thanks,
-Shaoqin
-
-> 
-
--- 
-Shaoqin
-
+--=20
+- Jiaxun
 
