@@ -1,144 +1,156 @@
-Return-Path: <kvm+bounces-10295-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10296-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBD1C86B738
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 19:31:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4376486B778
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 19:45:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2937F1C2592A
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 18:31:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DBC6B22613
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 18:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9E571ED8;
-	Wed, 28 Feb 2024 18:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3517174430;
+	Wed, 28 Feb 2024 18:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EQYoFSpz"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AeB1GBFU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB49371EA4
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 18:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0082571ED4
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 18:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709145073; cv=none; b=UwnMnfcobtmcIrv99rA6PT9Y4ge2bTVmTNqPI3HIVnDbfLVzHPhIS+AJY1lQhg6y1eWWR+HqaPBoVI9ddV67fHSOL65HVtzHx+RCCgMJn689/28fVMA+cKlm9amOPzTZGgIJcTp6N04jBVkXA2CLjiwNu4A89I79SfSnXPmEZTg=
+	t=1709145863; cv=none; b=RssDUuouxPDXfZGI67a6Q25Bd/PUAmcRMV0YmGMlBD9s2WgeWBe2MN5+25pUr1iw5R2pJADQXa+Z3e3VMTWZ9yKoUjvO6I1OnNagSslJZ9F0HlOKsj3NovMZG8E3anY2nf3aeF6JNL0PzjBQPEAuJ3+4EhgDaF13hAoh0q+Ql4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709145073; c=relaxed/simple;
-	bh=s/2MSjG8UyaUs97mrM1q6zQgCW0Xk0or22c3BdoaHmk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TSg5ZagsWKiJRWIhGM6JgPxWrV4xqtTtagr0aEXKmZAZNC66zS860AEcXptBtRE5ls9D0kFEAAGW9d/lRA72BfP44lJ1vRAfyVxM0iE/RnHQQroHTwmSB25n5CJSoD8Mut/nNmcITJPgwA3R5RuvpdBEqtueN47CgVJbAeF1ge8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EQYoFSpz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709145070;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=weArB08m8SQ4hme6AVbC9RsZWLdEnvH6fsjtADsJEm8=;
-	b=EQYoFSpzGoyn70NWVdo+JJF2Iw1nLgMDcEjLJQz9G44/z5KAmrj/goM3y1hTUlqcRSjJcA
-	O8aO6BydedIR78Rje2OY2knNitwlXJsxoQbFu2o4yV22LqbPb1+CBa68bTJAbKAH3xyjh5
-	woYC/Lal1uB0JE/Vj1Ti9UT14HN/yYs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-2IPtiIplO5GamBK9EOIb6Q-1; Wed, 28 Feb 2024 13:31:07 -0500
-X-MC-Unique: 2IPtiIplO5GamBK9EOIb6Q-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33d0d313b81so33529f8f.3
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 10:31:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709145066; x=1709749866;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=weArB08m8SQ4hme6AVbC9RsZWLdEnvH6fsjtADsJEm8=;
-        b=o4nMAzaKHf20fgJpiUlyW21GOgNc3ynG5OzzT8sUp2CAvUNlr0jEzDNxyQ+1byYxZL
-         5Z4wJWYFJ7wMkbZX3bHgPfnj+5GBDQe34dQpb7UWRmeKLwcLOhVkk7xH4SjN2RgNASrC
-         3HknO17W2ySue0KX2HqyEGvZtDN5Jj3cO0t5IvIgfL/ZG0OuAFBPioWNGOPrZDBqMdeT
-         TJo8NK3AEB+ulehIYa+h/LOpS4hy/EjezfoubDj6rz+gNM0JArZfWXHLT0p5aPgJC9V9
-         GYnlZS8Q4HcfP4kdFin4d7vbP9xeslZ/3KNKUQdCl8Khrd/VkU1AYjCwPBEc94ZXIq3m
-         N+bA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQOUOnjOzwKfnaiWetlSXfUNwJGhGTF8NXZ4OmSZtS+QkJa0SxY1wEy234Piw+IsplEBx6FRmIHauuO3iM7CexciTD
-X-Gm-Message-State: AOJu0YzTr/F6tnuWoCRaxID6LVGlVvUpoLl5TUkLq8W2wXKlxGrwYFX1
-	+hLSBIIW4p0SqMVVAkf1/dbtn4Lp5Hbf5gFq4g+a24ZmZLIdW+khYVMAKDjGiQJBkQm2KAZriUJ
-	1oxnSpL1snTX4s9bPDYbAcI4ZzD4PSX3l0N1xmj9p4TKGIWy/cQ==
-X-Received: by 2002:adf:9bdc:0:b0:33d:50cd:4672 with SMTP id e28-20020adf9bdc000000b0033d50cd4672mr256181wrc.21.1709145066129;
-        Wed, 28 Feb 2024 10:31:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEbucOOcYdc5E7w1hWPrlSDUK3hHwk9fJn5afQ97oLMcIn3c+BDLdxi5c2NUzfMbk+v1xT5yw==
-X-Received: by 2002:adf:9bdc:0:b0:33d:50cd:4672 with SMTP id e28-20020adf9bdc000000b0033d50cd4672mr256168wrc.21.1709145065820;
-        Wed, 28 Feb 2024 10:31:05 -0800 (PST)
-Received: from redhat.com ([2a02:14f:178:d6b0:a21c:61c4:2098:5db])
-        by smtp.gmail.com with ESMTPSA id bx10-20020a5d5b0a000000b0033b2799815csm15646500wrb.86.2024.02.28.10.31.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 10:31:05 -0800 (PST)
-Date: Wed, 28 Feb 2024 13:31:00 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Yunjian Wang <wangyunjian@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, kuba@kernel.org,
-	bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, xudingke@huawei.com,
-	liwei395@huawei.com
-Subject: Re: [PATCH net-next v2 0/3] tun: AF_XDP Tx zero-copy support
-Message-ID: <20240228133035-mutt-send-email-mst@kernel.org>
-References: <1709118281-125508-1-git-send-email-wangyunjian@huawei.com>
+	s=arc-20240116; t=1709145863; c=relaxed/simple;
+	bh=6Qt3twI1TqKynZ6Hn2RINsIkpOlzZSp2WOWjAHhOShQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Acpq+rqweZ02z5wZkm+uwr8wI6B7gTLGqkZoKS1p2zbjVDqePN5Tt19PrcnNVBqTDuUZgOBgJqyQIWTF492OOuYSua/yo57EnQdnE7omwPQHUI3+NpcrmDQdjtczMKef3iSkbvJP7TgAnr16Jzt62pQ20V14gWeiUo97eYe1prg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AeB1GBFU; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41SHHq0K010622;
+	Wed, 28 Feb 2024 18:43:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=qcppdkim1; bh=bSo4+TpCIpKA9iK73ekA6
+	ybmOXrnbL0luk3/aCyRvoY=; b=AeB1GBFU3sw8vhRbnKYXxCqKG14kR9yXz6rm6
+	Ud4b/y6NBZau3Onf0TQAeok9MWEXpa0ty6Qt1tu5r8nQ1zTEVebLdgWEiP4QfTGw
+	R2SycslKjHpLHT/ODlo82PFad11vnBlCneXbay6Q2aQw33SZtNRdc0rcVIwi81xA
+	5vB1XkjkeT7DPj47+aWN6Ts99BppABMPWMqNY4kgAL9jCG+AAGq8Zv5baJxLCQvq
+	5yj5ZUvSBBSWVlSVlarAAY81QvzyIHnR/b1vPaypHpnt5AEcLk4fysgOmnWLcoYC
+	FM6Xfm8kzomGMFegH78eAqxfbrL2Iv3+rtd0qN7VM6sEC1VAQ==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wj1d9sk6c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 28 Feb 2024 18:43:29 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41SIhSir023355
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 28 Feb 2024 18:43:28 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 28 Feb 2024 10:43:27 -0800
+Date: Wed, 28 Feb 2024 10:43:27 -0800
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: Quentin Perret <qperret@google.com>
+CC: David Hildenbrand <david@redhat.com>,
+        Matthew Wilcox
+	<willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
+        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
+        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+        <aou@eecs.berkeley.edu>, <seanjc@google.com>,
+        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <akpm@linux-foundation.org>, <xiaoyao.li@intel.com>,
+        <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
+        <jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
+        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
+        <mic@digikod.net>, <vbabka@suse.cz>, <vannapurve@google.com>,
+        <ackerleytng@google.com>, <mail@maciej.szmigiero.name>,
+        <michael.roth@amd.com>, <wei.w.wang@intel.com>,
+        <liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
+        <kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
+        <steven.price@arm.com>, <quic_mnalajal@quicinc.com>,
+        <quic_tsoni@quicinc.com>, <quic_svaddagi@quicinc.com>,
+        <quic_cvanscha@quicinc.com>, <quic_pderrin@quicinc.com>,
+        <quic_pheragu@quicinc.com>, <catalin.marinas@arm.com>,
+        <james.morse@arm.com>, <yuzenghui@huawei.com>,
+        <oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
+        <keirf@google.com>, <linux-mm@kvack.org>
+Subject: Re: Re: folio_mmapped
+Message-ID: <20240228103842643-0800.eberman@hu-eberman-lv.qualcomm.com>
+Mail-Followup-To: Quentin Perret <qperret@google.com>, 
+	David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>, 
+	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, 
+	steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, 
+	quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com, 
+	yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, 
+	keirf@google.com, linux-mm@kvack.org
+References: <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <ZdfoR3nCEP3HTtm1@casper.infradead.org>
+ <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
+ <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
+ <Zd8PY504BOwMR4jO@google.com>
+ <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
+ <Zd8qvwQ05xBDXEkp@google.com>
+ <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
+ <Zd82V1aY-ZDyaG8U@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <1709118281-125508-1-git-send-email-wangyunjian@huawei.com>
+In-Reply-To: <Zd82V1aY-ZDyaG8U@google.com>
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: BFRptV3lhNexvrzyysi2BMBXycZH1YyV
+X-Proofpoint-ORIG-GUID: BFRptV3lhNexvrzyysi2BMBXycZH1YyV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-28_08,2024-02-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=630
+ mlxscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0
+ suspectscore=0 impostorscore=0 spamscore=0 priorityscore=1501
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402280147
 
-On Wed, Feb 28, 2024 at 07:04:41PM +0800, Yunjian Wang wrote:
-> Hi all:
+On Wed, Feb 28, 2024 at 01:34:15PM +0000, Quentin Perret wrote:
+> Alternatively, the shared->private conversion happens in the KVM vcpu
+> run loop, so we'd be in a good position to exit the VCPU_RUN ioctl with a
+> new exit reason saying "can't donate that page while it's shared" and
+> have userspace use MADVISE_DONTNEED or munmap, or whatever on the back
+> of that. But I tend to prefer the rmap option if it's workable as that
+> avoids adding new KVM userspace ABI.
 > 
-> Now, some drivers support the zero-copy feature of AF_XDP sockets,
-> which can significantly reduce CPU utilization for XDP programs.
-> 
-> This patch set allows TUN to also support the AF_XDP Tx zero-copy
-> feature. It is based on Linux 6.8.0+(openEuler 23.09) and has
-> successfully passed Netperf and Netserver stress testing with
-> multiple streams between VM A and VM B, using AF_XDP and OVS.
-> 
-> The performance testing was performed on a Intel E5-2620 2.40GHz
-> machine. Traffic were generated/send through TUN(testpmd txonly
-> with AF_XDP) to VM (testpmd rxonly in guest).
-> 
-> +------+---------+---------+---------+
-> |      |   copy  |zero-copy| speedup |
-> +------+---------+---------+---------+
-> | UDP  |   Mpps  |   Mpps  |    %    |
-> | 64   |   2.5   |   4.0   |   60%   |
-> | 512  |   2.1   |   3.6   |   71%   |
-> | 1024 |   1.9   |   3.3   |   73%   |
-> +------+---------+---------+---------+
-> 
-> Yunjian Wang (3):
->   xsk: Remove non-zero 'dma_page' check in xp_assign_dev
->   vhost_net: Call peek_len when using xdp
->   tun: AF_XDP Tx zero-copy support
 
+You'll still probably need the new exit reason saying "can't donate that
+page while it's shared" if the refcount tests fail. Can use David's
+iouring as example of some other part of the kernel has a reference to
+the page. I can't think of anything to do other than exiting to
+userspace because we don't know how to drop that extra ref.
 
-threading broken pls repost.
-
-vhost bits look ok though:
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-
->  drivers/net/tun.c       | 177 ++++++++++++++++++++++++++++++++++++++--
->  drivers/vhost/net.c     |  21 +++--
->  include/linux/if_tun.h  |  32 ++++++++
->  net/xdp/xsk_buff_pool.c |   7 --
->  4 files changed, 220 insertions(+), 17 deletions(-)
-> 
-> -- 
-> 2.41.0
+Thanks,
+Elliot
 
 
