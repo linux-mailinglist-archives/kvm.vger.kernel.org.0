@@ -1,123 +1,112 @@
-Return-Path: <kvm+bounces-10311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419C086BA04
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:35:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D702086BA1D
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D56D01F2350A
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:35:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91D3828B555
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD1670050;
-	Wed, 28 Feb 2024 21:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E820670052;
+	Wed, 28 Feb 2024 21:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UcLPSQyO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZEJfGmAr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE057002F
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 21:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111C170041;
+	Wed, 28 Feb 2024 21:38:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709156096; cv=none; b=rzb8ph7HeeJf9RMTrM5BJhcgzoTpAuQvWeyKmBno3OE0eX8ZBZkY+vAZJVIzriV8Ytx9W5BGJn5+7RSb44dg7Nia0taQg+RbBTUVzRM+WvGB5/EfAg4XsmQMBoUAoDpI6u7j6CUNiajagFK3lTPJTZptMRhdB0pdDuVkGkpK4bo=
+	t=1709156321; cv=none; b=onMNo8W7bweuI253+zwOVZp/oUff2A5+Zh64fJr2Gy8BRps9X7bbvCpmuiNCx9FsB0tZ9fHSJvQnYXJ447W9/0Qmt5UVJ6Ct8wLTPtmHqMavSkK+5wGKfM/S141opJu2VRZWx2tBCroXmuMPyiLIroPGrxuoHax5GHoeAyZyjrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709156096; c=relaxed/simple;
-	bh=hYKDYcEw5lHqH2aRTYPwr/dy/RfHP5zZ7HjM/dRqXn4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ftmbQnzBuuS2UG0cSuVSuMQWjRWcr+v2EKRfwAnVPW0Ch+TmF8Mprtm8HmF01Q4shf2fmM3OG0Ckx6pHuo7MdwbY/XPEJFMdXttTZYuL2XKDpBSv2F6IvYkpLVCNwsSMdFphcekgZOudiVTshN6/66cPtve6tGEcGw/CYn0m1q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UcLPSQyO; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-299d76d3a5eso112398a91.3
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 13:34:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709156094; x=1709760894; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1XXg0IkU5TUPFv8zc80T7AHB4FtUby0AfD+GckQIvQA=;
-        b=UcLPSQyOeIiK0wylL/NBmVbjHt3P0pyG3v/m8DYkEENMwHttJRnaQWuwJ9ucwI+6aE
-         ShGU1NoCZz9ibuG9IrbJSxhO5im8yLcYO3kJE9mrTJno4xXQPV29Pla+E/JoySkVCkCi
-         itBtdkI7oVCTt2k6Nbms9/y2GEi92U8n8aQJxY3fFa3eFDrbpRjoImZyl1NQX5FlFBwn
-         EYPD/BDpsB+BqmSN9sipdbDiWbT5zYZmHoAxcHZXrpynnubWfa1rbnZkbzL/zm86MwA6
-         UkZn/rjqPCTEwfB88g5OFED7xEQE4m1e6wnGlhPfUDWWPG7+cvLC0vOXa4aLnIckiH9x
-         +c3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709156094; x=1709760894;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1XXg0IkU5TUPFv8zc80T7AHB4FtUby0AfD+GckQIvQA=;
-        b=xGlMKJKk01CvctVd0NwDJ2IlifD988EcbZ/SWHATleLq3Xuapj3wa+dcC6EWRCWI1D
-         Uq65wQS/38xbvSUsItWkGmxa6on6GndDbgLvQ8ks1r+qL6lcakRpVldmwn6JJ6tzvqsq
-         MOgiIhTpK3hChZh05bcRjEcKroNdxFAKjW+Z/IqYclsZhsGuAWzUOvhfbNUxtVCECuWQ
-         WXGS8KgvL6V70d3lf4ByRnxQ0gEqxMD95mA2lUkiIObiP1KGthB2PedaOdloyYGih5ux
-         lhq1f35fviUMm/lus/xAfLDvWivVeoEsaCApKtASfECyOVXx6RrTeU8C1hh4ldPsLsJV
-         iSsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCzTy7bw2zpqd0lJl9ebIA63VIsk5pI+5POIV+j05fG4BtKa2CL51nzHKaivl4HO2jmFtWlOc3RribLfW0jEuf+JFr
-X-Gm-Message-State: AOJu0YyR4DDA7FKRodEzaxUeQDiwAgUjlMPfb6wLvwFLH2noIs/lk5Ua
-	r7FcmjAaJlLbwJwiwZKWZ4GDKqSusFxPhPJi48fWOV/4DFNW+tTFQqALSILOhYO7j/OBOfwLl2X
-	Vdw==
-X-Google-Smtp-Source: AGHT+IHSa/71jx2w7IQMMCTRY7oSd9bBuHsHilIQ/kXSBHYoaxZh4u+KcytiCqhfbrsj61dcHuvEZ/TgqXQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d4c3:b0:1dc:b333:f2a4 with SMTP id
- o3-20020a170902d4c300b001dcb333f2a4mr463plg.12.1709156094095; Wed, 28 Feb
- 2024 13:34:54 -0800 (PST)
-Date: Wed, 28 Feb 2024 21:34:53 +0000
-In-Reply-To: <Zd-lzwQb0APsBFjM@linux.dev>
+	s=arc-20240116; t=1709156321; c=relaxed/simple;
+	bh=U8ywN+/QncDricW1r5N+b+wUQnEUJQCcZiIU2QULtyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GorRGFjNC2ziK0crsC4CU00ZPadcd9iULO9VCQFaWo96EURzahdiIqkHmkFAA5BJT8FgRHd+iOXiwtfbbT7E7wroo69NWtSu4vLgxGkSXAUf7+rySVlMepAsizsPTf9IIPuwjLnMrM+tA0r2gCSC1SC+r/QPHpvz586TGP8MboY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZEJfGmAr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C8B1C433C7;
+	Wed, 28 Feb 2024 21:38:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709156320;
+	bh=U8ywN+/QncDricW1r5N+b+wUQnEUJQCcZiIU2QULtyQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZEJfGmArPh3XY8OOIjd+m5oualk77oyH+7LIpaLs+GExkgYdqCMIp3sz0dXvoKGaB
+	 8M0Wn6kGjlo3vwq06rEEkqQFyVj9msUzEZmTJvjlD2EWpZEVam7up9Kz8G5yo4jLWq
+	 QDl8FdnKBTFIfja0ZKFbkW3pCUplXar46+oHG0m1yL3pwqzEEOX/qzmk+C+zZOgTZy
+	 YvzprWPMhDlTJe/YlQSLl6AUlaMRCfAJiYahgxI46wipIqjJEgafmIKnWoE7rnfQUm
+	 o9eNDd0zyYS50OItAMHNgBwXW34CSDKfP5hcpyZpljTJpp1qkkEQI4HuwUmeMqAFPe
+	 tT/1B4FNCNPkg==
+Date: Wed, 28 Feb 2024 21:38:35 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Aishwarya TCV <aishwarya.tcv@arm.com>
+Subject: Re: [PATCH v3 3/8] KVM: selftests: Move setting a vCPU's entry point
+ to a dedicated API
+Message-ID: <f399a68a-ad9d-4734-b5da-25f5ce3b832e@sirena.org.uk>
+References: <20240208204844.119326-1-thuth@redhat.com>
+ <20240208204844.119326-4-thuth@redhat.com>
+ <501ac94d-11ab-4765-a25d-75013c021be6@sirena.org.uk>
+ <Zd-JjBNCpFG5iDul@google.com>
+ <Zd-jdAtI_C_d_fp4@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240208204844.119326-1-thuth@redhat.com> <20240208204844.119326-4-thuth@redhat.com>
- <501ac94d-11ab-4765-a25d-75013c021be6@sirena.org.uk> <Zd-JjBNCpFG5iDul@google.com>
- <Zd-jdAtI_C_d_fp4@google.com> <Zd-lzwQb0APsBFjM@linux.dev>
-Message-ID: <Zd-m_WinXvoCmMCb@google.com>
-Subject: Re: [PATCH v3 3/8] KVM: selftests: Move setting a vCPU's entry point
- to a dedicated API
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Mark Brown <broonie@kernel.org>, Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Marc Zyngier <maz@kernel.org>, Aishwarya TCV <aishwarya.tcv@arm.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="SwDm9igrBxoRwCqa"
+Content-Disposition: inline
+In-Reply-To: <Zd-jdAtI_C_d_fp4@google.com>
+X-Cookie: Function reject.
 
-On Wed, Feb 28, 2024, Oliver Upton wrote:
-> +cc Raghavendra
-> 
-> Hey,
-> 
-> On Wed, Feb 28, 2024 at 01:19:48PM -0800, Sean Christopherson wrote:
-> > but due to a different issue that is fixed in the kvm-arm tree[*], but not in mine,
-> > I built without -Werror and didn't see the new warn in the sea of GUEST_PRINTF
-> > warnings.
-> > 
-> > Ugh, and I still can't enable -Werror, because there are unused functions in
-> > aarch64/vpmu_counter_access.c
-> > 
-> >   aarch64/vpmu_counter_access.c:96:20: error: unused function 'enable_counter' [-Werror,-Wunused-function]
-> >   static inline void enable_counter(int idx)
-> >                    ^
-> >   aarch64/vpmu_counter_access.c:104:20: error: unused function 'disable_counter' [-Werror,-Wunused-function]
-> >   static inline void disable_counter(int idx)
-> >                    ^
-> >   2 errors generated.
-> >   make: *** [Makefile:278: /usr/local/google/home/seanjc/go/src/kernel.org/nox/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.o] Error 1
-> >   make: *** Waiting for unfinished jobs....
-> > 
-> >   Commit 49f31cff9c533d264659356b90445023b04e10fb failed to build with 'make-clang make-arm make -j128'.
-> > 
-> > Oliver/Marc, any thoughts on how you want to fix the unused function warnings?
-> > As evidenced by this goof, being able to compile with -Werror is super helpful.
-> 
-> Are these the only remaining warnings we have in the arm64 selftests
-> build?
 
-Yep, unless I've missed something, this is the only outstanding warning across
-all architectures that support selftests (sans LoongArch and PPC, which are
-pending).
+--SwDm9igrBxoRwCqa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Wed, Feb 28, 2024 at 01:19:48PM -0800, Sean Christopherson wrote:
+
+> I'll squash the above and force push.
+
+Thanks, I'll give that a spin (likely tomorrow at this point).
+
+> And another question: is there any reason to not force -Werror for selftests?
+
+Enabling it by default can cause a bunch of fragility when people are
+running different compilers, there's things like all the different clang
+versions, and it's especially common to run into issues when you've got
+a shiny new compiler on a modern distro but need to go look at older
+kernels for some reason.  You then get issues bisecting things since you
+get regions where the build was broken due to -Werror which may or may
+not be pointing at the runtime issue you were looking for (particularly
+likely to be hiding things if the build issue is in a different test).
+
+--SwDm9igrBxoRwCqa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXfp9oACgkQJNaLcl1U
+h9A9bwf/VnSj06MmEyM0O1ewUOdPy7uhrvuT68nO1/lvDe+rtaLIid4t9pEV/dCX
+xVWT2JLrSU0tExy5RiX74TepZl9YIuWvZF1ErGoBOsd1zkJP6hmR/wDlqFoIxa6D
+AA35wfE1FFJgvg7xLwFu2ViM05ZGfRIkpsI5Xfa0fgU2fyLNP5g4M3DJffVXC0Bs
+ydCFydnLPiyCGEFBfU7i1IzxwmkU4yu8FvbqD4OXZ/zbDWcRlKys7TrnyrHTgHRm
+oObROPpcc4yYdEDkSa5llyja1965xEqVqLCPF50Si181hnvcE4jTnj0kPZEJSJsj
+k6gIX3jR9mFJyOarI1WbSPZFBOOIKg==
+=MB1e
+-----END PGP SIGNATURE-----
+
+--SwDm9igrBxoRwCqa--
 
