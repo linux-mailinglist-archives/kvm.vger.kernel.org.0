@@ -1,419 +1,280 @@
-Return-Path: <kvm+bounces-10208-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10209-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20A4386A814
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 06:38:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4094886A8F9
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 08:31:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C6291F244E6
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 05:38:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5B55287111
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 07:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB41221344;
-	Wed, 28 Feb 2024 05:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2D724B41;
+	Wed, 28 Feb 2024 07:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Us/BG3oS";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="nAjkZhbF"
 X-Original-To: kvm@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2119.outbound.protection.partner.outlook.cn [139.219.17.119])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F571D6AA
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 05:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193BA24A06;
+	Wed, 28 Feb 2024 07:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709098722; cv=fail; b=bhPjy/fO+eXgPk3tXDihXXXQ83wV/BywWdcOhUSgP6VnugwCS3sMKU0EYitymQM0L/IhIxtEDYuDBU615ySe0mxxq2ZBxxvhmxjPaZ0ghh+R0knSP73QG2sb8MTxgKMeilkO8pAI60cySizaTNhDPWtzxG/vAaHT4t/YEPCzrZM=
+	t=1709105461; cv=fail; b=gvMPTy4JLY5/a3X66F38Lhd4800Tn4uE8qDiGrVzrhsLpolig0/Fszz/ScOfSgCMlMeTsTTAtJsCOVGyLfCxlGZx32ePHq29Pf+ouPjemblEPax44pNEPCGhKbS8X/C664w52bk0rxLOQretKtwJsZL2/GTi/lm9rmch3S5LSCg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709098722; c=relaxed/simple;
-	bh=Rb0qj8dwXIZdQpqiboU7cxJMecfZjU5LxtQ7xIxMIOE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Dh4OujH0ZrmWNJlCdM4rnFjDpDdE062kU5JfVgeBYbe2T5R2kg/Wh61OQP12qmHkhgSxiGeIbyGDl2UM3RA5ol/N6ANRMCwAJ0WB2NcqXojYqoGIH7Vwu00PMRqmzsOeEBjCTOcwavdMEO1mfLEBnnkVjv4C/0KNvMj0WLjypA4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+	s=arc-20240116; t=1709105461; c=relaxed/simple;
+	bh=CyvkTIgNzyZykfnIz2JRo/pm3kxetbzcJ2/88+adHLo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZzxEj9UgYgU22ljww/74Tvw7zlDpAeUnfIQso06ITDMbkYNfwY4xF6Sjcbp+xBMTGF1XNj//UjZ/4lPoospS5AAPYHBIYytMsmASfx+AeXnTJKgs+XTqk/oGm6+9iOaZj6kGCtZLEnZf/uF68i5p2ndCC7SOZVp3lZbDtjO8hD4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Us/BG3oS; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=nAjkZhbF; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41S6iwNO010567;
+	Wed, 28 Feb 2024 07:30:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=eDm0dySGDSy5fmrwXQj2LWBX3sy6Dm9wUmp4/hBs1s8=;
+ b=Us/BG3oSDN5+823E7sL2nh25sciSPcMikXvRjjVzbitvyDY87r5Sl8vC65/c5D9qzBCM
+ XWt6n4yVdnsy2P5TxVDY/nqgGyFRT68JsgTeeus0Zs3VSfBm2wzv5Oa5hNUufYW8aU5V
+ EeRBof48crXMqMVG/6+wf+aSymeFYvvF9PqcjH+1qP6mJu2OaEyfjW4Z8nktD3qRNoUd
+ rFPpZ03zsoUQtKvw4wSulIg99xqk4kyZLtgoFLK61k2rMqMyImFO3mfnYtPuovOPPhqp
+ GrVvJm1LNCE7KG4S5za7viYsLLxSiwQQ/B0ML6PuenjDW39QVgwcvU0tvL5RRpnNCLLo mQ== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wf8bb9dph-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 28 Feb 2024 07:30:46 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41S6NSVP015314;
+	Wed, 28 Feb 2024 07:30:46 GMT
+Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam04lp2041.outbound.protection.outlook.com [104.47.74.41])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3wf6w8pqks-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 28 Feb 2024 07:30:46 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Tj1DXh7P6xnCyu2pN9PSvb7azskVEAtKHLHOoNDs6garnoTwUjljCWjj1QqAuDyvfEqdhC2GqM//u/xdvCcSt3Rk/D70D35DtMRdHqxK1kwLXt+6bdNMz1Jdg7JgbVD+bHhXD6jwdJWpgZT/e2XHlZANm/Ms85lmjNBtWcQ5r1636j2CCCmPYrjA8B0ZNgyRIeS76A+CJyRcbtS1WMIxfP0jLBqcZksS04fn2w4n0W7Pn87tp69+0tbFcK3iZRD9WduwEB3OowTnJ7uLAkM42m8RsMu1LI2i7NYh1O231+XDln3qHgzRN7SxQ3n3FTPsDMmyw08Bo2WwZWucQ8vo7Q==
+ b=KPE6+uV8Y0yknoYtu4YiNzxvPbKIwvfQ54Ey+nBNpIZ0BMgMRVUEVNzLSLhAvQ3KIAVU38tVEQ0jTst7QBh+NhAmEu7jut+3RmsFWAL/n2zt+RDM8RfI9TXHKbjXqiKj36u+VF1AlBO1UPpV/GMbuJfVNPPYKunkaLOxDJ8UyVG3PEny6c9JEYfXdbrjuvlpRp4hbfXMFt5pqBTBXMJwA8suKhcormHdy2DzzEQRh+QRgErC67evjK5gawBsMV4xbC26Z/ivPqgOIGIlJShzc6HcDXe2Viqu/yrRfspRgxkYdgrzIbLIcgoEIkODnkQ4ivGvvlbzIhkOnK9j4LbKoQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=331EN18HP6VLDxxJfGhy5X7zvzfJ0YCmP2yi+OnRANQ=;
- b=G3718lqXylUCK2Vx4JYR5Tk9E4EmYS7SnX5yeJ7yLcVK9eXFhQ9LuOEgEEavLsZjmVBdOD17uylz4Zwb/woU24YK1fHaPRIc5SBliohYJmjzmgVsSXflrIcuTT7giJsuCTH69U+ivHLsBbB2NNt/B9KOTcfQaULY60EoMWulwGUjVaIYBfJ4od0fMK+hTTKxBe2KJq3p4BpEcSPZlS3gjgLBz4NlKbh3dzbbq5dBv8cH558zfHCx9K/TS1iev5WqgotLG7LR4ubn2eUUc7h+NLg/5pwFqQv2rPet+zSRY3I2sg2e9daYS9jm5MY9iZHKRqeJURP47XTZp6RrHCK5Aw==
+ bh=eDm0dySGDSy5fmrwXQj2LWBX3sy6Dm9wUmp4/hBs1s8=;
+ b=QEekowC/a8EM/MS+OnbemzMzJH1c/1/Qm3Ij7mBuArg9DRTpK0gpWSF0Qz52TCWU2838pxVz4UyOcqo+jgsaEOAVj0gI2/XBdjcOdLjftjd/TPdxaAWWhfJt9qK5vglHycOoFGWa9/fMiZwLGfTQyX6l7B9EDTxsvlaE/O03vYjffTiwwm74HLiHsdcH1uHUe3lL0t2Z0eBivwnbp9B/s1yihtVTwEu4jcRDRycUahidAQtVd2XULKDHc4NCQs0LC56ZkgSyNQcggDgDByejm2FSaI5tLIYg7QnTwyPpT/b2pHCQ6pURtmvWKKSgbuwPyJe2ajO2KANKZsZ2h8YxpQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Received: from BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c211:f::16) by BJSPR01MB0660.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c211:1f::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.45; Wed, 28 Feb
- 2024 05:38:32 +0000
-Received: from BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn
- ([fe80::fcfa:931b:8b1d:6af5]) by
- BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn ([fe80::fcfa:931b:8b1d:6af5%4])
- with mapi id 15.20.7316.037; Wed, 28 Feb 2024 05:38:33 +0000
-From: JeeHeng Sia <jeeheng.sia@starfivetech.com>
-To: Zhao Liu <zhao1.liu@linux.intel.com>,
-	=?iso-8859-1?Q?Daniel_P_=2E_Berrang=E9?= <berrange@redhat.com>, Eduardo
- Habkost <eduardo@habkost.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	=?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>, Yanan Wang
-	<wangyanan55@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo
- Bonzini <pbonzini@redhat.com>, Richard Henderson
-	<richard.henderson@linaro.org>, Eric Blake <eblake@redhat.com>, Markus
- Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
-	=?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell
-	<peter.maydell@linaro.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Zhenyu Wang
-	<zhenyu.z.wang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, Yongwei Ma
-	<yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
-Subject: RE: [RFC 4/8] hw/core: Add cache topology options in -smp
-Thread-Topic: [RFC 4/8] hw/core: Add cache topology options in -smp
-Thread-Index: AQHaY9zhac1dKVm9KUeTp1HqzZbrarEfSC7g
-Date: Wed, 28 Feb 2024 05:38:33 +0000
-Message-ID:
- <BJSPR01MB05618A7D409C2DE3E408345C9C58A@BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn>
-References: <20240220092504.726064-1-zhao1.liu@linux.intel.com>
- <20240220092504.726064-5-zhao1.liu@linux.intel.com>
-In-Reply-To: <20240220092504.726064-5-zhao1.liu@linux.intel.com>
-Accept-Language: en-US
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eDm0dySGDSy5fmrwXQj2LWBX3sy6Dm9wUmp4/hBs1s8=;
+ b=nAjkZhbF9V4E5cdGjGl1Jv9IG++ueOL/Mgk7RMwSm2yPUe6lmAITmeN6q+CAvJpBKtTn7sqRn8R7exknkJnDy2+Z4nfE3i6/Hw+w4J7iPX5U0hqxweRBlv1dJePlbbdANL9HORCytYX5rzIAhukgSF60ZBqURpPjWmYSGk/hP94=
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
+ by CY8PR10MB6755.namprd10.prod.outlook.com (2603:10b6:930:96::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.33; Wed, 28 Feb
+ 2024 07:30:44 +0000
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::8156:346:504:7c6f]) by BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::8156:346:504:7c6f%6]) with mapi id 15.20.7316.037; Wed, 28 Feb 2024
+ 07:30:43 +0000
+Message-ID: <6c10e17a-b1f2-c587-fbdd-85d15256b507@oracle.com>
+Date: Tue, 27 Feb 2024 23:30:32 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 04/16] KVM: x86/mmu: Pass full 64-bit error code when
+ handling page faults
+To: Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+        David Matlack <dmatlack@google.com>
+References: <20240228024147.41573-1-seanjc@google.com>
+ <20240228024147.41573-5-seanjc@google.com>
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BJSPR01MB0561:EE_|BJSPR01MB0660:EE_
-x-ms-office365-filtering-correlation-id: ef73f824-358b-461e-f815-08dc381f8082
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 4OHnog0gJpMs5X7qooXax/QOlFy900m9uQ/KbdET1l5gSKChPfYUMwoAorVlaDANSHgcG+KYBoicIu1+yUdhYuJnJBJsndzpF0E/bk6rNyeJEnGUYEQVNslHOXierOZGeFZvvtxswXoAbtz1iYY8si3XGyaPBUXybDNINGaJLfls1d5czt6/08xWX2tYxObGbNZ3a7y1qlQYrxC/1UzjdMggUH6xSeT3otrPbVOWji9awpN7oTlVPvcHzqGTxFapnj/v7fLXScw3/ZLUZSiHwKCKHjUH1ALc0y6OT7OLIfu2n9A1VdXLrWoYyl8JNrOGyDsCe+tnkwI8vh+2CEGh0C44J10h200tGjgGHXv2qVt8N2ClccgeZJyap4OfcoBLNFiXKhoGmztz91swnLv4VT+F8Z+utdbRn4tl3xuuEzJCFbzAE1rG67AFbqhDfrzmxvSpT+Rjlx27dC9eAWCAo2jisQTT9iQzJa+Xj8kLTSn9UMMGSuZ3SSRaOPWm/ZYvB6a/2DyYH+WTVEBg1EmAuvWtYA6WTFzCew5cWUSfV923yYZP5vN/hQq0tYx5STxVUmMWs7RzdAPfQ1bOivMscXtR0zkkomOszD8K3fAiETWJacReHIQKj8NiQAah66KBuqSRZlJIkpo5C4ahTjc3gA==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(38070700009)(921011);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?wgns+GdTjLvBmhQwaj224Za7m//rAdioTwDhXGCvJKOv36mNhckcFneCwr?=
- =?iso-8859-1?Q?fdMVDc+XggLWHxPqZMlt/MdP0SOd2V7j0RM0rN76UkwxlETo2pkgLbaL6i?=
- =?iso-8859-1?Q?HnN+qBmHQxw8QdQ3LIuR/Y2Uy6Pg5eXwOfSKiBaDt61tUKS3zXvE1AKFBb?=
- =?iso-8859-1?Q?StXFLvbcNZzeYutJ8dkYm5tX7qCmw2m5IBG2wlmmL3nxAF8FEOdJNUawfO?=
- =?iso-8859-1?Q?nT5yalhnGSvEtz2iYozZ6UPCefhjZQZ9fAoGFgh3NZveOtDIMewlYs8XNG?=
- =?iso-8859-1?Q?buqql8msqGFvXh7CVmwY+G8FTGrbmUu2l6+cP0xgLx7MIJvopAgszSa+EI?=
- =?iso-8859-1?Q?Y8tlei07V4nAo56Oap7ubgNg7/t9dHcUC4jWBn5XObw4RlV4/bg9gb3Rew?=
- =?iso-8859-1?Q?xOsjPcmigiMe8KQDF7L4zOI8NW5r4vLPdc9IBFpMEIGZnYnVoDLEKymDVW?=
- =?iso-8859-1?Q?fCaWIworJsX78vnP/2jV1Ujs/ST6hI5aemokQTTlaKz+KOSNnRbfz92XiO?=
- =?iso-8859-1?Q?YFY1in1MkXoVbG4CsCm+PwTB73zE5vYHr0xDYeXmV6aSoBNvH1+hez4RTD?=
- =?iso-8859-1?Q?1wLn0hMS8brlHwHReWWI48uceFds4JfBCZSh/8U4lVEt/HmPcRs0PljEzK?=
- =?iso-8859-1?Q?0CwEZNKvz+HTPClShZgl9sDz/C44TmpBuZymFijr98to+zQceRpZbthwlJ?=
- =?iso-8859-1?Q?xhOvEZUHXBQ6aGmdkmHFZjylZaE3b9sljrDI80qyVNto8YcXTqWs3+45n5?=
- =?iso-8859-1?Q?XEAYkZ/cGUBnNjNOpM8doGrR58SYpz00Zefjwqb3vionH+PQq10pro5Idz?=
- =?iso-8859-1?Q?cEfMsBAmWoSOvyeO93vsXS3We9txmv9H5LZ060lLDoRjUIy4AGGeySjj5A?=
- =?iso-8859-1?Q?4+Lg65nqybkFZYogRMPuJGvX1awHuGl0B/JeNrjpqouDARJ9enZRuvi9i4?=
- =?iso-8859-1?Q?qATDssgAeo6zjTpGCai2UvJjY0VAEfsIqjx9dbUVFZIK/Z9wsS9GUuGKQQ?=
- =?iso-8859-1?Q?utgB0jR02MtPvKm1rTJDxFxvoI98nR+Fii0w5cogB/qppR2d5hAYjz4VVL?=
- =?iso-8859-1?Q?qxKgrxutcgSA6pvWmJviiuceWwX/T0ElQ2WhQUA2d2ZmV78xaDCd29LEEp?=
- =?iso-8859-1?Q?/NzXIYmhO+yEfu643mCbc1B+0ruIIpaez+xH43uHaBRcpH3HebAJWpcPqS?=
- =?iso-8859-1?Q?Xq4ks8dQRBV0algy85YMybcKdfpYeuCGAK4vLQyYaYLbVVmrkxwc8ovwWf?=
- =?iso-8859-1?Q?67vjwKY7Xh+P3CLm1mwpLHBP/JwGngRxQdisRSYtfQoDg2ohkkexteOAgj?=
- =?iso-8859-1?Q?eBmb2gePjS5QfC0d/cZqIcwRENWpmJDkTCTSjOuT5usd0Z0ojvmcXbCXxl?=
- =?iso-8859-1?Q?FPm/iLExBZNNSzOwA/o//x/cvDGwcpJVKRaakJlsa34N4Y0CE83NEs6puC?=
- =?iso-8859-1?Q?7Nhxo1cKZsCXdF02KCs0HAgdDsXxldMN/SMwWS/CdzjazeJbbYGgkJD5uL?=
- =?iso-8859-1?Q?wIm8bfs1Y2ZHVVMM47BdvdteX4cyYsCW6sjf0ggYY/5SypeBC8zHkWrfrc?=
- =?iso-8859-1?Q?ipuCFMP5YcJcIfKu9xkb1KCvXb8eqdT9e/bh0yrC6QY426VkskYq0HqJPJ?=
- =?iso-8859-1?Q?h47BBP00Sm4SLPUgiT4jL/z5vApDuDwfcHgQA29z7XrC4Ifwy/YhJrTQ?=
- =?iso-8859-1?Q?=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+From: Dongli Zhang <dongli.zhang@oracle.com>
+In-Reply-To: <20240228024147.41573-5-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL6PEPF0001640D.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1004:0:14) To BYAPR10MB2663.namprd10.prod.outlook.com
+ (2603:10b6:a02:a9::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: starfivetech.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|CY8PR10MB6755:EE_
+X-MS-Office365-Filtering-Correlation-Id: e83e3152-bc59-42b3-70f0-08dc382f2bde
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	+fF7xle5zv9wsXmDXyZxxJbkUGb2dUd7BheYfn4NYjn3LyUjnomwtBVhnZUHu8moYxK46xnjItzCv9Wt6eljb8I8pYCoGo15wlcSg3BVXFTCOa6XOAEEQmTgRg6vJXx61gE+TvmUJKaOcVov8o4c/Mot5nI0vUXwI9peOSVo4DOVn2JjRx1o3T6qcCnNv3a2lYEhOshYf7U3de8GR1Zx5cNHHAHGxDLXyWqg4FYAoWWSBRJsfBCrdxl7OsO6/QJRFXjYCWuyluxPoHrkawgWZeyUK49ffjcP+08fwxhqmkUJaBtHfQh/IDmaFmW6cHrXJeSO18+QiCun+J27v/Y+vJB3yduN8Kv6yrEwLuqwDTGPD6WhzyNiJDbM76QpEH+TQoWzjpUdarO9m6GcHws6d5ueJEC0t9MlumEuh+ifMVnIS/FWozUEXkix5qmtrap/Gg0ilk6EDuHfzjg4A/02rFT+Iwx/v6NfMvfSi88Y7Ogonnm59tHrifChX7AYD0Ac3ggAdhvRIXFD2sTQMga4GzPlUxgvcp710/kUbFljro5tkYsegJ4seoiaU4b4qYNEV+NDhIxpjMVedSerokxSD1a0rCTtlMRZQrKxU3f0Kn30XG9cF30oI1sgpPExE04B
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?VTMvNExESTNuaHNQUE1tM0tKV3VyMHB1M3NkcGNSendMMTd6TlYwdTk5ZHg4?=
+ =?utf-8?B?VGJMVm16bllBSU1vaW03ZXhGdEE0T3cyakE4UFY4WkxScC93VWZlU3k0eWFw?=
+ =?utf-8?B?cEVYQWJHMFQ5bk5sRElkaGpoVStRUzhGcHkwSE9JS3JhSkRmajZEWS83eVJC?=
+ =?utf-8?B?Qkt6dVUzOWpCYkc5VElwemhIaVRMdW54ZWtBeWI1VmM1ZTBnNnFhRTRuY2l4?=
+ =?utf-8?B?YXhGNE4wdmQ4ZXNhai92c0xZdm1sSjFmSC85L2l0a20xUVJtMHdZc0pmMVNX?=
+ =?utf-8?B?aWF4bHd2U3B2aFg3VDRZaXc3RG9LVHBMd2F0Y3p6Sm00MXBkK0dZZnB2WnV4?=
+ =?utf-8?B?R0dybzczZk1RYTRzMWNzL3B3WmhqRzdwL2JKY1ZtdUJSUzFCOWt0b1MzR1ky?=
+ =?utf-8?B?bHB2ejFHeVg5K2I4d1hYYVpNcXRWUk93bm0zTFBjcGI5UUhrNVVYLzAzNWln?=
+ =?utf-8?B?M1EvY2h4NGFhcFovM2JJY0xzYjhaZVA2UFdJcnVjc0lERVREUkRmbGJ4cmpP?=
+ =?utf-8?B?NGR4NTczSHlJQVNvZGZCdmRYOHhSdWJHWW54cy84dkdsVGpUT3B3T2xEYjgr?=
+ =?utf-8?B?NDN1dElxNzJXWTE1OWd6N0w5R2FyT29IY21ZYmp6ZEZQZmlFUlNjWngxdGhR?=
+ =?utf-8?B?Z25CSEQzS1N6akttSzdncEtRRUlyekk3dTJVMXFqTnRYdm1oeCtBZFNvL0pz?=
+ =?utf-8?B?dU9UdVFIVEgxZ21FSXU1bnRrQ3ZaWUR0bHdHNFBvU2NWOStmTTRFTzV4Y0I0?=
+ =?utf-8?B?UjdYWDlRQ0xNaHRkaEozRHNOS1hKVXlWVkEyYk5yb2VQNE5xeWh6eExlYmNs?=
+ =?utf-8?B?bGxLZnA0NE5xYjk3c2I4TTZPbkgwSVZjNFhSUjJnTVl3aEI4ZHJDa01WOUd3?=
+ =?utf-8?B?UWU5dGVJRE9IN2tzekxlRFBBeFJHSnJoZDk3bE1ZMk5sSVgvSncwSVkzMWhj?=
+ =?utf-8?B?aDI4eU9YeXVwRUQ0MXQxc1RwQkVJVUVYaWxvckpPYlVZTkNRQ0pHTDVVMml5?=
+ =?utf-8?B?VnVaSW5TUTJLNzVaVGo3Wk9tRlJFRjI1UEpaOXVsOElpcWtrNDhVVmR4RnUz?=
+ =?utf-8?B?MVFCZlZhdEE2RUEvcGo5U2ZBaFAxWjZvN2w5RVdSZWNwY3l3QS9vRlhGMzNr?=
+ =?utf-8?B?N3VidkR5Wm10WFNScWlQN2tjNWZzRzNSV2U0d1gzUW9JRDZ5bytTTW11M1hN?=
+ =?utf-8?B?VWppS1JvQjRnSGFacnVtZnRITkRTUnFsUlVNdHVWVjZWcjA4QVJtaXJDNEl2?=
+ =?utf-8?B?MGdacUgrY2RBTDJxT1lwV3pFaWR6M1JwVHg0QTA5cGx1dnVCRlo1VytIdzgy?=
+ =?utf-8?B?V3BnODlRZ3l2dGJaSkMyUVVTenhBYnhnQ3RMRVFzZlIyK0RMalBldDZRYkNn?=
+ =?utf-8?B?OVV3UmNrS044YWwrWmRpN3doY0tacVBhMGZlWHhiTTJ5dElaOUhjNHcrWnRO?=
+ =?utf-8?B?UWVaTTJEeHlnVHJKUW9nTjFPcHc1d05zNUFMT0MvYVNpMWUybnV4SnIvV3hN?=
+ =?utf-8?B?MUd4ZXdLSHpzY0JKMXM1VTV0Wllrb1ZOQ1YxM1E1dWxZKzFpTyt5Rkg2Z3cv?=
+ =?utf-8?B?Z0RZRnlNUmNnU25idDI4ZnhxWlBzMWM5ZktHMHFaRkdpR3dJbmdRQ2hRYXFN?=
+ =?utf-8?B?SzJwL2tpeDZhbC9KVisyYy9SL243cGMzRFA1QzRmczkyUHhwYXFMa0U0azdR?=
+ =?utf-8?B?K1Q5UW5GOUNWcGlrbHRVOFJIMFUxZWtLc1p3dkpYS2xUdXZJd1VibGNicDRx?=
+ =?utf-8?B?Ky9jS2F6UGVxQVROeStWdzQzcFdJdjN1bXp5R080NUprZkxFSUNqa3BLMVky?=
+ =?utf-8?B?Rm1aV1ExSG4xUlJGTTVXUHJtbGVpazRjdEJuQzEzR0p2OEozbWdWVlhwSmEv?=
+ =?utf-8?B?QkVvMmRIeUc3SnkwK01mMitLTUdydzNUd0NtSEhwQW5QQ2FXN2xTdGJvdC9E?=
+ =?utf-8?B?RThQNXRLRHZOU3hLTjEranBwZ1FTb0VRQ1d1dEczQ3Vvb0t2c3QwallBVmUx?=
+ =?utf-8?B?UUhIYWxHWmN5Z3huRVkzYkpnNDIxczc0UnpOVnFGcDlXY2IvZWV1NVJrV0dU?=
+ =?utf-8?B?NjI0ZFBDZnF5QTFaK083WWwyNjRRZW8wZU9iRkVmTHdFL3JLTWh5MmgvVHdq?=
+ =?utf-8?Q?iFavyZO/v7ALpx6RpvvCgttff?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	DzvF1/ctutQcOqp2mpLMddFVaWKB02cC1QY9X1Ee7wn+N9e4v/l7wd9bpfJXswGJwEhYdDnFKiYajoO+kIzQ/aHrJV0pLkbULivs263l8R8tkd7iRG7Pvr8p5NhoICEcYxYnX1B7ksnqhm4mverk2qSztTkBaFR7jdEhf9jdTZge1NojUTylFkKyQxJwcAuTv7WnIC0yhVgq6X0qnndx8zRa3s8OA6vJYOZztPAyL3R+BHFbn2PyV/O+M7IKnpTxYgB/fEmK/58ReoMs08CiZiKRWLIXa48ciFitsOI9QuTnoX/zNyGWKE4xj/RbbWjyDr0tKAlZpc2EHVeUlLeXjAJaflOIVMYAD/6eF47LaPg/4Xs8e2TikPRBnqDineHL8niqJbd1llPpzOO1SQmT2l2MctCF+kHr5zjtwLXyLlBTT76IbeXN4mXlkpiGfHpK+ZPJ+lxVA3nqu8k5QTuEgFs/67KTu2PlkA+UT4SlLt7oMRrcL91rhN9qpzdhc1tdRc5omPkZ+qlOPcf3YbSWEup5n4UqMdE3px+j1FgU7XaOc6FbQNRSJxhfbhCe2CKAGI4/ofAMsNzbEUdhDl4n7a+t9rlhjsNdmg1hvRI9Wtc=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e83e3152-bc59-42b3-70f0-08dc382f2bde
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef73f824-358b-461e-f815-08dc381f8082
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Feb 2024 05:38:33.0515
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2024 07:30:43.2440
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9LJKKtIeHJBuRWnhtyG3Zc4nyvm0UypDZpz8A11nCOEYRS5pVeFwjpRC4EVLZyA624TaL6MBP36VR+wRjHFrdh9F+MV1B50lgLL68wMijTQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJSPR01MB0660
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: grHgM4QaH9gICXRCaAL1Coj52K+Ta90BZXgr8G8KJlkjlbVGyZAhM2YlQEwN/tiSYRGLcVQEaZ58ma5b9jfazA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB6755
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-28_04,2024-02-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0 phishscore=0
+ spamscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402280057
+X-Proofpoint-GUID: lMIdfnMGhTitj34wovhOvkZPmyK9WWWu
+X-Proofpoint-ORIG-GUID: lMIdfnMGhTitj34wovhOvkZPmyK9WWWu
 
 
 
-> -----Original Message-----
-> From: Zhao Liu <zhao1.liu@linux.intel.com>
-> Sent: Tuesday, February 20, 2024 5:25 PM
-> To: Daniel P . Berrang=E9 <berrange@redhat.com>; Eduardo Habkost <eduardo=
-@habkost.net>; Marcel Apfelbaum
-> <marcel.apfelbaum@gmail.com>; Philippe Mathieu-Daud=E9 <philmd@linaro.org=
->; Yanan Wang <wangyanan55@huawei.com>;
-> Michael S . Tsirkin <mst@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>=
-; Richard Henderson <richard.henderson@linaro.org>;
-> Eric Blake <eblake@redhat.com>; Markus Armbruster <armbru@redhat.com>; Ma=
-rcelo Tosatti <mtosatti@redhat.com>; Alex Benn=E9e
-> <alex.bennee@linaro.org>; Peter Maydell <peter.maydell@linaro.org>; Jonat=
-han Cameron <Jonathan.Cameron@huawei.com>;
-> JeeHeng Sia <jeeheng.sia@starfivetech.com>
-> Cc: qemu-devel@nongnu.org; kvm@vger.kernel.org; qemu-riscv@nongnu.org; qe=
-mu-arm@nongnu.org; Zhenyu Wang
-> <zhenyu.z.wang@intel.com>; Dapeng Mi <dapeng1.mi@linux.intel.com>; Yongwe=
-i Ma <yongwei.ma@intel.com>; Zhao Liu
-> <zhao1.liu@intel.com>
-> Subject: [RFC 4/8] hw/core: Add cache topology options in -smp
->=20
-> From: Zhao Liu <zhao1.liu@intel.com>
->=20
-> Add "l1d-cache", "l1i-cache". "l2-cache", and "l3-cache" options in
-> -smp to define the cache topology for SMP system.
->=20
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+On 2/27/24 18:41, Sean Christopherson wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Plumb the full 64-bit error code throughout the page fault handling code
+> so that KVM can use the upper 32 bits, e.g. SNP's PFERR_GUEST_ENC_MASK
+> will be used to determine whether or not a fault is private vs. shared.
+> 
+> Note, passing the 64-bit error code to FNAME(walk_addr)() does NOT change
+> the behavior of permission_fault() when invoked in the page fault path, as
+> KVM explicitly clears PFERR_IMPLICIT_ACCESS in kvm_mmu_page_fault().
+
+May this lead to a WARN_ON_ONCE?
+
+5843 int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+u64 error_code,
+5844                        void *insn, int insn_len)
+5845 {
+... ...
+5856          */
+5857         if (WARN_ON_ONCE(error_code & PFERR_IMPLICIT_ACCESS))
+5858                 error_code &= ~PFERR_IMPLICIT_ACCESS;
+
+> 
+> Continue passing '0' from the async #PF worker, as guest_memfd() and thus
+
+:s/guest_memfd()/guest_memfd/ ?
+
+Dongli Zhang
+
+
+
+> private memory doesn't support async page faults.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> [mdr: drop references/changes on rebase, update commit message]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> [sean: drop truncation in call to FNAME(walk_addr)(), rewrite changelog]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  hw/core/machine-smp.c | 128 ++++++++++++++++++++++++++++++++++++++++++
->  hw/core/machine.c     |   4 ++
->  qapi/machine.json     |  14 ++++-
->  system/vl.c           |  15 +++++
->  4 files changed, 160 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
-> index 8a8296b0d05b..2cbd19f4aa57 100644
-> --- a/hw/core/machine-smp.c
-> +++ b/hw/core/machine-smp.c
-> @@ -61,6 +61,132 @@ static char *cpu_hierarchy_to_string(MachineState *ms=
-)
->      return g_string_free(s, false);
+>  arch/x86/kvm/mmu/mmu.c          | 3 +--
+>  arch/x86/kvm/mmu/mmu_internal.h | 4 ++--
+>  arch/x86/kvm/mmu/mmutrace.h     | 2 +-
+>  3 files changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e2fd74e06ff8..408969ac1291 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5860,8 +5860,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+>  	}
+>  
+>  	if (r == RET_PF_INVALID) {
+> -		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa,
+> -					  lower_32_bits(error_code), false,
+> +		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa, error_code, false,
+>  					  &emulation_type);
+>  		if (KVM_BUG_ON(r == RET_PF_INVALID, vcpu->kvm))
+>  			return -EIO;
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 0eea6c5a824d..1fab1f2359b5 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -190,7 +190,7 @@ static inline bool is_nx_huge_page_enabled(struct kvm *kvm)
+>  struct kvm_page_fault {
+>  	/* arguments to kvm_mmu_do_page_fault.  */
+>  	const gpa_t addr;
+> -	const u32 error_code;
+> +	const u64 error_code;
+>  	const bool prefetch;
+>  
+>  	/* Derived from error_code.  */
+> @@ -288,7 +288,7 @@ static inline void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
 >  }
->=20
-> +static bool machine_check_topo_support(MachineState *ms,
-> +                                       CPUTopoLevel topo)
-> +{
-> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-> +
-> +    if (topo =3D=3D CPU_TOPO_LEVEL_MODULE && !mc->smp_props.modules_supp=
-orted) {
-> +        return false;
-> +    }
-> +
-> +    if (topo =3D=3D CPU_TOPO_LEVEL_CLUSTER && !mc->smp_props.clusters_su=
-pported) {
-> +        return false;
-> +    }
-> +
-> +    if (topo =3D=3D CPU_TOPO_LEVEL_DIE && !mc->smp_props.dies_supported)=
- {
-> +        return false;
-> +    }
-> +
-> +    if (topo =3D=3D CPU_TOPO_LEVEL_BOOK && !mc->smp_props.books_supporte=
-d) {
-> +        return false;
-> +    }
-> +
-> +    if (topo =3D=3D CPU_TOPO_LEVEL_DRAWER && !mc->smp_props.drawers_supp=
-orted) {
-> +        return false;
-> +    }
-> +
-> +    return true;
-> +}
-> +
-> +static int smp_cache_string_to_topology(MachineState *ms,
-> +                                        char *topo_str,
-> +                                        CPUTopoLevel *topo,
-> +                                        Error **errp)
-> +{
-> +    *topo =3D string_to_cpu_topo(topo_str);
-> +
-> +    if (*topo =3D=3D CPU_TOPO_LEVEL_MAX || *topo =3D=3D CPU_TOPO_LEVEL_I=
-NVALID) {
-> +        error_setg(errp, "Invalid cache topology level: %s. The cache "
-> +                   "topology should match the CPU topology level", topo_=
-str);
-> +        return -1;
-> +    }
-> +
-> +    if (!machine_check_topo_support(ms, *topo)) {
-> +        error_setg(errp, "Invalid cache topology level: %s. The topology=
- "
-> +                   "level is not supported by this machine", topo_str);
-> +        return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void machine_parse_smp_cache_config(MachineState *ms,
-> +                                           const SMPConfiguration *confi=
-g,
-> +                                           Error **errp)
-> +{
-> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-> +
-> +    if (config->l1d_cache) {
-> +        if (!mc->smp_props.l1_separated_cache_supported) {
-> +            error_setg(errp, "L1 D-cache topology not "
-> +                       "supported by this machine");
-> +            return;
-> +        }
-> +
-> +        if (smp_cache_string_to_topology(ms, config->l1d_cache,
-> +            &ms->smp_cache.l1d, errp)) {
-> +            return;
-> +        }
-> +    }
-> +
-> +    if (config->l1i_cache) {
-> +        if (!mc->smp_props.l1_separated_cache_supported) {
-> +            error_setg(errp, "L1 I-cache topology not "
-> +                       "supported by this machine");
-> +            return;
-> +        }
-> +
-> +        if (smp_cache_string_to_topology(ms, config->l1i_cache,
-> +            &ms->smp_cache.l1i, errp)) {
-> +            return;
-> +        }
-> +    }
-> +
-> +    if (config->l2_cache) {
-> +        if (!mc->smp_props.l2_unified_cache_supported) {
-> +            error_setg(errp, "L2 cache topology not "
-> +                       "supported by this machine");
-> +            return;
-> +        }
-> +
-> +        if (smp_cache_string_to_topology(ms, config->l2_cache,
-> +            &ms->smp_cache.l2, errp)) {
-> +            return;
-> +        }
-> +
-> +        if (ms->smp_cache.l1d > ms->smp_cache.l2 ||
-> +            ms->smp_cache.l1i > ms->smp_cache.l2) {
-> +            error_setg(errp, "Invalid L2 cache topology. "
-> +                       "L2 cache topology level should not be "
-> +                       "lower than L1 D-cache/L1 I-cache");
-> +            return;
-> +        }
-> +    }
-> +
-> +    if (config->l3_cache) {
-> +        if (!mc->smp_props.l2_unified_cache_supported) {
-> +            error_setg(errp, "L3 cache topology not "
-> +                       "supported by this machine");
-> +            return;
-> +        }
-> +
-> +        if (smp_cache_string_to_topology(ms, config->l3_cache,
-> +            &ms->smp_cache.l3, errp)) {
-> +            return;
-> +        }
-> +
-> +        if (ms->smp_cache.l1d > ms->smp_cache.l3 ||
-> +            ms->smp_cache.l1i > ms->smp_cache.l3 ||
-> +            ms->smp_cache.l2 > ms->smp_cache.l3) {
-> +            error_setg(errp, "Invalid L3 cache topology. "
-> +                       "L3 cache topology level should not be "
-> +                       "lower than L1 D-cache/L1 I-cache/L2 cache");
-> +            return;
-> +        }
-> +    }
-> +}
-> +
->  /*
->   * machine_parse_smp_config: Generic function used to parse the given
->   *                           SMP configuration
-> @@ -249,6 +375,8 @@ void machine_parse_smp_config(MachineState *ms,
->                     mc->name, mc->max_cpus);
->          return;
->      }
-> +
-> +    machine_parse_smp_cache_config(ms, config, errp);
->  }
->=20
->  unsigned int machine_topo_get_cores_per_socket(const MachineState *ms)
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 426f71770a84..cb5173927b0d 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -886,6 +886,10 @@ static void machine_get_smp(Object *obj, Visitor *v,=
- const char *name,
->          .has_cores =3D true, .cores =3D ms->smp.cores,
->          .has_threads =3D true, .threads =3D ms->smp.threads,
->          .has_maxcpus =3D true, .maxcpus =3D ms->smp.max_cpus,
-> +        .l1d_cache =3D g_strdup(cpu_topo_to_string(ms->smp_cache.l1d)),
-> +        .l1i_cache =3D g_strdup(cpu_topo_to_string(ms->smp_cache.l1i)),
-> +        .l2_cache =3D g_strdup(cpu_topo_to_string(ms->smp_cache.l2)),
-> +        .l3_cache =3D g_strdup(cpu_topo_to_string(ms->smp_cache.l3)),
-Let's standardize the code by adding the 'has_' prefix.
->      };
->=20
->      if (!visit_type_SMPConfiguration(v, name, &config, &error_abort)) {
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index d0e7f1f615f3..0a923ac38803 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -1650,6 +1650,14 @@
->  #
->  # @threads: number of threads per core
->  #
-> +# @l1d-cache: topology hierarchy of L1 data cache (since 9.0)
-> +#
-> +# @l1i-cache: topology hierarchy of L1 instruction cache (since 9.0)
-> +#
-> +# @l2-cache: topology hierarchy of L2 unified cache (since 9.0)
-> +#
-> +# @l3-cache: topology hierarchy of L3 unified cache (since 9.0)
-> +#
->  # Since: 6.1
->  ##
->  { 'struct': 'SMPConfiguration', 'data': {
-> @@ -1662,7 +1670,11 @@
->       '*modules': 'int',
->       '*cores': 'int',
->       '*threads': 'int',
-> -     '*maxcpus': 'int' } }
-> +     '*maxcpus': 'int',
-> +     '*l1d-cache': 'str',
-> +     '*l1i-cache': 'str',
-> +     '*l2-cache': 'str',
-> +     '*l3-cache': 'str' } }
->=20
->  ##
->  # @x-query-irq:
-> diff --git a/system/vl.c b/system/vl.c
-> index a82555ae1558..ac95e5ddb656 100644
-> --- a/system/vl.c
-> +++ b/system/vl.c
-> @@ -741,6 +741,9 @@ static QemuOptsList qemu_smp_opts =3D {
->          }, {
->              .name =3D "clusters",
->              .type =3D QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name =3D "modules",
-> +            .type =3D QEMU_OPT_NUMBER,
->          }, {
->              .name =3D "cores",
->              .type =3D QEMU_OPT_NUMBER,
-> @@ -750,6 +753,18 @@ static QemuOptsList qemu_smp_opts =3D {
->          }, {
->              .name =3D "maxcpus",
->              .type =3D QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name =3D "l1d-cache",
-> +            .type =3D QEMU_OPT_STRING,
-> +        }, {
-> +            .name =3D "l1i-cache",
-> +            .type =3D QEMU_OPT_STRING,
-> +        }, {
-> +            .name =3D "l2-cache",
-> +            .type =3D QEMU_OPT_STRING,
-> +        }, {
-> +            .name =3D "l3-cache",
-> +            .type =3D QEMU_OPT_STRING,
->          },
->          { /*End of list */ }
->      },
-> --
-> 2.34.1
-
+>  
+>  static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> -					u32 err, bool prefetch, int *emulation_type)
+> +					u64 err, bool prefetch, int *emulation_type)
+>  {
+>  	struct kvm_page_fault fault = {
+>  		.addr = cr2_or_gpa,
+> diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
+> index ae86820cef69..195d98bc8de8 100644
+> --- a/arch/x86/kvm/mmu/mmutrace.h
+> +++ b/arch/x86/kvm/mmu/mmutrace.h
+> @@ -260,7 +260,7 @@ TRACE_EVENT(
+>  	TP_STRUCT__entry(
+>  		__field(int, vcpu_id)
+>  		__field(gpa_t, cr2_or_gpa)
+> -		__field(u32, error_code)
+> +		__field(u64, error_code)
+>  		__field(u64 *, sptep)
+>  		__field(u64, old_spte)
+>  		__field(u64, new_spte)
 
