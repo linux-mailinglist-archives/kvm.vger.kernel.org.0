@@ -1,496 +1,273 @@
-Return-Path: <kvm+bounces-10229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C4B286AC9B
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 12:07:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 765D686ACB5
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 12:11:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FC2E1C22507
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 11:07:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E14DDB24391
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 11:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F84A135A5D;
-	Wed, 28 Feb 2024 11:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A79B12EBF0;
+	Wed, 28 Feb 2024 11:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jLFxQ/rU"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B066145B2E;
-	Wed, 28 Feb 2024 11:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941BB44C6E
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 11:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709118371; cv=none; b=PLtVItBoB1jHnitAuImhJyZHSUPMR73XFnN33aApq7YGzRB/WfDzitJo5RMYUOcmkwPeYT2Ei/JElDinR3C/0JFhq6ay8NtmT39ZFPSOAE4FcnxJvY3me+cUkX0n+jlaIs6soI6a5fyYUcdN1hpCd9L5uDAMx8Tw0qFAubQpjE4=
+	t=1709118699; cv=none; b=PSCoX3MAxoR/TzcpkD7wqwX/+xYR7P/TfAgj8YclmlkRVkQ92rPd9gMfYD7cyiwgbh7yV4uDTBmMeXyhUJVXXuO12Eq3Ahf3P28RzS9t9et3Q9LBkUioiSxRSiL4Ga8hTANlNkB4A+XuvZzlE8+156Ck605u4JxPe7olznMTK7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709118371; c=relaxed/simple;
-	bh=6IELK7zbKJPWClXDXnq8oMFddEyhBDObOrY/tD9skIU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XCFuipq+9FrL24yeAb+VOb2qZsHrkcMiaE1+wM3XNksQv79FaXS4da4pW/+kt0vJB/uNHdwxfWfpRTWzAUi5/sOxAhovNWhia61Tqw5rn1b1Es/1ugXFEMC4V40h95UGnLWq9KtbPxHkffQ/JI/kDXmtNSgzwBar02zpBd6TAdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TlBL90Y4Dz1h0l4;
-	Wed, 28 Feb 2024 19:03:45 +0800 (CST)
-Received: from dggpemm500008.china.huawei.com (unknown [7.185.36.136])
-	by mail.maildlp.com (Postfix) with ESMTPS id E04971A016C;
-	Wed, 28 Feb 2024 19:05:59 +0800 (CST)
-Received: from localhost (10.174.242.157) by dggpemm500008.china.huawei.com
- (7.185.36.136) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 28 Feb
- 2024 19:05:59 +0800
-From: Yunjian Wang <wangyunjian@huawei.com>
-To: <mst@redhat.com>, <willemdebruijn.kernel@gmail.com>,
-	<jasowang@redhat.com>, <kuba@kernel.org>, <bjorn@kernel.org>,
-	<magnus.karlsson@intel.com>, <maciej.fijalkowski@intel.com>,
-	<jonathan.lemon@gmail.com>, <davem@davemloft.net>
-CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <xudingke@huawei.com>,
-	<liwei395@huawei.com>, Yunjian Wang <wangyunjian@huawei.com>
-Subject: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
-Date: Wed, 28 Feb 2024 19:05:56 +0800
-Message-ID: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
-X-Mailer: git-send-email 1.9.5.msysgit.1
+	s=arc-20240116; t=1709118699; c=relaxed/simple;
+	bh=N69/suQ4MaSCYmrP4WB8YtYlGmUS63cenW87j39hg6Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sAC6o5dnrYNm7kd/juaq6ah9RXL5OCjbqj+nwJmXvbqUtJhlcAw0IdWGNror6E/I8PeUsrA00NkBv7FB5iZTfYe7g8t2ElMVskqWvBCszBugpmw+/nbKqudnr2CTNOXhesIYtN40Wwf99aC9EM4+jLCycVrLs6dGuTiNC48zMU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jLFxQ/rU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709118696;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aUQ9sWDupyMNgIyawFwqXCHJWRUg3SyzP5KUns9QT5Y=;
+	b=jLFxQ/rUFQvKvTE5QCYabOXE6DgdcN8ZGePQGpjffVWHlrkvqowsc4SxpAitrAilvR/i4X
+	sNlVWfHofb2FBT4+Jv2vP4jLnFsRKnu3PiqiskGPbkuhywqSj38ah4LVO+kjpzIcCJ8Y1a
+	OHwFmc+jJn0XIDy/9LA6ETOzyM6eG0s=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-249-KJHa3Ve2PSGCnWEGycFFSw-1; Wed, 28 Feb 2024 06:11:34 -0500
+X-MC-Unique: KJHa3Ve2PSGCnWEGycFFSw-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2d2bac6e205so6933531fa.0
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 03:11:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709118693; x=1709723493;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aUQ9sWDupyMNgIyawFwqXCHJWRUg3SyzP5KUns9QT5Y=;
+        b=eAmXZSROPOWvRrRw6jt2oDzmDoAv7njunMR9DMDsdlsrgK6CM33Uwj8ABGhjRyTpco
+         xHI5VKQBG9FuIOt5hEpNTkq+PIswsgz3z8v/VQj5+Og5/TUfu7Zmt6+HQeWxNKnyEaUz
+         e1y2ixb/A+B/o/szhPSiW5gMuMw0zzI6Pv675FFIvB9sDM/8t6nUBqEkF7uXa8dx3pdv
+         fDZpYiVGLpLavJys4P67KJOIkxWqGN7Dm9fgwwIvwExsF3G2ENZQ+45X1OMPhwWjXSlw
+         pysuBGToVKmpdvhOYMOlJh9mKCbAci1bJvAf/O9SGqajaFnv352YzW4BaO9IH8kHwTsp
+         Dtuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWUTLjmNFfOsSJrkU9tIFgx4PPMc4dYc1Veery8yc4veaf0ghB7iwjGWkJfwc5yVK4MVXlUekaWOnW84XAqI4QoZMRw
+X-Gm-Message-State: AOJu0YzFH64S4EFD67LsGLrj4pex9A2jQKWzjmmrKUC7y7g0qrkdAujo
+	6Nu24YPu11l0t2PDTBhyVCR1F6v2Rn+6fqWftS1kVBpvrYBCfCf3Ac2LJU5jOjBR66VJeF+FJAb
+	lZoWfL/tLZkwKG5Rarxv/2pr9zLLWHg/RaczaLCp20F9c36VWVQ==
+X-Received: by 2002:a2e:a7c6:0:b0:2d2:3b18:6ffd with SMTP id x6-20020a2ea7c6000000b002d23b186ffdmr9973339ljp.41.1709118693359;
+        Wed, 28 Feb 2024 03:11:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHqOhbD2iOLY+ugTcvnejnosxm0uWRyxRkcMKFvjB5ZSJwMYQ9xMyT7/OZhG22VLJQSEK3wcA==
+X-Received: by 2002:a2e:a7c6:0:b0:2d2:3b18:6ffd with SMTP id x6-20020a2ea7c6000000b002d23b186ffdmr9973300ljp.41.1709118692897;
+        Wed, 28 Feb 2024 03:11:32 -0800 (PST)
+Received: from [10.32.64.237] (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id q16-20020adffed0000000b0033ce06c303csm14185846wrs.40.2024.02.28.03.11.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Feb 2024 03:11:32 -0800 (PST)
+Message-ID: <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
+Date: Wed, 28 Feb 2024 12:11:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500008.china.huawei.com (7.185.36.136)
+User-Agent: Mozilla Thunderbird
+Subject: Re: folio_mmapped
+Content-Language: en-US
+To: Quentin Perret <qperret@google.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+ akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+ chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+ dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
+ ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com,
+ wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, keirf@google.com, linux-mm@kvack.org
+References: <20240222161047.402609-1-tabba@google.com>
+ <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <ZdfoR3nCEP3HTtm1@casper.infradead.org>
+ <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
+ <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
+ <Zd8PY504BOwMR4jO@google.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <Zd8PY504BOwMR4jO@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This patch set allows TUN to support the AF_XDP Tx zero-copy feature,
-which can significantly reduce CPU utilization for XDP programs.
+On 28.02.24 11:48, Quentin Perret wrote:
+> On Tuesday 27 Feb 2024 at 15:59:37 (+0100), David Hildenbrand wrote:
+>>>
+>>> Ah, this was something I hadn't thought about. I think both Fuad and I
+>>> need to update our series to check the refcount rather than mapcount
+>>> (kvm_is_gmem_mapped for Fuad, gunyah_folio_lend_safe for me).
+>>
+>> An alternative might be !folio_mapped() && !folio_maybe_dma_pinned(). But
+>> checking for any unexpected references might be better (there are still some
+>> GUP users that don't use FOLL_PIN).
+> 
+> As a non-mm person I'm not sure to understand to consequences of holding
+> a GUP pin to a page that is not covered by any VMA. The absence of VMAs
+> imply that userspace cannot access the page right? Presumably the kernel
+> can't be coerced into accessing that page either? Is that correct?
 
-Since commit fc72d1d54dd9 ("tuntap: XDP transmission"), the pointer
-ring has been utilized to queue different types of pointers by encoding
-the type into the lower bits. Therefore, we introduce a new flag,
-TUN_XDP_DESC_FLAG(0x2UL), which allows us to enqueue XDP descriptors
-and differentiate them from XDP buffers and sk_buffs. Additionally, a
-spin lock is added for enabling and disabling operations on the xsk pool.
+Simple example: register the page using an iouring fixed buffer, then 
+unmap the VMA. iouring now has the page pinned and can read/write it 
+using an address in the kernel vitual address space (direct map).
 
-The performance testing was performed on a Intel E5-2620 2.40GHz machine.
-Traffic were generated/send through TUN(testpmd txonly with AF_XDP)
-to VM (testpmd rxonly in guest).
+Then, you can happily make the kernel read/write that page using 
+iouring, even though no VMA still covers/maps that page.
 
-+------+---------+---------+---------+
-|      |   copy  |zero-copy| speedup |
-+------+---------+---------+---------+
-| UDP  |   Mpps  |   Mpps  |    %    |
-| 64   |   2.5   |   4.0   |   60%   |
-| 512  |   2.1   |   3.6   |   71%   |
-| 1024 |   1.9   |   3.3   |   73%   |
-+------+---------+---------+---------+
+[...]
 
-Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
----
- drivers/net/tun.c      | 177 +++++++++++++++++++++++++++++++++++++++--
- drivers/vhost/net.c    |   4 +
- include/linux/if_tun.h |  32 ++++++++
- 3 files changed, 208 insertions(+), 5 deletions(-)
+>> Instead of
+>>
+>> 1) Converting a page to private only if there are no unexpected
+>>     references (no mappings, GUP pins, ...) and no VMAs covering it where
+>>     we could fault it in later
+>> 2) Disallowing mmap when the range would contain any private page
+>> 3) Handling races between mmap and page conversion
+> 
+> The one thing that makes the second option cleaner from a userspace
+> perspective (IMO) is that the conversion to private is happening lazily
+> during guest faults. So whether or not an mmapped page can indeed be
+> accessed from userspace will be entirely undeterministic as it depends
+> on the guest faulting pattern which userspace is entirely unaware of.
+> Elliot's suggestion would prevent spurious crashes caused by that
+> somewhat odd behaviour, though arguably sane userspace software
+> shouldn't be doing that to start with.
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index bc80fc1d576e..7f4ff50b532c 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -63,6 +63,7 @@
- #include <net/rtnetlink.h>
- #include <net/sock.h>
- #include <net/xdp.h>
-+#include <net/xdp_sock_drv.h>
- #include <net/ip_tunnels.h>
- #include <linux/seq_file.h>
- #include <linux/uio.h>
-@@ -86,6 +87,7 @@ static void tun_default_link_ksettings(struct net_device *dev,
- 				       struct ethtool_link_ksettings *cmd);
- 
- #define TUN_RX_PAD (NET_IP_ALIGN + NET_SKB_PAD)
-+#define TUN_XDP_BATCH 64
- 
- /* TUN device flags */
- 
-@@ -146,6 +148,9 @@ struct tun_file {
- 	struct tun_struct *detached;
- 	struct ptr_ring tx_ring;
- 	struct xdp_rxq_info xdp_rxq;
-+	struct xsk_buff_pool *xsk_pool;
-+	spinlock_t pool_lock;	/* Protects xsk pool enable/disable */
-+	u32 nb_descs;
- };
- 
- struct tun_page {
-@@ -614,6 +619,8 @@ void tun_ptr_free(void *ptr)
- 		struct xdp_frame *xdpf = tun_ptr_to_xdp(ptr);
- 
- 		xdp_return_frame(xdpf);
-+	} else if (tun_is_xdp_desc_frame(ptr)) {
-+		return;
- 	} else {
- 		__skb_array_destroy_skb(ptr);
- 	}
-@@ -631,6 +638,37 @@ static void tun_queue_purge(struct tun_file *tfile)
- 	skb_queue_purge(&tfile->sk.sk_error_queue);
- }
- 
-+static void tun_set_xsk_pool(struct tun_file *tfile, struct xsk_buff_pool *pool)
-+{
-+	if (!pool)
-+		return;
-+
-+	spin_lock(&tfile->pool_lock);
-+	xsk_pool_set_rxq_info(pool, &tfile->xdp_rxq);
-+	tfile->xsk_pool = pool;
-+	spin_unlock(&tfile->pool_lock);
-+}
-+
-+static void tun_clean_xsk_pool(struct tun_file *tfile)
-+{
-+	spin_lock(&tfile->pool_lock);
-+	if (tfile->xsk_pool) {
-+		void *ptr;
-+
-+		while ((ptr = ptr_ring_consume(&tfile->tx_ring)) != NULL)
-+			tun_ptr_free(ptr);
-+
-+		if (tfile->nb_descs) {
-+			xsk_tx_completed(tfile->xsk_pool, tfile->nb_descs);
-+			if (xsk_uses_need_wakeup(tfile->xsk_pool))
-+				xsk_set_tx_need_wakeup(tfile->xsk_pool);
-+			tfile->nb_descs = 0;
-+		}
-+		tfile->xsk_pool = NULL;
-+	}
-+	spin_unlock(&tfile->pool_lock);
-+}
-+
- static void __tun_detach(struct tun_file *tfile, bool clean)
- {
- 	struct tun_file *ntfile;
-@@ -648,6 +686,11 @@ static void __tun_detach(struct tun_file *tfile, bool clean)
- 		u16 index = tfile->queue_index;
- 		BUG_ON(index >= tun->numqueues);
- 
-+		ntfile = rtnl_dereference(tun->tfiles[tun->numqueues - 1]);
-+		/* Stop xsk zc xmit */
-+		tun_clean_xsk_pool(tfile);
-+		tun_clean_xsk_pool(ntfile);
-+
- 		rcu_assign_pointer(tun->tfiles[index],
- 				   tun->tfiles[tun->numqueues - 1]);
- 		ntfile = rtnl_dereference(tun->tfiles[index]);
-@@ -668,6 +711,7 @@ static void __tun_detach(struct tun_file *tfile, bool clean)
- 		tun_flow_delete_by_queue(tun, tun->numqueues + 1);
- 		/* Drop read queue */
- 		tun_queue_purge(tfile);
-+		tun_set_xsk_pool(ntfile, xsk_get_pool_from_qid(tun->dev, index));
- 		tun_set_real_num_queues(tun);
- 	} else if (tfile->detached && clean) {
- 		tun = tun_enable_queue(tfile);
-@@ -801,6 +845,7 @@ static int tun_attach(struct tun_struct *tun, struct file *file,
- 
- 		if (tfile->xdp_rxq.queue_index    != tfile->queue_index)
- 			tfile->xdp_rxq.queue_index = tfile->queue_index;
-+		tun_set_xsk_pool(tfile, xsk_get_pool_from_qid(dev, tfile->queue_index));
- 	} else {
- 		/* Setup XDP RX-queue info, for new tfile getting attached */
- 		err = xdp_rxq_info_reg(&tfile->xdp_rxq,
-@@ -1221,11 +1266,50 @@ static int tun_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 	return 0;
- }
- 
-+static int tun_xsk_pool_enable(struct net_device *netdev,
-+			       struct xsk_buff_pool *pool,
-+			       u16 qid)
-+{
-+	struct tun_struct *tun = netdev_priv(netdev);
-+	struct tun_file *tfile;
-+
-+	if (qid >= tun->numqueues)
-+		return -EINVAL;
-+
-+	tfile = rtnl_dereference(tun->tfiles[qid]);
-+	tun_set_xsk_pool(tfile, pool);
-+
-+	return 0;
-+}
-+
-+static int tun_xsk_pool_disable(struct net_device *netdev, u16 qid)
-+{
-+	struct tun_struct *tun = netdev_priv(netdev);
-+	struct tun_file *tfile;
-+
-+	if (qid >= MAX_TAP_QUEUES)
-+		return -EINVAL;
-+
-+	tfile = rtnl_dereference(tun->tfiles[qid]);
-+	if (tfile)
-+		tun_clean_xsk_pool(tfile);
-+	return 0;
-+}
-+
-+static int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-+			      u16 qid)
-+{
-+	return pool ? tun_xsk_pool_enable(dev, pool, qid) :
-+		tun_xsk_pool_disable(dev, qid);
-+}
-+
- static int tun_xdp(struct net_device *dev, struct netdev_bpf *xdp)
- {
- 	switch (xdp->command) {
- 	case XDP_SETUP_PROG:
- 		return tun_xdp_set(dev, xdp->prog, xdp->extack);
-+	case XDP_SETUP_XSK_POOL:
-+		return tun_xsk_pool_setup(dev, xdp->xsk.pool, xdp->xsk.queue_id);
- 	default:
- 		return -EINVAL;
- 	}
-@@ -1330,6 +1414,19 @@ static int tun_xdp_tx(struct net_device *dev, struct xdp_buff *xdp)
- 	return nxmit;
- }
- 
-+static int tun_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
-+{
-+	struct tun_struct *tun = netdev_priv(dev);
-+	struct tun_file *tfile;
-+
-+	rcu_read_lock();
-+	tfile = rcu_dereference(tun->tfiles[qid]);
-+	if (tfile)
-+		__tun_xdp_flush_tfile(tfile);
-+	rcu_read_unlock();
-+	return 0;
-+}
-+
- static const struct net_device_ops tap_netdev_ops = {
- 	.ndo_init		= tun_net_init,
- 	.ndo_uninit		= tun_net_uninit,
-@@ -1346,6 +1443,7 @@ static const struct net_device_ops tap_netdev_ops = {
- 	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_bpf		= tun_xdp,
- 	.ndo_xdp_xmit		= tun_xdp_xmit,
-+	.ndo_xsk_wakeup		= tun_xsk_wakeup,
- 	.ndo_change_carrier	= tun_net_change_carrier,
- };
- 
-@@ -1403,7 +1501,8 @@ static void tun_net_initialize(struct net_device *dev)
- 		/* Currently tun does not support XDP, only tap does. */
- 		dev->xdp_features = NETDEV_XDP_ACT_BASIC |
- 				    NETDEV_XDP_ACT_REDIRECT |
--				    NETDEV_XDP_ACT_NDO_XMIT;
-+				    NETDEV_XDP_ACT_NDO_XMIT |
-+				    NETDEV_XDP_ACT_XSK_ZEROCOPY;
- 
- 		break;
- 	}
-@@ -2058,11 +2157,11 @@ static ssize_t tun_chr_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 
- static ssize_t tun_put_user_xdp(struct tun_struct *tun,
- 				struct tun_file *tfile,
--				struct xdp_frame *xdp_frame,
-+				void *addr,
-+				size_t size,
- 				struct iov_iter *iter)
- {
- 	int vnet_hdr_sz = 0;
--	size_t size = xdp_frame->len;
- 	size_t ret;
- 
- 	if (tun->flags & IFF_VNET_HDR) {
-@@ -2077,7 +2176,7 @@ static ssize_t tun_put_user_xdp(struct tun_struct *tun,
- 		iov_iter_advance(iter, vnet_hdr_sz - sizeof(gso));
- 	}
- 
--	ret = copy_to_iter(xdp_frame->data, size, iter) + vnet_hdr_sz;
-+	ret = copy_to_iter(addr, size, iter) + vnet_hdr_sz;
- 
- 	preempt_disable();
- 	dev_sw_netstats_tx_add(tun->dev, 1, ret);
-@@ -2240,8 +2339,20 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
- 	if (tun_is_xdp_frame(ptr)) {
- 		struct xdp_frame *xdpf = tun_ptr_to_xdp(ptr);
- 
--		ret = tun_put_user_xdp(tun, tfile, xdpf, to);
-+		ret = tun_put_user_xdp(tun, tfile, xdpf->data, xdpf->len, to);
- 		xdp_return_frame(xdpf);
-+	} else if (tun_is_xdp_desc_frame(ptr)) {
-+		struct xdp_desc *desc = tun_ptr_to_xdp_desc(ptr);
-+		void *data;
-+
-+		spin_lock(&tfile->pool_lock);
-+		if (tfile->xsk_pool) {
-+			data = xsk_buff_raw_get_data(tfile->xsk_pool, desc->addr);
-+			ret = tun_put_user_xdp(tun, tfile, data, desc->len, to);
-+		} else {
-+			ret = 0;
-+		}
-+		spin_unlock(&tfile->pool_lock);
- 	} else {
- 		struct sk_buff *skb = ptr;
- 
-@@ -2654,6 +2765,10 @@ static int tun_ptr_peek_len(void *ptr)
- 			struct xdp_frame *xdpf = tun_ptr_to_xdp(ptr);
- 
- 			return xdpf->len;
-+		} else if (tun_is_xdp_desc_frame(ptr)) {
-+			struct xdp_desc *desc = tun_ptr_to_xdp_desc(ptr);
-+
-+			return desc->len;
- 		}
- 		return __skb_array_len_with_tag(ptr);
- 	} else {
-@@ -2661,6 +2776,54 @@ static int tun_ptr_peek_len(void *ptr)
- 	}
- }
- 
-+static void tun_peek_xsk(struct tun_file *tfile)
-+{
-+	struct xsk_buff_pool *pool;
-+	u32 i, batch, budget;
-+	void *frame;
-+
-+	if (!ptr_ring_empty(&tfile->tx_ring))
-+		return;
-+
-+	spin_lock(&tfile->pool_lock);
-+	pool = tfile->xsk_pool;
-+	if (!pool) {
-+		spin_unlock(&tfile->pool_lock);
-+		return;
-+	}
-+
-+	if (tfile->nb_descs) {
-+		xsk_tx_completed(pool, tfile->nb_descs);
-+		if (xsk_uses_need_wakeup(pool))
-+			xsk_set_tx_need_wakeup(pool);
-+	}
-+
-+	spin_lock(&tfile->tx_ring.producer_lock);
-+	budget = min_t(u32, tfile->tx_ring.size, TUN_XDP_BATCH);
-+
-+	batch = xsk_tx_peek_release_desc_batch(pool, budget);
-+	if (!batch) {
-+		tfile->nb_descs = 0;
-+		spin_unlock(&tfile->tx_ring.producer_lock);
-+		spin_unlock(&tfile->pool_lock);
-+		return;
-+	}
-+
-+	tfile->nb_descs = batch;
-+	for (i = 0; i < batch; i++) {
-+		/* Encode the XDP DESC flag into lowest bit for consumer to differ
-+		 * XDP desc from XDP buffer and sk_buff.
-+		 */
-+		frame = tun_xdp_desc_to_ptr(&pool->tx_descs[i]);
-+		/* The budget must be less than or equal to tx_ring.size,
-+		 * so enqueuing will not fail.
-+		 */
-+		__ptr_ring_produce(&tfile->tx_ring, frame);
-+	}
-+	spin_unlock(&tfile->tx_ring.producer_lock);
-+	spin_unlock(&tfile->pool_lock);
-+}
-+
- static int tun_peek_len(struct socket *sock)
- {
- 	struct tun_file *tfile = container_of(sock, struct tun_file, socket);
-@@ -2671,6 +2834,9 @@ static int tun_peek_len(struct socket *sock)
- 	if (!tun)
- 		return 0;
- 
-+	if (sock_flag(&tfile->sk, SOCK_XDP))
-+		tun_peek_xsk(tfile);
-+
- 	ret = PTR_RING_PEEK_CALL(&tfile->tx_ring, tun_ptr_peek_len);
- 	tun_put(tun);
- 
-@@ -3473,6 +3639,7 @@ static int tun_chr_open(struct inode *inode, struct file * file)
- 	}
- 
- 	mutex_init(&tfile->napi_mutex);
-+	spin_lock_init(&tfile->pool_lock);
- 	RCU_INIT_POINTER(tfile->tun, NULL);
- 	tfile->flags = 0;
- 	tfile->ifindex = 0;
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 077e74421558..eb83764be26c 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -202,6 +202,10 @@ static int vhost_net_buf_peek_len(void *ptr)
- 		struct xdp_frame *xdpf = tun_ptr_to_xdp(ptr);
- 
- 		return xdpf->len;
-+	} else if (tun_is_xdp_desc_frame(ptr)) {
-+		struct xdp_desc *desc = tun_ptr_to_xdp_desc(ptr);
-+
-+		return desc->len;
- 	}
- 
- 	return __skb_array_len_with_tag(ptr);
-diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
-index 043d442994b0..4142453b5e52 100644
---- a/include/linux/if_tun.h
-+++ b/include/linux/if_tun.h
-@@ -6,10 +6,12 @@
- #ifndef __IF_TUN_H
- #define __IF_TUN_H
- 
-+#include <uapi/linux/if_xdp.h>
- #include <uapi/linux/if_tun.h>
- #include <uapi/linux/virtio_net.h>
- 
- #define TUN_XDP_FLAG 0x1UL
-+#define TUN_XDP_DESC_FLAG 0x2UL
- 
- #define TUN_MSG_UBUF 1
- #define TUN_MSG_PTR  2
-@@ -43,6 +45,21 @@ static inline struct xdp_frame *tun_ptr_to_xdp(void *ptr)
- 	return (void *)((unsigned long)ptr & ~TUN_XDP_FLAG);
- }
- 
-+static inline bool tun_is_xdp_desc_frame(void *ptr)
-+{
-+	return (unsigned long)ptr & TUN_XDP_DESC_FLAG;
-+}
-+
-+static inline void *tun_xdp_desc_to_ptr(struct xdp_desc *desc)
-+{
-+	return (void *)((unsigned long)desc | TUN_XDP_DESC_FLAG);
-+}
-+
-+static inline struct xdp_desc *tun_ptr_to_xdp_desc(void *ptr)
-+{
-+	return (void *)((unsigned long)ptr & ~TUN_XDP_DESC_FLAG);
-+}
-+
- void tun_ptr_free(void *ptr);
- #else
- #include <linux/err.h>
-@@ -75,6 +92,21 @@ static inline struct xdp_frame *tun_ptr_to_xdp(void *ptr)
- 	return NULL;
- }
- 
-+static inline bool tun_is_xdp_desc_frame(void *ptr)
-+{
-+	return false;
-+}
-+
-+static inline void *tun_xdp_desc_to_ptr(struct xdp_desc *desc)
-+{
-+	return NULL;
-+}
-+
-+static inline struct xdp_frame *tun_ptr_to_xdp_desc(void *ptr)
-+{
-+	return NULL;
-+}
-+
- static inline void tun_ptr_free(void *ptr)
- {
- }
+The last sentence is the important one. User space should not access 
+that memory. If it does, it gets a slap on the hand. Because it should 
+not access that memory.
+
+We might even be able to export to user space which pages are currently 
+accessible and which ones not (e.g., pagemap), although it would be racy 
+as long as the VM is running and can trigger a conversion.
+
+> 
+> To add a layer of paint to the shed, the usage of SIGBUS for
+> something that is really a permission access problem doesn't feel
+
+SIGBUS stands for "BUS error (bad memory access)."
+
+Which makes sense, if you try accessing something that can no longer be 
+accessed. It's now inaccessible. Even if it is temporarily.
+
+Just like a page with an MCE error. Swapin errors. Etc. You cannot 
+access it.
+
+It might be a permission problem on the pKVM side, but it's not the 
+traditional "permission problem" as in mprotect() and friends. You 
+cannot resolve that permission problem yourself. It's a higher entity 
+that turned that memory inaccessible.
+
+> appropriate. Allocating memory via guestmem and donating that to a
+> protected guest is a way for userspace to voluntarily relinquish access
+> permissions to the memory it allocated. So a userspace process violating
+> that could, IMO, reasonably expect a SEGV instead of SIGBUS. By the
+> point that signal would be sent, the page would have been accounted
+> against that userspace process, so not sure the paging examples that
+> were discussed earlier are exactly comparable. To illustrate that
+> differently, given that pKVM and Gunyah use MMU-based protection, there
+> is nothing architecturally that prevents a guest from sharing a page
+> back with Linux as RO. 
+
+Sure, then allow page faults that allow for reads and give a signal on 
+write faults.
+
+In the scenario, it even makes more sense to not constantly require new 
+mmap's from user space just to access a now-shared page.
+
+> Note that we don't currently support this, so I
+> don't want to conflate this use case, but that hopefully makes it a
+> little more obvious that this is a "there is a page, but you don't
+> currently have the permission to access it" problem rather than "sorry
+> but we ran out of pages" problem.
+
+We could user other signals, at least as the semantics are clear and 
+it's documented. Maybe SIGSEGV would be warranted.
+
+I consider that a minor detail, though.
+
+Requiring mmap()/munmap() dances just to access a page that is now 
+shared from user space sounds a bit suboptimal. But I don't know all the 
+details of the user space implementation.
+
+"mmap() the whole thing once and only access what you are supposed to 
+access" sounds reasonable to me. If you don't play by the rules, you get 
+a signal.
+
+But I'm happy to learn more details.
+
 -- 
-2.41.0
+Cheers,
+
+David / dhildenb
 
 
