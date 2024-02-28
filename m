@@ -1,289 +1,230 @@
-Return-Path: <kvm+bounces-10305-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10306-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A3886B912
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:29:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B73286B9C3
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:20:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62DF828A645
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 20:29:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32DF1C234B5
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A066C1474CF;
-	Wed, 28 Feb 2024 20:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0BD27002E;
+	Wed, 28 Feb 2024 21:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BR6G5g8I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="poRPXhfs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9F75E068;
-	Wed, 28 Feb 2024 20:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693B970024
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 21:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709152150; cv=none; b=ag5PH8astIBaqBE3lwAx88GrTIzp9jdCWXgtLEfZMMKLPKNRoVZldkfKnRKMhBnKraW4ir0kFNkricRiEJz/6a5/IUlD6rTlJMIcq9XaHMGJe7vENLBjsx8/u7cUq4qCusmujOYct/UeihVR8DsyMutJUp89PjItmTfw2M8MGRQ=
+	t=1709155194; cv=none; b=blWTz/B6XhJXUQFhtnSguIiP97UA2TlFDSQpLqcw+IKCxYnwWSK0eebOBGNs1OeoPUH4vqvwCY8oF+zjkV15vtM2e363mkumUnW7C5+XRS+0ig48a3JkSaGAYGX17cbr4McZfTvsCrT88R1QLth+iHkDZwDd7xbeCX4Z1Mc1OCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709152150; c=relaxed/simple;
-	bh=TWmXO+E2jGYeoRyN3F8HU+r+G7vutEdFGwwl2ryKsSk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mb8lL0X+z0SMlOZM4rgLFLYBMJescoSmMIiJ2BSHfzsN9Ra8ug+SK3LB+FyM+egTZPM1PizbMUbLaGBXAiiLUD1wYc19GoWf6V5R0gsvcc47nuNscJY9U6eYkjwkW3RoJdp48ky+3Ziek1JAU+T+m6GCQ/iB8kjO4PwvcTJk9XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BR6G5g8I; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709152148; x=1740688148;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TWmXO+E2jGYeoRyN3F8HU+r+G7vutEdFGwwl2ryKsSk=;
-  b=BR6G5g8Iei5lsWcjr3sIKYLki3sQSDgemZaTO9Lah5lbUWEfjygWkueb
-   MxGWXTFDEku0a0GdvsJ0G+pTyyuQhRu0dBE1GYGXmOK1XclQ17j1pLiPb
-   2Ytr4H9e5aCBkmihPyr30RkaMk8Oi2UdLLLRCc8rt9oDIaM8607u4bFNM
-   Jzasp7xhUsIlCPIr9L8puBp/HFuIqSzxELdCW4RLkVs4OStrc7PQ2jtji
-   o5aYujY21vWtmj/Q7tcgz/Cjb7GfFamexHQ+cMN501uNwnLaTrXP/1DMW
-   Ml8LHJwoC9zIf1qj+Uo4BHTGo/xUe8MPSf4+26Al+igos8R1qnbf/rpQT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="26048805"
-X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
-   d="scan'208";a="26048805"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 12:29:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
-   d="scan'208";a="45083738"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 12:29:08 -0800
-Date: Wed, 28 Feb 2024 12:29:06 -0800
-From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
-	michael.roth@amd.com, isaku.yamahata@intel.com,
-	thomas.lendacky@amd.com, isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH 18/21] KVM: x86: Add gmem hook for initializing memory
-Message-ID: <20240228202906.GB10568@ls.amr.corp.intel.com>
-References: <20240227232100.478238-1-pbonzini@redhat.com>
- <20240227232100.478238-19-pbonzini@redhat.com>
+	s=arc-20240116; t=1709155194; c=relaxed/simple;
+	bh=gk/MrBtcV7Nj4M6X2sQOVcKzwLMPmaE9N2JN751XURU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gQr11M0RvHstGLgELj+lg3BuWb801rq/vP1MzZZLPnaVANcr/74A486dRTo8JsZroKL19XDJ93VYnzD4m4GHjGgsuhBg4G7ZBqqYbcuegWM03c3uPPWVHVLOIZ1c0/ivtOxbvVOlDquvmymC008YsmP5ZxSf2cEFQE+9DklY5Ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=poRPXhfs; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60966f363c1so1477577b3.3
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 13:19:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709155190; x=1709759990; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I3lMvE57lAGMOn/5i5GUfHlWgJVlKCqOgZHHFIXT5YI=;
+        b=poRPXhfsYkCniLxu2SKdSpdTc8kxYQFx268+jR6EGsyEEsUNkBSLHbI8qy4ZXOAELO
+         Ygn0BdGKwB3A70aIzf1JPMv7vBbEFE8Re1J5rwL+kfhdMazmI/71c+ySjWteu/kEzZED
+         dEmyXtOUe3gve0NgqXtGvDTppaVDyEv+r/DMj49nqVo6+lMCLonzFiL5vSQ2njXdSLuh
+         yYd3bOsrd4eDJhAeSAHjtMX3qXkrVU1XlCGWvEvnBTzzcNiH46/KNb6R5KJSMSyP2pJE
+         dyglx+6TLSZ/0mRg2ZnavTNyvDbv+0RWf3CI3fy5CmiwQihdR/PeI89ajk9MpWIcona9
+         Z4PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709155190; x=1709759990;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=I3lMvE57lAGMOn/5i5GUfHlWgJVlKCqOgZHHFIXT5YI=;
+        b=fPXEzDHpM+7sTaZNbeeZtl53OL4aDJ2WGDv48h/74ZGu8hqUI7ljgWJAJ+6D202KGV
+         geqk96dal1lasDXe8XrBKU2uloKV8at7DwInwShm3lh4FFXrLg6I76pns0GLEsdKWNjG
+         orb8YnIcIxOBp24oGqJfbavmwse7NJCyW/XsHkcQZQSzIn6IwPYleQ8yJTS+SZ80AlbG
+         M26cod0v2TBZr3Yl7vNCMf7AZ86smuS5gZM2MK5z0hZx8dJD44JvBto0grLxLjDAkRBp
+         Q3wLSWAy+qk9viJ20A9DF35j3epqCuLOro85qk918ow29P0VWaAmTlCnvQkP+o1Ff323
+         yZwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYq2BAGh1TriWqNBNz8DaLRQ+CZSTmueZc7MwqPEcaqQQ6pLGKdrMkugsPn26tRqVuzIPExxf0Sdect8Yi1/U6zmvE
+X-Gm-Message-State: AOJu0Yz0QwzN7s6Iw1k6ZecpQ7Te6YuJ6UEU+z9mbwHyxVgz70bqpEmx
+	VuiEGKal6OEy3XwiRchtRU9hYBcU6NeWsRO83b6NdlVdKJSqzdLzSCEgV/cWNTKReVjKZKQblxu
+	hOg==
+X-Google-Smtp-Source: AGHT+IGIb2EDaA1Xfc5xFJEWOVFhVtRT96S9AFF70n2hacpd3aAGkhz27VZdHFJQY6yEoiJnM3glwUpknsM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:338b:b0:609:22ea:f95e with SMTP id
+ fl11-20020a05690c338b00b0060922eaf95emr59391ywb.4.1709155190409; Wed, 28 Feb
+ 2024 13:19:50 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:19:48 -0800
+In-Reply-To: <Zd-JjBNCpFG5iDul@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240227232100.478238-19-pbonzini@redhat.com>
+Mime-Version: 1.0
+References: <20240208204844.119326-1-thuth@redhat.com> <20240208204844.119326-4-thuth@redhat.com>
+ <501ac94d-11ab-4765-a25d-75013c021be6@sirena.org.uk> <Zd-JjBNCpFG5iDul@google.com>
+Message-ID: <Zd-jdAtI_C_d_fp4@google.com>
+Subject: Re: [PATCH v3 3/8] KVM: selftests: Move setting a vCPU's entry point
+ to a dedicated API
+From: Sean Christopherson <seanjc@google.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Aishwarya TCV <aishwarya.tcv@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 27, 2024 at 06:20:57PM -0500,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Oliver and/or Marc, question for y'all towards the bottom.
 
-> guest_memfd pages are generally expected to be in some arch-defined
-> initial state prior to using them for guest memory. For SEV-SNP this
-> initial state is 'private', or 'guest-owned', and requires additional
-> operations to move these pages into a 'private' state by updating the
-> corresponding entries the RMP table.
-> 
-> Allow for an arch-defined hook to handle updates of this sort, and go
-> ahead and implement one for x86 so KVM implementations like AMD SVM can
-> register a kvm_x86_ops callback to handle these updates for SEV-SNP
-> guests.
-> 
-> The preparation callback is always called when allocating/grabbing
-> folios via gmem, and it is up to the architecture to keep track of
-> whether or not the pages are already in the expected state (e.g. the RMP
-> table in the case of SEV-SNP).
-> 
-> In some cases, it is necessary to defer the preparation of the pages to
-> handle things like in-place encryption of initial guest memory payloads
-> before marking these pages as 'private'/'guest-owned', so also add a
-> helper that performs the same function as kvm_gmem_get_pfn(), but allows
-> for the preparation callback to be bypassed to allow for pages to be
-> accessed beforehand.
-> 
-> Link: https://lore.kernel.org/lkml/ZLqVdvsF11Ddo7Dq@google.com/
-> Co-developed-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Message-Id: <20231230172351.574091-5-michael.roth@amd.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  1 +
->  arch/x86/kvm/x86.c                 |  6 +++
->  include/linux/kvm_host.h           | 14 ++++++
->  virt/kvm/Kconfig                   |  4 ++
->  virt/kvm/guest_memfd.c             | 72 +++++++++++++++++++++++++++---
->  6 files changed, 92 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index ac8b7614e79d..adfaad15e7e6 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -139,6 +139,7 @@ KVM_X86_OP(complete_emulated_msr)
->  KVM_X86_OP(vcpu_deliver_sipi_vector)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
->  KVM_X86_OP_OPTIONAL(get_untagged_addr)
-> +KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
->  
->  #undef KVM_X86_OP
->  #undef KVM_X86_OP_OPTIONAL
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 7de8a3f2a118..6d873d08f739 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1804,6 +1804,7 @@ struct kvm_x86_ops {
->  	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
->  
->  	gva_t (*get_untagged_addr)(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
-> +	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f10a5a617120..eff532ea59c9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13598,6 +13598,12 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
->  }
->  EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
->  
-> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> +int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order)
-> +{
-> +	return static_call(kvm_x86_gmem_prepare)(kvm, pfn, gfn, max_order);
-> +}
-> +#endif
->  
->  int kvm_spec_ctrl_test_value(u64 value)
->  {
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 97afe4519772..03bf616b7308 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2434,6 +2434,8 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->  #ifdef CONFIG_KVM_PRIVATE_MEM
->  int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
->  		     gfn_t gfn, kvm_pfn_t *pfn, int *max_order);
-> +int kvm_gmem_get_uninit_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
-> +		            gfn_t gfn, kvm_pfn_t *pfn, int *max_order);
->  #else
->  static inline int kvm_gmem_get_pfn(struct kvm *kvm,
->  				   struct kvm_memory_slot *slot, gfn_t gfn,
-> @@ -2442,6 +2444,18 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
->  	KVM_BUG_ON(1, kvm);
->  	return -EIO;
->  }
-> +
-> +static inline int kvm_gmem_get_uninit_pfn(struct kvm *kvm,
-> +				          struct kvm_memory_slot *slot, gfn_t gfn,
-> +				          kvm_pfn_t *pfn, int *max_order)
-> +{
-> +	KVM_BUG_ON(1, kvm);
-> +	return -EIO;
-> +}
->  #endif /* CONFIG_KVM_PRIVATE_MEM */
->  
-> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> +int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order);
-> +#endif
-> +
->  #endif
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index a11e9c80fac9..dcce0c3b5b13 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -111,3 +111,7 @@ config KVM_GENERIC_PRIVATE_MEM
->         select KVM_GENERIC_MEMORY_ATTRIBUTES
->         select KVM_PRIVATE_MEM
->         bool
-> +
-> +config HAVE_KVM_GMEM_PREPARE
-> +       bool
-> +       depends on KVM_PRIVATE_MEM
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index de0d5a5c210c..7ec7afafc960 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -13,12 +13,50 @@ struct kvm_gmem {
->  	struct list_head entry;
->  };
->  
-> -static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
-> +static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
-> +{
-> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> +	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
-> +	struct kvm_gmem *gmem;
-> +
-> +	list_for_each_entry(gmem, gmem_list, entry) {
-> +		struct kvm_memory_slot *slot;
-> +		struct kvm *kvm = gmem->kvm;
-> +		struct page *page;
-> +		kvm_pfn_t pfn;
-> +		gfn_t gfn;
-> +		int rc;
-> +
-> +		slot = xa_load(&gmem->bindings, index);
-> +		if (!slot)
-> +			continue;
-> +
-> +		page = folio_file_page(folio, index);
-> +		pfn = page_to_pfn(page);
-> +		gfn = slot->base_gfn + index - slot->gmem.pgoff;
-> +		rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, compound_order(compound_head(page)));
-> +		if (rc) {
-> +			pr_warn_ratelimited("gmem: Failed to prepare folio for index %lx, error %d.\n",
-> +					    index, rc);
-> +			return rc;
-> +		}
-> +	}
-> +
-> +#endif
-> +	return 0;
-> +}
+On Wed, Feb 28, 2024, Sean Christopherson wrote:
+> On Wed, Feb 28, 2024, Mark Brown wrote:
+> > On Thu, Feb 08, 2024 at 09:48:39PM +0100, Thomas Huth wrote:
+> > > From: Sean Christopherson <seanjc@google.com>
+> > >=20
+> > > Extract the code to set a vCPU's entry point out of vm_arch_vcpu_add(=
+) and
+> > > into a new API, vcpu_arch_set_entry_point().  Providing a separate AP=
+I
+> > > will allow creating a KVM selftests hardness that can handle tests th=
+at
+> > > use different entry points for sub-tests, whereas *requiring* the ent=
+ry
+> > > point to be specified at vCPU creation makes it difficult to create a
+> > > generic harness, e.g. the boilerplate setup/teardown can't easily cre=
+ate
+> > > and destroy the VM and vCPUs.
+> >=20
+> > With today's -next I'm seeing most of the KVM selftests failing on an
+> > arm64 defconfig with:
+> >=20
+> > # =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+> > #   include/kvm_util_base.h:677: !ret
+> > #   pid=3D735 tid=3D735 errno=3D9 - Bad file descriptor
+> > #      1	0x0000000000410937: vcpu_set_reg at kvm_util_base.h:677 (discr=
+iminator 4)
+> > #      2	 (inlined by) vcpu_arch_set_entry_point at processor.c:370 (di=
+scriminator 4)
+> > #      3	0x0000000000407bab: vm_vcpu_add at kvm_util_base.h:981
+> > #      4	 (inlined by) __vm_create_with_vcpus at kvm_util.c:419
+> > #      5	 (inlined by) __vm_create_shape_with_one_vcpu at kvm_util.c:43=
+2
+> > #      6	0x000000000040187b: __vm_create_with_one_vcpu at kvm_util_base=
+.h:892
+> > #      7	 (inlined by) vm_create_with_one_vcpu at kvm_util_base.h:899
+> > #      8	 (inlined by) main at aarch32_id_regs.c:158
+> > #      9	0x0000007fbcbe6dc3: ?? ??:0
+> > #     10	0x0000007fbcbe6e97: ?? ??:0
+> > #     11	0x0000000000401f2f: _start at ??:?
+> > #   KVM_SET_ONE_REG failed, rc: -1 errno: 9 (Bad file descriptor)
+> >=20
+> > and a bisect pointed to this commit which does look plausibly relevant.
+> >=20
+> > Note that while this was bisected with plain arm64 defconfig and the KV=
+M
+> > selftests fragment was not enabled, but enabling the KVM fragment gave
+> > the same result as would be expected based on the options enabled by th=
+e
+> > fragment.  We're also seeing an alternative failure pattern where the
+> > tests segfault when run in a different environment, I'm also tracking
+> > that down but I suspect these are the same issue.
+>=20
+> Gah, my bad, I should have at least tested on ARM since I have easy acces=
+s to
+> such hardware.  If I can't figure out what's going wrong in the next few =
+hours,
+> I'll drop this series and we can try again for 6.10.
+>=20
+> Sorry :-/
 
-Can we make it conditional?
+/facepalm
 
-TDX doesn't need prepare hook to set gmem_parepare = NULL.  With large memory
-guest(several hundreds Gbyte) to lookup page cache, this loop slows down guest
-startup. I think it would also applies to SW_PROTECTED_VM (and pKVM in future).
+The inner helper doesn't return the vCPU, and by dumb (bad) luck, selftests=
+ end
+up trying to use fd=3D0.
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 3835732491b9..cafb8d0997b5 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -842,6 +842,9 @@ struct kvm {
- #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-        /* Protected by slots_locks (for writes) and RCU (for reads) */
-        struct xarray mem_attr_array;
-+#endif
-+#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-+       bool gmem_need_prepare;
- #endif
-        char stats_id[KVM_STATS_NAME_SIZE];
- };
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 74e19170af8a..ab7d0f7d3d38 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -16,6 +16,7 @@ struct kvm_gmem {
- static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
- {
- #ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-+       rc = kvm_arch_gmem_prepare(inode, index, folio);
-        struct list_head *gmem_list = &inode->i_mapping->i_private_list;
-        struct kvm_gmem *gmem;
- 
-@@ -27,6 +28,9 @@ static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct fol
-                gfn_t gfn;
-                int rc;
- 
-+               if (!kvm->gmem_need_prepare)
-+                       continue;
-+
-                slot = xa_load(&gmem->bindings, index);
-                if (!slot)
-                        continue;
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/te=
+sting/selftests/kvm/lib/aarch64/processor.c
+index ed4ab29f4fad..a9eb17295be4 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -386,6 +386,7 @@ static struct kvm_vcpu *__aarch64_vcpu_add(struct kvm_v=
+m *vm, uint32_t vcpu_id,
+        aarch64_vcpu_setup(vcpu, init);
+=20
+        vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size=
+);
++       return vcpu;
+ }
+=20
+ struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
 
--- 
-Isaku Yamahata <isaku.yamahata@linux.intel.com>
+I'll squash the above and force push.
+
+
+In my defense, I would have caught this when build-testing, as the compiler=
+ does
+warn...
+
+  lib/aarch64/processor.c -o /usr/local/google/home/seanjc/go/src/kernel.or=
+g/nox/tools/testing/selftests/kvm/lib/aarch64/processor.o
+  lib/aarch64/processor.c: In function =E2=80=98__aarch64_vcpu_add=E2=80=99=
+:
+  lib/aarch64/processor.c:389:1: warning: no return statement in function r=
+eturning non-void [-Wreturn-type]
+    389 | }
+        | ^
+  At top level:
+  cc1: note: unrecognized command-line option =E2=80=98-Wno-gnu-variable-si=
+zed-type-not-at-end=E2=80=99 may have been intended to silence earlier diag=
+nostics
+
+but due to a different issue that is fixed in the kvm-arm tree[*], but not =
+in mine,
+I built without -Werror and didn't see the new warn in the sea of GUEST_PRI=
+NTF
+warnings.
+
+Ugh, and I still can't enable -Werror, because there are unused functions i=
+n
+aarch64/vpmu_counter_access.c
+
+  aarch64/vpmu_counter_access.c:96:20: error: unused function 'enable_count=
+er' [-Werror,-Wunused-function]
+  static inline void enable_counter(int idx)
+                   ^
+  aarch64/vpmu_counter_access.c:104:20: error: unused function 'disable_cou=
+nter' [-Werror,-Wunused-function]
+  static inline void disable_counter(int idx)
+                   ^
+  2 errors generated.
+  make: *** [Makefile:278: /usr/local/google/home/seanjc/go/src/kernel.org/=
+nox/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.o] Error 1
+  make: *** Waiting for unfinished jobs....
+
+  Commit 49f31cff9c533d264659356b90445023b04e10fb failed to build with 'mak=
+e-clang make-arm make -j128'.
+
+Oliver/Marc, any thoughts on how you want to fix the unused function warnin=
+gs?
+As evidenced by this goof, being able to compile with -Werror is super help=
+ful.
+
+And another question: is there any reason to not force -Werror for selftest=
+s?
+
+[*] https://lore.kernel.org/all/20240202234603.366925-1-seanjc@google.com
 
