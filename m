@@ -1,153 +1,125 @@
-Return-Path: <kvm+bounces-10207-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10208-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C5F86A7B5
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 05:56:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20A4386A814
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 06:38:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77AFA1F2335C
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 04:56:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C6291F244E6
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 05:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0F620DF4;
-	Wed, 28 Feb 2024 04:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E3Y1+11H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB41221344;
+	Wed, 28 Feb 2024 05:38:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2119.outbound.protection.partner.outlook.cn [139.219.17.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6734920B17;
-	Wed, 28 Feb 2024 04:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F571D6AA
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 05:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.119
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709096159; cv=fail; b=gCuHLfUiLo6LCkVeZHGeLE811IKVCDmViQdI5y+i+MAeTGmP243m/xAbDdMjYTMShUwSf21+4LnkTTFkxcCJs1uGBToEK+i1m4CzcAIcSCqh54ooTAHnbsQow7MGBwWZB5t/aLl+JObfmaDklgsoStVKHwVyNk2MY5zTLrh/oAM=
+	t=1709098722; cv=fail; b=bhPjy/fO+eXgPk3tXDihXXXQ83wV/BywWdcOhUSgP6VnugwCS3sMKU0EYitymQM0L/IhIxtEDYuDBU615ySe0mxxq2ZBxxvhmxjPaZ0ghh+R0knSP73QG2sb8MTxgKMeilkO8pAI60cySizaTNhDPWtzxG/vAaHT4t/YEPCzrZM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709096159; c=relaxed/simple;
-	bh=ALLOrjMYXnXvZaUqYcBBxGGTFpWW0jrV1EYybAasG4w=;
+	s=arc-20240116; t=1709098722; c=relaxed/simple;
+	bh=Rb0qj8dwXIZdQpqiboU7cxJMecfZjU5LxtQ7xIxMIOE=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=aqyfucxkab5mILxHOF84iKVUSSm1GiwsnY46gnVyDMBRT4xRAUqWeRbl5t/xU4Qfj5RWFbLqXbY3AToY1W2RJXbkQa0tM2/3tG1svtzFnWwf5vf7xfogPilgZcCemcni9snEPo9wmDa+64UuPVjb4ls+2jApN997m6nSRkcTNDQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E3Y1+11H; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709096157; x=1740632157;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ALLOrjMYXnXvZaUqYcBBxGGTFpWW0jrV1EYybAasG4w=;
-  b=E3Y1+11HLofKg8gim7s81XEHxlpkmL8tzNiCV51ogxGpr3te2yl1tQGm
-   qf/53XcuQH3iBV+hmUySxE16BUX1HDp13CDobL3JvHw9NBFyFc4kije1S
-   5tCHWJXnkrR1QhW9n5y//CoF8B5EX3UafeYqe9q6xXpKW69pfYdvpS2UF
-   aOqGUd4gchxX/xobCYCpn31u+F6rRzhECZK8Y2ssToYrbkBVNOkwycLZY
-   fk31ZeRmVGEMjjSkQUmFPh//7DerCU1QJ+ES2an4w+6j90UZyF2EC5+mu
-   FYy9xwMCVTjale7s1hgsrPf4wQgGjk5nXBpQ64oPSPE0ZnNk6x/OoCVe8
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="3322664"
-X-IronPort-AV: E=Sophos;i="6.06,189,1705392000"; 
-   d="scan'208";a="3322664"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 20:55:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,189,1705392000"; 
-   d="scan'208";a="11858403"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Feb 2024 20:55:56 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 27 Feb 2024 20:55:55 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 27 Feb 2024 20:55:55 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 27 Feb 2024 20:55:55 -0800
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 27 Feb 2024 20:55:54 -0800
+	 Content-Type:MIME-Version; b=Dh4OujH0ZrmWNJlCdM4rnFjDpDdE062kU5JfVgeBYbe2T5R2kg/Wh61OQP12qmHkhgSxiGeIbyGDl2UM3RA5ol/N6ANRMCwAJ0WB2NcqXojYqoGIH7Vwu00PMRqmzsOeEBjCTOcwavdMEO1mfLEBnnkVjv4C/0KNvMj0WLjypA4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OwjsUBqTaOWBHCOBLqqydyNrd7n5R9kPwqzuiIPU+9KzCQu10SD60wp3Hh4lFQyiLGAgjNhmhnDOxBzNckMp7IusS5OL2yLKqF9BVUyRGRupWfE857EJsRLt12XyAyzjLcBJbKs1NQDB1P3gXpTM0fGStmN+6EMm8f9PkCO4UrWu5IJzCQKmd+rfUHt4jFzck86C/r7ydfT/+m3j2sU3jCl+W24ArpquO51UDYddhu4x81NVUyHo6R4SeT8MvG6n44Ty0rB4xvJH/aX3nngz5ZO2cGadLmWfHx5sml/Gfj7Kasl/LsaTUm1Enyy6b5LEMp1/jcSoB7DI95o3wPNsSQ==
+ b=Tj1DXh7P6xnCyu2pN9PSvb7azskVEAtKHLHOoNDs6garnoTwUjljCWjj1QqAuDyvfEqdhC2GqM//u/xdvCcSt3Rk/D70D35DtMRdHqxK1kwLXt+6bdNMz1Jdg7JgbVD+bHhXD6jwdJWpgZT/e2XHlZANm/Ms85lmjNBtWcQ5r1636j2CCCmPYrjA8B0ZNgyRIeS76A+CJyRcbtS1WMIxfP0jLBqcZksS04fn2w4n0W7Pn87tp69+0tbFcK3iZRD9WduwEB3OowTnJ7uLAkM42m8RsMu1LI2i7NYh1O231+XDln3qHgzRN7SxQ3n3FTPsDMmyw08Bo2WwZWucQ8vo7Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ALLOrjMYXnXvZaUqYcBBxGGTFpWW0jrV1EYybAasG4w=;
- b=YC3PmIe+2vf40pZSRHCQS9P6vZC1cCbokYSLlZvX/mcvBzUkmx3YcrQalNbj+23YG+TDClOpHneOPF+4TsLq9HVSzzwj87BGiaSTsE6HCTuHM4NMq8OH0DQOBFfCOweb9191YNYMQOvy9hAST6dB2UqdFZK7iASLd44NZggyusmLELH/6rdbbuSqL1wKt/1P/+o0zUaqGBbidMd36hDQRdQwFtmwNWbXuU/FD1lA8ydXqTDSq3QAiHSLOkBxzroI1bX5h9v1/vWM8ssfxyTDJyhj8M9wUiwZgDoJW3lf1oYjzdExK+NY5bxAmdrfsAEUWd/rNboHCoUGG/Ld5Gf92A==
+ bh=331EN18HP6VLDxxJfGhy5X7zvzfJ0YCmP2yi+OnRANQ=;
+ b=G3718lqXylUCK2Vx4JYR5Tk9E4EmYS7SnX5yeJ7yLcVK9eXFhQ9LuOEgEEavLsZjmVBdOD17uylz4Zwb/woU24YK1fHaPRIc5SBliohYJmjzmgVsSXflrIcuTT7giJsuCTH69U+ivHLsBbB2NNt/B9KOTcfQaULY60EoMWulwGUjVaIYBfJ4od0fMK+hTTKxBe2KJq3p4BpEcSPZlS3gjgLBz4NlKbh3dzbbq5dBv8cH558zfHCx9K/TS1iev5WqgotLG7LR4ubn2eUUc7h+NLg/5pwFqQv2rPet+zSRY3I2sg2e9daYS9jm5MY9iZHKRqeJURP47XTZp6RrHCK5Aw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SJ0PR11MB4781.namprd11.prod.outlook.com (2603:10b6:a03:2d8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.25; Wed, 28 Feb
- 2024 04:55:52 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b0e3:e5b2:ab34:ff80]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b0e3:e5b2:ab34:ff80%7]) with mapi id 15.20.7339.024; Wed, 28 Feb 2024
- 04:55:52 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Brett Creeley <brett.creeley@amd.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"yishaih@nvidia.com" <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: RE: [PATCH v2 vfio 2/2] vfio/pds: Refactor/simplify reset logic
-Thread-Topic: [PATCH v2 vfio 2/2] vfio/pds: Refactor/simplify reset logic
-Thread-Index: AQHaad2mmn7QJGU1A0GQRc8NjAd5FbEfMPnA
-Date: Wed, 28 Feb 2024 04:55:52 +0000
-Message-ID: <BN9PR11MB5276CD4BF00814779A22CF1F8C582@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240228003205.47311-1-brett.creeley@amd.com>
- <20240228003205.47311-3-brett.creeley@amd.com>
-In-Reply-To: <20240228003205.47311-3-brett.creeley@amd.com>
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Received: from BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:f::16) by BJSPR01MB0660.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:1f::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.45; Wed, 28 Feb
+ 2024 05:38:32 +0000
+Received: from BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn
+ ([fe80::fcfa:931b:8b1d:6af5]) by
+ BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn ([fe80::fcfa:931b:8b1d:6af5%4])
+ with mapi id 15.20.7316.037; Wed, 28 Feb 2024 05:38:33 +0000
+From: JeeHeng Sia <jeeheng.sia@starfivetech.com>
+To: Zhao Liu <zhao1.liu@linux.intel.com>,
+	=?iso-8859-1?Q?Daniel_P_=2E_Berrang=E9?= <berrange@redhat.com>, Eduardo
+ Habkost <eduardo@habkost.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	=?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>, Yanan Wang
+	<wangyanan55@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Richard Henderson
+	<richard.henderson@linaro.org>, Eric Blake <eblake@redhat.com>, Markus
+ Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+	=?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell
+	<peter.maydell@linaro.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Zhenyu Wang
+	<zhenyu.z.wang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, Yongwei Ma
+	<yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
+Subject: RE: [RFC 4/8] hw/core: Add cache topology options in -smp
+Thread-Topic: [RFC 4/8] hw/core: Add cache topology options in -smp
+Thread-Index: AQHaY9zhac1dKVm9KUeTp1HqzZbrarEfSC7g
+Date: Wed, 28 Feb 2024 05:38:33 +0000
+Message-ID:
+ <BJSPR01MB05618A7D409C2DE3E408345C9C58A@BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn>
+References: <20240220092504.726064-1-zhao1.liu@linux.intel.com>
+ <20240220092504.726064-5-zhao1.liu@linux.intel.com>
+In-Reply-To: <20240220092504.726064-5-zhao1.liu@linux.intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ0PR11MB4781:EE_
-x-ms-office365-filtering-correlation-id: c2b2409e-57ca-44c8-b46f-08dc38198a63
+x-ms-traffictypediagnostic: BJSPR01MB0561:EE_|BJSPR01MB0660:EE_
+x-ms-office365-filtering-correlation-id: ef73f824-358b-461e-f815-08dc381f8082
 x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: YMJ1ZjpHIoY67Zq2lLinpjBJ6wzU5lTRnYU+zIjO8xpY3WsrWJWBZmiqTESYvMKEGMXUE9/ok2UyqQz1BG7fAKY2Sa2fo1W2qIEa+o+dYQ5F6Cemj1+q4vHis+ccsXwYifWO7wTWV4gHIjm0BtUknzz5audcnDZ+TSKAXoN4/iuymbSj/kS7+74RLC/NXeWx1UvVnbCOI5JM8MQI9V2WZ8o13wrfKtHT/TnGXw/8MEK7LauZClxYEC4uOdYS1dPRRl3tdJkQNMnlFdxmWRMKybKi8YA+4XHRroJBbQD1N5FpHeOdW4XARUqc6e8qXYyQ3TpsxQAIFjd+EnYFDqWATI+IoCDMeK+Oi4kUW2e9BvNQRDLZ7ODOg10DXLiuX8AIGTcRTcAwBOy0ATU0GG8zOmrH+wS7v7jphg3QR/e5eIfBmLpyHaJHKqFFLNprl0XrIWYR9SeKShkrtRozuetgOI4PpvgTgwbAu2xdXjA96+HQe9aHjyOewZqoMRbA1bsblCneipuy4nIFZVoxCxLyauFRa497Y5H5pGxU1um6UuKHCQOVt+MIYV6Hwm03vf4ZThk96ZiPdF/Idwqnx80ls+FMhMrYE4lEIYOM/VrmgJQW62P0Pyv8EJud85tDbRrHAPnm+P1XMSk7X6XNcbqCk5vS6nZxPjG6T41IFkX+26abjovqpVhxRe1IhIczXdFCkvpUyFIa47hH9Vy+I6dVQNt+CPvZmk6q36is69V9ziI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
+x-microsoft-antispam-message-info:
+ 4OHnog0gJpMs5X7qooXax/QOlFy900m9uQ/KbdET1l5gSKChPfYUMwoAorVlaDANSHgcG+KYBoicIu1+yUdhYuJnJBJsndzpF0E/bk6rNyeJEnGUYEQVNslHOXierOZGeFZvvtxswXoAbtz1iYY8si3XGyaPBUXybDNINGaJLfls1d5czt6/08xWX2tYxObGbNZ3a7y1qlQYrxC/1UzjdMggUH6xSeT3otrPbVOWji9awpN7oTlVPvcHzqGTxFapnj/v7fLXScw3/ZLUZSiHwKCKHjUH1ALc0y6OT7OLIfu2n9A1VdXLrWoYyl8JNrOGyDsCe+tnkwI8vh+2CEGh0C44J10h200tGjgGHXv2qVt8N2ClccgeZJyap4OfcoBLNFiXKhoGmztz91swnLv4VT+F8Z+utdbRn4tl3xuuEzJCFbzAE1rG67AFbqhDfrzmxvSpT+Rjlx27dC9eAWCAo2jisQTT9iQzJa+Xj8kLTSn9UMMGSuZ3SSRaOPWm/ZYvB6a/2DyYH+WTVEBg1EmAuvWtYA6WTFzCew5cWUSfV923yYZP5vN/hQq0tYx5STxVUmMWs7RzdAPfQ1bOivMscXtR0zkkomOszD8K3fAiETWJacReHIQKj8NiQAah66KBuqSRZlJIkpo5C4ahTjc3gA==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(38070700009)(921011);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?sh9B2D54eZycLT7X8P+d67tkVORBPSxvaE3lDZLqhT/t05zH9XQGAiHSArXP?=
- =?us-ascii?Q?494d3hqr2zvSoKxzBSz5SLs4+NyTAsTnKvE/nKpp8Xdi2d8BmTSFo3DepXBJ?=
- =?us-ascii?Q?xnFXA70OD56yBIRU5iYx59lPcheGjtgccUdd1157wJA7P6vsgadGsABWsz6V?=
- =?us-ascii?Q?WY5kkx9zFV5UGInDY4R+aMSb7aU9o0fgxfsnalNXOuH7ZQbij6UWi/wzx4sE?=
- =?us-ascii?Q?md9SHUvkYZFv4k9TVtvpJQhVAxIpCsUB+hsuzfrhe3qiTLlRv+SaH0owjhdP?=
- =?us-ascii?Q?NEE+Ufvk02Qd/pPuc92ARImiYfAukvWejRoiUGM5euVc9RLHYcD9oIUiaPnJ?=
- =?us-ascii?Q?khkyFExVcId4OXoEcDzx7XVJZuN6hEIuDvDhl6apytZNMo4g7RRODsggBwmt?=
- =?us-ascii?Q?BmHE7ym0uVGXnuHrzrKbYnuog+GZQcgI0CmtvIPmqXp08M2Dwj39OXiyHUtj?=
- =?us-ascii?Q?sGrEZ3OUSf88yyWBWBujDlVASt/7TH33L6fqO2OLsUIhaUMrSeizRgOjkfki?=
- =?us-ascii?Q?dAJydH8FTXMgL6XqEWTbkHRZfHxI70uVskhh9uRjOl+9qaraeKkT5NRB0DzE?=
- =?us-ascii?Q?FhOe7T70evRsDVpUW4ZQNJSJf4T2A3zRWZo98Smwe6iwEI2x8FNHE6Zvj+BV?=
- =?us-ascii?Q?h42EsW0RdpVS0QBBkYlpYBulOJRsyGr80ofIK5sX8oW3P7WwtnCQAAaymyCx?=
- =?us-ascii?Q?uDNNZJTw2vMJvuNpuEVCSN7uHB6IUJULDHEbPsLgCXbhAaWnt2cDyDKa6Rhu?=
- =?us-ascii?Q?7AIY/UvRDDRkyngexuY+DfQpEjZ0wnFnDQgmeJgVUaZpsa0wjGTM0LzQWleS?=
- =?us-ascii?Q?YEnGDKhNlzxRhYDKrGeGtnspJkxv5rVvwpKQ0niudjedKh1THO79qzt+YtTt?=
- =?us-ascii?Q?ZtfaRZaw7MXKG86k8xiqGV8oJnBVhc3iNZgvwjDtJHD9+7AyKYPIGohrZ9QC?=
- =?us-ascii?Q?w8vGKHHVEK4p8Mmm4Eu2+ZAOScwlERL9h+kFNijYKtKUfy2geGvqp5pFxkyS?=
- =?us-ascii?Q?ABiM2OreNpgcUCQBJI5E60QRLRlvrDo9FLoH68s5BDzhqPjyU9UEGXhZuP3Q?=
- =?us-ascii?Q?e1D3b5WBnz1iOaU9vXm6Wrzj0yPGyVzSquK2sUuBKoT4E9DSpMhxS9x5Ek/X?=
- =?us-ascii?Q?VfmJ3XFX/eVXBVr9PAwWlpBI/GFZJ9EaM9zHlw4BoDAK/qY0FSqSEjssL+H9?=
- =?us-ascii?Q?7mTYKc0ZWf9ASOYWO7MKYMHvKxPniyyUL37LiDTEKzL0UBsp2OPZlqvu4M4+?=
- =?us-ascii?Q?eG0n/W6gdQUIA0bmRbD1ZgGMLKyQEVC/WW4pXcQUEVrpnESQWU2OlswPi7D6?=
- =?us-ascii?Q?obkFlW88sW0iUmaNW8yDet6Z7jW+lYqHxAVipAbHxqSD3ymuoapFpvf3nHWn?=
- =?us-ascii?Q?ipmUP3VwanlEMsl3qMRlv/4DKbM1mkMI/nWHdJSTu/zePfV4/RYNMbWaBtJd?=
- =?us-ascii?Q?RoYXJd28/smUz9miETH/b89wFOpl+T/BpY9+WBNcQ9NT7Pv7hnAnlmtlQiYY?=
- =?us-ascii?Q?gsV+qAH6yO+o3UQUMtpD5B/cpi+4Oe5KaSg6jMZsaM+UW2Mr+bLEPKN8Bsv8?=
- =?us-ascii?Q?bpnwcctD3hSIotng5hJcYqmNHFW7DlNnLVJpLCnH?=
-Content-Type: text/plain; charset="us-ascii"
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?wgns+GdTjLvBmhQwaj224Za7m//rAdioTwDhXGCvJKOv36mNhckcFneCwr?=
+ =?iso-8859-1?Q?fdMVDc+XggLWHxPqZMlt/MdP0SOd2V7j0RM0rN76UkwxlETo2pkgLbaL6i?=
+ =?iso-8859-1?Q?HnN+qBmHQxw8QdQ3LIuR/Y2Uy6Pg5eXwOfSKiBaDt61tUKS3zXvE1AKFBb?=
+ =?iso-8859-1?Q?StXFLvbcNZzeYutJ8dkYm5tX7qCmw2m5IBG2wlmmL3nxAF8FEOdJNUawfO?=
+ =?iso-8859-1?Q?nT5yalhnGSvEtz2iYozZ6UPCefhjZQZ9fAoGFgh3NZveOtDIMewlYs8XNG?=
+ =?iso-8859-1?Q?buqql8msqGFvXh7CVmwY+G8FTGrbmUu2l6+cP0xgLx7MIJvopAgszSa+EI?=
+ =?iso-8859-1?Q?Y8tlei07V4nAo56Oap7ubgNg7/t9dHcUC4jWBn5XObw4RlV4/bg9gb3Rew?=
+ =?iso-8859-1?Q?xOsjPcmigiMe8KQDF7L4zOI8NW5r4vLPdc9IBFpMEIGZnYnVoDLEKymDVW?=
+ =?iso-8859-1?Q?fCaWIworJsX78vnP/2jV1Ujs/ST6hI5aemokQTTlaKz+KOSNnRbfz92XiO?=
+ =?iso-8859-1?Q?YFY1in1MkXoVbG4CsCm+PwTB73zE5vYHr0xDYeXmV6aSoBNvH1+hez4RTD?=
+ =?iso-8859-1?Q?1wLn0hMS8brlHwHReWWI48uceFds4JfBCZSh/8U4lVEt/HmPcRs0PljEzK?=
+ =?iso-8859-1?Q?0CwEZNKvz+HTPClShZgl9sDz/C44TmpBuZymFijr98to+zQceRpZbthwlJ?=
+ =?iso-8859-1?Q?xhOvEZUHXBQ6aGmdkmHFZjylZaE3b9sljrDI80qyVNto8YcXTqWs3+45n5?=
+ =?iso-8859-1?Q?XEAYkZ/cGUBnNjNOpM8doGrR58SYpz00Zefjwqb3vionH+PQq10pro5Idz?=
+ =?iso-8859-1?Q?cEfMsBAmWoSOvyeO93vsXS3We9txmv9H5LZ060lLDoRjUIy4AGGeySjj5A?=
+ =?iso-8859-1?Q?4+Lg65nqybkFZYogRMPuJGvX1awHuGl0B/JeNrjpqouDARJ9enZRuvi9i4?=
+ =?iso-8859-1?Q?qATDssgAeo6zjTpGCai2UvJjY0VAEfsIqjx9dbUVFZIK/Z9wsS9GUuGKQQ?=
+ =?iso-8859-1?Q?utgB0jR02MtPvKm1rTJDxFxvoI98nR+Fii0w5cogB/qppR2d5hAYjz4VVL?=
+ =?iso-8859-1?Q?qxKgrxutcgSA6pvWmJviiuceWwX/T0ElQ2WhQUA2d2ZmV78xaDCd29LEEp?=
+ =?iso-8859-1?Q?/NzXIYmhO+yEfu643mCbc1B+0ruIIpaez+xH43uHaBRcpH3HebAJWpcPqS?=
+ =?iso-8859-1?Q?Xq4ks8dQRBV0algy85YMybcKdfpYeuCGAK4vLQyYaYLbVVmrkxwc8ovwWf?=
+ =?iso-8859-1?Q?67vjwKY7Xh+P3CLm1mwpLHBP/JwGngRxQdisRSYtfQoDg2ohkkexteOAgj?=
+ =?iso-8859-1?Q?eBmb2gePjS5QfC0d/cZqIcwRENWpmJDkTCTSjOuT5usd0Z0ojvmcXbCXxl?=
+ =?iso-8859-1?Q?FPm/iLExBZNNSzOwA/o//x/cvDGwcpJVKRaakJlsa34N4Y0CE83NEs6puC?=
+ =?iso-8859-1?Q?7Nhxo1cKZsCXdF02KCs0HAgdDsXxldMN/SMwWS/CdzjazeJbbYGgkJD5uL?=
+ =?iso-8859-1?Q?wIm8bfs1Y2ZHVVMM47BdvdteX4cyYsCW6sjf0ggYY/5SypeBC8zHkWrfrc?=
+ =?iso-8859-1?Q?ipuCFMP5YcJcIfKu9xkb1KCvXb8eqdT9e/bh0yrC6QY426VkskYq0HqJPJ?=
+ =?iso-8859-1?Q?h47BBP00Sm4SLPUgiT4jL/z5vApDuDwfcHgQA29z7XrC4Ifwy/YhJrTQ?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -155,31 +127,293 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: starfivetech.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2b2409e-57ca-44c8-b46f-08dc38198a63
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Feb 2024 04:55:52.6515
+X-MS-Exchange-CrossTenant-AuthSource: BJSPR01MB0561.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef73f824-358b-461e-f815-08dc381f8082
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Feb 2024 05:38:33.0515
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Et5WquG9Fcqna+C82BLEXxn2QhujAFM3kZtl7Wec4h7FTDlQkFXJRo+AOe6FKvuh0JJu5M3ok+0sCR3R0RgmWQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4781
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-userprincipalname: 9LJKKtIeHJBuRWnhtyG3Zc4nyvm0UypDZpz8A11nCOEYRS5pVeFwjpRC4EVLZyA624TaL6MBP36VR+wRjHFrdh9F+MV1B50lgLL68wMijTQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJSPR01MB0660
 
-> From: Brett Creeley <brett.creeley@amd.com>
-> Sent: Wednesday, February 28, 2024 8:32 AM
->=20
-> The current logic for handling resets is more complicated than it needs
-> to be. The deferred_reset flag is used to indicate a reset is needed
-> and the deferred_reset_state is the requested, post-reset, state. The
-> source of the requested reset isn't immediately obvious. Improve
-> readability by replacing deferred_reset_state with deferred_reset_type,
-> which can be either PDS_VFIO_DEVICE_RESET (initiated/requested by the
-> DSC) or PDS_VFIO_HOST_RESET (initiated/requested by the VMM).
->=20
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+
+> -----Original Message-----
+> From: Zhao Liu <zhao1.liu@linux.intel.com>
+> Sent: Tuesday, February 20, 2024 5:25 PM
+> To: Daniel P . Berrang=E9 <berrange@redhat.com>; Eduardo Habkost <eduardo=
+@habkost.net>; Marcel Apfelbaum
+> <marcel.apfelbaum@gmail.com>; Philippe Mathieu-Daud=E9 <philmd@linaro.org=
+>; Yanan Wang <wangyanan55@huawei.com>;
+> Michael S . Tsirkin <mst@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>=
+; Richard Henderson <richard.henderson@linaro.org>;
+> Eric Blake <eblake@redhat.com>; Markus Armbruster <armbru@redhat.com>; Ma=
+rcelo Tosatti <mtosatti@redhat.com>; Alex Benn=E9e
+> <alex.bennee@linaro.org>; Peter Maydell <peter.maydell@linaro.org>; Jonat=
+han Cameron <Jonathan.Cameron@huawei.com>;
+> JeeHeng Sia <jeeheng.sia@starfivetech.com>
+> Cc: qemu-devel@nongnu.org; kvm@vger.kernel.org; qemu-riscv@nongnu.org; qe=
+mu-arm@nongnu.org; Zhenyu Wang
+> <zhenyu.z.wang@intel.com>; Dapeng Mi <dapeng1.mi@linux.intel.com>; Yongwe=
+i Ma <yongwei.ma@intel.com>; Zhao Liu
+> <zhao1.liu@intel.com>
+> Subject: [RFC 4/8] hw/core: Add cache topology options in -smp
+>=20
+> From: Zhao Liu <zhao1.liu@intel.com>
+>=20
+> Add "l1d-cache", "l1i-cache". "l2-cache", and "l3-cache" options in
+> -smp to define the cache topology for SMP system.
+>=20
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> ---
+>  hw/core/machine-smp.c | 128 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/core/machine.c     |   4 ++
+>  qapi/machine.json     |  14 ++++-
+>  system/vl.c           |  15 +++++
+>  4 files changed, 160 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
+> index 8a8296b0d05b..2cbd19f4aa57 100644
+> --- a/hw/core/machine-smp.c
+> +++ b/hw/core/machine-smp.c
+> @@ -61,6 +61,132 @@ static char *cpu_hierarchy_to_string(MachineState *ms=
+)
+>      return g_string_free(s, false);
+>  }
+>=20
+> +static bool machine_check_topo_support(MachineState *ms,
+> +                                       CPUTopoLevel topo)
+> +{
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+> +
+> +    if (topo =3D=3D CPU_TOPO_LEVEL_MODULE && !mc->smp_props.modules_supp=
+orted) {
+> +        return false;
+> +    }
+> +
+> +    if (topo =3D=3D CPU_TOPO_LEVEL_CLUSTER && !mc->smp_props.clusters_su=
+pported) {
+> +        return false;
+> +    }
+> +
+> +    if (topo =3D=3D CPU_TOPO_LEVEL_DIE && !mc->smp_props.dies_supported)=
+ {
+> +        return false;
+> +    }
+> +
+> +    if (topo =3D=3D CPU_TOPO_LEVEL_BOOK && !mc->smp_props.books_supporte=
+d) {
+> +        return false;
+> +    }
+> +
+> +    if (topo =3D=3D CPU_TOPO_LEVEL_DRAWER && !mc->smp_props.drawers_supp=
+orted) {
+> +        return false;
+> +    }
+> +
+> +    return true;
+> +}
+> +
+> +static int smp_cache_string_to_topology(MachineState *ms,
+> +                                        char *topo_str,
+> +                                        CPUTopoLevel *topo,
+> +                                        Error **errp)
+> +{
+> +    *topo =3D string_to_cpu_topo(topo_str);
+> +
+> +    if (*topo =3D=3D CPU_TOPO_LEVEL_MAX || *topo =3D=3D CPU_TOPO_LEVEL_I=
+NVALID) {
+> +        error_setg(errp, "Invalid cache topology level: %s. The cache "
+> +                   "topology should match the CPU topology level", topo_=
+str);
+> +        return -1;
+> +    }
+> +
+> +    if (!machine_check_topo_support(ms, *topo)) {
+> +        error_setg(errp, "Invalid cache topology level: %s. The topology=
+ "
+> +                   "level is not supported by this machine", topo_str);
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static void machine_parse_smp_cache_config(MachineState *ms,
+> +                                           const SMPConfiguration *confi=
+g,
+> +                                           Error **errp)
+> +{
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+> +
+> +    if (config->l1d_cache) {
+> +        if (!mc->smp_props.l1_separated_cache_supported) {
+> +            error_setg(errp, "L1 D-cache topology not "
+> +                       "supported by this machine");
+> +            return;
+> +        }
+> +
+> +        if (smp_cache_string_to_topology(ms, config->l1d_cache,
+> +            &ms->smp_cache.l1d, errp)) {
+> +            return;
+> +        }
+> +    }
+> +
+> +    if (config->l1i_cache) {
+> +        if (!mc->smp_props.l1_separated_cache_supported) {
+> +            error_setg(errp, "L1 I-cache topology not "
+> +                       "supported by this machine");
+> +            return;
+> +        }
+> +
+> +        if (smp_cache_string_to_topology(ms, config->l1i_cache,
+> +            &ms->smp_cache.l1i, errp)) {
+> +            return;
+> +        }
+> +    }
+> +
+> +    if (config->l2_cache) {
+> +        if (!mc->smp_props.l2_unified_cache_supported) {
+> +            error_setg(errp, "L2 cache topology not "
+> +                       "supported by this machine");
+> +            return;
+> +        }
+> +
+> +        if (smp_cache_string_to_topology(ms, config->l2_cache,
+> +            &ms->smp_cache.l2, errp)) {
+> +            return;
+> +        }
+> +
+> +        if (ms->smp_cache.l1d > ms->smp_cache.l2 ||
+> +            ms->smp_cache.l1i > ms->smp_cache.l2) {
+> +            error_setg(errp, "Invalid L2 cache topology. "
+> +                       "L2 cache topology level should not be "
+> +                       "lower than L1 D-cache/L1 I-cache");
+> +            return;
+> +        }
+> +    }
+> +
+> +    if (config->l3_cache) {
+> +        if (!mc->smp_props.l2_unified_cache_supported) {
+> +            error_setg(errp, "L3 cache topology not "
+> +                       "supported by this machine");
+> +            return;
+> +        }
+> +
+> +        if (smp_cache_string_to_topology(ms, config->l3_cache,
+> +            &ms->smp_cache.l3, errp)) {
+> +            return;
+> +        }
+> +
+> +        if (ms->smp_cache.l1d > ms->smp_cache.l3 ||
+> +            ms->smp_cache.l1i > ms->smp_cache.l3 ||
+> +            ms->smp_cache.l2 > ms->smp_cache.l3) {
+> +            error_setg(errp, "Invalid L3 cache topology. "
+> +                       "L3 cache topology level should not be "
+> +                       "lower than L1 D-cache/L1 I-cache/L2 cache");
+> +            return;
+> +        }
+> +    }
+> +}
+> +
+>  /*
+>   * machine_parse_smp_config: Generic function used to parse the given
+>   *                           SMP configuration
+> @@ -249,6 +375,8 @@ void machine_parse_smp_config(MachineState *ms,
+>                     mc->name, mc->max_cpus);
+>          return;
+>      }
+> +
+> +    machine_parse_smp_cache_config(ms, config, errp);
+>  }
+>=20
+>  unsigned int machine_topo_get_cores_per_socket(const MachineState *ms)
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 426f71770a84..cb5173927b0d 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -886,6 +886,10 @@ static void machine_get_smp(Object *obj, Visitor *v,=
+ const char *name,
+>          .has_cores =3D true, .cores =3D ms->smp.cores,
+>          .has_threads =3D true, .threads =3D ms->smp.threads,
+>          .has_maxcpus =3D true, .maxcpus =3D ms->smp.max_cpus,
+> +        .l1d_cache =3D g_strdup(cpu_topo_to_string(ms->smp_cache.l1d)),
+> +        .l1i_cache =3D g_strdup(cpu_topo_to_string(ms->smp_cache.l1i)),
+> +        .l2_cache =3D g_strdup(cpu_topo_to_string(ms->smp_cache.l2)),
+> +        .l3_cache =3D g_strdup(cpu_topo_to_string(ms->smp_cache.l3)),
+Let's standardize the code by adding the 'has_' prefix.
+>      };
+>=20
+>      if (!visit_type_SMPConfiguration(v, name, &config, &error_abort)) {
+> diff --git a/qapi/machine.json b/qapi/machine.json
+> index d0e7f1f615f3..0a923ac38803 100644
+> --- a/qapi/machine.json
+> +++ b/qapi/machine.json
+> @@ -1650,6 +1650,14 @@
+>  #
+>  # @threads: number of threads per core
+>  #
+> +# @l1d-cache: topology hierarchy of L1 data cache (since 9.0)
+> +#
+> +# @l1i-cache: topology hierarchy of L1 instruction cache (since 9.0)
+> +#
+> +# @l2-cache: topology hierarchy of L2 unified cache (since 9.0)
+> +#
+> +# @l3-cache: topology hierarchy of L3 unified cache (since 9.0)
+> +#
+>  # Since: 6.1
+>  ##
+>  { 'struct': 'SMPConfiguration', 'data': {
+> @@ -1662,7 +1670,11 @@
+>       '*modules': 'int',
+>       '*cores': 'int',
+>       '*threads': 'int',
+> -     '*maxcpus': 'int' } }
+> +     '*maxcpus': 'int',
+> +     '*l1d-cache': 'str',
+> +     '*l1i-cache': 'str',
+> +     '*l2-cache': 'str',
+> +     '*l3-cache': 'str' } }
+>=20
+>  ##
+>  # @x-query-irq:
+> diff --git a/system/vl.c b/system/vl.c
+> index a82555ae1558..ac95e5ddb656 100644
+> --- a/system/vl.c
+> +++ b/system/vl.c
+> @@ -741,6 +741,9 @@ static QemuOptsList qemu_smp_opts =3D {
+>          }, {
+>              .name =3D "clusters",
+>              .type =3D QEMU_OPT_NUMBER,
+> +        }, {
+> +            .name =3D "modules",
+> +            .type =3D QEMU_OPT_NUMBER,
+>          }, {
+>              .name =3D "cores",
+>              .type =3D QEMU_OPT_NUMBER,
+> @@ -750,6 +753,18 @@ static QemuOptsList qemu_smp_opts =3D {
+>          }, {
+>              .name =3D "maxcpus",
+>              .type =3D QEMU_OPT_NUMBER,
+> +        }, {
+> +            .name =3D "l1d-cache",
+> +            .type =3D QEMU_OPT_STRING,
+> +        }, {
+> +            .name =3D "l1i-cache",
+> +            .type =3D QEMU_OPT_STRING,
+> +        }, {
+> +            .name =3D "l2-cache",
+> +            .type =3D QEMU_OPT_STRING,
+> +        }, {
+> +            .name =3D "l3-cache",
+> +            .type =3D QEMU_OPT_STRING,
+>          },
+>          { /*End of list */ }
+>      },
+> --
+> 2.34.1
+
 
