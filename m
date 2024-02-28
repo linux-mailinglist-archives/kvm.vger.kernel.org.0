@@ -1,253 +1,172 @@
-Return-Path: <kvm+bounces-10213-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0635086AB50
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 10:33:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62D2286AB66
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 10:35:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 878291F24969
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 09:33:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B83501F27774
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 09:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073663A28D;
-	Wed, 28 Feb 2024 09:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FCD364BF;
+	Wed, 28 Feb 2024 09:34:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hrGJahEJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B4A15C8;
-	Wed, 28 Feb 2024 09:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5B736133;
+	Wed, 28 Feb 2024 09:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709112734; cv=none; b=GRPNZs3fwpfgwJ5u4bCz8/OK9fUDoa3YX38cl/SHOFlR7RPxp4iwyTDq5qMuWRuy3ZqTHGOGPAzAqy5t+Fj6B2VbOg3yWHd7uYl3p0oFbIJ+Lb9pSra64WSvCgZqC4yeqWDZkya6lF7OcHkx3ELkEH02FolHgBGwYA0T193dJw8=
+	t=1709112880; cv=none; b=ovzRqh7SuH2rPisC8kjXe2pyXmMFXPSiEEBilau9A/C040ANdyO/8H2TbriN2c0J2NtFL6Ho+vru42Pf2hp0bCV93pfHyfOGhQeFq7uJNjDs8yUSe1e5tvu9mQLUTfRF57i8g3yInT7mLU1BZ4tQ+wZHLXtdrj8f0/CKDZ2gUaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709112734; c=relaxed/simple;
-	bh=EkOVPmyG8AwI1ztH4WPEnwo5N1dm4jflvATq8fvXt7Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oBEasp2xzmnrAuaolAAxHjtTtzhInoV/r5sbATM2uBVto9/f/xPNgxSxNajqfyAhqQ3SMkQcn0CqivNdG+KaPMgdQ9jT1jLoy7eI9iIIHelTPaNY+jERTrQiI5uM5Sn1pMibkaVOTkS10kMYsr7vbax9fW3yM5b3cBEEm7EosVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Tl8Fn0V8Lz1h0nt;
-	Wed, 28 Feb 2024 17:29:49 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id D037F1404F1;
-	Wed, 28 Feb 2024 17:32:03 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 28 Feb 2024 17:32:03 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Jason Wang <jasowang@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <bpf@vger.kernel.org>
-Subject: [PATCH net-next v6 4/5] vhost/net: remove vhost_net_page_frag_refill()
-Date: Wed, 28 Feb 2024 17:30:11 +0800
-Message-ID: <20240228093013.8263-5-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240228093013.8263-1-linyunsheng@huawei.com>
-References: <20240228093013.8263-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1709112880; c=relaxed/simple;
+	bh=Cf7Ab1S5Azi7ftJlAgSjDp6AD00chiKeVOaFhJkgUqo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fIsqipA/KKwzQMx9SPmmmZ4p5HFR5/o3fvajeqD4fDFh8yX6udCt/SncWHsxAUOO7dMULSBPaKzeI3aRWhrouq5j1wdvGtMWm7WrWq4W3arOfQaCfGXjs3Dq/JX5btc95Q45UXRJN/RCXhFyvz8T7+IM3HqIjEjeOm2QXz+Nisc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hrGJahEJ; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5cddc5455aeso4905606a12.1;
+        Wed, 28 Feb 2024 01:34:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709112878; x=1709717678; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BnTxzgDB4D6z5X/XWZgAEvdqEsYIyodUJ23UluDAgo8=;
+        b=hrGJahEJja+59nTNLV8vTZpK5nHU2IWAh/hfK58Fwewtfy0la4gn6b5vC43Df9ybx9
+         oTa/ea6wsUI7shS0sUl/F2TQYAIlYdUHqMmqwaaQUPDmL0z5eBuSNDkGkNtrdmFapUEv
+         iaRGYDc8zlmkztVHWuAOLJQEPAR4+FlVALMMKjrslPaREuScwnS1WtD6+FLQQV4lB0l+
+         u3CU1HpUlu1WqfBgu/GinA90JyTbs8oX5vzjPJBvSm1ereLbyvfjORLumwyIdez4G8U2
+         ynTJEk6JJ6SxAYdX5TVe35DgWQ/V+vMxtWYUiKFd91tKjp+6ysIJNinwU2mN0f5x9o4y
+         cdew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709112878; x=1709717678;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BnTxzgDB4D6z5X/XWZgAEvdqEsYIyodUJ23UluDAgo8=;
+        b=YRG8rpYwLpVB3pwSRXANdox2pfISfFBfY5R+rHnWG1BRPdTvHQA4Swc/AftlebsSPX
+         9/z2hgprGPF4mY7miXjCv4YAuS6jyHix6kK8AobYEtUi7ISO9eElHJnJdWE0OyElBP0Y
+         c1x/U81rieL5zItFagqI0ZFvXukXroqkx/WxwsX+wj+DNhBbrsSBucCKrpUp+cqYDPk1
+         SgzfNrZN3RnRPA67JhbpPDP84YVcKWe3T0VcObY/WhxtnXopWa4AEURkkkbiP49x94+Q
+         75rjJBbP5k85k8swhgtk9hz5ES82UUDMAd6MGxeGId2OjZXElWFEuaIKXP+2/1k1aF1i
+         8d0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXSVrcGem6ulktbKxBBvXrqTHuAQtwqdS7CROayk01qI5dFuuXM6bZzbocI0s9aFYsHfcvcQyHri2Azn1uwkaWwC6toQsWEnvG5JxspdnviZAR3Tn7nvokIW6GYFHPX5APb
+X-Gm-Message-State: AOJu0Yx23xKd6rt74p+AIzztaDqtwS6EPToUPREP707lPPbQAV+NJQip
+	qs66AbvZ4RE/Gz7QNHp/EsAQxqCEFWbtDoCh6tJ1wWfGShzz91M1
+X-Google-Smtp-Source: AGHT+IGuQ8W5px8wKjurGo44FSp62ASDSBPR2Tehpe/JisAe2FtfFe9UEtCIaamJIUbV1mDvADh8YA==
+X-Received: by 2002:a05:6a20:c116:b0:1a0:fc33:17b8 with SMTP id bh22-20020a056a20c11600b001a0fc3317b8mr3634526pzb.24.1709112878380;
+        Wed, 28 Feb 2024 01:34:38 -0800 (PST)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id f19-20020a17090aa79300b0029ab73a80a2sm1104370pjq.22.2024.02.28.01.34.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 01:34:37 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id 6442518515716; Wed, 28 Feb 2024 16:34:34 +0700 (WIB)
+Date: Wed, 28 Feb 2024 16:34:33 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: seanjc@google.com, michael.roth@amd.com, aik@amd.com
+Subject: Re: [PATCH v3 05/15] Documentation: kvm/sev: separate description of
+ firmware
+Message-ID: <Zd7-KWFGOXGs_iOu@archie.me>
+References: <20240226190344.787149-1-pbonzini@redhat.com>
+ <20240226190344.787149-6-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="eUPRBjCtZiK17fws"
+Content-Disposition: inline
+In-Reply-To: <20240226190344.787149-6-pbonzini@redhat.com>
 
-The page frag in vhost_net_page_frag_refill() uses the
-'struct page_frag' from skb_page_frag_refill(), but it's
-implementation is similar to page_frag_alloc_align() now.
 
-This patch removes vhost_net_page_frag_refill() by using
-'struct page_frag_cache' instead of 'struct page_frag',
-and allocating frag using page_frag_alloc_align().
+--eUPRBjCtZiK17fws
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The added benefit is that not only unifying the page frag
-implementation a little, but also having about 0.5% performance
-boost testing by using the vhost_net_test introduced in the
-last patch.
+On Mon, Feb 26, 2024 at 02:03:34PM -0500, Paolo Bonzini wrote:
+> +``KVM_MEMORY_ENCRYPT_OP`` API
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
 
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vhost/net.c | 91 ++++++++++++++-------------------------------
- 1 file changed, 27 insertions(+), 64 deletions(-)
+Nit: I think to be consistent, with command names in section headings below,
+the API name heading above should not be inlined.
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index e574e21cc0ca..4b2fcb228a0a 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -141,10 +141,8 @@ struct vhost_net {
- 	unsigned tx_zcopy_err;
- 	/* Flush in progress. Protected by tx vq lock. */
- 	bool tx_flush;
--	/* Private page frag */
--	struct page_frag page_frag;
--	/* Refcount bias of page frag */
--	int refcnt_bias;
-+	/* Private page frag cache */
-+	struct page_frag_cache pf_cache;
- };
- 
- static unsigned vhost_net_zcopy_mask __read_mostly;
-@@ -655,41 +653,6 @@ static bool tx_can_batch(struct vhost_virtqueue *vq, size_t total_len)
- 	       !vhost_vq_avail_empty(vq->dev, vq);
- }
- 
--static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
--				       struct page_frag *pfrag, gfp_t gfp)
--{
--	if (pfrag->page) {
--		if (pfrag->offset + sz <= pfrag->size)
--			return true;
--		__page_frag_cache_drain(pfrag->page, net->refcnt_bias);
--	}
--
--	pfrag->offset = 0;
--	net->refcnt_bias = 0;
--	if (SKB_FRAG_PAGE_ORDER) {
--		/* Avoid direct reclaim but allow kswapd to wake */
--		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
--					  __GFP_COMP | __GFP_NOWARN |
--					  __GFP_NORETRY | __GFP_NOMEMALLOC,
--					  SKB_FRAG_PAGE_ORDER);
--		if (likely(pfrag->page)) {
--			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
--			goto done;
--		}
--	}
--	pfrag->page = alloc_page(gfp);
--	if (likely(pfrag->page)) {
--		pfrag->size = PAGE_SIZE;
--		goto done;
--	}
--	return false;
--
--done:
--	net->refcnt_bias = USHRT_MAX;
--	page_ref_add(pfrag->page, USHRT_MAX - 1);
--	return true;
--}
--
- #define VHOST_NET_RX_PAD (NET_IP_ALIGN + NET_SKB_PAD)
- 
- static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
-@@ -699,7 +662,6 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
- 	struct vhost_net *net = container_of(vq->dev, struct vhost_net,
- 					     dev);
- 	struct socket *sock = vhost_vq_get_backend(vq);
--	struct page_frag *alloc_frag = &net->page_frag;
- 	struct virtio_net_hdr *gso;
- 	struct xdp_buff *xdp = &nvq->xdp[nvq->batched_xdp];
- 	struct tun_xdp_hdr *hdr;
-@@ -710,6 +672,7 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
- 	int sock_hlen = nvq->sock_hlen;
- 	void *buf;
- 	int copied;
-+	int ret;
- 
- 	if (unlikely(len < nvq->sock_hlen))
- 		return -EFAULT;
-@@ -719,18 +682,17 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
- 		return -ENOSPC;
- 
- 	buflen += SKB_DATA_ALIGN(len + pad);
--	alloc_frag->offset = ALIGN((u64)alloc_frag->offset, SMP_CACHE_BYTES);
--	if (unlikely(!vhost_net_page_frag_refill(net, buflen,
--						 alloc_frag, GFP_KERNEL)))
-+	buf = page_frag_alloc_align(&net->pf_cache, buflen, GFP_KERNEL,
-+				    SMP_CACHE_BYTES);
-+	if (unlikely(!buf))
- 		return -ENOMEM;
- 
--	buf = (char *)page_address(alloc_frag->page) + alloc_frag->offset;
--	copied = copy_page_from_iter(alloc_frag->page,
--				     alloc_frag->offset +
--				     offsetof(struct tun_xdp_hdr, gso),
--				     sock_hlen, from);
--	if (copied != sock_hlen)
--		return -EFAULT;
-+	copied = copy_from_iter(buf + offsetof(struct tun_xdp_hdr, gso),
-+				sock_hlen, from);
-+	if (copied != sock_hlen) {
-+		ret = -EFAULT;
-+		goto err;
-+	}
- 
- 	hdr = buf;
- 	gso = &hdr->gso;
-@@ -743,27 +705,30 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
- 			       vhost16_to_cpu(vq, gso->csum_start) +
- 			       vhost16_to_cpu(vq, gso->csum_offset) + 2);
- 
--		if (vhost16_to_cpu(vq, gso->hdr_len) > len)
--			return -EINVAL;
-+		if (vhost16_to_cpu(vq, gso->hdr_len) > len) {
-+			ret = -EINVAL;
-+			goto err;
-+		}
- 	}
- 
- 	len -= sock_hlen;
--	copied = copy_page_from_iter(alloc_frag->page,
--				     alloc_frag->offset + pad,
--				     len, from);
--	if (copied != len)
--		return -EFAULT;
-+	copied = copy_from_iter(buf + pad, len, from);
-+	if (copied != len) {
-+		ret = -EFAULT;
-+		goto err;
-+	}
- 
- 	xdp_init_buff(xdp, buflen, NULL);
- 	xdp_prepare_buff(xdp, buf, pad, len, true);
- 	hdr->buflen = buflen;
- 
--	--net->refcnt_bias;
--	alloc_frag->offset += buflen;
--
- 	++nvq->batched_xdp;
- 
- 	return 0;
-+
-+err:
-+	page_frag_free(buf);
-+	return ret;
- }
- 
- static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-@@ -1353,8 +1318,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->page_frag.page = NULL;
--	n->refcnt_bias = 0;
-+	n->pf_cache.va = NULL;
- 
- 	return 0;
- }
-@@ -1422,8 +1386,7 @@ static int vhost_net_release(struct inode *inode, struct file *f)
- 	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
- 	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
- 	kfree(n->dev.vqs);
--	if (n->page_frag.page)
--		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
-+	page_frag_cache_drain(&n->pf_cache);
- 	kvfree(n);
- 	return 0;
- }
--- 
-2.33.0
+> =20
+>  The main ioctl to access SEV is KVM_MEMORY_ENCRYPT_OP.  If the argument
+>  to KVM_MEMORY_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
+> @@ -87,10 +81,6 @@ guests, such as launching, running, snapshotting, migr=
+ating and decommissioning.
+>  The KVM_SEV_INIT command is used by the hypervisor to initialize the SEV=
+ platform
+>  context. In a typical workflow, this command should be the first command=
+ issued.
+> =20
+> -The firmware can be initialized either by using its own non-volatile sto=
+rage or
+> -the OS can manage the NV storage for the firmware using the module param=
+eter
+> -``init_ex_path``. If the file specified by ``init_ex_path`` does not exi=
+st or
+> -is invalid, the OS will create or override the file with output from PSP.
+> =20
+>  Returns: 0 on success, -negative on error
+> =20
+> @@ -434,6 +424,21 @@ issued by the hypervisor to make the guest ready for=
+ execution.
+> =20
+>  Returns: 0 on success, -negative on error
+> =20
+> +Firmware Management
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +The SEV guest key management is handled by a separate processor called t=
+he AMD
+> +Secure Processor (AMD-SP). Firmware running inside the AMD-SP provides a=
+ secure
+> +key management interface to perform common hypervisor activities such as
+> +encrypting bootstrap code, snapshot, migrating and debugging the guest. =
+For more
+> +information, see the SEV Key Management spec [api-spec]_
+> +
+> +The AMD-SP firmware can be initialized either by using its own non-volat=
+ile
+> +storage or the OS can manage the NV storage for the firmware using
+> +parameter ``init_ex_path`` of the ``ccp`` module. If the file specified
+> +by ``init_ex_path`` does not exist or is invalid, the OS will create or
+> +override the file with PSP non-volatile storage.
+> +
 
+This one LGTM.
+
+Other than the nit,
+
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--eUPRBjCtZiK17fws
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZd7+IAAKCRD2uYlJVVFO
+o162AQCcn8Ku0qmJzR0aVZhAlymyxJjRteYpeKWfN7U4NfghawEAkNBc12XmmmJP
+8LB8u3zNlnOBbkVipGKxB+YnRI5WQQ8=
+=Hybi
+-----END PGP SIGNATURE-----
+
+--eUPRBjCtZiK17fws--
 
