@@ -1,123 +1,127 @@
-Return-Path: <kvm+bounces-10211-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10212-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C847786AAE8
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 10:08:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D50286AB40
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 10:33:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68C64B285F0
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 09:08:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B8641F2389B
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 09:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EF93A1CC;
-	Wed, 28 Feb 2024 09:05:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51628381AA;
+	Wed, 28 Feb 2024 09:32:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF89D38F98;
-	Wed, 28 Feb 2024 09:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41173714C;
+	Wed, 28 Feb 2024 09:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709111132; cv=none; b=i47jlOyTDfDNljFISuGdllX+0PaNE53+IWm42PHFpiJTFz1FKQjnILXYQ4aqsMNj5/TlGupyWF8cpPPHyjaryBBQbgnMC/X/eF8/FcDnkxxKXdb1tRl37cYA8W+hKuxc5nGv4xn7uVpd1lKoEkrGHYByc9+dT9omsv+KNcfzVEc=
+	t=1709112729; cv=none; b=Y5e01R7OlRj35IFT47TmyWj5x20ogm56ntI5nP3a27xrIU9iNvPsSqt7jE6GIdtryuMECSwAHFvACLBbcMrX+sKDKzhLOkeQRlbaOJr6OqIQYUXcBnOD+j4pevpyWbSwN/U9LgtdQHcJRt+lsQ7670jLHnAhUvFEbI0Bn5jBC/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709111132; c=relaxed/simple;
-	bh=WESIMAsMI+WtLCwW+GE6axyaA0i2azKiuAhul2HjH24=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XydAYhByJo4GC8eIq/TKfxs2wpKrWXbQh7e+czvLv2iDzXCzkoG7sRNb6mCJzU/q36kS0m7VcIBubU3qhv8QzaYR+ZtGZAWlBCWwfgPXfNpgZM4iuByNDbMFEjkSf6zEicXaJnRMw5ydrdmsLzr1acGVu4z9yCjZ738zggXByfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+	s=arc-20240116; t=1709112729; c=relaxed/simple;
+	bh=nN0hXC2rCPqcNLu07ELbr6FXn/yhkJ6KwF/VMli0qYo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=phXmayKs591LvgAjKr0qVBAazyaAPT5U/33aglanxtI2TG/WsimmpC8mjq0dO9HbKHSM1rL11jb6axcNcnwSi2V/OAVktZ6CrbTo6DEFgeoFx4VnP0sl3/Nic82IzWnzYJbWowt5DQ/8rEzoCltnHNb5IYkLsEI+uAxuFtmsXZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Tl7dJ6k78z67Q86;
-	Wed, 28 Feb 2024 17:01:40 +0800 (CST)
-Received: from lhrpeml100005.china.huawei.com (unknown [7.191.160.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id D4BB8140A1B;
-	Wed, 28 Feb 2024 17:05:26 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml100005.china.huawei.com (7.191.160.25) with Microsoft SMTP Server
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Tl8BW4Jfyz1b1CP;
+	Wed, 28 Feb 2024 17:26:59 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9A90B1A0172;
+	Wed, 28 Feb 2024 17:31:58 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 28 Feb 2024 09:05:26 +0000
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.035;
- Wed, 28 Feb 2024 09:05:26 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Brett Creeley <brett.creeley@amd.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"yishaih@nvidia.com" <yishaih@nvidia.com>, "kevin.tian@intel.com"
-	<kevin.tian@intel.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: RE: [PATCH v2 vfio 0/2] vfio/pds: Fix and simplify resets
-Thread-Topic: [PATCH v2 vfio 0/2] vfio/pds: Fix and simplify resets
-Thread-Index: AQHaad2kYsrb/UByXUeVSA/PNWDN9LEfdD1A
-Date: Wed, 28 Feb 2024 09:05:26 +0000
-Message-ID: <ead300c6e249429f92a4ce124fc0fd56@huawei.com>
-References: <20240228003205.47311-1-brett.creeley@amd.com>
-In-Reply-To: <20240228003205.47311-1-brett.creeley@amd.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.1.2507.35; Wed, 28 Feb 2024 17:31:58 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, Alexander
+ Duyck <alexander.duyck@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>, <linux-mm@kvack.org>
+Subject: [PATCH net-next v6 2/5] page_frag: unify gfp bits for order 3 page allocation
+Date: Wed, 28 Feb 2024 17:30:09 +0800
+Message-ID: <20240228093013.8263-3-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20240228093013.8263-1-linyunsheng@huawei.com>
+References: <20240228093013.8263-1-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
+Currently there seems to be three page frag implementations
+which all try to allocate order 3 page, if that fails, it
+then fail back to allocate order 0 page, and each of them
+all allow order 3 page allocation to fail under certain
+condition by using specific gfp bits.
 
+The gfp bits for order 3 page allocation are different
+between different implementation, __GFP_NOMEMALLOC is
+or'd to forbid access to emergency reserves memory for
+__page_frag_cache_refill(), but it is not or'd in other
+implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
+direct reclaim in vhost_net_page_frag_refill(), but it is
+not masked off in __page_frag_cache_refill().
 
-> -----Original Message-----
-> From: Brett Creeley <brett.creeley@amd.com>
-> Sent: Wednesday, February 28, 2024 12:32 AM
-> To: jgg@ziepe.ca; yishaih@nvidia.com; Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>; kevin.tian@intel.com;
-> alex.williamson@redhat.com; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org
-> Cc: shannon.nelson@amd.com; brett.creeley@amd.com
-> Subject: [PATCH v2 vfio 0/2] vfio/pds: Fix and simplify resets
->=20
-> This small series contains a fix and readability improvements for
-> resets.
->=20
-> v2:
-> - Split single patch into 2 patches
-> - Improve commit messages
+This patch unifies the gfp bits used between different
+implementions by or'ing __GFP_NOMEMALLOC and masking off
+__GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
+possible pressure for mm.
 
-Just a query on the reset_done handler and the deferred_reset()
-logic in this driver. From a quick look, it doesn't look like you have=20
-a condition where a copy_to/from_user() is under state_mutex. So
-do you think we can get rid of the deferred_reset logic from this=20
-driver? Please see the discussion here,
-https://lore.kernel.org/kvm/20240220132459.GM13330@nvidia.com/
+Leave the gfp unifying for page frag implementation in sock.c
+for now as suggested by Paolo Abeni.
 
-For HiSilicon, we do have the lock taken for PRE_COPY, but that needs fixin=
-g
-and then can get rid of the deferred_reset. I will sent out a patch for
-that soon.
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+---
+ drivers/vhost/net.c | 2 +-
+ mm/page_alloc.c     | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Thanks,
-Shameer
-
->=20
-> v1:
-> https://lore.kernel.org/kvm/20240126183225.19193-1-
-> brett.creeley@amd.com/
->=20
-> Brett Creeley (2):
->   vfio/pds: Always clear the save/restore FDs on reset
->   vfio/pds: Refactor/simplify reset logic
->=20
->  drivers/vfio/pci/pds/pci_drv.c  |  2 +-
->  drivers/vfio/pci/pds/vfio_dev.c | 14 +++++++-------
->  drivers/vfio/pci/pds/vfio_dev.h |  7 ++++++-
->  3 files changed, 14 insertions(+), 9 deletions(-)
->=20
-> --
-> 2.17.1
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f2ed7167c848..e574e21cc0ca 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
+ 		/* Avoid direct reclaim but allow kswapd to wake */
+ 		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+ 					  __GFP_COMP | __GFP_NOWARN |
+-					  __GFP_NORETRY,
++					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+ 					  SKB_FRAG_PAGE_ORDER);
+ 		if (likely(pfrag->page)) {
+ 			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index c0f7e67c4250..636145c29f70 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -4685,8 +4685,8 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+ 	gfp_t gfp = gfp_mask;
+ 
+ #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+-	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
+-		    __GFP_NOMEMALLOC;
++	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
++		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+ 	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+ 				PAGE_FRAG_CACHE_MAX_ORDER);
+ 	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+-- 
+2.33.0
 
 
