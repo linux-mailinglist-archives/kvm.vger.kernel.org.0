@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-10192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FAE686A6BD
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 03:43:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C999D86A6BF
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 03:43:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D13BF1C2325D
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 02:43:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F615287B7A
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 02:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C7D2375B;
-	Wed, 28 Feb 2024 02:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7730250F6;
+	Wed, 28 Feb 2024 02:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l0dW/RoA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="36imo14K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6604222318
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 02:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBA122F11
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 02:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709088124; cv=none; b=atFH9PS3h58qUrbTXAxqdzLTfaLNcUI8eI0XV0Iwa8dNiEn2FC9S98SaNUsn60yyUAvVVwQR7poRZiHIpWzp7W+xsm7zWIhGzUEVr21ksW51tdQyHa5c+Xz3fF3LE6iyUIcCmAo0WRiB3YNvhO2k+wDy/MV7dSSxv1lh+tCu6fg=
+	t=1709088125; cv=none; b=cXZmr5iKMTL4f3w8MUY6DnRDDt3Ty0Rt7lYFNqFa7q8YNNaQH+e7LnN4kWdX/59bTtQqhcP89CSXTJyiSVd9Nch6Gbmdg2qu/HA1liPHi1MBaq8evZJ8gHlGB4+tQ1VnG+KQIeFrazPWuFB2fJR/3lgayR6B+SpfH2QFqPBYDRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709088124; c=relaxed/simple;
-	bh=CoPJqaD56CaWccUD0GKW7vdTTZaLbgYVBxvvvw5siQg=;
+	s=arc-20240116; t=1709088125; c=relaxed/simple;
+	bh=L+IvU42/MjztgCK7ijdWOl+7+6gX/ME9VFnO9RlLhcM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L50Dzw0+x2G9c2pVZHsqTilzwpiyU1S13jvZ+klFBm9t3RfqENzAPWmSb7N0OKGxt/PttQWRvC0Zflq3PDOFcEvadqucdTmw2yH+FI/Ls6zdBEtMjmlwoPd3oRD0va2cSLREq2LjBTJ8naptQu1BWDOjLUzcIOIESmViGs7t7Pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l0dW/RoA; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=F9ruXaH9f4ZAOffnrGSof7QOUYX5vAoUqrbQSLD/tL06U9/q6QE0Ch0iJb7mjlWYz9BmMaIY8JDlG4Dgno9SZKBKigUZ5qoZdRbPxS70nho+Hfq+OHiXWllCmuGP58mbgEhnArqWShojqs7485EfIeYUcnZxwWRX+CD1EEiR8EY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=36imo14K; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcc58cddb50so8338134276.0
-        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 18:42:02 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6e568271a21so18239b3a.3
+        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 18:42:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709088121; x=1709692921; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709088124; x=1709692924; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=gfpkuG+ZVx2am4Y182O6tFhDfs/R2qPCe9zqwBMHRpo=;
-        b=l0dW/RoAOtJbVNHxcxiV8U7Q1j379bGF3UnqtuIE8ngJoiF0UYzhU7nBY1PnwKdQXI
-         dVUVYATYFzvhZlU0Tj0tuXClA+WyRU9sYlOK1y5TVjRCiGA7SAIQkT/QIaK2NsjdjDio
-         Bz38DKgmuFyG/Hfxrw2S8NbkjU45xUXl+x/oQKao4VOcogwzBHbb0N0Wtn1L65p/70U6
-         l0m0J+6qPWgNd8WsDl2xi4ww9cUJaUDG4vh6YhwVn9dlu0ilcgY76QCfPFE1r3eeGfuO
-         qNW9eZ51fOr2wbUsRyed2daDotzep+yjVbRD6Ef4uMQSm60y6i3pczVgzjqLLabcoBMx
-         zucg==
+        bh=K1OBRBk3Vku2bidIof7TOH5MpGEdlnRqjgwLLM8pKvQ=;
+        b=36imo14K2mj75sRhHOFdmZqXxsk4fKgN5mdj1SxJvCB4aTXpxsKec8kRZ/s3y80NKg
+         Cmb1nugw8vHc0/BoCO2dZiaceUfuCXGX1GIhOaTJVjD06w1nwstw86zDulVUEExiQug7
+         ttQm0KqKUi7+UByKYvmWuxKYMbvdn4XEKlnmgCMmD4Lps/qneG9vEJhM/RQMEV47tjEt
+         Kt4d6c+kkwv4OTYDdCCFzYb7XeP/l2LfaE7XPQHywZXaBew+vAHi5WGmRU6zYwxkwA6N
+         R8jbSS0BuuHRENoFmsPXfP540dJR4/RBNLymQkT58aMI83bMhThh66yKTmn2wdpmm2vD
+         Xb/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709088121; x=1709692921;
+        d=1e100.net; s=20230601; t=1709088124; x=1709692924;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gfpkuG+ZVx2am4Y182O6tFhDfs/R2qPCe9zqwBMHRpo=;
-        b=Knlby9pf4v1fmsKi+kYJC1t+yJM3MtTr2Ze2TFlhXU7jKBQl1lskY4dQS9zMZ1Rrpq
-         Xl4/LhnUTYyC5+HamyrWAe/P0N1n6ne5RevRWIUfP9lprk1vyEi37QquwFABkwg8+kjL
-         fIOw6cfW/3vKIaYqZoic+ne8WpmEuUuj4BBJUOlSGR334CUJ+llHKtwNzAHxlKK+BLha
-         uYjQkRai6PUV5Mt49INFRxwigDQ8hO/hIEz+csnUIYlmV86F0p15sFXSDetjMHR+UB8Y
-         76R0bFUqM3UBZD8yxyQs3SUpwZhLWffRZqAjWKrwryNhXr1/4NHD/Cj0m94jk+ay1So4
-         GZBA==
-X-Gm-Message-State: AOJu0YxMmeKJwpBxZxe1NfvWxLOKTXjsgakw1FChqaoxYNBDJ73TnZUm
-	ltfpS54K/pgUVYDw8aUIavsPNsqpa3ke0GWd1xFPrjp/li1XJCsp4gafkbarjD4XYNLlioFIkAm
-	Cmw==
-X-Google-Smtp-Source: AGHT+IF3KIx/8tFZn/wJwVNrNg1+yoGtgwdvNURhlI554RnWArO0MDtvM2JKBrSbo24e866hb0I37y5xSB0=
+        bh=K1OBRBk3Vku2bidIof7TOH5MpGEdlnRqjgwLLM8pKvQ=;
+        b=PJ9Scx6jAQhIHQ0kUGoeTt0eoSE8sYHPsPFqdigfpLNMqbEoLBQNVkWutwU6YHI0MA
+         2QN9eks5/NST5GQWT+l94tVIw1D2O0pp7uSYcuRNvNnkmwyCssvUHtRNVM8JwjwuA31d
+         JyyzLYXwPwisfBy8IuM8LJ3un7IQjiHlIpiDhPNq5FOwqeMZl6u/gcsCQFbQzm092m0X
+         nNRW+6R1QO7MriUjM2mrcSaNB3gN/Mp/23eGYL5iTKsphTG7SBnmB10BCAygkHgnrMI9
+         w6+Hjqv74WWQmaZBOiJg3N6C6+MJclnKwXMuzMCCgix8sE0dgcfDmkso0amMXEZc98xC
+         llaw==
+X-Gm-Message-State: AOJu0Yy+69MPrD3dfh9crhaKC7gRfiQK38IVp64cx5LXX4pKJlF6rGHS
+	mujFO0UFd2h4wI8Y6pMafSJgsB8MbxpN19WRF6cChJalC836vZoXe4KzjgtMGtFaVlDNKW5bCUl
+	CJg==
+X-Google-Smtp-Source: AGHT+IGQjZ5u9lsKdd55GvF9bKJDkjcEFySqssBNTDbI7xO0OMlG4FC/aQm6rWPNPLP5+jfE28ifC4/mWLY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:100a:b0:dc7:53a0:83ad with SMTP id
- w10-20020a056902100a00b00dc753a083admr385599ybt.5.1709088121589; Tue, 27 Feb
- 2024 18:42:01 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1aca:b0:6e5:1196:1277 with SMTP id
+ f10-20020a056a001aca00b006e511961277mr75263pfv.6.1709088123599; Tue, 27 Feb
+ 2024 18:42:03 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 27 Feb 2024 18:41:37 -0800
+Date: Tue, 27 Feb 2024 18:41:38 -0800
 In-Reply-To: <20240228024147.41573-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240228024147.41573-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240228024147.41573-7-seanjc@google.com>
-Subject: [PATCH 06/16] KVM: x86/mmu: WARN if upper 32 bits of legacy #PF error
- code are non-zero
+Message-ID: <20240228024147.41573-8-seanjc@google.com>
+Subject: [PATCH 07/16] KVM: x86: Move synthetic PFERR_* sanity checks to SVM's
+ #NPF handler
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -87,55 +87,72 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-WARN if bits 63:32 are non-zero when handling an intercepted legacy #PF,
-as the error code for #PF is limited to 32 bits (and in practice, 16 bits
-on Intel CPUS).  This behavior is architectural, is part of KVM's ABI
-(see kvm_vcpu_events.error_code), and is explicitly documented as being
-preserved for intecerpted #PF in both the APM:
+Move the sanity check that hardware never sets bits that collide with KVM-
+define synthetic bits from kvm_mmu_page_fault() to npf_interception(),
+i.e. make the sanity check #NPF specific.  The legacy #PF path already
+WARNs if _any_ of bits 63:32 are set, and the error code that comes from
+VMX's EPT Violatation and Misconfig is 100% synthesized (KVM morphs VMX's
+EXIT_QUALIFICATION into error code flags).
 
-  The error code saved in EXITINFO1 is the same as would be pushed onto
-  the stack by a non-intercepted #PF exception in protected mode.
-
-and even more explicitly in the SDM as VMCS.VM_EXIT_INTR_ERROR_CODE is a
-32-bit field.
-
-Simply drop the upper bits of hardware provides garbage, as spurious
-information should do no harm (though in all likelihood hardware is buggy
-and the kernel is doomed).
-
-Handling all upper 32 bits in the #PF path will allow moving the sanity
-check on synthetic checks from kvm_mmu_page_fault() to npf_interception(),
-which in turn will allow deriving PFERR_PRIVATE_ACCESS from AMD's
-PFERR_GUEST_ENC_MASK without running afoul of the sanity check.
-
-Note, this also why Intel uses bit 15 for SGX (highest bit on Intel CPUs)
-and AMD uses bit 31 for RMP (highest bit on AMD CPUs); using the highest
-bit minimizes the probability of a collision with the "other" vendor,
-without needing to plumb more bits through microcode.
+Add a compile-time assert in the legacy #PF handler to make sure that KVM-
+define flags are covered by its existing sanity check on the upper bits.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/x86/kvm/mmu/mmu.c | 12 +++---------
+ arch/x86/kvm/svm/svm.c |  9 +++++++++
+ 2 files changed, 12 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7807bdcd87e8..5d892bd59c97 100644
+index 5d892bd59c97..bd342ebd0809 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4553,6 +4553,13 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 	if (WARN_ON_ONCE(fault_address >> 32))
- 		return -EFAULT;
- #endif
-+	/*
-+	 * Legacy #PF exception only have a 32-bit error code.  Simply drop the
-+	 * upper bits as KVM doesn't use them for #PF (because they are never
-+	 * set), and to ensure there are no collisions with KVM-defined bits.
-+	 */
-+	if (WARN_ON_ONCE(error_code >> 32))
-+		error_code = lower_32_bits(error_code);
+@@ -4561,6 +4561,9 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+ 	if (WARN_ON_ONCE(error_code >> 32))
+ 		error_code = lower_32_bits(error_code);
  
++	/* Ensure the above sanity check also covers KVM-defined flags. */
++	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
++
  	vcpu->arch.l1tf_flush_l1d = true;
  	if (!flags) {
+ 		trace_kvm_page_fault(vcpu, fault_address, error_code);
+@@ -5845,15 +5848,6 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+ 	int r, emulation_type = EMULTYPE_PF;
+ 	bool direct = vcpu->arch.mmu->root_role.direct;
+ 
+-	/*
+-	 * WARN if hardware generates a fault with an error code that collides
+-	 * with KVM-defined sythentic flags.  Clear the flags and continue on,
+-	 * i.e. don't terminate the VM, as KVM can't possibly be relying on a
+-	 * flag that KVM doesn't know about.
+-	 */
+-	if (WARN_ON_ONCE(error_code & PFERR_SYNTHETIC_MASK))
+-		error_code &= ~PFERR_SYNTHETIC_MASK;
+-
+ 	if (WARN_ON_ONCE(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
+ 		return RET_PF_RETRY;
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index e90b429c84f1..199c4dd8d214 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2055,6 +2055,15 @@ static int npf_interception(struct kvm_vcpu *vcpu)
+ 	u64 fault_address = svm->vmcb->control.exit_info_2;
+ 	u64 error_code = svm->vmcb->control.exit_info_1;
+ 
++	/*
++	 * WARN if hardware generates a fault with an error code that collides
++	 * with KVM-defined sythentic flags.  Clear the flags and continue on,
++	 * i.e. don't terminate the VM, as KVM can't possibly be relying on a
++	 * flag that KVM doesn't know about.
++	 */
++	if (WARN_ON_ONCE(error_code & PFERR_SYNTHETIC_MASK))
++		error_code &= ~PFERR_SYNTHETIC_MASK;
++
+ 	trace_kvm_page_fault(vcpu, fault_address, error_code);
+ 	return kvm_mmu_page_fault(vcpu, fault_address, error_code,
+ 			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
