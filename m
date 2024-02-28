@@ -1,174 +1,150 @@
-Return-Path: <kvm+bounces-10301-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10302-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38E7386B825
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 20:29:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC13A86B86D
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 20:40:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD1621F22501
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 19:29:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBA261C2541D
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 19:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0170F74431;
-	Wed, 28 Feb 2024 19:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EB3163A86;
+	Wed, 28 Feb 2024 19:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IP9BevXJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKGfXarC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819C074414
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 19:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FBB34CDE
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 19:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709148560; cv=none; b=jZmN4dIf3g3C9fiJLZl9eIRAfQz7yU5vlBIpBUYPinLjTXx0hx+1jBvZsLMUKMd0Fa8Rc0Xi5IRbdNZwCT7DDuehZNDR27LD6Bp9eFf5phfJX15MYDL4RSLL+mRVULmqgdxu1ozPqVlstIfEXLY5mqogfCcizMC/6edVaj83nyQ=
+	t=1709149097; cv=none; b=Mry57ydAbOYMLoBXxzFTZZU6wm/uL8YEiNI66wadJ+2hQ5biMAp/nYVKGE2WoSqF+DB9pSTrdzYa3C99fs9belI1EW0QuqiBrAtywpOj/LGLpRAaB9U5hnLV5NWyB2BuPvoYhkmFeshKdq63bnmTPzku5M1EDkkFN5mdNi361uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709148560; c=relaxed/simple;
-	bh=HDIINGy+g4s1hGSMPco1nC2p3P5zb08MwBm6RlGXfn8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q2Lymu1FAzFIBYwXLbqpR/uMlvh7tAFnb4S7zEy3jkNoRh1hdopJvfe4kZWqEyWREP89uw/ttUqIN52UWsxhLRwxoq2EhQK2ZuWBnqDGuuX3j0iBs8t2LHs7YWKbGR2Kn9FLMKrxn36eMBoEdNpSgKbhiAz5tlsommzuz9OE75o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IP9BevXJ; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6047fed0132so2031757b3.1
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 11:29:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709148557; x=1709753357; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z7saMouekiNL4SDnY8l1WG6+uM8tId4as9SNT1MABgI=;
-        b=IP9BevXJd3HC4O9fDEXGpCRqJwv6FN40NePcqJZSiF/eesXruDf5uoiaOkMMYW3aKk
-         f2ezIC2fJlC8HqQHP9/bjSa5Vv03lRQWEAlHtkC4Bso2sV/XRRX4PWUjtlP7RTFBDl8N
-         EidRPb8lyh3Fpywe93H2Joh2Zzg3ACFZ2xohYhxmbuiE2FgE2mipQLBm/evMUJZoS2Ec
-         wi+dOQL68sm+Tt67nX8ba/MQAQNWeqXeIl4wCy1BirloUR7WqhsvKJXsw9pkD6yGlZuu
-         HJHgX1A7GJ/JVoL135K8f1teR88Jv62PwaqdvdJzHhTEdzrhriaiIUXehQqDixmM98eQ
-         cwnA==
+	s=arc-20240116; t=1709149097; c=relaxed/simple;
+	bh=CXacfLZxd/QfNk37caUzTH5lHopeOn500HrfDvKWa+8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tsN1pz6OH5YehdajcyT1KrrdraCFelpTdKARP/pf1HZHfeRb1ngY6onod/UPnDwF+2GjkYRFnO/f4YJoq4odQJHq/BO1Cy0y1aHaQUbzXH4ersg1oqGsGh4Ps0G9LHqBR40afr1IXc53MGUOZstyv9RTgfedSbmVfP0TBEb/MfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UKGfXarC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709149094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uA20CDAKsgM4Tx3YYjgPKLshZVqnm4Ew1QkRNRKLdZo=;
+	b=UKGfXarCbhjUiw8A6FNfr9s/+beoA2N4i0ENGV759ABFU4BgXxeXit4ESFhIWdwRszpbSo
+	b4rEtyZBJmGILtflQxg75QiKD9yayn8Dy8RMNlUcfOm5ThRco6n3vUi1DPD+FclT0wWH8w
+	bPZXbASSFaROdHPTBkSIaM/eK2Ds5KY=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-294-JAA9aklTO0Oo-4W1YzcxxA-1; Wed, 28 Feb 2024 14:38:13 -0500
+X-MC-Unique: JAA9aklTO0Oo-4W1YzcxxA-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c78505a39eso5175439f.1
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 11:38:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709148557; x=1709753357;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z7saMouekiNL4SDnY8l1WG6+uM8tId4as9SNT1MABgI=;
-        b=vD0OumAsq6lJfN3dxWY8eTbGSRtZuGcROgPqh9Ib8e0/fB7BFOGtSgAhy0+kRg+eMm
-         nt+jH3HY3k9TWRZhLJycEdoUxfpnqcKvaIIN5Z/1W/4JRSzNZaKhGTw5DDL+Ca9LBaIn
-         SgOXyv2YP/wnVQ6xJ0lA1DPG8ZMiskJIC4HXKl7il9U1kBntDzfi0rudT/myeaoi/f0J
-         B5/dzpfJAMbzPybaewaXXgWHBcgakIVA39jdaNgEKVki1J6D0wWQ7PjFp1EbWsYUAISH
-         ElZ5oFKwvi5bwDoRDckqiEHLVuoTTWyzHOZgjuGTdN0k3sPIDz75oXavARMxT/zvHndq
-         H+hg==
-X-Forwarded-Encrypted: i=1; AJvYcCUMN3/pTOqn1NmxrAfybn+jW6JNSpaM+3KBf9zTWdpO6ff2hgDJr0ul/EbXGbOb65FIgWCveabaQIih+s23bhPR8bkr
-X-Gm-Message-State: AOJu0YypnSLNmjk8lyUpzgBqQ7/kRf80VdkRgcGKKMxMkceJ1ABeimex
-	Q4eoTYda9ZpfaoAdhZhp3R/eLxmIRHUYVQNcvn4gsEJhUf/Z5/7x2rrpNG820+nM1VgM4N7Fg9x
-	YIQ==
-X-Google-Smtp-Source: AGHT+IGUwmJBAaiA58+gxzBbHGRKuvTNTMhF9ZigJKYpehWOoTrUnbjqb53H/C0+WfiTZaiYFralNhVs+S0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:3507:b0:608:e67f:4387 with SMTP id
- fq7-20020a05690c350700b00608e67f4387mr278ywb.7.1709148557586; Wed, 28 Feb
- 2024 11:29:17 -0800 (PST)
-Date: Wed, 28 Feb 2024 11:29:16 -0800
-In-Reply-To: <501ac94d-11ab-4765-a25d-75013c021be6@sirena.org.uk>
+        d=1e100.net; s=20230601; t=1709149092; x=1709753892;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uA20CDAKsgM4Tx3YYjgPKLshZVqnm4Ew1QkRNRKLdZo=;
+        b=NJY07+yCcrUv70UWHtjkfvpCnqpkfDNGV8MU0TCLzLlsKBX2lH4NMVsq+A5Jl9ow+S
+         Bu7+5FjTxe+fAeN3zJYeqeBUaHf5GFmUJVeDL9NlZFmmpx9hkD6xTTgQv/euJpwGYuQh
+         HvNPgOJ2u6gU4LXwzz1eFDa/rwJ66uoLTZ6BNnpCOVgImuRzQeumYm2Un6fBsH5HwMdE
+         ZXok9AlJYjV9nVwl5At2958+mDvCLf+jwEbUvzC4SkJmumdkaNQDmcRPenBYkyjc2RYO
+         4ajdAPkMLrq1g5BqU4kUFsXilKUxUGE/NRqh1IfELnQk1z7H97jISyCHuE4NzzWqQ1rA
+         YpMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVgR+n7LFYILO1B+0QibRECvjKHzay4uO+sYW+Wl9a6ZuaksfLrRLHvfQ0OUqMl7L4bPObdQCLpc3ZPBz7giJtJxhL5
+X-Gm-Message-State: AOJu0YzNFWSYwxjaLwvVc6o1CacaEVwM7TWsT0lJTWFoAkRucsTcSY8h
+	bYvc/nXU8GBwkXehUNbXkmzXmm3CjmWEFQLPrbp71dvJbLjTwiqsOGW3S3hb4QsNZX3UkxPs1if
+	2xx7T0iBm589HtokafSOXBdZQjIhtFGIuMpwd8UxXNZdC757dPA==
+X-Received: by 2002:a05:6602:734:b0:7c7:687e:41ba with SMTP id g20-20020a056602073400b007c7687e41bamr163492iox.9.1709149092239;
+        Wed, 28 Feb 2024 11:38:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFLbkc9moMLuoOGq7o7bm+s7c1gRZdMUmGNufsCw5nAB2hYAZNgiuYz111J6g0/Tgm8/E8rCg==
+X-Received: by 2002:a05:6602:734:b0:7c7:687e:41ba with SMTP id g20-20020a056602073400b007c7687e41bamr163467iox.9.1709149091853;
+        Wed, 28 Feb 2024 11:38:11 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id cl10-20020a0566383d0a00b004741d55e66asm7810jab.84.2024.02.28.11.38.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 11:38:11 -0800 (PST)
+Date: Wed, 28 Feb 2024 12:38:10 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Peter Delevoryas <peter@pjd.dev>
+Cc: qemu-devel <qemu-devel@nongnu.org>, suravee.suthikulpanit@amd.com,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [q&a] Status of IOMMU virtualization for nested virtualization
+ (userspace PCI drivers in VMs)
+Message-ID: <20240228123810.70663da2.alex.williamson@redhat.com>
+In-Reply-To: <3D96D76D-85D2-47B5-B4C1-D6F95061D7D6@pjd.dev>
+References: <3D96D76D-85D2-47B5-B4C1-D6F95061D7D6@pjd.dev>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240208204844.119326-1-thuth@redhat.com> <20240208204844.119326-4-thuth@redhat.com>
- <501ac94d-11ab-4765-a25d-75013c021be6@sirena.org.uk>
-Message-ID: <Zd-JjBNCpFG5iDul@google.com>
-Subject: Re: [PATCH v3 3/8] KVM: selftests: Move setting a vCPU's entry point
- to a dedicated API
-From: Sean Christopherson <seanjc@google.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Aishwarya TCV <aishwarya.tcv@arm.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 28, 2024, Mark Brown wrote:
-> On Thu, Feb 08, 2024 at 09:48:39PM +0100, Thomas Huth wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > 
-> > Extract the code to set a vCPU's entry point out of vm_arch_vcpu_add() and
-> > into a new API, vcpu_arch_set_entry_point().  Providing a separate API
-> > will allow creating a KVM selftests hardness that can handle tests that
-> > use different entry points for sub-tests, whereas *requiring* the entry
-> > point to be specified at vCPU creation makes it difficult to create a
-> > generic harness, e.g. the boilerplate setup/teardown can't easily create
-> > and destroy the VM and vCPUs.
-> 
-> With today's -next I'm seeing most of the KVM selftests failing on an
-> arm64 defconfig with:
-> 
-> # ==== Test Assertion Failure ====
-> #   include/kvm_util_base.h:677: !ret
-> #   pid=735 tid=735 errno=9 - Bad file descriptor
-> #      1	0x0000000000410937: vcpu_set_reg at kvm_util_base.h:677 (discriminator 4)
-> #      2	 (inlined by) vcpu_arch_set_entry_point at processor.c:370 (discriminator 4)
-> #      3	0x0000000000407bab: vm_vcpu_add at kvm_util_base.h:981
-> #      4	 (inlined by) __vm_create_with_vcpus at kvm_util.c:419
-> #      5	 (inlined by) __vm_create_shape_with_one_vcpu at kvm_util.c:432
-> #      6	0x000000000040187b: __vm_create_with_one_vcpu at kvm_util_base.h:892
-> #      7	 (inlined by) vm_create_with_one_vcpu at kvm_util_base.h:899
-> #      8	 (inlined by) main at aarch32_id_regs.c:158
-> #      9	0x0000007fbcbe6dc3: ?? ??:0
-> #     10	0x0000007fbcbe6e97: ?? ??:0
-> #     11	0x0000000000401f2f: _start at ??:?
-> #   KVM_SET_ONE_REG failed, rc: -1 errno: 9 (Bad file descriptor)
-> 
-> and a bisect pointed to this commit which does look plausibly relevant.
-> 
-> Note that while this was bisected with plain arm64 defconfig and the KVM
-> selftests fragment was not enabled, but enabling the KVM fragment gave
-> the same result as would be expected based on the options enabled by the
-> fragment.  We're also seeing an alternative failure pattern where the
-> tests segfault when run in a different environment, I'm also tracking
-> that down but I suspect these are the same issue.
+On Wed, 28 Feb 2024 10:29:32 -0800
+Peter Delevoryas <peter@pjd.dev> wrote:
 
-Gah, my bad, I should have at least tested on ARM since I have easy access to
-such hardware.  If I can't figure out what's going wrong in the next few hours,
-I'll drop this series and we can try again for 6.10.
+> Hey guys,
+>=20
+> I=E2=80=99m having a little trouble reading between the lines on various
+> docs, mailing list threads, KVM presentations, github forks, etc, so
+> I figured I=E2=80=99d just ask:
+>=20
+> What is the status of IOMMU virtualization, like in the case where I
+> want a VM guest to have a virtual IOMMU?
 
-Sorry :-/
+It works fine for simply nested assignment scenarios, ie. guest
+userspace drivers or nested VMs.
+=20
+> I found this great presentation from KVM Forum 2021: [1]
+>=20
+> 1. I=E2=80=99m using -device intel-iommu right now. This has performance
+> implications and large DMA transfers hit the vfio_iommu_type1
+> dma_entry_limit on the host because of how the mappings are made.
 
-> A full log from a sample failing run can be seen here.
-> 
->    https://lava.sirena.org.uk/scheduler/job/645026#L1581
-> 
-> Bisect log:
-> 
-> git bisect start
-> # good: [75d8cf735082728a5dfb7e46926ee184851cc519] Merge branch 'for-linux-next-fixes' of git://anongit.freedesktop.org/drm/drm-misc
-> git bisect good 75d8cf735082728a5dfb7e46926ee184851cc519
-> # bad: [20af1ca418d2c0b11bc2a1fe8c0c88f67bcc2a7e] Add linux-next specific files for 20240228
-> git bisect bad 20af1ca418d2c0b11bc2a1fe8c0c88f67bcc2a7e
-> # good: [1322f1801e59dddce10591d602d246c1bf49990c] Merge branch 'main' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
-> git bisect good 1322f1801e59dddce10591d602d246c1bf49990c
-> # good: [f996a1cab1c3547a0bd2edf0daa7a71eddec9b58] Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/pcmoore/lsm.git
-> git bisect good f996a1cab1c3547a0bd2edf0daa7a71eddec9b58
-> # bad: [22e19d7b30a88dc9e7b315935f44fb2a6c6bf7bf] Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/westeri/thunderbolt.git
-> git bisect bad 22e19d7b30a88dc9e7b315935f44fb2a6c6bf7bf
-> # good: [f9ad77051d5d45000848e87650a382995adf7e50] Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git
-> git bisect good f9ad77051d5d45000848e87650a382995adf7e50
-> # bad: [6e9a1d8a249374b0c8ff9472f30f160c98881519] Merge branch 'next' of https://github.com/kvm-x86/linux.git
-> git bisect bad 6e9a1d8a249374b0c8ff9472f30f160c98881519
-> # bad: [f3ac6b5aec49c3f8ced623802ee9efa6484263eb] Merge branch 'xen'
-> git bisect bad f3ac6b5aec49c3f8ced623802ee9efa6484263eb
-> # good: [938ccbf4327f38cec365986136e349486ddbb005] Merge branch 'pmu'
-> git bisect good 938ccbf4327f38cec365986136e349486ddbb005
-> # bad: [f3750b0c7f6e48b0adfb9bd2419de4a3c604ca68] KVM: selftests: Add a basic SEV-ES smoke test
-> git bisect bad f3750b0c7f6e48b0adfb9bd2419de4a3c604ca68
-> # bad: [992178c7219caa0bcdaa5c0ce59615b12da21662] KVM: selftests: Add a macro to define a test with one vcpu
-> git bisect bad 992178c7219caa0bcdaa5c0ce59615b12da21662
-> # good: [71cd774ad2f98d4c78bc868e7e55397810be3540] KVM: s390: move s390-specific structs to uapi/asm/kvm.h
-> git bisect good 71cd774ad2f98d4c78bc868e7e55397810be3540
-> # good: [db7d6fbc10447090bab8691a907a7c383ec66f58] KVM: remove unnecessary #ifdef
-> git bisect good db7d6fbc10447090bab8691a907a7c383ec66f58
-> # good: [221d65449453846bbf6801d0ecf7dfdf4f413ad9] KVM: selftests: x86: sync_regs_test: Get regs structure before modifying it
-> git bisect good 221d65449453846bbf6801d0ecf7dfdf4f413ad9
-> # bad: [8ef192609f14272b7bd6fc3a553ebe02d1133cd0] KVM: selftests: Move setting a vCPU's entry point to a dedicated API
-> git bisect bad 8ef192609f14272b7bd6fc3a553ebe02d1133cd0
-> # first bad commit: [8ef192609f14272b7bd6fc3a553ebe02d1133cd0] KVM: selftests: Move setting a vCPU's entry point to a dedicated API
+Hugepages for the guest and mappings within the guest should help both
+the mapping performance and DMA entry limit.  In general the type1 vfio
+IOMMU backend is not optimized for dynamic mapping, so performance-wise
+your best bet is still to design the userspace driver for static DMA
+buffers.
+=20
+> 2. -device virtio-iommu is an improvement, but it doesn=E2=80=99t seem
+> compatible with -device vfio-pci? I was only able to test this with
+> cloud-hypervisor, and it has a better vfio mapping pattern (avoids
+> hitting dma_entry_limit).
 
+AFAIK it's just growing pains, it should work but it's working through
+bugs.
+
+> 3. -object iommufd [2] I haven=E2=80=99t tried this quite yet, planning t=
+o:
+> if it=E2=80=99s using iommufd, and I have all the right kernel features in
+> the guest and host, I assume it=E2=80=99s implementing the passthrough mo=
+de
+> that AMD has described in their talk? Because I imagine that would be
+> the best solution for me, I=E2=80=99m just having trouble understanding if
+> it=E2=80=99s actually related or orthogonal.
+
+For now iommufd provides a similar DMA mapping interface to type1, but
+it does remove the DMA entry limit and improves locked page accounting.
+
+To really see a performance improvement relative to dynamic mappings,
+you'll need nesting support in the IOMMU, which is under active
+development.  From this aspect you will want iommufd since similar
+features will not be provided by type1.  Thanks,
+
+Alex
 
 
