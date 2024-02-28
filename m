@@ -1,78 +1,83 @@
-Return-Path: <kvm+bounces-10186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93EEA86A6B2
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 03:41:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B71F486A6B4
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 03:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF6F41C25FF5
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 02:41:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C1761C2612A
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 02:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914141D681;
-	Wed, 28 Feb 2024 02:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896D1200A8;
+	Wed, 28 Feb 2024 02:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BXnfxW/5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ENgPAUD1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E801CD15
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 02:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539901CFB9
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 02:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709088112; cv=none; b=ap99TmLeSluB/I/6xkpPMema4c/4YGeJeFMNSvH2mnwG4W7Cbg3E/5keL/XcrO1Lq+j2rz5W3ubBdU1vfLc2xgE/e+BDc5RiCA0BsZJFtQ7Dja5B/yDdrJKmvNPEcrnA97Dncxc80WjMPMAMMDPg3LLWPylJxqYwbYip35vQ+aM=
+	t=1709088114; cv=none; b=jIlYy+uR1PJWMfIWzTSKbD2GUdQa7pwB730RJ/AqNE2Ml70HYcyEuIE6yn1hACj8WyMu8cFRy3uQTuRlTJyOt10gqpV0ZdXS37Wq9oxSQePgpnsDWR4H7r9H9+NWzHN0RTtdGh9VrPGYg6v9rwoqJ/u14kZvdCb+1OKkGWDySLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709088112; c=relaxed/simple;
-	bh=fot6IvGX0Wk467Q0o26GAtryVO620eXI+SwQAgkJhw4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gyLBmmjeSVIbQhuKn74Xo0c/yLG5p40iab8rTGjPtAgUPRxh2UqKBzjk2OVOeMh9KR2FGRMC6O4k+ZyDSCzUVeApq2/4urqFa9wJ5skxxpvYH1gq/3kUGITLkpen0tUmKHglBI/5VQE/FAsZMNZzuVY0YesjWY81dcPRKbBhnSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BXnfxW/5; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1709088114; c=relaxed/simple;
+	bh=0nYnhkfXEoXgiOzmvAD6QsOU4Ex9riioYW0HkqLKI3I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hnMgwFSSD0R32rqz796HHIT8rK+plpr8j1pkd7agnbtMhwgqD29l6mUrQrwwNI1ks1w8yA5+4KECfyoZGeIaeWBF0GhbFG/cE6NUryWI/AzE2gPsRm5tNlMMWh+XTCOSgvjhC7kO5lsyIgYDNAl3f98rciqlkktohuMjVoPxyeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ENgPAUD1; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e53b85da30so1685799b3a.1
-        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 18:41:51 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1dcaff13db5so23563295ad.3
+        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 18:41:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709088110; x=1709692910; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=53SE99VtRIFLP8URa2ZR5LBSPMEfB4F4A0x9UaRfSO4=;
-        b=BXnfxW/5Ti/KVtGUF1bYLpxgYQafnUxhSHuXCrBX5jth1S9eBE+7jHTwIHq4L+P0it
-         ZyPcJOxbyxl0J9GHSrsz3c38F2HVtCJR3QBPKIglvTR8aKTmSVGabXIGeRI6LBbTzinX
-         p7KAU9Quw7hK65IsR7/x4Nh3pnieDPK04ZXxGrrtuIYxxOrkBPQIbsLgxYNk8n76JYb4
-         7s3fJmpxEMFLe4hoqUR5K9+gQGM28AFMxQm+FYzRtj7tLf+7T2GUScOh49znt58R77q7
-         3q/MIVaUKr14mKCerriQRNwa+8a5wb3GY8dkvYcQB1JS9HM7/j+ulujS5eEdjbrQHq4m
-         Znsw==
+        d=google.com; s=20230601; t=1709088112; x=1709692912; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=yZ0WtCwVDO8+ewSeZMQs1E3cZ245daVAR5Xu2LLMu24=;
+        b=ENgPAUD1amsVNQu56qAD34wlUMNbFKf4FUuqYOieghOpiD6XxA9B3ujNsnRkzk8BGv
+         k+7q8++BCQD+M9Sad+Qqbl3/dMOd0b29tnWiLI+l8/A/fh73Xf2KURapAtkVz4QWI/7F
+         41AAxtd2MA+TARP2Q/RW9KcYpjurGnExevLPkEcXNxFK8KyDINeLWtACErB78A1mLzmZ
+         e+xpy6nNyolRoZLUlC5PeBe20brCbSnm7gIc0cKEoHL3m7tLExb5K9g75RGv6xxuRsIb
+         pFX1O2PYJOQfJ2x4XpcJT/rdq2k6AxOkSMtMMRTToMbbUruZ1RJVjjAkH5UZQLSJ+RYo
+         GEgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709088110; x=1709692910;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=53SE99VtRIFLP8URa2ZR5LBSPMEfB4F4A0x9UaRfSO4=;
-        b=NaZKSftUXDQ6fnIBmc1EEPVAMekgUadyxh905SY8KKLcyh07fpS5dTKFBFVffAjOj9
-         mbuEd6cYBWt0KH+mPsKaJvfPkwt52oHcT3jL0FitvHlwqGmZfJ+tq8HB8+Xs6IODVOPS
-         OiKwoqMTaOlUeYSt2gjC0lFeRaXHOB6XPqlOGYmWagPbvAtB3a0KfABMjo1f3pqHZIzU
-         d6cJAWyQvW8mfGmDBqXnKK4ZvhwWsROmhPM2TCX7UAkbg5LYOthz4Pj56UHqjtCqG5ie
-         mnuDENJheQRRjrAjWktT3zn8VM7zV5bL2G4zlllJLozDMsO+sdIbspezD+p12uKiJuXT
-         pIEg==
-X-Gm-Message-State: AOJu0YwoJKG/4HxGGJrpH+SzTdlYHclen3M1EuVLdyII5JiXKdG6YsCT
-	7snPrkv6jZsh9WJFNDQWtPqsDLxvERKuPhq0ozTKDzp6oJWtIwv7droga+isgDyoL6VdEfykLkf
-	nuA==
-X-Google-Smtp-Source: AGHT+IHqZjnLQfoLDlb6615ZXQrJj6R337tVGFLkL2HvBVrbR39vItpyAICXZjZm9RQUXtmJjHxJl3bAMQQ=
+        d=1e100.net; s=20230601; t=1709088112; x=1709692912;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yZ0WtCwVDO8+ewSeZMQs1E3cZ245daVAR5Xu2LLMu24=;
+        b=n+6AKfK/QG6OMoqN/WvQ49+AXO52M7S5+heh2CGCpVw89h8h/DBVOQL1MEqt25odU1
+         Fomk/J51ixqe1KL6FoXE9gy+o2EwaPIcdnRStLTLv5DZ2w80lnl1BcmmAEjCU8PPxq2q
+         RprYy2NgXEhx4vaUGtk9g0g70W0Z/Jxb5gxzG/ctzZbMwO3HKlPqaMygfISs0QYfpwbE
+         LjF0S5lrEYAPF2UVtAzZ5ncAlUtw2gatS34VfrUzqSJlvQnhNGFw1afvwCC5QZTEwCKr
+         erNoFr+McSy81nwEVO6NdZQjovpGz1yAgYdOrx9lvqD+7C1372vGLXnZNPY844yRTQfi
+         Q/RQ==
+X-Gm-Message-State: AOJu0YyryG5yonvfotvb5Ikwe552471FqXd+V770OeqdJcm89yo/P+cH
+	ey+VJveOj67a8WahG2WvtJoGTTC3Z4PJb13JIavgRiQ5hRNli3CR0kI7iCNSC3NKo3YzlBKSAmV
+	GUw==
+X-Google-Smtp-Source: AGHT+IHT+n9eH6+34c02CKv+xvYBYlsjdHG/QXVBuMrn39hwmZ9Kl8Uiyv0qzfOxyiZ/4SfXMTOE04r4lGw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:92a6:b0:6e5:44d3:5865 with SMTP id
- jw38-20020a056a0092a600b006e544d35865mr136678pfb.2.1709088110637; Tue, 27 Feb
- 2024 18:41:50 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:dac9:b0:1dc:b424:56e0 with SMTP id
+ q9-20020a170902dac900b001dcb42456e0mr343078plx.3.1709088112680; Tue, 27 Feb
+ 2024 18:41:52 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 27 Feb 2024 18:41:31 -0800
+Date: Tue, 27 Feb 2024 18:41:32 -0800
+In-Reply-To: <20240228024147.41573-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240228024147.41573-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240228024147.41573-1-seanjc@google.com>
-Subject: [PATCH 00/16] KVM: x86/mmu: Page fault and MMIO cleanups
+Message-ID: <20240228024147.41573-2-seanjc@google.com>
+Subject: [PATCH 01/16] KVM: x86/mmu: Exit to userspace with -EFAULT if private
+ fault hits emulation
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -82,58 +87,70 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This is a combination of prep work for TDX and SNP, and a clean up of the
-page fault path to (hopefully) make it easier to follow the rules for
-private memory, noslot faults, writes to read-only slots, etc.
+Exit to userspace with -EFAULT / KVM_EXIT_MEMORY_FAULT if a private fault
+triggers emulation of any kind, as KVM doesn't currently support emulating
+access to guest private memory.  Practically speaking, private faults and
+emulation are already mutually exclusive, but there are edge cases upon
+edge cases where KVM can return RET_PF_EMULATE, and adding one last check
+to harden against weird, unexpected combinations is inexpensive.
 
-Paolo, this is the series I mentioned in your TDX/SNP prep work series.
-Stating the obvious, these
+Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c          |  8 --------
+ arch/x86/kvm/mmu/mmu_internal.h | 13 +++++++++++++
+ 2 files changed, 13 insertions(+), 8 deletions(-)
 
-  KVM: x86/mmu: Pass full 64-bit error code when handling page faults
-  KVM: x86: Move synthetic PFERR_* sanity checks to SVM's #NPF handler
-
-are the drop-in replacements.
-
-Isaku Yamahata (1):
-  KVM: x86/mmu: Pass full 64-bit error code when handling page faults
-
-Sean Christopherson (15):
-  KVM: x86/mmu: Exit to userspace with -EFAULT if private fault hits
-    emulation
-  KVM: x86: Remove separate "bit" defines for page fault error code
-    masks
-  KVM: x86: Define more SEV+ page fault error bits/flags for #NPF
-  KVM: x86/mmu: Use synthetic page fault error code to indicate private
-    faults
-  KVM: x86/mmu: WARN if upper 32 bits of legacy #PF error code are
-    non-zero
-  KVM: x86: Move synthetic PFERR_* sanity checks to SVM's #NPF handler
-  KVM: x86/mmu: WARN and skip MMIO cache on private, reserved page
-    faults
-  KVM: x86/mmu: Move private vs. shared check above slot validity checks
-  KVM: x86/mmu: Don't force emulation of L2 accesses to non-APIC
-    internal slots
-  KVM: x86/mmu: Explicitly disallow private accesses to emulated MMIO
-  KVM: x86/mmu: Move slot checks from __kvm_faultin_pfn() to
-    kvm_faultin_pfn()
-  KVM: x86/mmu: Handle no-slot faults at the beginning of
-    kvm_faultin_pfn()
-  KVM: x86/mmu: Set kvm_page_fault.hva to KVM_HVA_ERR_BAD for "no slot"
-    faults
-  KVM: x86/mmu: Initialize kvm_page_fault's pfn and hva to error values
-  KVM: x86/mmu: Sanity check that __kvm_faultin_pfn() doesn't create
-    noslot pfns
-
- arch/x86/include/asm/kvm_host.h |  45 ++++-----
- arch/x86/kvm/mmu.h              |   4 +-
- arch/x86/kvm/mmu/mmu.c          | 159 +++++++++++++++++++-------------
- arch/x86/kvm/mmu/mmu_internal.h |  24 ++++-
- arch/x86/kvm/mmu/mmutrace.h     |   2 +-
- arch/x86/kvm/svm/svm.c          |   9 ++
- 6 files changed, 151 insertions(+), 92 deletions(-)
-
-
-base-commit: ec1e3d33557babed2c2c2c7da6e84293c2f56f58
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e4cc7f764980..e2fd74e06ff8 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4309,14 +4309,6 @@ static inline u8 kvm_max_level_for_order(int order)
+ 	return PG_LEVEL_4K;
+ }
+ 
+-static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+-					      struct kvm_page_fault *fault)
+-{
+-	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
+-				      PAGE_SIZE, fault->write, fault->exec,
+-				      fault->is_private);
+-}
+-
+ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+ 				   struct kvm_page_fault *fault)
+ {
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 0669a8a668ca..0eea6c5a824d 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -279,6 +279,14 @@ enum {
+ 	RET_PF_SPURIOUS,
+ };
+ 
++static inline void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
++						     struct kvm_page_fault *fault)
++{
++	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
++				      PAGE_SIZE, fault->write, fault->exec,
++				      fault->is_private);
++}
++
+ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 					u32 err, bool prefetch, int *emulation_type)
+ {
+@@ -320,6 +328,11 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	else
+ 		r = vcpu->arch.mmu->page_fault(vcpu, &fault);
+ 
++	if (r == RET_PF_EMULATE && fault.is_private) {
++		kvm_mmu_prepare_memory_fault_exit(vcpu, &fault);
++		return -EFAULT;
++	}
++
+ 	if (fault.write_fault_to_shadow_pgtable && emulation_type)
+ 		*emulation_type |= EMULTYPE_WRITE_PF_TO_SP;
+ 
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
