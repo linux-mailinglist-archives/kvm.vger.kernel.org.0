@@ -1,151 +1,140 @@
-Return-Path: <kvm+bounces-10185-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10186-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 734F286A672
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 03:18:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93EEA86A6B2
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 03:41:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F71A284C71
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 02:18:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF6F41C25FF5
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 02:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59DD1947E;
-	Wed, 28 Feb 2024 02:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914141D681;
+	Wed, 28 Feb 2024 02:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ppEAyUak"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BXnfxW/5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7919C4C90
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 02:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E801CD15
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 02:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709086695; cv=none; b=PT1QxmHT7wkRCghLcHi/EjBP4kWchuTxqAtLAQ0Vd6BJhqsmAqCJlgGnXFx74XAT1QpckRk8WQUSunIzjJzXfjRhju0DkabhLvlGVdoyc7de7m0bDRusfphev/bOFEapCho62X+n+BEA/MG+ear8E8i+RmB8h5G91Gk0+ZnmjHA=
+	t=1709088112; cv=none; b=ap99TmLeSluB/I/6xkpPMema4c/4YGeJeFMNSvH2mnwG4W7Cbg3E/5keL/XcrO1Lq+j2rz5W3ubBdU1vfLc2xgE/e+BDc5RiCA0BsZJFtQ7Dja5B/yDdrJKmvNPEcrnA97Dncxc80WjMPMAMMDPg3LLWPylJxqYwbYip35vQ+aM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709086695; c=relaxed/simple;
-	bh=wAJMP/rjGSTVeulk/izYYwgmW/lGJuNoksrR8Forbog=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m/xl95W4zMmmZP2pWRWKQ+DuDyZtNdON6n0Z4p+xWO0gMdDxv51ljetiJ6LU7oB5nfph8agKOc5jvv0X4K3ImMiScyw88sQIOOW3avysqyMkfOwLXo4UUWK/Bn2Ze1L6oAPqslmGONi5ev2Y209xBoHmO1n0rmwm70L5DStpNXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ppEAyUak; arc=none smtp.client-ip=209.85.208.46
+	s=arc-20240116; t=1709088112; c=relaxed/simple;
+	bh=fot6IvGX0Wk467Q0o26GAtryVO620eXI+SwQAgkJhw4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gyLBmmjeSVIbQhuKn74Xo0c/yLG5p40iab8rTGjPtAgUPRxh2UqKBzjk2OVOeMh9KR2FGRMC6O4k+ZyDSCzUVeApq2/4urqFa9wJ5skxxpvYH1gq/3kUGITLkpen0tUmKHglBI/5VQE/FAsZMNZzuVY0YesjWY81dcPRKbBhnSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BXnfxW/5; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-563c403719cso6171919a12.2
-        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 18:18:13 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e53b85da30so1685799b3a.1
+        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 18:41:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709086692; x=1709691492; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mnovH/WwqoUfUjM68lvOHqxD1r2xoiTwaBE2RBdRmeQ=;
-        b=ppEAyUak2msSbz0GDvZoh8d+j7zul/4gR+KjBlqqEFZvzY9IVaJxCTPb+O3NgqFWIL
-         LbRkCciGEEoDZh2XmdUUJpctWN7PGih0Tky99SnIW9ZWNvL2ZC+6X5GYSlJPrNbxyKiX
-         8+/spiuRQVywK+gmQCUO4yFxiYh2MPrqMynE/uEuHbvrMgyyMcjmchDZxyErze+6otb5
-         o/Vn4edZssixeJaST6EJtLyRnQjgXfNfxqlWB9zvARV33nCdzrNMBcSk5J0ppqvVs5tV
-         vU2SX088K5YMZKp5XUg53UG8ZxY1Xf6Qm/ucrOy7co6xjIwYv8p2n17o0UZgKIAFAtDi
-         As7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709086692; x=1709691492;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20230601; t=1709088110; x=1709692910; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mnovH/WwqoUfUjM68lvOHqxD1r2xoiTwaBE2RBdRmeQ=;
-        b=eLzY24GYZPJWZclt7sAHBkvKJ8r65j02ztZnvsZuiKq+XVSne2czJ4FpYdjZGF8Qda
-         GSmdW6Eg0b5hYL1x5OLaIbNhCxZINcDmDhlGnyhp8pNTVfr4/yKmokxychVebFuqNLut
-         M7YPoJrKK7sgIsRTIdgz6W8cY6/I5lrYGXuF/vjuSBPr4WPyxhRdtfv/I5WzIWY2CoHM
-         UGo2mRJpCgoqrmHtgbHv4k3f8kw6j1KV6uku8sTBf4UfYuBys88dD+bum1S9zWCD3hHH
-         nSiwKfaYXtielSwv4EE0lnBpy9l42+LCMk3orFlHkh1viK07XfYKLAjRqtVhVRkYnAbG
-         1+Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCU91oyrIwcW9ZByH++zTbzOMIiPMDiss0nqXll7TDd0iKmbehubPTF0tkLqSU3kplDhv3doYRQXUwqATVFgPIc43JI5
-X-Gm-Message-State: AOJu0YyQwrY5JWxtYntEb86pHjz6JjBYgMvnJuQs+d46NOxR5Y060FdE
-	g6CsAHwtiekLN72PD1RJu6YQcgJ+oNoHQqN5OuGQMLI1nfrET+nemHHIZi4YuAmnfFRBPgenu+r
-	cEhqdvgvmuknaVJudfjZ0/iQQyRE7L8bPGR6n
-X-Google-Smtp-Source: AGHT+IHQZZ3zPmlSGvwEFJE+4UsPeBBcNupU3Pyfe+fYGWNJx1MOqwEHgIODePoyh3qPMjbtY9EfahMZlzE8HUkFmM0=
-X-Received: by 2002:a17:906:4809:b0:a3f:1b49:c92b with SMTP id
- w9-20020a170906480900b00a3f1b49c92bmr7585886ejq.48.1709086691753; Tue, 27 Feb
- 2024 18:18:11 -0800 (PST)
+        bh=53SE99VtRIFLP8URa2ZR5LBSPMEfB4F4A0x9UaRfSO4=;
+        b=BXnfxW/5Ti/KVtGUF1bYLpxgYQafnUxhSHuXCrBX5jth1S9eBE+7jHTwIHq4L+P0it
+         ZyPcJOxbyxl0J9GHSrsz3c38F2HVtCJR3QBPKIglvTR8aKTmSVGabXIGeRI6LBbTzinX
+         p7KAU9Quw7hK65IsR7/x4Nh3pnieDPK04ZXxGrrtuIYxxOrkBPQIbsLgxYNk8n76JYb4
+         7s3fJmpxEMFLe4hoqUR5K9+gQGM28AFMxQm+FYzRtj7tLf+7T2GUScOh49znt58R77q7
+         3q/MIVaUKr14mKCerriQRNwa+8a5wb3GY8dkvYcQB1JS9HM7/j+ulujS5eEdjbrQHq4m
+         Znsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709088110; x=1709692910;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=53SE99VtRIFLP8URa2ZR5LBSPMEfB4F4A0x9UaRfSO4=;
+        b=NaZKSftUXDQ6fnIBmc1EEPVAMekgUadyxh905SY8KKLcyh07fpS5dTKFBFVffAjOj9
+         mbuEd6cYBWt0KH+mPsKaJvfPkwt52oHcT3jL0FitvHlwqGmZfJ+tq8HB8+Xs6IODVOPS
+         OiKwoqMTaOlUeYSt2gjC0lFeRaXHOB6XPqlOGYmWagPbvAtB3a0KfABMjo1f3pqHZIzU
+         d6cJAWyQvW8mfGmDBqXnKK4ZvhwWsROmhPM2TCX7UAkbg5LYOthz4Pj56UHqjtCqG5ie
+         mnuDENJheQRRjrAjWktT3zn8VM7zV5bL2G4zlllJLozDMsO+sdIbspezD+p12uKiJuXT
+         pIEg==
+X-Gm-Message-State: AOJu0YwoJKG/4HxGGJrpH+SzTdlYHclen3M1EuVLdyII5JiXKdG6YsCT
+	7snPrkv6jZsh9WJFNDQWtPqsDLxvERKuPhq0ozTKDzp6oJWtIwv7droga+isgDyoL6VdEfykLkf
+	nuA==
+X-Google-Smtp-Source: AGHT+IHqZjnLQfoLDlb6615ZXQrJj6R337tVGFLkL2HvBVrbR39vItpyAICXZjZm9RQUXtmJjHxJl3bAMQQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:92a6:b0:6e5:44d3:5865 with SMTP id
+ jw38-20020a056a0092a600b006e544d35865mr136678pfb.2.1709088110637; Tue, 27 Feb
+ 2024 18:41:50 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 27 Feb 2024 18:41:31 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240227232100.478238-1-pbonzini@redhat.com> <20240227232100.478238-18-pbonzini@redhat.com>
- <Zd6W-aLnovAI1FL3@google.com>
-In-Reply-To: <Zd6W-aLnovAI1FL3@google.com>
-From: Yosry Ahmed <yosryahmed@google.com>
-Date: Tue, 27 Feb 2024 18:17:34 -0800
-Message-ID: <CAJD7tkapC6es9qjaOf=SmE9XYUdbh_fAperjSe9hy=_iqdB0wQ@mail.gmail.com>
-Subject: Re: [PATCH 17/21] filemap: add FGP_CREAT_ONLY
-To: Sean Christopherson <seanjc@google.com>, Matthew Wilcox <willy@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	michael.roth@amd.com, isaku.yamahata@intel.com, thomas.lendacky@amd.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
+Message-ID: <20240228024147.41573-1-seanjc@google.com>
+Subject: [PATCH 00/16] KVM: x86/mmu: Page fault and MMIO cleanups
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 27, 2024 at 6:15=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Tue, Feb 27, 2024, Paolo Bonzini wrote:
->
-> This needs a changelog, and also needs to be Cc'd to someone(s) that can =
-give it
-> a thumbs up.
+This is a combination of prep work for TDX and SNP, and a clean up of the
+page fault path to (hopefully) make it easier to follow the rules for
+private memory, noslot faults, writes to read-only slots, etc.
 
-+Matthew Wilcox
+Paolo, this is the series I mentioned in your TDX/SNP prep work series.
+Stating the obvious, these
 
->
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  include/linux/pagemap.h | 2 ++
-> >  mm/filemap.c            | 4 ++++
-> >  2 files changed, 6 insertions(+)
-> >
-> > diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-> > index 2df35e65557d..e8ac0b32f84d 100644
-> > --- a/include/linux/pagemap.h
-> > +++ b/include/linux/pagemap.h
-> > @@ -586,6 +586,7 @@ pgoff_t page_cache_prev_miss(struct address_space *=
-mapping,
-> >   * * %FGP_CREAT - If no folio is present then a new folio is allocated=
-,
-> >   *   added to the page cache and the VM's LRU list.  The folio is
-> >   *   returned locked.
-> > + * * %FGP_CREAT_ONLY - Fail if a folio is not present
-> >   * * %FGP_FOR_MMAP - The caller wants to do its own locking dance if t=
-he
-> >   *   folio is already in cache.  If the folio was allocated, unlock it
-> >   *   before returning so the caller can do the same dance.
-> > @@ -606,6 +607,7 @@ typedef unsigned int __bitwise fgf_t;
-> >  #define FGP_NOWAIT           ((__force fgf_t)0x00000020)
-> >  #define FGP_FOR_MMAP         ((__force fgf_t)0x00000040)
-> >  #define FGP_STABLE           ((__force fgf_t)0x00000080)
-> > +#define FGP_CREAT_ONLY               ((__force fgf_t)0x00000100)
-> >  #define FGF_GET_ORDER(fgf)   (((__force unsigned)fgf) >> 26) /* top 6 =
-bits */
-> >
-> >  #define FGP_WRITEBEGIN               (FGP_LOCK | FGP_WRITE | FGP_CREAT=
- | FGP_STABLE)
-> > diff --git a/mm/filemap.c b/mm/filemap.c
-> > index 750e779c23db..d5107bd0cd09 100644
-> > --- a/mm/filemap.c
-> > +++ b/mm/filemap.c
-> > @@ -1854,6 +1854,10 @@ struct folio *__filemap_get_folio(struct address=
-_space *mapping, pgoff_t index,
-> >               folio =3D NULL;
-> >       if (!folio)
-> >               goto no_page;
-> > +     if (fgp_flags & FGP_CREAT_ONLY) {
-> > +             folio_put(folio);
-> > +             return ERR_PTR(-EEXIST);
-> > +     }
-> >
-> >       if (fgp_flags & FGP_LOCK) {
-> >               if (fgp_flags & FGP_NOWAIT) {
-> > --
-> > 2.39.0
-> >
-> >
->
+  KVM: x86/mmu: Pass full 64-bit error code when handling page faults
+  KVM: x86: Move synthetic PFERR_* sanity checks to SVM's #NPF handler
+
+are the drop-in replacements.
+
+Isaku Yamahata (1):
+  KVM: x86/mmu: Pass full 64-bit error code when handling page faults
+
+Sean Christopherson (15):
+  KVM: x86/mmu: Exit to userspace with -EFAULT if private fault hits
+    emulation
+  KVM: x86: Remove separate "bit" defines for page fault error code
+    masks
+  KVM: x86: Define more SEV+ page fault error bits/flags for #NPF
+  KVM: x86/mmu: Use synthetic page fault error code to indicate private
+    faults
+  KVM: x86/mmu: WARN if upper 32 bits of legacy #PF error code are
+    non-zero
+  KVM: x86: Move synthetic PFERR_* sanity checks to SVM's #NPF handler
+  KVM: x86/mmu: WARN and skip MMIO cache on private, reserved page
+    faults
+  KVM: x86/mmu: Move private vs. shared check above slot validity checks
+  KVM: x86/mmu: Don't force emulation of L2 accesses to non-APIC
+    internal slots
+  KVM: x86/mmu: Explicitly disallow private accesses to emulated MMIO
+  KVM: x86/mmu: Move slot checks from __kvm_faultin_pfn() to
+    kvm_faultin_pfn()
+  KVM: x86/mmu: Handle no-slot faults at the beginning of
+    kvm_faultin_pfn()
+  KVM: x86/mmu: Set kvm_page_fault.hva to KVM_HVA_ERR_BAD for "no slot"
+    faults
+  KVM: x86/mmu: Initialize kvm_page_fault's pfn and hva to error values
+  KVM: x86/mmu: Sanity check that __kvm_faultin_pfn() doesn't create
+    noslot pfns
+
+ arch/x86/include/asm/kvm_host.h |  45 ++++-----
+ arch/x86/kvm/mmu.h              |   4 +-
+ arch/x86/kvm/mmu/mmu.c          | 159 +++++++++++++++++++-------------
+ arch/x86/kvm/mmu/mmu_internal.h |  24 ++++-
+ arch/x86/kvm/mmu/mmutrace.h     |   2 +-
+ arch/x86/kvm/svm/svm.c          |   9 ++
+ 6 files changed, 151 insertions(+), 92 deletions(-)
+
+
+base-commit: ec1e3d33557babed2c2c2c7da6e84293c2f56f58
+-- 
+2.44.0.278.ge034bb2e1d-goog
+
 
