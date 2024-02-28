@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-10198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B5EB86A6C8
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 03:45:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EC0E86A6CA
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 03:45:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25CBF287F4A
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 02:45:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1E4A1C25FE9
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 02:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E9F200B1;
-	Wed, 28 Feb 2024 02:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A540E28E2E;
+	Wed, 28 Feb 2024 02:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xp+mI7Zi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K3vCi+W9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF241AAC9
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 02:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF57E200BE
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 02:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709088135; cv=none; b=inCq70xopBMsNjBnpA0dRwiOHo/H98wTOLfWmj1iJrrnTEbe9wwCxcJRKqlyJ9bfQjRXKY2TfYDPrn/wjFSKWz+GNE7IjbVCWaHEWiAKAX/fSWwALtIy6zQCAPiKxu/sqWv3tBTHi5n1o1vMe4dAFPFP9D53CmOwnHTKkysK5p0=
+	t=1709088137; cv=none; b=KbeT2qRMdKeL3hGXJacTVHixlGr2tP8RsJLV08NB0eWyLTJwimMMkKDRIVQhncHUJgeH+KKpiywjLQkAi4AreqktZQigYiraXPOyzmQUSxro5jOqu4eMamsH5K7Gjvup295r950P0JprwR9UHHXPEWNko7EeJkcdcd1X9vNlXrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709088135; c=relaxed/simple;
-	bh=cV79rJWoCeFTUkciMMwroGk4yVBIOpdWOSpTM312CWI=;
+	s=arc-20240116; t=1709088137; c=relaxed/simple;
+	bh=0gEhOu+NvnccPPQj+DGkgmpKe+mDJdiQ8EYFWVgv6Yg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MapzSNlb2Y9e/Zd9V/UqHK2m/mHfaQUhL89UgEakc2dtpggLaCIHcfADytbtMz2B25WehAqTNUHBpxl7vo74qv+WHYj47W2kyE9/rWpX9PNxt8dqLjdZfykHxKX0AIGqvwq1SBTeVFSqRVGCEgaD+pra22JjMvZ78aJN3sOXhzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xp+mI7Zi; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=KqdVeYRoJYJD0T/41Z8PBBi+ORPS3Xpt8IfdzIia3d2z8QZbA1ZXEBSmfYZiwUFqFmZCe/doqSfGESYlLl6L8I5UPIEGeMRQHEnNbZFmyh4UX2WOZ7dY04c+V/tXA7WAB8SZb8AcPkBmlciYADdQfyX1JnI9AmtzuUZ6ZGHKiJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K3vCi+W9; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2993efc802dso2200123a91.1
-        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 18:42:13 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6093f75fc81so969307b3.1
+        for <kvm@vger.kernel.org>; Tue, 27 Feb 2024 18:42:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709088133; x=1709692933; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709088135; x=1709692935; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=dJc2s9t1awM79/Fy1pb8zawduPtJBJNE9uUwyg5GGwY=;
-        b=xp+mI7ZiWfjE3IFH4YwD9lyAfW7sd1lMUxvyRB40HLiqXdbsQtw11iZ4Wzd5MotUfT
-         JLhiaibdTS57YLVP19C4BrPT1nT+hGOEhJaN0m2kHIq/qO7zHq3+L4Z9ao/LNNvF8w0N
-         I1kNTKBcddmnw3zCLcxuBdUTeTDHWZxz8gs69fWF7gUaRviaiO+Jz5qUu2I3uiWYEjYW
-         qarlBaS/jpbSVeP+MmOo1WFL8TDOrv8RCECpLRTnyd5Er9DL1UVZqUZTxH+X7BEUJk8W
-         8mADb1cjVVEooZG9VYutd1Jyot9GgQHbng8BjQ6LFGth2y2kixRgZq8RkTVtXRJYej3M
-         9i7Q==
+        bh=l9B6PZq9lTAwCPQClSfUQyAcFb6buJcOcs8BLLLIFfI=;
+        b=K3vCi+W9PP9mOXJVXEgpPk8GWlyWO7FsUI5EGYp9/KHl/81V5sfa2Ccl1HnuFMY4Uv
+         CgxYNnEkV5Ky8lF7XRWzuGtVNb1olRoag5MKYejOOy0jy4FTBvf7AA8pyDYIG+Sa/ygg
+         9kgq1/g/fFWFBUqHJxX9xnyn5vQ4PEh2VV0Mq4ChxWj2ZrR1jM8c3XHVPgWyMr2jNtz0
+         +x4REkioKYUz5hHUmdpwEaNp9JWbQYagqq5uWE/upqWJp3KqhAEJO+IcCpdHKf2pYri8
+         xLoc+lxD2m4Htsydv27gwksD+ofGYKndcFQpgHW01YKvE2WIlFX+3zCMhHcr1Thn/RQI
+         pGLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709088133; x=1709692933;
+        d=1e100.net; s=20230601; t=1709088135; x=1709692935;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dJc2s9t1awM79/Fy1pb8zawduPtJBJNE9uUwyg5GGwY=;
-        b=Wr4CNMP7GLkIV9LUfvwFR5f8r3sc84Qw+1zOOj+217unlsROBEjqEENWLXlSqCXmSw
-         PchjT6URWb3fR+6qQ423Du0v8I6cyoCOml203/lWUarc2RJkKb+DxKkroDLMsJmLy+E6
-         ttT1w7ysq1XNXDRyduHTs89aKv5s29OlCBThYn5MYbXxlQH8nWeehcxUa+AANFt1E6Ou
-         t7pDLUQzqmQMeCRHxt9DxUFPn5XzGWJboz76eBqN0XJJkKiWpkXeqh7cmUM/UhUfWWel
-         DJZr+UDIgyPRVyuoN/7wsARxfWVNxCT5+0vBFatJ1/f5+LgmUuWW+4/TGcAqupoUR82y
-         8Elg==
-X-Gm-Message-State: AOJu0YyWxJHXSmL8w3I5GLxBHmPdAHAs1QI2P2HvQwgPohk242p2A2et
-	G03ghC90WgRFi8A+315JZJhzSeV3qTbyZLixE0p2HlClfXWgRaab+9fw4NxTANmy/IEHSlrdNbE
-	o4A==
-X-Google-Smtp-Source: AGHT+IEQrtR9z7mv6fKO+/I7F2jfZx7cwviWFpuAmB0BUMFbXR6LBdfKH1SzjUSCUVSMy+xt/hWaCnTFa+A=
+        bh=l9B6PZq9lTAwCPQClSfUQyAcFb6buJcOcs8BLLLIFfI=;
+        b=F0TTAsn0KypmkS7P3nP2yZ53Xl3ld/vrt/xPUKKqMs/gfMkjpBBwH9BuwP4pahL2Zc
+         0UUfeYoYuJZBtwK8MCSKxe+nJh0w2Ql2hx96bTIXpL0rX4+wQmJMyrxuVPl3Urjyvod+
+         VUuLaSLO4SX2M233OJ5ld/3qkpI3TeI/FTH8QmOa90JJY6wKBgeIO1wkTjxAxpGkWks3
+         SsKx4jjRRiKPo4r7j5c9Fd7S7cvEJMElkt0/kTHc5ogdwpgxTFAMLriXvewdLSlLpUEp
+         UT6QB3yGzEb9HEzPRbQtR1DLenw3wLlkw8Chv9MhxTfn2nFlD7BxsNVMXC3h10FzwGBy
+         I1Hg==
+X-Gm-Message-State: AOJu0YypBskBXIzQw3tlAH8c7KXkjeDxcQVBHlj/mfebLijf9pSLOnU4
+	kbLL+n1A49vwRkLzLH/p01dNAeZn2rzQs16bthV1D3W0Yh/GWooXv2lYOcD/VbSXIHuz5+u5wrU
+	zZA==
+X-Google-Smtp-Source: AGHT+IEPzkpN558mdThb1mQJAX8w0FWfivalHkGQsaKz9YUi8JxhkESyegzZmqcp881opi3TCAgG1XKM99s=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:3cc4:b0:299:979c:27e6 with SMTP id
- qd4-20020a17090b3cc400b00299979c27e6mr37082pjb.4.1709088132789; Tue, 27 Feb
- 2024 18:42:12 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a0d:d64e:0:b0:608:d0a4:75ea with SMTP id
+ y75-20020a0dd64e000000b00608d0a475eamr905939ywd.7.1709088134972; Tue, 27 Feb
+ 2024 18:42:14 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 27 Feb 2024 18:41:43 -0800
+Date: Tue, 27 Feb 2024 18:41:44 -0800
 In-Reply-To: <20240228024147.41573-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240228024147.41573-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240228024147.41573-13-seanjc@google.com>
-Subject: [PATCH 12/16] KVM: x86/mmu: Move slot checks from __kvm_faultin_pfn()
- to kvm_faultin_pfn()
+Message-ID: <20240228024147.41573-14-seanjc@google.com>
+Subject: [PATCH 13/16] KVM: x86/mmu: Handle no-slot faults at the beginning of kvm_faultin_pfn()
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -87,168 +86,124 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move the checks related to the validity of an access to a memslot from the
-inner __kvm_faultin_pfn() to its sole caller, kvm_faultin_pfn().  This
-allows emulating accesses to the APIC access page, which don't need to
-resolve a pfn, even if there is a relevant in-progress mmu_notifier
-invalidation.  Ditto for accesses to KVM internal memslots from L2, which
-KVM also treats as emulated MMIO.
+Handle the "no memslot" case at the beginning of kvm_faultin_pfn(), just
+after the private versus shared check, so that there's no need to
+repeatedly query whether or not a slot exists.  This also makes it more
+obvious that, except for private vs. shared attributes, the process of
+faulting in a pfn simply doesn't apply to gfns without a slot.
 
-More importantly, this will allow for future cleanup by having the
-"no memslot" case bail from kvm_faultin_pfn() very early on.
+Opportunistically stuff @fault's metadata in kvm_handle_noslot_fault() so
+that it doesn't need to be duplicated in all paths that invoke
+kvm_handle_noslot_fault(), and to minimize the probability of not stuffing
+the right fields.
 
-Go to rather extreme and gross lengths to make the change a glorified
-nop, e.g. call into __kvm_faultin_pfn() even when there is no slot, as the
-related code is very subtle.  E.g. fault->slot can be nullified if it
-points at the APIC access page, some flows in KVM x86 expect fault->pfn
-to be KVM_PFN_NOSLOT, while others check only fault->slot, etc.
+Leave the existing handle behind, but convert it to a WARN, to guard
+against __kvm_faultin_pfn() unexpectedly nullifying fault->slot.
 
-No functional change intended.
-
+Cc: David Matlack <dmatlack@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 105 +++++++++++++++++++++--------------------
- 1 file changed, 53 insertions(+), 52 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 29 +++++++++++++++++------------
+ arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+ 2 files changed, 18 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ebdb3fcce3dc..8aa957f0a717 100644
+index 8aa957f0a717..4dee0999a66e 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4340,9 +4340,59 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+@@ -3322,6 +3322,10 @@ static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
+ 	vcpu_cache_mmio_info(vcpu, gva, fault->gfn,
+ 			     access & shadow_mmio_access_mask);
  
- static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
--	struct kvm_memory_slot *slot = fault->slot;
- 	bool async;
++	fault->slot = NULL;
++	fault->pfn = KVM_PFN_NOSLOT;
++	fault->map_writable = false;
++
+ 	/*
+ 	 * If MMIO caching is disabled, emulate immediately without
+ 	 * touching the shadow page tables as attempting to install an
+@@ -4393,15 +4397,18 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 		return -EFAULT;
+ 	}
  
-+	if (fault->is_private)
-+		return kvm_faultin_pfn_private(vcpu, fault);
-+
-+	async = false;
-+	fault->pfn = __gfn_to_pfn_memslot(fault->slot, fault->gfn, false, false,
-+					  &async, fault->write,
-+					  &fault->map_writable, &fault->hva);
-+	if (!async)
-+		return RET_PF_CONTINUE; /* *pfn has correct page already */
-+
-+	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
-+		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
-+		if (kvm_find_async_pf_gfn(vcpu, fault->gfn)) {
-+			trace_kvm_async_pf_repeated_fault(fault->addr, fault->gfn);
-+			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
-+			return RET_PF_RETRY;
-+		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn)) {
-+			return RET_PF_RETRY;
-+		}
-+	}
-+
-+	/*
-+	 * Allow gup to bail on pending non-fatal signals when it's also allowed
-+	 * to wait for IO.  Note, gup always bails if it is unable to quickly
-+	 * get a page and a fatal signal, i.e. SIGKILL, is pending.
-+	 */
-+	fault->pfn = __gfn_to_pfn_memslot(fault->slot, fault->gfn, false, true,
-+					  NULL, fault->write,
-+					  &fault->map_writable, &fault->hva);
-+	return RET_PF_CONTINUE;
-+}
-+
-+static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-+			   unsigned int access)
-+{
-+	struct kvm_memory_slot *slot = fault->slot;
-+	int ret;
-+
-+	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
-+	smp_rmb();
-+
-+	/*
-+	 * Check for a private vs. shared mismatch *after* taking a snapshot of
-+	 * mmu_invalidate_seq, as changes to gfn attributes are guarded by the
-+	 * invalidation notifier.
-+	 */
-+	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-+		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-+		return -EFAULT;
-+	}
++	if (unlikely(!slot))
++		return kvm_handle_noslot_fault(vcpu, fault, access);
 +
  	/*
  	 * Retry the page fault if the gfn hit a memslot that is being deleted
  	 * or moved.  This ensures any existing SPTEs for the old memslot will
-@@ -4367,7 +4417,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 			fault->slot = NULL;
- 			fault->pfn = KVM_PFN_NOSLOT;
- 			fault->map_writable = false;
--			return RET_PF_CONTINUE;
-+			goto faultin_done;
- 		}
+ 	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
+ 	 */
+-	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
++	if (slot->flags & KVM_MEMSLOT_INVALID)
+ 		return RET_PF_RETRY;
+ 
+-	if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT) {
++	if (slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT) {
+ 		/*
+ 		 * Don't map L1's APIC access page into L2, KVM doesn't support
+ 		 * using APICv/AVIC to accelerate L2 accesses to L1's APIC,
+@@ -4413,12 +4420,9 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 		 * uses different roots for L1 vs. L2, i.e. there is no danger
+ 		 * of breaking APICv/AVIC for L1.
+ 		 */
+-		if (is_guest_mode(vcpu)) {
+-			fault->slot = NULL;
+-			fault->pfn = KVM_PFN_NOSLOT;
+-			fault->map_writable = false;
+-			goto faultin_done;
+-		}
++		if (is_guest_mode(vcpu))
++			return kvm_handle_noslot_fault(vcpu, fault, access);
++
  		/*
  		 * If the APIC access page exists but is disabled, go directly
-@@ -4379,56 +4429,6 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 		 * to emulation without caching the MMIO access or creating a
+@@ -4429,6 +4433,9 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
  			return RET_PF_EMULATE;
  	}
  
--	if (fault->is_private)
--		return kvm_faultin_pfn_private(vcpu, fault);
--
--	async = false;
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
--					  fault->write, &fault->map_writable,
--					  &fault->hva);
--	if (!async)
--		return RET_PF_CONTINUE; /* *pfn has correct page already */
--
--	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
--		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
--		if (kvm_find_async_pf_gfn(vcpu, fault->gfn)) {
--			trace_kvm_async_pf_repeated_fault(fault->addr, fault->gfn);
--			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
--			return RET_PF_RETRY;
--		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn)) {
--			return RET_PF_RETRY;
--		}
--	}
--
--	/*
--	 * Allow gup to bail on pending non-fatal signals when it's also allowed
--	 * to wait for IO.  Note, gup always bails if it is unable to quickly
--	 * get a page and a fatal signal, i.e. SIGKILL, is pending.
--	 */
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, true, NULL,
--					  fault->write, &fault->map_writable,
--					  &fault->hva);
--	return RET_PF_CONTINUE;
--}
--
--static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
--			   unsigned int access)
--{
--	int ret;
--
--	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
--	smp_rmb();
--
--	/*
--	 * Check for a private vs. shared mismatch *after* taking a snapshot of
--	 * mmu_invalidate_seq, as changes to gfn attributes are guarded by the
--	 * invalidation notifier.
--	 */
--	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
--		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
--		return -EFAULT;
--	}
--
++	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
++	smp_rmb();
++
  	/*
  	 * Check for a relevant mmu_notifier invalidation event before getting
  	 * the pfn from the primary MMU, and before acquiring mmu_lock.
-@@ -4458,6 +4458,7 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+@@ -4450,19 +4457,17 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 	 * *guaranteed* to need to retry, i.e. waiting until mmu_lock is held
+ 	 * to detect retry guarantees the worst case latency for the vCPU.
+ 	 */
+-	if (fault->slot &&
+-	    mmu_invalidate_retry_gfn_unsafe(vcpu->kvm, fault->mmu_seq, fault->gfn))
++	if (mmu_invalidate_retry_gfn_unsafe(vcpu->kvm, fault->mmu_seq, fault->gfn))
+ 		return RET_PF_RETRY;
+ 
+ 	ret = __kvm_faultin_pfn(vcpu, fault);
  	if (ret != RET_PF_CONTINUE)
  		return ret;
  
-+faultin_done:
+-faultin_done:
  	if (unlikely(is_error_pfn(fault->pfn)))
  		return kvm_handle_error_pfn(vcpu, fault);
  
+-	if (unlikely(!fault->slot))
++	if (WARN_ON_ONCE(!fault->slot))
+ 		return kvm_handle_noslot_fault(vcpu, fault, access);
+ 
+ 	/*
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index d7c10d338f14..74736d517e74 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -235,7 +235,7 @@ struct kvm_page_fault {
+ 	/* The memslot containing gfn. May be NULL. */
+ 	struct kvm_memory_slot *slot;
+ 
+-	/* Outputs of kvm_faultin_pfn.  */
++	/* Outputs of kvm_faultin_pfn. */
+ 	unsigned long mmu_seq;
+ 	kvm_pfn_t pfn;
+ 	hva_t hva;
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
