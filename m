@@ -1,143 +1,289 @@
-Return-Path: <kvm+bounces-10304-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10305-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C98F86B8EC
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:17:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0A3886B912
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:29:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93F371C218F4
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 20:17:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62DF828A645
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 20:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4409074439;
-	Wed, 28 Feb 2024 20:17:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A066C1474CF;
+	Wed, 28 Feb 2024 20:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RbjIdgmK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BR6G5g8I"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9269E7442D
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 20:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9F75E068;
+	Wed, 28 Feb 2024 20:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709151458; cv=none; b=oLFHLjh+jcSHlYRnHZOsm9v9XMK2Zk1fw2YdJRQmyyBHIH2xZ8QSY1MSQlBQDUSNITsxQCLMhw8myz3ch7uTsoPE9tAxiQtjDs7iOdn2WZWzQ6vyZd2hhMMh74zsm411R32YIFdr7kAMChCvqYsjPMx63QcIWo0VtxIiOmQ4f/s=
+	t=1709152150; cv=none; b=ag5PH8astIBaqBE3lwAx88GrTIzp9jdCWXgtLEfZMMKLPKNRoVZldkfKnRKMhBnKraW4ir0kFNkricRiEJz/6a5/IUlD6rTlJMIcq9XaHMGJe7vENLBjsx8/u7cUq4qCusmujOYct/UeihVR8DsyMutJUp89PjItmTfw2M8MGRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709151458; c=relaxed/simple;
-	bh=zCE3KeML9YfIVCAxmwUQkF435x0sQK0jWupf7a2rdBU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SxXiztmn1TOK+vroUwpBpuMlIYC6jPVYXtfIOEbV3Qr/qYKMBjXxt/Y6FTBC6LMmECFyFXaFljoYObFrOcI7RXRtDU4y0bOpB5jaSIX/DdxqlUvxWwLASCabXrYkBBNXxW092DcTr8dWu1eynIlNx9pD7dZty57UHmCS0Ltv81s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RbjIdgmK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709151455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TTw4ZSIJXGsiLChjCX2qkr5AsU1DzHE1V0dnP5D7DIs=;
-	b=RbjIdgmKGQhvEPEWaKdN/EiyzbbP/fhxBy1XcnCnEK7OlkZLx7tyBY3q2x/FJLoUX5S5i6
-	nKR1UlpW7nxT6q8XVIxrTdUhhf69H6O2xFYfxFHibkO4WC46W0ov+NINhbwUE/45U5gOX5
-	MwxzCooZf9Yqys+grKlluZNmAcDDGB0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-DIrAdVCGPSC2Rs0PRbY1Wg-1; Wed, 28 Feb 2024 15:17:33 -0500
-X-MC-Unique: DIrAdVCGPSC2Rs0PRbY1Wg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-412ad75b517so557745e9.1
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 12:17:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709151452; x=1709756252;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TTw4ZSIJXGsiLChjCX2qkr5AsU1DzHE1V0dnP5D7DIs=;
-        b=sHk0HMLCZ0K21Y4uLpxBDUm2m5wlam5sRDXktr0wTytUbSmN0uHfy/3JtNnSNwX+2E
-         w1xDqA1Mll0HDF4EsIk3qwi4XYYrIFxzzucqaUd/D4xSXYwduBEPBz1P1iyezP1ld9+V
-         VYSBmmcuw9zoZ+JXOao6uIRiLoRfFxXWPjGHltLL3E0v1nVX6QmDsfzIUjXCOcvEJuUS
-         emJ2dR4ssIALR/xRn/QL59IC8qsH2g5bNcC9TQJACSa0cfKXLu//+XnjzzFE51LOG8sp
-         cZ89ngu7C/ZY6Qo4SLV/jZ8CIniaxxVdlf/u9jxHhvCu5OdRT2epJ0cn3eTKsA0Urc7i
-         9ZGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXIA9KtMnehlNXAK5JY9h01mj6TMKbUZRgCNNMPu2liYhzgJ/fWaQYx8mAVT9WWNpQ41SXSEmumHfpqPeqfLBmaia8a
-X-Gm-Message-State: AOJu0YxEueDMlMKZQOx9B208FhOMgmiB8VfZayv7igvS0d7ieXM6+b9Z
-	PszCoOGGTzIjiHIDOtplyfOJr9eTZElavM2RkeUbPZ4AKv985QMnwlulVkym6Zgj3BxQdjxF+HR
-	44jhhL8zI0xZQ6p5JdFkHfofjrJNYn9hG4ii7HYrjbbAy/f+OCF72PqlgLmEnMauMAypZyS/pYg
-	/wrF2RW0dtYG0EZ6hpT2OZwuSN
-X-Received: by 2002:a5d:4b0a:0:b0:33d:afbc:6c85 with SMTP id v10-20020a5d4b0a000000b0033dafbc6c85mr461056wrq.8.1709151452252;
-        Wed, 28 Feb 2024 12:17:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGgHPzGN/DHFe4puI/8ysLIKlvcEuBiVtnUT6JuEjxUXY4Ozjp/ZzTMdzcpsSTIbMTP4PxKulnZgiPsoMvTHxg=
-X-Received: by 2002:a5d:4b0a:0:b0:33d:afbc:6c85 with SMTP id
- v10-20020a5d4b0a000000b0033dafbc6c85mr461045wrq.8.1709151451975; Wed, 28 Feb
- 2024 12:17:31 -0800 (PST)
+	s=arc-20240116; t=1709152150; c=relaxed/simple;
+	bh=TWmXO+E2jGYeoRyN3F8HU+r+G7vutEdFGwwl2ryKsSk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mb8lL0X+z0SMlOZM4rgLFLYBMJescoSmMIiJ2BSHfzsN9Ra8ug+SK3LB+FyM+egTZPM1PizbMUbLaGBXAiiLUD1wYc19GoWf6V5R0gsvcc47nuNscJY9U6eYkjwkW3RoJdp48ky+3Ziek1JAU+T+m6GCQ/iB8kjO4PwvcTJk9XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BR6G5g8I; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709152148; x=1740688148;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TWmXO+E2jGYeoRyN3F8HU+r+G7vutEdFGwwl2ryKsSk=;
+  b=BR6G5g8Iei5lsWcjr3sIKYLki3sQSDgemZaTO9Lah5lbUWEfjygWkueb
+   MxGWXTFDEku0a0GdvsJ0G+pTyyuQhRu0dBE1GYGXmOK1XclQ17j1pLiPb
+   2Ytr4H9e5aCBkmihPyr30RkaMk8Oi2UdLLLRCc8rt9oDIaM8607u4bFNM
+   Jzasp7xhUsIlCPIr9L8puBp/HFuIqSzxELdCW4RLkVs4OStrc7PQ2jtji
+   o5aYujY21vWtmj/Q7tcgz/Cjb7GfFamexHQ+cMN501uNwnLaTrXP/1DMW
+   Ml8LHJwoC9zIf1qj+Uo4BHTGo/xUe8MPSf4+26Al+igos8R1qnbf/rpQT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="26048805"
+X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
+   d="scan'208";a="26048805"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 12:29:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
+   d="scan'208";a="45083738"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 12:29:08 -0800
+Date: Wed, 28 Feb 2024 12:29:06 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
+	michael.roth@amd.com, isaku.yamahata@intel.com,
+	thomas.lendacky@amd.com, isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH 18/21] KVM: x86: Add gmem hook for initializing memory
+Message-ID: <20240228202906.GB10568@ls.amr.corp.intel.com>
+References: <20240227232100.478238-1-pbonzini@redhat.com>
+ <20240227232100.478238-19-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240227232100.478238-1-pbonzini@redhat.com> <20240227232100.478238-18-pbonzini@redhat.com>
- <Zd6W-aLnovAI1FL3@google.com> <CAJD7tkapC6es9qjaOf=SmE9XYUdbh_fAperjSe9hy=_iqdB0wQ@mail.gmail.com>
- <Zd8x3w2mwyAufKvm@casper.infradead.org> <CABgObfZ9LFDrtLkMaT5LVwy0Z2QMk6SqJ104+D=w7o9i0gEu+g@mail.gmail.com>
- <Zd-Icopo09aUmOvT@casper.infradead.org>
-In-Reply-To: <Zd-Icopo09aUmOvT@casper.infradead.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 28 Feb 2024 21:17:19 +0100
-Message-ID: <CABgObfZApRALa0AEWRDTY_Qc3bFVe25mVph2R1JaUBhqJ8eabg@mail.gmail.com>
-Subject: Re: [PATCH 17/21] filemap: add FGP_CREAT_ONLY
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Yosry Ahmed <yosryahmed@google.com>, Sean Christopherson <seanjc@google.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
-	isaku.yamahata@intel.com, thomas.lendacky@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240227232100.478238-19-pbonzini@redhat.com>
 
-On Wed, Feb 28, 2024 at 8:24=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
-> On Wed, Feb 28, 2024 at 02:28:45PM +0100, Paolo Bonzini wrote:
-> > Since you're here: KVM would like to add a ioctl to encrypt and
-> > install a page into guest_memfd, in preparation for launching an
-> > encrypted guest. For this API we want to rule out the possibility of
-> > overwriting a page that is already in the guest_memfd's filemap,
-> > therefore this API would pass FGP_CREAT_ONLY|FGP_CREAT
-> > into__filemap_get_folio. Do you think this is bogus...
->
-> Would it work to start out by either asserting the memfd is empty of
-> pages, or by evicting any existing pages?  Both those seem nicer than
-> starting, realising you've got some unencrypted memory and aborting.
+On Tue, Feb 27, 2024 at 06:20:57PM -0500,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Unfortunately it would be quite ugly to force userspace to do all the
-initialization in one go. For example, there are different kinds of
-pages that probably would be initialized at different points (e.g.
-before vs. after vCPUs are created, because the initial vCPU state is
-also encrypted).
+> guest_memfd pages are generally expected to be in some arch-defined
+> initial state prior to using them for guest memory. For SEV-SNP this
+> initial state is 'private', or 'guest-owned', and requires additional
+> operations to move these pages into a 'private' state by updating the
+> corresponding entries the RMP table.
+> 
+> Allow for an arch-defined hook to handle updates of this sort, and go
+> ahead and implement one for x86 so KVM implementations like AMD SVM can
+> register a kvm_x86_ops callback to handle these updates for SEV-SNP
+> guests.
+> 
+> The preparation callback is always called when allocating/grabbing
+> folios via gmem, and it is up to the architecture to keep track of
+> whether or not the pages are already in the expected state (e.g. the RMP
+> table in the case of SEV-SNP).
+> 
+> In some cases, it is necessary to defer the preparation of the pages to
+> handle things like in-place encryption of initial guest memory payloads
+> before marking these pages as 'private'/'guest-owned', so also add a
+> helper that performs the same function as kvm_gmem_get_pfn(), but allows
+> for the preparation callback to be bypassed to allow for pages to be
+> accessed beforehand.
+> 
+> Link: https://lore.kernel.org/lkml/ZLqVdvsF11Ddo7Dq@google.com/
+> Co-developed-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Message-Id: <20231230172351.574091-5-michael.roth@amd.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>  arch/x86/include/asm/kvm_host.h    |  1 +
+>  arch/x86/kvm/x86.c                 |  6 +++
+>  include/linux/kvm_host.h           | 14 ++++++
+>  virt/kvm/Kconfig                   |  4 ++
+>  virt/kvm/guest_memfd.c             | 72 +++++++++++++++++++++++++++---
+>  6 files changed, 92 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index ac8b7614e79d..adfaad15e7e6 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -139,6 +139,7 @@ KVM_X86_OP(complete_emulated_msr)
+>  KVM_X86_OP(vcpu_deliver_sipi_vector)
+>  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+>  KVM_X86_OP_OPTIONAL(get_untagged_addr)
+> +KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
+>  
+>  #undef KVM_X86_OP
+>  #undef KVM_X86_OP_OPTIONAL
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 7de8a3f2a118..6d873d08f739 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1804,6 +1804,7 @@ struct kvm_x86_ops {
+>  	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
+>  
+>  	gva_t (*get_untagged_addr)(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
+> +	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+>  };
+>  
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f10a5a617120..eff532ea59c9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -13598,6 +13598,12 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
+>  
+> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
+> +int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order)
+> +{
+> +	return static_call(kvm_x86_gmem_prepare)(kvm, pfn, gfn, max_order);
+> +}
+> +#endif
+>  
+>  int kvm_spec_ctrl_test_value(u64 value)
+>  {
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 97afe4519772..03bf616b7308 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2434,6 +2434,8 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>  #ifdef CONFIG_KVM_PRIVATE_MEM
+>  int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  		     gfn_t gfn, kvm_pfn_t *pfn, int *max_order);
+> +int kvm_gmem_get_uninit_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> +		            gfn_t gfn, kvm_pfn_t *pfn, int *max_order);
+>  #else
+>  static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+>  				   struct kvm_memory_slot *slot, gfn_t gfn,
+> @@ -2442,6 +2444,18 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+>  	KVM_BUG_ON(1, kvm);
+>  	return -EIO;
+>  }
+> +
+> +static inline int kvm_gmem_get_uninit_pfn(struct kvm *kvm,
+> +				          struct kvm_memory_slot *slot, gfn_t gfn,
+> +				          kvm_pfn_t *pfn, int *max_order)
+> +{
+> +	KVM_BUG_ON(1, kvm);
+> +	return -EIO;
+> +}
+>  #endif /* CONFIG_KVM_PRIVATE_MEM */
+>  
+> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
+> +int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order);
+> +#endif
+> +
+>  #endif
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index a11e9c80fac9..dcce0c3b5b13 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -111,3 +111,7 @@ config KVM_GENERIC_PRIVATE_MEM
+>         select KVM_GENERIC_MEMORY_ATTRIBUTES
+>         select KVM_PRIVATE_MEM
+>         bool
+> +
+> +config HAVE_KVM_GMEM_PREPARE
+> +       bool
+> +       depends on KVM_PRIVATE_MEM
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index de0d5a5c210c..7ec7afafc960 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -13,12 +13,50 @@ struct kvm_gmem {
+>  	struct list_head entry;
+>  };
+>  
+> -static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+> +static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
+> +{
+> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
+> +	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
+> +	struct kvm_gmem *gmem;
+> +
+> +	list_for_each_entry(gmem, gmem_list, entry) {
+> +		struct kvm_memory_slot *slot;
+> +		struct kvm *kvm = gmem->kvm;
+> +		struct page *page;
+> +		kvm_pfn_t pfn;
+> +		gfn_t gfn;
+> +		int rc;
+> +
+> +		slot = xa_load(&gmem->bindings, index);
+> +		if (!slot)
+> +			continue;
+> +
+> +		page = folio_file_page(folio, index);
+> +		pfn = page_to_pfn(page);
+> +		gfn = slot->base_gfn + index - slot->gmem.pgoff;
+> +		rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, compound_order(compound_head(page)));
+> +		if (rc) {
+> +			pr_warn_ratelimited("gmem: Failed to prepare folio for index %lx, error %d.\n",
+> +					    index, rc);
+> +			return rc;
+> +		}
+> +	}
+> +
+> +#endif
+> +	return 0;
+> +}
 
-The thing that I want to protect against is userspace trying to
-initialize the same encrypted page twice.
+Can we make it conditional?
 
-> > > This looks bogus to me, and if it's not bogus, it's incomplete.
-> >
-> > ... or if not, what incompleteness can you spot?
->
-> The part where we race another caller passing FGP_CREAT_ONLY and one gets
-> an EEXIST back from filemap_add_folio().  Maybe that's not something
-> that can happen in your use case, but it's at least semantics that
-> need documenting.
+TDX doesn't need prepare hook to set gmem_parepare = NULL.  With large memory
+guest(several hundreds Gbyte) to lookup page cache, this loop slows down guest
+startup. I think it would also applies to SW_PROTECTED_VM (and pKVM in future).
 
-From the point of view of filemap_add_folio(), one of the racers wins
-and one fails. It doesn't matter to filemap.c if the missing
-synchronization is in the kernel or in userspace. In the case of KVM,
-the ioctl will return the number of pages before it found an existing
-page, or -EEXIST if that number is zero (similar to what nonblocking
-read does with EAGAIN).
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 3835732491b9..cafb8d0997b5 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -842,6 +842,9 @@ struct kvm {
+ #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+        /* Protected by slots_locks (for writes) and RCU (for reads) */
+        struct xarray mem_attr_array;
++#endif
++#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
++       bool gmem_need_prepare;
+ #endif
+        char stats_id[KVM_STATS_NAME_SIZE];
+ };
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 74e19170af8a..ab7d0f7d3d38 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -16,6 +16,7 @@ struct kvm_gmem {
+ static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
+ {
+ #ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
++       rc = kvm_arch_gmem_prepare(inode, index, folio);
+        struct list_head *gmem_list = &inode->i_mapping->i_private_list;
+        struct kvm_gmem *gmem;
+ 
+@@ -27,6 +28,9 @@ static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct fol
+                gfn_t gfn;
+                int rc;
+ 
++               if (!kvm->gmem_need_prepare)
++                       continue;
++
+                slot = xa_load(&gmem->bindings, index);
+                if (!slot)
+                        continue;
 
-I'll improve the documentation and changelog and make sure to Cc you
-on the next version.
-
-Thanks again!
-
-Paolo
-
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
