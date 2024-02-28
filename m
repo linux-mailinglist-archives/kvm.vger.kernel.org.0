@@ -1,143 +1,147 @@
-Return-Path: <kvm+bounces-10289-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10290-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE1B86B5C2
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 18:20:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2976986B60B
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 18:33:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4FF1C22376
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 17:20:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFA0A1F26872
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 17:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83C03FBBF;
-	Wed, 28 Feb 2024 17:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BA015A498;
+	Wed, 28 Feb 2024 17:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QqtEKj4h"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ep7bkA7Z"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E416EEEA
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 17:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDBE3FBB7
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 17:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709140846; cv=none; b=ApyD/+hfAKmk6RLxssb9AoZEsdUcQB+p5GQBPx21XIEq+dtyWQs/tQ08Qel/MfGaMR3gCBS7MAcfLrRu1PMxL9IjK5Yni52binXjgfzR1Ma4/iNAJNWznIUcwzbieEjJvwqRL78lBu571W6g7f6iU4LrKgSx7xuAdYu/mRKO7yc=
+	t=1709141574; cv=none; b=rJBotPFed7obFHLuSr55FypnjQtuwQKWV2cpW1tc1IKui2x5IqeiUiOIu8aTIDlTuQ5hOMxjs5DNbfMmCOq2XsmB/8Cl1/rG9JjYJKCZAVBHrsFuV1TOj9JN2hre9kcm6RD8aj439rJ3zNOk/o0JTUEq1bUb2ABeoGjc68U3r9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709140846; c=relaxed/simple;
-	bh=n0exr615nC5EZEeM0EsZy8UeaK59EIm1bYINM1HeqaE=;
+	s=arc-20240116; t=1709141574; c=relaxed/simple;
+	bh=fYS13N9NZSFLqL5gwUsUap5mM8K5OiN8syZJhBDVxbs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ha84W8n0bqwasG0VT3o3d5YXBCMoNK6tKI6gTjnsk4Y3j3Be+EltWjAptwkB/TuJOEM2uvQKX1+k4S5kvkBw6TghvIEorwJ+pncsyklNYMy3jTuK+dQRKTWMxaoElRsGI8O0C2PhVzFXYpJ0bpjuo5XSJc0V2Zi65Qij7OlWyxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QqtEKj4h; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=uYgnHrD9zxeHlvWzT4+CR3jumPq4P2yotpNSWkvvSz/CWiI+1g3J1fDTKPbUpnT5L3furfdx+Y9NJ+tOYhfJ35lNnVLuerIN7T2dUnwqb+yG8EdQVvAuzeBecS560gZxOyongAnTV3zOxX5nGJXv84BHso9A7Tb9AjiwydkUuco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ep7bkA7Z; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709140843;
+	s=mimecast20190719; t=1709141572;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dycmzOR3/TdQOeG/y2ISWS/eLdq44stW8h6+F3A1yk8=;
-	b=QqtEKj4h9Z8AEbJoB6APSD97K4WKVx5NS+ZXmJ3Mbk2wSAIqjpZCrJJ8gbitR72AxyZaJH
-	uY9olGFe9GG+8bC2ZfrQeYuTLmx3XWvlooxBFe5NygdFTd9l6XEHLle0lT19QOA1PE8a0f
-	L5Ocf4pWgiQuW0QDe/QLbS3U+L8vvoY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=SmXoF31qoxcztznnZL7H+L5aSF9s4S/rqGoBb/y1mxw=;
+	b=Ep7bkA7Zc1sQDi5iYfdeq19RitBLcCk2VSYXxV8PvwnkJDeHF3F/hU9wRSy4xt5Q29kcr3
+	fKAD8OCt8fuQts7oSLPyBRCyhDKHDgJcYkxI1MwuV0LRw7XassJeomM3xQckpy4FU+5RaK
+	JpGKtOlgK2qxZA6560PwHToSKMfEtmw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-IHJVgw0rN6ea0m6nJ0JkXA-1; Wed, 28 Feb 2024 12:20:41 -0500
-X-MC-Unique: IHJVgw0rN6ea0m6nJ0JkXA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33d8b4175dbso10629f8f.0
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 09:20:41 -0800 (PST)
+ us-mta-266-XL3BMfGvPMuIk5GoifmxuQ-1; Wed, 28 Feb 2024 12:32:50 -0500
+X-MC-Unique: XL3BMfGvPMuIk5GoifmxuQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-412b7721ad0so2334475e9.2
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 09:32:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709140840; x=1709745640;
+        d=1e100.net; s=20230601; t=1709141569; x=1709746369;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dycmzOR3/TdQOeG/y2ISWS/eLdq44stW8h6+F3A1yk8=;
-        b=LOAyUJm6DVswgxZue1dQHkVJpL5UkUBtQlXSWhIbs/3yWAOxbnMmQVMM4lqkyXuzIl
-         8aD1uChLO1H/Lo63zd2dtNd3NSOXbWXqBKcUeAsn4QT8YWgCnVgvmDbYr/GsMTJn3ALH
-         aKiLOwH2lvWUmVP7iZYrQOTQ8L4NpByCxl+DtllecEAb8SS8cvLP2E4XdHHH5Odxw+1a
-         jw9+1V5bMxW6mdwIunAu55z1EDqKFWzmJ2cXh1BfDgObzRf4CJ3Lbhk+CJ4yjE/vRfZm
-         hO8g7IfqXPXF16Q53BgoWbB73Kz2fGvBL2/c5bE0Bo8ye8y2a7LOcBv2Jz93bRwAH7NS
-         JNQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIcWOn6vW9Y76NZUrlnbt5lgRfwRSZ/QDNjDk773pvq3NymitDshLqupcpLici5HkV9JSYNfEFsuZg5UDeF/1XqgrI
-X-Gm-Message-State: AOJu0YxCrekNKtAG48jyfcr1AAYbIsoXQoKdBoqQbvLe5iACYlbhQFVr
-	LTfKxfvFgFmyprybuPuZWQK/AaRXtuKQ+2TkSDDhwN07J0X8R+oWX3eGFdPCvHnGcSM3MuZfVcG
-	e30IeEolojepUVTDMOD/X/LDlkFzh+sSJCtU5llbi9z0W/h0YPspQZ9mWYzdjZcWiqiI43cqSBc
-	dXrFfPW5X4XMDclLArSpl4Y8Vd
-X-Received: by 2002:a5d:4f08:0:b0:33d:52f:a2a8 with SMTP id c8-20020a5d4f08000000b0033d052fa2a8mr132879wru.61.1709140840237;
-        Wed, 28 Feb 2024 09:20:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGrJxfnFvdAvyPZHwu1Poyv4u42Rgqf2slyitZ0GtBvFbjP6kttzzRXOZulX4AgXNXT/citq9hS8BivlWCOl4c=
-X-Received: by 2002:a5d:4f08:0:b0:33d:52f:a2a8 with SMTP id
- c8-20020a5d4f08000000b0033d052fa2a8mr132869wru.61.1709140839873; Wed, 28 Feb
- 2024 09:20:39 -0800 (PST)
+        bh=SmXoF31qoxcztznnZL7H+L5aSF9s4S/rqGoBb/y1mxw=;
+        b=AVKsh1mVgA657vHYczabaM6QJgz4PWPHc3YP5AcRdj7R5QkcP1UlACk2P8jC6BMYcv
+         SL4QIYfufVw1+W8tg7bdY1iKkxTbzoSesZd4ROvvLEv8lLdxjUy8zAdV4AZo9RONGm2w
+         mWn21/47CUeC4xFvWIKOwfZHOehM+Niw0PLW6bYyQpys5aF8rcuLOMwTwgLFQXQzi5Qg
+         PDG4J1k5hmjfdOnW9kTaQYEOB+cv++yTd1YCtq7J9iMdVKr2lleAJoQZh/CEd1g1Weax
+         bIF7kKZMfpVIPLVivoIFRb/IXRum5McC7UaxK5tvp99oyEdytUVb9tOj2vB+hWDryAsm
+         ENDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUPcNUJ7pyXMP5xWK20Cz3qIUlWVxkVTKmfaT3wva78EZ9+YM3sKPF5jsAOvHe3ISUtp8RQgi8nxsEFBfVr3tCNhIT
+X-Gm-Message-State: AOJu0YxZGfNio9mpMcam/kq8pwcoj6eBDaPRZuyPOTRtY2o9B8r9cUKN
+	3KAc1I78DrwREsI4dfyaKp034tewTEeTml6pDoGZsfiWXnEtit+M8oiBB6VMxhkXHIVL3sJ84M6
+	1Yi1boORTngNG17wuWtGS2+9wz6cpcLIfgiD/JO9nLm8h76ZasZ37GzoGLKg5Eju/XCS25Txc+x
+	dc/UQ+kfHhAuRXAp8wsKUWYdAh
+X-Received: by 2002:adf:e488:0:b0:33e:202:277a with SMTP id i8-20020adfe488000000b0033e0202277amr164347wrm.46.1709141569075;
+        Wed, 28 Feb 2024 09:32:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHxcghLhChHEAIG27LGbO9eqn7L5dVgSGoWWA3BJFwSP4LoUv8zzPOjUYDW9wZ+F93WhzORVl0bdNLPnNOtaFg=
+X-Received: by 2002:adf:e488:0:b0:33e:202:277a with SMTP id
+ i8-20020adfe488000000b0033e0202277amr164333wrm.46.1709141568784; Wed, 28 Feb
+ 2024 09:32:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240227232100.478238-1-pbonzini@redhat.com> <Zd6LK7RpZZ8t-5CY@google.com>
- <CABgObfYpRJnDdQrxp=OgjhbT9A+LHK36MHjMvzcQJsHAmfX++w@mail.gmail.com> <Zd9hrfJ5xRI6HeZp@google.com>
-In-Reply-To: <Zd9hrfJ5xRI6HeZp@google.com>
+References: <20240227232100.478238-1-pbonzini@redhat.com> <20240227232100.478238-11-pbonzini@redhat.com>
+ <Zd6T06Qghvutp8Qw@google.com>
+In-Reply-To: <Zd6T06Qghvutp8Qw@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 28 Feb 2024 18:20:27 +0100
-Message-ID: <CABgObfaPRpEnndHwkZpOZ=JOZjJPyh2KXYLh5ZGMFMSboZqj9w@mail.gmail.com>
-Subject: Re: [PATCH 00/21] TDX/SNP part 1 of n, for 6.9
+Date: Wed, 28 Feb 2024 18:32:37 +0100
+Message-ID: <CABgObfaPodSSzArO99Hkn=vpGotO1wZ-0dZKEZHx9EqLZ7M_XQ@mail.gmail.com>
+Subject: Re: [PATCH 10/21] KVM: SEV: Use a VMSA physical address variable for
+ populating VMCB
 To: Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
-	isaku.yamahata@intel.com, thomas.lendacky@amd.com
+	isaku.yamahata@intel.com, thomas.lendacky@amd.com, 
+	Ashish Kalra <ashish.kalra@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 28, 2024 at 5:39=E2=80=AFPM Sean Christopherson <seanjc@google.=
+On Wed, Feb 28, 2024 at 3:00=E2=80=AFAM Sean Christopherson <seanjc@google.=
 com> wrote:
-> > > This doesn't work.  The ENC flag gets set on any SNP *capable* CPU, w=
-hich results
-> > > in false positives for SEV and SEV-ES guests[*].
+>
+> On Tue, Feb 27, 2024, Paolo Bonzini wrote:
+> > From: Tom Lendacky <thomas.lendacky@amd.com>
 > >
-> > You didn't look at the patch did you? :)
->
-> Guilty, sort of.  I looked (and tested) the patch from the TDX series, bu=
-t I didn't
-> look at what you postd.  But it's a moot point, because now I did look at=
- what you
-> posted, and it's still broken :-)
->
-> > It does check for has_private_mem (alternatively I could have dropped t=
-he bit
-> > in SVM code for SEV and SEV-ES guests).
->
-> The problem isn't with *KVM* setting the bit, it's with *hardware* settin=
-g the
-> bit for SEV and SEV-ES guests.  That results in this:
->
->   .is_private =3D vcpu->kvm->arch.has_private_mem && (err & PFERR_GUEST_E=
-NC_MASK),
->
-> marking the fault as private.  Which, in a vacuum, isn't technically wron=
-g, since
-> from hardware's perspective the vCPU access was "private".  But from KVM'=
+> > In preparation to support SEV-SNP AP Creation, use a variable that hold=
 s
-> perspective, SEV and SEV-ES guests don't have private memory
+> > the VMSA physical address rather than converting the virtual address.
+> > This will allow SEV-SNP AP Creation to set the new physical address tha=
+t
+> > will be used should the vCPU reset path be taken.
+>
+> No, this patch belongs in the SNP series.  The hanlding of vmsa_pa is bro=
+ken
+> (KVM leaks the page set by the guest; I need to follow-up in the SNP seri=
+es).
+> On top of that, I detest duplicat variables, and I don't like that KVM ke=
+eps its
+> original VMSA (kernel allocation) after the guest creates its own.
+>
+> I can't possibly imagine why this needs to be pulled in early.  There's n=
+o way
+> TDX needs this, and while this patch is _small_, the functional change it=
+ leads
+> to is not.
 
-vcpu->kvm->arch.has_private_mem is the flag from the SEV VM types
-series. It's false on SEV and SEV-ES VMs, therefore fault->is_private
-is going to be false as well. Is it ENOCOFFEE for you or ENODINNER for
-me? :)
+Well, the point of this series (and there will be more if you agree)
+is exactly to ask "why not" in a way that is more manageable than
+through the huge TDX and SNP series. My reading of the above is that
+you believe this is small enough that it can even be merged with "KVM:
+SEV: Support SEV-SNP AP Creation NAE event" (with fixes), which I
+don't disagree with.
+
+Otherwise, if the approach was good there's no reason _not_ to get it
+in early. It's just a refactoring.
+
+Talking in general: I think I agree about keeping the gmem parts in a
+kvm-coco-queue branch (and in the meanwhile involving the mm people if
+mm/filemap.c changes are needed). #VE too, probably, but what I
+_really_ want to avoid is that these series (the plural is not a typo)
+become a new bottleneck for everybody. Basically these are meant to be
+a "these seem good to go to me, please confirm or deny" between
+comaintainers more than a real patch posting; having an extra branch
+is extra protection against screwups but we should be mindful that
+force pushes are painful for everyone.
+
+If you think I'm misguided, please do speak out or feel free to ask me
+to talk on voice.
 
 Paolo
-
-> And because the flag only gets set on SNP capable hardware (in my limited=
- testing
-> of a whole two systems), running the same VM on different hardware would =
-result
-> in faults being marked private on one system, but not the other.  Which m=
-eans that
-> KVM can't rely on the flag being set for SEV or SEV-ES guests, i.e. we ca=
-n't
-> retroactively enforce anything (not to mention that that might break exis=
-ting VMs).
->
 
 
