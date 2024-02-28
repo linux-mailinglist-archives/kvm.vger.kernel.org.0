@@ -1,230 +1,258 @@
-Return-Path: <kvm+bounces-10306-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10307-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B73286B9C3
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:20:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DBB886B9CA
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32DF1C234B5
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:20:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52A26285DA6
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0BD27002E;
-	Wed, 28 Feb 2024 21:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E475B70021;
+	Wed, 28 Feb 2024 21:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="poRPXhfs"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="W/6n1Ujf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2051.outbound.protection.outlook.com [40.107.95.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693B970024
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 21:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709155194; cv=none; b=blWTz/B6XhJXUQFhtnSguIiP97UA2TlFDSQpLqcw+IKCxYnwWSK0eebOBGNs1OeoPUH4vqvwCY8oF+zjkV15vtM2e363mkumUnW7C5+XRS+0ig48a3JkSaGAYGX17cbr4McZfTvsCrT88R1QLth+iHkDZwDd7xbeCX4Z1Mc1OCQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709155194; c=relaxed/simple;
-	bh=gk/MrBtcV7Nj4M6X2sQOVcKzwLMPmaE9N2JN751XURU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gQr11M0RvHstGLgELj+lg3BuWb801rq/vP1MzZZLPnaVANcr/74A486dRTo8JsZroKL19XDJ93VYnzD4m4GHjGgsuhBg4G7ZBqqYbcuegWM03c3uPPWVHVLOIZ1c0/ivtOxbvVOlDquvmymC008YsmP5ZxSf2cEFQE+9DklY5Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=poRPXhfs; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60966f363c1so1477577b3.3
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 13:19:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709155190; x=1709759990; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I3lMvE57lAGMOn/5i5GUfHlWgJVlKCqOgZHHFIXT5YI=;
-        b=poRPXhfsYkCniLxu2SKdSpdTc8kxYQFx268+jR6EGsyEEsUNkBSLHbI8qy4ZXOAELO
-         Ygn0BdGKwB3A70aIzf1JPMv7vBbEFE8Re1J5rwL+kfhdMazmI/71c+ySjWteu/kEzZED
-         dEmyXtOUe3gve0NgqXtGvDTppaVDyEv+r/DMj49nqVo6+lMCLonzFiL5vSQ2njXdSLuh
-         yYd3bOsrd4eDJhAeSAHjtMX3qXkrVU1XlCGWvEvnBTzzcNiH46/KNb6R5KJSMSyP2pJE
-         dyglx+6TLSZ/0mRg2ZnavTNyvDbv+0RWf3CI3fy5CmiwQihdR/PeI89ajk9MpWIcona9
-         Z4PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709155190; x=1709759990;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=I3lMvE57lAGMOn/5i5GUfHlWgJVlKCqOgZHHFIXT5YI=;
-        b=fPXEzDHpM+7sTaZNbeeZtl53OL4aDJ2WGDv48h/74ZGu8hqUI7ljgWJAJ+6D202KGV
-         geqk96dal1lasDXe8XrBKU2uloKV8at7DwInwShm3lh4FFXrLg6I76pns0GLEsdKWNjG
-         orb8YnIcIxOBp24oGqJfbavmwse7NJCyW/XsHkcQZQSzIn6IwPYleQ8yJTS+SZ80AlbG
-         M26cod0v2TBZr3Yl7vNCMf7AZ86smuS5gZM2MK5z0hZx8dJD44JvBto0grLxLjDAkRBp
-         Q3wLSWAy+qk9viJ20A9DF35j3epqCuLOro85qk918ow29P0VWaAmTlCnvQkP+o1Ff323
-         yZwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYq2BAGh1TriWqNBNz8DaLRQ+CZSTmueZc7MwqPEcaqQQ6pLGKdrMkugsPn26tRqVuzIPExxf0Sdect8Yi1/U6zmvE
-X-Gm-Message-State: AOJu0Yz0QwzN7s6Iw1k6ZecpQ7Te6YuJ6UEU+z9mbwHyxVgz70bqpEmx
-	VuiEGKal6OEy3XwiRchtRU9hYBcU6NeWsRO83b6NdlVdKJSqzdLzSCEgV/cWNTKReVjKZKQblxu
-	hOg==
-X-Google-Smtp-Source: AGHT+IGIb2EDaA1Xfc5xFJEWOVFhVtRT96S9AFF70n2hacpd3aAGkhz27VZdHFJQY6yEoiJnM3glwUpknsM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:338b:b0:609:22ea:f95e with SMTP id
- fl11-20020a05690c338b00b0060922eaf95emr59391ywb.4.1709155190409; Wed, 28 Feb
- 2024 13:19:50 -0800 (PST)
-Date: Wed, 28 Feb 2024 13:19:48 -0800
-In-Reply-To: <Zd-JjBNCpFG5iDul@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFD486250
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 21:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709155332; cv=fail; b=YCsBjbqS/Uh5WKioECdnTR1VxglkoestXySvTmu+6z/gp2dOCBoJStTFuEgoD+SConnovCjKhJGRTvmjQlLJMfZAD0bT3Wq9B8BxjxyZywM0aY/+rBw0kKixSfkZ1nCz8um9uzX+VXlgC+h3SORB/meh9eSOXolvbnAWhrzIG7k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709155332; c=relaxed/simple;
+	bh=P+c80z35x7869M7AQiDzlkhC72YHcJGwDEHSGus5GQA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=SsfnZsyYA2e3f5TQyVwWhjXmAFyc0oX08fk/g+g40mMwN36sPKRXMBj2ylh8CXUoV8RH4b3DaHIwzQWKfS9qqMxXJjeTqfFFssZ3XC8eT3H3v+hOKV275qKT9OyVbnnk74xf9Dxw73yS8QURIA1wVlqUBmpS9d2ScdP8UhU6O78=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=W/6n1Ujf; arc=fail smtp.client-ip=40.107.95.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MJYxWM/CS9dqA50jCfL4bsx9OMNuYxRO5o2788XkoGOhMSRFa9wNiYsR/S4EAfgVAu72Pn64OtNDDQQadckT6XOR/ncA+U3WV6QfRR3leNZVGUabsn8KHimlSTOYT4wKUjViz5sUW/LqiCnBWODGKVebZvKTk4V4pcD4mltqGv4F5cry6sjY0AvTSWLzMk0FJ+UhUaNEfHu3fcIhJHwitGxJwfR7iRg8LyZuoqYcsUBacdujWz8fsZ91vDHmN1szrq2do9SkJrWNOjwqNp1eiJuqMwkT5dIv0hS19/qOLpJnfu2hd8DKDXBOTXZquYhzJUiOhYYvb4O8inPnbftT2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Dj75PmMLN5A6l2He9dZLS881z0useZOtqJ78v8QVRTs=;
+ b=PxREaTS2fSd86boqWUJL0eC42kdIGmn16wq9EWkhgIRCR7Jo4tkBHFuMGqGVZF1UYEXT/z2kEj2e8vK4rsDOM0k0NflixBKqY1mDRI+/km90DanafXViKjkyeixROhgALQGg08VSILKYngsjcF9UEfOSds0a/NhWUC8CcvTmn1Vh12Bx5Rg/N0787UMHZlWg3VdWfrN6hkR4YN/cBuWR/CWMVS6qbx7s3j750BQEXBmnL6RdrpsHr3cAtiuV2f/5LWA3Po0rTYWe9vj35JVpae6HRDUlQZG7q2dm0uN5nI3SxYAEPoFDEutE+5Eo31hWB7AYiveFXAq121dmCvwMUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Dj75PmMLN5A6l2He9dZLS881z0useZOtqJ78v8QVRTs=;
+ b=W/6n1Ujf9V/2mlth7mF71g5/+i7tCdOfhAPIYj2gdPf04stULiIm5C+cfL2HY7/VzKHFbRkuGlZH+r1AVz6CvX9aBJ++SU/yn5t2KeUO3cjLkhQ/ChjcAiKAAOk8QJ9lvmOwM3sEAx+tcVVCG+t4FqeC01rW2otoSXwotP4VPvw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
+ by CH3PR12MB9217.namprd12.prod.outlook.com (2603:10b6:610:195::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.34; Wed, 28 Feb
+ 2024 21:22:07 +0000
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::b49d:bb81:38b6:ce54]) by MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::b49d:bb81:38b6:ce54%4]) with mapi id 15.20.7316.039; Wed, 28 Feb 2024
+ 21:22:07 +0000
+Message-ID: <3ab53ea9-be77-4ee7-9247-d89c0ec62346@amd.com>
+Date: Wed, 28 Feb 2024 15:22:03 -0600
+User-Agent: Mozilla Thunderbird
+Reply-To: babu.moger@amd.com
+Subject: Re: [PATCH v9 18/21] hw/i386/pc: Support smp.modules for x86 PC
+ machine
+Content-Language: en-US
+To: Zhao Liu <zhao1.liu@linux.intel.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Zhenyu Wang <zhenyu.z.wang@intel.com>,
+ Zhuocheng Ding <zhuocheng.ding@intel.com>, Yongwei Ma
+ <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
+References: <20240227103231.1556302-1-zhao1.liu@linux.intel.com>
+ <20240227103231.1556302-19-zhao1.liu@linux.intel.com>
+From: "Moger, Babu" <babu.moger@amd.com>
+In-Reply-To: <20240227103231.1556302-19-zhao1.liu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM5PR07CA0092.namprd07.prod.outlook.com
+ (2603:10b6:4:ae::21) To MW3PR12MB4553.namprd12.prod.outlook.com
+ (2603:10b6:303:2c::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240208204844.119326-1-thuth@redhat.com> <20240208204844.119326-4-thuth@redhat.com>
- <501ac94d-11ab-4765-a25d-75013c021be6@sirena.org.uk> <Zd-JjBNCpFG5iDul@google.com>
-Message-ID: <Zd-jdAtI_C_d_fp4@google.com>
-Subject: Re: [PATCH v3 3/8] KVM: selftests: Move setting a vCPU's entry point
- to a dedicated API
-From: Sean Christopherson <seanjc@google.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Aishwarya TCV <aishwarya.tcv@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW3PR12MB4553:EE_|CH3PR12MB9217:EE_
+X-MS-Office365-Filtering-Correlation-Id: e9ca65e5-003f-4ce4-70ce-08dc38a35111
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	eQCzzp3EtMzcFaeJpkf2zjcUAUHfN8Irc4Ccpemc39Wmo8b4mSuge352qkl25C8zLeee+sX70B1oNrXgNpHIlBT9IoqDKQAKWyo368OayQf2cOyXj90AqQikOfcY+aj2HvBo1K7xG7/xpsvBvD/qm4i2yNbsAWxI6dI+NWrJSVHZoPFjk3An6tnaO3qo2Lp3NdOF7Kj2nc6PXYZ31EvsBof+AeIh+MFfzggLJSBJiT0wyiaTZL0XjRDiR9m8wloUVmEVBaNN+vBOxi+xJS5zJvtjJfuRjRYh0ppTwwk04ZAfaVh8QCsiBU/r2TSQh8iD0dwuyqJMMyicdlyFMtJh5sqwK9NJnUIyidwdsJzgn6pqMoP36ihVcXS1J/ZRbSPFEZcQpCkxotfJDhd0be5KWNuGgm9yTLdHQT5diz241fx7zhJJLRwItv0fcmdDmiTrhETtNeo1dnSgph59ZfZjg+t0NKdQ0X8gAlAJM0nCkDJ8jTsY7rkxDY/Yprk8kgM0Krw3hCnrDAQ7RmcOqymlH1Jm8bpZTtzJzbVQsEcLay7I5qwt47hMWKgRDfPbGEJYEdClCSr/i7SoQ6hRBkmeLDh8sglAH5t1keiBPZ4CWDIsG6rocEUCRkwNSQwRmsYVpY6PeOspeE4xqR/W09oSNlOjeyUZ6aefKV/xQpUM1xa6J0GDGcfatGcOH0qdfnscA+1xnHDN4RBY8G+7g3yV+g==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(921011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?S0NRU0VYMlZDSzVQcXA3azhGY1BscFROdk8ycnd6cVd0enppZWsyYmRwRVBC?=
+ =?utf-8?B?Wlp0WGtzYzBEWG5Zb2F6K01tMitnWmdwR1ZjUUJmZWp4M0xSVVN6eng0d3Ny?=
+ =?utf-8?B?ejAva1VFM1U1bCt1Tm05UGpVSzhGWXhFU0NnS2ZsYzJQb3A2bVRRZ2hNTFBj?=
+ =?utf-8?B?c1RWRm5LTGhnU1IwckVKUDBVZE45OFhyMnpDenpSbTgxWThiRENhblhCMVpP?=
+ =?utf-8?B?dzEvTW5tYkdLMjcvdFN4WlJNOE9ZQXBWem1rdDVaKzdvL0NvZ1E4bDV4bFRU?=
+ =?utf-8?B?VFJPMFVrNUhXK0xiQ2F6QWI3Qng5NzB0RFZ2QktpeVduc2s0T0ROam9qbTdh?=
+ =?utf-8?B?VnlOcnIzWXFyUnY3VDQxRFQ2Z2dMSnZhakVTM3RQYU80VDZXOS8wZEFuUmds?=
+ =?utf-8?B?K3hPRjhWWTV1UU1iMmt1SFRrQjA1Nkd0T2NGQjB3a1V1Zms1ZU9QT2RzcDI1?=
+ =?utf-8?B?WmpLeXp0cDY5L3Uvcyt2VlhyVFVEeVh6SU9ZMTNGQmU5SUNGMG9tVVdjVDJJ?=
+ =?utf-8?B?a3h6b2hCYytLUFZtTWRUbG1MMzIzU0tvV1YvQ2huelNQNmgxWlZPamp2Y1Zx?=
+ =?utf-8?B?RzVyTHJNT3VMdCtsVkVsVjNUMlZ2dkxmd1ZHWFM1d3hMdHAvdERLTDYwYUkw?=
+ =?utf-8?B?MS9jSjFMemJUdzJIT3ZrNmJML2hIZUR4KzdQS0NESTlId1BkUTBrRDQ4UGs3?=
+ =?utf-8?B?YmNvWDNJTVFjZEdJelJGdzJqUDVWaWRZdlBwRVRLWllrQitSQnRtMEVpUG02?=
+ =?utf-8?B?RlJmRi8yZmVyNURSNWE2TzdCQzlVdnpHRjRRMmdickVjY21hRUtLZWdFbzNz?=
+ =?utf-8?B?Y0xDVGtERlY2ekdPK0xoOTZRQnVqTzAvSEM1VHlIVTljanlUZDR4SjlmWTBR?=
+ =?utf-8?B?dE9tUXFaenBLZW9RTWkrY3lCb0l0dWlmQkFwQUFFaFVZeHdhYTdPZGFyQWpT?=
+ =?utf-8?B?LzlraGNxYjJ5dFNTK092Z3JUTnNyajc5SFZ0d1lqRXhqc0N0T1VldFhGU2Q3?=
+ =?utf-8?B?elJiQmFOWUd2Z0EvVlRLck1DUlNrTnAweTRlRXVqa1lUZ1V1YzZocFpKci92?=
+ =?utf-8?B?eTQ3Um5TOXQ0N0Q2YkNjbTNjemxKWkk1S2pxRzJUZDVvN0o3cW13anF2N1V4?=
+ =?utf-8?B?OFRuV0J6dFFGaEhNTWhGVXFSVGpRS2FyV0lwNUxBL0FJZEhVYnVYeDQyUUVi?=
+ =?utf-8?B?S01DU09rMk5seFdZU0tuSTYvZklwQVo1Y0ZFYURYZkFTM3A3ZjNkNDEwRzRU?=
+ =?utf-8?B?d2k4NUdwaVJBWFQybXFRclJQNC9RazRaN1A3ZElzdmJwMGYyMW5YTHFJSURq?=
+ =?utf-8?B?eFppNmJmRDRLMW1hVlY4SWFleWZqa0lQS28xeHNXb3JDOTlYdGZxWVVuZTBu?=
+ =?utf-8?B?eUdBWkhoSTRPazRFdjNsK0tJOTZTQURTSmphb2hxMTJ5VFlQM0dTTGk3aGpp?=
+ =?utf-8?B?NVNXcEh5aFRrSEE3SDVUNGJOcEQ5OUo5NzdFeVFFQ0NYWUlVTVJOTnlWTlE3?=
+ =?utf-8?B?akxsVjloYi9Od3B5cGJHQ2lTd2V5RWloa3UrY3U2VU9kMGFsckRBanFzZ05R?=
+ =?utf-8?B?ZVBzb2VSdWtEWjdnb1RIMHdlRWE1YjNQbE80cFdMZ29BbjhQT1BWcktmalpV?=
+ =?utf-8?B?RWdkY1o5YzFPRk1BZTN5RzBFVWFLbWovOTNONE5aZ09zeWlUK1NQYXU2R2Jx?=
+ =?utf-8?B?Ukg4RmI4bWVaV3d2U3RrVXZXanJXdW5ENjlzVmI3TU5tcW40NXpPbzcyK0xi?=
+ =?utf-8?B?SjZDS3kzdEhPQVpIeUY1RmlWcVByUUFaR3FkRE5lcjVEN3RuOWxMOURpKzRM?=
+ =?utf-8?B?ZGNIUjVnQmh4OEs5b2wrR0p1Y3dzOHZaU1lsbWxJNWhkaVdJZUpHSjFROWpx?=
+ =?utf-8?B?RnppejFNeU53b01uSjBEVlgzWkxBMW1CN0d0dnF0eS9Gd0dIV0pUUzlwRkxl?=
+ =?utf-8?B?eXhlTm13aXl3SmZsNElmSGtBdk0reHE1VlFlZW1ra1ExU0o5UldKMlI5NWdD?=
+ =?utf-8?B?b0NHMllpN09LWUtPdS9YWStkVG9EQUJrNDc2elNlem9ucVRRYkRlY0l4cHZw?=
+ =?utf-8?B?SWJwRjlHdjgvSUhkNlI1dDFlUytURjh5WkdXV3lLQTVUTFU3K3R4UGZkcWpn?=
+ =?utf-8?Q?4Boo=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9ca65e5-003f-4ce4-70ce-08dc38a35111
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2024 21:22:07.3634
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: f4fF4gN96j4xNOCo2bWrzYxchvLxs0rqyw5ddebghqSDt0JdhvWUSX1TZe1Zwt2U
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9217
 
-Oliver and/or Marc, question for y'all towards the bottom.
+Hi Zhao,
 
-On Wed, Feb 28, 2024, Sean Christopherson wrote:
-> On Wed, Feb 28, 2024, Mark Brown wrote:
-> > On Thu, Feb 08, 2024 at 09:48:39PM +0100, Thomas Huth wrote:
-> > > From: Sean Christopherson <seanjc@google.com>
-> > >=20
-> > > Extract the code to set a vCPU's entry point out of vm_arch_vcpu_add(=
-) and
-> > > into a new API, vcpu_arch_set_entry_point().  Providing a separate AP=
-I
-> > > will allow creating a KVM selftests hardness that can handle tests th=
-at
-> > > use different entry points for sub-tests, whereas *requiring* the ent=
-ry
-> > > point to be specified at vCPU creation makes it difficult to create a
-> > > generic harness, e.g. the boilerplate setup/teardown can't easily cre=
-ate
-> > > and destroy the VM and vCPUs.
-> >=20
-> > With today's -next I'm seeing most of the KVM selftests failing on an
-> > arm64 defconfig with:
-> >=20
-> > # =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-> > #   include/kvm_util_base.h:677: !ret
-> > #   pid=3D735 tid=3D735 errno=3D9 - Bad file descriptor
-> > #      1	0x0000000000410937: vcpu_set_reg at kvm_util_base.h:677 (discr=
-iminator 4)
-> > #      2	 (inlined by) vcpu_arch_set_entry_point at processor.c:370 (di=
-scriminator 4)
-> > #      3	0x0000000000407bab: vm_vcpu_add at kvm_util_base.h:981
-> > #      4	 (inlined by) __vm_create_with_vcpus at kvm_util.c:419
-> > #      5	 (inlined by) __vm_create_shape_with_one_vcpu at kvm_util.c:43=
-2
-> > #      6	0x000000000040187b: __vm_create_with_one_vcpu at kvm_util_base=
-.h:892
-> > #      7	 (inlined by) vm_create_with_one_vcpu at kvm_util_base.h:899
-> > #      8	 (inlined by) main at aarch32_id_regs.c:158
-> > #      9	0x0000007fbcbe6dc3: ?? ??:0
-> > #     10	0x0000007fbcbe6e97: ?? ??:0
-> > #     11	0x0000000000401f2f: _start at ??:?
-> > #   KVM_SET_ONE_REG failed, rc: -1 errno: 9 (Bad file descriptor)
-> >=20
-> > and a bisect pointed to this commit which does look plausibly relevant.
-> >=20
-> > Note that while this was bisected with plain arm64 defconfig and the KV=
-M
-> > selftests fragment was not enabled, but enabling the KVM fragment gave
-> > the same result as would be expected based on the options enabled by th=
-e
-> > fragment.  We're also seeing an alternative failure pattern where the
-> > tests segfault when run in a different environment, I'm also tracking
-> > that down but I suspect these are the same issue.
->=20
-> Gah, my bad, I should have at least tested on ARM since I have easy acces=
-s to
-> such hardware.  If I can't figure out what's going wrong in the next few =
-hours,
-> I'll drop this series and we can try again for 6.10.
->=20
-> Sorry :-/
+On 2/27/24 04:32, Zhao Liu wrote:
+> From: Zhao Liu <zhao1.liu@intel.com>
+> 
+> As module-level topology support is added to X86CPU, now we can enable
+> the support for the modules parameter on PC machines. With this support,
+> we can define a 5-level x86 CPU topology with "-smp":
+> 
+> -smp cpus=*,maxcpus=*,sockets=*,dies=*,modules=*,cores=*,threads=*.
+> 
+> Additionally, add the 5-level topology example in description of "-smp".
+> 
+> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> Co-developed-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
+> Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> ---
+> Changes since v8:
+>  * Add missing "modules" parameter in -smp example.
+> 
+> Changes since v7:
+>  * Supported modules instead of clusters for PC.
+>  * Dropped Michael/Babu/Yanan's ACKed/Tested/Reviewed tags since the
+>    code change.
+>  * Re-added Yongwei's Tested tag For his re-testing.
+> ---
+>  hw/i386/pc.c    |  1 +
+>  qemu-options.hx | 18 ++++++++++--------
+>  2 files changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f8eb684a4926..b270a66605fc 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1830,6 +1830,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>      mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+>      mc->nvdimm_supported = true;
+>      mc->smp_props.dies_supported = true;
+> +    mc->smp_props.modules_supported = true;
+>      mc->default_ram_id = "pc.ram";
+>      pcmc->default_smbios_ep_type = SMBIOS_ENTRY_POINT_TYPE_64;
+>  
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9be1e5817c7d..b5784fda32cb 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -281,7 +281,8 @@ ERST
+>  
+>  DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+>      "-smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books][,sockets=sockets]\n"
+> -    "               [,dies=dies][,clusters=clusters][,cores=cores][,threads=threads]\n"
+> +    "               [,dies=dies][,clusters=clusters][,modules=modules][,cores=cores]\n"
+> +    "               [,threads=threads]\n"
+>      "                set the number of initial CPUs to 'n' [default=1]\n"
+>      "                maxcpus= maximum number of total CPUs, including\n"
+>      "                offline CPUs for hotplug, etc\n"
+> @@ -290,7 +291,8 @@ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+>      "                sockets= number of sockets in one book\n"
+>      "                dies= number of dies in one socket\n"
+>      "                clusters= number of clusters in one die\n"
+> -    "                cores= number of cores in one cluster\n"
+> +    "                modules= number of modules in one cluster\n"
+> +    "                cores= number of cores in one module\n"
+>      "                threads= number of threads in one core\n"
+>      "Note: Different machines may have different subsets of the CPU topology\n"
+>      "      parameters supported, so the actual meaning of the supported parameters\n"
+> @@ -306,7 +308,7 @@ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+>      "      must be set as 1 in the purpose of correct parsing.\n",
+>      QEMU_ARCH_ALL)
+>  SRST
+> -``-smp [[cpus=]n][,maxcpus=maxcpus][,sockets=sockets][,dies=dies][,clusters=clusters][,cores=cores][,threads=threads]``
+> +``-smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books][,sockets=sockets][,dies=dies][,clusters=clusters][,modules=modules][,cores=cores][,threads=threads]``
 
-/facepalm
+You have added drawers, books here. Were they missing before?
 
-The inner helper doesn't return the vCPU, and by dumb (bad) luck, selftests=
- end
-up trying to use fd=3D0.
+>      Simulate a SMP system with '\ ``n``\ ' CPUs initially present on
+>      the machine type board. On boards supporting CPU hotplug, the optional
+>      '\ ``maxcpus``\ ' parameter can be set to enable further CPUs to be
+> @@ -345,14 +347,14 @@ SRST
+>          -smp 8,sockets=2,cores=2,threads=2,maxcpus=8
+>  
+>      The following sub-option defines a CPU topology hierarchy (2 sockets
+> -    totally on the machine, 2 dies per socket, 2 cores per die, 2 threads
+> -    per core) for PC machines which support sockets/dies/cores/threads.
+> -    Some members of the option can be omitted but their values will be
+> -    automatically computed:
+> +    totally on the machine, 2 dies per socket, 2 modules per die, 2 cores per
+> +    module, 2 threads per core) for PC machines which support sockets/dies
+> +    /modules/cores/threads. Some members of the option can be omitted but
+> +    their values will be automatically computed:
+>  
+>      ::
+>  
+> -        -smp 16,sockets=2,dies=2,cores=2,threads=2,maxcpus=16
+> +        -smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32
+>  
+>      The following sub-option defines a CPU topology hierarchy (2 sockets
+>      totally on the machine, 2 clusters per socket, 2 cores per cluster,
 
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/te=
-sting/selftests/kvm/lib/aarch64/processor.c
-index ed4ab29f4fad..a9eb17295be4 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -386,6 +386,7 @@ static struct kvm_vcpu *__aarch64_vcpu_add(struct kvm_v=
-m *vm, uint32_t vcpu_id,
-        aarch64_vcpu_setup(vcpu, init);
-=20
-        vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size=
-);
-+       return vcpu;
- }
-=20
- struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
-
-I'll squash the above and force push.
-
-
-In my defense, I would have caught this when build-testing, as the compiler=
- does
-warn...
-
-  lib/aarch64/processor.c -o /usr/local/google/home/seanjc/go/src/kernel.or=
-g/nox/tools/testing/selftests/kvm/lib/aarch64/processor.o
-  lib/aarch64/processor.c: In function =E2=80=98__aarch64_vcpu_add=E2=80=99=
-:
-  lib/aarch64/processor.c:389:1: warning: no return statement in function r=
-eturning non-void [-Wreturn-type]
-    389 | }
-        | ^
-  At top level:
-  cc1: note: unrecognized command-line option =E2=80=98-Wno-gnu-variable-si=
-zed-type-not-at-end=E2=80=99 may have been intended to silence earlier diag=
-nostics
-
-but due to a different issue that is fixed in the kvm-arm tree[*], but not =
-in mine,
-I built without -Werror and didn't see the new warn in the sea of GUEST_PRI=
-NTF
-warnings.
-
-Ugh, and I still can't enable -Werror, because there are unused functions i=
-n
-aarch64/vpmu_counter_access.c
-
-  aarch64/vpmu_counter_access.c:96:20: error: unused function 'enable_count=
-er' [-Werror,-Wunused-function]
-  static inline void enable_counter(int idx)
-                   ^
-  aarch64/vpmu_counter_access.c:104:20: error: unused function 'disable_cou=
-nter' [-Werror,-Wunused-function]
-  static inline void disable_counter(int idx)
-                   ^
-  2 errors generated.
-  make: *** [Makefile:278: /usr/local/google/home/seanjc/go/src/kernel.org/=
-nox/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.o] Error 1
-  make: *** Waiting for unfinished jobs....
-
-  Commit 49f31cff9c533d264659356b90445023b04e10fb failed to build with 'mak=
-e-clang make-arm make -j128'.
-
-Oliver/Marc, any thoughts on how you want to fix the unused function warnin=
-gs?
-As evidenced by this goof, being able to compile with -Werror is super help=
-ful.
-
-And another question: is there any reason to not force -Werror for selftest=
-s?
-
-[*] https://lore.kernel.org/all/20240202234603.366925-1-seanjc@google.com
+-- 
+Thanks
+Babu Moger
 
