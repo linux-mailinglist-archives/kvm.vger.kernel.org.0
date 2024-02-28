@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-10265-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10266-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B61C86B217
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 15:44:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2BBE86B219
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 15:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B2A828224A
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 14:44:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56FCE287487
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 14:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4595215A4BA;
-	Wed, 28 Feb 2024 14:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DF4145351;
+	Wed, 28 Feb 2024 14:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n/Ghzxp2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nVQUALR1"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF4015CD51;
-	Wed, 28 Feb 2024 14:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1126215CD66;
+	Wed, 28 Feb 2024 14:43:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709131388; cv=none; b=GvbPOETkkkXUpiBoBPHXoiwTvEb6WgkH9gr9JHR2kR3Yj6GyutAs8w8E0SopLiz9mKKwJjvUs4K66Ln3LCQUsN6kAxkWw1QxNTwn/zVVpVdiLsoOK4FMn8gH2FiHyv/Uau8XrwmKGQG3p24rlABL5hxF2udbD1faRqPmArRrRM4=
+	t=1709131390; cv=none; b=tsbjSJXRvSh+cg1HMhjM39EAVdbPV3kTyQAZFfsLhUFDUb+Piq/Bn8mewZgJu/2vpmqtQIY+YmTJouT42RkRb88SzIfUB9tg+fjfvx6z45a2BmCTXmezuTMRW9WtGZIhsbtFGZREbuBrdts/toHrHyKgWnNppbU+61nMsPoC1qA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709131388; c=relaxed/simple;
-	bh=tXm2AUnRIeOiFPqvc10RMVAIitrxexXPi1ajm/TZ1ws=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=PRTRDp20Y9b5IAXSLzgTHn2AXp4zRpJ+2Mw2cp+Gy9Vcn0CWaPUMjWRxWJS3pwZxaWDAs6CIIpCSQOfTcheHrfdbh08m/10lQ7RiCxmOH1hqVIypwQ5nsxwJcEujjmRPVu9t3mjeB9azNGPae/u6IsmS6n7Cz34/QwFSQ7vbjYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n/Ghzxp2; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1709131390; c=relaxed/simple;
+	bh=JyQGY2fS+hn+3+WxGLZvpZMP3hUKRcU0ymez1in287o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=PfuzVP29xlRcmZR4uYNyYKy1st835kHbTncRkyuMgZnDBLqgBia4J6ypqCx9Yy+2edVOgnr0wEIlY84LEQg9iUCD6aruLDvmZSOgryA/BeP5Ibesjb1OnRCfUqGGYNMc5AVB7NjjzOm965vzqXudnF5tB2dXbdCT5vrSrfpE9Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nVQUALR1; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709131386; x=1740667386;
+  t=1709131389; x=1740667389;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=tXm2AUnRIeOiFPqvc10RMVAIitrxexXPi1ajm/TZ1ws=;
-  b=n/Ghzxp2wc5FC0qPgywtrb4TbIPAqSKRE/BnNbumCK1gsRD+VhMRIsj+
-   rlqJ5lq1e3z0VBcWoSDbF5y71yu3CAfQxBT/cnh8PD+ITpDDHwPELlrQh
-   q8ywG5QRerYowWgU+Q6EyXaxu6698Wjd25hTHWp6KAlwyYN9Jq4Kfo/iY
-   r3Lnk1H7BN8H+FdiAm85y698L32k1I83/JkElj/rjBDThTnvCF1GJGZ1k
-   +8JqJDnESR4kRDZvBQfM/8Y2QXWCp50HrzMUOGavNZUcojZSwGvRgSo73
-   I3biATfnHKPp7LI7HWeYgzjShPCzr5LlPSTjvpn8N+PQRTaMzO62npC18
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="14951027"
+  bh=JyQGY2fS+hn+3+WxGLZvpZMP3hUKRcU0ymez1in287o=;
+  b=nVQUALR10z5AAtRkf7CAbiP4FLC9rj2uv26WFicIyoCqqcy/9JFTX76n
+   Ln9i22TQ6YwQSXeNJFTwf0P+ImQe3dhDIWWKAtVuurxEpcV3T4fPtoOJy
+   3tQHQLNEEj6MdY2KOr+pdDC0Wezi3iAqlPAXcSsJ+O48/fdUFu6Vcswlx
+   u9SXpYqw5ysu68n6W4DhGTdkUya5cTcglL6N3MhdlT8gbQUiDIPatIixk
+   KSBvsRDX5JFC9aJpD3X1HU/yv4pL5d5Z5N+/L7xyy/sWtNW4yLoBJfLBd
+   cdnMWmGAkKg0Ysbvn3KXoRn/mrI5PAB2nfERwjMM9acPH3DetCefxgV9H
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="14951045"
 X-IronPort-AV: E=Sophos;i="6.06,190,1705392000"; 
-   d="scan'208";a="14951027"
+   d="scan'208";a="14951045"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 06:43:06 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 06:43:09 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,190,1705392000"; 
-   d="scan'208";a="11994783"
+   d="scan'208";a="11994817"
 Received: from qat-server-archercity1.sh.intel.com ([10.67.111.115])
-  by fmviesa005.fm.intel.com with ESMTP; 28 Feb 2024 06:43:03 -0800
+  by fmviesa005.fm.intel.com with ESMTP; 28 Feb 2024 06:43:06 -0800
 From: Xin Zeng <xin.zeng@intel.com>
 To: herbert@gondor.apana.org.au,
 	alex.williamson@redhat.com,
@@ -63,11 +63,10 @@ To: herbert@gondor.apana.org.au,
 Cc: linux-crypto@vger.kernel.org,
 	kvm@vger.kernel.org,
 	qat-linux@intel.com,
-	Siming Wan <siming.wan@intel.com>,
 	Xin Zeng <xin.zeng@intel.com>
-Subject: [PATCH v4 07/10] crypto: qat - add bank save and restore flows
-Date: Wed, 28 Feb 2024 22:33:59 +0800
-Message-Id: <20240228143402.89219-8-xin.zeng@intel.com>
+Subject: [PATCH v4 08/10] crypto: qat - add interface for live migration
+Date: Wed, 28 Feb 2024 22:34:00 +0800
+Message-Id: <20240228143402.89219-9-xin.zeng@intel.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20240228143402.89219-1-xin.zeng@intel.com>
 References: <20240228143402.89219-1-xin.zeng@intel.com>
@@ -77,427 +76,274 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-From: Siming Wan <siming.wan@intel.com>
+Extend the driver with a new interface to be used for VF live migration.
+This allows to create and destroy a qat_mig_dev object that contains
+a set of methods to allow to save and restore the state of QAT VF.
+This interface will be used by the qat-vfio-pci module.
 
-Add logic to save, restore, quiesce and drain a ring bank for QAT GEN4
-devices.
-This allows to save and restore the state of a Virtual Function (VF) and
-will be used to implement VM live migration.
-
-Signed-off-by: Siming Wan <siming.wan@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Xin Zeng <xin.zeng@intel.com>
 Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   2 +
- .../intel/qat/qat_common/adf_accel_devices.h  |  38 +++
- .../intel/qat/qat_common/adf_gen4_hw_data.c   | 279 ++++++++++++++++++
- .../intel/qat/qat_common/adf_gen4_hw_data.h   |  19 ++
- 4 files changed, 338 insertions(+)
+ drivers/crypto/intel/qat/qat_common/Makefile  |   2 +-
+ .../intel/qat/qat_common/adf_accel_devices.h  |  17 +++
+ .../intel/qat/qat_common/adf_gen4_vf_mig.h    |  10 ++
+ .../crypto/intel/qat/qat_common/qat_mig_dev.c | 130 ++++++++++++++++++
+ include/linux/qat/qat_mig_dev.h               |  31 +++++
+ 5 files changed, 189 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/qat_mig_dev.c
+ create mode 100644 include/linux/qat/qat_mig_dev.h
 
-diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-index ef4b0aa36603..eaf055e6f938 100644
---- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -455,6 +455,8 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
- 	hw_data->get_ring_to_svc_map = adf_gen4_get_ring_to_svc_map;
- 	hw_data->disable_iov = adf_disable_sriov;
- 	hw_data->ring_pair_reset = adf_gen4_ring_pair_reset;
-+	hw_data->bank_state_save = adf_gen4_bank_state_save;
-+	hw_data->bank_state_restore = adf_gen4_bank_state_restore;
- 	hw_data->enable_pm = adf_gen4_enable_pm;
- 	hw_data->handle_pm_interrupt = adf_gen4_handle_pm_interrupt;
- 	hw_data->dev_config = adf_gen4_dev_config;
+diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
+index ceaa685352ed..9fba31d4ac7f 100644
+--- a/drivers/crypto/intel/qat/qat_common/Makefile
++++ b/drivers/crypto/intel/qat/qat_common/Makefile
+@@ -54,6 +54,6 @@ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
+ intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
+ 			       adf_pfvf_pf_msg.o adf_pfvf_pf_proto.o \
+ 			       adf_pfvf_vf_msg.o adf_pfvf_vf_proto.o \
+-			       adf_gen2_pfvf.o adf_gen4_pfvf.o
++			       adf_gen2_pfvf.o adf_gen4_pfvf.o qat_mig_dev.o
+ 
+ intel_qat-$(CONFIG_CRYPTO_DEV_QAT_ERROR_INJECTION) += adf_heartbeat_inject.o
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index d1f3f5a822ff..986e63ec702d 100644
+index 986e63ec702d..b08fea10121e 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
 +++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -140,6 +140,40 @@ struct admin_info {
- 	u32 mailbox_offset;
+@@ -9,6 +9,7 @@
+ #include <linux/pci.h>
+ #include <linux/ratelimit.h>
+ #include <linux/types.h>
++#include <linux/qat/qat_mig_dev.h>
+ #include "adf_cfg_common.h"
+ #include "adf_rl.h"
+ #include "adf_telemetry.h"
+@@ -258,6 +259,20 @@ struct adf_dc_ops {
+ 	void (*build_deflate_ctx)(void *ctx);
  };
  
-+struct ring_config {
-+	u64 base;
-+	u32 config;
-+	u32 head;
-+	u32 tail;
-+	u32 reserved0;
++struct qat_migdev_ops {
++	int (*init)(struct qat_mig_dev *mdev);
++	void (*cleanup)(struct qat_mig_dev *mdev);
++	void (*reset)(struct qat_mig_dev *mdev);
++	int (*open)(struct qat_mig_dev *mdev);
++	void (*close)(struct qat_mig_dev *mdev);
++	int (*suspend)(struct qat_mig_dev *mdev);
++	int (*resume)(struct qat_mig_dev *mdev);
++	int (*save_state)(struct qat_mig_dev *mdev);
++	int (*save_setup)(struct qat_mig_dev *mdev);
++	int (*load_state)(struct qat_mig_dev *mdev);
++	int (*load_setup)(struct qat_mig_dev *mdev, int size);
 +};
 +
-+struct bank_state {
-+	u32 ringstat0;
-+	u32 ringstat1;
-+	u32 ringuostat;
-+	u32 ringestat;
-+	u32 ringnestat;
-+	u32 ringnfstat;
-+	u32 ringfstat;
-+	u32 ringcstat0;
-+	u32 ringcstat1;
-+	u32 ringcstat2;
-+	u32 ringcstat3;
-+	u32 iaintflagen;
-+	u32 iaintflagreg;
-+	u32 iaintflagsrcsel0;
-+	u32 iaintflagsrcsel1;
-+	u32 iaintcolen;
-+	u32 iaintcolctl;
-+	u32 iaintflagandcolen;
-+	u32 ringexpstat;
-+	u32 ringexpintenable;
-+	u32 ringsrvarben;
-+	u32 reserved0;
-+	struct ring_config rings[ADF_ETR_MAX_RINGS_PER_BANK];
+ struct adf_dev_err_mask {
+ 	u32 cppagentcmdpar_mask;
+ 	u32 parerr_ath_cph_mask;
+@@ -325,6 +340,7 @@ struct adf_hw_device_data {
+ 	struct adf_dev_err_mask dev_err_mask;
+ 	struct adf_rl_hw_data rl_data;
+ 	struct adf_tl_hw_data tl_data;
++	struct qat_migdev_ops vfmig_ops;
+ 	const char *fw_name;
+ 	const char *fw_mmp_name;
+ 	u32 fuses;
+@@ -381,6 +397,7 @@ struct adf_hw_device_data {
+ #define GET_CSR_OPS(accel_dev) (&(accel_dev)->hw_device->csr_ops)
+ #define GET_PFVF_OPS(accel_dev) (&(accel_dev)->hw_device->pfvf_ops)
+ #define GET_DC_OPS(accel_dev) (&(accel_dev)->hw_device->dc_ops)
++#define GET_VFMIG_OPS(accel_dev) (&(accel_dev)->hw_device->vfmig_ops)
+ #define GET_TL_DATA(accel_dev) GET_HW_DATA(accel_dev)->tl_data
+ #define accel_to_pci_dev(accel_ptr) accel_ptr->accel_pci_dev.pci_dev
+ 
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.h
+new file mode 100644
+index 000000000000..72216d078ee1
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.h
+@@ -0,0 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2024 Intel Corporation */
++#ifndef ADF_GEN4_VF_MIG_H_
++#define ADF_GEN4_VF_MIG_H_
++
++#include "adf_accel_devices.h"
++
++void adf_gen4_init_vf_mig_ops(struct qat_migdev_ops *vfmig_ops);
++
++#endif
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_mig_dev.c b/drivers/crypto/intel/qat/qat_common/qat_mig_dev.c
+new file mode 100644
+index 000000000000..892c2283a50e
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/qat_mig_dev.c
+@@ -0,0 +1,130 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright(c) 2024 Intel Corporation */
++#include <linux/dev_printk.h>
++#include <linux/export.h>
++#include <linux/pci.h>
++#include <linux/types.h>
++#include <linux/qat/qat_mig_dev.h>
++#include "adf_accel_devices.h"
++#include "adf_common_drv.h"
++
++struct qat_mig_dev *qat_vfmig_create(struct pci_dev *pdev, int vf_id)
++{
++	struct adf_accel_dev *accel_dev;
++	struct qat_migdev_ops *ops;
++	struct qat_mig_dev *mdev;
++
++	accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
++	if (!accel_dev)
++		return ERR_PTR(-ENODEV);
++
++	ops = GET_VFMIG_OPS(accel_dev);
++	if (!ops || !ops->init || !ops->cleanup || !ops->reset || !ops->open ||
++	    !ops->close || !ops->suspend || !ops->resume || !ops->save_state ||
++	    !ops->load_state || !ops->save_setup || !ops->load_setup)
++		return ERR_PTR(-EINVAL);
++
++	mdev = kmalloc(sizeof(*mdev), GFP_KERNEL);
++	if (!mdev)
++		return ERR_PTR(-ENOMEM);
++
++	mdev->vf_id = vf_id;
++	mdev->parent_accel_dev = accel_dev;
++
++	return mdev;
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_create);
++
++int qat_vfmig_init(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->init(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_init);
++
++void qat_vfmig_cleanup(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->cleanup(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_cleanup);
++
++void qat_vfmig_reset(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->reset(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_reset);
++
++int qat_vfmig_open(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->open(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_open);
++
++void qat_vfmig_close(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	GET_VFMIG_OPS(accel_dev)->close(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_close);
++
++int qat_vfmig_suspend(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->suspend(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_suspend);
++
++int qat_vfmig_resume(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->resume(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_resume);
++
++int qat_vfmig_save_state(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->save_state(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_save_state);
++
++int qat_vfmig_save_setup(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->save_setup(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_save_setup);
++
++int qat_vfmig_load_state(struct qat_mig_dev *mdev)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->load_state(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_load_state);
++
++int qat_vfmig_load_setup(struct qat_mig_dev *mdev, int size)
++{
++	struct adf_accel_dev *accel_dev = mdev->parent_accel_dev;
++
++	return GET_VFMIG_OPS(accel_dev)->load_setup(mdev, size);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_load_setup);
++
++void qat_vfmig_destroy(struct qat_mig_dev *mdev)
++{
++	kfree(mdev);
++}
++EXPORT_SYMBOL_GPL(qat_vfmig_destroy);
+diff --git a/include/linux/qat/qat_mig_dev.h b/include/linux/qat/qat_mig_dev.h
+new file mode 100644
+index 000000000000..dbbb6a063dd2
+--- /dev/null
++++ b/include/linux/qat/qat_mig_dev.h
+@@ -0,0 +1,31 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2024 Intel Corporation */
++#ifndef QAT_MIG_DEV_H_
++#define QAT_MIG_DEV_H_
++
++struct pci_dev;
++
++struct qat_mig_dev {
++	void *parent_accel_dev;
++	u8 *state;
++	u32 setup_size;
++	u32 remote_setup_size;
++	u32 state_size;
++	s32 vf_id;
 +};
 +
- struct adf_hw_csr_ops {
- 	u64 (*build_csr_ring_base_addr)(dma_addr_t addr, u32 size);
- 	u32 (*read_csr_ring_head)(void __iomem *csr_base_addr, u32 bank,
-@@ -271,6 +305,10 @@ struct adf_hw_device_data {
- 	void (*enable_ints)(struct adf_accel_dev *accel_dev);
- 	void (*set_ssm_wdtimer)(struct adf_accel_dev *accel_dev);
- 	int (*ring_pair_reset)(struct adf_accel_dev *accel_dev, u32 bank_nr);
-+	int (*bank_state_save)(struct adf_accel_dev *accel_dev, u32 bank_number,
-+			       struct bank_state *state);
-+	int (*bank_state_restore)(struct adf_accel_dev *accel_dev,
-+				  u32 bank_number, struct bank_state *state);
- 	void (*reset_device)(struct adf_accel_dev *accel_dev);
- 	void (*set_msix_rttable)(struct adf_accel_dev *accel_dev);
- 	const char *(*uof_get_name)(struct adf_accel_dev *accel_dev, u32 obj_num);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-index 12269e309fbf..41a0979e68c1 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
- /* Copyright(c) 2020 Intel Corporation */
- #include <linux/iopoll.h>
-+#include <asm/div64.h>
- #include "adf_accel_devices.h"
- #include "adf_cfg_services.h"
- #include "adf_common_drv.h"
-@@ -390,3 +391,281 @@ u16 adf_gen4_get_ring_to_svc_map(struct adf_accel_dev *accel_dev)
- 	return ring_to_svc_map;
- }
- EXPORT_SYMBOL_GPL(adf_gen4_get_ring_to_svc_map);
++struct qat_mig_dev *qat_vfmig_create(struct pci_dev *pdev, int vf_id);
++int qat_vfmig_init(struct qat_mig_dev *mdev);
++void qat_vfmig_cleanup(struct qat_mig_dev *mdev);
++void qat_vfmig_reset(struct qat_mig_dev *mdev);
++int qat_vfmig_open(struct qat_mig_dev *mdev);
++void qat_vfmig_close(struct qat_mig_dev *mdev);
++int qat_vfmig_suspend(struct qat_mig_dev *mdev);
++int qat_vfmig_resume(struct qat_mig_dev *mdev);
++int qat_vfmig_save_state(struct qat_mig_dev *mdev);
++int qat_vfmig_save_setup(struct qat_mig_dev *mdev);
++int qat_vfmig_load_state(struct qat_mig_dev *mdev);
++int qat_vfmig_load_setup(struct qat_mig_dev *mdev, int size);
++void qat_vfmig_destroy(struct qat_mig_dev *mdev);
 +
-+/*
-+ * adf_gen4_bank_quiesce_coal_timer() - quiesce bank coalesced interrupt timer
-+ * @accel_dev: Pointer to the device structure
-+ * @bank_idx: Offset to the bank within this device
-+ * @timeout_ms: Timeout in milliseconds for the operation
-+ *
-+ * This function tries to quiesce the coalesced interrupt timer of a bank if
-+ * it has been enabled and triggered.
-+ *
-+ * Returns 0 on success, error code otherwise
-+ *
-+ */
-+int adf_gen4_bank_quiesce_coal_timer(struct adf_accel_dev *accel_dev,
-+				     u32 bank_idx, int timeout_ms)
-+{
-+	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
-+	struct adf_hw_csr_ops *csr_ops = GET_CSR_OPS(accel_dev);
-+	void __iomem *csr_misc = adf_get_pmisc_base(accel_dev);
-+	void __iomem *csr_etr = adf_get_etr_base(accel_dev);
-+	u32 int_col_ctl, int_col_mask, int_col_en;
-+	u32 e_stat, intsrc;
-+	u64 wait_us;
-+	int ret;
-+
-+	if (timeout_ms < 0)
-+		return -EINVAL;
-+
-+	int_col_ctl = csr_ops->read_csr_int_col_ctl(csr_etr, bank_idx);
-+	int_col_mask = csr_ops->get_int_col_ctl_enable_mask();
-+	if (!(int_col_ctl & int_col_mask))
-+		return 0;
-+
-+	int_col_en = csr_ops->read_csr_int_col_en(csr_etr, bank_idx);
-+	int_col_en &= BIT(ADF_WQM_CSR_RP_IDX_RX);
-+
-+	e_stat = csr_ops->read_csr_e_stat(csr_etr, bank_idx);
-+	if (!(~e_stat & int_col_en))
-+		return 0;
-+
-+	wait_us = 2 * ((int_col_ctl & ~int_col_mask) << 8) * USEC_PER_SEC;
-+	do_div(wait_us, hw_data->clock_frequency);
-+	wait_us = min(wait_us, (u64)timeout_ms * USEC_PER_MSEC);
-+	dev_dbg(&GET_DEV(accel_dev),
-+		"wait for bank %d - coalesced timer expires in %llu us (max=%u ms estat=0x%x intcolen=0x%x)\n",
-+		bank_idx, wait_us, timeout_ms, e_stat, int_col_en);
-+
-+	ret = read_poll_timeout(ADF_CSR_RD, intsrc, intsrc,
-+				ADF_COALESCED_POLL_DELAY_US, wait_us, true,
-+				csr_misc, ADF_WQM_CSR_RPINTSOU(bank_idx));
-+	if (ret)
-+		dev_warn(&GET_DEV(accel_dev),
-+			 "coalesced timer for bank %d expired (%llu us)\n",
-+			 bank_idx, wait_us);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_bank_quiesce_coal_timer);
-+
-+static int drain_bank(void __iomem *csr, u32 bank_number, int timeout_us)
-+{
-+	u32 status;
-+
-+	ADF_CSR_WR(csr, ADF_WQM_CSR_RPRESETCTL(bank_number),
-+		   ADF_WQM_CSR_RPRESETCTL_DRAIN);
-+
-+	return read_poll_timeout(ADF_CSR_RD, status,
-+				status & ADF_WQM_CSR_RPRESETSTS_STATUS,
-+				ADF_RPRESET_POLL_DELAY_US, timeout_us, true,
-+				csr, ADF_WQM_CSR_RPRESETSTS(bank_number));
-+}
-+
-+void adf_gen4_bank_drain_finish(struct adf_accel_dev *accel_dev,
-+				u32 bank_number)
-+{
-+	void __iomem *csr = adf_get_etr_base(accel_dev);
-+
-+	ADF_CSR_WR(csr, ADF_WQM_CSR_RPRESETSTS(bank_number),
-+		   ADF_WQM_CSR_RPRESETSTS_STATUS);
-+}
-+
-+int adf_gen4_bank_drain_start(struct adf_accel_dev *accel_dev,
-+			      u32 bank_number, int timeout_us)
-+{
-+	void __iomem *csr = adf_get_etr_base(accel_dev);
-+	int ret;
-+
-+	dev_dbg(&GET_DEV(accel_dev), "Drain bank %d\n", bank_number);
-+
-+	ret = drain_bank(csr, bank_number, timeout_us);
-+	if (ret)
-+		dev_err(&GET_DEV(accel_dev), "Bank drain failed (timeout)\n");
-+	else
-+		dev_dbg(&GET_DEV(accel_dev), "Bank drain successful\n");
-+
-+	return ret;
-+}
-+
-+static void bank_state_save(struct adf_hw_csr_ops *ops, void __iomem *base,
-+			    u32 bank, struct bank_state *state, u32 num_rings)
-+{
-+	u32 i;
-+
-+	state->ringstat0 = ops->read_csr_stat(base, bank);
-+	state->ringuostat = ops->read_csr_uo_stat(base, bank);
-+	state->ringestat = ops->read_csr_e_stat(base, bank);
-+	state->ringnestat = ops->read_csr_ne_stat(base, bank);
-+	state->ringnfstat = ops->read_csr_nf_stat(base, bank);
-+	state->ringfstat = ops->read_csr_f_stat(base, bank);
-+	state->ringcstat0 = ops->read_csr_c_stat(base, bank);
-+	state->iaintflagen = ops->read_csr_int_en(base, bank);
-+	state->iaintflagreg = ops->read_csr_int_flag(base, bank);
-+	state->iaintflagsrcsel0 = ops->read_csr_int_srcsel(base, bank);
-+	state->iaintcolen = ops->read_csr_int_col_en(base, bank);
-+	state->iaintcolctl = ops->read_csr_int_col_ctl(base, bank);
-+	state->iaintflagandcolen = ops->read_csr_int_flag_and_col(base, bank);
-+	state->ringexpstat = ops->read_csr_exp_stat(base, bank);
-+	state->ringexpintenable = ops->read_csr_exp_int_en(base, bank);
-+	state->ringsrvarben = ops->read_csr_ring_srv_arb_en(base, bank);
-+
-+	for (i = 0; i < num_rings; i++) {
-+		state->rings[i].head = ops->read_csr_ring_head(base, bank, i);
-+		state->rings[i].tail = ops->read_csr_ring_tail(base, bank, i);
-+		state->rings[i].config = ops->read_csr_ring_config(base, bank, i);
-+		state->rings[i].base = ops->read_csr_ring_base(base, bank, i);
-+	}
-+}
-+
-+#define CHECK_STAT(op, expect_val, name, args...) \
-+({ \
-+	u32 __expect_val = (expect_val); \
-+	u32 actual_val = op(args); \
-+	(__expect_val == actual_val) ? 0 : \
-+		(pr_err("QAT: Fail to restore %s register. Expected 0x%x, actual 0x%x\n", \
-+			name, __expect_val, actual_val), -EINVAL); \
-+})
-+
-+static int bank_state_restore(struct adf_hw_csr_ops *ops, void __iomem *base,
-+			      u32 bank, struct bank_state *state, u32 num_rings,
-+			      int tx_rx_gap)
-+{
-+	u32 val, tmp_val, i;
-+	int ret;
-+
-+	for (i = 0; i < num_rings; i++)
-+		ops->write_csr_ring_base(base, bank, i, state->rings[i].base);
-+
-+	for (i = 0; i < num_rings; i++)
-+		ops->write_csr_ring_config(base, bank, i, state->rings[i].config);
-+
-+	for (i = 0; i < num_rings / 2; i++) {
-+		int tx = i * (tx_rx_gap + 1);
-+		int rx = tx + tx_rx_gap;
-+
-+		ops->write_csr_ring_head(base, bank, tx, state->rings[tx].head);
-+		ops->write_csr_ring_tail(base, bank, tx, state->rings[tx].tail);
-+
-+		/*
-+		 * The TX ring head needs to be updated again to make sure that
-+		 * the HW will not consider the ring as full when it is empty
-+		 * and the correct state flags are set to match the recovered state.
-+		 */
-+		if (state->ringestat & BIT(tx)) {
-+			val = ops->read_csr_int_srcsel(base, bank);
-+			val |= ADF_RP_INT_SRC_SEL_F_RISE_MASK;
-+			ops->write_csr_int_srcsel_w_val(base, bank, val);
-+			ops->write_csr_ring_head(base, bank, tx, state->rings[tx].head);
-+		}
-+
-+		ops->write_csr_ring_tail(base, bank, rx, state->rings[rx].tail);
-+		val = ops->read_csr_int_srcsel(base, bank);
-+		val |= ADF_RP_INT_SRC_SEL_F_RISE_MASK << ADF_RP_INT_SRC_SEL_RANGE_WIDTH;
-+		ops->write_csr_int_srcsel_w_val(base, bank, val);
-+
-+		ops->write_csr_ring_head(base, bank, rx, state->rings[rx].head);
-+		val = ops->read_csr_int_srcsel(base, bank);
-+		val |= ADF_RP_INT_SRC_SEL_F_FALL_MASK << ADF_RP_INT_SRC_SEL_RANGE_WIDTH;
-+		ops->write_csr_int_srcsel_w_val(base, bank, val);
-+
-+		/*
-+		 * The RX ring tail needs to be updated again to make sure that
-+		 * the HW will not consider the ring as empty when it is full
-+		 * and the correct state flags are set to match the recovered state.
-+		 */
-+		if (state->ringfstat & BIT(rx))
-+			ops->write_csr_ring_tail(base, bank, rx, state->rings[rx].tail);
-+	}
-+
-+	ops->write_csr_int_flag_and_col(base, bank, state->iaintflagandcolen);
-+	ops->write_csr_int_en(base, bank, state->iaintflagen);
-+	ops->write_csr_int_col_en(base, bank, state->iaintcolen);
-+	ops->write_csr_int_srcsel_w_val(base, bank, state->iaintflagsrcsel0);
-+	ops->write_csr_exp_int_en(base, bank, state->ringexpintenable);
-+	ops->write_csr_int_col_ctl(base, bank, state->iaintcolctl);
-+	ops->write_csr_ring_srv_arb_en(base, bank, state->ringsrvarben);
-+
-+	/* Check that all ring statuses match the saved state. */
-+	ret = CHECK_STAT(ops->read_csr_stat, state->ringstat0, "ringstat",
-+			 base, bank);
-+	if (ret)
-+		return ret;
-+
-+	ret = CHECK_STAT(ops->read_csr_e_stat, state->ringestat, "ringestat",
-+			 base, bank);
-+	if (ret)
-+		return ret;
-+
-+	ret = CHECK_STAT(ops->read_csr_ne_stat, state->ringnestat, "ringnestat",
-+			 base, bank);
-+	if (ret)
-+		return ret;
-+
-+	ret = CHECK_STAT(ops->read_csr_nf_stat, state->ringnfstat, "ringnfstat",
-+			 base, bank);
-+	if (ret)
-+		return ret;
-+
-+	ret = CHECK_STAT(ops->read_csr_f_stat, state->ringfstat, "ringfstat",
-+			 base, bank);
-+	if (ret)
-+		return ret;
-+
-+	ret = CHECK_STAT(ops->read_csr_c_stat, state->ringcstat0, "ringcstat",
-+			 base, bank);
-+	if (ret)
-+		return ret;
-+
-+	tmp_val = ops->read_csr_exp_stat(base, bank);
-+	val = state->ringexpstat;
-+	if (tmp_val && !val) {
-+		pr_err("QAT: Bank was restored with exception: 0x%x\n", val);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+int adf_gen4_bank_state_save(struct adf_accel_dev *accel_dev, u32 bank_number,
-+			     struct bank_state *state)
-+{
-+	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
-+	struct adf_hw_csr_ops *csr_ops = GET_CSR_OPS(accel_dev);
-+	void __iomem *csr_base = adf_get_etr_base(accel_dev);
-+
-+	if (bank_number >= hw_data->num_banks || !state)
-+		return -EINVAL;
-+
-+	dev_dbg(&GET_DEV(accel_dev), "Saving state of bank %d\n", bank_number);
-+
-+	bank_state_save(csr_ops, csr_base, bank_number, state,
-+			hw_data->num_rings_per_bank);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_bank_state_save);
-+
-+int adf_gen4_bank_state_restore(struct adf_accel_dev *accel_dev, u32 bank_number,
-+				struct bank_state *state)
-+{
-+	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
-+	struct adf_hw_csr_ops *csr_ops = GET_CSR_OPS(accel_dev);
-+	void __iomem *csr_base = adf_get_etr_base(accel_dev);
-+	int ret;
-+
-+	if (bank_number >= hw_data->num_banks  || !state)
-+		return -EINVAL;
-+
-+	dev_dbg(&GET_DEV(accel_dev), "Restoring state of bank %d\n", bank_number);
-+
-+	ret = bank_state_restore(csr_ops, csr_base, bank_number, state,
-+				 hw_data->num_rings_per_bank, hw_data->tx_rx_gap);
-+	if (ret)
-+		dev_err(&GET_DEV(accel_dev),
-+			"Unable to restore state of bank %d\n", bank_number);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_bank_state_restore);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
-index 719f7757e587..e8cb930e80c9 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
-@@ -77,10 +77,19 @@
- #define ADF_RPRESET_POLL_TIMEOUT_US	(5 * USEC_PER_SEC)
- #define ADF_RPRESET_POLL_DELAY_US	20
- #define ADF_WQM_CSR_RPRESETCTL_RESET	BIT(0)
-+#define ADF_WQM_CSR_RPRESETCTL_DRAIN	BIT(2)
- #define ADF_WQM_CSR_RPRESETCTL(bank)	(0x6000 + ((bank) << 3))
- #define ADF_WQM_CSR_RPRESETSTS_STATUS	BIT(0)
- #define ADF_WQM_CSR_RPRESETSTS(bank)	(ADF_WQM_CSR_RPRESETCTL(bank) + 4)
- 
-+/* Ring interrupt */
-+#define ADF_RP_INT_SRC_SEL_F_RISE_MASK	BIT(2)
-+#define ADF_RP_INT_SRC_SEL_F_FALL_MASK	GENMASK(2, 0)
-+#define ADF_RP_INT_SRC_SEL_RANGE_WIDTH	4
-+#define ADF_COALESCED_POLL_DELAY_US	1000
-+#define ADF_WQM_CSR_RPINTSOU(bank)	(0x200000 + ((bank) << 12))
-+#define ADF_WQM_CSR_RP_IDX_RX		1
-+
- /* Error source registers */
- #define ADF_GEN4_ERRSOU0	(0x41A200)
- #define ADF_GEN4_ERRSOU1	(0x41A204)
-@@ -150,5 +159,15 @@ void adf_gen4_set_msix_default_rttable(struct adf_accel_dev *accel_dev);
- void adf_gen4_set_ssm_wdtimer(struct adf_accel_dev *accel_dev);
- int adf_gen4_init_thd2arb_map(struct adf_accel_dev *accel_dev);
- u16 adf_gen4_get_ring_to_svc_map(struct adf_accel_dev *accel_dev);
-+int adf_gen4_bank_quiesce_coal_timer(struct adf_accel_dev *accel_dev,
-+				     u32 bank_idx, int timeout_ms);
-+int adf_gen4_bank_drain_start(struct adf_accel_dev *accel_dev,
-+			      u32 bank_number, int timeout_us);
-+void adf_gen4_bank_drain_finish(struct adf_accel_dev *accel_dev,
-+				u32 bank_number);
-+int adf_gen4_bank_state_save(struct adf_accel_dev *accel_dev, u32 bank_number,
-+			     struct bank_state *state);
-+int adf_gen4_bank_state_restore(struct adf_accel_dev *accel_dev,
-+				u32 bank_number, struct bank_state *state);
- 
- #endif
++#endif /*QAT_MIG_DEV_H_*/
 -- 
 2.18.2
 
