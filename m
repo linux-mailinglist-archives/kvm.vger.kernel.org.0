@@ -1,159 +1,232 @@
-Return-Path: <kvm+bounces-10314-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10315-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D2CA86BACE
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 23:40:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6323186BAF6
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 23:49:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 712611F27B2D
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:40:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C35FA1F226FA
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A309D71ECC;
-	Wed, 28 Feb 2024 22:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F2F72902;
+	Wed, 28 Feb 2024 22:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VRSMvcUR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D/OzBoj2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548AE4CB30
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 22:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709160029; cv=none; b=EZlSJPeD1pkp/hZOQWw+TRcHgsjLtClZC060gB4NPMqNgNDRsSq3cXFHs/TOlRHHr7C77dW0R5wqxwYHhheVmx4S39yhOKtC3cd/Otkr30IB00SCwbIZgZVojOzKiOdPxgPY0e+VhnklcQ7SW2qe9YZWIqcY03c/unfx5QbQAmk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709160029; c=relaxed/simple;
-	bh=UI4N3O0p1OPV51s6ww8VE+iOxUsmCX0+oAuufGaCP2g=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PmC4Fr8yTQ1A5gZ/RQ462Dp6j0ewALq+5lCGAMq1P2GCcjiCQoBsRe5VQWY/dFY5xJ4KFRKSO/f42IyDkMNDh9O4pL/szQSGjKhjpqMJIVyuMDPkrQEcy2UcgPA0ruaOpafZRFrwh6i0Rx4K9dHYa1eOBD36cIjufzMADYkQQ18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VRSMvcUR; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc693399655so552927276.1
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 14:40:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709160027; x=1709764827; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l+UTQgqjeTeuB4joWxs/sUGJ8L/gPUO2H1zeCMeGlUc=;
-        b=VRSMvcUR1Z0nR83k7kzHQOcmnt39dGdDGXjA13POB7UJv2hWZ0yA/arivRbHMA9P6z
-         KoyAjPSxTiL6qG4WHjqff/8lF1QnnBOGg75yYA8g16fpAW55Z5SRr6nKhV9fLVRftcvM
-         OctCfnY2e94ZDFNg4tKOvyV1BGy/mgnD9oydYGiESvjNpj/1Qm41qqylFSIiCfB+qlSU
-         EjVuWlQmbAaq0ZCsl77+efIaBzkkoK5ZX1JDxOQxZQ/JSrh9Z3Don3zIgHBjhlfln6ZH
-         mmJb3n/Sx/LYAiWqzmaxL4uz+uZlFVpXYS/sTe0SVMx2unLTd9pa9ChMBLdXw3MBKbSt
-         Obdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709160027; x=1709764827;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l+UTQgqjeTeuB4joWxs/sUGJ8L/gPUO2H1zeCMeGlUc=;
-        b=oBSNN3arsU/fWHDLXye0hNYOZtiIeVqFRrZU5wLHqiuHQqlG5r+KGsrnJKifl9CGO1
-         UeSesawIJo2Fzr4bH6gIhunEDm96sadtbYz9gmvKCvUhir6yPoA6rbEvoQCMlCVL5yo2
-         8U8hsTakHeVmz/+Br/ZevqE94AjghpbDkjgmM2diPAJRnvyg+T+Z8tTy2IMUfXuuMzX3
-         q/t74Kb416BIf9Y/IOHuM4ZUA9/p7nm0HwLrxVSW6RaIKHGV0V/1TRa4lEzWLag5qB/D
-         mrGtRewPpn1g0f2V9fkela/N0krV0K4LJrdgaA5Pmh+CovawTeBllQAtqm/ZgEpNyQHe
-         pHPw==
-X-Gm-Message-State: AOJu0YwXHcAZ3q4/nzBINTdxpXoamkSH0d9sBtIYjR5HuS9jHeuzAQ/m
-	T/hOIJtlAsyoan0Fr7zZoBaHdurS02ZOWQ2f8x21cK5Br1z7MYzBg19OFYAkBYB5NSJ0WSFCUnu
-	tnA==
-X-Google-Smtp-Source: AGHT+IFUPZtJnUkx4ZeqCTT90Ca+tWDsq48kFwktE+9CygIbxZw4LB/eimUqGjDzbeY7BpvlpduVfE/E17k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:abc2:0:b0:dc7:48ce:d17f with SMTP id
- v60-20020a25abc2000000b00dc748ced17fmr140494ybi.10.1709160027352; Wed, 28 Feb
- 2024 14:40:27 -0800 (PST)
-Date: Wed, 28 Feb 2024 14:40:20 -0800
-In-Reply-To: <170900037528.3692126.18029642068469384283.b4-ty@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25FD71EA5;
+	Wed, 28 Feb 2024 22:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709160573; cv=fail; b=f6oFHOWhvvEgde8CrAxGz3vSK1H2w3Adb+nv2VHQ2Y43vy/7LWilbaVcwk0Iwl1Q6hah4SuHS6AP+5BIEFKnB66rZUwBKh5Zi6+nFggWjJYKfajJx1L2iufFcpdeSfUllCK/2ooYFfOxvpcRomtC9XZeb8sN8J+Uhn1zMMTTpeA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709160573; c=relaxed/simple;
+	bh=IiXqCI8npsmLYB5g8L1D57ThZr+Xp4T/5RYnrTjLYTU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GkzrRB8Sk5JebghIezH6Y+bqgYEsmWSWsvoys/b4W88trK4RJsGIvmg22REsm4CiSrmGVlx3jz1SIzj0hjQye9qrXMLznR8CTu6gOjLjpp+Pl/9rJVoz8TTt3lJH8KYwPocC1mUZhgx1qGkUW/sYG+qu9BVrHpNmdOoS/hx9KM4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D/OzBoj2; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709160572; x=1740696572;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=IiXqCI8npsmLYB5g8L1D57ThZr+Xp4T/5RYnrTjLYTU=;
+  b=D/OzBoj2kNFYQtjuwJ6h+f4VEUZ4UX+o43Cf5Tm+5wSb7UtXiQL3zI5x
+   yTyhXZwtST2uIm7FT+elzLDZNinjrj6bKc/Cl2lrZ4YHQoSulXcDMMyUW
+   wm7FJ2V13KDWa/VnCgBs6Ob4BvOsocXzvy/g1eg41+aWuHazwckhGKCB7
+   W+g0TtHYggb3CIz5P820Qd6cCsvxGiBJF1HiPUiic+r7ypu+EJCHIJpwx
+   JJXBOs1kKr4RGl0/BCoWR1FijEfmsUoLWTW3U4YwTOo/fMEhy5D7YuYzz
+   YUxHc/f4tOP287Qr8zbx92U0HATwgpSbFADtcnsvPkbC77F8jD3TSJPoz
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="7378904"
+X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
+   d="scan'208";a="7378904"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 14:49:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
+   d="scan'208";a="7538835"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Feb 2024 14:49:31 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 28 Feb 2024 14:49:30 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 28 Feb 2024 14:49:30 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 28 Feb 2024 14:49:30 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jLpMIp2ukNsh7chhOG8cwZVutXboP24d1vQczCbVtOXp+4ehKkUK7XAlu7ir4iJdQmNxMA8gJjK8nVbtp1HGNo5UYhb3OJK3YW8r5Mkyi/nWOd0/Sbr0MC+U0xG65Og4iGWvpWphOgMtd/BI9p8VxXLE1HadSAhwDDBBkpx0R5skl+UxjmyNQF956PZdJd7vnr87NgMFWM3/6W9NnCzCuNxF2TcXAEqatC5jZuXGPjJbg4PxEftMqte/eAbEUgOFtd+qA2nnMklLgA/HnMYjokiP2tCUYyxXFkPhsiFICmYQ6viF90QU5rdOKkEeERLYS+sJhP8Bn84ix53zy8nwlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m37qmcIRCq328ItxtWuPZkD1kZXPGdKQzQ7pqgrT9hQ=;
+ b=M2yMgSHuycxNt67M9hwNy3H+7/fYMI/SjB1vXAznUaEjbzMsEOMyCtqczF1s/KlmwiD4+vCBff9zDfGGPFi2hGs/WahR1yZTZEMhSKcEFjdVjqQDe13yUl8uejZxnBfEW7iGlS9rn113x4BZymOOppaz1+jzTIq7CJ55RlHixv6WDeq7lwB0P/CRE1BBP88xpjxmbW/NS7OSKfR+GjLKmGA6v/rWX93XGWCgGYROzlnclu6edFl80cLmjssTCGYZ5UqEGCgY54apT2KJMhAw1OsVhKpVTsyJdQIWXRF+0g9Hnz4rO6U6XHO0CZ+fydVJBxWEJKhVdbn2S67Hvlubyw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by CH0PR11MB8235.namprd11.prod.outlook.com (2603:10b6:610:187::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.25; Wed, 28 Feb
+ 2024 22:49:22 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7339.024; Wed, 28 Feb 2024
+ 22:49:22 +0000
+Message-ID: <2f6897c0-1b57-45b3-a1f1-9862b0e4c884@intel.com>
+Date: Thu, 29 Feb 2024 11:49:13 +1300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 008/130] x86/tdx: Warning with 32bit build
+ shift-count-overflow
+To: <isaku.yamahata@intel.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	<erdemaktas@google.com>, Sean Christopherson <seanjc@google.com>, Sagi Shahar
+	<sagis@google.com>, <chen.bo@intel.com>, <hang.yuan@intel.com>,
+	<tina.zhang@intel.com>, "Kirill A. Shutemov"
+	<kirill.shutemov@linux.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <a50918ba3415be4186a91161fe3bbd839153d8b2.1708933498.git.isaku.yamahata@intel.com>
+Content-Language: en-US
+From: "Huang, Kai" <kai.huang@intel.com>
+In-Reply-To: <a50918ba3415be4186a91161fe3bbd839153d8b2.1708933498.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P222CA0025.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:303:114::30) To BL1PR11MB5978.namprd11.prod.outlook.com
+ (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240223004258.3104051-1-seanjc@google.com> <170900037528.3692126.18029642068469384283.b4-ty@google.com>
-Message-ID: <Zd-2VK2kvMr_t1jx@google.com>
-Subject: Re: [PATCH v9 00/11] KVM: selftests: Add SEV and SEV-ES smoke tests
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Andrew Jones <andrew.jones@linux.dev>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Michael Roth <michael.roth@amd.com>, Carlos Bilbao <carlos.bilbao@amd.com>, 
-	Peter Gonda <pgonda@google.com>, Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|CH0PR11MB8235:EE_
+X-MS-Office365-Filtering-Correlation-Id: a6b1a5ab-9a2e-47e2-fa47-08dc38af8185
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mhiu5RIyuPzFaKXTUjB1t8RJqBHU7465AG0BLG8ecMiU8Y1Bkt9rWaWZIxhym9d29XHwOQDisUneFaJ43unWEnJ6uK73A3mKXUeLHoaHDYYLwaC1zBuUZqsT9dUNdUFvzCG6vTWLITpxWLc4l1iWu7zYms77OAb97FhYqy2Z0FT4ChkM+Bf0TB2UnFsRJ8lUuKr/m7YeIustdwHmDiGFD9Q1+v5WH21IwxTVLe7HTtsRVYRlP9oHKb+f6k6guf1NsGoNolv9cvKeGxc9Etzmv8WZmQl80VFRr3B/24vw66eE2WuoDvv6ECg9+MMjjrg0FF+U/ZoD+Um67s6fwnQUTEirgrb49E5QfbzMwahgtGxVY1TuQ52IiZn96ayljxWh1GRYnwcbkC5CcCfzUT6L0nqJ0b4ouF2CtfPFphe3hqECgH6CKKs4yBh/ZeMwkdjK6ho8WSmCi4wAOIp3NWYn5S6zZyI2mpI5Ev2cTGmoaW3mTTt2foOojryJX2kkufPSVSgXAoc+ZJ9DCDsYqdW1+otOWnty6maxpzeI1fQc/0We7tXLRWlQDy4XmZR2ech3pRKkqZqTkZmegtb9PWXWhXdinPcxZ/ZM1zVdUPHaviHJS/LmDSK1S19sl/BtG1oBKgjqx4eL7joOjb+nqujvBQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?amU0U2tUaGJQcDZ1YXpmeVF4K0N4VWd1c2FSZkt6QnpRZHFtc2NNRGUrT0Y0?=
+ =?utf-8?B?Q3VxTkVNUnI2RjRoMWplbExOU2kwTmN2REZ3WjhNS2Z5bUtJNjg1YkJ0SERX?=
+ =?utf-8?B?b1F1WkpuRDJ1Skx2RDk1WGZzS1pTL254N245Ui9qdVRQMlBVSTFNY3lNZWxV?=
+ =?utf-8?B?b3pUczNJL3hxYURDNG5DOG1kcVRZOGZGUzFlWUJXT1EvQnRNcWdLS1JWWElF?=
+ =?utf-8?B?NDZNa2orQk15c1VER2FOeDJmL0lOYS9xdDY4UWpRaFdPTGhOc0Mwc3BMT2cx?=
+ =?utf-8?B?ZWplSjJ5OU1Za1RBcHpweHhnY1p1U1BuVTNsQmdJY1dueFRGOWFrMjdyY0pT?=
+ =?utf-8?B?SVI5RFhiMXViQy9kRERHSlQyMDJnb0RlNVVnNG5uTXZhSWxLbzlnd25iWHVE?=
+ =?utf-8?B?bUtxeHoyclZpVmppV3pDUUFUaE01dUwrazVBZDJtMzQ2aWI4MXhsL0RTYzYz?=
+ =?utf-8?B?WDZBQUpNdnlKMFB2UEM2QmFmcnBhck5LSkkxVWF2S3VwVG1hdC95Q1VqOUFL?=
+ =?utf-8?B?akRlM3prUm5JWHJ5ZnpRd1BBMnhxZVJ3SlQ1bjczeTFQYU5JZ0xMS01URGMr?=
+ =?utf-8?B?eTkzSFpJQ2VFQTd2aDUwVXNlNFdPWCtVTmdYMXZlekQxU00zR1NkVmJ6MUtt?=
+ =?utf-8?B?NTdONWVQcVp3MWxEeG1XemlabFlOOU9PTERvUlFWTzU1cldlcnFIeFpiL0lK?=
+ =?utf-8?B?N1EyR2pFQzNyc2V2cUJ3Z0RmVDdycXNGWkEydjZIVnFIYVAzbm1hNFk3VStn?=
+ =?utf-8?B?RS95ZytOeklRbWM5MnFsQktONFE0UUI3M1l3Mnp5Y2UvUmk0U0VnWmI4alB0?=
+ =?utf-8?B?SFBJbmFKbXhwSHpmaXpLUHY1M3pLV3NjaDE3aTl0bW40UzdybmpVN0NEeXdj?=
+ =?utf-8?B?UzdwNVRSN2ZiTE16OGM3TnhjZC9JMnhQaHhFTjRYc2NNYnhZWmtmVlZDWjJZ?=
+ =?utf-8?B?anhmR2tnNk9tMmUxTkpFQy9Na1Q3bWRZNkdBd1NJdEJJNUcvVVJ3eW9TMGVn?=
+ =?utf-8?B?dW5kUWtuZlc2VmtiZmFvYWszaUdjSHlleUF6bEFKZmNaZXFOR2UrY1hIdFV1?=
+ =?utf-8?B?NGphTXpxQnBLVVhyWjhWY1BBNWdJUjdlcEZtVnc2YTlTeVZrMGNUUVF6TEgy?=
+ =?utf-8?B?M2p4U3RKOXBTZjdVbk9LU0tzN3ROdzA0Y0NZNnYvb3BBTU9wcVRuOHJwSXRF?=
+ =?utf-8?B?ZFdkcm9hOC82RWVLdEo2dmhpdHRUelp3TWlKYWRwUGt1UjVtM2EwdEZiby9O?=
+ =?utf-8?B?cTRqRElnTFNZQzRTYUEzaCs5aTE0dFpYVjdpbGlTYVdZZEMyUlNQUGFVck5W?=
+ =?utf-8?B?RkNxVnp2VEYzS2U3VEp3K1llb0QvdG43QUdvREhwTlRXVkhpRVVLaHpGYWx4?=
+ =?utf-8?B?dk5EVGN4bGNKUHByU2RkTzBRT25lYXp0MmtFQmN4bnQwV3lQYW9sVitWQWNx?=
+ =?utf-8?B?V09pSnZaMXQyaHRTVkdkalNJQWUxZzFueEkvMzBFaGxmNi9hNGNIbys0YWR1?=
+ =?utf-8?B?WkhtYnF3N2l5bEE3RHFZUmJtdW9udXQ1ZnJjamF1bjZway9QQ1ZrRXYxeEVl?=
+ =?utf-8?B?M2c0RVp2VHY1QVZaeXFXdFdrRmM4WVlxUG5RYnpzd0Q3R080V1crWHdKNFNx?=
+ =?utf-8?B?YzlIUExBOUFHYloyTzBPbHovd1ZNNFdvcGhVOWIvN1p2RkhzWVhYYU5NUllo?=
+ =?utf-8?B?RE12TUdpVnhyNUh1OGNOMUtFVnJmT2E0K3hzc201NGE5bGd3WmxJeTFPRzBj?=
+ =?utf-8?B?emRmd21oeklxTGloa2prOEdGSzl0Y3NsTjdCTVpoRXlQeFBSaFU0U0hjUThL?=
+ =?utf-8?B?NkNtcUM4c0VvRGtmeHF2Q0FQQTByay9yWWpMMGFoUDI3aFpFTVVCMklQRk4y?=
+ =?utf-8?B?M3Zoa0F2WGdRY204TVFCWEs0Sk1MRm1VSjdYNmNwa0N1eE9pNUpOZGF5Y21F?=
+ =?utf-8?B?b1VOaXVpN3JyWkJlV0xGdE1MQTE5TlBUd3dqaEZycEJYK3djVHVDVHl0cFcw?=
+ =?utf-8?B?d1pxOVpRZHN4Und3ZGcxN0U4RVZ6a0JIYjI2R3BkMStndlRNd3V4bWp0Y3dM?=
+ =?utf-8?B?M0E5NU5JZENJTmZsZUNXYUp1M3FuSU1qSUJrdXdXYm94dkJJb1RxWGd1WURn?=
+ =?utf-8?Q?rTBFC1lvvnNlh/fO5ODyx2n9b?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a6b1a5ab-9a2e-47e2-fa47-08dc38af8185
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2024 22:49:22.4815
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0ozqLC87r0Xpr397db3i+ymD3K25qbZQajYId93LhVpgBKgQB8auxk1RhZu9CZNC7p0qK3MqVRuzuTCzLhLHew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB8235
+X-OriginatorOrg: intel.com
 
-On Mon, Feb 26, 2024, Sean Christopherson wrote:
-> On Thu, 22 Feb 2024 16:42:47 -0800, Sean Christopherson wrote:
-> > Add basic SEV and SEV-ES smoke tests.  Unlike the intra-host migration tests,
-> > this one actually runs a small chunk of code in the guest.
-> > 
-> > Unless anyone strongly objects to the quick and dirty approach I've taken for
-> > SEV-ES, I'll get all of this queued for 6.9 soon-ish.
-> > 
-> > As for _why_ I added the quick-and-dirty SEV-ES testcase, I have a series to
-> > cleanup __svm_sev_es_vcpu_run(), and found out that apparently I have a version
-> > of OVMF that doesn't quite have to the right <something> for SEV-ES, and so I
-> > could even get a "real" VM to reach KVM_RUN.  I assumed (correctly, yay!) that
-> > hacking together a selftest would be faster than figuring out what firmware
-> > magic I am missing.
-> > 
-> > [...]
+
+
+On 26/02/2024 9:25 pm, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Applied to kvm-x86 selftests, thanks!
+> This patch fixes the following warnings.
 > 
-> [01/11] KVM: selftests: Extend VM creation's @shape to allow control of VM subtype
->         https://github.com/kvm-x86/linux/commit/309d1ad7b6ff
-> [02/11] KVM: selftests: Make sparsebit structs const where appropriate
->         https://github.com/kvm-x86/linux/commit/6077c3ce4021
-> [03/11] KVM: selftests: Add a macro to iterate over a sparsebit range
->         https://github.com/kvm-x86/linux/commit/8811565ff68e
-> [04/11] KVM: selftests: Add support for allocating/managing protected guest memory
->         https://github.com/kvm-x86/linux/commit/29e749e8faff
-> [05/11] KVM: selftests: Add support for protected vm_vaddr_* allocations
->         https://github.com/kvm-x86/linux/commit/1e3af7cf984a
-> [06/11] KVM: selftests: Explicitly ucall pool from shared memory
->         https://github.com/kvm-x86/linux/commit/5ef7196273b6
-> [07/11] KVM: selftests: Allow tagging protected memory in guest page tables
->         https://github.com/kvm-x86/linux/commit/a8446cd81de8
-> [08/11] KVM: selftests: Add library for creating and interacting with SEV guests
->         https://github.com/kvm-x86/linux/commit/f3ff1e9b2f9c
-> [09/11] KVM: selftests: Use the SEV library APIs in the intra-host migration test
->         https://github.com/kvm-x86/linux/commit/0837ddb51f9b
-> [10/11] KVM: selftests: Add a basic SEV smoke test
->         https://github.com/kvm-x86/linux/commit/5101f1e27683
-> [11/11] KVM: selftests: Add a basic SEV-ES smoke test
->         https://github.com/kvm-x86/linux/commit/f3750b0c7f6e
+>     In file included from arch/x86/kernel/asm-offsets.c:22:
+>     arch/x86/include/asm/tdx.h:92:87: warning: shift count >= width of type [-Wshift-count-overflow]
+>     arch/x86/include/asm/tdx.h:20:21: note: expanded from macro 'TDX_ERROR'
+>     #define TDX_ERROR                       _BITUL(63)
+> 
+>                                             ^~~~~~~~~~
+> 
+> Also consistently use ULL for TDX_SEAMCALL_VMFAILINVALID.
+> 
+> Fixes: 527a534c7326 ("x86/tdx: Provide common base for SEAMCALL and TDCALL C wrappers")
 
-FYI, the hashes changed due to a force push to squash a bug in a different
-series.
++Kirill.
 
-[1/11] KVM: selftests: Extend VM creation's @shape to allow control of VM subtype
-      https://github.com/kvm-x86/linux/commit/126190379c57
-[2/11] KVM: selftests: Make sparsebit structs const where appropriate
-      https://github.com/kvm-x86/linux/commit/35f50c91c43e
-[3/11] KVM: selftests: Add a macro to iterate over a sparsebit range
-      https://github.com/kvm-x86/linux/commit/57e19f057758
-[4/11] KVM: selftests: Add support for allocating/managing protected guest memory
-      https://github.com/kvm-x86/linux/commit/cd8eb2913205
-[5/11] KVM: selftests: Add support for protected vm_vaddr_* allocations
-      https://github.com/kvm-x86/linux/commit/d210eebb51a2
-[6/11] KVM: selftests: Explicitly ucall pool from shared memory
-      https://github.com/kvm-x86/linux/commit/31e00dae72fd
-[7/11] KVM: selftests: Allow tagging protected memory in guest page tables
-      https://github.com/kvm-x86/linux/commit/bf47e87c65be
-[8/11] KVM: selftests: Add library for creating and interacting with SEV guests
-      https://github.com/kvm-x86/linux/commit/bdceeebcddb8
-[9/11] KVM: selftests: Use the SEV library APIs in the intra-host migration test
-      https://github.com/kvm-x86/linux/commit/8b174eb9d289
-[10/11] KVM: selftests: Add a basic SEV smoke test
-      https://github.com/kvm-x86/linux/commit/faa0d7027de3
-[11/11] KVM: selftests: Add a basic SEV-ES smoke test
-      https://github.com/kvm-x86/linux/commit/974ba6f0e595
+This kinda fix should be sent out as a separate patch.
+
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/include/asm/tdx.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> index 16be3a1e4916..1e9dcdf9912b 100644
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -17,9 +17,9 @@
+>    * Bits 47:40 == 0xFF indicate Reserved status code class that never used by
+>    * TDX module.
+>    */
+> -#define TDX_ERROR			_BITUL(63)
+> +#define TDX_ERROR			_BITULL(63)
+>   #define TDX_SW_ERROR			(TDX_ERROR | GENMASK_ULL(47, 40))
+> -#define TDX_SEAMCALL_VMFAILINVALID	(TDX_SW_ERROR | _UL(0xFFFF0000))
+> +#define TDX_SEAMCALL_VMFAILINVALID	(TDX_SW_ERROR | _ULL(0xFFFF0000))
+>   
+>   #define TDX_SEAMCALL_GP			(TDX_SW_ERROR | X86_TRAP_GP)
+>   #define TDX_SEAMCALL_UD			(TDX_SW_ERROR | X86_TRAP_UD)
+
+Both TDX guest and TDX host code depends on X86_64 in the Kconfig.  This 
+issue seems due to asm-offsets.c includes <asm/tdx.h> unconditionally.
+
+It doesn't make sense to generate any TDX related code in asm-offsets.h 
+so I am wondering whether it is better to just make the inclusion of 
+<asm/tdx.h> conditionally or move it the asm-offsets_64.c?
+
+
+Kirill what's your opinion?
+
+Btw after quick try seems I cannot reproduce this (w/o this KVM TDX 
+patchset).  Isaku, could you share your .config?
 
