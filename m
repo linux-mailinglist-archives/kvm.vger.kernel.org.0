@@ -1,82 +1,94 @@
-Return-Path: <kvm+bounces-10310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4787686B9FC
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:34:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 419C086BA04
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 22:35:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC2161F292ED
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:34:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D56D01F2350A
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 21:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4847003B;
-	Wed, 28 Feb 2024 21:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD1670050;
+	Wed, 28 Feb 2024 21:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M6EvXq+T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UcLPSQyO"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE5D70024
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 21:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE057002F
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 21:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709156065; cv=none; b=Uh7WMhiYEl9BuaHiLOIslICUPYK85YHISQKMonN3iIpIJzUw1TdaUp6L1+m5ol8D+PG3PLXlyTBRnI28VwDagqYJdpcPaq5PEohW8/jWC8u7o/ycfZAY6voEbTSIcvCge95JwGbgJOWBfy1wPCK0IXEVQQwPZgdUALq4yyTfRhc=
+	t=1709156096; cv=none; b=rzb8ph7HeeJf9RMTrM5BJhcgzoTpAuQvWeyKmBno3OE0eX8ZBZkY+vAZJVIzriV8Ytx9W5BGJn5+7RSb44dg7Nia0taQg+RbBTUVzRM+WvGB5/EfAg4XsmQMBoUAoDpI6u7j6CUNiajagFK3lTPJTZptMRhdB0pdDuVkGkpK4bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709156065; c=relaxed/simple;
-	bh=u0glWb8PLZEnaQBoKnM6UxMr33w9SryGXNiNoDypwRQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U1mBAcwkL6d/RkmyT41WxYDeOZXsoog4Eck/wabYoVlfkCa876Hp/gNwn/nfkPuVK4zvNjg3ApaRkDauXiIxRSp3xjEOzrpgO+/bzhk6fKmf1HncSJrHmMFfFtLLaT6nLnkN+ZgEv5LD7DzTSC5RiBQ2dNMFSwzoPsF+D6MXvfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M6EvXq+T; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 28 Feb 2024 21:34:17 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709156062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AKLLQheTiIIqIx7nrNpRjfoLsYpiraWTUJCmTz11PY4=;
-	b=M6EvXq+T0VEep82dPWCLF5UU1Mk68qeW9WjAWox6J2ZxmeZVw5VJPXHbiO644f5C4oiye6
-	e4rNb2cxMAA3ZmcBJrSfcecv1RFdTph9FrllNN6g6qRPKX+3Ztggkx1tzTz3dmmFIGm3EA
-	bTeDVZMZsZ1WwjF3dEyk+W+WpSXgYFI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Mark Brown <broonie@kernel.org>, Thomas Huth <thuth@redhat.com>,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Aishwarya TCV <aishwarya.tcv@arm.com>, rananta@google.com
-Subject: Re: [PATCH v3 3/8] KVM: selftests: Move setting a vCPU's entry point
- to a dedicated API
-Message-ID: <Zd-m2WHdQUtPeZOG@linux.dev>
-References: <20240208204844.119326-1-thuth@redhat.com>
- <20240208204844.119326-4-thuth@redhat.com>
- <501ac94d-11ab-4765-a25d-75013c021be6@sirena.org.uk>
- <Zd-JjBNCpFG5iDul@google.com>
- <Zd-jdAtI_C_d_fp4@google.com>
- <Zd-lzwQb0APsBFjM@linux.dev>
+	s=arc-20240116; t=1709156096; c=relaxed/simple;
+	bh=hYKDYcEw5lHqH2aRTYPwr/dy/RfHP5zZ7HjM/dRqXn4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ftmbQnzBuuS2UG0cSuVSuMQWjRWcr+v2EKRfwAnVPW0Ch+TmF8Mprtm8HmF01Q4shf2fmM3OG0Ckx6pHuo7MdwbY/XPEJFMdXttTZYuL2XKDpBSv2F6IvYkpLVCNwsSMdFphcekgZOudiVTshN6/66cPtve6tGEcGw/CYn0m1q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UcLPSQyO; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-299d76d3a5eso112398a91.3
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 13:34:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709156094; x=1709760894; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1XXg0IkU5TUPFv8zc80T7AHB4FtUby0AfD+GckQIvQA=;
+        b=UcLPSQyOeIiK0wylL/NBmVbjHt3P0pyG3v/m8DYkEENMwHttJRnaQWuwJ9ucwI+6aE
+         ShGU1NoCZz9ibuG9IrbJSxhO5im8yLcYO3kJE9mrTJno4xXQPV29Pla+E/JoySkVCkCi
+         itBtdkI7oVCTt2k6Nbms9/y2GEi92U8n8aQJxY3fFa3eFDrbpRjoImZyl1NQX5FlFBwn
+         EYPD/BDpsB+BqmSN9sipdbDiWbT5zYZmHoAxcHZXrpynnubWfa1rbnZkbzL/zm86MwA6
+         UkZn/rjqPCTEwfB88g5OFED7xEQE4m1e6wnGlhPfUDWWPG7+cvLC0vOXa4aLnIckiH9x
+         +c3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709156094; x=1709760894;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1XXg0IkU5TUPFv8zc80T7AHB4FtUby0AfD+GckQIvQA=;
+        b=xGlMKJKk01CvctVd0NwDJ2IlifD988EcbZ/SWHATleLq3Xuapj3wa+dcC6EWRCWI1D
+         Uq65wQS/38xbvSUsItWkGmxa6on6GndDbgLvQ8ks1r+qL6lcakRpVldmwn6JJ6tzvqsq
+         MOgiIhTpK3hChZh05bcRjEcKroNdxFAKjW+Z/IqYclsZhsGuAWzUOvhfbNUxtVCECuWQ
+         WXGS8KgvL6V70d3lf4ByRnxQ0gEqxMD95mA2lUkiIObiP1KGthB2PedaOdloyYGih5ux
+         lhq1f35fviUMm/lus/xAfLDvWivVeoEsaCApKtASfECyOVXx6RrTeU8C1hh4ldPsLsJV
+         iSsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVCzTy7bw2zpqd0lJl9ebIA63VIsk5pI+5POIV+j05fG4BtKa2CL51nzHKaivl4HO2jmFtWlOc3RribLfW0jEuf+JFr
+X-Gm-Message-State: AOJu0YyR4DDA7FKRodEzaxUeQDiwAgUjlMPfb6wLvwFLH2noIs/lk5Ua
+	r7FcmjAaJlLbwJwiwZKWZ4GDKqSusFxPhPJi48fWOV/4DFNW+tTFQqALSILOhYO7j/OBOfwLl2X
+	Vdw==
+X-Google-Smtp-Source: AGHT+IHSa/71jx2w7IQMMCTRY7oSd9bBuHsHilIQ/kXSBHYoaxZh4u+KcytiCqhfbrsj61dcHuvEZ/TgqXQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:d4c3:b0:1dc:b333:f2a4 with SMTP id
+ o3-20020a170902d4c300b001dcb333f2a4mr463plg.12.1709156094095; Wed, 28 Feb
+ 2024 13:34:54 -0800 (PST)
+Date: Wed, 28 Feb 2024 21:34:53 +0000
+In-Reply-To: <Zd-lzwQb0APsBFjM@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zd-lzwQb0APsBFjM@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20240208204844.119326-1-thuth@redhat.com> <20240208204844.119326-4-thuth@redhat.com>
+ <501ac94d-11ab-4765-a25d-75013c021be6@sirena.org.uk> <Zd-JjBNCpFG5iDul@google.com>
+ <Zd-jdAtI_C_d_fp4@google.com> <Zd-lzwQb0APsBFjM@linux.dev>
+Message-ID: <Zd-m_WinXvoCmMCb@google.com>
+Subject: Re: [PATCH v3 3/8] KVM: selftests: Move setting a vCPU's entry point
+ to a dedicated API
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Mark Brown <broonie@kernel.org>, Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	Marc Zyngier <maz@kernel.org>, Aishwarya TCV <aishwarya.tcv@arm.com>
+Content-Type: text/plain; charset="us-ascii"
 
-I really should fix the CC list _before_ drafting a reply...
-
-On Wed, Feb 28, 2024 at 09:29:56PM +0000, Oliver Upton wrote:
+On Wed, Feb 28, 2024, Oliver Upton wrote:
 > +cc Raghavendra
-
-See below :)
-
+> 
 > Hey,
 > 
 > On Wed, Feb 28, 2024 at 01:19:48PM -0800, Sean Christopherson wrote:
@@ -104,21 +116,8 @@ See below :)
 > 
 > Are these the only remaining warnings we have in the arm64 selftests
 > build?
-> 
-> Faster than me paging this test back in: Raghu, are we missing any test
-> cases upstream that these helpers were intended for? If no, mind sending
-> a patch to get rid of them?
-> 
-> > And another question: is there any reason to not force -Werror for selftests?
-> 
-> Nothing comes to mind. We need to bite the bullet and make the switch.
-> There might be breakage, but we can certainly handle that.
-> 
-> -- 
-> Thanks,
-> Oliver
 
--- 
-Thanks,
-Oliver
+Yep, unless I've missed something, this is the only outstanding warning across
+all architectures that support selftests (sans LoongArch and PPC, which are
+pending).
 
