@@ -1,217 +1,123 @@
-Return-Path: <kvm+bounces-10284-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10285-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F45D86B42F
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 17:08:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B7E286B488
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 17:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9A3E1F2C058
-	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 16:08:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27492285106
+	for <lists+kvm@lfdr.de>; Wed, 28 Feb 2024 16:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A78315D5D3;
-	Wed, 28 Feb 2024 16:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409FC6EF0E;
+	Wed, 28 Feb 2024 16:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y/u0lT7h"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D579F15D5AE
-	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 16:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9F16EF15
+	for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 16:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709136490; cv=none; b=YNJth18bsdM6jDf0711I00zPhQ4+463j5Kz/GYRX1GADv6esnZLv8kAhcdAc5sOcL8UNZnpEN1VgK74ZhQdlGX5tbYWpitClhzVoJe3RFj8Laz7TRN/A4bz4dBVBCCy5Q0tMCxT3xqN8PKpELKrRue9I7/94GojLnklgEfwssj0=
+	t=1709136987; cv=none; b=SyL7bW/Wk57/HneEDrcnv7J8GHp+59BQIHRmqDIotH6eLxM8MxCOFP7mH8bEVlqGij4A+hL87vKNTVZXpLWdmQBg5lUH+lLw90ob2vMWEP2IGpQzw6uIwsGS/IJWrSBJrfy3BpyRHpRBzidMajzXD7waMeC9aTuEPvAOkrxZg4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709136490; c=relaxed/simple;
-	bh=Ici6SGl/O6VfHPgTIKijM8kxjG1VHFI+ROt9a9T32Fc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M3rCeeO8MEERL6e7VWO28b5AT/XaD3tB/RTMtBMJHtoA8IbrHIIvTRkqMi9lLcKTp9Y1GjY3IE4FgPNHkskeOuwwHKfoAVo2reAJiYTiFG84i5bvVpjZMjr6Gw0CJKRESUQANCcqGcFvl07KOiav3jG/YJb9QTQhkgaubcZl60M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39FA9C15;
-	Wed, 28 Feb 2024 08:08:45 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E57F63F762;
-	Wed, 28 Feb 2024 08:08:04 -0800 (PST)
-Date: Wed, 28 Feb 2024 16:08:00 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 06/13] KVM: arm64: nv: Fast-track 'InHost' exception
- returns
-Message-ID: <20240228160800.GA3373815@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
- <20240226100601.2379693-7-maz@kernel.org>
+	s=arc-20240116; t=1709136987; c=relaxed/simple;
+	bh=rOYGkzPVxZK7M9p/OIZkBdeQFYn9J83LXlkmH1I6WCU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GhkxIfwkgeZY5ITuA2atwtlBWAbufVBulxnbR2GELu6qJ5x+PVoPe3zlzVLC/7dxHnPzWCFfnDRQkqr2/DV3v54iXd5a25xxiRbIM6RiRyuDpfxZ1l8qw9jqp1Zjc6bkeCsOZ3yNImyQrsny9AiEhBKGY2AR8hCQG75LQW/AUyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y/u0lT7h; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcbfe1a42a4so10834456276.2
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 08:16:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709136985; x=1709741785; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hMVVTD9yYHeQoP11M+2Mm848afum+RQNa4X561sKWio=;
+        b=y/u0lT7hr23Z5YUaQwE197qnc8DlVH19rWBIPNSzmEsp88FrVM9d9ZAbzPVfmf7Zsp
+         1BOn/cr1o3NOH52S0w3juMlMR/QDpgExSCdG3Z7dtuA+bn0maXaPkAglWVhx5KNOKR/l
+         CGrPWGizAU2+YWJmO37yVFceYHAmkB15FjPnjRlI6gqHZK4Xk6aulQyNX/LOORaU7hDh
+         4DfEhLfWJgYGTH8dRcufpu+ZdFBoTedfLobSC1CqafOrMO0wGLvNKfp/PZjVvM1opzzM
+         5KKWAlRlnh6Sk1hWY++C6s1VhsiuXKXA/14G6O0FStiDSE0wVj93S1M8KlmpkZ3ZPpGW
+         NDqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709136985; x=1709741785;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hMVVTD9yYHeQoP11M+2Mm848afum+RQNa4X561sKWio=;
+        b=UdiwWYfNJiHQfx6yCU7XwuffyvpVabDQtsb+3o5Nr6V2pdXm22PfrPsX7sQpCdYyh8
+         xjeDMVEcOegAC1SODZi6zhPZlnls4Yir2uoDXPAWp0uNoM4U/jGoh8R0lBBpbpDWSDup
+         IhMBNGmf5k6gPRLIgiU53ryZYfQQdbxAkgy8YQeHNCeXyO+woDgSiQ63IXf8QSv53dqZ
+         HwnKRNVO9llU3BQ4+CaaZvANAcUFvj4JRsYxivPnNTVztK+Rj1YdAEaxZPTAGn5aB6BA
+         +KvA/6FxJIepp52UTavqscve/GEFzBx5Oe2Hqyr8riYj8jzMXbLW/cGeiIpoNDwzTxB6
+         41Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIy/1wPIew36AULWw/GRGMsDWtd+cAv7ZxKy2HCpO4WYMX3DJWBxRg32zuZooIHHfIQzrbZqTq4p/xNsl0gyun32kS
+X-Gm-Message-State: AOJu0YzqYEBCKyhoOBCR6VnHsdOtTr27MTgXlu0e/HvF0RzurqR3ZoLS
+	a531kEthGz3zc77mjHsxOd+nW2ysSrAHOzAVsRt/bTdjWPgHWZVpqY5aY0HU6juwY99wFae0raa
+	15A==
+X-Google-Smtp-Source: AGHT+IHFbTJwSAhSpC3uUF8JQz3n16YUo7A4H885wDOtHYFEEJx/XZrsVfm5grmswMD0hb70zzrUqYxuU98=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1896:b0:dcc:6065:2b3d with SMTP id
+ cj22-20020a056902189600b00dcc60652b3dmr813062ybb.8.1709136984844; Wed, 28 Feb
+ 2024 08:16:24 -0800 (PST)
+Date: Wed, 28 Feb 2024 08:16:23 -0800
+In-Reply-To: <12f0b643-e2e8-8a9a-b264-5c7c460f1a24@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226100601.2379693-7-maz@kernel.org>
+Mime-Version: 1.0
+References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-4-seanjc@google.com>
+ <12f0b643-e2e8-8a9a-b264-5c7c460f1a24@oracle.com>
+Message-ID: <Zd9cV8bnFuJbXx5Y@google.com>
+Subject: Re: [PATCH 03/16] KVM: x86: Define more SEV+ page fault error
+ bits/flags for #NPF
+From: Sean Christopherson <seanjc@google.com>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 26, 2024 at 10:05:54AM +0000, Marc Zyngier wrote:
-> A significant part of the FEAT_NV extension is to trap ERET
-> instructions so that the hypervisor gets a chance to switch
-> from a vEL2 L1 guest to an EL1 L2 guest.
-> 
-> But this also has the unfortunate consequence of trapping ERET
-> in unsuspecting circumstances, such as staying at vEL2 (interrupt
-> handling while being in the guest hypervisor), or returning to host
-> userspace in the case of a VHE guest.
-> 
-> Although we already make some effort to handle these ERET quicker
-> by not doing the put/load dance, it is still way too far down the
-> line for it to be efficient enough.
-> 
-> For these cases, it would ideal to ERET directly, no question asked.
-> Of course, we can't do that. But the next best thing is to do it as
-> early as possible, in fixup_guest_exit(), much as we would handle
-> FPSIMD exceptions.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/emulate-nested.c | 29 +++-------------------
->  arch/arm64/kvm/hyp/vhe/switch.c | 44 +++++++++++++++++++++++++++++++++
->  2 files changed, 47 insertions(+), 26 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 2d80e81ae650..63a74c0330f1 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2172,8 +2172,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
->  
->  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
->  {
-> -	u64 spsr, elr, mode;
-> -	bool direct_eret;
-> +	u64 spsr, elr;
->  
->  	/*
->  	 * Forward this trap to the virtual EL2 if the virtual
-> @@ -2182,33 +2181,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
->  	if (forward_traps(vcpu, HCR_NV))
->  		return;
->  
-> -	/*
-> -	 * Going through the whole put/load motions is a waste of time
-> -	 * if this is a VHE guest hypervisor returning to its own
-> -	 * userspace, or the hypervisor performing a local exception
-> -	 * return. No need to save/restore registers, no need to
-> -	 * switch S2 MMU. Just do the canonical ERET.
-> -	 */
-> -	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
-> -	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
-> -
-> -	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> -
-> -	direct_eret  = (mode == PSR_MODE_EL0t &&
-> -			vcpu_el2_e2h_is_set(vcpu) &&
-> -			vcpu_el2_tge_is_set(vcpu));
-> -	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
-> -
-> -	if (direct_eret) {
-> -		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
-> -		*vcpu_cpsr(vcpu) = spsr;
-> -		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
-> -		return;
-> -	}
-> -
->  	preempt_disable();
->  	kvm_arch_vcpu_put(vcpu);
->  
-> +	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
-> +	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
->  	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
->  
->  	trace_kvm_nested_eret(vcpu, elr, spsr);
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index d5fdcea2b366..eaf242b8e0cf 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -206,6 +206,49 @@ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
->  	__vcpu_put_switch_sysregs(vcpu);
->  }
->  
-> +static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> +{
-> +	u64 spsr, mode;
-> +
-> +	/*
-> +	 * Going through the whole put/load motions is a waste of time
-> +	 * if this is a VHE guest hypervisor returning to its own
-> +	 * userspace, or the hypervisor performing a local exception
-> +	 * return. No need to save/restore registers, no need to
-> +	 * switch S2 MMU. Just do the canonical ERET.
-> +	 *
-> +	 * Unless the trap has to be forwarded further down the line,
-> +	 * of course...
-> +	 */
-> +	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-> +		return false;
-> +
-> +	spsr = read_sysreg_el1(SYS_SPSR);
-> +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> +
-> +	switch (mode) {
-> +	case PSR_MODE_EL0t:
-> +		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-> +			return false;
-> +		break;
-> +	case PSR_MODE_EL2t:
-> +		mode = PSR_MODE_EL1t;
-> +		break;
-> +	case PSR_MODE_EL2h:
-> +		mode = PSR_MODE_EL1h;
-> +		break;
-> +	default:
-> +		return false;
-> +	}
+On Tue, Feb 27, 2024, Dongli Zhang wrote:
+>=20
+>=20
+> On 2/27/24 18:41, Sean Christopherson wrote:
+> > Define more #NPF error code flags that are relevant to SEV+ (mostly SNP=
+)
+> > guests, as specified by the APM:
+> >=20
+> >  * Bit 34 (ENC):   Set to 1 if the guest=E2=80=99s effective C-bit was =
+1, 0 otherwise.
+> >  * Bit 35 (SIZEM): Set to 1 if the fault was caused by a size mismatch =
+between
+> >                    PVALIDATE or RMPADJUST and the RMP, 0 otherwise.
+> >  * Bit 36 (VMPL):  Set to 1 if the fault was caused by a VMPL permissio=
+n
+> >                    check failure, 0 otherwise.
+> >  * Bit 37 (SSS):   Set to VMPL permission mask SSS (bit 4) value if Vmp=
+lSSS is
+> >                    enabled.
+>=20
+> The above bits 34-37 do not match with the bits 31,34-36 in the patch.
 
-Thanks for pointing out to_hw_pstate() (off-list), I spent far too long trying
-to understand how the original code converted PSTATE.M from (v)EL2 to EL1, and
-missed that while browsing.
+Doh, good catch.  I copy+pasted this from the APM, but the RMP bit is defin=
+ed
+slightly earlier in the APM, and I missed SSS.  I'll fixup the changelog to=
+ talk
+about RMO, and I think I'll add SSS in v2; at the very least, having the #d=
+efine
+will make it clear which bits are used.
 
-Seems hard to re-use to_hw_pstate() here, since we want the early returns.
-
-> +
-> +	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-
-I don't think we need to mask out PSR_MODE32_BIT here again, since if it was
-set in `mode`, it wouldn't have matched in the switch statement. It's possibly
-out of 'defensiveness' though. And I'm being nitpicky.
-
-> +
-> +	write_sysreg_el2(spsr, SYS_SPSR);
-> +	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
-> +
-> +	return true;
-> +}
-> +
->  static const exit_handler_fn hyp_exit_handlers[] = {
->  	[0 ... ESR_ELx_EC_MAX]		= NULL,
->  	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
-> @@ -216,6 +259,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
->  	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
->  	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_hyp_handle_watchpt_low,
->  	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
-> +	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
->  	[ESR_ELx_EC_MOPS]		= kvm_hyp_handle_mops,
->  };
->  
-
-Otherwise,
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-Thanks,
-Joey
+Thanks!
 
