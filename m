@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-10350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B45586BFA7
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 04:53:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D440B86BFAC
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 04:56:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35D212853BC
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 03:53:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F5B92841F6
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 03:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43257381D1;
-	Thu, 29 Feb 2024 03:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D0B376EB;
+	Thu, 29 Feb 2024 03:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfeQ9d5M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JfeMyR+2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0C2376E0
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 03:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AE12E622
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 03:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709178774; cv=none; b=Qyz9a9p/N/kgJkCw2FHAvWwppq3Dprt88Vtlf8zpv+WGMrkPvqxXyzhfrPX5vWA+7rMQrBVgcD9Un2nCTOBxkqjCqekiimuDEgvSQ/Qav2OvCwjoVjSYyDU94QGBm+DFt5YSVrpbBy5wsqqYQ1e9KCZMyXeQayCALyvV7YMr6DU=
+	t=1709178961; cv=none; b=HlE9+it1EbLdRObV+49cfd/YRFXHQtXT8pfJxLdECqrIwmOMlNLvRtgq6nSV94NfcmZPEk+XyBvMyE90A1Ll1CG+LBM5yKL2aOsNpbH4l8yEsSEPWm3u/sorWM4E/t1yOwIkT2aw3gKYNaUwyufmhJvDCNoZX5H0LoxpPnRciug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709178774; c=relaxed/simple;
-	bh=iYs1GVx/6fOEeuOXek63hSPWzoQFoDaetlc7ATYkEX0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=X2AZW5pC3lrFOiW1OJJdOh5M729qzWO6tWMcAGm+vmZ2VIt9k51EU7TLM0mBGcE8o+yzubEVN/apW65CP63MiwEisuDowXN7NJf/FJ5Uv2aKSPncmDlCYkBiUjx7tVy3kljwik4plwpHS2omIOYE5WKZecyWa5oM3Z2X1cqJNgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfeQ9d5M; arc=none smtp.client-ip=209.85.166.180
+	s=arc-20240116; t=1709178961; c=relaxed/simple;
+	bh=7+tCSRcyaUV9cp7u0n3lHgnxUimH77Cvv7Gl05T0pMQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=Lkb5+D4/lOyhNuPzv5yTrcLysoqWJGHqpivQ5LUi1Aiy+5uprteTso41EmQ/fsPHwwQisOFPR7YE1CmsTznUXeTdFeO5qHpA37s9oy+d3D3tjI7GJJBu1nk4Lv7C41m6P4N0uLPZ11h0JMCsRoUMcgON2W0e6ZdoUgjCPphrsEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JfeMyR+2; arc=none smtp.client-ip=209.85.215.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-365aff1fa8dso2091435ab.2
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 19:52:52 -0800 (PST)
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5c229dabbb6so251624a12.0
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 19:55:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709178772; x=1709783572; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
+        d=gmail.com; s=20230601; t=1709178959; x=1709783759; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GE8HlfcNsFFEiu7txF0WkDnaFjS/axbXg3f2FUFn/bg=;
-        b=LfeQ9d5MI7FjjTIWmmkbv5q2sNBAKc/3E7si48nO/ftgy1dcPCtNVeID0hhsqsCVCz
-         C2eEoLvnyjZM6mqk/U7AgLhPwsSj36vxLYSHSzLV6Ju2aDueHWdxrhnBwp4JKDBOM4oy
-         AdwnH0+X4ArFWYlWJsGXNGX0xS9uV97bl+e81T28jkAZxCczVZWjsAUHXauDozAIQAYi
-         TVz3tlPUgHcaMgTWDM6ApI8A1Dlzy3J+GdTA3ymlbJqG4ZzhCEvDnn54IJosCYeu/fuZ
-         HudW0uTVS3kwZRUax+wSa+rjht4cFbi1WBb069fRkIpdhYOH3seVFTYXFBfRIF1ZTrHq
-         6nFg==
+        bh=JWcLujHHv8i/TCX/eV0Cq8RaT7/itl/bFzVITNyWgHU=;
+        b=JfeMyR+2bvtzIEWqt6M74QTkBGA+JP143dkpcGuuxlEVdVPGahd0ejbiyTLSQGYjYp
+         T2vF1jEJYOrXQKWU07St4tPRsnjCP9tO0bOElGtbBdAZq4fdK04Lg7iC/D5+c9orbzEX
+         sNzH/g+J2XRFnBGho8RftMI9pYNg0v9RjNUlr3/MzTXt00bS8tb/yKMXMPgPWGmf9Q4H
+         QtM9Ei7mTCy7qS0W/OAXUDNJ5qSCzH4OENbjUZQE0y2BvPle4HhQmQJyPgutVW2uk9Ex
+         j+fHKSThSYx+cGypzjUP4h0UoWtiVWAOHw+Uj0jFPLkGCr3B7hFFZ+y4UBlyiepNKNFj
+         eKig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709178772; x=1709783572;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
+        d=1e100.net; s=20230601; t=1709178959; x=1709783759;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=GE8HlfcNsFFEiu7txF0WkDnaFjS/axbXg3f2FUFn/bg=;
-        b=jA/NiALY+vUKFBXlfEIlvuRRxQeC2zhIKnqpKegMbYKFMLuXL0drCK+5DJs6ss9g4B
-         0hH2ywugl2GNOe8XtZHuuiFNEfjCBT4YRvN3MS+egDUnoVSb4ORB9xC4uuq8/ADeDkkN
-         mUhY9uG7yKr9KBRibusoYTv8lWlvlDfKSoa494RAho+vXiEjWvJ7vhy9UqHQcz5nNejm
-         Fj+sM6q8s9DCTBv3JN/wgecWanb4Nsjt/jjPFEfoyh9kSTno6ao4aEEjQ6rRN8B/p15g
-         Ssa5bvcF82kP1w6S4E2u5VOgGVVaAuiuONT7dljZRG4TvMyX1TU30qV7PWp1xA+ofS+z
-         werA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIuWfDpi2RMHfiKaPwBgsU/yw/h/bdu58vjy4p2FYnOP8CLy7oWc2m/S99oMfxkcqt8RW/RUygo99lxiLPk14RtCKp
-X-Gm-Message-State: AOJu0YwxiYI29lClS5pM2uN/tP4AxgGNcL3Au4ccLuDKeweOcTQRtdlq
-	0TjM3V4J587xnDyjGWhhcVFixNnRXEV9ZZ+cXgGRxuaVco4F9TGG
-X-Google-Smtp-Source: AGHT+IF2sCHOGIDu81WosmY/mHd2F1QEFCJeLxZ9sG77D1aTATrp5oOMhRYDapBFD1jxZ9C3lI9ZfQ==
-X-Received: by 2002:a92:c684:0:b0:365:1dd9:ee6b with SMTP id o4-20020a92c684000000b003651dd9ee6bmr1394815ilg.25.1709178772085;
-        Wed, 28 Feb 2024 19:52:52 -0800 (PST)
+        bh=JWcLujHHv8i/TCX/eV0Cq8RaT7/itl/bFzVITNyWgHU=;
+        b=XXU0V/TYM5F7nXjsEFBvqKxkCkdbPYVF9t2UWq/Y+ALvpWSrcIQsMcZvO9BzPZoucf
+         pus9+erJrqtGkZ5s/yG7/av91Q2MVrNJJn1JcbGXcqlR799YGxpe9n4Zh1lfZiOphhwE
+         15bIkCPykXGf89wnMWn1r7Voe8jxEJpTwNGTUp/wSfgP3wyrGz/ekmOE5VvC6xQY/cJv
+         hBSm7LUcwk+Mb2L/60EG5lwrjSpYNEZFQF+6VtJNr9S3JRRAnMiP117zEnXTcixeN8PK
+         Ro3Bzzhu1ZE4nxOWSujSl34LuXBBS4oBsi6kVgbD/Wkvp+AsHRx41hFFg5kgfDAZQRH+
+         EOBw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJMm1uf8Yfjt36MplO+Awm7fONWXNe0voIcHxRlrI0e83+RUWLTSOZKK316hrTU96m9abN0RqZYxzco95XAzEOZ6PY
+X-Gm-Message-State: AOJu0YyNI8MzUxH4PFWWQs29JT3JHO6nZwjnJ0QV8Kpzkb0+BC2hCeoF
+	VSGwWLEghZ6aa4wq5Cmutf5Kb8pquErJNpR4XM48iJL4/IrD85MZRSDmoHLu
+X-Google-Smtp-Source: AGHT+IGwE0WC6jn7KJKFPT27e1lEa2s+c9G7mMkwH4tcRT8KLb2sX/mDeX7697E6K+RQ8nsfd60WpA==
+X-Received: by 2002:a17:90b:342:b0:29a:a3e1:7ab4 with SMTP id fh2-20020a17090b034200b0029aa3e17ab4mr1196565pjb.20.1709178959242;
+        Wed, 28 Feb 2024 19:55:59 -0800 (PST)
 Received: from localhost (220-235-220-130.tpgi.com.au. [220.235.220.130])
-        by smtp.gmail.com with ESMTPSA id g5-20020a170902c38500b001dc78455383sm236299plg.223.2024.02.28.19.52.48
+        by smtp.gmail.com with ESMTPSA id d23-20020a17090ac25700b0029ae07f56b3sm325887pjx.5.2024.02.28.19.55.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Feb 2024 19:52:51 -0800 (PST)
+        Wed, 28 Feb 2024 19:55:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,45 +75,82 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 29 Feb 2024 13:52:46 +1000
-Message-Id: <CZH9B1R365G4.2Z2OICA7Z7OY9@wheely>
+Date: Thu, 29 Feb 2024 13:55:53 +1000
+Message-Id: <CZH9DFOIK83X.3M1VP48W32393@wheely>
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Andrew Jones" <andrew.jones@linux.dev>
 Cc: "Thomas Huth" <thuth@redhat.com>, "Laurent Vivier" <lvivier@redhat.com>,
  "Paolo Bonzini" <pbonzini@redhat.com>, "Joel Stanley" <joel@jms.id.au>,
  <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH 09/32] scripts: allow machine option to
- be specified in unittests.cfg
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Andrew Jones" <andrew.jones@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH 32/32] powerpc: gitlab CI update
 X-Mailer: aerc 0.15.2
 References: <20240226101218.1472843-1-npiggin@gmail.com>
- <20240226101218.1472843-10-npiggin@gmail.com>
- <20240228-386d106a6ef0bc0430edad1a@orel>
-In-Reply-To: <20240228-386d106a6ef0bc0430edad1a@orel>
+ <20240226101218.1472843-33-npiggin@gmail.com>
+ <20240228-86aa66c910b91dfebb8afee8@orel>
+In-Reply-To: <20240228-86aa66c910b91dfebb8afee8@orel>
 
-On Wed Feb 28, 2024 at 9:47 PM AEST, Andrew Jones wrote:
-> On Mon, Feb 26, 2024 at 08:11:55PM +1000, Nicholas Piggin wrote:
-> > This allows different machines with different requirements to be
-> > supported by run_tests.sh, similarly to how different accelerators
-> > are handled.
+On Wed Feb 28, 2024 at 10:16 PM AEST, Andrew Jones wrote:
+> On Mon, Feb 26, 2024 at 08:12:18PM +1000, Nicholas Piggin wrote:
+> > This adds testing for the powernv machine, and adds a gitlab-ci test
+> > group instead of specifying all tests in .gitlab-ci.yml.
 > >=20
-> > Acked-by: Thomas Huth <thuth@redhat.com>
 > > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > > ---
-> >  scripts/common.bash  |  8 ++++++--
-> >  scripts/runtime.bash | 16 ++++++++++++----
-> >  2 files changed, 18 insertions(+), 6 deletions(-)
+> >  .gitlab-ci.yml        | 16 ++++++----------
+> >  powerpc/unittests.cfg | 15 ++++++++-------
+> >  2 files changed, 14 insertions(+), 17 deletions(-)
+> >=20
+> > diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> > index 61f196d5d..51a593021 100644
+> > --- a/.gitlab-ci.yml
+> > +++ b/.gitlab-ci.yml
+> > @@ -69,11 +69,9 @@ build-ppc64be:
+> >   - cd build
+> >   - ../configure --arch=3Dppc64 --endian=3Dbig --cross-prefix=3Dpowerpc=
+64-linux-gnu-
+> >   - make -j2
+> > - - ACCEL=3Dtcg ./run_tests.sh
+> > -     selftest-setup selftest-migration selftest-migration-skip spapr_h=
+call
+> > -     rtas-get-time-of-day rtas-get-time-of-day-base rtas-set-time-of-d=
+ay
+> > -     emulator
+> > -     | tee results.txt
+> > + - ACCEL=3Dtcg MAX_SMP=3D8 ./run_tests.sh -g gitlab-ci | tee results.t=
+xt
+> > + - if grep -q FAIL results.txt ; then exit 1 ; fi
+> > + - ACCEL=3Dtcg MAX_SMP=3D8 MACHINE=3Dpowernv ./run_tests.sh -g gitlab-=
+ci | tee results.txt
+> >   - if grep -q FAIL results.txt ; then exit 1 ; fi
+> > =20
+> >  build-ppc64le:
+> > @@ -82,11 +80,9 @@ build-ppc64le:
+> >   - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
+> >   - ./configure --arch=3Dppc64 --endian=3Dlittle --cross-prefix=3Dpower=
+pc64-linux-gnu-
+> >   - make -j2
+> > - - ACCEL=3Dtcg ./run_tests.sh
+> > -     selftest-setup selftest-migration selftest-migration-skip spapr_h=
+call
+> > -     rtas-get-time-of-day rtas-get-time-of-day-base rtas-set-time-of-d=
+ay
+> > -     emulator
+> > -     | tee results.txt
+> > + - ACCEL=3Dtcg MAX_SMP=3D8 ./run_tests.sh -g gitlab-ci | tee results.t=
+xt
+> > + - if grep -q FAIL results.txt ; then exit 1 ; fi
+> > + - ACCEL=3Dtcg MAX_SMP=3D8 MACHINE=3Dpowernv ./run_tests.sh -g gitlab-=
+ci | tee results.txt
+> >   - if grep -q FAIL results.txt ; then exit 1 ; fi
+> > =20
 >
-> Please also update the unittests.cfg documentation.
+> We're slowly migrating all tests like these to
+>
+>  grep -q PASS results.txt && ! grep -q FAIL results.txt
+>
+> Here's a good opportunity to change ppc's.
 
-Yeah good catch, I will do.
-
-> Currently that
-> documentation lives in the header of each unittests.cfg file, but
-> we could maybe change each file to have a single line which points
-> at a single document.
-
-I'll take a look and do something if it's simple enough,
-otherwise I'll just update the unittests.cfg.
+Sure, I'll do that.
 
 Thanks,
 Nick
