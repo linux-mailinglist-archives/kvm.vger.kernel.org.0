@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-10347-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10348-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F09186BF7D
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 04:32:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A38D286BF95
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 04:50:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53B1E1C2292B
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 03:32:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6DF31C2166B
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 03:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF73374F7;
-	Thu, 29 Feb 2024 03:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7375C3770B;
+	Thu, 29 Feb 2024 03:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2AnhCxv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gc6H23D2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79591224DC;
-	Thu, 29 Feb 2024 03:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1E725765;
+	Thu, 29 Feb 2024 03:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709177522; cv=none; b=oNEf9vUQUk1B7zy5Fs2JgfEnUwq9u/XLXIKT6eoXyWIswwuvofoMAsp9GtXPky6axMUfE44C1KRje4F2Gzd1doEKswnnNOOX1p6+H8nlyTiSPij9I4GnD0COtV8GR1PeGFPZYDe6APHB9GZ23tr4JObM1d65wz0OfuOWxzQOhiI=
+	t=1709178607; cv=none; b=DEWtAFwHPT/GIH6Ase6ihIalzJ9PzYQxoqaOZLsUCr1/WB+b1CRUShh4hbbw4LseJHAVozI3S4klrxBdeP+ESpnm8XsVuDez0czASOKU670m7zuJBmt8CUzBDSSlEGTAcFuv3nDrHL2MVErMxrW1G1hwj1aF1x1CsqDsMLqp/cM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709177522; c=relaxed/simple;
-	bh=EWwAT3MCMHWVFMTJaVaYpUhcP+iR62i7wY/pmUecdW4=;
+	s=arc-20240116; t=1709178607; c=relaxed/simple;
+	bh=Er8EkfZFtuky5LDCB1/DSrXrfh17COeijDSglM1hi1A=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=XBQ9Mo5yuX9KGD4CFiwch28M1FTpKz8UPT2YPa6blgfEhciNpIqUHUGOmQSA9zuWVRQ0r2FVfNoxVoST5RF6+FV6vFrSKEuP/dBGGhfT7BlN4uHKiE2BZ1Uxct23QToIWP5k0Njae+tBtSORKBYDg/RRDCPOaBVmkS+TbKqkdv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N2AnhCxv; arc=none smtp.client-ip=209.85.160.50
+	 References:In-Reply-To; b=unpaO9WNpXtC/fzGWsnJjGUBim/KWiKtUqwXDrLGM1AazGIdCvdXOvdy1r18ALu6Dz/Gtt072MwunCvIz1Uj3zxpBT5fx/L751E3twXWnDWjrEssiEG1igmm/YA7qtCmwx9Rns43OlMAuIWPic1G6qviYqrkFVchNuFbaONwK64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gc6H23D2; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-22007fe465bso262116fac.1;
-        Wed, 28 Feb 2024 19:32:00 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1dcb3e6ff3fso4273795ad.2;
+        Wed, 28 Feb 2024 19:50:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709177519; x=1709782319; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709178605; x=1709783405; darn=vger.kernel.org;
         h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4CoFW6OKdyVFW2sqEZWn71FgR7RIK3QxGugFdW/eOQs=;
-        b=N2AnhCxv05K6R/vtRuN6eBbN4cYHqVt55+TmtkdwsonL3/xQJYOPZzU6uyNskgAbV8
-         Foj0e7AsKezl90dqjFXgenJI3+9qC4jwspkU1zUCvmcAP68uL7jYVCqNS4O6zyve5e6t
-         44PHuSA40PRS2dl0dMWMo7VIFpNjZ2Tc052aUJ9mbUpwLxpoNd+TLp2Zk3s9JYtvdJnT
-         6/bVx4ubwZ9owMmpm4a2Pz1IeQfzf/gidzk42bSeok7k3S0DyfZ6yw6ISABGpvb4hyNx
-         SWy0J1QPZ5Sthuxe5Iv+wyVBnN+uAfDqG81DKZOGD+R8VlF1ey50kZWklIx058Zs7B9+
-         5tdA==
+        bh=wkGL4ihV2OtiC1xVy3oIJJV1camQdA/fDE7d+XmMCGE=;
+        b=gc6H23D2RQCOpBW/rlHz+36M+Vyv0/B3u4r2DoNbDFCjTeQr2Xgyn/n//666iT9/t7
+         AHR7E0aFGAIdo7yWE7T6u+m1U7snABz2gJDmlp7SECCTlKPj3Z4x7z9hGEMTL6ZOePFZ
+         Rq5hjeDqzid85GN4Crnv949e68Nu78O88OSUpsvtEQivheJgORG40lbo5NOvUjeKJBvJ
+         YxDczKKhAmfE7mR3oFYzn8pa3NGQM8OS/lfk7rIrRBF3xV23Im4OJfIO/r3gGtHvkAvw
+         qGl5uWNJiX5JiU1VufQ4+Q7digDIErilko8CRR9jbpTG4fXBb8e/RJb20WJPbJCnWbZi
+         uvBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709177519; x=1709782319;
+        d=1e100.net; s=20230601; t=1709178605; x=1709783405;
         h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=4CoFW6OKdyVFW2sqEZWn71FgR7RIK3QxGugFdW/eOQs=;
-        b=ZDHMOhYADYIVHSQlH1t6SuaeoWlcN5h7dAZAyuNwt6rqgIAqTDbZiCIy26QAFcIdoS
-         jRuvAPLeKO845F809YgwdEjSQBo+8VIJhSJbCcACA8HAiTu5v/0EAjqudcm0svk+u2Ym
-         j+Ichrjvda38plkABxTravexv9bp1E8VADURfX7csIt4qnsqDkqDDZlHrRge9CY89ISt
-         wn0PkZQRPyFNZUQaJxBKw8D6m4X5G6IIhhriKNK0sA/2v35KN52AYVDFZa0mBYfB4ahT
-         bk5kv8UZJIP23wTbBwNmTnIbDssfooPOukr7JKaqO04vUDgeW06F1pKBceRK7swkeSf3
-         BbYA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCJIe2/i9CGZWiOaLfoYEJzifHuNM4P+kcxZyzbg+ty0nO1r9f6lDOapYGDU7XvTMBnnYhAQP/rB83F83H8DbOeSF7UB6tIiDaAWZ4Xpi/K66+bxhgAZzW+w9pBJF2xQ==
-X-Gm-Message-State: AOJu0YxNPEwvbFGANw72gquhfkw9FdqQLC7iCdN2BWSmonAekZH1lvul
-	jHOQ5TekWBTzmVSZj3hCUMEm60H2G33NYasMAqoHKq/bWd/DszWz
-X-Google-Smtp-Source: AGHT+IFB9PEwchGQbbJVMouwlE0FuOhB6jELVU4WqBvhZ3nzeCZtjl/MpeNpD6vcpNdJ4Et8AtDDpw==
-X-Received: by 2002:a05:6870:40d5:b0:21f:df18:349b with SMTP id l21-20020a05687040d500b0021fdf18349bmr837242oal.35.1709177519588;
-        Wed, 28 Feb 2024 19:31:59 -0800 (PST)
+        bh=wkGL4ihV2OtiC1xVy3oIJJV1camQdA/fDE7d+XmMCGE=;
+        b=VGjyUNZxWEUqYFahYOv4cowhLjw2Gp8cHM2R52e9TvkF7taJp1/kb21G+ghtBumtBy
+         ODz7uuMlgeavA8QduefnIWyJtJTfy6/v52A0pGhvIs7Jom49UHr9OUzwIh0OkagZfK+N
+         p4FrMuiQ0tlHGVO0P3hKIMYpKONUABADGLIbMjffKr93lqyiEa4IY/7mTe8C8ADVvH4j
+         2T2wsNwvqz+XJr+yLOxGJUEjSQRNPn7BdtkEkmRUJjDsVwRmyTlHh7/WoY1eAKa9i6rD
+         a4E/uQLe9maoeAjzIZ2PvUtbq73K7I2MX8poZrcmTjpQYyLR4Lij+E7EIzf0zoVFk0cg
+         Z2Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdKhT9r35Gvz0WeG5xGzT1UAZnvapmkDBAQEndFuiekZXvgeos1/V94jSlra+k/sije7N+LD/1iJIoF4OG9vCbyoOnpxxHmCTVapEgv1xr58RA5sZDfj2HINZx0Cc4gw==
+X-Gm-Message-State: AOJu0Yx/Od24ZuX3Ks3rv4nRLmQJbrLNjNZ5f4lOhSGT5KaOalxCv1cK
+	XbeXSZjFnCi/p25VlL+E3HoNSu5KLZ+dqp+oHPFIJsyiNDhQ10Xl
+X-Google-Smtp-Source: AGHT+IEFuQfnfOdxrtG5oSxHaCUMHqvsrtVGazOAp72epa+sxEp407xvB6/65mkpoFr1O5KeWHfjhg==
+X-Received: by 2002:a17:902:ed41:b0:1dc:297d:b621 with SMTP id y1-20020a170902ed4100b001dc297db621mr961057plb.16.1709178605410;
+        Wed, 28 Feb 2024 19:50:05 -0800 (PST)
 Received: from localhost (220-235-220-130.tpgi.com.au. [220.235.220.130])
-        by smtp.gmail.com with ESMTPSA id u23-20020aa78497000000b006e5092fb3efsm183625pfn.159.2024.02.28.19.31.55
+        by smtp.gmail.com with ESMTPSA id j18-20020a170902da9200b001d9773a1993sm229042plx.213.2024.02.28.19.50.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Feb 2024 19:31:59 -0800 (PST)
+        Wed, 28 Feb 2024 19:50:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,236 +75,175 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 29 Feb 2024 13:31:52 +1000
-Message-Id: <CZH8V1T0Z3QN.1ZVFAXR4B96BZ@wheely>
+Date: Thu, 29 Feb 2024 13:49:58 +1000
+Message-Id: <CZH98WKJY6NT.5D53XGR31X22@wheely>
 Cc: <pbonzini@redhat.com>, <thuth@redhat.com>, <kvmarm@lists.linux.dev>,
  <linuxppc-dev@lists.ozlabs.org>, <linux-s390@vger.kernel.org>,
  <lvivier@redhat.com>, <frankja@linux.ibm.com>, <imbrenda@linux.ibm.com>,
  <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 03/13] treewide: lib/stack: Fix backtrace
+Subject: Re: [kvm-unit-tests PATCH 04/13] treewide: lib/stack: Make
+ base_address arch specific
 From: "Nicholas Piggin" <npiggin@gmail.com>
 To: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>,
  <kvm-riscv@lists.infradead.org>
 X-Mailer: aerc 0.15.2
 References: <20240228150416.248948-15-andrew.jones@linux.dev>
- <20240228150416.248948-18-andrew.jones@linux.dev>
-In-Reply-To: <20240228150416.248948-18-andrew.jones@linux.dev>
+ <20240228150416.248948-19-andrew.jones@linux.dev>
+In-Reply-To: <20240228150416.248948-19-andrew.jones@linux.dev>
 
 On Thu Feb 29, 2024 at 1:04 AM AEST, Andrew Jones wrote:
-> We should never pass the result of __builtin_frame_address(0) to
-> another function since the compiler is within its rights to pop the
-> frame to which it points before making the function call, as may be
-> done for tail calls. Nobody has complained about backtrace(), so
-> likely all compilations have been inlining backtrace_frame(), not
-> dropping the frame on the tail call, or nobody is looking at traces.
-> However, for riscv, when built for EFI, it does drop the frame on the
-> tail call, and it was noticed. Preemptively fix backtrace() for all
-> architectures.
->
-> Fixes: 52266791750d ("lib: backtrace printing")
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> ---
->  lib/arm/stack.c   | 13 +++++--------
->  lib/arm64/stack.c | 12 +++++-------
->  lib/riscv/stack.c | 12 +++++-------
->  lib/s390x/stack.c | 12 +++++-------
->  lib/stack.h       | 24 +++++++++++++++++-------
->  lib/x86/stack.c   | 12 +++++-------
->  6 files changed, 42 insertions(+), 43 deletions(-)
->
-> diff --git a/lib/arm/stack.c b/lib/arm/stack.c
-> index 7d081be7c6d0..66d18b47ea53 100644
-> --- a/lib/arm/stack.c
-> +++ b/lib/arm/stack.c
-> @@ -8,13 +8,16 @@
->  #include <libcflat.h>
->  #include <stack.h>
-> =20
-> -int backtrace_frame(const void *frame, const void **return_addrs,
-> -		    int max_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	static int walking;
->  	int depth;
->  	const unsigned long *fp =3D (unsigned long *)frame;
-> =20
-> +	if (current_frame)
-> +		fp =3D __builtin_frame_address(0);
-> +
->  	if (walking) {
->  		printf("RECURSIVE STACK WALK!!!\n");
->  		return 0;
-> @@ -33,9 +36,3 @@ int backtrace_frame(const void *frame, const void **ret=
-urn_addrs,
->  	walking =3D 0;
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0),
-> -			       return_addrs, max_depth);
-> -}
-> diff --git a/lib/arm64/stack.c b/lib/arm64/stack.c
-> index 82611f4b1815..f5eb57fd8892 100644
-> --- a/lib/arm64/stack.c
-> +++ b/lib/arm64/stack.c
-> @@ -8,7 +8,8 @@
-> =20
->  extern char vector_stub_start, vector_stub_end;
-> =20
-> -int backtrace_frame(const void *frame, const void **return_addrs, int ma=
-x_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	const void *fp =3D frame;
->  	static bool walking;
-> @@ -17,6 +18,9 @@ int backtrace_frame(const void *frame, const void **ret=
-urn_addrs, int max_depth)
->  	bool is_exception =3D false;
->  	unsigned long addr;
-> =20
-> +	if (current_frame)
-> +		fp =3D __builtin_frame_address(0);
-> +
->  	if (walking) {
->  		printf("RECURSIVE STACK WALK!!!\n");
->  		return 0;
-> @@ -54,9 +58,3 @@ int backtrace_frame(const void *frame, const void **ret=
-urn_addrs, int max_depth)
->  	walking =3D false;
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0),
-> -			       return_addrs, max_depth);
-> -}
-> diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
-> index 712a5478d547..d865594b9671 100644
-> --- a/lib/riscv/stack.c
-> +++ b/lib/riscv/stack.c
-> @@ -2,12 +2,16 @@
->  #include <libcflat.h>
->  #include <stack.h>
-> =20
-> -int backtrace_frame(const void *frame, const void **return_addrs, int ma=
-x_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	static bool walking;
->  	const unsigned long *fp =3D (unsigned long *)frame;
->  	int depth;
-> =20
-> +	if (current_frame)
-> +		fp =3D __builtin_frame_address(0);
-> +
->  	if (walking) {
->  		printf("RECURSIVE STACK WALK!!!\n");
->  		return 0;
-> @@ -24,9 +28,3 @@ int backtrace_frame(const void *frame, const void **ret=
-urn_addrs, int max_depth)
->  	walking =3D false;
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0),
-> -			       return_addrs, max_depth);
-> -}
-> diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
-> index 9f234a12adf6..d194f654e94d 100644
-> --- a/lib/s390x/stack.c
-> +++ b/lib/s390x/stack.c
-> @@ -14,11 +14,15 @@
->  #include <stack.h>
->  #include <asm/arch_def.h>
-> =20
-> -int backtrace_frame(const void *frame, const void **return_addrs, int ma=
-x_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	int depth =3D 0;
->  	struct stack_frame *stack =3D (struct stack_frame *)frame;
-> =20
-> +	if (current_frame)
-> +		stack =3D __builtin_frame_address(0);
-> +
->  	for (depth =3D 0; stack && depth < max_depth; depth++) {
->  		return_addrs[depth] =3D (void *)stack->grs[8];
->  		stack =3D stack->back_chain;
-> @@ -28,9 +32,3 @@ int backtrace_frame(const void *frame, const void **ret=
-urn_addrs, int max_depth)
-> =20
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0),
-> -			       return_addrs, max_depth);
-> -}
-> diff --git a/lib/stack.h b/lib/stack.h
-> index 10fc2f793354..6edc84344b51 100644
-> --- a/lib/stack.h
-> +++ b/lib/stack.h
-> @@ -11,17 +11,27 @@
->  #include <asm/stack.h>
-> =20
->  #ifdef HAVE_ARCH_BACKTRACE_FRAME
-> -extern int backtrace_frame(const void *frame, const void **return_addrs,
-> -			   int max_depth);
-> +extern int arch_backtrace_frame(const void *frame, const void **return_a=
-ddrs,
-> +				int max_depth, bool current_frame);
-> +
-> +static inline int backtrace_frame(const void *frame, const void **return=
-_addrs,
-> +				  int max_depth)
-> +{
-> +	return arch_backtrace_frame(frame, return_addrs, max_depth, false);
-> +}
-> +
-> +static inline int backtrace(const void **return_addrs, int max_depth)
-> +{
-> +	return arch_backtrace_frame(NULL, return_addrs, max_depth, true);
-> +}
->  #else
-> -static inline int
-> -backtrace_frame(const void *frame __unused, const void **return_addrs __=
-unused,
-> -		int max_depth __unused)
-> +extern int backtrace(const void **return_addrs, int max_depth);
-> +
-> +static inline int backtrace_frame(const void *frame, const void **return=
-_addrs,
-> +				  int max_depth)
->  {
->  	return 0;
->  }
->  #endif
-> =20
-> -extern int backtrace(const void **return_addrs, int max_depth);
-> -
->  #endif
+> Calculating the offset of an address is image specific, which is
+> architecture specific. Until now, all architectures and architecture
+> configurations which select CONFIG_RELOC were able to subtract
+> _etext, but the EFI configuration of riscv cannot (it must subtract
+> ImageBase). Make this function architecture specific, since the
+> architecture's image layout already is.
 
-Is there a reason to add the inline wrappers rather than just externs
-and drop the arch_ prefix?
+arch_base_address()?
 
-Do we want to just generally have all arch specific functions have an
-arch_ prefix? Fine by me.
-
-Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-
-I'm fine to rebase the powerpc patch on top of this if it goes in first.
-Thanks for the heads up.
+How about a default implementation unlesss HAVE_ARCH_BASE_ADDRESS?
 
 Thanks,
 Nick
+
+>
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>  lib/arm64/stack.c | 17 +++++++++++++++++
+>  lib/riscv/stack.c | 18 ++++++++++++++++++
+>  lib/stack.c       | 19 ++-----------------
+>  lib/stack.h       |  2 ++
+>  lib/x86/stack.c   | 17 +++++++++++++++++
+>  5 files changed, 56 insertions(+), 17 deletions(-)
+>
+> diff --git a/lib/arm64/stack.c b/lib/arm64/stack.c
+> index f5eb57fd8892..3369031a74f7 100644
+> --- a/lib/arm64/stack.c
+> +++ b/lib/arm64/stack.c
+> @@ -6,6 +6,23 @@
+>  #include <stdbool.h>
+>  #include <stack.h>
+> =20
+> +#ifdef CONFIG_RELOC
+> +extern char _text, _etext;
+> +
+> +bool base_address(const void *rebased_addr, unsigned long *addr)
+> +{
+> +	unsigned long ra =3D (unsigned long)rebased_addr;
+> +	unsigned long start =3D (unsigned long)&_text;
+> +	unsigned long end =3D (unsigned long)&_etext;
+> +
+> +	if (ra < start || ra >=3D end)
+> +		return false;
+> +
+> +	*addr =3D ra - start;
+> +	return true;
+> +}
+> +#endif
+> +
+>  extern char vector_stub_start, vector_stub_end;
+> =20
+>  int arch_backtrace_frame(const void *frame, const void **return_addrs,
+> diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
+> index d865594b9671..a143c22a570a 100644
+> --- a/lib/riscv/stack.c
+> +++ b/lib/riscv/stack.c
+> @@ -2,6 +2,24 @@
+>  #include <libcflat.h>
+>  #include <stack.h>
+> =20
+> +#ifdef CONFIG_RELOC
+> +extern char ImageBase, _text, _etext;
+> +
+> +bool base_address(const void *rebased_addr, unsigned long *addr)
+> +{
+> +	unsigned long ra =3D (unsigned long)rebased_addr;
+> +	unsigned long base =3D (unsigned long)&ImageBase;
+> +	unsigned long start =3D (unsigned long)&_text;
+> +	unsigned long end =3D (unsigned long)&_etext;
+> +
+> +	if (ra < start || ra >=3D end)
+> +		return false;
+> +
+> +	*addr =3D ra - base;
+> +	return true;
+> +}
+> +#endif
+> +
+>  int arch_backtrace_frame(const void *frame, const void **return_addrs,
+>  			 int max_depth, bool current_frame)
+>  {
+> diff --git a/lib/stack.c b/lib/stack.c
+> index dd6bfa8dac6e..e5099e207388 100644
+> --- a/lib/stack.c
+> +++ b/lib/stack.c
+> @@ -11,23 +11,8 @@
+> =20
+>  #define MAX_DEPTH 20
+> =20
+> -#ifdef CONFIG_RELOC
+> -extern char _text, _etext;
+> -
+> -static bool base_address(const void *rebased_addr, unsigned long *addr)
+> -{
+> -	unsigned long ra =3D (unsigned long)rebased_addr;
+> -	unsigned long start =3D (unsigned long)&_text;
+> -	unsigned long end =3D (unsigned long)&_etext;
+> -
+> -	if (ra < start || ra >=3D end)
+> -		return false;
+> -
+> -	*addr =3D ra - start;
+> -	return true;
+> -}
+> -#else
+> -static bool base_address(const void *rebased_addr, unsigned long *addr)
+> +#ifndef CONFIG_RELOC
+> +bool base_address(const void *rebased_addr, unsigned long *addr)
+>  {
+>  	*addr =3D (unsigned long)rebased_addr;
+>  	return true;
+> diff --git a/lib/stack.h b/lib/stack.h
+> index 6edc84344b51..f8def4ad4d49 100644
+> --- a/lib/stack.h
+> +++ b/lib/stack.h
+> @@ -10,6 +10,8 @@
+>  #include <libcflat.h>
+>  #include <asm/stack.h>
+> =20
+> +bool base_address(const void *rebased_addr, unsigned long *addr);
+> +
+>  #ifdef HAVE_ARCH_BACKTRACE_FRAME
+>  extern int arch_backtrace_frame(const void *frame, const void **return_a=
+ddrs,
+>  				int max_depth, bool current_frame);
+> diff --git a/lib/x86/stack.c b/lib/x86/stack.c
+> index 58ab6c4b293a..7ba73becbd69 100644
+> --- a/lib/x86/stack.c
+> +++ b/lib/x86/stack.c
+> @@ -1,6 +1,23 @@
+>  #include <libcflat.h>
+>  #include <stack.h>
+> =20
+> +#ifdef CONFIG_RELOC
+> +extern char _text, _etext;
+> +
+> +bool base_address(const void *rebased_addr, unsigned long *addr)
+> +{
+> +	unsigned long ra =3D (unsigned long)rebased_addr;
+> +	unsigned long start =3D (unsigned long)&_text;
+> +	unsigned long end =3D (unsigned long)&_etext;
+> +
+> +	if (ra < start || ra >=3D end)
+> +		return false;
+> +
+> +	*addr =3D ra - start;
+> +	return true;
+> +}
+> +#endif
+> +
+>  int arch_backtrace_frame(const void *frame, const void **return_addrs,
+>  			 int max_depth, bool current_frame)
+>  {
+
 
