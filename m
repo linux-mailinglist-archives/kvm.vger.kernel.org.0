@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-10424-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10425-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 285FE86C168
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:54:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7067E86C16E
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:54:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF476286A81
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:54:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB2381F24451
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E9145BE4;
-	Thu, 29 Feb 2024 06:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90D847F7C;
+	Thu, 29 Feb 2024 06:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpsomyGm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HkcnJtsj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757AD4594C;
-	Thu, 29 Feb 2024 06:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEB44779E;
+	Thu, 29 Feb 2024 06:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709189629; cv=none; b=dl1AUsKBrS3tUOK/67sk/CMJ6sgVIu3z+smk5Tm1WeIKuh3pHvz9Zo932TmTMtnFEdSAvnHRn424g14xLmgoLK70PsDc56eC0HxMMbkFSX2EKTInMGwXoMIhW7IHQ3MRvtaoWSlRieLC7sRbZoDfHw4vNc/4qvwEK9DVYyQ336g=
+	t=1709189634; cv=none; b=kuS8ay/xPh9Ks0hEnNU01Ry6EJndcdTloM0Undn6tDoZbQwhmVqA2tPEOrbIjhiv9hXXuSZ68V+NPGAMnAwrE9DLrMVV2KWLd4YpmM0tmmnlUX+BqFUjDQBZLkgrqQwHVHVHqRVKgPl+YwTBj1GLFjim6WKmdsQEEq/RLhlmnkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709189629; c=relaxed/simple;
-	bh=rpPUI8/Ilc1h0gZrxlo0S9MkxaA5lzl3nhDeUQz8WlY=;
+	s=arc-20240116; t=1709189634; c=relaxed/simple;
+	bh=wLkR7aEG/EhxVLXUVeeUJKpIDRx2DyXyAakTyAkuIO8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lZ4xHPETObuGQyZyI7fhb6M5jNEriaFhKo2CcX81x7wmjbXipLgJQ0HYQeU5p/KmQomXDBnAmrQwtfwyk/o+TPGNugLrlgHfZheoAq0yalP2Lj/PVB0LV4RMUu/G0baAHcoXfntadJ5YUyFupRQh1ZQe27W0Jm5ANLJHOLqkfqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lpsomyGm; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=oRGqGoPhwMCqB6wnCcdoQriWjNbYgnprknXEU77mUIIyy6LdOJPO+deG0qD7NoBt85XaqhAPB9NA7kMctvZO1RqOeTgxUVn+jHr3Uaop+1DAh92in7+X3msMr5xBPChyyeTaD7BzJahN4xbfSkCy0ASGjKC1y1dUhdkX/McNtGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HkcnJtsj; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dc96f64c10so5996475ad.1;
-        Wed, 28 Feb 2024 22:53:48 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1dc5d0162bcso5874685ad.0;
+        Wed, 28 Feb 2024 22:53:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709189628; x=1709794428; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709189632; x=1709794432; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LzYCOce5vbS2RbT3cfrlWimjZLlkPfrhe1IV1KHmmpQ=;
-        b=lpsomyGmik/3vO9sZ4IA21YIOlmSpYdnlnEDKodzBGH067choMFeG3lAv9pjYKLmre
-         DUzql0CMm1HTwyLXqiuHvq1A4V4xxKE2w2akUG3PXBZMoqS8rGyE0WHasSNRgY04s+iT
-         yvMs/gavcw421rKf6FYXLuyAMFr4wTDz1RKoHZnmyWknFAJ3+U6hs5/8xl0ROrxG2E0M
-         WrVicFcOd5BkiCgaN/4LKVU6VRetMS5hMZwYlBxZCNEdxQToM/xBU0GzWL3oJ5K6G8Gl
-         kDuHhtpILW6QN8kCti6fBbnniAHDm6/bE4fMzsh0Rz9HWDB4Izd5XXObHpVjEf3wqvue
-         uXnQ==
+        bh=fPGkmifTwwHLgO5fJhv34X15SDCvJK/C4nnS1+TZMW0=;
+        b=HkcnJtsjwpxsYl71eefUiGDDqfww2cmp0ycPhXwhw5oddEVbQTjCpHZuV8xGPrmjDA
+         fDz/I4Y97eI6G4vPLhO3TW5UtXE5AEQCiiDrD0pdwtTFqXcEPHqbGl0B7lGrAzLWoTYF
+         rGtXKynki3WJSBRUQ2ibFwNTfoPiurI1e/qkoXCBBxNEw7XoEbssLtAZIxU0KLI+PvbI
+         1X+HZWVTuV2GpOTB7ViQ66ABtazfOCXB0SZP4yYsUr7kVTwhPjoGyIdZ/R5ZTALZf6dv
+         NGCiwtscXI7MrFKjkGEHPQId/6mw3fCRJwSdK4Q6+u+rzjboCIJuaU3WbLQ8XhwR2+si
+         GoSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709189628; x=1709794428;
+        d=1e100.net; s=20230601; t=1709189632; x=1709794432;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LzYCOce5vbS2RbT3cfrlWimjZLlkPfrhe1IV1KHmmpQ=;
-        b=TM+g7QOkxoPgvfUWGxRcVA/P9JoeddpwyohQHTIY5rANWeTMc1FBRaY6CNzOq4qT4O
-         oJemr0mr7jLecABwJ0oD260eplFgvnx9Oo2MgPqQeV7tPsbQkGi6BKG+1t+wGevoGQ32
-         neOyhbdiw2t4oXz+eeUfjCDcvSmovc/V8QV69g2mxIauX9CX24H6Jl6oGQCbMAAwhTel
-         XuHm4QkkckrUTaIFI5cb0Di/eqVlWtXml10u/Y9TRQNp7gLu3C1ODXY2+YVhyBeiXvus
-         J8PvXb3+NFfEyzjd4M17Y5I4l8+Y4e+w1Og1BVFQ3eJOgY9IGXA+6Tbxj3yjyo2i7U92
-         EEPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWrv5/7w/vQSorZxZJWauCwTslo6mcf/wAWLeznuJybeRPiqTwTsAQCyDQ+cr5cKUtAVZ+bQ3T2VFuGwGvV/fSZk43S5sxfgAafqCohp5C/qZH1y1GzxCD/LqEkiQ7J6Um
-X-Gm-Message-State: AOJu0YwGw8924YSRmfJ/ekh8m4gMn5VwBV6mDqsYyrkHD8/WKqhP1NiQ
-	CEQYWqPjronU27OjY81uE9wmfQYizrf3CtJ5JfbbN+Zs6v/zLjZV
-X-Google-Smtp-Source: AGHT+IGda8LP7RnnCF1XOEo6jvOCk88OmaEv0BmiQ3NUSVYHPR/reUiX2a6zIhwxj1w+wf9y9XY1mg==
-X-Received: by 2002:a17:902:c403:b0:1db:ecf1:3b67 with SMTP id k3-20020a170902c40300b001dbecf13b67mr1673914plk.66.1709189627675;
-        Wed, 28 Feb 2024 22:53:47 -0800 (PST)
+        bh=fPGkmifTwwHLgO5fJhv34X15SDCvJK/C4nnS1+TZMW0=;
+        b=ba0qw5vqQkbGntBWVlMn94OPfyooejUsxddIyTKBDCZqQvlbj9yZRqypYqAugREsEf
+         6vHXtQUrsXRlp5zx6oJAKVZlQ3dtbATGsONSGmDLtnopEO37ZAWZ9VLPCxlCGD0x2wlp
+         txhk3sP1gpS+mJtuKQKmOACXfKUA6ERNFgd5C6JYSF1skd4QY+xkQBh/v/6MGTknzKsb
+         9zRC+yMxAf1mAx4KzSpRyxx5B9sEP18X/wZ+gsHt/2pX8H04VV3/flqIFs2CYRDxG3nM
+         K1qed/RcyLKKAkgN4VgDYK9Z6/guOG4TNIUVjTd/+7a4vedFzwCbSSKdKrayGfSTJxww
+         OpXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWwv1d+mFdok01j0WSVDFDe17zBpgP6g6yJphlIKZTmYVBzuvdnzNahswk6AKfP8hVNzDednjDm/7zrQJhbLBTb1aDMIOI5zgrsj6KGE1vEj+EEzW+exVMJtUY1GyGgFjUM
+X-Gm-Message-State: AOJu0YwWeTcQ7QpBC2W0b2+AVKpVpc716aOAmZqpaQOI0R9VrhvxLJk5
+	5+aW9YZT521KRruZ4/DoubiFJ92sN2UWbXzt+0rk7cBF/ezDDyNT
+X-Google-Smtp-Source: AGHT+IEoVX+qNwQIdAZwon0zsOUV+m9tJa1G03TE/+hKAZWcCwptiImQH4ixo0jkpb35EouxZiB2WA==
+X-Received: by 2002:a17:902:eccc:b0:1dc:7b6:867a with SMTP id a12-20020a170902eccc00b001dc07b6867amr1473111plh.21.1709189632045;
+        Wed, 28 Feb 2024 22:53:52 -0800 (PST)
 Received: from localhost.localdomain ([43.132.141.8])
-        by smtp.gmail.com with ESMTPSA id c10-20020a170903234a00b001dc0d1fb3b1sm610509plh.58.2024.02.28.22.53.43
+        by smtp.gmail.com with ESMTPSA id c10-20020a170903234a00b001dc0d1fb3b1sm610509plh.58.2024.02.28.22.53.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 22:53:47 -0800 (PST)
+        Wed, 28 Feb 2024 22:53:51 -0800 (PST)
 From: Yi Wang <up2wing@gmail.com>
 X-Google-Original-From: Yi Wang <foxywang@tencent.com>
 To: seanjc@google.com,
@@ -89,9 +89,9 @@ To: seanjc@google.com,
 	frankja@linux.ibm.com,
 	imbrenda@linux.ibm.com
 Cc: up2wing@gmail.com
-Subject: [RESEND v3 1/3] KVM: setup empty irq routing when create vm
-Date: Thu, 29 Feb 2024 14:53:11 +0800
-Message-Id: <20240229065313.1871095-2-foxywang@tencent.com>
+Subject: [RESEND v3 2/3] KVM: x86: don't setup empty irq routing when KVM_CAP_SPLIT_IRQCHIP
+Date: Thu, 29 Feb 2024 14:53:12 +0800
+Message-Id: <20240229065313.1871095-3-foxywang@tencent.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20240229065313.1871095-1-foxywang@tencent.com>
 References: <20240229065313.1871095-1-foxywang@tencent.com>
@@ -105,78 +105,66 @@ Content-Transfer-Encoding: 8bit
 
 From: Yi Wang <foxywang@tencent.com>
 
-Add a new function to setup empty irq routing in kvm path, which
-can be invoded in non-architecture-specific functions. The difference
-compared to the kvm_setup_empty_irq_routing() is this function just
-alloc the empty irq routing and does not need synchronize srcu, as
-we will call it in kvm_create_vm().
+We found that it may cost more than 20 milliseconds very accidentally
+to enable cap of KVM_CAP_SPLIT_IRQCHIP on a host which has many vms
+already.
 
-Using the new adding function, we can setup empty irq routing when
-kvm_create_vm(), so that x86 and s390 no longer need to set
-empty/dummy irq routing when creating an IRQCHIP 'cause it avoid
-an synchronize_srcu.
+The reason is that when vmm(qemu/CloudHypervisor) invokes
+KVM_CAP_SPLIT_IRQCHIP kvm will call synchronize_srcu_expedited() and
+might_sleep and kworker of srcu may cost some delay during this period.
+
+As we have set up empty irq routing when creating vm, so this is no
+need now.
 
 Signed-off-by: Yi Wang <foxywang@tencent.com>
 ---
- include/linux/kvm_host.h |  1 +
- virt/kvm/irqchip.c       | 19 +++++++++++++++++++
- virt/kvm/kvm_main.c      |  4 ++++
- 3 files changed, 24 insertions(+)
+ arch/x86/kvm/irq.h      | 1 -
+ arch/x86/kvm/irq_comm.c | 5 -----
+ arch/x86/kvm/x86.c      | 3 ---
+ 3 files changed, 9 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4944136efaa2..e91525c0a4ea 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2000,6 +2000,7 @@ int kvm_set_irq_routing(struct kvm *kvm,
- 			const struct kvm_irq_routing_entry *entries,
- 			unsigned nr,
- 			unsigned flags);
-+int kvm_setup_empty_irq_routing_lockless(struct kvm *kvm);
- int kvm_set_routing_entry(struct kvm *kvm,
- 			  struct kvm_kernel_irq_routing_entry *e,
- 			  const struct kvm_irq_routing_entry *ue);
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 1e567d1f6d3d..90fc43bd0fe4 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -237,3 +237,22 @@ int kvm_set_irq_routing(struct kvm *kvm,
+diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+index c2d7cfe82d00..76d46b2f41dd 100644
+--- a/arch/x86/kvm/irq.h
++++ b/arch/x86/kvm/irq.h
+@@ -106,7 +106,6 @@ void __kvm_migrate_timers(struct kvm_vcpu *vcpu);
+ int apic_has_pending_timer(struct kvm_vcpu *vcpu);
  
- 	return r;
- }
-+
-+int kvm_setup_empty_irq_routing_lockless(struct kvm *kvm)
-+{
-+	struct kvm_irq_routing_table *new;
-+	u32 i, j;
-+
-+	new = kzalloc(struct_size(new, map, 1), GFP_KERNEL_ACCOUNT);
-+	if (!new)
-+		return -ENOMEM;
-+
-+	new->nr_rt_entries = 1;
-+	for (i = 0; i < KVM_NR_IRQCHIPS; i++)
-+		for (j = 0; j < KVM_IRQCHIP_NUM_PINS; j++)
-+			new->chip[i][j] = -1;
-+
-+	RCU_INIT_POINTER(kvm->irq_routing, new);
-+
-+	return 0;
-+}
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 7db96875ac46..db1b13fc0502 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1242,6 +1242,10 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
- 	if (r)
- 		goto out_err;
+ int kvm_setup_default_irq_routing(struct kvm *kvm);
+-int kvm_setup_empty_irq_routing(struct kvm *kvm);
+ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+ 			     struct kvm_lapic_irq *irq,
+ 			     struct dest_map *dest_map);
+diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+index 16d076a1b91a..99bf53b94175 100644
+--- a/arch/x86/kvm/irq_comm.c
++++ b/arch/x86/kvm/irq_comm.c
+@@ -392,11 +392,6 @@ int kvm_setup_default_irq_routing(struct kvm *kvm)
  
-+	r = kvm_setup_empty_irq_routing_lockless(kvm);
-+	if (r)
-+		goto out_err;
-+
- 	mutex_lock(&kvm_lock);
- 	list_add(&kvm->vm_list, &vm_list);
- 	mutex_unlock(&kvm_lock);
+ static const struct kvm_irq_routing_entry empty_routing[] = {};
+ 
+-int kvm_setup_empty_irq_routing(struct kvm *kvm)
+-{
+-	return kvm_set_irq_routing(kvm, empty_routing, 0, 0);
+-}
+-
+ void kvm_arch_post_irq_routing_update(struct kvm *kvm)
+ {
+ 	if (!irqchip_split(kvm))
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index cec0fc2a4b1c..6a2e786aca22 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -6414,9 +6414,6 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 			goto split_irqchip_unlock;
+ 		if (kvm->created_vcpus)
+ 			goto split_irqchip_unlock;
+-		r = kvm_setup_empty_irq_routing(kvm);
+-		if (r)
+-			goto split_irqchip_unlock;
+ 		/* Pairs with irqchip_in_kernel. */
+ 		smp_wmb();
+ 		kvm->arch.irqchip_mode = KVM_IRQCHIP_SPLIT;
 -- 
 2.39.3
 
