@@ -1,132 +1,123 @@
-Return-Path: <kvm+bounces-10539-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10540-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9295986D21E
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 19:25:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B58786D222
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 19:25:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 331871F2699A
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 18:25:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCBBD1C235A6
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 18:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AC67D06F;
-	Thu, 29 Feb 2024 18:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83BCF134414;
+	Thu, 29 Feb 2024 18:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVa8AwGO"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ENGQZjPM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE3578295;
-	Thu, 29 Feb 2024 18:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543D87A149
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 18:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709231082; cv=none; b=Yl+/dpSQ3Hg9LVmj0hcqDzvGMVbZ87h6wqFrHW3ozIFnUbZcY+Q46oAk2Dal8h2jokHMHau0dNFxI1PV7oOy9UurZTrFWd+MbN/+hwWvC7aImfhMyd5A88c+DOPHMlBM1bshtq9CeGukE/6u2ovCiIvuxnPkFo2pp9hCNOVFXbk=
+	t=1709231099; cv=none; b=aqIMw+fW3fyiC9e/1yoKHs35NRwr6s1Jxyx3UMib4NlErRhRmRJf2Vs9NZIMy1UAbN+XFvN4HnOPMD4iD8ghY1uE9jMLT0ChMjAEaOV/XSBOe3gwTSCKIsLdmOAzAjn2HlaFeMOsctSDiKlA35Jt+4dHtx5bDLMqIue4oCBXI10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709231082; c=relaxed/simple;
-	bh=djivfC0fMA7FF09Y1zo65j9t8YhyySEZcKWiLhmxvqQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QiTKDaXvDkchIHLRukR8KpOS+7Ej9BuxeoFi7/JXxkxRF7renwfwHKuvPwmg+YXOWJtcUymxtdDwXyeNn90+DHp1gK9ufdFSptBBGhz9mESDRFMFf68MkThrWH3WTzNukJRyjOFkhQv6OUT7obKzmJ4jeUIuDxEbxfSbBWeWKA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AVa8AwGO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E30C433F1;
-	Thu, 29 Feb 2024 18:24:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709231079;
-	bh=djivfC0fMA7FF09Y1zo65j9t8YhyySEZcKWiLhmxvqQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AVa8AwGOMwnS0YIZ9bWOWt60pTx0ndN3pNV5X1TuFNy/3JN2w6nlqO1iKQBEzRRj1
-	 1x5u4eejF4L/5PIG5VfvtXe4T/q130l/tKQbBb1Re+/adh6exvUfOu8+UWFHTbb2vo
-	 B2V7eLTlQK5tu3P1seIjNo5n7DXgXexUig8AtNN7aKYxaN3d6cf37jfnZwBgNxh9Ap
-	 ruChnaKibGGLWAUb35b2OySoRvr0irrgLYrn8UTFBMxUOqmKVPi1IGlevd23Txws5g
-	 J75iuh4qvXGwt69VcEf7FWe/nl+Zq5zwn+It5fhrDoS8XDu+PV9ZqhXk2vnxyXkze6
-	 0RkBWqt47cSFg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rfl5B-0087lh-F4;
-	Thu, 29 Feb 2024 18:24:37 +0000
-Date: Thu, 29 Feb 2024 18:24:37 +0000
-Message-ID: <864jdr2knu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Fix TRFCR_EL1/PMSCR_EL1 access in hVHE mode
-In-Reply-To: <ZeDAxL9nr_qmYGS9@linux.dev>
-References: <20240229145417.3606279-1-maz@kernel.org>
-	<ZeDAxL9nr_qmYGS9@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1709231099; c=relaxed/simple;
+	bh=Ce5pyQnb9GRcPSheUoJZhjpUrjGnCB77xYc5gcYNlxQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YKaH9GSww5CUvFyCWJXo2D8oOtgvMvdL6jfzioIfYD6VaN5uoHqmI52lGbtENG5LM+n8eU50g2+7JTRBDylA//dbTrFJGEK3ULw6g/yYCD5eTDdFob0KxPcACwEeNbeHU2W3kFEiRfhpwYz4AXcyd9tkoyHjdvuQLjratBCHD4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=ENGQZjPM; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e56787e691so1550870b3a.0
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 10:24:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1709231098; x=1709835898; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vqInfZ8mOq8nYZAY0kAdxi4SUGFvyqMPNmMOUUeoyfg=;
+        b=ENGQZjPMfEh2sAf36guydCaOXrhzFaPN4I3K5F3QN2g7nWsuX9IC1WQj2/cLxkTHdi
+         Qo5DZpoRSvdZZ7OuoVu0wrLcKPFz6BMXzeCZhehz9AbQaFwUOvTLl5YX7GMzj4yrJXJZ
+         N8m53e6FL/rmWDTyAqgK+cvAkxUMAA5y2bUUk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709231098; x=1709835898;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vqInfZ8mOq8nYZAY0kAdxi4SUGFvyqMPNmMOUUeoyfg=;
+        b=W3As9b6m5l43abBGkmdGXLhHE40p3xH3LHK8Tp4Ga/etGzzxjLPkuTvFtPThl+fhfO
+         n+EEIvZpvJLir73SSbQk7O8/XRFLgrlMCYoiaW23BWvI8JIsCwEasKIlCB90OqFQ8zc9
+         U1GhHvlmPoQcWPJQQo5TOnZ7ZdAPUOFLXzv9/B+hAvLxzaWpWtmDzWanAsXNFWogEL5u
+         CofFBTuVXsDTV8lYndW331ukTWquK4ZDTe45mMmhSPeQyffIL426Sfw8l1Z4eIypuYda
+         Xp2wp5EiDdHiFVip0H93+p1IiWeVWfPkKTqWntgxoIjcm8dWKzVCarOZOrThzPuUJlUf
+         DzNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPmHDgHrRITBgtJzhPzOp8YODMyL9RfNeu6iksCh2VC8Ax8Pm6TAStoqBlLeI45Ve+Nf91yrmAFkU+UebTDxST577c
+X-Gm-Message-State: AOJu0YwGisB/Nuh8WLHvbQNS2zF3+sJ7OTS6bd3LKBxZU14pApWXdwdj
+	tzxzuATnWoyNZAWDlrDpFq0k6TKRCQs9NNNcSQnfLVBPs6S8s2zRZe0YV3njxA==
+X-Google-Smtp-Source: AGHT+IExuEVVJmKP2BNOyB+LtexDDJxYmvvXcikwCbgKNASK/A5xRah0QTnX1g4AE8/nsBFkMxCoNQ==
+X-Received: by 2002:a17:90b:343:b0:29a:c992:198e with SMTP id fh3-20020a17090b034300b0029ac992198emr3923483pjb.15.1709231097697;
+        Thu, 29 Feb 2024 10:24:57 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id pl4-20020a17090b268400b0029af4116662sm3911274pjb.21.2024.02.29.10.24.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 10:24:57 -0800 (PST)
+Date: Thu, 29 Feb 2024 10:24:56 -0800
+From: Kees Cook <keescook@chromium.org>
+To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc: Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Alan Maguire <alan.maguire@oracle.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+	James Morris <jamorris@linux.microsoft.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
+	Marco Pagani <marpagan@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Thara Gopinath <tgopinath@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+	linux-um@lists.infradead.org, x86@kernel.org
+Subject: Re: [PATCH v1 6/8] kunit: Fix KUNIT_SUCCESS() calls in iov_iter tests
+Message-ID: <202402291024.CE0082115@keescook>
+References: <20240229170409.365386-1-mic@digikod.net>
+ <20240229170409.365386-7-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240229170409.365386-7-mic@digikod.net>
 
-On Thu, 29 Feb 2024 17:37:08 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, Feb 29, 2024 at 06:04:07PM +0100, Mickaël Salaün wrote:
+> Fix KUNIT_SUCCESS() calls to pass a test argument.
 > 
-> Hey,
+> This is a no-op for now because this macro does nothing, but it will be
+> required for the next commit.
 > 
-> On Thu, Feb 29, 2024 at 02:54:17PM +0000, Marc Zyngier wrote:
-> > When running in hVHE mode, EL1 accesses are performed with the EL12
-> > accessor, as we run with HCR_EL2.E2H=1.
-> > 
-> > Unfortunately, both PMSCR_EL1 and TRFCR_EL1 are used with the
-> > EL1 accessor, meaning that we actually affect the EL2 state. Duh.
-> > 
-> > Switch to using the {read,write}_sysreg_el1() helpers that will do
-> > the right thing in all circumstances.
-> 
-> I was wondering if there was a way to surface these screw-ups at compile
-> time, but there's nothing elegant that comes to mind. Guess we need to
-> be very careful reviewing "nVHE" changes going forward.
+> Cc: Brendan Higgins <brendanhiggins@google.com>
+> Cc: David Gow <davidgow@google.com>
+> Cc: Rae Moar <rmoar@google.com>
+> Cc: Shuah Khan <skhan@linuxfoundation.org>
+> Signed-off-by: Mickaël Salaün <mic@digikod.net>
 
-My take on this is that there should hardly be any read_sysreg_s() in
-the KVM code at all. We should always use read_sysreg_el*() so that
-there is no ambiguity about the state we're dealing with (that's, of
-course, only valid for registers that have both an EL1 and an EL2
-counterpart -- registers that are shared across ELs must still use the
-read_sysreg_s() accessor).
-
-It would also free the drive-by hacker from having to understand the
-subtleties of the E2H redirection. The macros do the right thing
-everywhere (they are context aware), and they should be the first port
-of call.
-
-> 
-> > Note that the 'Fixes:' tag doesn't represent the point where the bug
-> > was introduced (there is no such point), but the first practical point
-> > where the hVHE feature is usable.
-> > 
-> > Cc: James Clark <james.clark@arm.com>
-> > Cc: Anshuman Khandual <anshuman.khandual@arm.com>
-> > Fixes: 38cba55008e5 ("KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-Thanks. What should we do about it? Fix for 6.8, or part of the 6.9
-drop? hVHE+tracing is a pretty niche thing, and I don't have any other
-fix for the time being...
-
-	M.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
 -- 
-Without deviation from the norm, progress is not possible.
+Kees Cook
 
