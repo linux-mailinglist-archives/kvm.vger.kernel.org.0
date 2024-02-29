@@ -1,200 +1,206 @@
-Return-Path: <kvm+bounces-10516-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21DA086CE76
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 17:14:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E3CE86CE86
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 17:16:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B7951F21598
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 16:14:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91307B29584
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 16:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AE4158D79;
-	Thu, 29 Feb 2024 15:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D32470AC3;
+	Thu, 29 Feb 2024 15:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WRstr6se"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g93ljgmK"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2071.outbound.protection.outlook.com [40.107.237.71])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619DA16064E;
-	Thu, 29 Feb 2024 15:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709222027; cv=fail; b=GSAxJdXrA3xeTYO41mJKhySvFYGU1YTvg0FyR9yWoyUmQ/nqkr38cr6rOzHD0T4jzEy58e/jf+oUpXW9GK8LhexUXwXSxlf9YsDf47o797CBk+2raz9t1ovjjfIqf7dJSVyFVgWe6IcYp2UKQvfj1LquUAJmP1/p4B0Aeh+xVLM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709222027; c=relaxed/simple;
-	bh=f9t/SEjKgCdkV3GnnCf7/JbapJlz2tOzT12kGNCqcDE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=t6fFFgrjfJErRyXtIhK6Y5rVnRgGjlqgNt29owd6RvyRKSzHCJS5dCluOAVUaVJRLcShRgnc8Jh7J75X0O313jy50s9rbDYkpD0WFGjyQjRJFvwQ2u+9v55VpyOS8y2BtqJ6nlzzUszSbsZvGw8pUd8zl57T8qG3YHT6JRRMMcQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WRstr6se; arc=fail smtp.client-ip=40.107.237.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WQX67uEPMlAI24f/DFZdAnHh+QQ/AyYz/S+IXUJskpjmYwKatXdq1wgar/bSQRiZ8wb2mPH0ypgatI6VYa78bZ9Pi9+xGDlDaFBDvWkRLfC80G1beGb/Db81H9vYqkyMli8SNZsECugWJZmQC7wu6C9P5owJGiJsZ6VIWGCPxX2GO9AOKauzs+pZYWvPVjs9aa9P3wf7nVWljHHxi9xiEdMeT1C2ja9QIce+qkfIAeVyifuwsIyIn9Y7T8e8G3v2HxN6af+whZ0EkAhQpSKcB/iG8FY6efP9RsQPzYo9iy/sU9ltysJlf9K5NYMBfmrnBOG0v7m41q7qmDCEqzEPrg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M0Rl9PfrMyzwshrT9cl43UFVsHbmS4bI+TY35QLM1fs=;
- b=KpcLmZoiyEZrDUoRot4+bP67clwe955s0J5UKwyU/X0eB82lE4RcKOXW6mXCZdCm6ZMFQEQ63KP0EcqnosbNx3bPHW/Eps1y2C4dWmjQ6i8KyJ8u2KKc4VmKWcG8tx8BIeiEcNSol0EZLe8RrGRnWKdp5nLRDfMgatQpRFy/O+gh+tbV1IcgjzoYDaLnRY6FoABrWp3Xwxw3Ts3VjFpLtbXBn+BZJ266W+49mb9v9MOGOMAF3plf8MOS+zM7+cogindMcPEIbEsLQKo/JhyB5QPh7NXN3VZQIDw4rBU9r168iUAitzSxfCO7JJF4o1GdlcfIctkKbdHa9t+B6GqP/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=M0Rl9PfrMyzwshrT9cl43UFVsHbmS4bI+TY35QLM1fs=;
- b=WRstr6sejKifw2ZonLp6m32V7G7BeamLwo+AnmAJdF3MOZtBFnb04hmQjdAtBMEhMotpHmAVc+nWdiXNxEzPUcZwU8QgYVaTyp/0JXeTsy/CL3B9q81bJUwyiMgWze2QUgKak/+UbT3bJlS0iBI1DJfmVFz1ENKifPZwlhN76TwepmlO478MeA+1TC8NArm3NZAdwfb3c5c/jI6aReE+OSvNe4OCB0UwgvMwoh61TsFNomrmAHSXsbtSYwOY1iWw1UArh6tcbh4hWIb7n1brk0x5GFtVsRgUBhE/dFx0lOCVtHDjf+UkuOgy6sY3HC3HbzW+FmL0w7HuYWRYiZ4ckQ==
-Received: from PR1P264CA0069.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:2cc::7)
- by MW6PR12MB8706.namprd12.prod.outlook.com (2603:10b6:303:249::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
- 2024 15:53:38 +0000
-Received: from SN1PEPF00026368.namprd02.prod.outlook.com
- (2603:10a6:102:2cc:cafe::34) by PR1P264CA0069.outlook.office365.com
- (2603:10a6:102:2cc::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.31 via Frontend
- Transport; Thu, 29 Feb 2024 15:53:36 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF00026368.mail.protection.outlook.com (10.167.241.133) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Thu, 29 Feb 2024 15:53:36 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 29 Feb
- 2024 07:53:17 -0800
-Received: from [172.27.52.232] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 29 Feb
- 2024 07:53:13 -0800
-Message-ID: <bd471602-ef7e-4552-8de4-aba604739c62@nvidia.com>
-Date: Thu, 29 Feb 2024 17:53:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6B76CC11
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 15:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709222206; cv=none; b=Mb+p/vM1STHvFA9Qq5losGbzUd04lDFJtN77+BGit/gHq/lMODeVea9dMXQn3qrca5wYZ8N5ayrf5/bPtvtIZjq1Y7MSlUfggnEm/4j5EZqQ2oDcijhsk7vCRD9Nn3k8LToHfeEvy6MMdtPUE58SgaFdxjbCvk/XAI5kGNInUKc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709222206; c=relaxed/simple;
+	bh=P2TMqG7h7dnUJpKrrocNNNzpbY0+qjivekQDfKhl2bM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nVDjn9aQAij/Lpzr+eGtBgbpTo8W4hk4cyojUct3qEUV2AkKX+0Zhg9yc7xRR9Zd9elNFfLG4MHsMUYE4I1bop+MzLfYsJIgfMV/J1kEjFiZQF/AmYgoAImfcJV8I0Rwq61dQiiMtXz1+kP32P676sVVCMzCIE4y/5U24nOFiXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g93ljgmK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709222203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NK1oIanmqTW8WZH0kLEYVDI/xueTaYHkdWqNEI0DyFk=;
+	b=g93ljgmKSJuEWmLCARp7p8hPt+S7A2OwH8PTChSLfjRjPI1Dx2fRANQJIKq53AOTe1thTi
+	CJeOlJVpWejhtNU/EmA6lFtB8FlqVJFpYOVSkkW/KWjprUTxSqvwgDI7cmVfY4Uy3ShYSt
+	AZy1IcM8NFYsQScW2U5SDvk9MgwwBuU=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-UWmpCbM1MNmO-avh_Ezd_Q-1; Thu, 29 Feb 2024 10:56:42 -0500
+X-MC-Unique: UWmpCbM1MNmO-avh_Ezd_Q-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7c7f57fa5eeso96100439f.1
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 07:56:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709222201; x=1709827001;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NK1oIanmqTW8WZH0kLEYVDI/xueTaYHkdWqNEI0DyFk=;
+        b=wJ7gCl3ujqO1Fb0ZntRxsOFwP0ALJVyxxChSqa8I3aHoF4//dIMnCoSCN2GfTvSzKc
+         tImXCaQaC0LX/GwpRa+LIxWPcGw2gaTM31U5O3hZN/T4O0gJOBQMQnK1TXm+MKcejB6+
+         Oxxq9xUHWh2tpy8BKas16TmgpnigyWArfnLfTfqQng+JYsSXKDRNyEGWRLmT3AoeRyfv
+         p4d/ovrrJODmQ7x/7cY0261Dr4l68GUI5o8nKznEMtmwHQSZMyPH5CV6w+JUkhtAPe9t
+         0sgTHIasnnFm3yd5YrJWinJINr/3Cgme/Vg1v/PdpY/Ap1k42RnXtNnzK8Sj5wOqPAds
+         aeKA==
+X-Forwarded-Encrypted: i=1; AJvYcCUeQm8pv4p65Mil8wxS1bjqeffBctSewg0JSryfhPWqJ/LiqWAGf7d6RwFLghufHQMVuIm5IcfR9D8Cdc4wQSkHPi9s
+X-Gm-Message-State: AOJu0YxH4MydAK1p3pdw3W5banYDTsyAJAgTK1IZmzdJwq7bvfgyLMQB
+	zfyNo93pMAK+JXmYVEH91rO7JY11QV/DZB8iscDk7PnXUWNL1s1g+FfG7zCe55I6562AvwqQyFf
+	dht+w3UyPklGAQ+CanNTnDaw1URmlMFO+3eVywJZz48UZEa94TA==
+X-Received: by 2002:a05:6602:641d:b0:7c7:d3c6:e195 with SMTP id gn29-20020a056602641d00b007c7d3c6e195mr3443320iob.1.1709222201504;
+        Thu, 29 Feb 2024 07:56:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFS3pyDQfw+9kwU2WI8G5o84elkM6/6Ot566Bp3UBg2or4p9T85U4IZrIMXeiAPk8508EZT7Q==
+X-Received: by 2002:a05:6602:641d:b0:7c7:d3c6:e195 with SMTP id gn29-20020a056602641d00b007c7d3c6e195mr3443292iob.1.1709222201221;
+        Thu, 29 Feb 2024 07:56:41 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id j13-20020a02a68d000000b00474420a484esm364815jam.98.2024.02.29.07.56.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 07:56:40 -0800 (PST)
+Date: Thu, 29 Feb 2024 08:56:39 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: <ankita@nvidia.com>
+Cc: <jgg@nvidia.com>, <yishaih@nvidia.com>,
+ <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+ <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+ <targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
+ <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
+ <rrameshbabu@nvidia.com>, <zhiw@nvidia.com>, <anuaggarwal@nvidia.com>,
+ <mochs@nvidia.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 1/1] vfio/nvgrace-gpu: Convey kvm that the device is
+ wc safe
+Message-ID: <20240229085639.484b920c.alex.williamson@redhat.com>
+In-Reply-To: <20240228194801.2299-1-ankita@nvidia.com>
+References: <20240228194801.2299-1-ankita@nvidia.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>, Alex Williamson
-	<alex.williamson@redhat.com>
-CC: Xin Zeng <xin.zeng@intel.com>, <herbert@gondor.apana.org.au>,
-	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
-	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>, <qat-linux@intel.com>,
-	Yahui Cao <yahui.cao@intel.com>
-References: <20240221155008.960369-1-xin.zeng@intel.com>
- <20240221155008.960369-11-xin.zeng@intel.com>
- <20240226115556.3f494157.alex.williamson@redhat.com>
- <20240226191220.GM13330@nvidia.com>
- <20240226124107.4317b3c3.alex.williamson@redhat.com>
- <20240226194952.GO13330@nvidia.com>
- <20240226152458.2b8a0f83.alex.williamson@redhat.com>
- <20240228120706.715bc385.alex.williamson@redhat.com>
- <20240229141023.GF9179@nvidia.com>
-From: Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <20240229141023.GF9179@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00026368:EE_|MW6PR12MB8706:EE_
-X-MS-Office365-Filtering-Correlation-Id: 698d54be-148c-4aca-f4ba-08dc393e9712
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	hXevsymDVFETPZImhwQBC03Q8bsdCH9X4uInr/eognepcm4Pum9WmjSWEhouKlpxq1O2HJSydUtOc86JswKyoCCuvkmdSzPWYwyPPSTnb19NeuNwujhozjNXgX726UlB6qdrwnf3xXJgP83PIJ83y0X2X4rYDQHbaiiNIrFYIdhMkgDNwr1Mk0T6uKiI4Kya2fjVocn6oCjbjoUntt7T1kAXIO+fRBmEmqp2ugrUXVZtYMsvG6GthIKCA0Y1GNefEQK6Io1OPTLTTEr9DUpS9Wu4N7IKxRUr5o+W0M3F3uDsehFHtDLvUvGzg5xZwXOHEXtgyt5Lc6FS2xO1dAdt8vEIwv9HjU+PHzW4np/yR+SfuKY/ZDb3BRB72CeR9ZhO8ybewkGuWH4rBnbrJCopurKRqNvlYCPBhbiELobAxgKJKSBlezrak0g8vGAutMPDdcFoJP+2OeG3P9mBLTgoAa5LvHRHd9BoS/CpbBn/0HGEPdGzCjcfGxQRc+3dULHtn//5KzlNA6VfbQ5xE0ZtcP9e3qRk4xOO+wOFIbdcBnCcKtqWJ8XOL7Goapy7DY2HK7J4CFPpKpImkyfpHQnmbeyiJMWK7p4U37rzLX3dgGz5W+6Y3oHQbu7oWsceu/1lAznFZ06NiGYEH2WOmAF1bgd/nOVflsyKc/ITLvji9Ilc4i8YmYhxkoasShbsLUVKeEztr9uXaOzRsdefsmhUQf26DxTa9dPOqPGj6oeS9es2r8E3pScs/hlqhnsd2HeP
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 15:53:36.2468
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 698d54be-148c-4aca-f4ba-08dc393e9712
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00026368.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8706
 
-On 29/02/2024 16:10, Jason Gunthorpe wrote:
-> On Wed, Feb 28, 2024 at 12:07:06PM -0700, Alex Williamson wrote:
->> On Mon, 26 Feb 2024 15:24:58 -0700
->> Alex Williamson <alex.williamson@redhat.com> wrote:
->>
->>> On Mon, 26 Feb 2024 15:49:52 -0400
->>> Jason Gunthorpe <jgg@nvidia.com> wrote:
->>>
->>>> On Mon, Feb 26, 2024 at 12:41:07PM -0700, Alex Williamson wrote:
->>>>> On Mon, 26 Feb 2024 15:12:20 -0400
->>>>> libvirt recently implemented support for managed="yes" with variant
->>>>> drivers where it will find the best "vfio_pci" driver for a device
->>>>> using an algorithm like Max suggested, but in practice it's not clear
->>>>> how useful that will be considering devices likes CX7 require
->>>>> configuration before binding to the variant driver.  libvirt has no
->>>>> hooks to specify or perform configuration at that point.
->>>>
->>>> I don't think this is fully accurate (or at least not what was
->>>> intended), the VFIO device can be configured any time up until the VM
->>>> mlx5 driver reaches the device startup.
->>>>
->>>> Is something preventing this? Did we accidentally cache the migratable
->>>> flag in vfio or something??
->>>
->>> I don't think so, I think this was just the policy we had decided
->>> relative to profiling VFs when they're created rather than providing a
->>> means to do it though a common vfio variant driver interface[1].
->>
->> Turns out that yes, migration support needs to be established at probe
->> time.  vfio_pci_core_register_device() expects migration_flags,
->> mig_ops, and log_ops to all be established by this point, which for
->> mlx5-vfio-pci occurs when the .init function calls
->> mlx5vf_cmd_set_migratable().
+On Wed, 28 Feb 2024 19:48:01 +0000
+<ankita@nvidia.com> wrote:
+
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> This is unfortunate, we should look at trying to accomodate this,
-> IMHO. Yishai?
-
-I'm not sure what is the alternative here.
-
-Moving to the open() might be too late if the guest driver will be 
-active already, this might prevent changing/setting some caps/profiling, 
-by that time.
-
-In addition, as Alex wrote, today upon probe() each driver calls 
-vfio_pci_core_register_device() and by that time the 'mig/log' ops are 
-checked.
-
-Making a change here, I believe, requires a good justification / use 
-case and a working alternative and design.
-
-Note:
-The above is true for other migration drivers around which upon probe 
-should supply their 'mig/log' ops.
-
+> The NVIDIA Grace Hopper GPUs have device memory that is supposed to be
+> used as a regular RAM. It is accessible through CPU-GPU chip-to-chip
+> cache coherent interconnect and is present in the system physical
+> address space. The device memory is split into two regions - termed
+> as usemem and resmem - in the system physical address space,
+> with each region mapped and exposed to the VM as a separate fake
+> device BAR [1].
 > 
->> That also makes me wonder what happens if migration support is disabled
->> via devlink after binding the VF to mlx5-vfio-pci.  Arguably this could
->> be considered user error, but what's the failure mode and support
->> implication?  Thanks,
+> Owing to a hardware defect for Multi-Instance GPU (MIG) feature [2],
+> there is a requirement - as a workaround - for the resmem BAR to
+> display uncached memory characteristics. Based on [3], on system with
+> FWB enabled such as Grace Hopper, the requisite properties
+> (uncached, unaligned access) can be achieved through a VM mapping (S1)
+> of NORMAL_NC and host mapping (S2) of MT_S2_FWB_NORMAL_NC.
 > 
-> I think tThe FW will start failing the migration commands.
+> KVM currently maps the MMIO region in S2 as MT_S2_FWB_DEVICE_nGnRE by
+> default. The fake device BARs thus displays DEVICE_nGnRE behavior in the
+> VM.
 > 
+> The following table summarizes the behavior for the various S1 and S2
+> mapping combinations for systems with FWB enabled [3].
+> S1           |  S2           | Result
+> NORMAL_WB    |  NORMAL_NC    | NORMAL_NC
+> NORMAL_WT    |  NORMAL_NC    | NORMAL_NC
+> NORMAL_NC    |  NORMAL_NC    | NORMAL_NC
+> NORMAL_WB    |  DEVICE_nGnRE | DEVICE_nGnRE
+> NORMAL_WT    |  DEVICE_nGnRE | DEVICE_nGnRE
+> NORMAL_NC    |  DEVICE_nGnRE | DEVICE_nGnRE
+> 
+> Recently a change was added that modifies this default behavior and
+> make KVM map MMIO as MT_S2_FWB_NORMAL_NC when a VMA flag
+> VM_ALLOW_ANY_UNCACHED is set. Setting S2 as MT_S2_FWB_NORMAL_NC
+> provides the desired behavior (uncached, unaligned access) for resmem.
+> 
+> Such setting is extended to the usemem as a middle-of-the-road
+> setting to take it closer to the desired final system memory
+> characteristics (cached, unaligned). This will eventually be
+> fixed with the ongoing proposal [4].
+> 
+> To use VM_ALLOW_ANY_UNCACHED flag, the platform must guarantee that
+> no action taken on the MMIO mapping can trigger an uncontained
+> failure. The Grace Hopper satisfies this requirement. So set
+> the VM_ALLOW_ANY_UNCACHED flag in the VMA.
+> 
+> Applied over next-20240227.
+> base-commit: 22ba90670a51
+> 
+> Link: https://lore.kernel.org/all/20240220115055.23546-4-ankita@nvidia.com/ [1]
+> Link: https://www.nvidia.com/en-in/technologies/multi-instance-gpu/ [2]
+> Link: https://developer.arm.com/documentation/ddi0487/latest/ section D8.5.5 [3]
+> Link: https://lore.kernel.org/all/20230907181459.18145-2-ankita@nvidia.com/ [4]
+> 
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Vikram Sethi <vsethi@nvidia.com>
+> Cc: Zhi Wang <zhiw@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+> index 25814006352d..5539c9057212 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -181,6 +181,24 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  
+>  	vma->vm_pgoff = start_pfn;
+>  
+> +	/*
+> +	 * The VM_ALLOW_ANY_UNCACHED VMA flag is implemented for ARM64,
+> +	 * allowing KVM stage 2 device mapping attributes to use Normal-NC
+> +	 * rather than DEVICE_nGnRE, which allows guest mappings
+> +	 * supporting write-combining attributes (WC). This also
+> +	 * unlocks memory-like operations such as unaligned accesses.
+> +	 * This setting suits the fake BARs as they are expected to
+> +	 * demonstrate such properties within the guest.
+> +	 *
+> +	 * ARM does not architecturally guarantee this is safe, and indeed
+> +	 * some MMIO regions like the GICv2 VCPU interface can trigger
+> +	 * uncontained faults if Normal-NC is used. The nvgrace-gpu
+> +	 * however is safe in that the platform guarantees that no
+> +	 * action taken on the MMIO mapping can trigger an uncontained
+> +	 * failure. Hence VM_ALLOW_ANY_UNCACHED is set in the VMA flags.
+> +	 */
+> +	vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED);
+> +
+>  	return 0;
+>  }
+>  
 
-Right, please see my previous answer here, I supplied some further details.
+The commit log sort of covers it, but this comment doesn't seem to
+cover why we're setting an uncached attribute to the usemem region
+which we're specifically mapping as coherent... did we end up giving
+this flag a really poor name if it's being used here to allow unaligned
+access?  Thanks,
 
-Yishai
+Alex
+
 
