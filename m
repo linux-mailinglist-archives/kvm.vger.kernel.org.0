@@ -1,199 +1,203 @@
-Return-Path: <kvm+bounces-10486-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10487-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB69686C951
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 13:36:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E58C86C964
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 13:44:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BF72286931
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 12:36:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9D331F22F23
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 12:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20CC76F05;
-	Thu, 29 Feb 2024 12:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37BD27D3FE;
+	Thu, 29 Feb 2024 12:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Hn9GdPAF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W52H4Zoh"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2081.outbound.protection.outlook.com [40.107.94.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9B176EF4;
-	Thu, 29 Feb 2024 12:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709210200; cv=fail; b=kul1jmeXd/Y8RIl8c8sGnrf4QB7rB+8leWTY9D046MGfOUyEQw2BSa1vxsGa7BdLubBuLr8bLBf4MJ+oY9RPEA1ZcARcVQlQbjyBAGe3TWIvZFtp5g1oZaYBUJvgZQgS2yGpQjkRGUzBz/QDs+Q2MyE5CvnOenooDQ+U6P43DTE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709210200; c=relaxed/simple;
-	bh=5BH8LT9Fs0ZnCcKJsgz8qrCQkaPbx40Tkg2s8Upp9sI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MGGBCXHSHZKi59ycOX5OkUIGR+4vv+s3tC5SFOw9Nx94bWfBk9+DdY0qWvFVfA24yOBN2x10wmoDckM8uqJLdTPMptNRkQu6IemlhPj5x2XQWkOMFmBa2liAzoJgaFZW9SVZTN1W8lOkkcPY0fXdGakLndMQfDURa081S7qixBs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Hn9GdPAF; arc=fail smtp.client-ip=40.107.94.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fhZJfPFV17OhCeTtAxK5+NCAHQb7XF2Y32tyrwityw9r3iBiOdadpjaZ17DuL91xdoPNeqqdoeKEqyZcq79EJJeiSEG+W3UmC6FxP5gagKY8qADNAXRHRmKUjwAd94mr9pY9sAG9uy90OwcouYxn7FwGmPlZxePMWLx8fkMAHBXh8qg0XOZSLs0kEN5L33njD85gTB8BjqCmZROWr2pQSn7+d/LOYrZ3uIncCxtX0U+xs3Lig+N8aye0HNOXbLgsDmKonrwCpbBn/nlIk7+ufxJ52JwPJLIOcbCWxZLiBPRlhrOA8eKEkBgA29G+Ew/lpNiWLK3EYyWpb+FzvWGuIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NR5GaIR8XnHwSW4zyTh2E0mMKyyfcK4yaiN0CtivFzw=;
- b=hA4uEgHBIaNOwXeJD1O2k+qzJmIidAZZiEeF/1gTV0h0n58eV7wzH9E3vugYW+nVHuVwvpRheRkCGWxEI3AU4c6nizO5np+tTTjnLa3CLCjxkLV4hYYku3YjCMSO7qsDB7O9+e6jZuvsy814GFQDWVyOqDIPrNjurm1XNYsMIyKKQihwb72U4AK7Nyjo4SAgeiZIl5d1tbq3yG/S6+unPNRMH4WIxSMo1k50pYtuA5BGUaGFzubLgejP3/X3SQa8o1JyXbiy2eySbDaTMGGVKJ87YLJWO29NMWXESX5yy5wG5TCVr42gjhzbitUEUqsJ76CF61WFb3+I/p4lpP5Wjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NR5GaIR8XnHwSW4zyTh2E0mMKyyfcK4yaiN0CtivFzw=;
- b=Hn9GdPAFRz22nqU1fbP74y1WzJsBHnXOstxoUwDnCdDW7yX5wGENBV+QJWi4d7/A6qe5HtUvkH0LsYkFVeMDimC0JGLtyKMCCIfnQfXhceoG6qD1Zjm8PXWbwlpYTP7MTPcTrOywfaQbjZspxSSWf4nbHPu5Qvj8LrDHcHaHV1nVZrNcHSeVLTw7savK7bzcsgYG3wcRgji3Oxr97yhwP2ZhuS/uoK2YP5SHzOy8tN3GKCBZGTtLFjaHRerQoT5k6swTrHKemg7A199GJLinGwCU7RNS4tibVr5i5/5IuRcSkxYXolptLW+B+uLIXg9+Yczjkn/FL0dRuQRgytuqWw==
-Received: from SJ0PR05CA0130.namprd05.prod.outlook.com (2603:10b6:a03:33d::15)
- by DS0PR12MB8247.namprd12.prod.outlook.com (2603:10b6:8:f5::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
- 2024 12:36:34 +0000
-Received: from SJ5PEPF000001D3.namprd05.prod.outlook.com
- (2603:10b6:a03:33d:cafe::58) by SJ0PR05CA0130.outlook.office365.com
- (2603:10b6:a03:33d::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.30 via Frontend
- Transport; Thu, 29 Feb 2024 12:36:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ5PEPF000001D3.mail.protection.outlook.com (10.167.242.55) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Thu, 29 Feb 2024 12:36:33 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 29 Feb
- 2024 04:36:17 -0800
-Received: from [172.27.52.232] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 29 Feb
- 2024 04:36:13 -0800
-Message-ID: <0c23d2c9-6c1e-4887-ab95-ca74f0dcb844@nvidia.com>
-Date: Thu, 29 Feb 2024 14:36:14 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D717CF23
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 12:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709210674; cv=none; b=kTIV95TavdJYe1h4B1LvNHqOTMR4DIVuyW5OWv1nnJIevYvLi+NE3xN/1jdO5aP+1QdRjnm5xMhb1yNlQ7Jv2SZKLyDQV6L6KCf+PxRv0nuSI5i4xwkdB8vKa8GPx8cZNAP3NBV7DI0i2yRwAlLpIRvAcN/RhcrHYYXGjy3JgW4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709210674; c=relaxed/simple;
+	bh=PFbKm9oVKbiYCFV4Te4gZX/SgyWpu5Ye7VYR9JHaY+I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PL9a65tKSrDQF0E2J/6OlCEheIAk19nQNdKmpjU71AA+2jcExJH2a3FZgiUZR30R+TjQkj+9DVkcDBynCrfYFvOcmGtyWehZqK0WAQdF6/ikV1qnZD41BfNQ3ZNS5q120bnyllw3xmvk8/Sj0PraQ7nl9eLfzqr2WpdfwxQULro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W52H4Zoh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709210671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pkOonY3la2hSmoRffKrf9jEAOm9sMbK1Xqob1w0aSr4=;
+	b=W52H4ZohyPHTnPYIa2HxEQZzODLQxwHn4LeBgn29CnA+mu3yLu9gGLyKe6obSFavhKfMgR
+	SrTuEHSMwNIBPPRSADp4HgK8knxnd/6XEPEqXK9S5Cb1aKkHU1yGYjNxcaNaV4YeP7hEzk
+	OUngxQn4z/urIlImeeTPn02o+HiNN2U=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-29-N8s5hmQjMAi50TLP8mUHiw-1; Thu, 29 Feb 2024 07:44:29 -0500
+X-MC-Unique: N8s5hmQjMAi50TLP8mUHiw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33dc175ff8fso462434f8f.0
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 04:44:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709210668; x=1709815468;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pkOonY3la2hSmoRffKrf9jEAOm9sMbK1Xqob1w0aSr4=;
+        b=uLpQweRk+gKoL/3b4aj7P2kwoU5M5xR2trarOMmx/YliMzyIUBSzv/0PsVaC+r/Qbo
+         dzALdki4JsMpJaXFbH1WIhCANwy6NimJSeIopHITy80wisfhLe84o6GQlnnMp+hCd83E
+         UmEv/bKglW7j2hOXzgzqQpAZI/KeiZuAIdoEr6ReO6zJJD2gOF/l7WQUhPQsVAVeePqN
+         Dk5dVO4j2isGmuhkLLJVj0Ra/3rhVC81NC64R0qlYsX0qAoYy9HlQWoC0D7dGTjIy8Du
+         omyXbkIvmwcVLmlOehKDNkBCnt/c4OxH0AXVikHwkC2PP/FPSz1IUomFaser5Kgx0rmB
+         W8PA==
+X-Gm-Message-State: AOJu0YxuTl+xNfZZl9nLgxwAl08ytkjlmAUh4O2dt3izUiyBTlxeKV0Y
+	okKBadUO+vL4D9gwaRKMqRWRvwjNctTR6/K1RWUm5QgDBn6UC8JH7rlABwgFb2kAu+atXfzx791
+	p+DiyA/zakip9UqEUYMa/xrS8mNAqyxmQIKwfVdE1Bk5+cJpQ/6a/9Q/sa5RGPoU+uX3fpoH8j9
+	r1Vc3gr82sVVafuCnNzC9gATs6
+X-Received: by 2002:adf:ed89:0:b0:33d:afbc:6c76 with SMTP id c9-20020adfed89000000b0033dafbc6c76mr1309772wro.1.1709210668667;
+        Thu, 29 Feb 2024 04:44:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEglXVoZOe+ZU/1XST6B32cGfv1HAd9jHRkeNp9F1qKgaZm3JWYARDroQFeN1J5fe1YJyfx6e92lYSUEKJHyoM=
+X-Received: by 2002:adf:ed89:0:b0:33d:afbc:6c76 with SMTP id
+ c9-20020adfed89000000b0033dafbc6c76mr1309759wro.1.1709210668323; Thu, 29 Feb
+ 2024 04:44:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-To: Alex Williamson <alex.williamson@redhat.com>, Jason Gunthorpe
-	<jgg@nvidia.com>
-CC: Xin Zeng <xin.zeng@intel.com>, <herbert@gondor.apana.org.au>,
-	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
-	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>, <qat-linux@intel.com>,
-	Yahui Cao <yahui.cao@intel.com>
-References: <20240221155008.960369-1-xin.zeng@intel.com>
- <20240221155008.960369-11-xin.zeng@intel.com>
- <20240226115556.3f494157.alex.williamson@redhat.com>
- <20240226191220.GM13330@nvidia.com>
- <20240226124107.4317b3c3.alex.williamson@redhat.com>
- <20240226194952.GO13330@nvidia.com>
- <20240226152458.2b8a0f83.alex.williamson@redhat.com>
- <20240228120706.715bc385.alex.williamson@redhat.com>
-Content-Language: en-US
-From: Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <20240228120706.715bc385.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D3:EE_|DS0PR12MB8247:EE_
-X-MS-Office365-Filtering-Correlation-Id: 158181ad-9b44-466d-d7ad-08dc39231048
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	OEnwyvwLqW52OPt0ewsm3mXKm5twVb15IkQlgrFACOVj2gxbCGrEa7qPHxdWPts4gCMOx4HuYJsu0MEGkH+oY2ppigBwhqfhrxcfevzpGFIwkth694M199rtyZMXh6BS5ab7vUAyjwBWAIBmF4zFWO9w6bBQ0rOYXUJsVTArvYAkyOP5BPySGU4Y5FTOUYe52YHA7VjnhG0Vidkv693DXtTG0rUvhVtmRflZk0UU01EHcXG6szV7zrcLu+1T5TinOvHkG7DjyyAakaJsv9zlASJhRnOM3YscrD2gE9/RU0FJ64RXrPM6X0yIBIgHpikSp/68CsiHq6X3Sw6eG5KqXCR47MihhPUo91iMvTSsaIIAaux4+8xm7Coi/jSnFGUBpEjFM6b9ulklD31SFegZG8uz2OcVZ25TnYutPlhijILJ5qPx4XZg8RAYUtv6zGvnm6iTf2xwJaZTeyAv1q8b5AynSduw83QDaU8B9GpURE30xOYaldR0vm/nE2Y0K3B/GKzOh5MWARffNeplJCEbtcoSkc/0zPTzRiG9QiERtodE0VYZPRxWjKgmcTupiaBEH8XEOHRF0wynDSTRFHOdSRNONCheJnoMh+7tE4J7J677eFFqBltQOb44LuKX8tkUt2YnIUJCypAPqKIaFlvGaG+cF9Ous9H16k6YK8T0sxDDMs6HM0VN6gE4TePhJ8Q6OSwzdOXSkVO+Of+I4dqh4oUPlV93yGx88iTxi5lrx/P8vRDJDN6ns2UPiNDbe+xG
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 12:36:33.8990
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 158181ad-9b44-466d-d7ad-08dc39231048
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001D3.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8247
+References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-3-seanjc@google.com>
+In-Reply-To: <20240228024147.41573-3-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 29 Feb 2024 13:44:16 +0100
+Message-ID: <CABgObfbtPJ6AAX9GnjNscPRTbNAOtamdxX677kx_r=zd4scw6w@mail.gmail.com>
+Subject: Re: [PATCH 02/16] KVM: x86: Remove separate "bit" defines for page
+ fault error code masks
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 28/02/2024 21:07, Alex Williamson wrote:
-> On Mon, 26 Feb 2024 15:24:58 -0700
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
->> On Mon, 26 Feb 2024 15:49:52 -0400
->> Jason Gunthorpe <jgg@nvidia.com> wrote:
->>
->>> On Mon, Feb 26, 2024 at 12:41:07PM -0700, Alex Williamson wrote:
->>>> On Mon, 26 Feb 2024 15:12:20 -0400
->>>> libvirt recently implemented support for managed="yes" with variant
->>>> drivers where it will find the best "vfio_pci" driver for a device
->>>> using an algorithm like Max suggested, but in practice it's not clear
->>>> how useful that will be considering devices likes CX7 require
->>>> configuration before binding to the variant driver.  libvirt has no
->>>> hooks to specify or perform configuration at that point.
->>>
->>> I don't think this is fully accurate (or at least not what was
->>> intended), the VFIO device can be configured any time up until the VM
->>> mlx5 driver reaches the device startup.
->>>
->>> Is something preventing this? Did we accidentally cache the migratable
->>> flag in vfio or something??
->>
->> I don't think so, I think this was just the policy we had decided
->> relative to profiling VFs when they're created rather than providing a
->> means to do it though a common vfio variant driver interface[1].
-> 
-> Turns out that yes, migration support needs to be established at probe
-> time.  vfio_pci_core_register_device() expects migration_flags,
-> mig_ops, and log_ops to all be established by this point, which for
-> mlx5-vfio-pci occurs when the .init function calls
-> mlx5vf_cmd_set_migratable().
-> 
-> So the VF does indeed need to be "profiled" to enabled migration prior
-> to binding to the mlx5-vfio-pci driver in order to report support.
-> 
+On Wed, Feb 28, 2024 at 3:46=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Open code the bit number directly in the PFERR_* masks and drop the
+> intermediate PFERR_*_BIT defines, as having to bounce through two macros
+> just to see which flag corresponds to which bit is quite annoying, as is
+> having to define two macros just to add recognition of a new flag.
+>
+> Use ilog2() to derive the bit in permission_fault(), the one function tha=
+t
+> actually needs the bit number (it does clever shifting to manipulate flag=
+s
+> in order to avoid conditional branches).
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 32 ++++++++++----------------------
+>  arch/x86/kvm/mmu.h              |  4 ++--
+>  2 files changed, 12 insertions(+), 24 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index aaf5a25ea7ed..88cc523bafa8 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -254,28 +254,16 @@ enum x86_intercept_stage;
+>         KVM_GUESTDBG_INJECT_DB | \
+>         KVM_GUESTDBG_BLOCKIRQ)
+>
+> -
+> -#define PFERR_PRESENT_BIT 0
+> -#define PFERR_WRITE_BIT 1
+> -#define PFERR_USER_BIT 2
+> -#define PFERR_RSVD_BIT 3
+> -#define PFERR_FETCH_BIT 4
+> -#define PFERR_PK_BIT 5
+> -#define PFERR_SGX_BIT 15
+> -#define PFERR_GUEST_FINAL_BIT 32
+> -#define PFERR_GUEST_PAGE_BIT 33
+> -#define PFERR_IMPLICIT_ACCESS_BIT 48
+> -
+> -#define PFERR_PRESENT_MASK     BIT(PFERR_PRESENT_BIT)
+> -#define PFERR_WRITE_MASK       BIT(PFERR_WRITE_BIT)
+> -#define PFERR_USER_MASK                BIT(PFERR_USER_BIT)
+> -#define PFERR_RSVD_MASK                BIT(PFERR_RSVD_BIT)
+> -#define PFERR_FETCH_MASK       BIT(PFERR_FETCH_BIT)
+> -#define PFERR_PK_MASK          BIT(PFERR_PK_BIT)
+> -#define PFERR_SGX_MASK         BIT(PFERR_SGX_BIT)
+> -#define PFERR_GUEST_FINAL_MASK BIT_ULL(PFERR_GUEST_FINAL_BIT)
+> -#define PFERR_GUEST_PAGE_MASK  BIT_ULL(PFERR_GUEST_PAGE_BIT)
+> -#define PFERR_IMPLICIT_ACCESS  BIT_ULL(PFERR_IMPLICIT_ACCESS_BIT)
+> +#define PFERR_PRESENT_MASK     BIT(0)
+> +#define PFERR_WRITE_MASK       BIT(1)
+> +#define PFERR_USER_MASK                BIT(2)
+> +#define PFERR_RSVD_MASK                BIT(3)
+> +#define PFERR_FETCH_MASK       BIT(4)
+> +#define PFERR_PK_MASK          BIT(5)
+> +#define PFERR_SGX_MASK         BIT(15)
+> +#define PFERR_GUEST_FINAL_MASK BIT_ULL(32)
+> +#define PFERR_GUEST_PAGE_MASK  BIT_ULL(33)
+> +#define PFERR_IMPLICIT_ACCESS  BIT_ULL(48)
+>
+>  #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |       \
+>                                  PFERR_WRITE_MASK |             \
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index 60f21bb4c27b..e8b620a85627 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -213,7 +213,7 @@ static inline u8 permission_fault(struct kvm_vcpu *vc=
+pu, struct kvm_mmu *mmu,
+>          */
+>         u64 implicit_access =3D access & PFERR_IMPLICIT_ACCESS;
+>         bool not_smap =3D ((rflags & X86_EFLAGS_AC) | implicit_access) =
+=3D=3D X86_EFLAGS_AC;
+> -       int index =3D (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
+> +       int index =3D (pfec + (not_smap << ilog2(PFERR_RSVD_MASK))) >> 1;
 
-Right, the 'profiling' of the VF in mlx5 case, need to be done prior to 
-its probing/binding.
+Just use "(pfec + (not_smap ? PFERR_RSVD_MASK : 0)) >> 1".
 
-This is achieved today by running 'devlink <xxx> migratable enable' post 
-of creating the VF.
+Likewise below, "pte_access & PT_USER_MASK ? PFERR_RSVD_MASK : 0"/
 
-> That also makes me wonder what happens if migration support is disabled
-> via devlink after binding the VF to mlx5-vfio-pci.  Arguably this could
-> be considered user error,
+No need to even check what the compiler produces, it will be either
+exactly the same code or a bunch of cmov instructions.
 
-Yes, this is a clear user error.
+Paolo
 
-  but what's the failure mode and support
-> implication?  Thanks,
-> 
+>         u32 errcode =3D PFERR_PRESENT_MASK;
+>         bool fault;
+>
+> @@ -235,7 +235,7 @@ static inline u8 permission_fault(struct kvm_vcpu *vc=
+pu, struct kvm_mmu *mmu,
+>
+>                 /* clear present bit, replace PFEC.RSVD with ACC_USER_MAS=
+K. */
+>                 offset =3D (pfec & ~1) +
+> -                       ((pte_access & PT_USER_MASK) << (PFERR_RSVD_BIT -=
+ PT_USER_SHIFT));
+> +                       ((pte_access & PT_USER_MASK) << (ilog2(PFERR_RSVD=
+_MASK) - PT_USER_SHIFT));
+>
+>                 pkru_bits &=3D mmu->pkru_mask >> offset;
+>                 errcode |=3D -pkru_bits & PFERR_PK_MASK;
+> --
+> 2.44.0.278.ge034bb2e1d-goog
+>
 
-The user will simply get an error from the firmware, the kernel and 
-other stuff around will stay safe.
-
-Further details:
-In the source side, once the VM will be started the 'disable' itself 
-will fail as that configuration can't be changed once the VF is 
-running/active already.
-
-In the target, as it's in a pending mode, the 'disable' will succeed. 
-However, the migration will just fail later on in the firmware upon 
-running a migration related command, as expected.
-
-Yishai
 
