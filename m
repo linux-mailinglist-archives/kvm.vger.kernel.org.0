@@ -1,206 +1,192 @@
-Return-Path: <kvm+bounces-10462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10463-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C1A886C476
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 10:04:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7EC486C4A2
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 10:13:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A768B1F22054
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:04:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F2D11F23F5A
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B0857308;
-	Thu, 29 Feb 2024 09:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fzAeFvg4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65D45810B;
+	Thu, 29 Feb 2024 09:12:53 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4E356B76;
-	Thu, 29 Feb 2024 09:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4822257894
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 09:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709197426; cv=none; b=p2c7f0P8fR3wS1M8V9duRB/BW21jQy/afSCJEk1B8JePxAgMYgIjgKQNGptwzH+RrxXb6TIaaq6Cuq3IXTzQvZ23gtAWLEbvFPxHBAo4uuy8AJpce95ibcfklu78P1soYyYSBmzBYW3wmh2uVPVGVABlCZtRIlWHkZTh3Pyotk0=
+	t=1709197973; cv=none; b=gTitFrSHfwg+3yk/iLCZr5b+U76bVioE9SMAH11empn70MdwmXUqz5AQmKtxS1XoZha8xvZ41w42LQvjIu/9aPA+glSC+GfpZl+iy9GEyA6oSxMjL7qmsaTMOxgWqGdmTIoK6AgX4xg1rXRJ+MdopgY0d/VACXuuwRcx0TfPlQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709197426; c=relaxed/simple;
-	bh=nJRfK8GKMqwpq9hufK/6vQzSUVg/pOXvGhHHunOS26k=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=DgAl0u6ScS7jzB6O2ylJIipOaX+ah4n0C+sHsjdFYq11RCCPxS8+5J4ygDn/7NBW+o/mgiggHQZa3fQ1xAaeEtL7msCiMw63aeQGS5uOXMFO2Lenpm+1hx44mT33gd4kht1wdGK1Zan2eHHEbRnefgy967+Icu5oKige/5iAnSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fzAeFvg4; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1709197418; h=Message-ID:Subject:Date:From:To;
-	bh=q96LGD8K04QzTgJESixwydLLt2hvpiLBYYzrturobvI=;
-	b=fzAeFvg4PHQE4+BjDp/B8Elx/J4t/lQ4R56ec4nI/2mKfOeFGtTDT3J706W97TwwX+LRTZJYJfIuRLWBAbhmV0SIb0qVNoEtY4nXlqBdoelleApzzHM3y2YiP5wzIY5MG5OX+k8cBK5rM50K9a10YN5rfAC6g+z0uWB3YrEQ8uE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0W1SU1BR_1709197416;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W1SU1BR_1709197416)
-          by smtp.aliyun-inc.com;
-          Thu, 29 Feb 2024 17:03:37 +0800
-Message-ID: <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for premapped vq
-Date: Thu, 29 Feb 2024 17:02:37 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
- <20240229031755-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240229031755-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1709197973; c=relaxed/simple;
+	bh=XNGqeH95Uip5LZfw5a6EZ2fwARcCDtnw01gViFoZCk8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PoC6LSg3e9P2ApmryUpbkVI//rmhx5vbz/vDH8HHFI592rehKhWeNn8cysH2ZstY/WP8Z5XvMQymx/OxYn8RULK8PrZhxC2gXMi4vnrzTM3WVJzS5yWWDQSdo7R87ccn47SieI6/P6+Y2gRW+rLDP9f/HT675L0fAzYx036k7PA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TllkW6M5jz6K6FS;
+	Thu, 29 Feb 2024 17:08:19 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7B67F141017;
+	Thu, 29 Feb 2024 17:12:47 +0800 (CST)
+Received: from A2303104131.china.huawei.com (10.202.227.28) by
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 29 Feb 2024 09:12:21 +0000
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <kvm@vger.kernel.org>
+CC: <alex.williamson@redhat.com>, <jgg@ziepe.ca>, <yishaih@nvidia.com>,
+	<kevin.tian@intel.com>, <linuxarm@huawei.com>, <liulongfang@huawei.com>,
+	<bcreeley@amd.com>
+Subject: [PATCH] hisi_acc_vfio_pci: Remove the deferred_reset logic
+Date: Thu, 29 Feb 2024 09:11:52 +0000
+Message-ID: <20240229091152.56664-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Thu, 29 Feb 2024 03:21:14 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Thu, Feb 29, 2024 at 03:20:25PM +0800, Xuan Zhuo wrote:
-> > As discussed:
-> > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
-> >
-> > If the virtio is premapped mode, the driver should manage the dma info by self.
-> > So the virtio core should not store the dma info.
-> > So we can release the memory used to store the dma info.
-> >
-> > But if the desc_extra has not dma info, we face a new question,
-> > it is hard to get the dma info of the desc with indirect flag.
-> > For split mode, that is easy from desc, but for the packed mode,
-> > it is hard to get the dma info from the desc. And for hardening
-> > the dma unmap is saft, we should store the dma info of indirect
-> > descs.
-> >
-> > So I introduce the "structure the indirect desc table" to
-> > allocate space to store dma info with the desc table.
-> >
-> > On the other side, we mix the descs with indirect flag
-> > with other descs together to share the unmap api. That
-> > is complex. I found if we we distinguish the descs with
-> > VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
-> >
-> > Because of the dma array is allocated in the find_vqs(),
-> > so I introduce a new parameter to find_vqs().
-> >
-> > Note:
-> >     this is on the top of
-> >         [PATCH vhost v1] virtio: packed: fix unmap leak for indirect desc table
-> >         http://lore.kernel.org/all/20240223071833.26095-1-xuanzhuo@linux.alibaba.com
-> >
-> > Please review.
-> >
-> > Thanks
-> >
-> > v3:
-> >     1. fix the conflict with the vp_modern_create_avq().
->
-> Okay but are you going to address huge memory waste all this is causing for
-> - people who never do zero copy
-> - systems where dma unmap is a nop
->
-> ?
->
-> You should address all comments when you post a new version, not just
-> what was expedient, or alternatively tag patch as RFC and explain
-> in commit log that you plan to do it later.
+The deferred_reset logic was added to vfio migration drivers to prevent
+a circular locking dependency with respect to mm_lock and state mutex.
+This is mainly because of the copy_to/from_user() functions(which takes
+mm_lock) invoked under state mutex. But for HiSilicon driver, the only
+place where we now hold the state mutex for copy_to_user is during the
+PRE_COPY IOCTL. So for pre_copy, release the lock as soon as we have
+updated the data and perform copy_to_user without state mutex. By this,
+we can get rid of the deferred_reset logic.
 
+Link: https://lore.kernel.org/kvm/20240220132459.GM13330@nvidia.com/
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 48 +++++--------------
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  6 +--
+ 2 files changed, 14 insertions(+), 40 deletions(-)
 
-Do you miss this one?
-http://lore.kernel.org/all/1708997579.5613105-1-xuanzhuo@linux.alibaba.com
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+index 4d27465c8f1a..9a3e97108ace 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -630,25 +630,11 @@ static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vde
+ 	}
+ }
+ 
+-/*
+- * This function is called in all state_mutex unlock cases to
+- * handle a 'deferred_reset' if exists.
+- */
+-static void
+-hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
++static void hisi_acc_vf_reset(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+ {
+-again:
+-	spin_lock(&hisi_acc_vdev->reset_lock);
+-	if (hisi_acc_vdev->deferred_reset) {
+-		hisi_acc_vdev->deferred_reset = false;
+-		spin_unlock(&hisi_acc_vdev->reset_lock);
+-		hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
+-		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+-		hisi_acc_vf_disable_fds(hisi_acc_vdev);
+-		goto again;
+-	}
+-	mutex_unlock(&hisi_acc_vdev->state_mutex);
+-	spin_unlock(&hisi_acc_vdev->reset_lock);
++	hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
++	hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
++	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+ }
+ 
+ static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+@@ -804,8 +790,10 @@ static long hisi_acc_vf_precopy_ioctl(struct file *filp,
+ 
+ 	info.dirty_bytes = 0;
+ 	info.initial_bytes = migf->total_length - *pos;
++	mutex_unlock(&migf->lock);
++	mutex_unlock(&hisi_acc_vdev->state_mutex);
+ 
+-	ret = copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
++	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
+ out:
+ 	mutex_unlock(&migf->lock);
+ 	mutex_unlock(&hisi_acc_vdev->state_mutex);
+@@ -1071,7 +1059,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
+ 			break;
+ 		}
+ 	}
+-	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
++	mutex_unlock(&hisi_acc_vdev->state_mutex);
+ 	return res;
+ }
+ 
+@@ -1092,7 +1080,7 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
+ 
+ 	mutex_lock(&hisi_acc_vdev->state_mutex);
+ 	*curr_state = hisi_acc_vdev->mig_state;
+-	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
++	mutex_unlock(&hisi_acc_vdev->state_mutex);
+ 	return 0;
+ }
+ 
+@@ -1104,21 +1092,9 @@ static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
+ 				VFIO_MIGRATION_STOP_COPY)
+ 		return;
+ 
+-	/*
+-	 * As the higher VFIO layers are holding locks across reset and using
+-	 * those same locks with the mm_lock we need to prevent ABBA deadlock
+-	 * with the state_mutex and mm_lock.
+-	 * In case the state_mutex was taken already we defer the cleanup work
+-	 * to the unlock flow of the other running context.
+-	 */
+-	spin_lock(&hisi_acc_vdev->reset_lock);
+-	hisi_acc_vdev->deferred_reset = true;
+-	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
+-		spin_unlock(&hisi_acc_vdev->reset_lock);
+-		return;
+-	}
+-	spin_unlock(&hisi_acc_vdev->reset_lock);
+-	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
++	mutex_lock(&hisi_acc_vdev->state_mutex);
++	hisi_acc_vf_reset(hisi_acc_vdev);
++	mutex_unlock(&hisi_acc_vdev->state_mutex);
+ }
+ 
+ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+index dcabfeec6ca1..5bab46602fad 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+@@ -98,8 +98,8 @@ struct hisi_acc_vf_migration_file {
+ 
+ struct hisi_acc_vf_core_device {
+ 	struct vfio_pci_core_device core_device;
+-	u8 match_done:1;
+-	u8 deferred_reset:1;
++	u8 match_done;
++
+ 	/* For migration state */
+ 	struct mutex state_mutex;
+ 	enum vfio_device_mig_state mig_state;
+@@ -109,8 +109,6 @@ struct hisi_acc_vf_core_device {
+ 	struct hisi_qm vf_qm;
+ 	u32 vf_qm_state;
+ 	int vf_id;
+-	/* For reset handler */
+-	spinlock_t reset_lock;
+ 	struct hisi_acc_vf_migration_file *resuming_migf;
+ 	struct hisi_acc_vf_migration_file *saving_migf;
+ };
+-- 
+2.34.1
 
-I asked you. But I didnot recv your answer.
-
-Thanks.
-
-
->
-> > v2:
-> >     1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS + 2
-> >         addr + len pairs.
-> >     2. introduce virtnet_sq_free_stats for __free_old_xmit
-> >
-> > v1:
-> >     1. rename transport_vq_config to vq_transport_config
-> >     2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS +2)
-> >     3. introduce virtqueue_dma_map_sg_attrs
-> >     4. separate vring_create_virtqueue to an independent commit
-> >
-> >
-> >
-> > Xuan Zhuo (19):
-> >   virtio_ring: introduce vring_need_unmap_buffer
-> >   virtio_ring: packed: remove double check of the unmap ops
-> >   virtio_ring: packed: structure the indirect desc table
-> >   virtio_ring: split: remove double check of the unmap ops
-> >   virtio_ring: split: structure the indirect desc table
-> >   virtio_ring: no store dma info when unmap is not needed
-> >   virtio: find_vqs: pass struct instead of multi parameters
-> >   virtio: vring_create_virtqueue: pass struct instead of multi
-> >     parameters
-> >   virtio: vring_new_virtqueue(): pass struct instead of multi parameters
-> >   virtio_ring: simplify the parameters of the funcs related to
-> >     vring_create/new_virtqueue()
-> >   virtio: find_vqs: add new parameter premapped
-> >   virtio_ring: export premapped to driver by struct virtqueue
-> >   virtio_net: set premapped mode by find_vqs()
-> >   virtio_ring: remove api of setting vq premapped
-> >   virtio_ring: introduce dma map api for page
-> >   virtio_ring: introduce virtqueue_dma_map_sg_attrs
-> >   virtio_net: unify the code for recycling the xmit ptr
-> >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
-> >   virtio_net: sq support premapped mode
-> >
-> >  arch/um/drivers/virtio_uml.c             |  31 +-
-> >  drivers/net/virtio_net.c                 | 283 ++++++---
-> >  drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
-> >  drivers/remoteproc/remoteproc_virtio.c   |  31 +-
-> >  drivers/s390/virtio/virtio_ccw.c         |  33 +-
-> >  drivers/virtio/virtio_mmio.c             |  30 +-
-> >  drivers/virtio/virtio_pci_common.c       |  59 +-
-> >  drivers/virtio/virtio_pci_common.h       |   9 +-
-> >  drivers/virtio/virtio_pci_legacy.c       |  16 +-
-> >  drivers/virtio/virtio_pci_modern.c       |  38 +-
-> >  drivers/virtio/virtio_ring.c             | 698 ++++++++++++-----------
-> >  drivers/virtio/virtio_vdpa.c             |  45 +-
-> >  include/linux/virtio.h                   |  13 +-
-> >  include/linux/virtio_config.h            |  48 +-
-> >  include/linux/virtio_ring.h              |  82 +--
-> >  tools/virtio/virtio_test.c               |   4 +-
-> >  tools/virtio/vringh_test.c               |  28 +-
-> >  17 files changed, 847 insertions(+), 625 deletions(-)
-> >
-> > --
-> > 2.32.0.3.g01195cf9f
->
 
