@@ -1,192 +1,383 @@
-Return-Path: <kvm+bounces-10463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7EC486C4A2
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 10:13:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BEA286C4A3
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 10:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F2D11F23F5A
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:13:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C852A1F2402C
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65D45810B;
-	Thu, 29 Feb 2024 09:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103C658124;
+	Thu, 29 Feb 2024 09:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="yFokakQW"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2075.outbound.protection.outlook.com [40.107.223.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4822257894
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 09:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709197973; cv=none; b=gTitFrSHfwg+3yk/iLCZr5b+U76bVioE9SMAH11empn70MdwmXUqz5AQmKtxS1XoZha8xvZ41w42LQvjIu/9aPA+glSC+GfpZl+iy9GEyA6oSxMjL7qmsaTMOxgWqGdmTIoK6AgX4xg1rXRJ+MdopgY0d/VACXuuwRcx0TfPlQg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709197973; c=relaxed/simple;
-	bh=XNGqeH95Uip5LZfw5a6EZ2fwARcCDtnw01gViFoZCk8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PoC6LSg3e9P2ApmryUpbkVI//rmhx5vbz/vDH8HHFI592rehKhWeNn8cysH2ZstY/WP8Z5XvMQymx/OxYn8RULK8PrZhxC2gXMi4vnrzTM3WVJzS5yWWDQSdo7R87ccn47SieI6/P6+Y2gRW+rLDP9f/HT675L0fAzYx036k7PA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TllkW6M5jz6K6FS;
-	Thu, 29 Feb 2024 17:08:19 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7B67F141017;
-	Thu, 29 Feb 2024 17:12:47 +0800 (CST)
-Received: from A2303104131.china.huawei.com (10.202.227.28) by
- lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 29 Feb 2024 09:12:21 +0000
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <kvm@vger.kernel.org>
-CC: <alex.williamson@redhat.com>, <jgg@ziepe.ca>, <yishaih@nvidia.com>,
-	<kevin.tian@intel.com>, <linuxarm@huawei.com>, <liulongfang@huawei.com>,
-	<bcreeley@amd.com>
-Subject: [PATCH] hisi_acc_vfio_pci: Remove the deferred_reset logic
-Date: Thu, 29 Feb 2024 09:11:52 +0000
-Message-ID: <20240229091152.56664-1-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC31A57894;
+	Thu, 29 Feb 2024 09:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709197993; cv=fail; b=uVLBQgpdXXjGSHjEVmUVJ9Eqv+CSvmWCWgzvp8T6wZUX9/oEdBGmql3ViyhFTt9DhiusocWA5AXQ04A6A3LmbXcG9bS93ivaMJ/Sx7h00awJQKbCQlXzyLwF+mFw7kCJmk/cfwhRyZMdvWHcLstQMqmYbBAPFzhh8TE/0sJWAKY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709197993; c=relaxed/simple;
+	bh=T1ZMqIp/z89YWjuu1RsiPEMlD/ETZrXfn5NecfukNQ4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=XubJaBBo89Gm6aqt3jRY58cF8Z9UmAO1I0wZyrEIErycwrClPmbPSFhdvyYyJG/r1p9vNFndQe5skIA5+UP+nygKQ7wMHvshxwspt/uGvX6afn2DJNfK6isgFTlE+Q+0FSjYgc3ztn0e2YHpPf3626EK3dBaqmNJDC6zvgyFWhs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=yFokakQW; arc=fail smtp.client-ip=40.107.223.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jVr1e0/tGv/sJgeZbyzU5WNdPgoqhMGZJhp0OCYTYhLnLqjkbBWSWJNcTXNr9J8XOsUY9ZXBCcvhzhO4cjBo2hetnhCeuFsLk/U6HUdgngRzxpFag6X7lBPCVbf72eMbLDgncmaK04M6c/FJqCl00UwkgzJ4sGe0vhHscO09rxevbTGoDH2XrISgFvWFnmBDpVV3xw3Er0+jPTzte/rhc0YhNemImCcVtBSYg0qstIqJnT+lPnSEF6ryXGLIP5JM1rq7tLhSijy/gaaYrUTF6JwO9KVQfzCPEahmkNMknyWoJGZPXP6GGtceySJJSY/ChDxR4HdLvF6TKxnFx61ZUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wlLN0sk2/FVoktKz2de+rUsFEuqS4eoCFEqdQJDpB6M=;
+ b=bMsFmt10tIZKYbikLeKvESYmQFSAnoNqCDcqr5pvDqzntLKtRjs2XN5NFcO4/PJkcxjvl5ZMsAw6Ev06EtxwoHT2FnsIVIxfL/RSdFsNfZeB6Xfy83eGfPuZB7QFazkvfIWL5+pcyzm70gMxeP4+zQ8ZX0KWEh1BxcGprn2WWZoQFcnTuxYENYWD/qkLZfrfhrEaHmEr9RnR4i9B6r1YNttWEr4nlhcrAH9IEKZ3tfG3aNe5GTNVUi2k76bazlBhcYjT81YP7yFYn6vuEsi5JFcPqFyRkOCHWUvr4RWDKPqMEGJy1AcfOmmqum3syUhddAZN6qgyC/J+AFvkCexNlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wlLN0sk2/FVoktKz2de+rUsFEuqS4eoCFEqdQJDpB6M=;
+ b=yFokakQWVOvPPh0Ji6fsrFqwugCCB0qy5+32KLe8dgrN8Z9y/pvL9rSkplUflz7cM5GvxUuMPYR0DR0lOpV4E9AgsXbWZ2pzvruAgreLqWq81jWnq9TGgRM0hzN1uHVCngXHpWLKM9XFIpHyPlcXo2SLzkg/F2tYWrNWOvfOiQw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ MN6PR12MB8490.namprd12.prod.outlook.com (2603:10b6:208:470::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
+ 2024 09:13:08 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::71ca:c3d6:bd74:5aa4]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::71ca:c3d6:bd74:5aa4%4]) with mapi id 15.20.7316.037; Thu, 29 Feb 2024
+ 09:13:08 +0000
+Message-ID: <84a74c55-e314-4824-a088-297b3f1c89eb@amd.com>
+Date: Thu, 29 Feb 2024 14:42:58 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 03/16] virt: sev-guest: Add SNP guest request structure
+Content-Language: en-US
+To: Tom Lendacky <thomas.lendacky@amd.com>, linux-kernel@vger.kernel.org,
+ bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
+Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+ pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+References: <20240215113128.275608-1-nikunj@amd.com>
+ <20240215113128.275608-4-nikunj@amd.com>
+ <c03f15aa-6606-4aff-bcec-2e29e0b36d9f@amd.com>
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <c03f15aa-6606-4aff-bcec-2e29e0b36d9f@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN2PR01CA0220.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:ea::18) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|MN6PR12MB8490:EE_
+X-MS-Office365-Filtering-Correlation-Id: 086137fe-94b5-47dc-8421-08dc3906a510
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Ht5XKbXYo7MwvoGd38cOEsjNHb5y1ZkO9ShGFMCPnjb2n6WNjK3mD+fEF2KJfLfe+IVP47e+d7uKNkDLRtIRzXKfee1JwcJlqb3dBvdbg0YgDYf2RBfojtgxJd1jAgnjBnQSj6RAAU5f3ELxY6d37MzLCcxBBSsFrjAG5uEN8fmTxgBYxDKT87p0RGnTZXxfJ6524MUdDjSYIc3KpFKaaCqaw0ZjxIgDNtHBkSMs0BLB3gupZWxA1MHMO6QZ3QC1rWcipLGCeIt5Z31LUhIYEBbNI+Olo2RIiSj0WW3uLcaMyRQI4+5AAqH9jHbAY6w5jw47s//dyDXEEoyfYerVi0yg2BwEU4jreltioekGVtl9kf01Vco5/mxHSFYa3hrJ5ne6gMh9PVp/gvqqoKGJUsGulPxXp8ZQf9swFJTID0WPpCI+V45Ny402FIhl1sEklm4Ghzzj44mt2DW2Sr3Ih9zKJ5ZR6FKxWOS+2FpCJGbivnR+rVfGuw9QxlSKwODkqo9ZTKVPfdcwEREC0/O8zzu6HdyMV1kt6leq0EGk6cao5L8t/aiDQqvrEgLJQhGFhnUj01eQby1oPWPYcBpf2+4OW0WOTAW5AX1nFgsdznakIR5HOr9UBN1g5iWx/KjL
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dGxnaHpOakorNG5CSEw4aU1GNkdiWU5GaytOcHB4T3pxNStxVERObUtSR3Zq?=
+ =?utf-8?B?VEFCT0pMSmVxZXN5R2MyTjcxRWxJbytQMzFFcmxhNWJZM2tud2RYWCtDRWFB?=
+ =?utf-8?B?eDRDS0JaTVE2dUhyTnY3SFJML3BqT0RHanlJQTRnZklObjZPRXhBUnAvSGRi?=
+ =?utf-8?B?Nk5QNStTcElXQ0J3dGpQMS9iK1BIcXVUV3N2ZmNnS2ZBM0E0Y0pnVE5OVzdX?=
+ =?utf-8?B?dmgxK3E3M3g4V0ZjM1BPSUI5SjNwaHVhZk95eW5ncU5nZk5BVFFqS3BhaDA5?=
+ =?utf-8?B?b0toZjJXWnMvN0lNV1F3K3RKS0lDWDVLSmlncEZLYWdjRDIrb2o3cmNNVWNo?=
+ =?utf-8?B?VXdyaUFSZGxTeFRHY1dONEFkOCtab0tYTXozcnZxWUxoR2hWU2lGV0p4V0Qr?=
+ =?utf-8?B?STNOTkU4Q2JVSDBOUCtPQWRNTzNuTzlZaUF2MGFieVNwYVM2VWdsaTk0ejdG?=
+ =?utf-8?B?aStlbjM4VzJkNitiQXVRZHRoVnhDTTdUaGdjM216bmJLa0VCenlSaGlsdmFV?=
+ =?utf-8?B?eThQQlBidCswOXFyeXhKTU14bktMbXF0ZHBMRStXYlBRS3EySC8wcTJIQ1pX?=
+ =?utf-8?B?T2VjeXNvNXJrRjVMOHZNbDBVdWtrajQrdldCMXBJNzBNd1lCeDh6aHRJa0sw?=
+ =?utf-8?B?dXZ3SU1uZUQxQjVrbHU5bXM4TGJtRUpZNjdzNHZucm1uOW9BNEY1S2tOQTJs?=
+ =?utf-8?B?ZnAvMW50bGFsSFJrbjZscjVyd252SkdFNXNoN0hzV2FqYnNPWGcxK0htblow?=
+ =?utf-8?B?ajlDQk1rbVU0U3cxTloyZDdEYmszWFpIRUE1UzYzN29OVmxPb3VJa0NsVDRG?=
+ =?utf-8?B?ZXhTRGdBUmtvanJNSXZRbmora3lPRkZ0eE1WMnZIVkJ2aTJmWnYxbUZoeHJR?=
+ =?utf-8?B?VHdWM0VnOFBvZVluZUJpcm1FN0Y3eC9yZXlxZTdsZy9HTldBK25waUxDSTZH?=
+ =?utf-8?B?ZWZjRWJvaGoxR2orVndaa2t3OGVFSWlrWDZ0cVdvaDhBazBpdUczS3diUWIx?=
+ =?utf-8?B?VWlGK2RvUC9JMEtkdFVZN2FZMm85SkZjZk16Z29KMUxLZUY2dmZlQk5EekFJ?=
+ =?utf-8?B?dC84ekFxbjcycnd2THV1aEQ1cGpwcmswRDhBSTVnWmx0WHo1TllJUExnS3ZE?=
+ =?utf-8?B?YjZaQWlmTTA2N0dxbC9EdWtuL1d4ZzBVYTlGU1FYS0syMTl0QkhINkZjdUNE?=
+ =?utf-8?B?NzhSR3F1SC9ocXV4WWo2d3FxRnRVdGFwS2ZhaG9oTDdUQ2pIT0YrMDN1UGlM?=
+ =?utf-8?B?U0d4WUg3Q1huWUFlL3FwVWVZNWEyOTl0U1pCMHl4Q01ONWpuekVjYWRjU29D?=
+ =?utf-8?B?ZzZMc1R3NkRBenR6WjB0V1NHWXVBUi9HQUMxaDZDRFVLaTNhOXk5OUMyanh1?=
+ =?utf-8?B?MUNXVUhQUlZmazA3aEdTRHlSTVNWU1p6VWtJTGQzemhSVnlKenNXRGZjVU5o?=
+ =?utf-8?B?Um9Ib0tBM0d3RURZaU5wY1FTdzd2clVXaUVVMWo1cm5pV1BreGNFaVNXOTdh?=
+ =?utf-8?B?dDFyV3N5em1PdXZCSjlib05zaHBCU0Y0RzN2ZWhPWXhnd0tGRVc2N3IxcjNW?=
+ =?utf-8?B?S3E5WjRKczZlWjhDamJNd05wT3pXY1k4aVhQcFFySktWT1JETE9pK1JQRlZY?=
+ =?utf-8?B?NWdRcGp0ZExwWDhPNUM1UG5vQXFraEdMdFVxV013TGJJYlhVTWZmZDNhU0t0?=
+ =?utf-8?B?NTRHODFtdXpGVHY0QjJ2eU9OUS8rU0czbUNSaWxhYVVBd3FKUlZkU2dEdFZa?=
+ =?utf-8?B?dUxUWTlDYUZDcFRBRjdNRnljWW9vSUIwYXNNSnFLZHF4TjBPM0g0Mmdka1RN?=
+ =?utf-8?B?R2hmY0NzZ1lwTGs2cE1PS0RPYnFNTVFqUGFaWkY5V3BnMGhhcHRXc0RrcENE?=
+ =?utf-8?B?OTNCTXc0S0MzdWFMdk1mY2hwSlA4aE9rUWF6V2N4cGQwUHNKN2R4VWxOckNx?=
+ =?utf-8?B?OHV0bllPMXRobmtYN2ZXUk00bUVuN0lzYmNKS0FmZktjNnpiRkIzVGR2V2w3?=
+ =?utf-8?B?UnpJVXBRbzBQNG13MkorNW84endOOVd3Z2Z1MnliZENwVlY0Z2tqaUJqSk5S?=
+ =?utf-8?B?SzRsZEZUUytuV3pZMFVadWhCUlA1aVp3OWtlcFo2NE01OVduZlR3MlFKQkg5?=
+ =?utf-8?Q?jR5xXIiZG6iweBp5cE/qvfkNK?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 086137fe-94b5-47dc-8421-08dc3906a510
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 09:13:08.2620
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4KNSz+lADcWUvR0WwgjHyfqka0sWcmgQ8oWpc9XN+Q0MMgpHp//t4XBrE+BMwkjTHequfpAmwK7DsyEjTgYGLQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8490
 
-The deferred_reset logic was added to vfio migration drivers to prevent
-a circular locking dependency with respect to mm_lock and state mutex.
-This is mainly because of the copy_to/from_user() functions(which takes
-mm_lock) invoked under state mutex. But for HiSilicon driver, the only
-place where we now hold the state mutex for copy_to_user is during the
-PRE_COPY IOCTL. So for pre_copy, release the lock as soon as we have
-updated the data and perform copy_to_user without state mutex. By this,
-we can get rid of the deferred_reset logic.
+On 2/28/2024 3:50 AM, Tom Lendacky wrote:
+> On 2/15/24 05:31, Nikunj A Dadhania wrote:
+>> Add a snp_guest_req structure to simplify the function arguments. The
+>> structure will be used to call the SNP Guest message request API
+>> instead of passing a long list of parameters.
+>>
+>> Update snp_issue_guest_request() prototype to include the new guest request
+>> structure and move the prototype to sev.h.
+>>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>> ---
+>>   arch/x86/include/asm/sev.h              |  75 ++++++++-
+>>   arch/x86/kernel/sev.c                   |  15 +-
+>>   drivers/virt/coco/sev-guest/sev-guest.c | 195 +++++++++++++-----------
+>>   drivers/virt/coco/sev-guest/sev-guest.h |  66 --------
+>>   4 files changed, 187 insertions(+), 164 deletions(-)
+>>   delete mode 100644 drivers/virt/coco/sev-guest/sev-guest.h
+>>
+>> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+>> index bed95e1f4d52..0c0b11af9f89 100644
+>> --- a/arch/x86/include/asm/sev.h
+>> +++ b/arch/x86/include/asm/sev.h
+>> @@ -111,8 +111,6 @@ struct rmp_state {
+>>   struct snp_req_data {
+>>       unsigned long req_gpa;
+>>       unsigned long resp_gpa;
+>> -    unsigned long data_gpa;
+>> -    unsigned int data_npages;
+>>   };
+>>     struct sev_guest_platform_data {
+>> @@ -154,6 +152,73 @@ struct snp_secrets_page_layout {
+>>       u8 rsvd3[3840];
+>>   } __packed;
+>>   +#define MAX_AUTHTAG_LEN        32
+>> +#define AUTHTAG_LEN        16
+>> +#define AAD_LEN            48
+>> +#define MSG_HDR_VER        1
+>> +
+>> +/* See SNP spec SNP_GUEST_REQUEST section for the structure */
+>> +enum msg_type {
+>> +    SNP_MSG_TYPE_INVALID = 0,
+>> +    SNP_MSG_CPUID_REQ,
+>> +    SNP_MSG_CPUID_RSP,
+>> +    SNP_MSG_KEY_REQ,
+>> +    SNP_MSG_KEY_RSP,
+>> +    SNP_MSG_REPORT_REQ,
+>> +    SNP_MSG_REPORT_RSP,
+>> +    SNP_MSG_EXPORT_REQ,
+>> +    SNP_MSG_EXPORT_RSP,
+>> +    SNP_MSG_IMPORT_REQ,
+>> +    SNP_MSG_IMPORT_RSP,
+>> +    SNP_MSG_ABSORB_REQ,
+>> +    SNP_MSG_ABSORB_RSP,
+>> +    SNP_MSG_VMRK_REQ,
+>> +    SNP_MSG_VMRK_RSP,
+>> +
+>> +    SNP_MSG_TYPE_MAX
+>> +};
+>> +
+>> +enum aead_algo {
+>> +    SNP_AEAD_INVALID,
+>> +    SNP_AEAD_AES_256_GCM,
+>> +};
+>> +
+>> +struct snp_guest_msg_hdr {
+>> +    u8 authtag[MAX_AUTHTAG_LEN];
+>> +    u64 msg_seqno;
+>> +    u8 rsvd1[8];
+>> +    u8 algo;
+>> +    u8 hdr_version;
+>> +    u16 hdr_sz;
+>> +    u8 msg_type;
+>> +    u8 msg_version;
+>> +    u16 msg_sz;
+>> +    u32 rsvd2;
+>> +    u8 msg_vmpck;
+>> +    u8 rsvd3[35];
+>> +} __packed;
+>> +
+>> +struct snp_guest_msg {
+>> +    struct snp_guest_msg_hdr hdr;
+>> +    u8 payload[4000];
+> 
+> If the idea is to ensure that payload never goes beyond a page boundary (assuming page allocation/backing), it would be better to have:
+> 
+>     u8 payload[PAGE_SIZE - sizeof(struct snp_guest_msg_hdr)];
+> 
+> instead of hard-coding 4000 (I realize this is existing code). Although, since you probably want to ensure that you don't exceed the page allocation by testing against the size or page offset, you can just make this a variable length array:
+> 
+>     u8 payload[];
+> 
+> and ensure that you don't overrun.
 
-Link: https://lore.kernel.org/kvm/20240220132459.GM13330@nvidia.com/
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 48 +++++--------------
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  6 +--
- 2 files changed, 14 insertions(+), 40 deletions(-)
+Sure, below is the delta to make payload a variable length array. I will squash it with current patch.
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 4d27465c8f1a..9a3e97108ace 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -630,25 +630,11 @@ static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vde
- 	}
- }
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 0c0b11af9f89..85cf160f6203 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -200,9 +200,12 @@ struct snp_guest_msg_hdr {
  
--/*
-- * This function is called in all state_mutex unlock cases to
-- * handle a 'deferred_reset' if exists.
-- */
--static void
--hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-+static void hisi_acc_vf_reset(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
--again:
--	spin_lock(&hisi_acc_vdev->reset_lock);
--	if (hisi_acc_vdev->deferred_reset) {
--		hisi_acc_vdev->deferred_reset = false;
--		spin_unlock(&hisi_acc_vdev->reset_lock);
--		hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
--		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
--		hisi_acc_vf_disable_fds(hisi_acc_vdev);
--		goto again;
--	}
--	mutex_unlock(&hisi_acc_vdev->state_mutex);
--	spin_unlock(&hisi_acc_vdev->reset_lock);
-+	hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
-+	hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+	hisi_acc_vf_disable_fds(hisi_acc_vdev);
- }
+ struct snp_guest_msg {
+ 	struct snp_guest_msg_hdr hdr;
+-	u8 payload[4000];
++	u8 payload[];
+ } __packed;
  
- static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-@@ -804,8 +790,10 @@ static long hisi_acc_vf_precopy_ioctl(struct file *filp,
- 
- 	info.dirty_bytes = 0;
- 	info.initial_bytes = migf->total_length - *pos;
-+	mutex_unlock(&migf->lock);
-+	mutex_unlock(&hisi_acc_vdev->state_mutex);
- 
--	ret = copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
-+	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
- out:
- 	mutex_unlock(&migf->lock);
- 	mutex_unlock(&hisi_acc_vdev->state_mutex);
-@@ -1071,7 +1059,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
- 			break;
- 		}
- 	}
--	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-+	mutex_unlock(&hisi_acc_vdev->state_mutex);
- 	return res;
- }
- 
-@@ -1092,7 +1080,7 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
- 
- 	mutex_lock(&hisi_acc_vdev->state_mutex);
- 	*curr_state = hisi_acc_vdev->mig_state;
--	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-+	mutex_unlock(&hisi_acc_vdev->state_mutex);
- 	return 0;
- }
- 
-@@ -1104,21 +1092,9 @@ static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
- 				VFIO_MIGRATION_STOP_COPY)
- 		return;
- 
--	/*
--	 * As the higher VFIO layers are holding locks across reset and using
--	 * those same locks with the mm_lock we need to prevent ABBA deadlock
--	 * with the state_mutex and mm_lock.
--	 * In case the state_mutex was taken already we defer the cleanup work
--	 * to the unlock flow of the other running context.
--	 */
--	spin_lock(&hisi_acc_vdev->reset_lock);
--	hisi_acc_vdev->deferred_reset = true;
--	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
--		spin_unlock(&hisi_acc_vdev->reset_lock);
--		return;
--	}
--	spin_unlock(&hisi_acc_vdev->reset_lock);
--	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-+	mutex_lock(&hisi_acc_vdev->state_mutex);
-+	hisi_acc_vf_reset(hisi_acc_vdev);
-+	mutex_unlock(&hisi_acc_vdev->state_mutex);
- }
- 
- static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index dcabfeec6ca1..5bab46602fad 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -98,8 +98,8 @@ struct hisi_acc_vf_migration_file {
- 
- struct hisi_acc_vf_core_device {
- 	struct vfio_pci_core_device core_device;
--	u8 match_done:1;
--	u8 deferred_reset:1;
-+	u8 match_done;
++#define SNP_GUEST_MSG_SIZE 4096
++#define SNP_GUEST_MSG_PAYLOAD_SIZE (SNP_GUEST_MSG_SIZE - sizeof(struct snp_guest_msg))
 +
- 	/* For migration state */
- 	struct mutex state_mutex;
- 	enum vfio_device_mig_state mig_state;
-@@ -109,8 +109,6 @@ struct hisi_acc_vf_core_device {
- 	struct hisi_qm vf_qm;
- 	u32 vf_qm_state;
- 	int vf_id;
--	/* For reset handler */
--	spinlock_t reset_lock;
- 	struct hisi_acc_vf_migration_file *resuming_migf;
- 	struct hisi_acc_vf_migration_file *saving_migf;
- };
--- 
-2.34.1
+ struct snp_guest_req {
+ 	void *req_buf;
+ 	size_t req_sz;
+diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+index 596cec03f9eb..da9a616c76cf 100644
+--- a/drivers/virt/coco/sev-guest/sev-guest.c
++++ b/drivers/virt/coco/sev-guest/sev-guest.c
+@@ -46,7 +46,7 @@ struct snp_guest_dev {
+ 	 * Avoid information leakage by double-buffering shared messages
+ 	 * in fields that are in regular encrypted memory.
+ 	 */
+-	struct snp_guest_msg secret_request, secret_response;
++	struct snp_guest_msg *secret_request, *secret_response;
+ 
+ 	struct snp_secrets_page_layout *layout;
+ 	struct snp_req_data input;
+@@ -169,8 +169,8 @@ static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
+ 
+ static int verify_and_dec_payload(struct snp_guest_dev *snp_dev, struct snp_guest_req *req)
+ {
+-	struct snp_guest_msg *resp_msg = &snp_dev->secret_response;
+-	struct snp_guest_msg *req_msg = &snp_dev->secret_request;
++	struct snp_guest_msg *resp_msg = snp_dev->secret_response;
++	struct snp_guest_msg *req_msg = snp_dev->secret_request;
+ 	struct snp_guest_msg_hdr *req_msg_hdr = &req_msg->hdr;
+ 	struct snp_guest_msg_hdr *resp_msg_hdr = &resp_msg->hdr;
+ 	struct aesgcm_ctx *ctx = snp_dev->ctx;
+@@ -181,7 +181,7 @@ static int verify_and_dec_payload(struct snp_guest_dev *snp_dev, struct snp_gues
+ 		 resp_msg_hdr->msg_sz);
+ 
+ 	/* Copy response from shared memory to encrypted memory. */
+-	memcpy(resp_msg, snp_dev->response, sizeof(*resp_msg));
++	memcpy(resp_msg, snp_dev->response, SNP_GUEST_MSG_SIZE);
+ 
+ 	/* Verify that the sequence counter is incremented by 1 */
+ 	if (unlikely(resp_msg_hdr->msg_seqno != (req_msg_hdr->msg_seqno + 1)))
+@@ -210,7 +210,7 @@ static int verify_and_dec_payload(struct snp_guest_dev *snp_dev, struct snp_gues
+ 
+ static int enc_payload(struct snp_guest_dev *snp_dev, u64 seqno, struct snp_guest_req *req)
+ {
+-	struct snp_guest_msg *msg = &snp_dev->secret_request;
++	struct snp_guest_msg *msg = snp_dev->secret_request;
+ 	struct snp_guest_msg_hdr *hdr = &msg->hdr;
+ 	struct aesgcm_ctx *ctx = snp_dev->ctx;
+ 	u8 iv[GCM_AES_IV_SIZE] = {};
+@@ -233,7 +233,7 @@ static int enc_payload(struct snp_guest_dev *snp_dev, u64 seqno, struct snp_gues
+ 	pr_debug("request [seqno %lld type %d version %d sz %d]\n",
+ 		 hdr->msg_seqno, hdr->msg_type, hdr->msg_version, hdr->msg_sz);
+ 
+-	if (WARN_ON((req->req_sz + ctx->authsize) > sizeof(msg->payload)))
++	if (WARN_ON((req->req_sz + ctx->authsize) > SNP_GUEST_MSG_PAYLOAD_SIZE))
+ 		return -EBADMSG;
+ 
+ 	memcpy(iv, &hdr->msg_seqno, min(sizeof(iv), sizeof(hdr->msg_seqno)));
+@@ -341,7 +341,7 @@ static int snp_send_guest_request(struct snp_guest_dev *snp_dev, struct snp_gues
+ 		return -EIO;
+ 
+ 	/* Clear shared memory's response for the host to populate. */
+-	memset(snp_dev->response, 0, sizeof(struct snp_guest_msg));
++	memset(snp_dev->response, 0, SNP_GUEST_MSG_SIZE);
+ 
+ 	/* Encrypt the userspace provided payload in snp_dev->secret_request. */
+ 	rc = enc_payload(snp_dev, seqno, req);
+@@ -352,8 +352,7 @@ static int snp_send_guest_request(struct snp_guest_dev *snp_dev, struct snp_gues
+ 	 * Write the fully encrypted request to the shared unencrypted
+ 	 * request page.
+ 	 */
+-	memcpy(snp_dev->request, &snp_dev->secret_request,
+-	       sizeof(snp_dev->secret_request));
++	memcpy(snp_dev->request, snp_dev->secret_request, SNP_GUEST_MSG_SIZE);
+ 
+ 	rc = __handle_guest_request(snp_dev, req, rio);
+ 	if (rc) {
+@@ -864,12 +863,21 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+ 	snp_dev->dev = dev;
+ 	snp_dev->layout = layout;
+ 
++	/* Allocate secret request and response message for double buffering */
++	snp_dev->secret_request = kzalloc(SNP_GUEST_MSG_SIZE, GFP_KERNEL);
++	if (!snp_dev->secret_request)
++		goto e_unmap;
++
++	snp_dev->secret_response = kzalloc(SNP_GUEST_MSG_SIZE, GFP_KERNEL);
++	if (!snp_dev->secret_response)
++		goto e_free_secret_req;
++
+ 	/* Allocate the shared page used for the request and response message. */
+-	snp_dev->request = alloc_shared_pages(dev, sizeof(struct snp_guest_msg));
++	snp_dev->request = alloc_shared_pages(dev, SNP_GUEST_MSG_SIZE);
+ 	if (!snp_dev->request)
+-		goto e_unmap;
++		goto e_free_secret_resp;
+ 
+-	snp_dev->response = alloc_shared_pages(dev, sizeof(struct snp_guest_msg));
++	snp_dev->response = alloc_shared_pages(dev, SNP_GUEST_MSG_SIZE);
+ 	if (!snp_dev->response)
+ 		goto e_free_request;
+ 
+@@ -911,9 +919,13 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+ e_free_cert_data:
+ 	free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
+ e_free_response:
+-	free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
++	free_shared_pages(snp_dev->response, SNP_GUEST_MSG_SIZE);
+ e_free_request:
+-	free_shared_pages(snp_dev->request, sizeof(struct snp_guest_msg));
++	free_shared_pages(snp_dev->request, SNP_GUEST_MSG_SIZE);
++e_free_secret_resp:
++	kfree(snp_dev->secret_response);
++e_free_secret_req:
++	kfree(snp_dev->secret_request);
+ e_unmap:
+ 	iounmap(mapping);
+ 	return ret;
+@@ -924,9 +936,11 @@ static void __exit sev_guest_remove(struct platform_device *pdev)
+ 	struct snp_guest_dev *snp_dev = platform_get_drvdata(pdev);
+ 
+ 	free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
+-	free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
+-	free_shared_pages(snp_dev->request, sizeof(struct snp_guest_msg));
++	free_shared_pages(snp_dev->response, SNP_GUEST_MSG_SIZE);
++	free_shared_pages(snp_dev->request, SNP_GUEST_MSG_SIZE);
+ 	kfree(snp_dev->ctx);
++	kfree(snp_dev->secret_response);
++	kfree(snp_dev->secret_request);
+ 	misc_deregister(&snp_dev->misc);
+ }
+ 
 
 
