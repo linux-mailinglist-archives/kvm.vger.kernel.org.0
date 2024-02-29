@@ -1,214 +1,255 @@
-Return-Path: <kvm+bounces-10457-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10458-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08E186C37F
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:31:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D22386C3D2
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:40:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F0581F245D6
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 08:31:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C4F0B24865
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 08:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F0A4F5F2;
-	Thu, 29 Feb 2024 08:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831C654BC5;
+	Thu, 29 Feb 2024 08:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K9dYnj1p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ujp2QTfT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9090B1DDFF;
-	Thu, 29 Feb 2024 08:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE435381A
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 08:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709195472; cv=none; b=erCxV3RZq4m2QiafAe1/2N9l1VXOZiGuig5buetIP3sNv3+abJ0ras93zbbh8FxT5tDNfsxSUq7+9AeVKJSbL2KGHXBubind+m2lAwbvFgUpsqfsA4U98y5tRc+/rCZVpvK+Tg4hgbHj3YBm6S/Elo8nh0Fy5PSGlBwr/K9hWuI=
+	t=1709195876; cv=none; b=MVRI4cBrQYIK6Ma6vmeMJtL6XyepvcTXVETiMuYbvUy5amiDyafUVKtGMcrXRyfzPIslFZJSXrRAQ5EjislZQTTyEAxur/8y7bYHzZM2eNIdD8SxbbUERk7HvJJ7oilB7Kn9/Qht3anZdJiB2YfhIBkfe0feskzhyPadpoQO0PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709195472; c=relaxed/simple;
-	bh=OWd4fYTux+hAijsOgcO4XFq2Ff+muAy39DNVb8ggNhg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KZxSW7jiqJHzvfWSC+XO1iPVw708TavTxH4s1iy0DOCIUlLlSP1AM6p9hJA2XjyXpDG58oYvNDWJ2PNGKj/MV0Anw0eUuMQhqybMbVZCp89fl7pCdbIb1y/LygRfDca5O4u/PezjQ3p0A0ohZTEtSEQaKWQOvOX6DUl4ACrlXsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K9dYnj1p; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709195471; x=1740731471;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=OWd4fYTux+hAijsOgcO4XFq2Ff+muAy39DNVb8ggNhg=;
-  b=K9dYnj1pLZ9QhlESdstErgjsph0SH5PzJP61nRYTQAALPGLAnO1t0gNe
-   amQd6FLL/unD2183F5DnLFcrozs11EmlCKFxfUn7uAWlwx9o1z2xlG2gH
-   rdumqEPNvNtTBRvVPc3Vawpb8lFtvUMRH/MNbEF1asOj7itfKfgUY3iKS
-   v45acpxES9GMo8/IkXSFaizY5c7J2IFxlLC7vwMexdvq3vFSuU8msg0B0
-   yQsk1K17AjgM7RnqYILqUASDazRV1snIRxRY5Xjs7lCwYZhEEZNSbpgHW
-   1gQzJT6s/TiHQdlRzlIzsSxsS4TYZU5CDFtqi4thYY+1J0QbJtuc/adXD
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="4231409"
-X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="4231409"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Feb 2024 00:31:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="30923916"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.225.159]) ([10.124.225.159])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Feb 2024 00:31:04 -0800
-Message-ID: <9ceaf8d8-383a-4989-b58e-727d70ed525b@linux.intel.com>
-Date: Thu, 29 Feb 2024 16:31:01 +0800
+	s=arc-20240116; t=1709195876; c=relaxed/simple;
+	bh=zVhlPddmaAAR4jzdb9Kbl/uj4RNVr0lC2Np7Xz7TybE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LLmYkjTleQ/t5g/C3xZchjVl5aEj+snUkKabdEMYR6zmrzIODS/bpDLI84yShIXyN+nDQudTKxkAIMCI6jeXITTp98it5BYAh9uWc2T8B3p1LDm6pu9hmXZRhNuCU+j2Mpsvro+O+L5v+g0X3C9DnEZTUDGWXavWYjEQ1HSES9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ujp2QTfT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709195872;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bwmgSL8MZTBXd9LExpXGbveVK/spOqi1tYW6su6x9mk=;
+	b=Ujp2QTfT/0V8ZVsEL+7R6tFsxR6H1f+CDsC2YlTKvArLClDJIPwPN9hNkgxf0Fbp+/gL3P
+	6LSrtWtQk9yYIGVEeUdX3YJwje6jJlPPP9w5Pf+NZ72sUaP/IkqBvENoi5ojj9T9+WYBAT
+	CfN+RwuUJShVfxBBob0BMFL/dhHBhH0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-359-mfh2rIjXNtKjOpe44CSN3w-1; Thu, 29 Feb 2024 03:37:49 -0500
+X-MC-Unique: mfh2rIjXNtKjOpe44CSN3w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2AAE83BA8E;
+	Thu, 29 Feb 2024 08:37:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.193.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DE1D2166B33;
+	Thu, 29 Feb 2024 08:37:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id A177021E6740; Thu, 29 Feb 2024 09:37:44 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  David Hildenbrand
+ <david@redhat.com>,  Igor Mammedov <imammedo@redhat.com>,  Eduardo Habkost
+ <eduardo@habkost.net>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Yanan Wang
+ <wangyanan55@huawei.com>,  "Michael S. Tsirkin" <mst@redhat.com>,  Richard
+ Henderson <richard.henderson@linaro.org>,  Ani Sinha
+ <anisinha@redhat.com>,  Peter Xu <peterx@redhat.com>,  Cornelia Huck
+ <cohuck@redhat.com>,  Daniel P. =?utf-8?Q?Berrang=C3=A9?=
+ <berrange@redhat.com>,  Eric
+ Blake <eblake@redhat.com>,  Marcelo Tosatti <mtosatti@redhat.com>,
+  kvm@vger.kernel.org,  qemu-devel@nongnu.org,  Michael Roth
+ <michael.roth@amd.com>,  Claudio Fontana <cfontana@suse.de>,  Gerd
+ Hoffmann <kraxel@redhat.com>,  Isaku Yamahata <isaku.yamahata@gmail.com>,
+  Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v5 30/65] i386/tdx: Support user configurable
+ mrconfigid/mrowner/mrownerconfig
+In-Reply-To: <20240229063726.610065-31-xiaoyao.li@intel.com> (Xiaoyao Li's
+	message of "Thu, 29 Feb 2024 01:36:51 -0500")
+References: <20240229063726.610065-1-xiaoyao.li@intel.com>
+	<20240229063726.610065-31-xiaoyao.li@intel.com>
+Date: Thu, 29 Feb 2024 09:37:44 +0100
+Message-ID: <87edcv1x9j.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v5 06/29] KVM: selftests: TDX: Use
- KVM_TDX_CAPABILITIES to validate TDs' attribute configuration
-To: Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>,
- Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>,
- Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-References: <20231212204647.2170650-1-sagis@google.com>
- <20231212204647.2170650-7-sagis@google.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20231212204647.2170650-7-sagis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
+Xiaoyao Li <xiaoyao.li@intel.com> writes:
 
-
-On 12/13/2023 4:46 AM, Sagi Shahar wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> This also exercises the KVM_TDX_CAPABILITIES ioctl.
+> Three sha384 hash values, mrconfigid, mrowner and mrownerconfig, of a TD
+> can be provided for TDX attestation. Detailed meaning of them can be
+> found: https://lore.kernel.org/qemu-devel/31d6dbc1-f453-4cef-ab08-4813f4e=
+0ff92@intel.com/
 >
-> Suggested-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ryan Afranji <afranji@google.com>
-> Signed-off-by: Sagi Shahar <sagis@google.com>
+> Allow user to specify those values via property mrconfigid, mrowner and
+> mrownerconfig. They are all in base64 format.
+>
+> example
+> -object tdx-guest, \
+>   mrconfigid=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRW=
+eJq83v,\
+>   mrowner=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq=
+83v,\
+>   mrownerconfig=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wE=
+jRWeJq83v
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>
 > ---
->   .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   | 69 ++++++++++++++++++-
->   1 file changed, 66 insertions(+), 3 deletions(-)
-
-Nit: Can also dump 'supported_gpaw' in tdx_read_capabilities().
-
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-
+> Changes in v5:
+>  - refine the description of QAPI properties and add description of
+>    default value when not specified;
 >
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> index 9b69c733ce01..6b995c3f6153 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> @@ -27,10 +27,9 @@ static char *tdx_cmd_str[] = {
->   };
->   #define TDX_MAX_CMD_STR (ARRAY_SIZE(tdx_cmd_str))
->   
-> -static void tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data)
-> +static int _tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data)
->   {
->   	struct kvm_tdx_cmd tdx_cmd;
-> -	int r;
->   
->   	TEST_ASSERT(ioctl_no < TDX_MAX_CMD_STR, "Unknown TDX CMD : %d\n",
->   		    ioctl_no);
-> @@ -40,11 +39,58 @@ static void tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data)
->   	tdx_cmd.flags = flags;
->   	tdx_cmd.data = (uint64_t)data;
->   
-> -	r = ioctl(fd, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
-> +	return ioctl(fd, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
-> +}
+> Changes in v4:
+>  - describe more of there fields in qom.json
+>  - free the old value before set new value to avoid memory leak in
+>    _setter(); (Daniel)
+>
+> Changes in v3:
+>  - use base64 encoding instread of hex-string;
+> ---
+>  qapi/qom.json         | 17 ++++++++-
+>  target/i386/kvm/tdx.c | 87 +++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/kvm/tdx.h |  3 ++
+>  3 files changed, 106 insertions(+), 1 deletion(-)
+>
+> diff --git a/qapi/qom.json b/qapi/qom.json
+> index 89ed89b9b46e..cac875349a3a 100644
+> --- a/qapi/qom.json
+> +++ b/qapi/qom.json
+> @@ -905,10 +905,25 @@
+>  #     pages.  Some guest OS (e.g., Linux TD guest) may require this to
+>  #     be set, otherwise they refuse to boot.
+>  #
+> +# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
+> +#     e.g., run-time or OS configuration (base64 encoded SHA384 digest).
+> +#     (A default value 0 of SHA384 is used when absent).
+
+Suggest to drop the parenthesis in the last sentence.
+
+@mrconfigid is a string, so the default value can't be 0.  Actually,
+it's not just any string, but a base64 encoded SHA384 digest, which
+means it must be exactly 96 hex digits.  So it can't be "0", either.  It
+could be
+"00000000000000000000000000000000000000000000000000000000000000000000000000=
+0000000000000000000000".
+More on this below.
+
+> +#
+> +# @mrowner: ID for the guest TD=E2=80=99s owner (base64 encoded SHA384 d=
+igest).
+> +#     (A default value 0 of SHA384 is used when absent).
+> +#
+> +# @mrownerconfig: ID for owner-defined configuration of the guest TD,
+> +#     e.g., specific to the workload rather than the run-time or OS
+> +#     (base64 encoded SHA384 digest). (A default value 0 of SHA384 is
+> +#     used when absent).
+> +#
+>  # Since: 9.0
+>  ##
+>  { 'struct': 'TdxGuestProperties',
+> -  'data': { '*sept-ve-disable': 'bool' } }
+> +  'data': { '*sept-ve-disable': 'bool',
+> +            '*mrconfigid': 'str',
+> +            '*mrowner': 'str',
+> +            '*mrownerconfig': 'str' } }
+>=20=20
+>  ##
+>  # @ThreadContextProperties:
+> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+> index d0ad4f57b5d0..4ce2f1d082ce 100644
+> --- a/target/i386/kvm/tdx.c
+> +++ b/target/i386/kvm/tdx.c
+> @@ -13,6 +13,7 @@
+>=20=20
+>  #include "qemu/osdep.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/base64.h"
+>  #include "qapi/error.h"
+>  #include "qom/object_interfaces.h"
+>  #include "standard-headers/asm-x86/kvm_para.h"
+> @@ -516,6 +517,7 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+>      X86CPU *x86cpu =3D X86_CPU(cpu);
+>      CPUX86State *env =3D &x86cpu->env;
+>      g_autofree struct kvm_tdx_init_vm *init_vm =3D NULL;
+> +    size_t data_len;
+>      int r =3D 0;
+>=20=20
+>      object_property_set_bool(OBJECT(cpu), "pmu", false, &error_abort);
+> @@ -528,6 +530,38 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+>      init_vm =3D g_malloc0(sizeof(struct kvm_tdx_init_vm) +
+>                          sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_=
+ENTRIES);
+>=20=20
+> +#define SHA384_DIGEST_SIZE  48
 > +
-> +static void tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data)
-> +{
-> +	int r;
+> +    if (tdx_guest->mrconfigid) {
+> +        g_autofree uint8_t *data =3D qbase64_decode(tdx_guest->mrconfigi=
+d,
+> +                              strlen(tdx_guest->mrconfigid), &data_len, =
+errp);
+> +        if (!data || data_len !=3D SHA384_DIGEST_SIZE) {
+> +            error_setg(errp, "TDX: failed to decode mrconfigid");
+> +            return -1;
+> +        }
+> +        memcpy(init_vm->mrconfigid, data, data_len);
+> +    }
+
+When @mrconfigid is absent, the property remains null, and this
+conditional is not executed.  init_vm->mrconfigid[], an array of 6
+__u64, remains all zero.  How does the kernel treat that?
+
 > +
-> +	r = _tdx_ioctl(fd, ioctl_no, flags, data);
->   	TEST_ASSERT(r == 0, "%s failed: %d  %d", tdx_cmd_str[ioctl_no], r,
->   		    errno);
->   }
->   
-> +static struct kvm_tdx_capabilities *tdx_read_capabilities(struct kvm_vm *vm)
-> +{
-> +	int i;
-> +	int rc = -1;
-> +	int nr_cpuid_configs = 4;
-> +	struct kvm_tdx_capabilities *tdx_cap = NULL;
+> +    if (tdx_guest->mrowner) {
+> +        g_autofree uint8_t *data =3D qbase64_decode(tdx_guest->mrowner,
+> +                              strlen(tdx_guest->mrowner), &data_len, err=
+p);
+> +        if (!data || data_len !=3D SHA384_DIGEST_SIZE) {
+> +            error_setg(errp, "TDX: failed to decode mrowner");
+> +            return -1;
+> +        }
+> +        memcpy(init_vm->mrowner, data, data_len);
+> +    }
 > +
-> +	do {
-> +		nr_cpuid_configs *= 2;
+> +    if (tdx_guest->mrownerconfig) {
+> +        g_autofree uint8_t *data =3D qbase64_decode(tdx_guest->mrownerco=
+nfig,
+> +                              strlen(tdx_guest->mrownerconfig), &data_le=
+n, errp);
+> +        if (!data || data_len !=3D SHA384_DIGEST_SIZE) {
+> +            error_setg(errp, "TDX: failed to decode mrownerconfig");
+> +            return -1;
+> +        }
+> +        memcpy(init_vm->mrownerconfig, data, data_len);
+> +    }
 > +
-> +		tdx_cap = realloc(
-> +			tdx_cap, sizeof(*tdx_cap) +
-> +			nr_cpuid_configs * sizeof(*tdx_cap->cpuid_configs));
-> +		TEST_ASSERT(tdx_cap != NULL,
-> +			    "Could not allocate memory for tdx capability nr_cpuid_configs %d\n",
-> +			    nr_cpuid_configs);
-> +
-> +		tdx_cap->nr_cpuid_configs = nr_cpuid_configs;
-> +		rc = _tdx_ioctl(vm->fd, KVM_TDX_CAPABILITIES, 0, tdx_cap);
-> +	} while (rc < 0 && errno == E2BIG);
-> +
-> +	TEST_ASSERT(rc == 0, "KVM_TDX_CAPABILITIES failed: %d %d",
-> +		    rc, errno);
-> +
-> +	pr_debug("tdx_cap: attrs: fixed0 0x%016llx fixed1 0x%016llx\n"
-> +		 "tdx_cap: xfam fixed0 0x%016llx fixed1 0x%016llx\n",
-> +		 tdx_cap->attrs_fixed0, tdx_cap->attrs_fixed1,
-> +		 tdx_cap->xfam_fixed0, tdx_cap->xfam_fixed1);
-> +
-> +	for (i = 0; i < tdx_cap->nr_cpuid_configs; i++) {
-> +		const struct kvm_tdx_cpuid_config *config =
-> +			&tdx_cap->cpuid_configs[i];
-> +		pr_debug("cpuid config[%d]: leaf 0x%x sub_leaf 0x%x eax 0x%08x ebx 0x%08x ecx 0x%08x edx 0x%08x\n",
-> +			 i, config->leaf, config->sub_leaf,
-> +			 config->eax, config->ebx, config->ecx, config->edx);
-> +	}
-> +
-> +	return tdx_cap;
-> +}
-> +
->   #define XFEATURE_MASK_CET (XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)
->   
->   static void tdx_apply_cpuid_restrictions(struct kvm_cpuid2 *cpuid_data)
-> @@ -78,6 +124,21 @@ static void tdx_apply_cpuid_restrictions(struct kvm_cpuid2 *cpuid_data)
->   	}
->   }
->   
-> +static void tdx_check_attributes(struct kvm_vm *vm, uint64_t attributes)
-> +{
-> +	struct kvm_tdx_capabilities *tdx_cap;
-> +
-> +	tdx_cap = tdx_read_capabilities(vm);
-> +
-> +	/* TDX spec: any bits 0 in attrs_fixed0 must be 0 in attributes */
-> +	TEST_ASSERT_EQ(attributes & ~tdx_cap->attrs_fixed0, 0);
-> +
-> +	/* TDX spec: any bits 1 in attrs_fixed1 must be 1 in attributes */
-> +	TEST_ASSERT_EQ(attributes & tdx_cap->attrs_fixed1, tdx_cap->attrs_fixed1);
-> +
-> +	free(tdx_cap);
-> +}
-> +
->   static void tdx_td_init(struct kvm_vm *vm, uint64_t attributes)
->   {
->   	const struct kvm_cpuid2 *cpuid;
-> @@ -91,6 +152,8 @@ static void tdx_td_init(struct kvm_vm *vm, uint64_t attributes)
->   	memset(init_vm, 0, sizeof(*init_vm));
->   	memcpy(&init_vm->cpuid, cpuid, kvm_cpuid2_size(cpuid->nent));
->   
-> +	tdx_check_attributes(vm, attributes);
-> +
->   	init_vm->attributes = attributes;
->   
->   	tdx_apply_cpuid_restrictions(&init_vm->cpuid);
+>      r =3D kvm_vm_enable_cap(kvm_state, KVM_CAP_MAX_VCPUS, 0, ms->smp.cpu=
+s);
+>      if (r < 0) {
+>          error_setg(errp, "Unable to set MAX VCPUS to %d", ms->smp.cpus);
+
+[...]
 
 
