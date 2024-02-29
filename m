@@ -1,143 +1,175 @@
-Return-Path: <kvm+bounces-10507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C534386CC2A
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 15:54:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8540386CC2C
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 15:55:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BB3D289178
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 14:54:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EFF11F26392
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 14:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C9F137775;
-	Thu, 29 Feb 2024 14:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54406137774;
+	Thu, 29 Feb 2024 14:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A3Xx+DQd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vmo6mUOv"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDDE13775B;
-	Thu, 29 Feb 2024 14:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE1F137747;
+	Thu, 29 Feb 2024 14:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709218467; cv=none; b=bd8609GM3j4sqVdsd89rg3YXjtooE8bd3coASkMdWHh3e+qwtEFsHtT98QdG51aVdtbqOtudr2drmNhY/hLbsGLfdoflFmLgZJE0MBPgSP9L+EojHkAEh/yJUEaNzOOPoCB9kjdlZ4mETr7Lfw67HznT/b7d85qQBd54bO98h6s=
+	t=1709218541; cv=none; b=KVLOXr/BIRyj1gfBdTp64FXcYY+6qVtpAIubIGTJxsQhWdy5qa7pWraDP/fCWRfk6MAKnuTqab3TEmfKuUCu6+QsvKVykFkbFD17VLgDXFKSs9PLCGbNxXfnNVs24OiNPfbfOOum0Xul+NBGmBhynGORv0Y61CkH21W6Gzd2qeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709218467; c=relaxed/simple;
-	bh=r6oB4kaLBR7dvKtM/qhXIjLnaZum9WS4h7QaCR+0Xsg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hk+vGOsnhxcfi0bPOE8m3DpyQNDbp6xtfOO1CQhEWXP5zd9BKTKuTxmFTRlLyAAc4/sMamMVYpB3H0JMinOHEVK9q1jQ37Yzu9ZGfmCsrHt0MtF6wIqf9tJNEGmB3BIV+D7eiYqp27tV3zEejqdvkBaH3r2OMITgO4U4k9FVYV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3Xx+DQd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD49FC433F1;
-	Thu, 29 Feb 2024 14:54:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709218466;
-	bh=r6oB4kaLBR7dvKtM/qhXIjLnaZum9WS4h7QaCR+0Xsg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=A3Xx+DQdVDNSTWUcQ1acFEsa4BYLaImGQigxZ+3fDiW7fuVb9EPirYkTEzf0TlsKp
-	 735BCZc1Oen1GcHfZ5/CkqhY5/zMg5aaDlPUClc/jGeL/9vJLMi3xIhm86skRfGlIq
-	 FGsGYZShg1SHy6e3BkLUFco9bY5SPpPP+fk5eZECMEfdxfNgODyNEPFBSMB1ux47ld
-	 /8lwLvy86boQBPYR3juGCR9jB3NTF5nz9EXfwny+0o1t9MMtGK8SVyMa6XH1piQmRq
-	 CTyboUpSEsKaXgarL0+fyqJAns9e7mp566eNyDUiRJKHVAWxDBI9Kq3gTpp+wsRBLA
-	 nkhrlML2uZiPA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rfhnk-0082lm-Bg;
-	Thu, 29 Feb 2024 14:54:24 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: [PATCH] KVM: arm64: Fix TRFCR_EL1/PMSCR_EL1 access in hVHE mode
-Date: Thu, 29 Feb 2024 14:54:17 +0000
-Message-Id: <20240229145417.3606279-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1709218541; c=relaxed/simple;
+	bh=f+/q7GkH+OaFYxQE4zP/4onFmtutKCNIPD40hxaVN6M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eUe5oEIBej/FPtDqJro4ELoF24A1fbYe8y+3HebWTGp+JQ2i1Nz6Zpb/DsDy1BehOwNJIb4KE8TIT8tbwDLhLJrk9rxyANkrsOmGlAmTEE4dBK9h9YrUgXTk4VnO4yP7eQ916TKr2A4DBzr80IpCkoitom/fGUGf6+l5aZMH/JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vmo6mUOv; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-299b92948a6so657314a91.3;
+        Thu, 29 Feb 2024 06:55:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709218539; x=1709823339; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hP6lzrqapccsF2KLWHw3WzMibJs8TMjgt2szFY2HpXk=;
+        b=Vmo6mUOvTOBHWe3SiE4PFklJJMfq+PHEpLSmNz60KQNhhxSxYdvQ1S/qejzK9nK6yz
+         EvM3AmsX19suwrI3niBMm/d3npAjSbc0ei4UNCvLYoUa0rWSXDWK05hvkiMbmiDQ7hft
+         Xlt71a61wFmUjr5ErHTjZFzVqzEOlR8kuDWY7kAa9KxxK7rIsNrrxUBY4v4Pjp4cN3eR
+         5b7a70HxtkERCtU/FQNDf923P0WYX/M5WUSlppxHwCEn9PdmpQPC0SHCzcA+DoYlFyvR
+         IIScn2nI2FiD7fcHfumrn5lMtYnQPaDb0GUqtPsMaMwCzkyhQijQBuvaLL2DbHmCzRXO
+         sENg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709218539; x=1709823339;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hP6lzrqapccsF2KLWHw3WzMibJs8TMjgt2szFY2HpXk=;
+        b=BB4bzkoBXPkA1qfguxy4EjIgCrnKlCcaNhpF9hYjO3BmE51hDn2zFFBxjeu8LI9QZS
+         QYPtWTxvRQ7gizXPkF0NGe1iB55PF6PxKJXbWD4yZOXvgs7EPTmGV5pH9m3tVt7DFIqN
+         epFUbqPaL4qOAfw4FBJRpvPX5lLzDKEc9PZAPDxSNTmalTOkWM2hqWC2drvX6LthbxUd
+         pObDq1an1o+bNLFy9CF1ydi8wL8rFeXrGsSm3JSKgW45XYqwtRkKZzQueP9pFmR6imR5
+         2wA0Nbv4WE9KZEK4LTn8bMsxUmoHyp2+lPKpUxSluwIoGO26t3vJZkB8brkz8U4B0nEp
+         /y8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVAp7ql2XyN0T+rvbBmNmHksFFzN3PSviZhdBECICLNA7pQHu+Rm+x0LsyLeQUWj8Vk89WTwEQ7b7PAiwn8ICwKDiNB
+X-Gm-Message-State: AOJu0YywKwiKhbHL7qtOI6iTw+2jpDuNlPNOyANPwZHgWqWym9N1+4DP
+	P8eWxP41sxDn15IqGeMtwtSvWuQ2k4NxgWNUTsDlE+3qy/RL00KE0iMSnM0h7sfoCe8vuTNI2Kr
+	D8KSDC5ZXQSTROslhW+sLcvVVQuQ=
+X-Google-Smtp-Source: AGHT+IEhVLB8oSGlTlLkyrt6KF+P4ZoHNYQMmdL5tHoI8RvPCpSpZVPwG1yKonSyWpwnlhp8XnSUC0GfqgD4tmrthfA=
+X-Received: by 2002:a17:90a:4384:b0:29a:feba:abbd with SMTP id
+ r4-20020a17090a438400b0029afebaabbdmr2696847pjg.0.1709218539331; Thu, 29 Feb
+ 2024 06:55:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20240226143630.33643-1-jiangshanlai@gmail.com> <CABgObfaSGOt4AKRF5WEJt2fGMj_hLXd7J2x2etce2ymvT4HkpA@mail.gmail.com>
+In-Reply-To: <CABgObfaSGOt4AKRF5WEJt2fGMj_hLXd7J2x2etce2ymvT4HkpA@mail.gmail.com>
+From: Lai Jiangshan <jiangshanlai@gmail.com>
+Date: Thu, 29 Feb 2024 22:55:28 +0800
+Message-ID: <CAJhGHyDSHzPPhwaipSbcZXDJ+P3d6-K=ngjk1Ru3DbwzPGuz4Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/73] KVM: x86/PVM: Introduce a new hypervisor
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Lai Jiangshan <jiangshan.ljs@antgroup.com>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+	Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org, x86@kernel.org, 
+	Kees Cook <keescook@chromium.org>, Juergen Gross <jgross@suse.com>, 
+	Hou Wenlong <houwenlong.hwl@antgroup.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When running in hVHE mode, EL1 accesses are performed with the EL12
-accessor, as we run with HCR_EL2.E2H=1.
+Hello, Paolo
 
-Unfortunately, both PMSCR_EL1 and TRFCR_EL1 are used with the
-EL1 accessor, meaning that we actually affect the EL2 state. Duh.
+On Mon, Feb 26, 2024 at 10:49=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+>
+> On Mon, Feb 26, 2024 at 3:34=E2=80=AFPM Lai Jiangshan <jiangshanlai@gmail=
+.com> wrote:
+> > - Full control: In XENPV/Lguest, the host Linux (dom0) entry code is
+> >   subordinate to the hypervisor/switcher, and the host Linux kernel
+> >   loses control over the entry code. This can cause inconvenience if
+> >   there is a need to update something when there is a bug in the
+> >   switcher or hardware.  Integral entry gives the control back to the
+> >   host kernel.
+> >
+> > - Zero overhead incurred: The integrated entry code doesn't cause any
+> >   overhead in host Linux entry path, thanks to the discreet design with
+> >   PVM code in the switcher, where the PVM path is bypassed on host even=
+ts.
+> >   While in XENPV/Lguest, host events must be handled by the
+> >   hypervisor/switcher before being processed.
+>
+> Lguest... Now that's a name I haven't heard in a long time. :)  To be
+> honest, it's a bit weird to see yet another PV hypervisor. I think
+> what really killed Xen PV was the impossibility to protect from
+> various speculation side channel attacks, and I would like to
+> understand how PVM fares here.
 
-Switch to using the {read,write}_sysreg_el1() helpers that will do
-the right thing in all circumstances.
+How does the host kernel protect itself from guest's speculation side
+channel attacks?
 
-Note that the 'Fixes:' tag doesn't represent the point where the bug
-was introduced (there is no such point), but the first practical point
-where the hVHE feature is usable.
+PVM is primarily designed for secure containers like Kata containers,
+where safety and security are of utmost importance.
 
-Cc: James Clark <james.clark@arm.com>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>
-Fixes: 38cba55008e5 ("KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/nvhe/debug-sr.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Guests run in the hardware ring3 and they are treated as the same as the
+normal user applications in the views of the host kernel's protections
+and mitigations. The code employs all of the current protections and
+mitigations for kernel/user interactions to host/guest and with extra
+protections from pagetable isolation and with protections/mitigations
+usually used for host/VTX_or_AMDV_guest (with some similar VM enter/exit
+code as in vmx/ svm/). All of these are sorta easily achieved by the
+"integral entry" design and "the distinct separation of the address
+spaces" design can also help for protections.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 8103f8c695b4..6d57b5c86a91 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -31,8 +31,8 @@ static void __debug_save_spe(u64 *pmscr_el1)
- 		return;
- 
- 	/* Yes; save the control register and disable data generation */
--	*pmscr_el1 = read_sysreg_s(SYS_PMSCR_EL1);
--	write_sysreg_s(0, SYS_PMSCR_EL1);
-+	*pmscr_el1 = read_sysreg_el1(SYS_PMSCR);
-+	write_sysreg_el1(0, SYS_PMSCR);
- 	isb();
- 
- 	/* Now drain all buffered data to memory */
-@@ -48,7 +48,7 @@ static void __debug_restore_spe(u64 pmscr_el1)
- 	isb();
- 
- 	/* Re-enable data generation */
--	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
-+	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
- }
- 
- static void __debug_save_trace(u64 *trfcr_el1)
-@@ -63,8 +63,8 @@ static void __debug_save_trace(u64 *trfcr_el1)
- 	 * Since access to TRFCR_EL1 is trapped, the guest can't
- 	 * modify the filtering set by the host.
- 	 */
--	*trfcr_el1 = read_sysreg_s(SYS_TRFCR_EL1);
--	write_sysreg_s(0, SYS_TRFCR_EL1);
-+	*trfcr_el1 = read_sysreg_el1(SYS_TRFCR);
-+	write_sysreg_el1(0, SYS_TRFCR);
- 	isb();
- 	/* Drain the trace buffer to memory */
- 	tsb_csync();
-@@ -76,7 +76,7 @@ static void __debug_restore_trace(u64 trfcr_el1)
- 		return;
- 
- 	/* Restore trace filter controls */
--	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
-+	write_sysreg_el1(trfcr_el1, SYS_TRFCR);
- }
- 
- void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
--- 
-2.39.2
+How does the guest kernel protect itself from guest users' speculation
+side channel attacks?
 
+The code also tries its best to provide all of the current protections
+and mitigations between the native kernel/user for virtualized kernel/user.
+It is obvious that the PVM virtualized kernel operates in hardware ring3
+and you can't expect all methods can be effective. Since the linux kernel
+can provide protections for threads switching between different user
+processes, PVM can potentially offer similar protections between guest
+kernel/user through the PVM hypervisor's support.
+
+I'm not familiar with XENPV's handling and its solutions (including its
+impossibility) for the speculation side channel attacks, thus I cannot
+provide additional insights or assurances in this context.
+
+PVM is not designed as a general-purpose virtualization. The primary
+objective is for secure container and Linux kernel testing. PVM intends
+to allow for the universal deployment of Kata Containers inside cloud
+VMs leased from any provider over the world.
+
+For Kata containers, the protection between host/guest is much more
+important and every container is only for a single tenement in which
+the guest kernel is not a TCB of the external container services.
+It means the protection requirements between guest kernel/user are
+more flexible and customized.
+
+
+>
+> You obviously did a great job in implementing this within the KVM
+> framework; the changes in arch/x86/ are impressively small.
+
+Thanks for your appreciation.
+
+> On the
+> other hand this means it's also not really my call to decide whether
+> this is suitable for merging upstream. The bulk of the changes are
+> really in arch/x86/kernel/ and arch/x86/entry/, and those are well
+> outside my maintenance area.
+>
+
+Thanks
+Lai
 
