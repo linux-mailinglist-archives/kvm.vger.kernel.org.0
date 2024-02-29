@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-10374-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10375-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D12A486C0EC
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:41:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0446886C0ED
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:41:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 724E6B2641A
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:41:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CDFB1C20956
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE72446AD;
-	Thu, 29 Feb 2024 06:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A256944C7A;
+	Thu, 29 Feb 2024 06:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Up2Sg6Qj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l2cK0CZK"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D6F446AF
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 06:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662FF44C63
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 06:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709188773; cv=none; b=U7jeXryVQJsUTMrWpL0c1VNvJri244tP2rUufKbFOlA04YzRaMqOq90QjdWt8c9Y8Zvp/q4xv+cSzsfN/snf+DpIb1X6yV4ylp6TYvkf7PqtALpiwftmW8GeXfATU/gtEc0j26pFEe8mHAGN5CJGQFjgy5DOQ91Cws/Hj/qNvH0=
+	t=1709188780; cv=none; b=fjAjXkjTIdgVrtlfjsYQeM3lxz0+DDxqBWNCvl/1rhGdjBNNvm4CMuiHmUvUvDwfhRNJ4Qoq5HdlgzVUODM2W2TvPRNsrttpoHDfFm17RS5TzCqVyO7x12mVE7YVm5duOFO7H1xTew/6IG/gXtpnOh/7tePcp/qW87a+sLBGqVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709188773; c=relaxed/simple;
-	bh=xcjX8S6Or4RgbxyPFn2A1+rsnCrOWOXt1edq7jIgm+g=;
+	s=arc-20240116; t=1709188780; c=relaxed/simple;
+	bh=FLp+hgOGY3sd28zmvVM5XHMY5E5c8pPz1qJGCbY+1C0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JZkons/1sYkHbilYJkFBDI2tj9B97jD3eYeLfWQ7DeJ0l24lrrWo8KJGlTgYYfNXNM4xYdd/RDraAqB+nOe/rc4fkTupsTJC9GOOBFNUfwqajRl2zmluyGMvHPPKT+BkxlavFp57TaZ14d481VpyjhwK7BfQvFseHEchM6FxU5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Up2Sg6Qj; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=AXSve1pcWEOTDOO1N766x3udFt6LLui4sp77Ke1mQ1fqqouVuTMyE9vTMzyihdCwRPWLL9o1D3Rk9k496DjPp1QAxaMs4ObKQ7NcT1jLTa5ZdUFugQOQ6dXllp6DDRqBrVLbHh74Q+VQ+OCK6jMt52hY8kyO8VapA7Wrgl90S/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l2cK0CZK; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709188772; x=1740724772;
+  t=1709188779; x=1740724779;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xcjX8S6Or4RgbxyPFn2A1+rsnCrOWOXt1edq7jIgm+g=;
-  b=Up2Sg6QjCrWLyiGWLBmhMqY1S7fkRHo3v5gHpgLs7+UW9ENhKD2kxrjz
-   VkPn0/0naJ1Qzz/vaoxh36wpG4vrr4lwmCZ2GXDJVctuvOy4zBT9O50e/
-   hsIPSqRri8wx0H5/Aho9z6hNt4LLs8OXtZY8G1ahmSN9Jrl1+p9sPLgFV
-   szsfHh823L9ASAUCqG5zdPS/EW1LcJyQn2EbwYqKEVnAP7qc6Dz4Oifq6
-   1g/LrCMN4sDhTQcLPQkZ57PLggKl5x8ivdm3kkbg/To2277Jo/NKJS1yO
-   hhWkurzaakt7kZjhvRuAWO8NhI+4MTg8MVI9kYAvMiGicRp1pgA7knNzs
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3802643"
+  bh=FLp+hgOGY3sd28zmvVM5XHMY5E5c8pPz1qJGCbY+1C0=;
+  b=l2cK0CZKBIZKvGQwQyXFj3HwQKTjaS267PseeYah7zjDKb1Vg+rzI/EX
+   abHuf6u9QVxJiXKFA/q/6yzAvPGrwBvD70jPLPb7DXWRmUbcPybcq+O9s
+   9quiLDg1ixDjG+koEKuqSyu3PEh17pZC2KPSJbfDJQuNqZR0D7T8wmw8w
+   cV5v0hH/xSgG4TzrePjrwzdpDRqSS7CLOoXLNRf4achpT1Xobus1CL2eR
+   m7/qeBk+5EZxq3TNBJCMWvnB++jJ2izzbzLJTRhocUJkex+K8m/HztuZ/
+   jZeH5xbEGI/PCUd7yVtSADmkJh61fyi9hA3qT7xlZNPNSSlZDFIPsA3Zl
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3802652"
 X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="3802643"
+   d="scan'208";a="3802652"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 22:39:32 -0800
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 22:39:38 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="8075212"
+   d="scan'208";a="8075281"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa007.jf.intel.com with ESMTP; 28 Feb 2024 22:39:26 -0800
+  by orviesa007.jf.intel.com with ESMTP; 28 Feb 2024 22:39:32 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -79,9 +79,9 @@ Cc: kvm@vger.kernel.org,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	xiaoyao.li@intel.com
-Subject: [PATCH v5 18/65] i386/tdx: Make Intel-PT unsupported for TD guest
-Date: Thu, 29 Feb 2024 01:36:39 -0500
-Message-Id: <20240229063726.610065-19-xiaoyao.li@intel.com>
+Subject: [PATCH v5 19/65] i386/tdx: Update tdx_cpuid_lookup[].tdx_fixed0/1 by tdx_caps.cpuid_config[]
+Date: Thu, 29 Feb 2024 01:36:40 -0500
+Message-Id: <20240229063726.610065-20-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240229063726.610065-1-xiaoyao.li@intel.com>
 References: <20240229063726.610065-1-xiaoyao.li@intel.com>
@@ -93,41 +93,72 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Due to the fact that Intel-PT virtualization support has been broken in
-QEMU since Sapphire Rapids generation[1], below warning is triggered when
-luanching TD guest:
+tdx_cpuid_lookup[].tdx_fixed0/1 is QEMU maintained data which reflects
+TDX restrictions regrading what bits are fixed by TDX module.
 
-  warning: host doesn't support requested feature: CPUID.07H:EBX.intel-pt [bit 25]
-
-Before Intel-pt is fixed in QEMU, just make Intel-PT unsupported for TD
-guest, to avoid the confusing warning.
-
-[1] https://lore.kernel.org/qemu-devel/20230531084311.3807277-1-xiaoyao.li@intel.com/
+It's retrieved from TDX spec and static. However, TDX may evolve and
+change some fixed fields to configurable in the future. Update
+tdx_cpuid.lookup[].tdx_fixed0/1 fields by removing the bits that
+reported from TDX module as configurable. This can adapt with the
+updated TDX (module) automatically.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
-Changes in v4:
- - newly added patch;
----
- target/i386/kvm/tdx.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ target/i386/kvm/tdx.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 85d96140b450..239170142e4f 100644
+index 239170142e4f..424c0f3c0fbb 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -292,6 +292,11 @@ void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
-     if (function == 1 && reg == R_ECX && !enable_cpu_pm) {
-         *ret &= ~CPUID_EXT_MONITOR;
-     }
-+
-+    /* QEMU Intel-pt support is broken, don't advertise Intel-PT */
-+    if (function == 7 && reg == R_EBX) {
-+        *ret &= ~CPUID_7_0_EBX_INTEL_PT;
-+    }
+@@ -377,6 +377,38 @@ static int get_tdx_capabilities(Error **errp)
+     return 0;
  }
  
- enum tdx_ioctl_level{
++static void update_tdx_cpuid_lookup_by_tdx_caps(void)
++{
++    KvmTdxCpuidLookup *entry;
++    FeatureWordInfo *fi;
++    uint32_t config;
++    FeatureWord w;
++
++    for (w = 0; w < FEATURE_WORDS; w++) {
++        fi = &feature_word_info[w];
++        entry = &tdx_cpuid_lookup[w];
++
++        if (fi->type != CPUID_FEATURE_WORD) {
++            continue;
++        }
++
++        config = tdx_cap_cpuid_config(fi->cpuid.eax,
++                                      fi->cpuid.needs_ecx ? fi->cpuid.ecx : ~0u,
++                                      fi->cpuid.reg);
++
++        if (!config) {
++            continue;
++        }
++
++        /*
++         * Remove the configurable bits from tdx_fixed0/1 in case QEMU
++         * maintained fixed0/1 values is outdated to TDX module.
++         */
++        entry->tdx_fixed0 &= ~config;
++        entry->tdx_fixed1 &= ~config;
++    }
++}
++
+ static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+@@ -392,6 +424,8 @@ static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+         }
+     }
+ 
++    update_tdx_cpuid_lookup_by_tdx_caps();
++
+     tdx_guest = tdx;
+     return 0;
+ }
 -- 
 2.34.1
 
