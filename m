@@ -1,246 +1,292 @@
-Return-Path: <kvm+bounces-10553-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10554-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84DC986D683
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 23:04:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD77986D68E
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 23:06:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05DB5283CBB
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 22:04:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74804284864
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 22:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5376D53A;
-	Thu, 29 Feb 2024 22:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B44574BE0;
+	Thu, 29 Feb 2024 22:06:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtANYdoW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zAEqVb6H"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2053.outbound.protection.outlook.com [40.107.93.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BD216FF21
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 22:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709244255; cv=none; b=hfQ56yzTJuB4jiimLdOT2tXuIhZrr24QZmt5MNljvJgT6gPuZaf9G1hQdFS3kdtHKViniPb/JQliN6iNfAlDvqq3l91Pn2i82p1euUcB0m2eGZK0pB6YUi6I0ILhEyRuPuOuX7uBhLeyvU8t8dejO4dKRj52OaMiXIkgMu1xEUE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709244255; c=relaxed/simple;
-	bh=5ubYRa2KwnGmMmdBlB9FaAnD69udRueK67E102lJcvs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TWXj6MaG29/bc+sxuSxI1dvI7RLl42Z4ugLjskwwLB436NnvMeKK1J4jT2mLj+e7LGBvk1miEsZHawtqnGfFZAEbYxY93m8z/aTOEWxwTA0GfKlJU9rr6iVa9+mWk3BL45C1RlmnvpfR9fXfYupDBrz4K+u3CApPOaIHESzu49s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YtANYdoW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709244252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aNG3+S9v1/vdCmBpDlDkhTu4/UoEKRmapR+0MWUUhG4=;
-	b=YtANYdoWfgBhOcrJmwgGVTm+gltPRuVJ2uAB1HqnfEkCJ9EIOpTNmC6IObHuH0Alswquuv
-	YLEQMyc2pvP3Iog2oy7DbSzRkbxIV3KAwPOjThFw4VproE+x0ILbiPBa7KY0Hm5Jl84YnV
-	8Qg87aukywiP1Ppxiy2Y1Wvp41BEDCM=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-478-TdnoMuRIMiWQi_nFYdg3tg-1; Thu, 29 Feb 2024 17:04:10 -0500
-X-MC-Unique: TdnoMuRIMiWQi_nFYdg3tg-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c78573f2d0so139709639f.1
-        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 14:04:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709244249; x=1709849049;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aNG3+S9v1/vdCmBpDlDkhTu4/UoEKRmapR+0MWUUhG4=;
-        b=ks3Ah0bDoI5UcDeSL5uR6WByw6xPQDGJywfe6Do9Kec/H17Oen+ry/e9ibb/k7X51h
-         7S5W44wWX7SFoynd0NYjnnJPKbmtRPmNJDieW3I8DmECH5p4Auj+0L7VvrKKb8Lkqc5e
-         SoNReCXn+TUaxPgZOcQnS836hbO7eZAZMJ5MvbqtDmyNKhaRcnz76z+2LJX9RXPVqqj1
-         zol2G8TpfVRr3mFstoyeLq0XRLoZ0hjSEszM+MuNakPZIjR6mtK0NEfet6wqCH0RlT5q
-         uG6xEyPs3PjJcGfd91j+XSpSufbWL2ThP31iKXj3X25Yyp1ghTAF899uliArL4wcsW7Z
-         m3jg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZatd9TQv6mYrekRFINUoCGWlAXTBZDdeqDYpUYCm+0CCJ5HRyl8mm+gIhC5QL39YHvxDEjrcdQw9ClTHWGdsQx4Cf
-X-Gm-Message-State: AOJu0YyUKHvCUH3ySxhuAFa6Q34mEaNQlR30WZWjXDbmpko2l/6W6ZTW
-	xJWKhbYmlVAZAbV1m3FW4+Zr5qxZw2HuC/SzuBDSN/dUO71y1wQ9gHQiR2h9Z9KXTad40oZYh7O
-	OvW7yiWv1+/0vnLyqbIgKiBMxMTQXsm8Dm8bC/GEzuim/5AgIdg==
-X-Received: by 2002:a5e:c80a:0:b0:7c7:b1e4:50b with SMTP id y10-20020a5ec80a000000b007c7b1e4050bmr288979iol.13.1709244249623;
-        Thu, 29 Feb 2024 14:04:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEj18l3oxXB3QTSfTU/vUmW9+aA3E/E9I3F9nYwIu/isQya1T/o6ucp9pWRYhN/op7hidf3DQ==
-X-Received: by 2002:a5e:c80a:0:b0:7c7:b1e4:50b with SMTP id y10-20020a5ec80a000000b007c7b1e4050bmr288958iol.13.1709244249267;
-        Thu, 29 Feb 2024 14:04:09 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id bv11-20020a056638448b00b004713170def2sm512021jab.93.2024.02.29.14.04.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 14:04:08 -0800 (PST)
-Date: Thu, 29 Feb 2024 15:04:06 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Yisheng Xie <ethan.xys@linux.alibaba.com>, akpm@linux-foundation.org,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH] vfio/type1: unpin PageReserved page
-Message-ID: <20240229150406.4d41db01.alex.williamson@redhat.com>
-In-Reply-To: <20240227132556.17e87767.alex.williamson@redhat.com>
-References: <20240226160106.24222-1-ethan.xys@linux.alibaba.com>
-	<20240226091438.1fc37957.alex.williamson@redhat.com>
-	<e10ace3f-78d3-4843-8028-a0e1cd107c15@linux.alibaba.com>
-	<20240226103238.75ad4b24.alex.williamson@redhat.com>
-	<abb00aef-378c-481a-a885-327a99aa7b09@redhat.com>
-	<20240227132556.17e87767.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DC76D535
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 22:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709244369; cv=fail; b=RV4kUkRxKhE/9yv7Ilbr0TPujq9S8s4YuMnnnJsVmt39FAb+xZY0iA8FzIlLlu8G+oT9CD/TAhWcSlhIzPb8fbm0TkseeARmUVAJsi8vHKWlWzD3JiMzdCopjrZN0oUUHUt2hCunXs3cTRSiL8w7F5AR8C1Qj/KlNC925vVDCzg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709244369; c=relaxed/simple;
+	bh=9UXICV3rUemDqg71ecnMLk+hDKmpNFr839hTxBaEHow=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=M++SHjZRqSfFCdny4b9HkvSdDAgaftdboqHSHeroUctK0l5zwVi3WGaTevSKfweLx4sZS+2MvU2XzKeELTKYUJDvxpldNkF1f0tIIHxcCUB+2WokZV2zDNQ4sLpoS5Sln+1zcRsFqxX7poA90fajISsSifBdATKQ1x17E6X9/So=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zAEqVb6H; arc=fail smtp.client-ip=40.107.93.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fCT4Uk1cl/4Zb9bWeDTEq1Z2alc/U+CMye93pGSqPSrYtrdXjzjieUOEvnRjD7ll/J3va9aDLgfybz2efEi6+bvx5j2cmCog7wadeG3Nh9CI7wZx7ZQR42HUgCnLeE2Ia67TzaQXWUXYGkv6qgTjcUKbQM9+Lj3NkuDZv/6DeaekCWxR5KrspvV0+a805nYtEwIHl8zbTFUw2GNrbCRmjdR18ALhRl43y7dGUIYA1FIpjUxvAatg03hpFXcCcrQDroE4crOsIpn0hrmHPe30Wl9yuAWyIH68/9hTChrnXEry12LWDLerfA16ayemyP3xFoZCHZ0IBqYWOFFaK6GbPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3Fhsmdff4KjTeU8PcTYqAc1mjTKDOIcX0RJH1+BOSSQ=;
+ b=IlvAKwLuXkFYbrHDvhhMDbWOhgpJyciTimdcsnOXg8i6DIu7bbl2fRjuXW+O+vtYxW511Xl3zb4wVemFQ/vBvdt4xIRRY3iCOsC6Rqd5iGu+muQ5GhM5XuAseEOaBdbe6UMg3K9k7IfcpfwspOnzhbptbY7HdIwihaXQZNLwR1bCtdHR6hOzhA2sPnwJrwC5t0rBaqryiUM2tkDxX/UzgYyPzVcag1mzVVGlaXRh1MTtCCl+pJtgklgnheY9cL6kux4akZhZNZzXs6Jy1/w8Myog1VrxbcHXawznG1vqtWs8qxjwJ55kAcJVeuJUzfRitDNd4e9ZbX9QXRGmmUOumA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3Fhsmdff4KjTeU8PcTYqAc1mjTKDOIcX0RJH1+BOSSQ=;
+ b=zAEqVb6HrHGsBS8AF+e8VqBbxd7IKuax/1NiZ8xruKI1OYQYl8xjh4rwTe0GLAatiQNSB4we25mqRn0yA/PzNVzgi80lPDlzoQF+naL4nNQIKSKvXD/y+hBA0uzxJnXfetwHHwQCpWvh/l/OUr4w8yMwb5iCRmERum6SER6vTOc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by SJ1PR12MB6217.namprd12.prod.outlook.com (2603:10b6:a03:458::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.33; Thu, 29 Feb
+ 2024 22:06:00 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::c325:df95:6683:b429]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::c325:df95:6683:b429%6]) with mapi id 15.20.7316.039; Thu, 29 Feb 2024
+ 22:06:00 +0000
+Message-ID: <eed5d95c-f447-4383-8163-1ce419cc0fe6@amd.com>
+Date: Thu, 29 Feb 2024 14:05:58 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] hisi_acc_vfio_pci: Remove the deferred_reset logic
+Content-Language: en-US
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ kvm@vger.kernel.org
+Cc: alex.williamson@redhat.com, jgg@ziepe.ca, yishaih@nvidia.com,
+ kevin.tian@intel.com, linuxarm@huawei.com, liulongfang@huawei.com
+References: <20240229091152.56664-1-shameerali.kolothum.thodi@huawei.com>
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20240229091152.56664-1-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH7PR17CA0026.namprd17.prod.outlook.com
+ (2603:10b6:510:323::19) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SJ1PR12MB6217:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2436ad62-4acb-44be-97f6-08dc39729ce8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	X6msv5rmfPQSIZyI+8Ri3kYbC1TDkex3lPyeijeMHEB6V69niSIFpMzBUuIFjmXdzSSv7+c6zcoDXPD4Xmhc6kyvKYqmrMul7DoRiyIt8RGjEefY8ZVcx/SagWvM/SJRxgO45RvUcjOAI6W7oJFUmyKRk71wT1SI6qAt+tT8MrcUUaMKrNfdFJTsthYS7bKf1XL7PeT3LInQbBn1EbDU6mXpSk456TSj3AwKUWy9gKgtTZKFjdB7oenzsFs0xDAUTcsPDknADugQqNDVta8QW9Gc/7BtoZ7zrl9eFQ6QEFQMboZWAymOyXFZg3LMPwNiMnR/xV2n58zXmK2IH62MLTAeAev9Yjc2UoojQ/1DeOPj4A+7U5m6ITVwYsiFKixb1vkUjoDvJnOH8YMsYhFyPYJShDzIWGiM2da1I4B4K+c/aLRzURbBdlUJZeNyQ1/88wcIR2uIZf3asycMgaN1xVqE47MBWevO7GZt+iGYfPVZlYy98eYOF4e5uJQGU4xB4dw/zffkTFWmFHIMOW2XiWi9H2UDrEIEIoY7KuPZjlH8VNRZlpgMFONc8au4/gh/CBLiuiB3XMmY3Kdvr9kKzFCuD4t+xdW4nNVO5LzT21Y=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?N1JXRlRWWmthSU01dlU4emtiamRUR1ZNM0FxN1B6YnJZYkdDYkJEZzNlQUZi?=
+ =?utf-8?B?Q21nNk9OOVBOZmsvajEwRDYvTWhnSzdxTTdYNnVJZlNkR2Rpa0tYa1JlL0cz?=
+ =?utf-8?B?YjNnOGpFVEh6WWlUWFdVM3k2NkFKQlRKalRrT0hYSWxUUzFqT0RzRGhsWDdJ?=
+ =?utf-8?B?aDBuWkJ5MTM1Wk9qd3Q5V1NkeDg3VUQ0S0lNUnl3ZllxY1RuZVJlQzJVMmsz?=
+ =?utf-8?B?WkxEWEdzVjBjN3NLSFIzU1h6RlVVRzM4V2gzdFBHYy9xcW9TY3NYZnBDMUF0?=
+ =?utf-8?B?bHNYTk5jMmwyY2JYbEJBaWhTcDFzaVVLZkdnWjJLM1ZqbWdKR1VoREo5R1hH?=
+ =?utf-8?B?MWdxdVQ4Nm1GOFFsdVl3RWdoK0NpQXhkL3l3TFQ5YlhTd0tQR0hCck43d3dU?=
+ =?utf-8?B?dGpjWWdKb1R3QmhrblBZTzRwY2F4dHhVZm9XMUd5aFNKMjZIc0wyNHc1VENO?=
+ =?utf-8?B?NDJmdDlhd3phYlgrS2ROYW5HRWIzcG1lUDc5SjJNM0N4bGRVdnF3eVhOTXhC?=
+ =?utf-8?B?U3ZieWU0b1JWcm1LUWN6eDFqM3dPMHRVSVpJSWl6WGxqcTlNbmE4SjNZbXZF?=
+ =?utf-8?B?dC9Md0xDcm1FbmNtTTN4MW1NVGVoTi9QQnFzdWZTRkFWT0dlRWVCd1lBYSt5?=
+ =?utf-8?B?WjgxSjZYaTYvUGpzcGM5YllyQ2ZGa3hHampCcnRhb0ZlaHU1TEtKQzRGNDR0?=
+ =?utf-8?B?d0ladUNCWU9ncnJqYk9iWHFjN2JFVnpvNkRxUDM1T0h4eW1RdzErVkhVZklW?=
+ =?utf-8?B?MTM1eHlZR1pLRXNHT1VsdnVUTlp5Q0h5RERXWC9xWEtMMXdITlc3dlFZZnVK?=
+ =?utf-8?B?ckpDQlRBLzZOZndjbU9jaUdiSEc0Q3JIOFBiNjBFL3dzcUhTRXRKRktZZTJZ?=
+ =?utf-8?B?dTdwR3JTVC9wSVFhcFhXU0JKTGhzaUwzejZuSDNkQjZuclg4K3JhRXBKNTJR?=
+ =?utf-8?B?bVE1clA2bjNubTdSa20wSFZ6MVFhN080OGhZbXB3blRqRUowZGtwWE5WWXRD?=
+ =?utf-8?B?RnFPanNYZEpSVDJJOVVxVVRvWG15UlBPS255S1J2WnRLcHJVallFSENVbHBY?=
+ =?utf-8?B?V3ZmWUIvMmVLYnI5Zmo2U3ZXVUxlNTAydXVjZXhHOFhhb3h0cmJjYTNKME1i?=
+ =?utf-8?B?VUFZTXJXN2N6N1hoRmJRcUZ2TDRyVnBQeStmY0tWL0FpMko4RGdOTUs5VWtW?=
+ =?utf-8?B?cmhTZGNJZmpFRGZkOW5kVENhbGJLcVl1SXZzSmlzTGgwZmpzejBlSlEwV1VL?=
+ =?utf-8?B?TzdWZHVjbEpxMjkvY3FQN2xpRjQvbVk1eWptUlYyb1dkNFBDbUU2K1hxOFVi?=
+ =?utf-8?B?NzZEYm9EZkMwT0pKbXJ6cHdUN1Q3VGZTR1czSXp3SERpUDN1UVgwQVczV2hq?=
+ =?utf-8?B?NVBHd2hNMlJ0VklqOXdsWU43dnd4Mk1rZVZnVnlYNUNjVjJ5VmZPZGk4aTVP?=
+ =?utf-8?B?Y1I5UW5QcW8wcXJQMWdxY3d5SGMyNnZlcHRzbFZub0REemlDcVlLL2Rmb0pU?=
+ =?utf-8?B?eEJtVVpLaDRaYzJmSmtMOGZUMzhzYTJLYlp3RldTMkttQ0xtbSs3cmozYTNv?=
+ =?utf-8?B?UG9VTlBRSFVJcGVNOGJjbTV6VlI0VGpTSEQxRFR5S1RHQVZmRXNFTFVxRGk4?=
+ =?utf-8?B?YUJJZGp2eHBlUW03VU5TTnBseGU0MnllQy9aOHNTOHphQlRlYklLYm90UzRR?=
+ =?utf-8?B?c1FBYWFGUG1FQmtBN1dobGhTaSsxSjUrWjFoTDZ1UW1YN1ltTVZqM09hUVdR?=
+ =?utf-8?B?TC9rUjluOW55NE9ra0VacXc0RzBZbmpzQ2lBQmYzb3NvYWlMczR2OUlaaDZD?=
+ =?utf-8?B?bWdKWXhPZ29wNG80cVQwdmM3MlVGMTYxUjZrOHRUMEFqd2FSQVU3bXRvVEtL?=
+ =?utf-8?B?Y3A5dDhsTk9ySW1xUTFmUGFxNzlWUXpaVnd6azVGWFJCMFRLSnNoUmJQMDJ4?=
+ =?utf-8?B?WDJWQ25YYkFKRW5XczJsNXRzS1owS0lFTGppTyt3ZlRPTUQwdUJoeHByWkFs?=
+ =?utf-8?B?VFA5V0tHUFJYMTZzQ0N6NjZkRGU5TkFXcFAyUUpFUGVVUXNMaFhpeElMdk0w?=
+ =?utf-8?B?QTQxSVFsV3RWQllpcmhPeHNycFE4d2JXeTBUbVdGaFdYb3pxazNGTUtaWEU1?=
+ =?utf-8?Q?Mp2LtTiQ/a/VHb+gslWl7Lz4W?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2436ad62-4acb-44be-97f6-08dc39729ce8
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 22:06:00.2644
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1EieVvu5b1Fz+mPrnw/Xip9MMrDqCddjJLrVZ6m82o0iktvaKhCMEYp926WoFqRYcUQpV53b1rVHUh5Q4rQ/2A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6217
 
-On Tue, 27 Feb 2024 13:25:56 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On 2/29/2024 1:11 AM, Shameer Kolothum wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+> The deferred_reset logic was added to vfio migration drivers to prevent
+> a circular locking dependency with respect to mm_lock and state mutex.
+> This is mainly because of the copy_to/from_user() functions(which takes
+> mm_lock) invoked under state mutex. But for HiSilicon driver, the only
+> place where we now hold the state mutex for copy_to_user is during the
+> PRE_COPY IOCTL. So for pre_copy, release the lock as soon as we have
+> updated the data and perform copy_to_user without state mutex. By this,
+> we can get rid of the deferred_reset logic.
+> 
+> Link: https://lore.kernel.org/kvm/20240220132459.GM13330@nvidia.com/
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-> On Tue, 27 Feb 2024 11:27:08 +0100
-> David Hildenbrand <david@redhat.com> wrote:
->=20
-> > On 26.02.24 18:32, Alex Williamson wrote: =20
-> > > On Tue, 27 Feb 2024 01:14:54 +0800
-> > > Yisheng Xie <ethan.xys@linux.alibaba.com> wrote:
-> > >    =20
-> > >> =E5=9C=A8 2024/2/27 00:14, Alex Williamson =E5=86=99=E9=81=93:   =20
-> > >>> On Tue, 27 Feb 2024 00:01:06 +0800
-> > >>> Yisheng Xie<ethan.xys@linux.alibaba.com>  wrote:
-> > >>>      =20
-> > >>>> We meet a warning as following:
-> > >>>>    WARNING: CPU: 99 PID: 1766859 at mm/gup.c:209 try_grab_page.par=
-t.0+0xe8/0x1b0
-> > >>>>    CPU: 99 PID: 1766859 Comm: qemu-kvm Kdump: loaded Tainted: GOE =
- 5.10.134-008.2.x86_64 #1   =20
-> > >>>                                                                    =
-  ^^^^^^^^
-> > >>>
-> > >>> Does this issue reproduce on mainline?  Thanks,   =20
-> > >>
-> > >> I have check the code of mainline, the logical seems the same as my
-> > >> version.
-> > >>
-> > >> so I think it can reproduce if i understand correctly.   =20
-> > >=20
-> > > I obviously can't speak to what's in your 5.10.134-008.2 kernel, but I
-> > > do know there's a very similar issue resolved in v6.0 mainline and
-> > > included in v5.10.146 of the stable tree.  Please test.  Thanks,   =20
-> >=20
-> > This commit, to be precise:
-> >=20
-> > commit 873aefb376bbc0ed1dd2381ea1d6ec88106fdbd4
-> > Author: Alex Williamson <alex.williamson@redhat.com>
-> > Date:   Mon Aug 29 21:05:40 2022 -0600
-> >=20
-> >      vfio/type1: Unpin zero pages
-> >     =20
-> >      There's currently a reference count leak on the zero page.  We inc=
-rement
-> >      the reference via pin_user_pages_remote(), but the page is later h=
-andled
-> >      as an invalid/reserved page, therefore it's not accounted against =
-the
-> >      user and not unpinned by our put_pfn().
-> >     =20
-> >      Introducing special zero page handling in put_pfn() would resolve =
-the
-> >      leak, but without accounting of the zero page, a single user could
-> >      still create enough mappings to generate a reference count overflo=
-w.
-> >     =20
-> >      The zero page is always resident, so for our purposes there's no r=
-eason
-> >      to keep it pinned.  Therefore, add a loop to walk pages returned f=
-rom
-> >      pin_user_pages_remote() and unpin any zero pages.
-> >=20
-> >=20
-> > BUT
-> >=20
-> > in the meantime, we also have
-> >=20
-> > commit c8070b78751955e59b42457b974bea4a4fe00187
-> > Author: David Howells <dhowells@redhat.com>
-> > Date:   Fri May 26 22:41:40 2023 +0100
-> >=20
-> >      mm: Don't pin ZERO_PAGE in pin_user_pages()
-> >     =20
-> >      Make pin_user_pages*() leave a ZERO_PAGE unpinned if it extracts a=
- pointer
-> >      to it from the page tables and make unpin_user_page*() correspondi=
-ngly
-> >      ignore a ZERO_PAGE when unpinning.  We don't want to risk overrunn=
-ing a
-> >      zero page's refcount as we're only allowed ~2 million pins on it -
-> >      something that userspace can conceivably trigger.
-> >     =20
-> >      Add a pair of functions to test whether a page or a folio is a ZER=
-O_PAGE.
-> >=20
-> >=20
-> > So the unpin_user_page_* won't do anything with the shared zeropage.
-> >=20
-> > (likely, we could revert 873aefb376bbc0ed1dd2381ea1d6ec88106fdbd4) =20
->=20
->=20
-> Yes, according to the commit log it seems like the unpin is now just
-> wasted work since v6.5.  Thanks!
+Shameer,
 
-I dusted off an old unit test for mapping the zeropage through vfio and
-started working on posting a revert for 873aefb376bb but I actually
-found that this appears to be resolved even before c8070b787519.  I
-bisected it to:
+Thanks for providing this example. After seeing this, it probably 
+doens't make sense to accept my 2/2 patch at 
+https://lore.kernel.org/kvm/20240228003205.47311-3-brett.creeley@amd.com/.
 
-commit 84209e87c6963f928194a890399e24e8ad299db1
-Author: David Hildenbrand <david@redhat.com>
-Date:   Wed Nov 16 11:26:48 2022 +0100
+I have reworked that patch and am currently doing some testing with it 
+to make sure it's functional. Once I have some results I will send a v3.
 
-    mm/gup: reliable R/O long-term pinning in COW mappings
-   =20
-    We already support reliable R/O pinning of anonymous memory.
-    However, assume we end up pinning (R/O long-term) a pagecache page
-    or the shared zeropage inside a writable private ("COW") mapping.
-    The next write access will trigger a write-fault and replace the
-    pinned page by an exclusive anonymous page in the process page
-    tables to break COW: the pinned page no longer corresponds to the
-    page mapped into the process' page table.=20
-    Now that FAULT_FLAG_UNSHARE can break COW on anything mapped into a
-    COW mapping, let's properly break COW first before R/O long-term
-    pinning something that's not an exclusive anon page inside a COW
-    mapping. FAULT_FLAG_UNSHARE will break COW and map an exclusive
-    anon page instead that can get pinned safely.
-   =20
-    With this change, we can stop using FOLL_FORCE|FOLL_WRITE for
-    reliable R/O long-term pinning in COW mappings.
+Thanks,
 
-[...]
+Brett
 
-    Note 3: For users that use FOLL_LONGTERM right now without
-    FOLL_WRITE, such as VFIO, we'd now no longer pin the shared
-    zeropage. Instead, we'd populate exclusive anon pages that we can
-    pin. There was a concern that this could affect the memlock limit
-    of existing setups.
-
-    For example, a VM running with VFIO could run into the memlock
-    limit and fail to run. However, we essentially had the same
-    behavior already in commit 17839856fd58 ("gup: document and work
-    around "COW can break either way" issue") which got merged into
-    some enterprise distros, and there were not any such complaints. So
-    most probably, we're fine.
-
-IIUC, c8070b787519 fixes that we can no longer run up the refcount on
-the zeropage but with the above we're no longer using the zeropage
-anyway.  I also confirm that after your commit above, my unit test that
-previously triggered this with a read-only, anonymous mmap generates no
-unpin hits in the vfio loop.
-
-Anyway, all that to say that I think we're doubly covered that removing
-the heinous workaround in vfio is overdue.  Thanks,
-
-Alex
-
+> ---
+>   .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 48 +++++--------------
+>   .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  6 +--
+>   2 files changed, 14 insertions(+), 40 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> index 4d27465c8f1a..9a3e97108ace 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> @@ -630,25 +630,11 @@ static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vde
+>          }
+>   }
+> 
+> -/*
+> - * This function is called in all state_mutex unlock cases to
+> - * handle a 'deferred_reset' if exists.
+> - */
+> -static void
+> -hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> +static void hisi_acc_vf_reset(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>   {
+> -again:
+> -       spin_lock(&hisi_acc_vdev->reset_lock);
+> -       if (hisi_acc_vdev->deferred_reset) {
+> -               hisi_acc_vdev->deferred_reset = false;
+> -               spin_unlock(&hisi_acc_vdev->reset_lock);
+> -               hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
+> -               hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+> -               hisi_acc_vf_disable_fds(hisi_acc_vdev);
+> -               goto again;
+> -       }
+> -       mutex_unlock(&hisi_acc_vdev->state_mutex);
+> -       spin_unlock(&hisi_acc_vdev->reset_lock);
+> +       hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
+> +       hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+> +       hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>   }
+> 
+>   static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> @@ -804,8 +790,10 @@ static long hisi_acc_vf_precopy_ioctl(struct file *filp,
+> 
+>          info.dirty_bytes = 0;
+>          info.initial_bytes = migf->total_length - *pos;
+> +       mutex_unlock(&migf->lock);
+> +       mutex_unlock(&hisi_acc_vdev->state_mutex);
+> 
+> -       ret = copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
+> +       return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
+>   out:
+>          mutex_unlock(&migf->lock);
+>          mutex_unlock(&hisi_acc_vdev->state_mutex);
+> @@ -1071,7 +1059,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
+>                          break;
+>                  }
+>          }
+> -       hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
+> +       mutex_unlock(&hisi_acc_vdev->state_mutex);
+>          return res;
+>   }
+> 
+> @@ -1092,7 +1080,7 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
+> 
+>          mutex_lock(&hisi_acc_vdev->state_mutex);
+>          *curr_state = hisi_acc_vdev->mig_state;
+> -       hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
+> +       mutex_unlock(&hisi_acc_vdev->state_mutex);
+>          return 0;
+>   }
+> 
+> @@ -1104,21 +1092,9 @@ static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
+>                                  VFIO_MIGRATION_STOP_COPY)
+>                  return;
+> 
+> -       /*
+> -        * As the higher VFIO layers are holding locks across reset and using
+> -        * those same locks with the mm_lock we need to prevent ABBA deadlock
+> -        * with the state_mutex and mm_lock.
+> -        * In case the state_mutex was taken already we defer the cleanup work
+> -        * to the unlock flow of the other running context.
+> -        */
+> -       spin_lock(&hisi_acc_vdev->reset_lock);
+> -       hisi_acc_vdev->deferred_reset = true;
+> -       if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
+> -               spin_unlock(&hisi_acc_vdev->reset_lock);
+> -               return;
+> -       }
+> -       spin_unlock(&hisi_acc_vdev->reset_lock);
+> -       hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
+> +       mutex_lock(&hisi_acc_vdev->state_mutex);
+> +       hisi_acc_vf_reset(hisi_acc_vdev);
+> +       mutex_unlock(&hisi_acc_vdev->state_mutex);
+>   }
+> 
+>   static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> index dcabfeec6ca1..5bab46602fad 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> @@ -98,8 +98,8 @@ struct hisi_acc_vf_migration_file {
+> 
+>   struct hisi_acc_vf_core_device {
+>          struct vfio_pci_core_device core_device;
+> -       u8 match_done:1;
+> -       u8 deferred_reset:1;
+> +       u8 match_done;
+> +
+>          /* For migration state */
+>          struct mutex state_mutex;
+>          enum vfio_device_mig_state mig_state;
+> @@ -109,8 +109,6 @@ struct hisi_acc_vf_core_device {
+>          struct hisi_qm vf_qm;
+>          u32 vf_qm_state;
+>          int vf_id;
+> -       /* For reset handler */
+> -       spinlock_t reset_lock;
+>          struct hisi_acc_vf_migration_file *resuming_migf;
+>          struct hisi_acc_vf_migration_file *saving_migf;
+>   };
+> --
+> 2.34.1
+> 
 
