@@ -1,156 +1,235 @@
-Return-Path: <kvm+bounces-10542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEAE186D247
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 19:29:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0968B86D274
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 19:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEE131C23777
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 18:29:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 297DE1C20B7F
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 18:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53483134406;
-	Thu, 29 Feb 2024 18:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2EBC7E580;
+	Thu, 29 Feb 2024 18:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ft0sFR8H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v98Jnhab"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A347A15C
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 18:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DCC224D7
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 18:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709231303; cv=none; b=Cvz+XyMpTD19hU6IvgfktqIO3e/6YAhUnjM/I8hk87RteWfeuoebJmnvTp/y8Ve/ueo/vrHKAkFg7bF6nd6+i9XU7mXFto8Jsk0r6YRvcHtBOb/gNGBxuucOIJSUHeo8ViqCeOaVxCLllCPMrvS5RZCNS39e5732c0j9ZzBNYn4=
+	t=1709232008; cv=none; b=gN2EEup9TVBfxXxXyxVtVeZTTG5UO2ZBkO5ORbchlFlLU9yCNv43rB/Q3DbaFTtEZoIZt6KQfcEBUoAnc0itPbiuer5UwnKWqWwfURLOg98TdUUjpw8rEOmcXJ7tGGsLKn7qspmJ8qIvg82CNlCKlNR+SW9htHDE9rEEawOSn/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709231303; c=relaxed/simple;
-	bh=TsNS9H9GnTpwvcccMLUCGH9dbY20A+4uTVdeOoyOT04=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nFbF7utSlF/vcI6hxsF6A3a8WeooTRCjRtYKZ59vE/Dov62YSYs5PMRN/4jyFLgY/AYtHWe/0ITPfPTT9N2mHh4lUhVvrO0f0rOw+1xr3LtBXF0C+LMdfOg30UT3I64G493L68+8iNL6vF1uMsKxGAVihSLVFKahcbwa4V2tbHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Ft0sFR8H; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1dc96f64c10so12414615ad.1
-        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 10:28:19 -0800 (PST)
+	s=arc-20240116; t=1709232008; c=relaxed/simple;
+	bh=EfSzWHQXiIuv/QXiMcoNXY6pXi3oCnDesgNhCcVu5z4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tcr3YH7W0ptEQ1M01JrxpAnktFqxJ68RiLeg4uI5+8VCTzehB984tuvQ5TjlPkJjDdPhBvVDf8zRHjJHtCa+PJVbeTUosHqj4OkgoczoZRzSBlvoBEGsEGJJF6OUAfNpERC1E57ekzdtiI2o1JL6XTD9EB2HokZ7FpZXgLUbJqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v98Jnhab; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60904453110so15524277b3.2
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 10:40:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1709231299; x=1709836099; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=S7hpS9VpNEze5H4aDuNsMr11UTcGSJ5cm/3AR7/T5Hc=;
-        b=Ft0sFR8H+zbuiyIAKexQ970Fx7JhlQ21wk125e53FUT7WAKC0Kv6b32aFjCXt31Cdw
-         YwYLEbkFU1Po8mGu8gHM0AYQkev29ajaqmVNJ4DBrDOwUjH4EJ7hpCS/vvFEMnYKoku/
-         +7G7W9Sd+q+dG+9hp6MIjgFNMao++iFBvT/iM=
+        d=google.com; s=20230601; t=1709232005; x=1709836805; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vY/rdOoD7orW1sSyXqQMEdLlDPVHr5lpBJycktuWo78=;
+        b=v98JnhabzmqTSfjRq8Je7E5qmQeMOZC6VxwZfVfo30sJoX6NsNLR/KOz7t8MiLnF2n
+         DPbWvdtLZ60biyTC7scafSoEnF5ppBAbu3+9lzuKSdYDzL6vFwxYkPNSzuR3CgAGeXRH
+         NKxBxkTNc7FTgIcuYAD5BK4+bw54wqNX3M35ocCo/PvEFe9nVHbyQsrCRK9PRze8P36E
+         1Bi54/TgcYMKz71c8Myr8pvTJiSYvn3d79rCLyZcEEulFCqCj5CybtiQrpVbDL1wtj4o
+         iF/6Uq2dGV4Te9plU0lblnxmqr9xW/RinYxB/IvV4u8RtDhkUK7T2JQtJoUU1Fsb4iZw
+         VHJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709231299; x=1709836099;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S7hpS9VpNEze5H4aDuNsMr11UTcGSJ5cm/3AR7/T5Hc=;
-        b=kZQdpXm5WfTPW3z+mDJn1Zy187OfRNyx/L+kYf3PvlRW7+KMhiprp83sX3nMH7GsA+
-         ygzSX8IUHUftiKX81xukhc69EoaOkt2C7m3a6sJOCdyh0SwNpRwbHhQes1zGHfP3Ye06
-         o2ronce9i/SeXreVXh1ENxJuh+OPPhuBwqq0lTUj8rGuzN8e4NDDokY/y2PMqbbxaJb3
-         NsvLZd06Q44QMKFp6IYx8JejeiwE8MmU1mfIyJa9vRtkKKJWNIHiuM7HPdIXe78eHBWU
-         e3xEQ+l4g2w9jKl95NvzGNbqWdKeMBrgtgxZEb7wMV/cAZVD/dYX9uiRf/8y7oOsqZYH
-         +25A==
-X-Forwarded-Encrypted: i=1; AJvYcCWL2PgxXJIHN+vdVC5ZDG1Rj2DsQfD8USwNQI+xdWubQt7+nS4+SNY7qtAfcA5P5tm2ozu5cSdwJvIOGKx/4OSJGg6f
-X-Gm-Message-State: AOJu0Ywa80q13c4p447AZaPqgPXGTcLaR3NfGkzxrpTpOpsvrG3Zk9wZ
-	+KPqVhX7cjKmEZatvx2rCgihRZYpGAjv6hZf+PzkN9FWTySMguah/x21qeR8iQ==
-X-Google-Smtp-Source: AGHT+IFv6v7GCq84bRF/XSbui043ytODMyWUS4Rfqf+IDs54+SrN6ooF1PL5gcE4I2rCfOz2B9orlw==
-X-Received: by 2002:a17:902:c394:b0:1dc:1831:8ede with SMTP id g20-20020a170902c39400b001dc18318edemr3025429plg.53.1709231299355;
-        Thu, 29 Feb 2024 10:28:19 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id n4-20020a170903110400b001dc391cc28fsm1798569plh.121.2024.02.29.10.28.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 10:28:18 -0800 (PST)
-Date: Thu, 29 Feb 2024 10:28:18 -0800
-From: Kees Cook <keescook@chromium.org>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: Brendan Higgins <brendanhiggins@google.com>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Alan Maguire <alan.maguire@oracle.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-	James Morris <jamorris@linux.microsoft.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
-	Marco Pagani <marpagan@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Thara Gopinath <tgopinath@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-um@lists.infradead.org, x86@kernel.org
-Subject: Re: [PATCH v1 8/8] kunit: Add tests for faults
-Message-ID: <202402291027.6F0E4994@keescook>
-References: <20240229170409.365386-1-mic@digikod.net>
- <20240229170409.365386-9-mic@digikod.net>
+        d=1e100.net; s=20230601; t=1709232005; x=1709836805;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vY/rdOoD7orW1sSyXqQMEdLlDPVHr5lpBJycktuWo78=;
+        b=GjtlxXfmEHkaMAkfB0L/hx9rHqxg2tCtw5UPdwkNlJC12JwC9FrH9MvE+MRu5TaGW5
+         Yy7TVf6GrvV4zQaaXPzi7nZTvRASZI622Spgs0fDbNuSsMSKs0uyDA4SsP75Rw9fnjRn
+         kdpwS/05wVURklPBi40c2UQBBVB/WBszS5DDcIt9yhWS2F7JIpZLQv30i76gpzuAPclH
+         KW+7/NYAHpwSzwmnw30qgbnWOAT1zPyxZO3goJU4EgA+GdAl+pfDgOX63j6eVcaI3QWu
+         lBHIfcq+802Aq5Ays7pH4pRhtvw/owsA9Lc60fQiHaplRQVlir0SeY/JycLu5s1ATulF
+         WfOg==
+X-Gm-Message-State: AOJu0YxHA71C6qyfVWoYSb71r3JOyYR/m8+s630bmNcPBC/RjdbeKmfF
+	qEhSty/apNFI1yjHxYz8f14VtkdKqXoQffqJ9PwPx7NUN85fjWOBOncItS2ZHdrSnQdeQITI8gu
+	GPQ==
+X-Google-Smtp-Source: AGHT+IEg+77D7oFXFUtb7myxTYn0+eui+WQiWZe+o6cGIvgW/UaK+dQNFE4gTiVy8VFY9DzEUtC/JeMjDT8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:9b47:0:b0:608:1b39:246b with SMTP id
+ s68-20020a819b47000000b006081b39246bmr706371ywg.3.1709232005455; Thu, 29 Feb
+ 2024 10:40:05 -0800 (PST)
+Date: Thu, 29 Feb 2024 10:40:03 -0800
+In-Reply-To: <CABgObfbtPJ6AAX9GnjNscPRTbNAOtamdxX677kx_r=zd4scw6w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240229170409.365386-9-mic@digikod.net>
+Mime-Version: 1.0
+References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-3-seanjc@google.com>
+ <CABgObfbtPJ6AAX9GnjNscPRTbNAOtamdxX677kx_r=zd4scw6w@mail.gmail.com>
+Message-ID: <ZeDPgx1O_AuR2Iz3@google.com>
+Subject: Re: [PATCH 02/16] KVM: x86: Remove separate "bit" defines for page
+ fault error code masks
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 29, 2024 at 06:04:09PM +0100, Mickaël Salaün wrote:
-> The first test checks NULL pointer dereference and make sure it would
-> result as a failed test.
-> 
-> The second and third tests check that read-only data is indeed read-only
-> and trying to modify it would result as a failed test.
-> 
-> This kunit_x86_fault test suite is marked as skipped when run on a
-> non-x86 native architecture.  It is then skipped on UML because such
-> test would result to a kernel panic.
-> 
-> Tested with:
-> ./tools/testing/kunit/kunit.py run --arch x86_64 kunit_x86_fault
-> 
-> Cc: Brendan Higgins <brendanhiggins@google.com>
-> Cc: David Gow <davidgow@google.com>
-> Cc: Rae Moar <rmoar@google.com>
-> Cc: Shuah Khan <skhan@linuxfoundation.org>
-> Signed-off-by: Mickaël Salaün <mic@digikod.net>
+On Thu, Feb 29, 2024, Paolo Bonzini wrote:
+> On Wed, Feb 28, 2024 at 3:46=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> > index 60f21bb4c27b..e8b620a85627 100644
+> > --- a/arch/x86/kvm/mmu.h
+> > +++ b/arch/x86/kvm/mmu.h
+> > @@ -213,7 +213,7 @@ static inline u8 permission_fault(struct kvm_vcpu *=
+vcpu, struct kvm_mmu *mmu,
+> >          */
+> >         u64 implicit_access =3D access & PFERR_IMPLICIT_ACCESS;
+> >         bool not_smap =3D ((rflags & X86_EFLAGS_AC) | implicit_access) =
+=3D=3D X86_EFLAGS_AC;
+> > -       int index =3D (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
+> > +       int index =3D (pfec + (not_smap << ilog2(PFERR_RSVD_MASK))) >> =
+1;
+>=20
+> Just use "(pfec + (not_smap ? PFERR_RSVD_MASK : 0)) >> 1".
+>=20
+> Likewise below, "pte_access & PT_USER_MASK ? PFERR_RSVD_MASK : 0"/
+>=20
+> No need to even check what the compiler produces, it will be either
+> exactly the same code or a bunch of cmov instructions.
 
-If we can add some way to collect WARN/BUG output for examination, I
-could rewrite most of LKDTM in KUnit! I really like this!
+I couldn't resist :-)
 
-> ---
->  lib/kunit/kunit-test.c | 115 ++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 114 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/kunit/kunit-test.c b/lib/kunit/kunit-test.c
-> index f7980ef236a3..57d8eff00c66 100644
-> --- a/lib/kunit/kunit-test.c
-> +++ b/lib/kunit/kunit-test.c
-> @@ -10,6 +10,7 @@
->  #include <kunit/test-bug.h>
->  
->  #include <linux/device.h>
-> +#include <linux/init.h>
->  #include <kunit/device.h>
->  
->  #include "string-stream.h"
-> @@ -109,6 +110,117 @@ static struct kunit_suite kunit_try_catch_test_suite = {
->  	.test_cases = kunit_try_catch_test_cases,
->  };
->  
-> +#ifdef CONFIG_X86
+The second one generates identical code, but for this one:
 
-Why is this x86 specific?
+  int index =3D (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
 
--- 
-Kees Cook
+gcc generates almost bizarrely different code in the call from vcpu_mmio_gv=
+a_to_gpa().
+clang is clever enough to realize "pfec" can only contain USER_MASK and/or =
+WRITE_MASK,
+and so does a ton of dead code elimination and other optimizations.  But fo=
+r some
+reason, gcc doesn't appear to realize that, and generates a MOVSX when comp=
+uting
+"index", i.e. sign-extends the result of the ADD (at least, I think that's =
+what it's
+doing).
+
+There's no actual bug today, and the vcpu_mmio_gva_to_gpa() path is super s=
+afe
+since KVM fully controls the error code.  But the call from FNAME(walk_addr=
+_generic)
+uses a _much_ more dynamic error code.
+
+If an error code with unexpected bits set managed to get into permission_fa=
+ult(),
+I'm pretty sure we'd end up with out-of-bounds accesses.  KVM sanity checks=
+ that
+PK and RSVD aren't set,=20
+
+	WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
+
+but KVM unnecessarily uses an ADD instead of OR, here
+
+
+	int index =3D (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
+
+and here
+
+		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
+		offset =3D (pfec & ~1) +
+			((pte_access & PT_USER_MASK) << (PFERR_RSVD_BIT - PT_USER_SHIFT));
+
+i.e. if the WARN fired, KVM would generate completely unexpected values due=
+ to
+adding two RSVD bit flags.
+
+And if _really_ unexpected flags make their way into permission_fault(), e.=
+g. the
+upcoming RMP flag (bit 31) or Intel's SGX flag (bit 15), then the use of in=
+dex
+
+	fault =3D (mmu->permissions[index] >> pte_access) & 1;
+
+could generate a read waaaya outside of the array.  It can't/shouldn't happ=
+en in
+practice since KVM shouldn't be trying to emulate RMP violations or faults =
+in SGX
+enclaves, but it's unnecessarily dangerous.
+
+Long story short, I think we should get to the below (I'll post a separate =
+series,
+assuming I'm not missing something).
+
+	unsigned long rflags =3D static_call(kvm_x86_get_rflags)(vcpu);
+	unsigned int pfec =3D access & (PFERR_PRESENT_MASK |
+				      PFERR_WRITE_MASK |
+				      PFERR_USER_MASK |
+				      PFERR_FETCH_MASK);
+
+	/*
+	 * For explicit supervisor accesses, SMAP is disabled if EFLAGS.AC =3D 1.
+	 * For implicit supervisor accesses, SMAP cannot be overridden.
+	 *
+	 * SMAP works on supervisor accesses only, and not_smap can
+	 * be set or not set when user access with neither has any bearing
+	 * on the result.
+	 *
+	 * We put the SMAP checking bit in place of the PFERR_RSVD_MASK bit;
+	 * this bit will always be zero in pfec, but it will be one in index
+	 * if SMAP checks are being disabled.
+	 */
+	u64 implicit_access =3D access & PFERR_IMPLICIT_ACCESS;
+	bool not_smap =3D ((rflags & X86_EFLAGS_AC) | implicit_access) =3D=3D X86_=
+EFLAGS_AC;
+	int index =3D (pfec | (not_smap ? PFERR_RSVD_MASK : 0)) >> 1;
+	u32 errcode =3D PFERR_PRESENT_MASK;
+	bool fault;
+
+	kvm_mmu_refresh_passthrough_bits(vcpu, mmu);
+
+	fault =3D (mmu->permissions[index] >> pte_access) & 1;
+
+	/*
+	 * Sanity check that no bits are set in the legacy #PF error code
+	 * (bits 31:0) other than the supported permission bits (see above).
+	 */
+	WARN_ON_ONCE(pfec !=3D (unsigned int)access);
+
+	if (unlikely(mmu->pkru_mask)) {
+		u32 pkru_bits, offset;
+
+		/*
+		* PKRU defines 32 bits, there are 16 domains and 2
+		* attribute bits per domain in pkru.  pte_pkey is the
+		* index of the protection domain, so pte_pkey * 2 is
+		* is the index of the first bit for the domain.
+		*/
+		pkru_bits =3D (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
+
+		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
+		offset =3D (pfec & ~1) | (pte_access & PT_USER_MASK ? PFERR_RSVD_MASK : 0=
+);
+
+		pkru_bits &=3D mmu->pkru_mask >> offset;
+		errcode |=3D -pkru_bits & PFERR_PK_MASK;
+		fault |=3D (pkru_bits !=3D 0);
+	}
+
+	return -(u32)fault & errcode;
 
