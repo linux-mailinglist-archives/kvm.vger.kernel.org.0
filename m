@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-10416-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10417-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B2286C126
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:45:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E393186C127
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EEDE282F05
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:45:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B47E2845CF
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB0B44C7A;
-	Thu, 29 Feb 2024 06:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C822E3D388;
+	Thu, 29 Feb 2024 06:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NOsl95ok"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UdTav59X"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D080D15B1
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 06:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8695E15B1
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 06:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709189049; cv=none; b=eCTcjV7iFoHSL7v7OPXgiGiebIw6J/bPbRXy4SR0Qz4oeZRNcK0fLSMwfSEOfme+RU1fw3UMBeBRw5+ZzczPvHRtHzS6lrul9CZUdJcbwOFnyff26uSk9itdCNi2pgddl+mDxpvgITJj9dv7u2hqGVWqk3/+0v55kTTs+hEm07s=
+	t=1709189055; cv=none; b=qc5xDTdo+o/YQA2fPTUFu9ZY1ktt4QogyRT2AVJJs1XcYhYfJ3keXnlvE566EsCKmgzh7ozOvZK96hr/sr6LWaWsC2caD48nIdeGVbrM9CXKDw/sZfVsZGoQRDEXUoJS1LCJMfnRovCRG/TK6ExltiFsAh1+KoCsnTmmu3HZvKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709189049; c=relaxed/simple;
-	bh=KznjdvH3kuXEv/1tkBP3lz4cJ1FU6WY/9gVj9V1KPcg=;
+	s=arc-20240116; t=1709189055; c=relaxed/simple;
+	bh=RrzkhDw1VtDi2hKo7a+7rAJ71YA5KKx9qyDrNK94Sdk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OFKead8pyf04AIoJyn1pE7/hd5f4IFinP5Y0F81FHpT/yYD28EPk3ZwpkeR5uB/LI1Ts2shGOxc3HkHBx+FBsXoEMhiu2sr3nfc8haHNuXipxms3Aj+nu0Mee0i6NHh4lLfYX2a/7eYOxxK+ZKbZpp7vFNPHHxy2FMpstOxu2RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NOsl95ok; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=CLlr4jCt6XijvLxmcTy5sKGFNWyiduEjGLWQpXbT7KoIK3QUUX77paME50qejMsLhgXMPZ6PkvVNg5XStkaTagtyM8kGleBuR8LgQ58iOcJW+WSRX0MtPzYxxcyqqnexdGQhzKmX0BPhWpselqByyHkOkYXwmBAorg0Tp4/+cy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UdTav59X; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709189047; x=1740725047;
+  t=1709189053; x=1740725053;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KznjdvH3kuXEv/1tkBP3lz4cJ1FU6WY/9gVj9V1KPcg=;
-  b=NOsl95okEcPWnSBMgHu2tjhxIPiO/YzzGGCp3Hv8rLUZk/GUzZ7fzIWM
-   JJoCCrgFoqL8nCoiB4KO/+wqcUvtlhnyTJt/81WA/Gl5DgENUcYzdUvVA
-   ddw6rxLJdz6tZpYaACOdbyh6koQ1csts+NzEcjo+xxveFCqFXHUdjsCdr
-   u8VrgZ1gSUC0y9sj4nbyrXd0kUJmZX9U+Tb5Qe20or1DHd57WIstEXYl3
-   o8iTFZO5R59VWKj9mItRuWiVpN9nMF15/mfmgcdudthOARvVhocvEHb0B
-   c3vvVnrSgNHarHiCWptOGh+4f2sc36IkUxhRY4H2jx6qnjO6RQzZbURJ4
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3803271"
+  bh=RrzkhDw1VtDi2hKo7a+7rAJ71YA5KKx9qyDrNK94Sdk=;
+  b=UdTav59XzbwfOaKILbLdmb0WfjOy2+9/SDSNzUSYwoKEz5Z+eHMRBjfc
+   wZIYewpJIN1YGvsEeN9Lu56S6zFbHE862s4Jhieq604tlgSxprUDDYlEg
+   ei8fiTqr1+ni9KLOERJu4eKIy5DCexIjWpOLWrHF5L6S3KqgOAFvFI/5m
+   Qcw9ayEqopzltl5EBcyH/0nJSP7szD5xV934jBkux/Bg8bWWdmyXtUAr9
+   SaiU0UNZv8rOgPrpyEG+meVLcDVE1cofJvqb0Sr4WlGM1gqLaXZ3HxmaZ
+   KYg3+anFHydZMswfsx7cuf2CGto7IHuoe/qVuvo6taKKP9ajx9Ih2QHlW
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3803304"
 X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="3803271"
+   d="scan'208";a="3803304"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 22:44:07 -0800
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 22:44:13 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="8076477"
+   d="scan'208";a="8076514"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa007.jf.intel.com with ESMTP; 28 Feb 2024 22:44:01 -0800
+  by orviesa007.jf.intel.com with ESMTP; 28 Feb 2024 22:44:07 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -79,9 +79,9 @@ Cc: kvm@vger.kernel.org,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	xiaoyao.li@intel.com
-Subject: [PATCH v5 60/65] hw/i386: add option to forcibly report edge trigger in acpi tables
-Date: Thu, 29 Feb 2024 01:37:21 -0500
-Message-Id: <20240229063726.610065-61-xiaoyao.li@intel.com>
+Subject: [PATCH v5 61/65] i386/tdx: Don't synchronize guest tsc for TDs
+Date: Thu, 29 Feb 2024 01:37:22 -0500
+Message-Id: <20240229063726.610065-62-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240229063726.610065-1-xiaoyao.li@intel.com>
 References: <20240229063726.610065-1-xiaoyao.li@intel.com>
@@ -95,286 +95,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-When level trigger isn't supported on x86 platform,
-forcibly report edge trigger in acpi tables.
+TSC of TDs is not accessible and KVM doesn't allow access of
+MSR_IA32_TSC for TDs. To avoid the assert() in kvm_get_tsc, make
+kvm_synchronize_all_tsc() noop for TDs,
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Connor Kuehl <ckuehl@redhat.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/i386/acpi-build.c  | 99 ++++++++++++++++++++++++++++---------------
- hw/i386/acpi-common.c | 45 +++++++++++++++-----
- 2 files changed, 101 insertions(+), 43 deletions(-)
+ target/i386/kvm/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 15242b9096b5..8b493a2e9605 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -964,7 +964,8 @@ static void build_dbg_aml(Aml *table)
-     aml_append(table, scope);
- }
- 
--static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
-+static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg,
-+                           bool level_trigger_unsupported)
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index b1b0384b0c5c..83276e23b19f 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -277,7 +277,7 @@ void kvm_synchronize_all_tsc(void)
  {
-     Aml *dev;
-     Aml *crs;
-@@ -976,7 +977,10 @@ static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
-     aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
+     CPUState *cpu;
  
-     crs = aml_resource_template();
--    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
-+    aml_append(crs, aml_interrupt(AML_CONSUMER,
-+                                  level_trigger_unsupported ?
-+                                  AML_EDGE : AML_LEVEL,
-+                                  AML_ACTIVE_HIGH,
-                                   AML_SHARED, irqs, ARRAY_SIZE(irqs)));
-     aml_append(dev, aml_name_decl("_PRS", crs));
- 
-@@ -1000,7 +1004,8 @@ static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
-     return dev;
-  }
- 
--static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
-+static Aml *build_gsi_link_dev(const char *name, uint8_t uid,
-+                               uint8_t gsi, bool level_trigger_unsupported)
- {
-     Aml *dev;
-     Aml *crs;
-@@ -1013,7 +1018,10 @@ static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
- 
-     crs = aml_resource_template();
-     irqs = gsi;
--    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
-+    aml_append(crs, aml_interrupt(AML_CONSUMER,
-+                                  level_trigger_unsupported ?
-+                                  AML_EDGE : AML_LEVEL,
-+                                  AML_ACTIVE_HIGH,
-                                   AML_SHARED, &irqs, 1));
-     aml_append(dev, aml_name_decl("_PRS", crs));
- 
-@@ -1032,7 +1040,7 @@ static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
- }
- 
- /* _CRS method - get current settings */
--static Aml *build_iqcr_method(bool is_piix4)
-+static Aml *build_iqcr_method(bool is_piix4, bool level_trigger_unsupported)
- {
-     Aml *if_ctx;
-     uint32_t irqs;
-@@ -1040,7 +1048,9 @@ static Aml *build_iqcr_method(bool is_piix4)
-     Aml *crs = aml_resource_template();
- 
-     irqs = 0;
--    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL,
-+    aml_append(crs, aml_interrupt(AML_CONSUMER,
-+                                  level_trigger_unsupported ?
-+                                  AML_EDGE : AML_LEVEL,
-                                   AML_ACTIVE_HIGH, AML_SHARED, &irqs, 1));
-     aml_append(method, aml_name_decl("PRR0", crs));
- 
-@@ -1074,7 +1084,7 @@ static Aml *build_irq_status_method(void)
-     return method;
- }
- 
--static void build_piix4_pci0_int(Aml *table)
-+static void build_piix4_pci0_int(Aml *table, bool level_trigger_unsupported)
- {
-     Aml *dev;
-     Aml *crs;
-@@ -1087,12 +1097,16 @@ static void build_piix4_pci0_int(Aml *table)
-     aml_append(sb_scope, pci0_scope);
- 
-     aml_append(sb_scope, build_irq_status_method());
--    aml_append(sb_scope, build_iqcr_method(true));
-+    aml_append(sb_scope, build_iqcr_method(true, level_trigger_unsupported));
- 
--    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQ0")));
--    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQ1")));
--    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQ2")));
--    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQ3")));
-+    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQ0"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQ1"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQ2"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQ3"),
-+                                        level_trigger_unsupported));
- 
-     dev = aml_device("LNKS");
-     {
-@@ -1101,7 +1115,9 @@ static void build_piix4_pci0_int(Aml *table)
- 
-         crs = aml_resource_template();
-         irqs = 9;
--        aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL,
-+        aml_append(crs, aml_interrupt(AML_CONSUMER,
-+                                      level_trigger_unsupported ?
-+                                      AML_EDGE : AML_LEVEL,
-                                       AML_ACTIVE_HIGH, AML_SHARED,
-                                       &irqs, 1));
-         aml_append(dev, aml_name_decl("_PRS", crs));
-@@ -1187,7 +1203,7 @@ static Aml *build_q35_routing_table(const char *str)
-     return pkg;
- }
- 
--static void build_q35_pci0_int(Aml *table)
-+static void build_q35_pci0_int(Aml *table, bool level_trigger_unsupported)
- {
-     Aml *method;
-     Aml *sb_scope = aml_scope("_SB");
-@@ -1226,25 +1242,41 @@ static void build_q35_pci0_int(Aml *table)
-     aml_append(sb_scope, pci0_scope);
- 
-     aml_append(sb_scope, build_irq_status_method());
--    aml_append(sb_scope, build_iqcr_method(false));
-+    aml_append(sb_scope, build_iqcr_method(false, level_trigger_unsupported));
- 
--    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQA")));
--    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQB")));
--    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQC")));
--    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQD")));
--    aml_append(sb_scope, build_link_dev("LNKE", 4, aml_name("PRQE")));
--    aml_append(sb_scope, build_link_dev("LNKF", 5, aml_name("PRQF")));
--    aml_append(sb_scope, build_link_dev("LNKG", 6, aml_name("PRQG")));
--    aml_append(sb_scope, build_link_dev("LNKH", 7, aml_name("PRQH")));
-+    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQA"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQB"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQC"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQD"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKE", 4, aml_name("PRQE"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKF", 5, aml_name("PRQF"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKG", 6, aml_name("PRQG"),
-+                                        level_trigger_unsupported));
-+    aml_append(sb_scope, build_link_dev("LNKH", 7, aml_name("PRQH"),
-+                                        level_trigger_unsupported));
- 
--    aml_append(sb_scope, build_gsi_link_dev("GSIA", 0x10, 0x10));
--    aml_append(sb_scope, build_gsi_link_dev("GSIB", 0x11, 0x11));
--    aml_append(sb_scope, build_gsi_link_dev("GSIC", 0x12, 0x12));
--    aml_append(sb_scope, build_gsi_link_dev("GSID", 0x13, 0x13));
--    aml_append(sb_scope, build_gsi_link_dev("GSIE", 0x14, 0x14));
--    aml_append(sb_scope, build_gsi_link_dev("GSIF", 0x15, 0x15));
--    aml_append(sb_scope, build_gsi_link_dev("GSIG", 0x16, 0x16));
--    aml_append(sb_scope, build_gsi_link_dev("GSIH", 0x17, 0x17));
-+    aml_append(sb_scope, build_gsi_link_dev("GSIA", 0x10, 0x10,
-+                                            level_trigger_unsupported));
-+    aml_append(sb_scope, build_gsi_link_dev("GSIB", 0x11, 0x11,
-+                                            level_trigger_unsupported));
-+    aml_append(sb_scope, build_gsi_link_dev("GSIC", 0x12, 0x12,
-+                                            level_trigger_unsupported));
-+    aml_append(sb_scope, build_gsi_link_dev("GSID", 0x13, 0x13,
-+                                            level_trigger_unsupported));
-+    aml_append(sb_scope, build_gsi_link_dev("GSIE", 0x14, 0x14,
-+                                            level_trigger_unsupported));
-+    aml_append(sb_scope, build_gsi_link_dev("GSIF", 0x15, 0x15,
-+                                            level_trigger_unsupported));
-+    aml_append(sb_scope, build_gsi_link_dev("GSIG", 0x16, 0x16,
-+                                            level_trigger_unsupported));
-+    aml_append(sb_scope, build_gsi_link_dev("GSIH", 0x17, 0x17,
-+                                            level_trigger_unsupported));
- 
-     aml_append(table, sb_scope);
- }
-@@ -1426,6 +1458,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     PCMachineState *pcms = PC_MACHINE(machine);
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
-     X86MachineState *x86ms = X86_MACHINE(machine);
-+    bool level_trigger_unsupported = x86ms->eoi_intercept_unsupported;
-     AcpiMcfgInfo mcfg;
-     bool mcfg_valid = !!acpi_get_mcfg(&mcfg);
-     uint32_t nr_mem = machine->ram_slots;
-@@ -1458,7 +1491,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
-             build_x86_acpi_pci_hotplug(dsdt, pm->pcihp_io_base);
+-    if (kvm_enabled()) {
++    if (kvm_enabled() && !is_tdx_vm()) {
+         CPU_FOREACH(cpu) {
+             run_on_cpu(cpu, do_kvm_synchronize_tsc, RUN_ON_CPU_NULL);
          }
--        build_piix4_pci0_int(dsdt);
-+        build_piix4_pci0_int(dsdt, level_trigger_unsupported);
-     } else if (q35) {
-         sb_scope = aml_scope("_SB");
-         dev = aml_device("PCI0");
-@@ -1502,7 +1535,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         if (pm->pcihp_bridge_en) {
-             build_x86_acpi_pci_hotplug(dsdt, pm->pcihp_io_base);
-         }
--        build_q35_pci0_int(dsdt);
-+        build_q35_pci0_int(dsdt, level_trigger_unsupported);
-     }
- 
-     if (misc->has_hpet) {
-diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
-index 20f19269da40..d93281b13758 100644
---- a/hw/i386/acpi-common.c
-+++ b/hw/i386/acpi-common.c
-@@ -103,6 +103,7 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
-     const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(MACHINE(x86ms));
-     AcpiTable table = { .sig = "APIC", .rev = 3, .oem_id = oem_id,
-                         .oem_table_id = oem_table_id };
-+    bool level_trigger_unsupported = x86ms->eoi_intercept_unsupported;
- 
-     acpi_table_begin(&table, table_data);
-     /* Local APIC Address */
-@@ -122,18 +123,42 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
-                      IO_APIC_SECONDARY_ADDRESS, IO_APIC_SECONDARY_IRQBASE);
-     }
- 
--    if (x86mc->apic_xrupt_override) {
--        build_xrupt_override(table_data, 0, 2,
--            0 /* Flags: Conforms to the specifications of the bus */);
--    }
-+    if (level_trigger_unsupported) {
-+        /* Force edge trigger */
-+        if (x86mc->apic_xrupt_override) {
-+            build_xrupt_override(table_data, 0, 2,
-+                                 /* Flags: active high, edge triggered */
-+                                 1 | (1 << 2));
-+        }
-+
-+        for (i = x86mc->apic_xrupt_override ? 1 : 0; i < 16; i++) {
-+            build_xrupt_override(table_data, i, i,
-+                                 /* Flags: active high, edge triggered */
-+                                 1 | (1 << 2));
-+        }
-+
-+        if (x86ms->ioapic2) {
-+            for (i = 0; i < 16; i++) {
-+                build_xrupt_override(table_data, IO_APIC_SECONDARY_IRQBASE + i,
-+                                     IO_APIC_SECONDARY_IRQBASE + i,
-+                                     /* Flags: active high, edge triggered */
-+                                     1 | (1 << 2));
-+            }
-+        }
-+    } else {
-+        if (x86mc->apic_xrupt_override) {
-+            build_xrupt_override(table_data, 0, 2,
-+                    0 /* Flags: Conforms to the specifications of the bus */);
-+        }
- 
--    for (i = 1; i < 16; i++) {
--        if (!(x86ms->pci_irq_mask & (1 << i))) {
--            /* No need for a INT source override structure. */
--            continue;
-+        for (i = 1; i < 16; i++) {
-+            if (!(x86ms->pci_irq_mask & (1 << i))) {
-+                /* No need for a INT source override structure. */
-+                continue;
-+            }
-+            build_xrupt_override(table_data, i, i,
-+                0xd /* Flags: Active high, Level Triggered */);
-         }
--        build_xrupt_override(table_data, i, i,
--            0xd /* Flags: Active high, Level Triggered */);
-     }
- 
-     if (x2apic_mode) {
 -- 
 2.34.1
 
