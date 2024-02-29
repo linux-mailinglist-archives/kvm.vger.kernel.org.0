@@ -1,220 +1,247 @@
-Return-Path: <kvm+bounces-10466-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10467-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 876DA86C551
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 10:33:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F36686C567
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 10:35:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAF8228F39A
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:33:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04F17291773
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35605DF1F;
-	Thu, 29 Feb 2024 09:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE43F5F480;
+	Thu, 29 Feb 2024 09:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CHFij9P8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+ic0V/N"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC6B5D90E;
-	Thu, 29 Feb 2024 09:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1A05EE98
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 09:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709199218; cv=none; b=LUlh2XUyl09jKgcmwM6x6WkuxESv7oh7FWWyhNpH2CgO3XBFFIzzApVaqR9OFbVJlH0NZHULQZkk8gY67s+NQCutP/A3Ud9389yoK2preCaQ6GReJF/zGfJq2RDn2Di3Aq4jCXcb72Ia8XQIm3SVwKyAxtCo2rlw4VACkiL/tzA=
+	t=1709199274; cv=none; b=GMMJlFpIyVblPNkey1mY/kiGafKJmQ8JXy0wlRsZF11ZDgPTi75uTigGtZ4/5UoWyjDacjIbOvUlf5aYDU+4UuJDGwIjizVkuYx5c4kNAZEjxgA4qRv/4wb1YiQ1U2udCuxyVdtuURWNfh/sjwbTj4/daYLVWQaX7BUr7XBXj+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709199218; c=relaxed/simple;
-	bh=6hEUsDoKnBdMgOpUQ7bGbCK6eMHLI2mgEGsfeFNJJv4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=F1HJlF97JGGa6zP+0J0a/pyb7Q3uury3rgX+t6BP867+D8Z1+74e5OHqeEyiGOIMNh67j7jTc06SIzYMN8v9pQVNLpFf/OzIcjnURcF8yxNmKUtO80Z0vcb5yRSLY6bHxAXue9/on4+scPb1w+X6jwvCdJtMgGX91xJwuvyI/Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CHFij9P8; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=6hEUsDoKnBdMgOpUQ7bGbCK6eMHLI2mgEGsfeFNJJv4=; b=CHFij9P83Tatoksu8XpECuSLzz
-	B4T+aCmM7b1HQHgGuNcVep+4nvjsxVuyM9YtKJHhqriPOyjS1/i74vxsvLiLz6cUvZ0jsxF21uTZ2
-	rwpTrwKHVRMSzNJpyqQhJCCzygk4Qh1GedSwuwSEF2eQN8KDs7r+5SOpWhCwEbn4idvKOoDlHuXhv
-	x9aOmOEio9MtNFLKVDt90NRdaadGO6rb70YYhYKUv2aRiUpwLwrIVxwknDlt0oVEPLZ4qoiYZtz8h
-	5WydFVwAbh1oe/U8ilnhQt/xLahAmZp/cylLdq1ID4kQyMyj8hVbdOYoSl36gUK2zFfiTlnZt11Dn
-	JlVT1bFg==;
-Received: from [54.239.6.188] (helo=freeip.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rfcn9-00000007gdx-2XkT;
-	Thu, 29 Feb 2024 09:33:27 +0000
-Message-ID: <16781c35a30cc5d8548da66303b323436187bbd9.camel@infradead.org>
-Subject: Re: [RFC PATCH 00/73] KVM: x86/PVM: Introduce a new hypervisor
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, linux-kernel@vger.kernel.org, 
- Lai Jiangshan <jiangshan.ljs@antgroup.com>, Linus Torvalds
- <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>,
- Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Ingo
- Molnar <mingo@redhat.com>, kvm@vger.kernel.org,  x86@kernel.org, Kees Cook
- <keescook@chromium.org>, Juergen Gross <jgross@suse.com>,  Hou Wenlong
- <houwenlong.hwl@antgroup.com>
-Date: Thu, 29 Feb 2024 10:33:24 +0100
-In-Reply-To: <Zd4bhQPwZDvyrF44@google.com>
-References: <20240226143630.33643-1-jiangshanlai@gmail.com>
-	 <CABgObfaSGOt4AKRF5WEJt2fGMj_hLXd7J2x2etce2ymvT4HkpA@mail.gmail.com>
-	 <Zd4bhQPwZDvyrF44@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-GgRoAFd51iO6aDo8KasU"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1709199274; c=relaxed/simple;
+	bh=GkGAw/dbvtAPuNf/2pfICzWyjWviIwP6O5SJmj0u3KA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B1Z4i+r5EjgZCpbZK0m6Mwf4xgcA3PzJNOJ19MCa7D+SdcxhScqCwVSos6h/jfeCTgf7zW34JP6wXufVhgzE5BL9ZPM32n7vPAKyWkJN8YiPeesKTf5L887ozttxaDdHfPnixGTJ2jt3XBGQAm1hElAXvbg/fz5gQhj+02GtnL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+ic0V/N; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709199271;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TZsdg3ZN0LxY9nQESQ96ahFfH0ahlO3yM9XYoF9kTdE=;
+	b=R+ic0V/NoM8GgFQi+NvpZvZqbffRRV7hW5uafPPt9ZrXzTME8zPm1Je+gLMKp+fuL/NRJM
+	4UdF/hCprvzdLrnOC/YtiuxMp51+BBg0upG5TEjf+7wp2IfOTeG4+rQ4HLuhvvJO41gIcB
+	y3wbMMluRf11jtyFx5Gi5iUF6UBgYh0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-473-u16iwLd1NC-pKSO3gWaWbg-1; Thu, 29 Feb 2024 04:34:29 -0500
+X-MC-Unique: u16iwLd1NC-pKSO3gWaWbg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-412b0d34a42so3246955e9.0
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 01:34:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709199268; x=1709804068;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TZsdg3ZN0LxY9nQESQ96ahFfH0ahlO3yM9XYoF9kTdE=;
+        b=qS43QsETxeHPOjhOCzrnC7DUI92I/o/ciNH4ZRmpNAF5F120zEE0qHanf8bh30rQjQ
+         tFpd+cXphuN2lavNkjZt6NgP1jI890ZJy/Kbhrrhs6ImibHeoKbE6sjuNYEcVPueBlpE
+         VoYRJVmpuetMce9PR+WotZTEKOTOHT2BcnqxjNoqI2ASs8tH5I+NuV3s8O5VBkt/059j
+         LPC1UmBzCwaobNaPeqtdv65sHkrdonUwdC2Y353fY3kuzVHaNWSWoox+awDHLNX8Ttck
+         hZF6F3S4clpiE61g9eom2uT5jY0iFgOJSh+5/g8Ij1GRfqPYanKRhYShdOkwQwU8GBt9
+         KADw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfBKwl5xMMyaR0zjAM3yiVbOMwluSF1y27PUjMSaEYhXfmDWLDUcbNjOmZV8l8W+9ZHhyMBKvBLXTDL3KNnDicaGfU
+X-Gm-Message-State: AOJu0YxZ6HW1Q2O01JZcI3CBMV3aCU8iSfwdZ78g3RYVRq8gAfZkMrIy
+	9db3Tn6Ac346vKfWoc4YZ03SJTX+6VyqnekRn881eF3pDkRAPNe7n7Jhj7PuTi41hN3/Pya3rha
+	VJ9/j4NciH2PkMGxwDG4U0hdIA2WV8IqcA3tDgJYejmRF/2YQqw==
+X-Received: by 2002:a05:600c:1548:b0:412:aec6:484f with SMTP id f8-20020a05600c154800b00412aec6484fmr1414591wmg.15.1709199268315;
+        Thu, 29 Feb 2024 01:34:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEfnF8uRkHXZC7wKNnT1fDTSMQyKX3qeooc5Rt0FsbIbstjuFdW8armLc3YEo+G0sH6Cq11xQ==
+X-Received: by 2002:a05:600c:1548:b0:412:aec6:484f with SMTP id f8-20020a05600c154800b00412aec6484fmr1414542wmg.15.1709199267841;
+        Thu, 29 Feb 2024 01:34:27 -0800 (PST)
+Received: from redhat.com ([2a02:14f:178:d6b0:a21c:61c4:2098:5db])
+        by smtp.gmail.com with ESMTPSA id o17-20020adfa111000000b0033df8854f0dsm1256096wro.26.2024.02.29.01.34.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 01:34:27 -0800 (PST)
+Date: Thu, 29 Feb 2024 04:34:20 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-um@lists.infradead.org, netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for
+ premapped vq
+Message-ID: <20240229043238-mutt-send-email-mst@kernel.org>
+References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
+ <20240229031755-mutt-send-email-mst@kernel.org>
+ <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
+
+On Thu, Feb 29, 2024 at 05:02:37PM +0800, Xuan Zhuo wrote:
+> On Thu, 29 Feb 2024 03:21:14 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Thu, Feb 29, 2024 at 03:20:25PM +0800, Xuan Zhuo wrote:
+> > > As discussed:
+> > > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
+> > >
+> > > If the virtio is premapped mode, the driver should manage the dma info by self.
+> > > So the virtio core should not store the dma info.
+> > > So we can release the memory used to store the dma info.
+> > >
+> > > But if the desc_extra has not dma info, we face a new question,
+> > > it is hard to get the dma info of the desc with indirect flag.
+> > > For split mode, that is easy from desc, but for the packed mode,
+> > > it is hard to get the dma info from the desc. And for hardening
+> > > the dma unmap is saft, we should store the dma info of indirect
+> > > descs.
+> > >
+> > > So I introduce the "structure the indirect desc table" to
+> > > allocate space to store dma info with the desc table.
+> > >
+> > > On the other side, we mix the descs with indirect flag
+> > > with other descs together to share the unmap api. That
+> > > is complex. I found if we we distinguish the descs with
+> > > VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> > >
+> > > Because of the dma array is allocated in the find_vqs(),
+> > > so I introduce a new parameter to find_vqs().
+> > >
+> > > Note:
+> > >     this is on the top of
+> > >         [PATCH vhost v1] virtio: packed: fix unmap leak for indirect desc table
+> > >         http://lore.kernel.org/all/20240223071833.26095-1-xuanzhuo@linux.alibaba.com
+> > >
+> > > Please review.
+> > >
+> > > Thanks
+> > >
+> > > v3:
+> > >     1. fix the conflict with the vp_modern_create_avq().
+> >
+> > Okay but are you going to address huge memory waste all this is causing for
+> > - people who never do zero copy
+> > - systems where dma unmap is a nop
+> >
+> > ?
+> >
+> > You should address all comments when you post a new version, not just
+> > what was expedient, or alternatively tag patch as RFC and explain
+> > in commit log that you plan to do it later.
+> 
+> 
+> Do you miss this one?
+> http://lore.kernel.org/all/1708997579.5613105-1-xuanzhuo@linux.alibaba.com
 
 
---=-GgRoAFd51iO6aDo8KasU
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I did. The answer is that no, you don't get to regress memory usage
+for lots of people then fix it up.
+So the patchset is big, I guess it will take a couple of cycles to
+merge gradually.
 
-On Tue, 2024-02-27 at 09:27 -0800, Sean Christopherson wrote:
->=20
-> The bulk of the pain with nested hardware virtualization lies in having t=
-o emulate
-> VMX/SVM, and shadow L1's TDP page tables.=C2=A0 Hyper-V's eVMCS takes som=
-e of the sting
-> off nVMX in particular, but eVMCS is still hobbled by its desire to be al=
-most
-> drop-in compatible with VMX.
->=20
-> If we're willing to define a fully PV interface between L0 and L1 hypervi=
-sors, I
-> suspect we provide performance far, far better than nVMX/nSVM.=C2=A0 E.g.=
- if L0 provides
-> a hypercall to map an L2=3D>L1 GPA, then L0 doesn't need to shadow L1 TDP=
-, and L1
-> doesn't even need to maintain hardware-defined page tables, it can use wh=
-atever
-> software-defined data structure best fits it needs.
+> I asked you. But I didnot recv your answer.
+> 
+> Thanks.
+> 
+> 
+> >
+> > > v2:
+> > >     1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS + 2
+> > >         addr + len pairs.
+> > >     2. introduce virtnet_sq_free_stats for __free_old_xmit
+> > >
+> > > v1:
+> > >     1. rename transport_vq_config to vq_transport_config
+> > >     2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS +2)
+> > >     3. introduce virtqueue_dma_map_sg_attrs
+> > >     4. separate vring_create_virtqueue to an independent commit
+> > >
+> > >
+> > >
+> > > Xuan Zhuo (19):
+> > >   virtio_ring: introduce vring_need_unmap_buffer
+> > >   virtio_ring: packed: remove double check of the unmap ops
+> > >   virtio_ring: packed: structure the indirect desc table
+> > >   virtio_ring: split: remove double check of the unmap ops
+> > >   virtio_ring: split: structure the indirect desc table
+> > >   virtio_ring: no store dma info when unmap is not needed
+> > >   virtio: find_vqs: pass struct instead of multi parameters
+> > >   virtio: vring_create_virtqueue: pass struct instead of multi
+> > >     parameters
+> > >   virtio: vring_new_virtqueue(): pass struct instead of multi parameters
+> > >   virtio_ring: simplify the parameters of the funcs related to
+> > >     vring_create/new_virtqueue()
+> > >   virtio: find_vqs: add new parameter premapped
+> > >   virtio_ring: export premapped to driver by struct virtqueue
+> > >   virtio_net: set premapped mode by find_vqs()
+> > >   virtio_ring: remove api of setting vq premapped
+> > >   virtio_ring: introduce dma map api for page
+> > >   virtio_ring: introduce virtqueue_dma_map_sg_attrs
+> > >   virtio_net: unify the code for recycling the xmit ptr
+> > >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
+> > >   virtio_net: sq support premapped mode
+> > >
+> > >  arch/um/drivers/virtio_uml.c             |  31 +-
+> > >  drivers/net/virtio_net.c                 | 283 ++++++---
+> > >  drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
+> > >  drivers/remoteproc/remoteproc_virtio.c   |  31 +-
+> > >  drivers/s390/virtio/virtio_ccw.c         |  33 +-
+> > >  drivers/virtio/virtio_mmio.c             |  30 +-
+> > >  drivers/virtio/virtio_pci_common.c       |  59 +-
+> > >  drivers/virtio/virtio_pci_common.h       |   9 +-
+> > >  drivers/virtio/virtio_pci_legacy.c       |  16 +-
+> > >  drivers/virtio/virtio_pci_modern.c       |  38 +-
+> > >  drivers/virtio/virtio_ring.c             | 698 ++++++++++++-----------
+> > >  drivers/virtio/virtio_vdpa.c             |  45 +-
+> > >  include/linux/virtio.h                   |  13 +-
+> > >  include/linux/virtio_config.h            |  48 +-
+> > >  include/linux/virtio_ring.h              |  82 +--
+> > >  tools/virtio/virtio_test.c               |   4 +-
+> > >  tools/virtio/vringh_test.c               |  28 +-
+> > >  17 files changed, 847 insertions(+), 625 deletions(-)
+> > >
+> > > --
+> > > 2.32.0.3.g01195cf9f
+> >
 
-I'd like to understand how, if at all, this intersects with the
-requirements we have for pKVM on x86. For example, would pKVM run the
-untrusted part of the kernel as a PVM guest using this model? Would the
-PV interface of which you speak also map to the calls from the kernel
-into the secure pKVM hypervisor... ?
-
---=-GgRoAFd51iO6aDo8KasU
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMjI5MDkzMzI0WjAvBgkqhkiG9w0BCQQxIgQgoOYQ6dok
-Zy2+3I+kxSGX2yX4z3JaXU3iMGj1f9rCK8wwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA3C0+VjOyWCn9EOlwP2KZIFbIVQysNr94L
-W/cIweAqIuuoGiITLtFa77CXi116YAh+zodfWuAl9dp7yj3k88lg+novANMtqmdWQv9zG6lNmC7b
-uyWpyqJube1gAh1GNUpAWR4vkRRAXKW80dB27dFwzCgPuRQdS9LF+jSRNbN4FL+aaYTRywL/CKzb
-mkH6axwb5oIK20sVx5Bz2AbBVNezpr5EWgyvOnk5B7msnkEcxE54MqS10z/oWE/POwQqqJNwIkMS
-whGR3boV52IyrazYTvngN+Pza9Tg9JR6o6Gqt047PoB4pcFZF0GmtVled36cQlkLk9eBMPlU7h+1
-ugQzYK3SeOi/h+aB8ZhaBF8UEp4P6mme71inIr11IW5v+gvSWv6eQF6w43lmC7I+X0OP/DuwWJgX
-zrvxdfQ0pzmV8SkpsWqzz9vle8FXnsZT2BJeh30JV2q7sIy5E0dnYBQdNrGbv8UpSpcPwwExyhd4
-P6eCJYZlSh3ltUvoPohG1tYkGlygZ1iV6P05TXl3pPrgt1i82UUf13C3FHxHaC4QyUF4S9qz/KEY
-IbhIVEd95lPmHbkDkQL4qniAZX+XkqYwXrVambO/2aCj75KfowAcZ/7+3+ZMUfNuDyk3Ymf1Kii3
-zg98UWS5xvwlyVRtwirQGcT/tVkTMmpuw3aPU5b8zAAAAAAAAA==
-
-
---=-GgRoAFd51iO6aDo8KasU--
 
