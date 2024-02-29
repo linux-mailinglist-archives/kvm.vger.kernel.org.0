@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-10390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C02786C103
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:42:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7902C86C106
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D155B26BBF
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:42:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 359462820A2
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B30F446D3;
-	Thu, 29 Feb 2024 06:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8133745BE2;
+	Thu, 29 Feb 2024 06:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AM9COpoj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JdD3R/ty"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD77446AC
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 06:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E86A45941
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 06:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709188879; cv=none; b=q0sziHDoz7E1q/GF1FiXthL4pHWfe1iQ2RharEnTdGE3Hd2TXwqF0IYSuGA3CYvahNOuqVKrpe3Ef00TvH0/gAVPTked704UPPbWXqgUQOjkDFqa69PCWuax5+8b2CYA6T6WnJNTF6visVPxxytuszgMxn/ZW7WZKPjGw8YMDaM=
+	t=1709188885; cv=none; b=A2cD/bILxU4h7AGFrgWWB9qtKky+9Kio3vBwGUK4yQnjuxLHKvYdnw/+Xu6J2w7UvBgADzsUfd+tjswhhZCinx/ViJ9+96G7V6ZFtV0NDZfsoU9Qs7ZFl4pB18GxVRPIhOEwZSf1Uu8xHMQFuyZi5xHNFNm4pd5VcLPW+OeCGBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709188879; c=relaxed/simple;
-	bh=uZvEeQRwcg5hfdsq1aVm4Uu/EiX+YrSVEsATsRjn5FQ=;
+	s=arc-20240116; t=1709188885; c=relaxed/simple;
+	bh=e+2C9uKtbhbExisrx4zbEuOZzq0QWHDfGmG/4u6UwRk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YAvwsqs9ukFpCRGz9RcRrD8pc8b/YAQJPZqDBmjHPCQnQflwXPhz+sjGxd0QL4a/gkCilJ2rpld0b6OreDYFxlx6xoxfqrdMVvugbXPXoW9ie7U4VpxoMdCemDymzShHj9dubdbVJJEaj6y9zRERwFrENK/vLvDfgFCkK9r6k04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AM9COpoj; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=LzxMrQqkXmo7pHSqJ6oqX1bhuFLrUv12BaLZZgZeAJWBM7p4RVZuaLhNxNfNg/MfwbSd1UATZfkQt1oEqmNciq9tpiXDt5rlLBaQ9MRPlubjBa59Ya4GQ666bnglV2C7+MI104y/9bTpbgDkTdQpBRMCkaFBtsKhR/doYVkXOX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JdD3R/ty; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709188878; x=1740724878;
+  t=1709188884; x=1740724884;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uZvEeQRwcg5hfdsq1aVm4Uu/EiX+YrSVEsATsRjn5FQ=;
-  b=AM9COpojXywBROuRsMWPXg6FWiq6A0OHXgRu4fazuGyNLcRo0+otEV7x
-   sPuhrozNeWZ6N0yQTL+8q8uIm5sqQpCIAIc86ii5/s2dFmNsnuQs6QaPe
-   ceiOAi6G8Qtv3ms+1/gP00E1eT1ASN43KDaRh4j+hE1hbWKWmfUGIULHQ
-   BndtqeMLnN9cyuN+BNRXRtXlzp0Y06TfhVa+5vxpsRWps4q7x7inBC49Z
-   20xdPJSIvEu4eQhzAYayv1NQnwL6acLEwB90vrZUyLBKSPbcC30uxa1BF
-   Qcj6IEw+bHEcf2YegUEhIv0zZ8puEq8gXJx+kUJeaQFGrQgr8Mh9jXdTd
+  bh=e+2C9uKtbhbExisrx4zbEuOZzq0QWHDfGmG/4u6UwRk=;
+  b=JdD3R/tykcE74St6lsCtoqN08xImBt5iydy67IDzz6tg7czepOMXMz7Z
+   BzC4Q1XIVernca5LT7G29CHYOpzXfZVNHgUVHk6LAW3Okw1Eh3ruR/k/v
+   I/3OJ+O6NIxzPmpdO48pvRZ57uOBZd4J85VcXXWklYnm+0FXC0qkkN9Mp
+   wZJpaOIRY1MMivMy5819lgREDBPqvJpxyx4+84rD9vWXMox+8SHgImDUW
+   q+HIt2yM4FYEgrXNIhnTRp8xfkHNfiD88px/gAFBuSJFcvp8Jo3Ru6D+o
+   oN8cpFKYS+qbI8SZwGv6av3bm0BgzAdVT3hhP70168E4y3Ait7HwMKpqo
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3802873"
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3802882"
 X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="3802873"
+   d="scan'208";a="3802882"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 22:41:17 -0800
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 22:41:24 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="8075640"
+   d="scan'208";a="8075656"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa007.jf.intel.com with ESMTP; 28 Feb 2024 22:41:11 -0800
+  by orviesa007.jf.intel.com with ESMTP; 28 Feb 2024 22:41:18 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -79,9 +79,9 @@ Cc: kvm@vger.kernel.org,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	xiaoyao.li@intel.com
-Subject: [PATCH v5 34/65] kvm/tdx: Ignore memory conversion to shared of unassigned region
-Date: Thu, 29 Feb 2024 01:36:55 -0500
-Message-Id: <20240229063726.610065-35-xiaoyao.li@intel.com>
+Subject: [PATCH v5 35/65] memory: Introduce memory_region_init_ram_guest_memfd()
+Date: Thu, 29 Feb 2024 01:36:56 -0500
+Message-Id: <20240229063726.610065-36-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240229063726.610065-1-xiaoyao.li@intel.com>
 References: <20240229063726.610065-1-xiaoyao.li@intel.com>
@@ -93,49 +93,73 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Introduce memory_region_init_ram_guest_memfd() to allocate private
+guset memfd on the MemoryRegion initialization. It's for the use case of
+TDVF, which must be private on TDX case.
 
-TDX requires vMMIO region to be shared.  For KVM, MMIO region is the region
-which kvm memslot isn't assigned to (except in-kernel emulation).
-qemu has the memory region for vMMIO at each device level.
-
-While OVMF issues MapGPA(to-shared) conservatively on 32bit PCI MMIO
-region, qemu doesn't find corresponding vMMIO region because it's before
-PCI device allocation and memory_region_find() finds the device region, not
-PCI bus region.  It's safe to ignore MapGPA(to-shared) because when guest
-accesses those region they use GPA with shared bit set for vMMIO.  Ignore
-memory conversion request of non-assigned region to shared and return
-success.  Otherwise OVMF is confused and panics there.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- accel/kvm/kvm-all.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Changes in v5:
+- drop memory_region_set_default_private() because this function is
+  dropped in this v5 series;
+---
+ include/exec/memory.h |  6 ++++++
+ system/memory.c       | 25 +++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index d533e2611ad8..9dc17a1b5f43 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2953,6 +2953,18 @@ static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
-     section = memory_region_find(get_system_memory(), start, size);
-     mr = section.mr;
-     if (!mr) {
-+        /*
-+         * Ignore converting non-assigned region to shared.
-+         *
-+         * TDX requires vMMIO region to be shared to inject #VE to guest.
-+         * OVMF issues conservatively MapGPA(shared) on 32bit PCI MMIO region,
-+         * and vIO-APIC 0xFEC00000 4K page.
-+         * OVMF assigns 32bit PCI MMIO region to
-+         * [top of low memory: typically 2GB=0xC000000,  0xFC00000)
-+         */
-+        if (!to_private) {
-+            return 0;
-+        }
-         return -1;
-     }
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 679a8476852e..1e351f6fc875 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1603,6 +1603,12 @@ bool memory_region_init_ram(MemoryRegion *mr,
+                             uint64_t size,
+                             Error **errp);
  
++bool memory_region_init_ram_guest_memfd(MemoryRegion *mr,
++                                        Object *owner,
++                                        const char *name,
++                                        uint64_t size,
++                                        Error **errp);
++
+ /**
+  * memory_region_init_rom: Initialize a ROM memory region.
+  *
+diff --git a/system/memory.c b/system/memory.c
+index c756950c0c0f..85a22408e9a4 100644
+--- a/system/memory.c
++++ b/system/memory.c
+@@ -3606,6 +3606,31 @@ bool memory_region_init_ram(MemoryRegion *mr,
+     return true;
+ }
+ 
++bool memory_region_init_ram_guest_memfd(MemoryRegion *mr,
++                                        Object *owner,
++                                        const char *name,
++                                        uint64_t size,
++                                        Error **errp)
++{
++    DeviceState *owner_dev;
++
++    if (!memory_region_init_ram_flags_nomigrate(mr, owner, name, size,
++                                                RAM_GUEST_MEMFD, errp)) {
++        return false;
++    }
++
++    /* This will assert if owner is neither NULL nor a DeviceState.
++     * We only want the owner here for the purposes of defining a
++     * unique name for migration. TODO: Ideally we should implement
++     * a naming scheme for Objects which are not DeviceStates, in
++     * which case we can relax this restriction.
++     */
++    owner_dev = DEVICE(owner);
++    vmstate_register_ram(mr, owner_dev);
++
++    return true;
++}
++
+ bool memory_region_init_rom(MemoryRegion *mr,
+                             Object *owner,
+                             const char *name,
 -- 
 2.34.1
 
