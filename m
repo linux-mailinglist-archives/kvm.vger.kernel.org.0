@@ -1,235 +1,147 @@
-Return-Path: <kvm+bounces-10543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0968B86D274
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 19:40:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD2FF86D298
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 19:54:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 297DE1C20B7F
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 18:40:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 455511F24D2C
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 18:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2EBC7E580;
-	Thu, 29 Feb 2024 18:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38440134429;
+	Thu, 29 Feb 2024 18:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v98Jnhab"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kz0bMdNp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DCC224D7
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 18:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF265160629
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 18:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709232008; cv=none; b=gN2EEup9TVBfxXxXyxVtVeZTTG5UO2ZBkO5ORbchlFlLU9yCNv43rB/Q3DbaFTtEZoIZt6KQfcEBUoAnc0itPbiuer5UwnKWqWwfURLOg98TdUUjpw8rEOmcXJ7tGGsLKn7qspmJ8qIvg82CNlCKlNR+SW9htHDE9rEEawOSn/o=
+	t=1709232862; cv=none; b=crBzkDA0+1feDQA952wqQSD3kDbNzvMTzv0Oe72ksttQkG//DQ7thnysBZwXqLZbpdpOQhlcNzCAZ1Zonbnn5ogfGfNPQn0i7mx524hgpiKyYxjsZ0Ipxuu3sxbrQYjRYvRZb2QKtu49LIXNo74bojc4Rq8nW3NPkGwHttp3Qqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709232008; c=relaxed/simple;
-	bh=EfSzWHQXiIuv/QXiMcoNXY6pXi3oCnDesgNhCcVu5z4=;
+	s=arc-20240116; t=1709232862; c=relaxed/simple;
+	bh=c3H3vBFipsXo3Sef6GdzrpDZnYGyG/8rNuySDhgx7MU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tcr3YH7W0ptEQ1M01JrxpAnktFqxJ68RiLeg4uI5+8VCTzehB984tuvQ5TjlPkJjDdPhBvVDf8zRHjJHtCa+PJVbeTUosHqj4OkgoczoZRzSBlvoBEGsEGJJF6OUAfNpERC1E57ekzdtiI2o1JL6XTD9EB2HokZ7FpZXgLUbJqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v98Jnhab; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=rhJQAXfgNwTyFichgFe4tQP3Im13LOiLRrssjzpZEq3Gl5pIvcPRRzO5eSkb5rxmKYwQ31PAemzQlS5Dh9wP4UyEiRttZtbyI+tNpT6nw/ai2TuhUpR1x5VaxJlFSG6wGWkAf5nj5ud3qE+nmBABOllPt1PH3m2FeRfN+Ar+a+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kz0bMdNp; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60904453110so15524277b3.2
-        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 10:40:06 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6ceade361so2146169276.0
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 10:54:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709232005; x=1709836805; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vY/rdOoD7orW1sSyXqQMEdLlDPVHr5lpBJycktuWo78=;
-        b=v98JnhabzmqTSfjRq8Je7E5qmQeMOZC6VxwZfVfo30sJoX6NsNLR/KOz7t8MiLnF2n
-         DPbWvdtLZ60biyTC7scafSoEnF5ppBAbu3+9lzuKSdYDzL6vFwxYkPNSzuR3CgAGeXRH
-         NKxBxkTNc7FTgIcuYAD5BK4+bw54wqNX3M35ocCo/PvEFe9nVHbyQsrCRK9PRze8P36E
-         1Bi54/TgcYMKz71c8Myr8pvTJiSYvn3d79rCLyZcEEulFCqCj5CybtiQrpVbDL1wtj4o
-         iF/6Uq2dGV4Te9plU0lblnxmqr9xW/RinYxB/IvV4u8RtDhkUK7T2JQtJoUU1Fsb4iZw
-         VHJA==
+        d=google.com; s=20230601; t=1709232860; x=1709837660; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T5dFvqCRIbO656OOkYJr9SD1ZDKhVN7MuRH/M19ZUc4=;
+        b=Kz0bMdNpg5P5GRj0peYH1lYzxhoeGeRPf3eViYvuw487ZCOszgOjq5JPtVBB7OLOUj
+         ohGmt69+cBCH2LFBHmS1oquVL1PP9m8VCbjhTKEhpIEXqjdgpp2PPxe0Nbav6OymqJC7
+         fztId74OpYOE5fj/7ehdaUIiWZi71biMTBR6pQIyKrA4UBo/XC3RbADz5IhjLc2DnMkB
+         euamMARpBXVjAHosqT0ivz+eOju7fDCfZAii+5CDXHXwkIGQU0+EA3QyT/tqaAnek+Hb
+         8CUtIbQXNo4eNvMx4hOnR/dhiajbTZzbNQJeQF85QEg/PDqiwFTUGgKJ7e8TS+Uz+VXi
+         Xkdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709232005; x=1709836805;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vY/rdOoD7orW1sSyXqQMEdLlDPVHr5lpBJycktuWo78=;
-        b=GjtlxXfmEHkaMAkfB0L/hx9rHqxg2tCtw5UPdwkNlJC12JwC9FrH9MvE+MRu5TaGW5
-         Yy7TVf6GrvV4zQaaXPzi7nZTvRASZI622Spgs0fDbNuSsMSKs0uyDA4SsP75Rw9fnjRn
-         kdpwS/05wVURklPBi40c2UQBBVB/WBszS5DDcIt9yhWS2F7JIpZLQv30i76gpzuAPclH
-         KW+7/NYAHpwSzwmnw30qgbnWOAT1zPyxZO3goJU4EgA+GdAl+pfDgOX63j6eVcaI3QWu
-         lBHIfcq+802Aq5Ays7pH4pRhtvw/owsA9Lc60fQiHaplRQVlir0SeY/JycLu5s1ATulF
-         WfOg==
-X-Gm-Message-State: AOJu0YxHA71C6qyfVWoYSb71r3JOyYR/m8+s630bmNcPBC/RjdbeKmfF
-	qEhSty/apNFI1yjHxYz8f14VtkdKqXoQffqJ9PwPx7NUN85fjWOBOncItS2ZHdrSnQdeQITI8gu
-	GPQ==
-X-Google-Smtp-Source: AGHT+IEg+77D7oFXFUtb7myxTYn0+eui+WQiWZe+o6cGIvgW/UaK+dQNFE4gTiVy8VFY9DzEUtC/JeMjDT8=
+        d=1e100.net; s=20230601; t=1709232860; x=1709837660;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T5dFvqCRIbO656OOkYJr9SD1ZDKhVN7MuRH/M19ZUc4=;
+        b=ggdhfidjJ2oEFiXWTCId8Tq8hi3FhRYYNIALexAbXdVUzg4SCvyIWuXHzBZkI6p0xj
+         XcNJvt1GMox7LaTQ/WMTRg5naECgmhq9LpOqT7MlJBJqpdfCZM9siNOwITm/TSdlfEI4
+         cgQEtdixuBJg3WyHToTIhhNgY8McQCzqo068fEJ6ypEAKz5VyyjThy5SZRdgZqc9sZd8
+         Bm6LgBITTkRwwI+5neYsI4AD70S6BXAsgYM+bHBLGsuE7HDo0E3M/f5E9262HA2cqJuy
+         2R7Azy96lWMf6Mr06KT2WcV9YU6duc4x4PdgIf6cIKXoULfrhI23icJiD1hZ5j4+WPvL
+         lnnA==
+X-Gm-Message-State: AOJu0Yw9W5eCxVRRYZvrfIEsk8Zn2Wqvvh3dQGLTJHL0P6ZdUECWoyfc
+	vFk5oZykEenBUD/4pIeuUhh8zJl4J3rRUuJT/WVq+al9PANP09Z/bYtmvsiLcySXO+26Dp+020g
+	H8Q==
+X-Google-Smtp-Source: AGHT+IGy7cy+CsI630B50Nc5GYMwlKcoDrJ/CHzlWTNRj7zzuz8ZyLkMc3db8YwqGl9a0Vqfx/M/rZSQf+k=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:9b47:0:b0:608:1b39:246b with SMTP id
- s68-20020a819b47000000b006081b39246bmr706371ywg.3.1709232005455; Thu, 29 Feb
- 2024 10:40:05 -0800 (PST)
-Date: Thu, 29 Feb 2024 10:40:03 -0800
-In-Reply-To: <CABgObfbtPJ6AAX9GnjNscPRTbNAOtamdxX677kx_r=zd4scw6w@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:188d:b0:dcc:54d0:85e0 with SMTP id
+ cj13-20020a056902188d00b00dcc54d085e0mr768688ybb.11.1709232859989; Thu, 29
+ Feb 2024 10:54:19 -0800 (PST)
+Date: Thu, 29 Feb 2024 10:54:18 -0800
+In-Reply-To: <87h6hrmmox.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-3-seanjc@google.com>
- <CABgObfbtPJ6AAX9GnjNscPRTbNAOtamdxX677kx_r=zd4scw6w@mail.gmail.com>
-Message-ID: <ZeDPgx1O_AuR2Iz3@google.com>
-Subject: Re: [PATCH 02/16] KVM: x86: Remove separate "bit" defines for page
- fault error code masks
+References: <20240228101837.93642-1-vkuznets@redhat.com> <20240228101837.93642-3-vkuznets@redhat.com>
+ <Zd_BY8Us6TYNBueI@google.com> <87h6hrmmox.fsf@redhat.com>
+Message-ID: <ZeDS2nhkK_QDBJS0@google.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Use actual kvm_cpuid.base for clearing KVM_FEATURE_PV_UNHALT
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Li RongQing <lirongqing@baidu.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Feb 29, 2024, Paolo Bonzini wrote:
-> On Wed, Feb 28, 2024 at 3:46=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> > index 60f21bb4c27b..e8b620a85627 100644
-> > --- a/arch/x86/kvm/mmu.h
-> > +++ b/arch/x86/kvm/mmu.h
-> > @@ -213,7 +213,7 @@ static inline u8 permission_fault(struct kvm_vcpu *=
-vcpu, struct kvm_mmu *mmu,
-> >          */
-> >         u64 implicit_access =3D access & PFERR_IMPLICIT_ACCESS;
-> >         bool not_smap =3D ((rflags & X86_EFLAGS_AC) | implicit_access) =
-=3D=3D X86_EFLAGS_AC;
-> > -       int index =3D (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
-> > +       int index =3D (pfec + (not_smap << ilog2(PFERR_RSVD_MASK))) >> =
-1;
->=20
-> Just use "(pfec + (not_smap ? PFERR_RSVD_MASK : 0)) >> 1".
->=20
-> Likewise below, "pte_access & PT_USER_MASK ? PFERR_RSVD_MASK : 0"/
->=20
-> No need to even check what the compiler produces, it will be either
-> exactly the same code or a bunch of cmov instructions.
+On Thu, Feb 29, 2024, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> > Am I missing something, or can we just swap() the new and old, update the new
+> > in the context of the vCPU, and then undo the swap() if there's an issue?
+> > vcpu->mutex is held, and accessing this state from a different task is wildly
+> > unsafe, so I don't see any problem with temporarily having an in-flux state.
+> >
+> 
+> I don't see why this approach shouldn't work and I agree it looks like
+> it would make things better but I can't say that I'm in love with
+> it.
 
-I couldn't resist :-)
+Agreed, but the lack of atomicity is a pre-existing problem, though as proposed,
+my idea would make it worse.  More below.
 
-The second one generates identical code, but for this one:
+> Ideally, I would want to see the following "atomic" workflow for all
+> updates:
+> 
+> - Check that the supplied data is correct, return an error if not. No
+> changes to the state on this step.
+> - Tweak the data if needed.
+> - Update the state and apply the side-effects of the update. Ideally,
+> there should be no errors on this step as rollback can be
+> problemmatic. In the real world we will have to handle e.g. failed
+> memory allocations here but in most cases the best course of action is
+> to kill the VM.
+> 
+> Well, kvm_set_cpuid() is not like that. At least:
+> - kvm_hv_vcpu_init() is a side-effect but we apply it before all checks
+> are complete. There's no way back.
+> - kvm_check_cpuid() sounds like a pure checker but in reallity we end up
+> mangling guest FPU state in fpstate_realloc()
 
-  int index =3D (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
+Yeah, I really, really don't like the call to fpu_enable_guest_xfd_features().
+But to not make it worse, that call could be hoisted out of kvm_check_cpuid()
+so that it can be performed after kvm_cpuid_check_equal(), i.e. be kept dead last
+(and with a comment saying it needs to be dead last due to side effects that are
+visible to serspace).
 
-gcc generates almost bizarrely different code in the call from vcpu_mmio_gv=
-a_to_gpa().
-clang is clever enough to realize "pfec" can only contain USER_MASK and/or =
-WRITE_MASK,
-and so does a ton of dead code elimination and other optimizations.  But fo=
-r some
-reason, gcc doesn't appear to realize that, and generates a MOVSX when comp=
-uting
-"index", i.e. sign-extends the result of the ADD (at least, I think that's =
-what it's
-doing).
+> Both are probably "no big deal" but certainly break the atomicity.
+>
+> > If we want to be paranoid, we can probably get away with killing the VM if the
+> > vCPU has run and the incoming CPUID is "bad", e.g. to guard against something
+> > in kvm_set_cpuid() consuming soon-to-be-stale state.  And that's actually a
+> > feature of sorts, because _if_ something in kvm_set_cpuid() consumes the vCPU's
+> > CPUID, then we have a bug _now_ that affects the happy path.
+> >
+> > Completely untested (I haven't updated the myriad helpers), but this would allow
+> > us to revert/remove all of the changes that allow peeking at a CPUID array that
+> > lives outside of the vCPU.
+> 
+> Thanks, assuming there's no urgency
 
-There's no actual bug today, and the vcpu_mmio_gva_to_gpa() path is super s=
-afe
-since KVM fully controls the error code.  But the call from FNAME(walk_addr=
-_generic)
-uses a _much_ more dynamic error code.
+Definitely no urgency.
 
-If an error code with unexpected bits set managed to get into permission_fa=
-ult(),
-I'm pretty sure we'd end up with out-of-bounds accesses.  KVM sanity checks=
- that
-PK and RSVD aren't set,=20
+> let me take a look at this in the course of the next week or so.
 
-	WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
+No need, it was more of an "FYI, this is what I may go futz with".  Specifically,
+it will impact what I want to do with guest cpu_caps[*], hopefully in a good way.
+My plan is to play around with it when I get back to that series.
 
-but KVM unnecessarily uses an ADD instead of OR, here
+[*] https://lore.kernel.org/all/20231110235528.1561679-1-seanjc@google.com
 
-
-	int index =3D (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
-
-and here
-
-		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
-		offset =3D (pfec & ~1) +
-			((pte_access & PT_USER_MASK) << (PFERR_RSVD_BIT - PT_USER_SHIFT));
-
-i.e. if the WARN fired, KVM would generate completely unexpected values due=
- to
-adding two RSVD bit flags.
-
-And if _really_ unexpected flags make their way into permission_fault(), e.=
-g. the
-upcoming RMP flag (bit 31) or Intel's SGX flag (bit 15), then the use of in=
-dex
-
-	fault =3D (mmu->permissions[index] >> pte_access) & 1;
-
-could generate a read waaaya outside of the array.  It can't/shouldn't happ=
-en in
-practice since KVM shouldn't be trying to emulate RMP violations or faults =
-in SGX
-enclaves, but it's unnecessarily dangerous.
-
-Long story short, I think we should get to the below (I'll post a separate =
-series,
-assuming I'm not missing something).
-
-	unsigned long rflags =3D static_call(kvm_x86_get_rflags)(vcpu);
-	unsigned int pfec =3D access & (PFERR_PRESENT_MASK |
-				      PFERR_WRITE_MASK |
-				      PFERR_USER_MASK |
-				      PFERR_FETCH_MASK);
-
-	/*
-	 * For explicit supervisor accesses, SMAP is disabled if EFLAGS.AC =3D 1.
-	 * For implicit supervisor accesses, SMAP cannot be overridden.
-	 *
-	 * SMAP works on supervisor accesses only, and not_smap can
-	 * be set or not set when user access with neither has any bearing
-	 * on the result.
-	 *
-	 * We put the SMAP checking bit in place of the PFERR_RSVD_MASK bit;
-	 * this bit will always be zero in pfec, but it will be one in index
-	 * if SMAP checks are being disabled.
-	 */
-	u64 implicit_access =3D access & PFERR_IMPLICIT_ACCESS;
-	bool not_smap =3D ((rflags & X86_EFLAGS_AC) | implicit_access) =3D=3D X86_=
-EFLAGS_AC;
-	int index =3D (pfec | (not_smap ? PFERR_RSVD_MASK : 0)) >> 1;
-	u32 errcode =3D PFERR_PRESENT_MASK;
-	bool fault;
-
-	kvm_mmu_refresh_passthrough_bits(vcpu, mmu);
-
-	fault =3D (mmu->permissions[index] >> pte_access) & 1;
-
-	/*
-	 * Sanity check that no bits are set in the legacy #PF error code
-	 * (bits 31:0) other than the supported permission bits (see above).
-	 */
-	WARN_ON_ONCE(pfec !=3D (unsigned int)access);
-
-	if (unlikely(mmu->pkru_mask)) {
-		u32 pkru_bits, offset;
-
-		/*
-		* PKRU defines 32 bits, there are 16 domains and 2
-		* attribute bits per domain in pkru.  pte_pkey is the
-		* index of the protection domain, so pte_pkey * 2 is
-		* is the index of the first bit for the domain.
-		*/
-		pkru_bits =3D (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
-
-		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
-		offset =3D (pfec & ~1) | (pte_access & PT_USER_MASK ? PFERR_RSVD_MASK : 0=
-);
-
-		pkru_bits &=3D mmu->pkru_mask >> offset;
-		errcode |=3D -pkru_bits & PFERR_PK_MASK;
-		fault |=3D (pkru_bits !=3D 0);
-	}
-
-	return -(u32)fault & errcode;
 
