@@ -1,206 +1,182 @@
-Return-Path: <kvm+bounces-10517-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10518-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E3CE86CE86
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 17:16:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44BF386CEB3
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 17:21:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91307B29584
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 16:16:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C516C1F265B7
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 16:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D32470AC3;
-	Thu, 29 Feb 2024 15:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B23F8142900;
+	Thu, 29 Feb 2024 16:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g93ljgmK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KcTK0148"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6B76CC11
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 15:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437431428E7
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 16:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709222206; cv=none; b=Mb+p/vM1STHvFA9Qq5losGbzUd04lDFJtN77+BGit/gHq/lMODeVea9dMXQn3qrca5wYZ8N5ayrf5/bPtvtIZjq1Y7MSlUfggnEm/4j5EZqQ2oDcijhsk7vCRD9Nn3k8LToHfeEvy6MMdtPUE58SgaFdxjbCvk/XAI5kGNInUKc=
+	t=1709222564; cv=none; b=QHWd9qYBgjxKqyho5ZV81g3mdiJxnyAe6U+zKvRIylFQct49Xql5LT2HcMH8cCAZRgBtE1/8eD/ZvneimMMzfF4e5v98cLHUOA3qYfKqFAUS/flxzHMKQ5Mg2xotpApzWDgt+EuQw977qisQsZhr1lEOT+6Xa0tZ2Aqrf27O+fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709222206; c=relaxed/simple;
-	bh=P2TMqG7h7dnUJpKrrocNNNzpbY0+qjivekQDfKhl2bM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nVDjn9aQAij/Lpzr+eGtBgbpTo8W4hk4cyojUct3qEUV2AkKX+0Zhg9yc7xRR9Zd9elNFfLG4MHsMUYE4I1bop+MzLfYsJIgfMV/J1kEjFiZQF/AmYgoAImfcJV8I0Rwq61dQiiMtXz1+kP32P676sVVCMzCIE4y/5U24nOFiXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g93ljgmK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709222203;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NK1oIanmqTW8WZH0kLEYVDI/xueTaYHkdWqNEI0DyFk=;
-	b=g93ljgmKSJuEWmLCARp7p8hPt+S7A2OwH8PTChSLfjRjPI1Dx2fRANQJIKq53AOTe1thTi
-	CJeOlJVpWejhtNU/EmA6lFtB8FlqVJFpYOVSkkW/KWjprUTxSqvwgDI7cmVfY4Uy3ShYSt
-	AZy1IcM8NFYsQScW2U5SDvk9MgwwBuU=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-UWmpCbM1MNmO-avh_Ezd_Q-1; Thu, 29 Feb 2024 10:56:42 -0500
-X-MC-Unique: UWmpCbM1MNmO-avh_Ezd_Q-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7c7f57fa5eeso96100439f.1
-        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 07:56:42 -0800 (PST)
+	s=arc-20240116; t=1709222564; c=relaxed/simple;
+	bh=wA6/NCRWbGF4UBqPQpanKkBvk0zz/+RnoTAw/npQYHs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LZtQlBLPLLLFGIRACkt+NUq3pBpqVn7us0LTBjZ3XyMFxcoFgSDH8Gt71Lqfxb2nbhzpKSzuNd5+9EosQkrYtVxQsEqf3DIY6JW2ejTu1+kr6/+YOT/nsDRPaAfmt9OIO2odg/xR5yIEjQvM8OY773l5SyFsSJDXkdGjC27Harg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KcTK0148; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcbee93a3e1so1783498276.3
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 08:02:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709222560; x=1709827360; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GAuXf0DJO8tOCKY3YV3tHsU6z5YsVb54ZKPvhRBV/xk=;
+        b=KcTK0148tHfabq5jySgVFnibytuzlyP/DQ2S8ww34Nnf9svJW/E/V0H5XROLhmaXBR
+         jQ9a0cL2bCdoy0f8NLcDwauMMvpugfzfvSpVctrsN/88d2bOhEBQDOefIcz3PINyIAl+
+         aTgaII5oJ3m2X1p043V9bOh7j2zJidY8hw1C45Myb0POTzsDqRpWTkl+iRwNbegrHtJG
+         W/jZYz3ECuJPwe88ws7oeYH2XOi0lqsCGw3kY8PVejfvoPntG+nySBfL24lFKaWk/iD7
+         WTfoMrdJHVX5Y9euKT//s0PDkSQVfPWeTsgf2k/sQQMFV7eyAqJm1at5A68Hx2bNkURa
+         Ba5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709222201; x=1709827001;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NK1oIanmqTW8WZH0kLEYVDI/xueTaYHkdWqNEI0DyFk=;
-        b=wJ7gCl3ujqO1Fb0ZntRxsOFwP0ALJVyxxChSqa8I3aHoF4//dIMnCoSCN2GfTvSzKc
-         tImXCaQaC0LX/GwpRa+LIxWPcGw2gaTM31U5O3hZN/T4O0gJOBQMQnK1TXm+MKcejB6+
-         Oxxq9xUHWh2tpy8BKas16TmgpnigyWArfnLfTfqQng+JYsSXKDRNyEGWRLmT3AoeRyfv
-         p4d/ovrrJODmQ7x/7cY0261Dr4l68GUI5o8nKznEMtmwHQSZMyPH5CV6w+JUkhtAPe9t
-         0sgTHIasnnFm3yd5YrJWinJINr/3Cgme/Vg1v/PdpY/Ap1k42RnXtNnzK8Sj5wOqPAds
-         aeKA==
-X-Forwarded-Encrypted: i=1; AJvYcCUeQm8pv4p65Mil8wxS1bjqeffBctSewg0JSryfhPWqJ/LiqWAGf7d6RwFLghufHQMVuIm5IcfR9D8Cdc4wQSkHPi9s
-X-Gm-Message-State: AOJu0YxH4MydAK1p3pdw3W5banYDTsyAJAgTK1IZmzdJwq7bvfgyLMQB
-	zfyNo93pMAK+JXmYVEH91rO7JY11QV/DZB8iscDk7PnXUWNL1s1g+FfG7zCe55I6562AvwqQyFf
-	dht+w3UyPklGAQ+CanNTnDaw1URmlMFO+3eVywJZz48UZEa94TA==
-X-Received: by 2002:a05:6602:641d:b0:7c7:d3c6:e195 with SMTP id gn29-20020a056602641d00b007c7d3c6e195mr3443320iob.1.1709222201504;
-        Thu, 29 Feb 2024 07:56:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFS3pyDQfw+9kwU2WI8G5o84elkM6/6Ot566Bp3UBg2or4p9T85U4IZrIMXeiAPk8508EZT7Q==
-X-Received: by 2002:a05:6602:641d:b0:7c7:d3c6:e195 with SMTP id gn29-20020a056602641d00b007c7d3c6e195mr3443292iob.1.1709222201221;
-        Thu, 29 Feb 2024 07:56:41 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id j13-20020a02a68d000000b00474420a484esm364815jam.98.2024.02.29.07.56.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 07:56:40 -0800 (PST)
-Date: Thu, 29 Feb 2024 08:56:39 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: <ankita@nvidia.com>
-Cc: <jgg@nvidia.com>, <yishaih@nvidia.com>,
- <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
- <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
- <targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
- <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
- <rrameshbabu@nvidia.com>, <zhiw@nvidia.com>, <anuaggarwal@nvidia.com>,
- <mochs@nvidia.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1 1/1] vfio/nvgrace-gpu: Convey kvm that the device is
- wc safe
-Message-ID: <20240229085639.484b920c.alex.williamson@redhat.com>
-In-Reply-To: <20240228194801.2299-1-ankita@nvidia.com>
-References: <20240228194801.2299-1-ankita@nvidia.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1709222560; x=1709827360;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GAuXf0DJO8tOCKY3YV3tHsU6z5YsVb54ZKPvhRBV/xk=;
+        b=IKqeSbd8A3pzwm3Uh0febDxWiuCj3Vyxt7VxP8ipAMQdqlKRxBQ80JGPqCYkakwlmw
+         nh3ykpgQoA5atowhp9lgDY9DuYjcmlknRhWAfPwMuyT1HJB5sFk3r6c4b26bYp4s+/8J
+         l1WvKLKpkY6/UQxXTXIqth0Y74xbD4PlVOyqHjLqrPqnaUamSVGKJ/X1LiTDczPNZtsi
+         Q5AHlRfrt1obsPYiK/iwFPWbkJvNYJ3YI99sYZmL9NAtR4S+AtHfenqEIXHfv0iNwn2e
+         amlxSkimizuAO34smZvJSCC3ueKE6558L1YNYQK+U9Wx3AVIvIO4/NAtoEPtbK7dJLj4
+         fNQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVHOHRcNdUw1hcsVUfPHXQxiwwuNvGLKusxHSSTNFSY6w5biuAmVLa2DG+GBcR2LDFneiD6ogPu4Lx3F7R/EUuODRRE
+X-Gm-Message-State: AOJu0YyDxfqHnrUw7HlkSSw+4VUGoZ+V1Z8TX9awSW0LqlH/axA7tZLv
+	/Rmepf8YULLdnAaz7jPbhQdyPG5YZrz2nC793qbID6DkY341IlgaYcpTvRn9qrr6n1fktzJmuk0
+	j7A==
+X-Google-Smtp-Source: AGHT+IF5NR9OMvvFjif3DsgvK0jpQks91MFMKGd3JY1jrWeykZgUWksJDuC0Z/ca6xul8OXCuHsgaKTxvqI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c2:b0:dc6:e823:9edb with SMTP id
+ w2-20020a05690210c200b00dc6e8239edbmr106898ybu.12.1709222560220; Thu, 29 Feb
+ 2024 08:02:40 -0800 (PST)
+Date: Thu, 29 Feb 2024 08:02:38 -0800
+In-Reply-To: <CABgObfaPodSSzArO99Hkn=vpGotO1wZ-0dZKEZHx9EqLZ7M_XQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240227232100.478238-1-pbonzini@redhat.com> <20240227232100.478238-11-pbonzini@redhat.com>
+ <Zd6T06Qghvutp8Qw@google.com> <CABgObfaPodSSzArO99Hkn=vpGotO1wZ-0dZKEZHx9EqLZ7M_XQ@mail.gmail.com>
+Message-ID: <ZeCqnq7dLcJI41O9@google.com>
+Subject: Re: [PATCH 10/21] KVM: SEV: Use a VMSA physical address variable for
+ populating VMCB
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
+	isaku.yamahata@intel.com, thomas.lendacky@amd.com, 
+	Ashish Kalra <ashish.kalra@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 28 Feb 2024 19:48:01 +0000
-<ankita@nvidia.com> wrote:
+On Wed, Feb 28, 2024, Paolo Bonzini wrote:
+> On Wed, Feb 28, 2024 at 3:00=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Tue, Feb 27, 2024, Paolo Bonzini wrote:
+> > > From: Tom Lendacky <thomas.lendacky@amd.com>
+> > >
+> > > In preparation to support SEV-SNP AP Creation, use a variable that ho=
+lds
+> > > the VMSA physical address rather than converting the virtual address.
+> > > This will allow SEV-SNP AP Creation to set the new physical address t=
+hat
+> > > will be used should the vCPU reset path be taken.
+> >
+> > No, this patch belongs in the SNP series.  The hanlding of vmsa_pa is b=
+roken
+> > (KVM leaks the page set by the guest; I need to follow-up in the SNP se=
+ries).
+> > On top of that, I detest duplicat variables, and I don't like that KVM =
+keeps its
+> > original VMSA (kernel allocation) after the guest creates its own.
+> >
+> > I can't possibly imagine why this needs to be pulled in early.  There's=
+ no way
+> > TDX needs this, and while this patch is _small_, the functional change =
+it leads
+> > to is not.
+>=20
+> Well, the point of this series (and there will be more if you agree)
+> is exactly to ask "why not" in a way that is more manageable than
+> through the huge TDX and SNP series. My reading of the above is that
+> you believe this is small enough that it can even be merged with "KVM:
+> SEV: Support SEV-SNP AP Creation NAE event" (with fixes), which I
+> don't disagree with.
 
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> The NVIDIA Grace Hopper GPUs have device memory that is supposed to be
-> used as a regular RAM. It is accessible through CPU-GPU chip-to-chip
-> cache coherent interconnect and is present in the system physical
-> address space. The device memory is split into two regions - termed
-> as usemem and resmem - in the system physical address space,
-> with each region mapped and exposed to the VM as a separate fake
-> device BAR [1].
-> 
-> Owing to a hardware defect for Multi-Instance GPU (MIG) feature [2],
-> there is a requirement - as a workaround - for the resmem BAR to
-> display uncached memory characteristics. Based on [3], on system with
-> FWB enabled such as Grace Hopper, the requisite properties
-> (uncached, unaligned access) can be achieved through a VM mapping (S1)
-> of NORMAL_NC and host mapping (S2) of MT_S2_FWB_NORMAL_NC.
-> 
-> KVM currently maps the MMIO region in S2 as MT_S2_FWB_DEVICE_nGnRE by
-> default. The fake device BARs thus displays DEVICE_nGnRE behavior in the
-> VM.
-> 
-> The following table summarizes the behavior for the various S1 and S2
-> mapping combinations for systems with FWB enabled [3].
-> S1           |  S2           | Result
-> NORMAL_WB    |  NORMAL_NC    | NORMAL_NC
-> NORMAL_WT    |  NORMAL_NC    | NORMAL_NC
-> NORMAL_NC    |  NORMAL_NC    | NORMAL_NC
-> NORMAL_WB    |  DEVICE_nGnRE | DEVICE_nGnRE
-> NORMAL_WT    |  DEVICE_nGnRE | DEVICE_nGnRE
-> NORMAL_NC    |  DEVICE_nGnRE | DEVICE_nGnRE
-> 
-> Recently a change was added that modifies this default behavior and
-> make KVM map MMIO as MT_S2_FWB_NORMAL_NC when a VMA flag
-> VM_ALLOW_ANY_UNCACHED is set. Setting S2 as MT_S2_FWB_NORMAL_NC
-> provides the desired behavior (uncached, unaligned access) for resmem.
-> 
-> Such setting is extended to the usemem as a middle-of-the-road
-> setting to take it closer to the desired final system memory
-> characteristics (cached, unaligned). This will eventually be
-> fixed with the ongoing proposal [4].
-> 
-> To use VM_ALLOW_ANY_UNCACHED flag, the platform must guarantee that
-> no action taken on the MMIO mapping can trigger an uncontained
-> failure. The Grace Hopper satisfies this requirement. So set
-> the VM_ALLOW_ANY_UNCACHED flag in the VMA.
-> 
-> Applied over next-20240227.
-> base-commit: 22ba90670a51
-> 
-> Link: https://lore.kernel.org/all/20240220115055.23546-4-ankita@nvidia.com/ [1]
-> Link: https://www.nvidia.com/en-in/technologies/multi-instance-gpu/ [2]
-> Link: https://developer.arm.com/documentation/ddi0487/latest/ section D8.5.5 [3]
-> Link: https://lore.kernel.org/all/20230907181459.18145-2-ankita@nvidia.com/ [4]
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Cc: Vikram Sethi <vsethi@nvidia.com>
-> Cc: Zhi Wang <zhiw@nvidia.com>
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->  drivers/vfio/pci/nvgrace-gpu/main.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-> index 25814006352d..5539c9057212 100644
-> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
-> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -181,6 +181,24 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
->  
->  	vma->vm_pgoff = start_pfn;
->  
-> +	/*
-> +	 * The VM_ALLOW_ANY_UNCACHED VMA flag is implemented for ARM64,
-> +	 * allowing KVM stage 2 device mapping attributes to use Normal-NC
-> +	 * rather than DEVICE_nGnRE, which allows guest mappings
-> +	 * supporting write-combining attributes (WC). This also
-> +	 * unlocks memory-like operations such as unaligned accesses.
-> +	 * This setting suits the fake BARs as they are expected to
-> +	 * demonstrate such properties within the guest.
-> +	 *
-> +	 * ARM does not architecturally guarantee this is safe, and indeed
-> +	 * some MMIO regions like the GICv2 VCPU interface can trigger
-> +	 * uncontained faults if Normal-NC is used. The nvgrace-gpu
-> +	 * however is safe in that the platform guarantees that no
-> +	 * action taken on the MMIO mapping can trigger an uncontained
-> +	 * failure. Hence VM_ALLOW_ANY_UNCACHED is set in the VMA flags.
-> +	 */
-> +	vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED);
-> +
->  	return 0;
->  }
->  
+Maybe?  That wasn't my point.
 
-The commit log sort of covers it, but this comment doesn't seem to
-cover why we're setting an uncached attribute to the usemem region
-which we're specifically mapping as coherent... did we end up giving
-this flag a really poor name if it's being used here to allow unaligned
-access?  Thanks,
+> Otherwise, if the approach was good there's no reason _not_ to get it
+> in early. It's just a refactoring.
 
-Alex
+It's not really a refactoring though, that's why I'm objecting.  If this pa=
+tch
+stored _just_ the physical adddress of the VMSA, then I would consider it a
+refactoring and would have no problem applying it earlier.
 
+But this patch adds a second, 100% duplicate field (as of now), and the rea=
+son
+it does so is to allow "svm->sev_es.vmsa" to become disconnected from the "=
+real"
+VMSA that is used by hardware, which is all kinds of messed up.  That's wha=
+t I
+meant by "the functional change it leads to is not (small)".
+
+> Talking in general: I think I agree about keeping the gmem parts in a
+> kvm-coco-queue branch (and in the meanwhile involving the mm people if
+> mm/filemap.c changes are needed). #VE too, probably, but what I
+> _really_ want to avoid is that these series (the plural is not a typo)
+> become a new bottleneck for everybody. Basically these are meant to be
+> a "these seem good to go to me, please confirm or deny" between
+> comaintainers more than a real patch posting; having an extra branch
+> is extra protection against screwups but we should be mindful that
+> force pushes are painful for everyone.
+
+Yes, which is largely why I suggested we separate the gmem.  I suspect we'l=
+l need
+to force push to fixup gmem things, whereas I'm confident the other prep wo=
+rk won't
+need to be tweaked once it's fully reviewed.
+
+For the other stuff, specifically to avoid creating another bottleneck, my =
+preference
+is to follow the "normal" rules for posting patches, with slightly relaxed =
+bundling
+rules.  I.e.  post multiple, independent series so that they can be reviewe=
+d,
+iterated upon, and applied like any other series.
+
+E.g. my objection to this VMSA tracking patch shouldn't get in the way of t=
+he MMU
+changes, the #VE patch shoudln't interfere with the vmx/main.c patch, etc. =
+ In
+other words, throwing everything into a kitchen sink "TDX/SNP prep work" se=
+ries
+just creates another (smaller) bottleneck.
+
+I am 100% in favor of applying prep patches in advance of the larger SNP an=
+d TDX
+series.  That's actually partly why I ended up posting my series that inclu=
+des
+the PFERR_PRIVATE_ACCESS patch; I was trying to pull in using PFERR_GUEST_E=
+NC_MASK
+and some of the other "simple" patches, and the darn thing failed on me.
 
