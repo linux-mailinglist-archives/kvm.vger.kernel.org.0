@@ -1,226 +1,214 @@
-Return-Path: <kvm+bounces-10456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C48A986C35A
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:21:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A08E186C37F
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 09:31:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AE05282861
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 08:21:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F0581F245D6
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 08:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E41D5025E;
-	Thu, 29 Feb 2024 08:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F0A4F5F2;
+	Thu, 29 Feb 2024 08:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UkqZuhdJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K9dYnj1p"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAE34B5DA
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 08:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9090B1DDFF;
+	Thu, 29 Feb 2024 08:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709194892; cv=none; b=ccf3dzav5i1O1yaCg/qXS1b15iHUkUggchKENlzugx1oXpIzq9icOA3hvqKbeIABTcQyx4YjEYs7LVGHTb4TUOnzggabEBc82wBCV/WpfWorAUul5Osf4AFVhp9sxqRgpU5w0lRZMkPfqV7ibrTrtRTYj1yF94lKLE792X/E1hg=
+	t=1709195472; cv=none; b=erCxV3RZq4m2QiafAe1/2N9l1VXOZiGuig5buetIP3sNv3+abJ0ras93zbbh8FxT5tDNfsxSUq7+9AeVKJSbL2KGHXBubind+m2lAwbvFgUpsqfsA4U98y5tRc+/rCZVpvK+Tg4hgbHj3YBm6S/Elo8nh0Fy5PSGlBwr/K9hWuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709194892; c=relaxed/simple;
-	bh=WU7ffeSphhs/r9s6sbUYBG4gjwSJ/QhbvB2NXAEgqLU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=InzRJ0kjJuqch8ctBMTvwCJ/nuMSDlcP6k7ZJTkvDUI6XL+0eBYg9H7c93/GGR3olHbigMwIh38q9jWyBgtavhOD5ky9B3xs4SudFyMuOF0eGveZwAQHYMJh+0j1+uZvxE/Q+ttq/IBtx80LtDLrPsrzhLLq/YvaisI45ONbtyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UkqZuhdJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709194889;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yYWjbn49/FOaKnxv8tY8E/wAWpBZLZbrgSR43I6LPzc=;
-	b=UkqZuhdJCRQ92srziGQ6PSpCoIlkdZdv7SiBfTeqI6BQpQ0xOpzKQGPRYcdZlDM/In61vh
-	TFg6xaSOZzwGJ8e41dHHu5sX3Lv9HUJAMu413NbZa/9VNVtvhlmVaGS6/Y3Upz/XjYivgy
-	m/A2Uzw7CLoEVfUVj6vz9LJ7j8HUCYE=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-677-8XNULMxTMC21RQN0o0vRSg-1; Thu, 29 Feb 2024 03:21:24 -0500
-X-MC-Unique: 8XNULMxTMC21RQN0o0vRSg-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-512aacf66d1so388040e87.3
-        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 00:21:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709194883; x=1709799683;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yYWjbn49/FOaKnxv8tY8E/wAWpBZLZbrgSR43I6LPzc=;
-        b=Xy8++7VV9PeBeHYb8dWk1YLSu2rIXdVWtVVQkwXca1+q+oXtVkd1BwbHNfTwJPgjlZ
-         VHdOffRQ56/bguqXUXflebD2LFGo6FUXUDFefVWcXIzxrpyhDbV6VvmO92n2CXZypCJl
-         3mHbO2UC6lASx1lk6MU1zzh0GWIEYxj6g2Uez5Re0ITa27sdWImvN7xU9N1EYp8g2AVL
-         ZmEXPie+lelOP3Vq6Bot36zx57aWepVdk0W64X0JOnT/HdN0K6PVAhn3d8N8GghHFRPs
-         7icECzeZBMXIXKK0CBfbkPKRsprziUOHOpuNZHkSELffi0k6BU/V6I7/er5Ha7QaTgF5
-         +dRg==
-X-Forwarded-Encrypted: i=1; AJvYcCXuEM4MVV/dUormYWZ2yOUlWkyqoG+CI9H4n+6SF3SBOs9hwITabO2wz9ZYyqHFE3QN3vw3U2Y/w1pe+negjOPkp5ZG
-X-Gm-Message-State: AOJu0YyLX4F6tUJ9EeTAMSSJDrLBGpP6zDyFeNc4rgtZ1pNLUpBvia8e
-	Q1rNSHbrtnxeyWYMhVhnP1rLIK6hFUwj7kRM/PtAVtTdYamBNXnQ07tskJU1QdpbtkNqx+9E0Lj
-	1WHqzfd2txyHDpQu7forIw25EH9VWZZ5988AcerMq5LUWgrCXbg==
-X-Received: by 2002:a05:6512:2388:b0:513:26e7:440c with SMTP id c8-20020a056512238800b0051326e7440cmr679720lfv.61.1709194883523;
-        Thu, 29 Feb 2024 00:21:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHnM+zAIJHxVsYzJ0TLR9J0gKcOujhg4JzZrjGf+sjNfANqyY2DOR0YHjNv8O6HjvN3PHqhFQ==
-X-Received: by 2002:a05:6512:2388:b0:513:26e7:440c with SMTP id c8-20020a056512238800b0051326e7440cmr679694lfv.61.1709194883093;
-        Thu, 29 Feb 2024 00:21:23 -0800 (PST)
-Received: from redhat.com ([2a02:14f:178:d6b0:a21c:61c4:2098:5db])
-        by smtp.gmail.com with ESMTPSA id bt6-20020a056000080600b0033db9383e70sm1078294wrb.81.2024.02.29.00.21.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 00:21:22 -0800 (PST)
-Date: Thu, 29 Feb 2024 03:21:14 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Vadim Pasternak <vadimp@nvidia.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-um@lists.infradead.org, netdev@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-	kvm@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for
- premapped vq
-Message-ID: <20240229031755-mutt-send-email-mst@kernel.org>
-References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1709195472; c=relaxed/simple;
+	bh=OWd4fYTux+hAijsOgcO4XFq2Ff+muAy39DNVb8ggNhg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KZxSW7jiqJHzvfWSC+XO1iPVw708TavTxH4s1iy0DOCIUlLlSP1AM6p9hJA2XjyXpDG58oYvNDWJ2PNGKj/MV0Anw0eUuMQhqybMbVZCp89fl7pCdbIb1y/LygRfDca5O4u/PezjQ3p0A0ohZTEtSEQaKWQOvOX6DUl4ACrlXsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K9dYnj1p; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709195471; x=1740731471;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OWd4fYTux+hAijsOgcO4XFq2Ff+muAy39DNVb8ggNhg=;
+  b=K9dYnj1pLZ9QhlESdstErgjsph0SH5PzJP61nRYTQAALPGLAnO1t0gNe
+   amQd6FLL/unD2183F5DnLFcrozs11EmlCKFxfUn7uAWlwx9o1z2xlG2gH
+   rdumqEPNvNtTBRvVPc3Vawpb8lFtvUMRH/MNbEF1asOj7itfKfgUY3iKS
+   v45acpxES9GMo8/IkXSFaizY5c7J2IFxlLC7vwMexdvq3vFSuU8msg0B0
+   yQsk1K17AjgM7RnqYILqUASDazRV1snIRxRY5Xjs7lCwYZhEEZNSbpgHW
+   1gQzJT6s/TiHQdlRzlIzsSxsS4TYZU5CDFtqi4thYY+1J0QbJtuc/adXD
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="4231409"
+X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
+   d="scan'208";a="4231409"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Feb 2024 00:31:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
+   d="scan'208";a="30923916"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.225.159]) ([10.124.225.159])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Feb 2024 00:31:04 -0800
+Message-ID: <9ceaf8d8-383a-4989-b58e-727d70ed525b@linux.intel.com>
+Date: Thu, 29 Feb 2024 16:31:01 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v5 06/29] KVM: selftests: TDX: Use
+ KVM_TDX_CAPABILITIES to validate TDs' attribute configuration
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>,
+ Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>,
+ Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <20231212204647.2170650-1-sagis@google.com>
+ <20231212204647.2170650-7-sagis@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20231212204647.2170650-7-sagis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 29, 2024 at 03:20:25PM +0800, Xuan Zhuo wrote:
-> As discussed:
-> http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
-> 
-> If the virtio is premapped mode, the driver should manage the dma info by self.
-> So the virtio core should not store the dma info.
-> So we can release the memory used to store the dma info.
-> 
-> But if the desc_extra has not dma info, we face a new question,
-> it is hard to get the dma info of the desc with indirect flag.
-> For split mode, that is easy from desc, but for the packed mode,
-> it is hard to get the dma info from the desc. And for hardening
-> the dma unmap is saft, we should store the dma info of indirect
-> descs.
-> 
-> So I introduce the "structure the indirect desc table" to
-> allocate space to store dma info with the desc table.
-> 
-> On the other side, we mix the descs with indirect flag
-> with other descs together to share the unmap api. That
-> is complex. I found if we we distinguish the descs with
-> VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
-> 
-> Because of the dma array is allocated in the find_vqs(),
-> so I introduce a new parameter to find_vqs().
-> 
-> Note:
->     this is on the top of
->         [PATCH vhost v1] virtio: packed: fix unmap leak for indirect desc table
->         http://lore.kernel.org/all/20240223071833.26095-1-xuanzhuo@linux.alibaba.com
-> 
-> Please review.
-> 
-> Thanks
-> 
-> v3:
->     1. fix the conflict with the vp_modern_create_avq().
 
-Okay but are you going to address huge memory waste all this is causing for
-- people who never do zero copy
-- systems where dma unmap is a nop
 
-?
+On 12/13/2023 4:46 AM, Sagi Shahar wrote:
+> From: Ackerley Tng <ackerleytng@google.com>
+>
+> This also exercises the KVM_TDX_CAPABILITIES ioctl.
+>
+> Suggested-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ryan Afranji <afranji@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> ---
+>   .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   | 69 ++++++++++++++++++-
+>   1 file changed, 66 insertions(+), 3 deletions(-)
 
-You should address all comments when you post a new version, not just
-what was expedient, or alternatively tag patch as RFC and explain
-in commit log that you plan to do it later.
+Nit: Can also dump 'supported_gpaw' in tdx_read_capabilities().
 
-> v2:
->     1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS + 2
->         addr + len pairs.
->     2. introduce virtnet_sq_free_stats for __free_old_xmit
-> 
-> v1:
->     1. rename transport_vq_config to vq_transport_config
->     2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS +2)
->     3. introduce virtqueue_dma_map_sg_attrs
->     4. separate vring_create_virtqueue to an independent commit
-> 
-> 
-> 
-> Xuan Zhuo (19):
->   virtio_ring: introduce vring_need_unmap_buffer
->   virtio_ring: packed: remove double check of the unmap ops
->   virtio_ring: packed: structure the indirect desc table
->   virtio_ring: split: remove double check of the unmap ops
->   virtio_ring: split: structure the indirect desc table
->   virtio_ring: no store dma info when unmap is not needed
->   virtio: find_vqs: pass struct instead of multi parameters
->   virtio: vring_create_virtqueue: pass struct instead of multi
->     parameters
->   virtio: vring_new_virtqueue(): pass struct instead of multi parameters
->   virtio_ring: simplify the parameters of the funcs related to
->     vring_create/new_virtqueue()
->   virtio: find_vqs: add new parameter premapped
->   virtio_ring: export premapped to driver by struct virtqueue
->   virtio_net: set premapped mode by find_vqs()
->   virtio_ring: remove api of setting vq premapped
->   virtio_ring: introduce dma map api for page
->   virtio_ring: introduce virtqueue_dma_map_sg_attrs
->   virtio_net: unify the code for recycling the xmit ptr
->   virtio_net: rename free_old_xmit_skbs to free_old_xmit
->   virtio_net: sq support premapped mode
-> 
->  arch/um/drivers/virtio_uml.c             |  31 +-
->  drivers/net/virtio_net.c                 | 283 ++++++---
->  drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
->  drivers/remoteproc/remoteproc_virtio.c   |  31 +-
->  drivers/s390/virtio/virtio_ccw.c         |  33 +-
->  drivers/virtio/virtio_mmio.c             |  30 +-
->  drivers/virtio/virtio_pci_common.c       |  59 +-
->  drivers/virtio/virtio_pci_common.h       |   9 +-
->  drivers/virtio/virtio_pci_legacy.c       |  16 +-
->  drivers/virtio/virtio_pci_modern.c       |  38 +-
->  drivers/virtio/virtio_ring.c             | 698 ++++++++++++-----------
->  drivers/virtio/virtio_vdpa.c             |  45 +-
->  include/linux/virtio.h                   |  13 +-
->  include/linux/virtio_config.h            |  48 +-
->  include/linux/virtio_ring.h              |  82 +--
->  tools/virtio/virtio_test.c               |   4 +-
->  tools/virtio/vringh_test.c               |  28 +-
->  17 files changed, 847 insertions(+), 625 deletions(-)
-> 
-> --
-> 2.32.0.3.g01195cf9f
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+>
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> index 9b69c733ce01..6b995c3f6153 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> @@ -27,10 +27,9 @@ static char *tdx_cmd_str[] = {
+>   };
+>   #define TDX_MAX_CMD_STR (ARRAY_SIZE(tdx_cmd_str))
+>   
+> -static void tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data)
+> +static int _tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data)
+>   {
+>   	struct kvm_tdx_cmd tdx_cmd;
+> -	int r;
+>   
+>   	TEST_ASSERT(ioctl_no < TDX_MAX_CMD_STR, "Unknown TDX CMD : %d\n",
+>   		    ioctl_no);
+> @@ -40,11 +39,58 @@ static void tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data)
+>   	tdx_cmd.flags = flags;
+>   	tdx_cmd.data = (uint64_t)data;
+>   
+> -	r = ioctl(fd, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
+> +	return ioctl(fd, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
+> +}
+> +
+> +static void tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data)
+> +{
+> +	int r;
+> +
+> +	r = _tdx_ioctl(fd, ioctl_no, flags, data);
+>   	TEST_ASSERT(r == 0, "%s failed: %d  %d", tdx_cmd_str[ioctl_no], r,
+>   		    errno);
+>   }
+>   
+> +static struct kvm_tdx_capabilities *tdx_read_capabilities(struct kvm_vm *vm)
+> +{
+> +	int i;
+> +	int rc = -1;
+> +	int nr_cpuid_configs = 4;
+> +	struct kvm_tdx_capabilities *tdx_cap = NULL;
+> +
+> +	do {
+> +		nr_cpuid_configs *= 2;
+> +
+> +		tdx_cap = realloc(
+> +			tdx_cap, sizeof(*tdx_cap) +
+> +			nr_cpuid_configs * sizeof(*tdx_cap->cpuid_configs));
+> +		TEST_ASSERT(tdx_cap != NULL,
+> +			    "Could not allocate memory for tdx capability nr_cpuid_configs %d\n",
+> +			    nr_cpuid_configs);
+> +
+> +		tdx_cap->nr_cpuid_configs = nr_cpuid_configs;
+> +		rc = _tdx_ioctl(vm->fd, KVM_TDX_CAPABILITIES, 0, tdx_cap);
+> +	} while (rc < 0 && errno == E2BIG);
+> +
+> +	TEST_ASSERT(rc == 0, "KVM_TDX_CAPABILITIES failed: %d %d",
+> +		    rc, errno);
+> +
+> +	pr_debug("tdx_cap: attrs: fixed0 0x%016llx fixed1 0x%016llx\n"
+> +		 "tdx_cap: xfam fixed0 0x%016llx fixed1 0x%016llx\n",
+> +		 tdx_cap->attrs_fixed0, tdx_cap->attrs_fixed1,
+> +		 tdx_cap->xfam_fixed0, tdx_cap->xfam_fixed1);
+> +
+> +	for (i = 0; i < tdx_cap->nr_cpuid_configs; i++) {
+> +		const struct kvm_tdx_cpuid_config *config =
+> +			&tdx_cap->cpuid_configs[i];
+> +		pr_debug("cpuid config[%d]: leaf 0x%x sub_leaf 0x%x eax 0x%08x ebx 0x%08x ecx 0x%08x edx 0x%08x\n",
+> +			 i, config->leaf, config->sub_leaf,
+> +			 config->eax, config->ebx, config->ecx, config->edx);
+> +	}
+> +
+> +	return tdx_cap;
+> +}
+> +
+>   #define XFEATURE_MASK_CET (XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)
+>   
+>   static void tdx_apply_cpuid_restrictions(struct kvm_cpuid2 *cpuid_data)
+> @@ -78,6 +124,21 @@ static void tdx_apply_cpuid_restrictions(struct kvm_cpuid2 *cpuid_data)
+>   	}
+>   }
+>   
+> +static void tdx_check_attributes(struct kvm_vm *vm, uint64_t attributes)
+> +{
+> +	struct kvm_tdx_capabilities *tdx_cap;
+> +
+> +	tdx_cap = tdx_read_capabilities(vm);
+> +
+> +	/* TDX spec: any bits 0 in attrs_fixed0 must be 0 in attributes */
+> +	TEST_ASSERT_EQ(attributes & ~tdx_cap->attrs_fixed0, 0);
+> +
+> +	/* TDX spec: any bits 1 in attrs_fixed1 must be 1 in attributes */
+> +	TEST_ASSERT_EQ(attributes & tdx_cap->attrs_fixed1, tdx_cap->attrs_fixed1);
+> +
+> +	free(tdx_cap);
+> +}
+> +
+>   static void tdx_td_init(struct kvm_vm *vm, uint64_t attributes)
+>   {
+>   	const struct kvm_cpuid2 *cpuid;
+> @@ -91,6 +152,8 @@ static void tdx_td_init(struct kvm_vm *vm, uint64_t attributes)
+>   	memset(init_vm, 0, sizeof(*init_vm));
+>   	memcpy(&init_vm->cpuid, cpuid, kvm_cpuid2_size(cpuid->nent));
+>   
+> +	tdx_check_attributes(vm, attributes);
+> +
+>   	init_vm->attributes = attributes;
+>   
+>   	tdx_apply_cpuid_restrictions(&init_vm->cpuid);
 
 
