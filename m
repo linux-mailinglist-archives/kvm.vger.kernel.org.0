@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-10344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8859286BF33
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 04:00:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3969D86BF35
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 04:00:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB4E31C21C2E
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 03:00:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 550781C20627
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 03:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF30B43AD8;
-	Thu, 29 Feb 2024 02:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FCE446D3;
+	Thu, 29 Feb 2024 02:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iMgLyVET"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OSJZ1f5M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EB242053
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 02:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8C8446AC
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 02:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709175517; cv=none; b=qxgqLMRkv3q6kGWkqeJYtjsemk9Ix3+rQtOke7xM6BWMEyECzlpcw2iH+vxgujvbdhRhPe1h+OsXWb/TKIUU9WDaIJg/t5qJoYgMEDKbBvvyrFmCQroZA2zwYBKeM7v7TDnYysJ/QWg/dUTpEOzCN1YtCnXCdqlpS7D9v3uTFb4=
+	t=1709175522; cv=none; b=og48cPdG6VBV9klOQ9AX8UwMBAHBcPYqBygyj0GoX0q2WNE/AYHTghXdpyJXo+12gdqogL7jcq+Ew4zN4z+c0RHiaMxWqUgys9+3f/kbmiSTNOnPPpgVA0dPCunm1MnInEdM4MZlUqEWT43mQ4+kLSFYXDu6E/DEq/t5mbX+tV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709175517; c=relaxed/simple;
-	bh=UIJzBxDI/Inn6eJziAqaeOpmUvLyyhxfpWjO2dCmE1Y=;
+	s=arc-20240116; t=1709175522; c=relaxed/simple;
+	bh=mx4ftk9A2eIm9XAiiyU38OIODZ8JYeMn5dt8m6qb2xg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gJJuXJc2pmJJspq+CveRvmU+9PuA4UvKtqLw290Py2NAOelHS2IHacFv+lHDCJYUsiKFJPfafBhkaQRodMaTi5cvUAP2I3xj7wsf4Z19tDAzlnMs4JCkenCbjAjN36ovc0W0fhbi12v2T8TJA0MOHKm+ruOtmJcLtvAFtGIAMwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=iMgLyVET; arc=none smtp.client-ip=209.85.167.174
+	 MIME-Version; b=OlBv0OFvQjbYVS/8XndpBUrMP2wbYIr57zoxN2jztVebWM1BXLN0Q1ma+xg3Ah0ODMc3Oi8lvNHpIMNpV+LRnkyRN4AiYjtl2AWGO6+KNjYkj5iRHgyCwCkxW6NVLoWaILp24mTTdUwDCN+C/TIvoJj8Gk9PtyLIEyyuOP5bU8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=OSJZ1f5M; arc=none smtp.client-ip=209.85.160.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3bb9d54575cso256067b6e.2
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 18:58:35 -0800 (PST)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-214def5da12so218030fac.2
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 18:58:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1709175514; x=1709780314; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1709175519; x=1709780319; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rjuEwew1c9XXdIDCEsgjgWaQEbnELox0pWUx+WG8IvI=;
-        b=iMgLyVETxWC8KRYKo/7f74QL9LDcZBAMlVPkBKvtTNYj/ZL14ZW7CKnWrEJVkO1PKA
-         mBcVirTjXDxpOt84VuuDZLrF/Z3h5ayEsGwJvGsfhp0e9xPGn9eNwv7r2Kovve3L+KVF
-         odJU3QEC08tnBddJm/oQYWU46oyOvELb6P/jI=
+        bh=mkoJpJo0GmazuamQk6RjcdpeI7xXFyOUp8sC9NxHbRI=;
+        b=OSJZ1f5MVL/wYvFWJSp5mZ9WtNfkduU/eKx0FTVD/QunRr+FZRNvWTq2zQzQouwyd1
+         KSIsxDkRZ0/TpAWFeBQpcKPHn++cMNm0WNjM4+wNb8AnoS76o5SPDXPmfnpjurLdnXP4
+         1IbSyyIJkQpdQe1UhUfu6brQN7F4EPP5SKV7E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709175514; x=1709780314;
+        d=1e100.net; s=20230601; t=1709175519; x=1709780319;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rjuEwew1c9XXdIDCEsgjgWaQEbnELox0pWUx+WG8IvI=;
-        b=dD8zEODzihFiWMVNoAVNHH79iIbivPf1HCrSKOuRwGSAbQXVKAc+ARLgqW6oi2pZHK
-         J9OYH3gTpJ/yeTLOotGOsvzG3twHACH8NqdPY1/d4Q2O8LpVrppS92z824VbDLHA2jz6
-         LoCQ8QaPZgQXuZG5e1v5vJK45FD9Pul0iKQc0KkVq5rYQbQrDP0U/4lw8MBuGmctULNw
-         xXvmhdjCgI+3mwGqNFrcWg3v6WgSE22toe2OlOCM8yD8BCS/p0JPjkYmmzn12pHH8Mdz
-         UaIpfrYz3Tf0DC4zIpY8tSrHfysdeEr1r8rZtq/HDxxbf8GEm7o10LTP+6YhlBl/vw3a
-         sutw==
-X-Forwarded-Encrypted: i=1; AJvYcCXfp5AnN73J1ox/abwxOAFh+ADNK7unznzfeWZW18mqhxaJKwdC+PfHA3EXpDqeB2zkYiBQVZWjzVeQyPky00Q9Bjqp
-X-Gm-Message-State: AOJu0YzlGAJ7ujDzsZSKGZj9l24SNUjWC186J4wD99RVwb7mtjD1RQ0n
-	fgoZIv2dGUKUf8VO5XFwjEkjpRuOrwUhBk1VhePJ6aHETzqZZ+QN0o2IYcqHjQ==
-X-Google-Smtp-Source: AGHT+IHv5f1wWy5Mteh5mYoqzd0nZksGuXKcqFrO3o6Kt/eptOM26RonYJOAOu65xJX16drRYjcd3w==
-X-Received: by 2002:a05:6808:2196:b0:3c1:acc3:99ce with SMTP id be22-20020a056808219600b003c1acc399cemr1050071oib.37.1709175514558;
-        Wed, 28 Feb 2024 18:58:34 -0800 (PST)
+        bh=mkoJpJo0GmazuamQk6RjcdpeI7xXFyOUp8sC9NxHbRI=;
+        b=iZiGHatW+xTpwE1jhMtXnw+um9oTM29UbI7q4dB9AReDUbSb8flmjWxRRZDtmwbohC
+         36ffbBjvNPvwUs343rUZYtY42rV+C/IUBMZUSFI++L0sSPARIOKE4Lmxt/rUwTMta6mG
+         Fr0cZeFPvoVNZEaUJezF91RHLHq6sTNIL7nlrcg3cZ7ad+ehqmyb2p4gqtj7b83XURl/
+         ynxX/hXFETDGHtw1GhTNsWBGutY4t67tgKyxQT6RH9a44w+NleD1eMC7EJZKJJrJ9rmq
+         oei3laPNeItJu8BzJi6DJcMr2NZq3XSuoZc3V/dL1hhRGccTbFt6ajpZR7IpORr3ZhQ3
+         NUaA==
+X-Forwarded-Encrypted: i=1; AJvYcCVXD9vO9ICE82WV9r5LfwIrWyrKnkk+5qyD88fCeBKiq/hmuBL4PIbtpI8qpjPp8cHc0kAjHXh7rlMlqXIKGUT4GtwI
+X-Gm-Message-State: AOJu0YxECU+H5WMMAW9ENY3XUc2zr9aoTZnXFI95YZJKEQHfD/Ba1fu7
+	chQ9i+zVupmv4pZftjQTciE+vz++a6aPSpiNYRFbFJqROXywupcVYvuB7jMgsQ==
+X-Google-Smtp-Source: AGHT+IHgSlYOUqHE4Ztt8RlztYFhsUc43C3tIJE3BmbRfEvMcUwAl07lFXU547r4/LOxkwdG5eTJ8Q==
+X-Received: by 2002:a05:6870:a79e:b0:21f:cd31:f051 with SMTP id x30-20020a056870a79e00b0021fcd31f051mr796695oao.11.1709175519257;
+        Wed, 28 Feb 2024 18:58:39 -0800 (PST)
 Received: from localhost ([2401:fa00:8f:203:f51:e79e:9056:77ea])
-        by smtp.gmail.com with UTF8SMTPSA id e25-20020a62aa19000000b006e45dce37basm153830pff.220.2024.02.28.18.58.32
+        by smtp.gmail.com with UTF8SMTPSA id z12-20020aa785cc000000b006e56e5c09absm166699pfn.14.2024.02.28.18.58.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Feb 2024 18:58:34 -0800 (PST)
+        Wed, 28 Feb 2024 18:58:38 -0800 (PST)
 From: David Stevens <stevensd@chromium.org>
 X-Google-Original-From: David Stevens <stevensd@google.com>
 To: Sean Christopherson <seanjc@google.com>,
@@ -76,9 +76,9 @@ Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	David Stevens <stevensd@chromium.org>
-Subject: [PATCH v11 6/8] KVM: x86: Migrate to kvm_follow_pfn()
-Date: Thu, 29 Feb 2024 11:57:57 +0900
-Message-ID: <20240229025759.1187910-7-stevensd@google.com>
+Subject: [PATCH v11 7/8] KVM: x86/mmu: Track if sptes refer to refcounted pages
+Date: Thu, 29 Feb 2024 11:57:58 +0900
+Message-ID: <20240229025759.1187910-8-stevensd@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
 In-Reply-To: <20240229025759.1187910-1-stevensd@google.com>
 References: <20240229025759.1187910-1-stevensd@google.com>
@@ -92,162 +92,331 @@ Content-Transfer-Encoding: 8bit
 
 From: David Stevens <stevensd@chromium.org>
 
-Migrate functions which need to be able to map non-refcounted struct
-pages to kvm_follow_pfn(). These functions are kvm_faultin_pfn() and
-reexecute_instruction(). The former requires replacing the async in/out
-parameter with FOLL_NOWAIT parameter and the KVM_PFN_ERR_NEEDS_IO return
-value (actually handling non-refcounted pages is complicated, so it will
-be done in a followup). The latter is a straightforward refactor.
+Use one of the unused bits in EPT sptes to track whether or not an spte
+refers to a struct page that has a valid refcount, in preparation for
+adding support for mapping such pages into guests. The new bit is used
+to avoid triggering a page_count() == 0 warning and to avoid touching
+A/D bits of unknown usage.
 
-APIC related callers do not need to migrate because KVM controls the
-memslot, so it will always be regular memory. Prefetch related callers
-do not need to be migrated because atomic gfn_to_pfn() calls can never
-make it to hva_to_pfn_remapped().
+Non-EPT sptes don't have any free bits to use, so this tracking is not
+possible when TDP is disabled or on 32-bit x86.
 
 Signed-off-by: David Stevens <stevensd@chromium.org>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 43 ++++++++++++++++++++++++++++++++----------
- arch/x86/kvm/x86.c     | 11 +++++++++--
- virt/kvm/kvm_main.c    | 11 ++++-------
- 3 files changed, 46 insertions(+), 19 deletions(-)
+ arch/x86/kvm/mmu/mmu.c         | 47 ++++++++++++++++++++--------------
+ arch/x86/kvm/mmu/paging_tmpl.h |  5 ++--
+ arch/x86/kvm/mmu/spte.c        |  5 +++-
+ arch/x86/kvm/mmu/spte.h        | 16 +++++++++++-
+ arch/x86/kvm/mmu/tdp_mmu.c     | 21 ++++++++-------
+ include/linux/kvm_host.h       |  3 +++
+ virt/kvm/kvm_main.c            |  6 +++--
+ 7 files changed, 69 insertions(+), 34 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2d6cdeab1f8a..bbeb0f6783d7 100644
+index bbeb0f6783d7..4936a8c5829b 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4331,7 +4331,14 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
- static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+@@ -541,12 +541,14 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+ 
+ 	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte)) {
+ 		flush = true;
+-		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
++		if (is_refcounted_page_spte(old_spte))
++			kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+ 	}
+ 
+ 	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte)) {
+ 		flush = true;
+-		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
++		if (is_refcounted_page_spte(old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
+ 	}
+ 
+ 	return flush;
+@@ -578,20 +580,23 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+ 
+ 	pfn = spte_to_pfn(old_spte);
+ 
+-	/*
+-	 * KVM doesn't hold a reference to any pages mapped into the guest, and
+-	 * instead uses the mmu_notifier to ensure that KVM unmaps any pages
+-	 * before they are reclaimed.  Sanity check that, if the pfn is backed
+-	 * by a refcounted page, the refcount is elevated.
+-	 */
+-	page = kvm_pfn_to_refcounted_page(pfn);
+-	WARN_ON_ONCE(page && !page_count(page));
++	if (is_refcounted_page_spte(old_spte)) {
++		/*
++		 * KVM doesn't hold a reference to any pages mapped into the
++		 * guest, and instead uses the mmu_notifier to ensure that KVM
++		 * unmaps any pages before they are reclaimed. Sanity check
++		 * that, if the pfn is backed by a refcounted page, the
++		 * refcount is elevated.
++		 */
++		page = kvm_pfn_to_refcounted_page(pfn);
++		WARN_ON_ONCE(!page || !page_count(page));
+ 
+-	if (is_accessed_spte(old_spte))
+-		kvm_set_pfn_accessed(pfn);
++		if (is_accessed_spte(old_spte))
++			kvm_set_page_accessed(pfn_to_page(pfn));
+ 
+-	if (is_dirty_spte(old_spte))
+-		kvm_set_pfn_dirty(pfn);
++		if (is_dirty_spte(old_spte))
++			kvm_set_page_dirty(pfn_to_page(pfn));
++	}
+ 
+ 	return old_spte;
+ }
+@@ -627,8 +632,8 @@ static bool mmu_spte_age(u64 *sptep)
+ 		 * Capture the dirty status of the page, so that it doesn't get
+ 		 * lost when the SPTE is marked for access tracking.
+ 		 */
+-		if (is_writable_pte(spte))
+-			kvm_set_pfn_dirty(spte_to_pfn(spte));
++		if (is_writable_pte(spte) && is_refcounted_page_spte(spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(spte)));
+ 
+ 		spte = mark_spte_for_access_track(spte);
+ 		mmu_spte_update_no_track(sptep, spte);
+@@ -1267,8 +1272,8 @@ static bool spte_wrprot_for_clear_dirty(u64 *sptep)
  {
- 	struct kvm_memory_slot *slot = fault->slot;
--	bool async;
-+	struct kvm_follow_pfn kfp = {
-+		.slot = slot,
-+		.gfn = fault->gfn,
-+		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
-+		.try_map_writable = true,
-+		.guarded_by_mmu_notifier = true,
-+		.allow_non_refcounted_struct_page = false,
-+	};
+ 	bool was_writable = test_and_clear_bit(PT_WRITABLE_SHIFT,
+ 					       (unsigned long *)sptep);
+-	if (was_writable && !spte_ad_enabled(*sptep))
+-		kvm_set_pfn_dirty(spte_to_pfn(*sptep));
++	if (was_writable && !spte_ad_enabled(*sptep) && is_refcounted_page_spte(*sptep))
++		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(*sptep)));
  
+ 	return was_writable;
+ }
+@@ -2946,7 +2951,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 	}
+ 
+ 	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
+-			   true, host_writable, &spte);
++			   true, host_writable, true, &spte);
+ 
+ 	if (*sptep == spte) {
+ 		ret = RET_PF_SPURIOUS;
+@@ -5999,6 +6004,10 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+ 
+ #ifdef CONFIG_X86_64
+ 	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled;
++
++	/* The SPTE_MMU_PAGE_REFCOUNTED bit is only available with EPT. */
++	if (enable_tdp)
++		shadow_refcounted_mask = SPTE_MMU_PAGE_REFCOUNTED;
+ #endif
  	/*
- 	 * Retry the page fault if the gfn hit a memslot that is being deleted
-@@ -4368,12 +4375,20 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (fault->is_private)
- 		return kvm_faultin_pfn_private(vcpu, fault);
+ 	 * max_huge_page_level reflects KVM's MMU capabilities irrespective
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 4d4e98fe4f35..c965f77ac4d5 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -902,7 +902,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+  */
+ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
+ {
+-	bool host_writable;
++	bool host_writable, is_refcounted;
+ 	gpa_t first_pte_gpa;
+ 	u64 *sptep, spte;
+ 	struct kvm_memory_slot *slot;
+@@ -959,10 +959,11 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+ 	sptep = &sp->spt[i];
+ 	spte = *sptep;
+ 	host_writable = spte & shadow_host_writable_mask;
++	is_refcounted = is_refcounted_page_spte(spte);
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+ 	make_spte(vcpu, sp, slot, pte_access, gfn,
+ 		  spte_to_pfn(spte), spte, true, false,
+-		  host_writable, &spte);
++		  host_writable, is_refcounted, &spte);
  
--	async = false;
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
--					  fault->write, &fault->map_writable,
--					  &fault->hva);
--	if (!async)
--		return RET_PF_CONTINUE; /* *pfn has correct page already */
-+	kfp.flags |= FOLL_NOWAIT;
-+	fault->pfn = kvm_follow_pfn(&kfp);
-+
-+	if (!is_error_noslot_pfn(fault->pfn))
-+		goto success;
-+
-+	/*
-+	 * If kvm_follow_pfn() failed because I/O is needed to fault in the
-+	 * page, then either set up an asynchronous #PF to do the I/O, or if
-+	 * doing an async #PF isn't possible, retry kvm_follow_pfn() with
-+	 * I/O allowed. All other failures are fatal, i.e. retrying won't help.
-+	 */
-+	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
-+		return RET_PF_CONTINUE;
+ 	return mmu_spte_update(sptep, spte);
+ }
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 4a599130e9c9..e4a458b7e185 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -39,6 +39,7 @@ u64 __read_mostly shadow_memtype_mask;
+ u64 __read_mostly shadow_me_value;
+ u64 __read_mostly shadow_me_mask;
+ u64 __read_mostly shadow_acc_track_mask;
++u64 __read_mostly shadow_refcounted_mask;
  
- 	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
- 		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
-@@ -4391,9 +4406,17 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	 * to wait for IO.  Note, gup always bails if it is unable to quickly
- 	 * get a page and a fatal signal, i.e. SIGKILL, is pending.
- 	 */
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, true, NULL,
--					  fault->write, &fault->map_writable,
--					  &fault->hva);
-+	kfp.flags |= FOLL_INTERRUPTIBLE;
-+	kfp.flags &= ~FOLL_NOWAIT;
-+	fault->pfn = kvm_follow_pfn(&kfp);
+ u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
+ u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
+@@ -138,7 +139,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+ 	       u64 old_spte, bool prefetch, bool can_unsync,
+-	       bool host_writable, u64 *new_spte)
++	       bool host_writable, bool is_refcounted, u64 *new_spte)
+ {
+ 	int level = sp->role.level;
+ 	u64 spte = SPTE_MMU_PRESENT_MASK;
+@@ -188,6 +189,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 
+ 	if (level > PG_LEVEL_4K)
+ 		spte |= PT_PAGE_SIZE_MASK;
++	if (is_refcounted)
++		spte |= shadow_refcounted_mask;
+ 
+ 	if (shadow_memtype_mask)
+ 		spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index a129951c9a88..6bf0069d8db6 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -96,6 +96,13 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
+ /* Defined only to keep the above static asserts readable. */
+ #undef SHADOW_ACC_TRACK_SAVED_MASK
+ 
++/*
++ * Indicates that the SPTE refers to a page with a valid refcount. Only
++ * available for TDP SPTEs, since bits 62:52 are reserved for PAE paging,
++ * including NPT PAE.
++ */
++#define SPTE_MMU_PAGE_REFCOUNTED        BIT_ULL(59)
 +
-+	if (!is_error_noslot_pfn(fault->pfn))
-+		goto success;
-+
-+	return RET_PF_CONTINUE;
-+success:
-+	fault->hva = kfp.hva;
-+	fault->map_writable = kfp.writable;
- 	return RET_PF_CONTINUE;
+ /*
+  * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
+  * the memslots generation and is derived as follows:
+@@ -345,6 +352,13 @@ static inline bool is_dirty_spte(u64 spte)
+ 	return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
  }
  
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 363b1c080205..f4a20e9bc7a6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8747,6 +8747,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
++extern u64 __read_mostly shadow_refcounted_mask;
++
++static inline bool is_refcounted_page_spte(u64 spte)
++{
++	return !shadow_refcounted_mask || (spte & shadow_refcounted_mask);
++}
++
+ static inline u64 get_rsvd_bits(struct rsvd_bits_validate *rsvd_check, u64 pte,
+ 				int level)
  {
- 	gpa_t gpa = cr2_or_gpa;
- 	kvm_pfn_t pfn;
-+	struct kvm_follow_pfn kfp;
+@@ -475,7 +489,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+ 	       u64 old_spte, bool prefetch, bool can_unsync,
+-	       bool host_writable, u64 *new_spte);
++	       bool host_writable, bool is_refcounted, u64 *new_spte);
+ u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
+ 		      	      union kvm_mmu_page_role role, int index);
+ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 6ae19b4ee5b1..ee497fb78d90 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -414,6 +414,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	bool was_leaf = was_present && is_last_spte(old_spte, level);
+ 	bool is_leaf = is_present && is_last_spte(new_spte, level);
+ 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
++	bool is_refcounted = is_refcounted_page_spte(old_spte);
  
- 	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
- 		return false;
-@@ -8776,7 +8777,13 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	 * retry instruction -> write #PF -> emulation fail -> retry
- 	 * instruction -> ...
- 	 */
--	pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(gpa));
-+	kfp = (struct kvm_follow_pfn) {
-+		.slot = gfn_to_memslot(vcpu->kvm, gpa_to_gfn(gpa)),
-+		.gfn = gpa_to_gfn(gpa),
-+		.flags = FOLL_GET | FOLL_WRITE,
-+		.allow_non_refcounted_struct_page = true,
-+	};
-+	pfn = kvm_follow_pfn(&kfp);
+ 	WARN_ON_ONCE(level > PT64_ROOT_MAX_LEVEL);
+ 	WARN_ON_ONCE(level < PG_LEVEL_4K);
+@@ -478,9 +479,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	if (is_leaf != was_leaf)
+ 		kvm_update_page_stats(kvm, level, is_leaf ? 1 : -1);
+ 
+-	if (was_leaf && is_dirty_spte(old_spte) &&
++	if (was_leaf && is_dirty_spte(old_spte) && is_refcounted &&
+ 	    (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
+-		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
++		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
  
  	/*
- 	 * If the instruction failed on the error pfn, it can not be fixed,
-@@ -8785,7 +8792,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	if (is_error_noslot_pfn(pfn))
- 		return false;
+ 	 * Recursively handle child PTs if the change removed a subtree from
+@@ -492,9 +493,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
+ 		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
  
--	kvm_release_pfn_clean(pfn);
-+	kvm_release_page_clean(kfp.refcounted_page);
+-	if (was_leaf && is_accessed_spte(old_spte) &&
++	if (was_leaf && is_accessed_spte(old_spte) && is_refcounted &&
+ 	    (!is_present || !is_accessed_spte(new_spte) || pfn_changed))
+-		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
++		kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+ }
  
- 	/* The instructions are well-emulated on direct mmu. */
- 	if (vcpu->arch.mmu->root_role.direct) {
+ /*
+@@ -956,8 +957,8 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
+ 	else
+ 		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
+-					 fault->pfn, iter->old_spte, fault->prefetch, true,
+-					 fault->map_writable, &new_spte);
++				   fault->pfn, iter->old_spte, fault->prefetch, true,
++				   fault->map_writable, true, &new_spte);
+ 
+ 	if (new_spte == iter->old_spte)
+ 		ret = RET_PF_SPURIOUS;
+@@ -1178,8 +1179,9 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
+ 		 * Capture the dirty status of the page, so that it doesn't get
+ 		 * lost when the SPTE is marked for access tracking.
+ 		 */
+-		if (is_writable_pte(iter->old_spte))
+-			kvm_set_pfn_dirty(spte_to_pfn(iter->old_spte));
++		if (is_writable_pte(iter->old_spte) &&
++		    is_refcounted_page_spte(iter->old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter->old_spte)));
+ 
+ 		new_spte = mark_spte_for_access_track(iter->old_spte);
+ 		iter->old_spte = kvm_tdp_mmu_write_spte(iter->sptep,
+@@ -1602,7 +1604,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		trace_kvm_tdp_mmu_spte_changed(iter.as_id, iter.gfn, iter.level,
+ 					       iter.old_spte,
+ 					       iter.old_spte & ~dbit);
+-		kvm_set_pfn_dirty(spte_to_pfn(iter.old_spte));
++		if (is_refcounted_page_spte(iter.old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter.old_spte)));
+ 	}
+ 
+ 	rcu_read_unlock();
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 59dc9fbafc08..d19a418df04b 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1211,6 +1211,9 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gfn_t gfn,
+ void kvm_release_page_clean(struct page *page);
+ void kvm_release_page_dirty(struct page *page);
+ 
++void kvm_set_page_accessed(struct page *page);
++void kvm_set_page_dirty(struct page *page);
++
+ struct kvm_follow_pfn {
+ 	const struct kvm_memory_slot *slot;
+ 	gfn_t gfn;
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 17bf9fd6774e..24e2269339cb 100644
+index 24e2269339cb..235c92830cdc 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -3293,6 +3293,9 @@ void kvm_release_page_clean(struct page *page)
- {
- 	WARN_ON(is_error_page(page));
- 
-+	if (!page)
-+		return;
-+
- 	kvm_set_page_accessed(page);
- 	put_page(page);
+@@ -3277,17 +3277,19 @@ static bool kvm_is_ad_tracked_page(struct page *page)
+ 	return !PageReserved(page);
  }
-@@ -3300,16 +3303,10 @@ EXPORT_SYMBOL_GPL(kvm_release_page_clean);
  
- void kvm_release_pfn_clean(kvm_pfn_t pfn)
+-static void kvm_set_page_dirty(struct page *page)
++void kvm_set_page_dirty(struct page *page)
  {
--	struct page *page;
--
- 	if (is_error_noslot_pfn(pfn))
- 		return;
- 
--	page = kvm_pfn_to_refcounted_page(pfn);
--	if (!page)
--		return;
--
--	kvm_release_page_clean(page);
-+	kvm_release_page_clean(kvm_pfn_to_refcounted_page(pfn));
+ 	if (kvm_is_ad_tracked_page(page))
+ 		SetPageDirty(page);
  }
- EXPORT_SYMBOL_GPL(kvm_release_pfn_clean);
++EXPORT_SYMBOL_GPL(kvm_set_page_dirty);
  
+-static void kvm_set_page_accessed(struct page *page)
++void kvm_set_page_accessed(struct page *page)
+ {
+ 	if (kvm_is_ad_tracked_page(page))
+ 		mark_page_accessed(page);
+ }
++EXPORT_SYMBOL_GPL(kvm_set_page_accessed);
+ 
+ void kvm_release_page_clean(struct page *page)
+ {
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
