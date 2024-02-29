@@ -1,193 +1,159 @@
-Return-Path: <kvm+bounces-10548-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10549-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 724FB86D3C1
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 20:54:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4447086D591
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 22:05:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28AC8287A80
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 19:54:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C975E28BE37
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 21:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1AC142903;
-	Thu, 29 Feb 2024 19:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEC574BFE;
+	Thu, 29 Feb 2024 20:53:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pjd.dev header.i=@pjd.dev header.b="MRCduglQ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OCqkEO0D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FpoHLgzV"
 X-Original-To: kvm@vger.kernel.org
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C7F1428ED;
-	Thu, 29 Feb 2024 19:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D14C74BEF
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 20:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709236435; cv=none; b=CKtmVzfIyyjT7lPc/8VVQ8yaV25IwqLgBBNoPgBm5HqGPfTlFcxkDPv3ZCiIe2XVukK1PTMfTo/B4X/PGedW2NHqER5bo4dHxPNshn5oCptfWJMmnySG23WVx+jnLBHeoDbhipxjYv8EvflmjQdAYyYmZlmyX+KrS9ddHnKuzZw=
+	t=1709240032; cv=none; b=CvLoOq+N6/U0drxMMRtCWTA8feKEUNACAaxaS9RUCIOQmElJYax1uIC8g10m7SI1cZHHgbfvNa38QE+1JOrH2OdOEs1VbC8C5Eb6qEAxvUKQ34B3kX7idXEcpY4OHQZhL6x6FO8iffvbTasNCXFS3jsNbCII9+EjYtFpoaaEIdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709236435; c=relaxed/simple;
-	bh=jthKmHH9qkCJL1rwJwt8b2jErTogMsGgAUEXSYO24Yw=;
-	h=From:Content-Type:Mime-Version:Subject:Date:In-Reply-To:Cc:
-	 References:Message-Id; b=HjNlqxFZlM4NQLEoAzRcu/oGFyjl1jE51X9s/goOSSXAnxaLWoDN85NnNyl5Qa/DQnOi7brhyl1kf1yji+1rdLShWBjzNT751orlFseZYQ2Fu5rE+/rxNU4yvD9b9eK4QxeB63fslkrb/vmLYSnBiVQGjXh3rsST4/lKF4HiATg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pjd.dev; spf=pass smtp.mailfrom=pjd.dev; dkim=pass (2048-bit key) header.d=pjd.dev header.i=@pjd.dev header.b=MRCduglQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OCqkEO0D; arc=none smtp.client-ip=66.111.4.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pjd.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pjd.dev
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailout.nyi.internal (Postfix) with ESMTP id 51E785C005D;
-	Thu, 29 Feb 2024 14:53:52 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute7.internal (MEProxy); Thu, 29 Feb 2024 14:53:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pjd.dev; h=cc:cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to; s=fm2; t=1709236432; x=
-	1709322832; bh=M6rbw+n+N/w7eLH273TiruvrBg5kCYrlH64w/wGT6BE=; b=M
-	RCduglQ26s2yEjvTWgEx6I1ewsYbU+20i4Z1Fx8vBy3oeMwZGTJsJ1+U994l+jkz
-	++L+pcn8/y4qSpBlFBNzj6Gfrnir/WEIz/GDN18PEjRzKJHO2r77JA9fNcNOQiZy
-	//BvVlFPwGxQuiUfd4FEQQk2hyz62f38PT+El97C1JsD0s2XuEf3rtmBjEKvg4Gj
-	guem2TQ3+p2/2S96IJljZvvDoU3WZgRgjpLP7phbSCgmA/XeP+NusQCyvLVbcZ3J
-	OOy2ihFl1GLtDUj5ERXtQWYyojAVRRPugvE/Gq23ZRAR3Z0GB57lFZLWvveVFmeY
-	s+ZD0RhrOoHvYeWE6CDlQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1709236432; x=
-	1709322832; bh=M6rbw+n+N/w7eLH273TiruvrBg5kCYrlH64w/wGT6BE=; b=O
-	CqkEO0DvDTpEFyxxN1l26pty9a/06rQgGuKiB+F7L2R2aUPZjJ9BafSWil98zPij
-	pNTb09Lw0CTca1fSMX5Ldee60EIDdCo4X3+wHnTs8j4/8YYYBW+EahliDj8hQ1e3
-	f3dVVUvWfd6eH/TSY2hfzO/wvDhr7hOirE5SHwXzBdkOC4TR4DgDkLQNjmyasglS
-	mVpSIFXIuJFu00Le4C2fuRuDitAZISVOtr6+ojCE3AwyYnMcaBeh09HGgDWa7pGX
-	zRQySiyeP5tdDMvTIRA2aBmrL8eHJFD3KpgUC6vogO+0/Sjcswzjqw5QxnHoA0Ls
-	5t1qIlkKdP9Xxy4DdOobA==
-X-ME-Sender: <xms:0ODgZYhQJiJZ8e8CxidGqvAUQvWY2uP42x_FpRpmC8qfe7spo4qt4Q>
-    <xme:0ODgZRCWAGwMurvef3OvjOAwD4JywlxqmiVR-cECLzxdiyPc0eRwv8A9h3wcizRfC
-    AM7E7XsGaKoU7RU500>
-X-ME-Received: <xmr:0ODgZQGdMrH1sbmw07PB1Mv506CikCgtFNo7DHQzgStY_wa-dTPTNeY5qvzlJ4k0uMlHkz0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrgeelgdduvdelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenuchmihhsshhinhhgucfvqfcufhhivghlugculdeftd
-    dmnecujfgurhephfgtgfggufffjgevfhfkofesthhqmhdthhdtjeenucfhrhhomheprfgv
-    thgvrhcuffgvlhgvvhhorhihrghsuceophgvthgvrhesphhjugdruggvvheqnecuggftrf
-    grthhtvghrnhepledvleeijedtteffudfhkeduheeludefgfeuveekheekvefhfffhffeh
-    ieeifeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epphgvthgvrhesphhjugdruggvvh
-X-ME-Proxy: <xmx:0ODgZZQra8s9NrKYILgCsPHGziVk5PK6CQUEYLNT3jOGF55DZA5xcQ>
-    <xmx:0ODgZVxKfKaJXuS9nQ9pNluWXLInu-7dM2Bar0Syb-suaMEs_P6b_Q>
-    <xmx:0ODgZX7tcGNY2ZTDdXgg4EwnoQNqCkZS0_9nh897giTD31Op3Wu-Qw>
-    <xmx:0ODgZcnnaCFXPoYGS5hc8uT3M-zpslxBKte70xWrye0IsH1TXnmWng>
-Feedback-ID: i9e814621:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 29 Feb 2024 14:53:51 -0500 (EST)
-From: Peter Delevoryas <peter@pjd.dev>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1709240032; c=relaxed/simple;
+	bh=aSfCidGWZQymlsm3BsMfr0uts4B7cslkQpccMqtTIlU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q2VRq3BG5haJc/W/pwRcxdU6+nsspgJ2WG+B7oGGVEaLIwL7lIT2ViGDQO0SDcghqL5r5wMap60ealQ9zMNQxuXOs9LQxSctnwaT182JENvouC/F7PFdJ5CTR3nJcP3W2C2kiSgAerLvMbdMsjrRfDBnvyiENi/Q6FoUo0PeqCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FpoHLgzV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709240029;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=pwC7w8RQ315Hy8ZjgqKPWOY3T5YPFeI5JvaDoZSl2GE=;
+	b=FpoHLgzVcto67Kcnqwa0sZKH4arGrKuhzupCc2M1O7hgygpOzRVm1yq+3wdYqrL5o90zLU
+	U4P5Q4CqPgUyQNEvq1az0m19eV4XWGVe9BXfv7xyq34JCMLatt6Okm2jYJKVVC5VyRDGX1
+	wgvPoJ+piVMtvkgf5e1dZOOWRf/Zvuw=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631-x3ywzNeDNvmhBOuzqYb3zQ-1; Thu, 29 Feb 2024 15:53:47 -0500
+X-MC-Unique: x3ywzNeDNvmhBOuzqYb3zQ-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-56421fd7029so1000235a12.3
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 12:53:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709240026; x=1709844826;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pwC7w8RQ315Hy8ZjgqKPWOY3T5YPFeI5JvaDoZSl2GE=;
+        b=xNhv/fmKld92ImQSn8sIYG/lx+G6mPRwZFKoGre+xYyvabheoP++1baI27nWoAzwAY
+         yFRaSdF/nuqL11VYmTXcCqvZbchD2XSPGp2WwL/ZhXj1r/9ht9n5CXdp59mvF7Amasgn
+         qC9EF+3QBaYo804HzN/sdS7lwZah4tQeBjrpyKhvXhLnFRQ6BLRXjjfEdvy6JJjq1cUP
+         8GW568SzyFjO7uU7tl/K6dxdI+3oid04xmVTO950FtrKhfJXgvVYoGU1Fjfm52wCEWwr
+         v+bjrmDorWu5qRG0Un6gyEGE0aw0CPz3wvBxXlGQ1cAEXT+/0d5RWLiYTVxSQC83S9Ue
+         YGYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVvkFt+h2jcXHgecE64XMBqRiplsO2XFbVMhjb722EWOm/6zG41ZTCSLGD8LaBOpx8LFyPjU/B2F+8hRB8EgqHPaavG
+X-Gm-Message-State: AOJu0Ywskx/UZ0oK7Hj2WJgrwvJzXuB1wAEnN7zj1n0N0ZYZbt1JCz7I
+	QEc7C0hLaUMfWEzomKmHHTHt/yTl0OeZAkhrcOiRMwcZwVDGEtokj5az4Kw9yV2RFjQ9AyvPkEa
+	qS92cT/YlKpK4ObYUsF8w5uNKxT1TSBJ/SosZ05roYTDH4CYttA==
+X-Received: by 2002:a50:85ca:0:b0:565:7733:3c58 with SMTP id q10-20020a5085ca000000b0056577333c58mr58408edh.4.1709240026736;
+        Thu, 29 Feb 2024 12:53:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEOZ2cLSgzAhYyDA6LLyzzJ+clnn6kc1PAWLDoUQN+uKtntvl2GL/JHid/8tMXrs0ACpLPt7A==
+X-Received: by 2002:a50:85ca:0:b0:565:7733:3c58 with SMTP id q10-20020a5085ca000000b0056577333c58mr58405edh.4.1709240026415;
+        Thu, 29 Feb 2024 12:53:46 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id es17-20020a056402381100b005666aaf340dsm925739edb.21.2024.02.29.12.53.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Feb 2024 12:53:45 -0800 (PST)
+Message-ID: <f25bc125-a013-4c43-b67d-09512786ae90@redhat.com>
+Date: Thu, 29 Feb 2024 21:53:43 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.400.31\))
-Subject: Re: [q&a] Status of IOMMU virtualization for nested virtualization
- (userspace PCI drivers in VMs)
-Date: Thu, 29 Feb 2024 11:53:39 -0800
-In-Reply-To: <20240228123810.70663da2.alex.williamson@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>,
- suravee.suthikulpanit@amd.com,
- iommu@lists.linux.dev,
- kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- alex.williamson@redhat.com,
- Peter Delevoryas <peter@pjd.dev>
-References: <3D96D76D-85D2-47B5-B4C1-D6F95061D7D6@pjd.dev>
- <20240228123810.70663da2.alex.williamson@redhat.com>
-Message-Id: <D4DDA526-5E5D-40DB-86EF-B4B6D7692663@pjd.dev>
-X-Mailer: Apple Mail (2.3774.400.31)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: CVE-2021-46978: KVM: nVMX: Always make an attempt to map eVMCS
+ after migration
+Content-Language: en-US
+To: Theodore Ts'o <tytso@mit.edu>
+Cc: Greg KH <gregkh@kernel.org>, cve@kernel.org,
+ linux-kernel@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <2024022822-CVE-2021-46978-3516@gregkh>
+ <54595439-1dbf-4c3c-b007-428576506928@redhat.com>
+ <2024022905-barrette-lividly-c312@gregkh>
+ <CABgObfZ+bMOac-yf2v6jD+s0-_RXACY3ApDknC2FnTmmgDXEug@mail.gmail.com>
+ <20240229143454.GC272762@mit.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20240229143454.GC272762@mit.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 2/29/24 15:34, Theodore Ts'o wrote:
+> On Thu, Feb 29, 2024 at 11:04:45AM +0100, Paolo Bonzini wrote:
+>> Also, LKML does not get the initial announcement, which makes it a bit
+>> more painful to find the full discussion on lore (you have to go
+>> through a "no message with that id, maybe you mean this one from other
+>> mailing lists" page, instead of having the whole thread in the same
+>> place). A linux-cve mailing list with public posting, used for Cc and
+>> Reply-to of the initial message, would solve this issue as well.
+> 
+> I believe the url https://lore.kernel.org/all/<message-id> will get
+> the whole thread, regardless of which mailing lists individual mail
+> messages were sent to, does it not?
 
+Yes, it does.  That covers the web interface but it still leaves out 
+subscribers and people reading via NNTP.
 
-> On Feb 28, 2024, at 11:38=E2=80=AFAM, Alex Williamson =
-<alex.williamson@redhat.com> wrote:
->=20
-> On Wed, 28 Feb 2024 10:29:32 -0800
-> Peter Delevoryas <peter@pjd.dev> wrote:
->=20
->> Hey guys,
->>=20
->> I=E2=80=99m having a little trouble reading between the lines on =
-various
->> docs, mailing list threads, KVM presentations, github forks, etc, so
->> I figured I=E2=80=99d just ask:
->>=20
->> What is the status of IOMMU virtualization, like in the case where I
->> want a VM guest to have a virtual IOMMU?
->=20
-> It works fine for simply nested assignment scenarios, ie. guest
-> userspace drivers or nested VMs.
->=20
->> I found this great presentation from KVM Forum 2021: [1]
->>=20
->> 1. I=E2=80=99m using -device intel-iommu right now. This has =
-performance
->> implications and large DMA transfers hit the vfio_iommu_type1
->> dma_entry_limit on the host because of how the mappings are made.
->=20
-> Hugepages for the guest and mappings within the guest should help both
-> the mapping performance and DMA entry limit.  In general the type1 =
-vfio
-> IOMMU backend is not optimized for dynamic mapping, so =
-performance-wise
-> your best bet is still to design the userspace driver for static DMA
-> buffers.
+That said, I'm not sure why people who look at CVEs for a living should 
+not have their own lighter-traffic mailing list, which was the main 
+reason to have a linux-cve mailing list.
 
-Yep, huge pages definitely help, will probably switch to allocating them =
-at boot for better guarantees.
-
->=20
->> 2. -device virtio-iommu is an improvement, but it doesn=E2=80=99t =
-seem
->> compatible with -device vfio-pci? I was only able to test this with
->> cloud-hypervisor, and it has a better vfio mapping pattern (avoids
->> hitting dma_entry_limit).
->=20
-> AFAIK it's just growing pains, it should work but it's working through
-> bugs.
-
-Oh really?? Ok: I might even be configuring things incorrectly, or
-Maybe I need to upgrade from QEMU 7.1 to 8. I was relying on whatever
-libvirt does by default, which seems to just be:
-
-    -device virtio-iommu -device vfio-pci,host=3D<bdf>
-
-But maybe I need some other options?
-
->=20
->> 3. -object iommufd [2] I haven=E2=80=99t tried this quite yet, =
-planning to:
->> if it=E2=80=99s using iommufd, and I have all the right kernel =
-features in
->> the guest and host, I assume it=E2=80=99s implementing the =
-passthrough mode
->> that AMD has described in their talk? Because I imagine that would be
->> the best solution for me, I=E2=80=99m just having trouble =
-understanding if
->> it=E2=80=99s actually related or orthogonal.
->=20
-> For now iommufd provides a similar DMA mapping interface to type1, but
-> it does remove the DMA entry limit and improves locked page =
-accounting.
->=20
-> To really see a performance improvement relative to dynamic mappings,
-> you'll need nesting support in the IOMMU, which is under active
-> development.  =46rom this aspect you will want iommufd since similar
-> features will not be provided by type1.  Thanks,
-
-I see, thanks! That=E2=80=99s great to hear.
-
->=20
-> Alex
->=20
+Paolo
 
 
