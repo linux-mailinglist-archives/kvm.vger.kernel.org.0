@@ -1,74 +1,80 @@
-Return-Path: <kvm+bounces-10336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62D8C86BE3B
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 02:25:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD65A86BEF1
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 03:32:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD60AB21128
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 01:25:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3758F1F229FC
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 02:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202EB2E62C;
-	Thu, 29 Feb 2024 01:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E1322083;
+	Thu, 29 Feb 2024 02:32:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="PRNTWzWZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GS97b6de"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5831A2D048
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 01:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1AB1C3E
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 02:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709169944; cv=none; b=JfwXVf4ez+U/Ivl/2/2rCfq1OAjJ45BPaKlnhRSV49qV+5SS0L5bLJNrMjYXagJu7l6SDUTrs2RjOkggWqjs8yMpi7ho5Ds8D+wczxZkZyDq9DxUXRG3O8KU6vXrLTCBs0p5LMiU4T0h4z4fCj1VYd9tmQNWFVXfeCe2rtDplIE=
+	t=1709173952; cv=none; b=EIc0tnZUrCNO15I+uHO6tIeESqhAXiU8ngf+yQafSKHecYhOw4iyu4eqZgGhujLG53C8As5xwAWcRv5oAlhTUu8eh241wAHP2WeYhqYRlyj/b1C4DSP65snq4GVAC2ZhUyNB5MVL/iITv2VXAFlmSEcR5B8BlLG6q4gZRggbsaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709169944; c=relaxed/simple;
-	bh=qIGnVqZ/Kay7J7/4DkGf5cjQtbvjlFkLUW8VJT2xv+8=;
+	s=arc-20240116; t=1709173952; c=relaxed/simple;
+	bh=YOkdAprSCV+XulnV5YqABOxeO5ZoWWxGnpd4AFlm/Og=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dW34pWr0hJObgybzGoAN5g28Ok2q2EqLM/RwKbMHwTVIYQYExINqWCf1XLQY4crb8UeLy3/XbhEXwN/+yr5641psD7UOOEzigDFVVKo0zhdmtI7MsxVftXPVjGDT06pVzjdftyxoAYMuGmSu2kjWkSAuKe2aiqnfKv1CzV1Zlqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=PRNTWzWZ; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6e55bb75c9eso315459b3a.3
-        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 17:25:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1709169939; x=1709774739; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=q7x7uA7NSQkePcQ/Dz95qzCoBbFkkFThRf0k4ROWmH0=;
-        b=PRNTWzWZ7sR5TXKazS85KzxxsaggSU8yytwdD3JP0Rfatw4nL6ekoofZinQ5rFWn0R
-         Nx/6Ayl+yyoWAizqq3hh6rmipyt7dLRYYOBrvn+qI0ZqANwXsvdaMVqCTxPbTQRhRAWU
-         IINUUGazqGcf218VwZ1/4JTiIjYgKdeOW60YSX5ftYtXxPLxjEf9nYPQFkwFpJKUYxHZ
-         GN4tAmKp8ClC4V4Y9SUV90li6TXuEU9dqGa+aZ3sUrY3qZ4vJ4F6WJJxGoa5oxKSFYRN
-         TZHIZEB3ecQkk8+1+3Tnh4QFoXHIazVpez+PPB7oz0erI8lHAXH7ld22C9kkTzR+FJ/6
-         01bQ==
+	 In-Reply-To:Content-Type; b=ckrbWvrYYiJo0IbKCDYCV/apvwplwckXd3bKtNOk4rJptVKnAjBzh9vTbuPofET3teU/KyK2k4B7jajZLung3zNSPg+ILN4bI1zzrVVPbnztntUg6awJ4qEWCDLC+lz44CV6Ci2lfRSmPsZXDCdMlfYeeTmFAZcZMRwtCUsQpDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GS97b6de; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709173949;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PPsYBEJddN/xQ57WL3+GwTydxyzz4QoXjKgo1oJ6u6w=;
+	b=GS97b6deVzr4R+i9vntrHSuFQGXI64I7b0GyM0/z1EVjJT7YLg/Vbc3s3+aD/ejZe2KfYn
+	d5Euduk3RvsjwSmtksskRCCTqG4qrn4iqRF6N4ItpJMjOq4PUaAF45o6A5Xp0KcNz7x5hD
+	n4c7hZyEdMQlrkmeiUZcPpBdZGQ26UE=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-587-LDX-tXUsMjWS67xW-H7zoQ-1; Wed, 28 Feb 2024 21:32:27 -0500
+X-MC-Unique: LDX-tXUsMjWS67xW-H7zoQ-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5cfccde4a54so67697a12.1
+        for <kvm@vger.kernel.org>; Wed, 28 Feb 2024 18:32:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709169939; x=1709774739;
+        d=1e100.net; s=20230601; t=1709173946; x=1709778746;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q7x7uA7NSQkePcQ/Dz95qzCoBbFkkFThRf0k4ROWmH0=;
-        b=TKf/3zYaE7KJ+aoLV6xpg2h4EJdbKIG1aOxCIXwEcUnby85ML1Mw37M3Y9h7MSaQWc
-         EKotUdWzIRLgYAVBVKZ9QBNeudtUttKYLyV3Jlmi3djUIpwqxPCpxdWBrQRy/Nan8uyU
-         QmqWLQh0xSD0vxUiMQTL3OAUBmX8wC5KkSii9bOagOoM/qS+Z77C66ZdigPf+fnD7jOH
-         8n1p4uWvwGgOeYgRKrp/FgyZKj2/FHG/OjXNnXs8tgu37YXFNRJN9hZfEed6HREaa1Sn
-         tof0QMOrFWVV4EmVvdF8BuMgqO0l9ZmAXFknpUF5py1S8lo2QAOx6Nh7WMbVL+8sCGV3
-         ebwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkYfKTixCz22IkjBgV1tidynZCqxsgSiO46K1F/Ox5F8uwV5SEOyYALsPmHGWkoWiLM1blRho3tkjJVGAZBJ+mLVEk
-X-Gm-Message-State: AOJu0Yzl/fMk4cQWfc8ZXXPdXvs6NZpjrshJvHMqb52YEetFApF/yVkc
-	WKbASGyF2ULh5rcmI9mltNNFT2/V5LNHdPjLywOybMOS/Qh8GmLtuClVYWyxbTA=
-X-Google-Smtp-Source: AGHT+IGVNq0GdLLoZO6gsHV0enVh/g1iccgeAPyi28DWJ/hAb4TwrAvEc8ANrsMQqAciXHOFf/KYzQ==
-X-Received: by 2002:a05:6a00:3d0c:b0:6e4:bb45:49f3 with SMTP id lo12-20020a056a003d0c00b006e4bb4549f3mr1315237pfb.34.1709169939235;
-        Wed, 28 Feb 2024 17:25:39 -0800 (PST)
-Received: from [172.16.0.23] (c-67-188-2-18.hsd1.ca.comcast.net. [67.188.2.18])
-        by smtp.gmail.com with ESMTPSA id y37-20020a056a00182500b006e56b0f274fsm84872pfa.134.2024.02.28.17.25.36
+        bh=PPsYBEJddN/xQ57WL3+GwTydxyzz4QoXjKgo1oJ6u6w=;
+        b=uAXj+wtAPAEqNOLpRLP25a051BqN4Zv+4e3nIKaD/oI0KIQVx1EQtRPjzve2cuOClU
+         r1TcAIAyl3hKy6CIWY7lPzo/T/GpIJkJ0/ATxtKbY87VROzFd7kGp1+XahGri33hRhzj
+         4zdSQ+p7CQW9KR7I4RXpNBZBzhHcXnpimYsmOKPjvRE95/nTZJM7tUya5vEir/WlCm9v
+         50YjstkvR/0JmKMmGX2SRabANVpCrbVHMYUZu9Gixk0ckd6KPOvlnmWAMrC3ZgGUnwFA
+         zHFVVp64Jxr2SPniei+bHJM+04dKo2ei/rmEIAqDkm/fLIJfTgcH6WTlRQ7EVSMYXuEO
+         9ajw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEWUMThMHTZrRbtlb3fuN0f8r8BOulUJKAPe/KQSVA4ZhfVCVKcn26JXOxGxhDKgjUAZzukePi5c2ZFi0Wd/NWXe3R
+X-Gm-Message-State: AOJu0YyDriZSdSuUu6z9QTSYHjrfWrhmT+Ncrc+Sci7tCBkoSWzcLd9n
+	lgfK404NTy9WogNKzMH8HjLvAGCJYZc5ufOpPhhT3KE3fMPjAGzBxClH7PtKIp4K3lfgbUYMozY
+	45s2JFDZnAnsPOVMWZ8z5yuUxA/YIdVsoM47gN1ewKalZ0bkVMA==
+X-Received: by 2002:a05:6a20:6a11:b0:1a0:f897:492e with SMTP id p17-20020a056a206a1100b001a0f897492emr1253886pzk.3.1709173946560;
+        Wed, 28 Feb 2024 18:32:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE3gZGctzFdHsOkiyxlZx2notX2p2+NaZGh7I1jhWnkTKKw0O7Gy7Opyuz/raMPL2YQZay1Nw==
+X-Received: by 2002:a05:6a20:6a11:b0:1a0:f897:492e with SMTP id p17-20020a056a206a1100b001a0f897492emr1253864pzk.3.1709173946061;
+        Wed, 28 Feb 2024 18:32:26 -0800 (PST)
+Received: from [10.72.116.135] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id kw13-20020a170902f90d00b001dc90ac1cecsm151422plb.284.2024.02.28.18.32.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Feb 2024 17:25:38 -0800 (PST)
-Message-ID: <63d73f09-84e5-49e1-99f5-60f414b22d70@rivosinc.com>
-Date: Wed, 28 Feb 2024 17:25:34 -0800
+        Wed, 28 Feb 2024 18:32:25 -0800 (PST)
+Message-ID: <c50ece12-0c20-4f37-a193-3d819937272b@redhat.com>
+Date: Thu, 29 Feb 2024 10:32:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,429 +82,385 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 00/20] Add Counter delegation ISA extension support
+Subject: Re: [PATCH v7] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
 Content-Language: en-US
-To: Ian Rogers <irogers@google.com>
-Cc: linux-kernel@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Alexandre Ghiti <alexghiti@rivosinc.com>,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Atish Patra <atishp@atishpatra.org>, Christian Brauner <brauner@kernel.org>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>,
- Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org,
- Evan Green <evan@rivosinc.com>, Guo Ren <guoren@kernel.org>,
- Heiko Stuebner <heiko@sntech.de>, Ingo Molnar <mingo@redhat.com>,
- James Clark <james.clark@arm.com>, Jing Zhang <renyu.zj@linux.alibaba.com>,
- Jiri Olsa <jolsa@kernel.org>, Ji Sheng Teoh <jisheng.teoh@starfivetech.com>,
- John Garry <john.g.garry@oracle.com>, Jonathan Corbet <corbet@lwn.net>,
- Kan Liang <kan.liang@linux.intel.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
- Ley Foon Tan <leyfoon.tan@starfivetech.com>, linux-doc@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-riscv@lists.infradead.org,
- Mark Rutland <mark.rutland@arm.com>, Namhyung Kim <namhyung@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Peter Zijlstra <peterz@infradead.org>,
- Rob Herring <robh+dt@kernel.org>, Samuel Holland
- <samuel.holland@sifive.com>, Weilin Wang <weilin.wang@intel.com>,
- Will Deacon <will@kernel.org>, kaiwenxue1@gmail.com,
- Yang Jihong <yangjihong1@huawei.com>
-References: <20240217005738.3744121-1-atishp@rivosinc.com>
- <CAP-5=fXh79aeHZ-M4CqP_GkfOHw0-7Cc1YLLGEyW5pT7t8eGHw@mail.gmail.com>
-From: Atish Patra <atishp@rivosinc.com>
-In-Reply-To: <CAP-5=fXh79aeHZ-M4CqP_GkfOHw0-7Cc1YLLGEyW5pT7t8eGHw@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, Eric Auger <eauger@redhat.com>,
+ Sebastian Ott <sebott@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20240221063431.76992-1-shahuang@redhat.com>
+ <CAFEAcA-dAghULy_LibG8XLq4yUT3wZLUKvjrRzWZ+4ZSKfYEmQ@mail.gmail.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <CAFEAcA-dAghULy_LibG8XLq4yUT3wZLUKvjrRzWZ+4ZSKfYEmQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 2/17/24 12:28, Ian Rogers wrote:
-> On Fri, Feb 16, 2024 at 4:58 PM Atish Patra <atishp@rivosinc.com> wrote:
+Hi Peter,
+
+On 2/22/24 22:28, Peter Maydell wrote:
+> On Wed, 21 Feb 2024 at 06:34, Shaoqin Huang <shahuang@redhat.com> wrote:
 >>
->> This series adds the counter delegation extension support. It is based on
->> very early PoC work done by Kevin Xue and mostly rewritten after that.
->> The counter delegation ISA extension(Smcdeleg/Ssccfg) actually depends
->> on multiple ISA extensions.
+>> The KVM_ARM_VCPU_PMU_V3_FILTER provides the ability to let the VMM decide
+>> which PMU events are provided to the guest. Add a new option
+>> `kvm-pmu-filter` as -cpu sub-option to set the PMU Event Filtering.
+>> Without the filter, all PMU events are exposed from host to guest by
+>> default. The usage of the new sub-option can be found from the updated
+>> document (docs/system/arm/cpu-features.rst).
 >>
->> 1. S[m|s]csrind : The indirect CSR extension[1] which defines additional
->>     5 ([M|S|VS]IREG2-[M|S|VS]IREG6) register to address size limitation of
->>     RISC-V CSR address space.
->> 2. Smstateen: The stateen bit[60] controls the access to the registers
->>     indirectly via the above indirect registers.
->> 3. Smcdeleg/Ssccfg: The counter delegation extensions[2]
+>> Here is an example which shows how to use the PMU Event Filtering, when
+>> we launch a guest by use kvm, add such command line:
 >>
->> The counter delegation extension allows Supervisor mode to program the
->> hpmevent and hpmcounters directly without needing the assistance from the
->> M-mode via SBI calls. This results in a faster perf profiling and very
->> few traps. This extension also introduces a scountinhibit CSR which allows
->> to stop/start any counter directly from the S-mode. As the counter
->> delegation extension potentially can have more than 100 CSRs, the specification
->> leverages the indirect CSR extension to save the precious CSR address range.
+>>    # qemu-system-aarch64 \
+>>          -accel kvm \
+>>          -cpu host,kvm-pmu-filter="D:0x11-0x11"
 >>
->> Due to the dependency of these extensions, the following extensions must be
->> enabled in qemu to use the counter delegation feature in S-mode.
+>> Since the first action is deny, we have a global allow policy. This
+>> filters out the cycle counter (event 0x11 being CPU_CYCLES).
 >>
->> "smstateen=true,sscofpmf=true,ssccfg=true,smcdeleg=true,smcsrind=true,sscsrind=true"
+>> And then in guest, use the perf to count the cycle:
 >>
->> When we access the counters directly in S-mode, we also need to solve the
->> following problems.
+>>    # perf stat sleep 1
 >>
->> 1. Event to counter mapping
->> 2. Event encoding discovery
+>>     Performance counter stats for 'sleep 1':
 >>
->> The RISC-V ISA doesn't define any standard either for event encoding or the
->> event to counter mapping rules.
+>>                1.22 msec task-clock                       #    0.001 CPUs utilized
+>>                   1      context-switches                 #  820.695 /sec
+>>                   0      cpu-migrations                   #    0.000 /sec
+>>                  55      page-faults                      #   45.138 K/sec
+>>     <not supported>      cycles
+>>             1128954      instructions
+>>              227031      branches                         #  186.323 M/sec
+>>                8686      branch-misses                    #    3.83% of all branches
 >>
->> Until now, the SBI PMU implementation relies on device tree binding[3] to
->> discover the event to counter mapping in RISC-V platform in the firmware. The
->> SBI PMU specification[4] defines event encoding for standard perf events as well.
->> Thus, the kernel can query the appropriate counter for an given event from the
->> firmware.
+>>         1.002492480 seconds time elapsed
 >>
->> However, the kernel doesn't need any firmware interaction for hardware
->> counters if counter delegation is available in the hardware. Thus, the driver
->> needs to discover the above mappings/encodings by itself without any assistance
->> from firmware. One of the options considered was to extend the PMU DT parsing
->> support to kernel as well. However, that requires additional support in ACPI
->> based system. It also needs more infrastructure in the virtualization as well.
+>>         0.001752000 seconds user
+>>         0.000000000 seconds sys
 >>
->> This patch series solves the above problem #1 by extending the perf tool in a
->> way so that event json file can specify the counter constraints of each event
->> and that can be passed to the driver to choose the best counter for a given
->> event. The perf stat metric series[5] from Weilin already extend the perf tool
->> to parse "Counter" property to specify the hardware counter restriction.
->> I have included the patch from Weilin in this series for verification purposes
->> only. I will rebase as that series evolves.
+>> As we can see, the cycle counter has been disabled in the guest, but
+>> other pmu events do still work.
 >>
->> This series extends that support by converting comma separated string to a
->> bitmap. The counter constraint bitmap is passed to the perf driver via
->> newly introduced "counterid_mask" property set in "config2". Even though, this
->> is a generic perf tool change, this should not affect any other architecture
->> if "counterid_mask" is not mapped.
+>> Reviewed-by: Sebastian Ott <sebott@redhat.com>
+>> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+>> ---
+>> v6->v7:
+>>    - Check return value of sscanf.
+>>    - Improve the check condition.
 >>
->> @Weilin: Please let me know if there is a better way to solve the problem I
->> described.
+>> v5->v6:
+>>    - Commit message improvement.
+>>    - Remove some unused code.
+>>    - Collect Reviewed-by, thanks Sebastian.
+>>    - Use g_auto(Gstrv) to replace the gchar **.          [Eric]
 >>
->> The problem #2 is solved by defining a architecture specific override function
->> that will replace the perf standard event encoding with an encoding specified
->> in the json file with the same event name. The alternate solution considered
->> was to specify the encodings in the driver. However, these encodings are vendor
->> specific in absence of an ISA guidelines and will become unmanageable with
->> so many RISC-V vendors touching the driver for their encoding.
+>> v4->v5:
+>>    - Change the kvm-pmu-filter as a -cpu sub-option.     [Eric]
+>>    - Comment tweak.                                      [Gavin]
+>>    - Rebase to the latest branch.
 >>
->> The override is only required when counter delegation is available in the
->> platform which is detected at the runtime. The SBI PMU (current implementation)
->> doesn't require any override as it defines the standard event encoding. The
->> hwprobe syscall defined for RISC-V is used for this detection in this series.
->> A sysfs based property can be explored to do the same but we may require
->> hwprobe in future given the churn of extensions in RISC-V. That's why, I went
->> with hwprobe. Let me know if anybody thinks that's a bad idea.
+>> v3->v4:
+>>    - Fix the wrong check for pmu_filter_init.            [Sebastian]
+>>    - Fix multiple alignment issue.                       [Gavin]
+>>    - Report error by warn_report() instead of error_report(), and don't use
+>>    abort() since the PMU Event Filter is an add-on and best-effort feature.
+>>                                                          [Gavin]
+>>    - Add several missing {  } for single line of code.   [Gavin]
+>>    - Use the g_strsplit() to replace strtok().           [Gavin]
 >>
->> The perf tool also hook allows RISC-V ISA platform vendors to define their
->> encoding for any standard perf or ISA event. I have tried to cover all the use
->> cases that I am aware of (stat, record, top). Please let me know if I have
->> missed any particular use case where architecture hook must be invoked. I am
->> also open to any other idea to solve the above said problem.
+>> v2->v3:
+>>    - Improve commits message, use kernel doc wording, add more explaination on
+>>      filter example, fix some typo error.                [Eric]
+>>    - Add g_free() in kvm_arch_set_pmu_filter() to prevent memory leak. [Eric]
+>>    - Add more precise error message report.              [Eric]
+>>    - In options doc, add pmu-filter rely on KVM_ARM_VCPU_PMU_V3_FILTER support in
+>>      KVM.                                                [Eric]
+>>
+>> v1->v2:
+>>    - Add more description for allow and deny meaning in
+>>      commit message.                                     [Sebastian]
+>>    - Small improvement.                                  [Sebastian]
+>>
+>>   docs/system/arm/cpu-features.rst | 23 +++++++++
+>>   target/arm/cpu.h                 |  3 ++
+>>   target/arm/kvm.c                 | 80 ++++++++++++++++++++++++++++++++
+>>   3 files changed, 106 insertions(+)
 > 
-> Hi Atish,
+> The new syntax for the filter property seems quite complicated.
+> I think it would be worth testing it with a new test in
+> tests/qtest/arm-cpu-features.c.
+
+I was trying to add a test in tests/qtest/arm-cpu-features.c. But I 
+found all other cpu-feature is bool property.
+
+When I use the 'query-cpu-model-expansion' to query the cpu-features, 
+the kvm-pmu-filter will not shown in the returned results, just like below.
+
+{'execute': 'query-cpu-model-expansion', 'arguments': {'type': 'full', 
+'model': { 'name': 'host'}}}{"return": {}}
+
+{"return": {"model": {"name": "host", "props": {"sve768": false, 
+"sve128": false, "sve1024": false, "sve1280": false, "sve896": false, 
+"sve256": false, "sve1536": false, "sve1792": false, "sve384": false, 
+"sve": false, "sve2048": false, "pauth": false, "kvm-no-adjvtime": 
+false, "sve512": false, "aarch64": true, "pmu": true, "sve1920": false, 
+"sve1152": false, "kvm-steal-time": true, "sve640": false, "sve1408": 
+false, "sve1664": false}}}}
+
+I'm not sure if it's because the `query-cpu-model-expansion` only return 
+the feature which is bool. Since the kvm-pmu-filter is a str, it won't 
+be recognized as a feature.
+
+So I want to ask how can I add the kvm-pmu-filter which is str property 
+into the cpu-feature.c test.
+
 > 
-> Thank you for the work! I know how the perf tool discovers events is
-> somewhat assumed knowledge, I thought I'd just go through it here and
-> explain a difference that is landing in Linux 6.8, as well as recent
-> heterogeneous/hybrid/big.little support changes, just so those who
-> aren't up to speed can catch up for the sake of discussion on this
-> approach - sorry for turning this into a longer email than it perhaps
-> needs to be, and the historical take may lack accuracy that I
-> apologize in advance for.
 > 
-> The job of discovering events is to map a name like "cycles" into a
-> set up for the perf_event_attr passed to perf_event_open. This sounds
-> simple but "cycles" may be encoded differently for different PMUs on a
-> heterogeneous system, it may also be an event on an accelerator like a
-> GPU. So the first thing to recognize is that a name like "cycles" may
-> map onto multiple struct perf_event_attr values. The behavior of how
-> the perf tool does this lacks consistency, for example are all or just
-> core PMUs considered, but this is deliberate for the sake of somewhat
-> consistency by the tool over time. Perhaps in the future we'll
-> change/fix this as things like accelerators dominate performance
-> concerns.
+>> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+>> index a5fb929243..7c8f6a60ef 100644
+>> --- a/docs/system/arm/cpu-features.rst
+>> +++ b/docs/system/arm/cpu-features.rst
+>> @@ -204,6 +204,29 @@ the list of KVM VCPU features and their descriptions.
+>>     the guest scheduler behavior and/or be exposed to the guest
+>>     userspace.
+>>
+>> +``kvm-pmu-filter``
+>> +  By default kvm-pmu-filter is disabled. This means that by default all pmu
 > 
-> The next thing is that what "cycles" means has been evolving over
-> Linux releases. Originally "cycles" was assumed to be a CPU event and
-> there were other events like "page-faults" which were software events.
-> In perf_event.h there are enums for the "type" of event (hardware,
-> software, cache, etc.) and for the actual event itself - cycles is
-> "config" value 0. In the code we tend to refer to this kind of
-> encoding as legacy. An ability was added (maybe it was always there)
-> to dynamically add PMUs and PMUs advertise the value for the struct
-> perf_event_attr through sysfs in  "/sys/devices/<pmu name>/type". On
-> x86 the performance core typically has a type matching the legacy
-> hardware number, but on ARM this isn't the case. So that legacy events
-> can work on heterogeneous/hybrid/big.little systems where there should
-> be multiple PMUs (looking at most Android devices for misconfiguring
-> this), there is an extended type field in the top 32-bits of the
-> struct perf_event_attr config. The extended type means I want this
-> legacy event type on the extended type PMU.
-> 
-> For non-legacy events there is a problem of how to map a name to a
-> config value (I'll say singular config value but overtime it has
-> actually become 4 64-bit values). The sysfs format directory
-> "/sys/devices/<pmu name>/format" does this. The files in the format
-> directory say that on x86 the event is encoded in the first byte of
-> the config and the umask in the second byte. If there is an event like
-> "assists.any" that has an event of 0xc1 and a umask of 7, then the
-> perf tool knows to create a config value of 0x7c1 using the format
-> encoding.
-> 
-> To go from an event name like "cycles" to a format encoding there are
-> two places to look, the first is "/sys/devices/<pmu name>/events/". In
-> the events directory on x86 there is a "cpu-cycles" that contains
-> "event=0x3c", i.e. a format style encoding. The second are the json
-> files that are mapped to format style encodings for a specific cpuid
-> by jevents.py. The easiest way to see the 2nd kind is to run "perf
-> list --details":
-> ```
-> ...
->    assists.any
->        [Number of occurrences where a microcode assist is invoked by hardware]
->         default_core/event=0xc1,period=0x186a3,umask=0x7/
-> ...
-> ```
-> We can see there is a format style encoding that has been built into
-> the perf tool.
-> 
-> A place where ambiguity creeps in and is changing in Linux 6.8 is what
-> to do when we have the same event in places like the legacy name,
-> sysfs and the json? The behavior we have is:
-> 1) "perf stat -e cycles ..." - the event was specified without PMUs,
-> it is assumed a legacy encoding on all core PMUs is preferred (note
-> non-core PMUs that have a cycles event are ignored, but this wouldn't
-> be the case if the event weren't a legacy event name)
-> 2) "perf stat -e cpu/cycles/" - the event was specified with a core
-> PMU, prior to 6.8 (ie any current perf tool), a legacy encoding will
-> be used. In 6.8 and after the json and sysfs encoding will have
-> priority: https://lore.kernel.org/r/20231123042922.834425-1-irogers@google.com
-> 3) "perf stat -e pmu/cycles/" - event was specified with a non-core
-> PMU so a legacy encoding won't be considered, only json and sysfs.
-> 
-> As I understand the problem you are trying to fix in the perf tool it
-> is for behavior 1 above, this is because the PMU driver wants the
-> legacy event encodings to be in json so it needn't discover them.
-> Behaviors 2 and 3 already prefer json encodings that are built into
-> the perf tool.
-> 
-> So given behavior 1 is kind of weird, it considers different PMUs
-> dependent on whether the event is legacy or not, it doesn't override
-> with a sysfs/json event if one is present, why don't we look to change
-> behavior 1 so that it is more like behaviors 2 and 3? I believe this
-> gives you the ability to override legacy events you want. At the same
-> time I'd like to also remove the "only core PMUs" assumption.
+> "PMU"
 > 
 
-Absolutely. Thanks for the detailed context and walking through the 
-different cases for each event type.
+Got it.
 
-> What would this look like? Well in the current code we take a legacy
-> event and then create a perf_event_attr for each core PMU:
-> https://git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools-next.git/tree/tools/perf/util/parse-events.c?h=perf-tools-next#n1348
-> We'd need to change this so that we wild card all the PMUs and
-> consider the sysfs/json events first, which is what we already do
-> here:
-> https://git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools-next.git/tree/tools/perf/util/parse-events.y?h=perf-tools-next#n305
-> with the sysfs/json fix up being here:
-> https://git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools-next.git/tree/tools/perf/util/parse-events.c?h=perf-tools-next#n1016
+>> +  events will be exposed to guest.
+>> +
+>> +  KVM implements PMU Event Filtering to prevent a guest from being able to
+>> +  sample certain events. It depends on the KVM_ARM_VCPU_PMU_V3_FILTER
+>> +  attribute supported in KVM. It has the following format:
+>> +
+>> +  kvm-pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
+>> +
+>> +  The A means "allow" and D means "deny", start is the first event of the
+>> +  range and the end is the last one. The first registered range defines
+>> +  the global policy(global ALLOW if the first @action is DENY, global DENY
 > 
-> As with the 6.8 change to prioritize sysfs/json over legacy the
-> largest part of this change will be updating all the test
-> expectations. Wdyt?
+> Missing space before '('.
 > 
-
-That's awesome. That's exactly what I want. Let me know if you are going 
-to push that change or want me to work on it while revising this series.
-
-I am happy to test those changes either way.
-
-> Things this patch series does that I don't like:
->   - hardcoding the expected CPU's PMU to "cpu", this should almost
-> certainly be an iterator over all core PMU types. This allows core
-
-Agreed. I did not like this approach either and not sure if this is the 
-best method to fix the problem we have. I should have clarified well 
-that in the cover letter.
-
-> PMUs not to be called "cpu" and for heterogeneous configurations to
-> work.
->   - doing things in an arch specific way. Test coverage is really hard
-
-
-We do have an additional architecture specific issue at hand here.
-As described, we need the event mapping with platforms with newer ISA 
-extensions but doesn't need it for older platforms without ISA 
-extensions. In addition to that, the new ISA extension doesn't cover 
-virtualization. Thus, kvm guests continue to rely on the old way of 
-discovering the events through SBI (ecall) interface.
-
-Thus, a platform (e.g Qemu) can have both options present depending on
-how it is configured.
-
-To cover both cases, I introduced a RISC-V specific mechanism to detect 
-the presence of the ISA extension in the perf tool.
-
-"PATCH 18-20 adds hwprobe mechanism to enable perf to detect if platform 
-supports delegation extensions."
-
-If we don't want to keep any architecture specific hooks in this path, 
-can we use a sysfs way to enable/disable mapping ?
-
-I believe the pmu driver can update the sysfs for the perf tool to 
-decide in that case ?
-
-> and when something lives in arch directory we lose coverage unless we
-> run on that machine type. Ugh, I'm just reminded that ARM
-> heterogeneous is broken because of an arch override that doesn't
-> consider >1 core PMU. Testing an ARM heterogenous PMU set up is hard
-> but not doing so breaks people running Linux on M1 macs. Really we
-> should just have PMU specific behaviors and the arch directory should
-> disappear. This would also greatly help cross architecture work where
-> you may record from perf on one architecture, but analyze the data on
-> another.
->   - we've been moving to have perf and the json have less special
-> architecture knowledge. Weilin's patches aside, we've added things
-> like  "/sys/devices/<pmu name>/caps/slots" so that metrics can use
-> "#slots" rather than hard coding the pipeline width in each metric. My
-> hope for Weilin's patches is that we can make it less Intel specific
-> and ultimately we may be able to advertise the specific features like
-> number of fixed and generic counters via something like sysfs.
-
-While that's ideal for x86/ARM64 where number of platform vendors are 
-less (x86) or ISA has defined all-to-all event to counter mapping.
-
-In RISC-V, we tried to push for all-to-all mapping which was not 
-accepted withing RISC-V working groups. Every platform vendor will most 
-likely end up in a different mapping of event to counters.
-
-Thus, event to counter mapping via "Counter" field in json solve this
-problem quite well. The only downside is that there is no common way 
-across the architecture to pass that information to the pmu driver.
-
-Hence a RISC-V specific solution via config2
-https://lore.kernel.org/lkml/20240217005738.3744121-17-atishp@rivosinc.com/
-
-Please let me know if this can be solved in an eficient way as well.
-
-> However, the counters an event can go on is a property of the event so
-> I see a need for the sysfs/json to add this.
-> 
-> Congratulations if you got this far, sorry this email was so long. Thanks,
-> Ian
+> Why the '@' before 'action'?
 > 
 
-Apologies for the delayed reply and Thanks again!
+I copied the description from kvm document. And it has the @ before 
+action, I think I can delete @ at there.
 
->> PATCH organization:
->> PATCH 1 is from the perf metric series[5]
->> PATCH 2-5 defines and implements the indirect CSR extension.
->> PATCH 6-10 defines the other required ISA extensions.
->> PATCH 11 just an overall restructure of the RISC-V PMU driver.
->> PATCH 12-14 implements the counter delegation extension and new perf tool
->> plumbings to solve #1 and #2.
->> PATCH 15-16 improves the perf tool support to solve #1 and #2.
->> PATCH 17 adds a perf json file for qemu virt machine.
->> PATCH 18-20 adds hwprobe mechanism to enable perf to detect if platform supports
->> delegation extensions.
+>> +  if the first @action is ALLOW). The start and end only support hexadecimal
+>> +  format. For example:
+>> +
+>> +  kvm-pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
+>> +
+>> +  Since the first action is allow, we have a global deny policy. It
+>> +  will allow event 0x11 (The cycle counter), events 0x23 to 0x3a are
+> 
+> lowercase "the".
+> 
+
+Gotta.
+
+>> +  also allowed except the event 0x30 which is denied, and all the other
+>> +  events are denied.
+>> +
+> 
+> Did you check that the documentation builds and that this new
+> documentation renders into HTML the way you want it?
+> 
+
+I can double check it.
+
+>>   TCG VCPU Features
+>>   =================
 >>
->> There is no change in process to run perf stat/record and will continue to work
->> as it is as long as the relevant extensions have been enabled in Qemu.
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index 63f31e0d98..f7f2431755 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -948,6 +948,9 @@ struct ArchCPU {
 >>
->> However, the perf tool needs to be recompiled with as it requires new kenrel
->> headers.
+>>       /* KVM steal time */
+>>       OnOffAuto kvm_steal_time;
+>> +
+>> +    /* KVM PMU Filter */
+>> +    char *kvm_pmu_filter;
+>>   #endif /* CONFIG_KVM */
 >>
->> The Qemu patches can be found here:
->> https://github.com/atishp04/qemu/tree/counter_delegation_rfc
+>>       /* Uniprocessor system with MP extensions */
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index 81813030a5..5c62580d34 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -496,6 +496,22 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+>>       ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>>   }
 >>
->> The opensbi patch can be found here:
->> https://github.com/atishp04/opensbi/tree/counter_delegation_v1
+>> +static char *kvm_pmu_filter_get(Object *obj, Error **errp)
+>> +{
+>> +    ARMCPU *cpu = ARM_CPU(obj);
+>> +
+>> +    return g_strdup(cpu->kvm_pmu_filter);
+>> +}
+>> +
+>> +static void kvm_pmu_filter_set(Object *obj, const char *pmu_filter,
+>> +                               Error **errp)
+>> +{
+>> +    ARMCPU *cpu = ARM_CPU(obj);
+>> +
+>> +    g_free(cpu->kvm_pmu_filter);
+>> +    cpu->kvm_pmu_filter = g_strdup(pmu_filter);
+>> +}
+>> +
+>>   /* KVM VCPU properties should be prefixed with "kvm-". */
+>>   void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>>   {
+>> @@ -517,6 +533,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>>                                kvm_steal_time_set);
+>>       object_property_set_description(obj, "kvm-steal-time",
+>>                                       "Set off to disable KVM steal time.");
+>> +
+>> +    object_property_add_str(obj, "kvm-pmu-filter", kvm_pmu_filter_get,
+>> +                            kvm_pmu_filter_set);
+>> +    object_property_set_description(obj, "kvm-pmu-filter",
+>> +                                    "PMU Event Filtering description for "
+>> +                                    "guest PMU. (default: NULL, disabled)");
+>>   }
 >>
->> The Linux kernel patches can be found here:
->> https://github.com/atishp04/linux/tree/counter_delegation_rfc
+>>   bool kvm_arm_pmu_supported(void)
+>> @@ -1706,6 +1728,62 @@ static bool kvm_arm_set_device_attr(ARMCPU *cpu, struct kvm_device_attr *attr,
+>>       return true;
+>>   }
 >>
->> [1] https://github.com/riscv/riscv-indirect-csr-access
->> [2] https://github.com/riscv/riscv-smcdeleg-ssccfg
->> [3] https://www.kernel.org/doc/Documentation/devicetree/bindings/perf/riscv%2Cpmu.yaml
->> [4] https://github.com/riscv-non-isa/riscv-sbi-doc/blob/master/src/ext-pmu.adoc
->> [5] https://lore.kernel.org/all/20240209031441.943012-4-weilin.wang@intel.com/
+>> +static void kvm_arm_pmu_filter_init(ARMCPU *cpu)
+>> +{
+>> +    static bool pmu_filter_init;
+>> +    struct kvm_pmu_event_filter filter;
+>> +    struct kvm_device_attr attr = {
+>> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
+>> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
+>> +        .addr       = (uint64_t)&filter,
+>> +    };
+>> +    int i;
+>> +    g_auto(GStrv) event_filters;
+>> +
+>> +    if (!cpu->kvm_pmu_filter) {
+>> +        return;
+>> +    }
+>> +    if (kvm_vcpu_ioctl(CPU(cpu), KVM_HAS_DEVICE_ATTR, &attr)) {
+>> +        warn_report("The KVM doesn't support the PMU Event Filter!");
+> 
+> Drop "The ".
+> 
+> Should this really only be a warning, rather than an error?
+> 
+
+I think this is an add-on feature, and shouldn't block the qemu init 
+process. If we want to set the wrong pmu filter and it doesn't take 
+affect to the VM, it can be detected in the VM.
+
+>> +        return;
+>> +    }
+>> +
+>> +    /*
+>> +     * The filter only needs to be initialized through one vcpu ioctl and it
+>> +     * will affect all other vcpu in the vm.
+> 
+> Weird. Why isn't it a VM ioctl if it affects the whole VM ?
+> 
+ From (kernel) commit d7eec2360e3 ("KVM: arm64: Add PMU event filtering
+infrastructure"):
+   Note that although the ioctl is per-vcpu, the map of allowed events is
+   global to the VM (it can be setup from any vcpu until the vcpu PMU is
+   initialized).
+
+>> +     */
+>> +    if (pmu_filter_init) {
+>> +        return;
+>> +    } else {
+>> +        pmu_filter_init = true;
+>> +    }
+> 
+> Shouldn't we do this before we do the kvm_vcpu_ioctl check
+> for whether the kernel supports the filter? Otherwise presumably
+> we'll print the warning once per vCPU, rather than only once.
+> 
+
+Yes. I will move this to the beginning of the function.
+
+>> +
+>> +    event_filters = g_strsplit(cpu->kvm_pmu_filter, ";", -1);
+>> +    for (i = 0; event_filters[i]; i++) {
+>> +        unsigned short start = 0, end = 0;
+>> +        char act;
+>> +
+>> +        if (sscanf(event_filters[i], "%c:%hx-%hx", &act, &start, &end) != 3) {
+>> +            warn_report("Skipping invalid PMU filter %s", event_filters[i]);
+>> +            continue;
+>> +        }
+>> +
+>> +        if ((act != 'A' && act != 'D') || start > end) {
+>> +            warn_report("Skipping invalid PMU filter %s", event_filters[i]);
+>> +            continue;
+>> +        }
+> 
+> It would be better to do the syntax checking up-front when
+> the user tries to set the property. Then you can make the
+> property-setting return an error for invalid strings.
+> 
+
+Ok. I guess you mean to say move the syntax checking to the 
+kvm_pmu_filter_set() function. But wouldn't it cause some code 
+duplication? Since it should first check syntax of the string in 
+kvm_pmu_filter_set() and then parse the string in this function.
+
+>> +
+>> +        filter.base_event = start;
+>> +        filter.nevents = end - start + 1;
+>> +        filter.action = (act == 'A') ? KVM_PMU_EVENT_ALLOW :
+>> +                                       KVM_PMU_EVENT_DENY;
+>> +
+>> +        if (!kvm_arm_set_device_attr(cpu, &attr, "PMU_V3_FILTER")) {
+> 
+> Shouldn't we arrange for an error message if this fails?
+> 
+
+If it fails, the kvm_arm_set_device_attr() function would help us to 
+report the error. So I think there is no need to report the error again.
+
+Thanks,
+Shaoqin
+
+>> +            break;
+>> +        }
+>> +    }
+>> +}
+>> +
+>>   void kvm_arm_pmu_init(ARMCPU *cpu)
+>>   {
+>>       struct kvm_device_attr attr = {
+>> @@ -1716,6 +1794,8 @@ void kvm_arm_pmu_init(ARMCPU *cpu)
+>>       if (!cpu->has_pmu) {
+>>           return;
+>>       }
+>> +
+>> +    kvm_arm_pmu_filter_init(cpu);
+>>       if (!kvm_arm_set_device_attr(cpu, &attr, "PMU")) {
+>>           error_report("failed to init PMU");
+>>           abort();
 >>
->> Atish Patra (17):
->> RISC-V: Add Sxcsrind ISA extension definition and parsing
->> dt-bindings: riscv: add Sxcsrind ISA extension description
->> RISC-V: Define indirect CSR access helpers
->> RISC-V: Add Ssccfg ISA extension definition and parsing
->> dt-bindings: riscv: add Ssccfg ISA extension description
->> RISC-V: Add Smcntrpmf extension parsing
->> dt-bindings: riscv: add Smcntrpmf ISA extension description
->> RISC-V: perf: Restructure the SBI PMU code
->> RISC-V: perf: Modify the counter discovery mechanism
->> RISC-V: perf: Implement supervisor counter delegation support
->> RISC-V: perf: Use config2 for event to counter mapping
->> tools/perf: Add arch hooks to override perf standard events
->> tools/perf: Pass the Counter constraint values in the pmu events
->> perf: Add json file for virt machine supported events
->> tools arch uapi: Sync the uinstd.h header file for RISC-V
->> RISC-V: Add hwprobe support for Counter delegation extensions
->> tools/perf: Detect if platform supports counter delegation
->>
->> Kaiwen Xue (2):
->> RISC-V: Add Sxcsrind ISA extension CSR definitions
->> RISC-V: Add Sscfg extension CSR definition
->>
->> Weilin Wang (1):
->> perf pmu-events: Add functions in jevent.py to parse counter and event
->> info for hardware aware grouping
->>
->> Documentation/arch/riscv/hwprobe.rst          |  10 +
->> .../devicetree/bindings/riscv/extensions.yaml |  34 +
->> MAINTAINERS                                   |   4 +-
->> arch/riscv/include/asm/csr.h                  |  47 ++
->> arch/riscv/include/asm/csr_ind.h              |  42 ++
->> arch/riscv/include/asm/hwcap.h                |   5 +
->> arch/riscv/include/asm/sbi.h                  |   2 +-
->> arch/riscv/include/uapi/asm/hwprobe.h         |   4 +
->> arch/riscv/kernel/cpufeature.c                |   5 +
->> arch/riscv/kernel/sys_hwprobe.c               |   3 +
->> arch/riscv/kvm/vcpu_pmu.c                     |   2 +-
->> drivers/perf/Kconfig                          |  16 +-
->> drivers/perf/Makefile                         |   4 +-
->> .../perf/{riscv_pmu.c => riscv_pmu_common.c}  |   0
->> .../perf/{riscv_pmu_sbi.c => riscv_pmu_dev.c} | 654 ++++++++++++++----
->> include/linux/perf/riscv_pmu.h                |  13 +-
->> tools/arch/riscv/include/uapi/asm/unistd.h    |  14 +-
->> tools/perf/arch/riscv/util/Build              |   2 +
->> tools/perf/arch/riscv/util/evlist.c           |  60 ++
->> tools/perf/arch/riscv/util/pmu.c              |  41 ++
->> tools/perf/arch/riscv/util/pmu.h              |  11 +
->> tools/perf/builtin-record.c                   |   3 +
->> tools/perf/builtin-stat.c                     |   2 +
->> tools/perf/builtin-top.c                      |   3 +
->> .../pmu-events/arch/riscv/arch-standard.json  |  10 +
->> tools/perf/pmu-events/arch/riscv/mapfile.csv  |   1 +
->> .../pmu-events/arch/riscv/qemu/virt/cpu.json  |  30 +
->> .../arch/riscv/qemu/virt/firmware.json        |  68 ++
->> tools/perf/pmu-events/jevents.py              | 186 ++++-
->> tools/perf/pmu-events/pmu-events.h            |  25 +-
->> tools/perf/util/evlist.c                      |   6 +
->> tools/perf/util/evlist.h                      |   6 +
->> 32 files changed, 1167 insertions(+), 146 deletions(-)
->> create mode 100644 arch/riscv/include/asm/csr_ind.h
->> rename drivers/perf/{riscv_pmu.c => riscv_pmu_common.c} (100%)
->> rename drivers/perf/{riscv_pmu_sbi.c => riscv_pmu_dev.c} (61%)
->> create mode 100644 tools/perf/arch/riscv/util/evlist.c
->> create mode 100644 tools/perf/arch/riscv/util/pmu.c
->> create mode 100644 tools/perf/arch/riscv/util/pmu.h
->> create mode 100644 tools/perf/pmu-events/arch/riscv/arch-standard.json
->> create mode 100644 tools/perf/pmu-events/arch/riscv/qemu/virt/cpu.json
->> create mode 100644 tools/perf/pmu-events/arch/riscv/qemu/virt/firmware.json
->>
+>> base-commit: 760b4dcdddba4a40b9fa0eb78fdfc7eda7cb83d0
 >> --
->> 2.34.1
->>
+>> 2.40.1
+> 
+> thanks
+> -- PMM
+> 
+
+-- 
+Shaoqin
 
 
