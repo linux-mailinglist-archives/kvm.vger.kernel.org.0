@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-10395-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10396-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFDBC86C10B
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:43:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A93D686C10C
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 07:43:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7595D1F21138
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:43:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39B67B24989
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 06:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C87247F65;
-	Thu, 29 Feb 2024 06:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB379481A6;
+	Thu, 29 Feb 2024 06:41:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dWMnZGtp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QP0MCQ6+"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E6E4595B
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 06:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9635147F6F
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 06:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709188912; cv=none; b=aGhJSTqyXe6eVY9dovJI2KFxT4mu3PgExbGpw7xruQ1Z4AUXpw4D3Fy08V4ONCNak6MXHJYwJMHHpMYJ/YpMi6skv1s51FZ9Lj8O5BYyu4yU4OtS3ASvj9j0ev8nLj8F2b/itla182o0lehLQm3wBpVei6fgBbX8bnD8uC2uC/0=
+	t=1709188919; cv=none; b=TxMWSL/A5tJ034ldtK7RVVxUK0FiHHIbx2SN4U+ufqJThNLnbym78/nnSQcLobzUTDnbRV6SPaMKAmTMBV2cW9EA0NIbHzdEUm+S8Qm0VWRnjqN1lRK54Vvj4ntpAmFCDN9qZdPvQbAu5CMlnr2vN9oOwlSw0cSCWyntHNlw0r8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709188912; c=relaxed/simple;
-	bh=w+3FVIgu6+6PP0tbc6InvSJYIh6/cEjrfhsEEHWGAEQ=;
+	s=arc-20240116; t=1709188919; c=relaxed/simple;
+	bh=B3E1j7nvOawtQ7oIhpLArUrNfzgHFHOAjtEVU0aC1Q8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dW5Wq7sPNhUxukrvH5xyxlq26HDOsBWVUqvJ3yFUnu08pQ5Yl2yfYffexYaWxRfuvrPl6o4clTU1AGIyiHDOwVtXDKBQmyjwycHyUs7CqP0uuycku4f8FVGS0c+7SR6Zb1SJ/Ia+q4aOM7N1ey2ZlpQNxrusKU+yxjmpPK6btEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dWMnZGtp; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=COajQ4gQT82pJqM7iuykRBHRYGsDG0UE0u0/3e7EZAyl+WAwkDxOtr8OiRD1pMTjF4p+EOKIkLInyOchYwZlXYZEEpzmaz/k12YYvIVDkyAEre+4kBb9rpdir1xFYZSHjOfWBQxeMd8X0XyOHf5wp02PDgc+8u175+/XEZky6Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QP0MCQ6+; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709188911; x=1740724911;
+  t=1709188917; x=1740724917;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=w+3FVIgu6+6PP0tbc6InvSJYIh6/cEjrfhsEEHWGAEQ=;
-  b=dWMnZGtpQ04YJVACU9DwUn14yFiEuFde53oes70dSxp6QoJ8lHjc/w4M
-   vt4vkrwIg6TIeykMEraLLiq7o1mz+fnRxUGI7+5K52OhjZH5syx1JDsD3
-   VJHiAFQClgZ2AtYcLIdUkCmemArASJn+0rFi4NBguYF6J+fTn2krgSbGf
-   MrwTQ3UqGlmwp1MJGx13nEp4deutoynr2AHU5Tuv0Hl3z8Js7+rlmwHlU
-   naP5f5t4UoEPpVgle6vDnRA/OW6GJHKN2GawRPKPswlvQ8g+DYW+wHBAP
-   88AGfMa6S2mGtffsXZL/bj02yeobtUA+j/8ZZllcsj03CFXDP8rFztQTC
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3802950"
+  bh=B3E1j7nvOawtQ7oIhpLArUrNfzgHFHOAjtEVU0aC1Q8=;
+  b=QP0MCQ6+KaBL/o42hA3UUXzpHTJu5GdPlFqaDhSbHV2GkzY+DKhJq14J
+   Eu/AZEtqx1d2VQra6lXWUSSg9x7PTO9tOgc5nF5iI24v69IfckxkQjH/5
+   QZqUN9Bv9Qm3anAXsetXH7H2w02Kb2QH6Wz+w76oW0105ua/p7g1abSRe
+   RixG/u2y8KfQiERaPkh+jtmjlyFhaDQZ9tbSLTRiHkjy7UD/BF2lw66Eu
+   i3HhkBt1Q493GGi2VzkWBmqu7lFL1kqqRYyIwfx7HflYRUI7F07I0U6uI
+   ImFyIMQ/DhcDXu48PKGvc0S93mb0SyD3OQ8zDt1sC9sYDSeoxwWontVJC
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3802958"
 X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="3802950"
+   d="scan'208";a="3802958"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 22:41:50 -0800
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 22:41:57 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,192,1705392000"; 
-   d="scan'208";a="8075755"
+   d="scan'208";a="8075763"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa007.jf.intel.com with ESMTP; 28 Feb 2024 22:41:45 -0800
+  by orviesa007.jf.intel.com with ESMTP; 28 Feb 2024 22:41:51 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -79,9 +79,9 @@ Cc: kvm@vger.kernel.org,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	xiaoyao.li@intel.com
-Subject: [PATCH v5 39/65] i386/tdx: Skip BIOS shadowing setup
-Date: Thu, 29 Feb 2024 01:37:00 -0500
-Message-Id: <20240229063726.610065-40-xiaoyao.li@intel.com>
+Subject: [PATCH v5 40/65] i386/tdx: Don't initialize pc.rom for TDX VMs
+Date: Thu, 29 Feb 2024 01:37:01 -0500
+Message-Id: <20240229063726.610065-41-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240229063726.610065-1-xiaoyao.li@intel.com>
 References: <20240229063726.610065-1-xiaoyao.li@intel.com>
@@ -93,57 +93,60 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TDX doesn't support map different GPAs to same private memory. Thus,
-aliasing top 128KB of BIOS as isa-bios is not supported.
-
-On the other hand, TDX guest cannot go to real mode, it can work fine
-without isa-bios.
+For TDX, the address below 1MB are entirely general RAM. No need to
+initialize pc.rom memory region for TDs.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
-Changes in v1:
- - update commit message and comment to clarify
+This is more as a workaround of the issue that for q35 machine type, the
+real memslot update (which requires memslot deletion )for pc.rom happens
+after tdx_init_memory_region. It leads to the private memory ADD'ed
+before get lost. I haven't work out a good solution to resolve the
+order issue. So just skip the pc.rom setup to avoid memslot deletion.
 ---
- hw/i386/x86.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+ hw/i386/pc.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 5a0cadc88c4f..61c45dfc14dd 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -1190,17 +1190,20 @@ void x86_bios_rom_init(MachineState *ms, const char *default_firmware,
-     }
-     g_free(filename);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f5ff970acfa0..3f8dd218eb08 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -43,6 +43,7 @@
+ #include "sysemu/xen.h"
+ #include "sysemu/reset.h"
+ #include "kvm/kvm_i386.h"
++#include "kvm/tdx.h"
+ #include "hw/xen/xen.h"
+ #include "qapi/qmp/qlist.h"
+ #include "qemu/error-report.h"
+@@ -1028,16 +1029,18 @@ void pc_memory_init(PCMachineState *pcms,
+     /* Initialize PC system firmware */
+     pc_system_firmware_init(pcms, rom_memory);
  
--    /* map the last 128KB of the BIOS in ISA space */
--    isa_bios_size = MIN(bios_size, 128 * KiB);
--    isa_bios = g_malloc(sizeof(*isa_bios));
--    memory_region_init_alias(isa_bios, NULL, "isa-bios", bios,
--                             bios_size - isa_bios_size, isa_bios_size);
--    memory_region_add_subregion_overlap(rom_memory,
--                                        0x100000 - isa_bios_size,
--                                        isa_bios,
--                                        1);
--    if (!isapc_ram_fw) {
--        memory_region_set_readonly(isa_bios, true);
-+    /* For TDX, alias different GPAs to same private memory is not supported */
+-    option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+-    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+-                           &error_fatal);
+-    if (pcmc->pci_enabled) {
+-        memory_region_set_readonly(option_rom_mr, true);
 +    if (!is_tdx_vm()) {
-+        /* map the last 128KB of the BIOS in ISA space */
-+        isa_bios_size = MIN(bios_size, 128 * KiB);
-+        isa_bios = g_malloc(sizeof(*isa_bios));
-+        memory_region_init_alias(isa_bios, NULL, "isa-bios", bios,
-+                                bios_size - isa_bios_size, isa_bios_size);
-+        memory_region_add_subregion_overlap(rom_memory,
-+                                            0x100000 - isa_bios_size,
-+                                            isa_bios,
-+                                            1);
-+        if (!isapc_ram_fw) {
-+            memory_region_set_readonly(isa_bios, true);
++        option_rom_mr = g_malloc(sizeof(*option_rom_mr));
++        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
++                            &error_fatal);
++        if (pcmc->pci_enabled) {
++            memory_region_set_readonly(option_rom_mr, true);
 +        }
++        memory_region_add_subregion_overlap(rom_memory,
++                                            PC_ROM_MIN_VGA,
++                                            option_rom_mr,
++                                            1);
      }
+-    memory_region_add_subregion_overlap(rom_memory,
+-                                        PC_ROM_MIN_VGA,
+-                                        option_rom_mr,
+-                                        1);
  
-     /* map all the bios at the top of memory */
+     fw_cfg = fw_cfg_arch_create(machine,
+                                 x86ms->boot_cpus, x86ms->apic_id_limit);
 -- 
 2.34.1
 
