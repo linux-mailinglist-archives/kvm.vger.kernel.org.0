@@ -1,158 +1,138 @@
-Return-Path: <kvm+bounces-10549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4447086D591
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 22:05:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 278F086D5B6
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 22:08:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C975E28BE37
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 21:05:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5E4028E5BC
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 21:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEC574BFE;
-	Thu, 29 Feb 2024 20:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4F61504EA;
+	Thu, 29 Feb 2024 20:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FpoHLgzV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R1tYiV8W"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D14C74BEF
-	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 20:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE69213E7F6
+	for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 20:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709240032; cv=none; b=CvLoOq+N6/U0drxMMRtCWTA8feKEUNACAaxaS9RUCIOQmElJYax1uIC8g10m7SI1cZHHgbfvNa38QE+1JOrH2OdOEs1VbC8C5Eb6qEAxvUKQ34B3kX7idXEcpY4OHQZhL6x6FO8iffvbTasNCXFS3jsNbCII9+EjYtFpoaaEIdc=
+	t=1709240184; cv=none; b=A90b0JIAVfkavijdIAI11iDO+p8h0PnL3BglfewtU0aFoiTQAZbS8W4fhhdIi8iOTj0eyLIEQj0asLdPOECfzTpl5dyRxXSO4x1KcB0335kLiF4ff9pLQBkbz5Xjkc29L4ZcaGhhHQO3QIU6uDTRVx3QPQRKSgM6VEFYTdN/Jt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709240032; c=relaxed/simple;
-	bh=aSfCidGWZQymlsm3BsMfr0uts4B7cslkQpccMqtTIlU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q2VRq3BG5haJc/W/pwRcxdU6+nsspgJ2WG+B7oGGVEaLIwL7lIT2ViGDQO0SDcghqL5r5wMap60ealQ9zMNQxuXOs9LQxSctnwaT182JENvouC/F7PFdJ5CTR3nJcP3W2C2kiSgAerLvMbdMsjrRfDBnvyiENi/Q6FoUo0PeqCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FpoHLgzV; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1709240184; c=relaxed/simple;
+	bh=fV1kqpZQ/sSCXlptOjdZ28ZJ5cm/XhJs99VfeV8ikn8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mQKrORHKJGTv8ard3d48tY969zitgadfRTggIYPv4gJoL9OQtt4DSPYOhZi8ApiEi34FyudEIE26otaD2BEIO9dw9JC8d1W6tHw7BZXvXpHI05I8ChyALNccK7m0OPZyuYNGYVtsrJRlTT4PXm8l+f7ii0mUDAPbR7wA2rkDeiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R1tYiV8W; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709240029;
+	s=mimecast20190719; t=1709240181;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=pwC7w8RQ315Hy8ZjgqKPWOY3T5YPFeI5JvaDoZSl2GE=;
-	b=FpoHLgzVcto67Kcnqwa0sZKH4arGrKuhzupCc2M1O7hgygpOzRVm1yq+3wdYqrL5o90zLU
-	U4P5Q4CqPgUyQNEvq1az0m19eV4XWGVe9BXfv7xyq34JCMLatt6Okm2jYJKVVC5VyRDGX1
-	wgvPoJ+piVMtvkgf5e1dZOOWRf/Zvuw=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=eiaPwrwhaqL9Ej4GtEw9LKGF9DdPVcepWFooDH+BsfA=;
+	b=R1tYiV8WTKo5t2YqWMV72/F5ZATLL1JGM+73uwhdHDfwPdQDBYZk7nSF8oS0n+5sHoA7bH
+	A2Kz0BXfHm056Labz7LVUZsazrtH5eXgOmChGpybJmckV0uoAjZgWQAjDA6uzWW3Bwqe3u
+	4ZQzbh1egCkPpKoIji8BPAKeU7YdD44=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-x3ywzNeDNvmhBOuzqYb3zQ-1; Thu, 29 Feb 2024 15:53:47 -0500
-X-MC-Unique: x3ywzNeDNvmhBOuzqYb3zQ-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-56421fd7029so1000235a12.3
-        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 12:53:47 -0800 (PST)
+ us-mta-321-T_TdDBK9NgCApsjnU6sEuw-1; Thu, 29 Feb 2024 15:56:17 -0500
+X-MC-Unique: T_TdDBK9NgCApsjnU6sEuw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-412b845aab2so5311495e9.1
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 12:56:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709240026; x=1709844826;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pwC7w8RQ315Hy8ZjgqKPWOY3T5YPFeI5JvaDoZSl2GE=;
-        b=xNhv/fmKld92ImQSn8sIYG/lx+G6mPRwZFKoGre+xYyvabheoP++1baI27nWoAzwAY
-         yFRaSdF/nuqL11VYmTXcCqvZbchD2XSPGp2WwL/ZhXj1r/9ht9n5CXdp59mvF7Amasgn
-         qC9EF+3QBaYo804HzN/sdS7lwZah4tQeBjrpyKhvXhLnFRQ6BLRXjjfEdvy6JJjq1cUP
-         8GW568SzyFjO7uU7tl/K6dxdI+3oid04xmVTO950FtrKhfJXgvVYoGU1Fjfm52wCEWwr
-         v+bjrmDorWu5qRG0Un6gyEGE0aw0CPz3wvBxXlGQ1cAEXT+/0d5RWLiYTVxSQC83S9Ue
-         YGYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVvkFt+h2jcXHgecE64XMBqRiplsO2XFbVMhjb722EWOm/6zG41ZTCSLGD8LaBOpx8LFyPjU/B2F+8hRB8EgqHPaavG
-X-Gm-Message-State: AOJu0Ywskx/UZ0oK7Hj2WJgrwvJzXuB1wAEnN7zj1n0N0ZYZbt1JCz7I
-	QEc7C0hLaUMfWEzomKmHHTHt/yTl0OeZAkhrcOiRMwcZwVDGEtokj5az4Kw9yV2RFjQ9AyvPkEa
-	qS92cT/YlKpK4ObYUsF8w5uNKxT1TSBJ/SosZ05roYTDH4CYttA==
-X-Received: by 2002:a50:85ca:0:b0:565:7733:3c58 with SMTP id q10-20020a5085ca000000b0056577333c58mr58408edh.4.1709240026736;
-        Thu, 29 Feb 2024 12:53:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEOZ2cLSgzAhYyDA6LLyzzJ+clnn6kc1PAWLDoUQN+uKtntvl2GL/JHid/8tMXrs0ACpLPt7A==
-X-Received: by 2002:a50:85ca:0:b0:565:7733:3c58 with SMTP id q10-20020a5085ca000000b0056577333c58mr58405edh.4.1709240026415;
-        Thu, 29 Feb 2024 12:53:46 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id es17-20020a056402381100b005666aaf340dsm925739edb.21.2024.02.29.12.53.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Feb 2024 12:53:45 -0800 (PST)
-Message-ID: <f25bc125-a013-4c43-b67d-09512786ae90@redhat.com>
-Date: Thu, 29 Feb 2024 21:53:43 +0100
+        d=1e100.net; s=20230601; t=1709240176; x=1709844976;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eiaPwrwhaqL9Ej4GtEw9LKGF9DdPVcepWFooDH+BsfA=;
+        b=XWKYERaup3GfzvIzVXLUc1mSf6ecT7DfMvaVgrsZNrEg1Nqp3AL1toL7GJarVzbzSF
+         jIx8sSFYgB1I96zptmr5f/RubwiH6+Ifu7FeWyxWRGMa9hwa0BXFrtpCDrHhSDTBhTIF
+         0V+OfA06OBEqDSBts1yPT4J3wmdlK+Uh/VBTYpjad/jVOGgn/LPTm4sHbIUydmYZ79Lh
+         dHMw4B60qU5caxklFvn+JcflvKJj+9iuoLv396WgCMNbCpTkXuW7Rg8iIzomXRsJCagz
+         mKG1350UQi8X6QG7ky41+sXsPa7ddvszVO5BX+iSV+TRU8NfuqF0/YlJSCY6RLWlyJnU
+         O0Lg==
+X-Gm-Message-State: AOJu0YxbF6nboAfDfutgiy9TwgRV75ki5OQJkO+03Yn+RkJJSwVvt7Wy
+	2f5m6eypk3MWfaAFQNemA2nD8l36G2+aZfPTgEGjXv0rRZnP+RlKv6f57G1J4mdTN/Cxfr76Lm1
+	+CNmUDWOtzOOgLqZJW2DpnS+91Yjao8oAkhzRdXOPusx1urIyr1PIKn1b2U2DJOdg13dtQCWUD6
+	hV6Xj8uxJxe36y2+tiHrQ5xdTl
+X-Received: by 2002:a05:600c:a386:b0:412:b6c4:ac21 with SMTP id hn6-20020a05600ca38600b00412b6c4ac21mr129751wmb.41.1709240176749;
+        Thu, 29 Feb 2024 12:56:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF/pLwxu7qVY+FEzPu28C2COXQu70si1JtMVmyrPRMvUbqeq+QPhQ4uW/IqUc+Dif1jUGUYHijFe39hpc6rWc8=
+X-Received: by 2002:a05:600c:a386:b0:412:b6c4:ac21 with SMTP id
+ hn6-20020a05600ca38600b00412b6c4ac21mr129737wmb.41.1709240176364; Thu, 29 Feb
+ 2024 12:56:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: CVE-2021-46978: KVM: nVMX: Always make an attempt to map eVMCS
- after migration
-Content-Language: en-US
-To: Theodore Ts'o <tytso@mit.edu>
-Cc: Greg KH <gregkh@kernel.org>, cve@kernel.org,
- linux-kernel@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <2024022822-CVE-2021-46978-3516@gregkh>
- <54595439-1dbf-4c3c-b007-428576506928@redhat.com>
- <2024022905-barrette-lividly-c312@gregkh>
- <CABgObfZ+bMOac-yf2v6jD+s0-_RXACY3ApDknC2FnTmmgDXEug@mail.gmail.com>
- <20240229143454.GC272762@mit.edu>
+References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-3-seanjc@google.com>
+ <CABgObfbtPJ6AAX9GnjNscPRTbNAOtamdxX677kx_r=zd4scw6w@mail.gmail.com> <ZeDPgx1O_AuR2Iz3@google.com>
+In-Reply-To: <ZeDPgx1O_AuR2Iz3@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240229143454.GC272762@mit.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Date: Thu, 29 Feb 2024 21:56:04 +0100
+Message-ID: <CABgObfaXQR7WaUwjvBz-1yJN3fyysj1BMyY0S9L3DbizWjgrSQ@mail.gmail.com>
+Subject: Re: [PATCH 02/16] KVM: x86: Remove separate "bit" defines for page
+ fault error code masks
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/29/24 15:34, Theodore Ts'o wrote:
-> On Thu, Feb 29, 2024 at 11:04:45AM +0100, Paolo Bonzini wrote:
->> Also, LKML does not get the initial announcement, which makes it a bit
->> more painful to find the full discussion on lore (you have to go
->> through a "no message with that id, maybe you mean this one from other
->> mailing lists" page, instead of having the whole thread in the same
->> place). A linux-cve mailing list with public posting, used for Cc and
->> Reply-to of the initial message, would solve this issue as well.
-> 
-> I believe the url https://lore.kernel.org/all/<message-id> will get
-> the whole thread, regardless of which mailing lists individual mail
-> messages were sent to, does it not?
+On Thu, Feb 29, 2024 at 7:40=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+> Long story short, I think we should get to the below (I'll post a separat=
+e series,
+> assuming I'm not missing something).
+>
+>         unsigned long rflags =3D static_call(kvm_x86_get_rflags)(vcpu);
+>         unsigned int pfec =3D access & (PFERR_PRESENT_MASK |
+>                                       PFERR_WRITE_MASK |
+>                                       PFERR_USER_MASK |
+>                                       PFERR_FETCH_MASK);
+>
+>         /*
+>          * For explicit supervisor accesses, SMAP is disabled if EFLAGS.A=
+C =3D 1.
+>          * For implicit supervisor accesses, SMAP cannot be overridden.
+>          *
+>          * SMAP works on supervisor accesses only, and not_smap can
+>          * be set or not set when user access with neither has any bearin=
+g
+>          * on the result.
+>          *
+>          * We put the SMAP checking bit in place of the PFERR_RSVD_MASK b=
+it;
+>          * this bit will always be zero in pfec, but it will be one in in=
+dex
+>          * if SMAP checks are being disabled.
+>          */
+>         u64 implicit_access =3D access & PFERR_IMPLICIT_ACCESS;
+>         bool not_smap =3D ((rflags & X86_EFLAGS_AC) | implicit_access) =
+=3D=3D X86_EFLAGS_AC;
+>         int index =3D (pfec | (not_smap ? PFERR_RSVD_MASK : 0)) >> 1;
+>         u32 errcode =3D PFERR_PRESENT_MASK;
+>         bool fault;
 
-Yes, it does.  That covers the web interface but it still leaves out 
-subscribers and people reading via NNTP.
+Sounds good.  The whole series is
 
-That said, I'm not sure why people who look at CVEs for a living should 
-not have their own lighter-traffic mailing list, which was the main 
-reason to have a linux-cve mailing list.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+apart from the small nits that were pointed out here and there.
 
 Paolo
 
