@@ -1,276 +1,257 @@
-Return-Path: <kvm+bounces-10498-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10499-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E33F986CA8A
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 14:44:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D3F86CA8E
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 14:44:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D2E71C2245A
-	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 13:44:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 973B5286EF7
+	for <lists+kvm@lfdr.de>; Thu, 29 Feb 2024 13:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F178627D;
-	Thu, 29 Feb 2024 13:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91F9127B5B;
+	Thu, 29 Feb 2024 13:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SKddM8fm";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Xfx4Q87R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cOuAaWgm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028504B5DA;
-	Thu, 29 Feb 2024 13:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709214251; cv=fail; b=Z2tPyEej4FNZbGt984FZjgMOrMU+qAUoCgd1p4Y+02PbbUK7TWgeveslnY6skAOyjTjLPFBvT+tbSAwF+aOFmJc7yEvIGQXgxcI7A+bgU0p+3ddx4wA0NvgOINFF0xYCjjHiFqnhX3FU2J4MPVW8eDXrZX5w42Z+fZr9pZKDw7g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709214251; c=relaxed/simple;
-	bh=qRDoNeKqbcYTOKhKuwxTa1mZVwmMUIuA4H5Jz2BDAnw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WAos8QH70BBqlPBWV++/W3lJXPz3ECn5WtTzfg8fJh81JYlXX1uxQBr9ipBDt9gqIJe1RD5bB8sgLJSjZxXWk6sbl5+gFPRohO7Syk8j9PeQu6LqpaX/PY/q9yqiClliY45YtZeiWnjsx1l3KxGHvU+mAinLeo6OP4CVYiFFq1g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=SKddM8fm; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Xfx4Q87R; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41T9TwMb013376;
-	Thu, 29 Feb 2024 13:44:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=H+teY3XgExtXvz7RRQMJP8VCSRx33NffbBt/KhT48nw=;
- b=SKddM8fmvRGN0ZnRRGGD/cBf+lMCeqxEaDcC5Gpi92wBsUjf/Ag5GjNrGt3Q5dhLhfzE
- Syb3azVnTyT2Rz6zmXB2z/r1yJvF+daBQOPQS9AeDdpw/xfyD865POoY0Zy6Nuf4hlFr
- NaM5XojTA7N8LPY/V8KHqL87YaahT2jit0eGXpwVZORmhVKPyL8gO+NyztMuwiU3Pu35
- g6o83cdUXU6j6HH5+rV1ewnxP1LJW4MgL8MjkG05wlOcpAQm8gua65MWawujwg+NCTYH
- YCz21aOVnpPnRX1gr+63BZMIIqnnKFoy1c0dkRugNBeSNnexhsOPsdC3Bs08kdV4IW3E 9Q== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wf8gdnvxp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 29 Feb 2024 13:44:00 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41TCmdFI009594;
-	Thu, 29 Feb 2024 13:43:59 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2040.outbound.protection.outlook.com [104.47.73.40])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wjrqk63ht-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 29 Feb 2024 13:43:59 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cT++O8wj8gAxkW06bktjgMnx01cdaT6TsrELiJEJGB22AOTRho5ST9oCIZ9MyMQRuRrVdespj+aauXHZ7kyax/rMhKfpP94NGYo0+SnkJ8FwMZlAQO5b8zA6UTQqp2Oa+9iQJxl5nK4p/QjGEB/mUUvXK1nzbx/jv7Ef55N06JEkaymVUWQfXUgDuwPJoqd9ZYuJ4pgP+ZxQiMyVZfxpJvqfU+HfOtbx0N9jiCr66y9fMV5pkgIrZ9/rPsRNP2Ybb9sL+4c2Q8HrBEQ/FzzZEta34jwhLMFjMSHkOk6wSDeOgtGrP1H0AjVutgTzEgVgM3/1Li31IiVvYqj5esTAGw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H+teY3XgExtXvz7RRQMJP8VCSRx33NffbBt/KhT48nw=;
- b=isBhnbDRdALAuAdlFLvQnTTU7hZYjkNCZNmT2w9gI18i/XBJW6tavK5EzrK/fnSQi6VNSA6x7/XvhJcYuBjSOXS2VawLGs/dAXqU47pfcNEQvgwMbz2Cz9isxKoVg7szLW6pmo5/pPqGhkZr/Ej77lBqpxWecxukSSR/tZHykuzSeNTBMcokRwuGmcjK7a0auzB/bBHzfAzW7adBij000SKhIwWhzAsuFoDefLtAhbBxJ7z9mWWqbD+aGWuSLOu1YF01BzKpQuqMWYZItI1Hxn1LDCjBD6dApTnZMgNL042je8mD5i3r1aGCYYnf+M9KudleoGDec6ZGV+6fqQ8+1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H+teY3XgExtXvz7RRQMJP8VCSRx33NffbBt/KhT48nw=;
- b=Xfx4Q87RXtehykV1/s1Uqto6ShU3gwZAP2whrXO0L/kBpIE16/H2MU+XiIHUBhAbshxy3ePsoe48RGmJ/2y+UcVMzzIFnU8FqNcpC/aQ4MxVyQcGcKpTYL60Wb5tsEUTNuUHlmcrse9IE0o00H8i5+PBbdwHouZd+xYhP/V/19A=
-Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
- by CH0PR10MB4921.namprd10.prod.outlook.com (2603:10b6:610:c2::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
- 2024 13:43:57 +0000
-Received: from BYAPR10MB2663.namprd10.prod.outlook.com
- ([fe80::8156:346:504:7c6f]) by BYAPR10MB2663.namprd10.prod.outlook.com
- ([fe80::8156:346:504:7c6f%6]) with mapi id 15.20.7316.037; Thu, 29 Feb 2024
- 13:43:57 +0000
-Message-ID: <c0d80c37-ff1c-9c94-e1ac-78d26ee4da15@oracle.com>
-Date: Thu, 29 Feb 2024 05:43:55 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 02/16] KVM: x86: Remove separate "bit" defines for page
- fault error code masks
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
-        David Matlack <dmatlack@google.com>
-References: <20240228024147.41573-1-seanjc@google.com>
- <20240228024147.41573-3-seanjc@google.com>
-From: Dongli Zhang <dongli.zhang@oracle.com>
-In-Reply-To: <20240228024147.41573-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0139.namprd03.prod.outlook.com
- (2603:10b6:a03:33c::24) To BYAPR10MB2663.namprd10.prod.outlook.com
- (2603:10b6:a02:a9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0052F7D40D;
+	Thu, 29 Feb 2024 13:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709214285; cv=none; b=H2EfKepC6/09HObyUTYQxQXWg13y6Qi46qGzk5vlrY0aYZqs4JXNcnOEckn6BFuc0MRlQ0Hl5iN5tPL7Ww4QPsyYYAyutBa06DEPkiCTVQEQ7KwWGnTexiCWMfApSVj1OkKiDh0fEYAhgcPAKuQtQVZJuez+1KYSySAcyE66E9I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709214285; c=relaxed/simple;
+	bh=XTpw44JNPqXPEVSHUU3pPsdOlJEurvo2VnwQIw4VifE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RT4nCbHI9F1+3pqtmN14se7PFpCJ0o1FTwBz3MGOHgUlJtyrrtE3Q2Cc4+AvMpcOD2IhvW5fYKlqylbcCULFb7XLmMQfFXIJcUNxZG+pj0odgK+LI4RRHj5qycswyjscvtzr2Ch8Ep7LvGTHgOyudM7YT07fGQj6gWCYV/aFetw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cOuAaWgm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A40AC433C7;
+	Thu, 29 Feb 2024 13:44:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709214284;
+	bh=XTpw44JNPqXPEVSHUU3pPsdOlJEurvo2VnwQIw4VifE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cOuAaWgmMO4i5vqB1r42gVQeHeWIczvckM4YcJ329GQ4NLDmCPttEy4nHE25iXen5
+	 EELckE/Ocfiphu54XgMpQwYstOefOeVoOORgvDTnzxrxVeGbKgAjIPFYZO6QC+t7N4
+	 mxGGQYM/15W+l8ee5WpfFprHSXtcT5jbm/iSnShHxUc1zBQMotcbVgsI4xPjx2n7xV
+	 YQQHvoylQ7JOSn/HbixkWGbnW8mCaX5L+oxk/J43TdvvX5FXo3ft7OCmylWm0znpej
+	 JQEY99CIBKavtyt0Flg/1FK31G6BGr9NuqUD0Xc+VnhEMqkOr+1v9/ddE5p3Xaqw00
+	 PZJ2VV7HAkpXQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rfgiH-0081RA-TQ;
+	Thu, 29 Feb 2024 13:44:42 +0000
+Date: Thu, 29 Feb 2024 13:44:40 +0000
+Message-ID: <865xy72xmf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 06/13] KVM: arm64: nv: Fast-track 'InHost' exception returns
+In-Reply-To: <20240228160800.GA3373815@e124191.cambridge.arm.com>
+References: <20240226100601.2379693-1-maz@kernel.org>
+	<20240226100601.2379693-7-maz@kernel.org>
+	<20240228160800.GA3373815@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|CH0PR10MB4921:EE_
-X-MS-Office365-Filtering-Correlation-Id: ae1f83ca-f746-4b00-cff5-08dc392c7a13
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	zOjOWAJMGwCrNJGp2AvdMDoGb1axTQfhjQpjvHYy+dULmiH1PEVV8nr11x9NKZ8mOJU9ac8xwiCLJ83SovQ8Zoy6o5G81TazZH5ZEZQMAsSJEUbGrlVg9JHF/jvnE2fBWbgVts5zwG1xEiWM4zoKoixi8C7pmbVG4r9uj+qY08RUCneOsFBOR6HF//gmQusHsPwIDvp+/gGCZciQ6LK1Ixiqbo2kt3iHzCFSblLCZkkfCFmu5IyIfxSKZXxgK8EdkECVdLc+F59dtVgoVo2b1a9lKZpR7r6d4Og2RGm+tf6SpGtN08K5bDCknnQW61o0yafMyu9yLDIUQ2HmQCWOWYYM0novTeqbnR+UJoU67wIIo5f8GbAnFvQESlKGUnGrU996S5ScFymMJCltVQPpOyQWriSWFZ81FZs4SxdrD2foXW+Ci4zgF3iavyzZ1+x4IDwu8udciX2npUaryKDxPYuHv5uO/3IEQIjMZJOlC67dZG2TJFnqdJaCz0bzIrWY2M79nruc71/jf2ZOaBbLoizKn9/cS6o+eVN8m6dD9HTBgn9/0N0KWoV/9qpxknkYAulymVwIyj7O+2X6T4K3t6xjv05y8P+wNY1Sx5yM/3hsd7xw8qxQFVVdPQ7Fo+Wf
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?SmFxcWdzTmx1WWZNT1V5V2VtTWlCQWJYWElYZ1BDZTh0dXJlSUlsTWtTTitT?=
- =?utf-8?B?bWVUZ2h5TTkvSDlyUVVrS3cweGxZL0xZZHV0OXIxV2N4SzhiS2pHQVMyQUxo?=
- =?utf-8?B?OUZiZ0NkUHdDVlUwM1BUREJMcjV2SHFDcDJod0sxOVYvOHVpVzJXaTRYQlBZ?=
- =?utf-8?B?ZitYbklBa0FGREt5dmpjaXRzZS9ieHpaSEFHallxdWJqcGlndmpIUVhZc3JV?=
- =?utf-8?B?cXlKNmxLMkFOVjZpdVArd2hvVFV4UEZVRW9pcjdJNlRPZU1XQjBvbGM1VUJ3?=
- =?utf-8?B?YmYySGJmaE8vbzhKV2NkWVdDZGFyTDhWR3BSM05NcFVkTHdhZkV6cVNwcDkv?=
- =?utf-8?B?VzFacHU2aTBpY2NwQjZZVVZxR1N6ZlF5VDhHdWdtazRmaE5rRGVEZzhHanlm?=
- =?utf-8?B?ZnZWUFJzWmxiLzVaQ3U4MEZhVitZMkQvZjYvUkg3TW10a3IyTDBVTkNUN2R4?=
- =?utf-8?B?M3dGWE5PNWN3U3d2RDduS3FSWHp0S0xuOW45MktGeUJBYUlHN1VLdlFVWUtQ?=
- =?utf-8?B?MDdJM1o4V2Y4dlp1dXZQU1JGYmU2bjJwM255R08wOTBNeTBEdDF4ckJuSkZ2?=
- =?utf-8?B?Wkt2N1ZxcGxscHhqZHVHb0JnWVRBZXRGT2k1RHZPZFE1anYwL2NuM1kxd1Js?=
- =?utf-8?B?U0JTeTNvc1hIZ1JodU8xVXByWlBTUlhROWVZRlN5TjNhSkZOTVh1ZnBWOVc4?=
- =?utf-8?B?U2o3Q1lsTzNNT1UxSGFNOVJKd1lLV3NtdDEvVmtGUHhqbGRZblpYTldiZ0Jp?=
- =?utf-8?B?OGs4elNmU1h0a24remtaTkxSdDk3VjVWOEpqS0U0THFSRGVZaGxVSlI2Qkwy?=
- =?utf-8?B?VDlzbHNYT0RPMTRBcjJMaGVjSmw0TWd0YlVIaFh2b21JM21QL3k5R2xIU2hN?=
- =?utf-8?B?RWJpdk1FUThPZHltUGpqSjZvT2V2M3lvYStvUWxIYmNXNjlnSy9ieVV3anpB?=
- =?utf-8?B?Z1ZqcnNuMm9RL21FcVNObUlQQi85L0xHNXpQSTdnZDU1M0JacXI3K1F1REgy?=
- =?utf-8?B?NUVoV0dmNmwycmFaRDQreWQxeFpTelBpaXhtd0xKS295T2gwYXVrNGg0S29E?=
- =?utf-8?B?QTZLeWdNNEhxNVNuRkVHdDB3YlJjUGxrRTZyRVE1b0JNVVhKOXZRQWhwT1lX?=
- =?utf-8?B?dEhRbzVORHNjcUZrYzcxOHhqTlhLZ1dYd3RGM3ZlQ05hQkJ3QzJOUlkrdVd6?=
- =?utf-8?B?bXo4NlpKZGFvaDF4SjJ4M1R0Z0NWRGY2RkZDd2FlMks1a2ZzYSttS2JESTRY?=
- =?utf-8?B?ZmJ1YnJMZk9nZjRjbUQvQXUxeVF3TW5WWnFDYk80Q3lISTg1Z01ZUmVTS1RL?=
- =?utf-8?B?VU53cjhRY2VMQlNzSWFvVnVvTW9rTWtWV3hta2FudW10NFlkKzJybUo3czFU?=
- =?utf-8?B?ZFNaWE5XaS9xZEl3Y0V4OGppRXNKMGFBKzl6SGJteHVsVGVCY093dDNDRk5z?=
- =?utf-8?B?TzRMbHhic3FRb2E1QWM3dTZ6SHJwb2lvWWZhRTVmeTdlakRvbEtodjRkM2Ev?=
- =?utf-8?B?Wm85M3N1SkNKVm9aV2lHcTIrWUcydWw0dkRjQjgybDRPYW5wZWZXV2tiWlFh?=
- =?utf-8?B?SXBOajlCRXBIQzYzMUJoOEFDRWplQ2ljeWZMSDhBNW5TS0l5RUNPRU1BZWxj?=
- =?utf-8?B?REN1bFRKNXVBUENwTEttRjZxTFNsekJEVFZDNWRKNmI3aDJTMVlPbGNCN0Ja?=
- =?utf-8?B?TFNVbVl1QUlIOEpwY0V3dE9CUFFaeVF6VzdrcFlRb2xQOEtOU1IvZVZMM1NC?=
- =?utf-8?B?UDRpc3J0ckh2eXpxTmJMOERwcDEyY0ZUdjFrenNzV2dtMXp2TWFicjFvNHY4?=
- =?utf-8?B?ZE9IcURLZVNXMEhaK3Zkb1p3VmRtTytBUkUzdUlWRUltTHk0bHVIMnFHOFA5?=
- =?utf-8?B?aEhwWndZNkVsZDFNMFNTSytBVXIzZzJvSTNxbXFmZ1ZhSnVnYU1KSDREb3hL?=
- =?utf-8?B?ZTZvMU9US2pBK25kNGlhalZIZmVhRFpKSC9Qb3doekgvWE5xeXNXVmlGNDBh?=
- =?utf-8?B?dHREZFo1MmZuQ1ZCbFkwZjNGTnFyT1dPd2g2ZGZJaFRhZHY4c0JFZU92SlBm?=
- =?utf-8?B?UnlVRlN3eTNkYk5nMDRkQk5maDVFeFF5TzRPczhrMitHQVNRRG5YQ3dZWXFQ?=
- =?utf-8?B?MnFCMGovbGZXenowYlhDUnArTGNCSUxmRS9MSlFEUlVtS25UWER4SlJHTGVS?=
- =?utf-8?B?TkE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	MfMyGHsx0zXE51fFqTxibgDDE+YLJPwEOkbnbiVy8SJKynJZYoyOiRWlRW36CjVypt+IZdULRm8ZFOihd35HlVk9buTxb4S4m/EU7mNEUYQePkw1aroxNZm2+QGVNR4DRU2MvpgUw9vMIi4UYIMKOsux4xAZyXt+wddJEj9eILqMcGPFXLBvFjj0cNv9u8nL5qh7Je4IpJks2nVv4ZXISQJ/lcC9UbfMbGkKZsJvXRC98UimiQtsLP4ddR0TI4+Mv1y+OS1M4vbTDtrfvzYd1j4Rbt3Rd9PZS09SlenB3JKrdx2rmzz4vAu/3zULzVQ/Z48UesQVydF3vPGcJfvYCyBLy4pa4R9FP3syXQxAatudhzUt4jL8gjj6RbnD7H2IuIGUgJ/DvCSF/wcC53ayPKE5yv7oHPqXIjooLZhKvkQosCpv6WXfT5S1WdA4SNkzBjKPhKN6s0xSZDG/uJA4m+jW16IRDjNDSioNV4tL0z2AuWShNSdCVPC9WrbDYRAW5y19R5qwHpMykNpkQ1LDHoWX0YqvaVTEA0orESMm4PlEy5VXRIhMSMb1Rx/vv+gitSbMHr1eD81NcwNNECwjFH2joe0hWiohVIEmougR3iA=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae1f83ca-f746-4b00-cff5-08dc392c7a13
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 13:43:57.0232
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8kX1beN7byWwwzsGnVCxE4AV9YCuSk/UmYD0p9+RWihHsYrnYDNJ3BLWn+3Udf2hqc59AiyMUVYfdPvLF4FlDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB4921
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-29_02,2024-02-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=0
- spamscore=0 phishscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402290106
-X-Proofpoint-ORIG-GUID: g1Kxm_gMzc-8jV5TNxJpMXF7mUwXoSSW
-X-Proofpoint-GUID: g1Kxm_gMzc-8jV5TNxJpMXF7mUwXoSSW
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-I remember I read somewhere suggesting not to change the headers in selftest.
+On Wed, 28 Feb 2024 16:08:00 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Mon, Feb 26, 2024 at 10:05:54AM +0000, Marc Zyngier wrote:
+> > A significant part of the FEAT_NV extension is to trap ERET
+> > instructions so that the hypervisor gets a chance to switch
+> > from a vEL2 L1 guest to an EL1 L2 guest.
+> > 
+> > But this also has the unfortunate consequence of trapping ERET
+> > in unsuspecting circumstances, such as staying at vEL2 (interrupt
+> > handling while being in the guest hypervisor), or returning to host
+> > userspace in the case of a VHE guest.
+> > 
+> > Although we already make some effort to handle these ERET quicker
+> > by not doing the put/load dance, it is still way too far down the
+> > line for it to be efficient enough.
+> > 
+> > For these cases, it would ideal to ERET directly, no question asked.
+> > Of course, we can't do that. But the next best thing is to do it as
+> > early as possible, in fixup_guest_exit(), much as we would handle
+> > FPSIMD exceptions.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/emulate-nested.c | 29 +++-------------------
+> >  arch/arm64/kvm/hyp/vhe/switch.c | 44 +++++++++++++++++++++++++++++++++
+> >  2 files changed, 47 insertions(+), 26 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > index 2d80e81ae650..63a74c0330f1 100644
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -2172,8 +2172,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+> >  
+> >  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> >  {
+> > -	u64 spsr, elr, mode;
+> > -	bool direct_eret;
+> > +	u64 spsr, elr;
+> >  
+> >  	/*
+> >  	 * Forward this trap to the virtual EL2 if the virtual
+> > @@ -2182,33 +2181,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> >  	if (forward_traps(vcpu, HCR_NV))
+> >  		return;
+> >  
+> > -	/*
+> > -	 * Going through the whole put/load motions is a waste of time
+> > -	 * if this is a VHE guest hypervisor returning to its own
+> > -	 * userspace, or the hypervisor performing a local exception
+> > -	 * return. No need to save/restore registers, no need to
+> > -	 * switch S2 MMU. Just do the canonical ERET.
+> > -	 */
+> > -	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> > -	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+> > -
+> > -	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > -
+> > -	direct_eret  = (mode == PSR_MODE_EL0t &&
+> > -			vcpu_el2_e2h_is_set(vcpu) &&
+> > -			vcpu_el2_tge_is_set(vcpu));
+> > -	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+> > -
+> > -	if (direct_eret) {
+> > -		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
+> > -		*vcpu_cpsr(vcpu) = spsr;
+> > -		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
+> > -		return;
+> > -	}
+> > -
+> >  	preempt_disable();
+> >  	kvm_arch_vcpu_put(vcpu);
+> >  
+> > +	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
+> > +	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+> >  	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+> >  
+> >  	trace_kvm_nested_eret(vcpu, elr, spsr);
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index d5fdcea2b366..eaf242b8e0cf 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -206,6 +206,49 @@ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
+> >  	__vcpu_put_switch_sysregs(vcpu);
+> >  }
+> >  
+> > +static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > +{
+> > +	u64 spsr, mode;
+> > +
+> > +	/*
+> > +	 * Going through the whole put/load motions is a waste of time
+> > +	 * if this is a VHE guest hypervisor returning to its own
+> > +	 * userspace, or the hypervisor performing a local exception
+> > +	 * return. No need to save/restore registers, no need to
+> > +	 * switch S2 MMU. Just do the canonical ERET.
+> > +	 *
+> > +	 * Unless the trap has to be forwarded further down the line,
+> > +	 * of course...
+> > +	 */
+> > +	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
+> > +		return false;
+> > +
+> > +	spsr = read_sysreg_el1(SYS_SPSR);
+> > +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > +
+> > +	switch (mode) {
+> > +	case PSR_MODE_EL0t:
+> > +		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
+> > +			return false;
+> > +		break;
+> > +	case PSR_MODE_EL2t:
+> > +		mode = PSR_MODE_EL1t;
+> > +		break;
+> > +	case PSR_MODE_EL2h:
+> > +		mode = PSR_MODE_EL1h;
+> > +		break;
+> > +	default:
+> > +		return false;
+> > +	}
+> 
+> Thanks for pointing out to_hw_pstate() (off-list), I spent far too long trying
+> to understand how the original code converted PSTATE.M from (v)EL2 to EL1, and
+> missed that while browsing.
+> 
+> Seems hard to re-use to_hw_pstate() here, since we want the early
+> returns.
 
-Just double-check if there is requirement to edit
-tools/testing/selftests/kvm/include/x86_64/processor.h.
+Indeed. I tried to fit it in, but ended up checking for things twice,
+which isn't great either.
 
-Dongli Zhang
+> 
+> > +
+> > +	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
+> 
+> I don't think we need to mask out PSR_MODE32_BIT here again, since if it was
+> set in `mode`, it wouldn't have matched in the switch statement. It's possibly
+> out of 'defensiveness' though. And I'm being nitpicky.
 
-On 2/27/24 18:41, Sean Christopherson wrote:
-> Open code the bit number directly in the PFERR_* masks and drop the
-> intermediate PFERR_*_BIT defines, as having to bounce through two macros
-> just to see which flag corresponds to which bit is quite annoying, as is
-> having to define two macros just to add recognition of a new flag.
+It's a sanity thing. We want to make sure all of M[4:0] are cleared
+before or'ing the new mode. I agree that we wouldn't be there if
+PSR_MODE_32BIT was set, but this matches the usage in most other
+places in the code.
+
 > 
-> Use ilog2() to derive the bit in permission_fault(), the one function that
-> actually needs the bit number (it does clever shifting to manipulate flags
-> in order to avoid conditional branches).
+> > +
+> > +	write_sysreg_el2(spsr, SYS_SPSR);
+> > +	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
+> > +
+> > +	return true;
+> > +}
+> > +
+> >  static const exit_handler_fn hyp_exit_handlers[] = {
+> >  	[0 ... ESR_ELx_EC_MAX]		= NULL,
+> >  	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+> > @@ -216,6 +259,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+> >  	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
+> >  	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_hyp_handle_watchpt_low,
+> >  	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+> > +	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
+> >  	[ESR_ELx_EC_MOPS]		= kvm_hyp_handle_mops,
+> >  };
+> >  
 > 
-> No functional change intended.
+> Otherwise,
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 32 ++++++++++----------------------
->  arch/x86/kvm/mmu.h              |  4 ++--
->  2 files changed, 12 insertions(+), 24 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index aaf5a25ea7ed..88cc523bafa8 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -254,28 +254,16 @@ enum x86_intercept_stage;
->  	KVM_GUESTDBG_INJECT_DB | \
->  	KVM_GUESTDBG_BLOCKIRQ)
->  
-> -
-> -#define PFERR_PRESENT_BIT 0
-> -#define PFERR_WRITE_BIT 1
-> -#define PFERR_USER_BIT 2
-> -#define PFERR_RSVD_BIT 3
-> -#define PFERR_FETCH_BIT 4
-> -#define PFERR_PK_BIT 5
-> -#define PFERR_SGX_BIT 15
-> -#define PFERR_GUEST_FINAL_BIT 32
-> -#define PFERR_GUEST_PAGE_BIT 33
-> -#define PFERR_IMPLICIT_ACCESS_BIT 48
-> -
-> -#define PFERR_PRESENT_MASK	BIT(PFERR_PRESENT_BIT)
-> -#define PFERR_WRITE_MASK	BIT(PFERR_WRITE_BIT)
-> -#define PFERR_USER_MASK		BIT(PFERR_USER_BIT)
-> -#define PFERR_RSVD_MASK		BIT(PFERR_RSVD_BIT)
-> -#define PFERR_FETCH_MASK	BIT(PFERR_FETCH_BIT)
-> -#define PFERR_PK_MASK		BIT(PFERR_PK_BIT)
-> -#define PFERR_SGX_MASK		BIT(PFERR_SGX_BIT)
-> -#define PFERR_GUEST_FINAL_MASK	BIT_ULL(PFERR_GUEST_FINAL_BIT)
-> -#define PFERR_GUEST_PAGE_MASK	BIT_ULL(PFERR_GUEST_PAGE_BIT)
-> -#define PFERR_IMPLICIT_ACCESS	BIT_ULL(PFERR_IMPLICIT_ACCESS_BIT)
-> +#define PFERR_PRESENT_MASK	BIT(0)
-> +#define PFERR_WRITE_MASK	BIT(1)
-> +#define PFERR_USER_MASK		BIT(2)
-> +#define PFERR_RSVD_MASK		BIT(3)
-> +#define PFERR_FETCH_MASK	BIT(4)
-> +#define PFERR_PK_MASK		BIT(5)
-> +#define PFERR_SGX_MASK		BIT(15)
-> +#define PFERR_GUEST_FINAL_MASK	BIT_ULL(32)
-> +#define PFERR_GUEST_PAGE_MASK	BIT_ULL(33)
-> +#define PFERR_IMPLICIT_ACCESS	BIT_ULL(48)
->  
->  #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
->  				 PFERR_WRITE_MASK |		\
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 60f21bb4c27b..e8b620a85627 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -213,7 +213,7 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->  	 */
->  	u64 implicit_access = access & PFERR_IMPLICIT_ACCESS;
->  	bool not_smap = ((rflags & X86_EFLAGS_AC) | implicit_access) == X86_EFLAGS_AC;
-> -	int index = (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
-> +	int index = (pfec + (not_smap << ilog2(PFERR_RSVD_MASK))) >> 1;
->  	u32 errcode = PFERR_PRESENT_MASK;
->  	bool fault;
->  
-> @@ -235,7 +235,7 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->  
->  		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
->  		offset = (pfec & ~1) +
-> -			((pte_access & PT_USER_MASK) << (PFERR_RSVD_BIT - PT_USER_SHIFT));
-> +			((pte_access & PT_USER_MASK) << (ilog2(PFERR_RSVD_MASK) - PT_USER_SHIFT));
->  
->  		pkru_bits &= mmu->pkru_mask >> offset;
->  		errcode |= -pkru_bits & PFERR_PK_MASK;
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
