@@ -1,430 +1,164 @@
-Return-Path: <kvm+bounces-10593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32BB86DC3B
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 08:42:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C76BA86DC40
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 08:44:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 454711F23214
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 07:42:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8174328A6D6
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 07:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB8F69954;
-	Fri,  1 Mar 2024 07:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841B169971;
+	Fri,  1 Mar 2024 07:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="oulFuplw"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3r59unbY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2041.outbound.protection.outlook.com [40.107.212.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E36A69952
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 07:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709278924; cv=none; b=deEwVNcr96jWVNoRS3nTuNpp7OdzREeoIos97zTV49jE+daJ+BOiQPjrFNo1DzKu+Z4ocqtQffFpTvlzncDVXVbeEQkQ1Cs0mKUhqWrV6nPE0ViICzlJE8lPF0MCSwhva0z4rPIOjsyQSVOyMC6J3wJZzMvlDEouiuCMNyGJVZM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709278924; c=relaxed/simple;
-	bh=wFUxx6DzFeuxkKEsvnRW+K0fDd0cYYnaYF6T1+UNmeA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bJkGd0hbZ9vz5C5D02Gu9BsHH4i9DZ6jr8OJv2po0yYyCWxblwmqIXI3Ux93SAD5xEWwgKVQhb00ev9GPIReOvd+pCKHIOlB6qyiw8yntNEa4HLAAP6KQbyNvEqUhOS/OtyUV8KT50ROGFOa0P+guIHRtyytxgl+AYf+JD1cCvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=oulFuplw; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-512f3e75391so1541783e87.2
-        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 23:42:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709278921; x=1709883721; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WkccNrWZdoZxP0mrO++NLB3QkLGur0wRvaYkBajMr4o=;
-        b=oulFuplw9N1UNnUuvpXO1DfmUZ/k99k19ErpgT+1dmuRurjXoIEJrPxHJ96jdZCAlR
-         LnvmCDD+P+QMOB8ltSrxONy3Hh3R4WxTgGNNtZf6aqcsqNI10AXotNQNbU4IUTEfsssl
-         0dJuZ88GuH9ULNKx61T5KmZOVt0FCiW6xLAWd2wWRJ0r68yD0tJnSphuWaY7KCgAlbvJ
-         78OYWjWRRLDP9300g5ytcjkeLTkI2L8nqhVhfYugqbL4BHI4K+hIHB91r+Jr/KlvLoK8
-         XQ8QqnKT79OLDn6GiF/LRL+3FqLHh4d8LhSlbHCdQ6JY9M/vVcH2jocQKlI3LBihFpnM
-         7lDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709278921; x=1709883721;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WkccNrWZdoZxP0mrO++NLB3QkLGur0wRvaYkBajMr4o=;
-        b=RD00ta1EvDRhjTtBWBlBI+ybwiP44EnlOlSwZJ0xaOzjWQ73WByTYhUan2KUCB8Gep
-         Ctq4uyGHgDNnUsXTPvBK69VFIkKZLDFl5AbwiKqc87i+Y2CZ2cXWzUcPcUVyVAJ3HNy7
-         zVKreJl25KE8RTDHe5lPaH/nIUpE8TmqmclLtOlx3hNzpt8zvQPZs+fyx7rDgvA1CmBc
-         4/m4/2MX19RcTbalHLDlRcemBdr4f6KsEnQFJw+og1S4c+YqUrY8Mec3+rqnkNoGr9NZ
-         V7+tvbi5OgVhMbsRNgfNXRmCePLId8P/MxC6msTzkldQHfdldZnDuNaursXgUbMbrZo9
-         KGZg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXM6TO2ceaoZrMxVdGUTa+dIv5pyky4TLWo99ciegWnYHSsSSWXGP4650RWgIVS2o5Hn56UVjqgZl1YwNG0s/6UsrP
-X-Gm-Message-State: AOJu0YzWivi4gXWG780ghfWj3Ko7u1GAc2mkZG0+ZPZaORLEc5FClvmu
-	vwNsHSKhZlppv36S252LMKQRqlHLC81wSCFu50tHNPW7iTBzvXdcnW3a8SSTzI015oWmMrXpB8K
-	ZkInSxSW/fgm+34RbJH7EFYk9pVUeJ9AnMWNbog==
-X-Google-Smtp-Source: AGHT+IGeZ/e9EPenJSwwtqwfTjZTV3Rs6mTLRjyPlv1sIDYdzZekJE7jaIdzINjO6ztD8gD4yQWzH7HbSNdb7bBEpjo=
-X-Received: by 2002:a05:6512:310b:b0:512:e7dd:2532 with SMTP id
- n11-20020a056512310b00b00512e7dd2532mr629291lfb.30.1709278920546; Thu, 29 Feb
- 2024 23:42:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22CF69952;
+	Fri,  1 Mar 2024 07:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709279083; cv=fail; b=osjprU1biu3tOaSpQhy9kCuXUnW5WrmLRLoxQegxNgOKQ36sSN2ZIaQvyjl0/A91UMsSFy4t5uEiPF2KaFuD97KPCNLzu/MjPq2dJGBtqaNeItrtmI5J7d6U0veY1jc6Yg+ZAz/T1ucNjf0KF2Ma3whH38TH1Crmx9y+lGMZswU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709279083; c=relaxed/simple;
+	bh=oaPwoVL3tzqhAc2007zK+7EWOmJEEXRv7u4awC5C2OI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ae1jyRpRvFH9MAjl77vVez03IP/MkhaO4hUCxPdCUtptHdtudAX/TvuYKrIw4z5hg9s1bYcRhTUcBnW6TyE00osRKx8zpVcGHpQgRRe/0hzrFgZV5tO4q8iGmU1hW6ahooyM/YSIM9pKsACQjT9GC7YQGvOGQ+cVIICQpar4Agw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3r59unbY; arc=fail smtp.client-ip=40.107.212.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BMwAqj4ImHMgjqPRjUo/cjxBcHRR1+UMHXicjBjCt6+vxk26z0evGPpKKyxGzLTE6/Up0f8VX4f+wSMm79jzPp3KDRn9OxPQiedd393gtPy17AlHMJWOCAXEb4/dA8KeNQjRrJAmQgwumtXYpsRjqUK1dyCp1ZEU2w+UT6BjYW0fXY2nkUYKzckO/FeiU3Afs5unnskOCJYlaa73JW00si+I+EO0iRJRCqnDR4Ux2u+qz2TkCj/pUNmAvI1BaJ6v0kr2SCUSp1Fy5lIj2JrLQ2zPid7I3rugnWa1DhDLw2h29FE0tMADkBgIJawVvO/xL0uGIyM2nFGti73mZiL+mQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wDHhqAsCApQAa/bXgQs5jL1Hb9Zxs3xIbG93Hf4Sq9o=;
+ b=dtLnX1g9dn0JSWX3CHzyLD9BBVdD2ROlA8YtWsdqr9XeRjP2yVtHNJKO6HH2VPXBoYN/NMCw0AthuKVnad4vQqnhaqgrVfd5IdgaHk4rBT+qoOQB1ekp/slO/nen7Jb8kSbdRpRerej4InDLaHU9NZ2wYiue1GT6qrherUZFuRvIYYw/UdvPV9gdWYMD1cEUZCFkDaznKInyTTsDmIZLT3M/SEOq5Lpgj6qdCmTDd43utdRgyKZwkO3yi0bagPHEMB5QntZKtaDlYZeTfYNXskqn/Q53UCJTikv17GnDS7bFxAmEPTfkbQtETz2ltIlUqcOaj1XiAwx4eQ1Y/OlNEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wDHhqAsCApQAa/bXgQs5jL1Hb9Zxs3xIbG93Hf4Sq9o=;
+ b=3r59unbY6ZmmWpcmMWk1RpPYoPbS69IkFxokza5b8uOJRGC0FLDfrKRN6bTdqviaFyOu37b6YFlToRItL25YqDGo7aovMwquRryJ88Sq9OQxXreYbN5qszCMz+NIxCDUpm7ehb/qdeg/jxgSZ0T2jL/gaOmz3qIeVt/LlAvh3xg=
+Received: from DM6PR02CA0117.namprd02.prod.outlook.com (2603:10b6:5:1b4::19)
+ by SN7PR12MB7131.namprd12.prod.outlook.com (2603:10b6:806:2a3::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.47; Fri, 1 Mar
+ 2024 07:44:38 +0000
+Received: from CY4PEPF0000EE30.namprd05.prod.outlook.com
+ (2603:10b6:5:1b4:cafe::a7) by DM6PR02CA0117.outlook.office365.com
+ (2603:10b6:5:1b4::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.33 via Frontend
+ Transport; Fri, 1 Mar 2024 07:44:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE30.mail.protection.outlook.com (10.167.242.36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7292.25 via Frontend Transport; Fri, 1 Mar 2024 07:44:37 +0000
+Received: from sindhu.amdval.net (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 1 Mar
+ 2024 01:44:31 -0600
+From: Sandipan Das <sandipan.das@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <hpa@zytor.com>, <mlevitsk@redhat.com>,
+	<vkuznets@redhat.com>, <mizhang@google.com>, <tao1.su@linux.intel.com>,
+	<jmattson@google.com>, <andriy.shevchenko@linux.intel.com>,
+	<ravi.bangoria@amd.com>, <ananth.narayan@amd.com>, <nikunj.dadhania@amd.com>,
+	<santosh.shukla@amd.com>, <manali.shukla@amd.com>, <sandipan.das@amd.com>
+Subject: [PATCH] KVM: x86: Do not mask LVTPC when handling a PMI on AMD platforms
+Date: Fri, 1 Mar 2024 13:14:23 +0530
+Message-ID: <20240301074423.643779-1-sandipan.das@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301013545.10403-1-duchao@eswincomputing.com>
- <20240301013545.10403-2-duchao@eswincomputing.com> <CAAhSdy2+_+t4L8LHmYcJQZBGJHj6pyFm26_KwFBahFxz7eV1fQ@mail.gmail.com>
- <1f31ec16.1447.18df8b97f73.Coremail.duchao@eswincomputing.com>
- <CAAhSdy0x6bdm3hYk8jeRG_bF-vFXP8eOqYJ5GMY4Eb=bMNkaQw@mail.gmail.com> <698f58e.1490.18df8e9084f.Coremail.duchao@eswincomputing.com>
-In-Reply-To: <698f58e.1490.18df8e9084f.Coremail.duchao@eswincomputing.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Fri, 1 Mar 2024 13:11:49 +0530
-Message-ID: <CAK9=C2Wz6ZHjsxPMkMnRBT+maE2qLuy+zi4wCRJ+1nkssCX5FA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
-To: Chao Du <duchao@eswincomputing.com>
-Cc: Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	atishp@atishpatra.org, pbonzini@redhat.com, shuah@kernel.org, 
-	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, duchao713@qq.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE30:EE_|SN7PR12MB7131:EE_
+X-MS-Office365-Filtering-Correlation-Id: d7e232a8-504f-4f73-346e-08dc39c37276
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	cru5drQmFEOMaV+eAjj0fh9ZPFXpogjohATEldYero5MFNZH+6LnRRRzHg1v0bLN2ozCVNKRZR3A2y+gw1dDx3qCMo5MYLQv6Shkci0NvybBIq0ue5D6pCqXWELI7yuSPxBb8MbEyxzgzK9rr0WCw/tXlJJJXYMmk9+ohQhrbDxEG8vpUhFNCPbFnICQBdLvgMwCI7/nx4qJKufZRckW1wyHcsGgPq9FsMAMl3vwwtVb0F/vkqfbP6eH6FB1X8zJCKX0g1CudCaVlsCBszzMZ1YMkE1A1qQQFaqmmY2t2GAZapvF455/EPddykEfizF+X/0hgHygsQJlRxaNLxNNDXLpx8Cj4Tni8Rg/H7rPPdq02d0Eer3C/J9YR0t7FZ3YL1jfwQcabF/49R/Elju5sNU0TAmM7gMRPDi+Gjt8d1EayD9FnnFXUs9lbYrIA8CacFiaK9auKdA/URZUIMdMTuwD1t/zGIU1T3wXjNLHFIBelQlv39Q4Y7ozmOM68jA96D1D8dMb05EVUgdOXNxyJTYYOwOnHo3yuC4UCof6YWSEYQmKgi1qIB9FXglDnqn/XCLR+sw5tMSJnypKPDL3r8PQbRIRoGaMQUj81ZFhReRjojdP077AZAbryhHWc0HZ12BQOijzc7W3aUJoXV6n4GtbbfiAJ8boYTW33E/neS7iWaxcWg9LjADkkkofKhSzMt/EVX86oYMvvFBJ03s0WRLinNp8KTuVesf66xwmffPbkUddApJhMmq3jpYzK9Xj
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2024 07:44:37.9491
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7e232a8-504f-4f73-346e-08dc39c37276
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE30.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7131
 
-On Fri, Mar 1, 2024 at 12:57=E2=80=AFPM Chao Du <duchao@eswincomputing.com>=
- wrote:
->
-> On 2024-03-01 15:29, Anup Patel <anup@brainfault.org> wrote:
-> >
-> > On Fri, Mar 1, 2024 at 12:05=E2=80=AFPM Chao Du <duchao@eswincomputing.=
-com> wrote:
-> > >
-> > > On 2024-03-01 13:00, Anup Patel <anup@brainfault.org> wrote:
-> > > >
-> > > > On Fri, Mar 1, 2024 at 7:08=E2=80=AFAM Chao Du <duchao@eswincomputi=
-ng.com> wrote:
-> > > > >
-> > > > > kvm_vm_ioctl_check_extension(): Return 1 if KVM_CAP_SET_GUEST_DEB=
-UG is
-> > > > > been checked.
-> > > > >
-> > > > > kvm_arch_vcpu_ioctl_set_guest_debug(): Update the guest_debug fla=
-gs
-> > > > > from userspace accordingly. Route the breakpoint exceptions to HS=
- mode
-> > > > > if the VCPU is being debugged by userspace, by clearing the
-> > > > > corresponding bit in hedeleg. Write the actual CSR in
-> > > > > kvm_arch_vcpu_load().
-> > > > >
-> > > > > Signed-off-by: Chao Du <duchao@eswincomputing.com>
-> > > > > ---
-> > > > >  arch/riscv/include/asm/kvm_host.h | 17 +++++++++++++++++
-> > > > >  arch/riscv/include/uapi/asm/kvm.h |  1 +
-> > > > >  arch/riscv/kvm/main.c             | 18 ++----------------
-> > > > >  arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
-> > > > >  arch/riscv/kvm/vm.c               |  1 +
-> > > > >  5 files changed, 34 insertions(+), 18 deletions(-)
-> > > > >
-> > > > > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/inclu=
-de/asm/kvm_host.h
-> > > > > index 484d04a92fa6..9ee3f03ba5d1 100644
-> > > > > --- a/arch/riscv/include/asm/kvm_host.h
-> > > > > +++ b/arch/riscv/include/asm/kvm_host.h
-> > > > > @@ -43,6 +43,22 @@
-> > > > >         KVM_ARCH_REQ_FLAGS(5, KVM_REQUEST_WAIT | KVM_REQUEST_NO_W=
-AKEUP)
-> > > > >  #define KVM_REQ_STEAL_UPDATE           KVM_ARCH_REQ(6)
-> > > > >
-> > > > > +#define KVM_HEDELEG_DEFAULT            ((_AC(1, UL) << EXC_INST_=
-MISALIGNED) | \
-> > > > > +                                        (_AC(1, UL) << EXC_BREAK=
-POINT) | \
-> > > > > +                                        (_AC(1, UL) << EXC_SYSCA=
-LL) | \
-> > > > > +                                        (_AC(1, UL) << EXC_INST_=
-PAGE_FAULT) | \
-> > > > > +                                        (_AC(1, UL) << EXC_LOAD_=
-PAGE_FAULT) | \
-> > > > > +                                        (_AC(1, UL) << EXC_STORE=
-_PAGE_FAULT))
-> > > >
-> > > > Use BIT(xyz) here. For example: BIT(EXC_INST_MISALIGNED)
-> > >
-> > > Thanks, I will use BIT() instead in next revision.
-> > >
-> > > >
-> > >
-> > > > Also, BIT(EXC_BREAKPOINT) should not be part of KVM_HEDELEG_DEFAULT=
-.
-> > >
-> > > I think the bit EXC_BREAKPOINT should be set by default, like what yo=
-u
-> > > already did in kvm_arch_hardware_enable(). Then the VS could get the =
-ebreak
-> > > and handle it accordingly.
-> > >
-> > > If the guest_debug is enabled, ebreak instructions are inserted by th=
-e
-> > > userspace(QEMU). So KVM should 'intercept' the ebreak and exit to QEM=
-U.
-> > > Bit EXC_BREAKPOINT should be cleared in this case.
-> >
-> > If EXC_BREAKPOINT is delegated by default then it is not consistent wit=
-h
-> > vcpu->guest_debug which is not enabled by default.
->
-> To enable the guest_debug corresponding to NOT delegate the EXC_BREAKPOIN=
-T.
-> They are somehow 'opposite'.
->
-> This 'kvm_guest_debug' feature is different from "debug in the guest".
-> The later requires the delegation of EXC_BREAKPOINT.
-> The former does not.
+On AMD and Hygon platforms, the local APIC does not automatically set
+the mask bit of the LVTPC register when handling a PMI and there is
+no need to clear it in the kernel's PMI handler.
 
-In which case your below code is totally misleading.
+For guests, the mask bit is currently set by kvm_apic_local_deliver()
+and unless it is cleared by the guest kernel's PMI handler, PMIs stop
+arriving and break use-cases like sampling with perf record.
 
-+       if (dbg->control & KVM_GUESTDBG_ENABLE) {
-+               vcpu->guest_debug =3D dbg->control;
-+               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_GUEST_DEBUG;
-+       } else {
-+               vcpu->guest_debug =3D 0;
-+               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_DEFAULT;
-+       }
+This does not affect non-PerfMonV2 guests because PMIs are handled in
+the guest kernel by x86_pmu_handle_irq() which always clears the LVTPC
+mask bit irrespective of the vendor.
 
-This should have been:
+Before:
 
-+       if (dbg->control & KVM_GUESTDBG_ENABLE) {
-+               vcpu->guest_debug =3D dbg->control;
-+               vcpu->arch.cfg.hedeleg &=3D ~BIT(EXC_BREAKPOINT);
-+       } else {
-+               vcpu->guest_debug =3D 0;
-+               vcpu->arch.cfg.hedeleg |=3D BIT(EXC_BREAKPOINT);
-+       }
+  $ perf record -e cycles:u true
+  [ perf record: Woken up 1 times to write data ]
+  [ perf record: Captured and wrote 0.001 MB perf.data (1 samples) ]
 
->
-> >
-> > >
-> > > >
-> > > > > +#define KVM_HEDELEG_GUEST_DEBUG                ((_AC(1, UL) << E=
-XC_INST_MISALIGNED) | \
-> > > > > +                                        (_AC(1, UL) << EXC_SYSCA=
-LL) | \
-> > > > > +                                        (_AC(1, UL) << EXC_INST_=
-PAGE_FAULT) | \
-> > > > > +                                        (_AC(1, UL) << EXC_LOAD_=
-PAGE_FAULT) | \
-> > > > > +                                        (_AC(1, UL) << EXC_STORE=
-_PAGE_FAULT))
-> > > >
-> > > > No need for KVM_HEDELEG_GUEST_DEBUG, see below.
-> > > >
-> > > > > +
-> > > > > +#define KVM_HIDELEG_DEFAULT            ((_AC(1, UL) << IRQ_VS_SO=
-FT) | \
-> > > > > +                                        (_AC(1, UL) << IRQ_VS_TI=
-MER) | \
-> > > > > +                                        (_AC(1, UL) << IRQ_VS_EX=
-T))
-> > > > > +
-> > > >
-> > > > Same as above, use BIT(xyz) here.
-> > > >
-> > > > >  enum kvm_riscv_hfence_type {
-> > > > >         KVM_RISCV_HFENCE_UNKNOWN =3D 0,
-> > > > >         KVM_RISCV_HFENCE_GVMA_VMID_GPA,
-> > > > > @@ -169,6 +185,7 @@ struct kvm_vcpu_csr {
-> > > > >  struct kvm_vcpu_config {
-> > > > >         u64 henvcfg;
-> > > > >         u64 hstateen0;
-> > > > > +       unsigned long hedeleg;
-> > > > >  };
-> > > > >
-> > > > >  struct kvm_vcpu_smstateen_csr {
-> > > > > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/inclu=
-de/uapi/asm/kvm.h
-> > > > > index 7499e88a947c..39f4f4b9dede 100644
-> > > > > --- a/arch/riscv/include/uapi/asm/kvm.h
-> > > > > +++ b/arch/riscv/include/uapi/asm/kvm.h
-> > > > > @@ -17,6 +17,7 @@
-> > > > >
-> > > > >  #define __KVM_HAVE_IRQ_LINE
-> > > > >  #define __KVM_HAVE_READONLY_MEM
-> > > > > +#define __KVM_HAVE_GUEST_DEBUG
-> > > > >
-> > > > >  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
-> > > > >
-> > > > > diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> > > > > index 225a435d9c9a..bab2ec34cd87 100644
-> > > > > --- a/arch/riscv/kvm/main.c
-> > > > > +++ b/arch/riscv/kvm/main.c
-> > > > > @@ -22,22 +22,8 @@ long kvm_arch_dev_ioctl(struct file *filp,
-> > > > >
-> > > > >  int kvm_arch_hardware_enable(void)
-> > > > >  {
-> > > > > -       unsigned long hideleg, hedeleg;
-> > > > > -
-> > > > > -       hedeleg =3D 0;
-> > > > > -       hedeleg |=3D (1UL << EXC_INST_MISALIGNED);
-> > > > > -       hedeleg |=3D (1UL << EXC_BREAKPOINT);
-> > > > > -       hedeleg |=3D (1UL << EXC_SYSCALL);
-> > > > > -       hedeleg |=3D (1UL << EXC_INST_PAGE_FAULT);
-> > > > > -       hedeleg |=3D (1UL << EXC_LOAD_PAGE_FAULT);
-> > > > > -       hedeleg |=3D (1UL << EXC_STORE_PAGE_FAULT);
-> > > > > -       csr_write(CSR_HEDELEG, hedeleg);
-> > > > > -
-> > > > > -       hideleg =3D 0;
-> > > > > -       hideleg |=3D (1UL << IRQ_VS_SOFT);
-> > > > > -       hideleg |=3D (1UL << IRQ_VS_TIMER);
-> > > > > -       hideleg |=3D (1UL << IRQ_VS_EXT);
-> > > > > -       csr_write(CSR_HIDELEG, hideleg);
-> > > > > +       csr_write(CSR_HEDELEG, KVM_HEDELEG_DEFAULT);
-> > > > > +       csr_write(CSR_HIDELEG, KVM_HIDELEG_DEFAULT);
-> > > > >
-> > > > >         /* VS should access only the time counter directly. Every=
-thing else should trap */
-> > > > >         csr_write(CSR_HCOUNTEREN, 0x02);
-> > > > > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > > > > index b5ca9f2e98ac..242076c2227f 100644
-> > > > > --- a/arch/riscv/kvm/vcpu.c
-> > > > > +++ b/arch/riscv/kvm/vcpu.c
-> > > > > @@ -475,8 +475,15 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct k=
-vm_vcpu *vcpu,
-> > > > >  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
-> > > > >                                         struct kvm_guest_debug *d=
-bg)
-> > > > >  {
-> > > > > -       /* TODO; To be implemented later. */
-> > > > > -       return -EINVAL;
-> > > >
-> > > > if (vcpu->arch.ran_atleast_once)
-> > > >         return -EBUSY;
-> > >
-> > > If we enabled the guest_debug in QEMU side, then the KVM_SET_GUEST_DE=
-BUG ioctl
-> > > will come before the first KVM_RUN. This will always cause an ERROR.
-> >
-> > The check ensures that KVM user space can only enable/disable
-> > guest debug before the VCPU is run. I don't see why this would
-> > fail for QEMU.
->
-> In the current implementation of GDB and QEMU, the userspace will enable/=
-disable
-> guest_debug frequently during the debugging (almost every step).
-> The sequence should like:
->
-> KVM_SET_GUEST_DEBUG enable
-> KVM_RUN
-> KVM_SET_GUEST_DEBUG disable
-> KVM_SET_GUEST_DEBUG enable
-> KVM_RUN
-> KVM_SET_GUEST_DEBUG disable
-> KVM_SET_GUEST_DEBUG enable
-> KVM_RUN
-> KVM_SET_GUEST_DEBUG disable
-> ...
+After:
 
-Fair enough, no need to check "ran_atleast_once"
+  $ perf record -e cycles:u true
+  [ perf record: Woken up 1 times to write data ]
+  [ perf record: Captured and wrote 0.002 MB perf.data (19 samples) ]
 
->
-> >
-> > >
-> > > >
-> > > >
-> > > > > +       if (dbg->control & KVM_GUESTDBG_ENABLE) {
-> > > > > +               vcpu->guest_debug =3D dbg->control;
-> > > > > +               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_GUEST_DEBU=
-G;
-> > > > > +       } else {
-> > > > > +               vcpu->guest_debug =3D 0;
-> > > > > +               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_DEFAULT;
-> > > > > +       }
-> > > >
-> > > > Don't update vcpu->arch.cfg.hedeleg here since it should be only do=
-ne
-> > > > in kvm_riscv_vcpu_setup_config().
-> > > >
-> > > > > +
-> > > > > +       return 0;
-> > > > >  }
-> > > > >
-> > > > >  static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
-> > > > > @@ -505,6 +512,9 @@ static void kvm_riscv_vcpu_setup_config(struc=
-t kvm_vcpu *vcpu)
-> > > > >                 if (riscv_isa_extension_available(isa, SMSTATEEN)=
-)
-> > > > >                         cfg->hstateen0 |=3D SMSTATEEN0_SSTATEEN0;
-> > > > >         }
-> > > > > +
-> > > > > +       if (!vcpu->guest_debug)
-> > > > > +               cfg->hedeleg =3D KVM_HEDELEG_DEFAULT;
-> > > >
-> > > > This should be:
-> > > >
-> > > > cfg->hedeleg =3D KVM_HEDELEG_DEFAULT;
-> > > > if (vcpu->guest_debug)
-> > > >         cfg->hedeleg |=3D BIT(EXC_BREAKPOINT);
-> > >
-> > > Like above, here the logic should be:
-> > >
-> > > cfg->hedeleg =3D KVM_HEDELEG_DEFAULT; // with BIT(EXC_BREAKPOINT)
-> > > if (vcpu->guest_debug)
-> > >         cfg->hedeleg &=3D ~BIT(EXC_BREAKPOINT);
-> > >
-> > > Another approach is:
-> > > initialize the cfg->hedeleg as KVM_HEDELEG_DEFAULT during kvm_arch_vc=
-pu_create().
-> > > Besides that, only update the cfg->hedeleg in kvm_arch_vcpu_ioctl_set=
-_guest_debug().
-> >
-> > I disagree. We should handle hedeleg just like we handle henvcfg.
->
-> OK, let's only update the cfg->hedeleg in kvm_riscv_vcpu_setup_config().
->
-> >
-> > >
-> > > >
-> > > > >  }
-> > > > >
-> > > > >  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> > > > > @@ -519,6 +529,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu=
-, int cpu)
-> > > > >         csr_write(CSR_VSEPC, csr->vsepc);
-> > > > >         csr_write(CSR_VSCAUSE, csr->vscause);
-> > > > >         csr_write(CSR_VSTVAL, csr->vstval);
-> > > > > +       csr_write(CSR_HEDELEG, cfg->hedeleg);
-> > > > >         csr_write(CSR_HVIP, csr->hvip);
-> > > > >         csr_write(CSR_VSATP, csr->vsatp);
-> > > > >         csr_write(CSR_HENVCFG, cfg->henvcfg);
-> > > > > diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> > > > > index ce58bc48e5b8..7396b8654f45 100644
-> > > > > --- a/arch/riscv/kvm/vm.c
-> > > > > +++ b/arch/riscv/kvm/vm.c
-> > > > > @@ -186,6 +186,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *=
-kvm, long ext)
-> > > > >         case KVM_CAP_READONLY_MEM:
-> > > > >         case KVM_CAP_MP_STATE:
-> > > > >         case KVM_CAP_IMMEDIATE_EXIT:
-> > > > > +       case KVM_CAP_SET_GUEST_DEBUG:
-> > > > >                 r =3D 1;
-> > > > >                 break;
-> > > > >         case KVM_CAP_NR_VCPUS:
-> > > > > --
-> > > > > 2.17.1
-> > > > >
-> > > >
-> > > > Regards,
-> > > > Anup
-> > >
-> > > Thanks,
-> > > Chao
-> >
-> > Regards,
-> > Anup
->
-> Thanks,
-> Chao
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+Fixes: a16eb25b09c0 ("KVM: x86: Mask LVTPC when handling a PMI")
+Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+---
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards,
-Anup
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 3242f3da2457..0959a887c306 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2768,7 +2768,7 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, int lvt_type)
+ 		trig_mode = reg & APIC_LVT_LEVEL_TRIGGER;
+ 
+ 		r = __apic_accept_irq(apic, mode, vector, 1, trig_mode, NULL);
+-		if (r && lvt_type == APIC_LVTPC)
++		if (r && lvt_type == APIC_LVTPC && !guest_cpuid_is_amd_or_hygon(apic->vcpu))
+ 			kvm_lapic_set_reg(apic, APIC_LVTPC, reg | APIC_LVT_MASKED);
+ 		return r;
+ 	}
+-- 
+2.34.1
+
 
