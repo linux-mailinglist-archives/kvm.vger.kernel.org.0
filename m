@@ -1,128 +1,191 @@
-Return-Path: <kvm+bounces-10609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44ACC86DE84
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 10:44:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 390E586DE8A
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 10:45:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72E121C2284C
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 09:44:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EB371C20B7C
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 09:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B016A8BA;
-	Fri,  1 Mar 2024 09:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8922E6A8B9;
+	Fri,  1 Mar 2024 09:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFP1sI1U"
 X-Original-To: kvm@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF276A32F
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 09:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAF26A32F
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 09:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709286246; cv=none; b=WKxt+dduBa/Lg0RHLQbUcghOrINf1D1cvIUVyxJkz97tiLQNv4mGkl6yK4/594cu10TFf/UPdpl6hGi9ZfSYg06cVEEh4/LhGkIfXgIkN0J6HjFdkQoPzqcBTt9zPX6lxJtNzy2OoNjIKSjaWJUshjozTT9wpkPFoTYWxZ1sIWo=
+	t=1709286321; cv=none; b=koXwSbmvQV8BFvtx1qrx8vXQSwh3HeYLiM2zDk1QKOJE5DYZb4mn8ILkDKT4qIumm1k1NabIKJOpUk7ZVhsRtySue+K8F/aW9KyUF/2lmBFk5gOckJw1SOFOIwQGNcfmN/cu9zQs1Bt0VJRFur2Dtr6V0RCjK11HzApT1SltYkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709286246; c=relaxed/simple;
-	bh=rs+YMAJgsTpc1M6XNBVWi+ryyYv6qIQGn/pLKX7tcyY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=H7krbK0HMm91yHJepVbivHmMiMKAseLaxVA0W05Tv9p3zu5nB3gQfQnplcSk13qcSGX3qKPjfMWDGO///pdKmC/3pasrFDIqjkxNbzs+Aggzf4cRNqFqENyCUawTKDBG5FGegRhvBHIxAMVBZlWdsVFrYx56UgTfiop/PB0MwmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from duchao$eswincomputing.com ( [10.64.113.11] ) by
- ajax-webmail-app2 (Coremail) ; Fri, 1 Mar 2024 17:43:37 +0800 (GMT+08:00)
-Date: Fri, 1 Mar 2024 17:43:37 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Chao Du" <duchao@eswincomputing.com>
-To: "Andrew Jones" <ajones@ventanamicro.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, anup@brainfault.org, 
-	atishp@atishpatra.org, pbonzini@redhat.com, shuah@kernel.org, 
-	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, duchao713@qq.com
-Subject: Re: [PATCH v2 3/3] RISC-V: KVM: selftests: Add breakpoints test
- support
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT6.0.3 build 20220420(169d3f8c)
- Copyright (c) 2002-2024 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <20240301-16a75ed14197d3c5e0e7251e@orel>
-References: <20240301013545.10403-1-duchao@eswincomputing.com>
- <20240301013545.10403-4-duchao@eswincomputing.com>
- <20240301-16a75ed14197d3c5e0e7251e@orel>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1709286321; c=relaxed/simple;
+	bh=oe+STWzSHNFx92Ed5Z4M4cS3V7pEndT2r4nJ64v+428=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=JmnzZfuGY5aNNff14EpTQuiudVF/leM45aQiiYGMLoguUunIfATdByNj47fDPJeUQ3TUDEous+4InccBJT1md4VaflR3JDfRkbz9ZQlArW6gLU64Yd5PD9772R+EqGSgALo16cMUX5OsVUbgar6so7OT+WoDMIGDXc0/NS5M6uU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CFP1sI1U; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709286318;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=4H0OYCm6hFlmx4RA0pYmYEJnMmqz3AUipl1jTzgwcLE=;
+	b=CFP1sI1U3F83Ba3udaL37d1uSFre97yDoWCs2NODQCOSog1P3B/7ktJOVDKHcxyXmNHQyQ
+	YVZgjyrKWB9bVWUrgMGUm9CiXw753NxvovvAd3da2YFpiADrE6Qlq0XwByH2JH/llWuwei
+	GqX9nRu0t67RRm5kmutmABtSBY3nC80=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-680-7Iwtx11ZP3iZ1IS0sMqgOQ-1; Fri, 01 Mar 2024 04:45:17 -0500
+X-MC-Unique: 7Iwtx11ZP3iZ1IS0sMqgOQ-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-787b8dd3330so499230485a.1
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 01:45:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709286317; x=1709891117;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4H0OYCm6hFlmx4RA0pYmYEJnMmqz3AUipl1jTzgwcLE=;
+        b=TDfSx7W8J0iUMNZJIZduMeogj9Jj5cV1oSLswPiQWyGen8EWyXxUYEx3alKw5zqSSH
+         hwaI9iCCQVLrvsOTFJsVu8dDRKHVYP3+C4zhk7NT/HyFQvHrafbzKQMsu8I0jiCywdQT
+         zjlY3Kz9/yWrOCVJm8IZUWN2n4ENTW2PHGekvkIoAH6it3QsQMpdp4u1OFt4HByQ2amc
+         MIHRNxYaSwjfjYwD5e+LUvMDWNrpAdy2P1DfO2Sal8swjD+BskGtIw1FHHOjHl2N/bir
+         d3G00qFJefV0LBhpc6LtiombhvlP+K8QqE7NNorhQ6R5ODF97sRDIxzsYLSkFTV213vi
+         IUrw==
+X-Forwarded-Encrypted: i=1; AJvYcCWK8MtNvrpWNIsN2Pq0z/GZYO1lNpbruCQXHacicoARX1j+MihAxc62gRY1X2UZoVZZfZecNYp9la4yzGx3NfoZMSIZ
+X-Gm-Message-State: AOJu0YwnWDe7Cs0YjX6cWuEyKPGdeEQqzq1wPSwX9Pk4SnZsAYbqewmt
+	0FdFORVoIb8M18OogB+pbDo8sUz8yhTnFosabGn8IDwpJ41H5FSOQhiZ+l79VvVE3tELUSlWejb
+	6Liys080V7M9bqxNk8z9GnATdvZgIHOCJX+S1OZo0AwATNsWXMg==
+X-Received: by 2002:a05:620a:b1c:b0:787:a2d2:d59b with SMTP id t28-20020a05620a0b1c00b00787a2d2d59bmr1364784qkg.26.1709286317063;
+        Fri, 01 Mar 2024 01:45:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH3ZGmrG95zUVRhKvl+Z3Z4TCBmcrBRud34bZ7otTXr0OO1dnrorQHaOC3fDp3qa8laUrQPzw==
+X-Received: by 2002:a05:620a:b1c:b0:787:a2d2:d59b with SMTP id t28-20020a05620a0b1c00b00787a2d2d59bmr1364774qkg.26.1709286316816;
+        Fri, 01 Mar 2024 01:45:16 -0800 (PST)
+Received: from [192.168.0.9] (ip-109-43-178-133.web.vodafone.de. [109.43.178.133])
+        by smtp.gmail.com with ESMTPSA id g4-20020a05620a40c400b0078783b32229sm1491763qko.7.2024.03.01.01.45.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Mar 2024 01:45:16 -0800 (PST)
+Message-ID: <f659964b-da95-4339-9d4f-c7b6a72fbac0@redhat.com>
+Date: Fri, 1 Mar 2024 10:45:12 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <53c9d1f0.1501.18df965d8ca.Coremail.duchao@eswincomputing.com>
-X-Coremail-Locale: en_US
-X-CM-TRANSID:TQJkCgDHVdRJo+FlHjYdAA--.10121W
-X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/1tbiAQEDDGXgo4Qn4wAAsp
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 03/32] powerpc: Fix stack backtrace
+ termination
+Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
+ <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org
+References: <20240226101218.1472843-1-npiggin@gmail.com>
+ <20240226101218.1472843-4-npiggin@gmail.com>
+ <94491aab-b252-4590-b2a7-7a581297606f@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <94491aab-b252-4590-b2a7-7a581297606f@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-T24gMjAyNC0wMy0wMSAxNzoyNCwgQW5kcmV3IEpvbmVzIDxham9uZXNAdmVudGFuYW1pY3JvLmNv
-bT4gd3JvdGU6Cj4gCj4gT24gRnJpLCBNYXIgMDEsIDIwMjQgYXQgMDE6MzU6NDVBTSArMDAwMCwg
-Q2hhbyBEdSB3cm90ZToKPiA+IEluaXRpYWwgc3VwcG9ydCBmb3IgUklTQy1WIEtWTSBicmVha3Bv
-aW50IHRlc3QuIENoZWNrIHRoZSBleGl0IHJlYXNvbgo+ID4gYW5kIHRoZSBQQyB3aGVuIGd1ZXN0
-IGRlYnVnIGlzIGVuYWJsZWQuCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IENoYW8gRHUgPGR1Y2hh
-b0Blc3dpbmNvbXB1dGluZy5jb20+Cj4gPiAtLS0KPiA+ICB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0
-cy9rdm0vTWFrZWZpbGUgICAgICAgICAgfCAgMSArCj4gPiAgLi4uL3Rlc3Rpbmcvc2VsZnRlc3Rz
-L2t2bS9yaXNjdi9icmVha3BvaW50cy5jIHwgNDkgKysrKysrKysrKysrKysrKysrKwo+ID4gIDIg
-ZmlsZXMgY2hhbmdlZCwgNTAgaW5zZXJ0aW9ucygrKQo+ID4gIGNyZWF0ZSBtb2RlIDEwMDY0NCB0
-b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vcmlzY3YvYnJlYWtwb2ludHMuYwo+ID4gCj4gPiBk
-aWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL01ha2VmaWxlIGIvdG9vbHMv
-dGVzdGluZy9zZWxmdGVzdHMva3ZtL01ha2VmaWxlCj4gPiBpbmRleCA0OTJlOTM3ZmFiMDAuLjVm
-OTA0OGE3NDBiMCAxMDA2NDQKPiA+IC0tLSBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9N
-YWtlZmlsZQo+ID4gKysrIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL01ha2VmaWxlCj4g
-PiBAQCAtMTg0LDYgKzE4NCw3IEBAIFRFU1RfR0VOX1BST0dTX3MzOTB4ICs9IHJzZXFfdGVzdAo+
-ID4gIFRFU1RfR0VOX1BST0dTX3MzOTB4ICs9IHNldF9tZW1vcnlfcmVnaW9uX3Rlc3QKPiA+ICBU
-RVNUX0dFTl9QUk9HU19zMzkweCArPSBrdm1fYmluYXJ5X3N0YXRzX3Rlc3QKPiA+ICAKPiA+ICtU
-RVNUX0dFTl9QUk9HU19yaXNjdiArPSByaXNjdi9icmVha3BvaW50cwo+ID4gIFRFU1RfR0VOX1BS
-T0dTX3Jpc2N2ICs9IGRlbWFuZF9wYWdpbmdfdGVzdAo+ID4gIFRFU1RfR0VOX1BST0dTX3Jpc2N2
-ICs9IGRpcnR5X2xvZ190ZXN0Cj4gPiAgVEVTVF9HRU5fUFJPR1NfcmlzY3YgKz0gZ2V0LXJlZy1s
-aXN0Cj4gPiBkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL3Jpc2N2L2Jy
-ZWFrcG9pbnRzLmMgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vcmlzY3YvYnJlYWtwb2lu
-dHMuYwo+ID4gbmV3IGZpbGUgbW9kZSAxMDA2NDQKPiA+IGluZGV4IDAwMDAwMDAwMDAwMC4uYmUy
-ZDk0ODM3YzgzCj4gPiAtLS0gL2Rldi9udWxsCj4gPiArKysgYi90b29scy90ZXN0aW5nL3NlbGZ0
-ZXN0cy9rdm0vcmlzY3YvYnJlYWtwb2ludHMuYwo+ID4gQEAgLTAsMCArMSw0OSBAQAo+ID4gKy8v
-IFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wCj4gPiArLyoKPiA+ICsgKiBSSVNDLVYg
-S1ZNIGJyZWFrcG9pbnQgdGVzdHMuCj4gPiArICoKPiA+ICsgKiBDb3B5cmlnaHQgMjAyNCBCZWlq
-aW5nIEVTV0lOIENvbXB1dGluZyBUZWNobm9sb2d5IENvLiwgTHRkLgo+ID4gKyAqCj4gPiArICov
-Cj4gPiArI2luY2x1ZGUgImt2bV91dGlsLmgiCj4gPiArCj4gPiArI2RlZmluZSBQQyh2KSAoKHVp
-bnQ2NF90KSYodikpCj4gPiArCj4gPiArZXh0ZXJuIHVuc2lnbmVkIGNoYXIgc3dfYnA7Cj4gPiAr
-Cj4gPiArc3RhdGljIHZvaWQgZ3Vlc3RfY29kZSh2b2lkKQo+ID4gK3sKPiA+ICsJYXNtIHZvbGF0
-aWxlKCJzd19icDogZWJyZWFrIik7Cj4gPiArCWFzbSB2b2xhdGlsZSgibm9wIik7Cj4gPiArCWFz
-bSB2b2xhdGlsZSgibm9wIik7Cj4gPiArCWFzbSB2b2xhdGlsZSgibm9wIik7Cj4gCj4gV2hhdCBh
-cmUgdGhlIG5vcHMgZm9yPyBBbmQsIHNpbmNlIHRoZXkncmUgYWxsIGluIHRoZWlyIG93biBhc20o
-KSdzIHRoZQo+IGNvbXBpbGVyIGNvdWxkIGJlIGluc2VydGluZyBpbnN0cnVjdGlvbnMgYmV0d2Vl
-biB0aGVtIGFuZCBhbHNvIHRoZSBlYnJlYWsKPiBhYm92ZS4gSWYgd2UgbmVlZCB0aHJlZSBub3Bz
-IGltbWVkaWF0ZWx5IGZvbGxvd2luZyB0aGUgZWJyZWFrIHRoZW4gd2UKPiBuZWVkIHRvIHB1dCBl
-dmVyeXRoaW5nIGluIG9uZSBhc20oKQo+IAo+ICAgYXNtIHZvbGF0aWxlKAo+ICAgInN3X2JwOgll
-YnJlYWtcbiIKPiAgICIJCW5vcFxuIgo+ICAgIgkJbm9wXG4iCj4gICAiCQlub3BcbiIpOwo+IAoK
-QWN0dWFsbHkgdGhlIG5vcHMgaGF2ZSBubyBzcGVjaWFsIHB1cnBvc2UsIEkgd2lsbCByZW1vdmUg
-YW5kIGp1c3Qga2VlcCB0aGUKZWJyZWFrIGhlcmUuCgo+ID4gKwo+ID4gKwlHVUVTVF9ET05FKCk7
-Cj4gPiArfQo+ID4gKwo+ID4gK2ludCBtYWluKHZvaWQpCj4gPiArewo+ID4gKwlzdHJ1Y3Qga3Zt
-X3ZtICp2bTsKPiA+ICsJc3RydWN0IGt2bV92Y3B1ICp2Y3B1Owo+ID4gKwlzdHJ1Y3Qga3ZtX2d1
-ZXN0X2RlYnVnIGRlYnVnOwo+ID4gKwl1aW50NjRfdCBwYzsKPiA+ICsKPiA+ICsJVEVTVF9SRVFV
-SVJFKGt2bV9oYXNfY2FwKEtWTV9DQVBfU0VUX0dVRVNUX0RFQlVHKSk7Cj4gPiArCj4gPiArCXZt
-ID0gdm1fY3JlYXRlX3dpdGhfb25lX3ZjcHUoJnZjcHUsIGd1ZXN0X2NvZGUpOwo+ID4gKwo+ID4g
-KwltZW1zZXQoJmRlYnVnLCAwLCBzaXplb2YoZGVidWcpKTsKPiA+ICsJZGVidWcuY29udHJvbCA9
-IEtWTV9HVUVTVERCR19FTkFCTEU7Cj4gCj4gbml0OiBUaGUgYWJvdmUgdHdvIGxpbmVzIGNhbiBi
-ZSByZW1vdmVkIGlmIHdlIGluaXRpYWxpemUgZGVidWcgYXMKPiAKPiAgIHN0cnVjdCBrdm1fZ3Vl
-c3RfZGVidWcgZGVidWcgPSB7Cj4gICAgICAuY29udHJvbCA9IEtWTV9HVUVTVERCR19FTkFCTEUs
-Cj4gICB9Owo+IAoKWWVhaCwgSSB3aWxsIGRvIHNvIGluIHRoZSBuZXh0IHBhdGNoLgoKPiA+ICsJ
-dmNwdV9ndWVzdF9kZWJ1Z19zZXQodmNwdSwgJmRlYnVnKTsKPiA+ICsJdmNwdV9ydW4odmNwdSk7
-Cj4gPiArCj4gPiArCVRFU1RfQVNTRVJUX0tWTV9FWElUX1JFQVNPTih2Y3B1LCBLVk1fRVhJVF9E
-RUJVRyk7Cj4gCj4gQXMgQW51cCBwb2ludGVkIG91dCwgd2UgbmVlZCB0byBhbHNvIGVuc3VyZSB0
-aGF0IHdpdGhvdXQgbWFraW5nIHRoZQo+IEtWTV9TRVRfR1VFU1RfREVCVUcgaW9jdGwgY2FsbCB3
-ZSBnZXQgdGhlIGV4cGVjdGVkIGJlaGF2aW9yLiBZb3UKPiBjYW4gdXNlIEdVRVNUX1NZTkMoKSBp
-biB0aGUgZ3Vlc3QgY29kZSB0byBwcm92ZSB0aGF0IGl0IHdhcyBhYmxlIHRvCj4gaXNzdWUgYW4g
-ZWJyZWFrIHdpdGhvdXQgZXhpdGluZyB0byB0aGUgVk1NLgo+IAoKU3VyZSwgd2lsbCBjb3ZlciB0
-aGF0IGNhc2UgYWxzby4KCj4gPiArCj4gPiArCXZjcHVfZ2V0X3JlZyh2Y3B1LCBSSVNDVl9DT1JF
-X1JFRyhyZWdzLnBjKSwgJnBjKTsKPiA+ICsKPiA+ICsJVEVTVF9BU1NFUlRfRVEocGMsIFBDKHN3
-X2JwKSk7Cj4gPiArCj4gPiArCWt2bV92bV9mcmVlKHZtKTsKPiA+ICsKPiA+ICsJcmV0dXJuIDA7
-Cj4gPiArfQo+ID4gLS0gCj4gPiAyLjE3LjEKPiA+Cj4gCj4gVGhhbmtzLAo+IGRyZXcK
+On 27/02/2024 09.50, Thomas Huth wrote:
+> On 26/02/2024 11.11, Nicholas Piggin wrote:
+>> The backtrace handler terminates when it sees a NULL caller address,
+>> but the powerpc stack setup does not keep such a NULL caller frame
+>> at the start of the stack.
+>>
+>> This happens to work on pseries because the memory at 0 is mapped and
+>> it contains 0 at the location of the return address pointer if it
+>> were a stack frame. But this is fragile, and does not work with powernv
+>> where address 0 contains firmware instructions.
+>>
+>> Use the existing dummy frame on stack as the NULL caller, and create a
+>> new frame on stack for the entry code.
+>>
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>>   powerpc/cstart64.S | 12 ++++++++++--
+>>   1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> Thanks for tackling this! ... however, not doing powerpc work since years 
+> anymore, I have some ignorant questions below...
+> 
+>> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+>> index e18ae9a22..14ab0c6c8 100644
+>> --- a/powerpc/cstart64.S
+>> +++ b/powerpc/cstart64.S
+>> @@ -46,8 +46,16 @@ start:
+>>       add    r1, r1, r31
+>>       add    r2, r2, r31
+>> +    /* Zero backpointers in initial stack frame so backtrace() stops */
+>> +    li    r0,0
+>> +    std    r0,0(r1)
+> 
+> 0(r1) is the back chain pointer ...
+> 
+>> +    std    r0,16(r1)
+> 
+> ... but what is 16(r1) ? I suppose that should be the "LR save word" ? But 
+> isn't that at 8(r1) instead?? (not sure whether I'm looking at the right ELF 
+> abi spec right now...)
+
+Ok, I was looking at the wrong ELF spec, indeed (it was an ancient 32-bit 
+spec, not the 64-bit ABI). Sorry for the confusion. Having a proper #define 
+or a comment for the 16 here would still be helpful, though.
+
+  Thomas
+
 
