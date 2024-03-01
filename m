@@ -1,210 +1,342 @@
-Return-Path: <kvm+bounces-10585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F02B786DB88
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 07:36:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE70A86DBB0
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 07:52:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9297A2891AE
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 06:36:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A61EB23643
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 06:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988E867E9D;
-	Fri,  1 Mar 2024 06:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5766930C;
+	Fri,  1 Mar 2024 06:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n7IoLJHO"
 X-Original-To: kvm@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CE74087C
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 06:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56FE167C6B;
+	Fri,  1 Mar 2024 06:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709274962; cv=none; b=ZBGqyT7yOlgDoWz6gfMXmz/NH62KV+K57BKnkhGgtQy088lFl9idk3o6MoiYWKC0kUpMUIANM/aR8DuTvcfHsKYg0pZZ/D73V2SrAA5aY/xdns3U71GI3k3BblNXsoZFGU91SCXWYJ0d//F2AMTBlsXeFJObVRS10PseuKWHhCU=
+	t=1709275967; cv=none; b=acBExd7gEsQxkACcal0MrtWyL6LC4mrvf9dsLUtu8ieNHCnM216GqjJZLVkJ9EGZLQEQfQm6Wmz0V03kpG91OSiV/Yh6/mo+tEgPYVkO+Q8nzuRFhI2Tru5vHZLLwpcul7nQ2O6OCwxSWByumkoNgjS42HJP5zfZpU2siT9vZiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709274962; c=relaxed/simple;
-	bh=SY3KektVtKpIkSLiIBOyfY+4U65/g5sesycyVZsC23o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=T9S2FRysi10uOUPjQNBLa98n251nmPwIISCdUB5B/VH0H6NVTENcNy58+CwsaVRIvv+gl1DbN9Bpmlpl8JUJBRgZB3adeUOQMHjf+QUdXajOg8OqznIrYm+4jjggm9SNtLP1kfAkyKbAXNn416CgDgSlOvbx5jGGrvUPWLAONyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=207.46.229.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from duchao$eswincomputing.com ( [10.64.113.11] ) by
- ajax-webmail-app2 (Coremail) ; Fri, 1 Mar 2024 14:35:22 +0800 (GMT+08:00)
-Date: Fri, 1 Mar 2024 14:35:22 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Chao Du" <duchao@eswincomputing.com>
-To: "Anup Patel" <anup@brainfault.org>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	atishp@atishpatra.org, pbonzini@redhat.com, shuah@kernel.org, 
-	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, duchao713@qq.com
-Subject: Re: [PATCH v2 1/3] RISC-V: KVM: Implement
- kvm_arch_vcpu_ioctl_set_guest_debug()
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT6.0.3 build 20220420(169d3f8c)
- Copyright (c) 2002-2024 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <CAAhSdy2+_+t4L8LHmYcJQZBGJHj6pyFm26_KwFBahFxz7eV1fQ@mail.gmail.com>
-References: <20240301013545.10403-1-duchao@eswincomputing.com>
- <20240301013545.10403-2-duchao@eswincomputing.com>
- <CAAhSdy2+_+t4L8LHmYcJQZBGJHj6pyFm26_KwFBahFxz7eV1fQ@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1709275967; c=relaxed/simple;
+	bh=PZcAanboKcUp2tLccdXfkXE1+xs/N+nzxRhzAH5IS9w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ULPCcn5oTcl/Soy0anoDQYPrCz1eciRWF1DJ/wzutz3zrzWDYjTjNzXN7dy//ka3aQAGCcZhUp4LSj4HuTTeMnqbbzY/xwVR4LqZgCL+xVlByJm2erYP3eZPy3o+7bvIfdOfR4sWrD9W1QkV2Hp/qa3BcC8azFFPzIqWzsQq5ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n7IoLJHO; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709275965; x=1740811965;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PZcAanboKcUp2tLccdXfkXE1+xs/N+nzxRhzAH5IS9w=;
+  b=n7IoLJHOmuYkbcUqOPJv1/IeV+2FWXoWGgspUWPgIc/BcmIs7LQWj0G0
+   AQc5EoLx+6YDAK+AF1eVPS1It0tdt/X+SImWi1nDUWYmhYpvOuGadMAEt
+   q61tVdbAkC0OlXX3oqB9NV01J7tIw7bgrEt1u9Fhp9kimM4bL+E2aNyWX
+   j1o5qPzvZNSzE1624r1cRxOTreEsM1CKjEuWjwi/KPgI9DkWh2u8jSh6H
+   9rmPxD3ZEkn7P5C9MT3QvxIhBnnnv+0IK5lJ6XOrK1yS404CE4f4wK+1V
+   7TzjsOR0rX/3UPRF9GJejH4q6EVSi+ewgv8HFJfyOG8kPoUisitTKx3il
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10999"; a="3957530"
+X-IronPort-AV: E=Sophos;i="6.06,195,1705392000"; 
+   d="scan'208";a="3957530"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Feb 2024 22:52:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,195,1705392000"; 
+   d="scan'208";a="8035272"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.125.242.247]) ([10.125.242.247])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Feb 2024 22:52:40 -0800
+Message-ID: <704b58a8-2893-4fdb-8171-395bcd7166a7@linux.intel.com>
+Date: Fri, 1 Mar 2024 14:52:36 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <1f31ec16.1447.18df8b97f73.Coremail.duchao@eswincomputing.com>
-X-Coremail-Locale: en_US
-X-CM-TRANSID:TQJkCgBX5tQqd+FlBy8dAA--.10184W
-X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/1tbiAgEDDGXgo9IeJAABsD
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v5 09/29] KVM: selftests: TDX: Add report_fatal_error
+ test
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>,
+ Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>,
+ Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <20231212204647.2170650-1-sagis@google.com>
+ <20231212204647.2170650-10-sagis@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20231212204647.2170650-10-sagis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-T24gMjAyNC0wMy0wMSAxMzowMCwgQW51cCBQYXRlbCA8YW51cEBicmFpbmZhdWx0Lm9yZz4gd3Jv
-dGU6Cj4gCj4gT24gRnJpLCBNYXIgMSwgMjAyNCBhdCA3OjA44oCvQU0gQ2hhbyBEdSA8ZHVjaGFv
-QGVzd2luY29tcHV0aW5nLmNvbT4gd3JvdGU6Cj4gPgo+ID4ga3ZtX3ZtX2lvY3RsX2NoZWNrX2V4
-dGVuc2lvbigpOiBSZXR1cm4gMSBpZiBLVk1fQ0FQX1NFVF9HVUVTVF9ERUJVRyBpcwo+ID4gYmVl
-biBjaGVja2VkLgo+ID4KPiA+IGt2bV9hcmNoX3ZjcHVfaW9jdGxfc2V0X2d1ZXN0X2RlYnVnKCk6
-IFVwZGF0ZSB0aGUgZ3Vlc3RfZGVidWcgZmxhZ3MKPiA+IGZyb20gdXNlcnNwYWNlIGFjY29yZGlu
-Z2x5LiBSb3V0ZSB0aGUgYnJlYWtwb2ludCBleGNlcHRpb25zIHRvIEhTIG1vZGUKPiA+IGlmIHRo
-ZSBWQ1BVIGlzIGJlaW5nIGRlYnVnZ2VkIGJ5IHVzZXJzcGFjZSwgYnkgY2xlYXJpbmcgdGhlCj4g
-PiBjb3JyZXNwb25kaW5nIGJpdCBpbiBoZWRlbGVnLiBXcml0ZSB0aGUgYWN0dWFsIENTUiBpbgo+
-ID4ga3ZtX2FyY2hfdmNwdV9sb2FkKCkuCj4gPgo+ID4gU2lnbmVkLW9mZi1ieTogQ2hhbyBEdSA8
-ZHVjaGFvQGVzd2luY29tcHV0aW5nLmNvbT4KPiA+IC0tLQo+ID4gIGFyY2gvcmlzY3YvaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaCB8IDE3ICsrKysrKysrKysrKysrKysrCj4gPiAgYXJjaC9yaXNjdi9p
-bmNsdWRlL3VhcGkvYXNtL2t2bS5oIHwgIDEgKwo+ID4gIGFyY2gvcmlzY3Yva3ZtL21haW4uYyAg
-ICAgICAgICAgICB8IDE4ICsrLS0tLS0tLS0tLS0tLS0tLQo+ID4gIGFyY2gvcmlzY3Yva3ZtL3Zj
-cHUuYyAgICAgICAgICAgICB8IDE1ICsrKysrKysrKysrKystLQo+ID4gIGFyY2gvcmlzY3Yva3Zt
-L3ZtLmMgICAgICAgICAgICAgICB8ICAxICsKPiA+ICA1IGZpbGVzIGNoYW5nZWQsIDM0IGluc2Vy
-dGlvbnMoKyksIDE4IGRlbGV0aW9ucygtKQo+ID4KPiA+IGRpZmYgLS1naXQgYS9hcmNoL3Jpc2N2
-L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggYi9hcmNoL3Jpc2N2L2luY2x1ZGUvYXNtL2t2bV9ob3N0
-LmgKPiA+IGluZGV4IDQ4NGQwNGE5MmZhNi4uOWVlM2YwM2JhNWQxIDEwMDY0NAo+ID4gLS0tIGEv
-YXJjaC9yaXNjdi9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gPiArKysgYi9hcmNoL3Jpc2N2L2lu
-Y2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiA+IEBAIC00Myw2ICs0MywyMiBAQAo+ID4gICAgICAgICBL
-Vk1fQVJDSF9SRVFfRkxBR1MoNSwgS1ZNX1JFUVVFU1RfV0FJVCB8IEtWTV9SRVFVRVNUX05PX1dB
-S0VVUCkKPiA+ICAjZGVmaW5lIEtWTV9SRVFfU1RFQUxfVVBEQVRFICAgICAgICAgICBLVk1fQVJD
-SF9SRVEoNikKPiA+Cj4gPiArI2RlZmluZSBLVk1fSEVERUxFR19ERUZBVUxUICAgICAgICAgICAg
-KChfQUMoMSwgVUwpIDw8IEVYQ19JTlNUX01JU0FMSUdORUQpIHwgXAo+ID4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAoX0FDKDEsIFVMKSA8PCBFWENfQlJFQUtQT0lO
-VCkgfCBcCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIChfQUMo
-MSwgVUwpIDw8IEVYQ19TWVNDQUxMKSB8IFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgKF9BQygxLCBVTCkgPDwgRVhDX0lOU1RfUEFHRV9GQVVMVCkgfCBcCj4g
-PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIChfQUMoMSwgVUwpIDw8
-IEVYQ19MT0FEX1BBR0VfRkFVTFQpIHwgXAo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAoX0FDKDEsIFVMKSA8PCBFWENfU1RPUkVfUEFHRV9GQVVMVCkpCj4gCj4g
-VXNlIEJJVCh4eXopIGhlcmUuIEZvciBleGFtcGxlOiBCSVQoRVhDX0lOU1RfTUlTQUxJR05FRCkK
-ClRoYW5rcywgSSB3aWxsIHVzZSBCSVQoKSBpbnN0ZWFkIGluIG5leHQgcmV2aXNpb24uCgo+IAoK
-PiBBbHNvLCBCSVQoRVhDX0JSRUFLUE9JTlQpIHNob3VsZCBub3QgYmUgcGFydCBvZiBLVk1fSEVE
-RUxFR19ERUZBVUxULgoKSSB0aGluayB0aGUgYml0IEVYQ19CUkVBS1BPSU5UIHNob3VsZCBiZSBz
-ZXQgYnkgZGVmYXVsdCwgbGlrZSB3aGF0IHlvdQphbHJlYWR5IGRpZCBpbiBrdm1fYXJjaF9oYXJk
-d2FyZV9lbmFibGUoKS4gVGhlbiB0aGUgVlMgY291bGQgZ2V0IHRoZSBlYnJlYWsKYW5kIGhhbmRs
-ZSBpdCBhY2NvcmRpbmdseS4KCklmIHRoZSBndWVzdF9kZWJ1ZyBpcyBlbmFibGVkLCBlYnJlYWsg
-aW5zdHJ1Y3Rpb25zIGFyZSBpbnNlcnRlZCBieSB0aGUKdXNlcnNwYWNlKFFFTVUpLiBTbyBLVk0g
-c2hvdWxkICdpbnRlcmNlcHQnIHRoZSBlYnJlYWsgYW5kIGV4aXQgdG8gUUVNVS4KQml0IEVYQ19C
-UkVBS1BPSU5UIHNob3VsZCBiZSBjbGVhcmVkIGluIHRoaXMgY2FzZS4KCj4gCj4gPiArI2RlZmlu
-ZSBLVk1fSEVERUxFR19HVUVTVF9ERUJVRyAgICAgICAgICAgICAgICAoKF9BQygxLCBVTCkgPDwg
-RVhDX0lOU1RfTUlTQUxJR05FRCkgfCBcCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIChfQUMoMSwgVUwpIDw8IEVYQ19TWVNDQUxMKSB8IFwKPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKF9BQygxLCBVTCkgPDwgRVhDX0lOU1Rf
-UEFHRV9GQVVMVCkgfCBcCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIChfQUMoMSwgVUwpIDw8IEVYQ19MT0FEX1BBR0VfRkFVTFQpIHwgXAo+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAoX0FDKDEsIFVMKSA8PCBFWENfU1RPUkVf
-UEFHRV9GQVVMVCkpCj4gCj4gTm8gbmVlZCBmb3IgS1ZNX0hFREVMRUdfR1VFU1RfREVCVUcsIHNl
-ZSBiZWxvdy4KPiAKPiA+ICsKPiA+ICsjZGVmaW5lIEtWTV9ISURFTEVHX0RFRkFVTFQgICAgICAg
-ICAgICAoKF9BQygxLCBVTCkgPDwgSVJRX1ZTX1NPRlQpIHwgXAo+ID4gKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAoX0FDKDEsIFVMKSA8PCBJUlFfVlNfVElNRVIpIHwg
-XAo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAoX0FDKDEsIFVM
-KSA8PCBJUlFfVlNfRVhUKSkKPiA+ICsKPiAKPiBTYW1lIGFzIGFib3ZlLCB1c2UgQklUKHh5eikg
-aGVyZS4KPiAKPiA+ICBlbnVtIGt2bV9yaXNjdl9oZmVuY2VfdHlwZSB7Cj4gPiAgICAgICAgIEtW
-TV9SSVNDVl9IRkVOQ0VfVU5LTk9XTiA9IDAsCj4gPiAgICAgICAgIEtWTV9SSVNDVl9IRkVOQ0Vf
-R1ZNQV9WTUlEX0dQQSwKPiA+IEBAIC0xNjksNiArMTg1LDcgQEAgc3RydWN0IGt2bV92Y3B1X2Nz
-ciB7Cj4gPiAgc3RydWN0IGt2bV92Y3B1X2NvbmZpZyB7Cj4gPiAgICAgICAgIHU2NCBoZW52Y2Zn
-Owo+ID4gICAgICAgICB1NjQgaHN0YXRlZW4wOwo+ID4gKyAgICAgICB1bnNpZ25lZCBsb25nIGhl
-ZGVsZWc7Cj4gPiAgfTsKPiA+Cj4gPiAgc3RydWN0IGt2bV92Y3B1X3Ntc3RhdGVlbl9jc3Igewo+
-ID4gZGlmZiAtLWdpdCBhL2FyY2gvcmlzY3YvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCBiL2FyY2gv
-cmlzY3YvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+ID4gaW5kZXggNzQ5OWU4OGE5NDdjLi4zOWY0
-ZjRiOWRlZGUgMTAwNjQ0Cj4gPiAtLS0gYS9hcmNoL3Jpc2N2L2luY2x1ZGUvdWFwaS9hc20va3Zt
-LmgKPiA+ICsrKyBiL2FyY2gvcmlzY3YvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+ID4gQEAgLTE3
-LDYgKzE3LDcgQEAKPiA+Cj4gPiAgI2RlZmluZSBfX0tWTV9IQVZFX0lSUV9MSU5FCj4gPiAgI2Rl
-ZmluZSBfX0tWTV9IQVZFX1JFQURPTkxZX01FTQo+ID4gKyNkZWZpbmUgX19LVk1fSEFWRV9HVUVT
-VF9ERUJVRwo+ID4KPiA+ICAjZGVmaW5lIEtWTV9DT0FMRVNDRURfTU1JT19QQUdFX09GRlNFVCAx
-Cj4gPgo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvcmlzY3Yva3ZtL21haW4uYyBiL2FyY2gvcmlzY3Yv
-a3ZtL21haW4uYwo+ID4gaW5kZXggMjI1YTQzNWQ5YzlhLi5iYWIyZWMzNGNkODcgMTAwNjQ0Cj4g
-PiAtLS0gYS9hcmNoL3Jpc2N2L2t2bS9tYWluLmMKPiA+ICsrKyBiL2FyY2gvcmlzY3Yva3ZtL21h
-aW4uYwo+ID4gQEAgLTIyLDIyICsyMiw4IEBAIGxvbmcga3ZtX2FyY2hfZGV2X2lvY3RsKHN0cnVj
-dCBmaWxlICpmaWxwLAo+ID4KPiA+ICBpbnQga3ZtX2FyY2hfaGFyZHdhcmVfZW5hYmxlKHZvaWQp
-Cj4gPiAgewo+ID4gLSAgICAgICB1bnNpZ25lZCBsb25nIGhpZGVsZWcsIGhlZGVsZWc7Cj4gPiAt
-Cj4gPiAtICAgICAgIGhlZGVsZWcgPSAwOwo+ID4gLSAgICAgICBoZWRlbGVnIHw9ICgxVUwgPDwg
-RVhDX0lOU1RfTUlTQUxJR05FRCk7Cj4gPiAtICAgICAgIGhlZGVsZWcgfD0gKDFVTCA8PCBFWENf
-QlJFQUtQT0lOVCk7Cj4gPiAtICAgICAgIGhlZGVsZWcgfD0gKDFVTCA8PCBFWENfU1lTQ0FMTCk7
-Cj4gPiAtICAgICAgIGhlZGVsZWcgfD0gKDFVTCA8PCBFWENfSU5TVF9QQUdFX0ZBVUxUKTsKPiA+
-IC0gICAgICAgaGVkZWxlZyB8PSAoMVVMIDw8IEVYQ19MT0FEX1BBR0VfRkFVTFQpOwo+ID4gLSAg
-ICAgICBoZWRlbGVnIHw9ICgxVUwgPDwgRVhDX1NUT1JFX1BBR0VfRkFVTFQpOwo+ID4gLSAgICAg
-ICBjc3Jfd3JpdGUoQ1NSX0hFREVMRUcsIGhlZGVsZWcpOwo+ID4gLQo+ID4gLSAgICAgICBoaWRl
-bGVnID0gMDsKPiA+IC0gICAgICAgaGlkZWxlZyB8PSAoMVVMIDw8IElSUV9WU19TT0ZUKTsKPiA+
-IC0gICAgICAgaGlkZWxlZyB8PSAoMVVMIDw8IElSUV9WU19USU1FUik7Cj4gPiAtICAgICAgIGhp
-ZGVsZWcgfD0gKDFVTCA8PCBJUlFfVlNfRVhUKTsKPiA+IC0gICAgICAgY3NyX3dyaXRlKENTUl9I
-SURFTEVHLCBoaWRlbGVnKTsKPiA+ICsgICAgICAgY3NyX3dyaXRlKENTUl9IRURFTEVHLCBLVk1f
-SEVERUxFR19ERUZBVUxUKTsKPiA+ICsgICAgICAgY3NyX3dyaXRlKENTUl9ISURFTEVHLCBLVk1f
-SElERUxFR19ERUZBVUxUKTsKPiA+Cj4gPiAgICAgICAgIC8qIFZTIHNob3VsZCBhY2Nlc3Mgb25s
-eSB0aGUgdGltZSBjb3VudGVyIGRpcmVjdGx5LiBFdmVyeXRoaW5nIGVsc2Ugc2hvdWxkIHRyYXAg
-Ki8KPiA+ICAgICAgICAgY3NyX3dyaXRlKENTUl9IQ09VTlRFUkVOLCAweDAyKTsKPiA+IGRpZmYg
-LS1naXQgYS9hcmNoL3Jpc2N2L2t2bS92Y3B1LmMgYi9hcmNoL3Jpc2N2L2t2bS92Y3B1LmMKPiA+
-IGluZGV4IGI1Y2E5ZjJlOThhYy4uMjQyMDc2YzIyMjdmIDEwMDY0NAo+ID4gLS0tIGEvYXJjaC9y
-aXNjdi9rdm0vdmNwdS5jCj4gPiArKysgYi9hcmNoL3Jpc2N2L2t2bS92Y3B1LmMKPiA+IEBAIC00
-NzUsOCArNDc1LDE1IEBAIGludCBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9tcHN0YXRlKHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSwKPiA+ICBpbnQga3ZtX2FyY2hfdmNwdV9pb2N0bF9zZXRfZ3Vlc3Rf
-ZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ID4gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHN0cnVjdCBrdm1fZ3Vlc3RfZGVidWcgKmRiZykKPiA+ICB7Cj4gPiAt
-ICAgICAgIC8qIFRPRE87IFRvIGJlIGltcGxlbWVudGVkIGxhdGVyLiAqLwo+ID4gLSAgICAgICBy
-ZXR1cm4gLUVJTlZBTDsKPiAKPiBpZiAodmNwdS0+YXJjaC5yYW5fYXRsZWFzdF9vbmNlKQo+ICAg
-ICAgICAgcmV0dXJuIC1FQlVTWTsKCklmIHdlIGVuYWJsZWQgdGhlIGd1ZXN0X2RlYnVnIGluIFFF
-TVUgc2lkZSwgdGhlbiB0aGUgS1ZNX1NFVF9HVUVTVF9ERUJVRyBpb2N0bAp3aWxsIGNvbWUgYmVm
-b3JlIHRoZSBmaXJzdCBLVk1fUlVOLiBUaGlzIHdpbGwgYWx3YXlzIGNhdXNlIGFuIEVSUk9SLgoK
-PiAKPiAKPiA+ICsgICAgICAgaWYgKGRiZy0+Y29udHJvbCAmIEtWTV9HVUVTVERCR19FTkFCTEUp
-IHsKPiA+ICsgICAgICAgICAgICAgICB2Y3B1LT5ndWVzdF9kZWJ1ZyA9IGRiZy0+Y29udHJvbDsK
-PiA+ICsgICAgICAgICAgICAgICB2Y3B1LT5hcmNoLmNmZy5oZWRlbGVnID0gS1ZNX0hFREVMRUdf
-R1VFU1RfREVCVUc7Cj4gPiArICAgICAgIH0gZWxzZSB7Cj4gPiArICAgICAgICAgICAgICAgdmNw
-dS0+Z3Vlc3RfZGVidWcgPSAwOwo+ID4gKyAgICAgICAgICAgICAgIHZjcHUtPmFyY2guY2ZnLmhl
-ZGVsZWcgPSBLVk1fSEVERUxFR19ERUZBVUxUOwo+ID4gKyAgICAgICB9Cj4gCj4gRG9uJ3QgdXBk
-YXRlIHZjcHUtPmFyY2guY2ZnLmhlZGVsZWcgaGVyZSBzaW5jZSBpdCBzaG91bGQgYmUgb25seSBk
-b25lCj4gaW4ga3ZtX3Jpc2N2X3ZjcHVfc2V0dXBfY29uZmlnKCkuCj4gCj4gPiArCj4gPiArICAg
-ICAgIHJldHVybiAwOwo+ID4gIH0KPiA+Cj4gPiAgc3RhdGljIHZvaWQga3ZtX3Jpc2N2X3ZjcHVf
-c2V0dXBfY29uZmlnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiA+IEBAIC01MDUsNiArNTEyLDkg
-QEAgc3RhdGljIHZvaWQga3ZtX3Jpc2N2X3ZjcHVfc2V0dXBfY29uZmlnKHN0cnVjdCBrdm1fdmNw
-dSAqdmNwdSkKPiA+ICAgICAgICAgICAgICAgICBpZiAocmlzY3ZfaXNhX2V4dGVuc2lvbl9hdmFp
-bGFibGUoaXNhLCBTTVNUQVRFRU4pKQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgY2ZnLT5o
-c3RhdGVlbjAgfD0gU01TVEFURUVOMF9TU1RBVEVFTjA7Cj4gPiAgICAgICAgIH0KPiA+ICsKPiA+
-ICsgICAgICAgaWYgKCF2Y3B1LT5ndWVzdF9kZWJ1ZykKPiA+ICsgICAgICAgICAgICAgICBjZmct
-PmhlZGVsZWcgPSBLVk1fSEVERUxFR19ERUZBVUxUOwo+IAo+IFRoaXMgc2hvdWxkIGJlOgo+IAo+
-IGNmZy0+aGVkZWxlZyA9IEtWTV9IRURFTEVHX0RFRkFVTFQ7Cj4gaWYgKHZjcHUtPmd1ZXN0X2Rl
-YnVnKQo+ICAgICAgICAgY2ZnLT5oZWRlbGVnIHw9IEJJVChFWENfQlJFQUtQT0lOVCk7CgpMaWtl
-IGFib3ZlLCBoZXJlIHRoZSBsb2dpYyBzaG91bGQgYmU6CgpjZmctPmhlZGVsZWcgPSBLVk1fSEVE
-RUxFR19ERUZBVUxUOyAvLyB3aXRoIEJJVChFWENfQlJFQUtQT0lOVCkKaWYgKHZjcHUtPmd1ZXN0
-X2RlYnVnKQogICAgICAgIGNmZy0+aGVkZWxlZyAmPSB+QklUKEVYQ19CUkVBS1BPSU5UKTsKCkFu
-b3RoZXIgYXBwcm9hY2ggaXM6CmluaXRpYWxpemUgdGhlIGNmZy0+aGVkZWxlZyBhcyBLVk1fSEVE
-RUxFR19ERUZBVUxUIGR1cmluZyBrdm1fYXJjaF92Y3B1X2NyZWF0ZSgpLgpCZXNpZGVzIHRoYXQs
-IG9ubHkgdXBkYXRlIHRoZSBjZmctPmhlZGVsZWcgaW4ga3ZtX2FyY2hfdmNwdV9pb2N0bF9zZXRf
-Z3Vlc3RfZGVidWcoKS4KCj4gCj4gPiAgfQo+ID4KPiA+ICB2b2lkIGt2bV9hcmNoX3ZjcHVfbG9h
-ZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBjcHUpCj4gPiBAQCAtNTE5LDYgKzUyOSw3IEBA
-IHZvaWQga3ZtX2FyY2hfdmNwdV9sb2FkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IGNwdSkK
-PiA+ICAgICAgICAgY3NyX3dyaXRlKENTUl9WU0VQQywgY3NyLT52c2VwYyk7Cj4gPiAgICAgICAg
-IGNzcl93cml0ZShDU1JfVlNDQVVTRSwgY3NyLT52c2NhdXNlKTsKPiA+ICAgICAgICAgY3NyX3dy
-aXRlKENTUl9WU1RWQUwsIGNzci0+dnN0dmFsKTsKPiA+ICsgICAgICAgY3NyX3dyaXRlKENTUl9I
-RURFTEVHLCBjZmctPmhlZGVsZWcpOwo+ID4gICAgICAgICBjc3Jfd3JpdGUoQ1NSX0hWSVAsIGNz
-ci0+aHZpcCk7Cj4gPiAgICAgICAgIGNzcl93cml0ZShDU1JfVlNBVFAsIGNzci0+dnNhdHApOwo+
-ID4gICAgICAgICBjc3Jfd3JpdGUoQ1NSX0hFTlZDRkcsIGNmZy0+aGVudmNmZyk7Cj4gPiBkaWZm
-IC0tZ2l0IGEvYXJjaC9yaXNjdi9rdm0vdm0uYyBiL2FyY2gvcmlzY3Yva3ZtL3ZtLmMKPiA+IGlu
-ZGV4IGNlNThiYzQ4ZTViOC4uNzM5NmI4NjU0ZjQ1IDEwMDY0NAo+ID4gLS0tIGEvYXJjaC9yaXNj
-di9rdm0vdm0uYwo+ID4gKysrIGIvYXJjaC9yaXNjdi9rdm0vdm0uYwo+ID4gQEAgLTE4Niw2ICsx
-ODYsNyBAQCBpbnQga3ZtX3ZtX2lvY3RsX2NoZWNrX2V4dGVuc2lvbihzdHJ1Y3Qga3ZtICprdm0s
-IGxvbmcgZXh0KQo+ID4gICAgICAgICBjYXNlIEtWTV9DQVBfUkVBRE9OTFlfTUVNOgo+ID4gICAg
-ICAgICBjYXNlIEtWTV9DQVBfTVBfU1RBVEU6Cj4gPiAgICAgICAgIGNhc2UgS1ZNX0NBUF9JTU1F
-RElBVEVfRVhJVDoKPiA+ICsgICAgICAgY2FzZSBLVk1fQ0FQX1NFVF9HVUVTVF9ERUJVRzoKPiA+
-ICAgICAgICAgICAgICAgICByID0gMTsKPiA+ICAgICAgICAgICAgICAgICBicmVhazsKPiA+ICAg
-ICAgICAgY2FzZSBLVk1fQ0FQX05SX1ZDUFVTOgo+ID4gLS0KPiA+IDIuMTcuMQo+ID4KPiAKPiBS
-ZWdhcmRzLAo+IEFudXAKClRoYW5rcywKQ2hhbw==
+
+
+On 12/13/2023 4:46 AM, Sagi Shahar wrote:
+> The test checks report_fatal_error functionality.
+>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ryan Afranji <afranji@google.com>
+> ---
+>   .../selftests/kvm/include/x86_64/tdx/tdx.h    |  6 ++-
+>   .../kvm/include/x86_64/tdx/tdx_util.h         |  1 +
+>   .../kvm/include/x86_64/tdx/test_util.h        | 19 ++++++++
+>   .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 39 ++++++++++++++++
+>   .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   | 12 +++++
+>   .../selftests/kvm/lib/x86_64/tdx/test_util.c  | 10 +++++
+>   .../selftests/kvm/x86_64/tdx_vm_tests.c       | 45 +++++++++++++++++++
+>   7 files changed, 131 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+> index a7161efe4ee2..1340c1070002 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+> @@ -3,10 +3,14 @@
+>   #define SELFTEST_TDX_TDX_H
+>   
+>   #include <stdint.h>
+> +#include "kvm_util_base.h"
+>   
+> -#define TDG_VP_VMCALL_INSTRUCTION_IO 30
+> +#define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
+>   
+> +#define TDG_VP_VMCALL_INSTRUCTION_IO 30
+> +void handle_userspace_tdg_vp_vmcall_exit(struct kvm_vcpu *vcpu);
+>   uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+>   				      uint64_t write, uint64_t *data);
+> +void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa);
+>   
+>   #endif // SELFTEST_TDX_TDX_H
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx_util.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx_util.h
+> index 274b245f200b..32dd6b8fda46 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx_util.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx_util.h
+> @@ -12,5 +12,6 @@ struct kvm_vm *td_create(void);
+>   void td_initialize(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+>   		   uint64_t attributes);
+>   void td_finalize(struct kvm_vm *vm);
+> +void td_vcpu_run(struct kvm_vcpu *vcpu);
+>   
+>   #endif // SELFTESTS_TDX_KVM_UTIL_H
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+> index b570b6d978ff..6d69921136bd 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+> @@ -49,4 +49,23 @@ bool is_tdx_enabled(void);
+>    */
+>   void tdx_test_success(void);
+>   
+> +/**
+> + * Report an error with @error_code to userspace.
+> + *
+> + * Return value from tdg_vp_vmcall_report_fatal_error is ignored since execution
+> + * is not expected to continue beyond this point.
+> + */
+> +void tdx_test_fatal(uint64_t error_code);
+> +
+> +/**
+> + * Report an error with @error_code to userspace.
+> + *
+> + * @data_gpa may point to an optional shared guest memory holding the error
+> + * string.
+> + *
+> + * Return value from tdg_vp_vmcall_report_fatal_error is ignored since execution
+> + * is not expected to continue beyond this point.
+> + */
+> +void tdx_test_fatal_with_data(uint64_t error_code, uint64_t data_gpa);
+> +
+>   #endif // SELFTEST_TDX_TEST_UTIL_H
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+> index c2414523487a..b854c3aa34ff 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+> @@ -1,8 +1,31 @@
+>   // SPDX-License-Identifier: GPL-2.0-only
+>   
+> +#include <string.h>
+> +
+>   #include "tdx/tdcall.h"
+>   #include "tdx/tdx.h"
+>   
+> +void handle_userspace_tdg_vp_vmcall_exit(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_tdx_vmcall *vmcall_info = &vcpu->run->tdx.u.vmcall;
+> +	uint64_t vmcall_subfunction = vmcall_info->subfunction;
+> +
+> +	switch (vmcall_subfunction) {
+> +	case TDG_VP_VMCALL_REPORT_FATAL_ERROR:
+> +		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> +		vcpu->run->system_event.ndata = 3;
+> +		vcpu->run->system_event.data[0] =
+> +			TDG_VP_VMCALL_REPORT_FATAL_ERROR;
+> +		vcpu->run->system_event.data[1] = vmcall_info->in_r12;
+> +		vcpu->run->system_event.data[2] = vmcall_info->in_r13;
+> +		vmcall_info->status_code = 0;
+> +		break;
+> +	default:
+> +		TEST_FAIL("TD VMCALL subfunction %lu is unsupported.\n",
+> +			  vmcall_subfunction);
+> +	}
+> +}
+> +
+>   uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+>   				      uint64_t write, uint64_t *data)
+>   {
+> @@ -25,3 +48,19 @@ uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+>   
+>   	return ret;
+>   }
+> +
+> +void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa)
+> +{
+> +	struct tdx_hypercall_args args;
+> +
+> +	memset(&args, 0, sizeof(struct tdx_hypercall_args));
+> +
+> +	if (data_gpa)
+> +		error_code |= 0x8000000000000000;
+> +
+> +	args.r11 = TDG_VP_VMCALL_REPORT_FATAL_ERROR;
+> +	args.r12 = error_code;
+> +	args.r13 = data_gpa;
+> +
+> +	__tdx_hypercall(&args, 0);
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> index b302060049d5..d745bb6287c1 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> @@ -10,6 +10,7 @@
+>   
+>   #include "kvm_util.h"
+>   #include "test_util.h"
+> +#include "tdx/tdx.h"
+>   #include "tdx/td_boot.h"
+>   #include "kvm_util_base.h"
+>   #include "processor.h"
+> @@ -519,3 +520,14 @@ void td_finalize(struct kvm_vm *vm)
+>   
+>   	tdx_td_finalizemr(vm);
+>   }
+> +
+> +void td_vcpu_run(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu_run(vcpu);
+> +
+> +	/* Handle TD VMCALLs that require userspace handling. */
+> +	if (vcpu->run->exit_reason == KVM_EXIT_TDX &&
+> +	    vcpu->run->tdx.type == KVM_EXIT_TDX_VMCALL) {
+> +		handle_userspace_tdg_vp_vmcall_exit(vcpu);
+> +	}
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+> index 6905d0ca3877..7f3cd8089cea 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+> @@ -32,3 +32,13 @@ void tdx_test_success(void)
+>   				     TDX_TEST_SUCCESS_SIZE,
+>   				     TDG_VP_VMCALL_INSTRUCTION_IO_WRITE, &code);
+>   }
+> +
+> +void tdx_test_fatal_with_data(uint64_t error_code, uint64_t data_gpa)
+> +{
+> +	tdg_vp_vmcall_report_fatal_error(error_code, data_gpa);
+> +}
+> +
+> +void tdx_test_fatal(uint64_t error_code)
+> +{
+> +	tdx_test_fatal_with_data(error_code, 0);
+> +}
+> diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+> index a18d1c9d6026..8638c7bbedaa 100644
+> --- a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+> +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+> @@ -2,6 +2,7 @@
+>   
+>   #include <signal.h>
+>   #include "kvm_util_base.h"
+> +#include "tdx/tdx.h"
+>   #include "tdx/tdx_util.h"
+>   #include "tdx/test_util.h"
+>   #include "test_util.h"
+> @@ -30,6 +31,49 @@ void verify_td_lifecycle(void)
+>   	printf("\t ... PASSED\n");
+>   }
+>   
+> +void guest_code_report_fatal_error(void)
+> +{
+> +	uint64_t err;
+> +
+> +	/*
+> +	 * Note: err should follow the GHCI spec definition:
+> +	 * bits 31:0 should be set to 0.
+> +	 * bits 62:32 are used for TD-specific extended error code.
+> +	 * bit 63 is used to mark additional information in shared memory.
+> +	 */
+> +	err = 0x0BAAAAAD00000000;
+> +	if (err)
+> +		tdx_test_fatal(err);
+
+I find tdx_test_fatal() is called a lot and each call site checks the err
+before calling it. Is it simpler to move the check of err inside of
+tdx_test_fatal() so that the callers just call it without check it every 
+time?
+
+
+> +
+> +	tdx_test_success();
+> +}
+> +void verify_report_fatal_error(void)
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	vm = td_create();
+> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
+> +	vcpu = td_vcpu_add(vm, 0, guest_code_report_fatal_error);
+> +	td_finalize(vm);
+> +
+> +	printf("Verifying report_fatal_error:\n");
+> +
+> +	td_vcpu_run(vcpu);
+> +
+> +	TEST_ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_SYSTEM_EVENT);
+> +	TEST_ASSERT_EQ(vcpu->run->system_event.ndata, 3);
+> +	TEST_ASSERT_EQ(vcpu->run->system_event.data[0], TDG_VP_VMCALL_REPORT_FATAL_ERROR);
+> +	TEST_ASSERT_EQ(vcpu->run->system_event.data[1], 0x0BAAAAAD00000000);
+> +	TEST_ASSERT_EQ(vcpu->run->system_event.data[2], 0);
+> +
+> +	vcpu_run(vcpu);
+> +	TDX_TEST_ASSERT_SUCCESS(vcpu);
+> +
+> +	kvm_vm_free(vm);
+> +	printf("\t ... PASSED\n");
+> +}
+> +
+>   int main(int argc, char **argv)
+>   {
+>   	setbuf(stdout, NULL);
+> @@ -40,6 +84,7 @@ int main(int argc, char **argv)
+>   	}
+>   
+>   	run_in_new_process(&verify_td_lifecycle);
+> +	run_in_new_process(&verify_report_fatal_error);
+>   
+>   	return 0;
+>   }
+
 
