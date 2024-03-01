@@ -1,120 +1,183 @@
-Return-Path: <kvm+bounces-10677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40D6D86E93A
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:10:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D977C86E948
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8957287755
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 19:10:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 097281C25344
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 19:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0697E3A29E;
-	Fri,  1 Mar 2024 19:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64C03A292;
+	Fri,  1 Mar 2024 19:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="dnzKh2OB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjD/gQtE"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-8fae.mail.infomaniak.ch (smtp-8fae.mail.infomaniak.ch [83.166.143.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6D639AE7
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 19:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D56737160;
+	Fri,  1 Mar 2024 19:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709320191; cv=none; b=DWr93ojcnjXQQI9dU8JaRJSVP8JA/9f3G57bW87/3yBSOb2vQdS5cW+eY+XKYR9Pb/a7pEHdCUkxns21sL0/jOpCVIfxPVHo2nsxbCY2cloujYLiqBBVEw+ftW0BefWQ/Cz2lmIbla5rxcJ86C/Mbl/98nRW/Y72yUhVoSKOBCU=
+	t=1709320444; cv=none; b=kK8EyClij96rSxNKVA/Vtr34bnwCnaHlAqw/+cY0b8bK3SmaZzA4N8FF5RdZffvBBBnbNdcpIFcnP6qKYUAjXRWa6AiF22+LitBWSpfrRXlfMAPCfnhpxPRLMLmeFgyfVOe8qPb6/Q+3xHLoUrV6ULJUQAQdnIb1+DaABeb0aEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709320191; c=relaxed/simple;
-	bh=rjofMt5czWAZ/8UdgmbuNLIMUbqVfuBuDdVqP8nEB2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=au/RXnk9Ax69xGvUh7hXj35POqXdqbitxZAYY/42zwVg4u9q/SlwEo/tkb+gCPVbv6/c07JLbFM/aO5/6jYIiI37Uv44Uz2vS09O+tqAtrXJfD0F4yP7+pxAGmpHve0Jl7eZxiwhDam6cIcDBYmQlnLj+mkzwV1vxVkStPl94GY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=dnzKh2OB; arc=none smtp.client-ip=83.166.143.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tmd1t6YX5zMyYJT;
-	Fri,  1 Mar 2024 20:09:38 +0100 (CET)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tmd1s45G5zMpnPg;
-	Fri,  1 Mar 2024 20:09:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1709320178;
-	bh=rjofMt5czWAZ/8UdgmbuNLIMUbqVfuBuDdVqP8nEB2w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dnzKh2OBS0YkrIYpEspkpvDAydMZFIZk4Nh0+Gbx0+8Lk3b671LXi4kdNjVmCBsTZ
-	 Rm7K2WbZWudBEHrEPsAMJOJB+6kHAUx0XE/0mQzOmvZ1EZHpPA5fTAcSzByG999MpW
-	 RTwlsi3ZWspSksJZHRaVH8PWKdKF1bQBjNrpiNAw=
-Date: Fri, 1 Mar 2024 20:09:27 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Kees Cook <keescook@chromium.org>
-Cc: Brendan Higgins <brendanhiggins@google.com>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Alan Maguire <alan.maguire@oracle.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	James Morris <jamorris@linux.microsoft.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marco Pagani <marpagan@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Thara Gopinath <tgopinath@microsoft.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Wanpeng Li <wanpengli@tencent.com>, Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org
-Subject: Re: [PATCH v1 5/8] kunit: Handle test faults
-Message-ID: <20240301.EeyeePa2lien@digikod.net>
-References: <20240229170409.365386-1-mic@digikod.net>
- <20240229170409.365386-6-mic@digikod.net>
- <202402291023.071AA58E3@keescook>
+	s=arc-20240116; t=1709320444; c=relaxed/simple;
+	bh=G6RwsnJujCGZ67YrDrQYHLQoE1KXq3LL5931ik8TiVo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ye2U0hEQQAu73j8KdYrDlc4AEuJ9n3X5UbZhX2VjLIW9DXwByDLxiCHK11qKOPnSJFTAqB3bJ9G0KDkzD4uHQFKA30RA7278fASUWJ1CSN6199bW2qEPak7rGIhAQ3BxmswifQ+YJVl7CqAfYOWV8DEWyjFksRaTDxj8g3mEh6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjD/gQtE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B769C433C7;
+	Fri,  1 Mar 2024 19:14:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709320443;
+	bh=G6RwsnJujCGZ67YrDrQYHLQoE1KXq3LL5931ik8TiVo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kjD/gQtErWVyXc6zRpJZiD9pseQVm/52FreVVqQ9czqKNedDcJc7vTW7vQaanBFNL
+	 elVQCJqJU375Mp/p+bTPK6hgf1nxcVj6vgooMtH97YKfw3XkmPLch5ofZFRrL9vUdu
+	 dBF3Nf/zK7lP8og3M0gN8cmstnWYa+3CmdX/wkrMPFJ5ohYRZgUHDLe36pvPYK6Y0d
+	 QckoSBk11lZFDwr1+S8wrjnrniXDRYyZNe9LytWurb6q4tpBxuV+OO/wwQLAFYNG9S
+	 7h+h23pN1Me/iCjp7/iQi5JU4TT+B9ToiPoTFwyyMBGNMDaP/jQvvPZiII+Y74s6e/
+	 vMR6J4JIfGkWA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rg8KX-008buY-6I;
+	Fri, 01 Mar 2024 19:14:01 +0000
+Date: Fri, 01 Mar 2024 19:14:00 +0000
+Message-ID: <861q8t3guf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 07/13] KVM: arm64: nv: Honor HFGITR_EL2.ERET being set
+In-Reply-To: <20240301180734.GA3958355@e124191.cambridge.arm.com>
+References: <20240226100601.2379693-1-maz@kernel.org>
+	<20240226100601.2379693-8-maz@kernel.org>
+	<20240301180734.GA3958355@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <202402291023.071AA58E3@keescook>
-X-Infomaniak-Routing: alpha
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Feb 29, 2024 at 10:24:19AM -0800, Kees Cook wrote:
-> On Thu, Feb 29, 2024 at 06:04:06PM +0100, Mickaël Salaün wrote:
-> > Previously, when a kernel test thread crashed (e.g. NULL pointer
-> > dereference, general protection fault), the KUnit test hanged for 30
-> > seconds and exited with a timeout error.
-> > 
-> > Fix this issue by waiting on task_struct->vfork_done instead of the
-> > custom kunit_try_catch.try_completion, and track the execution state by
-> > initially setting try_result with -EFAULT and only setting it to 0 if
-> > the test passed.
-> > 
-> > Fix kunit_generic_run_threadfn_adapter() signature by returning 0
-> > instead of calling kthread_complete_and_exit().  Because thread's exit
-> > code is never checked, always set it to 0 to make it clear.
-> > 
-> > Fix the -EINTR error message, which couldn't be reached until now.
-> > 
-> > This is tested with a following patch.
-> > 
-> > Cc: Brendan Higgins <brendanhiggins@google.com>
-> > Cc: David Gow <davidgow@google.com>
-> > Cc: Rae Moar <rmoar@google.com>
-> > Cc: Shuah Khan <skhan@linuxfoundation.org>
-> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> 
-> I assume we can start checking for "intentional" faults now?
+Hi Joey,
 
-Yes, but adding dedicated exception handling for such faults would
-probably be cleaner.
+On Fri, 01 Mar 2024 18:07:34 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> Got a question about this one,
+> 
+> On Mon, Feb 26, 2024 at 10:05:55AM +0000, Marc Zyngier wrote:
+> > If the L1 hypervisor decides to trap ERETs while running L2,
+> > make sure we don't try to emulate it, just like we wouldn't
+> > if it had its NV bit set.
+> > 
+> > The exception will be reinjected from the core handler.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/vhe/switch.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index eaf242b8e0cf..3ea9bdf6b555 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -220,7 +220,8 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	 * Unless the trap has to be forwarded further down the line,
+> >  	 * of course...
+> >  	 */
+> > -	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
+> > +	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
+> > +	    (__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET))
+> >  		return false;
+> >  
+> >  	spsr = read_sysreg_el1(SYS_SPSR);
+> 
+> Are we missing a forward_traps() call in kvm_emulated_nested_eret() for the
+> HFGITR case?
+> 
+> Trying to follow the code path here, and I'm unsure of where else the
+> HFIGTR_EL2_ERET trap would be forwarded:
+> 
+> kvm_arm_vcpu_enter_exit ->
+> 	ERET executes in guest
+> 	fixup_guest_exit ->
+> 		kvm_hyp_handle_eret (returns false)
+> 
+> handle_exit ->
+> 	kvm_handle_eret ->
+> 		kvm_emulated_nested_eret
+> 			if HCR_NV
+> 				forward traps
+> 			else
+> 				emulate ERET
 
-At least we can now easily write tests as I did with the last patch. The
-only potential issue is that the kernel will still print the related
-warning in logs, but I think it's OK for tests (and maybe something we'd
-like to test too by the way).
+There's a bit more happening in kvm_handle_eret().
 
 > 
-> Reviewed-by: Kees Cook <keescook@chromium.org>
 > 
-> -- 
-> Kees Cook
-> 
+> And if the answer is that it is being reinjected somewhere, putting that
+> function name in the commit instead of 'core handler' would help with
+> understanding!
+
+Let's look at the code:
+
+	static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+	{
+		[...]
+	
+		if (is_hyp_ctxt(vcpu))
+			kvm_emulate_nested_eret(vcpu);
+
+If we're doing an ERET from guest EL2, then we just emulate it,
+because there is nothing else to do. Crucially, HFGITR_EL2.ERET
+doesn't apply to EL2.
+
+		else
+			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+
+In any other case, we simply reinject the trap into the guest EL2,
+because that's the only possible outcome. And that's what you were
+missing.
+
+		return 1;
+	}
+	
+
+> I need to find the time to get an NV setup set-up, so I can do some experiments
+> myself.
+
+The FVP should be a good enough environment if you can bare the
+glacial speed. Other than that, I hear that QEMU has grown some NV
+support lately, but I haven't tried it yet. HW-wise, M2 is the only
+machine that can be bought by a human being (everything else is
+vapourware, or they would have already taken my money).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
