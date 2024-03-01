@@ -1,48 +1,48 @@
-Return-Path: <kvm+bounces-10683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDAD886E9C5
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:41:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F98B86E9CA
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:41:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89A1D2820FD
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 19:41:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4F531F219E3
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 19:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275353BB55;
-	Fri,  1 Mar 2024 19:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEA63C6AB;
+	Fri,  1 Mar 2024 19:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="Vd+N/tIg"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="UNYZ0xJK"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-bc0f.mail.infomaniak.ch (smtp-bc0f.mail.infomaniak.ch [45.157.188.15])
+Received: from smtp-190f.mail.infomaniak.ch (smtp-190f.mail.infomaniak.ch [185.125.25.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4B13A8E1
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 19:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4843B2A6;
+	Fri,  1 Mar 2024 19:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709322055; cv=none; b=Tt2VKnH9Aej2EjRqFRd6MIOi9EmTloBzgCbkztKOOGXqA0mRBcCSk2DfktvozoQI8MxMCAKubkpxMI9tQv5hfc6Jf6DFEs/7LdTFMJtYr0Rl1PT3dwtaA2GXFSuVlKGrwlgY9WeZoN9/geO5eVYpq1y14ihWHvP3DnbqkaLeuPM=
+	t=1709322056; cv=none; b=MCUDWGY/pxix+rcfVotY8lzGl9XmEhhybGYkpEoTG8MzfRMd8r/F6XeXcR+foQvn/gKN2m31K8Mj6+Eu6c/MqNXXGo7m5ixPnGKlfEHNYo5yIJEnOStJl1PxNbgEXOQ5pJxrenHCiJyrWHUPlF5I1d4wB3GdvgjFAOr8SZx0lCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709322055; c=relaxed/simple;
-	bh=jkhmQz7nkMs7xp2ykDqNMWSLInw6oMw8Eref1dxaomo=;
+	s=arc-20240116; t=1709322056; c=relaxed/simple;
+	bh=aBipZnzNTUCokDElM7UYa9F0lGpvUK219Za2n6GQq4Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fS4/eWTJVykNiYcf9/yLuYwPO97GKcHcKjHRcngcj4KC62JYa6sWYcW3eeiBNnwHLqS76Td+dMJfFj3oTJjvulHRSVgz5hD3QbNUcTIBCaPS6X0B+eCXjtM4aOKVI3Fn1rxEhK0EzXXlKkh5DPOZ+4ZN4ZUbi+5slQgfKkw06Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=Vd+N/tIg; arc=none smtp.client-ip=45.157.188.15
+	 MIME-Version:Content-Type; b=B1JN/m/npMsNhwqN5c0hrB8NdSFjnVXFTVfEP908koh4bESvn6V+gfHGyI1rNLpSrQODrwYbmAWAQuLccT1bgFxQjX8HaelEfyRuRNmSaRWOkds5uvgsHQUEu5cPuj18Lkxl08Eo0PRSi0Ua9gmvQV+ksdgq7RnkCe2Yf44nwTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=UNYZ0xJK; arc=none smtp.client-ip=185.125.25.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
 Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tmdjt5ghXzkK1;
-	Fri,  1 Mar 2024 20:40:50 +0100 (CET)
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tmdjt0SPqznyw;
-	Fri,  1 Mar 2024 20:40:50 +0100 (CET)
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tmdjw0F1Nznjb;
+	Fri,  1 Mar 2024 20:40:52 +0100 (CET)
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tmdjv1xJGznyy;
+	Fri,  1 Mar 2024 20:40:51 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1709322050;
-	bh=jkhmQz7nkMs7xp2ykDqNMWSLInw6oMw8Eref1dxaomo=;
+	s=20191114; t=1709322051;
+	bh=aBipZnzNTUCokDElM7UYa9F0lGpvUK219Za2n6GQq4Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vd+N/tIgA2C6MTwZX8etILLsyzDPCEdWFm06zVVXnd3T/PZeUUlbXgO+5vW7bM1VX
-	 o6oY/T9zP+sgCjKPE9FQgDuYo3APtqNDmKr1JS8HLqpFP2xMdLnE2q1lZherO6MoI2
-	 KHqktHrPWkaKpsb0ZNB4JKViPBvmEt0V5Tsu7CKw=
+	b=UNYZ0xJKl83Weh0HZXkX+75DtgbucsYUYb3GwJDzqtVbcYnTvcggNkhy0ioW4MMSZ
+	 fnerYo+ZLufmIhR0vKm5k5WdS3vITUXQbsgjc2ISrEzQNh0TIdOvkp4cGNI+MRf3Ur
+	 LJCtGilHG9y8nSgLg8D8vSJX5kJXlQ0ztX1gQWyU=
 From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 To: Brendan Higgins <brendanhiggins@google.com>,
 	David Gow <davidgow@google.com>,
@@ -74,9 +74,9 @@ Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
 	linux-security-module@vger.kernel.org,
 	linux-um@lists.infradead.org,
 	x86@kernel.org
-Subject: [PATCH v2 1/7] kunit: Handle thread creation error
-Date: Fri,  1 Mar 2024 20:40:31 +0100
-Message-ID: <20240301194037.532117-2-mic@digikod.net>
+Subject: [PATCH v2 2/7] kunit: Fix kthread reference
+Date: Fri,  1 Mar 2024 20:40:32 +0100
+Message-ID: <20240301194037.532117-3-mic@digikod.net>
 In-Reply-To: <20240301194037.532117-1-mic@digikod.net>
 References: <20240301194037.532117-1-mic@digikod.net>
 Precedence: bulk
@@ -89,11 +89,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Infomaniak-Routing: alpha
 
-Previously, if a thread creation failed (e.g. -ENOMEM), the function was
-called (kunit_catch_run_case or kunit_catch_run_case_cleanup) without
-marking the test as failed.  Instead, fill try_result with the error
-code returned by kthread_run(), which will mark the test as failed and
-print "internal error occurred...".
+There is a race condition when a kthread finishes after the deadline and
+before the call to kthread_stop(), which may lead to use after free.
 
 Cc: Brendan Higgins <brendanhiggins@google.com>
 Cc: David Gow <davidgow@google.com>
@@ -101,27 +98,54 @@ Cc: Rae Moar <rmoar@google.com>
 Cc: Shuah Khan <skhan@linuxfoundation.org>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: Mickaël Salaün <mic@digikod.net>
-Link: https://lore.kernel.org/r/20240301194037.532117-2-mic@digikod.net
+Link: https://lore.kernel.org/r/20240301194037.532117-3-mic@digikod.net
 ---
 
 Changes since v1:
 * Added Kees's Reviewed-by.
 ---
- lib/kunit/try-catch.c | 1 +
- 1 file changed, 1 insertion(+)
+ lib/kunit/try-catch.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/lib/kunit/try-catch.c b/lib/kunit/try-catch.c
-index f7825991d576..a5cb2ef70a25 100644
+index a5cb2ef70a25..73f5007f20ea 100644
 --- a/lib/kunit/try-catch.c
 +++ b/lib/kunit/try-catch.c
-@@ -69,6 +69,7 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
- 				  try_catch,
- 				  "kunit_try_catch_thread");
+@@ -11,6 +11,7 @@
+ #include <linux/completion.h>
+ #include <linux/kernel.h>
+ #include <linux/kthread.h>
++#include <linux/sched/task.h>
+ 
+ #include "try-catch-impl.h"
+ 
+@@ -65,14 +66,15 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
+ 	try_catch->context = context;
+ 	try_catch->try_completion = &try_completion;
+ 	try_catch->try_result = 0;
+-	task_struct = kthread_run(kunit_generic_run_threadfn_adapter,
+-				  try_catch,
+-				  "kunit_try_catch_thread");
++	task_struct = kthread_create(kunit_generic_run_threadfn_adapter,
++				     try_catch, "kunit_try_catch_thread");
  	if (IS_ERR(task_struct)) {
-+		try_catch->try_result = PTR_ERR(task_struct);
+ 		try_catch->try_result = PTR_ERR(task_struct);
  		try_catch->catch(try_catch->context);
  		return;
  	}
++	get_task_struct(task_struct);
++	wake_up_process(task_struct);
+ 
+ 	time_remaining = wait_for_completion_timeout(&try_completion,
+ 						     kunit_test_timeout());
+@@ -82,6 +84,7 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
+ 		kthread_stop(task_struct);
+ 	}
+ 
++	put_task_struct(task_struct);
+ 	exit_code = try_catch->try_result;
+ 
+ 	if (!exit_code)
 -- 
 2.44.0
 
