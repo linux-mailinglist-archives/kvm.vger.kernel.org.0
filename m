@@ -1,144 +1,124 @@
-Return-Path: <kvm+bounces-10655-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10656-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A9F386E515
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 17:16:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B20886E604
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 17:47:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FB071C21073
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 16:16:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 249441F26D33
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 16:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A304A70CCF;
-	Fri,  1 Mar 2024 16:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619C725619;
+	Fri,  1 Mar 2024 16:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eb5vjprR"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Rw3Dwuqs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300F470030;
-	Fri,  1 Mar 2024 16:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E235C22097
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 16:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709309783; cv=none; b=qiL7s6pUw1/QP2qiBtZ12epSOcE0xS7IhGJFhBplnfxRShmpwQnkHG+6ntxvOzwx2GCeiuwAcSiPU8tZNxiRE1CEWb1OFN/8SXvqHA0kO8FDOF1a189jbmxKucZTnHCv8LEMySGcGFXsw35yzEurqe0oB3uwNcyXQeaic4sVzzM=
+	t=1709311239; cv=none; b=NrxObrEdPODgLkzaE0baBkIBg6tTjNkKwdpbJxeyT8nXTKfHkjGRyB7OmhZBE2b5KfahgG5J1BNeZExIYlQi4VZRzNWDQSva3M6wFQWPuT8+SPM0UbOHcRDINysk7CYpv4GJgcMTmLMxzRVF6cGl279mk7OXMHG7aNVsxgipYZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709309783; c=relaxed/simple;
-	bh=n5S1ol70AH6Wm/4ovXpBDCp9DIz877B8wVkhQTych20=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bq+fIKYbg+dIkP3XUe60PNBU64HMlOOLIozfxnlBBpv95BA6EqiOHvmU8Gu8tnBkrPp+dc+zpu/losaJULpiEFYqNBJn7Xn6rYQa2nPbWkDtF2mrwYf8qydA2MV10bS5HteM+hrZWWOMexSbf59VA92e/dVcIzZLh30r6p1Bibk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eb5vjprR; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709309782; x=1740845782;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=n5S1ol70AH6Wm/4ovXpBDCp9DIz877B8wVkhQTych20=;
-  b=eb5vjprROUiMqyYd33y2SA5JQGTxR2eo7dA6FSBuvJRZTVa+N5txQlL5
-   VQnDzHlmgWy4GFbVocOQtlqCcce35Bsddi4wYWxHtDCmqfv3ZeZehM3LW
-   XwthZJ7gqCNuYmyjKDNU159ercZ1p0r5DhRA9OKDIF/j0t88kvXztvE4W
-   1LrYUAJheFWklEuuA341hyHloNMUiEQvIHADhKtuG4acK54sC1/EyxsY2
-   jX6EW4vchsWkdQ58QmzgX6+kL2rGNT6UbaNydPeyOMtxPddtDgD38EMny
-   PVKD8Xuy/xJDu/sVqqVaJ0D0ZsgbjdfNaQo4yF8/atezKg+1YlNPV1bBE
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11000"; a="15264465"
-X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
-   d="scan'208";a="15264465"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 08:16:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
-   d="scan'208";a="12790536"
-Received: from linux.bj.intel.com ([10.238.157.71])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 08:16:18 -0800
-Date: Sat, 2 Mar 2024 00:13:24 +0800
-From: Tao Su <tao1.su@linux.intel.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/3] kvm: wire up KVM_CAP_VM_GPA_BITS for x86
-Message-ID: <ZeH+pPO7hhgDNujs@linux.bj.intel.com>
-References: <20240301101410.356007-1-kraxel@redhat.com>
- <20240301101410.356007-2-kraxel@redhat.com>
+	s=arc-20240116; t=1709311239; c=relaxed/simple;
+	bh=1DFl0ZbNmoHHCDx2NBctdiyCsC0l1eSWBPINNTEml0Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XNwz+wxT740eJ631iuDCOoYKTfIW86eado4aHv0ouO86cJ2JmfzsHzIQgxQMEwJVhySCfd0tXEwtqInK1gHFpBL6qqD7iaicwvSR4lV7Fu4pFM3fIA4N8q8m4tFFbRdBVnfEgnmXnnFZJwc5qbJ6noxQ5nvIbUoAnbwYrgjzpZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Rw3Dwuqs; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-365c8257940so6718015ab.2
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 08:40:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1709311236; x=1709916036; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0xpVEUPupFJ4mY5Qxb0D2y0+A3GchrSV23FNcC1i+jo=;
+        b=Rw3DwuqsCzOiiHT9eSWMkJ0EoDc2l/s02nmZMNiKrWNT0TvusHRfdWpiAQ83kdmuRx
+         rUHmdSHs/wzp72ezfdcdGhWx8w8MDKJFExTF/BVL9ObWk8mXTOULJ737uoNBfJxUOken
+         AiTV8q3mNkZ1c9K6xH8aKqxzMzX8qXX+PFKtvpMClg/RnXdDgd583FGupCY0obX4Bg/p
+         V1/gvvPIdh0MB7Lg1TsUEDxm8w2it0DaUVIor6lX6mHmUv74yizHzVqA9zdpxgEb03ym
+         qD722WaHHwtLNJs2904i9eyEUjdJhQEGe1oPLVABAAR/bTjjSvUdERHeHKW2Chwm+RVJ
+         dH4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709311236; x=1709916036;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0xpVEUPupFJ4mY5Qxb0D2y0+A3GchrSV23FNcC1i+jo=;
+        b=WhUvz40hVo91EPQAqICssZ2fCwK+hx3BNYLtF+00i8aMrSm4WiqjpfY5t5ITyF4Bi+
+         kKwXivxkcgrHKyPEdB8oZBhhKCJCkceL5H87BVqEaS3bhK1HdlzVDgFdzZVULVCtNC1V
+         oXjdNfHWi5Fs6Ag8W14d1RLaN7SYOmydbxYe+yY1eP/SV3apepPPVp0owJNJr3b82SNJ
+         xzJDrZOOKnSIRbImFVzPFY6FvwYLL7Y38UzQa0+dvJ0BMrVJYIGpnQcr1Q3t7WNlDvpC
+         krM7Hgl05DHuhVX2W0n8v+lhrlTheYt6idMLkjl6Zqp5+qBG5rcnG9Va+usnyD4h6ZCg
+         Fl4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVlllP/ICgZ6LLMbL3m1rMN7hjVMkpBzDVyDk6St6+oHfvVQgR6SbDYzm6T9P2c8SDs88+2u1+/SkD/SAnFwqe4F26j
+X-Gm-Message-State: AOJu0Yz83s4cgto8FPrFXvIlmYMcPROjRamySdRB7XAI+ltQMOBMEJ20
+	xTn1Fg4uMVMnEVG6byWRLzi2hW0zMQ/Fo609D1Aw2CqtjwMmn0dUwYsGZVf00+NXql/1tIGFzeT
+	HUs12BJnHs3hT0pv1v9hZ1AXTUt9SdqsJQwO/7A==
+X-Google-Smtp-Source: AGHT+IFA/8ZsTPlrzqpqMe1C7sAim+Tu77L5L4EC5Mu3PiP55/jHP04OSuPWwGne0ZjJhx4bUxIrY3D6GoIF2d46Q1U=
+X-Received: by 2002:a92:c24e:0:b0:365:c1fc:dc07 with SMTP id
+ k14-20020a92c24e000000b00365c1fcdc07mr2509460ilo.0.1709311235987; Fri, 01 Mar
+ 2024 08:40:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240301101410.356007-2-kraxel@redhat.com>
+References: <20240214123757.305347-1-apatel@ventanamicro.com>
+In-Reply-To: <20240214123757.305347-1-apatel@ventanamicro.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 1 Mar 2024 22:10:25 +0530
+Message-ID: <CAAhSdy3ObzJHgF0QL9QqKVm37F83HzdF28A5107fm0dLFxoOLQ@mail.gmail.com>
+Subject: Re: [PATCH 0/5] KVM RISC-V report few more ISA extensions through ONE_REG
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Atish Patra <atishp@atishpatra.org>, 
+	Shuah Khan <shuah@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 01, 2024 at 11:14:07AM +0100, Gerd Hoffmann wrote:
-> Add new guest_phys_bits field to kvm_caps, return the value to
-> userspace when asked for KVM_CAP_VM_GPA_BITS capability.
-> 
-> Initialize guest_phys_bits with boot_cpu_data.x86_phys_bits.
-> Vendor modules (i.e. vmx and svm) can adjust this field in case
-> additional restrictions apply, for example in case EPT has no
-> support for 5-level paging.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  arch/x86/kvm/x86.h | 2 ++
->  arch/x86/kvm/x86.c | 5 +++++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 2f7e19166658..e03aec3527f8 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -24,6 +24,8 @@ struct kvm_caps {
->  	bool has_bus_lock_exit;
->  	/* notify VM exit supported? */
->  	bool has_notify_vmexit;
-> +	/* usable guest phys bits */
-> +	u32  guest_phys_bits;
->  
->  	u64 supported_mce_cap;
->  	u64 supported_xcr0;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 48a61d283406..e270b9b708d1 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4784,6 +4784,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		if (kvm_is_vm_type_supported(KVM_X86_SW_PROTECTED_VM))
->  			r |= BIT(KVM_X86_SW_PROTECTED_VM);
->  		break;
-> +	case KVM_CAP_VM_GPA_BITS:
-> +		r = kvm_caps.guest_phys_bits;
-> +		break;
->  	default:
->  		break;
->  	}
-> @@ -9706,6 +9709,8 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
->  	if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES))
->  		rdmsrl(MSR_IA32_ARCH_CAPABILITIES, host_arch_capabilities);
->  
-> +	kvm_caps.guest_phys_bits = boot_cpu_data.x86_phys_bits;
+On Wed, Feb 14, 2024 at 6:08=E2=80=AFPM Anup Patel <apatel@ventanamicro.com=
+> wrote:
+>
+> This series extends the KVM RISC-V ONE_REG interface to report few more
+> ISA extensions namely: Ztso and Zacas. These extensions are already
+> supported by the HWPROBE interface in Linux-6.8 kernel.
+>
+> To test these patches, use KVMTOOL from the riscv_more_exts_round2_v1
+> branch at: https://github.com/avpatel/kvmtool.git
+>
+> These patches can also be found in the riscv_kvm_more_exts_round2_v1
+> branch at: https://github.com/avpatel/linux.git
+>
+> Anup Patel (5):
+>   RISC-V: KVM: Forward SEED CSR access to user space
+>   RISC-V: KVM: Allow Ztso extension for Guest/VM
+>   KVM: riscv: selftests: Add Ztso extension to get-reg-list test
+>   RISC-V: KVM: Allow Zacas extension for Guest/VM
+>   KVM: riscv: selftests: Add Zacas extension to get-reg-list test
 
-When KeyID_bits is non-zero, MAXPHYADDR != boot_cpu_data.x86_phys_bits
-here, you can check in detect_tme().
+Queued this series for Linux-6.9
 
 Thanks,
-Tao
+Anup
 
-> +
->  	r = ops->hardware_setup();
->  	if (r != 0)
->  		goto out_mmu_exit;
-> -- 
-> 2.44.0
-> 
-> 
+>
+>  arch/riscv/include/uapi/asm/kvm.h                |  2 ++
+>  arch/riscv/kvm/vcpu_insn.c                       | 13 +++++++++++++
+>  arch/riscv/kvm/vcpu_onereg.c                     |  4 ++++
+>  tools/testing/selftests/kvm/riscv/get-reg-list.c |  8 ++++++++
+>  4 files changed, 27 insertions(+)
+>
+> --
+> 2.34.1
+>
 
