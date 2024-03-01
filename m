@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-10602-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10603-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71D4286DD11
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 09:27:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3569F86DD34
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 09:37:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0583D1F21BB2
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 08:27:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E360C2830CF
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 08:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B1569D25;
-	Fri,  1 Mar 2024 08:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BAB869E08;
+	Fri,  1 Mar 2024 08:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="M81FT9RJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dBClkucG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4F969D13
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 08:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA5569D0F;
+	Fri,  1 Mar 2024 08:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709281664; cv=none; b=sNIKpQ462Ew+yo5UnyyZEeVz9RHODwiphGkK8WTCIjFF80MiPeRDiXld8bnSukFPCsOL7m6mFCiVeLeUoDQ+OlgCs7KRzPTRNr1ChMD9PuOMliaHA4biSkuGz6rex1HpdID6/lFbCfRqA/cm3q1LuLFXoKdocYQANpvYTZ3fpSQ=
+	t=1709282248; cv=none; b=iUTF0wjxLMN9HRIPoEY4BkAEt5vx24nzMNTq9l2VfojSgVaeu7Y56ve5kXaCfrcKqcqx3iPvFqIcEIgNr2u8P+eMklWWUcO2G2aUbc1Vn20pq0v5bxBu/6+0W1MKQwvMS/ON5DdiICB0K+631qpGDmNpbbcmkN3PaRjc43CZpZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709281664; c=relaxed/simple;
-	bh=XqfNJZAlUlGhU0tMLlsUHrVl8hhs+fFQE6upJ67bxBM=;
+	s=arc-20240116; t=1709282248; c=relaxed/simple;
+	bh=O/xcTjzqimRfgoome/Wsnc5JDospAjX/DhL+CZ4+z7E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sP1VK5KL1WQBwW95H1JMK8B2DDmsE+cYYUEfcuPH6UeqL4yGOGAoT4j8EdTD94vswfTj+4/A+Mf7/7rvvzjgVPTVjHNFWH7G2hVfa+1PYouOgsCCX0Z+nxgBWh0hJmtkyKyvPsYkhYti8SK/NTtHQim3drqNod3Dyh0bNrFHdp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=M81FT9RJ; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3bc21303a35so577132b6e.0
-        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 00:27:42 -0800 (PST)
+	 In-Reply-To:Content-Type; b=ak9+8ZhOSeSyitxu9vAfFnLdwc8jTEn27sC0mLsZ7yLbFKDZsd2b0f+sOWagQwh+PH5tz//D9CkbAq5XJadbmcxJl0L8gGkVPQs33p5zwH/XqbKdL7wNWDts8xynOP4JOKm8wXxRlx62hXuCD8odoK/nuh490BxjJWpIwcbRTtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dBClkucG; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-299ea1f1989so1356014a91.0;
+        Fri, 01 Mar 2024 00:37:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1709281661; x=1709886461; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709282246; x=1709887046; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=u+1gYR9fNMcL6Yz70ujlHI/EnqcOVjeumCs1fZJGDkY=;
-        b=M81FT9RJhuS9Xgc+mQidbYySp/9ztKdkjneZ+/Fya+5wAZ2jd4T5TT7PxYjUJNrVtQ
-         7nJ/ydMd8Lekbv9o+1sTbDzdvUa8jceAfl9NfegRUmgj0VsFOUQqjQXXsUB52qO35QwW
-         ibxtKFAZHEe1WFrNVSAjnlYdCILBObuCHZLZ1KW03DEUl0QyLficwx7qfOz4rBYgUn17
-         dmNlOlW5+E+pGHMIBw1ZeX7VGsrlepDADzU0ymBY5wyb18VL3tiebKSN8LENyRDfv3Us
-         xyM5DOCAMYwDultm2kbe4gnDu6tbxFmbn4W6aYjHEvqBtcuOwoXG5ejfvuhmh9IXBY4s
-         f8FQ==
+        bh=1KP1OIsCMvJGez96bNApKJ4GpsDICD3OZeSUcfZwjEc=;
+        b=dBClkucGCNQG6VpUvd8UWVJPW500FjQnkWKP3U7h2qsmwr+Ke/uF98gNHQ2ko/rlsF
+         vY9BwX3ZUBzFHDXrArfA2jXzVCTgC7+TN0jcE06j6nh5d21q40XsnuPKXNZSVbK5bijM
+         MD65zuPubBoI0V5GmyZprrjFoWVgxaYGrmPngxxdv0OU+z6br3GTT6MC8eSvZ00i8q7Y
+         aWf1sVdGQHMZiTUubN9HPTTPnDkIl/emlQaUY3dYzGDM5cxqo9dAaOdRPqvefBheYpEt
+         hpo3LcpqRx6No9YcV56/eUq9OHC0FpFK5kI2lYeL0qe3s2hcisf/VfZh4RON0IuCx9Kq
+         BsRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709281661; x=1709886461;
+        d=1e100.net; s=20230601; t=1709282246; x=1709887046;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u+1gYR9fNMcL6Yz70ujlHI/EnqcOVjeumCs1fZJGDkY=;
-        b=VyfzhpwUz0qZR79CoBT+vDQ9FMSPcE1u65wbkvorkFdSwpwX5Dmidb5rFUjRZSquk9
-         r5x3P5kQRMKGXL/rHgRzhhSE/QlJt/98D+GghyN4QRR1nwkNaPLeGqpkGewLmXNK3rVj
-         hXHZ7IWGN9cZd1ljaD0o6fqbyIPzORxk7ab8j85NuubeKMNnULHZhsw0PIVpE4apyxK0
-         Xkg0xR0SxiO2V93ydLbYF5akSN00fhdXM/+vIolQmf0ixIl6EEZh7imsbl6oB77rRnJJ
-         JSzoXPwpB5O6/72gKGfrV4viQ7HLF/mBpQoSClVILXkG6CubLIvmaC+GdUvHZsqQDWqK
-         LknA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5JmHlsFeVlk73j8ms3x9L5g4LUjX06UNcv2JMWtA64Ix91cI4NovHrX3fg8zMn4D2T5ZJVBQZpKi8GnlU4wOIrcU2
-X-Gm-Message-State: AOJu0YzWXUMTbme2jhclJPoPOsOc9qCdiMHVxi6FCKeQ0zW6kBvAIt8C
-	tphdd9Am6MoGlcRZ3/K3exiFctd2wgPNZalxAlLOaoDww8ptu3i8sdphEQMI2yc=
-X-Google-Smtp-Source: AGHT+IEdyiT1lfztdP7slsQZvQ1H9ibF+1htyyfiSkFgE7uzu3qWKNguG9y0uIjwtsPG01jsOQ/DmQ==
-X-Received: by 2002:a05:6808:211a:b0:3c1:aa85:7ab4 with SMTP id r26-20020a056808211a00b003c1aa857ab4mr1284563oiw.3.1709281661587;
-        Fri, 01 Mar 2024 00:27:41 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:999:a3a0:1070:febd:b4af:e79a? ([2a01:e0a:999:a3a0:1070:febd:b4af:e79a])
-        by smtp.gmail.com with ESMTPSA id r7-20020aa78b87000000b006e13e202914sm2449292pfd.56.2024.03.01.00.27.30
+        bh=1KP1OIsCMvJGez96bNApKJ4GpsDICD3OZeSUcfZwjEc=;
+        b=kWr5Oa+OpQMOeTfNQXKqzDKITSLifq/S7Hb11sKJv275KR+YHWNmTCA8Z6Z9seRYmf
+         2Kg1sVxKDoIulgONvVZq8V2ZSlc4J7gtAXLy0kr8cUFzdDdfApSl32wTEEvfHn0dfNd3
+         u6Uibo6wEDRIWBblFF/Oox04NLVhi7zDVnhU/8Nj8Fyh9PiJPD3J53MEQhkDmnIjdU/o
+         N/16rx7GZtWqSJE87OhoTCZQQA7mC3slss8TlIUnhZk+qbZLE5BBuDyH0aABUGMZ/pa+
+         tl62bpZ7f9j7/KZFF7hKNE4XRNfnwjOMdVezJRWy6rqXvlbsBOzKrutg800YJT4iSE/U
+         zH2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXNbfiJzI14onxQ4WOtol0sWTOCzOzVLhOM+lrMycFPcilmcL+dPU3m+j5DVw8VAZ0CEDEU0hqJtcoqFSjPpp9aO/6hzANAbR/Qf6jnEmOI3fbpli8CQ7rYu/jXP1niSj31
+X-Gm-Message-State: AOJu0Yz1QCdGwf9ch/yrb9oms38kqn9FYwCcsZxOyS2Bu1tNkFj9irgd
+	epxgZNXn7Lz7TElC95/ZfI9LISIStpFocVeuGPpLSpgPjWrXP0/O
+X-Google-Smtp-Source: AGHT+IF6CJdU3IVs+5kG8Yi4Ol3M1o4Vi/U3gm2EL4hHhkVGhHKBRvvSuZZMH9oBYmRD/sFnfzUocA==
+X-Received: by 2002:a17:90a:a8f:b0:299:7b37:9221 with SMTP id 15-20020a17090a0a8f00b002997b379221mr924936pjw.12.1709282246357;
+        Fri, 01 Mar 2024 00:37:26 -0800 (PST)
+Received: from [192.168.255.10] ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id c13-20020a17090ae10d00b0029a8a599584sm2712200pjz.13.2024.03.01.00.37.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Mar 2024 00:27:40 -0800 (PST)
-Message-ID: <8e3003f0-ec27-47d4-9b1f-89de2afbb8b8@rivosinc.com>
-Date: Fri, 1 Mar 2024 09:27:30 +0100
+        Fri, 01 Mar 2024 00:37:25 -0800 (PST)
+Message-ID: <06061a28-88c0-404b-98a6-83cc6cc8c796@gmail.com>
+Date: Fri, 1 Mar 2024 16:37:20 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,56 +76,87 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 02/15] RISC-V: Add FIRMWARE_READ_HI definition
+Subject: Re: [PATCH] KVM: x86/svm/pmu: Set PerfMonV2 global control bits
+ correctly
 Content-Language: en-US
-To: Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, linux-kselftest@vger.kernel.org,
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alexghiti@rivosinc.com>,
- kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Conor Dooley <conor.dooley@microchip.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Guo Ren <guoren@kernel.org>,
- kvm-riscv@lists.infradead.org, Atish Patra <atishp@atishpatra.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, linux-riscv@lists.infradead.org,
- Shuah Khan <shuah@kernel.org>, Andrew Jones <ajones@ventanamicro.com>
-References: <20240229010130.1380926-1-atishp@rivosinc.com>
- <20240229010130.1380926-3-atishp@rivosinc.com>
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20240229010130.1380926-3-atishp@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To: Sandipan Das <sandipan.das@amd.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, dapeng1.mi@linux.intel.com,
+ mizhang@google.com, jmattson@google.com, ravi.bangoria@amd.com,
+ nikunj.dadhania@amd.com, santosh.shukla@amd.com, manali.shukla@amd.com,
+ babu.moger@amd.com, kvm list <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240301075007.644152-1-sandipan.das@amd.com>
+From: Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20240301075007.644152-1-sandipan.das@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-
-On 29/02/2024 02:01, Atish Patra wrote:
-> SBI v2.0 added another function to SBI PMU extension to read
-> the upper bits of a counter with width larger than XLEN.
+On 1/3/2024 3:50 pm, Sandipan Das wrote:
+> With PerfMonV2, a performance monitoring counter will start operating
+> only when both the PERF_CTLx enable bit as well as the corresponding
+> PerfCntrGlobalCtl enable bit are set.
 > 
-> Add the definition for that function.
+> When the PerfMonV2 CPUID feature bit (leaf 0x80000022 EAX bit 0) is set
+> for a guest but the guest kernel does not support PerfMonV2 (such as
+> kernels older than v5.19), the guest counters do not count since the
+> PerfCntrGlobalCtl MSR is initialized to zero and the guest kernel never
+> writes to it.
+
+If the vcpu has the PerfMonV2 feature, it should not work the way legacy
+PMU does. Users need to use the new driver to operate the new hardware,
+don't they ? One practical approach is that the hypervisor should not set
+the PerfMonV2 bit for this unpatched 'v5.19' guest.
+
 > 
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> Reviewed-by: Anup Patel <anup@brainfault.org>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> This is not observed on bare-metal as the default value of the
+> PerfCntrGlobalCtl MSR after a reset is 0x3f (assuming there are six
+> counters) and the counters can still be operated by using the enable
+> bit in the PERF_CTLx MSRs. Replicate the same behaviour in guests for
+> compatibility with older kernels.
+> 
+> Before:
+> 
+>    $ perf stat -e cycles:u true
+> 
+>     Performance counter stats for 'true':
+> 
+>                     0      cycles:u
+> 
+>           0.001074773 seconds time elapsed
+> 
+>           0.001169000 seconds user
+>           0.000000000 seconds sys
+> 
+> After:
+> 
+>    $ perf stat -e cycles:u true
+> 
+>     Performance counter stats for 'true':
+> 
+>               227,850      cycles:u
+> 
+>           0.037770758 seconds time elapsed
+> 
+>           0.000000000 seconds user
+>           0.037886000 seconds sys
+> 
+> Reported-by: Babu Moger <babu.moger@amd.com>
+> Fixes: 4a2771895ca6 ("KVM: x86/svm/pmu: Add AMD PerfMonV2 support")
+> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
 > ---
->  arch/riscv/include/asm/sbi.h | 1 +
->  1 file changed, 1 insertion(+)
+>   arch/x86/kvm/svm/pmu.c | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
-> index 6e68f8dff76b..ef8311dafb91 100644
-> --- a/arch/riscv/include/asm/sbi.h
-> +++ b/arch/riscv/include/asm/sbi.h
-> @@ -131,6 +131,7 @@ enum sbi_ext_pmu_fid {
->  	SBI_EXT_PMU_COUNTER_START,
->  	SBI_EXT_PMU_COUNTER_STOP,
->  	SBI_EXT_PMU_COUNTER_FW_READ,
-> +	SBI_EXT_PMU_COUNTER_FW_READ_HI,
->  };
->  
->  union sbi_pmu_ctr_info {
-
-Reviewed-by: Clément Léger <cleger@rivosinc.com>
-
-Thanks,
-
-Clément
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index b6a7ad4d6914..14709c564d6a 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -205,6 +205,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
+>   	if (pmu->version > 1) {
+>   		pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
+>   		pmu->global_status_mask = pmu->global_ctrl_mask;
+> +		pmu->global_ctrl = ~pmu->global_ctrl_mask;
+>   	}
+>   
+>   	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
 
