@@ -1,130 +1,163 @@
-Return-Path: <kvm+bounces-10645-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10646-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DAD86E2A8
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 14:45:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C428386E2BC
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 14:49:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C61A7B23B2F
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 13:45:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24BBEB21964
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 13:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4585F6D1C8;
-	Fri,  1 Mar 2024 13:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CC96EB6F;
+	Fri,  1 Mar 2024 13:49:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="OfLa6Njb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OYdN6+Gj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EEC6D1A4
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 13:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D2E6EB4F
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 13:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709300746; cv=none; b=Z0vxnDqM6bIC09NMKqMPAMv4PBpu3QUlYu8bzECAgJvAMlXTZwCep5IqVJghKg3/NARKYeVSueWzwNqnpQpCnb/nm17gD0FyJ8bKk1DlPavUsE3T9NsqsjZkRbcMiTjKfyvA4bUDOtt+qeFc7/xecmIoKsldrSV1v4FjbR1LFog=
+	t=1709300965; cv=none; b=o5Qc92wgMpKua/PhGDcMrmhJHIFP/wNs3AjGpOsBzTUf52WPAp3Ya32KDRFW3/qj+XuewmRW234tJbqwR55Ke8hD0zl7S8Xl5UXhkCgpLn0eZVy8W0oOs0CWAPocJZtnpW3pAYB/MAq932bpzuSnK1EyntLC92kAtD7gdsdB09w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709300746; c=relaxed/simple;
-	bh=wpL4ltZWaXYI2Sx4HOhz+whfpsMIHIYkKd3J//8TyTA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HW6VIW25wGNweeTO3eNq5j2I4mwOu31kbDV9RzduHfijU6fkEV60nnLqSGX1B8lJlOu/Or/NL2XvzRLSXUSq3PFU/PUCvdT9botEt+eSVpPvDI1QRvtdCxL8tC3lKDt3NNQErSheXh4gMEGNL99QYHn0K+VFFxj6BYY731mXd3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=OfLa6Njb; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a445587b796so230244966b.1
-        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 05:45:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709300742; x=1709905542; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tVgbEQ4kyQbtblCUPkOlRv+wZVI/qCCBeziGpPNTTHM=;
-        b=OfLa6NjbAmvOSBAgCQ1PP0V3pkj6hhrMWacPr/QL1Nzlhhr2BnzzIxeMgxXK8l0wPo
-         LHfYA9V+uPR6LY0pcHMCSIT34Jax3UvliDHOij3rtaUzZWYqJr/CU31P6tGJ7li3erQY
-         Hifld1uSC2Rg/Lbhy0QFuIaCcS0xUBcYX4lMhomexcAgEjD32ZFtgxgV4hhv01AKQZrj
-         oMmHZuWJVSQMXGa/0yK675d4oSKDTyfL1pOfArVAubqdZPonMETIGmKra0WO6rKUfkWp
-         vXZDOYaM536q4ICdX9X2SbsyKwwf2Nhjo2SxuOhwMCS0Thh/TQuldiOK6Fybn/Dt+JCT
-         fKFw==
+	s=arc-20240116; t=1709300965; c=relaxed/simple;
+	bh=OsGTedaK6/mohp8uU8DEDhCaqpYJiEuZGp/c8EbZYx4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pUA7uRO1Yk2+okMGonzXgxPz2TnvJiOVlXIQLUmsOKh6F88FnWuCzXeX9NKXGzSCorCbJnVv5N6/pCBT0L1Bp62H2aappvcvqNvABcqP1gbSK7aUqL9I1b2She2x4eLcNEeyiVLkyyn9r+DXM4cfssGfZDjGLDTDsxgVakYLqDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OYdN6+Gj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709300962;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=B4Q4Q4LrAxLQsEJ1nzM2u+gYauPHsp+I5fupvnZdXis=;
+	b=OYdN6+GjG9E/iyEmqmW3Z0i5buhOnw5OEI28jrgAEWiARpfwXs7YXGtAy0KP6Xl9pGxdwp
+	hE2sC1FHnPUONE+UKZaEP5B6+aEPmWC5kA0oEKRpBc3d9/jdOte8ZBRy3eA8WFJ+RlI9fl
+	hokJc9eOwWJJOJGRHXiw2kD50O98wdM=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-660-1BVT0Fj6Oy-T2JU4SxVGpg-1; Fri, 01 Mar 2024 08:49:20 -0500
+X-MC-Unique: 1BVT0Fj6Oy-T2JU4SxVGpg-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-787c04e48a7so228345485a.1
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 05:49:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709300742; x=1709905542;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tVgbEQ4kyQbtblCUPkOlRv+wZVI/qCCBeziGpPNTTHM=;
-        b=E62iGCQf/8ZnOQwI8nbgB9feSE70ejM2dfyKlBcFYY4PRDWJGPbD8E9BJGdDcBiWf4
-         rkUzwMy2YrpJe5jvE8BMXkFnrnsQY78wCZSSAxhQBenU4i+OAZYpWNDWM5tYquN3ZZX1
-         BE3oKY6dZFfOWdcBl5x54PMmcIs7ygaIuBXyWbbdc+bkPhUx/fm3AhOYrJ27AeAVRS0T
-         /6rJsO6YKhQaN9C5cKjPaeAlkMvlAvVgmqeOTdvAcWCnxRz4r2HSncGBTy0ils5AXfrF
-         2nX34lUeeRlXPlDnq4VA3ui9GyRUKtFYo+wDBE9aLvxNpMsorvvmseOb2xmjT/BXoa4u
-         gMXw==
-X-Forwarded-Encrypted: i=1; AJvYcCUHalff9lw0PCN/u5AMiUTh0GFHkGbLXCm3ab0/OaIJir9LXJ6T0+IqMtO9iivmJRvY4fHRz4A9pnvr3ai6kj8WI1Vx
-X-Gm-Message-State: AOJu0Yx6HS/VWIUwNgqeWIHPax0X+4UnXojhAH2pSvwFtLxHL1gxAkz9
-	1mzDovI6jHgG/CZYg/BARG1P6xyzBfRAc46VbiTMFSpSrha0k00MEzB2YNXdlD4=
-X-Google-Smtp-Source: AGHT+IEUmgSAurOUDe9d1ZRfnCdJozDY6XtBUZXROZY7Us5XumAjIbS9btAdtfpRWlh4RA5xIiOf/g==
-X-Received: by 2002:a17:906:b84e:b0:a43:292c:7c38 with SMTP id ga14-20020a170906b84e00b00a43292c7c38mr1231239ejb.14.1709300742389;
-        Fri, 01 Mar 2024 05:45:42 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id lb24-20020a170906add800b00a4131367204sm1704722ejb.80.2024.03.01.05.45.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 05:45:42 -0800 (PST)
-Date: Fri, 1 Mar 2024 14:45:41 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, 
-	Laurent Vivier <lvivier@redhat.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 14/32] powerpc: general interrupt tests
-Message-ID: <20240301-65a02dd1ea0bc25377fb248f@orel>
-References: <20240226101218.1472843-1-npiggin@gmail.com>
- <20240226101218.1472843-15-npiggin@gmail.com>
- <1b89e399-1160-4fca-a9d7-89d60fc9a710@redhat.com>
+        d=1e100.net; s=20230601; t=1709300960; x=1709905760;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4Q4Q4LrAxLQsEJ1nzM2u+gYauPHsp+I5fupvnZdXis=;
+        b=sUIBN04lRuhLaRT6Qnm4Zjn7BVXDrsbyoJw/usdmLPzpQbxzpqvQH/KJBP8zFMUPsK
+         zg+tABHozxprwD+L+KSjzFAyF8eFI+oYeFHvWAyB676sJOxFlC+noayXG1/zQHtrxEGW
+         Nl+yodYlMyGuMAsiwUpiwjllo8VN0Ui35xMR6cNPND7oqGbqtJ8iFFUZOGtjgoNnoDhq
+         6yibzyrgpM3o8UWRhwLwzQ/T4qpC9abtFVqgsmTjuyoIMPnJ73HZ3EBnMTMnuGUDSM25
+         Y3sIdF1ow5cAQVb27EShaP4ulGbVGsh6Bqp8rHS5H+3UmfZIT4CvvAyKsu+mR8Arey3i
+         4fJw==
+X-Gm-Message-State: AOJu0Ywr7ZLZadzDe/zTQPRNO9WNmpCyaFOvaoV0Arz1rHerkWCR6XQ2
+	mZdrRRSEXvPSQ8a1RygRHNZ1za1YrViWf+hijETpffN0dIAc+xzzQ/G0ARmrFxIJOZwPB1715jL
+	33s3tvvm8B9xkJeXhuZuuLQ+P/wENiqOdnXwJQqjZbFdbFlALPg==
+X-Received: by 2002:a05:620a:1083:b0:787:f466:bc9e with SMTP id g3-20020a05620a108300b00787f466bc9emr1722865qkk.16.1709300960037;
+        Fri, 01 Mar 2024 05:49:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGa6sgVtEll3K3BbX7X5s71qOw70Yvse3T0Tb91aAoaGGSIHp0XgmZcezKDxj2a3uiFiUxnBw==
+X-Received: by 2002:a05:620a:1083:b0:787:f466:bc9e with SMTP id g3-20020a05620a108300b00787f466bc9emr1722846qkk.16.1709300959791;
+        Fri, 01 Mar 2024 05:49:19 -0800 (PST)
+Received: from [192.168.0.9] (ip-109-43-178-133.web.vodafone.de. [109.43.178.133])
+        by smtp.gmail.com with ESMTPSA id p13-20020ae9f30d000000b007873213b29csm1645214qkg.49.2024.03.01.05.49.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Mar 2024 05:49:19 -0800 (PST)
+Message-ID: <3579c50c-e1dd-41db-9537-b8e36b3be18a@redhat.com>
+Date: Fri, 1 Mar 2024 14:49:13 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b89e399-1160-4fca-a9d7-89d60fc9a710@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 3/7] (arm|s390): Use migrate_skip in test
+ cases
+Content-Language: en-US
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+ Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
+ Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Marc Hartmayer
+ <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+ linux-s390@vger.kernel.org
+References: <20240226093832.1468383-1-npiggin@gmail.com>
+ <20240226093832.1468383-4-npiggin@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240226093832.1468383-4-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 01, 2024 at 01:41:22PM +0100, Thomas Huth wrote:
-> On 26/02/2024 11.12, Nicholas Piggin wrote:
-> > Add basic testing of various kinds of interrupts, machine check,
-> > page fault, illegal, decrementer, trace, syscall, etc.
-> > 
-> > This has a known failure on QEMU TCG pseries machines where MSR[ME]
-> > can be incorrectly set to 0.
+On 26/02/2024 10.38, Nicholas Piggin wrote:
+> Have tests use the new migrate_skip command in skip paths, rather than
+> calling migrate_once to prevent harness reporting an error.
 > 
-> Two questions out of curiosity:
+> s390x/migration.c adds a new command that looks like it was missing
+> previously.
 > 
-> Any chance that this could be fixed easily in QEMU?
-> 
-> Or is there a way to detect TCG from within the test? (for example, we have
-> a host_is_tcg() function for s390x so we can e.g. use report_xfail() for
-> tests that are known to fail on TCG there)
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   arm/gic.c              | 21 ++++++++++++---------
+>   s390x/migration-cmm.c  |  8 ++++----
+>   s390x/migration-skey.c |  4 +++-
+>   s390x/migration.c      |  1 +
+>   4 files changed, 20 insertions(+), 14 deletions(-)
 
-If there's nothing better, then it should be possible to check the
-QEMU_ACCEL environment variable which will be there with the default
-environ.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> 
-> > @@ -0,0 +1,415 @@
-> > +/*
-> > + * Test interrupts
-> > + *
-> > + * Copyright 2024 Nicholas Piggin, IBM Corp.
-> > + *
-> > + * This work is licensed under the terms of the GNU LGPL, version 2.
-> 
-> I know, we're using this line in a lot of source files ... but maybe we
-> should do better for new files at least: "LGPL, version 2" is a little bit
-> ambiguous: Does it mean the "Library GPL version 2.0" or the "Lesser GPL
-> version 2.1"? Maybe you could clarify by additionally providing a SPDX
-> identifier here, or by explicitly writing 2.0 or 2.1.
-
-Let's only add SPDX identifiers to new files.
-
-Thanks,
-drew
 
