@@ -1,175 +1,133 @@
-Return-Path: <kvm+bounces-10691-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10692-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92EE686EA25
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 21:16:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B45FD86EA86
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 21:44:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F99F1C24039
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:16:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5977728E724
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F553C47A;
-	Fri,  1 Mar 2024 20:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456B33D997;
+	Fri,  1 Mar 2024 20:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J7sdiITJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E783C6A4
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 20:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F271C7E1;
+	Fri,  1 Mar 2024 20:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709324155; cv=none; b=lTOqKw+6DGPArQqDntQfWqH0frZ5iC/CjV428bKKMEbHKmKpFQAg8QJDaY0peUutAXJ6y/X/LCchdqendlRjF2VecKffg+VGXHlrlFWi4LIKp4k0fXzRgkCdSAu3OhhPlWXTc1448R+v6pVmyID1jNHC3f+dbR+E3oz1cGNRyTw=
+	t=1709325833; cv=none; b=Rbeof/Mu+72jo/slQ8qrLYjzimE8XJKaeMvLncdGI+50WG6fKvg2NnOpBBf4IYeWYhHdOeIygI3v2bto2zE8FU9QFuEoDPmK6lSOu+IPMt8naa6y0+5EIcnCFdICDWJb7xxULjYxL1aoK7uGbhhKK8Fka+WF7eFgoy11iJwxC+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709324155; c=relaxed/simple;
-	bh=bE1H3ZR3mcE6l2fGWaCh+j6K68SoFInxbaR7he+rkdQ=;
+	s=arc-20240116; t=1709325833; c=relaxed/simple;
+	bh=kUyMdHkVkpeJxiyTY9gwfrRpGuWeFO/2yLcwV4ze4PY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D6czQ7+Kyjs4xhuLSWyHVe+6aKQqux0eCsMfLMU/gTtN9b+CZEu+fBsM5kJR+FwgxuGmi91+F+r7KRe/bToWK37lxLMovhGZYQ/bqOlv4mSkuy/rQzlIjhPbLIGDdIX7pv0RC5hvgK0PWA2a7PT5qXg7z/7ZZqMXQC2a/yNUK/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 247511FB;
-	Fri,  1 Mar 2024 12:16:29 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CBAB3F73F;
-	Fri,  1 Mar 2024 12:15:49 -0800 (PST)
-Date: Fri, 1 Mar 2024 20:15:43 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 07/13] KVM: arm64: nv: Honor HFGITR_EL2.ERET being set
-Message-ID: <20240301201543.GA3968751@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
- <20240226100601.2379693-8-maz@kernel.org>
- <20240301180734.GA3958355@e124191.cambridge.arm.com>
- <861q8t3guf.wl-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eJRpnTlhHr0/POhRK6S128M0PD4l1vnUCVb3a+jkjufx2wCkOfYTLlwqQarJr5piEUVN36gskxrH1KLtR6aS1WKOqFOrId2J1zRiW0JBnv2zMkF+k96aHS43hYOkELuuPiI+KzirBdcTk2TbtfrQx6u16W7I0pC9v2PO4Io01CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J7sdiITJ; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709325832; x=1740861832;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=kUyMdHkVkpeJxiyTY9gwfrRpGuWeFO/2yLcwV4ze4PY=;
+  b=J7sdiITJ1kAZr8sgz50mVhoWucZdfvkoFsu+OXac+ZYGYPkQFX5OPufN
+   GYcmyMdCwuJePDNkldKBwQ6Phco2fJwTUK2a/EYPGiSOa6dTn5qX5w9/w
+   CROt2hwL/xvur3IU3TOkt5EJb7dPdWtOr06eQ3UiXhTGSTMmZ6lUzvNpT
+   D+4P4zIm2il4OlYlml1+oBehYmh+3/dx5FXGBN/UfMgwIx+r9AaOG4YTA
+   jSKPPtaCV5JYuqmCgCIxKjCPVLwsnronNpJzofoZ/sbagtThIMm4oXZ+O
+   JCuLQ7HKbUTVjG3yx+nnYsf8kbPkClwW+teTUG1nqvpO7nCvbuGsZxFXc
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11000"; a="3808094"
+X-IronPort-AV: E=Sophos;i="6.06,197,1705392000"; 
+   d="scan'208";a="3808094"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 12:43:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,197,1705392000"; 
+   d="scan'208";a="8374083"
+Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
+  by orviesa009.jf.intel.com with ESMTP; 01 Mar 2024 12:43:42 -0800
+Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rg9j3-000E5D-2e;
+	Fri, 01 Mar 2024 20:43:32 +0000
+Date: Sat, 2 Mar 2024 04:42:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>, Kees Cook <keescook@chromium.org>,
+	Rae Moar <rmoar@google.com>, Shuah Khan <skhan@linuxfoundation.org>
+Cc: oe-kbuild-all@lists.linux.dev,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	Alan Maguire <alan.maguire@oracle.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+	James Morris <jamorris@linux.microsoft.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
+	Marco Pagani <marpagan@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Thara Gopinath <tgopinath@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+	linux-um@lists.infradead.org, x86@kernel.org
+Subject: Re: [PATCH v1 8/8] kunit: Add tests for faults
+Message-ID: <202403020418.NnNnFElm-lkp@intel.com>
+References: <20240229170409.365386-9-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <861q8t3guf.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240229170409.365386-9-mic@digikod.net>
 
-On Fri, Mar 01, 2024 at 07:14:00PM +0000, Marc Zyngier wrote:
-> Hi Joey,
-> 
-> On Fri, 01 Mar 2024 18:07:34 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > Got a question about this one,
-> > 
-> > On Mon, Feb 26, 2024 at 10:05:55AM +0000, Marc Zyngier wrote:
-> > > If the L1 hypervisor decides to trap ERETs while running L2,
-> > > make sure we don't try to emulate it, just like we wouldn't
-> > > if it had its NV bit set.
-> > > 
-> > > The exception will be reinjected from the core handler.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/hyp/vhe/switch.c | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > index eaf242b8e0cf..3ea9bdf6b555 100644
-> > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > @@ -220,7 +220,8 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > >  	 * Unless the trap has to be forwarded further down the line,
-> > >  	 * of course...
-> > >  	 */
-> > > -	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-> > > +	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
-> > > +	    (__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET))
-> > >  		return false;
-> > >  
-> > >  	spsr = read_sysreg_el1(SYS_SPSR);
-> > 
-> > Are we missing a forward_traps() call in kvm_emulated_nested_eret() for the
-> > HFGITR case?
-> > 
-> > Trying to follow the code path here, and I'm unsure of where else the
-> > HFIGTR_EL2_ERET trap would be forwarded:
-> > 
-> > kvm_arm_vcpu_enter_exit ->
-> > 	ERET executes in guest
-> > 	fixup_guest_exit ->
-> > 		kvm_hyp_handle_eret (returns false)
-> > 
-> > handle_exit ->
-> > 	kvm_handle_eret ->
-> > 		kvm_emulated_nested_eret
-> > 			if HCR_NV
-> > 				forward traps
-> > 			else
-> > 				emulate ERET
-> 
-> There's a bit more happening in kvm_handle_eret().
-> 
-> > 
-> > 
-> > And if the answer is that it is being reinjected somewhere, putting that
-> > function name in the commit instead of 'core handler' would help with
-> > understanding!
-> 
-> Let's look at the code:
-> 
-> 	static int kvm_handle_eret(struct kvm_vcpu *vcpu)
-> 	{
-> 		[...]
-> 	
-> 		if (is_hyp_ctxt(vcpu))
-> 			kvm_emulate_nested_eret(vcpu);
-> 
-> If we're doing an ERET from guest EL2, then we just emulate it,
-> because there is nothing else to do. Crucially, HFGITR_EL2.ERET
-> doesn't apply to EL2.
-> 
-> 		else
-> 			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> 
-> In any other case, we simply reinject the trap into the guest EL2,
-> because that's the only possible outcome. And that's what you were
-> missing.
-> 
-> 		return 1;
-> 	}
-> 	
+Hi Mickaël,
 
-Thanks, that makes sense now! I was forgetting about the crucial fact that
-HFGITR_EL2.ERET applies to EL1, which is !is_hyp_ctxt(), so we take the other
-branch.
+kernel test robot noticed the following build warnings:
 
-With that cleared up:
+[auto build test WARNING on d206a76d7d2726f3b096037f2079ce0bd3ba329b]
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/Micka-l-Sala-n/kunit-Run-tests-when-the-kernel-is-fully-setup/20240301-011020
+base:   d206a76d7d2726f3b096037f2079ce0bd3ba329b
+patch link:    https://lore.kernel.org/r/20240229170409.365386-9-mic%40digikod.net
+patch subject: [PATCH v1 8/8] kunit: Add tests for faults
+config: x86_64-randconfig-122-20240301 (https://download.01.org/0day-ci/archive/20240302/202403020418.NnNnFElm-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240302/202403020418.NnNnFElm-lkp@intel.com/reproduce)
 
-Thanks,
-Joey
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202403020418.NnNnFElm-lkp@intel.com/
 
-> 
-> > I need to find the time to get an NV setup set-up, so I can do some experiments
-> > myself.
-> 
-> The FVP should be a good enough environment if you can bare the
-> glacial speed. Other than that, I hear that QEMU has grown some NV
-> support lately, but I haven't tried it yet. HW-wise, M2 is the only
-> machine that can be bought by a human being (everything else is
-> vapourware, or they would have already taken my money).
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+sparse warnings: (new ones prefixed by >>)
+>> lib/kunit/kunit-test.c:142:11: sparse: sparse: symbol 'test_const' was not declared. Should it be static?
+
+vim +/test_const +142 lib/kunit/kunit-test.c
+
+   141	
+ > 142	const int test_const = 1;
+   143	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
