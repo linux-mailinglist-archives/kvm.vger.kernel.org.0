@@ -1,170 +1,124 @@
-Return-Path: <kvm+bounces-10693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D963D86EA88
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 21:44:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A056686ECB0
+	for <lists+kvm@lfdr.de>; Sat,  2 Mar 2024 00:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 666991F22E7E
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:44:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B92041C21F09
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 23:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519A83D555;
-	Fri,  1 Mar 2024 20:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2825EE84;
+	Fri,  1 Mar 2024 23:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aBXXhKeZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Twh2iKlL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6243D56E;
-	Fri,  1 Mar 2024 20:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0DC5EE6A
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 23:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709325835; cv=none; b=becFf1PZO0gPwnY5cYEsJOGynC+hb0uX78cy/+7xm+zgPxbduVWrhPdvCPhc5CWESmL294/0fkzQHcDefWMY/B2BvchUym1iTT/ADQ0f4DPwyxPZNJRMKrYLfpLbLc/eXWPcJ2aFWlqPPWkftKEen22nc5y6UWtdeem4AjtAYMw=
+	t=1709334552; cv=none; b=Sn6/Xfy5AvHS+qnPkZZcWhLUmmkju9Q8WGd2EcnHewD573cUZvMnkXfalcLnkO3lH4zdFQVeBWDuuOFTX112Mp8P5QxTQnSfE33htPhofDBpVEos2OxV/pTWj4bCIhgyGe0P2sxp7zKkLfgSg1X1od+bmIFU6067rAwoNNvOyDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709325835; c=relaxed/simple;
-	bh=51Uf3kFC58rOpYfAttq8+yZjSU49IWuNMuMSRyOitBw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=obe9CbXxpXD2VjdP3YQNXz+a9O1bH3of3gIAuZvWEtptcRYKUgeJQ0w0JPHDZVwS5T7MJ7MUxBIxHwQJanMw+kkQJpztneZWqta1KCzmLcu+is7LxC/jMsDo8ITZdkhx1sEb7EiUzaHQ3WL33yw+pf/lCBXP1SVRN47X0wwmJYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aBXXhKeZ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 421KgGrZ007039;
-	Fri, 1 Mar 2024 20:43:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=ydGBT0xPZvsFLbMhQUeawZ2Y0iiJGDIWTZi7AtGhAEo=;
- b=aBXXhKeZrsos35SSt9538sxBZB2uoAyeYL8Yd5KHbJYwd+cgvM6TrAK1l4G0WuLAT6pq
- 4bt7Cq0mqcBGP8IIJaip2k1ir1HGKJ9dFjuZsaYMnbGHu4HSISUaQUTftYlRqcEC377j
- vquigP28cVEWlmBIrYFhGLq+Yho5lrsNslyOX8wdRG3My2WxaBm/mXBhNyG8MOQx3N1J
- YKbsA5thm46cAHwQU0m6XXHRxeByBUUb9Od281GEmq3W9auq301wX8DDbTckG9tTo9RT
- Brj2EYgTmrK3W91SPrAzdcFiZGxcmOOPUapqywYP4MTLfF+OI/S9KS0dz6VWdoHTzaDs wQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wkp9mg0v6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Mar 2024 20:43:52 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 421KgYwQ008461;
-	Fri, 1 Mar 2024 20:43:52 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wkp9mg0ua-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Mar 2024 20:43:51 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 421IkkqE008852;
-	Fri, 1 Mar 2024 20:43:50 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wftsu77u8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Mar 2024 20:43:50 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 421Khjb83080870
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 1 Mar 2024 20:43:47 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 10C262004E;
-	Fri,  1 Mar 2024 20:43:45 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F0C2F2004B;
-	Fri,  1 Mar 2024 20:43:44 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  1 Mar 2024 20:43:44 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-	id 1EC51E01F3; Fri,  1 Mar 2024 21:43:44 +0100 (CET)
-From: Eric Farman <farman@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH] KVM: s390: vsie: retry SIE instruction on host intercepts
-Date: Fri,  1 Mar 2024 21:43:42 +0100
-Message-Id: <20240301204342.3217540-1-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1709334552; c=relaxed/simple;
+	bh=DxMwVVZpPHAjU+eOYaGF1/2G85jDOCsgnZ2MK7ig95M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KULiZfg/v2c2oNz6kfNT31pApHNDAtNeu1YiqX2L4HPKrCq7Kc1D2cJxLNvEOaYdKvyZOc3uQZs6inpEuUL5wq5cr0HrGFueWsV1290pd8WxsrLwyiNh8cDfG81IGMFblBqbvdOzbUMt30c5UQB3Bxv6I5P2wrxLI3ynB9U7hhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Twh2iKlL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709334549;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=34L2ffpp68JRHN28OPMs2fL29bGErHKbRkDZnmh3sOE=;
+	b=Twh2iKlL89REEhFKU6KsmnGNOSqTZIPpmwYpdKemG5Lujsi+dVhXz3vy5hVRZORKhvOI45
+	QTKYVVXP3Phc11cDoRhCMHanteufynNZOdIDWGYcsl91rfewpYyR1DE77BqVANTWBn3HIB
+	2DGGMrnDNWZ8qBgzEaxYj2SHieXthzg=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-456-mJgdQmU5NnqZmoD-kJ1Bjg-1; Fri, 01 Mar 2024 18:09:08 -0500
+X-MC-Unique: mJgdQmU5NnqZmoD-kJ1Bjg-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c7ba82fd11so227849539f.2
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 15:09:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709334547; x=1709939347;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=34L2ffpp68JRHN28OPMs2fL29bGErHKbRkDZnmh3sOE=;
+        b=I+aMOS+cHVwqyaGRv+3sp+MHeyMy29EEW1+XssFv1GM5483JIInoGVbgQqw9wz95uB
+         zzoV+OfnBrCBftHWL4g47oKdb6IcgsJzklnzAcf29R01z2+NfdWJQGfeAuS9UGbkE7Mp
+         5GNR4EKPQQaLMvs72HTQ/Hc7CVyovOyXCMzFlR1gAf3YXPrbb/iEpGDkP3cv8q469IJP
+         TBW1VH0RtWD9UIYpUoZS72jLP+qtivAc8zrjR6HjR3U/12vvIT/P1Gej02qT/n9M3cHQ
+         LK3+suVN6j5grV1njJFRdy/ijqp3LQfTgiFhBHdYu351bcDiwuhRK3rpVPpgvYVysMHx
+         Ezaw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9F1ZElMyohyoV18b/gKe1jfcVK2I1VHQ+kyJBTac4yePZYr/oQZzssnidBqOPYx3hXy9xn2fMP5CGFq5ONlrEu3PK
+X-Gm-Message-State: AOJu0YydGdHcK5z+7P8AA9ixvuzbT93xAQYaFJDYLWGng3AF/JPfBI9I
+	c18823bhnwyIFZ7q1RdSipTp4Sbcl58MXHTgG4s9DIGWG4QnoS4gZhpMWa3K3TTY3mMYlhZIe6Y
+	R0ZIjfoK20Ia0LDqPdJp7ZoRsT4FZQUmglrIWhSts802hCZ9A+w==
+X-Received: by 2002:a5d:9bca:0:b0:7c7:90e8:c2e7 with SMTP id d10-20020a5d9bca000000b007c790e8c2e7mr2907125ion.9.1709334547599;
+        Fri, 01 Mar 2024 15:09:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFf1dcCYWpkeVxj2OJs6FxuqhJjw0aL0rNKwpyTFd/MFzG9kEj+sgvi7zMB3hgGZvWhMQl6NQ==
+X-Received: by 2002:a5d:9bca:0:b0:7c7:90e8:c2e7 with SMTP id d10-20020a5d9bca000000b007c790e8c2e7mr2907112ion.9.1709334547277;
+        Fri, 01 Mar 2024 15:09:07 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id z24-20020a02ceb8000000b00474cb5264c2sm544127jaq.156.2024.03.01.15.09.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 15:09:06 -0800 (PST)
+Date: Fri, 1 Mar 2024 16:09:04 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Brett Creeley <brett.creeley@amd.com>
+Cc: <jgg@ziepe.ca>, <yishaih@nvidia.com>,
+ <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+ <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <shannon.nelson@amd.com>
+Subject: Re: [PATCH v2 vfio 0/2] vfio/pds: Fix and simplify resets
+Message-ID: <20240301160904.41162583.alex.williamson@redhat.com>
+In-Reply-To: <20240228003205.47311-1-brett.creeley@amd.com>
+References: <20240228003205.47311-1-brett.creeley@amd.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: T2rW6v16c8WURl6mAtP36kTM9_ZxtEte
-X-Proofpoint-ORIG-GUID: ESQEe1PhCChPZN1yuDW4R-wBLwYgv6uu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-01_21,2024-03-01_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- phishscore=0 mlxlogscore=900 priorityscore=1501 clxscore=1015 adultscore=0
- malwarescore=0 bulkscore=0 suspectscore=0 impostorscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2403010172
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-It's possible that SIE exits for work that the host needs to perform
-rather than something that is intended for the guest.
+On Tue, 27 Feb 2024 16:32:03 -0800
+Brett Creeley <brett.creeley@amd.com> wrote:
 
-A Linux guest will ignore this intercept code since there is nothing
-for it to do, but a more robust solution would rewind the PSW back to
-the SIE instruction. This will transparently resume the guest once
-the host completes its work, without the guest needing to process
-what is effectively a NOP and re-issue SIE itself.
+> This small series contains a fix and readability improvements for
+> resets.
+> 
+> v2:
+> - Split single patch into 2 patches
+> - Improve commit messages
+> 
+> v1:
+> https://lore.kernel.org/kvm/20240126183225.19193-1-brett.creeley@amd.com/
+> 
+> Brett Creeley (2):
+>   vfio/pds: Always clear the save/restore FDs on reset
+>   vfio/pds: Refactor/simplify reset logic
+> 
+>  drivers/vfio/pci/pds/pci_drv.c  |  2 +-
+>  drivers/vfio/pci/pds/vfio_dev.c | 14 +++++++-------
+>  drivers/vfio/pci/pds/vfio_dev.h |  7 ++++++-
+>  3 files changed, 14 insertions(+), 9 deletions(-)
+> 
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- arch/s390/kvm/vsie.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+Applied to vfio next branch for v6.9.  Thanks,
 
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index 8f0f944f81c2..63aae70a6790 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -1306,10 +1306,24 @@ static int vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 
- 		if (rc == -EAGAIN)
- 			rc = 0;
--		if (rc || scb_s->icptcode || signal_pending(current) ||
-+
-+		/*
-+		 * Exit the loop if the guest needs to process the intercept
-+		 */
-+		if (rc || scb_s->icptcode)
-+			break;
-+
-+		/*
-+		 * Exit the loop if the host needs to process an intercept,
-+		 * but rewind the PSW to re-enter SIE once that's completed
-+		 * instead of passing a "no action" intercept to the guest.
-+		 */
-+		if (signal_pending(current) ||
- 		    kvm_s390_vcpu_has_irq(vcpu, 0) ||
--		    kvm_s390_vcpu_sie_inhibited(vcpu))
-+		    kvm_s390_vcpu_sie_inhibited(vcpu)) {
-+			kvm_s390_rewind_psw(vcpu, 4);
- 			break;
-+		}
- 		cond_resched();
- 	}
- 
-@@ -1428,8 +1442,10 @@ int kvm_s390_handle_vsie(struct kvm_vcpu *vcpu)
- 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
- 
- 	if (signal_pending(current) || kvm_s390_vcpu_has_irq(vcpu, 0) ||
--	    kvm_s390_vcpu_sie_inhibited(vcpu))
-+	    kvm_s390_vcpu_sie_inhibited(vcpu)) {
-+		kvm_s390_rewind_psw(vcpu, 4);
- 		return 0;
-+	}
- 
- 	vsie_page = get_vsie_page(vcpu->kvm, scb_addr);
- 	if (IS_ERR(vsie_page))
--- 
-2.40.1
+Alex
 
 
