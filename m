@@ -1,191 +1,175 @@
-Return-Path: <kvm+bounces-10610-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10611-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 390E586DE8A
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 10:45:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D767386DEA1
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 10:52:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EB371C20B7C
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 09:45:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12A99B23C2B
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 09:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8922E6A8B9;
-	Fri,  1 Mar 2024 09:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBB76BB32;
+	Fri,  1 Mar 2024 09:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFP1sI1U"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="coZWtSlb"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAF26A32F
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 09:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2FB6A8C8
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 09:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709286321; cv=none; b=koXwSbmvQV8BFvtx1qrx8vXQSwh3HeYLiM2zDk1QKOJE5DYZb4mn8ILkDKT4qIumm1k1NabIKJOpUk7ZVhsRtySue+K8F/aW9KyUF/2lmBFk5gOckJw1SOFOIwQGNcfmN/cu9zQs1Bt0VJRFur2Dtr6V0RCjK11HzApT1SltYkk=
+	t=1709286756; cv=none; b=uXes/kTCOTjikKj1gbQQkkl0bgENkTc9kqPD4o7EF1dWZn1pvM5lb6eDLnfzU4I8SWaI4R7UG6l/jszjcJViAlMzrZ09QqWt1Rf2sM/f3sTLzFpNsNi6i3ixYOypK1q3+pktJtBDzQyE+ORaI0HWzvD0t1AYBWviOJHVrAHjjC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709286321; c=relaxed/simple;
-	bh=oe+STWzSHNFx92Ed5Z4M4cS3V7pEndT2r4nJ64v+428=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=JmnzZfuGY5aNNff14EpTQuiudVF/leM45aQiiYGMLoguUunIfATdByNj47fDPJeUQ3TUDEous+4InccBJT1md4VaflR3JDfRkbz9ZQlArW6gLU64Yd5PD9772R+EqGSgALo16cMUX5OsVUbgar6so7OT+WoDMIGDXc0/NS5M6uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CFP1sI1U; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709286318;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=4H0OYCm6hFlmx4RA0pYmYEJnMmqz3AUipl1jTzgwcLE=;
-	b=CFP1sI1U3F83Ba3udaL37d1uSFre97yDoWCs2NODQCOSog1P3B/7ktJOVDKHcxyXmNHQyQ
-	YVZgjyrKWB9bVWUrgMGUm9CiXw753NxvovvAd3da2YFpiADrE6Qlq0XwByH2JH/llWuwei
-	GqX9nRu0t67RRm5kmutmABtSBY3nC80=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-7Iwtx11ZP3iZ1IS0sMqgOQ-1; Fri, 01 Mar 2024 04:45:17 -0500
-X-MC-Unique: 7Iwtx11ZP3iZ1IS0sMqgOQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-787b8dd3330so499230485a.1
-        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 01:45:17 -0800 (PST)
+	s=arc-20240116; t=1709286756; c=relaxed/simple;
+	bh=O5SoYzfgteCQ6ALh9ZQ0QFHLP3C0R6ls6LeO2LAOIIM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ioxSFYFNSwxUfdb4LqHM9LB/4fJM1oEP9m/89wh8OKciGx0Qe0NzV9FviwlKXzzlxk31vE+ZCjQKKxTqHa65NlfZiG7yCYpNEOiIupbJxO5y58cGBlzPL5l+PlMQ//P22jDZus/Y+rfzVtP1JKgKBwaA3Ko2vZ7xD3GvLZX3c7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=coZWtSlb; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a446478b04bso168710666b.3
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 01:52:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1709286753; x=1709891553; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j9QHyWahfs9gCWf7uMaefOcLnvNGoebBSGi+N5cc4JQ=;
+        b=coZWtSlbLcar5hxTRopmsCqRZPL+6bX1HJWD97ntHVwgTwgLjoce/2QfC99qy92a16
+         BaC+aObyeOQCbLhizP0aJUmfCkRdyVh5cpnXXxLw+htQONdKaP8rvAMvoL90jK/wH/ue
+         2JyUf0UHrW7xX1UppkxyUboOttCC9xrC94m/ch343qPLroXuu/75rO1NqdZMEfL9y4/C
+         4u8TqVQZEPDVDjppnCKHH6NIpBhLjRugeY0pwevbygp1S6m+EcZO3dit0POmFhD/0QNU
+         8J1A9wyT0A3m5UyNrUxC7nrq1sFvNyVEJOx22LIyQfSjcJLmPbOIgcqFLdnpgCmkgQpu
+         l8dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709286317; x=1709891117;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4H0OYCm6hFlmx4RA0pYmYEJnMmqz3AUipl1jTzgwcLE=;
-        b=TDfSx7W8J0iUMNZJIZduMeogj9Jj5cV1oSLswPiQWyGen8EWyXxUYEx3alKw5zqSSH
-         hwaI9iCCQVLrvsOTFJsVu8dDRKHVYP3+C4zhk7NT/HyFQvHrafbzKQMsu8I0jiCywdQT
-         zjlY3Kz9/yWrOCVJm8IZUWN2n4ENTW2PHGekvkIoAH6it3QsQMpdp4u1OFt4HByQ2amc
-         MIHRNxYaSwjfjYwD5e+LUvMDWNrpAdy2P1DfO2Sal8swjD+BskGtIw1FHHOjHl2N/bir
-         d3G00qFJefV0LBhpc6LtiombhvlP+K8QqE7NNorhQ6R5ODF97sRDIxzsYLSkFTV213vi
-         IUrw==
-X-Forwarded-Encrypted: i=1; AJvYcCWK8MtNvrpWNIsN2Pq0z/GZYO1lNpbruCQXHacicoARX1j+MihAxc62gRY1X2UZoVZZfZecNYp9la4yzGx3NfoZMSIZ
-X-Gm-Message-State: AOJu0YwnWDe7Cs0YjX6cWuEyKPGdeEQqzq1wPSwX9Pk4SnZsAYbqewmt
-	0FdFORVoIb8M18OogB+pbDo8sUz8yhTnFosabGn8IDwpJ41H5FSOQhiZ+l79VvVE3tELUSlWejb
-	6Liys080V7M9bqxNk8z9GnATdvZgIHOCJX+S1OZo0AwATNsWXMg==
-X-Received: by 2002:a05:620a:b1c:b0:787:a2d2:d59b with SMTP id t28-20020a05620a0b1c00b00787a2d2d59bmr1364784qkg.26.1709286317063;
-        Fri, 01 Mar 2024 01:45:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH3ZGmrG95zUVRhKvl+Z3Z4TCBmcrBRud34bZ7otTXr0OO1dnrorQHaOC3fDp3qa8laUrQPzw==
-X-Received: by 2002:a05:620a:b1c:b0:787:a2d2:d59b with SMTP id t28-20020a05620a0b1c00b00787a2d2d59bmr1364774qkg.26.1709286316816;
-        Fri, 01 Mar 2024 01:45:16 -0800 (PST)
-Received: from [192.168.0.9] (ip-109-43-178-133.web.vodafone.de. [109.43.178.133])
-        by smtp.gmail.com with ESMTPSA id g4-20020a05620a40c400b0078783b32229sm1491763qko.7.2024.03.01.01.45.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Mar 2024 01:45:16 -0800 (PST)
-Message-ID: <f659964b-da95-4339-9d4f-c7b6a72fbac0@redhat.com>
-Date: Fri, 1 Mar 2024 10:45:12 +0100
+        d=1e100.net; s=20230601; t=1709286753; x=1709891553;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j9QHyWahfs9gCWf7uMaefOcLnvNGoebBSGi+N5cc4JQ=;
+        b=UDPzUgmlAtzMO7ymlzG6RRf2NyXFRO/UWtdrYp+MNx7qjuw+NKxKy3NP0pbC3tShxE
+         UkNsBr9csIGlLA2UJzATPUVUxlCZRxJlJRwUumaqCDAs0n6clxFq3RNC0R+Ycb7ywjPk
+         xX/Inn+1x3nUA94uLj4Aq4PwWPb5w5tNqzZKrv2S+FmAwKBEpfNoWMnir7ufxm2+JvOQ
+         D+Cb6f8fSwROukDI+eGHrwEyXGXgkYtrivGhUGraUtq9TSTSIwVxWzUbdVC93XzwpymZ
+         KtLKYbnlluxt9TDlabsgS4hx/OWcHKE9TTNgaSrGuUnMbMbNyXuN1ONEZR+QVC03p1Hk
+         hwbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWipVLYNhJG/NiItZ2Rr1KskuzG+cqL/Qys/KKt1BAwf/DQInogVQi53+8xiczYp2mT+/o6++AH0of7UoNIOH1Tti1U
+X-Gm-Message-State: AOJu0YyvFmpQl0rWX0fKGPh+xWyjIj+QX9aJ6kaZt6R7lVkpwOF4li0f
+	EJEuzvWjDYQ/NWt5Pd8TDzJeDUnTp43GmtNXoxCOqhmn33qOiYy9zEgraVEGRxo=
+X-Google-Smtp-Source: AGHT+IFFb5bzOks+lqs/185Lu0au521O/ZsFgW4Nrk2H88MGDv0vRN/r6X3wkkf9qeHNHigHYwOjLA==
+X-Received: by 2002:a17:906:a197:b0:a43:af0b:c1c0 with SMTP id s23-20020a170906a19700b00a43af0bc1c0mr980628ejy.16.1709286753092;
+        Fri, 01 Mar 2024 01:52:33 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id vu2-20020a170907a64200b00a43bf7ef577sm1535120ejc.188.2024.03.01.01.52.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 01:52:32 -0800 (PST)
+Date: Fri, 1 Mar 2024 10:52:31 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Conor Dooley <conor.dooley@microchip.com>, Anup Patel <anup@brainfault.org>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, Icenowy Zheng <uwu@icenowy.me>, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 03/15] drivers/perf: riscv: Read upper bits of a
+ firmware counter
+Message-ID: <20240301-36ababe3e198d3d7573f316e@orel>
+References: <20240229010130.1380926-1-atishp@rivosinc.com>
+ <20240229010130.1380926-4-atishp@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 03/32] powerpc: Fix stack backtrace
- termination
-Content-Language: en-US
-From: Thomas Huth <thuth@redhat.com>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
- <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
- Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org
-References: <20240226101218.1472843-1-npiggin@gmail.com>
- <20240226101218.1472843-4-npiggin@gmail.com>
- <94491aab-b252-4590-b2a7-7a581297606f@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <94491aab-b252-4590-b2a7-7a581297606f@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229010130.1380926-4-atishp@rivosinc.com>
 
-On 27/02/2024 09.50, Thomas Huth wrote:
-> On 26/02/2024 11.11, Nicholas Piggin wrote:
->> The backtrace handler terminates when it sees a NULL caller address,
->> but the powerpc stack setup does not keep such a NULL caller frame
->> at the start of the stack.
->>
->> This happens to work on pseries because the memory at 0 is mapped and
->> it contains 0 at the location of the return address pointer if it
->> were a stack frame. But this is fragile, and does not work with powernv
->> where address 0 contains firmware instructions.
->>
->> Use the existing dummy frame on stack as the NULL caller, and create a
->> new frame on stack for the entry code.
->>
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->>   powerpc/cstart64.S | 12 ++++++++++--
->>   1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> Thanks for tackling this! ... however, not doing powerpc work since years 
-> anymore, I have some ignorant questions below...
-> 
->> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
->> index e18ae9a22..14ab0c6c8 100644
->> --- a/powerpc/cstart64.S
->> +++ b/powerpc/cstart64.S
->> @@ -46,8 +46,16 @@ start:
->>       add    r1, r1, r31
->>       add    r2, r2, r31
->> +    /* Zero backpointers in initial stack frame so backtrace() stops */
->> +    li    r0,0
->> +    std    r0,0(r1)
-> 
-> 0(r1) is the back chain pointer ...
-> 
->> +    std    r0,16(r1)
-> 
-> ... but what is 16(r1) ? I suppose that should be the "LR save word" ? But 
-> isn't that at 8(r1) instead?? (not sure whether I'm looking at the right ELF 
-> abi spec right now...)
+On Wed, Feb 28, 2024 at 05:01:18PM -0800, Atish Patra wrote:
+> SBI v2.0 introduced a explicit function to read the upper 32 bits
+> for any firmwar counter width that is longer than 32bits.
 
-Ok, I was looking at the wrong ELF spec, indeed (it was an ancient 32-bit 
-spec, not the 64-bit ABI). Sorry for the confusion. Having a proper #define 
-or a comment for the 16 here would still be helpful, though.
+firmware
 
-  Thomas
+> This is only applicable for RV32 where firmware counter can be
+> 64 bit.
+> 
+> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> Reviewed-by: Anup Patel <anup@brainfault.org>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  drivers/perf/riscv_pmu_sbi.c | 20 ++++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> index 16acd4dcdb96..ea0fdb589f0d 100644
+> --- a/drivers/perf/riscv_pmu_sbi.c
+> +++ b/drivers/perf/riscv_pmu_sbi.c
+> @@ -35,6 +35,8 @@
+>  PMU_FORMAT_ATTR(event, "config:0-47");
+>  PMU_FORMAT_ATTR(firmware, "config:63");
+>  
+> +static bool sbi_v2_available;
+> +
+>  static struct attribute *riscv_arch_formats_attr[] = {
+>  	&format_attr_event.attr,
+>  	&format_attr_firmware.attr,
+> @@ -488,16 +490,23 @@ static u64 pmu_sbi_ctr_read(struct perf_event *event)
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	int idx = hwc->idx;
+>  	struct sbiret ret;
+> -	union sbi_pmu_ctr_info info;
+>  	u64 val = 0;
+> +	union sbi_pmu_ctr_info info = pmu_ctr_list[idx];
+>  
+>  	if (pmu_sbi_is_fw_event(event)) {
+>  		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ,
+>  				hwc->idx, 0, 0, 0, 0, 0);
+> -		if (!ret.error)
+> -			val = ret.value;
+> +		if (ret.error)
+> +			return 0;
+> +
+> +		val = ret.value;
+> +		if (IS_ENABLED(CONFIG_32BIT) && sbi_v2_available && info.width >= 32) {
+> +			ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ_HI,
+> +					hwc->idx, 0, 0, 0, 0, 0);
+> +			if (!ret.error)
+
+Getting an error here indicates a buggy SBI. Maybe we should have a
+warn-once?
+
+> +				val |= ((u64)ret.value << 32);
+> +		}
+>  	} else {
+> -		info = pmu_ctr_list[idx];
+>  		val = riscv_pmu_ctr_read_csr(info.csr);
+>  		if (IS_ENABLED(CONFIG_32BIT))
+>  			val = ((u64)riscv_pmu_ctr_read_csr(info.csr + 0x80)) << 31 | val;
+> @@ -1108,6 +1117,9 @@ static int __init pmu_sbi_devinit(void)
+>  		return 0;
+>  	}
+>  
+> +	if (sbi_spec_version >= sbi_mk_version(2, 0))
+> +		sbi_v2_available = true;
+> +
+>  	ret = cpuhp_setup_state_multi(CPUHP_AP_PERF_RISCV_STARTING,
+>  				      "perf/riscv/pmu:starting",
+>  				      pmu_sbi_starting_cpu, pmu_sbi_dying_cpu);
+> -- 
+> 2.34.1
+>
+
+Either way,
+
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
 
