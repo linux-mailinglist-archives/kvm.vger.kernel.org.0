@@ -1,183 +1,140 @@
-Return-Path: <kvm+bounces-10678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D977C86E948
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:14:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44EAA86E953
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:16:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 097281C25344
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 19:14:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F08B8289128
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 19:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64C03A292;
-	Fri,  1 Mar 2024 19:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0183AC19;
+	Fri,  1 Mar 2024 19:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjD/gQtE"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="ekdE8C1Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D56737160;
-	Fri,  1 Mar 2024 19:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C309739AEA
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 19:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709320444; cv=none; b=kK8EyClij96rSxNKVA/Vtr34bnwCnaHlAqw/+cY0b8bK3SmaZzA4N8FF5RdZffvBBBnbNdcpIFcnP6qKYUAjXRWa6AiF22+LitBWSpfrRXlfMAPCfnhpxPRLMLmeFgyfVOe8qPb6/Q+3xHLoUrV6ULJUQAQdnIb1+DaABeb0aEY=
+	t=1709320588; cv=none; b=L7J9BLST02NVxJlDeynhc3jJZKyZBDS2qTT0kIjKMOAFvAPtGPbig0YkfXQ7xSHVItkD67uWhLkYqe89cbGo6ungdWQO7x7P/w7miI/fmma1uuDmFSw3SJTTFkGpQ9yeBcSWwCeGpUWGhQMtFuEYVm0Hk062o82sGuPArPlu234=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709320444; c=relaxed/simple;
-	bh=G6RwsnJujCGZ67YrDrQYHLQoE1KXq3LL5931ik8TiVo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ye2U0hEQQAu73j8KdYrDlc4AEuJ9n3X5UbZhX2VjLIW9DXwByDLxiCHK11qKOPnSJFTAqB3bJ9G0KDkzD4uHQFKA30RA7278fASUWJ1CSN6199bW2qEPak7rGIhAQ3BxmswifQ+YJVl7CqAfYOWV8DEWyjFksRaTDxj8g3mEh6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjD/gQtE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B769C433C7;
-	Fri,  1 Mar 2024 19:14:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709320443;
-	bh=G6RwsnJujCGZ67YrDrQYHLQoE1KXq3LL5931ik8TiVo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kjD/gQtErWVyXc6zRpJZiD9pseQVm/52FreVVqQ9czqKNedDcJc7vTW7vQaanBFNL
-	 elVQCJqJU375Mp/p+bTPK6hgf1nxcVj6vgooMtH97YKfw3XkmPLch5ofZFRrL9vUdu
-	 dBF3Nf/zK7lP8og3M0gN8cmstnWYa+3CmdX/wkrMPFJ5ohYRZgUHDLe36pvPYK6Y0d
-	 QckoSBk11lZFDwr1+S8wrjnrniXDRYyZNe9LytWurb6q4tpBxuV+OO/wwQLAFYNG9S
-	 7h+h23pN1Me/iCjp7/iQi5JU4TT+B9ToiPoTFwyyMBGNMDaP/jQvvPZiII+Y74s6e/
-	 vMR6J4JIfGkWA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rg8KX-008buY-6I;
-	Fri, 01 Mar 2024 19:14:01 +0000
-Date: Fri, 01 Mar 2024 19:14:00 +0000
-Message-ID: <861q8t3guf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 07/13] KVM: arm64: nv: Honor HFGITR_EL2.ERET being set
-In-Reply-To: <20240301180734.GA3958355@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
-	<20240226100601.2379693-8-maz@kernel.org>
-	<20240301180734.GA3958355@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1709320588; c=relaxed/simple;
+	bh=Q7fU6Ub3q+6YxoCBFaoEp7a/GqkOwDsLuYbxuGhGrJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kehAcMP1lKuM7LL+DpsX5fxZmnpQixZ+ZfiQVuUILrUs8ix3jnmv2DJ3Tr4WXziMA8Mk6ACd71U4dYWUY11Em1KxAlVR9pKt8XOMvNvlSkzbTc/mTJqZYCmSbFSQeL7tkNFhQyZ71duplmeMhClk47+Dwfvq2KNjuXbsHZmUMZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=ekdE8C1Y; arc=none smtp.client-ip=45.157.188.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tmd9Y1VK2zXyj;
+	Fri,  1 Mar 2024 20:16:17 +0100 (CET)
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tmd9W6JqCzpmw;
+	Fri,  1 Mar 2024 20:16:15 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1709320577;
+	bh=Q7fU6Ub3q+6YxoCBFaoEp7a/GqkOwDsLuYbxuGhGrJY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ekdE8C1Ycehc5cU0FFdPBLOQIWYuuwCoAVIcd6blq2ECeRFY83hIegduUPkzETJSJ
+	 1aED213nnnjEoQbHieGvuKeSAmm8UB1bPBZPlrobr+nQOfkOfTvxMUACoi0q1XEtyO
+	 1h134Jafh7/zywAVozq8HQY0K0a+ZnyoDROUVHAo=
+Date: Fri, 1 Mar 2024 20:16:05 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Kees Cook <keescook@chromium.org>
+Cc: Brendan Higgins <brendanhiggins@google.com>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Alan Maguire <alan.maguire@oracle.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	James Morris <jamorris@linux.microsoft.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marco Pagani <marpagan@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Thara Gopinath <tgopinath@microsoft.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>, Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org
+Subject: Re: [PATCH v1 8/8] kunit: Add tests for faults
+Message-ID: <20240301.aekiung2aL7K@digikod.net>
+References: <20240229170409.365386-1-mic@digikod.net>
+ <20240229170409.365386-9-mic@digikod.net>
+ <202402291027.6F0E4994@keescook>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <202402291027.6F0E4994@keescook>
+X-Infomaniak-Routing: alpha
 
-Hi Joey,
+On Thu, Feb 29, 2024 at 10:28:18AM -0800, Kees Cook wrote:
+> On Thu, Feb 29, 2024 at 06:04:09PM +0100, Mickaël Salaün wrote:
+> > The first test checks NULL pointer dereference and make sure it would
+> > result as a failed test.
+> > 
+> > The second and third tests check that read-only data is indeed read-only
+> > and trying to modify it would result as a failed test.
+> > 
+> > This kunit_x86_fault test suite is marked as skipped when run on a
+> > non-x86 native architecture.  It is then skipped on UML because such
+> > test would result to a kernel panic.
+> > 
+> > Tested with:
+> > ./tools/testing/kunit/kunit.py run --arch x86_64 kunit_x86_fault
+> > 
+> > Cc: Brendan Higgins <brendanhiggins@google.com>
+> > Cc: David Gow <davidgow@google.com>
+> > Cc: Rae Moar <rmoar@google.com>
+> > Cc: Shuah Khan <skhan@linuxfoundation.org>
+> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
+> 
+> If we can add some way to collect WARN/BUG output for examination, I
+> could rewrite most of LKDTM in KUnit! I really like this!
 
-On Fri, 01 Mar 2024 18:07:34 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+Thanks!  About the WARN/BUG examination, I guess the easier way would be
+to do in in user space by extending kunit_parser.py.
+
 > 
-> Got a question about this one,
-> 
-> On Mon, Feb 26, 2024 at 10:05:55AM +0000, Marc Zyngier wrote:
-> > If the L1 hypervisor decides to trap ERETs while running L2,
-> > make sure we don't try to emulate it, just like we wouldn't
-> > if it had its NV bit set.
-> > 
-> > The exception will be reinjected from the core handler.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/hyp/vhe/switch.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >  lib/kunit/kunit-test.c | 115 ++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 114 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index eaf242b8e0cf..3ea9bdf6b555 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -220,7 +220,8 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  	 * Unless the trap has to be forwarded further down the line,
-> >  	 * of course...
-> >  	 */
-> > -	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-> > +	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
-> > +	    (__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET))
-> >  		return false;
+> > diff --git a/lib/kunit/kunit-test.c b/lib/kunit/kunit-test.c
+> > index f7980ef236a3..57d8eff00c66 100644
+> > --- a/lib/kunit/kunit-test.c
+> > +++ b/lib/kunit/kunit-test.c
+> > @@ -10,6 +10,7 @@
+> >  #include <kunit/test-bug.h>
 > >  
-> >  	spsr = read_sysreg_el1(SYS_SPSR);
+> >  #include <linux/device.h>
+> > +#include <linux/init.h>
+> >  #include <kunit/device.h>
+> >  
+> >  #include "string-stream.h"
+> > @@ -109,6 +110,117 @@ static struct kunit_suite kunit_try_catch_test_suite = {
+> >  	.test_cases = kunit_try_catch_test_cases,
+> >  };
+> >  
+> > +#ifdef CONFIG_X86
 > 
-> Are we missing a forward_traps() call in kvm_emulated_nested_eret() for the
-> HFGITR case?
-> 
-> Trying to follow the code path here, and I'm unsure of where else the
-> HFIGTR_EL2_ERET trap would be forwarded:
-> 
-> kvm_arm_vcpu_enter_exit ->
-> 	ERET executes in guest
-> 	fixup_guest_exit ->
-> 		kvm_hyp_handle_eret (returns false)
-> 
-> handle_exit ->
-> 	kvm_handle_eret ->
-> 		kvm_emulated_nested_eret
-> 			if HCR_NV
-> 				forward traps
-> 			else
-> 				emulate ERET
+> Why is this x86 specific?
 
-There's a bit more happening in kvm_handle_eret().
+Because I didn't test on other architecture, and it looks it crashed on
+arm64. :)
+
+I'll test on arm64 and change this condition with !CONFIG_UML.
 
 > 
+> -- 
+> Kees Cook
 > 
-> And if the answer is that it is being reinjected somewhere, putting that
-> function name in the commit instead of 'core handler' would help with
-> understanding!
-
-Let's look at the code:
-
-	static int kvm_handle_eret(struct kvm_vcpu *vcpu)
-	{
-		[...]
-	
-		if (is_hyp_ctxt(vcpu))
-			kvm_emulate_nested_eret(vcpu);
-
-If we're doing an ERET from guest EL2, then we just emulate it,
-because there is nothing else to do. Crucially, HFGITR_EL2.ERET
-doesn't apply to EL2.
-
-		else
-			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-
-In any other case, we simply reinject the trap into the guest EL2,
-because that's the only possible outcome. And that's what you were
-missing.
-
-		return 1;
-	}
-	
-
-> I need to find the time to get an NV setup set-up, so I can do some experiments
-> myself.
-
-The FVP should be a good enough environment if you can bare the
-glacial speed. Other than that, I hear that QEMU has grown some NV
-support lately, but I haven't tried it yet. HW-wise, M2 is the only
-machine that can be bought by a human being (everything else is
-vapourware, or they would have already taken my money).
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
