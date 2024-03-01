@@ -1,220 +1,501 @@
-Return-Path: <kvm+bounces-10652-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10653-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C3486E327
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 15:17:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBA3786E38B
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 15:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B105B22D6A
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 14:17:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79B1F1F22A8B
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 14:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378C06F069;
-	Fri,  1 Mar 2024 14:17:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F0D442A;
+	Fri,  1 Mar 2024 14:40:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cRjw51WL"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="CvsaHZ1P"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00B46EF16
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 14:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2BA23DE
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 14:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709302650; cv=none; b=tS9D8MUokiJzLIFrzyx40HEpZOollAo1wIeIICubW2EqswDtPfZiE/DMJ4eW7O/9iRjAgKM11BITHYjYNVybnUU7kAyMD1dObgF1ER9phqOF+XNZmzNTbM7zT/lOff0zwoTpSk4TfI5bxUdQ6RM2Xm4j6wzfCJ5l2A5DNmc7BuM=
+	t=1709304049; cv=none; b=M/IJQW3spiWRSG985DgB4Xzg0oKQQmU6Q8fUdeRHoBDG1Mk7tg03oqRTnTtDcqHJsO5B1n/IKWvhmivBtzrGh8TJJ3un50sIVds/fG4KjKaGnA3mmx1p20MKYMlaiF2GvR83ToSnScTozF+sKLrGBUKkHfeaXKIp9kaoOXy1KPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709302650; c=relaxed/simple;
-	bh=Ztkom19pCAZHVqWszjHoKU89VmzVueUiZKhec6ViPF0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CebUDIK1ytU59KP3NDqroJnN6/PkAt7eBmhOgNehbSbi8i8TFDxIfOrHl3xZXDnLTfMgI9sGMM88dsgqCiDv8VFKv1QJhCqDNqh/PrfjmntrfZNc66wHSndp0qomcF7kBXx9GPxt6+0EyMku5uAEgqRGobwuBLqzezkC/X/E/EM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cRjw51WL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709302647;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=XdQRoYuLB946J0e/mSqK86GZ+TUT5MWy9cpEWLnkJE0=;
-	b=cRjw51WLB8hFjxyYPB1RnJa+yeIACAT23CpdqDcUq05ooRB6fZoh4X6A3PWW+f/u97IWCj
-	VEf38edFvFuKLZ2NEFvE8EbzcnD/3vWy2XcAyBHjUsjp1LwfEORm7NyGSD1P6onAIJJJYd
-	dH3HwAaWDbtT4TX0Cqpg9W/siv5TkrY=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-464-GoxmtpdLMk-Qa4PmONUvRQ-1; Fri, 01 Mar 2024 09:17:26 -0500
-X-MC-Unique: GoxmtpdLMk-Qa4PmONUvRQ-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-42ed2deb055so1508601cf.3
-        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 06:17:24 -0800 (PST)
+	s=arc-20240116; t=1709304049; c=relaxed/simple;
+	bh=WMSw5cE6yzpZ/oWRNSEpaFg92NKoKbCJGdB3z7DqFZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WNEypQ5YDUVGrlWKafaLW9HTAcDmfkoMWCCzppe3ab+e3u70CtLRSB3pg16PadJLC+aKrogvfv0nZEOKaslhA/gPg2EaJT+h+P1Z9aCB+KDHk7WlnqwhNLEydNzTkqYsJrIbq7XFNfJj7HLCSo6/cWW51j2aFR3rYvl6QKzLRUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=CvsaHZ1P; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-33d32f74833so1237731f8f.3
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 06:40:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1709304044; x=1709908844; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/fH9e4Y+5VSjP/Y4cR8MCnV8KGx8N82MLsMiROFh7zo=;
+        b=CvsaHZ1PdE3b02RO7Ftl9n1EuxN+/jq1XS4KjJpeLJmPQVbVUI/2RGl0CbgAYvwzMN
+         +0HfgJ2jEQtkGSn9rhwxyVgQ2tNVYif44Kk77KWNorfvWcBwWGEq+cxCDd0JmPqOWRAG
+         9mPFFIheBxAAuOf2VmhoSe7GI8kRz6PyY1At3LkPoRYNJbs4sdqv1ndw2S8KWagzWmbi
+         fx6OeA0B+hR93mcGGoNb+Rx2mKHgRra4/vK9Ba3rCc55qVoZ4G/eRcaENC1Yv2weaeOC
+         brCINGBfqahpjot8IppGAmZ9NMS8B4er9+DMsohjREDMj1crSOGuUVgzZ0MdFWdqe6f9
+         J5Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709302624; x=1709907424;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XdQRoYuLB946J0e/mSqK86GZ+TUT5MWy9cpEWLnkJE0=;
-        b=Y/kQ7+55N0m3HJktMMUcPfam+9sD2EuBBXHA9pxeysDHKJnpUOZOHT8e+wCiPwgOAJ
-         x+18B/5C0tSfdyy2Z8d2wJYUEAN2JlOJ3aXDy5K94jWHw9b8dm5ZGswq6e8u2nDguMrC
-         WgGayOrhv7sS6G6f+hW3xSi5ViYAHkQqDV3DIak3kuXGLGyGnCcLhvPK6vnSStpJyces
-         wgN7rep8zjlIHwxjoXgBunN0tBf4RSEWJUTnWQFxe4pQZMTpZeTLOEsyx+iE715a3s1E
-         hQEKX/L7nmEnYa3ivBgj5QzMMV+qcPWh7wGndhxHKn8U+/FvrmvNCbvt6gHjNZtQ8H1a
-         ZZIA==
-X-Gm-Message-State: AOJu0YwyuAHRGM9jLcVQtcIPFrHr0+9lrWnrsx0l1lILICsOHE3qaPP9
-	agLCAOCuGSi0vLRIEBVEwXGqBdPFrkuDrEKqHMCxBkhMX1JcHmU7/GW5T4enVGeiGeNh45756b7
-	FzkhjP5lfdlzKHt6gMwMf92slmeY4b2EiNPSAr/bBWNUs6HvarQ==
-X-Received: by 2002:ac8:58d4:0:b0:42e:5ca9:2523 with SMTP id u20-20020ac858d4000000b0042e5ca92523mr2162811qta.14.1709302624133;
-        Fri, 01 Mar 2024 06:17:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHd1p4x+eIknKnCjYBxDqw76/dMFzvB9PlIFhReZzffFgOlMi9dq+iai/fH1zysfbXulhw3Zg==
-X-Received: by 2002:ac8:58d4:0:b0:42e:5ca9:2523 with SMTP id u20-20020ac858d4000000b0042e5ca92523mr2162786qta.14.1709302623858;
-        Fri, 01 Mar 2024 06:17:03 -0800 (PST)
-Received: from [192.168.0.9] (ip-109-43-178-133.web.vodafone.de. [109.43.178.133])
-        by smtp.gmail.com with ESMTPSA id c12-20020a05620a134c00b00787ae919d02sm1676317qkl.17.2024.03.01.06.17.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Mar 2024 06:17:03 -0800 (PST)
-Message-ID: <7783977b-69ea-4831-a8f2-55de26d7bfd4@redhat.com>
-Date: Fri, 1 Mar 2024 15:16:59 +0100
+        d=1e100.net; s=20230601; t=1709304044; x=1709908844;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/fH9e4Y+5VSjP/Y4cR8MCnV8KGx8N82MLsMiROFh7zo=;
+        b=xQu7G/qrlzkmMM5NJpgdnWELsCjOe52XdkFc0MpoAY10d2jFPvoXzlV4YaHg2o1jKW
+         uK0QwoAXQ0IRRsHBpZYYNKIm7xc0fGWxJ8osWBCuzWSErc+zPuqN4jjhE6zoH1MlKVKU
+         eCFWtonSMgpiuNtUMHQeQ2FRTEEmuYZlAZ5MBLMq1nNYDjW57ae7hN3FcsfvkiRLxZRL
+         A3obEeJAbBUuCHStNfCp6SomkNC7rV0Y3/PKolM3Cr7GDvdm4c/1L6wUUTMDQtGaGkdU
+         Is+KY1BzoLjAbqz4L4bcJ7waxuJmogrxBj2h9QWZeE3zT6SohKEkPwuptUsMutD6Rwsb
+         2JuA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9z6DXmHY2uMnVNiC6HD8DvAsLx0mtGoKTXJZg8vr67rj8zH+kRBjTz5BelV/accSlWYu6M75ljJB1OT9Fe0rpQr3Z
+X-Gm-Message-State: AOJu0Ywkc4S8v+cggaX8mw9wNroHwc1aRM7drihVy7fEwmF2oApUHTMw
+	uJ1WF5VizePM2C0cuUqxGVAwo5OlE3UBQoB53QHg0U5A81cNPRd4fdDUKPwcv8I=
+X-Google-Smtp-Source: AGHT+IFYJjdmIlrg4fK3WoCRNzoK5W1dEpib8k88k8LxEH9B8Q+MpB4/nMVejEIsAdEv356F0HcTVw==
+X-Received: by 2002:a5d:550c:0:b0:33e:cc6:e6b5 with SMTP id b12-20020a5d550c000000b0033e0cc6e6b5mr1492380wrv.23.1709304044512;
+        Fri, 01 Mar 2024 06:40:44 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id co24-20020a0560000a1800b0033da4b06632sm4870668wrb.6.2024.03.01.06.40.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 06:40:44 -0800 (PST)
+Date: Fri, 1 Mar 2024 15:40:43 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Anup Patel <anup@brainfault.org>, Conor Dooley <conor.dooley@microchip.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, Icenowy Zheng <uwu@icenowy.me>, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 05/15] drivers/perf: riscv: Implement SBI PMU snapshot
+ function
+Message-ID: <20240301-9587f1bcaa6b25b1dcc7062e@orel>
+References: <20240229010130.1380926-1-atishp@rivosinc.com>
+ <20240229010130.1380926-6-atishp@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 6/7] gitlab-ci: Run migration selftest on
- s390x and powerpc
-Content-Language: en-US
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
- Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Marc Hartmayer
- <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org
-References: <20240226093832.1468383-1-npiggin@gmail.com>
- <20240226093832.1468383-7-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240226093832.1468383-7-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229010130.1380926-6-atishp@rivosinc.com>
 
-On 26/02/2024 10.38, Nicholas Piggin wrote:
-> The migration harness is complicated and easy to break so CI will
-> be helpful.
+On Wed, Feb 28, 2024 at 05:01:20PM -0800, Atish Patra wrote:
+> SBI v2.0 SBI introduced PMU snapshot feature which adds the following
+> features.
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> 1. Read counter values directly from the shared memory instead of
+> csr read.
+> 2. Start multiple counters with initial values with one SBI call.
+> 
+> These functionalities optimizes the number of traps to the higher
+> privilege mode. If the kernel is in VS mode while the hypervisor
+> deploy trap & emulate method, this would minimize all the hpmcounter
+> CSR read traps. If the kernel is running in S-mode, the benefits
+> reduced to CSR latency vs DRAM/cache latency as there is no trap
+> involved while accessing the hpmcounter CSRs.
+> 
+> In both modes, it does saves the number of ecalls while starting
+> multiple counter together with an initial values. This is a likely
+> scenario if multiple counters overflow at the same time.
+> 
+> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+> Reviewed-by: Anup Patel <anup@brainfault.org>
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
 > ---
->   .gitlab-ci.yml | 18 +++++++++++-------
->   1 file changed, 11 insertions(+), 7 deletions(-)
+>  drivers/perf/riscv_pmu.c       |   1 +
+>  drivers/perf/riscv_pmu_sbi.c   | 209 +++++++++++++++++++++++++++++++--
+>  include/linux/perf/riscv_pmu.h |   6 +
+>  3 files changed, 204 insertions(+), 12 deletions(-)
 > 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 71d986e98..61f196d5d 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -64,26 +64,28 @@ build-arm:
->   build-ppc64be:
->    extends: .outoftree_template
->    script:
-> - - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
-> + - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
->    - mkdir build
->    - cd build
->    - ../configure --arch=ppc64 --endian=big --cross-prefix=powerpc64-linux-gnu-
->    - make -j2
->    - ACCEL=tcg ./run_tests.sh
-> -     selftest-setup spapr_hcall rtas-get-time-of-day rtas-get-time-of-day-base
-> -     rtas-set-time-of-day emulator
-> +     selftest-setup selftest-migration selftest-migration-skip spapr_hcall
-> +     rtas-get-time-of-day rtas-get-time-of-day-base rtas-set-time-of-day
-> +     emulator
->        | tee results.txt
->    - if grep -q FAIL results.txt ; then exit 1 ; fi
->   
->   build-ppc64le:
->    extends: .intree_template
->    script:
-> - - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
-> + - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
->    - ./configure --arch=ppc64 --endian=little --cross-prefix=powerpc64-linux-gnu-
->    - make -j2
->    - ACCEL=tcg ./run_tests.sh
-> -     selftest-setup spapr_hcall rtas-get-time-of-day rtas-get-time-of-day-base
-> -     rtas-set-time-of-day emulator
-> +     selftest-setup selftest-migration selftest-migration-skip spapr_hcall
-> +     rtas-get-time-of-day rtas-get-time-of-day-base rtas-set-time-of-day
-> +     emulator
->        | tee results.txt
->    - if grep -q FAIL results.txt ; then exit 1 ; fi
->   
-> @@ -107,7 +109,7 @@ build-riscv64:
->   build-s390x:
->    extends: .outoftree_template
->    script:
-> - - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu
-> + - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu nmap-ncat
->    - mkdir build
->    - cd build
->    - ../configure --arch=s390x --cross-prefix=s390x-linux-gnu-
-> @@ -133,6 +135,8 @@ build-s390x:
->         sclp-1g
->         sclp-3g
->         selftest-setup
-> +      selftest-migration
-> +      selftest-migration-skip
->         sieve
->         smp
->         stsi
+> diff --git a/drivers/perf/riscv_pmu.c b/drivers/perf/riscv_pmu.c
+> index 0dda70e1ef90..5b57acb770d3 100644
+> --- a/drivers/perf/riscv_pmu.c
+> +++ b/drivers/perf/riscv_pmu.c
+> @@ -412,6 +412,7 @@ struct riscv_pmu *riscv_pmu_alloc(void)
+>  		cpuc->n_events = 0;
+>  		for (i = 0; i < RISCV_MAX_COUNTERS; i++)
+>  			cpuc->events[i] = NULL;
+> +		cpuc->snapshot_addr = NULL;
+>  	}
+>  	pmu->pmu = (struct pmu) {
+>  		.event_init	= riscv_pmu_event_init,
+> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> index ea0fdb589f0d..8de5721e8019 100644
+> --- a/drivers/perf/riscv_pmu_sbi.c
+> +++ b/drivers/perf/riscv_pmu_sbi.c
+> @@ -36,6 +36,9 @@ PMU_FORMAT_ATTR(event, "config:0-47");
+>  PMU_FORMAT_ATTR(firmware, "config:63");
+>  
+>  static bool sbi_v2_available;
+> +static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
+> +#define sbi_pmu_snapshot_available() \
+> +	static_branch_unlikely(&sbi_pmu_snapshot_available)
+>  
+>  static struct attribute *riscv_arch_formats_attr[] = {
+>  	&format_attr_event.attr,
+> @@ -485,14 +488,100 @@ static int pmu_sbi_event_map(struct perf_event *event, u64 *econfig)
+>  	return ret;
+>  }
+>  
+> +static void pmu_sbi_snapshot_free(struct riscv_pmu *pmu)
+> +{
+> +	int cpu;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		struct cpu_hw_events *cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
+> +
+> +		if (!cpu_hw_evt->snapshot_addr)
+> +			continue;
+> +
+> +		free_page((unsigned long)cpu_hw_evt->snapshot_addr);
+> +		cpu_hw_evt->snapshot_addr = NULL;
+> +		cpu_hw_evt->snapshot_addr_phys = 0;
+> +	}
+> +}
+> +
+> +static int pmu_sbi_snapshot_alloc(struct riscv_pmu *pmu)
+> +{
+> +	int cpu;
+> +	struct page *snapshot_page;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		struct cpu_hw_events *cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
+> +
+> +		if (cpu_hw_evt->snapshot_addr)
+> +			continue;
+> +
+> +		snapshot_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
+> +		if (!snapshot_page) {
+> +			pmu_sbi_snapshot_free(pmu);
+> +			return -ENOMEM;
+> +		}
+> +		cpu_hw_evt->snapshot_addr = page_to_virt(snapshot_page);
+> +		cpu_hw_evt->snapshot_addr_phys = page_to_phys(snapshot_page);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void pmu_sbi_snapshot_disable(void)
+> +{
+> +	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM, -1,
+> +		  -1, 0, 0, 0, 0);
+> +}
+> +
+> +static int pmu_sbi_snapshot_setup(struct riscv_pmu *pmu, int cpu)
+> +{
+> +	struct cpu_hw_events *cpu_hw_evt;
+> +	struct sbiret ret = {0};
+> +
+> +	cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
+> +	if (!cpu_hw_evt->snapshot_addr_phys)
+> +		return -EINVAL;
+> +
+> +	if (cpu_hw_evt->snapshot_set_done)
+> +		return 0;
+> +
+> +	if (IS_ENABLED(CONFIG_32BIT))
+> +		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
+> +				cpu_hw_evt->snapshot_addr_phys,
+> +				(u64)(cpu_hw_evt->snapshot_addr_phys) >> 32, 0, 0, 0, 0);
+> +	else
+> +		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
+> +				cpu_hw_evt->snapshot_addr_phys, 0, 0, 0, 0, 0);
+> +
+> +	/* Free up the snapshot area memory and fall back to SBI PMU calls without snapshot */
+> +	if (ret.error) {
+> +		if (ret.error != SBI_ERR_NOT_SUPPORTED)
+> +			pr_warn("pmu snapshot setup failed with error %ld\n", ret.error);
+> +		return sbi_err_map_linux_errno(ret.error);
+> +	}
+> +
+> +	cpu_hw_evt->snapshot_set_done = true;
+> +
+> +	return 0;
+> +}
+> +
+>  static u64 pmu_sbi_ctr_read(struct perf_event *event)
+>  {
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	int idx = hwc->idx;
+>  	struct sbiret ret;
+>  	u64 val = 0;
+> +	struct riscv_pmu *pmu = to_riscv_pmu(event->pmu);
+> +	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+> +	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
+>  	union sbi_pmu_ctr_info info = pmu_ctr_list[idx];
+>  
+> +	/* Read the value from the shared memory directly */
+> +	if (sbi_pmu_snapshot_available()) {
+> +		val = sdata->ctr_values[idx];
+> +		return val;
+> +	}
+> +
+>  	if (pmu_sbi_is_fw_event(event)) {
+>  		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ,
+>  				hwc->idx, 0, 0, 0, 0, 0);
+> @@ -539,6 +628,7 @@ static void pmu_sbi_ctr_start(struct perf_event *event, u64 ival)
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	unsigned long flag = SBI_PMU_START_FLAG_SET_INIT_VALUE;
+>  
+> +	/* There is no benefit setting SNAPSHOT FLAG for a single counter */
+>  #if defined(CONFIG_32BIT)
+>  	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, hwc->idx,
+>  			1, flag, ival, ival >> 32, 0);
+> @@ -559,16 +649,36 @@ static void pmu_sbi_ctr_stop(struct perf_event *event, unsigned long flag)
+>  {
+>  	struct sbiret ret;
+>  	struct hw_perf_event *hwc = &event->hw;
+> +	struct riscv_pmu *pmu = to_riscv_pmu(event->pmu);
+> +	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+> +	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
+>  
+>  	if ((hwc->flags & PERF_EVENT_FLAG_USER_ACCESS) &&
+>  	    (hwc->flags & PERF_EVENT_FLAG_USER_READ_CNT))
+>  		pmu_sbi_reset_scounteren((void *)event);
+>  
+> +	if (sbi_pmu_snapshot_available())
+> +		flag |= SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
+> +
+>  	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, hwc->idx, 1, flag, 0, 0, 0);
+> -	if (ret.error && (ret.error != SBI_ERR_ALREADY_STOPPED) &&
+> -		flag != SBI_PMU_STOP_FLAG_RESET)
+> +	if (!ret.error && sbi_pmu_snapshot_available()) {
+> +		/*
+> +		 * The counter snapshot is based on the index base specified by hwc->idx.
+> +		 * The actual counter value is updated in shared memory at index 0 when counter
+> +		 * mask is 0x01. To ensure accurate counter values, it's necessary to transfer
+> +		 * the counter value to shared memory. However, if hwc->idx is zero, the counter
+> +		 * value is already correctly updated in shared memory, requiring no further
+> +		 * adjustment.
+> +		 */
+> +		if (hwc->idx > 0) {
+> +			sdata->ctr_values[hwc->idx] = sdata->ctr_values[0];
+> +			sdata->ctr_values[0] = 0;
+> +		}
+> +	} else if (ret.error && (ret.error != SBI_ERR_ALREADY_STOPPED) &&
+> +		flag != SBI_PMU_STOP_FLAG_RESET) {
+>  		pr_err("Stopping counter idx %d failed with error %d\n",
+>  			hwc->idx, sbi_err_map_linux_errno(ret.error));
+> +	}
+>  }
+>  
+>  static int pmu_sbi_find_num_ctrs(void)
+> @@ -626,10 +736,14 @@ static inline void pmu_sbi_stop_all(struct riscv_pmu *pmu)
+>  static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
+>  {
+>  	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+> +	unsigned long flag = 0;
+> +
+> +	if (sbi_pmu_snapshot_available())
+> +		flag = SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
+>  
+>  	/* No need to check the error here as we can't do anything about the error */
+>  	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, 0,
+> -		  cpu_hw_evt->used_hw_ctrs[0], 0, 0, 0, 0);
+> +		  cpu_hw_evt->used_hw_ctrs[0], flag, 0, 0, 0);
+>  }
+>  
+>  /*
+> @@ -638,11 +752,10 @@ static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
+>   * while the overflowed counters need to be started with updated initialization
+>   * value.
+>   */
+> -static inline void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
+> -					       unsigned long ctr_ovf_mask)
+> +static noinline void pmu_sbi_start_ovf_ctrs_sbi(struct cpu_hw_events *cpu_hw_evt,
+> +						unsigned long ctr_ovf_mask)
+>  {
+>  	int idx = 0;
+> -	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+>  	struct perf_event *event;
+>  	unsigned long flag = SBI_PMU_START_FLAG_SET_INIT_VALUE;
+>  	unsigned long ctr_start_mask = 0;
+> @@ -677,6 +790,49 @@ static inline void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
+>  	}
+>  }
+>  
+> +static noinline void pmu_sbi_start_ovf_ctrs_snapshot(struct cpu_hw_events *cpu_hw_evt,
+> +						     unsigned long ctr_ovf_mask)
+> +{
+> +	int idx = 0;
+> +	struct perf_event *event;
+> +	unsigned long flag = SBI_PMU_START_FLAG_INIT_FROM_SNAPSHOT;
+> +	u64 max_period, init_val = 0;
+> +	struct hw_perf_event *hwc;
+> +	unsigned long ctr_start_mask = 0;
+> +	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
+> +
+> +	for_each_set_bit(idx, cpu_hw_evt->used_hw_ctrs, RISCV_MAX_COUNTERS) {
+> +		if (ctr_ovf_mask & (1 << idx)) {
 
-While I can update the qemu binary for the s390x-kvm job, the build-* jobs 
-run in a container with a normal QEMU from the corresponding distros, so I 
-think this has to wait 'til we get distros that contain your QEMU TCG 
-migration fix.
+nit: BIT(idx)
 
-  Thomas
+> +			event = cpu_hw_evt->events[idx];
+> +			hwc = &event->hw;
+> +			max_period = riscv_pmu_ctr_get_width_mask(event);
+> +			init_val = local64_read(&hwc->prev_count) & max_period;
+> +			sdata->ctr_values[idx] = init_val;
+> +		}
+> +		/*
+> +		 * We donot need to update the non-overflow counters the previous
 
+do not
+
+> +		 * value should have been there already.
+> +		 */
+> +	}
+> +
+> +	ctr_start_mask = cpu_hw_evt->used_hw_ctrs[0];
+> +
+> +	/* Start all the counters in a single shot */
+> +	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, 0, ctr_start_mask,
+> +		  flag, 0, 0, 0);
+
+I think we should always loop over all words of used_hw_ctrs[] since it'll
+have more than one for riscv32. Hmm, it seems like there are several
+places where we don't expect riscv32's second word to be used...
+
+> +}
+> +
+> +static void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
+> +					unsigned long ctr_ovf_mask)
+> +{
+> +	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+> +
+> +	if (sbi_pmu_snapshot_available())
+> +		pmu_sbi_start_ovf_ctrs_snapshot(cpu_hw_evt, ctr_ovf_mask);
+> +	else
+> +		pmu_sbi_start_ovf_ctrs_sbi(cpu_hw_evt, ctr_ovf_mask);
+> +}
+> +
+>  static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
+>  {
+>  	struct perf_sample_data data;
+> @@ -690,6 +846,7 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
+>  	unsigned long overflowed_ctrs = 0;
+>  	struct cpu_hw_events *cpu_hw_evt = dev;
+>  	u64 start_clock = sched_clock();
+> +	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
+>  
+>  	if (WARN_ON_ONCE(!cpu_hw_evt))
+>  		return IRQ_NONE;
+> @@ -711,8 +868,10 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
+>  	pmu_sbi_stop_hw_ctrs(pmu);
+>  
+>  	/* Overflow status register should only be read after counter are stopped */
+> -	ALT_SBI_PMU_OVERFLOW(overflow);
+> -
+> +	if (sbi_pmu_snapshot_available())
+> +		overflow = sdata->ctr_overflow_mask;
+> +	else
+> +		ALT_SBI_PMU_OVERFLOW(overflow);
+>  	/*
+>  	 * Overflow interrupt pending bit should only be cleared after stopping
+>  	 * all the counters to avoid any race condition.
+> @@ -794,6 +953,9 @@ static int pmu_sbi_starting_cpu(unsigned int cpu, struct hlist_node *node)
+>  		enable_percpu_irq(riscv_pmu_irq, IRQ_TYPE_NONE);
+>  	}
+>  
+> +	if (sbi_pmu_snapshot_available())
+> +		return pmu_sbi_snapshot_setup(pmu, cpu);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -807,6 +969,9 @@ static int pmu_sbi_dying_cpu(unsigned int cpu, struct hlist_node *node)
+>  	/* Disable all counters access for user mode now */
+>  	csr_write(CSR_SCOUNTEREN, 0x0);
+>  
+> +	if (sbi_pmu_snapshot_available())
+> +		pmu_sbi_snapshot_disable();
+> +
+>  	return 0;
+>  }
+>  
+> @@ -1076,10 +1241,6 @@ static int pmu_sbi_device_probe(struct platform_device *pdev)
+>  	pmu->event_unmapped = pmu_sbi_event_unmapped;
+>  	pmu->csr_index = pmu_sbi_csr_index;
+>  
+> -	ret = cpuhp_state_add_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->node);
+> -	if (ret)
+> -		return ret;
+> -
+>  	ret = riscv_pm_pmu_register(pmu);
+>  	if (ret)
+>  		goto out_unregister;
+> @@ -1088,8 +1249,32 @@ static int pmu_sbi_device_probe(struct platform_device *pdev)
+>  	if (ret)
+>  		goto out_unregister;
+>  
+> +	/* SBI PMU Snapsphot is only available in SBI v2.0 */
+> +	if (sbi_v2_available) {
+> +		ret = pmu_sbi_snapshot_alloc(pmu);
+> +		if (ret)
+> +			goto out_unregister;
+> +
+> +		ret = pmu_sbi_snapshot_setup(pmu, smp_processor_id());
+> +		if (!ret) {
+> +			pr_info("SBI PMU snapshot detected\n");
+> +			/*
+> +			 * We enable it once here for the boot cpu. If snapshot shmem setup
+> +			 * fails during cpu hotplug process, it will fail to start the cpu
+> +			 * as we can not handle hetergenous PMUs with different snapshot
+> +			 * capability.
+> +			 */
+> +			static_branch_enable(&sbi_pmu_snapshot_available);
+> +		}
+> +		/* Snapshot is an optional feature. Continue if not available */
+> +	}
+> +
+>  	register_sysctl("kernel", sbi_pmu_sysctl_table);
+>  
+> +	ret = cpuhp_state_add_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->node);
+> +	if (ret)
+> +		return ret;
+> +
+>  	return 0;
+>  
+>  out_unregister:
+> diff --git a/include/linux/perf/riscv_pmu.h b/include/linux/perf/riscv_pmu.h
+> index 43282e22ebe1..c3fa90970042 100644
+> --- a/include/linux/perf/riscv_pmu.h
+> +++ b/include/linux/perf/riscv_pmu.h
+> @@ -39,6 +39,12 @@ struct cpu_hw_events {
+>  	DECLARE_BITMAP(used_hw_ctrs, RISCV_MAX_COUNTERS);
+>  	/* currently enabled firmware counters */
+>  	DECLARE_BITMAP(used_fw_ctrs, RISCV_MAX_COUNTERS);
+> +	/* The virtual address of the shared memory where counter snapshot will be taken */
+> +	void *snapshot_addr;
+> +	/* The physical address of the shared memory where counter snapshot will be taken */
+> +	phys_addr_t snapshot_addr_phys;
+> +	/* Boolean flag to indicate setup is already done */
+> +	bool snapshot_set_done;
+
+Instead of the 'snapshot_set_done' boolean, we can just use
+snapshot_addr, which can't be NULL after setup.
+
+>  };
+>  
+>  struct riscv_pmu {
+> -- 
+> 2.34.1
+> 
+
+Thanks,
+drew
 
