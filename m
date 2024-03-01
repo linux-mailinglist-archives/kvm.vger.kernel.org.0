@@ -1,166 +1,172 @@
-Return-Path: <kvm+bounces-10624-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10625-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A1986DFFF
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 12:15:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B6886E001
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 12:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9266A1C21678
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 11:15:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CC811C20AD5
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 11:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507326CDAE;
-	Fri,  1 Mar 2024 11:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31146BFC6;
+	Fri,  1 Mar 2024 11:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ojxr+zuC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBZD9FJG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1686BFA2
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 11:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A205D23BD
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 11:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709291655; cv=none; b=p+bllx8Bd9Zt+ZI8q7KXWOwo5goB5L7mUPj+gVmF/AD9ExQO8hrFp0YrH3Dsj1wSZEXFmTOaFrXYEeM0gOcIEIR4on0ZD563WRQD+zfBg3zEGz3B8n/82/o3dq/Yc1MIPNUd6zXk16baIDfvv7nH7Dnb7vxh5zFjyuGRUZlJo58=
+	t=1709291769; cv=none; b=hE5rgktu0k8JG14YzG7QGPmTpvF0kXGDxDIzrxzJZcYOO2uN9aK1TrahniskIY65mTuyKC+YQ6rmqkB8DCB7sIIrjNVL0O1yYmZP2MvmBF0n0/xXDxS7iuFIV7t8KsO/cKKbbIUzQNmtOcdCfyRuZPdeoMV6UJ1+O8dRdlwjbDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709291655; c=relaxed/simple;
-	bh=zkbtf2XhdXqJAJc2oYBIfqC9jUyxnkqSO9tew8V0bg8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Afmf3i/XGuTYdljVE0T49DZQYNp24E2T3pi77hIaoVadwN2WIQFixqGjLqDHwXvYxrZ3oTjReIxbY0ALAQYa/s/3s/MHIUEYz2lwZT2wlK+vjmSpzvl0NRnXb+ud32HIN528fKeJQ+80sMD82I0S+vcSkSCtRCHKq7CyTTMiuJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ojxr+zuC; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-512bd533be0so2442795e87.0
-        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 03:14:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709291651; x=1709896451; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jXt56DDN1trQQI8RIOoz0OKV0RNEBNHuWLr8xaraJVQ=;
-        b=ojxr+zuC/PpK426wnS6w13kYyIzL9mBC8UehHmts6Yk/0Z9Qw8Cstg9MvvOL9+Lvte
-         lHCuR63R26xspRTGe2jEJiy4suoIIdhHSPJ/34rjXLIU2tKl/p3+WS4UM8BmvqTPYl55
-         QkhFiLiOJHmYnFv3YKsrLvOLWlD+ds4EBnQ2Cuk+00DpEUVZqpRyN7jZ6H1E85n5Fbr/
-         L38Es5opuNC6cPXWNcxrmRPEWXZ+HB/nH3OLJvm/dto6FeuqSpiCeXqf6tcga/f3R+IV
-         rNETlhe409XcbtV1NkVXIPL5XcqutRt2Tw97zmhL+KI+UiZH5bVzvzd5k/4Rm8ZrHZfz
-         Zdwg==
+	s=arc-20240116; t=1709291769; c=relaxed/simple;
+	bh=QRkyqV3BpGvP77PNRBUdvlPtk3cr8zXG2tzni/ygQCo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=APGFHo22WUe+bPtw445X3siEDLpIs0WqHp/3W/UodBy58if0ut1SQTpO0Vg3YG8s6YTBOmgIkYIeIFsisJF5YeXxTB98QKoMnNESkEosHFUkRBGZJfo6+F4S7Uh+c6t4ipGS0lajqEHHus/0jQ8WaAGkf1uXvVxFLppHxAX1wA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dBZD9FJG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709291766;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hz2gVlDx8rmyr1wJjekvfluZY3NlkxY6GUZj6+XbcUk=;
+	b=dBZD9FJGaT9EjynE9lwm9xTRCG7mPBySK8JfHTFzf7oXYxBNuKu/AMm1aYAVdHcg/LE0V0
+	DRM/qZMQiUdbY3Y9kSJpU3vmNC4csZM8XWiR3JnoBPaxBkQMz7CdREjc0i+LC3KJ7X6dY5
+	GkwtcKKaS+4cInYNwiRCw4XiLJuA7QM=
+Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
+ [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-7-eR0OoXtUPzyl0mtRYzub8Q-1; Fri, 01 Mar 2024 06:16:05 -0500
+X-MC-Unique: eR0OoXtUPzyl0mtRYzub8Q-1
+Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-4b92015b9dcso1143708e0c.2
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 03:16:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709291651; x=1709896451;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jXt56DDN1trQQI8RIOoz0OKV0RNEBNHuWLr8xaraJVQ=;
-        b=fbAD2dJHMVto+TqP6Gz6TvL0VDNF5btVXwVFmP/Nym0RscXXn63PVvvxk/y3F7Zafw
-         v1s6MfLmggIrWahU6S721ZoxvqwsYxjF2+MdRGyXLc6dRRDrz7CNTSGqXbjjViaNoBHX
-         7HD8L4tZ9gIBYBeomyzB64LTh2Jcpl75ZZYsvtATkDmtdJ77And1BVxDIYDGnS3AWHRI
-         I6R06YhGIC2wnxOao4fB39132bu2GEG7+CD8zU1ehxTj3laxmjrne7oWyJYSdzKPerwP
-         PbG0nOyRFCWM1eNdpayhxASUiSJnu9X22/cNY5gIi6bTbT6v9IARrAeIh7+b0OSvPFzF
-         EGUw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6epYxf84i0z77zsVA+jIpo2Nucbfp+ZsMnBV41QjJ2B/jzlqkPR+UOrJVK1Al+2UXgp6gfgcHDxLfritu4zWDz8aC
-X-Gm-Message-State: AOJu0YzIJMVoWTwgVPu5y27VFvXS3ozpLPZqTZzP54/bTw0UjvD8nulB
-	Pb/gRKCaTnkqVPu/SWOuBsbrBXHBMla6GlpuTJJdtjHrBhKLfHbTjtHxxLishxI=
-X-Google-Smtp-Source: AGHT+IEMU3X0u8IVUbmn5Hd0kEbruFTDCYQR+XS7mqKnTdFj2a5iVEk93dn2ijW3fSXhfMFxgwHqFQ==
-X-Received: by 2002:a05:6512:2388:b0:512:be8e:79da with SMTP id c8-20020a056512238800b00512be8e79damr1364981lfv.8.1709291650643;
-        Fri, 01 Mar 2024 03:14:10 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id q16-20020a5d6590000000b0033d56aa4f45sm4292371wru.112.2024.03.01.03.14.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 03:14:10 -0800 (PST)
-Date: Fri, 1 Mar 2024 12:14:09 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
-	Palmer Dabbelt <palmer@rivosinc.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alexghiti@rivosinc.com>, Atish Patra <atishp@atishpatra.org>, 
-	Conor Dooley <conor.dooley@microchip.com>, Guo Ren <guoren@kernel.org>, Icenowy Zheng <uwu@icenowy.me>, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 04/15] RISC-V: Add SBI PMU snapshot definitions
-Message-ID: <20240301-1a1aa2a2c04640c34749cb5f@orel>
-References: <20240229010130.1380926-1-atishp@rivosinc.com>
- <20240229010130.1380926-5-atishp@rivosinc.com>
+        d=1e100.net; s=20230601; t=1709291764; x=1709896564;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hz2gVlDx8rmyr1wJjekvfluZY3NlkxY6GUZj6+XbcUk=;
+        b=fUjK7mkngCVwLrx6GiRlNWV8znHZhwJnqRCghI66+0xox8YBut7xOLHbI0di9mhxoL
+         5PAvOndFQzewlAO7W6vFLf7BHRZN1KwDhC1AJO9SVZlja7+qb0qtp9bnyGSeenD32Mld
+         FwnTkGtYkSsKHB791YxYE6RJdxcbmuhuioiqg6Eh+ahu/ISHd2cgsTPEAiPrsvYckSbS
+         F+aVK92Y+pYqKFveS+z3flvhw9CV5K0q6dgkzaCFB0F2ERKsIJj3Rey5ecZkIPe8okcE
+         V5nxjv3ZTprJWMkrQw3K+xnrMuw5BRzByAC61EeMhrmHGMMGFMVL6ihvBl5TZw0TQTPg
+         Hvcw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0GSxo6vP9u8lSBRvdhCx5q+vlIhrJuBQG0vv8H+qY7OVk/ZwUBRo3s5ikz7Azi+9MB1zHDB5hw1xXsWdHAhqKnqI0
+X-Gm-Message-State: AOJu0YwQcDgM5Rcp2T+Prj8KOgheBPBpln/bBpAKGbunZawTFznceJyw
+	qRiKc06ECzrPf0eGC45wQcI9KN0Yk5ykVa23FpXa+JWL+NbmbWGO7bh06bBMAnmxH7+ZPHyjudF
+	qUGLHfostfZ8+IlKWotoI2Mgys2ACsgaWLuLdmPpqb/eHWW/ZIg==
+X-Received: by 2002:a05:6122:459a:b0:4c8:8025:f451 with SMTP id de26-20020a056122459a00b004c88025f451mr1112229vkb.12.1709291764753;
+        Fri, 01 Mar 2024 03:16:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEBgzNPag+mP+cbaorJIWf/mWEgMxVtHFiHVO5YW298gVYpDpwwcQws5mdd100h5uHBRc/CTg==
+X-Received: by 2002:a05:6122:459a:b0:4c8:8025:f451 with SMTP id de26-20020a056122459a00b004c88025f451mr1112216vkb.12.1709291764457;
+        Fri, 01 Mar 2024 03:16:04 -0800 (PST)
+Received: from [192.168.0.9] (ip-109-43-178-133.web.vodafone.de. [109.43.178.133])
+        by smtp.gmail.com with ESMTPSA id f14-20020a05622a1a0e00b0042e1950d591sm1601473qtb.70.2024.03.01.03.16.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Mar 2024 03:16:04 -0800 (PST)
+Message-ID: <04e976cc-0239-4ee9-b0d2-cfdebbc4c3d9@redhat.com>
+Date: Fri, 1 Mar 2024 12:15:59 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229010130.1380926-5-atishp@rivosinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 07/32] powerpc/sprs: Don't fail changed
+ SPRs that are used by the test harness
+Content-Language: en-US
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
+ <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org
+References: <20240226101218.1472843-1-npiggin@gmail.com>
+ <20240226101218.1472843-8-npiggin@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240226101218.1472843-8-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 28, 2024 at 05:01:19PM -0800, Atish Patra wrote:
-> SBI PMU Snapshot function optimizes the number of traps to
-> higher privilege mode by leveraging a shared memory between the S/VS-mode
-> and the M/HS mode. Add the definitions for that extension and new error
-> codes.
+On 26/02/2024 11.11, Nicholas Piggin wrote:
+> SPRs annotated with SPR_HARNESS can change between consecutive reads
+> because the test harness code has changed them. Avoid failing the
+> test in this case.
 > 
-> Reviewed-by: Anup Patel <anup@brainfault.org>
-> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->  arch/riscv/include/asm/sbi.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>   powerpc/sprs.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
-> index ef8311dafb91..dfa830f7d54b 100644
-> --- a/arch/riscv/include/asm/sbi.h
-> +++ b/arch/riscv/include/asm/sbi.h
-> @@ -132,6 +132,7 @@ enum sbi_ext_pmu_fid {
->  	SBI_EXT_PMU_COUNTER_STOP,
->  	SBI_EXT_PMU_COUNTER_FW_READ,
->  	SBI_EXT_PMU_COUNTER_FW_READ_HI,
-> +	SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
->  };
->  
->  union sbi_pmu_ctr_info {
-> @@ -148,6 +149,13 @@ union sbi_pmu_ctr_info {
->  	};
->  };
->  
-> +/* Data structure to contain the pmu snapshot data */
-> +struct riscv_pmu_snapshot_data {
-> +	u64 ctr_overflow_mask;
-> +	u64 ctr_values[64];
-> +	u64 reserved[447];
-> +};
-> +
->  #define RISCV_PMU_RAW_EVENT_MASK GENMASK_ULL(47, 0)
->  #define RISCV_PMU_RAW_EVENT_IDX 0x20000
->  
-> @@ -244,9 +252,11 @@ enum sbi_pmu_ctr_type {
->  
->  /* Flags defined for counter start function */
->  #define SBI_PMU_START_FLAG_SET_INIT_VALUE (1 << 0)
+> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+> index 8253ea971..44edd0d7b 100644
+> --- a/powerpc/sprs.c
+> +++ b/powerpc/sprs.c
+> @@ -563,7 +563,7 @@ int main(int argc, char **argv)
+>   			if (before[i] >> 32)
+>   				pass = false;
+>   		}
+> -		if (!(sprs[i].type & SPR_ASYNC) && (before[i] != after[i]))
+> +		if (!(sprs[i].type & (SPR_HARNESS|SPR_ASYNC)) && (before[i] != after[i]))
+>   			pass = false;
+>   
+>   		if (sprs[i].width == 32 && !(before[i] >> 32) && !(after[i] >> 32))
 
-A patch before this which changes all flags to use BIT() instead of shifts
-would be good, since otherwise the new flags are inconsistent.
+I guess you could also squash this into the previous patch (to avoid 
+problems with bisecting later?) ...
 
-> +#define SBI_PMU_START_FLAG_INIT_FROM_SNAPSHOT BIT(1)
+Anyway:
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-This is named SBI_PMU_START_FLAG_INIT_SNAPSHOT in the spec.
-
->  
->  /* Flags defined for counter stop function */
->  #define SBI_PMU_STOP_FLAG_RESET (1 << 0)
-> +#define SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT BIT(1)
->  
->  enum sbi_ext_dbcn_fid {
->  	SBI_EXT_DBCN_CONSOLE_WRITE = 0,
-> @@ -285,6 +295,7 @@ struct sbi_sta_struct {
->  #define SBI_ERR_ALREADY_AVAILABLE -6
->  #define SBI_ERR_ALREADY_STARTED -7
->  #define SBI_ERR_ALREADY_STOPPED -8
-> +#define SBI_ERR_NO_SHMEM	-9
->  
->  extern unsigned long sbi_spec_version;
->  struct sbiret {
-> -- 
-> 2.34.1
->
-
-Thanks,
-drew
 
