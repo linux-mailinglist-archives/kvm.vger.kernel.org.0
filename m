@@ -1,172 +1,286 @@
-Return-Path: <kvm+bounces-10647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10648-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C455986E2D7
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 14:57:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E5E686E2E5
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 15:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3934AB22831
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 13:57:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BF481C22E8B
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 14:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3FF6EB6B;
-	Fri,  1 Mar 2024 13:57:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FDE6EEE6;
+	Fri,  1 Mar 2024 14:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T1gO54np"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ASbjTFCj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC6969E1C
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 13:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A9C6EB52;
+	Fri,  1 Mar 2024 14:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709301433; cv=none; b=UXUwH/3LYgMk8VxA8er7wB7mT68yKy/i+WTPmK5mxS5jx1uuSSCm0BCSJNDQFDLd0zQ6u/OB5IUsHLybijYVLmJNAoDbrL3i4L3K0KTJeqJ4Ei63oeqDrXGr4+EegNafgzmUOi/2VHSkZDC9ZsqXJHoNrQKQHMxS/JDvkXWtsWs=
+	t=1709301631; cv=none; b=ES+1De0A71btAwCcON6GK7LhCu5QO+DwDZus94uqJqCf8gaw573AIbRni3el8kqxFymgBfJ6Iq9VEE1esrEfkquZFPrImBXr8Z006DL2kBghnukT00k8pB7jnzqgcmUwJrxiV0a9Y3+TpKbJWR6T2eIJNroIt17iS3DIMf+tS98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709301433; c=relaxed/simple;
-	bh=f/xHck/+LG443adeLDpgOLPz0VMLQVBodeAE5wF558g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EwltJvYGEVcymaYZLUEQChmCCS4G3noDPe3uNGB+PyrQXooigobZngmSmBlfF43eu4QmlIjPp91+qks4V3gC6q+Pe4kGH1XuumPgmaXZ4z2bf2xokVlIhYCxizmbtS5KgRYafXKvAl7gthe7jGiy0G/JuF6b2vF9a/yUWx//+MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T1gO54np; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709301431;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=X7PBjlrpvNONsqh2uMY775tMAp1gZn/T320+nNQVSQ8=;
-	b=T1gO54npBC0gYzodTHqP92oUWinnQKGHe+QuC1X86Xnuok+EP1R8OcnTUIfJdgfZbv4Y3u
-	sp892Bcfs00E6FRDdWqZbywMN6yyZ7q/JGKO4i8okhp4Bkv5mgBJKfJ/E7br2X1aBhcCgI
-	wKgmf+sHbKopcaSOhrk2Fpvy6GVQZcQ=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-618-Saiu1idUMG2I7qA7Nw3bWw-1; Fri, 01 Mar 2024 08:57:09 -0500
-X-MC-Unique: Saiu1idUMG2I7qA7Nw3bWw-1
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-59fb255d718so2053571eaf.3
-        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 05:57:09 -0800 (PST)
+	s=arc-20240116; t=1709301631; c=relaxed/simple;
+	bh=rnQG0RYa0vCgi5/RqR0kfUP0JURoJ9BVtlS3WqRsXqs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L+iUT5SFirVS3O5mxduGdj2ZuRgGiIFd/dG2xLzVEx9+RvJAxBGVJzSoxkyV3FZiJ4U5roy1orCPP1MplsAQemafbaFlESe1mP9KEZmGsDbDBemrF03Pt8CR7bHb5sqVMMP2LtuvanVcYO/xpQV58KVO7+e7z6TnTjyN/nFx9oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ASbjTFCj; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5ce07cf1e5dso1925599a12.2;
+        Fri, 01 Mar 2024 06:00:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709301629; x=1709906429; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7hpDxMagyZiMsrEcLSx4CKqR7Q5yVjUbUGFKDQCjEe8=;
+        b=ASbjTFCj2L70sjzIk6Kz4L1vGamoiRO3yq1Nrax3j7sEoMegiWPhvrQiXoZBMVauWZ
+         r0dULVuTptNssrnQo2GOWGwRIzllAp5z3XygMKg1/BKQLrgE22LsMXlUyC/cq0ghzC/3
+         Po6pKgN7Rj4mOU+V0/HcrU8WzF0OiesdiaJE51vlpVunnr0RJSHyrSydL5ZIgHd8uHf0
+         qQ6PKp6J2hyl/pWFYvXtmDwbM/RxmBYfb/rsRRUMT4oDlwP/mJ+c9oqN0A5coonaMYS+
+         DrUn/MKgBeSpoSNEv8MD2o7GGiu50VX68+9KapkZlU/rEzsZcTWLGZYV6uwkQb5sDvI/
+         u4UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709301429; x=1709906229;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X7PBjlrpvNONsqh2uMY775tMAp1gZn/T320+nNQVSQ8=;
-        b=jx2pb+LqF/iBG/dmNq07wAacf4+oImJPpJSmJ2hZeF/TCEH/ehtdRhJZUnPRd5WhdA
-         lnEXabkAZK9DsV6SgaD5+F993RbFMk/142jrjtBqlOOeNFbaDf3LiIG3JUq5VA8z61Dy
-         /NoKxlZ3z/9kPQZooeWkh59p2ju2U9m4lc1jfgZR5u/OMEl1Gh/cAjX/ZPoa3+Tka5+5
-         oav47px1w63ojw0LpmdeQsO0s3qVaAUdW56oLefC5S/Ni2tWeMyd5TV7M/opEKio2gdP
-         IEI4wn6tTHaDjVrXispFpHiV/rBbDLcK9Rc6uZuHLzbEfkxouMdGNGj8/MAOmc6oXiRX
-         Bjsw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3NTeM8ehli5pKKJg0AKbYepn88ILZ5Tp4iSLHJTc805Q/geQtnLwOYXy0dbwyABDh2wPyAcbWjgqLki+iT7u1ZL49
-X-Gm-Message-State: AOJu0Ywp1RSrnLgUsYuPDJJpO/qH8WfBgjENjiNUUV2s6yYvh2fA0HW6
-	rKQgZPIBUGt/MQGvwGXHfxVcS2dToXBRfgJ1FLr6q30sSrPeM4zLC4lS69sBwQypaysdA+uQ0VZ
-	367kzBvtOfpTwEEFFHTMXC9HsTS1HANmX+XP51MerQ0IZdY6/Jg==
-X-Received: by 2002:a05:6359:4104:b0:17b:581c:430e with SMTP id kh4-20020a056359410400b0017b581c430emr1629943rwc.3.1709301429081;
-        Fri, 01 Mar 2024 05:57:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHAALUYF3MjHnSxAWn3yxvvW7J/Y+wZ+qYcQuBwbpMuvxGNhVX2UbCWs/R+c5oDVW3YrxDr8Q==
-X-Received: by 2002:a05:6359:4104:b0:17b:581c:430e with SMTP id kh4-20020a056359410400b0017b581c430emr1629929rwc.3.1709301428811;
-        Fri, 01 Mar 2024 05:57:08 -0800 (PST)
-Received: from [192.168.0.9] (ip-109-43-178-133.web.vodafone.de. [109.43.178.133])
-        by smtp.gmail.com with ESMTPSA id a19-20020a0ce353000000b00690314356a4sm1874327qvm.80.2024.03.01.05.57.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Mar 2024 05:57:08 -0800 (PST)
-Message-ID: <b4a1b995-e5cd-40e9-afc1-445a9e5f6fa5@redhat.com>
-Date: Fri, 1 Mar 2024 14:57:04 +0100
+        d=1e100.net; s=20230601; t=1709301629; x=1709906429;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7hpDxMagyZiMsrEcLSx4CKqR7Q5yVjUbUGFKDQCjEe8=;
+        b=Xz1spPGvck4ctJBvHpcmXBPV/W6m0KEMxMW6Fk4YyV1vJMckE+Jc5qUfvqE8j4GwGg
+         oU0BtwwXODJ2RbTuxv/wBu9fzz2ZbhaNpzbWpJlEvrqNl3wD9PJodhZiB8WiFPShTwEk
+         a1RB9EmEEwxaIbPFf3qLDtoYbtIdv7pR7TauNSFUNSAhINaP9iax9MpUtiJXWB43UV6+
+         eYR7AlTn2Ub0Mgx9SPsZCbCXPtVm0IC9QLL66U2FVol5aEL3VtdlOGogxZTFsINsv5TO
+         u5vPWcv9GQmJoNIM7UnPJiut1NjW4F1avZYQGC6SjKNKWVyUqrOyYgMi4TgEYU9b6i6I
+         cGnw==
+X-Forwarded-Encrypted: i=1; AJvYcCWOwTvfpim+9rKX+50QF2UJ/k3wuLavxK/vSZRSfrp/4OrW5tNA48ZpQltIfHEm3ojAgYW3XDWKR+vZpEtrLodsk4oDrJO9ppyoBGLbNW7MNKYZbxhDsdEVT/xgHnLqU36B
+X-Gm-Message-State: AOJu0YxO8Hy13nHqFwIauYuG1XNPOiz3ce0Gq6H33OZyUh3/qcFWD4V2
+	P+IVMEh1uciKNSdguTSbznuHg6PTnVhPaEOaU8DmHO7qgYLb7oZC34jCZ9ffu9qlFpDcNOrTmDU
+	PjYgu+yrX5fx72KCVih5Wm5HXFpw=
+X-Google-Smtp-Source: AGHT+IEN3fKckUQ9bIamtgU20Go7E3qdpBliAncF94FYF8hBWPLJ+p02vAHPjpbiOhvjXwyaawlg7U5DKeweY+PKcng=
+X-Received: by 2002:a05:6a20:d808:b0:1a0:dcf0:c73e with SMTP id
+ iv8-20020a056a20d80800b001a0dcf0c73emr1681454pzb.56.1709301629404; Fri, 01
+ Mar 2024 06:00:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 14/32] powerpc: general interrupt tests
-Content-Language: en-US
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Andrew Jones <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
- Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org
-References: <20240226101218.1472843-1-npiggin@gmail.com>
- <20240226101218.1472843-15-npiggin@gmail.com>
- <1b89e399-1160-4fca-a9d7-89d60fc9a710@redhat.com>
- <20240301-65a02dd1ea0bc25377fb248f@orel>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240301-65a02dd1ea0bc25377fb248f@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240226143630.33643-1-jiangshanlai@gmail.com>
+ <CABgObfaSGOt4AKRF5WEJt2fGMj_hLXd7J2x2etce2ymvT4HkpA@mail.gmail.com> <Zd4bhQPwZDvyrF44@google.com>
+In-Reply-To: <Zd4bhQPwZDvyrF44@google.com>
+From: Lai Jiangshan <jiangshanlai@gmail.com>
+Date: Fri, 1 Mar 2024 22:00:16 +0800
+Message-ID: <CAJhGHyChprt9LvLXXDeu1KwS4_V5mqhUTwJyDvqca-S_PSy6zg@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/73] KVM: x86/PVM: Introduce a new hypervisor
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	Lai Jiangshan <jiangshan.ljs@antgroup.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org, x86@kernel.org, 
+	Kees Cook <keescook@chromium.org>, Juergen Gross <jgross@suse.com>, 
+	Hou Wenlong <houwenlong.hwl@antgroup.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 01/03/2024 14.45, Andrew Jones wrote:
-> On Fri, Mar 01, 2024 at 01:41:22PM +0100, Thomas Huth wrote:
->> On 26/02/2024 11.12, Nicholas Piggin wrote:
->>> Add basic testing of various kinds of interrupts, machine check,
->>> page fault, illegal, decrementer, trace, syscall, etc.
->>>
->>> This has a known failure on QEMU TCG pseries machines where MSR[ME]
->>> can be incorrectly set to 0.
->>
->> Two questions out of curiosity:
->>
->> Any chance that this could be fixed easily in QEMU?
->>
->> Or is there a way to detect TCG from within the test? (for example, we have
->> a host_is_tcg() function for s390x so we can e.g. use report_xfail() for
->> tests that are known to fail on TCG there)
-> 
-> If there's nothing better, then it should be possible to check the
-> QEMU_ACCEL environment variable which will be there with the default
-> environ.
+Hello, Sean
 
-Well, but that's only available from the host side, not within the test 
-(i.e. the guest). So that does not help much with report_xfail...
-I was rather thinking of something like checking the device tree, e.g. for 
-the compatible property in /hypervisor to see whether it's KVM or TCG...?
+On Wed, Feb 28, 2024 at 1:27=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Mon, Feb 26, 2024, Paolo Bonzini wrote:
+> > On Mon, Feb 26, 2024 at 3:34=E2=80=AFPM Lai Jiangshan <jiangshanlai@gma=
+il.com> wrote:
+> > > - Full control: In XENPV/Lguest, the host Linux (dom0) entry code is
+> > >   subordinate to the hypervisor/switcher, and the host Linux kernel
+> > >   loses control over the entry code. This can cause inconvenience if
+> > >   there is a need to update something when there is a bug in the
+> > >   switcher or hardware.  Integral entry gives the control back to the
+> > >   host kernel.
+> > >
+> > > - Zero overhead incurred: The integrated entry code doesn't cause any
+> > >   overhead in host Linux entry path, thanks to the discreet design wi=
+th
+> > >   PVM code in the switcher, where the PVM path is bypassed on host ev=
+ents.
+> > >   While in XENPV/Lguest, host events must be handled by the
+> > >   hypervisor/switcher before being processed.
+> >
+> > Lguest... Now that's a name I haven't heard in a long time. :)  To be
+> > honest, it's a bit weird to see yet another PV hypervisor. I think
+> > what really killed Xen PV was the impossibility to protect from
+> > various speculation side channel attacks, and I would like to
+> > understand how PVM fares here.
+> >
+> > You obviously did a great job in implementing this within the KVM
+> > framework; the changes in arch/x86/ are impressively small. On the
+> > other hand this means it's also not really my call to decide whether
+> > this is suitable for merging upstream. The bulk of the changes are
+> > really in arch/x86/kernel/ and arch/x86/entry/, and those are well
+> > outside my maintenance area.
+>
+> The bulk of changes in _this_ patchset are outside of arch/x86/kvm, but t=
+here are
+> more changes on the horizon:
+>
+>  : To mitigate the performance problem, we designed several optimizations
+>  : for the shadow MMU (not included in the patchset) and also planning to
+>  : build a shadow EPT in L0 for L2 PVM guests.
+>
+>  : - Parallel Page fault for SPT and Paravirtualized MMU Optimization.
+>
+> And even absent _new_ shadow paging functionality, merging PVM would effe=
+ctively
+> shatter any hopes of ever removing KVM's existing, complex shadow paging =
+code.
+>
+> Specifically, unsync 4KiB PTE support in KVM provides almost no benefit f=
+or nested
+> TDP.  So if we can ever drop support for legacy shadow paging, which is a=
+ big if,
+> but not completely impossible, then we could greatly simplify KVM's shado=
+w MMU.
+>
 
-  Thomas
+One of the important goals of open-sourcing PVM is to allow for the
+optimization of shadow paging, especially through paravirtualization
+methods, and potentially even to eliminate the need for shadow paging.
+
+1) Technology: Shadow paging is a technique for page table compaction in
+   the category of "one-dimensional paging", which includes the direct
+   paging technology in XenPV. When the page tables are stable,
+   one-dimensional paging can outperform TDP because it saves on TLB
+   resources. Another one-dimensional paging technology would be better
+   to be introduced before shadow paging is removed for performance.
+
+2) Naming: The reason we use the name shadowpage in our paper and the
+   cover letter is that this term is more widely recognized and makes it
+   easier for people to understand how PVM implements its page tables.
+   It also demonstrates that PVM is able to implement a paging mechanism
+   with very little code on top of KVM. However, this does not mean we
+   adhere to shadow paging. Any one-dimensional paging technology can
+   work here too.
+
+3) Paravirt: As you mentioned, the best way to eliminate shadow paging
+   is by using a paravirtualization (PV) approach. PVM is inherently
+   suitable for having PV since it is a paravirt solution and has a
+   corresponding framework. However, PV pagetables leads to a complex
+   patchset, which we prefer not to include in the initial PVM patchset
+   introduction.
+
+4) Pave the path: One of the purposes of open-sourcing PVM is to bring
+   in a new scenario for possibly introducing PV pagetable interfaces
+   and optimizing shadow paging. Moreover, investing development effort
+   in shadow paging is the only way to ultimately remove it.
+
+5) Optimizations: We have experimented with numerous optimizations
+   including at least two categories: parallel-pagetable and
+   enlightened-pagetable. The parallel pagetable overhauls the locking
+   mechanism within the shadow paging. The enlightened-pagetable
+   introduces PVOPS in the guest to modify the page tables. One set of
+   PVOPS, used on 4KiB PTEs, queues the pointers of the modified GPTEs
+   in a hypervisor-guest shared ring buffer. Although the overall
+   mechanism, including TLB handling, is not simple, the hypervisor
+   portion is simpler than the unsync-sp method, and it bypasses many
+   unsync-sp related code paths. The other set of PVOPS targets larger
+   page table entries and directly issues hypercalls. Should both sets
+   of PVOPS be utilized, write-protect for SPs is unneeded and shadow
+   paging could be considered as being removed.
 
 
+> Which is a good segue into my main question: was there any one thing that=
+ was
+> _the_ motivating factor for taking on the cost+complexity of shadow pagin=
+g?  And
+> as alluded to be Paolo, taking on the downsides of reduced isolation?
+>
+> It doesn't seem like avoiding L0 changes was the driving decision, since =
+IIUC
+> you have plans to make changes there as well.
+>
+>  : To mitigate the performance problem, we designed several optimizations
+>  : for the shadow MMU (not included in the patchset) and also planning to
+>  : build a shadow EPT in L0 for L2 PVM guests.
+>
+
+
+Getting every cloud provider to adopt a technology is more challenging
+than developing the technology itself. It is easy to compile a list that
+includes many technologies for L0 that have been merged into upstream
+KVM for quite some time, yet not all major cloud providers use or
+support them.
+
+The purpose of PVM includes enabling the use of KVM within various cloud
+VMs, allowing for easy operation of businesses with secure containers.
+Therefore, it cannot rely on whether cloud providers make such changes
+to L0.
+
+The reason we are experimenting with modifications to L0 is because we
+have many physical machines. Developing this technology getting help from
+L0 for L2 paging could provide us and others who have their own physical
+machines with an additional option.
+
+
+> Performance I can kinda sorta understand, but my gut feeling is that the =
+problems
+> with nested virtualization are solvable by adding nested paravirtualizati=
+on between
+> L0<=3D>L1, with likely lower overall cost+complexity than paravirtualizin=
+g L1<=3D>L2.
+>
+> The bulk of the pain with nested hardware virtualization lies in having t=
+o emulate
+> VMX/SVM, and shadow L1's TDP page tables.  Hyper-V's eVMCS takes some of =
+the sting
+> off nVMX in particular, but eVMCS is still hobbled by its desire to be al=
+most
+> drop-in compatible with VMX.
+>
+> If we're willing to define a fully PV interface between L0 and L1 hypervi=
+sors, I
+> suspect we provide performance far, far better than nVMX/nSVM.  E.g. if L=
+0 provides
+> a hypercall to map an L2=3D>L1 GPA, then L0 doesn't need to shadow L1 TDP=
+, and L1
+> doesn't even need to maintain hardware-defined page tables, it can use wh=
+atever
+> software-defined data structure best fits it needs.
+>
+> And if we limit support to 64-bit L2 kernels and drop support for unneces=
+sary cruft,
+> the L1<=3D>L2 entry/exit paths could be drastically simplified and stream=
+lined.  And
+> it should be very doable to concoct an ABI between L0 and L2 that allows =
+L0 to
+> directly emulate "hot" instructions from L2, e.g. CPUID, common MSRs, etc=
+.  I/O
+> would likely be solvable too, e.g. maybe with a mediated device type solu=
+tion that
+> allows L0 to handle the data path for L2?
+>
+> The one thing that I don't see line of sight to supporting is taking L0 o=
+ut of the
+> TCB, i.e. running L2 VMs inside TDX/SNP guests.  But for me at least, tha=
+t alone
+> isn't sufficient justification for adding a PV flavor of KVM.
+
+
+I didn't want to suggest that running PVM inside TDX is an important use
+case, but I just used it to emphasize PVM's universally accessibility in
+all environments, including inside the notoriously otherwise impossible
+environment as TDX as Paolo said in a LWN comment:
+https://lwn.net/Articles/865807/
+
+ : TDX cannot be used in a nested VM, and you cannot use nested
+ : virtualization inside a TDX virtual machine.
+
+(and actually the support for PVM in TDX/SNP is not completed yet)
+
+Thanks
+Lai
 
