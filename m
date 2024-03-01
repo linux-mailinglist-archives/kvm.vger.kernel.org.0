@@ -1,186 +1,430 @@
-Return-Path: <kvm+bounces-10598-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E49086DCAF
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 09:06:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D32BB86DC3B
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 08:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 817681C2270B
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 08:06:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 454711F23214
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 07:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FD769D1C;
-	Fri,  1 Mar 2024 08:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB8F69954;
+	Fri,  1 Mar 2024 07:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SNoEEHUJ"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="oulFuplw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D97B6930E;
-	Fri,  1 Mar 2024 08:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709280397; cv=fail; b=k5B968lVsCjdVFayY3CXr/wphkjK2mr3ySdG+0wOM4Co15rTHKW8jh50Ze2ye0W4HE85NKVNo+HT0qcOFoE7cHEueMczQJMHQrYX2IlnRlqA5vPrkXw1o0YYbgPlmbhrnxzkrFq8Xbdrftej8YwgQuMVEIknFOsKCCI7nU40WFc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709280397; c=relaxed/simple;
-	bh=aZbFo6XpJFAfppkmfJn/pWWENlEJvWU5dL6/smlyP9c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=buaoKM3vK8V6gdUIlkH0bCov3+HVmOkEapf+wSGGb11WElfq3VuG4YUwt9LEFkEr/eQ6HjT/8mRaMXOQmHI9pTSZBAm9yiMeZVGMuXfDQGK4RQkYaH0wHvUqcNtmDEmq20jniSX/fBtBYiv+/NrSSEXdCWKyKUkiy2v85rYAzqA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SNoEEHUJ; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709280396; x=1740816396;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=aZbFo6XpJFAfppkmfJn/pWWENlEJvWU5dL6/smlyP9c=;
-  b=SNoEEHUJYalFLFhbBy0G7x2Bdcw7A92JyEfGRbo/PdPRjGx0GPqqh9+Y
-   HbQhNEuegwj/0p3P1B9j0jEnrCyVYoTJ1adi/03qzw+Qo8f3ID1a5vbk/
-   qnjjdS9CvykakBC0PuDS2eWL4wneVkImpxgc8mNMuQP69MwipnxR19k24
-   3rJS0BTzsnDWU0F623W5elyDgQxjncxagutrWhV9llrABRL+D9m7OiJ+8
-   MKuKZfXcWmF2RDo6YvxYpiJuaz2NKewA7936T72BJA3/u0wsCmHHNpDAE
-   mMQLksIxx7gGqcegan2rCelHTeWMRC+w74FK7b2YBmyyQAYrEyOT8V10g
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10999"; a="7620010"
-X-IronPort-AV: E=Sophos;i="6.06,195,1705392000"; 
-   d="scan'208";a="7620010"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 00:06:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,195,1705392000"; 
-   d="scan'208";a="12809574"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Mar 2024 00:06:34 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 1 Mar 2024 00:06:34 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 1 Mar 2024 00:06:33 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 1 Mar 2024 00:06:33 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 1 Mar 2024 00:06:33 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WH2xemcemA6mrSBCRCbAi9r2X42xfm8X2Uu72G+0dZOIFD3L7ueaMJffqcKRuWU17yxXWu/P+YCA25H7yV/G4Oon8bZ6EbEdvphGkaElxq0NvtPXFr8hLjz0mqTesdYub5Z6yomaaAGu2q8edtsnOdGE1KL8gl6OmyJXo9F8Jxj8qtXfpdFszC+XdRPwaFbPeYPZItcOjEdec1Mk4y5xzSNSUswSUO97zi8BqgO4BYKgcG+lAbpFLeBGLFF2eWmBxFeMomHf4jVrP0hxqJbD7i4U+RA2KHhVwVsXYrVfpDqavu5PvPeCe9Q5EaSlAcg3Px3d0CAzyH1fGb8ZDOuXHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0f4oSD7xcpbYJEjjiqfWpvtBWkADHjXhSQGmQ4skr9E=;
- b=WqwKXMbfnonqe37+kseLkPRKSvpgYoVL6jPZvvzLgpMQK9gRN1EHjMZ9mEgrwv2bL+E0okQFo5yYqutwRUMX8qjdp/DEltv5CC5cZoe7+VvFj8MCJ+62Gt08NTIkmFb2gnAR3LmDik8mXjIFtS7p3ypChehjXlBKtTOGORMis4OTppPlxtn9J++7pFplYcdDQry33zMfvgDZtDOKjU0gf65Sk9WzYC9TOpgJZUbOwsayQzIeSfd0mtguOUF7JEn/xRGaUUu6fdwuRKK55LtI5hiHgNgNxCzzM2ynpzMA4anoNJZrUaywMCsLOoxCr7RtBz7z9Y6HtsUBwgCbYbt/Dw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DM6PR11MB4546.namprd11.prod.outlook.com (2603:10b6:5:2a7::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7339.25; Fri, 1 Mar 2024 08:06:23 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::55f1:8d0:2fa1:c7af]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::55f1:8d0:2fa1:c7af%5]) with mapi id 15.20.7362.013; Fri, 1 Mar 2024
- 08:06:23 +0000
-Date: Fri, 1 Mar 2024 15:36:33 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sagi Shahar <sagis@google.com>
-CC: <linux-kselftest@vger.kernel.org>, Ackerley Tng <ackerleytng@google.com>,
-	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, Isaku
- Yamahata <isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Peter
- Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>, Chao Peng
-	<chao.p.peng@linux.intel.com>, "Vishal Annapurve" <vannapurve@google.com>,
-	Roger Wang <runanwang@google.com>, "Vipin Sharma" <vipinsh@google.com>,
-	<jmattson@google.com>, <dmatlack@google.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: Re: [RFC PATCH v5 08/29] KVM: selftests: TDX: Add TDX lifecycle test
-Message-ID: <ZeGFgQQU2WL7PUO9@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20231212204647.2170650-1-sagis@google.com>
- <20231212204647.2170650-9-sagis@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231212204647.2170650-9-sagis@google.com>
-X-ClientProxiedBy: SI2PR02CA0012.apcprd02.prod.outlook.com
- (2603:1096:4:194::7) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E36A69952
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 07:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709278924; cv=none; b=deEwVNcr96jWVNoRS3nTuNpp7OdzREeoIos97zTV49jE+daJ+BOiQPjrFNo1DzKu+Z4ocqtQffFpTvlzncDVXVbeEQkQ1Cs0mKUhqWrV6nPE0ViICzlJE8lPF0MCSwhva0z4rPIOjsyQSVOyMC6J3wJZzMvlDEouiuCMNyGJVZM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709278924; c=relaxed/simple;
+	bh=wFUxx6DzFeuxkKEsvnRW+K0fDd0cYYnaYF6T1+UNmeA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bJkGd0hbZ9vz5C5D02Gu9BsHH4i9DZ6jr8OJv2po0yYyCWxblwmqIXI3Ux93SAD5xEWwgKVQhb00ev9GPIReOvd+pCKHIOlB6qyiw8yntNEa4HLAAP6KQbyNvEqUhOS/OtyUV8KT50ROGFOa0P+guIHRtyytxgl+AYf+JD1cCvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=oulFuplw; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-512f3e75391so1541783e87.2
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 23:42:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1709278921; x=1709883721; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WkccNrWZdoZxP0mrO++NLB3QkLGur0wRvaYkBajMr4o=;
+        b=oulFuplw9N1UNnUuvpXO1DfmUZ/k99k19ErpgT+1dmuRurjXoIEJrPxHJ96jdZCAlR
+         LnvmCDD+P+QMOB8ltSrxONy3Hh3R4WxTgGNNtZf6aqcsqNI10AXotNQNbU4IUTEfsssl
+         0dJuZ88GuH9ULNKx61T5KmZOVt0FCiW6xLAWd2wWRJ0r68yD0tJnSphuWaY7KCgAlbvJ
+         78OYWjWRRLDP9300g5ytcjkeLTkI2L8nqhVhfYugqbL4BHI4K+hIHB91r+Jr/KlvLoK8
+         XQ8QqnKT79OLDn6GiF/LRL+3FqLHh4d8LhSlbHCdQ6JY9M/vVcH2jocQKlI3LBihFpnM
+         7lDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709278921; x=1709883721;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WkccNrWZdoZxP0mrO++NLB3QkLGur0wRvaYkBajMr4o=;
+        b=RD00ta1EvDRhjTtBWBlBI+ybwiP44EnlOlSwZJ0xaOzjWQ73WByTYhUan2KUCB8Gep
+         Ctq4uyGHgDNnUsXTPvBK69VFIkKZLDFl5AbwiKqc87i+Y2CZ2cXWzUcPcUVyVAJ3HNy7
+         zVKreJl25KE8RTDHe5lPaH/nIUpE8TmqmclLtOlx3hNzpt8zvQPZs+fyx7rDgvA1CmBc
+         4/m4/2MX19RcTbalHLDlRcemBdr4f6KsEnQFJw+og1S4c+YqUrY8Mec3+rqnkNoGr9NZ
+         V7+tvbi5OgVhMbsRNgfNXRmCePLId8P/MxC6msTzkldQHfdldZnDuNaursXgUbMbrZo9
+         KGZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXM6TO2ceaoZrMxVdGUTa+dIv5pyky4TLWo99ciegWnYHSsSSWXGP4650RWgIVS2o5Hn56UVjqgZl1YwNG0s/6UsrP
+X-Gm-Message-State: AOJu0YzWivi4gXWG780ghfWj3Ko7u1GAc2mkZG0+ZPZaORLEc5FClvmu
+	vwNsHSKhZlppv36S252LMKQRqlHLC81wSCFu50tHNPW7iTBzvXdcnW3a8SSTzI015oWmMrXpB8K
+	ZkInSxSW/fgm+34RbJH7EFYk9pVUeJ9AnMWNbog==
+X-Google-Smtp-Source: AGHT+IGeZ/e9EPenJSwwtqwfTjZTV3Rs6mTLRjyPlv1sIDYdzZekJE7jaIdzINjO6ztD8gD4yQWzH7HbSNdb7bBEpjo=
+X-Received: by 2002:a05:6512:310b:b0:512:e7dd:2532 with SMTP id
+ n11-20020a056512310b00b00512e7dd2532mr629291lfb.30.1709278920546; Thu, 29 Feb
+ 2024 23:42:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DM6PR11MB4546:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9ebe84e-d5dd-447e-a89b-08dc39c67bbe
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: krMk1eCIr5ha77MEXC82+NuFWxNGnGB8XYnmToaFDjcGDEBiuTTCKN47hA9hk9OSDVqr3p1lIfVCTR8rJa7MzTbUfqaUMa6eIg3LrCMyUAGviT94C/+d++tWISGs8vx7nkkueOlEqSV0zmLVA87SZNSHZE433FjlK91vbRWpDHV7iY8Hk9xLPi+Lz6ChYyMZlZKFzFckBboXTtqPCaATj07VXINkKgbWKYsgQ8Pp5eSWaP473R5NOQVHmt/T8NxwtPzK7lH3eLi5ExoX/wn/wG3jUHtZma1kBKPCAI2i+3GXx5zgEpl5PTb5W9lP6F8ax1yX9rSpeI8Pe6J9wbCDNY+UOlIr1PcioYZmS6de92p/J8q7bRJiXQyIx7XGeH2QKePlYMhR24e26tieuqWdviCw9TYBT0/KNcGhqS1m6FdTaG/L/skTcSKVhylimS/mMdlymBlr/UpIzGFv/4Qyg2S3uBt0xQBb2KhdZZXeQGuiSHY0p8Q5fznk4PlLzlAwLK61syyiXr02ZYjnggZqVsdDEVkhmAZWrV15pdAfVfAXoumnR8yJcjrohOYz28T5Z9oYDLGQCE7dMlE9ihI7kA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oPzGd1vgagoMWFlqMUhlGCoV1dxc5RGoPQXkSLjud+Qo+/YYc7ZG2IUgsBzv?=
- =?us-ascii?Q?iWgEGXBzc8hSYkn3GzyGT9Y4ClYHARHbjwmrGeZJ1aV/nHjBw5+ItqbAHG3d?=
- =?us-ascii?Q?Cy1nHSEzxRF2fOr8WFv8GSpKPSDHcow9rulc3kG/lCL+eIHv+irhIV52khzh?=
- =?us-ascii?Q?7A0p7Vj15VelaEC7Mk1Ku7Trsa/+QhJt/ywEbdqDBmrYZvd2EZEHKJZBi8XF?=
- =?us-ascii?Q?aY1rrewjz5UGZTuptRXJZhFGPjojjOrkRlr2+GG54vi/WY8qYJ3JmayedI+o?=
- =?us-ascii?Q?2A5CTbPqMmfDYdAUFlj0vKY8IUnmn7174vXwfCoXr8n7AwzOl8klVYmH6XIT?=
- =?us-ascii?Q?AqAgost1S4l0YjLwXp08o6s1vdvG74y9EGX13/C1QDPEeBCYu1ZK0T/Wfgqr?=
- =?us-ascii?Q?QlT+Tkl6QNCIrv+Sdkxnu1aNV8xjNIuX/qS9t+7undPs/MYVnT+dntwh76Cv?=
- =?us-ascii?Q?2E1JhLpI8uzrlGqTkVQpimK8S5HMwqDJn7z5J8Ur34EXslU60Vz6OSyAN5Ig?=
- =?us-ascii?Q?2YfHtwNXqYkd42AsLTc4r4i+WFMKjkzEy3j2B/QxLI2ItL4L0mTsuzrDUztL?=
- =?us-ascii?Q?jSPxbaK9UVShYgR/jJb2ARlySLQB/4nIkoaaRIvv1x7336VFpwakdXt7Qju1?=
- =?us-ascii?Q?cnrpM6SINxxDVjveU128kukxu1rmHRFU3jTfE8wp2rQaYRzwLE0GduCq6eBl?=
- =?us-ascii?Q?5mmJU1ecP0xnDt/4gX/qgC1UWnjfHt9V52uQevGl4Lh4CAzaHWG+C6rlRZZc?=
- =?us-ascii?Q?tbKDdH4A6wqTBoRpwQLqmJ2OpJuHlNlkynvnImaUIXVoWRQGq5EE6/TqnsRq?=
- =?us-ascii?Q?9FR06AVmhED4AzmG3ns6jJjH3a6freRt2bRTAD3P/lxBG25fRthklcYnOwJ0?=
- =?us-ascii?Q?BTEtb4lRtFgnol9VHrvJ57dw+cyrmfkPMjby4OK6KvPlozchC5bydufqKLIl?=
- =?us-ascii?Q?QgfB2/F/hEUMYT+OAYUPzt6onzMFKp/Lx7q/WPgiPcFNLyUd+zgN1in/kOep?=
- =?us-ascii?Q?mY5gOUph2XDBEcm6zLqY0P4YCqPf8hFCiPAvfCX+zE0/0PJqh7ZoUqhCyQN3?=
- =?us-ascii?Q?FGA9jFngRenq8L5fuu0WkB8gbdTQg3ze6A7jbqikSZ0ddRL+34y/e1Lfm9or?=
- =?us-ascii?Q?DKue48k8SdK64qj7WTOH7r7nAhmhr5/NUcpKQ7Afo1fu9PEXjneEV0VIPZgo?=
- =?us-ascii?Q?lsd2++byBJB+9i0nfpUycFFSCMG/s9rKC2y5wqmtfsAsAFOwsl0anRXD5fPS?=
- =?us-ascii?Q?BjcAllGMKGSIAxQoB1/98dGbEf8mwkJsEMTaTcu5ybF1/ds4mwoGqDDdZ5zi?=
- =?us-ascii?Q?rt0I1tgK5n2lttFe2MHmVvzdKEMJDBbfGXRdXvo95/5ZbPTsPoXy5hmhvcvY?=
- =?us-ascii?Q?GG9+H7xvuHTKsdlI8nx9JrUQKfByhOxU+0Pl/Ujb6f2Dv7QSlZC2yLnhzIYq?=
- =?us-ascii?Q?gRQcFUd22129VYitm+d4gEWrqA2MO1pIQIMkPvgNv6wF45QhLPmxgKC2Xqfe?=
- =?us-ascii?Q?bGl/4ySrs/Wlz5grqa0JCVznqSGhY2YulhbQUfRSMFQ97BjUp9FXjJwrKoUc?=
- =?us-ascii?Q?TsErHQJWtObNHaeVCn/JVkwY38bwjxxYsagOICqu?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9ebe84e-d5dd-447e-a89b-08dc39c67bbe
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2024 08:06:22.5436
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QVN5UuCp2RUjdUpUD3un8gCT4VQgMhJWKFi9k1rzc9dQLtFOwT0fLwOyQyF/95vtZdj2KSmM5LO15glTb2zqTA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4546
-X-OriginatorOrg: intel.com
+References: <20240301013545.10403-1-duchao@eswincomputing.com>
+ <20240301013545.10403-2-duchao@eswincomputing.com> <CAAhSdy2+_+t4L8LHmYcJQZBGJHj6pyFm26_KwFBahFxz7eV1fQ@mail.gmail.com>
+ <1f31ec16.1447.18df8b97f73.Coremail.duchao@eswincomputing.com>
+ <CAAhSdy0x6bdm3hYk8jeRG_bF-vFXP8eOqYJ5GMY4Eb=bMNkaQw@mail.gmail.com> <698f58e.1490.18df8e9084f.Coremail.duchao@eswincomputing.com>
+In-Reply-To: <698f58e.1490.18df8e9084f.Coremail.duchao@eswincomputing.com>
+From: Anup Patel <apatel@ventanamicro.com>
+Date: Fri, 1 Mar 2024 13:11:49 +0530
+Message-ID: <CAK9=C2Wz6ZHjsxPMkMnRBT+maE2qLuy+zi4wCRJ+1nkssCX5FA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+To: Chao Du <duchao@eswincomputing.com>
+Cc: Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@atishpatra.org, pbonzini@redhat.com, shuah@kernel.org, 
+	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, duchao713@qq.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> index 063ff486fb86..b302060049d5 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> @@ -224,6 +224,7 @@ static void tdx_enable_capabilities(struct kvm_vm *vm)
->  		      KVM_X2APIC_API_USE_32BIT_IDS |
->  			      KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK);
->  	vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-> +	vm_enable_cap(vm, KVM_CAP_MAX_VCPUS, 512);
+On Fri, Mar 1, 2024 at 12:57=E2=80=AFPM Chao Du <duchao@eswincomputing.com>=
+ wrote:
+>
+> On 2024-03-01 15:29, Anup Patel <anup@brainfault.org> wrote:
+> >
+> > On Fri, Mar 1, 2024 at 12:05=E2=80=AFPM Chao Du <duchao@eswincomputing.=
+com> wrote:
+> > >
+> > > On 2024-03-01 13:00, Anup Patel <anup@brainfault.org> wrote:
+> > > >
+> > > > On Fri, Mar 1, 2024 at 7:08=E2=80=AFAM Chao Du <duchao@eswincomputi=
+ng.com> wrote:
+> > > > >
+> > > > > kvm_vm_ioctl_check_extension(): Return 1 if KVM_CAP_SET_GUEST_DEB=
+UG is
+> > > > > been checked.
+> > > > >
+> > > > > kvm_arch_vcpu_ioctl_set_guest_debug(): Update the guest_debug fla=
+gs
+> > > > > from userspace accordingly. Route the breakpoint exceptions to HS=
+ mode
+> > > > > if the VCPU is being debugged by userspace, by clearing the
+> > > > > corresponding bit in hedeleg. Write the actual CSR in
+> > > > > kvm_arch_vcpu_load().
+> > > > >
+> > > > > Signed-off-by: Chao Du <duchao@eswincomputing.com>
+> > > > > ---
+> > > > >  arch/riscv/include/asm/kvm_host.h | 17 +++++++++++++++++
+> > > > >  arch/riscv/include/uapi/asm/kvm.h |  1 +
+> > > > >  arch/riscv/kvm/main.c             | 18 ++----------------
+> > > > >  arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
+> > > > >  arch/riscv/kvm/vm.c               |  1 +
+> > > > >  5 files changed, 34 insertions(+), 18 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/inclu=
+de/asm/kvm_host.h
+> > > > > index 484d04a92fa6..9ee3f03ba5d1 100644
+> > > > > --- a/arch/riscv/include/asm/kvm_host.h
+> > > > > +++ b/arch/riscv/include/asm/kvm_host.h
+> > > > > @@ -43,6 +43,22 @@
+> > > > >         KVM_ARCH_REQ_FLAGS(5, KVM_REQUEST_WAIT | KVM_REQUEST_NO_W=
+AKEUP)
+> > > > >  #define KVM_REQ_STEAL_UPDATE           KVM_ARCH_REQ(6)
+> > > > >
+> > > > > +#define KVM_HEDELEG_DEFAULT            ((_AC(1, UL) << EXC_INST_=
+MISALIGNED) | \
+> > > > > +                                        (_AC(1, UL) << EXC_BREAK=
+POINT) | \
+> > > > > +                                        (_AC(1, UL) << EXC_SYSCA=
+LL) | \
+> > > > > +                                        (_AC(1, UL) << EXC_INST_=
+PAGE_FAULT) | \
+> > > > > +                                        (_AC(1, UL) << EXC_LOAD_=
+PAGE_FAULT) | \
+> > > > > +                                        (_AC(1, UL) << EXC_STORE=
+_PAGE_FAULT))
+> > > >
+> > > > Use BIT(xyz) here. For example: BIT(EXC_INST_MISALIGNED)
+> > >
+> > > Thanks, I will use BIT() instead in next revision.
+> > >
+> > > >
+> > >
+> > > > Also, BIT(EXC_BREAKPOINT) should not be part of KVM_HEDELEG_DEFAULT=
+.
+> > >
+> > > I think the bit EXC_BREAKPOINT should be set by default, like what yo=
+u
+> > > already did in kvm_arch_hardware_enable(). Then the VS could get the =
+ebreak
+> > > and handle it accordingly.
+> > >
+> > > If the guest_debug is enabled, ebreak instructions are inserted by th=
+e
+> > > userspace(QEMU). So KVM should 'intercept' the ebreak and exit to QEM=
+U.
+> > > Bit EXC_BREAKPOINT should be cleared in this case.
+> >
+> > If EXC_BREAKPOINT is delegated by default then it is not consistent wit=
+h
+> > vcpu->guest_debug which is not enabled by default.
+>
+> To enable the guest_debug corresponding to NOT delegate the EXC_BREAKPOIN=
+T.
+> They are somehow 'opposite'.
+>
+> This 'kvm_guest_debug' feature is different from "debug in the guest".
+> The later requires the delegation of EXC_BREAKPOINT.
+> The former does not.
 
-This is not a must for TD life cycle?
-Though I know, currently, the selftest will fail without setting this
-line, due to TD's default max vcpu count is -1.
-But I guess it's an error.
-https://lore.kernel.org/all/ZeGC64sAzg4EN3G5@yzhao56-desk.sh.intel.com/
+In which case your below code is totally misleading.
+
++       if (dbg->control & KVM_GUESTDBG_ENABLE) {
++               vcpu->guest_debug =3D dbg->control;
++               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_GUEST_DEBUG;
++       } else {
++               vcpu->guest_debug =3D 0;
++               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_DEFAULT;
++       }
+
+This should have been:
+
++       if (dbg->control & KVM_GUESTDBG_ENABLE) {
++               vcpu->guest_debug =3D dbg->control;
++               vcpu->arch.cfg.hedeleg &=3D ~BIT(EXC_BREAKPOINT);
++       } else {
++               vcpu->guest_debug =3D 0;
++               vcpu->arch.cfg.hedeleg |=3D BIT(EXC_BREAKPOINT);
++       }
+
+>
+> >
+> > >
+> > > >
+> > > > > +#define KVM_HEDELEG_GUEST_DEBUG                ((_AC(1, UL) << E=
+XC_INST_MISALIGNED) | \
+> > > > > +                                        (_AC(1, UL) << EXC_SYSCA=
+LL) | \
+> > > > > +                                        (_AC(1, UL) << EXC_INST_=
+PAGE_FAULT) | \
+> > > > > +                                        (_AC(1, UL) << EXC_LOAD_=
+PAGE_FAULT) | \
+> > > > > +                                        (_AC(1, UL) << EXC_STORE=
+_PAGE_FAULT))
+> > > >
+> > > > No need for KVM_HEDELEG_GUEST_DEBUG, see below.
+> > > >
+> > > > > +
+> > > > > +#define KVM_HIDELEG_DEFAULT            ((_AC(1, UL) << IRQ_VS_SO=
+FT) | \
+> > > > > +                                        (_AC(1, UL) << IRQ_VS_TI=
+MER) | \
+> > > > > +                                        (_AC(1, UL) << IRQ_VS_EX=
+T))
+> > > > > +
+> > > >
+> > > > Same as above, use BIT(xyz) here.
+> > > >
+> > > > >  enum kvm_riscv_hfence_type {
+> > > > >         KVM_RISCV_HFENCE_UNKNOWN =3D 0,
+> > > > >         KVM_RISCV_HFENCE_GVMA_VMID_GPA,
+> > > > > @@ -169,6 +185,7 @@ struct kvm_vcpu_csr {
+> > > > >  struct kvm_vcpu_config {
+> > > > >         u64 henvcfg;
+> > > > >         u64 hstateen0;
+> > > > > +       unsigned long hedeleg;
+> > > > >  };
+> > > > >
+> > > > >  struct kvm_vcpu_smstateen_csr {
+> > > > > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/inclu=
+de/uapi/asm/kvm.h
+> > > > > index 7499e88a947c..39f4f4b9dede 100644
+> > > > > --- a/arch/riscv/include/uapi/asm/kvm.h
+> > > > > +++ b/arch/riscv/include/uapi/asm/kvm.h
+> > > > > @@ -17,6 +17,7 @@
+> > > > >
+> > > > >  #define __KVM_HAVE_IRQ_LINE
+> > > > >  #define __KVM_HAVE_READONLY_MEM
+> > > > > +#define __KVM_HAVE_GUEST_DEBUG
+> > > > >
+> > > > >  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+> > > > >
+> > > > > diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+> > > > > index 225a435d9c9a..bab2ec34cd87 100644
+> > > > > --- a/arch/riscv/kvm/main.c
+> > > > > +++ b/arch/riscv/kvm/main.c
+> > > > > @@ -22,22 +22,8 @@ long kvm_arch_dev_ioctl(struct file *filp,
+> > > > >
+> > > > >  int kvm_arch_hardware_enable(void)
+> > > > >  {
+> > > > > -       unsigned long hideleg, hedeleg;
+> > > > > -
+> > > > > -       hedeleg =3D 0;
+> > > > > -       hedeleg |=3D (1UL << EXC_INST_MISALIGNED);
+> > > > > -       hedeleg |=3D (1UL << EXC_BREAKPOINT);
+> > > > > -       hedeleg |=3D (1UL << EXC_SYSCALL);
+> > > > > -       hedeleg |=3D (1UL << EXC_INST_PAGE_FAULT);
+> > > > > -       hedeleg |=3D (1UL << EXC_LOAD_PAGE_FAULT);
+> > > > > -       hedeleg |=3D (1UL << EXC_STORE_PAGE_FAULT);
+> > > > > -       csr_write(CSR_HEDELEG, hedeleg);
+> > > > > -
+> > > > > -       hideleg =3D 0;
+> > > > > -       hideleg |=3D (1UL << IRQ_VS_SOFT);
+> > > > > -       hideleg |=3D (1UL << IRQ_VS_TIMER);
+> > > > > -       hideleg |=3D (1UL << IRQ_VS_EXT);
+> > > > > -       csr_write(CSR_HIDELEG, hideleg);
+> > > > > +       csr_write(CSR_HEDELEG, KVM_HEDELEG_DEFAULT);
+> > > > > +       csr_write(CSR_HIDELEG, KVM_HIDELEG_DEFAULT);
+> > > > >
+> > > > >         /* VS should access only the time counter directly. Every=
+thing else should trap */
+> > > > >         csr_write(CSR_HCOUNTEREN, 0x02);
+> > > > > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > > > > index b5ca9f2e98ac..242076c2227f 100644
+> > > > > --- a/arch/riscv/kvm/vcpu.c
+> > > > > +++ b/arch/riscv/kvm/vcpu.c
+> > > > > @@ -475,8 +475,15 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct k=
+vm_vcpu *vcpu,
+> > > > >  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+> > > > >                                         struct kvm_guest_debug *d=
+bg)
+> > > > >  {
+> > > > > -       /* TODO; To be implemented later. */
+> > > > > -       return -EINVAL;
+> > > >
+> > > > if (vcpu->arch.ran_atleast_once)
+> > > >         return -EBUSY;
+> > >
+> > > If we enabled the guest_debug in QEMU side, then the KVM_SET_GUEST_DE=
+BUG ioctl
+> > > will come before the first KVM_RUN. This will always cause an ERROR.
+> >
+> > The check ensures that KVM user space can only enable/disable
+> > guest debug before the VCPU is run. I don't see why this would
+> > fail for QEMU.
+>
+> In the current implementation of GDB and QEMU, the userspace will enable/=
+disable
+> guest_debug frequently during the debugging (almost every step).
+> The sequence should like:
+>
+> KVM_SET_GUEST_DEBUG enable
+> KVM_RUN
+> KVM_SET_GUEST_DEBUG disable
+> KVM_SET_GUEST_DEBUG enable
+> KVM_RUN
+> KVM_SET_GUEST_DEBUG disable
+> KVM_SET_GUEST_DEBUG enable
+> KVM_RUN
+> KVM_SET_GUEST_DEBUG disable
+> ...
+
+Fair enough, no need to check "ran_atleast_once"
+
+>
+> >
+> > >
+> > > >
+> > > >
+> > > > > +       if (dbg->control & KVM_GUESTDBG_ENABLE) {
+> > > > > +               vcpu->guest_debug =3D dbg->control;
+> > > > > +               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_GUEST_DEBU=
+G;
+> > > > > +       } else {
+> > > > > +               vcpu->guest_debug =3D 0;
+> > > > > +               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_DEFAULT;
+> > > > > +       }
+> > > >
+> > > > Don't update vcpu->arch.cfg.hedeleg here since it should be only do=
+ne
+> > > > in kvm_riscv_vcpu_setup_config().
+> > > >
+> > > > > +
+> > > > > +       return 0;
+> > > > >  }
+> > > > >
+> > > > >  static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
+> > > > > @@ -505,6 +512,9 @@ static void kvm_riscv_vcpu_setup_config(struc=
+t kvm_vcpu *vcpu)
+> > > > >                 if (riscv_isa_extension_available(isa, SMSTATEEN)=
+)
+> > > > >                         cfg->hstateen0 |=3D SMSTATEEN0_SSTATEEN0;
+> > > > >         }
+> > > > > +
+> > > > > +       if (!vcpu->guest_debug)
+> > > > > +               cfg->hedeleg =3D KVM_HEDELEG_DEFAULT;
+> > > >
+> > > > This should be:
+> > > >
+> > > > cfg->hedeleg =3D KVM_HEDELEG_DEFAULT;
+> > > > if (vcpu->guest_debug)
+> > > >         cfg->hedeleg |=3D BIT(EXC_BREAKPOINT);
+> > >
+> > > Like above, here the logic should be:
+> > >
+> > > cfg->hedeleg =3D KVM_HEDELEG_DEFAULT; // with BIT(EXC_BREAKPOINT)
+> > > if (vcpu->guest_debug)
+> > >         cfg->hedeleg &=3D ~BIT(EXC_BREAKPOINT);
+> > >
+> > > Another approach is:
+> > > initialize the cfg->hedeleg as KVM_HEDELEG_DEFAULT during kvm_arch_vc=
+pu_create().
+> > > Besides that, only update the cfg->hedeleg in kvm_arch_vcpu_ioctl_set=
+_guest_debug().
+> >
+> > I disagree. We should handle hedeleg just like we handle henvcfg.
+>
+> OK, let's only update the cfg->hedeleg in kvm_riscv_vcpu_setup_config().
+>
+> >
+> > >
+> > > >
+> > > > >  }
+> > > > >
+> > > > >  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> > > > > @@ -519,6 +529,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu=
+, int cpu)
+> > > > >         csr_write(CSR_VSEPC, csr->vsepc);
+> > > > >         csr_write(CSR_VSCAUSE, csr->vscause);
+> > > > >         csr_write(CSR_VSTVAL, csr->vstval);
+> > > > > +       csr_write(CSR_HEDELEG, cfg->hedeleg);
+> > > > >         csr_write(CSR_HVIP, csr->hvip);
+> > > > >         csr_write(CSR_VSATP, csr->vsatp);
+> > > > >         csr_write(CSR_HENVCFG, cfg->henvcfg);
+> > > > > diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> > > > > index ce58bc48e5b8..7396b8654f45 100644
+> > > > > --- a/arch/riscv/kvm/vm.c
+> > > > > +++ b/arch/riscv/kvm/vm.c
+> > > > > @@ -186,6 +186,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *=
+kvm, long ext)
+> > > > >         case KVM_CAP_READONLY_MEM:
+> > > > >         case KVM_CAP_MP_STATE:
+> > > > >         case KVM_CAP_IMMEDIATE_EXIT:
+> > > > > +       case KVM_CAP_SET_GUEST_DEBUG:
+> > > > >                 r =3D 1;
+> > > > >                 break;
+> > > > >         case KVM_CAP_NR_VCPUS:
+> > > > > --
+> > > > > 2.17.1
+> > > > >
+> > > >
+> > > > Regards,
+> > > > Anup
+> > >
+> > > Thanks,
+> > > Chao
+> >
+> > Regards,
+> > Anup
+>
+> Thanks,
+> Chao
+> --
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+
+Regards,
+Anup
 
