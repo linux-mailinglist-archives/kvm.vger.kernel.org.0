@@ -1,223 +1,155 @@
-Return-Path: <kvm+bounces-10632-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10633-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03FD986E015
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 12:22:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2306E86E025
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 12:26:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96B712832A2
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 11:22:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B730B284E98
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 11:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5C96EB75;
-	Fri,  1 Mar 2024 11:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664616CBE1;
+	Fri,  1 Mar 2024 11:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M5atMBfF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IYxrHid8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A316EB59;
-	Fri,  1 Mar 2024 11:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2119E20300
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 11:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709292075; cv=none; b=tJRPMbON52Tu/HBuyM6Ypp4+3hjvcXxH/F21839fiABrrbs7oyVjjH5YBMVYsk6uqHcUoygO5+WT1Wtv3yeE1bcC5wzsfF+z4vo54xV6iWEFRQhmmJEit3KcCEThbAbcaKFVB1JeI4NAjHADscrd0RgivU9RL/nA6ooiTvsjIFA=
+	t=1709292365; cv=none; b=s/5ALFCbLPuaNEPNIoc7KtmiK6z7h5gTP4RE6E9ezDOZp98nNWovhzpiwefyntTZlAfjMCmofxuYoK+6Mg6XqlwFcMEeHpocRSN15lBZQhEFTtk+4xdydR+79hlXGIZjx9y8F6dgv5OG+x9mBaWvcE6gKqbuiNEt5K++xfAlTzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709292075; c=relaxed/simple;
-	bh=emqtL0+dXzwOhy3Q+tmmc3fBKAMADFr0JjYEl1DTI0I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hKjUoH/vZkQ/tgl6himqU/VZtZ6gqz7wbo26cruPTkq4eT/mhn9k8LXw00CsiAXPvuNXyBD5PFj7FAAuWsxKVhF9V5/XeLZwWgLccDbo7KiywIwcS2hUiX1TpBfWqcmhgEciJMjqz4e+qk81jfx5ZUjoElYMFQgHaQ3bHYdlCEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M5atMBfF; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709292074; x=1740828074;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=emqtL0+dXzwOhy3Q+tmmc3fBKAMADFr0JjYEl1DTI0I=;
-  b=M5atMBfF5+FeSERIaDCFTcgtaCz72PRyF02eZyrJNJc8q6625fcM++kw
-   pNFvADh3ODFRYxUn/7ppOg6rn7/Fvy8g7DSzP097eMl0geroOZq9W1lBT
-   0DUsqZecT7MToGynVvbv2yxR3Y153lKr7pri7BSJdQ3pVEtnjEN8zjq2B
-   K0T9CWG7HgLVz7qjjd+kMDrsRTIVb5ZTl+sHuViceHJtRQmXZ8Mxxt2bz
-   bYg4BLmiPRDk/GZC20PK5I6WlmZYDBcA4iovbSvCFoDyVLK/ZIQCdIdw4
-   MSVbD7nroccoz6zSmOjece7DlXX0kR5Gz8sCp7+2mz4xyvnypYW+VcMr4
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10999"; a="14465081"
-X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
-   d="scan'208";a="14465081"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 03:21:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
-   d="scan'208";a="31350730"
-Received: from rcaudill-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.48.180])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 03:21:10 -0800
-From: Kai Huang <kai.huang@intel.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: x86@kernel.org,
-	dave.hansen@intel.com,
-	kirill.shutemov@linux.intel.com,
-	peterz@infradead.org,
-	tglx@linutronix.de,
-	bp@alien8.de,
-	mingo@redhat.com,
-	hpa@zytor.com,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	isaku.yamahata@intel.com,
-	jgross@suse.com,
-	kai.huang@intel.com
-Subject: [PATCH 5/5] x86/virt/tdx: Export global metadata read infrastructure
-Date: Sat,  2 Mar 2024 00:20:37 +1300
-Message-ID: <ec9fc9f1d45348ddfc73362ddfb310cc5f129646.1709288433.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <cover.1709288433.git.kai.huang@intel.com>
-References: <cover.1709288433.git.kai.huang@intel.com>
+	s=arc-20240116; t=1709292365; c=relaxed/simple;
+	bh=PUQUEAguC7a4iodr6Z1RP3waTSFcj0XsUi8Jo092jnk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QdJqBMfIlUna1G4/fT3CW4QS+pD4v46vKFsXt8KJBX0XHeHC7SjYAEgi21Qq/A8Mf4ruMEbrB3jqJOCsdl6VocHV6T4+XLa7nYzR9PhrdEoD7tIWtHMpG4jca05njFHCwijRcFMpbofjrO38ofA+76n3ZzuQ0U6cdJbJgpciGC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IYxrHid8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709292362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=F99ZBpwcts994IwUQySStogjROuvdQA8mnKDnTZ7VIQ=;
+	b=IYxrHid8/x1HP9MZydwNsvgMcbpkmqO7dS1wNBfaM8IBfaBSokbrhrBvemmt9p8IbAKaD4
+	R1kDvM9EWmfq1BOjkaiPkeATaIJl1qeiw3sIKLwcduDDXzmQEvtIXlVyGm2aw3wdxWJ+xE
+	FWhRuiOVcD4myuqG/oTx8p9kRj9gm7w=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-267-KMkweal0MjOiQiRkxfG3Xg-1; Fri, 01 Mar 2024 06:26:01 -0500
+X-MC-Unique: KMkweal0MjOiQiRkxfG3Xg-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-42ea49780c1so24570971cf.2
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 03:26:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709292361; x=1709897161;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F99ZBpwcts994IwUQySStogjROuvdQA8mnKDnTZ7VIQ=;
+        b=IyCCr5oSLOdx91LFw25VVPKEsiD4OnXW5aJEsJy+Fw1t25eqK4O5LcvNR82HuOmNRS
+         3HHWwdWA0m1NuZhLCIXh1zm3K1larhglv3Bs4sLP/cYaq9UFbPru7IPfTxbh3OjsoJkp
+         1gNp9uFwOs6DDmTO/Ahh2WZzBeC0We9XOxAXGR40c4m5KhdCgPLbdBEkb/3SLy8OQkDY
+         DW3bPiBJG5eZjos3N+RppC1ogW+R8nT8K50EW1IZeR/eilyWAQwxv/ARlNU4/UaRUe9g
+         ZdNMIscasA7Sj3gGBR5sB6u3fNMbjzs3fRssIB1Qh/gmKEETZD9Ja/v6xIH5P3XEtyyD
+         xNVA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/8l8Rjdjm4Pv7QwCwGmrixIZrHfEfJ1SRz1XnlCAsgLtmJRf/5KRUhu9ciABLqdrm0m+NlMfdo9jrFLBNTM1asnau
+X-Gm-Message-State: AOJu0YwVfzpIUN/IZIlcHqiEqkX9q/qYp9FHRj4eJoE8AjCEFUHZ37oD
+	ftn6dHXYFG5QvGGmz1lJ6Jh7kZj2OU8zqwIW1RodGYY4/QXzGTUaxlK8rm89Yayc30AQbGQU/sp
+	eKO2wYUA4zol7mm+mnUhTqYzNC8TnkGNV4LyBbdIxh5USw81PQA==
+X-Received: by 2002:a05:622a:190c:b0:42e:b2fa:80cc with SMTP id w12-20020a05622a190c00b0042eb2fa80ccmr1484908qtc.56.1709292361039;
+        Fri, 01 Mar 2024 03:26:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHbQCdB9jRZGAsNwj3H5NlUMm3A1jQlDhe6tfyELOMd7VcIMNwpobakiwetJJebgSUBT6GSyQ==
+X-Received: by 2002:a05:622a:190c:b0:42e:b2fa:80cc with SMTP id w12-20020a05622a190c00b0042eb2fa80ccmr1484891qtc.56.1709292360786;
+        Fri, 01 Mar 2024 03:26:00 -0800 (PST)
+Received: from [192.168.0.9] (ip-109-43-178-133.web.vodafone.de. [109.43.178.133])
+        by smtp.gmail.com with ESMTPSA id j19-20020ac85c53000000b0042e7c95c5d6sm1605442qtj.18.2024.03.01.03.25.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Mar 2024 03:26:00 -0800 (PST)
+Message-ID: <e38eec04-5d2d-4027-85b8-91d072306d4f@redhat.com>
+Date: Fri, 1 Mar 2024 12:25:56 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 08/32] powerpc/sprs: Avoid taking PMU
+ interrupts caused by register fuzzing
+Content-Language: en-US
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
+ <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org
+References: <20240226101218.1472843-1-npiggin@gmail.com>
+ <20240226101218.1472843-9-npiggin@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240226101218.1472843-9-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-KVM will need to read a bunch of non-TDMR related metadata to create and
-run TDX guests.  Export the metadata read infrastructure for KVM to use.
+On 26/02/2024 11.11, Nicholas Piggin wrote:
+> Storing certain values in MMCR0 can cause PMU interrupts when msleep
+> enables MSR[EE], and this crashes the test. Freeze the PMU counters
+> and clear any PMU exception before calling msleep.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   lib/powerpc/asm/reg.h |  4 ++++
+>   powerpc/sprs.c        | 17 +++++++++++------
+>   2 files changed, 15 insertions(+), 6 deletions(-)
 
-Specifically, export two helpers:
-
-1) The helper which reads multiple metadata fields to a buffer of a
-   structure based on the "field ID -> structure member" mapping table.
-
-2) The low level helper which just reads a given field ID.
-
-The two helpers cover cases when the user wants to cache a bunch of
-metadata fields to a certain structure and when the user just wants to
-query a specific metadata field on demand.  They are enough for KVM to
-use (and also should be enough for other potential users).
-
-Signed-off-by: Kai Huang <kai.huang@intel.com>
-Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- arch/x86/include/asm/tdx.h  | 22 ++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.c | 25 ++++++++-----------------
- 2 files changed, 30 insertions(+), 17 deletions(-)
-
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index eba178996d84..709b9483f9e4 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -116,6 +116,28 @@ static inline u64 sc_retry(sc_func_t func, u64 fn,
- int tdx_cpu_enable(void);
- int tdx_enable(void);
- const char *tdx_dump_mce_info(struct mce *m);
-+
-+struct tdx_metadata_field_mapping {
-+	u64 field_id;
-+	int offset;
-+	int size;
-+};
-+
-+#define TD_SYSINFO_MAP(_field_id, _struct, _member)	\
-+	{ .field_id = MD_FIELD_ID_##_field_id,		\
-+	  .offset   = offsetof(_struct, _member),	\
-+	  .size     = sizeof(typeof(((_struct *)0)->_member)) }
-+
-+/*
-+ * Read multiple global metadata fields to a buffer of a structure
-+ * based on the "field ID -> structure member" mapping table.
-+ */
-+int tdx_sys_metadata_read(const struct tdx_metadata_field_mapping *fields,
-+			  int nr_fields, void *stbuf);
-+
-+/* Read a single global metadata field */
-+int tdx_sys_metadata_field_read(u64 field_id, u64 *data);
-+
- #else
- static inline void tdx_init(void) { }
- static inline int tdx_cpu_enable(void) { return -ENODEV; }
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 4ee4b8cf377c..dc21310776ab 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -251,7 +251,7 @@ static int build_tdx_memlist(struct list_head *tmb_list)
- 	return ret;
- }
- 
--static int read_sys_metadata_field(u64 field_id, u64 *data)
-+int tdx_sys_metadata_field_read(u64 field_id, u64 *data)
- {
- 	struct tdx_module_args args = {};
- 	int ret;
-@@ -270,6 +270,7 @@ static int read_sys_metadata_field(u64 field_id, u64 *data)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(tdx_sys_metadata_field_read);
- 
- /* Return the metadata field element size in bytes */
- static int get_metadata_field_bytes(u64 field_id)
-@@ -295,7 +296,7 @@ static int stbuf_read_sys_metadata_field(u64 field_id,
- 	if (WARN_ON_ONCE(get_metadata_field_bytes(field_id) != bytes))
- 		return -EINVAL;
- 
--	ret = read_sys_metadata_field(field_id, &tmp);
-+	ret = tdx_sys_metadata_field_read(field_id, &tmp);
- 	if (ret)
- 		return ret;
- 
-@@ -304,19 +305,8 @@ static int stbuf_read_sys_metadata_field(u64 field_id,
- 	return 0;
- }
- 
--struct field_mapping {
--	u64 field_id;
--	int offset;
--	int size;
--};
--
--#define TD_SYSINFO_MAP(_field_id, _struct, _member)	\
--	{ .field_id = MD_FIELD_ID_##_field_id,		\
--	  .offset   = offsetof(_struct, _member),	\
--	  .size     = sizeof(typeof(((_struct *)0)->_member)) }
--
--static int read_sys_metadata(const struct field_mapping *fields, int nr_fields,
--			     void *stbuf)
-+int tdx_sys_metadata_read(const struct tdx_metadata_field_mapping *fields,
-+			  int nr_fields, void *stbuf)
- {
- 	int i, ret;
- 
-@@ -331,6 +321,7 @@ static int read_sys_metadata(const struct field_mapping *fields, int nr_fields,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(tdx_sys_metadata_read);
- 
- #define TD_SYSINFO_MAP_TDMR_INFO(_field_id, _member)	\
- 	TD_SYSINFO_MAP(_field_id, struct tdx_tdmr_sysinfo, _member)
-@@ -338,7 +329,7 @@ static int read_sys_metadata(const struct field_mapping *fields, int nr_fields,
- static int get_tdx_tdmr_sysinfo(struct tdx_tdmr_sysinfo *tdmr_sysinfo)
- {
- 	/* Map TD_SYSINFO fields into 'struct tdx_tdmr_sysinfo': */
--	const struct field_mapping fields[] = {
-+	const struct tdx_metadata_field_mapping fields[] = {
- 		TD_SYSINFO_MAP_TDMR_INFO(MAX_TDMRS,		max_tdmrs),
- 		TD_SYSINFO_MAP_TDMR_INFO(MAX_RESERVED_PER_TDMR, max_reserved_per_tdmr),
- 		TD_SYSINFO_MAP_TDMR_INFO(PAMT_4K_ENTRY_SIZE,    pamt_entry_size[TDX_PS_4K]),
-@@ -347,7 +338,7 @@ static int get_tdx_tdmr_sysinfo(struct tdx_tdmr_sysinfo *tdmr_sysinfo)
- 	};
- 
- 	/* Populate 'tdmr_sysinfo' fields using the mapping structure above: */
--	return read_sys_metadata(fields, ARRAY_SIZE(fields), tdmr_sysinfo);
-+	return tdx_sys_metadata_read(fields, ARRAY_SIZE(fields), tdmr_sysinfo);
- }
- 
- /* Calculate the actual TDMR size */
--- 
-2.43.2
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
