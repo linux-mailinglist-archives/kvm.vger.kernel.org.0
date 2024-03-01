@@ -1,213 +1,285 @@
-Return-Path: <kvm+bounces-10572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10573-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A5586D9D2
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 03:39:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE6686DAAE
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 05:30:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607811C22A8A
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 02:39:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3C341C20B94
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 04:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D432405C6;
-	Fri,  1 Mar 2024 02:39:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CD84F60D;
+	Fri,  1 Mar 2024 04:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="tUPu3cpg"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp238.sjtu.edu.cn (smtp238.sjtu.edu.cn [202.120.2.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FB9111B1;
-	Fri,  1 Mar 2024 02:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42D94F5EA
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 04:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709260760; cv=none; b=BUNJHX/8DF6nDFXD1+E3JwHdwjaNxRcZA6LUoY7CQgKz+yZGsu9h1B4vBgpyaIPXq2BeGGtl54yZZcrrXXDmbUHAv6FYmLVoHE4kvfDpHizMt3bM7anXh04MI52MHmGoGJse4uRk1pPqcsgD8SGkTBh0X2xQ6aLcWH/quYqCvQA=
+	t=1709267436; cv=none; b=TonP2zQQpQG7u9ZdEqhkUvmc55xAx1mtrYqxbqXkUhMl+3N6RqvmAExLB+fji6akN7Gd+urSuA6KwDx6RcX8qRcbfYf36VsF9zWOVYjp186VyA9mrBWfmkf75kSiPeHLFiXOO/W0kO3Qoq+wHAtTAMKQi5nrQF8vXP/byvPixEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709260760; c=relaxed/simple;
-	bh=5OyCANYln5q1VLkON3YNr7lqyaeK3o62e/PwZmVTQz4=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type; b=TxwrUvW5Ju2AorWenpSjT8gKaJgs7p87rATzHMUAzy2YFEhaonj/zrkJvTt7jWLTCshVJYvNS0vSYgKknOsyrC81rzI5SNrZrkgEMePL2MRTteyQDcv+fzoRquXqMZU7jhoXbCuetXbDOP9lKjN1t+CuNzunbCCtkbvbpUQXeEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
-Received: from mta91.sjtu.edu.cn (unknown [10.118.0.91])
-	by smtp238.sjtu.edu.cn (Postfix) with ESMTPS id DAB52DAA;
-	Fri,  1 Mar 2024 10:30:50 +0800 (CST)
-Received: from mstore135.sjtu.edu.cn (unknown [10.118.0.135])
-	by mta91.sjtu.edu.cn (Postfix) with ESMTP id A037037C8F4;
-	Fri,  1 Mar 2024 10:30:50 +0800 (CST)
-Date: Fri, 1 Mar 2024 10:30:50 +0800 (CST)
-From: Zheyun Shen <szy0127@sjtu.edu.cn>
-To: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <1880816055.4545532.1709260250219.JavaMail.zimbra@sjtu.edu.cn>
-Subject: [PATCH] KVM:SVM: Flush cache only on CPUs running SEV guest
+	s=arc-20240116; t=1709267436; c=relaxed/simple;
+	bh=6ZSwzvZa7/QWt6Zts/1a0e38aM9Z/Bh3yx29QjyPgbI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p1WGjXLy61Sr7zl841/EHV4oA7eQBf3bOnN3ZbavBkcKFAws4BC2Z48mPlIIVgKpG84RxAhFd6gWZzNwYF/WfYNy0qDZmpGk5AxWakJvb1LRbSnNdjs5fHNrsumI/AJuiu1wXZQVB18Bq7FJC3wzahExGq223OFZJQ7RcrN+QaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=tUPu3cpg; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7c78b520bc3so63772039f.0
+        for <kvm@vger.kernel.org>; Thu, 29 Feb 2024 20:30:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1709267434; x=1709872234; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U9fQ7RC4xc34ND181p/Cmnn+gjK6g/XMfKjErmffW8s=;
+        b=tUPu3cpgrCtuTUanD6s7x0yX9UwixVc2zjEkXaI+MHv6QDP5ThvUPs3OivBMvoTNoG
+         UI6CwM0oETtH/knoI3SdjKPi6Sj2XnUy3TPojYAtWLh8g8gBorSSxjmQjApD0EX4x3td
+         z2lA30h/h6Q0O4jJaccJuSmuFJm+bjlcDCkMT6ZCOzesSoYoPd4eFD+l4TFSOHbmNCQp
+         6Of3JkaOq7kd7z6Qtpgo/R3q7YoACskF8KTlA4AYBCTn0kdxUPKyZ5g2KOG5INQBWLGM
+         P05jVEW/jMoZlenvATohehDSuyg5TVtjxNlqNCa3B8wYqKyURHGr8wsW5LKJeBQEG3/k
+         R2oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709267434; x=1709872234;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U9fQ7RC4xc34ND181p/Cmnn+gjK6g/XMfKjErmffW8s=;
+        b=E7ikrq5OmVfMdNMclUuNQ5FRkGRcUxYi7iaO+3BWUyER5gfKFsnbLpzyYSeP/0IAmJ
+         Yzel2KCf6lhPJIcVBx7aUtA2JWwkp3XC5MVAs58dJqzhsoKIDyTVvtJgWP1ZCwzBxan3
+         RNaIs9pukaz3PNiaJwKMHtDYXXouUUDRM4x2j9JXr6Dv4ipzEzL5OC+Zpy9qjzV6iLhu
+         +tlqH2bDDhHpuD8WIXSHO/SFVMxxio9rutWd/mJzrTm8zWeI1uNvakW3lrEjKRdPitMy
+         Jlu2TgR1/G9cFjJZT/xpfrKRDiiSq8cMNCoJu0Hs+ASqFXOCXpdJ0Zv/PTAPn3dmR4Ri
+         aQKw==
+X-Gm-Message-State: AOJu0YxA/BNebjOB1mlMM6PNw7T4cwYckNxfaZ7EUn6hAIM43R158mb+
+	6BbDOE32XWgJLUsjD3McVkFHGCg3Bh477ifGQi3WW+j18wEkgxskJqyX7sjgLCKx23befEKKkpD
+	ivPnOK7agIGTu1yo4m3Ue8YXl55a8EMth4WVURA==
+X-Google-Smtp-Source: AGHT+IFpk9oSfyH0+nbWbG5EGwPri9Z/SnwPWj4nbuD7lxMy9Z3pXe9DZQfsb92pnvOjE1EJs2eRaPBwCygerDMkWJk=
+X-Received: by 2002:a92:cda9:0:b0:364:216e:d1dc with SMTP id
+ g9-20020a92cda9000000b00364216ed1dcmr909152ild.22.1709267433859; Thu, 29 Feb
+ 2024 20:30:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=GB2312
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 10.0.6_GA_4585 (ZimbraWebClient - GC121 (Win)/10.0.6_GA_4585)
-Thread-Index: 6+0saTCB4Pk4lnaiqVwtNt1nJUojNQ==
-Thread-Topic: Flush cache only on CPUs running SEV guest
+References: <20240301013545.10403-1-duchao@eswincomputing.com> <20240301013545.10403-2-duchao@eswincomputing.com>
+In-Reply-To: <20240301013545.10403-2-duchao@eswincomputing.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 1 Mar 2024 10:00:23 +0530
+Message-ID: <CAAhSdy2+_+t4L8LHmYcJQZBGJHj6pyFm26_KwFBahFxz7eV1fQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+To: Chao Du <duchao@eswincomputing.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, 
+	pbonzini@redhat.com, shuah@kernel.org, dbarboza@ventanamicro.com, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	duchao713@qq.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On AMD CPUs without ensuring cache consistency, each memory page reclamation in
-an SEV guest triggers a call to wbinvd_on_all_cpus, thereby affecting the
-performance of other programs on the host.
+On Fri, Mar 1, 2024 at 7:08=E2=80=AFAM Chao Du <duchao@eswincomputing.com> =
+wrote:
+>
+> kvm_vm_ioctl_check_extension(): Return 1 if KVM_CAP_SET_GUEST_DEBUG is
+> been checked.
+>
+> kvm_arch_vcpu_ioctl_set_guest_debug(): Update the guest_debug flags
+> from userspace accordingly. Route the breakpoint exceptions to HS mode
+> if the VCPU is being debugged by userspace, by clearing the
+> corresponding bit in hedeleg. Write the actual CSR in
+> kvm_arch_vcpu_load().
+>
+> Signed-off-by: Chao Du <duchao@eswincomputing.com>
+> ---
+>  arch/riscv/include/asm/kvm_host.h | 17 +++++++++++++++++
+>  arch/riscv/include/uapi/asm/kvm.h |  1 +
+>  arch/riscv/kvm/main.c             | 18 ++----------------
+>  arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
+>  arch/riscv/kvm/vm.c               |  1 +
+>  5 files changed, 34 insertions(+), 18 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
+vm_host.h
+> index 484d04a92fa6..9ee3f03ba5d1 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -43,6 +43,22 @@
+>         KVM_ARCH_REQ_FLAGS(5, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_STEAL_UPDATE           KVM_ARCH_REQ(6)
+>
+> +#define KVM_HEDELEG_DEFAULT            ((_AC(1, UL) << EXC_INST_MISALIGN=
+ED) | \
+> +                                        (_AC(1, UL) << EXC_BREAKPOINT) |=
+ \
+> +                                        (_AC(1, UL) << EXC_SYSCALL) | \
+> +                                        (_AC(1, UL) << EXC_INST_PAGE_FAU=
+LT) | \
+> +                                        (_AC(1, UL) << EXC_LOAD_PAGE_FAU=
+LT) | \
+> +                                        (_AC(1, UL) << EXC_STORE_PAGE_FA=
+ULT))
 
-Typically, an AMD server may have 128 cores or more, while the SEV guest might only
-utilize 8 of these cores. Meanwhile, host can use qemu-affinity to bind these 8 vCPUs
-to specific physical CPUs.
+Use BIT(xyz) here. For example: BIT(EXC_INST_MISALIGNED)
 
-Therefore, keeping a record of the physical core numbers each time a vCPU runs
-can help avoid flushing the cache for all CPUs every time.
+Also, BIT(EXC_BREAKPOINT) should not be part of KVM_HEDELEG_DEFAULT.
 
-Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
----
- arch/x86/include/asm/smp.h |  1 +
- arch/x86/kvm/svm/sev.c     | 28 ++++++++++++++++++++++++----
- arch/x86/kvm/svm/svm.c     |  4 ++++
- arch/x86/kvm/svm/svm.h     |  3 +++
- arch/x86/lib/cache-smp.c   |  7 +++++++
- 5 files changed, 39 insertions(+), 4 deletions(-)
+> +#define KVM_HEDELEG_GUEST_DEBUG                ((_AC(1, UL) << EXC_INST_=
+MISALIGNED) | \
+> +                                        (_AC(1, UL) << EXC_SYSCALL) | \
+> +                                        (_AC(1, UL) << EXC_INST_PAGE_FAU=
+LT) | \
+> +                                        (_AC(1, UL) << EXC_LOAD_PAGE_FAU=
+LT) | \
+> +                                        (_AC(1, UL) << EXC_STORE_PAGE_FA=
+ULT))
 
-diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
-index 4fab2ed45..19297202b 100644
---- a/arch/x86/include/asm/smp.h
-+++ b/arch/x86/include/asm/smp.h
-@@ -120,6 +120,7 @@ void native_play_dead(void);
- void play_dead_common(void);
- void wbinvd_on_cpu(int cpu);
- int wbinvd_on_all_cpus(void);
-+int wbinvd_on_cpus(struct cpumask *cpumask);
- 
- void smp_kick_mwait_play_dead(void);
- 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f760106c3..b6ed9a878 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -215,6 +215,21 @@ static void sev_asid_free(struct kvm_sev_info *sev)
-         sev->misc_cg = NULL;
- }
- 
-+struct cpumask *sev_get_cpumask(struct kvm *kvm)
-+{
-+        struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+
-+        return &sev->cpumask;
-+}
-+
-+void sev_clear_cpumask(struct kvm *kvm)
-+{
-+        struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+
-+        cpumask_clear(&sev->cpumask);
-+}
-+
-+
- static void sev_decommission(unsigned int handle)
- {
-         struct sev_data_decommission decommission;
-@@ -255,6 +270,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
-         if (unlikely(sev->active))
-                 return ret;
- 
-+        cpumask_clear(&sev->cpumask);
-         sev->active = true;
-         sev->es_active = argp->id == KVM_SEV_ES_INIT;
-         asid = sev_asid_new(sev);
-@@ -2048,7 +2064,8 @@ int sev_mem_enc_unregister_region(struct kvm *kvm,
-          * releasing the pages back to the system for use. CLFLUSH will
-          * not do this, so issue a WBINVD.
-          */
--        wbinvd_on_all_cpus();
-+        wbinvd_on_cpus(sev_get_cpumask(kvm));
-+        sev_clear_cpumask(kvm);
- 
-         __unregister_enc_region_locked(kvm, region);
- 
-@@ -2152,7 +2169,8 @@ void sev_vm_destroy(struct kvm *kvm)
-          * releasing the pages back to the system for use. CLFLUSH will
-          * not do this, so issue a WBINVD.
-          */
--        wbinvd_on_all_cpus();
-+        wbinvd_on_cpus(sev_get_cpumask(kvm));
-+        sev_clear_cpumask(kvm);
- 
-         /*
-          * if userspace was terminated before unregistering the memory regions
-@@ -2343,7 +2361,8 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
-         return;
- 
- do_wbinvd:
--        wbinvd_on_all_cpus();
-+        wbinvd_on_cpus(sev_get_cpumask(vcpu->kvm));
-+        sev_clear_cpumask(vcpu->kvm);
- }
- 
- void sev_guest_memory_reclaimed(struct kvm *kvm)
-@@ -2351,7 +2370,8 @@ void sev_guest_memory_reclaimed(struct kvm *kvm)
-         if (!sev_guest(kvm))
-                 return;
- 
--        wbinvd_on_all_cpus();
-+        wbinvd_on_cpus(sev_get_cpumask(kvm));
-+        sev_clear_cpumask(kvm);
- }
- 
- void sev_free_vcpu(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index e90b429c8..f9bfa6e57 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4107,6 +4107,10 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
- 
-         amd_clear_divider();
- 
-+    if (sev_guest(vcpu->kvm))
-+                cpumask_set_cpu(smp_processor_id(), sev_get_cpumask(vcpu->kvm));
-+    
-         if (sev_es_guest(vcpu->kvm))
-                 __svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted);
-         else
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 8ef95139c..1577e200e 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -90,6 +90,7 @@ struct kvm_sev_info {
-         struct list_head mirror_entry; /* Use as a list entry of mirrors */
-         struct misc_cg *misc_cg; /* For misc cgroup accounting */
-         atomic_t migration_in_progress;
-+        struct cpumask cpumask; /* CPU list to flush */
- };
- 
- struct kvm_svm {
-@@ -694,6 +695,8 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
- void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
- void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
- void sev_es_unmap_ghcb(struct vcpu_svm *svm);
-+struct cpumask *sev_get_cpumask(struct kvm *kvm);
-+void sev_clear_cpumask(struct kvm *kvm);
- 
- /* vmenter.S */
- 
-diff --git a/arch/x86/lib/cache-smp.c b/arch/x86/lib/cache-smp.c
-index 7af743bd3..8806f53ba 100644
---- a/arch/x86/lib/cache-smp.c
-+++ b/arch/x86/lib/cache-smp.c
-@@ -20,3 +20,10 @@ int wbinvd_on_all_cpus(void)
-         return 0;
- }
- EXPORT_SYMBOL(wbinvd_on_all_cpus);
-+
-+int wbinvd_on_cpus(struct cpumask *mask)
-+{
-+    on_each_cpu_cond_mask(NULL, __wbinvd, NULL, 1, mask);
-+    return 0;
-+}
-+EXPORT_SYMBOL(wbinvd_on_cpus);
---
-2.34.1
+No need for KVM_HEDELEG_GUEST_DEBUG, see below.
+
+> +
+> +#define KVM_HIDELEG_DEFAULT            ((_AC(1, UL) << IRQ_VS_SOFT) | \
+> +                                        (_AC(1, UL) << IRQ_VS_TIMER) | \
+> +                                        (_AC(1, UL) << IRQ_VS_EXT))
+> +
+
+Same as above, use BIT(xyz) here.
+
+>  enum kvm_riscv_hfence_type {
+>         KVM_RISCV_HFENCE_UNKNOWN =3D 0,
+>         KVM_RISCV_HFENCE_GVMA_VMID_GPA,
+> @@ -169,6 +185,7 @@ struct kvm_vcpu_csr {
+>  struct kvm_vcpu_config {
+>         u64 henvcfg;
+>         u64 hstateen0;
+> +       unsigned long hedeleg;
+>  };
+>
+>  struct kvm_vcpu_smstateen_csr {
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
+asm/kvm.h
+> index 7499e88a947c..39f4f4b9dede 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -17,6 +17,7 @@
+>
+>  #define __KVM_HAVE_IRQ_LINE
+>  #define __KVM_HAVE_READONLY_MEM
+> +#define __KVM_HAVE_GUEST_DEBUG
+>
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>
+> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+> index 225a435d9c9a..bab2ec34cd87 100644
+> --- a/arch/riscv/kvm/main.c
+> +++ b/arch/riscv/kvm/main.c
+> @@ -22,22 +22,8 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>
+>  int kvm_arch_hardware_enable(void)
+>  {
+> -       unsigned long hideleg, hedeleg;
+> -
+> -       hedeleg =3D 0;
+> -       hedeleg |=3D (1UL << EXC_INST_MISALIGNED);
+> -       hedeleg |=3D (1UL << EXC_BREAKPOINT);
+> -       hedeleg |=3D (1UL << EXC_SYSCALL);
+> -       hedeleg |=3D (1UL << EXC_INST_PAGE_FAULT);
+> -       hedeleg |=3D (1UL << EXC_LOAD_PAGE_FAULT);
+> -       hedeleg |=3D (1UL << EXC_STORE_PAGE_FAULT);
+> -       csr_write(CSR_HEDELEG, hedeleg);
+> -
+> -       hideleg =3D 0;
+> -       hideleg |=3D (1UL << IRQ_VS_SOFT);
+> -       hideleg |=3D (1UL << IRQ_VS_TIMER);
+> -       hideleg |=3D (1UL << IRQ_VS_EXT);
+> -       csr_write(CSR_HIDELEG, hideleg);
+> +       csr_write(CSR_HEDELEG, KVM_HEDELEG_DEFAULT);
+> +       csr_write(CSR_HIDELEG, KVM_HIDELEG_DEFAULT);
+>
+>         /* VS should access only the time counter directly. Everything el=
+se should trap */
+>         csr_write(CSR_HCOUNTEREN, 0x02);
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index b5ca9f2e98ac..242076c2227f 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -475,8 +475,15 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu =
+*vcpu,
+>  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>                                         struct kvm_guest_debug *dbg)
+>  {
+> -       /* TODO; To be implemented later. */
+> -       return -EINVAL;
+
+if (vcpu->arch.ran_atleast_once)
+        return -EBUSY;
+
+
+> +       if (dbg->control & KVM_GUESTDBG_ENABLE) {
+> +               vcpu->guest_debug =3D dbg->control;
+> +               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_GUEST_DEBUG;
+> +       } else {
+> +               vcpu->guest_debug =3D 0;
+> +               vcpu->arch.cfg.hedeleg =3D KVM_HEDELEG_DEFAULT;
+> +       }
+
+Don't update vcpu->arch.cfg.hedeleg here since it should be only done
+in kvm_riscv_vcpu_setup_config().
+
+> +
+> +       return 0;
+>  }
+>
+>  static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
+> @@ -505,6 +512,9 @@ static void kvm_riscv_vcpu_setup_config(struct kvm_vc=
+pu *vcpu)
+>                 if (riscv_isa_extension_available(isa, SMSTATEEN))
+>                         cfg->hstateen0 |=3D SMSTATEEN0_SSTATEEN0;
+>         }
+> +
+> +       if (!vcpu->guest_debug)
+> +               cfg->hedeleg =3D KVM_HEDELEG_DEFAULT;
+
+This should be:
+
+cfg->hedeleg =3D KVM_HEDELEG_DEFAULT;
+if (vcpu->guest_debug)
+        cfg->hedeleg |=3D BIT(EXC_BREAKPOINT);
+
+>  }
+>
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> @@ -519,6 +529,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cp=
+u)
+>         csr_write(CSR_VSEPC, csr->vsepc);
+>         csr_write(CSR_VSCAUSE, csr->vscause);
+>         csr_write(CSR_VSTVAL, csr->vstval);
+> +       csr_write(CSR_HEDELEG, cfg->hedeleg);
+>         csr_write(CSR_HVIP, csr->hvip);
+>         csr_write(CSR_VSATP, csr->vsatp);
+>         csr_write(CSR_HENVCFG, cfg->henvcfg);
+> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> index ce58bc48e5b8..7396b8654f45 100644
+> --- a/arch/riscv/kvm/vm.c
+> +++ b/arch/riscv/kvm/vm.c
+> @@ -186,6 +186,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
+g ext)
+>         case KVM_CAP_READONLY_MEM:
+>         case KVM_CAP_MP_STATE:
+>         case KVM_CAP_IMMEDIATE_EXIT:
+> +       case KVM_CAP_SET_GUEST_DEBUG:
+>                 r =3D 1;
+>                 break;
+>         case KVM_CAP_NR_VCPUS:
+> --
+> 2.17.1
+>
+
+Regards,
+Anup
 
