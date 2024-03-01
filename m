@@ -1,184 +1,150 @@
-Return-Path: <kvm+bounces-10680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10681-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C5FB86E95F
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:20:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D34D386E972
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 20:24:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40D79286C94
-	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 19:20:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E2C81F20FBE
+	for <lists+kvm@lfdr.de>; Fri,  1 Mar 2024 19:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFD03AC26;
-	Fri,  1 Mar 2024 19:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14CC3AC14;
+	Fri,  1 Mar 2024 19:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="lktGmRmB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2oQl1kTH"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DC739FF2
-	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 19:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582FF13AC0
+	for <kvm@vger.kernel.org>; Fri,  1 Mar 2024 19:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709320813; cv=none; b=UPXNdF8EBNUlTsrmLfcwbMSj+dk7VzaYRQ6TCeAvcXxylufg2bGQaNnHZmMat7ODuzAoxs3wBMUAT+T1N98vH4Xr1AIB72v4i+Asif7MrxdtS7qnXrRq5Hoqcb9WS1Vnk1p55CQYRoFGiD4MgQ0dxO5kVrF4pxbjLRXOOuW+P8M=
+	t=1709321071; cv=none; b=MIAMaVNpeKSBetHD99i2akeze7TYg9cKAkEN0ObP3+g2mZwCSREyp+o4prvvYSuC6a8Hqu1TfjEb2FyXoK7yV4sRxAhzSwHR60kpLrr4abhNbfXhbQDUBRN+uw+1rV66DNPS5wMbX7ip/Y3NnHB3fZixB9hlpfp3GOsdBpoT47g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709320813; c=relaxed/simple;
-	bh=Swe/Qd9r++tAyJ9RTTXIMVdtbl0ZRCkDiMrhyMl4Y/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dA+Q50CC0zlsIs8nPAK0QVzdEuRw5YZelNEOgPubV4E3PbiLX5Bvtg7+E8i2LBtZ0g1YGLWgExOc5+PD9tWHucTXF4NZaSqU4lgb63FiWDOM/Ay/Up8wQ5rhZHYgTlYN7/G1bAxDSbplekzeTYh7dE66qtOteBmjuZOcOkjbjGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=lktGmRmB; arc=none smtp.client-ip=83.166.143.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TmdFs5ByrzWxc;
-	Fri,  1 Mar 2024 20:20:01 +0100 (CET)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4TmdFr4x9XzMpnPn;
-	Fri,  1 Mar 2024 20:20:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1709320801;
-	bh=Swe/Qd9r++tAyJ9RTTXIMVdtbl0ZRCkDiMrhyMl4Y/U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lktGmRmB5jUGmygRJXVx3w6EV3a0DZTb+fL0YMAQUVn6UY6tLSvUrsV71IIHpR5FX
-	 qxh1iOBsRbD0j1QUslG9mjhRqgyWekJAvJVhwQjiv4OwW3RsUNfZ9wKQ7O5bHGYTk/
-	 KGCYwD0LX3vUL7eYRcXxxH0H8C7z9+3+g9HzC8Tw=
-Date: Fri, 1 Mar 2024 20:19:50 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: David Gow <davidgow@google.com>
-Cc: Brendan Higgins <brendanhiggins@google.com>, 
-	Kees Cook <keescook@chromium.org>, Rae Moar <rmoar@google.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Alan Maguire <alan.maguire@oracle.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	James Morris <jamorris@linux.microsoft.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marco Pagani <marpagan@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Thara Gopinath <tgopinath@microsoft.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Wanpeng Li <wanpengli@tencent.com>, Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org
-Subject: Re: [PATCH v1 0/8] Run KUnit tests late and handle faults
-Message-ID: <20240301.gaiWei9eng4u@digikod.net>
-References: <20240229170409.365386-1-mic@digikod.net>
- <CABVgOSnTfUBWcX4o68ZoZC+vZSEzUp=UikQM5M70ECyS44GfNQ@mail.gmail.com>
+	s=arc-20240116; t=1709321071; c=relaxed/simple;
+	bh=umgf9/Xh2fiEs38aP0Wij2OiHd8/uhV+11hOzUYf1uQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B0DqMG6scDndvdwLoZBTMsbJEiUZpTfxBfp5MnkD8O/yS/Hj3fKmDMJMjresaI+K5VaerHR1qV1E9mTk6evCsZGVoZ/OQ5yY7/AWTo3+V75FWKLfC15+3AO67wuCT2V0HvDX5gBFXdYXNn2+nJwCwr0jSGW8C9rnB4bOeoL4TA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2oQl1kTH; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso14404a12.0
+        for <kvm@vger.kernel.org>; Fri, 01 Mar 2024 11:24:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709321068; x=1709925868; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LDuPeEH5wsG8B80wWhr2QXdeB+S1bWAHLXQ9jR96lHc=;
+        b=2oQl1kTHnCt60tj71ozCMPfS+yM3Wbr8xdZeAUfE0y6A0ZX7HBCYCzOJ8N8+RKTlB/
+         1/08cldk/tKUK8DgdoaYMjhicN+NmZlhH2UWb7hbc2fZ463qxoaxmb+pOIPTxX23YP/i
+         9gmFYt5R+8QskTXjRLdWi2gFqDJjColg+HhlYbyzSkFZYICPbKBuP/BoF+opCBvRwa0j
+         u1WiOcD1hTzuz6dgq4F8D5qf2hxeqIHCvxOv63xTL/OItvB2UXViDTlMjPPrX3IzahEQ
+         m6pTnKpFSYOGWEoJ3cQjcTQhXCf+01KOFPtDOEGWHj0SGv85mwyDVFKkCK6e5AXEXARk
+         rNbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709321068; x=1709925868;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LDuPeEH5wsG8B80wWhr2QXdeB+S1bWAHLXQ9jR96lHc=;
+        b=OkDP+uLHm8z6Q3koEUwhlHNfQhgeayCwZ5XSzRejSQE17hG98TAyLfeV6HUN5hVSmi
+         nO/wBGTQO4TRJ6A28Jw8F9J4oAiEAk8UzHY5Kr2MKQwu1LY6O7m0PiK5dMXDcQFmN0rT
+         XXDePeAkAl7cIuySBCw8uBeXloZ3aBlh7k0kM3UQ97dmo7Gq1Ev9Whr2Z30CZ+cYczlM
+         qap3PL0YXhP1Gxvic0fwjSGV/6sX9Kxq3fXGalqvmL4YucRyW9Q3ZOCpAUilfXm35cCg
+         o5G6nUeVdR8/h74lRobyxwzfgsM+Ygp3caqcWRFRauOiLUIXaGIaDoEk5Ep/jquPEH/h
+         Uj0g==
+X-Gm-Message-State: AOJu0YzkfxST3Qq6LlQdyQ3jiFB80IfI6PaNxx9v7C41ZKcJqvF3lKv2
+	1f0kMXPGkdx9AHUl+9C2uY9DM0lnqQZXId1bvSdrFzNUiORrHXeldt+bCtJ4L3CMR5gqiw2ahqJ
+	cWvh5GMsT8JKPU9TMd5B4qcwtaBesy5276V4X
+X-Google-Smtp-Source: AGHT+IFQ0gnP6qnKKDdSZv1A5AwEYM2+CsTYjoZPo8yzDomIX1ZoElk/kzrghH7WVuOGDi2oFtU7dFMuwrTDybDo3xo=
+X-Received: by 2002:a05:6402:5215:b0:566:f626:229b with SMTP id
+ s21-20020a056402521500b00566f626229bmr28826edd.7.1709321067574; Fri, 01 Mar
+ 2024 11:24:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABVgOSnTfUBWcX4o68ZoZC+vZSEzUp=UikQM5M70ECyS44GfNQ@mail.gmail.com>
-X-Infomaniak-Routing: alpha
+References: <20240301074423.643779-1-sandipan.das@amd.com>
+In-Reply-To: <20240301074423.643779-1-sandipan.das@amd.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 1 Mar 2024 11:24:11 -0800
+Message-ID: <CALMp9eRbOQpVsKkZ9N1VYTyOrKPWCmvi0B5WZCFXAPsSkShmEA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Do not mask LVTPC when handling a PMI on AMD platforms
+To: Sandipan Das <sandipan.das@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, seanjc@google.com, 
+	pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	mlevitsk@redhat.com, vkuznets@redhat.com, mizhang@google.com, 
+	tao1.su@linux.intel.com, andriy.shevchenko@linux.intel.com, 
+	ravi.bangoria@amd.com, ananth.narayan@amd.com, nikunj.dadhania@amd.com, 
+	santosh.shukla@amd.com, manali.shukla@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 01, 2024 at 03:15:08PM +0800, David Gow wrote:
-> On Fri, 1 Mar 2024 at 01:04, Mickaël Salaün <mic@digikod.net> wrote:
-> >
-> > Hi,
-> >
-> 
-> Thanks very much. I think there's a lot going on in this series, and
-> it'd probably be easier to address if it were broken up a bit more.
-> 
-> To take things one at a time:
-> 
-> > This patch series moves KUnit test execution at the very end of kernel
-> > initialization, just before launching the init process.  This opens the
-> > way to test any kernel code in its normal state (i.e. fully
-> > initialized).
-> 
-> I like the general idea here, but there are a few things to keep in mind:
-> - We can already do this with tests built as modules.
-> - We have explicit support for testing __init code, so if we want to
-> keep that (and I think we do), we'll need to make sure that there
-> remains a way to run tests before __init.
-> - Behaviour changes here will need to be documented and tested well
-> across all tests and architectures, so it's not something I'd want to
-> land quickly.
-> - The requirement to have a root filesystem set up is another thing
-> we'll want to handle carefully.
-> - As-is, the patch seems to break arm64.
+On Thu, Feb 29, 2024 at 11:44=E2=80=AFPM Sandipan Das <sandipan.das@amd.com=
+> wrote:
+>
+> On AMD and Hygon platforms, the local APIC does not automatically set
+> the mask bit of the LVTPC register when handling a PMI and there is
+> no need to clear it in the kernel's PMI handler.
 
-Fair, I'll remove this patch from the next series.
+I don't know why it didn't occur to me that different x86 vendors
+wouldn't agree on this specification. :)
 
-> 
-> >
-> > This patch series also teaches KUnit to handle kthread faults as errors,
-> > and it brings a few related fixes and improvements.
-> 
-> These seem very good overall. I want to look at the last location
-> stuff in a bit more detail, but otherwise this is okay.
+> For guests, the mask bit is currently set by kvm_apic_local_deliver()
+> and unless it is cleared by the guest kernel's PMI handler, PMIs stop
+> arriving and break use-cases like sampling with perf record.
+>
+> This does not affect non-PerfMonV2 guests because PMIs are handled in
+> the guest kernel by x86_pmu_handle_irq() which always clears the LVTPC
+> mask bit irrespective of the vendor.
+>
+> Before:
+>
+>   $ perf record -e cycles:u true
+>   [ perf record: Woken up 1 times to write data ]
+>   [ perf record: Captured and wrote 0.001 MB perf.data (1 samples) ]
+>
+> After:
+>
+>   $ perf record -e cycles:u true
+>   [ perf record: Woken up 1 times to write data ]
+>   [ perf record: Captured and wrote 0.002 MB perf.data (19 samples) ]
+>
+> Fixes: a16eb25b09c0 ("KVM: x86: Mask LVTPC when handling a PMI")
+> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+> ---
+>  arch/x86/kvm/lapic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 3242f3da2457..0959a887c306 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2768,7 +2768,7 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, =
+int lvt_type)
+>                 trig_mode =3D reg & APIC_LVT_LEVEL_TRIGGER;
+>
+>                 r =3D __apic_accept_irq(apic, mode, vector, 1, trig_mode,=
+ NULL);
+> -               if (r && lvt_type =3D=3D APIC_LVTPC)
+> +               if (r && lvt_type =3D=3D APIC_LVTPC && !guest_cpuid_is_am=
+d_or_hygon(apic->vcpu))
 
-Thanks!
+Perhaps we could use a positive predicate instead:
+guest_cpuid_is_intel(apic->vcpu)?
 
-> 
-> Personally, I'd like to see this split out into a separate series,
-> partly because I don't want to delay it while we sort the other parts
-> of this series out, and partly because I have some other changes to
-> the thread context stuff I think we need to make.
-
-I'll do that today.
-
-> 
-> >
-> > New tests check NULL pointer dereference and read-only memory, which
-> > wasn't possible before.
-> 
-> These look interesting, but I don't like that they are listed as x86-specific.
-
-I was reluctant to make it more broadly available because I only tested
-on x86...
-
-> 
-> >
-> > This is useful to test current kernel self-protection mechanisms or
-> > future ones such as Heki: https://github.com/heki-linux
-> >
-> > Regards,
-> 
-> Thanks again. I'll do a more detailed review of the individual patches
-> next week, but I'm excited to see this overall.
-
-Good, you'll review the v2 then.
-
-> 
-> Cheers,
-> -- David
-> 
-> 
-> >
-> > Mickaël Salaün (8):
-> >   kunit: Run tests when the kernel is fully setup
-> >   kunit: Handle thread creation error
-> >   kunit: Fix kthread reference
-> >   kunit: Fix timeout message
-> >   kunit: Handle test faults
-> >   kunit: Fix KUNIT_SUCCESS() calls in iov_iter tests
-> >   kunit: Print last test location on fault
-> >   kunit: Add tests for faults
-> >
-> >  include/kunit/test.h                |  24 +++++-
-> >  include/kunit/try-catch.h           |   3 -
-> >  init/main.c                         |   4 +-
-> >  lib/bitfield_kunit.c                |   8 +-
-> >  lib/checksum_kunit.c                |   2 +-
-> >  lib/kunit/executor.c                |  81 ++++++++++++++------
-> >  lib/kunit/kunit-example-test.c      |   6 +-
-> >  lib/kunit/kunit-test.c              | 115 +++++++++++++++++++++++++++-
-> >  lib/kunit/try-catch.c               |  33 +++++---
-> >  lib/kunit_iov_iter.c                |  70 ++++++++---------
-> >  tools/testing/kunit/kunit_kernel.py |   6 +-
-> >  11 files changed, 261 insertions(+), 91 deletions(-)
-> >
-> >
-> > base-commit: d206a76d7d2726f3b096037f2079ce0bd3ba329b
-> > --
-> > 2.44.0
-> >
-
-
+>                         kvm_lapic_set_reg(apic, APIC_LVTPC, reg | APIC_LV=
+T_MASKED);
+>                 return r;
+>         }
+> --
+> 2.34.1
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
