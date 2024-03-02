@@ -1,196 +1,188 @@
-Return-Path: <kvm+bounces-10709-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7765486EF74
-	for <lists+kvm@lfdr.de>; Sat,  2 Mar 2024 09:16:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDF2686EF86
+	for <lists+kvm@lfdr.de>; Sat,  2 Mar 2024 09:26:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E267F1F221B8
-	for <lists+kvm@lfdr.de>; Sat,  2 Mar 2024 08:16:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 584271F2341C
+	for <lists+kvm@lfdr.de>; Sat,  2 Mar 2024 08:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13884134C0;
-	Sat,  2 Mar 2024 08:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="nkCn4lPW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997AB17743;
+	Sat,  2 Mar 2024 08:25:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AAB10A1A
-	for <kvm@vger.kernel.org>; Sat,  2 Mar 2024 08:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625D31754E;
+	Sat,  2 Mar 2024 08:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709367366; cv=none; b=RmHdxaX3Y09hFbl8MTOzDNSJVEoaBK4hqVnDAIp4upXu0UMuvAHLVTqFcwrchCXiVSrIrzdm7nk+XJ8uTUuEtDqRT/mBDOQO9yWHDr5jrsWqpsVk++fMckdUQROZoqJ+sI6YHUgM8Y1pFWRr2MRCx8tE0ArlO662CdY2B6gz0Zc=
+	t=1709367939; cv=none; b=N+01Ub9JMlrgSTU0yKox+moKDk0w8FXMVn1QleAC/rUHx3OomFrtpifI8DpQuWM6mRri26NTl98IAAGDXvSOUQ2i76pozpAFDR6nsUZY7HjDqcv9aql4f9K62qu7mWTKMD06PImaKuuQf7w9oN1cKAemjWTUU7/Rskd5VXhWZTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709367366; c=relaxed/simple;
-	bh=imsGxIIQqPdVCZnOSU+QGiRGjl9zsoGfrVdggA1Gq08=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SDpGfim43+jikzcyemTKuXddfDMFp6CfpgUR3TOY9T0I/vfn5fCQySfWMabivnpb7rsK1sSfQYxMp15lnXvK5Blu2dAi2wk0L4b2WcrEvVv4V0T03yNhiPx+vUFkDUqgjAO3fmHOiLuQ1iS/FqjSqm2sAigRN8sEIexby7I1L1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=nkCn4lPW; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5133d276cbaso205957e87.2
-        for <kvm@vger.kernel.org>; Sat, 02 Mar 2024 00:16:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709367362; x=1709972162; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j+sRBWRjS//bpUjvTytLqzgwvFA5NfQ/0kKt6udHWnE=;
-        b=nkCn4lPWjY7mr0p+amadO30qxhcAvozpbC8erI2rqMjD0cBAwyP8ZWlU4hIjrcpMX7
-         t2gOhMrmvWKSa+iHkDtdkhgeXM5DM25fsDylmEGioHYzeNgZhZMpPh5SQuqG0d6/9qBe
-         7HVx59wW26/jEAwIFGYUL03JyvtPvv2eUv1N6g8uRSgxFlNHBdk+6lH8P05rKtgaQojU
-         QO0vp+59tuvCSuliNZ0SViW6KIBRRRVnFQcBF0l5mi+RXdbsQzEWa8WoLSuEjhyRpSUl
-         yBkILIyN5tn5UJHfyCLoOu5DhdLgdbJngNGwk6hW+F6a0s4LtaC5heUk6CsBuCnkAxpV
-         rWVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709367362; x=1709972162;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j+sRBWRjS//bpUjvTytLqzgwvFA5NfQ/0kKt6udHWnE=;
-        b=nuyGq/w5QjPl08/hK0sLg4ptJ01kyaIZSLnYqAEZ+TYa8dmsQ8kK/rtM4A6Yy7gqZT
-         PpjwrZEku09epZL93AMUPeRhb8IIkg6ZG+dBtuCQjYNROBm+fJwsDa3+hwTA3RzkPR4T
-         8O+gFuZ8GgG0Z3bI9IbhLaqa0KuHNA03zrhAT0GP6HRk+J2NYhRkOGenbUjkU42Z4cOR
-         CXwx/PwWrfki/mqMCv6cIm4uMgSIyuzxHCdXpNW+OG5mOO4cnFj4MewkryXWBhKdtKt4
-         IeHSQ/xB5kV7/hXnv+N8PDpf90us54hybmSxwgyQssd227CNiW3rIRsYl6upt2VRYC3x
-         JzKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQTNtDWbAdrbKkO86Jei1AczmRngvhI1LShTp9CfcbpNtKTE8OjfV3HBvO4g6j24qQSCWLaRsUWaMshoGfT/l7CzGd
-X-Gm-Message-State: AOJu0YwlZcHFFMH4Qj2HJY4UDj+hydn9lG2fI+F+LBEaCjrTaoqFo7JU
-	fSMdI169zE/m+yLB90S+YvF/ZLMmtThHoEU1kRSk3QPdKu3awbVPU3YfdUr2zq8=
-X-Google-Smtp-Source: AGHT+IEWpcwm0FZQqjctycZ68/FbELxvzDOdEDS3pWw2MGcSKO0tFBODP1icN8h9TBp1bR13mcTvxA==
-X-Received: by 2002:a05:6512:308f:b0:513:24b8:90cb with SMTP id z15-20020a056512308f00b0051324b890cbmr3714993lfd.0.1709367362484;
-        Sat, 02 Mar 2024 00:16:02 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id h5-20020adf9cc5000000b0033dd9b050f9sm6617089wre.14.2024.03.02.00.16.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Mar 2024 00:16:01 -0800 (PST)
-Date: Sat, 2 Mar 2024 09:15:55 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
-	Atish Patra <atishp@atishpatra.org>, Conor Dooley <conor.dooley@microchip.com>, 
-	Guo Ren <guoren@kernel.org>, Icenowy Zheng <uwu@icenowy.me>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Shuah Khan <shuah@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 07/15] RISC-V: KVM: No need to exit to the user space
- if perf event failed
-Message-ID: <20240302-1a3c0df25f2422e1e6abecf3@orel>
-References: <20240229010130.1380926-1-atishp@rivosinc.com>
- <20240229010130.1380926-8-atishp@rivosinc.com>
+	s=arc-20240116; t=1709367939; c=relaxed/simple;
+	bh=o3q1u0pG1faOVKC8mBP4iV1gk27RLSStqnjTvqSvTpo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XqVaMXU6fKMJnU4uwciZZL2+qkMYGBoLpKXZH76Q6fDqBqFw7QLJSeRvaTWmvE/3MmDJoym1UJgkKEHfNnDCgrg0x6Mv3xpHAPQ5nMn4FnM7fq5TJR3UG0Upy0xIKZZA9dUaCEv79XL5YrXF9AWylPyGu/6nBm2jBsLOUMSkAuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8DxdfF+4uJlC4oTAA--.49640S3;
+	Sat, 02 Mar 2024 16:25:34 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxLBN84uJlqlhMAA--.6847S2;
+	Sat, 02 Mar 2024 16:25:33 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Huacai Chen <chenhuacai@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: [PATCH v6 0/7] LoongArch: Add pv ipi support on LoongArch VM
+Date: Sat,  2 Mar 2024 16:25:25 +0800
+Message-Id: <20240302082532.1415200-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229010130.1380926-8-atishp@rivosinc.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxLBN84uJlqlhMAA--.6847S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxJw4DuF1xWw1xZw48KrWDWrX_yoW7Jw1Dpa
+	yUurnxWFs5Gr93Zwnxtas3ur98Jw1xG34aq3W2yrW8CrW2qF1UZr48Gr98Aas5Jw4fJFW0
+	qF1rGw1Yg3WDAabCm3ZEXasCq-sJn29KB7ZKAUJUUUUP529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
+	6r1j6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x02
+	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0PCztUUUUU==
 
-On Wed, Feb 28, 2024 at 05:01:22PM -0800, Atish Patra wrote:
-> Currently, we return a linux error code if creating a perf event failed
-> in kvm. That shouldn't be necessary as guest can continue to operate
-> without perf profiling or profiling with firmware counters.
-> 
-> Return appropriate SBI error code to indicate that PMU configuration
-> failed. An error message in kvm already describes the reason for failure.
+On physical machine, ipi HW uses IOCSR registers, however there is trap
+into hypervisor when vcpu accesses IOCSR registers if system is in VM
+mode. SWI is a interrupt mechanism like SGI on ARM, software can send
+interrupt to CPU, only that on LoongArch SWI can only be sent to local CPU
+now. So SWI can not used for IPI on real HW system, however it can be used
+on VM when combined with hypercall method. IPI can be sent with hypercall
+method and SWI interrupt is injected to vcpu, vcpu can treat SWI
+interrupt as IPI.
 
-I don't know enough about the perf subsystem to know if there may be
-a concern that resources are temporarily unavailable. If so, then this
-patch would make it possible for a guest to do the exact same thing,
-but sometimes succeed and sometimes get SBI_ERR_NOT_SUPPORTED.
-sbi_pmu_counter_config_matching doesn't currently have any error types
-specified that say "unsupported at the moment, maybe try again", which
-would be more appropriate in that case. I do see
-perf_event_create_kernel_counter() can return ENOMEM when memory isn't
-available, but if the kernel isn't able to allocate a small amount of
-memory, then we're in bigger trouble anyway, so the concern would be
-if there are perf resource pools which may temporarily be exhausted at
-the time the guest makes this request.
+With PV IPI supported, there is one trap with IPI sending, however with IPI
+receiving there is no trap. with IOCSR HW ipi method, there will be one
+trap with IPI sending and two trap with ipi receiving.
 
-One comment below.
+Also IPI multicast support is added for VM, the idea comes from x86 PV ipi.
+IPI can be sent to 128 vcpus in one time. With IPI multicast support, trap
+will be reduced greatly.
 
-> 
-> Fixes: 0cb74b65d2e5 ("RISC-V: KVM: Implement perf support without sampling")
-> Reviewed-by: Anup Patel <anup@brainfault.org>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  arch/riscv/kvm/vcpu_pmu.c     | 14 +++++++++-----
->  arch/riscv/kvm/vcpu_sbi_pmu.c |  6 +++---
->  2 files changed, 12 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> index b1574c043f77..29bf4ca798cb 100644
-> --- a/arch/riscv/kvm/vcpu_pmu.c
-> +++ b/arch/riscv/kvm/vcpu_pmu.c
-> @@ -229,8 +229,9 @@ static int kvm_pmu_validate_counter_mask(struct kvm_pmu *kvpmu, unsigned long ct
->  	return 0;
->  }
->  
-> -static int kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_event_attr *attr,
-> -				     unsigned long flags, unsigned long eidx, unsigned long evtdata)
-> +static long kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_event_attr *attr,
-> +				      unsigned long flags, unsigned long eidx,
-> +				      unsigned long evtdata)
->  {
->  	struct perf_event *event;
->  
-> @@ -454,7 +455,8 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
->  				     unsigned long eidx, u64 evtdata,
->  				     struct kvm_vcpu_sbi_return *retdata)
->  {
-> -	int ctr_idx, ret, sbiret = 0;
-> +	int ctr_idx, sbiret = 0;
-> +	long ret;
->  	bool is_fevent;
->  	unsigned long event_code;
->  	u32 etype = kvm_pmu_get_perf_event_type(eidx);
-> @@ -513,8 +515,10 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
->  			kvpmu->fw_event[event_code].started = true;
->  	} else {
->  		ret = kvm_pmu_create_perf_event(pmc, &attr, flags, eidx, evtdata);
-> -		if (ret)
-> -			return ret;
-> +		if (ret) {
-> +			sbiret = SBI_ERR_NOT_SUPPORTED;
-> +			goto out;
-> +		}
->  	}
->  
->  	set_bit(ctr_idx, kvpmu->pmc_in_use);
-> diff --git a/arch/riscv/kvm/vcpu_sbi_pmu.c b/arch/riscv/kvm/vcpu_sbi_pmu.c
-> index 7eca72df2cbd..b70179e9e875 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_pmu.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_pmu.c
-> @@ -42,9 +42,9 @@ static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  #endif
->  		/*
->  		 * This can fail if perf core framework fails to create an event.
-> -		 * Forward the error to userspace because it's an error which
-> -		 * happened within the host kernel. The other option would be
-> -		 * to convert to an SBI error and forward to the guest.
-> +		 * No need to forward the error to userspace and exit the guest
+Here is the microbenchmarck data with "perf bench futex wake" testcase on
+3C5000 single-way machine, there are 16 cpus on 3C5000 single-way machine,
+VM has 16 vcpus also. The benchmark data is ms time unit to wakeup 16
+threads, the performance is better if data is smaller.
 
-Period after guest
+physical machine                     0.0176 ms
+VM original                          0.1140 ms
+VM with pv ipi patch                 0.0481 ms
+
+It passes to boot with 128/256 vcpus, runltp command in package ltp-20230516
+passes to run with 16 cores.
+
+---
+Change in V6:
+  1. Add privilege checking when emulating cpucfg at index 0x4000000 --
+0x400000FF, return 0 if not executed at kernel mode.
+  2. Add document about LoongArch pv ipi with new creatly directory
+Documentation/virt/kvm/loongarch/
+  3. Fix pv ipi handling in kvm backend function kvm_pv_send_ipi(),
+where min should plus BITS_PER_LONG with second bitmap, otherwise
+VM with more than 64 vpus fails to boot.
+  4. Adjust patch order and code refine with review comments.
+ 
+Change in V5:
+  1. Refresh function/macro name from review comments.
+
+Change in V4:
+  1. Modfiy pv ipi hook function name call_func_ipi() and
+call_func_single_ipi() with send_ipi_mask()/send_ipi_single(), since pv
+ipi is used for both remote function call and reschedule notification.
+  2. Refresh changelog.
+
+Change in V3:
+  1. Add 128 vcpu ipi multicast support like x86
+  2. Change cpucfg base address from 0x10000000 to 0x40000000, in order
+to avoid confliction with future hw usage
+  3. Adjust patch order in this patchset, move patch
+Refine-ipi-ops-on-LoongArch-platform to the first one.
+
+Change in V2:
+  1. Add hw cpuid map support since ipi routing uses hw cpuid
+  2. Refine changelog description
+  3. Add hypercall statistic support for vcpu
+  4. Set percpu pv ipi message buffer aligned with cacheline
+  5. Refine pv ipi send logic, do not send ipi message with if there is
+pending ipi message.
+---
+Bibo Mao (7):
+  LoongArch/smp: Refine some ipi functions on LoongArch platform
+  LoongArch: KVM: Add hypercall instruction emulation support
+  LoongArch: KVM: Add cpucfg area for kvm hypervisor
+  LoongArch: KVM: Add vcpu search support from physical cpuid
+  LoongArch: KVM: Add pv ipi support on kvm side
+  LoongArch: Add pv ipi support on guest kernel side
+  Documentation: KVM: Add hypercall for LoongArch
+
+ Documentation/virt/kvm/index.rst              |   1 +
+ .../virt/kvm/loongarch/hypercalls.rst         |  79 +++++++++
+ Documentation/virt/kvm/loongarch/index.rst    |  10 ++
+ arch/loongarch/Kconfig                        |   9 +
+ arch/loongarch/include/asm/Kbuild             |   1 -
+ arch/loongarch/include/asm/hardirq.h          |   5 +
+ arch/loongarch/include/asm/inst.h             |   1 +
+ arch/loongarch/include/asm/irq.h              |  10 +-
+ arch/loongarch/include/asm/kvm_host.h         |  27 +++
+ arch/loongarch/include/asm/kvm_para.h         | 156 ++++++++++++++++++
+ arch/loongarch/include/asm/kvm_vcpu.h         |   1 +
+ arch/loongarch/include/asm/loongarch.h        |  11 ++
+ arch/loongarch/include/asm/paravirt.h         |  27 +++
+ .../include/asm/paravirt_api_clock.h          |   1 +
+ arch/loongarch/include/asm/smp.h              |  31 ++--
+ arch/loongarch/include/uapi/asm/Kbuild        |   2 -
+ arch/loongarch/kernel/Makefile                |   1 +
+ arch/loongarch/kernel/irq.c                   |  24 +--
+ arch/loongarch/kernel/paravirt.c              | 151 +++++++++++++++++
+ arch/loongarch/kernel/perf_event.c            |  14 +-
+ arch/loongarch/kernel/smp.c                   |  62 ++++---
+ arch/loongarch/kernel/time.c                  |  12 +-
+ arch/loongarch/kvm/exit.c                     | 141 ++++++++++++++--
+ arch/loongarch/kvm/vcpu.c                     |  94 ++++++++++-
+ arch/loongarch/kvm/vm.c                       |  11 ++
+ 25 files changed, 780 insertions(+), 102 deletions(-)
+ create mode 100644 Documentation/virt/kvm/loongarch/hypercalls.rst
+ create mode 100644 Documentation/virt/kvm/loongarch/index.rst
+ create mode 100644 arch/loongarch/include/asm/kvm_para.h
+ create mode 100644 arch/loongarch/include/asm/paravirt.h
+ create mode 100644 arch/loongarch/include/asm/paravirt_api_clock.h
+ delete mode 100644 arch/loongarch/include/uapi/asm/Kbuild
+ create mode 100644 arch/loongarch/kernel/paravirt.c
 
 
-> +		 * operation can continue without profiling. Forward the
+base-commit: 87adedeba51a822533649b143232418b9e26d08b
+-- 
+2.39.3
 
-The operation
-
-> +		 * appropriate SBI error to the guest.
->  		 */
->  		ret = kvm_riscv_vcpu_pmu_ctr_cfg_match(vcpu, cp->a0, cp->a1,
->  						       cp->a2, cp->a3, temp, retdata);
-> -- 
-> 2.34.1
->
-
-Thanks,
-drew
 
