@@ -1,87 +1,70 @@
-Return-Path: <kvm+bounces-10735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10736-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1338F86F06C
-	for <lists+kvm@lfdr.de>; Sat,  2 Mar 2024 13:35:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26CD186F3A8
+	for <lists+kvm@lfdr.de>; Sun,  3 Mar 2024 05:51:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 364781C214D0
-	for <lists+kvm@lfdr.de>; Sat,  2 Mar 2024 12:35:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 504F41C20F77
+	for <lists+kvm@lfdr.de>; Sun,  3 Mar 2024 04:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E621755A;
-	Sat,  2 Mar 2024 12:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5617079D8;
+	Sun,  3 Mar 2024 04:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="hycrEykc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BH6uByEa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCA67E1
-	for <kvm@vger.kernel.org>; Sat,  2 Mar 2024 12:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B331753BE;
+	Sun,  3 Mar 2024 04:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709382949; cv=none; b=jnzxYPfrw2UHEs/qi1iOA9EdvBtXhWJNwWyUjGubQdqqz/a/rt/Oc+ON+ySdOaLovXrt8K75601axsjwVbqEJPvWCfjUkWc9T8rBYtWb0iBWFuocMbqsmVOGsZyfGdSwBITKNLSLzUYouQBEnsoQrq0T3xFSrz/nY2NUHv1HTOc=
+	t=1709441493; cv=none; b=Uk9Dng+4FeWaQFtndKlIZfm/HigD55C7JVOVofST0tJGDLX7IFecaqXuUlY7Hll87xMU+zbOWIix4f72exNJyPgN/yaTLYtqRwT3mPHYoeBBMUYx8hWdl9QcjoHPrYdiQWXloEBKwUFNbfpr8f2l+dQa5MZRmpnODYgmFlWUpKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709382949; c=relaxed/simple;
-	bh=uvZe44R5Uc/kuroAUbRFRRLGnzr36ZRMq4JyI110Xtc=;
+	s=arc-20240116; t=1709441493; c=relaxed/simple;
+	bh=DiznAYK71m8KjN3kngmKzjZ08qDdBKWha23BeRkoj2U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QupMLDQMnX3jTyeC8tc7BjZACecIhUZClmKewtZxql0K8929iKtWYxfzDukTbStyrQVbiVdFfSaTJGguhHfmM1yeSvsIxP52+g0VqJAXNtD8Ga7fFxeoM8md6pitLxk36ffQsTdXywc5gTXcsaiviR3Y/IreAbxD4Zomka2Ah7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=hycrEykc; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5101cd91017so3913863e87.2
-        for <kvm@vger.kernel.org>; Sat, 02 Mar 2024 04:35:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709382945; x=1709987745; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fLmBNF7KnRHNjxFzW+xgQkBjw9RgIhEMQhm8dyjLxo0=;
-        b=hycrEykcvI7a6vJkuvwAHzAlK65vcwluSikVanzWhmk3ZJEcxN0j5l+JdmbA/cNu6m
-         /p4sbXvFma2yGYHpEq7fGrTVGRzGiN7gSrrQTaksa0y/wa0piV19JHZrvC7xBzQVm/hP
-         avIT6y9A938rOdDj1rvfAdjjeRbkdMcOkVkHpVeywyEQBMG4mOnwMIUaizNdpLgQmY8d
-         DDmaJGqausFc7als+FlfqzULu28BmoxuPALB16zIel5RWRL+Bf7gjPPBLTNVsmx/q481
-         B9Jpdcr5+ifzyxa6pcB2x4UZERy+hPFhY6y1rx7KxJc33eq+hu7PVy5BpvVjsK+NWwxu
-         fG+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709382945; x=1709987745;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fLmBNF7KnRHNjxFzW+xgQkBjw9RgIhEMQhm8dyjLxo0=;
-        b=aKGuqpVsHdd0iyYWIAs/dNYpqAn3zA8UdZSrn+nYT6YUXSq1Ca1a/Lf34py/5Za9Zi
-         Bv1H+OzppI8v8/pgBpJNPV0tQ2Orz9w1HyVglxOT21iA7kzpMHIa8OISKXnuAQ2Mef18
-         5IqaIC0ZMBSdcWr11dWZsboI3yL6fwKyjTEXo+IDoEzlysgZee4+jpDX/t8Dm8/Dr+yb
-         AXZX7vcsc89jta4Xq01F+Qu5Chi2DbGUnRE7j1Zdb7ttszxR8p5JxavGaIRDQU1k6NEr
-         NEL3dudGNlrm694Ajdcx1e4lHz+xTkxXPs/m+JvZ4hXI64N47/2PxNnuwcDC3F48SmKW
-         hcHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU8I+MRZS+k4iCn70hDcHa3ffsl/5gN8bLZqHG8mraSXcWvNd+2a2mvbEEoFBE0k0vttDc8WrNAafyOMZPM6M7GOzaI
-X-Gm-Message-State: AOJu0YwSrghbFSlXbuv+0VrskadrMoMeVuobajauHTSw9i7GeLL1GrzF
-	9HDWkaVgJSuqYtl1gHxtJk0wQnTEMEiYNqsDdLYJAiDMPI2FtqsHedbZXD+uzkU=
-X-Google-Smtp-Source: AGHT+IF7kMvVlfm0QV38CtL+50al6rOjeAc9EACkMvLkxpLCDVBPYC3K3Y+nOEoZwdZtjbgrgiosrA==
-X-Received: by 2002:a05:6512:473:b0:513:1e3c:38ec with SMTP id x19-20020a056512047300b005131e3c38ecmr2688559lfd.22.1709382945338;
-        Sat, 02 Mar 2024 04:35:45 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id g3-20020a056402180300b00566ea8e9f38sm1084255edy.40.2024.03.02.04.35.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Mar 2024 04:35:44 -0800 (PST)
-Date: Sat, 2 Mar 2024 13:35:43 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alexghiti@rivosinc.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Conor Dooley <conor.dooley@microchip.com>, 
-	Guo Ren <guoren@kernel.org>, Icenowy Zheng <uwu@icenowy.me>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Shuah Khan <shuah@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 15/15] KVM: riscv: selftests: Add a test for counter
- overflow
-Message-ID: <20240302-fb3a4d2c7918a24d10ee4a63@orel>
-References: <20240229010130.1380926-1-atishp@rivosinc.com>
- <20240229010130.1380926-16-atishp@rivosinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GzZG/0e9IDcbemzcUc/ctcAgKMLDawIHLxdU0/eFJkNCnx5shxD2OrmBdRk/NvEXHtpTS37hSFphBs1wfisV83OyWUFGBBgLgeE2tdR8bBt61TvDA16tnClS2oWkzv7XIM19OaYw1e4ibBN11cRdu9OoCBA3e0cHJ1untL4D/4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BH6uByEa; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709441492; x=1740977492;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DiznAYK71m8KjN3kngmKzjZ08qDdBKWha23BeRkoj2U=;
+  b=BH6uByEalP3xReEcXzs7RGVVqK58iHJnXN5Hkf0I1weTCBB2Q7QqWInB
+   c8SnAaSWQSjZmqNOFZfaxjgo3PhxIf6iUTHCUnk1q2Qh1v0jauxlXOGzX
+   XTVktWsNSLgBiFHyZ55K7L3U6mbnDY947lbfwtdJDNZFaWoGe2GylDrld
+   GmuWLAcA9U29gAtgSGG4EPo9p9dZt8mbpfl6sRiAcsO7a4wYuLXRxcbA6
+   SDHsxV4mm6A0CJcvhar+qP1qH0cCpmGQLSGvEabEG+Noui+XlSoZhQtpl
+   sZlLsEOF4Yujq0MsBqkZdkucwf5OmUM+C5yKc+I/2mMlELabk6Ltij2k4
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11001"; a="7723694"
+X-IronPort-AV: E=Sophos;i="6.06,200,1705392000"; 
+   d="scan'208";a="7723694"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2024 20:51:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,200,1705392000"; 
+   d="scan'208";a="39621421"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa001.fm.intel.com with ESMTP; 02 Mar 2024 20:51:29 -0800
+Date: Sun, 3 Mar 2024 12:47:19 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
+	michael.roth@amd.com, isaku.yamahata@intel.com,
+	thomas.lendacky@amd.com
+Subject: Re: [PATCH 11/21] KVM: x86/tdp_mmu: Init role member of struct
+ kvm_mmu_page at allocation
+Message-ID: <ZeQA12SlPPSgLBGG@yilunxu-OptiPlex-7050>
+References: <20240227232100.478238-1-pbonzini@redhat.com>
+ <20240227232100.478238-12-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,243 +73,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240229010130.1380926-16-atishp@rivosinc.com>
+In-Reply-To: <20240227232100.478238-12-pbonzini@redhat.com>
 
-On Wed, Feb 28, 2024 at 05:01:30PM -0800, Atish Patra wrote:
-> Add a test for verifying overflow interrupt. Currently, it relies on
-> overflow support on cycle/instret events. This test works for cycle/
-> instret events which support sampling via hpmcounters on the platform.
-> There are no ISA extensions to detect if a platform supports that. Thus,
-
-Ouch. Are there discussions/proposals as to how we can do better with
-discoverability here? This type of thing sounds like the types of things
-that get new extension names defined for them as part of the profile spec
-work.
-
-> this test will fail on platform with virtualization but doesn't
-> support overflow on these two events.
+On Tue, Feb 27, 2024 at 06:20:50PM -0500, Paolo Bonzini wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  tools/testing/selftests/kvm/riscv/sbi_pmu.c | 126 +++++++++++++++++++-
->  1 file changed, 125 insertions(+), 1 deletion(-)
+> Refactor tdp_mmu_alloc_sp() and tdp_mmu_init_sp and eliminate
+                                  ^
+tdp_mmu_init_sp() 
+
+> tdp_mmu_init_child_sp().  Currently tdp_mmu_init_sp() (or
+> tdp_mmu_init_child_sp()) sets kvm_mmu_page.role after tdp_mmu_alloc_sp()
+> allocating struct kvm_mmu_page and its page table page.  This patch makes
+> tdp_mmu_alloc_sp() initialize kvm_mmu_page.role instead of
+> tdp_mmu_init_sp().
 > 
-> diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu.c b/tools/testing/selftests/kvm/riscv/sbi_pmu.c
-> index 8ea2a6db6610..c0264c636054 100644
-> --- a/tools/testing/selftests/kvm/riscv/sbi_pmu.c
-> +++ b/tools/testing/selftests/kvm/riscv/sbi_pmu.c
-> @@ -8,6 +8,7 @@
->   * Copyright (c) 2024, Rivos Inc.
->   */
->  
-> +#include "asm/csr.h"
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
-> @@ -16,6 +17,7 @@
->  #include "kvm_util.h"
->  #include "test_util.h"
->  #include "processor.h"
-> +#include "arch_timer.h"
->  
->  /* Maximum counters (firmware + hardware)*/
->  #define RISCV_MAX_PMU_COUNTERS 64
-> @@ -26,6 +28,11 @@ union sbi_pmu_ctr_info ctrinfo_arr[RISCV_MAX_PMU_COUNTERS];
->  static void *snapshot_gva;
->  static vm_paddr_t snapshot_gpa;
->  
-> +static int pmu_irq = IRQ_PMU_OVF;
-> +
-> +static int vcpu_shared_irq_count;
-> +static int counter_in_use;
-> +
->  /* Cache the available counters in a bitmask */
->  static unsigned long counter_mask_available;
->  
-> @@ -69,7 +76,9 @@ unsigned long pmu_csr_read_num(int csr_num)
->  #undef switchcase_csr_read
->  }
->  
-> -static inline void dummy_func_loop(int iter)
-> +static void stop_counter(unsigned long counter, unsigned long stop_flags);
-> +
-> +static inline void dummy_func_loop(uint64_t iter)
->  {
->  	int i = 0;
->  
-> @@ -88,6 +97,26 @@ static void guest_illegal_exception_handler(struct ex_regs *regs)
->  	regs->epc += 4;
->  }
->  
-> +static void guest_irq_handler(struct ex_regs *regs)
-> +{
-> +	unsigned int irq_num = regs->cause & ~CAUSE_IRQ_FLAG;
-> +	struct riscv_pmu_snapshot_data *snapshot_data = snapshot_gva;
-> +	unsigned long overflown_mask;
-> +
-> +	/* Stop all counters first to avoid further interrupts */
-> +	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, 0, 1UL << counter_in_use,
-> +		  SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT, 0, 0, 0);
-> +
-> +	csr_clear(CSR_SIP, BIT(pmu_irq));
-> +
-> +	overflown_mask = READ_ONCE(snapshot_data->ctr_overflow_mask);
-> +	GUEST_ASSERT(overflown_mask & (1UL << counter_in_use));
-> +
-> +	/* Validate that we are in the correct irq handler */
-> +	GUEST_ASSERT_EQ(irq_num, pmu_irq);
+> To handle private page tables, argument of is_private needs to be passed
+> down.  Given that already page level is passed down, it would be cumbersome
+> to add one more parameter about sp. Instead replace the level argument with
+> union kvm_mmu_page_role.  Thus the number of argument won't be increased
 
-Should probably do this irq handler assert first.
+This section is hard to understand. I'm lost at which functions are
+mentioned here that took the level argument and should be replaced by
+role.
 
-> +	WRITE_ONCE(vcpu_shared_irq_count, vcpu_shared_irq_count+1);
-> +}
-> +
->  static unsigned long get_counter_index(unsigned long cbase, unsigned long cmask,
->  				       unsigned long cflags,
->  				       unsigned long event)
-> @@ -263,6 +292,32 @@ static void test_pmu_event_snapshot(unsigned long event)
->  	stop_counter(counter, SBI_PMU_STOP_FLAG_RESET);
->  }
->  
-> +static void test_pmu_event_overflow(unsigned long event)
-> +{
-> +	unsigned long counter;
-> +	unsigned long counter_value_post;
-> +	unsigned long counter_init_value = ULONG_MAX - 10000;
-> +	struct riscv_pmu_snapshot_data *snapshot_data = snapshot_gva;
-> +
-> +	counter = get_counter_index(0, counter_mask_available, 0, event);
-> +	counter_in_use = counter;
-> +
-> +	/* The counter value is updated w.r.t relative index of cbase passed to start/stop */
-> +	WRITE_ONCE(snapshot_data->ctr_values[0], counter_init_value);
-> +	start_counter(counter, SBI_PMU_START_FLAG_INIT_FROM_SNAPSHOT, 0);
-> +	dummy_func_loop(10000);
-> +	udelay(msecs_to_usecs(2000));
-> +	/* irq handler should have stopped the counter */
-> +
-> +	counter_value_post = READ_ONCE(snapshot_data->ctr_values[counter_in_use]);
-> +	/* The counter value after stopping should be less the init value due to overflow */
-> +	__GUEST_ASSERT(counter_value_post < counter_init_value,
-> +		       "counter_value_post %lx counter_init_value %lx for counter\n",
-> +		       counter_value_post, counter_init_value);
-> +
-> +	stop_counter(counter, SBI_PMU_STOP_FLAG_RESET);
-> +}
-> +
->  static void test_invalid_event(void)
->  {
->  	struct sbiret ret;
-> @@ -361,6 +416,43 @@ static void test_pmu_events_snaphost(int cpu)
->  	GUEST_DONE();
->  }
->  
-> +static void test_pmu_events_overflow(int cpu)
+> and more info about sp can be passed down.
 
-no need for cpu
+My understanding of the change is:
 
-> +{
-> +	long out_val = 0;
-> +	bool probe;
-> +	int num_counters = 0;
-> +	unsigned long sbi_impl_version;
-> +
-> +	probe = guest_sbi_probe_extension(SBI_EXT_PMU, &out_val);
-> +	GUEST_ASSERT(probe && out_val == 1);
-> +
-> +	sbi_impl_version = get_host_sbi_impl_version();
-> +	if (sbi_impl_version >= sbi_mk_version(2, 0))
-> +		__GUEST_ASSERT(0, "SBI implementation version doesn't support PMU Snapshot");
+Extra handling is need for Allocation of private page tables, so
+earlier caculate the kvm_mmu_page_role for the sp and pass it to
+tdp_mmu_alloc_sp().  Since the sp.role could be decided on sp
+allocation, in turn remove the role argument for tdp_mmu_init_sp(), also
+eliminate the helper tdp_mmu_init_child_sp().
 
-Identical probe and version check as test_pmu_events_snaphost(). Can
-factor out.
+> 
+> For private sp, secure page table will be also allocated in addition to
+> struct kvm_mmu_page and page table (spt member).  The allocation functions
+> (tdp_mmu_alloc_sp() and __tdp_mmu_alloc_sp_for_split()) need to know if the
+> allocation is for the conventional page table or private page table.  Pass
+> union kvm_mmu_role to those functions and initialize role member of struct
+        ^
 
-> +
-> +	snapshot_set_shmem(snapshot_gpa, 0);
-> +	csr_set(CSR_IE, BIT(pmu_irq));
-> +	local_irq_enable();
-> +
-> +	/* Get the counter details */
-> +	num_counters = get_num_counters();
-> +	update_counter_info(num_counters);
-> +
-> +	/*
-> +	 * Qemu supports overflow for cycle/instruction.
-> +	 * This test may fail on any platform that do not support overflow for these two events.
-> +	 */
-> +	test_pmu_event_overflow(SBI_PMU_HW_CPU_CYCLES);
-> +	GUEST_ASSERT_EQ(vcpu_shared_irq_count, 1);
-> +
-> +	/* Renable the interrupt again for another event */
-> +	csr_set(CSR_IE, BIT(pmu_irq));
-> +	test_pmu_event_overflow(SBI_PMU_HW_INSTRUCTIONS);
-> +	GUEST_ASSERT_EQ(vcpu_shared_irq_count, 2);
-> +
-> +	GUEST_DONE();
-> +}
-> +
->  static void run_vcpu(struct kvm_vcpu *vcpu)
->  {
->  	struct ucall uc;
-> @@ -449,6 +541,35 @@ static void test_vm_events_snapshot_test(void *guest_code)
->  	test_vm_destroy(vm);
->  }
->  
-> +static void test_vm_events_overflow(void *guest_code)
-> +{
-> +	struct kvm_vm *vm = NULL;
-> +	struct kvm_vcpu *vcpu = NULL;
-
-nit: no need for NULL
-
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> +	__TEST_REQUIRE(__vcpu_has_ext(vcpu, RISCV_SBI_EXT_REG(KVM_RISCV_SBI_EXT_PMU)),
-> +				   "SBI PMU not available, skipping test");
-> +
-> +	__TEST_REQUIRE(__vcpu_has_ext(vcpu, RISCV_ISA_EXT_REG(KVM_RISCV_ISA_EXT_SSCOFPMF)),
-> +				   "Sscofpmf is not available, skipping overflow test");
-> +
-> +
-> +	test_vm_setup_snapshot_mem(vm, vcpu);
-> +	vm_init_vector_tables(vm);
-> +	vm_install_interrupt_handler(vm, guest_irq_handler);
-> +
-> +	vcpu_init_vector_tables(vcpu);
-> +	/* Initialize guest timer frequency. */
-> +	vcpu_get_reg(vcpu, RISCV_TIMER_REG(frequency), &timer_freq);
-> +	sync_global_to_guest(vm, timer_freq);
-
-I just noticed that timer_freq is in arch_timer.h and isn't an extern...
-Fixing that is out of scope for this series though.
-
-> +
-> +	vcpu_args_set(vcpu, 1, 0);
-
-no need for args
-
-> +
-> +	run_vcpu(vcpu);
-> +
-> +	test_vm_destroy(vm);
-> +}
-> +
->  int main(void)
->  {
->  	test_vm_basic_test(test_pmu_basic_sanity);
-> @@ -460,5 +581,8 @@ int main(void)
->  	test_vm_events_snapshot_test(test_pmu_events_snaphost);
->  	pr_info("SBI PMU event verification with snapshot test : PASS\n");
->  
-> +	test_vm_events_overflow(test_pmu_events_overflow);
-> +	pr_info("SBI PMU event verification with overflow test : PASS\n");
-> +
->  	return 0;
->  }
-> -- 
-> 2.34.1
->
+Should be kvm_mmu_page_role
 
 Thanks,
-drew
+Yilun
 
