@@ -1,140 +1,103 @@
-Return-Path: <kvm+bounces-10830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40D22870BA1
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 21:33:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68342870BBF
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 21:45:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFB53B22019
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 20:33:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A9701C209A9
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 20:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B8B8F6F;
-	Mon,  4 Mar 2024 20:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74509947B;
+	Mon,  4 Mar 2024 20:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h40mIeUk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MXaE9l9Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6679A8BF9
-	for <kvm@vger.kernel.org>; Mon,  4 Mar 2024 20:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9112310A1D;
+	Mon,  4 Mar 2024 20:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709584375; cv=none; b=nW6Qbat6WWJHLhjnkPhhnrd4YKI22a/P+fJB1nphQMAT9p3JOdvtYa+TT9yIIBSMD/I39YsPTwZFlNddxNCxyjP8gFXOaSWBmCc1DYd9yG95QEv9goEUa8ao75CudfmAIun63sIJROyrAcnGeyylKkqBWsBV7GJ0oYcJbYpJ3W8=
+	t=1709585122; cv=none; b=PCla01+u0axDMBUdK4uT1ZcfgPk7Z84WsjOQ9T5nVKSnO8nO/J9aa2zknF1Gqxp++WoyJB1R2Fc4ssFq79B+A2OWuqoV60pIVPgSZD2eVjic92a71pifs+h6ugjYmb0HH7+xcNbJdKvc4CqyndI4uppyD/N5+8J5V+mJmqodCvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709584375; c=relaxed/simple;
-	bh=aN7iBP0Fr7hMMlKq3I0xxEeo5y2nD9yxqABrzVhf8DU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KjlBYW49NDw+vzCVxMqLMGO60USE/QlCgQnzmRTHN8HvI+e0Rsj6L2N4HzG5SKqHc+/awbBTbrCaa68dNwyV2veWmYsWc8O+YDjnUhGgE6898RJbVtfk/WsZpkzhf9+yUTM+tCF8mEZsFQg+mmm5MtzhkjT8oHUlHxHfECQW5fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h40mIeUk; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcd94cc48a1so7656548276.3
-        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 12:32:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709584373; x=1710189173; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IGjbhidK9mIBRigo6mJIfMD0RxuUrgdaznMkQx4mOsU=;
-        b=h40mIeUk2nE9giQpXMqUNwvUJqpF1fkK4IT7EJGWhc5287zOFncD8iVyqFacKAyZ+1
-         +geFRGvz5329BX3B5mQcXKkwNR15W7/N1atza+SFbXuRhfNDkyd7PPr1llrW+oP24byf
-         3pZoKDRnBvWA0nlx8PZRB/Jo9D0qzioehzFFkRQo975tjqOC+R4TLdwQ1VZ7B/KXrCW4
-         7Qddhq3pjSqviN5djo6dOM1CZ5bioQVcFUWZOvkhNltwb+0hSSMGl93f33U/m6Fur3JX
-         TpL7XKl/dvls7L/Ze+iaYOaP64uRmbSDXby/jxycyeHYkLJ65n08UMZe4SosXa+Odq0v
-         Yfaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709584373; x=1710189173;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IGjbhidK9mIBRigo6mJIfMD0RxuUrgdaznMkQx4mOsU=;
-        b=h/LqA4IptvjI7q5ahAt3QxIIAwf+yNyucFJfEnNYoJ9s/zYkaP+T0ngN9qQ6zxXszf
-         l0JkhyhCU5AYf+fHvsBc5RXorYHhZwie09yiTfS0jfLLDFScSh+6oEb2jvp+65w1AMps
-         kb7WAVpQ5y6LhG0M+koQvbs03eDwT+nI5KygZBoI3JoHynkwPufyKdQPCn8kbq+CPmJ+
-         r3MlrIyjelHqdfAc9RVJoXueI+Le3b1fznI+AGYhQgl8mHjexdd2I9cPwjwqegzxduQ8
-         XC0Okvf2M6YoJYbUVsX+AcTSqwtFKI9pxXdBHwIZVyv1fCh6GUUKRr0Ydebm63oWNMH2
-         73KA==
-X-Forwarded-Encrypted: i=1; AJvYcCWaAmdpzTXw5wRwTQrkQQEm18izbXfdAxU8S1I6Iqn74ldLkgqs5/Vu8IjevUzW4wqeVg+E1U+GwL49j2hrUkBpDJes
-X-Gm-Message-State: AOJu0YwZgJnHs/paTrYH/AVQI14Z7t6qhAK9UHVR2ASY9zIvnrM5BUKS
-	g/0rcw7DzAG0BVv6xX4wfbWhgY4B0ISVQtwbNC+L3c4TE8/mp9D31ai2V5h3UFtXJA13D/G//+t
-	3wg==
-X-Google-Smtp-Source: AGHT+IEmRdAyXCmSUg6f9/OpeGnPuqGycjin7usqBi6tnzcnwZA/qldiy/+AtwEb+/ocbiyWAY5WKQraOik=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1004:b0:dc7:48ce:d17f with SMTP id
- w4-20020a056902100400b00dc748ced17fmr2609142ybt.10.1709584373516; Mon, 04 Mar
- 2024 12:32:53 -0800 (PST)
-Date: Mon, 4 Mar 2024 12:32:51 -0800
-In-Reply-To: <ZeYqt86yVmCu5lKP@linux.dev>
+	s=arc-20240116; t=1709585122; c=relaxed/simple;
+	bh=ULDkS8RkWD6QDE68IwwR2M/s5AOQ7RG4h0RyTMv5QG4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=irSd7B7rqSC8AJgPqYJt3cwWJxxuuSNQj7f+k/62EF1yDjTdEhoeyagKIGaack2VQPA1cq1dLNfG7YapXx6hdmxlFy0eBYrFDYax6YcoYEjN0BoSQCCfrJF9KJcvnFpWKoLcgIzLPa+DQxKHizVgaCHQ5vuQntSty4PHO6hzW98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MXaE9l9Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DC2C433F1;
+	Mon,  4 Mar 2024 20:45:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709585122;
+	bh=ULDkS8RkWD6QDE68IwwR2M/s5AOQ7RG4h0RyTMv5QG4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MXaE9l9YDQIXNKz9r/Q/Vvjz8IKAIimL/AgqgawrhqrW4UiYogbIdJMloK4Ojm8AJ
+	 1FKfwV60OU/31DUkpkmZ5FwtYl4bEQX9eS+FACpHwxaG6e8YNhJ+CYClIDaIY0UWmX
+	 dkiymdt8fjemv/ha3Ggv/xkQ/avde+Y2kEQfEV3ycoaZR0dp/ClMGjLqkQHAD8nX7L
+	 bX/FxTb77BzOK/JCEhrJOuGrk1c19x2nani9ITFUwhajyxnI4XNQv8+vQcAqY61kSF
+	 JO61Xy6ABZu8Jwp4xH/HlJvG53cVyRGnfMdfQbTMUR8AoEq70OVhYWvCCEId9xcNKv
+	 Eb5vfRYltHo9w==
+Date: Mon, 4 Mar 2024 20:45:17 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH 4/5] KVM: arm64: Exclude host_fpsimd_state pointer from
+ kvm_vcpu_arch
+Message-ID: <1b2bdbc4-9c88-4764-96b6-ccc276dbc450@sirena.org.uk>
+References: <20240302111935.129994-1-maz@kernel.org>
+ <20240302111935.129994-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-9-amoorthy@google.com>
- <ZeYoSSYtDxKma-gg@linux.dev> <ZeYqt86yVmCu5lKP@linux.dev>
-Message-ID: <ZeYv86atkVpVMa2S@google.com>
-Subject: Re: [PATCH v7 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO and
- annotate fault in the stage-2 fault handler
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Anish Moorthy <amoorthy@google.com>, maz@kernel.org, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, robert.hoo.linux@gmail.com, jthoughton@google.com, 
-	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com, 
-	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Ch1OVIoC65ICBkrp"
+Content-Disposition: inline
+In-Reply-To: <20240302111935.129994-5-maz@kernel.org>
+X-Cookie: He who hesitates is last.
 
-On Mon, Mar 04, 2024, Oliver Upton wrote:
-> On Mon, Mar 04, 2024 at 08:00:15PM +0000, Oliver Upton wrote:
-> > On Thu, Feb 15, 2024 at 11:53:59PM +0000, Anish Moorthy wrote:
-> > 
-> > [...]
-> > 
-> > > +	if (is_error_noslot_pfn(pfn)) {
-> > > +		kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PAGE_SIZE,
-> > > +					      write_fault, exec_fault, false);
-> > 
-> > Hmm... Reinterpreting the fault context into something that wants to be
-> > arch-neutral might make this a bit difficult for userspace to
-> > understand.
-> > 
-> > The CPU can take an instruction abort on an S1PTW due to missing write
-> > permissions, i.e. hardware cannot write to the stage-1 descriptor for an
-> > AF or DBM update. In this case HPFAR points to the IPA of the stage-1
-> > descriptor that took the fault, not the target page.
-> > 
-> > It would seem this gets expressed to userspace as an intent to write and
-> > execute on the stage-1 page tables, no?
-> 
-> Duh, kvm_vcpu_trap_is_exec_fault() (not to be confused with
-> kvm_vcpu_trap_is_iabt()) filters for S1PTW, so this *should*
-> shake out as a write fault on the stage-1 descriptor.
-> 
-> With that said, an architecture-neutral UAPI may not be able to capture
-> the nuance of a fault. This UAPI will become much more load-bearing in
-> the future, and the loss of granularity could become an issue.
 
-What is the possible fallout from loss of granularity/nuance?  E.g. if the worst
-case scenario is that KVM may exit to userspace multiple times in order to resolve
-the problem, IMO that's an acceptable cost for having "dumb", common uAPI.
+--Ch1OVIoC65ICBkrp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The intent/contract of the exit to userspace isn't for userspace to be able to
-completely understand what fault occurred, but rather for KVM to communicate what
-action userspace needs to take in order for KVM to make forward progress.
+On Sat, Mar 02, 2024 at 11:19:34AM +0000, Marc Zyngier wrote:
+> As the name of the field indicates, host_fpsimd_state is strictly
+> a host piece of data, and we reset this pointer on each PID change.
+>=20
+> So let's move it where it belongs, and set it at load-time. Although
+> this is slightly more often, it is a well defined life-cycle which
+> matches other pieces of data.
 
-> Marc had some ideas about forwarding the register state to userspace
-> directly, which should be the right level of information for _any_ fault
-> taken to userspace.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-I don't know enough about ARM to weigh in on that side of things, but for x86
-this definitely doesn't hold true.  E.g. on the x86 side, KVM intentionally sets
-reserved bits in SPTEs for "caching" emulated MMIO accesses, and the resulting
-fault captures the "reserved bits set" information in register state.  But that's
-purely an (optional) imlementation detail of KVM that should never be exposed to
-userspace.
+--Ch1OVIoC65ICBkrp
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Ditto for things like access tracking on hardware without A/D bits, and shadow
-paging, which again can generate fault state that is inscrutable/misleading
-without context that only KVM knows (and shouldn't expose to userspace).
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXmMtwACgkQJNaLcl1U
+h9DiZAf/Uv1+L9/4aFLjTpfXLUBONd7LgDqShmDWUjPPiaFHywW/ftHKn2AYnzpe
+B4yuTg4WLLLbF8hOHxrQdziVNSbmo8w913TjHoxrTBJR7XbqQUC/6p+GSV0hfBEt
+Ll5xFhum2w1qBHxjXpZyLx9EzszyLvRnrYGfMfxUcOAKegNygamWV6Xj7T1gKQHJ
+9t/IKXZqndnrt1ZVGZLThgcJlePGJ3+1EyioEZl0ppn/E887Go3bRxQaSj5JKSxp
+FlULCkjTuasu1OxGyDlXMU9TIEJsimH0HkEWtucjbgRRD71OipPvwLih8YrHnRla
+ynnlxdoVs7I8eqWQGwV2f2sOoHfkyA==
+=/9Dk
+-----END PGP SIGNATURE-----
+
+--Ch1OVIoC65ICBkrp--
 
