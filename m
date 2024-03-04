@@ -1,61 +1,40 @@
-Return-Path: <kvm+bounces-10761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53FFC86FB3A
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 08:59:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B90686FB3C
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 08:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B1B2281DDA
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 07:59:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DA2F1C21A60
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 07:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E76E171A7;
-	Mon,  4 Mar 2024 07:59:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HMl5ewI4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E17168DF;
+	Mon,  4 Mar 2024 07:59:34 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB94171A2;
-	Mon,  4 Mar 2024 07:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0781F14A8C
+	for <kvm@vger.kernel.org>; Mon,  4 Mar 2024 07:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709539157; cv=none; b=JxyauE3fasGPmyEiyf68d0HqpAXqF3fVB5/lCusN4R998/DV5hhXR0Buqxr8BOWzbmC50aMcgB/IqQCQShV7fLeJvi/6ghTblUewcIs6qfPuFiCfRkYuIudLY5uXSz7hE7OC6tH0dt3DHsPJ2s9I3sK7lRHbYReRjdg0VZiVbGE=
+	t=1709539173; cv=none; b=c525fvnZ+IEOT+GzxjlK/wTIBF5Gm3yAlOdEbawQsjPXrTkVNGEM0RmshKinLZxB/kITdYXq/mE5jwzWhesKKouZB5Nqsmbmdb8jP1+5jqZi3fio9/xKccfRH6djKYVYTZeIESo0MXYHIfuPgvDJbIUwAwDGXThQY7Gl1RziFac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709539157; c=relaxed/simple;
-	bh=wbUpByb5oxuPadRm9JZleAn/NqozTy3sADip5yJwJ3M=;
+	s=arc-20240116; t=1709539173; c=relaxed/simple;
+	bh=+nJ1r/7CdPXhY6mmgRjpOzaiV8J/Wa7cYMW+D3Ru0gs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kQObubfAgMxZr0oVU1/AdtpNo7z3MP+qJUw8tGQmnPokXKnWKhGPIfCr13jiD7/2wX/5nR78H7Rr8bLT2uyYpe021J9hRq94qvnW/bp2DpZa5wUh9l9eNEdCdcrbSNXQ/1+S9OjmPQ0I2xMLFdu4QcWTTig37dPdtNeUiIsvNic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HMl5ewI4; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709539156; x=1741075156;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=wbUpByb5oxuPadRm9JZleAn/NqozTy3sADip5yJwJ3M=;
-  b=HMl5ewI4bfFEgLfpEvUa+/RUTNs5rKLTDdNNBv0Wo1kgeL4X8v9PVf8T
-   cuQnB3IUhYQF2QV+iQN6s4wgA0V9bd4fYtlU9iBmq+QM7f4E6E6kyzmeE
-   H4xXk6Ww+qtud6lgWspITvdPbMZxff/ipmMlmmpP1ugXCjncFBKwDjbQK
-   0DbGjpXtWYY3OgadBOqIDoFKUepsbRJax6JS5ZRj646I/SCyvjcVYlgZc
-   xR/jMsXfcC5C+t79aGEkyLXMtXphrK5t/X+YgmWvsWE2259ydcjP5/y25
-   U3QhGPLEXtyKoEAjn3hfzZ5XCLPyrZEic68ThEqeyI9Jrf1fiaCKXolB4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11002"; a="26480268"
-X-IronPort-AV: E=Sophos;i="6.06,203,1705392000"; 
-   d="scan'208";a="26480268"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2024 23:59:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,203,1705392000"; 
-   d="scan'208";a="13469584"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.239.60]) ([10.124.239.60])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2024 23:59:08 -0800
-Message-ID: <f5bbe9ac-ca35-4c3e-8cd7-249839fbb8b8@linux.intel.com>
-Date: Mon, 4 Mar 2024 15:59:05 +0800
+	 In-Reply-To:Content-Type; b=F03j4jv0VCdUOkHPTYrAJ88EIpwoV8lkojcY/fAqBVEoiZrI9cs5FNpab1SYWo+1abPz67IroD3+Uta0wAPMAWxM3uBATdUrwW2ntuVl+81Vs9rsQChgKuIZ32vuuqWeWc/3DdiOdXJxDaEjaDOeteqQpSywOCgjTpMg8ewnhm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2747F1FB;
+	Mon,  4 Mar 2024 00:00:07 -0800 (PST)
+Received: from [192.168.5.30] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 577E73F762;
+	Sun,  3 Mar 2024 23:59:29 -0800 (PST)
+Message-ID: <fc22d6ee-7868-4203-bcac-eb21f8cd22c6@arm.com>
+Date: Mon, 4 Mar 2024 07:59:28 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,121 +42,168 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86/svm/pmu: Set PerfMonV2 global control bits
- correctly
-Content-Language: en-US
-To: Sandipan Das <sandipan.das@amd.com>, Like Xu <like.xu.linux@gmail.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, mizhang@google.com,
- jmattson@google.com, ravi.bangoria@amd.com, nikunj.dadhania@amd.com,
- santosh.shukla@amd.com, manali.shukla@amd.com, babu.moger@amd.com,
- kvm list <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20240301075007.644152-1-sandipan.das@amd.com>
- <06061a28-88c0-404b-98a6-83cc6cc8c796@gmail.com>
- <cc8699be-3aae-42aa-9c70-f8b6a9728ee3@amd.com>
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <cc8699be-3aae-42aa-9c70-f8b6a9728ee3@amd.com>
+Subject: Re: [kvm-unit-tests PATCH v2 11/18] arm/arm64: Factor out some
+ initial setup
+Content-Language: en-GB
+To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, shahuang@redhat.com,
+ pbonzini@redhat.com, thuth@redhat.com
+References: <20240227192109.487402-20-andrew.jones@linux.dev>
+ <20240227192109.487402-31-andrew.jones@linux.dev>
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20240227192109.487402-31-andrew.jones@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
+On 27/02/2024 19:21, Andrew Jones wrote:
+> Factor out some initial setup code into separate functions in order
+> to share more code between setup() and setup_efi().
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 
-On 3/1/2024 5:00 PM, Sandipan Das wrote:
-> On 3/1/2024 2:07 PM, Like Xu wrote:
->> On 1/3/2024 3:50 pm, Sandipan Das wrote:
->>> With PerfMonV2, a performance monitoring counter will start operating
->>> only when both the PERF_CTLx enable bit as well as the corresponding
->>> PerfCntrGlobalCtl enable bit are set.
->>>
->>> When the PerfMonV2 CPUID feature bit (leaf 0x80000022 EAX bit 0) is set
->>> for a guest but the guest kernel does not support PerfMonV2 (such as
->>> kernels older than v5.19), the guest counters do not count since the
->>> PerfCntrGlobalCtl MSR is initialized to zero and the guest kernel never
->>> writes to it.
->> If the vcpu has the PerfMonV2 feature, it should not work the way legacy
->> PMU does. Users need to use the new driver to operate the new hardware,
->> don't they ? One practical approach is that the hypervisor should not set
->> the PerfMonV2 bit for this unpatched 'v5.19' guest.
->>
-> My understanding is that the legacy method of managing the counters should
-> still work because the enable bits in PerfCntrGlobalCtl are expected to be
-> set. The AMD PPR does mention that the PerfCntrEn bitfield of PerfCntrGlobalCtl
-> is set to 0x3f after a system reset. That way, the guest kernel can use either
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
+Thanks,
 
-If so, please add the PPR description here as comments.
+Nikos
 
-
-> the new or legacy method.
->
->>> This is not observed on bare-metal as the default value of the
->>> PerfCntrGlobalCtl MSR after a reset is 0x3f (assuming there are six
->>> counters) and the counters can still be operated by using the enable
->>> bit in the PERF_CTLx MSRs. Replicate the same behaviour in guests for
->>> compatibility with older kernels.
->>>
->>> Before:
->>>
->>>     $ perf stat -e cycles:u true
->>>
->>>      Performance counter stats for 'true':
->>>
->>>                      0      cycles:u
->>>
->>>            0.001074773 seconds time elapsed
->>>
->>>            0.001169000 seconds user
->>>            0.000000000 seconds sys
->>>
->>> After:
->>>
->>>     $ perf stat -e cycles:u true
->>>
->>>      Performance counter stats for 'true':
->>>
->>>                227,850      cycles:u
->>>
->>>            0.037770758 seconds time elapsed
->>>
->>>            0.000000000 seconds user
->>>            0.037886000 seconds sys
->>>
->>> Reported-by: Babu Moger <babu.moger@amd.com>
->>> Fixes: 4a2771895ca6 ("KVM: x86/svm/pmu: Add AMD PerfMonV2 support")
->>> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
->>> ---
->>>    arch/x86/kvm/svm/pmu.c | 1 +
->>>    1 file changed, 1 insertion(+)
->>>
->>> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
->>> index b6a7ad4d6914..14709c564d6a 100644
->>> --- a/arch/x86/kvm/svm/pmu.c
->>> +++ b/arch/x86/kvm/svm/pmu.c
->>> @@ -205,6 +205,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->>>        if (pmu->version > 1) {
->>>            pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
->>>            pmu->global_status_mask = pmu->global_ctrl_mask;
->>> +        pmu->global_ctrl = ~pmu->global_ctrl_mask;
-
-
-It seems to be more easily understand to calculate global_ctrl firstly 
-and then derive the globol_ctrl_mask (negative logic).
-
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index e886300f0f97..7ac9b080aba6 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -199,7 +199,8 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
-kvm_pmu_cap.num_counters_gp);
-
-         if (pmu->version > 1) {
--               pmu->global_ctrl_mask = ~((1ull << 
-pmu->nr_arch_gp_counters) - 1);
-+               pmu->global_ctrl = (1ull << pmu->nr_arch_gp_counters) - 1;
-+               pmu->global_ctrl_mask = ~pmu->global_ctrl;
-                 pmu->global_status_mask = pmu->global_ctrl_mask;
-         }
-
->>>        }
->>>          pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
->
+> ---
+>   lib/arm/setup.c | 81 ++++++++++++++++++++++++++++---------------------
+>   1 file changed, 47 insertions(+), 34 deletions(-)
+> 
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 76aae4627a7b..f96ee04ddd68 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -182,32 +182,57 @@ static void mem_init(phys_addr_t freemem_start)
+>   	page_alloc_ops_enable();
+>   }
+>   
+> -void setup(const void *fdt, phys_addr_t freemem_start)
+> +static void freemem_push_fdt(void **freemem, const void *fdt)
+>   {
+> -	void *freemem;
+> -	const char *bootargs, *tmp;
+>   	u32 fdt_size;
+>   	int ret;
+>   
+> -	assert(sizeof(long) == 8 || freemem_start < (3ul << 30));
+> -	freemem = (void *)(unsigned long)freemem_start;
+> -
+> -	/* Move the FDT to the base of free memory */
+>   	fdt_size = fdt_totalsize(fdt);
+> -	ret = fdt_move(fdt, freemem, fdt_size);
+> +	ret = fdt_move(fdt, *freemem, fdt_size);
+>   	assert(ret == 0);
+> -	ret = dt_init(freemem);
+> +	ret = dt_init(*freemem);
+>   	assert(ret == 0);
+> -	freemem += fdt_size;
+> +	*freemem += fdt_size;
+> +}
+> +
+> +static void freemem_push_dt_initrd(void **freemem)
+> +{
+> +	const char *tmp;
+> +	int ret;
+>   
+> -	/* Move the initrd to the top of the FDT */
+>   	ret = dt_get_initrd(&tmp, &initrd_size);
+>   	assert(ret == 0 || ret == -FDT_ERR_NOTFOUND);
+>   	if (ret == 0) {
+> -		initrd = freemem;
+> +		initrd = *freemem;
+>   		memmove(initrd, tmp, initrd_size);
+> -		freemem += initrd_size;
+> +		*freemem += initrd_size;
+>   	}
+> +}
+> +
+> +static void initrd_setup(void)
+> +{
+> +	char *env;
+> +
+> +	if (!initrd)
+> +		return;
+> +
+> +	/* environ is currently the only file in the initrd */
+> +	env = malloc(initrd_size);
+> +	memcpy(env, initrd, initrd_size);
+> +	setup_env(env, initrd_size);
+> +}
+> +
+> +void setup(const void *fdt, phys_addr_t freemem_start)
+> +{
+> +	void *freemem;
+> +	const char *bootargs;
+> +	int ret;
+> +
+> +	assert(sizeof(long) == 8 || freemem_start < (3ul << 30));
+> +	freemem = (void *)(unsigned long)freemem_start;
+> +
+> +	freemem_push_fdt(&freemem, fdt);
+> +	freemem_push_dt_initrd(&freemem);
+>   
+>   	memregions_init(arm_mem_regions, NR_MEM_REGIONS);
+>   	memregions_add_dt_regions(MAX_DT_MEM_REGIONS);
+> @@ -229,12 +254,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+>   	assert(ret == 0 || ret == -FDT_ERR_NOTFOUND);
+>   	setup_args_progname(bootargs);
+>   
+> -	if (initrd) {
+> -		/* environ is currently the only file in the initrd */
+> -		char *env = malloc(initrd_size);
+> -		memcpy(env, initrd, initrd_size);
+> -		setup_env(env, initrd_size);
+> -	}
+> +	initrd_setup();
+>   
+>   	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+>   		setup_vm();
+> @@ -277,7 +297,6 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>   	uintptr_t text = (uintptr_t)&_text, etext = ALIGN((uintptr_t)&_etext, 4096);
+>   	uintptr_t data = (uintptr_t)&_data, edata = ALIGN((uintptr_t)&_edata, 4096);
+>   	const void *fdt = efi_bootinfo->fdt;
+> -	int fdt_size, ret;
+>   
+>   	/*
+>   	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
+> @@ -344,14 +363,13 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>   	}
+>   
+>   	if (efi_bootinfo->fdt_valid) {
+> -		/* Move the FDT to the base of free memory */
+> -		fdt_size = fdt_totalsize(fdt);
+> -		ret = fdt_move(fdt, (void *)free_mem_start, fdt_size);
+> -		assert(ret == 0);
+> -		ret = dt_init((void *)free_mem_start);
+> -		assert(ret == 0);
+> -		free_mem_start += ALIGN(fdt_size, EFI_PAGE_SIZE);
+> -		free_mem_pages -= ALIGN(fdt_size, EFI_PAGE_SIZE) >> EFI_PAGE_SHIFT;
+> +		unsigned long old_start = free_mem_start;
+> +		void *freemem = (void *)free_mem_start;
+> +
+> +		freemem_push_fdt(&freemem, fdt);
+> +
+> +		free_mem_start = ALIGN((unsigned long)freemem, EFI_PAGE_SIZE);
+> +		free_mem_pages = (free_mem_start - old_start) >> EFI_PAGE_SHIFT;
+>   	}
+>   
+>   	__phys_end &= PHYS_MASK;
+> @@ -419,13 +437,8 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+>   	io_init();
+>   
+>   	timer_save_state();
+> -	if (initrd) {
+> -		/* environ is currently the only file in the initrd */
+> -		char *env = malloc(initrd_size);
+>   
+> -		memcpy(env, initrd, initrd_size);
+> -		setup_env(env, initrd_size);
+> -	}
+> +	initrd_setup();
+>   
+>   	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+>   		setup_vm();
 
