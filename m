@@ -1,137 +1,228 @@
-Return-Path: <kvm+bounces-10810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82AE7870526
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 16:17:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 684B4870641
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 16:54:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3F8E1C22CAB
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 15:17:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83444B2C1BD
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 15:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9424D58E;
-	Mon,  4 Mar 2024 15:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9714C3C3;
+	Mon,  4 Mar 2024 15:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kd4b+qkS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hPlg1T59"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134972C18D
-	for <kvm@vger.kernel.org>; Mon,  4 Mar 2024 15:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433454AED8;
+	Mon,  4 Mar 2024 15:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709565348; cv=none; b=erbgsoFnwQ3Rm18C90gP+mcD7J+P2Op61FxFEYrObDhwqDGvDPKyoZCI0P6Yh5p6ZZ9pzAKWnYkhf7p8Y3igHEmzMhq/hOAKk2sAZRQyyGDEXyxVPQS8uNkzONcMw5srcU2aiOrYhLVeIZAkBRaYCjFVIs4ZWWmLxkli/CW0PyE=
+	t=1709566634; cv=none; b=dIxwWWPN4Li0p8ze91ug6wVNfenKtGMZynskOF8Iwb66cu6MarbQ872v1H3lkjmIgd64M+totG6qzseXBWYu/7RkQ9TWG9/FVzBSfn8McEY2vQ+KMvrfQirnL+NXQcHmBNC3vP2t9JCvz9x2B9P5wRqXdZ3AYQ/rgdp+GYhaOPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709565348; c=relaxed/simple;
-	bh=PHagvGZN49C8CopjtNuDmKmGFqr3kmXN7R8kWRH/HsA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nOVje8SJyfIG32kILBznAgsLyRXcDeHHLCJxSx5abAUKGRJdBjNt4J/mFuWwO+1tpQBkjKJ2JDh9p//xAL76jVBOAcEQ+bIMqqY4OcWkvsRIIvIQcdHRpuVmD7+02CHf7y+w8fB/Ch/b6xCxNZgAinYAwxtDM/mK1WAdCW9liV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kd4b+qkS; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1dcabe5b779so59249205ad.0
-        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 07:15:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709565346; x=1710170146; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pFO6+UywViZZyvnPAa9tMMRLlhb9803+MwFU94Wmgk4=;
-        b=Kd4b+qkSPT44csNE/JIMN3qr5t0cBmih5H7hsQQpfsihY4rIBv+OLNhz/2uD9gcMa2
-         +5+0nBMfAxzZLlhm9SyuHLmXO1ifG1CT57cSFaV/lJXkMWeZH1VWVFH+ciC/0vk7VgtK
-         vizuUJr0u2eA76d1aqYy8tI1MSxWxGfVM4el+ydURYfImxTE1seRKetCyevUToXbD3a7
-         abIjNEY/yXF8Y8etFIb5Kx/Myrk/t2NQBgWmvYzeFTPaGHIuOAUCiPjrtM0CiLQrpad+
-         BOYKWG2BtAj+iX1znxEwm3n54lLSpbhIE+1HDXwpq0pdDV68rjCKUx3nhvaC9hGZ2lRC
-         H9Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709565346; x=1710170146;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pFO6+UywViZZyvnPAa9tMMRLlhb9803+MwFU94Wmgk4=;
-        b=MPEsZvOpkD96Z/TqCY77G4z1uxTk9G8XSCfmprGxkXomYrkBRd7sE0yfn3FiDkB076
-         wJI9NTf7MYqj5bTYXOmgCM18vDvc11B3pz6d+wSET/ff5N63jzOFak4ivqotzpmiPbC6
-         YZKqu1GIJK5rdEYKfOkjQNvQO/KQ1hPnGUb6PLUd3aoYPJLv+9TcD8FJwwzxGEM7DZzv
-         oJVL8IHYLQXnbaYMwriB1y4kK5B18JlceuLHDoJbK2V3M42XDuYncZHC2zzrMlU+PFsX
-         csQ3woSkKMK01W85uJ89A2XMPN234gvbFYBceNTr07Ayx2U8hAjhftATnrgc9hEIJWdj
-         2LPA==
-X-Gm-Message-State: AOJu0YzVITVg858JPkfeY4paarbmK7rA0jvoOmyNZnOdwwfYU0RI6nsM
-	Q5IN8hhLgg7R08V/ieBRNi7XKhfcQGNe8K4MgtVrDIf69G882AUiy9VRUqDjfxtzAEIedxDWvE8
-	DmQ==
-X-Google-Smtp-Source: AGHT+IHGAA0Lrr6D8JJnCJuBRYdJyqZCbHSa/69Uam1kLs9A6DxL38nQx5C9WFnOxNa+i/UXz2cKgvYsNBM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e5c8:b0:1dc:e9e:374e with SMTP id
- u8-20020a170902e5c800b001dc0e9e374emr91930plf.12.1709565346183; Mon, 04 Mar
- 2024 07:15:46 -0800 (PST)
-Date: Mon, 4 Mar 2024 07:15:44 -0800
-In-Reply-To: <20240301101410.356007-2-kraxel@redhat.com>
+	s=arc-20240116; t=1709566634; c=relaxed/simple;
+	bh=9anreWHQNMx10cgfgXgGcoJZXQbgks6wNmEebSnD0Wo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GyC3HUc+YF7SxiwlCZcaBZdc7chjTsuLsyJyyXnaUoc/2dHPG0+oRgQt8vnIayW6GId8+P72r3SJmg72B7O4dbAcAfat14/KHJiwB0j8olyr7TEaOPfD5dG6XhJSMEJVrFK83vAlohk6YuKkdzOrQbEg/VLZkOZqkr8c14sPReg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hPlg1T59; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709566632; x=1741102632;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9anreWHQNMx10cgfgXgGcoJZXQbgks6wNmEebSnD0Wo=;
+  b=hPlg1T59zLRRoMkC4BdwNhK6KEYcZoZmqe+Hs0T1xgPQqJkp73ybPjy2
+   3gNFhro0vQsDBDNtE/twuTcL559l0SrhUcyxGbE+TrMs0JvTSdOmgUUnK
+   MjKYiLdn7mDEUSKxxXrFD79B9AqBTOf/RzpQ17N1wi/9Fbf+HoBv5kwQn
+   mH0mH+C6izAhBvp2SZVeAg902s8wtKM/8G5PLs/DxVAVIDKSfoWuFpTOz
+   ffzhloXvI4kbm4erJTRegSIuOhn8rvRTbBDLji1a3x6pODVtj5C82PeYN
+   HKeKTk0gd/M7k6IsXT7fK/gVjs/+VrjS2sI0ouze71VQqpKFbdbh38+Bu
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11002"; a="7878152"
+X-IronPort-AV: E=Sophos;i="6.06,203,1705392000"; 
+   d="scan'208";a="7878152"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 07:37:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,203,1705392000"; 
+   d="scan'208";a="32199049"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa002.fm.intel.com with ESMTP; 04 Mar 2024 07:37:09 -0800
+Date: Mon, 4 Mar 2024 23:32:57 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
+	michael.roth@amd.com, aik@amd.com
+Subject: Re: [PATCH v3 13/15] KVM: SEV: define VM types for SEV and SEV-ES
+Message-ID: <ZeXpqf/0YoBmctw2@yilunxu-OptiPlex-7050>
+References: <20240226190344.787149-1-pbonzini@redhat.com>
+ <20240226190344.787149-14-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240301101410.356007-1-kraxel@redhat.com> <20240301101410.356007-2-kraxel@redhat.com>
-Message-ID: <ZeXloHPV1dkOwBTe@google.com>
-Subject: Re: [PATCH 1/3] kvm: wire up KVM_CAP_VM_GPA_BITS for x86
-From: Sean Christopherson <seanjc@google.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, 
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, 
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240226190344.787149-14-pbonzini@redhat.com>
 
-On Fri, Mar 01, 2024, Gerd Hoffmann wrote:
-> Add new guest_phys_bits field to kvm_caps, return the value to
-> userspace when asked for KVM_CAP_VM_GPA_BITS capability.
-> 
-> Initialize guest_phys_bits with boot_cpu_data.x86_phys_bits.
-> Vendor modules (i.e. vmx and svm) can adjust this field in case
-> additional restrictions apply, for example in case EPT has no
-> support for 5-level paging.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+On Mon, Feb 26, 2024 at 02:03:42PM -0500, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/kvm/x86.h | 2 ++
->  arch/x86/kvm/x86.c | 5 +++++
->  2 files changed, 7 insertions(+)
+>  Documentation/virt/kvm/api.rst  |  2 ++
+>  arch/x86/include/uapi/asm/kvm.h |  2 ++
+>  arch/x86/kvm/svm/sev.c          | 16 +++++++++++++---
+>  arch/x86/kvm/svm/svm.c          |  7 +++++++
+>  arch/x86/kvm/svm/svm.h          |  1 +
+>  arch/x86/kvm/x86.c              |  2 ++
+>  6 files changed, 27 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 2f7e19166658..e03aec3527f8 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -24,6 +24,8 @@ struct kvm_caps {
->  	bool has_bus_lock_exit;
->  	/* notify VM exit supported? */
->  	bool has_notify_vmexit;
-> +	/* usable guest phys bits */
-> +	u32  guest_phys_bits;
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 0b5a33ee71ee..f0b76ff5030d 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8819,6 +8819,8 @@ means the VM type with value @n is supported.  Possible values of @n are::
 >  
->  	u64 supported_mce_cap;
->  	u64 supported_xcr0;
+>    #define KVM_X86_DEFAULT_VM	0
+>    #define KVM_X86_SW_PROTECTED_VM	1
+> +  #define KVM_X86_SEV_VM	2
+> +  #define KVM_X86_SEV_ES_VM	3
+>  
+>  Note, KVM_X86_SW_PROTECTED_VM is currently only for development and testing.
+>  Do not use KVM_X86_SW_PROTECTED_VM for "real" VMs, and especially not in
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index d0c1b459f7e9..9d950b0b64c9 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -857,5 +857,7 @@ struct kvm_hyperv_eventfd {
+>  
+>  #define KVM_X86_DEFAULT_VM	0
+>  #define KVM_X86_SW_PROTECTED_VM	1
+> +#define KVM_X86_SEV_VM		2
+> +#define KVM_X86_SEV_ES_VM	3
+>  
+>  #endif /* _ASM_X86_KVM_H */
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 2549a539a686..1248ccf433e8 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -247,6 +247,9 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	if (kvm->created_vcpus)
+>  		return -EINVAL;
+>  
+> +	if (kvm->arch.vm_type != KVM_X86_DEFAULT_VM)
+                                 ^
+
+IIUC it should be KVM_X86_SEV_VM?
+
+> +		return -EINVAL;
+> +
+>  	if (unlikely(sev->active))
+>  		return -EINVAL;
+>  
+> @@ -264,6 +267,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  	INIT_LIST_HEAD(&sev->regions_list);
+>  	INIT_LIST_HEAD(&sev->mirror_vms);
+> +	sev->need_init = false;
+>  
+>  	kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_SEV);
+>  
+> @@ -1799,7 +1803,8 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  	if (ret)
+>  		goto out_fput;
+>  
+> -	if (sev_guest(kvm) || !sev_guest(source_kvm)) {
+> +	if (kvm->arch.vm_type != source_kvm->arch.vm_type ||
+> +	    sev_guest(kvm) || !sev_guest(source_kvm)) {
+>  		ret = -EINVAL;
+>  		goto out_unlock;
+>  	}
+> @@ -2118,6 +2123,7 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  	mirror_sev->asid = source_sev->asid;
+>  	mirror_sev->fd = source_sev->fd;
+>  	mirror_sev->es_active = source_sev->es_active;
+> +	mirror_sev->need_init = false;
+>  	mirror_sev->handle = source_sev->handle;
+>  	INIT_LIST_HEAD(&mirror_sev->regions_list);
+>  	INIT_LIST_HEAD(&mirror_sev->mirror_vms);
+> @@ -2183,10 +2189,14 @@ void sev_vm_destroy(struct kvm *kvm)
+>  
+>  void __init sev_set_cpu_caps(void)
+>  {
+> -	if (sev_enabled)
+> +	if (sev_enabled) {
+>  		kvm_cpu_cap_set(X86_FEATURE_SEV);
+> -	if (sev_es_enabled)
+> +		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_VM);
+> +	}
+> +	if (sev_es_enabled) {
+>  		kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
+> +		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_ES_VM);
+> +	}
+>  }
+>  
+>  void __init sev_hardware_setup(void)
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 1cf9e5f1fd02..f4a750426b24 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4089,6 +4089,9 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
+>  
+>  static int svm_vcpu_pre_run(struct kvm_vcpu *vcpu)
+>  {
+> +	if (to_kvm_sev_info(vcpu->kvm)->need_init)
+> +		return -EINVAL;
+> +
+>  	return 1;
+>  }
+>  
+> @@ -4890,6 +4893,10 @@ static void svm_vm_destroy(struct kvm *kvm)
+>  
+>  static int svm_vm_init(struct kvm *kvm)
+>  {
+> +	if (kvm->arch.vm_type != KVM_X86_DEFAULT_VM &&
+> +	    kvm->arch.vm_type != KVM_X86_SW_PROTECTED_VM)
+> +		to_kvm_sev_info(kvm)->need_init = true;
+> +
+>  	if (!pause_filter_count || !pause_filter_thresh)
+>  		kvm->arch.pause_in_guest = true;
+>  
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index ebf2160bf0c6..7a921acc534f 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -79,6 +79,7 @@ enum {
+>  struct kvm_sev_info {
+>  	bool active;		/* SEV enabled guest */
+>  	bool es_active;		/* SEV-ES enabled guest */
+> +	bool need_init;		/* waiting for SEV_INIT2 */
+>  	unsigned int asid;	/* ASID used for this guest */
+>  	unsigned int handle;	/* SEV firmware handle */
+>  	int fd;			/* SEV device fd */
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 48a61d283406..e270b9b708d1 100644
+> index 3b87e65904ae..b9dfe3179332 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -4784,6 +4784,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		if (kvm_is_vm_type_supported(KVM_X86_SW_PROTECTED_VM))
->  			r |= BIT(KVM_X86_SW_PROTECTED_VM);
->  		break;
-> +	case KVM_CAP_VM_GPA_BITS:
-> +		r = kvm_caps.guest_phys_bits;
-
-This is not a fast path, just compute the effective guest.MAXPHYADDR on the fly
-using tdp_root_level and max_tdp_level.  But as pointed out and discussed in the
-previous thread, adverising a guest.MAXPHYADDR that is smaller than host.MAXPHYADDR
-simply doesn't work[*].
-
-I thought the plan was to add a way for KVM to advertise the maximum *addressable*
-GPA, and figure out a way to communicate that to the guest, e.g. so that firmware
-doesn't try to use legal GPAs that the host cannot address.
-
-Paolo, any update on this?
-
-[*] https://lore.kernel.org/all/CALMp9eTutnTxCjQjs-nxP=XC345vTmJJODr+PcSOeaQpBW0Skw@mail.gmail.com
+> @@ -12576,6 +12576,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	kvm->arch.vm_type = type;
+>  	kvm->arch.has_private_mem =
+>  		(type == KVM_X86_SW_PROTECTED_VM);
+> +	kvm->arch.has_protected_state =
+> +		(type == KVM_X86_SEV_ES_VM);
+>  
+>  	ret = kvm_page_track_init(kvm);
+>  	if (ret)
+> -- 
+> 2.39.1
+> 
+> 
+> 
 
