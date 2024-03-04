@@ -1,132 +1,116 @@
-Return-Path: <kvm+bounces-10815-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10816-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1280870639
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 16:52:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA243870753
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 17:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C07DB26D82
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 15:51:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 803FB1F23CAF
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 16:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA8547F7A;
-	Mon,  4 Mar 2024 15:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240B84CE11;
+	Mon,  4 Mar 2024 16:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SDZXtRgi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SVjAOgsT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045A347772
-	for <kvm@vger.kernel.org>; Mon,  4 Mar 2024 15:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F9C1E48B
+	for <kvm@vger.kernel.org>; Mon,  4 Mar 2024 16:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709567468; cv=none; b=M2+dGgCGBZzP5PQ8MpePsQI+O0kBKhaEww1KqlW+pjodwAGQZ1x5nmyGQEmF//QuUdw5z60eWmaz7pitBJZtGHe3UyP/HbXEfJeNGw5tafvxAjmJHtFP9FEkHBl5Gi3w6FTZHg2qsxOh9VA1Ai0lrIVclmCMqqJf7ZX2Pnc2hmo=
+	t=1709570274; cv=none; b=OTZBoeIbd+yc5doYhXmkXuMfMTJejPzivYECMNpLT4g2UQAcz7bM1XknpOw/XZMVebZHGkwsGshCR59XFte4+sRfcgks/8kw99ATDIyIIkJ5xwhAfUODjN2nTGx8eLkAF6UV/G7y/vfzjMlkAoljGyx0OFiCc9+nmxPrYR9P5S8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709567468; c=relaxed/simple;
-	bh=yBt5TwzmivGnFmrcNnjakHcmowxPO+T1ILDhjFfS+5s=;
+	s=arc-20240116; t=1709570274; c=relaxed/simple;
+	bh=4aHwxdGxoejJyDNv4pzXE89oIPQDG1fk8iLHeraQ44A=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Adc+iYB3HZmwv9RAb/CF5sIgTEhQzWg4ltCKo/0ly9z8BSGfBgkAAiuudDdfTqxG8k+efoAhgpVgIcPVTyGfn4ywP2eFM3eILBUdp8rPomZb/YE+SgteCuuXEJ9kGzdSN9NmHkY8irXy+q3019UgLxCF9d1RXd8EJnHJfrraWhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SDZXtRgi; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=F9b107drdTXB4umV5r0R6FtvfLzPmRq8tMeJRDyp9YnH8rr11SzBxs+gzV2m3QiZZdJeEs4Lg1c/Etqv/KJ+A4DhNzsCHb7GiesQo6nIO1xz/YyLEA67VsKMkhA5JhGM5aATmbITvj6lpGb26n2RnNstOrk0u6H2PSxc+n/01zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SVjAOgsT; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5dca5c631ffso4377933a12.2
-        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 07:51:06 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc693399655so8577013276.1
+        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 08:37:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709567466; x=1710172266; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709570272; x=1710175072; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sBUCyHuTZA9i0dCfsQh5d6xGpY6OHPS4YyBabmMxAP4=;
-        b=SDZXtRgiyj+5MbAIgJu07FhCICtaTMIu9JLGYC24BLs46xhb5qinRqL5sNiG7xAFgh
-         c4OfNJoLeO9P0c2wvvQfdW9kKoTs/hlsLXZCSJP0UMpIYFWDZsSQ4FB+EU2U71CxMFdc
-         One/V1kt7L1ynO8z3y0QkD4etJgPSNY0OIENB3j3SDtZVu/maykrTUady53rqEw4Y+Qs
-         izVc9lkmJ2GAIO4L4zxXAayIKoV0/o5Qr7v4g46SRd8K/4ZDhHyvSmkYdY1PqLc2NaQX
-         xJ8PM1YwzEmKj4rofdgdVHqB5+nYKSxb3twT66Zwk8A5NzmXjt3HQAxYb82UDjA/a+lN
-         rzUQ==
+        bh=/KfEI8gaz4FKcUI1Choooy+OQPG/WSY3Mi84VhLiojA=;
+        b=SVjAOgsTAb7LTd/AgGIKifD54zcwgIHkO0SmhnWwBDsPzD8y1o8BB3xTNQPQBDeyp6
+         Ze7VNkw0JhTvI6E+yGr51ls+RqUsNF5t0EWMOvqpzK4fzNLRfDHgD4kqnYsLQq0z1F7C
+         /lWfy9UHrecra53scmeGuRrYT24+RmYTxLM+v4amvIvIcexqj4HzwDmrjc+PQCbZwxRQ
+         5ERnZlbvJpsR2AFkBFcw+5LxeilZBxRRqtsHYDVOCDVZIevNEMrvA1yfoIXNcfIcCGxc
+         kV/sObYYeAQ6PEtlhlwegjMfVsv5kVHfYDVkONEVwkASv+6Vew/u45kwtKibHKSoAnnY
+         uufA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709567466; x=1710172266;
+        d=1e100.net; s=20230601; t=1709570272; x=1710175072;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sBUCyHuTZA9i0dCfsQh5d6xGpY6OHPS4YyBabmMxAP4=;
-        b=LxtjY7+fMI0YsK9v9NwO9owedq0DXPOkfKnOHPSbwEpLoIQduRxPIQwZUx6OouYqCH
-         9vLN2iIl8lMBsKPSMIgihKe4RSvEMr76w6/dCG3fjIhf4oryx6mlLoMGfhFIrLafEiZk
-         tuNOPcxwYTrPwytS8iTpT38S0G3ADGxQ8V9DefYesxPS5KgDPUEFJ9xowwPKy9rbQJjE
-         +iKx0CBfuXS/QAiBxheaB7ndaE2gop8HEPj7LisK2qg5S7upSgCc5dcuuNE47/LvR3mY
-         uKDEhtfF2CmFNDEE+GLs4IFxcgu178EyqXCgcckQ5OJNqSYBFBuqgddBCoyVcmFb46kU
-         8rpA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkbL7asuNUZrK61zNdD0KdvJ7ksRpGrBQy6atlNCJLvURr+ulZP3fzwzvokX12CzymkCI2Mb/uSWq5tA3HSIHKAX4V
-X-Gm-Message-State: AOJu0Yy8uj3cT52AcuRcvg8TwzW7LeCrCZSSR3oTEaCrZmNc4FilaIXs
-	rA/WiwJeJGE+G7H9BJSOfuYCk7WFhqQKOlGR09nBOUHNeiK+BxKN09258RTWv58JNFwmFXpi2Bn
-	Iig==
-X-Google-Smtp-Source: AGHT+IEVyjSh5NovjKr5fkDkRZyDvD0iMlIGtwRXV2B2y4ATUNzJdtnYgus2gWiVbWe/2y2bviGgzKsFeEE=
+        bh=/KfEI8gaz4FKcUI1Choooy+OQPG/WSY3Mi84VhLiojA=;
+        b=seK8/cNOaOf/62KjQgO7ezTogxiqEt5xEWJVKV5i0LVY8jiCMvKyUyX+spiDEa7lLp
+         VumIN3yNnPehkdlMTeP6lhSofA5+DFkzY0o/dGZa8Ywzuq2is86qL1bl2s3vFjBENckS
+         cTWHj3BPqNmjlgo21Wlzxi2+x9YxO2KTDLGumMs1l3CJj/yG02DvttbgKDIV+RSc2j35
+         +tIqzGpi0hV+dWml6YCrporGufGXW2tVqFPexCVS+LFbcmsZb8BQGQ61yGaKimQ2fBST
+         BsGGXuuk0fgWMo5U2E47gErK1n+tZKHtV3XmT9Rj+IDJEJ5kR5YwgeGEs++F1rYfvlb1
+         mIHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXKp3XhrAWggKM2YUZi9uZSCpElvJMcQz2rglYQaSNtBbiK1ZWycpmKwA5v9OVA/gbE0FGN6q9yIPiL08TltsZhjRUP
+X-Gm-Message-State: AOJu0Yxgtvpbp85hnnW+9s/5DYRmOAp25FHw6S3CCNr21Ru8Y5BnP424
+	CBZCVZGd0l9J6YonyPbsM+vbRR8i3+bHnO45qlgH73tqROlT2QB4oR6Y3H8JnAEQ5wuXVD8+Y47
+	0mg==
+X-Google-Smtp-Source: AGHT+IFr9VE+8742uLdZ5k+nJnffkgEUEpcactZjFcf1JOn5ZMwhDKcZ9pqmLwhs3Kkma5rYMDHsuRkJU0M=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:5d0e:0:b0:5dc:eb5:19db with SMTP id
- r14-20020a635d0e000000b005dc0eb519dbmr27392pgb.0.1709567465769; Mon, 04 Mar
- 2024 07:51:05 -0800 (PST)
-Date: Mon, 4 Mar 2024 07:51:04 -0800
-In-Reply-To: <05449435-008c-4d51-b21f-03df1fa58e77@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1101:b0:dc6:fec4:1c26 with SMTP id
+ o1-20020a056902110100b00dc6fec41c26mr2470737ybu.1.1709570271925; Mon, 04 Mar
+ 2024 08:37:51 -0800 (PST)
+Date: Mon, 4 Mar 2024 08:37:50 -0800
+In-Reply-To: <ZeXpqf/0YoBmctw2@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-9-seanjc@google.com>
- <2237d6b1-1c90-4acd-99e9-f051556dd6ac@intel.com> <ZeEOC0mo8C4GL708@google.com>
- <05449435-008c-4d51-b21f-03df1fa58e77@intel.com>
-Message-ID: <ZeXt6A_w4etYCYP7@google.com>
-Subject: Re: [PATCH 08/16] KVM: x86/mmu: WARN and skip MMIO cache on private,
- reserved page faults
+References: <20240226190344.787149-1-pbonzini@redhat.com> <20240226190344.787149-14-pbonzini@redhat.com>
+ <ZeXpqf/0YoBmctw2@yilunxu-OptiPlex-7050>
+Message-ID: <ZeX43hHosoyCQsi-@google.com>
+Subject: Re: [PATCH v3 13/15] KVM: SEV: define VM types for SEV and SEV-ES
 From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	David Matlack <dmatlack@google.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	michael.roth@amd.com, aik@amd.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Mar 01, 2024, Kai Huang wrote:
-> On 1/03/2024 12:06 pm, Sean Christopherson wrote:
-> > E.g. in this case, KVM will just skip various fast paths because of the RSVD flag,
-> > and treat the fault like a PRIVATE fault.  Hmm, but page_fault_handle_page_track()
-> > would skip write tracking, which could theoretically cause data corruption, so I
-> > guess arguably it would be safer to bail?
-> > 
-> > Anyone else have an opinion?  This type of bug should never escape development,
-> > so I'm a-ok effectively killing the VM.  Unless someone has a good argument for
-> > continuing on, I'll go with Kai's suggestion and squash this:
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index cedacb1b89c5..d796a162b2da 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -5892,8 +5892,10 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
-> >                  error_code |= PFERR_PRIVATE_ACCESS;
-> >          r = RET_PF_INVALID;
-> > -       if (unlikely((error_code & PFERR_RSVD_MASK) &&
-> > -                    !WARN_ON_ONCE(error_code & PFERR_PRIVATE_ACCESS))) {
-> > +       if (unlikely(error_code & PFERR_RSVD_MASK)) {
-> > +               if (WARN_ON_ONCE(error_code & PFERR_PRIVATE_ACCESS))
-> > +                       return -EFAULT;
+On Mon, Mar 04, 2024, Xu Yilun wrote:
+> On Mon, Feb 26, 2024 at 02:03:42PM -0500, Paolo Bonzini wrote:
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> > index d0c1b459f7e9..9d950b0b64c9 100644
+> > --- a/arch/x86/include/uapi/asm/kvm.h
+> > +++ b/arch/x86/include/uapi/asm/kvm.h
+> > @@ -857,5 +857,7 @@ struct kvm_hyperv_eventfd {
+> >  
+> >  #define KVM_X86_DEFAULT_VM	0
+> >  #define KVM_X86_SW_PROTECTED_VM	1
+> > +#define KVM_X86_SEV_VM		2
+> > +#define KVM_X86_SEV_ES_VM	3
+> >  
+> >  #endif /* _ASM_X86_KVM_H */
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index 2549a539a686..1248ccf433e8 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -247,6 +247,9 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >  	if (kvm->created_vcpus)
+> >  		return -EINVAL;
+> >  
+> > +	if (kvm->arch.vm_type != KVM_X86_DEFAULT_VM)
 > 
-> -EFAULT is part of guest_memfd() memory fault ABI.  I didn't think over this
-> thoroughly but do you want to return -EFAULT here?
+> IIUC it should be KVM_X86_SEV_VM?
 
-Yes, I/we do.  There are many existing paths that can return -EFAULT from KVM_RUN
-without setting run->exit_reason to KVM_EXIT_MEMORY_FAULT.  Userspace is responsible
-for checking run->exit_reason on -EFAULT (and -EHWPOISON), i.e. must be prepared
-to handle a "bare" -EFAULT, where for all intents and purposes "handle" means
-"terminate the guest".
-
-That's actually one of the reasons why KVM_EXIT_MEMORY_FAULT exists, it'd require
-an absurd amount of work and churn in KVM to *safely* return useful information
-on *all* -EFAULTs.  FWIW, I had hopes and dreams of actually doing exactly this,
-but have long since abandoned those dreams.
-
-In other words, KVM_EXIT_MEMORY_FAULT essentially communicates to userspace that
-(a) userspace can likely fix whatever badness triggered the -EFAULT, and (b) that
-KVM is in a state where fixing the underlying problem and resuming the guest is
-safe, e.g. won't corrupt the guest (because KVM is in a half-baked state).
+No, this is for the KVM_SEV_INIT version 1, which is restricted to "default" VMs.
+The idea is that KVM_X86_SEV_VM and KVM_X86_SEV_ES_VM guests must be initialized
+via KVM_SEV_INIT2.
 
