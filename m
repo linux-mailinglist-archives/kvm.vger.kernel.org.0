@@ -1,283 +1,186 @@
-Return-Path: <kvm+bounces-10781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10782-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEB086FCFA
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 10:18:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027AB86FD06
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 10:19:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D43B1F23BAB
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 09:18:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 266941C22526
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 09:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA6024B28;
-	Mon,  4 Mar 2024 09:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A44A0249F3;
+	Mon,  4 Mar 2024 09:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LaQ3zIxK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LMGMLGtU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAE020B27;
-	Mon,  4 Mar 2024 09:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709543824; cv=none; b=u/6KofVU4dyZkkhZssmIU0DqRrDppaTFJ8QAqcRRNYFlJM8oeQnTS+6jqTRuLMRJDk3jmDRNLxUzsaavYcBUTG9mrrT1JeFlhBzuJo62ktf2/1P0f6icg6XOURSVTzrgmr/tPSa8miXTNzYBn3vcheovAz97+vOtGpn+b1UVQRI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709543824; c=relaxed/simple;
-	bh=3DwW30fbFMvQ2ySHnVA3fgbqopvn+6yGmMXD+bUNixc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qrCHK9l8VtNLsWJUBs7uBT2CKds1hQq+mdADzBNmoV2TNGty6+wcVHhtEIxExGTrqoyJiI5EgZFRBs6p9x48HIDnlXrzY+QqCm5q+qODAk6y0pZOOVTYvIw7H20GgnaINGFX8e0a17KpXU5OyONfHK/4+1MvzfOMQq/f2MiatJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LaQ3zIxK; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E219D19BA6;
+	Mon,  4 Mar 2024 09:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709543887; cv=fail; b=a9AvSmB+8jwAjM4BZjpa+KIalBiWQIANvavdrekbdNgpVJt+51VqrwvFLPGNdIe6P34J8o0UtksQGnpRgblPS/wtp3AYTsYKpdX8MF4+k6hIaUrFZ4o/oyanMmsIN1N2ltoscOHd73Tll5AncT48W6y38GyJUOqY0vEhBGLvkGQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709543887; c=relaxed/simple;
+	bh=xXRFHR2Tn3+WLdzv93fUaX+174XpZD8benoF00Rsjic=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=E5pjp1OUB9F8SRopekc1hz49gw4u3lj2VhcGlF7CM39dN0ydPUgL95mV1spLtEypLnoxxoZH4A+jq72UhlCt8Xf4UE93JPqKGLgm+cFRBgKweXY699pscKj8cAndP4YsX9R1fTzxCSKedLcvDVqBg1TBHaWeZH/tTOpcVimYR5M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LMGMLGtU; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709543823; x=1741079823;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3DwW30fbFMvQ2ySHnVA3fgbqopvn+6yGmMXD+bUNixc=;
-  b=LaQ3zIxKeub5ytSP8j+O1NMnmwULvEEXZijLRekAF9RY5cWXa3+i+CFf
-   LllY/VoUtUtIulX2unkXnezgNXz2YuDKr8Mp9xhnvJ0mrKL8nQgrR0Ilq
-   IkAvM9tmWZJTt2QEdKY7BUodtJN9yeVYUVeMMa/4aXRbJSKoufLI0eMN5
-   RK6GRtr4OfIhDhJqqRF9ZEL8ZRl+ewm5VL0gGEVGMy1VCBX5ltqa+4vbD
-   2cA6LAfNx6SJwGCAvZpL0aRez6kJq5+bbsitWEwWBnq/PoSx2PI4LjpMh
-   lAS615xi0qYirc4ltD1SquJFTw90Xnzau0SoKXzpZqwnT/dYMn9F61GpK
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11002"; a="7833985"
+  t=1709543885; x=1741079885;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xXRFHR2Tn3+WLdzv93fUaX+174XpZD8benoF00Rsjic=;
+  b=LMGMLGtU+8Vl6iAQbDdoLvgZMN1cjlsr7hxB3wQNuI/apZqK4Yseid8m
+   YC15dn2U7FYS11q1iLBaTjEOvAWKWm4gZX9Ad52FdsEjMMfsM5nTDjlb4
+   XD7G85En/5l/QxOKp/efG581b9sLCMWyCbVtwNIacgObU553qP4puF8HP
+   j/5X0fEL9m/fzgDVXKX51l+7chNnwEkkK8YL+k7ujcR+cBHEOZY41p5A4
+   oL1K1u4eyQGkSmOazSRNNRtXNRmQvrpNsWrVcU+bLQLjodUTej0f1tZGO
+   8VgOZknnOGnSq9AUD03Ht4o6XmpwRRU8OFPJbIRh0ABDX/Krn3CT/0iST
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11002"; a="3885603"
 X-IronPort-AV: E=Sophos;i="6.06,203,1705392000"; 
-   d="scan'208";a="7833985"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 01:17:00 -0800
+   d="scan'208";a="3885603"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 01:18:04 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,203,1705392000"; 
-   d="scan'208";a="8838530"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.218]) ([10.238.8.218])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 01:16:55 -0800
-Message-ID: <0344d85f-d6ab-4d78-abac-d0293d71ef91@linux.intel.com>
-Date: Mon, 4 Mar 2024 17:16:53 +0800
+   d="scan'208";a="13591817"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Mar 2024 01:18:04 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 4 Mar 2024 01:18:03 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 4 Mar 2024 01:18:02 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 4 Mar 2024 01:18:02 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 4 Mar 2024 01:18:02 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bpmNtRz7Wx+ckw1vt30OCswB5TanCKcbAvwjVfq8mMySwtjFIL15pmRHKmc88sTIqjubrZ7lYIYpDZM1Fer7srXK48wAESl5qXcBYTJkHHoTWNsWdtabJh1zd9SLs+6I+JFBN8ZYYwnWSicMVfLv+wTWJxBthvSxERdsv/koRsTPlwdyHx3GyefZwXd0JfdxcVAPbitejuyEcTooSBAV6K5wxCPM7bjwrG/0JdVjURLB7R843XU66ms0m/hCHacu1cXlEO6mLfE67OApgjO9TLzHTH3AdVoB4ZOPeBl89cbl+OloR8ISJG1s2ZSJveQgaMA4tYSuqp7lvjMdl0sV7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xXRFHR2Tn3+WLdzv93fUaX+174XpZD8benoF00Rsjic=;
+ b=ThsoosWrvJf9gexR4UkS/h1GzUGV+KGd8hvc2KxA/z490rn43mkJEznpL9yIuKXpEjRdfQ2WWnlCgbyHOFQOhtuoKUMK6Yl5MtX41OPazf+CmiJIywj5F90Ja+zpHYh/gfdJa38Q676ZhaZbDUwjXm8sdbyajAQlBnUANEkINFMoJvGmz7CGzX23gr6o7TXdI9d631JkKbZrBFqkXpUlhi/Xv2U1GLz3bfs5aU1xoINCFeJJ1o8LC5+8EZl1C3PgSqmuoAcf4Xp9V5TWNgIfXxtVQwSB/CvJPuLP67STuH0B0QtJq7VxPeq1aZ8dsZeaTfDKPEgOTPI1niITADKViA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5271.namprd11.prod.outlook.com (2603:10b6:208:31a::21)
+ by CYYPR11MB8431.namprd11.prod.outlook.com (2603:10b6:930:c7::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.22; Mon, 4 Mar
+ 2024 09:18:00 +0000
+Received: from BL1PR11MB5271.namprd11.prod.outlook.com
+ ([fe80::ca67:e14d:c39b:5c01]) by BL1PR11MB5271.namprd11.prod.outlook.com
+ ([fe80::ca67:e14d:c39b:5c01%4]) with mapi id 15.20.7362.019; Mon, 4 Mar 2024
+ 09:18:00 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: "Zeng, Xin" <xin.zeng@intel.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
+	"Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+Subject: RE: [PATCH v4 01/10] crypto: qat - adf_get_etr_base() helper
+Thread-Topic: [PATCH v4 01/10] crypto: qat - adf_get_etr_base() helper
+Thread-Index: AQHaalRrxMw1HNq2EEyUy2uDoGUJELEnVD8A
+Date: Mon, 4 Mar 2024 09:18:00 +0000
+Message-ID: <BL1PR11MB52717E799927181BCB06D2C18C232@BL1PR11MB5271.namprd11.prod.outlook.com>
+References: <20240228143402.89219-1-xin.zeng@intel.com>
+ <20240228143402.89219-2-xin.zeng@intel.com>
+In-Reply-To: <20240228143402.89219-2-xin.zeng@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5271:EE_|CYYPR11MB8431:EE_
+x-ms-office365-filtering-correlation-id: ca9afe36-5bd0-410f-ebbd-08dc3c2bfcfc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: TLwad11W4i653X3dMNGVj6Pja1k6WSsAjTA3HFmHR/pnh2gad8+DizFiuaueAxQyabMhIlgrUKycG3z974bzUQ+rvgtkagFARtlylegwHqaQxJFHOvx1TKBIvrvk4ws0bAlq5S5V0ELBrCzfyUjbsd9bFVXzPSUtowSR0OENL/k4H56+HjPx6I9L3MR9KeSrmA+gFRbZFeEekn+yHT79E/Y+4FQwF5DJQCtyrfVe+Pmah/3ogUiTYo2UvMr0rvWifl6g1BuytelH2MJCZNMSRq9Skyv7fKj8LrHooYHDfB8ws6mmas4Ya/WjM3sCB5LsVbiDicaT8dV5V8btpUWU+1F1u54kMJKhIMrSay7Tc7+RAFSKCKNvEP4YPDFXN/PWt9CorqxvgFkq0kk3q/I7SZJneVegYSDglXlDPck3nSObyQ5plEXPTbhpCBtYWcw/gd5FYJtBpHKP/a7ahLEtQyRI+EzMPXrkRsCNr2Jwxq9cnP1RaL2BGMBMK4AiCP2ztSpbAArCrALgP+Jwy45qcapt6hpQJtLQIhEAFMcSm0IWcGYChWhbkPyCvJFWxuFBcZx/avpmhPQqEVxROsUqFr+tXrqx/r6qzMZNsh5cF2qGg2ld49VPkLJuPWO6/39LOgZdmIKfMA6PcmO33TCggicxb+w1ZGeglSslJYyCcpOkz30S+iybyOaawftmf5P8qZENSZY2GBmt4UUf/zQu7w==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5271.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Qb9tlOF9pwlJSbwlvEY39e9mMKJEpMs8DDJkYSWYibiyvJ1MhVtvWmnfUI1c?=
+ =?us-ascii?Q?rA3qxbNwEBkVil8u/dQ0OSXc+efLOdN+1hAzm3FR51bXOzguyxSFIbcqji7g?=
+ =?us-ascii?Q?Lhap9hkgnXsTEigYBtMDOnvEjXC6+jW5vjIT7w1s3isF1SlFulvI59tYRCiE?=
+ =?us-ascii?Q?v7P5pHUHkYRjbXw91pbBJaGUM9LwU8CSZaJk+GNZTTgUe6GktSPYJiW/p0ko?=
+ =?us-ascii?Q?1nUfn2AgP2QiZFH3VOUaCRJV25UhevVESjR4Q9OgAjApkW7WR/mpAUWZF6G9?=
+ =?us-ascii?Q?8TJIqZd3EbQylRFD0z6PDAtDgAh200ylUIUpX+YCJ0Q0dHfM2ZfCHbMH+FLR?=
+ =?us-ascii?Q?vjmPP0OtEEUsw79rinnMLm5PENQAdSrQJlv7O9OWEef7WWfZmQ1MbAAPIAd9?=
+ =?us-ascii?Q?ccJXOUbvuEDAg24LPpcCFywMAg9xKf0pmUGYPfafGLsPb62nu16+PUovfx3p?=
+ =?us-ascii?Q?pSXKbne+/Qqz8iO5jJIMsQyyQRzpjMHgyH7cMP2EOZvAxDAATOJ/jtQK1IKp?=
+ =?us-ascii?Q?YlhxYBm/ZhDxU7vxQC/aAaT6Kof8kjBfrzkShqNax3q+6nny7+cFNqQW81fi?=
+ =?us-ascii?Q?jPTEPGLGIYYa2rnI7I8u0DmxXFLGVeDopmwUNZXNnWT2Xrb7QNMzTBh/tGEz?=
+ =?us-ascii?Q?e9aGFLbrzXcVKz+jNgGNHQfNmKUt1LIWaGSZ0QzCF7OBs1Qcd/+fL/Axdcqb?=
+ =?us-ascii?Q?1Nnb1OwqUcHuQowcJ5n+Wr2WYICoXZh2p4MlVgJaH0muW46F/XkTcCpgFrWe?=
+ =?us-ascii?Q?eWuEvj1zbnPtbkuRBMzoLLlxH/hlUi4ZV5Q3sO8+f1FSEiTbyZPN3ByU9C2B?=
+ =?us-ascii?Q?ZnvCgN6gDnnHlCq3cyDE5A1x8LEUeXKJhZTi6r1uPMZPchR8qGCFI4ep0zLW?=
+ =?us-ascii?Q?rdL+WFiAh2BZuL+a3/k3qzHYyAK4xOk4bJe1SgSpy+ksl5v3jJxP/naINA7N?=
+ =?us-ascii?Q?WvL6I2wjOhlprFXYDHOHf9/DCdWBnGlJH1/nHIP6uh8UJqd1sxq1vZH1Djwv?=
+ =?us-ascii?Q?56mopXnbpwOeLmR8kzOINAZCRP+hl+syRT4HVyQIt465DIETtPMLEVf364An?=
+ =?us-ascii?Q?As2+NvBTB28BBlOamNQQJsz3MoPCC35VIVDscDhLYiY7dB+q0qegMAAybpKz?=
+ =?us-ascii?Q?d1mOVa/F0WoVEdH62/CV8UA+XgqDWv2KLGoHXDosLGfqpJGlq+t04pneDty3?=
+ =?us-ascii?Q?KPY6C6Hdwfq+Eo4frFqEarEqyJ8beoQlu53HQQPNRVciRuLctqBh6V/e3ocG?=
+ =?us-ascii?Q?GO7q/ifv4K6pmwYzK4b5lfEtmo9Lo+CMYvf+SuRwd0a38172nc7GM8ADmSQj?=
+ =?us-ascii?Q?8Vsebe9ElpL8NzALzUh/pUpT8qsBtPBKEn1y4fjX25065qkB5splPWqB6gLX?=
+ =?us-ascii?Q?DBjkz7UrR+5QCOhnDlTdZzQsb8FMAZken2FgZZRxofJnFL7pU+nV4Oz7Onyb?=
+ =?us-ascii?Q?iYD0dGC1aEf2qul2t5mlZnDEWQD5N6KFGdxYwLpkZMC3p1RyuBeE6pCGa6KO?=
+ =?us-ascii?Q?ATVY1VKgRotuwgykYwIZNfDBgPPauOe4GCxuLU8RCK2dyJ3kbBIgI5RtBrp5?=
+ =?us-ascii?Q?Sj/qN7LxtqJZKZlAlZ00jaCMn/YyOu4wK6UiCqPo?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v5 10/29] KVM: selftests: TDX: Adding test case for
- TDX port IO
-To: Yan Zhao <yan.y.zhao@intel.com>, Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>,
- Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>,
- Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-References: <20231212204647.2170650-1-sagis@google.com>
- <20231212204647.2170650-11-sagis@google.com>
- <ZeUvtzHmMo9jdMnu@yzhao56-desk.sh.intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZeUvtzHmMo9jdMnu@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5271.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca9afe36-5bd0-410f-ebbd-08dc3c2bfcfc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Mar 2024 09:18:00.5351
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FdhIfZrJSIn3aWXKQyV+fcpaiKV0Z0tEGJzSRJBqyNohFSfvNxnau2vo9DDwKsm3HZje5pVl6a1FMfZYeCkzdw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8431
+X-OriginatorOrg: intel.com
 
+> From: Zeng, Xin <xin.zeng@intel.com>
+> Sent: Wednesday, February 28, 2024 10:34 PM
+>=20
+> From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+>=20
+> Add and use the new helper function adf_get_etr_base() which retrieves
+> the virtual address of the ring bar.
+>=20
+> This will be used extensively when adding support for Live Migration.
+>=20
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Xin Zeng <xin.zeng@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
 
-
-On 3/4/2024 10:19 AM, Yan Zhao wrote:
-> On Tue, Dec 12, 2023 at 12:46:25PM -0800, Sagi Shahar wrote:
->> From: Erdem Aktas <erdemaktas@google.com>
->>
->> Verifies TDVMCALL<INSTRUCTION.IO> READ and WRITE operations.
->>
->> Signed-off-by: Erdem Aktas <erdemaktas@google.com>
->> Signed-off-by: Sagi Shahar <sagis@google.com>
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> Signed-off-by: Ryan Afranji <afranji@google.com>
->> ---
->>   .../kvm/include/x86_64/tdx/test_util.h        | 34 ++++++++
->>   .../selftests/kvm/x86_64/tdx_vm_tests.c       | 82 +++++++++++++++++++
->>   2 files changed, 116 insertions(+)
->>
->> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
->> index 6d69921136bd..95a5d5be7f0b 100644
->> --- a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
->> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
->> @@ -9,6 +9,40 @@
->>   #define TDX_TEST_SUCCESS_PORT 0x30
->>   #define TDX_TEST_SUCCESS_SIZE 4
->>   
->> +/**
->> + * Assert that some IO operation involving tdg_vp_vmcall_instruction_io() was
->> + * called in the guest.
->> + */
->> +#define TDX_TEST_ASSERT_IO(VCPU, PORT, SIZE, DIR)			\
->> +	do {								\
->> +		TEST_ASSERT((VCPU)->run->exit_reason == KVM_EXIT_IO,	\
->> +			"Got exit_reason other than KVM_EXIT_IO: %u (%s)\n", \
->> +			(VCPU)->run->exit_reason,			\
->> +			exit_reason_str((VCPU)->run->exit_reason));	\
->> +									\
->> +		TEST_ASSERT(((VCPU)->run->exit_reason == KVM_EXIT_IO) && \
->> +			((VCPU)->run->io.port == (PORT)) &&		\
->> +			((VCPU)->run->io.size == (SIZE)) &&		\
->> +			((VCPU)->run->io.direction == (DIR)),		\
->> +			"Got unexpected IO exit values: %u (%s) %d %d %d\n", \
->> +			(VCPU)->run->exit_reason,			\
->> +			exit_reason_str((VCPU)->run->exit_reason),	\
->> +			(VCPU)->run->io.port, (VCPU)->run->io.size,	\
->> +			(VCPU)->run->io.direction);			\
->> +	} while (0)
->> +
->> +/**
->> + * Check and report if there was some failure in the guest, either an exception
->> + * like a triple fault, or if a tdx_test_fatal() was hit.
->> + */
->> +#define TDX_TEST_CHECK_GUEST_FAILURE(VCPU)				\
->> +	do {								\
->> +		if ((VCPU)->run->exit_reason == KVM_EXIT_SYSTEM_EVENT)	\
->> +			TEST_FAIL("Guest reported error. error code: %lld (0x%llx)\n", \
->> +				(VCPU)->run->system_event.data[1],	\
->> +				(VCPU)->run->system_event.data[1]);	\
->> +	} while (0)
->> +
->>   /**
->>    * Assert that tdx_test_success() was called in the guest.
->>    */
->> diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
->> index 8638c7bbedaa..75467c407ca7 100644
->> --- a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
->> +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
->> @@ -2,6 +2,7 @@
->>   
->>   #include <signal.h>
->>   #include "kvm_util_base.h"
->> +#include "tdx/tdcall.h"
->>   #include "tdx/tdx.h"
->>   #include "tdx/tdx_util.h"
->>   #include "tdx/test_util.h"
->> @@ -74,6 +75,86 @@ void verify_report_fatal_error(void)
->>   	printf("\t ... PASSED\n");
->>   }
->>   
->> +#define TDX_IOEXIT_TEST_PORT 0x50
->> +
->> +/*
->> + * Verifies IO functionality by writing a |value| to a predefined port.
->> + * Verifies that the read value is |value| + 1 from the same port.
->> + * If all the tests are passed then write a value to port TDX_TEST_PORT
->> + */
->> +void guest_ioexit(void)
->> +{
->> +	uint64_t data_out, data_in, delta;
->> +	uint64_t ret;
->> +
->> +	data_out = 0xAB;
->> +	ret = tdg_vp_vmcall_instruction_io(TDX_IOEXIT_TEST_PORT, 1,
->> +					TDG_VP_VMCALL_INSTRUCTION_IO_WRITE,
->> +					&data_out);
->> +	if (ret)
->> +		tdx_test_fatal(ret);
->> +
->> +	ret = tdg_vp_vmcall_instruction_io(TDX_IOEXIT_TEST_PORT, 1,
->> +					TDG_VP_VMCALL_INSTRUCTION_IO_READ,
->> +					&data_in);
->> +	if (ret)
->> +		tdx_test_fatal(ret);
->> +
->> +	delta = data_in - data_out;
->> +	if (delta != 1)
->> +		tdx_test_fatal(ret);
->> +
->> +	tdx_test_success();
->> +}
->> +
->> +void verify_td_ioexit(void)
->> +{
->> +	struct kvm_vm *vm;
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	uint32_t port_data;
->> +
->> +	vm = td_create();
->> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
->> +	vcpu = td_vcpu_add(vm, 0, guest_ioexit);
->> +	td_finalize(vm);
->> +
->> +	printf("Verifying TD IO Exit:\n");
->> +
->> +	/* Wait for guest to do a IO write */
->> +	td_vcpu_run(vcpu);
->> +	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> This check is a vain, because the first VMExit from vcpu run is always
-> KVM_EXIT_IO caused by tdg_vp_vmcall_instruction_io().
-
-I think tdg_vp_vmcall_instruction_io() could fail if RCX (GPR select) 
-doesn't
-meet the requirement (some bits must be 0).
-Although RCX is set by guest code (in selftest, it set in __tdx_hypercall())
-and it will not trigger the error, it still can be used as a guard to make
-sure guest doesn't pass a invalid RCX.
-
-
->
->
->> +	TDX_TEST_ASSERT_IO(vcpu, TDX_IOEXIT_TEST_PORT, 1,
->> +			TDG_VP_VMCALL_INSTRUCTION_IO_WRITE);
->> +	port_data = *(uint8_t *)((void *)vcpu->run + vcpu->run->io.data_offset);
->> +
->> +	printf("\t ... IO WRITE: OK\n");
-> So,  even if there's an error in emulating writing of TDX_IOEXIT_TEST_PORT,
-> and guest would then find a failure and trigger tdx_test_fatal(), this line
-> will still print "IO WRITE: OK", which is not right.
->
->> +
->> +	/*
->> +	 * Wait for the guest to do a IO read. Provide the previous written data
->> +	 * + 1 back to the guest
->> +	 */
->> +	td_vcpu_run(vcpu);
->> +	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> This check is a vain, too, as in  write case.
->
->> +	TDX_TEST_ASSERT_IO(vcpu, TDX_IOEXIT_TEST_PORT, 1,
->> +			TDG_VP_VMCALL_INSTRUCTION_IO_READ);
->> +	*(uint8_t *)((void *)vcpu->run + vcpu->run->io.data_offset) = port_data + 1;
->> +
->> +	printf("\t ... IO READ: OK\n");
-> Same as in write case, this line should not be printed until after guest
-> finishing checking return code.
->
->> +
->> +	/*
->> +	 * Wait for the guest to complete execution successfully. The read
->> +	 * value is checked within the guest.
->> +	 */
->> +	td_vcpu_run(vcpu);
->> +	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
->> +	TDX_TEST_ASSERT_SUCCESS(vcpu);
->> +
->> +	printf("\t ... IO verify read/write values: OK\n");
->> +	kvm_vm_free(vm);
->> +	printf("\t ... PASSED\n");
->> +}
->> +
->>   int main(int argc, char **argv)
->>   {
->>   	setbuf(stdout, NULL);
->> @@ -85,6 +166,7 @@ int main(int argc, char **argv)
->>   
->>   	run_in_new_process(&verify_td_lifecycle);
->>   	run_in_new_process(&verify_report_fatal_error);
->> +	run_in_new_process(&verify_td_ioexit);
->>   
->>   	return 0;
->>   }
->> -- 
->> 2.43.0.472.g3155946c3a-goog
->>
->>
-
+IMHO s-o-b already implies that the author has reviewed his own code...
 
