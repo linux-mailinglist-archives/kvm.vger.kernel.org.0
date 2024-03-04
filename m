@@ -1,132 +1,140 @@
-Return-Path: <kvm+bounces-10829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B0CC870B98
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 21:28:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D22870BA1
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 21:33:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D6281C22773
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 20:28:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFB53B22019
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 20:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D7E7B3DE;
-	Mon,  4 Mar 2024 20:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B8B8F6F;
+	Mon,  4 Mar 2024 20:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HGsyHqRP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h40mIeUk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00C15FF0E
-	for <kvm@vger.kernel.org>; Mon,  4 Mar 2024 20:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6679A8BF9
+	for <kvm@vger.kernel.org>; Mon,  4 Mar 2024 20:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709584061; cv=none; b=rmzES8lG06a/ok/c4RQjF09P8oLQuRHkUUAe/3Bi4wDFYPv+XLtG0+DpYNo0+stjic5ZXo5skh4iTHW86aX+hpMes9EGTkQO+uVZ9y0J9hSbSTH4R68ls1DOLP2DnbKlwTz64l3g3Klj7lVzAcDIl52PvABzCZBJ1ln7JBS1Kw8=
+	t=1709584375; cv=none; b=nW6Qbat6WWJHLhjnkPhhnrd4YKI22a/P+fJB1nphQMAT9p3JOdvtYa+TT9yIIBSMD/I39YsPTwZFlNddxNCxyjP8gFXOaSWBmCc1DYd9yG95QEv9goEUa8ao75CudfmAIun63sIJROyrAcnGeyylKkqBWsBV7GJ0oYcJbYpJ3W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709584061; c=relaxed/simple;
-	bh=E4Y+jYp9vWBypjxdtdA622/MXqA7JiGJ8aj/k58DLlI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AVUxTONurEqGo8RvYfhZU2kQDZiAPdouYM6HuNrFi4QAxwA+X8/CHZ4BNf1ERh3wVtsKrzWm4DcXen9KC9z422Z0b2jluyZAIFxLjl9Jw/bjBspb2lQBQgldr4F5pkhCyJSP9fcIcbDKYL76Qlx/+KObyYb9fD7Bjbt7ZXmiFco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HGsyHqRP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709584057;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EVVcgRE/QddLe3v5WXQ240l1iFCe02aYVgi2FeEnepg=;
-	b=HGsyHqRPeZlprqtpWVJ+UfyOmlpk0vBzjMUPE9ts1hVTZqqnEbAZgPy/dYG63ipfFZaNMe
-	HBDszrTSVShbD3E59srrjV+7eiB2UJG0dljdEEbpXCn1VMZG2/QvcfByVcg1rObWpSmFGM
-	I21Ibsb5OYWRzGitJwZem8uwBtk3F8k=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-5ZTHgDBVNLaSAsSrQM4uOQ-1; Mon, 04 Mar 2024 15:27:36 -0500
-X-MC-Unique: 5ZTHgDBVNLaSAsSrQM4uOQ-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7c84b3570cfso163991739f.3
-        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 12:27:36 -0800 (PST)
+	s=arc-20240116; t=1709584375; c=relaxed/simple;
+	bh=aN7iBP0Fr7hMMlKq3I0xxEeo5y2nD9yxqABrzVhf8DU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KjlBYW49NDw+vzCVxMqLMGO60USE/QlCgQnzmRTHN8HvI+e0Rsj6L2N4HzG5SKqHc+/awbBTbrCaa68dNwyV2veWmYsWc8O+YDjnUhGgE6898RJbVtfk/WsZpkzhf9+yUTM+tCF8mEZsFQg+mmm5MtzhkjT8oHUlHxHfECQW5fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h40mIeUk; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcd94cc48a1so7656548276.3
+        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 12:32:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709584373; x=1710189173; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IGjbhidK9mIBRigo6mJIfMD0RxuUrgdaznMkQx4mOsU=;
+        b=h40mIeUk2nE9giQpXMqUNwvUJqpF1fkK4IT7EJGWhc5287zOFncD8iVyqFacKAyZ+1
+         +geFRGvz5329BX3B5mQcXKkwNR15W7/N1atza+SFbXuRhfNDkyd7PPr1llrW+oP24byf
+         3pZoKDRnBvWA0nlx8PZRB/Jo9D0qzioehzFFkRQo975tjqOC+R4TLdwQ1VZ7B/KXrCW4
+         7Qddhq3pjSqviN5djo6dOM1CZ5bioQVcFUWZOvkhNltwb+0hSSMGl93f33U/m6Fur3JX
+         TpL7XKl/dvls7L/Ze+iaYOaP64uRmbSDXby/jxycyeHYkLJ65n08UMZe4SosXa+Odq0v
+         Yfaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709584056; x=1710188856;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EVVcgRE/QddLe3v5WXQ240l1iFCe02aYVgi2FeEnepg=;
-        b=KopAhFHdCA2plMQDw2LQ/2EqAlJcpytPczdWVYCu1aRbMSMLKP+gDSrRLnsYChbb+O
-         ri1wzpyg0jIVcp5c6mNyaF7meyc4ODoNg0koIcoxEcGYO0Q3b1y+TgOz/tnZFPn+L9op
-         zMM6u2wAOn9dK9w6cTjQfb7jyL9qXTTN1aXXE+l+I/UbxTSivGIzYjTUvZiUxbP3lC2N
-         ehr7CDGUQszz5UzRj8BnOaBmxwYYx25yC3xsbBjbkRp4GbLmQ8imD3ia6AFiJU4MuWM4
-         H7gPuJ3QCG6oOvM8FxwhIUf4CkBu39OBtpKmH9AGz7FtK1BuX1wWcp6ZGSUdKKJgMmqq
-         Rm/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWS8rm4AOwilKI0G6PIykOcoj59Q+LOPIMb1Vxon8CvHRqMTNDlU+pxECuGRwvZrH9eccXl7bAJmIKMsBKOYyTGupq/
-X-Gm-Message-State: AOJu0YxCsKTBkuh8YrkScLPmFYjoeaIiQCROdAaod1zmVC8IF3dW6Tiz
-	Am+k/QZY2Sso8H/e+J++ud6n27uE24iWM/hYoHTukEWU042NCvhH4YDG9k9gmQsu0C6cfrhjaIm
-	OoQtgRFMAN6O5JqsrlEpR/wgeccLUtZbZnxIgpNR00wIqo1g33A==
-X-Received: by 2002:a6b:c9c2:0:b0:7c8:63b6:a0f3 with SMTP id z185-20020a6bc9c2000000b007c863b6a0f3mr736753iof.18.1709584055905;
-        Mon, 04 Mar 2024 12:27:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEAFPx6bbWNHpshukLWXh37C2p/Or/xC5GCj4PDWlahG/DaXcyk5s8zlICNfgiH/I6/FmYpng==
-X-Received: by 2002:a6b:c9c2:0:b0:7c8:63b6:a0f3 with SMTP id z185-20020a6bc9c2000000b007c863b6a0f3mr736744iof.18.1709584055683;
-        Mon, 04 Mar 2024 12:27:35 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id h21-20020a056638063500b00474dd9c2b21sm1452220jar.82.2024.03.04.12.27.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Mar 2024 12:27:35 -0800 (PST)
-Date: Mon, 4 Mar 2024 13:27:33 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Brett Creeley <bcreeley@amd.com>
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- kvm@vger.kernel.org, jgg@ziepe.ca, yishaih@nvidia.com,
- kevin.tian@intel.com, linuxarm@huawei.com, liulongfang@huawei.com
-Subject: Re: [PATCH] hisi_acc_vfio_pci: Remove the deferred_reset logic
-Message-ID: <20240304132733.2b7044ad.alex.williamson@redhat.com>
-In-Reply-To: <eed5d95c-f447-4383-8163-1ce419cc0fe6@amd.com>
-References: <20240229091152.56664-1-shameerali.kolothum.thodi@huawei.com>
-	<eed5d95c-f447-4383-8163-1ce419cc0fe6@amd.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1709584373; x=1710189173;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IGjbhidK9mIBRigo6mJIfMD0RxuUrgdaznMkQx4mOsU=;
+        b=h/LqA4IptvjI7q5ahAt3QxIIAwf+yNyucFJfEnNYoJ9s/zYkaP+T0ngN9qQ6zxXszf
+         l0JkhyhCU5AYf+fHvsBc5RXorYHhZwie09yiTfS0jfLLDFScSh+6oEb2jvp+65w1AMps
+         kb7WAVpQ5y6LhG0M+koQvbs03eDwT+nI5KygZBoI3JoHynkwPufyKdQPCn8kbq+CPmJ+
+         r3MlrIyjelHqdfAc9RVJoXueI+Le3b1fznI+AGYhQgl8mHjexdd2I9cPwjwqegzxduQ8
+         XC0Okvf2M6YoJYbUVsX+AcTSqwtFKI9pxXdBHwIZVyv1fCh6GUUKRr0Ydebm63oWNMH2
+         73KA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaAmdpzTXw5wRwTQrkQQEm18izbXfdAxU8S1I6Iqn74ldLkgqs5/Vu8IjevUzW4wqeVg+E1U+GwL49j2hrUkBpDJes
+X-Gm-Message-State: AOJu0YwZgJnHs/paTrYH/AVQI14Z7t6qhAK9UHVR2ASY9zIvnrM5BUKS
+	g/0rcw7DzAG0BVv6xX4wfbWhgY4B0ISVQtwbNC+L3c4TE8/mp9D31ai2V5h3UFtXJA13D/G//+t
+	3wg==
+X-Google-Smtp-Source: AGHT+IEmRdAyXCmSUg6f9/OpeGnPuqGycjin7usqBi6tnzcnwZA/qldiy/+AtwEb+/ocbiyWAY5WKQraOik=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1004:b0:dc7:48ce:d17f with SMTP id
+ w4-20020a056902100400b00dc748ced17fmr2609142ybt.10.1709584373516; Mon, 04 Mar
+ 2024 12:32:53 -0800 (PST)
+Date: Mon, 4 Mar 2024 12:32:51 -0800
+In-Reply-To: <ZeYqt86yVmCu5lKP@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-9-amoorthy@google.com>
+ <ZeYoSSYtDxKma-gg@linux.dev> <ZeYqt86yVmCu5lKP@linux.dev>
+Message-ID: <ZeYv86atkVpVMa2S@google.com>
+Subject: Re: [PATCH v7 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO and
+ annotate fault in the stage-2 fault handler
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Anish Moorthy <amoorthy@google.com>, maz@kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, robert.hoo.linux@gmail.com, jthoughton@google.com, 
+	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 29 Feb 2024 14:05:58 -0800
-Brett Creeley <bcreeley@amd.com> wrote:
-
-> On 2/29/2024 1:11 AM, Shameer Kolothum wrote:
-> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+On Mon, Mar 04, 2024, Oliver Upton wrote:
+> On Mon, Mar 04, 2024 at 08:00:15PM +0000, Oliver Upton wrote:
+> > On Thu, Feb 15, 2024 at 11:53:59PM +0000, Anish Moorthy wrote:
 > > 
+> > [...]
 > > 
-> > The deferred_reset logic was added to vfio migration drivers to prevent
-> > a circular locking dependency with respect to mm_lock and state mutex.
-> > This is mainly because of the copy_to/from_user() functions(which takes
-> > mm_lock) invoked under state mutex. But for HiSilicon driver, the only
-> > place where we now hold the state mutex for copy_to_user is during the
-> > PRE_COPY IOCTL. So for pre_copy, release the lock as soon as we have
-> > updated the data and perform copy_to_user without state mutex. By this,
-> > we can get rid of the deferred_reset logic.
+> > > +	if (is_error_noslot_pfn(pfn)) {
+> > > +		kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PAGE_SIZE,
+> > > +					      write_fault, exec_fault, false);
 > > 
-> > Link: https://lore.kernel.org/kvm/20240220132459.GM13330@nvidia.com/
-> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>  
+> > Hmm... Reinterpreting the fault context into something that wants to be
+> > arch-neutral might make this a bit difficult for userspace to
+> > understand.
+> > 
+> > The CPU can take an instruction abort on an S1PTW due to missing write
+> > permissions, i.e. hardware cannot write to the stage-1 descriptor for an
+> > AF or DBM update. In this case HPFAR points to the IPA of the stage-1
+> > descriptor that took the fault, not the target page.
+> > 
+> > It would seem this gets expressed to userspace as an intent to write and
+> > execute on the stage-1 page tables, no?
 > 
-> Shameer,
+> Duh, kvm_vcpu_trap_is_exec_fault() (not to be confused with
+> kvm_vcpu_trap_is_iabt()) filters for S1PTW, so this *should*
+> shake out as a write fault on the stage-1 descriptor.
 > 
-> Thanks for providing this example. After seeing this, it probably 
-> doens't make sense to accept my 2/2 patch at 
-> https://lore.kernel.org/kvm/20240228003205.47311-3-brett.creeley@amd.com/.
-> 
-> I have reworked that patch and am currently doing some testing with it 
-> to make sure it's functional. Once I have some results I will send a v3.
+> With that said, an architecture-neutral UAPI may not be able to capture
+> the nuance of a fault. This UAPI will become much more load-bearing in
+> the future, and the loss of granularity could become an issue.
 
-Darn, somehow this thread snuck by me last week.  Currently your series
-is at the top of my next branch, so I'll just rebase it to 8512ed256334
-("vfio/pds: Always clear the save/restore FDs on reset") to drop your
-2/2 and wait for something new relative to the reset logic.  Thanks,
+What is the possible fallout from loss of granularity/nuance?  E.g. if the worst
+case scenario is that KVM may exit to userspace multiple times in order to resolve
+the problem, IMO that's an acceptable cost for having "dumb", common uAPI.
 
-Alex
+The intent/contract of the exit to userspace isn't for userspace to be able to
+completely understand what fault occurred, but rather for KVM to communicate what
+action userspace needs to take in order for KVM to make forward progress.
 
+> Marc had some ideas about forwarding the register state to userspace
+> directly, which should be the right level of information for _any_ fault
+> taken to userspace.
+
+I don't know enough about ARM to weigh in on that side of things, but for x86
+this definitely doesn't hold true.  E.g. on the x86 side, KVM intentionally sets
+reserved bits in SPTEs for "caching" emulated MMIO accesses, and the resulting
+fault captures the "reserved bits set" information in register state.  But that's
+purely an (optional) imlementation detail of KVM that should never be exposed to
+userspace.
+
+Ditto for things like access tracking on hardware without A/D bits, and shadow
+paging, which again can generate fault state that is inscrutable/misleading
+without context that only KVM knows (and shouldn't expose to userspace).
 
