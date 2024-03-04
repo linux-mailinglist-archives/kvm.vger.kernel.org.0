@@ -1,183 +1,136 @@
-Return-Path: <kvm+bounces-10787-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86E4686FE18
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 10:55:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC6E586FE1B
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 10:56:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CD56282025
-	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 09:55:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78D29283599
+	for <lists+kvm@lfdr.de>; Mon,  4 Mar 2024 09:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF222233A;
-	Mon,  4 Mar 2024 09:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B59E224ED;
+	Mon,  4 Mar 2024 09:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FFVw1ir9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q3w6x+ni"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEB2208A2
-	for <kvm@vger.kernel.org>; Mon,  4 Mar 2024 09:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED9D21A0A;
+	Mon,  4 Mar 2024 09:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709546148; cv=none; b=OA5WWEQ2Z5ZudOwbHrNA+rt9ht5XO93ckLI/nKfmHkIup2ZRD/qWaL0Cn0UYUPhyrZhe7pofh6Sb6r4/sYbuP9Gg1N7d9Kw9CqNMEGFuF2EYuUEEttbK7vx8orKthipkVGi0Kp1DoPFRsUFKfKKS6Xuno04i1WdVcX8SZISLTEk=
+	t=1709546156; cv=none; b=oUUZiXT3ITF7tMvecvFZMQ9fcrAEYJiS/yc39S39L3xzi7a+cPQ0nDkqQQ1jTIH+4a73heLO2SKanaxv2hTongvyX683nw3rDAJ7UfWe0khBr7XFY138/2eZLzuMhQpd0yRCke8I1Cifkrv/70RpEnIoeBTNdObQOsu/OhC14hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709546148; c=relaxed/simple;
-	bh=1Mm9dRTQgjPzBkaNQnPnHrEGMtEfjaDgfmzP9NWshn0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VjhhXgh11FN0u9M9KPxjVvqtlc7VwLVOzj7lY5nOoHbIoQpeD868muZPzcJcXfR3m8o2Pbkj3G8YA4eo90Z/GstdLB0oaYbyH871WV1NVmzIowgumwuNuwjx0/3hI+JSciS6fG+iKbMWGOl/ddgunG0Q0cvGayb68oExOTpC8yI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FFVw1ir9; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 4 Mar 2024 10:55:41 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709546144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GGup8Lw+aSd2ugIO2sejSm6SajL8kCyGLyvMIExqoyg=;
-	b=FFVw1ir9bp4wHBTi0TBibjQS8aTlEAkNfY32ye2+nR76lwXqFaaFGcT+tcnib31hWKpmEg
-	7KCo4pArS0O/NdaYIt5z0w6KhhY7qL9o6mQK7RUVtJSS7Li00joqg2N14Ectis3pWiSF3H
-	AGnomtVeCCDjo1CrnO4EfJZRjD9oVYs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, 
-	eric.auger@redhat.com, shahuang@redhat.com, pbonzini@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 13/18] arm64: Simplify efi_mem_init
-Message-ID: <20240304-9cc10a0c64d1723d3c203cf2@orel>
-References: <20240227192109.487402-20-andrew.jones@linux.dev>
- <20240227192109.487402-33-andrew.jones@linux.dev>
- <3d0cb559-87dc-423f-9461-574e810fbdb2@arm.com>
+	s=arc-20240116; t=1709546156; c=relaxed/simple;
+	bh=FNurAoSIJM5iqfJTeKCtzPgTaSyy2bsh6qtFhnt9DPM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B45C6f8mHQycV1l2l/9nCMZSYXmFH/2ZSpi8XdAvhhTub4kzH8xaCyQMwBnJjO/I3dJBDs3L/T3t5BSEWtP1e8WqdMrbNJEz8Nf/hBWfLb4CuTWEhM2fDqkOosB1nkVvSUuDpMhZlX+hXeRYrvRtXOGH0HCCCPODfItN+3OYnSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q3w6x+ni; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709546154; x=1741082154;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FNurAoSIJM5iqfJTeKCtzPgTaSyy2bsh6qtFhnt9DPM=;
+  b=Q3w6x+niEQk/Ju8Ut1sXqbPswVVsv7bDPJmLMk9oijxbI/q2J3+cbLpJ
+   2s/wg1vX9unak1ApkCFVUzcNPi628Qb9idfrvbb/GxxKeiL2kJFudGMoT
+   LhRiJh12Pgnrxa+aURCJrjy7AEY6hdpyM6aSGXlpJBSYeV6ISfO4afl0j
+   8PQ0fnPdGBuP6WvHj/Cf2XdKHDqDzuXkGjZSLt5wkE1Jf9clNcXm4r1E5
+   ZNU65Md+20qBErRbSfeqlzT2Me5sCJ7iEGy5Wkc82/xOK75dPTWbjHrOP
+   XFppLdL4UehKdnbneUG31cN8QcPk9L6h3KQ2SeC52y5AJbvyXqpprchhY
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11002"; a="6980716"
+X-IronPort-AV: E=Sophos;i="6.06,203,1705392000"; 
+   d="scan'208";a="6980716"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 01:55:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,203,1705392000"; 
+   d="scan'208";a="32105342"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.218]) ([10.238.8.218])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 01:55:49 -0800
+Message-ID: <30c3bcb8-3bb1-4c88-bbca-909a02903f0c@linux.intel.com>
+Date: Mon, 4 Mar 2024 17:55:46 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d0cb559-87dc-423f-9461-574e810fbdb2@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v5 24/29] KVM: selftests: Expose _vm_vaddr_alloc
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>,
+ Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>,
+ Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <20231212204647.2170650-1-sagis@google.com>
+ <20231212204647.2170650-25-sagis@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20231212204647.2170650-25-sagis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 04, 2024 at 08:10:40AM +0000, Nikos Nikoleris wrote:
-> On 27/02/2024 19:21, Andrew Jones wrote:
-> > Reduce the EFI mem_map loop to only setting flags and finding the
-> > largest free memory region. Then, apply memregions_split() for
-> > the code/data region split and do the rest of the things that
-> > used to be done in the EFI mem_map loop in a separate mem_region
-> > loop.
-> > 
-> > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> 
-> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
-Thanks. While skimming this patch now to remind myself about it for v3,
-I see the etext = ALIGN() below which I forgot to consider. We certainly
-need the end of the text section to be on a page boundary, but that
-doesn't seem to be the case right now. I think we need to add this
-change
 
-diff --git a/arm/efi/elf_aarch64_efi.lds b/arm/efi/elf_aarch64_efi.lds
-index 836d98255d88..7a4192b77900 100644
---- a/arm/efi/elf_aarch64_efi.lds
-+++ b/arm/efi/elf_aarch64_efi.lds
-@@ -13,6 +13,7 @@ SECTIONS
-     *(.rodata*)
-     . = ALIGN(16);
-   }
-+  . = ALIGN(4096);
-   _etext = .;
-   _text_size = . - _text;
-   .dynamic  : { *(.dynamic) }
+On 12/13/2023 4:46 AM, Sagi Shahar wrote:
+> From: Ackerley Tng <ackerleytng@google.com>
+>
+> vm_vaddr_alloc always allocates memory in memslot 0. This allows users
+> of this function to choose which memslot to allocate virtual memory
+> in.
 
-Thanks,
-drew
+Nit: The patch exposes ____vm_vaddr_alloc() instead of _vm_vaddr_alloc().
 
-> 
-> Thanks,
-> 
-> Nikos
-> 
-> > ---
-> >   lib/arm/setup.c | 45 ++++++++++++++++++++-------------------------
-> >   1 file changed, 20 insertions(+), 25 deletions(-)
-> > 
-> > diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> > index d0be4c437708..631597b343f1 100644
-> > --- a/lib/arm/setup.c
-> > +++ b/lib/arm/setup.c
-> > @@ -301,9 +301,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> >   	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
-> >   	efi_memory_desc_t *buffer = *map->map;
-> >   	efi_memory_desc_t *d = NULL;
-> > -	struct mem_region r;
-> > -	uintptr_t text = (uintptr_t)&_text, etext = ALIGN((uintptr_t)&_etext, 4096);
-> > -	uintptr_t data = (uintptr_t)&_data, edata = ALIGN((uintptr_t)&_edata, 4096);
-> > +	struct mem_region r, *code, *data;
-> >   	const void *fdt = efi_bootinfo->fdt;
-> >   	/*
-> > @@ -337,21 +335,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> >   			r.flags = MR_F_IO;
-> >   			break;
-> >   		case EFI_LOADER_CODE:
-> > -			if (r.start <= text && r.end > text) {
-> > -				/* This is the unit test region. Flag the code separately. */
-> > -				phys_addr_t tmp = r.end;
-> > -
-> > -				assert(etext <= data);
-> > -				assert(edata <= r.end);
-> > -				r.flags = MR_F_CODE;
-> > -				r.end = data;
-> > -				memregions_add(&r);
-> > -				r.start = data;
-> > -				r.end = tmp;
-> > -				r.flags = 0;
-> > -			} else {
-> > -				r.flags = MR_F_RESERVED;
-> > -			}
-> > +			r.flags = MR_F_CODE;
-> >   			break;
-> >   		case EFI_CONVENTIONAL_MEMORY:
-> >   			if (free_mem_pages < d->num_pages) {
-> > @@ -361,15 +345,27 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> >   			break;
-> >   		}
-> > -		if (!(r.flags & MR_F_IO)) {
-> > -			if (r.start < __phys_offset)
-> > -				__phys_offset = r.start;
-> > -			if (r.end > __phys_end)
-> > -				__phys_end = r.end;
-> > -		}
-> >   		memregions_add(&r);
-> >   	}
-> > +	memregions_split((unsigned long)&_etext, &code, &data);
-> > +	assert(code && (code->flags & MR_F_CODE));
-> > +	if (data)
-> > +		data->flags &= ~MR_F_CODE;
-> > +
-> > +	for (struct mem_region *m = mem_regions; m->end; ++m) {
-> > +		if (m != code && (m->flags & MR_F_CODE))
-> > +			m->flags = MR_F_RESERVED;
-> > +
-> > +		if (!(m->flags & MR_F_IO)) {
-> > +			if (m->start < __phys_offset)
-> > +				__phys_offset = m->start;
-> > +			if (m->end > __phys_end)
-> > +				__phys_end = m->end;
-> > +		}
-> > +	}
-> > +	__phys_end &= PHYS_MASK;
-> > +
-> >   	if (efi_bootinfo->fdt_valid) {
-> >   		unsigned long old_start = free_mem_start;
-> >   		void *freemem = (void *)free_mem_start;
-> > @@ -380,7 +376,6 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> >   		free_mem_pages = (free_mem_start - old_start) >> EFI_PAGE_SHIFT;
-> >   	}
-> > -	__phys_end &= PHYS_MASK;
-> >   	asm_mmu_disable();
-> >   	if (free_mem_pages == 0)
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ryan Afranji <afranji@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> ---
+>   tools/testing/selftests/kvm/include/kvm_util_base.h | 3 +++
+>   tools/testing/selftests/kvm/lib/kvm_util.c          | 6 +++---
+>   2 files changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index efd7ae8abb20..5dbebf5cfd07 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -561,6 +561,9 @@ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
+>   struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
+>   void vm_populate_vaddr_bitmap(struct kvm_vm *vm);
+>   vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
+> +vm_vaddr_t ____vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
+> +			      vm_vaddr_t vaddr_min, vm_paddr_t paddr_min,
+> +			      uint32_t data_memslot, bool encrypt);
+>   vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
+>   vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
+>   			    enum kvm_mem_region_type type);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 28780fa1f0f2..d024abc5379c 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1410,9 +1410,9 @@ vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz,
+>    * a unique set of pages, with the minimum real allocation being at least
+>    * a page.
+>    */
+> -static vm_vaddr_t ____vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
+> -				     vm_vaddr_t vaddr_min, vm_paddr_t paddr_min,
+> -				     uint32_t data_memslot, bool encrypt)
+> +vm_vaddr_t ____vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
+> +			      vm_vaddr_t vaddr_min, vm_paddr_t paddr_min,
+> +			      uint32_t data_memslot, bool encrypt)
+>   {
+>   	uint64_t pages = (sz >> vm->page_shift) + ((sz % vm->page_size) != 0);
+>   
+
 
