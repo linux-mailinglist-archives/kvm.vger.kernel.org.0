@@ -1,94 +1,135 @@
-Return-Path: <kvm+bounces-11010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70CBB8720FC
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:59:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E77987214B
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 15:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2735D1F26414
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:59:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D2D71F2491D
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033E186151;
-	Tue,  5 Mar 2024 13:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994F886630;
+	Tue,  5 Mar 2024 14:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HvY8kQ3/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FBE85C74
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733DD85C73;
+	Tue,  5 Mar 2024 14:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709647144; cv=none; b=U55NR1ylfOtxH0ug+gCh5olikfQSPXyDVTU0SvMqcaz0PN5vZpOfC1pvDfpypfJklcDTPyGBftUQV55IvwHFWzMWEB+wV22XPjW4Q10R9huU2iFCEqwcSgm22hOEAFu/8VdMMajmIVJGrjBUU+0PFqm2y3W9E4Dq0mjzLiYw4B8=
+	t=1709648142; cv=none; b=UfD+bK2uYAxVWiXlIRHvovGoT4qd8O+wbVPDoIOIgQUu4658u7wjJgt5lOBNzlyk1g6w7CMlOctqgouxsRXap0zVxn8ymZuz1G1Xmpn30GsF6dHmv7RtlqDdxZDtTLC02Z/Kzd1DV1wyWf3FCIH+mmgu8iVu+rGaULs1etU44Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709647144; c=relaxed/simple;
-	bh=7l33o63t817PVAJxkpl+CDCljilBzWublR/7OYtNxNM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=a0cF9OKjvy/aRUxJEj//37QVG70f7p63NCLZcEgcaf4qC3EcESK0gwUhxRnQPYyP/pOxqwVBDiV2nVF7y6KuEHrexiRPiXGDkCc3bOXXiJweN21cJtPAl1cXmU5a2rccmPwSrKqLDagL9It4MlTWgh7GxHE5Z31RNOLOFA3RG2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c85571a980so149485639f.1
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:59:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709647142; x=1710251942;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ozqm1QJ84yI8HdJqurYAliOOcrvYW5cx3nOSejB731o=;
-        b=qh/JZoUEwDdT4SMTkR3kyG5dfDqeb8I3QN3ziM+dP/Yst4bucPu2o2W1hvihQMujsi
-         XDNupVrQ2TWw2IN5Sx20W5yE3mpd+jApXmTawyazxHsIvGZhW1k7r9xRsRpxdld0RPwR
-         OgMZJtKEL/1A3Klk1NaV1aZjWeh7rae6LNq/81fkStLqPZ+x9hxwSlw/q78SiKiIOnmo
-         lHsH3z8XinB7jT+cKaTmw16hIQa1HRNeJHuIobIBp8LvMboXWH2uhoTq/O4hUi7S8rnn
-         S2YUNTTk0x2DsOKAtBFLrVuoTOM992s5On+NLUneJ9Szb7bQA58fEpqoj+be8SDw0fdY
-         uWdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVko/+/YPOav8Y31x0K7R/DUzWZOZRX1sH8CqvRxh3mBX+JH9pbcnw8+1j7GkmHVMoNUwdLASCJuXOYmgjqCXAnahr0
-X-Gm-Message-State: AOJu0YyejfJg4jxOcDR7IN1mog7XYTWQMmgNy2BeM0hSk9Qs6LJ7Lxaz
-	cmWw976RQMrdQsHiKGCaZ1c9Du5+Hmd1U20O9FH7oTirmJlO3rRrSqBF+meDhDtAu1kNjfn5RM+
-	rKtMbsDHfYSC4J98Cw8UxMyMHrdRUt0tzJC4P+ANSjdLzBE0tz1GL5HA=
-X-Google-Smtp-Source: AGHT+IEP8n8qSf96nLlSO2rFxSJmbyVVUTknjVpsBlFop11mtXH7lx6mogLF/UQM1fodPwn/6hIAi5kpU8HrhUOEGbHhzUj7aJDi
+	s=arc-20240116; t=1709648142; c=relaxed/simple;
+	bh=NOrYqrOBKmtYhNesKNo9esl759+uodRTcRkHuZf+zRk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l68uKuLBLJtbLE5GHCwBAOpvKMcLJKAFQ1u/2AzQiyOsLMh/Mt0iZHMnXYLISfRCysnhrs5RlMRikG+Ub4FcIjkYPpOUOvvk1+ZjrSjSBgT22j3FMQ/3OKnhk1c7dV/YdqqEF3cdcMrB7k/VrGJOKDwlFkVE/kqRG4WFUSw+Qk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HvY8kQ3/; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 425EF0A4027026;
+	Tue, 5 Mar 2024 14:15:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=uCGzW2iZ273VwjEQ9vkC8xRDDD3pC4czBjmDdDYh0iM=;
+ b=HvY8kQ3/63r0fuGIi901Od2JNbj3d/BbcTQGIbZVj2q/oMxY1FwQK+Xm8npK5dTWxwHc
+ iiVvhkt0by+LzgvWAC4i64v3EV20TkSeWBdJURu+S7oYuQ6LDc9WGSizYji8bjlwO4E1
+ 0R6aL+IjzOb7IGYDzPGIB8VTZ9KWAUnpRV18GWOroBgk5h0bzp4Sjb27TGKYLi6XKvr3
+ VTjXf+oWLM81/ASJLgBrt64FpqZnTYhbyAx0k2jzn67uEJY2uXXUy4ilGg9n4TBUJoVZ
+ OCr+chWcvy74A2CQAa0Nn5obhI5+uaKoHEWWF0vItrYJQaSI57RPT8avJqACAJ95VMLg lQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wp3fwb333-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Mar 2024 14:15:40 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 425EFd7Y028062;
+	Tue, 5 Mar 2024 14:15:39 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wp3fwb2wr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Mar 2024 14:15:37 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 425DZXtI027187;
+	Tue, 5 Mar 2024 14:12:20 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wmfenr008-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Mar 2024 14:12:20 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 425ECEkl38928736
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 5 Mar 2024 14:12:16 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8E3BB2006B;
+	Tue,  5 Mar 2024 14:12:14 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 58AD32004E;
+	Tue,  5 Mar 2024 14:12:14 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  5 Mar 2024 14:12:14 +0000 (GMT)
+From: Nico Boehr <nrb@linux.ibm.com>
+To: frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        npiggin@gmail.com
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1] arch-run: Wait for incoming socket being removed
+Date: Tue,  5 Mar 2024 15:11:51 +0100
+Message-ID: <20240305141214.707046-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:35a7:b0:474:d2f6:f0d1 with SMTP id
- v39-20020a05663835a700b00474d2f6f0d1mr81402jal.1.1709647142220; Tue, 05 Mar
- 2024 05:59:02 -0800 (PST)
-Date: Tue, 05 Mar 2024 05:59:02 -0800
-In-Reply-To: <000000000000376d93060a5207ed@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009a8bce0612ea3e3c@google.com>
-Subject: Re: [syzbot] [kvm?] WARNING in kvm_mmu_notifier_invalidate_range_start
- (3)
-From: syzbot <syzbot+c74f40907a9c0479af10@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com, 
-	syzkaller-bugs@googlegroups.com, tintinm2017@gmail.com, 
-	usama.anjum@collabora.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9uaFL7PHBJW9HG2uLp4zkUY0lR0axDGr
+X-Proofpoint-ORIG-GUID: z9j5wqFjEdIOLBq4c8vkkLy0gPXnGZgr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-05_11,2024-03-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ lowpriorityscore=0 mlxlogscore=999 adultscore=0 clxscore=1011 bulkscore=0
+ phishscore=0 priorityscore=1501 suspectscore=0 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2403050115
 
-syzbot suspects this issue was fixed by commit:
+Sometimes, QEMU needs a bit longer to remove the incoming migration
+socket. This happens in some environments on s390x for the
+migration-skey-sequential test.
 
-commit 4cccb6221cae6d020270606b9e52b1678fc8b71a
-Author: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Date:   Tue Jan 9 11:24:42 2024 +0000
+Instead of directly erroring out, wait for the removal of the socket.
 
-    fs/proc/task_mmu: move mmu notification mechanism inside mm lock
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ scripts/arch-run.bash | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1638c66c180000
-start commit:   b57b17e88bf5 Merge tag 'parisc-for-6.7-rc1-2' of git://git..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d950a2e2e34359e2
-dashboard link: https://syzkaller.appspot.com/bug?extid=c74f40907a9c0479af10
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15785fc4e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1469c9a8e80000
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 2214d940cf7d..413f3eda8cb8 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -237,12 +237,8 @@ do_migration ()
+ 	echo > ${dst_infifo}
+ 	rm ${dst_infifo}
+ 
+-	# Ensure the incoming socket is removed, ready for next destination
+-	if [ -S ${dst_incoming} ] ; then
+-		echo "ERROR: Incoming migration socket not removed after migration." >& 2
+-		qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
+-		return 2
+-	fi
++	# Wait for the incoming socket being removed, ready for next destination
++	while [ -S ${dst_incoming} ] ; do sleep 0.1 ; done
+ 
+ 	wait ${live_pid}
+ 	ret=$?
+-- 
+2.44.0
 
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: fs/proc/task_mmu: move mmu notification mechanism inside mm lock
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
