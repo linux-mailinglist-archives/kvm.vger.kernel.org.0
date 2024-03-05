@@ -1,90 +1,268 @@
-Return-Path: <kvm+bounces-11012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11013-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601A5872221
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 15:57:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9E9872258
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 16:03:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1733C1F221A2
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:57:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DA48281E18
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 15:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56F0126F21;
-	Tue,  5 Mar 2024 14:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A41126F36;
+	Tue,  5 Mar 2024 15:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EOdiagnM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp238.sjtu.edu.cn (smtp238.sjtu.edu.cn [202.120.2.238])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E89126F1D;
-	Tue,  5 Mar 2024 14:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C97126F02;
+	Tue,  5 Mar 2024 15:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709650637; cv=none; b=HFOg0PGkxeRAtYq08SkhPdQYqxrmTHDzOMX71zfCDYmyG0UqWrkX/b/SGbwsIT7L0ycMoj9dB5oN1SxDJ1jx25iqZQvmnREJ1jpCDlZjHWp0RiqZRW81+7ZxeS6nGCgX5oQpdlGypjKjdyBeOvdUN9mDO/SUdk86GHoEo+MbnZU=
+	t=1709651003; cv=none; b=awhVgyUF/eS7hF3fa17Qop7ral8nt4tGYcNn/y/p4frKw92QfebvKTUaRwAr7gZu3bUnrCJHUA1m59HzOAHooW5/cKSuVrPK9Ja517LTF9xOdwxO1lGk0czCuUyy7SZM3Tm3gd95uQLPC18psrVKh/zMDq6zpREhmJW/aNFbv54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709650637; c=relaxed/simple;
-	bh=MCI8FrWoh73Sxz96+HLoOzEC8uhjSDDNbG870C/UW8w=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type; b=qOxc/J7maV/xVdzokK6tBOhxOlO8kKStS4+ulcyjoq+R73p/SGi/cO7qwkcoszHIgQtOmDcv6iDdqVktaqnE0bbzhWavtvRNB83jyQfqVh5jbMjshxYMxEAPQiu1lHooXjPuOY3I8IDtNDHj1XuA0Ezsv7+yo+uiNfPzGuhrlL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
-Received: from mta90.sjtu.edu.cn (unknown [10.118.0.90])
-	by smtp238.sjtu.edu.cn (Postfix) with ESMTPS id 9E76BBEDE;
-	Tue,  5 Mar 2024 22:57:03 +0800 (CST)
-Received: from mstore135.sjtu.edu.cn (unknown [10.118.0.135])
-	by mta90.sjtu.edu.cn (Postfix) with ESMTP id 62D5837C878;
-	Tue,  5 Mar 2024 22:57:03 +0800 (CST)
-Date: Tue, 5 Mar 2024 22:57:03 +0800 (CST)
-From: Zheyun Shen <szy0127@sjtu.edu.cn>
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini <pbonzini@redhat.com>, tglx <tglx@linutronix.de>, 
-	thomas lendacky <thomas.lendacky@amd.com>, kvm <kvm@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>
-Message-ID: <722904540.5000784.1709650623262.JavaMail.zimbra@sjtu.edu.cn>
-Subject: Re: [PATCH] KVM:SVM: Flush cache only on CPUs running SEV guest
+	s=arc-20240116; t=1709651003; c=relaxed/simple;
+	bh=2mdrOFobw+z2H9C4Cm3HCZJiFsJR2HEgKEYWYzKiOyM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LTtgBumC9tdARYCZOb/wjWQpKZccUW3lul5cmBxZxSQbJK4mLKvmB+XxG6EGJveQyWzjzu/TTKkWfQp5ne2XoKvH5MRUGU5ni9r7EFch3x+tuadf4iOI9FjL+TT+JNL1vpLu8EdILRynNrMUl+DSbNYE2XNHN0e7/T7y80e+lhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EOdiagnM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D76CC433C7;
+	Tue,  5 Mar 2024 15:03:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709651003;
+	bh=2mdrOFobw+z2H9C4Cm3HCZJiFsJR2HEgKEYWYzKiOyM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EOdiagnMhEDSmA3O9ywwmSdokjgZN8utfeB3NA2rvO4XM2fZytggJWGVbeVdWfNbM
+	 KYnFa1+ZhMX+lyVz1LDw0RZiwYrtGz/DZN+UFYgTntbU7nE+HyKnevnVTcvb+vBFc9
+	 sf9VPCdNF69Yx15CHzNkiVh902i2pTJXQcbvYDekM5EQl6PdsiRIB0uyvVkW+FhJPB
+	 FhFOXhmbYi+DBLo/buQxDbSpk2sKOInL3Qhxn4NCyaUHM0eS/MoO4cj15glXgZ6Ywy
+	 oYQpWgskIHLmNczBFFzU0+HSMVMX+cLxYzrC+Ah/msBaHXLCS4t9VWziUXcjCpvesN
+	 rcKA5TZ3h6JcA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rhWK8-009cCM-QI;
+	Tue, 05 Mar 2024 15:03:20 +0000
+Date: Tue, 05 Mar 2024 15:03:20 +0000
+Message-ID: <86r0go201z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	darren@os.amperecomputing.com,
+	d.scott.phillips@amperecomputing.com
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
+In-Reply-To: <6685c3a6-2017-4bc2-ad26-d11949097050@os.amperecomputing.com>
+References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+	<86sf150w4t.wl-maz@kernel.org>
+	<6685c3a6-2017-4bc2-ad26-d11949097050@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=GB2312
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 10.0.6_GA_4585 (ZimbraWebClient - GC122 (Win)/10.0.6_GA_4585)
-Thread-Index: MUWiCXlfMum3WwlzB2dt/UpqVaVaDA==
-Thread-Topic: Flush cache only on CPUs running SEV guest
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Mar 04, 2024, Sean Christopherson wrote:
-> Instead of copy+paste WBINVD+cpumask_clear() everywhere, add a prep patch to
-> replace relevant open coded calls to wbinvd_on_all_cpus() with calls to
-> sev_guest_memory_reclaimed().  Then only sev_guest_memory_reclaimed() needs to
-> updated, and IMO it helps document why KVM is blasting WBINVD.
+On Tue, 05 Mar 2024 13:29:08 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> 
+> On 05-03-2024 04:43 pm, Marc Zyngier wrote:
+> > [re-sending with kvmarm@ fixed]
+> > 
+> > On Tue, 05 Mar 2024 05:46:06 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> As per 'commit 178a6915434c ("KVM: arm64: nv: Unmap/flush shadow stage 2
+> > 
+> > $ git describe --contains 178a6915434c --match=v\*
+> > fatal: cannot describe '178a6915434c141edefd116b8da3d55555ea3e63'
+> > 
+> 
+> My bad(I would have been more verbose), I missed to mention that this
+> patch is on top of NV-V11 patch series.
+> 
+> > This commit simply doesn't exist upstream. It only lives in a
+> > now deprecated branch that will never be merged.
+> > 
+> >> page tables")', when ever there is unmap of pages that
+> >> are mapped to L1, they are invalidated from both L1 S2-MMU and from
+> >> all the active shadow/L2 S2-MMU tables. Since there is no mapping
+> >> to invalidate the IPAs of Shadow S2 to a page, there is a complete
+> >> S2-MMU page table walk and invalidation is done covering complete
+> >> address space allocated to a L2. This has performance impacts and
+> >> even soft lockup for NV(L1 and L2) boots with higher number of
+> >> CPUs and large Memory.
+> >> 
+> >> Adding a lookup table of mapping of Shadow IPA to Canonical IPA
+> >> whenever a page is mapped to any of the L2. While any page is
+> >> unmaped, this lookup is helpful to unmap only if it is mapped in
+> >> any of the shadow S2-MMU tables. Hence avoids unnecessary long
+> >> iterations of S2-MMU table walk-through and invalidation for the
+> >> complete address space.
+> > 
+> > All of this falls in the "premature optimisation" bucket. Why should
+> > we bother with any of this when not even 'AT S1' works correctly,
+> 
+> Hmm, I am not aware of this, is this something new issue of V11?
 
-> I'm also pretty sure this should be a cpumask_var_t, and dynamically allocated
-> as appropriate.  And at that point, it should be allocated and filled if and only
-> if the CPU doesn't have X86_FEATURE_SME_COHERENT
+it's been there since v0. All we have is a trivial implementation that
+doesn't survive the S1 page-tables being swapped out. It requires a
+full S1 PTW to be written.
 
-I notice that several callers of wbinvd_on_all_cpus() must use wbinvd to flush cache
-instead of using clflush or just doing nothing if the CPU has X86_FEATURE_SME_COHERENT,
-according to https://github.com/AMDESE/linux/commit/2e2409afe5f0c284c7dfe5504058e8d115806a7d
-Therefore, I think the flush operation should be divided into two functions. One is the 
-optimized wbinvd, which does not consider X86_FEATURE_SME_COHERENT, and the other is 
-sev_guest_memory_reclaimed(), which should use clflush instead of wbinvd in case of 
-X86_FEATURE_SME_COHERENT. Thus the cpumask struct should be exist whether the CPU has
-X86_FEATURE_SME_COHERENT or not.
+> 
+> > making it trivial to prevent a guest from making forward progress? You
+> > also show no numbers that would hint at a measurable improvement under
+> > any particular workload.
+> 
+> This patch is avoiding long iterations of unmap which was resulting in
+> soft-lockup, when tried L1 and L2 with 192 cores.
+> Fixing soft lockup isn't a required fix for feature enablement?
 
-Besides, if we consider X86_FEATURE_SME_COHERENT to get rid of wbinvd in sev_guest_memory_reclaimed(),
-we should ensure the clflush is called on corresponding addresses, as mentioned in  
-https://github.com/AMDESE/linux/commit/d45829b351ee6ec5f54dd55e6aca1f44fe239fe6 
-However, caller of sev_guest_memory_reclaimed() (e.g., kvm_mmu_notifier_invalidate_range_start()) 
-only get HVA belongs to userspace(e.g., qemu), so calling clflush with this HVA may 
-lead to a page fault in kernel. I was wondering if notifying userspace applications to 
-do clflush themselves is the only solution here. But for the sake of safety, maybe KVM 
-cannot left the work for untrusted userspace applications?
+No. All we care is correctness, not performance. Addressing
+soft-lockups is *definitely* a performance issue, which I'm 100% happy
+to ignore.
 
-Or should I just temporarily ignore the X86_FEATURE_SME_COHERENT scenario which is hard to implement, 
-and just refine the patch only for wbinvd_on_all_cpus() ?
+[...]
 
-Best regards,
-Zheyun Shen
+> >>   +static inline bool kvm_is_l1_using_shadow_s2(struct kvm_vcpu
+> >> *vcpu)
+> >> +{
+> >> +	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu);
+> >> +}
+> > 
+> > Isn't that the very definition of "!in_hyp_ctxt()"? You are abusing
+> 
+> "!in_hyp_ctxt()" isn't true for non-NV case also?
+
+Surely you don't try to use this in non-NV contexts, right? Why would
+you try to populate a shadow reverse-map outside of a NV context?
+
+> This function added to know that L1 is NV enabled and using shadow S2.
+> 
+> > the hw_mmu pointer to derive something, but the source of truth is the
+> > translation regime, as defined by HCR_EL2.{E2H,TGE} and PSTATE.M.
+> > 
+> 
+> OK, I can try HCR_EL2.{E2H,TGE} and PSTATE.M instead of hw_mmu in next
+> version.
+
+No. Use is_hyp_ctxt().
+
+[...]
+
+> >> index 61bdd8798f83..3948681426a0 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -1695,6 +1695,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>   					     memcache,
+> >>   					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+> >>   					     KVM_PGTABLE_WALK_SHARED);
+> >> +		if ((nested || kvm_is_l1_using_shadow_s2(vcpu)) && !ret) {
+> > 
+> > I don't understand this condition. If nested is non-NULL, it's because
+> > we're using a shadow S2. So why the additional condition?
+> 
+> No, nested is set only for L2, for L1 it is not.
+> To handle L1 shadow S2 case, I have added this condition.
+
+But there is *no shadow* for L1 at all. The only way to get a shadow
+is to be outside of the EL2(&0) translation regime. El2(&0) itself is
+always backed by the canonical S2. By definition, L1 does not run with
+a S2 it is in control of. No S2, no shadow.
+
+[...]
+
+> > What guarantees that the mapping you have for L1 has the same starting
+> > address as the one you have for L2? L1 could have a 2MB mapping and L2
+> > only 4kB *in the middle*.
+> 
+> IIUC, when a page is mapped to 2MB in L1, it won't be
+> mapped to L2 and we iterate with the step of PAGE_SIZE and we should
+> be hitting the L2's IPA in lookup table, provided the L2 page falls in
+> unmap range.
+
+But then how do you handle the reverse (4kB at L1, 2MB at L2)? Without
+tracking of the *intersection*, this fails to be correctly detected.
+This is TLB matching 101.
+
+[...]
+
+> >> +			while (start < end) {
+> >> +				size = PAGE_SIZE;
+> >> +				/*
+> >> +				 * get the Shadow IPA if the page is mapped
+> >> +				 * to L1 and also mapped to any of active L2.
+> >> +				 */
+> > 
+> > Why is L1 relevant here?
+> 
+> We do map while L1 boots(early stage) in shadow S2, at that moment
+> if the L1 mapped page is unmapped/migrated we do need to unmap from
+> L1's S2 table also.
+
+Sure. But you can also get a page that is mapped in L2 and not mapped
+in the canonical S2, which is L1's. I more and more feel that you have
+a certain misconception of how L1 gets its pages mapped.
+
+> 
+> > 
+> >> +				ret = get_shadow_ipa(mmu, start, &shadow_ipa, &size);
+> >> +				if (ret)
+> >> +					kvm_unmap_stage2_range(mmu, shadow_ipa, size);
+> >> +				start += size;
+> >> +			}
+> >> +		}
+> >> +	}
+> >> +}
+> >> +
+> >>   /* expects kvm->mmu_lock to be held */
+> >>   void kvm_nested_s2_flush(struct kvm *kvm)
+> >>   {
+> > 
+> > There are a bunch of worrying issues with this patch. But more
+> > importantly, this looks like a waste of effort until the core issues
+> > that NV still has are solved, and I will not consider anything of the
+> > sort until then.
+> 
+> OK thanks for letting us know, I will pause the work on V2 of this
+> patch until then.
+> 
+> > 
+> > I get the ugly feeling that you are trying to make it look as if it
+> > was "production ready", which it won't be for another few years,
+> > specially if the few interested people (such as you) are ignoring the
+> > core issues in favour of marketing driven features ("make it fast").
+> > 
+> 
+> What are the core issues (please forgive me if you mentioned already)?
+> certainly we will prioritise them than this.
+
+AT is a big one. Maintenance interrupts are more or less broken. I'm
+slowly plugging PAuth, but there's no testing whatsoever (running
+Linux doesn't count). Lack of SVE support is also definitely a
+blocker.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
