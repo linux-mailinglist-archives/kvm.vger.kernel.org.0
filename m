@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-11048-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11049-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8614872552
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 18:10:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ECAB872553
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 18:10:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EDFC1F26840
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 17:10:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A05FD1C22DCB
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 17:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBC018C38;
-	Tue,  5 Mar 2024 17:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3526A18E3A;
+	Tue,  5 Mar 2024 17:09:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mmdEf9Oh"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vvmIDvs5"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F063518AE0
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 17:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DD318E14
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 17:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709658562; cv=none; b=HSySKoA4GCPoAA91D3/sK6G4hNEo8ZEhqyTXhF7XVzSBENDn4myoGzdiB/KqyHsVtgwu+9LrDo74/Vx7JTZf1SDD6Z2AAfCwFb+lv1cR5br/cfObPLI3XlCMdz4kbrI7fbO33oPqtZ4CDjQF5m3ZNBQmMh0hIPi+Za6CnMxULRg=
+	t=1709658565; cv=none; b=Q4mzIx4y38xMBXQ9zjkbg8qNGu1SdByGZGiwT221uiqLuXUJc6ZUEEsAFst3RnrBvmSeGFu1Et4khLNJmY6yJ1jGChVvkj0fmj+n/bnDDDBlUMqdh5g+1UrPtpGJtxeTah6Qo97Sr+p3SH+XTqDsJ8WdXQykz7tjqNesU4naJPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709658562; c=relaxed/simple;
-	bh=842kSUfw/J9tfpz6xFdzxL2dTFMWqeK2nUCShuyT1CA=;
+	s=arc-20240116; t=1709658565; c=relaxed/simple;
+	bh=t4qs1j1Jaf7RIelbQmV+6dKsnEXYutJ25gzZT+FJKo8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=jFDeePhAb2uRBm1FDOjatRLlG2oWucX5H7ZAZ8u7yTFJ2EZl0mTwOatPEkxsmaGoF6Th0Atvc0KN8TAfzwWlaavJw11PJNU04LuCoukAPvG4K5peSaqjQhwssfoy2xK+onoqOORm+eD2nnD55XpKyfSRwJ6KsiJklMEukALl7ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mmdEf9Oh; arc=none smtp.client-ip=91.218.175.181
+	 MIME-Version:Content-type; b=jWADRwoDIet8g181xKDEu4dwITu5hrHZ8KITnyeTdPrSHazkGoil+wbVQ/SdB5l0fzsOcNS1N9nBMOHetSzNW+6Eq9zilClZISZ0wAQ8xtzLj9u1TzbXPX2I4RyCfMKqEKkLB2RfogTNV4BX+pbRIyfL1zqU/cf3T5EEkq7a37A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vvmIDvs5; arc=none smtp.client-ip=95.215.58.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709658559;
+	t=1709658562;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mC+XlKr2wuD4Jt3JyCwAi5RF7Z+b/5X3cQTUHW9SzKY=;
-	b=mmdEf9Ohm5Zj75UQXFhHhL8tuq/0CWD1Tj69IAgaSEmQpDL435NcE16VzjfGsuaHMAXze+
-	vkOwv5dK+PxGu7C6BS98TYCzWlfQKlp4k9CWgR8LaRCYZVPqJQkc63ZdWU0SiXHQjFfKL4
-	rCGL2Gs/mRSUcW2EdaYNIA3OrlCos58=
+	bh=60erSBumokDdrzjlqC5ZP+QvOuHbufETq/jMNeBQ/NY=;
+	b=vvmIDvs5rFqIDCkmOpDKsPS++4vCt8uFCkUHvpqB05TY9EB367Pt4zX1Urxc0+tG+mEQSg
+	RmqrgrjkmqqC4zJ6dRx7nurOUkEbwpKYI/c7tiMDeYpEJtxvdNoETNTT7pJfJgshEKcAAi
+	5VxHMmPuanhBEWquUwRos3ZT1RYrFKc=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 07/13] riscv: Enable building for EFI
-Date: Tue,  5 Mar 2024 18:09:06 +0100
-Message-ID: <20240305170858.395836-22-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 08/13] riscv: efi: Switch stack in _start
+Date: Tue,  5 Mar 2024 18:09:07 +0100
+Message-ID: <20240305170858.395836-23-andrew.jones@linux.dev>
 In-Reply-To: <20240305170858.395836-15-andrew.jones@linux.dev>
 References: <20240305170858.395836-15-andrew.jones@linux.dev>
 Precedence: bulk
@@ -62,115 +62,55 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Mimicking arm64 support, add configure and makefile changes to build
-for EFI. Since the linker script is replaced also replace the initial
-cstart code (also done like arm64). Finally, provide a stub for
-setup_efi() in order to allow compiling to complete (even though
-tests can't yet run).
+Modify gnu-efi's _start to switch the stack. This allows us to not
+map memory regions which have EFI memory type EFI_BOOT_SERVICES_DATA,
+as the stack will be in the EFI_LOADER_CODE region instead. We'll
+still map the stack as R/W instead of R/X because we'll split the
+EFI_LOADER_CODE region on the _etext boundary and map addresses
+before _etext as R/X and the rest as R/W.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- configure             |  3 ++-
- lib/riscv/asm/setup.h |  5 +++++
- riscv/Makefile        | 27 +++++++++++++++++++++++++--
- riscv/cstart.S        |  4 ++++
- 4 files changed, 36 insertions(+), 3 deletions(-)
+ riscv/efi/crt0-efi-riscv64.S | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/configure b/configure
-index 51edee8cd21b..c1d0fe4adbb0 100755
---- a/configure
-+++ b/configure
-@@ -231,7 +231,8 @@ else
-     fi
- fi
- 
--if [ "$efi" ] && [ "$arch" != "x86_64" ] && [ "$arch" != "arm64" ]; then
-+if [ "$efi" ] && [ "$arch" != "x86_64" ] &&
-+   [ "$arch" != "arm64" ] && [ "$arch" != "riscv64" ]; then
-     echo "--[enable|disable]-efi is not supported for $arch"
-     usage
- fi
-diff --git a/lib/riscv/asm/setup.h b/lib/riscv/asm/setup.h
-index e58dd53071ae..dfc8875fbb3b 100644
---- a/lib/riscv/asm/setup.h
-+++ b/lib/riscv/asm/setup.h
-@@ -12,4 +12,9 @@ int hartid_to_cpu(unsigned long hartid);
- void io_init(void);
- void setup(const void *fdt, phys_addr_t freemem_start);
- 
-+#ifdef CONFIG_EFI
-+#include <efi.h>
-+static inline efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo) { return 0; }
-+#endif
+diff --git a/riscv/efi/crt0-efi-riscv64.S b/riscv/efi/crt0-efi-riscv64.S
+index cc8551a43c6a..4ed82b14a1d6 100644
+--- a/riscv/efi/crt0-efi-riscv64.S
++++ b/riscv/efi/crt0-efi-riscv64.S
+@@ -164,7 +164,20 @@ _start:
+ 	bne		a0, zero, 0f
+ 	ld		a1, 8(sp)
+ 	ld		a0, 0(sp)
 +
- #endif /* _ASMRISCV_SETUP_H_ */
-diff --git a/riscv/Makefile b/riscv/Makefile
-index 85bbca151739..919a3ebb5211 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -17,7 +17,8 @@ tests += $(TEST_DIR)/sieve.$(exe)
- 
- all: $(tests)
- 
--$(TEST_DIR)/sieve.elf: AUXFLAGS = 0x1
-+# When built for EFI sieve needs extra memory, run with e.g. '-m 256' on QEMU
-+$(TEST_DIR)/sieve.$(exe): AUXFLAGS = 0x1
- 
- cstart.o = $(TEST_DIR)/cstart.o
- 
-@@ -85,7 +86,29 @@ include $(SRCDIR)/scripts/asm-offsets.mak
- 		-DPROGNAME=\"$(notdir $(@:.aux.o=.$(exe)))\" -DAUXFLAGS=$(AUXFLAGS)
- 
- ifeq ($(CONFIG_EFI),y)
--	# TODO
-+# avoid jump tables before all relocations have been processed
-+riscv/efi/reloc_riscv64.o: CFLAGS += -fno-jump-tables
-+cflatobjs += riscv/efi/reloc_riscv64.o
-+cflatobjs += lib/acpi.o
-+cflatobjs += lib/efi.o
++	/* Switch to our own stack */
++	mv		a2, sp
++	la		sp, stacktop
++	mv		fp, zero
++	push_fp zero
++	addi		sp, sp, -16
++	sd		a2, 0(sp)
 +
-+.PRECIOUS: %.so
+ 	call		efi_main
 +
-+%.so: EFI_LDFLAGS += -defsym=EFI_SUBSYSTEM=0xa --no-undefined
-+%.so: %.o $(FLATLIBS) $(SRCDIR)/riscv/efi/elf_riscv64_efi.lds $(cstart.o) %.aux.o
-+	$(LD) $(EFI_LDFLAGS) -o $@ -T $(SRCDIR)/riscv/efi/elf_riscv64_efi.lds \
-+		$(filter %.o, $^) $(FLATLIBS) $(EFI_LIBS)
++	/* Restore sp */
++	ld		sp, 0(sp)
 +
-+%.efi: %.so
-+	$(call arch_elf_check, $^)
-+	$(OBJCOPY) --only-keep-debug $^ $@.debug
-+	$(OBJCOPY) --strip-debug $^
-+	$(OBJCOPY) --add-gnu-debuglink=$@.debug $^
-+	$(OBJCOPY) \
-+		-j .text -j .sdata -j .data -j .rodata -j .dynamic -j .dynsym \
-+		-j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
-+		-j .reloc \
-+		-O binary $^ $@
- else
- %.elf: LDFLAGS += -pie -n -z notext
- %.elf: %.o $(FLATLIBS) $(SRCDIR)/riscv/flat.lds $(cstart.o) %.aux.o
-diff --git a/riscv/cstart.S b/riscv/cstart.S
-index c935467ff6a1..10b5da5779b0 100644
---- a/riscv/cstart.S
-+++ b/riscv/cstart.S
-@@ -42,6 +42,9 @@
- 9997:
- .endm
+ 	ld		ra, 16(sp)
+ 0:	addi		sp, sp, 24
+ 	ret
+@@ -172,6 +185,11 @@ _start:
+ // hand-craft a dummy .reloc section so EFI knows it's a relocatable executable:
+  
+  	.data
++
++.balign 16384
++.space 16384
++stacktop:
++
+ dummy:	.4byte	0
  
-+#ifdef CONFIG_EFI
-+#include "efi/crt0-efi-riscv64.S"
-+#else
- 	.section .init
- 
- /*
-@@ -109,6 +112,7 @@ start:
- 	call	exit
- 	j	halt
- 
-+#endif /* !CONFIG_EFI */
- 	.text
- 
- .balign 4
+ #define IMAGE_REL_ABSOLUTE	0
 -- 
 2.44.0
 
