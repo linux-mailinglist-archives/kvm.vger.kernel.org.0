@@ -1,484 +1,258 @@
-Return-Path: <kvm+bounces-10969-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47DBD871D92
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:26:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84468871DA0
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:28:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 671C81C21EE5
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:26:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17DC41F27E21
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8202354916;
-	Tue,  5 Mar 2024 11:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2815B664;
+	Tue,  5 Mar 2024 11:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iEe5O7nQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jA3A49vE"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4E2604AD;
-	Tue,  5 Mar 2024 11:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1D355E58;
+	Tue,  5 Mar 2024 11:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709637596; cv=none; b=RP+rev7L99DO/qknzZpZnlyFS3T+fZfUYUKxeDKPlWqSUj8zrM8wsPoRC4TzGfkAoe68AUl564DwC7ue1NFSaeY89pLQEAmmZ1KctTeA8aRCBBUMvkJOp43olmt2vDRogiYHVej/7Fsjh3akZnbGEIqeO4mlxF8MoPnRnLFSlzc=
+	t=1709637832; cv=none; b=YXEakB5dDQ2w5C288lLNeVfGlQytFvbg56avMDslxSg+4sl3eNhBOUHmA4k9kd0PsO8h5sfHVy5TrunZjWtmR2qez2x9UTBvkCN8MIlsyL96qRaEYA/GK5RfGjXPeem1HELVFOxoztTpqmJBcIsxtRU0sqkDlkrbgOPgukypmDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709637596; c=relaxed/simple;
-	bh=POBXmxmfWLR3OdaBK59TZEAySmTXPtp10vl7hcXrrqE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XsSK7GpPJNYmEb48xaAG97UC+ojZDU5aQ2fQ/AZrKlAGMp1Y3mzZK/v3zBjb7cWrLZkZh0zU6aPHsrwNK6Wi9Z+rAFtorIY8YJqK4hxhu8cWCOdHtJR04X7Qtci0uVKcXVzixPyQmcYJTaDZfQVZGwMc13/yJamvMbERaI4k+s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iEe5O7nQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7783C433C7;
-	Tue,  5 Mar 2024 11:19:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709637596;
-	bh=POBXmxmfWLR3OdaBK59TZEAySmTXPtp10vl7hcXrrqE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iEe5O7nQxOwTtvwCxloOxSNflsI8pgVht7KrqrUoyjvIA//bNfjdwpLXQhmnNUG+7
-	 +sbnJaRnULrDsFLu3aamZmvRLTR6S3KfqMHZuD0nKRYPJJFTHRCFxqOTF7o2sTPcSO
-	 yoGUSEImScOHwafMNLeRscZ1fp3ftmKXzkLwOr/kuZN3JjfChMzNnqBzdBsJ7h8MjY
-	 x1tKITfCDc3osh+u2Tzd9qFJsXyI/OjxzZaneBb3C8m3vWQSnriFceEKlMm8OyXyos
-	 2quqQv5Nrl5LbcS7FwTmH1rCeNKEDtQnRhtcxBY+E66dZVjlbi5hLqQU3C/3lNeUNl
-	 GKmbcMTVhgWYA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
-Date: Tue,  5 Mar 2024 13:18:47 +0200
-Message-ID: <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1709635535.git.leon@kernel.org>
-References: <cover.1709635535.git.leon@kernel.org>
+	s=arc-20240116; t=1709637832; c=relaxed/simple;
+	bh=JyjwkuHnYBoLTGojfsVzV+696GFqnuVrIlOLCLHz8hA=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=kStZ+gDxUr1Z1fnZ5g5BpHraDf2zZPUTz1Gawf+PKR7vjtBkWM86X/XyQITZBWcVR19u8y0ygbC04uMGeyT/3Ov1z4jiUvn4nqM2mwJOGgafCP4a8O+epaGEFGitk/maE09RqcPTLMYyj7z7lD8FFrsKUwGcJxpoHiCOSILkGHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jA3A49vE; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709637831; x=1741173831;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=JyjwkuHnYBoLTGojfsVzV+696GFqnuVrIlOLCLHz8hA=;
+  b=jA3A49vEeSSVhap6QLJlexe4DqpPllhv2dPhuGeU8odTytX9FVTCP3Ea
+   zH6D15vw6mXXcbeLb6uDn++FNYp1lHbfSObQ7YIEe6d6pYP94cqWJ8RMN
+   WTpE4vJmhzA2qXJYIJpZ83XvPJWXXUwPaNAK46Mw6Do3SVnOAN6C8Rk38
+   HOjk1IRJNoTUIsoPTuxj3nGrFGaVD/hPoyv5xErjZ59nBPYOa9Lvuf1u1
+   3bGo7i6/zLYLVZgCbUfORT1q9fTXTZdu2++4Kga1o7RURtdaoo5k84kGG
+   4WAi8Ud+WUPtHbRc5skO9LQi/tsqBJZUAXTQWPxk2fdNoHjPA5BTqVNF9
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4040098"
+X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
+   d="scan'208";a="4040098"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 03:23:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
+   d="scan'208";a="14031011"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.246.51.37])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 03:23:30 -0800
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Tue, 5 Mar 2024 13:23:25 +0200 (EET)
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>, 
+    Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+    Johannes Berg <johannes@sipsolutions.net>, 
+    Hans de Goede <hdegoede@redhat.com>, Vadim Pasternak <vadimp@nvidia.com>, 
+    Bjorn Andersson <andersson@kernel.org>, 
+    Mathieu Poirier <mathieu.poirier@linaro.org>, 
+    Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, 
+    Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+    Vasily Gorbik <gor@linux.ibm.com>, 
+    Alexander Gordeev <agordeev@linux.ibm.com>, 
+    Christian Borntraeger <borntraeger@linux.ibm.com>, 
+    Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+    Jason Wang <jasowang@redhat.com>, linux-um@lists.infradead.org, 
+    platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+    linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH vhost 1/4] virtio: find_vqs: pass struct instead of multi
+ parameters
+In-Reply-To: <20240304114719.3710-2-xuanzhuo@linux.alibaba.com>
+Message-ID: <f0ff7ef2-ba67-4091-efad-dc8eb8042dc3@linux.intel.com>
+References: <20240304114719.3710-1-xuanzhuo@linux.alibaba.com> <20240304114719.3710-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 
-From: Chaitanya Kulkarni <kch@nvidia.com>
+On Mon, 4 Mar 2024, Xuan Zhuo wrote:
 
-Update nvme_iod structure to hold iova, list of DMA linked addresses and
-total linked count, first one is needed in the request submission path
-to create a request to DMA mapping and last two are needed in the
-request completion path to remove the DMA mapping. In nvme_map_data()
-initialize iova with device, direction, and iova dma length with the
-help of blk_rq_get_dma_length(). Allocate iova using dma_alloc_iova().
-and call in nvme_pci_setup_sgls().
+> Now, we pass multi parameters to find_vqs. These parameters
+> may work for transport or work for vring.
+> 
+> And find_vqs has multi implements in many places:
+> 
+>  arch/um/drivers/virtio_uml.c
+>  drivers/platform/mellanox/mlxbf-tmfifo.c
+>  drivers/remoteproc/remoteproc_virtio.c
+>  drivers/s390/virtio/virtio_ccw.c
+>  drivers/virtio/virtio_mmio.c
+>  drivers/virtio/virtio_pci_legacy.c
+>  drivers/virtio/virtio_pci_modern.c
+>  drivers/virtio/virtio_vdpa.c
+> 
+> Every time, we try to add a new parameter, that is difficult.
+> We must change every find_vqs implement.
+> 
+> One the other side, if we want to pass a parameter to vring,
+> we must change the call path from transport to vring.
+> Too many functions need to be changed.
+> 
+> So it is time to refactor the find_vqs. We pass a structure
+> cfg to find_vqs(), that will be passed to vring by transport.
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  arch/um/drivers/virtio_uml.c             | 23 ++++-----
+>  drivers/platform/mellanox/mlxbf-tmfifo.c | 13 ++----
+>  drivers/remoteproc/remoteproc_virtio.c   | 28 ++++++-----
+>  drivers/s390/virtio/virtio_ccw.c         | 29 ++++++------
+>  drivers/virtio/virtio_mmio.c             | 26 +++++------
+>  drivers/virtio/virtio_pci_common.c       | 59 +++++++++++-------------
+>  drivers/virtio/virtio_pci_common.h       |  9 +---
+>  drivers/virtio/virtio_pci_legacy.c       | 11 +++--
+>  drivers/virtio/virtio_pci_modern.c       | 33 +++++++------
+>  drivers/virtio/virtio_vdpa.c             | 36 +++++++--------
+>  include/linux/virtio_config.h            | 51 ++++++++++++++++----
+>  11 files changed, 172 insertions(+), 146 deletions(-)
+> 
+> diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
+> index 8adca2000e51..c13dfeeb90c4 100644
+> --- a/arch/um/drivers/virtio_uml.c
+> +++ b/arch/um/drivers/virtio_uml.c
+> @@ -937,8 +937,8 @@ static int vu_setup_vq_call_fd(struct virtio_uml_device *vu_dev,
+>  }
+>  
+>  static struct virtqueue *vu_setup_vq(struct virtio_device *vdev,
+> -				     unsigned index, vq_callback_t *callback,
+> -				     const char *name, bool ctx)
+> +				     unsigned index,
+> +				     struct virtio_vq_config *cfg)
+>  {
+>  	struct virtio_uml_device *vu_dev = to_virtio_uml_device(vdev);
+>  	struct platform_device *pdev = vu_dev->pdev;
+> @@ -953,10 +953,12 @@ static struct virtqueue *vu_setup_vq(struct virtio_device *vdev,
+>  		goto error_kzalloc;
+>  	}
+>  	snprintf(info->name, sizeof(info->name), "%s.%d-%s", pdev->name,
+> -		 pdev->id, name);
+> +		 pdev->id, cfg->names[cfg->cfg_idx]);
+>  
+>  	vq = vring_create_virtqueue(index, num, PAGE_SIZE, vdev, true, true,
+> -				    ctx, vu_notify, callback, info->name);
+> +				    cfg->ctx ? cfg->ctx[cfg->cfg_idx] : false,
 
-Call newly added blk_rq_dma_map() to create request to DMA mapping and
-provide a callback function nvme_pci_sgl_map(). In the callback
-function initialize NVMe SGL dma addresses.
+Based on the commit message, I don't understand why this transformation 
+was made. It's perhaps some artifact of moving things around but please 
+state it in the commit message because this isn't 1:1 transformation 
+which would be just ctx -> cfg->ctx
 
-Finally in nvme_unmap_data() unlink the dma address and free iova.
+> +				    vu_notify,
+> +				    cfg->callbacks[cfg->cfg_idx], info->name);
+>  	if (!vq) {
+>  		rc = -ENOMEM;
+>  		goto error_create;
 
-Full disclosure:-
------------------
 
-This is an RFC to demonstrate the newly added DMA APIs can be used to
-map/unmap bvecs without the use of sg list, hence I've modified the pci
-code to only handle SGLs for now. Once we have some agreement on the
-structure of new DMA API I'll add support for PRPs along with all the
-optimization that I've removed from the code for this RFC for NVMe SGLs
-and PRPs.
+> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+> index b655fccaf773..a9ae03904dcf 100644
+> --- a/drivers/virtio/virtio_pci_common.c
+> +++ b/drivers/virtio/virtio_pci_common.c
+> @@ -172,9 +172,7 @@ static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
+>  }
+>  
+>  static struct virtqueue *vp_setup_vq(struct virtio_device *vdev, unsigned int index,
+> -				     void (*callback)(struct virtqueue *vq),
+> -				     const char *name,
+> -				     bool ctx,
+> +				     struct virtio_vq_config *cfg,
+>  				     u16 msix_vec)
+>  {
+>  	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> @@ -186,13 +184,13 @@ static struct virtqueue *vp_setup_vq(struct virtio_device *vdev, unsigned int in
+>  	if (!info)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> -	vq = vp_dev->setup_vq(vp_dev, info, index, callback, name, ctx,
+> +	vq = vp_dev->setup_vq(vp_dev, info, index, cfg,
+>  			      msix_vec);
 
-I was able to run fio verification job successfully :-
+Should now easily fit to one line.
 
-$ fio fio/verify.fio --ioengine=io_uring --filename=/dev/nvme0n1
-                     --loops=10
-write-and-verify: (g=0): rw=randwrite, bs=(R) 8192B-8192B, (W) 8192B-8192B,
-	(T) 8192B-8192B, ioengine=io_uring, iodepth=16
-fio-3.36
-Starting 1 process
-Jobs: 1 (f=1): [V(1)][81.6%][r=12.2MiB/s][r=1559 IOPS][eta 03m:00s]
-write-and-verify: (groupid=0, jobs=1): err= 0: pid=4435: Mon Mar  4 20:54:48 2024
-  read: IOPS=2789, BW=21.8MiB/s (22.9MB/s)(6473MiB/297008msec)
-    slat (usec): min=4, max=5124, avg=356.51, stdev=604.30
-    clat (nsec): min=1593, max=23376k, avg=5377076.99, stdev=2039189.93
-     lat (usec): min=493, max=23407, avg=5733.58, stdev=2103.22
-    clat percentiles (usec):
-     |  1.00th=[ 1172],  5.00th=[ 2114], 10.00th=[ 2835], 20.00th=[ 3654],
-     | 30.00th=[ 4228], 40.00th=[ 4752], 50.00th=[ 5276], 60.00th=[ 5800],
-     | 70.00th=[ 6325], 80.00th=[ 7046], 90.00th=[ 8094], 95.00th=[ 8979],
-     | 99.00th=[10421], 99.50th=[11076], 99.90th=[12780], 99.95th=[14222],
-     | 99.99th=[16909]
-  write: IOPS=2608, BW=20.4MiB/s (21.4MB/s)(10.0GiB/502571msec); 0 zone resets
-    slat (usec): min=4, max=5787, avg=382.68, stdev=649.01
-    clat (nsec): min=521, max=23650k, avg=5751363.17, stdev=2676065.35
-     lat (usec): min=95, max=23674, avg=6134.04, stdev=2813.48
-    clat percentiles (usec):
-     |  1.00th=[  709],  5.00th=[ 1270], 10.00th=[ 1958], 20.00th=[ 3261],
-     | 30.00th=[ 4228], 40.00th=[ 5014], 50.00th=[ 5800], 60.00th=[ 6521],
-     | 70.00th=[ 7373], 80.00th=[ 8225], 90.00th=[ 9241], 95.00th=[ 9896],
-     | 99.00th=[11469], 99.50th=[11863], 99.90th=[13960], 99.95th=[15270],
-     | 99.99th=[17695]
-   bw (  KiB/s): min= 1440, max=132496, per=99.28%, avg=20715.88, stdev=13123.13, samples=1013
-   iops        : min=  180, max=16562, avg=2589.34, stdev=1640.39, samples=1013
-  lat (nsec)   : 750=0.01%
-  lat (usec)   : 2=0.01%, 4=0.01%, 100=0.01%, 250=0.01%, 500=0.07%
-  lat (usec)   : 750=0.79%, 1000=1.22%
-  lat (msec)   : 2=5.94%, 4=18.87%, 10=69.53%, 20=3.58%, 50=0.01%
-  cpu          : usr=1.01%, sys=98.95%, ctx=1591, majf=0, minf=2286
-  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=100.0%, 32=0.0%, >=64=0.0%
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.1%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued rwts: total=828524,1310720,0,0 short=0,0,0,0 dropped=0,0,0,0
-     latency   : target=0, window=0, percentile=100.00%, depth=16
 
-Run status group 0 (all jobs):
-   READ: bw=21.8MiB/s (22.9MB/s), 21.8MiB/s-21.8MiB/s (22.9MB/s-22.9MB/s),
-	io=6473MiB (6787MB), run=297008-297008msec
-  WRITE: bw=20.4MiB/s (21.4MB/s), 20.4MiB/s-20.4MiB/s (21.4MB/s-21.4MB/s),
-	io=10.0GiB (10.7GB), run=502571-502571msec
+> @@ -126,10 +124,7 @@ bool vp_notify(struct virtqueue *vq);
+>  /* the config->del_vqs() implementation */
+>  void vp_del_vqs(struct virtio_device *vdev);
+>  /* the config->find_vqs() implementation */
+> -int vp_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
+> -		struct virtqueue *vqs[], vq_callback_t *callbacks[],
+> -		const char * const names[], const bool *ctx,
+> -		struct irq_affinity *desc);
+> +int vp_find_vqs(struct virtio_device *vdev, struct virtio_vq_config *cfg);
 
-Disk stats (read/write):
-  nvme0n1: ios=829189/1310720, sectors=13293416/20971520, merge=0/0,
-	ticks=836561/1340351, in_queue=2176913, util=99.30%
+Without knowing better, do you expect cfg is mutated inside vp_find_vqs()? 
+If not, mark it as const.
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/nvme/host/pci.c | 220 +++++++++-------------------------------
- 1 file changed, 49 insertions(+), 171 deletions(-)
+> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+> index da9b271b54db..1df8634d1258 100644
+> --- a/include/linux/virtio_config.h
+> +++ b/include/linux/virtio_config.h
+> @@ -96,6 +96,20 @@ typedef void vq_callback_t(struct virtqueue *);
+>   * @create_avq: create admin virtqueue resource.
+>   * @destroy_avq: destroy admin virtqueue resource.
+>   */
+> +
+> +struct virtio_vq_config {
+> +	unsigned int nvqs;
+> +
+> +	/* the vq index may not eq to the cfg index of the other array items */
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index e6267a6aa380..140939228409 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -236,7 +236,9 @@ struct nvme_iod {
- 	unsigned int dma_len;	/* length of single DMA segment mapping */
- 	dma_addr_t first_dma;
- 	dma_addr_t meta_dma;
--	struct sg_table sgt;
-+	struct dma_iova_attrs iova;
-+	dma_addr_t dma_link_address[128];
-+	u16 nr_dma_link_address;
- 	union nvme_descriptor list[NVME_MAX_NR_ALLOCATIONS];
- };
- 
-@@ -521,25 +523,10 @@ static inline bool nvme_pci_use_sgls(struct nvme_dev *dev, struct request *req,
- 	return true;
- }
- 
--static void nvme_free_prps(struct nvme_dev *dev, struct request *req)
--{
--	const int last_prp = NVME_CTRL_PAGE_SIZE / sizeof(__le64) - 1;
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	dma_addr_t dma_addr = iod->first_dma;
--	int i;
--
--	for (i = 0; i < iod->nr_allocations; i++) {
--		__le64 *prp_list = iod->list[i].prp_list;
--		dma_addr_t next_dma_addr = le64_to_cpu(prp_list[last_prp]);
--
--		dma_pool_free(dev->prp_page_pool, prp_list, dma_addr);
--		dma_addr = next_dma_addr;
--	}
--}
--
- static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	u16 i;
- 
- 	if (iod->dma_len) {
- 		dma_unmap_page(dev->dev, iod->first_dma, iod->dma_len,
-@@ -547,9 +534,8 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 		return;
- 	}
- 
--	WARN_ON_ONCE(!iod->sgt.nents);
--
--	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
-+	for (i = 0; i < iod->nr_dma_link_address; i++)
-+		dma_unlink_range(&iod->iova, iod->dma_link_address[i]);
- 
- 	if (iod->nr_allocations == 0)
- 		dma_pool_free(dev->prp_small_pool, iod->list[0].sg_list,
-@@ -557,120 +543,15 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 	else if (iod->nr_allocations == 1)
- 		dma_pool_free(dev->prp_page_pool, iod->list[0].sg_list,
- 			      iod->first_dma);
--	else
--		nvme_free_prps(dev, req);
--	mempool_free(iod->sgt.sgl, dev->iod_mempool);
--}
--
--static void nvme_print_sgl(struct scatterlist *sgl, int nents)
--{
--	int i;
--	struct scatterlist *sg;
--
--	for_each_sg(sgl, sg, nents, i) {
--		dma_addr_t phys = sg_phys(sg);
--		pr_warn("sg[%d] phys_addr:%pad offset:%d length:%d "
--			"dma_address:%pad dma_length:%d\n",
--			i, &phys, sg->offset, sg->length, &sg_dma_address(sg),
--			sg_dma_len(sg));
--	}
--}
--
--static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
--		struct request *req, struct nvme_rw_command *cmnd)
--{
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	struct dma_pool *pool;
--	int length = blk_rq_payload_bytes(req);
--	struct scatterlist *sg = iod->sgt.sgl;
--	int dma_len = sg_dma_len(sg);
--	u64 dma_addr = sg_dma_address(sg);
--	int offset = dma_addr & (NVME_CTRL_PAGE_SIZE - 1);
--	__le64 *prp_list;
--	dma_addr_t prp_dma;
--	int nprps, i;
--
--	length -= (NVME_CTRL_PAGE_SIZE - offset);
--	if (length <= 0) {
--		iod->first_dma = 0;
--		goto done;
--	}
--
--	dma_len -= (NVME_CTRL_PAGE_SIZE - offset);
--	if (dma_len) {
--		dma_addr += (NVME_CTRL_PAGE_SIZE - offset);
--	} else {
--		sg = sg_next(sg);
--		dma_addr = sg_dma_address(sg);
--		dma_len = sg_dma_len(sg);
--	}
--
--	if (length <= NVME_CTRL_PAGE_SIZE) {
--		iod->first_dma = dma_addr;
--		goto done;
--	}
--
--	nprps = DIV_ROUND_UP(length, NVME_CTRL_PAGE_SIZE);
--	if (nprps <= (256 / 8)) {
--		pool = dev->prp_small_pool;
--		iod->nr_allocations = 0;
--	} else {
--		pool = dev->prp_page_pool;
--		iod->nr_allocations = 1;
--	}
--
--	prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
--	if (!prp_list) {
--		iod->nr_allocations = -1;
--		return BLK_STS_RESOURCE;
--	}
--	iod->list[0].prp_list = prp_list;
--	iod->first_dma = prp_dma;
--	i = 0;
--	for (;;) {
--		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
--			__le64 *old_prp_list = prp_list;
--			prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
--			if (!prp_list)
--				goto free_prps;
--			iod->list[iod->nr_allocations++].prp_list = prp_list;
--			prp_list[0] = old_prp_list[i - 1];
--			old_prp_list[i - 1] = cpu_to_le64(prp_dma);
--			i = 1;
--		}
--		prp_list[i++] = cpu_to_le64(dma_addr);
--		dma_len -= NVME_CTRL_PAGE_SIZE;
--		dma_addr += NVME_CTRL_PAGE_SIZE;
--		length -= NVME_CTRL_PAGE_SIZE;
--		if (length <= 0)
--			break;
--		if (dma_len > 0)
--			continue;
--		if (unlikely(dma_len < 0))
--			goto bad_sgl;
--		sg = sg_next(sg);
--		dma_addr = sg_dma_address(sg);
--		dma_len = sg_dma_len(sg);
--	}
--done:
--	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sgt.sgl));
--	cmnd->dptr.prp2 = cpu_to_le64(iod->first_dma);
--	return BLK_STS_OK;
--free_prps:
--	nvme_free_prps(dev, req);
--	return BLK_STS_RESOURCE;
--bad_sgl:
--	WARN(DO_ONCE(nvme_print_sgl, iod->sgt.sgl, iod->sgt.nents),
--			"Invalid SGL for payload:%d nents:%d\n",
--			blk_rq_payload_bytes(req), iod->sgt.nents);
--	return BLK_STS_IOERR;
-+	dma_free_iova(&iod->iova);
- }
- 
- static void nvme_pci_sgl_set_data(struct nvme_sgl_desc *sge,
--		struct scatterlist *sg)
-+				 dma_addr_t dma_addr,
-+				 unsigned int dma_len)
- {
--	sge->addr = cpu_to_le64(sg_dma_address(sg));
--	sge->length = cpu_to_le32(sg_dma_len(sg));
-+	sge->addr = cpu_to_le64(dma_addr);
-+	sge->length = cpu_to_le32(dma_len);
- 	sge->type = NVME_SGL_FMT_DATA_DESC << 4;
- }
- 
-@@ -682,25 +563,37 @@ static void nvme_pci_sgl_set_seg(struct nvme_sgl_desc *sge,
- 	sge->type = NVME_SGL_FMT_LAST_SEG_DESC << 4;
- }
- 
-+struct nvme_pci_sgl_map_data {
-+	struct nvme_iod *iod;
-+	struct nvme_sgl_desc *sgl_list;
-+};
-+
-+static void nvme_pci_sgl_map(void *data, u32 cnt, dma_addr_t dma_addr,
-+			    dma_addr_t offset, u32 len)
-+{
-+	struct nvme_pci_sgl_map_data *d = data;
-+	struct nvme_sgl_desc *sgl_list = d->sgl_list;
-+	struct nvme_iod *iod = d->iod;
-+
-+	nvme_pci_sgl_set_data(&sgl_list[cnt], dma_addr, len);
-+	iod->dma_link_address[cnt] = offset;
-+	iod->nr_dma_link_address++;
-+}
-+
- static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
- 		struct request *req, struct nvme_rw_command *cmd)
- {
-+	unsigned int entries = blk_rq_nr_phys_segments(req);
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	struct dma_pool *pool;
- 	struct nvme_sgl_desc *sg_list;
--	struct scatterlist *sg = iod->sgt.sgl;
--	unsigned int entries = iod->sgt.nents;
-+	struct dma_pool *pool;
- 	dma_addr_t sgl_dma;
--	int i = 0;
-+	int linked_count;
-+	struct nvme_pci_sgl_map_data data;
- 
- 	/* setting the transfer type as SGL */
- 	cmd->flags = NVME_CMD_SGL_METABUF;
- 
--	if (entries == 1) {
--		nvme_pci_sgl_set_data(&cmd->dptr.sgl, sg);
--		return BLK_STS_OK;
--	}
--
- 	if (entries <= (256 / sizeof(struct nvme_sgl_desc))) {
- 		pool = dev->prp_small_pool;
- 		iod->nr_allocations = 0;
-@@ -718,11 +611,13 @@ static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
- 	iod->list[0].sg_list = sg_list;
- 	iod->first_dma = sgl_dma;
- 
--	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, entries);
--	do {
--		nvme_pci_sgl_set_data(&sg_list[i++], sg);
--		sg = sg_next(sg);
--	} while (--entries > 0);
-+	data.iod = iod;
-+	data.sgl_list = sg_list;
-+
-+	linked_count = blk_rq_dma_map(req, nvme_pci_sgl_map, &data,
-+				       &iod->iova);
-+
-+	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, linked_count);
- 
- 	return BLK_STS_OK;
- }
-@@ -788,36 +683,20 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 							     &cmnd->rw, &bv);
- 		}
- 	}
--
--	iod->dma_len = 0;
--	iod->sgt.sgl = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
--	if (!iod->sgt.sgl)
-+	iod->iova.dev = dev->dev;
-+	iod->iova.dir = rq_dma_dir(req);
-+	iod->iova.attrs = DMA_ATTR_NO_WARN;
-+	iod->iova.size = blk_rq_get_dma_length(req);
-+	if (!iod->iova.size)
- 		return BLK_STS_RESOURCE;
--	sg_init_table(iod->sgt.sgl, blk_rq_nr_phys_segments(req));
--	iod->sgt.orig_nents = blk_rq_map_sg(req->q, req, iod->sgt.sgl);
--	if (!iod->sgt.orig_nents)
--		goto out_free_sg;
- 
--	rc = dma_map_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req),
--			     DMA_ATTR_NO_WARN);
--	if (rc) {
--		if (rc == -EREMOTEIO)
--			ret = BLK_STS_TARGET;
--		goto out_free_sg;
--	}
-+	rc = dma_alloc_iova(&iod->iova);
-+	if (rc)
-+		return BLK_STS_RESOURCE;
- 
--	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
--		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
--	else
--		ret = nvme_pci_setup_prps(dev, req, &cmnd->rw);
--	if (ret != BLK_STS_OK)
--		goto out_unmap_sg;
--	return BLK_STS_OK;
-+	iod->dma_len = 0;
- 
--out_unmap_sg:
--	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
--out_free_sg:
--	mempool_free(iod->sgt.sgl, dev->iod_mempool);
-+	ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
- 	return ret;
- }
- 
-@@ -841,7 +720,6 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
- 
- 	iod->aborted = false;
- 	iod->nr_allocations = -1;
--	iod->sgt.nents = 0;
- 
- 	ret = nvme_setup_cmd(req->q->queuedata, req);
- 	if (ret)
+Can you try to make this comment clearer, as is I don't understand what it 
+means. E.g. what is "the other array"? not eq = not equal ?
+
+> +	unsigned int cfg_idx;
+> +
+> +	struct virtqueue **vqs;
+> +	vq_callback_t **callbacks;
+> +	const char *const *names;
+> +	const bool *ctx;
+> +	struct irq_affinity *desc;
+> +};
+
+The placement of the struct is wrong. Now the documentation of struct 
+virtio_config_ops is above your struct!?!
+
+Please also document the members of the newly added struct with kerneldoc.
+
+> +
+>  struct virtio_config_ops {
+>  	void (*get)(struct virtio_device *vdev, unsigned offset,
+>  		    void *buf, unsigned len);
+> @@ -105,10 +119,7 @@ struct virtio_config_ops {
+>  	u8 (*get_status)(struct virtio_device *vdev);
+>  	void (*set_status)(struct virtio_device *vdev, u8 status);
+>  	void (*reset)(struct virtio_device *vdev);
+> -	int (*find_vqs)(struct virtio_device *, unsigned nvqs,
+> -			struct virtqueue *vqs[], vq_callback_t *callbacks[],
+> -			const char * const names[], const bool *ctx,
+> -			struct irq_affinity *desc);
+> +	int (*find_vqs)(struct virtio_device *vdev, struct virtio_vq_config *cfg);
+>  	void (*del_vqs)(struct virtio_device *);
+>  	void (*synchronize_cbs)(struct virtio_device *);
+>  	u64 (*get_features)(struct virtio_device *vdev);
+
+
 -- 
-2.44.0
+ i.
 
 
