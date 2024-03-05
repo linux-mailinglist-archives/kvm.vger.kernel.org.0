@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-10989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 582C487208F
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:43:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 715EE872091
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:43:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C45791F250C6
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:43:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 017F5288CC0
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DA3685C7B;
-	Tue,  5 Mar 2024 13:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BA48613C;
+	Tue,  5 Mar 2024 13:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="an7nzRRG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j7TAC6XO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDD85676A
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B4186126
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709646182; cv=none; b=mjkyLHBM4tV+hqwsPEHUlwO9vWFvK1CbvxQcgVA3Sy6TBx6wjEXcpKyljw/a6xr/XhH7ocSazYX8EE3XoPKR4Yeo/RjWgyAMn396eMs9nOjnAmfBu9LDczGHo8hQ471hY5QAjC5zZv7/5t69MxymkFWAuvXQeCXVzysOSsJUwjU=
+	t=1709646189; cv=none; b=rw5JVN3bPvzELECMQaFeTb/QeBB6wdo9NATLwSMt4bBD/eb445pnZq1hGq+1H7dwdToXSRTWmymz9B+ibocGDhFHid3wREk04kvFbEXf+jLby2UobkmoKsry2yZ9sHmDIGuz58I1srqEohMPiZENy52sTf9BqL0LoXWXpQGjyOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709646182; c=relaxed/simple;
-	bh=62dsR2/qTVriqw72MWy5pDibfLhl1iF8csUOZ4rt08Q=;
+	s=arc-20240116; t=1709646189; c=relaxed/simple;
+	bh=GNSSRndJCpU/HMACy39lWc79Zr8+mPLGjEktUi3MkcY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s7w7OK5k2hu4mUydSI9XFeT11+gdusyA28IWBvfzGGKp29hs9av2JBW9YLxYNizCxxJgNGCvnM7R8CFyzuvcxJRk2sDea7I/C0rVE9S7IQSBSWwI63ez0ngW4QaLGi/FccQdSxog8VD0drJ79UNozd2jOLsqFFLEuBFV55E2raQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=an7nzRRG; arc=none smtp.client-ip=209.85.208.46
+	 MIME-Version:Content-Type; b=GJt/N9+4U5MkSUlbt+Z9kTnumRZCAg5unyOrDFtZ/eyb1dELvzMySbEdHyMoGcHWowLnQ0PbhOj34rxHF873oegsva8UJUZnmi5eccj7nJy/sS+l6ZFZF0KBhG4uV3v/uFN9cmEJYROxz3iBx/gB26069x+9eoM45VuiIvIwocE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=j7TAC6XO; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5640fef9fa6so6950001a12.0
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:43:00 -0800 (PST)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5658082d2c4so7796370a12.1
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:43:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709646179; x=1710250979; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709646186; x=1710250986; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P6j3vsQkgHjlqXgYSK7hYcuXtUupY0HchuWejne43RQ=;
-        b=an7nzRRGV3uVcFY8xddW6AmKgW0P8F475T5P/44pADzc1xo6uNVgj3HJiwuvGRjDFt
-         VSjz/mgH7j+akVQ8yl/UGsedGEvzVIgc+9d5PA5yeAWdU8f8iZEgTKBd9PAofU+9hh0G
-         bWtXk8Cg3Ea938r1Q4meXl+U4vV8ToyzKksWZ+I6DdkL0MDrYzN73nF4HNCji7GjlgpL
-         mNEnE6ub3LKofT/Z/LsODlXK6QteQYGfh/Pxmvy7XUjh6eg8Hqve60DwG3SCvQImQ/P4
-         EzJumNEgnH1L4vtp5kpReDKA1FzIhz7dsbErz/UhyQ8B+KFr4+kTagGLfpdwVYBFwrPM
-         DAbw==
+        bh=qNCIUOXAP5nkn1WP2t/PEPvMd4mRhcnbtnDDAPAoHAk=;
+        b=j7TAC6XOJWgDCZ2p/6p9l89eSu3pf13/yWIpVPwJ/D8K4TdYWrZJzsHhzL6miKNWi5
+         IEIM+yuFA5IowKc7h4fRNeala1ytASYFrpCYjQcUz7OivDEBr+gLmji3TGyH6ryKTh0r
+         9lA2YKm33LAPZq2HHkaXDdaSC9xFEf2MUyi6cPwkOiAmv3tWcukfZhcrz5jERJQObt7C
+         UWTZqESgycefJWgpktSE27pwjFrX5NmtzkA3rNBWHeJpJbPDyOp+YEOOoxfk2C8n2UdZ
+         Z4pVEk5fxOrixqmnXwJNaTCBwqsQ8LFMv54KA3GtZzw9NnPo5lr3FLibKOeDdVLFv5as
+         7VKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709646179; x=1710250979;
+        d=1e100.net; s=20230601; t=1709646186; x=1710250986;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=P6j3vsQkgHjlqXgYSK7hYcuXtUupY0HchuWejne43RQ=;
-        b=Y0Gu/YMj3ZaSntVMQk2kSzW4moZ+9/zKqkIY0sNnrPFJArJkefb/0oslxEIeF41m0K
-         OjqQwSpE13lAfs3kVbAZceIQ0BK4TdxrBIG/anPTvk1IZpSwqExTWH4Jn858ZpE+UOfg
-         jOsLw8XGOj+1kcPOQiYoP/Z2ZH87GGTtR4oJse3Jm32ST945Iim+z/UFvjXRAqMtMVYX
-         wucS0h0D/jIx0ukTMk4hyzyybxTrcC5sTUJWz4LJPL95qqkN0J0vHzBn2/XGaCoqO2XY
-         U2eOKcs7MAXTJqqGaDiDVNGaHFFbAGrks06hZCnVl1x+3Qi10sZfJ58w9a3jLSk2KT4i
-         Kntw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJPMjq82eSpcIOv0OXa0rafyhgjr3RJIY6XznAq+bztziuviKx3BBY/ZQQZj6FtuJHQu5tOtsOeWc9SHOhm277+obu
-X-Gm-Message-State: AOJu0YzfjAga72rdJzGZcwvXxzDoJViA9wwHjGaCNX/DRAIRv1toFovy
-	7wLzsEbXV+3ZUQg3jewuZzoTeLuQphrSCS8/jYBVS74FiQEjF2o4n2NcH4IKjgQ=
-X-Google-Smtp-Source: AGHT+IFbWNyURA+FceZTD6yItwbOnb08ix3nn/dgtrYLs3f5Fy0iPr8irxrkPsFNRKIP2au/om3Y3Q==
-X-Received: by 2002:a05:6402:2152:b0:566:ef8:a81a with SMTP id bq18-20020a056402215200b005660ef8a81amr9346231edb.7.1709646179007;
-        Tue, 05 Mar 2024 05:42:59 -0800 (PST)
+        bh=qNCIUOXAP5nkn1WP2t/PEPvMd4mRhcnbtnDDAPAoHAk=;
+        b=Glk7MQRNGHf7I2O8mvP0gevJsB+PQXetZ1ZmTkb/ibBsO3pzPOl33b0Qjcvhll2xXl
+         SzMXiOnMYO8Iq8an3y+1MSY6icbd9dqebT/Q3uAXSO7ZoOmhaCO4gMmhAPIMUs+4GSZi
+         cPh+K0grkJqfnPTCDC8vgWgZB8ZwCQicgevmjeWN654BhjMbZFAHgx+NbBkFzqt2JKtB
+         UU7v8hob9+jCkkAvPw+uU8jbd1gDN9GZKFDVU/MWoOwm0P4IV1nE2O7zlpC9UdIJu0zz
+         tFGJeZyXcmHOlM6XBh22yyvWv5Aw0+1/01Yc0bTxcpWhtQQPYZPD3rpxsFTwXcDQSqF2
+         o3rw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWNIdqrXTgioA7ds49umiipMD8EmYLWIu3rMbIhZgr9T4ciFhXNxQSLELf24shvahVSFeIUvTvACAKaYYtlPs2biNU
+X-Gm-Message-State: AOJu0Yyq50LoHP//TozYUMzZVb8rt1qkIkBUTRqaLHqz0ZnhfxpGSuZK
+	m/kKVFPLFASoyKW+RnwwYRqQk2vnplFZnMOmxSZHctC79brLNy7u4Nx2e3cU4Bg=
+X-Google-Smtp-Source: AGHT+IFf8ZGZhDfjYAXFDPsxT7EZZWXpGFpXOeFd4BwtvveykEU8Vst9MseHS8RugHUgHLPbLYodgA==
+X-Received: by 2002:a17:906:270d:b0:a45:ab75:7628 with SMTP id z13-20020a170906270d00b00a45ab757628mr1214935ejc.52.1709646186033;
+        Tue, 05 Mar 2024 05:43:06 -0800 (PST)
 Received: from m1x-phil.lan ([176.176.177.70])
-        by smtp.gmail.com with ESMTPSA id ev16-20020a056402541000b0055d333a0584sm5846620edb.72.2024.03.05.05.42.56
+        by smtp.gmail.com with ESMTPSA id lh24-20020a170906f8d800b00a45b1ce5046sm946ejb.155.2024.03.05.05.43.03
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 05 Mar 2024 05:42:58 -0800 (PST)
+        Tue, 05 Mar 2024 05:43:05 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Thomas Huth <thuth@redhat.com>
@@ -83,9 +83,9 @@ Cc: Igor Mammedov <imammedo@redhat.com>,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Eduardo Habkost <eduardo@habkost.net>
-Subject: [PATCH-for-9.1 05/18] hw/i386/acpi: Remove PCMachineClass::legacy_acpi_table_size
-Date: Tue,  5 Mar 2024 14:42:07 +0100
-Message-ID: <20240305134221.30924-6-philmd@linaro.org>
+Subject: [PATCH-for-9.1 06/18] hw/i386/pc: Remove deprecated pc-i440fx-2.1 machine
+Date: Tue,  5 Mar 2024 14:42:08 +0100
+Message-ID: <20240305134221.30924-7-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240305134221.30924-1-philmd@linaro.org>
 References: <20240305134221.30924-1-philmd@linaro.org>
@@ -98,128 +98,126 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-PCMachineClass::legacy_acpi_table_size was only used by the
-pc-i440fx-2.0 machine, which got removed. Remove it and simplify
-acpi_build().
+The pc-i440fx-2.1 machine was deprecated for the 8.2
+release (see commit c7437f0ddb "docs/about: Mark the
+old pc-i440fx-2.0 - 2.3 machine types as deprecated"),
+time to remove it.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/hw/i386/pc.h |  1 -
- hw/i386/acpi-build.c | 60 +++++++++-----------------------------------
- 2 files changed, 12 insertions(+), 49 deletions(-)
+ docs/about/deprecated.rst       |  2 +-
+ docs/about/removed-features.rst |  2 +-
+ include/hw/i386/pc.h            |  3 ---
+ hw/i386/pc.c                    |  7 -------
+ hw/i386/pc_piix.c               | 23 -----------------------
+ 5 files changed, 2 insertions(+), 35 deletions(-)
 
+diff --git a/docs/about/deprecated.rst b/docs/about/deprecated.rst
+index 6d4738ca20..c68b17df23 100644
+--- a/docs/about/deprecated.rst
++++ b/docs/about/deprecated.rst
+@@ -221,7 +221,7 @@ deprecated; use the new name ``dtb-randomness`` instead. The new name
+ better reflects the way this property affects all random data within
+ the device tree blob, not just the ``kaslr-seed`` node.
+ 
+-``pc-i440fx-2.1`` up to ``pc-i440fx-2.3`` (since 8.2)
++``pc-i440fx-2.2`` up to ``pc-i440fx-2.3`` (since 8.2)
+ '''''''''''''''''''''''''''''''''''''''''''''''''''''
+ 
+ These old machine types are quite neglected nowadays and thus might have
+diff --git a/docs/about/removed-features.rst b/docs/about/removed-features.rst
+index 156737989e..d01b0afbef 100644
+--- a/docs/about/removed-features.rst
++++ b/docs/about/removed-features.rst
+@@ -801,7 +801,7 @@ mips ``fulong2e`` machine alias (removed in 6.0)
+ 
+ This machine has been renamed ``fuloong2e``.
+ 
+-``pc-0.10`` up to ``pc-i440fx-2.0`` (removed in 4.0 up to 9.0)
++``pc-0.10`` up to ``pc-i440fx-2.1`` (removed in 4.0 up to 9.0)
+ ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ 
+ These machine types were very old and likely could not be used for live
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 3360ca2307..758d670a36 100644
+index 758d670a36..f77639d94f 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -103,7 +103,6 @@ struct PCMachineClass {
-     /* ACPI compat: */
-     bool has_acpi_build;
-     bool rsdp_in_ram;
--    int legacy_acpi_table_size;
-     unsigned acpi_data_size;
-     int pci_root_uid;
+@@ -281,9 +281,6 @@ extern const size_t pc_compat_2_3_len;
+ extern GlobalProperty pc_compat_2_2[];
+ extern const size_t pc_compat_2_2_len;
  
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 15242b9096..8c7fad92e9 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2496,13 +2496,12 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     X86MachineState *x86ms = X86_MACHINE(machine);
-     DeviceState *iommu = pcms->iommu;
-     GArray *table_offsets;
--    unsigned facs, dsdt, rsdt, fadt;
-+    unsigned facs, dsdt, rsdt;
-     AcpiPmInfo pm;
-     AcpiMiscInfo misc;
-     AcpiMcfgInfo mcfg;
-     Range pci_hole = {}, pci_hole64 = {};
-     uint8_t *u;
--    size_t aml_len = 0;
-     GArray *tables_blob = tables->table_data;
-     AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
-     Object *vmgenid_dev;
-@@ -2548,19 +2547,12 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     build_dsdt(tables_blob, tables->linker, &pm, &misc,
-                &pci_hole, &pci_hole64, machine);
- 
--    /* Count the size of the DSDT and SSDT, we will need it for legacy
--     * sizing of ACPI tables.
--     */
--    aml_len += tables_blob->len - dsdt;
+-extern GlobalProperty pc_compat_2_1[];
+-extern const size_t pc_compat_2_1_len;
 -
-     /* ACPI tables pointed to by RSDT */
--    fadt = tables_blob->len;
-     acpi_add_table(table_offsets, tables_blob);
-     pm.fadt.facs_tbl_offset = &facs;
-     pm.fadt.dsdt_tbl_offset = &dsdt;
-     pm.fadt.xdsdt_tbl_offset = &dsdt;
-     build_fadt(tables_blob, tables->linker, &pm.fadt, oem_id, oem_table_id);
--    aml_len += tables_blob->len - fadt;
+ #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
+     static void pc_machine_##suffix##_class_init(ObjectClass *oc, void *data) \
+     { \
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index bb7ef31af2..d417cf106c 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -304,13 +304,6 @@ GlobalProperty pc_compat_2_2[] = {
+ };
+ const size_t pc_compat_2_2_len = G_N_ELEMENTS(pc_compat_2_2);
  
-     acpi_add_table(table_offsets, tables_blob);
-     acpi_build_madt(tables_blob, tables->linker, x86ms,
-@@ -2691,49 +2683,21 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-      * too simple to be enough.  4k turned out to be too small an
-      * alignment very soon, and in fact it is almost impossible to
-      * keep the table size stable for all (max_cpus, max_memory_slots)
--     * combinations.  So the table size is always 64k for pc-i440fx-2.1
--     * and we give an error if the table grows beyond that limit.
--     *
--     * We still have the problem of migrating from "-M pc-i440fx-2.0".  For
--     * that, we exploit the fact that QEMU 2.1 generates _smaller_ tables
--     * than 2.0 and we can always pad the smaller tables with zeros.  We can
--     * then use the exact size of the 2.0 tables.
-+     * combinations.
-      *
-      * All this is for PIIX4, since QEMU 2.0 didn't support Q35 migration.
-      */
--    if (pcmc->legacy_acpi_table_size) {
--        /* Subtracting aml_len gives the size of fixed tables.  Then add the
--         * size of the PIIX4 DSDT/SSDT in QEMU 2.0.
--         */
--        int legacy_aml_len =
--            pcmc->legacy_acpi_table_size +
--            ACPI_BUILD_LEGACY_CPU_AML_SIZE * x86ms->apic_id_limit;
--        int legacy_table_size =
--            ROUND_UP(tables_blob->len - aml_len + legacy_aml_len,
--                     ACPI_BUILD_ALIGN_SIZE);
--        if ((tables_blob->len > legacy_table_size) &&
--            !pcmc->resizable_acpi_blob) {
--            /* Should happen only with PCI bridges and -M pc-i440fx-2.0.  */
--            warn_report("ACPI table size %u exceeds %d bytes,"
--                        " migration may not work",
--                        tables_blob->len, legacy_table_size);
--            error_printf("Try removing CPUs, NUMA nodes, memory slots"
--                         " or PCI bridges.\n");
--        }
--        g_array_set_size(tables_blob, legacy_table_size);
--    } else {
--        /* Make sure we have a buffer in case we need to resize the tables. */
--        if ((tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) &&
--            !pcmc->resizable_acpi_blob) {
--            /* As of QEMU 2.1, this fires with 160 VCPUs and 255 memory slots.  */
--            warn_report("ACPI table size %u exceeds %d bytes,"
--                        " migration may not work",
--                        tables_blob->len, ACPI_BUILD_TABLE_SIZE / 2);
--            error_printf("Try removing CPUs, NUMA nodes, memory slots"
--                         " or PCI bridges.\n");
--        }
--        acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
-+    /* Make sure we have a buffer in case we need to resize the tables. */
-+    if ((tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) &&
-+        !pcmc->resizable_acpi_blob) {
-+        /* As of QEMU 2.1, this fires with 160 VCPUs and 255 memory slots.  */
-+        warn_report("ACPI table size %u exceeds %d bytes,"
-+                    " migration may not work",
-+                    tables_blob->len, ACPI_BUILD_TABLE_SIZE / 2);
-+        error_printf("Try removing CPUs, NUMA nodes, memory slots"
-+                     " or PCI bridges.\n");
-     }
-+    acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
+-GlobalProperty pc_compat_2_1[] = {
+-    PC_CPU_MODEL_IDS("2.1.0")
+-    { "coreduo" "-" TYPE_X86_CPU, "vmx", "on" },
+-    { "core2duo" "-" TYPE_X86_CPU, "vmx", "on" },
+-};
+-const size_t pc_compat_2_1_len = G_N_ELEMENTS(pc_compat_2_1);
+-
+ GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled)
+ {
+     GSIState *s;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 594b131625..88457de0f8 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -65,7 +65,6 @@
+ #include "hw/hyperv/vmbus-bridge.h"
+ #include "hw/mem/nvdimm.h"
+ #include "hw/i386/acpi-build.h"
+-#include "kvm/kvm-cpu.h"
+ #include "target/i386/cpu.h"
  
-     acpi_align_size(tables->linker->cmd_blob, ACPI_BUILD_ALIGN_SIZE);
+ #define XEN_IOAPIC_NUM_PIRQS 128ULL
+@@ -435,12 +434,6 @@ static void pc_compat_2_2_fn(MachineState *machine)
+     pc_compat_2_3_fn(machine);
+ }
  
+-static void pc_compat_2_1_fn(MachineState *machine)
+-{
+-    pc_compat_2_2_fn(machine);
+-    x86_cpu_change_kvm_default("svm", NULL);
+-}
+-
+ #ifdef CONFIG_ISAPC
+ static void pc_init_isa(MachineState *machine)
+ {
+@@ -847,22 +840,6 @@ static void pc_i440fx_2_2_machine_options(MachineClass *m)
+ DEFINE_I440FX_MACHINE(v2_2, "pc-i440fx-2.2", pc_compat_2_2_fn,
+                       pc_i440fx_2_2_machine_options);
+ 
+-static void pc_i440fx_2_1_machine_options(MachineClass *m)
+-{
+-    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+-
+-    pc_i440fx_2_2_machine_options(m);
+-    m->hw_version = "2.1.0";
+-    m->default_display = NULL;
+-    compat_props_add(m->compat_props, hw_compat_2_1, hw_compat_2_1_len);
+-    compat_props_add(m->compat_props, pc_compat_2_1, pc_compat_2_1_len);
+-    pcmc->smbios_uuid_encoded = false;
+-    pcmc->enforce_aligned_dimm = false;
+-}
+-
+-DEFINE_I440FX_MACHINE(v2_1, "pc-i440fx-2.1", pc_compat_2_1_fn,
+-                      pc_i440fx_2_1_machine_options);
+-
+ #ifdef CONFIG_ISAPC
+ static void isapc_machine_options(MachineClass *m)
+ {
 -- 
 2.41.0
 
