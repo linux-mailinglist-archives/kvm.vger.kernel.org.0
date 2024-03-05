@@ -1,116 +1,80 @@
-Return-Path: <kvm+bounces-10869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26D78715B2
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 07:10:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37CBE87155B
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 06:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 813B0283615
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 06:10:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A27ECB22D11
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 05:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649A77BB0F;
-	Tue,  5 Mar 2024 06:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBB562171;
+	Tue,  5 Mar 2024 05:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R8CfdxKy"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="C7epLVqy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2094.outbound.protection.outlook.com [40.107.244.94])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBF03398B;
-	Tue,  5 Mar 2024 06:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A33AD5E;
+	Tue,  5 Mar 2024 05:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.94
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709619048; cv=fail; b=W/9ix409zDrxat107oy9Dk5yASnGDdzFj2ERrmwaztJfhhemXhEnpqYeDbCTBsauFauAhZHSMxJuIG4g9pbSdP4yB0jc34hoBaGZ/i9VeKKN/Y00JdtTbtrIO2qvz5+NDkLxMelV79p4jwgp0tWvsxSKmn2FUVPd3+COXAjRX5I=
+	t=1709617592; cv=fail; b=TGg6HSpNVRH/AqXaq38ijluWrN0TRWx2SShVFt+b3uF+dESYSl1vhw/BwoVGtmjNUj/vrxRW/lAEaOoS/N+0Id3YKBLk6anjLuUaFIkvjUR0oJYS9owdhRlrPHuHyoM5jRkd1pfcYXfyFxJUEvAQ0WQf3PJXUYvOXUiEgbGuGAc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709619048; c=relaxed/simple;
-	bh=iW+gHiz97dUJYQAYk7XIhMv/xRS8y9W+4SguMPbSbfg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=uD4+d4sZ6nXpGSg+qkkLv5d/g1GxfVMC9sYh/szXlGKL1tnSI7XL1PX56lLiM/nX4yRUfk13MirG0meayZAoq+rAFQsGLXaZxMQaVecy84DfXGzEYv04i0sTT8OCMSl1hBNplAo7hNjOCbQbbVQ/Lrb9Wt2MbZVq9SN8v2S7II4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R8CfdxKy; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709619047; x=1741155047;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=iW+gHiz97dUJYQAYk7XIhMv/xRS8y9W+4SguMPbSbfg=;
-  b=R8CfdxKyluzmJUtZJiJhBZQ3rrBx+fQXEkfx3Z9k/7hxVRToubffps7Q
-   pcJSnOxCZUbYcFBBtTW9UzrBwWU+U9iCEk5iKmwIDYf6nZDxmZQwhXF3F
-   TIzuPbw+tKXdx7IX1HOs+5c9onPbQfbi3ffxmNKla/O/53p8IWaV/BgwY
-   Zxl2EbGYsZzMEryIsyaFzRNYwvDc5BuegkOIeY26wo7y6jvA6HhsgMAiI
-   XFAFimhxoRdhXjbtTcHaBmDqM5a2t9KewaAvSV20c9fN1jK43ssGvxPhI
-   nQGJd3yZgHn9+Wgit2Updbv2GUi6dSjrOOYdS8NSA3Q/Zs3pYBWM6iqAd
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4734876"
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="4734876"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 22:10:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="9210199"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Mar 2024 22:10:45 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 4 Mar 2024 22:10:44 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 4 Mar 2024 22:10:44 -0800
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 4 Mar 2024 22:10:44 -0800
+	s=arc-20240116; t=1709617592; c=relaxed/simple;
+	bh=fvm6PWk/jOIBj5IDMUR8ZIzsuPphjE/h2GOFx3WBTZ8=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=FOaD3rPBQHKBP8vWRQPNZ7yd0pQoec7AFTAHOfIkcZUJPB+l4OBX7K8f8BM7O2D+lGuUHMf9ZvwFlOKtPWeYRWQCD5tilGXtNjo3pdV3XTBsNBUazgC4RLkBgKH6jILzcW3go+24/tIjSvkQ7WmXrNdELTCuzMuT2izSHmAQLsI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=C7epLVqy; arc=fail smtp.client-ip=40.107.244.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XERzQoByE7JN17RpN0kzbWXY4tf7cLHZvjO2u39VG2LY8wrcgQX7ENM2zXDN5BZ4gS+JUWYQHM+pPf1GdNaiPx0eT07niXNhepGx5141lzAf6iLEn+DpuNATzL1R0VpLGJXSGQjvYtmi+c6Nu0OoxrpFdmBOxPf2Wj5oAeUPTt3KvxirAMEE0E5qAoR6pvL1mHaAOwfdVmYluJpUGh6O9t4uV7/56RJ0lF29lRiVIEDh4kKaef7Fo9hjyO4gXO4TtnXVaIqZiuakDFcTwlHMMp5t7oo/qQGK4DGiiqrEKbNruo156wvpzrjBr8FA8G9EKlvI+EqC88Ty32UTVE8YjQ==
+ b=ElOj8rSi/W6oiqvEwV03zd5hwC4socswoqsQpcS+urjHyLmWUNk91a881JX6XsG1SZRl8w3T8Rr7+U47RSNecByXnKeEQTW58tm1su9NDaF0jmwunTanMBw95eHyWiR3zo78JaC6GdYi8r/Aoe+6OgBYmOVwrHOG5rdlqVqVFGZfLxZPmPIFjlcvY412KALe+auTzDHP7mPrEGf8jCvBXOqj4I+gfGO4UqoKYMDjIRhOpTwQOX83qcL6O58uNH5Lt+075GEBFZGkpaYQF7UtOFPmEx28rCedTmWwq4GS5n/xla/aqBKbrFgetRpLCs81oSjwLFK8V0yay2TJdGldrQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Bvc5HZM8z9+WRvNUROz2fsaP6vyZVdN9BcHM78cOacM=;
- b=bXlouWvAk02B/ZxAjgcHDVpn8AGJDZjd8Wr942AT5XMQqYF507mwClpgM9zEfOCfmq6eGosrT1h5wIzpBwFJSZC7Pbkx30TJMo9h0QiszJbOx6pRu0NFBEobm5kPL+4jFjsx1YWhQ6XbZLNhyHt8swWIU71z42TsS8Toya39SrBPnUk1xCPyzibhrGNo9pTUfCXHyWkgicZVSGCq/p2Nt2JxCQvsJdXYVBthWfs+OS+QpO1w+PGdq0leXjzFV3Ay9DK36DKbitOYDO4AcaZs3+H2gWHEChRwmDMyOesHrJHB9DNeVAtq/qUe6PS8gTbM5YwnFA2XLxDYwOV4cMJ62A==
+ bh=o76U4oQZ7U4En32PT+pRE3QIJWdoaQeX0VSWW6gNAbo=;
+ b=RcUPfGVG3IYhjwYwIdCQ35GemHysLNvAtUhMHS+oorRXRu4VgGqUc/ZkEUAXc4k+9yshZKaAFYxR8e31ql1gcInAKMKfq0IuBFlqrs9O2UQNWJmbXx7bICc9X45HP721mJvaypulB8Rqnb5t6qVT4xnhW5zO+4FwCfUw2rf98oIoBOy84yhr7Lo8W6f/yRSV2M1MnSQywn/jhvKmtordSR6tgqR6EF8pXpWS8KPSDeYP7+IQhjX7n1qqQ0I6TdYQPGom+hrvpf9kJTtNyk9LJcz1CPIxkLOliTlJobb3h6VASKSsPw+hr9GU7Ytx6NpWD2wxzcSC35GXp0ayzn7nUg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=o76U4oQZ7U4En32PT+pRE3QIJWdoaQeX0VSWW6gNAbo=;
+ b=C7epLVqy3Usb//L1wVeIjWn2hvDWW4bQjz7PYR8Q2c7gzfw3ylaJH3TiODh9Ph0mymQ8E04wBLozAjgU+3Rc5w67VmvE/wL5W/Uyp3Fbx1cM00rfj9UIQWUsYpm61/OqqBK4G97M31SsiQBh3BiZz36NvW/tid6kWpGeAs/gRUg=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SJ0PR11MB5181.namprd11.prod.outlook.com (2603:10b6:a03:2de::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.14; Tue, 5 Mar
- 2024 06:10:36 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::55f1:8d0:2fa1:c7af]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::55f1:8d0:2fa1:c7af%5]) with mapi id 15.20.7362.019; Tue, 5 Mar 2024
- 06:10:36 +0000
-Date: Tue, 5 Mar 2024 13:40:42 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-CC: Sagi Shahar <sagis@google.com>, <linux-kselftest@vger.kernel.org>,
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
-	Erdem Aktas <erdemaktas@google.com>, Isaku Yamahata
-	<isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Peter Gonda
-	<pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>, Chao Peng
-	<chao.p.peng@linux.intel.com>, Vishal Annapurve <vannapurve@google.com>,
-	Roger Wang <runanwang@google.com>, Vipin Sharma <vipinsh@google.com>,
-	<jmattson@google.com>, <dmatlack@google.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: Re: [RFC PATCH v5 16/29] KVM: selftests: TDX: Add TDX HLT exit test
-Message-ID: <ZeawWs9cAhjLb/YO@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20231212204647.2170650-1-sagis@google.com>
- <20231212204647.2170650-17-sagis@google.com>
- <1f9d2b41-95ad-42ca-b1e5-70212b93a9c1@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1f9d2b41-95ad-42ca-b1e5-70212b93a9c1@linux.intel.com>
-X-ClientProxiedBy: SI2P153CA0001.APCP153.PROD.OUTLOOK.COM (2603:1096:4:140::7)
- To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ PH7PR01MB8124.prod.exchangelabs.com (2603:10b6:510:2a5::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7339.39; Tue, 5 Mar 2024 05:46:25 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9%3]) with mapi id 15.20.7339.035; Tue, 5 Mar 2024
+ 05:46:25 +0000
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+To: kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: maz@kernel.org,
+	oliver.upton@linux.dev,
+	darren@os.amperecomputing.com,
+	d.scott.phillips@amperecomputing.com,
+	gankulkarni@os.amperecomputing.com
+Subject: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
+Date: Mon,  4 Mar 2024 21:46:06 -0800
+Message-Id: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+X-Mailer: git-send-email 2.40.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CH0P221CA0006.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:11c::29) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -118,212 +82,346 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SJ0PR11MB5181:EE_
-X-MS-Office365-Filtering-Correlation-Id: def2243a-072a-4b3e-4ead-08dc3cdaf8f9
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|PH7PR01MB8124:EE_
+X-MS-Office365-Filtering-Correlation-Id: 77c29341-7365-43ea-ccc9-08dc3cd7984a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SYWkb4rQEmXECL1SfjAXelbyvCbfhJU1mccP/4mV5+kSDOtaDNJNPemDFv39HVHsvpmVDn/5VFNDrfiIPgEHe0EpItz32DmFn2s1a3ZyT9zlzkzfuIY/VANEvCNCxN2EUmJYIS0HVgPiJ86HVGGLEDsHA1vuiJFbUeJZ9G1HDPjLnvHb5NdauRJiOf7ZHXGNJJMxpZbnhb4EbQM5k4MmhIEfjngwWL/MAPGB10z0c8kIxWuCTJRnc0xxugN9tIt6Rr34xuszqjUY5DzE/AFmL3IFXxfTR5/crWe5absdGZ4QyjzwC3W8uOV/oMVwvsDMC1wdjzdI2WcEE5sBtuB7mLuOwWlXto/FQP75TUHXmsxWhv/OFD8Fu2GZNDGAZDkOGmDJcxU4F7nHCW2tqQo2tpIiXpn00Sxg9vAqv2iPw8+hoor33k2G+Vj9+iuZhf3jAEflgWENwVIk3spsmtWhop2wy/1CN7MbyEZJ2cDwHwg5Ezxay052LYchg62YiIEAZA/dKQZaOKzzCUlpSLye1/oqwMLXaIxv/JoTZvc6sdnincsfv5YzCzz/A45vjkcuSTudcqt2mRoEsKSQZ9BUL6jSR52Q9B6xvzqfndz0aRw/AlAJ4eL8apzVf4QO7Q1j0dqUYQlzmFvedQcALjq3XeqIw1osDsm0oSi6TACNii0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info:
+	Bkniur6+xFBJyIsx1Z5Y3arAmeGSZzgMgLQqk2CbU+cDbX0kN4LgwIehVnDssrMb/RehmgkvToS2G4K2sb7PVjB0E7PzSI/XU9mla0wl5AqT8ADd96utThuYtLoS0T0iUMb3zOLIa1rNQL3VkP+07BPSsAJGp4opu5iJ3Bwn19VhTnf19bJrRdBPf92Gzxgp7Tz0rW0KE5FngDux5lW9f1vZGbp06YhbnHlvnF2e4oTpUBRxb9FrCpuQddknZcNfoAy7iuSltYfBuGprZzJOc8hFhY9kdvMbNhCWCcBxiQJEIqFBTKP/Wol9w5wHucK+aG2dZ4iuSVyR35dGUha5Cb6TpDwTWWp/ZaEIpdh2dbPLSviGqbr46tGltUD7sQxbU2u2IpM0cTISMvLG/BGorkMfSlqxu6HUgIm4Y0WX7aX6w1MvUHnYC4Zh22rOCiuJMpau80JqaPFZ8eqFveZkTIfEdbWsejZpNIDhmVfz9+wLre7na+oCQc37SFczfgLhpSzDhtfnSBWcN+HhOhfhwM2XLvWc2wcUNh75QxFepe1UWFW2WSaiv0HmeP3MVOyZIJj9sznZ9RwYEJ4BqvW2fXHmEw8J91NSAl/NAi0vqW2shiwG1TG1fEkmj8s27xBCGIoU0LS71x1yjT/7c/w/Ng8nD0+rC0PCN5LRch1vMBcGDnJTdZ4UWfRDrdi2LQcdHC1NpoSlO+f+zhsmt6XHhjqIXR2xma6Q256Cq4mVmIk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38350700005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hMAiYS88n6O4VC5EyVEBtZ0JYC/HBi/R85TjQCv+na18Fs7OtzUXpgZrFPUQ?=
- =?us-ascii?Q?r/Seo9DvSIep9lJMaaPPbfsNOns4owGpWePbghLPSNq19wXd4lOXfUP+YYcP?=
- =?us-ascii?Q?CXg+IQe5s/izBVomTYZw7BsyEDsQoBrYxV8xz2meCERPuqq7CDEizKBEeDxU?=
- =?us-ascii?Q?al4ssKRpfc5gGaSzf/WVSq57OlNQdLQwxRa9e6YEwHMlWbsPuIra33rBTKjE?=
- =?us-ascii?Q?0I0DjguqHPiud9OLLJ4dn4l2ksjgEx5PzJfI8sMkWJ1/6CTB0mJWmtKku9Em?=
- =?us-ascii?Q?yCJ15IokDWCQRmOcOsr0i5cg04O9oGsePzu56mLdhFSObiLj4GPhM3W7MJIA?=
- =?us-ascii?Q?ZoQUFqn/iiFghJ29JayLsHl9Al873/yYvae5m1GDx4ycNUybPlSB3jxdXuGI?=
- =?us-ascii?Q?tvONygVl3ykO3y+Ylc4YtSK5DukZFltxi4TjroNBJPq7KfVEvEtT813PZ9zt?=
- =?us-ascii?Q?KiuFHVxQj4eMsE+jTaqeABvUr1vHOuhJcO6mQRqsbD6X8gGJhJxVdlMxx7E8?=
- =?us-ascii?Q?9CuzbofhCaxuAysSmHT8RSGOJJPzPVMh4Y0TxsmGK18nYTbC/WHRBWGhSddb?=
- =?us-ascii?Q?k+Di10RpaumKzEdGJBFBSY6QS+FEDTeVhqYKcTuVFDJh2NHfmn56o/5xJsZi?=
- =?us-ascii?Q?dV7wSamFxFIita9oarli4zPVfCdBU6AwpWdlBJNp+J2swpiihQS9Rxz3EN6m?=
- =?us-ascii?Q?RoaHEeh6XBjgtMnRuSzFOvaC977gG0qz2IkpfTiBA2iDcrJOgmS2s+a/T0tw?=
- =?us-ascii?Q?NrSa51cdjlVX5Hq+NlvvR1X6fS/zg/nJYFfDWSSWKFXs4nMzqj0cKHmznWjR?=
- =?us-ascii?Q?bUj1KeWArn3buMd9uWN4qnlisDWaobEzZPrVSL963MFBUDD2d65hYXK3eoov?=
- =?us-ascii?Q?JkrMYC5DYOmZsvFBuzGtcJMo3XPa5V7j+NA4wucQkqP2MjnWjKMSN6I1TDjg?=
- =?us-ascii?Q?Lkq5s8Mp+UplFP1MU0xncjfcJrnrHLo+nc8jTcqQ5TvxBmDu8MJ+IuawBt2h?=
- =?us-ascii?Q?YDZsp9fSc1A4W4yZdKFlbmSmxKv03wMDVW2oFsmypiR+MR7lCLs3RHokRYTH?=
- =?us-ascii?Q?FqmDo7uix4cC8aok5Pm5ToRI7kOSoA9wTKA1IvndmqJWRyqpFAppGTUGUwbj?=
- =?us-ascii?Q?PkNIxzDUKvZB8xo+jSsjf3RdVgNUHTZlQ9+tyyXe8TiDb6QbOY4BtsK1hz0c?=
- =?us-ascii?Q?KrCGAyvcoA0Rd9xvNhYyDDsgMZUZSRJMt9GwvBdbbmTPDqGi0zERyb3YudTr?=
- =?us-ascii?Q?PvrjhzlN8iPZxdlY6rduHN4Eb2ewDOTuDJ2Kgsz91gT8b9rihxr5ApHsy7Er?=
- =?us-ascii?Q?iF9N6tAfa5TQsJgO+Z/YWKWsaGTLsom1qGz4KZjWIx3BPDE2MMb+7cAa9kX6?=
- =?us-ascii?Q?HoPaFf4s3BKvZscQBwukpmgW/wIM3Rrnh7pCLlNe/qmzYwTrXAv3AW/ehuz5?=
- =?us-ascii?Q?T9DoXVnHsLWOSHe8UE2G+VyHvpnYkdv/pMyr+zs0VYxV+ItpC3QSZgEAnHMm?=
- =?us-ascii?Q?MvbIR/ZCHoJvaw3dMM6tXFA6Toqn2cwnLK7WuxIv21norvqy6DD1fnBJVZT1?=
- =?us-ascii?Q?GoWxnhKLAcYZkqoQc9QXk/5IGErvQ+NYybVvISSz?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: def2243a-072a-4b3e-4ead-08dc3cdaf8f9
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?nkj7zNr/mQ06jgXS8xz+LOo586YUtpo3fd+fkiF1Hl1TTrmbSPtfSaOWU1ZL?=
+ =?us-ascii?Q?gVSEBYiZwxfR7b+e/4jBwGAUS5Tkvnu/o14II6uJPKSOPjx75M7Y/acUIGJ2?=
+ =?us-ascii?Q?oO7+FFV9oGmd4BHquG2BgKz+BwjFRaHOUmBm0Z50iAmNc+9ZmdtTmx3zf85I?=
+ =?us-ascii?Q?CWIH8wCw9Dp5CasgxAdMuQItIBIOifb2wvR1jnB5B/NOCQgB2byjyMoEg68P?=
+ =?us-ascii?Q?8dzt4b1XXZEGcqC6QxUQD0J37MiP2/JJo5QFXn+iW5X/IiN0ubJlbJt4I/k6?=
+ =?us-ascii?Q?E7tCmK77tUgWm6BH8sm3KXvH/E2SqIni8SLq4NRyPgrOJAbDEI2Vh/KKuS1M?=
+ =?us-ascii?Q?h2Wdl8mMUvvivXe6g9rWoztOwssMegy6mP4pDja6gbU34GCbeHe/ooKvrGr4?=
+ =?us-ascii?Q?jg6silW0a6F81fzAZI/xRc7Ut81NRFdJsiRKrd3U2Vg+G8rKi6b3dphK9RbR?=
+ =?us-ascii?Q?NHLtVyK9I9XDllblFZibrM9Dj9Ep2Y0R0fmTmuzDVgj2hIDFR7nKdCLgOQLo?=
+ =?us-ascii?Q?A9nTbmSERabVciZJK1enXIPPojGv9Bnpzhezz6h54UD1NaJl5NXimOf0kTJC?=
+ =?us-ascii?Q?Y0n3fwwlUETVXwyLb3EC/JDzsk4Ct4ooTrenzOdQJto4lUr3QoH8VHKpynZ/?=
+ =?us-ascii?Q?zu5gkfMyQdLF49fxTN65L/P7mxI7HReoBE+7K23b8/OsZd34xUa3wIbU7PQq?=
+ =?us-ascii?Q?BMjvOx2Bp3gImnEdrXO1U/OE3rQu5XkbU5tM9y7Q4Rwh72PLl2nJHBJLVU9a?=
+ =?us-ascii?Q?gJQsawAboEFnWNGctsODYRKG6fbJzKAZ26DKhV/JBM5GyDVK9IzRAzKw10vc?=
+ =?us-ascii?Q?k+sBCYG2rG2QZrYZHGoP8QMO+bO/t7wNdpj9u2ECvdsFx7YqqimEtuPlI3X8?=
+ =?us-ascii?Q?4bizTwU22zDNISQbLBAGmVn473iv8Obt+v0RVJnPdxu1xOYH4f0sOPl97GGV?=
+ =?us-ascii?Q?ICsfqTyvOYqhnbt0PdEdDgInGB8mw/ouZo3uAgHAImTMuSU6hY4UvuVfJ9zx?=
+ =?us-ascii?Q?Cu8VMxQUGIvLsgxjyojEyysIO6FcKcsmk5as6rMNApdsxSOq1I5yLqKb61eu?=
+ =?us-ascii?Q?5qkHYT5P8I5pUzHWjUCWRAj/S5DwtPs2VXofoinoKit3fP6ddKY5ObH1OjrT?=
+ =?us-ascii?Q?KpXxnPfP7wwJcYK76ExaIMgb9yClL9wwSW7A5cRR1+CpLKH0m6aQQMRDbtG5?=
+ =?us-ascii?Q?+EEYywvcFCZ+3fPS2TejGjQIn3T6CwbGoJanjfwHCQ1mbkj1DjFp6k6EG1WQ?=
+ =?us-ascii?Q?OoAiWIBuze1bBHpXfU9CmXNq7PbUmkLyMdUXQmtwU/XywH8gW5W2Q8S7p57S?=
+ =?us-ascii?Q?eHj8YGBEXmUpeBU7Eta8i6KKgaIrJXAnIClfJNYjMjxs7lVrxpCWiJMmlrdJ?=
+ =?us-ascii?Q?ZYa7XkjdnoZfDQgZsUmm+Y8JVeyS5HaRTsI7Ko5BI95DBiZ8Bcmp244e7oSj?=
+ =?us-ascii?Q?BTFUn8jIDzR+a1XlkyeJ74SRmZ1W23uYeMmgOeqJqoIRGR9LzmM77wNt9RXZ?=
+ =?us-ascii?Q?6KkcFN0Sz7srBiKzhNsUIV/lpKKqWj30joc5WFD+kUsyqDNVghkDyJCw7mZA?=
+ =?us-ascii?Q?O1rKaEe3Af+Yb5tzKWVCtB/VNTyoVQwXzwhya1mXgCt2hCFMUrX2HTcRFwQj?=
+ =?us-ascii?Q?R6Y5chEtCWf7Mepy7Uojxeg=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77c29341-7365-43ea-ccc9-08dc3cd7984a
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 06:10:35.8844
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 05:46:25.1835
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yewhIxjduZCRB+SYhhp1l1YQjF2j+BYQt/Zh5qlAXn5J/9WshpMNg6FITvOjARadsf6TTjIxSZaSl4DsOEHEEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5181
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: YnNe6GnIBtV+1/orUXVE0Jnrx+CG7/fHSzqCqhK9x0E5+5+kBUow5DIG1iSfu35rUxtYYOit8aNXDRpy6lnuHNJbZi9KCAqe6WAPtBu46BAf3WGuj1SkUQKvBplpfd5P
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR01MB8124
 
-On Sat, Mar 02, 2024 at 03:31:07PM +0800, Binbin Wu wrote:
-> On 12/13/2023 4:46 AM, Sagi Shahar wrote:
-> > The test verifies that the guest runs TDVMCALL<INSTRUCTION.HLT> and the
-> > guest vCPU enters to the halted state.
-> > 
-> > Signed-off-by: Erdem Aktas <erdemaktas@google.com>
-> > Signed-off-by: Sagi Shahar <sagis@google.com>
-> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> > Signed-off-by: Ryan Afranji <afranji@google.com>
-> > ---
-> >   .../selftests/kvm/include/x86_64/tdx/tdx.h    |  2 +
-> >   .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 10 +++
-> >   .../selftests/kvm/x86_64/tdx_vm_tests.c       | 78 +++++++++++++++++++
-> >   3 files changed, 90 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-> > index 85ba6aab79a7..b18e39d20498 100644
-> > --- a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-> > +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-> > @@ -8,6 +8,7 @@
-> >   #define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
-> >   #define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
-> > +#define TDG_VP_VMCALL_INSTRUCTION_HLT 12
-> >   #define TDG_VP_VMCALL_INSTRUCTION_IO 30
-> >   #define TDG_VP_VMCALL_INSTRUCTION_RDMSR 31
-> >   #define TDG_VP_VMCALL_INSTRUCTION_WRMSR 32
-> > @@ -20,5 +21,6 @@ uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
-> >   					uint64_t *r13, uint64_t *r14);
-> >   uint64_t tdg_vp_vmcall_instruction_rdmsr(uint64_t index, uint64_t *ret_value);
-> >   uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value);
-> > +uint64_t tdg_vp_vmcall_instruction_hlt(uint64_t interrupt_blocked_flag);
-> >   #endif // SELFTEST_TDX_TDX_H
-> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-> > index 88ea6f2a6469..9485bafedc38 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-> > @@ -114,3 +114,13 @@ uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value)
-> >   	return __tdx_hypercall(&args, 0);
-> >   }
-> > +
-> > +uint64_t tdg_vp_vmcall_instruction_hlt(uint64_t interrupt_blocked_flag)
-> > +{
-> > +	struct tdx_hypercall_args args = {
-> > +		.r11 = TDG_VP_VMCALL_INSTRUCTION_HLT,
-> > +		.r12 = interrupt_blocked_flag,
-> > +	};
-> > +
-> > +	return __tdx_hypercall(&args, 0);
-> > +}
-> > diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> > index 5db3701cc6d9..5fae4c6e5f95 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> > @@ -721,6 +721,83 @@ void verify_guest_msr_writes(void)
-> >   	printf("\t ... PASSED\n");
-> >   }
-> > +/*
-> > + * Verifies HLT functionality.
-> > + */
-> > +void guest_hlt(void)
-> > +{
-> > +	uint64_t ret;
-> > +	uint64_t interrupt_blocked_flag;
-> > +
-> > +	interrupt_blocked_flag = 0;
-> > +	ret = tdg_vp_vmcall_instruction_hlt(interrupt_blocked_flag);
-> > +	if (ret)
-> > +		tdx_test_fatal(ret);
-> > +
-> > +	tdx_test_success();
-> > +}
-> > +
-> > +void _verify_guest_hlt(int signum);
-> > +
-> > +void wake_me(int interval)
-> > +{
-> > +	struct sigaction action;
-> > +
-> > +	action.sa_handler = _verify_guest_hlt;
-> > +	sigemptyset(&action.sa_mask);
-> > +	action.sa_flags = 0;
-> > +
-> > +	TEST_ASSERT(sigaction(SIGALRM, &action, NULL) == 0,
-> > +		    "Could not set the alarm handler!");
-> > +
-> > +	alarm(interval);
-> > +}
-> > +
-> > +void _verify_guest_hlt(int signum)
-> > +{
-> > +	struct kvm_vm *vm;
-> > +	static struct kvm_vcpu *vcpu;
-> > +
-> > +	/*
-> > +	 * This function will also be called by SIGALRM handler to check the
-> > +	 * vCPU MP State. If vm has been initialized, then we are in the signal
-> > +	 * handler. Check the MP state and let the guest run again.
-> > +	 */
-> > +	if (vcpu != NULL) {
-> 
-> What if the following case if there is a bug in KVM so that:
-> 
-> In guest, execution of tdg_vp_vmcall_instruction_hlt() return 0, but the
-> vcpu is not actually halted. Then guest will call tdx_test_success().
-> 
-> And the first call of _verify_guest_hlt() will call kvm_vm_free(vm) to free
-> the vm, which also frees the vcpu, and 1 second later, in this path vcpu
-> will
-> be accessed after free.
->
-Right. Another possibility is that if buggy KVM returns success to guest
-without putting guest to halted state, the selftest will still print
-"PASSED" because the second _verify_guest_hlt() (after waiting for 1s)
-has no chance to get executed before the process exits.
+As per 'commit 178a6915434c ("KVM: arm64: nv: Unmap/flush shadow stage 2
+page tables")', when ever there is unmap of pages that
+are mapped to L1, they are invalidated from both L1 S2-MMU and from
+all the active shadow/L2 S2-MMU tables. Since there is no mapping
+to invalidate the IPAs of Shadow S2 to a page, there is a complete
+S2-MMU page table walk and invalidation is done covering complete
+address space allocated to a L2. This has performance impacts and
+even soft lockup for NV(L1 and L2) boots with higher number of
+CPUs and large Memory.
 
-> > +		struct kvm_mp_state mp_state;
-> > +
-> > +		vcpu_mp_state_get(vcpu, &mp_state);
-> > +		TEST_ASSERT_EQ(mp_state.mp_state, KVM_MP_STATE_HALTED);
-> > +
-> > +		/* Let the guest to run and finish the test.*/
-> > +		mp_state.mp_state = KVM_MP_STATE_RUNNABLE;
-> > +		vcpu_mp_state_set(vcpu, &mp_state);
-> > +		return;
-> > +	}
-> > +
-> > +	vm = td_create();
-> > +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-> > +	vcpu = td_vcpu_add(vm, 0, guest_hlt);
-> > +	td_finalize(vm);
-> > +
-> > +	printf("Verifying HLT:\n");
-> > +
-> > +	printf("\t ... Running guest\n");
-> > +
-> > +	/* Wait 1 second for guest to execute HLT */
-> > +	wake_me(1);
-> > +	td_vcpu_run(vcpu);
-> > +
-> > +	TDX_TEST_ASSERT_SUCCESS(vcpu);
-> > +
-> > +	kvm_vm_free(vm);
-> > +	printf("\t ... PASSED\n");
-> > +}
-> > +
-> > +void verify_guest_hlt(void)
-> > +{
-> > +	_verify_guest_hlt(0);
-> > +}
-> >   int main(int argc, char **argv)
-> >   {
-> > @@ -740,6 +817,7 @@ int main(int argc, char **argv)
-> >   	run_in_new_process(&verify_guest_reads);
-> >   	run_in_new_process(&verify_guest_msr_writes);
-> >   	run_in_new_process(&verify_guest_msr_reads);
-> > +	run_in_new_process(&verify_guest_hlt);
-> >   	return 0;
-> >   }
-> 
-> 
+Adding a lookup table of mapping of Shadow IPA to Canonical IPA
+whenever a page is mapped to any of the L2. While any page is
+unmaped, this lookup is helpful to unmap only if it is mapped in
+any of the shadow S2-MMU tables. Hence avoids unnecessary long
+iterations of S2-MMU table walk-through and invalidation for the
+complete address space.
+
+Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+---
+ arch/arm64/include/asm/kvm_emulate.h |   5 ++
+ arch/arm64/include/asm/kvm_host.h    |  14 ++++
+ arch/arm64/include/asm/kvm_nested.h  |   4 +
+ arch/arm64/kvm/mmu.c                 |  19 ++++-
+ arch/arm64/kvm/nested.c              | 113 +++++++++++++++++++++++++++
+ 5 files changed, 152 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5173f8cf2904..f503b2eaedc4 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -656,4 +656,9 @@ static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hw_mmu->nested_stage2_enabled);
+ }
+ 
++static inline bool kvm_is_l1_using_shadow_s2(struct kvm_vcpu *vcpu)
++{
++	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu);
++}
++
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 8da3c9a81ae3..f61c674c300a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -144,6 +144,13 @@ struct kvm_vmid {
+ 	atomic64_t id;
+ };
+ 
++struct mapipa_node {
++	struct rb_node node;
++	phys_addr_t ipa;
++	phys_addr_t shadow_ipa;
++	long size;
++};
++
+ struct kvm_s2_mmu {
+ 	struct kvm_vmid vmid;
+ 
+@@ -216,6 +223,13 @@ struct kvm_s2_mmu {
+ 	 * >0: Somebody is actively using this.
+ 	 */
+ 	atomic_t refcnt;
++
++	/*
++	 * For a Canonical IPA to Shadow IPA mapping.
++	 */
++	struct rb_root nested_mapipa_root;
++	rwlock_t mmu_lock;
++
+ };
+ 
+ static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index da7ebd2f6e24..c31a59a1fdc6 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -65,6 +65,9 @@ extern void kvm_init_nested(struct kvm *kvm);
+ extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+ extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
+ extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
++extern void add_shadow_ipa_map_node(
++		struct kvm_s2_mmu *mmu,
++		phys_addr_t ipa, phys_addr_t shadow_ipa, long size);
+ 
+ union tlbi_info;
+ 
+@@ -123,6 +126,7 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+ extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+ extern void kvm_nested_s2_wp(struct kvm *kvm);
+ extern void kvm_nested_s2_unmap(struct kvm *kvm);
++extern void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range);
+ extern void kvm_nested_s2_flush(struct kvm *kvm);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 61bdd8798f83..3948681426a0 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1695,6 +1695,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 					     memcache,
+ 					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+ 					     KVM_PGTABLE_WALK_SHARED);
++		if ((nested || kvm_is_l1_using_shadow_s2(vcpu)) && !ret) {
++			struct kvm_s2_mmu *shadow_s2_mmu;
++
++			ipa &= ~(vma_pagesize - 1);
++			shadow_s2_mmu = lookup_s2_mmu(vcpu);
++			add_shadow_ipa_map_node(shadow_s2_mmu, ipa, fault_ipa, vma_pagesize);
++		}
+ 	}
+ 
+ 	/* Mark the page dirty only if the fault is handled successfully */
+@@ -1918,7 +1925,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			     (range->end - range->start) << PAGE_SHIFT,
+ 			     range->may_block);
+ 
+-	kvm_nested_s2_unmap(kvm);
++	kvm_nested_s2_unmap_range(kvm, range);
+ 	return false;
+ }
+ 
+@@ -1953,7 +1960,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			       PAGE_SIZE, __pfn_to_phys(pfn),
+ 			       KVM_PGTABLE_PROT_R, NULL, 0);
+ 
+-	kvm_nested_s2_unmap(kvm);
++	kvm_nested_s2_unmap_range(kvm, range);
+ 	return false;
+ }
+ 
+@@ -2223,12 +2230,18 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
+ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 				   struct kvm_memory_slot *slot)
+ {
++	struct kvm_gfn_range range;
++
+ 	gpa_t gpa = slot->base_gfn << PAGE_SHIFT;
+ 	phys_addr_t size = slot->npages << PAGE_SHIFT;
+ 
++	range.start = gpa;
++	range.end = gpa + size;
++	range.may_block = true;
++
+ 	write_lock(&kvm->mmu_lock);
+ 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
+-	kvm_nested_s2_unmap(kvm);
++	kvm_nested_s2_unmap_range(kvm, &range);
+ 	write_unlock(&kvm->mmu_lock);
+ }
+ 
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index f88d9213c6b3..888ec9fba4a0 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -565,6 +565,88 @@ void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
+ 	write_unlock(&kvm->mmu_lock);
+ }
+ 
++/*
++ * Create a node and add to lookup table, when a page is mapped to
++ * Canonical IPA and also mapped to Shadow IPA.
++ */
++void add_shadow_ipa_map_node(struct kvm_s2_mmu *mmu,
++			phys_addr_t ipa,
++			phys_addr_t shadow_ipa, long size)
++{
++	struct rb_root *ipa_root = &(mmu->nested_mapipa_root);
++	struct rb_node **node = &(ipa_root->rb_node), *parent = NULL;
++	struct mapipa_node *new;
++
++	new = kzalloc(sizeof(struct mapipa_node), GFP_KERNEL);
++	if (!new)
++		return;
++
++	new->shadow_ipa = shadow_ipa;
++	new->ipa = ipa;
++	new->size = size;
++
++	write_lock(&mmu->mmu_lock);
++
++	while (*node) {
++		struct mapipa_node *tmp;
++
++		tmp = container_of(*node, struct mapipa_node, node);
++		parent = *node;
++		if (new->ipa < tmp->ipa) {
++			node = &(*node)->rb_left;
++		} else if (new->ipa > tmp->ipa) {
++			node = &(*node)->rb_right;
++		} else {
++			write_unlock(&mmu->mmu_lock);
++			kfree(new);
++			return;
++		}
++	}
++
++	rb_link_node(&new->node, parent, node);
++	rb_insert_color(&new->node, ipa_root);
++	write_unlock(&mmu->mmu_lock);
++}
++
++/*
++ * Iterate over the lookup table of Canonical IPA to Shadow IPA.
++ * Return Shadow IPA, if the page mapped to Canonical IPA is
++ * also mapped to a Shadow IPA.
++ *
++ */
++bool get_shadow_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa, phys_addr_t *shadow_ipa, long *size)
++{
++	struct rb_node *node;
++	struct mapipa_node *tmp = NULL;
++
++	read_lock(&mmu->mmu_lock);
++	node = mmu->nested_mapipa_root.rb_node;
++
++	while (node) {
++		tmp = container_of(node, struct mapipa_node, node);
++
++		if (tmp->ipa == ipa)
++			break;
++		else if (ipa > tmp->ipa)
++			node = node->rb_right;
++		else
++			node = node->rb_left;
++	}
++
++	read_unlock(&mmu->mmu_lock);
++
++	if (tmp && tmp->ipa == ipa) {
++		*shadow_ipa = tmp->shadow_ipa;
++		*size = tmp->size;
++		write_lock(&mmu->mmu_lock);
++		rb_erase(&tmp->node, &mmu->nested_mapipa_root);
++		write_unlock(&mmu->mmu_lock);
++		kfree(tmp);
++		return true;
++	}
++	return false;
++}
++
+ /* Must be called with kvm->mmu_lock held */
+ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
+ {
+@@ -674,6 +756,7 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+ 	mmu->tlb_vttbr = 1;
+ 	mmu->nested_stage2_enabled = false;
+ 	atomic_set(&mmu->refcnt, 0);
++	mmu->nested_mapipa_root = RB_ROOT;
+ }
+ 
+ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+@@ -760,6 +843,36 @@ void kvm_nested_s2_unmap(struct kvm *kvm)
+ 	}
+ }
+ 
++void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	int i;
++	long size;
++	bool ret;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu)) {
++			phys_addr_t shadow_ipa, start, end;
++
++			start = range->start << PAGE_SHIFT;
++			end = range->end << PAGE_SHIFT;
++
++			while (start < end) {
++				size = PAGE_SIZE;
++				/*
++				 * get the Shadow IPA if the page is mapped
++				 * to L1 and also mapped to any of active L2.
++				 */
++				ret = get_shadow_ipa(mmu, start, &shadow_ipa, &size);
++				if (ret)
++					kvm_unmap_stage2_range(mmu, shadow_ipa, size);
++				start += size;
++			}
++		}
++	}
++}
++
+ /* expects kvm->mmu_lock to be held */
+ void kvm_nested_s2_flush(struct kvm *kvm)
+ {
+-- 
+2.40.1
+
 
