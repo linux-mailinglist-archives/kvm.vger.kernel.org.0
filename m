@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-10986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF64187208A
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:42:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF15987208E
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:43:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A77728632E
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:42:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84D922883EE
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC50F85C7A;
-	Tue,  5 Mar 2024 13:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC788626A;
+	Tue,  5 Mar 2024 13:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N/j2q7kK"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xyos9Q0E"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D84B5915D
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B412B5915D
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709646169; cv=none; b=GySMwiZZioIA+5Ga8Ah5Qtf2liRQ3Ntq70ylm2X9uBqYYyIHmEm6Lqua19Donnk9HCO8kKL4gOglU+17RnanDY0/yDtMnsuEX/P+JSFBaGfSUwjcNYjSxf9M4FMezAs+6zGKWgedqeHug4s7Gw350bTeGMlYiT+KU5qL7F/rwPQ=
+	t=1709646175; cv=none; b=BRtV7Blx8/nBE6qbdWAAWsXNWF5dFdrUPAYgvJX3jG5+CIKQXek9xsQlXj3iXXsrKWuq7wpcd3AFeQNB6d+4JOqgL9s25ZLfsd8gKgtLenR1804IRwDeUj9nPcATH+tDnp5jzhPNTEQ3nkG2h5OQaPTiOZ0o2Z9NVCjUzEOfxsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709646169; c=relaxed/simple;
-	bh=N991mKd0AFXRIfv94zfpnQ52F8jfBOvaDyhRcABY4Xw=;
+	s=arc-20240116; t=1709646175; c=relaxed/simple;
+	bh=2+aQnHax8qcm6hglygfT9XHRHSnzR1kia8emApeNfO4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SKJglQ3txzQZshEPYNQveAMuxG3CwrdYUGIvF1QcZmrhdJhbj0OC1YsQAvFexhfU1dYecYoz2rnNfrvY3pZvpoSC+CGvl53Fw7aUNPNezAc118ShSXBdg4dRKqHuG0NysJeTQoBWp/Beooav3dI7KifxT0LQS5kYV3lsfNu9mmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=N/j2q7kK; arc=none smtp.client-ip=209.85.208.50
+	 MIME-Version:Content-Type; b=s0U9xam1/dpnKZmQtRfM6lC74bLOogxwJSRru3oP70Dk0IiP+muvZVir9LffeAK56HIKkFh2ey43G+tfkfK+h/xpqq/bfK/lNJPjqTde+t6NV10vQWzhiwgNq+fWf0rVPeUlOVfDhQztRD6/aTsbNkf6KfilhbfyixrLch22D0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Xyos9Q0E; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5672afabb86so2435126a12.3
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:42:46 -0800 (PST)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a44f2d894b7so376268166b.1
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:42:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709646165; x=1710250965; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709646172; x=1710250972; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=puZvfwYJmiovgLIksxQYRb4sHK5AG83t9xnfOfq3iqY=;
-        b=N/j2q7kKXs50wAHkTYVrY2Ago+a6IZzZwMcfQDJGec8QWy/Z+FVmxMLXVXWP6tlUEj
-         Ew/bUUd4VV7fJTRrQU9zDA9hzSg8Lc4i+WEI0TLFYf0znRJJVd+VcqmAmSlEwMi2EG21
-         KF0Mv3Av50oXqVW9jzpN6ov4Cf1CoTyLJbRHezm0GiBj1qQuI6qYM12LCBBw6etjp7h9
-         fYR8ygNHKblYdE9WzfFFSQVVN8Dfs8chaEW56dIyV/2Ln8SNvKR9mu0xaCKDu27PBov0
-         odhHoEbH+A2+SaIeRrTT+++MN8Yd3nPCMGaFyejJvQKJiBpm3SX6W0W9DBA3qXY/jWTa
-         FK2A==
+        bh=dfW77RB2c7k3ZDXHGh05HNMU3UcmTeaypC3Kdgt/4jc=;
+        b=Xyos9Q0EnTYiahB/SlOA+ZUukEbERsHVaH5pJyfgpPoiSZW9eKUYvORCU5auJ74Fxn
+         Vz3BHMKqcXCSscGof43g6DNYz/786+fDwdnLJdGkzjWLWHmf8PEvHc6QXAKD6cUovlYx
+         7pjdSjW1Lg7UAdIQSvO+/WE6wh0no0F1BqG7xFWwKXtzcZwlGHWCJ4IcCcyR+VuDtgMl
+         6xnW/7SJrpmaTyLN+p6WDvG0j3oy5nfFEKIPeCrlxDoHktCwt0jp6tvRwRHgJN2wjeUr
+         Qu5sHO8QSuTZo5hF9x5l9foAs7qSJZ2ZRSU6l6Kk+MpAg1eizSpas/oFJjcGuYSq/R8r
+         YnfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709646165; x=1710250965;
+        d=1e100.net; s=20230601; t=1709646172; x=1710250972;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=puZvfwYJmiovgLIksxQYRb4sHK5AG83t9xnfOfq3iqY=;
-        b=w4MEkxxy925j4QXtMRNUOuubCRFZVFPB1hPKWjj6wZdXqyR+/5Mc2aW9Gc1cN1gjmt
-         nOQ7VlLSiPeG5Hekz7EXtmKrFzpqcTZ1xcyPsaf1M0bu2rBxLEBjK+pcK7tmRScxq8Nf
-         QCqIngYt9Shd7pXPx82+tGTkAX8wtnFyj27MIGYZLSnMPBuiKujh+jcsqMvdgER7GAyZ
-         cpUmN17xuHyqvRKNwSN8ClQ4cI138c+J+VFB1NxiYuEPP+ddCIdliGragkdN2P+n6z/U
-         T3m1D4dP6MkbZIupT7CNaFmOrk4ERYS0pLEwpFzfwK0W9+GmuguTkXXjx9PSDxkIhDaT
-         m9sw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTtEv/7kjSYK7n/8FZiPMx/hoeJMrsoErVtxKIcPrCB7HrDkq+d5bzx+TfJh2LI6oL4g3v0mFeZFKAk5ST5uLpODBW
-X-Gm-Message-State: AOJu0Yxov5+R2ENv0raLbOSUKieec6cA8XIlIPridvS9r44uPPzuA+Ky
-	6fw3LYEoh/EhySGXyUvibQlt3dtsIsWJYAN9rDDfVndew7ivc2Dl2wxYmlut5LU=
-X-Google-Smtp-Source: AGHT+IGoQLz3vb/hw5i2C2mEhP7oyJ2WOykEYWfKelOzXGkQ9Oyr76XV3KVkqIMUEC1WspvOGAtlkw==
-X-Received: by 2002:aa7:cb0b:0:b0:564:dd13:56e9 with SMTP id s11-20020aa7cb0b000000b00564dd1356e9mr8683560edt.29.1709646165626;
-        Tue, 05 Mar 2024 05:42:45 -0800 (PST)
+        bh=dfW77RB2c7k3ZDXHGh05HNMU3UcmTeaypC3Kdgt/4jc=;
+        b=JIxqYWxITlxY7CEB4LloANphVEarHSDwukhEXdVS6UDTHeSu+f0oIqWrihVIvK3Pqp
+         CKyFoEdAaIjbMDoNILyOIvlio7fyErbffGytnSKFXhswIWF6Hs2gDHt6JJPay1co2agQ
+         PhE/e6JDWKtfDVjmJxttCyMmDLED57rHNjF5G8I4OiL9Vz/WwF246Z15j9RGohongShH
+         orpo4r2S8yRyqtK7yc89vUasj/RgMVxK4KDlnCob/d0VWhjq5vReSKQ51BoRXp/Bbbfc
+         Cdu9UGoScvIqsHCVC8akx8QgCibQmOPks7vdSEueKSXlouwPtcYNj0P1TJXv52rxJmLV
+         LVJw==
+X-Forwarded-Encrypted: i=1; AJvYcCVeqXjwWwbIAq9atKDDnZCnXhbkdMZSKSgY5pW8pNvgm9ZFFAA2bHiz3h3wEc/61lLEVxX3R8+Qimnv2P5IE6iN1vnu
+X-Gm-Message-State: AOJu0Yy0bHin4YBhwkyD6bPxJJIsLkPttfPCsVJPACgWMW+NwSvhzmnM
+	nlxaoTDIEDx5KoptyfwZIHHQWZxMR+UsYM+g1dy6/8hXFAsi3SQfnoncibSKYPs=
+X-Google-Smtp-Source: AGHT+IFHUEUkZWZFlVXOVF2NKxZ+5If4reUQf8Sy4TYxGOUAHFlet0qWjxsTML0lIIl8M8UOzNFzsA==
+X-Received: by 2002:a17:906:378b:b0:a44:90b3:aa3b with SMTP id n11-20020a170906378b00b00a4490b3aa3bmr8825793ejc.11.1709646172215;
+        Tue, 05 Mar 2024 05:42:52 -0800 (PST)
 Received: from m1x-phil.lan ([176.176.177.70])
-        by smtp.gmail.com with ESMTPSA id z42-20020a509e2d000000b005669d904871sm6107335ede.49.2024.03.05.05.42.43
+        by smtp.gmail.com with ESMTPSA id tj10-20020a170907c24a00b00a4452ed413asm5859830ejc.16.2024.03.05.05.42.50
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 05 Mar 2024 05:42:45 -0800 (PST)
+        Tue, 05 Mar 2024 05:42:51 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Thomas Huth <thuth@redhat.com>
@@ -82,9 +82,9 @@ Cc: Igor Mammedov <imammedo@redhat.com>,
 	"Michael S. Tsirkin" <mst@redhat.com>,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH-for-9.1 03/18] hw/usb/hcd-xhci: Remove XHCI_FLAG_FORCE_PCIE_ENDCAP flag
-Date: Tue,  5 Mar 2024 14:42:05 +0100
-Message-ID: <20240305134221.30924-4-philmd@linaro.org>
+Subject: [PATCH-for-9.1 04/18] hw/usb/hcd-xhci: Remove XHCI_FLAG_SS_FIRST flag
+Date: Tue,  5 Mar 2024 14:42:06 +0100
+Message-ID: <20240305134221.30924-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240305134221.30924-1-philmd@linaro.org>
 References: <20240305134221.30924-1-philmd@linaro.org>
@@ -97,56 +97,138 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-XHCI_FLAG_FORCE_PCIE_ENDCAP was only used by the
-pc-i440fx-2.0 machine, which got removed. Remove it
-and simplify usb_xhci_pci_realize().
+XHCI_FLAG_SS_FIRST was only used by the pc-i440fx-2.0 machine,
+which got removed. Remove it and simplify various functions in
+hcd-xhci.c.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/usb/hcd-xhci.h     | 1 -
- hw/usb/hcd-xhci-nec.c | 2 --
- hw/usb/hcd-xhci-pci.c | 3 +--
- 3 files changed, 1 insertion(+), 5 deletions(-)
+ hw/usb/hcd-xhci.h     |  1 -
+ hw/usb/hcd-xhci-nec.c |  2 --
+ hw/usb/hcd-xhci-pci.c |  1 -
+ hw/usb/hcd-xhci.c     | 42 ++++++++----------------------------------
+ 4 files changed, 8 insertions(+), 38 deletions(-)
 
 diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index 37f0d2e43b..7dcab8b8db 100644
+index 7dcab8b8db..051ea43261 100644
 --- a/hw/usb/hcd-xhci.h
 +++ b/hw/usb/hcd-xhci.h
-@@ -37,7 +37,6 @@ typedef struct XHCIEPContext XHCIEPContext;
+@@ -36,7 +36,6 @@ typedef struct XHCIStreamContext XHCIStreamContext;
+ typedef struct XHCIEPContext XHCIEPContext;
  
  enum xhci_flags {
-     XHCI_FLAG_SS_FIRST = 1,
--    XHCI_FLAG_FORCE_PCIE_ENDCAP = 2,
+-    XHCI_FLAG_SS_FIRST = 1,
      XHCI_FLAG_ENABLE_STREAMS = 3,
  };
  
 diff --git a/hw/usb/hcd-xhci-nec.c b/hw/usb/hcd-xhci-nec.c
-index 328e5bfe7c..5d5b069cf9 100644
+index 5d5b069cf9..0c063b3697 100644
 --- a/hw/usb/hcd-xhci-nec.c
 +++ b/hw/usb/hcd-xhci-nec.c
-@@ -43,8 +43,6 @@ static Property nec_xhci_properties[] = {
+@@ -41,8 +41,6 @@ struct XHCINecState {
+ static Property nec_xhci_properties[] = {
+     DEFINE_PROP_ON_OFF_AUTO("msi", XHCIPciState, msi, ON_OFF_AUTO_AUTO),
      DEFINE_PROP_ON_OFF_AUTO("msix", XHCIPciState, msix, ON_OFF_AUTO_AUTO),
-     DEFINE_PROP_BIT("superspeed-ports-first", XHCINecState, flags,
-                     XHCI_FLAG_SS_FIRST, true),
--    DEFINE_PROP_BIT("force-pcie-endcap", XHCINecState, flags,
--                    XHCI_FLAG_FORCE_PCIE_ENDCAP, false),
+-    DEFINE_PROP_BIT("superspeed-ports-first", XHCINecState, flags,
+-                    XHCI_FLAG_SS_FIRST, true),
      DEFINE_PROP_UINT32("intrs", XHCINecState, intrs, XHCI_MAXINTRS),
      DEFINE_PROP_UINT32("slots", XHCINecState, slots, XHCI_MAXSLOTS),
      DEFINE_PROP_END_OF_LIST(),
 diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
-index 4423983308..cbad96f393 100644
+index cbad96f393..264d7ebb77 100644
 --- a/hw/usb/hcd-xhci-pci.c
 +++ b/hw/usb/hcd-xhci-pci.c
-@@ -148,8 +148,7 @@ static void usb_xhci_pci_realize(struct PCIDevice *dev, Error **errp)
-                      PCI_BASE_ADDRESS_MEM_TYPE_64,
-                      &s->xhci.mem);
+@@ -242,7 +242,6 @@ static void qemu_xhci_instance_init(Object *obj)
+     s->msix     = ON_OFF_AUTO_AUTO;
+     xhci->numintrs = XHCI_MAXINTRS;
+     xhci->numslots = XHCI_MAXSLOTS;
+-    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
+ }
  
--    if (pci_bus_is_express(pci_get_bus(dev)) ||
--        xhci_get_flag(&s->xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
-+    if (pci_bus_is_express(pci_get_bus(dev))) {
-         ret = pcie_endpoint_cap_init(dev, 0xa0);
-         assert(ret > 0);
-     }
+ static const TypeInfo qemu_xhci_info = {
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index ad40232eb6..b6411f0bda 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -541,18 +541,10 @@ static XHCIPort *xhci_lookup_port(XHCIState *xhci, struct USBPort *uport)
+     case USB_SPEED_LOW:
+     case USB_SPEED_FULL:
+     case USB_SPEED_HIGH:
+-        if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
+-            index = uport->index + xhci->numports_3;
+-        } else {
+-            index = uport->index;
+-        }
++        index = uport->index + xhci->numports_3;
+         break;
+     case USB_SPEED_SUPER:
+-        if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
+-            index = uport->index;
+-        } else {
+-            index = uport->index + xhci->numports_2;
+-        }
++        index = uport->index;
+         break;
+     default:
+         return NULL;
+@@ -2779,11 +2771,7 @@ static uint64_t xhci_cap_read(void *ptr, hwaddr reg, unsigned size)
+         ret = 0x20425355; /* "USB " */
+         break;
+     case 0x28: /* Supported Protocol:08 */
+-        if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
+-            ret = (xhci->numports_2<<8) | (xhci->numports_3+1);
+-        } else {
+-            ret = (xhci->numports_2<<8) | 1;
+-        }
++        ret = (xhci->numports_2 << 8) | (xhci->numports_3 + 1);
+         break;
+     case 0x2c: /* Supported Protocol:0c */
+         ret = 0x00000000; /* reserved */
+@@ -2795,11 +2783,7 @@ static uint64_t xhci_cap_read(void *ptr, hwaddr reg, unsigned size)
+         ret = 0x20425355; /* "USB " */
+         break;
+     case 0x38: /* Supported Protocol:08 */
+-        if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
+-            ret = (xhci->numports_3<<8) | 1;
+-        } else {
+-            ret = (xhci->numports_3<<8) | (xhci->numports_2+1);
+-        }
++        ret = (xhci->numports_3 << 8) | 1;
+         break;
+     case 0x3c: /* Supported Protocol:0c */
+         ret = 0x00000000; /* reserved */
+@@ -3349,13 +3333,8 @@ static void usb_xhci_init(XHCIState *xhci)
+     for (i = 0; i < usbports; i++) {
+         speedmask = 0;
+         if (i < xhci->numports_2) {
+-            if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
+-                port = &xhci->ports[i + xhci->numports_3];
+-                port->portnr = i + 1 + xhci->numports_3;
+-            } else {
+-                port = &xhci->ports[i];
+-                port->portnr = i + 1;
+-            }
++            port = &xhci->ports[i + xhci->numports_3];
++            port->portnr = i + 1 + xhci->numports_3;
+             port->uport = &xhci->uports[i];
+             port->speedmask =
+                 USB_SPEED_MASK_LOW  |
+@@ -3366,13 +3345,8 @@ static void usb_xhci_init(XHCIState *xhci)
+             speedmask |= port->speedmask;
+         }
+         if (i < xhci->numports_3) {
+-            if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
+-                port = &xhci->ports[i];
+-                port->portnr = i + 1;
+-            } else {
+-                port = &xhci->ports[i + xhci->numports_2];
+-                port->portnr = i + 1 + xhci->numports_2;
+-            }
++            port = &xhci->ports[i];
++            port->portnr = i + 1;
+             port->uport = &xhci->uports[i];
+             port->speedmask = USB_SPEED_MASK_SUPER;
+             assert(i < XHCI_MAXPORTS);
 -- 
 2.41.0
 
