@@ -1,55 +1,63 @@
-Return-Path: <kvm+bounces-11043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11044-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33FC2872546
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 18:09:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32F0487254A
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 18:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C890FB2303F
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 17:09:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95FE71F25F1A
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 17:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A29A17756;
-	Tue,  5 Mar 2024 17:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6620C17BD8;
+	Tue,  5 Mar 2024 17:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ap7NF3d0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="smHoWrGm"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF10D17559
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 17:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC88175AB
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 17:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709658549; cv=none; b=SpOVXeCCkciMTFuoA9hQStT1kixANAR0gLZwjjh7fOcCyIKm2OUpJcSpzi3DVEkEPpfriMaFv0SeaqpxBvwpxMeOntnhcH4VoFOx9YhOOMEVOVWE9xecc40mbG2yHLVmYe3qaDsB6WSVlRXZvW3h6/pprny0HAzI1fLxxZbZo+s=
+	t=1709658552; cv=none; b=UDQvd4oh1GlbI6t3gvRlmwaTStKgMRgBrnnuZ1Le11lqy3H8S7v9LpkxOc7ZxZDivRso74kYJ4ODdJtcCW/sF5sxSvpUYKhqvGCmJGsb4DHb38E5jGuJNGWLn+ekpx7s77ywBAyPuxMxb1MUkdt8jdvzyjLv2CGjdeyYtwKTU9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709658549; c=relaxed/simple;
-	bh=24V7ixbq2YncjbjPwMlh0hmEj06CdhvH7HFYRxqOIv4=;
+	s=arc-20240116; t=1709658552; c=relaxed/simple;
+	bh=VkVxzzEu3nVElayvwDmLcanYxqP9mTejahFEjNfr+w8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=BXRTxs3ULcHyIe4e/aPvGk6YoFWa+ta+kh0iw80PPqi29c62yGjxxWa29s4ERs/BtKD9sAf3iQcoIVxDcXFZxs2LwM0E8hTAEyMKXyA4KRRT0QXhRZ6iXMl4WIdczek93pu2jkw62o1AV/PNBMUaHL2MM7LSnaCiPD8H2slbJNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ap7NF3d0; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version:Content-type; b=HZ0TaR0F42wtloxIa1kT2uPOYkkkzJVHuSHEVvEain/AzzAPArHmGM3xfoM9HbL1f42d7AEbwSHe2ZUs1C0qHoae6bRemD4ij9uhT7GqihMO54XO7F+Y8MCQGLtJTfKMYGEo+6DRdsnr6vEW6XOo+AIBLihuUzyE0Al7Hd4H3Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=smHoWrGm; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709658546;
+	t=1709658548;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Lnx86mIelCSQRXsx8I9hWhibAHGsTcpUKaR0USeZNW0=;
-	b=Ap7NF3d0Sr0EKWsRkQgdeVChuSEzDVhSUa/MJtFu0dRsvP3gkzFvAwqntvycYsVBoW9awy
-	qvjnlJ7L/RGALtWUgqoRSJEr7pjuVNXlIORh9clqmUtFnSX1i8TNqHeS2h0kKIeV3xAyZa
-	LG1U9cuJYOihSQlNW60/nJahEqUNwT8=
+	bh=MraLn1H3cyPePsk9ywys4sQEOsdtJQzZmf/lns7/wI4=;
+	b=smHoWrGmsdeJ9o2I/sXSbb/8LrOQCi30nPSaXKPznf9whoa31DK/NUjgOwd/oOHU0Yv0Qw
+	G4qnoj6qjFK2voml2hTSfzPkdMut9sSjfab/ZI0apVoInf2309MR4Sl/+hjrB3sN9wYPsq
+	Ylm59PH0HRxlJqZhPy/f0XOjjZOwYk8=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: pbonzini@redhat.com,
-	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 02/13] riscv: show_regs: Prepare for EFI images
-Date: Tue,  5 Mar 2024 18:09:01 +0100
-Message-ID: <20240305170858.395836-17-andrew.jones@linux.dev>
+	thuth@redhat.com,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org,
+	lvivier@redhat.com,
+	frankja@linux.ibm.com,
+	nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2 03/13] treewide: lib/stack: Fix backtrace
+Date: Tue,  5 Mar 2024 18:09:02 +0100
+Message-ID: <20240305170858.395836-18-andrew.jones@linux.dev>
 In-Reply-To: <20240305170858.395836-15-andrew.jones@linux.dev>
 References: <20240305170858.395836-15-andrew.jones@linux.dev>
 Precedence: bulk
@@ -62,60 +70,230 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-EFI images start with a header page and then _text, so the load
-address should use 'ImageBase' instead of _text. Just add the
-ImageBase symbol to the non-efi build too and then change show_regs()
-to use it instead. While there, add a couple convenience calculations
-for the PC and return address (pre-subtract the load address from
-them) in order to make it quicker for looking them up in an objdump.
+We should never pass the result of __builtin_frame_address(0) to
+another function since the compiler is within its rights to pop the
+frame to which it points before making the function call, as may be
+done for tail calls. Nobody has complained about backtrace(), so
+likely all compilations have been inlining backtrace_frame(), not
+dropping the frame on the tail call, or nobody is looking at traces.
+However, for riscv, when built for EFI, it does drop the frame on the
+tail call, and it was noticed. Preemptively fix backtrace() for all
+architectures.
 
+Fixes: 52266791750d ("lib: backtrace printing")
+Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/riscv/processor.c | 8 ++++----
- riscv/flat.lds        | 1 +
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ lib/arm/stack.c   | 13 +++++--------
+ lib/arm64/stack.c | 12 +++++-------
+ lib/riscv/stack.c | 12 +++++-------
+ lib/s390x/stack.c | 12 +++++-------
+ lib/stack.h       | 24 +++++++++++++++++-------
+ lib/x86/stack.c   | 12 +++++-------
+ 6 files changed, 42 insertions(+), 43 deletions(-)
 
-diff --git a/lib/riscv/processor.c b/lib/riscv/processor.c
-index 6c868b805cf7..ece7cbffc6dd 100644
---- a/lib/riscv/processor.c
-+++ b/lib/riscv/processor.c
-@@ -8,20 +8,20 @@
- #include <asm/processor.h>
- #include <asm/setup.h>
+diff --git a/lib/arm/stack.c b/lib/arm/stack.c
+index 7d081be7c6d0..66d18b47ea53 100644
+--- a/lib/arm/stack.c
++++ b/lib/arm/stack.c
+@@ -8,13 +8,16 @@
+ #include <libcflat.h>
+ #include <stack.h>
  
--extern unsigned long _text;
-+extern unsigned long ImageBase;
- 
- void show_regs(struct pt_regs *regs)
+-int backtrace_frame(const void *frame, const void **return_addrs,
+-		    int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
  {
- 	struct thread_info *info = current_thread_info();
--	uintptr_t text = (uintptr_t)&_text;
-+	uintptr_t loadaddr = (uintptr_t)&ImageBase;
- 	unsigned int w = __riscv_xlen / 4;
+ 	static int walking;
+ 	int depth;
+ 	const unsigned long *fp = (unsigned long *)frame;
  
--	printf("Load address: %" PRIxPTR "\n", text);
-+	printf("Load address: %" PRIxPTR "\n", loadaddr);
- 	printf("CPU%3d : hartid=%lx\n", info->cpu, info->hartid);
- 	printf("status : %.*lx\n", w, regs->status);
- 	printf("cause  : %.*lx\n", w, regs->cause);
- 	printf("badaddr: %.*lx\n", w, regs->badaddr);
--	printf("pc: %.*lx ra: %.*lx\n", w, regs->epc, w, regs->ra);
-+	printf("pc: %.*lx (%lx) ra: %.*lx (%lx)\n", w, regs->epc, regs->epc - loadaddr, w, regs->ra, regs->ra - loadaddr);
- 	printf("sp: %.*lx gp: %.*lx tp : %.*lx\n", w, regs->sp, w, regs->gp, w, regs->tp);
- 	printf("a0: %.*lx a1: %.*lx a2 : %.*lx a3 : %.*lx\n", w, regs->a0, w, regs->a1, w, regs->a2, w, regs->a3);
- 	printf("a4: %.*lx a5: %.*lx a6 : %.*lx a7 : %.*lx\n", w, regs->a4, w, regs->a5, w, regs->a6, w, regs->a7);
-diff --git a/riscv/flat.lds b/riscv/flat.lds
-index d4853f82ba1c..1ca501e6593b 100644
---- a/riscv/flat.lds
-+++ b/riscv/flat.lds
-@@ -30,6 +30,7 @@ PHDRS
++	if (current_frame)
++		fp = __builtin_frame_address(0);
++
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+ 		return 0;
+@@ -33,9 +36,3 @@ int backtrace_frame(const void *frame, const void **return_addrs,
+ 	walking = 0;
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0),
+-			       return_addrs, max_depth);
+-}
+diff --git a/lib/arm64/stack.c b/lib/arm64/stack.c
+index 82611f4b1815..f5eb57fd8892 100644
+--- a/lib/arm64/stack.c
++++ b/lib/arm64/stack.c
+@@ -8,7 +8,8 @@
  
- SECTIONS
+ extern char vector_stub_start, vector_stub_end;
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
  {
-+    PROVIDE(ImageBase = .);
-     PROVIDE(_text = .);
-     .text : { *(.init) *(.text) *(.text.*) } :text
-     . = ALIGN(4K);
+ 	const void *fp = frame;
+ 	static bool walking;
+@@ -17,6 +18,9 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 	bool is_exception = false;
+ 	unsigned long addr;
+ 
++	if (current_frame)
++		fp = __builtin_frame_address(0);
++
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+ 		return 0;
+@@ -54,9 +58,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 	walking = false;
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0),
+-			       return_addrs, max_depth);
+-}
+diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
+index 712a5478d547..d865594b9671 100644
+--- a/lib/riscv/stack.c
++++ b/lib/riscv/stack.c
+@@ -2,12 +2,16 @@
+ #include <libcflat.h>
+ #include <stack.h>
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
+ {
+ 	static bool walking;
+ 	const unsigned long *fp = (unsigned long *)frame;
+ 	int depth;
+ 
++	if (current_frame)
++		fp = __builtin_frame_address(0);
++
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+ 		return 0;
+@@ -24,9 +28,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 	walking = false;
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0),
+-			       return_addrs, max_depth);
+-}
+diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
+index 9f234a12adf6..d194f654e94d 100644
+--- a/lib/s390x/stack.c
++++ b/lib/s390x/stack.c
+@@ -14,11 +14,15 @@
+ #include <stack.h>
+ #include <asm/arch_def.h>
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
+ {
+ 	int depth = 0;
+ 	struct stack_frame *stack = (struct stack_frame *)frame;
+ 
++	if (current_frame)
++		stack = __builtin_frame_address(0);
++
+ 	for (depth = 0; stack && depth < max_depth; depth++) {
+ 		return_addrs[depth] = (void *)stack->grs[8];
+ 		stack = stack->back_chain;
+@@ -28,9 +32,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0),
+-			       return_addrs, max_depth);
+-}
+diff --git a/lib/stack.h b/lib/stack.h
+index 10fc2f793354..6edc84344b51 100644
+--- a/lib/stack.h
++++ b/lib/stack.h
+@@ -11,17 +11,27 @@
+ #include <asm/stack.h>
+ 
+ #ifdef HAVE_ARCH_BACKTRACE_FRAME
+-extern int backtrace_frame(const void *frame, const void **return_addrs,
+-			   int max_depth);
++extern int arch_backtrace_frame(const void *frame, const void **return_addrs,
++				int max_depth, bool current_frame);
++
++static inline int backtrace_frame(const void *frame, const void **return_addrs,
++				  int max_depth)
++{
++	return arch_backtrace_frame(frame, return_addrs, max_depth, false);
++}
++
++static inline int backtrace(const void **return_addrs, int max_depth)
++{
++	return arch_backtrace_frame(NULL, return_addrs, max_depth, true);
++}
+ #else
+-static inline int
+-backtrace_frame(const void *frame __unused, const void **return_addrs __unused,
+-		int max_depth __unused)
++extern int backtrace(const void **return_addrs, int max_depth);
++
++static inline int backtrace_frame(const void *frame, const void **return_addrs,
++				  int max_depth)
+ {
+ 	return 0;
+ }
+ #endif
+ 
+-extern int backtrace(const void **return_addrs, int max_depth);
+-
+ #endif
+diff --git a/lib/x86/stack.c b/lib/x86/stack.c
+index 5ecd97ce90b9..58ab6c4b293a 100644
+--- a/lib/x86/stack.c
++++ b/lib/x86/stack.c
+@@ -1,12 +1,16 @@
+ #include <libcflat.h>
+ #include <stack.h>
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
+ {
+ 	static int walking;
+ 	int depth = 0;
+ 	const unsigned long *bp = (unsigned long *) frame;
+ 
++	if (current_frame)
++		bp = __builtin_frame_address(0);
++
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+ 		return 0;
+@@ -23,9 +27,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 	walking = 0;
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0), return_addrs,
+-			       max_depth);
+-}
 -- 
 2.44.0
 
