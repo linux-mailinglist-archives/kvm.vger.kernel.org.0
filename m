@@ -1,153 +1,162 @@
-Return-Path: <kvm+bounces-10862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10863-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C87B1871424
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 04:10:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B45871473
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 04:55:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F0961F250F9
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 03:10:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 669BE1C21A76
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 03:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1BC2942C;
-	Tue,  5 Mar 2024 03:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4263C087;
+	Tue,  5 Mar 2024 03:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JOm0gI8q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FVOUEUva"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A4917C6C
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 03:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230AA27441;
+	Tue,  5 Mar 2024 03:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709608221; cv=none; b=MuEWwWRbwu+scrkuL/uZUXDbOx08CWeBfuhTt3OiKNppKHArYFaRLXSKL9N6Ecn2Ff8ada4w/XHq3tbB2gZlWx6hX3RBCWmt/4G6XkBiMfylCKPDc2ia41m3Cy/ls+N9kWglFB/9SrXQ1p45TEwbZ30inFqc/unoo9owd+92vCs=
+	t=1709610933; cv=none; b=e0ZBj3smbXO4smG6F3mc7AZq1gSsVGFSUVf0FksVRzuVcKTbWd6gt3Wf3nxRyTxED0Zfid0KWHc01fWIOF1b7XvWJx0hjZHJf1kvYSpAEyAvE5iVV4SmpTvX3Wplb2uH7O8xNnNZpv3EBxR5iU5ZpMwFIr3Mca/0bNcnZi+2Ndg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709608221; c=relaxed/simple;
-	bh=WeEgENVkgj4FbzgvewclCT729n9kD5VPiZmZZtVrPsI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ukZy+DI7g2m5Hwh2zdrbgVUi8hUa1Tcd+tKP4H0X3xAK0wbp0TRmctPcHralX7tUfwb4YYksgsJOhXs1J/mbYmgSaYmAgUL2WM3Prgnq5i7Kc30nzBUdP3h617rB+7ZaGy7jwY2QnEB+EaCK774ABEgEvCIaqzU8SkgoNIvOJDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JOm0gI8q; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-412a2c2ce88so22245e9.1
-        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 19:10:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709608218; x=1710213018; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gvn3MANUj/EZDfhu91vd14pnU3eGW+Y5/g+sIiJa3c8=;
-        b=JOm0gI8qa8J/YyxcqLC5/zUbDEYMXQbSiFTxid1xic7aqEQRRsnAb83eQZRauwBpyw
-         emWxdDMm6xmWnTcw21CyyCDjbTlSCfYMZMkawb9vCY0spHBw5bAdYtJLHViTEyK4r/EF
-         s8LLID4omDoLJ7p4zwxWScYjN8g7UWRL2Ddy/unPLBQhtjI42ZTnQz2a7jy7YZStXlin
-         n1pVP+NwkHqplH0C9TvCI3XVJ24CuGE1hS0f9Nc1XIzJ4xD58QHLgAG78NSRMVz7hi8e
-         NtdCyBUAqEgob46T/Qn94F6hsH0E6+nuzTW7kN1eSS1ZRuHLXzA5JjtzWT0HQ3K5f3sq
-         lxHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709608218; x=1710213018;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gvn3MANUj/EZDfhu91vd14pnU3eGW+Y5/g+sIiJa3c8=;
-        b=JQMYg3ExkSmvN69pjiLi3+KcJKdxI7zX+9LVvi5RlJY8IC4hlmm4dF9CHQniXNBgHl
-         96EVNKK9W/5xzcqi9QmCbaYOr91ztrlTz21zinxIVO5iHtOqFkZwNvjlPKYVz78A4QEp
-         o8qnpdbB0USyW4eNQ2dV8vsbKTCkClCsuHSSA6oNaLalQxHYZB93U82Tj6Qxu15qxFRW
-         7mUxf32bFYXvR2TVrelIwLp4iP6lIFwFC0Cr9pbrkWDT8P6DWPZ508KW7s8FawUt2HSl
-         tGEFOQLL3cCGWRq8/V5BAwsv0CLx67LutUJHxNgGP/SEvLawOoM+j1N++JiiZ4YZTTYA
-         PaCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvE0c5+sp3xAee0qxHUIRKTI+8XNLpnSAsbNPNyXMjDQnhC5BOKhV0FF7inwaVlCduMRkB1Tjk53WopOrzrBieoz9p
-X-Gm-Message-State: AOJu0Yy/EjH1GwHXwYeY5XsdfL2ygHN873WTI135GcNveQ0lbk9u13qA
-	KEwuZZ3MZkn+Sl63FzndCxott8BE82QKB2HU0CVB/adppJPdbFGkMTUAyMqUnf4WmZtSAHOIIrR
-	dXi/QDlMYfOsW/KyAJWxfNbCCSXpj4yrMRRrXUdgpgRX4Hw57Akui
-X-Google-Smtp-Source: AGHT+IHZdBV4XvLVjH2kYHplMlzfwvFzrZsluNZicC+ljUyG4+mrtZOBsCtDakMRE5TO1oiZkqqfMbCk0kJfLUeMUAE=
-X-Received: by 2002:a05:600c:4c11:b0:412:e4fc:b10 with SMTP id
- d17-20020a05600c4c1100b00412e4fc0b10mr13995wmp.3.1709608218354; Mon, 04 Mar
- 2024 19:10:18 -0800 (PST)
+	s=arc-20240116; t=1709610933; c=relaxed/simple;
+	bh=VKB1fixRTwhbAOmMV/PfK3xoWcTLoDoP3w8zcVJSMvE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cGMBkmKgczsD/iHzE4w3KSmJNvmZ/L303BvSHiQaJjDXRfKLZWQHvw1KPGatmZlc2Eh+4IgRWDtFDGlUZzWHPOUDxGujnzNGhqfe5pM9urTt+qWhkys2e2dnmy2A6EXl63Rlsp133XR0BblhbUr81c2YIcE9ZbP8l9/bud5Gz38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FVOUEUva; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709610931; x=1741146931;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VKB1fixRTwhbAOmMV/PfK3xoWcTLoDoP3w8zcVJSMvE=;
+  b=FVOUEUvaAdjglnxU79DhN5UGLD4lLXiOw2rRwiYsHxZdkNBzYlE1XePs
+   UbzPQo8NM5pQE5DXyoOL2KxdkaND23uHAEW+SZ+wqa0aMnBQL5QEiBgBr
+   gxMLuSx6rgy6sBDWh/fccG1llJBu4Xc0RAysH//ggiTqkAy2UA9sWFR1E
+   MfxXmy/vmhYytxgKYthdPuAKSI3ddJFah/jIFY+Zri/Ygl7Qk/kbxMy5V
+   rV9foQVG3ep+ruSCz9VrO/CIR/ufYJGVFVoCB4Vn6MVPg/m7DhtefDflR
+   5Y1PMwaT1MdBxQHXiznN39P20cAI5uaFWJfJ/KH7HmNHEmyO66EA4juT1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4001570"
+X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
+   d="scan'208";a="4001570"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 19:55:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
+   d="scan'208";a="9193182"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.125.243.127]) ([10.125.243.127])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 19:55:28 -0800
+Message-ID: <89d600e4-483f-46f3-945d-9e895f90d25b@intel.com>
+Date: Tue, 5 Mar 2024 11:55:24 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <39E9DB13-5FA3-4D1A-A573-7D58BA83B35C@fb.com> <20240304145932.4e685a38.alex.williamson@redhat.com>
- <51e57a7c-c8a1-4a18-a08b-d2c8fd5b35b3@redhat.com> <383DC340-967F-454A-B298-C59B3F70B63C@fb.com>
-In-Reply-To: <383DC340-967F-454A-B298-C59B3F70B63C@fb.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 4 Mar 2024 19:10:04 -0800
-Message-ID: <CALMp9eRwTEMUy+u-03U8Y20ez5_nyD=XA6Hs=OJYN2Pe80ms9A@mail.gmail.com>
-Subject: Re: Why does the vmovdqu works for passthrough device but crashes for
- emulated device with "illegal operand" error (in x86_64 QEMU, -accel = kvm) ?
-To: Xu Liu <liuxu@meta.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/16] KVM: x86/mmu: Pass full 64-bit error code when
+ handling page faults
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
+ Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+ David Matlack <dmatlack@google.com>
+References: <20240228024147.41573-1-seanjc@google.com>
+ <20240228024147.41573-5-seanjc@google.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20240228024147.41573-5-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 4, 2024 at 6:11=E2=80=AFPM Xu Liu <liuxu@meta.com> wrote:
->
-> Hey Alex and Paolo,
->
-> I saw there is some code related to AVX  https://elixir.bootlin.com/linux=
-/latest/source/arch/x86/kvm/emulate.c#L668
->
-> Does that mean in some special cases, kvm supports AVX instructions ?
-> I didn=E2=80=99t really know the big picture, so just guess what it is do=
-ing .
+On 2/28/2024 10:41 AM, Sean Christopherson wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Plumb the full 64-bit error code throughout the page fault handling code
+> so that KVM can use the upper 32 bits, e.g. SNP's PFERR_GUEST_ENC_MASK
+> will be used to determine whether or not a fault is private vs. shared.
+> 
+> Note, passing the 64-bit error code to FNAME(walk_addr)() does NOT change
+> the behavior of permission_fault() when invoked in the page fault path, as
+> KVM explicitly clears PFERR_IMPLICIT_ACCESS in kvm_mmu_page_fault().
+> 
+> Continue passing '0' from the async #PF worker, as guest_memfd() and thus
+> private memory doesn't support async page faults.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> [mdr: drop references/changes on rebase, update commit message]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> [sean: drop truncation in call to FNAME(walk_addr)(), rewrite changelog]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-The Avx bit was added in commit 1c11b37669a5 ("KVM: x86 emulator: add
-support for vector alignment"). It is not used.
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-> Thanks,
-> Xu
->
-> > On Mar 4, 2024, at 6:39=E2=80=AFPM, Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
-> >
-> > !-------------------------------------------------------------------|
-> > This Message Is From an External Sender
-> >
-> > |-------------------------------------------------------------------!
-> >
-> > On 3/4/24 22:59, Alex Williamson wrote:
-> >> Since you're not seeing a KVM_EXIT_MMIO I'd guess this is more of a KV=
-M
-> >> issue than QEMU (Cc kvm list).  Possibly KVM doesn't emulate vmovdqu
-> >> relative to an MMIO access, but honestly I'm not positive that AVX
-> >> instructions are meant to work on MMIO space.  I'll let x86 KVM expert=
-s
-> >> more familiar with specific opcode semantics weigh in on that.
-> >
-> > Indeed, KVM's instruction emulator supports some SSE MOV instructions b=
-ut not the corresponding AVX instructions.
-> >
-> > Vector instructions however do work on MMIO space, and they are used oc=
-casionally especially in combination with write-combining memory.  SSE supp=
-ort was added to KVM because some operating systems used SSE instructions t=
-o read and write to VRAM.  However, so far we've never received any reports=
- of OSes using AVX instructions on devices that QEMU can emulate (as oppose=
-d to, for example, GPU VRAM that is passed through).
-> >
-> > Thanks,
-> >
-> > Paolo
-> >
-> >> Is your "program" just doing a memcpy() with an mmap() of the PCI BAR
-> >> acquired through pci-sysfs or a userspace vfio-pci driver within the
-> >> guest?
-> >> In QEMU 4a2e242bbb30 ("memory: Don't use memcpy for ram_device
-> >> regions") we resolved an issue[1] where QEMU itself was doing a memcpy=
-()
-> >> to assigned device MMIO space resulting in breaking functionality of
-> >> the device.  IIRC memcpy() was using an SSE instruction that didn't
-> >> fault, but didn't work correctly relative to MMIO space either.
-> >> So I also wouldn't rule out that the program isn't inherently
-> >> misbehaving by using memcpy() and thereby ignoring the nature of the
-> >> device MMIO access semantics.  Thanks,
-> >> Alex
-> >> [1]https://bugs.launchpad.net/qemu/+bug/1384892
-> >
->
+
+> ---
+>   arch/x86/kvm/mmu/mmu.c          | 3 +--
+>   arch/x86/kvm/mmu/mmu_internal.h | 4 ++--
+>   arch/x86/kvm/mmu/mmutrace.h     | 2 +-
+>   3 files changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e2fd74e06ff8..408969ac1291 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5860,8 +5860,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+>   	}
+>   
+>   	if (r == RET_PF_INVALID) {
+> -		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa,
+> -					  lower_32_bits(error_code), false,
+> +		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa, error_code, false,
+>   					  &emulation_type);
+>   		if (KVM_BUG_ON(r == RET_PF_INVALID, vcpu->kvm))
+>   			return -EIO;
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 0eea6c5a824d..1fab1f2359b5 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -190,7 +190,7 @@ static inline bool is_nx_huge_page_enabled(struct kvm *kvm)
+>   struct kvm_page_fault {
+>   	/* arguments to kvm_mmu_do_page_fault.  */
+>   	const gpa_t addr;
+> -	const u32 error_code;
+> +	const u64 error_code;
+>   	const bool prefetch;
+>   
+>   	/* Derived from error_code.  */
+> @@ -288,7 +288,7 @@ static inline void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+>   }
+>   
+>   static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> -					u32 err, bool prefetch, int *emulation_type)
+> +					u64 err, bool prefetch, int *emulation_type)
+>   {
+>   	struct kvm_page_fault fault = {
+>   		.addr = cr2_or_gpa,
+> diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
+> index ae86820cef69..195d98bc8de8 100644
+> --- a/arch/x86/kvm/mmu/mmutrace.h
+> +++ b/arch/x86/kvm/mmu/mmutrace.h
+> @@ -260,7 +260,7 @@ TRACE_EVENT(
+>   	TP_STRUCT__entry(
+>   		__field(int, vcpu_id)
+>   		__field(gpa_t, cr2_or_gpa)
+> -		__field(u32, error_code)
+> +		__field(u64, error_code)
+>   		__field(u64 *, sptep)
+>   		__field(u64, old_spte)
+>   		__field(u64, new_spte)
+
 
