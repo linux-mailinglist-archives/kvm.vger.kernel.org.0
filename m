@@ -1,45 +1,46 @@
-Return-Path: <kvm+bounces-10953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B932B871D3B
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:19:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BDEA871D40
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:19:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E1C8B20D9D
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:19:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE98E1F23318
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F7C56758;
-	Tue,  5 Mar 2024 11:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6A558225;
+	Tue,  5 Mar 2024 11:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r002UdI0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oDVDa6DQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C0A548FB;
-	Tue,  5 Mar 2024 11:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F79557870;
+	Tue,  5 Mar 2024 11:18:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709637534; cv=none; b=ImC5dSX2H4w9Zcji9Zg+ObiyXaPt8Y8jtnNhsU0qQKDwD7LhOwL+oWolbYqsisIZ4HZmINfJ+W/fLh33jFE/GVKO8x2cFeHZVUkkvZKCr6wzbKrIPIi58HoPiQ5nPCTtlghTT/GHiaKY0sz7H962jkAW+765kz7ezASlO3ZYWR8=
+	t=1709637538; cv=none; b=NRXSY+LoGSe/9uufMFBlhMO0GvfcYPMFbibOZwRU8qWeyp1vAD5RO2G9Bzp0KbqwEpAuovxzmHXRUHY54VEW2yho6uENaWXRxZmJZx0lIAKaP3iKPGH7rPb309iP+DOGSJ+Y9xE6k4ZKbC1MRpyM9x9Plly4ixlFRb+AcdKNOGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709637534; c=relaxed/simple;
-	bh=NxhQVbYsKSwyvGgGk5qfaF5a/Y1wAzitab7stbdLKEk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VI9SaCC4Q8VqXbsinGVdNZrzh6IY88g73STuTSWR4u6Rl8j2LSfjq0TocVvhLuAHjkYgiepZp34bbds3d6H1MbAsXfIB5i/Jcv389rcvQPrzNVdnmF+mHxmjzRf0oSdPtgBQAiJySJ6vsw6no1d3TQhS/kgqb9fLLHjN0Fu7188=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r002UdI0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 531A2C433F1;
-	Tue,  5 Mar 2024 11:18:53 +0000 (UTC)
+	s=arc-20240116; t=1709637538; c=relaxed/simple;
+	bh=EE9BRQu4WZxxi1OZrE2CKyiBDx8STpwb4qcA00ZbW2s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=f5D6mFj+RtC2Sn28dy11Tlym4+zpsq8vFH2hOg0XErmu5LO7vQAsjwJRWx0AECG25CGsZxv0AU2YJEL3otmOSkptmbgQVV1/+4nGyJ844wi/qzyfhFmr7z1dELe5xqiRegIC8MvTbjJ1ADjHWS1NFtiIf0npKSnFM30x8AC3uwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oDVDa6DQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A2EEC43390;
+	Tue,  5 Mar 2024 11:18:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709637534;
-	bh=NxhQVbYsKSwyvGgGk5qfaF5a/Y1wAzitab7stbdLKEk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=r002UdI01gg2rXuVaeOK/D1fhwvZco1HuVKXX0raiRp4PUfsfXV1wc5RAqWyZvJGK
-	 mRH29l4+teuQlcz7MYEH/XOhAk5fjO/D/+ObXI96O5zHSMTDzcXW1equc4uEnI9Kre
-	 2BcxvXeVYU69p4m+lD0jFj6BxZAVk5SYUzkfEQXMq9ZQADbWBmK/mOgQSEndSNXrmU
-	 N0zqFP6N8iRdWJolF3xUwGboWwTM+WK03mm/r/4T6jt0HRL4N+JZfELJzmdMuRU5c2
-	 3ntsHZLDUHj1RvDsUQibOL0qdzbtw4jvy9b1b8vryqWssRm+htmwj9BHKQEKphbBXH
-	 1E2fwP28bIgFw==
+	s=k20201202; t=1709637538;
+	bh=EE9BRQu4WZxxi1OZrE2CKyiBDx8STpwb4qcA00ZbW2s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oDVDa6DQwNTcv3NwnWsgiiMKOIV7/K6NDlVTdgGBiYwnB7EisVZPVobiznADeFy7f
+	 ZNkpViGakTvQNDN5lcqWymg90055eoDxJGkjcEo0SLPgVGObALAW8gzuwJbHHbIrnQ
+	 GzaG57EN9Qa1s6MgxTTglPO3tlZGinvm+yuj5Uw6p0CXEuATlMU768QtIgpbaacA4s
+	 QEjkVrnPb4cNOVhk/MGHgtTp878F1cJdcZAkgg9j458WXiok8jtBXFcnRaKQl71Tny
+	 m6tk3S6ClgeMTJJuB+n/Eg16neudzyOU+cRnBAYeXVb8c2Fit16B8JJyUe8jG5cqdP
+	 Ikg+UfLv0Xv6A==
 From: Leon Romanovsky <leon@kernel.org>
 To: Christoph Hellwig <hch@lst.de>,
 	Robin Murphy <robin.murphy@arm.com>,
@@ -48,7 +49,8 @@ To: Christoph Hellwig <hch@lst.de>,
 	Will Deacon <will@kernel.org>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
 	Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>,
 	Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <kbusch@kernel.org>,
 	Sagi Grimberg <sagi@grimberg.me>,
@@ -74,12 +76,13 @@ Cc: Jonathan Corbet <corbet@lwn.net>,
 	"daniel@iogearbox.net" <daniel@iogearbox.net>,
 	Dan Williams <dan.j.williams@intel.com>,
 	"jack@suse.com" <jack@suse.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
 	Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Date: Tue,  5 Mar 2024 13:18:31 +0200
-Message-ID: <cover.1709635535.git.leon@kernel.org>
+Subject: [RFC RESEND 01/16] mm/hmm: let users to tag specific PFNs
+Date: Tue,  5 Mar 2024 13:18:32 +0200
+Message-ID: <a77609c9c9a09214e38b04133e44eee67fe50ab0.1709635535.git.leon@kernel.org>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <cover.1709635535.git.leon@kernel.org>
+References: <cover.1709635535.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,93 +91,135 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is complimentary part to the proposed LSF/MM topic.
-https://lore.kernel.org/linux-rdma/22df55f8-cf64-4aa8-8c0b-b556c867b926@linux.dev/T/#m85672c860539fdbbc8fe0f5ccabdc05b40269057
+From: Leon Romanovsky <leonro@nvidia.com>
 
-This is posted as RFC to get a feedback on proposed split, but RDMA, VFIO and
-DMA patches are ready for review and inclusion, the NVMe patches are still in
-progress as they require agreement on API first.
+Introduce new sticky flag, which isn't overwritten by HMM range fault.
+Such flag allows users to tag specific PFNs with extra data in addition
+to already filled by HMM.
 
-Thanks
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+---
+ include/linux/hmm.h |  3 +++
+ mm/hmm.c            | 34 +++++++++++++++++++++-------------
+ 2 files changed, 24 insertions(+), 13 deletions(-)
 
--------------------------------------------------------------------------------
-The DMA mapping operation performs two steps at one same time: allocates
-IOVA space and actually maps DMA pages to that space. This one shot
-operation works perfectly for non-complex scenarios, where callers use
-that DMA API in control path when they setup hardware.
-
-However in more complex scenarios, when DMA mapping is needed in data
-path and especially when some sort of specific datatype is involved,
-such one shot approach has its drawbacks.
-
-That approach pushes developers to introduce new DMA APIs for specific
-datatype. For example existing scatter-gather mapping functions, or
-latest Chuck's RFC series to add biovec related DMA mapping [1] and
-probably struct folio will need it too.
-
-These advanced DMA mapping APIs are needed to calculate IOVA size to
-allocate it as one chunk and some sort of offset calculations to know
-which part of IOVA to map.
-
-Instead of teaching DMA to know these specific datatypes, let's separate
-existing DMA mapping routine to two steps and give an option to advanced
-callers (subsystems) perform all calculations internally in advance and
-map pages later when it is needed.
-
-In this series, three users are converted and each of such conversion
-presents different positive gain:
-1. RDMA simplifies and speeds up its pagefault handling for
-   on-demand-paging (ODP) mode.
-2. VFIO PCI live migration code saves huge chunk of memory.
-3. NVMe PCI avoids intermediate SG table manipulation and operates
-   directly on BIOs.
-
-Thanks
-
-[1] https://lore.kernel.org/all/169772852492.5232.17148564580779995849.stgit@klimt.1015granger.net
-
-Chaitanya Kulkarni (2):
-  block: add dma_link_range() based API
-  nvme-pci: use blk_rq_dma_map() for NVMe SGL
-
-Leon Romanovsky (14):
-  mm/hmm: let users to tag specific PFNs
-  dma-mapping: provide an interface to allocate IOVA
-  dma-mapping: provide callbacks to link/unlink pages to specific IOVA
-  iommu/dma: Provide an interface to allow preallocate IOVA
-  iommu/dma: Prepare map/unmap page functions to receive IOVA
-  iommu/dma: Implement link/unlink page callbacks
-  RDMA/umem: Preallocate and cache IOVA for UMEM ODP
-  RDMA/umem: Store ODP access mask information in PFN
-  RDMA/core: Separate DMA mapping to caching IOVA and page linkage
-  RDMA/umem: Prevent UMEM ODP creation with SWIOTLB
-  vfio/mlx5: Explicitly use number of pages instead of allocated length
-  vfio/mlx5: Rewrite create mkey flow to allow better code reuse
-  vfio/mlx5: Explicitly store page list
-  vfio/mlx5: Convert vfio to use DMA link API
-
- Documentation/core-api/dma-attributes.rst |   7 +
- block/blk-merge.c                         | 156 ++++++++++++++
- drivers/infiniband/core/umem_odp.c        | 219 +++++++------------
- drivers/infiniband/hw/mlx5/mlx5_ib.h      |   1 +
- drivers/infiniband/hw/mlx5/odp.c          |  59 +++--
- drivers/iommu/dma-iommu.c                 | 129 ++++++++---
- drivers/nvme/host/pci.c                   | 220 +++++--------------
- drivers/vfio/pci/mlx5/cmd.c               | 252 ++++++++++++----------
- drivers/vfio/pci/mlx5/cmd.h               |  22 +-
- drivers/vfio/pci/mlx5/main.c              | 136 +++++-------
- include/linux/blk-mq.h                    |   9 +
- include/linux/dma-map-ops.h               |  13 ++
- include/linux/dma-mapping.h               |  39 ++++
- include/linux/hmm.h                       |   3 +
- include/rdma/ib_umem_odp.h                |  22 +-
- include/rdma/ib_verbs.h                   |  54 +++++
- kernel/dma/debug.h                        |   2 +
- kernel/dma/direct.h                       |   7 +-
- kernel/dma/mapping.c                      |  91 ++++++++
- mm/hmm.c                                  |  34 +--
- 20 files changed, 870 insertions(+), 605 deletions(-)
-
+diff --git a/include/linux/hmm.h b/include/linux/hmm.h
+index 126a36571667..b90902baa593 100644
+--- a/include/linux/hmm.h
++++ b/include/linux/hmm.h
+@@ -23,6 +23,7 @@ struct mmu_interval_notifier;
+  * HMM_PFN_WRITE - if the page memory can be written to (requires HMM_PFN_VALID)
+  * HMM_PFN_ERROR - accessing the pfn is impossible and the device should
+  *                 fail. ie poisoned memory, special pages, no vma, etc
++ * HMM_PFN_STICKY - Flag preserved on input-to-output transformation
+  *
+  * On input:
+  * 0                 - Return the current state of the page, do not fault it.
+@@ -36,6 +37,8 @@ enum hmm_pfn_flags {
+ 	HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
+ 	HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
+ 	HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
++	/* Sticky lag, carried from Input to Output */
++	HMM_PFN_STICKY = 1UL << (BITS_PER_LONG - 7),
+ 	HMM_PFN_ORDER_SHIFT = (BITS_PER_LONG - 8),
+ 
+ 	/* Input flags */
+diff --git a/mm/hmm.c b/mm/hmm.c
+index 277ddcab4947..9645a72beec0 100644
+--- a/mm/hmm.c
++++ b/mm/hmm.c
+@@ -44,8 +44,10 @@ static int hmm_pfns_fill(unsigned long addr, unsigned long end,
+ {
+ 	unsigned long i = (addr - range->start) >> PAGE_SHIFT;
+ 
+-	for (; addr < end; addr += PAGE_SIZE, i++)
+-		range->hmm_pfns[i] = cpu_flags;
++	for (; addr < end; addr += PAGE_SIZE, i++) {
++		range->hmm_pfns[i] &= HMM_PFN_STICKY;
++		range->hmm_pfns[i] |= cpu_flags;
++	}
+ 	return 0;
+ }
+ 
+@@ -202,8 +204,10 @@ static int hmm_vma_handle_pmd(struct mm_walk *walk, unsigned long addr,
+ 		return hmm_vma_fault(addr, end, required_fault, walk);
+ 
+ 	pfn = pmd_pfn(pmd) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+-	for (i = 0; addr < end; addr += PAGE_SIZE, i++, pfn++)
+-		hmm_pfns[i] = pfn | cpu_flags;
++	for (i = 0; addr < end; addr += PAGE_SIZE, i++, pfn++) {
++		hmm_pfns[i] &= HMM_PFN_STICKY;
++		hmm_pfns[i] |= pfn | cpu_flags;
++	}
+ 	return 0;
+ }
+ #else /* CONFIG_TRANSPARENT_HUGEPAGE */
+@@ -236,7 +240,7 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 			hmm_pte_need_fault(hmm_vma_walk, pfn_req_flags, 0);
+ 		if (required_fault)
+ 			goto fault;
+-		*hmm_pfn = 0;
++		*hmm_pfn = *hmm_pfn & HMM_PFN_STICKY;
+ 		return 0;
+ 	}
+ 
+@@ -253,14 +257,14 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 			cpu_flags = HMM_PFN_VALID;
+ 			if (is_writable_device_private_entry(entry))
+ 				cpu_flags |= HMM_PFN_WRITE;
+-			*hmm_pfn = swp_offset_pfn(entry) | cpu_flags;
++			*hmm_pfn = (*hmm_pfn & HMM_PFN_STICKY) | swp_offset_pfn(entry) | cpu_flags;
+ 			return 0;
+ 		}
+ 
+ 		required_fault =
+ 			hmm_pte_need_fault(hmm_vma_walk, pfn_req_flags, 0);
+ 		if (!required_fault) {
+-			*hmm_pfn = 0;
++			*hmm_pfn = *hmm_pfn & HMM_PFN_STICKY;
+ 			return 0;
+ 		}
+ 
+@@ -304,11 +308,11 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 			pte_unmap(ptep);
+ 			return -EFAULT;
+ 		}
+-		*hmm_pfn = HMM_PFN_ERROR;
++		*hmm_pfn = (*hmm_pfn & HMM_PFN_STICKY) | HMM_PFN_ERROR;
+ 		return 0;
+ 	}
+ 
+-	*hmm_pfn = pte_pfn(pte) | cpu_flags;
++	*hmm_pfn = (*hmm_pfn & HMM_PFN_STICKY) | pte_pfn(pte) | cpu_flags;
+ 	return 0;
+ 
+ fault:
+@@ -453,8 +457,10 @@ static int hmm_vma_walk_pud(pud_t *pudp, unsigned long start, unsigned long end,
+ 		}
+ 
+ 		pfn = pud_pfn(pud) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+-		for (i = 0; i < npages; ++i, ++pfn)
+-			hmm_pfns[i] = pfn | cpu_flags;
++		for (i = 0; i < npages; ++i, ++pfn) {
++			hmm_pfns[i] &= HMM_PFN_STICKY;
++			hmm_pfns[i] |= pfn | cpu_flags;
++		}
+ 		goto out_unlock;
+ 	}
+ 
+@@ -512,8 +518,10 @@ static int hmm_vma_walk_hugetlb_entry(pte_t *pte, unsigned long hmask,
+ 	}
+ 
+ 	pfn = pte_pfn(entry) + ((start & ~hmask) >> PAGE_SHIFT);
+-	for (; addr < end; addr += PAGE_SIZE, i++, pfn++)
+-		range->hmm_pfns[i] = pfn | cpu_flags;
++	for (; addr < end; addr += PAGE_SIZE, i++, pfn++) {
++		range->hmm_pfns[i] &= HMM_PFN_STICKY;
++		range->hmm_pfns[i] |= pfn | cpu_flags;
++	}
+ 
+ 	spin_unlock(ptl);
+ 	return 0;
 -- 
 2.44.0
 
