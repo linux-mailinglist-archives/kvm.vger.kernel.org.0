@@ -1,133 +1,126 @@
-Return-Path: <kvm+bounces-11039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09DA98724BB
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 17:48:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE3928724CF
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 17:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B924C28A0E7
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 16:48:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BA301C21DFD
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 16:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4151E14A9F;
-	Tue,  5 Mar 2024 16:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECD3DDA1;
+	Tue,  5 Mar 2024 16:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nmBYy50P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DIyeloCv"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5194B182DF
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 16:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5ECD271
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 16:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709657251; cv=none; b=l0u6D1NbQ584KnahgM2RY57dxl/6WL+H4MzRl0Il/pP448e8Bg4Go+a4lW/9uGWpIdvc9fY/w+OhdiOPEdeNJrHGmvK/B6cBKGuVi26/iqzEu7M6tgWwOzDvIt30KJZWI42R0+3XpxxYbmjDcgSnFHkNpAlQL1Eelx7kHLVDWSI=
+	t=1709657379; cv=none; b=XericJOGOh+f5Exh7oX2eYn2HUICu1hm3RtmJfNFAIo+swE4O4HqWytHyPCMtUApkWgczlP+b5HIEPL+rOn/1+bvg91eXnEBhV5GS7dWJvl3qDnYegbD9d6xTlBn44+W/Aq62cTx5Qm/cxAXj8WrJQaiVGH0JJcPYxobN81VEbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709657251; c=relaxed/simple;
-	bh=e4bXbx2KTvcdc5d5nvAkdolPvnGndbkaYf/rBUAU94E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=U/IVVfwjX+qgQF++zxdD7AcK3bUl8nSo9htdOHOae5BsqaRhZVGHKyoKdlFPjJyrtu/MwqxvCE+vNKYGFdci4K3nREwf7mrIZdnD/zfrNPs/GDZRVCcPIwyfPklZP+Ppe5zTvBHvnzpgI1cA7z9Be9Q9WEK8AhoJ32AMbfLlizI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nmBYy50P; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709657246;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L+jSEC4/nnRJYhJ0h7r/3oDRG2E8rjWg83W2hl/qlns=;
-	b=nmBYy50PjE2oyhy/nsjGkcSk/yrKuW3LfUHr9JJd4Xy/qikLIlPdfQP0/MHDBKn9FN3nd3
-	mUX3L2pUQzOShdhRXh222QwQJxITHn5SM+qZto3iPbT/prjLHMsFaP4Y/PawN0FpI8iFAr
-	JHrsAJuJP3781DfaRH1Tm6aAih1zQ54=
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com,
-	eric.auger@redhat.com,
-	nikos.nikoleris@arm.com,
-	shahuang@redhat.com,
-	pbonzini@redhat.com,
-	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3 18/18] arm64: efi: Add gitlab CI
-Date: Tue,  5 Mar 2024 17:46:42 +0100
-Message-ID: <20240305164623.379149-38-andrew.jones@linux.dev>
-In-Reply-To: <20240305164623.379149-20-andrew.jones@linux.dev>
-References: <20240305164623.379149-20-andrew.jones@linux.dev>
+	s=arc-20240116; t=1709657379; c=relaxed/simple;
+	bh=qbV5GBHxAnDxkjaJfXmOkJweCyzg1dMqs5oq5rbAGZU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VoXRk38QgN57jYROe/DtyDy088Ywhmy+gtAk3zFDyt5O/OCeqYtghHtpUZxscTfnc/GeELSeEyLs7KX/NEQPEvXAfVWetHPn3pQriBZQ1H0rfzZfp4uvjytQ9uP8K4Y4flLkDQqX/UhKK/0mHk1++NXPvbPn/j+5GSwHgQ0eBf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DIyeloCv; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-608ac8c5781so101601687b3.3
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 08:49:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709657377; x=1710262177; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xXZIc3wNbndhWEpVASmyszcv7nKEE3gY7hgo/qGmKlo=;
+        b=DIyeloCvJwx3wyJzp/sRdl21zVK9eSajcjoF6lrNH6PP2VwyHScJ9W0pFaR5X+gTQK
+         /Uzs5BVb5n4LKmvcS9Av+SbK2nrEl6HLDrLcQsksIfcexUSwwjFla/GYONfbAL6pAv4E
+         vTSTF5Bruy4cQLFjYqbFz91icTo+srspxw3uQj0/54kTgjsII6bQM12e3E5l00gKsIHt
+         5ZxxrgKnx9m8nEQ1WYngkrvZSPYvER2MK+P9VxGoIWkpW/iTLlxA5NHaJSASx0NHPNG4
+         bVg3mhu22BjqEIhQVagU3k86ngTFy96TKXjYOH4A75dWSvq0wCquBm74YbW6zUutU7RZ
+         QZiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709657377; x=1710262177;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xXZIc3wNbndhWEpVASmyszcv7nKEE3gY7hgo/qGmKlo=;
+        b=glCkudIzPXHPh3QA0iSGb+GQC/XILPIxsx6Sc8PkqGmbJlG7UC4mrudhWcqHhokqJQ
+         3BcScmwerKFaAIRBTSvlFcP2+3FGfjg4XRLkGSNxF/Xx9aCmK8bOZM53buH75U688cW+
+         vFWQrGlLY3PzncU8HCG/M112s5VT4Q6LJQOov4gCCBb325cO5mZoc0aQP/zCSU7psm3e
+         TFyc+01AmWQR+HdNOEcr+gHEA8WC1BZc8udFpesU2XYdF3c62QvOy/NQmq4n8ng1Yj2s
+         HXadPQz7XrmsMXtC6NYDfjDzQoNyvYQ9m20PES0tNkq3V/IVCWiBkt8OM2mC2yAZg5mR
+         jYvA==
+X-Forwarded-Encrypted: i=1; AJvYcCWEyEr+nDvFpBjJpySETOUi9ONP7ZmbXWdWajGb/Ysj1uN9IU0MjXmWYNw3On4BAgVRWBbrSzyzKYFrIFDjKlKO/Rrk
+X-Gm-Message-State: AOJu0YwRPam4BwbIFyqrcQ0Rltbj6yl/2OHBN4zuZKoNBrgeXXJ71VDc
+	CvLO24k4ItTeWb+5K5gtpA6LYkMTn+inNSGfLy9KDPThYVFdM+YNJ0b5gAF82zedP99x8njDZA2
+	kRA==
+X-Google-Smtp-Source: AGHT+IELJZj61IeskW7Yq6+29Bob4zlRg4/whoNJBc6e44I0oxelmb9XYLdfKu21EAsyvqGMguVZS0coKnE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:110a:b0:dbd:b165:441 with SMTP id
+ o10-20020a056902110a00b00dbdb1650441mr3120332ybu.0.1709657377037; Tue, 05 Mar
+ 2024 08:49:37 -0800 (PST)
+Date: Tue, 5 Mar 2024 08:49:35 -0800
+In-Reply-To: <722904540.5000784.1709650623262.JavaMail.zimbra@sjtu.edu.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <722904540.5000784.1709650623262.JavaMail.zimbra@sjtu.edu.cn>
+Message-ID: <ZedNH2DFpsg5RvHC@google.com>
+Subject: Re: [PATCH] KVM:SVM: Flush cache only on CPUs running SEV guest
+From: Sean Christopherson <seanjc@google.com>
+To: Zheyun Shen <szy0127@sjtu.edu.cn>
+Cc: pbonzini <pbonzini@redhat.com>, tglx <tglx@linutronix.de>, 
+	thomas lendacky <thomas.lendacky@amd.com>, kvm <kvm@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-Now that we have efi-direct and tests run much faster, add a few
-(just selftests) to the CI. Test with both DT and ACPI. While
-touching the file update arm and arm64's pass/fail criteria to
-the new style that ensures they're not all skips.
+On Tue, Mar 05, 2024, Zheyun Shen wrote:
+> On Mon, Mar 04, 2024, Sean Christopherson wrote:
+> > Instead of copy+paste WBINVD+cpumask_clear() everywhere, add a prep patch to
+> > replace relevant open coded calls to wbinvd_on_all_cpus() with calls to
+> > sev_guest_memory_reclaimed().  Then only sev_guest_memory_reclaimed() needs to
+> > updated, and IMO it helps document why KVM is blasting WBINVD.
+> 
+> > I'm also pretty sure this should be a cpumask_var_t, and dynamically allocated
+> > as appropriate.  And at that point, it should be allocated and filled if and only
+> > if the CPU doesn't have X86_FEATURE_SME_COHERENT
+> 
+> I notice that several callers of wbinvd_on_all_cpus() must use wbinvd to flush cache
+> instead of using clflush or just doing nothing if the CPU has X86_FEATURE_SME_COHERENT,
+> according to https://github.com/AMDESE/linux/commit/2e2409afe5f0c284c7dfe5504058e8d115806a7d
+> Therefore, I think the flush operation should be divided into two functions. One is the 
+> optimized wbinvd, which does not consider X86_FEATURE_SME_COHERENT, and the other is 
+> sev_guest_memory_reclaimed(), which should use clflush instead of wbinvd in case of 
+> X86_FEATURE_SME_COHERENT. Thus the cpumask struct should be exist whether the CPU has
+> X86_FEATURE_SME_COHERENT or not.
 
-Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- .gitlab-ci.yml | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+FWIW, the usage of sev_flush_asids() isn't tied to a single VM, i.e. KVM can't use
+per-VM tracking in that case.  But...
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 71d986e9884e..ff34b1f5062e 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -44,7 +44,35 @@ build-aarch64:
-       selftest-vectors-user
-       timer
-       | tee results.txt
-- - if grep -q FAIL results.txt ; then exit 1 ; fi
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+
-+build-aarch64-efi:
-+ extends: .intree_template
-+ script:
-+ - dnf install -y qemu-system-aarch64 gcc-aarch64-linux-gnu edk2-aarch64
-+ - ./configure --arch=aarch64 --cross-prefix=aarch64-linux-gnu- --enable-efi --enable-efi-direct
-+ - make -j2
-+ - ACCEL=tcg MAX_SMP=8 ./run_tests.sh
-+      selftest-setup
-+      selftest-smp
-+      selftest-vectors-kernel
-+      selftest-vectors-user
-+      | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+
-+build-aarch64-efi-acpi:
-+ extends: .intree_template
-+ script:
-+ - dnf install -y qemu-system-aarch64 gcc-aarch64-linux-gnu edk2-aarch64
-+ - ./configure --arch=aarch64 --cross-prefix=aarch64-linux-gnu- --enable-efi --enable-efi-direct
-+ - make -j2
-+ - EFI_USE_ACPI=y ACCEL=tcg MAX_SMP=8 ./run_tests.sh
-+      selftest-setup
-+      selftest-smp
-+      selftest-vectors-kernel
-+      selftest-vectors-user
-+      | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
- build-arm:
-  extends: .outoftree_template
-@@ -59,7 +87,7 @@ build-arm:
-      pci-test pmu-cycle-counter gicv2-ipi gicv2-mmio gicv3-ipi gicv2-active
-      gicv3-active
-      | tee results.txt
-- - if grep -q FAIL results.txt ; then exit 1 ; fi
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
- build-ppc64be:
-  extends: .outoftree_template
--- 
-2.44.0
+> Besides, if we consider X86_FEATURE_SME_COHERENT to get rid of wbinvd in sev_guest_memory_reclaimed(),
+> we should ensure the clflush is called on corresponding addresses, as mentioned in  
+> https://github.com/AMDESE/linux/commit/d45829b351ee6ec5f54dd55e6aca1f44fe239fe6 
+> However, caller of sev_guest_memory_reclaimed() (e.g., kvm_mmu_notifier_invalidate_range_start()) 
+> only get HVA belongs to userspace(e.g., qemu), so calling clflush with this HVA may 
+> lead to a page fault in kernel. I was wondering if notifying userspace applications to 
+> do clflush themselves is the only solution here. But for the sake of safety, maybe KVM 
+> cannot left the work for untrusted userspace applications?
 
+Ugh, right, I forgot the whole mess with userspace virtual addresses.  Bummer.
+
+> Or should I just temporarily ignore the X86_FEATURE_SME_COHERENT scenario
+> which is hard to implement, and just refine the patch only for
+> wbinvd_on_all_cpus() ?
+
+Ignore X86_FEATURE_SME_COHERENT and just refine the patch to optimize WBINVDs that
+are tied to a specific VM.  I simply forgot that KVM only uses CLFLUSHOPT when
+purging VMSA pages.
 
