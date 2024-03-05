@@ -1,85 +1,78 @@
-Return-Path: <kvm+bounces-10977-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10978-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A28DA871EAE
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:12:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B44B871F38
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:30:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4D991C24440
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:12:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EC2D1C2534E
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E379F5A110;
-	Tue,  5 Mar 2024 12:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9F65B21C;
+	Tue,  5 Mar 2024 12:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="BcQnRcUM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="edE9W4ex"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588147484
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 12:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5ABA5A4C0;
+	Tue,  5 Mar 2024 12:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709640749; cv=none; b=Gs3+iN93cmWLAIGCOh7ecoPDQMz7JLUuMZENzkjIbWNGDCAlt6BEL7h+W8YW6wmgWvWB3vdQYhnNB87v4xUNi19jiRjr0AbGy5WslmmZX+KQnBNTHQ1IqO0AVGSmza2FIF40ugdD/JKY4b8/GecZCBsD2dc95b8OMRlasuUU48g=
+	t=1709641780; cv=none; b=hfYNNUReNlZMXRZxX7n+9ff5ePUYIFOeRNJ8GMdEs3H9zzy+kyaZ3isQJxiQMRtBUHfCrhvUjQEX/uLDEdb0tMg8UJdHEWs0sKGCEOnAnFdjRJz2/EjNtMYAOt50jNj8GPDKNIne5VPU/POin1oodQSoLmnx7XedopnZKt6fwbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709640749; c=relaxed/simple;
-	bh=ocMIsDhlS5WldfjDukI+u3DpHI4pPjCBjT49loOkVsY=;
+	s=arc-20240116; t=1709641780; c=relaxed/simple;
+	bh=P93hlccw+xdxdbFmx+6Lr6WNHOyANq8FCYqtCUP40hE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SrVYB5VXmQC9X+3zEZIiVE0sV5E7aQrBqoOiLqbn9eH+KK2Pe4FztryBC9Necs3nYWgDS3I/eSdriWbr9JIe036OABEvmk0OOdRFf1XiU/4zXtK/e2BVLvIH7ydoyOwlhOaTt75ONVHFJ+fyMrHgukfj8oZWOeFps5rMSMa6PUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=BcQnRcUM; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d27fef509eso79489891fa.3
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 04:12:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709640745; x=1710245545; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5m7gYDKto0sFQCZ782GSun8unKW9cIcfeVFfoYHYElE=;
-        b=BcQnRcUMVgmVGzlL57LCww0DbqJ5HIE7Jxss4YB7RW8g+JTeHwu6R/Lav5+i85KmhE
-         bzEx31oRm2rcFu+nnRcSuYN5tronlW2LIryEZiDRB8kPXUGZCHZsxYwDomVDCfCUJx/4
-         YxXaYenVaqp5yDUfbljIYP1GW7xZra71EuJmcDNMP4rAWLOEfWbUfH0Ucd24VMlDhHE9
-         gIFnTKRju9lgV9LlvFE/4KEc1n2Y97wv2VfAzG7VPobRHppuHxJOUZjCvJsN3dhPljMM
-         O+BrXbIpxKldSUKASAIhiKv1yjWnOMTTyMm3vZ2RB5pZWpG7Oxu1efqN6IrmQmBfqzeL
-         ChUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709640745; x=1710245545;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5m7gYDKto0sFQCZ782GSun8unKW9cIcfeVFfoYHYElE=;
-        b=qMDHaQF1sbALCOroifZjMwum+82xwXFYTI5ExlDQe956iXTBrtYCEQYwi5Hagaqore
-         YnFHXcHz6sH0YPyDO9wN+qaL9mBg3W+Az5luRAPUf27aks8zjdjMKRtrYbHWRDAWwf2G
-         Wr3YiWK40r/jp7GCeLCJxrfvb0Se0v6FUQOvcYdBnLG0VP4mlh0wDfxF3DKGaJoQcoA9
-         +rL2xkUcth3sPDfvvfPL7vFVjglJwAlZIDBFKBxWp2+qS5TTvMvcwY9xWPOXShUj4qm+
-         0lfMne33kfL5ZyFmlvv7j/YLDEpvx72+t4R29N1s4KhLJyWT/Yrb/XtRcYAgEr1Ac3Gw
-         YZHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxxUpnHYh/MP4GTB2P51B1iuiwShLHb4SL5LGXvUb3b+1LgZHUcSd6tRXjo9rjZDAzGZuqQIhilRZijnzG7njBFBpU
-X-Gm-Message-State: AOJu0Yy7qVhqVEkQGahkLP1QNL5Q/Mx46Xf2tlVzQSILWCnJqry7FNDs
-	tZrLPFDob2AjI9RAueELCj0zxN1h4B6ptgLBJ38Irbx0dttqg5u3XiPq2sxvB58=
-X-Google-Smtp-Source: AGHT+IGD7Z2QBwGwn4YryjUN6znpGI3JV/UOun2bVjCoidWV/1/p0sKcqoMZxU2kw7bIWMzf+PXSuw==
-X-Received: by 2002:a2e:300d:0:b0:2d2:9b77:6e38 with SMTP id w13-20020a2e300d000000b002d29b776e38mr1074386ljw.27.1709640745431;
-        Tue, 05 Mar 2024 04:12:25 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id v29-20020a50a45d000000b005649f17558bsm6021422edb.42.2024.03.05.04.12.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 04:12:25 -0800 (PST)
-Date: Tue, 5 Mar 2024 13:12:24 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, 
-	Laurent Vivier <lvivier@redhat.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 14/32] powerpc: general interrupt tests
-Message-ID: <20240305-7ef885812bb2490a8110f301@orel>
-References: <20240226101218.1472843-1-npiggin@gmail.com>
- <20240226101218.1472843-15-npiggin@gmail.com>
- <1b89e399-1160-4fca-a9d7-89d60fc9a710@redhat.com>
- <CZLGGDYWE8P0.VKR8WWH6B6LM@wheely>
- <542716d5-2db2-4bba-9c58-f5fa32b22d52@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZrRZobJVkqLI6tkAw6zoFQ1Er+LgswJYKbECr2TeydSJK4T3yADjX+fOdGgUbgsUGWQpIKoOocd9PCW9Moq+d8RRtt9DkjIRMU5vLZzfoulBJmm5/p4OF7U1ECFXd6RaWwlP1qdVefOxy6qb4zEexBOJzjkF+9dukApA8zwXY4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=edE9W4ex; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AE6CC43394;
+	Tue,  5 Mar 2024 12:29:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709641780;
+	bh=P93hlccw+xdxdbFmx+6Lr6WNHOyANq8FCYqtCUP40hE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=edE9W4exQ/mLyQoFZ0ecW6HlLDr9Z099WMeUuaFujQg2FZTZLAQnGDjK498JWa0ni
+	 hqFMO5hIGroOgoA/TTNGplduxItE+LvgFwOBWjD33xVKfmTFkJ5U+9CtOOpdfL7udr
+	 qhAc/itUetIkKuPj6Jv0+bNurWlOja/yk+vF05wSc8ytz4RcHmc2Kw2jU+9t5qdqtK
+	 2MmLJphfTq56uO+Iq2YwNgSXMY5Hs5aBypVWlDYoEFPocQlvJgPL/m9HUD+GamQVTE
+	 DFv6scJ4w1oMC0aHDm5eYXuKeZW4m+eUbOnkHeJ/XxbIduCTrPWiF//VLFhaMH4KXv
+	 NmAjytaBBw2hw==
+Date: Tue, 5 Mar 2024 14:29:35 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240305122935.GB36868@unreal>
+References: <cover.1709635535.git.leon@kernel.org>
+ <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,63 +81,148 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <542716d5-2db2-4bba-9c58-f5fa32b22d52@redhat.com>
+In-Reply-To: <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com>
 
-On Tue, Mar 05, 2024 at 07:26:18AM +0100, Thomas Huth wrote:
-> On 05/03/2024 03.19, Nicholas Piggin wrote:
-> > On Fri Mar 1, 2024 at 10:41 PM AEST, Thomas Huth wrote:
-> > > On 26/02/2024 11.12, Nicholas Piggin wrote:
-> > > > Add basic testing of various kinds of interrupts, machine check,
-> > > > page fault, illegal, decrementer, trace, syscall, etc.
-> > > > 
-> > > > This has a known failure on QEMU TCG pseries machines where MSR[ME]
-> > > > can be incorrectly set to 0.
-> > > 
-> > > Two questions out of curiosity:
-> > > 
-> > > Any chance that this could be fixed easily in QEMU?
+On Tue, Mar 05, 2024 at 12:05:23PM +0000, Robin Murphy wrote:
+> On 2024-03-05 11:18 am, Leon Romanovsky wrote:
+> > This is complimentary part to the proposed LSF/MM topic.
+> > https://lore.kernel.org/linux-rdma/22df55f8-cf64-4aa8-8c0b-b556c867b926@linux.dev/T/#m85672c860539fdbbc8fe0f5ccabdc05b40269057
 > > 
-> > Yes I have a fix on the mailing list. It should get into 9.0 and
-> > probably stable.
-> 
-> Ok, then it's IMHO not worth the effort to make the k-u-t work around this
-> bug in older QEMU versions.
-> 
-> > > Or is there a way to detect TCG from within the test? (for example, we have
-> > > a host_is_tcg() function for s390x so we can e.g. use report_xfail() for
-> > > tests that are known to fail on TCG there)
+> > This is posted as RFC to get a feedback on proposed split, but RDMA, VFIO and
+> > DMA patches are ready for review and inclusion, the NVMe patches are still in
+> > progress as they require agreement on API first.
 > > 
-> > I do have a half-done patch which adds exactly this.
+> > Thanks
 > > 
-> > One (minor) annoyance is that it doesn't seem possible to detect QEMU
-> > version to add workarounds. E.g., we would like to test the fixed
-> > functionality, but older qemu should not. Maybe that's going too much
-> > into a rabbit hole. We *could* put a QEMU version into device tree
-> > to deal with this though...
+> > -------------------------------------------------------------------------------
+> > The DMA mapping operation performs two steps at one same time: allocates
+> > IOVA space and actually maps DMA pages to that space. This one shot
+> > operation works perfectly for non-complex scenarios, where callers use
+> > that DMA API in control path when they setup hardware.
+> > 
+> > However in more complex scenarios, when DMA mapping is needed in data
+> > path and especially when some sort of specific datatype is involved,
+> > such one shot approach has its drawbacks.
+> > 
+> > That approach pushes developers to introduce new DMA APIs for specific
+> > datatype. For example existing scatter-gather mapping functions, or
+> > latest Chuck's RFC series to add biovec related DMA mapping [1] and
+> > probably struct folio will need it too.
+> > 
+> > These advanced DMA mapping APIs are needed to calculate IOVA size to
+> > allocate it as one chunk and some sort of offset calculations to know
+> > which part of IOVA to map.
 > 
-> No, let's better not do this - hardwired version checks are often a bad
-> idea, e.g. when a bug is in QEMU 8.0.0 and 8.1.0, it could be fixed in 8.0.1
-> and then it could get really messy with the version checks...
->
+> I don't follow this part at all - at *some* point, something must know a
+> range of memory addresses involved in a DMA transfer, so that's where it
+> should map that range for DMA. 
 
-We've tried to address this type of issue (but for KVM, so kernel versions
-instead of QEMU versions) in the past by inventing the errata framework,
-which is based on environment variables. Instead of checking for versions,
-we check for a hash (which is just the commit hash of the fix). While we
-do guess that the fix is present by version number, it can always be
-manually set as present as well. In any case, the test is simply skipped
-when the errata environment variable isn't present, so in the worst case
-we lose some coverage we could have had, but the rest of the tests still
-complete and we don't get the same failures over and over. An example of
-its use is in arm/psci.c. Look for the ERRATA() calls.
+In all presented cases in this series, the overall DMA size is known in
+advance. In RDMA case, it is known when user registers the memory, in
+VFIO, when live migration is happening and in NVMe, when BIO is created.
 
-We could extend the errata framework for QEMU/TCG. We just need to add
-another bit of data to the errata.txt file for it to know it should
-check QEMU versions instead of kernel versions for those errata. We can
-also ignore the errata framework and just create the errata environment
-variable which would by 'n' by default now and later, after distros have
-fixes, it could be changed to 'y'.
+So once we allocated IOVA, we will need to link ranges, which si the
+same as map but without IOVA allocation.
 
-Thanks,
-drew
+> Even in a badly-designed system where the
+> point it's most practical to make the mapping is further out and only knows
+> that DMA will touch some subset of a buffer, but doesn't know exactly what
+> subset yet, you'd usually just map the whole buffer. I don't see why the DMA
+> API would ever need to know about anything other than pages/PFNs and
+> dma_addr_ts (yes, it does also accept them being wrapped together in
+> scatterlists; yes, scatterlists are awful and it would be nice to replace
+> them with a better general DMA descriptor; that is a whole other subject of
+> its own).
+
+This is exactly what was done here, we got rid of scatterlists.
+
+> 
+> > Instead of teaching DMA to know these specific datatypes, let's separate
+> > existing DMA mapping routine to two steps and give an option to advanced
+> > callers (subsystems) perform all calculations internally in advance and
+> > map pages later when it is needed.
+> 
+> From a brief look, this is clearly an awkward reinvention of the IOMMU API.
+> If IOMMU-aware drivers/subsystems want to explicitly manage IOMMU address
+> spaces then they can and should use the IOMMU API. Perhaps there's room for
+> some quality-of-life additions to the IOMMU API to help with common usage
+> patterns, but the generic DMA mapping API is absolutely not the place for
+> it.
+
+DMA mapping gives nice abstraction from IOMMU, and allows us to have
+same flow for IOMMU and non-IOMMU flows without duplicating code, while
+you suggest to teach almost every part in the kernel to know about IOMMU.
+
+In this series, we changed RDMA, VFIO and NVMe, and in all cases we
+removed more code than added. From what I saw, VDPA and virito-blk will
+benefit from proposed API too.
+
+Even in this RFC, where Chaitanya did partial job and didn't convert
+whole driver, the gain is pretty obvious:
+https://lore.kernel.org/linux-rdma/016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org/T/#u
+
+ drivers/nvme/host/pci.c | 220 ++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 1 file changed, 49 insertions(+), 171 deletions(-)
+
+
+Thanks
+
+> 
+> Thanks,
+> Robin.
+> 
+> > In this series, three users are converted and each of such conversion
+> > presents different positive gain:
+> > 1. RDMA simplifies and speeds up its pagefault handling for
+> >     on-demand-paging (ODP) mode.
+> > 2. VFIO PCI live migration code saves huge chunk of memory.
+> > 3. NVMe PCI avoids intermediate SG table manipulation and operates
+> >     directly on BIOs.
+> > 
+> > Thanks
+> > 
+> > [1] https://lore.kernel.org/all/169772852492.5232.17148564580779995849.stgit@klimt.1015granger.net
+> > 
+> > Chaitanya Kulkarni (2):
+> >    block: add dma_link_range() based API
+> >    nvme-pci: use blk_rq_dma_map() for NVMe SGL
+> > 
+> > Leon Romanovsky (14):
+> >    mm/hmm: let users to tag specific PFNs
+> >    dma-mapping: provide an interface to allocate IOVA
+> >    dma-mapping: provide callbacks to link/unlink pages to specific IOVA
+> >    iommu/dma: Provide an interface to allow preallocate IOVA
+> >    iommu/dma: Prepare map/unmap page functions to receive IOVA
+> >    iommu/dma: Implement link/unlink page callbacks
+> >    RDMA/umem: Preallocate and cache IOVA for UMEM ODP
+> >    RDMA/umem: Store ODP access mask information in PFN
+> >    RDMA/core: Separate DMA mapping to caching IOVA and page linkage
+> >    RDMA/umem: Prevent UMEM ODP creation with SWIOTLB
+> >    vfio/mlx5: Explicitly use number of pages instead of allocated length
+> >    vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+> >    vfio/mlx5: Explicitly store page list
+> >    vfio/mlx5: Convert vfio to use DMA link API
+> > 
+> >   Documentation/core-api/dma-attributes.rst |   7 +
+> >   block/blk-merge.c                         | 156 ++++++++++++++
+> >   drivers/infiniband/core/umem_odp.c        | 219 +++++++------------
+> >   drivers/infiniband/hw/mlx5/mlx5_ib.h      |   1 +
+> >   drivers/infiniband/hw/mlx5/odp.c          |  59 +++--
+> >   drivers/iommu/dma-iommu.c                 | 129 ++++++++---
+> >   drivers/nvme/host/pci.c                   | 220 +++++--------------
+> >   drivers/vfio/pci/mlx5/cmd.c               | 252 ++++++++++++----------
+> >   drivers/vfio/pci/mlx5/cmd.h               |  22 +-
+> >   drivers/vfio/pci/mlx5/main.c              | 136 +++++-------
+> >   include/linux/blk-mq.h                    |   9 +
+> >   include/linux/dma-map-ops.h               |  13 ++
+> >   include/linux/dma-mapping.h               |  39 ++++
+> >   include/linux/hmm.h                       |   3 +
+> >   include/rdma/ib_umem_odp.h                |  22 +-
+> >   include/rdma/ib_verbs.h                   |  54 +++++
+> >   kernel/dma/debug.h                        |   2 +
+> >   kernel/dma/direct.h                       |   7 +-
+> >   kernel/dma/mapping.c                      |  91 ++++++++
+> >   mm/hmm.c                                  |  34 +--
+> >   20 files changed, 870 insertions(+), 605 deletions(-)
+> > 
 
