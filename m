@@ -1,131 +1,155 @@
-Return-Path: <kvm+bounces-10982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F3C787204C
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:35:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A36B0872086
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40C141C22C44
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:35:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BADAB2824A
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFB285C6C;
-	Tue,  5 Mar 2024 13:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15B685C70;
+	Tue,  5 Mar 2024 13:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="KbWfAVby"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nyYYkv5T"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48AD85C45
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D0B5915D
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709645709; cv=none; b=Ohbi2aiBDiRZITgoaOpSHEx1LUWu+xYqxncxEaKClWcUEJIgyHO0q8x3qWV2a0nwt8GZadsXuAqyjskTIh3W1hZGLiQQukXcUP8vgCNNDpy8anA+lYdMRVdnOrOGDqBA81/axouqFhuDFrzLoDNBGXUOKLIgTTikl7ZavI3Pngs=
+	t=1709646148; cv=none; b=RCZrehV8Rr7+a4r319rTTILWCZ4aQwJtWcq1VLJoRsq6sFTc2/f2Iw00lgH5KPkeFoVF360oSAhd9/bqH1IEg8QBT2QrTdvR1ea4ooMTRoYFtmbPG74J/WOZc9f0IXX9meK3DyF9xkAroB6g8rz6fXEIffBgDEBR4IG6MegrGRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709645709; c=relaxed/simple;
-	bh=v7c1xsLMInn/5Mchbg4we+VnwJuPNzz5Azawwmq4BXI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bypqhDtuPALOrWIoeDLphwzf2wFXWqUWcP9l7d03LUHVc1rP2cYxte5x6eCH11liaB1EEXgA3Sj3l5ZUBGYMgcv/2LF4soc+5Nm3pvQFL0pfesD8ntLvjlvj5T+tfHwn90wEL8ffhZMrgXcOLKFWg46jU35dIZ648n3dfNtISss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=KbWfAVby; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a44ad785a44so474868366b.3
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:35:07 -0800 (PST)
+	s=arc-20240116; t=1709646148; c=relaxed/simple;
+	bh=eHLhfDgOogjVHUo6amSlxecKkQJfo5wNJOFQOnEC/fw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XCCpCVYOZbHZU5qcdWYLi9cp4FTEqUXcVSwuZXHuhWXsK2P6vmygnqE2j/FrZujaZQJwCuAzDjHAxamZXK73P0ojhHeAOf1iBPh9elwqmH624i0xHm485s1xo9QrOovml62lpUVwHdjX13utQ+Bo4jNNoTNB3G14Mm3yoQ5Vl+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nyYYkv5T; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5645960cd56so857690a12.1
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:42:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709645706; x=1710250506; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ae4+Cp+l1bY4RKGHb6iJ6Of9BTh3GCN02weE9qYMRq0=;
-        b=KbWfAVbygscMmPAEHW+Jl5Xd8WOKboMtwOtMLypCRXw8MfnycSGk7Cws1Vt0zPiEbL
-         RpESpsUES9ExJ1py+jLZLIBVi0JhPSBbt015T9P3H3taHl4buf5Q/g1jrlVGdyR0D7Ci
-         3WjkkM8qNLMDPa5dY/Krbd8k+Qq9y4dMQc7gghRpK/gHtrsmi6XWE58QAjCXB8MAq01q
-         gA+YepLtDLJu49Vv7f042zbYg70IFgVoY77CC2IZ1TDPhdBJrI3J3wtsWtORZtcMZXnZ
-         MNPiQrWpV4eD66wkgWnVpWKTdzI22FyIEM1xn5qp/dP0pR9zvHffR38F9Mq0p5xPK/7h
-         iVoQ==
+        d=linaro.org; s=google; t=1709646145; x=1710250945; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oq7s+3d2WZzPSy9BYq/6Wk1gHRe7Pd/DU9HZZvyDy9s=;
+        b=nyYYkv5TS1e5ygAil5371xPje/1KpEr0TlaIHHlBc9JZK+LHLjPAVr0V5L3PKZmp+k
+         +JSD5R5YMsdue3l2tvituBzlLVs3j7b0m70ZYguad2EUaq4SRFkU5ML3LNf++WO3HgJG
+         HhCDMoO5gW92aFRT5kuNVVktDmKedOb4Wqe9jr+MNTbWgvKeMKuh9o5AmLhiG33Be18w
+         505HZitH9215VGlTnra7/q5Ylu5z9UrcVbZclJvRDURW28zZWU6cK2wlaNXS2GLZ6rvM
+         Ms4pszpP4YiUkr2YlP/vlXrnFM36ARj2QBkg72d6oKxadhpQoUxGxCRePPqFLCe78EEZ
+         t1uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709645706; x=1710250506;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ae4+Cp+l1bY4RKGHb6iJ6Of9BTh3GCN02weE9qYMRq0=;
-        b=sOp4MfDJhtWpERNJ7TdYp4wP7LSsbWwvZPSosMbp+vXy0SfhSc+u5/e1aJuqu2eKR+
-         mJRu9Eeuvm81e+mSmOtUGDCVpjTbBoxQpHgp7hDspuOCMRKCVqRK0kvBy4SxVswGpEcS
-         NTxDzxaumWUrqwYV5GtuaS+qG/jTkLM3BU6Jt1HCnmKx0NxHuDat4imazZSq3EFqEDZ0
-         Tn3UzX1DiwHodz7K//fHLYUbQV08W0NXfRWtvmuXVdMWYA3nw1jcdDaZXAfVTSkqQGO4
-         oyJmhVeViFge/c8ePlud50StSJhzFL1rVv2/XYcj2dgpvC/MXYbBa7nTu+Nv3ub72WKR
-         Lmrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWi45vHe5gPpeW1Ja78p0zOBvm6KuA7u590kBC4hE8cHqsDNjVuiKDkrPE2/ZVlbmynqPAI8rbdCggAPMomKeeFMpdl
-X-Gm-Message-State: AOJu0Yyj0LruPGW+RjS9V1+kH1zi5gf5I/oXUYnEB63mV2UOZDOkxXhx
-	4lg+CHS5Xo7p7yXJAJ9p8dK/VbhQdBhyVWl05r+eSJ0Kj1T5MT6zQznPxWi1Cn4=
-X-Google-Smtp-Source: AGHT+IFueuTAylL1tx9JB8wiH2uMPMK5gbhLA50sOBnahqRee7bniVhxGN24/qoLHwtOXwthJjARqA==
-X-Received: by 2002:a17:907:174a:b0:a44:c1bf:a801 with SMTP id lf10-20020a170907174a00b00a44c1bfa801mr7174024ejc.17.1709645705985;
-        Tue, 05 Mar 2024 05:35:05 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id x14-20020a170906710e00b00a45769e8e58sm1726285ejj.219.2024.03.05.05.35.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 05:35:05 -0800 (PST)
-Date: Tue, 5 Mar 2024 14:35:04 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com, 
-	maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [kvmtool PATCH 03/10] riscv: Add Zbc extension support
-Message-ID: <20240305-8f39b0950d3bcdfd44e0cbe0@orel>
-References: <20240214122141.305126-1-apatel@ventanamicro.com>
- <20240214122141.305126-4-apatel@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1709646145; x=1710250945;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Oq7s+3d2WZzPSy9BYq/6Wk1gHRe7Pd/DU9HZZvyDy9s=;
+        b=e65iKM3QIaj5Wf+UMG7QMW372uMTWkOR8kpo1CL6M7kw+Hu6xzeSWGXNSDsHsfGk6n
+         X7Bp5wK0J8u488iLFTpF0MSjltVF7obmWc1gVQjwQ2CwKJlaxfGVi0Rv2JHgwPRLRZGP
+         wwF1t5AfbQ9nhO9+h2ipS7AiN1sci8zn0735aYdOCprgSqK7v/A+j8434ou5T3Cil/br
+         7VBgpIbzbZm/b15mN70QafQlKcLYDNBAiKipYwGravYzjbbIzc16Nq+o9JRb7iVb7tea
+         xO/o++gPEhr63Z4jnTfCNN1l19+bVeXjonEu4O4UnPbkQ93IUl9X7SgcsWXci3deNY5h
+         21Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCWLlgqhbr2ktkj9lpg99xfDJ7ZxyWfGvbS7kLWSKKy6J3q2iC5BxB69oy7Ye/pWs5bKgIMUfFz1yUYMtHZ62UZq+ZbY
+X-Gm-Message-State: AOJu0Yx3sM0CI/VEFeGYooMsbTCg+d6nDaQKW6yOeVAu5rtiSsifw+bI
+	N56q4t3RqeTpfoOnsSsqBZWR16fXETwZt9AvDG6dHWkWyH6ba+f3Ly3JqvdeME8=
+X-Google-Smtp-Source: AGHT+IEe1H1poGp10OUoKEEQQFEBCbwYqRiDyQFYhfp+3jBcvYgWoJD/I5kDi6kDS6rgjGn/iJZtJg==
+X-Received: by 2002:a50:d482:0:b0:566:4797:c330 with SMTP id s2-20020a50d482000000b005664797c330mr8941912edi.21.1709646145496;
+        Tue, 05 Mar 2024 05:42:25 -0800 (PST)
+Received: from m1x-phil.lan ([176.176.177.70])
+        by smtp.gmail.com with ESMTPSA id g13-20020a056402428d00b0056793ab2ad8sm549529edc.94.2024.03.05.05.42.23
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 05 Mar 2024 05:42:25 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org,
+	Thomas Huth <thuth@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	kvm@vger.kernel.org,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	devel@lists.libvirt.org,
+	David Hildenbrand <david@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH-for-9.1 00/18] hw/i386: Remove deprecated pc-i440fx-2.0 -> 2.3 machines
+Date: Tue,  5 Mar 2024 14:42:02 +0100
+Message-ID: <20240305134221.30924-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240214122141.305126-4-apatel@ventanamicro.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 14, 2024 at 05:51:34PM +0530, Anup Patel wrote:
-> When the Zbc extension is available expose it to the guest
-> via device tree so that guest can use it.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  riscv/fdt.c                         | 1 +
->  riscv/include/kvm/kvm-config-arch.h | 3 +++
->  2 files changed, 4 insertions(+)
-> 
-> diff --git a/riscv/fdt.c b/riscv/fdt.c
-> index 8485acf..84b6087 100644
-> --- a/riscv/fdt.c
-> +++ b/riscv/fdt.c
-> @@ -24,6 +24,7 @@ struct isa_ext_info isa_info_arr[] = {
->  	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
->  	{"zba", KVM_RISCV_ISA_EXT_ZBA},
->  	{"zbb", KVM_RISCV_ISA_EXT_ZBB},
-> +	{"zbc", KVM_RISCV_ISA_EXT_ZBC},
->  	{"zbs", KVM_RISCV_ISA_EXT_ZBS},
->  	{"zicbom", KVM_RISCV_ISA_EXT_ZICBOM},
->  	{"zicboz", KVM_RISCV_ISA_EXT_ZICBOZ},
-> diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-> index d2fc2d4..6d09eee 100644
-> --- a/riscv/include/kvm/kvm-config-arch.h
-> +++ b/riscv/include/kvm/kvm-config-arch.h
-> @@ -49,6 +49,9 @@ struct kvm_config_arch {
->  	OPT_BOOLEAN('\0', "disable-zbb",				\
->  		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBB],	\
->  		    "Disable Zbb Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zbc",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBC],	\
-> +		    "Disable Zbc Extension"),				\
->  	OPT_BOOLEAN('\0', "disable-zbs",				\
->  		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBS],	\
->  		    "Disable Zbs Extension"),				\
-> -- 
-> 2.34.1
->
+Kill legacy code, because we need to evolve.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+I ended there via dynamic machine -> ICH9 -> legacy ACPI...
+
+Based-on: <20240301185936.95175-1-philmd@linaro.org>
+          "hw/i386/pc: Trivial cleanups"
+
+Philippe Mathieu-Daudé (18):
+  hw/i386/pc: Remove deprecated pc-i440fx-2.0 machine
+  hw/usb/hcd-xhci: Enumerate xhci_flags setting values
+  hw/usb/hcd-xhci: Remove XHCI_FLAG_FORCE_PCIE_ENDCAP flag
+  hw/usb/hcd-xhci: Remove XHCI_FLAG_SS_FIRST flag
+  hw/i386/acpi: Remove PCMachineClass::legacy_acpi_table_size
+  hw/i386/pc: Remove deprecated pc-i440fx-2.1 machine
+  target/i386/kvm: Remove x86_cpu_change_kvm_default() and 'kvm-cpu.h'
+  hw/i386/pc: Remove PCMachineClass::smbios_uuid_encoded
+  hw/i386/pc: Remove PCMachineClass::enforce_aligned_dimm
+  hw/mem/pc-dimm: Remove legacy_align argument from pc_dimm_pre_plug()
+  hw/mem/memory-device: Remove legacy_align from
+    memory_device_pre_plug()
+  hw/i386/pc: Remove deprecated pc-i440fx-2.2 machine
+  hw/i386/pc: Remove PCMachineClass::resizable_acpi_blob
+  hw/i386/pc: Remove PCMachineClass::rsdp_in_ram
+  hw/i386/acpi: Remove AcpiBuildState::rsdp field
+  hw/i386/pc: Remove deprecated pc-i440fx-2.3 machine
+  target/i386: Remove X86CPU::kvm_no_smi_migration field
+  hw/i386/pc: Replace PCMachineClass::acpi_data_size by
+    PC_ACPI_DATA_SIZE
+
+ docs/about/deprecated.rst       |   7 ---
+ docs/about/removed-features.rst |   2 +-
+ hw/usb/hcd-xhci.h               |   4 +-
+ include/hw/i386/pc.h            |  22 -------
+ include/hw/mem/memory-device.h  |   2 +-
+ include/hw/mem/pc-dimm.h        |   3 +-
+ target/i386/cpu.h               |   3 -
+ target/i386/kvm/kvm-cpu.h       |  41 ------------
+ hw/arm/virt.c                   |   2 +-
+ hw/i386/acpi-build.c            |  94 +++-------------------------
+ hw/i386/fw_cfg.c                |   2 +-
+ hw/i386/pc.c                    | 107 +++++---------------------------
+ hw/i386/pc_piix.c               | 101 ------------------------------
+ hw/loongarch/virt.c             |   2 +-
+ hw/mem/memory-device.c          |  12 ++--
+ hw/mem/pc-dimm.c                |   6 +-
+ hw/ppc/spapr.c                  |   2 +-
+ hw/usb/hcd-xhci-nec.c           |   4 --
+ hw/usb/hcd-xhci-pci.c           |   4 +-
+ hw/usb/hcd-xhci.c               |  42 +++----------
+ hw/virtio/virtio-md-pci.c       |   2 +-
+ target/i386/cpu.c               |   2 -
+ target/i386/kvm/kvm-cpu.c       |   3 +-
+ target/i386/kvm/kvm.c           |   6 --
+ 24 files changed, 48 insertions(+), 427 deletions(-)
+ delete mode 100644 target/i386/kvm/kvm-cpu.h
+
+-- 
+2.41.0
+
 
