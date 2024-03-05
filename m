@@ -1,268 +1,196 @@
-Return-Path: <kvm+bounces-11013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C9E9872258
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 16:03:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83399872300
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 16:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DA48281E18
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 15:03:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E16DAB24784
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 15:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A41126F36;
-	Tue,  5 Mar 2024 15:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F407127B56;
+	Tue,  5 Mar 2024 15:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EOdiagnM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jlZu5C6k"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C97126F02;
-	Tue,  5 Mar 2024 15:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E671272CB
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 15:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709651003; cv=none; b=awhVgyUF/eS7hF3fa17Qop7ral8nt4tGYcNn/y/p4frKw92QfebvKTUaRwAr7gZu3bUnrCJHUA1m59HzOAHooW5/cKSuVrPK9Ja517LTF9xOdwxO1lGk0czCuUyy7SZM3Tm3gd95uQLPC18psrVKh/zMDq6zpREhmJW/aNFbv54=
+	t=1709653191; cv=none; b=VbZH0AIg8GLCyfSdZoH4wjWPQUhEV5MIIa+VG59G/zo0612rwdNmItmEVVcs3xfubzioCOhYwSawu9UKGDWl2Qr5RAWhtP4fwNVpLlqVJ6fBABmoRjTjdwCjZ+hG0IhgPjk8Ng3WHK/y0alKcB8W4OLhcHZ2jlsyFKle8TUFeXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709651003; c=relaxed/simple;
-	bh=2mdrOFobw+z2H9C4Cm3HCZJiFsJR2HEgKEYWYzKiOyM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LTtgBumC9tdARYCZOb/wjWQpKZccUW3lul5cmBxZxSQbJK4mLKvmB+XxG6EGJveQyWzjzu/TTKkWfQp5ne2XoKvH5MRUGU5ni9r7EFch3x+tuadf4iOI9FjL+TT+JNL1vpLu8EdILRynNrMUl+DSbNYE2XNHN0e7/T7y80e+lhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EOdiagnM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D76CC433C7;
-	Tue,  5 Mar 2024 15:03:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709651003;
-	bh=2mdrOFobw+z2H9C4Cm3HCZJiFsJR2HEgKEYWYzKiOyM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EOdiagnMhEDSmA3O9ywwmSdokjgZN8utfeB3NA2rvO4XM2fZytggJWGVbeVdWfNbM
-	 KYnFa1+ZhMX+lyVz1LDw0RZiwYrtGz/DZN+UFYgTntbU7nE+HyKnevnVTcvb+vBFc9
-	 sf9VPCdNF69Yx15CHzNkiVh902i2pTJXQcbvYDekM5EQl6PdsiRIB0uyvVkW+FhJPB
-	 FhFOXhmbYi+DBLo/buQxDbSpk2sKOInL3Qhxn4NCyaUHM0eS/MoO4cj15glXgZ6Ywy
-	 oYQpWgskIHLmNczBFFzU0+HSMVMX+cLxYzrC+Ah/msBaHXLCS4t9VWziUXcjCpvesN
-	 rcKA5TZ3h6JcA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rhWK8-009cCM-QI;
-	Tue, 05 Mar 2024 15:03:20 +0000
-Date: Tue, 05 Mar 2024 15:03:20 +0000
-Message-ID: <86r0go201z.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	darren@os.amperecomputing.com,
-	d.scott.phillips@amperecomputing.com
-Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
-In-Reply-To: <6685c3a6-2017-4bc2-ad26-d11949097050@os.amperecomputing.com>
-References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
-	<86sf150w4t.wl-maz@kernel.org>
-	<6685c3a6-2017-4bc2-ad26-d11949097050@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1709653191; c=relaxed/simple;
+	bh=SOPn+LGQ9aR4zkLvr2256Iz/ahqbcnZ+Gq/iOGSyy2g=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MenLt+yzLNgjl0RPjyna9rnrVdYF74USXv33GO1WxTNWiRAzLgmBlxkbkJL0unnBnBXJoRuFbaGX5YjpYCW42nsmOMNXvdwXYJg3ePlbtc4ROgq7PgUWaxatXJi1urMTHoTYtmcJD4E61lapWPYmt80vLF8vuqzXGE+V4l4UyzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jlZu5C6k; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e4d0e28cd1so4540350b3a.0
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 07:39:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709653187; x=1710257987; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y2+QNZsGB7vBwDONJtQuDYHORz8pvCTwyrAobu/LpG4=;
+        b=jlZu5C6k5LxtyLnNTSTKymf8mcYdyMWflQMoQUBoBMD2hoVgd7eCZJ4pL4TB5FuAXm
+         aqdZ3VessrMYhLlJSdMHC/qunSzSIC5w0YXVV5h1oFF7tuALUT2dVrRg+LhNndYvLM+s
+         SO5HH7Gf1FqTS8vFGBioJDXbLU9Rgqb5NU6iYp6sJJbS9f+iSIWAphBILwonL+wdux6m
+         Kf/6CyIfes7oLmwj8pIrbwI0W7CGFh6E0XMbkhVePHct7eLlPXUPJxcZCtGDpdGSr88m
+         YjXsauu6LZMlH3Szf2jR59L5ybEote6/wPz2CdTYWYihYJapQRUUmhK4AaZDOUKrSSPO
+         DliA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709653187; x=1710257987;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y2+QNZsGB7vBwDONJtQuDYHORz8pvCTwyrAobu/LpG4=;
+        b=jwaga6yUsonzSfTy9Tj08POyxEMmoPd2mK5tT8qol0dZAKRmLUHYkFgx3Lgnzd9OgG
+         WIG1PE0zrIp/U0akfSLe0PfyyeMf4e6KaQldExdS/lRIyBsNhbYNFWQb+gVqMdD4V01y
+         0K6z7Zn5+MaUaXEuzK0c6JuKrXGISYylRzrv2oJfEHssecTF7aqy+vKa+9G66UOCCKwa
+         JJ63mJf/BNL3HYYuYssGOZX1elFVqfKRFF47Sip6GKNfdyacgZgc5SuNN3ne8OCHz+j+
+         PCrQySy4Raax2ckPa9m0jDdmmvSN0UeOlVL2K+7ADXqyW+ErCjLWAMPxlK5vu+gg2G2S
+         Oybg==
+X-Forwarded-Encrypted: i=1; AJvYcCULDcRuCldQasll1qLeN1tb7ia2Atl38wIjei+cMp+qKSwPPv1yQaKHDNLsQPTS8yRt18qWFoqDrACJPSdUwuGeh5o+
+X-Gm-Message-State: AOJu0YxG93SX7sYRliOYtzyJPRqdE1FOcnPrWkuTrgbD5zXm8RXmQNVr
+	+cvgjztqY1a853bsOV4cqIQ3kqtXiNhhP6sEXAKTiqcWg27MwpuzXkB8ZTFxBjZPCurRGnnLWW8
+	xlA==
+X-Google-Smtp-Source: AGHT+IEWf/wnSiieRPHpf8VMzJDEgUGq3r1WyDXmi+v8L/+r4DjFPQtsJOt6QRXW5vzBjW64rgvLCTl6NVQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:8d1:b0:6e5:d02:6162 with SMTP id
+ s17-20020a056a0008d100b006e50d026162mr95902pfu.0.1709653187173; Tue, 05 Mar
+ 2024 07:39:47 -0800 (PST)
+Date: Tue, 5 Mar 2024 07:39:45 -0800
+In-Reply-To: <ZeZu9D3Ic_1O5CIO@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-9-amoorthy@google.com>
+ <ZeYoSSYtDxKma-gg@linux.dev> <ZeYqt86yVmCu5lKP@linux.dev> <ZeYv86atkVpVMa2S@google.com>
+ <ZeY3P8Za5Q6pkkQV@linux.dev> <ZeZP4xOMk7LUnNt2@google.com> <ZeZu9D3Ic_1O5CIO@linux.dev>
+Message-ID: <Zec8stHiFS3KOOPt@google.com>
+Subject: Re: [PATCH v7 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO and
+ annotate fault in the stage-2 fault handler
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Anish Moorthy <amoorthy@google.com>, maz@kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, robert.hoo.linux@gmail.com, jthoughton@google.com, 
+	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 05 Mar 2024 13:29:08 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Tue, Mar 05, 2024, Oliver Upton wrote:
+> On Mon, Mar 04, 2024 at 02:49:07PM -0800, Sean Christopherson wrote:
 > 
+> [...]
 > 
+> > The presense of MTE stuff shouldn't affect the fundamental access information,
 > 
-> On 05-03-2024 04:43 pm, Marc Zyngier wrote:
-> > [re-sending with kvmarm@ fixed]
+>   "When FEAT_MTE is implemented, for a synchronous Data Abort on an
+>   instruction that directly accesses Allocation Tags, ISV is 0."
+> 
+> If there is no instruction syndrome, there's insufficient fault context
+> to determine if the guest was doing a read or a write.
+> 
+> > e.g. if the guest was attempting to write, then KVM should set KVM_MEMORY_EXIT_FLAG_WRITE
+> > irrespective of whether or not MTE is in play.
+> 
+> When the MMU generates such an abort, it *is not* read, write, or execute.
+> It is a NoTagAccess fault. There is no sane way to describe this in
+> terms of RWX.
+
+RWX=0, with KVM_MEMORY_EXIT_FLAG_MTE seems like a reasonable way to communicate
+that, no?
+
+> > > > E.g. on the x86 side, KVM intentionally sets reserved bits in SPTEs for
+> > > > "caching" emulated MMIO accesses, and the resulting fault captures the
+> > > > "reserved bits set" information in register state.  But that's purely an
+> > > > (optional) imlementation detail of KVM that should never be exposed to
+> > > > userspace.
+> > > 
+> > > MMIO accesses would show up elsewhere though, right?
 > > 
-> > On Tue, 05 Mar 2024 05:46:06 +0000,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >> 
-> >> As per 'commit 178a6915434c ("KVM: arm64: nv: Unmap/flush shadow stage 2
+> > Yes, but I don't see how that's relevant.  Maybe I'm just misunderstanding what
+> > you're saying/asking.
+> 
+> If "reserved" EPT violations found their way to userspace via the
+> "memory fault" exit structure then that'd likely be due to a KVM bug.
+
+Heh, sadly no.  Userspace can convert a GFN to private at any time, and the
+TDX and SNP specs allow for implicit converstion "requests" from the guest, i.e.
+KVM isn't allowed to kill the guest if the guest accesses a GFN with the "wrong"
+private/shared attribute.
+
+This particular case would likely be hit only if there's a userspace and/or guest
+bug, but whether the setup is broken or just unique isn't KVM's call to make.
+
+> The only expected flows in the near term are this and CoCo crap.
+> 
+> > > Either way, I have no issues whatsoever if the direction for x86 is to
+> > > provide abstracted fault information.
 > > 
-> > $ git describe --contains 178a6915434c --match=v\*
-> > fatal: cannot describe '178a6915434c141edefd116b8da3d55555ea3e63'
-> > 
+> > I don't understand how ARM can get away with NOT providing a layer of abstraction.
+> > Copying fault state verbatim to userspace will bleed KVM implementation details
+> > into userspace,
 > 
-> My bad(I would have been more verbose), I missed to mention that this
-> patch is on top of NV-V11 patch series.
+> The memslot flag already bleeds KVM implementation detail into userspace
+> to a degree. The event we're trying to let userspace handle is at the
+> intersection of a specific hardware/software state.
+
+Yes, but IMO there's a huge difference between userspace knowing that KVM uses gup()
+and memslots to translate gfn=>hva=>pfn, or even knowing that KVM plays games with
+reserved stage-2 PTE bits, and userspace knowing exactly how KVM configures stage-2
+PTEs.
+
+Another example would be dirty logging on Intel CPUs.  The *admin* can decide
+whether to use a write-protection scheme or page-modification logging, but KVM's
+ABI with userspace provides a layer of abstraction (dirty ring or bitmap) so that
+the userspace VMM doesn't need to do X for write-protection and Y for PML.
+
+> > Abstracting gory hardware details from userspace is one of the main roles of the
+> > kernel.
 > 
-> > This commit simply doesn't exist upstream. It only lives in a
-> > now deprecated branch that will never be merged.
-> > 
-> >> page tables")', when ever there is unmap of pages that
-> >> are mapped to L1, they are invalidated from both L1 S2-MMU and from
-> >> all the active shadow/L2 S2-MMU tables. Since there is no mapping
-> >> to invalidate the IPAs of Shadow S2 to a page, there is a complete
-> >> S2-MMU page table walk and invalidation is done covering complete
-> >> address space allocated to a L2. This has performance impacts and
-> >> even soft lockup for NV(L1 and L2) boots with higher number of
-> >> CPUs and large Memory.
-> >> 
-> >> Adding a lookup table of mapping of Shadow IPA to Canonical IPA
-> >> whenever a page is mapped to any of the L2. While any page is
-> >> unmaped, this lookup is helpful to unmap only if it is mapped in
-> >> any of the shadow S2-MMU tables. Hence avoids unnecessary long
-> >> iterations of S2-MMU table walk-through and invalidation for the
-> >> complete address space.
-> > 
-> > All of this falls in the "premature optimisation" bucket. Why should
-> > we bother with any of this when not even 'AT S1' works correctly,
+> Where it can be accomplished without a loss (or misrepresentation) of
+> information, agreed. But KVM UAPI is so architecture-specific that it
+> seems arbitrary to draw the line here.
+
+I don't think it's arbitrary.  KVM's existing uAPI for mapping memory into the
+guest is almost entirely arch-neutral, and I want to preserve that for related
+functionality unless it's literally impossible to do so.
+
+> > A concrete example of hardware throwing a wrench in things is AMD's upcoming
+> > "encrypted" flag (in the stage-2 page fault error code), which is set by SNP-capable
+> > CPUs for *any* VM that supports guest-controlled encrypted memory.  If KVM reported
+> > the page fault error code directly to userspace, then running the same VM on
+> > different hardware generations, e.g. after live migration, would generate different
+> > error codes.
+> >  
+> > Are we talking past each other?  I'm genuinely confused by the pushback on
+> > capturing RWX information.  Yes, the RWX info may be insufficient in some cases,
+> > but its existence doesn't preclude KVM from providing more information as needed.
 > 
-> Hmm, I am not aware of this, is this something new issue of V11?
+> My pushback isn't exactly on RWX (even though I noted the MTE quirk
+> above). What I'm poking at here is the general infrastructure for
+> reflecting faults into userspace, which is aggressively becoming more
+> relevant.
 
-it's been there since v0. All we have is a trivial implementation that
-doesn't survive the S1 page-tables being swapped out. It requires a
-full S1 PTW to be written.
+But the purpose of memory_fault isn't to reflect faults into userspace, it's to
+alert userspace that KVM has encountered a memory fault that requires userspace
+action to resolve.
 
-> 
-> > making it trivial to prevent a guest from making forward progress? You
-> > also show no numbers that would hint at a measurable improvement under
-> > any particular workload.
-> 
-> This patch is avoiding long iterations of unmap which was resulting in
-> soft-lockup, when tried L1 and L2 with 192 cores.
-> Fixing soft lockup isn't a required fix for feature enablement?
+That distinction matters because there are and will be MMU features that KVM
+supports, and that can generate novel faults, but such faults won't be punted to
+userspace unless KVM provides a way for userspace to explicitly control the MMU
+feature.
 
-No. All we care is correctness, not performance. Addressing
-soft-lockups is *definitely* a performance issue, which I'm 100% happy
-to ignore.
-
-[...]
-
-> >>   +static inline bool kvm_is_l1_using_shadow_s2(struct kvm_vcpu
-> >> *vcpu)
-> >> +{
-> >> +	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu);
-> >> +}
-> > 
-> > Isn't that the very definition of "!in_hyp_ctxt()"? You are abusing
-> 
-> "!in_hyp_ctxt()" isn't true for non-NV case also?
-
-Surely you don't try to use this in non-NV contexts, right? Why would
-you try to populate a shadow reverse-map outside of a NV context?
-
-> This function added to know that L1 is NV enabled and using shadow S2.
-> 
-> > the hw_mmu pointer to derive something, but the source of truth is the
-> > translation regime, as defined by HCR_EL2.{E2H,TGE} and PSTATE.M.
-> > 
-> 
-> OK, I can try HCR_EL2.{E2H,TGE} and PSTATE.M instead of hw_mmu in next
-> version.
-
-No. Use is_hyp_ctxt().
-
-[...]
-
-> >> index 61bdd8798f83..3948681426a0 100644
-> >> --- a/arch/arm64/kvm/mmu.c
-> >> +++ b/arch/arm64/kvm/mmu.c
-> >> @@ -1695,6 +1695,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >>   					     memcache,
-> >>   					     KVM_PGTABLE_WALK_HANDLE_FAULT |
-> >>   					     KVM_PGTABLE_WALK_SHARED);
-> >> +		if ((nested || kvm_is_l1_using_shadow_s2(vcpu)) && !ret) {
-> > 
-> > I don't understand this condition. If nested is non-NULL, it's because
-> > we're using a shadow S2. So why the additional condition?
-> 
-> No, nested is set only for L2, for L1 it is not.
-> To handle L1 shadow S2 case, I have added this condition.
-
-But there is *no shadow* for L1 at all. The only way to get a shadow
-is to be outside of the EL2(&0) translation regime. El2(&0) itself is
-always backed by the canonical S2. By definition, L1 does not run with
-a S2 it is in control of. No S2, no shadow.
-
-[...]
-
-> > What guarantees that the mapping you have for L1 has the same starting
-> > address as the one you have for L2? L1 could have a 2MB mapping and L2
-> > only 4kB *in the middle*.
-> 
-> IIUC, when a page is mapped to 2MB in L1, it won't be
-> mapped to L2 and we iterate with the step of PAGE_SIZE and we should
-> be hitting the L2's IPA in lookup table, provided the L2 page falls in
-> unmap range.
-
-But then how do you handle the reverse (4kB at L1, 2MB at L2)? Without
-tracking of the *intersection*, this fails to be correctly detected.
-This is TLB matching 101.
-
-[...]
-
-> >> +			while (start < end) {
-> >> +				size = PAGE_SIZE;
-> >> +				/*
-> >> +				 * get the Shadow IPA if the page is mapped
-> >> +				 * to L1 and also mapped to any of active L2.
-> >> +				 */
-> > 
-> > Why is L1 relevant here?
-> 
-> We do map while L1 boots(early stage) in shadow S2, at that moment
-> if the L1 mapped page is unmapped/migrated we do need to unmap from
-> L1's S2 table also.
-
-Sure. But you can also get a page that is mapped in L2 and not mapped
-in the canonical S2, which is L1's. I more and more feel that you have
-a certain misconception of how L1 gets its pages mapped.
-
-> 
-> > 
-> >> +				ret = get_shadow_ipa(mmu, start, &shadow_ipa, &size);
-> >> +				if (ret)
-> >> +					kvm_unmap_stage2_range(mmu, shadow_ipa, size);
-> >> +				start += size;
-> >> +			}
-> >> +		}
-> >> +	}
-> >> +}
-> >> +
-> >>   /* expects kvm->mmu_lock to be held */
-> >>   void kvm_nested_s2_flush(struct kvm *kvm)
-> >>   {
-> > 
-> > There are a bunch of worrying issues with this patch. But more
-> > importantly, this looks like a waste of effort until the core issues
-> > that NV still has are solved, and I will not consider anything of the
-> > sort until then.
-> 
-> OK thanks for letting us know, I will pause the work on V2 of this
-> patch until then.
-> 
-> > 
-> > I get the ugly feeling that you are trying to make it look as if it
-> > was "production ready", which it won't be for another few years,
-> > specially if the few interested people (such as you) are ignoring the
-> > core issues in favour of marketing driven features ("make it fast").
-> > 
-> 
-> What are the core issues (please forgive me if you mentioned already)?
-> certainly we will prioritise them than this.
-
-AT is a big one. Maintenance interrupts are more or less broken. I'm
-slowly plugging PAuth, but there's no testing whatsoever (running
-Linux doesn't count). Lack of SVE support is also definitely a
-blocker.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+And if KVM lets userspace control a feature, then KVM needs new uAPI to expose
+the controls.  Which means that we should always have an opportunity to expand
+memory_fault, e.g. with new flags, to support such features.
 
