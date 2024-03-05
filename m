@@ -1,255 +1,244 @@
-Return-Path: <kvm+bounces-10885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9358A871849
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 09:35:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA3E87184B
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 09:36:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AA2F281C67
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 08:35:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F03161C2116E
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 08:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6BB4EB31;
-	Tue,  5 Mar 2024 08:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E744DA0C;
+	Tue,  5 Mar 2024 08:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NM4rPb8f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RGlpUwJ+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6718F4EB22;
-	Tue,  5 Mar 2024 08:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBA2249F1;
+	Tue,  5 Mar 2024 08:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709627728; cv=none; b=fNv4HWuW6lp+FGrOj3bkp3LPVNhc9dCU9akQCAb8fo7jbR8nhmFz755NUz7zip02MHugjc1A2IZm3X2zoih3bKNNJiWtE+qSu20fKWbG3gyHICKKTVaZUCm1AZp7KHe4jKGa+57YvYRqLqQh6PyGGNs0BwO4FZsDGjA6Yi0tv40=
+	t=1709627741; cv=none; b=K6tbzyXmzTFIbzIq4YP/4lX3gTtRnTGwfMMU9jHGdsUlurn7T0gWZ3guQSjzZFrcQtE3a06Rxz/98P/JGOJNdUfXanUNmt440DGIBWWQxZEB2Sm+vSX0mjt2LR/wLkZRN7XZuS0q7JWIrMDe1XRflqZaEm4qISUwzDGSmwy9gzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709627728; c=relaxed/simple;
-	bh=Lvdwo8Wjh4EqdeFBZ0MIjbX4qtOpFjCSFMxxVxnEDZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IsqGV/WyTafspWg/Zs3Yv6kmIg/GjAW8j9uswjbpRtaagVyMcoXJqoyAYK5jRe/va8s3Ue5RjSopBOgdZagTVwoDDU1hjnt8mqzO4EbPKCxwfgINyCEtVr8D3RCDhlJ32N9ux0+pswAFc85s2tvEa8GySFtKZuJa0etDKL2QJeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NM4rPb8f; arc=none smtp.client-ip=192.198.163.9
+	s=arc-20240116; t=1709627741; c=relaxed/simple;
+	bh=LPw3A2szBAoVVtalkXlJFKeMTfTKY/oEBwCzke2iCdE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DGPvdcZI1DL0B4o1OsLwG40ymNitH1movXfh3zur08F2O5FOVqDuq5CRFg4Wgr719qyjeQuFnM3lnlqyxQ/3luUCAf7YvjkkQCu7iaQOiVcTv0XwdftNnOumnIb/nddjIdQkMX03M4POZDywZuXahKOGtNwPFcXP1Zz1KeyAIdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RGlpUwJ+; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709627726; x=1741163726;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Lvdwo8Wjh4EqdeFBZ0MIjbX4qtOpFjCSFMxxVxnEDZA=;
-  b=NM4rPb8fUKWbtDcsMC9tI//r4azteHqmiwwTlFDbUh3oaKL5PexERlYa
-   3UFCwymGUVfg33m8Wyh7zfPTCIwBdTZRQiAgGdzlOgidMfJk4NIH4WCz0
-   MyVKFR4/W4wAM9zi5SnlNP+e2NO332gkL/DBy97oh4R0UcgkcvvFU/Rx7
-   Ssh87oySrh9+8EvyIPO35QZj86xanQLhXCzlUb1ctVg7P7CY3hkcPxG+A
-   R+60dH1a+sVtJEMnkCdF4jrrgxy5o5wyZzXIiVaXnsQqcDtmadtsWiBL4
-   lkjG3DPLyqXbS8J9/+itkyeiEfkXNDiRYMUuC3+E/W6KwFgb1ci9LE7Uw
+  t=1709627739; x=1741163739;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=LPw3A2szBAoVVtalkXlJFKeMTfTKY/oEBwCzke2iCdE=;
+  b=RGlpUwJ+q/N4H+mop2HpXgJHcT/sCGI5xUGe3hEcYZ+GGGpFEUtT0RMk
+   jvI5XLGjmSEtkTDUwrSAu5K/b8lejmiZo0qFiJQ1NoLVwD+meecSeNOmB
+   SqRvZsoX278/U89KFJuw4j5j0VqoPzfVv4ua4x+qxE0FXxkPLO3m1fibC
+   1IzBL9AOHdrQbQvfbCRsytsqj1e73zeRY5BJNaf+Po3QXRNahI1zrFve6
+   PWhqIOKSF8IE76Sd6pgOx0Oe5lHwxtRQNi7WCqJDhnpsW2TKaTYZJglS/
+   T6m9h+MisU/QKkP0Gtf8E6JurSVlL/XUotkl0PNk+fXXEXdMumILs4Bf3
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="14881712"
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="14746449"
 X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="14881712"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 00:35:25 -0800
+   d="scan'208";a="14746449"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 00:35:38 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="9414347"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 00:35:24 -0800
-Date: Tue, 5 Mar 2024 00:35:24 -0800
-From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 091/130] KVM: TDX: remove use of struct vcpu_vmx from
- posted_interrupt.c
-Message-ID: <20240305083524.GE10568@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <6c7774a44515d6787c9512cb05c3b305e9b5855c.1708933498.git.isaku.yamahata@intel.com>
- <3b99cf5d-08c7-4ef1-84dd-ebbf246e601f@linux.intel.com>
+   d="scan'208";a="9238207"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.218]) ([10.238.8.218])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 00:35:36 -0800
+Message-ID: <02794f06-1da7-4ea0-8c31-6a09aeadbcea@linux.intel.com>
+Date: Tue, 5 Mar 2024 16:35:34 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3b99cf5d-08c7-4ef1-84dd-ebbf246e601f@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 06/21] KVM: x86/mmu: Track shadow MMIO value on a per-VM
+ basis
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
+ michael.roth@amd.com, isaku.yamahata@intel.com, thomas.lendacky@amd.com
+References: <20240227232100.478238-1-pbonzini@redhat.com>
+ <20240227232100.478238-7-pbonzini@redhat.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240227232100.478238-7-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 27, 2024 at 04:52:01PM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-> 
-> 
-> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > As TDX will use posted_interrupt.c, the use of struct vcpu_vmx is a
-> > blocker.  Because the members of
-> 
-> Extra "of"
-> 
-> > struct pi_desc pi_desc and struct
-> > list_head pi_wakeup_list are only used in posted_interrupt.c, introduce
-> > common structure, struct vcpu_pi, make vcpu_vmx and vcpu_tdx has same
-> > layout in the top of structure.
-> > 
-> > To minimize the diff size, avoid code conversion like,
-> > vmx->pi_desc => vmx->common->pi_desc.  Instead add compile time check
-> > if the layout is expected.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/kvm/vmx/posted_intr.c | 41 ++++++++++++++++++++++++++--------
-> >   arch/x86/kvm/vmx/posted_intr.h | 11 +++++++++
-> >   arch/x86/kvm/vmx/tdx.c         |  1 +
-> >   arch/x86/kvm/vmx/tdx.h         |  8 +++++++
-> >   arch/x86/kvm/vmx/vmx.h         | 14 +++++++-----
-> >   5 files changed, 60 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> > index af662312fd07..b66add9da0f3 100644
-> > --- a/arch/x86/kvm/vmx/posted_intr.c
-> > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> > @@ -11,6 +11,7 @@
-> >   #include "posted_intr.h"
-> >   #include "trace.h"
-> >   #include "vmx.h"
-> > +#include "tdx.h"
-> >   /*
-> >    * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_handler()
-> > @@ -31,9 +32,29 @@ static DEFINE_PER_CPU(struct list_head, wakeup_vcpus_on_cpu);
-> >    */
-> >   static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock);
-> > +/*
-> > + * The layout of the head of struct vcpu_vmx and struct vcpu_tdx must match with
-> > + * struct vcpu_pi.
-> > + */
-> > +static_assert(offsetof(struct vcpu_pi, pi_desc) ==
-> > +	      offsetof(struct vcpu_vmx, pi_desc));
-> > +static_assert(offsetof(struct vcpu_pi, pi_wakeup_list) ==
-> > +	      offsetof(struct vcpu_vmx, pi_wakeup_list));
-> > +#ifdef CONFIG_INTEL_TDX_HOST
-> > +static_assert(offsetof(struct vcpu_pi, pi_desc) ==
-> > +	      offsetof(struct vcpu_tdx, pi_desc));
-> > +static_assert(offsetof(struct vcpu_pi, pi_wakeup_list) ==
-> > +	      offsetof(struct vcpu_tdx, pi_wakeup_list));
-> > +#endif
-> > +
-> > +static inline struct vcpu_pi *vcpu_to_pi(struct kvm_vcpu *vcpu)
-> > +{
-> > +	return (struct vcpu_pi *)vcpu;
-> > +}
-> > +
-> >   static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
-> >   {
-> > -	return &(to_vmx(vcpu)->pi_desc);
-> > +	return &vcpu_to_pi(vcpu)->pi_desc;
-> >   }
-> >   static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
-> > @@ -52,8 +73,8 @@ static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
-> >   void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
-> >   {
-> > -	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
-> > -	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > +	struct vcpu_pi *vcpu_pi = vcpu_to_pi(vcpu);
-> > +	struct pi_desc *pi_desc = &vcpu_pi->pi_desc;
-> >   	struct pi_desc old, new;
-> >   	unsigned long flags;
-> >   	unsigned int dest;
-> > @@ -90,7 +111,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
-> >   	 */
-> >   	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
-> >   		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-> > -		list_del(&vmx->pi_wakeup_list);
-> > +		list_del(&vcpu_pi->pi_wakeup_list);
-> >   		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-> >   	}
-> > @@ -145,15 +166,15 @@ static bool vmx_can_use_vtd_pi(struct kvm *kvm)
-> >    */
-> >   static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
-> >   {
-> > -	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
-> > -	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > +	struct vcpu_pi *vcpu_pi = vcpu_to_pi(vcpu);
-> > +	struct pi_desc *pi_desc = &vcpu_pi->pi_desc;
-> >   	struct pi_desc old, new;
-> >   	unsigned long flags;
-> >   	local_irq_save(flags);
-> >   	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-> > -	list_add_tail(&vmx->pi_wakeup_list,
-> > +	list_add_tail(&vcpu_pi->pi_wakeup_list,
-> >   		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
-> >   	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-> > @@ -190,7 +211,8 @@ static bool vmx_needs_pi_wakeup(struct kvm_vcpu *vcpu)
-> >   	 * notification vector is switched to the one that calls
-> >   	 * back to the pi_wakeup_handler() function.
-> >   	 */
-> > -	return vmx_can_use_ipiv(vcpu) || vmx_can_use_vtd_pi(vcpu->kvm);
-> > +	return (vmx_can_use_ipiv(vcpu) && !is_td_vcpu(vcpu)) ||
-> > +		vmx_can_use_vtd_pi(vcpu->kvm);
-> >   }
-> >   void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
-> > @@ -200,7 +222,8 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
-> >   	if (!vmx_needs_pi_wakeup(vcpu))
-> >   		return;
-> > -	if (kvm_vcpu_is_blocking(vcpu) && !vmx_interrupt_blocked(vcpu))
-> > +	if (kvm_vcpu_is_blocking(vcpu) &&
-> > +	    (is_td_vcpu(vcpu) || !vmx_interrupt_blocked(vcpu)))
-> >   		pi_enable_wakeup_handler(vcpu);
-> >   	/*
-> > diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
-> > index 26992076552e..2fe8222308b2 100644
-> > --- a/arch/x86/kvm/vmx/posted_intr.h
-> > +++ b/arch/x86/kvm/vmx/posted_intr.h
-> > @@ -94,6 +94,17 @@ static inline bool pi_test_sn(struct pi_desc *pi_desc)
-> >   			(unsigned long *)&pi_desc->control);
-> >   }
-> > +struct vcpu_pi {
-> > +	struct kvm_vcpu	vcpu;
-> > +
-> > +	/* Posted interrupt descriptor */
-> > +	struct pi_desc pi_desc;
-> > +
-> > +	/* Used if this vCPU is waiting for PI notification wakeup. */
-> > +	struct list_head pi_wakeup_list;
-> > +	/* Until here common layout betwwn vcpu_vmx and vcpu_tdx. */
-> 
-> s/betwwn/between
-> 
-> Also, in pi_wakeup_handler(), it is still using struct vcpu_vmx, but it
-> could
-> be vcpu_tdx.
-> Functionally it is OK, however, since you have added vcpu_pi, should it use
-> vcpu_pi instead of vcpu_vmx in pi_wakeup_handler()?
 
-Makes sense.
+On 2/28/2024 7:20 AM, Paolo Bonzini wrote:
+> From: Sean Christopherson <seanjc@google.com>
+>
+> TDX will use a different shadow PTE entry value for MMIO from VMX.  Add
+> members to kvm_arch and track value for MMIO per-VM instead of global
 
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index b66add9da0f3..5b71aef931dc 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -243,13 +243,13 @@ void pi_wakeup_handler(void)
-        int cpu = smp_processor_id();
-        struct list_head *wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
-        raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
--       struct vcpu_vmx *vmx;
-+       struct vcpu_pi *pi;
- 
-        raw_spin_lock(spinlock);
--       list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
-+       list_for_each_entry(pi, wakeup_list, pi_wakeup_list) {
- 
--               if (pi_test_on(&vmx->pi_desc))
--                       kvm_vcpu_wake_up(&vmx->vcpu);
-+               if (pi_test_on(&pi->pi_desc))
-+                       kvm_vcpu_wake_up(&pi->vcpu);
-        }
+Nit: members -> a member, since only 'shadow_mmio_value' is added.
 
--- 
-Isaku Yamahata <isaku.yamahata@linux.intel.com>
+> variables.  By using the per-VM EPT entry value for MMIO, the existing VMX
+> logic is kept working.  Introduce a separate setter function so that guest
+> TD can override later.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Message-Id: <229a18434e5d83f45b1fcd7bf1544d79db1becb6.1705965635.git.isaku.yamahata@intel.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+> ---
+>   arch/x86/include/asm/kvm_host.h |  2 ++
+>   arch/x86/kvm/mmu.h              |  1 +
+>   arch/x86/kvm/mmu/mmu.c          |  8 +++++---
+>   arch/x86/kvm/mmu/spte.c         | 10 ++++++++--
+>   arch/x86/kvm/mmu/spte.h         |  4 ++--
+>   arch/x86/kvm/mmu/tdp_mmu.c      |  6 +++---
+>   6 files changed, 21 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 85dc0f7d09e3..a4514c2ef0ec 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1313,6 +1313,8 @@ struct kvm_arch {
+>   	 */
+>   	spinlock_t mmu_unsync_pages_lock;
+>   
+> +	u64 shadow_mmio_value;
+> +
+>   	struct iommu_domain *iommu_domain;
+>   	bool iommu_noncoherent;
+>   #define __KVM_HAVE_ARCH_NONCOHERENT_DMA
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index 60f21bb4c27b..2c54ba5b0a28 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -101,6 +101,7 @@ static inline u8 kvm_get_shadow_phys_bits(void)
+>   }
+>   
+>   void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask);
+> +void kvm_mmu_set_mmio_spte_value(struct kvm *kvm, u64 mmio_value);
+>   void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
+>   void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
+>   
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b5baf11359ad..195e46a1f00f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2515,7 +2515,7 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
+>   				return kvm_mmu_prepare_zap_page(kvm, child,
+>   								invalid_list);
+>   		}
+> -	} else if (is_mmio_spte(pte)) {
+> +	} else if (is_mmio_spte(kvm, pte)) {
+>   		mmu_spte_clear_no_track(spte);
+>   	}
+>   	return 0;
+> @@ -4197,7 +4197,7 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
+>   	if (WARN_ON_ONCE(reserved))
+>   		return -EINVAL;
+>   
+> -	if (is_mmio_spte(spte)) {
+> +	if (is_mmio_spte(vcpu->kvm, spte)) {
+>   		gfn_t gfn = get_mmio_spte_gfn(spte);
+>   		unsigned int access = get_mmio_spte_access(spte);
+>   
+> @@ -4813,7 +4813,7 @@ EXPORT_SYMBOL_GPL(kvm_mmu_new_pgd);
+>   static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+>   			   unsigned int access)
+>   {
+> -	if (unlikely(is_mmio_spte(*sptep))) {
+> +	if (unlikely(is_mmio_spte(vcpu->kvm, *sptep))) {
+>   		if (gfn != get_mmio_spte_gfn(*sptep)) {
+>   			mmu_spte_clear_no_track(sptep);
+>   			return true;
+> @@ -6320,6 +6320,8 @@ static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
+>   
+>   void kvm_mmu_init_vm(struct kvm *kvm)
+>   {
+> +
+> +	kvm->arch.shadow_mmio_value = shadow_mmio_value;
+>   	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
+>   	INIT_LIST_HEAD(&kvm->arch.zapped_obsolete_pages);
+>   	INIT_LIST_HEAD(&kvm->arch.possible_nx_huge_pages);
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index 02a466de2991..318135daf685 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -74,10 +74,10 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
+>   	u64 spte = generation_mmio_spte_mask(gen);
+>   	u64 gpa = gfn << PAGE_SHIFT;
+>   
+> -	WARN_ON_ONCE(!shadow_mmio_value);
+> +	WARN_ON_ONCE(!vcpu->kvm->arch.shadow_mmio_value);
+>   
+>   	access &= shadow_mmio_access_mask;
+> -	spte |= shadow_mmio_value | access;
+> +	spte |= vcpu->kvm->arch.shadow_mmio_value | access;
+>   	spte |= gpa | shadow_nonpresent_or_rsvd_mask;
+>   	spte |= (gpa & shadow_nonpresent_or_rsvd_mask)
+>   		<< SHADOW_NONPRESENT_OR_RSVD_MASK_LEN;
+> @@ -411,6 +411,12 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_mmu_set_mmio_spte_mask);
+>   
+> +void kvm_mmu_set_mmio_spte_value(struct kvm *kvm, u64 mmio_value)
+> +{
+> +	kvm->arch.shadow_mmio_value = mmio_value;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_mmu_set_mmio_spte_value);
+> +
+>   void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask)
+>   {
+>   	/* shadow_me_value must be a subset of shadow_me_mask */
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index 26bc95bbc962..1a163aee9ec6 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -264,9 +264,9 @@ static inline struct kvm_mmu_page *root_to_sp(hpa_t root)
+>   	return spte_to_child_sp(root);
+>   }
+>   
+> -static inline bool is_mmio_spte(u64 spte)
+> +static inline bool is_mmio_spte(struct kvm *kvm, u64 spte)
+>   {
+> -	return (spte & shadow_mmio_mask) == shadow_mmio_value &&
+> +	return (spte & shadow_mmio_mask) == kvm->arch.shadow_mmio_value &&
+>   	       likely(enable_mmio_caching);
+>   }
+>   
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index c8a4d92497b4..d15c44a8e123 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -495,8 +495,8 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+>   		 * impact the guest since both the former and current SPTEs
+>   		 * are nonpresent.
+>   		 */
+> -		if (WARN_ON_ONCE(!is_mmio_spte(old_spte) &&
+> -				 !is_mmio_spte(new_spte) &&
+> +		if (WARN_ON_ONCE(!is_mmio_spte(kvm, old_spte) &&
+> +				 !is_mmio_spte(kvm, new_spte) &&
+>   				 !is_removed_spte(new_spte)))
+>   			pr_err("Unexpected SPTE change! Nonpresent SPTEs\n"
+>   			       "should not be replaced with another,\n"
+> @@ -1028,7 +1028,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+>   	}
+>   
+>   	/* If a MMIO SPTE is installed, the MMIO will need to be emulated. */
+> -	if (unlikely(is_mmio_spte(new_spte))) {
+> +	if (unlikely(is_mmio_spte(vcpu->kvm, new_spte))) {
+>   		vcpu->stat.pf_mmio_spte_created++;
+>   		trace_mark_mmio_spte(rcu_dereference(iter->sptep), iter->gfn,
+>   				     new_spte);
+
 
