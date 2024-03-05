@@ -1,120 +1,94 @@
-Return-Path: <kvm+bounces-11009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92CB8720D5
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:52:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CBB8720FC
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 14:59:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55522831F7
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:52:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2735D1F26414
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 13:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47005762DF;
-	Tue,  5 Mar 2024 13:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="dAMoq0OU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033E186151;
+	Tue,  5 Mar 2024 13:59:05 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD91E58AC7
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FBE85C74
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 13:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709646750; cv=none; b=jQzL7Il++inY4MSPaWTKdXSoH3MM3OHwwZwnUxlmy6Cq2PisTsgxBKWrbqrnszvXQEdMBeXi7DAGWLQ+rGkcEaxliHeRz+mM51zglpZsq477ceWJVWfATaUTsu8bU7QGipnN6Bdwa+wVoDy7lIDKA+lmFBR5Qk929ESPjRInza4=
+	t=1709647144; cv=none; b=U55NR1ylfOtxH0ug+gCh5olikfQSPXyDVTU0SvMqcaz0PN5vZpOfC1pvDfpypfJklcDTPyGBftUQV55IvwHFWzMWEB+wV22XPjW4Q10R9huU2iFCEqwcSgm22hOEAFu/8VdMMajmIVJGrjBUU+0PFqm2y3W9E4Dq0mjzLiYw4B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709646750; c=relaxed/simple;
-	bh=E0cup9XHTg0Jk93yvKwsAEASCZWwsWlH8fQYCFJSKrA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cdug5GSgwOaXzIFsvafDF44zCQvYr5UvBNfqKDV0H8VboV5QBG52ooFn4Ni9jGP3fNs88VNfRqPJTL4RzlAPt78LK8zU6U9bGhaT8SIddOOM1TlKbEWgXihPTxJo6njVf400SnKDkuil09Y4nfLcjibLjLjzp2jgCf/x27qFFX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=dAMoq0OU; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-513298d6859so861797e87.3
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:52:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709646747; x=1710251547; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x0+/F9yIyDFWa2cLOZBvi3dYezgFdZjlUBtNmjzvp0Y=;
-        b=dAMoq0OUVMcjyxAEjYhGDT4OrlsitTsU8cSQGzfL/Cv4W1FdsIXSkz2hXeITQzTi79
-         jucw8G2bUfXp5b0rlkWgDY2+X/J7q0HGKb6hOyd4fUOb/VQyNJ+ze2ypHZ0s5kzD5n+I
-         3WjQglQBXg1ckRSdJjtmJQxiX97HDQz/v5iK0MiW51d1oxX6v8Y7H/l09g1XrV0htwHR
-         cIa5aDe0B4JRZYqGVj/nHRme590JrjmbKrI229tO++1nMgGpw+123CEYDHWhCJcExgqQ
-         3792AJUOOUsKeM+dugvQ7F6mJ7/qM3U3P5EHMS8J4+NLtzC5BFSZVX17G13cM/NtvbLV
-         EX/Q==
+	s=arc-20240116; t=1709647144; c=relaxed/simple;
+	bh=7l33o63t817PVAJxkpl+CDCljilBzWublR/7OYtNxNM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=a0cF9OKjvy/aRUxJEj//37QVG70f7p63NCLZcEgcaf4qC3EcESK0gwUhxRnQPYyP/pOxqwVBDiV2nVF7y6KuEHrexiRPiXGDkCc3bOXXiJweN21cJtPAl1cXmU5a2rccmPwSrKqLDagL9It4MlTWgh7GxHE5Z31RNOLOFA3RG2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c85571a980so149485639f.1
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 05:59:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709646747; x=1710251547;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x0+/F9yIyDFWa2cLOZBvi3dYezgFdZjlUBtNmjzvp0Y=;
-        b=St701m9bE/Ynnen6kSVLpKmSEB9VDyGmgBqH/M6WhtvFLLerd5tcT0ZRhavKfDEECU
-         Lu488wWTdgsGK+LIY8zKa3u6mclqA6zTvbGdM4lse6SgzKn9zKka47ireoJz9ldQlyst
-         M01VgTIUoGA12edWQ1zVx+BTkehqaoXtL16dG8W9MSo/mne9pfm0nUkahFSPJICKPx8b
-         Xrg03hg7To5PKg3F5FpMjJU/VnxCsMCmit5sEwh8k4JxRNB1DV2X+Tn/2x1e69pEO/n8
-         1FhuCKwTuKc3IGIhaas5Q4HCTp3AWf7+5o4enFCDQ6qygknbTDijkvkroerPyfvgTaEX
-         nzjA==
-X-Forwarded-Encrypted: i=1; AJvYcCVM98rxRve1yiawf7NoDL5MPKpk46dfvCUefl7z9YA/xdRAkw4utFU7FW6pqkDaZESIdJuqQVAVJT/Rj0ri6/T8qKbG
-X-Gm-Message-State: AOJu0Yx87jkVqJulszIBRdAie4IpCj/hZ+i5alftpweA8yz2BNt/6PBc
-	NSa9hdOvfU4KArRmIxyQaRg3cnx8SRkzpC0nLInYnFp4SQTxVtWQptyI5xRna4A=
-X-Google-Smtp-Source: AGHT+IFk1xWhU+ZUpYRMGt03Z0RA0hJbI17AYWEhXFT2tGMtV8bWqxsiwi9F6QIc+IsSw3z+tDmcqA==
-X-Received: by 2002:a05:6512:3d0d:b0:513:46f2:26 with SMTP id d13-20020a0565123d0d00b0051346f20026mr1703856lfv.66.1709646746897;
-        Tue, 05 Mar 2024 05:52:26 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id f17-20020a170906049100b00a40f7ed6cb9sm6076835eja.4.2024.03.05.05.52.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 05:52:26 -0800 (PST)
-Date: Tue, 5 Mar 2024 14:52:25 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com, 
-	maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [kvmtool PATCH 10/10] riscv: Allow disabling SBI STA extension
- for Guest
-Message-ID: <20240305-05dffac2a28923796e790f0b@orel>
-References: <20240214122141.305126-1-apatel@ventanamicro.com>
- <20240214122141.305126-11-apatel@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1709647142; x=1710251942;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ozqm1QJ84yI8HdJqurYAliOOcrvYW5cx3nOSejB731o=;
+        b=qh/JZoUEwDdT4SMTkR3kyG5dfDqeb8I3QN3ziM+dP/Yst4bucPu2o2W1hvihQMujsi
+         XDNupVrQ2TWw2IN5Sx20W5yE3mpd+jApXmTawyazxHsIvGZhW1k7r9xRsRpxdld0RPwR
+         OgMZJtKEL/1A3Klk1NaV1aZjWeh7rae6LNq/81fkStLqPZ+x9hxwSlw/q78SiKiIOnmo
+         lHsH3z8XinB7jT+cKaTmw16hIQa1HRNeJHuIobIBp8LvMboXWH2uhoTq/O4hUi7S8rnn
+         S2YUNTTk0x2DsOKAtBFLrVuoTOM992s5On+NLUneJ9Szb7bQA58fEpqoj+be8SDw0fdY
+         uWdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVko/+/YPOav8Y31x0K7R/DUzWZOZRX1sH8CqvRxh3mBX+JH9pbcnw8+1j7GkmHVMoNUwdLASCJuXOYmgjqCXAnahr0
+X-Gm-Message-State: AOJu0YyejfJg4jxOcDR7IN1mog7XYTWQMmgNy2BeM0hSk9Qs6LJ7Lxaz
+	cmWw976RQMrdQsHiKGCaZ1c9Du5+Hmd1U20O9FH7oTirmJlO3rRrSqBF+meDhDtAu1kNjfn5RM+
+	rKtMbsDHfYSC4J98Cw8UxMyMHrdRUt0tzJC4P+ANSjdLzBE0tz1GL5HA=
+X-Google-Smtp-Source: AGHT+IEP8n8qSf96nLlSO2rFxSJmbyVVUTknjVpsBlFop11mtXH7lx6mogLF/UQM1fodPwn/6hIAi5kpU8HrhUOEGbHhzUj7aJDi
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240214122141.305126-11-apatel@ventanamicro.com>
+X-Received: by 2002:a05:6638:35a7:b0:474:d2f6:f0d1 with SMTP id
+ v39-20020a05663835a700b00474d2f6f0d1mr81402jal.1.1709647142220; Tue, 05 Mar
+ 2024 05:59:02 -0800 (PST)
+Date: Tue, 05 Mar 2024 05:59:02 -0800
+In-Reply-To: <000000000000376d93060a5207ed@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009a8bce0612ea3e3c@google.com>
+Subject: Re: [syzbot] [kvm?] WARNING in kvm_mmu_notifier_invalidate_range_start
+ (3)
+From: syzbot <syzbot+c74f40907a9c0479af10@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com, 
+	syzkaller-bugs@googlegroups.com, tintinm2017@gmail.com, 
+	usama.anjum@collabora.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 14, 2024 at 05:51:41PM +0530, Anup Patel wrote:
-> We add "--disable-sbi-sta" options to allow users disable SBI steal-time
-> extension for the Guest.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  riscv/include/kvm/kvm-config-arch.h | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-> index 6415d3d..e562d71 100644
-> --- a/riscv/include/kvm/kvm-config-arch.h
-> +++ b/riscv/include/kvm/kvm-config-arch.h
-> @@ -186,6 +186,9 @@ struct kvm_config_arch {
->  		    "Disable SBI Vendor Extensions"),			\
->  	OPT_BOOLEAN('\0', "disable-sbi-dbcn",				\
->  		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_DBCN],	\
-> -		    "Disable SBI DBCN Extension"),
-> +		    "Disable SBI DBCN Extension"),			\
-> +	OPT_BOOLEAN('\0', "disable-sbi-sta",				\
-> +		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_STA],	\
-> +		    "Disable SBI STA Extension"),
->  
->  #endif /* KVM__KVM_CONFIG_ARCH_H */
-> -- 
-> 2.34.1
->
+syzbot suspects this issue was fixed by commit:
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+commit 4cccb6221cae6d020270606b9e52b1678fc8b71a
+Author: Muhammad Usama Anjum <usama.anjum@collabora.com>
+Date:   Tue Jan 9 11:24:42 2024 +0000
+
+    fs/proc/task_mmu: move mmu notification mechanism inside mm lock
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1638c66c180000
+start commit:   b57b17e88bf5 Merge tag 'parisc-for-6.7-rc1-2' of git://git..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d950a2e2e34359e2
+dashboard link: https://syzkaller.appspot.com/bug?extid=c74f40907a9c0479af10
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15785fc4e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1469c9a8e80000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: fs/proc/task_mmu: move mmu notification mechanism inside mm lock
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
