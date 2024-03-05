@@ -1,150 +1,155 @@
-Return-Path: <kvm+bounces-10843-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5AEA8711CA
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 01:38:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72B35871230
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 02:02:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DB962839F4
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 00:37:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0127C281CE2
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 01:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B2779C4;
-	Tue,  5 Mar 2024 00:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93ABDEEC4;
+	Tue,  5 Mar 2024 01:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mh0LXIwk"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mwrsa//Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352633211
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 00:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105388BEC
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 01:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709599066; cv=none; b=n9gk4DNVHJk18Cb/Y1PsMeqYfiVYeAbY0RabTLWNoytgOAY6egORyt3XCq9rWG1HI2SktDWae8+xghPwTL4laUvA8np6ys0uBNGKh2V9yeJyoQsxA+ywYQUsZgWKaIOAnJWhDIxGqH+aZkzV0JHuOIun5YLa1mnroMoqhRzYbzo=
+	t=1709600513; cv=none; b=KLvI+7RNK19oTxKcLZsVjhbkgG46YIZm8l3z1Vv5H2Q9Zt6xc6KarZYLjgrnfW6jhpq+tQdcv9s+R2YVUM88dY68AUx/4nkb/xnLWhIPzNAP1tR9ibv6FXaO4x5+6UsjA36zOM4lUha5+keqXBJC+PwH92u5ArR49AL0Z9zxDaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709599066; c=relaxed/simple;
-	bh=DUXhp+g4qoxMZncdiQGNSWIv8z7LVY9hkgbsTfx2fRQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fK3Rr+vGkojfNQEIhbJRBhx3vThCgXKno8iQcIlIwBifHBVHhXskCw9r5fAUifHASIPPwuAsMfVwmaztS/esldVGurksQSskxZDF5++i4yBRvZ89x1Goxgqj+QRDrqS/mpEiyt0+yhht+5PmYe7f/ykCpAfePFAZExQQassJ6aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mh0LXIwk; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-29ad35a8650so4842508a91.0
-        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 16:37:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709599064; x=1710203864; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qPDZDFGuvVe1xm4D1iYkB/saEEgYVA3F8rFzvBJXEcU=;
-        b=Mh0LXIwkXgNwesFjha1FKnlA6c5sgTK0SKWV0vtb2srlO6C5NbuG+bux91YkryI1By
-         rjitqWdS+0/mGelKxvuuF6EI48hPLdKski437eF5MuQ5DREOy5J42wdS5J2yVzq0xsuB
-         epHDy/jX/ltAOAWXC+5BQNFOADIa0ieO0gGoADQzC/OQ8O3dPJARA0iZ/IQQKNwQDywh
-         n6n0W65lkLA+T6VmZefqmov0Uvlz8fD8MPn57MkRM6dpIOW9fe4F5rMVP63+ZJnWX8sc
-         MG/lTXjmXXPf9bREGw782OjOwp00taOEA8zrgYYRKBAvf/HONzBiqqgcC8eEYMVUQTXB
-         nGNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709599064; x=1710203864;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qPDZDFGuvVe1xm4D1iYkB/saEEgYVA3F8rFzvBJXEcU=;
-        b=c0miBPdSFYSsiVYudzNaopGi8X7rQwSBTDEqtU3oORvRb3E0it1AJ1OLphUG7Q/LhI
-         Qdms94RwxRXlS7tBGNxFzLWTk1PdhTRw/uCKPcs/Jyfgz0K1vSH+GDItnZN3pzy5bz0c
-         xfwdXo4oylVBEtijLzqRAIuEhG/OpNaKzGRdat0vlrtdh9q5uFghjlc44sLnVQ5g8NM4
-         4kG63NcAiOScb0OiqBV4u/DwpHM6hh4183Cb19fdw93qThb7QcQiX7DW0QZiz+jdO+hQ
-         P5PwARHSFwXTKqSHP7xsmf/8UUFvq6HPiP+ztfMwy1xmE4cC+qp7K4m08d1KAyqZcDbT
-         PIgQ==
-X-Gm-Message-State: AOJu0Yz+stqhem4HHJ22dqqglajv1kds6vzHzbrlf1A0WyB8QHupWi+X
-	5JDAhx9q36yQMS/nGVyK5PTW0YAlBVgnmL5HSuavLMW9jZMRwXIoae06/hWXgSSvdwecH3RKMuX
-	IYw==
-X-Google-Smtp-Source: AGHT+IEIR3UYe44S1T2sQALNQ9lpMFR1+QrQVzgvSlJIhG/glLcCrrCzAf9Qa7vrIu0VeJkZ+mhlNOZcKOY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:5414:b0:29b:2fb2:e2a1 with SMTP id
- z20-20020a17090a541400b0029b2fb2e2a1mr5802pjh.2.1709599064239; Mon, 04 Mar
- 2024 16:37:44 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon,  4 Mar 2024 16:37:42 -0800
+	s=arc-20240116; t=1709600513; c=relaxed/simple;
+	bh=BwPSZlt7NYNE4oqpthrBP3Pq0CvLDk53hLZltcU3Pqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QZlOsSMx8/G0Z4I0OWXUkGx6SUjmowz7oJyqVO4hyiFp2CrXWrvHwl6vueZzgtnpn/mLTkElQVGI4it10vPu37nmnYRM3n/3ApDxzJyRZjHq627Nen8pOx8Y7jX7kIORok51P5dS3PlZ5szi8MsNLOlTZMzhrurAyFjPIH6Nf18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mwrsa//Q; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 5 Mar 2024 01:01:40 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709600508;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JtsWbQ9wjONc3H0VXJlmWvFBcN642D74YneUxe2uTig=;
+	b=mwrsa//QZkjTewCtK+S311ucLPc4G/6akOxyzNFwUhvJcjZjgDFjOq+GbOG42BHUlt5JXr
+	kmeqWobMVwQcOgYL8mwPk9rD5/w2F628JYlJnGvcUITof0O3dSWF19VvuO7QdLgol94zad
+	sbJPomi0xx3lIHuqm2y/MB0V9UztKQ8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Anish Moorthy <amoorthy@google.com>, maz@kernel.org,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	robert.hoo.linux@gmail.com, jthoughton@google.com,
+	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com,
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com,
+	kconsul@linux.vnet.ibm.com
+Subject: Re: [PATCH v7 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
+ and annotate fault in the stage-2 fault handler
+Message-ID: <ZeZu9D3Ic_1O5CIO@linux.dev>
+References: <20240215235405.368539-1-amoorthy@google.com>
+ <20240215235405.368539-9-amoorthy@google.com>
+ <ZeYoSSYtDxKma-gg@linux.dev>
+ <ZeYqt86yVmCu5lKP@linux.dev>
+ <ZeYv86atkVpVMa2S@google.com>
+ <ZeY3P8Za5Q6pkkQV@linux.dev>
+ <ZeZP4xOMk7LUnNt2@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240305003742.245767-1-seanjc@google.com>
-Subject: [PATCH] KVM: Drop unused @may_block param from gfn_to_pfn_cache_invalidate_start()
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Like Xu <like.xu.linux@gmail.com>, Paul Durrant <paul@xen.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZeZP4xOMk7LUnNt2@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Remove gfn_to_pfn_cache_invalidate_start()'s unused @may_block parameter,
-which was leftover from KVM's abandoned (for now) attempt to support guest
-usage of gfn_to_pfn caches.
+On Mon, Mar 04, 2024 at 02:49:07PM -0800, Sean Christopherson wrote:
 
-Fixes: a4bff3df5147 ("KVM: pfncache: remove KVM_GUEST_USES_PFN usage")
-Reported-by: Like Xu <like.xu.linux@gmail.com>
-Cc: Paul Durrant <paul@xen.org>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- virt/kvm/kvm_main.c | 3 +--
- virt/kvm/kvm_mm.h   | 6 ++----
- virt/kvm/pfncache.c | 2 +-
- 3 files changed, 4 insertions(+), 7 deletions(-)
+[...]
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ff588677beb7..7106b57b8468 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -832,8 +832,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 	 * mn_active_invalidate_count (see above) instead of
- 	 * mmu_invalidate_in_progress.
- 	 */
--	gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end,
--					  hva_range.may_block);
-+	gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end);
- 
- 	/*
- 	 * If one or more memslots were found and thus zapped, notify arch code
-diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
-index ecefc7ec51af..715f19669d01 100644
---- a/virt/kvm/kvm_mm.h
-+++ b/virt/kvm/kvm_mm.h
-@@ -26,13 +26,11 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
- #ifdef CONFIG_HAVE_KVM_PFNCACHE
- void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
- 				       unsigned long start,
--				       unsigned long end,
--				       bool may_block);
-+				       unsigned long end);
- #else
- static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
- 						     unsigned long start,
--						     unsigned long end,
--						     bool may_block)
-+						     unsigned long end)
- {
- }
- #endif /* HAVE_KVM_PFNCACHE */
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index 9ac8c9da4eda..bff9875cdcd2 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -23,7 +23,7 @@
-  * MMU notifier 'invalidate_range_start' hook.
-  */
- void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
--				       unsigned long end, bool may_block)
-+				       unsigned long end)
- {
- 	struct gfn_to_pfn_cache *gpc;
- 
+> The presense of MTE stuff shouldn't affect the fundamental access information,
 
-base-commit: 003d914220c97ef93cabfe3ec4e245e2383e19e9
+  "When FEAT_MTE is implemented, for a synchronous Data Abort on an
+  instruction that directly accesses Allocation Tags, ISV is 0."
+
+If there is no instruction syndrome, there's insufficient fault context
+to determine if the guest was doing a read or a write.
+
+> e.g. if the guest was attempting to write, then KVM should set KVM_MEMORY_EXIT_FLAG_WRITE
+> irrespective of whether or not MTE is in play.
+
+When the MMU generates such an abort, it *is not* read, write, or execute.
+It is a NoTagAccess fault. There is no sane way to describe this in
+terms of RWX.
+
+> The one thing we may want to squeak in before 6.8 is released is a placeholder
+> in memory_fault, though I don't think that's strictly necessary since the union
+> as a whole is padded to 256 bytes.  I suppose userspace could allocate based on
+> sizeof(kvm_run.memory_fault), but that's a bit of a stretch.
+
+Strictly speaking, that isn't ABI any more, but compile-time brittleness
+to header changes. IOW, old userspace could still run on new kernel b/c
+it compiled against the old structure size and only knows about the
+fields present at that time.
+
+> > > E.g. on the x86 side, KVM intentionally sets reserved bits in SPTEs for
+> > > "caching" emulated MMIO accesses, and the resulting fault captures the
+> > > "reserved bits set" information in register state.  But that's purely an
+> > > (optional) imlementation detail of KVM that should never be exposed to
+> > > userspace.
+> > 
+> > MMIO accesses would show up elsewhere though, right?
+> 
+> Yes, but I don't see how that's relevant.  Maybe I'm just misunderstanding what
+> you're saying/asking.
+
+If "reserved" EPT violations found their way to userspace via the
+"memory fault" exit structure then that'd likely be due to a KVM bug.
+The only expected flows in the near term are this and CoCo crap.
+
+> > Either way, I have no issues whatsoever if the direction for x86 is to
+> > provide abstracted fault information.
+> 
+> I don't understand how ARM can get away with NOT providing a layer of abstraction.
+> Copying fault state verbatim to userspace will bleed KVM implementation details
+> into userspace,
+
+The memslot flag already bleeds KVM implementation detail into userspace
+to a degree. The event we're trying to let userspace handle is at the
+intersection of a specific hardware/software state.
+
+> Abstracting gory hardware details from userspace is one of the main roles of the
+> kernel.
+
+Where it can be accomplished without a loss (or misrepresentation) of
+information, agreed. But KVM UAPI is so architecture-specific that it
+seems arbitrary to draw the line here.
+
+> A concrete example of hardware throwing a wrench in things is AMD's upcoming
+> "encrypted" flag (in the stage-2 page fault error code), which is set by SNP-capable
+> CPUs for *any* VM that supports guest-controlled encrypted memory.  If KVM reported
+> the page fault error code directly to userspace, then running the same VM on
+> different hardware generations, e.g. after live migration, would generate different
+> error codes.
+>  
+> Are we talking past each other?  I'm genuinely confused by the pushback on
+> capturing RWX information.  Yes, the RWX info may be insufficient in some cases,
+> but its existence doesn't preclude KVM from providing more information as needed.
+
+My pushback isn't exactly on RWX (even though I noted the MTE quirk
+above). What I'm poking at here is the general infrastructure for
+reflecting faults into userspace, which is aggressively becoming more
+relevant.
+
 -- 
-2.44.0.278.ge034bb2e1d-goog
-
+Thanks,
+Oliver
 
