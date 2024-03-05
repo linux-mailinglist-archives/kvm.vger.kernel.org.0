@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-10956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10957-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8417A871D4B
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:20:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78653871D52
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:21:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF4C4B24564
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:20:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3342728630D
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F9E5A7A5;
-	Tue,  5 Mar 2024 11:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F0B5B67B;
+	Tue,  5 Mar 2024 11:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KjAV+KIv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MpdeScnU"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71BB5A4ED;
-	Tue,  5 Mar 2024 11:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B930F5B5A9;
+	Tue,  5 Mar 2024 11:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709637546; cv=none; b=n0CkIn7HjHa4kw6HS8aK3x0hjVvneAhmLQceiXCqTIxrPBaC40L9PLv0SBBwPvRmTmy6v7UvJXMWp/xWM8R8Q1Ej7r1dR6OEWZ+l6lw0MMfJkywEEsqcqlnqFxCAc/T4lT5RXj5GqRGLMbogUjns95rR1iDBEwZJH0G5iwThj1c=
+	t=1709637550; cv=none; b=l5YhC6EsRTVx2sDjwR5V/2Jp4rI39dQDBiQS/jHeSEN6U6RDL2IM+BRD5Wy+s4ykPY3BZog1T1xbUzK6fpj2RdJw20inBVKaMpWjNcmJ87nscAlfH3yzENTwVHC7gM0+g71C30idhHB9SDjo50glrQkRqP8flkdd1bSnX1I4I4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709637546; c=relaxed/simple;
-	bh=qAJEud8zSEtY+UaYfguXl0FuNLhyjwr4jvzS2H85FiM=;
+	s=arc-20240116; t=1709637550; c=relaxed/simple;
+	bh=W6hmByMbviZow30AysrbmdCiStk7NPI/+8Qeoey1JY8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uOFeUVCht3moNhOjMhjE0hQfOV+6Uhhv2s9qdqzWtRg0lidkv1t2WSBq0OaeDS7bT3Uc752Y/DuC4XLCFEV87EqRp4Nl4go9mVE4Ocagu+FiXG89dvOODXxaZBy8VJm49ZGEzj+Fz8fU7iB6+VmJa5uensB3NAiPbxaLWAWUlb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KjAV+KIv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7A1EC433C7;
-	Tue,  5 Mar 2024 11:19:05 +0000 (UTC)
+	 MIME-Version; b=IxrWI2Mg+fqy2BH6nKEc83hC280UkDqbNgfHvNhhMYVibsbZWBHyyDgxCMnGcTCoSp8sH/QTnT93IUpjH6R+cWkhYEv+DOVnXOJHU4RDL+eWr3Ks80khrSjTrTOQ0PWXLGKt45ydLK3f4YbMw7X8b/MnIRXVcP22RYMmOMRB4mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MpdeScnU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C71CDC43399;
+	Tue,  5 Mar 2024 11:19:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709637546;
-	bh=qAJEud8zSEtY+UaYfguXl0FuNLhyjwr4jvzS2H85FiM=;
+	s=k20201202; t=1709637550;
+	bh=W6hmByMbviZow30AysrbmdCiStk7NPI/+8Qeoey1JY8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KjAV+KIvzMLMIdyG6JQAPl5ekfey4SRoKdyMLevM5fk4VwjTRfuycwOlywUkEPDcy
-	 0DlyyyZ/zaORCQOgnjFjU8rjSTbdyLBgVk6eAf8U/7rgufjmCZV0Se7mNNWv57XAwW
-	 3kcOXGxfOWDGLKRTmHc39BKEs25lC2ncwvbVWh9JRe7ynug0LMSFdUR51UNihoDebH
-	 7Rp6XPyJK6e/PYCkYMmdP+NsRMPF6nlrrpQ8zDLr4mpVlJhfrPCf1T4vHDBeatDyJP
-	 OIIkQ912eZthQoJoEx5LjrRYDUM2DluK9KVVx2lxW+TXlMzYxT1ExRjxvcAi/tEEWs
-	 yPGH84ns91w6w==
+	b=MpdeScnUIeYk+dhaM84hI3cY+U/wRl1QwW6ChtfURz2UuXIkV/XmMb1iErLTtmXiG
+	 /HjgMX099w475jFo54Xe8Q+caajG6pt9XGe0DUtiQeES0xUT7BVd7CoWZIw8EA+uwo
+	 6dsPHe/M7bBaiSWUKfrDQaBJaxVr4WKQToT6uKCEnE7l4hHS5sYzkV1muh3ik4mCtm
+	 eJmV3SQytdzwIJJShgEZZtirWhrLq9A38CmemQNqmmnucs2zB1yVGEf9bDZylrpk3V
+	 omibGAuvCU7jmybm4/4tvGmiTBVuJ6HkGBg7ybwdZHbeop+Scpi/j4bhWKRUfyTUEQ
+	 3R/7MjGMtOeCw==
 From: Leon Romanovsky <leon@kernel.org>
 To: Christoph Hellwig <hch@lst.de>,
 	Robin Murphy <robin.murphy@arm.com>,
@@ -77,9 +77,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	Dan Williams <dan.j.williams@intel.com>,
 	"jack@suse.com" <jack@suse.com>,
 	Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: [RFC RESEND 03/16] dma-mapping: provide callbacks to link/unlink pages to specific IOVA
-Date: Tue,  5 Mar 2024 13:18:34 +0200
-Message-ID: <f1049f0fc280288ae2f0c1e02388cde91b0f7876.1709635535.git.leon@kernel.org>
+Subject: [RFC RESEND 04/16] iommu/dma: Provide an interface to allow preallocate IOVA
+Date: Tue,  5 Mar 2024 13:18:35 +0200
+Message-ID: <e580473eb571d56c8e3952ebcdab05151a7efe7c.1709635535.git.leon@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <cover.1709635535.git.leon@kernel.org>
 References: <cover.1709635535.git.leon@kernel.org>
@@ -93,169 +93,164 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Introduce new DMA link/unlink API to provide a way for advanced users
-to directly map/unmap pages without ned to allocate IOVA on every map
-call.
+Separate IOVA allocation to dedicated callback so it will allow
+cache of IOVA and reuse it in fast paths for devices which support
+ODP (on-demand-paging) mechanism.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- include/linux/dma-map-ops.h | 10 +++++++
- include/linux/dma-mapping.h | 13 +++++++++
- kernel/dma/debug.h          |  2 ++
- kernel/dma/direct.h         |  3 ++
- kernel/dma/mapping.c        | 57 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 85 insertions(+)
+ drivers/iommu/dma-iommu.c | 50 +++++++++++++++++++++++++++++----------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
-index bd605b44bb57..fd03a080df1e 100644
---- a/include/linux/dma-map-ops.h
-+++ b/include/linux/dma-map-ops.h
-@@ -86,6 +86,13 @@ struct dma_map_ops {
+diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+index 50ccc4f1ef81..e55726783501 100644
+--- a/drivers/iommu/dma-iommu.c
++++ b/drivers/iommu/dma-iommu.c
+@@ -356,7 +356,7 @@ int iommu_dma_init_fq(struct iommu_domain *domain)
+ 	atomic_set(&cookie->fq_timer_on, 0);
+ 	/*
+ 	 * Prevent incomplete fq state being observable. Pairs with path from
+-	 * __iommu_dma_unmap() through iommu_dma_free_iova() to queue_iova()
++	 * __iommu_dma_unmap() through __iommu_dma_free_iova() to queue_iova()
+ 	 */
+ 	smp_wmb();
+ 	WRITE_ONCE(cookie->fq_domain, domain);
+@@ -760,7 +760,7 @@ static int dma_info_to_prot(enum dma_data_direction dir, bool coherent,
+ 	}
+ }
  
- 	dma_addr_t (*alloc_iova)(struct device *dev, size_t size);
- 	void (*free_iova)(struct device *dev, dma_addr_t dma_addr, size_t size);
-+	dma_addr_t (*link_range)(struct device *dev, struct page *page,
-+				 unsigned long offset, dma_addr_t addr,
-+				 size_t size, enum dma_data_direction dir,
-+				 unsigned long attrs);
-+	void (*unlink_range)(struct device *dev, dma_addr_t dma_handle,
-+			     size_t size, enum dma_data_direction dir,
-+			     unsigned long attrs);
+-static dma_addr_t iommu_dma_alloc_iova(struct iommu_domain *domain,
++static dma_addr_t __iommu_dma_alloc_iova(struct iommu_domain *domain,
+ 		size_t size, u64 dma_limit, struct device *dev)
+ {
+ 	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+@@ -806,7 +806,7 @@ static dma_addr_t iommu_dma_alloc_iova(struct iommu_domain *domain,
+ 	return (dma_addr_t)iova << shift;
+ }
+ 
+-static void iommu_dma_free_iova(struct iommu_dma_cookie *cookie,
++static void __iommu_dma_free_iova(struct iommu_dma_cookie *cookie,
+ 		dma_addr_t iova, size_t size, struct iommu_iotlb_gather *gather)
+ {
+ 	struct iova_domain *iovad = &cookie->iovad;
+@@ -843,7 +843,7 @@ static void __iommu_dma_unmap(struct device *dev, dma_addr_t dma_addr,
+ 
+ 	if (!iotlb_gather.queued)
+ 		iommu_iotlb_sync(domain, &iotlb_gather);
+-	iommu_dma_free_iova(cookie, dma_addr, size, &iotlb_gather);
++	__iommu_dma_free_iova(cookie, dma_addr, size, &iotlb_gather);
+ }
+ 
+ static dma_addr_t __iommu_dma_map(struct device *dev, phys_addr_t phys,
+@@ -861,12 +861,12 @@ static dma_addr_t __iommu_dma_map(struct device *dev, phys_addr_t phys,
+ 
+ 	size = iova_align(iovad, size + iova_off);
+ 
+-	iova = iommu_dma_alloc_iova(domain, size, dma_mask, dev);
++	iova = __iommu_dma_alloc_iova(domain, size, dma_mask, dev);
+ 	if (!iova)
+ 		return DMA_MAPPING_ERROR;
+ 
+ 	if (iommu_map(domain, iova, phys - iova_off, size, prot, GFP_ATOMIC)) {
+-		iommu_dma_free_iova(cookie, iova, size, NULL);
++		__iommu_dma_free_iova(cookie, iova, size, NULL);
+ 		return DMA_MAPPING_ERROR;
+ 	}
+ 	return iova + iova_off;
+@@ -970,7 +970,7 @@ static struct page **__iommu_dma_alloc_noncontiguous(struct device *dev,
+ 		return NULL;
+ 
+ 	size = iova_align(iovad, size);
+-	iova = iommu_dma_alloc_iova(domain, size, dev->coherent_dma_mask, dev);
++	iova = __iommu_dma_alloc_iova(domain, size, dev->coherent_dma_mask, dev);
+ 	if (!iova)
+ 		goto out_free_pages;
+ 
+@@ -1004,7 +1004,7 @@ static struct page **__iommu_dma_alloc_noncontiguous(struct device *dev,
+ out_free_sg:
+ 	sg_free_table(sgt);
+ out_free_iova:
+-	iommu_dma_free_iova(cookie, iova, size, NULL);
++	__iommu_dma_free_iova(cookie, iova, size, NULL);
+ out_free_pages:
+ 	__iommu_dma_free_pages(pages, count);
+ 	return NULL;
+@@ -1436,7 +1436,7 @@ static int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg,
+ 	if (!iova_len)
+ 		return __finalise_sg(dev, sg, nents, 0);
+ 
+-	iova = iommu_dma_alloc_iova(domain, iova_len, dma_get_mask(dev), dev);
++	iova = __iommu_dma_alloc_iova(domain, iova_len, dma_get_mask(dev), dev);
+ 	if (!iova) {
+ 		ret = -ENOMEM;
+ 		goto out_restore_sg;
+@@ -1453,7 +1453,7 @@ static int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg,
+ 	return __finalise_sg(dev, sg, nents, iova);
+ 
+ out_free_iova:
+-	iommu_dma_free_iova(cookie, iova, iova_len, NULL);
++	__iommu_dma_free_iova(cookie, iova, iova_len, NULL);
+ out_restore_sg:
+ 	__invalidate_sg(sg, nents);
+ out:
+@@ -1706,6 +1706,30 @@ static size_t iommu_dma_opt_mapping_size(void)
+ 	return iova_rcache_range();
+ }
+ 
++static dma_addr_t iommu_dma_alloc_iova(struct device *dev, size_t size)
++{
++	struct iommu_domain *domain = iommu_get_dma_domain(dev);
++	struct iommu_dma_cookie *cookie = domain->iova_cookie;
++	struct iova_domain *iovad = &cookie->iovad;
++	dma_addr_t dma_mask = dma_get_mask(dev);
++
++	size = iova_align(iovad, size);
++	return __iommu_dma_alloc_iova(domain, size, dma_mask, dev);
++}
++
++static void iommu_dma_free_iova(struct device *dev, dma_addr_t iova,
++				size_t size)
++{
++	struct iommu_domain *domain = iommu_get_dma_domain(dev);
++	struct iommu_dma_cookie *cookie = domain->iova_cookie;
++	struct iova_domain *iovad = &cookie->iovad;
++	struct iommu_iotlb_gather iotlb_gather;
++
++	size = iova_align(iovad, size);
++	iommu_iotlb_gather_init(&iotlb_gather);
++	__iommu_dma_free_iova(cookie, iova, size, &iotlb_gather);
++}
++
+ static const struct dma_map_ops iommu_dma_ops = {
+ 	.flags			= DMA_F_PCI_P2PDMA_SUPPORTED,
+ 	.alloc			= iommu_dma_alloc,
+@@ -1728,6 +1752,8 @@ static const struct dma_map_ops iommu_dma_ops = {
+ 	.unmap_resource		= iommu_dma_unmap_resource,
+ 	.get_merge_boundary	= iommu_dma_get_merge_boundary,
+ 	.opt_mapping_size	= iommu_dma_opt_mapping_size,
++	.alloc_iova		= iommu_dma_alloc_iova,
++	.free_iova		= iommu_dma_free_iova,
  };
  
- #ifdef CONFIG_DMA_OPS
-@@ -428,6 +435,9 @@ bool arch_dma_unmap_sg_direct(struct device *dev, struct scatterlist *sg,
- #define arch_dma_unmap_sg_direct(d, s, n)	(false)
- #endif
+ /*
+@@ -1776,7 +1802,7 @@ static struct iommu_dma_msi_page *iommu_dma_get_msi_page(struct device *dev,
+ 	if (!msi_page)
+ 		return NULL;
  
-+#define arch_dma_link_range_direct arch_dma_map_page_direct
-+#define arch_dma_unlink_range_direct arch_dma_unmap_page_direct
-+
- #ifdef CONFIG_ARCH_HAS_SETUP_DMA_OPS
- void arch_setup_dma_ops(struct device *dev, u64 dma_base, u64 size,
- 		bool coherent);
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index 176fb8a86d63..91cc084adb53 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -113,6 +113,9 @@ static inline int dma_mapping_error(struct device *dev, dma_addr_t dma_addr)
+-	iova = iommu_dma_alloc_iova(domain, size, dma_get_mask(dev), dev);
++	iova = __iommu_dma_alloc_iova(domain, size, dma_get_mask(dev), dev);
+ 	if (!iova)
+ 		goto out_free_page;
  
- int dma_alloc_iova(struct dma_iova_attrs *iova);
- void dma_free_iova(struct dma_iova_attrs *iova);
-+dma_addr_t dma_link_range(struct page *page, unsigned long offset,
-+			  struct dma_iova_attrs *iova, dma_addr_t dma_offset);
-+void dma_unlink_range(struct dma_iova_attrs *iova, dma_addr_t dma_offset);
+@@ -1790,7 +1816,7 @@ static struct iommu_dma_msi_page *iommu_dma_get_msi_page(struct device *dev,
+ 	return msi_page;
  
- dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
- 		size_t offset, size_t size, enum dma_data_direction dir,
-@@ -179,6 +182,16 @@ static inline int dma_alloc_iova(struct dma_iova_attrs *iova)
- static inline void dma_free_iova(struct dma_iova_attrs *iova)
- {
- }
-+static inline dma_addr_t dma_link_range(struct page *page, unsigned long offset,
-+					struct dma_iova_attrs *iova,
-+					dma_addr_t dma_offset)
-+{
-+	return DMA_MAPPING_ERROR;
-+}
-+static inline void dma_unlink_range(struct dma_iova_attrs *iova,
-+				    dma_addr_t dma_offset)
-+{
-+}
- static inline dma_addr_t dma_map_page_attrs(struct device *dev,
- 		struct page *page, size_t offset, size_t size,
- 		enum dma_data_direction dir, unsigned long attrs)
-diff --git a/kernel/dma/debug.h b/kernel/dma/debug.h
-index f525197d3cae..3d529f355c6d 100644
---- a/kernel/dma/debug.h
-+++ b/kernel/dma/debug.h
-@@ -127,4 +127,6 @@ static inline void debug_dma_sync_sg_for_device(struct device *dev,
- {
- }
- #endif /* CONFIG_DMA_API_DEBUG */
-+#define debug_dma_link_range debug_dma_map_page
-+#define debug_dma_unlink_range debug_dma_unmap_page
- #endif /* _KERNEL_DMA_DEBUG_H */
-diff --git a/kernel/dma/direct.h b/kernel/dma/direct.h
-index 18d346118fe8..1c30e1cd607a 100644
---- a/kernel/dma/direct.h
-+++ b/kernel/dma/direct.h
-@@ -125,4 +125,7 @@ static inline void dma_direct_unmap_page(struct device *dev, dma_addr_t addr,
- 		swiotlb_tbl_unmap_single(dev, phys, size, dir,
- 					 attrs | DMA_ATTR_SKIP_CPU_SYNC);
- }
-+
-+#define dma_direct_link_range dma_direct_map_page
-+#define dma_direct_unlink_range dma_direct_unmap_page
- #endif /* _KERNEL_DMA_DIRECT_H */
-diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-index b6b27bab90f3..f989c64622c2 100644
---- a/kernel/dma/mapping.c
-+++ b/kernel/dma/mapping.c
-@@ -213,6 +213,63 @@ void dma_free_iova(struct dma_iova_attrs *iova)
- }
- EXPORT_SYMBOL(dma_free_iova);
- 
-+/**
-+ * dma_link_range - Link a physical page to DMA address
-+ * @page: The page to be mapped
-+ * @offset: The offset within the page
-+ * @iova: Preallocated IOVA attributes
-+ * @dma_offset: DMA offset form which this page needs to be linked
-+ *
-+ * dma_alloc_iova() allocates IOVA based on the size specified by ther user in
-+ * iova->size. Call this function after IOVA allocation to link @page from
-+ * @offset to get the DMA address. Note that very first call to this function
-+ * will have @dma_offset set to 0 in the IOVA space allocated from
-+ * dma_alloc_iova(). For subsequent calls to this function on same @iova,
-+ * @dma_offset needs to be advanced by the caller with the size of previous
-+ * page that was linked + DMA address returned for the previous page that was
-+ * linked by this function.
-+ */
-+dma_addr_t dma_link_range(struct page *page, unsigned long offset,
-+			  struct dma_iova_attrs *iova, dma_addr_t dma_offset)
-+{
-+	struct device *dev = iova->dev;
-+	size_t size = iova->size;
-+	enum dma_data_direction dir = iova->dir;
-+	unsigned long attrs = iova->attrs;
-+	dma_addr_t addr = iova->addr + dma_offset;
-+	const struct dma_map_ops *ops = get_dma_ops(dev);
-+
-+	if (dma_map_direct(dev, ops) ||
-+	    arch_dma_link_range_direct(dev, page_to_phys(page) + offset + size))
-+		addr = dma_direct_link_range(dev, page, offset, size, dir, attrs);
-+	else if (ops->link_range)
-+		addr = ops->link_range(dev, page, offset, addr, size, dir, attrs);
-+
-+	kmsan_handle_dma(page, offset, size, dir);
-+	debug_dma_link_range(dev, page, offset, size, dir, addr, attrs);
-+	return addr;
-+}
-+EXPORT_SYMBOL(dma_link_range);
-+
-+void dma_unlink_range(struct dma_iova_attrs *iova, dma_addr_t dma_offset)
-+{
-+	struct device *dev = iova->dev;
-+	size_t size = iova->size;
-+	enum dma_data_direction dir = iova->dir;
-+	unsigned long attrs = iova->attrs;
-+	dma_addr_t addr = iova->addr + dma_offset;
-+	const struct dma_map_ops *ops = get_dma_ops(dev);
-+
-+	if (dma_map_direct(dev, ops) ||
-+	    arch_dma_unlink_range_direct(dev, addr + size))
-+		dma_direct_unlink_range(dev, addr, size, dir, attrs);
-+	else if (ops->unlink_range)
-+		ops->unlink_range(dev, addr, size, dir, attrs);
-+
-+	debug_dma_unlink_range(dev, addr, size, dir);
-+}
-+EXPORT_SYMBOL(dma_unlink_range);
-+
- static int __dma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
- 	 int nents, enum dma_data_direction dir, unsigned long attrs)
- {
+ out_free_iova:
+-	iommu_dma_free_iova(cookie, iova, size, NULL);
++	__iommu_dma_free_iova(cookie, iova, size, NULL);
+ out_free_page:
+ 	kfree(msi_page);
+ 	return NULL;
 -- 
 2.44.0
 
