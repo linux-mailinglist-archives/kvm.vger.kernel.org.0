@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-10920-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E2D871B14
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:28:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E763E871B1F
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:28:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 599A9B21E06
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 10:27:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EC4C281A0D
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 10:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7186633F6;
-	Tue,  5 Mar 2024 10:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E198C651BE;
+	Tue,  5 Mar 2024 10:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ME6sTK28"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNEwTJ5c"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C743263108;
-	Tue,  5 Mar 2024 10:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC89D56755;
+	Tue,  5 Mar 2024 10:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709633792; cv=none; b=jg59iN0F5nu4sOloPdWAahtzrdN5q39Fm2P41l5Sn9umbuN/nIsT6X51khXUf6KTGFAKeJt7uk8WaIl+pd0FpRDkQXWk2draPzI+AW100Vbe6GA/C672RGWmz2NtHdvS1kHKt7/jc3w4r5pbtqLn+QYBytp2feQmBpKBBSfX3AE=
+	t=1709633796; cv=none; b=qxdSSQe/FK6N54ni4h38DDdVJM8iyct6rIq1vgJTb5CuFzcJZQ8mGF3CCs8AH6crc7pvBT1TjEkL+kdtKvpFWlOWGsll007fCuMTFg2yldAxcTurZXSFnMFLpe8b4oDVCtLwsEkaoKzSDFzMfEXSlmlfno8cqskWpHRj6h4ocWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709633792; c=relaxed/simple;
-	bh=4IocgUHLj9eV065W5P3anYxI4nhTW2naxln23AtMtis=;
+	s=arc-20240116; t=1709633796; c=relaxed/simple;
+	bh=LoE4Mk2h+x4QygNOYAaQkErlcP1J9OkI1WKvPNtdRq4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aQYEvOfgSg2qvxEVU2GMoZzwNhVW40tuZcwl+m24404d+1PLRweTzGd8nwfLLcHJytESuc56ilTl77uSkQyVEewaYpsBlseMuRKet1h08GAXK6aaik7t///BWkA+vz8PGUbq15iFnYylp120wE+Ft+ozbbGZnku96sz9AHcDhoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ME6sTK28; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD3FC43390;
-	Tue,  5 Mar 2024 10:16:31 +0000 (UTC)
+	 MIME-Version; b=rV+YQS5O9L4k7WGttCxaa2KYZ5WDE8bgxPl2KdNHur7aY8c08Z0AKq51k4IIvGNQcaa2BRurtIoxHEWpYBG3/Fx6oD2tWc1mBX2FjjymxNflECxBHeTLSZMXPP24Aq1bj1Y+07WH8ihCgMTktBqTJbdycUsQ42HbqlaHf8sFB0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WNEwTJ5c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D045C43394;
+	Tue,  5 Mar 2024 10:16:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709633792;
-	bh=4IocgUHLj9eV065W5P3anYxI4nhTW2naxln23AtMtis=;
+	s=k20201202; t=1709633795;
+	bh=LoE4Mk2h+x4QygNOYAaQkErlcP1J9OkI1WKvPNtdRq4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ME6sTK286uwoXoz+IpcdDC5iiCveCz60c3QC6e2Qoo6RT1vn1QMiK79xbl2Z0iJEQ
-	 lF+WIuufy46vobE2X5BkxN4zFsuEFfqCY7nNLgqtqaGEzXhdvxV79SceqYL9IBcm1m
-	 TvpaFHgFXCBfyApy9K0LVj6Gp960SddtGc3bQwTBI9C4yeb0N89NQ9nYnZIjPV3lud
-	 HWI1R9l5KpNKb/eOURGHv33QqpDtRBoDV6zIP7rZo4UIRb0nFH+r1oENLRXAryoJBH
-	 l4+GOIMyR7QDazy9mrVtajxBlb0ezE2lg1MG7ckSp0k65UFJTLImRNCeq2jbANxI8Z
-	 7hpa9NbeUdkHw==
+	b=WNEwTJ5cMN9ELwzZS16ppqt8z3E74GD7UClDOZ+K258awlhlHWmthDNESMHRqcqrd
+	 FB5rGUzT1HNrfY0k9YRNPH7tpd6eRrBCHBFvW2HuHKRpDRIcieGpESqf5qYSZEu7Ot
+	 rJawxgEDFjOWV3aypoQz9qlwzRrIaDARCl71nYqsSh9yKTfAjSlP900AU9rH1yZsqq
+	 FSiuklZ0TDjrPQoHx0CLw7CspAdlMh8IJ7b9yEWuOD9m26KZiCU7D2cXRMmTCHbBNI
+	 pVkHPjju2ehO/3/QWSJNDh9vuYxqDYLnTUKNJldj71/uHBe1w+Vt8uTvJzHh9hKp99
+	 5/3DH4IEH+yWg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Christoph Hellwig <hch@lst.de>,
 	Robin Murphy <robin.murphy@arm.com>,
@@ -49,7 +49,7 @@ To: Christoph Hellwig <hch@lst.de>,
 	Will Deacon <will@kernel.org>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
 	Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
+Cc: Chaitanya Kulkarni <kch@nvidia.com>,
 	Jonathan Corbet <corbet@lwn.net>,
 	Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <kbusch@kernel.org>,
@@ -76,10 +76,11 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	"daniel@iogearbox.net" <daniel@iogearbox.net>,
 	Dan Williams <dan.j.williams@intel.com>,
 	"jack@suse.com" <jack@suse.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
 	Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: [RFC 14/16] vfio/mlx5: Convert vfio to use DMA link API
-Date: Tue,  5 Mar 2024 12:15:24 +0200
-Message-ID: <e42ea94ec4de8569f5a4c418b6f44c2a8730ceda.1709631413.git.leon@kernel.org>
+Subject: [RFC 15/16] block: add dma_link_range() based API
+Date: Tue,  5 Mar 2024 12:15:25 +0200
+Message-ID: <1e52aa392b9c434f55203c9d630dd06fcdb75c32.1709631413.git.leon@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <a77609c9c9a09214e38b04133e44eee67fe50ab0.1709631413.git.leon@kernel.org>
 References: <a77609c9c9a09214e38b04133e44eee67fe50ab0.1709631413.git.leon@kernel.org>
@@ -91,427 +92,241 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: Chaitanya Kulkarni <kch@nvidia.com>
 
-Remove intermediate scatter-gather table as it is not needed
-if DMA link API is used. This conversion reduces drastically
-the memory used to manage that table.
+Add two helper functions that are needed to calculate the total DMA
+length of the request blk_rq_get_dma_length() and to create DMA
+mapping blk_rq_dma_map().
 
+blk_rq_get_dma_length() is used to get the total length of the request,
+when driver is allocating IOVA space for this request with the call to
+dma_alloc_iova(). This length is then initialized to the iova->size and
+passed to allocate iova call chain :-
+dma_map_ops->allov_iova()
+        iommu_dma_alloc_iova()
+                alloc_iova_fast()
+                        iova_rcache_get()
+                                OR
+                        alloc_iova()
+
+blk_rq_dma_map() iterates through bvec list and creates DMA mapping
+for each page using iova parameter with the help of dma_link_range().
+Note that @iova is allocated & pre-initialized using dma_alloc_iova()
+by the caller. After creating a mapping for each page, call into the
+callback function @cb provided by the drive with a mapped DMA address
+for this page, offset into the iova space (needed at the time of
+unlink), length of the mapped page, and page number that is mapped in
+this request. Driver is responsible for using this DMA address to
+complete the mapping of underlying protocol-specific data structures,
+such as NVMe PRPs or NVMe SGLs. This callback approach allows us to
+iterate bvec list only once to create bvec to DMA mapping and use that
+DMA address in driver to build the protocol-specific data structure,
+essentially mapping one bvec page at a time to DMA address and using
+that DMA address to create underlying protocol-specific data structures.
+Finally, returning the number of linked count.
+
+Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/vfio/pci/mlx5/cmd.c  | 177 ++++++++++++++++-------------------
- drivers/vfio/pci/mlx5/cmd.h  |   8 +-
- drivers/vfio/pci/mlx5/main.c |  50 ++--------
- 3 files changed, 91 insertions(+), 144 deletions(-)
+ block/blk-merge.c      | 156 +++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |   9 +++
+ 2 files changed, 165 insertions(+)
 
-diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-index 5e2103042d9b..cfae03f7b7da 100644
---- a/drivers/vfio/pci/mlx5/cmd.c
-+++ b/drivers/vfio/pci/mlx5/cmd.c
-@@ -332,26 +332,60 @@ static u32 *alloc_mkey_in(u32 npages, u32 pdn)
- 	return in;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 2d470cf2173e..63effc8ac1db 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -583,6 +583,162 @@ int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
  }
+ EXPORT_SYMBOL(__blk_rq_map_sg);
  
--static int create_mkey(struct mlx5_core_dev *mdev, u32 npages,
--		       struct mlx5_vhca_data_buffer *buf, u32 *mkey_in,
-+static int create_mkey(struct mlx5_core_dev *mdev, u32 npages, u32 *mkey_in,
- 		       u32 *mkey)
- {
-+	int inlen = MLX5_ST_SZ_BYTES(create_mkey_in) +
-+		    sizeof(__be64) * round_up(npages, 2);
-+
-+	return mlx5_core_create_mkey(mdev, mkey, mkey_in, inlen);
-+}
-+
-+static void unregister_dma_pages(struct mlx5_core_dev *mdev, u32 npages,
-+				 u32 *mkey_in, struct dma_iova_attrs *iova)
++static dma_addr_t blk_dma_link_page(struct page *page, unsigned int page_offset,
++				    struct dma_iova_attrs *iova,
++				    dma_addr_t dma_offset)
 +{
-+	dma_addr_t addr;
- 	__be64 *mtt;
--	int inlen;
-+	int i;
- 
- 	mtt = (__be64 *)MLX5_ADDR_OF(create_mkey_in, mkey_in, klm_pas_mtt);
- 
--	if (buf) {
--		struct sg_dma_page_iter dma_iter;
-+	for (i = npages - 1; i >= 0; i--) {
-+		addr = be64_to_cpu(mtt[i]);
-+		dma_unlink_range(iova, addr);
++	dma_addr_t dma_addr;
++	int ret;
++
++	dma_addr = dma_link_range(page, page_offset, iova, dma_offset);
++	ret = dma_mapping_error(iova->dev, dma_addr);
++	if (ret) {
++		pr_err("dma_mapping_err %d dma_addr 0x%llx dma_offset %llu\n",
++			ret, dma_addr, dma_offset);
++		/* better way ? */
++		dma_addr = 0;
 +	}
-+	dma_free_iova(iova);
++	return dma_addr;
 +}
 +
-+static int register_dma_pages(struct mlx5_core_dev *mdev, u32 npages,
-+			      struct page **page_list, u32 *mkey_in,
-+			      struct dma_iova_attrs *iova)
++/**
++ * blk_rq_dma_map: block layer request to DMA mapping helper.
++ *
++ * @req         : [in] request to be mapped
++ * @cb          : [in] callback to be called for each bvec mapped bvec into
++ *                     underlaying driver.
++ * @cb_data     : [in] callback data to be passed, privete to the underlaying
++ *                     driver.
++ * @iova        : [in] iova to be used to create DMA mapping for this request's
++ *                     bvecs.
++ * Description:
++ * Iterates through bvec list and create dma mapping between each bvec page
++ * using @iova with dma_link_range(). Note that @iova needs to be allocated and
++ * pre-initialized using dma_alloc_iova() by the caller. After creating
++ * a mapping for each page, call into the callback function @cb provided by
++ * driver with mapped dma address for this bvec, offset into iova space, length
++ * of the mapped page, and bvec number that is mapped in this requets. Driver is
++ * responsible for using this dma address to complete the mapping of underlaying
++ * protocol specific data structure, such as NVMe PRPs or NVMe SGLs. This
++ * callback approach allows us to iterate bvec list only once to create bvec to
++ * DMA mapping & use that dma address in the driver to build the protocol
++ * specific data structure, essentially mapping one bvec page at a time to DMA
++ * address and use that DMA address to create underlaying protocol specific
++ * data structure.
++ *
++ * Caller needs to ensure @iova is initialized & allovated with using
++ * dma_alloc_iova().
++ */
++int blk_rq_dma_map(struct request *req, driver_map_cb cb, void *cb_data,
++		   struct dma_iova_attrs *iova)
 +{
-+	dma_addr_t addr;
-+	__be64 *mtt;
-+	int i, err;
++	dma_addr_t curr_dma_offset = 0;
++	dma_addr_t prev_dma_addr = 0;
++	dma_addr_t dma_addr;
++	size_t prev_dma_len = 0;
++	struct req_iterator iter;
++	struct bio_vec bv;
++	int linked_cnt = 0;
 +
-+	iova->dev = mdev->device;
-+	iova->size = npages * PAGE_SIZE;
-+	err = dma_alloc_iova(iova);
-+	if (err)
-+		return err;
++	rq_for_each_bvec(bv, req, iter) {
++		if (bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
++			curr_dma_offset = prev_dma_addr + prev_dma_len;
 +
-+	mtt = (__be64 *)MLX5_ADDR_OF(create_mkey_in, mkey_in, klm_pas_mtt);
++			dma_addr = blk_dma_link_page(bv.bv_page, bv.bv_offset,
++						     iova, curr_dma_offset);
++			if (!dma_addr)
++				break;
 +
-+	for (i = 0; i < npages; i++) {
-+		addr = dma_link_range(page_list[i], 0, iova, i * PAGE_SIZE);
-+		if (dma_mapping_error(mdev->device, addr))
-+			goto error;
- 
--		for_each_sgtable_dma_page(&buf->table.sgt, &dma_iter, 0)
--			*mtt++ = cpu_to_be64(sg_page_iter_dma_address(&dma_iter));
-+		*mtt++ = cpu_to_be64(addr);
- 	}
- 
--	inlen = MLX5_ST_SZ_BYTES(create_mkey_in) +
--		sizeof(__be64) * round_up(npages, 2);
-+	return 0;
- 
--	return mlx5_core_create_mkey(mdev, mkey, mkey_in, inlen);
-+error:
-+	unregister_dma_pages(mdev, i, mkey_in, iova);
-+	return -ENOMEM;
- }
- 
- static int mlx5vf_dma_data_buffer(struct mlx5_vhca_data_buffer *buf)
-@@ -367,17 +401,16 @@ static int mlx5vf_dma_data_buffer(struct mlx5_vhca_data_buffer *buf)
- 	if (buf->dmaed || !buf->npages)
- 		return -EINVAL;
- 
--	ret = dma_map_sgtable(mdev->device, &buf->table.sgt, buf->dma_dir, 0);
--	if (ret)
--		return ret;
--
- 	buf->mkey_in = alloc_mkey_in(buf->npages, buf->migf->pdn);
--	if (!buf->mkey_in) {
--		ret = -ENOMEM;
--		goto err;
--	}
-+	if (!buf->mkey_in)
-+		return -ENOMEM;
++			cb(cb_data, linked_cnt, dma_addr, curr_dma_offset,
++			   bv.bv_len);
 +
-+	ret = register_dma_pages(mdev, buf->npages, buf->page_list,
-+				 buf->mkey_in, &buf->iova);
-+	if (ret)
-+		goto err_register_dma;
- 
--	ret = create_mkey(mdev, buf->npages, buf, buf->mkey_in, &buf->mkey);
-+	ret = create_mkey(mdev, buf->npages, buf->mkey_in, &buf->mkey);
- 	if (ret)
- 		goto err_create_mkey;
- 
-@@ -386,32 +419,39 @@ static int mlx5vf_dma_data_buffer(struct mlx5_vhca_data_buffer *buf)
- 	return 0;
- 
- err_create_mkey:
-+	unregister_dma_pages(mdev, buf->npages, buf->mkey_in, &buf->iova);
-+err_register_dma:
- 	kvfree(buf->mkey_in);
--err:
--	dma_unmap_sgtable(mdev->device, &buf->table.sgt, buf->dma_dir, 0);
- 	return ret;
- }
- 
-+static void free_page_list(u32 npages, struct page **page_list)
-+{
-+	int i;
++			prev_dma_len = bv.bv_len;
++			prev_dma_addr = dma_addr;
++			linked_cnt++;
++		} else {
++			unsigned nbytes = bv.bv_len;
++			unsigned total = 0;
++			unsigned offset, len;
 +
-+	/* Undo alloc_pages_bulk_array() */
-+	for (i = npages - 1; i >= 0; i--)
-+		__free_page(page_list[i]);
++			while (nbytes > 0) {
++				struct page *page = bv.bv_page;
 +
-+	kvfree(page_list);
++				offset = bv.bv_offset + total;
++				len = min(get_max_segment_size(&req->q->limits,
++							       page, offset),
++							       nbytes);
++
++				page += (offset >> PAGE_SHIFT);
++				offset &= ~PAGE_MASK;
++
++				curr_dma_offset = prev_dma_addr + prev_dma_len;
++
++				dma_addr = blk_dma_link_page(page, offset,
++							     iova,
++							     curr_dma_offset);
++				if (!dma_addr)
++					break;
++
++				cb(cb_data, linked_cnt, dma_addr,
++				   curr_dma_offset, len);
++
++				total += len;
++				nbytes -= len;
++
++				prev_dma_len = len;
++				prev_dma_addr = dma_addr;
++				linked_cnt++;
++			}
++		}
++	}
++	return linked_cnt;
 +}
++EXPORT_SYMBOL_GPL(blk_rq_dma_map);
 +
- void mlx5vf_free_data_buffer(struct mlx5_vhca_data_buffer *buf)
++/*
++ * Calculate total DMA length needed to satisfy this request.
++ */
++size_t blk_rq_get_dma_length(struct request *rq)
++{
++	struct request_queue *q = rq->q;
++	struct bio *bio = rq->bio;
++	unsigned int offset, len;
++	struct bvec_iter iter;
++	size_t dma_length = 0;
++	struct bio_vec bvec;
++
++	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
++		return rq->special_vec.bv_len;
++
++	if (!rq->bio)
++		return 0;
++
++	for_each_bio(bio) {
++		bio_for_each_bvec(bvec, bio, iter) {
++			unsigned int nbytes = bvec.bv_len;
++			unsigned int total = 0;
++
++			if (bvec.bv_offset + bvec.bv_len <= PAGE_SIZE) {
++				dma_length += bvec.bv_len;
++				continue;
++			}
++
++			while (nbytes > 0) {
++				offset = bvec.bv_offset + total;
++				len = min(get_max_segment_size(&q->limits,
++							       bvec.bv_page,
++							       offset), nbytes);
++				total += len;
++				nbytes -= len;
++				dma_length += len;
++			}
++		}
++	}
++
++	return dma_length;
++}
++EXPORT_SYMBOL(blk_rq_get_dma_length);
++
+ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
+ 						  sector_t offset)
  {
--	struct mlx5_vf_migration_file *migf = buf->migf;
--	struct sg_page_iter sg_iter;
-+	struct mlx5vf_pci_core_device *mvdev = buf->migf->mvdev;
-+	struct mlx5_core_dev *mdev = mvdev->mdev;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 7a8150a5f051..80b9c7f2c3a0 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -8,6 +8,7 @@
+ #include <linux/scatterlist.h>
+ #include <linux/prefetch.h>
+ #include <linux/srcu.h>
++#include <linux/dma-mapping.h>
  
--	lockdep_assert_held(&migf->mvdev->state_mutex);
--	WARN_ON(migf->mvdev->mdev_detach);
-+	lockdep_assert_held(&mvdev->state_mutex);
-+	WARN_ON(mvdev->mdev_detach);
+ struct blk_mq_tags;
+ struct blk_flush_queue;
+@@ -1144,7 +1145,15 @@ static inline int blk_rq_map_sg(struct request_queue *q, struct request *rq,
  
- 	if (buf->dmaed) {
--		mlx5_core_destroy_mkey(migf->mvdev->mdev, buf->mkey);
-+		mlx5_core_destroy_mkey(mdev, buf->mkey);
-+		unregister_dma_pages(mdev, buf->npages, buf->mkey_in,
-+				     &buf->iova);
- 		kvfree(buf->mkey_in);
--		dma_unmap_sgtable(migf->mvdev->mdev->device, &buf->table.sgt,
--				  buf->dma_dir, 0);
- 	}
- 
--	/* Undo alloc_pages_bulk_array() */
--	for_each_sgtable_page(&buf->table.sgt, &sg_iter, 0)
--		__free_page(sg_page_iter_page(&sg_iter));
--	sg_free_append_table(&buf->table);
--	kvfree(buf->page_list);
-+	free_page_list(buf->npages, buf->page_list);
- 	kfree(buf);
+ 	return __blk_rq_map_sg(q, rq, sglist, &last_sg);
  }
++
++typedef void (*driver_map_cb)(void *cb_data, u32 cnt, dma_addr_t dma_addr,
++			      dma_addr_t offset, u32 len);
++
++int blk_rq_dma_map(struct request *req, driver_map_cb cb, void *cb_data,
++		   struct dma_iova_attrs *iova);
++
+ void blk_dump_rq_flags(struct request *, char *);
++size_t blk_rq_get_dma_length(struct request *rq);
  
-@@ -426,7 +466,7 @@ mlx5vf_alloc_data_buffer(struct mlx5_vf_migration_file *migf, u32 npages,
- 	if (!buf)
- 		return ERR_PTR(-ENOMEM);
- 
--	buf->dma_dir = dma_dir;
-+	buf->iova.dir = dma_dir;
- 	buf->migf = migf;
- 	if (npages) {
- 		ret = mlx5vf_add_migration_pages(buf, npages);
-@@ -469,7 +509,7 @@ mlx5vf_get_data_buffer(struct mlx5_vf_migration_file *migf, u32 npages,
- 
- 	spin_lock_irq(&migf->list_lock);
- 	list_for_each_entry_safe(buf, temp_buf, &migf->avail_list, buf_elm) {
--		if (buf->dma_dir == dma_dir) {
-+		if (buf->iova.dir == dma_dir) {
- 			list_del_init(&buf->buf_elm);
- 			if (buf->npages >= npages) {
- 				spin_unlock_irq(&migf->list_lock);
-@@ -1253,17 +1293,6 @@ static void mlx5vf_destroy_qp(struct mlx5_core_dev *mdev,
- 	kfree(qp);
- }
- 
--static void free_recv_pages(struct mlx5_vhca_recv_buf *recv_buf)
--{
--	int i;
--
--	/* Undo alloc_pages_bulk_array() */
--	for (i = 0; i < recv_buf->npages; i++)
--		__free_page(recv_buf->page_list[i]);
--
--	kvfree(recv_buf->page_list);
--}
--
- static int alloc_recv_pages(struct mlx5_vhca_recv_buf *recv_buf,
- 			    unsigned int npages)
- {
-@@ -1300,56 +1329,16 @@ static int alloc_recv_pages(struct mlx5_vhca_recv_buf *recv_buf,
- 	return -ENOMEM;
- }
- 
--static void unregister_dma_pages(struct mlx5_core_dev *mdev, u32 npages,
--				 u32 *mkey_in)
--{
--	dma_addr_t addr;
--	__be64 *mtt;
--	int i;
--
--	mtt = (__be64 *)MLX5_ADDR_OF(create_mkey_in, mkey_in, klm_pas_mtt);
--
--	for (i = npages - 1; i >= 0; i--) {
--		addr = be64_to_cpu(mtt[i]);
--		dma_unmap_single(mdev->device, addr, PAGE_SIZE,
--				 DMA_FROM_DEVICE);
--	}
--}
--
--static int register_dma_pages(struct mlx5_core_dev *mdev, u32 npages,
--			      struct page **page_list, u32 *mkey_in)
--{
--	dma_addr_t addr;
--	__be64 *mtt;
--	int i;
--
--	mtt = (__be64 *)MLX5_ADDR_OF(create_mkey_in, mkey_in, klm_pas_mtt);
--
--	for (i = 0; i < npages; i++) {
--		addr = dma_map_page(mdev->device, page_list[i], 0, PAGE_SIZE,
--				    DMA_FROM_DEVICE);
--		if (dma_mapping_error(mdev->device, addr))
--			goto error;
--
--		*mtt++ = cpu_to_be64(addr);
--	}
--
--	return 0;
--
--error:
--	unregister_dma_pages(mdev, i, mkey_in);
--	return -ENOMEM;
--}
--
- static void mlx5vf_free_qp_recv_resources(struct mlx5_core_dev *mdev,
- 					  struct mlx5_vhca_qp *qp)
- {
- 	struct mlx5_vhca_recv_buf *recv_buf = &qp->recv_buf;
- 
- 	mlx5_core_destroy_mkey(mdev, recv_buf->mkey);
--	unregister_dma_pages(mdev, recv_buf->npages, recv_buf->mkey_in);
-+	unregister_dma_pages(mdev, recv_buf->npages, recv_buf->mkey_in,
-+			     &recv_buf->iova);
- 	kvfree(recv_buf->mkey_in);
--	free_recv_pages(&qp->recv_buf);
-+	free_page_list(recv_buf->npages, recv_buf->page_list);
- }
- 
- static int mlx5vf_alloc_qp_recv_resources(struct mlx5_core_dev *mdev,
-@@ -1370,24 +1359,24 @@ static int mlx5vf_alloc_qp_recv_resources(struct mlx5_core_dev *mdev,
- 		goto end;
- 	}
- 
-+	recv_buf->iova.dir = DMA_FROM_DEVICE;
- 	err = register_dma_pages(mdev, npages, recv_buf->page_list,
--				 recv_buf->mkey_in);
-+				 recv_buf->mkey_in, &recv_buf->iova);
- 	if (err)
- 		goto err_register_dma;
- 
--	err = create_mkey(mdev, npages, NULL, recv_buf->mkey_in,
--			  &recv_buf->mkey);
-+	err = create_mkey(mdev, npages, recv_buf->mkey_in, &recv_buf->mkey);
- 	if (err)
- 		goto err_create_mkey;
- 
- 	return 0;
- 
- err_create_mkey:
--	unregister_dma_pages(mdev, npages, recv_buf->mkey_in);
-+	unregister_dma_pages(mdev, npages, recv_buf->mkey_in, &recv_buf->iova);
- err_register_dma:
- 	kvfree(recv_buf->mkey_in);
- end:
--	free_recv_pages(recv_buf);
-+	free_page_list(npages, recv_buf->page_list);
- 	return err;
- }
- 
-diff --git a/drivers/vfio/pci/mlx5/cmd.h b/drivers/vfio/pci/mlx5/cmd.h
-index 815fcb54494d..3a046166d9f2 100644
---- a/drivers/vfio/pci/mlx5/cmd.h
-+++ b/drivers/vfio/pci/mlx5/cmd.h
-@@ -57,22 +57,17 @@ struct mlx5_vf_migration_header {
- };
- 
- struct mlx5_vhca_data_buffer {
-+	struct dma_iova_attrs iova;
- 	struct page **page_list;
--	struct sg_append_table table;
- 	loff_t start_pos;
- 	u64 length;
- 	u32 npages;
- 	u32 mkey;
- 	u32 *mkey_in;
--	enum dma_data_direction dma_dir;
- 	u8 dmaed:1;
- 	u8 stop_copy_chunk_num;
- 	struct list_head buf_elm;
- 	struct mlx5_vf_migration_file *migf;
--	/* Optimize mlx5vf_get_migration_page() for sequential access */
--	struct scatterlist *last_offset_sg;
--	unsigned int sg_last_entry;
--	unsigned long last_offset;
- };
- 
- struct mlx5vf_async_data {
-@@ -137,6 +132,7 @@ struct mlx5_vhca_cq {
- };
- 
- struct mlx5_vhca_recv_buf {
-+	struct dma_iova_attrs iova;
- 	u32 npages;
- 	struct page **page_list;
- 	u32 next_rq_offset;
-diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index 7ffe24693a55..668c28bc429c 100644
---- a/drivers/vfio/pci/mlx5/main.c
-+++ b/drivers/vfio/pci/mlx5/main.c
-@@ -34,35 +34,10 @@ static struct mlx5vf_pci_core_device *mlx5vf_drvdata(struct pci_dev *pdev)
- 			    core_device);
- }
- 
--struct page *
--mlx5vf_get_migration_page(struct mlx5_vhca_data_buffer *buf,
--			  unsigned long offset)
-+struct page *mlx5vf_get_migration_page(struct mlx5_vhca_data_buffer *buf,
-+				       unsigned long offset)
- {
--	unsigned long cur_offset = 0;
--	struct scatterlist *sg;
--	unsigned int i;
--
--	/* All accesses are sequential */
--	if (offset < buf->last_offset || !buf->last_offset_sg) {
--		buf->last_offset = 0;
--		buf->last_offset_sg = buf->table.sgt.sgl;
--		buf->sg_last_entry = 0;
--	}
--
--	cur_offset = buf->last_offset;
--
--	for_each_sg(buf->last_offset_sg, sg,
--			buf->table.sgt.orig_nents - buf->sg_last_entry, i) {
--		if (offset < sg->length + cur_offset) {
--			buf->last_offset_sg = sg;
--			buf->sg_last_entry += i;
--			buf->last_offset = cur_offset;
--			return nth_page(sg_page(sg),
--					(offset - cur_offset) / PAGE_SIZE);
--		}
--		cur_offset += sg->length;
--	}
--	return NULL;
-+	return buf->page_list[offset / PAGE_SIZE];
- }
- 
- int mlx5vf_add_migration_pages(struct mlx5_vhca_data_buffer *buf,
-@@ -72,13 +47,9 @@ int mlx5vf_add_migration_pages(struct mlx5_vhca_data_buffer *buf,
- 	size_t old_size, new_size;
- 	struct page **page_list;
- 	unsigned long filled;
--	unsigned int to_fill;
--	int ret;
- 
--	to_fill = min_t(unsigned int, npages,
--			PAGE_SIZE / sizeof(*buf->page_list));
- 	old_size = buf->npages * sizeof(*buf->page_list);
--	new_size = old_size + to_fill * sizeof(*buf->page_list);
-+	new_size = old_size + to_alloc * sizeof(*buf->page_list);
- 	page_list = kvrealloc(buf->page_list, old_size, new_size,
- 			      GFP_KERNEL_ACCOUNT | __GFP_ZERO);
- 	if (!page_list)
-@@ -87,22 +58,13 @@ int mlx5vf_add_migration_pages(struct mlx5_vhca_data_buffer *buf,
- 	buf->page_list = page_list;
- 
- 	do {
--		filled = alloc_pages_bulk_array(GFP_KERNEL_ACCOUNT, to_fill,
-+		filled = alloc_pages_bulk_array(GFP_KERNEL_ACCOUNT, to_alloc,
- 						buf->page_list + buf->npages);
- 		if (!filled)
- 			return -ENOMEM;
- 
- 		to_alloc -= filled;
--		ret = sg_alloc_append_table_from_pages(
--			&buf->table, buf->page_list + buf->npages, filled, 0,
--			filled << PAGE_SHIFT, UINT_MAX, SG_MAX_SINGLE_ALLOC,
--			GFP_KERNEL_ACCOUNT);
--		if (ret)
--			return ret;
--
- 		buf->npages += filled;
--		to_fill = min_t(unsigned int, to_alloc,
--				PAGE_SIZE / sizeof(*buf->page_list));
- 	} while (to_alloc > 0);
- 
- 	return 0;
-@@ -164,7 +126,7 @@ static void mlx5vf_buf_read_done(struct mlx5_vhca_data_buffer *vhca_buf)
- 	struct mlx5_vf_migration_file *migf = vhca_buf->migf;
- 
- 	if (vhca_buf->stop_copy_chunk_num) {
--		bool is_header = vhca_buf->dma_dir == DMA_NONE;
-+		bool is_header = vhca_buf->iova.dir == DMA_NONE;
- 		u8 chunk_num = vhca_buf->stop_copy_chunk_num;
- 		size_t next_required_umem_size = 0;
- 
+ #ifdef CONFIG_BLK_DEV_ZONED
+ static inline unsigned int blk_rq_zone_no(struct request *rq)
 -- 
 2.44.0
 
