@@ -1,427 +1,205 @@
-Return-Path: <kvm+bounces-10867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37CBE87155B
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 06:46:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E218F8715C1
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 07:18:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A27ECB22D11
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 05:46:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 127101C21313
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 06:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBB562171;
-	Tue,  5 Mar 2024 05:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A027BAEF;
+	Tue,  5 Mar 2024 06:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="C7epLVqy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XdQMokJi"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2094.outbound.protection.outlook.com [40.107.244.94])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A33AD5E;
-	Tue,  5 Mar 2024 05:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.94
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709617592; cv=fail; b=TGg6HSpNVRH/AqXaq38ijluWrN0TRWx2SShVFt+b3uF+dESYSl1vhw/BwoVGtmjNUj/vrxRW/lAEaOoS/N+0Id3YKBLk6anjLuUaFIkvjUR0oJYS9owdhRlrPHuHyoM5jRkd1pfcYXfyFxJUEvAQ0WQf3PJXUYvOXUiEgbGuGAc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709617592; c=relaxed/simple;
-	bh=fvm6PWk/jOIBj5IDMUR8ZIzsuPphjE/h2GOFx3WBTZ8=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=FOaD3rPBQHKBP8vWRQPNZ7yd0pQoec7AFTAHOfIkcZUJPB+l4OBX7K8f8BM7O2D+lGuUHMf9ZvwFlOKtPWeYRWQCD5tilGXtNjo3pdV3XTBsNBUazgC4RLkBgKH6jILzcW3go+24/tIjSvkQ7WmXrNdELTCuzMuT2izSHmAQLsI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=C7epLVqy; arc=fail smtp.client-ip=40.107.244.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ElOj8rSi/W6oiqvEwV03zd5hwC4socswoqsQpcS+urjHyLmWUNk91a881JX6XsG1SZRl8w3T8Rr7+U47RSNecByXnKeEQTW58tm1su9NDaF0jmwunTanMBw95eHyWiR3zo78JaC6GdYi8r/Aoe+6OgBYmOVwrHOG5rdlqVqVFGZfLxZPmPIFjlcvY412KALe+auTzDHP7mPrEGf8jCvBXOqj4I+gfGO4UqoKYMDjIRhOpTwQOX83qcL6O58uNH5Lt+075GEBFZGkpaYQF7UtOFPmEx28rCedTmWwq4GS5n/xla/aqBKbrFgetRpLCs81oSjwLFK8V0yay2TJdGldrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o76U4oQZ7U4En32PT+pRE3QIJWdoaQeX0VSWW6gNAbo=;
- b=RcUPfGVG3IYhjwYwIdCQ35GemHysLNvAtUhMHS+oorRXRu4VgGqUc/ZkEUAXc4k+9yshZKaAFYxR8e31ql1gcInAKMKfq0IuBFlqrs9O2UQNWJmbXx7bICc9X45HP721mJvaypulB8Rqnb5t6qVT4xnhW5zO+4FwCfUw2rf98oIoBOy84yhr7Lo8W6f/yRSV2M1MnSQywn/jhvKmtordSR6tgqR6EF8pXpWS8KPSDeYP7+IQhjX7n1qqQ0I6TdYQPGom+hrvpf9kJTtNyk9LJcz1CPIxkLOliTlJobb3h6VASKSsPw+hr9GU7Ytx6NpWD2wxzcSC35GXp0ayzn7nUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o76U4oQZ7U4En32PT+pRE3QIJWdoaQeX0VSWW6gNAbo=;
- b=C7epLVqy3Usb//L1wVeIjWn2hvDWW4bQjz7PYR8Q2c7gzfw3ylaJH3TiODh9Ph0mymQ8E04wBLozAjgU+3Rc5w67VmvE/wL5W/Uyp3Fbx1cM00rfj9UIQWUsYpm61/OqqBK4G97M31SsiQBh3BiZz36NvW/tid6kWpGeAs/gRUg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
- PH7PR01MB8124.prod.exchangelabs.com (2603:10b6:510:2a5::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7339.39; Tue, 5 Mar 2024 05:46:25 +0000
-Received: from SJ2PR01MB8101.prod.exchangelabs.com
- ([fe80::d3dd:ece:637f:bde9]) by SJ2PR01MB8101.prod.exchangelabs.com
- ([fe80::d3dd:ece:637f:bde9%3]) with mapi id 15.20.7339.035; Tue, 5 Mar 2024
- 05:46:25 +0000
-From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-To: kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	darren@os.amperecomputing.com,
-	d.scott.phillips@amperecomputing.com,
-	gankulkarni@os.amperecomputing.com
-Subject: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
-Date: Mon,  4 Mar 2024 21:46:06 -0800
-Message-Id: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
-X-Mailer: git-send-email 2.40.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: CH0P221CA0006.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:610:11c::29) To SJ2PR01MB8101.prod.exchangelabs.com
- (2603:10b6:a03:4f6::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB95B28E3F
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 06:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709619524; cv=none; b=Vh8vbKCL0n6V25JtMoRoY3uD/3QAUTH5DkagfB1eGIZMIw8qeENOoVLk2UtD9McjAPp2R1aAJvRqqR8W2ahp911FDWAkmc9+cmeynDuHo67STfh7DLEeoqeULA1azvPnm4RW38Kuw/B8/vzCdHZPMgKExSdYVxDu4FeYs2Ht2F8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709619524; c=relaxed/simple;
+	bh=PTvJU+XaebFLD6Co6TyQTHOlrwvVqnkR9zP2vnJKR3U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ep1t+ZvjEUp7V2PTlDTDhQJ6EefQgzI4fc0hsjU376zVTNSC+VkX/JXPKyHMPlj5fCSNlw5CiqcT6Q+wXh8XyrnFGdaUtkXiRwks0/ly2fgV7Izrfs+vbdunGEa8uK6VVnjWlvUkliBuMGCEupFzdelZG2YpyfBRG8OIoIMLb0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XdQMokJi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709619521;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=pcar2p6s3XrNXLPqtltxkPso06L+KAfnP6O+e52AU68=;
+	b=XdQMokJikS/zZw6g8Kr7gjixbjFjP5pUT78td0IYNFc3vo+djD1bb1/p7f0TpAmHYdSgkT
+	JD7Wq98ME8md+4e4BVbrfdweD4XFFehTbhQMWHUr+3HTduIo30Jjus0+NdwNbxIeXZaOOp
+	fPWgbeoBAiMym4itQeI2wTkiLAZJGwc=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-635-Fjx9P3hbPA6E5BHqAbnPlQ-1; Tue, 05 Mar 2024 01:18:38 -0500
+X-MC-Unique: Fjx9P3hbPA6E5BHqAbnPlQ-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a45a90e1661so15027866b.0
+        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 22:18:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709619517; x=1710224317;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pcar2p6s3XrNXLPqtltxkPso06L+KAfnP6O+e52AU68=;
+        b=W7TLnc3RqXpl8+Ijq7p2ISlBMRn2YCNlr4RpB9ZUEWaM8x+OOqsk9pr3iBsnAlEbVX
+         yJIozNjtIMoYyT7FofjDhoLH2xTuybhJdHwiHkR0Uauy0wOHJa8q/lMkjNk8mei3/2iu
+         BvgBox1kcsi11nV9vSqw7AKGyWhq7tpXe8ipcRxxLYgFH6QngSTC9B/iB9r1JKdISgbJ
+         ffy34ZKHnApuGf72IeDuVV4XK500NTnIWJPxBsikw/GAac1YeB89zBe10t3BvHQXwAKN
+         DEPePLLy9bkgCDWZgwtm/GQrOXdDgvAcqXsZ+ZZNOUjd42hBPTUPrliQokgZD7ktrvC7
+         J8dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTvNxidm/81okulxiYT9p2DwRY4fKWcPGf16yvx/IWq/Fhw0hNb8t3e17HlliSMulATGtVvhR2POaH0KQ7Ftofj2LJ
+X-Gm-Message-State: AOJu0Yz2ox77vWbVthz4t6cA93pj9svqy4zZHNq0DnMrI7N2LPJljEWT
+	zjnbP8ORfCHTHRwKM6XYBVvX/aCm/MNHWrWR/ZYjW9oegUdojpn7+524tT54w3tjwz2HwIjHuo/
+	j8ehB5EEiXWPOk5i9yzVGEBNZXVUsuy2TOQUDuH2r+U7ng7ui1g==
+X-Received: by 2002:a17:906:f9cd:b0:a45:3759:ffb8 with SMTP id lj13-20020a170906f9cd00b00a453759ffb8mr3113156ejb.61.1709619517172;
+        Mon, 04 Mar 2024 22:18:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHEQt1ZcIkbKaeEQzPnba6flgCaowRaPPx8ACJbaWQaxJsrim4BdI92+gX6/aSmC/7vxcRY4Q==
+X-Received: by 2002:a17:906:f9cd:b0:a45:3759:ffb8 with SMTP id lj13-20020a170906f9cd00b00a453759ffb8mr3113139ejb.61.1709619516747;
+        Mon, 04 Mar 2024 22:18:36 -0800 (PST)
+Received: from [192.168.0.9] (ip-109-43-178-243.web.vodafone.de. [109.43.178.243])
+        by smtp.gmail.com with ESMTPSA id cm26-20020a170906f59a00b00a3ca56e9bcfsm5691745ejd.187.2024.03.04.22.18.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Mar 2024 22:18:36 -0800 (PST)
+Message-ID: <e8d9cebe-71ce-4943-92a7-8bde1b7f40d9@redhat.com>
+Date: Tue, 5 Mar 2024 07:18:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|PH7PR01MB8124:EE_
-X-MS-Office365-Filtering-Correlation-Id: 77c29341-7365-43ea-ccc9-08dc3cd7984a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Bkniur6+xFBJyIsx1Z5Y3arAmeGSZzgMgLQqk2CbU+cDbX0kN4LgwIehVnDssrMb/RehmgkvToS2G4K2sb7PVjB0E7PzSI/XU9mla0wl5AqT8ADd96utThuYtLoS0T0iUMb3zOLIa1rNQL3VkP+07BPSsAJGp4opu5iJ3Bwn19VhTnf19bJrRdBPf92Gzxgp7Tz0rW0KE5FngDux5lW9f1vZGbp06YhbnHlvnF2e4oTpUBRxb9FrCpuQddknZcNfoAy7iuSltYfBuGprZzJOc8hFhY9kdvMbNhCWCcBxiQJEIqFBTKP/Wol9w5wHucK+aG2dZ4iuSVyR35dGUha5Cb6TpDwTWWp/ZaEIpdh2dbPLSviGqbr46tGltUD7sQxbU2u2IpM0cTISMvLG/BGorkMfSlqxu6HUgIm4Y0WX7aX6w1MvUHnYC4Zh22rOCiuJMpau80JqaPFZ8eqFveZkTIfEdbWsejZpNIDhmVfz9+wLre7na+oCQc37SFczfgLhpSzDhtfnSBWcN+HhOhfhwM2XLvWc2wcUNh75QxFepe1UWFW2WSaiv0HmeP3MVOyZIJj9sznZ9RwYEJ4BqvW2fXHmEw8J91NSAl/NAi0vqW2shiwG1TG1fEkmj8s27xBCGIoU0LS71x1yjT/7c/w/Ng8nD0+rC0PCN5LRch1vMBcGDnJTdZ4UWfRDrdi2LQcdHC1NpoSlO+f+zhsmt6XHhjqIXR2xma6Q256Cq4mVmIk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38350700005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?nkj7zNr/mQ06jgXS8xz+LOo586YUtpo3fd+fkiF1Hl1TTrmbSPtfSaOWU1ZL?=
- =?us-ascii?Q?gVSEBYiZwxfR7b+e/4jBwGAUS5Tkvnu/o14II6uJPKSOPjx75M7Y/acUIGJ2?=
- =?us-ascii?Q?oO7+FFV9oGmd4BHquG2BgKz+BwjFRaHOUmBm0Z50iAmNc+9ZmdtTmx3zf85I?=
- =?us-ascii?Q?CWIH8wCw9Dp5CasgxAdMuQItIBIOifb2wvR1jnB5B/NOCQgB2byjyMoEg68P?=
- =?us-ascii?Q?8dzt4b1XXZEGcqC6QxUQD0J37MiP2/JJo5QFXn+iW5X/IiN0ubJlbJt4I/k6?=
- =?us-ascii?Q?E7tCmK77tUgWm6BH8sm3KXvH/E2SqIni8SLq4NRyPgrOJAbDEI2Vh/KKuS1M?=
- =?us-ascii?Q?h2Wdl8mMUvvivXe6g9rWoztOwssMegy6mP4pDja6gbU34GCbeHe/ooKvrGr4?=
- =?us-ascii?Q?jg6silW0a6F81fzAZI/xRc7Ut81NRFdJsiRKrd3U2Vg+G8rKi6b3dphK9RbR?=
- =?us-ascii?Q?NHLtVyK9I9XDllblFZibrM9Dj9Ep2Y0R0fmTmuzDVgj2hIDFR7nKdCLgOQLo?=
- =?us-ascii?Q?A9nTbmSERabVciZJK1enXIPPojGv9Bnpzhezz6h54UD1NaJl5NXimOf0kTJC?=
- =?us-ascii?Q?Y0n3fwwlUETVXwyLb3EC/JDzsk4Ct4ooTrenzOdQJto4lUr3QoH8VHKpynZ/?=
- =?us-ascii?Q?zu5gkfMyQdLF49fxTN65L/P7mxI7HReoBE+7K23b8/OsZd34xUa3wIbU7PQq?=
- =?us-ascii?Q?BMjvOx2Bp3gImnEdrXO1U/OE3rQu5XkbU5tM9y7Q4Rwh72PLl2nJHBJLVU9a?=
- =?us-ascii?Q?gJQsawAboEFnWNGctsODYRKG6fbJzKAZ26DKhV/JBM5GyDVK9IzRAzKw10vc?=
- =?us-ascii?Q?k+sBCYG2rG2QZrYZHGoP8QMO+bO/t7wNdpj9u2ECvdsFx7YqqimEtuPlI3X8?=
- =?us-ascii?Q?4bizTwU22zDNISQbLBAGmVn473iv8Obt+v0RVJnPdxu1xOYH4f0sOPl97GGV?=
- =?us-ascii?Q?ICsfqTyvOYqhnbt0PdEdDgInGB8mw/ouZo3uAgHAImTMuSU6hY4UvuVfJ9zx?=
- =?us-ascii?Q?Cu8VMxQUGIvLsgxjyojEyysIO6FcKcsmk5as6rMNApdsxSOq1I5yLqKb61eu?=
- =?us-ascii?Q?5qkHYT5P8I5pUzHWjUCWRAj/S5DwtPs2VXofoinoKit3fP6ddKY5ObH1OjrT?=
- =?us-ascii?Q?KpXxnPfP7wwJcYK76ExaIMgb9yClL9wwSW7A5cRR1+CpLKH0m6aQQMRDbtG5?=
- =?us-ascii?Q?+EEYywvcFCZ+3fPS2TejGjQIn3T6CwbGoJanjfwHCQ1mbkj1DjFp6k6EG1WQ?=
- =?us-ascii?Q?OoAiWIBuze1bBHpXfU9CmXNq7PbUmkLyMdUXQmtwU/XywH8gW5W2Q8S7p57S?=
- =?us-ascii?Q?eHj8YGBEXmUpeBU7Eta8i6KKgaIrJXAnIClfJNYjMjxs7lVrxpCWiJMmlrdJ?=
- =?us-ascii?Q?ZYa7XkjdnoZfDQgZsUmm+Y8JVeyS5HaRTsI7Ko5BI95DBiZ8Bcmp244e7oSj?=
- =?us-ascii?Q?BTFUn8jIDzR+a1XlkyeJ74SRmZ1W23uYeMmgOeqJqoIRGR9LzmM77wNt9RXZ?=
- =?us-ascii?Q?6KkcFN0Sz7srBiKzhNsUIV/lpKKqWj30joc5WFD+kUsyqDNVghkDyJCw7mZA?=
- =?us-ascii?Q?O1rKaEe3Af+Yb5tzKWVCtB/VNTyoVQwXzwhya1mXgCt2hCFMUrX2HTcRFwQj?=
- =?us-ascii?Q?R6Y5chEtCWf7Mepy7Uojxeg=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77c29341-7365-43ea-ccc9-08dc3cd7984a
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 05:46:25.1835
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YnNe6GnIBtV+1/orUXVE0Jnrx+CG7/fHSzqCqhK9x0E5+5+kBUow5DIG1iSfu35rUxtYYOit8aNXDRpy6lnuHNJbZi9KCAqe6WAPtBu46BAf3WGuj1SkUQKvBplpfd5P
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR01MB8124
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 14/32] powerpc: general interrupt tests
+Content-Language: en-US
+To: Nicholas Piggin <npiggin@gmail.com>,
+ Andrew Jones <ajones@ventanamicro.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
+ <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org
+References: <20240226101218.1472843-1-npiggin@gmail.com>
+ <20240226101218.1472843-15-npiggin@gmail.com>
+ <1b89e399-1160-4fca-a9d7-89d60fc9a710@redhat.com>
+ <20240301-65a02dd1ea0bc25377fb248f@orel> <CZLGOZZBFIS3.1ZVPJ6AKUMP3A@wheely>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzR5UaG9tYXMgSHV0
+ aCA8dGh1dGhAcmVkaGF0LmNvbT7CwXgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
+ QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
+ EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
+ 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
+ eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
+ ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
+ zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
+ tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
+ WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
+ UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDzsFN
+ BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
+ 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
+ +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
+ 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
+ gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
+ WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
+ VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
+ knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
+ cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
+ X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABwsFfBBgBAgAJBQJR+3lM
+ AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
+ ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
+ fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
+ 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
+ cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
+ ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
+ Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
+ oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
+ IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
+ yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
+In-Reply-To: <CZLGOZZBFIS3.1ZVPJ6AKUMP3A@wheely>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-As per 'commit 178a6915434c ("KVM: arm64: nv: Unmap/flush shadow stage 2
-page tables")', when ever there is unmap of pages that
-are mapped to L1, they are invalidated from both L1 S2-MMU and from
-all the active shadow/L2 S2-MMU tables. Since there is no mapping
-to invalidate the IPAs of Shadow S2 to a page, there is a complete
-S2-MMU page table walk and invalidation is done covering complete
-address space allocated to a L2. This has performance impacts and
-even soft lockup for NV(L1 and L2) boots with higher number of
-CPUs and large Memory.
+On 05/03/2024 03.30, Nicholas Piggin wrote:
+> On Fri Mar 1, 2024 at 11:45 PM AEST, Andrew Jones wrote:
+>> On Fri, Mar 01, 2024 at 01:41:22PM +0100, Thomas Huth wrote:
+>>> On 26/02/2024 11.12, Nicholas Piggin wrote:
+>>>> Add basic testing of various kinds of interrupts, machine check,
+>>>> page fault, illegal, decrementer, trace, syscall, etc.
+>>>>
+>>>> This has a known failure on QEMU TCG pseries machines where MSR[ME]
+>>>> can be incorrectly set to 0.
+>>>
+>>> Two questions out of curiosity:
+>>>
+>>> Any chance that this could be fixed easily in QEMU?
+>>>
+>>> Or is there a way to detect TCG from within the test? (for example, we have
+>>> a host_is_tcg() function for s390x so we can e.g. use report_xfail() for
+>>> tests that are known to fail on TCG there)
+>>
+>> If there's nothing better, then it should be possible to check the
+>> QEMU_ACCEL environment variable which will be there with the default
+>> environ.
+>>
+>>>
+>>>> @@ -0,0 +1,415 @@
+>>>> +/*
+>>>> + * Test interrupts
+>>>> + *
+>>>> + * Copyright 2024 Nicholas Piggin, IBM Corp.
+>>>> + *
+>>>> + * This work is licensed under the terms of the GNU LGPL, version 2.
+>>>
+>>> I know, we're using this line in a lot of source files ... but maybe we
+>>> should do better for new files at least: "LGPL, version 2" is a little bit
+>>> ambiguous: Does it mean the "Library GPL version 2.0" or the "Lesser GPL
+>>> version 2.1"? Maybe you could clarify by additionally providing a SPDX
+>>> identifier here, or by explicitly writing 2.0 or 2.1.
+>>
+>> Let's only add SPDX identifiers to new files.
+> 
+> +1
+> 
+> Speaking of which, a bunch of these just got inherited from the file
+> that was copied to begin with (I tried not to remove copyright
+> notices unless there was really nothing of the original remaining).
+> So for new code/files, is there any particular preference for the
+> license to use? I don't much mind between the *GPL*. Looks like almost
+> all the SPDX code use GPL 2.0 only, but that could be just from
+> coming from Linux. I might just go with that.
 
-Adding a lookup table of mapping of Shadow IPA to Canonical IPA
-whenever a page is mapped to any of the L2. While any page is
-unmaped, this lookup is helpful to unmap only if it is mapped in
-any of the shadow S2-MMU tables. Hence avoids unnecessary long
-iterations of S2-MMU table walk-through and invalidation for the
-complete address space.
+k-u-t were originally licensed under the LGPL, but in the course of time, 
+code has been copied from the Linux kernel here and there, so we updated the 
+license to GPL 2.
+So yes, for code that might have been copied from the kernel, we have to use 
+GPL 2. For other code, it's up to the author to chose. (IIRC we once 
+discussed that LGPL would be nice for the files in the lib/ directory, while 
+GPL is fine for the other folders, but my memory might fail here and it was 
+never written in stone anyway)
 
-Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
----
- arch/arm64/include/asm/kvm_emulate.h |   5 ++
- arch/arm64/include/asm/kvm_host.h    |  14 ++++
- arch/arm64/include/asm/kvm_nested.h  |   4 +
- arch/arm64/kvm/mmu.c                 |  19 ++++-
- arch/arm64/kvm/nested.c              | 113 +++++++++++++++++++++++++++
- 5 files changed, 152 insertions(+), 3 deletions(-)
+  Thomas
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5173f8cf2904..f503b2eaedc4 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -656,4 +656,9 @@ static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hw_mmu->nested_stage2_enabled);
- }
- 
-+static inline bool kvm_is_l1_using_shadow_s2(struct kvm_vcpu *vcpu)
-+{
-+	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu);
-+}
-+
- #endif /* __ARM64_KVM_EMULATE_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8da3c9a81ae3..f61c674c300a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -144,6 +144,13 @@ struct kvm_vmid {
- 	atomic64_t id;
- };
- 
-+struct mapipa_node {
-+	struct rb_node node;
-+	phys_addr_t ipa;
-+	phys_addr_t shadow_ipa;
-+	long size;
-+};
-+
- struct kvm_s2_mmu {
- 	struct kvm_vmid vmid;
- 
-@@ -216,6 +223,13 @@ struct kvm_s2_mmu {
- 	 * >0: Somebody is actively using this.
- 	 */
- 	atomic_t refcnt;
-+
-+	/*
-+	 * For a Canonical IPA to Shadow IPA mapping.
-+	 */
-+	struct rb_root nested_mapipa_root;
-+	rwlock_t mmu_lock;
-+
- };
- 
- static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index da7ebd2f6e24..c31a59a1fdc6 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -65,6 +65,9 @@ extern void kvm_init_nested(struct kvm *kvm);
- extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
- extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
- extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
-+extern void add_shadow_ipa_map_node(
-+		struct kvm_s2_mmu *mmu,
-+		phys_addr_t ipa, phys_addr_t shadow_ipa, long size);
- 
- union tlbi_info;
- 
-@@ -123,6 +126,7 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
- extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
- extern void kvm_nested_s2_wp(struct kvm *kvm);
- extern void kvm_nested_s2_unmap(struct kvm *kvm);
-+extern void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range);
- extern void kvm_nested_s2_flush(struct kvm *kvm);
- int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 61bdd8798f83..3948681426a0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1695,6 +1695,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 					     memcache,
- 					     KVM_PGTABLE_WALK_HANDLE_FAULT |
- 					     KVM_PGTABLE_WALK_SHARED);
-+		if ((nested || kvm_is_l1_using_shadow_s2(vcpu)) && !ret) {
-+			struct kvm_s2_mmu *shadow_s2_mmu;
-+
-+			ipa &= ~(vma_pagesize - 1);
-+			shadow_s2_mmu = lookup_s2_mmu(vcpu);
-+			add_shadow_ipa_map_node(shadow_s2_mmu, ipa, fault_ipa, vma_pagesize);
-+		}
- 	}
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
-@@ -1918,7 +1925,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- 			     (range->end - range->start) << PAGE_SHIFT,
- 			     range->may_block);
- 
--	kvm_nested_s2_unmap(kvm);
-+	kvm_nested_s2_unmap_range(kvm, range);
- 	return false;
- }
- 
-@@ -1953,7 +1960,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 			       PAGE_SIZE, __pfn_to_phys(pfn),
- 			       KVM_PGTABLE_PROT_R, NULL, 0);
- 
--	kvm_nested_s2_unmap(kvm);
-+	kvm_nested_s2_unmap_range(kvm, range);
- 	return false;
- }
- 
-@@ -2223,12 +2230,18 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
- void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot)
- {
-+	struct kvm_gfn_range range;
-+
- 	gpa_t gpa = slot->base_gfn << PAGE_SHIFT;
- 	phys_addr_t size = slot->npages << PAGE_SHIFT;
- 
-+	range.start = gpa;
-+	range.end = gpa + size;
-+	range.may_block = true;
-+
- 	write_lock(&kvm->mmu_lock);
- 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
--	kvm_nested_s2_unmap(kvm);
-+	kvm_nested_s2_unmap_range(kvm, &range);
- 	write_unlock(&kvm->mmu_lock);
- }
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index f88d9213c6b3..888ec9fba4a0 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -565,6 +565,88 @@ void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
- 	write_unlock(&kvm->mmu_lock);
- }
- 
-+/*
-+ * Create a node and add to lookup table, when a page is mapped to
-+ * Canonical IPA and also mapped to Shadow IPA.
-+ */
-+void add_shadow_ipa_map_node(struct kvm_s2_mmu *mmu,
-+			phys_addr_t ipa,
-+			phys_addr_t shadow_ipa, long size)
-+{
-+	struct rb_root *ipa_root = &(mmu->nested_mapipa_root);
-+	struct rb_node **node = &(ipa_root->rb_node), *parent = NULL;
-+	struct mapipa_node *new;
-+
-+	new = kzalloc(sizeof(struct mapipa_node), GFP_KERNEL);
-+	if (!new)
-+		return;
-+
-+	new->shadow_ipa = shadow_ipa;
-+	new->ipa = ipa;
-+	new->size = size;
-+
-+	write_lock(&mmu->mmu_lock);
-+
-+	while (*node) {
-+		struct mapipa_node *tmp;
-+
-+		tmp = container_of(*node, struct mapipa_node, node);
-+		parent = *node;
-+		if (new->ipa < tmp->ipa) {
-+			node = &(*node)->rb_left;
-+		} else if (new->ipa > tmp->ipa) {
-+			node = &(*node)->rb_right;
-+		} else {
-+			write_unlock(&mmu->mmu_lock);
-+			kfree(new);
-+			return;
-+		}
-+	}
-+
-+	rb_link_node(&new->node, parent, node);
-+	rb_insert_color(&new->node, ipa_root);
-+	write_unlock(&mmu->mmu_lock);
-+}
-+
-+/*
-+ * Iterate over the lookup table of Canonical IPA to Shadow IPA.
-+ * Return Shadow IPA, if the page mapped to Canonical IPA is
-+ * also mapped to a Shadow IPA.
-+ *
-+ */
-+bool get_shadow_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa, phys_addr_t *shadow_ipa, long *size)
-+{
-+	struct rb_node *node;
-+	struct mapipa_node *tmp = NULL;
-+
-+	read_lock(&mmu->mmu_lock);
-+	node = mmu->nested_mapipa_root.rb_node;
-+
-+	while (node) {
-+		tmp = container_of(node, struct mapipa_node, node);
-+
-+		if (tmp->ipa == ipa)
-+			break;
-+		else if (ipa > tmp->ipa)
-+			node = node->rb_right;
-+		else
-+			node = node->rb_left;
-+	}
-+
-+	read_unlock(&mmu->mmu_lock);
-+
-+	if (tmp && tmp->ipa == ipa) {
-+		*shadow_ipa = tmp->shadow_ipa;
-+		*size = tmp->size;
-+		write_lock(&mmu->mmu_lock);
-+		rb_erase(&tmp->node, &mmu->nested_mapipa_root);
-+		write_unlock(&mmu->mmu_lock);
-+		kfree(tmp);
-+		return true;
-+	}
-+	return false;
-+}
-+
- /* Must be called with kvm->mmu_lock held */
- struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
- {
-@@ -674,6 +756,7 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
- 	mmu->tlb_vttbr = 1;
- 	mmu->nested_stage2_enabled = false;
- 	atomic_set(&mmu->refcnt, 0);
-+	mmu->nested_mapipa_root = RB_ROOT;
- }
- 
- void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-@@ -760,6 +843,36 @@ void kvm_nested_s2_unmap(struct kvm *kvm)
- 	}
- }
- 
-+void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range)
-+{
-+	int i;
-+	long size;
-+	bool ret;
-+
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (kvm_s2_mmu_valid(mmu)) {
-+			phys_addr_t shadow_ipa, start, end;
-+
-+			start = range->start << PAGE_SHIFT;
-+			end = range->end << PAGE_SHIFT;
-+
-+			while (start < end) {
-+				size = PAGE_SIZE;
-+				/*
-+				 * get the Shadow IPA if the page is mapped
-+				 * to L1 and also mapped to any of active L2.
-+				 */
-+				ret = get_shadow_ipa(mmu, start, &shadow_ipa, &size);
-+				if (ret)
-+					kvm_unmap_stage2_range(mmu, shadow_ipa, size);
-+				start += size;
-+			}
-+		}
-+	}
-+}
-+
- /* expects kvm->mmu_lock to be held */
- void kvm_nested_s2_flush(struct kvm *kvm)
- {
--- 
-2.40.1
 
 
