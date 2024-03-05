@@ -1,447 +1,314 @@
-Return-Path: <kvm+bounces-10951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10975-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB6F871CF4
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:08:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 704FE871E1B
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:39:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A96A1C23203
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:08:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27924287C36
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67A1548FF;
-	Tue,  5 Mar 2024 11:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC60859B77;
+	Tue,  5 Mar 2024 11:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hrrdnIYw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="duVoZa9S"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4571DDF4;
-	Tue,  5 Mar 2024 11:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709636903; cv=none; b=brc4Evoy2pQNWjW5rBFVusYbXNGXgMf0Q9e9Ymdp34/Of9yDL1K3inF02hl/j6YbhdoHXyZMKfY/ytzUJJfJJqsoYyat7S4OAkxo0ifZgcIf8rge4KRPA9AOEy5LbDtrONfiHoRwTj6cErV01cJ3i7fnoUiknB0sHtIODvrHrQc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709636903; c=relaxed/simple;
-	bh=hYe5XQ+IP1JuC7E8eQWr5MCHTm4U3EdknaRhWNl3EdA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q6n3Vj6gm29PUyfWwZmozyZk1pvMQ6R1HuoCxtW0wsgW9RmeFqwBs3cMCr9YDBAMP9s7C1ruS+xCyKA2anC/o9PKpKl/Wv+Rbcr6NtiF77jbNI29hb8zjpCgt57JYgcFSU/WCLt4YUXVJv0X2JIM0syNtNAib2Yrfys0VC7USrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hrrdnIYw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E48FC43390;
-	Tue,  5 Mar 2024 11:08:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709636902;
-	bh=hYe5XQ+IP1JuC7E8eQWr5MCHTm4U3EdknaRhWNl3EdA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hrrdnIYw+TSUP2TL0ryMLzdyHMxzKJ5FfWszsES1n/ciqH3AnTFJmE+FldKFXKUS1
-	 iHe7TGaiSgWhv9qbB2029+dy6j0zfDaMThrRYLCZQBjb0RvAzi/8qEgQw0KKcpBFr4
-	 72tWVEHWiiVHMcQDKOE34rh3Pxp1XPDpQP0+fT14y/EwLFYBeqdrUYyDjPVaL9VNQ9
-	 Jd/VtxChoG55uCUaXoiAJ1d012NiWTZtnVx4QRV810EW+RViWy2Idt7TFadQxWsqcJ
-	 AVEJVTSYlMPeaX04dDsb2/qpNM90sqKwhNLJRNTPf9vQQnm+1h/3vqDCg0p7336zgX
-	 Vyf8766Ldwu1Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rhSeh-009XLq-P6;
-	Tue, 05 Mar 2024 11:08:19 +0000
-Date: Tue, 05 Mar 2024 11:08:18 +0000
-Message-ID: <86ttll0wd9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmar@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	darren@os.amperecomputing.com,
-	d.scott.phillips@amperecomputing.com
-Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
-In-Reply-To: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
-References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E34C59B5B;
+	Tue,  5 Mar 2024 11:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709638754; cv=fail; b=ry08swafRlzWPFRIHkSuIaH8DfLLjpKdO+5qEl07LhvJE3r7abL2Auawz35qGw+HUdk+1fqgEQ/z97vbLd+pyWTxpamL9d445U+7ENSes4ch6IK5hkcP1Vy2rOPN9pL5+kPwnJreTWYbvG2LjDWkZtWkWWMYpcTd97ZrspGZ8/c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709638754; c=relaxed/simple;
+	bh=DeC0cG/7DRQIr3reOTuFnloEcg/bTFTtFYm8UX00WMU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=dGStHnSUvwbWUILQD49USV6YY7hrk4I+/djTqW34PNZTRSPDcg5NmRjVOZN/xbicPnnFOJQz96f3BmGldprF803jYZGE5mwI7J38tGq/02V8RnYXP7IFd1iA4M7LB/HnSWXQ3+EtmxjRl8X5YXZXiHLpVSOC1bh85CLlwWE6pFY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=duVoZa9S; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709638752; x=1741174752;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=DeC0cG/7DRQIr3reOTuFnloEcg/bTFTtFYm8UX00WMU=;
+  b=duVoZa9Spt9X0yavvsMru8cyODqZtyeILpP17aWeA2qrmjREKHZiJQIx
+   YEbLwlp03uEAUrRmuUNr2ZhGIy38DnguDcv2DIDaLmnWpLaaUeT46H7UB
+   UPI1ouiiZAQgalPEu1Ej1viTTRUvEZc19L2tYmS91QpVWBFrDWlQWdmOy
+   oeGpLNAPxgPoMRLSP50h2nJRvoHG8zwbIXLLqoiT29aYCPW5WUNcOsgLp
+   4bvQKs1VZ0reKEHsJDi7kATCbJcPjAZ+Sl+veDuTv1qVe2bx3x1zMImxo
+   VCO30/5kl7YbCQ4Wfbbbn86gqNPiw7kwKY11+6XCe+LpxXpMdHZKlnilA
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4043251"
+X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
+   d="scan'208";a="4043251"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 03:39:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
+   d="scan'208";a="13833260"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Mar 2024 03:39:10 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 5 Mar 2024 03:39:09 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 5 Mar 2024 03:39:09 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 5 Mar 2024 03:39:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EAl8E+oh8JDKTiKs/4PZngBauEgcs0Z6Xv1sUxF5lFKaYKs+dskjDCVrLK90T9G9CQlRkoReZDVkbdiFCwofPnwNRzqUgZPboLOh+zPfKDQ2NT2qddWlI5NJ6V6hq2gvli6Kuog9Xjr3jp/VbcZAtegm+IyPoWxcISuu1RuEjpUYXiuMj3C8hAO2Wq1vmom/ttNTbBIB9h6FpUX///cplHDz7bpMC0GaurskZLNdZsZQc4mJMXlM7rpzxKO2K0DSSDQMBO+OUD9b3BygQPggmOavBuk+0Xtfu0YpCL0jjcWzHBjo2+APnMPQLcKISU5y2WWK/vRfPdR3k+qQjelJlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K26aNhBJ5GVhE6FbuPTzk9IPtvjjs7rs5TGsNhGpNfc=;
+ b=nDuBfbqXmDYD/YAFLq8J7mJwi0HQZlD+nhO4rjFEixPbP8RXC8+YRCFWLF6il+E9IGvQOPVCOm1OeComqm/bPvhExxCXKeOa7AtVHVpFZj3Ow3GZ26KPzEEymsPPFdrCHbmu/reTMBg1qvidp9bR4eSHJ9XcAEzjwXT6HOzB1NGSOZKuaKbXkwzYp6C9+4L3D4TOPi0Egm2tt32DFTurlTf5PCgOTpo6SVMSQXXtwPrZI2rzBFBUEe0glnR7dQpUBIGvD+vWXe0/+5uZuUXOU1o5b1cfVX0PkEJOkctM5pnLUuiU4j89ivLjI20SM9TYKYmlg8jsNYGULL/7LnYLLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH8PR11MB7071.namprd11.prod.outlook.com (2603:10b6:510:215::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7362.24; Tue, 5 Mar 2024 11:39:07 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::55f1:8d0:2fa1:c7af]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::55f1:8d0:2fa1:c7af%5]) with mapi id 15.20.7362.019; Tue, 5 Mar 2024
+ 11:39:07 +0000
+Date: Tue, 5 Mar 2024 19:09:15 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sagi Shahar <sagis@google.com>
+CC: <linux-kselftest@vger.kernel.org>, Ackerley Tng <ackerleytng@google.com>,
+	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>,
+	"Isaku Yamahata" <isaku.yamahata@intel.com>, Sean Christopherson
+	<seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, "Peter Gonda" <pgonda@google.com>, Haibo Xu
+	<haibo1.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Vishal
+ Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>, Vipin
+ Sharma <vipinsh@google.com>, <jmattson@google.com>, <dmatlack@google.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: Re: [RFC PATCH v5 22/29] KVM: selftests: Add functions to allow
+ mapping as shared
+Message-ID: <Zeb9W1ig6dFKXAgj@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20231212204647.2170650-1-sagis@google.com>
+ <20231212204647.2170650-23-sagis@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231212204647.2170650-23-sagis@google.com>
+X-ClientProxiedBy: SI2PR06CA0018.apcprd06.prod.outlook.com
+ (2603:1096:4:186::8) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmar@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH8PR11MB7071:EE_
+X-MS-Office365-Filtering-Correlation-Id: 037e96c1-0d2e-4dfd-2c2c-08dc3d08de02
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: M/SwQ1dqwpvAeguIwH2ZhLmuligiI0gCiaSvTU5grqguf+7GXKAu0wbjjsICNPjmQsHYJ6aqIXXCDsUgFSbIzczgBvHcOEEa92EZV/BFL5pn73XUERuuxI0upDo+wywDNrNX1II3NymK6H4yCnFC3tyguw0E8MjqNS8Hj1lwIkiWVHMVPxyRN7ZPCbOZdNjGji/EILFOgYhoehX/r7z16F3w48smQTikAeJ8j/3MxgiIIDTdSxiksrG6CpEmOPQqanfvNIy0QMdwIbW313i9co3kszAJNPfg0FE5HFMvk5Hm5yfIO5Z0TtyblNZf++fDA0bnvtng43zTBmSzMfR+aN8m7fttMRmoCyebgBni2O4Xw0NUqFtIR+ntHFeeHADGyeqNw5LGP0urqZWAmPl91xk705hK2B0lf4KX3xp1fvMI3oSZHGXQslVksP1xnIWSNcSP9oh6N4n+JzUyNIkpWWRUVuSetJ7a7IlxgDt0PUz7MpLJsW0MGjpVnKnC57F4lyOyKM3kt0sT3utjrOyV0h7K3ATnWEy/5vKbnwh2S4weu83OM9vBBJ20aDokTGdwFGQOa0qP8FB8yZwBZDeHjjz7+HcwnSdmp8ZnxxDsNTldFbNlVrHrozSFr0ELDH3cfFK6SkHUS6GGQekoV3YOlIE0ckkEbqiB+I7c029N/qM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pdmVSu93Kqt0/9kDeV+FEtcHVGyk2T++tm42l1V7hSMSDwZEZ16oS4Ly3p/q?=
+ =?us-ascii?Q?0Oxl5LUhuR8lJN2b96tLSM2hEVJpnDpL1VO/OZ5HJxD+Ozft6i7339c/Yxq4?=
+ =?us-ascii?Q?P4D8GzTnzlWrlKnvWIim5RYuzhcq3/NGQGE0k8D1wGML2ufcSLETX95tR7v1?=
+ =?us-ascii?Q?sGftuYVQrqrqYr/cilcq7Zc8Zq50iDfWdlFyru1DU3cA8tXiRN9Mq/Nttkfe?=
+ =?us-ascii?Q?9yvtocTqYko03we2sNhp7nswl3PUUoWCJZ2OLU0YQdKxFIGwb1jh1W/xGQYE?=
+ =?us-ascii?Q?kNQBmmohQ5uONaLIrNVbuvo2W8N/wExkIWYt918gz5yIkOdJ6KCyrN7yOgFO?=
+ =?us-ascii?Q?AbJlZS+h7uRsQNJ05JVGMm8iyubBNMDkoAl9649pSvWF5DYBDngN0nO/X+D+?=
+ =?us-ascii?Q?ijT2Ur/51JuQ+6eoSeVq0yXlY+Y62eRGYZrXg02roF58ypTeZFPDnkfHid0j?=
+ =?us-ascii?Q?iIfJK9O/nh4PAG19ofyRSw2sM8LMtO0kwD2+819b4nNmCB0m9Wje5uJjO8I4?=
+ =?us-ascii?Q?kyKvpZJP2gSdkMaWke06OSTbMT1A4ZVrBojvn/HZv6INOvg/AkI+rxPe2pZT?=
+ =?us-ascii?Q?SpLHQp6wrN3S+gZR8YifTYg8IIn8gel88hkKQYvVdBuwF61tPNKBt6qoLJmF?=
+ =?us-ascii?Q?uzC42xvZy81uy7S0J9m3B6+DiYACSZxtsJRWot8yuKFbW4SvAJwLxfgQj6s9?=
+ =?us-ascii?Q?/ZEcFl5+OQwwvehL3LlkG5kiTAxoz7a8ynkh8XVN+tJ6e8trogzR/+uIk8yt?=
+ =?us-ascii?Q?QMknIufhsZij/aXHgU2QHiMG9q+I2qnKTa38U2i3ChHR1tXiM9CmEv33L1Qx?=
+ =?us-ascii?Q?7X3hAoaSc7nbSq3pmLsJNyYbziA4jWLaiGO7Si8AHyU9//xbiSJxf+FcTfUU?=
+ =?us-ascii?Q?Vk2CxYT9yPuIk0TijDa+l1h0HKFR5fSomLSOd1s0VIUoVtEc/N2nIxvoDvxx?=
+ =?us-ascii?Q?9OXDW5MDGHJdTL7eVYcISB7NmbM8T+RRe+LogGOQbZlHgCUhLC80vHhpJ1fP?=
+ =?us-ascii?Q?ezP77x3zEMpJMMS6TE4JwlBSn0V/pBE4JS/GYC55DI8BTsi26ya/pdVAYPfa?=
+ =?us-ascii?Q?a+darqnjhLrqZQLS6fNeRWWyrMBJvoqccoVwhv1swkxVuzviUf9Uuvbq9mAt?=
+ =?us-ascii?Q?fYIVvwF7o9CAnYo8JRiY3VAwU57asbTtnvG9cBrhZb34/TZqvbzHhYIOmRL3?=
+ =?us-ascii?Q?frfeQzKTGD+mp0Vr6D7RmL2KHjTrbnaobsgF3UYsFlmUaOzYupfNEZGtHN3d?=
+ =?us-ascii?Q?tG3wKY3Ir6VU0lGp+VPMWEM9DnMNNBb3E2hsGw3TI2+WWWjb4pzYXPYRXv2/?=
+ =?us-ascii?Q?0OjdDJ6DQGXo1CbWZwWVtemb7FrZYwezzvR2773YEt/9bmVVxl5a5DztPft4?=
+ =?us-ascii?Q?j7IoRULSGiZreWFMJtWEyeHrnoPmx8In4aNNdwIxCElgo2vRBmxl25yGFf+G?=
+ =?us-ascii?Q?xcAzvOcFVf7y6iJx5ufY7ZwIm+P7XDJQ2pgOqU1wMcFa4kEqPgQxLeRV2HNc?=
+ =?us-ascii?Q?dxQwch89yXLA+XuuKiLSXBoUqCjKUUKVNWczgAPLaeNAWxuagMBNV3UeKDH9?=
+ =?us-ascii?Q?mj0Zhr5ipvHqUjgoqc017r084OrrsNCx/kvcx2ig?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 037e96c1-0d2e-4dfd-2c2c-08dc3d08de02
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 11:39:07.4767
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RXpC8icWmQgRUZ1UOCyrXTRmPpV0jag3xRs7NfYhFLYR++oBY+BlfvgLKGLzd6iTxxiXJ1qJdc2I9oYgXJfsAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7071
+X-OriginatorOrg: intel.com
 
-On Tue, 05 Mar 2024 05:46:06 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Tue, Dec 12, 2023 at 12:46:37PM -0800, Sagi Shahar wrote:
+> From: Ackerley Tng <ackerleytng@google.com>
 > 
-> As per 'commit 178a6915434c ("KVM: arm64: nv: Unmap/flush shadow stage 2
-
-$ git describe --contains 178a6915434c --match=v\*
-fatal: cannot describe '178a6915434c141edefd116b8da3d55555ea3e63'
-
-This commit simply doesn't exist upstream. It only lives in a
-now deprecated branch that will never be merged.
-
-> page tables")', when ever there is unmap of pages that
-> are mapped to L1, they are invalidated from both L1 S2-MMU and from
-> all the active shadow/L2 S2-MMU tables. Since there is no mapping
-> to invalidate the IPAs of Shadow S2 to a page, there is a complete
-> S2-MMU page table walk and invalidation is done covering complete
-> address space allocated to a L2. This has performance impacts and
-> even soft lockup for NV(L1 and L2) boots with higher number of
-> CPUs and large Memory.
-> 
-> Adding a lookup table of mapping of Shadow IPA to Canonical IPA
-> whenever a page is mapped to any of the L2. While any page is
-> unmaped, this lookup is helpful to unmap only if it is mapped in
-> any of the shadow S2-MMU tables. Hence avoids unnecessary long
-> iterations of S2-MMU table walk-through and invalidation for the
-> complete address space.
-
-All of this falls in the "premature optimisation" bucket. Why should
-we bother with any of this when not even 'AT S1' works correctly,
-making it trivial to prevent a guest from making forward progress? You
-also show no numbers that would hint at a measurable improvement under
-any particular workload.
-
-I am genuinely puzzled that you are wasting valuable engineering time
-on *this*.
-
->
-> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ryan Afranji <afranji@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h |   5 ++
->  arch/arm64/include/asm/kvm_host.h    |  14 ++++
->  arch/arm64/include/asm/kvm_nested.h  |   4 +
->  arch/arm64/kvm/mmu.c                 |  19 ++++-
->  arch/arm64/kvm/nested.c              | 113 +++++++++++++++++++++++++++
->  5 files changed, 152 insertions(+), 3 deletions(-)
+>  .../selftests/kvm/include/kvm_util_base.h     | 24 ++++++++++++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 32 +++++++++++++++++++
+>  .../selftests/kvm/lib/x86_64/processor.c      | 15 +++++++--
+>  3 files changed, 69 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 5173f8cf2904..f503b2eaedc4 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -656,4 +656,9 @@ static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hw_mmu->nested_stage2_enabled);
->  }
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index b353617fcdd1..efd7ae8abb20 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -574,6 +574,8 @@ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm);
 >  
-> +static inline bool kvm_is_l1_using_shadow_s2(struct kvm_vcpu *vcpu)
-> +{
-> +	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu);
-> +}
-
-Isn't that the very definition of "!in_hyp_ctxt()"? You are abusing
-the hw_mmu pointer to derive something, but the source of truth is the
-translation regime, as defined by HCR_EL2.{E2H,TGE} and PSTATE.M.
-
-> +
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8da3c9a81ae3..f61c674c300a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -144,6 +144,13 @@ struct kvm_vmid {
->  	atomic64_t id;
->  };
->  
-> +struct mapipa_node {
-> +	struct rb_node node;
-> +	phys_addr_t ipa;
-> +	phys_addr_t shadow_ipa;
-> +	long size;
-> +};
-> +
->  struct kvm_s2_mmu {
->  	struct kvm_vmid vmid;
->  
-> @@ -216,6 +223,13 @@ struct kvm_s2_mmu {
->  	 * >0: Somebody is actively using this.
->  	 */
->  	atomic_t refcnt;
-> +
-> +	/*
-> +	 * For a Canonical IPA to Shadow IPA mapping.
-> +	 */
-> +	struct rb_root nested_mapipa_root;
-
-Why isn't this a maple tree? If there is no overlap between mappings
-(and it really shouldn't be any), why should we use a bare-bone rb-tree?
-
-> +	rwlock_t mmu_lock;
-
-Hell no. We have plenty of locking already, and there is no reason why
-this should gain its own locking. I can't see a case where you would
-take this lock outside of holding the *real* mmu_lock -- extra bonus
-point for the ill-chosen name.
-
-> +
->  };
->  
->  static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index da7ebd2f6e24..c31a59a1fdc6 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -65,6 +65,9 @@ extern void kvm_init_nested(struct kvm *kvm);
->  extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
->  extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
->  extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
-> +extern void add_shadow_ipa_map_node(
-> +		struct kvm_s2_mmu *mmu,
-> +		phys_addr_t ipa, phys_addr_t shadow_ipa, long size);
->  
->  union tlbi_info;
->  
-> @@ -123,6 +126,7 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
->  extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
->  extern void kvm_nested_s2_wp(struct kvm *kvm);
->  extern void kvm_nested_s2_unmap(struct kvm *kvm);
-> +extern void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range);
->  extern void kvm_nested_s2_flush(struct kvm *kvm);
->  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 61bdd8798f83..3948681426a0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1695,6 +1695,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  					     memcache,
->  					     KVM_PGTABLE_WALK_HANDLE_FAULT |
->  					     KVM_PGTABLE_WALK_SHARED);
-> +		if ((nested || kvm_is_l1_using_shadow_s2(vcpu)) && !ret) {
-
-I don't understand this condition. If nested is non-NULL, it's because
-we're using a shadow S2. So why the additional condition?
-
-> +			struct kvm_s2_mmu *shadow_s2_mmu;
-> +
-> +			ipa &= ~(vma_pagesize - 1);
-> +			shadow_s2_mmu = lookup_s2_mmu(vcpu);
-> +			add_shadow_ipa_map_node(shadow_s2_mmu, ipa, fault_ipa, vma_pagesize);
-> +		}
->  	}
->  
->  	/* Mark the page dirty only if the fault is handled successfully */
-> @@ -1918,7 +1925,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->  			     (range->end - range->start) << PAGE_SHIFT,
->  			     range->may_block);
->  
-> -	kvm_nested_s2_unmap(kvm);
-> +	kvm_nested_s2_unmap_range(kvm, range);
->  	return false;
->  }
->  
-> @@ -1953,7 +1960,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->  			       PAGE_SIZE, __pfn_to_phys(pfn),
->  			       KVM_PGTABLE_PROT_R, NULL, 0);
->  
-> -	kvm_nested_s2_unmap(kvm);
-> +	kvm_nested_s2_unmap_range(kvm, range);
->  	return false;
->  }
->  
-> @@ -2223,12 +2230,18 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
->  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
->  				   struct kvm_memory_slot *slot)
->  {
-> +	struct kvm_gfn_range range;
-> +
->  	gpa_t gpa = slot->base_gfn << PAGE_SHIFT;
->  	phys_addr_t size = slot->npages << PAGE_SHIFT;
->  
-> +	range.start = gpa;
-> +	range.end = gpa + size;
-> +	range.may_block = true;
-> +
->  	write_lock(&kvm->mmu_lock);
->  	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-> -	kvm_nested_s2_unmap(kvm);
-> +	kvm_nested_s2_unmap_range(kvm, &range);
->  	write_unlock(&kvm->mmu_lock);
->  }
->  
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index f88d9213c6b3..888ec9fba4a0 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -565,6 +565,88 @@ void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
->  	write_unlock(&kvm->mmu_lock);
+>  void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+>  	      unsigned int npages);
+> +void virt_map_shared(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> +		     unsigned int npages);
+>  void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa);
+>  void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);
+>  vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva);
+> @@ -1034,6 +1036,28 @@ static inline void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr
+>  	virt_arch_pg_map(vm, vaddr, paddr);
 >  }
 >  
 > +/*
-> + * Create a node and add to lookup table, when a page is mapped to
-> + * Canonical IPA and also mapped to Shadow IPA.
-> + */
-> +void add_shadow_ipa_map_node(struct kvm_s2_mmu *mmu,
-> +			phys_addr_t ipa,
-> +			phys_addr_t shadow_ipa, long size)
-> +{
-> +	struct rb_root *ipa_root = &(mmu->nested_mapipa_root);
-> +	struct rb_node **node = &(ipa_root->rb_node), *parent = NULL;
-> +	struct mapipa_node *new;
-> +
-> +	new = kzalloc(sizeof(struct mapipa_node), GFP_KERNEL);
-> +	if (!new)
-> +		return;
-> +
-> +	new->shadow_ipa = shadow_ipa;
-> +	new->ipa = ipa;
-> +	new->size = size;
-> +
-> +	write_lock(&mmu->mmu_lock);
-> +
-> +	while (*node) {
-> +		struct mapipa_node *tmp;
-> +
-> +		tmp = container_of(*node, struct mapipa_node, node);
-> +		parent = *node;
-> +		if (new->ipa < tmp->ipa) {
-> +			node = &(*node)->rb_left;
-> +		} else if (new->ipa > tmp->ipa) {
-> +			node = &(*node)->rb_right;
-> +		} else {
-> +			write_unlock(&mmu->mmu_lock);
-> +			kfree(new);
-> +			return;
-> +		}
-> +	}
-> +
-> +	rb_link_node(&new->node, parent, node);
-> +	rb_insert_color(&new->node, ipa_root);
-> +	write_unlock(&mmu->mmu_lock);
-
-All this should be removed in favour of simply using a maple tree.
-
-> +}
-> +
-> +/*
-> + * Iterate over the lookup table of Canonical IPA to Shadow IPA.
-> + * Return Shadow IPA, if the page mapped to Canonical IPA is
-> + * also mapped to a Shadow IPA.
+> + * VM Virtual Page Map as Shared
 > + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   vaddr - VM Virtual Address
+> + *   paddr - VM Physical Address
+> + *   memslot - Memory region slot for new virtual translation tables
+> + *
+> + * Output Args: None
+> + *
+> + * Return: None
+> + *
+> + * Within @vm, creates a virtual translation for the page starting
+> + * at @vaddr to the page starting at @paddr.
 > + */
-> +bool get_shadow_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa, phys_addr_t *shadow_ipa, long *size)
-
-static?
-
+> +void virt_arch_pg_map_shared(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr);
+> +
+> +static inline void virt_pg_map_shared(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
 > +{
-> +	struct rb_node *node;
-> +	struct mapipa_node *tmp = NULL;
-> +
-> +	read_lock(&mmu->mmu_lock);
-> +	node = mmu->nested_mapipa_root.rb_node;
-> +
-> +	while (node) {
-> +		tmp = container_of(node, struct mapipa_node, node);
-> +
-> +		if (tmp->ipa == ipa)
-
-What guarantees that the mapping you have for L1 has the same starting
-address as the one you have for L2? L1 could have a 2MB mapping and L2
-only 4kB *in the middle*.
-
-> +			break;
-> +		else if (ipa > tmp->ipa)
-> +			node = node->rb_right;
-> +		else
-> +			node = node->rb_left;
-> +	}
-> +
-> +	read_unlock(&mmu->mmu_lock);
-
-Why would you drop the lock here....
-
-> +
-> +	if (tmp && tmp->ipa == ipa) {
-> +		*shadow_ipa = tmp->shadow_ipa;
-> +		*size = tmp->size;
-> +		write_lock(&mmu->mmu_lock);
-
-... if taking it again here? What could have changed in between?
-
-> +		rb_erase(&tmp->node, &mmu->nested_mapipa_root);
-> +		write_unlock(&mmu->mmu_lock);
-> +		kfree(tmp);
-> +		return true;
-> +	}
-> +	return false;
+> +	virt_arch_pg_map_shared(vm, vaddr, paddr);
 > +}
-
-So simply hitting in the reverse mapping structure *frees* it? Meaning
-that you cannot use it as a way to update a mapping?
-
-> +
->  /* Must be called with kvm->mmu_lock held */
->  struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
->  {
-> @@ -674,6 +756,7 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
->  	mmu->tlb_vttbr = 1;
->  	mmu->nested_stage2_enabled = false;
->  	atomic_set(&mmu->refcnt, 0);
-> +	mmu->nested_mapipa_root = RB_ROOT;
->  }
 >  
->  void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> @@ -760,6 +843,36 @@ void kvm_nested_s2_unmap(struct kvm *kvm)
+>  /*
+>   * Address Guest Virtual to Guest Physical
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 4f1ae0f1eef0..28780fa1f0f2 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1573,6 +1573,38 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
 >  	}
 >  }
 >  
-> +void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range)
+> +/*
+> + * Map a range of VM virtual address to the VM's physical address as shared
+> + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   vaddr - Virtuall address to map
+> + *   paddr - VM Physical Address
+> + *   npages - The number of pages to map
+> + *
+> + * Output Args: None
+> + *
+> + * Return: None
+> + *
+> + * Within the VM given by @vm, creates a virtual translation for
+> + * @npages starting at @vaddr to the page range starting at @paddr.
+> + */
+> +void virt_map_shared(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> +		     unsigned int npages)
 > +{
-> +	int i;
-> +	long size;
-> +	bool ret;
+> +	size_t page_size = vm->page_size;
+> +	size_t size = npages * page_size;
 > +
-> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +	TEST_ASSERT(vaddr + size > vaddr, "Vaddr overflow");
+> +	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
 > +
-> +		if (kvm_s2_mmu_valid(mmu)) {
-> +			phys_addr_t shadow_ipa, start, end;
-> +
-> +			start = range->start << PAGE_SHIFT;
-> +			end = range->end << PAGE_SHIFT;
-> +
-> +			while (start < end) {
-> +				size = PAGE_SIZE;
-> +				/*
-> +				 * get the Shadow IPA if the page is mapped
-> +				 * to L1 and also mapped to any of active L2.
-> +				 */
-
-Why is L1 relevant here?
-
-> +				ret = get_shadow_ipa(mmu, start, &shadow_ipa, &size);
-> +				if (ret)
-> +					kvm_unmap_stage2_range(mmu, shadow_ipa, size);
-> +				start += size;
-> +			}
-> +		}
+> +	while (npages--) {
+> +		virt_pg_map_shared(vm, vaddr, paddr);
+> +		vaddr += page_size;
+> +		paddr += page_size;
 > +	}
 > +}
+Set vm->vpages_mapped as what's done in virt_map() ?
+
 > +
->  /* expects kvm->mmu_lock to be held */
->  void kvm_nested_s2_flush(struct kvm *kvm)
+>  /*
+>   * Address VM Physical to Host Virtual
+>   *
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 566d82829da4..aa2a57ddb8d3 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -190,7 +190,8 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
+>  	return pte;
+>  }
+>  
+> -void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+> +static void ___virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> +			   int level, bool protected)
 >  {
-
-There are a bunch of worrying issues with this patch. But more
-importantly, this looks like a waste of effort until the core issues
-that NV still has are solved, and I will not consider anything of the
-sort until then.
-
-I get the ugly feeling that you are trying to make it look as if it
-was "production ready", which it won't be for another few years,
-specially if the few interested people (such as you) are ignoring the
-core issues in favour of marketing driven features ("make it fast").
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>  	const uint64_t pg_size = PG_LEVEL_SIZE(level);
+>  	uint64_t *pml4e, *pdpe, *pde;
+> @@ -235,17 +236,27 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+>  		    "PTE already present for 4k page at vaddr: 0x%lx\n", vaddr);
+>  	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
+>  
+> -	if (vm_is_gpa_protected(vm, paddr))
+> +	if (protected)
+>  		*pte |= vm->arch.c_bit;
+>  	else
+>  		*pte |= vm->arch.s_bit;
+>  }
+>  
+> +void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+> +{
+> +	___virt_pg_map(vm, vaddr, paddr, level, vm_is_gpa_protected(vm, paddr));
+> +}
+> +
+>  void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+>  {
+>  	__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K);
+>  }
+>  
+> +void virt_arch_pg_map_shared(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+> +{
+> +	___virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K, false);
+> +}
+> +
+>  void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+>  		    uint64_t nr_bytes, int level)
+>  {
+> -- 
+> 2.43.0.472.g3155946c3a-goog
+> 
+> 
 
