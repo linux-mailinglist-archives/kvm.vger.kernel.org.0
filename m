@@ -1,186 +1,151 @@
-Return-Path: <kvm+bounces-10854-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94858713A2
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 03:32:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEDB58713A8
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 03:35:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EDD4286AD7
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 02:32:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70E1D1F21DA5
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 02:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B841F286B3;
-	Tue,  5 Mar 2024 02:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761E3282EE;
+	Tue,  5 Mar 2024 02:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xc9OROup"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FseWVgwr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDA9EDE;
-	Tue,  5 Mar 2024 02:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568BA23CE
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 02:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709605923; cv=none; b=DoyjGjrwYdf8ult8e96Cbn/146JdUnCjP1ke5HL+XObLGiL50KbvqsCE8qc+BxjjSN3oXqNeMf4HdryMWT5BCJGQcZbtH9ISoFqbZeb3ckhpTWb6ohhtxn/Q1nZLN7skUvysXgWijvyuJxoeBqKDJy8hN6PjKcYPhP6buHX9geM=
+	t=1709606139; cv=none; b=m/ON+aGLX8UWtycupk2h/vurH/tvJmktG6UfqB22N/zmJ6MUdzmVH6y4KRVxYFd9nT8ClvBquzJLWvLaTWw0UklP6AQr2JIVxa8K4ZgbEFVi3TNnWejJYH96p3vPacNefejVSWf1lhM5n/9UrxJvSBYLLYzqjdXNe305DPOxZEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709605923; c=relaxed/simple;
-	bh=hk4ffxNQWELF0B5T5gTeWLKMNq6Hkl+1UGHQBiJSKRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YzDhXdXLjvQYzaGBgPMtvBT4UgjFQ0wvSLbRru67pHD9z9NSNmX91ZVkt73vN1jiorJnj7KVTkpRAsrPTN0KVsAo0WqL9kQwiM75MQYps7Jx67B0SOBBXesiDp5/1a46WTEoRQ8IAphQ3MWp46weZbHzJ9hO61WrfcyGL7hgVws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xc9OROup; arc=none smtp.client-ip=209.85.210.45
+	s=arc-20240116; t=1709606139; c=relaxed/simple;
+	bh=N+xrQxFkgiT2zXyroYi8UiH205d3grUsaMt27oLZHPg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=RxsgbGE59oHQ4hRKpWs0SMVMhmWzuZ+ZjtEPYnVH6jgjBST+36KEORcThILAOGIieK1D/bQ7EnDnSfsfQ6U0qUASfMv4mWqXMvENPaWOtmPECDGrkyMvpq+tcaByezgHsaejVN3o5EaCxBthG1AQ9lWgUSiFQfsZH1JnK8CAw70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FseWVgwr; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6e4f1660493so457186a34.0;
-        Mon, 04 Mar 2024 18:32:01 -0800 (PST)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6e617b39877so1574902b3a.3
+        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 18:35:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709605920; x=1710210720; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DQS78kDIQyyXIAHjahu4pRvGKqSGcVFJuYh7FUonVEM=;
-        b=Xc9OROupavOHaIEzCzc/YIQVQbvXpH9KPX8BuAZ9LPwZunlt5EDLkGL44+fTQt/zUw
-         tYsvjzqk3DJo/lkmFR20IVqnWOT/qhJK+RFBTsBYVOOkNMK9jf+uASwdFAoznTuyJk1F
-         Q9DMFNQV7rjgUHIktvXq/br++I2f/+bq1lVEsVt/QWQsuQiHtfRkr0zudlDhS6VIH8Ea
-         ps0mTg6Ss9b4qdQAuVIcEsodWDqN6dRpx1AAt9aQa3zrhCkc4BjQDwDETbLGg3fBny5X
-         /+8pq10x+/gaYP43JfjJXRhNit6m+kxgS4yUEgFOtTkV6a4eyqeZBkxmu0Frp42K0eMk
-         ijpA==
+        d=gmail.com; s=20230601; t=1709606137; x=1710210937; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N+xrQxFkgiT2zXyroYi8UiH205d3grUsaMt27oLZHPg=;
+        b=FseWVgwrKqHsrj2HXSCbDzL+isQjgeX+DwHSQHHFXxrE2tVRoT0hm6yeF2ddN0/ACw
+         X85EwaiLJJe1tZcNl58mhAliyglP6prCub0T4LxCKGdC84hY5HkH9ILZxZ/riM5SpCZC
+         H2oxXIaP6KB1nfoFATlqo13JwkK/v+a2yWXu8mYPttqQGn07GStrE+APjsOYDG8tsP3K
+         OnXHtcWKPVIisSKPuEruW+YSRpgMPjHq4xOZ4cDZPxIh+3F3Oofnl7oiLWdTaK8mGYeW
+         QVV2gzeGEJqDlhZo1HDsGYS/xNU2vDjXn9IrYhiwE4IegBIg1dXu75up3vQTrgfpV2Kt
+         xAnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709605920; x=1710210720;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DQS78kDIQyyXIAHjahu4pRvGKqSGcVFJuYh7FUonVEM=;
-        b=kJ1tuF8MP3gxP9aNuLBQXr8tVqttVw2YF3N+1/fd90UZhh9d0oMfSrRB0TJt2cp1pN
-         XmgEWZfjUIXeFewjbQL286A1gBIeCSB0MynIR+BTPDrc1Zu07zw3Jj2tVunxqK6kc/Ux
-         Rb4HLROatS3s9GvPTD/V41FVX6jZ0cAN0RjBRCRxPFhIBDkcZhR3Snfme88V0t2hwrrf
-         9gc0wmGt5ZZfsbJjuPWczrKR5AYxn9nK80Xa7+xKLpIt/7PilbWSjx7k4u+PWlITw44g
-         gvldgf+NCWW0qPQZirKo87cXAl36ZgbIIz2+ivnfKgQUsc4c6g81RpjHpvr5iKrexLZ2
-         khJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3fqaq2/dyhqThshRLoiMjdursjt8ZH6yBTeqO67mzs3rwxjhg/oCl9rnVcajDahpLlS+YwqTsWuhuzlNO0ckvyp/UJrHpgy1oCp/WldiLZjmF7YuO3rVxdE/T8hjXFu6l
-X-Gm-Message-State: AOJu0YwFEo1aycKcjgGD9xOM4voXaRdRchZolGb3jwmYuP1/MyMVaKlS
-	BoKmJ2sDwK6nctHDhTNlFr33/Jed356z5bEcvfdUk3puvnRl+7RdrcOBrcX0FbM=
-X-Google-Smtp-Source: AGHT+IGeh/sNbtF2r85uQWZaRW1uNmHaXmFmsrApiNZFT4slLKxfnAiVMzH6gJJojerhG10rysbivg==
-X-Received: by 2002:a05:6870:f6aa:b0:21e:95d9:dc7b with SMTP id el42-20020a056870f6aa00b0021e95d9dc7bmr587919oab.30.1709605920528;
-        Mon, 04 Mar 2024 18:32:00 -0800 (PST)
-Received: from [192.168.255.10] ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id u20-20020a62d454000000b006e468cd0a5asm8540777pfl.178.2024.03.04.18.31.56
+        d=1e100.net; s=20230601; t=1709606137; x=1710210937;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=N+xrQxFkgiT2zXyroYi8UiH205d3grUsaMt27oLZHPg=;
+        b=OiYF4J4KNe01GeiQT6/1vGkFQ7EKEMjuI6CLD1JlmmAdKg1Egs3G7jOC14TcLebK99
+         5Ei2F+HjBhP9Mp2dkp6hngRdt3gHShgrQjRjVDQKtH2vS87DmZsRFQmjvbPECBNqniFJ
+         G8/md97d2fQJKLeWi1SWbOd4B32ga0O+uL9RZYHNd2F1lmHn3hZBK51mANUdKpt64EFp
+         sQR6CTfsZbajsaod2ad+0NyNa4sbzJsnQ2rVjPUxrvQc7NzErPjL9d9QzR9DXEIFkjyZ
+         SWk+0GRsHm+D/tWVQZaFlLZskc766gz0rQj8R3AxauGObAdjt5YVR7WDZs8DD2WRup3N
+         nMcA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQi1/02I3SSjfRMPyjmYOymKBfd8tCKwPJaNUNGZDtHvbWp5cKJPqf9G+ns7Xwn9mxKlb/w0z6fAGvKzYHO5YiCpwQ
+X-Gm-Message-State: AOJu0YzwPjko8EbIWV2XH5CTlpS02AbSBubGxinOgzHfMZx7GlLZ5Yyu
+	q9HNDQXBoCYgxdtItJZJUH68wPIjYo4DKdQJxVQ4RP+ClNPm3fyu
+X-Google-Smtp-Source: AGHT+IFWHPaDxpd9bOxuV1992+XKIgj0weLG7m7eGnp6z6kVYI8q6dzZSPJZ7bnSE7aWZLXV8NJXjA==
+X-Received: by 2002:a05:6a20:7f96:b0:19e:c3a1:238d with SMTP id d22-20020a056a207f9600b0019ec3a1238dmr539679pzj.52.1709606137537;
+        Mon, 04 Mar 2024 18:35:37 -0800 (PST)
+Received: from localhost (220-235-220-130.tpgi.com.au. [220.235.220.130])
+        by smtp.gmail.com with ESMTPSA id lp3-20020a056a003d4300b006e553f2b880sm7839075pfb.211.2024.03.04.18.35.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Mar 2024 18:31:59 -0800 (PST)
-Message-ID: <8a846ba5-d346-422e-817b-e00ab9701f19@gmail.com>
-Date: Tue, 5 Mar 2024 10:31:55 +0800
+        Mon, 04 Mar 2024 18:35:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86/svm/pmu: Set PerfMonV2 global control bits
- correctly
-To: Sean Christopherson <seanjc@google.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Sandipan Das <sandipan.das@amd.com>, pbonzini@redhat.com,
- mizhang@google.com, jmattson@google.com, ravi.bangoria@amd.com,
- nikunj.dadhania@amd.com, santosh.shukla@amd.com, manali.shukla@amd.com,
- babu.moger@amd.com, kvm list <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20240301075007.644152-1-sandipan.das@amd.com>
- <06061a28-88c0-404b-98a6-83cc6cc8c796@gmail.com>
- <cc8699be-3aae-42aa-9c70-f8b6a9728ee3@amd.com>
- <f5bbe9ac-ca35-4c3e-8cd7-249839fbb8b8@linux.intel.com>
- <ZeYlEGORqeTPLK2_@google.com>
-Content-Language: en-US
-From: Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <ZeYlEGORqeTPLK2_@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 05 Mar 2024 12:35:31 +1000
+Message-Id: <CZLGSMOBJAR4.1Q6P8X2V9X969@wheely>
+Cc: "Laurent Vivier" <lvivier@redhat.com>, "Andrew Jones"
+ <andrew.jones@linux.dev>, "Paolo Bonzini" <pbonzini@redhat.com>, "Joel
+ Stanley" <joel@jms.id.au>, <linuxppc-dev@lists.ozlabs.org>,
+ <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH 14/32] powerpc: general interrupt tests
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Andrew Jones" <ajones@ventanamicro.com>, "Thomas Huth"
+ <thuth@redhat.com>
+X-Mailer: aerc 0.15.2
+References: <20240226101218.1472843-1-npiggin@gmail.com>
+ <20240226101218.1472843-15-npiggin@gmail.com>
+ <1b89e399-1160-4fca-a9d7-89d60fc9a710@redhat.com>
+ <20240301-65a02dd1ea0bc25377fb248f@orel>
+ <b4a1b995-e5cd-40e9-afc1-445a9e5f6fa5@redhat.com>
+ <20240301-0483593c146ffd3bbded2f69@orel>
+In-Reply-To: <20240301-0483593c146ffd3bbded2f69@orel>
 
-On 5/3/2024 3:46 am, Sean Christopherson wrote:
-> On Mon, Mar 04, 2024, Dapeng Mi wrote:
->>
->> On 3/1/2024 5:00 PM, Sandipan Das wrote:
->>> On 3/1/2024 2:07 PM, Like Xu wrote:
->>>> On 1/3/2024 3:50 pm, Sandipan Das wrote:
->>>>> With PerfMonV2, a performance monitoring counter will start operating
->>>>> only when both the PERF_CTLx enable bit as well as the corresponding
->>>>> PerfCntrGlobalCtl enable bit are set.
->>>>>
->>>>> When the PerfMonV2 CPUID feature bit (leaf 0x80000022 EAX bit 0) is set
->>>>> for a guest but the guest kernel does not support PerfMonV2 (such as
->>>>> kernels older than v5.19), the guest counters do not count since the
->>>>> PerfCntrGlobalCtl MSR is initialized to zero and the guest kernel never
->>>>> writes to it.
->>>> If the vcpu has the PerfMonV2 feature, it should not work the way legacy
->>>> PMU does. Users need to use the new driver to operate the new hardware,
->>>> don't they ? One practical approach is that the hypervisor should not set
->>>> the PerfMonV2 bit for this unpatched 'v5.19' guest.
->>>>
->>> My understanding is that the legacy method of managing the counters should
->>> still work because the enable bits in PerfCntrGlobalCtl are expected to be
->>> set. The AMD PPR does mention that the PerfCntrEn bitfield of PerfCntrGlobalCtl
->>> is set to 0x3f after a system reset. That way, the guest kernel can use either
->>
->> If so, please add the PPR description here as comments.
-> 
-> Or even better, make that architectural behavior that's documented in the APM.
+On Sat Mar 2, 2024 at 12:14 AM AEST, Andrew Jones wrote:
+> On Fri, Mar 01, 2024 at 02:57:04PM +0100, Thomas Huth wrote:
+> > On 01/03/2024 14.45, Andrew Jones wrote:
+> > > On Fri, Mar 01, 2024 at 01:41:22PM +0100, Thomas Huth wrote:
+> > > > On 26/02/2024 11.12, Nicholas Piggin wrote:
+> > > > > Add basic testing of various kinds of interrupts, machine check,
+> > > > > page fault, illegal, decrementer, trace, syscall, etc.
+> > > > >=20
+> > > > > This has a known failure on QEMU TCG pseries machines where MSR[M=
+E]
+> > > > > can be incorrectly set to 0.
+> > > >=20
+> > > > Two questions out of curiosity:
+> > > >=20
+> > > > Any chance that this could be fixed easily in QEMU?
+> > > >=20
+> > > > Or is there a way to detect TCG from within the test? (for example,=
+ we have
+> > > > a host_is_tcg() function for s390x so we can e.g. use report_xfail(=
+) for
+> > > > tests that are known to fail on TCG there)
+> > >=20
+> > > If there's nothing better, then it should be possible to check the
+> > > QEMU_ACCEL environment variable which will be there with the default
+> > > environ.
+> >=20
+> > Well, but that's only available from the host side, not within the test
+> > (i.e. the guest). So that does not help much with report_xfail...
+>
+> powerpc has had environment variables in guests since commit f266c3e8ef15
+> ("powerpc: enable environ"). QEMU_ACCEL is one of the environment
+> variables given to unit tests by default when ENVIRON_DEFAULT is 'yes', a=
+s
+> is the default set in configure. But...
+>
+> > I was rather thinking of something like checking the device tree, e.g. =
+for
+> > the compatible property in /hypervisor to see whether it's KVM or TCG..=
+.?
+>
+> ...while QEMU_ACCEL will work when the environ is present, DT will always
+> be present, so checking the hypervisor node sounds better to me.
 
-On the AMD side, we can't even reason that "PerfMonV3" will be compatible with
-"PerfMonV2" w/o APM clarification which is a concern for both driver/virt impl.
+Yeah I got that.
 
-> 
->>>>> ---
->>>>>     arch/x86/kvm/svm/pmu.c | 1 +
->>>>>     1 file changed, 1 insertion(+)
->>>>>
->>>>> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
->>>>> index b6a7ad4d6914..14709c564d6a 100644
->>>>> --- a/arch/x86/kvm/svm/pmu.c
->>>>> +++ b/arch/x86/kvm/svm/pmu.c
->>>>> @@ -205,6 +205,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>>         if (pmu->version > 1) {
->>>>>             pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
->>>>>             pmu->global_status_mask = pmu->global_ctrl_mask;
->>>>> +        pmu->global_ctrl = ~pmu->global_ctrl_mask;
->>
->> It seems to be more easily understand to calculate global_ctrl firstly and
->> then derive the globol_ctrl_mask (negative logic).
-> 
-> Hrm, I'm torn.  On one hand, awful name aside (global_ctrl_mask should really be
-> something like global_ctrl_rsvd_bits), the computation of the reserved bits should
-> come from the capabilities of the PMU, not from the RESET value.
-> 
-> On the other hand, setting _all_ non-reserved bits will likely do the wrong thing
-> if AMD ever adds bits in PerfCntGlobalCtl that aren't tied to general purpose
-> counters.  But, that's a future theoretical problem, so I'm inclined to vote for
-> Sandipan's approach.
+One issue with xfail I noted when looking at this earlier, is that it
+*always* expects a fail, and fails if it succeeds. So if you fix a QEMU
+bug then you introduce a fail to kvm-unit-tests. So we really want a
+report_known_bug(cond, "SPRs look sane", "QEMU TCG before v9.0 and
+POWER9 DD2.0 is known to fail..."); and that could report a maybe-fail
+that doesn't make the test group fail.
 
-I suspect that Intel hardware also has this behaviour [*] although guest
-kernels using Intel pmu version 1 are pretty much non-existent.
-
-[*] Table 10-1. IA-32 and Intel® 64 Processor States Following Power-up, Reset, 
-or INIT (Contd.)
-
-We need to update the selftest to guard this.
-
-> 
->> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
->> index e886300f0f97..7ac9b080aba6 100644
->> --- a/arch/x86/kvm/svm/pmu.c
->> +++ b/arch/x86/kvm/svm/pmu.c
->> @@ -199,7 +199,8 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->> kvm_pmu_cap.num_counters_gp);
->>
->>          if (pmu->version > 1) {
->> -               pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters)
->> - 1);
->> +               pmu->global_ctrl = (1ull << pmu->nr_arch_gp_counters) - 1;
->> +               pmu->global_ctrl_mask = ~pmu->global_ctrl;
->>                  pmu->global_status_mask = pmu->global_ctrl_mask;
->>          }
->>
->>>>>         }
->>>>>           pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
->>>
-> 
+Thanks,
+Nick
 
