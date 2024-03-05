@@ -1,155 +1,110 @@
-Return-Path: <kvm+bounces-11070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11071-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49BF0872904
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 21:58:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44FE8872947
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 22:18:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E4901C20441
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 20:58:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D7DCB2C79B
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 21:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F34212D1E8;
-	Tue,  5 Mar 2024 20:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D5712AAF5;
+	Tue,  5 Mar 2024 21:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VItnTInX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hZL5rxvN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338B212BEAA
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 20:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEDD26AD0
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 21:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709672300; cv=none; b=C8/nUqbpSzlRbItfv9G1xk2GctEGHNY7OHVHeo/svVurVw5y7wicS53Nm6Lh3uWA38WC0h6ox9XR53ZHWIF3Qwz7IIJoj65162jIBAEGA3dTIDBOnJ0WKByqWR5cQeWPZzsvUXneaboLuiMlm/UQOteLtt4Ol8hqe7Z7umB0ask=
+	t=1709673174; cv=none; b=SwHJMzhuI2CR3nlx3A4fXIkE0BsAlXBQQTUe56hY5cCImEpttaKm1QbBKhVQWxYKaNzC/g3Kwc/fzLKdHODJx07ckYi9duLRLaS26345X38qAtM7ISmFWTaVksWlEYH6Is9ZmPniSVuH+1xTEULfAF+ayDBw1T9WXgf2CQN3Bnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709672300; c=relaxed/simple;
-	bh=hz+ZxSOYv8PxZNrsTqx4IxtCpcRrFHGU/VQIYl36LGQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T/mATlTbvB9y5I6f+mQOHMiQU7LVli75ya7tJ+cGB/Xu9jJRfNyjbQ9IEcmruPbXXgnGOwYbDndPzgG3MBBGihLp643+c9nLeXzDbBU4O0SK166XwDBPGaM0RY/OFNU1Lvkd8ImFd+HpnDQBomGHRAGp4WtijCResFyKO98N3jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VItnTInX; arc=none smtp.client-ip=209.85.160.182
+	s=arc-20240116; t=1709673174; c=relaxed/simple;
+	bh=FXf49kdBXVQUcN5HuOuu/xL/lL2UaeLFaRmdPdq6YJw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KFxROifiPGdbrs73r3S0MiGrQYSEAWGnad9dqvCLs2jLkbFe2A6o6u4Q7f8avk658pY5eHcbd4N+JxYNyd7e6BZmsvBA9GNVdW27QrSn7Pt52qk0B342XYs/S5s5YlLUhJJSwzUc0wNNN603BXUhzpCHjRfbbKiM0O0TK0xoXts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hZL5rxvN; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-42ee0c326e8so58311cf.0
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 12:58:18 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc647f65573so10759043276.2
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 13:12:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709672297; x=1710277097; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NM9bu0HcRSpvQ/lk6AsEXTNfL1CGnBbQK/LGwtIb+y4=;
-        b=VItnTInX7KAkkHOMp2ynIn3AlD2CYHHFuIraqXwe9THhasvj/qOOkonyVAxlRjOTWO
-         kPo8lezaR4nNpxQJfm6V4lsF68/BZH2fvpVfYyaXLccHLrbh+4MievBbhCLPf508tC2R
-         ZY+RuPcM+MhOetVT04AzXndvmTqnxvlWkNOKceGo6o+gTFbn0kB6Gs/VIRXG29TB7tsK
-         lW3FcunEAG/JJrDbd5B4fhdZBjc7bQSxKvqE7kGC55M4wdpEQZgfEHGhnzOBgmVV2tVC
-         chFM5sxG7LVxwOm4ONNVpchwCiDfe14GHs/s1MzYCG54VSk1Pc4Oa0EsDKwAnk0Wppkn
-         AKxQ==
+        d=google.com; s=20230601; t=1709673172; x=1710277972; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Ag+2iHq1txfrjL7kar9Psm6rqRJcEV1IG7J5tV87jM=;
+        b=hZL5rxvNsyE8SPQzAXfAAsNuEV7HvnrNXhGHlhaQYRY4xvdyvuEpIwK3fsSt1exumt
+         Oyh469nqGNiGhnnjDyz36adbAVqVZtATsr/4EnupLHHLVYXsKgidtpamis0n5tigSpzb
+         EKiwPOGubd+ClULr/i/Iwq9eSLPRd9Q08bCrtsJZ3qg1foDXWB2/8teORkS4dzHEcpv2
+         lYxOpRPAwLCrhEZ9pTSb0EF7r+awqCk7D8aKpXg0pZWr059t0RI5A0clFLP4LpKcbeeJ
+         k1zUuvMkRR8H3bwzG1D1y+Aigpc3Xxzsi0OELAd19F/MNAiHcGwgTDWlIJ+QwIIJa9XL
+         uQZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709672297; x=1710277097;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NM9bu0HcRSpvQ/lk6AsEXTNfL1CGnBbQK/LGwtIb+y4=;
-        b=dH7Utz5J4YB1kuU/3n+jm7poQ27uAHiOnzHF+Y+KpJdjcCzZT8lK6SXXSaTfFbZi0o
-         Fxj39TpcLHjNTqC1y+K/NM8nAaF/lHvWaPsMKZw4hzLh0HW0oI0Ht+wiqaI7/cKBdbdL
-         3GusAY9hZrG+Vkjl5OPWdVaNG1YxG9GLaWJjpkWVZhY+NHewQtNUGpiIeAH0faJa/I3Q
-         kw0TQ2cxcgpRBfBEXhtM9RY/RzMmaDsReZpM6Yf+FPe4xSoypfdthJ7K+yBIDdXbvzi3
-         Xh23j32ev8+VrPPySangTFfxvldLYTKZGXJ6sgJ++JBUnqAycmPb2yWXZ4zdWSZEjFL5
-         zD2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXlJSm7lGufYanumYIxjAbwjh3NI/diafqr4uBHBRpw+KUVUWJDrpxET9sIRbz6P2xTDVKs9EYc0nWsGQcKoYZL9ekq
-X-Gm-Message-State: AOJu0YxNYyOmlRIVlle9sdx7IDnKardWWyvmEVhPKzDKbpSR2LGKFN0e
-	D3WnT9AonfN158NPErTX7gmmQZYnkuR2F7qzcKRKhaDBB8fy0vdYfsxBTO7UKfd1m+eVHK+zFjE
-	cvYE05+0ENMLVbp8rkTEcGIv11Flq9h/noe+v
-X-Google-Smtp-Source: AGHT+IGJuhFV2CSZhTpphuYInlBxp0BhTfrnQUeh2OvKsSqzEL4tX1NuAVfzJjBoxId+yPuVZh+Ut8IQpuDDq6mQdxI=
-X-Received: by 2002:ac8:59d5:0:b0:42f:a3c:2d4c with SMTP id
- f21-20020ac859d5000000b0042f0a3c2d4cmr72229qtf.13.1709672297226; Tue, 05 Mar
- 2024 12:58:17 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709673172; x=1710277972;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Ag+2iHq1txfrjL7kar9Psm6rqRJcEV1IG7J5tV87jM=;
+        b=vpXvJHnIZNxoj49VNPuq5r2R9F9T/0RFgWAdubKs5TdvgKqSMqKcxWASeXtylMioIY
+         +N8Nic/Cl6dtIvbimijbZKqGXnUcCzjcjOGa60PF3Dy+9yJwoD7gx+mA8HFsZl/3HSzM
+         7UIVb8jlxqm1x+mAl5bjMLU1j6O2Zvc5e6+Sq5g0KtOJq6DI++ITGFxQ61kGtecAfmRL
+         Ery5JPEwiSBOWfAyGGR2p934Q8sffAY57Ejl0Hzv6C92YNs0JUJaprwGLKbyXZTTV7Oh
+         4Hhq5ve/VmNVAUnWJ7lpq/8QGPA8l/HC1vjA0CmmvXk1Ewuz+MMZwOPgbp1FR1Crb6Lh
+         eZSA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ7KXsx0FzRYQ1R6QXqF8N2uxl/dS5JqHnhI60a2p5ThGDluw2Dx9xqBDFl905E26bwcOszezKEa0YAerE3fEl1R/t
+X-Gm-Message-State: AOJu0YwwSDXurmgsa4WW21tFYqMMC11AzYuWGRrIsU6x2UC7eXRFkLR5
+	sy5mwYPpebUVa7Fe39ahAfUI7JqOAjUoBtrzVLR5f0CrivSw/QHwwoTU6drxB7ClxdV6+HXpGyk
+	y/A==
+X-Google-Smtp-Source: AGHT+IGlqIIv+7adrz5MYT2XABbgiBYwvWRi+Vj/bM1xdE33mR45AWrUzWllQG26UicqEt7cbkKEU51adPE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1004:b0:dc7:48ce:d17f with SMTP id
+ w4-20020a056902100400b00dc748ced17fmr3360283ybt.10.1709673172095; Tue, 05 Mar
+ 2024 13:12:52 -0800 (PST)
+Date: Tue, 5 Mar 2024 13:12:50 -0800
+In-Reply-To: <c72f8a65-c67e-4f11-b888-5d0994f8ee11@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240301194037.532117-1-mic@digikod.net> <20240301194037.532117-4-mic@digikod.net>
-In-Reply-To: <20240301194037.532117-4-mic@digikod.net>
-From: Rae Moar <rmoar@google.com>
-Date: Tue, 5 Mar 2024 15:58:05 -0500
-Message-ID: <CA+GJov4BPGuuu+oivgX3Z0J8sb1bYLhrNRrex7qza45WNMtBcQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/7] kunit: Fix timeout message
-To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
-Cc: Brendan Higgins <brendanhiggins@google.com>, David Gow <davidgow@google.com>, 
-	Kees Cook <keescook@chromium.org>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Alan Maguire <alan.maguire@oracle.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>, 
-	Ingo Molnar <mingo@redhat.com>, James Morris <jamorris@linux.microsoft.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, 
-	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marco Pagani <marpagan@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Thara Gopinath <tgopinath@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
-	Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	linux-um@lists.infradead.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240227115648.3104-1-dwmw2@infradead.org> <20240227115648.3104-2-dwmw2@infradead.org>
+ <ZeZc549aow68CeD-@google.com> <c72f8a65-c67e-4f11-b888-5d0994f8ee11@xen.org>
+Message-ID: <ZeeK0lkwzBRdgX2z@google.com>
+Subject: Re: [PATCH v2 1/8] KVM: x86/xen: improve accuracy of Xen timers
+From: Sean Christopherson <seanjc@google.com>
+To: paul@xen.org
+Cc: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Michal Luczaj <mhal@rbox.co>, David Woodhouse <dwmw@amazon.co.uk>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Mar 1, 2024 at 2:40=E2=80=AFPM Micka=C3=ABl Sala=C3=BCn <mic@digiko=
-d.net> wrote:
->
-> The exit code is always checked, so let's properly handle the -ETIMEDOUT
-> error code.
+On Tue, Mar 05, 2024, Paul Durrant wrote:
+> On 04/03/2024 23:44, Sean Christopherson wrote:
+> > On Tue, Feb 27, 2024, David Woodhouse wrote:
+> > 	/*
+> > 	 * Xen has a 'Linux workaround' in do_set_timer_op() which checks for
+> > 	 * negative absolute timeout values (caused by integer overflow), and
+> > 	 * for values about 13 days in the future (2^50ns) which would be
+> > 	 * caused by jiffies overflow. For those cases, Xen sets the timeout
+> > 	 * 100ms in the future (not *too* soon, since if a guest really did
+> > 	 * set a long timeout on purpose we don't want to keep churning CPU
+> > 	 * time by waking it up).  Emulate Xen's workaround when starting the
+> > 	 * timer in response to __HYPERVISOR_set_timer_op.
+> > 	 */
+> > 	if (linux_wa &&
+> > 	    unlikely((int64_t)guest_abs < 0 ||
+> > 		     (delta > 0 && (uint32_t) (delta >> 50) != 0))) {
+> 
+> Now that I look at it again, since the last test is simply a '!= 0', I don't
+> really see why the case is necessary. Perhaps lose that too. Otherwise LGTM.
 
-Hello!
+Hmm, I think I'll keep it as-is purely so that the diff shows that it's a just
+code movement.  There's already enough going on in in this patch, and practically
+speaking I doubt anything other than checkpatch will ever care about the "!= 0".
 
-This change looks good to me. Thanks!
--Rae
-
-Reviewed-by: Rae Moar <rmoar@google.com>
-
-
->
-> Cc: Brendan Higgins <brendanhiggins@google.com>
-> Cc: David Gow <davidgow@google.com>
-> Cc: Rae Moar <rmoar@google.com>
-> Cc: Shuah Khan <skhan@linuxfoundation.org>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@digikod.net>
-> Link: https://lore.kernel.org/r/20240301194037.532117-4-mic@digikod.net
-> ---
->
-> Changes since v1:
-> * Added Kees's Reviewed-by.
-> ---
->  lib/kunit/try-catch.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/lib/kunit/try-catch.c b/lib/kunit/try-catch.c
-> index 73f5007f20ea..cab8b24b5d5a 100644
-> --- a/lib/kunit/try-catch.c
-> +++ b/lib/kunit/try-catch.c
-> @@ -79,7 +79,6 @@ void kunit_try_catch_run(struct kunit_try_catch *try_ca=
-tch, void *context)
->         time_remaining =3D wait_for_completion_timeout(&try_completion,
->                                                      kunit_test_timeout()=
-);
->         if (time_remaining =3D=3D 0) {
-> -               kunit_err(test, "try timed out\n");
->                 try_catch->try_result =3D -ETIMEDOUT;
->                 kthread_stop(task_struct);
->         }
-> @@ -94,6 +93,8 @@ void kunit_try_catch_run(struct kunit_try_catch *try_ca=
-tch, void *context)
->                 try_catch->try_result =3D 0;
->         else if (exit_code =3D=3D -EINTR)
->                 kunit_err(test, "wake_up_process() was never called\n");
-> +       else if (exit_code =3D=3D -ETIMEDOUT)
-> +               kunit_err(test, "try timed out\n");
->         else if (exit_code)
->                 kunit_err(test, "Unknown error: %d\n", exit_code);
->
-> --
-> 2.44.0
->
+Thanks!
 
