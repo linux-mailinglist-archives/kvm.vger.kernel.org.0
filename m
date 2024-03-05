@@ -1,87 +1,94 @@
-Return-Path: <kvm+bounces-11080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11079-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B17C2872ADE
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 00:14:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C358D872ADD
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 00:14:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 285AF1F280F7
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 23:14:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 520B428B4FA
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 23:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E032512EBC5;
-	Tue,  5 Mar 2024 23:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF7012E1E0;
+	Tue,  5 Mar 2024 23:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StQUUKHZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IzNiGEzu"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D22512DDBE
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 23:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B31612D779
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 23:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709680407; cv=none; b=CG8mtTr7Z3+vpn1jSDASAIvMWyjjrjMKWAla3DAnRdXJutiIyUYFYvBF8iEQMZ1MxtVxFiKH3VDPNKlXwseHJcmycNw8tJ9mlLwqtKz+Obbf08bJqxU9GFX68Lkg7KGtefmqXQ1Z+dDlPQMGqqkoPNgkodQoqhsVG3bf8xqH4f8=
+	t=1709680405; cv=none; b=EJ6vU/f2Yk6hYg5/oV4ibdC3xoFFMfUswMMXByqQAEvaE0AqMdqJxHFjqafYF+RWuKqST0aOMa3TB3BoiXN/o5oOVor4T/YkG7zWGy7xIQfmnlG81lVh7lQ5Hwu8iRlwuDnd4uyV3QmOzxpVTAKv9KvXpICQ5wPlqa5rovlCB5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709680407; c=relaxed/simple;
-	bh=DBDrKUA81JtzmXSb4rA+240wDRyvevEIN1zSyRb208s=;
+	s=arc-20240116; t=1709680405; c=relaxed/simple;
+	bh=cLhW8+AnPXF+x0lQb/dnv/o/Sf8sk08keva7j4YfP4M=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m1nQCFN9hDlBciG7Pyx2OwmbvE3NO5gDNR9GZIwFOudZR4AWdO2Nuh3G2DooeWj6tQLmQnC0j0bIbsYOt5h5zr9Aj4lcKxQCy69dCgA1IeIa7MFyWZUla8B851XXD6vx59MOecdALxdKTrEBISJHB+O7XtBdTy4DjmlEg//VVwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=StQUUKHZ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=sBAkwvHl71nW8RNlBswWA9aJcUY/1hAaAjG5gneQbGQATTJr/nFWliRtGCX4kCEelYXW9IsZGD+D4iubUZnH4HT2BunumVAXDEg+ACAH51JuHtBvg89CLY7D0ngP5X0j4/cN1SpHe38hG+1YEer8SrFf46NEal8AV2cMltfshCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IzNiGEzu; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709680404;
+	s=mimecast20190719; t=1709680402;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=I7oX6TQq3gnlEQ/JHOQfAZW1rojI6AXt0k3riqS9WiU=;
-	b=StQUUKHZ8tS5PBhKrztfb7o2D9nF6UgcP4Zjj0oX7M5e23dxj9K/3eiqw78jZIobeQA9zN
-	Iwus1luXuAnU4Rat7ZmeWl0N9r1m/Is+nxARh587DgiCJIUHRqy5hD5gOUB2+sk/uJKlsm
-	9D0gFGrGeQt+bnZiRaweGGYyHYT4evM=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=A+hfIOAS3CirjTR2TDkQQzoNgn7WBbQgBJrbYh4eZAU=;
+	b=IzNiGEzuKmOopKbyTc143xoAaOL9oxCEQQeYzeGnDZFm1oSgO6pAqhTfGqQKFOTavjvi6N
+	4a9EoguIXR4bjJ2hlv3BmiFT/6BSOPqqyOtMMqSZkBHSGLC/Qn1ySoPyg10RLkyTsiWoZa
+	sWFiZKrVyKgW7wh1g3TPtDDiO/4ByEk=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-646-fl7VroiGO1yXbLeKRNCt1w-1; Tue, 05 Mar 2024 18:13:23 -0500
-X-MC-Unique: fl7VroiGO1yXbLeKRNCt1w-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-365761d483aso55648615ab.2
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 15:13:23 -0800 (PST)
+ us-mta-9-jSg-f-dhNkOi5jENeP8MGA-1; Tue, 05 Mar 2024 18:13:21 -0500
+X-MC-Unique: jSg-f-dhNkOi5jENeP8MGA-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3650bfcb2bfso2212655ab.1
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 15:13:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709680402; x=1710285202;
+        d=1e100.net; s=20230601; t=1709680400; x=1710285200;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I7oX6TQq3gnlEQ/JHOQfAZW1rojI6AXt0k3riqS9WiU=;
-        b=LO/IkO2mpRfOVKwMziIXzYVdHlC3x/BLIxcDWASs1sYHa2VnVEFuvUiYz7U6pzwCul
-         wuuATbYlU/bKxqO3cMpAH0LpgezPfdQc1CRgAVN0sUK1C1GTQjV+4tb3Bgg5g5oJfUBb
-         DE6xrRf3j6YJb9nr4fgTM600G4AQPwMy43Zo615buGR5goKmu5yF3FQLAtX9U3WYeE52
-         XdggTkCyfpsdOz4Hn6jSc796bx36ynI7c9ZDZIwUwx8jsqioSr0nRcgxjrqlKqQ0kvV8
-         KQKw9hvIcVYxl/Xekc1mQv20j1keqKsyaMWekbPMmM5sUl8Bud7pZfVoJ9+Erg+/IBI9
-         4Wbg==
-X-Gm-Message-State: AOJu0YxHIdGldq2pF0hG5m0mNrdViuFgTcfvtZJhCiaUpXbgx/BwyE1h
-	O8pM0RIPB5AHj9H0159ifsqUsDgjkLsPI2YtEbbEfDzZ9ZTK9KQgkT1QfHDymbl6zibaAAF7SMI
-	JMZ04YYQjaUaLSdHj1QA5h8W1+JGH8+5dgvKDqKrL2GEYtqSl8g==
-X-Received: by 2002:a05:6e02:1c82:b0:365:b614:5cb7 with SMTP id w2-20020a056e021c8200b00365b6145cb7mr18279908ill.16.1709680402352;
-        Tue, 05 Mar 2024 15:13:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGdxCJ+2chdn4hqWqktfybAk7qGIpBM504TRi8Aaeg6fwVD1R7bmqDmiL6y1KaueEWibZq5WA==
-X-Received: by 2002:a05:6e02:1c82:b0:365:b614:5cb7 with SMTP id w2-20020a056e021c8200b00365b6145cb7mr18279892ill.16.1709680402112;
-        Tue, 05 Mar 2024 15:13:22 -0800 (PST)
+        bh=A+hfIOAS3CirjTR2TDkQQzoNgn7WBbQgBJrbYh4eZAU=;
+        b=dno7ld/fVLNCbiLFi9s5iAjZTc9q+EnPDmmTU9YMvMkercsF7aetEmdQJK99CFSZrq
+         nsuznnERgoFskvpO7zRopqaP18Sl77P66rtGvUgx6mnZDtzHR0xvc0lHgLZH2WL1Mqj8
+         jcTAGxJQyeBWFBUs/OAQcko1gjkUVHsqBKbnUPyFQO9olUYfKMb6pC67ktUSHWckZxo9
+         pdRdT5GM0AlkiOUSr4tLIbW0qFfOWpxws4CgaC8t2xeUjhOPh/8UXadD+N3E/wMmMCF5
+         rhEJ4bs42M66lF3pi0QFXC508edfW/2m/Nww4Pik0iNJnb/Aaq8QL/m3wpYuSt02Nklx
+         LbuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5KoZ1bAmnFCzKwxXwt1U3sGc0EJATjfYuA+JAkkwipoBXtuJp58Nkpww4rDjfhMLxPMGEZMt+JZ3QBrmwCHk4mwur
+X-Gm-Message-State: AOJu0YzPHmFnRtwQa+0oafesnQlj4RGWHE0iZB/8QKmyTXC2OG63FVhV
+	rRlbyZYPz7VaxjhwaZt6ftDY13aL3vr+QsbLEi5VRg4p1f0tr8KmFkVIOezHz/sicmNQysuBm1S
+	s6CKxqR1d2IX449gC82e7jOSvYi+FwsYlDsyIbOQPCfrQgQ2drQ==
+X-Received: by 2002:a05:6e02:20ea:b0:361:933c:3b04 with SMTP id q10-20020a056e0220ea00b00361933c3b04mr3503351ilv.7.1709680400442;
+        Tue, 05 Mar 2024 15:13:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH2nNbJIhVFGias1huSm3/yhiAERbq5Ckc+7Kk03yYzrJLJ0gi6XO6zCth4naFRvHkOeLYHrw==
+X-Received: by 2002:a05:6e02:20ea:b0:361:933c:3b04 with SMTP id q10-20020a056e0220ea00b00361933c3b04mr3503335ilv.7.1709680400167;
+        Tue, 05 Mar 2024 15:13:20 -0800 (PST)
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id c26-20020a02c9da000000b00474b48a629csm3084467jap.46.2024.03.05.15.13.20
+        by smtp.gmail.com with ESMTPSA id c26-20020a02c9da000000b00474b48a629csm3084467jap.46.2024.03.05.15.13.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 15:13:21 -0800 (PST)
-Date: Tue, 5 Mar 2024 16:12:41 -0700
+        Tue, 05 Mar 2024 15:13:18 -0800 (PST)
+Date: Tue, 5 Mar 2024 16:12:56 -0700
 From: Alex Williamson <alex.williamson@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: <kvm@vger.kernel.org>, <jgg@ziepe.ca>, <yishaih@nvidia.com>,
- <kevin.tian@intel.com>, <linuxarm@huawei.com>, <liulongfang@huawei.com>,
- <bcreeley@amd.com>
-Subject: Re: [PATCH] hisi_acc_vfio_pci: Remove the deferred_reset logic
-Message-ID: <20240305161241.7eeda272.alex.williamson@redhat.com>
-In-Reply-To: <20240229091152.56664-1-shameerali.kolothum.thodi@huawei.com>
-References: <20240229091152.56664-1-shameerali.kolothum.thodi@huawei.com>
+To: <ankita@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>
+Cc: <jgg@nvidia.com>, <yishaih@nvidia.com>,
+ <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+ <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+ <targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
+ <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
+ <rrameshbabu@nvidia.com>, <zhiw@nvidia.com>, <anuaggarwal@nvidia.com>,
+ <mochs@nvidia.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 1/1] vfio/nvgrace-gpu: Convey kvm to map device
+ memory region as noncached
+Message-ID: <20240305161256.09bda6c4.alex.williamson@redhat.com>
+In-Reply-To: <20240229193934.2417-1-ankita@nvidia.com>
+References: <20240229193934.2417-1-ankita@nvidia.com>
 X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -92,142 +99,96 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 29 Feb 2024 09:11:52 +0000
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+On Thu, 29 Feb 2024 19:39:34 +0000
+<ankita@nvidia.com> wrote:
 
-> The deferred_reset logic was added to vfio migration drivers to prevent
-> a circular locking dependency with respect to mm_lock and state mutex.
-> This is mainly because of the copy_to/from_user() functions(which takes
-> mm_lock) invoked under state mutex. But for HiSilicon driver, the only
-> place where we now hold the state mutex for copy_to_user is during the
-> PRE_COPY IOCTL. So for pre_copy, release the lock as soon as we have
-> updated the data and perform copy_to_user without state mutex. By this,
-> we can get rid of the deferred_reset logic.
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> Link: https://lore.kernel.org/kvm/20240220132459.GM13330@nvidia.com/
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> The NVIDIA Grace Hopper GPUs have device memory that is supposed to be
+> used as a regular RAM. It is accessible through CPU-GPU chip-to-chip
+> cache coherent interconnect and is present in the system physical
+> address space. The device memory is split into two regions - termed
+> as usemem and resmem - in the system physical address space,
+> with each region mapped and exposed to the VM as a separate fake
+> device BAR [1].
+> 
+> Owing to a hardware defect for Multi-Instance GPU (MIG) feature [2],
+> there is a requirement - as a workaround - for the resmem BAR to
+> display uncached memory characteristics. Based on [3], on system with
+> FWB enabled such as Grace Hopper, the requisite properties
+> (uncached, unaligned access) can be achieved through a VM mapping (S1)
+> of NORMAL_NC and host mapping (S2) of MT_S2_FWB_NORMAL_NC.
+> 
+> KVM currently maps the MMIO region in S2 as MT_S2_FWB_DEVICE_nGnRE by
+> default. The fake device BARs thus displays DEVICE_nGnRE behavior in the
+> VM.
+> 
+> The following table summarizes the behavior for the various S1 and S2
+> mapping combinations for systems with FWB enabled [3].
+> S1           |  S2           | Result
+> NORMAL_NC    |  NORMAL_NC    | NORMAL_NC
+> NORMAL_NC    |  DEVICE_nGnRE | DEVICE_nGnRE
+> 
+> Recently a change was added that modifies this default behavior and
+> make KVM map MMIO as MT_S2_FWB_NORMAL_NC when a VMA flag
+> VM_ALLOW_ANY_UNCACHED is set [4]. Setting S2 as MT_S2_FWB_NORMAL_NC
+> provides the desired behavior (uncached, unaligned access) for resmem.
+> 
+> To use VM_ALLOW_ANY_UNCACHED flag, the platform must guarantee that
+> no action taken on the MMIO mapping can trigger an uncontained
+> failure. The Grace Hopper satisfies this requirement. So set
+> the VM_ALLOW_ANY_UNCACHED flag in the VMA.
+> 
+> Applied over next-20240227.
+> base-commit: 22ba90670a51
+> 
+> Link: https://lore.kernel.org/all/20240220115055.23546-4-ankita@nvidia.com/ [1]
+> Link: https://www.nvidia.com/en-in/technologies/multi-instance-gpu/ [2]
+> Link: https://developer.arm.com/documentation/ddi0487/latest/ section D8.5.5 [3]
+> Link: https://lore.kernel.org/all/20240224150546.368-1-ankita@nvidia.com/ [4]
+> 
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Vikram Sethi <vsethi@nvidia.com>
+> Cc: Zhi Wang <zhiw@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 48 +++++--------------
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  6 +--
->  2 files changed, 14 insertions(+), 40 deletions(-)
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 
-Applied to vfio next branch for v6.9.  Thanks,
+Applied to vfio next branch for v6.9.
+
+Oliver, FYI I did merge the branch you provided in [1] for this, thanks
+for the foresight in providing that.
 
 Alex
 
+[1]https://lore.kernel.org/all/170899100569.1405597.5047894183843333522.b4-ty@linux.dev/
+
 > 
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 4d27465c8f1a..9a3e97108ace 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -630,25 +630,11 @@ static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vde
->  	}
->  }
->  
-> -/*
-> - * This function is called in all state_mutex unlock cases to
-> - * handle a 'deferred_reset' if exists.
-> - */
-> -static void
-> -hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-> +static void hisi_acc_vf_reset(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->  {
-> -again:
-> -	spin_lock(&hisi_acc_vdev->reset_lock);
-> -	if (hisi_acc_vdev->deferred_reset) {
-> -		hisi_acc_vdev->deferred_reset = false;
-> -		spin_unlock(&hisi_acc_vdev->reset_lock);
-> -		hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
-> -		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-> -		hisi_acc_vf_disable_fds(hisi_acc_vdev);
-> -		goto again;
-> -	}
-> -	mutex_unlock(&hisi_acc_vdev->state_mutex);
-> -	spin_unlock(&hisi_acc_vdev->reset_lock);
-> +	hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
-> +	hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-> +	hisi_acc_vf_disable_fds(hisi_acc_vdev);
->  }
->  
->  static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-> @@ -804,8 +790,10 @@ static long hisi_acc_vf_precopy_ioctl(struct file *filp,
->  
->  	info.dirty_bytes = 0;
->  	info.initial_bytes = migf->total_length - *pos;
-> +	mutex_unlock(&migf->lock);
-> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
->  
-> -	ret = copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
-> +	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
->  out:
->  	mutex_unlock(&migf->lock);
->  	mutex_unlock(&hisi_acc_vdev->state_mutex);
-> @@ -1071,7 +1059,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
->  			break;
->  		}
->  	}
-> -	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
->  	return res;
->  }
->  
-> @@ -1092,7 +1080,7 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
->  
->  	mutex_lock(&hisi_acc_vdev->state_mutex);
->  	*curr_state = hisi_acc_vdev->mig_state;
-> -	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
->  	return 0;
->  }
->  
-> @@ -1104,21 +1092,9 @@ static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
->  				VFIO_MIGRATION_STOP_COPY)
->  		return;
->  
-> -	/*
-> -	 * As the higher VFIO layers are holding locks across reset and using
-> -	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-> -	 * with the state_mutex and mm_lock.
-> -	 * In case the state_mutex was taken already we defer the cleanup work
-> -	 * to the unlock flow of the other running context.
-> -	 */
-> -	spin_lock(&hisi_acc_vdev->reset_lock);
-> -	hisi_acc_vdev->deferred_reset = true;
-> -	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
-> -		spin_unlock(&hisi_acc_vdev->reset_lock);
-> -		return;
-> -	}
-> -	spin_unlock(&hisi_acc_vdev->reset_lock);
-> -	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-> +	mutex_lock(&hisi_acc_vdev->state_mutex);
-> +	hisi_acc_vf_reset(hisi_acc_vdev);
-> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
->  }
->  
->  static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> index dcabfeec6ca1..5bab46602fad 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> @@ -98,8 +98,8 @@ struct hisi_acc_vf_migration_file {
->  
->  struct hisi_acc_vf_core_device {
->  	struct vfio_pci_core_device core_device;
-> -	u8 match_done:1;
-> -	u8 deferred_reset:1;
-> +	u8 match_done;
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+> index 25814006352d..a7fd018aa548 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -160,8 +160,17 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  	 * The carved out region of the device memory needs the NORMAL_NC
+>  	 * property. Communicate as such to the hypervisor.
+>  	 */
+> -	if (index == RESMEM_REGION_INDEX)
+> +	if (index == RESMEM_REGION_INDEX) {
+> +		/*
+> +		 * The nvgrace-gpu module has no issues with uncontained
+> +		 * failures on NORMAL_NC accesses. VM_ALLOW_ANY_UNCACHED is
+> +		 * set to communicate to the KVM to S2 map as NORMAL_NC.
+> +		 * This opens up guest usage of NORMAL_NC for this mapping.
+> +		 */
+> +		vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED);
 > +
->  	/* For migration state */
->  	struct mutex state_mutex;
->  	enum vfio_device_mig_state mig_state;
-> @@ -109,8 +109,6 @@ struct hisi_acc_vf_core_device {
->  	struct hisi_qm vf_qm;
->  	u32 vf_qm_state;
->  	int vf_id;
-> -	/* For reset handler */
-> -	spinlock_t reset_lock;
->  	struct hisi_acc_vf_migration_file *resuming_migf;
->  	struct hisi_acc_vf_migration_file *saving_migf;
->  };
+>  		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+> +	}
+>  
+>  	/*
+>  	 * Perform a PFN map to the memory and back the device BAR by the
 
 
