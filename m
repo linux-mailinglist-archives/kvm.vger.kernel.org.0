@@ -1,316 +1,191 @@
-Return-Path: <kvm+bounces-11018-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11019-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D18872469
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 17:35:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47BA0872482
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 17:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D66D285BA3
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 16:35:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AFAA1C25017
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 16:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6E9BA41;
-	Tue,  5 Mar 2024 16:35:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8EE14F62;
+	Tue,  5 Mar 2024 16:39:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ydu1fkxV"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HCuBm8tM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3134D8BF7
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 16:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709656537; cv=none; b=j4A01Jyt+Osd0AYH08tdc3o58yFyn3DPy8hOW6H7uX3khEJb90h6Fj6t6bcr4k05N3d7tSYv7ASBq/HBvvvGgZjxUdT1WwVf2GqF+iCZO0Pk0mgDxGSniwoVRN1uq7/sfBXsfBxEfwPVV2D/WDUiksmtM5yi5wKos1X5eQyNEbg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709656537; c=relaxed/simple;
-	bh=8fCD3mFM356hHR4y4xRDKU/RTQ6W8aBHd+DS5kjFZ8Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AS1Wm/PpSsJAxIhoPtT0W/PmnNt7nQa+48YLFvqKl0rbVK576P8UEtI0xUp32SOG1sxFb7z+7doCBHScNVLGGc5Tvct7LJJvtNTQ2skS0Kt+cP/hPP88vVfWeIXWG8cYivbO24oLNj+sFj8YJfAg4zcgJCs4oXC8D8mUQ4dkWg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ydu1fkxV; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf618042daso8888050276.0
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 08:35:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709656535; x=1710261335; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QQmbrJT9dwObj4pbI1GLJWzAoRH+/arY+5jTHTxjCY8=;
-        b=ydu1fkxVFAc7z3RGL+4WyzY3aZDazHKwq4MeQAAQ2YnikxvC8koqWGnLclG81OJlWg
-         Sdx8MdmXo5N/Gq5VVRO8nyYBPgkcebJjkzLfiShMwN7hCys2iculWZfw642SXjire4rg
-         LztuBO7qRDCyncghmqghUWZ6CLQ8J8DoZ1qPQWIYA8PuoY+v1IOA0Y4P1ofvMMSCKB9Y
-         Za821EJ1WvzYydGdynnxCkk9u3YuIbH7nBXG8w9EeFKo1hmmgTcU3eFm1VAxRDWnBJe0
-         A1uRrTlXJvSRHAU+i5L0Up4Q4CF3WGZnO7uJ4WYyg6yr+3OVeMUrwCUvZHoziSjW22gu
-         0pIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709656535; x=1710261335;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QQmbrJT9dwObj4pbI1GLJWzAoRH+/arY+5jTHTxjCY8=;
-        b=PE11bjVox6BnPIJeNtfTRkfdcIkJzMuB2cMsMpSOqpVozxZEiGvmyZSy06MnIXpLZP
-         owI+kMY/k/veMSL537pLtBQfrVW0kSr2HUTsDddnppvTnc/Ek8ESh+Es5wQ/pRBMjiFJ
-         /BY4RTMwgGUsrtDalyxx1U8FiO3bPEKWULnpTu9mYDSgPuLunaXQFGUNbgFls4OeT653
-         I6aoWV5iQ+qnA17lOT8c/zlAeOWz2nNhMVwmbikQcgy5cu3V+x6fESGrzdg7689b+ZsB
-         s2MoWSlsln4NuAG5Bm66C7NPJt33P4ZNTFbwofVg74n8QI9HmgFExcHRNvg926SF+QDR
-         BYDg==
-X-Gm-Message-State: AOJu0YyMhv1Pd+XWFu0yr5XPpiYx8HCRQ7ICsG+JwqS3FBXpNaV7oAy/
-	0kvxUMBTKVx/b80vqsdpySKONIQN4vm/hrjX952lowiYTHGZRXgd8RFpfu5fAOMVE7LP/JwIWmm
-	OHA==
-X-Google-Smtp-Source: AGHT+IHruno/sPushTJHAVm2hrfJdFuFu3KW+MjOH2NiCDASBhOf9P5HCA7/lTJp7lXCzbWJ7NzURiaR8kQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:18d3:b0:dc7:865b:22c6 with SMTP id
- ck19-20020a05690218d300b00dc7865b22c6mr485363ybb.8.1709656535232; Tue, 05 Mar
- 2024 08:35:35 -0800 (PST)
-Date: Tue, 5 Mar 2024 08:35:33 -0800
-In-Reply-To: <20240305103506.613950-1-kraxel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82E7D520;
+	Tue,  5 Mar 2024 16:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709656786; cv=fail; b=WvuzZkDe/cf0S8JDbzfK+I3QIyRvHCM6OWh2FCwemPjNF9Bo6XY7/3Pm74UfPqTlkQr8nl3XHT4x7tilEsbO09iqfRFHEsBO+MxBINfjT2M4MF0b+NHVl86F46khQfrrqGCVViUdHnMAdXXNlQlFuduLjAmbfXKQ7varyiZfEgs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709656786; c=relaxed/simple;
+	bh=33A9ph0keNb+crMqKhKEr/ADHhGsYBkTLtDdDaGdrKI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=TCfx7BXmF7tTVVtDmvBGVGFhJ+7J4u1/dlF9P5n0fUONsDIM4YCHSqJwD3S0SqBpskcudBnez3VNHhnd8GbM4iplzpdugmZ7P0hjpuWoFmhMXWwPZT3gVSCgFtcubzF08tE80lABlgxLHbphOQzt61tphtwu3GYGj0xFC6r0S6E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HCuBm8tM; arc=fail smtp.client-ip=40.107.236.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PqvfpAvSHT2jlnKu11mm5FHsJ8rLUMXbKlZ41sv/qiXiBKzmRIPzGNmZJh6Se14XIXroZfDHINQ2pUFipsBYiLCQvlG6jJzaQX58IKgL8kewuaQRKnvYUQFWc+yw0AMBA5xvMHdX68JIG6Gj3QT5/Wi8g8lokput1zBs8ueOdm7kBBBICg7BYyv3tXUCPvHkGQ091cwkpDokyltD3lDSIKDig4WpKZf2lpdTnPIE/47O3rUMw4E3ePlLbnhS9jSGjk9SSFqZitjmjaBpVuCdxbcyzU+XGD4VXvutOroLT2weG4oZAt7D8CW/pRD/KFcMfX2iWZZ7eqaLtDkY3wm/wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=33A9ph0keNb+crMqKhKEr/ADHhGsYBkTLtDdDaGdrKI=;
+ b=iyXFt9D9+xN9y9croJ90QWxd8GpF7ChoO0+E9hb8XGsGhyZHkw7Y0O1wW0pQE00pcex2CboXwqlRLExsdII9IkxpXZM1fyaIQsuYlpaOvahTBsIbnAr3gf0Ab98admCMk3G/bzgwM96+uwwA/WOqdfbI5qytpk+fiqiFJHljqUT3t4XzhXE0bZpznUbVWi0wt3wURcnX1WtA1tTSlwvs+G55Fuzw4S4ZxgEIEa/vpRWuP1LJkKu6oaOIgjUgByJGYJIcKwKiIi7a1NdLpoCdgYXjnuD9g0b5OocdUN8G4CsBmeH5fAworw6Y43M6dH+0D+Nt9D66li09a4gnyywuHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=33A9ph0keNb+crMqKhKEr/ADHhGsYBkTLtDdDaGdrKI=;
+ b=HCuBm8tMTjF6MuVb52pGcFFG7M3G7L82ZZxlXCWiJUN7cjKRrY9s5vUC2amQFydWUuSXcGCa1pt7DuKvkxPyl7OjiDOHO9bQabUdvbhnRH9PV2L4fUVG4oaLvpo4soqNAeOaYM5KZwiFzPDxFgSxm2GGVkRn2kMk1wHlYleJ9Wm/UEbR251wCneSvIQ4/LkYjiWZSOmo8fT0so6TgWjXzlsteUKyqUWs548GXIO/rgDeoNlOqz9fOzC+FwqBiZItulCMP5T8l2G04b7xNJqKQAeBtmxikzkWVYFg5NkOpqUD1sRJXcCWPgddbjfTrRcVME76f5f4h1ln3UrdvddqGw==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by SA3PR12MB9132.namprd12.prod.outlook.com (2603:10b6:806:394::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39; Tue, 5 Mar
+ 2024 16:39:40 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::a1:5ecd:3681:16f2]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::a1:5ecd:3681:16f2%7]) with mapi id 15.20.7339.035; Tue, 5 Mar 2024
+ 16:39:40 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Leon
+ Romanovsky <leon@kernel.org>
+CC: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>, Marek
+ Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>, Will
+ Deacon <will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Chaitanya Kulkarni
+	<chaitanyak@nvidia.com>, Jonathan Corbet <corbet@lwn.net>, Sagi Grimberg
+	<sagi@grimberg.me>, Yishai Hadas <yishaih@nvidia.com>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Bart Van
+ Assche <bvanassche@acm.org>, Damien Le Moal
+	<damien.lemoal@opensource.wdc.com>, Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>, "jack@suse.com" <jack@suse.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
+Thread-Topic: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
+Thread-Index: AQHabu8RTS4WklM5BkqSvNX/cXqR77EpTDsAgAAEsICAAAikAA==
+Date: Tue, 5 Mar 2024 16:39:39 +0000
+Message-ID: <22a03aa8-f121-486e-8471-ceecbe452b35@nvidia.com>
+References: <cover.1709635535.git.leon@kernel.org>
+ <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org>
+ <Zec_nAQn1Ft_ZTHH@kbusch-mbp.dhcp.thefacebook.com>
+ <06787e6a-4e78-4524-960d-ec24b9f38191@kernel.dk>
+In-Reply-To: <06787e6a-4e78-4524-960d-ec24b9f38191@kernel.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|SA3PR12MB9132:EE_
+x-ms-office365-filtering-correlation-id: d0defe28-6bf2-41a5-1d44-08dc3d32da51
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ o2kStEWeSO8Fi3HxmCOBEOlaQ+0hBXXNpZJRduSFmPdKrtTJsqqQQwhlp9TBr3BoEMCCMPsYOvIv/yBvFMRbL6OEjCCEeoVuMJuMGtFToiBiXKboomMaeL8i4kvbcHdw8t2NXZL9HFndkSE7bSK/N8gUJfEVVHe7YXvg8rFvMiqpsW0pLaPjXqSUVX3zPH6GxRGs0/ki0ToiH2/q08dZC9IydNwcH9zDo9nn6rf3MnKoJI/qSHvOcV5L65cT/DxL/aLYfkVZ5ZXkeRRE6+iUQ8xq9pZ8YiV5MOOilKnulYw27FFUMesiTdhkV93H93bkgs42CnM+mX0BtWaXcJnBhlfbg/lh/DhIKa6m2imE7U3cNOodzrezjy8XUNdDh35/qJOzCUXP5PmNhmwuv3oH3l38xy7YwQLCfdzxSoBzT8g/xyeusVoyF1iU/1R/PG5GkzK60QZ0t/CvvDMfpzk2tPfZGgkDQu8xdCWPoxpUYmI8pj7xAA8ilI6SYZztszBKxCKyAc7557SfDMUWs1b6FL6TPDS96m1Z0JXWsvJ9Vmf8EjKviZ1/oyovP5bBcvblukMIJF0kyjPf97lJg5Emp0DLBSqqzpvdYp0uXhUbUvao761T8i4ecaoSz40TRsYno48MEAGCmBtzbwL2gd+6xJu4xbcQrcFiek+IT190F6e6wuoIyIJE3Y+pJwXcZJQfENY0Fvmg4h+yiOepxx9yYm83Acnn1TPfxzG6qFR20q8=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WWhUemwvMFBTRFhPbU1LRXBoaEhvZmFEMTFFWlNQU1I0cXBlWjVRbSt2bTZU?=
+ =?utf-8?B?S2x4UU1lQnFSRTRLdmlWcWliYm01MzJCRkkvRGgydlBMcWQyRDNlSGduUGpS?=
+ =?utf-8?B?cEZhcjB1clZIMXUzU0dvZUV1OEYzMVQzYThUdWw5Zkc0Nmx1eUZMTStNOGpB?=
+ =?utf-8?B?RFdOM2lFZjFhNDVDRVhhSlFucmFVUnF5QTN1V1lEeEJpaE1aR2pmeFFsOU1r?=
+ =?utf-8?B?TzRGN0c5WU1Idmw1OGh3SWRDWGJTVDJMN25ta3FMVjdkQzVjUnpQeUN2emdY?=
+ =?utf-8?B?eFdHNVVobTY5cm13MmFIRDNuYnZKdGp0VENobVkvQUxLY1lzWVJ1ekE1aVpv?=
+ =?utf-8?B?SU5Bd3BpSENNVUQxK2RYKzFGM3J3V2lYclJTeEdkTHBrdHM2REFYcWJDL0tJ?=
+ =?utf-8?B?ZXdYZnJicnpJRTgzNEw1WFFMWEFUQ3ZYaW90U2JwQ0EvQ3NZS09hc1JxVXNW?=
+ =?utf-8?B?Tm0vS21rVW1HSHVrb1A3ckdFTlljTnlYYUpRRUxkSWNybVkyK0svbnVoVGwv?=
+ =?utf-8?B?dzd6SnMxUFJlZjM2WEJCaG1YdzEyaDNIeXJTNngyQ1BzMVNDeVRWKytibkJa?=
+ =?utf-8?B?VjZKVDVZY2VTOVlQb2ZVT1JJcUxuTW1oeE5oRVFYNGozaGlMVENCNjhiUGxB?=
+ =?utf-8?B?VXlzK2R4Z1VwTGw4Q3BiY0JlcUJUMVkwMlBpN1BqMGQ0N0p1T2ZaVW9DNjhr?=
+ =?utf-8?B?cFVtNEE5UXVZMENVWWFGaW8xeC9udzJqdU95Y2Zuayt6bVJsWmZmU3NpTW9t?=
+ =?utf-8?B?bmJEb0c2QnFIcExTbzVYSU9xdFdyeUhhWGRSMHZQM28rZzF1R1NEaVdJOGxp?=
+ =?utf-8?B?KytqeEFuZ21qYVkrTDluOVZmaUVvRnZJblBsRWdtMkhQUnJYeDU2YnZpYkVq?=
+ =?utf-8?B?elVRSS9GN0RNZlNkWXQ5dXZYVlhCK1oveUxWaWNNRGlSVXdIc0NHZ3JyMm1H?=
+ =?utf-8?B?MDNkaUUxc0JmN1pzUVo0RkEzbXBNVjcyTVFseVVPWWZOUW50MTUwYmhtYURO?=
+ =?utf-8?B?bG5FYUEvRlRVMUpxR2JDVEZlVjRmOTFnT3J0Ykh6U1dkVnlaR2NwSHpFUUhT?=
+ =?utf-8?B?azg0WjN4dDRNVUt3Zms5eXNDVjBMK0FXckFGOU02REljbEVmd2t2ZlFnL3ov?=
+ =?utf-8?B?RTNOekpzUHUydFdleHZiUk55UG82eW42c2RZeWNiU3JBOWxtTXMxcUdwb21I?=
+ =?utf-8?B?M0dmaVE0NTJSYW9RLzlhelRQcEFNY3pMSWNRanZHcTg4VzA4L3dOWmhRdy80?=
+ =?utf-8?B?MWRBR2JWL1pyS2hZYzRzSkRQK3RDSjByV1J0NjUzdmIweGFINEszdjZmT3hO?=
+ =?utf-8?B?RmFNemNTTUFZSWd4VEdDVS9WOEQ4U0w3amplZ3V6UHAyZ0MyTHJIN2ordm5r?=
+ =?utf-8?B?Z2pseTdEbXRYTnZRa1AvTmRCcG1HQ0xhRkpWNllOU0VMMG1QRktlc1J3QVF6?=
+ =?utf-8?B?Q055ZWVWMUZ6dHFibWpjNGI0dllBUUVjR3pTQmlXd0RqalN1Wk1kTFJtdjBq?=
+ =?utf-8?B?bFN0UXM5MXErZUp2ZUV6YXBJc2QyOUJYdVVaZ3hSYXJpc2xUamlzcWxVWXhj?=
+ =?utf-8?B?VXI5RjJrdm5GY0hQV0d2TlB2UkRXYUlrd1JMa0U3OWNOMUQvakxxZExPQnor?=
+ =?utf-8?B?TFg4ZXlxRk9ZbWlaY2JraWpvazlGRG1aTzlXcklVeThFbVpyZU5MSUNaVzJE?=
+ =?utf-8?B?VStNSnZGK1l4WW91Z1gxaEZRd0J1dnVNUTVGMGcrM0xwYWdjTmtCbmcxaEhN?=
+ =?utf-8?B?NHBBTUtkbUtFN3paNDQzV1JjM2pYQVltSkxxa1VqRW5lR0I4T2Y2aWx0Vmpt?=
+ =?utf-8?B?SUJSUXJkZVlLSmt2czZFRVc3Q0ErL1dtSCt6SS8rMWdPT2tFTjVpeElJbElZ?=
+ =?utf-8?B?MHlaUnVhMmFVc25jNzRjSVkrTjBPV3RueFZOSE82N3dVakZOY3dOazF4TGN6?=
+ =?utf-8?B?dzZJdGxiRG1ndkp4WWtmSGtBMUhSSCtrY29OTUt4eHBXVkwya1dud2xsVlhs?=
+ =?utf-8?B?Mis5OEVWQUQvZjZNNGo5MUtpeHFEWmZDUWVOeWJwdWNTZFZrSGtML3hJNzRp?=
+ =?utf-8?B?ZFNndGN5RldDVlJIUzRqdTBsbEJneDI0NWNianliUkFGMU8ySjFsSkhIcjgr?=
+ =?utf-8?B?RXk1c2tGY2x6Mkd0cENZYitTcjB2ZXRjZTBna3I3VHdnTGRoR1I5UzdleFA5?=
+ =?utf-8?Q?vBv39wdpX/svdonKSdgcP9U2MUpc4ThFTzGOdr4PxTtl?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3779E6529C7642428E2D5370CDF4AD37@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240305103506.613950-1-kraxel@redhat.com>
-Message-ID: <ZedJ1UmvaYZ4PWp6@google.com>
-Subject: Re: [PATCH v2] kvm: set guest physical bits in CPUID.0x80000008
-From: Sean Christopherson <seanjc@google.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, 
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0defe28-6bf2-41a5-1d44-08dc3d32da51
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Mar 2024 16:39:39.9567
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nFhdzo/3LqUTC26UCfjY9R7EzDPR2qXiK9YAXZXdBAkB+9YHKVMIsqzvGRRoAXDWlVZIbAGeW9voX6ruYtG1vA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9132
 
-KVM: x86:
-
-On Tue, Mar 05, 2024, Gerd Hoffmann wrote:
-> Set CPUID.0x80000008:EAX[23:16] to guest phys bits, i.e. the bits which
-> are actually addressable.  In most cases this is identical to the host
-> phys bits, but tdp restrictions (no 5-level paging) can limit this to
-> 48.
->=20
-> Quoting AMD APM (revision 3.35):
->=20
->   23:16 GuestPhysAddrSize Maximum guest physical address size in bits.
->                           This number applies only to guests using nested
->                           paging. When this field is zero, refer to the
->                           PhysAddrSize field for the maximum guest
->                           physical address size. See =E2=80=9CSecure Virt=
-ual
->                           Machine=E2=80=9D in APM Volume 2.
->=20
-> Tom Lendacky confirmed the purpose of this field is software use,
-> hardware always returns zero here.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  arch/x86/kvm/mmu.h     |  2 ++
->  arch/x86/kvm/cpuid.c   |  3 ++-
->  arch/x86/kvm/mmu/mmu.c | 15 +++++++++++++++
->  3 files changed, 19 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 60f21bb4c27b..42b5212561c8 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -100,6 +100,8 @@ static inline u8 kvm_get_shadow_phys_bits(void)
->  	return boot_cpu_data.x86_phys_bits;
->  }
-> =20
-> +int kvm_mmu_get_guest_phys_bits(void);
-> +
->  void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 acces=
-s_mask);
->  void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
->  void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index adba49afb5fe..12037f1b017e 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1240,7 +1240,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_=
-array *array, u32 function)
->  		else if (!g_phys_as)
-
-Based on the new information that GuestPhysAddrSize is software-defined, an=
-d the
-fact that KVM and QEMU are planning on using GuestPhysAddrSize to communica=
-te
-the maximum *addressable* GPA, deriving PhysAddrSize from GuestPhysAddrSize=
- is
-wrong.
-
-E.g. if KVM is running as L1 on top of a new KVM, on a CPU with MAXPHYADDR=
-=3D52,
-and on a CPU without 5-level TDP, then KVM (as L1) will see:
-
-  PhysAddrSize      =3D 52
-  GuestPhysAddrSize =3D 48
-
-Propagating GuestPhysAddrSize to PhysAddrSize (which is confusingly g_phys_=
-as)
-will yield an L2 with
-
-  PhysAddrSize      =3D 48=20
-  GuestPhysAddrSize =3D 48
-
-which is broken, because GPAs with bits 51:48!=3D0 are *legal*, but not add=
-ressable.
-
->  			g_phys_as =3D phys_as;
-> =20
-> -		entry->eax =3D g_phys_as | (virt_as << 8);
-> +		entry->eax =3D g_phys_as | (virt_as << 8)
-> +			| kvm_mmu_get_guest_phys_bits() << 16;
-
-The APM explicitly states that GuestPhysAddrSize only applies to NPT.  KVM =
-should
-follow suit to avoid creating unnecessary ABI, and because KVM can address =
-any
-legal GPA when using shadow paging.
-
->  		entry->ecx &=3D ~(GENMASK(31, 16) | GENMASK(11, 8));
->  		entry->edx =3D 0;
->  		cpuid_entry_override(entry, CPUID_8000_0008_EBX);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 2d6cdeab1f8a..8bebb3e96c8a 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5267,6 +5267,21 @@ static inline int kvm_mmu_get_tdp_level(struct kvm=
-_vcpu *vcpu)
->  	return max_tdp_level;
->  }
-> =20
-> +/*
-> + * return the actually addressable guest phys bits, which might be
-> + * less than host phys bits due to tdp restrictions.
-> + */
-> +int kvm_mmu_get_guest_phys_bits(void)
-> +{
-> +	if (tdp_enabled && shadow_phys_bits > 48) {
-> +		if (tdp_root_level && tdp_root_level !=3D PT64_ROOT_5LEVEL)
-> +			return 48;
-> +		if (max_tdp_level !=3D PT64_ROOT_5LEVEL)
-> +			return 48;
-
-I would prefer to not use shadow_phys_bits to cap the reported CPUID.0x8000=
-_0008,
-so that the logic isn't spread across the CPUID code and the MMU.  I don't =
-love
-that the two have duplicate logic, but there's no great way to handle that =
-since
-the MMU needs to be able to determine the effective host MAXPHYADDR even if
-CPUID.0x8000_0008 is unsupported.
-
-I'm thinking this, maybe spread across two patches: one to undo KVM's usage=
- of
-GuestPhysAddrSize, and a second to then set GuestPhysAddrSize for userspace=
-?
-
----
- arch/x86/kvm/cpuid.c   | 38 ++++++++++++++++++++++++++++----------
- arch/x86/kvm/mmu.h     |  2 ++
- arch/x86/kvm/mmu/mmu.c |  5 +++++
- 3 files changed, 35 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index adba49afb5fe..ae03e69d7fb9 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -1221,9 +1221,18 @@ static inline int __do_cpuid_func(struct kvm_cpuid_a=
-rray *array, u32 function)
- 		entry->eax =3D entry->ebx =3D entry->ecx =3D 0;
- 		break;
- 	case 0x80000008: {
--		unsigned g_phys_as =3D (entry->eax >> 16) & 0xff;
--		unsigned virt_as =3D max((entry->eax >> 8) & 0xff, 48U);
--		unsigned phys_as =3D entry->eax & 0xff;
-+		unsigned int virt_as =3D max((entry->eax >> 8) & 0xff, 48U);
-+
-+		/*
-+		 * KVM's ABI is to report the effective MAXPHYADDR for the guest
-+		 * in PhysAddrSize (phys_as), and the maximum *addressable* GPA
-+		 * in GuestPhysAddrSize (g_phys_as).  GuestPhysAddrSize is valid
-+		 * if and only if TDP is enabled, in which case the max GPA that
-+		 * can be addressed by KVM may be less than the max GPA that can
-+		 * be legally generated by the guest, e.g. if MAXPHYADDR>48 but
-+		 * the CPU doesn't support 5-level TDP.
-+		 */
-+		unsigned int phys_as, g_phys_as;
-=20
- 		/*
- 		 * If TDP (NPT) is disabled use the adjusted host MAXPHYADDR as
-@@ -1231,16 +1240,25 @@ static inline int __do_cpuid_func(struct kvm_cpuid_=
-array *array, u32 function)
- 		 * reductions in MAXPHYADDR for memory encryption affect shadow
- 		 * paging, too.
- 		 *
--		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
--		 * provided, use the raw bare metal MAXPHYADDR as reductions to
--		 * the HPAs do not affect GPAs.
-+		 * If TDP is enabled, the effective guest MAXPHYADDR is the same
-+		 * as the raw bare metal MAXPHYADDR, as reductions to HPAs don't
-+		 * affect GPAs.  The max addressable GPA is the same as the max
-+		 * effective GPA, except that it's capped at 48 bits if 5-level
-+		 * TDP isn't supported (hardware processes bits 51:48 only when
-+		 * walking the fifth level page table).
- 		 */
--		if (!tdp_enabled)
--			g_phys_as =3D boot_cpu_data.x86_phys_bits;
--		else if (!g_phys_as)
-+		if (!tdp_enabled) {
-+			phys_as =3D boot_cpu_data.x86_phys_bits;
-+			g_phys_as =3D 0;
-+		} else {
-+			phys_as =3D entry->eax & 0xff;
- 			g_phys_as =3D phys_as;
-=20
--		entry->eax =3D g_phys_as | (virt_as << 8);
-+			if (kvm_mmu_get_max_tdp_level() < 5)
-+				g_phys_as =3D min(g_phys_as, 48);
-+		}
-+
-+		entry->eax =3D phys_as | (virt_as << 8) | (g_phys_as << 16);
- 		entry->ecx &=3D ~(GENMASK(31, 16) | GENMASK(11, 8));
- 		entry->edx =3D 0;
- 		cpuid_entry_override(entry, CPUID_8000_0008_EBX);
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 60f21bb4c27b..b410a227c601 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -100,6 +100,8 @@ static inline u8 kvm_get_shadow_phys_bits(void)
- 	return boot_cpu_data.x86_phys_bits;
- }
-=20
-+u8 kvm_mmu_get_max_tdp_level(void);
-+
- void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_=
-mask);
- void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
- void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2d6cdeab1f8a..ffd32400fd8c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5267,6 +5267,11 @@ static inline int kvm_mmu_get_tdp_level(struct kvm_v=
-cpu *vcpu)
- 	return max_tdp_level;
- }
-=20
-+u8 kvm_mmu_get_max_tdp_level(void)
-+{
-+	return tdp_root_level ? tdp_root_level : max_tdp_level;
-+}
-+
- static union kvm_mmu_page_role
- kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
- 				union kvm_cpu_role cpu_role)
-
-base-commit: c0372e747726ce18a5fba8cdc71891bd795148f6
---=20
-
+T24gMy81LzI0IDA4OjA4LCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBPbiAzLzUvMjQgODo1MSBBTSwg
+S2VpdGggQnVzY2ggd3JvdGU6DQo+PiBPbiBUdWUsIE1hciAwNSwgMjAyNCBhdCAwMToxODo0N1BN
+ICswMjAwLCBMZW9uIFJvbWFub3Zza3kgd3JvdGU6DQo+Pj4gQEAgLTIzNiw3ICsyMzYsOSBAQCBz
+dHJ1Y3QgbnZtZV9pb2Qgew0KPj4+ICAgCXVuc2lnbmVkIGludCBkbWFfbGVuOwkvKiBsZW5ndGgg
+b2Ygc2luZ2xlIERNQSBzZWdtZW50IG1hcHBpbmcgKi8NCj4+PiAgIAlkbWFfYWRkcl90IGZpcnN0
+X2RtYTsNCj4+PiAgIAlkbWFfYWRkcl90IG1ldGFfZG1hOw0KPj4+IC0Jc3RydWN0IHNnX3RhYmxl
+IHNndDsNCj4+PiArCXN0cnVjdCBkbWFfaW92YV9hdHRycyBpb3ZhOw0KPj4+ICsJZG1hX2FkZHJf
+dCBkbWFfbGlua19hZGRyZXNzWzEyOF07DQo+Pj4gKwl1MTYgbnJfZG1hX2xpbmtfYWRkcmVzczsN
+Cj4+PiAgIAl1bmlvbiBudm1lX2Rlc2NyaXB0b3IgbGlzdFtOVk1FX01BWF9OUl9BTExPQ0FUSU9O
+U107DQo+Pj4gICB9Ow0KPj4gVGhhdCdzIHF1aXRlIGEgbG90IG9mIHNwYWNlIHRvIGFkZCB0byB0
+aGUgaW9kLiBXZSBwcmVhbGxvY2F0ZSBvbmUgZm9yDQo+PiBldmVyeSByZXF1ZXN0LCBhbmQgdGhl
+cmUgY291bGQgYmUgbWlsbGlvbnMgb2YgdGhlbS4NCj4gWWVhaCwgdGhhdCdzIGp1c3QgYSBjb21w
+bGV0ZSBub24tc3RhcnRlci4gQXMgZmFyIGFzIEkgY2FuIHRlbGwsIHRoaXMNCj4gZW5kcyB1cCBh
+ZGRpbmcgMTA1MiBieXRlcyBwZXIgcmVxdWVzdC4gRG9pbmcgdGhlIHF1aWNrIG1hdGggb24gbXkg
+dGVzdA0KPiBib3ggKDI0IGRyaXZlcyksIHRoYXQncyBqdXN0IGEgc21pZGdlIG92ZXIgM0dCIG9m
+IGV4dHJhIG1lbW9yeS4gVGhhdCdzDQo+IG5vdCBnb2luZyB0byB3b3JrLCBub3QgZXZlbiBjbG9z
+ZS4NCj4NCg0KSSBkb24ndCBoYXZlIGFueSBpbnRlbnQgdG8gdXNlIG1vcmUgc3BhY2UgZm9yIHRo
+ZSBudm1lX2lvZCB0aGFuIHdoYXQNCml0IGlzIG5vdy4gSSdsbCB0cmltIGRvd24gdGhlIGlvZCBz
+dHJ1Y3R1cmUgYW5kIHNlbmQgb3V0IGEgcGF0Y2ggc29vbiB3aXRoDQp0aGlzIGZpeGVkIHRvIGNv
+bnRpbnVlIHRoZSBkaXNjdXNzaW9uIGhlcmUgb24gdGhpcyB0aHJlYWQgLi4uDQoNCi1jaw0KDQoN
+Cg==
 
