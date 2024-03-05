@@ -1,88 +1,104 @@
-Return-Path: <kvm+bounces-10940-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10942-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39F77871BC4
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:42:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB132871BD2
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:43:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA9161F248CC
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 10:42:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94FF4B22711
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 10:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9883476F1A;
-	Tue,  5 Mar 2024 10:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8A977A0E;
+	Tue,  5 Mar 2024 10:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JfOhzVZU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="p0ODYWU/"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2082.outbound.protection.outlook.com [40.107.223.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD3F76EF6;
-	Tue,  5 Mar 2024 10:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709634207; cv=none; b=bzrG3krquETQUBoJQYGMChoF7qirXTnyF6WAzr8PXKSzdhXymsQ0quTzbTCg0KcwvxAtIufhcbAYx/62GPVavjpnoJoBNDhIHfFojgGwONh0gf5XOObF7lLH3qs6p+UY3aR4wJrnRVfy1ExqHB9A2jvn0LYzA6h9sooPltYCMD0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709634207; c=relaxed/simple;
-	bh=POBXmxmfWLR3OdaBK59TZEAySmTXPtp10vl7hcXrrqE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Su7SfLrOofQJzwWYPqB54HXNVbcn8fTdBu+kO5nNPIn1bg0EO6ydb+2AMAKci8jCj+2Y5DYEleQqVRihwwy+B1nUrWlsflE1v+jxwlLPS1Jf3JlyBGKk8w+vfIXteLOMAr1WvXp5bUi5TZw2bbhtTQyYR7PS1HHiz+nilBeAn7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JfOhzVZU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8375BC433F1;
-	Tue,  5 Mar 2024 10:23:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709634206;
-	bh=POBXmxmfWLR3OdaBK59TZEAySmTXPtp10vl7hcXrrqE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JfOhzVZU+PbAcYQ1NVtZEVt8RuGzFpDwvJhc8ZmNR/MQVL5rFEvZdI69ZI/CfRn/9
-	 lDgTnl3e4vosZKaNqjHmg2gD0OzDdqkJbEILuC92XRwFJP0oBxZbFVGeaBD7BIEEcz
-	 /gPzVTSeBDKGQSe2wWMvfIiFkByrXNbsadAf08OawLxQBl8iQ1z3LeH/j4eWcLP0bv
-	 Om5VKAISLfH8L+ZLD4Ctsjw+8zkFVTnaS/Sk8mAS2fAh6CnbKFtI06ECPVUFOxQa/J
-	 zriDWTohGgJ3TPzImH+yT9rlBAUvo/wPEFost8Rs0sPhO279SVYIuUWU7IFsKaHp+s
-	 s/6ryTSTZ4GSA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: [RFC 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
-Date: Tue,  5 Mar 2024 12:22:17 +0200
-Message-ID: <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709631413.git.leon@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1709631800.git.leon@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6167C5FBA5;
+	Tue,  5 Mar 2024 10:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709634256; cv=fail; b=OSvBOtLhg9ZEYbiG9VBlW0tiOh9v933HJk6o1sSsFK1LzFeJOJV31CjfyUwn5XzWDHB4Q3gYYv9N8yhQqHjcKSo9BZemcHy6GUzC6hxX2zHBG0OCobFY/MZecY2BRUo5+7E1MpC1vdLaDphcU10J0N59z3ETxwPJWiuXDwKc+Fc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709634256; c=relaxed/simple;
+	bh=PCPoEscrqyDenQs86QkKV1wT/niX8KNFD7OhI/8NWEc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fjnn0kNb5W+kXWznBC/7La42TgMD+Mobzru1uSNT+Kn53FQUzNvSHQgdx1FXKAD7iiKqC4VZWeidx2Y/huyMeFG7Z0wunLaJyEdakCKL3r8dCxireiPGwG1Vgg0YWxXQgmeLs+UwRQ2PFMyTIby1ejNloV3lGpd5KxyPe/RmSDk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=p0ODYWU/; arc=fail smtp.client-ip=40.107.223.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LBSAcJCoyX0HLwY4Y7eqLEMwjKKR/Ay8mzXXxTEBQuNzR+M5DHzVoZ0MGfgCjx/r80cf9u0Vgi67xMdL6mPL5j1/BDtP3zR0F4bBU+YteJ/EpZ6SY8eAvmzkX1mJ748KcHtRKj37zL2R54uhYo1CESLHz4m9BYVi5iM29IV8gRdJaGcuJrgoh7qPO9U83ferXXib9clvMFDe7WvYRO3Y4e/urlElPbqdtpUIgHa2eMIpFFWdePn6joMt1FSGQZoPHizFvUAhoE6yyZ0bXd9T38nKhGoeDp/0oUjh2jfaMbLfdUcrWk8JVLYD4HNqFD8IlIqxpG9iI4yq573GYmfA4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cKDrPIO/QWk9rI2EOx2e+ni1hyhZbNDxAOjlD7faWi0=;
+ b=fTWu02YTt/g6UDhyF2wNwVyxBH2SesEo72/OOJHgtlw85jkTZ1NqDrqix7FgGXogcbFkBSt0RyR5yrn3VbZBjc9yGqcoJzSTfoUnkJay/UMkXoeNp86IDAng7P3fQkH2jiGglXnY+ImYRq9KFGO4gIWH+RCCctzhZG03Z5nWWuAGtPByq2ntnENS84be4wxtLtu0pA2imSK+0J5E6MIgaMg8nb0b0xqXPT6smQZDxEt4tkzEPLtqbLW3hBmuNEM2BlM1xA5A9W+SBD/OGmdeOIydXRJzlzeNKZOyzniJChP/3D8cG4ynIO9PwbLmJTcri96CCKPyvC3cjdivQsLxhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=lst.de smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cKDrPIO/QWk9rI2EOx2e+ni1hyhZbNDxAOjlD7faWi0=;
+ b=p0ODYWU/87Mkkbz50iYHTOxd5M6/hR47RIWkLWkEodmNbp5OcfXVpX39HTaeaiXqoosNkVy3B3tejiGRqTEDqF7lPmQQec4w9w7jioX7xAbxT2Zzj1tiuBE4UAuwPYqufbTEqYdKsmA0/NnmLujFx7B/FiH+XUEXI//TLXo1Ppa8UCe3uxxZErdajeGVMTI0mWOMIMM1M4Ylp6GdgS+hCde6ju8lQSoGPkKRI0FHTe4Vk0MhqE7vT0ycf4YzjauGGXMqfuD6gzSZYbjncq4YPL+fNTAK7lgLXVUrc1RE2L9iNUWHQ2ZfU2NZeQ9qyVfaBUN1Je/ShhUTQNAe86fLLQ==
+Received: from BN0PR04CA0011.namprd04.prod.outlook.com (2603:10b6:408:ee::16)
+ by SA0PR12MB4399.namprd12.prod.outlook.com (2603:10b6:806:98::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39; Tue, 5 Mar
+ 2024 10:24:11 +0000
+Received: from BN1PEPF00004680.namprd03.prod.outlook.com
+ (2603:10b6:408:ee:cafe::af) by BN0PR04CA0011.outlook.office365.com
+ (2603:10b6:408:ee::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39 via Frontend
+ Transport; Tue, 5 Mar 2024 10:24:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF00004680.mail.protection.outlook.com (10.167.243.85) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7362.11 via Frontend Transport; Tue, 5 Mar 2024 10:24:10 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 5 Mar 2024
+ 02:23:56 -0800
+Received: from localhost (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Tue, 5 Mar
+ 2024 02:23:55 -0800
+Date: Tue, 5 Mar 2024 12:23:52 +0200
+From: Leon Romanovsky <leonro@nvidia.com>
+To: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>,
+	"Marek Szyprowski" <m.szyprowski@samsung.com>, Joerg Roedel
+	<joro@8bytes.org>, "Will Deacon" <will@kernel.org>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Chaitanya Kulkarni <chaitanyak@nvidia.com>
+CC: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, "Keith
+ Busch" <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, Yishai Hadas
+	<yishaih@nvidia.com>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>, "=?iso-8859-1?B?Suly9G1l?=
+ Glisse" <jglisse@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<iommu@lists.linux.dev>, <linux-nvme@lists.infradead.org>,
+	<kvm@vger.kernel.org>, <linux-mm@kvack.org>, Bart Van Assche
+	<bvanassche@acm.org>, Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	"Amir Goldstein" <amir73il@gmail.com>, "josef@toxicpanda.com"
+	<josef@toxicpanda.com>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, Dan Williams
+	<dan.j.williams@intel.com>, "jack@suse.com" <jack@suse.com>, Zhu Yanjun
+	<zyjzyj2000@gmail.com>
+Subject: Re: [RFC 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240305102352.GA36868@unreal>
 References: <cover.1709631800.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -90,395 +106,46 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <cover.1709631800.git.leon@kernel.org>
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004680:EE_|SA0PR12MB4399:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0d8c86ec-271c-4d49-a081-08dc3cfe65ec
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	BBIKQi3XwMpwRZW4ws4G0X7csKdJp8PjgE8LcABnBH9f9odwT/jBocsHq95hFFZKTwnBJc3m3SpgzMoffHPT12fgW40PukCC0IttAzgf53Lw3DyJ0zZc3bRl9fTr1bzeOtd8ifH4QDvZJiiHbEUbZo0Z9vFL8kaqbTmLouxu5Kv9MMJcEy2LRwMohZEEKmf0wlsSBzrbAeQt6L7lT2NT/fvvAL4rPDmF0AlnKKdqtuYF+aPDk4Tm2JqHcZ1SNVsdlVOLkNN6aPxaI6vCWo5RkS9AKE1nO9Wjxh4RxcJn8+hyj5LyNMlt56Qu0/8cWG3G56HcxBiw5pPjimsdZSsx21NysqQrq5B/AD5vlgw4sPSUDPTjUSLkcTpBrv3OD7riiME3lXv35NoUqy4AEop5xurJcfFEbUgLvAuFtr4A4CYgdIDF2HgsDRX2IKJoMiCq5Y4hHCzEolrllwd/n4wcCUHesmyToe0vgsLGyNSenqeFq3j1FN8qmT9y4ut636pPgihTaRq4e1r9/35Y027ELem4OfoHKCBeiFF069qHxuJonAdrTMROouAoYyxG+xiVUVbovQvn4se/pgGCyb1N5VjMAff9VcsE3mCdtJZuprb+uvWgqJjKYwyga0aebvHb6DfRtx32+675JmQYzLGUX80ygJHZNC/NcunyKg/GvAJFjieeYwK5WxGFBD+j2sQ1XiYyZjGilY8XgYcl0IWQMriwDOT93sjGlkfSfUGvrMkBgO+y1gcJ4XcLkQqBB6/J
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 10:24:10.7415
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d8c86ec-271c-4d49-a081-08dc3cfe65ec
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004680.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4399
 
-From: Chaitanya Kulkarni <kch@nvidia.com>
+On Tue, Mar 05, 2024 at 12:15:10PM +0200, Leon Romanovsky wrote:
+> This is complimentary part to the proposed LSF/MM topic.
+> https://lore.kernel.org/linux-rdma/22df55f8-cf64-4aa8-8c0b-b556c867b926@linux.dev/T/#m85672c860539fdbbc8fe0f5ccabdc05b40269057
+> 
+> This is posted as RFC to get a feedback on proposed split, but RDMA, VFIO and
+> DMA patches are ready for review and inclusion, the NVMe patches are still in
+> progress as they require agreement on API first.
+> 
+> Thanks
 
-Update nvme_iod structure to hold iova, list of DMA linked addresses and
-total linked count, first one is needed in the request submission path
-to create a request to DMA mapping and last two are needed in the
-request completion path to remove the DMA mapping. In nvme_map_data()
-initialize iova with device, direction, and iova dma length with the
-help of blk_rq_get_dma_length(). Allocate iova using dma_alloc_iova().
-and call in nvme_pci_setup_sgls().
+Please ignore this cover letter as it came disconnected from the series
+https://lore.kernel.org/all/a77609c9c9a09214e38b04133e44eee67fe50ab0.1709631413.git.leon@kernel.org
 
-Call newly added blk_rq_dma_map() to create request to DMA mapping and
-provide a callback function nvme_pci_sgl_map(). In the callback
-function initialize NVMe SGL dma addresses.
-
-Finally in nvme_unmap_data() unlink the dma address and free iova.
-
-Full disclosure:-
------------------
-
-This is an RFC to demonstrate the newly added DMA APIs can be used to
-map/unmap bvecs without the use of sg list, hence I've modified the pci
-code to only handle SGLs for now. Once we have some agreement on the
-structure of new DMA API I'll add support for PRPs along with all the
-optimization that I've removed from the code for this RFC for NVMe SGLs
-and PRPs.
-
-I was able to run fio verification job successfully :-
-
-$ fio fio/verify.fio --ioengine=io_uring --filename=/dev/nvme0n1
-                     --loops=10
-write-and-verify: (g=0): rw=randwrite, bs=(R) 8192B-8192B, (W) 8192B-8192B,
-	(T) 8192B-8192B, ioengine=io_uring, iodepth=16
-fio-3.36
-Starting 1 process
-Jobs: 1 (f=1): [V(1)][81.6%][r=12.2MiB/s][r=1559 IOPS][eta 03m:00s]
-write-and-verify: (groupid=0, jobs=1): err= 0: pid=4435: Mon Mar  4 20:54:48 2024
-  read: IOPS=2789, BW=21.8MiB/s (22.9MB/s)(6473MiB/297008msec)
-    slat (usec): min=4, max=5124, avg=356.51, stdev=604.30
-    clat (nsec): min=1593, max=23376k, avg=5377076.99, stdev=2039189.93
-     lat (usec): min=493, max=23407, avg=5733.58, stdev=2103.22
-    clat percentiles (usec):
-     |  1.00th=[ 1172],  5.00th=[ 2114], 10.00th=[ 2835], 20.00th=[ 3654],
-     | 30.00th=[ 4228], 40.00th=[ 4752], 50.00th=[ 5276], 60.00th=[ 5800],
-     | 70.00th=[ 6325], 80.00th=[ 7046], 90.00th=[ 8094], 95.00th=[ 8979],
-     | 99.00th=[10421], 99.50th=[11076], 99.90th=[12780], 99.95th=[14222],
-     | 99.99th=[16909]
-  write: IOPS=2608, BW=20.4MiB/s (21.4MB/s)(10.0GiB/502571msec); 0 zone resets
-    slat (usec): min=4, max=5787, avg=382.68, stdev=649.01
-    clat (nsec): min=521, max=23650k, avg=5751363.17, stdev=2676065.35
-     lat (usec): min=95, max=23674, avg=6134.04, stdev=2813.48
-    clat percentiles (usec):
-     |  1.00th=[  709],  5.00th=[ 1270], 10.00th=[ 1958], 20.00th=[ 3261],
-     | 30.00th=[ 4228], 40.00th=[ 5014], 50.00th=[ 5800], 60.00th=[ 6521],
-     | 70.00th=[ 7373], 80.00th=[ 8225], 90.00th=[ 9241], 95.00th=[ 9896],
-     | 99.00th=[11469], 99.50th=[11863], 99.90th=[13960], 99.95th=[15270],
-     | 99.99th=[17695]
-   bw (  KiB/s): min= 1440, max=132496, per=99.28%, avg=20715.88, stdev=13123.13, samples=1013
-   iops        : min=  180, max=16562, avg=2589.34, stdev=1640.39, samples=1013
-  lat (nsec)   : 750=0.01%
-  lat (usec)   : 2=0.01%, 4=0.01%, 100=0.01%, 250=0.01%, 500=0.07%
-  lat (usec)   : 750=0.79%, 1000=1.22%
-  lat (msec)   : 2=5.94%, 4=18.87%, 10=69.53%, 20=3.58%, 50=0.01%
-  cpu          : usr=1.01%, sys=98.95%, ctx=1591, majf=0, minf=2286
-  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=100.0%, 32=0.0%, >=64=0.0%
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.1%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued rwts: total=828524,1310720,0,0 short=0,0,0,0 dropped=0,0,0,0
-     latency   : target=0, window=0, percentile=100.00%, depth=16
-
-Run status group 0 (all jobs):
-   READ: bw=21.8MiB/s (22.9MB/s), 21.8MiB/s-21.8MiB/s (22.9MB/s-22.9MB/s),
-	io=6473MiB (6787MB), run=297008-297008msec
-  WRITE: bw=20.4MiB/s (21.4MB/s), 20.4MiB/s-20.4MiB/s (21.4MB/s-21.4MB/s),
-	io=10.0GiB (10.7GB), run=502571-502571msec
-
-Disk stats (read/write):
-  nvme0n1: ios=829189/1310720, sectors=13293416/20971520, merge=0/0,
-	ticks=836561/1340351, in_queue=2176913, util=99.30%
-
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/nvme/host/pci.c | 220 +++++++++-------------------------------
- 1 file changed, 49 insertions(+), 171 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index e6267a6aa380..140939228409 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -236,7 +236,9 @@ struct nvme_iod {
- 	unsigned int dma_len;	/* length of single DMA segment mapping */
- 	dma_addr_t first_dma;
- 	dma_addr_t meta_dma;
--	struct sg_table sgt;
-+	struct dma_iova_attrs iova;
-+	dma_addr_t dma_link_address[128];
-+	u16 nr_dma_link_address;
- 	union nvme_descriptor list[NVME_MAX_NR_ALLOCATIONS];
- };
- 
-@@ -521,25 +523,10 @@ static inline bool nvme_pci_use_sgls(struct nvme_dev *dev, struct request *req,
- 	return true;
- }
- 
--static void nvme_free_prps(struct nvme_dev *dev, struct request *req)
--{
--	const int last_prp = NVME_CTRL_PAGE_SIZE / sizeof(__le64) - 1;
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	dma_addr_t dma_addr = iod->first_dma;
--	int i;
--
--	for (i = 0; i < iod->nr_allocations; i++) {
--		__le64 *prp_list = iod->list[i].prp_list;
--		dma_addr_t next_dma_addr = le64_to_cpu(prp_list[last_prp]);
--
--		dma_pool_free(dev->prp_page_pool, prp_list, dma_addr);
--		dma_addr = next_dma_addr;
--	}
--}
--
- static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	u16 i;
- 
- 	if (iod->dma_len) {
- 		dma_unmap_page(dev->dev, iod->first_dma, iod->dma_len,
-@@ -547,9 +534,8 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 		return;
- 	}
- 
--	WARN_ON_ONCE(!iod->sgt.nents);
--
--	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
-+	for (i = 0; i < iod->nr_dma_link_address; i++)
-+		dma_unlink_range(&iod->iova, iod->dma_link_address[i]);
- 
- 	if (iod->nr_allocations == 0)
- 		dma_pool_free(dev->prp_small_pool, iod->list[0].sg_list,
-@@ -557,120 +543,15 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 	else if (iod->nr_allocations == 1)
- 		dma_pool_free(dev->prp_page_pool, iod->list[0].sg_list,
- 			      iod->first_dma);
--	else
--		nvme_free_prps(dev, req);
--	mempool_free(iod->sgt.sgl, dev->iod_mempool);
--}
--
--static void nvme_print_sgl(struct scatterlist *sgl, int nents)
--{
--	int i;
--	struct scatterlist *sg;
--
--	for_each_sg(sgl, sg, nents, i) {
--		dma_addr_t phys = sg_phys(sg);
--		pr_warn("sg[%d] phys_addr:%pad offset:%d length:%d "
--			"dma_address:%pad dma_length:%d\n",
--			i, &phys, sg->offset, sg->length, &sg_dma_address(sg),
--			sg_dma_len(sg));
--	}
--}
--
--static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
--		struct request *req, struct nvme_rw_command *cmnd)
--{
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	struct dma_pool *pool;
--	int length = blk_rq_payload_bytes(req);
--	struct scatterlist *sg = iod->sgt.sgl;
--	int dma_len = sg_dma_len(sg);
--	u64 dma_addr = sg_dma_address(sg);
--	int offset = dma_addr & (NVME_CTRL_PAGE_SIZE - 1);
--	__le64 *prp_list;
--	dma_addr_t prp_dma;
--	int nprps, i;
--
--	length -= (NVME_CTRL_PAGE_SIZE - offset);
--	if (length <= 0) {
--		iod->first_dma = 0;
--		goto done;
--	}
--
--	dma_len -= (NVME_CTRL_PAGE_SIZE - offset);
--	if (dma_len) {
--		dma_addr += (NVME_CTRL_PAGE_SIZE - offset);
--	} else {
--		sg = sg_next(sg);
--		dma_addr = sg_dma_address(sg);
--		dma_len = sg_dma_len(sg);
--	}
--
--	if (length <= NVME_CTRL_PAGE_SIZE) {
--		iod->first_dma = dma_addr;
--		goto done;
--	}
--
--	nprps = DIV_ROUND_UP(length, NVME_CTRL_PAGE_SIZE);
--	if (nprps <= (256 / 8)) {
--		pool = dev->prp_small_pool;
--		iod->nr_allocations = 0;
--	} else {
--		pool = dev->prp_page_pool;
--		iod->nr_allocations = 1;
--	}
--
--	prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
--	if (!prp_list) {
--		iod->nr_allocations = -1;
--		return BLK_STS_RESOURCE;
--	}
--	iod->list[0].prp_list = prp_list;
--	iod->first_dma = prp_dma;
--	i = 0;
--	for (;;) {
--		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
--			__le64 *old_prp_list = prp_list;
--			prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
--			if (!prp_list)
--				goto free_prps;
--			iod->list[iod->nr_allocations++].prp_list = prp_list;
--			prp_list[0] = old_prp_list[i - 1];
--			old_prp_list[i - 1] = cpu_to_le64(prp_dma);
--			i = 1;
--		}
--		prp_list[i++] = cpu_to_le64(dma_addr);
--		dma_len -= NVME_CTRL_PAGE_SIZE;
--		dma_addr += NVME_CTRL_PAGE_SIZE;
--		length -= NVME_CTRL_PAGE_SIZE;
--		if (length <= 0)
--			break;
--		if (dma_len > 0)
--			continue;
--		if (unlikely(dma_len < 0))
--			goto bad_sgl;
--		sg = sg_next(sg);
--		dma_addr = sg_dma_address(sg);
--		dma_len = sg_dma_len(sg);
--	}
--done:
--	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sgt.sgl));
--	cmnd->dptr.prp2 = cpu_to_le64(iod->first_dma);
--	return BLK_STS_OK;
--free_prps:
--	nvme_free_prps(dev, req);
--	return BLK_STS_RESOURCE;
--bad_sgl:
--	WARN(DO_ONCE(nvme_print_sgl, iod->sgt.sgl, iod->sgt.nents),
--			"Invalid SGL for payload:%d nents:%d\n",
--			blk_rq_payload_bytes(req), iod->sgt.nents);
--	return BLK_STS_IOERR;
-+	dma_free_iova(&iod->iova);
- }
- 
- static void nvme_pci_sgl_set_data(struct nvme_sgl_desc *sge,
--		struct scatterlist *sg)
-+				 dma_addr_t dma_addr,
-+				 unsigned int dma_len)
- {
--	sge->addr = cpu_to_le64(sg_dma_address(sg));
--	sge->length = cpu_to_le32(sg_dma_len(sg));
-+	sge->addr = cpu_to_le64(dma_addr);
-+	sge->length = cpu_to_le32(dma_len);
- 	sge->type = NVME_SGL_FMT_DATA_DESC << 4;
- }
- 
-@@ -682,25 +563,37 @@ static void nvme_pci_sgl_set_seg(struct nvme_sgl_desc *sge,
- 	sge->type = NVME_SGL_FMT_LAST_SEG_DESC << 4;
- }
- 
-+struct nvme_pci_sgl_map_data {
-+	struct nvme_iod *iod;
-+	struct nvme_sgl_desc *sgl_list;
-+};
-+
-+static void nvme_pci_sgl_map(void *data, u32 cnt, dma_addr_t dma_addr,
-+			    dma_addr_t offset, u32 len)
-+{
-+	struct nvme_pci_sgl_map_data *d = data;
-+	struct nvme_sgl_desc *sgl_list = d->sgl_list;
-+	struct nvme_iod *iod = d->iod;
-+
-+	nvme_pci_sgl_set_data(&sgl_list[cnt], dma_addr, len);
-+	iod->dma_link_address[cnt] = offset;
-+	iod->nr_dma_link_address++;
-+}
-+
- static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
- 		struct request *req, struct nvme_rw_command *cmd)
- {
-+	unsigned int entries = blk_rq_nr_phys_segments(req);
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	struct dma_pool *pool;
- 	struct nvme_sgl_desc *sg_list;
--	struct scatterlist *sg = iod->sgt.sgl;
--	unsigned int entries = iod->sgt.nents;
-+	struct dma_pool *pool;
- 	dma_addr_t sgl_dma;
--	int i = 0;
-+	int linked_count;
-+	struct nvme_pci_sgl_map_data data;
- 
- 	/* setting the transfer type as SGL */
- 	cmd->flags = NVME_CMD_SGL_METABUF;
- 
--	if (entries == 1) {
--		nvme_pci_sgl_set_data(&cmd->dptr.sgl, sg);
--		return BLK_STS_OK;
--	}
--
- 	if (entries <= (256 / sizeof(struct nvme_sgl_desc))) {
- 		pool = dev->prp_small_pool;
- 		iod->nr_allocations = 0;
-@@ -718,11 +611,13 @@ static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
- 	iod->list[0].sg_list = sg_list;
- 	iod->first_dma = sgl_dma;
- 
--	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, entries);
--	do {
--		nvme_pci_sgl_set_data(&sg_list[i++], sg);
--		sg = sg_next(sg);
--	} while (--entries > 0);
-+	data.iod = iod;
-+	data.sgl_list = sg_list;
-+
-+	linked_count = blk_rq_dma_map(req, nvme_pci_sgl_map, &data,
-+				       &iod->iova);
-+
-+	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, linked_count);
- 
- 	return BLK_STS_OK;
- }
-@@ -788,36 +683,20 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 							     &cmnd->rw, &bv);
- 		}
- 	}
--
--	iod->dma_len = 0;
--	iod->sgt.sgl = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
--	if (!iod->sgt.sgl)
-+	iod->iova.dev = dev->dev;
-+	iod->iova.dir = rq_dma_dir(req);
-+	iod->iova.attrs = DMA_ATTR_NO_WARN;
-+	iod->iova.size = blk_rq_get_dma_length(req);
-+	if (!iod->iova.size)
- 		return BLK_STS_RESOURCE;
--	sg_init_table(iod->sgt.sgl, blk_rq_nr_phys_segments(req));
--	iod->sgt.orig_nents = blk_rq_map_sg(req->q, req, iod->sgt.sgl);
--	if (!iod->sgt.orig_nents)
--		goto out_free_sg;
- 
--	rc = dma_map_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req),
--			     DMA_ATTR_NO_WARN);
--	if (rc) {
--		if (rc == -EREMOTEIO)
--			ret = BLK_STS_TARGET;
--		goto out_free_sg;
--	}
-+	rc = dma_alloc_iova(&iod->iova);
-+	if (rc)
-+		return BLK_STS_RESOURCE;
- 
--	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
--		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
--	else
--		ret = nvme_pci_setup_prps(dev, req, &cmnd->rw);
--	if (ret != BLK_STS_OK)
--		goto out_unmap_sg;
--	return BLK_STS_OK;
-+	iod->dma_len = 0;
- 
--out_unmap_sg:
--	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
--out_free_sg:
--	mempool_free(iod->sgt.sgl, dev->iod_mempool);
-+	ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
- 	return ret;
- }
- 
-@@ -841,7 +720,6 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
- 
- 	iod->aborted = false;
- 	iod->nr_allocations = -1;
--	iod->sgt.nents = 0;
- 
- 	ret = nvme_setup_cmd(req->q->queuedata, req);
- 	if (ret)
--- 
-2.44.0
-
+Thanks
 
