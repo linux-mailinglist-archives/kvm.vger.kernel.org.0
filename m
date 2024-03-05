@@ -1,131 +1,150 @@
-Return-Path: <kvm+bounces-10842-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10843-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB798711C2
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 01:35:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5AEA8711CA
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 01:38:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2F71F23C03
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 00:35:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DB962839F4
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 00:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FFE4A1B;
-	Tue,  5 Mar 2024 00:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B2779C4;
+	Tue,  5 Mar 2024 00:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K39hEweP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mh0LXIwk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF347F
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 00:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352633211
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 00:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709598947; cv=none; b=F6xTO6ZSSIisMJ05W/573RuUPa9ebjbM2Kpi78fT69/MO3wZCgep0VWcVGMFCEjlygZECgKUHxTv/iPPmKCIxR01YNVf7YAZ0OMIJn+FpkrGcpOKeFfr7ItJnPbLf6k9n9OkZ6JZyVYtGra1YxGI+Tz8VmmJ8qsjpk05JT2uGDY=
+	t=1709599066; cv=none; b=n9gk4DNVHJk18Cb/Y1PsMeqYfiVYeAbY0RabTLWNoytgOAY6egORyt3XCq9rWG1HI2SktDWae8+xghPwTL4laUvA8np6ys0uBNGKh2V9yeJyoQsxA+ywYQUsZgWKaIOAnJWhDIxGqH+aZkzV0JHuOIun5YLa1mnroMoqhRzYbzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709598947; c=relaxed/simple;
-	bh=nz2uwfTR8sf65a1ZD2zIjGYWkZpb+xRs7KEpe80VU1I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cCTg0qpRDch8CMDbZGP2c5avumsDEkAcfrCDgPtpRID1IAmaJCVZpmeVEIzMw+tdNbPpkLUNFcjRczRr7fjg8LXUt9XjeZWhsp3IGfFkDL9U/8d/NYQSoTVxcqcclvlcFZjgZaizB3zDg3wHR6KsWyUXwzwVC8qCu0RUIA/TUNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K39hEweP; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1709599066; c=relaxed/simple;
+	bh=DUXhp+g4qoxMZncdiQGNSWIv8z7LVY9hkgbsTfx2fRQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fK3Rr+vGkojfNQEIhbJRBhx3vThCgXKno8iQcIlIwBifHBVHhXskCw9r5fAUifHASIPPwuAsMfVwmaztS/esldVGurksQSskxZDF5++i4yBRvZ89x1Goxgqj+QRDrqS/mpEiyt0+yhht+5PmYe7f/ykCpAfePFAZExQQassJ6aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mh0LXIwk; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5d8bcf739e5so113751a12.1
-        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 16:35:45 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-29ad35a8650so4842508a91.0
+        for <kvm@vger.kernel.org>; Mon, 04 Mar 2024 16:37:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709598945; x=1710203745; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kFvdt/4tnpJSxljtGoomCVbep7+Yys+l9WxGlfhAn90=;
-        b=K39hEweP0bEh0geEhf6nAI7yaAPhFLcUOIwG4dDBP+j942AAOWLG72pqfEmpePh3Kv
-         6wVeDqrIUa1yyh/hRCGpKMQVR8FpaXSC1UXBliYjwbsMLlfUTKZ3zBmvyYjvbs4bCMdA
-         zqbJ6iw9TMypwCjVaxdZ/kOYoVJ3YjOy0bQV4WYtykYyaZJWN7Mh+HUoYiAQuxUQpnt6
-         ZRo6pio3Y64PtpOCdYvHykySFX7kVX/xHIpCBSWQajwZQj/qftE8nKDxQbP7r70B2f10
-         kByUsNkSi9ERicttCt/fHoTzXQ4VhVvVpx9Ma7QvEPYxwQn8vOcMo75XZlNNsjnd6GPu
-         hxJA==
+        d=google.com; s=20230601; t=1709599064; x=1710203864; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qPDZDFGuvVe1xm4D1iYkB/saEEgYVA3F8rFzvBJXEcU=;
+        b=Mh0LXIwkXgNwesFjha1FKnlA6c5sgTK0SKWV0vtb2srlO6C5NbuG+bux91YkryI1By
+         rjitqWdS+0/mGelKxvuuF6EI48hPLdKski437eF5MuQ5DREOy5J42wdS5J2yVzq0xsuB
+         epHDy/jX/ltAOAWXC+5BQNFOADIa0ieO0gGoADQzC/OQ8O3dPJARA0iZ/IQQKNwQDywh
+         n6n0W65lkLA+T6VmZefqmov0Uvlz8fD8MPn57MkRM6dpIOW9fe4F5rMVP63+ZJnWX8sc
+         MG/lTXjmXXPf9bREGw782OjOwp00taOEA8zrgYYRKBAvf/HONzBiqqgcC8eEYMVUQTXB
+         nGNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709598945; x=1710203745;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kFvdt/4tnpJSxljtGoomCVbep7+Yys+l9WxGlfhAn90=;
-        b=bk5/0/oioRPhtp1eCwruJ7dh3/NaeobSeONWQliC5rEmnJ1d1IcYnGy3I9jZcfNC5b
-         WJXunuiIyTgkLXlBke+/MEd1C1K5VEdxCx9NlwzFIZIjFDJrtCjtLBsQsI1BSxu6x65P
-         xgP52T30cYmz77EEV+IKXJNfKWhcBIQn5Irjx9kkjJ1BTx5V9AVhLI4qtHxcuUgNWRSI
-         /zimg1IWZGQxTzBVCbhH6ftHNYHljz4q7SXUCpgXlF/gvZ5vcdlaQzpYfEPm9crOQHYd
-         +SfUItczQTK0/KhXZH3qrJaILYQ8moAil2VOQJ+4qfwMi5v/34mL165Ws2RuaLEDyYAc
-         B08Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXTAfFtSuVWPOiqIR1IeIv9tr0cPqs7k8sa69JWn3mwUR33mU5e3Zz/m4X2jL1a+YuiaPGmcKhv2u7Xevil+l7OlZWi
-X-Gm-Message-State: AOJu0YzxXJc53qOibXCjXxrwAA5xDysIBc4jxhufxPnxDq+ieKGZhne6
-	1Orvuf8KM/6fGQq7H9EWe6PC0FZYqb2MZ/EhnFIvnZqI2tedc4PmNhG8ReSmTJbA7IRep1nYgbz
-	FEA==
-X-Google-Smtp-Source: AGHT+IFi935yC1blv5rbR4g4qsYXLK/qNY3UJ+evQs8kWTCmFNIEwbILtRtCAfCFK09jqlz1tb13YRaXics=
+        d=1e100.net; s=20230601; t=1709599064; x=1710203864;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qPDZDFGuvVe1xm4D1iYkB/saEEgYVA3F8rFzvBJXEcU=;
+        b=c0miBPdSFYSsiVYudzNaopGi8X7rQwSBTDEqtU3oORvRb3E0it1AJ1OLphUG7Q/LhI
+         Qdms94RwxRXlS7tBGNxFzLWTk1PdhTRw/uCKPcs/Jyfgz0K1vSH+GDItnZN3pzy5bz0c
+         xfwdXo4oylVBEtijLzqRAIuEhG/OpNaKzGRdat0vlrtdh9q5uFghjlc44sLnVQ5g8NM4
+         4kG63NcAiOScb0OiqBV4u/DwpHM6hh4183Cb19fdw93qThb7QcQiX7DW0QZiz+jdO+hQ
+         P5PwARHSFwXTKqSHP7xsmf/8UUFvq6HPiP+ztfMwy1xmE4cC+qp7K4m08d1KAyqZcDbT
+         PIgQ==
+X-Gm-Message-State: AOJu0Yz+stqhem4HHJ22dqqglajv1kds6vzHzbrlf1A0WyB8QHupWi+X
+	5JDAhx9q36yQMS/nGVyK5PTW0YAlBVgnmL5HSuavLMW9jZMRwXIoae06/hWXgSSvdwecH3RKMuX
+	IYw==
+X-Google-Smtp-Source: AGHT+IEIR3UYe44S1T2sQALNQ9lpMFR1+QrQVzgvSlJIhG/glLcCrrCzAf9Qa7vrIu0VeJkZ+mhlNOZcKOY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:ef14:0:b0:5d8:be12:fa64 with SMTP id
- u20-20020a63ef14000000b005d8be12fa64mr25264pgh.0.1709598945151; Mon, 04 Mar
- 2024 16:35:45 -0800 (PST)
-Date: Mon,  4 Mar 2024 16:35:29 -0800
-In-Reply-To: <20240227115648.3104-1-dwmw2@infradead.org>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:5414:b0:29b:2fb2:e2a1 with SMTP id
+ z20-20020a17090a541400b0029b2fb2e2a1mr5802pjh.2.1709599064239; Mon, 04 Mar
+ 2024 16:37:44 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon,  4 Mar 2024 16:37:42 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240227115648.3104-1-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <170959827445.241146.17036420374400264270.b4-ty@google.com>
-Subject: Re: [PATCH v2 0/8] KVM: x86/xen updates
+Message-ID: <20240305003742.245767-1-seanjc@google.com>
+Subject: [PATCH] KVM: Drop unused @may_block param from gfn_to_pfn_cache_invalidate_start()
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	David Woodhouse <dwmw2@infradead.org>
-Cc: Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, Michal Luczaj <mhal@rbox.co>
-Content-Type: text/plain; charset="utf-8"
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Like Xu <like.xu.linux@gmail.com>, Paul Durrant <paul@xen.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 27 Feb 2024 11:49:14 +0000, David Woodhouse wrote:
-> These apply to the kvm-x86/xen tree.
-> 
-> First, deal with the awful brokenness of the KVM clock, and its systemic
-> drift especially when TSC scaling is used. This is a bit of a workaround
-> for Xen timers where it hurts *most*, but it's actually easier in this
-> case because there is a vCPU (and associated PV clock information) to
-> use for the scaling. A better fix for __get_kvmclock() is in the works,
-> but there's an enormous yak to shave there because there are so many
-> interrelated bugs in the TSC and timekeeping code.
-> 
-> [...]
+Remove gfn_to_pfn_cache_invalidate_start()'s unused @may_block parameter,
+which was leftover from KVM's abandoned (for now) attempt to support guest
+usage of gfn_to_pfn caches.
 
-Applied 1-5 to kvm-x86 xen.  Please take a look and test the result (patches 1
-and 4 in particular).  I didn't _intend_ to make any functional changes outside
-of fixing up the unlock goof, but I'd greatly appreciate extra eyeballs,
-especially this close to the merge window.
+Fixes: a4bff3df5147 ("KVM: pfncache: remove KVM_GUEST_USES_PFN usage")
+Reported-by: Like Xu <like.xu.linux@gmail.com>
+Cc: Paul Durrant <paul@xen.org>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/kvm_main.c | 3 +--
+ virt/kvm/kvm_mm.h   | 6 ++----
+ virt/kvm/pfncache.c | 2 +-
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
-Oh, and can you look at v2[*] of Vitaly's fixes for xen_shinfo_test?  I'd like
-to get that applied soonish (I see intermittent failures), but I'm nowhere near
-competent enough with clocks to give it a proper review.
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ff588677beb7..7106b57b8468 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -832,8 +832,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 	 * mn_active_invalidate_count (see above) instead of
+ 	 * mmu_invalidate_in_progress.
+ 	 */
+-	gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end,
+-					  hva_range.may_block);
++	gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end);
+ 
+ 	/*
+ 	 * If one or more memslots were found and thus zapped, notify arch code
+diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+index ecefc7ec51af..715f19669d01 100644
+--- a/virt/kvm/kvm_mm.h
++++ b/virt/kvm/kvm_mm.h
+@@ -26,13 +26,11 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
+ #ifdef CONFIG_HAVE_KVM_PFNCACHE
+ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+ 				       unsigned long start,
+-				       unsigned long end,
+-				       bool may_block);
++				       unsigned long end);
+ #else
+ static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+ 						     unsigned long start,
+-						     unsigned long end,
+-						     bool may_block)
++						     unsigned long end)
+ {
+ }
+ #endif /* HAVE_KVM_PFNCACHE */
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 9ac8c9da4eda..bff9875cdcd2 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -23,7 +23,7 @@
+  * MMU notifier 'invalidate_range_start' hook.
+  */
+ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
+-				       unsigned long end, bool may_block)
++				       unsigned long end)
+ {
+ 	struct gfn_to_pfn_cache *gpc;
+ 
 
-Thanks!
+base-commit: 003d914220c97ef93cabfe3ec4e245e2383e19e9
+-- 
+2.44.0.278.ge034bb2e1d-goog
 
-[*] https://lore.kernel.org/all/20240206151950.31174-1-vkuznets@redhat.com
-
-
-[1/8] KVM: x86/xen: improve accuracy of Xen timers
-      https://github.com/kvm-x86/linux/commit/451a707813ae
-[2/8] KVM: x86/xen: inject vCPU upcall vector when local APIC is enabled
-      https://github.com/kvm-x86/linux/commit/8e62bf2bfa46
-[3/8] KVM: x86/xen: remove WARN_ON_ONCE() with false positives in evtchn delivery
-      https://github.com/kvm-x86/linux/commit/66e3cf729b1e
-[4/8] KVM: pfncache: simplify locking and make more self-contained
-      https://github.com/kvm-x86/linux/commit/6addfcf27139
-[5/8] KVM: x86/xen: fix recursive deadlock in timer injection
-      https://github.com/kvm-x86/linux/commit/7a36d680658b
-[6/8] KVM: x86/xen: split up kvm_xen_set_evtchn_fast()
-      (not applied)
-[7/8] KVM: x86/xen: avoid blocking in hardirq context in kvm_xen_set_evtchn_fast()
-      (not applied)
-[8/8] KVM: pfncache: clean up rwlock abuse
-      (not applied)
-
---
-https://github.com/kvm-x86/linux/tree/next
 
