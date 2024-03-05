@@ -1,76 +1,77 @@
-Return-Path: <kvm+bounces-10890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ACC887199A
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 10:29:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35A5D8719A4
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 10:32:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE921F2302D
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 09:29:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4DB4284C0A
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 09:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08ABF52F92;
-	Tue,  5 Mar 2024 09:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F5053804;
+	Tue,  5 Mar 2024 09:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jzv1XxVK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OkH0stL6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6618524B1
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 09:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0226B4F1F8;
+	Tue,  5 Mar 2024 09:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709630982; cv=none; b=nMTOhdCsxWmwRLlzneP9dFcC4pacla0AwdmTC/sacXMnWGktq96eRIgfTGfT54AX81ptTcEDuRUNlvDITmla//+btyidRxzy+aoVAidiBtGpqFDtahE1zpUd0w5FRPFJpMdImfyKXMXVnxVR/E/1lpn2uXhBzJICEFIgoo0jkGE=
+	t=1709631135; cv=none; b=RhH7TlokH7DJJnviyF/6/NVpXTftSivQTWWhNMiI2ka/4CuA7jkKcR7qcrGIBRHF/M0HEfPrMuLBa1dQjkt8D/8ALlzh28qHHD2IRx3AFbAazqZdwrHAuJIYMs+8KfxgYIMXg3sD0sMMXhjGwPvynvxbkRBZNfnLqQ0HMOgyV7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709630982; c=relaxed/simple;
-	bh=So0ky33PyVGswJuSEzBUYSdaA+QXuJFbrH+hZezXjoY=;
+	s=arc-20240116; t=1709631135; c=relaxed/simple;
+	bh=5EPSFVVnwFFNn+xZEadu+AOH/jq+6eTcU34T204mVSc=;
 	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=nmppOVa+KyApQ1peY6OFsgKyBiKYZsS6V/crJjRpE6wxCZztkNNVvwJtiB/ggvAxabQTFRt8G1ZJfNvse5mRvzogHXNrCb9W0Hb0b8+K4QvqaGun0nYTdiKS+1Up+9oyOgnMlU4ZP8NxI2TUUvoeNPnbc9ZC9uLFSOulbLyGH0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jzv1XxVK; arc=none smtp.client-ip=209.85.128.44
+	 In-Reply-To:Content-Type; b=oZXZx4qugVMIZfaDIPlXDVg4y3CnYq9geJOrSF3grMByKtCNua9iaLeGkh1E6att++I7tyxDKi4HtYkCcYWyMN7JPPh79pX/xFWT6EHdBXqDyXHhqzpWWyiKpWP+6mkR60u6Sqz+ZitXFeK6wMmP3BDEA6rDRjaVaVME4JWDM0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OkH0stL6; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-412ededaf07so1828545e9.3
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 01:29:40 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-33e27940554so2106427f8f.3;
+        Tue, 05 Mar 2024 01:32:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709630979; x=1710235779; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+        d=gmail.com; s=20230601; t=1709631131; x=1710235931; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bZYTqncmNW1eARtGdAHLKkGjyHFXxuYT4eSOhqyunzI=;
-        b=Jzv1XxVKNE/5Ds1ZVPmB79OKQQxq1T7MqmY8xy6EWTSwVw79pmwoTsIe61u6Mo9ciX
-         fnSkZvAr5BKLa6IP5CDuCvzsvLwZYw/2carXabDAmcjJ6DR/DTXHVjPRaXssSpFCMp8Y
-         GcrOSxGrqSpNApH9V9qpPsGRy9e5YPJ8Ax9XhI/kyW54pYMGpwClk0eRzDdF28oNd+GA
-         rgcecEHuEFrP8+JzpiIvXJO1720Z8hu2G4imwDx7ZjtGg6h/3txYfr/nTVnd0shdO6n/
-         NEy5SCStzehTfwloQ/q+EU/BxsgpMfkiDjnc4HAD+rmxrVJ0dVzN7Vtrlhv7mn5wCaaQ
-         ml4A==
+        bh=AnpeB/fbih0dzCK3HxEZh9jhAURN9PnPgtNJe0vDNuo=;
+        b=OkH0stL6X3/KY/5OSdMIcIUd4KtXj4uH0h7GKW2D4zUfnnUtkheOmNhCLwwdyJGacW
+         hJI7LHeTU5NSFiM0skm/08G1WX+VJ57p8BQlrWGZmOnGMpk29Ap7fNwX67L9D/i6gdci
+         TwpJbZ2cWFpg2dGWKs98tSzSwOZ7tnXlFKBNoPoCygBwXk6At5OZRWy1ErzMbOnSg8GD
+         hFIG5hiL9+HFmdMOfsZxLYze8yGygDCEoGu8bnd+pS318ZpBiH5I1GofqHsnsFSYlvh/
+         WhGrnHwasBi+ZOHLQKALUctCSj1vyTUi147XyFbPzoxoy+j2adUV+W0w4tarjkqRiqRO
+         bimA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709630979; x=1710235779;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+        d=1e100.net; s=20230601; t=1709631131; x=1710235931;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bZYTqncmNW1eARtGdAHLKkGjyHFXxuYT4eSOhqyunzI=;
-        b=I2ujIWcKYeYZ24SW6gOA/4YwQAuPc0b6fdpvesz3EUl555bMWG+ZVmS80eDDpuu6SP
-         r0EV982+93mye9DLgbk+fXw57FmWrwTJ2loe5WqQw6x2DvK4DhFwjQZvIgio3lCXmngG
-         shEOgIRKp3dm6O4Ox1s0bg+eULkDhON7mKBEAF1zX5D4+e/80gOJeOPa9flFdN3J/bAa
-         rtdS1OzY7zFqyDrpv88JhD9JxX1tu8T38TwOuaqh5bOsKdJsEY2e854gcc/fV3nH2i/6
-         0dl3qCCUuWv7Yj/XrQqrQ28A6pwa223XJdzuIae/edT33Sd1xXxb4OeZYq7GFuRpgNgs
-         wUwg==
-X-Gm-Message-State: AOJu0YxcHQc19W/1Mx6BeffXB/nnV1KIAlTrN+YY0S9K3QIXaH9znQPV
-	LqD95SxoiLfs9Frs9KyFy5E7oGRcWF0BUX7pa0igpi5eBGKALqCL4Bt/p5VKFR8=
-X-Google-Smtp-Source: AGHT+IHxc/aL6Iy5pSTNDMKRu2smgEdYN3ViojwOxZVbk5sdPREfhEmENLfZD6antzed80DeBycWDQ==
-X-Received: by 2002:a05:600c:4f51:b0:412:ec05:adbc with SMTP id m17-20020a05600c4f5100b00412ec05adbcmr1011950wmq.22.1709630978702;
-        Tue, 05 Mar 2024 01:29:38 -0800 (PST)
+        bh=AnpeB/fbih0dzCK3HxEZh9jhAURN9PnPgtNJe0vDNuo=;
+        b=QPQXm4YQ2rPF44DMjQaWoEpOYwp4+VOGwr3R9CQwU9olRfUk5R/3xT0iXk48j42WMf
+         lhC+f0sw3pDcEgfLRhCefRzFO0h+WOlPYZmhvO3EyuyeqL4oiL6Tj+tKnH/vaVIdgfvs
+         olVh4Q4WdIxBqsiY9NjOjmeol+OBJQ/IbcmbRWq1adUmyqVRdYKistNfBPDw1Istu+Ww
+         3RS/wz7LcUK0MjTmoSfSXIb/NQRTRufMczJAywQK1uFhP0PaS6s99eDdaIOzKjcCju/A
+         wvlfA568Nu/D1zJW6Pwd/DKmi8pGKr79sw50GX6kDkp+bPoy4ediJKgSzmd4bGhLjXVj
+         HWag==
+X-Forwarded-Encrypted: i=1; AJvYcCWkvcM7NPwT+v5pN6AXkI/eirz9B4LqpY4ROPvSTWY5z2cVefh61qt9efNMQMYDtWn0qkLBAJuQ7mbtNqwxtJOMYFUjjf/UHyw1iUQv
+X-Gm-Message-State: AOJu0YyYnQf0RGCqwBfeBQNmvSl/ZsQEFCgJeDbQ3puQOfod0xYWd5QM
+	8KoLv5qaC9xvkH1DXDCkolT122++pycdZuOI5gL+Mj6BmmqWNaii
+X-Google-Smtp-Source: AGHT+IH/AzVB1tK9puOCaNVpjcvfadwjFJKNjC5dw3N79NtI1PRHEAm357UhgqbaFNmy7dz5w7308g==
+X-Received: by 2002:a5d:6283:0:b0:33d:1153:f41a with SMTP id k3-20020a5d6283000000b0033d1153f41amr6804395wru.20.1709631131159;
+        Tue, 05 Mar 2024 01:32:11 -0800 (PST)
 Received: from [192.168.19.5] (54-240-197-238.amazon.com. [54.240.197.238])
-        by smtp.gmail.com with ESMTPSA id jz12-20020a05600c580c00b00411a6ce0f99sm16936421wmb.24.2024.03.05.01.29.38
+        by smtp.gmail.com with ESMTPSA id v13-20020adfd04d000000b0033d202abf01sm14402366wrh.28.2024.03.05.01.32.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Mar 2024 01:29:38 -0800 (PST)
+        Tue, 05 Mar 2024 01:32:10 -0800 (PST)
 From: Paul Durrant <xadimgnik@gmail.com>
 X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <c72f8a65-c67e-4f11-b888-5d0994f8ee11@xen.org>
-Date: Tue, 5 Mar 2024 09:29:35 +0000
+Message-ID: <c46f27b8-3ff3-4da9-bfde-c1c24e77f2d9@xen.org>
+Date: Tue, 5 Mar 2024 09:32:08 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,73 +80,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [PATCH v2 1/8] KVM: x86/xen: improve accuracy of Xen timers
-To: Sean Christopherson <seanjc@google.com>,
- David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Michal Luczaj <mhal@rbox.co>, David Woodhouse <dwmw@amazon.co.uk>
-References: <20240227115648.3104-1-dwmw2@infradead.org>
- <20240227115648.3104-2-dwmw2@infradead.org> <ZeZc549aow68CeD-@google.com>
+Subject: Re: [PATCH] KVM: Drop unused @may_block param from
+ gfn_to_pfn_cache_invalidate_start()
 Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Like Xu <like.xu.linux@gmail.com>, David Woodhouse <dwmw2@infradead.org>
+References: <20240305003742.245767-1-seanjc@google.com>
 Organization: Xen Project
-In-Reply-To: <ZeZc549aow68CeD-@google.com>
+In-Reply-To: <20240305003742.245767-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 04/03/2024 23:44, Sean Christopherson wrote:
-> On Tue, Feb 27, 2024, David Woodhouse wrote:
->> +	/* Xen has a 'Linux workaround' in do_set_timer_op() which
->> +	 * checks for negative absolute timeout values (caused by
->> +	 * integer overflow), and for values about 13 days in the
->> +	 * future (2^50ns) which would be caused by jiffies
->> +	 * overflow. For those cases, it sets the timeout 100ms in
->> +	 * the future (not *too* soon, since if a guest really did
->> +	 * set a long timeout on purpose we don't want to keep
->> +	 * churning CPU time by waking it up).
->> +	 */
+On 05/03/2024 00:37, Sean Christopherson wrote:
+> Remove gfn_to_pfn_cache_invalidate_start()'s unused @may_block parameter,
+> which was leftover from KVM's abandoned (for now) attempt to support guest
+> usage of gfn_to_pfn caches.
 > 
-> I'm going to massage this slightly, partly to take advantage of reduced indentation,
-> but also to call out when the workaround is applied.  Though in all honesty, the
-> extra context may just be in response to a PEBKAC on my end, as I misread the diff
-> multiple times.
+> Fixes: a4bff3df5147 ("KVM: pfncache: remove KVM_GUEST_USES_PFN usage")
+> Reported-by: Like Xu <like.xu.linux@gmail.com>
+> Cc: Paul Durrant <paul@xen.org>
+> Cc: David Woodhouse <dwmw2@infradead.org>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   virt/kvm/kvm_main.c | 3 +--
+>   virt/kvm/kvm_mm.h   | 6 ++----
+>   virt/kvm/pfncache.c | 2 +-
+>   3 files changed, 4 insertions(+), 7 deletions(-)
 > 
->> +	if (linux_wa) {
->> +		if ((unlikely((int64_t)guest_abs < 0 ||
-> 
-> No need for a second set of parantheses around the unlikely.
-> 
->> +			      (delta > 0 && (uint32_t) (delta >> 50) != 0)))) {
-> 
-> And this can all easily fit into one if-statement.
-> 
->> +			delta = 100 * NSEC_PER_MSEC;
->> +			guest_abs = guest_now + delta;
->> +		}
->> +	}
-> 
-> This is what I'm going to commit, holler if it looks wrong (disclaimer: I've only
-> compile tested at this point).
-> 
-> 	/*
-> 	 * Xen has a 'Linux workaround' in do_set_timer_op() which checks for
-> 	 * negative absolute timeout values (caused by integer overflow), and
-> 	 * for values about 13 days in the future (2^50ns) which would be
-> 	 * caused by jiffies overflow. For those cases, Xen sets the timeout
-> 	 * 100ms in the future (not *too* soon, since if a guest really did
-> 	 * set a long timeout on purpose we don't want to keep churning CPU
-> 	 * time by waking it up).  Emulate Xen's workaround when starting the
-> 	 * timer in response to __HYPERVISOR_set_timer_op.
-> 	 */
-> 	if (linux_wa &&
-> 	    unlikely((int64_t)guest_abs < 0 ||
-> 		     (delta > 0 && (uint32_t) (delta >> 50) != 0))) {
 
-Now that I look at it again, since the last test is simply a '!= 0', I 
-don't really see why the case is necessary. Perhaps lose that too. 
-Otherwise LGTM.
-
-> 		delta = 100 * NSEC_PER_MSEC;
-> 		guest_abs = guest_now + delta;
-> 	}
+Reviewed-by: Paul Durrant <paul@xen.org>
 
 
