@@ -1,191 +1,151 @@
-Return-Path: <kvm+bounces-10888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237AA87192A
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 10:11:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACC887199A
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 10:29:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDB231F241E1
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 09:11:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE921F2302D
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 09:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF19F51C2B;
-	Tue,  5 Mar 2024 09:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08ABF52F92;
+	Tue,  5 Mar 2024 09:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uev3Od2R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jzv1XxVK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EFB50263
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 09:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6618524B1
+	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 09:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709629853; cv=none; b=oAmTnebXPSc+6eP1rnxOiwn0FZ4GMaWKiC5XPPosGNuU9xXH+fH3krzV9J8P3ntTJK64M4esBy6MYTH4BFE7ol+ifJj8gujCwwre5hKtUJe5VRZrnWg2LkSpcNKDM6LIBLBy5yEWHOhcpsYn2Kxc8bAW4PWKWkr9/i72dl5G6EY=
+	t=1709630982; cv=none; b=nMTOhdCsxWmwRLlzneP9dFcC4pacla0AwdmTC/sacXMnWGktq96eRIgfTGfT54AX81ptTcEDuRUNlvDITmla//+btyidRxzy+aoVAidiBtGpqFDtahE1zpUd0w5FRPFJpMdImfyKXMXVnxVR/E/1lpn2uXhBzJICEFIgoo0jkGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709629853; c=relaxed/simple;
-	bh=rVIwlJM3IgwqSihvhW2HEaT8sLQNzBRHPyLxvk8Crcg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ErO4o1Zod10GqoooocP3JCDljO9ciABnIYIRNvymsAP7G56U3gkCVlxVYQHiCqv5Oy90EEooNNwpeDzOqeU5BpzNqkrqmL/Ak9gcyinRCPhQgxw+mWvgx0tSZEH0H8RqRxvljNDcIjmEzjZAJPU6ykbJ/0Xxsc91+KJAEyJve/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Uev3Od2R; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709629851; x=1741165851;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rVIwlJM3IgwqSihvhW2HEaT8sLQNzBRHPyLxvk8Crcg=;
-  b=Uev3Od2RV2cQ/Zv4Iok1J7NCrgP85Oc94cyieGrLRiNS9uxoDIU66NY6
-   QkBjYQqOtkfiWYHzzL4kENXk9vy66+HTNmEBzqgtVsmWmdImkGb6Bu/8K
-   Qnrh2eVkz83Cv0A0RnQsKSsho9SKy4tTdlNAPDTfouxNEYRjSbmLUNwbR
-   meMc6iYqglgKJaHThlOKiI+obA8f3Mi+2uaTu6oyViE3R10ni/78P1zGy
-   djkf+nPY3hraA2nrrs0VV+LMNv1wazyps7euCHgGiQz9XpOlTz1ICI2x+
-   +4vKlODwJf7Tng2GxY48/Pd65C1a0yey7KErZglo9HvKU9HS+3hqx3nhL
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="29593503"
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="29593503"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 01:10:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="13899085"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 01:10:50 -0800
-Date: Tue, 5 Mar 2024 01:10:49 -0800
-From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-	qemu-devel@nongnu.org, Michael Roth <michael.roth@amd.com>,
-	Claudio Fontana <cfontana@suse.de>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>,
-	isaku.yamahata@linux.intel.com, isaku.yamahata@intel.com
-Subject: Re: [PATCH v5 08/65] kvm: handle KVM_EXIT_MEMORY_FAULT
-Message-ID: <20240305091049.GA368614@ls.amr.corp.intel.com>
-References: <20240229063726.610065-1-xiaoyao.li@intel.com>
- <20240229063726.610065-9-xiaoyao.li@intel.com>
+	s=arc-20240116; t=1709630982; c=relaxed/simple;
+	bh=So0ky33PyVGswJuSEzBUYSdaA+QXuJFbrH+hZezXjoY=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=nmppOVa+KyApQ1peY6OFsgKyBiKYZsS6V/crJjRpE6wxCZztkNNVvwJtiB/ggvAxabQTFRt8G1ZJfNvse5mRvzogHXNrCb9W0Hb0b8+K4QvqaGun0nYTdiKS+1Up+9oyOgnMlU4ZP8NxI2TUUvoeNPnbc9ZC9uLFSOulbLyGH0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jzv1XxVK; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-412ededaf07so1828545e9.3
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 01:29:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709630979; x=1710235779; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bZYTqncmNW1eARtGdAHLKkGjyHFXxuYT4eSOhqyunzI=;
+        b=Jzv1XxVKNE/5Ds1ZVPmB79OKQQxq1T7MqmY8xy6EWTSwVw79pmwoTsIe61u6Mo9ciX
+         fnSkZvAr5BKLa6IP5CDuCvzsvLwZYw/2carXabDAmcjJ6DR/DTXHVjPRaXssSpFCMp8Y
+         GcrOSxGrqSpNApH9V9qpPsGRy9e5YPJ8Ax9XhI/kyW54pYMGpwClk0eRzDdF28oNd+GA
+         rgcecEHuEFrP8+JzpiIvXJO1720Z8hu2G4imwDx7ZjtGg6h/3txYfr/nTVnd0shdO6n/
+         NEy5SCStzehTfwloQ/q+EU/BxsgpMfkiDjnc4HAD+rmxrVJ0dVzN7Vtrlhv7mn5wCaaQ
+         ml4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709630979; x=1710235779;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bZYTqncmNW1eARtGdAHLKkGjyHFXxuYT4eSOhqyunzI=;
+        b=I2ujIWcKYeYZ24SW6gOA/4YwQAuPc0b6fdpvesz3EUl555bMWG+ZVmS80eDDpuu6SP
+         r0EV982+93mye9DLgbk+fXw57FmWrwTJ2loe5WqQw6x2DvK4DhFwjQZvIgio3lCXmngG
+         shEOgIRKp3dm6O4Ox1s0bg+eULkDhON7mKBEAF1zX5D4+e/80gOJeOPa9flFdN3J/bAa
+         rtdS1OzY7zFqyDrpv88JhD9JxX1tu8T38TwOuaqh5bOsKdJsEY2e854gcc/fV3nH2i/6
+         0dl3qCCUuWv7Yj/XrQqrQ28A6pwa223XJdzuIae/edT33Sd1xXxb4OeZYq7GFuRpgNgs
+         wUwg==
+X-Gm-Message-State: AOJu0YxcHQc19W/1Mx6BeffXB/nnV1KIAlTrN+YY0S9K3QIXaH9znQPV
+	LqD95SxoiLfs9Frs9KyFy5E7oGRcWF0BUX7pa0igpi5eBGKALqCL4Bt/p5VKFR8=
+X-Google-Smtp-Source: AGHT+IHxc/aL6Iy5pSTNDMKRu2smgEdYN3ViojwOxZVbk5sdPREfhEmENLfZD6antzed80DeBycWDQ==
+X-Received: by 2002:a05:600c:4f51:b0:412:ec05:adbc with SMTP id m17-20020a05600c4f5100b00412ec05adbcmr1011950wmq.22.1709630978702;
+        Tue, 05 Mar 2024 01:29:38 -0800 (PST)
+Received: from [192.168.19.5] (54-240-197-238.amazon.com. [54.240.197.238])
+        by smtp.gmail.com with ESMTPSA id jz12-20020a05600c580c00b00411a6ce0f99sm16936421wmb.24.2024.03.05.01.29.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Mar 2024 01:29:38 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <c72f8a65-c67e-4f11-b888-5d0994f8ee11@xen.org>
+Date: Tue, 5 Mar 2024 09:29:35 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240229063726.610065-9-xiaoyao.li@intel.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v2 1/8] KVM: x86/xen: improve accuracy of Xen timers
+To: Sean Christopherson <seanjc@google.com>,
+ David Woodhouse <dwmw2@infradead.org>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Michal Luczaj <mhal@rbox.co>, David Woodhouse <dwmw@amazon.co.uk>
+References: <20240227115648.3104-1-dwmw2@infradead.org>
+ <20240227115648.3104-2-dwmw2@infradead.org> <ZeZc549aow68CeD-@google.com>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <ZeZc549aow68CeD-@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 29, 2024 at 01:36:29AM -0500,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On 04/03/2024 23:44, Sean Christopherson wrote:
+> On Tue, Feb 27, 2024, David Woodhouse wrote:
+>> +	/* Xen has a 'Linux workaround' in do_set_timer_op() which
+>> +	 * checks for negative absolute timeout values (caused by
+>> +	 * integer overflow), and for values about 13 days in the
+>> +	 * future (2^50ns) which would be caused by jiffies
+>> +	 * overflow. For those cases, it sets the timeout 100ms in
+>> +	 * the future (not *too* soon, since if a guest really did
+>> +	 * set a long timeout on purpose we don't want to keep
+>> +	 * churning CPU time by waking it up).
+>> +	 */
+> 
+> I'm going to massage this slightly, partly to take advantage of reduced indentation,
+> but also to call out when the workaround is applied.  Though in all honesty, the
+> extra context may just be in response to a PEBKAC on my end, as I misread the diff
+> multiple times.
+> 
+>> +	if (linux_wa) {
+>> +		if ((unlikely((int64_t)guest_abs < 0 ||
+> 
+> No need for a second set of parantheses around the unlikely.
+> 
+>> +			      (delta > 0 && (uint32_t) (delta >> 50) != 0)))) {
+> 
+> And this can all easily fit into one if-statement.
+> 
+>> +			delta = 100 * NSEC_PER_MSEC;
+>> +			guest_abs = guest_now + delta;
+>> +		}
+>> +	}
+> 
+> This is what I'm going to commit, holler if it looks wrong (disclaimer: I've only
+> compile tested at this point).
+> 
+> 	/*
+> 	 * Xen has a 'Linux workaround' in do_set_timer_op() which checks for
+> 	 * negative absolute timeout values (caused by integer overflow), and
+> 	 * for values about 13 days in the future (2^50ns) which would be
+> 	 * caused by jiffies overflow. For those cases, Xen sets the timeout
+> 	 * 100ms in the future (not *too* soon, since if a guest really did
+> 	 * set a long timeout on purpose we don't want to keep churning CPU
+> 	 * time by waking it up).  Emulate Xen's workaround when starting the
+> 	 * timer in response to __HYPERVISOR_set_timer_op.
+> 	 */
+> 	if (linux_wa &&
+> 	    unlikely((int64_t)guest_abs < 0 ||
+> 		     (delta > 0 && (uint32_t) (delta >> 50) != 0))) {
 
-> From: Chao Peng <chao.p.peng@linux.intel.com>
-> 
-> When geeting KVM_EXIT_MEMORY_FAULT exit, it indicates userspace needs to
-> do the memory conversion on the RAMBlock to turn the memory into desired
-> attribute, i.e., private/shared.
-> 
-> Currently only KVM_MEMORY_EXIT_FLAG_PRIVATE in flags is valid when
-> KVM_EXIT_MEMORY_FAULT happens.
-> 
-> Note, KVM_EXIT_MEMORY_FAULT makes sense only when the RAMBlock has
-> guest_memfd memory backend.
-> 
-> Note, KVM_EXIT_MEMORY_FAULT returns with -EFAULT, so special handling is
-> added.
-> 
-> When page is converted from shared to private, the original shared
-> memory can be discarded via ram_block_discard_range(). Note, shared
-> memory can be discarded only when it's not back'ed by hugetlb because
-> hugetlb is supposed to be pre-allocated and no need for discarding.
-> 
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> 
-> ---
-> Changes in v4:
-> - open-coded ram_block_discard logic;
-> - change warn_report() to error_report(); (Daniel)
-> ---
->  accel/kvm/kvm-all.c | 94 ++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 84 insertions(+), 10 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 70d482a2c936..87e4275932a7 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2903,6 +2903,68 @@ static void kvm_eat_signals(CPUState *cpu)
->      } while (sigismember(&chkset, SIG_IPI));
->  }
->  
-> +static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
-> +{
-> +    MemoryRegionSection section;
-> +    ram_addr_t offset;
-> +    MemoryRegion *mr;
-> +    RAMBlock *rb;
-> +    void *addr;
-> +    int ret = -1;
-> +
-> +    if (!QEMU_PTR_IS_ALIGNED(start, qemu_host_page_size) ||
-> +        !QEMU_PTR_IS_ALIGNED(size, qemu_host_page_size)) {
-> +        return -1;
-> +    }
-> +
-> +    if (!size) {
-> +        return -1;
-> +    }
-> +
-> +    section = memory_region_find(get_system_memory(), start, size);
-> +    mr = section.mr;
-> +    if (!mr) {
-> +        return -1;
-> +    }
-> +
-> +    if (memory_region_has_guest_memfd(mr)) {
-> +        if (to_private) {
-> +            ret = kvm_set_memory_attributes_private(start, size);
-> +        } else {
-> +            ret = kvm_set_memory_attributes_shared(start, size);
-> +        }
-> +
-> +        if (ret) {
-> +            memory_region_unref(section.mr);
-> +            return ret;
-> +        }
-> +
-> +        addr = memory_region_get_ram_ptr(mr) + section.offset_within_region;
-> +        rb = qemu_ram_block_from_host(addr, false, &offset);
-> +
-> +        if (to_private) {
-> +            if (rb->page_size != qemu_host_page_size) {
-> +                /*
-> +                * shared memory is back'ed by  hugetlb, which is supposed to be
-> +                * pre-allocated and doesn't need to be discarded
-> +                */
-> +                return 0;
+Now that I look at it again, since the last test is simply a '!= 0', I 
+don't really see why the case is necessary. Perhaps lose that too. 
+Otherwise LGTM.
 
-The reference count leaks. Add memory_region_unref() is needed.
+> 		delta = 100 * NSEC_PER_MSEC;
+> 		guest_abs = guest_now + delta;
+> 	}
 
-Otherwise looks good to me.
-Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
--- 
-Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
