@@ -1,446 +1,181 @@
-Return-Path: <kvm+bounces-10952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-10953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEA21871D20
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:13:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B932B871D3B
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 12:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B6F31F21E28
-	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:13:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E1C8B20D9D
+	for <lists+kvm@lfdr.de>; Tue,  5 Mar 2024 11:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A1554912;
-	Tue,  5 Mar 2024 11:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F7C56758;
+	Tue,  5 Mar 2024 11:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TAxm36U+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r002UdI0"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A688566D;
-	Tue,  5 Mar 2024 11:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C0A548FB;
+	Tue,  5 Mar 2024 11:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709637208; cv=none; b=CEL/Iul9pBMfQ7qoDe/EXg/fVsa1fWEfs5NSIx1kP1XmxImOvUUIuSnC+ANK/HS5dxD+8bbbI2cnG5fL0XoGxes8sCcVg3PFEqeV/pPg461GBR7hZvUFnuDSV4XWHOjO2aJZV8pTra3s71vXUxln4gaWHnxsgqX6rbLDyX5fep0=
+	t=1709637534; cv=none; b=ImC5dSX2H4w9Zcji9Zg+ObiyXaPt8Y8jtnNhsU0qQKDwD7LhOwL+oWolbYqsisIZ4HZmINfJ+W/fLh33jFE/GVKO8x2cFeHZVUkkvZKCr6wzbKrIPIi58HoPiQ5nPCTtlghTT/GHiaKY0sz7H962jkAW+765kz7ezASlO3ZYWR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709637208; c=relaxed/simple;
-	bh=+nKFvbjIEO/C4qNxSG508FL/jDF0Yk3m2k2wKnF96aY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L8qkS1YBiR8WhaSLR/18qzmZftsqGNUtjT9gAV0UZt/T5wXL3+usLbsaNJfWwwIAz8ethH3v/iwUNtE/Y1kuDZ8OzBPmC+IbLJLF8YkGh023oMF5GhqyMUN0oPaoL65SdafvcD5sXBL6WqgN/M+XwMCvmS010KB+TM8bcqL3/64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TAxm36U+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C32C433C7;
-	Tue,  5 Mar 2024 11:13:27 +0000 (UTC)
+	s=arc-20240116; t=1709637534; c=relaxed/simple;
+	bh=NxhQVbYsKSwyvGgGk5qfaF5a/Y1wAzitab7stbdLKEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VI9SaCC4Q8VqXbsinGVdNZrzh6IY88g73STuTSWR4u6Rl8j2LSfjq0TocVvhLuAHjkYgiepZp34bbds3d6H1MbAsXfIB5i/Jcv389rcvQPrzNVdnmF+mHxmjzRf0oSdPtgBQAiJySJ6vsw6no1d3TQhS/kgqb9fLLHjN0Fu7188=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r002UdI0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 531A2C433F1;
+	Tue,  5 Mar 2024 11:18:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709637207;
-	bh=+nKFvbjIEO/C4qNxSG508FL/jDF0Yk3m2k2wKnF96aY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TAxm36U+NwPNwM2RVKs70IwU81D7DxFLmY9tXDKNKCmxwSqewPSfmZjDg+bLaqTop
-	 ES0/laclWMonOb9tGF7pmMqMLuxCa4qXXRc49B3uayANbEEcO84gHfUnB/QiBEymTg
-	 WB/GXxJLhOTtq+1kV3mefSEmcolPHBKIYzeVvw/H6baAeypVlvW+4953iTDJ3IjJyo
-	 awjwQDwhrsYyhW2n7xk5dQQvlNBe4/T4UZzCxtfPcJYAsc1iezgUx8ceqkFi17Poxd
-	 Mb03N2A5Yl7eGg0LNrQihcnWHgiempQEcvgjseWtdNOYcGO1dxLj+1KilEdTrnLQNi
-	 xHvXb50hSShmw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rhSjd-009XWE-Ff;
-	Tue, 05 Mar 2024 11:13:25 +0000
-Date: Tue, 05 Mar 2024 11:13:22 +0000
-Message-ID: <86sf150w4t.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,	kvm@vger.kernel.org,	linux-arm-kernel@lists.infradead.org,	linux-kernel@vger.kernel.org,	oliver.upton@linux.dev,	darren@os.amperecomputing.com,	d.scott.phillips@amperecomputing.com
-Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
-In-Reply-To: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
-References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1709637534;
+	bh=NxhQVbYsKSwyvGgGk5qfaF5a/Y1wAzitab7stbdLKEk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=r002UdI01gg2rXuVaeOK/D1fhwvZco1HuVKXX0raiRp4PUfsfXV1wc5RAqWyZvJGK
+	 mRH29l4+teuQlcz7MYEH/XOhAk5fjO/D/+ObXI96O5zHSMTDzcXW1equc4uEnI9Kre
+	 2BcxvXeVYU69p4m+lD0jFj6BxZAVk5SYUzkfEQXMq9ZQADbWBmK/mOgQSEndSNXrmU
+	 N0zqFP6N8iRdWJolF3xUwGboWwTM+WK03mm/r/4T6jt0HRL4N+JZfELJzmdMuRU5c2
+	 3ntsHZLDUHj1RvDsUQibOL0qdzbtw4jvy9b1b8vryqWssRm+htmwj9BHKQEKphbBXH
+	 1E2fwP28bIgFw==
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Date: Tue,  5 Mar 2024 13:18:31 +0200
+Message-ID: <cover.1709635535.git.leon@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-[re-sending with kvmarm@ fixed]
+This is complimentary part to the proposed LSF/MM topic.
+https://lore.kernel.org/linux-rdma/22df55f8-cf64-4aa8-8c0b-b556c867b926@linux.dev/T/#m85672c860539fdbbc8fe0f5ccabdc05b40269057
 
-On Tue, 05 Mar 2024 05:46:06 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> As per 'commit 178a6915434c ("KVM: arm64: nv: Unmap/flush shadow stage 2
+This is posted as RFC to get a feedback on proposed split, but RDMA, VFIO and
+DMA patches are ready for review and inclusion, the NVMe patches are still in
+progress as they require agreement on API first.
 
-$ git describe --contains 178a6915434c --match=v\*
-fatal: cannot describe '178a6915434c141edefd116b8da3d55555ea3e63'
+Thanks
 
-This commit simply doesn't exist upstream. It only lives in a
-now deprecated branch that will never be merged.
+-------------------------------------------------------------------------------
+The DMA mapping operation performs two steps at one same time: allocates
+IOVA space and actually maps DMA pages to that space. This one shot
+operation works perfectly for non-complex scenarios, where callers use
+that DMA API in control path when they setup hardware.
 
-> page tables")', when ever there is unmap of pages that
-> are mapped to L1, they are invalidated from both L1 S2-MMU and from
-> all the active shadow/L2 S2-MMU tables. Since there is no mapping
-> to invalidate the IPAs of Shadow S2 to a page, there is a complete
-> S2-MMU page table walk and invalidation is done covering complete
-> address space allocated to a L2. This has performance impacts and
-> even soft lockup for NV(L1 and L2) boots with higher number of
-> CPUs and large Memory.
-> 
-> Adding a lookup table of mapping of Shadow IPA to Canonical IPA
-> whenever a page is mapped to any of the L2. While any page is
-> unmaped, this lookup is helpful to unmap only if it is mapped in
-> any of the shadow S2-MMU tables. Hence avoids unnecessary long
-> iterations of S2-MMU table walk-through and invalidation for the
-> complete address space.
+However in more complex scenarios, when DMA mapping is needed in data
+path and especially when some sort of specific datatype is involved,
+such one shot approach has its drawbacks.
 
-All of this falls in the "premature optimisation" bucket. Why should
-we bother with any of this when not even 'AT S1' works correctly,
-making it trivial to prevent a guest from making forward progress? You
-also show no numbers that would hint at a measurable improvement under
-any particular workload.
+That approach pushes developers to introduce new DMA APIs for specific
+datatype. For example existing scatter-gather mapping functions, or
+latest Chuck's RFC series to add biovec related DMA mapping [1] and
+probably struct folio will need it too.
 
-I am genuinely puzzled that you are wasting valuable engineering time
-on *this*.
+These advanced DMA mapping APIs are needed to calculate IOVA size to
+allocate it as one chunk and some sort of offset calculations to know
+which part of IOVA to map.
 
->
-> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |   5 ++
->  arch/arm64/include/asm/kvm_host.h    |  14 ++++
->  arch/arm64/include/asm/kvm_nested.h  |   4 +
->  arch/arm64/kvm/mmu.c                 |  19 ++++-
->  arch/arm64/kvm/nested.c              | 113 +++++++++++++++++++++++++++
->  5 files changed, 152 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 5173f8cf2904..f503b2eaedc4 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -656,4 +656,9 @@ static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hw_mmu->nested_stage2_enabled);
->  }
->  
-> +static inline bool kvm_is_l1_using_shadow_s2(struct kvm_vcpu *vcpu)
-> +{
-> +	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu);
-> +}
+Instead of teaching DMA to know these specific datatypes, let's separate
+existing DMA mapping routine to two steps and give an option to advanced
+callers (subsystems) perform all calculations internally in advance and
+map pages later when it is needed.
 
-Isn't that the very definition of "!in_hyp_ctxt()"? You are abusing
-the hw_mmu pointer to derive something, but the source of truth is the
-translation regime, as defined by HCR_EL2.{E2H,TGE} and PSTATE.M.
+In this series, three users are converted and each of such conversion
+presents different positive gain:
+1. RDMA simplifies and speeds up its pagefault handling for
+   on-demand-paging (ODP) mode.
+2. VFIO PCI live migration code saves huge chunk of memory.
+3. NVMe PCI avoids intermediate SG table manipulation and operates
+   directly on BIOs.
 
-> +
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8da3c9a81ae3..f61c674c300a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -144,6 +144,13 @@ struct kvm_vmid {
->  	atomic64_t id;
->  };
->  
-> +struct mapipa_node {
-> +	struct rb_node node;
-> +	phys_addr_t ipa;
-> +	phys_addr_t shadow_ipa;
-> +	long size;
-> +};
-> +
->  struct kvm_s2_mmu {
->  	struct kvm_vmid vmid;
->  
-> @@ -216,6 +223,13 @@ struct kvm_s2_mmu {
->  	 * >0: Somebody is actively using this.
->  	 */
->  	atomic_t refcnt;
-> +
-> +	/*
-> +	 * For a Canonical IPA to Shadow IPA mapping.
-> +	 */
-> +	struct rb_root nested_mapipa_root;
+Thanks
 
-Why isn't this a maple tree? If there is no overlap between mappings
-(and it really shouldn't be any), why should we use a bare-bone rb-tree?
+[1] https://lore.kernel.org/all/169772852492.5232.17148564580779995849.stgit@klimt.1015granger.net
 
-> +	rwlock_t mmu_lock;
+Chaitanya Kulkarni (2):
+  block: add dma_link_range() based API
+  nvme-pci: use blk_rq_dma_map() for NVMe SGL
 
-Hell no. We have plenty of locking already, and there is no reason why
-this should gain its own locking. I can't see a case where you would
-take this lock outside of holding the *real* mmu_lock -- extra bonus
-point for the ill-chosen name.
+Leon Romanovsky (14):
+  mm/hmm: let users to tag specific PFNs
+  dma-mapping: provide an interface to allocate IOVA
+  dma-mapping: provide callbacks to link/unlink pages to specific IOVA
+  iommu/dma: Provide an interface to allow preallocate IOVA
+  iommu/dma: Prepare map/unmap page functions to receive IOVA
+  iommu/dma: Implement link/unlink page callbacks
+  RDMA/umem: Preallocate and cache IOVA for UMEM ODP
+  RDMA/umem: Store ODP access mask information in PFN
+  RDMA/core: Separate DMA mapping to caching IOVA and page linkage
+  RDMA/umem: Prevent UMEM ODP creation with SWIOTLB
+  vfio/mlx5: Explicitly use number of pages instead of allocated length
+  vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+  vfio/mlx5: Explicitly store page list
+  vfio/mlx5: Convert vfio to use DMA link API
 
-> +
->  };
->  
->  static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index da7ebd2f6e24..c31a59a1fdc6 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -65,6 +65,9 @@ extern void kvm_init_nested(struct kvm *kvm);
->  extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
->  extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
->  extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
-> +extern void add_shadow_ipa_map_node(
-> +		struct kvm_s2_mmu *mmu,
-> +		phys_addr_t ipa, phys_addr_t shadow_ipa, long size);
->  
->  union tlbi_info;
->  
-> @@ -123,6 +126,7 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
->  extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
->  extern void kvm_nested_s2_wp(struct kvm *kvm);
->  extern void kvm_nested_s2_unmap(struct kvm *kvm);
-> +extern void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range);
->  extern void kvm_nested_s2_flush(struct kvm *kvm);
->  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 61bdd8798f83..3948681426a0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1695,6 +1695,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  					     memcache,
->  					     KVM_PGTABLE_WALK_HANDLE_FAULT |
->  					     KVM_PGTABLE_WALK_SHARED);
-> +		if ((nested || kvm_is_l1_using_shadow_s2(vcpu)) && !ret) {
-
-I don't understand this condition. If nested is non-NULL, it's because
-we're using a shadow S2. So why the additional condition?
-
-> +			struct kvm_s2_mmu *shadow_s2_mmu;
-> +
-> +			ipa &= ~(vma_pagesize - 1);
-> +			shadow_s2_mmu = lookup_s2_mmu(vcpu);
-> +			add_shadow_ipa_map_node(shadow_s2_mmu, ipa, fault_ipa, vma_pagesize);
-> +		}
->  	}
->  
->  	/* Mark the page dirty only if the fault is handled successfully */
-> @@ -1918,7 +1925,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->  			     (range->end - range->start) << PAGE_SHIFT,
->  			     range->may_block);
->  
-> -	kvm_nested_s2_unmap(kvm);
-> +	kvm_nested_s2_unmap_range(kvm, range);
->  	return false;
->  }
->  
-> @@ -1953,7 +1960,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->  			       PAGE_SIZE, __pfn_to_phys(pfn),
->  			       KVM_PGTABLE_PROT_R, NULL, 0);
->  
-> -	kvm_nested_s2_unmap(kvm);
-> +	kvm_nested_s2_unmap_range(kvm, range);
->  	return false;
->  }
->  
-> @@ -2223,12 +2230,18 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
->  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
->  				   struct kvm_memory_slot *slot)
->  {
-> +	struct kvm_gfn_range range;
-> +
->  	gpa_t gpa = slot->base_gfn << PAGE_SHIFT;
->  	phys_addr_t size = slot->npages << PAGE_SHIFT;
->  
-> +	range.start = gpa;
-> +	range.end = gpa + size;
-> +	range.may_block = true;
-> +
->  	write_lock(&kvm->mmu_lock);
->  	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-> -	kvm_nested_s2_unmap(kvm);
-> +	kvm_nested_s2_unmap_range(kvm, &range);
->  	write_unlock(&kvm->mmu_lock);
->  }
->  
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index f88d9213c6b3..888ec9fba4a0 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -565,6 +565,88 @@ void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
->  	write_unlock(&kvm->mmu_lock);
->  }
->  
-> +/*
-> + * Create a node and add to lookup table, when a page is mapped to
-> + * Canonical IPA and also mapped to Shadow IPA.
-> + */
-> +void add_shadow_ipa_map_node(struct kvm_s2_mmu *mmu,
-> +			phys_addr_t ipa,
-> +			phys_addr_t shadow_ipa, long size)
-> +{
-> +	struct rb_root *ipa_root = &(mmu->nested_mapipa_root);
-> +	struct rb_node **node = &(ipa_root->rb_node), *parent = NULL;
-> +	struct mapipa_node *new;
-> +
-> +	new = kzalloc(sizeof(struct mapipa_node), GFP_KERNEL);
-> +	if (!new)
-> +		return;
-> +
-> +	new->shadow_ipa = shadow_ipa;
-> +	new->ipa = ipa;
-> +	new->size = size;
-> +
-> +	write_lock(&mmu->mmu_lock);
-> +
-> +	while (*node) {
-> +		struct mapipa_node *tmp;
-> +
-> +		tmp = container_of(*node, struct mapipa_node, node);
-> +		parent = *node;
-> +		if (new->ipa < tmp->ipa) {
-> +			node = &(*node)->rb_left;
-> +		} else if (new->ipa > tmp->ipa) {
-> +			node = &(*node)->rb_right;
-> +		} else {
-> +			write_unlock(&mmu->mmu_lock);
-> +			kfree(new);
-> +			return;
-> +		}
-> +	}
-> +
-> +	rb_link_node(&new->node, parent, node);
-> +	rb_insert_color(&new->node, ipa_root);
-> +	write_unlock(&mmu->mmu_lock);
-
-All this should be removed in favour of simply using a maple tree.
-
-> +}
-> +
-> +/*
-> + * Iterate over the lookup table of Canonical IPA to Shadow IPA.
-> + * Return Shadow IPA, if the page mapped to Canonical IPA is
-> + * also mapped to a Shadow IPA.
-> + *
-> + */
-> +bool get_shadow_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa, phys_addr_t *shadow_ipa, long *size)
-
-static?
-
-> +{
-> +	struct rb_node *node;
-> +	struct mapipa_node *tmp = NULL;
-> +
-> +	read_lock(&mmu->mmu_lock);
-> +	node = mmu->nested_mapipa_root.rb_node;
-> +
-> +	while (node) {
-> +		tmp = container_of(node, struct mapipa_node, node);
-> +
-> +		if (tmp->ipa == ipa)
-
-What guarantees that the mapping you have for L1 has the same starting
-address as the one you have for L2? L1 could have a 2MB mapping and L2
-only 4kB *in the middle*.
-
-> +			break;
-> +		else if (ipa > tmp->ipa)
-> +			node = node->rb_right;
-> +		else
-> +			node = node->rb_left;
-> +	}
-> +
-> +	read_unlock(&mmu->mmu_lock);
-
-Why would you drop the lock here....
-
-> +
-> +	if (tmp && tmp->ipa == ipa) {
-> +		*shadow_ipa = tmp->shadow_ipa;
-> +		*size = tmp->size;
-> +		write_lock(&mmu->mmu_lock);
-
-... if taking it again here? What could have changed in between?
-
-> +		rb_erase(&tmp->node, &mmu->nested_mapipa_root);
-> +		write_unlock(&mmu->mmu_lock);
-> +		kfree(tmp);
-> +		return true;
-> +	}
-> +	return false;
-> +}
-
-So simply hitting in the reverse mapping structure *frees* it? Meaning
-that you cannot use it as a way to update a mapping?
-
-> +
->  /* Must be called with kvm->mmu_lock held */
->  struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
->  {
-> @@ -674,6 +756,7 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
->  	mmu->tlb_vttbr = 1;
->  	mmu->nested_stage2_enabled = false;
->  	atomic_set(&mmu->refcnt, 0);
-> +	mmu->nested_mapipa_root = RB_ROOT;
->  }
->  
->  void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> @@ -760,6 +843,36 @@ void kvm_nested_s2_unmap(struct kvm *kvm)
->  	}
->  }
->  
-> +void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range)
-> +{
-> +	int i;
-> +	long size;
-> +	bool ret;
-> +
-> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> +
-> +		if (kvm_s2_mmu_valid(mmu)) {
-> +			phys_addr_t shadow_ipa, start, end;
-> +
-> +			start = range->start << PAGE_SHIFT;
-> +			end = range->end << PAGE_SHIFT;
-> +
-> +			while (start < end) {
-> +				size = PAGE_SIZE;
-> +				/*
-> +				 * get the Shadow IPA if the page is mapped
-> +				 * to L1 and also mapped to any of active L2.
-> +				 */
-
-Why is L1 relevant here?
-
-> +				ret = get_shadow_ipa(mmu, start, &shadow_ipa, &size);
-> +				if (ret)
-> +					kvm_unmap_stage2_range(mmu, shadow_ipa, size);
-> +				start += size;
-> +			}
-> +		}
-> +	}
-> +}
-> +
->  /* expects kvm->mmu_lock to be held */
->  void kvm_nested_s2_flush(struct kvm *kvm)
->  {
-
-There are a bunch of worrying issues with this patch. But more
-importantly, this looks like a waste of effort until the core issues
-that NV still has are solved, and I will not consider anything of the
-sort until then.
-
-I get the ugly feeling that you are trying to make it look as if it
-was "production ready", which it won't be for another few years,
-specially if the few interested people (such as you) are ignoring the
-core issues in favour of marketing driven features ("make it fast").
-
-Thanks,
-
-	M.
+ Documentation/core-api/dma-attributes.rst |   7 +
+ block/blk-merge.c                         | 156 ++++++++++++++
+ drivers/infiniband/core/umem_odp.c        | 219 +++++++------------
+ drivers/infiniband/hw/mlx5/mlx5_ib.h      |   1 +
+ drivers/infiniband/hw/mlx5/odp.c          |  59 +++--
+ drivers/iommu/dma-iommu.c                 | 129 ++++++++---
+ drivers/nvme/host/pci.c                   | 220 +++++--------------
+ drivers/vfio/pci/mlx5/cmd.c               | 252 ++++++++++++----------
+ drivers/vfio/pci/mlx5/cmd.h               |  22 +-
+ drivers/vfio/pci/mlx5/main.c              | 136 +++++-------
+ include/linux/blk-mq.h                    |   9 +
+ include/linux/dma-map-ops.h               |  13 ++
+ include/linux/dma-mapping.h               |  39 ++++
+ include/linux/hmm.h                       |   3 +
+ include/rdma/ib_umem_odp.h                |  22 +-
+ include/rdma/ib_verbs.h                   |  54 +++++
+ kernel/dma/debug.h                        |   2 +
+ kernel/dma/direct.h                       |   7 +-
+ kernel/dma/mapping.c                      |  91 ++++++++
+ mm/hmm.c                                  |  34 +--
+ 20 files changed, 870 insertions(+), 605 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.44.0
 
--- 
-Without deviation from the norm, progress is not possible.
 
