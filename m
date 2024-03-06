@@ -1,115 +1,88 @@
-Return-Path: <kvm+bounces-11103-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18290872E46
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 06:20:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF3A1872E42
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 06:18:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2629A1C239ED
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 05:20:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F1011C234FD
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 05:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2CD1804E;
-	Wed,  6 Mar 2024 05:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E80619BBA;
+	Wed,  6 Mar 2024 05:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="auXr+KCm"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mkeB4cJn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2075.outbound.protection.outlook.com [40.107.244.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887BF33CA;
-	Wed,  6 Mar 2024 05:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B7314F7F;
+	Wed,  6 Mar 2024 05:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.75
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709702446; cv=fail; b=TDRlaQesq2V7wThKV+yjGx21rNIhlnrLFOCQjzhnT0fn9u/oRWWdgLNaEnuAO3X0pTgJUPMRkQKaO+gbvpR/tPBEgl+wQ3M3eToYYz9P9aMle1A18ENxZfOmL0hZTAIt7q3LC30jBtw8RG8okQKECaukgGAM8/gPhO/PlMnZv5M=
+	t=1709702294; cv=fail; b=h0o7cKYUYyhV2zIQUkwazAYe/3wi/3MV9QZZcx8gsWyB4C9GtWVNudErDJTKlhSywke3b59b19Y8H5TE9mjRqdoMlw0iPJGa+S7pL0tJckgdmd46a6dEbZAdhhYmqQBK13dNUjjZGan5TnOqn7srKqa+SbqBqcOIa2cAaJpeDcU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709702446; c=relaxed/simple;
-	bh=cDMoqob9KmuCwuvTFaK4+DJpjwOcR4RNVsgYy+7I/sw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=JnZ3YksAk9TFOWyrFKwJQzjPDkM/WH12tHHGzJoFbtMTQz1GtHcGWkIlAXXX3hMKw+4QPMvghakZwkiW7Pb8mx05f2UpTza0rvR1HlK7RDpNh1giHfW/EHSRoaXkTFKYAMh/UrLiaTda4ly2DjaesNaOnfIRNBEazbV4Zl6/tys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=auXr+KCm; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709702443; x=1741238443;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=cDMoqob9KmuCwuvTFaK4+DJpjwOcR4RNVsgYy+7I/sw=;
-  b=auXr+KCm5zrg9CbC3cW+fpOeBc4lHA4vLmLlJIpbQbHJCbRdOAmWeDLk
-   bKWRAG9qVjHYaqiJgJutRy6Jx0xD8p88TKqtm/LrAo/0M60eaenX4XPyW
-   POs5tZ/WJJQoKu95xbx9whh+aibcc5nRJLslHgQt1LHy6mJBBX6zpZThn
-   IKC0GJ8OKg8CjaKvYox/4SaqK5acTchD9t3gOJ2PrP4+uxSWsxop0Uk9T
-   kje25CNWlX0O9+Oe6JwQF+AgkGlGKKx2a5x6koRutvHM51N5gOY9fheNI
-   6xbTd+F7u0udKlk8wxkI4yXK0faDjx3dPVBC7jLjK8zjhtiPLJ+kqzm5L
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="8061892"
-X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="8061892"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 21:20:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="40626223"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Mar 2024 21:20:42 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 5 Mar 2024 21:20:41 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 5 Mar 2024 21:20:41 -0800
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 5 Mar 2024 21:20:41 -0800
+	s=arc-20240116; t=1709702294; c=relaxed/simple;
+	bh=W/uOKsgoQAq1sTUF5cjzknkcO8MGQ+zAayeLcckidHI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=F0PF8GT1ZUBbH/PdoO8lPZqpDbfoqTvt2gbOBoJd4M97G7rXmkAVMnZekqhfG5vh0hP3x+FsqfbtX4T4k7rBP1AEeOTu1IAeWqZo753LHYVVg1afLnZz8/DCnjsL3Em5cER7KsF6XxKQNhcRH5cShRDotbseC2vCSt0g0HtlyDs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mkeB4cJn; arc=fail smtp.client-ip=40.107.244.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NIDcODo7WXT8q0SBxft23/iWQLoZCtqoBhk2P497rvE8WDpwNbKPwDkqpqinJLUZniAS8mKdYHPXkmEaudaH9oozXdgqCpjyKNoqvH5UChAcvvk4BzxC+fruIfGAt3MUlhyeYUGALStTlIRinQxv4deF7M1vP4seI+zVRu4g+8jHyx052U1x8M/yX2eGflqUiH9XFhaqmVNuueMOs6+4Ff0wWdGoFj+ILzh/JFFZJxbB6ANuZ/iBdvpGASs45yh7N9GwbNtXjkF3Czk1xeunkuJNFasy9+yh9Lt2DdLMiPlOTlMQyxM5LOpDAjdCIdKvbMFFmE44YYZ9iNsbISmwjA==
+ b=OebJF4OZXTLQo33H80+H/3yT+fdJkHRl5HIHIUGKlqq0r+XS04OcYnB+vnthUzSW9NJmXoEwGjmXJsQ5juR+5E4XyQUzqN94Nx1Vb8JF5s/0H2eB/l6CmTJiz5zjsQ07pSg8V1cqjDua2IGDFKFB1oHJTlZGLMUwzPhYn2iZkJluEH5abHE0lb0vG2P8nIufAyF+75W2uP08u8dTg3LCQuTATKSP9vnaTeAnDeHE2CkY23Zo/zj9578BbR0HT7jo4mOggFqD6nc8kVjKC5dXMqIsZnGgaAvi1CPHYHljFfhpX/bBfQOyht6foRCHBz+zNojr9SuoxJz5fMhyX2LOng==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WmtmpG1/t8bg99N8TK2XQSd7CxQQ5qlLrjX/g6UxiWc=;
- b=WbbzjPqsy0ek/xPJWGdX0G2Q3FSuUIaPpQbn2RS8Yl8NM5cEyqNzhwEwFHfEcHAZ1GTgRnkQ35YBhGTgOcCij4JUDqwE5jCxIjE4quInvHoRQCLGzROJJT1pR3Zpr/VuKBZFCMtNRFbmrpW61dSH0KO7qY+xjp/DrIKaQNx54XNXzuuFZbivfdZOOKyKtIEhfDiLonDpe+xHUyaNvHnEereAIvrqV30+/2GO1xAgSOcznZFiS/la2gmH/2o66YNPgOhMy6digIm0ixAuPtG4XgJrFUxrcFTLXLEq45DCS2C7eeUbYjk4oYkPp1pB11zWV651MVjm1xxEPUNyg0ciVQ==
+ bh=wK7asREL232uYRoodnWt8C3oQj8t4vf4nmCdGPd+Tfw=;
+ b=Ps754+0W9J367ZvHwRWAUJxxdt6qS4r56AzFgL3XD9WZmyDnNBq+UZrHaX9MLCRJO3zO3/rUgyUnhc8SkPrZBiyjrYYJk9+X/vHJSBFEThaxFOxc8CQu9FT2W//HNz1pUUqqcYHR69lr4aSB1LBNc6igpniys8O6DAZDmClWRfTlFkiHnySQQB8XNkICyTAcUmHXWPTiBqEJLvLrK41Un7pCer3xrRLXqFaUhA1G8c8f/0TSTDxAI4eh6if0gLvL/Y8oew37yQ8QFSwUoqtAQpDHOt3P8fY1rwegst7Io+/wuqzl5zEdH+xlbvlmN6KSKr7tcybw58g4l4Rx3Vqscg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wK7asREL232uYRoodnWt8C3oQj8t4vf4nmCdGPd+Tfw=;
+ b=mkeB4cJne9nLgrqiLZtJ4+KV395GmqTCkX09kttAnyrxHL4QCnMZPw7SWv40jYBbInJHng1XMVGImne2ORrwEluQYhAxHWgrkYOSEHtPUwP9mZmfj7Xv8M4HmFElOcfZUOi9paph2gQfLkARfXcnrh6fG3SQDevqv1vL3GmhYc8=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- BL1PR11MB5256.namprd11.prod.outlook.com (2603:10b6:208:30a::10) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5712.namprd12.prod.outlook.com (2603:10b6:510:1e3::13)
+ by MN2PR12MB4062.namprd12.prod.outlook.com (2603:10b6:208:1d0::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
- 2024 05:20:39 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::55f1:8d0:2fa1:c7af]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::55f1:8d0:2fa1:c7af%5]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
- 05:20:39 +0000
-Date: Wed, 6 Mar 2024 12:50:47 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sagi Shahar <sagis@google.com>
-CC: <linux-kselftest@vger.kernel.org>, Ackerley Tng <ackerleytng@google.com>,
-	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>,
-	"Isaku Yamahata" <isaku.yamahata@intel.com>, Sean Christopherson
-	<seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, "Peter Gonda" <pgonda@google.com>, Haibo Xu
-	<haibo1.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Vishal
- Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>, Vipin
- Sharma <vipinsh@google.com>, <jmattson@google.com>, <dmatlack@google.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: Re: [RFC PATCH v5 21/29] KVM: selftests: TDX: Add TDG.VP.INFO test
-Message-ID: <Zef2J/ygG8KT5a02@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20231212204647.2170650-1-sagis@google.com>
- <20231212204647.2170650-22-sagis@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231212204647.2170650-22-sagis@google.com>
-X-ClientProxiedBy: SI1PR02CA0026.apcprd02.prod.outlook.com
- (2603:1096:4:1f4::11) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+ 2024 05:18:07 +0000
+Received: from PH7PR12MB5712.namprd12.prod.outlook.com
+ ([fe80::9dcb:30:4f52:82f5]) by PH7PR12MB5712.namprd12.prod.outlook.com
+ ([fe80::9dcb:30:4f52:82f5%5]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
+ 05:18:07 +0000
+Message-ID: <265a906f-6179-4ec4-b46d-491930b3d9ac@amd.com>
+Date: Wed, 6 Mar 2024 10:47:53 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86/svm/pmu: Set PerfMonV2 global control bits
+ correctly
+To: Sean Christopherson <seanjc@google.com>
+Cc: Like Xu <like.xu.linux@gmail.com>, Dapeng Mi
+ <dapeng1.mi@linux.intel.com>, pbonzini@redhat.com, mizhang@google.com,
+ jmattson@google.com, ravi.bangoria@amd.com, nikunj.dadhania@amd.com,
+ santosh.shukla@amd.com, manali.shukla@amd.com, babu.moger@amd.com,
+ kvm list <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240301075007.644152-1-sandipan.das@amd.com>
+ <06061a28-88c0-404b-98a6-83cc6cc8c796@gmail.com>
+ <cc8699be-3aae-42aa-9c70-f8b6a9728ee3@amd.com>
+ <f5bbe9ac-ca35-4c3e-8cd7-249839fbb8b8@linux.intel.com>
+ <ZeYlEGORqeTPLK2_@google.com>
+ <8a846ba5-d346-422e-817b-e00ab9701f19@gmail.com>
+ <ZedUwKWW7PNkvUH1@google.com>
+Content-Language: en-US
+From: Sandipan Das <sandipan.das@amd.com>
+In-Reply-To: <ZedUwKWW7PNkvUH1@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN3PR01CA0139.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:bf::9) To PH7PR12MB5712.namprd12.prod.outlook.com
+ (2603:10b6:510:1e3::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -117,174 +90,196 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|BL1PR11MB5256:EE_
-X-MS-Office365-Filtering-Correlation-Id: e26b55e5-15e2-4672-3835-08dc3d9d2936
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5712:EE_|MN2PR12MB4062:EE_
+X-MS-Office365-Filtering-Correlation-Id: c6dc0dfd-f817-42f4-5d09-08dc3d9cce4f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 33WjOPrR1aErE6j1+QQIRgqZG8GeU6KTppYOmPUphGTgm9w07ew5glZAqkvVTLzDJaNz130fxWuCOpMeQvNdgQrFCIvH+zu0+6wTGAJnkWNuHzXmIJxO1Eq0DwYvdGwUc2g64kxCqaBRU7NOFjNei7aXUiOX7MoGieGR6KF8z2QoN/uMnChOQlS5xug1kybp911lYgLPMUyTdiZKeFahmtAFw2jWJQblhiniXRZW7AhHWMvBdmDwx98EnEjs0VjT5nFpHspng9J4BTVfK7GS7ndMt70PBSmChmjBhO6NoZ0PXCDEB+t+ZJ3G4rRfL9VsGL6UnFLqlMhYm5+BE0sLyIT9huqqw/9O1Qh0Rrgd6WmY5YP0rycJyUAEdrMpqg37FjH9rmoAaPS+Kdl9kyj0KeB3QmOzbvoqkijtFQ2YXqFCi8SwB0++5KvJ0BG1FHGV8nQ7oC7mzXwZZLs2ljp6AYDl4fbLKDyqYMqhVwsZjvSfDnU8RnAP3jwublPqEJzr6aXhLHDfLYv1a1qdx7bEZS9/WnGCQQAayt8weWoY5C38Z4TEwFF2vfomoD3HkGMspR38DGG1xEe7SjA6FdBvdQyIEvwu9NVBu7SrbLk1VtY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info:
+	5kMnHdo8kh1mcOYtWiflF/GyGA1ZC87IYY6nG69JfgBzmaJIPADYAJXB8I9FwRBpzcWjN/F7c7NL1ip75y7IdAMV741cEuluvXY/So4K2jJdIhiHaG+IouXcjGMnnKKr/XtQWt3FI60r0sivPWP5GDUonkuDZacLnulLXXqnU719XQphx2xh8YEJEgitPgjVVMeK8YTZ4Z9Cun9Jxre1PWHtbCVx4OkxMcqKN2qz64seHgIy37LtynGgTu92cvLHHIlESOVNeBpozJLesA0615dL5N6Sd075/V8u88748l/PMIrUs3LOmT4KC1v1A0t3Ob3ZD1eHn+Deg9IR5yn71exm3hMr42ikmmumMulj/x38MvssXOTS6nwoXCZytaZmatLXHJQCkw22R0PmEJFJnW1EqDKxYNSdnrP7XKxNiZZX7GW2FCX9DiPOQjPTlU7ve63Iiztel08d0MRpTwcCvcdj3zIP4CItBQQGimH3Cc7TWuVnpHD+zCi2DIB9tnQrxjbTewp9G6m2V/CFAAqOwH8f4YnxEVxr2+iacR++aUl+IF9UfRB/uBhS09BMfzwLw/3AlIP7mxtU1G8x68Hxud7yKiNpiHCLQS6GeFkM63En/4ygG6A7kCJvWq8U2nq/XHLziORV4VrOz2sdulUuEpDq+eVIyKZeAkKvgos6J+k=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5712.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6TyOfnXD5udL0qVOpcuFKOKSgXZljr8im+ZwTZ9U5EbgwB7GpCwdDyc+n3da?=
- =?us-ascii?Q?nLe2QTlmvJ47y28qwc8D4Ye7LRDBhhvKqPsigHHsorrMZnfYVXolyQSg6zMO?=
- =?us-ascii?Q?5BcVF4jjj6mXZlTo48azSKSu4BNj1Ers+u5aRDShgAKFsAzoRoolSpneSiSF?=
- =?us-ascii?Q?g60ZTxzOHld3/JdqzRePgbgjmdQQROITnQxb4GI/ijck/20iugXpzfTUVEsG?=
- =?us-ascii?Q?m8okNIUQ1W52HUKUaqC1ObdCwk1BtFYLljVKpR6cLpuY95SRn6wHFcV06dY+?=
- =?us-ascii?Q?l3dgZY/BgHMDVckSIp46fjXGHMo2qTxS/aNFkEqCc79dCw6SP62W83W+hLzd?=
- =?us-ascii?Q?Z9JvgJ1TjIUBdjUKma1gVzhx5okcoJp24rzZw4Ko0lDUYfC9zHBJAkXZWkp0?=
- =?us-ascii?Q?lo71we9g82geyozuCK6KLvhNskASXY7csWAhVvMcFZux0M20ZWLySN98Vm5k?=
- =?us-ascii?Q?MWGD/h2TcC/pvng84w27DrDZXOF+SvgNPE+uTqLgE8sh8C5g/bYJrhaXjwCM?=
- =?us-ascii?Q?87xu9lpN1wabM4VB7paGka5orEYU7A3seKfJIrSv+KR92ZUiTIjnpnxJJhTA?=
- =?us-ascii?Q?uYKWTHyp5BwqITbG2yXt8jPhNVMXS+3+c42RKsBNemSUBIgNujYkCHpnayFB?=
- =?us-ascii?Q?424U4hU3JVY6f/cwiEeqN6SeJsbL3oWohS4qmlzMB+a9SjCZVcSULA57Ro1y?=
- =?us-ascii?Q?r1JhQzHCO695qQq0R35Uw9dYH7WXLlKkIECce48okUQuU3DVshLOskLbVFGq?=
- =?us-ascii?Q?DHydLDq0BAA5g4RFPKP+imgMDdzhEYZlwRNlfwojENWb7disW8uXS/LnDSpU?=
- =?us-ascii?Q?FIdLKd9Q1kMkXPyPDhX6xC0mA4vIvEhOd7mf7Pxsm545EC0APZLURdFfr//5?=
- =?us-ascii?Q?9PdvOon4K2dAQlV+guK/HvoniUwy3uqaeGxGHTc6dHRYGQnKU4hxgMjjUj+G?=
- =?us-ascii?Q?6Y9aPRjO975Px2Mpkv8Z4E0X3NdGJqcoFAaaU0Z12ya+uIUoxobefzL8U5At?=
- =?us-ascii?Q?SUlu4RC7mQPQRTHleWo2wfw2av63llyaK1y/oJxrxaiQZNRSNK8xlvYa2WdZ?=
- =?us-ascii?Q?qurJ4+KHHOjCTsfn0BlFzMr2d1ZP7Zg+D56rqgefH++q7WFGMBx0caCQTV6q?=
- =?us-ascii?Q?vM2HJFImhBZjKUdej185ciUzkLVe+hTy06EyfeENy8XgJzhriZ6zvP3vEWCR?=
- =?us-ascii?Q?MFb8TpYDViBb/1A/QQCaaWvYJCTRjUWqz2tQFFGOnygkWA7rZ+nWL/zUEHCd?=
- =?us-ascii?Q?Dq8WKellczRVgNaDNml4Hdi9H5Q3z5crkkNsLu2O+YxFabATXzbmNJ24RDCh?=
- =?us-ascii?Q?f81syTaNxXzm0MNDAvmZTodzxETj9ZXwgtVvIQ6kL6K3GMlm1U4OULkFUagd?=
- =?us-ascii?Q?nn4NwQRn9g/OmnWu0IJshBO4PINQVfILKOdunXlLj+XybGltIN3pLdMGXyb9?=
- =?us-ascii?Q?r64RmdhHfpDEyWejgT+ohj6QrqCKuWUbUKSuDvCRoiESGPEeXv4Ks9dMWyyN?=
- =?us-ascii?Q?6frLOqmL/BPEXW170vYtYnAifgPOIQAYrVTmxSAiTeb5O/AJK6idgGRVpDLp?=
- =?us-ascii?Q?f1e7bms/QE7WFqDg7b6C1Ibk9OQgwj/8YTGCoIz0?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e26b55e5-15e2-4672-3835-08dc3d9d2936
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cDVENUg4MVZYT3JRcVRodkNMV3JjZE9FcFM1MFEvS3V4UjkxMVI4OWJqVWx6?=
+ =?utf-8?B?UlVkNE5UYjZOWlBiMTJBUGhyODFvdlJzNjV5ZWsvUE5VQTJWZGp4ODhEL0F1?=
+ =?utf-8?B?M3pzQU43M2FJcnRkYVQ0WGV5bDQzNVdib1dlUUFIQmJqbzNJOVRpd3BHbTV4?=
+ =?utf-8?B?cGNGSytTemgwUFhGWEF5N3Z1TXRZVE02eGxVdWpGMGpmQkIxTm83OCtYYkFj?=
+ =?utf-8?B?M2tDWVdNRG8yMXcvVG9XQmpvTmdZN3NBdzlGREtNUFdlS1Y3dzQvZVIrODhE?=
+ =?utf-8?B?elpXQ1ZYRXkyaG84OHJlQU41TjdSVlZ4bS9XbFN3eGQrZDQ4R1lzdHFRWStI?=
+ =?utf-8?B?K1VXRnM4WjI3UzVPYTU2bWhFbnlJYXl1cStlM1drZWw4K3FMQ0JKa005VWlJ?=
+ =?utf-8?B?dUQvaXlRV2VOVzY5eE1wekZjSHRXelIweDZDWmYvV3Nmd2RyL25oQm1sRVUv?=
+ =?utf-8?B?elpKVVpOV3kzL1BSbzJ6aXM4WUVwYkdTcWNRWUI4QTk0SExid2NRWG1JMlNM?=
+ =?utf-8?B?ZHJuazhrLzRSQVZQNXY5SHEwWlF3cVZJZHFIT0hRaGY5YVV3NlNHc2RBb21K?=
+ =?utf-8?B?Y3d4dVNzVUJCT3o4Y3BGVlA3WGRtamw5dVZicCticWM3d1F2TFZJVEk3TmEz?=
+ =?utf-8?B?Qm1zQllMeVhPRVVVeDlJM3NDZHlmMlZDYTJoYWZoTTF0bnBsd1dVSjhFeVUy?=
+ =?utf-8?B?Z1REMmNjN2RGOFdnSjFnaWR3UmxuZ3hPWDEyRXh4Q1AxYURENVZTaXBEa2Q5?=
+ =?utf-8?B?N3dtRnd2L2laa1N2UlRhT3VsUm9QbG5DMTNSTFhtSm9nUzdnRGMxaUhQZHUy?=
+ =?utf-8?B?d0VNdE05L20ySUNSUXQ5b05KR1lqaTJCcFJFTWlQa0h3SlBoYy9BVDhWcSsz?=
+ =?utf-8?B?SFFka2FpWWlqZ2J4QVFjbmprM0N2NXBIK2N6eXRWcXhlbC9QRHR6RzFuUFFp?=
+ =?utf-8?B?dVhnWFNYRG9IVGFPZ3pwbld0bEc5cjRkeElveDZINWJpSUoxOVJLQXhNNDVq?=
+ =?utf-8?B?YW9hcXh1ZEk3cXAyMEdxT0RJU1pONzdyTHVyZXQ3REZCRi9Yd01BSm1KVWZl?=
+ =?utf-8?B?Q25ndHFEcEdTODdTT1d3d0RzcEtOek1ZWlh5QXREQW5PLy9Lcm9rUGp6OG85?=
+ =?utf-8?B?WjhZVzY1ZGpRVStGcmIxKzBzeDNDWkQrcXFWdWFlUXNsclVJaGVLMDNHSXJ6?=
+ =?utf-8?B?eDQzdy91OTRTbHZDQU5YOUNNNSt3cXVvRmdCeEZjZXh5MGVaVWJsWjk4bklp?=
+ =?utf-8?B?NkVybWdzbCsvcGhIU1FEN0dMbXlDaHJiZVpiZ0tOa0wyNXhNaHJJWUFSd0F6?=
+ =?utf-8?B?clIzNWpBZDNBZ0YvQXdpMWdBSFZpdE5hajI5djBlUjF5emV4REttTUV3a012?=
+ =?utf-8?B?QkZBUThYUjV1dHpySk5YemNsUFlHRUFWZFZGWWM0emlFWUNzN1EwbnUwejM1?=
+ =?utf-8?B?WFN2V2dGNzlSOHB2RVlxenNRZm4zY1M2VWhyaUhGcGc1azI4Y3EzbDhXb1cw?=
+ =?utf-8?B?aWhTVU4zSG51dVZCdTBoaWtvbGNPUTZyc21MNnUyZStJUDNpRmU1ZHJVMzVN?=
+ =?utf-8?B?c2JKZXRIdEF4ZS9pckVsc2tIU1E2TzEwWmttbjc5ZlhLRDVNVk9CZFA3YUwy?=
+ =?utf-8?B?Y29FS2dPM0wxa1hSZkpublJXUTZBejRuUE10aXhkTjdzdmxRVTgzRHFIOElk?=
+ =?utf-8?B?YWhjRUtkQ3BEalNqMEEzQTdNTldQUys2cTk2WENxQWwzaWJIN2NWeE93dXBY?=
+ =?utf-8?B?V2duZzZKSS83dkliSkFFY0xOdldST28zMURJeTlCbmdJVjFjc20rZmg0UmNi?=
+ =?utf-8?B?QTBlZkhQdzlvckE0V1NwaVFmOVNrQytGZFI5eE83d1l0ZzJqbzMvOXQxMlg1?=
+ =?utf-8?B?Ung1RzhSZzdiN3haL1AyT05GT3gvUDc4WHVsTzFQV0xhM2tkeEJScjQ1Yk04?=
+ =?utf-8?B?M0pZRVdNL2dlR1E1VFFFd1hxK3NwQXk5TFpBT05Cekd2Y1piMjF5NTF5bFR0?=
+ =?utf-8?B?alZtMlVnZnJ3dWkxblVINzhPeWVpWkMxK1BRNkRtQ0ZjWVprcHB5WmFLSGdh?=
+ =?utf-8?B?R3hHMTdBQUZSSHNjcmtZZ2tDK29uWE1OajBmbSt2cExWTUwzTzk3ejNvTEFZ?=
+ =?utf-8?Q?THYWHaHAEw29u9Av9f3Meijtl?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6dc0dfd-f817-42f4-5d09-08dc3d9cce4f
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5712.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 05:20:39.1456
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 05:18:06.9481
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Hwf2LKoJSSDuxylax/a57PhLqAu02Cqm5kE7NcSN/8RMjXTTddgSQpw4d1qym+LbJTSx1WY0AzMto+efr6AUEw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5256
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: KcP6BYUFcEN7iBtNg5L6ZNUlgz+C8Q2a3IqDRyVfg1bgU/HWPuUNzmMo+oe0A2wn7nM4JDmF9vn9U/YJEc1rfA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4062
 
-> +/*
-> + * TDG.VP.INFO call from the guest. Verify the right values are returned
-> + */
-> +void verify_tdcall_vp_info(void)
-> +{
-> +	const int num_vcpus = 2;
-> +	struct kvm_vcpu *vcpus[num_vcpus];
-> +	struct kvm_vm *vm;
-> +
-> +	uint64_t rcx, rdx, r8, r9, r10, r11;
-> +	uint32_t ret_num_vcpus, ret_max_vcpus;
-> +	uint64_t attributes;
-> +	uint32_t i;
-> +	const struct kvm_cpuid_entry2 *cpuid_entry;
-> +	int max_pa = -1;
-> +
-> +	vm = td_create();
-> +
-> +#define TDX_TDPARAM_ATTR_SEPT_VE_DISABLE_BIT	(1UL << 28)
-> +#define TDX_TDPARAM_ATTR_PKS_BIT		(1UL << 30)
-> +	/* Setting attributes parameter used by TDH.MNG.INIT to 0x50000000 */
-> +	attributes = TDX_TDPARAM_ATTR_SEPT_VE_DISABLE_BIT |
-> +		     TDX_TDPARAM_ATTR_PKS_BIT;
-> +
-> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, attributes);
-> +
-> +	for (i = 0; i < num_vcpus; i++)
-> +		vcpus[i] = td_vcpu_add(vm, i, guest_tdcall_vp_info);
-> +
-> +	td_finalize(vm);
-> +
-> +	printf("Verifying TDG.VP.INFO call:\n");
-> +
-> +	/* Get KVM CPUIDs for reference */
-> +	cpuid_entry = get_cpuid_entry(kvm_get_supported_cpuid(), 0x80000008, 0);
-> +	TEST_ASSERT(cpuid_entry, "CPUID entry missing\n");
-> +	max_pa = cpuid_entry->eax & 0xff;
-> +
-> +	for (i = 0; i < num_vcpus; i++) {
-> +		struct kvm_vcpu *vcpu = vcpus[i];
-> +
-> +		/* Wait for guest to report rcx value */
-> +		td_vcpu_run(vcpu);
-> +		TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> +		rcx = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +		/* Wait for guest to report rdx value */
-> +		td_vcpu_run(vcpu);
-> +		TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> +		rdx = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +		/* Wait for guest to report r8 value */
-> +		td_vcpu_run(vcpu);
-> +		TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> +		r8 = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +		/* Wait for guest to report r9 value */
-> +		td_vcpu_run(vcpu);
-> +		TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> +		r9 = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +		/* Wait for guest to report r10 value */
-> +		td_vcpu_run(vcpu);
-> +		TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> +		r10 = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +		/* Wait for guest to report r11 value */
-> +		td_vcpu_run(vcpu);
-> +		TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> +		r11 = tdx_test_read_64bit_report_from_guest(vcpu);
-> +
-> +		ret_num_vcpus = r8 & 0xFFFFFFFF;
-> +		ret_max_vcpus = (r8 >> 32) & 0xFFFFFFFF;
-> +
-> +		/* first bits 5:0 of rcx represent the GPAW */
-> +		TEST_ASSERT_EQ(rcx & 0x3F, max_pa);
-> +		/* next 63:6 bits of rcx is reserved and must be 0 */
-> +		TEST_ASSERT_EQ(rcx >> 6, 0);
-> +		TEST_ASSERT_EQ(rdx, attributes);
-> +		TEST_ASSERT_EQ(ret_num_vcpus, num_vcpus);
-> +		TEST_ASSERT_EQ(ret_max_vcpus, 512);
-
-Better to assert of kvm_check_cap(KVM_CAP_MAX_VCPUS) here .
-
-> +		/* VCPU_INDEX = i */
-> +		TEST_ASSERT_EQ(r9, i);
-> +		/*
-> +		 * verify reserved bits are 0
-> +		 * r10 bit 0 (SYS_RD) indicates that the TDG.SYS.RD/RDM/RDALL
-> +		 * functions are available and can be either 0 or 1.
-> +		 */
-> +		TEST_ASSERT_EQ(r10 & ~1, 0);
-> +		TEST_ASSERT_EQ(r11, 0);
-> +
-> +		/* Wait for guest to complete execution */
-> +		td_vcpu_run(vcpu);
-> +
-> +		TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-> +		TDX_TEST_ASSERT_SUCCESS(vcpu);
-> +
-> +		printf("\t ... Guest completed run on VCPU=%u\n", i);
-> +	}
-> +
-> +	kvm_vm_free(vm);
-> +	printf("\t ... PASSED\n");
-> +}
-> +
->  int main(int argc, char **argv)
+On 3/5/2024 10:52 PM, Sean Christopherson wrote:
+> On Tue, Mar 05, 2024, Like Xu wrote:
+>> On 5/3/2024 3:46 am, Sean Christopherson wrote:
+>>>>>>> ---
+>>>>>>>     arch/x86/kvm/svm/pmu.c | 1 +
+>>>>>>>     1 file changed, 1 insertion(+)
+>>>>>>>
+>>>>>>> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+>>>>>>> index b6a7ad4d6914..14709c564d6a 100644
+>>>>>>> --- a/arch/x86/kvm/svm/pmu.c
+>>>>>>> +++ b/arch/x86/kvm/svm/pmu.c
+>>>>>>> @@ -205,6 +205,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
+>>>>>>>         if (pmu->version > 1) {
+>>>>>>>             pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
+>>>>>>>             pmu->global_status_mask = pmu->global_ctrl_mask;
+>>>>>>> +        pmu->global_ctrl = ~pmu->global_ctrl_mask;
+>>>>
+>>>> It seems to be more easily understand to calculate global_ctrl firstly and
+>>>> then derive the globol_ctrl_mask (negative logic).
+>>>
+>>> Hrm, I'm torn.  On one hand, awful name aside (global_ctrl_mask should really be
+>>> something like global_ctrl_rsvd_bits), the computation of the reserved bits should
+>>> come from the capabilities of the PMU, not from the RESET value.
+>>>
+>>> On the other hand, setting _all_ non-reserved bits will likely do the wrong thing
+>>> if AMD ever adds bits in PerfCntGlobalCtl that aren't tied to general purpose
+>>> counters.  But, that's a future theoretical problem, so I'm inclined to vote for
+>>> Sandipan's approach.
+>>
+>> I suspect that Intel hardware also has this behaviour [*] although guest
+>> kernels using Intel pmu version 1 are pretty much non-existent.
+>>
+>> [*] Table 10-1. IA-32 and Intel® 64 Processor States Following Power-up,
+>> Reset, or INIT (Contd.)
+> 
+> Aha!  Nice.  To save people lookups, the table says:
+> 
+>   IA32_PERF_GLOBAL_CTRL:  Sets bits n-1:0 and clears the upper bits.
+> 
+> and 
+> 
+>   Where "n" is the number of general-purpose counters available in the processor.
+> 
+> Which means that (a) KVM can handle this in common code and (b) we can dodge the
+> whole reserved bits chicken-and-egg problem since global_ctrl *can't* be derived
+> from global_ctrl_mask.
+> 
+> This?  (compile tested only)
+> 
+> ---
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Tue, 5 Mar 2024 09:02:26 -0800
+> Subject: [PATCH] KVM: x86/pmu: Set enable bits for GP counters in
+>  PERF_GLOBAL_CTRL at "RESET"
+> 
+> Set the enable bits for general purpose counters in IA32_PERF_GLOBAL_CTRL
+> when refreshing the PMU to emulate the MSR's architecturally defined
+> post-RESET behavior.  Per Intel's SDM:
+> 
+>   IA32_PERF_GLOBAL_CTRL:  Sets bits n-1:0 and clears the upper bits.
+> 
+> and
+> 
+>   Where "n" is the number of general-purpose counters available in the processor.
+> 
+> This is a long-standing bug that was recently exposed when KVM added
+> supported for AMD's PerfMonV2, i.e. when KVM started exposing a vPMU with
+> PERF_GLOBAL_CTRL to guest software that only knew how to program v1 PMUs
+> (that don't support PERF_GLOBAL_CTRL).  Failure to emulate the post-RESET
+> behavior results in such guests unknowingly leaving all general purpose
+> counters globally disabled (the entire reason the post-RESET value sets
+> the GP counter enable bits is to maintain backwards compatibility).
+> 
+> The bug has likely gone unnoticed because PERF_GLOBAL_CTRL has been
+> supported on Intel CPUs for as long as KVM has existed, i.e. hardly anyone
+> is running guest software that isn't aware of PERF_GLOBAL_CTRL on Intel
+> PMUs.
+> 
+> Note, kvm_pmu_refresh() can be invoked multiple times, i.e. it's not a
+> "pure" RESET flow.  But it can only be called prior to the first KVM_RUN,
+> i.e. the guest will only ever observe the final value.
+> 
+> Reported-by: Reported-by: Babu Moger <babu.moger@amd.com>
+> Cc: Like Xu <like.xu.linux@gmail.com>
+> Cc: Mingwei Zhang <mizhang@google.com>
+> Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Cc: Sandipan Das <sandipan.das@amd.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/pmu.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 87cc6c8809ad..f61ce26aeb90 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -741,6 +741,8 @@ static void kvm_pmu_reset(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
 >  {
->  	setbuf(stdout, NULL);
-> @@ -1169,6 +1313,7 @@ int main(int argc, char **argv)
->  	run_in_new_process(&verify_mmio_writes);
->  	run_in_new_process(&verify_td_cpuid_tdcall);
->  	run_in_new_process(&verify_host_reading_private_mem);
-> +	run_in_new_process(&verify_tdcall_vp_info);
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +
+>  	if (KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm))
+>  		return;
 >  
->  	return 0;
+> @@ -750,8 +752,18 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+>  	 */
+>  	kvm_pmu_reset(vcpu);
+>  
+> -	bitmap_zero(vcpu_to_pmu(vcpu)->all_valid_pmc_idx, X86_PMC_IDX_MAX);
+> +	bitmap_zero(pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
+>  	static_call(kvm_x86_pmu_refresh)(vcpu);
+> +
+> +	/*
+> +	 * At RESET, both Intel and AMD CPUs set all enable bits for general
+> +	 * purpose counters in IA32_PERF_GLOBAL_CTRL (so that software that
+> +	 * was written for v1 PMUs don't unknowingly leave GP counters disabled
+> +	 * in the global controls).  Emulate that behavior when refreshing the
+> +	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
+> +	 */
+> +	if (kvm_pmu_has_perf_global_ctrl(pmu))
+> +		pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
 >  }
-> -- 
-> 2.43.0.472.g3155946c3a-goog
+>  
+>  void kvm_pmu_init(struct kvm_vcpu *vcpu)
 > 
-> 
+> base-commit: 1d7ae977d219e68698fdb9bed1049dc561038aa1
+
+Thanks. This looks good.
+
+Tested-by: Sandipan Das <sandipan.das@amd.com>
+
 
