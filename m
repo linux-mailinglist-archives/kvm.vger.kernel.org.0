@@ -1,150 +1,138 @@
-Return-Path: <kvm+bounces-11146-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11148-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF7F9873987
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 15:44:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0E49873997
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 15:45:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9048C1F22027
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 14:44:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0A6AB23BA5
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 14:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4296134738;
-	Wed,  6 Mar 2024 14:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1381339B1;
+	Wed,  6 Mar 2024 14:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fO4eZYii"
 X-Original-To: kvm@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC6712FB31;
-	Wed,  6 Mar 2024 14:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CB480605
+	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 14:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709736268; cv=none; b=LopTb/fKh34Npc6RH+aVljXKQu9LKnQxIKOKMWoJbAU09CeBdkWJC7Q8EE3Ah8ZNrZ0zg8v7blR49lzR0EeNi9IZz0vIFniPstE1OEOiqcpBaS1oSrTOE1c7DWdjdbES98Ql6S8yqpFs8/ldkd50uJR7LWElMOXdb1KXA5EKAAQ=
+	t=1709736336; cv=none; b=SsMxSuZ4oYDXaRdt0tRLD/nlUzUExSEnet5Joy4NSt9IvvaEc/AlIrTTdnT8jq689omtoB9udoYARmg96QKiKa2fnLOXf+CouxK9m84pWK8cbATJQ/P+B5bBt8/thON5ELEGrkAsbdzspNCRl4nII1Y0RBzuJURBIj6Fw8lywX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709736268; c=relaxed/simple;
-	bh=Cg+/N+/d48kp+Bii6xwPc6Sv3b/fJs9pKZfyKHqumHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ihvgbR0V/c/+G46kcT7Bcac8cuquZlRMadzCs1boqg+FblI1xFMXQnUOPOsjafPpPmu6fpSU/pgk80tmbucADUtbKT9gGPTp5fEwgKEw1CJaIz7PFpE6BXodGmpYwH5/ijMc+EDLE10issr+RjDPsHwhU8cfrbNF+/WouN1+KzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 6727E68C4E; Wed,  6 Mar 2024 15:44:17 +0100 (CET)
-Date: Wed, 6 Mar 2024 15:44:16 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@lst.de>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
- steps
-Message-ID: <20240306144416.GB19711@lst.de>
-References: <cover.1709635535.git.leon@kernel.org> <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com> <20240305122935.GB36868@unreal>
+	s=arc-20240116; t=1709736336; c=relaxed/simple;
+	bh=4qDDeM2GJDKd/s57z1lZPEZLMCakZLt6IBfNNHqraZo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uaxT5g+2Qxe67G3aABVNxyXnwA/Tt+REYFCRLocC8X6co1dBdiZT9q4E6Hy7Pii3O636zZwhfHiKyfLeY41dZhbNVZcKf0ComO98I1iShgAVmgG+wybW/N/T5gtrAmubtK2Bzfun/ssLpnF2xfUDfTKskBQJ5IEOCQ7PUadpROo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fO4eZYii; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-608dc99b401so118502367b3.0
+        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 06:45:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709736333; x=1710341133; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uXZjsUmARj2Dgx8DrIwjJBZxc3BuQgEpxgkrz4sv/pc=;
+        b=fO4eZYiiZbLb+jgFcDnOpzCS7LRKR0TVitfQpVWuX74/rmiylbXs5M3dpAyTJHjHlB
+         Oml5abGBKoVLTcZVtWgakc6aexABidmWoEaqHK+3i2VcUntamIv/uiF+mnT7rO5E8IDN
+         cGJUODWg/WP0Z0Z/wldHdQjrxO+ke+y4PkdDduPeUamkN+ZTqUgzXWZFQAKCv2it1T06
+         fbZQ+Jm3yjXidiu+7mWWaMACsu5BI5H0x3lfIRUO78PQmhYbuEzcCdngEiksXBq3yGX4
+         daUu7ueg0hND1CC/3kCfR0I1XujXM7z1Bk1fTYK94y1D8tihpCLPdwBK5gYu2iM5U8rk
+         mSRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709736333; x=1710341133;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uXZjsUmARj2Dgx8DrIwjJBZxc3BuQgEpxgkrz4sv/pc=;
+        b=ObSCOtEQJ97Yk0sPU2HVlHX6H9sj2PEOT+HLqNXBHvcdlBXXlzJIJa5nbbX0UcFm/N
+         n/L/pbNa+UI8RM7vS2yzLBCUCoY/qL6Llg5qMhN7L/BzH/rVTC/Hpb0H//R5AkBONdtJ
+         /BiS6Hnwl/8CLoA2jnreWFyzRnOw/wud492x3YxPVfLocTH/ytgtI9KGKAiBnBHopw7j
+         CTgQ8FX5YX+ZB1GzTpznWbhUzFUUE7MLkND1Vzb97ueM8JZFkl3/ifImmms2pICQYr4u
+         O4yX6xnJXlfDKpvEq/HY4i47+jDFWxfK5u80gL7f/dkCYoXv1YgdxwQ6o3ZW5BCayOPS
+         ypuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXsaRhmq5KJ7uYHAWTBFXHCTOLC4TqX29rmlNq5eWhM+uFN+u2vtHfZpjyBGBDV8+fVrUdr0k4FzLZnY14Y5oJtpss1
+X-Gm-Message-State: AOJu0YyGRlRbG89F29BlOiYG5vQpZ7J8+zcDeNj6hau4qdzWhuDueHcf
+	fa9SldK0b0Z3pJhwYEkE2Vi8gsdoqUKzLJccan8Bp/lZAs2MinQn6DbTxIO5EQ4SuN7x05X/L50
+	p5w==
+X-Google-Smtp-Source: AGHT+IFag51vL/UvoYhlWt+cP5hn/hFVKq6JWZ8TC7/r3Y68GfcXp0uRyzr/BSVM0D4aSJiRiUKQoyXIzXc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:3507:b0:609:3c79:dbf1 with SMTP id
+ fq7-20020a05690c350700b006093c79dbf1mr4263672ywb.8.1709736332428; Wed, 06 Mar
+ 2024 06:45:32 -0800 (PST)
+Date: Wed, 6 Mar 2024 06:45:30 -0800
+In-Reply-To: <Zeg6tKA0zNQ+dUpn@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240305122935.GB36868@unreal>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Mime-Version: 1.0
+References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-6-seanjc@google.com>
+ <Zeg6tKA0zNQ+dUpn@yilunxu-OptiPlex-7050>
+Message-ID: <ZeiBLjzDsEN0UsaW@google.com>
+Subject: Re: [PATCH 05/16] KVM: x86/mmu: Use synthetic page fault error code
+ to indicate private faults
+From: Sean Christopherson <seanjc@google.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Mar 05, 2024 at 02:29:35PM +0200, Leon Romanovsky wrote:
-> > > These advanced DMA mapping APIs are needed to calculate IOVA size to
-> > > allocate it as one chunk and some sort of offset calculations to know
-> > > which part of IOVA to map.
+On Wed, Mar 06, 2024, Xu Yilun wrote:
+> On Tue, Feb 27, 2024 at 06:41:36PM -0800, Sean Christopherson wrote:
+> > Add and use a synthetic, KVM-defined page fault error code to indicate
+> > whether a fault is to private vs. shared memory.  TDX and SNP have
+> > different mechanisms for reporting private vs. shared, and KVM's
+> > software-protected VMs have no mechanism at all.  Usurp an error code
+> > flag to avoid having to plumb another parameter to kvm_mmu_page_fault()
+> > and friends.
 > > 
-> > I don't follow this part at all - at *some* point, something must know a
-> > range of memory addresses involved in a DMA transfer, so that's where it
-> > should map that range for DMA. 
+> > Alternatively, KVM could borrow AMD's PFERR_GUEST_ENC_MASK, i.e. set it
+> > for TDX and software-protected VMs as appropriate, but that would require
+> > *clearing* the flag for SEV and SEV-ES VMs, which support encrypted
+> > memory at the hardware layer, but don't utilize private memory at the
+> > KVM layer.
 > 
-> In all presented cases in this series, the overall DMA size is known in
-> advance. In RDMA case, it is known when user registers the memory, in
-> VFIO, when live migration is happening and in NVMe, when BIO is created.
-> 
-> So once we allocated IOVA, we will need to link ranges, which si the
-> same as map but without IOVA allocation.
+> I see this alternative in other patchset.  And I still don't understand why
+> synthetic way is better after reading patch #5-7.  I assume for SEV(-ES) if
+> there is spurious PFERR_GUEST_ENC flag set in error code when private memory
+> is not used in KVM, then it is a HW issue or SW bug that needs to be caught
+> and warned, and by the way cleared.
 
-But above you say:
+The conundrum is that SEV(-ES) support _encrypted_ memory, but cannot support
+what KVM calls "private" memory.  In quotes because SEV(-ES) memory encryption
+does provide confidentially/privacy, but in KVM they don't support memslots that
+can be switched between private and shared, e.g. will return false for
+kvm_arch_has_private_mem().
 
-"These advanced DMA mapping APIs are needed to calculate IOVA size to
-allocate it as one chunk and some sort of offset calculations to know
-which part of IOVA to map."
+And KVM _can't_ sanely use private/shared memslots for SEV(-ES), because it's
+impossible to intercept implicit conversions by the guest, i.e. KVM can't prevent
+the guest from encrypting a page that KVM thinks is private, and vice versa.
 
-this suggests you need helpers to calculate the len and offset.  I
-can't see where that would ever make sense.  The total transfer
-size should just be passed in by the callers and be known, and
-there should be no offset.
+But from hardware's perspective, while the APM is a bit misleading and I don't
+love the behavior, I can't really argue that it's a hardware bug if the CPU sets
+PFERR_GUEST_ENC on a fault where the guest access had C-bit=1, because the access
+_was_ indeed to encrypted memory.
 
-> > > Instead of teaching DMA to know these specific datatypes, let's separate
-> > > existing DMA mapping routine to two steps and give an option to advanced
-> > > callers (subsystems) perform all calculations internally in advance and
-> > > map pages later when it is needed.
-> > 
-> > From a brief look, this is clearly an awkward reinvention of the IOMMU API.
-> > If IOMMU-aware drivers/subsystems want to explicitly manage IOMMU address
-> > spaces then they can and should use the IOMMU API. Perhaps there's room for
-> > some quality-of-life additions to the IOMMU API to help with common usage
-> > patterns, but the generic DMA mapping API is absolutely not the place for
-> > it.
-> 
-> DMA mapping gives nice abstraction from IOMMU, and allows us to have
-> same flow for IOMMU and non-IOMMU flows without duplicating code, while
-> you suggest to teach almost every part in the kernel to know about IOMMU.
+Which is a long-winded way of saying the unwanted PFERR_GUEST_ENC faults aren't
+really spurious, nor are they hardware or software bugs, just another unfortunate
+side effect of the fact that the hypervisor can't intercept shared<->encrypted
+conversions for SEV(-ES) guests.  And that means that KVM can't WARN, because
+literally every SNP-capable CPU would yell when running SEV(-ES) guests.
 
-Except that the flows are fundamentally different for the "can coalesce"
-vs "can't coalesce" case.  In the former we have one dma_addr_t range,
-and in the latter as many as there are input vectors (this is ignoring
-the weird iommu merging case where we we coalesce some but not all
-segments, but I'd rather not have that in a new API).
+I also don't like the idea of usurping PFERR_GUEST_ENC to have it mean something
+different in KVM as compared to how hardware defines/uses the flag.
 
-So if we want to efficiently be able to handle these cases we need
-two APIs in the driver and a good framework to switch between them.
-Robins makes a point here that the iommu API handles the can coalesce
-case and he has a point as that's exactly how the IOMMU API works.
-I'd still prefer to wrap it with dma callers to handle things like
-swiotlb and maybe Xen grant tables and to avoid the type confusion
-between dma_addr_t and then untyped iova in the iommu layer, but
-having this layer or not is probably worth a discussion.
-
-> 
-> In this series, we changed RDMA, VFIO and NVMe, and in all cases we
-> removed more code than added. From what I saw, VDPA and virito-blk will
-> benefit from proposed API too.
-> 
-> Even in this RFC, where Chaitanya did partial job and didn't convert
-> whole driver, the gain is pretty obvious:
-> https://lore.kernel.org/linux-rdma/016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org/T/#u
-> 
-
-I have no idea how that nvme patch is even supposed to work.  It removes
-the PRP path in nvme-pci, which not only is the most common I/O path
-but actually required for the admin queue as NVMe doesn't support
-SGLs for the admin queue.
-
+Lastly, the approach in Paolo's series to propagate PFERR_GUEST_ENC to .is_private
+iff the VM has private memory is brittle, in that it would be too easy for KVM
+code that has access to the error code to do the wrong thing and interpret
+PFERR_GUEST_ENC has meaning "private".
 
