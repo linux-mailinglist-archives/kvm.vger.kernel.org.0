@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-11166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11167-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBD7A873CCF
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 18:00:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D6B8873CD1
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 18:01:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A0091C2260A
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 17:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B6B52876A3
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 17:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF04C13BAEB;
-	Wed,  6 Mar 2024 16:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2427313C9D4;
+	Wed,  6 Mar 2024 17:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcI3FTWI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yh+ClnVc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFAA137934
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 16:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDA213BAF7
+	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 17:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709744368; cv=none; b=VkjH8wjl3m7Eu6H1o0LFH9RTUwCICZDUA70KorzmSbMFyQmOOa2KmHX5OmBbDjzM5O1ME2Ar8r6PZVPqgf2jMVX9j0W+EY1JzhaAhcTTK4+YcbFEvBBztzCJ7Aw6JlPgk1oebEusYwrflKyT2d7z0Jtf4Q5RF9Qpp4oi6ek/C5I=
+	t=1709744413; cv=none; b=aw/U2CKfJbpVD4mTF173R3TL8wx6LW5vstq5Ks6JxqHkXGSM/d9HaRpvumEOMGI10VAya/0gs2IHLTVMR2vTkEow6/T5FNel/3Z1aqlugcq7PL3n90wRue3gYmHra8x8atOpWmixgngOr/1fnDSvR2j1X8Nnfc7lt93UZWHCLjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709744368; c=relaxed/simple;
-	bh=6voBldJepqS9xoaKqYdNQYeA54RXB8fpl6MrXu3dP/E=;
+	s=arc-20240116; t=1709744413; c=relaxed/simple;
+	bh=y/KT0BcmDXgFtFD/xw2D4kpcbZ4ed8ybnuauuEp7qO4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X//K3ld4asSLpVz38JlIBbZqp8t8F7Ll/p32D9Qh/xBsJioPY1mXrh0rGsM6i+7avq88PfoKB7ogCKAYlxYH3NfFTMEj6RnB1aueOx45WnTGPHK5MoS+ZH9Bw9upBwnyfJVnoHY67/9aSkwkCl2OHkWg5FsUKCYnus5dnQpgc3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gcI3FTWI; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=dU/D6rtt31j1OYzxZzhcAaNR+VsFhLzLNGt4v6OsJgzC3ytM9UbHFT+Rl1jVMS3I9XO6ExNA2o4bSsgHzB0HTnlERyT4DYthGQs0riTJv8HZMKjb/lbPwudsP/c/PChOnpZH+RHzI/TZtlirIS4goILQ522z0/3SC0Bx5ak3j14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yh+ClnVc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709744365;
+	s=mimecast20190719; t=1709744410;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hE/ZqNmd1X0ptql1MwvYIvaVvoBbwsA30SeD65YYv8o=;
-	b=gcI3FTWINV/R1bpKx3s957KwB4gRsjeYr7V5QhhNo4nEpi9IsdQjKCgilFhcsrbLClXZM1
-	CVg9ObqxJDOG9KCAf0cgcsNk375JXiFxtju+p1ycx4iydKWOKRAeJuOzrNeBjq20G24wFk
-	WlGt5Y8C4fldxIB8G4C30dq+kModn+M=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cNVEEqb1mRnWhoo9RlzFO/sQ6mMSUAqTYT7vudTjWSw=;
+	b=Yh+ClnVcc4OZytB+n0QScWtqLoQdX9D4xwJmD16YBK42sCxaJzfsLhq7dz7pa077R4j9yS
+	+1V+4CIyJlohYY81V0KVUV8PwdO3Q4+fUnIQQXLxCzMk8GvWaogn4akGMOlM8yV2p17/TP
+	2YDkwj6NCVEdVziZoWZcwPGfAHsi6bo=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-R_mFTN0xPOujlT1xLhz4zQ-1; Wed, 06 Mar 2024 11:59:24 -0500
-X-MC-Unique: R_mFTN0xPOujlT1xLhz4zQ-1
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6e5002ecc0cso619646a34.0
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 08:59:24 -0800 (PST)
+ us-mta-391-9AYc9akeMwS438t40NJQeA-1; Wed, 06 Mar 2024 12:00:09 -0500
+X-MC-Unique: 9AYc9akeMwS438t40NJQeA-1
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3c1f6d317d9so2243910b6e.2
+        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 09:00:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709744343; x=1710349143;
+        d=1e100.net; s=20230601; t=1709744408; x=1710349208;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hE/ZqNmd1X0ptql1MwvYIvaVvoBbwsA30SeD65YYv8o=;
-        b=cm7zP5dK09qj8WP/lko4ZtOPqqHD5mnb+Awz7Q7EDrz8fVg+g/Tzjul2RV8bCU45Nx
-         oGE5HsofMn0oVc9i2P8y0/NlicoEph8ywdhzaGJMLF2h3ZCsWHPcr/QfUVCJhH8OTMS/
-         tK8EWMtKAripHXPNijx8BgVe6HlT9TVIzms5Q5tGn2NMcv0A89om/68P2xv40QwQ3tdJ
-         579kRBX6FCQPXajKJ5KsRXfc0yph/ZcvNXyy9Xv50EbNeC2c512oFx3Il8C3Wvb6GAS+
-         csV2U2GskywjlD/Hs1MyF9H59motjHIPDrJXnZYY3rbHHX1c+RxD2z3H9LgqQRYMdOyO
-         RGTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVq8RghbUiQUIBcO2/WRG8+PCyHwbCq7Tw16YNvjT0HGy5eJI/5g+6Q2kj4wx9FWm0R7LIn8Yc6QywbY8VshvCdD3G0
-X-Gm-Message-State: AOJu0Yy4kyjBdkPwHi0twUyJWULLUgFKkE14atsGVdP2mkhUDaMRavM8
-	zZgyr9EqnSoQVW8rN0ZQE4cZaYMU2Ifu2+WfEzab8StNbYBeEBqw3L5eIAAfDI+cM2IBumvQ3h3
-	YviKMJcEWwj49rguUI0DoCbwBfGv8TdefRXpygRcZw7IRaHFDfg==
-X-Received: by 2002:a05:6808:d4b:b0:3c2:1863:1b9f with SMTP id w11-20020a0568080d4b00b003c218631b9fmr346650oik.21.1709744343811;
-        Wed, 06 Mar 2024 08:59:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFyQJaCZ4Y9d9ey9HELJnXa0gqn6FNsshi+nrNSQ97VwWfZkZ5YZrTtXzcHs6OqXAYZXaGAmg==
-X-Received: by 2002:a05:6808:d4b:b0:3c2:1863:1b9f with SMTP id w11-20020a0568080d4b00b003c218631b9fmr346634oik.21.1709744343558;
-        Wed, 06 Mar 2024 08:59:03 -0800 (PST)
+        bh=cNVEEqb1mRnWhoo9RlzFO/sQ6mMSUAqTYT7vudTjWSw=;
+        b=jsbU/3T56lj6bGJ1bHN0L7LyDFgXy679pBevw6RCWOGwZr2J9bnIVehqjctIPEhCs5
+         ytwCvEUvQJt23W4dUu3TRN2KckfChA7RY2VxnsDJJTzIb3yqHrGqZqgjJe6goVbFMpVC
+         QCZJxoGaHj5cTihAmGfOcCXjWmXenS9Tit4breIgZdhuo8dz1fk6gHJv5XjTrx32hqqc
+         uQfeUl7UtpIILWhDgnIS0mEA94ffceQvXN8s7NiDYOHSPBs67gZoUHXVqZ29LJ6FBc9O
+         PMH/RcXBFqCD/WNoeWV/pttCG+awWEs+X9p5f4odQ5SCJjvgptAahxvDYfELpQ0fyPm/
+         PaEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVirS8JGyykILvSJZp7eGptkiWkqpUTWhtki1ObeQ1cHnStsLtSb47O/PxN+VWaHm+CZlbZ+4a6pkAl2JBB5la0bEu2
+X-Gm-Message-State: AOJu0YxpK9obEcJptU2nhSevc3iUcbebRXqGGHTND9v41q3zxfOArrYe
+	FyFNV1NUxxB9D8By5mVskUVfPZA7uXEJKxIGlHsKqns4gYOs09vAgthOoODc63V8Htw6z6ARLvi
+	NnCogwI1rD1BdKbbEayKjCtvFMUNHrDH6uyC6ii5WPjZCmOMEjQ==
+X-Received: by 2002:a05:6808:3a7:b0:3c1:a37e:26ed with SMTP id n7-20020a05680803a700b003c1a37e26edmr5364835oie.42.1709744408471;
+        Wed, 06 Mar 2024 09:00:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG0hdt7vKPGkh54JTlZwFbcqgBN1HjNn2uHJ16iD2EryLDadaXbB+Sz+QjPTJrliV/7tScAvg==
+X-Received: by 2002:a05:6808:3a7:b0:3c1:a37e:26ed with SMTP id n7-20020a05680803a700b003c1a37e26edmr5364801oie.42.1709744408084;
+        Wed, 06 Mar 2024 09:00:08 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-178-151.web.vodafone.de. [109.43.178.151])
-        by smtp.gmail.com with ESMTPSA id t11-20020a0568080b2b00b003c1f461d1cbsm760543oij.37.2024.03.06.08.58.58
+        by smtp.gmail.com with ESMTPSA id t11-20020a0568080b2b00b003c1f461d1cbsm760543oij.37.2024.03.06.09.00.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 08:59:03 -0800 (PST)
-Message-ID: <0554c009-0c1d-49c5-8744-a7bb12e2b837@redhat.com>
-Date: Wed, 6 Mar 2024 17:58:58 +0100
+        Wed, 06 Mar 2024 09:00:07 -0800 (PST)
+Message-ID: <46dc3475-3b68-4720-a600-5fee7155e290@redhat.com>
+Date: Wed, 6 Mar 2024 18:00:04 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH-for-9.1 10/18] hw/mem/pc-dimm: Remove legacy_align
- argument from pc_dimm_pre_plug()
+Subject: Re: [PATCH-for-9.1 11/18] hw/mem/memory-device: Remove legacy_align
+ from memory_device_pre_plug()
 Content-Language: en-US
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
@@ -94,17 +94,10 @@ Cc: Igor Mammedov <imammedo@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <eduardo@habkost.net>, Song Gao <gaosong@loongson.cn>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Nicholas Piggin <npiggin@gmail.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org
+ Eduardo Habkost <eduardo@habkost.net>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 References: <20240305134221.30924-1-philmd@linaro.org>
- <20240305134221.30924-11-philmd@linaro.org>
+ <20240305134221.30924-12-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -148,22 +141,22 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240305134221.30924-11-philmd@linaro.org>
+In-Reply-To: <20240305134221.30924-12-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 05/03/2024 14.42, Philippe Mathieu-Daudé wrote:
-> 'legacy_align' is always NULL, remove it.
+> 'legacy_align' is always NULL, remove it, simplifying
+> memory_device_pre_plug().
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   include/hw/mem/pc-dimm.h | 3 +--
->   hw/arm/virt.c            | 2 +-
->   hw/i386/pc.c             | 2 +-
->   hw/loongarch/virt.c      | 2 +-
->   hw/mem/pc-dimm.c         | 6 ++----
->   hw/ppc/spapr.c           | 2 +-
->   6 files changed, 7 insertions(+), 10 deletions(-)
+>   include/hw/mem/memory-device.h |  2 +-
+>   hw/i386/pc.c                   |  3 +--
+>   hw/mem/memory-device.c         | 12 ++++--------
+>   hw/mem/pc-dimm.c               |  2 +-
+>   hw/virtio/virtio-md-pci.c      |  2 +-
+>   5 files changed, 8 insertions(+), 13 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
