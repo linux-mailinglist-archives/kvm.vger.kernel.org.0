@@ -1,212 +1,146 @@
-Return-Path: <kvm+bounces-11112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD1A873232
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 10:13:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D64E387326E
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 10:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC7981F21B05
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 09:13:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 140AC1C23EF4
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 09:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E372760ECA;
-	Wed,  6 Mar 2024 09:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4457A5DF21;
+	Wed,  6 Mar 2024 09:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VzZJueTL"
+	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="rBzkv6WH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214385F49A;
-	Wed,  6 Mar 2024 09:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8623C5DF01;
+	Wed,  6 Mar 2024 09:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709715955; cv=none; b=CBX7Qw5+go/yIf0nFp2P77z+1+TsGLW34E+dP+ZBaYtpZZxCr5v5tkkSeHWZKJaIRRvLxpzNYSelhQsW7Qcbae27kypJxo3gbrhvw7uG5qtrvXwZVCBoHbawdn/KiHyg71VGHRyvJ6JyjugFpqQ0KyCLyYbJFsqgBX+3ovVF94k=
+	t=1709716970; cv=none; b=jIszY+j/M/kP7NZQ113j54l/6cGluj1+dMROzZoBRwpz6yHGELh5v88jBryFvLPoeM6yo/s4UEYHEx+99W84bPuhFn7OSl/QvmMqDPPfornCaXFCMzifU96YIt9gFsFKkZTYro3MJtLy+uXm5zCKglqnZDwieil17uPPxirUnB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709715955; c=relaxed/simple;
-	bh=aYnahezun73pjCUX2IVGuMCgrwsCOEkGUjelhjR0KAE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jq5tR0zo+BzBihtUphkHqSUwrM73XrJnl9mhN4xdtYlZJFbTwHMuwgrFNtSbHL0hs8AJPzs1cBcjMQVcUqhs4qyAHsLHmulptbi9UAoggOY0ClHpdwz2+gL4Bpp4sQn76u0w2ExVbXMObPoTn9rfFgKwusKgbJxOt9eMcBwkSvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VzZJueTL; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709715953; x=1741251953;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aYnahezun73pjCUX2IVGuMCgrwsCOEkGUjelhjR0KAE=;
-  b=VzZJueTLnWKMq1zszGjBRrTpi8fE+7IdOwOveDPoPebjAz5beQMlKy6L
-   Lgbz21VknVoH/UZnkpd3RSLV8g3BRKZDbCFV0UcXHYfM1x6vpMTvcLHIl
-   h3BhIo2Y4e4OR4lznBFb9/3nKC4usUDPttPL2NDblKTGSppQGhHJ6pBvH
-   cPtsFD2pzBvubsgj0g4jKp9Q59HdzUNO6XqvPdlexTPhclO56QtvZqZpn
-   pWiwsLCKe2PRD6/2dup6CJawNTRkZvdqS2Ep5x2jQbtSTmxoCgbr463by
-   N7ccq0Pj04fapyl6sW7CbFYda9apddPCpj65DH7WZpb3WaGP8q4B9L157
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="26783873"
-X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="26783873"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 01:05:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="9665672"
-Received: from sunyi-station.sh.intel.com (HELO ysun46-mobl.sh.intel.com) ([10.239.159.10])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 01:05:49 -0800
-Date: Wed, 6 Mar 2024 17:05:45 +0800
-From: Yi Sun <yi.sun@linux.intel.com>
-To: isaku.yamahata@intel.com, Kai Huang <kai.huang@intel.com>,
-	yi.sun@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, chen.bo@intel.com,
-	hang.yuan@intel.com, tina.zhang@intel.com,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v19 005/130] x86/virt/tdx: Export global metadata read
- infrastructure
-Message-ID: <Zegx6R4W3lVd+5tx@ysun46-mobl.sh.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <eec524e07ee17961a4deb1cc7a1390c91d8708ff.1708933498.git.isaku.yamahata@intel.com>
+	s=arc-20240116; t=1709716970; c=relaxed/simple;
+	bh=o4WXpLuFlb2On21gYF6e06FQki+re+8xuTwVBSizxMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=swnWBWEqkamfgfUgPw+3EoJitExCJ536ldb1/6JII5lm6BmfJY+KdfZ93H2vamt2wFPtwMg0RcpoqONxWu+TC5aVcDDRxZ+EGfsPcJ0YPrBb7aZrQlNPQxbHzgeotViA8DJUo7cyWwDG1uAgj0R3LjybKT1ijVn9Nis3wnFW1hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=rBzkv6WH; arc=none smtp.client-ip=115.28.160.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
+	t=1709716964; bh=o4WXpLuFlb2On21gYF6e06FQki+re+8xuTwVBSizxMI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rBzkv6WHSyXZIk6znzU7nnLyL4/jck+sMZRhuySYFRLWZKkN1d1KsNE7YUsV8NWoK
+	 umxFcxOBgdLaEa1rvbZ520CbIoNR8/RHQG/cdi98q2Tll/TNBWCQER0u0OTXpPmCEc
+	 CsAEx0w4+waz8+o8k40rSOV9dqnlRmLpToVMFjRA=
+Received: from [IPV6:240e:688:100:1:e42:6442:8662:5647] (unknown [IPv6:240e:688:100:1:e42:6442:8662:5647])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 7524F600CE;
+	Wed,  6 Mar 2024 17:22:44 +0800 (CST)
+Message-ID: <4039d1ff-8e9f-42cf-a8fa-b326102fcbf5@xen0n.name>
+Date: Wed, 6 Mar 2024 17:22:43 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <eec524e07ee17961a4deb1cc7a1390c91d8708ff.1708933498.git.isaku.yamahata@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 7/7] Documentation: KVM: Add hypercall for LoongArch
+To: maobibo <maobibo@loongson.cn>, Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>
+Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org
+References: <20240302082532.1415200-1-maobibo@loongson.cn>
+ <20240302084724.1415344-1-maobibo@loongson.cn>
+ <846a5e46-4e8f-4f73-ac5b-323e78ec1bb1@xen0n.name>
+ <853f2909-e455-bd1c-c6a4-6a13beb37125@loongson.cn>
+ <ec871702-388d-4a29-aec1-5cd6d1de6d0a@xen0n.name>
+ <7079bf3b-a7af-7cab-be78-3de1081649e1@loongson.cn>
+Content-Language: en-US
+From: WANG Xuerui <kernel@xen0n.name>
+In-Reply-To: <7079bf3b-a7af-7cab-be78-3de1081649e1@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 26.02.2024 00:25, isaku.yamahata@intel.com wrote:
->From: Kai Huang <kai.huang@intel.com>
->
->KVM will need to read a bunch of non-TDMR related metadata to create and
->run TDX guests.  Export the metadata read infrastructure for KVM to use.
->
->Specifically, export two helpers:
->
->1) The helper which reads multiple metadata fields to a buffer of a
->   structure based on the "field ID -> structure member" mapping table.
->
->2) The low level helper which just reads a given field ID.
->
->The two helpers cover cases when the user wants to cache a bunch of
->metadata fields to a certain structure and when the user just wants to
->query a specific metadata field on demand.  They are enough for KVM to
->use (and also should be enough for other potential users).
->
->Signed-off-by: Kai Huang <kai.huang@intel.com>
->Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
->Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->---
-> arch/x86/include/asm/tdx.h  | 22 ++++++++++++++++++++++
-> arch/x86/virt/vmx/tdx/tdx.c | 25 ++++++++-----------------
-> 2 files changed, 30 insertions(+), 17 deletions(-)
->
->diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
->index eba178996d84..709b9483f9e4 100644
->--- a/arch/x86/include/asm/tdx.h
->+++ b/arch/x86/include/asm/tdx.h
->@@ -116,6 +116,28 @@ static inline u64 sc_retry(sc_func_t func, u64 fn,
-> int tdx_cpu_enable(void);
-> int tdx_enable(void);
-> const char *tdx_dump_mce_info(struct mce *m);
->+
->+struct tdx_metadata_field_mapping {
->+	u64 field_id;
->+	int offset;
->+	int size;
->+};
->+
->+#define TD_SYSINFO_MAP(_field_id, _struct, _member)	\
->+	{ .field_id = MD_FIELD_ID_##_field_id,		\
->+	  .offset   = offsetof(_struct, _member),	\
->+	  .size     = sizeof(typeof(((_struct *)0)->_member)) }
->+
->+/*
->+ * Read multiple global metadata fields to a buffer of a structure
->+ * based on the "field ID -> structure member" mapping table.
->+ */
->+int tdx_sys_metadata_read(const struct tdx_metadata_field_mapping *fields,
->+			  int nr_fields, void *stbuf);
->+
->+/* Read a single global metadata field */
->+int tdx_sys_metadata_field_read(u64 field_id, u64 *data);
->+
-> #else
-> static inline void tdx_init(void) { }
-> static inline int tdx_cpu_enable(void) { return -ENODEV; }
->diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
->index a19adc898df6..dc21310776ab 100644
->--- a/arch/x86/virt/vmx/tdx/tdx.c
->+++ b/arch/x86/virt/vmx/tdx/tdx.c
->@@ -251,7 +251,7 @@ static int build_tdx_memlist(struct list_head *tmb_list)
-> 	return ret;
-> }
->
->-static int read_sys_metadata_field(u64 field_id, u64 *data)
->+int tdx_sys_metadata_field_read(u64 field_id, u64 *data)
-> {
-> 	struct tdx_module_args args = {};
-> 	int ret;
->@@ -270,6 +270,7 @@ static int read_sys_metadata_field(u64 field_id, u64 *data)
->
-> 	return 0;
-> }
->+EXPORT_SYMBOL_GPL(tdx_sys_metadata_field_read);
->
-> /* Return the metadata field element size in bytes */
-> static int get_metadata_field_bytes(u64 field_id)
->@@ -295,7 +296,7 @@ static int stbuf_read_sys_metadata_field(u64 field_id,
-> 	if (WARN_ON_ONCE(get_metadata_field_bytes(field_id) != bytes))
-> 		return -EINVAL;
->
->-	ret = read_sys_metadata_field(field_id, &tmp);
->+	ret = tdx_sys_metadata_field_read(field_id, &tmp);
-> 	if (ret)
-> 		return ret;
->
->@@ -304,19 +305,8 @@ static int stbuf_read_sys_metadata_field(u64 field_id,
-> 	return 0;
-> }
->
->-struct field_mapping {
->-	u64 field_id;
->-	int offset;
->-	int size;
->-};
->-
->-#define TD_SYSINFO_MAP(_field_id, _struct, _member)	\
->-	{ .field_id = MD_FIELD_ID_##_field_id,		\
->-	  .offset   = offsetof(_struct, _member),	\
->-	  .size     = sizeof(typeof(((_struct *)0)->_member)) }
->-
->-static int read_sys_metadata(struct field_mapping *fields, int nr_fields,
->-			     void *stbuf)
->+int tdx_sys_metadata_read(const struct tdx_metadata_field_mapping *fields,
->+			  int nr_fields, void *stbuf)
-> {
-> 	int i, ret;
->
->@@ -331,6 +321,7 @@ static int read_sys_metadata(struct field_mapping *fields, int nr_fields,
->
-> 	return 0;
-> }
->+EXPORT_SYMBOL_GPL(tdx_sys_metadata_read);
-Hi Kai,
+On 3/6/24 11:28, maobibo wrote:
+> On 2024/3/6 上午2:26, WANG Xuerui wrote:
+>> On 3/4/24 17:10, maobibo wrote:
+>>> On 2024/3/2 下午5:41, WANG Xuerui wrote:
+>>>> On 3/2/24 16:47, Bibo Mao wrote:
+>>>>> [snip]
+>>>>> +
+>>>>> +KVM hypercall ABI
+>>>>> +=================
+>>>>> +
+>>>>> +Hypercall ABI on KVM is simple, only one scratch register a0 (v0) 
+>>>>> and at most
+>>>>> +five generic registers used as input parameter. FP register and 
+>>>>> vector register
+>>>>> +is not used for input register and should not be modified during 
+>>>>> hypercall.
+>>>>> +Hypercall function can be inlined since there is only one scratch 
+>>>>> register.
+>>>>
+>>>> It should be pointed out explicitly that on hypercall return all 
+>>> Well, return value description will added. What do think about the 
+>>> meaning of return value for KVM_HCALL_FUNC_PV_IPI hypercall?  The 
+>>> number of CPUs with IPI delivered successfully like kvm x86 or simply 
+>>> success/failure?
 
-The two helpers can potentially be used by TD guests, as you mentioned.
-It's a good idea to declare it in the header asm/tdx.h.
+I just noticed I've forgotten to comment on this question. FYI, RISC-V 
+SBI's equivalent [1] doesn't even indicate errors. And from my 
+perspective, we can always add a new hypercall returning more info 
+should that info is needed in the future; for now I don't have a problem 
+whether the return type is void, bool or number of CPUs that are 
+successfully reached.
 
-However, the function cannot be compiled if its definition remains in the
-vmx/tdx/tdx.c file while disabling the CONFIG_TDX_HOST.
+[1]: 
+https://github.com/riscv-non-isa/riscv-sbi-doc/blob/v2.0/src/ext-ipi.adoc
 
-It would be better to move the definition to a shared location,
-allowing the host and guest to share the same code.
+>>>> architectural state except ``$a0`` is preserved. Or is the whole 
+>>>> ``$a0 - $t8`` range clobbered, just like with Linux syscalls?
+>>>>
+>>> what is advantage with $a0 - > $t8 clobbered?
+>>
+>> Because then a hypercall is going to behave identical as an ordinary C 
+>> function call, which is easy for people and compilers to understand.
+>>
+> If you really understand detailed behavior about hypercall/syscall, the 
+> conclusion may be different.
+> 
+> If T0 - T8 is clobbered with hypercall instruction, hypercall caller 
+> need save clobbered register, now hypercall exception save/restore all 
+> the registers during VM exits. If so, hypercall caller need not save 
+> general registers and it is not necessary scratched for hypercall ABI.
+> 
+> Until now all the discussion the macro level, no detail code level.
+> 
+> Can you show me some example code where T0-T8 need not save/restore 
+> during LoongArch hypercall exception?
 
-Thanks
-   --Sun, Yi
+I was emphasizing that consistency is generally good, and yes that's 
+"macroscopic" level talk. Of course, the hypercall client code would 
+have to do *less* work if *more* registers than the minimum are 
+preserved -- if right now everything is already preserved, nothing needs 
+to change.
+
+But please also notice that the context switch cost is paid for every 
+hypercall, and we can't reduce the number of preserved registers without 
+breaking compatibility. So I think we can keep the current 
+implementation behavior, but promise less in the spec: this way we'll 
+keep the possibility of reducing the context switch overhead.
+
+-- 
+WANG "xen0n" Xuerui
+
+Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
 
 
