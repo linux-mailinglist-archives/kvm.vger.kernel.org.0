@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-11165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E9F873CBC
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 17:57:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBD7A873CCF
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 18:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B3321F26E51
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 16:57:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A0091C2260A
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 17:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6079137938;
-	Wed,  6 Mar 2024 16:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF04C13BAEB;
+	Wed,  6 Mar 2024 16:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Usxwx5rd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcI3FTWI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E062605DC
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 16:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFAA137934
+	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 16:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709744270; cv=none; b=HYLsEoL/UovVtBO6XlWPllr8KPA1kthHUXsiSG3OSOFnFEdBt99t8fSzx2cknusrOYLKEoU4bs89Hm5O/cBtSKt/PEqrHxHFNocbxeMGGCaY/jJZJFI6K3BeTUJanCgcPXMxiReu5+KfM5yB8PRg40eaahhEZj/0TmD79lRF/bw=
+	t=1709744368; cv=none; b=VkjH8wjl3m7Eu6H1o0LFH9RTUwCICZDUA70KorzmSbMFyQmOOa2KmHX5OmBbDjzM5O1ME2Ar8r6PZVPqgf2jMVX9j0W+EY1JzhaAhcTTK4+YcbFEvBBztzCJ7Aw6JlPgk1oebEusYwrflKyT2d7z0Jtf4Q5RF9Qpp4oi6ek/C5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709744270; c=relaxed/simple;
-	bh=6bObcZL7xX5s0b9fUHNg0AQNl9wFEEmGUXIOETIVSiI=;
+	s=arc-20240116; t=1709744368; c=relaxed/simple;
+	bh=6voBldJepqS9xoaKqYdNQYeA54RXB8fpl6MrXu3dP/E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uYRzFGEn8RDww6xmDUZm8+l/mcSzqDsUmZQOtbkI+AhIyqJZuuBfJFpNNQyOxXbiGP+Nu4oViTUxLCzd6byM5jdN35rCwWKozPw/7qW4Tm4cPJL7XHiEd7sGuEBRpLllVll2C+SSCgmTa8sYsAkGREsgvjG8pQZoO2dX9EZtNhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Usxwx5rd; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=X//K3ld4asSLpVz38JlIBbZqp8t8F7Ll/p32D9Qh/xBsJioPY1mXrh0rGsM6i+7avq88PfoKB7ogCKAYlxYH3NfFTMEj6RnB1aueOx45WnTGPHK5MoS+ZH9Bw9upBwnyfJVnoHY67/9aSkwkCl2OHkWg5FsUKCYnus5dnQpgc3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gcI3FTWI; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709744268;
+	s=mimecast20190719; t=1709744365;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=FVWQV0jRaGpJuKMtdpHVmyHOgCYVqPnJLOckdknQiRI=;
-	b=Usxwx5rddDezgzsY1lCjZt7NMoCdyUe9EgxXXuzngbkuvegYX6jwqod7dawb1Z6/hwfuqn
-	/Hsr1Y8LcrZSMVh/qbk9WLDhTiUhH8ugMMjdToLZga704egUMm/4ow/P/iu2EUwQB30sZB
-	OQmXneyrtVBQQZYSotQu0nDd95K1ZXg=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=hE/ZqNmd1X0ptql1MwvYIvaVvoBbwsA30SeD65YYv8o=;
+	b=gcI3FTWINV/R1bpKx3s957KwB4gRsjeYr7V5QhhNo4nEpi9IsdQjKCgilFhcsrbLClXZM1
+	CVg9ObqxJDOG9KCAf0cgcsNk375JXiFxtju+p1ycx4iydKWOKRAeJuOzrNeBjq20G24wFk
+	WlGt5Y8C4fldxIB8G4C30dq+kModn+M=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-223-qQ9ZuL5pM0mf9Zb2BWtd_w-1; Wed, 06 Mar 2024 11:57:47 -0500
-X-MC-Unique: qQ9ZuL5pM0mf9Zb2BWtd_w-1
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3c1f586cb52so665934b6e.0
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 08:57:45 -0800 (PST)
+ us-mta-642-R_mFTN0xPOujlT1xLhz4zQ-1; Wed, 06 Mar 2024 11:59:24 -0500
+X-MC-Unique: R_mFTN0xPOujlT1xLhz4zQ-1
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6e5002ecc0cso619646a34.0
+        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 08:59:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709744265; x=1710349065;
+        d=1e100.net; s=20230601; t=1709744343; x=1710349143;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FVWQV0jRaGpJuKMtdpHVmyHOgCYVqPnJLOckdknQiRI=;
-        b=gkq3K4Hx5JAdZ77OQZOBEOPf+G67eU1PH+AvlhgC3crlDcyL0eZJ5U6Fu5TnoguxxG
-         hAZZ6h8KY2VQ8Qikgr5a1IhI9VWDQ4qR6/SNHRhWsLKocx/mMzyfLIu6Z/x7/QVCQDJF
-         F+g0tg7jEDEyRnRzDXgKKHXElbHab7aydjYI1YUKsZ60ofIWmDeiGJHD6GvMnhE6qbZj
-         yluOTdnAPzQV0Yd1MoLCcoNI7Ew5qtborq05VKa6XpEY7s3G0JgN7x5Kb6rBhrs1J3QB
-         33IcxnNuuJNho9xks3Ih9PGBPdIvRZXx2YpXD8shUrFLbEq33T6127JWZ9UaLD4fDsqO
-         nrOw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5zlnTSoRiZbubCWjY+siEOrt3aJ9SUm0UZ0Lwh7HO9xUgxMA2fCtlCFiNtC/NokXVL7Lc+X8zIwp3M4bDcAYkaGqa
-X-Gm-Message-State: AOJu0YzXvXaKpW2e8vwPQJreaV4mdGLGPC5vssj2T3MVyf0UCPOukmtR
-	ZyUp6FILTXU7GV70B57ziq+SwiGLTaV3Sk9Q/zimad6pLL2PD8fVQMjWSp31nW4FQMyg6PumBrk
-	MBOde5CeWkzJyTwaHC2qmzpMQkvQFIKDKegAEv0443PTOhhITew==
-X-Received: by 2002:a05:6808:2111:b0:3c2:1051:ee94 with SMTP id r17-20020a056808211100b003c21051ee94mr323653oiw.5.1709744265397;
-        Wed, 06 Mar 2024 08:57:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IExaWNWz+8FAdyHD42Segvt9jWCc56GjQzK533355gLxz7rIzD0UR0zrXkU6PwGOO91v4DPMQ==
-X-Received: by 2002:a05:6808:2111:b0:3c2:1051:ee94 with SMTP id r17-20020a056808211100b003c21051ee94mr323643oiw.5.1709744265095;
-        Wed, 06 Mar 2024 08:57:45 -0800 (PST)
+        bh=hE/ZqNmd1X0ptql1MwvYIvaVvoBbwsA30SeD65YYv8o=;
+        b=cm7zP5dK09qj8WP/lko4ZtOPqqHD5mnb+Awz7Q7EDrz8fVg+g/Tzjul2RV8bCU45Nx
+         oGE5HsofMn0oVc9i2P8y0/NlicoEph8ywdhzaGJMLF2h3ZCsWHPcr/QfUVCJhH8OTMS/
+         tK8EWMtKAripHXPNijx8BgVe6HlT9TVIzms5Q5tGn2NMcv0A89om/68P2xv40QwQ3tdJ
+         579kRBX6FCQPXajKJ5KsRXfc0yph/ZcvNXyy9Xv50EbNeC2c512oFx3Il8C3Wvb6GAS+
+         csV2U2GskywjlD/Hs1MyF9H59motjHIPDrJXnZYY3rbHHX1c+RxD2z3H9LgqQRYMdOyO
+         RGTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVq8RghbUiQUIBcO2/WRG8+PCyHwbCq7Tw16YNvjT0HGy5eJI/5g+6Q2kj4wx9FWm0R7LIn8Yc6QywbY8VshvCdD3G0
+X-Gm-Message-State: AOJu0Yy4kyjBdkPwHi0twUyJWULLUgFKkE14atsGVdP2mkhUDaMRavM8
+	zZgyr9EqnSoQVW8rN0ZQE4cZaYMU2Ifu2+WfEzab8StNbYBeEBqw3L5eIAAfDI+cM2IBumvQ3h3
+	YviKMJcEWwj49rguUI0DoCbwBfGv8TdefRXpygRcZw7IRaHFDfg==
+X-Received: by 2002:a05:6808:d4b:b0:3c2:1863:1b9f with SMTP id w11-20020a0568080d4b00b003c218631b9fmr346650oik.21.1709744343811;
+        Wed, 06 Mar 2024 08:59:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFyQJaCZ4Y9d9ey9HELJnXa0gqn6FNsshi+nrNSQ97VwWfZkZ5YZrTtXzcHs6OqXAYZXaGAmg==
+X-Received: by 2002:a05:6808:d4b:b0:3c2:1863:1b9f with SMTP id w11-20020a0568080d4b00b003c218631b9fmr346634oik.21.1709744343558;
+        Wed, 06 Mar 2024 08:59:03 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-178-151.web.vodafone.de. [109.43.178.151])
-        by smtp.gmail.com with ESMTPSA id t11-20020a0568080b2b00b003c1f461d1cbsm760543oij.37.2024.03.06.08.57.42
+        by smtp.gmail.com with ESMTPSA id t11-20020a0568080b2b00b003c1f461d1cbsm760543oij.37.2024.03.06.08.58.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 08:57:44 -0800 (PST)
-Message-ID: <399a594d-4f7a-4068-8dad-ea01dfea939a@redhat.com>
-Date: Wed, 6 Mar 2024 17:57:40 +0100
+        Wed, 06 Mar 2024 08:59:03 -0800 (PST)
+Message-ID: <0554c009-0c1d-49c5-8744-a7bb12e2b837@redhat.com>
+Date: Wed, 6 Mar 2024 17:58:58 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH-for-9.1 09/18] hw/i386/pc: Remove
- PCMachineClass::enforce_aligned_dimm
+Subject: Re: [PATCH-for-9.1 10/18] hw/mem/pc-dimm: Remove legacy_align
+ argument from pc_dimm_pre_plug()
 Content-Language: en-US
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
@@ -94,9 +94,17 @@ Cc: Igor Mammedov <imammedo@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>
+ Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <eduardo@habkost.net>, Song Gao <gaosong@loongson.cn>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org
 References: <20240305134221.30924-1-philmd@linaro.org>
- <20240305134221.30924-10-philmd@linaro.org>
+ <20240305134221.30924-11-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -140,45 +148,24 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240305134221.30924-10-philmd@linaro.org>
+In-Reply-To: <20240305134221.30924-11-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 05/03/2024 14.42, Philippe Mathieu-Daudé wrote:
-> PCMachineClass::enforce_aligned_dimm was only used by the
-> pc-i440fx-2.1 machine, which got removed. It is now always
-> true. Remove it, simplifying pc_get_device_memory_range().
+> 'legacy_align' is always NULL, remove it.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   include/hw/i386/pc.h |  3 ---
->   hw/i386/pc.c         | 14 +++-----------
->   2 files changed, 3 insertions(+), 14 deletions(-)
-> 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index f051ddafca..bf1d6e99b4 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -74,8 +74,6 @@ typedef struct PCMachineState {
->    *
->    * Compat fields:
->    *
-> - * @enforce_aligned_dimm: check that DIMM's address/size is aligned by
-> - *                        backend's alignment value if provided
->    * @acpi_data_size: Size of the chunk of memory at the top of RAM
->    *                  for the BIOS ACPI tables and other BIOS
->    *                  datastructures.
-> @@ -114,7 +112,6 @@ struct PCMachineClass {
->       /* RAM / address space compat: */
->       bool gigabyte_align;
->       bool has_reserved_memory;
-> -    bool enforce_aligned_dimm;
+>   include/hw/mem/pc-dimm.h | 3 +--
+>   hw/arm/virt.c            | 2 +-
+>   hw/i386/pc.c             | 2 +-
+>   hw/loongarch/virt.c      | 2 +-
+>   hw/mem/pc-dimm.c         | 6 ++----
+>   hw/ppc/spapr.c           | 2 +-
+>   6 files changed, 7 insertions(+), 10 deletions(-)
 
-This is also mentioned in a comment in tests/avocado/mem-addr-space-check.py 
-... it would be nice if you could update that, too.
-
-  Thanks,
-   Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
 
