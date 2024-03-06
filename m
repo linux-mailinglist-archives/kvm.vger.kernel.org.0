@@ -1,131 +1,124 @@
-Return-Path: <kvm+bounces-11132-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11133-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFBC3873789
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 14:14:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1160C8737C4
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 14:34:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D64F1C220FC
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 13:14:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 430851C2194D
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 13:34:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D6E13172E;
-	Wed,  6 Mar 2024 13:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC20131744;
+	Wed,  6 Mar 2024 13:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OP8I6US4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JpP4T1JV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2468C130AED
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 13:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA72E13172E;
+	Wed,  6 Mar 2024 13:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709730854; cv=none; b=VQ4M5aiqCZZgueVxpxhTm7FWxSa+7vQYugl0C2YENhSNUY+nlEe3lYQRHTG01+Iy0tZApEd+Mo9GnLQKvIayYFoYrn28GLYAMw7RvewiNLSBlTkYP4gCSpoXlmPIWtooDEYdkOaNROL9evwy3gDwpt3WzAWEh7wtAJJDIb4DUpk=
+	t=1709732020; cv=none; b=I6mm7DxFAYDIWuVn9vgjL0XcP3w0tQRQ/4axWKmRZpitTZoMlAEyY8ANKJEhESEVS4E9BvdDlFgYy96r+Vis68iyVg6b1TOvPLe2rP2As3Q+fHHDkwjgKVlLPdH3Y4ytP517vUHvsbm4T4PwQvZpNTaYR03mNlyPB3kbpuP/Nww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709730854; c=relaxed/simple;
-	bh=p8ErNJLqEVurtuygwgHqoaWZ6GjvF3Rx52YwT8d3QIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C3XL5ZcxwpcscOd+R4p8VQGBw3PDc889QEu6oIi7lE3iNPaqk9TiimfAII2fEKD83xyNxBzaJgHGNMPDL1oFX5JuKojVeZ2AzcT+MF/mxGWlP1u2MRZJr41r5DtdsS1zMX8toXG6zW1FQJX53gCtr+rkxT+YGmbbUj8cMK2yJ0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OP8I6US4; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709730852; x=1741266852;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=p8ErNJLqEVurtuygwgHqoaWZ6GjvF3Rx52YwT8d3QIc=;
-  b=OP8I6US4PP78qJPlwGt3ZF++dGVhuwYAD52Msq+0TEvNDkz8KxyFGSTD
-   OkS8us5dxrQIxFg1wnm16fpOCOWKAUmd8BGhSjKRbX8iMBtKGJA39gywu
-   Qsht2O2sJueWldtrWQJ58a/QwycnfWoEvw63VaOGZAVkeAzVnyLCLewnS
-   TAwMbJv5NdgHj75jh34Cg3lGQhuMEp/4z87aI3KLHJc0pxh3gcbvrU9wY
-   1mvUeGm7Gs9KrlmrKOPyXfiNbcGgY+usQASeGOQllhFymc6GJn+06Go6q
-   0PHHDazsjNbmPqYRh1/I1VQhxvsqCVb/T77eBLiOxeEzkhn3cj0HLFuru
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="4493319"
-X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
-   d="scan'208";a="4493319"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 05:14:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
-   d="scan'208";a="10174137"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orviesa007.jf.intel.com with ESMTP; 06 Mar 2024 05:14:07 -0800
-Date: Wed, 6 Mar 2024 21:27:54 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-	devel@lists.libvirt.org, David Hildenbrand <david@redhat.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH-for-9.1 02/18] hw/usb/hcd-xhci: Enumerate xhci_flags
- setting values
-Message-ID: <ZehvWi8UhQOl3v8j@intel.com>
-References: <20240305134221.30924-1-philmd@linaro.org>
- <20240305134221.30924-3-philmd@linaro.org>
+	s=arc-20240116; t=1709732020; c=relaxed/simple;
+	bh=Xl9sdtFyBLWW8dE9wRCAPhZL+YZqGt4B7zD6QgzsmyI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=apRtV6gjXn+nHD6qpAgtoV8/xFsMKynt+kHX62JgsQffOreQlODuRYr4w4XsNvWWu6A37Sm+aRHgJsSXgwzdquGvSDcFPLN3rLaonIW6A/vFrzOWUtGRKctWaHTsWvLzTj4lZ/yocKE9nkfy40zEfFy2h+mv/NsapjnS7YQT+dU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JpP4T1JV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60A07C433F1;
+	Wed,  6 Mar 2024 13:33:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709732020;
+	bh=Xl9sdtFyBLWW8dE9wRCAPhZL+YZqGt4B7zD6QgzsmyI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JpP4T1JVkxhKTMvoG0W01NIGOPgG/G+eV7f5iDSQ23KSG7FjRVzX4p9y0fAyUniMz
+	 bDspb7bsPAG+v627t3LmHBFkyGJ4Itn795rqYkSZQZqhedYU0IX9xXLRGC1RKXMFvX
+	 ZqjGVFRHgrnNb1g/CFCw/KZlz6qWRklViC6IsO35uF6AhO8FYRjtg5h0Onwmpzt9tH
+	 AB8rgFWiVLPV9HYyVlcim8JoMSrDFgRPqXxuOlZcieBHhZDWojnhvjeC+M+WXo8ruf
+	 8hSnsf1vdUhVMWCHwe3rZvBDV7nrZZxkW/jABQk1Hch5lUl1QqqFTXT/0cdztb1hIn
+	 clFpfuyJtqh5Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rhrOr-009wnc-DU;
+	Wed, 06 Mar 2024 13:33:37 +0000
+Date: Wed, 06 Mar 2024 13:33:34 +0000
+Message-ID: <86plw71o41.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	darren@os.amperecomputing.com,
+	d.scott.phillips@amperecomputing.com,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
+In-Reply-To: <8e2ee8dd-4412-4133-8b08-75d64ab79649@os.amperecomputing.com>
+References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+	<Zebb9CyihqC4JqnK@linux.dev>
+	<8e2ee8dd-4412-4133-8b08-75d64ab79649@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240305134221.30924-3-philmd@linaro.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Philippe,
+On Wed, 06 Mar 2024 05:31:09 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> 
+> On 05-03-2024 02:16 pm, Oliver Upton wrote:
+> > -cc old kvmarm list
+> > +cc new kvmarm list, reviewers
+> > 
+> > Please run scripts/get_maintainer.pl next time around so we get the
+> > right people looking at a patch.
+> > 
+> 
+> Of course I know this script -:)
+> I didn't cc since I felt to avoid unnecessary overloading someone's
+> inbox. I don't think anyone(even ARM) is interested in this feature
+> other than Marc and me/Ampere. Otherwise this would have merged
+> upstream by now.
 
-On Tue, Mar 05, 2024 at 02:42:04PM +0100, Philippe Mathieu-Daudé wrote:
-> Date: Tue,  5 Mar 2024 14:42:04 +0100
-> From: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Subject: [PATCH-for-9.1 02/18] hw/usb/hcd-xhci: Enumerate xhci_flags
->  setting values
-> X-Mailer: git-send-email 2.41.0
-> 
-> xhci_flags are used as bits for QOM properties,
-> expected to be somehow stable (external interface).
-> 
-> Explicit their values so removing any enum doesn't
-> modify the other ones.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->  hw/usb/hcd-xhci.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-> index 98f598382a..37f0d2e43b 100644
-> --- a/hw/usb/hcd-xhci.h
-> +++ b/hw/usb/hcd-xhci.h
-> @@ -37,8 +37,8 @@ typedef struct XHCIEPContext XHCIEPContext;
->  
->  enum xhci_flags {
->      XHCI_FLAG_SS_FIRST = 1,
-> -    XHCI_FLAG_FORCE_PCIE_ENDCAP,
-> -    XHCI_FLAG_ENABLE_STREAMS,
-> +    XHCI_FLAG_FORCE_PCIE_ENDCAP = 2,
-> +    XHCI_FLAG_ENABLE_STREAMS = 3,
->  };
->
+You're wrong on a lot of this. There is quite a significant interest,
+actually. But in the fine corporate tradition, not even my employer
+can be bothered to actively contribute. These people are waiting for
+things to land. I'm happy to make them wait even longer (I'm paying
+for my own HW, so I don't owe anyone anything).
 
-From the commit 290fd20db6e0 ("usb xhci: change msi/msix property
-type"), the enum values were modified directly.
+The architecture also wasn't in a good enough state for the support to
+be merged until very recently, and it still is broken in a lot of
+respects.
 
-So it seems not necessary to bind enum type with specific value,
-right?
+> BTW, NV feature development started way back in 2016/17.
+
+And? Cc'ing individuals and lists is basic courtesy, I'm afraid.
+Please don't leave people in the dark.
 
 Thanks,
-Zhao
 
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 
