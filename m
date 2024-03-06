@@ -1,138 +1,197 @@
-Return-Path: <kvm+bounces-11148-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11149-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0E49873997
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 15:45:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C509C8739EC
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 15:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0A6AB23BA5
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 14:45:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C09528AEED
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 14:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1381339B1;
-	Wed,  6 Mar 2024 14:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C44134750;
+	Wed,  6 Mar 2024 14:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fO4eZYii"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="vkkJGBJ3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CB480605
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 14:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709736336; cv=none; b=SsMxSuZ4oYDXaRdt0tRLD/nlUzUExSEnet5Joy4NSt9IvvaEc/AlIrTTdnT8jq689omtoB9udoYARmg96QKiKa2fnLOXf+CouxK9m84pWK8cbATJQ/P+B5bBt8/thON5ELEGrkAsbdzspNCRl4nII1Y0RBzuJURBIj6Fw8lywX8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709736336; c=relaxed/simple;
-	bh=4qDDeM2GJDKd/s57z1lZPEZLMCakZLt6IBfNNHqraZo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uaxT5g+2Qxe67G3aABVNxyXnwA/Tt+REYFCRLocC8X6co1dBdiZT9q4E6Hy7Pii3O636zZwhfHiKyfLeY41dZhbNVZcKf0ComO98I1iShgAVmgG+wybW/N/T5gtrAmubtK2Bzfun/ssLpnF2xfUDfTKskBQJ5IEOCQ7PUadpROo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fO4eZYii; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-608dc99b401so118502367b3.0
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 06:45:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC18780605;
+	Wed,  6 Mar 2024 14:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.100
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709737047; cv=fail; b=NvXXBOCJYpFZOvjvQuDZUgJs8kMy24lxuAkwCUVaJqztggJ3I0xnstnqz5kJTlt7zcLr7Tl+2/k7DjmpqTGCfDgE7/u/Dsq26ocf3rRG8hgC0nPkDaEI8gwNePChbBIbmr9M275Cm4AfRW9+84iksctLFY107NYu4qP2JK1++5A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709737047; c=relaxed/simple;
+	bh=GXALoYvBstTL3GEs6DjzQdBQ7oWnPz+UUle1dyuUTOs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=CUy9JHZgjwxvSJ1iBdsiqxfApFvflfaDMiA4suZGBuruScv0u/FLPwAIeDMibPiMGdoY8KdJbKpE7alD7C3eCCIxF8uMtgiCwDWt8qP5JrFAAhW8bY3Scdwg1xSDMxfu2iNwR4PQUKzsH1afZ0/foPQCA94cCD5+PGICKFdVm+8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=vkkJGBJ3; arc=fail smtp.client-ip=40.107.236.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nOT5gbr6tzzvQXzDUXIHPIyVFDYa1J6iUma5MlHwXAAArq1DcCcISa6XdREIohJm6fFGO0QLm0zzGaO4bP8gKZZzJhcta9uJLlqqJTJbSJk4KzLpxIe+lJvJb4UDASpwlzbKTdJeIaQZVwl08IKjDcMsuRopn9rUF+u6aV6t2f6YN+xcDUzv+J5YmA3mIzqsP+M4cE9ue+316lqS6GnIkoXvAihfSmqm/XcTRsjcf/qa22LXVXEu759U5hczoI0ZLptVVI1GKDNZgGdoozbHQmcrw00+0aigLzlKIM9ZZzb8A9nIMboKO9iGVQ8+aVy/vb1/C+qcOTtrodFKuaH2ug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mtOQnnAgNYmB1uUbffZwnEDbbOe+NH1H4HP3RFmqM9o=;
+ b=JYIxtkCJBNOvk0pbDv4fy/LcxbD6RFXSt6VPXNKa+9nqP+hdo1/0mtjghLgAvkLksB4FvJ7LGsA3PW3GbsgAyes8oR/zmXtRvCq3uDdh6s8Xxl5Kr2QaomzNM/Sskg6H3xvKbWRD19hqtfy4+eMWt44fXGC8rSNEF4rluGsLqD9sxj2zUaavcYyGBcMzQwpIsMKTNyvyUSwQD9WbMKdVkpsfobwhjvQcH/a72b252zEXK9FLEyN7zY9RAH0jvolvidM2NE4wM8AJ7sI3nj3rEhzyHRYeiD2afNAIkaB5ROzf8clISgGWToxb8s24VxGqmmTDVtSEJ+iQhrFNEm5CLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709736333; x=1710341133; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uXZjsUmARj2Dgx8DrIwjJBZxc3BuQgEpxgkrz4sv/pc=;
-        b=fO4eZYiiZbLb+jgFcDnOpzCS7LRKR0TVitfQpVWuX74/rmiylbXs5M3dpAyTJHjHlB
-         Oml5abGBKoVLTcZVtWgakc6aexABidmWoEaqHK+3i2VcUntamIv/uiF+mnT7rO5E8IDN
-         cGJUODWg/WP0Z0Z/wldHdQjrxO+ke+y4PkdDduPeUamkN+ZTqUgzXWZFQAKCv2it1T06
-         fbZQ+Jm3yjXidiu+7mWWaMACsu5BI5H0x3lfIRUO78PQmhYbuEzcCdngEiksXBq3yGX4
-         daUu7ueg0hND1CC/3kCfR0I1XujXM7z1Bk1fTYK94y1D8tihpCLPdwBK5gYu2iM5U8rk
-         mSRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709736333; x=1710341133;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uXZjsUmARj2Dgx8DrIwjJBZxc3BuQgEpxgkrz4sv/pc=;
-        b=ObSCOtEQJ97Yk0sPU2HVlHX6H9sj2PEOT+HLqNXBHvcdlBXXlzJIJa5nbbX0UcFm/N
-         n/L/pbNa+UI8RM7vS2yzLBCUCoY/qL6Llg5qMhN7L/BzH/rVTC/Hpb0H//R5AkBONdtJ
-         /BiS6Hnwl/8CLoA2jnreWFyzRnOw/wud492x3YxPVfLocTH/ytgtI9KGKAiBnBHopw7j
-         CTgQ8FX5YX+ZB1GzTpznWbhUzFUUE7MLkND1Vzb97ueM8JZFkl3/ifImmms2pICQYr4u
-         O4yX6xnJXlfDKpvEq/HY4i47+jDFWxfK5u80gL7f/dkCYoXv1YgdxwQ6o3ZW5BCayOPS
-         ypuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXsaRhmq5KJ7uYHAWTBFXHCTOLC4TqX29rmlNq5eWhM+uFN+u2vtHfZpjyBGBDV8+fVrUdr0k4FzLZnY14Y5oJtpss1
-X-Gm-Message-State: AOJu0YyGRlRbG89F29BlOiYG5vQpZ7J8+zcDeNj6hau4qdzWhuDueHcf
-	fa9SldK0b0Z3pJhwYEkE2Vi8gsdoqUKzLJccan8Bp/lZAs2MinQn6DbTxIO5EQ4SuN7x05X/L50
-	p5w==
-X-Google-Smtp-Source: AGHT+IFag51vL/UvoYhlWt+cP5hn/hFVKq6JWZ8TC7/r3Y68GfcXp0uRyzr/BSVM0D4aSJiRiUKQoyXIzXc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:3507:b0:609:3c79:dbf1 with SMTP id
- fq7-20020a05690c350700b006093c79dbf1mr4263672ywb.8.1709736332428; Wed, 06 Mar
- 2024 06:45:32 -0800 (PST)
-Date: Wed, 6 Mar 2024 06:45:30 -0800
-In-Reply-To: <Zeg6tKA0zNQ+dUpn@yilunxu-OptiPlex-7050>
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mtOQnnAgNYmB1uUbffZwnEDbbOe+NH1H4HP3RFmqM9o=;
+ b=vkkJGBJ3WW134E+TJ+kRWvwfyoJR91SQ7Cf/HG9DuPb16Z4idaLhxIMadPz0VvKovqfdMKIxzUcJS4mACjmEKYtxL+ht/Y29Q8gumDNZojFbbzIASEkG/yCw54fLyD4X1iJdCql4lt+dKoS6NvsI4gSf9THhIaEH6PL1TjxH/Ps=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ SA0PR01MB6489.prod.exchangelabs.com (2603:10b6:806:ec::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7339.38; Wed, 6 Mar 2024 14:57:23 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9%3]) with mapi id 15.20.7339.035; Wed, 6 Mar 2024
+ 14:57:22 +0000
+Message-ID: <b473a3f9-17a3-4d53-a477-cce008e1def0@os.amperecomputing.com>
+Date: Wed, 6 Mar 2024 20:27:15 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU
+ tables.
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, darren@os.amperecomputing.com,
+ d.scott.phillips@amperecomputing.com, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+ <Zebb9CyihqC4JqnK@linux.dev>
+ <8e2ee8dd-4412-4133-8b08-75d64ab79649@os.amperecomputing.com>
+ <86plw71o41.wl-maz@kernel.org>
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <86plw71o41.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0P221CA0044.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:11d::27) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-6-seanjc@google.com>
- <Zeg6tKA0zNQ+dUpn@yilunxu-OptiPlex-7050>
-Message-ID: <ZeiBLjzDsEN0UsaW@google.com>
-Subject: Re: [PATCH 05/16] KVM: x86/mmu: Use synthetic page fault error code
- to indicate private faults
-From: Sean Christopherson <seanjc@google.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|SA0PR01MB6489:EE_
+X-MS-Office365-Filtering-Correlation-Id: 35053a5f-acd8-4170-798e-08dc3dedba7d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	tAUrKGI5TaF6uBmeNITR6wr5e7zyOIkKLdgEH8K9Oo8d26yLq7xD02z/uDrUIOH6TgejK1KZURDgquk8egLXvDDOUGKsp9RrIyvj4/SMeji2eplivQy+q9vEUvN2mhYKeluVqfY0Tc57xEPwMh68AJHGkOBuDWOgzYu1/O0/da42de/XPjNWEx+mc9YOBn29BaHyEfN450SJt1sDBDDR8yJCU4wB2Ptb+YRrORAQYVL/e5cy1mUbqPCLSd8VbYIuQ+YiWNg5QWdaxHZ7nridPexTDOcCfgTfdgdtaCPlAt0rWKnZHuw3GJgwm9aPhX765L6+7qRVre91ytHfuD4Q5qR259yMMVsj1C5p1XkmqA9/5VMcyZn55nXt8wv+32qQxCIn39DslDD070Dax6XPSu7e1l6cXdd+ALnqXAGawrPQL1cFgrUFwp+6dlt1e+liqyz2BNLxSPXp2uh5bmtidDSty2EgzqmyYHtkYpFwe+ns7ZE3ARxcT44znpx4gTDMvMGUkc8vW4EqFFFjJ6PlSKNFyck0zZ8KoKLAgzscRyGgSXBae8Pq7ehUPfIJFBOfhRTredEsNbT9nDu3XBoj/5Z3PBK1a2BzLRiBI7a9a899FwDHF4NJOlTG/4siMFE/rBp/opjXEbL7CQah21mbtv8Vlv6HPwLHzdbRbIQzDC8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OXdIT0hkS3ZqU2hhcmQ5L0JZcEZzKytoMnd1NGlFSTQyL29WdXRUK0gyR2Vl?=
+ =?utf-8?B?eHJJOEpRQklid29iVktWL2lpd2NNQWxLMVU3OFBWRHBFSnYxZXcxSUZCM05U?=
+ =?utf-8?B?YU5XTWxkS01VTWRJblBxVnNqSlV0NThpSGNwRGk1MkkzYmgxS3lYa0pPaWlh?=
+ =?utf-8?B?YXh6aEs3YmJGZW1UMmJmWGZMZVJsUXhLb1FiVXZvOXRPbDB2Q3JMU1ZEaUlE?=
+ =?utf-8?B?WkR0SnU4aFQxaUZyNGJ2RW9UV09XRFVrOGI3c2gxVUp2SlZxZlVGcHhKUHV1?=
+ =?utf-8?B?Tit4bzJGeXlBK0tyVlB4b3FEKzg2NnpyY016MDd5SjFCdnlqdi9OZEhISWly?=
+ =?utf-8?B?a0t5Yy9vWGNHYmc4ZnBrNnpXSjZrU1lzT3Bhck5QdSsrVS9WZFA0MWcyTUI5?=
+ =?utf-8?B?MW5yRmZrNitWTU1EZG10SEw3dUtnMWZBamFpdE13MnRhRDIvMnVWWXo1eENW?=
+ =?utf-8?B?aGp5endaOW9hWm4xdTFwM29Fdjl0UFo2LzNtdkpsMTR4S2ZkYXUvL25teU92?=
+ =?utf-8?B?ZWtub3I2QS9rS29kZUhHSXFLSUEwNWVoRW1mRi9MODVlR0JNQU04M1NNYnYr?=
+ =?utf-8?B?ZVZzbXQyazZ5eE1oN2lzOUxVM29GOW5Ma3NnM1hiVHpjbWtIVmFEUStvclA0?=
+ =?utf-8?B?MmpkeTdoVzk4RHUzSDY2Slh4QXBUdWdyNXA0NTJOYXVyRXlxdVl3bkRTMlc5?=
+ =?utf-8?B?MEI4K2t1RVl3QWdqQ3RoQkRUTmppVytzMENyODh3YnZqSFRwNmErN2RxUDVu?=
+ =?utf-8?B?ZGtRTG9Lbng5dkJzZnV2eGJVbW5QNkpDV2VFT2YyQU93d2ZXZG5CUGhRM3Rn?=
+ =?utf-8?B?UTlUYS9qVWpYRC84QUtMZHdCdStsSG5LbzUvYzVpMEVPYll0WmN1ODB3VjBx?=
+ =?utf-8?B?SEJkSkg1LzJvWWM1emZMekhNdHZHRi9QR3MraFpsQVhUMWhtS2xaaGNaMEh5?=
+ =?utf-8?B?UXBuSUFMZFRHaFlRMWlxYlc1OXZMNE5oamZwR1ZvWlhteTR4RTQ0eUFWR2da?=
+ =?utf-8?B?TnpZak9DSXVSa3hRWlUxSTFUZC9DY0FDR1AzejJFa1NWQ2NYM2t5aDlLMTR4?=
+ =?utf-8?B?cTc1cXpSb1Z6dkpKaGc1bnZldi8xNzJVVkNNa3VwVys5QlNiU2ZPMmx5L0FW?=
+ =?utf-8?B?Rm0vc2dZdDhuWUkzTERsdzRrVG9ISFAvV0U5ak1LdG1paUNKYlFySUJDdmta?=
+ =?utf-8?B?Zkg5dGR3emJrRmpkeG5ESGNvV0NFUkN1b002RjRuM1V1MkpneTBHUWx1aWdy?=
+ =?utf-8?B?Z0w4a3RodUJ3YmY0TGJ1UWRhOHByWmpzMWhTNXRJSmc3RUQveTB0aDZzVFFR?=
+ =?utf-8?B?NkFIdFlUMFRjbW5kVWEvNFQ3L1FrWUt4OFg3VGFiMkZ2OEFQYjJCN3lKVVFN?=
+ =?utf-8?B?Y1pHVDZiTlVUbmlXL0xiMytuZmlnOG1RdFcrZ3ZTQ3JBbUV5NzAwclltVjdE?=
+ =?utf-8?B?allrQklEaGZwZ2RWQm81elFqQUlRVEFWMUpHcE5sSW5mNmUzUVZkclJHOGJK?=
+ =?utf-8?B?RHJoZmJ1ZkpXcnJ2SDJ2cGVZWHgvUzhPNkgzcGZIVmhEN2RhcmNBMnJHLy9o?=
+ =?utf-8?B?QTUrWTdIaEttU1ZuTTdNckNIS2dXQVE2M1VZZVFaV2JiUDBrSXBuK1dEaXBJ?=
+ =?utf-8?B?Nzd0YUxkY0J5R0ZuQThjaVdMUjhHeTFheUl5YmpDNFB2c3R1RG5xUmE1Tm44?=
+ =?utf-8?B?clhFbTdlNi82YldsbjRKOHM5U1NTUUk4M2hlS2hScElPdy81NlJTZG9Cdnpx?=
+ =?utf-8?B?a3NyTVJhTUg0RFkyeE5VUEJhMzJiSWtlVG5MMnkzSmJoQ281SlNaM0tseXBB?=
+ =?utf-8?B?b09Nemw4enJaODMxZGFrUWhBRGMvbjlKM1dROUtGY2hpakhPSnErRnVhZFZk?=
+ =?utf-8?B?YnZHMGlidDJYT2cwSUQ4R0J5WjdYWkI1RGtxRkFrTWNlci9QUVhPVjFEK003?=
+ =?utf-8?B?alhhdUVmU243MjJTdGg2c2E1MWkvYXg5SWx3dE1raTBDK0hFUVFPNGRyZlFS?=
+ =?utf-8?B?bkxpOFh0dnVMZXBYeG9TdzltZVBaUmluMlhVdnFyRnZjZU9ZbXFSeHBtbGhU?=
+ =?utf-8?B?VThNMUV2K1JrZGlnY3RaSVFUelV1RVZtYThYUktDTkxBSEthaDdCVkRReUp3?=
+ =?utf-8?B?RUNrc29jT3hEUlBtSjhpdTNvMEVPdE9WdTcrSHNwYWh3M2RJekpqVWRQVjB2?=
+ =?utf-8?Q?4ajW1odYLQQGIvypTG4s9tE=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35053a5f-acd8-4170-798e-08dc3dedba7d
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 14:57:22.7058
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sHcnov6hThZjnnm/gie7r9ufSrRVyHriEXnrOa7woriK9CVqmIdzKZhzt5j3RP5A2q1B2hV6nXPOB06abWg5CCSCMUWCNeqk1SAsQijUN0lUdbDMP1bVDlkTUiwpvvXF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR01MB6489
 
-On Wed, Mar 06, 2024, Xu Yilun wrote:
-> On Tue, Feb 27, 2024 at 06:41:36PM -0800, Sean Christopherson wrote:
-> > Add and use a synthetic, KVM-defined page fault error code to indicate
-> > whether a fault is to private vs. shared memory.  TDX and SNP have
-> > different mechanisms for reporting private vs. shared, and KVM's
-> > software-protected VMs have no mechanism at all.  Usurp an error code
-> > flag to avoid having to plumb another parameter to kvm_mmu_page_fault()
-> > and friends.
-> > 
-> > Alternatively, KVM could borrow AMD's PFERR_GUEST_ENC_MASK, i.e. set it
-> > for TDX and software-protected VMs as appropriate, but that would require
-> > *clearing* the flag for SEV and SEV-ES VMs, which support encrypted
-> > memory at the hardware layer, but don't utilize private memory at the
-> > KVM layer.
+
+
+On 06-03-2024 07:03 pm, Marc Zyngier wrote:
+> On Wed, 06 Mar 2024 05:31:09 +0000,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>>
+>>
+>>
+>> On 05-03-2024 02:16 pm, Oliver Upton wrote:
+>>> -cc old kvmarm list
+>>> +cc new kvmarm list, reviewers
+>>>
+>>> Please run scripts/get_maintainer.pl next time around so we get the
+>>> right people looking at a patch.
+>>>
+>>
+>> Of course I know this script -:)
+>> I didn't cc since I felt to avoid unnecessary overloading someone's
+>> inbox. I don't think anyone(even ARM) is interested in this feature
+>> other than Marc and me/Ampere. Otherwise this would have merged
+>> upstream by now.
 > 
-> I see this alternative in other patchset.  And I still don't understand why
-> synthetic way is better after reading patch #5-7.  I assume for SEV(-ES) if
-> there is spurious PFERR_GUEST_ENC flag set in error code when private memory
-> is not used in KVM, then it is a HW issue or SW bug that needs to be caught
-> and warned, and by the way cleared.
+> You're wrong on a lot of this. There is quite a significant interest,
+> actually. But in the fine corporate tradition, not even my employer
+> can be bothered to actively contribute. These people are waiting for
+> things to land. I'm happy to make them wait even longer (I'm paying
+> for my own HW, so I don't owe anyone anything).
+> 
+> The architecture also wasn't in a good enough state for the support to
+> be merged until very recently, and it still is broken in a lot of
+> respects.
+> 
+>> BTW, NV feature development started way back in 2016/17.
+> 
+> And? Cc'ing individuals and lists is basic courtesy, I'm afraid.
+> Please don't leave people in the dark.
 
-The conundrum is that SEV(-ES) support _encrypted_ memory, but cannot support
-what KVM calls "private" memory.  In quotes because SEV(-ES) memory encryption
-does provide confidentially/privacy, but in KVM they don't support memslots that
-can be switched between private and shared, e.g. will return false for
-kvm_arch_has_private_mem().
+Sure, My apologies, will not skip in future!
 
-And KVM _can't_ sanely use private/shared memslots for SEV(-ES), because it's
-impossible to intercept implicit conversions by the guest, i.e. KVM can't prevent
-the guest from encrypting a page that KVM thinks is private, and vice versa.
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
-But from hardware's perspective, while the APM is a bit misleading and I don't
-love the behavior, I can't really argue that it's a hardware bug if the CPU sets
-PFERR_GUEST_ENC on a fault where the guest access had C-bit=1, because the access
-_was_ indeed to encrypted memory.
-
-Which is a long-winded way of saying the unwanted PFERR_GUEST_ENC faults aren't
-really spurious, nor are they hardware or software bugs, just another unfortunate
-side effect of the fact that the hypervisor can't intercept shared<->encrypted
-conversions for SEV(-ES) guests.  And that means that KVM can't WARN, because
-literally every SNP-capable CPU would yell when running SEV(-ES) guests.
-
-I also don't like the idea of usurping PFERR_GUEST_ENC to have it mean something
-different in KVM as compared to how hardware defines/uses the flag.
-
-Lastly, the approach in Paolo's series to propagate PFERR_GUEST_ENC to .is_private
-iff the VM has private memory is brittle, in that it would be too easy for KVM
-code that has access to the error code to do the wrong thing and interpret
-PFERR_GUEST_ENC has meaning "private".
+Thanks,
+Ganapat
 
