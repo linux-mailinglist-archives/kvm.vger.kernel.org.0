@@ -1,88 +1,83 @@
-Return-Path: <kvm+bounces-11102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11104-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF3A1872E42
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 06:18:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F38EF872E61
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 06:31:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F1011C234FD
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 05:18:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B063A28B6E5
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 05:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E80619BBA;
-	Wed,  6 Mar 2024 05:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC8CBA38;
+	Wed,  6 Mar 2024 05:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mkeB4cJn"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="tdkp9yP5"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2075.outbound.protection.outlook.com [40.107.244.75])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2111.outbound.protection.outlook.com [40.107.220.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B7314F7F;
-	Wed,  6 Mar 2024 05:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE351BC4C;
+	Wed,  6 Mar 2024 05:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.111
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709702294; cv=fail; b=h0o7cKYUYyhV2zIQUkwazAYe/3wi/3MV9QZZcx8gsWyB4C9GtWVNudErDJTKlhSywke3b59b19Y8H5TE9mjRqdoMlw0iPJGa+S7pL0tJckgdmd46a6dEbZAdhhYmqQBK13dNUjjZGan5TnOqn7srKqa+SbqBqcOIa2cAaJpeDcU=
+	t=1709703083; cv=fail; b=fv7iz6BEav8PefufZr/+5yZT/xlhqHHNBAro9W35Po5s7d7+UVYf9BbWl//MUgMRlMYFfERO+VqlJ3AbzhXuMyAfEdGmm9av6aT/M7zZqri/+0NEDLtnqu9EGDfpux0L8OvW6TcVdd/CmlVTCGi2Ok1VakxLh39BNz3+tg8a+Do=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709702294; c=relaxed/simple;
-	bh=W/uOKsgoQAq1sTUF5cjzknkcO8MGQ+zAayeLcckidHI=;
+	s=arc-20240116; t=1709703083; c=relaxed/simple;
+	bh=15ihCUMFyCFT+Q7/z8oQtBWCtN2GtMKp5V/oPbUKsbQ=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=F0PF8GT1ZUBbH/PdoO8lPZqpDbfoqTvt2gbOBoJd4M97G7rXmkAVMnZekqhfG5vh0hP3x+FsqfbtX4T4k7rBP1AEeOTu1IAeWqZo753LHYVVg1afLnZz8/DCnjsL3Em5cER7KsF6XxKQNhcRH5cShRDotbseC2vCSt0g0HtlyDs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mkeB4cJn; arc=fail smtp.client-ip=40.107.244.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	 Content-Type:MIME-Version; b=lj6Lz/4CrFx9TqCKSn5NK3DylO8gpKtPPRcQdyy7kDlGOShe0PTt4D1/ij+kgLISLJPhCKbuKh3CRQ4xqjhEeUjzrLADEPLJ0WzFXK5rXZ/v+MYv8JKxU3ecqXWlFK94VYuKXGpPVciw4ZWFU15w6uSyu/vMDiMLPcxbGqLPBTQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=tdkp9yP5; arc=fail smtp.client-ip=40.107.220.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OebJF4OZXTLQo33H80+H/3yT+fdJkHRl5HIHIUGKlqq0r+XS04OcYnB+vnthUzSW9NJmXoEwGjmXJsQ5juR+5E4XyQUzqN94Nx1Vb8JF5s/0H2eB/l6CmTJiz5zjsQ07pSg8V1cqjDua2IGDFKFB1oHJTlZGLMUwzPhYn2iZkJluEH5abHE0lb0vG2P8nIufAyF+75W2uP08u8dTg3LCQuTATKSP9vnaTeAnDeHE2CkY23Zo/zj9578BbR0HT7jo4mOggFqD6nc8kVjKC5dXMqIsZnGgaAvi1CPHYHljFfhpX/bBfQOyht6foRCHBz+zNojr9SuoxJz5fMhyX2LOng==
+ b=Zgg3BKHsY1EWvLKiPSE9k1HPJB39nRZoLFHJpDCt/U62qG/kJmHqq5PCkTmEBAdgYAv7fqv0m/0yq7DxCJnDSxfnb6FWZE75fe+AxGJpw8s4AM3/PVvgIuIm2/05MZqDd+C7odRq1lZ1xIQw9XYDYhJmFggXsst2YXm82L65JL/QRRkaBcwMijUEIU/EY8D7/gX1ep/q24jPw4Edh3m8Yscz8GHcTivMv5uB1wkb0Vmp+XLoc07md2Cqk1rFAU5hlm3lqoHk2m7eKTsUiiYSOicwTVWun1itAabyOrt2Wd1H5UvhsGZNdhA6DfqLpYAc5SS3wmTiL7nkTzcLLxWBwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wK7asREL232uYRoodnWt8C3oQj8t4vf4nmCdGPd+Tfw=;
- b=Ps754+0W9J367ZvHwRWAUJxxdt6qS4r56AzFgL3XD9WZmyDnNBq+UZrHaX9MLCRJO3zO3/rUgyUnhc8SkPrZBiyjrYYJk9+X/vHJSBFEThaxFOxc8CQu9FT2W//HNz1pUUqqcYHR69lr4aSB1LBNc6igpniys8O6DAZDmClWRfTlFkiHnySQQB8XNkICyTAcUmHXWPTiBqEJLvLrK41Un7pCer3xrRLXqFaUhA1G8c8f/0TSTDxAI4eh6if0gLvL/Y8oew37yQ8QFSwUoqtAQpDHOt3P8fY1rwegst7Io+/wuqzl5zEdH+xlbvlmN6KSKr7tcybw58g4l4Rx3Vqscg==
+ bh=OSsErPnPH5VnY3x+qIrHYfUqffNXqeBD9V4XaZqTjuk=;
+ b=oMwH7EYFC+YvjIAUOteoBZVmDPhramH54EeF+BZuAomYCTL5uRoxonku2/AzKBc7M34ftkn5nrm8xL06wAkHvFUJcG0Cn4tuZPcyHJk4pb88Vhs/Ae7tYjfycgqNLtHWntrPy8aoyM/JekUgvBqgs0BZUgjGnJsFxQkJSkKWq6L8wwwz7a8xPpHEfVwiOBkMdgzBuxJG4LOx+3989RPisu4GdDVpO+zQW8XYOzpF9hCnIne6k9E/m5KYPC/xaUQvXzaAmvoYeXmiZ+82Z6+6ad1LBXXF9Cg78cyAPIg9xiQTjY86ZyKq46J3hgrVCYd9ziHBNQonp+WzK8aGyusksQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wK7asREL232uYRoodnWt8C3oQj8t4vf4nmCdGPd+Tfw=;
- b=mkeB4cJne9nLgrqiLZtJ4+KV395GmqTCkX09kttAnyrxHL4QCnMZPw7SWv40jYBbInJHng1XMVGImne2ORrwEluQYhAxHWgrkYOSEHtPUwP9mZmfj7Xv8M4HmFElOcfZUOi9paph2gQfLkARfXcnrh6fG3SQDevqv1vL3GmhYc8=
+ bh=OSsErPnPH5VnY3x+qIrHYfUqffNXqeBD9V4XaZqTjuk=;
+ b=tdkp9yP5a6saQf7ofDcq5G/nZnshwd6IwTRnrTEa1iEpUf5AdZwyK3jqK1lZX4Y4OgdLf9phY55qlqd2MeTe45bNHk9hdaQqNb2RTYhZsWOOWoz7zXUjqnMMXkvbIeM+iGLWfDNJEhiblCrQHoJEWSAH92OLqhXq4dkFO3k0lng=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5712.namprd12.prod.outlook.com (2603:10b6:510:1e3::13)
- by MN2PR12MB4062.namprd12.prod.outlook.com (2603:10b6:208:1d0::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
- 2024 05:18:07 +0000
-Received: from PH7PR12MB5712.namprd12.prod.outlook.com
- ([fe80::9dcb:30:4f52:82f5]) by PH7PR12MB5712.namprd12.prod.outlook.com
- ([fe80::9dcb:30:4f52:82f5%5]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
- 05:18:07 +0000
-Message-ID: <265a906f-6179-4ec4-b46d-491930b3d9ac@amd.com>
-Date: Wed, 6 Mar 2024 10:47:53 +0530
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ PH0PR01MB6119.prod.exchangelabs.com (2603:10b6:510:d::10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7339.38; Wed, 6 Mar 2024 05:31:17 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9%3]) with mapi id 15.20.7339.035; Wed, 6 Mar 2024
+ 05:31:16 +0000
+Message-ID: <8e2ee8dd-4412-4133-8b08-75d64ab79649@os.amperecomputing.com>
+Date: Wed, 6 Mar 2024 11:01:09 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86/svm/pmu: Set PerfMonV2 global control bits
- correctly
-To: Sean Christopherson <seanjc@google.com>
-Cc: Like Xu <like.xu.linux@gmail.com>, Dapeng Mi
- <dapeng1.mi@linux.intel.com>, pbonzini@redhat.com, mizhang@google.com,
- jmattson@google.com, ravi.bangoria@amd.com, nikunj.dadhania@amd.com,
- santosh.shukla@amd.com, manali.shukla@amd.com, babu.moger@amd.com,
- kvm list <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20240301075007.644152-1-sandipan.das@amd.com>
- <06061a28-88c0-404b-98a6-83cc6cc8c796@gmail.com>
- <cc8699be-3aae-42aa-9c70-f8b6a9728ee3@amd.com>
- <f5bbe9ac-ca35-4c3e-8cd7-249839fbb8b8@linux.intel.com>
- <ZeYlEGORqeTPLK2_@google.com>
- <8a846ba5-d346-422e-817b-e00ab9701f19@gmail.com>
- <ZedUwKWW7PNkvUH1@google.com>
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU
+ tables.
 Content-Language: en-US
-From: Sandipan Das <sandipan.das@amd.com>
-In-Reply-To: <ZedUwKWW7PNkvUH1@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN3PR01CA0139.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:bf::9) To PH7PR12MB5712.namprd12.prod.outlook.com
- (2603:10b6:510:1e3::13)
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ maz@kernel.org, darren@os.amperecomputing.com,
+ d.scott.phillips@amperecomputing.com, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+ <Zebb9CyihqC4JqnK@linux.dev>
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <Zebb9CyihqC4JqnK@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR07CA0034.namprd07.prod.outlook.com
+ (2603:10b6:610:20::47) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,196 +85,225 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5712:EE_|MN2PR12MB4062:EE_
-X-MS-Office365-Filtering-Correlation-Id: c6dc0dfd-f817-42f4-5d09-08dc3d9cce4f
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|PH0PR01MB6119:EE_
+X-MS-Office365-Filtering-Correlation-Id: f531f617-31cf-4534-1abd-08dc3d9ea554
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	5kMnHdo8kh1mcOYtWiflF/GyGA1ZC87IYY6nG69JfgBzmaJIPADYAJXB8I9FwRBpzcWjN/F7c7NL1ip75y7IdAMV741cEuluvXY/So4K2jJdIhiHaG+IouXcjGMnnKKr/XtQWt3FI60r0sivPWP5GDUonkuDZacLnulLXXqnU719XQphx2xh8YEJEgitPgjVVMeK8YTZ4Z9Cun9Jxre1PWHtbCVx4OkxMcqKN2qz64seHgIy37LtynGgTu92cvLHHIlESOVNeBpozJLesA0615dL5N6Sd075/V8u88748l/PMIrUs3LOmT4KC1v1A0t3Ob3ZD1eHn+Deg9IR5yn71exm3hMr42ikmmumMulj/x38MvssXOTS6nwoXCZytaZmatLXHJQCkw22R0PmEJFJnW1EqDKxYNSdnrP7XKxNiZZX7GW2FCX9DiPOQjPTlU7ve63Iiztel08d0MRpTwcCvcdj3zIP4CItBQQGimH3Cc7TWuVnpHD+zCi2DIB9tnQrxjbTewp9G6m2V/CFAAqOwH8f4YnxEVxr2+iacR++aUl+IF9UfRB/uBhS09BMfzwLw/3AlIP7mxtU1G8x68Hxud7yKiNpiHCLQS6GeFkM63En/4ygG6A7kCJvWq8U2nq/XHLziORV4VrOz2sdulUuEpDq+eVIyKZeAkKvgos6J+k=
+	GA8nJdZX8vSurkpzIGVWE9mcn3ZfmXbXmF26jsOMH7jtXvcOCeM4/kx7W99Y8vcsHNuhrEMxenbc9x91MyJxEG9zMvhxXhiTCQnfHLaeqQs4H59Mj6QDyWHlChkOnOntX1gEVrhlP76jIRuZO28RVuNLkW3jqUvoOywD0BtsH+8VK+bzw87mcmy0rTCn8kjd7ZVUqG7pMBQwfXKmb3KlHfhIv09IHDrOwOaagSHfg+5ScKRwp+oPwBa8gA6HQVTx/Ukeh7+DhnwuPvYq7pgA6CU9nqhq66eEkmgOufo5NNZoQmmB5Fjqc7pKZ2GcN6JS74BGBOyT3vAyksVdIugZTIRSB+SJF4PZZ8kltHzUI7O+qm+y2HePhk6z+xx7vq2qzyGrsBJkpMZM964+9xUjbzRisg6ImeCqpxzVonD4bKjbM2dt9t0euLJ/4eWggIF7yZA4IrrAssnTITGHDwOduTAwgiLFwrMm6nweJpAFBGiBpCRV3wKYCs9FiNeG/SBs2JbUCRkgZlz9pvmhwbs2ecPvTMWH+GbMdhaohucCOng6c0wiv0zsQTbUosTcKM3VZ6WmBBF0+WVpAjdZYAj1bXqQn71+E89PUMKckuFuW3N8zWQuH7Mevx4dfGHcSk8Mg8rD4kDuFGaiV0IXtHQrhFl2OEnmZkj5Th517X1uXMY=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5712.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cDVENUg4MVZYT3JRcVRodkNMV3JjZE9FcFM1MFEvS3V4UjkxMVI4OWJqVWx6?=
- =?utf-8?B?UlVkNE5UYjZOWlBiMTJBUGhyODFvdlJzNjV5ZWsvUE5VQTJWZGp4ODhEL0F1?=
- =?utf-8?B?M3pzQU43M2FJcnRkYVQ0WGV5bDQzNVdib1dlUUFIQmJqbzNJOVRpd3BHbTV4?=
- =?utf-8?B?cGNGSytTemgwUFhGWEF5N3Z1TXRZVE02eGxVdWpGMGpmQkIxTm83OCtYYkFj?=
- =?utf-8?B?M2tDWVdNRG8yMXcvVG9XQmpvTmdZN3NBdzlGREtNUFdlS1Y3dzQvZVIrODhE?=
- =?utf-8?B?elpXQ1ZYRXkyaG84OHJlQU41TjdSVlZ4bS9XbFN3eGQrZDQ4R1lzdHFRWStI?=
- =?utf-8?B?K1VXRnM4WjI3UzVPYTU2bWhFbnlJYXl1cStlM1drZWw4K3FMQ0JKa005VWlJ?=
- =?utf-8?B?dUQvaXlRV2VOVzY5eE1wekZjSHRXelIweDZDWmYvV3Nmd2RyL25oQm1sRVUv?=
- =?utf-8?B?elpKVVpOV3kzL1BSbzJ6aXM4WUVwYkdTcWNRWUI4QTk0SExid2NRWG1JMlNM?=
- =?utf-8?B?ZHJuazhrLzRSQVZQNXY5SHEwWlF3cVZJZHFIT0hRaGY5YVV3NlNHc2RBb21K?=
- =?utf-8?B?Y3d4dVNzVUJCT3o4Y3BGVlA3WGRtamw5dVZicCticWM3d1F2TFZJVEk3TmEz?=
- =?utf-8?B?Qm1zQllMeVhPRVVVeDlJM3NDZHlmMlZDYTJoYWZoTTF0bnBsd1dVSjhFeVUy?=
- =?utf-8?B?Z1REMmNjN2RGOFdnSjFnaWR3UmxuZ3hPWDEyRXh4Q1AxYURENVZTaXBEa2Q5?=
- =?utf-8?B?N3dtRnd2L2laa1N2UlRhT3VsUm9QbG5DMTNSTFhtSm9nUzdnRGMxaUhQZHUy?=
- =?utf-8?B?d0VNdE05L20ySUNSUXQ5b05KR1lqaTJCcFJFTWlQa0h3SlBoYy9BVDhWcSsz?=
- =?utf-8?B?SFFka2FpWWlqZ2J4QVFjbmprM0N2NXBIK2N6eXRWcXhlbC9QRHR6RzFuUFFp?=
- =?utf-8?B?dVhnWFNYRG9IVGFPZ3pwbld0bEc5cjRkeElveDZINWJpSUoxOVJLQXhNNDVq?=
- =?utf-8?B?YW9hcXh1ZEk3cXAyMEdxT0RJU1pONzdyTHVyZXQ3REZCRi9Yd01BSm1KVWZl?=
- =?utf-8?B?Q25ndHFEcEdTODdTT1d3d0RzcEtOek1ZWlh5QXREQW5PLy9Lcm9rUGp6OG85?=
- =?utf-8?B?WjhZVzY1ZGpRVStGcmIxKzBzeDNDWkQrcXFWdWFlUXNsclVJaGVLMDNHSXJ6?=
- =?utf-8?B?eDQzdy91OTRTbHZDQU5YOUNNNSt3cXVvRmdCeEZjZXh5MGVaVWJsWjk4bklp?=
- =?utf-8?B?NkVybWdzbCsvcGhIU1FEN0dMbXlDaHJiZVpiZ0tOa0wyNXhNaHJJWUFSd0F6?=
- =?utf-8?B?clIzNWpBZDNBZ0YvQXdpMWdBSFZpdE5hajI5djBlUjF5emV4REttTUV3a012?=
- =?utf-8?B?QkZBUThYUjV1dHpySk5YemNsUFlHRUFWZFZGWWM0emlFWUNzN1EwbnUwejM1?=
- =?utf-8?B?WFN2V2dGNzlSOHB2RVlxenNRZm4zY1M2VWhyaUhGcGc1azI4Y3EzbDhXb1cw?=
- =?utf-8?B?aWhTVU4zSG51dVZCdTBoaWtvbGNPUTZyc21MNnUyZStJUDNpRmU1ZHJVMzVN?=
- =?utf-8?B?c2JKZXRIdEF4ZS9pckVsc2tIU1E2TzEwWmttbjc5ZlhLRDVNVk9CZFA3YUwy?=
- =?utf-8?B?Y29FS2dPM0wxa1hSZkpublJXUTZBejRuUE10aXhkTjdzdmxRVTgzRHFIOElk?=
- =?utf-8?B?YWhjRUtkQ3BEalNqMEEzQTdNTldQUys2cTk2WENxQWwzaWJIN2NWeE93dXBY?=
- =?utf-8?B?V2duZzZKSS83dkliSkFFY0xOdldST28zMURJeTlCbmdJVjFjc20rZmg0UmNi?=
- =?utf-8?B?QTBlZkhQdzlvckE0V1NwaVFmOVNrQytGZFI5eE83d1l0ZzJqbzMvOXQxMlg1?=
- =?utf-8?B?Ung1RzhSZzdiN3haL1AyT05GT3gvUDc4WHVsTzFQV0xhM2tkeEJScjQ1Yk04?=
- =?utf-8?B?M0pZRVdNL2dlR1E1VFFFd1hxK3NwQXk5TFpBT05Cekd2Y1piMjF5NTF5bFR0?=
- =?utf-8?B?alZtMlVnZnJ3dWkxblVINzhPeWVpWkMxK1BRNkRtQ0ZjWVprcHB5WmFLSGdh?=
- =?utf-8?B?R3hHMTdBQUZSSHNjcmtZZ2tDK29uWE1OajBmbSt2cExWTUwzTzk3ejNvTEFZ?=
- =?utf-8?Q?THYWHaHAEw29u9Av9f3Meijtl?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6dc0dfd-f817-42f4-5d09-08dc3d9cce4f
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5712.namprd12.prod.outlook.com
+	=?utf-8?B?YUtRaUtNM2NtbGo2ZTlsN0VGcmE0cWNpa0xPR3NqTXVwN21mNVlTU1c3NzJi?=
+ =?utf-8?B?T2pLKzFpdUlMb2h0SzRhVnRveUxpVTZmaUxpc0VYb2gxZFI4cUVqS0Z6TGJ4?=
+ =?utf-8?B?NHJ2Q0o4WGJETFNyVVhkU1VEMGljM01YcHdWZjhhWmRaVEw5aXowekpaK3Ni?=
+ =?utf-8?B?TnZjQm0yaWVPalhuNzZUTnNCRG90ajlxaldtWVFSY3B4SmZxOHlTOXRkZEV6?=
+ =?utf-8?B?dUkxblZhNWVUeDRTYWYraVhWczNWVWVSN3hRMTVYWlAzWHlrb3FhM1dzTEFL?=
+ =?utf-8?B?emZtd0RnRTFKVk1yTHB2SFMwdCtkY0pEL3hMODBEQ1BLbzNWZmVla3MrV3l4?=
+ =?utf-8?B?cmtvcm9KY3Z6cFFCeDlNNSt3aGJDV1pySnRXTDdUS3JwTHRhcGZ5ckgwSVJm?=
+ =?utf-8?B?RTdCSDhEZVovcnJuekw5ZC9tNDhvYzVrb0xRWFpQY0NWS0hwWE9vc3pEM2JJ?=
+ =?utf-8?B?MjJ5TTdQRGUwWWdyN0NXcE5yek1tMjR1eXJzSlVvcS9VelF3OGlIWFY4dlpS?=
+ =?utf-8?B?RVhYRTJkSE5jWWp6WUhuKzZOZ2xTZjZwcXNlUGc0QmdwQkFBYTJYUUUrREpo?=
+ =?utf-8?B?OFJ5NGlLeVdzUlV2eTg3QmdwOWQ5cFM4L3VtR3NjaEhMdE5JQitLSXN6dzRN?=
+ =?utf-8?B?QzM3T2hqNjVHRURKdVNyejJjUG10Wi80elhVM3ZKWmNDeEVRMmZ1SXlSa1o1?=
+ =?utf-8?B?RVJ5MDlhOHo3cDFEWXYvM2tRTHpYYU5QaVc2clZ5MmV4TTRyaG0wSVNxZUFP?=
+ =?utf-8?B?aFk1b2NsSHc4bHFXeE9hTGNWTU51QVRFNkZtc2ZFb0RIMGRsRy9WcEFBV09o?=
+ =?utf-8?B?eUFlQlc3S3VBVW5saVF5WUhsZmtzQkhhVlgxeG52NkRNMkZVbzNvNEE1Nysw?=
+ =?utf-8?B?M2lTT1RJbzFzOWdHWEhETVpjZnFkaHIzVEFyazZBVndTM2VGc2lrU295ckZP?=
+ =?utf-8?B?UGFiU1o0ak1UcU1KdEgyQkMrcHBrcXNtcEQxNUJDWVFzZlBpUGdxS3RGYjdI?=
+ =?utf-8?B?NHN5MHFTVDlXNGlSYkNlWmtMYTJrRjEyQjRSVHRkL0V1enRNM21aT3FsQy9Z?=
+ =?utf-8?B?Z0J6dDVXb2F6Qis1aVZqS1h5RTRIUW1Tcy81bENCZS8yUzBIR3doRmQzaDgy?=
+ =?utf-8?B?MkdQRUYwTFVlaXMzemFRemYxbDBNZWxpQ28xZ2swdWo2SXdIS1ZwOHVXZlV4?=
+ =?utf-8?B?aFdUWWgvMlp6UlFwcStHZytBUEpNb2hneW91UWJHTlRhWi9DUEkwRWVsbzlr?=
+ =?utf-8?B?Y1gxYU11aWliV244bThUeUd1WGE5YVhZanBZSHVMOWhuYzJRZlk1VWxwekNj?=
+ =?utf-8?B?UE9UM2FIN0VhZUR5MTdtbkI5dGZnVlJ2aU1IaTZOUksyVWNEZ0g3clpZd2Rr?=
+ =?utf-8?B?YmY4aE5vM3JqVFRoL3p2UUtmZTFiT0EyN250VkhSZ3N2N0FVd3lSTlJxZGhM?=
+ =?utf-8?B?TmNUcEpQZ20wcG5XdDdydW1rQmVpYkVxanowak54RXJsTElTUXRhc21iT1V6?=
+ =?utf-8?B?cjJ0RVhTQ25aOWNpUkN1ZkJWYlFyRzRNWlFlamsxaExoOElOazJLbDFndTdQ?=
+ =?utf-8?B?d2c5QkM5eDlWa2VUajY3eXJCa1lqT2Y5UUhoOHhMaEdVd0s2RTVxaDNlRWNL?=
+ =?utf-8?B?eW1SVyt0N3FDVDZBVWRsS2V0M2NVa1Nlbmxha2tLbDJBS01mbzlzT1NlVWxr?=
+ =?utf-8?B?eVFudWRkazl6T3Z3Zms0dGh6SzFDRUhiYnVqUG5hNTNFTHNQQ0tSSTJKZldP?=
+ =?utf-8?B?Y3NNMDBjaEpZY3JrTkd5SmNZVzk2bFJtZWV5aWUzN281b2tGK3RPMnNqRFJL?=
+ =?utf-8?B?ZEwzTmc3NTA3SlpYOUEvempKWlpHdGlTWWEvUm15djBTOWhKRFdwWnRFWjlC?=
+ =?utf-8?B?MzRRLy9UaDRreXdTT3BxQU5CYjNkNXZGb3VjQlFNZlQ4blcyVTh5dTFxTkRW?=
+ =?utf-8?B?WHRHNVlFUzNsNXdrYVl3SFQxTjZwSTJLcU1iZGdnSm1UMnlzTDZPeEZ5WUpm?=
+ =?utf-8?B?c0ZhbHJTYWN3WHJzNXNHaGcxN1NxOXVBMW9KTHZoNXpjbC9FeWtpU2RrMWZW?=
+ =?utf-8?B?T0d5emJaMjNpamRteVNldHYxcWRwUjdsV2ExOHV2d0o3d2Y1allOTjZOdjlr?=
+ =?utf-8?B?Z09xV2J3OHFxMGFwUkJQMEhVMGxPZE1UdHZEZERlcG5XTFE0OUNJQklJakw5?=
+ =?utf-8?Q?qULJK2Coyn3gWARCDF9O3AA=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f531f617-31cf-4534-1abd-08dc3d9ea554
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 05:18:06.9481
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 05:31:16.8784
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KcP6BYUFcEN7iBtNg5L6ZNUlgz+C8Q2a3IqDRyVfg1bgU/HWPuUNzmMo+oe0A2wn7nM4JDmF9vn9U/YJEc1rfA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4062
+X-MS-Exchange-CrossTenant-UserPrincipalName: v3VKAtUPAYu4SOZk6ki6D3fDVk4F6MJuf0lAMep6V4YikZ4/MmZUqQx98UUMthZsdt9qe05It6v4BLxNMVtbte18LUy5U7Dv5USY1QsTvo1D+HRCzHvq/YGsfDdUq3R7
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB6119
 
-On 3/5/2024 10:52 PM, Sean Christopherson wrote:
-> On Tue, Mar 05, 2024, Like Xu wrote:
->> On 5/3/2024 3:46 am, Sean Christopherson wrote:
->>>>>>> ---
->>>>>>>     arch/x86/kvm/svm/pmu.c | 1 +
->>>>>>>     1 file changed, 1 insertion(+)
->>>>>>>
->>>>>>> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
->>>>>>> index b6a7ad4d6914..14709c564d6a 100644
->>>>>>> --- a/arch/x86/kvm/svm/pmu.c
->>>>>>> +++ b/arch/x86/kvm/svm/pmu.c
->>>>>>> @@ -205,6 +205,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>>>>         if (pmu->version > 1) {
->>>>>>>             pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
->>>>>>>             pmu->global_status_mask = pmu->global_ctrl_mask;
->>>>>>> +        pmu->global_ctrl = ~pmu->global_ctrl_mask;
->>>>
->>>> It seems to be more easily understand to calculate global_ctrl firstly and
->>>> then derive the globol_ctrl_mask (negative logic).
->>>
->>> Hrm, I'm torn.  On one hand, awful name aside (global_ctrl_mask should really be
->>> something like global_ctrl_rsvd_bits), the computation of the reserved bits should
->>> come from the capabilities of the PMU, not from the RESET value.
->>>
->>> On the other hand, setting _all_ non-reserved bits will likely do the wrong thing
->>> if AMD ever adds bits in PerfCntGlobalCtl that aren't tied to general purpose
->>> counters.  But, that's a future theoretical problem, so I'm inclined to vote for
->>> Sandipan's approach.
->>
->> I suspect that Intel hardware also has this behaviour [*] although guest
->> kernels using Intel pmu version 1 are pretty much non-existent.
->>
->> [*] Table 10-1. IA-32 and Intel® 64 Processor States Following Power-up,
->> Reset, or INIT (Contd.)
-> 
-> Aha!  Nice.  To save people lookups, the table says:
-> 
->   IA32_PERF_GLOBAL_CTRL:  Sets bits n-1:0 and clears the upper bits.
-> 
-> and 
-> 
->   Where "n" is the number of general-purpose counters available in the processor.
-> 
-> Which means that (a) KVM can handle this in common code and (b) we can dodge the
-> whole reserved bits chicken-and-egg problem since global_ctrl *can't* be derived
-> from global_ctrl_mask.
-> 
-> This?  (compile tested only)
-> 
-> ---
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Tue, 5 Mar 2024 09:02:26 -0800
-> Subject: [PATCH] KVM: x86/pmu: Set enable bits for GP counters in
->  PERF_GLOBAL_CTRL at "RESET"
-> 
-> Set the enable bits for general purpose counters in IA32_PERF_GLOBAL_CTRL
-> when refreshing the PMU to emulate the MSR's architecturally defined
-> post-RESET behavior.  Per Intel's SDM:
-> 
->   IA32_PERF_GLOBAL_CTRL:  Sets bits n-1:0 and clears the upper bits.
-> 
-> and
-> 
->   Where "n" is the number of general-purpose counters available in the processor.
-> 
-> This is a long-standing bug that was recently exposed when KVM added
-> supported for AMD's PerfMonV2, i.e. when KVM started exposing a vPMU with
-> PERF_GLOBAL_CTRL to guest software that only knew how to program v1 PMUs
-> (that don't support PERF_GLOBAL_CTRL).  Failure to emulate the post-RESET
-> behavior results in such guests unknowingly leaving all general purpose
-> counters globally disabled (the entire reason the post-RESET value sets
-> the GP counter enable bits is to maintain backwards compatibility).
-> 
-> The bug has likely gone unnoticed because PERF_GLOBAL_CTRL has been
-> supported on Intel CPUs for as long as KVM has existed, i.e. hardly anyone
-> is running guest software that isn't aware of PERF_GLOBAL_CTRL on Intel
-> PMUs.
-> 
-> Note, kvm_pmu_refresh() can be invoked multiple times, i.e. it's not a
-> "pure" RESET flow.  But it can only be called prior to the first KVM_RUN,
-> i.e. the guest will only ever observe the final value.
-> 
-> Reported-by: Reported-by: Babu Moger <babu.moger@amd.com>
-> Cc: Like Xu <like.xu.linux@gmail.com>
-> Cc: Mingwei Zhang <mizhang@google.com>
-> Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Cc: Sandipan Das <sandipan.das@amd.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/pmu.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 87cc6c8809ad..f61ce26aeb90 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -741,6 +741,8 @@ static void kvm_pmu_reset(struct kvm_vcpu *vcpu)
->   */
->  void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
->  {
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +
->  	if (KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm))
->  		return;
->  
-> @@ -750,8 +752,18 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
->  	 */
->  	kvm_pmu_reset(vcpu);
->  
-> -	bitmap_zero(vcpu_to_pmu(vcpu)->all_valid_pmc_idx, X86_PMC_IDX_MAX);
-> +	bitmap_zero(pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
->  	static_call(kvm_x86_pmu_refresh)(vcpu);
-> +
-> +	/*
-> +	 * At RESET, both Intel and AMD CPUs set all enable bits for general
-> +	 * purpose counters in IA32_PERF_GLOBAL_CTRL (so that software that
-> +	 * was written for v1 PMUs don't unknowingly leave GP counters disabled
-> +	 * in the global controls).  Emulate that behavior when refreshing the
-> +	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
-> +	 */
-> +	if (kvm_pmu_has_perf_global_ctrl(pmu))
-> +		pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
->  }
->  
->  void kvm_pmu_init(struct kvm_vcpu *vcpu)
-> 
-> base-commit: 1d7ae977d219e68698fdb9bed1049dc561038aa1
 
-Thanks. This looks good.
 
-Tested-by: Sandipan Das <sandipan.das@amd.com>
+On 05-03-2024 02:16 pm, Oliver Upton wrote:
+> -cc old kvmarm list
+> +cc new kvmarm list, reviewers
+> 
+> Please run scripts/get_maintainer.pl next time around so we get the
+> right people looking at a patch.
+> 
 
+Of course I know this script -:)
+I didn't cc since I felt to avoid unnecessary overloading someone's 
+inbox. I don't think anyone(even ARM) is interested in this feature 
+other than Marc and me/Ampere. Otherwise this would have merged upstream 
+by now.
+BTW, NV feature development started way back in 2016/17.
+
+> On Mon, Mar 04, 2024 at 09:46:06PM -0800, Ganapatrao Kulkarni wrote:
+>> @@ -216,6 +223,13 @@ struct kvm_s2_mmu {
+>>   	 * >0: Somebody is actively using this.
+>>   	 */
+>>   	atomic_t refcnt;
+>> +
+>> +	/*
+>> +	 * For a Canonical IPA to Shadow IPA mapping.
+>> +	 */
+>> +	struct rb_root nested_mapipa_root;
+> 
+> There isn't any benefit to tracking the canonical IPA -> shadow IPA(s)
+> mapping on a per-S2 basis, as there already exists a one-to-many problem
+> (more below). Maintaining a per-VM data structure (since this is keyed
+> by canonical IPA) makes a bit more sense.
+> 
+>> +	rwlock_t mmu_lock;
+>> +
+> 
+> Err, is there any reason the existing mmu_lock is insufficient here?
+> Surely taking a new reference on a canonical IPA for a shadow S2 must be
+> done behind the MMU lock for it to be safe against MMU notifiers...
+> 
+> Also, Reusing the exact same name for it is sure to produce some lock
+> imbalance funnies.
+> 
+>>   };
+>>   
+>>   static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
+>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+>> index da7ebd2f6e24..c31a59a1fdc6 100644
+>> --- a/arch/arm64/include/asm/kvm_nested.h
+>> +++ b/arch/arm64/include/asm/kvm_nested.h
+>> @@ -65,6 +65,9 @@ extern void kvm_init_nested(struct kvm *kvm);
+>>   extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+>>   extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
+>>   extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
+>> +extern void add_shadow_ipa_map_node(
+>> +		struct kvm_s2_mmu *mmu,
+>> +		phys_addr_t ipa, phys_addr_t shadow_ipa, long size);
+> 
+> style nitpick: no newline between the open bracket and first parameter.
+> Wrap as needed at 80 (or a bit more) columns.
+> 
+>> +/*
+>> + * Create a node and add to lookup table, when a page is mapped to
+>> + * Canonical IPA and also mapped to Shadow IPA.
+>> + */
+>> +void add_shadow_ipa_map_node(struct kvm_s2_mmu *mmu,
+>> +			phys_addr_t ipa,
+>> +			phys_addr_t shadow_ipa, long size)
+>> +{
+>> +	struct rb_root *ipa_root = &(mmu->nested_mapipa_root);
+>> +	struct rb_node **node = &(ipa_root->rb_node), *parent = NULL;
+>> +	struct mapipa_node *new;
+>> +
+>> +	new = kzalloc(sizeof(struct mapipa_node), GFP_KERNEL);
+>> +	if (!new)
+>> +		return;
+> 
+> Should be GFP_KERNEL_ACCOUNT, you want to charge this to the user.
+> 
+>> +
+>> +	new->shadow_ipa = shadow_ipa;
+>> +	new->ipa = ipa;
+>> +	new->size = size;
+> 
+> What about aliasing? You could have multiple shadow IPAs that point to
+> the same canonical IPA, even within a single MMU.
+> 
+>> +	write_lock(&mmu->mmu_lock);
+>> +
+>> +	while (*node) {
+>> +		struct mapipa_node *tmp;
+>> +
+>> +		tmp = container_of(*node, struct mapipa_node, node);
+>> +		parent = *node;
+>> +		if (new->ipa < tmp->ipa) {
+>> +			node = &(*node)->rb_left;
+>> +		} else if (new->ipa > tmp->ipa) {
+>> +			node = &(*node)->rb_right;
+>> +		} else {
+>> +			write_unlock(&mmu->mmu_lock);
+>> +			kfree(new);
+>> +			return;
+>> +		}
+>> +	}
+>> +
+>> +	rb_link_node(&new->node, parent, node);
+>> +	rb_insert_color(&new->node, ipa_root);
+>> +	write_unlock(&mmu->mmu_lock);
+> 
+> Meh, one of the annoying things with rbtree is you have to build your
+> own search functions...
+> 
+> It would appear that the rbtree intends to express intervals (i.e. GPA +
+> size), but the search implementation treats GPA as an index. So I don't
+> think this works as intended.
+> 
+> Have you considered other abstract data types (e.g. xarray, maple tree)
+> and how they might apply here?
+> 
+
+Thanks for suggesting the maple tree based lookup, I will try it in next 
+version.
+
+>> +bool get_shadow_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa, phys_addr_t *shadow_ipa, long *size)
+>> +{
+>> +	struct rb_node *node;
+>> +	struct mapipa_node *tmp = NULL;
+>> +
+>> +	read_lock(&mmu->mmu_lock);
+>> +	node = mmu->nested_mapipa_root.rb_node;
+>> +
+>> +	while (node) {
+>> +		tmp = container_of(node, struct mapipa_node, node);
+>> +
+>> +		if (tmp->ipa == ipa)
+>> +			break;
+>> +		else if (ipa > tmp->ipa)
+>> +			node = node->rb_right;
+>> +		else
+>> +			node = node->rb_left;
+>> +	}
+>> +
+>> +	read_unlock(&mmu->mmu_lock);
+>> +
+>> +	if (tmp && tmp->ipa == ipa) {
+>> +		*shadow_ipa = tmp->shadow_ipa;
+>> +		*size = tmp->size;
+>> +		write_lock(&mmu->mmu_lock);
+>> +		rb_erase(&tmp->node, &mmu->nested_mapipa_root);
+>> +		write_unlock(&mmu->mmu_lock);
+>> +		kfree(tmp);
+>> +		return true;
+>> +	}
+> 
+> Implicitly evicting the entry isn't going to work if we want to use it
+> for updates to a stage-2 that do not evict the mapping, like write
+> protection or access flag updates.
+> 
+
+Thanks,
+Ganapat
 
