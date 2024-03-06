@@ -1,183 +1,183 @@
-Return-Path: <kvm+bounces-11152-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11153-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02207873B01
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 16:44:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8233873B97
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 17:05:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABF762821CB
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 15:44:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 173731C23FD5
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 16:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD66135A49;
-	Wed,  6 Mar 2024 15:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCEC2135A52;
+	Wed,  6 Mar 2024 16:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="EHbRTffY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AFf9InTb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644D913665A
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 15:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1C3136668
+	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 16:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709739814; cv=none; b=YefF/5qT9NO16pK3c4qW8rXL3Pc3JUdae8ovCfDWbfnmMINUfvtLLCXbNKv5SwEqDi2C6SNvLepsqGQuxahryyLJlnqT5L0x9O4dqYSatvyiyOn4b/X9TVdZer8Qj2UVtq8AKQPUOdPHhrq9LDg1Ize/qNaj+Y3CCa4hBkC7Uu8=
+	t=1709740921; cv=none; b=HPQJqnae7Q6n5A60YWazdRLzqXJ7kpkRn/1d/0JpUVpMQEN+vZSGig4Weqw/hbM1WzAsm2jZnObUG6g9bK7tjs4CuJ+6D3t4bWGEaed6qeUnUqVYKywf2bEBD5ErKDUyVpsBqLzZfeSfGLzUVsdQWbmR994v+ofVmi47DY8lKD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709739814; c=relaxed/simple;
-	bh=pGaDc0TLwfeotZCgvBcO4BGO9qk0bmKODRVmJ9jH1RY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YguZqpI+jg8x27UbabVy0oc7cLZkLch1+J3x/05PEuy/jv46YlTyEebIvq0CmUx7+/+w7YQ5/QvnUcQssdo4Gt9GPaqLdy6GBpUlshOPOFhBbGjzHF41K5qFc8BKSxT0H0epBhXAVumCQ0t8sQo3NjgovtzwmvtMftHXt6efod0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=EHbRTffY; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5a18f0f42c8so135527eaf.0
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 07:43:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1709739810; x=1710344610; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k1cN5gYBP45I54WCStxe7DUVSwP4yg1UztQaoI/QgCY=;
-        b=EHbRTffYRUPXi/5DH5IevGwnWlcrTDhMcLaL1V7n8fKyTJ3zWc9GzowCcApsqb4F/j
-         OAvS90y7UEP4b6YqKcflqWW3qa+9Cpai4UMVePHbjxruVuIK6Qpvw+95onDilF2IwIYz
-         gzkxxOC+kczjYtmKUDMoOV4dtPdPMkdCIcC0Z2rAD8AIp8thVggKPrA61LG0p/82v8S7
-         HHX0rK4u0RDL59n+x6QuLIprN12eVoVIiAm8geP4mTuO8hkg66lhfAgl9I/sRRkS9z0p
-         OPtl/BDe2lWdfFN+MtXlT70pUOfAog7UHhd9W2RvAXQcH7aWmTVfsVi5orHgjUUAPLDK
-         Qd5Q==
+	s=arc-20240116; t=1709740921; c=relaxed/simple;
+	bh=EE98jEkK2IgxbIB0yhqU7nlbCvA7qeSvYdi35YbgGXk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H1TivNqglbWefoabTJLPxF2OO9l2CfjWXiC9cOTHfgytETlp/xRIb5GqpuWAfOwSbk6US4JuqYYxJGcUwXVoJUtAC48krHfeVEjuyHTzyvEjC7cxvvcOq+T5xquKlSqLisWw4DsbSth89yWjdmcjp9S20bA+O2DfxKV6FIIrzDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AFf9InTb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709740918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=HIKrZDxlEHFzlQCbSggPchCcXnWZkSttvq8u+AjlpFs=;
+	b=AFf9InTb09bmOWSDnsxP8PIgtTWEYSIX7XOQbdQyjZF+fmydkSW48Y6bJ5ozjV6RwIUnA1
+	m2RzYSVzMM98xAksaLpi2U/QueQzlI5qFx79P2B3ocQBLrv7NYA9giIwKGepEBE1sYklmB
+	CB/U6XblpfKL5f0wrcehYAUByTN1pCI=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-472-YDGDVx7MPTWz0cPVXXee9A-1; Wed, 06 Mar 2024 11:01:56 -0500
+X-MC-Unique: YDGDVx7MPTWz0cPVXXee9A-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-55d71ec6ef3so6541129a12.0
+        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 08:01:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709739810; x=1710344610;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1709740915; x=1710345715;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k1cN5gYBP45I54WCStxe7DUVSwP4yg1UztQaoI/QgCY=;
-        b=CEAoiLyLiQPM2mQxm+ZcRCmgfE7MCIGzeZ7MJZiSn24YSU7VQGR9lzJKbsRZIihyLP
-         M0ljSdxE6ToBYtPp+5BXtp+KZArYMzxY5GDpf6uxEdXx8UbfBgGALYA5ATogUnfW10O+
-         9o23zG2WK8ZCg9l7vhTO/OxTHlkkWtgyPeNhJFFjcun/4mjA4qhectrUYjXdGUBEBVNC
-         NmzjaOc1tlIlU5/hjtTnCNPuX+kXWYdrtarg/tEwKWqxMWIGJgVoiEfvLmhV6AZLMDGe
-         lY9Efhvb8+6mZ9NqGmOMrt6qD3zijV+yHtinoUVOUDvxgDflR+tOVrOwVtr+J86goVqq
-         hqFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWRZGTDxNV1a4cql4dfCZ5yxkdWVs+TpgKRw9eyg7zDS3cYg2g9avgZH/D0dsApLnL9Lk8VTfgnsK/gwGS3ccEVzFlw
-X-Gm-Message-State: AOJu0YyNTZQRAMTewvOxCZtuvdGLEz3+GOn1LEMwFj7Y5AE9o6x/l5+V
-	Ku0TCSFixbDSwkwOjx2il5xWh87jJHw1WH28tT8Y+1lH8chWLGg6NwtDVcJoZZE=
-X-Google-Smtp-Source: AGHT+IF835JdG2KV+Fg3U6AZj/VvG5X03U44hahvSgMdG82XDPKZTf6weC4/9ghDsNohTNUCXi+btw==
-X-Received: by 2002:a05:6358:78a:b0:17c:1bc7:16d5 with SMTP id n10-20020a056358078a00b0017c1bc716d5mr5567125rwj.5.1709739810357;
-        Wed, 06 Mar 2024 07:43:30 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id j10-20020ae9c20a000000b007871bac855fsm6707680qkg.47.2024.03.06.07.43.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 07:43:29 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rhtQW-001c2D-PU;
-	Wed, 06 Mar 2024 11:43:28 -0400
-Date: Wed, 6 Mar 2024 11:43:28 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Message-ID: <20240306154328.GM9225@ziepe.ca>
-References: <cover.1709635535.git.leon@kernel.org>
- <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com>
- <20240305122935.GB36868@unreal>
- <20240306144416.GB19711@lst.de>
+        bh=HIKrZDxlEHFzlQCbSggPchCcXnWZkSttvq8u+AjlpFs=;
+        b=MT6MaBkzh3lL36On9+yMG6dA3XKmqoH7YZ8PSKDkyfxm9VuSUllusHu4YUkiNbvp1B
+         MuPMiqsnL8ADyDaiioFJ/eyUvfQ9c6xPH5ezaBwgsDoiYUtEntt0qltYFc9aNgVAcrEm
+         m0d+x+gq7/0lQcvkurafZwZ9ol7DYzL/OSBjpJr3GNSB2P02arRDT8WIqKtDeFKV0KhG
+         CEgWl0OUc24IG0a1xqdzBFG0P110zSExnZ7/srfMAGBe1v7lIxpCRiPF61Vyn7LhyLZf
+         5wbNRP4cQi40UJr7BDshABErRPHUJu6A7xSL+H2N/xKI7yFvi2x2Hio4NtGQF9aMqBsw
+         GXGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAtn9tg+nw1Z+YTCiQ6uun3RAelS0KS9w+4KVRjb09z+O3t5gMV3Uo9hR/kLr4uECYC9DfsLQEWXalZkRPOeejFKsZ
+X-Gm-Message-State: AOJu0YwP9tz5aYum7G9vWOGcfsIE//WTtzrWlXn1NidbddMAZwJz366P
+	2MRoBgDUW+PlXthU0lLLJ7bSv+trTzu03Ioq1nsJV/2zTMtaRSwtcOTVce4uLtuu/mhbnpsQbvx
+	LClhBozUagMXBbK/HKQnz1SQTJBUenVHA14iEqkuAgeIMA6cSZw==
+X-Received: by 2002:a50:c8cb:0:b0:566:a235:9355 with SMTP id k11-20020a50c8cb000000b00566a2359355mr11404490edh.33.1709740915740;
+        Wed, 06 Mar 2024 08:01:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFlStsX0L5rrMhZ5WBqFHt/WXXTtiOgD+MZyXs0J2J16cUAoPHyWAoXJfdhAF4xwrLrtAJ88Q==
+X-Received: by 2002:a50:c8cb:0:b0:566:a235:9355 with SMTP id k11-20020a50c8cb000000b00566a2359355mr11404457edh.33.1709740915184;
+        Wed, 06 Mar 2024 08:01:55 -0800 (PST)
+Received: from [192.168.0.9] (ip-109-43-178-151.web.vodafone.de. [109.43.178.151])
+        by smtp.gmail.com with ESMTPSA id f16-20020aa7d850000000b00563f3ee5003sm7003058eds.91.2024.03.06.08.01.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Mar 2024 08:01:54 -0800 (PST)
+Message-ID: <2a01baa6-b6a3-4572-94cd-63b2eaab7b38@redhat.com>
+Date: Wed, 6 Mar 2024 17:01:52 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306144416.GB19711@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH-for-9.1 16/18] hw/i386/pc: Remove deprecated pc-i440fx-2.3
+ machine
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, kvm@vger.kernel.org,
+ Marcelo Tosatti <mtosatti@redhat.com>, devel@lists.libvirt.org,
+ David Hildenbrand <david@redhat.com>, Ani Sinha <anisinha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>
+References: <20240305134221.30924-1-philmd@linaro.org>
+ <20240305134221.30924-17-philmd@linaro.org>
+Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240305134221.30924-17-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 06, 2024 at 03:44:16PM +0100, Christoph Hellwig wrote:
+On 05/03/2024 14.42, Philippe Mathieu-Daudé wrote:
+> The pc-i440fx-2.3 machine was deprecated for the 8.2
+> release (see commit c7437f0ddb "docs/about: Mark the
+> old pc-i440fx-2.0 - 2.3 machine types as deprecated"),
+> time to remove it.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   docs/about/deprecated.rst       |  7 -------
+>   docs/about/removed-features.rst |  2 +-
+>   hw/i386/pc.c                    | 25 -------------------------
+>   hw/i386/pc_piix.c               | 20 --------------------
+>   4 files changed, 1 insertion(+), 53 deletions(-)
+> 
+> diff --git a/docs/about/deprecated.rst b/docs/about/deprecated.rst
+> index 84c82d85e1..78be35e42a 100644
+> --- a/docs/about/deprecated.rst
+> +++ b/docs/about/deprecated.rst
+> @@ -221,13 +221,6 @@ deprecated; use the new name ``dtb-randomness`` instead. The new name
+>   better reflects the way this property affects all random data within
+>   the device tree blob, not just the ``kaslr-seed`` node.
+>   
+> -``pc-i440fx-2.3`` (since 8.2)
+> -'''''''''''''''''''''''''''''
+> -
+> -This old machine type is quite neglected nowadays and thus might have
+> -various pitfalls with regards to live migration. Use a newer machine type
+> -instead.
 
-> Except that the flows are fundamentally different for the "can coalesce"
-> vs "can't coalesce" case.  In the former we have one dma_addr_t range,
-> and in the latter as many as there are input vectors (this is ignoring
-> the weird iommu merging case where we we coalesce some but not all
-> segments, but I'd rather not have that in a new API).
+Instead of removing this section, could you please change it to deprecate 
+the next set of old PC machine types here (say 2.4 - 2.7 or so)?
 
-I don't think they are so fundamentally different, at least in our
-past conversations I never came out with the idea we should burden the
-driver with two different flows based on what kind of alignment the
-transfer happens to have.
+  Thanks,
+   Thomas
 
-Certainly if we split the API to focus one API on doing only
-page-aligned transfers the aligned part does become a little.
-
-At least the RDMA drivers could productively use just a page aligned
-interface. But I didn't think this would make BIO users happy so never
-even thought about it..
-
-> The total transfer size should just be passed in by the callers and
-> be known, and there should be no offset.
-
-The API needs the caller to figure out the total number of IOVA pages
-it needs, rounding up the CPU ranges to full aligned pages. That
-becomes the IOVA allocation.
-
-offset is something that arises to support non-aligned transfers.
-
-> So if we want to efficiently be able to handle these cases we need
-> two APIs in the driver and a good framework to switch between them.
-
-But, what does the non-page-aligned version look like? Doesn't it
-still look basically like this?
-
-And what is the actual difference if the input is aligned? The caller
-can assume it doesn't need to provide a per-range dma_addr_t during
-unmap.
-
-It still can't assume the HW programming will be linear due to the P2P
-!ACS support.
-
-And it still has to call an API per-cpu range to actually program the
-IOMMU.
-
-So are they really so different to want different APIs? That strikes
-me as a big driver cost.
-
-> I'd still prefer to wrap it with dma callers to handle things like
-> swiotlb and maybe Xen grant tables and to avoid the type confusion
-> between dma_addr_t and then untyped iova in the iommu layer, but
-> having this layer or not is probably worth a discussion.
-
-I'm surprised by the idea of random drivers reaching past dma-iommu.c
-and into the iommu layer to setup DMA directly on the DMA API's
-iommu_domain?? That seems like completely giving up on the DMA API
-abstraction to me. :(
-
-IMHO, it needs to be wrapped, the wrapper needs to do all the special
-P2P stuff, at a minimum. The wrapper should multiplex to all the
-non-iommu cases for the driver too.
-
-We still need to achieve some kind of abstraction here that doesn't
-bruden every driver with different code paths for each DMA back end!
-Don't we??
-
-Jason
 
