@@ -1,263 +1,240 @@
-Return-Path: <kvm+bounces-11092-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11090-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C44872C86
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 03:06:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE58872C5C
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 02:50:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4609B1F21596
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 02:06:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1A9F1C2275A
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 01:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CED7D29E;
-	Wed,  6 Mar 2024 02:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F05DD26B;
+	Wed,  6 Mar 2024 01:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b="n4i39rgQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ft8ZWW9J"
 X-Original-To: kvm@vger.kernel.org
-Received: from butterfly.pear.relay.mailchannels.net (butterfly.pear.relay.mailchannels.net [23.83.216.27])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6633717FE
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 02:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.216.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA169DDA5;
+	Wed,  6 Mar 2024 01:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709690783; cv=pass; b=G55hwT8WnALtzcvGpc/7uV6Vij85COssPIQVHiBWNa0yxMdC4DNhNr0Qvg4LYdEbmh5R3/lmWgDucdpnyIbFbyaJMGLZmhaQISTDlxvHWRzy6dVd3/AL382IK51sA+ZSpo3z31sSQpVSpNyvB5yu2lTzDX8xcv4qW2KEVFHB0gY=
+	t=1709689839; cv=fail; b=YypUaD0iOtlo2oB08yW4kYbkWb4OQtj5ynz7seRY+YwXJl+X8ANnfwU57Rad/723kRxFfQr2VfA/oCypOHTI3Esb6pikN0bTxWeXw5q1WTgXHByFX3PYb++1oX3E8deR1h2bwt0qPOOIGEdgoQsixGmf72wQPEqM7tWFcxxVhQs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709690783; c=relaxed/simple;
-	bh=on8gZm2QdDyARPaE+/P1kLM0jMpWnGyLwBsuWanXgp8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cdzsGKpngG/hgMrUmGkxgdv5vM4FDHGWmvWIaPqCQ3TvBu+VOvnT6TGezTLeOTPPR12pxNEfyp7MBS1j0i8rxNWXwehx+wCo/33QpDfN/VLZuMNMuOBp88jiJKFjWg2xbVXIXpk207EA5AvQInDhCUlDRdjHgPAWAtGq+tzVik8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com; spf=pass smtp.mailfrom=templeofstupid.com; dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b=n4i39rgQ; arc=pass smtp.client-ip=23.83.216.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=templeofstupid.com
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 8EF681028F7
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 00:49:58 +0000 (UTC)
-Received: from pdx1-sub0-mail-a210.dreamhost.com (unknown [127.0.0.6])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 2B94F101673
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 00:49:58 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1709686198; a=rsa-sha256;
-	cv=none;
-	b=c4VQxfN/N6u7wF2ZNRQwn3x0duHV7XzWypGRxaz0p9iIi1BO17IOMmmyjOBL1ABnBssp9f
-	C8gevBImnJQpKWnAAK35j+o4EYTncZxDeFZcHjVtbfl1q/Ed2DsJyg+kB77UZT6xjIl048
-	mDWz5A1z0azusWGF4plFutlfjxY+CK7aDJCSgM72EMqa1z8OJPjqHZQXZY6+aU+oESzk6w
-	u1GWp8Vb5WT0JBcOIdoWVoW60N1pqbr56yOxGLvid/eTawfhE1XPLyi07m0fxRT3eBJv/J
-	TA0pdlCBqzyEDjnrhviBb0s9O4qhl6WHuEFU82dEli10UMGQ1bZ1KRmVYbTE+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1709686198;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=zB/e4S9PL1mKLbb+4/xBriylBo1s1uvVH44wHxVwVlM=;
-	b=dg8YqbBrMPFV6gmG2BRrlOdi9bBVcpnHPgkI/+GqufDvIrtPynELhvDQtAd1WeTE2MMr4N
-	vnds7xUUuiOFxlCAPMnX7kwmAkh7ouhPj/o+ehsrqBvnrB5vopqJNigCIBScn8G6pede/T
-	4yNrQnobBDUhY4LiqLH5+4zInnI92acgiiriNCIY5mrVsmchVck7Csmowoj3JyXgto1Ru7
-	wzxLuJ4feeeJH8fOBLulO+NpjX6f8Za5aA1n3mpRUlhfGj7qU9a2YbA3lHelwe4nm4LFiS
-	JrtJb0vf7xXXz8XHlnHkdITc5x5sFr0dt9C+yzUXN67Tqn1Ox9AVmXWwl+41GA==
-ARC-Authentication-Results: i=1;
-	rspamd-55b4bfd7cb-t6svs;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MC-Relay: Good
-X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MailChannels-Auth-Id: dreamhost
-X-Squirrel-Relation: 223914876b412ded_1709686198445_3617887133
-X-MC-Loop-Signature: 1709686198445:3134370656
-X-MC-Ingress-Time: 1709686198445
-Received: from pdx1-sub0-mail-a210.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.112.142.242 (trex/6.9.2);
-	Wed, 06 Mar 2024 00:49:58 +0000
-Received: from kmjvbox.templeofstupid.com (c-73-222-159-162.hsd1.ca.comcast.net [73.222.159.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kjlx@templeofstupid.com)
-	by pdx1-sub0-mail-a210.dreamhost.com (Postfix) with ESMTPSA id 4TqDNj6mZfzJZ
-	for <kvm@vger.kernel.org>; Tue,  5 Mar 2024 16:49:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
-	s=dreamhost; t=1709686198;
-	bh=zB/e4S9PL1mKLbb+4/xBriylBo1s1uvVH44wHxVwVlM=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=n4i39rgQl6sE76YQvdLbztq5cVNDLVBxTfzkSGVKCWkzBZQ3dmCWEHr3sg9We8XA/
-	 2dvc0swIb+8kY77cZYNORlhnPkxpJPDMVOAaUh700eqpRUmN93iNF69CZzqlocfETw
-	 BAIWJw8Zrrw3Cc/3qlFoo/tLeKro73C7jGIHCNXxpLHLvxIK2XabV2dW4RMAn2+53P
-	 Um0X1mlTPXGk7woNw4izFVkiEQnGjMnga62jwi4GTzKtgbrrqjH9Pza9c74nM91QQE
-	 rou121DSeJWp8C3nm2FtRiqQwFy/6zMLZRrnWDd2Nu09u2ce3BgDbgCbdnvU1csJiU
-	 s6yXiHC0VWEqg==
-Received: from johansen (uid 1000)
-	(envelope-from kjlx@templeofstupid.com)
-	id e0082
-	by kmjvbox.templeofstupid.com (DragonFly Mail Agent v0.12);
-	Tue, 05 Mar 2024 16:49:49 -0800
-Date: Tue, 5 Mar 2024 16:49:49 -0800
-From: Krister Johansen <kjlx@templeofstupid.com>
-To: stable@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
-Subject: [PATCH 5.15.y v2 2/2] KVM: arm64: Limit stage2_apply_range() batch
- size to largest block
-Message-ID: <373363c947131626f70c6337c5c0f197046db4fe.1709685364.git.kjlx@templeofstupid.com>
-References: <cover.1709665227.git.kjlx@templeofstupid.com>
- <cover.1709685364.git.kjlx@templeofstupid.com>
+	s=arc-20240116; t=1709689839; c=relaxed/simple;
+	bh=uTL8b3lReh6YYErmSoZXphjuJ9TpZTk49k2rF8otgoY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ACH9DA8DfOB7HNGpIggz1EHrGOYNEFCxeYhVz9pICTp8nmPIesngU45wltYUAXH/qIvQ0/EZy0JYrz3KL2ToI5wmLls4TGXh07u+kNVjd5BrSkrjCURc9W1hLP1tqFr+GWrU5eY6d6//hbs7HI8aTl3my9chbuqMWsN7bVAfoic=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ft8ZWW9J; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709689838; x=1741225838;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=uTL8b3lReh6YYErmSoZXphjuJ9TpZTk49k2rF8otgoY=;
+  b=Ft8ZWW9Jwl7WZWCEeURchAGkJ9IF6UCOJGmqOOzH7XYsdO21Jmgaze/p
+   2L3CIQ8Cily5Dcsz+KCv7AHU5HHwiImKTnFSS5dZ5kVkSpkreMSvwViQv
+   J392KxH94aeyWqDChQT8pstNyDSMaKSzJnrkbq7zTjSwC7xt6TwhVn3X9
+   7kh+ZMqo8ZBMzzCNmxda3Egzp3gtYP2dvpfyGG0AyirM17B5XWUL/r/HT
+   G5Z7+cg0fAvawpm0Iqd09j9ThtqOOsCCSE8YQbwjdlAdSP10x26hutH2I
+   yIX6Pozdh34TqB5MvFQb+SMllcy7cBAeIuAb3335doerWR68CdD1VmPEF
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="4139828"
+X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
+   d="scan'208";a="4139828"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 17:50:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
+   d="scan'208";a="9984118"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Mar 2024 17:50:37 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 5 Mar 2024 17:50:35 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 5 Mar 2024 17:50:35 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 5 Mar 2024 17:50:35 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 5 Mar 2024 17:50:34 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XbqULSu2zbsx/ajCtw7p8n6Il2Uhbv1Vk0TXtvbuUPEftVyediWnHyRjJStYEMwuDuy1CzMOgMviu3WJjS8e7nIkAqRVgVuDymeNm/kYClhJFc3nK8v+QFLcbeCVQwGHo+Igzv5j/DogZ3o5A2jTGXhOb9T8hzh5YX+cLZhoqhWeyoIP1iS/xxZa88903N/IUc1IB/cKibePQd3VFH+eOM6K7XKlAgr9QvaGbRPkfbuEnQSy08d2njQenGA8I7Vv4T60swhTugy55CVMc43YTRtMHJHCX6WaWtMhk7fNwtWiPdMhmnKVhCdOS3J3s4CsV7ReRR1i61bZPtHQYg8X+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RxJ3y8ZOXWq4dfVY82p4QeOuTYPRRH7rdvux326er4Q=;
+ b=E7NMtjZvLnzxmxQSe4yX1cTjGxONFDF1TLv4HXmbQMC0J6324MEGOWSsVWykUB/LuTbQmgJTu4INPmlxEEx/9+a5ktqgtsZF/wu/4u2rd2SLigBA8N2zlDHw9tRr5Y4HClsqfkEjciaB2lN5UPmrY8BQcSBtGG0intQXdoG4L9bWXHc9EEMksczSHyPGTlhNTEhM9fyg6YLpzaj4PMudf0QjnZHbKNoNAGUUgK5QoiJy5s/eDhSWwe0ef3aq2vCtTE0IBfqXRRdujoiX9i2Pwean4TxGHMk6T5lYanFulGnA9vZIOOIfjPhk/xGSodbSISRfSqouOAZ6pYwNLVykRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ SJ2PR11MB8322.namprd11.prod.outlook.com (2603:10b6:a03:549::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
+ 2024 01:50:30 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::55f1:8d0:2fa1:c7af]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::55f1:8d0:2fa1:c7af%5]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
+ 01:50:30 +0000
+Date: Wed, 6 Mar 2024 09:20:35 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sagi Shahar <sagis@google.com>
+CC: <linux-kselftest@vger.kernel.org>, Ackerley Tng <ackerleytng@google.com>,
+	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, Isaku
+ Yamahata <isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Peter
+ Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>, Chao Peng
+	<chao.p.peng@linux.intel.com>, "Vishal Annapurve" <vannapurve@google.com>,
+	Roger Wang <runanwang@google.com>, "Vipin Sharma" <vipinsh@google.com>,
+	<jmattson@google.com>, <dmatlack@google.com>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: Re: [RFC PATCH v5 23/29] KVM: selftests: TDX: Add shared memory test
+Message-ID: <ZefE4wq1C2nA/Saq@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20231212204647.2170650-1-sagis@google.com>
+ <20231212204647.2170650-24-sagis@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231212204647.2170650-24-sagis@google.com>
+X-ClientProxiedBy: SG2PR06CA0245.apcprd06.prod.outlook.com
+ (2603:1096:4:ac::29) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1709685364.git.kjlx@templeofstupid.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SJ2PR11MB8322:EE_
+X-MS-Office365-Filtering-Correlation-Id: a11b06dc-7aa6-4e07-c0b2-08dc3d7fcde9
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dXfogLzZI8OVzSAQ9hnk+F5XNkTOoEaULyJC6tkF2Lybb8cVuZusGetgp2bCsbvf3gVgfhMy69FDODJoYiYwGa6zS3m8oCqCPOsGPasgrRimxaiRrzTmgtsHQUfIDwoGlrHfwpLgYAq7akEh7jJZWpaJKUXQ0rkygxbEd8NqLcfuqjs7jwWiW+0BKOYmvhnnJ95HTNAhehYf2pe6SPAyeg8AhcdAybj72vYijuVtJtl1Hfr6UQzxpJJggzRxgCobBtcH93S3tUiVIOFEfFgCCZc/4ZOTuzA7dAjWn9Of91xGpq/VxFwyETxGF0PIh+5SbegJdKMawdFL6BiZyi37vvg0Y4QeQWwuG73S3hpJU8e6SUMBHbMaxDQn873aRF7dQgWHbytngf7vRU19RTtQuxGTU+U1j6uV+rJJdeh6lQDoHS3e5hTXQv8E0jZJqa71RnRfzzVMdevvOQgJexpdET6kEpvqapg5mUm8NvMAGM88Nsxt322HJViUpvx+P4osErq7VIqzKNho7tsT+amdabJZQ7Bg8aOxNOmTNuw9Xj7hgbGTSBvWu7AN4sPsTG9AIHXVnzDwGM53xbvj6gyHOt4JiKifihZ0UbB3/megGUez2PsWxqulBJwoLEcPev/fmNiNsHnelRGHXF751WeXS3uEPti0VYAIpt17ugHKr2k=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wg7SyciJV1CfWidUgeE6ZhL3CM5/s0PK43VSBBqExA/PHQ9qxPp67npKp3Au?=
+ =?us-ascii?Q?9ars2moMhkVWoo8x7k9xhvkcHTE67gsSTTJlq8C4YcP6QtPPRv0xnyAzV5fR?=
+ =?us-ascii?Q?TjCaerFffGcU5V/J8Q6g+wI+Tas4gEemOnFM0iaBze5LDvAyg0jUy9bxekAF?=
+ =?us-ascii?Q?/sI7nYw8eRIPNjBknaOGB8XC95KAs3OtXDwYXKYJVggQ3WLCIBGsoZFLlfMb?=
+ =?us-ascii?Q?mn/zqgyCp+8x+aCfqbYPjAov4NSMpjnAzOxYcejBpXOdXVFPrqXdvRQKqiJX?=
+ =?us-ascii?Q?JGlJ2PkHyKrJKijOw2yOJBb1GvUao/+tfFPKQs9zhiBr7XgkfrSM27+p1w0l?=
+ =?us-ascii?Q?xdU3K5CASfWdN1cnnvPvIv0GRaMEtLOlV6NJWWPXz/2j7v9zJ4gMNtJ9npQd?=
+ =?us-ascii?Q?SglUZkP2W+fFSC0HSN4suaEoBGsCJE4SX8bsIcp+SFkJOoa5/lTRxKc7fCdH?=
+ =?us-ascii?Q?sqTRhFobF5VZm59AmmyTemdtV3P9mSGhN9LE5OoffBITqTg6J0ygn472XSoM?=
+ =?us-ascii?Q?BVklmj/x2gwcGhCw1uxXNzbBtUjLaaVyOgvzYjG+FbQE+2NzQCx5zZHgrOZP?=
+ =?us-ascii?Q?d+9HeKDreLZX4oM6TW5E/uPIs3FdUMLAOjHme0UyBpXkVlEAsvANV+deFSjQ?=
+ =?us-ascii?Q?/jAfcrockvq0COZZ5tGPSnt/8i1QrtTglilMefxQuZ/xrT1vsyxr8OR9+yKo?=
+ =?us-ascii?Q?5QZKEFy66CKtu2EDsoTW4XSAvOub4kBobgjuruyHywiwq8uOqxRR7Su2ximY?=
+ =?us-ascii?Q?nwsZ0apTZoVp5jIWhrMet03GGHS9lXY+LRDIxtE/jUGzejViz4nOhzlO6NJq?=
+ =?us-ascii?Q?VJICyEqyEewRbAdsL5zHSASwky2SAqnQH2UjhtTrG50FiG1F8AOO0QequB1l?=
+ =?us-ascii?Q?uR8hVU3wP3XlRW84Og0rIRH8PtaOVW/C8xc4tSWnQpM4/v0vENqK/8oOSqDU?=
+ =?us-ascii?Q?9vN/Gm62Sl9NG5ciFvkW3BsiZrV9USNAbYXyDuOFRMw1ZKkHbUfEpH7Nv+Bs?=
+ =?us-ascii?Q?e62+3O3dLebTITefL2ySFQosl4CaonTVedrqYO0pMqr3cFURIlg6/b7hV6Yn?=
+ =?us-ascii?Q?5kPWrrImZw+cOQC4hUhVUSbUpLUoJtvFe9jXMFuL4eknELr8Tzjmt0hL/o57?=
+ =?us-ascii?Q?zGNGqDlo7iM5UcGg1gQxfjEbSAhTs07Td9IYNQrJ3k4DdAZLCl8SrnJqD/z8?=
+ =?us-ascii?Q?ZEDIlo0cL+duQNQjMj+TO0ib0Yre1yzA7fCd4GN1CPwiXOruws0YIovx4CJ8?=
+ =?us-ascii?Q?Dq428ntIVbBRSwCgikS0ckjNBkHGL2o4A5GneHSMoBrAHWaZTH/lthynBRPs?=
+ =?us-ascii?Q?eiPGYLWQ67/PfEx2ErUZ9DP2rbqv73g2gBQKQLsIH9cEP+XM5QIObnr2BwqF?=
+ =?us-ascii?Q?c/BL9Dyb7T8R8ODNUqIZ6y3z40w1CpNG4VhG2L7ER+fr38RHYFTIaeEVZ3PK?=
+ =?us-ascii?Q?GnLVveZ2YoBLmR0qFk3tH4HRb6vwjLxKfkpI6d9f9ohrKWMa4cdfpDx4nSix?=
+ =?us-ascii?Q?8DI398sZI1s5RWtxHnecmj3w4Dzky0vYeSaBqfMZTT2sMqCpS6+y22WfzOt0?=
+ =?us-ascii?Q?uTRU+UgOFqgEvkD+YBB+US9FHVb695IuFhIq02uW?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a11b06dc-7aa6-4e07-c0b2-08dc3d7fcde9
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 01:50:30.5990
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BQoebdl4u3yhIci4VSY7VDjwnicVVHOCelLgAb175yNeJNV+/+7B6cIuzb2oCNoTArjwOC2J6zNHjlBYeSJoxw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8322
+X-OriginatorOrg: intel.com
 
-From: Oliver Upton <oliver.upton@linux.dev>
+> +int verify_shared_mem(void)
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	vm_vaddr_t test_mem_private_gva;
+> +	uint32_t *test_mem_hva;
+> +
+> +	vm = td_create();
+> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
+> +	vcpu = td_vcpu_add(vm, 0, guest_shared_mem);
+> +
+> +	/*
+> +	 * Set up shared memory page for testing by first allocating as private
+> +	 * and then mapping the same GPA again as shared. This way, the TD does
+> +	 * not have to remap its page tables at runtime.
+> +	 */
+> +	test_mem_private_gva = vm_vaddr_alloc(vm, vm->page_size,
+> +					      TDX_SHARED_MEM_TEST_PRIVATE_GVA);
+> +	TEST_ASSERT_EQ(test_mem_private_gva, TDX_SHARED_MEM_TEST_PRIVATE_GVA);
+> +
+> +	test_mem_hva = addr_gva2hva(vm, test_mem_private_gva);
+> +	TEST_ASSERT(test_mem_hva != NULL,
+> +		    "Guest address not found in guest memory regions\n");
+> +
+> +	test_mem_private_gpa = addr_gva2gpa(vm, test_mem_private_gva);
+> +	virt_pg_map_shared(vm, TDX_SHARED_MEM_TEST_SHARED_GVA,
+> +			   test_mem_private_gpa);
+> +
+> +	test_mem_shared_gpa = test_mem_private_gpa | BIT_ULL(vm->pa_bits - 1);
+Why not use vm->arch.s_bit?
 
-commit 5994bc9e05c2f8811f233aa434e391cd2783f0f5 upstream.
+> +	sync_global_to_guest(vm, test_mem_private_gpa);
+test_mem_private_gpa is not used in guest. No need to sync.
 
-Presently stage2_apply_range() works on a batch of memory addressed by a
-stage 2 root table entry for the VM. Depending on the IPA limit of the
-VM and PAGE_SIZE of the host, this could address a massive range of
-memory. Some examples:
-
-  4 level, 4K paging -> 512 GB batch size
-
-  3 level, 64K paging -> 4TB batch size
-
-Unsurprisingly, working on such a large range of memory can lead to soft
-lockups. When running dirty_log_perf_test:
-
-  ./dirty_log_perf_test -m -2 -s anonymous_thp -b 4G -v 48
-
-  watchdog: BUG: soft lockup - CPU#0 stuck for 45s! [dirty_log_perf_:16703]
-  Modules linked in: vfat fat cdc_ether usbnet mii xhci_pci xhci_hcd sha3_generic gq(O)
-  CPU: 0 PID: 16703 Comm: dirty_log_perf_ Tainted: G           O       6.0.0-smp-DEV #1
-  pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-  pc : dcache_clean_inval_poc+0x24/0x38
-  lr : clean_dcache_guest_page+0x28/0x4c
-  sp : ffff800021763990
-  pmr_save: 000000e0
-  x29: ffff800021763990 x28: 0000000000000005 x27: 0000000000000de0
-  x26: 0000000000000001 x25: 00400830b13bc77f x24: ffffad4f91ead9c0
-  x23: 0000000000000000 x22: ffff8000082ad9c8 x21: 0000fffafa7bc000
-  x20: ffffad4f9066ce50 x19: 0000000000000003 x18: ffffad4f92402000
-  x17: 000000000000011b x16: 000000000000011b x15: 0000000000000124
-  x14: ffff07ff8301d280 x13: 0000000000000000 x12: 00000000ffffffff
-  x11: 0000000000010001 x10: fffffc0000000000 x9 : ffffad4f9069e580
-  x8 : 000000000000000c x7 : 0000000000000000 x6 : 000000000000003f
-  x5 : ffff07ffa2076980 x4 : 0000000000000001 x3 : 000000000000003f
-  x2 : 0000000000000040 x1 : ffff0830313bd000 x0 : ffff0830313bcc40
-  Call trace:
-   dcache_clean_inval_poc+0x24/0x38
-   stage2_unmap_walker+0x138/0x1ec
-   __kvm_pgtable_walk+0x130/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   kvm_pgtable_stage2_unmap+0xc4/0xf8
-   kvm_arch_flush_shadow_memslot+0xa4/0x10c
-   kvm_set_memslot+0xb8/0x454
-   __kvm_set_memory_region+0x194/0x244
-   kvm_vm_ioctl_set_memory_region+0x58/0x7c
-   kvm_vm_ioctl+0x49c/0x560
-   __arm64_sys_ioctl+0x9c/0xd4
-   invoke_syscall+0x4c/0x124
-   el0_svc_common+0xc8/0x194
-   do_el0_svc+0x38/0xc0
-   el0_svc+0x2c/0xa4
-   el0t_64_sync_handler+0x84/0xf0
-   el0t_64_sync+0x1a0/0x1a4
-
-Use the largest supported block mapping for the configured page size as
-the batch granularity. In so doing the walker is guaranteed to visit a
-leaf only once.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20221007234151.461779-3-oliver.upton@linux.dev
-Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
----
- arch/arm64/include/asm/stage2_pgtable.h | 20 --------------------
- arch/arm64/kvm/mmu.c                    |  9 ++++++++-
- 2 files changed, 8 insertions(+), 21 deletions(-)
-
-diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-index fe341a6578c3..c8dca8ae359c 100644
---- a/arch/arm64/include/asm/stage2_pgtable.h
-+++ b/arch/arm64/include/asm/stage2_pgtable.h
-@@ -10,13 +10,6 @@
+> +	sync_global_to_guest(vm, test_mem_shared_gpa);
+> +
+> +	td_finalize(vm);
+> +
+> +	printf("Verifying shared memory accesses for TDX\n");
+> +
+> +	/* Begin guest execution; guest writes to shared memory. */
+> +	printf("\t ... Starting guest execution\n");
+> +
+> +	/* Handle map gpa as shared */
+> +	td_vcpu_run(vcpu);
+> +	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
+> +
+> +	td_vcpu_run(vcpu);
+> +	TDX_TEST_ASSERT_IO(vcpu, TDX_SHARED_MEM_TEST_INFO_PORT, 4,
+> +			   TDG_VP_VMCALL_INSTRUCTION_IO_WRITE);
+> +	TEST_ASSERT_EQ(*test_mem_hva, TDX_SHARED_MEM_TEST_GUEST_WRITE_VALUE);
+> +
+> +	*test_mem_hva = TDX_SHARED_MEM_TEST_HOST_WRITE_VALUE;
+> +	td_vcpu_run(vcpu);
+> +	TDX_TEST_ASSERT_IO(vcpu, TDX_SHARED_MEM_TEST_INFO_PORT, 4,
+> +			   TDG_VP_VMCALL_INSTRUCTION_IO_WRITE);
+> +	TEST_ASSERT_EQ(
+> +		*(uint32_t *)((void *)vcpu->run + vcpu->run->io.data_offset),
+> +		TDX_SHARED_MEM_TEST_HOST_WRITE_VALUE);
+> +
+> +	printf("\t ... PASSED\n");
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
  
- #include <linux/pgtable.h>
- 
--/*
-- * PGDIR_SHIFT determines the size a top-level page table entry can map
-- * and depends on the number of levels in the page table. Compute the
-- * PGDIR_SHIFT for a given number of levels.
-- */
--#define pt_levels_pgdir_shift(lvls)	ARM64_HW_PGTABLE_LEVEL_SHIFT(4 - (lvls))
--
- /*
-  * The hardware supports concatenation of up to 16 tables at stage2 entry
-  * level and we use the feature whenever possible, which means we resolve 4
-@@ -30,11 +23,6 @@
- #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
- #define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
- 
--/* stage2_pgdir_shift() is the size mapped by top-level stage2 entry for the VM */
--#define stage2_pgdir_shift(kvm)		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
--#define stage2_pgdir_size(kvm)		(1ULL << stage2_pgdir_shift(kvm))
--#define stage2_pgdir_mask(kvm)		~(stage2_pgdir_size(kvm) - 1)
--
- /*
-  * kvm_mmmu_cache_min_pages() is the number of pages required to install
-  * a stage-2 translation. We pre-allocate the entry level page table at
-@@ -42,12 +30,4 @@
-  */
- #define kvm_mmu_cache_min_pages(kvm)	(kvm_stage2_levels(kvm) - 1)
- 
--static inline phys_addr_t
--stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
--{
--	phys_addr_t boundary = (addr + stage2_pgdir_size(kvm)) & stage2_pgdir_mask(kvm);
--
--	return (boundary - 1 < end - 1) ? boundary : end;
--}
--
- #endif	/* __ARM64_S2_PGTABLE_H_ */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 38a8095744a0..db667b4ad103 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -31,6 +31,13 @@ static phys_addr_t hyp_idmap_vector;
- 
- static unsigned long io_map_base;
- 
-+static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
-+{
-+	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
-+	phys_addr_t boundary = ALIGN_DOWN(addr + size, size);
-+
-+	return (boundary - 1 < end - 1) ? boundary : end;
-+}
- 
- /*
-  * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
-@@ -52,7 +59,7 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
- 		if (!pgt)
- 			return -EINVAL;
- 
--		next = stage2_pgd_addr_end(kvm, addr, end);
-+		next = stage2_range_addr_end(addr, end);
- 		ret = fn(pgt, addr, next - addr);
- 		if (ret)
- 			break;
--- 
-2.25.1
-
 
