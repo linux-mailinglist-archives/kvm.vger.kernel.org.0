@@ -1,134 +1,136 @@
-Return-Path: <kvm+bounces-11203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C199B87428C
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 23:14:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B03E5874296
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 23:17:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 775271F23036
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 22:14:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1C9D1C22FCD
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 22:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41F11BF5C;
-	Wed,  6 Mar 2024 22:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F374E1BDC4;
+	Wed,  6 Mar 2024 22:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EiZIfPzR"
 X-Original-To: kvm@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397D61BDED;
-	Wed,  6 Mar 2024 22:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575141B95B;
+	Wed,  6 Mar 2024 22:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709763249; cv=none; b=mC+aEtdKRir+ZDMz1hq3oZCbUBtXUvtTxfI8MUwzI7oXsiNMi5ppyZujBv5+2gFzDwkYG4rtUvKbvRRU2jMxWfyrLXHtKAOfRefN0sSvkP3MpuzGM6o2lGewIyuxg3Z+g/1NjjgcNyR/qYJCTVHy9Nuug1N0XSPyYdpd6P5MLYI=
+	t=1709763451; cv=none; b=qP2RS8/pOq1zb02xqfDoh4Catp+k3Ab0hmJzXUBYphALMepOdUyZbffRO730uoA6w6ilJCup2wvEUMOWsY0/7AlfQs3HL21k2qZTWyuFkpH1JQXUOfxxM1oaLI3wllk+UG46XwGhI21QHUz3glBy9BsimwgiV1FaUVd0egYOKgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709763249; c=relaxed/simple;
-	bh=ZRvTmNRqpxW4X0oWSN8HCjjORJ85EhOCc8pC07Wc42M=;
+	s=arc-20240116; t=1709763451; c=relaxed/simple;
+	bh=Q/HnkSBjRtmv2HAo1EODOvFiwirAxHCTijp7h5jPD2M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XtvzMfmGPb582tq6+GSaAy0xjP92NKZXNl33U7hyI+RJtj/r15n1IYIjx3rgnSG5loT7ditnPUtSQJDsaYG+khEAMb1iFmOcxXPeM6Km2uWvytakyFx3QUv72mZMYlo9RXqrTxwektPvOmzsQl6Q/kb5N/gj9lwODhSdFJoiCPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id B087E68C4E; Wed,  6 Mar 2024 23:14:00 +0100 (CET)
-Date: Wed, 6 Mar 2024 23:14:00 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
- steps
-Message-ID: <20240306221400.GA8663@lst.de>
-References: <cover.1709635535.git.leon@kernel.org> <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com> <20240305122935.GB36868@unreal> <20240306144416.GB19711@lst.de> <20240306154328.GM9225@ziepe.ca> <20240306162022.GB28427@lst.de> <20240306174456.GO9225@ziepe.ca>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lLEpuqolgxyoY+NOCwWSf3FOW79rXUuQ+BigGNtpRNA26kuVFuppMDFaIi9P0lKP+j1LXDp35WyaeOEiY8heGZIWE1St1f5kq/P87lsw2GIKTxQ5w+S8Fgy3k5rtjHKm5gAJzWn9UeENW1TgiHhXxc6kPDXMLOOCGJmGKD6Bec8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EiZIfPzR; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709763449; x=1741299449;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Q/HnkSBjRtmv2HAo1EODOvFiwirAxHCTijp7h5jPD2M=;
+  b=EiZIfPzRJRLESFLLnzJj3wl2e6+aQDb6XyVhK4FgftoE5ao7NdMm1/d8
+   I4xnBJVSTo02Xhp4czfQuOOACSp6SCc3rVRpaMicqP+b7T5vBGYST6QLK
+   2S++jmaQjLMoWAuEGrTmtqxnDuqBN6yIn+i3UuFfENO88hGOIt3EnDV1M
+   dCrhgrFphs78580oODg6qR1EXw1S5iizWRoLqduqbv7IVRurV1mshbf1U
+   zDSzdu7EsZ7f5y7UZAZRoOA+fnRAObvKJ0tQzwF4G1xmAr3hD3xHleEtq
+   1BJT6n8PIH6OWzmpoMKy2TQHm8l+GtaYKLUn+gsEEOv8zoXWPg0QlzmSQ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="15054814"
+X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
+   d="scan'208";a="15054814"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 14:17:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
+   d="scan'208";a="40882683"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 14:17:28 -0800
+Date: Wed, 6 Mar 2024 14:17:28 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: Isaku Yamahata <isaku.yamahata@linux.intel.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, chen.bo@intel.com,
+	hang.yuan@intel.com, tina.zhang@intel.com
+Subject: Re: [PATCH v19 008/130] x86/tdx: Warning with 32bit build
+ shift-count-overflow
+Message-ID: <20240306221728.GB368614@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <a50918ba3415be4186a91161fe3bbd839153d8b2.1708933498.git.isaku.yamahata@intel.com>
+ <2f6897c0-1b57-45b3-a1f1-9862b0e4c884@intel.com>
+ <jvyz3nuz225ry6ss6hs42jyuvrytsnsi2l74cwibtt5sedaimb@v2vilg4mbhws>
+ <20240305081219.GC10568@ls.amr.corp.intel.com>
+ <75adc31d-6632-4ea1-8191-dad1659e7b33@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240306174456.GO9225@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <75adc31d-6632-4ea1-8191-dad1659e7b33@intel.com>
 
-On Wed, Mar 06, 2024 at 01:44:56PM -0400, Jason Gunthorpe wrote:
-> There is a list of interesting cases this has to cover:
-> 
->  1. Direct map. No dma_addr_t at unmap, multiple HW SGLs
->  2. IOMMU aligned map, no P2P. Only IOVA range at unmap, single HW SGLs
->  3. IOMMU aligned map, P2P. Only IOVA range at unmap, multiple HW SGLs
->  4. swiotlb single range. Only IOVA range at unmap, single HW SGL
->  5. swiotlb multi-range. All dma_addr_t's at unmap, multiple HW SGLs.
->  6. Unaligned IOMMU. Only IOVA range at unmap, multiple HW SGLs
-> 
-> I think we agree that 1 and 2 should be optimized highly as they are
-> the common case. That mainly means no dma_addr_t storage in either
-
-I don't think you can do without dma_addr_t storage.  In most cases
-your can just store the dma_addr_t in the LE/BE encoded hardware
-SGL, so no extra storage should be needed though.
-
-> 3 is quite similar to 1, but it has the IOVA range at unmap.
-
-Can you explain what P2P case you mean?  The switch one with the
-bus address is indeed basically the same, just with potentioally a
-different offset, while the through host bridge case is the same
-as a normal iommu map.
+On Wed, Mar 06, 2024 at 10:35:43AM +1300,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
 > 
-> 4 is basically the same as 2 from the driver's viewpoint
-
-I'd actually treat it the same as one.
-
-> 5 is the slowest and has the most overhead.
-
-and 5 could be broken into multiple 4s at least for now.  Or do you
-have a different dfinition of range here?
-
-> So are you thinking something more like a driver flow of:
 > 
->   .. extent IO and get # aligned pages and know if there is P2P ..
->   dma_init_io(state, num_pages, p2p_flag)
->   if (dma_io_single_range(state)) {
->        // #2, #4
->        for each io()
-> 	    dma_link_aligned_pages(state, io range)
->        hw_sgl = (state->iova, state->len)
->   } else {
+> On 5/03/2024 9:12 pm, Isaku Yamahata wrote:
+> > On Fri, Mar 01, 2024 at 01:36:43PM +0200,
+> > "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com> wrote:
+> > 
+> > > On Thu, Feb 29, 2024 at 11:49:13AM +1300, Huang, Kai wrote:
+> > > > 
+> > > > 
+> > > > On 26/02/2024 9:25 pm, isaku.yamahata@intel.com wrote:
+> > > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > > > 
+> > > > > This patch fixes the following warnings.
+> > > > > 
+> > > > >      In file included from arch/x86/kernel/asm-offsets.c:22:
+> > > > >      arch/x86/include/asm/tdx.h:92:87: warning: shift count >= width of type [-Wshift-count-overflow]
+> > > > >      arch/x86/include/asm/tdx.h:20:21: note: expanded from macro 'TDX_ERROR'
+> > > > >      #define TDX_ERROR                       _BITUL(63)
+> > > > > 
+> > > > >                                              ^~~~~~~~~~
+> > > > > 
+> > > 
+> > > I think you trim the warning message. I don't see the actual user of the
+> > > define. Define itself will not generate the warning. You need to actually
+> > > use it outside of preprocessor. I don't understand who would use it in
+> > > 32-bit code. Maybe fixing it this way masking other issue.
+> > > 
+> > > That said, I don't object the change itself. We just need to understand
+> > > the context more.
+> > 
+> > v18 used it as stub function. v19 dropped it as the stub was not needed.
+> 
+> Sorry I literally don't understand what you are talking about here.
+> 
+> Please just clarify (at least):
+> 
+>  - Does this problem exist in upstream code?
 
-I think what you have a dma_io_single_range should become before
-the dma_init_io.  If we know we can't coalesce it really just is a
-dma_map_{single,page,bvec} loop, no need for any extra state.
+No.
 
-And we're back to roughly the proposal I sent out years ago.
+>  - If it does, what is the root cause, and how to reproduce?
 
-> This is not quite what you said, we split the driver flow based on
-> needing 1 HW SGL vs need many HW SGL.
-
-That's at least what I intended to say, and I'm a little curious as what
-it came across.
-
+v18 had a problem because it has stub function. v19 doesn't have problem because
+it deleted the stub function.
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
