@@ -1,181 +1,277 @@
-Return-Path: <kvm+bounces-11096-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11097-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A719872CCD
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 03:33:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CF7872CF8
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 03:47:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDEE8B22A64
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 02:33:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47D0C1C26562
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 02:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DE4D51D;
-	Wed,  6 Mar 2024 02:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84B2DDA9;
+	Wed,  6 Mar 2024 02:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mSuSfBfO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="asbbMXpP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1487117E9;
-	Wed,  6 Mar 2024 02:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709692370; cv=none; b=XOpqtK4Kqf3NyDPYcBueUPW7JDv414EtzSF0DMx2jT+cDcSE8onn1IVgKf4+gnMTWVHkItnudmyGspPp/m7fsk+EffJ8KsAtEEnXgjQyHk0fTxEY2aG6ziemMcEnoTzE6ymhhuW72iChkFdoonxo0Bbd5p1UOgEs395pmDbyVXg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709692370; c=relaxed/simple;
-	bh=aIGfNej6zLoTMAs10B0Xo/VB2CyyZGbqbt8RV9b3g5U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A80myY/uEcM5ZzsWNB1/lbQceQ2NYtCuPhlRE2O7ZH36ziyAIjiGbfynCbONNnzDvLQj4esR2jG0QQi3gKbT5Wy7dZUdvRla8hiw4FqcFcNaVqUgkNkot3GujUgv03ip0K4EgOrntlvICSvoYL91umjA0uKgcmxlQdoZlvD/Qus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mSuSfBfO; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33616D51D;
+	Wed,  6 Mar 2024 02:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709693262; cv=fail; b=DFqgamcxsHmvBeBLSYmzUlK90ZkFM3AKCIx82tOXs0UfOP3218aBjrkA2aDbBRcn/Y17Uz0tXjQxgSv5ju/ye3F/NQNhwLpfnZBrbjDkTmAglhlPwFVRHMAxpkfIjmZNaaZ3YpE3jVHoI1/fQ8pNJesVHqKc73GsLvmgcMUa0Eo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709693262; c=relaxed/simple;
+	bh=6KS2PB+J/nDNECSUvu6r6WLh7L2PcCmqAg0TNEHXsfA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QDcHcBqVOSGp8SXQsyXiPSU/Lu0Y0qf2ItagoeWpxUW8f96hOKq523q0zfzRIntmOHe2AG1wZ/fVvMKjIKg/bIW8oMfcI25hIMfxxHoajymgodIa8CwOK7hdZH2fmyuDuzSfxSrg7FYJJmHhQkJuip/zmb5V1sVo5XaK1lk9Xi8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=asbbMXpP; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709692369; x=1741228369;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aIGfNej6zLoTMAs10B0Xo/VB2CyyZGbqbt8RV9b3g5U=;
-  b=mSuSfBfOVUNhIZCB1nAOq/Fq8ZGUHNBEYAbHmRNsWe9n2iaBRo/mqypb
-   9lSTimV25CsGkka1zqTXKLOlqMjXFAtnPwJ7N9cCJOzgIbot7bah0nEXz
-   z6AAgeoArvsr2hYsXJHt2tWP2zsaooLAaDZhiUb1vmHu5ekogWBHCrEbO
-   y0698bj0V5b6rm39gfMJLAkSudqp14QvW32BJolg9vu2yH4mtIcIqrUuE
-   7paE0xirq7G8xmKKPIUePD1GlI7UBW5h4rlYuC21/ZRnS2nXGbSwOkJ8p
-   uH0rQtgrDUtL3/6zPTEWxGm2EJbT8H3bnBoiDiWqucqTRQzqRvE9/LD4Z
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="8103554"
+  t=1709693260; x=1741229260;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=6KS2PB+J/nDNECSUvu6r6WLh7L2PcCmqAg0TNEHXsfA=;
+  b=asbbMXpPxvnWDOMN4QzCvTu4ye4l40aKp6aeQYeDtJMDRNNyCCbMu5hr
+   02WiSYdtFkgUIgA6OERPLm/SoSyBw/pg79DaoJOFg8L/i+vJSZe6+SHWR
+   ERlqnWDpZYcsY4bJ62rkRfdtyVMxDxdWgMkI7f+WiCF8T6qHxfX3GjLC+
+   0NJi6kXzh2PbLfNxbMPvEp6AzdO4saKqD7DqFxcVstCpTNGT63zUztvPf
+   +Z6+2AhZGZM/xmRL+K339t6n4RapWnklkhe6d5z2UbNphQW826Nr0eaZA
+   sGnspPkVae+i0a32TrxTL5T1vkeg89v0UhAazkFrQh0GI6ZpiWSljkfUR
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="4458951"
 X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="8103554"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 18:32:48 -0800
+   d="scan'208";a="4458951"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 18:47:39 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="10015749"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.239.60]) ([10.124.239.60])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 18:32:45 -0800
-Message-ID: <9f7f5e0b-de05-49f1-941f-29349d1b9280@linux.intel.com>
-Date: Wed, 6 Mar 2024 10:32:41 +0800
+   d="scan'208";a="14295773"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Mar 2024 18:47:39 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 5 Mar 2024 18:47:38 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 5 Mar 2024 18:47:38 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 5 Mar 2024 18:47:38 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b0+7Un3GKAinIn3LFAv/PxC0+WaxoFp5HdaahX5XUZDd3jX8yVYWqEYNeaO6N6CINYQkHO3falW2+18BVoUDLUwsyHfyUMX4ffiJDTtOKgNVo04gGPB+bfziOiaabxDZq0lrjdDyRv5Q0nOYwAQK5DyNu/EkVuOl6H5XQjiuHL8sfwT49oD3VgLxsKjZB6+NGKswa5SEAA0AGf0iSM6rXb6MpUYpkhyCstt7nlb+jkpVkNq8xbl2RngIys3S2vf1YcrcrTu/8MaqpkkJ2MIqXTR04Uc+jouaiixHNwNSGaltonM+/YPd4X80zfblo6seXqp7+wc7RT/VhuQ1uf9tQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GAuCaNCyzXLZhJHOx0IQX84Eoj9L8+K6hnYy2fiXGCc=;
+ b=TBB7RbiEh6y42VAPP7EM+8xHoGRNrPqghZBZJgrFzgCdyHVF8JMG3x8t410LF8+rsgv9SCxnoYzq6hLBsVvOGBdinVblJ4OAyx+WIprU3tMZaanBVlKo4GOFEIqvG1Z0rV93BryT71H/Pa3vf9Od0mbfqTz6fsokwkRRzSLLD7oZzOFdKG/QaNq9xO1UjEKon2w/lSWA/cYwdKBNY+4wSap1ing7gXuObkJiQUFjw2AU9xTNQXcU9GnTQEA73O+KOkY8JKvwGVxNzpNRuxaf4j2X1VaUonGkvvZYtH2UX93gJfFbLX2j53/qnf0IvKVgoYm1bQ4VuSpLrPSQs2Bj+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com (2603:10b6:5:39e::23)
+ by PH7PR11MB8501.namprd11.prod.outlook.com (2603:10b6:510:308::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.23; Wed, 6 Mar
+ 2024 02:47:36 +0000
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::3487:7a1:bef5:979e]) by DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::3487:7a1:bef5:979e%7]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
+ 02:47:36 +0000
+From: "Zeng, Xin" <xin.zeng@intel.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
+	"Cao, Yahui" <yahui.cao@intel.com>
+Subject: RE: [PATCH v4 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Topic: [PATCH v4 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Index: AQHaalR9StzovMarUEC10fvX40lRFLEoy0sAgAAnj9A=
+Date: Wed, 6 Mar 2024 02:47:36 +0000
+Message-ID: <DM4PR11MB550263F49D2EA8755F3CCFA588212@DM4PR11MB5502.namprd11.prod.outlook.com>
+References: <20240228143402.89219-1-xin.zeng@intel.com>
+ <20240228143402.89219-11-xin.zeng@intel.com>
+ <BN9PR11MB5276492EDE7F9CA57117FE518C222@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB5276492EDE7F9CA57117FE518C222@BN9PR11MB5276.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB5502:EE_|PH7PR11MB8501:EE_
+x-ms-office365-filtering-correlation-id: da9b25af-8f17-40a4-2e5a-08dc3d87c7f1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DO54RL9SveuMkEKkt+5aHIQd7IM7DzdYZ8d569P4xB00xFMcVpQgP+jopmNyyXuW5jXAkgH8Q4k1gxyR2P6mtAI1Ak1tI/bL3npZP3kiHzTl0UjDynYXQoWhGdV+QuQGb7srAfT5i2wh1fG1GJnDfBpPJkq+ChFVA5vKmUFZui74vR0lnweQ9WF0XGVsyYgaggvgTi+WvVHMXY8bSlH4b9puaf5PCmMmvtJcuBKXvfKIyeug8yVdWp9LGhA06XZUQ3f4/tbj/hRo2mLGifnGIqfFWOr7hnZE+fg/MLgTuXGxyHZee3YrKI8oG9s6zRmEFNjYisTRL41EfemwPGtXC0vBIvBwEh1K8BomPbIRetZ1O0xdp0dH3xZFypUTgDQpWurP3z9h4C53SW/SRBqOE39RTsfgJaz3qu23QOyTx1a7gBgVQaAzRkiz9ahE0lmOxyXgCamAtUCB0S1lVXy+TLekSKeLpyC0sAjtp8m9QbBuQn5edaoZ79Q/55JrmYIm2fiYVU/+ppdb4m/26kdQ8S2pUKbwryvX3yTdxxQi2vCAEnor76wrMMFA9vknOKXJOniYZOx97ZNYStRanxhmMhA4xDi0yWOnLdR2qn/vuAL/h+Es0Urs6Q4EupBwVv41CccZEg8Aeekec/MxUjEhedrciaDchQVcz/gQjJb6dmjc/0pSy0fTzuryXuey2aaWA0Zj97Sb5y1hkaVnHKVfZ/P9Lxh1+uW9UKaeufvyhFc=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5502.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2OTsKs5oYk50VhSF+EIXZ1Co3SbIsi42GmLOO772AQsrbmk5ZtNwRUaOKlcE?=
+ =?us-ascii?Q?sqvgvssdBrKKii/hBmrMOtCd7RKLH6fhwvRI9dY233r1vDR4qm7TT8IMFnMN?=
+ =?us-ascii?Q?k01TLSby3HznMR5Ix8/Bx9p/pnshW00v9DkcpaeFM6UD/brtrTiO0ZpHKkU1?=
+ =?us-ascii?Q?iVbg9UoQzzEhRlSb8PWX3aQZjDZ7RYoItuxpIuUnvFo6dHSvYfosS1X1+usO?=
+ =?us-ascii?Q?uCJbKV0YzhV0gTYBgarxFFVD53DqdZXrvgMKFpWO2eydhMESiUKALnG/X8iG?=
+ =?us-ascii?Q?NvFNkzjvHny04BHG/jyDY6FbwacS7f2gwAASVgZLnDNz2U9BVIREbGGdur4W?=
+ =?us-ascii?Q?AEO1cYhP8iHwtBESTikUccTi8j6eQwdeoWL7YrH9jxe+afIYOv/fpWvOhSdi?=
+ =?us-ascii?Q?4aGdwulDQ/U91e2sdsfrXcXNlloqXqwbVuA3pkxNVRYOOfAMxPbIzdwG0/sU?=
+ =?us-ascii?Q?KJGJrBXTHnrpnsvRDKFNNk9zATgEMA4I6s63KjFI0o7TUHJ0TI6wjKki+hYv?=
+ =?us-ascii?Q?DZ7qnBzJVDxM44Bjhi6EcehFynCvr+l8QR9CyXmNeUJZlrUYMx4ZCbrO876P?=
+ =?us-ascii?Q?gtn9P4i1rn1IUySMqdTrLHujCpK6CKxufidNxlq1/4MIOtiDx+gnBgRB6xJE?=
+ =?us-ascii?Q?EXASYZdOCun03BfTt4PJvGakv2H4n7aoeQRSMaKAZYOQLzfDJxcl1ClskVQq?=
+ =?us-ascii?Q?dyfUZMbg41fNPkp+I0H92fdkoZn/xfH57remF/t1BvKRjrstzcC4ImWENoY8?=
+ =?us-ascii?Q?e1aoCl5xNnJ7Lru/tzpBEGhDRUbcmYiJgg151NqpOO2NjB+bicSmfU1vt1kz?=
+ =?us-ascii?Q?/MoX8mcK9OwBU4Ntip/MwVCbINnhvHi/aayysisI9luVhzVOaN7bXnLiazRx?=
+ =?us-ascii?Q?B/ZyD5poTGy/5a4K7zROVjEVbf25dA1uR7mBPxwfhL7Gg1M33I7OWTdQZrbW?=
+ =?us-ascii?Q?ulAESH+qncMkna+xsF61TP/CkA93nynuflfk6d3/2Z5EJzIbfXLmMuaksDlx?=
+ =?us-ascii?Q?kRYKDnY6/55J3zEfTKjwab1iFCgZDETJ59k15DTt3u5z1Rksi0MPWK4RVtZT?=
+ =?us-ascii?Q?RtJgnZGPaghBWpEpAJUc12LnTJtuzunJqAgtdDq9Bk82sYXj9jpgzJTEylcx?=
+ =?us-ascii?Q?vJYNYz4XzMyHzaIHbDTDCkA8ufU3PsVVQxTWcgASsDp7Ou8u4bCtZxD1LKOi?=
+ =?us-ascii?Q?MvL8+R3LpCh44XWuGV/kGRO9R1+Y8cONXh+nTrWMZIU1o+y3o3TdoaEd2iCG?=
+ =?us-ascii?Q?79o+pgcsptLTKH0oxMS9M4SmqSbmR1Es0NInRyQjGhL0VGjgTQQXvK87b3vr?=
+ =?us-ascii?Q?fnLHft6x+54av4Z3x3yJoVr33sXpT5QFXh+1z/UNQ4QOSA5utGcBVOoUMrG/?=
+ =?us-ascii?Q?meWWQdYDaEawiB7cJbKH5YrpSZwxSg4OUgSNVU84nB8u6EvVjvwvhcybmvrP?=
+ =?us-ascii?Q?ZdOjshG3KVLK4uOj0L8Sc17AROYiWkr7eN5aaEWrv7iplI5pTkLuQaEPKCsE?=
+ =?us-ascii?Q?VlhQisf3oUPHE3pxS47sx3VH6OSUhcMiONjr2s8x8aMoqzD/O+yhUjueOT6h?=
+ =?us-ascii?Q?lbkNsRWylPFQNm50QveT0Ja0oGLKI/SSy+p+fH7r?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86/svm/pmu: Set PerfMonV2 global control bits
- correctly
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>, Like Xu <like.xu.linux@gmail.com>
-Cc: Sandipan Das <sandipan.das@amd.com>, pbonzini@redhat.com,
- mizhang@google.com, jmattson@google.com, ravi.bangoria@amd.com,
- nikunj.dadhania@amd.com, santosh.shukla@amd.com, manali.shukla@amd.com,
- babu.moger@amd.com, kvm list <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20240301075007.644152-1-sandipan.das@amd.com>
- <06061a28-88c0-404b-98a6-83cc6cc8c796@gmail.com>
- <cc8699be-3aae-42aa-9c70-f8b6a9728ee3@amd.com>
- <f5bbe9ac-ca35-4c3e-8cd7-249839fbb8b8@linux.intel.com>
- <ZeYlEGORqeTPLK2_@google.com>
- <8a846ba5-d346-422e-817b-e00ab9701f19@gmail.com>
- <ZedUwKWW7PNkvUH1@google.com> <ZedepdnKSl6oFNUq@google.com>
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <ZedepdnKSl6oFNUq@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5502.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da9b25af-8f17-40a4-2e5a-08dc3d87c7f1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 02:47:36.3893
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6ZYrHE66lY+Mtm38UESi1d/+JeXkodn94EDQ1pQ7wNAr0CwAlCxew8FQr66aBWuCY5B4qrWRJMlLe6QwPjKTAQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8501
+X-OriginatorOrg: intel.com
 
+Thanks for the comments, Kevin.
+On Tuesday, March 5, 2024 3:38 PM, Tian, Kevin <kevin.tian@intel.com> wrote=
+:
+> > From: Zeng, Xin <xin.zeng@intel.com>
+> > Sent: Wednesday, February 28, 2024 10:34 PM
+> > +
+> > +static long qat_vf_precopy_ioctl(struct file *filp, unsigned int cmd,
+> > +				 unsigned long arg)
+> > +{
+> > +	struct qat_vf_migration_file *migf =3D filp->private_data;
+> > +	struct qat_vf_core_device *qat_vdev =3D migf->qat_vdev;
+> > +	struct qat_mig_dev *mig_dev =3D qat_vdev->mdev;
+> > +	struct vfio_precopy_info info;
+> > +	loff_t *pos =3D &filp->f_pos;
+> > +	unsigned long minsz;
+> > +	int ret =3D 0;
+> > +
+> > +	if (cmd !=3D VFIO_MIG_GET_PRECOPY_INFO)
+> > +		return -ENOTTY;
+> > +
+> > +	minsz =3D offsetofend(struct vfio_precopy_info, dirty_bytes);
+> > +
+> > +	if (copy_from_user(&info, (void __user *)arg, minsz))
+> > +		return -EFAULT;
+> > +	if (info.argsz < minsz)
+> > +		return -EINVAL;
+> > +
+> > +	mutex_lock(&qat_vdev->state_mutex);
+> > +	if (qat_vdev->mig_state !=3D VFIO_DEVICE_STATE_PRE_COPY) {
+> > +		mutex_unlock(&qat_vdev->state_mutex);
+> > +		return -EINVAL;
+> > +	}
+>=20
+> what about PRE_COPY_P2P?
 
-On 3/6/2024 2:04 AM, Sean Christopherson wrote:
-> On Tue, Mar 05, 2024, Sean Christopherson wrote:
->> On Tue, Mar 05, 2024, Like Xu wrote:
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index 87cc6c8809ad..f61ce26aeb90 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -741,6 +741,8 @@ static void kvm_pmu_reset(struct kvm_vcpu *vcpu)
->>    */
->>   void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
->>   {
->> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->> +
->>   	if (KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm))
->>   		return;
->>   
->> @@ -750,8 +752,18 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
->>   	 */
->>   	kvm_pmu_reset(vcpu);
->>   
->> -	bitmap_zero(vcpu_to_pmu(vcpu)->all_valid_pmc_idx, X86_PMC_IDX_MAX);
->> +	bitmap_zero(pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
->>   	static_call(kvm_x86_pmu_refresh)(vcpu);
->> +
->> +	/*
->> +	 * At RESET, both Intel and AMD CPUs set all enable bits for general
->> +	 * purpose counters in IA32_PERF_GLOBAL_CTRL (so that software that
->> +	 * was written for v1 PMUs don't unknowingly leave GP counters disabled
->> +	 * in the global controls).  Emulate that behavior when refreshing the
->> +	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
->> +	 */
->> +	if (kvm_pmu_has_perf_global_ctrl(pmu))
->> +		pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
->>   }
-> Doh, this is based on kvm/kvm-uapi, I'll rebase to kvm-x86/next before posting.
->
-> I'll also update the changelog to call out that KVM has always clobbered global_ctrl
-> during PMU refresh, i.e. there is no danger of breaking existing setups by
-> clobbering a value set by userspace, e.g. during live migration.
->
-> Lastly, I'll also update the changelog to call out that KVM *did* actually set
-> the general purpose counter enable bits in global_ctrl at "RESET" until v6.0,
-> and that KVM intentionally removed that behavior because of what appears to be
-> an Intel SDM bug.
->
-> Of course, in typical KVM fashion, that old code was also broken in its own way
-> (the history of this code is a comedy of errors).  Initial vPMU support in commit
-> f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests") *almost*
-> got it right, but for some reason only set the bits if the guest PMU was
-> advertised as v1:
->
->          if (pmu->version == 1) {
->                  pmu->global_ctrl = (1 << pmu->nr_arch_gp_counters) - 1;
->                  return;
->          }
->
->
-> Commit f19a0c2c2e6a ("KVM: PMU emulation: GLOBAL_CTRL MSR should be enabled on
-> reset") then tried to remedy that goof, but botched things and also enabled the
-> fixed counters:
->
->          pmu->global_ctrl = ((1 << pmu->nr_arch_gp_counters) - 1) |
->                  (((1ull << pmu->nr_arch_fixed_counters) - 1) << X86_PMC_IDX_FIXED);
->          pmu->global_ctrl_mask = ~pmu->global_ctrl;
->
-> Which was KVM's behavior up until commit c49467a45fe0 ("KVM: x86/pmu: Don't overwrite
-> the pmu->global_ctrl when refreshing") incorrectly removed *everything*.  Very
-> ironically, that commit came from Like.
->
-> Author: Like Xu <likexu@tencent.com>
-> Date:   Tue May 10 12:44:07 2022 +0800
->
->      KVM: x86/pmu: Don't overwrite the pmu->global_ctrl when refreshing
->      
->      Assigning a value to pmu->global_ctrl just to set the value of
->      pmu->global_ctrl_mask is more readable but does not conform to the
->      specification. The value is reset to zero on Power up and Reset but
->      stays unchanged on INIT, like most other MSRs.
->
-> But wait, it gets even better.  Like wasn't making up that behavior, Intel's SDM
-> circa December 2022 states that "Global Perf Counter Controls" is '0' at Power-Up
-> and RESET.  But then the March 2023 SDM rolls out and says
->
->    IA32_PERF_GLOBAL_CTRL: Sets bits n-1:0 and clears the upper bits.
->
-> So presumably someone at Intel noticed that what their CPUs do and what the
-> documentation says didn't match.
+Good catch, will add it in next version.
 
-It's a really long story... thanks for figuring it out.
+>=20
+> > +static struct qat_vf_migration_file *
+> > +qat_vf_save_device_data(struct qat_vf_core_device *qat_vdev, bool
+> > pre_copy)
+> > +{
+> > +	struct qat_vf_migration_file *migf;
+> > +	int ret;
+> > +
+> > +	migf =3D kzalloc(sizeof(*migf), GFP_KERNEL);
+> > +	if (!migf)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	migf->filp =3D anon_inode_getfile("qat_vf_mig", &qat_vf_save_fops,
+> > +					migf, O_RDONLY);
+> > +	ret =3D PTR_ERR_OR_ZERO(migf->filp);
+> > +	if (ret) {
+> > +		kfree(migf);
+> > +		return ERR_PTR(ret);
+> > +	}
+> > +
+> > +	stream_open(migf->filp->f_inode, migf->filp);
+> > +	mutex_init(&migf->lock);
+> > +
+> > +	if (pre_copy)
+> > +		ret =3D qat_vf_save_setup(qat_vdev, migf);
+> > +	else
+> > +		ret =3D qat_vf_save_state(qat_vdev, migf);
+> > +	if (ret) {
+> > +		fput(migf->filp);
+> > +		return ERR_PTR(ret);
+> > +	}
+>=20
+> lack of kfree(migf). Using goto can avoid such typo in error unwind.
 
->
-> *sigh*
->
+kfree(migf) will be invoked in fput. This was pointed out by
+Shameer and I updated it in v2. :-)
+
+>=20
+> > +
+> > +static struct file *qat_vf_pci_step_device_state(struct
+> qat_vf_core_device
+> > *qat_vdev, u32 new)
+> > +{
+> > +	u32 cur =3D qat_vdev->mig_state;
+> > +	int ret;
+> > +
+> > +	if ((cur =3D=3D VFIO_DEVICE_STATE_RUNNING && new =3D=3D
+> > VFIO_DEVICE_STATE_RUNNING_P2P) ||
+> > +	    (cur =3D=3D VFIO_DEVICE_STATE_PRE_COPY && new =3D=3D
+> > VFIO_DEVICE_STATE_PRE_COPY_P2P)) {
+> > +		ret =3D qat_vfmig_suspend(qat_vdev->mdev);
+> > +		if (ret)
+> > +			return ERR_PTR(ret);
+> > +		return NULL;
+> > +	}
+>=20
+> could you arrange the transitions in pair as mlx does e.g. following
+> above is the reverse one calling qat_vfmig_resume()?
+
+Sure, will update it in next version.
+
+>=20
+> > +
+> > +MODULE_LICENSE("GPL");
+> > +MODULE_AUTHOR("Intel Corporation");
+>=20
+> please use your name as the author.
+
+Sure, will do.
+
 
