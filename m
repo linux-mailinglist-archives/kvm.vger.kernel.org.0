@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-11199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB1128741C5
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 22:17:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 600EF8741C3
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 22:17:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9009728446D
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 21:17:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 115101F233C7
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 21:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA2D1B5A0;
-	Wed,  6 Mar 2024 21:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB481CAB1;
+	Wed,  6 Mar 2024 21:15:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TG1QqZh/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TSAwVOCL"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47DF91CD2C
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 21:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EF31C6B9
+	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 21:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709759714; cv=none; b=iEFNnD1eVGCg7NJF4UTmwURbgPxKo6sG8vuEBRDvll/AaZwreaerXO5yfiqWkDriQuDW+6XLXgvkMKRb3McL3XrnzcDafPM3MtKfOe81ebdA29WaPoZ8YuUH7IxBl6UI7WnH38+2Vkpo+pckiNsE4Anlwery5rthe/RGXlOg5bg=
+	t=1709759710; cv=none; b=JYO/a7qB5H4wrc3V8WbWDt507rP9qW77aHHqMt2qAeZbesSLTWPbi50nRKMrIZSore5VP76cwIZmtXXgkCn04jATdjk0tuPUoG2bHqkQXwm1yL4mX20/HI2Ywajgghot+Y06f/zqPNh//lVxU2j/t3COTKKy8/SAM+aGtb+tstU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709759714; c=relaxed/simple;
-	bh=Y3KQF+zA4wycp1Z5FAS3b0qEAdujAKLwEmP4NGVfBKo=;
+	s=arc-20240116; t=1709759710; c=relaxed/simple;
+	bh=DcVKXTML5ywo+4G+K2NpqKcgjW37poRbZY0R6kODpyA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZV7D2KHCf/5xtJ1CQf85A9oWOIWrfVO2dwCgdqE1n+umLgA2mTvbz3wPca4mhpn+LZRS1R486K+Wf4YtkN0PVHHXkS5VtcoLi18bSPGn+daXF/HuKUwBKCKi7VpjD/g06dX4S3B8jwob18unAUEAI1ywDxgYRN+TGD2GwnCY0t4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TG1QqZh/; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=sgJoKCOIwKa/PmAabCZOCXxbkc79JUm8FP+Or9d6MwrQvmM4R4Hzq/ue4nZrGhxk9YpKCkm/N0LJk9+OgmC03OWN+1kVCC/dQvctzF5z6poUkBFN0YNrpI+E2D8wQezyysBULObhM9gno06ft5K3ZnIKowHkEAOmDmQgXZ58gJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TSAwVOCL; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709759708;
+	s=mimecast20190719; t=1709759707;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JA1Ji9HHz4yOl6708hESZdgxjLQ5gcMbcM6qyIzNyE8=;
-	b=TG1QqZh/BohnjD79oSoyaB5g/C8UmjNNEz0Ay1OWPY99OmXHetQR1Yekl++g5Z11D2ZqC0
-	Vdn2cQ6bDb3n0tXs5Zi5uOQ3bpmLBmZGGoV1iUrVxdSSBLJdZDqnsrLXpJLrCw+FAxAvGM
-	ba6QPCQpopIlxTXGB3d3gZsDDYEeORs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-343-F7W_7JawPoqGExY43-kivg-1; Wed, 06 Mar 2024 16:15:04 -0500
-X-MC-Unique: F7W_7JawPoqGExY43-kivg-1
+	bh=uvV/nDuM+sweXjvIC5LuTFavoYDPU4njYTvMMtNtIIo=;
+	b=TSAwVOCL7J3JIlOOuK/810LMfmssxzT1U6v3jZDaMt2+az2dlNmNZvNCnI0xuQsirYnlOR
+	kZxoBgadm76jBR+BpaXZGw8hdeBvLfrj+9MuSBSrZxrGjTtuDi4se/BAAnJLQdqIVlweob
+	L9ZfZ3JaocG4I18mZl+A6ThKWkscFW4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-499-Q7XHd1CCMGiyPq3ivckN0w-1; Wed,
+ 06 Mar 2024 16:15:04 -0500
+X-MC-Unique: Q7XHd1CCMGiyPq3ivckN0w-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F3B8185A781;
-	Wed,  6 Mar 2024 21:15:02 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E6DCC1C05158;
+	Wed,  6 Mar 2024 21:15:03 +0000 (UTC)
 Received: from omen.home.shazbot.org (unknown [10.22.33.99])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 94D4F36FF;
-	Wed,  6 Mar 2024 21:15:01 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E05B537F6;
+	Wed,  6 Mar 2024 21:15:02 +0000 (UTC)
 From: Alex Williamson <alex.williamson@redhat.com>
 To: alex.williamson@redhat.com
 Cc: kvm@vger.kernel.org,
@@ -62,10 +62,11 @@ Cc: kvm@vger.kernel.org,
 	clg@redhat.com,
 	reinette.chatre@intel.com,
 	linux-kernel@vger.kernel.org,
-	kevin.tian@intel.com
-Subject: [PATCH 6/7] vfio/platform: Create persistent IRQ handlers
-Date: Wed,  6 Mar 2024 14:14:41 -0700
-Message-ID: <20240306211445.1856768-7-alex.williamson@redhat.com>
+	kevin.tian@intel.com,
+	diana.craciun@oss.nxp.com
+Subject: [PATCH 7/7] vfio/fsl-mc: Block calling interrupt handler without trigger
+Date: Wed,  6 Mar 2024 14:14:42 -0700
+Message-ID: <20240306211445.1856768-8-alex.williamson@redhat.com>
 In-Reply-To: <20240306211445.1856768-1-alex.williamson@redhat.com>
 References: <20240306211445.1856768-1-alex.williamson@redhat.com>
 Precedence: bulk
@@ -77,245 +78,47 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-The vfio-platform SET_IRQS ioctl currently allows loopback triggering of
-an interrupt before a signaling eventfd has been configured by the user,
-which thereby allows a NULL pointer dereference.
+The eventfd_ctx trigger pointer of the vfio_fsl_mc_irq object is
+initially NULL and may become NULL if the user sets the trigger
+eventfd to -1.  The interrupt handler itself is guaranteed that
+trigger is always valid between request_irq() and free_irq(), but
+the loopback testing mechanisms to invoke the handler function
+need to test the trigger.  The triggering and setting ioctl paths
+both make use of igate and are therefore mutually exclusive.
 
-Rather than register the IRQ relative to a valid trigger, register all
-IRQs in a disabled state in the device open path.  This allows mask
-operations on the IRQ to nest within the overall enable state governed
-by a valid eventfd signal.  This decouples @masked, protected by the
-@locked spinlock from @trigger, protected via the @igate mutex.
+The vfio-fsl-mc driver does not make use of irqfds, nor does it
+support any sort of masking operations, therefore unlike vfio-pci
+and vfio-platform, the flow can remain essentially unchanged.
 
-In doing so, it's guaranteed that changes to @trigger cannot race the
-IRQ handlers because the IRQ handler is synchronously disabled before
-modifying the trigger, and loopback triggering of the IRQ via ioctl is
-safe due to serialization with trigger changes via igate.
-
-For compatibility, request_irq() failures are maintained to be local to
-the SET_IRQS ioctl rather than a fatal error in the open device path.
-This allows, for example, a userspace driver with polling mode support
-to continue to work regardless of moving the request_irq() call site.
-This necessarily blocks all SET_IRQS access to the failed index.
-
-Cc: Eric Auger <eric.auger@redhat.com>
-Fixes: 57f972e2b341 ("vfio/platform: trigger an interrupt via eventfd")
+Cc: Diana Craciun <diana.craciun@oss.nxp.com>
+Fixes: cc0ee20bd969 ("vfio/fsl-mc: trigger an interrupt via eventfd")
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- drivers/vfio/platform/vfio_platform_irq.c | 102 +++++++++++++++-------
- 1 file changed, 70 insertions(+), 32 deletions(-)
+ drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
-index a311d70c695b..e72f5b10c266 100644
---- a/drivers/vfio/platform/vfio_platform_irq.c
-+++ b/drivers/vfio/platform/vfio_platform_irq.c
-@@ -136,6 +136,16 @@ static int vfio_platform_set_irq_unmask(struct vfio_platform_device *vdev,
- 	return 0;
- }
- 
-+/*
-+ * The trigger eventfd is guaranteed valid in the interrupt path
-+ * and protected by the igate mutex when triggered via ioctl.
-+ */
-+static void vfio_send_eventfd(struct vfio_platform_irq *irq_ctx)
-+{
-+	if (likely(irq_ctx->trigger))
-+		eventfd_signal(irq_ctx->trigger);
-+}
-+
- static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
- {
- 	struct vfio_platform_irq *irq_ctx = dev_id;
-@@ -155,7 +165,7 @@ static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
- 	spin_unlock_irqrestore(&irq_ctx->lock, flags);
- 
- 	if (ret == IRQ_HANDLED)
--		eventfd_signal(irq_ctx->trigger);
-+		vfio_send_eventfd(irq_ctx);
- 
- 	return ret;
- }
-@@ -164,52 +174,40 @@ static irqreturn_t vfio_irq_handler(int irq, void *dev_id)
- {
- 	struct vfio_platform_irq *irq_ctx = dev_id;
- 
--	eventfd_signal(irq_ctx->trigger);
-+	vfio_send_eventfd(irq_ctx);
- 
- 	return IRQ_HANDLED;
- }
- 
- static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
--			    int fd, irq_handler_t handler)
-+			    int fd)
- {
- 	struct vfio_platform_irq *irq = &vdev->irqs[index];
- 	struct eventfd_ctx *trigger;
--	int ret;
- 
- 	if (irq->trigger) {
--		irq_clear_status_flags(irq->hwirq, IRQ_NOAUTOEN);
--		free_irq(irq->hwirq, irq);
--		kfree(irq->name);
-+		disable_irq(irq->hwirq);
- 		eventfd_ctx_put(irq->trigger);
- 		irq->trigger = NULL;
- 	}
- 
- 	if (fd < 0) /* Disable only */
- 		return 0;
--	irq->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-irq[%d](%s)",
--			      irq->hwirq, vdev->name);
--	if (!irq->name)
--		return -ENOMEM;
- 
- 	trigger = eventfd_ctx_fdget(fd);
--	if (IS_ERR(trigger)) {
--		kfree(irq->name);
-+	if (IS_ERR(trigger))
- 		return PTR_ERR(trigger);
--	}
- 
- 	irq->trigger = trigger;
- 
--	irq_set_status_flags(irq->hwirq, IRQ_NOAUTOEN);
--	ret = request_irq(irq->hwirq, handler, 0, irq->name, irq);
--	if (ret) {
--		kfree(irq->name);
--		eventfd_ctx_put(trigger);
--		irq->trigger = NULL;
--		return ret;
--	}
--
--	if (!irq->masked)
--		enable_irq(irq->hwirq);
-+	/*
-+	 * irq->masked effectively provides nested disables within the overall
-+	 * enable relative to trigger.  Specifically request_irq() is called
-+	 * with NO_AUTOEN, therefore the IRQ is initially disabled.  The user
-+	 * may only further disable the IRQ with a MASK operations because
-+	 * irq->masked is initially false.
-+	 */
-+	enable_irq(irq->hwirq);
- 
- 	return 0;
- }
-@@ -228,7 +226,7 @@ static int vfio_platform_set_irq_trigger(struct vfio_platform_device *vdev,
- 		handler = vfio_irq_handler;
- 
- 	if (!count && (flags & VFIO_IRQ_SET_DATA_NONE))
--		return vfio_set_trigger(vdev, index, -1, handler);
-+		return vfio_set_trigger(vdev, index, -1);
- 
- 	if (start != 0 || count != 1)
- 		return -EINVAL;
-@@ -236,7 +234,7 @@ static int vfio_platform_set_irq_trigger(struct vfio_platform_device *vdev,
- 	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
- 		int32_t fd = *(int32_t *)data;
- 
--		return vfio_set_trigger(vdev, index, fd, handler);
-+		return vfio_set_trigger(vdev, index, fd);
- 	}
+diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+index d62fbfff20b8..82b2afa9b7e3 100644
+--- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
++++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+@@ -141,13 +141,14 @@ static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
+ 	irq = &vdev->mc_irqs[index];
  
  	if (flags & VFIO_IRQ_SET_DATA_NONE) {
-@@ -260,6 +258,14 @@ int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
- 		    unsigned start, unsigned count, uint32_t flags,
- 		    void *data) = NULL;
+-		vfio_fsl_mc_irq_handler(hwirq, irq);
++		if (irq->trigger)
++			eventfd_signal(irq->trigger);
  
-+	/*
-+	 * For compatibility, errors from request_irq() are local to the
-+	 * SET_IRQS path and reflected in the name pointer.  This allows,
-+	 * for example, polling mode fallback for an exclusive IRQ failure.
-+	 */
-+	if (IS_ERR(vdev->irqs[index].name))
-+		return PTR_ERR(vdev->irqs[index].name);
-+
- 	switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
- 	case VFIO_IRQ_SET_ACTION_MASK:
- 		func = vfio_platform_set_irq_mask;
-@@ -280,7 +286,7 @@ int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+ 	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+ 		u8 trigger = *(u8 *)data;
  
- int vfio_platform_irq_init(struct vfio_platform_device *vdev)
- {
--	int cnt = 0, i;
-+	int cnt = 0, i, ret = 0;
- 
- 	while (vdev->get_irq(vdev, cnt) >= 0)
- 		cnt++;
-@@ -292,29 +298,56 @@ int vfio_platform_irq_init(struct vfio_platform_device *vdev)
- 
- 	for (i = 0; i < cnt; i++) {
- 		int hwirq = vdev->get_irq(vdev, i);
-+		irq_handler_t handler = vfio_irq_handler;
- 
--		if (hwirq < 0)
-+		if (hwirq < 0) {
-+			ret = -EINVAL;
- 			goto err;
-+		}
- 
- 		spin_lock_init(&vdev->irqs[i].lock);
- 
- 		vdev->irqs[i].flags = VFIO_IRQ_INFO_EVENTFD;
- 
--		if (irq_get_trigger_type(hwirq) & IRQ_TYPE_LEVEL_MASK)
-+		if (irq_get_trigger_type(hwirq) & IRQ_TYPE_LEVEL_MASK) {
- 			vdev->irqs[i].flags |= VFIO_IRQ_INFO_MASKABLE
- 						| VFIO_IRQ_INFO_AUTOMASKED;
-+			handler = vfio_automasked_irq_handler;
-+		}
- 
- 		vdev->irqs[i].count = 1;
- 		vdev->irqs[i].hwirq = hwirq;
- 		vdev->irqs[i].masked = false;
-+		vdev->irqs[i].name = kasprintf(GFP_KERNEL_ACCOUNT,
-+					       "vfio-irq[%d](%s)", hwirq,
-+					       vdev->name);
-+		if (!vdev->irqs[i].name) {
-+			ret = -ENOMEM;
-+			goto err;
-+		}
-+
-+		ret = request_irq(hwirq, handler, IRQF_NO_AUTOEN,
-+				  vdev->irqs[i].name, &vdev->irqs[i]);
-+		if (ret) {
-+			kfree(vdev->irqs[i].name);
-+			vdev->irqs[i].name = ERR_PTR(ret);
-+		}
+-		if (trigger)
+-			vfio_fsl_mc_irq_handler(hwirq, irq);
++		if (trigger && irq->trigger)
++			eventfd_signal(irq->trigger);
  	}
- 
- 	vdev->num_irqs = cnt;
  
  	return 0;
- err:
-+	for (--i; i >= 0; i--) {
-+		int hwirq = vdev->get_irq(vdev, i);
-+
-+		if (!IS_ERR(vdev->irqs[i].name)) {
-+			free_irq(hwirq, &vdev->irqs[i]);
-+			kfree(vdev->irqs[i].name);
-+		}
-+	}
- 	kfree(vdev->irqs);
--	return -EINVAL;
-+	return ret;
- }
- 
- void vfio_platform_irq_cleanup(struct vfio_platform_device *vdev)
-@@ -326,7 +359,12 @@ void vfio_platform_irq_cleanup(struct vfio_platform_device *vdev)
- 
- 		vfio_virqfd_disable(&vdev->irqs[i].mask);
- 		vfio_virqfd_disable(&vdev->irqs[i].unmask);
--		vfio_set_trigger(vdev, i, -1, NULL);
-+		if (!IS_ERR(vdev->irqs[i].name)) {
-+			free_irq(hwirq, &vdev->irqs[i]);
-+			if (vdev->irqs[i].trigger)
-+				eventfd_ctx_put(vdev->irqs[i].trigger);
-+			kfree(vdev->irqs[i].name);
-+		}
- 	}
- 
- 	vdev->num_irqs = 0;
 -- 
 2.43.2
 
