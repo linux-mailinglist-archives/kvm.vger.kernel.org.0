@@ -1,146 +1,140 @@
-Return-Path: <kvm+bounces-11113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11115-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D64E387326E
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 10:23:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E609F8732F5
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 10:46:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 140AC1C23EF4
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 09:23:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 240021C26FFB
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 09:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4457A5DF21;
-	Wed,  6 Mar 2024 09:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3379D60DF5;
+	Wed,  6 Mar 2024 09:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="rBzkv6WH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PNyDIZhd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8623C5DF01;
-	Wed,  6 Mar 2024 09:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD6E60DDC;
+	Wed,  6 Mar 2024 09:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709716970; cv=none; b=jIszY+j/M/kP7NZQ113j54l/6cGluj1+dMROzZoBRwpz6yHGELh5v88jBryFvLPoeM6yo/s4UEYHEx+99W84bPuhFn7OSl/QvmMqDPPfornCaXFCMzifU96YIt9gFsFKkZTYro3MJtLy+uXm5zCKglqnZDwieil17uPPxirUnB4=
+	t=1709718221; cv=none; b=uh81pJEZdk75Rn23CZazporG/AXQ/QXw5DvIDwTCiUfFKO1g3UMolPt2rngneW/04PJ2higR8EMwMn436gDEKMCCHse1WnC3I8NwDHNYdJ6DtRYKA4/WdpF0mRb0nXYdeyODvIfwAMfWvjEup9wzA7VVrvC+rzNNeMotfMxSvTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709716970; c=relaxed/simple;
-	bh=o4WXpLuFlb2On21gYF6e06FQki+re+8xuTwVBSizxMI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=swnWBWEqkamfgfUgPw+3EoJitExCJ536ldb1/6JII5lm6BmfJY+KdfZ93H2vamt2wFPtwMg0RcpoqONxWu+TC5aVcDDRxZ+EGfsPcJ0YPrBb7aZrQlNPQxbHzgeotViA8DJUo7cyWwDG1uAgj0R3LjybKT1ijVn9Nis3wnFW1hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=rBzkv6WH; arc=none smtp.client-ip=115.28.160.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1709716964; bh=o4WXpLuFlb2On21gYF6e06FQki+re+8xuTwVBSizxMI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rBzkv6WHSyXZIk6znzU7nnLyL4/jck+sMZRhuySYFRLWZKkN1d1KsNE7YUsV8NWoK
-	 umxFcxOBgdLaEa1rvbZ520CbIoNR8/RHQG/cdi98q2Tll/TNBWCQER0u0OTXpPmCEc
-	 CsAEx0w4+waz8+o8k40rSOV9dqnlRmLpToVMFjRA=
-Received: from [IPV6:240e:688:100:1:e42:6442:8662:5647] (unknown [IPv6:240e:688:100:1:e42:6442:8662:5647])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 7524F600CE;
-	Wed,  6 Mar 2024 17:22:44 +0800 (CST)
-Message-ID: <4039d1ff-8e9f-42cf-a8fa-b326102fcbf5@xen0n.name>
-Date: Wed, 6 Mar 2024 17:22:43 +0800
+	s=arc-20240116; t=1709718221; c=relaxed/simple;
+	bh=VlacLIJetZbSc37w9oCgwWXUQ4SkJoVFKp/+32psVko=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UAvUc/vfH/S2TetZWw6EHCt9UVpBeFP+8xPms2nDwC2vLi1YzPMweytbcjvGy4uJ2OEbLJIhek/k35tmUs22v1p+oiKalrG/oB6/wSw/KpJc6X0fQ2ZKhEXmziFhr+Z8Ua0mL3f+FHBydTNaazYEk2dxjLWuGOpcq5jeq6grx38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PNyDIZhd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD56FC433C7;
+	Wed,  6 Mar 2024 09:43:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709718220;
+	bh=VlacLIJetZbSc37w9oCgwWXUQ4SkJoVFKp/+32psVko=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PNyDIZhdO1Map2G6d312fQ+R4uj7Oko/SG1vXb/T+mcs7mNxUFEfjumYvZB2nbFSc
+	 OgDu5OKOhDlr3Yx4uEzDy1/3uL3ntEGBau1Gs9j6O5dZ3mUDhqq5oJy61RwaxOUlPB
+	 q/rlFlsav4ajiR52rEpi3CVXmDOFfMpmNg6ZrBVF1O2GIhfTe/mY/EVK/CGfFTFI/8
+	 C5PhcaHrax6zprup1/lXjqwgrtXle+FgxSKWUTQCjKh+XsQnoYdgsCFvhYNAFo6tKw
+	 ArMgHNAqTcoTKfusv6a/ak7ffy9Y7kzrwFUtKn1AXk1JfvrtOjzda4yRVLF8QGXTvf
+	 hj7YRdmDj2BwA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rhnoH-009sbl-1f;
+	Wed, 06 Mar 2024 09:43:38 +0000
+Date: Wed, 06 Mar 2024 09:43:13 +0000
+Message-ID: <87edcnr8zy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
+In-Reply-To: <6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
+References: <20240302111935.129994-1-maz@kernel.org>
+	<20240302111935.129994-6-maz@kernel.org>
+	<6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 7/7] Documentation: KVM: Add hypercall for LoongArch
-To: maobibo <maobibo@loongson.cn>, Tianrui Zhao <zhaotianrui@loongson.cn>,
- Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>
-Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, kvm@vger.kernel.org
-References: <20240302082532.1415200-1-maobibo@loongson.cn>
- <20240302084724.1415344-1-maobibo@loongson.cn>
- <846a5e46-4e8f-4f73-ac5b-323e78ec1bb1@xen0n.name>
- <853f2909-e455-bd1c-c6a4-6a13beb37125@loongson.cn>
- <ec871702-388d-4a29-aec1-5cd6d1de6d0a@xen0n.name>
- <7079bf3b-a7af-7cab-be78-3de1081649e1@loongson.cn>
-Content-Language: en-US
-From: WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <7079bf3b-a7af-7cab-be78-3de1081649e1@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 3/6/24 11:28, maobibo wrote:
-> On 2024/3/6 上午2:26, WANG Xuerui wrote:
->> On 3/4/24 17:10, maobibo wrote:
->>> On 2024/3/2 下午5:41, WANG Xuerui wrote:
->>>> On 3/2/24 16:47, Bibo Mao wrote:
->>>>> [snip]
->>>>> +
->>>>> +KVM hypercall ABI
->>>>> +=================
->>>>> +
->>>>> +Hypercall ABI on KVM is simple, only one scratch register a0 (v0) 
->>>>> and at most
->>>>> +five generic registers used as input parameter. FP register and 
->>>>> vector register
->>>>> +is not used for input register and should not be modified during 
->>>>> hypercall.
->>>>> +Hypercall function can be inlined since there is only one scratch 
->>>>> register.
->>>>
->>>> It should be pointed out explicitly that on hypercall return all 
->>> Well, return value description will added. What do think about the 
->>> meaning of return value for KVM_HCALL_FUNC_PV_IPI hypercall?  The 
->>> number of CPUs with IPI delivered successfully like kvm x86 or simply 
->>> success/failure?
-
-I just noticed I've forgotten to comment on this question. FYI, RISC-V 
-SBI's equivalent [1] doesn't even indicate errors. And from my 
-perspective, we can always add a new hypercall returning more info 
-should that info is needed in the future; for now I don't have a problem 
-whether the return type is void, bool or number of CPUs that are 
-successfully reached.
-
-[1]: 
-https://github.com/riscv-non-isa/riscv-sbi-doc/blob/v2.0/src/ext-ipi.adoc
-
->>>> architectural state except ``$a0`` is preserved. Or is the whole 
->>>> ``$a0 - $t8`` range clobbered, just like with Linux syscalls?
->>>>
->>> what is advantage with $a0 - > $t8 clobbered?
->>
->> Because then a hypercall is going to behave identical as an ordinary C 
->> function call, which is easy for people and compilers to understand.
->>
-> If you really understand detailed behavior about hypercall/syscall, the 
-> conclusion may be different.
+On Mon, 04 Mar 2024 19:10:08 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> If T0 - T8 is clobbered with hypercall instruction, hypercall caller 
-> need save clobbered register, now hypercall exception save/restore all 
-> the registers during VM exits. If so, hypercall caller need not save 
-> general registers and it is not necessary scratched for hypercall ABI.
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
+> > In retrospect, it is fairly obvious that the FP state ownership
+> > is only meaningful for a given CPU, and that locating this
+> > information in the vcpu was just a mistake.
+> > 
+> > Move the ownership tracking into the host data structure, and
+> > rename it from fp_state to fp_owner, which is a better description
+> > (name suggested by Mark Brown).
 > 
-> Until now all the discussion the macro level, no detail code level.
+> The SME patch series proposes adding an additional state to this
+> enumeration which would say if the registers are stored in a format
+> suitable for exchange with userspace, that would make this state part of
+> the vCPU state.  With the addition of SME we can have two vector lengths
+> in play so the series proposes picking the larger to be the format for
+> userspace registers.
+
+What does this addition have anything to do with the ownership of the
+physical register file? Not a lot, it seems.
+
+Specially as there better be no state resident on the CPU when
+userspace messes up with it.
+
 > 
-> Can you show me some example code where T0-T8 need not save/restore 
-> during LoongArch hypercall exception?
+> We could store this separately to fp_state/owner but it'd still be a
+> value stored in the vCPU.
 
-I was emphasizing that consistency is generally good, and yes that's 
-"macroscopic" level talk. Of course, the hypercall client code would 
-have to do *less* work if *more* registers than the minimum are 
-preserved -- if right now everything is already preserved, nothing needs 
-to change.
+I totally disagree.
 
-But please also notice that the context switch cost is paid for every 
-hypercall, and we can't reduce the number of preserved registers without 
-breaking compatibility. So I think we can keep the current 
-implementation behavior, but promise less in the spec: this way we'll 
-keep the possibility of reducing the context switch overhead.
+> Storing in a format suitable for userspace
+> usage all the time when we've got SME would most likely result in
+> performance overhead
+
+What performance overhead? Why should we care?
+
+> if nothing else and feels more complicated than
+> rewriting the data in the relatively unusual case where userspace looks
+> at it.  Trying to convert userspace writes into the current layout would
+> have issues if the current layout uses the smaller vector length and
+> create fragility with ordering issues when loading the guest state.
+
+What ordering issues? If userspace manipulates the guest state, the
+guest isn't running. If it is, all bets are off.
+
+> 
+> The proposal is not the most lovely idea ever but given the architecture
+> I think some degree of clunkiness would be unavoidable.
+
+It is only unavoidable if we decide to make a bad job of it.
+
+	M.
 
 -- 
-WANG "xen0n" Xuerui
-
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
-
+Without deviation from the norm, progress is not possible.
 
