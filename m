@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-11163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3183A873CA6
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 17:53:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD592873CB2
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 17:55:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54AEB1C20E0A
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 16:53:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D5EE1C232DB
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 16:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DBE4137931;
-	Wed,  6 Mar 2024 16:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059B713B7B2;
+	Wed,  6 Mar 2024 16:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b0HLmXZv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b67+VUym"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C2AD534
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 16:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C192513665A
+	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 16:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709743995; cv=none; b=jRScOt6xNp8Cs1+hJQqumH3Echp8mV1FMGsWyMC0J+LRBGHTgNsaEZbleI503ZlAdFSdqXrS238rYlXWzxYltdMou5TcnBfEoW9vSsvkwMwt1rov/bzTH3viN4nnjIOLQIsrt8y/ULblCdGQSJwmPDanUzQ4I/6KfZVRrMm57gk=
+	t=1709744096; cv=none; b=LEBeSF0P10nFuJC0jpmIhnY8i9DFhG+EYc815zwAMlBn7DfiaQxrWlUD2MlnTiV2Po/je9YMdgPewc0tM1ojxOgE7MAVn9MI+fvBUzCmolIHVCKU9tHS43pi9CtUgw3JfhhJPZMU1KIUfPdK0gYNYyy9XfVp7xht0xIpEqaXzKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709743995; c=relaxed/simple;
-	bh=6SB+uyvwTQXeMGEdssSTknSpAo9HcAwnJO/vLjPujX4=;
+	s=arc-20240116; t=1709744096; c=relaxed/simple;
+	bh=9B1jnMnf/lZuROM1ohqXZzfLg7dYxA+d4b91YufNt04=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EhSjpyxcLCsHomxdIOG2fe5VzMmrxcGBWC+KUvI1EMhVLbSWvzHD8mO2Wri9sGysQURrFtj8LB0yXJT4SOicXSzr7/Ws7tsIrLtIYLhpJyj8kxeCTQkCG2t4RSg3V5sEHpLp5FG12zYntw0FPVSTrBwwr89v7FZp482pZTxvAZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b0HLmXZv; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=BIgaWnXnaTvBphmwL+MT+9bJeYwWE19MOx4qKWfuuKOnbwdjTZCpmsaZL61JlL9ODOGM7pG8SFz/NfY5gcK3toH1lvIY/9v5Xt6Ecs9uEc+zrEYPpceOXsHHGNJvdv2Z873zxFD84W5/nCyD7cLCkwArsOEmS2JJb+SqfMRXTVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b67+VUym; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709743992;
+	s=mimecast20190719; t=1709744093;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WutCinmYz1M7S4R9mNKtvtvrjQFirF94DXtp/OLsS34=;
-	b=b0HLmXZvNwsZ0DicIn7WLJ7eURO1z092wdeIln3Zyf5JMHXI/7ospasl2erGds9r6tPDe4
-	DBafk7kuV7+4ykE2SCqvzxapPTcd0NfIUnr2hv+fAUP+vah5JBUVxuSsfd6aMJ/aL+Nsri
-	p4AOk5RwtWwESqRj4e30Uy9SrZJ1N20=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=E5tEhvrVpBjUExIADe7y2coPlP9Ws/ykxeh0yUTaq0E=;
+	b=b67+VUymRpcuw9UvH/MwtFwbb3f2GxEHdj0Bsx77NFoeNIqWS71T//HczBd05o5zeyyT/f
+	YnFNs7hiQ18hFMaE/essGBLw+IpKFsM4JRyiTdhw0x4HHXCHiFl0qrNF4vd3X0yJBLFryY
+	UV2YWUGfzhHfBNdGPfGMjF+kU5TxJYw=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-271-nzcKgQPzPMyJmab4Iv0b5w-1; Wed, 06 Mar 2024 11:53:10 -0500
-X-MC-Unique: nzcKgQPzPMyJmab4Iv0b5w-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-56484d05dcaso3546054a12.0
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 08:53:10 -0800 (PST)
+ us-mta-516-BwrpO2vgO7CO3W1lGiWX0A-1; Wed, 06 Mar 2024 11:54:52 -0500
+X-MC-Unique: BwrpO2vgO7CO3W1lGiWX0A-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d2e4ea0f63so52503821fa.2
+        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 08:54:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709743989; x=1710348789;
+        d=1e100.net; s=20230601; t=1709744091; x=1710348891;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WutCinmYz1M7S4R9mNKtvtvrjQFirF94DXtp/OLsS34=;
-        b=eGo0/Gg2hA1ecTyuklyoQo3wLVmlYUfTMsO5ywFlR5lkVERM3SPay0Qs1bFFkDgQ1C
-         UQNg0M3KCaYyeYqmMqkki/X75aenLzph6Bp3Se5IOJFo5vZCTya6W40fzdHAJjt4eGJJ
-         m9bs9jlrT4uwgQkunHQf/nrv6aBzEiEPya2UIjnDIwcGsZ5PcQziIQjr5oMKoefRC6MT
-         5AqrLJ9wHsgUW99nH9RdQkhIKfD05TxHDXjbK5mccxSGIVj4E0afZDLkofz3mRCY4UUG
-         gO7rOSUx02x02cweStmotjpc8b5yqdtgCQjJz7x6/ehPXa6ma545ljP0pBCgwjHu6pNz
-         PQwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXr+Qd5XOgcMBTucQEvNOaFlA526wI/MJAZY2WjEz0V2qh4xQ9b2ltWnXRWOaLdqBhcIoTNrn2Dm5RKN9hML/d6ZMUs
-X-Gm-Message-State: AOJu0Yxbjf/4aiJqAddt+f79Q+3zNACe3wa5cgBQf+9Ikls2KSpNQ+x7
-	UwIXeGYWc09XqCFp3Qq7vq0g/8mwXyLqtfgTv2e1XJ3XoI2dGX3KwZKW1YRzoMT9FXjKCLWVJwZ
-	BI2qz5FcC2xTC0DkKMqysy+WhB7c4zfAM3pwFTT+md2fiHRONmg==
-X-Received: by 2002:a05:6402:b6e:b0:567:6a67:664e with SMTP id cb14-20020a0564020b6e00b005676a67664emr5496809edb.34.1709743989703;
-        Wed, 06 Mar 2024 08:53:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF0ZAwykGq5coisNisdkWKGr0v1zQ1r5R2rU52uz15Lq6vXH1hNu1l+xgRAW+1GduwlQVwt6w==
-X-Received: by 2002:a05:6402:b6e:b0:567:6a67:664e with SMTP id cb14-20020a0564020b6e00b005676a67664emr5496787edb.34.1709743989182;
-        Wed, 06 Mar 2024 08:53:09 -0800 (PST)
+        bh=E5tEhvrVpBjUExIADe7y2coPlP9Ws/ykxeh0yUTaq0E=;
+        b=oizvp05AONy63/xJWaed2QPvp2PXElogfWzoGJV2FKxBByK0riSiBemggEtRpG2I2/
+         JHibA1zWjftpZrOroZ9zUdblgRn9qxhhPg+Kfpq85JOrWHIctM2qhj6HAG2OPWuNPOmz
+         +UoBu2VW+cRQPFqwbAYitZJRZvnyv8Jz4RFw9t2cyo2v8eq8PCVuvvM8LIC5H7lVdL2b
+         Iuccv0dhMhRbmOpMyWwMzFBl03w32Q7p+o8oAAukt+nwVT30YBAtjCkArCJYlO/yL6GQ
+         ncoC51MYekfghxHwFaHjIKFWE9DXPOmTM99r77NjonFq3bOK5uRbRRHqv6c97OEwTJDY
+         yTYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWdcenBjA/0nX5FH/D7JEUkvw4xUZNy7QXFFqdCY3l1ktXA9sHwPbTQlFoy5w9WmcjTP3muz72IlV6o+KbOWIQgqeib
+X-Gm-Message-State: AOJu0Yyrz6Bo6ZoLuRwnj6d9z/nHwb3Dp27N3i7hhF4wyMhWFgQrz0pU
+	fj+lOcpor263U8rMdUuEAz4CYu1gPhefwPDCIQQkBJPyIRk8GvSNhapR47u19doV8GUZ3ZosSMk
+	rYdnBXNeOlLssHdN4h5WnUdI8sqVYDDgrZsY4TjVB/CtRiFp9iw==
+X-Received: by 2002:a05:651c:103a:b0:2d3:a096:cb83 with SMTP id w26-20020a05651c103a00b002d3a096cb83mr3608746ljm.51.1709744091099;
+        Wed, 06 Mar 2024 08:54:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHdasodf3Bn3ko4LFJBf8O4uThijtWsDM+2wGTzX463uesenzburGh4fvX4MBvQKXyXnA0Y2Q==
+X-Received: by 2002:a05:651c:103a:b0:2d3:a096:cb83 with SMTP id w26-20020a05651c103a00b002d3a096cb83mr3608737ljm.51.1709744090754;
+        Wed, 06 Mar 2024 08:54:50 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-178-151.web.vodafone.de. [109.43.178.151])
-        by smtp.gmail.com with ESMTPSA id fe3-20020a056402390300b00567c34d8a82sm1335445edb.85.2024.03.06.08.53.08
+        by smtp.gmail.com with ESMTPSA id fe3-20020a056402390300b00567c34d8a82sm1335445edb.85.2024.03.06.08.54.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 08:53:08 -0800 (PST)
-Message-ID: <8bfad1f4-8fcb-42ad-ad43-80a72a448959@redhat.com>
-Date: Wed, 6 Mar 2024 17:53:07 +0100
+        Wed, 06 Mar 2024 08:54:50 -0800 (PST)
+Message-ID: <e3c7fa3a-b965-43c0-b20c-07759e54e59e@redhat.com>
+Date: Wed, 6 Mar 2024 17:54:49 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH-for-9.1 07/18] target/i386/kvm: Remove
- x86_cpu_change_kvm_default() and 'kvm-cpu.h'
+Subject: Re: [PATCH-for-9.1 08/18] hw/i386/pc: Remove
+ PCMachineClass::smbios_uuid_encoded
 Content-Language: en-US
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
@@ -93,9 +93,10 @@ Cc: Igor Mammedov <imammedo@redhat.com>,
  David Hildenbrand <david@redhat.com>, Ani Sinha <anisinha@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+ "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>
 References: <20240305134221.30924-1-philmd@linaro.org>
- <20240305134221.30924-8-philmd@linaro.org>
+ <20240305134221.30924-9-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -139,26 +140,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240305134221.30924-8-philmd@linaro.org>
+In-Reply-To: <20240305134221.30924-9-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 05/03/2024 14.42, Philippe Mathieu-Daudé wrote:
-> x86_cpu_change_kvm_default() was only used out of kvm-cpu.c by
-> the pc-i440fx-2.1 machine, which got removed. Inline it, and
-
-s/Inline/Make it static/ ?
-(since it is not a real inlining here)
-
-> remove its declaration. "kvm-cpu.h" is now empty, remove it too.
+> PCMachineClass::smbios_uuid_encoded was only used by the
+> pc-i440fx-2.1 machine, which got removed. It is now always
+> true, remove it.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   target/i386/kvm/kvm-cpu.h | 41 ---------------------------------------
->   target/i386/kvm/kvm-cpu.c |  3 +--
->   2 files changed, 1 insertion(+), 43 deletions(-)
->   delete mode 100644 target/i386/kvm/kvm-cpu.h
+>   include/hw/i386/pc.h | 1 -
+>   hw/i386/fw_cfg.c     | 2 +-
+>   hw/i386/pc.c         | 1 -
+>   3 files changed, 1 insertion(+), 3 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
 
