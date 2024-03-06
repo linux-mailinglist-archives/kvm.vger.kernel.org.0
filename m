@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-11190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11191-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB5D873FB5
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 19:38:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03900873FBB
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 19:39:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B913628166D
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 18:38:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26CEC1C22675
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 18:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E51143752;
-	Wed,  6 Mar 2024 18:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DABE14265A;
+	Wed,  6 Mar 2024 18:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bd78ICi8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D41Vy4fN"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01C113790F
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 18:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FA313774C
+	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 18:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709749820; cv=none; b=pYMAzRxrHErvMb+KOP9T6Vb4kWjinaS9vbmAKnnPEO6FR/F2qNRMbUfgl39RsySDXuHcqnp+99VP0nmhs0y+60g4mSl6wunbxEYRlGWq9S8rv8FdO9WvRtHBGhf5n3A6G3e0ZgaI1Jyknfn1u878VCJTAKaqej3V9vWoqnO20XA=
+	t=1709749954; cv=none; b=CH/Azx6Ml/BLdS09FqC4sGjON47b8OdAbvQvEn6TCMfDMyPvZGBranatR1KUsG8fsNvE6zD8CNqXOIFwfUN1aXNT0ip/cJ81KPlh2S7+NCSb44iWRiKpwl96x+h72R3Qk2w9P7jPeraaoN5iM7tGKJ0Y6GeIFN43JNBq+Hv+2sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709749820; c=relaxed/simple;
-	bh=aXZKjsNpEgJ0PMygu9fmYGwPhzAz24nUfVnTZjCVTNg=;
+	s=arc-20240116; t=1709749954; c=relaxed/simple;
+	bh=fw+q/MvD8ZZ66OXVTut4vMiR9fcPLxpsncx0bazJmKs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EvOzZtLVRgTW+cyfTLgslDQM7HxVmxT1dNg+x4uzx0cH90z17iiBukdCtjtrosKQOCTPAUdz8P35rjLwu8hnwISexUNK6P8Yyp8wmmGKPa0P5uhBuHRy8ajQOTWRqCfviycLVpO6iQW1bo6XLGHAdjk0d21G2IXUhadxYjNJ3+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bd78ICi8; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=UAFVcs01KHX3mq1OgH6TRTj8TtY4hX+TvN8ARoU6j/hFQ57JBF4QG8iuHp9j0+utuqWwN99fPZiFTuRv8EVI2eARYK0WBEYrpGAo7QzX/cCVQKbEE+EoDQwr7UkC8VP0mPgCdfwkGmeJSLK59V64pmfxIVmXkJDlEpYDZJk9W0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D41Vy4fN; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709749817;
+	s=mimecast20190719; t=1709749951;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=k7KgayFbR+hNyRj6m2G0t2A8yhp89iJhEkkZnVmMqZg=;
-	b=bd78ICi8Ka/TOfMtRHsOc9vDv1dVQatZxMcipNsNQY19Z2wcb3YUo6bpeuoJaYjLMXzNNP
-	mRkSsTyv/6k9ciNH/MrGR6ybpNK7skUQa8GOonmMboj4Ow2+1jNvbi44GvPT9p7LnQqMFS
-	FBXinS5gisGWYhsZYh4tHTM2B89XcFM=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=X864d1QVqITGbbV4mJu9JgFeSGvjt/VRT0OHec/qfzk=;
+	b=D41Vy4fNxhaJun5T6giI1ELNRBi7PowHF2EUAse4I9ZM7H5co716JCGs9y+S7x9b6aCAYk
+	v0Qf8B5jtaymAJfpXnKIhMUvxxZzxQ1JrSr+N+fwrfeB0FC041wt1beaJF1TTC/qFd4+Lq
+	x3r5mCcciR8bPozIgHGDYr931bRiseE=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-sEVEJ5DHNOWTFq2JJtNw-A-1; Wed, 06 Mar 2024 13:30:16 -0500
-X-MC-Unique: sEVEJ5DHNOWTFq2JJtNw-A-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-51337da375dso4811368e87.3
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 10:30:15 -0800 (PST)
+ us-mta-627-dNPBX0SMOSW6ocfwQJ6d7Q-1; Wed, 06 Mar 2024 13:32:30 -0500
+X-MC-Unique: dNPBX0SMOSW6ocfwQJ6d7Q-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5136f815e65so548251e87.1
+        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 10:32:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709749814; x=1710354614;
+        d=1e100.net; s=20230601; t=1709749949; x=1710354749;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k7KgayFbR+hNyRj6m2G0t2A8yhp89iJhEkkZnVmMqZg=;
-        b=eNqE8ficzlwQ9thk18nIE795FDLRTt6gZW8cg2QsHYMGP2mcIeGjny4EpRN0Plt62a
-         jfIIq2NOBJw9niXQOmVTNidGeRlnUX8AwJaiclQ5w4SkqRANzxUZF4NaTfdWSITiixuE
-         qwIE9QJpP/lN8lXD5BL7xTa46sx81BHjiW6woPn3RiIz3aL8hI+N3CapdsTxo8JnB+bm
-         0NMGux9/5aHRKI0yApztQt4Ma7WjoAiJJokxz3EwF/ONeW8yM5DvstjZ3rgpmp+/QjKg
-         Z/dGjbM73zLKNxrJ4V/zSaASuuKf/Id1gMKMk5kPb4n7wXeFUtzqJsKIOsSXs6irIVg0
-         RARQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7bCR/2K7coTN1ZE3PAZbe8mRGlwWKgkb9J86qZGBkwG9P9a0UEbMk33kEkxs4CbHtQR5k0cbHCsowQKog/acdXcQU
-X-Gm-Message-State: AOJu0YwVjhJkWmxWvfXvGSl8ymA20e8ELfd7e422F1j4+r+7N7SvOqMQ
-	PwPMAzKI7qIJnPjRktPftX/0q3lbvBvdKGGoHFJsmJjfhDtx/8Sg5PR+I33VyXqeiAnZcNU1lWP
-	443vrEwGuMdbrm8eSyH173z2WbADVimjZ3eaOPGSaWfez7HJz8A==
-X-Received: by 2002:a05:6512:148:b0:513:26fd:5c13 with SMTP id m8-20020a056512014800b0051326fd5c13mr3863709lfo.52.1709749814717;
-        Wed, 06 Mar 2024 10:30:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFnQWxdZjVtvijqTnq9PdLFe6OMtKx6FhU+4/c9ObET/W6uD/MiWEzV38Iq+/ZhCVVhBmHZwA==
-X-Received: by 2002:a05:6512:148:b0:513:26fd:5c13 with SMTP id m8-20020a056512014800b0051326fd5c13mr3863688lfo.52.1709749814363;
-        Wed, 06 Mar 2024 10:30:14 -0800 (PST)
+        bh=X864d1QVqITGbbV4mJu9JgFeSGvjt/VRT0OHec/qfzk=;
+        b=d999xbB66+TDyHTj/Hb78LjPU52CPFLiP3K4hXDKnScY5XUP6u/5xY7L1sTTCUgkyL
+         8m+ZAtcMEwi56LAXjBg3vBwoQGCw7Azpo5DUV+saPWcHKzrJQxKS/hX5P1h3C7AAePwq
+         pQMzTBVz6ySifi8CYnu1XP90iwMnKX5c/Gse2une06D3kT00rMeXxN6uTPcfioZj8Sk6
+         YN8Xn5fM9BZKLNDj+zV2Nc+WKrgvU68wahX3loevHQ5Q5IHnVnzncXR3wCSatqDEMvxK
+         dOlU9c1S5kwnv+cizGXzUY9pPXZMDJWh01FZkx5UzOt6BAR3t9DDqLINAxCsAEvaCQi2
+         TJWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEJ+zcFwx1kt8OC4pZN5nhOKc2trINJGy5HKQF23UOjC+eMro52LPm3w/dvXTStEo2ylCwebNFKSxBq6WVHOw4YQqT
+X-Gm-Message-State: AOJu0YxWZSR/CS4z36O5qGJygftTxGw4lAoSNMjkycvdMS84kGCYM5Y9
+	2V3kv4jdXtQFc2qkCZ4kDhXnI2OHR+o1Mn6G2r9Uwpa9+X5umuKlEMsNjat853D9SEOmYfHRq6o
+	0I4CJkkPJShZQENBNqjEDMRthudP2MEW6w6XNDa85CEi+KUiEvg==
+X-Received: by 2002:a19:7711:0:b0:513:5a38:f54f with SMTP id s17-20020a197711000000b005135a38f54fmr2132807lfc.63.1709749948776;
+        Wed, 06 Mar 2024 10:32:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGtn0K8sXtVQm/GuN/vWPnsldnSryb02WelYC7s79/1SCOzMTVySx3fKCPyBHbaXTUel2zq4A==
+X-Received: by 2002:a19:7711:0:b0:513:5a38:f54f with SMTP id s17-20020a197711000000b005135a38f54fmr2132783lfc.63.1709749948372;
+        Wed, 06 Mar 2024 10:32:28 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-178-151.web.vodafone.de. [109.43.178.151])
-        by smtp.gmail.com with ESMTPSA id gc9-20020a170906c8c900b00a4498726bb9sm6255742ejb.173.2024.03.06.10.30.12
+        by smtp.gmail.com with ESMTPSA id bh23-20020a170906a0d700b00a45acb058ffsm1798413ejb.216.2024.03.06.10.32.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 10:30:14 -0800 (PST)
-Message-ID: <c66d3c14-962d-439d-bc33-6d52d0f776be@redhat.com>
-Date: Wed, 6 Mar 2024 19:30:12 +0100
+        Wed, 06 Mar 2024 10:32:27 -0800 (PST)
+Message-ID: <3faf44cd-147c-4bc0-abfb-4ab1d968570b@redhat.com>
+Date: Wed, 6 Mar 2024 19:32:26 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH-for-9.1 17/18] target/i386: Remove
- X86CPU::kvm_no_smi_migration field
+Subject: Re: [PATCH-for-9.1 18/18] hw/i386/pc: Replace
+ PCMachineClass::acpi_data_size by PC_ACPI_DATA_SIZE
 Content-Language: en-US
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
@@ -93,9 +93,10 @@ Cc: Igor Mammedov <imammedo@redhat.com>,
  David Hildenbrand <david@redhat.com>, Ani Sinha <anisinha@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+ "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>
 References: <20240305134221.30924-1-philmd@linaro.org>
- <20240305134221.30924-18-philmd@linaro.org>
+ <20240305134221.30924-19-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -139,72 +140,21 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240305134221.30924-18-philmd@linaro.org>
+In-Reply-To: <20240305134221.30924-19-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 05/03/2024 14.42, Philippe Mathieu-Daudé wrote:
-> X86CPU::kvm_no_smi_migration was only used by the
-> pc-i440fx-2.3 machine, which got removed. Remove it
-> and simplify kvm_put_vcpu_events().
+> PCMachineClass::acpi_data_size was only used by the pc-i440fx-2.0
+> machine, which got removed. Since it is constant, replace the class
+> field by a definition.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   target/i386/cpu.h     | 3 ---
->   target/i386/cpu.c     | 2 --
->   target/i386/kvm/kvm.c | 6 ------
->   3 files changed, 11 deletions(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 952174bb6f..bdc640e844 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -2018,9 +2018,6 @@ struct ArchCPU {
->       /* if set, limit maximum value for phys_bits when host_phys_bits is true */
->       uint8_t host_phys_bits_limit;
->   
-> -    /* Stop SMI delivery for migration compatibility with old machines */
-> -    bool kvm_no_smi_migration;
-> -
->       /* Forcefully disable KVM PV features not exposed in guest CPUIDs */
->       bool kvm_pv_enforce_cpuid;
->   
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 2666ef3808..0e3ad8db2b 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -7905,8 +7905,6 @@ static Property x86_cpu_properties[] = {
->       DEFINE_PROP_BOOL("x-vendor-cpuid-only", X86CPU, vendor_cpuid_only, true),
->       DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
->       DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
-> -    DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
-> -                     false),
->       DEFINE_PROP_BOOL("kvm-pv-enforce-cpuid", X86CPU, kvm_pv_enforce_cpuid,
->                        false),
->       DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 42970ab046..571cbbf1fc 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -4344,12 +4344,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
->               events.smi.pending = 0;
->               events.smi.latched_init = 0;
->           }
-> -        /* Stop SMI delivery on old machine types to avoid a reboot
-> -         * on an inward migration of an old VM.
-> -         */
-> -        if (!cpu->kvm_no_smi_migration) {
-> -            events.flags |= KVM_VCPUEVENT_VALID_SMM;
-> -        }
+>   include/hw/i386/pc.h |  4 ----
+>   hw/i386/pc.c         | 19 ++++++++++++-------
+>   2 files changed, 12 insertions(+), 11 deletions(-)
 
-Shouldn't it be the other way round, i.e. that the flag is now always set?
-
-pc_compat_2_3[] had:
-
-     { TYPE_X86_CPU, "kvm-no-smi-migration", "on" },
-
-... so I think kvm_no_smi_migration was set to true for the old machines?
-
-  Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
