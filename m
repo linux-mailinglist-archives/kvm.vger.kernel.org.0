@@ -1,131 +1,118 @@
-Return-Path: <kvm+bounces-11082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8EF872BAD
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 01:20:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5B9872BBE
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 01:26:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 960D21C21830
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 00:19:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C3A1285DE7
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 00:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B46C8C7;
-	Wed,  6 Mar 2024 00:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CA6FC18;
+	Wed,  6 Mar 2024 00:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ismIrwIF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q6eOSqPL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77026320A
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 00:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1859DDBE
+	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 00:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709684389; cv=none; b=i+XjfF18j1MDDO+CjXCPj/QrjACVGRe3r87V11FgybRRVk/9WbV5Z327CbfIPZ8JyOurePAGFuIvJmWe0kJVuCK2uEAjnpBlhISYL8cC0IQH9Xmwfwv4J2oT+ugnz/DdM2xyX1pULuN2gFjhvSiVsHhwTEthd1zIAgZC2rotCB4=
+	t=1709684757; cv=none; b=VHQvVUFi3HcZeGcY3xhfAUT4zHpMT/SaJ15L/S90wUknoM7rgWQ10fnoG4vxTylm6wM868bmGYdO0izDWM/s/hD+9+ahrRE4n9BKA8GDMFfdDn/VWigsyPEfU0AMcuwiP+6YJGUuU8TiWwcFatp515S8DYLn0zUyeAjE0MILSjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709684389; c=relaxed/simple;
-	bh=l5Z4UTiZAV0FnKHADONYXORI5k3mrUH4FrHUJ/WTslc=;
+	s=arc-20240116; t=1709684757; c=relaxed/simple;
+	bh=cOzX46HPtdjFrZDrmpp1FEEiEuyKrMsxVJ0ppoHR8yE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=K5fXZpa2LH0siUbsM6MLPLa7ao5B6yaoUrPuDxof0r0CZyuUseFEqFHLpb6OeXduqhz1giD6uXSo1wpXK25hg0MPsiNrVn++OQPIdn2LcSG5a4vS3FeHRdfEfO4lSeF9astUP2IGgBtFkAGoNClK9i15WjOZNKjggZ8TQGdn9P8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ismIrwIF; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=mM26ugfuxBODyB0Mh6LmL0cydn9pRhoWsXqfd42bJ4mpymIvmLt4L02LrTCk3oAU/Ar15oWZfcv+nB76XxhkQzEf4kfCuWZNbLXTX5sdRwyjFDSy4b03dKTqNgsZBX94Pju8JIHBY8abEFrbRfCPicXHUxoMd9T04ceteVHxVKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q6eOSqPL; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5dc91de351fso237149a12.0
-        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 16:19:48 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1dd01e6a1beso38841415ad.1
+        for <kvm@vger.kernel.org>; Tue, 05 Mar 2024 16:25:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709684388; x=1710289188; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709684755; x=1710289555; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OlafunnuQDmjQI6RGQQ8IG6bwWUsRoZnzCla50xupzE=;
-        b=ismIrwIFvYMISOdBkmI7N5m/tcB87kkhyGIVzc6/DuXBo1KZlReryVhSBwUwyZQzv1
-         GiwuJcHMILNr9RzHT4QGpxrFSsbBNhpKb/5zTt3AeV2MLpw40LYbiV16PowI7YIWOqT3
-         cQEW6lYRc3tP9M+1l3slyaNBTpwRxDuYwD803IgBxDUqnEa+Srq8lrxQgWouvT14zXFe
-         XfEHm6IzuB/1iPtw9v3Q9SUc0ChBDLSV0bttZbQyPKQrKAwTGV0fGiPiUCyt2B5XpCKv
-         ScI06BMWPfNGlnZsHcaN33S2wslMwQnT9BvxsXXmJs3iTvU2FmnEb1EgSZpOlxhF3l+n
-         CMCg==
+        bh=9f6NA83OzYo58HbjFCzlBsiK2gdKmrkemt55OHdw4EM=;
+        b=q6eOSqPLilYflk66Uy3hgvRicweV/WWinCVNQAd5C+ki6SnQRZ8RMBoYwa4PJa18zG
+         7C6we2TtBfXgUmSgZ0COYeVZa7X1zc7DpeGMfH97mVjCgQjK8xoOprfGfHMdATBywrQE
+         h8WzDHHM6UWpQ0PM/Tw15j3mM5a1dr+rFKFO/Egfmwu/StqHYj7laTtmW4HV3uxED3lE
+         boWuEylNO1IFv+nsILdlZpPHYIl9n3qzxxOrYe5wHQLhYRC+37es/j5R1Ja1WtuLTAml
+         5wtQ4ukWqyrc/6GLigQEMLg69eKARkEFpFwVrJLd0IWphW4jFKkjpS76tfyyRmINqfTI
+         OEYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709684388; x=1710289188;
+        d=1e100.net; s=20230601; t=1709684755; x=1710289555;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OlafunnuQDmjQI6RGQQ8IG6bwWUsRoZnzCla50xupzE=;
-        b=H83MXlDV+AyGayakIgqfEV+FrOsfXLre2PEzBRCu2A2SXmsL7h6DE3dCudtpwbZtDO
-         ngoEwhgEnRMIG3F9M3KiWPKQzdusP7ThQyYZXFgOhS4uniQAdgGjrSYLPx2iSrB5w641
-         U7czJO3ZM8NG0Sw1dwOqrtLAyKkuQTj8DarmyaoVaP5F0RG6vnTUk3erKpKx8CEN2euT
-         mCrSltYTMhGwwokfNj8KVfXzp3IQgm89G5Bd+/bxcjanITmqMwZb/Iq7vRelB6qCQq6f
-         BGAUMCSFAV1PfoOLg9gpNQGfS5p0QWmYt7CpGk1XKhgwWtGwWorckz3BaSTVEA4JDKmo
-         1trw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFIHxA6gcuyi5WTGBw33KfmLTpUL+2FfdtHYbKuKozmStYIuQhlI55Je0TNu0aEMb6n6rtayJ66N5gL4Tj5lRwre+s
-X-Gm-Message-State: AOJu0YwaU8dNL5SPIXqqQZw1xftHB9MI8FFn5NwWUx3EbO2eerl34lji
-	Bfk6wjyqSxxPfThQaO8aFlAUlp3Zn15H0vRO309DkSOOyHSbCL/3KLBfCiZn+aRtCmG1aOmIh61
-	N1w==
-X-Google-Smtp-Source: AGHT+IGnRNghV9U0qTiTeThRt68W4kCSoa4n/bzHUjWD8qRkEmjsgFZT0aiuWc8DkWGKfbQn5Mz5agbV/hI=
+        bh=9f6NA83OzYo58HbjFCzlBsiK2gdKmrkemt55OHdw4EM=;
+        b=hTMKUVAqPMhmvlkV/JSwQPpzvZ4RCVAZsd4Wlsh7gelIGQpQ/g+31BWwVGuD6LkBig
+         gs8uDRY0dUMO2hCDkKQoCYU+63bs/9ukWojQk9J/MMaRKuLdeP4lxm53TKSadQaxnyrZ
+         ZoUTOmn0jLAdoM8GZNfi8jvQEeHsPBPG/2R1LD/Bdudmkdaqe5HjBKU+s8G2wXMZz8zu
+         V3eSY1CYIZs7eUnOlBuZGa4ByvLhllu1gxHuShcAxR8ZTwxwhN1djSQPLC5YmX8pM/F0
+         YO/GL8LQSOkb6U2zoD2FeSdzCNd09eU/VLCz+fE9CpHEB+5gbvyma5O2um7ZB4lHAkwm
+         bz4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVcj/RLdFfDexeY/cIfc2YgrnqUwGOEd4yOLNbVcRRwd+hxzsNVWY+UYjGI+xZoDVuQOoln08/hdrTd5K2v1dOCKdwG
+X-Gm-Message-State: AOJu0Yx8Zq2XzlXQC2gfTgtGEWSIOdHO2vullSN+SiEwEUkSF76ihiUP
+	NHTbpx4gZrcA4VeS6H4r4AXG0U+d3Z+jVXdDvYaY4iK6wOYdKloyV33oidbcLGEIvaE5i1JWC72
+	X6A==
+X-Google-Smtp-Source: AGHT+IHa+wYIcVWQIi2qj7G4ce/GINBo8H3/5p7Fgm0qZOtwL5sMbDfa9aT2DWbZNJVs9LrRZT8zY5/DrAQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:f311:0:b0:5dc:4a5f:a5ee with SMTP id
- l17-20020a63f311000000b005dc4a5fa5eemr11899pgh.1.1709684387635; Tue, 05 Mar
- 2024 16:19:47 -0800 (PST)
-Date: Tue, 5 Mar 2024 16:19:46 -0800
-In-Reply-To: <edd86a97-b2ef-49e6-aa2b-16b1ef790d96@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e544:b0:1dc:9220:5e7 with SMTP id
+ n4-20020a170902e54400b001dc922005e7mr26207plf.0.1709684754732; Tue, 05 Mar
+ 2024 16:25:54 -0800 (PST)
+Date: Tue, 5 Mar 2024 16:25:53 -0800
+In-Reply-To: <420cf8e8-88de-40b1-91a3-6660f7568494@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <1880816055.4545532.1709260250219.JavaMail.zimbra@sjtu.edu.cn>
- <ZeYK-hNDQz5cFhre@google.com> <edd86a97-b2ef-49e6-aa2b-16b1ef790d96@amd.com>
-Message-ID: <Zee2ogAOl8cR4vNZ@google.com>
-Subject: Re: [PATCH] KVM:SVM: Flush cache only on CPUs running SEV guest
+References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-9-seanjc@google.com>
+ <2237d6b1-1c90-4acd-99e9-f051556dd6ac@intel.com> <ZeEOC0mo8C4GL708@google.com>
+ <05449435-008c-4d51-b21f-03df1fa58e77@intel.com> <ZeXt6A_w4etYCYP7@google.com>
+ <420cf8e8-88de-40b1-91a3-6660f7568494@intel.com>
+Message-ID: <Zee4EVTp77S2GLRW@google.com>
+Subject: Re: [PATCH 08/16] KVM: x86/mmu: WARN and skip MMIO cache on private,
+ reserved page faults
 From: Sean Christopherson <seanjc@google.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Zheyun Shen <szy0127@sjtu.edu.cn>, pbonzini@redhat.com, tglx@linutronix.de, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kai Huang <kai.huang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Mar 05, 2024, Tom Lendacky wrote:
-> On 3/4/24 11:55, Sean Christopherson wrote:
-> > +Tom
+On Wed, Mar 06, 2024, Kai Huang wrote:
+> On 5/03/2024 4:51 am, Sean Christopherson wrote:
+> > In other words, KVM_EXIT_MEMORY_FAULT essentially communicates to userspace that
+> > (a) userspace can likely fix whatever badness triggered the -EFAULT, and (b) that
+> > KVM is in a state where fixing the underlying problem and resuming the guest is
+> > safe, e.g. won't corrupt the guest (because KVM is in a half-baked state).
 > > 
-> > "KVM: SVM:" for the shortlog scope.
-> > 
-> > On Fri, Mar 01, 2024, Zheyun Shen wrote:
-> > > On AMD CPUs without ensuring cache consistency, each memory page reclamation in
-> > > an SEV guest triggers a call to wbinvd_on_all_cpus, thereby affecting the
-> > > performance of other programs on the host.
-> > > 
-> > > Typically, an AMD server may have 128 cores or more, while the SEV guest might only
-> > > utilize 8 of these cores. Meanwhile, host can use qemu-affinity to bind these 8 vCPUs
-> > > to specific physical CPUs.
-> > > 
-> > > Therefore, keeping a record of the physical core numbers each time a vCPU runs
-> > > can help avoid flushing the cache for all CPUs every time.
-> > 
-> > This needs an unequivocal statement from AMD that flushing caches only on CPUs
-> > that do VMRUN is sufficient.  That sounds like it should be obviously correct,
-> > as I don't see how else a cache line can be dirtied for the encrypted PA, but
-> > this entire non-coherent caches mess makes me more than a bit paranoid.
 > 
-> As long as the wbinvd_on_all_cpus() related to the ASID flushing isn't
-> changed, this should be ok. And the code currently flushes the source pages
-> when doing LAUNCH_UPDATE commands and adding encrypted regions, so should be
-> good there.
+> Sure.  One small issue might be that, in a later code check, we actually
+> return KVM_EXIT_MEMORY_FAULT when private fault hits RET_PF_EMULATION -- see
+> your patch:
+> 
+> [PATCH 01/16] KVM: x86/mmu: Exit to userspace with -EFAULT if private fault
+> hits emulation
+> 
+> So here if we just return -EFAULT w/o reporting KVM_EXIT_MEMORY_FAULT when
+> private+reserved is hit, it seems there's a little bit inconsistency here.
 
-Nice, thanks!
+It's intentionally inconsistent.  -EFAULT without KVM_EXIT_MEMORY_FAULT is
+essentially KVM saying "something bad happened, and it can't be fixed", whereas
+exiting with KVM_EXIT_MEMORY_FAULT says "there's an issue, but you may be able
+to resolve it".
 
-> Would it make sense to make this configurable, with the current behavior the
-> default, until testing looks good for a while?
-
-I don't hate the idea, but I'm inclined to hit the "I'm feeling lucky" button.
-I would rather we put in effort to all but guarantee we can do a clean revert in
-the future, at which point a kill switch doesn't add all that much value.  E.g.
-it would allow for a non-disruptive fix, and maybe a slightly faster confirmation
-of a bug, but that's about it.
-
-And since the fallout from this would be host data corruption, _not_ rebooting
-hosts that may have been corrupted is probably a bad idea, i.e. the whole
-non-disruptive fix benefit is quite dubious.
-
-The other issue is that it'd be extremely difficult to know when we could/should
-remove the kill switch.  It might be months or even years before anyone starts
-running high volume of SEV/SEV-ES VMs with this optimization.
+The ABI is a bit messy, e.g. in some ways it would be cleaner if KVM returned '0'.
+But doing that in a backwards compatible way would have required a rather ugly
+opt-in, and it would also make it more tedious to extend KVM_EXIT_MEMORY_FAULT,
+e.g. pairing it with -EHWPOISON didn't require any new flags.
 
