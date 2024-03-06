@@ -1,66 +1,70 @@
-Return-Path: <kvm+bounces-11121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11122-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59038733A5
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 11:09:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0435F873411
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 11:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 667391F21549
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 10:09:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE15B291083
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 10:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3E05F86B;
-	Wed,  6 Mar 2024 10:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEEAB604BC;
+	Wed,  6 Mar 2024 10:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BMq0PKCr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ueLaVv6j"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FE65F549;
-	Wed,  6 Mar 2024 10:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08255FB97;
+	Wed,  6 Mar 2024 10:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709719724; cv=none; b=cZ81Ug9lcqxgiheTAIbk/ll3iOjs2hFzHBIVcumGRoZs32eFytFV+LcnM8b7S7cqovRd7Do5cUE7bhEwUO6Dw/ZWwMMfrtLVHkydVIbUsLuWSLHVbvMTUDGcVsUNtRiFt2RuqSjjT0RM0N1a9qL34SlgGWjFU2YTJA+lHug4GAI=
+	t=1709720596; cv=none; b=ELz69MVcypGpdvLzcs3uds/FTtOPR1Httq363dFnBpIuLPKP0LQa2YvT8eofYKZWb3sNu9KN/fCNoeCSm8uc8dIVxdzG1G4svSUSvO+80zC5o6wAqZxWWk4gv2yLvY28ssU+72nYrZPBEBaFmrep9gQsFwVWJVrM8i6xyf3f/dI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709719724; c=relaxed/simple;
-	bh=8uRZFPs9MOHH6l9eL3ZLYPLG5SB90bi0hB1yMklhULc=;
+	s=arc-20240116; t=1709720596; c=relaxed/simple;
+	bh=am4CcjtfeE6MF8q/1whJHcAa25zNF3wSJWqj4Zqk1f4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R47gIgqwMAJiNnnRxpyI4URe8OuL1KNoNc7COa1jGykOTUrs51Ro7hoN9d8JtaC/ZN9MIBr7BEDlJ+gsM9nCcL9T1GPUh+XEIcb3C54Zr93nuq6pmNGCu1jYhrG32oM+znYvexntfFvbYju332DYEVBDgrjPDSDOYKQzwjHICvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BMq0PKCr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 362F6C433C7;
-	Wed,  6 Mar 2024 10:08:44 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NfLRmwYlbvLEKGzXvIlql8GRVTr9Qagpq0I7KTBMgOjrJ7V+7xst0xUk7z3VU0V5LdGNY7TDzF4YK8RF3GXs1RIzQ2tsVASZo2wSgVdakjElv0YNm8CpSOHve9tvUEeI/KBfDSvIrZ+J04etA/HYHmMa8+HkBlW2oYluYoxDEms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ueLaVv6j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7588BC433F1;
+	Wed,  6 Mar 2024 10:23:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709719724;
-	bh=8uRZFPs9MOHH6l9eL3ZLYPLG5SB90bi0hB1yMklhULc=;
+	s=k20201202; t=1709720595;
+	bh=am4CcjtfeE6MF8q/1whJHcAa25zNF3wSJWqj4Zqk1f4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BMq0PKCrT3S6Z/INMsvyKQvjOBJm8VEEzbOk4/lkAASQM4tf39FyC9mp0cUngp7ku
-	 TNIqYsrW0nfJXNfQxS2QuxKsBvR6elonYQJCiro6L7P6g93XWQHodV/eFH3Ern6BSr
-	 VTsTuv45OFzjgN0QbJz08zoTQR8d9VlOmjnzaN6xSAwD4D6fF1dsrJJQok7DXz3nVJ
-	 uhq0fi3G0MnfGLgGRI/9XoYeYKBFBT/Re3QQMAEBjmDEqQM6BDP9tipAMbT2WEvyZ/
-	 imLNMVQECwGjlotyQ32rk9Ew8hlsYpeTJFU5F/kXMqk4RUptkKndYgOQeyhj/dQjsL
-	 irqNLXP1VkJSA==
+	b=ueLaVv6jN+9gmHWC9HJSXlPkO3zBqGQkVkmk4H6l6wL+0uH1q8fgvL5TKOX4mwQGD
+	 xUDvjXWw54+HQOPN1o3ogBucCVvNElTccBebf5nGZAmcljYk7T/TejzPxGBRbtT+mT
+	 1xYqXL7qOWXDATgBWYa3GXnvH20Iw9cKwkc/CT0zIxTEunhrGnoufYA3j4g1D2QyxT
+	 2lHGuVq3jaHDZ7I2k4WDeBIV3mh5n5G6j8ohMt+si0C3vpgjuoBIgv4d35X10Em9/G
+	 sX7OvecAGfJlZTF5LqBKU9f9VVfD03pp1R5a4C8+Onm+dVQ3C1Y2PzNaev3QAymtw8
+	 jSSixnvi/xDuA==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rhoCY-009tGy-0Z;
-	Wed, 06 Mar 2024 10:08:42 +0000
-Date: Wed, 06 Mar 2024 10:08:40 +0000
-Message-ID: <878r2vr7tj.wl-maz@kernel.org>
+	id 1rhoQa-009tYJ-P6;
+	Wed, 06 Mar 2024 10:23:13 +0000
+Date: Wed, 06 Mar 2024 10:23:03 +0000
+Message-ID: <877cifr75k.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Krister Johansen <kjlx@templeofstupid.com>
-Cc: stable@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	David Matlack <dmatlack@google.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 5.15.y v2 0/2] fix softlockups in stage2_apply_range()
-In-Reply-To: <cover.1709685364.git.kjlx@templeofstupid.com>
-References: <cover.1709665227.git.kjlx@templeofstupid.com>
-	<cover.1709685364.git.kjlx@templeofstupid.com>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	darren@os.amperecomputing.com,
+	d.scott.phillips@amperecomputing.com
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
+In-Reply-To: <2911d04d-a785-4d60-9a8d-be0d2cec21de@os.amperecomputing.com>
+References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+	<86sf150w4t.wl-maz@kernel.org>
+	<6685c3a6-2017-4bc2-ad26-d11949097050@os.amperecomputing.com>
+	<86r0go201z.wl-maz@kernel.org>
+	<2911d04d-a785-4d60-9a8d-be0d2cec21de@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,37 +76,57 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: kjlx@templeofstupid.com, stable@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, dmatlack@google.com, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 06 Mar 2024 00:49:34 +0000,
-Krister Johansen <kjlx@templeofstupid.com> wrote:
+On Tue, 05 Mar 2024 18:33:27 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> Hi Stable Team,
-> In 5.15, unmapping large kvm vms on arm64 can generate softlockups.  My team has
-> been hitting this when tearing down VMs > 100Gb in size.
+> >>>> index 61bdd8798f83..3948681426a0 100644
+> >>>> --- a/arch/arm64/kvm/mmu.c
+> >>>> +++ b/arch/arm64/kvm/mmu.c
+> >>>> @@ -1695,6 +1695,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>>>    					     memcache,
+> >>>>    					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+> >>>>    					     KVM_PGTABLE_WALK_SHARED);
+> >>>> +		if ((nested || kvm_is_l1_using_shadow_s2(vcpu)) && !ret) {
+> >>> 
+> >>> I don't understand this condition. If nested is non-NULL, it's because
+> >>> we're using a shadow S2. So why the additional condition?
+> >> 
+> >> No, nested is set only for L2, for L1 it is not.
+> >> To handle L1 shadow S2 case, I have added this condition.
+> > 
+> > But there is *no shadow* for L1 at all. The only way to get a shadow
+> > is to be outside of the EL2(&0) translation regime. El2(&0) itself is
+> > always backed by the canonical S2. By definition, L1 does not run with
+> > a S2 it is in control of. No S2, no shadow.
 > 
-> Oliver fixed this with the attached patches.  They've been in mainline since
-> 6.1.
-> 
-> I tested on 5.15.150 with these patches applied. When they're present,
-> both the dirty_log_perf_test detailed in the second patch, and
-> kvm_page_table_test no longer generate softlockups when unmapping VMs
-> with large memory configurations.
-> 
-> Would you please consider these patches for inclusion in an upcoming 5.15
-> release?
-> 
-> Change in v2:  I ran format-patch without the --from option which incorrectly
-> generated the first series without leaving Oliver in place as the author.  The
-> v2 should retain the correct authorship.  Apologies for the mistake.
+> Shadow, I mean nested_mmus[0] which is used(first consumer of the
+> S2-MMU array) while L1 booting till it switches to NV2.
 
-Thanks for this.
+Please fix your terminology:
 
-FWIW,
+- if someone is using *any* of the nested_mmus[], then it is an L2. It
+  may come from the same guest binary, but it doesn't change that it
+  has changed translation regime to EL1&0. So by definition, it is an
+  L2. Yes, booting a Linux guest at EL2 involve both an L1 (the EL2
+  part) *and* an L2 (the EL1 part).
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+- I don't understand 'till it switches to NV2'. Do you mean EL2?
+
+> As per my tracing, the nested_mmus[0] is used for L1 after first ERET
+> trap while L1 is booting and switches back to canonical S2, when it is
+> moved to NV2.
+> 
+> In this window, if the pages are unmapped, we need to unmap from the
+> nested_mmus[0] table.
+
+Well, we need to unmap things from all shadow PTs that target the same
+PA. Index 0 isn't special.
+
+Thanks,
 
 	M.
 
