@@ -1,65 +1,63 @@
-Return-Path: <kvm+bounces-11118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6883873337
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 10:57:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A45F087334C
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 10:59:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 058951C20349
-	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 09:57:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25ABAB20CC4
+	for <lists+kvm@lfdr.de>; Wed,  6 Mar 2024 09:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD7F5E3A5;
-	Wed,  6 Mar 2024 09:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EAC65FB9F;
+	Wed,  6 Mar 2024 09:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jdYuvxqy"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AZqxKAe9"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDB15C5E9
-	for <kvm@vger.kernel.org>; Wed,  6 Mar 2024 09:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295A05C5E9;
+	Wed,  6 Mar 2024 09:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709719058; cv=none; b=cG7twO9q8jRw7oHRZhntn9DYwIOcOygB7aODCsPHUxPrrrgr6xRL3VKMiX6GPxHX6Xt81P71ouQcFJjE1dQubh34jdGN39p2t60US3t9abMokav/qbmcM6W/gVXZ9d/7nflqP9NT8CzTXH7rcCFLh+rRBa/3UsJXOfmnCBd6ibw=
+	t=1709719107; cv=none; b=EHhVdLrSxqGneEG/o6XInH5yVrFV+ChoLr+0uEegq0peU75wjDXZpcDQS3hi6/q4tMpPY/PJrZ/xap5fEhLmrR0mhYeo12/DZMgiGW8n36dx5lUMRv9735mTyNWSSi2rWLJozn2OW0Avdh20Ob+rxja4DzwDYfBfMUL5BYPBdSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709719058; c=relaxed/simple;
-	bh=gfyW3UVGXODJENHnSgseKzOYPg+75LbE+EKYEOiukp0=;
+	s=arc-20240116; t=1709719107; c=relaxed/simple;
+	bh=0YoJLMFOI/5aB0qu1u+P+cip9X79LRwCYAcbKJCmHjQ=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J5F3mPl3PvYdmscCvjthizVhqpMrG+qOEfP+JSLIIVjEU+ZbB0D0MYltlhQOJRcRHgOStLk6+dtnQOFymv/P0y6hoCS+i53UvABfJ7eTI8nPzauCJxi6WSSCS4tJX/Bs+Oz4SyV/IFqVSS+XxYmaMQxElxEqY80jBNXYA2X8Jc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jdYuvxqy; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=SZQOyZXn/ZkebxzOzWWeYnMMMmrPtjNFiXj29SvodHfE5WrfJVuXo+MuGNwMq9Lr0svWHbgyEqT/3U7nt6+PnvhzCLmqxqBHBNQDDIOJYHHPvO3Lp3Pf2lbX4AwBWeZoTuxXLEEmjIThGSwgs6bIfQ+Mo8RQJJEgqjoppKGnTnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=AZqxKAe9; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=gfyW3UVGXODJENHnSgseKzOYPg+75LbE+EKYEOiukp0=; b=jdYuvxqyk0R4KvS5QLizv/EeCW
-	lgYGwFL5nETpVjRdMjJCH3gBSwGgiisMjPujRslChLwaJ9zJDn+d9NIkEtuas44my/rex3Jm6a8Ex
-	bCeIDztGPP8Xy3YNpMrnuf2uzWY0VuJfGzaDaJPXCuQZ2lDfUb8cJfauYhrZHPmXlCSy+bBp4dPr5
-	eDQDlDuMUlal3y0rTd9rRU+5lmrFrZ9vEzbIFDOzaizRGxZdwG+DRQZPYrpxYSbNJX6nEA4han/lS
-	XxxQ+jdYyJ6qRPEqboJR3Xc/Cy4+v0hXn3ESQm3NCHQJXDUTKNV0oIpAOZZAcDHzw8u8ua/s7/CE+
-	BN/w1FhA==;
+	bh=0YoJLMFOI/5aB0qu1u+P+cip9X79LRwCYAcbKJCmHjQ=; b=AZqxKAe98Pyye/yLvaf670FeiO
+	+v+oGFOXLUmN6PIO9AZ1mF+H1u7r3fYgUDZXGx7uJ1nZVs7VZEHIBarNBYGdDRLaYbqaDbRMZaJ6Y
+	BPejigLYQqhnvn+Ws95yVS6NXnBsyaWsHfsa9Bmg7QMgQnWVxYXHYJ7ff9s5l/vLIYhn3O8Opl54F
+	NdmHK+9P37sN0Q70YHAmFkenAepXgC98BdSJ+Tix/crcKNt2T5Siu+zq6cL1JchAVFq42YCpC6/Ao
+	kjDKi0F7NX+c5EXJYe0GT3azgJkhvQUf6Y3DQlwjRxN/zwJFPdj4KRba980aIteWhx5HOkbv0/70F
+	LXM9xrdA==;
 Received: from [2001:8b0:10b:5:d558:eca6:9e00:d24a] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rho1k-00000006WFi-08Xa;
-	Wed, 06 Mar 2024 09:57:32 +0000
-Message-ID: <4d2523546b404968635e17a973cb75c4ba42b3b8.camel@infradead.org>
-Subject: Re: [PATCH v2 1/8] KVM: x86/xen: improve accuracy of Xen timers
+	id 1rho2X-00000006WHl-3SA8;
+	Wed, 06 Mar 2024 09:58:22 +0000
+Message-ID: <06bc264f1ce63e0146c13c5f6ff6999ee08e8af8.camel@infradead.org>
+Subject: Re: [PATCH] KVM: Drop unused @may_block param from
+ gfn_to_pfn_cache_invalidate_start()
 From: David Woodhouse <dwmw2@infradead.org>
-To: paul@xen.org, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Michal Luczaj
-	 <mhal@rbox.co>
-Date: Wed, 06 Mar 2024 09:57:31 +0000
-In-Reply-To: <a11bac5d-03cb-47a5-accb-1b5ee06bd931@xen.org>
-References: <20240227115648.3104-1-dwmw2@infradead.org>
-	 <20240227115648.3104-2-dwmw2@infradead.org> <ZeZc549aow68CeD-@google.com>
-	 <c72f8a65-c67e-4f11-b888-5d0994f8ee11@xen.org>
-	 <ZeeK0lkwzBRdgX2z@google.com>
-	 <a11bac5d-03cb-47a5-accb-1b5ee06bd931@xen.org>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Like Xu
+	 <like.xu.linux@gmail.com>, Paul Durrant <paul@xen.org>
+Date: Wed, 06 Mar 2024 09:58:21 +0000
+In-Reply-To: <20240305003742.245767-1-seanjc@google.com>
+References: <20240305003742.245767-1-seanjc@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-LCo9tudSrDiCodEUK3M+"
+	boundary="=-ohpkDuTMLUVHXehgMjA/"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -70,67 +68,25 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-LCo9tudSrDiCodEUK3M+
+--=-ohpkDuTMLUVHXehgMjA/
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2024-03-06 at 09:48 +0000, Paul Durrant wrote:
-> On 05/03/2024 21:12, Sean Christopherson wrote:
-> > On Tue, Mar 05, 2024, Paul Durrant wrote:
-> > > On 04/03/2024 23:44, Sean Christopherson wrote:
-> > > > On Tue, Feb 27, 2024, David Woodhouse wrote:
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Xen has a 'Linux=
- workaround' in do_set_timer_op() which checks for
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * negative absolut=
-e timeout values (caused by integer overflow), and
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * for values about=
- 13 days in the future (2^50ns) which would be
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * caused by jiffie=
-s overflow. For those cases, Xen sets the timeout
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 100ms in the fut=
-ure (not *too* soon, since if a guest really did
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * set a long timeo=
-ut on purpose we don't want to keep churning CPU
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * time by waking i=
-t up).=C2=A0 Emulate Xen's workaround when starting the
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * timer in respons=
-e to __HYPERVISOR_set_timer_op.
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (linux_wa &&
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-unlikely((int64_t)guest_abs < 0 ||
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (delta > 0 && (uint3=
-2_t) (delta >> 50) !=3D 0))) {
-> > >=20
-> > > Now that I look at it again, since the last test is simply a '!=3D 0'=
-, I don't
-> > > really see why the case is necessary. Perhaps lose that too. Otherwis=
-e LGTM.
-> >=20
-> > Hmm, I think I'll keep it as-is purely so that the diff shows that it's=
- a just
-> > code movement.=C2=A0 There's already enough going on in in this patch, =
-and practically
-> > speaking I doubt anything other than checkpatch will ever care about th=
-e "!=3D 0".
-> >=20
-> > Thanks!
+On Mon, 2024-03-04 at 16:37 -0800, Sean Christopherson wrote:
+> Remove gfn_to_pfn_cache_invalidate_start()'s unused @may_block parameter,
+> which was leftover from KVM's abandoned (for now) attempt to support gues=
+t
+> usage of gfn_to_pfn caches.
 >=20
-> ... and now I see I typo-ed 'cast' to 'case'... it was more that=20
-> '(uint32_t)' than the superfluous '!=3D 0' that caught my eye but yes, I=
-=20
-> agree, it's code movement so separate cleanup is probably better.
+> Fixes: a4bff3df5147 ("KVM: pfncache: remove KVM_GUEST_USES_PFN usage")
+> Reported-by: Like Xu <like.xu.linux@gmail.com>
+> Cc: Paul Durrant <paul@xen.org>
+> Cc: David Woodhouse <dwmw2@infradead.org>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Right. FWIW it looks like that because that's how it is in Xen:
-https://xenbits.xen.org/gitweb/?p=3Dxen.git;a=3Dcommitdiff;h=3D76e5a428e1e
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-I do agree that (uint32_t) cast is superfluous. I just don't know
-whether I care more about that, or the (cosmetic) difference from how
-Xen implements the check.
-
---=-LCo9tudSrDiCodEUK3M+
+--=-ohpkDuTMLUVHXehgMjA/
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -222,25 +178,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzA2MDk1NzMxWjAvBgkqhkiG9w0BCQQxIgQgPQFXvPJs
-jz7RGpnzRx1GchWI2YUHrUESZZ6teTgzzpowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzA2MDk1ODIxWjAvBgkqhkiG9w0BCQQxIgQgVjTXOXu0
+xuidXSvVSxq2nntOXWPj/IT2eQRAL4wEZ8swgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCwqmWLsOUp+LnDY6zAPZXoW6V2SiF1elbW
-/FQAJn2Tr0DK2rEF2f9sLUGObbaHxgZdFRQRsn9z7+i8rO/NMxpj+1FUBZQosIrYlcD/aif5FyjR
-YzEqYx0uuTzDUQ+cpLhR/n3RNzN6bxrNHUzwIr8Eu5uDYhZ957Y+IUNiyV3Qt/TH6RPIb6840qa8
-J05de/s7LwFQSdyMuYENC3HxHgwqF1COaPzgH4Io5QE6+wFej/slFuZsyhbZaHiHYdHmki8CLyhy
-fLkK1hwt5hKPSFjg/E7fnstv+syDXK0BjakdUPKo7SpRNKSPP0XuRkDddrdutGAHhupRDNSgu6qn
-lw25auZaZMvtNsMZBZfsYqj9qH7wSx7VEDMnS5AP3RUaa4K5QSSMHUgZ279iq7ePP6fPeQ3nOIwn
-Jd+gDD4tY40uRCXkeTdxYAtVmz5rIc0N0BWnJLSfQG7Q932MLysSN88BruWyhYNz3ZLZYC618dXe
-CIOkCB+RyvrU9miEVjuOo4Bt2Ell0x6Dh3vSs0VjYXw3v2o7EosWlY4T4kHEi2OctThxejuZgcpH
-x8WxrJeJCRTQ8R9Pfog4cbV+ydKR9gXRYESV0LvfXW9SwfXPvY+rSrFGFcWB05aE4ns0Tpm0iWzK
-MQSehJsH0fLxSmNtBZes3JLORwgP6cX8hKGK7pvRrgAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCsfnCepVhz9nv8GNMN5oxxF7gdcV1P5kEd
+VKvYH5+we7z/TDJWFHSezXL/Aioa0HLo7CASrM+kOu6aJF5rqBX6xftmGLdewUZQwkX4qEqeIHjJ
+U6oEwIFwjkh+Lb29/KIbdHkhQ2MOi09w+zRW5GThNTIVkr+N2S1uTM/Si4A90d8RtphJQ1djiWY5
+GQqHMgLha/zJkrA982O/dAZ/c5zsMEZ67Uq0rfo0Ql31s4eaz0QloaRtxzq8TAKi2dSs/iNI8Plh
+WhmtJ/xd3azO7OH8e2VcUrKCtRQeZGqrlD7p0LPum2phvYbKhjm0TFvFwkfRuNupSANdQ5TNN0pY
+4kY3fulcqdi2kVu8yUAifv6MJ6ZtshxEIS9OeXox/BWlQ/ZZpu3EJE69hEsVbJZ4qFpnHXKungX4
+gmPx2Csu9wLsDnMxL1z4pezimRvJyGw1Wsb4tdfSf2ogKPYl1g41DwAH9CK5zuA65ZKqEYo3s+d4
+Aj+Y3WCdszTQvausuVisXTp83mkJ2S63WnHVHhihimN868iN4WH5TaX1S3tYDzeJBGh58HBqsj5r
+7AfCD6zluCHd4uzDWw1bXDIPfUVyDpQm8ojTrOwE7vfcYHfawFUG+4X0s+60VvZehzhfFIzNdmGf
+7un1+zTeOgcEUAul3ff4KLK5HsPiZqsGZlgc6Ckz4AAAAAAAAA==
 
 
---=-LCo9tudSrDiCodEUK3M+--
+--=-ohpkDuTMLUVHXehgMjA/--
 
