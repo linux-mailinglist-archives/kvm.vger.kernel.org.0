@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-11303-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11304-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF8DC8750E0
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 14:51:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC0A787510B
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 14:56:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C2871F25239
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 13:51:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65E7D28CAC6
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 13:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBB912D1F8;
-	Thu,  7 Mar 2024 13:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE84312D744;
+	Thu,  7 Mar 2024 13:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGVgjvgJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwVVHwsY"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B54E12AAFD
-	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 13:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC515F86B
+	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 13:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709819472; cv=none; b=Qz5bxk8WU5101dsXNia6ngIF96CABsBWSB362ZMlBXx0y7DupmiPE5NAeQLcZNxBNinbHEqtMmtn1CmpECF/OIgKViIdv20sioHp4DMT2T2mZgJKLbfkQ/dOQH6ynteweAZpSmEFTaD2rzN4GwL4E0QZrBmvR888IZXZ3bvFYv4=
+	t=1709819784; cv=none; b=Kivu9y5DAhPo6V+aG/VeJMcGurv73jtxXu5qRt9oYD5GTXKTOlhz1TB5tFHhDAXbLYg8Om7bwRGgUvASSVSX8ehsPAXNI5z8oRipgbPuQnw2Jv9qooC3bw9axRRKoRUQI71jo50Oy4yb0D50F5hPtPOPJs1Z3A1i1zDHQsD0gKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709819472; c=relaxed/simple;
-	bh=ywOnnYbBqsKbDMswLHsduRzizSpB7dU80OTh+yFPN3Y=;
+	s=arc-20240116; t=1709819784; c=relaxed/simple;
+	bh=TL28DIDonAWW1PTseFRK4e69qaMPCqvqMINdIwZSmuo=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jBp0f//SpXNinJSYA1UM6VsFBiT0GUTuVxZEz5gQ5r4SAin0HZhZGamR5C27kgZaABtU18nE3epdpeYiO/8rwUhGJfRiQEEktdxhsdPqeWB54Up3u//mkCL6gB9VGwYvlUQDYwDdl0/TyD6rFecXh+Hp3gZSfr/EFOZOlY1PPCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hGVgjvgJ; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=fhHVH0V1gy26hI46qrMP/VMkGTB/y5Ggv9vxnwmIQcNYRwG/JzPP1zsw0REaKILnKPRDYzlqBlC89DNBwYZtY1Zn2tQXs2RYYEkd9ExNtya/uW1ljsoc+Lef5SIBfXaPRWoUCqzb5QnJaF7aQMTVhl4DvyfhiGNXtw7L8nTzSUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dwVVHwsY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709819469;
+	s=mimecast20190719; t=1709819780;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Pzi7sdNZeGs1dGXxkhkbvPNWB5w1qE1yGq6BNriwoh4=;
-	b=hGVgjvgJIaA4tIo/+pu/ttxNkM/AUNrMz2iJCeujHXTWeFComURfQuxqfP200+FdwreCs5
-	0VvA8lDCRHq64x3/ux4Ofmx9OGlCCzT3WXEDsaOG9qLeF3GIxcraHZg+vEdee7AWk3qozC
-	UHV2fF9yK0T/jUSROxYW7bgMlrT9oOI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-245-gs78qwJkMz6nYKxsNPaW9g-1; Thu, 07 Mar 2024 08:51:06 -0500
-X-MC-Unique: gs78qwJkMz6nYKxsNPaW9g-1
+	bh=8cvkgaBtTuoC3Wc+2TSS7zKm5F0tiDeYXB0fHBJZoHc=;
+	b=dwVVHwsY1f/ZgZb97Pp15M8q0ZQN+OA+gCaynGYmy5A5wXiilJ6KXphzSvHnKcVasRz/bG
+	0GlvxG2OfDmvP4IJg0Me+Xm33C3Bl8QcSjghkSadJ5lR/d0EQwBVQPntOzbSPFfDEcn1QM
+	iayqVoAmpGS8qRWIPU9BcXLofOvmMwE=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-551-ujLVtXAtM5ufl9nioQN28g-1; Thu,
+ 07 Mar 2024 08:56:17 -0500
+X-MC-Unique: ujLVtXAtM5ufl9nioQN28g-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 060C9101CC67;
-	Thu,  7 Mar 2024 13:51:05 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 95AF41E441D5;
+	Thu,  7 Mar 2024 13:56:16 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.39.192.3])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9224016A9C;
-	Thu,  7 Mar 2024 13:51:04 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F4C017A96;
+	Thu,  7 Mar 2024 13:56:16 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 7F6E621E6A24; Thu,  7 Mar 2024 14:51:03 +0100 (CET)
+	id 4030821E6A24; Thu,  7 Mar 2024 14:56:15 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,  David Hildenbrand
@@ -73,16 +73,20 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,  David Hildenbrand
  <michael.roth@amd.com>,  Claudio Fontana <cfontana@suse.de>,  Gerd
  Hoffmann <kraxel@redhat.com>,  Isaku Yamahata <isaku.yamahata@gmail.com>,
   Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v5 52/65] i386/tdx: Wire TDX_REPORT_FATAL_ERROR with
- GuestPanic facility
-In-Reply-To: <d5cb6e5e-0bc1-40bd-8fc1-50a03f42e9cf@intel.com> (Xiaoyao Li's
-	message of "Thu, 7 Mar 2024 19:30:37 +0800")
+Subject: Re: [PATCH v5 30/65] i386/tdx: Support user configurable
+ mrconfigid/mrowner/mrownerconfig
+In-Reply-To: <0f3df4b7-ffb9-4fc5-90eb-8a1d6fea5786@intel.com> (Xiaoyao Li's
+	message of "Thu, 7 Mar 2024 19:24:04 +0800")
 References: <20240229063726.610065-1-xiaoyao.li@intel.com>
-	<20240229063726.610065-53-xiaoyao.li@intel.com>
-	<874jdr1wmt.fsf@pond.sub.org>
-	<d5cb6e5e-0bc1-40bd-8fc1-50a03f42e9cf@intel.com>
-Date: Thu, 07 Mar 2024 14:51:03 +0100
-Message-ID: <87y1au881k.fsf@pond.sub.org>
+	<20240229063726.610065-31-xiaoyao.li@intel.com>
+	<87edcv1x9j.fsf@pond.sub.org>
+	<f9774e89-399c-42ad-8fa8-dd4050ee46da@intel.com>
+	<871q8vxuzx.fsf@pond.sub.org>
+	<4602df24-029e-4a40-bdec-1b0a6aa30a3c@intel.com>
+	<87v85yv3j9.fsf@pond.sub.org>
+	<0f3df4b7-ffb9-4fc5-90eb-8a1d6fea5786@intel.com>
+Date: Thu, 07 Mar 2024 14:56:15 +0100
+Message-ID: <87ttli87sw.fsf@pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -96,135 +100,206 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
 Xiaoyao Li <xiaoyao.li@intel.com> writes:
 
-> On 2/29/2024 4:51 PM, Markus Armbruster wrote:
+> On 3/7/2024 4:39 PM, Markus Armbruster wrote:
 >> Xiaoyao Li <xiaoyao.li@intel.com> writes:
 >>=20
->>> Integrate TDX's TDX_REPORT_FATAL_ERROR into QEMU GuestPanic facility
+>>> On 2/29/2024 9:25 PM, Markus Armbruster wrote:
+>>>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>>>>
+>>>>> On 2/29/2024 4:37 PM, Markus Armbruster wrote:
+>>>>>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>>>>>>
+>>>>>>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>>>>>
+>>>>>>> Three sha384 hash values, mrconfigid, mrowner and mrownerconfig, of=
+ a TD
+>>>>>>> can be provided for TDX attestation. Detailed meaning of them can be
+>>>>>>> found: https://lore.kernel.org/qemu-devel/31d6dbc1-f453-4cef-ab08-4=
+813f4e0ff92@intel.com/
+>>>>>>>
+>>>>>>> Allow user to specify those values via property mrconfigid, mrowner=
+ and
+>>>>>>> mrownerconfig. They are all in base64 format.
+>>>>>>>
+>>>>>>> example
+>>>>>>> -object tdx-guest, \
+>>>>>>>      mrconfigid=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0Vni=
+avN7wEjRWeJq83v,\
+>>>>>>>      mrowner=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN=
+7wEjRWeJq83v,\
+>>>>>>>      mrownerconfig=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0=
+VniavN7wEjRWeJq83v
+>>>>>>>
+>>>>>>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>>>>> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> [...]
+>>>>
+>>>>>>> diff --git a/qapi/qom.json b/qapi/qom.json
+>>>>>>> index 89ed89b9b46e..cac875349a3a 100644
+>>>>>>> --- a/qapi/qom.json
+>>>>>>> +++ b/qapi/qom.json
+>>>>>>> @@ -905,10 +905,25 @@
+>>>>>>>    #     pages.  Some guest OS (e.g., Linux TD guest) may require t=
+his to
+>>>>>>>    #     be set, otherwise they refuse to boot.
+>>>>>>>    #
+>>>>>>> +# @mrconfigid: ID for non-owner-defined configuration of the guest=
+ TD,
+>>>>>>> +#     e.g., run-time or OS configuration (base64 encoded SHA384 di=
+gest).
+>>>>>>> +#     (A default value 0 of SHA384 is used when absent).
+>>>>>>
+>>>>>> Suggest to drop the parenthesis in the last sentence.
+>>>>>>
+>>>>>> @mrconfigid is a string, so the default value can't be 0.  Actually,
+>>>>>> it's not just any string, but a base64 encoded SHA384 digest, which
+>>>>>> means it must be exactly 96 hex digits.  So it can't be "0", either.=
+  It
+>>>>>> could be
+>>>>>> "0000000000000000000000000000000000000000000000000000000000000000000=
+00000000000000000000000000000".
+>>>>>
+>>>>> I thought value 0 of SHA384 just means it.
+>>>>>
+>>>>> That's my fault and my poor english.
+>>>>
+>>>> "Fault" is too harsh :)  It's not as precise as I want our interface
+>>>> documentation to be.  We work together to get there.
+>>>>
+>>>>>> More on this below.
+>>>>>>
+>>>>>>> +#
+>>>>>>> +# @mrowner: ID for the guest TD=E2=80=99s owner (base64 encoded SH=
+A384 digest).
+>>>>>>> +#     (A default value 0 of SHA384 is used when absent).
+>>>>>>> +#
+>>>>>>> +# @mrownerconfig: ID for owner-defined configuration of the guest =
+TD,
+>>>>>>> +#     e.g., specific to the workload rather than the run-time or OS
+>>>>>>> +#     (base64 encoded SHA384 digest). (A default value 0 of SHA384=
+ is
+>>>>>>> +#     used when absent).
+>>>>>>> +#
+>>>>>>>    # Since: 9.0
+>>>>>>>    ##
+>>>>>>>    { 'struct': 'TdxGuestProperties',
+>>>>>>> -  'data': { '*sept-ve-disable': 'bool' } }
+>>>>>>> +  'data': { '*sept-ve-disable': 'bool',
+>>>>>>> +            '*mrconfigid': 'str',
+>>>>>>> +            '*mrowner': 'str',
+>>>>>>> +            '*mrownerconfig': 'str' } }
+>>>>>>>    ##
+>>>>>>>    # @ThreadContextProperties:
+>>>>>>> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+>>>>>>> index d0ad4f57b5d0..4ce2f1d082ce 100644
+>>>>>>> --- a/target/i386/kvm/tdx.c
+>>>>>>> +++ b/target/i386/kvm/tdx.c
+>>>>>>> @@ -13,6 +13,7 @@
+>>>>>>>    #include "qemu/osdep.h"
+>>>>>>>    #include "qemu/error-report.h"
+>>>>>>> +#include "qemu/base64.h"
+>>>>>>>    #include "qapi/error.h"
+>>>>>>>    #include "qom/object_interfaces.h"
+>>>>>>>    #include "standard-headers/asm-x86/kvm_para.h"
+>>>>>>> @@ -516,6 +517,7 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **=
+errp)
+>>>>>>>        X86CPU *x86cpu =3D X86_CPU(cpu);
+>>>>>>>        CPUX86State *env =3D &x86cpu->env;
+>>>>>>>        g_autofree struct kvm_tdx_init_vm *init_vm =3D NULL;
+>>>>>>> +    size_t data_len;
+>>>>>>>        int r =3D 0;
+>>>>>>>        object_property_set_bool(OBJECT(cpu), "pmu", false, &error_a=
+bort);
+>>>>>>> @@ -528,6 +530,38 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error *=
+*errp)
+>>>>>>>        init_vm =3D g_malloc0(sizeof(struct kvm_tdx_init_vm) +
+>>>>>>>                            sizeof(struct kvm_cpuid_entry2) * KVM_MA=
+X_CPUID_ENTRIES);
+>>>>>>> +#define SHA384_DIGEST_SIZE  48
+>>>>>>> +
+>>>>>>> +    if (tdx_guest->mrconfigid) {
+>>>>>>> +        g_autofree uint8_t *data =3D qbase64_decode(tdx_guest->mrc=
+onfigid,
+>>>>>>> +                              strlen(tdx_guest->mrconfigid), &data=
+_len, errp);
+>>>>>>> +        if (!data || data_len !=3D SHA384_DIGEST_SIZE) {
+>>>>>>> +            error_setg(errp, "TDX: failed to decode mrconfigid");
+>>>>>>> +            return -1;
+>>>>>>> +        }
+>>>>>>> +        memcpy(init_vm->mrconfigid, data, data_len);
+>>>>>>> +    }
+>>>>>>
+>>>>>> When @mrconfigid is absent, the property remains null, and this
+>>>>>> conditional is not executed.  init_vm->mrconfigid[], an array of 6
+>>>>>> __u64, remains all zero.  How does the kernel treat that?
+>>>>>
+>>>>> A all-zero SHA384 value is still a valid value, isn't it?
+>>>>>
+>>>>> KVM treats it with no difference.
+>>>>
+>>>> Can you point me to the spot in the kernel where mrconfigid is used?
 >>>
->>> Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
->>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>> ---
->>> Changes in v5:
->>> - mention additional error information in gpa when it presents;
->>> - refine the documentation; (Markus)
+>>> https://github.com/intel/tdx/blob/66a10e258636fa8ec9f5ce687607bf2196a92=
+341/arch/x86/kvm/vmx/tdx.c#L2322
 >>>
->>> Changes in v4:
->>> - refine the documentation; (Markus)
+>>> KVM just copy what QEMU provides into its own data structure @td_params=
+. The format @of td_params is defined by TDX spec, and @td_params needs to =
+be passed to TDX module when initialize the context of TD via SEAMCALL(TDH.=
+MNG.INIT): https://github.com/intel/tdx/blob/66a10e258636fa8ec9f5ce687607bf=
+2196a92341/arch/x86/kvm/vmx/tdx.c#L2450
 >>>
->>> Changes in v3:
->>> - Add docmentation of new type and struct; (Daniel)
->>> - refine the error message handling; (Daniel)
->>> ---
->>>   qapi/run-state.json   | 31 +++++++++++++++++++++--
->>>   system/runstate.c     | 58 +++++++++++++++++++++++++++++++++++++++++++
->>>   target/i386/kvm/tdx.c | 24 +++++++++++++++++-
->>>   3 files changed, 110 insertions(+), 3 deletions(-)
 >>>
->>> diff --git a/qapi/run-state.json b/qapi/run-state.json
->>> index dd0770b379e5..b71dd1884eb6 100644
->>> --- a/qapi/run-state.json
->>> +++ b/qapi/run-state.json
->>> @@ -483,10 +483,12 @@
->>>  #
->>>  # @s390: s390 guest panic information type (Since: 2.12)
->>>  #
->>> +# @tdx: tdx guest panic information type (Since: 9.0)
->>> +#
->>>  # Since: 2.9
->>>  ##
->>>  { 'enum': 'GuestPanicInformationType',
->>> -  'data': [ 'hyper-v', 's390' ] }
->>> +  'data': [ 'hyper-v', 's390', 'tdx' ] }
->>>     ##
->>> # @GuestPanicInformation:
->>> @@ -501,7 +503,8 @@
->>>    'base': {'type': 'GuestPanicInformationType'},
->>>    'discriminator': 'type',
->>>    'data': {'hyper-v': 'GuestPanicInformationHyperV',
->>> -          's390': 'GuestPanicInformationS390'}}
->>> +          's390': 'GuestPanicInformationS390',
->>> +          'tdx' : 'GuestPanicInformationTdx'}}
->>>  ##
->>>  # @GuestPanicInformationHyperV:
->>> @@ -564,6 +567,30 @@
->>>             'psw-addr': 'uint64',
->>>             'reason': 'S390CrashReason'}}
->>> +##
->>> +# @GuestPanicInformationTdx:
->>> +#
->>> +# TDX Guest panic information specific to TDX, as specified in the
->>> +# "Guest-Hypervisor Communication Interface (GHCI) Specification",
->>> +# section TDG.VP.VMCALL<ReportFatalError>.
->>> +#
->>> +# @error-code: TD-specific error code
->>> +#
->>> +# @message: Human-readable error message provided by the guest. Not
->>> +#     to be trusted.
->>> +#
->>> +# @gpa: guest-physical address of a page that contains more verbose
->>> +#     error information, as zero-terminated string.  Present when the
->>> +#     "GPA valid" bit (bit 63) is set in @error-code.
+>>> In fact, all the three SHA384 fields, will be hashed together with some=
+ other fields (in td_params and other content of TD) to compromise the init=
+ial measurement of TD.
+>>>
+>>> TDX module doesn't care the value of td_params->mrconfigid.
 >>
->> Uh, peeking at GHCI Spec section 3.4 TDG.VP.VMCALL<ReportFatalError>, I
->> see operand R12 consists of
->>
->>      bits    name                        description
->>      31:0    TD-specific error code      TD-specific error code
->>                                          Panic =E2=80=93 0x0.
->>                                          Values =E2=80=93 0x1 to 0xFFFFF=
-FFF
->>                                          reserved.
->>      62:32   TD-specific extended        TD-specific extended error code.
->>              error code                  TD software defined.
->>      63      GPA Valid                   Set if the TD specified additio=
-nal
->>                                          information in the GPA parameter
->>                                          (R13).
->> Is @error-code all of R12, or just bits 31:0?
->> If it's all of R12, description of @error-code as "TD-specific error
->> code" is misleading.
+>> My problem is that I don't understand when and why users would omit the
+>> optional @mrFOO.
 >
-> We pass all of R12 to @error_code.
+> When users don't care it and don't have an explicit value for them, they =
+can omit it. Then a default all-zero value is used.
 >
-> Here it wants to use "error_code" as generic as the whole R12. Do you hav=
-e any better description of it ?
-
-Sadly, the spec is of no help: it doesn't name the entire thing, only
-the three sub-fields TD-specific error code, TD-specific extended error
-code, GPA valid.
-
-We could take the hint, and provide the sub-fields instead:
-
-* @error-code contains the TD-specific error code (bits 31:0)
-
-* @extended-error-code contains the TD-specific extended error code
-  (bits 62:32)
-
-* we don't need @gpa-valid, because it's the same as "@gpa is present"
-
-If we decide to keep the single member, we do need another name for it.
-@error-codes (plural) doesn't exactly feel wonderful, but it gives at
-least a subtle hint that it's not just *the* error code.
-
->> If it's just bits 31:0, then 'Present when the "GPA valid" bit (bit 63)
->> is set in @error-code' is wrong.  Could go with 'Only present when the
->> guest provides this information'.
->>=20
->>> +#
->>> +#
+> If making it mandatory field, then users have to explicit pass a all-zero=
+ value when they don't care it.
+>
+>> I naively expected absent @mrFOO to mean something like "no attestation
+>> of FOO".
 >>
->> Drop one of these two lines, please.
->>=20
->>> +# Since: 9.0
->>> +##
->>> +{'struct': 'GuestPanicInformationTdx',
->>> + 'data': {'error-code': 'uint64',
->>> +          'message': 'str',
->>> +          '*gpa': 'uint64'}}
->>> +
->>>   ##
->>>   # @MEMORY_FAILURE:
->>>   #
->>=20
+>> But I see that they default to
+>> "00000000000000000000000000000000000000000000000000000000000000000000000=
+0000000000000000000000000".
+>>
+>> If this zero value is special and means "no attestation", then we
+>> accidentally get no attestation when whatever is being hashed happens to
+>> hash to this zero value.  Unlikely, but possible.
+>>
+>> If it's not special, then when and why is the ability to omit it useful?
+>
+> At some point, the zero value is special, because it is the default value=
+ if no explicit one provided by user. But for TDX point of view, it is not =
+special. The field is a must for any TD, and whatever value it is, it will =
+be hashed into MRTD (Build-time Measurement Register) for later attestation.
+>
+> TDX architecture defines what fields are always hashed into measurement a=
+nd also provide other mechanism to hash optional field into measurement. Al=
+l this is known to users of TDX, and users can calculate the final measurem=
+ent by itself and compare to what gets reported by TDX to see they are iden=
+tical.
+>
+> For these three fields, they are must-to-have fields to be hashed into me=
+asurement. For user's convenience, we don't want to make it mandatory input=
+ because not everyone cares it and have a specific value to input.
+> What people needs to know is that, when no explicit value is provided for=
+ these three field, a all-zero value is used.
+
+Alright, the doc comment is not the place to educate me about TDX.
+Perhaps we can go with
+
+# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
+#     e.g., run-time or OS configuration (base64 encoded SHA384 digest).
+#     Defaults to all zeroes.
 
 
