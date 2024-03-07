@@ -1,241 +1,239 @@
-Return-Path: <kvm+bounces-11305-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11306-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D14E78751C4
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 15:26:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A1898751D2
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 15:27:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B516B22CB6
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 14:26:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 109DE286DF7
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 14:27:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADB812E1EE;
-	Thu,  7 Mar 2024 14:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A62712EBEE;
+	Thu,  7 Mar 2024 14:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjfA4eA8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e9f8vdF9"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF9A12DDBB;
-	Thu,  7 Mar 2024 14:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D80412B144;
+	Thu,  7 Mar 2024 14:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709821455; cv=none; b=X6p1tZOv6QEWNp6AVjgnvPArRoaTiQYoEFeQatDF9FptGXaMucxFfIQF7NdfTXAmJ2vmQc9uBlvTLTR+rgDrFq/qKFUDWU2/mhFkEq4xY4jw0q9jtK/sFlaX3qjdbzr4VaehScwmv6Y2DYNqfbpg6VnwdgQTKWhjpmx2j/YuZSc=
+	t=1709821596; cv=none; b=RjxDLMKIkFv7vlMWuiqDoEc6PL/R2ZGCXCVQ/+4CvwEZ0EBP9nASWIyQNVvtenASYYhIa4Z4YVQzDwaA9e5o2F18buGD6ACDrVdBZOWytQNCkI/ozApU3W95kz/RikluZK4lAbIxgpEczSM4f2kgMgRElYHyQP/gksCMkC0OXIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709821455; c=relaxed/simple;
-	bh=SeKYgsfD02CyxjqB1q3f/vCt6yt6vglHNBbzp9JzJAs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CgYq4w21YeA/38zLpTE3WSD4oquuo2C+pACsOBZMBnuSGmtKgYGu6n/vXBzucks61nH7RTV3MAAabvNQcAX5/keBBEEUQmoIZ3SqjaURtetTkTikbeVjG0+sWPttxfYf9Thyh+NKTN1H1R+gxZD1Ue3bheJ1xculWl7eONl8BEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjfA4eA8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18CEEC433F1;
-	Thu,  7 Mar 2024 14:24:15 +0000 (UTC)
+	s=arc-20240116; t=1709821596; c=relaxed/simple;
+	bh=ERFgShQvFhcrWGlVZuQlZmDIiSMh3WKYF+9+ofB/zXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qmp0gkHnjqqByh4JO0fFkhG+dm484X6azIAS39lCrNgd+Mom9DUGEgEhonAoSNUH1Fcevx5yWCpsV7iHl6XFIk4Q9YzqzDiqQWnU18Eb7WUUjcjgjNKRdbYHRg1ztr+UYnWJqjM4sqZUHTFr5Vj0CIVJFN4Igf7fgbm+F7Ymjto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e9f8vdF9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0CDFC433F1;
+	Thu,  7 Mar 2024 14:26:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709821455;
-	bh=SeKYgsfD02CyxjqB1q3f/vCt6yt6vglHNBbzp9JzJAs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EjfA4eA81nA2FgcONi2/awMPpKz1pJzeHgN2n7J6MzyMifAm71iMv9bO0nhpgn+G7
-	 woBM6im54N61Wi1tY09OZZg91/1owMN100h56VBHD0aPO5dOhKJs7Z+89w2ef+tQT7
-	 IjJ2uVCowc0k9hUaIRsQzmjg5TtWRD6mWsE3XpF9CuEANVQDYRMril7jV4yZdjEsPX
-	 2wUifaJDCfhhbsHvVZqY7kOs0p4d0vmweKtb0z3TSwyFXQ/blFAiexKx26Ife/eBHh
-	 xXdtv+mEwuztWit8kqDKORvCY1UopOaBdq29W4d6MQ2Aur5xL8eHY62NeA8fGYB5d3
-	 G3aJJ9WPDejig==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1riEfL-00AKwL-OU;
-	Thu, 07 Mar 2024 14:24:11 +0000
-Date: Thu, 07 Mar 2024 14:24:11 +0000
-Message-ID: <86jzme15o4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
+	s=k20201202; t=1709821595;
+	bh=ERFgShQvFhcrWGlVZuQlZmDIiSMh3WKYF+9+ofB/zXA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e9f8vdF9HGfJMgvGLTCm0ewPDD+nCFGGUBCgjI8+C+uMi9IsWU20WyjcxiREjdnMv
+	 2/pQty8meFGSHNDQEA9aBs/0P3SDl+oTscwuR0Ox95Ju7vMh4oxeTEk64GwOZf0ARK
+	 3SECbs2szLaK+lw2JIGd1sWTUPmcsfxqSHeyo1A91m6m290CpvKoGlSgwjc5WZuT0c
+	 p4k6uD4++cCwdE2w+JPEh9WsSrrz2lM7lSTY3N/BVJIOyXGiLzICDo/UX0G2ikzCLH
+	 EGP1/YLnqeOP+XbnSe4r0TBW45oPnsbYuKVHX/q+88c6MXC4Ig6Q2F6JAhViXmmvYb
+	 eHJokuEppoekQ==
+Date: Thu, 7 Mar 2024 14:26:30 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 11/13] KVM: arm64: nv: Add emulation for ERETAx instructions
-In-Reply-To: <20240307133912.GA861552@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
-	<20240226100601.2379693-12-maz@kernel.org>
-	<20240307133912.GA861552@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
+Message-ID: <3d731a55-300e-4a14-89bb-4effbd16b781@sirena.org.uk>
+References: <20240302111935.129994-1-maz@kernel.org>
+ <20240302111935.129994-6-maz@kernel.org>
+ <6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
+ <87edcnr8zy.wl-maz@kernel.org>
+ <a8416451-011c-4159-b9e4-b492b81f5a2c@sirena.org.uk>
+ <86msra1emn.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="FRfexx2pgfvQa5A6"
+Content-Disposition: inline
+In-Reply-To: <86msra1emn.wl-maz@kernel.org>
+X-Cookie: Been Transferred Lately?
 
-On Thu, 07 Mar 2024 13:39:12 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Note that this is my first time looking at PAuth.
 
-I'm sorry! ;-)
+--FRfexx2pgfvQa5A6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> On Mon, Feb 26, 2024 at 10:05:59AM +0000, Marc Zyngier wrote:
-> > FEAT_NV has the interesting property of relying on ERET being
-> > trapped. An added complexity is that it also traps ERETAA and
-> > ERETAB, meaning that the Pointer Authentication aspect of these
-> > instruction must be emulated.
-> > 
-> > Add an emulation of Pointer Authentication, limited to ERETAx
-> > (always using SP_EL2 as the modifier and ELR_EL2 as the pointer),
-> > using the Generic Authentication instructions.
-> > 
-> > The emulation, however small, is placed in its own compilation
-> > unit so that it can be avoided if the configuration doesn't
-> > include it (or the toolchan in not up to the task).
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_nested.h    |  12 ++
-> >  arch/arm64/include/asm/pgtable-hwdef.h |   1 +
-> >  arch/arm64/kvm/Makefile                |   1 +
-> >  arch/arm64/kvm/pauth.c                 | 196 +++++++++++++++++++++++++
-> >  4 files changed, 210 insertions(+)
-> >  create mode 100644 arch/arm64/kvm/pauth.c
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > index dbc4e3a67356..5e0ab0596246 100644
-> > --- a/arch/arm64/include/asm/kvm_nested.h
-> > +++ b/arch/arm64/include/asm/kvm_nested.h
-> > @@ -64,4 +64,16 @@ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
-> >  
-> >  int kvm_init_nv_sysregs(struct kvm *kvm);
-> >  
-> > +#ifdef CONFIG_ARM64_PTR_AUTH
-> > +bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr);
-> > +#else
-> > +static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
-> > +{
-> > +	/* We really should never execute this... */
-> > +	WARN_ON_ONCE(1);
-> > +	*elr = 0xbad9acc0debadbad;
-> > +	return false;
-> > +}
-> > +#endif
-> > +
-> >  #endif /* __ARM64_KVM_NESTED_H */
-> > diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> > index e4944d517c99..bb88e9ef6296 100644
-> > --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> > +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> > @@ -277,6 +277,7 @@
-> >  #define TCR_TBI1		(UL(1) << 38)
-> >  #define TCR_HA			(UL(1) << 39)
-> >  #define TCR_HD			(UL(1) << 40)
-> > +#define TCR_TBID0		(UL(1) << 51)
-> >  #define TCR_TBID1		(UL(1) << 52)
-> >  #define TCR_NFD0		(UL(1) << 53)
-> >  #define TCR_NFD1		(UL(1) << 54)
-> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> > index c0c050e53157..04882b577575 100644
-> > --- a/arch/arm64/kvm/Makefile
-> > +++ b/arch/arm64/kvm/Makefile
-> > @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
-> >  	 vgic/vgic-its.o vgic/vgic-debug.o
-> >  
-> >  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> > +kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-> >  
-> >  always-y := hyp_constants.h hyp-constants.s
-> >  
-> > diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
-> > new file mode 100644
-> > index 000000000000..a3a5c404375b
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/pauth.c
-> > @@ -0,0 +1,196 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Copyright (C) 2024 - Google LLC
-> > + * Author: Marc Zyngier <maz@kernel.org>
-> > + *
-> > + * Primitive PAuth emulation for ERETAA/ERETAB.
-> > + *
-> > + * This code assumes that is is run from EL2, and that it is part of
-> > + * the emulation of ERETAx for a guest hypervisor. That's a lot of
-> > + * baked-in assumptions and shortcuts.
-> > + *
-> > + * Do no reuse for anything else!
-> > + */
-> > +
-> > +#include <linux/kvm_host.h>
-> > +
-> > +#include <asm/kvm_emulate.h>
-> > +#include <asm/pointer_auth.h>
-> > +
-> > +static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
-> > +		       struct ptrauth_key ikey)
-> > +{
-> > +	struct ptrauth_key gkey;
-> > +	u64 mod, pac = 0;
-> > +
-> > +	preempt_disable();
-> > +
-> > +	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
-> > +		mod = __vcpu_sys_reg(vcpu, SP_EL2);
-> > +	else
-> > +		mod = read_sysreg(sp_el1);
-> > +
-> > +	gkey.lo = read_sysreg_s(SYS_APGAKEYLO_EL1);
-> > +	gkey.hi = read_sysreg_s(SYS_APGAKEYHI_EL1);
-> > +
-> > +	__ptrauth_key_install_nosync(APGA, ikey);
-> > +	isb();
-> > +
-> > +	asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
-> > +		     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
-> 
-> To use `pacga`, we require that the Address authentication and Generic
-> authentication use the same algorithm, right?
+On Thu, Mar 07, 2024 at 11:10:40AM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Wed, Mar 06, 2024 at 09:43:13AM +0000, Marc Zyngier wrote:
+> > > Mark Brown <broonie@kernel.org> wrote:
+> > > > On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
 
-Indeed. It is a strong requirement, and if we don't have that, nothing
-works.
+> > > > The SME patch series proposes adding an additional state to this
+> > > > enumeration which would say if the registers are stored in a format
+> > > > suitable for exchange with userspace, that would make this state pa=
+rt of
+> > > > the vCPU state.  With the addition of SME we can have two vector le=
+ngths
+> > > > in play so the series proposes picking the larger to be the format =
+for
+> > > > userspace registers.
 
-Or rather, emulating ERETAx becomes so bloody complicated it isn't
-funny: you need to somehow to replay the auth in the context of a
-guest so that all of TCR_EL2, SP_EL2, SCTLR_EL2, HCR_EL2, ELR_EL2 are
-correctly set, get the value back, and compare it to the one you are
-trying to authenticate.
+> > > What does this addition have anything to do with the ownership of the
+> > > physical register file? Not a lot, it seems.
 
-Not happening! Mark and I talked about it ages ago and concluded it
-was absolutely insane. PACGA allows us to sidestep the whole thing and
-reconstruct the PAC like the pseudocode does using the ComputePAC()
-function.
+> > > Specially as there better be no state resident on the CPU when
+> > > userspace messes up with it.
 
-> There doesn't seem to be a check for that up front. There is kinda a check for
-> that if the PAC doesn't match, (by kvm_has_pauth()).
+> > If we have a situation where the state might be stored in memory in
+> > multiple formats it seems reasonable to consider the metadata which
+> > indicates which format is currently in use as part of the state.
 
-Indeed. The main issue is that it is really hard to prevent that
-unless we forbid it for all KVM guests, not just NV guests. It is also
-that I don't know of any HW that would implement two different auth
-methods (which would be really bizarre from an implementation
-perspective).
+> There is no reason why the state should be in multiple formats
+> *simultaneously*. All the FP/SIMD/SVE/SME state is largely
+> overlapping, and we only need to correctly invalidate the state that
+> isn't relevant to writes from userspace.
 
-I'm happy to harden system_has_full_ptr_auth() in that case, which
-would do the trick.
+I agree that we don't want to store multiple copies, the proposed
+implementation for SME does that - when converting between guest native
+and userspace formats we discard the original format after conversion
+and updates the metadata which says which format is stored.  That
+metadata is modeled as adding a new owner.
 
-Thanks,
+> > > > We could store this separately to fp_state/owner but it'd still be a
+> > > > value stored in the vCPU.
 
-	M.
+> > > I totally disagree.
 
--- 
-Without deviation from the norm, progress is not possible.
+> > Where would you expect to see the state stored?
+
+> Sorry, that came out wrong. I expect *some* vcpu state to describe the
+> current use of the FP/vector registers, and that's about it. Not the
+> ownership information.
+
+Ah, I think the distinction here is that you're modeling the state
+tracking updated by this patch as purely tracking the registers in which
+case yes, we should just add a separate variable in the vCPU for
+tracking the format of the data.  I was modeling the state tracking as
+covering both the state in the registers and the state of the storage
+backing them (since the guest state being in the registers means that
+the state in memory is invalid).
+
+> > > > Storing in a format suitable for userspace
+> > > > usage all the time when we've got SME would most likely result in
+> > > > performance overhead
+
+> > > What performance overhead? Why should we care?
+> >=20
+> > Since in situations where we're not using the larger VL we would need to
+> > load and store the registers using a vector length other than the
+
+=2E..
+
+> > and would instead need to manually compute the memory locations where
+> > values are stored.  As well as the extra instructions when using the
+> > smaller vector length we'd also be working with sparser data likely over
+> > more cache lines.
+
+> Are you talking about a context switch? or userspace accesses? I don't
+> give a damn about the latter, as it statistically never happens. The
+> former is of course of interest, but you still don't explain why the
+> above is a problem.
+
+Well, there will be a cost in any rewriting so I'm trying to shift it
+away from context switch to userspace access since as you say they are
+negligably frequent.
+
+> Nothing prevent you from storing the registers using the *current* VL,
+> since there is no data sharing between the SVE registers and the
+> streaming-SVE ones. All you need to do is to make sure you don't mix
+> the two.
+
+You seem to be suggesting modeling the streaming mode registers as a
+completely different set of registers in the KVM ABI.  That would
+certainly be another option, though it's a bit unclear from an
+architecture point of view and it didn't seem to entirely fit with the
+handling of the FPSIMD registers when SVE is in use.  From an
+architecture point of view the streaming mode registers aren't really a
+separate set of registers.  When in streaming mode it is not possible to
+observe the non-streaming register state and vice versa, and entering or
+exiting streaming mode zeros the register state so functionally you just
+have floating point registers.
+
+You'd need to handle what happens with access to the inactive register
+set from userspace, the simplest thing to implement would be to read the
+logical value of zero and either discard or return an error on writes.
+
+> > We would also need to consider if we need to zero the holes in the data
+> > when saving, we'd only potentially be leaking information from the guest
+> > but it might cause nasty surprises given that transitioning to/from
+> > streaming mode is expected to zero values.  If we do need to zero then
+> > that would be additional work that would need doing.
+
+> The zeroing is mandated by the architecture, AFAIU. That's not optional.
+
+Yes, we need to zero at some point - we could just do it on userspace
+read though I think rather than having to do it when saving.
+
+> > Spending more effort to implement something which also has more runtime
+> > performance overhead for the case of saving and restoring guest state
+> > which I expect to be vastly more common than the VMM accessing the guest
+> > registers just doesn't seem like an appealing choice.
+
+> I don't buy the runtime performance aspect at all. As long as you have
+> the space to dump the largest possible VL, you can always dump it in
+> the native format.
+
+Sure, my point was that you appeared to be asking to dump in a
+non-native format. =20
+
+> > If we were storing the data in the native format for the guest then that
+> > format will change if streaming mode is changed via a write to SVCR.
+> > This would mean that the host would need to understand that when writing
+> > values SVCR needs to be written before the Z and P registers.  To be
+> > clear I don't think this is a good idea.
+
+> The architecture is crystal clear: you flip SVCR.SM, you loose all
+> data in both Z and P regs. If userspace doesn't understand the
+> architecture, that's their problem. The only thing we need to provide
+> is a faithful emulation of the architecture.
+
+It is not clear to me that the intention behind the KVM register ABI is
+that it should have all the ordering requirements that the architecture
+has, and decisions like hiding the V registers when SVE is active do
+take us away from just a natural architectural point of view.  My
+understanding was that it was intended that userspace should be able to
+do something like just enumerate all the registers, save them and then
+later on restore them without really understanding them.
+
+--FRfexx2pgfvQa5A6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXpzpYACgkQJNaLcl1U
+h9DjNQgAgKUJ9sHh4bjpJJ9K8LNZGPeZaFhD0zd99CxvPkBH5ss1Mzqg6YHgNoAJ
+RB0WiaPAkLvzmV7Cr0GDi/jZ3V5biM+9BN6LPitlWxU9PPosoh9NqT6ZtUJZZTAD
+W+CnPS3dOUe7fRjWiI3r+WV83Agi/gRZgI5KqTWrTR/BqJSSuJ47dTemSOgQG3O6
+ZLjdE7xbrDC2SVFR5jWWa90dFb6O0M/+UYC+x3xLVJhAEEDPPXeJhoiCezsCVcns
+Nu+zlBbvwC3I0Acpe9+wRsWXa8ffi75H0Pn7cpRUkIrKvXqkmm23D9obYW8oXdKv
+vo3xMOw+tmLPHjprLd6IsUccmUUmIw==
+=NNpE
+-----END PGP SIGNATURE-----
+
+--FRfexx2pgfvQa5A6--
 
