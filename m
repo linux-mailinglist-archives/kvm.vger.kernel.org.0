@@ -1,110 +1,113 @@
-Return-Path: <kvm+bounces-11226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11227-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8581187452E
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:37:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16FEF874533
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:39:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E366287041
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 00:37:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61407287321
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 00:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C473FEC;
-	Thu,  7 Mar 2024 00:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC37441F;
+	Thu,  7 Mar 2024 00:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kXbROZBU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vjykp72+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D3A1391
-	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 00:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229B217F0
+	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 00:38:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709771816; cv=none; b=NacmIo6/dEZfSYJeTjMdH5gsm+r3wrf4Tfjj3NBveOTLUauttVj7+e5YcokFSot1p2fKDty6K9Gfg2iTpJmSP6NpVqac+ZaQbyru06DZWELGHyPOrGUqhoxwX9dm0zHnqJXxFjbZAaYdUO7jYzfXzz89c7RRiOyt8l1sAnMbCYw=
+	t=1709771939; cv=none; b=R2KjsyUFHojsgh40F9ZL5WEHbRlJNQOwbZRy4Y/7P4xR4aQAv28zVIf2+Rtllhnq/9MeG+hDznFWicyIsAKp69Po+A8O3EhTde/kPUb7ElDzsHGAVxWnY13nfy9XKoE14hj50jI5b/CDLt9/TKXs/SdFucrSR8JPNnCfApoy6ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709771816; c=relaxed/simple;
-	bh=L9dgnWyLxFCVdggjmJiORnnWcjypSYVxA8mld3gFTj4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JawfIZSCtFc1pVfxzqJrSoR4TPzDxnR51l9uri3/L9+Lp2J8mSGEeiN2L/SOtZVUePtgA33gEc7Ky6uXMNQ/o/W/ezU5iRa3biF8A7bW9WGvFGxUmaaDwSCSiAzDOYY+T/gFxOySTo92L+HyQYSeLOOCTPaRRLRuHcI+jIuL7Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kXbROZBU; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1709771939; c=relaxed/simple;
+	bh=CFE532M5hAtX5Za+q/iJbe7f0CvmNnRovlc6d0cc4yk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=prQUx6nzWcp90JmIrHSFnd7YgduYN/n04XJOjmxAU/9l+BAd1Gitf+ibIrhwB0dYl2/AMNlmicX3sQhYc1ZiNzR/Q0Cry9xHmbTNEPHgbt0WubBuS4ZY1ihHSba7B5If6NWHfVqBHwPj7CHy7OUxTtnR+rDc+ilB1LBsVNUu3cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vjykp72+; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33e1878e357so156706f8f.3
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 16:36:54 -0800 (PST)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso232832a12.3
+        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 16:38:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709771813; x=1710376613; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sA+douFdCVSw2K0QPSVkTDqBV+yw1K0VDjl64dpeibg=;
-        b=kXbROZBU1kB+arwyc8KxlyCpXSM83Kp0Zvx7bscuuNxL9irmq698P4HeS2IDpHZjJ+
-         1M0Ck2/ehlGZRfk2SmsnhpxuRD9s9+GRippLj06ZEUIMRlZyt+H+/1A16CG9sBP1gTdy
-         TBQa8aGWvtTFMplkJngq/PgHmnuJQKUIT6rXmlQIUdqIWYs3/YLLwsqx1QlPLiXKZAVP
-         YSvc0ZOCft8K4lPE7M/PZ1nxxBH4zat1ihmVEfjLdvpOfXKxTHYiQ7FJ14M+ghbKhpzy
-         5c38mNJIWGQxxuqho2e9BCkgk95Wj0+zVD0nmH/Jb7EbK2B1+Ak366ymBTCMiqXkGym3
-         uT0Q==
+        d=google.com; s=20230601; t=1709771937; x=1710376737; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=07yicnOc/PjJtyaEa9iiJfb1DnX3D1F7MyH/+iGhC1A=;
+        b=vjykp72+xqV0dHaGy5TYekAAgSbYv0YhBAuQ7IhgVyBB88v31QVYmo0+i6KRdQTktP
+         bgZ4xJT6gGEYgAhgR9H7+CT0k70J36SRGX+iwRsAnYvvSpW0r73Q3gDRCHuyk4s6hRr7
+         609r+vZ6UmAjqm4ZzjIN1QXIegF2b1lbVhRmuC6M2w7x8gPwpRZna3OEogwPLGFhCJsu
+         K2IyCVSNUua1jt8o+c37DPcv8Gv8XTYJE99VsHjLQy6/b44CgRf62D+WHOVvQ7YG0tD2
+         JhLgvee7Rlri39KaX0RbOt7iGHbxd3mSFKw/6c2P0Aj6TA0KeTD1ZMtOFVlyMcvk/Gup
+         JuXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709771813; x=1710376613;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sA+douFdCVSw2K0QPSVkTDqBV+yw1K0VDjl64dpeibg=;
-        b=uNAtfN5dDDnzCEgGRuEqjqRr3dGJEiSSa6y+XomSGv2LAC9WsAfRRhivIrhQKsIUU1
-         qGx7Q7dlNn7pL/M9XSUSib9f++vj15szk0LgxdF9VFnq6XBxd90Q6fGKOOhPItnl47qE
-         pI9MsGk2wIJNpVncKV63juKIVFk9MF9TTfBZoDOztbfxovbvmMeD5v+9S2Q7cZAZ/edt
-         Gtgz0JxPV+Bnn05DRtexHoxI7WWTAU36mzx3L6eKE6vGBSf2JFozHzeB5yngFjyi7kq2
-         CT5o00z3THDf5oxS4bg/ii1eXZB1crLsaRv8bwg437qpwnTyvJv5vfB/mlFCMDufSU1q
-         5f9w==
-X-Gm-Message-State: AOJu0YyUkDu3aEc3oTyqJmu9cLCw0eKh7Fwao1fBmVrGeMDBcblsVXmS
-	zqG5lXeGgde9cZgNW38UN7gE1tLYLmrebZ4hFAdsV1SPlOwL0ue8Vxnk/Keixn8URItCByMkHS2
-	iSo5/4kTjpEjL9tRvQP0DnTe+MJddPkn9PODA
-X-Google-Smtp-Source: AGHT+IFaagZRCCemBSS/fbnTN+CGon0DKBjI0AJKtCElvj+bTZZKWGY7FBjNXKPsRWWE6tButWW/iJZi6gvGKtUfzuA=
-X-Received: by 2002:a05:6000:250:b0:33e:1c80:7a0 with SMTP id
- m16-20020a056000025000b0033e1c8007a0mr9969063wrz.17.1709771813319; Wed, 06
- Mar 2024 16:36:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709771937; x=1710376737;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=07yicnOc/PjJtyaEa9iiJfb1DnX3D1F7MyH/+iGhC1A=;
+        b=LJAjwLRue3v22dSXxSpDJWxbwa1roPr3o21hRzzO2OwTK15M0PSvyYbygVllRiSXFb
+         fQBADOwt9wX6M7MKnE+BvJF5e0ySVOD6KANvFbq2lNJ6OeyxS+Wma6fWy/+T8olW1HOD
+         dMj6TJ4Tf60gi0jIBasVrf+8SJsrl46yE6KrNKugKQLTEjHs+Ua+kZ0g2Ruh7xh0nhy9
+         Q7bbYyesRVb0AsISvaMGBemUEAQWixCP5d2QfkHFTtczV2Ig3BpWgK0w2cH9MLZDMEcr
+         gIJH03ULtq5MgtQr81R6hOYKXBqhnvrI3pVa6e8SFh4VATGmtaH0qNbrS+6tLlEJ/hV+
+         kX+A==
+X-Gm-Message-State: AOJu0YzbKFgLrWHgGYzZlfDPHiPGwLua7IzvV1S4dlMGvYPHLoBLJv5P
+	4gBqF+mh5Kvvt0+h499EehWxy6DPbILXVJa9fqaENchhZdq/VFoaKbkkyhGwuw==
+X-Google-Smtp-Source: AGHT+IE2iyEEn9+TjU9+2CJlBZ/+NCoUhNOkaVMd24e0RKcWnT0q+i09dxDO4Bi7heFKQf1591iabA==
+X-Received: by 2002:a05:6a21:6d95:b0:1a1:4da9:8d76 with SMTP id wl21-20020a056a216d9500b001a14da98d76mr7457655pzb.13.1709771937301;
+        Wed, 06 Mar 2024 16:38:57 -0800 (PST)
+Received: from google.com (61.139.125.34.bc.googleusercontent.com. [34.125.139.61])
+        by smtp.gmail.com with ESMTPSA id i37-20020a631325000000b005dc36761ad1sm10833508pgl.33.2024.03.06.16.38.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 16:38:56 -0800 (PST)
+Date: Wed, 6 Mar 2024 16:38:53 -0800
+From: David Matlack <dmatlack@google.com>
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, isaku.yamahata@gmail.com,
+	linux-kernel@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Federico Parola <federico.parola@polito.it>
+Subject: Re: [RFC PATCH 5/8] KVM: x86/mmu: Introduce kvm_mmu_map_page() for
+ prepopulating guest memory
+Message-ID: <ZekMnStRy1WwF2eb@google.com>
+References: <cover.1709288671.git.isaku.yamahata@intel.com>
+ <7b7dd4d56249028aa0b84d439ffdf1b79e67322a.1709288671.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1709288671.git.isaku.yamahata@intel.com>
- <66a957f4ec4a8591d2ff2550686e361ec648b308.1709288671.git.isaku.yamahata@intel.com>
- <ZekKwlLdf6vm5e5u@google.com>
-In-Reply-To: <ZekKwlLdf6vm5e5u@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Wed, 6 Mar 2024 16:36:25 -0800
-Message-ID: <CALzav=dHNYP02q_CJncwk-JdL9OSB=613v4+siBm1Cp2rmxLLw@mail.gmail.com>
-Subject: Re: [RFC PATCH 6/8] KVM: x86: Implement kvm_arch_{, pre_}vcpu_map_memory()
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, isaku.yamahata@gmail.com, 
-	linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <michael.roth@amd.com>, 
-	Federico Parola <federico.parola@polito.it>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7b7dd4d56249028aa0b84d439ffdf1b79e67322a.1709288671.git.isaku.yamahata@intel.com>
 
-On Wed, Mar 6, 2024 at 4:31=E2=80=AFPM David Matlack <dmatlack@google.com> =
-wrote:
->
-> On 2024-03-01 09:28 AM, isaku.yamahata@intel.com wrote:
-> >
-> > +     if (IS_ALIGNED(mapping->base_gfn, KVM_PAGES_PER_HPAGE(PG_LEVEL_1G=
-)) &&
-> > +         mapping->nr_pages >=3D KVM_PAGES_PER_HPAGE(PG_LEVEL_1G))
-> > +             max_level =3D PG_LEVEL_1G;
-> > +     else if (IS_ALIGNED(mapping->base_gfn, KVM_PAGES_PER_HPAGE(PG_LEV=
-EL_2M)) &&
-> > +              mapping->nr_pages >=3D KVM_PAGES_PER_HPAGE(PG_LEVEL_2M))
-> > +             max_level =3D PG_LEVEL_2M;
-> > +     else
-> > +             max_level =3D PG_LEVEL_4K;
->
-> Is there a requirement that KVM must not map memory outside of the
-> requested region?
+On 2024-03-01 09:28 AM, isaku.yamahata@intel.com wrote:
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e4cc7f764980..7d5e80d17977 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4659,6 +4659,36 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  	return direct_page_fault(vcpu, fault);
+>  }
+>  
+> +int kvm_mmu_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> +		     u8 max_level, u8 *goal_level)
+> +{
+> +	struct kvm_page_fault fault = KVM_PAGE_FAULT_INIT(vcpu, gpa, error_code,
+> +							  false, max_level);
+> +	int r;
+> +
+> +	r = __kvm_mmu_do_page_fault(vcpu, &fault);
 
-And if so, what if the requested region is already mapped with a larger pag=
-e?
+If TDP is disabled __kvm_mmu_do_page_fault() will interpret @gpa as a
+GVA no? And if the vCPU is in guest-mode __kvm_mmu_do_page_fault() will
+interpret gpa as a nGPA right?
 
