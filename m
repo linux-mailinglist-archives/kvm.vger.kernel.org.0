@@ -1,254 +1,223 @@
-Return-Path: <kvm+bounces-11221-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11222-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 845FA8744DC
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:01:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE2508744F3
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:04:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A48821C22192
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 00:00:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F10471C22A80
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 00:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1992DF55;
-	Thu,  7 Mar 2024 00:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F101C2D;
+	Thu,  7 Mar 2024 00:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NsZTbDch"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X1x2a+dy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29316525D
-	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 00:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709769643; cv=none; b=aOsUO1rnJlXtcHqwMflmiRYF15PSt8FE6oEHO8PHxxLfQ04NP2DsQ1DI7wNXYhxYEgFoc42vk1ipnngZO+L1WO7d1YG3dj4nHV4Uf+WSHJ0grcs4uTGiFvAymr0IotdjkOMCQLPvX/XznX1ki+p0rVtMJWTj4ojOy3nSolFzmRo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709769643; c=relaxed/simple;
-	bh=T+UOSxEPBysqG32w+zMGX5xyeXuEl5alWxX1qNj0v48=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lr4qMyjF7FdwZUWm2C4f15SIgzY+CdbCBPX49gq5ZBQxzT9iKAJzIfwRTadYtEXrz7rjau//bTIFSgjbuZO8M5KS2GLoubxGIyjk8rda6+Yi87N+TN6ScRNBu3nZPxJ6EQ17gc03MTCoW84jmp3AiStg+4i5KOYFgmLOTXZirAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=NsZTbDch; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-21f996af9bdso84342fac.2
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 16:00:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1709769640; x=1710374440; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FnAsXY5W3o0aBO5Fh+OdY1VF737kiERo49tIrv2JTH0=;
-        b=NsZTbDch8wC6sasBCF6lPZ5a9uT85angZHr+9Fcg2WcIONOFUVqCOhLdLXs1QMz7CF
-         fE5abEuJwtMVWXIfwbGl6sLJjYaFCJE/RHiji6HDc612aQrRPtubOqHJ7+VeQTqhcdMG
-         olSzIPq/N6AveQDAZuE01G3P+jyn7GhvgYbEKBeOxD4nGA4Lo8n2G5SEEuvQQrwsK+pB
-         +71SwuD5SBmh4/TyqxZtgqyAYXS57Sz6JcJo+8l8v/ImU14NhWejMKtIJyueTeVb/daB
-         zwI/wp35dllpF/towcyd3qY1dKGx/hmqbLTOV33lwt/HV6/b2XtymYBw35wcpFsxxWM2
-         enhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709769640; x=1710374440;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FnAsXY5W3o0aBO5Fh+OdY1VF737kiERo49tIrv2JTH0=;
-        b=Iknss2zf92UR+3/Ur6dcAkyat6oBXltRij3tLwc/x/XYGZdLwD62h4qcFZIlfT9DDu
-         EGSKV0ksJBXuohaD9UKNwefQB72pSfWIYWmgdNaNIoKcfLQogEAge7wU/gwRAwbLv/hl
-         VkS7Y3SgxT4G9e7lRru2k5O6XPhcc1aC3TikX9qamo5Q+9dWWaQdoYha05SCCCDkT11+
-         mpXgj6nSz32Msv4ihy2ToFBtF0/5XHdRfiVhZfIIdy+xknVKvzUFFX7nUgql7/pdYJ4d
-         jvTacnzSsxE+9kio7R2d6HA4vK1vxZ/wPpi1zScbT4xYIT4jlERVZIk909/SObqBaY3b
-         sUng==
-X-Forwarded-Encrypted: i=1; AJvYcCUP1y40BpypzZCcFpd4p++Mas6uLewa3H8G+2xft4V128hH4aSEpcL/WWXEHHAvgghZOrFU+LE5pJvapQ3mnN+NGc61
-X-Gm-Message-State: AOJu0Yym7sYc1uynNswdKtrGDdk8J1Jhc9bSY4ppBajEpSkugTcOzvRR
-	TM4qfZpYm3NTcuzF21Wd1kjbm1jeHZVZstFNhjuYu+AGmi3App5JN8jEF6NWf6Q=
-X-Google-Smtp-Source: AGHT+IGK0xl48nl3utXsBsT9cDlUym3mZ050RInjod+5qLAgYBHQgf3Jm+BxBWeRpDZbnqg1tP4wIQ==
-X-Received: by 2002:a05:6871:28e:b0:21e:dd7a:2d3e with SMTP id i14-20020a056871028e00b0021edd7a2d3emr6947112oae.22.1709769640012;
-        Wed, 06 Mar 2024 16:00:40 -0800 (PST)
-Received: from ziepe.ca ([12.97.180.36])
-        by smtp.gmail.com with ESMTPSA id vz3-20020a056871a40300b00220c6f7734esm2827969oab.35.2024.03.06.16.00.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 16:00:39 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1ri1Bc-002SqN-Sb;
-	Wed, 06 Mar 2024 20:00:36 -0400
-Date: Wed, 6 Mar 2024 20:00:36 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Message-ID: <20240307000036.GP9225@ziepe.ca>
-References: <cover.1709635535.git.leon@kernel.org>
- <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com>
- <20240305122935.GB36868@unreal>
- <20240306144416.GB19711@lst.de>
- <20240306154328.GM9225@ziepe.ca>
- <20240306162022.GB28427@lst.de>
- <20240306174456.GO9225@ziepe.ca>
- <20240306221400.GA8663@lst.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4471AA21;
+	Thu,  7 Mar 2024 00:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709769848; cv=fail; b=I7KW8tsYHLkWOyNHQrU4KdS8IXPi2XUpIanbhWaBHkO2+JZfTjd0QNziYhk5mB4BlTYJ+qxUOdnaLb8Be2sEFxLq7tB6vJHnYNS5l/o2fHnXwvnjov6hLfLnJHrNd3l4Sz+93V+rAEjpDy+r6B63ZQBv4ZbdD4+8bq88gBwtQn8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709769848; c=relaxed/simple;
+	bh=nbDK7ygeEWXYF07JRkaPB3wMoJcMX415601vIaFePRo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KaMU/qTLJMnzvnn10RHZwMfBYbpOI+KcrCSKwQUjEyx32IUWESUNXuOTIC+BbhOxH0HnYdQrbleQDRQsEbi5S2XFsP00rsmtcGFthO+AJIIdDXp3ZtD+pdmhOAguTdV7ybaLdt/ICVhXVSzmMZto0BI7+3xn6G2MkDzA8noVSV8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X1x2a+dy; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709769846; x=1741305846;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nbDK7ygeEWXYF07JRkaPB3wMoJcMX415601vIaFePRo=;
+  b=X1x2a+dygb1EHdMjPqRxw0H9fCmXU1WHQnBNcyrHClTZIpfASOnwVqdg
+   djl52t9Hvc48UPFAi4tlnWNxT7VTek1sXDfF1gFy3a+/Lx8q5Pf1qlCiC
+   pvOnxEqPvgqLk64+CVWgciXqaPUciat9dheY3chywW/gY00bq6o85N/w8
+   HLPsgpNf6SIElo6SDKxcOMbgI/44Xmz6t8Lww5cOFnblWhzjGiftJVf0i
+   ZGirAfYl2OX2d/ApjDuj4rWAEOCL2Lkh7h6VWHW5bTMDxeOb4pkrRRGgk
+   CzUMUko1c5k4edoSxVgX/OHQEP0XuEdkMo0xHiLzhLSDls/FS8wjKTFaL
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="4348971"
+X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
+   d="scan'208";a="4348971"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 16:04:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
+   d="scan'208";a="9821382"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Mar 2024 16:04:05 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 6 Mar 2024 16:04:05 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 6 Mar 2024 16:04:04 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 6 Mar 2024 16:04:04 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 6 Mar 2024 16:04:04 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=h5BWeeC2adcAfJWQkll0cExz/JoQP+eGx80WD5MnfsmhcekLbsXdCKtMKTHThqbvR7WJof5apgAXckXEwvi0x4IfZcv2Ed/JSfkOroTkfXCfESjt4/ClCLJgHMYe5HMFiG+nedduXK57R3KZC+wB56sKXz1ACfmQGUfMns5qkH9SwtLbco/6fXPLisi3qNOI06jK4ZfniMt1anhZaYNvO5tnvTvc07t3yrDVPsBtC0Zzd3XIsUvnPqScpaSKmNazXJyZGT5pdYEKVGpqjSkErRTLTHPOhwKd9/KfarC3OtQIMdyJ3odFlTBlRBN+wIMWTBJgEGo5xClCYuRhE0u5vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dJnD50abvotzZo/qb2pz4c0KDF1cDkM9WCYuEc36NAw=;
+ b=RR/PmGxzCVgazUh5j2BvDenUpSTaK7X9Et6Y7RvLsM9uOW/au/FdY/iWzHmSvxk3qeIbPoYLrlZjUIyGFjqZzlgY0h4SLdpaIGWZixAQw8CDCZ6uvPxpmlzyeqn7OtjloEGhrAOnFvIN4UMLjeFUzCQlyzUnnsgCtK8M+Z/I2ZF71ihBjuB/P/YWP2NY+RuSGAqxHrV8XEKX76wuaUuk106aS+aZftJsIKhbCLv67SvgjMXrTBHgA1cGlMdG5bhJ+Tl1iy0rmRecgo4I8Ty1cPmL34haLkKs+aNUaE9D3mab9GoLfmQI2gBsJgvgsRuh3v+LX2vn6fQTzgGTmxpsEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by CH3PR11MB8591.namprd11.prod.outlook.com (2603:10b6:610:1af::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.22; Thu, 7 Mar
+ 2024 00:04:01 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7362.019; Thu, 7 Mar 2024
+ 00:04:00 +0000
+Message-ID: <9c781386-e359-42fb-b3db-4b781508c7da@intel.com>
+Date: Thu, 7 Mar 2024 13:03:51 +1300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 10/16] KVM: x86/mmu: Don't force emulation of L2 accesses
+ to non-APIC internal slots
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yan Zhao
+	<yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, "Michael
+ Roth" <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, "Chao
+ Peng" <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, "David
+ Matlack" <dmatlack@google.com>
+References: <20240228024147.41573-1-seanjc@google.com>
+ <20240228024147.41573-11-seanjc@google.com>
+From: "Huang, Kai" <kai.huang@intel.com>
+In-Reply-To: <20240228024147.41573-11-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0190.namprd03.prod.outlook.com
+ (2603:10b6:303:b8::15) To BL1PR11MB5978.namprd11.prod.outlook.com
+ (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306221400.GA8663@lst.de>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|CH3PR11MB8591:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d057d02-202e-455c-2419-08dc3e3a177e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZimGotooM5mWmGnWAsvJBEvj2fgPHDrofTsn0NhE17yMmGkUe2zj4t1V92QM7txXSwuOKdalrhP6fY5JIlM+ra4GQuWNvGpG0u7f7b4ss0yWBU2umL2GAX86Y4xdiKICDSKldauXECh3aqQqjAejYUnvx/oQlwTmincSOMtYlYh8lyxA4SHXRMjIiC8gJzvt2KCk3W1rVmfX7It0aIqkEF1eDdbo9UADq8n2rKiuV29W/PgeYMrwqpxo57l3whrGUc+Xmu43GhmAXxFGKJFOVWZNbgOKO8bBxpfNYowNqpLbg+gZqAzsiq9EVCiekGIZpPFXLqEGFpOBV1DLXbUwKJptvPMLjb9byuHMdDV/cn3AmzTMJn/s/9zvl5267MaxsJJ5ug5FG7wRk2Irr8muSrPsnI4W3WaePxH+kNgkqCxdaRRmblo+JWcp5K5os8rf5YquxC8LniVsyyouWFE4codcA7iCL/d/72Lbc0Xk3ftdjO+IXLqpiVCEMfzttSTp6xUYbYQNQ4ENu3CXHHS3AqwIi5TIjdpPhcy9iCMs5+4E0eCnXiLZuEA52THf1cOsMh9ZAxjFqAdUi0y6AKi9ppljaambpTQIwG/HG1LQn6CMDqbDKsz/6Xdf5ULMRkjDvwG0Ve804ZWaK+OQMF/iaaFwmlDdkeqBZWLfQV+sOyA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UWpJUUp4SUVPUjlSNjZzbzFaZ2JaLzkwUE5GdGt6bTlsQ0FEblpWRUZSVFNh?=
+ =?utf-8?B?QnZEaitBRkF4bVVUb2c2WjNyV2xrRjZucW5zd0hIOE9hNkNmTjZ4c0RSZnhz?=
+ =?utf-8?B?L3E4bU9JeUxmU2U2Y3FDR2VMaWdwMkNEWEFDTWlsVkhISDdVWXA3ZVNoNGNh?=
+ =?utf-8?B?WmQxaEM5dENKQTBZNE5NOG1keHZodEpwTUpUU1lqdDB0cWpWeWp1elhmTHVz?=
+ =?utf-8?B?REtzSDZwVE45N2FyM1BveFFhZDdlVmFFeVIrZ2I0YnIvL0d5U2t2cDZFazFm?=
+ =?utf-8?B?QWk1akUzbHRpbUVwaGFldVlXMVA4MnJXN2liTVF5ZmMwS0ZxK29qanZuV0xO?=
+ =?utf-8?B?NE45N0dPbEZ1MzNxaGQ0MFJlMG9XWHZuTXYvWjYxekxweUNsTGVqenVMWW5V?=
+ =?utf-8?B?NEpENjg1RUYwNHQrenI5cHo1SE5HZkdnWmFlTzBtRUpPWFJEZ2JDT2pTRjJi?=
+ =?utf-8?B?ZVVCOWlUU28wWklvVnkyS2FwL1h4TFZSWVp5aGFFMWxXMWVCZ1d2T285enU5?=
+ =?utf-8?B?OHkxWGZKMTUvK1dVNEhzWkxUVmRkaG5ReDFmQTV4OVZseWx1Mkl1RXA5dFNC?=
+ =?utf-8?B?cnFWV3g0ekFoNldkSzJBem84U0d6NWJYWDZURDRBekZBZXkrN1lUSW5GR0pN?=
+ =?utf-8?B?aEtzVVRjV1Y5NmRVMEt3T3VuMHNjMWNSaWJCR0RaMW1BbkpKbjlkdU9KTXpp?=
+ =?utf-8?B?d1NPV1Z3VzNveTJmc2FLRTFVcFdnamxSdUh1OXFkNHlPVGIxOWd5QlZUOEJw?=
+ =?utf-8?B?OVpjQlhCK1lqSmwzREF1bnMwNTdkYmxkMW95V3Q2VzRQdzN3U1l2eUJPSFZG?=
+ =?utf-8?B?dU8xMnBQdFpjV3daYUdJMkJkaVlnOUFRY1V1bEo0dUJMNXF0dG9ibGF6TFg0?=
+ =?utf-8?B?YjBLcGNmU2lHM0ZwN3cyYUNleHJIYmdDN3ZQSHBuUUE1ZzJDSXo2c3hHL2ti?=
+ =?utf-8?B?ZnhkN1RvMzJkSk5FRXlaTjFJeTFody8rdWVSdldWdVlJUlpqei9BREJQYnh2?=
+ =?utf-8?B?RE52SE1aTkV0Z0V3TXlVc2wxZXIrejdWY1BoV0U0di9GVHVZZW9vdDMxTmhu?=
+ =?utf-8?B?VmZVS0xPUHBMUkYzTEdsVU90MXRMNmtmRHdWN2V5RWVzdTdDSG5neStqUTJB?=
+ =?utf-8?B?cHFHUzJDZCs5Yk44Um5ER1hTZEhQZmZuRWdJNGlBQnF3b2tvSk0xSnFoTDZk?=
+ =?utf-8?B?VUJwTFJ6NU1uMlZvdDFjSTNWR0pwSDM2RTVCNFdScGZ0UTBaak56NnE4ZzVG?=
+ =?utf-8?B?Sm12NUp4dUV6NFEwVmFCRUJYV1Z1S2ZDQlZROFA1eDNFYVpPSFhiQjA2NWF1?=
+ =?utf-8?B?dmdGb1hJYjN4MmRPRlhYaHZGK0s4a3V5bmR5U2R3aW1pQXB2YkNMNXNIQVJO?=
+ =?utf-8?B?aEpGMUQrU3o3VnVGOFVvTWJPWllITHpmN0JFUXJyYlgzSmY3VjhqQUZaaXBK?=
+ =?utf-8?B?Ly9YQUhrQjRhaTBEdXJKZjNuK3RuMkw3N1BzUkVGRHhPdGQrQU9DeEdrc2Er?=
+ =?utf-8?B?MCs0T1JULzNlSGVjSWp2MDNXQW9OTmZIdDc2Zm54WDljM0UydnhqRGFmSUV0?=
+ =?utf-8?B?b3RvaFNzT0s3RXM0ZzJObjdVYVZZQ25ubytMdVNPQ1lTUWZzKzluNUwxYStz?=
+ =?utf-8?B?UUdVS1VwUStOa0psTEg2djBscVRURlhRL3RyenEzbmJPbXVsQnFvdkVUeWFj?=
+ =?utf-8?B?VFBDcnIwYnQrYkwwcXZlUWNwb2NVemxraHY0R2FJb0ZydDJaM0tHUDcxSDgy?=
+ =?utf-8?B?RHljZERRbkJWWnlpazNkeHFKT1ZKRjB2YkNZZnp3VkV5UE1vYnVRdlErVEIz?=
+ =?utf-8?B?MWt5OUJ6SGIvOW5XRWIycTE2aTNEdkc3RzE2Y2dqaVpIVFpjS2N4RW1sUUl1?=
+ =?utf-8?B?S29qSWpiSy9HcEJhaTRQTHFRNy9EQVFyVE0wdFRnSUtjQmJYeS95a1hkdWVW?=
+ =?utf-8?B?WFBJWnRrNzBneElTL2dsbDhmMWF3N3ZBTllHODdGZ2xxTWxLYXBSSDZOTDN4?=
+ =?utf-8?B?VFpOVEtSODkrNGZUMkVzUHc1WHh4emV3dG1wdFkxZmlLUWp2UkdHV0w0R0Fs?=
+ =?utf-8?B?cGxuaUZjdHdnY0w2Umx4enNyQ1I3b25XSnhVNkVBYVVPcWFvUllLT1lDQWta?=
+ =?utf-8?Q?dw2i0RCODHH0KFmno702YUhrY?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d057d02-202e-455c-2419-08dc3e3a177e
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2024 00:04:00.4855
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fMrNWJuZbpVvHtU5vULHra5nlOohMFppbMXMMbsrdGjiXjbcI2BNP38/AyPK2D3E4tINDNnsuGoV5bMHF0hfkg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8591
+X-OriginatorOrg: intel.com
 
-On Wed, Mar 06, 2024 at 11:14:00PM +0100, Christoph Hellwig wrote:
-> On Wed, Mar 06, 2024 at 01:44:56PM -0400, Jason Gunthorpe wrote:
-> > There is a list of interesting cases this has to cover:
-> > 
-> >  1. Direct map. No dma_addr_t at unmap, multiple HW SGLs
-> >  2. IOMMU aligned map, no P2P. Only IOVA range at unmap, single HW SGLs
-> >  3. IOMMU aligned map, P2P. Only IOVA range at unmap, multiple HW SGLs
-> >  4. swiotlb single range. Only IOVA range at unmap, single HW SGL
-> >  5. swiotlb multi-range. All dma_addr_t's at unmap, multiple HW SGLs.
-> >  6. Unaligned IOMMU. Only IOVA range at unmap, multiple HW SGLs
-> > 
-> > I think we agree that 1 and 2 should be optimized highly as they are
-> > the common case. That mainly means no dma_addr_t storage in either
+
+
+On 28/02/2024 3:41 pm, Sean Christopherson wrote:
+> Allow mapping KVM's internal memslots used for EPT without unrestricted
+> guest into L2, i.e. allow mapping the hidden TSS and the identity mapped
+> page tables into L2.  Unlike the APIC access page, there is no correctness
+> issue with letting L2 access the "hidden" memory.  Allowing these memslots
+> to be mapped into L2 fixes a largely theoretical bug where KVM could
+> incorrectly emulate subsequent _L1_ accesses as MMIO, and also ensures
+> consistent KVM behavior for L2.
 > 
-> I don't think you can do without dma_addr_t storage.  In most cases
-> your can just store the dma_addr_t in the LE/BE encoded hardware
-> SGL, so no extra storage should be needed though.
-
-RDMA (and often DRM too) generally doesn't work like that, the driver
-copies the page table into the device and then the only reason to have
-a dma_addr_t storage is to pass that to the dma unmap API. Optionally
-eliminating long term dma_addr_t storage would be a worthwhile memory
-savings for large long lived user space memory registrations.
-
-> > 3 is quite similar to 1, but it has the IOVA range at unmap.
+> If KVM is using TDP, but L1 is using shadow paging for L2, then routing
+> through kvm_handle_noslot_fault() will incorrectly cache the gfn as MMIO,
+> and create an MMIO SPTE.  Creating an MMIO SPTE is ok, but only because
+> kvm_mmu_page_role.guest_mode ensure KVM uses different roots for L1 vs.
+> L2.  But vcpu->arch.mmio_gfn will remain valid, and could cause KVM to
+> incorrectly treat an L1 access to the hidden TSS or identity mapped page
+> tables as MMIO.
 > 
-> Can you explain what P2P case you mean?  The switch one with the
-> bus address is indeed basically the same, just with potentioally a
-> different offset, while the through host bridge case is the same
-> as a normal iommu map.
-
-Yes, the bus address case. The IOMMU is turned on, ACS on a local
-switch is off.
-
-All pages go through the IOMMU in the normal way except P2P pages
-between devices on the same switch. (ie the dma_addr_t is CPU physical
-of the P2P plus an offset). RDMA must support a mixture of IOVA and
-P2P addresses in the same IO operation.
-
-I suppose it would make more sense to say it is similar to 6.
-
-> > 5 is the slowest and has the most overhead.
+> Furthermore, forcing L2 accesses to be treated as "no slot" faults doesn't
+> actually prevent exposing KVM's internal memslots to L2, it simply forces
+> KVM to emulate the access.  In most cases, that will trigger MMIO,
+> amusingly due to filling vcpu->arch.mmio_gfn, but also because
+> vcpu_is_mmio_gpa() unconditionally treats APIC accesses as MMIO, i.e. APIC
+> accesses are ok.  But the hidden TSS and identity mapped page tables could
+> go either way (MMIO or access the private memslot's backing memory).
 > 
-> and 5 could be broken into multiple 4s at least for now.  Or do you
-> have a different dfinition of range here?
-
-I wrote the list as from a single IO operation perspective, so all but
-5 need to store a single IOVA range that could be stored in some
-simple non-dynamic memory along with whatever HW SGLs/etc are needed.
-
-The point of 5 being different is because the driver has to provide a
-dynamically sized list of dma_addr_t's as storage until unmap. 5 is
-the only case that requires that full list.
-
-So yes, 5 could be broken up into multiple IOs, but then the
-specialness of 5 is the driver must keep track of multiple IOs..
-
-> > So are you thinking something more like a driver flow of:
-> > 
-> >   .. extent IO and get # aligned pages and know if there is P2P ..
-> >   dma_init_io(state, num_pages, p2p_flag)
-> >   if (dma_io_single_range(state)) {
-> >        // #2, #4
-> >        for each io()
-> > 	    dma_link_aligned_pages(state, io range)
-> >        hw_sgl = (state->iova, state->len)
-> >   } else {
+> Alternatively, the inconsistent emulator behavior could be addressed by
+> forcing MMIO emulation for L2 access to all internal memslots, not just to
+> the APIC.  But that's arguably less correct than letting L2 access the
+> hidden TSS and identity mapped page tables, not to mention that it's
+> *extremely* unlikely anyone cares what KVM does in this case.  From L1's
+> perspective there is R/W memory at those memslots, the memory just happens
+> to be initialized with non-zero data.  Making the memory disappear when it
+> is accessed by L2 is far more magical and arbitrary than the memory
+> existing in the first place.
 > 
-> I think what you have a dma_io_single_range should become before
-> the dma_init_io.  If we know we can't coalesce it really just is a
-> dma_map_{single,page,bvec} loop, no need for any extra state.
-
-I imagine dma_io_single_range() to just check a flag in state.
-
-I still want to call dma_init_io() for the non-coalescing cases
-because all the flows, regardless of composition, should be about as
-fast as dma_map_sg is today.
-
-That means we need to always pre-allocate the IOVA in any case where
-the IOMMU might be active - even on a non-coalescing flow.
-
-IOW, dma_init_io() always pre-allocates IOVA if the iommu is going to
-be used and we can't just call today's dma_map_page() in a loop on the
-non-coalescing side and pay the overhead of Nx IOVA allocations.
-
-In large part this is for RDMA, were a single P2P page in a large
-multi-gigabyte user memory registration shouldn't drastically harm the
-registration performance by falling down to doing dma_map_page, and an
-IOVA allocation, on a 4k page by page basis.
-
-The other thing that got hand waved here is how does dma_init_io()
-know which of the 6 states we are looking at? I imagine we probably
-want to do something like:
-
-   struct dma_io_summarize summary = {};
-   for each io()
-        dma_io_summarize_range(&summary, io range)
-   dma_init_io(dev, &state, &summary);
-   if (state->single_range) {
-   } else {
-   }
-   dma_io_done_mapping(&state); <-- flush IOTLB once
-
-At least this way the DMA API still has some decent opportunity for
-abstraction and future growth using state to pass bits of information
-between the API family.
-
-There is some swiotlb complexity that needs something like this, a
-system with iommu can still fail to coalesce if the pages are
-encrypted and the device doesn't support DMA from encrypted pages. We
-need to check for P2P pages, encrypted memory pages, and who knows
-what else.
-
-> And we're back to roughly the proposal I sent out years ago.
-
-Well, all of this is roughly your original proposal, just with
-different optimization choices and some enhancement to also cover
-hmm_range_fault() users.
-
-Enhancing the single sgl case is not a big change, I think. It does
-seem simplifying for the driver to not have to coalesce SGLs to detect
-the single-SGL fast-path.
-
-> > This is not quite what you said, we split the driver flow based on
-> > needing 1 HW SGL vs need many HW SGL.
-> 
-> That's at least what I intended to say, and I'm a little curious as what
-> it came across.
-
-Ok, I was reading the discussion more about as alignment than single
-HW SGL, I think you ment alignment as implying coalescing behavior
-implying single HW SGL..
-
-Jason
+> The APIC access page is special because KVM _must_ emulate the access to
+> do the right thing (emulate an APIC access instead of reading/writing the
+> APIC access page).  And despite what commit 3a2936dedd20 ("kvm: mmu: Don't
+> expose private memslots to L2") said, it's not just necessary when L1 is
+> accelerating L2's virtual APIC, it's just as important (likely *more*
+> imporant for correctness when L1 is passing through its own APIC to L
+Reviewed-by: Kai Huang <kai.huang@intel.com>
 
