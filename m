@@ -1,162 +1,329 @@
-Return-Path: <kvm+bounces-11316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF5887556B
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 18:43:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9D0875609
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 19:22:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 794941F257EF
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 17:43:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 527CEB2463E
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 18:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94310130AE1;
-	Thu,  7 Mar 2024 17:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817A5131E3C;
+	Thu,  7 Mar 2024 18:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YJ7tDhwH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KJzvlxKJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C00F74262
-	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 17:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087A61332A6
+	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 18:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709833388; cv=none; b=KLuzJ9Z8MRGV/wRQZGo01eqZV6WsAkypemQyYiz8HfewpPdbwh+Fo4xl2BTIbW/If9pTGj6Tjv24V1v5idWn0RN99Xx0iGW40C32uRh6ahmCf1hLbPbLAes2XdQWOoD2lOVzjUcd/P21DNU3+yfMzFbLc9VRDTLlW34jgeHARaM=
+	t=1709835742; cv=none; b=FTQn0yF25pqAnqOH/Da+BI6vddNSoOL/U7niv99hW23YP/hFcfwg9Azc0az8rXV6X+KeW5ur5wMfgGV9yBoaxboR8tCxbL0YzjRkXx9csWeW9VgV2sfSzkqr6ooWAeneoSRTvvie4ooiCO3ATzPwSdi8HbEBceLRmV+BBf122dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709833388; c=relaxed/simple;
-	bh=1lsVsguPPQhppE27G7fGmWeuudFk/07LF8KMTfRtQ9k=;
+	s=arc-20240116; t=1709835742; c=relaxed/simple;
+	bh=MvIahTrTqjQbnEWZDHoAYa0jlgqVtVHddDlO3dnhGkY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uoeJu781eXF/dad3ghmGHO5OLe6wlMmpQZPz/jPCoD9XFGH3zzsNwg9PjSNZWjeZvnH95LtB3Q2uxuTjs4VLnd54H4PulIU7R36p1hdqiLJV700KvkBa/FMZMu5gSNhPuHgiYLTP0cyBkTjA+iWOzmbF4DvMEXROOsYEv3z5hQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YJ7tDhwH; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=LmKZB5Bka9DhN/xMY5wdn4PV3nEsOF8Fl9DaXycpxAFL7HoHdYHTyMYnf3cB597stCeynIoffgM8ylAFkdp71FWIolK5QcBe5uIG9UvzpHM/GsYi+qxnZKgq0wrkD2OaN4CFYsAN3fiocMfqVuZRS1atLPswwgAJKHA5WwrkApo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KJzvlxKJ; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609a1063919so21644247b3.0
-        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 09:43:07 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dd0ae66422fso2502705276.0
+        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 10:22:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709833386; x=1710438186; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709835740; x=1710440540; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+5Nth4pqkIcnddTjv6Z5nf7/zGpa8tqI8lzvmd174U=;
-        b=YJ7tDhwHtKHWMFttjMwKlCRHzWlL4DOEQY9HeCvh6V4Cc8V+Wle4e1Pa67N2MaIRNt
-         lKq+mrT9jQukBLU27QhZDzKDW/9J4c4g5YNvOCzaHLAvlyXKoDkiWPRBdZL0AIY22Izx
-         APBnn6b3ZbYXP4KOo2gqNquv6k+FvVBVXbEftfQ1F//V+32yJsdjVvhuPt0IJIVUFtQo
-         +2lg97lmA8mwHQ3wYNp3kgHmjfDjBz6k7lnHn8hEwwQJSacMSUuumFIR5e2D+EI9NiNE
-         eEfCxeaJ0j3AwbmDz0VkOdOYM09B40JheQm1+sbEkADHxYUlofaZ5CrWz87A9YJ9m8Mx
-         Q1PA==
+        bh=KYhTYHOXWFkjcmXmPD3zJwyk7pg1G0PQhE3XitSL9PI=;
+        b=KJzvlxKJXp/22fcR0Qywv82yRjZ/KGS5C6iO/55H6hVsYl3AfeRBR8KQRWoX3LxmcV
+         Bd1wI0WDWx3AyT0HFbdVfi3+urD13wu6wt2trvQe1n4qawxHahz7Uvdwpg6PcmfYVmrl
+         1KKeoqXjjwGaesL1STknpgKCDCvCrXFjEMFcLyaNC0BzW7knYtaUi4brjQGmEHW5HYm3
+         cjq35d9TSqcJTm6eHGurWPPfennrR+PmaxgUhY68+3DSRaapFocvs6Oe/xJulqa6vJvM
+         qZw/4fHEAPvms0tF7qs9G+706/xlzAbcwjMptaQrMuqJXAWWnyK2oiAd8FBz/+iDyiX6
+         BwYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709833386; x=1710438186;
+        d=1e100.net; s=20230601; t=1709835740; x=1710440540;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+5Nth4pqkIcnddTjv6Z5nf7/zGpa8tqI8lzvmd174U=;
-        b=Oa5UY4drwzWquJAr5oKbEpAjlvyYpnotY46Gnbz30zGh9lWiZfINWjxXOEm9/hAi1z
-         GXR2bPmDp89l/lZH09/UXZgDWshETYJHhLQ8glhf48th4tTC/3i+g+I0O/PnCOksOGAf
-         vtldxFyD+2JceKZnUGUSpnyxQM4DSWmUTyb/tRXrho4FZQ+iFDJwVFaJuzNAMbaOTRfg
-         SKHpU0BnCkdcTmniG97CHKMBcsiw29VtfioO9olpcTr7Rzqo7KssiQCPpjujycG/gLF+
-         RThCAcyRjqFuLjdcpce6oqvxv89XOm20pm4LYbCYJhxfr9RHEXo4+sJ81m5McAI+s9x0
-         Mx8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUjqkFJi1g3Fn0crMSASTlemimpSl5kTKgzZ5TIQ+wK5SS5wr8HVS3JEibPw8Vme/NB/U9q2G25+mL+WkQOrQOdNLXY
-X-Gm-Message-State: AOJu0YxXHgVn1UfLO56tI3qzeIvGMVtJfqFUscfo/McssTB9+83SLgnt
-	qeUERLmuuNopQllLmoOzyljd99EuWBzgRJSVjNt08aFmnicNcbrjcVZ9OM94V0tyUxPssFdgj6z
-	PBA==
-X-Google-Smtp-Source: AGHT+IHNTAEAMeaU5NCWBeLFwT7ykzpqTDT1vNYBMW7hMx5a61k23ruY/0B0R8r7RW9EZoJZ8cIFK3Zky4I=
+        bh=KYhTYHOXWFkjcmXmPD3zJwyk7pg1G0PQhE3XitSL9PI=;
+        b=La8GwuWJDn0GUQxbhRkP7cIcrt5+iqeJlcTE9ELgnYqJ+2yZ3YhUD55JeIEZ/1Sz2n
+         VnWkJwXu1HkbsVzW1xTRytvHZXOsakrFJa/7IisdhWvRvXDmynufU2lFW5jzgruoS2XQ
+         rvtTSCnwsp9MAE4Bh5Vp0dRuLWSg2aM9ZFkC7cxymdJ3pBlF2+dAARcA8AA3O46T3aO8
+         nLodwZty5LCRQC3oBRzDVHqR8vMro642VoW+Rv4FIWDacPCOxTnm0S6ij82NZyB1VUxE
+         6iTzoB0OUPJlUFKpTtQ+zDz6XuOCkG8Ci5TVGeA5Vm4SvRnXLm94r4pgz48/KKEua7f9
+         mJ3w==
+X-Gm-Message-State: AOJu0YwgozDtTwfuBvhjksrImyOFPVoTdrMvuGBErjM9wD2Ys0fVTU1N
+	X9vfR/iOmxOWNv7mmXlDRqZMh/Bvn37UB8/sy+NvccT5NR1CClOsvhKQtQZlnWuxNzza5T8q/Jn
+	p4w==
+X-Google-Smtp-Source: AGHT+IFOk/vATsBgFrLrqHusHv7BoqhVAzQX4Yy8Wy1PMD2ERk7ncQYT/cH5zg79Q6A+cEqrjhsEiXK8Szc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:c86:b0:608:ce23:638c with SMTP id
- cm6-20020a05690c0c8600b00608ce23638cmr5279235ywb.4.1709833386363; Thu, 07 Mar
- 2024 09:43:06 -0800 (PST)
-Date: Thu, 7 Mar 2024 09:43:04 -0800
-In-Reply-To: <CAAhSdy1rYFoYjCRWTPouiT=tiN26Z_v3Y36K2MyDrcCkRs1Luw@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a5b:9c5:0:b0:dcc:2267:796e with SMTP id
+ y5-20020a5b09c5000000b00dcc2267796emr46265ybq.2.1709835740049; Thu, 07 Mar
+ 2024 10:22:20 -0800 (PST)
+Date: Thu, 7 Mar 2024 10:22:18 -0800
+In-Reply-To: <20240307054623.13632-6-manali.shukla@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <CAAhSdy1rYFoYjCRWTPouiT=tiN26Z_v3Y36K2MyDrcCkRs1Luw@mail.gmail.com>
-Message-ID: <Zen8qGzVpaOB_vKa@google.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.9
+References: <20240307054623.13632-1-manali.shukla@amd.com> <20240307054623.13632-6-manali.shukla@amd.com>
+Message-ID: <ZeoF2vfrUMCja0x7@google.com>
+Subject: Re: [PATCH v1 5/5] selftests: KVM: SVM: Add Idle HLT intercept test
 From: Sean Christopherson <seanjc@google.com>
-To: Anup Patel <anup@brainfault.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Palmer Dabbelt <palmer@rivosinc.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
-	KVM General <kvm@vger.kernel.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
+	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com, 
+	vkuznets@redhat.com, bp@alien8.de
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Mar 07, 2024, Anup Patel wrote:
-> ----------------------------------------------------------------
-> KVM/riscv changes for 6.9
+On Thu, Mar 07, 2024, Manali Shukla wrote:
+> From: Manali Shukla <Manali.Shukla@amd.com>
 > 
-> - Exception and interrupt handling for selftests
-> - Sstc (aka arch_timer) selftest
-> - Forward seed CSR access to KVM userspace
-> - Ztso extension support for Guest/VM
-> - Zacas extension support for Guest/VM
+> The Execution of the HLT instruction results in a VMEXIT. Hypervisor
+> observes pending V_INTR and V_NMI events just after the VMEXIT
+> generated by the HLT for the vCPU and causes VM entry to service the
+> pending events.  The Idle HLT intercept feature avoids the wasteful
+> VMEXIT during the halt if there are pending V_INTR and V_NMI events
+> for the vCPU.
 > 
-> ----------------------------------------------------------------
-> Anup Patel (5):
->       RISC-V: KVM: Forward SEED CSR access to user space
->       RISC-V: KVM: Allow Ztso extension for Guest/VM
->       KVM: riscv: selftests: Add Ztso extension to get-reg-list test
->       RISC-V: KVM: Allow Zacas extension for Guest/VM
->       KVM: riscv: selftests: Add Zacas extension to get-reg-list test
+> The selftest for the Idle HLT intercept instruments the above-mentioned
+> scenario.
 > 
-> Haibo Xu (11):
->       KVM: arm64: selftests: Data type cleanup for arch_timer test
->       KVM: arm64: selftests: Enable tuning of error margin in arch_timer test
->       KVM: arm64: selftests: Split arch_timer test code
->       KVM: selftests: Add CONFIG_64BIT definition for the build
->       tools: riscv: Add header file csr.h
->       tools: riscv: Add header file vdso/processor.h
->       KVM: riscv: selftests: Switch to use macro from csr.h
->       KVM: riscv: selftests: Add exception handling support
->       KVM: riscv: selftests: Add guest helper to get vcpu id
+> Signed-off-by: Manali Shukla <Manali.Shukla@amd.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/x86_64/svm_idlehlt_test.c   | 118 ++++++++++++++++++
+>  2 files changed, 119 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_idlehlt_test.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 492e937fab00..7ad03dc4f35e 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -89,6 +89,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/state_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/svm_idlehlt_test
 
-Uh, what's going on with this series?  Many of these were committed *yesterday*,
-but you sent a mail on February 12th[1] saying these were queued.  That's quite
-the lag.
+Uber nit, maybe svm_idle_hlt_test?  I find "idlehlt" hard to parse.
 
-I don't intend to police the RISC-V tree, but this commit caused a conflict with
-kvm-x86/selftests[2].  It's a non-issue in this case because it's such a trivial
-conflict, and we're all quite lax with selftests, but sending a pull request ~12
-hours after pushing commits that clearly aren't fixes is a bit ridiciulous.  E.g.
-if this were to happen with a less trivial conflict, the other sub-maintainer would
-be left doing a late scramble to figure things out just before sending their own
-pull requests.
+>  TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/svm_nested_shutdown_test
+> diff --git a/tools/testing/selftests/kvm/x86_64/svm_idlehlt_test.c b/tools/testing/selftests/kvm/x86_64/svm_idlehlt_test.c
+> new file mode 100644
+> index 000000000000..1564511799d4
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/svm_idlehlt_test.c
+> @@ -0,0 +1,118 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + *  svm_idlehalt_test
+> + *
 
-  tag kvm-riscv-6.9-1
-  Tagger:     Anup Patel <anup@brainfault.org>
-  TaggerDate: Thu Mar 7 11:54:34 2024 +0530
+Please omit this, file comments that state the name of the test inevitably
+become stale (see above).
 
-...
+> + *  Copyright (C) 2024 Advanced Micro Devices, Inc.
+> + *
+> + *  For licencing details see kernel-base/COPYING
 
-  commit d8c0831348e78fdaf67aa95070bae2ef8e819b05
-  Author:     Anup Patel <apatel@ventanamicro.com>
-  AuthorDate: Tue Feb 13 13:39:17 2024 +0530
-  Commit:     Anup Patel <anup@brainfault.org>
-  CommitDate: Wed Mar 6 20:53:44 2024 +0530
+This seems gratuitous, doesn't the SPDX stuff take care this?
 
-The other reason this caught my eye is that the conflict happened in common code,
-but the added helper is RISC-V specific and used only from RISC-V code.  ARM does
-have an identical helper, but AFAICT ARM's helper is only used from ARM code.
+> + *
+> + *  Author:
+> + *  Manali Shukla  <manali.shukla@amd.com>
+> + */
+> +#include "kvm_util.h"
+> +#include "svm_util.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +#include "apic.h"
+> +
+> +#define VINTR_VECTOR     0x30
+> +#define NUM_ITERATIONS 100000
 
-But the prototype of guest_get_vcpuid() is in common code.  Which isn't a huge
-deal, but it's rather undesirable because there's no indication that its
-implementation is arch-specific, and trying to use it in code built for s390 or
-x86 (or MIPS or PPC, which are on the horizon), would fail.  I'm all for making
-code common where possible, but going halfway and leaving a trap for other
-architectures makes for a poor experience for developers.
+What's the runtime?  If it's less than a second, then whatever, but if it's at
+all longer than that, then I'd prefer to use a lower default and make this user-
+configurable.
 
-And again, this showing up _so_ late means it's unnecessarily difficult to clean
-things up.  Which is kinda the whole point of getting thing into linux-next, so
-that folks that weren't involved in the original patch/series can react if there
-is a hiccup/problem/oddity.
+> +/*
+> + * Incremented in the VINTR handler. Provides evidence to the sender that the
+> + * VINR is arrived at the destination.
 
-[1] https://lore.kernel.org/all/CAAhSdy2wFzk0h5MiM5y9Fij0HyWake=7vNuV1MExUxkEtMWShw@mail.gmail.com
-[2] https://lore.kernel.org/all/20240307145946.7e014225@canb.auug.org.au
+Evidence is useless if there's no detective looking for it.  Yeah, it gets
+printed out in the end, but in reality, no one is going to look at that.
 
->       KVM: riscv: selftests: Change vcpu_has_ext to a common function
->       KVM: riscv: selftests: Add sstc timer test
+Rather than read this from the host, just make it a non-volatile bool and assert
+that it set after every 
+
+> + */
+> +static volatile uint64_t vintr_rcvd;
+> +
+> +void verify_apic_base_addr(void)
+> +{
+> +	uint64_t msr = rdmsr(MSR_IA32_APICBASE);
+> +	uint64_t base = GET_APIC_BASE(msr);
+> +
+> +	GUEST_ASSERT(base == APIC_DEFAULT_GPA);
+> +}
+> +
+> +/*
+> + * The halting guest code instruments the scenario where there is a V_INTR pending
+> + * event available while hlt instruction is executed. The HLT VM Exit doesn't
+> + * occur in above-mentioned scenario if the Idle HLT intercept feature is enabled.
+> + */
+> +
+> +static void halter_guest_code(void)
+
+Just "guest_code()".  Yeah, it's a weird generic name, but at this point it's so
+ubiquitous that it's analogous to main(), i.e. readers know that guest_code() is
+the entry point.  And deviating from that suggests that there is a second vCPU
+running _other_ guest code (otherwise, why differentiate?), which isn't the case.
+
+> +{
+> +	uint32_t icr_val;
+> +	int i;
+> +
+> +	verify_apic_base_addr();
+
+Why?  The test will fail if the APIC is borked, this is just unnecessary noise
+that distracts readers.
+
+
+> +	xapic_enable();
+> +
+> +	icr_val = (APIC_DEST_SELF | APIC_INT_ASSERT | VINTR_VECTOR);
+> +
+> +	for (i = 0; i < NUM_ITERATIONS; i++) {
+> +		xapic_write_reg(APIC_ICR, icr_val);
+> +		asm volatile("sti; hlt; cli");
+
+Please add safe_halt() and cli() helpers in processor.h.  And then do:
+
+		cli();
+		xapic_write_reg(APIC_ICR, icr_val);
+		safe_halt();
+
+to guarantee that interrupts are disabled when the IPI is sent.  And as above,
+
+		GUEST_ASSERT(READ_ONCE(irq_received));
+		WRITE_ONCE(irq_received, false);
+
+> +	}
+> +	GUEST_DONE();
+> +}
+> +
+> +static void guest_vintr_handler(struct ex_regs *regs)
+> +{
+> +	vintr_rcvd++;
+> +	xapic_write_reg(APIC_EOI, 0x30);
+
+EOI is typically written with '0', not the vector, because the legacy EOI register
+clears the highest ISR vector, not whatever is specified.  IIRC, one of the Intel
+or AMD specs even says to use '0'.
+
+AMD's Specific EOI register does allow targeting a specific vector, but that's
+not what's being used here.
+
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +	struct ucall uc;
+> +	uint64_t  halt_exits, vintr_exits;
+> +	uint64_t *pvintr_rcvd;
+> +
+> +	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
+
+No, this test doesn't require SVM, which is KVM advertising *nested* SVM.  This
+test does require idle-hlt support though...
+
+> +	/* Check the extension for binary stats */
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_BINARY_STATS_FD));
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, halter_guest_code);
+> +
+> +	vm_init_descriptor_tables(vm);
+> +	vcpu_init_descriptor_tables(vcpu);
+> +	vm_install_exception_handler(vm, VINTR_VECTOR, guest_vintr_handler);
+> +	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
+> +
+> +	vcpu_run(vcpu);
+> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+> +
+> +	halt_exits = vcpu_get_stat(vcpu, "halt_exits");
+
+Is there really no way to get binary stats without having to pass in strings?
+
+> +	vintr_exits = vcpu_get_stat(vcpu, "irq_window_exits");
+> +	pvintr_rcvd = (uint64_t *)addr_gva2hva(vm, (uint64_t)&vintr_rcvd);
+> +
+> +	switch (get_ucall(vcpu, &uc)) {
+> +	case UCALL_ABORT:
+> +		REPORT_GUEST_ASSERT(uc);
+> +		/* NOT REACHED */
+
+Eh, just put a "break;" here and drop the comment.
+
+> +	case UCALL_DONE:
+> +		goto done;
+
+break;
+
+> +	default:
+> +		TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
+> +	}
+> +
+> +done:
+> +	TEST_ASSERT(halt_exits == 0,
+
+So in all honesty, this isn't a very interesting test.  It's more of a CPU test
+than a KVM test.  I do think it's worth adding, because why not.
+
+But I'd also like to see a testcase for KVM_X86_DISABLE_EXITS_HLT.  It would be
+a generic test, i.e. not specific to idle-hlt since there is no dependency and
+the test shouldn't care.  I _think_ it would be fairly straightforward: create
+a VM without an in-kernel APIC (so that HLT exits to userspace), disable HLT
+interception, send a signal from a different task after some delay, and execute
+HLT in the guest.  Then verify the vCPU exited because of -EINTR and not HLT.
+
+> +		    "Test Failed:\n"
+> +		    "Guest executed VINTR followed by halts: %d times\n"
+> +		    "The guest exited due to halt: %ld times and number\n"
+> +		    "of vintr exits: %ld and vintr got re-injected: %ld times\n",
+> +		    NUM_ITERATIONS, halt_exits, vintr_exits, *pvintr_rcvd);
+
+I appreciate the effort to provide more info, but this is way too noisy.  If
+anything, print gory details in a pr_debug() *before* the assert (see below),
+and then simply do:
+
+	TEST_ASSERT_EQ(halt_exits, 0);
+
+> +	fprintf(stderr,
+> +		"Test Successful:\n"
+> +		"Guest executed VINTR followed by halts: %d times\n"
+> +		"The guest exited due to halt: %ld times and number\n"
+> +		"of vintr exits: %ld and vintr got re-injected: %ld times\n",
+> +		NUM_ITERATIONS, halt_exits, vintr_exits, *pvintr_rcvd);
+
+And this should be pr_debug(), because no human is going to look at this except
+when the test isn't working correctly.
+
+> +
+> +	kvm_vm_free(vm);
+> +	return 0;
+> +}
+> -- 
+> 2.34.1
+> /pvintr_rcvd
+
 
