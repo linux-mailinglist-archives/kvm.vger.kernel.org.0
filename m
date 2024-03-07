@@ -1,203 +1,154 @@
-Return-Path: <kvm+bounces-11313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11314-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27E68753BD
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 16:59:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C2887543A
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 17:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF2CF1C21B2F
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 15:59:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C75DB287DC2
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 16:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5EA12F59B;
-	Thu,  7 Mar 2024 15:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4355A12F398;
+	Thu,  7 Mar 2024 16:35:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FUh5wB7t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gu84BMLI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465FD12F379;
-	Thu,  7 Mar 2024 15:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55DF53366
+	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 16:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709827142; cv=none; b=cOnJpMC/YSpvzBt/ktGKiMsFyztnONHVD1DCXCt2sTdWPo8KjtUNWWz1SL8WycYrVZYN/g7Yg+0LIKLZn9TsJQmPhjz3uP8fwptMlpHYMosE9n4N8AnJVRD8xy/1I3kuYnHWmF21mP6zQ8V2s4Fe2wGb8JyEE+VIkRhd/uCX6vc=
+	t=1709829354; cv=none; b=k3swgzW+nYyqk8qKIb9QfCFRk+Zmv0yybB1FA/0JeWUPp0CZZyrDanAh0dWXox22cP1zdBpJsV4Fbqw92bFxIH1TZfR6oXt7UWuAjPZDuN4/F1vNTynqTe4PnsJDBcIJJg8GNwcStY6wLnJAakqhYxYNxa4urf4TgZvA/H5Xa6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709827142; c=relaxed/simple;
-	bh=UYtkG8yfOSupBSMZ3Yyq2qnzTXCcLitPyHm9qpOJKYc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZYtjgWEnQsXDHzA9nA3edpa+IFwbazwL9lD1AJomRLpM7XnNstkj+n6O9kpreL9moX/fB1gpa1+tIUxc8y+Iv0t7StfY7Zg4oK9M3OZNgJ4LL/MXLLe/xvU79Px5D2sYN1zrjraA9N70FgDs4haJAXnuUl1Cq2QoYpn+1fD7ia0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FUh5wB7t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C335DC433F1;
-	Thu,  7 Mar 2024 15:59:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709827141;
-	bh=UYtkG8yfOSupBSMZ3Yyq2qnzTXCcLitPyHm9qpOJKYc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FUh5wB7teSfQ4E3Jgt0/JB2cACgh+qZ1YBngLgiU9iyk5TbuFh30QrjPlGT7cgcCc
-	 LSVaniC6YV079btLKS2gC+lyWgl46McHPlku5Ycsh7D0HzJUt9C03O8PP8Cm4iRJEn
-	 wcYPGkpeHfulvLEjQdx27NmEXEMNwWow1JZNwW9vZLA/hH7ExoXVWyMOqZS+w4hA7T
-	 XKeU/BeQDd5sxV5FWYurXRXsxP60aw3h+BCe7nSbFOY0yWMsFocdKOmWhGiyVwNiNz
-	 v1ltzB4Ib3Nl9eWkh/xmI6BGnqu29l7ZY8LXNcMHX0UQdM4D/YiVeP6XqjVlzuwmY3
-	 twceigxI/L1mA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1riG94-00AMt8-FV;
-	Thu, 07 Mar 2024 15:58:58 +0000
-Date: Thu, 07 Mar 2024 15:58:58 +0000
-Message-ID: <86il1y11a5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 08/13] KVM: arm64: nv: Handle HCR_EL2.{API,APK} independently
-In-Reply-To: <20240307151454.GA913041@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
-	<20240226100601.2379693-9-maz@kernel.org>
-	<20240307151454.GA913041@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1709829354; c=relaxed/simple;
+	bh=ovLcO+ArYsqwVJr0lJWnhl4OzaIopjYDqjX/lQIcKLU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AvTi9t14EYDhwpadDlqqqAkxtTlzCAYd0nbK3pxd6/yPMTdQs6I12urO5ul3t5X59If3NSApnHXDN8uL2oD+oVp8Bmch1b3Ik3sOSOIGuj9FqKG5KRLh09h+tIts+cums30oPOOGkl7t28wlylVZCY3vkfU0L0OFfYNH+AoaP6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gu84BMLI; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc05887ee9so1524085276.1
+        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 08:35:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709829352; x=1710434152; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SYNo+R7zcBcCdJec9GfDUXBmVK9TVYpdgkY84ts0zNo=;
+        b=gu84BMLI+CLVhpjkNqzqY8qA+vHMePtrNCfCzAwwVnCR8I7ATKeqgKSaqjzoDIVp9O
+         6u8+TaFm2oZOwaKC+mX4oE4tR2ZFihJYd7YTKlyD15A56tfS8nFGDmAdyTU7abfAnIpp
+         +yyew6nsyfg9ZU0zYkXsvIQayPAGneRUTqPMrFhJyRbtY2LZ1Pt0Ffam1Xulcte//bsK
+         X0GMSYSYyGje7rguMKmoU8rGautDAVKTyuobgXoLcAaI3tw/PgVJI8uD+9PcKVpp2jiR
+         Lw97S2+sLUiXFMe4wDZ8YZ2DpRMA1Gzum9eCeypH7HVfn/t5XJ4QcUIm5RxYk4L/H4XL
+         wQ4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709829352; x=1710434152;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SYNo+R7zcBcCdJec9GfDUXBmVK9TVYpdgkY84ts0zNo=;
+        b=KQFCDNtlBQL7gXI3XKR3OqC0nGOdlk39MXAzlTl19aru2gl7SQF5OOBaTd6eQgvNpl
+         9YB+RVhJNUp0gHi+lPAkOyUyajs1IOvsWEvAqSbeibLVasLO6RSZ8V4eA5Rc3Z29nmek
+         NLgtOCoInyJ/9BoVC8PF1g072c9UiHawn29s16oZvXPZzTDuIVvTis9uNCxBOQ6AeDuF
+         k4KICPNT8uS9LhAZoqw7hUN7FkoBJ0uLFv9HQTiqDcZrLnIRxsTT+cJtMfhzDf58yNc5
+         G7jkrAgU0VurTrISkj4WraXT+JvNs8NyxcHbZMoZ4zf7s5lkNuZfCsf8+2XfFU7UO8jg
+         Kisg==
+X-Gm-Message-State: AOJu0YwW6EPQx2etr8X4+p+KSb8a+p95CCBqqfYRoLtp6UNApm5tBBh6
+	aQKa9SewRljgcctTL14Kq9OYGM1ty5CRyBh1C6JaV2O8IPtxWZ/4FQnbGhk3QSKE0nOQ3vyrre0
+	leIAEs1gpOg==
+X-Google-Smtp-Source: AGHT+IH/qR9uUaBf6Ts/jDJbTeMQ575YzhN2Kk4eUXg0ntDQe0fSFTbYxetrAAcFI4Cd+rez5dkheX/CjKktrg==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a25:a009:0:b0:dc6:b982:cfa2 with SMTP id
+ x9-20020a25a009000000b00dc6b982cfa2mr619610ybh.8.1709829351768; Thu, 07 Mar
+ 2024 08:35:51 -0800 (PST)
+Date: Thu,  7 Mar 2024 08:35:41 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
+Message-ID: <20240307163541.92138-1-dmatlack@google.com>
+Subject: [PATCH v2] KVM: Mark a vCPU as preempted/ready iff it's scheduled out
+ while running
+From: David Matlack <dmatlack@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, David Matlack <dmatlack@google.com>, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 07 Mar 2024 15:14:54 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Mon, Feb 26, 2024 at 10:05:56AM +0000, Marc Zyngier wrote:
-> > Although KVM couples API and APK for simplicity, the architecture
-> > makes no such requirement, and the two can be independently set or
-> > cleared.
-> > 
-> > Check for which of the two possible reasons we have trapped here,
-> > and if the corresponding L1 control bit isn't set, delegate the
-> > handling for forwarding.
-> > 
-> > Otherwise, set this exact bit in HCR_EL2 and resume the guest.
-> > Of course, in the non-NV case, we keep setting both bits and
-> > be done with it. Note that the entry core already saves/restores
-> > the keys should any of the two control bits be set.
-> > 
-> > This results in a bit of rework, and the removal of the (trivial)
-> > vcpu_ptrauth_enable() helper.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_emulate.h    |  5 ----
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 32 +++++++++++++++++++++----
-> >  2 files changed, 27 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index debc3753d2ef..d2177bc77844 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -125,11 +125,6 @@ static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
-> >  	vcpu->arch.hcr_el2 |= HCR_TWI;
-> >  }
-> >  
-> > -static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
-> > -{
-> > -	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-> > -}
-> > -
-> >  static inline void vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
-> >  {
-> >  	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index f5f701f309a9..a0908d7a8f56 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -480,11 +480,35 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-> >  static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  {
-> >  	struct kvm_cpu_context *ctxt;
-> > -	u64 val;
-> > +	u64 enable = 0;
-> >  
-> >  	if (!vcpu_has_ptrauth(vcpu))
-> >  		return false;
-> >  
-> > +	/*
-> > +	 * NV requires us to handle API and APK independently, just in
-> > +	 * case the hypervisor is totally nuts. Please barf >here<.
-> > +	 */
-> > +	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-> > +		switch (ESR_ELx_EC(kvm_vcpu_get_esr(vcpu))) {
-> > +		case ESR_ELx_EC_PAC:
-> > +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_API))
-> > +				return false;
-> > +
-> > +			enable |= HCR_API;
-> > +			break;
-> > +
-> > +		case ESR_ELx_EC_SYS64:
-> > +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_APK))
-> > +				return false;
-> > +
-> > +			enable |= HCR_APK;
-> > +			break;
-> > +		}
-> > +	} else {
-> > +		enable = HCR_API | HCR_APK;
-> > +	}
-> > +
-> >  	ctxt = this_cpu_ptr(&kvm_hyp_ctxt);
-> >  	__ptrauth_save_key(ctxt, APIA);
-> >  	__ptrauth_save_key(ctxt, APIB);
-> > @@ -492,11 +516,9 @@ static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  	__ptrauth_save_key(ctxt, APDB);
-> >  	__ptrauth_save_key(ctxt, APGA);
-> >  
-> > -	vcpu_ptrauth_enable(vcpu);
-> >  
-> > -	val = read_sysreg(hcr_el2);
-> > -	val |= (HCR_API | HCR_APK);
-> > -	write_sysreg(val, hcr_el2);
-> > +	vcpu->arch.hcr_el2 |= enable;
-> > +	sysreg_clear_set(hcr_el2, 0, enable);
-> >  
-> >  	return true;
-> >  }
-> 
-> A bit of sleuthing tells me you plan to delete kvm_hyp_handle_ptrauth() anyway,
-> so presumably it makes some sense to put that patch before this to avoid
-> modifying the code just to delete it!
+Mark a vCPU as preempted/ready if-and-only-if it's scheduled out while
+running. i.e. Do not mark a vCPU preempted/ready if it's scheduled out
+during a non-KVM_RUN ioctl() or when userspace is doing KVM_RUN with
+immediate_exit.
 
-Well, I haven't posted that patch yet (soon!), but it is also
-important to show how these things interact overall. *if* we agree
-that there is no point in the current approach, then I'll squash the
-two.
+Commit 54aa83c90198 ("KVM: x86: do not set st->preempted when going back
+to user space") stopped marking a vCPU as preempted when returning to
+userspace, but if userspace then invokes a KVM vCPU ioctl() that gets
+preempted, the vCPU will be marked preempted/ready. This is arguably
+incorrect behavior since the vCPU was not actually preempted while the
+guest was running, it was preempted while doing something on behalf of
+userspace.
 
-But there is a lot to be said about:
+This commit also avoids KVM dirtying guest memory after userspace has
+paused vCPUs, e.g. for Live Migration, which allows userspace to collect
+the final dirty bitmap before or in parallel with saving vCPU state
+without having to worry about saving vCPU state triggering writes to
+guest memory.
 
-- discussion on the list first
-- minimal changes to track regressions
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+v2:
+ - Drop Google-specific "PRODKERNEL: " shortlog prefix
 
-So I think there is still value in reviewing this patch on its own!
+v1: https://lore.kernel.org/kvm/20231218185850.1659570-1-dmatlack@google.com/
 
-Thanks,
+ include/linux/kvm_host.h | 1 +
+ virt/kvm/kvm_main.c      | 5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-	M.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7e7fd25b09b3..5b2300614d22 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -378,6 +378,7 @@ struct kvm_vcpu {
+ 		bool dy_eligible;
+ 	} spin_loop;
+ #endif
++	bool wants_to_run;
+ 	bool preempted;
+ 	bool ready;
+ 	struct kvm_vcpu_arch arch;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ff588677beb7..3da1b2e3785d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4438,7 +4438,10 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 				synchronize_rcu();
+ 			put_pid(oldpid);
+ 		}
++		vcpu->wants_to_run = !vcpu->run->immediate_exit;
+ 		r = kvm_arch_vcpu_ioctl_run(vcpu);
++		vcpu->wants_to_run = false;
++
+ 		trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+ 		break;
+ 	}
+@@ -6312,7 +6315,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
+ {
+ 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
+ 
+-	if (current->on_rq) {
++	if (current->on_rq && vcpu->wants_to_run) {
+ 		WRITE_ONCE(vcpu->preempted, true);
+ 		WRITE_ONCE(vcpu->ready, true);
+ 	}
 
+base-commit: 687d8f4c3dea0758afd748968d91288220bbe7e3
 -- 
-Without deviation from the norm, progress is not possible.
+2.44.0.278.ge034bb2e1d-goog
+
 
