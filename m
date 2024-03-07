@@ -1,209 +1,239 @@
-Return-Path: <kvm+bounces-11295-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11296-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46EC7874D6B
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 12:30:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 689F1874E4E
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 12:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A1D71C213AE
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 11:30:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C11B4282A99
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 11:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511B6839E3;
-	Thu,  7 Mar 2024 11:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xq7TTBNR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7619112B149;
+	Thu,  7 Mar 2024 11:52:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B118529A
-	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 11:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D93129A69;
+	Thu,  7 Mar 2024 11:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709811049; cv=none; b=OEOCVd7xZA1SCV4nLOcN/ggYCO/D/lGEJlVnx9yIt85FruteDHL3l7vM3ujZAK28Qf1/TbHSD04KFR+myNOTgfGrzeAQARPZQvXFu4X0twGokyXDaBnSwRw3IIXZ+zS+siQrjgwvtT41Wxc345Ti7wW91suEurehmCCf7AcYepM=
+	t=1709812322; cv=none; b=S3sjuiTQgrhUKHBhXA5mLSTupCJzD2RwzZCJKIXjnopsaPH1yIrQeA+UmcmqneDplPPpSS37vIOKYHFBlPtO5HQFTnF+oa9huGOlrgXj9sR0GtGpaSnCtlbyjEivloeXxIbkjBmXuFbtoyCDWjOitiNxWAxIKPnCMCY9RBUR9ZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709811049; c=relaxed/simple;
-	bh=A10UBKhRS/a5V9sC5bEpT6S/qORoPkNjQunvfSxHJ6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N2L7ZDqQRIMpFn6xufHwFW+soBL5BXHlQ5dxVbNlPbe8tbl6btKw9lEWH4loegwAPB7J1nYzqmojgYYBxTXlay8489fxkhMsveqS+TVUZc48XkEH4uS3eYTxcsvZUU9IyPGeElZkFZCHzEVg/T94TJiFBMOPlWK2HiNOmWm6DGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xq7TTBNR; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709811048; x=1741347048;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=A10UBKhRS/a5V9sC5bEpT6S/qORoPkNjQunvfSxHJ6I=;
-  b=Xq7TTBNRWJCNZik/3FD+4A6pHkf4GNXGh+mJFn71LnXzkCxMFZin3Kn0
-   gRe9Pv2zzM3wmLl8qSnhvB+47Yj5rlUosXaSLVdmZHe8VQokUTm9Lsew5
-   rC8PYpkmxq8fI+i9bDkQMOQCSAOBMADFCG8LOv1n/Kxp6o7Nw+zh5F+tS
-   /OfNf4uAQLiNw9xduEJIaRjRSiQt4+blx/6qBech12yVBLXzzk1CcpGps
-   pjENUW5hGM0aJXAAyhGo08MIKxXjqqJgeYMAf365EHTKk9btmns7qA/KU
-   ecsko12s7mLeytRsLdWLoSEn/cEPHJvn/++coxDLh3AWohiebj1ewrMv0
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="29916223"
-X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
-   d="scan'208";a="29916223"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 03:30:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
-   d="scan'208";a="33237722"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 03:30:41 -0800
-Message-ID: <d5cb6e5e-0bc1-40bd-8fc1-50a03f42e9cf@intel.com>
-Date: Thu, 7 Mar 2024 19:30:37 +0800
+	s=arc-20240116; t=1709812322; c=relaxed/simple;
+	bh=gBRNuY+93eIjOMjnpY06QMUglsaAZpoaFQbwH9s9Ixw=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=XeMRkow5ZEuX1UyCI2gUwqoVEptldGfdcaXpeGIYnagbX70RsFgkX6iQSPC5pyD3gDUgTq5+KUGyOPEWrSBMdCYciwJaQ7FqCYCttg/Lm1pajSC5raxTORr8HennBHOfkouaKrdHmVyDpkff95sT9HvInEPwoUjPRf/W/lqY1hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Tr6zL3DkGz1QB7D;
+	Thu,  7 Mar 2024 19:49:34 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
+	by mail.maildlp.com (Postfix) with ESMTPS id CDD561A016C;
+	Thu,  7 Mar 2024 19:51:56 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Mar 2024 19:51:56 +0800
+Subject: Re: [PATCH v3 2/4] hisi_acc_vfio_pci: Create subfunction for data
+ reading
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
+References: <20240307060353.16095-1-liulongfang@huawei.com>
+ <20240307060353.16095-3-liulongfang@huawei.com>
+ <63cc4710dbb94b049bc1576f743b1729@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <1b0c7475-884c-4035-6e7a-c2f7ad4f6f95@huawei.com>
+Date: Thu, 7 Mar 2024 19:51:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 52/65] i386/tdx: Wire TDX_REPORT_FATAL_ERROR with
- GuestPanic facility
-Content-Language: en-US
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
- <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
- qemu-devel@nongnu.org, Michael Roth <michael.roth@amd.com>,
- Claudio Fontana <cfontana@suse.de>, Gerd Hoffmann <kraxel@redhat.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20240229063726.610065-1-xiaoyao.li@intel.com>
- <20240229063726.610065-53-xiaoyao.li@intel.com> <874jdr1wmt.fsf@pond.sub.org>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <874jdr1wmt.fsf@pond.sub.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <63cc4710dbb94b049bc1576f743b1729@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
 
-On 2/29/2024 4:51 PM, Markus Armbruster wrote:
-> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+On 2024/3/7 16:33, Shameerali Kolothum Thodi wrote:
 > 
->> Integrate TDX's TDX_REPORT_FATAL_ERROR into QEMU GuestPanic facility
+> 
+>> -----Original Message-----
+>> From: liulongfang <liulongfang@huawei.com>
+>> Sent: Thursday, March 7, 2024 6:04 AM
+>> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
+>> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>
+>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
+>> Subject: [PATCH v3 2/4] hisi_acc_vfio_pci: Create subfunction for data
+>> reading
 >>
->> Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> During the live migration process. It needs to obtain various status
+>> data of drivers and devices. In order to facilitate calling it in the
+>> debugfs function. For all operations that read data from device registers,
+>> the driver creates a subfunction.
+>> Also fixed the location of address data.
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 >> ---
->> Changes in v5:
->> - mention additional error information in gpa when it presents;
->> - refine the documentation; (Markus)
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 55 ++++++++++---------
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  3 +
+>>  2 files changed, 33 insertions(+), 25 deletions(-)
 >>
->> Changes in v4:
->> - refine the documentation; (Markus)
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index 45351be8e270..1881f3fa9266 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -486,42 +486,22 @@ static int vf_qm_load_data(struct
+>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	return 0;
+>>  }
 >>
->> Changes in v3:
->> - Add docmentation of new type and struct; (Daniel)
->> - refine the error message handling; (Daniel)
->> ---
->>   qapi/run-state.json   | 31 +++++++++++++++++++++--
->>   system/runstate.c     | 58 +++++++++++++++++++++++++++++++++++++++++++
->>   target/i386/kvm/tdx.c | 24 +++++++++++++++++-
->>   3 files changed, 110 insertions(+), 3 deletions(-)
+>> -static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>> -			    struct hisi_acc_vf_migration_file *migf)
+>> +static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data
+>> *vf_data)
+>>  {
+>> -	struct acc_vf_data *vf_data = &migf->vf_data;
+>> -	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>  	struct device *dev = &vf_qm->pdev->dev;
+>>  	int ret;
 >>
->> diff --git a/qapi/run-state.json b/qapi/run-state.json
->> index dd0770b379e5..b71dd1884eb6 100644
->> --- a/qapi/run-state.json
->> +++ b/qapi/run-state.json
->> @@ -483,10 +483,12 @@
->>   #
->>   # @s390: s390 guest panic information type (Since: 2.12)
->>   #
->> +# @tdx: tdx guest panic information type (Since: 9.0)
->> +#
->>   # Since: 2.9
->>   ##
->>   { 'enum': 'GuestPanicInformationType',
->> -  'data': [ 'hyper-v', 's390' ] }
->> +  'data': [ 'hyper-v', 's390', 'tdx' ] }
->>   
->>   ##
->>   # @GuestPanicInformation:
->> @@ -501,7 +503,8 @@
->>    'base': {'type': 'GuestPanicInformationType'},
->>    'discriminator': 'type',
->>    'data': {'hyper-v': 'GuestPanicInformationHyperV',
->> -          's390': 'GuestPanicInformationS390'}}
->> +          's390': 'GuestPanicInformationS390',
->> +          'tdx' : 'GuestPanicInformationTdx'}}
->>   
->>   ##
->>   # @GuestPanicInformationHyperV:
->> @@ -564,6 +567,30 @@
->>             'psw-addr': 'uint64',
->>             'reason': 'S390CrashReason'}}
->>   
->> +##
->> +# @GuestPanicInformationTdx:
->> +#
->> +# TDX Guest panic information specific to TDX, as specified in the
->> +# "Guest-Hypervisor Communication Interface (GHCI) Specification",
->> +# section TDG.VP.VMCALL<ReportFatalError>.
->> +#
->> +# @error-code: TD-specific error code
->> +#
->> +# @message: Human-readable error message provided by the guest. Not
->> +#     to be trusted.
->> +#
->> +# @gpa: guest-physical address of a page that contains more verbose
->> +#     error information, as zero-terminated string.  Present when the
->> +#     "GPA valid" bit (bit 63) is set in @error-code.
+>> -	if (unlikely(qm_wait_dev_not_ready(vf_qm))) {
+>> -		/* Update state and return with match data */
+>> -		vf_data->vf_qm_state = QM_NOT_READY;
+>> -		hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>> -		migf->total_length = QM_MATCH_SIZE;
+>> -		return 0;
+>> -	}
+>> -
+>> -	vf_data->vf_qm_state = QM_READY;
+>> -	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>> -
+>> -	ret = vf_qm_cache_wb(vf_qm);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to writeback QM Cache!\n");
+>> -		return ret;
+>> -	}
+>> -
+>>  	ret = qm_get_regs(vf_qm, vf_data);
 > 
-> Uh, peeking at GHCI Spec section 3.4 TDG.VP.VMCALL<ReportFatalError>, I
-> see operand R12 consists of
 > 
->      bits    name                        description
->      31:0    TD-specific error code      TD-specific error code
->                                          Panic – 0x0.
->                                          Values – 0x1 to 0xFFFFFFFF
->                                          reserved.
->      62:32   TD-specific extended        TD-specific extended error code.
->              error code                  TD software defined.
->      63      GPA Valid                   Set if the TD specified additional
->                                          information in the GPA parameter
->                                          (R13).
-> 
-> Is @error-code all of R12, or just bits 31:0?
-> 
-> If it's all of R12, description of @error-code as "TD-specific error
-> code" is misleading.
+> So this doesn't need the qm_wait_dev_not_ready(vf_qm) check above for the
+> debugfs ? What happens if you read when device is not ready?
+>
 
-We pass all of R12 to @error_code.
+There is still a call to qm_wait_dev_not_ready() in vf_qm_state_save.
+Here is just the data reading operation of the new vf_qm_read_data() function.
 
-Here it wants to use "error_code" as generic as the whole R12. Do you 
-have any better description of it ?
 
-> If it's just bits 31:0, then 'Present when the "GPA valid" bit (bit 63)
-> is set in @error-code' is wrong.  Could go with 'Only present when the
-> guest provides this information'.
+>>  	if (ret)
+>>  		return -EINVAL;
+>>
+>>  	/* Every reg is 32 bit, the dma address is 64 bit. */
+>> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
+>> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
 > 
->> +#
->> +#
+> Also since there is no serialization with core migration now, what will be the data
+> returned in debugfs when there is a vf_qm_load_data() is in progress?
+>> So I guess the intention or assumption here is that the debugfs data is only
+> valid when the user knows that devices not under migration process.
 > 
-> Drop one of these two lines, please.
+> Is that right?
+>
+
+The data read by debugfs is the data in the device when the read operation occurs.
+As for whether the device is in the running state or the resuming state,
+debugfs does not need to pay attention to it.
+
+If the user wants to read the status data of the device in different states,
+he can first query the device's state, and then read the save data based on
+the state result.
+
+Thanks,
+Longfang.
+
+> Thanks,
+> Shameer
 > 
->> +# Since: 9.0
->> +##
->> +{'struct': 'GuestPanicInformationTdx',
->> + 'data': {'error-code': 'uint64',
->> +          'message': 'str',
->> +          '*gpa': 'uint64'}}
+>>  	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
+>> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
+>> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
+>> +	vf_data->aeqe_dma = vf_data-
+>>> qm_aeqc_dw[QM_XQC_ADDR_HIGH];
+>>  	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
+>> +	vf_data->aeqe_dma |= vf_data-
+>>> qm_aeqc_dw[QM_XQC_ADDR_LOW];
+>>
+>>  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
+>>  	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
+>> @@ -536,6 +516,31 @@ static int vf_qm_state_save(struct
+>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  		return -EINVAL;
+>>  	}
+>>
+>> +	return 0;
+>> +}
 >> +
->>   ##
->>   # @MEMORY_FAILURE:
->>   #
+>> +static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>> +			    struct hisi_acc_vf_migration_file *migf)
+>> +{
+>> +	struct acc_vf_data *vf_data = &migf->vf_data;
+>> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>> +	int ret;
+>> +
+>> +	if (unlikely(qm_wait_dev_not_ready(vf_qm))) {
+>> +		/* Update state and return with match data */
+>> +		vf_data->vf_qm_state = QM_NOT_READY;
+>> +		hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>> +		migf->total_length = QM_MATCH_SIZE;
+>> +		return 0;
+>> +	}
+>> +
+>> +	vf_data->vf_qm_state = QM_READY;
+>> +	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>> +
+>> +	ret = vf_qm_read_data(vf_qm, vf_data);
+>> +	if (ret)
+>> +		return -EINVAL;
+>> +
+>>  	migf->total_length = sizeof(struct acc_vf_data);
+>>  	return 0;
+>>  }
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> index 5bab46602fad..7a9dc87627cd 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> @@ -38,6 +38,9 @@
+>>  #define QM_REG_ADDR_OFFSET	0x0004
+>>
+>>  #define QM_XQC_ADDR_OFFSET	32U
+>> +#define QM_XQC_ADDR_LOW		0x1
+>> +#define QM_XQC_ADDR_HIGH	0x2
+>> +
+>>  #define QM_VF_AEQ_INT_MASK	0x0004
+>>  #define QM_VF_EQ_INT_MASK	0x000c
+>>  #define QM_IFC_INT_SOURCE_V	0x0020
+>> --
+>> 2.24.0
 > 
-
+> .
+> 
 
