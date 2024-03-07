@@ -1,106 +1,109 @@
-Return-Path: <kvm+bounces-11234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45457874555
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:54:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 252D1874556
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:54:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DAF7CB23587
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 00:53:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA905B23372
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 00:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A6A4A33;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBCB24C8B;
 	Thu,  7 Mar 2024 00:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TtcZ+CDC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qYL/uWqR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665BE29B0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE042441F
 	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 00:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709772827; cv=none; b=bJz516UGDjx3TsJBNIl1nlpu0IqLys4YhwBCJr+fx0qPuNVjK75yrl7ZgZgKWVEuRQD3t7zbS6VSApTtRxh2OgxUeafVGMnE2lbulqJX55ObxmtXfF2aRy8wyz1m8cj1Qiyup+2gQUafo7xs8JjjAcWlrt1poQqoJsMtAxCxX5w=
+	t=1709772828; cv=none; b=oBP7ewrGT2vf+q4mN8Yvp/RhxSUaqecSLr2kaW1DmSC5JmA1DZH8gb9/ESHqAUXXCNa7HedJjAn60d37OJ6vNH+D4mqRQMVNhbtncNlAg36imAttCWsjYcAPh16UZWe0gDuJNt9ziCZdLzvqb03P1LNeki25MIgN6IrI9sv/ocI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709772827; c=relaxed/simple;
-	bh=kL//jgPDiFCIqsbXAwIf6piqMB/VEIeEGVOQr6c+ZM4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oC+3gq2/AtjmYgF78mRdANJircoGpYKrp7eHbtbpz9PcTbMkhAJsIQvoTZOfunT11JY7ju+DwTdFLKq2dN0FdQWxobZI5suGlieMcT0nIbR90C3F7TtJpuvoZX160x29g6FAL3O3yApV7oSUi0I+VrV1bluNDleWObW93r3TB60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TtcZ+CDC; arc=none smtp.client-ip=209.85.215.170
+	s=arc-20240116; t=1709772828; c=relaxed/simple;
+	bh=5a/K4Sl1FUS7oq60ekNERF2iXFSv3DJI7QNsBj3/nFc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=i10j2DsoFQsiGebxOjfVtm70pq6AdvCS35NGbNzA756SLIxJi+CYEQlLTShoDDeCun65IfDoDoLleAdgcZEEJTrXhZoGkCjf/CYfaYADhNz6cRBE9sMtA9WVIJO2uWiM13A+ZMYCSi3GQn0PDHgmvObUgm/QdXGF0Fp96dkWZSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qYL/uWqR; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5e42b4bbfa4so213876a12.1
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5cec8bc5c66so229311a12.1
         for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 16:53:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20230601; t=1709772826; x=1710377626; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XTftWjXZw94q4+F4f8emI0lnL+iz/nWWwkVmzB+hhvg=;
-        b=TtcZ+CDCKB1Vx+33z3GuAGYZCgGj59wyGBC82V6x4qn7ROFFNPTs1N7BIatU97Kkjf
-         DLvisLUDt/ahDaOs0if6mBGQf/l9u1NirKnivUyjIg1uDCT0ujqGoL/lF6zQf510/LSH
-         Ii26hgHk7X8iPgbUS35oNF+vbcbDZOTDnSOZvfFUC9x4/ZHTv8Li0k13YTRr8WjKQp0g
-         VoySSAS60qGVnwJR4CBt+eXOZyi5Pla55k6CT5vpsrIhs7YgFbeXu/aZ6n0xAXpRAdsU
-         MceSh767nr9kpR5ADVk9Ksh8KAQKLwkDOjivoF4++LJKlzNoTxLVGGDBGG0qkRa3Cwv0
-         4lzA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=13JM4dn5oLawZvcGqOUh0FKLknmM5OO13+s6TUK67SM=;
+        b=qYL/uWqRYfRXAJCaIezmM3j9JaQzznvy1x4cB/7jYWaQM/h/yWFYb8rs31WNLR2ctW
+         QHl0RR/XxPo8It0EGAZwBUlzkrZNW3nJD4A/2ffQyz1496f1UPjP5cloclVw37uEh8tW
+         e/rTbTn4ngCckwNj/h99lw4qKAkZbjmGmqiXDMUrh60ScTeD5E+7Ndow1dxzuje7J9ob
+         WDBTWnwdVlpXYmw2vTQEI2GN22lEV1X7yyibD0CiwvubtAF/LdCW5cRswK/DhR9A2hjR
+         +65vy4E3ZM32hNQaeN8riR57P4M/0K5lfrhZbN/jqTUjaX77mba+CtCfHJWewMR9ov5T
+         SzDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1709772826; x=1710377626;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XTftWjXZw94q4+F4f8emI0lnL+iz/nWWwkVmzB+hhvg=;
-        b=mwzgqlxs9wvqiU4W6DthrpHBgk9sgTFPOl4gpptR8VLjy/EZmoad3AIRPm6fKTNl0R
-         NiZ6L07jmR9a+VOLEdkzjjNlB6xQ2O29Cim5VMaL0D/PEEigLWiXpMeYyrsoBpsdiHXa
-         bRRhF/QJDqLPTWDOuNsLIaaFoS9KzoXVCfcpum9nRav/f6SIoUHORwS6vCGIZNC2EtGH
-         eIdHJPDI0GPyKala2l4yUlrw6A425dAEBwYN86Zx4uIh2QysJFSe3AcA0RxjKJeuoD7s
-         xPQAV7jYyCBq9E2avnxIONTSitbUdUv3LgyIyQcbNV1yngW5Ww8E7S3ugf0YaCRMW9ap
-         +jwQ==
-X-Gm-Message-State: AOJu0YwD7gRmBgglMuk2WqgOhfI8ynY+RLfFIxzYmdkYTilfWWGeTnmk
-	2eVAHUQXexxY1EwITcfcLeOW9UY+ObKoa8/+oNzbscBOcNcAwOi0WXE2yCnn0Q==
-X-Google-Smtp-Source: AGHT+IGAn1fdYlbImKRNZc/GrCx7mEmPc71V+M4i5UOui2PzT3x/GBReTpx2caiH9qy7SvCNMsgKBQ==
-X-Received: by 2002:a05:6a20:1a90:b0:1a1:44f9:cbf3 with SMTP id ci16-20020a056a201a9000b001a144f9cbf3mr5188857pzb.57.1709772825580;
-        Wed, 06 Mar 2024 16:53:45 -0800 (PST)
-Received: from google.com (61.139.125.34.bc.googleusercontent.com. [34.125.139.61])
-        by smtp.gmail.com with ESMTPSA id m2-20020a170902db0200b001dcf91da5c8sm9398420plx.95.2024.03.06.16.53.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 16:53:45 -0800 (PST)
-Date: Wed, 6 Mar 2024 16:53:41 -0800
-From: David Matlack <dmatlack@google.com>
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, isaku.yamahata@gmail.com,
-	linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Federico Parola <federico.parola@polito.it>
-Subject: Re: [RFC PATCH 0/8] KVM: Prepopulate guest memory API
-Message-ID: <ZekQFdPlU7RDVt-B@google.com>
-References: <cover.1709288671.git.isaku.yamahata@intel.com>
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=13JM4dn5oLawZvcGqOUh0FKLknmM5OO13+s6TUK67SM=;
+        b=Lba7ATtilPRrLV09lfuUFU6FJrSHcTc2dfLGwCj+JqqQkjsMzL8x6Ja6Gzwsc+aPOM
+         m/kypz/oD9+lMaWKaQtv9WHuLZf9/ewjEN6b8iY87xghFFSVFwZc3gww6o+nNIu72gvz
+         ZsZXaNvpyIzhYLX6GfxyYIxb/xtJrQe9B7Ch9ExwMIwfQVaXbiN0SvmFO4zLBlZZ/85B
+         KYFe36hJZJadFcTnrnCN+D32EafUU90zG770D3zzXN5p4fa7s37Rq5cWDGN1wnhfy3Ri
+         jyZBow4U/4fIzGRu0JowDqNVlnpmd8/+hL8MstG3a6y1hD6mq7lKbYMs44ArE8+KY4tq
+         S1UA==
+X-Forwarded-Encrypted: i=1; AJvYcCWxo3o4FgaAaI52oBhbkRaHhMqkaixnOJJH0Jdo1qvkCr+2Gecz/n4WkGzwQiSTX1Lh/kgDEpMTn+keWEh1AzWR3+Sk
+X-Gm-Message-State: AOJu0YzdIKZsLx3PqC1x2wg91W5KwkYI9hkcmlWazTNLkcOnoWwG6gG7
+	Y+LZ5Z9nO4l2eED5tN6sP+LJ4UlQ6NDBLyIg9L+FuKqQy23GLi8vddq+22YcO0hmU6/R2Yfn48d
+	UYQ==
+X-Google-Smtp-Source: AGHT+IEOis2Z/A2Rk3zVzgay5WAqcSG5X9JevTM43hdYFp0yDzRzI+2V1NgOIQ2StNbL0Xtfu4AKG73nMbc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:b8b:b0:5e4:5fba:17e with SMTP id
+ dh11-20020a056a020b8b00b005e45fba017emr42501pgb.4.1709772825909; Wed, 06 Mar
+ 2024 16:53:45 -0800 (PST)
+Date: Wed, 6 Mar 2024 16:53:43 -0800
+In-Reply-To: <d325e811-c80d-49ba-85cf-06893cec659a@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1709288671.git.isaku.yamahata@intel.com>
+Mime-Version: 1.0
+References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-14-seanjc@google.com>
+ <d325e811-c80d-49ba-85cf-06893cec659a@intel.com>
+Message-ID: <ZekQF9MlVzlgleq7@google.com>
+Subject: Re: [PATCH 13/16] KVM: x86/mmu: Handle no-slot faults at the
+ beginning of kvm_faultin_pfn()
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 2024-03-01 09:28 AM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Thu, Mar 07, 2024, Kai Huang wrote:
 > 
-> Implementation:
-> - x86 KVM MMU
->   In x86 KVM MMU, I chose to use kvm_mmu_do_page_fault().  It's not confined to
->   KVM TDP MMU.  We can restrict it to KVM TDP MMU and introduce an optimized
->   version.
+> 
+> On 28/02/2024 3:41 pm, Sean Christopherson wrote:
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -235,7 +235,7 @@ struct kvm_page_fault {
+> >   	/* The memslot containing gfn. May be NULL. */
+> >   	struct kvm_memory_slot *slot;
+> > -	/* Outputs of kvm_faultin_pfn.  */
+> > +	/* Outputs of kvm_faultin_pfn. */
+> >   	unsigned long mmu_seq;
+> >   	kvm_pfn_t pfn;
+> >   	hva_t hva;
+> 
+> ... how about get rid of this non-related fix?
 
-Restricting to TDP MMU seems like a good idea. But I'm not quite sure
-how to reliably do that from a vCPU context. Checking for TDP being
-enabled is easy, but what if the vCPU is in guest-mode?
-
-Perhaps we can just return an error out to userspace if the vCPU is in
-guest-mode or TDP is disabled, and make it userspace's problem to do
-memory mapping before loading any vCPU state.
+Eww, yeah, I'll drop it.  I originally had code that made the outputs valid if
+and only if @slot was non-null, and had updated the comment accordingly, but
+ended up going a different route and cleaned up the comment a little too well :-)
 
