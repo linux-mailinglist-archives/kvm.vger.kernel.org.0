@@ -1,242 +1,265 @@
-Return-Path: <kvm+bounces-11292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 793FD874D0D
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 12:10:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D3F9874D52
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 12:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CDD0283499
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 11:10:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E87EF1F25B6F
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 11:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DEE085273;
-	Thu,  7 Mar 2024 11:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE851128836;
+	Thu,  7 Mar 2024 11:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sg8YeDUm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hdE/SuqN"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74FF127B7C;
-	Thu,  7 Mar 2024 11:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3372D5FDD5
+	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 11:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709809845; cv=none; b=YspgX0rTYah1WNmskHizDOWcB5xw7dmz6vqcORR8i95a2zOLgT8yQO7nnzE2VlVnHRnKnBQtiM+d5CebAd9UqGvVs94RYKJvJZJ0QC43EMtxpF5O8Fi7gnoanTU8JMDHwfOkjo6jWk15/A5fCzD7lD8j0wag7nECK9IVu6ADh60=
+	t=1709810664; cv=none; b=rXhC+w2Npsb4btXesbC/ykZumF8VrQicoZMD6G5hH0XXESF5cNX9qYzelHifzDA37iQ3P5GOhft7ET85a7IoAoRUy4rg0Zi0x8njIU+29nH8PCq8+fkrllMCgSuItd/9O6wnRYUJeXSVkz8h7t7QtKv+4ca+aWd1iX0if8qgBKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709809845; c=relaxed/simple;
-	bh=TYL2VXcJsX0IXYej7YEq+AZLx+ZRvw4xRl9UAvuFn2c=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b/UfCEcTcXcbjw9vQ+xi9/IcG+EAWueZbNKfmLBva0HfBz66h0sOdiqooiybOO7hUBqZeK5M2SVpt72Ezdkkixl2obdZH1kUgguSBkBBdX8fO/D1PROeB/Yinr3iOzgitgUu0tZN5lOlp1JLpwpxM8MueS1bumo3QFicJ5WW+gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sg8YeDUm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3240DC433C7;
-	Thu,  7 Mar 2024 11:10:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709809845;
-	bh=TYL2VXcJsX0IXYej7YEq+AZLx+ZRvw4xRl9UAvuFn2c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Sg8YeDUmmwuUIJRbuzkUkqY8dkFdcEVcRM6Sr5SV1qhSlr4wfLAMPG5yZf7WH/K2x
-	 x1VwbOtCiF08hR8ClKCQDVNBQav3fgN9E/1JW/27txBU7HNBUwpXaqdmQV7xtlYcD3
-	 usS1zeVkMKIpmvcATz8zlSmgE3TRKETXDzmZZjMO9he2MKAyHSeL8V+VYUpSR3COcb
-	 mwkEr9P7QD1x8IRf2iIM/sqC+S+WVuD7zzZbKfjjOr9XLKtDGXGnOeIxNnQijZnSIK
-	 GXFECGl93EXSpcKtbDTObn9U9hDvb3WISf5yC4kDh8x/RtpTSvjcpctyGXbz3xa6MG
-	 57xfrH+5HYq1g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1riBe5-00AGAv-RT;
-	Thu, 07 Mar 2024 11:10:41 +0000
-Date: Thu, 07 Mar 2024 11:10:40 +0000
-Message-ID: <86msra1emn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
-In-Reply-To: <a8416451-011c-4159-b9e4-b492b81f5a2c@sirena.org.uk>
-References: <20240302111935.129994-1-maz@kernel.org>
-	<20240302111935.129994-6-maz@kernel.org>
-	<6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
-	<87edcnr8zy.wl-maz@kernel.org>
-	<a8416451-011c-4159-b9e4-b492b81f5a2c@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1709810664; c=relaxed/simple;
+	bh=eKQJMp2KjcRGiZeV5u89MH7FjELomniIJ5L02BqxnT8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HglTDXTe25kfWolUbW5FDDPasxYrlil6k9UqLzCP88PA19C2yJr5jv+EwVmtaJ0ra6EctE/Vq9Y3oqfoCkMrItV7JO6Et8S1DRNGG8kNQSji7anQ8nQS7MT9lCOJZmWNbD4hwK0HlPgFfihfr+jiIL7h7J+P973bYL2c2hhUqxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hdE/SuqN; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709810662; x=1741346662;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=eKQJMp2KjcRGiZeV5u89MH7FjELomniIJ5L02BqxnT8=;
+  b=hdE/SuqN2L2C/IAitvbmnl/GtrbOnzTCDaZOAtfU04rqi2v0fZ4shqE5
+   EDVqnO9FRclV1GuVaYo8NVaQeVs5iCh8w8R5YBA9aqIWuf3N2GdgGV83U
+   BdJUZZ4wCcsfdqDzon69T1djrlc+Zy050HeDy6vTArh/dwk8XqVvchlx4
+   dbYDzkloruLAggxFl3Y5/X/KDMtQbrgClpwLJ6zDtnQoc4DdXFr9SV50Q
+   QjETaAUB+5Dyjc4uasDAyvFMExQvnDIW4oOSFlLKesTPKaFyoREykOw8K
+   pU/4f4TwBiMaIUPAsG6GdYm0GGsO5P0aH8zYtUO3q36iWRZHDhMiFz8Xb
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="4327515"
+X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
+   d="scan'208";a="4327515"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 03:24:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
+   d="scan'208";a="10527562"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 03:24:08 -0800
+Message-ID: <0f3df4b7-ffb9-4fc5-90eb-8a1d6fea5786@intel.com>
+Date: Thu, 7 Mar 2024 19:24:04 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 30/65] i386/tdx: Support user configurable
+ mrconfigid/mrowner/mrownerconfig
+Content-Language: en-US
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
+ <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, Michael Roth <michael.roth@amd.com>,
+ Claudio Fontana <cfontana@suse.de>, Gerd Hoffmann <kraxel@redhat.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20240229063726.610065-1-xiaoyao.li@intel.com>
+ <20240229063726.610065-31-xiaoyao.li@intel.com> <87edcv1x9j.fsf@pond.sub.org>
+ <f9774e89-399c-42ad-8fa8-dd4050ee46da@intel.com>
+ <871q8vxuzx.fsf@pond.sub.org>
+ <4602df24-029e-4a40-bdec-1b0a6aa30a3c@intel.com>
+ <87v85yv3j9.fsf@pond.sub.org>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <87v85yv3j9.fsf@pond.sub.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 06 Mar 2024 22:19:03 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On 3/7/2024 4:39 PM, Markus Armbruster wrote:
+> Xiaoyao Li <xiaoyao.li@intel.com> writes:
 > 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Wed, Mar 06, 2024 at 09:43:13AM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> > > On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
+>> On 2/29/2024 9:25 PM, Markus Armbruster wrote:
+>>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>>>
+>>>> On 2/29/2024 4:37 PM, Markus Armbruster wrote:
+>>>>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>>>>>
+>>>>>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>>>>
+>>>>>> Three sha384 hash values, mrconfigid, mrowner and mrownerconfig, of a TD
+>>>>>> can be provided for TDX attestation. Detailed meaning of them can be
+>>>>>> found: https://lore.kernel.org/qemu-devel/31d6dbc1-f453-4cef-ab08-4813f4e0ff92@intel.com/
+>>>>>>
+>>>>>> Allow user to specify those values via property mrconfigid, mrowner and
+>>>>>> mrownerconfig. They are all in base64 format.
+>>>>>>
+>>>>>> example
+>>>>>> -object tdx-guest, \
+>>>>>>      mrconfigid=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v,\
+>>>>>>      mrowner=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v,\
+>>>>>>      mrownerconfig=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v
+>>>>>>
+>>>>>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>>>> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>> [...]
+>>>
+>>>>>> diff --git a/qapi/qom.json b/qapi/qom.json
+>>>>>> index 89ed89b9b46e..cac875349a3a 100644
+>>>>>> --- a/qapi/qom.json
+>>>>>> +++ b/qapi/qom.json
+>>>>>> @@ -905,10 +905,25 @@
+>>>>>>    #     pages.  Some guest OS (e.g., Linux TD guest) may require this to
+>>>>>>    #     be set, otherwise they refuse to boot.
+>>>>>>    #
+>>>>>> +# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
+>>>>>> +#     e.g., run-time or OS configuration (base64 encoded SHA384 digest).
+>>>>>> +#     (A default value 0 of SHA384 is used when absent).
+>>>>>
+>>>>> Suggest to drop the parenthesis in the last sentence.
+>>>>>
+>>>>> @mrconfigid is a string, so the default value can't be 0.  Actually,
+>>>>> it's not just any string, but a base64 encoded SHA384 digest, which
+>>>>> means it must be exactly 96 hex digits.  So it can't be "0", either.  It
+>>>>> could be
+>>>>> "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000".
+>>>>
+>>>> I thought value 0 of SHA384 just means it.
+>>>>
+>>>> That's my fault and my poor english.
+>>>
+>>> "Fault" is too harsh :)  It's not as precise as I want our interface
+>>> documentation to be.  We work together to get there.
+>>>
+>>>>> More on this below.
+>>>>>
+>>>>>> +#
+>>>>>> +# @mrowner: ID for the guest TD’s owner (base64 encoded SHA384 digest).
+>>>>>> +#     (A default value 0 of SHA384 is used when absent).
+>>>>>> +#
+>>>>>> +# @mrownerconfig: ID for owner-defined configuration of the guest TD,
+>>>>>> +#     e.g., specific to the workload rather than the run-time or OS
+>>>>>> +#     (base64 encoded SHA384 digest). (A default value 0 of SHA384 is
+>>>>>> +#     used when absent).
+>>>>>> +#
+>>>>>>    # Since: 9.0
+>>>>>>    ##
+>>>>>>    { 'struct': 'TdxGuestProperties',
+>>>>>> -  'data': { '*sept-ve-disable': 'bool' } }
+>>>>>> +  'data': { '*sept-ve-disable': 'bool',
+>>>>>> +            '*mrconfigid': 'str',
+>>>>>> +            '*mrowner': 'str',
+>>>>>> +            '*mrownerconfig': 'str' } }
+>>>>>>    ##
+>>>>>>    # @ThreadContextProperties:
+>>>>>> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+>>>>>> index d0ad4f57b5d0..4ce2f1d082ce 100644
+>>>>>> --- a/target/i386/kvm/tdx.c
+>>>>>> +++ b/target/i386/kvm/tdx.c
+>>>>>> @@ -13,6 +13,7 @@
+>>>>>>    #include "qemu/osdep.h"
+>>>>>>    #include "qemu/error-report.h"
+>>>>>> +#include "qemu/base64.h"
+>>>>>>    #include "qapi/error.h"
+>>>>>>    #include "qom/object_interfaces.h"
+>>>>>>    #include "standard-headers/asm-x86/kvm_para.h"
+>>>>>> @@ -516,6 +517,7 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+>>>>>>        X86CPU *x86cpu = X86_CPU(cpu);
+>>>>>>        CPUX86State *env = &x86cpu->env;
+>>>>>>        g_autofree struct kvm_tdx_init_vm *init_vm = NULL;
+>>>>>> +    size_t data_len;
+>>>>>>        int r = 0;
+>>>>>>        object_property_set_bool(OBJECT(cpu), "pmu", false, &error_abort);
+>>>>>> @@ -528,6 +530,38 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+>>>>>>        init_vm = g_malloc0(sizeof(struct kvm_tdx_init_vm) +
+>>>>>>                            sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
+>>>>>> +#define SHA384_DIGEST_SIZE  48
+>>>>>> +
+>>>>>> +    if (tdx_guest->mrconfigid) {
+>>>>>> +        g_autofree uint8_t *data = qbase64_decode(tdx_guest->mrconfigid,
+>>>>>> +                              strlen(tdx_guest->mrconfigid), &data_len, errp);
+>>>>>> +        if (!data || data_len != SHA384_DIGEST_SIZE) {
+>>>>>> +            error_setg(errp, "TDX: failed to decode mrconfigid");
+>>>>>> +            return -1;
+>>>>>> +        }
+>>>>>> +        memcpy(init_vm->mrconfigid, data, data_len);
+>>>>>> +    }
+>>>>>
+>>>>> When @mrconfigid is absent, the property remains null, and this
+>>>>> conditional is not executed.  init_vm->mrconfigid[], an array of 6
+>>>>> __u64, remains all zero.  How does the kernel treat that?
+>>>>
+>>>> A all-zero SHA384 value is still a valid value, isn't it?
+>>>>
+>>>> KVM treats it with no difference.
+>>>
+>>> Can you point me to the spot in the kernel where mrconfigid is used?
+>>
+>> https://github.com/intel/tdx/blob/66a10e258636fa8ec9f5ce687607bf2196a92341/arch/x86/kvm/vmx/tdx.c#L2322
+>>
+>> KVM just copy what QEMU provides into its own data structure @td_params. The format @of td_params is defined by TDX spec, and @td_params needs to be passed to TDX module when initialize the context of TD via SEAMCALL(TDH.MNG.INIT): https://github.com/intel/tdx/blob/66a10e258636fa8ec9f5ce687607bf2196a92341/arch/x86/kvm/vmx/tdx.c#L2450
+>>
+>>
+>> In fact, all the three SHA384 fields, will be hashed together with some other fields (in td_params and other content of TD) to compromise the initial measurement of TD.
+>>
+>> TDX module doesn't care the value of td_params->mrconfigid.
 > 
-> > > > Move the ownership tracking into the host data structure, and
-> > > > rename it from fp_state to fp_owner, which is a better description
-> > > > (name suggested by Mark Brown).
+> My problem is that I don't understand when and why users would omit the
+> optional @mrFOO.
+
+When users don't care it and don't have an explicit value for them, they 
+can omit it. Then a default all-zero value is used.
+
+If making it mandatory field, then users have to explicit pass a 
+all-zero value when they don't care it.
+
+> I naively expected absent @mrFOO to mean something like "no attestation
+> of FOO".
 > 
-> > > The SME patch series proposes adding an additional state to this
-> > > enumeration which would say if the registers are stored in a format
-> > > suitable for exchange with userspace, that would make this state part of
-> > > the vCPU state.  With the addition of SME we can have two vector lengths
-> > > in play so the series proposes picking the larger to be the format for
-> > > userspace registers.
+> But I see that they default to
+> "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000".
 > 
-> > What does this addition have anything to do with the ownership of the
-> > physical register file? Not a lot, it seems.
+> If this zero value is special and means "no attestation", then we
+> accidentally get no attestation when whatever is being hashed happens to
+> hash to this zero value.  Unlikely, but possible.
 > 
-> > Specially as there better be no state resident on the CPU when
-> > userspace messes up with it.
+> If it's not special, then when and why is the ability to omit it useful?
 > 
-> If we have a situation where the state might be stored in memory in
-> multiple formats it seems reasonable to consider the metadata which
-> indicates which format is currently in use as part of the state.
+At some point, the zero value is special, because it is the default 
+value if no explicit one provided by user. But for TDX point of view, it 
+is not special. The field is a must for any TD, and whatever value it 
+is, it will be hashed into MRTD (Build-time Measurement Register) for 
+later attestation.
 
-There is no reason why the state should be in multiple formats
-*simultaneously*. All the FP/SIMD/SVE/SME state is largely
-overlapping, and we only need to correctly invalidate the state that
-isn't relevant to writes from userspace.
+TDX architecture defines what fields are always hashed into measurement 
+and also provide other mechanism to hash optional field into 
+measurement. All this is known to users of TDX, and users can calculate 
+the final measurement by itself and compare to what gets reported by TDX 
+to see they are identical.
 
-> 
-> > > We could store this separately to fp_state/owner but it'd still be a
-> > > value stored in the vCPU.
-> 
-> > I totally disagree.
-> 
-> Where would you expect to see the state stored?
+For these three fields, they are must-to-have fields to be hashed into 
+measurement. For user's convenience, we don't want to make it mandatory 
+input because not everyone cares it and have a specific value to input.
+What people needs to know is that, when no explicit value is provided 
+for these three field, a all-zero value is used.
 
-Sorry, that came out wrong. I expect *some* vcpu state to describe the
-current use of the FP/vector registers, and that's about it. Not the
-ownership information.
 
-> 
-> > > Storing in a format suitable for userspace
-> > > usage all the time when we've got SME would most likely result in
-> > > performance overhead
-> 
-> > What performance overhead? Why should we care?
-> 
-> Since in situations where we're not using the larger VL we would need to
-> load and store the registers using a vector length other than the
-> currently configured vector length we would not be able to use the
-> ability to load and store to a location based on a multiple of the
-> vector length that the architecture has:
-> 
->    LDR <Zt>, [<Xn|SP>{, #<imm>, MUL VL}]
->    LDR <Pt>, [<Xn|SP>{, #<imm>, MUL VL}]
->    
->    STR <Zt>, [<Xn|SP>{, #<imm>, MUL VL}]
->    STR <Pt>, [<Xn|SP>{, #<imm>, MUL VL}]
-> 
-> and would instead need to manually compute the memory locations where
-> values are stored.  As well as the extra instructions when using the
-> smaller vector length we'd also be working with sparser data likely over
-> more cache lines.
-
-Are you talking about a context switch? or userspace accesses? I don't
-give a damn about the latter, as it statistically never happens. The
-former is of course of interest, but you still don't explain why the
-above is a problem.
-
-Nothing prevent you from storing the registers using the *current* VL,
-since there is no data sharing between the SVE registers and the
-streaming-SVE ones. All you need to do is to make sure you don't mix
-the two.
-
-> We would also need to consider if we need to zero the holes in the data
-> when saving, we'd only potentially be leaking information from the guest
-> but it might cause nasty surprises given that transitioning to/from
-> streaming mode is expected to zero values.  If we do need to zero then
-> that would be additional work that would need doing.
-
-The zeroing is mandated by the architecture, AFAIU. That's not optional.
-
-> 
-> Exactly what the performance hit would be will be system and use case
-> dependent.  *Hopefully* we aren't needing to save and load the guest
-> state too often but I would be very surprised if we didn't have people
-> considering any cost in the guest context switch path worth paying
-> attention to.
-
-These people can come out of the wood with numbers and reproducible
-workloads. Until they do, their concerns do not really exist.
-
-> As well as the performance overhead there would be some code complexity
-> cost, if nothing else we'd not be using the same format as fpsimd_save()
-> and would need to rearrange how we handle saving the register state.
-
-And I'm fine with that. The way we store things is nobody's business
-but ours, and I'm not sentimentally attached to 15 year old code.
-
-> Spending more effort to implement something which also has more runtime
-> performance overhead for the case of saving and restoring guest state
-> which I expect to be vastly more common than the VMM accessing the guest
-> registers just doesn't seem like an appealing choice.
-
-I don't buy the runtime performance aspect at all. As long as you have
-the space to dump the largest possible VL, you can always dump it in
-the native format.
-
-> > > if nothing else and feels more complicated than
-> > > rewriting the data in the relatively unusual case where userspace looks
-> > > at it.  Trying to convert userspace writes into the current layout would
-> > > have issues if the current layout uses the smaller vector length and
-> > > create fragility with ordering issues when loading the guest state.
-> 
-> > What ordering issues? If userspace manipulates the guest state, the
-> > guest isn't running. If it is, all bets are off.
-> 
-> If we were storing the data in the native format for the guest then that
-> format will change if streaming mode is changed via a write to SVCR.
-> This would mean that the host would need to understand that when writing
-> values SVCR needs to be written before the Z and P registers.  To be
-> clear I don't think this is a good idea.
-
-The architecture is crystal clear: you flip SVCR.SM, you loose all
-data in both Z and P regs. If userspace doesn't understand the
-architecture, that's their problem. The only thing we need to provide
-is a faithful emulation of the architecture.
-
-> 
-> > > The proposal is not the most lovely idea ever but given the architecture
-> > > I think some degree of clunkiness would be unavoidable.
-> 
-> > It is only unavoidable if we decide to make a bad job of it.
-> 
-> I don't think the handling of the vector registers for KVM with SME is
-> something where there is a clear good and bad job we can do - I don't
-> see how we can reasonably avoid at some point needing to translate
-> vector lengths or to/from FPSIMD format (in the case of a system with
-> SME but not SVE) which is just inherently a sharp edge.  It's just a
-> question of when and how we do that.
-
-My point is that there is no reason to translate the vector registers.
-As long as your vcpu is in a given mode, all storage is done in that
-mode. You switch mode, you lose data, as per the architecture. And
-yes, there is some zeroing and invalidation to perform if the vcpu has
-switched mode behind your back.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
