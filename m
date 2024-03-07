@@ -1,363 +1,228 @@
-Return-Path: <kvm+bounces-11298-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11299-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 612E9874E7D
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 13:02:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE227874F0E
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 13:30:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16343282B7F
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 12:02:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DFFF1C243E1
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 12:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47B2129A7B;
-	Thu,  7 Mar 2024 12:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3631CA97;
+	Thu,  7 Mar 2024 12:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fN4mYmbG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gMoyjo6R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D79B26AF5;
-	Thu,  7 Mar 2024 12:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709812958; cv=none; b=r8M+mR39Uba+nuL/5RYv4qqD/pn0VCn+Muu2iR7cxzugjuDXoIx9sGFx4S2088Fq2jELe8A1p4sOUzcONsSTTQC960MVVGyskS7nh6WhLVLgwoCgrvcpTiB2lt1EQA4QLioadeNgOGRjwCRBE8fzKak3PW9gXhgUWUn/ISB3AH0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709812958; c=relaxed/simple;
-	bh=jq/yLDCr7ooLKZzMBxV6A1cyASSSs5RmVDgW+iMhRus=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PJ6ob/OZ4txTY8/f+qIWURPUxugZButblxOVhOiwbDehhfiam1bTuugtcan492Fh3bKrLhS2jUVfX2d8neM8/5iF8xZemZyyAQS/mRvEi6MVt9u+0m/YULMGwwkhi81n/OxLNhXr6PgneCKeErt4E0WVkBWbGOFg5foxvuNVOJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fN4mYmbG; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1dc1ff3ba1aso6130845ad.3;
-        Thu, 07 Mar 2024 04:02:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709812956; x=1710417756; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=32Xd4vG74gCf71WpQP/SsM5wd+5XoWj9D9vwMONqJCc=;
-        b=fN4mYmbG2i0xNRMxIIcGoAWlg2B43XitFsmZxJUsTmuEnvlsPgqDkjBn4+NShLCohj
-         GvVZuaBezGscjLVwOFOuhJVFHmAtme640fq+SC25gy07QgIQkCACzbFHblnFglkIcW2D
-         N1c9inexH+ke7AtuzUx70d2tiRXDQd7L7K+ObrdghqCnbCaM23zRwXxgQnDDODIj+XTt
-         UiyOoDb13OLmu6wly/a8Qmwq8a/B9zqWoxAoQq83xnrC8tkR1w9xKfIJ+JXBMtXjv9lU
-         mTzmQm/37aQ0gKkIS/XnBFRabPTWRLzN2fOE59YHsmZgCfBMfCXg68FrKvf5KHnR+sM4
-         qObA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709812956; x=1710417756;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=32Xd4vG74gCf71WpQP/SsM5wd+5XoWj9D9vwMONqJCc=;
-        b=WpfVnNbRKgh1V4uLwN9Q1qjmZMmkOh45+nxSoLIeyAz5cIUVlFdjGHPG2UO6r1onpr
-         ZWZbfGpT/UZWvsxBtEzGF5Edf9QiRSHe5PYktR4Fo/bOnJbDFXFlsY9L68NBZKhDAiDw
-         52scbJrUFM6BpduHS0Y228SxvMtxj4Rem52xVnTQu2kh2WijeFihz3oaFgsnxT8U7nop
-         5IdFPjI1XwF+0O+gySE8HjagwmxfS7lKFfXQr9X37da0nPaXiNUWjNnstv0qHh+K0Q4G
-         Q9syti44qhPRODg0FfTgRKFEqk7Y3DZv1y6KhUArvyhtXDPblZf8gE9hp7Hi2yyYC5M9
-         ebDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVDAAfw6EK6bSJr2dntk212BueujseISHh8Ls4k8EeY+qdIYSLYsPUfk8TlWwKUlkkIVTMkXitL6n1rSSRapfdvUMLxs4IdSfu5eK08n8rO3znn70WNFgxUgGtd6/+1yydVUOoBcmEIWZl4B2XtmubF8xCv8EMMkhoZYoRQWrViV+tQ1A==
-X-Gm-Message-State: AOJu0YxeQzpQJ8w6Ebsih4s1US7Xeve5Yl5va1+6cBi06AlJHgRM0UAW
-	Vjmv93ljvHvzkFyGK5nC1wnRr4UFkowq+WQTQlrSb7kqy1v+NXax
-X-Google-Smtp-Source: AGHT+IHO2Tcyyo8b0ZOJtzXB28nrZnzZtAvNHlbs5a0WFXDRKhBQ87TY3wNqV65CXNKXG6lMakSUqQ==
-X-Received: by 2002:a17:902:e544:b0:1db:7195:5fca with SMTP id n4-20020a170902e54400b001db71955fcamr9330350plf.34.1709812956086;
-        Thu, 07 Mar 2024 04:02:36 -0800 (PST)
-Received: from [192.168.255.10] ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id p24-20020a170903249800b001dbcfb4766csm14396800plw.226.2024.03.07.04.02.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Mar 2024 04:02:32 -0800 (PST)
-Message-ID: <8548ea3c-7ec6-4027-927f-fce9bbd5e6a3@gmail.com>
-Date: Thu, 7 Mar 2024 20:02:27 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F72846C;
+	Thu,  7 Mar 2024 12:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709814610; cv=fail; b=XkOWqnDUajCpo55SZtkelV6cFqgAiaSCWIJo776g5q80PrpdmWp2RDVg1Gwj4OaYRF4EHYbtwWIqEt45cea53IcDHgrFZjzGe6jvST79fTVt91fZWjtB63f8qTzwEjU0zsIDP9iqiIAU0V1T36cjpsz9GvsoPxabdpAuzTfolB4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709814610; c=relaxed/simple;
+	bh=rik+6+4z2BM8YkqH3+O/aGSK/GJZxVI4ZUCpgp+trz8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=p3vZsK7+n8ryHyhiru7DK+EYdXfEUXuAvx1Hj/mcBsuUKMNffvCpwXV9Twk1QmSEGAfod0k4ylb9n13ORzG5Sb+Pfk9MdcW0nKiQfDfoyn1dy1h3G1nfDBb/1sqEapjmtjtYdt9B1VtrbJRT7vjYzxpvfwIQoVyOHy4pYxHhJWI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gMoyjo6R; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709814608; x=1741350608;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=rik+6+4z2BM8YkqH3+O/aGSK/GJZxVI4ZUCpgp+trz8=;
+  b=gMoyjo6R6GrB3++o+OlrxHlB36D0ghsXZsjw9sThEmGplXWk7P2mwqBG
+   jxpcixi7cJkjOKVDr3sx2ovU9rITH4O50beUiiiJjhcUC10b1L3yeGWKl
+   tZYxvcHGVpVhPO26bstjPEDKpChBukPP9geemni990o1+HPkFstELhGth
+   YREBAscPodSfSoDOWmXt6Nf/jHm26Lrxy1Bg2RdFmdf/o1zDY1H89E88y
+   tXGn1pdtENO8nrJdtNQiTAgzTrCJ1ztYwB8a2HPAIqmpvx6vCNXspcepQ
+   WF0JW3FVGywjkFVjH6RDBHW+HEX1cDJ0Adk0LxlrJqK8TsjvD9j0h4Z2i
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="4409054"
+X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
+   d="scan'208";a="4409054"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 04:30:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
+   d="scan'208";a="14696753"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Mar 2024 04:30:07 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 7 Mar 2024 04:30:06 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 7 Mar 2024 04:30:06 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Mar 2024 04:30:06 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l3NbHPj1HKs0ro/sUfGhOziPJm+oLI0I74yvZLUn+WliqpQwpZ6aK69ZJD/Ppu6Gwv9Vdh8hHP+zoDdDPloWYSArgxNhGbgrDnT7IAehRVkxxGCQTpd8XCRog0YGBO/6hd14bk++JyK5qBxKQHaRz9ltpC1z4ZmFPGtUu/Vm/elN0HBqTchOd8/skzG7qkmxeMbNPfP/ggetuXP4z45nRSp3u0Ty+vRSQVb/mhM6q9KHA2XGHEoXHjZPZfXpFzmYmpvT2PAdCa/lEfgTfvWV2KUF5wIaksR7COYilBLJx6mxIxTibHnURuMPMdQMuu29QJFcHj7dKbcHts/6mw9PmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rik+6+4z2BM8YkqH3+O/aGSK/GJZxVI4ZUCpgp+trz8=;
+ b=NsoLUJrqD7c1zVy4G+Kh5wvumYok7GPpKkldXw6EOhg60zZiqOfJXXX6q+333hjLaMghgzBT/Rb6QjuXcXDCqTbsskOd6Lvx1BLYQNNvn8BoDK8p0gwW/njGGwRIhh+xg7XSC2FIckAwtRMvHGAW6bBORFcc9zX89FgBRKK1+rVAml1//MH/qDpUmoOkawfl3vTFo1g9101agkw9RyZmPcDEd6yE7i8lxmqaFJQGrE62a3njzuTk7hSjDtmyekGMWAjzyyxO08u37lefFNEP0awB1uZfVnYy2ApahKRPsYZh9sH9mFwa9fA5Hlsl+hed7bY4WkL9RtdX72N4JqmJKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH0PR11MB5077.namprd11.prod.outlook.com (2603:10b6:510:3b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.6; Thu, 7 Mar
+ 2024 12:30:04 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7362.019; Thu, 7 Mar 2024
+ 12:30:04 +0000
+From: "Huang, Kai" <kai.huang@intel.com>
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Yamahata, Isaku"
+	<isaku.yamahata@intel.com>
+CC: "federico.parola@polito.it" <federico.parola@polito.it>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "dmatlack@google.com"
+	<dmatlack@google.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "isaku.yamahata@gmail.com"
+	<isaku.yamahata@gmail.com>, "michael.roth@amd.com" <michael.roth@amd.com>,
+	"seanjc@google.com" <seanjc@google.com>
+Subject: Re: [RFC PATCH 1/8] KVM: Document KVM_MAP_MEMORY ioctl
+Thread-Topic: [RFC PATCH 1/8] KVM: Document KVM_MAP_MEMORY ioctl
+Thread-Index: AQHaa/4rmsaNLqB4SE290Rjzl3NphrEsPlsA
+Date: Thu, 7 Mar 2024 12:30:04 +0000
+Message-ID: <9f8d8e3b707de3cd879e992a30d646475c608678.camel@intel.com>
+References: <cover.1709288671.git.isaku.yamahata@intel.com>
+	 <c50dc98effcba3ff68a033661b2941b777c4fb5c.1709288671.git.isaku.yamahata@intel.com>
+In-Reply-To: <c50dc98effcba3ff68a033661b2941b777c4fb5c.1709288671.git.isaku.yamahata@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH0PR11MB5077:EE_
+x-ms-office365-filtering-correlation-id: bd71f19f-b246-4bf1-9970-08dc3ea2512b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: BP9V+CJx0Sb7U3itCy9sGltB06ifs/AOJaRE6KbDGEaQnA5Pa3Lkv3Pg/OW4/HEWV9F0zJ5+lJTxl6z6cyHuBfy7cNYdqTMV7XjxcSFQ3ARWqhXWaAiLcg1rVuRq3WzmwASRX9w5j47DAYuWelQSjRX/Ir3nPYGw9+53JCmZDE8Im+te0VA92ARcUxCfOyqO3bMIfhgkz8BiaRqeEP/D9dVa1j4unntdSwe0n5thclrU6Snl5vbUZt0DiW8h2U2eg19klb7fhBSuc0TEPD9xBXtKmvQ6/kVFr4QZTrnJl6AeSSfJh6wDaJN/tE+1oKf9C/qjOjhyWZi55/qg/lK0BLF4wzRv9NDJ/UotZBjmeHfnKh0uzRNaWZLk3nQkAhvDTI0gbfAPGZE7dXSD/W+zu6iAftVfRpPfq4TN/1JqU6FYsDKEDTtI7i9lseJBHah79M/hWC2DLH2lRDQHzxfU8pRAL6JNmgOAwzCT1ZK7UEu6VEbsEVpHGr6eYpKtZHjLT1xutX5iiqvpC3xT/Q7c4JAceL3tF0vAFsAAhkxwV9U/+3km6k6ISy2uwL+dss03NbjXQFhI2BPnLtRW4Sw9RIu9aDwa6zujijICKhqRgXA/zYu9alJCdApNdWlvi1fPDz6tHMix5v9e49gDtdNmGvn18ormXSMcrfBXz2nwc88HHNooYGWHcKWqiE8ZPqhLq3EcLN1tjSyi4i4BoF4vkczxiUaiqKbMsETydSBubHA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bHFJRlZGQUdqV1hHS3hiak15SlFEazVrdC8xNHBQQzQrbWQ3dFdwcW03dy9w?=
+ =?utf-8?B?NEx0bCt1UjQ0ekZCL2ZqTTlMTkQ3cTFqMmZQWnJXNXBJUW1UaTFaa2Y4STBQ?=
+ =?utf-8?B?aE1DbTJmRVlDcGNkOE0rVGNTY2hoRHBsN0o0cWVnbTNSL0E3SXZOMVVTUXFK?=
+ =?utf-8?B?OTZJTkJQTGpBRTZvcnVNeXZlbklicVI4cWNwemJmazZ4TDIzZWhvWFN2c0Vi?=
+ =?utf-8?B?MU01amNFOCs2Z2ZvODlOMEZSRld4ZUQxcE9vQnNQakpMY0lYZXdLWnMyc2JV?=
+ =?utf-8?B?SkprQ2VralNJaU9FS3VIUXE4MCtZLy9kajVodGRGcjdCajhTOGNWSE5DalNF?=
+ =?utf-8?B?cmxGTWFDL1lGMFB4SDRSU2F3S291NlBETkoyN0ZWdUxsOFhvb1ZRVjRvWWd0?=
+ =?utf-8?B?U1RpSzBIaFJ2bWxqbHJMQ01PRE5LZ2h2TnJpbm1WakFodm9mbkNQdzJCTHdw?=
+ =?utf-8?B?NFB2TDBlMXRVZTY1b04xR3BYRzd0WFZiOTE1VzJ0bjBCQVFQMUdXVDZNQWxE?=
+ =?utf-8?B?NzdGd29BRFlPcmx3ZWhBNFBhTzlvY1pxZGJlcTRBWDdJMG1sR2VtV1Z2S0pT?=
+ =?utf-8?B?eUdjV0VOUHZxZWRyMmRLTVJodS9oU1RxQmlnRW9TMjZTMWNLYkQweEI1L0VX?=
+ =?utf-8?B?WlJVUFI4T0NGMUFkbTl0Tk1qNVlVZE13UGt5S01BSnphRkNMYzdhemowbmJW?=
+ =?utf-8?B?bk5YRHY2NkVmSy9qOWN1S2FscXpZRTdmcFY2enplVDYzanBNYWpKQjR6c1Ji?=
+ =?utf-8?B?YytLVEhETlNLWVZkQnMwUVpiOWo1ZnRPM1hNK3JrYUxnakVHNjY0dStHcHJo?=
+ =?utf-8?B?aUY5TkY3dUdveHhjNW5QcVhNNzhaTWpMUzN5dHJjU3JpaitVaHk3QUtsNTc0?=
+ =?utf-8?B?ckg1ckhWd3IrbTU2WVg2aUo2dUYzakFOcUR0MWRyMW45MW5zVG9rd3J5T01J?=
+ =?utf-8?B?TGF0Ym9tNzROVHNWMlY0eVpZS0daQ3psSXAyNGx3a09ZemljT1lEOFFweGk3?=
+ =?utf-8?B?OWpvZDJYOTc3a2RZSEdxdGFlRC9IV21Sa01ZSmkyZ0YwT0hvWTQ1WUdFaHVv?=
+ =?utf-8?B?SmZta0hPQS8vUGFyM2VnZjIzZmRPOHIrdFI1TTFoSkFMMWp1OEFHOHg3dzZH?=
+ =?utf-8?B?a0VXTkhuNzRDY2NPS1JmdFB6NFhNT09NOEhSVkJnMW1wc0ttOXVCd2tCeWpk?=
+ =?utf-8?B?SEVsckN0YklYZCt2UzJhcUJPRlNuV001U2tvMTg5ckJQSURvNmpqcXJQZUJ6?=
+ =?utf-8?B?V3Fwc0U1Nk1mVjVSOUc4YUVqT3V4UHZjZWdBMHRrRlE2cThYNmkrRkFVN1Vm?=
+ =?utf-8?B?QWI2bi85Uk9vS3VxeFkyOVZZRy9tTXJ6ZnpGRVR3a3ZWbFdvb1J4SDBtUEdV?=
+ =?utf-8?B?R0VQVDMwZVg3OUdjK2ZlWjJkM21OeVZjeXJOZzRuZ0pkZG15RTdWdlJ5aGhx?=
+ =?utf-8?B?MEd5cEtZWllJMG9BbTRId0lHeDBOVGdOMmhYUU9Dd3lQWis5OVBJUjNPT2o4?=
+ =?utf-8?B?MW5uLzRVaWp4QmhnTDJwUzdPYmRPUVlUUlZ6ZEpOcURYdFRHbDg5VjQ2Z1lX?=
+ =?utf-8?B?dUtLUHNsOUZMbGl0c3oyV2ZGVHVHalFGYTZ3MEoyL2tkN0JOQThFcWZtZGo3?=
+ =?utf-8?B?UDBIOEVUdXNJRUhCc1pMNmNDNnpGTDlkdGdSUStXeStKSjZuQ1lMTVFFOWNx?=
+ =?utf-8?B?aEFrVzF1dWVPVjN6S1RkaUJkeSs5a0d3ZHRMbUhDdlpiek1HUFc3bDBSNmVa?=
+ =?utf-8?B?Qkd0WFdvNUsvaHZJdVpBQ1pERUdoVUhxMnBPZE5iVFZyY2NZZG9FRkV5b0l3?=
+ =?utf-8?B?V2htWXBLR256b09jb2dCM1lJVmZUd0ZpeW0zaTh6L3BSTDd5akI3bVhrSlNX?=
+ =?utf-8?B?bnFPYzdMOHMvTnZZRkJuNG1HWVpFYWFUQUJBOHVoc3VjMlZtQTdPY0RZT2RQ?=
+ =?utf-8?B?OC9ydUg5dUxKdk1lVDRrTlBreVEyaWNCUjc3Y0V3bE94ZHlVWGI2SkcvY0JX?=
+ =?utf-8?B?UVAzK29tbWJkbXIxL0NrWXdHMEFHWjdaTEJBZXpWVXovdnpVWjh0Q1hpcCtX?=
+ =?utf-8?B?SStKS3lMOTQwcFFsbHJHK3IwZFQ3c2RGMWtabFNLSDJheFpwREVxRzFiMVoy?=
+ =?utf-8?B?MFRJR3hrY2hqUkRTK092eEtQQzJiWFY2QzFlVytaUXJWaW5SZmcxWStjbmhZ?=
+ =?utf-8?B?VkE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C5AB8AB506A1DF47BB64ED7A0A0A6090@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch v3] KVM: x86/pmu: Manipulate FIXED_CTR_CTRL MSR with
- macros
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Kan Liang <kan.liang@linux.intel.com>, Like Xu <likexu@tencent.com>,
- kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>,
- Zhang Xiong <xiong.y.zhang@intel.com>, Lv Zhiyuan <zhiyuan.lv@intel.com>,
- Dapeng Mi <dapeng1.mi@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-References: <20230824020546.1108516-1-dapeng1.mi@linux.intel.com>
- <ZeepGjHCeSfadANM@google.com>
- <2677739b-bc84-43ee-ba56-a5e243148ceb@gmail.com>
- <ZejPRlFpWNRs5jzp@google.com>
-From: Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <ZejPRlFpWNRs5jzp@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd71f19f-b246-4bf1-9970-08dc3ea2512b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2024 12:30:04.6701
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /gsZOcLmEcFYNppjP15bLKea+j1PLlMywMo1CYNaoUJctJFYpWwWWEw2fw99BiD69FlicCjt4tkWMqNMJVk70Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5077
+X-OriginatorOrg: intel.com
 
-On 7/3/2024 4:17 am, Sean Christopherson wrote:
-> On Wed, Mar 06, 2024, Like Xu wrote:
->>>> @@ -595,7 +600,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>    			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
->>>>    			for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
->>>>    				pmu->fixed_ctr_ctrl_mask &=
->>>> -					~(1ULL << (INTEL_PMC_IDX_FIXED + i * 4));
->>>
->>> OMG, this might just win the award for most obfuscated PMU code in KVM, which is
->>> saying something.  The fact that INTEL_PMC_IDX_FIXED happens to be 32, the same
->>> bit number as ICL_FIXED_0_ADAPTIVE, is 100% coincidence.  Good riddance.
->>>
->>> Argh, and this goofy code helped introduce a real bug.  reprogram_fixed_counters()
->>> doesn't account for the upper 32 bits of IA32_FIXED_CTR_CTRL.
->>>
->>> Wait, WTF?  Nothing in KVM accounts for the upper bits.  This can't possibly work.
->>>
->>> IIUC, because KVM _always_ sets precise_ip to a non-zero bit for PEBS events,
->>> perf will _always_ generate an adaptive record, even if the guest requested a
->>> basic record.  Ugh, and KVM will always generate adaptive records even if the
->>> guest doesn't support them.  This is all completely broken.  It probably kinda
->>> sorta works because the Basic info is always stored in the record, and generating
->>> more info requires a non-zero MSR_PEBS_DATA_CFG, but ugh.
->>
->> Yep, it works at least on machines with both adaptive and pebs_full features.
-> 
-> *AND* if the guest uses PEBS exactly the same way that the Linux kernel uses PEBS.
-> 
->> Mingwei or others are encouraged to construct use cases in KUT::pmu_pebs.flat
->> that violate guest-pebs rules (e.g., leak host state), as we all recognize
->> that testing is the right way to condemn legacy code, not just lengthy emails.
-> 
-> *sigh*
-> 
-> diff --git a/x86/pmu_pebs.c b/x86/pmu_pebs.c
-> index f7b52b90..43e7a207 100644
-> --- a/x86/pmu_pebs.c
-> +++ b/x86/pmu_pebs.c
-> @@ -212,8 +212,12 @@ static void pebs_enable(u64 bitmask, u64 pebs_data_cfg)
->          u64 baseline_extra_ctrl = 0, fixed_ctr_ctrl = 0;
->          unsigned int idx;
->   
-> -       if (has_baseline)
-> -               wrmsr(MSR_PEBS_DATA_CFG, pebs_data_cfg);
-> +       if (has_baseline) {
-> +               if (pebs_data_cfg)
-> +                       wrmsr(MSR_PEBS_DATA_CFG, pebs_data_cfg);
-> +               else
-> +                       wrmsr(MSR_PEBS_DATA_CFG, 0xf);
-> +       }
->   
->          ds = (struct debug_store *)ds_bufer;
->          ds->pebs_index = ds->pebs_buffer_base = (unsigned long)pebs_buffer;
-> @@ -224,7 +228,7 @@ static void pebs_enable(u64 bitmask, u64 pebs_data_cfg)
->          for (idx = 0; idx < pmu.nr_fixed_counters; idx++) {
->                  if (!(BIT_ULL(FIXED_CNT_INDEX + idx) & bitmask))
->                          continue;
-> -               if (has_baseline)
-> +               if (has_baseline && pebs_data_cfg)
->                          baseline_extra_ctrl = BIT(FIXED_CNT_INDEX + idx * 4);
->                  wrmsr(MSR_PERF_FIXED_CTRx(idx), ctr_start_val);
->                  fixed_ctr_ctrl |= (0xbULL << (idx * 4) | baseline_extra_ctrl);
-> @@ -235,7 +239,7 @@ static void pebs_enable(u64 bitmask, u64 pebs_data_cfg)
->          for (idx = 0; idx < max_nr_gp_events; idx++) {
->                  if (!(BIT_ULL(idx) & bitmask))
->                          continue;
-> -               if (has_baseline)
-> +               if (has_baseline && pebs_data_cfg)
->                          baseline_extra_ctrl = ICL_EVENTSEL_ADAPTIVE;
->                  wrmsr(MSR_GP_EVENT_SELECTx(idx), EVNTSEL_EN | EVNTSEL_OS | EVNTSEL_USR |
->                                                   intel_arch_events[idx] | baseline_extra_ctrl);
-> 
-> FAIL: Multiple (0x700000055): PEBS record (written seq 0) is verified (including size, counters and cfg).
-> FAIL: The pebs_record_size (488) doesn't match with MSR_PEBS_DATA_CFG (32).
-> FAIL: The pebs_data_cfg (0xf) doesn't match with MSR_PEBS_DATA_CFG (0x0).
-> FAIL: GP counter 0 (0xfffffffffffe): PEBS record (written seq 0) is verified (including size, counters and cfg).
-> FAIL: The pebs_record_size (488) doesn't match with MSR_PEBS_DATA_CFG (32).
-> FAIL: The pebs_data_cfg (0xf) doesn't match with MSR_PEBS_DATA_CFG (0x0).
-> FAIL: Multiple (0x700000055): PEBS record (written seq 0) is verified (including size, counters and cfg).
-> FAIL: The pebs_record_size (488) doesn't match with MSR_PEBS_DATA_CFG (32).
-> FAIL: The pebs_data_cfg (0xf) doesn't match with MSR_PEBS_DATA_CFG (0x0).
-> 
->>> Oh great, and it gets worse.  intel_pmu_disable_fixed() doesn't clear the upper
->>> bits either, i.e. leaves ICL_FIXED_0_ADAPTIVE set.  Unless I'm misreading the code,
->>> intel_pmu_enable_fixed() effectively doesn't clear ICL_FIXED_0_ADAPTIVE either,
->>> as it only modifies the bit when it wants to set ICL_FIXED_0_ADAPTIVE.
->>>
->>> *sigh*
->>>
->>> I'm _very_ tempted to disable KVM PEBS support for the current PMU, and make it
->>> available only when the so-called passthrough PMU is available[*].  Because I
->>> don't see how this is can possibly be functionally correct, nor do I see a way
->>> to make it functionally correct without a rather large and invasive series.
->>
->> Considering that I've tried the idea myself, I have no inclination towards
->> "passthrough PMU", and I'd like to be able to take the time to review that
->> patchset while we all wait for a clear statement from that perf-core man,
->> who don't really care about virtualization and don't want to lose control
->> of global hardware resources.
->>
->> Before we actually get to that ideal state you want, we have to deal with
->> some intermediate state and face to any users that rely on the current code,
-> 
-> It's not an ideal state, it's simply the only way I see to get things like adaptive
-> PEBS to work safely, reliably, and correctly without taking on an absurd amount of
-> complexity.
-
-The upstream guest_pebs feature has always been broken from my perspective,
-but unfortunately I didn't get enough time to polish it (slow path, host/guest 
-multiplexing,
-live migration support, security defense), so I'm really glad that Google is 
-seriously
-considering using this or that PMU feature.
-
-> 
->> you had urged to merge in a KVM document for vPMU, not sure how far
->> along that part of the work is.
-> 
->>> Ouch.  And after chatting with Mingwei, who asked the very good question of
->>> "can this leak host state?", I am pretty sure that yes, this can leak host state.
->>
->> The Basic Info has a tsc field, I suspect it's the host-state-tsc.
-> 
-> It's not, the CPU offsets it correctly, at least on ICX (I haven't check scaling).
-
-And one more to check, the tsc fields form the guest Intel_PT or Timed LBR if any.
-
-> 
->>> When PERF_CAP_PEBS_BASELINE is enabled for the guest, i.e. when the guest has
->>> access to adaptive records, KVM gives the guest full access to MSR_PEBS_DATA_CFG
->>>
->>> 	pmu->pebs_data_cfg_mask = ~0xff00000full;
->>>
->>> which makes sense in a vacuum, because AFAICT the architecture doesn't allow
->>> exposing a subset of the four adaptive controls.
->>>
->>> GPRs and XMMs are always context switched and thus benign, but IIUC, Memory Info
->>> provides data that might now otherwise be available to the guest, e.g. if host
->>> userspace has disallowed equivalent events via KVM_SET_PMU_EVENT_FILTER.
->>
->> Indeed, KVM_SET_PMU_EVENT_FILTER doesn't work in harmony with
->> guest-pebs, and I believe there is a big problem here, especially with the
->> lack of targeted testing.
->>
->> One reason for this is that we don't use this cockamamie API in our
-> 
-> Libeling APIs because they aren't useful for _your_ security goals doesn't mean
-> you get to ignore their existence when contributing upstream.  New features don't
-> necessarilly have to fully support existing capabilities, e.g. I would be a-ok
-> making KVM_SET_PMU_EVENT_FILTER mututally exclusive with exposing adapative PEBS
-> to the guest.  That way the user can at least know that filtering won't work if
-> adapative PEBS is exposed to the guest.
-
-Yes, that should be considered.
-
-> 
->> large-scale production environments, and users of vPMU want to get real
->> runtime information about physical cpus, not just virtualised hardware
->> architecture interfaces.
->>
->>>
->>> And unless I'm missing something, LBRs are a full leak of host state.  Nothing
->>> in the SDM suggests that PEBS records honor MSR intercepts, so unless KVM is
->>> also passing through LBRs, i.e. is context switching all LBR MSRs, the guest can
->>> use PEBS to read host LBRs at will.
->>
->> KVM is also passing through LBRs when guest uses LBR but not at the
->> granularity of vm-exit/entry. I'm not sure if the LBR_EN bit is required
->> to get LBR information via PEBS, also not confirmed whether PEBS-lbr
->> can be enabled at the same time as independent LBR;
->>
->> I recall that PEBS-assist, per cpu-arch, would clean up this part of the
->> record when crossing root/non-root boundaries, or not generate record.
-> 
-> Nope.  The MSRs definitely leak to the guest.  The only hard part was figuring
-> out how to get perf to utilize LBRs without consuming every counter (`perf top`
-> was the extent of my knowledge, until now...).
-> 
-> E.g.
-> 
->    perf record -b -e instructions
-
-Consulting "Ian Rogers" is the fastest route.
-
-> 
-> and
-> 
->    FAIL: PEBS LBR record 0 isn't empty, got from = 'ffffffffc0a00ccb', to = 'ffffffffc0a010af', info = '2'
->    FAIL: PEBS LBR record 1 isn't empty, got from = 'ffffffffc0a010aa', to = 'ffffffffc0a00cb0', info = '6'
->    FAIL: PEBS LBR record 2 isn't empty, got from = 'ffffffffc0a00e06', to = 'ffffffffc0a01090', info = '1'
->    FAIL: PEBS LBR record 3 isn't empty, got from = 'ffffffffc0a00df4', to = 'ffffffffc0a00e00', info = '2'
->    FAIL: PEBS LBR record 4 isn't empty, got from = 'ffffffffc0a00dbc', to = 'ffffffffc0a00de0', info = '1'
->    FAIL: PEBS LBR record 5 isn't empty, got from = 'ffffffffc0a00f63', to = 'ffffffffc0a00db5', info = '1'
->    FAIL: PEBS LBR record 6 isn't empty, got from = 'ffffffffc0903f23', to = 'ffffffffc0a00f61', info = '11'
->    FAIL: PEBS LBR record 7 isn't empty, got from = 'ffffffffc0a00f5c', to = 'ffffffffc0903f10', info = '1'
->    FAIL: PEBS LBR record 8 isn't empty, got from = 'ffffffffc0a00db0', to = 'ffffffffc0a00f55', info = '1'
->    FAIL: PEBS LBR record 9 isn't empty, got from = 'ffffffff8f6b2c23', to = 'ffffffffc0a00da6', info = 'a'
->    FAIL: PEBS LBR record 10 isn't empty, got from = 'ffffffffc0a00da1', to = 'ffffffff8f6b2b60', info = '7'
->    FAIL: PEBS LBR record 11 isn't empty, got from = 'ffffffff8eba1b85', to = 'ffffffffc0a00d9a', info = '6'
->    FAIL: PEBS LBR record 12 isn't empty, got from = 'ffffffff8eba1b8c', to = 'ffffffff8eba1b3f', info = '1'
->    FAIL: PEBS LBR record 13 isn't empty, got from = 'ffffffff8eba1b2d', to = 'ffffffff8eba1b87', info = 'e'
->    FAIL: PEBS LBR record 14 isn't empty, got from = 'ffffffff8eba1aff', to = 'ffffffff8eba1b18', info = '7'
->    FAIL: PEBS LBR record 15 isn't empty, got from = 'ffffffff8eb996e0', to = 'ffffffff8eba1aeb', info = '2'
->    FAIL: PEBS LBR record 16 isn't empty, got from = 'ffffffff8eb9963a', to = 'ffffffff8eb996cc', info = '1'
->    FAIL: PEBS LBR record 17 isn't empty, got from = 'ffffffff8eb995ef', to = 'ffffffff8eb9962f', info = '1'
->    FAIL: PEBS LBR record 18 isn't empty, got from = 'ffffffff8f6b30a1', to = 'ffffffff8eb995df', info = '4'
->    FAIL: PEBS LBR record 19 isn't empty, got from = 'ffffffff8eb995da', to = 'ffffffff8f6b3070', info = '2'
->    FAIL: PEBS LBR record 20 isn't empty, got from = 'ffffffff8eba1ae6', to = 'ffffffff8eb995c0', info = '6'
->    FAIL: PEBS LBR record 21 isn't empty, got from = 'ffffffffc0a00d95', to = 'ffffffff8eba1a90', info = '2'
->    FAIL: PEBS LBR record 22 isn't empty, got from = 'ffffffff8eb69135', to = 'ffffffffc0a00d89', info = '2'
->    FAIL: PEBS LBR record 23 isn't empty, got from = 'ffffffff8eb690d6', to = 'ffffffff8eb69104', info = '2'
->    FAIL: PEBS LBR record 24 isn't empty, got from = 'ffffffff8eb69102', to = 'ffffffff8eb690c3', info = '1'
->    FAIL: PEBS LBR record 25 isn't empty, got from = 'ffffffff8eb6f442', to = 'ffffffff8eb69100', info = '2'
->    FAIL: PEBS LBR record 26 isn't empty, got from = 'ffffffff8eb6f3f3', to = 'ffffffff8eb6f429', info = '5'
->    FAIL: PEBS LBR record 27 isn't empty, got from = 'ffffffff8eb6f3a6', to = 'ffffffff8eb6f3c3', info = '2'
->    FAIL: PEBS LBR record 28 isn't empty, got from = 'ffffffff8eb690fb', to = 'ffffffff8eb6f390', info = '2'
->    FAIL: PEBS LBR record 29 isn't empty, got from = 'ffffffff8eb690c1', to = 'ffffffff8eb690d8', info = '2'
->    FAIL: PEBS LBR record 30 isn't empty, got from = 'ffffffff8eb6907b', to = 'ffffffff8eb690b1', info = '1'
->    FAIL: PEBS LBR record 31 isn't empty, got from = 'ffffffff8eb690af', to = 'ffffffff8eb6906e', info = '1'
-
-Guilty Guilty Guilty
-
-> 
->>> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
->>> index 41a4533f9989..a2f827fa0ca1 100644
->>> --- a/arch/x86/kvm/vmx/capabilities.h
->>> +++ b/arch/x86/kvm/vmx/capabilities.h
->>> @@ -392,7 +392,7 @@ static inline bool vmx_pt_mode_is_host_guest(void)
->>>    static inline bool vmx_pebs_supported(void)
->>>    {
->>> -       return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
->>> +       return false;
->>
->> As you know, user-space VMM may disable guest-pebs by filtering out the
->> MSR_IA32_PERF_CAPABILITIE.PERF_CAP_PEBS_FORMAT or CPUID.PDCM.
-> 
-> Relying on userspace to fudge around KVM bugs is not acceptable for upstream.
-> PMU virtualization is already a bit dicey in that KVM relies on userspace to
-> filter out sensitive events, but leaking host addresses and failing to correctly
-> virtualize the architecture is an entirely different level of wrong.
-
-The leak is real and I would do the same thing (drop ADAPTIVE) in the kernel side.
-
-> 
->> In the end, if our great KVM maintainers insist on doing this,
->> there is obviously nothing I can do about it.
-> 
-> Bullshit.  There is plenty you could have done to prevent this.  It took me what,
-> 6 hours total?  To (a) realize the code is buggy, (b) type up an email, and (c)
-> modify tests to confirm the bugs.  And at least half of that time was due to me
-> floundering around trying to generate LBR records because I know nothing about
-> the perf tool.
-> 
-> If you were more interested in ensuring KVM is maintainble, secure, and functionally
-> correct, we wouldn't be where we are today.
-
-I was actually really trying to communicate my todo list to my successors
-in this direction, but it took a long time for them to warm up.
-
-Very pleased to know that you have so much manpower invested in vPMU,
-which was unimaginable a few years ago when I was the only one doing
-these things.
-
-We have benefited from your efforts here or there, and hope to still have
-the opportunity to contribute back. Thank you, Sean.
+T24gRnJpLCAyMDI0LTAzLTAxIGF0IDA5OjI4IC0wODAwLCBpc2FrdS55YW1haGF0YUBpbnRlbC5j
+b20gd3JvdGU6DQo+IEZyb206IElzYWt1IFlhbWFoYXRhIDxpc2FrdS55YW1haGF0YUBpbnRlbC5j
+b20+DQo+IA0KPiBBZGRzIGRvY3VtZW50YXRpb24gb2YgS1ZNX01BUF9NRU1PUlkgaW9jdGwuDQo+
+IA0KPiBJdCBwcmUtcG9wdWxhdGVzIGd1ZXN0IG1lbW9yeS4gQW5kIHBvdGVudGlhbGx5IGRvIGlu
+aXRpYWxpemVkIG1lbW9yeQ0KPiBjb250ZW50cyB3aXRoIGVuY3J5cHRpb24gYW5kIG1lYXN1cmVt
+ZW50IGRlcGVuZGluZyBvbiB1bmRlcmx5aW5nDQo+IHRlY2hub2xvZ3kuDQo+IA0KPiBTdWdnZXN0
+ZWQtYnk6IFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW5qY0Bnb29nbGUuY29tPg0KPiBTaWduZWQt
+b2ZmLWJ5OiBJc2FrdSBZYW1haGF0YSA8aXNha3UueWFtYWhhdGFAaW50ZWwuY29tPg0KPiAtLS0N
+Cj4gIERvY3VtZW50YXRpb24vdmlydC9rdm0vYXBpLnJzdCB8IDM2ICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysNCj4gIDEgZmlsZSBjaGFuZ2VkLCAzNiBpbnNlcnRpb25zKCspDQo+
+IA0KPiBkaWZmIC0tZ2l0IGEvRG9jdW1lbnRhdGlvbi92aXJ0L2t2bS9hcGkucnN0IGIvRG9jdW1l
+bnRhdGlvbi92aXJ0L2t2bS9hcGkucnN0DQo+IGluZGV4IDBiNWEzM2VlNzFlZS4uMzNkMmI2M2Y3
+ZGJmIDEwMDY0NA0KPiAtLS0gYS9Eb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QNCj4gKysr
+IGIvRG9jdW1lbnRhdGlvbi92aXJ0L2t2bS9hcGkucnN0DQo+IEBAIC02MzUyLDYgKzYzNTIsNDIg
+QEAgYSBzaW5nbGUgZ3Vlc3RfbWVtZmQgZmlsZSwgYnV0IHRoZSBib3VuZCByYW5nZXMgbXVzdCBu
+b3Qgb3ZlcmxhcCkuDQo+ICANCj4gIFNlZSBLVk1fU0VUX1VTRVJfTUVNT1JZX1JFR0lPTjIgZm9y
+IGFkZGl0aW9uYWwgZGV0YWlscy4NCj4gIA0KPiArNC4xNDMgS1ZNX01BUF9NRU1PUlkNCj4gKy0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiArDQo+ICs6Q2FwYWJpbGl0eTogS1ZNX0NBUF9NQVBf
+TUVNT1JZDQo+ICs6QXJjaGl0ZWN0dXJlczogbm9uZQ0KPiArOlR5cGU6IHZjcHUgaW9jdGwNCg0K
+SSB0aGluayAidmNwdSBpb2N0bCIgbWVhbnMgdGhlb3JldGljYWxseSBpdCBjYW4gYmUgY2FsbGVk
+IG9uIG11bHRpcGxlIHZjcHVzLg0KDQpXaGF0IGhhcHBlbnMgaW4gdGhhdCBjYXNlPw0KDQo+ICs6
+UGFyYW1ldGVyczogc3RydWN0IGt2bV9tZW1vcnlfbWFwcGluZyhpbi9vdXQpDQo+ICs6UmV0dXJu
+czogMCBvbiBzdWNjZXNzLCA8MCBvbiBlcnJvcg0KPiArDQo+ICtLVk1fTUFQX01FTU9SWSBwb3B1
+bGF0ZXMgZ3Vlc3QgbWVtb3J5IHdpdGhvdXQgcnVubmluZyB2Y3B1Lg0KPiArDQo+ICs6Og0KPiAr
+DQo+ICsgIHN0cnVjdCBrdm1fbWVtb3J5X21hcHBpbmcgew0KPiArCV9fdTY0IGJhc2VfZ2ZuOw0K
+PiArCV9fdTY0IG5yX3BhZ2VzOw0KPiArCV9fdTY0IGZsYWdzOw0KPiArCV9fdTY0IHNvdXJjZTsN
+Cj4gKyAgfTsNCj4gKw0KPiArICAvKiBGb3Iga3ZtX21lbW9yeV9tYXBwaW5nOjogZmxhZ3MgKi8N
+Cj4gKyAgI2RlZmluZSBLVk1fTUVNT1JZX01BUFBJTkdfRkxBR19XUklURSAgICAgICAgIF9CSVRV
+TEwoMCkNCj4gKyAgI2RlZmluZSBLVk1fTUVNT1JZX01BUFBJTkdfRkxBR19FWEVDICAgICAgICAg
+IF9CSVRVTEwoMSkNCj4gKyAgI2RlZmluZSBLVk1fTUVNT1JZX01BUFBJTkdfRkxBR19VU0VSICAg
+ICAgICAgIF9CSVRVTEwoMikNCg0KSSBhbSBub3Qgc3VyZSB3aGF0J3MgdGhlIGdvb2Qgb2YgaGF2
+aW5nICJGTEFHX1VTRVIiPw0KDQpUaGlzIGlvY3RsIGlzIGNhbGxlZCBmcm9tIHVzZXJzcGFjZSwg
+dGh1cyBJIHRoaW5rIHdlIGNhbiBqdXN0IHRyZWF0IHRoaXMgYWx3YXlzDQphcyB1c2VyLWZhdWx0
+Pw0KDQo+ICsgICNkZWZpbmUgS1ZNX01FTU9SWV9NQVBQSU5HX0ZMQUdfUFJJVkFURSAgICAgICBf
+QklUVUxMKDMpDQo+ICsNCj4gK0tWTV9NQVBfTUVNT1JZIHBvcHVsYXRlcyBndWVzdCBtZW1vcnkg
+aW4gdGhlIHVuZGVybHlpbmcgbWFwcGluZy4gSWYgc291cmNlIGlzDQo+ICtub3QgemVybyBhbmQg
+aXQncyBzdXBwb3J0ZWQgKGRlcGVuZGluZyBvbiB1bmRlcmx5aW5nIHRlY2hub2xvZ3kpLCB0aGUg
+Z3Vlc3QNCj4gK21lbW9yeSBjb250ZW50IGlzIHBvcHVsYXRlZCB3aXRoIHRoZSBzb3VyY2UuICBU
+aGUgZmxhZ3MgZmllbGQgc3VwcG9ydHMgdGhyZWUNCj4gK2ZsYWdzOiBLVk1fTUVNT1JZX01BUFBJ
+TkdfRkxBR19XUklURSwgS1ZNX01FTU9SWV9NQVBQSU5HX0ZMQUdfRVhFQywgYW5kDQo+ICtLVk1f
+TUVNT1JZX01BUFBJTkdfRkxBR19VU0VSLiAgV2hpY2ggY29ycmVzcG9uZHMgdG8gZmF1bHQgY29k
+ZSBmb3Iga3ZtIHBhZ2UNCj4gK2ZhdWx0IHRvIHBvcHVsYXRlIGd1ZXN0IG1lbW9yeS4gd3JpdGUg
+ZmF1bHQsIGZldGNoIGZhdWx0IGFuZCB1c2VyIGZhdWx0Lg0KPiArV2hlbiBpdCByZXR1cm5lZCwg
+dGhlIGlucHV0IGlzIHVwZGF0ZWQuICBJZiBucl9wYWdlcyBpcyBsYXJnZSwgaXQgbWF5DQo+ICty
+ZXR1cm4gLUVBR0FJTiBhbmQgdXBkYXRlIHRoZSB2YWx1ZXMgKGJhc2VfZ2ZuIGFuZCBucl9wYWdl
+cy4gc291cmNlIGlmIG5vdCB6ZXJvKQ0KPiArdG8gcG9pbnQgdGhlIHJlbWFpbmluZyByYW5nZS4N
+Cj4gKw0KPiAgNS4gVGhlIGt2bV9ydW4gc3RydWN0dXJlDQo+ICA9PT09PT09PT09PT09PT09PT09
+PT09PT0NCj4gIA0KDQo=
 
