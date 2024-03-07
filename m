@@ -1,109 +1,184 @@
-Return-Path: <kvm+bounces-11235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11236-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 252D1874556
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:54:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 342AF874561
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA905B23372
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 00:54:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD4B3285C57
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 00:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBCB24C8B;
-	Thu,  7 Mar 2024 00:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71FE4A24;
+	Thu,  7 Mar 2024 00:58:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qYL/uWqR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GFmJmBEV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE042441F
-	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 00:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EED4522A
+	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 00:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709772828; cv=none; b=oBP7ewrGT2vf+q4mN8Yvp/RhxSUaqecSLr2kaW1DmSC5JmA1DZH8gb9/ESHqAUXXCNa7HedJjAn60d37OJ6vNH+D4mqRQMVNhbtncNlAg36imAttCWsjYcAPh16UZWe0gDuJNt9ziCZdLzvqb03P1LNeki25MIgN6IrI9sv/ocI=
+	t=1709773117; cv=none; b=RkUsPmgJSpyMPwo9zcPcI/6rj4WroWKV4M2TIyYu2iasA499m101sEIKAGgFVfufVDocEeHUK7z0gfZQnYwqwEsOaBjcLPASydVSFmg4tcM6BXSTriwMZY+8i8MsrI8VR8tCzoP66JydlpAsYLsFK7Fvv8lutmDbN/4DdWwLa0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709772828; c=relaxed/simple;
-	bh=5a/K4Sl1FUS7oq60ekNERF2iXFSv3DJI7QNsBj3/nFc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=i10j2DsoFQsiGebxOjfVtm70pq6AdvCS35NGbNzA756SLIxJi+CYEQlLTShoDDeCun65IfDoDoLleAdgcZEEJTrXhZoGkCjf/CYfaYADhNz6cRBE9sMtA9WVIJO2uWiM13A+ZMYCSi3GQn0PDHgmvObUgm/QdXGF0Fp96dkWZSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qYL/uWqR; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1709773117; c=relaxed/simple;
+	bh=MZ06/FnKdpF7EpHBWXvXS06dDQwjud1EBOqxLUdR4v8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=iLBZ9QsCbZkmibkxQNPW7MVjrwERANF/9YRDTs/YTBCtM8kgN9tm/mcNN/ikCez4Zd2LtFNXcCYprFVpom3Fj97c0f0wuo747OMK1DkBl7mESaRc0O83XBxc2uRpBKArk3fb31HXpEGRw91d2z2PEz70pPs1L1klSnKaNDhvyF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GFmJmBEV; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5cec8bc5c66so229311a12.1
-        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 16:53:46 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6e5d234fb2bso348035b3a.0
+        for <kvm@vger.kernel.org>; Wed, 06 Mar 2024 16:58:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709772826; x=1710377626; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=13JM4dn5oLawZvcGqOUh0FKLknmM5OO13+s6TUK67SM=;
-        b=qYL/uWqRYfRXAJCaIezmM3j9JaQzznvy1x4cB/7jYWaQM/h/yWFYb8rs31WNLR2ctW
-         QHl0RR/XxPo8It0EGAZwBUlzkrZNW3nJD4A/2ffQyz1496f1UPjP5cloclVw37uEh8tW
-         e/rTbTn4ngCckwNj/h99lw4qKAkZbjmGmqiXDMUrh60ScTeD5E+7Ndow1dxzuje7J9ob
-         WDBTWnwdVlpXYmw2vTQEI2GN22lEV1X7yyibD0CiwvubtAF/LdCW5cRswK/DhR9A2hjR
-         +65vy4E3ZM32hNQaeN8riR57P4M/0K5lfrhZbN/jqTUjaX77mba+CtCfHJWewMR9ov5T
-         SzDQ==
+        d=google.com; s=20230601; t=1709773116; x=1710377916; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MmRQNGCRtnjmRvh6sRQ5xEu1hAgcZnkmkF6J3pyfr1U=;
+        b=GFmJmBEV3ZEPtkpYrHWVhNG6TXewl8jULZut3OJ97/r/8tgTRWxkbp71gqecYsla92
+         oAWPa7gnU5+z1/V39f8fXyFpbzZ0QFDAP77B1cbMTbh4FbDGV9Sdl0YT+XRItz9qNwud
+         3OenFIbT/ylF68oFWNyZbMjN9O5URynnJ4IUD/UPPJ0mXblzjx/ox+zWUBc8lPg39GHr
+         1qJ8xmZxH/6VahjFEoVXqaSdnAYCfP3DgwmCYcUrBR92OdGcE+FB4zlIwJF/kkSEoi7P
+         UZNzWNdWsCEn8mUVI93wJmIs1ftliQY0m7uL49KjGGdbJCvM8jG518ncdXJFyD053FAZ
+         GVmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709772826; x=1710377626;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=13JM4dn5oLawZvcGqOUh0FKLknmM5OO13+s6TUK67SM=;
-        b=Lba7ATtilPRrLV09lfuUFU6FJrSHcTc2dfLGwCj+JqqQkjsMzL8x6Ja6Gzwsc+aPOM
-         m/kypz/oD9+lMaWKaQtv9WHuLZf9/ewjEN6b8iY87xghFFSVFwZc3gww6o+nNIu72gvz
-         ZsZXaNvpyIzhYLX6GfxyYIxb/xtJrQe9B7Ch9ExwMIwfQVaXbiN0SvmFO4zLBlZZ/85B
-         KYFe36hJZJadFcTnrnCN+D32EafUU90zG770D3zzXN5p4fa7s37Rq5cWDGN1wnhfy3Ri
-         jyZBow4U/4fIzGRu0JowDqNVlnpmd8/+hL8MstG3a6y1hD6mq7lKbYMs44ArE8+KY4tq
-         S1UA==
-X-Forwarded-Encrypted: i=1; AJvYcCWxo3o4FgaAaI52oBhbkRaHhMqkaixnOJJH0Jdo1qvkCr+2Gecz/n4WkGzwQiSTX1Lh/kgDEpMTn+keWEh1AzWR3+Sk
-X-Gm-Message-State: AOJu0YzdIKZsLx3PqC1x2wg91W5KwkYI9hkcmlWazTNLkcOnoWwG6gG7
-	Y+LZ5Z9nO4l2eED5tN6sP+LJ4UlQ6NDBLyIg9L+FuKqQy23GLi8vddq+22YcO0hmU6/R2Yfn48d
-	UYQ==
-X-Google-Smtp-Source: AGHT+IEOis2Z/A2Rk3zVzgay5WAqcSG5X9JevTM43hdYFp0yDzRzI+2V1NgOIQ2StNbL0Xtfu4AKG73nMbc=
+        d=1e100.net; s=20230601; t=1709773116; x=1710377916;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MmRQNGCRtnjmRvh6sRQ5xEu1hAgcZnkmkF6J3pyfr1U=;
+        b=bliwD8IH0wgDnl/GiSf3+2qagDeyv1a0vaQ/1cQsRr2fRmx7cfaK+OrsL9BDnaC2O6
+         IYAHTbKpm6bTCNZeQcR89tsUyktHRMHiQrFBXaULoibUlHWmel+jciU62Oekl0c+AC6d
+         yDVonp9POWpZkJn39mdasKS8pV4XnRPTkn7eChJh8h/ro/igsl/PAEFO5/huDg45M3Is
+         HlYXO3AlX5toGG5q1p3nX5r0g63AmF1DPR5cmP/93kvSb7rCxipEgkoanihG0K+7DDVG
+         R3SYRbGAGOMHYRlwIm6L4AFhmY/tBq+0SuPZFkIvFYju932PtDwlEXfbEOn6f2dq5qzM
+         TYjA==
+X-Gm-Message-State: AOJu0YyBx5vjMYpvgXgRnvwnSEYSMYu8lYLwwI72nibmGXH2u3N3mUi6
+	GVYIxSUKrHYrhMOLrp2+iqKRR7fJ+HGDeuPI/+ztGbQqoSviHrLmVtx7bNiYxZhG6sRi2fVZOVH
+	9XQ==
+X-Google-Smtp-Source: AGHT+IGIG+GBlQTENCyrDeP5/bdimzYYp6TGnKTwGmCTJ2ir6tHwOlEgRf5XNTZcp18EgHSc03M+AlwZBP0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:b8b:b0:5e4:5fba:17e with SMTP id
- dh11-20020a056a020b8b00b005e45fba017emr42501pgb.4.1709772825909; Wed, 06 Mar
- 2024 16:53:45 -0800 (PST)
-Date: Wed, 6 Mar 2024 16:53:43 -0800
-In-Reply-To: <d325e811-c80d-49ba-85cf-06893cec659a@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1808:b0:6e5:9a0a:b66a with SMTP id
+ y8-20020a056a00180800b006e59a0ab66amr786472pfa.3.1709773115641; Wed, 06 Mar
+ 2024 16:58:35 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed,  6 Mar 2024 16:58:33 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-14-seanjc@google.com>
- <d325e811-c80d-49ba-85cf-06893cec659a@intel.com>
-Message-ID: <ZekQF9MlVzlgleq7@google.com>
-Subject: Re: [PATCH 13/16] KVM: x86/mmu: Handle no-slot faults at the
- beginning of kvm_faultin_pfn()
+X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
+Message-ID: <20240307005833.827147-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/pmu: Disable support for adaptive PEBS
 From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Like Xu <like.xu.linux@gmail.com>, Mingwei Zhang <mizhang@google.com>, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Zhang Xiong <xiong.y.zhang@intel.com>, 
+	Lv Zhiyuan <zhiyuan.lv@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>, 
+	Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Mar 07, 2024, Kai Huang wrote:
-> 
-> 
-> On 28/02/2024 3:41 pm, Sean Christopherson wrote:
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -235,7 +235,7 @@ struct kvm_page_fault {
-> >   	/* The memslot containing gfn. May be NULL. */
-> >   	struct kvm_memory_slot *slot;
-> > -	/* Outputs of kvm_faultin_pfn.  */
-> > +	/* Outputs of kvm_faultin_pfn. */
-> >   	unsigned long mmu_seq;
-> >   	kvm_pfn_t pfn;
-> >   	hva_t hva;
-> 
-> ... how about get rid of this non-related fix?
+Drop support for virtualizing adaptive PEBS, as KVM's implementation is
+architecturally broken without an obvious/easy path forward, and because
+exposing adaptive PEBS can leak host LBRs to the guest, i.e. can leak
+host kernel addresses to the guest.
 
-Eww, yeah, I'll drop it.  I originally had code that made the outputs valid if
-and only if @slot was non-null, and had updated the comment accordingly, but
-ended up going a different route and cleaned up the comment a little too well :-)
+Bug #1 is that KVM doesn't doesn't account for the upper 32 bits of
+IA32_FIXED_CTR_CTRL when (re)programming fixed counters, e.g
+fixed_ctrl_field() drops the upper bits, reprogram_fixed_counters()
+stores local variables as u8s and truncates the upper bits too, etc.
+
+Bug #2 is that, because KVM _always_ sets precise_ip to a non-zero value
+for PEBS events, perf will _always_ generate an adaptive record, even if
+the guest requested a basic record.  Note, KVM will also enable adaptive
+PEBS in individual *counter*, even if adaptive PEBS isn't exposed to the
+guest, but this is benign as MSR_PEBS_DATA_CFG is guaranteed to be zero,
+i.e. the guest will only ever see Basic records.
+
+Bug #3 is in perf.  intel_pmu_disable_fixed() doesn't clear the upper
+bits either, i.e. leaves ICL_FIXED_0_ADAPTIVE set, and
+intel_pmu_enable_fixed() effectively doesn't clear ICL_FIXED_0_ADAPTIVE
+either.  I.e. perf _always_ enables ADAPTIVE counters, regardless of what
+KVM requests.
+
+Bug #4 is that adaptive PEBS *might* effectively bypass event filters set
+by the host, as "Updated Memory Access Info Group" records information
+that might be disallowed by userspace via KVM_SET_PMU_EVENT_FILTER.
+
+Bug #5 is that KVM doesn't ensure LBR MSRs hold guest values (or at least
+zeros) when entering a vCPU with adaptive PEBS, which allows the guest
+to read host LBRs, i.e. host RIPs/addresses, by enabling "LBR Entries"
+records.
+
+Disable adaptive PEBS support as an immediate fix due to the severity of
+the LBR leak in particular, and because fixing all of the bugs will be
+non-trivial, e.g. not suitable for backporting to stable kernels.
+
+Note!  This will break live migration, but trying to make KVM play nice
+with live migration would be quite complicated, wouldn't be guaranteed to
+work (i.e. KVM might still kill/confuse the guest), and it's not clear
+that there are any publicly available VMMs that support adaptive PEBS,
+let alone live migrate VMs that support adaptive PEBS, e.g. QEMU doesn't
+support PEBS in any capacity.
+
+Link: https://lore.kernel.org/all/20240306230153.786365-1-seanjc@google.com
+Link: https://lore.kernel.org/all/ZeepGjHCeSfadANM@google.com
+Fixes: c59a1f106f5c ("KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS")
+Cc: stable@vger.kernel.org
+Cc: Like Xu <like.xu.linux@gmail.com>
+Cc: Mingwei Zhang <mizhang@google.com>
+Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc: Zhang Xiong <xiong.y.zhang@intel.com>
+Cc: Lv Zhiyuan <zhiyuan.lv@intel.com>
+Cc: Dapeng Mi <dapeng1.mi@intel.com>
+Cc: Jim Mattson <jmattson@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 7a74388f9ecf..641a7d5bf584 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7864,8 +7864,28 @@ static u64 vmx_get_perf_capabilities(void)
+ 
+ 	if (vmx_pebs_supported()) {
+ 		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
+-		if ((perf_cap & PERF_CAP_PEBS_FORMAT) < 4)
+-			perf_cap &= ~PERF_CAP_PEBS_BASELINE;
++
++		/*
++		 * Disallow adaptive PEBS as it is functionally broken, can be
++		 * used by the guest to read *host* LBRs, and can be used to
++		 * bypass userspace event filters.  To correctly and safely
++		 * support adaptive PEBS, KVM needs to:
++		 *
++		 * 1. Account for the ADAPTIVE flag when (re)programming fixed
++		 *    counters.
++		 *
++		 * 2. Gain support from perf (or take direct control of counter
++		 *    programming) to support events without adaptive PEBS
++		 *    enabled for the hardware counter.
++		 *
++		 * 3. Ensure LBR MSRs cannot hold host data on VM-Entry with
++		 *    adaptive PEBS enabled and MSR_PEBS_DATA_CFG.LBRS=1.
++		 *
++		 * 4. Document which PMU events are effectively exposed to the
++		 *    guest via adaptive PEBS, and make adaptive PEBS mutually
++		 *    exclusive with KVM_SET_PMU_EVENT_FILTER if necessary.
++		 */
++		perf_cap &= ~PERF_CAP_PEBS_BASELINE;
+ 	}
+ 
+ 	return perf_cap;
+
+base-commit: 0c64952fec3ea01cb5b09f00134200f3e7ab40d5
+-- 
+2.44.0.278.ge034bb2e1d-goog
+
 
