@@ -1,126 +1,155 @@
-Return-Path: <kvm+bounces-11329-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11330-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EAD0875837
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 21:24:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4053087587A
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 21:33:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B12791C22B84
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 20:24:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0B1C2812E0
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 20:33:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3219F1386DD;
-	Thu,  7 Mar 2024 20:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51E964CDC;
+	Thu,  7 Mar 2024 20:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UNrS1QcO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dp7wx2PO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5535B1FD
-	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 20:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DF5139571;
+	Thu,  7 Mar 2024 20:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709843036; cv=none; b=lF24dGFwdxKg4bX8WoszDkt3P4SWDykImeq/O5m5FCzYSPWTIUJ3lSl36Kt4zsFPMhc95YhZB8tmE+OY8HdgxT/7OT4TZO499jBREcyxegpw19lasMV0hc1G0MlNHl528TKgqRY5mBDSXd0K9uUE8EV4L6FOI8OXSdEI4F/6LdI=
+	t=1709843624; cv=none; b=YTmFq9DnCwEjAa33FKSTpp+Es/bVONBR9uOTUMzuhj2qVXtz21saP6YfDsc02vDpC6a9h5s1ck9KIqZzeSYxlBLY0cj5suhhVHg2bZfGlewzLSd6grZfdlOC2Oj6NTdAIaEF3+Xpc488IkTw7Q+aYmuP0rQLMmgN/acCNo6/jAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709843036; c=relaxed/simple;
-	bh=n41G5cMXZfffNFebNQD0HhXIaaovLpPefnDOeOUdHew=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C+KrRr8MLjG0S+bWFSIp3I/SQbMhfbbRXrPZCkpIjRZQE6XWNJprK8ihO8JmNV/O1VZYC32HbRZo4woVA5/8m2YG3K/ozDq4VPjkGrSC6CUgzMpemXWR3Uj+06uYPajf9L/LF43nkAsBENk5B2K0qljmOl2S/5PE9Krg149YVVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UNrS1QcO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709843032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JzYa2p0WN1L2k72Xj6BYuK/wXJ3KScc8Fyb6F0WXYSw=;
-	b=UNrS1QcO7diqxQkQ+yM5Hudv9LsGPzVQG1C71ecw1N+AzeTPiV4qpUQT85HGx9rvSoJlxZ
-	W+F+hhrI5ZvkRM6tafL4+mVfxwjFzt656/OGjpydbB5m7zErPeLSi5R2WQVuOxotdiCtl6
-	q1Bw7zXujqcZaqYpFVNXmtSAZHUsTTM=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-455-Mqx596XDO16NOiFqbTMNOA-1; Thu, 07 Mar 2024 15:23:51 -0500
-X-MC-Unique: Mqx596XDO16NOiFqbTMNOA-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c874fb2baaso11497339f.3
-        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 12:23:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709843030; x=1710447830;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JzYa2p0WN1L2k72Xj6BYuK/wXJ3KScc8Fyb6F0WXYSw=;
-        b=vE3DZEkj5537OScIeFOCwIGZhSmwwx07EbGoo4T12B0fwfxwi0ec+in3DqUZprggNP
-         zDCVO9WU2c1wEM4dzQZwTUTqiyGQLcta9F8cN/tQOMgMrUGKIiPjrjEDzKTZIbUnLqOu
-         mRZ8rx5DpkJPWDiR+ZsNkB5v5MwB9zzQ2A2U68TsQiync1wi5HS3PZGS13VKBx8YGl2t
-         wDBTLTTWko19AKQ3YL5PQXf9x5V1s4VhK+CoxdR8mHwDPsc8B6UZyYfIqn2T5WkV4zhr
-         vPEgEG+km+yDRV0LpZOZ//LTUsNUuNCZCS7Tgfg08cqSXpyasNGJZ1rR6yFXupBIbhZ7
-         MYsA==
-X-Gm-Message-State: AOJu0YwkC4qg+i4UgtS1efpUUZJUStEB6JhSeXpfiVjsnVGEiDbrD9ar
-	pafR+7/vSfL1TrSWiO1Puse5ed7x2QRyyhcy/QPEuV7Drp/tev78jE4ZeKGsVPRjMtM1NR8mLco
-	qSjDdJ0yW5urUECaAmZzEu7fyFqOpzgPmMAxunEdyBoUaVuWcHw==
-X-Received: by 2002:a6b:e509:0:b0:7c8:84c8:7813 with SMTP id y9-20020a6be509000000b007c884c87813mr3123557ioc.0.1709843030399;
-        Thu, 07 Mar 2024 12:23:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFi5cEQ2ohJmNhdL87DIGzEjk0iugzxVt59dKtJvpR8SdNhIluz4q5AmTctWKUVHAHjcsZauA==
-X-Received: by 2002:a6b:e509:0:b0:7c8:84c8:7813 with SMTP id y9-20020a6be509000000b007c884c87813mr3123548ioc.0.1709843030170;
-        Thu, 07 Mar 2024 12:23:50 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id g12-20020a02c54c000000b00474f04561bdsm2269985jaj.136.2024.03.07.12.23.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 12:23:49 -0800 (PST)
-Date: Thu, 7 Mar 2024 13:23:48 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "eric.auger@redhat.com"
- <eric.auger@redhat.com>, "clg@redhat.com" <clg@redhat.com>, "Chatre,
- Reinette" <reinette.chatre@intel.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/7] vfio/pci: Disable auto-enable of exclusive INTx IRQ
-Message-ID: <20240307132348.5dbc57dc.alex.williamson@redhat.com>
-In-Reply-To: <BL1PR11MB527189373E8756AA8697E8D78C202@BL1PR11MB5271.namprd11.prod.outlook.com>
-References: <20240306211445.1856768-1-alex.williamson@redhat.com>
-	<20240306211445.1856768-2-alex.williamson@redhat.com>
-	<BL1PR11MB527189373E8756AA8697E8D78C202@BL1PR11MB5271.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1709843624; c=relaxed/simple;
+	bh=pYm922DxqcT6fMWqbP4U26AYgN9ggB1aB8F8XfUPFDY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jxpqlsPUJ9wkceLmJmFkPWAl3sTDrK6hUfIFygIZz668vGwohG7FgootaFGfx4qmjl73o/OzT7D24r0nypCaOXBnsveNzVbsCVMjjSGAxZtgcXup7z/OitRJIONHloD5lplcZpO2Dzf8hjzer0IVIwENf9yma5wD7jNrsYcx/CE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dp7wx2PO; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709843622; x=1741379622;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pYm922DxqcT6fMWqbP4U26AYgN9ggB1aB8F8XfUPFDY=;
+  b=dp7wx2POs3xpLzSCM+m21mhYB5gxMakh50CsTujO1zMNKRcBFGjlvwK0
+   MjAvSoT30HTdj/LrLBNH59xXS1XqRTrChtp6li/TzWO0xiRmypfru/Jh/
+   vw+PNrVkVnf5DCRmUdG9dMvIHnsXUm2UhuMFPBA5EnbZ57sjq49wKBLH0
+   v420U6JMlJM7J+QM20SHUbGOgEWjY1XrESNtgykdQE0SvsaLz6VFqvyjJ
+   ESbwCm/QAmXlbhFfTnDis61nqqoESUKjcJ62jR6p+E7pF33bet3wiTcJB
+   ZqU0HJCDcRAVxz+1EH9pSEbTZ2n0UyNBd8Y+QQHyrcDkiUlDnXCzrf9dC
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="15109178"
+X-IronPort-AV: E=Sophos;i="6.07,107,1708416000"; 
+   d="scan'208";a="15109178"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 12:33:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,107,1708416000"; 
+   d="scan'208";a="41212476"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 12:33:41 -0800
+Date: Thu, 7 Mar 2024 12:33:40 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"federico.parola@polito.it" <federico.parola@polito.it>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"dmatlack@google.com" <dmatlack@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"michael.roth@amd.com" <michael.roth@amd.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [RFC PATCH 1/8] KVM: Document KVM_MAP_MEMORY ioctl
+Message-ID: <20240307203340.GI368614@ls.amr.corp.intel.com>
+References: <cover.1709288671.git.isaku.yamahata@intel.com>
+ <c50dc98effcba3ff68a033661b2941b777c4fb5c.1709288671.git.isaku.yamahata@intel.com>
+ <9f8d8e3b707de3cd879e992a30d646475c608678.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9f8d8e3b707de3cd879e992a30d646475c608678.camel@intel.com>
 
-On Thu, 7 Mar 2024 08:39:16 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Thu, Mar 07, 2024 at 12:30:04PM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Thursday, March 7, 2024 5:15 AM
+> On Fri, 2024-03-01 at 09:28 -0800, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > > 
-> > Currently for devices requiring masking at the irqchip for INTx, ie.
-> > devices without DisINTx support, the IRQ is enabled in request_irq()
-> > and subsequently disabled as necessary to align with the masked status
-> > flag.  This presents a window where the interrupt could fire between
-> > these events, resulting in the IRQ incrementing the disable depth twice.
-> > This would be unrecoverable for a user since the masked flag prevents
-> > nested enables through vfio.
+> > Adds documentation of KVM_MAP_MEMORY ioctl.
 > > 
-> > Instead, invert the logic using IRQF_NO_AUTOEN such that exclusive INTx
-> > is never auto-enabled, then unmask as required.
+> > It pre-populates guest memory. And potentially do initialized memory
+> > contents with encryption and measurement depending on underlying
+> > technology.
 > > 
-> > Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>  
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst | 36 ++++++++++++++++++++++++++++++++++
+> >  1 file changed, 36 insertions(+)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 0b5a33ee71ee..33d2b63f7dbf 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -6352,6 +6352,42 @@ a single guest_memfd file, but the bound ranges must not overlap).
+> >  
+> >  See KVM_SET_USER_MEMORY_REGION2 for additional details.
+> >  
+> > +4.143 KVM_MAP_MEMORY
+> > +------------------------
+> > +
+> > +:Capability: KVM_CAP_MAP_MEMORY
+> > +:Architectures: none
+> > +:Type: vcpu ioctl
 > 
-> CC stable?
+> I think "vcpu ioctl" means theoretically it can be called on multiple vcpus.
+> 
+> What happens in that case?
 
-I've always found that having a Fixes: tag is sufficient to get picked
-up for stable, so I typically don't do both.  If it helps out someone's
-process I'd be happy to though.  Thanks,
+Each vcpu can handle the ioctl simaltaneously.  If we assume tdp_mmu, each vcpu
+calls the kvm fault handler simultaneously with read spinlock.
+If gfn ranges overlap, vcpu will get 0 (success) or EAGAIN.
 
-Alex
 
+> > +:Parameters: struct kvm_memory_mapping(in/out)
+> > +:Returns: 0 on success, <0 on error
+> > +
+> > +KVM_MAP_MEMORY populates guest memory without running vcpu.
+> > +
+> > +::
+> > +
+> > +  struct kvm_memory_mapping {
+> > +	__u64 base_gfn;
+> > +	__u64 nr_pages;
+> > +	__u64 flags;
+> > +	__u64 source;
+> > +  };
+> > +
+> > +  /* For kvm_memory_mapping:: flags */
+> > +  #define KVM_MEMORY_MAPPING_FLAG_WRITE         _BITULL(0)
+> > +  #define KVM_MEMORY_MAPPING_FLAG_EXEC          _BITULL(1)
+> > +  #define KVM_MEMORY_MAPPING_FLAG_USER          _BITULL(2)
+> 
+> I am not sure what's the good of having "FLAG_USER"?
+> 
+> This ioctl is called from userspace, thus I think we can just treat this always
+> as user-fault?
+
+The point is how to emulate kvm page fault as if vcpu caused the kvm page
+fault.  Not we call the ioctl as user context.
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
