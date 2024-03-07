@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-11245-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11246-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B47278745C5
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 02:52:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A78A98745EC
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 03:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6844B1F248E8
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 01:52:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFF182814E0
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 02:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0049A53A9;
-	Thu,  7 Mar 2024 01:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D6A63A9;
+	Thu,  7 Mar 2024 02:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lrZLVNs1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RKdvvWik"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABD74C7C;
-	Thu,  7 Mar 2024 01:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A073153A9;
+	Thu,  7 Mar 2024 02:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709776316; cv=none; b=Y4ukDZyZCNlShpvzeS01T6oi7MLADPyvZkmV1DLmuJlbK+zEfbuZLjUZ5marnTeL2ay2GZEp8M8WxYfj6pGNb6B8TrgBG1hWQ6VZJ4vEUsbP/kUbMMWUL9gkap/2TgFt8tNz9RAHwIgv/SW7HC/7XbKZstVaE84nSdiXRHusnq4=
+	t=1709777399; cv=none; b=CldTop4ZxfRCakm9lGC9rpags/a8dKArjioiV2uKqMdCaFy98e0oJAOeoIZA66hw1T0epufLYkhDdAs0QEZQTeEFPNvKU+JHtfm1VtpcLFa6b2hxurugdqGS0Y0XkDpFNlRZpRuxvUQWA9tS2dDxlXRLmiEGIJcJlv7hIXzy900=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709776316; c=relaxed/simple;
-	bh=iIB6+wE9OpkB3gzRbWGFl0PRdQ4qvk9fQg0LbRlU6xA=;
+	s=arc-20240116; t=1709777399; c=relaxed/simple;
+	bh=GRzK8ViaMAxJeHXB+2h6QVlT4bjuo8GxQtmPB2W7JFA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dVUOVm20hfq+m4EazIpcTP7vYU11bxav5upz4wWzWY5k6bYctFdL78jXca6AeQU7HSGpSBwCYetVrVImwJ8ybUZsPe4ua7Yom4T4yZo5+fk0bS+tTb/UFEHyeWPMBSiDZawfBDiWNcNRCKWwIHC5XIZqfp0h2seDtJVGZqtsoK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lrZLVNs1; arc=none smtp.client-ip=198.175.65.19
+	 Content-Type:Content-Disposition:In-Reply-To; b=NSMvDzv3SdIVHrbxtOEsKjWSY+RyBXFD5VUy106w7OE0XsdnPHMSPxU9PzVZduacp1FTL78bclct2Lvq1Ue+5WP4tWKM2rY5Ik4KH8iWzqAL5xr5CMCkrucQvzMqR7+Cyt6fDupxWdffbtuv5IiEfx2iV6Qy6oCHo6peYReTMnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RKdvvWik; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709776315; x=1741312315;
+  t=1709777397; x=1741313397;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=iIB6+wE9OpkB3gzRbWGFl0PRdQ4qvk9fQg0LbRlU6xA=;
-  b=lrZLVNs1L96cfvybam7+VY4mJnJTdcARvyllKsb3d32F5MPisJSs+sCA
-   zBoidn0h8gQvJHMFaE5DdsKcUF4gI4+13YUgsKd9+hGt8VRlwZOnayKkd
-   EQms1ymf5iy9kAu9rNa5Tr+NEWkH0x/xBdVzCegA6QIHsCV1wv3JCFLJG
-   N7bgkqAwssPxcXgw9IVeZ2fPqV5Hv1OKcHgJDAYjAOS7duBI9rLh1LTLb
-   juUuz5ZX3VhubaUeEW4s7Iyaq04IS+csgCvm1zo8FD//8nzI67iZcRcDB
-   d1Sug8ixvp5nBxban7vcJrG5DbxY8z3GcABDu9RjMEaRisTmmM4tosv99
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="4284879"
+   mime-version:in-reply-to;
+  bh=GRzK8ViaMAxJeHXB+2h6QVlT4bjuo8GxQtmPB2W7JFA=;
+  b=RKdvvWikUWWWr9Rn/p6iUhzGWpszBz76+8RlzuxpXzdZAbCXvN1wxlYv
+   JcvP7dFg4Fhja54x3++SMeDutzmag3jNuXPmvsRyW1w10eUyslU8oMJwo
+   jotdRP9fpjd5gbJh5lv1rQhrfrgVjJeOe+Y0RRiCnx3szdX90jjLLMX+d
+   /W0sSHFpQWklhbmfnxT/l8AYCX3yIojqShDFg9DmUTlBTHIWWXfUuosi7
+   FCuKfco2SDIOy7vLN4IDOkxboXeVzRpXs+6xSqFRQWSGGYVFOuk+YvJsi
+   pes+wre3txPKrtuvUFdyiAVx/DCMRn6gBdxpM2YTF8LHGJfNTjsYEXNeO
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="4313173"
 X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
-   d="scan'208";a="4284879"
+   d="scan'208";a="4313173"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 17:51:54 -0800
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 18:09:56 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
-   d="scan'208";a="10379250"
+   d="scan'208";a="10383067"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 17:51:53 -0800
-Date: Wed, 6 Mar 2024 17:51:51 -0800
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 18:09:55 -0800
+Date: Wed, 6 Mar 2024 18:09:54 -0800
 From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
 To: David Matlack <dmatlack@google.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, isaku.yamahata@gmail.com,
@@ -64,13 +64,10 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, isaku.yamahata@gmail.com,
 	Michael Roth <michael.roth@amd.com>,
 	Federico Parola <federico.parola@polito.it>,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [RFC PATCH 6/8] KVM: x86: Implement kvm_arch_{,
- pre_}vcpu_map_memory()
-Message-ID: <20240307015151.GF368614@ls.amr.corp.intel.com>
+Subject: Re: [RFC PATCH 0/8] KVM: Prepopulate guest memory API
+Message-ID: <20240307020954.GG368614@ls.amr.corp.intel.com>
 References: <cover.1709288671.git.isaku.yamahata@intel.com>
- <66a957f4ec4a8591d2ff2550686e361ec648b308.1709288671.git.isaku.yamahata@intel.com>
- <ZekKwlLdf6vm5e5u@google.com>
- <CALzav=dHNYP02q_CJncwk-JdL9OSB=613v4+siBm1Cp2rmxLLw@mail.gmail.com>
+ <ZekQFdPlU7RDVt-B@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,43 +76,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALzav=dHNYP02q_CJncwk-JdL9OSB=613v4+siBm1Cp2rmxLLw@mail.gmail.com>
+In-Reply-To: <ZekQFdPlU7RDVt-B@google.com>
 
-On Wed, Mar 06, 2024 at 04:36:25PM -0800,
+On Wed, Mar 06, 2024 at 04:53:41PM -0800,
 David Matlack <dmatlack@google.com> wrote:
 
-> On Wed, Mar 6, 2024 at 4:31 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On 2024-03-01 09:28 AM, isaku.yamahata@intel.com wrote:
-> > >
-> > > +     if (IS_ALIGNED(mapping->base_gfn, KVM_PAGES_PER_HPAGE(PG_LEVEL_1G)) &&
-> > > +         mapping->nr_pages >= KVM_PAGES_PER_HPAGE(PG_LEVEL_1G))
-> > > +             max_level = PG_LEVEL_1G;
-> > > +     else if (IS_ALIGNED(mapping->base_gfn, KVM_PAGES_PER_HPAGE(PG_LEVEL_2M)) &&
-> > > +              mapping->nr_pages >= KVM_PAGES_PER_HPAGE(PG_LEVEL_2M))
-> > > +             max_level = PG_LEVEL_2M;
-> > > +     else
-> > > +             max_level = PG_LEVEL_4K;
-> >
-> > Is there a requirement that KVM must not map memory outside of the
-> > requested region?
+> On 2024-03-01 09:28 AM, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > Implementation:
+> > - x86 KVM MMU
+> >   In x86 KVM MMU, I chose to use kvm_mmu_do_page_fault().  It's not confined to
+> >   KVM TDP MMU.  We can restrict it to KVM TDP MMU and introduce an optimized
+> >   version.
 > 
-> And if so, what if the requested region is already mapped with a larger page?
+> Restricting to TDP MMU seems like a good idea. But I'm not quite sure
+> how to reliably do that from a vCPU context. Checking for TDP being
+> enabled is easy, but what if the vCPU is in guest-mode?
 
-Yes. We'd like to map exact gpa range for SNP or TDX case. We don't want to map
-zero at around range.  For SNP or TDX, we map page to GPA, it's one time
-operation.  It updates measurement.
+As you pointed out in other mail, legacy KVM MMU support or guest-mode will be
+troublesome.  The use case I supposed is pre-population before guest runs, the
+guest-mode wouldn't matter. I didn't add explicit check for it, though.
 
-Say, we'd like to populate GPA1 and GPA2 with initial guest memory image.  And
-they are within same 2M range.  Map GPA1 first. If GPA2 is also mapped with zero
-with 2M page, the following mapping of GPA2 fails.  Even if mapping of GPA2
-succeeds, measurement may be updated when mapping GPA1. 
+Any use case while vcpus running?
 
-It's user space VMM responsibility to map GPA range only once at most for SNP or
-TDX.  Is this too strict requirement for default VM use case to mitigate KVM
-page fault at guest boot up?  If so, what about a flag like EXACT_MAPPING or
-something?
+
+> Perhaps we can just return an error out to userspace if the vCPU is in
+> guest-mode or TDP is disabled, and make it userspace's problem to do
+> memory mapping before loading any vCPU state.
+
+If the use case for default VM or sw-proteced VM is to avoid excessive kvm page
+fault at guest boot, error on guest-mode or disabled TDP wouldn't matter.
 -- 
 Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
