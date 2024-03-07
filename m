@@ -1,176 +1,203 @@
-Return-Path: <kvm+bounces-11312-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11313-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C45B4875305
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 16:22:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C27E68753BD
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 16:59:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61BC3B21C2A
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 15:22:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF2CF1C21B2F
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 15:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF7412F379;
-	Thu,  7 Mar 2024 15:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5EA12F59B;
+	Thu,  7 Mar 2024 15:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LgS+NoHh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FUh5wB7t"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0567112DDBA;
-	Thu,  7 Mar 2024 15:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465FD12F379;
+	Thu,  7 Mar 2024 15:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709824928; cv=none; b=ff5dyzpFxxBHDBG3gwI0Ixyxe+YAI0za/cj01CGo4wthSA0NidYteCbDIRVGNnOTuc8AKCwtRJscBpqwWcXLIYuI2WoIY8P3zBVEHa4+4yK2KzmVLEUf7KtXLZIrNV2GDjFBZvVs3Z4AHX89LtVPpZkC6N5YXKDwkYx/3yaKoYo=
+	t=1709827142; cv=none; b=cOnJpMC/YSpvzBt/ktGKiMsFyztnONHVD1DCXCt2sTdWPo8KjtUNWWz1SL8WycYrVZYN/g7Yg+0LIKLZn9TsJQmPhjz3uP8fwptMlpHYMosE9n4N8AnJVRD8xy/1I3kuYnHWmF21mP6zQ8V2s4Fe2wGb8JyEE+VIkRhd/uCX6vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709824928; c=relaxed/simple;
-	bh=dXXAP6ggtVzzLfF8jgYN0QQav58miECgxTM+SNjFCi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iHFU6HDA5dT7A9MekrN06TSm3wYDM1zmHjVDkU2VgGJGWsVaOgPxz7+hZk6fSDV0nv6Ebx7SAncD7xde82Tx02z8vB+uIaupzgwpi9kzEYrWC5q1tLa0XWbRK5CAALRW5KgZOAklnKQ7nWftRfXhJ91y/1MFonSZOkr1J6L+XiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LgS+NoHh; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709824925; x=1741360925;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dXXAP6ggtVzzLfF8jgYN0QQav58miECgxTM+SNjFCi0=;
-  b=LgS+NoHhmTAdUkTPv42bZ82p3A7xtyqthiwJvUUeRqd5+yAQ+bHL66O9
-   61sH+uvQi+/NSvbhqYwarJk+ZWzAiKAOz2FSlv2mpBVQXX+fJw+AU1qE+
-   SguJwcKYZ+r1tjQC9SQmSD9aashEIHBHVA0MEbjxqqefEOVIJOQ54etBW
-   Eb9SvjMQhr6Owd07TWqjp+2jDCaOdCntpHII2IcTvNR1BA0b9PEOpf0YL
-   KDQzV5HUWTtaDeyq2gX6ZYbNFmRc11fTG7oTcNd6haA4/9b945SGHi2RZ
-   k0v6tqExpoutvdXex3qZB9Ge0gOloYxT/p7lI4IOudD7CUwOevjByh0I6
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="4617588"
-X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
-   d="scan'208";a="4617588"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 07:22:05 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
-   d="scan'208";a="14801134"
-Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 07 Mar 2024 07:22:01 -0800
-Received: from kbuild by b21307750695 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1riFZG-0005Hr-2x;
-	Thu, 07 Mar 2024 15:21:58 +0000
-Date: Thu, 7 Mar 2024 23:21:47 +0800
-From: kernel test robot <lkp@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, eric.auger@redhat.com, clg@redhat.com,
-	reinette.chatre@intel.com, linux-kernel@vger.kernel.org,
-	kevin.tian@intel.com, diana.craciun@oss.nxp.com
-Subject: Re: [PATCH 7/7] vfio/fsl-mc: Block calling interrupt handler without
- trigger
-Message-ID: <202403072356.jlxR3E5Q-lkp@intel.com>
-References: <20240306211445.1856768-8-alex.williamson@redhat.com>
+	s=arc-20240116; t=1709827142; c=relaxed/simple;
+	bh=UYtkG8yfOSupBSMZ3Yyq2qnzTXCcLitPyHm9qpOJKYc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZYtjgWEnQsXDHzA9nA3edpa+IFwbazwL9lD1AJomRLpM7XnNstkj+n6O9kpreL9moX/fB1gpa1+tIUxc8y+Iv0t7StfY7Zg4oK9M3OZNgJ4LL/MXLLe/xvU79Px5D2sYN1zrjraA9N70FgDs4haJAXnuUl1Cq2QoYpn+1fD7ia0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FUh5wB7t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C335DC433F1;
+	Thu,  7 Mar 2024 15:59:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709827141;
+	bh=UYtkG8yfOSupBSMZ3Yyq2qnzTXCcLitPyHm9qpOJKYc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FUh5wB7teSfQ4E3Jgt0/JB2cACgh+qZ1YBngLgiU9iyk5TbuFh30QrjPlGT7cgcCc
+	 LSVaniC6YV079btLKS2gC+lyWgl46McHPlku5Ycsh7D0HzJUt9C03O8PP8Cm4iRJEn
+	 wcYPGkpeHfulvLEjQdx27NmEXEMNwWow1JZNwW9vZLA/hH7ExoXVWyMOqZS+w4hA7T
+	 XKeU/BeQDd5sxV5FWYurXRXsxP60aw3h+BCe7nSbFOY0yWMsFocdKOmWhGiyVwNiNz
+	 v1ltzB4Ib3Nl9eWkh/xmI6BGnqu29l7ZY8LXNcMHX0UQdM4D/YiVeP6XqjVlzuwmY3
+	 twceigxI/L1mA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1riG94-00AMt8-FV;
+	Thu, 07 Mar 2024 15:58:58 +0000
+Date: Thu, 07 Mar 2024 15:58:58 +0000
+Message-ID: <86il1y11a5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 08/13] KVM: arm64: nv: Handle HCR_EL2.{API,APK} independently
+In-Reply-To: <20240307151454.GA913041@e124191.cambridge.arm.com>
+References: <20240226100601.2379693-1-maz@kernel.org>
+	<20240226100601.2379693-9-maz@kernel.org>
+	<20240307151454.GA913041@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306211445.1856768-8-alex.williamson@redhat.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Alex,
+On Thu, 07 Mar 2024 15:14:54 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Mon, Feb 26, 2024 at 10:05:56AM +0000, Marc Zyngier wrote:
+> > Although KVM couples API and APK for simplicity, the architecture
+> > makes no such requirement, and the two can be independently set or
+> > cleared.
+> > 
+> > Check for which of the two possible reasons we have trapped here,
+> > and if the corresponding L1 control bit isn't set, delegate the
+> > handling for forwarding.
+> > 
+> > Otherwise, set this exact bit in HCR_EL2 and resume the guest.
+> > Of course, in the non-NV case, we keep setting both bits and
+> > be done with it. Note that the entry core already saves/restores
+> > the keys should any of the two control bits be set.
+> > 
+> > This results in a bit of rework, and the removal of the (trivial)
+> > vcpu_ptrauth_enable() helper.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h    |  5 ----
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 32 +++++++++++++++++++++----
+> >  2 files changed, 27 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index debc3753d2ef..d2177bc77844 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -125,11 +125,6 @@ static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
+> >  	vcpu->arch.hcr_el2 |= HCR_TWI;
+> >  }
+> >  
+> > -static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+> > -{
+> > -	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
+> > -}
+> > -
+> >  static inline void vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
+> >  {
+> >  	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index f5f701f309a9..a0908d7a8f56 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -480,11 +480,35 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+> >  static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  {
+> >  	struct kvm_cpu_context *ctxt;
+> > -	u64 val;
+> > +	u64 enable = 0;
+> >  
+> >  	if (!vcpu_has_ptrauth(vcpu))
+> >  		return false;
+> >  
+> > +	/*
+> > +	 * NV requires us to handle API and APK independently, just in
+> > +	 * case the hypervisor is totally nuts. Please barf >here<.
+> > +	 */
+> > +	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> > +		switch (ESR_ELx_EC(kvm_vcpu_get_esr(vcpu))) {
+> > +		case ESR_ELx_EC_PAC:
+> > +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_API))
+> > +				return false;
+> > +
+> > +			enable |= HCR_API;
+> > +			break;
+> > +
+> > +		case ESR_ELx_EC_SYS64:
+> > +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_APK))
+> > +				return false;
+> > +
+> > +			enable |= HCR_APK;
+> > +			break;
+> > +		}
+> > +	} else {
+> > +		enable = HCR_API | HCR_APK;
+> > +	}
+> > +
+> >  	ctxt = this_cpu_ptr(&kvm_hyp_ctxt);
+> >  	__ptrauth_save_key(ctxt, APIA);
+> >  	__ptrauth_save_key(ctxt, APIB);
+> > @@ -492,11 +516,9 @@ static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	__ptrauth_save_key(ctxt, APDB);
+> >  	__ptrauth_save_key(ctxt, APGA);
+> >  
+> > -	vcpu_ptrauth_enable(vcpu);
+> >  
+> > -	val = read_sysreg(hcr_el2);
+> > -	val |= (HCR_API | HCR_APK);
+> > -	write_sysreg(val, hcr_el2);
+> > +	vcpu->arch.hcr_el2 |= enable;
+> > +	sysreg_clear_set(hcr_el2, 0, enable);
+> >  
+> >  	return true;
+> >  }
+> 
+> A bit of sleuthing tells me you plan to delete kvm_hyp_handle_ptrauth() anyway,
+> so presumably it makes some sense to put that patch before this to avoid
+> modifying the code just to delete it!
 
-kernel test robot noticed the following build warnings:
+Well, I haven't posted that patch yet (soon!), but it is also
+important to show how these things interact overall. *if* we agree
+that there is no point in the current approach, then I'll squash the
+two.
 
-[auto build test WARNING on awilliam-vfio/next]
-[also build test WARNING on linus/master v6.8-rc7 next-20240307]
-[cannot apply to awilliam-vfio/for-linus]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+But there is a lot to be said about:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Alex-Williamson/vfio-pci-Disable-auto-enable-of-exclusive-INTx-IRQ/20240307-051931
-base:   https://github.com/awilliam/linux-vfio.git next
-patch link:    https://lore.kernel.org/r/20240306211445.1856768-8-alex.williamson%40redhat.com
-patch subject: [PATCH 7/7] vfio/fsl-mc: Block calling interrupt handler without trigger
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20240307/202403072356.jlxR3E5Q-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240307/202403072356.jlxR3E5Q-lkp@intel.com/reproduce)
+- discussion on the list first
+- minimal changes to track regressions
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202403072356.jlxR3E5Q-lkp@intel.com/
+So I think there is still value in reviewing this patch on its own!
 
-All warnings (new ones prefixed by >>):
+Thanks,
 
->> drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c:111:11: warning: variable 'hwirq' set but not used [-Wunused-but-set-variable]
-     111 |         int ret, hwirq;
-         |                  ^
-   1 warning generated.
-
-
-vim +/hwirq +111 drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-
-cc0ee20bd96971 Diana Craciun   2020-10-05  104  
-2e0d29561f593a Diana Craciun   2020-10-05  105  static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
-2e0d29561f593a Diana Craciun   2020-10-05  106  				       unsigned int index, unsigned int start,
-2e0d29561f593a Diana Craciun   2020-10-05  107  				       unsigned int count, u32 flags,
-2e0d29561f593a Diana Craciun   2020-10-05  108  				       void *data)
-2e0d29561f593a Diana Craciun   2020-10-05  109  {
-cc0ee20bd96971 Diana Craciun   2020-10-05  110  	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-cc0ee20bd96971 Diana Craciun   2020-10-05 @111  	int ret, hwirq;
-cc0ee20bd96971 Diana Craciun   2020-10-05  112  	struct vfio_fsl_mc_irq *irq;
-cc0ee20bd96971 Diana Craciun   2020-10-05  113  	struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
-cc0ee20bd96971 Diana Craciun   2020-10-05  114  	struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
-cc0ee20bd96971 Diana Craciun   2020-10-05  115  
-159246378d8483 Diana Craciun   2020-10-15  116  	if (!count && (flags & VFIO_IRQ_SET_DATA_NONE))
-159246378d8483 Diana Craciun   2020-10-15  117  		return vfio_set_trigger(vdev, index, -1);
-159246378d8483 Diana Craciun   2020-10-15  118  
-cc0ee20bd96971 Diana Craciun   2020-10-05  119  	if (start != 0 || count != 1)
-2e0d29561f593a Diana Craciun   2020-10-05  120  		return -EINVAL;
-cc0ee20bd96971 Diana Craciun   2020-10-05  121  
-da119f387e9464 Jason Gunthorpe 2021-08-05  122  	mutex_lock(&vdev->vdev.dev_set->lock);
-cc0ee20bd96971 Diana Craciun   2020-10-05  123  	ret = fsl_mc_populate_irq_pool(mc_cont,
-cc0ee20bd96971 Diana Craciun   2020-10-05  124  			FSL_MC_IRQ_POOL_MAX_TOTAL_IRQS);
-cc0ee20bd96971 Diana Craciun   2020-10-05  125  	if (ret)
-cc0ee20bd96971 Diana Craciun   2020-10-05  126  		goto unlock;
-cc0ee20bd96971 Diana Craciun   2020-10-05  127  
-cc0ee20bd96971 Diana Craciun   2020-10-05  128  	ret = vfio_fsl_mc_irqs_allocate(vdev);
-cc0ee20bd96971 Diana Craciun   2020-10-05  129  	if (ret)
-cc0ee20bd96971 Diana Craciun   2020-10-05  130  		goto unlock;
-da119f387e9464 Jason Gunthorpe 2021-08-05  131  	mutex_unlock(&vdev->vdev.dev_set->lock);
-cc0ee20bd96971 Diana Craciun   2020-10-05  132  
-cc0ee20bd96971 Diana Craciun   2020-10-05  133  	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
-cc0ee20bd96971 Diana Craciun   2020-10-05  134  		s32 fd = *(s32 *)data;
-cc0ee20bd96971 Diana Craciun   2020-10-05  135  
-cc0ee20bd96971 Diana Craciun   2020-10-05  136  		return vfio_set_trigger(vdev, index, fd);
-cc0ee20bd96971 Diana Craciun   2020-10-05  137  	}
-cc0ee20bd96971 Diana Craciun   2020-10-05  138  
-d86a6d47bcc6b4 Thomas Gleixner 2021-12-10  139  	hwirq = vdev->mc_dev->irqs[index]->virq;
-cc0ee20bd96971 Diana Craciun   2020-10-05  140  
-cc0ee20bd96971 Diana Craciun   2020-10-05  141  	irq = &vdev->mc_irqs[index];
-cc0ee20bd96971 Diana Craciun   2020-10-05  142  
-cc0ee20bd96971 Diana Craciun   2020-10-05  143  	if (flags & VFIO_IRQ_SET_DATA_NONE) {
-dce72fdf5c6be9 Alex Williamson 2024-03-06  144  		if (irq->trigger)
-dce72fdf5c6be9 Alex Williamson 2024-03-06  145  			eventfd_signal(irq->trigger);
-cc0ee20bd96971 Diana Craciun   2020-10-05  146  
-cc0ee20bd96971 Diana Craciun   2020-10-05  147  	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
-cc0ee20bd96971 Diana Craciun   2020-10-05  148  		u8 trigger = *(u8 *)data;
-cc0ee20bd96971 Diana Craciun   2020-10-05  149  
-dce72fdf5c6be9 Alex Williamson 2024-03-06  150  		if (trigger && irq->trigger)
-dce72fdf5c6be9 Alex Williamson 2024-03-06  151  			eventfd_signal(irq->trigger);
-cc0ee20bd96971 Diana Craciun   2020-10-05  152  	}
-cc0ee20bd96971 Diana Craciun   2020-10-05  153  
-cc0ee20bd96971 Diana Craciun   2020-10-05  154  	return 0;
-cc0ee20bd96971 Diana Craciun   2020-10-05  155  
-cc0ee20bd96971 Diana Craciun   2020-10-05  156  unlock:
-da119f387e9464 Jason Gunthorpe 2021-08-05  157  	mutex_unlock(&vdev->vdev.dev_set->lock);
-cc0ee20bd96971 Diana Craciun   2020-10-05  158  	return ret;
-cc0ee20bd96971 Diana Craciun   2020-10-05  159  
+	M.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Without deviation from the norm, progress is not possible.
 
