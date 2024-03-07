@@ -1,154 +1,171 @@
-Return-Path: <kvm+bounces-11326-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11327-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A599875765
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 20:43:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ADC187581D
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 21:17:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5988E1C20B2E
-	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 19:43:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40EEB28753F
+	for <lists+kvm@lfdr.de>; Thu,  7 Mar 2024 20:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E9E137C44;
-	Thu,  7 Mar 2024 19:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1DE1386BF;
+	Thu,  7 Mar 2024 20:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x2zoBdR0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dv/5hQOF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEA31369BB
-	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 19:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE0E1386BB
+	for <kvm@vger.kernel.org>; Thu,  7 Mar 2024 20:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709840603; cv=none; b=I6Fmo5nT59KVglsOvNNJsw8vLpYIQ1wSW6Tk0Ot+PE95RclCb2vbD/93sC6JxSJq88ZwuoSJrMCYuxhxGmx2tYpu0P85Zjr3MfjDnEpKZOlEfhaU1wu0EuzAT78S3oshYdqYZeSc/6xt21zRqKMHkj2XDjWSxLGYeHCIhj5ZBLk=
+	t=1709842644; cv=none; b=s76dOGjBrLjf4Ne6JNDWFq2saYTXGLbcUEmrxUU/ijAVaezclkOPw1vM+haOrNJj17S4MNF+O/QcivkASjgMIHiwaj+0y4CLay9RrHvzSDotQvxQxFVkxo0IMR5U7IGisLoWEiMxtW6G2ddd5o6VWTTVA3nVstyM2NwalcXy+ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709840603; c=relaxed/simple;
-	bh=V5E4NzO07aa5S4gs3SV2JHwGbgx/er14+hYh0RYUCV8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bbXouRLqpewZaGcB7+O32zFhigkC2ZsJSeoeWchBjwXgnhnHDeBouH+cxBmlvqDLOrajghrRHZsHUdazMIEbku8TLch1vxBc5xi3WtsE1njbQUgm9+4n+YfSAh/oLDXZIatCFZykt67IhRloknMcG85CUV8WxRbuHgETCK7/bOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x2zoBdR0; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-609fe93b5cfso2555557b3.0
-        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 11:43:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709840600; x=1710445400; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=R/CxQ8IXJwQYxLbYdax/leKLs8+bGoPDvy/xmVenJg4=;
-        b=x2zoBdR0h2s7eqI+SgaGqkgA9N6dew+K3Mdtdx4eISO2osgu2WvkkkFPjP+1pubSse
-         Z6klmnl9VbbB7eVU2Q0Z5QSgcKnE1LeB+tGge7mgR1dGmxmUN/D4PzusTW0YJLiWb/t8
-         PgPZkb7jSuVk0IV4OP3y9YZ8qAjEFywnKTidPO7o6iyTL/iwv69bhvzLkgPNLR7bmw1u
-         esxmlU0FPWwUPv4HVqdTAU4vLaIAZ+vm5RFmjnj/uv+sfbAnAC5oeQ95ST34MdIc0SRz
-         Vo2FxOoanPC0xXHkbK6YIjHa0psvC/G+XGYStgVbMC8RFDEYGFuFrV67GE63pM3Q89Fm
-         s9Eg==
+	s=arc-20240116; t=1709842644; c=relaxed/simple;
+	bh=/YUybJbsSXbRwRUMAvYnKQA/SRd72YChTHUB65fv0+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aEmGW+PCLKG+alZ5xRQQbauhRZ17GSR60kkRDun2w1vFm6ktZUgaZv1XQ0DcX+GTzbxXRiBCOU0TtrqPiMTPHrd3O9cM3r1TBzPQr5B7iw46iTdVR8wx/8S2oShWmvaDcB/9IWErBpt6nMn+fhp2OhmmfuSsKOdimWT29hNqIts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dv/5hQOF; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709842640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oWG/IRYPalUuOXVHKI+XsPiSvzLLDZYH1nG41oHFe8M=;
+	b=dv/5hQOFORGEZ+mFptvUbziiVnLO0d81KJ9VC7a4RHXEM5/QPTb+/xj0xc1CwF7lER9zrX
+	SLWm2Kdl0XSqh3ABPjMr5M8+kx2sRIS+SEeEHjgpyra0Eu7ELWuy70zMc7lXjHKfuTo06z
+	0Z8zCQqw72eJkDlM80ZCoLLyoZ9gLYs=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-253-iZseRp1UOuS1lDbnx3CKew-1; Thu, 07 Mar 2024 15:17:19 -0500
+X-MC-Unique: iZseRp1UOuS1lDbnx3CKew-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c7e21711d0so116276439f.3
+        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 12:17:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709840600; x=1710445400;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=R/CxQ8IXJwQYxLbYdax/leKLs8+bGoPDvy/xmVenJg4=;
-        b=TKIcR3YaBNUg1vUluhqMHTqYL+jJInELPa9QVgwXSPK0wjw/tLJ53j30/JUP4zXqW8
-         OJ1bfONZ9YUhcaFnkPRcMMk3tq+s0VnXd3aM9isAhEPYSeMScBfcWv+rSzPUi7AmF98P
-         0CYLP+Js4nhqShFzVwwSTKxHFKkpPgkymFzmPPW3ZOPfeds7cosTP+z6ZhH187YvUPYc
-         MQgEdGhAcJ03+CG2hyVAszbQ3pCcU2I7rPPzIbdY8lW52Kc9pcEfXK3t1ZThrWCim6B4
-         e78PcOcKODG7LRKiivhXrTCFuiUh/z0nbSyMHEO9e7UjXFh7HAkZ/Q9mY1RZCKNwLScq
-         sZeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWmkso1JEl9i5ELEcG1zviuCWO3qRc/CIohl2//S0xqUhOoqwqApso1bLvoQYsLBbF2PW/TmVNUbzYiqDn1MNJ0Y6bx
-X-Gm-Message-State: AOJu0YztItXv8mgbbafopPehfEnkkwyiR0h8AlIyE8z1DcDmxi5OMt+c
-	IIJTwLgc6lIMe0XgDdiFX9whgyFYtRZw5CsONfC3F6GPidL9AGlTiNYiHRMatAVimy2Hk1Xu1tC
-	cC/LY72Kvgg==
-X-Google-Smtp-Source: AGHT+IGOeyLE/MrHK3FEqNITKGuFyefy3d3MUFlLE34QrA2ka8F5EmNVbX4BHcU3p77e0xt/2kB0LuQ3O2aGzQ==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:157:0:b0:dcf:f526:4cc6 with SMTP id
- 84-20020a250157000000b00dcff5264cc6mr685643ybb.11.1709840600651; Thu, 07 Mar
- 2024 11:43:20 -0800 (PST)
-Date: Thu,  7 Mar 2024 11:42:55 -0800
+        d=1e100.net; s=20230601; t=1709842638; x=1710447438;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oWG/IRYPalUuOXVHKI+XsPiSvzLLDZYH1nG41oHFe8M=;
+        b=IuGvbbRv2I9JgKpWv9HYqq5RQFDKDi5PI5MI8S/F00bcSvdLv9x/OkxGG8i7uUxxUw
+         y4Qq+4O+tlfbUfeyjpHW0SUcMKaPlCoSI+DVFkA9bnc1cz6YmijYkg9s65reKeKrDDHj
+         ARndXWqqq+w82LJFvoSPnCHQ0sYValfbGU3XtwHy2bA9q1WWuax0ULXbJVwaBJ29aUFN
+         dtvYfPZiIOaSSQpGpOCKN58CQfhoGha85+PrCgllYUNU//ZnGWVGxB4cYp989Igypoin
+         vLPyU0nN411uW16yp9SCnYFeS2SRFdnjBgHWJOrPZ80pNiigUp6WY4duleiCFRuDZfNH
+         cyQg==
+X-Gm-Message-State: AOJu0YxwN4grTaPntcVSL6Ro2ss50NgyevjzFVx9xtjB8v+mvSIM/qsx
+	U1behgWicccllBvbloD9YcO9YPV3grK2UWB85CgkteT35CZ1pdrGKl5n1+wo6fe7NZfUcVSuN4b
+	ku1bLLemwtX+K3eNc5dhvSZ/uyqas4mkq6wQZFTyp8r7pYgRtng==
+X-Received: by 2002:a5e:d50f:0:b0:7c7:ead3:d8a0 with SMTP id e15-20020a5ed50f000000b007c7ead3d8a0mr17169224iom.2.1709842638336;
+        Thu, 07 Mar 2024 12:17:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE6jNLo/L7oVmym45jibgdfGVjio9E2EV/9/SsVH70E+7HdSuDVCHGsvUBY8tx1dnDdq/K7iA==
+X-Received: by 2002:a5e:d50f:0:b0:7c7:ead3:d8a0 with SMTP id e15-20020a5ed50f000000b007c7ead3d8a0mr17169210iom.2.1709842637970;
+        Thu, 07 Mar 2024 12:17:17 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id d18-20020a6b6812000000b007c854623affsm1796957ioc.35.2024.03.07.12.17.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 12:17:17 -0800 (PST)
+Date: Thu, 7 Mar 2024 13:17:16 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "eric.auger@redhat.com"
+ <eric.auger@redhat.com>, "clg@redhat.com" <clg@redhat.com>, "Chatre,
+ Reinette" <reinette.chatre@intel.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/7] vfio/pci: Disable auto-enable of exclusive INTx IRQ
+Message-ID: <20240307131716.5feda507.alex.williamson@redhat.com>
+In-Reply-To: <BL1PR11MB52711AF96C93A7C2B70FE12D8C202@BL1PR11MB5271.namprd11.prod.outlook.com>
+References: <20240306211445.1856768-1-alex.williamson@redhat.com>
+	<20240306211445.1856768-2-alex.williamson@redhat.com>
+	<BL1PR11MB52711AF96C93A7C2B70FE12D8C202@BL1PR11MB5271.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240307194255.1367442-1-dmatlack@google.com>
-Subject: [PATCH] KVM: selftests: Create memslot 0 at GPA 0x100000000 on x86_64
-From: David Matlack <dmatlack@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Fuad Tabba <tabba@google.com>, Peter Gonda <pgonda@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Michael Roth <michael.roth@amd.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Create memslot 0 at 0x100000000 (4GiB) to avoid it overlapping with
-KVM's private memslot for the APIC-access page.
+On Thu, 7 Mar 2024 08:28:45 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-Without this change running large-enough selftests (high number of vCPUs
-and/or guest memory) can result in KVM_CREATE_VCPU failing because the
-APIC-access page memslot overlaps memslot 0 created by the selftest:
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Thursday, March 7, 2024 5:15 AM
+> > 
+> > Currently for devices requiring masking at the irqchip for INTx, ie.
+> > devices without DisINTx support, the IRQ is enabled in request_irq()
+> > and subsequently disabled as necessary to align with the masked status
+> > flag.  This presents a window where the interrupt could fire between
+> > these events, resulting in the IRQ incrementing the disable depth twice.  
+> 
+> Can you elaborate the last point about disable depth?
 
-  $ ./dirty_log_perf_test -v 256 -s anonymous_hugetlb_1gb -b 4G
-  Test iterations: 2
-  Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-  ==== Test Assertion Failure ====
-    lib/kvm_util.c:1341: vcpu->fd >= 0
-    pid=53654 tid=53654 errno=17 - File exists
-    (stack trace empty)
-    KVM_CREATE_VCPU failed, rc: -1 errno: 17 (File exists)
+Each irq_desc maintains a depth field, a disable increments the depth,
+an enable decrements.  On the disable transition from 0 to 1 the IRQ
+chip is disabled, on the enable transition from 1 to 0 the IRQ chip is
+enabled.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- tools/testing/selftests/kvm/include/x86_64/processor.h | 6 ++++++
- tools/testing/selftests/kvm/lib/kvm_util.c             | 7 ++++++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+Therefore if an interrupt fires between request_irq() and
+disable_irq(), vfio_intx_handler() will disable the IRQ (depth 0->1).
+Note that masked is not tested here, the interrupt is expected to be
+exclusive for non-pci_2_3 devices.  @masked would be redundantly set to
+true.  The setup call path would increment depth to 2.  The order these
+happen is not important so long as the interrupt is in-flight before
+the setup path disables the IRQ.
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 3bd03b088dda..ee33528007ee 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -20,6 +20,12 @@
- 
- #include "../kvm_util.h"
- 
-+/*
-+ * Create memslot 0 at 4GiB to avoid overlapping with KVM's private memslot for
-+ * the APIC-access page at 0xfee00000.
-+ */
-+#define KVM_UTIL_MEMSLOT0_GPA 0x100000000ULL
-+
- extern bool host_cpu_is_intel;
- extern bool host_cpu_is_amd;
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index b2262b5fad9e..c8d7e66d308d 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -20,6 +20,10 @@
- 
- #define KVM_UTIL_MIN_PFN	2
- 
-+#ifndef KVM_UTIL_MEMSLOT0_GPA
-+#define KVM_UTIL_MEMSLOT0_GPA 0ULL
-+#endif
-+
- static int vcpu_mmap_sz(void);
- 
- int open_path_or_exit(const char *path, int flags)
-@@ -418,7 +422,8 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
- 
- 	vm = ____vm_create(shape);
- 
--	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    KVM_UTIL_MEMSLOT0_GPA, 0, nr_pages, 0);
- 	for (i = 0; i < NR_MEM_REGIONS; i++)
- 		vm->memslots[i] = 0;
- 
+> > This would be unrecoverable for a user since the masked flag prevents
+> > nested enables through vfio.  
+> 
+> What is 'nested enables'?
 
-base-commit: 0c64952fec3ea01cb5b09f00134200f3e7ab40d5
--- 
-2.44.0.278.ge034bb2e1d-goog
+In the case above we have masked true and disable depth 2.  If the user
+now unmasks the interrupt then depth is reduced to 1, the IRQ is still
+disabled, and masked is false.  The masked value is now out of sync
+with the IRQ line and prevents the user from unmasking again.  The
+disable depth is stuck at 1.
+
+Nested enables would be if we allowed the user to unmask a line that we
+think is already unmasked.
+ 
+> > Instead, invert the logic using IRQF_NO_AUTOEN such that exclusive INTx
+> > is never auto-enabled, then unmask as required.
+> > 
+> > Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>  
+> 
+> But this patch looks good to me:
+> 
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> 
+> with one nit...
+> 
+> > 
+> > +	/*
+> > +	 * Devices without DisINTx support require an exclusive interrupt,
+> > +	 * IRQ masking is performed at the IRQ chip.  The masked status is  
+> 
+> "exclusive interrupt, with IRQ masking performed at..."
+
+TBH, the difference is too subtle for me.  With my version above you
+could replace the comma with a period, I think it has the same meaning.
+However, "...exclusive interrupt, with IRQ masking performed at..."
+almost suggests that we need a specific type of exclusive interrupt
+with this property.  There's nothing unique about the exclusive
+interrupt, we could arbitrarily decide we want an exclusive interrupt
+for DisINTx masking if we wanted to frustrate a lot of users.
+
+Performing masking at the IRQ chip is actually what necessitates the
+exclusive interrupt here.  Thanks,
+
+Alex
 
 
