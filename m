@@ -1,333 +1,142 @@
-Return-Path: <kvm+bounces-11370-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11371-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB7E87677B
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 16:40:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A55598767AF
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 16:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDDE81F24613
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 15:40:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 278071F22BD6
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 15:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C938A1F93E;
-	Fri,  8 Mar 2024 15:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857291EF1E;
+	Fri,  8 Mar 2024 15:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A1hzkDDo"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="sUjZFJrL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB5E1F932
-	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 15:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173C42C6A8
+	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 15:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709912446; cv=none; b=MUuEoe5S2GjTLC6D9U5LiEimFAofrlCNnG/oD+vTmrTXL/5ZyRdmHj/hOTk9QU7DnqCYZQ73ArxJUfG7k7zrjKET3oyI3wnHaB/Z5PAgd52kjjJGWcy7GoyFztwJ3Szu44wQ55afLOzwYfMDiWfbjl79d7ZcZglAAS2EKinrtaw=
+	t=1709913011; cv=none; b=b5YNmnBZSbcUyxJ9SkgjlewR8Pas7IuHqxCBYRyKTPLJj27dR52sUylCUkrXeJDjG5yKptJJGXgV3iLDj6DXovRcBUidzrrLpgfXGFvJnZR1VCXyRyq3AG2/7lQYUENW6j6PqPM9VjrhBgM1aSL068c4nUvRmNF6L2WE9WhG4to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709912446; c=relaxed/simple;
-	bh=DcGK2/3fl/rA0ThXMceF6UGOxdgz7YeQ6d40VzoEefU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IRzrzElLSnCYxack8lMWnho/WxMZqyUtacHrkWB94BC35Hsh50iab7T5aI8OoI5clVYazWXUldQIO6n5R9HMshMHP2Eavyc2rq7ghm0jam8iR1e1eIxnp2hBmizNlAbWX67AqkJ3cDPw1+FobpccKaPOMUbcThwF79SR90jr5bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A1hzkDDo; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5d1bffa322eso2293577a12.1
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 07:40:44 -0800 (PST)
+	s=arc-20240116; t=1709913011; c=relaxed/simple;
+	bh=QA4lHtqKxSjsxT9qHmwJmhLD+pT1DQH3Vc8P8ZDukqU=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ko/zG3xqMS68mVc62Mxa7IQsDTbXZJHNDybhz/CONLYXhW4cc71k0Uv2Q43bXWdQJRwHIN5zf7/kiOVkJcb/QvQHOcL7d91L22jUBLGVUBpBtdtx/PCgetma3X0PLiAGJL3g/oQVmiCn2qoCaHlF59hUH73zMfF0IuQTSsssmvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=sUjZFJrL; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709912443; x=1710517243; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yGXij0pXxbNnFrojQkAhwWd7kWJ6lHgt5Xgw5lH9rKY=;
-        b=A1hzkDDokp6aEDVDoaxwHBqjsNur/n/QG19gyuKKsjlwX9KxpKkPCDJtofIXTDUq0y
-         XCjBq3mLoufqZoJFSEwQ7IdRmqgOaV4NSIS3lJg0Nb/001FVYLnR2mcLwvBMcfvgDxqu
-         sj58Z+xYeayCEpG2GW7jZ7/lZDEafyDq+gWvswM8djCcG4OAB7T/BoP1YSd0s8IEudJG
-         etD1Mf7cd9dIXhwwcC77pqTg4mGIrd7iU4EPM5quq0xUZBPdp14ebvd5CHi8CJK+vFcP
-         Girq8XaIufo5TwSKqyWkN89V9dqB6PizZKWCVXCXQ7oTm1TqQ6eJ1sIJCW9pm5nU/FqJ
-         IAZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709912443; x=1710517243;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yGXij0pXxbNnFrojQkAhwWd7kWJ6lHgt5Xgw5lH9rKY=;
-        b=UFL01wou8e/QtEHyqP4xhe34ujWwj8B8cWdzAie2aTj2C/Uoi9FU04MPfPi/7vHoh3
-         yJXoXPKOs8y3iafFyPZEPtxwblmKubVGOVFoyxfDc1ija2C20hxmzh87PVrPhogem3uU
-         gxOriENvKSTF0bki+SRyVZkYglVvCdeZv6S1jv0gB/KbnkYTLA0sE1YzcJxiAsMQ111Q
-         jyQmeilt0P5M7G4CyOnurIwkq1AlC1zpVQeQaTIrh8G973+FsxoqayyxrfjqCliEoZpO
-         PBWg13nGRHoDr4/gNX8zbh4xXuS9Au9aL6OOgV7TV00z14zh5hlLrAmBxIkghCqX9Kvg
-         8b1g==
-X-Forwarded-Encrypted: i=1; AJvYcCU26UTyUwrDWjfOQUG/T8u32V+x5eE1bLfWYXozlJAWv/ziR7hNkgFYnbQzEWe87qlVhPU9CoZEEUknuTuGxnaHGSKV
-X-Gm-Message-State: AOJu0YyM0eFmjt73NVYsLa5riharRowYTNPTJnNBDvwWrxLoshHpsG2S
-	5ALuN+J+WbHRYIJzejAuu0lhywC5o/vcAFT21RkBltU39lJObZQvKGSAGuvuyJ/pCJNeQuK5n1/
-	3LQ==
-X-Google-Smtp-Source: AGHT+IFjEBX6C+7q1SBXQ+tSA4pdjdQXgmJ9UBKLZS/xnmX8tOHGVqK01y9ERowX6ifH4R9/jDDhuoSeDmU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:1f64:0:b0:5dc:1c7d:2c75 with SMTP id
- q36-20020a631f64000000b005dc1c7d2c75mr56894pgm.1.1709912443614; Fri, 08 Mar
- 2024 07:40:43 -0800 (PST)
-Date: Fri, 8 Mar 2024 07:40:42 -0800
-In-Reply-To: <CAAhSdy2Mu08RsBM+7FMjkcV49p9gOj3UKEoZnPAVk92e_3q=sw@mail.gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1709913010; x=1741449010;
+  h=from:to:cc:subject:date:message-id:content-id:
+   content-transfer-encoding:mime-version;
+  bh=QA4lHtqKxSjsxT9qHmwJmhLD+pT1DQH3Vc8P8ZDukqU=;
+  b=sUjZFJrL5e9ej2vlGK81PUPVGEjo8JPcnpal+i1XE/wPgVSbegsHQoSG
+   XnsrPebkemdsI/zhNeKG3CBrskGBI1R5D+OeXYniXsrSf3oo7+693xRvF
+   PgrGrakbw+ns8YAOJPoF+ytiSa5avj1AQ4y4R/TLkreHyAs/rzb7Ml0Md
+   0=;
+X-IronPort-AV: E=Sophos;i="6.07,110,1708387200"; 
+   d="scan'208";a="391958052"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 15:50:07 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:1988]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.25.203:2525] with esmtp (Farcaster)
+ id 8c23d56c-2946-4ad1-a458-e638ebc96e22; Fri, 8 Mar 2024 15:50:05 +0000 (UTC)
+X-Farcaster-Flow-ID: 8c23d56c-2946-4ad1-a458-e638ebc96e22
+Received: from EX19D022EUC004.ant.amazon.com (10.252.51.159) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 8 Mar 2024 15:50:05 +0000
+Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
+ EX19D022EUC004.ant.amazon.com (10.252.51.159) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 8 Mar 2024 15:50:05 +0000
+Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
+ EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
+ 15.02.1258.028; Fri, 8 Mar 2024 15:50:05 +0000
+From: "Gowans, James" <jgowans@amazon.com>
+To: "seanjc@google.com" <seanjc@google.com>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "Roy, Patrick" <roypat@amazon.co.uk>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>, "Manwaring,
+ Derek" <derekmn@amazon.com>, "rppt@kernel.org" <rppt@kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Woodhouse, David"
+	<dwmw@amazon.co.uk>
+CC: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "lstoakes@gmail.com"
+	<lstoakes@gmail.com>, "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>, "kirill.shutemov@linux.intel.com"
+	<kirill.shutemov@linux.intel.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"mst@redhat.com" <mst@redhat.com>, "somlo@cmu.edu" <somlo@cmu.edu>, "Graf
+ (AWS), Alexander" <graf@amazon.de>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
+	<linux-coco@lists.linux.dev>
+Subject: Unmapping KVM Guest Memory from Host Kernel
+Thread-Topic: Unmapping KVM Guest Memory from Host Kernel
+Thread-Index: AQHacXBJeX10YUH0O0SiQBg1zQLaEw==
+Date: Fri, 8 Mar 2024 15:50:05 +0000
+Message-ID: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
+Accept-Language: en-ZA, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3D0CAAE8EB336B4C9323DDC23B24F0C0@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAAhSdy1rYFoYjCRWTPouiT=tiN26Z_v3Y36K2MyDrcCkRs1Luw@mail.gmail.com>
- <Zen8qGzVpaOB_vKa@google.com> <CAAhSdy2Mu08RsBM+7FMjkcV49p9gOj3UKEoZnPAVk92e_3q=sw@mail.gmail.com>
-Message-ID: <ZesxeoyFZUeo-Z9F@google.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.9
-From: Sean Christopherson <seanjc@google.com>
-To: Anup Patel <anup@brainfault.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Palmer Dabbelt <palmer@rivosinc.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
-	KVM General <kvm@vger.kernel.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 
-On Fri, Mar 08, 2024, Anup Patel wrote:
-> On Thu, Mar 7, 2024 at 11:13=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Thu, Mar 07, 2024, Anup Patel wrote:
-> > > ----------------------------------------------------------------
-> > > KVM/riscv changes for 6.9
-> > Uh, what's going on with this series?  Many of these were committed *ye=
-sterday*,
-> > but you sent a mail on February 12th[1] saying these were queued.  That=
-'s quite
-> > the lag.
-> >
-> > I don't intend to police the RISC-V tree, but this commit caused a conf=
-lict with
-> > kvm-x86/selftests[2].  It's a non-issue in this case because it's such =
-a trivial
-> > conflict, and we're all quite lax with selftests, but sending a pull re=
-quest ~12
-> > hours after pushing commits that clearly aren't fixes is a bit ridiciul=
-ous.  E.g.
-> > if this were to happen with a less trivial conflict, the other sub-main=
-tainer would
-> > be left doing a late scramble to figure things out just before sending =
-their own
-> > pull requests.
-> >
-> >   tag kvm-riscv-6.9-1
-> >   Tagger:     Anup Patel <anup@brainfault.org>
-> >   TaggerDate: Thu Mar 7 11:54:34 2024 +0530
-> >
-> > ...
-> >
-> >   commit d8c0831348e78fdaf67aa95070bae2ef8e819b05
-> >   Author:     Anup Patel <apatel@ventanamicro.com>
-> >   AuthorDate: Tue Feb 13 13:39:17 2024 +0530
-> >   Commit:     Anup Patel <anup@brainfault.org>
-> >   CommitDate: Wed Mar 6 20:53:44 2024 +0530
-> >
-> > The other reason this caught my eye is that the conflict happened in co=
-mmon code,
-> > but the added helper is RISC-V specific and used only from RISC-V code.=
-  ARM does
-> > have an identical helper, but AFAICT ARM's helper is only used from ARM=
- code.
-> >
-> > But the prototype of guest_get_vcpuid() is in common code.  Which isn't=
- a huge
-> > deal, but it's rather undesirable because there's no indication that it=
-s
-> > implementation is arch-specific, and trying to use it in code built for=
- s390 or
-> > x86 (or MIPS or PPC, which are on the horizon), would fail.  I'm all fo=
-r making
-> > code common where possible, but going halfway and leaving a trap for ot=
-her
-> > architectures makes for a poor experience for developers.
-> >
-> > And again, this showing up _so_ late means it's unnecessarily difficult=
- to clean
-> > things up.  Which is kinda the whole point of getting thing into linux-=
-next, so
-> > that folks that weren't involved in the original patch/series can react=
- if there
-> > is a hiccup/problem/oddity.
->=20
-> Sorry for the last minute conflict.
->=20
-> In all release cycles, the riscv_kvm_queue freezes by rc6 and riscv_kvm_n=
-ext
-> is updated at least a week before sending PR.
->=20
-> In this case there was a crucial last minute bug found in RISC-V arch_tim=
-er
-> selftest patches due to which the get-reg-list selftest was broken so I
-> updated the offending commits in the queue itself before sending out PR.
->=20
-> I will definitely try my best to avoid such last minute conflict.
-
-You're missing the point.  I don't care when patches land in the RISC-V tre=
-e, nor
-do I care that you made a last minute tweak to fix a bug.  I care when comm=
-its
-show up in linux-next, and *none* of these commits were in linux-next until
-yesterday.
-
-  $ git tag -l --contains 2c5af1c8460376751d57c50af88a053a3b869926
-  next-20240307
-  next-20240308
-
-The *entire* purpose of linux-next is to integrate *all* work destined for =
-the
-next kernel into a single tree, so that conflicts, bugs, etc. can be found =
-and
-fixed *before* the next merge window.
-
-Commits should be getting pushed to riscv_kvm_next, i.e. pulled by linux-ne=
-xt,
-the instant you are confident they are "stable" and unlikely to be amended.=
-  The
-entire RISC-V KVM tree showing up in linux-next a week before the merge win=
-dow
-opens is *way* too late.
-
-From Documentation/process/howto.rst:
-
-  - As soon as a new kernel is released a two week window is open,
-    during this period of time maintainers can submit big diffs to
-    Linus, usually the patches that have already been included in the
-    linux-next for a few weeks.=20
-
-...
-
-  linux-next integration testing tree
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- =20
-  Before updates from subsystem trees are merged into the mainline tree,
-  they need to be integration-tested.  For this purpose, a special
-  testing repository exists into which virtually all subsystem trees are
-  pulled on an almost daily basis:
- =20
-  	https://git.kernel.org/?p=3Dlinux/kernel/git/next/linux-next.git
- =20
-  This way, the linux-next gives a summary outlook onto what will be
-  expected to go into the mainline kernel at the next merge period.
-  Adventurous testers are very welcome to runtime-test the linux-next.
- =20
-The fact that your tree is based on -rc6 means your entire workflow is flaw=
-ed.
-There is almost never a need to to use a release candidate later than -rc2 =
-as
-the base, as the odds of there being a fix in Linus' tree aftern -rc2 that =
-is
-*absolutely necessary* for testing KVM are vanishingly small.
-
-And given that these were "queued" on February 12th, but are now based on -=
-rc6,
-means that you reparented them at least once.  Rebasing/reparenting is expl=
-icitly
-documented as a Bad Idea=E2=84=A2, because for all intents and purposes reb=
-asing creates
-a completely new commit, and thus invalidates much of the testing that was =
-done
-on the prior incarnation of the branch/commits.
-
-E.g. if you make a mistake when rebasing a patch and introduce a bug, bisec=
-t will
-point to the rebased commit, despite the fact that as *submitted* and origi=
-nally
-applied, the patch was correct.  But if you (or more likely Paolo or Linus)=
- make
-the same mistake when merging the branch, bisect will point at the merge co=
-mmit.
-That is a huge difference, as it pinpoints that the problem wasn't with the=
- patch
-itself, but instead with how it was integrated without someone else's work.
-
-From Documentation/maintainer/rebasing-and-merging.rst
-
-  Rebasing
-  =3D=3D=3D=3D=3D=3D=3D=3D
- =20
-  "Rebasing" is the process of changing the history of a series of commits
-  within a repository.  There are two different types of operations that ar=
-e
-  referred to as rebasing since both are done with the ``git rebase``
-  command, but there are significant differences between them:
- =20
-   - Changing the parent (starting) commit upon which a series of patches i=
-s
-     built.  For example, a rebase operation could take a patch set built o=
-n
-     the previous kernel release and base it, instead, on the current
-     release.  We'll call this operation "reparenting" in the discussion
-     below.
- =20
-   - Changing the history of a set of patches by fixing (or deleting) broke=
-n
-     commits, adding patches, adding tags to commit changelogs, or changing
-     the order in which commits are applied.  In the following text, this
-     type of operation will be referred to as "history modification"
- =20
-  The term "rebasing" will be used to refer to both of the above operations=
-.
-  Used properly, rebasing can yield a cleaner and clearer development
-  history; used improperly, it can obscure that history and introduce bugs.
- =20
-  There are a few rules of thumb that can help developers to avoid the wors=
-t
-  perils of rebasing:
- =20
-   - History that has been exposed to the world beyond your private system
-     should usually not be changed.  Others may have pulled a copy of your
-     tree and built on it; modifying your tree will create pain for them.  =
-If
-     work is in need of rebasing, that is usually a sign that it is not yet
-     ready to be committed to a public repository.
- =20
-     That said, there are always exceptions.  Some trees (linux-next being
-     a significant example) are frequently rebased by their nature, and
-     developers know not to base work on them.  Developers will sometimes
-     expose an unstable branch for others to test with or for automated
-     testing services.  If you do expose a branch that may be unstable in
-     this way, be sure that prospective users know not to base work on it.
- =20
-   - Do not rebase a branch that contains history created by others.  If yo=
-u
-     have pulled changes from another developer's repository, you are now a
-     custodian of their history.  You should not change it.  With few
-     exceptions, for example, a broken commit in a tree like this should be
-     explicitly reverted rather than disappeared via history modification.
- =20
-   - Do not reparent a tree without a good reason to do so.  Just being on =
-a
-     newer base or avoiding a merge with an upstream repository is not
-     generally a good reason.
- =20
-   - If you must reparent a repository, do not pick some random kernel comm=
-it
-     as the new base.  The kernel is often in a relatively unstable state
-     between release points; basing development on one of those points
-     increases the chances of running into surprising bugs.  When a patch
-     series must move to a new base, pick a stable point (such as one of
-     the -rc releases) to move to.
- =20
-   - Realize that reparenting a patch series (or making significant history
-     modifications) changes the environment in which it was developed and,
-     likely, invalidates much of the testing that was done.  A reparented
-     patch series should, as a general rule, be treated like new code and
-     retested from the beginning.
- =20
-  A frequent cause of merge-window trouble is when Linus is presented with =
-a
-  patch series that has clearly been reparented, often to a random commit,
-  shortly before the pull request was sent.  The chances of such a series
-  having been adequately tested are relatively low - as are the chances of
-  the pull request being acted upon.
- =20
-  If, instead, rebasing is limited to private trees, commits are based on a
-  well-known starting point, and they are well tested, the potential for
-  trouble is low.
+SGVsbG8gS1ZNLCBNTSBhbmQgbWVtZmRfc2VjcmV0IGZvbGtzLA0KDQpDdXJyZW50bHkgd2hlbiB1
+c2luZyBhbm9ueW1vdXMgbWVtb3J5IGZvciBLVk0gZ3Vlc3QgUkFNLCB0aGUgbWVtb3J5IGFsbA0K
+cmVtYWlucyBtYXBwZWQgaW50byB0aGUga2VybmVsIGRpcmVjdCBtYXAuIFdlIGFyZSBsb29raW5n
+IGF0IG9wdGlvbnMgdG8NCmdldCBLVk0gZ3Vlc3QgbWVtb3J5IG91dCBvZiB0aGUga2VybmVs4oCZ
+cyBkaXJlY3QgbWFwIGFzIGEgcHJpbmNpcGxlZA0KYXBwcm9hY2ggdG8gbWl0aWdhdGluZyBzcGVj
+dWxhdGl2ZSBleGVjdXRpb24gaXNzdWVzIGluIHRoZSBob3N0IGtlcm5lbC4NCk91ciBnb2FsIGlz
+IHRvIG1vcmUgY29tcGxldGVseSBhZGRyZXNzIHRoZSBjbGFzcyBvZiBpc3N1ZXMgd2hvc2UgbGVh
+aw0Kb3JpZ2luIGlzIGNhdGVnb3JpemVkIGFzICJNYXBwZWQgbWVtb3J5IiBbMV0uDQoNCldlIGN1
+cnJlbnRseSBoYXZlIGRvd25zdHJlYW0tb25seSBzb2x1dGlvbnMgdG8gdGhpcywgYnV0IHdlIHdh
+bnQgdG8gbW92ZQ0KdG8gcHVyZWx5IHVwc3RyZWFtIGNvZGUuDQoNClNvIGZhciB3ZSBoYXZlIGJl
+ZW4gbG9va2luZyBhdCB1c2luZyBtZW1mZF9zZWNyZXQsIHdoaWNoIHNlZW1zIHRvIGJlDQpkZXNp
+Z25lZCBleGFjdGx5IGZvciB1c2VjYXNlcyB3aGVyZSBpdCBpcyB1bmRlc2lyYWJsZSB0byBoYXZl
+IHNvbWUNCm1lbW9yeSByYW5nZSBhY2Nlc3NpYmxlIHRocm91Z2ggdGhlIGtlcm5lbOKAmXMgZGly
+ZWN0IG1hcC4NCg0KSG93ZXZlciwgbWVtZmRfc2VjcmV0IGRvZXNu4oCZdCB3b3JrIG91dCB0aGUg
+Ym94IGZvciBLVk0gZ3Vlc3QgbWVtb3J5OyB0aGUNCm1haW4gcmVhc29uIHNlZW1zIHRvIGJlIHRo
+YXQgdGhlIEdVUCBwYXRoIGlzIGludGVudGlvbmFsbHkgZGlzYWJsZWQgZm9yDQptZW1mZF9zZWNy
+ZXQsIHNvIGlmIHdlIHVzZSBhIG1lbWZkX3NlY3JldCBiYWNrZWQgVk1BIGZvciBhIG1lbXNsb3Qg
+dGhlbg0KS1ZNIGlzIG5vdCBhYmxlIHRvIGZhdWx0IHRoZSBtZW1vcnkgaW4uIElmIGl04oCZcyBi
+ZWVuIHByZS1mYXVsdGVkIGluIGJ5DQp1c2Vyc3BhY2UgdGhlbiBpdCBzZWVtcyB0byB3b3JrLg0K
+DQpUaGVyZSBhcmUgYSBmZXcgb3RoZXIgaXNzdWVzIGFyb3VuZCB3aGVuIEtWTSBhY2Nlc3NlcyB0
+aGUgZ3Vlc3QgbWVtb3J5Lg0KRm9yIGV4YW1wbGUgdGhlIEtWTSBQViBjbG9jayBjb2RlIGdvZXMg
+ZGlyZWN0bHkgdG8gdGhlIFBGTiB2aWEgdGhlDQpwZm5jYWNoZSwgYW5kIHRoYXQgYWxzbyBicmVh
+a3MgaWYgdGhlIFBGTiBpcyBub3QgaW4gdGhlIGRpcmVjdCBtYXAsIHNvDQp3ZeKAmWQgbmVlZCB0
+byBjaGFuZ2UgdGhhdCBzb3J0IG9mIHRoaW5nLCBwZXJoYXBzIGdvaW5nIHZpYSB1c2Vyc3BhY2UN
+CmFkZHJlc3Nlcy4NCg0KSWYgd2UgcmVtb3ZlIHRoZSBtZW1mZF9zZWNyZXQgY2hlY2sgZnJvbSB0
+aGUgR1VQIHBhdGgsIGFuZCBkaXNhYmxlIEtWTeKAmXMNCnB2Y2xvY2sgZnJvbSB1c2Vyc3BhY2Ug
+dmlhIEtWTV9DUFVJRF9GRUFUVVJFUywgd2UgYXJlIGFibGUgdG8gYm9vdCBhDQpzaW1wbGUgTGlu
+dXggaW5pdHJkIHVzaW5nIGEgRmlyZWNyYWNrZXIgVk1NIG1vZGlmaWVkIHRvIHVzZQ0KbWVtZmRf
+c2VjcmV0Lg0KDQpXZSBhcmUgYWxzbyBhd2FyZSBvZiBvbmdvaW5nIHdvcmsgb24gZ3Vlc3RfbWVt
+ZmQuIFRoZSBjdXJyZW50DQppbXBsZW1lbnRhdGlvbiB1bm1hcHMgZ3Vlc3QgbWVtb3J5IGZyb20g
+Vk1NIGFkZHJlc3Mgc3BhY2UsIGJ1dCBsZWF2ZXMgaXQNCmluIHRoZSBrZXJuZWzigJlzIGRpcmVj
+dCBtYXAuIFdl4oCZcmUgbm90IGxvb2tpbmcgYXQgdW5tYXBwaW5nIGZyb20gVk1NDQp1c2Vyc3Bh
+Y2UgeWV0OyB3ZSBzdGlsbCBuZWVkIGd1ZXN0IFJBTSB0aGVyZSBmb3IgUFYgZHJpdmVycyBsaWtl
+IHZpcnRpbw0KdG8gY29udGludWUgdG8gd29yay4gU28gS1ZN4oCZcyBnbWVtIGRvZXNu4oCZdCBz
+ZWVtIGxpa2UgdGhlIHJpZ2h0IHNvbHV0aW9uPw0KDQpXaXRoIHRoaXMgaW4gbWluZCwgd2hhdOKA
+mXMgdGhlIGJlc3Qgd2F5IHRvIHNvbHZlIGdldHRpbmcgZ3Vlc3QgUkFNIG91dCBvZg0KdGhlIGRp
+cmVjdCBtYXA/IElzIG1lbWZkX3NlY3JldCBpbnRlZ3JhdGlvbiB3aXRoIEtWTSB0aGUgd2F5IHRv
+IGdvLCBvcg0Kc2hvdWxkIHdlIGJ1aWxkIGEgc29sdXRpb24gb24gdG9wIG9mIGd1ZXN0X21lbWZk
+LCBmb3IgZXhhbXBsZSB2aWEgc29tZQ0KZmxhZyB0aGF0IGNhdXNlcyBpdCB0byBsZWF2ZSBtZW1v
+cnkgaW4gdGhlIGhvc3QgdXNlcnNwYWNl4oCZcyBwYWdlIHRhYmxlcywNCmJ1dCByZW1vdmVzIGl0
+IGZyb20gdGhlIGRpcmVjdCBtYXA/IA0KDQpXZSBhcmUga2VlbiB0byBoZWxwIGNvbnRyaWJ1dGUg
+dG8gZ2V0dGluZyB0aGlzIHdvcmtpbmcsIHdl4oCZcmUganVzdA0KbG9va2luZyBmb3IgZ3VpZGFu
+Y2UgZnJvbSBtYWludGFpbmVycyBvbiB3aGF0IHRoZSBjb3JyZWN0IHdheSB0byBzb2x2ZQ0KdGhp
+cyBpcy4NCg0KQ2hlZXJzLA0KSmFtZXMgKyBjb2xsZWFndWVzIERlcmVrIGFuZCBQYXRyaWNrDQoN
+Cg==
 
