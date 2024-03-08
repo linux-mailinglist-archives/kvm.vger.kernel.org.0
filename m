@@ -1,113 +1,109 @@
-Return-Path: <kvm+bounces-11407-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51CFF876D52
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 23:47:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D9CA876DB4
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 00:06:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F216E28180B
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 22:47:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47D1CB21E35
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 23:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3898136B09;
-	Fri,  8 Mar 2024 22:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10533FBA0;
+	Fri,  8 Mar 2024 23:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uFArpV64"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tsfhb2Ar"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6589445
-	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 22:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C2139FC0
+	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 23:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709938060; cv=none; b=kkU3uNb71RnnltDdXSJuuFBo2hqCCGDayQ/bB9H/rMW5D+2Ot64lkD4+1alKjJfnwUabqKzkmDXwol6RRg7AuWsBtCN2j2Vht2ug/fHbxnWKKYFssvF2EcUu89BMO69vxwUveiQbKUmG7nfgAUFzN5a77IsyZkJq+9ambpTZQpQ=
+	t=1709939173; cv=none; b=SsFz5ny0OpauUJf7O4rYaBrj6pw3EIdCNhFEG++mty1F9Y6fZkqIJzKdzaMO/53enEANlmi6VnFHg8OM318wAiacn7lSulFZ5r+NJlMBv7kiimjZNGMJISYt/x+G2iqY8Ghb1wCtKCZoc8j3pV5j4Uep1ohXBuji+Je5w9pGD/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709938060; c=relaxed/simple;
-	bh=M/bx8q8CM3qETkQji4PtCsuoRWZzooyLQhnGcyOMldU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UYEsDX5n6XQapNPYjOuVLDXYL4NTJ8UKhZ/gLVVqVJtDgHuhNWgzMb7HmM3YNRW4AlUqzovHH0dg67D3vA09d2ojBaP4Nwnx8oc714jU+Hchjx+h+E5yVGaX1QPJzl9TWjibqhQuezrmJoArsD4dNbPDZYghT6TgAXEasRbUI9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uFArpV64; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-609fb719f48so33066267b3.2
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 14:47:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709938058; x=1710542858; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SKmvQ5PcWXT/71cgvqMhhqx5Wzq7n7WsxYjGNYsq8ec=;
-        b=uFArpV64e2cMQ7HFp6kljIG0NjTC9gYCv109ZFatYS2IcXxRq23Dp486AGixx2n6zb
-         3MqXzd2XySjlCnvVTJtecELt9jnKW44EmDqdWICrc0mmueySOXwxnc/8EXx5J/+FLzNu
-         upUhky71jXV4T6nqaqCtIa/GGYFR7cJ7TOicmLaF7ggwLF5fS2+NMlM09qh/jp+hPggA
-         WlL2itndegtZqmNMvnBjhJezNWCnqhs3XsYYqS2fIQx3M2xiB9RD4f5AE6Dr7xzd/KCW
-         TofL/SAWGHY2WK5LZI3U8JIKlYh+sU04wAB778R3JfkMogrUvjSMUwxsLt9mgcMGUWT/
-         71Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709938058; x=1710542858;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SKmvQ5PcWXT/71cgvqMhhqx5Wzq7n7WsxYjGNYsq8ec=;
-        b=pJEZoYFB6AcVPmSMsyB5CP7H7O0Rh0F1ddyGw0+iZ4r4D+jLv9jDUsdWFvDIFoeQ+h
-         hRkDk/0RgfXSVvdl1x4gCW53Qwo/ZjoKsYuCkZWkTy6P6b41RIvoWIzSZtBS38JjOzeP
-         BQDYJzBwhrzGgAVsC1izJ9qQpRodt/6JPuWwenOppHfvoaQqeFCCEHTSxWwzIeg6QoXE
-         ukCpFtDla0suUVSPAiAPJgRE7jwwYzwYGyIKw8VvSdZKCZMyFC7gbJn8b1g8YSqws0mi
-         1vZqu91NgpKOME9n5e2CwAPV1FzxWj/roaZxiv7yrUxfgKjGEFFgtaCYiwLcOm4FfwNK
-         Znkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWN58e4KAxNaAptUY/xjsYAYZLp3erYuEH85gTdgxFxu4gzc93r/IJBPIVVDurzA22Co99yUcbXXDqN3BfHIeAxXQm5
-X-Gm-Message-State: AOJu0YwYw+RbGanKHoPFdfwC4VE0Ax9YoYlNn2vMsyDGQ0yjhrOm1D9x
-	Em0lWcAIT9QYYSvsHMpG1QCnPudNccX4XEfcpG9V7KDgInVeJNDSWZnJ5RC0uKUWpbFQYDTCjdY
-	oqQ==
-X-Google-Smtp-Source: AGHT+IFqRwVOtamqH/NKTy0aNd2o9IZB1qaPOD/2a3NruNRdmlhFTn+MhqozJICSJlnbYsW/c2VqgNYGi+8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:5201:0:b0:608:ecf3:ef8 with SMTP id
- g1-20020a815201000000b00608ecf30ef8mr124505ywb.0.1709938058024; Fri, 08 Mar
- 2024 14:47:38 -0800 (PST)
-Date: Fri, 8 Mar 2024 14:47:36 -0800
-In-Reply-To: <aa50a5ea6dbcd5f3f1df39dcf2fc4f5ee881ec8e.camel@infradead.org>
+	s=arc-20240116; t=1709939173; c=relaxed/simple;
+	bh=UgNCsPYDfPK8fXAwp9yH+lGepvO4l0WGBsuozUu4gBE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GkpOIoWsnEcgbNzUp+JB7ca27tptIpJzZcFbR7JFF9SxwVl0+qLb6thZEs3g3jZCDgcMlwGO8uJJWU/WbXne6vJUYtz6Eiw9q9IEnvEtwFTG7z+R8pwpUKdLqhGap17nB98hcVLkprmH90JaPhZHUI6trxE99bCybKYTQecReds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tsfhb2Ar; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709939169;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IDezgE//GekdRKrLiXezeVzaF0hQXhS702rH5dPLxcA=;
+	b=Tsfhb2Ar/r8j9b5GQklJ30iyZo9dGWnKCzNNYET59KQH5v38C5I8anYVyHiQOec3K4EzQV
+	HnplodpRAWFsvdrKwu03rxOLKSZ0IgHTVzQh66/602jjHN/R6K8eOY0pirbDRJd9IeHpr5
+	eKt6MPnUAnD0f5qzt4cf87ySxdTgItY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-479-K1ZwyV4BPAqFCNLoksqkXQ-1; Fri, 08 Mar 2024 18:06:05 -0500
+X-MC-Unique: K1ZwyV4BPAqFCNLoksqkXQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E41C5800264;
+	Fri,  8 Mar 2024 23:06:04 +0000 (UTC)
+Received: from omen.home.shazbot.org (unknown [10.22.8.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E5AA137F6;
+	Fri,  8 Mar 2024 23:06:03 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+To: alex.williamson@redhat.com
+Cc: kvm@vger.kernel.org,
+	eric.auger@redhat.com,
+	clg@redhat.com,
+	reinette.chatre@intel.com,
+	linux-kernel@vger.kernel.org,
+	kevin.tian@intel.com
+Subject: [PATCH v2 0/7] vfio: Interrupt eventfd hardening
+Date: Fri,  8 Mar 2024 16:05:21 -0700
+Message-ID: <20240308230557.805580-1-alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
- <CA+i-1C34VT5oFQL7en1n+MdRrO7AXaAMdNVvjFPxOaTDGXu9Dw@mail.gmail.com>
- <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com> <aa50a5ea6dbcd5f3f1df39dcf2fc4f5ee881ec8e.camel@infradead.org>
-Message-ID: <ZeuVV3Jo31lcL41H@google.com>
-Subject: Re: Unmapping KVM Guest Memory from Host Kernel
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: David Matlack <dmatlack@google.com>, Brendan Jackman <jackmanb@google.com>, 
-	James Gowans <jgowans@amazon.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, Patrick Roy <roypat@amazon.co.uk>, 
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>, Derek Manwaring <derekmn@amazon.com>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	Nikita Kalyazin <kalyazin@amazon.co.uk>, "lstoakes@gmail.com" <lstoakes@gmail.com>, 
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, 
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"mst@redhat.com" <mst@redhat.com>, "somlo@cmu.edu" <somlo@cmu.edu>, Alexander Graf <graf@amazon.de>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On Fri, Mar 08, 2024, David Woodhouse wrote:
-> On Fri, 2024-03-08 at 09:35 -0800, David Matlack wrote:
-> > I think what James is looking for (and what we are also interested
-> > in), is _eliminating_ the ability to access guest memory from the
-> > direct map entirely. And in general, eliminate the ability to access
-> > guest memory in as many ways as possible.
-> 
-> Well, pKVM does that... 
+This series hardens interrupt code relative to eventfd registration
+across several vfio bus drivers, ensuring that NULL eventfds cannot
+be triggered by users.  Several other more minor issues were discovered
+and fixed along the way.
 
-Out-of-tree :-)
+Thanks to Reinette for identifying this latent vulnerability.  Thanks,
 
-I'm not just being snarky; when pKVM lands this functionality upstream, I fully
-expect zapping direct map entries to be generic guest_memfd functionality that
-would be opt-in, either by the in-kernel technology, e.g. pKVM, or by userspace,
-or by some combination of the two, e.g. I can see making it optional to nuke the
-direct map when using guest_memfd for TDX guests so that rogue accesses from the
-host generate synchronous #PFs instead of latent #MCs.
+Alex
+
+v2:
+ * Add R-b from Kevin & Reinette (thanks!)
+ * Remove unused hwirqs in 5/ and avoid unnecessary hwirq lookup in
+   cleanup and init unwind in 6/
+
+Alex Williamson (7):
+  vfio/pci: Disable auto-enable of exclusive INTx IRQ
+  vfio/pci: Lock external INTx masking ops
+  vfio: Introduce interface to flush virqfd inject workqueue
+  vfio/pci: Create persistent INTx handler
+  vfio/platform: Disable virqfds on cleanup
+  vfio/platform: Create persistent IRQ handlers
+  vfio/fsl-mc: Block calling interrupt handler without trigger
+
+ drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    |   7 +-
+ drivers/vfio/pci/vfio_pci_intrs.c         | 176 +++++++++++++---------
+ drivers/vfio/platform/vfio_platform_irq.c | 105 +++++++++----
+ drivers/vfio/virqfd.c                     |  21 +++
+ include/linux/vfio.h                      |   2 +
+ 5 files changed, 205 insertions(+), 106 deletions(-)
+
+-- 
+2.44.0
+
 
