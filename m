@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-11394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C36876C19
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 21:58:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D372876C2F
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 22:02:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 494AC2834E1
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 20:58:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D0E283057
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 21:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AFC5F47B;
-	Fri,  8 Mar 2024 20:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6F35FB9A;
+	Fri,  8 Mar 2024 21:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fI0l4AwK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ce5BxOhb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E7F5E062;
-	Fri,  8 Mar 2024 20:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B035E090;
+	Fri,  8 Mar 2024 21:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709931521; cv=none; b=Ygx9+LN+d0zCvx8YuS0V4Us3YllorbZdwcp+/QjWZMTRkJ/s4N6l6JECasq3Bt/7TyBKJrjy6croES6NjkShDA8yMxmC58+h+AVuV0gTWfGTPmtx7ejdgoOJNCuY7Bx22xw9cLuLigv5IXVXDpVg/xj8nVm6Sfvika7P6n+ETE4=
+	t=1709931680; cv=none; b=V3dsQKeaAAsPNtFtGQmdpxGRCSH71EpxtHEwcuegARsZqUruU6N9ATcjh8ZAxnEcIZ8oD7Y1n/pcUASXQCiiN6K7WdIuOetq3aimep52tfMAi+OobdpSh996nTgwIhzU58KRyKqTt9v2OQ/9Hq6vJ9FdABin3B1zcEEgUZNWnlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709931521; c=relaxed/simple;
-	bh=ouGvOwjRtMXmy8kwxtlJZ9GeTTI+/olVPO7iYCKpTLo=;
+	s=arc-20240116; t=1709931680; c=relaxed/simple;
+	bh=DDl8vWySAK96jU7FvSbeJPzo1lFEUUlodXhYmz+FK+o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P7/2jUZNM+bxzgH7B29hcWIDqvupRu1FlKq43VknVXOYuqL085ENjsX0TR8FErzcoe6MunpavLxHOcorwfgw1ELxFfTdvG54yznrLryp7TwH/MbRKKvOp3CtWdF4pO42UXydj8cva4HzUOQY0PN1XWwJX/aYzHJkOVMIhCZy7r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fI0l4AwK; arc=none smtp.client-ip=198.175.65.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=fhIyiAxce9PN1nSerMPVcZC8lZChbuPyKjVT+5tuYqoKkXZTl492RlsJFg7N7ecOqe3kQk2hymmKrS6tPoqnbBEz5NwgBEreUp8GDKZLppw+wFiQTgN0naUbrHAn3EYrYVi6Vg3h3UuXVFTP8SXcd2ZZFkaHU07K5G5JmbqVluo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ce5BxOhb; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709931520; x=1741467520;
+  t=1709931678; x=1741467678;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=ouGvOwjRtMXmy8kwxtlJZ9GeTTI+/olVPO7iYCKpTLo=;
-  b=fI0l4AwKVCO2hP85BQV+LsVHsHI1kTsHHASM9acEYRwpBDKSnTdRplZQ
-   ahQ9A7N4FbRrvT94Zb5vIyHxGCzJ+g1gD0Wl4itXYd3le58j9NqJgsKLP
-   jrPOOsuhdM8hv61fO/i5BolTc6FZ+QqbWVnekYW4vHXqIJ9+x4GiBlnUj
-   /JSRahRDtAUHAEmOB+3Uoa5Tt64/ogfx1RGS45EiX9R2xyUj4TM18kzgI
-   kASjb1nNoKkh8OFrrI6v85a3Zaxez2yN2rD11PnNSibLvyWMF+beGkbUP
-   6XEGIv9g/W4W1lwuEOkg5PTl6LiD8VgyhaC/l4l0KC6AFRsZcJ2Ttgs+A
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11007"; a="27141048"
+  bh=DDl8vWySAK96jU7FvSbeJPzo1lFEUUlodXhYmz+FK+o=;
+  b=ce5BxOhb7mJEsC10tFHwQb6Xc74RRP8Mu+V3LLyE8CHEUiJsh8Deo8Mn
+   PrEki+08cVqFtIxh736+biYeSCwREScuj5UvOGDG70JRLkznHGHrV/7nM
+   TaVoGFB7A5Z52xv+sWltN1b0Drv3GBxhoBjqtYxNY45ziL0hj1pEoL8y2
+   RxUCyAbtj+aH7y0YEvFONDsrYB/lQUSU9e5j3TjPmBJjsmzXU+f0H4EaP
+   GNqyPUcCUGLTKDSjZy/QzVelGPr3AqxLPIeBrQ5Z7nGd7a7kAvauo1pgC
+   JwcexCbEEFoBfWP65c9KvDNN+YOds26sbFW8fn0YmJJmi40iEJCxhim0p
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11007"; a="8485088"
 X-IronPort-AV: E=Sophos;i="6.07,110,1708416000"; 
-   d="scan'208";a="27141048"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 12:58:39 -0800
+   d="scan'208";a="8485088"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 13:01:18 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,110,1708416000"; 
-   d="scan'208";a="41542112"
+   d="scan'208";a="15067143"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 12:58:38 -0800
-Date: Fri, 8 Mar 2024 12:58:38 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 13:01:17 -0800
+Date: Fri, 8 Mar 2024 13:01:16 -0800
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Chen Yu <yu.c.chen@intel.com>
+To: Yin Fengwei <fengwei.yin@intel.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
 	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
@@ -64,12 +64,12 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 080/130] KVM: TDX: restore host xsave state when exit
- from the guest TD
-Message-ID: <20240308205838.GA713729@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v19 014/130] KVM: Add KVM vcpu ioctl to pre-populate
+ guest memory
+Message-ID: <20240308210116.GB713729@ls.amr.corp.intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <2894ed10014279f4b8caab582e3b7e7061b5dad3.1708933498.git.isaku.yamahata@intel.com>
- <Zel7kFS31SSVsSaJ@chenyu5-mobl2>
+ <8b7380f1b02f8e3995f18bebb085e43165d5d682.1708933498.git.isaku.yamahata@intel.com>
+ <6b453972-2723-47c5-981e-56c150f217d7@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,73 +78,109 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Zel7kFS31SSVsSaJ@chenyu5-mobl2>
+In-Reply-To: <6b453972-2723-47c5-981e-56c150f217d7@intel.com>
 
-On Thu, Mar 07, 2024 at 04:32:16PM +0800,
-Chen Yu <yu.c.chen@intel.com> wrote:
+On Thu, Mar 07, 2024 at 03:01:11PM +0800,
+Yin Fengwei <fengwei.yin@intel.com> wrote:
 
-> On 2024-02-26 at 00:26:22 -0800, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > On exiting from the guest TD, xsave state is clobbered.  Restore xsave
-> > state on TD exit.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> > v19:
-> > - Add EXPORT_SYMBOL_GPL(host_xcr0)
-> > 
-> > v15 -> v16:
-> > - Added CET flag mask
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/tdx.c | 19 +++++++++++++++++++
-> >  arch/x86/kvm/x86.c     |  1 +
-> >  2 files changed, 20 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 9616b1aab6ce..199226c6cf55 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -2,6 +2,7 @@
-> >  #include <linux/cpu.h>
-> >  #include <linux/mmu_context.h>
-> >  
-> > +#include <asm/fpu/xcr.h>
-> >  #include <asm/tdx.h>
-> >  
-> >  #include "capabilities.h"
-> > @@ -534,6 +535,23 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> >  	 */
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 0349e1f241d1..2f0a8e28795e 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -4409,6 +4409,62 @@ static int kvm_vcpu_ioctl_get_stats_fd(struct kvm_vcpu *vcpu)
+> >  	return fd;
 > >  }
 > >  
-> > +static void tdx_restore_host_xsave_state(struct kvm_vcpu *vcpu)
+> > +__weak void kvm_arch_vcpu_pre_memory_mapping(struct kvm_vcpu *vcpu)
 > > +{
-> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> > +
-> > +	if (static_cpu_has(X86_FEATURE_XSAVE) &&
-> > +	    host_xcr0 != (kvm_tdx->xfam & kvm_caps.supported_xcr0))
-> > +		xsetbv(XCR_XFEATURE_ENABLED_MASK, host_xcr0);
-> > +	if (static_cpu_has(X86_FEATURE_XSAVES) &&
-> > +	    /* PT can be exposed to TD guest regardless of KVM's XSS support */
-> > +	    host_xss != (kvm_tdx->xfam &
-> > +			 (kvm_caps.supported_xss | XFEATURE_MASK_PT | TDX_TD_XFAM_CET)))
-> > +		wrmsrl(MSR_IA32_XSS, host_xss);
-> > +	if (static_cpu_has(X86_FEATURE_PKU) &&
-> > +	    (kvm_tdx->xfam & XFEATURE_MASK_PKRU))
-> > +		write_pkru(vcpu->arch.host_pkru);
 > > +}
-> 
-> Maybe one minor question regarding the pkru restore. In the non-TDX version
-> kvm_load_host_xsave_state(), it first tries to read the current setting
-> vcpu->arch.pkru = rdpkru(); if this setting does not equal to host_pkru,
-> it trigger the write_pkru on host. Does it mean we can also leverage that mechanism
-> in TDX to avoid 1 pkru write(I guess pkru write is costly than a read pkru)?
+> > +
+> > +__weak int kvm_arch_vcpu_memory_mapping(struct kvm_vcpu *vcpu,
+> > +					struct kvm_memory_mapping *mapping)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +
+> > +static int kvm_vcpu_memory_mapping(struct kvm_vcpu *vcpu,
+> > +				   struct kvm_memory_mapping *mapping)
+> > +{
+> > +	bool added = false;
+> > +	int idx, r = 0;
+> > +
+> > +	/* flags isn't used yet. */
+> > +	if (mapping->flags)
+> > +		return -EINVAL;
+> > +
+> > +	/* Sanity check */
+> > +	if (!IS_ALIGNED(mapping->source, PAGE_SIZE) ||
+> > +	    !mapping->nr_pages ||
+> > +	    mapping->nr_pages & GENMASK_ULL(63, 63 - PAGE_SHIFT) ||
+> > +	    mapping->base_gfn + mapping->nr_pages <= mapping->base_gfn)
+> I suppose !mapping->nr_pages can be deleted as this line can cover it.
+> > +		return -EINVAL;
+> > +
+> > +	vcpu_load(vcpu);
+> > +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> > +	kvm_arch_vcpu_pre_memory_mapping(vcpu);
+> > +
+> > +	while (mapping->nr_pages) {
+> > +		if (signal_pending(current)) {
+> > +			r = -ERESTARTSYS;
+> > +			break;
+> > +		}
+> > +
+> > +		if (need_resched())
+> > +			cond_resched();
+> > +
+> > +		r = kvm_arch_vcpu_memory_mapping(vcpu, mapping);
+> > +		if (r)
+> > +			break;
+> > +
+> > +		added = true;
+> > +	}
+> > +
+> > +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > +	vcpu_put(vcpu);
+> > +
+> > +	if (added && mapping->nr_pages > 0)
+> > +		r = -EAGAIN;
+> > +
+> > +	return r;
+> > +}
+> > +
+> >  static long kvm_vcpu_ioctl(struct file *filp,
+> >  			   unsigned int ioctl, unsigned long arg)
+> >  {
+> > @@ -4610,6 +4666,17 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >  		r = kvm_vcpu_ioctl_get_stats_fd(vcpu);
+> >  		break;
+> >  	}
+> > +	case KVM_MEMORY_MAPPING: {
+> > +		struct kvm_memory_mapping mapping;
+> > +
+> > +		r = -EFAULT;
+> > +		if (copy_from_user(&mapping, argp, sizeof(mapping)))
+> > +			break;
+> > +		r = kvm_vcpu_memory_mapping(vcpu, &mapping);
+> return value r should be checked before copy_to_user
 
-Yes, that's the intention.  When we set the PKRU feature for the guest, TDX
-module unconditionally initialize pkru.  Do you have use case that wrpkru()
-(without rdpkru()) is better?
+That's intentional to tell the mapping is partially or fully processed
+regardless that error happened or not.
+
+> 
+> 
+> Regards
+> Yin, Fengwei
+> 
+> > +		if (copy_to_user(argp, &mapping, sizeof(mapping)))
+> > +			r = -EFAULT;
+> > +		break;
+> > +	}
+> >  	default:
+> >  		r = kvm_arch_vcpu_ioctl(filp, ioctl, arg);
+> >  	}
+> 
+
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
