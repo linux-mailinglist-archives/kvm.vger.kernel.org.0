@@ -1,166 +1,107 @@
-Return-Path: <kvm+bounces-11342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95549875BF6
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 02:28:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 563E3875C0C
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 02:36:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51E04283853
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 01:28:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B313D28394F
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 01:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266DC22638;
-	Fri,  8 Mar 2024 01:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1B722EE8;
+	Fri,  8 Mar 2024 01:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z3eMkDpS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="molgs+v+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042C463C1
-	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 01:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C869210EC;
+	Fri,  8 Mar 2024 01:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709861304; cv=none; b=P+C3o4wOSY0/wNjucMgYaiJeX6r+bLVW4eKLA6X89t91jz5N9v+RbR0i0jWqPwQ8xrPGefyU/BpZfT7K8i/1yZEs59ttKYxvgk1rtIIcjShj0qcYHHEtoK9FnGVoZCUFTeQDwnqCTnFgz3mv/TKDIk/whzw8UakdWu825zYSaZc=
+	t=1709861771; cv=none; b=doy5xct7Ki80/dnq65L07y4FcRmvSEiQzwoKT1IeQy+VRxcFu5iv74pIVL4iqnGACjjy4HvE6e0tx58tAgL5qVCPDOUUQet7h0HkFku1I7vSbY6IUWNrF/lMLTf/1MHQMJbf8wnvyZFQpr5yWMi5Hz0mA4yhY4MbiBE8mKxFXNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709861304; c=relaxed/simple;
-	bh=WdRzAXoOjri8cM1mBf2nyZ1olyPeorHKC2ja6oHUC8w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CSz5Gh5xc+VsF5vfdLo/TG+uJFqP2Rz5ltt+nF9LVJYiZW83J396EcjPA5mTnmntwlJO6Aq+1QUZkTpOAoz6oO2ItjrR1h3GWRCUvod3tqKgmV5b9hzVM94pU4NS9bQiFB7jRqApoUgFwD2XC3TWEbIUawRNrxoHiinznRqh/FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z3eMkDpS; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e5db5599afso1399813b3a.3
-        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 17:28:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709861302; x=1710466102; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Q7HJDONtRmF9iMvjCwghqWgvN0CigeogTDpvGQ69zI=;
-        b=z3eMkDpS/6+PetwDBmlpRG7eOoJ7Yj2yffijPFTBRNMv8KatRYJpOndk24nc1kc8Yh
-         mSG6DwOaG1HZZwRZb8J5qB2qcxHBMPXLQaQuuUCi9byCqvijNj9/sEFj0PuWZibUuURD
-         aQywtjzDegzBpLk6xbOqZdpSTSCJ4KzjvfiEsyluBFQAdFHJ96jHCY8gkbsjbRX7uTNm
-         AJJqeLknQBb4NNPLQ8j4u3PZBrCtbWlxsQUNALHWlFZwE3TBo1ha1LziDMcqe+lhoIom
-         A8g/QYhi+H5QGMOcP+8gIwxpUhPhlQxMHbzevdpPltsipTpxbMqO0/wq/Etgu6GBKu6S
-         4xdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709861302; x=1710466102;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Q7HJDONtRmF9iMvjCwghqWgvN0CigeogTDpvGQ69zI=;
-        b=MkvDu5DqeQoTie81dDAGOprX5WKIfLA8PdoiT3zF6e0P5Drp7HHlTrFCjHVhMD7gzP
-         OjtEEF3CZu03mqOigi1xltuJSgP5ZbBpzwQR2ZO9hs4MhG5rZUUbUrXxPvZlqYt3xDPV
-         r2si42t6pU9v9pYgSRe2DXh57Mh81B4TvblBw4hwLYl92ZInmXxbkaqBdZywWhNDK0zK
-         OLjBXfLytjplt1RwSK3u3Uf51PwpHVb6lATrRydAMj8mi2xcCHcFAL0esNWYNicF7TbG
-         Zv6uUIuXwZXLB3VG/G40htwCZ7HncvEaXfASXMuOWKzCnKNObPRiykHg6FyQMUH5DzkH
-         1fWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/rX+fmEDf9xqcSBuQNZ3KmzTQyHPxbFj5z9fVNDmgUkx1iwCJLKY0aJEXs55Py/gASEqAqsGw4K47033bbpk0xd/D
-X-Gm-Message-State: AOJu0Yyqf7ymm5i4QdzXGSPf7S14Bkr2Zo8uCLM+kQ5p6ezy8iRNhW77
-	BA8/776o4KHRG4/+/1eKBJqKhvncNjUFtdnfUvsZcYM4h7JJFLIRDnvKosrS9fl+2wTGrnRd+4s
-	XGA==
-X-Google-Smtp-Source: AGHT+IHdYWUzvYdf15FnyNO896HQz1OFemDtQKuALNWeOLBq+TJIPqRQI68uDP5g8qHfZP4vcbtwxAcqddw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:9398:b0:6e5:35c8:eefa with SMTP id
- ka24-20020a056a00939800b006e535c8eefamr382394pfb.2.1709861302144; Thu, 07 Mar
- 2024 17:28:22 -0800 (PST)
-Date: Thu, 7 Mar 2024 17:28:20 -0800
-In-Reply-To: <ZepiU1x7i-ksI28A@google.com>
+	s=arc-20240116; t=1709861771; c=relaxed/simple;
+	bh=xbGto3fk4Wl8w2TSsqYZ5+LuoyoD0/16Q7GhKQ4m+RQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TnYd6vylMUBNh7YV+ydCLlVw4o+xkcaOBF4t4sl8OgH5JT4GNNHM6jar44XBMfO3i6ERRn0yuqH8J7eHseDkSkHxRBdcrqpLFlLkOGUcQomJYWGrLt5CDLGHy0PBYiQkqjtEqPjL7bgYyDdoKpB4nW3BVJIb2JBpbTRSFGNKadw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=molgs+v+; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709861769; x=1741397769;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xbGto3fk4Wl8w2TSsqYZ5+LuoyoD0/16Q7GhKQ4m+RQ=;
+  b=molgs+v+eUFK5GpH3C6FKosQ3kNqTINMlNSs6HnHa0BqN5bEQoxWmA2w
+   vMIL/9ddK6MzZkaAFq4tmkkNMu8PC4iyFIOp9l1kl3S87uJWUpMBazr5I
+   g4XiWgrhktTXOIiIHFQ7Xul2C8cdJfa9lnit508TEdnXhRHUrX7jYz5mN
+   nB6BRmh0OCixxOHxVxQDQP1C4YYuAzTLWxsHOFU5U8OWCnBfQVG0HwhD7
+   7wj4j5XxdiJy27r5eG8yg6oVncyX5KrjxkdKnK7rzvN37RcFfIW98ev/x
+   WZ8lBWG0o69K0bKcJ0Y2GbmBS7J9IHrTIBoo2S/nXfEEeS3v4J3uYmiav
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="4449832"
+X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
+   d="scan'208";a="4449832"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 17:36:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
+   d="scan'208";a="41227121"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 17:36:08 -0800
+Date: Thu, 7 Mar 2024 17:36:07 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	erdemaktas@google.com, Vishal Annapurve <vannapurve@google.com>,
+	Jim Mattson <jmattson@google.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@gmail.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v3 3/4] KVM: X86: Add a capability to configure bus
+ frequency for APIC timer
+Message-ID: <20240308013607.GL368614@ls.amr.corp.intel.com>
+References: <cover.1702974319.git.isaku.yamahata@intel.com>
+ <f393da364d3389f8e65c7fae3e5d9210ffe7a2db.1702974319.git.isaku.yamahata@intel.com>
+ <ZdjzIgS6EAeCsUue@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1709288671.git.isaku.yamahata@intel.com>
- <c50dc98effcba3ff68a033661b2941b777c4fb5c.1709288671.git.isaku.yamahata@intel.com>
- <9f8d8e3b707de3cd879e992a30d646475c608678.camel@intel.com>
- <20240307203340.GI368614@ls.amr.corp.intel.com> <35141245-ce1a-4315-8597-3df4f66168f8@intel.com>
- <ZepiU1x7i-ksI28A@google.com>
-Message-ID: <ZepptFuo5ZK6w4TT@google.com>
-Subject: Re: [RFC PATCH 1/8] KVM: Document KVM_MAP_MEMORY ioctl
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@linux.intel.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"federico.parola@polito.it" <federico.parola@polito.it>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, "michael.roth@amd.com" <michael.roth@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZdjzIgS6EAeCsUue@google.com>
 
-On Thu, Mar 07, 2024, David Matlack wrote:
-> On 2024-03-08 01:20 PM, Huang, Kai wrote:
-> > > > > +:Parameters: struct kvm_memory_mapping(in/out)
-> > > > > +:Returns: 0 on success, <0 on error
-> > > > > +
-> > > > > +KVM_MAP_MEMORY populates guest memory without running vcpu.
-> > > > > +
-> > > > > +::
-> > > > > +
-> > > > > +  struct kvm_memory_mapping {
-> > > > > +	__u64 base_gfn;
-> > > > > +	__u64 nr_pages;
-> > > > > +	__u64 flags;
-> > > > > +	__u64 source;
-> > > > > +  };
-> > > > > +
-> > > > > +  /* For kvm_memory_mapping:: flags */
-> > > > > +  #define KVM_MEMORY_MAPPING_FLAG_WRITE         _BITULL(0)
-> > > > > +  #define KVM_MEMORY_MAPPING_FLAG_EXEC          _BITULL(1)
-> > > > > +  #define KVM_MEMORY_MAPPING_FLAG_USER          _BITULL(2)
-> > > > 
-> > > > I am not sure what's the good of having "FLAG_USER"?
-> > > > 
-> > > > This ioctl is called from userspace, thus I think we can just treat this always
-> > > > as user-fault?
-> > > 
-> > > The point is how to emulate kvm page fault as if vcpu caused the kvm page
-> > > fault.  Not we call the ioctl as user context.
-> > 
-> > Sorry I don't quite follow.  What's wrong if KVM just append the #PF USER
-> > error bit before it calls into the fault handler?
-> > 
-> > My question is, since this is ABI, you have to tell how userspace is
-> > supposed to use this.  Maybe I am missing something, but I don't see how
-> > USER should be used here.
+On Fri, Feb 23, 2024 at 11:33:54AM -0800,
+Sean Christopherson <seanjc@google.com> wrote:
+
+> On Tue, Dec 19, 2023, Isaku Yamahata wrote:
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 7025b3751027..cc976df2651e 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -7858,6 +7858,20 @@ This capability is aimed to mitigate the threat that malicious VMs can
+> >  cause CPU stuck (due to event windows don't open up) and make the CPU
+> >  unavailable to host or other VMs.
+> >  
+> > +7.34 KVM_CAP_X86_BUS_FREQUENCY_CONTROL
 > 
-> If we restrict this API to the TDP MMU then KVM_MEMORY_MAPPING_FLAG_USER
-> is meaningless, PFERR_USER_MASK is only relevant for shadow paging.
-
-+1
-
-> KVM_MEMORY_MAPPING_FLAG_WRITE seems useful to allow memslots to be
-> populated with writes (which avoids just faulting in the zero-page for
-> anon or tmpfs backed memslots), while also allowing populating read-only
-> memslots.
+> BUS_FREQUENCY_CONTROL is simultaneously too long, yet not descriptive enough.
+> Depending on whether people get hung up on nanoseconds not being a "frequency",
+> either KVM_CAP_X86_APIC_BUS_FREQUENCY or KVM_CAP_X86_APIC_BUS_CYCLES_NS.
 > 
-> I don't really see a use-case for KVM_MEMORY_MAPPING_FLAG_EXEC.
+> Also, this series needs to be rebased onto kvm-x86/next.
 
-It would midly be interesting for something like the NX hugepage mitigation.
-
-For the initial implementation, I don't think the ioctl() should specify
-protections, period.
-
-VMA-based mappings, i.e. !guest_memfd, already have a way to specify protections.
-And for guest_memfd, finer grained control in general, and long term compatibility
-with other features that are in-flight or proposed, I would rather userspace specify
-RWX protections via KVM_SET_MEMORY_ATTRIBUTES.  Oh, and dirty logging would be a
-pain too.
-
-KVM doesn't currently support execute-only (XO) or !executable (RW), so I think
-we can simply define KVM_MAP_MEMORY to behave like a read fault.  E.g. map RX,
-and add W if all underlying protections allow it.
-
-That way we can defer dealing with things like XO and RW *if* KVM ever does gain
-support for specifying those combinations via KVM_SET_MEMORY_ATTRIBUTES, which
-will likely be per-arch/vendor and non-trivial, e.g. AMD's NPT doesn't even allow
-for XO memory.
-
-And we shouldn't need to do anything for KVM_MAP_MEMORY in particular if
-KVM_SET_MEMORY_ATTRIBUTES gains support for RWX protections the existing RWX and
-RX combinations, e.g. if there's a use-case for write-protecting guest_memfd
-regions.
-
-We can always expand the uAPI, but taking away functionality is much harder, if
-not impossible.
+Thanks for the feedback with the concrete change to the patch.
+I agree with those for the next respin.
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
