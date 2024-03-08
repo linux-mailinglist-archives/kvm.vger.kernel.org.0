@@ -1,111 +1,187 @@
-Return-Path: <kvm+bounces-11362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11363-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468AC875EDD
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 08:53:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE7C875EE7
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 08:56:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB2621F23608
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 07:53:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C09BF1F23262
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 07:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE614F8A9;
-	Fri,  8 Mar 2024 07:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475774F8A2;
+	Fri,  8 Mar 2024 07:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="nWC6iOOI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JjleRlaf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAC84F5FC
-	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 07:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709884390; cv=none; b=hUEzOZ9RNlSeCqtU7Q7dXMM2KrLJ6Jr1UeGKG2etA64PfY2tNVRyUiNld8m0gOm2PZdQhIVfo+FZOa4myxSGhFb46G784d310x3m2NtlwwSdKqzap2dHB/GRnsT9lQm5Fg+OSWqUowpcnoORNbDTrZbRqc/D//4Av481eRLWg1I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709884390; c=relaxed/simple;
-	bh=/JCwJPffdIEDQLzjTwDXYjywLsFs5AnpuWxe1WBILHE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KsepFOIH8NZJmD+N8TeJTHJKC4AInNNjn+lKt4s2TH1XLbD2tzB18osqRIzLb5b6IbRohfo+HVl2ULJY0y8/h5Tgn1fz0Hw96JQuHEKFPD89FtIOzf4GQ7V1l3CmaB8y6LRjKoelzAPtFk8Fjfo428r1ngKn0i88PrjFZdH0K/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=nWC6iOOI; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4131bbb7fbcso36315e9.2
-        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 23:53:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1709884387; x=1710489187; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YMX300WmqP7OPP0k2s8oRpai64z6fg6Nih1X4pJ5ZrY=;
-        b=nWC6iOOIcUsQvyXOhYPCj1hQLZjHRe8drWpKKbcmSsGYFH/oQOij2YoqMKqT8JYXXJ
-         IdD/vVHgMUZWp6QhTmhpmjuAI9am03noQdKafgzynR5snulSuOydqkuX3B/EbmqxBfs1
-         jEPBZaQSqqRAezTPHvbLXEx7x6q9Od9pKoG5tpDCIQUkuPtNF86xt/4jhOt0uTLYCE2C
-         lOAfe3No32RpStAJ8og9xVteDOBF+49cRQcAVk83tRsdd8yge/MOLknOOvsFAzqj9hRE
-         rpExLWNsYkGQtC1WtTQyyOTULZWrgGkIxYDLbod8rGvx8VQPbcTR/ZKfke7shca94xXi
-         sy2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709884387; x=1710489187;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YMX300WmqP7OPP0k2s8oRpai64z6fg6Nih1X4pJ5ZrY=;
-        b=s271MmySzjT29O1NQQEr8S4Pg3G8yK2aUjKNc7mh8AIMxk+ZW9IRK2BpvvdOf6SNq0
-         uX63MpI2z1r5cjQTBMDKbNsMpRURwVAsL8EuKsrxIg7SzXW8hnseX4yO9J5YwAHvkh6l
-         +j58MDzF+UeKHvF8KJFXvgvo0qsdQ0FQt2SXwGuB40OD96va3QR0ffcwqm1wFcv78+iL
-         hrTuwWI3MaCFitMi90sFGhC0/9Silg7vShu8P4EQQiWQhmYQ4ZE+YtM5NmtMVTzwGsCQ
-         LW5j2HWsvEheC6noPVAB1Xacu2tI4YBsLjZEFwU9DFu397OAsvsxCUDOQXAogxz3wOI7
-         Ae3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW2FPIjAYNnpz5tab0+aqhfNSJq2u0MAvuPxmaW4gKWaXIuUOVVGExazevqrKA4Kb27GIOlK5Lb6+8ZsyBVWrJnXI5c
-X-Gm-Message-State: AOJu0YyeT4xsZZoEhGa6DJXYml+vAoZ22METaw7A6C9+IFKYiQwa6ofo
-	0hEiT8JCEDvxbEgX1Pxdlj86fvMYOJFXN51xFJw7FFFAknnCBeT2POc4C0KMdnU=
-X-Google-Smtp-Source: AGHT+IFRvPfPH7sazFwQQwkcYiePuHoemGv4c5hK5Fr4v1LmmXzLFkOofwB/Xfp3tyRgkLrI76lnvQ==
-X-Received: by 2002:a05:600c:468a:b0:412:b0d3:62f4 with SMTP id p10-20020a05600c468a00b00412b0d362f4mr15571185wmo.26.1709884386947;
-        Thu, 07 Mar 2024 23:53:06 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id w11-20020a05600c474b00b004130fef5134sm4546585wmo.11.2024.03.07.23.53.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 23:53:06 -0800 (PST)
-Date: Fri, 8 Mar 2024 08:53:05 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
-	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
-	KVM General <kvm@vger.kernel.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, linux-riscv <linux-riscv@lists.infradead.org>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.9
-Message-ID: <20240308-5d406beb72ee7f30f894c45d@orel>
-References: <CAAhSdy1rYFoYjCRWTPouiT=tiN26Z_v3Y36K2MyDrcCkRs1Luw@mail.gmail.com>
- <Zen8qGzVpaOB_vKa@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D6A22F11;
+	Fri,  8 Mar 2024 07:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709884584; cv=fail; b=KVCfhFSVz9umBl/agPAsFn/32zTwooVngx1bbTpLZT05ThHlU4RdXJWggcCN/xgvbRhy1mwFK7XDOePdk0Ovy8idVsuz8WrAN/KfSb5xnxh2/W+Plo7cyD4zxiPx43uUDZc5L6T1I4PwCVgm2rwYkyA3/45zuuuIZsCgKsSc3W8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709884584; c=relaxed/simple;
+	bh=MReAVH50D/i7ok3JxbGQS83hwpMRvkbFdJ8Om0K12ns=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=fw6A+Sw940uStdcjPSVN65DiCgmVlbvq0t8ygNA6uYeEsNeV7uYuvgSrzven5eyxvCvWIrX6wsQ7FwIHLg3akC/vsme+RC/i/qkLg7SmQTF3I2psqHHOIU4I/LF0s8snQDf+7SNu/kvd9l3IwsYjyWlUQeBR/OOxXxpGVzwmMlI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JjleRlaf; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709884583; x=1741420583;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MReAVH50D/i7ok3JxbGQS83hwpMRvkbFdJ8Om0K12ns=;
+  b=JjleRlafNqsM20rUd6R5gOWPdEkK+TWvqS/nRPR8p0J5ITZMYZVUfq2Y
+   8uYuyTJkGSQh90KFiPfFLLxmWKlN68ltufgjGtXV6UNeH3fArs/gGHQQH
+   IpRL10ioGmw0EVWeorYk2pombpuL9DpOWTHmVmCzj3wftTn4GvTP3M1WL
+   SxRABOvLjvXjqvIhQBww6XsPGV2rdu+7vkt+mlG4KOw9fl+EwzHpHUOZ6
+   vCY/h6eQngiO2Y59KdAmBMWoWlYYvP50W8pVOBlH3KH9zEaIIH1eMBImf
+   PlmWArw6hwGK1OUk8FgM5Xr41wEf/pu4/7XxK2VNfW+oMrXIezb4VoinI
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="30036645"
+X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
+   d="scan'208";a="30036645"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 23:56:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
+   d="scan'208";a="10938341"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Mar 2024 23:56:22 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 7 Mar 2024 23:56:21 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 7 Mar 2024 23:56:21 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Mar 2024 23:56:20 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WT2F9CTTg4RGgRcXCbnJebiWjfUTv3xE1U9F6Nqp4/hZ1GFsmshnhQTaizUHEy1j7CSldLs3uBlH4elW4XkWX19KhwKHj4pIxUfrM+58wcCGe6d+EnDkbrzaTuhHoHuzNe6aucVCYa0eTeDazZQHCR4jTyoV/8DKiZgOU3gF7wasygAqZUcY4GPJ9u6frUR6JAwrISR7GarZIHQh8oom9yzX+Ig4mE1APT5W/N2OD5TjHm6q3wWSUIujIE9oG+qs5BoG8eoc1b4iMRWLTKPdp9cONMq/r4Xqx8yuF1jvo4OqcLhvvttAYazCPVex9JlVbOjNoDSCYCxHtHl3fmdyJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MReAVH50D/i7ok3JxbGQS83hwpMRvkbFdJ8Om0K12ns=;
+ b=MnbnL4bHxKNnJF29peeqI53s9UmiaZadzg1d8Dv8+gMcUM5aQzUvd1HV/MItfcE/16Yo8gkgjVoRga7Qqb8UzXUL0jusyVUzglXNBOLWLVvH3gnTOfLR1YfVnYuiYKDca6RcP7hRZ9mtc9BvzVH6aeG0ZSPGiPcCHxs7oPMVbIr0/NwpJHY56SgT4a+3Q/NIvX+d18r17tPZ2HSK2wBlNMecEUflmKu5YMhYFNc7lzX+G4ZBz9eQggcRQzLsvYrou8hEJI8HsIAaFRP9jgagY/ePjX2ui7udFBIoFEaDSfnSh/p70quydAZLSWWeu+G/JcxWpyEENcsWyZsNbz+enw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SJ0PR11MB5896.namprd11.prod.outlook.com (2603:10b6:a03:42c::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Fri, 8 Mar
+ 2024 07:56:18 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::39d:5a9c:c9f5:c327]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::39d:5a9c:c9f5:c327%5]) with mapi id 15.20.7386.006; Fri, 8 Mar 2024
+ 07:56:18 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: "Zeng, Xin" <xin.zeng@intel.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
+	"Cao, Yahui" <yahui.cao@intel.com>
+Subject: RE: [PATCH v5 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Topic: [PATCH v5 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Index: AQHab8/CZzEAY4bT50qLepUwBk799LEtfA+Q
+Date: Fri, 8 Mar 2024 07:56:18 +0000
+Message-ID: <BN9PR11MB52765A3A24BA7767EBFBCDFC8C272@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240306135855.4123535-1-xin.zeng@intel.com>
+ <20240306135855.4123535-11-xin.zeng@intel.com>
+In-Reply-To: <20240306135855.4123535-11-xin.zeng@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ0PR11MB5896:EE_
+x-ms-office365-filtering-correlation-id: a58f67c6-57a5-4f3e-7d0c-08dc3f453c9a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: e5+AF930d051Xbt20JK4s242RNLF5rZ+j0XG4mWQvCJEi5o8oDqjmTmDh3mx01S11onm/KKbxNU8OHd3++9zNEVQLgTEN4EeL0P8aDiBehm9ilDbAfXovomMRstB5OPdbWnHLnh1qZD/K1R21Wpe3lYE1+L0pgDixURoBaFkom5R9ak3LOcrg+qiBwcJ6mJkXiDRWLh159Ft1IkDAC7TxtU9wVxc1q4w9k77OvjReXygvWkFy5IXz0EzuYxT3/dGxfIgkYhsg8FJ7wy2tRWNesHI8tXlshIuxJ4Qq84/ywyHUB+H5fxIXdK08fYWJ5vVPpBnf9LQBKS5iK+RcrtE1+mk7/dSrRWUY6WOrUk4ZW/npsNs8BrDSrMcWQ6if1GsYrxFson3lDgi2wIMLri0Nr/BjGo2ukUBSQuC4buov0JHhUguYn93Nr94KL95Z+NhPM61EJKppnsga3jpyzwEn1veXEWq8aSsN3YaTh8CNjS3HRUDe7TZIDwl633NUZiVR+FVRcMNOwaZvZLNbbOdZRLmtLzaOYc2Nt/P0CTFHdZxrXR7KM7blDXwyNAd2OQE8E5YTdrXNc6mEBz0gnM1/0uX69BE1Uv7p2saFDELKwgAgzKCHQZ0qjV3Cw5XtZrsBATZnJGPRyqxjr8AxdGOInUw29VXzWPhGe08gr9hqU3apbwcfjj7Rk817zCH18codY68EJszs2oAV2ghH5i52w==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Qq85aTbmzTzlVRLAJZUdIgv6tYcNgPCv6LusHO1OSRBYEcwx+DBPAkhE6AW9?=
+ =?us-ascii?Q?4Ut5L5ZZcVg6Xb09DU5JGnROLUsURXnr0n41eYHJMLCxlDsecNbq9cHLE4mP?=
+ =?us-ascii?Q?NtWJ3SEb7zzbu9VRqOA0myPTrcq3V7HjDa51ppHyrJp98roMNfjSbWJ1PU1s?=
+ =?us-ascii?Q?XaIBm//NJDVl5UQyJwSfmZYZoqyH9Moa/sZpM9/kXOBqy+FVmLqYdZumrd3R?=
+ =?us-ascii?Q?CXq+rKlQGnjRkMknjGE2V5Re3xqfLePKjNUQkjxpTm2pWO3h/U4/krq2n8vC?=
+ =?us-ascii?Q?z0vV5eJvMFg+JB2HoW62t7cqEP4bATDqHRzGL5+T3T6ZJIv4rCtWytpnpYgp?=
+ =?us-ascii?Q?zd2FNgAG2kpk9vn1HuRB/3tS5G6zoXf5tmc54kh6+uChxPSocE/hpGZ789sE?=
+ =?us-ascii?Q?JWvBebCXcwXs2JqN9BYqPli10Mp00En7c7eyPJrCQTeu2TM4pCRuaaclFe0z?=
+ =?us-ascii?Q?EJFA9eCmtr6e2hJCuZBYuk03jD/IJz9pFDGVvrasogyieShQp/X5ZjRg3CtN?=
+ =?us-ascii?Q?yOe4a95D1Vlm7jEb8WkmGNqy21y9aKxDOvA9WVbBhUOHxCjW07Lp4jnEtSmM?=
+ =?us-ascii?Q?ycLaKuB/1+AprjVrQx7LH5IewGuVLcxqwycW7EuyNi9znsLlD3p1ebr4yUET?=
+ =?us-ascii?Q?RI60Bu7aDL8q2CbNdGVzIXlDnhVA5AfxvD6mf/wbJhegv3e9o2wpFrtoikCB?=
+ =?us-ascii?Q?VoI6d6PZv1oiiAj6j8zYr2p9DV3p66xH4ECdOjvQIp+7qMQFP37A+efHnIop?=
+ =?us-ascii?Q?gkOH3ZaZD+5O75M3m2nt2mmA01uKeAeFFxjqebfkeYcTldg2cfkU3trCbNTt?=
+ =?us-ascii?Q?iUn5FKhTXW1+YtDDRFhRzWXamtrS3nPvq764Wc9g416ShRTQE/AVYay6K0k9?=
+ =?us-ascii?Q?1fIvhfEpi2MMbKUZ377RNmuvffXk7WhAsmgLACp+VAeyB+mSgBIkWyck1wOt?=
+ =?us-ascii?Q?b+gtDONjGT7VdnsZvkhFW7YMuhQkUT1Pj030YomZOQbgcbB8RPhvefNy/A2Z?=
+ =?us-ascii?Q?hiwaCfGJQMw+Q8LS48gqoHY/33+RQr02E0UmDggXe4m/eNVwn2Ja+ECPBtL8?=
+ =?us-ascii?Q?1m4VgRb6RX695SVtMAt2oBw+KvC+BO14SiAdUfCPI2GqtKB8KsocOr3f6izy?=
+ =?us-ascii?Q?BAFd796/aAhFI8Fw3KTOX8zEd2nmIB/oXUI8Q12Lh5jsceT9Pd8VVCpzDQE0?=
+ =?us-ascii?Q?jjkBxSoJi4L/JzmB+B+ovX95HaOIbaqQFlALth39W/PQQd4u79MnTq7Abiwx?=
+ =?us-ascii?Q?sfJHoIOlHtl5mcB7pDzEu1ECVFIAjCW9zNXWghIw8T511JK6Ie2AyRlbMbPe?=
+ =?us-ascii?Q?Ka+hLkTxdOiNuq3j9+lV7YQcILFrvqofqwnfAw9uZQnDuJQUDC9yMY/ShNTZ?=
+ =?us-ascii?Q?dkcwIuuzWoklEbIPQDcvvuJcChJoKwzPg3kypr12LagpGOAlqFBJBBotMlz7?=
+ =?us-ascii?Q?UaiLc2RydptMoSgvcd1nxe4FOwMkfJMxYvEMn1ITwbO+2T+T2l7ZcZFLRvWW?=
+ =?us-ascii?Q?itUgey5TQu4YrIEFNdbECvJDEr7GC5Y2DObic6tBg0mFmocD9ZicT+7dgj4U?=
+ =?us-ascii?Q?3pikivM5AI8QbEggzPTqEvdrDwZwEm4OroxlkSoB?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zen8qGzVpaOB_vKa@google.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a58f67c6-57a5-4f3e-7d0c-08dc3f453c9a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Mar 2024 07:56:18.1536
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1f3tw1ph6ABUkQksaIxrMEPSPblGBpJ9J5x+c1lRFPxqH5CI6cVZ3sH45uuJb8XADBqGhjMaTYcBt8N+hhBrmg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5896
+X-OriginatorOrg: intel.com
 
-On Thu, Mar 07, 2024 at 09:43:04AM -0800, Sean Christopherson wrote:
-...
-> But the prototype of guest_get_vcpuid() is in common code.  Which isn't a huge
-> deal, but it's rather undesirable because there's no indication that its
-> implementation is arch-specific, and trying to use it in code built for s390 or
-> x86 (or MIPS or PPC, which are on the horizon), would fail.  I'm all for making
-> code common where possible, but going halfway and leaving a trap for other
-> architectures makes for a poor experience for developers.
->
+> From: Zeng, Xin <xin.zeng@intel.com>
+> Sent: Wednesday, March 6, 2024 9:59 PM
+>=20
+> Add vfio pci driver for Intel QAT VF devices.
+>=20
+> This driver uses vfio_pci_core to register to the VFIO subsystem. It
+> acts as a vfio agent and interacts with the QAT PF driver to implement
+> VF live migration.
+>=20
+> Co-developed-by: Yahui Cao <yahui.cao@intel.com>
+> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-I've got a few other riscv kvm selftests cleanup patches locally queued.
-I'll add another one which moves the prototype to include/riscv/processor.h
-and include/aarch64/processor.h. Making guest_get_vcpuid() common (for
-which I think I'm to blame) was premature and, as you point out, it should
-have at least been named arch_guest_get_vcpuid(). I could do the rename
-instead, but since I'm not sure if it'll ever get adopted outside riscv
-and aarch64, I'll just move for now.
+If Alex doesn't require closing the ID matching open before merging
+this:
 
-Thanks,
-drew
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 
