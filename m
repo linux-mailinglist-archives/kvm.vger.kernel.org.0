@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-11402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11403-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4663A876D3B
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 23:38:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C1A876D3C
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 23:39:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE71B1F2256C
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 22:38:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECD91B20EC5
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 22:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC5A4E1CA;
-	Fri,  8 Mar 2024 22:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB6A54FAD;
+	Fri,  8 Mar 2024 22:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T+jT/85W"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qmM625sV"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955944CB30
-	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 22:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A168F4DA1D
+	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 22:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709937437; cv=none; b=QsNEVQIKOW7aKlTCGteSJNQ+8XlAYrn9KXrrv+7BxgccAANf1ImxhKylU0TlrzNMxUeXxZgkxQc7RkSC3DvKte2zHDE2oMeKgxNzyBW2fxDbecQdb7uqJs/4Fak2rUokggrcznC++8kvKEPfSC7rYdvCEA2L/oH54unUGRV2Eo4=
+	t=1709937439; cv=none; b=eAjwI/44GNA52W2V09rGulNo6DBKoNHs5yToSMENyMx03RnakkBlDX4sWt6iKErEHA9iYUncZX3SqvXouonb6cAImhVM28JMbhnZK79pZ1DzFSPJ+EaJAWm1GsaVifZhkwDHbbsXFCuO04F1YMg+sPUH9gXBUOfRh7XMOZTO7/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709937437; c=relaxed/simple;
-	bh=GVX9GtS2jO4/AU5ZUhjw99ZSzSSyUs5GF9Sj/L1TvvM=;
+	s=arc-20240116; t=1709937439; c=relaxed/simple;
+	bh=Cx7f0LVK3agk27XVlL40f1u6TZkbMfoIz9OO1MplwA8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uZYTumNxSvLkEuedRgM0JhcSvJJZ5/qzoKosxwIQgXH3CsRPdY3WCGB2WPxL9gahda7+JMi/It6igp14p3EexQaCEIm1FzMc5xfMBQMlNsq1jQg+/c+Pa1k1hlsXbczXaL0QfaDYMqG9I0aT6Q4xnxYh3vlTxzqY6awJuxUVvi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T+jT/85W; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=X+TakWt1T8AYjr24W0uiMW+7VvXpj1MMC00MiwIj0puelYsiQpnBf3mPM5I+A+op3NQN8oxKhl+Q6vSEUzE0oxwvJ8INurpxLHSEkHJfj3GyrC9iJVNYWKbOHupDwapH8CO7w+vs45xO1JCzmiULvS0QvTDQfMLeD3gekIsbnOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qmM625sV; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a0b18e52dso9006037b3.1
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 14:37:15 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-609fb151752so36851067b3.2
+        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 14:37:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709937434; x=1710542234; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709937437; x=1710542237; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=fwit3zPKPJowboW07esGbJJ/DYpDWWtu6UvUgXB1DWM=;
-        b=T+jT/85WHeyh31C294RG2Gp1ZTx1B/QwduP0mMN8GOE4ZxdWO6hjtQgDtQgUl4DSVf
-         ux83wmZ9qYhdaTx4L+UWTYllb0g/eNg/xEIlXe8hlLkI8ZXpgyaiaNBTP+Ti99JKoOEb
-         E8fgIsCLOBhT9LZOqhUIUFltq5s3u3ZXbCKq8LNamIF7+9oj1bIdGhgvYTbPtnYZwiHI
-         W2MKhkAmOz7fmN4iBhhJJUbeLMqxNtQxJJ3WDKaYZdGospL215qNdkmOqajfV/ZQjA1x
-         HajY+4rAhy23nXeWVbvl9YVA1NEB+WjugXD5b+Nc1Gww8jnm1VDvbbDZ0TteKflCBGyP
-         FAUg==
+        bh=Wk7WezRe+PQVWxoR7gEA577W4P7MYaIjcJoEoxf0Qyg=;
+        b=qmM625sV/JqZDDgDZuEn4n+emjohCMS8mdug4+HlKH2i4wCc3tKdJDO0PRFoajjHTe
+         lt6y1hro7zH36/RpOsXkDW23MFEsGZ2llP+EfG/0YL0+W/+371YNkijRkY1hGT0hSrD9
+         oOoOSU3zvgq8LHgUVF1em3x+4g6Ec+DS3N2Xko5lpIYZ+tv/PO+HIT3C3rfrUJYC2PUR
+         OL+rUJ1bjAWVQ0P/UajvnlL8nICyfeVC8hgShNRejwwZaMguVitlgulpYv6ZnLmvxv7y
+         OerSGxMKC7++3ZYm3IqpMmwPlvnxnNbukF1jyYbEKJVO5RIb7NPvyLAli2OXn8Hh3Lj9
+         ZzqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709937434; x=1710542234;
+        d=1e100.net; s=20230601; t=1709937437; x=1710542237;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fwit3zPKPJowboW07esGbJJ/DYpDWWtu6UvUgXB1DWM=;
-        b=Kqm9IrKKD9/NwA3P3dcIzmwDd39Bp+IUdE6ZtZ3+0/C3g5aj8C7CNee2JG2IWnkWoo
-         OzgyzLKXOtQfUzTjNRrWzc34iaZFDagQmd5HOZxfvf7qqzrNKGI85+3YbkysqkUWIjB+
-         J9uffGxdnhgYAHz28EEj1RQoI/my62p7z5gXTM7Q7NqBWRPNk+emf2+oWJykf099Nxxj
-         a45uxMX1xbfkFQiDpNyWdCPGhsBxEyjKS47I1SfPGR8HUCOKMDQgiNOYQqWbaztZuROr
-         df88O+FwYXAKJrnMwqHWyJ1v6ZyhTLK1rcruRDhZjFQdntLXUl8mKQ32/TpcQaGRVJUe
-         EEVw==
-X-Gm-Message-State: AOJu0YxwiYYfiksiH5ZVMdsRDJQ8r8KeAn0C7ENUlyg0xZwBGqLFmvdP
-	2egvzD2Ix9tuOmyz6tIKGn9frlIvm3yI3xq60TCMBsQ50iejXV+a4zfEJvL6/3vPUI1lsVGk4z1
-	Ghg==
-X-Google-Smtp-Source: AGHT+IGBKyIAz2GkM/hYToD+b4J4B0JxtCkZlF2tzy9ZBMWHuA2MNbKVsDAFZHk3Wu1kNz+HN+Z3cV9xbIc=
+        bh=Wk7WezRe+PQVWxoR7gEA577W4P7MYaIjcJoEoxf0Qyg=;
+        b=GhZ9elPEuN9dtTyX5wT/CEeFTs9RSps1Hz05wHo2aFq9L0sP3Z54tPFIevZzI6GYBf
+         t+wBR5ICzDgRRQpKA4L9ugUAlkM5ZYNKMC5Gas3syGBIqRYUAZUvODzxnDUA9n8Q2TM8
+         W3v/8PNn+Sapv0PnU7KAt1wfYe84MscTHFaDrCqGRoMeqV6mmTB+ZX9Kfy5Nnjstn3eI
+         PChKy0MU+d+AHybOBxEA0Qg5dbX0C9LaUhdyg8tXr7fjUuiCyJGcatLx92IJBDznk+vQ
+         1nHcXKAtHXdfDnzQ72FL2/vDU5+I5lJWOxJgtmaPZqdeT2z2F+u+EQqTftZmQM99Tlgx
+         rIDA==
+X-Gm-Message-State: AOJu0YyRlX8xlWhDy3L6Zb+69MjyYhbqM7xZEXdREkBbTgFxyXeSAD+V
+	heTqJHOvDyjkySS0vB6GswkzTt8K3batdud6CqZtemN8F58pzTnLiKGg/4nQ0L32NxeiNPL9KWe
+	Z5A==
+X-Google-Smtp-Source: AGHT+IGnmjfvlcjZuy3b19/cYW0QdWQ7KiHDZyOkuNlHhwxG/abXYYKbahuS+mfiBMwV9TjogKtbf11y14k=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:cc8a:0:b0:608:b6fe:9616 with SMTP id
- o132-20020a0dcc8a000000b00608b6fe9616mr142198ywd.2.1709937434784; Fri, 08 Mar
- 2024 14:37:14 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a81:4f43:0:b0:609:fcd2:2749 with SMTP id
+ d64-20020a814f43000000b00609fcd22749mr150967ywb.4.1709937436831; Fri, 08 Mar
+ 2024 14:37:16 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  8 Mar 2024 14:36:57 -0800
+Date: Fri,  8 Mar 2024 14:36:58 -0800
 In-Reply-To: <20240308223702.1350851-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,19 +75,26 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240308223702.1350851-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240308223702.1350851-5-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: MMU changes for 6.9
+Message-ID: <20240308223702.1350851-6-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: PMU changes for 6.9
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The bulk of the changes are TDP MMU improvements related to memslot deletion
-(ChromeOS has a use case that "requires" frequent deletion of a GPU buffer).
-The other highlight is allocating the write-tracking metadata on-demand, e.g.
-so that distro kernels pay the memory cost of the arrays if and only if KVM
-or KVMGT actually needs to shadow guest page tables.
+Lots of PMU fixes and cleanups, along with related selftests.  The most notable
+fix is to *not* disallow the use of fixed counters and event encodings just
+because the CPU doesn't report support for the matching architectural event
+encoding.
+
+Note, the selftests changes have several annoying conflicts with "the" selftests
+pull request that you'll also receive from me.  I recommend merging that one
+first, as I found it slightly easier to resolve the conflicts in that order.
+
+P.S. I expect to send another PMU related pull request of 3-4 fixes at some
+point during the merge window.  But they're all small and urgent (if we had a
+few more weeks for 6.8, I'd have tried to squeeze them into 6.8).
 
 The following changes since commit 41bccc98fb7931d63d03f326a746ac4d429c1dd3:
 
@@ -95,59 +102,112 @@ The following changes since commit 41bccc98fb7931d63d03f326a746ac4d429c1dd3:
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-mmu-6.9
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-pmu-6.9
 
-for you to fetch changes up to a364c014a2c1ad6e011bc5fdb8afb9d4ba316956:
+for you to fetch changes up to 812d432373f629eb8d6cb696ea6804fca1534efa:
 
-  kvm/x86: allocate the write-tracking metadata on-demand (2024-02-27 11:49:54 -0800)
-
-----------------------------------------------------------------
-KVM x86 MMU changes for 6.9:
-
- - Clean up code related to unprotecting shadow pages when retrying a guest
-   instruction after failed #PF-induced emulation.
-
- - Zap TDP MMU roots at 4KiB granularity to minimize the delay in yielding if
-   a reschedule is needed, e.g. if a high priority task needs to run.  Because
-   KVM doesn't support yielding in the middle of processing a zapped non-leaf
-   SPTE, zapping at 1GiB granularity can result in multi-millisecond lag when
-   attempting to schedule in a high priority.
-
- - Rework TDP MMU root unload, free, and alloc to run with mmu_lock held for
-   read, e.g. to avoid serializing vCPUs when userspace deletes a memslot.
-
- - Allocate write-tracking metadata on-demand to avoid the memory overhead when
-   running kernels built with KVMGT support (external write-tracking enabled),
-   but for workloads that don't use nested virtualization (shadow paging) or
-   KVMGT.
+  KVM: x86/pmu: Explicitly check NMI from guest to reducee false positives (2024-02-26 15:57:22 -0800)
 
 ----------------------------------------------------------------
-Andrei Vagin (1):
-      kvm/x86: allocate the write-tracking metadata on-demand
+KVM x86 PMU changes for 6.9:
 
-Kunwu Chan (1):
-      KVM: x86/mmu: Use KMEM_CACHE instead of kmem_cache_create()
+ - Fix several bugs where KVM speciously prevents the guest from utilizing
+   fixed counters and architectural event encodings based on whether or not
+   guest CPUID reports support for the _architectural_ encoding.
 
-Mingwei Zhang (1):
-      KVM: x86/mmu: Don't acquire mmu_lock when using indirect_shadow_pages as a heuristic
+ - Fix a variety of bugs in KVM's emulation of RDPMC, e.g. for "fast" reads,
+   priority of VMX interception vs #GP, PMC types in architectural PMUs, etc.
 
-Sean Christopherson (10):
-      KVM: x86: Drop dedicated logic for direct MMUs in reexecute_instruction()
-      KVM: x86: Drop superfluous check on direct MMU vs. WRITE_PF_TO_SP flag
-      KVM: x86/mmu: Zap invalidated TDP MMU roots at 4KiB granularity
-      KVM: x86/mmu: Don't do TLB flush when zappings SPTEs in invalid roots
-      KVM: x86/mmu: Allow passing '-1' for "all" as_id for TDP MMU iterators
-      KVM: x86/mmu: Skip invalid roots when zapping leaf SPTEs for GFN range
-      KVM: x86/mmu: Skip invalid TDP MMU roots when write-protecting SPTEs
-      KVM: x86/mmu: Check for usable TDP MMU root while holding mmu_lock for read
-      KVM: x86/mmu: Alloc TDP MMU roots while holding mmu_lock for read
-      KVM: x86/mmu: Free TDP MMU roots while holding mmy_lock for read
+ - Add a selftest to verify KVM correctly emulates RDMPC, counter availability,
+   and a variety of other PMC-related behaviors that depend on guest CPUID,
+   i.e. are difficult to validate via KVM-Unit-Tests.
 
- arch/x86/include/asm/kvm_host.h |   9 +++
- arch/x86/kvm/mmu/mmu.c          |  37 +++++++-----
- arch/x86/kvm/mmu/page_track.c   |  68 +++++++++++++++++++++-
- arch/x86/kvm/mmu/tdp_mmu.c      | 124 ++++++++++++++++++++++++++++------------
- arch/x86/kvm/mmu/tdp_mmu.h      |   2 +-
- arch/x86/kvm/x86.c              |  35 +++++-------
- 6 files changed, 201 insertions(+), 74 deletions(-)
+ - Zero out PMU metadata on AMD if the virtual PMU is disabled to avoid wasting
+   cycles, e.g. when checking if a PMC event needs to be synthesized when
+   skipping an instruction.
+
+ - Optimize triggering of emulated events, e.g. for "count instructions" events
+   when skipping an instruction, which yields a ~10% performance improvement in
+   VM-Exit microbenchmarks when a vPMU is exposed to the guest.
+
+ - Tighten the check for "PMI in guest" to reduce false positives if an NMI
+   arrives in the host while KVM is handling an IRQ VM-Exit.
+
+----------------------------------------------------------------
+Dapeng Mi (1):
+      KVM: selftests: Test top-down slots event in x86's pmu_counters_test
+
+Jinrong Liang (7):
+      KVM: selftests: Add vcpu_set_cpuid_property() to set properties
+      KVM: selftests: Add pmu.h and lib/pmu.c for common PMU assets
+      KVM: selftests: Test Intel PMU architectural events on gp counters
+      KVM: selftests: Test Intel PMU architectural events on fixed counters
+      KVM: selftests: Test consistency of CPUID with num of gp counters
+      KVM: selftests: Test consistency of CPUID with num of fixed counters
+      KVM: selftests: Add functional test for Intel's fixed PMU counters
+
+Like Xu (1):
+      KVM: x86/pmu: Explicitly check NMI from guest to reducee false positives
+
+Sean Christopherson (32):
+      KVM: x86/pmu: Always treat Fixed counters as available when supported
+      KVM: x86/pmu: Allow programming events that match unsupported arch events
+      KVM: x86/pmu: Remove KVM's enumeration of Intel's architectural encodings
+      KVM: x86/pmu: Setup fixed counters' eventsel during PMU initialization
+      KVM: x86/pmu: Get eventsel for fixed counters from perf
+      KVM: x86/pmu: Don't ignore bits 31:30 for RDPMC index on AMD
+      KVM: x86/pmu: Prioritize VMX interception over #GP on RDPMC due to bad index
+      KVM: x86/pmu: Apply "fast" RDPMC only to Intel PMUs
+      KVM: x86/pmu: Disallow "fast" RDPMC for architectural Intel PMUs
+      KVM: x86/pmu: Treat "fixed" PMU type in RDPMC as index as a value, not flag
+      KVM: x86/pmu: Explicitly check for RDPMC of unsupported Intel PMC types
+      KVM: selftests: Drop the "name" param from KVM_X86_PMU_FEATURE()
+      KVM: selftests: Extend {kvm,this}_pmu_has() to support fixed counters
+      KVM: selftests: Expand PMU counters test to verify LLC events
+      KVM: selftests: Add a helper to query if the PMU module param is enabled
+      KVM: selftests: Add helpers to read integer module params
+      KVM: selftests: Query module param to detect FEP in MSR filtering test
+      KVM: selftests: Move KVM_FEP macro into common library header
+      KVM: selftests: Test PMC virtualization with forced emulation
+      KVM: selftests: Add a forced emulation variation of KVM_ASM_SAFE()
+      KVM: selftests: Add helpers for safe and safe+forced RDMSR, RDPMC, and XGETBV
+      KVM: selftests: Extend PMU counters test to validate RDPMC after WRMSR
+      KVM: x86/pmu: Zero out PMU metadata on AMD if PMU is disabled
+      KVM: x86/pmu: Add common define to capture fixed counters offset
+      KVM: x86/pmu: Move pmc_idx => pmc translation helper to common code
+      KVM: x86/pmu: Snapshot and clear reprogramming bitmap before reprogramming
+      KVM: x86/pmu: Add macros to iterate over all PMCs given a bitmap
+      KVM: x86/pmu: Process only enabled PMCs when emulating events in software
+      KVM: x86/pmu: Snapshot event selectors that KVM emulates in software
+      KVM: x86/pmu: Expand the comment about what bits are check emulating events
+      KVM: x86/pmu: Check eventsel first when emulating (branch) insns retired
+      KVM: x86/pmu: Avoid CPL lookup if PMC enabline for USER and KERNEL is the same
+
+ arch/x86/include/asm/kvm-x86-pmu-ops.h             |   4 +-
+ arch/x86/include/asm/kvm_host.h                    |  11 +-
+ arch/x86/kvm/emulate.c                             |   2 +-
+ arch/x86/kvm/kvm_emulate.h                         |   2 +-
+ arch/x86/kvm/pmu.c                                 | 163 ++++--
+ arch/x86/kvm/pmu.h                                 |  57 +-
+ arch/x86/kvm/svm/pmu.c                             |  22 +-
+ arch/x86/kvm/vmx/nested.c                          |   2 +-
+ arch/x86/kvm/vmx/pmu_intel.c                       | 222 +++-----
+ arch/x86/kvm/x86.c                                 |  15 +-
+ arch/x86/kvm/x86.h                                 |   6 -
+ tools/testing/selftests/kvm/Makefile               |   2 +
+ .../testing/selftests/kvm/include/kvm_util_base.h  |   4 +
+ tools/testing/selftests/kvm/include/x86_64/pmu.h   |  97 ++++
+ .../selftests/kvm/include/x86_64/processor.h       | 148 +++--
+ tools/testing/selftests/kvm/lib/kvm_util.c         |  62 ++-
+ tools/testing/selftests/kvm/lib/x86_64/pmu.c       |  31 ++
+ tools/testing/selftests/kvm/lib/x86_64/processor.c |  15 +-
+ .../selftests/kvm/x86_64/pmu_counters_test.c       | 620 +++++++++++++++++++++
+ .../selftests/kvm/x86_64/pmu_event_filter_test.c   | 143 ++---
+ .../kvm/x86_64/smaller_maxphyaddr_emulation_test.c |   2 +-
+ .../selftests/kvm/x86_64/userspace_msr_exit_test.c |  29 +-
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       |   2 +-
+ 23 files changed, 1262 insertions(+), 399 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/pmu.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/pmu.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
 
