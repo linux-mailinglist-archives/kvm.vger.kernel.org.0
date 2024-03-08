@@ -1,121 +1,131 @@
-Return-Path: <kvm+bounces-11365-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11366-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 910EC87603C
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 09:52:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 890C08761D4
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 11:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2F121C2249A
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 08:52:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E8631F223CA
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 10:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABC654667;
-	Fri,  8 Mar 2024 08:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC39D54BCB;
+	Fri,  8 Mar 2024 10:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eq5SZJ1F"
 X-Original-To: kvm@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F38537FA
-	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 08:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25BC54799;
+	Fri,  8 Mar 2024 10:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709887921; cv=none; b=uTIIYZ4nZ2sK9AQhRr9lUSPHa5cuLfa6L/h/z0jN5y2nLK8q4LqL5HGoWpP11vjCa2BoqiwABzq7UZhBw2IPfhsePXnww07+vte3EWiD5yt11JZQPJmBIzbMolHtmVcXEM86PHNcE1RWZy9WR6o4VDtZEe1tjHzbtZKQo6C/7Jk=
+	t=1709893179; cv=none; b=mfEK2Akvgi4JLJs1E2ljHbCyZLL6A0bC9d3jj7tEXBlHjOZf/FK4za7unw2QOqV8A66TXrf+kdrer0JL9NSFl2AmQBiB5a7UZpI8OdESZ7Nv9CtSyIlAb2LNMIUtaAgacfEjEMzLHB1M/8qCALdUK2+XkqrNchubT6lNXnnX3L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709887921; c=relaxed/simple;
-	bh=7OCLVxrivuYmBWk05zflwh6tyIz/ojGTwINI4ZjhP8E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g9wVvVNhNxA6IEVTW60OdOE0zclGpGseevINT5TqyW2N7YW7OnnzuyrSFXC8o6z02IaeQ1RiwkOg9nKwIxtZ7z6LpVK3E2Zg6NfftYbUKQTQ0CsMjK5bcVPbv6ddYY7zyF57sL146MFKx7PsR8lgMVpCviI+BVx9yxrG2/yhCgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1riVxH-000715-Gh; Fri, 08 Mar 2024 09:51:51 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1riVxG-0056Np-RX; Fri, 08 Mar 2024 09:51:50 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1riVxG-00246H-2V;
-	Fri, 08 Mar 2024 09:51:50 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Eric Auger <eric.auger@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH] vfio/platform: Convert to platform remove callback returning void
-Date: Fri,  8 Mar 2024 09:51:19 +0100
-Message-ID:  <79d3df42fe5b359a05b8061631e72e5ed249b234.1709886922.git.u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1709893179; c=relaxed/simple;
+	bh=Q1N/xDWWH1N2mESqkCTav+THxX2BdxiFo16ZnUREngs=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=POGS/UDqb84+5zwiTJwWAbmSnXRS2YYcEMRxCkGpHuapONjG/+fF9+GeoGYwJispQiBKudCdq3MwMd/KmNsovT0vtfsaiKapEotZpzY1o4YIQh51V7KS2B7RklI98Lo0YpNA/HYl8NEbxywFb1mpCIOjZot+ykbsnQk3QcJrDtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Eq5SZJ1F; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709893176; x=1741429176;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=Q1N/xDWWH1N2mESqkCTav+THxX2BdxiFo16ZnUREngs=;
+  b=Eq5SZJ1FtflK6578guuCz2itE8EOTVh/TvQG7hfRR24a4duSyDLwvfyd
+   MjyV9Db3mNPjqRcYmPruJnz6gZc1r22CZRDmN3XVo+s7Sd+kCjtmAisZl
+   uStNmLQ3uqOEYMy8Oa/o2qnu5nE6UK8r/MVdIUgAZOuUP60ieP/Y5LVFE
+   8Fb7FZsqr+xzFrcyY2267fzdCwjG4Gr4S+VT1moJuk5/JfR9R0ivP7/Wb
+   g5vJtCUqnyYl/Zjq0g3cgEp/fZNuNd27JXqw/squ779oLIIqs+AaJFYTH
+   OwWPLJ1xmdBIaACfiPenIDvg9LxyaO7Hy6QFALJXlAn7addtHYsFZSeWx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="22132934"
+X-IronPort-AV: E=Sophos;i="6.07,109,1708416000"; 
+   d="scan'208";a="22132934"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 02:19:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,109,1708416000"; 
+   d="scan'208";a="15004974"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.244.186])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 02:19:27 -0800
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Fri, 8 Mar 2024 12:19:21 +0200 (EET)
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>, 
+    Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+    Johannes Berg <johannes@sipsolutions.net>, 
+    Hans de Goede <hdegoede@redhat.com>, Vadim Pasternak <vadimp@nvidia.com>, 
+    Bjorn Andersson <andersson@kernel.org>, 
+    Mathieu Poirier <mathieu.poirier@linaro.org>, 
+    Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, 
+    Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+    Vasily Gorbik <gor@linux.ibm.com>, 
+    Alexander Gordeev <agordeev@linux.ibm.com>, 
+    Christian Borntraeger <borntraeger@linux.ibm.com>, 
+    Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+    Jason Wang <jasowang@redhat.com>, linux-um@lists.infradead.org, 
+    platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+    linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH vhost v1 2/4] virtio: vring_create_virtqueue: pass struct
+ instead of multi parameters
+In-Reply-To: <20240306114615.88770-3-xuanzhuo@linux.alibaba.com>
+Message-ID: <8f77a787-0bb7-96ad-0dac-f8ef36879ae3@linux.intel.com>
+References: <20240306114615.88770-1-xuanzhuo@linux.alibaba.com> <20240306114615.88770-3-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1977; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=7OCLVxrivuYmBWk05zflwh6tyIz/ojGTwINI4ZjhP8E=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBl6tGMgaK2CFwPxc5pX6qTJ3t2nFbKByfd+MBTp zD4dEerIZqJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZerRjAAKCRCPgPtYfRL+ Tnm6B/9wbKuxZH8Iq5kW6nqia3XxDzITOFF2mOl9GS1N2houBxJ9+F+U3GbUz5Ci7tEi3B2TeqH lTrerTlIslZwfKvS8XGegnnPq7/zWE4DCjW6ZKlcNdD6KMeu3eKEyWZdRlIGwdfbTlMTHsbnx4u znimkqSEvJQl1AiLsMJxnGLaCxCyv1cG2r8S0wxrizctthfaPnx0l8AWiqFoBuxv8Kjqgzgvp2B U8vMm8Qh3FslkMnh7DE7k2YdPPtgc07G1B9qSWgvGlDauwoLokrwo2cz+lXuyusHENYI+qrMGpe yjrwm86sstOs0BPptHzaqZ2rXIWao7762AkJpp7uEUep7t+B
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 
-The .remove() callback for a platform driver returns an int which makes
-many driver authors wrongly assume it's possible to do error handling by
-returning an error code. However the value returned is ignored (apart
-from emitting a warning) and this typically results in resource leaks.
+On Wed, 6 Mar 2024, Xuan Zhuo wrote:
 
-To improve here there is a quest to make the remove callback return
-void. In the first step of this quest all drivers are converted to
-.remove_new(), which already returns void. Eventually after all drivers
-are converted, .remove_new() will be renamed to .remove().
+> Now, we pass multi parameters to vring_create_virtqueue. These parameters
+> may from transport or from driver.
+> 
+> vring_create_virtqueue is called by many places.
+> Every time, we try to add a new parameter, that is difficult.
+> 
+> If parameters from the driver, that should directly be passed to vring.
+> Then the vring can access the config from driver directly.
+> 
+> If parameters from the transport, we squish the parameters to a
+> structure. That will be helpful to add new parameter.
+> 
+> Because the virtio_uml.c changes the name, so change the "names" inside
+> the virtio_vq_config from "const char *const *names" to
+> "const char **names".
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Acked-by: Johannes Berg <johannes@sipsolutions.net>
 
-Trivially convert this driver from always returning zero in the remove
-callback to the void returning variant.
+> @@ -60,38 +61,25 @@ struct virtio_device;
+>  struct virtqueue;
+>  struct device;
+>  
+> +struct vq_transport_config {
+> +	unsigned int num;
+> +	unsigned int vring_align;
+> +	bool weak_barriers;
+> +	bool may_reduce_num;
+> +	bool (*notify)(struct virtqueue *vq);
+> +	struct device *dma_dev;
+> +};
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/vfio/platform/vfio_platform.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+kerneldoc is missing from this struct too.
 
-diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
-index 8cf22fa65baa..42d1462c5e19 100644
---- a/drivers/vfio/platform/vfio_platform.c
-+++ b/drivers/vfio/platform/vfio_platform.c
-@@ -85,14 +85,13 @@ static void vfio_platform_release_dev(struct vfio_device *core_vdev)
- 	vfio_platform_release_common(vdev);
- }
- 
--static int vfio_platform_remove(struct platform_device *pdev)
-+static void vfio_platform_remove(struct platform_device *pdev)
- {
- 	struct vfio_platform_device *vdev = dev_get_drvdata(&pdev->dev);
- 
- 	vfio_unregister_group_dev(&vdev->vdev);
- 	pm_runtime_disable(vdev->device);
- 	vfio_put_device(&vdev->vdev);
--	return 0;
- }
- 
- static const struct vfio_device_ops vfio_platform_ops = {
-@@ -113,7 +112,7 @@ static const struct vfio_device_ops vfio_platform_ops = {
- 
- static struct platform_driver vfio_platform_driver = {
- 	.probe		= vfio_platform_probe,
--	.remove		= vfio_platform_remove,
-+	.remove_new	= vfio_platform_remove,
- 	.driver	= {
- 		.name	= "vfio-platform",
- 	},
+It would be generally helpful if you are proactive when somebody comments 
+your series by checking if there are similar cases within your series,
+instead of waiting them to be pointed out for you specificly.
 
-base-commit: 8ffc8b1bbd505e27e2c8439d326b6059c906c9dd
 -- 
-2.43.0
+ i.
 
 
