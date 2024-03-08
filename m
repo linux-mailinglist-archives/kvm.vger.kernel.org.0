@@ -1,132 +1,555 @@
-Return-Path: <kvm+bounces-11385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81898876A8B
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 19:09:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582B8876A8E
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 19:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2B9A1C2174E
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 18:09:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3EA21F21959
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 18:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8937D57867;
-	Fri,  8 Mar 2024 18:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF8553E17;
+	Fri,  8 Mar 2024 18:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QjvarfKt"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KFN+2HQ7"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB30B55E65
-	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 18:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB4C2C853
+	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 18:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709921386; cv=none; b=pzwepLspxtx3n5ck1nImK4NS7mXwLePyC26iklR7IgPzMbksPSde1TNqjWwAWeUiDXA4tilHKkNyVJ5QNln/D+4QfHZ9N0ATcOiz2TJ+NYTg565JblbnuuNNYTQPiqW+8PFmkJSqvPFUecfS/RRobnHrY0KlRgTIRslSHrmd34c=
+	t=1709921448; cv=none; b=rSLyYxpt1REwyXf+GTpqyGRg0Gg29/G19O3ZpvS8oBeVFRkeX2sdYwBNXhUt1htUAEBFngwln5qyYlmlRYfIXKY+gh7oQ6NlRo5kJszUViVJNwrAMnFX9K60fPEadzcS2evpqwsgAqAEYa2ChtTee/7WauWqFd32KiYDT9p9ZOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709921386; c=relaxed/simple;
-	bh=LikYyzCecy2Q4f2KC79AVP0DWAPyW0dRwSVNlJmxM1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LeLox5gWgB0wJK/2zbnA1De6+5HIYnzxmdFUAMFrHwZDMgKGl7lUL/Muidz4twl4olvj9ivdGEJPU8dieyM1AEWHUaA1ppFlPUVCt8LYO6K8ws4Eaxgtvmw5raLkxXhuJz4CAun1zqUSYVeEGAIe0xMJw21DAwPP0Tm9d9jmuWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QjvarfKt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709921383;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Xz/YxiA/VGUbQYXY3ND1aG0ujsEUkM8N72A3ZL6M5NI=;
-	b=QjvarfKtkRdiC8y2z6WvEWwFtwQSqSl9eokhg5QzsjSCLC+A22iXwAWsmietT6PFfqLM2j
-	LIvcaMR4+9iXsMg31A9sCr6BDR+lXgDK4QDV9CF8UUXIgXvsJtCpRrxt+0G5xZ3ZbZpP6y
-	WiwZkjBh3pHECoi9Yd95FOV6j15uxxM=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-141-Wv4SbF6qNtOkP7X1E644cw-1; Fri, 08 Mar 2024 13:09:42 -0500
-X-MC-Unique: Wv4SbF6qNtOkP7X1E644cw-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3662fd7ae59so5697625ab.0
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 10:09:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709921381; x=1710526181;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Xz/YxiA/VGUbQYXY3ND1aG0ujsEUkM8N72A3ZL6M5NI=;
-        b=g5QXM8kXq8DYGPJ1+g8JC0/bHumHgJYrKGkni0tuCHDGRcaxfdMqMWLFuWsOaDWbC7
-         PUILPVjbd13/AMKZNE+imhwsMzeu65lVEa8VdGexsOHDuYM7rGXQxPHRUDap421pChTD
-         g8ON8cZ22OHkNqrzE4jKyPML0vKd1zC9dv1eBERkxra+lcIjuMuWT12fOgdBhzWw0lvU
-         HyuBSE9oQCcREfGbWTIpUbK8qKkh6eGUC5BboaZsI918lhLfXqzqp8vnWGxZ7bA5uzkk
-         wmLxBJwZkMVMgWGS24eREpKK3Ty1tc1Pde/AN+vD+DxFOi/9HeQfC+lyn2bsjGjrCFjQ
-         t84A==
-X-Gm-Message-State: AOJu0YxnrgJsyawI3iiW3udoeZXFwXGy9mBx6ywK5bSffooZrWCLZ1BC
-	Yxy4NVphRmehWyQBlG6C6a9AYdaSMKhUdNo7U8upRZ8PvhbKvt1mACbhYIflWnhLsSmIe4MfUUF
-	9TX1PxJ53vkxYnGrgroJU1stzD7S+AQ0POwoIpnV0ib78z4i/ow==
-X-Received: by 2002:a05:6e02:218c:b0:365:1749:cae5 with SMTP id j12-20020a056e02218c00b003651749cae5mr26162578ila.19.1709921381782;
-        Fri, 08 Mar 2024 10:09:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH1gQYxWu4+4Cc/UIrD66Vitl3FDWB+wq5vJpfnJ7XfX/xSfWuW2ihD+P4DW6Rr6XiJ+ynUKw==
-X-Received: by 2002:a05:6e02:218c:b0:365:1749:cae5 with SMTP id j12-20020a056e02218c00b003651749cae5mr26162558ila.19.1709921381520;
-        Fri, 08 Mar 2024 10:09:41 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id j8-20020a05663822c800b00476c165e60csm646730jat.30.2024.03.08.10.09.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 10:09:40 -0800 (PST)
-Date: Fri, 8 Mar 2024 11:09:37 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "eric.auger@redhat.com"
- <eric.auger@redhat.com>, "clg@redhat.com" <clg@redhat.com>, "Chatre,
- Reinette" <reinette.chatre@intel.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5/7] vfio/platform: Disable virqfds on cleanup
-Message-ID: <20240308110937.2f2d934e.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB52766BAB438D1D1B782243038C272@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240306211445.1856768-1-alex.williamson@redhat.com>
-	<20240306211445.1856768-6-alex.williamson@redhat.com>
-	<BN9PR11MB52766BAB438D1D1B782243038C272@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+	s=arc-20240116; t=1709921448; c=relaxed/simple;
+	bh=BUlDZIWnogtTnHt7s02nXNXb+2jlKmKp/ziIDDykCJc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XuP0aGZ5LR9tPvEGgWEnvVUswhXFU9VBXq1LQ6M6x2dbLSfkJZ5wOsvqwsYzPjpceJ68Bf1QPHZSIQIj5Zudqgd3jtOtHwXtNSad5IxasNX5unwAyKoSOpHCrRHtlfbm7Jy9xOfI50OvLDgsaOmUOQZqBAsdoDoOWVmDzphHF2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KFN+2HQ7; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=JsJcRqyR5Iepat5NEJ7IJXJ+Id47yH7eX2DNVSdjdJU=; b=KFN+2HQ7Gu/iOp9uS6doUIXSwU
+	way/gkrap/h4qI25YZhMSzI7D4Fs7Uk5B1ha9eF4CKfby9F0wfMUmnUUgqz9i0SnMpnCBs1hJUQ6/
+	JbY5KNWjhGqoVR9/bP7lZV6y6CizkhJVjqP7DgCz1o1jkm9TeIjJj+8XwQTTlSH6ehBeqW9sqiYHf
+	hjH6mf0jCsfgZFEfKHZ1BhglPHnGTSbl+jumtiMeEALvQn/KLIRSIY7sFaH5uypLnd52ZC21XcTBX
+	BoRp2XBbmS0cqBGJB6REJkNcy22Gz2V4HvTLeiUeZ9/zvoHwV1yL5MCJKMaG3HKsX3TitoEGJV4t/
+	mEArBmGw==;
+Received: from [2001:8b0:10b:5:c6ce:88bc:1e6a:da42] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rieg3-0000000C2Ek-4BuB;
+	Fri, 08 Mar 2024 18:10:42 +0000
+Message-ID: <76c61e1cb86e04df892d74c10976597700fe4cb5.camel@infradead.org>
+Subject: Re: [PATCH v2 7/8] KVM: x86/xen: avoid blocking in hardirq context
+ in kvm_xen_set_evtchn_fast()
+From: David Woodhouse <dwmw2@infradead.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>, Paul
+ Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, Michal Luczaj
+ <mhal@rbox.co>,  Paul Durrant <pdurrant@amazon.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,  Borislav Petkov
+ <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, Dave Hansen
+ <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ x86@kernel.org
+Date: Fri, 08 Mar 2024 18:10:39 +0000
+In-Reply-To: <20240227094326.04fd2b09@gandalf.local.home>
+References: <20240227115648.3104-1-dwmw2@infradead.org>
+	 <20240227115648.3104-8-dwmw2@infradead.org>
+	 <20240227094326.04fd2b09@gandalf.local.home>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-pt0n40j6y4dzc13Z2bt7"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, 8 Mar 2024 07:16:02 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Thursday, March 7, 2024 5:15 AM
-> > 
-> > @@ -321,8 +321,13 @@ void vfio_platform_irq_cleanup(struct
-> > vfio_platform_device *vdev)
-> >  {
-> >  	int i;
-> > 
-> > -	for (i = 0; i < vdev->num_irqs; i++)
-> > +	for (i = 0; i < vdev->num_irqs; i++) {
-> > +		int hwirq = vdev->get_irq(vdev, i);  
-> 
-> hwirq is unused.
+--=-pt0n40j6y4dzc13Z2bt7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yep, poor split with the next patch.  I'll update the next patch to use
-vdev->irqs[i].hwirq here and in the unwind on init to avoid this.  Thanks,
+On Tue, 2024-02-27 at 09:43 -0500, Steven Rostedt wrote:
+>=20
+> > --- a/arch/x86/kvm/xen.c
+> > +++ b/arch/x86/kvm/xen.c
+> > @@ -1736,9 +1736,23 @@ static int set_shinfo_evtchn_pending(struct kvm_=
+vcpu *vcpu, u32 port)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unsigned long flags;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int rc =3D -EWOULDBLOCK=
+;
+> > =C2=A0=20
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0read_lock_irqsave(&gpc->lock=
+, flags);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0local_irq_save(flags);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!read_trylock(&gpc->lock=
+)) {
+>=20
+> Note, directly disabling interrupts in PREEMPT_RT is just as bad as doing
+> so in non RT and the taking a mutex.
+>=20
+> Worse yet, in PREEMPT_RT read_unlock_irqrestore() isn't going to re-enabl=
+e
+> interrupts.
+>=20
+> Not really sure what the best solution is here.
 
-Alex
+I think the best solution is to realise that now Paul made the in-
+interrupt code paths use read_trylock(), we don't even need to use
+read_lock_irqsave() anywhere anyway, and then we don't have to *care*
+that PREEMPT_RT does it differently. Going to do some testing with this
+version...
 
-> > +
-> > +		vfio_virqfd_disable(&vdev->irqs[i].mask);
-> > +		vfio_virqfd_disable(&vdev->irqs[i].unmask);
-> >  		vfio_set_trigger(vdev, i, -1, NULL);
-> > +	}
-> > 
-> >  	vdev->num_irqs = 0;
-> >  	kfree(vdev->irqs);
-> > --
-> > 2.43.2  
-> 
+From: David Woodhouse <dwmw@amazon.co.uk>
+Subject: [PATCH] KVM: x86/xen: avoid blocking in hardirq context in
+ kvm_xen_set_evtchn_fast()
 
+As described in [1] compiling with CONFIG_PROVE_RAW_LOCK_NESTING shows that
+kvm_xen_set_evtchn_fast() is blocking on pfncache locks in IRQ context.
+There is only actually blocking with PREEMPT_RT because the locks will
+turned into mutexes. There is no 'raw' version of rwlock_t that can be used
+to avoid that, so use read_trylock() and treat failure to lock the same as
+an invalid cache.
+
+However, with PREEMPT_RT read_lock_irqsave() doesn't actually disable IRQs
+either. So open-coding a trylock_irqsave() using local_irq_save() would be
+wrong in the PREEMPT_RT case.
+
+In fact, if kvm_xen_set_evtchn_fast() is now going to use a trylock anyway
+when invoked in hardirq context, there's actually no *need* for interrupts
+to be disabled by any other code path that takes the lock. So just switch
+all other users to a plain read_lock() and then the different semantics
+on PREEMPT_RT are not an issue.
+
+Add a warning in __kvm_xen_has_interrupt() just to be sure that one never
+does occur from interrupt context.
+
+[1] https://lore.kernel.org/lkml/99771ef3a4966a01fefd3adbb2ba9c3a75f97cf2.c=
+amel@infradead.org/T/#mbd06e5a04534ce9c0ee94bd8f1e8d942b2d45bd6
+Fixes: 77c9b9dea4fb ("KVM: x86/xen: Use fast path for Xen timer delivery")
+Fixes: bbe17c625d68 ("KVM: x86/xen: Fix potential deadlock in kvm_xen_updat=
+e_runstate_guest()")
+Co-developed-by: Paul Durrant <pdurrant@amazon.com>
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/x86/kvm/xen.c | 80 ++++++++++++++++++++++++----------------------
+ 1 file changed, 41 insertions(+), 39 deletions(-)
+
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index f8113eb8d040..ab3bbe75602d 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -45,7 +45,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm)
+ 	int ret =3D 0;
+ 	int idx =3D srcu_read_lock(&kvm->srcu);
+=20
+-	read_lock_irq(&gpc->lock);
++	read_lock(&gpc->lock);
+ 	while (!kvm_gpc_check(gpc, PAGE_SIZE)) {
+ 		read_unlock_irq(&gpc->lock);
+=20
+@@ -53,7 +53,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm)
+ 		if (ret)
+ 			goto out;
+=20
+-		read_lock_irq(&gpc->lock);
++		read_lock(&gpc->lock);
+ 	}
+=20
+ 	/*
+@@ -96,7 +96,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm)
+ 	smp_wmb();
+=20
+ 	wc->version =3D wc_version + 1;
+-	read_unlock_irq(&gpc->lock);
++	read_unlock(&gpc->lock);
+=20
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_MASTERCLOCK_UPDATE);
+=20
+@@ -277,7 +277,6 @@ static void kvm_xen_update_runstate_guest(struct kvm_vc=
+pu *v, bool atomic)
+ 	struct gfn_to_pfn_cache *gpc2 =3D &vx->runstate2_cache;
+ 	size_t user_len, user_len1, user_len2;
+ 	struct vcpu_runstate_info rs;
+-	unsigned long flags;
+ 	size_t times_ofs;
+ 	uint8_t *update_bit =3D NULL;
+ 	uint64_t entry_time;
+@@ -373,16 +372,13 @@ static void kvm_xen_update_runstate_guest(struct kvm_=
+vcpu *v, bool atomic)
+ 	 * gfn_to_pfn caches that cover the region.
+ 	 */
+ 	if (atomic) {
+-		local_irq_save(flags);
+-		if (!read_trylock(&gpc1->lock)) {
+-			local_irq_restore(flags);
++		if (!read_trylock(&gpc1->lock))
+ 			return;
+-		}
+ 	} else {
+-		read_lock_irqsave(&gpc1->lock, flags);
++		read_lock(&gpc1->lock);
+ 	}
+ 	while (!kvm_gpc_check(gpc1, user_len1)) {
+-		read_unlock_irqrestore(&gpc1->lock, flags);
++		read_unlock(&gpc1->lock);
+=20
+ 		/* When invoked from kvm_sched_out() we cannot sleep */
+ 		if (atomic)
+@@ -391,7 +387,7 @@ static void kvm_xen_update_runstate_guest(struct kvm_vc=
+pu *v, bool atomic)
+ 		if (kvm_gpc_refresh(gpc1, user_len1))
+ 			return;
+=20
+-		read_lock_irqsave(&gpc1->lock, flags);
++		read_lock(&gpc1->lock);
+ 	}
+=20
+ 	if (likely(!user_len2)) {
+@@ -419,7 +415,7 @@ static void kvm_xen_update_runstate_guest(struct kvm_vc=
+pu *v, bool atomic)
+ 		lock_set_subclass(&gpc1->lock.dep_map, 1, _THIS_IP_);
+ 		if (atomic) {
+ 			if (!read_trylock(&gpc2->lock)) {
+-				read_unlock_irqrestore(&gpc1->lock, flags);
++				read_unlock(&gpc1->lock);
+ 				return;
+ 			}
+ 		} else {
+@@ -428,7 +424,7 @@ static void kvm_xen_update_runstate_guest(struct kvm_vc=
+pu *v, bool atomic)
+=20
+ 		if (!kvm_gpc_check(gpc2, user_len2)) {
+ 			read_unlock(&gpc2->lock);
+-			read_unlock_irqrestore(&gpc1->lock, flags);
++			read_unlock(&gpc1->lock);
+=20
+ 			/* When invoked from kvm_sched_out() we cannot sleep */
+ 			if (atomic)
+@@ -533,7 +529,7 @@ static void kvm_xen_update_runstate_guest(struct kvm_vc=
+pu *v, bool atomic)
+ 	}
+=20
+ 	kvm_gpc_mark_dirty_in_slot(gpc1);
+-	read_unlock_irqrestore(&gpc1->lock, flags);
++	read_unlock(&gpc1->lock);
+ }
+=20
+ void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
+@@ -592,7 +588,6 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+ {
+ 	unsigned long evtchn_pending_sel =3D READ_ONCE(v->arch.xen.evtchn_pending=
+_sel);
+ 	struct gfn_to_pfn_cache *gpc =3D &v->arch.xen.vcpu_info_cache;
+-	unsigned long flags;
+=20
+ 	if (!evtchn_pending_sel)
+ 		return;
+@@ -602,14 +597,14 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v=
+)
+ 	 * does anyway. Page it in and retry the instruction. We're just a
+ 	 * little more honest about it.
+ 	 */
+-	read_lock_irqsave(&gpc->lock, flags);
++	read_lock(&gpc->lock);
+ 	while (!kvm_gpc_check(gpc, sizeof(struct vcpu_info))) {
+-		read_unlock_irqrestore(&gpc->lock, flags);
++		read_unlock(&gpc->lock);
+=20
+ 		if (kvm_gpc_refresh(gpc, sizeof(struct vcpu_info)))
+ 			return;
+=20
+-		read_lock_irqsave(&gpc->lock, flags);
++		read_lock(&gpc->lock);
+ 	}
+=20
+ 	/* Now gpc->khva is a valid kernel address for the vcpu_info */
+@@ -639,7 +634,7 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+ 	}
+=20
+ 	kvm_gpc_mark_dirty_in_slot(gpc);
+-	read_unlock_irqrestore(&gpc->lock, flags);
++	read_unlock(&gpc->lock);
+=20
+ 	/* For the per-vCPU lapic vector, deliver it as MSI. */
+ 	if (v->arch.xen.upcall_vector)
+@@ -649,7 +644,6 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ {
+ 	struct gfn_to_pfn_cache *gpc =3D &v->arch.xen.vcpu_info_cache;
+-	unsigned long flags;
+ 	u8 rc =3D 0;
+=20
+ 	/*
+@@ -665,9 +659,10 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ 	BUILD_BUG_ON(sizeof(rc) !=3D
+ 		     sizeof_field(struct compat_vcpu_info, evtchn_upcall_pending));
+=20
+-	read_lock_irqsave(&gpc->lock, flags);
++	WARN_ON_ONCE(in_interrupt());
++	read_lock(&gpc->lock);
+ 	while (!kvm_gpc_check(gpc, sizeof(struct vcpu_info))) {
+-		read_unlock_irqrestore(&gpc->lock, flags);
++		read_unlock(&gpc->lock);
+=20
+ 		/*
+ 		 * This function gets called from kvm_vcpu_block() after setting the
+@@ -687,11 +682,11 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ 			 */
+ 			return 0;
+ 		}
+-		read_lock_irqsave(&gpc->lock, flags);
++		read_lock(&gpc->lock);
+ 	}
+=20
+ 	rc =3D ((struct vcpu_info *)gpc->khva)->evtchn_upcall_pending;
+-	read_unlock_irqrestore(&gpc->lock, flags);
++	read_unlock(&gpc->lock);
+ 	return rc;
+ }
+=20
+@@ -1382,12 +1377,11 @@ static bool wait_pending_event(struct kvm_vcpu *vcp=
+u, int nr_ports,
+ 	struct kvm *kvm =3D vcpu->kvm;
+ 	struct gfn_to_pfn_cache *gpc =3D &kvm->arch.xen.shinfo_cache;
+ 	unsigned long *pending_bits;
+-	unsigned long flags;
+ 	bool ret =3D true;
+ 	int idx, i;
+=20
+ 	idx =3D srcu_read_lock(&kvm->srcu);
+-	read_lock_irqsave(&gpc->lock, flags);
++	read_lock(&gpc->lock);
+ 	if (!kvm_gpc_check(gpc, PAGE_SIZE))
+ 		goto out_rcu;
+=20
+@@ -1408,7 +1402,7 @@ static bool wait_pending_event(struct kvm_vcpu *vcpu,=
+ int nr_ports,
+ 	}
+=20
+  out_rcu:
+-	read_unlock_irqrestore(&gpc->lock, flags);
++	read_unlock(&gpc->lock);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+=20
+ 	return ret;
+@@ -1730,12 +1724,17 @@ static int set_shinfo_evtchn_pending(struct kvm_vcp=
+u *vcpu, u32 port)
+ 	struct kvm *kvm =3D vcpu->kvm;
+ 	struct gfn_to_pfn_cache *gpc =3D &kvm->arch.xen.shinfo_cache;
+ 	unsigned long *pending_bits, *mask_bits;
+-	unsigned long flags;
+ 	int rc =3D -EWOULDBLOCK;
+=20
+-	read_lock_irqsave(&gpc->lock, flags);
++	if (in_interrupt()) {
++		if (!read_trylock(&gpc->lock))
++			goto out;
++	} else {
++		read_lock(&gpc->lock);
++	}
++
+ 	if (!kvm_gpc_check(gpc, PAGE_SIZE))
+-		goto out;
++		goto out_unlock;
+=20
+ 	if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode) {
+ 		struct shared_info *shinfo =3D gpc->khva;
+@@ -1758,8 +1757,9 @@ static int set_shinfo_evtchn_pending(struct kvm_vcpu =
+*vcpu, u32 port)
+ 		rc =3D 1; /* It is newly raised */
+ 	}
+=20
++ out_unlock:
++	read_unlock(&gpc->lock);
+  out:
+-	read_unlock_irqrestore(&gpc->lock, flags);
+ 	return rc;
+ }
+=20
+@@ -1767,23 +1767,23 @@ static bool set_vcpu_info_evtchn_pending(struct kvm=
+_vcpu *vcpu, u32 port)
+ {
+ 	struct kvm *kvm =3D vcpu->kvm;
+ 	struct gfn_to_pfn_cache *gpc =3D &vcpu->arch.xen.vcpu_info_cache;
+-	unsigned long flags;
+ 	bool kick_vcpu =3D false;
++	bool locked;
+=20
+-	read_lock_irqsave(&gpc->lock, flags);
++	locked =3D read_trylock(&gpc->lock);
+=20
+ 	/*
+ 	 * Try to deliver the event directly to the vcpu_info. If successful and
+ 	 * the guest is using upcall_vector delivery, send the MSI.
+-	 * If the pfncache is invalid, set the shadow. In this case, or if the
+-	 * guest is using another form of event delivery, the vCPU must be
+-	 * kicked to complete the delivery.
++	 * If the pfncache lock is contended or the cache is invalid, set the
++	 * shadow. In this case, or if the guest is using another form of event
++	 * delivery, the vCPU must be kicked to complete the delivery.
+ 	 */
+ 	if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode) {
+ 		struct vcpu_info *vcpu_info =3D gpc->khva;
+ 		int port_word_bit =3D port / 64;
+=20
+-		if (!kvm_gpc_check(gpc, sizeof(*vcpu_info))) {
++		if ((!locked || !kvm_gpc_check(gpc, sizeof(*vcpu_info)))) {
+ 			if (!test_and_set_bit(port_word_bit, &vcpu->arch.xen.evtchn_pending_sel=
+))
+ 				kick_vcpu =3D true;
+ 			goto out;
+@@ -1797,7 +1797,7 @@ static bool set_vcpu_info_evtchn_pending(struct kvm_v=
+cpu *vcpu, u32 port)
+ 		struct compat_vcpu_info *vcpu_info =3D gpc->khva;
+ 		int port_word_bit =3D port / 32;
+=20
+-		if (!kvm_gpc_check(gpc, sizeof(*vcpu_info))) {
++		if ((!locked || !kvm_gpc_check(gpc, sizeof(*vcpu_info)))) {
+ 			if (!test_and_set_bit(port_word_bit, &vcpu->arch.xen.evtchn_pending_sel=
+))
+ 				kick_vcpu =3D true;
+ 			goto out;
+@@ -1816,7 +1816,9 @@ static bool set_vcpu_info_evtchn_pending(struct kvm_v=
+cpu *vcpu, u32 port)
+ 	}
+=20
+  out:
+-	read_unlock_irqrestore(&gpc->lock, flags);
++	if (locked)
++		read_unlock(&gpc->lock);
++
+ 	return kick_vcpu;
+ }
+=20
+--=20
+2.34.1
+
+
+
+
+
+--=-pt0n40j6y4dzc13Z2bt7
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzA4MTgxMDM5WjAvBgkqhkiG9w0BCQQxIgQgN0pzd+JW
+O0ckbe+R3lkWrD/w1ncLo4gGSMo1d+Bb1RAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAk1+1dREZSAZJEFcdFf42LGGuiWK5Zck5z
+5QYoSGIjLzh5HehqEGwK7bxdm5fdIGdKuMRW0tbcsobZnYu6lsim7wN2dz+tVLfBVBAAPu1U2pQu
+KwVbGyF1//FP15xmBPvPYXq13dKDmvSKSSIFJu3ZM+zmf68P6N9zr4jendxkRkVJuKRqfcNdWRx0
+/rwVhXfNm9icbjk5zt/oLyHWxiMjL9y2k9xTjC+mHLkP8jg3jqpFhGRp/cvgfNOC7JTQIC0EEMYx
+oJ9JEAvOyN1gHRIAFurIbatllEP9bArto29I8oCLjeu5zN6lH09DH5o68sEhieaxU4PurWsUIhb4
+cfIYrjGhV8pM8AjNzrkRDUjzEjoGSJs2QjKqZZf4UB6WYfKdsvyjT5splAvRXR8zE6pM1oi7r9hi
+rpfWlek33tCtHcJeiSKqN2Ct3TY0Jjl8GmmODSpnOVFn7MRxOmxqOTlhW5XVFG2SCLZObz9QJRFv
+yIhHtK3vx+y3IHkmpW093Fa9GEWEoybGxUyTzJfvP32hRW9Fzd50w/6EsK39hXjWKFEvVfxVmM3K
+NRmd6rP7bbeG46BqCoET4TXlH9ZkIsAOOipfm/DGgym4uFIGh9fpS7wPFrZHlfFUwYdhDDPgnTXg
+EqcfcOmlsAm1phyCbIr8lOCw0W6U6IZSxXtsKVbCNQAAAAAAAA==
+
+
+--=-pt0n40j6y4dzc13Z2bt7--
 
