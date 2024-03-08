@@ -1,165 +1,111 @@
-Return-Path: <kvm+bounces-11361-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11362-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAE80875ECB
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 08:46:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468AC875EDD
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 08:53:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE9301C21BC7
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 07:46:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB2621F23608
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 07:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5A74F61D;
-	Fri,  8 Mar 2024 07:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE614F8A9;
+	Fri,  8 Mar 2024 07:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QiaBxAH8"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="nWC6iOOI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885654EB2F;
-	Fri,  8 Mar 2024 07:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAC84F5FC
+	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 07:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709883972; cv=none; b=Qs3hdVZ1WTs418knTQ6Z2q8DcItVZkDbjbqDh0LJdiPcoHJh+DUKJOZl4cFfnHqz4jevDrpms5oOhly/aLuYeVq0ezBRzYnyNlGFz/nYdTDxLfPbWv7S+tjkyPOeYZA/1F2HEan60Fv5fE9p11tmq8YWAaK7ygWN2SG57WHLzQc=
+	t=1709884390; cv=none; b=hUEzOZ9RNlSeCqtU7Q7dXMM2KrLJ6Jr1UeGKG2etA64PfY2tNVRyUiNld8m0gOm2PZdQhIVfo+FZOa4myxSGhFb46G784d310x3m2NtlwwSdKqzap2dHB/GRnsT9lQm5Fg+OSWqUowpcnoORNbDTrZbRqc/D//4Av481eRLWg1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709883972; c=relaxed/simple;
-	bh=SU/y7eEP7nRNmSd87woC458+unvPZtN0wfjyjyZJNHM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r08WJbuTTTtGhggDHTDTg5hnAHD9HegJ+8kV8ERzdyLOym8dgfVfAqg9aqV4Esu0O1rfAOlyFu6AC9JnhbFHAEQyFf6JxsFmPU9k/6VwzBH/LV3HEjfeN6x7nWaJeiul/x3Xwsq9oynYxBgx1HbIap5+mPisyhLr0zKad7opywc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QiaBxAH8; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709883971; x=1741419971;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=SU/y7eEP7nRNmSd87woC458+unvPZtN0wfjyjyZJNHM=;
-  b=QiaBxAH8pyk1cMUOdLc8WBHy1WIL33ZPg4CvK84WBQpWGuhnk/nRU4sZ
-   KkfvMiq+yPOH2X/4wdW3Si3GE7ACMBYJ3ZzcKdVTYn24fowxQrmnZth0T
-   dHVDoflmH6KApRTGboaRTJkquzzIoLZxae/F4zjWVEO13xJ9/Sp3EZ9qY
-   lTved9XeJmkZzl4iebZ7NAJPEaZy15YRqdTPArH10qi697OsUdrGXnU1t
-   5F0wZ72yrRvj4Ouvt7sApIoE0pzBQqv31JDa710tCSQB7YUsilTF2YMlE
-   K95mRgivmnm+bRNtFvad1QUFD2xEz9X/ZhLv6vWCtcPOW9vK5ISGdh9G8
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="4474766"
-X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
-   d="scan'208";a="4474766"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 23:46:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
-   d="scan'208";a="14968970"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.242.47]) ([10.124.242.47])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 23:46:06 -0800
-Message-ID: <5af738d6-626d-49d5-9bf9-e2140ac50155@linux.intel.com>
-Date: Fri, 8 Mar 2024 15:46:04 +0800
+	s=arc-20240116; t=1709884390; c=relaxed/simple;
+	bh=/JCwJPffdIEDQLzjTwDXYjywLsFs5AnpuWxe1WBILHE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KsepFOIH8NZJmD+N8TeJTHJKC4AInNNjn+lKt4s2TH1XLbD2tzB18osqRIzLb5b6IbRohfo+HVl2ULJY0y8/h5Tgn1fz0Hw96JQuHEKFPD89FtIOzf4GQ7V1l3CmaB8y6LRjKoelzAPtFk8Fjfo428r1ngKn0i88PrjFZdH0K/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=nWC6iOOI; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4131bbb7fbcso36315e9.2
+        for <kvm@vger.kernel.org>; Thu, 07 Mar 2024 23:53:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1709884387; x=1710489187; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YMX300WmqP7OPP0k2s8oRpai64z6fg6Nih1X4pJ5ZrY=;
+        b=nWC6iOOIcUsQvyXOhYPCj1hQLZjHRe8drWpKKbcmSsGYFH/oQOij2YoqMKqT8JYXXJ
+         IdD/vVHgMUZWp6QhTmhpmjuAI9am03noQdKafgzynR5snulSuOydqkuX3B/EbmqxBfs1
+         jEPBZaQSqqRAezTPHvbLXEx7x6q9Od9pKoG5tpDCIQUkuPtNF86xt/4jhOt0uTLYCE2C
+         lOAfe3No32RpStAJ8og9xVteDOBF+49cRQcAVk83tRsdd8yge/MOLknOOvsFAzqj9hRE
+         rpExLWNsYkGQtC1WtTQyyOTULZWrgGkIxYDLbod8rGvx8VQPbcTR/ZKfke7shca94xXi
+         sy2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709884387; x=1710489187;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YMX300WmqP7OPP0k2s8oRpai64z6fg6Nih1X4pJ5ZrY=;
+        b=s271MmySzjT29O1NQQEr8S4Pg3G8yK2aUjKNc7mh8AIMxk+ZW9IRK2BpvvdOf6SNq0
+         uX63MpI2z1r5cjQTBMDKbNsMpRURwVAsL8EuKsrxIg7SzXW8hnseX4yO9J5YwAHvkh6l
+         +j58MDzF+UeKHvF8KJFXvgvo0qsdQ0FQt2SXwGuB40OD96va3QR0ffcwqm1wFcv78+iL
+         hrTuwWI3MaCFitMi90sFGhC0/9Silg7vShu8P4EQQiWQhmYQ4ZE+YtM5NmtMVTzwGsCQ
+         LW5j2HWsvEheC6noPVAB1Xacu2tI4YBsLjZEFwU9DFu397OAsvsxCUDOQXAogxz3wOI7
+         Ae3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW2FPIjAYNnpz5tab0+aqhfNSJq2u0MAvuPxmaW4gKWaXIuUOVVGExazevqrKA4Kb27GIOlK5Lb6+8ZsyBVWrJnXI5c
+X-Gm-Message-State: AOJu0YyeT4xsZZoEhGa6DJXYml+vAoZ22METaw7A6C9+IFKYiQwa6ofo
+	0hEiT8JCEDvxbEgX1Pxdlj86fvMYOJFXN51xFJw7FFFAknnCBeT2POc4C0KMdnU=
+X-Google-Smtp-Source: AGHT+IFRvPfPH7sazFwQQwkcYiePuHoemGv4c5hK5Fr4v1LmmXzLFkOofwB/Xfp3tyRgkLrI76lnvQ==
+X-Received: by 2002:a05:600c:468a:b0:412:b0d3:62f4 with SMTP id p10-20020a05600c468a00b00412b0d362f4mr15571185wmo.26.1709884386947;
+        Thu, 07 Mar 2024 23:53:06 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id w11-20020a05600c474b00b004130fef5134sm4546585wmo.11.2024.03.07.23.53.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 23:53:06 -0800 (PST)
+Date: Fri, 8 Mar 2024 08:53:05 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
+	KVM General <kvm@vger.kernel.org>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, linux-riscv <linux-riscv@lists.infradead.org>
+Subject: Re: [GIT PULL] KVM/riscv changes for 6.9
+Message-ID: <20240308-5d406beb72ee7f30f894c45d@orel>
+References: <CAAhSdy1rYFoYjCRWTPouiT=tiN26Z_v3Y36K2MyDrcCkRs1Luw@mail.gmail.com>
+ <Zen8qGzVpaOB_vKa@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 003/130] x86/virt/tdx: Unbind global metadata read
- with 'struct tdx_tdmr_sysinfo'
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <96c21cc1d283cf59ecba003cd5a19bfbce83675d.1708933498.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <96c21cc1d283cf59ecba003cd5a19bfbce83675d.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zen8qGzVpaOB_vKa@google.com>
 
-
-
-On 2/26/2024 4:25 PM, isaku.yamahata@intel.com wrote:
-> From: Kai Huang <kai.huang@intel.com>
+On Thu, Mar 07, 2024 at 09:43:04AM -0800, Sean Christopherson wrote:
+...
+> But the prototype of guest_get_vcpuid() is in common code.  Which isn't a huge
+> deal, but it's rather undesirable because there's no indication that its
+> implementation is arch-specific, and trying to use it in code built for s390 or
+> x86 (or MIPS or PPC, which are on the horizon), would fail.  I'm all for making
+> code common where possible, but going halfway and leaving a trap for other
+> architectures makes for a poor experience for developers.
 >
-> For now the kernel only reads TDMR related global metadata fields for
-> module initialization, and the metadata read code only works with the
-> 'struct tdx_tdmr_sysinfo'.
->
-> KVM will need to read a bunch of non-TDMR related metadata to create and
-> run TDX guests.  It's essential to provide a generic metadata read
-> infrastructure which is not bound to any specific structure.
->
-> To start providing such infrastructure, unbound the metadata read with
-> the 'struct tdx_tdmr_sysinfo'.
->
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+I've got a few other riscv kvm selftests cleanup patches locally queued.
+I'll add another one which moves the prototype to include/riscv/processor.h
+and include/aarch64/processor.h. Making guest_get_vcpuid() common (for
+which I think I'm to blame) was premature and, as you point out, it should
+have at least been named arch_guest_get_vcpuid(). I could do the rename
+instead, but since I'm not sure if it'll ever get adopted outside riscv
+and aarch64, I'll just move for now.
 
-> ---
->   arch/x86/virt/vmx/tdx/tdx.c | 25 ++++++++++++++-----------
->   1 file changed, 14 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index cdcb3332bc5d..eb208da4ff63 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -273,9 +273,9 @@ static int read_sys_metadata_field(u64 field_id, u64 *data)
->   
->   static int read_sys_metadata_field16(u64 field_id,
->   				     int offset,
-> -				     struct tdx_tdmr_sysinfo *ts)
-> +				     void *stbuf)
->   {
-> -	u16 *ts_member = ((void *)ts) + offset;
-> +	u16 *st_member = stbuf + offset;
->   	u64 tmp;
->   	int ret;
->   
-> @@ -287,7 +287,7 @@ static int read_sys_metadata_field16(u64 field_id,
->   	if (ret)
->   		return ret;
->   
-> -	*ts_member = tmp;
-> +	*st_member = tmp;
->   
->   	return 0;
->   }
-> @@ -297,19 +297,22 @@ struct field_mapping {
->   	int offset;
->   };
->   
-> -#define TD_SYSINFO_MAP(_field_id, _member) \
-> -	{ .field_id = MD_FIELD_ID_##_field_id,	   \
-> -	  .offset   = offsetof(struct tdx_tdmr_sysinfo, _member) }
-> +#define TD_SYSINFO_MAP(_field_id, _struct, _member)	\
-> +	{ .field_id = MD_FIELD_ID_##_field_id,		\
-> +	  .offset   = offsetof(_struct, _member) }
-> +
-> +#define TD_SYSINFO_MAP_TDMR_INFO(_field_id, _member)	\
-> +	TD_SYSINFO_MAP(_field_id, struct tdx_tdmr_sysinfo, _member)
->   
->   static int get_tdx_tdmr_sysinfo(struct tdx_tdmr_sysinfo *tdmr_sysinfo)
->   {
->   	/* Map TD_SYSINFO fields into 'struct tdx_tdmr_sysinfo': */
->   	const struct field_mapping fields[] = {
-> -		TD_SYSINFO_MAP(MAX_TDMRS,	      max_tdmrs),
-> -		TD_SYSINFO_MAP(MAX_RESERVED_PER_TDMR, max_reserved_per_tdmr),
-> -		TD_SYSINFO_MAP(PAMT_4K_ENTRY_SIZE,    pamt_entry_size[TDX_PS_4K]),
-> -		TD_SYSINFO_MAP(PAMT_2M_ENTRY_SIZE,    pamt_entry_size[TDX_PS_2M]),
-> -		TD_SYSINFO_MAP(PAMT_1G_ENTRY_SIZE,    pamt_entry_size[TDX_PS_1G]),
-> +		TD_SYSINFO_MAP_TDMR_INFO(MAX_TDMRS,		max_tdmrs),
-> +		TD_SYSINFO_MAP_TDMR_INFO(MAX_RESERVED_PER_TDMR, max_reserved_per_tdmr),
-> +		TD_SYSINFO_MAP_TDMR_INFO(PAMT_4K_ENTRY_SIZE,    pamt_entry_size[TDX_PS_4K]),
-> +		TD_SYSINFO_MAP_TDMR_INFO(PAMT_2M_ENTRY_SIZE,    pamt_entry_size[TDX_PS_2M]),
-> +		TD_SYSINFO_MAP_TDMR_INFO(PAMT_1G_ENTRY_SIZE,    pamt_entry_size[TDX_PS_1G]),
->   	};
->   	int ret;
->   	int i;
-
+Thanks,
+drew
 
