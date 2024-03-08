@@ -1,362 +1,164 @@
-Return-Path: <kvm+bounces-11380-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11381-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 788C08769C0
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 18:22:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBFAF876A03
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 18:36:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 052861F252C9
-	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 17:22:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 788EA1F22249
+	for <lists+kvm@lfdr.de>; Fri,  8 Mar 2024 17:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF62057335;
-	Fri,  8 Mar 2024 17:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BAF850251;
+	Fri,  8 Mar 2024 17:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b="OQbO7omb"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533094F213
-	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 17:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FA54879B
+	for <kvm@vger.kernel.org>; Fri,  8 Mar 2024 17:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709918471; cv=none; b=q/Omdon+3bgfqctuIUb1XdE7ZysUxROW0ElUDQqMUz/Ipc0qNj7ED3FVpA4XDjTuRlzobqfhvl1OMQHXwphyHRpC0DJPd9MuBjkNXlnEnH0IFUzp23mwOtLLGLTgkWB9MWQcr0hNsqSI1DT1j7APa3K2t+nKYXIBiwdH2w3Rrpg=
+	t=1709919317; cv=none; b=qNr4YkgdAMnvWQaAxDj/m6gjb6XY2thFODE6BKuEdb4Q8ZjchCXwvs9j3FikS20l8CWkdh21/jYMJfMoVsewS2DPjfGpA9D8ULa6+uhZTvKNS2OY6Pexg1xQnfHNBNP3ufHQrdyPLCnmizk89Q8u2tYTCHNgjBURlkzrgUcLFvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709918471; c=relaxed/simple;
-	bh=i37/8mp8aujBGo+6L2woz8WoAapVoQ4OPIaSRPWVPMw=;
+	s=arc-20240116; t=1709919317; c=relaxed/simple;
+	bh=sDCuyYqHhXwatCvf1bK8Y6Awy2oBcDLB7r6iE7tGSow=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QuHBAq+H0ksNq9xpgw+5jVH2KxIhMm1wzdb0A1bYV8MJfitxu4I8CR4hUfcWMV1IBu/AKHqwEXH3HVS6Sq8r0K13xWvzBHDfdGUL35tuBBKTFy2TbuOvAnSz8nky43oFh2ew9lpOTa28QKGsJ8gEiyaTG1KYupdXGAG+ixYVb8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78594C15;
-	Fri,  8 Mar 2024 09:21:45 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5611C3F738;
-	Fri,  8 Mar 2024 09:21:07 -0800 (PST)
-Date: Fri, 8 Mar 2024 17:20:59 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 11/13] KVM: arm64: nv: Add emulation for ERETAx
- instructions
-Message-ID: <20240308172059.GA1052268@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
- <20240226100601.2379693-12-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jlbzBxaynS4ynasCoYC/uJtVLO7ZTO9J7PCQ/XOuOcjOV/PYNxusl5ZrZ9tUbCOkFh6L2Dv0OIUN+9cstcCwEaVh8z8nnvAixRHt6AMdZwdg0IXKUpe2VtUaQ05jYXW2ga/+GDi4K8/tI75douN4YG/p2cNWrC3tPlAZsr6VYtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b=OQbO7omb; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5a1d83a86e8so61089eaf.0
+        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 09:35:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.com; s=cloud; t=1709919314; x=1710524114; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=42z1c6En4OMO73HSWbt9qhFCGOY4c7z3vfsZqA96K6s=;
+        b=OQbO7ombB7Tq73mesaPSUQegfYEQV6zfdH3bU03Q1FmiF29gr1Yq60HgwLeglJW8mF
+         cKpulOh9gZSW1J3Y8tcusQiih/fWGDVP9o0CtSirUfcv3UtmKny/wRp+QFWHqCAj+1la
+         1bjE+l45idH4JVdHZuEy4hfY8TeDe6GM2kDdA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709919314; x=1710524114;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=42z1c6En4OMO73HSWbt9qhFCGOY4c7z3vfsZqA96K6s=;
+        b=F9TK1JL2vpFu8M33SvJq4PjYbd3PIZBOCJ+2+3l42VuTQxJyR4dPOQBTb5Dpcx8sP2
+         0uo1oIPYzPObI+BNEfapfPHOKJTBMKSx5M0DLlYZD8zS98G+gwDP4qKkZKXdGwIwLrLR
+         WuCTcxCXvCjbFAC8HiamB0ICVUj3B/ZVG6itgKfSwHrGC4Tfjj2620CSleEJ0qkSs3MT
+         F/XsFJTpDgd+I56Jmkg0gErcday0jR8vDy6Fok/ARJxJbq/e4xzsOTGKL4aHD2h8BIbR
+         tlKRWjt4xwA9SSNhScDOnH98Em/oaQ9UaD9UeGrFd9uMThvGEDXGnTOXiYW7kUbDynNw
+         9brw==
+X-Forwarded-Encrypted: i=1; AJvYcCVamHvor/eEei0Yro5wk6Pkw8447iKALOm2eST2A5kI4JhKJGqYvtrtoy3KACeuE0EYSo+6BfqS4+hGzTix6JJtfxkr
+X-Gm-Message-State: AOJu0YzX6Nxm0add8QyyFehR0QuqgsgIuXu2fqH7+XQKJh0OoY2Q2lAQ
+	ldSbyntuTmf6+bQg73OoMzsK/s6N9bob50gTWAUrnHFGsT6vXrQ8HVL3h/oGd329Cxg95zFJb0X
+	1cms=
+X-Google-Smtp-Source: AGHT+IFP+iIn7ziPACo/W5ywuwt3jU9vKOJI+Md4melHw3m+IPRBayOOv3MnfyWInvHuBqQD34WXQg==
+X-Received: by 2002:a05:6820:2227:b0:5a1:34cf:400c with SMTP id cj39-20020a056820222700b005a134cf400cmr12525786oob.9.1709919314653;
+        Fri, 08 Mar 2024 09:35:14 -0800 (PST)
+Received: from perard.uk.xensource.com (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
+        by smtp.gmail.com with ESMTPSA id z5-20020a05683020c500b006e12266433csm2248064otq.27.2024.03.08.09.35.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 09:35:14 -0800 (PST)
+Date: Fri, 8 Mar 2024 17:35:08 +0000
+From: Anthony PERARD <anthony.perard@cloud.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, qemu-s390x@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	qemu-ppc@nongnu.org, qemu-arm@nongnu.org,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	=?iso-8859-1?Q?Fr=E9d=E9ric?= Barrat <fbarrat@linux.ibm.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>, mzamazal@redhat.com,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Paul Durrant <paul@xen.org>, Peter Xu <peterx@redhat.com>,
+	Fabiano Rosas <farosas@suse.de>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Cameron Esfahani <dirty@apple.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Bin Meng <bin.meng@windriver.com>, Weiwei Li <liwei1518@gmail.com>,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v3 01/29] bulk: Access existing variables initialized to
+ &S->F when available
+Message-ID: <a495a2c8-0259-4a44-8ac4-9cb6052074b6@perard>
+References: <20240129164514.73104-1-philmd@linaro.org>
+ <20240129164514.73104-2-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240226100601.2379693-12-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240129164514.73104-2-philmd@linaro.org>
 
-Phew..
-
-On Mon, Feb 26, 2024 at 10:05:59AM +0000, Marc Zyngier wrote:
-> FEAT_NV has the interesting property of relying on ERET being
-> trapped. An added complexity is that it also traps ERETAA and
-> ERETAB, meaning that the Pointer Authentication aspect of these
-> instruction must be emulated.
+On Mon, Jan 29, 2024 at 05:44:43PM +0100, Philippe Mathieu-Daudé wrote:
+> When a variable is initialized to &struct->field, use it
+> in place. Rationale: while this makes the code more concise,
+> this also helps static analyzers.
 > 
-> Add an emulation of Pointer Authentication, limited to ERETAx
-> (always using SP_EL2 as the modifier and ELR_EL2 as the pointer),
-> using the Generic Authentication instructions.
+> Mechanical change using the following Coccinelle spatch script:
 > 
-> The emulation, however small, is placed in its own compilation
-> unit so that it can be avoided if the configuration doesn't
-> include it (or the toolchan in not up to the task).
+>  @@
+>  type S, F;
+>  identifier s, m, v;
+>  @@
+>       S *s;
+>       ...
+>       F *v = &s->m;
+>       <+...
+>  -    &s->m
+>  +    v
+>       ...+>
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Inspired-by: Zhao Liu <zhao1.liu@intel.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->  arch/arm64/include/asm/kvm_nested.h    |  12 ++
->  arch/arm64/include/asm/pgtable-hwdef.h |   1 +
->  arch/arm64/kvm/Makefile                |   1 +
->  arch/arm64/kvm/pauth.c                 | 196 +++++++++++++++++++++++++
->  4 files changed, 210 insertions(+)
->  create mode 100644 arch/arm64/kvm/pauth.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index dbc4e3a67356..5e0ab0596246 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -64,4 +64,16 @@ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
+> diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+> index 36e6f93c37..10ddf6bc91 100644
+> --- a/hw/xen/xen_pt.c
+> +++ b/hw/xen/xen_pt.c
+> @@ -710,7 +710,7 @@ static void xen_pt_destroy(PCIDevice *d) {
+>      uint8_t intx;
+>      int rc;
 >  
->  int kvm_init_nv_sysregs(struct kvm *kvm);
->  
-> +#ifdef CONFIG_ARM64_PTR_AUTH
-> +bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr);
-> +#else
-> +static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
-> +{
-> +	/* We really should never execute this... */
-> +	WARN_ON_ONCE(1);
-> +	*elr = 0xbad9acc0debadbad;
-> +	return false;
-> +}
-> +#endif
-> +
->  #endif /* __ARM64_KVM_NESTED_H */
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index e4944d517c99..bb88e9ef6296 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -277,6 +277,7 @@
->  #define TCR_TBI1		(UL(1) << 38)
->  #define TCR_HA			(UL(1) << 39)
->  #define TCR_HD			(UL(1) << 40)
-> +#define TCR_TBID0		(UL(1) << 51)
->  #define TCR_TBID1		(UL(1) << 52)
->  #define TCR_NFD0		(UL(1) << 53)
->  #define TCR_NFD1		(UL(1) << 54)
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index c0c050e53157..04882b577575 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 vgic/vgic-its.o vgic/vgic-debug.o
->  
->  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> +kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
->  
->  always-y := hyp_constants.h hyp-constants.s
->  
-> diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
-> new file mode 100644
-> index 000000000000..a3a5c404375b
-> --- /dev/null
-> +++ b/arch/arm64/kvm/pauth.c
-> @@ -0,0 +1,196 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2024 - Google LLC
-> + * Author: Marc Zyngier <maz@kernel.org>
-> + *
-> + * Primitive PAuth emulation for ERETAA/ERETAB.
-> + *
-> + * This code assumes that is is run from EL2, and that it is part of
-> + * the emulation of ERETAx for a guest hypervisor. That's a lot of
-> + * baked-in assumptions and shortcuts.
-> + *
-> + * Do no reuse for anything else!
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/pointer_auth.h>
-> +
-> +static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
-> +		       struct ptrauth_key ikey)
-> +{
-> +	struct ptrauth_key gkey;
-> +	u64 mod, pac = 0;
-> +
-> +	preempt_disable();
-> +
-> +	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
-> +		mod = __vcpu_sys_reg(vcpu, SP_EL2);
-> +	else
-> +		mod = read_sysreg(sp_el1);
-> +
-> +	gkey.lo = read_sysreg_s(SYS_APGAKEYLO_EL1);
-> +	gkey.hi = read_sysreg_s(SYS_APGAKEYHI_EL1);
-> +
-> +	__ptrauth_key_install_nosync(APGA, ikey);
-> +	isb();
-> +
-> +	asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
-> +		     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
-> +	isb();
-> +
-> +	__ptrauth_key_install_nosync(APGA, gkey);
-> +
-> +	preempt_enable();
-> +
-> +	/* PAC in the top 32bits */
-> +	return pac;
-> +}
-> +
-> +static bool effective_tbi(struct kvm_vcpu *vcpu, bool bit55)
-> +{
-> +	u64 tcr = vcpu_read_sys_reg(vcpu, TCR_EL2);
-> +	bool tbi, tbid;
-> +
-> +	/*
-> +	 * Since we are authenticating an instruction address, we have
-> +	 * to take TBID into account. If E2H==0, ignore VA[55], as
-> +	 * TCR_EL2 only has a single TBI/TBID. If VA[55] was set in
-> +	 * this case, this is likely a guest bug...
-> +	 */
-> +	if (!vcpu_el2_e2h_is_set(vcpu)) {
-> +		tbi = tcr & BIT(20);
-> +		tbid = tcr & BIT(29);
-> +	} else if (bit55) {
-> +		tbi = tcr & TCR_TBI1;
-> +		tbid = tcr & TCR_TBID1;
-> +	} else {
-> +		tbi = tcr & TCR_TBI0;
-> +		tbid = tcr & TCR_TBID0;
-> +	}
-> +
-> +	return tbi && !tbid;
-> +}
-> +
-> +static int compute_bottom_pac(struct kvm_vcpu *vcpu, bool bit55)
-> +{
-> +	static const int maxtxsz = 39; // Revisit these two values once
-> +	static const int mintxsz = 16; // (if) we support TTST/LVA/LVA2
-> +	u64 tcr = vcpu_read_sys_reg(vcpu, TCR_EL2);
-> +	int txsz;
-> +
-> +	if (!vcpu_el2_e2h_is_set(vcpu) || !bit55)
-> +		txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-> +	else
-> +		txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
-> +
-> +	return 64 - clamp(txsz, mintxsz, maxtxsz);
-> +}
-> +
-> +static u64 compute_pac_mask(struct kvm_vcpu *vcpu, bool bit55)
-> +{
-> +	int bottom_pac;
-> +	u64 mask;
-> +
-> +	bottom_pac = compute_bottom_pac(vcpu, bit55);
-> +
-> +	mask = GENMASK(54, bottom_pac);
-> +	if (!effective_tbi(vcpu, bit55))
-> +		mask |= GENMASK(63, 56);
-> +
-> +	return mask;
-> +}
-> +
-> +static u64 to_canonical_addr(struct kvm_vcpu *vcpu, u64 ptr, u64 mask)
-> +{
-> +	bool bit55 = !!(ptr & BIT(55));
-> +
-> +	if (bit55)
-> +		return ptr | mask;
-> +
-> +	return ptr & ~mask;
-> +}
-> +
-> +static u64 corrupt_addr(struct kvm_vcpu *vcpu, u64 ptr)
-> +{
-> +	bool bit55 = !!(ptr & BIT(55));
-> +	u64 mask, error_code;
-> +	int shift;
-> +
-> +	if (effective_tbi(vcpu, bit55)) {
-> +		mask = GENMASK(54, 53);
-> +		shift = 53;
-> +	} else {
-> +		mask = GENMASK(62, 61);
-> +		shift = 61;
-> +	}
-> +
-> +	if (esr_iss_is_eretab(kvm_vcpu_get_esr(vcpu)))
-> +		error_code = 2 << shift;
-> +	else
-> +		error_code = 1 << shift;
-> +
-> +	ptr &= ~mask;
-> +	ptr |= error_code;
-> +
-> +	return ptr;
-> +}
-> +
-> +/*
-> + * Authenticate an ERETAA/ERETAB instruction, returning true if the
-> + * authentication succeeded and false otherwise. In all cases, *elr
-> + * contains the VA to ERET to. Potential exception injection is left
-> + * to the caller.
-> + */
-> +bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
-> +{
-> +	u64 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
-> +	u64 esr = kvm_vcpu_get_esr(vcpu);
-> +	u64 ptr, cptr, pac, mask;
-> +	struct ptrauth_key ikey;
-> +
-> +	*elr = ptr = vcpu_read_sys_reg(vcpu, ELR_EL2);
-> +
-> +	/* We assume we're already in the context of an ERETAx */
-> +	if (esr_iss_is_eretab(esr)) {
-> +		if (!(sctlr & SCTLR_EL1_EnIB))
-> +			return true;
-> +
-> +		ikey.lo = __vcpu_sys_reg(vcpu, APIBKEYLO_EL1);
-> +		ikey.hi = __vcpu_sys_reg(vcpu, APIBKEYHI_EL1);
-> +	} else {
-> +		if (!(sctlr & SCTLR_EL1_EnIA))
-> +			return true;
-> +
-> +		ikey.lo = __vcpu_sys_reg(vcpu, APIAKEYLO_EL1);
-> +		ikey.hi = __vcpu_sys_reg(vcpu, APIAKEYHI_EL1);
-> +	}
-> +
-> +	mask = compute_pac_mask(vcpu, !!(ptr & BIT(55)));
-> +	cptr = to_canonical_addr(vcpu, ptr, mask);
-> +
-> +	pac = compute_pac(vcpu, cptr, ikey);
-> +
-> +	/*
-> +	 * Slightly deviate from the pseudocode: if we have a PAC
-> +	 * match with the signed pointer, then it must be good.
-> +	 * Anything after this point is pure error handling.
-> +	 */
-> +	if ((pac & mask) == (ptr & mask)) {
-> +		*elr = cptr;
-> +		return true;
-> +	}
-> +
-> +	/*
-> +	 * Authentication failed, corrupt the canonical address if
-> +	 * PAuth2 isn't implemented, or some XORing if it is.
-> +	 */
-> +	if (!kvm_has_pauth(vcpu->kvm, PAuth2))
-> +		cptr = corrupt_addr(vcpu, cptr);
-> +	else
-> +		cptr = ptr ^ (pac & mask);
-> +
-> +	*elr = cptr;
-> +	return false;
-> +}
+> -    if (machine_irq && !xen_host_pci_device_closed(&s->real_device)) {
+> +    if (machine_irq && !xen_host_pci_device_closed(host_dev)) {
+>          intx = xen_pt_pci_intx(s);
+>          rc = xc_domain_unbind_pt_irq(xen_xc, xen_domid, machine_irq,
+>                                       PT_IRQ_TYPE_PCI,
+> @@ -759,8 +759,8 @@ static void xen_pt_destroy(PCIDevice *d) {
+>          memory_listener_unregister(&s->io_listener);
+>          s->listener_set = false;
+>      }
+> -    if (!xen_host_pci_device_closed(&s->real_device)) {
+> -        xen_host_pci_device_put(&s->real_device);
+> +    if (!xen_host_pci_device_closed(host_dev)) {
+> +        xen_host_pci_device_put(host_dev);
 
-Each function in this file is quite small, but there's certainly a lot of
-complexity and background knowledge required to understand them!
-
-I spent quite some time on each part to see if it matches what I understood
-from the Arm ARM.
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-
-A side note / thing I considered. KVM doesn't currently handle ERET exceptions
-from EL1.
-
-1. If an ERETA{A,B} were executed from a nested EL1 guest, that would be
-trapped up to Host KVM at EL2.
-
-2. kvm_hyp_handle_eret() returns false since it's not from vEL2.  Inside
-kvm_handle_eret(), is_hyp_ctxt() is false so the exception is injected into
-vEL2 (via kvm_inject_nested_sync()).
-
-3. vEL2 gets the exception, kvm_hyp_handle_eret() returns false as before.
-Inside kvm_handle_eret(), is_hyp_ctxt() is also false, so
-kvm_inject_nested_sync() is called but now errors out since vcpu_has_nv() is
-false.
-
-Is that flow right? Am I missing something?
+For the Xen part:
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
 Thanks,
-Joey
+
+-- 
+Anthony PERARD
 
