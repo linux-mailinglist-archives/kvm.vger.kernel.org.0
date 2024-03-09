@@ -1,127 +1,99 @@
-Return-Path: <kvm+bounces-11439-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11440-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F16B876ED5
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 03:46:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F091B876F3E
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 06:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D573C2828FC
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:46:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63F8A2820DC
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 05:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA552D638;
-	Sat,  9 Mar 2024 02:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D8C2CCB3;
+	Sat,  9 Mar 2024 05:02:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UOZxGP+S"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eRJRVBpP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0412C6AA
-	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 02:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D611E49B;
+	Sat,  9 Mar 2024 05:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709952366; cv=none; b=LEQb9yvJnJK7p7QozGIAeY68GE7/zoy45MeojXtwOmGsiBtoAgDiszok0brt3Vid1YQuL35TOxISuxl/iWAJRyWu0eGAJjZAqvu5tWPYkgAyUjCBMg528/CjBIjijVqEXRlCTIdRR0b0hhrbgn/NBTabMGke6NJ4WiazUXuxCgo=
+	t=1709960521; cv=none; b=F4wb2U7pVfMq+IP7zz4afR40HqTxcPeo2Q9H7iYvdEvPjSHwfxA1RKsUQY9mKdDJMK8xpAWmf0QhxbHWrF8CFgUoFauZKS6OY2nMl7bQXBpANvy+rUhAzUFZGl8UxVen0cA8ZzsEEHE8p7Z2NREuknOuyOHY0HwxH1L1Gj2pxNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709952366; c=relaxed/simple;
-	bh=FaGxOMw8hAeHVyQkCVZb0DCHhnDYyHKuxNIwAvfWDWA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=R4GP+5m4sL7LmFKZZwbsB72EZF9rhNk0mAYfLmfCTZV130yeeuCjVW/0yK+XyXRyGlTrkVdMEjIhhblKpPZ+X84NhgvI/AehXE/e1ivFCGCvu8ziA+U9YTW9eX5L3lL6iL+xY1k1JrnaV1Ig1ja7MOsLDGneKUZ46+EaLi/YeBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UOZxGP+S; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1709952365; x=1741488365;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=FaGxOMw8hAeHVyQkCVZb0DCHhnDYyHKuxNIwAvfWDWA=;
-  b=UOZxGP+SQ074FfySbKC37cep1lgEsuXLpRPWE4A/IO9giYAY3iVVc/L2
-   zStTNjtDS2DXgRh2mKu5bpMKScz22RWyCAsNfXLOzlygLoMBPGW/y6MUT
-   uGCOfzcsLAlnKCU8mCGygW16qYA+HJF4hv4o673ROn/+WCJIZ4ujbPlSS
-   4=;
-X-IronPort-AV: E=Sophos;i="6.07,111,1708387200"; 
-   d="scan'208";a="643486831"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2024 02:46:02 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:58391]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.222:2525] with esmtp (Farcaster)
- id 8be3daf9-db1b-4473-aca9-d0c64320ade8; Sat, 9 Mar 2024 02:46:01 +0000 (UTC)
-X-Farcaster-Flow-ID: 8be3daf9-db1b-4473-aca9-d0c64320ade8
-Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 9 Mar 2024 02:46:01 +0000
-Received: from [192.168.12.128] (10.106.101.5) by
- EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 9 Mar 2024 02:45:59 +0000
-Message-ID: <8e3c2b45-356d-4ca9-bebc-012505235142@amazon.com>
-Date: Fri, 8 Mar 2024 19:45:57 -0700
+	s=arc-20240116; t=1709960521; c=relaxed/simple;
+	bh=q/mKtUyIHp2P1tXA8EgYGneMh+II7SaGDgn8hCOM4Zs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mJ9usRDzdPwhj3OmzkCMwY271JdIP88ptlpegFkOXJ5BflK9qG6Df8T1H6VlXsvoT02ebF37JljgJXF8Jrp1Gxu6fhdsvKOKUEvslYRV6zUYPLOJ6mkvURUg3NjyuSHJQvuzF00GfTKplEIEoGWEPiLVBWTCLnPotHNKzS6/QTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eRJRVBpP; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=+dmMM5sP7jm3IQ10EcQ/oF53RCutABKC3zszuGrAmug=; b=eRJRVBpP+hDPeoTydnpfcslrF5
+	OKFRYKTa5B6RZFEBTEK6/4mjHjm28ta2hKtmtGrqjxGKR5O734E0NeGJmlm7ExuM2STIynpmddZ9H
+	qO8ZldGhRT0e1F6gZPRniijUVk0O+fBLf1pg06nGeYsL+0mcB/0raj038qT01w/YGdX0qjqJ8YeQt
+	woBYG23ofHBQd1n1UALctDWDNUNohTngFj1uTLmnn31gMErQOZ2xlbFW/LMNQsPG2daE8JQDEHeW2
+	RJOJ4cJJAouXMC0fwU/wHVZlFwOQTNDearcplJIJuDsDRdR576zbwrra/FDh9Ne3MLTh9A8/t2JUa
+	BZxbM+cA==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rioq9-0000000D3Cq-1PKl;
+	Sat, 09 Mar 2024 05:01:45 +0000
+Date: Sat, 9 Mar 2024 05:01:45 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: "Gowans, James" <jgowans@amazon.com>
+Cc: "seanjc@google.com" <seanjc@google.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"Roy, Patrick" <roypat@amazon.co.uk>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"Manwaring, Derek" <derekmn@amazon.com>,
+	"rppt@kernel.org" <rppt@kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"Woodhouse, David" <dwmw@amazon.co.uk>,
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"lstoakes@gmail.com" <lstoakes@gmail.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>,
+	"mst@redhat.com" <mst@redhat.com>, "somlo@cmu.edu" <somlo@cmu.edu>,
+	"Graf (AWS), Alexander" <graf@amazon.de>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
+Subject: Re: Unmapping KVM Guest Memory from Host Kernel
+Message-ID: <ZevtORMrVbTsauzn@casper.infradead.org>
+References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Unmapping KVM Guest Memory from Host Kernel
-Content-Language: en-US
-To: David Matlack <dmatlack@google.com>, Brendan Jackman <jackmanb@google.com>
-CC: "Gowans, James" <jgowans@amazon.com>, "seanjc@google.com"
-	<seanjc@google.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"Roy, Patrick" <roypat@amazon.co.uk>, "chao.p.peng@linux.intel.com"
-	<chao.p.peng@linux.intel.com>, "rppt@kernel.org" <rppt@kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Woodhouse, David"
-	<dwmw@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
-	"lstoakes@gmail.com" <lstoakes@gmail.com>, "Liam.Howlett@oracle.com"
-	<Liam.Howlett@oracle.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>, "mst@redhat.com" <mst@redhat.com>,
-	"somlo@cmu.edu" <somlo@cmu.edu>, "Graf (AWS), Alexander" <graf@amazon.de>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>, <tabba@google.com>,
-	<qperret@google.com>, <jason.cj.chen@intel.com>
-References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
- <CA+i-1C34VT5oFQL7en1n+MdRrO7AXaAMdNVvjFPxOaTDGXu9Dw@mail.gmail.com>
- <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com>
-From: "Manwaring, Derek" <derekmn@amazon.com>
-In-Reply-To: <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
- EX19D003UWC002.ant.amazon.com (10.13.138.169)
+In-Reply-To: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
 
-On 2024-03-08 10:36-0700, David Matlack wrote:
-> On Fri, Mar 8, 2024 at 8:25 AM Brendan Jackman <jackmanb@google.com> wrote:
-> > On Fri, 8 Mar 2024 at 16:50, Gowans, James <jgowans@amazon> wrote:
-> > > Our goal is to more completely address the class of issues whose leak
-> > > origin is categorized as "Mapped memory" [1].
-> >
-> > Did you forget a link below? I'm interested in hearing about that
-> > categorisation.
+On Fri, Mar 08, 2024 at 03:50:05PM +0000, Gowans, James wrote:
+> Currently when using anonymous memory for KVM guest RAM, the memory all
+> remains mapped into the kernel direct map. We are looking at options to
+> get KVM guest memory out of the kernel’s direct map as a principled
+> approach to mitigating speculative execution issues in the host kernel.
+> Our goal is to more completely address the class of issues whose leak
+> origin is categorized as "Mapped memory" [1].
 
-The paper from Hertogh, et al. is https://download.vusec.net/papers/quarantine_raid23.pdf
-specifically Table 1.
-
-> > It's perhaps a bigger hammer than you are looking for, but the
-> > solution we're working on at Google is "Address Space Isolation" (ASI)
-> > - the latest posting about that is [2].
->
-> I think what James is looking for (and what we are also interested
-> in), is _eliminating_ the ability to access guest memory from the
-> direct map entirely.
-
-Actually, just preventing speculation of guest memory through the
-direct map is sufficient for our current focus.
-
-Brendan,
-I will look into the general ASI approach, thank you. Did you consider
-memfd_secret or a guest_memfd-based approach for Userspace-ASI? Based on
-Sean's earlier reply to James it sounds like the vision of guest_memfd
-aligns with ASI's goals.
-
-Derek
+One of the things that is holding Linux back is the inability to do I/O
+to memory which is not part of memmap.  _So Much_ of our infrastructure
+is based on having a struct page available to stick into an sglist, bio,
+skb_frag, or whatever.  The solution to this is to move to a (phys_addr,
+length) tuple instead of (page, offset, len) tuple.  I call this "phyr"
+and I've written about it before.  I'm not working on this as I have
+quite enough to do with the folio work, but I hope somebody works on it
+before I get time to.
 
