@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-11430-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11431-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEAF8876E8A
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:29:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73987876E8C
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:29:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC8301F22A02
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:29:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95417285871
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9903436AF2;
-	Sat,  9 Mar 2024 01:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C86B374F9;
+	Sat,  9 Mar 2024 01:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s85dU/Wv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cFfeOdfH"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A60B2E644
-	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB992364A5
+	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709947660; cv=none; b=WcNPdT/6Io3L24pyj57L4kP/2nZVtLT9UgDTz3EGBZRedqyZYN5VRLksMIwCCy8bD4l5O2sMCDFdlZ3I9FfPcM3iZQghZwZOT7A1m/dKwDGpeZfU8hKrpJRy/jCY8ySOyFqUqAvOCqwjk+KxaWPJ2YO53NTDobR9y/tc3rSU3vM=
+	t=1709947662; cv=none; b=Ne+FQsuf12yBMDdQ0ACJdxjgox45+eegJ1gMUil1SGEuBW66CWhppB6I+y12yC2bnmOXtyN4sOYf5oga8QXPbs9mD1wXAljIyxeEAPMlgP368Zm4kvdQa6mdZiWsnhWeTMOUlb8v6ah4ywAT0tw0m1bA1aDWCOprOZyRCIDxHmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709947660; c=relaxed/simple;
-	bh=cSo/9H4LV+ugQDK8WH64MT/A8kylvoerz+EThSRDTZ0=;
+	s=arc-20240116; t=1709947662; c=relaxed/simple;
+	bh=asA2Q64cYEdVnPGwxvGxEdtiJ+4njYAq1P8HIi+00oU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tZspA6pzvPLX6sdTybKaXgGRiiK4f+JLO7wLTx9oV5aOqz7/jonitz+NqUvlFxzsfzqMwBH9ojxeSiNdhXpShhFuxzzrEmiCAmOzgy1t3ca+bUhNhFOeScwo64JUUHW20WzCeHgUBPLo5VlzHByLzjc4wqSlsPOIPVr1C1KS7Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s85dU/Wv; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=U9ag6WHWKYIfPdHqY9F43cDmjxsmlSVl21ZebV/CxjQZbxKBwF8M3R8ddRqEnSN5V8pn1LMfMTjkQYq8sHn2S1o/kaUbf8Q12FWXBGD6IOQc5OM21x2y+GQloSfZWyuIP1959dAvPJivnqU5lGxQd2L3l6u2YRQasVWLHfKslx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cFfeOdfH; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d9a541b720aso4750458276.0
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:27:39 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc58cddb50so4401773276.0
+        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:27:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709947658; x=1710552458; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709947660; x=1710552460; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=J2mk3yjINFLzpjFivjrb5N/1XLkVh6F5pa6/JTyW+Xg=;
-        b=s85dU/WvNT6ambJeTz55S2TJcT8bgzf2wWEEFHu0dKcS3Qv6uzfwJAbFAgJSxuuLYo
-         EchOugvVQNajRruIO3ECwj6usk2UZ5X+H1T0BffxnsCm4Irs0Pxi+c72NdTC4y6ViRwq
-         2xZ7ZoWgyBp/u0zLjKDXSG1rUBU3jhk5d67edHlWz20p95ID/dXyB7RJsn4vj7mDbCBs
-         v94oKwCfjaYeAa1mRxKfMA40cGFFwFHnmbq5eqJwcMMnbyaeaSndEXWPCjIgTIUbUFXd
-         i05LAOZpzKVt4Dzv+fJvAGoxILN1zvTBkEa+aPDQAQ3PU9f9q22RmFbnOevnoERbpwiL
-         uC7A==
+        bh=7zfSsZ0P3OmkAxzO4p6XnXAYwdNDLv4d4j/tO3LJoqY=;
+        b=cFfeOdfHuHVcK2WWbInVR/NCHRniyKHTKGOEmI+/qlMx5l7PySK6cczYdfNxUMLEm5
+         4L4Nl2sb+PI9TGt9muRci4ZIldxj2kN6ao/9kQjXryX63bd3unbhobzQai35FIz/KFlO
+         3ReUMEGy8j9RF8tY5IBJe84g/ETCAgE+Ss2Byue9rrI41A5HTucoZSoeBQuIJsjKK2In
+         LhBbzx3H3loWYhp0cnobrkdxqKJjnChXH2Taa799sBs/YSLIhjKmrvQ4tpqyebH0GTXX
+         Ccpbh07pfqFEPvWGi7qYgj3dH+OczKI2H/q3MVsYuEu/67RVYePhAcYf+x7p3jCUtY/L
+         8IPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709947658; x=1710552458;
+        d=1e100.net; s=20230601; t=1709947660; x=1710552460;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=J2mk3yjINFLzpjFivjrb5N/1XLkVh6F5pa6/JTyW+Xg=;
-        b=Mh7X0YGkAVYBhLO4+PONXdtnnL4tcJ9OOtvV6XZW7z8kwlx1Z604LFTM7SR5AGwI53
-         K+cbVVh+2lTPpWXs/RO8SVaLsMA7WMZdBNpzL4LSoB3/FaNvIueACtE4il0ePztfRF35
-         3+1VhfyjDm+9xqjyK7SAv7TNSs05BB1RBhY9yPQDqKw2fEAXrB5p6lwvK8Q4+wFM14sv
-         XAdn/m6sqLDI6eyGAeySloIWOlM4siyKY0OIUpssgM17VXCK7LhOckNMh9YAmujSuVZb
-         ioHhkl/+b4JM8rJ5rZLncw4UrsnrymBO7XpOT37tP++nBGgL7Nd9RnMMYHmLz9fmSTHM
-         tSDw==
-X-Forwarded-Encrypted: i=1; AJvYcCUt58yrOKpdjkLf6l4/XsNXQwBINXWLutubcPqMDvWbEbrluZi0NXOBX/LKQp4h/5RydIO4cDV3uuS2Hv1dbgEwjU7v
-X-Gm-Message-State: AOJu0YwQ07dgH+Hz2GLX2vMh+HauE1htnViVFIGWQiXbOcJljsyNP5DR
-	Xdum07aDTms7Rpjem+cVFgzIB+4AqfV2THrMQhePhhmQRxpgzJoPaVD/MBXTOGZK9+5oV25AAFi
-	NJQ==
-X-Google-Smtp-Source: AGHT+IHrI5FDrUBoUl0r6JtHEuthwtAy7BhRUu74r7xvlQts2botI/ZyPUrf7LiPIj+ypGRGHDyvqTmpyOU=
+        bh=7zfSsZ0P3OmkAxzO4p6XnXAYwdNDLv4d4j/tO3LJoqY=;
+        b=bbkLJYQaa6ghTC08W31q3zXyPwbXPo65KkxyHpiLKZm+joaVHZ0lvZa+jJsOJgxYE2
+         d98S3AN2wk1n342tLcBIVnl+MKjGbUhXCAIUJhZt0ohObOXDDgCLqR+VhE1wYiHrzCOE
+         xmbbcrpVC4j1l5hVXEwmB+hVDJ7gJxCE/49w+BGbqrsfJZHxblapE6dhXvTo8G+er71c
+         zYb6JhCNj3/tNDc5fjgKZuQOUCWELO582W5WHubszopYhhKIK/YxfK+1U8D4xVjzMlS6
+         pBCUPxtAo0oWFyFLVBgrmjJ4t+C7W/EAJ2kY7HIK3ojOhSuKCKwYbnKNHiWJnhFjHp1I
+         ulKA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4voG4Y1NwfSxLV+rva2dbf8f3Y0ZOL6cjPi6z+UhR/+plGuzPgcw/KPcHg9xWUn4q+6PbLaWuuUSCIq2pxE6y7ITJ
+X-Gm-Message-State: AOJu0YxdcYXuKrh17Hp0u3maZ79fCkZBT0ZV6khbGX4B2rQla24iMXIv
+	/GZcLxzOQAImkCKq/5upDkKK0uT6Mi9g+pP70WSSmGEMyOixw0Z1cByZMZQFtUXgVP4m7JfXwQZ
+	kIA==
+X-Google-Smtp-Source: AGHT+IFcW7KzgO/BpgyMqKPfaZjTeUEzLTWFoMFPJK2iqgZo0BYHsKQoyclB2VWqfLuEY3nnCdYV1aYmGj8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ef46:0:b0:dcd:88e9:e508 with SMTP id
- w6-20020a25ef46000000b00dcd88e9e508mr185467ybm.5.1709947658336; Fri, 08 Mar
- 2024 17:27:38 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:aa83:0:b0:dc2:3441:897f with SMTP id
+ t3-20020a25aa83000000b00dc23441897fmr185240ybi.6.1709947659928; Fri, 08 Mar
+ 2024 17:27:39 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  8 Mar 2024 17:27:20 -0800
+Date: Fri,  8 Mar 2024 17:27:21 -0800
 In-Reply-To: <20240309012725.1409949-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240309012725.1409949-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240309012725.1409949-5-seanjc@google.com>
-Subject: [PATCH v6 4/9] KVM: VMX: Move MSR_IA32_VMX_BASIC bit defines to asm/vmx.h
+Message-ID: <20240309012725.1409949-6-seanjc@google.com>
+Subject: [PATCH v6 5/9] KVM: VMX: Track CPU's MSR_IA32_VMX_BASIC as a single
+ 64-bit value
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -87,17 +88,19 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Shan Kang <shan.kang@intel.com>, Kai Huang <kai.huang@intel.com>, Xin Li <xin3.li@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Xin Li <xin3.li@intel.com>
+Track the "basic" capabilities VMX MSR as a single u64 in vmcs_config
+instead of splitting it across three fields, that obviously don't combine
+into a single 64-bit value, so that KVM can use the macros that define MSR
+bits using their absolute position.  Replace all open coded shifts and
+masks, many of which are relative to the "high" half, with the appropriate
+macro.
 
-Move the bit defines for MSR_IA32_VMX_BASIC from msr-index.h to vmx.h so
-that they are colocated with other VMX MSR bit defines, and with the
-helpers that extract specific information from an MSR_IA32_VMX_BASIC value.
+Opportunistically use VMX_BASIC_32BIT_PHYS_ADDR_ONLY instead of an open
+coded equivalent, and clean up the related comment to not reference a
+specific SDM section (to the surprise of no one, the comment is stale).
 
-Opportunistically use BIT_ULL() instead of open coding hex values.
-
-Opportunistically rename VMX_BASIC_64 to VMX_BASIC_32BIT_PHYS_ADDR_ONLY,
-as "VMX_BASIC_64" is widly misleading.  The flag enumerates that addresses
-are limited to 32 bits, not that 64-bit addresses are allowed.
+No functional change intended (though obviously the code generation will
+be quite different).
 
 Cc: Shan Kang <shan.kang@intel.com>
 Cc: Kai Huang <kai.huang@intel.com>
@@ -105,47 +108,135 @@ Signed-off-by: Xin Li <xin3.li@intel.com>
 [sean: split to separate patch, write changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/msr-index.h | 8 --------
- arch/x86/include/asm/vmx.h       | 7 +++++++
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/vmx.h      |  5 +++++
+ arch/x86/kvm/vmx/capabilities.h |  6 ++----
+ arch/x86/kvm/vmx/vmx.c          | 28 ++++++++++++++--------------
+ 3 files changed, 21 insertions(+), 18 deletions(-)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index af71f8bb76ae..5ca81ad509b5 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -1122,14 +1122,6 @@
- #define MSR_IA32_VMX_VMFUNC             0x00000491
- #define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
- 
--/* VMX_BASIC bits and bitmasks */
--#define VMX_BASIC_VMCS_SIZE_SHIFT	32
--#define VMX_BASIC_TRUE_CTLS		(1ULL << 55)
--#define VMX_BASIC_64		0x0001000000000000LLU
--#define VMX_BASIC_MEM_TYPE_SHIFT	50
--#define VMX_BASIC_MEM_TYPE_MASK	0x003c000000000000LLU
--#define VMX_BASIC_INOUT		0x0040000000000000LLU
--
- /* Resctrl MSRs: */
- /* - Intel: */
- #define MSR_IA32_L3_QOS_CFG		0xc81
 diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 4fdc76263066..c3a97dca4a33 100644
+index c3a97dca4a33..ce6d166fc3c5 100644
 --- a/arch/x86/include/asm/vmx.h
 +++ b/arch/x86/include/asm/vmx.h
-@@ -133,6 +133,13 @@
- #define VMX_VMFUNC_EPTP_SWITCHING               VMFUNC_CONTROL_BIT(EPTP_SWITCHING)
- #define VMFUNC_EPTP_ENTRIES  512
+@@ -150,6 +150,11 @@ static inline u32 vmx_basic_vmcs_size(u64 vmx_basic)
+ 	return (vmx_basic & GENMASK_ULL(44, 32)) >> 32;
+ }
  
-+#define VMX_BASIC_VMCS_SIZE_SHIFT		32
-+#define VMX_BASIC_32BIT_PHYS_ADDR_ONLY		BIT_ULL(48)
-+#define VMX_BASIC_DUAL_MONITOR_TREATMENT	BIT_ULL(49)
-+#define VMX_BASIC_MEM_TYPE_SHIFT		50
-+#define VMX_BASIC_INOUT				BIT_ULL(54)
-+#define VMX_BASIC_TRUE_CTLS			BIT_ULL(55)
++static inline u32 vmx_basic_vmcs_mem_type(u64 vmx_basic)
++{
++	return (vmx_basic & GENMASK_ULL(53, 50)) >> 50;
++}
 +
- static inline u32 vmx_basic_vmcs_revision_id(u64 vmx_basic)
+ static inline int vmx_misc_preemption_timer_rate(u64 vmx_misc)
  {
- 	return vmx_basic & GENMASK_ULL(30, 0);
+ 	return vmx_misc & VMX_MISC_PREEMPTION_TIMER_RATE_MASK;
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 41a4533f9989..86ce8bb96bed 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -54,9 +54,7 @@ struct nested_vmx_msrs {
+ };
+ 
+ struct vmcs_config {
+-	int size;
+-	u32 basic_cap;
+-	u32 revision_id;
++	u64 basic;
+ 	u32 pin_based_exec_ctrl;
+ 	u32 cpu_based_exec_ctrl;
+ 	u32 cpu_based_2nd_exec_ctrl;
+@@ -76,7 +74,7 @@ extern struct vmx_capability vmx_capability __ro_after_init;
+ 
+ static inline bool cpu_has_vmx_basic_inout(void)
+ {
+-	return	(((u64)vmcs_config.basic_cap << 32) & VMX_BASIC_INOUT);
++	return	vmcs_config.basic & VMX_BASIC_INOUT;
+ }
+ 
+ static inline bool cpu_has_virtual_nmis(void)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 71cc6e3b3221..e312c48f542f 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2554,13 +2554,13 @@ static u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 			     struct vmx_capability *vmx_cap)
+ {
+-	u32 vmx_msr_low, vmx_msr_high;
+ 	u32 _pin_based_exec_control = 0;
+ 	u32 _cpu_based_exec_control = 0;
+ 	u32 _cpu_based_2nd_exec_control = 0;
+ 	u64 _cpu_based_3rd_exec_control = 0;
+ 	u32 _vmexit_control = 0;
+ 	u32 _vmentry_control = 0;
++	u64 basic_msr;
+ 	u64 misc_msr;
+ 	int i;
+ 
+@@ -2679,29 +2679,29 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 		_vmexit_control &= ~x_ctrl;
+ 	}
+ 
+-	rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
++	rdmsrl(MSR_IA32_VMX_BASIC, basic_msr);
+ 
+ 	/* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
+-	if ((vmx_msr_high & 0x1fff) > PAGE_SIZE)
++	if (vmx_basic_vmcs_size(basic_msr) > PAGE_SIZE)
+ 		return -EIO;
+ 
+ #ifdef CONFIG_X86_64
+-	/* IA-32 SDM Vol 3B: 64-bit CPUs always have VMX_BASIC_MSR[48]==0. */
+-	if (vmx_msr_high & (1u<<16))
++	/*
++	 * KVM expects to be able to shove all legal physical addresses into
++	 * VMCS fields for 64-bit kernels, and per the SDM, "This bit is always
++	 * 0 for processors that support Intel 64 architecture".
++	 */
++	if (basic_msr & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
+ 		return -EIO;
+ #endif
+ 
+ 	/* Require Write-Back (WB) memory type for VMCS accesses. */
+-	if (((vmx_msr_high >> 18) & 15) != X86_MEMTYPE_WB)
++	if (vmx_basic_vmcs_mem_type(basic_msr) != X86_MEMTYPE_WB)
+ 		return -EIO;
+ 
+ 	rdmsrl(MSR_IA32_VMX_MISC, misc_msr);
+ 
+-	vmcs_conf->size = vmx_msr_high & 0x1fff;
+-	vmcs_conf->basic_cap = vmx_msr_high & ~0x1fff;
+-
+-	vmcs_conf->revision_id = vmx_msr_low;
+-
++	vmcs_conf->basic = basic_msr;
+ 	vmcs_conf->pin_based_exec_ctrl = _pin_based_exec_control;
+ 	vmcs_conf->cpu_based_exec_ctrl = _cpu_based_exec_control;
+ 	vmcs_conf->cpu_based_2nd_exec_ctrl = _cpu_based_2nd_exec_control;
+@@ -2851,13 +2851,13 @@ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
+ 	if (!pages)
+ 		return NULL;
+ 	vmcs = page_address(pages);
+-	memset(vmcs, 0, vmcs_config.size);
++	memset(vmcs, 0, vmx_basic_vmcs_size(vmcs_config.basic));
+ 
+ 	/* KVM supports Enlightened VMCS v1 only */
+ 	if (kvm_is_using_evmcs())
+ 		vmcs->hdr.revision_id = KVM_EVMCS_VERSION;
+ 	else
+-		vmcs->hdr.revision_id = vmcs_config.revision_id;
++		vmcs->hdr.revision_id = vmx_basic_vmcs_revision_id(vmcs_config.basic);
+ 
+ 	if (shadow)
+ 		vmcs->hdr.shadow_vmcs = 1;
+@@ -2950,7 +2950,7 @@ static __init int alloc_kvm_area(void)
+ 		 * physical CPU.
+ 		 */
+ 		if (kvm_is_using_evmcs())
+-			vmcs->hdr.revision_id = vmcs_config.revision_id;
++			vmcs->hdr.revision_id = vmx_basic_vmcs_revision_id(vmcs_config.basic);
+ 
+ 		per_cpu(vmxarea, cpu) = vmcs;
+ 	}
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
