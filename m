@@ -1,78 +1,82 @@
-Return-Path: <kvm+bounces-11420-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11421-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC946876E61
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:09:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E977D876E62
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:10:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DF3EB216F0
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:09:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D3C281DBF
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C19C184F;
-	Sat,  9 Mar 2024 01:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9731096F;
+	Sat,  9 Mar 2024 01:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qwJhfx5Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c3vCCYZs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7AAA34
-	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46220FBF3
+	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709946576; cv=none; b=KTLq8ydYHz8vyXb1GuDlpiwSHgf9L1HB+N4T7Z4UKB6pOLFS2VPhNyND1e6qWZobVzb6b5Vkg1dVYdZtgOhj4DfNOPd3fIIfpotxW7pZHaCtbCh9Tw3bsUc7O6paMPz7dv93rV7jiUtFUDkVCaZLRX9LAa2o+W1nv9DD0H6ktK0=
+	t=1709946582; cv=none; b=HdX18KSXK6nvcts13BRhvx7OlPcoWrmZe/fjlWGjb3H5FiwDfLeDMrFVfaR28f/b+03VBjBrUovyT+wovJeDSGGLmop64a+iD4vHUNxXNnHGd4FgNluJlXFwAUW9hhqLqVe03zyn+X2xVZkRiRGjUQMx6rW/KAp4CGkYZPg+NZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709946576; c=relaxed/simple;
-	bh=o/dHrg4W/2Qu7LhXHcnBR4PyxF3Ttwy46Ocol2kgU+w=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZmARX1M1MamcKVUtTNvVuInvM4tKdhG7N9npzvXGRm/G+gsEJrMITWFgR9YnGdo4YR6vSEbG4Z3BSD4yRIkIGOoKtiSrQhKgReg45JqHEjynJDT/vmzKVL4qozdk4A4HtA6EjMXmnE14nbbjeRA5V4V6ywNXys8etLuY0pGULdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qwJhfx5Z; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1709946582; c=relaxed/simple;
+	bh=BkxXb1PJT45SPB5f2ZRw63TbVdgcv8zNrWS8Wmbb0WA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fQ+y1kDrlnnJLt7FbbQa90GUVjjYIF71jt7OUEPNfsG78xa0nS9FgljN0YCUBOjvTUrocE2zbKaqECCj99hybQ+iOZtFWRZweXh/TttOBCZkUCMIBg3+Pknorw4PC/YNFVfvpadFyNTqPyjd2U0yPwMrDF0RfKt/QHDGqcFTreI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c3vCCYZs; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8bdadc79cso1096037a12.2
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:09:34 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-607838c0800so40665747b3.1
+        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:09:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709946574; x=1710551374; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/DWrZ/Y6O9dtVdJ6fn791rDIK6aHa8oXbKQewTP1zRw=;
-        b=qwJhfx5ZH2VDMhdp6veR4n8SnPSYw+A10yfBjPkKl8gnpu+uXtrxox1G+WcT2fJgCy
-         HFeAg3GjlQS8uy+d/gF+tYLm8FPHlmYk+opRK5tRtHOV6XhuIJS6fMTJksw2pep1Kt0d
-         7xa0wWuBq6Oux0DeaJHlc2j2QV2aLFgJGOAmlhLE3MEiKsfQecLy5xhQGr8kkPDQFapE
-         Svo0rncoqbW5rzkLpPJEjenaiaZNT2bxuOySOK9CCvClJB1aI5QqccfENNpgcbLGgcuv
-         iCXFVcSl9yDcL56Ak0SbXw7MQV3t4r93F63QIfHq7WqUvSYzOOwRQ6eRg02PnN3/quRv
-         Tiew==
+        d=google.com; s=20230601; t=1709946578; x=1710551378; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=khI6vPx6zVNT1jQysQZ4ukuRubebUHrypQhqEYEiMM8=;
+        b=c3vCCYZsWIgkSc3geBi4e2VARFiQI8Tx1iP/y01L3SHi9eW9pDq4deI7LpkQpxcvq9
+         YLpvch0wm2ygkylZo3vErOIXzLHO64/C6tpKsA76LkJAlxJGXxaPBKayd8+GLvvimQHT
+         OrXv/ZQfYJICp6KF8LEMtTWqRXDPCtPUEQnsfOw/mL8V4qKZHNO2+CAseJAw/48FEvZG
+         towB/zGW+AH6mYjR96MCwWznht4Soc6NEdXciuNsnu1buWU9HgWDklkvQNDU9nRpOxDo
+         T3NV4v72pSsZl3cI8FmQHoii/JgNu9tOOxybMEGDtXG9n5B4Xi7yCmdc/tjK4eFumLzZ
+         u/ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709946574; x=1710551374;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/DWrZ/Y6O9dtVdJ6fn791rDIK6aHa8oXbKQewTP1zRw=;
-        b=NLjAtNsppMvH86Wl1JiDSulb1jG5pIPeAlFN7eYro/tIzzWWWhlH5j5h1cvE2K+UpW
-         BDCPdNZEMjDmh8cyopXvkPeSvsDDZvCD4glt3lVv+DnTS9eoy8sL6GpGgYUH05BcI2Kb
-         vpUtIiXzqBZ1So+1wBSlb7ocrjch+XElyJ/K2z09ClKxCbI/n/nc7XbIO7iOB/cJtVoc
-         +RbEVFSyEFsW4c9j3yfVwCUkgaT3KDTbjFUahDgi3EWaW5P+tYW5H6zISWQZkbfFVDcT
-         b0GSk8lS4JFSG6N7UsJW1CH273VPjdqUpa3KgUlEWmavm/+JzPSykTEEtFEc56555lbl
-         jfDg==
-X-Gm-Message-State: AOJu0YwlRZsY0ZfnyWjSKNQ0mLwnn3eM4xQBtA86RatudkUEKR2OaSlu
-	49VQFQ6qpV0lFv7SI00azc7ye3EMXi6IER0g8XBDZ3fkmEaBewvu2O7QdihSb/D7LvIteGPusRa
-	KEw==
-X-Google-Smtp-Source: AGHT+IEj3pG5ofKXZEqws9DjqT4BkVYkLBXjhj3PglQMYC5OQznB5l3CPPuqHtoMiPRbHPynuQY+Asfi0aA=
+        d=1e100.net; s=20230601; t=1709946578; x=1710551378;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=khI6vPx6zVNT1jQysQZ4ukuRubebUHrypQhqEYEiMM8=;
+        b=k3BcQVHD65hx0RVWvUA4EkobBfRU8vuBdVSnp92m62EUpifIueP/BobVDzYkj6Wo5A
+         JMARpOlreCxbKq62aZda/Zw1MiBY3C7S48BF2Ue7Y55m4gNE0+7cU3ZwD46ELvBkTKl3
+         tnGdlJPcsAh7iLisWMWEkp7ZL3Ky4w1n3PYb1S6SVTvTZMLHZLYhfJX3kh3WdRh5aLnk
+         WKSJYqCxfN/b7jM1zrUUXonOHQ4a65m8rhpvp9YlB1J5BGyjHrXkAXqTBvM3doFvRpBZ
+         BX0V5iZdFhM5IJuRVMoczVuylvud44lSg2F6UmfFIua0klzkD74UHfdk0BAGyGNWvZ29
+         TV4A==
+X-Gm-Message-State: AOJu0Yxnrog966XlsQ8fl67pWdLZ20FiQibj16GmHJyDRdH4UDHO800N
+	UEDzupk78CEzRcIIXYLMwsHL6g3mjmYqJqfv5ARGas7mQlk9g1V/Vs/JbKtkLzjpVE6ObQTd8OV
+	SVA==
+X-Google-Smtp-Source: AGHT+IF0MxohByoCDeZoSbGkaU4uEqEKhTbK0IJ9U3G4BNgufdr7rZv/IInfL3NYyBqyahGutRHOqqrfD3w=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:5347:0:b0:5d5:e46f:d39c with SMTP id
- t7-20020a635347000000b005d5e46fd39cmr1463pgl.12.1709946574438; Fri, 08 Mar
- 2024 17:09:34 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a81:918b:0:b0:609:eb3f:734 with SMTP id
+ i133-20020a81918b000000b00609eb3f0734mr409260ywg.2.1709946578253; Fri, 08 Mar
+ 2024 17:09:38 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  8 Mar 2024 17:09:24 -0800
+Date: Fri,  8 Mar 2024 17:09:25 -0800
+In-Reply-To: <20240309010929.1403984-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240309010929.1403984-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240309010929.1403984-1-seanjc@google.com>
-Subject: [PATCH 0/5] KVM: VMX: Drop MTRR virtualization, honor guest PAT
+Message-ID: <20240309010929.1403984-2-seanjc@google.com>
+Subject: [PATCH 1/5] KVM: x86: Remove VMX support for virtualizing guest MTRR memtypes
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Lai Jiangshan <jiangshanlai@gmail.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
@@ -82,52 +86,1204 @@ Cc: kvm@vger.kernel.org, rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Yiwei Zhang <zzyiwei@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-First, rip out KVM's support for virtualizing guest MTRRs on VMX.  The
-code is costly to main, a drag on guest boot performance, imperfect, and
-not required for functional correctness with modern guest kernels.  Many
-details in patch 1's changelog.
+Remove KVM's support for virtualizing guest MTRR memtypes, as full MTRR
+adds no value, negatively impacts guest performance, and is a maintenance
+burden due to it's complexity and oddities.
 
-With MTRR virtualization gone, always honor guest PAT on Intel CPUs that
-support self-snoop, as such CPUs are guaranteed to maintain coherency
-even if the guest is aliasing memtypes, e.g. if the host is using WB but
-the guest is using WC.  Honoring guest PAT is desirable for use cases
-where the guest must use WC when accessing memory that is DMA'd from a
-non-coherent device that does NOT bounce through VFIO, e.g. for mediated
-virtual GPUs.
+KVM's approach to virtualizating MTRRs make no sense, at all.  KVM *only*
+honors guest MTRR memtypes if EPT is enabled *and* the guest has a device
+that may perform non-coherent DMA access.  From a hardware virtualization
+perspective of guest MTRRs, there is _nothing_ special about EPT.  Legacy
+shadowing paging doesn't magically account for guest MTRRs, nor does NPT.
 
-The SRCU patch adds an API that is effectively documentation for the
-memory barrier in srcu_read_lock().  Intel CPUs with self-snoop require
-a memory barrier after VM-Exit to ensure coherency, and KVM always does
-a srcu_read_lock() before reading guest memory after VM-Exit.  Relying
-on SRCU to provide the barrier allows KVM to avoid emitting a redundant
-barrier of its own.
+Unwinding and deciphering KVM's murky history, the MTRR virtualization
+code appears to be the result of misdiagnosed issues when EPT + VT-d with
+passthrough devices was enabled years and years ago.  And importantly, the
+underlying bugs that were fudged around by honoring guest MTRR memtypes
+have since been fixed (though rather poorly in some cases).
 
-This series needs a _lot_ more testing; I arguably should have tagged it
-RFC, but I'm feeling lucky.
+The zapping GFNs logic in the MTRR virtualization code came from:
 
-Sean Christopherson (3):
-  KVM: x86: Remove VMX support for virtualizing guest MTRR memtypes
-  KVM: VMX: Drop support for forcing UC memory when guest CR0.CD=1
-  KVM: VMX: Always honor guest PAT on CPUs that support self-snoop
+  commit efdfe536d8c643391e19d5726b072f82964bfbdb
+  Author: Xiao Guangrong <guangrong.xiao@linux.intel.com>
+  Date:   Wed May 13 14:42:27 2015 +0800
 
-Yan Zhao (2):
-  srcu: Add an API for a memory barrier after SRCU read lock
-  KVM: x86: Ensure a full memory barrier is emitted in the VM-Exit path
+    KVM: MMU: fix MTRR update
 
- Documentation/virt/kvm/api.rst        |   6 +-
- Documentation/virt/kvm/x86/errata.rst |  18 +
+    Currently, whenever guest MTRR registers are changed
+    kvm_mmu_reset_context is called to switch to the new root shadow page
+    table, however, it's useless since:
+    1) the cache type is not cached into shadow page's attribute so that
+       the original root shadow page will be reused
+
+    2) the cache type is set on the last spte, that means we should sync
+       the last sptes when MTRR is changed
+
+    This patch fixs this issue by drop all the spte in the gfn range which
+    is being updated by MTRR
+
+which was a fix for:
+
+  commit 0bed3b568b68e5835ef5da888a372b9beabf7544
+  Author:     Sheng Yang <sheng@linux.intel.com>
+  AuthorDate: Thu Oct 9 16:01:54 2008 +0800
+  Commit:     Avi Kivity <avi@redhat.com>
+  CommitDate: Wed Dec 31 16:51:44 2008 +0200
+
+      KVM: Improve MTRR structure
+
+      As well as reset mmu context when set MTRR.
+
+which was part of a "MTRR/PAT support for EPT" series that also added:
+
++       if (mt_mask) {
++               mt_mask = get_memory_type(vcpu, gfn) <<
++                         kvm_x86_ops->get_mt_mask_shift();
++               spte |= mt_mask;
++       }
+
+where get_memory_type() was a truly gnarly helper to retrieve the guest
+MTRR memtype for a given memtype.  And *very* subtly, at the time of that
+change, KVM *always* set VMX_EPT_IGMT_BIT,
+
+        kvm_mmu_set_base_ptes(VMX_EPT_READABLE_MASK |
+                VMX_EPT_WRITABLE_MASK |
+                VMX_EPT_DEFAULT_MT << VMX_EPT_MT_EPTE_SHIFT |
+                VMX_EPT_IGMT_BIT);
+
+which came in via:
+
+  commit 928d4bf747e9c290b690ff515d8f81e8ee226d97
+  Author:     Sheng Yang <sheng@linux.intel.com>
+  AuthorDate: Thu Nov 6 14:55:45 2008 +0800
+  Commit:     Avi Kivity <avi@redhat.com>
+  CommitDate: Tue Nov 11 21:00:37 2008 +0200
+
+      KVM: VMX: Set IGMT bit in EPT entry
+
+      There is a potential issue that, when guest using pagetable without vmexit when
+      EPT enabled, guest would use PAT/PCD/PWT bits to index PAT msr for it's memory,
+      which would be inconsistent with host side and would cause host MCE due to
+      inconsistent cache attribute.
+
+      The patch set IGMT bit in EPT entry to ignore guest PAT and use WB as default
+      memory type to protect host (notice that all memory mapped by KVM should be WB).
+
+Note the CommitDates!  The AuthorDates strongly suggests Sheng Yang added
+the whole "ignoreIGMT things as a bug fix for issues that were detected
+during EPT + VT-d + passthrough enabling, but it was applied earlier
+because it was a generic fix.
+
+Jumping back to 0bed3b568b68 ("KVM: Improve MTRR structure"), the other
+relevant code, or rather lack thereof, is the handling of *host* MMIO.
+That fix came in a bit later, but given the author and timing, it's safe
+to say it was all part of the same EPT+VT-d enabling mess.
+
+  commit 2aaf69dcee864f4fb6402638dd2f263324ac839f
+  Author:     Sheng Yang <sheng@linux.intel.com>
+  AuthorDate: Wed Jan 21 16:52:16 2009 +0800
+  Commit:     Avi Kivity <avi@redhat.com>
+  CommitDate: Sun Feb 15 02:47:37 2009 +0200
+
+    KVM: MMU: Map device MMIO as UC in EPT
+
+    Software are not allow to access device MMIO using cacheable memory type, the
+    patch limit MMIO region with UC and WC(guest can select WC using PAT and
+    PCD/PWT).
+
+In addition to the host MMIO and IGMT issues, KVM's MTRR virtualization
+was obviously never tested on NPT until much later, which lends further
+credence to the theory/argument that this was all the result of
+misdiagnosed issues.
+
+Discussion from the EPT+MTRR enabling thread[*] more or less confirms that
+Sheng Yang was trying to resolve issues with passthrough MMIO.
+
+ * Sheng Yang
+  : Do you mean host(qemu) would access this memory and if we set it to guest
+  : MTRR, host access would be broken? We would cover this in our shadow MTRR
+  : patch, for we encountered this in video ram when doing some experiment with
+  : VGA assignment.
+
+And in the same thread, there's also what appears to be confirmation of
+Intel running into issues with Windows XP related to a guest device driver
+mapping DMA with WC in the PAT.
+
+ * Avi Kavity
+  : Sheng Yang wrote:
+  : > Yes... But it's easy to do with assigned devices' mmio, but what if guest
+  : > specific some non-mmio memory's memory type? E.g. we have met one issue in
+  : > Xen, that a assigned-device's XP driver specific one memory region as buffer,
+  : > and modify the memory type then do DMA.
+  : >
+  : > Only map MMIO space can be first step, but I guess we can modify assigned
+  : > memory region memory type follow guest's?
+  : >
+  :
+  : With ept/npt, we can't, since the memory type is in the guest's
+  : pagetable entries, and these are not accessible.
+
+[*] https://lore.kernel.org/all/1223539317-32379-1-git-send-email-sheng@linux.intel.com
+
+So, for the most part, what likely happened is that 15 years ago, a few
+engineers (a) fixed a #MC problem by ignoring guest PAT and (b) initially
+"fixed" passthrough device MMIO by emulating *guest* MTRRs.  Except for
+the below case, everything since then has been a result of those two
+intertwined changes.
+
+The one exception, which is actually yet more confirmation of all of the
+above, is the revert of Paolo's attempt at "full" virtualization of guest
+MTRRs:
+
+  commit 606decd67049217684e3cb5a54104d51ddd4ef35
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Thu Oct 1 13:12:47 2015 +0200
+
+    Revert "KVM: x86: apply guest MTRR virtualization on host reserved pages"
+
+    This reverts commit fd717f11015f673487ffc826e59b2bad69d20fe5.
+    It was reported to cause Machine Check Exceptions (bug 104091).
+
+...
+
+  commit fd717f11015f673487ffc826e59b2bad69d20fe5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Tue Jul 7 14:38:13 2015 +0200
+
+    KVM: x86: apply guest MTRR virtualization on host reserved pages
+
+    Currently guest MTRR is avoided if kvm_is_reserved_pfn returns true.
+    However, the guest could prefer a different page type than UC for
+    such pages. A good example is that pass-throughed VGA frame buffer is
+    not always UC as host expected.
+
+    This patch enables full use of virtual guest MTRRs.
+
+I.e. Paolo tried to add back KVM's behavior before "Map device MMIO as UC
+in EPT" and got the same result: machine checks, likely due to the guest
+MTRRs not being trustworthy/sane at all times.
+
+Note, Paolo also tried to enable MTRR virtualization on SVM+NPT, but that
+too got reverted.  Unfortunately, it doesn't appear that anyone ever found
+a smoking gun, i.e. exactly why emulating guest MTRRs via NPT PAT caused
+extremely slow boot times doesn't appear to have a definitive root cause.
+
+  commit fc07e76ac7ffa3afd621a1c3858a503386a14281
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Thu Oct 1 13:20:22 2015 +0200
+
+    Revert "KVM: SVM: use NPT page attributes"
+
+    This reverts commit 3c2e7f7de3240216042b61073803b61b9b3cfb22.
+    Initializing the mapping from MTRR to PAT values was reported to
+    fail nondeterministically, and it also caused extremely slow boot
+    (due to caching getting disabled---bug 103321) with assigned devices.
+
+...
+
+  commit 3c2e7f7de3240216042b61073803b61b9b3cfb22
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Tue Jul 7 14:32:17 2015 +0200
+
+    KVM: SVM: use NPT page attributes
+
+    Right now, NPT page attributes are not used, and the final page
+    attribute depends solely on gPAT (which however is not synced
+    correctly), the guest MTRRs and the guest page attributes.
+
+    However, we can do better by mimicking what is done for VMX.
+    In the absence of PCI passthrough, the guest PAT can be ignored
+    and the page attributes can be just WB.  If passthrough is being
+    used, instead, keep respecting the guest PAT, and emulate the guest
+    MTRRs through the PAT field of the nested page tables.
+
+    The only snag is that WP memory cannot be emulated correctly,
+    because Linux's default PAT setting only includes the other types.
+
+In short, honoring guest MTRRs for VMX was initially a workaround of
+sorts for KVM ignoring guest PAT *and* for KVM not forcing UC for host
+MMIO.  And while there *are* known cases where honoring guest MTRRs is
+desirable, e.g. passthrough VGA frame buffers, the desired behavior in
+that case is to get WC instead of UC, i.e. at this point it's for
+performance, not correctness.
+
+Furthermore, the complete absence of MTRR virtualization on NPT and
+shadow paging proves that, while KVM theoretically can do better, it's
+by no means necessary for correctnesss.
+
+Lastly, since kernels mostly rely on firmware to do MTRR setup, and the
+host typically provides guest firmware, honoring guest MTRRs is effectively
+honoring *host* userspace memtypes, which is also backwards.  I.e. it
+would be far better for host userspace to communicate its desired memtype
+directly to KVM (or perhaps indirectly via VMAs in the host kernel), not
+through guest MTRRs.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ Documentation/virt/kvm/x86/errata.rst |   7 +
  arch/x86/include/asm/kvm_host.h       |  15 +-
  arch/x86/kvm/mmu.h                    |   7 +-
- arch/x86/kvm/mmu/mmu.c                |  35 +-
+ arch/x86/kvm/mmu/mmu.c                |  33 +-
  arch/x86/kvm/mtrr.c                   | 644 ++------------------------
- arch/x86/kvm/vmx/vmx.c                |  40 +-
- arch/x86/kvm/x86.c                    |  24 +-
+ arch/x86/kvm/vmx/vmx.c                |  38 +-
+ arch/x86/kvm/x86.c                    |  16 +-
  arch/x86/kvm/x86.h                    |   4 -
- include/linux/srcu.h                  |  14 +
- 10 files changed, 105 insertions(+), 702 deletions(-)
+ 8 files changed, 69 insertions(+), 695 deletions(-)
 
-
-base-commit: 964d0c614c7f71917305a5afdca9178fe8231434
+diff --git a/Documentation/virt/kvm/x86/errata.rst b/Documentation/virt/kvm/x86/errata.rst
+index 49a05f24747b..1b70bad7325e 100644
+--- a/Documentation/virt/kvm/x86/errata.rst
++++ b/Documentation/virt/kvm/x86/errata.rst
+@@ -48,3 +48,10 @@ have the same physical APIC ID, KVM will deliver events targeting that APIC ID
+ only to the vCPU with the lowest vCPU ID.  If KVM_X2APIC_API_USE_32BIT_IDS is
+ not enabled, KVM follows x86 architecture when processing interrupts (all vCPUs
+ matching the target APIC ID receive the interrupt).
++
++MTRRs
++-----
++KVM does not virtualization guest MTRR memory types.  KVM emulates accesses to
++MTRR MSRs, i.e. {RD,WR}MSR in the guest will behave as expected, but KVM does
++not honor guest MTRRs when determining the effective memory type, and instead
++treats all of guest memory as having Writeback (WB) MTRRs.
+\ No newline at end of file
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9e7b1a00e265..595710e309b9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -159,7 +159,6 @@
+ #define KVM_MIN_FREE_MMU_PAGES 5
+ #define KVM_REFILL_PAGES 25
+ #define KVM_MAX_CPUID_ENTRIES 256
+-#define KVM_NR_FIXED_MTRR_REGION 88
+ #define KVM_NR_VAR_MTRR 8
+ 
+ #define ASYNC_PF_PER_VCPU 64
+@@ -601,18 +600,12 @@ enum {
+ 	KVM_DEBUGREG_WONT_EXIT = 2,
+ };
+ 
+-struct kvm_mtrr_range {
+-	u64 base;
+-	u64 mask;
+-	struct list_head node;
+-};
+-
+ struct kvm_mtrr {
+-	struct kvm_mtrr_range var_ranges[KVM_NR_VAR_MTRR];
+-	mtrr_type fixed_ranges[KVM_NR_FIXED_MTRR_REGION];
++	u64 var[KVM_NR_VAR_MTRR * 2];
++	u64 fixed_64k;
++	u64 fixed_16k[2];
++	u64 fixed_4k[8];
+ 	u64 deftype;
+-
+-	struct list_head head;
+ };
+ 
+ /* Hyper-V SynIC timer */
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 60f21bb4c27b..c8028eb2cf48 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -245,12 +245,7 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 	return -(u32)fault & errcode;
+ }
+ 
+-bool __kvm_mmu_honors_guest_mtrrs(bool vm_has_noncoherent_dma);
+-
+-static inline bool kvm_mmu_honors_guest_mtrrs(struct kvm *kvm)
+-{
+-	return __kvm_mmu_honors_guest_mtrrs(kvm_arch_has_noncoherent_dma(kvm));
+-}
++bool kvm_mmu_may_ignore_guest_pat(void);
+ 
+ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e4cc7f764980..403cd8f914cd 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4619,38 +4619,21 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
+ }
+ #endif
+ 
+-bool __kvm_mmu_honors_guest_mtrrs(bool vm_has_noncoherent_dma)
++bool kvm_mmu_may_ignore_guest_pat(void)
+ {
+ 	/*
+-	 * If host MTRRs are ignored (shadow_memtype_mask is non-zero), and the
+-	 * VM has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is
+-	 * to honor the memtype from the guest's MTRRs so that guest accesses
+-	 * to memory that is DMA'd aren't cached against the guest's wishes.
+-	 *
+-	 * Note, KVM may still ultimately ignore guest MTRRs for certain PFNs,
+-	 * e.g. KVM will force UC memtype for host MMIO.
++	 * When EPT is enabled (shadow_memtype_mask is non-zero), and the VM
++	 * has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is to
++	 * honor the memtype from the guest's PAT so that guest accesses to
++	 * memory that is DMA'd aren't cached against the guest's wishes.  As a
++	 * result, KVM _may_ ignore guest PAT, whereas without non-coherent DMA,
++	 * KVM _always_ ignores guest PAT (when EPT is enabled).
+ 	 */
+-	return vm_has_noncoherent_dma && shadow_memtype_mask;
++	return shadow_memtype_mask;
+ }
+ 
+ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+-	/*
+-	 * If the guest's MTRRs may be used to compute the "real" memtype,
+-	 * restrict the mapping level to ensure KVM uses a consistent memtype
+-	 * across the entire mapping.
+-	 */
+-	if (kvm_mmu_honors_guest_mtrrs(vcpu->kvm)) {
+-		for ( ; fault->max_level > PG_LEVEL_4K; --fault->max_level) {
+-			int page_num = KVM_PAGES_PER_HPAGE(fault->max_level);
+-			gfn_t base = gfn_round_for_level(fault->gfn,
+-							 fault->max_level);
+-
+-			if (kvm_mtrr_check_gfn_range_consistency(vcpu, base, page_num))
+-				break;
+-		}
+-	}
+-
+ #ifdef CONFIG_X86_64
+ 	if (tdp_mmu_enabled)
+ 		return kvm_tdp_mmu_page_fault(vcpu, fault);
+diff --git a/arch/x86/kvm/mtrr.c b/arch/x86/kvm/mtrr.c
+index a67c28a56417..05490b9d8a43 100644
+--- a/arch/x86/kvm/mtrr.c
++++ b/arch/x86/kvm/mtrr.c
+@@ -19,33 +19,21 @@
+ #include <asm/mtrr.h>
+ 
+ #include "cpuid.h"
+-#include "mmu.h"
+ 
+-#define IA32_MTRR_DEF_TYPE_E		(1ULL << 11)
+-#define IA32_MTRR_DEF_TYPE_FE		(1ULL << 10)
+-#define IA32_MTRR_DEF_TYPE_TYPE_MASK	(0xff)
+-
+-static bool is_mtrr_base_msr(unsigned int msr)
+-{
+-	/* MTRR base MSRs use even numbers, masks use odd numbers. */
+-	return !(msr & 0x1);
+-}
+-
+-static struct kvm_mtrr_range *var_mtrr_msr_to_range(struct kvm_vcpu *vcpu,
+-						    unsigned int msr)
++static u64 *find_mtrr(struct kvm_vcpu *vcpu, unsigned int msr)
+ {
+-	int index = (msr - MTRRphysBase_MSR(0)) / 2;
++	int index;
+ 
+-	return &vcpu->arch.mtrr_state.var_ranges[index];
+-}
+-
+-static bool msr_mtrr_valid(unsigned msr)
+-{
+ 	switch (msr) {
+ 	case MTRRphysBase_MSR(0) ... MTRRphysMask_MSR(KVM_NR_VAR_MTRR - 1):
++		index = msr - MTRRphysBase_MSR(0);
++		return &vcpu->arch.mtrr_state.var[index];
+ 	case MSR_MTRRfix64K_00000:
++		return &vcpu->arch.mtrr_state.fixed_64k;
+ 	case MSR_MTRRfix16K_80000:
+ 	case MSR_MTRRfix16K_A0000:
++		index = msr - MSR_MTRRfix16K_80000;
++		return &vcpu->arch.mtrr_state.fixed_16k[index];
+ 	case MSR_MTRRfix4K_C0000:
+ 	case MSR_MTRRfix4K_C8000:
+ 	case MSR_MTRRfix4K_D0000:
+@@ -54,10 +42,14 @@ static bool msr_mtrr_valid(unsigned msr)
+ 	case MSR_MTRRfix4K_E8000:
+ 	case MSR_MTRRfix4K_F0000:
+ 	case MSR_MTRRfix4K_F8000:
++		index = msr - MSR_MTRRfix4K_C0000;
++		return &vcpu->arch.mtrr_state.fixed_4k[index];
+ 	case MSR_MTRRdefType:
+-		return true;
++		return &vcpu->arch.mtrr_state.deftype;
++	default:
++		break;
+ 	}
+-	return false;
++	return NULL;
+ }
+ 
+ static bool valid_mtrr_type(unsigned t)
+@@ -70,9 +62,6 @@ static bool kvm_mtrr_valid(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+ 	int i;
+ 	u64 mask;
+ 
+-	if (!msr_mtrr_valid(msr))
+-		return false;
+-
+ 	if (msr == MSR_MTRRdefType) {
+ 		if (data & ~0xcff)
+ 			return false;
+@@ -85,8 +74,9 @@ static bool kvm_mtrr_valid(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+ 	}
+ 
+ 	/* variable MTRRs */
+-	WARN_ON(!(msr >= MTRRphysBase_MSR(0) &&
+-		  msr <= MTRRphysMask_MSR(KVM_NR_VAR_MTRR - 1)));
++	if (WARN_ON_ONCE(!(msr >= MTRRphysBase_MSR(0) &&
++			   msr <= MTRRphysMask_MSR(KVM_NR_VAR_MTRR - 1))))
++		return false;
+ 
+ 	mask = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
+ 	if ((msr & 1) == 0) {
+@@ -94,309 +84,32 @@ static bool kvm_mtrr_valid(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+ 		if (!valid_mtrr_type(data & 0xff))
+ 			return false;
+ 		mask |= 0xf00;
+-	} else
++	} else {
+ 		/* MTRR mask */
+ 		mask |= 0x7ff;
++	}
+ 
+ 	return (data & mask) == 0;
+ }
+ 
+-static bool mtrr_is_enabled(struct kvm_mtrr *mtrr_state)
+-{
+-	return !!(mtrr_state->deftype & IA32_MTRR_DEF_TYPE_E);
+-}
+-
+-static bool fixed_mtrr_is_enabled(struct kvm_mtrr *mtrr_state)
+-{
+-	return !!(mtrr_state->deftype & IA32_MTRR_DEF_TYPE_FE);
+-}
+-
+-static u8 mtrr_default_type(struct kvm_mtrr *mtrr_state)
+-{
+-	return mtrr_state->deftype & IA32_MTRR_DEF_TYPE_TYPE_MASK;
+-}
+-
+-static u8 mtrr_disabled_type(struct kvm_vcpu *vcpu)
+-{
+-	/*
+-	 * Intel SDM 11.11.2.2: all MTRRs are disabled when
+-	 * IA32_MTRR_DEF_TYPE.E bit is cleared, and the UC
+-	 * memory type is applied to all of physical memory.
+-	 *
+-	 * However, virtual machines can be run with CPUID such that
+-	 * there are no MTRRs.  In that case, the firmware will never
+-	 * enable MTRRs and it is obviously undesirable to run the
+-	 * guest entirely with UC memory and we use WB.
+-	 */
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_MTRR))
+-		return MTRR_TYPE_UNCACHABLE;
+-	else
+-		return MTRR_TYPE_WRBACK;
+-}
+-
+-/*
+-* Three terms are used in the following code:
+-* - segment, it indicates the address segments covered by fixed MTRRs.
+-* - unit, it corresponds to the MSR entry in the segment.
+-* - range, a range is covered in one memory cache type.
+-*/
+-struct fixed_mtrr_segment {
+-	u64 start;
+-	u64 end;
+-
+-	int range_shift;
+-
+-	/* the start position in kvm_mtrr.fixed_ranges[]. */
+-	int range_start;
+-};
+-
+-static struct fixed_mtrr_segment fixed_seg_table[] = {
+-	/* MSR_MTRRfix64K_00000, 1 unit. 64K fixed mtrr. */
+-	{
+-		.start = 0x0,
+-		.end = 0x80000,
+-		.range_shift = 16, /* 64K */
+-		.range_start = 0,
+-	},
+-
+-	/*
+-	 * MSR_MTRRfix16K_80000 ... MSR_MTRRfix16K_A0000, 2 units,
+-	 * 16K fixed mtrr.
+-	 */
+-	{
+-		.start = 0x80000,
+-		.end = 0xc0000,
+-		.range_shift = 14, /* 16K */
+-		.range_start = 8,
+-	},
+-
+-	/*
+-	 * MSR_MTRRfix4K_C0000 ... MSR_MTRRfix4K_F8000, 8 units,
+-	 * 4K fixed mtrr.
+-	 */
+-	{
+-		.start = 0xc0000,
+-		.end = 0x100000,
+-		.range_shift = 12, /* 12K */
+-		.range_start = 24,
+-	}
+-};
+-
+-/*
+- * The size of unit is covered in one MSR, one MSR entry contains
+- * 8 ranges so that unit size is always 8 * 2^range_shift.
+- */
+-static u64 fixed_mtrr_seg_unit_size(int seg)
+-{
+-	return 8 << fixed_seg_table[seg].range_shift;
+-}
+-
+-static bool fixed_msr_to_seg_unit(u32 msr, int *seg, int *unit)
+-{
+-	switch (msr) {
+-	case MSR_MTRRfix64K_00000:
+-		*seg = 0;
+-		*unit = 0;
+-		break;
+-	case MSR_MTRRfix16K_80000 ... MSR_MTRRfix16K_A0000:
+-		*seg = 1;
+-		*unit = array_index_nospec(
+-			msr - MSR_MTRRfix16K_80000,
+-			MSR_MTRRfix16K_A0000 - MSR_MTRRfix16K_80000 + 1);
+-		break;
+-	case MSR_MTRRfix4K_C0000 ... MSR_MTRRfix4K_F8000:
+-		*seg = 2;
+-		*unit = array_index_nospec(
+-			msr - MSR_MTRRfix4K_C0000,
+-			MSR_MTRRfix4K_F8000 - MSR_MTRRfix4K_C0000 + 1);
+-		break;
+-	default:
+-		return false;
+-	}
+-
+-	return true;
+-}
+-
+-static void fixed_mtrr_seg_unit_range(int seg, int unit, u64 *start, u64 *end)
+-{
+-	struct fixed_mtrr_segment *mtrr_seg = &fixed_seg_table[seg];
+-	u64 unit_size = fixed_mtrr_seg_unit_size(seg);
+-
+-	*start = mtrr_seg->start + unit * unit_size;
+-	*end = *start + unit_size;
+-	WARN_ON(*end > mtrr_seg->end);
+-}
+-
+-static int fixed_mtrr_seg_unit_range_index(int seg, int unit)
+-{
+-	struct fixed_mtrr_segment *mtrr_seg = &fixed_seg_table[seg];
+-
+-	WARN_ON(mtrr_seg->start + unit * fixed_mtrr_seg_unit_size(seg)
+-		> mtrr_seg->end);
+-
+-	/* each unit has 8 ranges. */
+-	return mtrr_seg->range_start + 8 * unit;
+-}
+-
+-static int fixed_mtrr_seg_end_range_index(int seg)
+-{
+-	struct fixed_mtrr_segment *mtrr_seg = &fixed_seg_table[seg];
+-	int n;
+-
+-	n = (mtrr_seg->end - mtrr_seg->start) >> mtrr_seg->range_shift;
+-	return mtrr_seg->range_start + n - 1;
+-}
+-
+-static bool fixed_msr_to_range(u32 msr, u64 *start, u64 *end)
+-{
+-	int seg, unit;
+-
+-	if (!fixed_msr_to_seg_unit(msr, &seg, &unit))
+-		return false;
+-
+-	fixed_mtrr_seg_unit_range(seg, unit, start, end);
+-	return true;
+-}
+-
+-static int fixed_msr_to_range_index(u32 msr)
+-{
+-	int seg, unit;
+-
+-	if (!fixed_msr_to_seg_unit(msr, &seg, &unit))
+-		return -1;
+-
+-	return fixed_mtrr_seg_unit_range_index(seg, unit);
+-}
+-
+-static int fixed_mtrr_addr_to_seg(u64 addr)
+-{
+-	struct fixed_mtrr_segment *mtrr_seg;
+-	int seg, seg_num = ARRAY_SIZE(fixed_seg_table);
+-
+-	for (seg = 0; seg < seg_num; seg++) {
+-		mtrr_seg = &fixed_seg_table[seg];
+-		if (mtrr_seg->start <= addr && addr < mtrr_seg->end)
+-			return seg;
+-	}
+-
+-	return -1;
+-}
+-
+-static int fixed_mtrr_addr_seg_to_range_index(u64 addr, int seg)
+-{
+-	struct fixed_mtrr_segment *mtrr_seg;
+-	int index;
+-
+-	mtrr_seg = &fixed_seg_table[seg];
+-	index = mtrr_seg->range_start;
+-	index += (addr - mtrr_seg->start) >> mtrr_seg->range_shift;
+-	return index;
+-}
+-
+-static u64 fixed_mtrr_range_end_addr(int seg, int index)
+-{
+-	struct fixed_mtrr_segment *mtrr_seg = &fixed_seg_table[seg];
+-	int pos = index - mtrr_seg->range_start;
+-
+-	return mtrr_seg->start + ((pos + 1) << mtrr_seg->range_shift);
+-}
+-
+-static void var_mtrr_range(struct kvm_mtrr_range *range, u64 *start, u64 *end)
+-{
+-	u64 mask;
+-
+-	*start = range->base & PAGE_MASK;
+-
+-	mask = range->mask & PAGE_MASK;
+-
+-	/* This cannot overflow because writing to the reserved bits of
+-	 * variable MTRRs causes a #GP.
+-	 */
+-	*end = (*start | ~mask) + 1;
+-}
+-
+-static void update_mtrr(struct kvm_vcpu *vcpu, u32 msr)
+-{
+-	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
+-	gfn_t start, end;
+-
+-	if (!kvm_mmu_honors_guest_mtrrs(vcpu->kvm))
+-		return;
+-
+-	if (!mtrr_is_enabled(mtrr_state) && msr != MSR_MTRRdefType)
+-		return;
+-
+-	/* fixed MTRRs. */
+-	if (fixed_msr_to_range(msr, &start, &end)) {
+-		if (!fixed_mtrr_is_enabled(mtrr_state))
+-			return;
+-	} else if (msr == MSR_MTRRdefType) {
+-		start = 0x0;
+-		end = ~0ULL;
+-	} else {
+-		/* variable range MTRRs. */
+-		var_mtrr_range(var_mtrr_msr_to_range(vcpu, msr), &start, &end);
+-	}
+-
+-	kvm_zap_gfn_range(vcpu->kvm, gpa_to_gfn(start), gpa_to_gfn(end));
+-}
+-
+-static bool var_mtrr_range_is_valid(struct kvm_mtrr_range *range)
+-{
+-	return (range->mask & (1 << 11)) != 0;
+-}
+-
+-static void set_var_mtrr_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+-{
+-	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
+-	struct kvm_mtrr_range *tmp, *cur;
+-
+-	cur = var_mtrr_msr_to_range(vcpu, msr);
+-
+-	/* remove the entry if it's in the list. */
+-	if (var_mtrr_range_is_valid(cur))
+-		list_del(&cur->node);
+-
+-	/*
+-	 * Set all illegal GPA bits in the mask, since those bits must
+-	 * implicitly be 0.  The bits are then cleared when reading them.
+-	 */
+-	if (is_mtrr_base_msr(msr))
+-		cur->base = data;
+-	else
+-		cur->mask = data | kvm_vcpu_reserved_gpa_bits_raw(vcpu);
+-
+-	/* add it to the list if it's enabled. */
+-	if (var_mtrr_range_is_valid(cur)) {
+-		list_for_each_entry(tmp, &mtrr_state->head, node)
+-			if (cur->base >= tmp->base)
+-				break;
+-		list_add_tail(&cur->node, &tmp->node);
+-	}
+-}
+-
+ int kvm_mtrr_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+ {
+-	int index;
++	u64 *mtrr;
++
++	mtrr = find_mtrr(vcpu, msr);
++	if (!mtrr)
++		return 1;
+ 
+ 	if (!kvm_mtrr_valid(vcpu, msr, data))
+ 		return 1;
+ 
+-	index = fixed_msr_to_range_index(msr);
+-	if (index >= 0)
+-		*(u64 *)&vcpu->arch.mtrr_state.fixed_ranges[index] = data;
+-	else if (msr == MSR_MTRRdefType)
+-		vcpu->arch.mtrr_state.deftype = data;
+-	else
+-		set_var_mtrr_msr(vcpu, msr, data);
+-
+-	update_mtrr(vcpu, msr);
++	*mtrr = data;
+ 	return 0;
+ }
+ 
+ int kvm_mtrr_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata)
+ {
+-	int index;
++	u64 *mtrr;
+ 
+ 	/* MSR_MTRRcap is a readonly MSR. */
+ 	if (msr == MSR_MTRRcap) {
+@@ -410,311 +123,10 @@ int kvm_mtrr_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata)
+ 		return 0;
+ 	}
+ 
+-	if (!msr_mtrr_valid(msr))
++	mtrr = find_mtrr(vcpu, msr);
++	if (!mtrr)
+ 		return 1;
+ 
+-	index = fixed_msr_to_range_index(msr);
+-	if (index >= 0) {
+-		*pdata = *(u64 *)&vcpu->arch.mtrr_state.fixed_ranges[index];
+-	} else if (msr == MSR_MTRRdefType) {
+-		*pdata = vcpu->arch.mtrr_state.deftype;
+-	} else {
+-		/* Variable MTRRs */
+-		if (is_mtrr_base_msr(msr))
+-			*pdata = var_mtrr_msr_to_range(vcpu, msr)->base;
+-		else
+-			*pdata = var_mtrr_msr_to_range(vcpu, msr)->mask;
+-
+-		*pdata &= ~kvm_vcpu_reserved_gpa_bits_raw(vcpu);
+-	}
+-
++	*pdata = *mtrr;
+ 	return 0;
+ }
+-
+-void kvm_vcpu_mtrr_init(struct kvm_vcpu *vcpu)
+-{
+-	INIT_LIST_HEAD(&vcpu->arch.mtrr_state.head);
+-}
+-
+-struct mtrr_iter {
+-	/* input fields. */
+-	struct kvm_mtrr *mtrr_state;
+-	u64 start;
+-	u64 end;
+-
+-	/* output fields. */
+-	int mem_type;
+-	/* mtrr is completely disabled? */
+-	bool mtrr_disabled;
+-	/* [start, end) is not fully covered in MTRRs? */
+-	bool partial_map;
+-
+-	/* private fields. */
+-	union {
+-		/* used for fixed MTRRs. */
+-		struct {
+-			int index;
+-			int seg;
+-		};
+-
+-		/* used for var MTRRs. */
+-		struct {
+-			struct kvm_mtrr_range *range;
+-			/* max address has been covered in var MTRRs. */
+-			u64 start_max;
+-		};
+-	};
+-
+-	bool fixed;
+-};
+-
+-static bool mtrr_lookup_fixed_start(struct mtrr_iter *iter)
+-{
+-	int seg, index;
+-
+-	if (!fixed_mtrr_is_enabled(iter->mtrr_state))
+-		return false;
+-
+-	seg = fixed_mtrr_addr_to_seg(iter->start);
+-	if (seg < 0)
+-		return false;
+-
+-	iter->fixed = true;
+-	index = fixed_mtrr_addr_seg_to_range_index(iter->start, seg);
+-	iter->index = index;
+-	iter->seg = seg;
+-	return true;
+-}
+-
+-static bool match_var_range(struct mtrr_iter *iter,
+-			    struct kvm_mtrr_range *range)
+-{
+-	u64 start, end;
+-
+-	var_mtrr_range(range, &start, &end);
+-	if (!(start >= iter->end || end <= iter->start)) {
+-		iter->range = range;
+-
+-		/*
+-		 * the function is called when we do kvm_mtrr.head walking.
+-		 * Range has the minimum base address which interleaves
+-		 * [looker->start_max, looker->end).
+-		 */
+-		iter->partial_map |= iter->start_max < start;
+-
+-		/* update the max address has been covered. */
+-		iter->start_max = max(iter->start_max, end);
+-		return true;
+-	}
+-
+-	return false;
+-}
+-
+-static void __mtrr_lookup_var_next(struct mtrr_iter *iter)
+-{
+-	struct kvm_mtrr *mtrr_state = iter->mtrr_state;
+-
+-	list_for_each_entry_continue(iter->range, &mtrr_state->head, node)
+-		if (match_var_range(iter, iter->range))
+-			return;
+-
+-	iter->range = NULL;
+-	iter->partial_map |= iter->start_max < iter->end;
+-}
+-
+-static void mtrr_lookup_var_start(struct mtrr_iter *iter)
+-{
+-	struct kvm_mtrr *mtrr_state = iter->mtrr_state;
+-
+-	iter->fixed = false;
+-	iter->start_max = iter->start;
+-	iter->range = NULL;
+-	iter->range = list_prepare_entry(iter->range, &mtrr_state->head, node);
+-
+-	__mtrr_lookup_var_next(iter);
+-}
+-
+-static void mtrr_lookup_fixed_next(struct mtrr_iter *iter)
+-{
+-	/* terminate the lookup. */
+-	if (fixed_mtrr_range_end_addr(iter->seg, iter->index) >= iter->end) {
+-		iter->fixed = false;
+-		iter->range = NULL;
+-		return;
+-	}
+-
+-	iter->index++;
+-
+-	/* have looked up for all fixed MTRRs. */
+-	if (iter->index >= ARRAY_SIZE(iter->mtrr_state->fixed_ranges))
+-		return mtrr_lookup_var_start(iter);
+-
+-	/* switch to next segment. */
+-	if (iter->index > fixed_mtrr_seg_end_range_index(iter->seg))
+-		iter->seg++;
+-}
+-
+-static void mtrr_lookup_var_next(struct mtrr_iter *iter)
+-{
+-	__mtrr_lookup_var_next(iter);
+-}
+-
+-static void mtrr_lookup_start(struct mtrr_iter *iter)
+-{
+-	if (!mtrr_is_enabled(iter->mtrr_state)) {
+-		iter->mtrr_disabled = true;
+-		return;
+-	}
+-
+-	if (!mtrr_lookup_fixed_start(iter))
+-		mtrr_lookup_var_start(iter);
+-}
+-
+-static void mtrr_lookup_init(struct mtrr_iter *iter,
+-			     struct kvm_mtrr *mtrr_state, u64 start, u64 end)
+-{
+-	iter->mtrr_state = mtrr_state;
+-	iter->start = start;
+-	iter->end = end;
+-	iter->mtrr_disabled = false;
+-	iter->partial_map = false;
+-	iter->fixed = false;
+-	iter->range = NULL;
+-
+-	mtrr_lookup_start(iter);
+-}
+-
+-static bool mtrr_lookup_okay(struct mtrr_iter *iter)
+-{
+-	if (iter->fixed) {
+-		iter->mem_type = iter->mtrr_state->fixed_ranges[iter->index];
+-		return true;
+-	}
+-
+-	if (iter->range) {
+-		iter->mem_type = iter->range->base & 0xff;
+-		return true;
+-	}
+-
+-	return false;
+-}
+-
+-static void mtrr_lookup_next(struct mtrr_iter *iter)
+-{
+-	if (iter->fixed)
+-		mtrr_lookup_fixed_next(iter);
+-	else
+-		mtrr_lookup_var_next(iter);
+-}
+-
+-#define mtrr_for_each_mem_type(_iter_, _mtrr_, _gpa_start_, _gpa_end_) \
+-	for (mtrr_lookup_init(_iter_, _mtrr_, _gpa_start_, _gpa_end_); \
+-	     mtrr_lookup_okay(_iter_); mtrr_lookup_next(_iter_))
+-
+-u8 kvm_mtrr_get_guest_memory_type(struct kvm_vcpu *vcpu, gfn_t gfn)
+-{
+-	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
+-	struct mtrr_iter iter;
+-	u64 start, end;
+-	int type = -1;
+-	const int wt_wb_mask = (1 << MTRR_TYPE_WRBACK)
+-			       | (1 << MTRR_TYPE_WRTHROUGH);
+-
+-	start = gfn_to_gpa(gfn);
+-	end = start + PAGE_SIZE;
+-
+-	mtrr_for_each_mem_type(&iter, mtrr_state, start, end) {
+-		int curr_type = iter.mem_type;
+-
+-		/*
+-		 * Please refer to Intel SDM Volume 3: 11.11.4.1 MTRR
+-		 * Precedences.
+-		 */
+-
+-		if (type == -1) {
+-			type = curr_type;
+-			continue;
+-		}
+-
+-		/*
+-		 * If two or more variable memory ranges match and the
+-		 * memory types are identical, then that memory type is
+-		 * used.
+-		 */
+-		if (type == curr_type)
+-			continue;
+-
+-		/*
+-		 * If two or more variable memory ranges match and one of
+-		 * the memory types is UC, the UC memory type used.
+-		 */
+-		if (curr_type == MTRR_TYPE_UNCACHABLE)
+-			return MTRR_TYPE_UNCACHABLE;
+-
+-		/*
+-		 * If two or more variable memory ranges match and the
+-		 * memory types are WT and WB, the WT memory type is used.
+-		 */
+-		if (((1 << type) & wt_wb_mask) &&
+-		      ((1 << curr_type) & wt_wb_mask)) {
+-			type = MTRR_TYPE_WRTHROUGH;
+-			continue;
+-		}
+-
+-		/*
+-		 * For overlaps not defined by the above rules, processor
+-		 * behavior is undefined.
+-		 */
+-
+-		/* We use WB for this undefined behavior. :( */
+-		return MTRR_TYPE_WRBACK;
+-	}
+-
+-	if (iter.mtrr_disabled)
+-		return mtrr_disabled_type(vcpu);
+-
+-	/* not contained in any MTRRs. */
+-	if (type == -1)
+-		return mtrr_default_type(mtrr_state);
+-
+-	/*
+-	 * We just check one page, partially covered by MTRRs is
+-	 * impossible.
+-	 */
+-	WARN_ON(iter.partial_map);
+-
+-	return type;
+-}
+-EXPORT_SYMBOL_GPL(kvm_mtrr_get_guest_memory_type);
+-
+-bool kvm_mtrr_check_gfn_range_consistency(struct kvm_vcpu *vcpu, gfn_t gfn,
+-					  int page_num)
+-{
+-	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
+-	struct mtrr_iter iter;
+-	u64 start, end;
+-	int type = -1;
+-
+-	start = gfn_to_gpa(gfn);
+-	end = gfn_to_gpa(gfn + page_num);
+-	mtrr_for_each_mem_type(&iter, mtrr_state, start, end) {
+-		if (type == -1) {
+-			type = iter.mem_type;
+-			continue;
+-		}
+-
+-		if (type != iter.mem_type)
+-			return false;
+-	}
+-
+-	if (iter.mtrr_disabled)
+-		return true;
+-
+-	if (!iter.partial_map)
+-		return true;
+-
+-	if (type == -1)
+-		return true;
+-
+-	return type == mtrr_default_type(mtrr_state);
+-}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 7a74388f9ecf..66bf79decdad 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7596,39 +7596,27 @@ static int vmx_vm_init(struct kvm *kvm)
+ 
+ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ {
+-	/* We wanted to honor guest CD/MTRR/PAT, but doing so could result in
+-	 * memory aliases with conflicting memory types and sometimes MCEs.
+-	 * We have to be careful as to what are honored and when.
+-	 *
+-	 * For MMIO, guest CD/MTRR are ignored.  The EPT memory type is set to
+-	 * UC.  The effective memory type is UC or WC depending on guest PAT.
+-	 * This was historically the source of MCEs and we want to be
+-	 * conservative.
+-	 *
+-	 * When there is no need to deal with noncoherent DMA (e.g., no VT-d
+-	 * or VT-d has snoop control), guest CD/MTRR/PAT are all ignored.  The
+-	 * EPT memory type is set to WB.  The effective memory type is forced
+-	 * WB.
+-	 *
+-	 * Otherwise, we trust guest.  Guest CD/MTRR/PAT are all honored.  The
+-	 * EPT memory type is used to emulate guest CD/MTRR.
++	/*
++	 * Force UC for host MMIO regions, as allowing the guest to access MMIO
++	 * with cacheable accesses will result in Machine Checks.
+ 	 */
+-
+ 	if (is_mmio)
+ 		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
+ 
++	/*
++	 * Force WB and ignore guest PAT if the VM does NOT have a non-coherent
++	 * device attached.  Letting the guest control memory types on Intel
++	 * CPUs may result in unexpected behavior, and so KVM's ABI is to trust
++	 * the guest to behave only as a last resort.
++	 */
+ 	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
+ 		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+ 
+-	if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {
+-		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+-			return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
+-		else
+-			return (MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT) |
+-				VMX_EPT_IPAT_BIT;
+-	}
++	if (kvm_read_cr0_bits(vcpu, X86_CR0_CD) &&
++	    !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
++		return (MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+ 
+-	return kvm_mtrr_get_guest_memory_type(vcpu, gfn) << VMX_EPT_MT_EPTE_SHIFT;
++	return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT);
+ }
+ 
+ static void vmcs_set_secondary_exec_control(struct vcpu_vmx *vmx, u32 new_ctl)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 66c4381460dc..2a38b4c26d35 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -962,7 +962,8 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
+ 		kvm_mmu_reset_context(vcpu);
+ 
+ 	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
+-	    kvm_mmu_honors_guest_mtrrs(vcpu->kvm) &&
++	    kvm_mmu_may_ignore_guest_pat() &&
++	    kvm_arch_has_noncoherent_dma(vcpu->kvm) &&
+ 	    !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+ 		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
+ }
+@@ -12155,7 +12156,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
+ 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
+ 	kvm_xen_init_vcpu(vcpu);
+-	kvm_vcpu_mtrr_init(vcpu);
+ 	vcpu_load(vcpu);
+ 	kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
+ 	kvm_vcpu_reset(vcpu, false);
+@@ -13425,13 +13425,13 @@ EXPORT_SYMBOL_GPL(kvm_arch_has_assigned_device);
+ static void kvm_noncoherent_dma_assignment_start_or_stop(struct kvm *kvm)
+ {
+ 	/*
+-	 * Non-coherent DMA assignment and de-assignment will affect
+-	 * whether KVM honors guest MTRRs and cause changes in memtypes
+-	 * in TDP.
+-	 * So, pass %true unconditionally to indicate non-coherent DMA was,
+-	 * or will be involved, and that zapping SPTEs might be necessary.
++	 * Non-coherent DMA assignment and de-assignment may affect whether or
++	 * not KVM honors guest PAT, and thus may cause changes in EPT SPTEs
++	 * due to toggling the "ignore PAT" bit.  Zap all SPTEs when the first
++	 * (or last) non-coherent device is (un)registered to so that new SPTEs
++	 * with the correct "ignore guest PAT" setting are created.
+ 	 */
+-	if (__kvm_mmu_honors_guest_mtrrs(true))
++	if (kvm_mmu_may_ignore_guest_pat())
+ 		kvm_zap_gfn_range(kvm, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
+ }
+ 
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index a8b71803777b..2891a9bb0dd0 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -309,12 +309,8 @@ int handle_ud(struct kvm_vcpu *vcpu);
+ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu,
+ 				   struct kvm_queued_exception *ex);
+ 
+-void kvm_vcpu_mtrr_init(struct kvm_vcpu *vcpu);
+-u8 kvm_mtrr_get_guest_memory_type(struct kvm_vcpu *vcpu, gfn_t gfn);
+ int kvm_mtrr_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data);
+ int kvm_mtrr_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata);
+-bool kvm_mtrr_check_gfn_range_consistency(struct kvm_vcpu *vcpu, gfn_t gfn,
+-					  int page_num);
+ bool kvm_vector_hashing_enabled(void);
+ void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code);
+ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
