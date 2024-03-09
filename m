@@ -1,150 +1,112 @@
-Return-Path: <kvm+bounces-11435-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11436-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEF04876E96
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:31:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4990876E9B
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:36:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63A99286F18
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:31:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 656762878B8
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE673DB86;
-	Sat,  9 Mar 2024 01:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A6D17545;
+	Sat,  9 Mar 2024 01:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YK90p5J5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X6U0MnFs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD673AC08
-	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C72211187
+	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:36:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709947670; cv=none; b=jw7ZTRuePhKKBjPPCT0NIjy2/BMMg6quz68jBoeI4ft/k6gWXpqqJIJ7fujBKiuwxlgRiIqknqVGZDmLDlpjgSI3aFi512RL9iF2Ad54L3caCg8Rt/APT7bqHcY8BV+qdr8LBkCNTm1oLLQMkJlCSbcsTzYOgWROJio88bHL0Iw=
+	t=1709948205; cv=none; b=B2DXbMGPVRl/Z3xL4Uf3N9fzHCHUDKUqON9fOWxjATNcskG7Pgat2tN8RqbBoSzZmLsE1SzpwnM0g++1qdnptJr5BiR7qwqgIZ4PEtwVLrZFfX76NOuQVNwEm4n3w+CFQVuSHhvA/gmhlYnc+jm3vinDtr/j6bIdFFEZwTT3zLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709947670; c=relaxed/simple;
-	bh=3RB5ybb2eWpxvWqhePHFkoyZ4DVvi7cGA85H74hezaE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=scFlfIuYkF1sAzDaNWmWMcsH87t5lWttBqpw0p7EETnTaxGxgoNFGjWKClVuFUIEAZiXagJobOwA6NihUvdpXuQeWggUiAaVW6pO9MvMOPsxbAxyoQ/JNVJVWlhNskOT7N2Syl638IfUYDjFDtt9DGEmDNpyRnIRC7c0W3dYeWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YK90p5J5; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1709948205; c=relaxed/simple;
+	bh=KNAhwOBL8cw8T6ZXppejn/QBiDWrlTqw/s/Csa4uJDM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fvLd5AeQNzJpZ49P0WPddPvRFeuKNrRfwEvkVRxVVeBPJd/wa0ejhScInMaTUaK0WDuBWIidsLuoqc6RJdcTnS2DLSME/GOMAJdclTMjjvDL81/cUBL2wTkPNdINzM4WTVfF5yExTIuL5SYQ6WAyciSOZFmPpsvul9rTZW6GAeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X6U0MnFs; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e62136860eso1259941b3a.3
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:27:48 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6e673910497so550177b3a.0
+        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:36:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709947668; x=1710552468; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=PaASkSwAWfMjl4NBiq05b1lXThMlN3vSRBX1XjjeH98=;
-        b=YK90p5J5vNtDrnM0FcqgUm4DVGGNSX2ISZ9v8TsPAGelJTpKv6H7wWyWT9haJFvRMN
-         SJ20rVLUPaWXboYVMXl9nvKXCPWXiyI6yKWcS+Rdm/d9sm9RD8XGLraae+4tMRPfaoWv
-         1mkz0S8imx37mTaSjlo45m2JScfQ9DowpwF+J182eLATqzUa8aG/s8dLHrrgPRTdN8xy
-         fKahl9V9jXo/x2rzh4qwSHDwQuLDWP7adiSLpo2rRiJZB+ccDxAZ2VPWO5ax9FuQXvF7
-         9UNa7PIVE0goTmyB0me0rEvNQBNeV2uAkIr7CgiD+U6kmdEGiZqUKmy6voqT3W7OC/Wt
-         3aqQ==
+        d=google.com; s=20230601; t=1709948204; x=1710553004; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bZoHkUtSLo4x8GP9qkez26jA5e/nyhOVKeVVLDBsGLg=;
+        b=X6U0MnFs8be3Ny6CTWgAFNDnYe1pHGmbSbgNO35iJBkgn6+INrAQ+sV5hNC5xvv0kn
+         uznpg3T4TCGmTbsroBxnglj753clltYUclxpNh3HzsF7n64uMTAz7IDnGLpfiCb0IqBe
+         qdaNbRVSjNsSOYoM5nGW/wq0iCzJBD+wKYctAgcuKMO/DPr6IRyukyjZhVIVGX5Chp8Q
+         sthisM39MylnC/d+gmzaTA7TdCv8K0wsKutwXS5Nr4fYSwJFQNYQN06E+NWGpMexj+Vh
+         po8P2Tm77I85P/Typ04YM3PwmPNHNwuscSh8NiM4tXktel+hmZkDJ4DldK+8cFKJJ05y
+         8shg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709947668; x=1710552468;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PaASkSwAWfMjl4NBiq05b1lXThMlN3vSRBX1XjjeH98=;
-        b=JG3pcP2tXAhxjAX/atvSa6iHMKZz9z8YbvQ8TUJjserLko1gRWInrtJ2MCiIwluAll
-         PuPFtMbqFJYlDrgFeJxy4G/ocAu3C2nF79zQ+nzg+AsiW8Y6GkvWpiLZv7UuqFrZDOV6
-         1VQ7yJh75zkqsPZT6cKEm2y0yGDihCPQPH1lDPM/do59KOfZ2v+hQKSVNTOEqPqd1g5D
-         /yQGajQ3HZtXaivLQ/F4ma9LXbSqOTRKB4WGisjPgKu6H0gc9hExmzTzEgxiHkiRhVfb
-         o1sSlDzw7nETBN/OE73JywAbazMuJDChWm2r5fRL0VXTT8CiLjl9z0e5LLcUwhdx2BZw
-         UWZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWuGkw5uniZ0fHF07ta/NetES9PwW5lsNLUnCkqis1CNMUoGSaSTLvwOhQWNyn5snZjnxkr9JJYMHEzr0oFNgmdwkFn
-X-Gm-Message-State: AOJu0Yw3cDHuMj11xCwGgA3v6CEcw/XKGp6FXzLN9LhNSeQ+QFIQ2cGx
-	A7TSZ2aeXf/vP/XazVeg3k8flDud5qyVMZk+4mJym4s9EzMBKB28mLqIBLKsquu8JYfM2b9G5Vf
-	A7Q==
-X-Google-Smtp-Source: AGHT+IECrHtNs6BgHJfPn5W88AEGOjcbjO3YQOnM3DErPQrq0yT7XiAUw/mEaCIWPLmtk4712WYOVZyywRg=
+        d=1e100.net; s=20230601; t=1709948204; x=1710553004;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bZoHkUtSLo4x8GP9qkez26jA5e/nyhOVKeVVLDBsGLg=;
+        b=M82Ugv9JNDS6f0g/DLOpnxWB4CnKrUQmu4OkCJ82mN8CJT6dT+1IZ/2oNdwPrVazjm
+         sHWWOHw4v6Yx4HOOUDes7azGVY0H5JUzBeIyy5FZjJ9ZF13ioKqmlcQE7TMeJ5LceUIP
+         turDd2qQjiyyRhAKvcfpAAOoFd2Xl6MqKKe7XGNO2kBgT0GUSAwtN0v7IXit8/Lezz/z
+         O0TOpdNKBMLPHkQH+83xmvHo/w0CIZ3oJ/FaLezcZldSv3I/PYyXr2iEafaH00FYuRpl
+         JQ589fnNPvXgybfzQk3tN5/XQ8tO+NHRjJwLy8txEPUBFZk0TCWF5RwOCe/D4LSSul/k
+         YI8A==
+X-Gm-Message-State: AOJu0YwRzon61tqztcUfMUbLVE0He0H74I/4a6oZcMuiQno4ymeeEAAz
+	MrkpMIKtN7ZWDoLC8uz87WUnSCV6qmgXtleC2RzsIOu5skNt5EALTCotfbBA/jxAURiYcqw6ZAh
+	l2Q==
+X-Google-Smtp-Source: AGHT+IGuMWGprHd2f3WGnkKUh0RfOvaJp2hNLz6lArkJPZN/8TUkyANMs0O8AsihYk8e+SL2JDrTH3IviPc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1389:b0:6e6:691f:42f5 with SMTP id
- t9-20020a056a00138900b006e6691f42f5mr47078pfg.0.1709947667900; Fri, 08 Mar
- 2024 17:27:47 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:c95:b0:6e6:6dd5:7a40 with SMTP id
+ a21-20020a056a000c9500b006e66dd57a40mr53380pfv.0.1709948203703; Fri, 08 Mar
+ 2024 17:36:43 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  8 Mar 2024 17:27:25 -0800
-In-Reply-To: <20240309012725.1409949-1-seanjc@google.com>
+Date: Fri,  8 Mar 2024 17:36:39 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240309012725.1409949-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240309012725.1409949-10-seanjc@google.com>
-Subject: [PATCH v6 9/9] KVM: nVMX: Use macros and #defines in vmx_restore_vmx_misc()
+Message-ID: <20240309013641.1413400-1-seanjc@google.com>
+Subject: [PATCH 0/2] KVM: x86/pmu: Globally enable GP counters at "RESET"
 From: Sean Christopherson <seanjc@google.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Shan Kang <shan.kang@intel.com>, Kai Huang <kai.huang@intel.com>, Xin Li <xin3.li@intel.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Babu Moger <babu.moger@amd.com>, Sandipan Das <sandipan.das@amd.com>, 
+	Like Xu <like.xu.linux@gmail.com>, Mingwei Zhang <mizhang@google.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Xin Li <xin3.li@intel.com>
+Globally enable GP counters in PERF_GLOBAL_CTRL when refreshing a vCPU's
+PMU to emulate the architecturally defined post-RESET behavior of the MSR.
 
-Use macros in vmx_restore_vmx_misc() instead of open coding everything
-using BIT_ULL() and GENMASK_ULL().  Opportunistically split feature bits
-and reserved bits into separate variables, and add a comment explaining
-the subset logic (it's not immediately obvious that the set of feature
-bits is NOT the set of _supported_ feature bits).
+Extend pmu_counters_test.c to verify the behavior.
 
-Cc: Shan Kang <shan.kang@intel.com>
-Cc: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Xin Li <xin3.li@intel.com>
-[sean: split to separate patch, write changelog, drop #defines]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/nested.c | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+Note, this is slightly different than what I "posted" before: it keeps
+PERF_GLOBAL_CTRL '0' if there are no counters.  That's technically not
+what the SDM dictates, but I went with the common sense route of
+interpreting the SDM to mean "globally enable all GP counters".
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 06512ee7a5c4..6610d258c680 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1322,16 +1322,29 @@ vmx_restore_control_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
- 
- static int vmx_restore_vmx_misc(struct vcpu_vmx *vmx, u64 data)
- {
--	const u64 feature_and_reserved_bits =
--		/* feature */
--		BIT_ULL(5) | GENMASK_ULL(8, 6) | BIT_ULL(14) | BIT_ULL(15) |
--		BIT_ULL(28) | BIT_ULL(29) | BIT_ULL(30) |
--		/* reserved */
--		GENMASK_ULL(13, 9) | BIT_ULL(31);
-+	const u64 feature_bits = VMX_MISC_SAVE_EFER_LMA |
-+				 VMX_MISC_ACTIVITY_HLT |
-+				 VMX_MISC_ACTIVITY_SHUTDOWN |
-+				 VMX_MISC_ACTIVITY_WAIT_SIPI |
-+				 VMX_MISC_INTEL_PT |
-+				 VMX_MISC_RDMSR_IN_SMM |
-+				 VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
-+				 VMX_MISC_VMXOFF_BLOCK_SMI |
-+				 VMX_MISC_ZERO_LEN_INS;
-+
-+	const u64 reserved_bits = BIT_ULL(31) | GENMASK_ULL(13, 9);
-+
- 	u64 vmx_misc = vmx_control_msr(vmcs_config.nested.misc_low,
- 				       vmcs_config.nested.misc_high);
- 
--	if (!is_bitwise_subset(vmx_misc, data, feature_and_reserved_bits))
-+	BUILD_BUG_ON(feature_bits & reserved_bits);
-+
-+	/*
-+	 * The incoming value must not set feature bits or reserved bits that
-+	 * aren't allowed/supported by KVM.  Fields, i.e. multi-bit values, are
-+	 * explicitly checked below.
-+	 */
-+	if (!is_bitwise_subset(vmx_misc, data, feature_bits | reserved_bits))
- 		return -EINVAL;
- 
- 	if ((vmx->nested.msrs.pinbased_ctls_high &
+I figured it was much more likely that the SDM writers didn't think
+about virtual CPUs that can have a PMU without any GP counters, versus
+Intel really wanting to set _all_ bits in PERF_GLOBAL_CTRL :-)
+
+Sean Christopherson (2):
+  KVM: x86/pmu: Set enable bits for GP counters in PERF_GLOBAL_CTRL at
+    "RESET"
+  KVM: selftests: Verify post-RESET value of PERF_GLOBAL_CTRL in PMCs
+    test
+
+ arch/x86/kvm/pmu.c                            | 16 +++++++++++++--
+ .../selftests/kvm/x86_64/pmu_counters_test.c  | 20 ++++++++++++++++++-
+ 2 files changed, 33 insertions(+), 3 deletions(-)
+
+
+base-commit: 964d0c614c7f71917305a5afdca9178fe8231434
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
