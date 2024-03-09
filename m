@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-11423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56548876E66
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:10:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBDE876E68
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:11:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03CA81F216C3
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:10:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 216601F219B2
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1382D208D0;
-	Sat,  9 Mar 2024 01:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5B62374E;
+	Sat,  9 Mar 2024 01:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2FT3jFrK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sY2Wr5fp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56361DA52
-	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DE615C3
+	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709946587; cv=none; b=OuTMthdWos25r81gr7Dky9LYdEH6jr60xo1npvzT6dMmspj6cNZQl4ylzQaCYod7PQ5BSAhY4lDR8cNZrfJHBKmWuER53HSaXNkpjSIzOy80W52PEgxXwR7Mo82YWUwi4T83oflSZDVvmKYQqaR7kqUGTWJktuT6LgWSGSmT6Tk=
+	t=1709946590; cv=none; b=dhpZlpPSBvzWmQzIrcQFCk6lg023w9OEigSymKYpVz5dz3BSaydE+EAYSQP2d843e+zFyTHgNXL/sUbuWV+c/K+WBZ/Ai4bag3sKRdwCUI4P3pzuI2QZe46OuOPDGXzxmdS20WixqS69yUZMFmJTWpCHiJOC3xyzsqjNxgTABHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709946587; c=relaxed/simple;
-	bh=ycBchpSWHJX8l3+qZZZs50c8pkvQnvrnnxo1fe2hEZc=;
+	s=arc-20240116; t=1709946590; c=relaxed/simple;
+	bh=j5KgXER4nINsShPo8aYOrG+wphwo2SK+yLSChO3NEJA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HuA7ZyIW9utiMq3YGul1FR2LoGpvxskNx9FGLZj++YJW0pBi7rxJ272NFEdCRVOtulliRRKLewO+2tr/R7/CZfAaTQdqeP3tKEiIb4MNatldkj8moKunKnBkp2GNkEqZkd3MT4JEm/bjoG33qEPccMUH60kO+o0o9h/rftyBG3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2FT3jFrK; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=cjpREVL+KyejGSFr1142N8qA3edBlr8Mc9UzW5wHIdk//jfVjAhdypdSLRWBlbo9b8jDl5MJGGGzRsGTREsF5co3oYE2uaDzH9YObhX/KF0Z1/ckXEL01qLyqqFxOk0V7Y+7hwJ42E+bJoXjH5IZDMudTqym3o+yirb71NCLwrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sY2Wr5fp; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-609ff5727f9so22500337b3.0
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:09:45 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e67b55e508so26191b3a.0
+        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:09:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709946585; x=1710551385; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709946588; x=1710551388; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=g4owpzTMykQxDUqiA6ej7g45orHQxXd/2WL2dIWa35k=;
-        b=2FT3jFrKAA7AuyqS+TGTMp9MsPHqm7nfNdjH2gI2DxkC+nmlNDEui/eS9thJOX3L5S
-         AzMQ3rFqqzsW2L7qbBnund07mHDuaEKVjKrvkYPDHCZXG0ur10H3cnx9atKyDG3p1MgU
-         tqvTarwQn0JLdGbaxq8kQyeUpzT1VeJQZJiRFWgNca0pp10U63YKD0HWAnTCWX1w7YTb
-         F9DEM4vZmuJ/sM/Q+Xk9GimlRSMfphtZQt5tJhFx5z4an4zE9fMBWPSYNP8SgYEN39s0
-         M7c/AbD+IijsH9oKNgd5nl8BpE7xcDg6qtDMYzwvW7/ZF6D39eBgg8UiKfaARAtWLOr0
-         g0NA==
+        bh=opv/pkYi5ZzIQaSkE1dFeCV7eMElrF9Hr2aQKt+M0LM=;
+        b=sY2Wr5fpg09RPtdj9bLKU8/33TfK9+4kvMkg+yjdPXkBUOAGFSFwROK/zC3s1MaL5z
+         DccWlFXW+bv30XCRIJI3T9WwVUNzT/i4gEKDrIn3WiGvPqUx+Q/u0KrgIlFtkHD26/n+
+         iBi2U1gxZD19BXWxqQYpCEYxA+CEnsthMty2FBd/yYK/0mWSfQ+AKDHlefDP1W1rEqta
+         IL5+m2rzJE8VqEiY41Cuwrtv5CmmUaDeYD7cy3scFSI7cuIuREvtoAw6WNhrwlnNURT1
+         jncNtTiLsnVh4uMa9LsptlRB+fePoL32YC2kMAs1yzfVi359kwFgktidNQAdgnr6O+9c
+         z+tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709946585; x=1710551385;
+        d=1e100.net; s=20230601; t=1709946588; x=1710551388;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=g4owpzTMykQxDUqiA6ej7g45orHQxXd/2WL2dIWa35k=;
-        b=SQNNndbDdVo40IIFy91hBlLHzUp1eSTdG/HAPKYmHr3SDqOcR4UKHJeRSzrngJCXLC
-         DHBML2thhZNt2zVV9V6WqRwZl2eRyq4ejXJ6OtHbGqxCD/yhkCjGkqKz4fEisxNl8oSY
-         +t96cEbdtFBGyyRDBH81qrlhYFvj6IdDbzbsgQ1gx9dminZeX5VOtFr4HLvewbp6Uh+B
-         lLxaiM+fTIG3LaTDYNjJ/TXVVl1TtWwspe7xJuEAc2vIdAzkEhyhmQxVZCTVnIQaeC+B
-         vevmePO+xMaTQKZh3noWegfBZ1VEflXwIK5oKUxxxXuB/VIP+O+SRlrBuHazQ4kEK5Lk
-         fRVA==
-X-Gm-Message-State: AOJu0YxSfaYcFk99nHy5VvoLv6GPnCHVvL8cZmFkTirYGXsqvVX8r7yP
-	gTbsyt033Z27yxjbX48GUdG+bNCknWYKGcWeNwDyId9I9AdK6uFV6JoKWuJghyj1emOxZ/gxL1r
-	6lQ==
-X-Google-Smtp-Source: AGHT+IG6WhzVfQfNxhkh6vO1oFttllHBGIxq53Aa6SsBcpq2DPCtMuTS0yWAgaYlxw31FNSJQ8BASJ/xVnw=
+        bh=opv/pkYi5ZzIQaSkE1dFeCV7eMElrF9Hr2aQKt+M0LM=;
+        b=s2RdEnB/qBRz7KL9dB43BN4sh09aYHpVGKyMfqpXvN7gCyC8SbHmRYnNE+LXB597+r
+         bFWxkIppJlBUb1HEkccHg/iqlGy11ja25VHOw1NX/xbUN9XVat2E+nmq5EORB2TPHPJL
+         yd0ft6JS+Tov5NQhfMt1tqV1li+Bi04KazGpuc1T6iuMbC4RqnBj8RhaJBBpHs7lP102
+         ADRpUpowERht6ulkAHuu8jSrBeTgzufOaqJDA/pLecC/Vaor8EtOhbFerwoGFGZI774x
+         1WpyvN7EV8CzUvywVBxDloIIfxlKwxlxqm1x+cKRv6g0kE4j6vmChO9/ktRAW+Ionp+T
+         iRuw==
+X-Gm-Message-State: AOJu0Yzhgh7u/TBtHaFwFXgLb8gjbbQ9/vi+2kSKlr+eom6AYwHXf7ry
+	yJ/vj8bz2HVLmK8ixkUThCc01jX7P+ZTmJoxks+IgSZQcO8h3awdNAaVLDxVPpp8/dCSIiWFaV0
+	w8Q==
+X-Google-Smtp-Source: AGHT+IEzPID2lPLBmutN4pY8hBZkktARYVaXQpGLwpt2q43XvRaJrXEizBq0sMzKUMMe8Z6+tvqhpC6gOYM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:df93:0:b0:609:6150:da22 with SMTP id
- i141-20020a0ddf93000000b006096150da22mr217869ywe.1.1709946585045; Fri, 08 Mar
- 2024 17:09:45 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2291:b0:6e6:4f0a:422 with SMTP id
+ f17-20020a056a00229100b006e64f0a0422mr38978pfe.6.1709946588027; Fri, 08 Mar
+ 2024 17:09:48 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  8 Mar 2024 17:09:27 -0800
+Date: Fri,  8 Mar 2024 17:09:28 -0800
 In-Reply-To: <20240309010929.1403984-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240309010929.1403984-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240309010929.1403984-4-seanjc@google.com>
-Subject: [PATCH 3/5] srcu: Add an API for a memory barrier after SRCU read lock
+Message-ID: <20240309010929.1403984-5-seanjc@google.com>
+Subject: [PATCH 4/5] KVM: x86: Ensure a full memory barrier is emitted in the
+ VM-Exit path
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Lai Jiangshan <jiangshanlai@gmail.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
@@ -88,17 +89,14 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Yan Zhao <yan.y.zhao@intel.com>
 
-To avoid redundant memory barriers, add smp_mb__after_srcu_read_lock() to
-pair with smp_mb__after_srcu_read_unlock() for use in paths that need to
-emit a memory barrier, but already do srcu_read_lock(), which includes a
-full memory barrier.  Provide an API, e.g. as opposed to having callers
-document the behavior via a comment, as the full memory barrier provided
-by srcu_read_lock() is an implementation detail that shouldn't bleed into
-random subsystems.
+Ensure a full memory barrier is emitted in the VM-Exit path, as a full
+barrier is required on Intel CPUs to evict WC buffers.  This will allow
+unconditionally honoring guest PAT on Intel CPUs that support self-snoop.
 
-KVM will use smp_mb__after_srcu_read_lock() in it's VM-Exit path to ensure
-a memory barrier is emitted, which is necessary to ensure correctness of
-mixed memory types on CPUs that support self-snoop.
+As srcu_read_lock() is always called in the VM-Exit path and it internally
+has a smp_mb(), call smp_mb__after_srcu_read_lock() to avoid adding a
+second fence and make sure smp_mb() is called without dependency on
+implementation details of srcu_read_lock().
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
@@ -107,34 +105,26 @@ Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 [sean: massage changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/srcu.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/x86/kvm/x86.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/include/linux/srcu.h b/include/linux/srcu.h
-index 236610e4a8fa..1cb4527076de 100644
---- a/include/linux/srcu.h
-+++ b/include/linux/srcu.h
-@@ -343,6 +343,20 @@ static inline void smp_mb__after_srcu_read_unlock(void)
- 	/* __srcu_read_unlock has smp_mb() internally so nothing to do here. */
- }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 276ae56dd888..69e815df1699 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11082,6 +11082,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
  
-+/**
-+ * smp_mb__after_srcu_read_lock - ensure full ordering after srcu_read_lock
-+ *
-+ * Converts the preceding srcu_read_lock into a two-way memory barrier.
-+ *
-+ * Call this after srcu_read_lock, to guarantee that all memory operations
-+ * that occur after smp_mb__after_srcu_read_lock will appear to happen after
-+ * the preceding srcu_read_lock.
-+ */
-+static inline void smp_mb__after_srcu_read_lock(void)
-+{
-+	/* __srcu_read_lock has smp_mb() internally so nothing to do here. */
-+}
+ 	kvm_vcpu_srcu_read_lock(vcpu);
+ 
++	/*
++	 * Call this to ensure WC buffers in guest are evicted after each VM
++	 * Exit, so that the evicted WC writes can be snooped across all cpus
++	 */
++	smp_mb__after_srcu_read_lock();
 +
- DEFINE_LOCK_GUARD_1(srcu, struct srcu_struct,
- 		    _T->idx = srcu_read_lock(_T->lock),
- 		    srcu_read_unlock(_T->lock, _T->idx),
+ 	/*
+ 	 * Profile KVM exit RIPs:
+ 	 */
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
