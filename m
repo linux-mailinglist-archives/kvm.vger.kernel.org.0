@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-11432-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11433-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39006876E8F
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:30:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F72876E91
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:30:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D69181F22798
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:30:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D36461F2261D
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8D13839D;
-	Sat,  9 Mar 2024 01:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8499939FC5;
+	Sat,  9 Mar 2024 01:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="plY1J/gm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uDqmOj71"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A72E374F5
-	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E95238382
+	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709947664; cv=none; b=JVC2v9O8gcq7GGnj14cMzHy7bXbKRgiNxEYZPpWUPDJ9ZJF5RQB6fxo7okwn3xodHyvMwwlbyRXtac8cd1/OjTj0brn0BM69b4otdnCg8499H/77GDIUmO+Z/qsv7DlkEsfVUAl9aswawKembVsgfoQ0/LTUi0iGqivOFzDEnUk=
+	t=1709947666; cv=none; b=qW0/3Nqa5D38UiXSYBh5br/xN2iDPajfj8WraotM/57xN4u1HR9sljDb6Bc+e4NgfwP3jHJWT0DHj5CQUV32MkpUhjXBao/BWYkwmRu9E7sLHLflvb9UiA22kER7ToN4AnmSIGELTlnh6Z47nRNUbAqKqofbO9p27AYHe042pf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709947664; c=relaxed/simple;
-	bh=0Bygn6FGfK7hczQ7MYvkTd3Y6tG5a7KkroAmIU0tSQ4=;
+	s=arc-20240116; t=1709947666; c=relaxed/simple;
+	bh=ZEiLrY1KoQ4Fx0NTSZKVxy7T5TZLTSRB54wG8b69QkY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=quQH1zbEuQMnqFfClmO7Xhev3304hM7peooSuL3PyvXEpL105SLMSj6qkEQ76hOoSdzdQn14i9QMlVlr9ZQ0thXfspBYyqwrrw1wxS8rtTh55uxB/AWp8FDsg2WqeZ9nQ2bmjszN2Wqz73IPSshXvL3pxZLZ9GgWzhJWN/VLRoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=plY1J/gm; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=M/OaxFoXQ2kpJGpClCfxYmFMyYK2At8jSVonMNXEEp7zez2Ss6nbR63G1BPewhjf4kh96IY657VFj6whPpqUjtJhE6RVJYUJKCeMF/9CFDj3LHRiT+MabJAaqNcYbcQ2UoAQQQdqUEYOgaxt6g5fKXqG9xMz24bOkZJKqT0KN4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uDqmOj71; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-29b5af6b4dfso2095988a91.0
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:27:43 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcd1779adbeso5022375276.3
+        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:27:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709947662; x=1710552462; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709947664; x=1710552464; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=mjAr6s0HGaO3+5h8Ie2u9Yey208VqmWXwMYkWSzg22A=;
-        b=plY1J/gmNz6wZzKK2ZA1+jU0sa+jwCVQHQDpuenOf/sgRWPlCVno6kGzlo/iK3J1we
-         N6jfA6o+GxzXbAl5Y6bjj7moO8N58i3jE7qj6azR0loNGPTq1Yh7Dy4nSHZ6vG47okLD
-         vVc0lxmSMoQxELo+weYjvDAYIg0WnoUHsGlNpf2EMkGN0s8qm9L17PRYbpLZowxnukp4
-         teHYPb/YAiXO0EwlFdtEcWPrp/3PguZrMW/qKRaSMeIZADGaDFwqecRL9EK/s6Az/28a
-         qP66Dj7TcqDiwTjGlf5PL2TgPVMcbPoQKZoW/xrHv9JNQmLR3Ji7YlwpUkFsdjfMitet
-         PC3g==
+        bh=Z0hXUDRVrnWiVd/XkZxxPle06FSyDaHVj3M6N2xEb8c=;
+        b=uDqmOj716Fl0bSLgUENe4S9NFy3CDMg3ukvdx57UFjGrLDQmDoBY4RQj4WgJe8HNJz
+         teWxMDuybiGcWvccuHGgl4Ix+DyW0hy3I5RMVrwid7HM1p8fldmz03Rd3tIWZ7NDGCUy
+         igrncfJcgcTizvqXPHD3PzRfs6+ICFAqfNxeXVXuwcv4DO2Gh9oXF64zlegxbWVk2VYc
+         7VFNe+j0xQQBzvUJzCWRPzO3bPlHJ9vT8cC0I+1YaMINLMwGzkmFzO3THgT31SKuTLWM
+         Y0QUyezCVxaia0i0VmHAYsup2o14RA1rSGv3XAmUmCMwQ5/6L7aT4LwJx0/MhJ4bz5/k
+         5NAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709947662; x=1710552462;
+        d=1e100.net; s=20230601; t=1709947664; x=1710552464;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mjAr6s0HGaO3+5h8Ie2u9Yey208VqmWXwMYkWSzg22A=;
-        b=GYKwfaXomyG4Kk+NmXcxMxiu1W97qBJvHgF8sxlJXZa2eRuaghiKTG2qD2Bdh/QN8w
-         h96GROYNd+sEwGF3HXyogbqtBdg63dJkVctrtjS4L4vYcMmytFXrJJHkcRgbo081+qZL
-         i0iEr92nI2GaD+M4IvFYWXE6EPswJjdviw7Rzhx11gyqbbMPodvmmJNXDUTIasiW7tkU
-         i/wlYMBU7jnaM0t7TMDDVmXwW8xp3rSgyuwoKXmUo3WnroXRe/VQ27vc/TsebPHhHa62
-         TLbwKzmydWhNcWb0Vh+2k7G2Emxgfz8CmWCcVkOht1eI/iDO3+qj7vgfOf89wKmRIJcd
-         6fhA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgECsQAMjiMD9PXAl6ad/SyCvbvkc27A6LaguhvXDO244dXY3ZFKR1rKPcxEtk9I7Wq6naAGldtXUKNy/LFaayCAoZ
-X-Gm-Message-State: AOJu0YxlyfsmhybppYDDHW3vg0/z406tDZqq8+8qu7pW102peRyWAgVK
-	dk48+IJUTQU4WmTDqlovthOTH1iF4Rq2D71HQSkXn0CEHUXeoMxDsPzFItSSFUty4maKQ447aR/
-	QzQ==
-X-Google-Smtp-Source: AGHT+IGsNNKjWe5wisyM7/b0FQKlpNvDtTNfaGIHuq9cW8kK/Cxbk+EhF7GpV5gmkbYL414F+r8ZBDlG/hY=
+        bh=Z0hXUDRVrnWiVd/XkZxxPle06FSyDaHVj3M6N2xEb8c=;
+        b=VD2TScB4GQCNdn95daohQUc5zOP2kJry+8GmAPMcChfStR8J31mCTHOJ+KsbjwKE22
+         pIEfH0/zqFyHIk5mzQnh1pqjURGPOa0FKtaMDX7OAI8cfkPvO/KfFQ0Wjp9xeyNNVi8e
+         NWuO2zqNjnUkNZ0hNet6hK7vkDogqiaKu+WXK2/d3Ctt68xq7VrayLvjZ/AvCHs3aB7J
+         0v+PVuE1YkScPmGCFkTCe0ET/a7FnaTVTpKM9Us1YJMGGfeEmYA0N8tLf+dgrFN+b/E2
+         yG6PCzkDq+aEIGC8KIHbppxCdeNr2s8gaCvpUpqV412LiCdpU9YHpNhejAbS3/vytLg2
+         OH1g==
+X-Forwarded-Encrypted: i=1; AJvYcCXG/9xJKM9ABWeBADfmuU+yqnDaCF7ltFFgPKyupSGgO1Y4NBt/xSVPjOBnbtWlkdNELBJTEn4ZdZhJLpHDEL0oP28n
+X-Gm-Message-State: AOJu0YzUF0PoIHb9rimatZY4A0KHe8JoHswrpWv5ucETlzPISQg2QBKo
+	ZSS/FaK93kKhKIu5R7hAnrQqxOXJs9i4lre5n7a1DfPLebhYdgtw35I9TGfyjshT/6/4TxHkJMZ
+	QlQ==
+X-Google-Smtp-Source: AGHT+IHmflw34lq1WAlNZ9yNOJPtmcj0Q5muJ8m3UkhtRdxvaNlP5bAOSFjzOKKe2zkVBXxtgGtliF3ZaUU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:38cc:b0:29b:c58e:8a53 with SMTP id
- nn12-20020a17090b38cc00b0029bc58e8a53mr15336pjb.0.1709947661557; Fri, 08 Mar
- 2024 17:27:41 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:110a:b0:dcc:50ca:e153 with SMTP id
+ o10-20020a056902110a00b00dcc50cae153mr132642ybu.7.1709947664231; Fri, 08 Mar
+ 2024 17:27:44 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  8 Mar 2024 17:27:22 -0800
+Date: Fri,  8 Mar 2024 17:27:23 -0800
 In-Reply-To: <20240309012725.1409949-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240309012725.1409949-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240309012725.1409949-7-seanjc@google.com>
-Subject: [PATCH v6 6/9] KVM: nVMX: Use macros and #defines in vmx_restore_vmx_basic()
+Message-ID: <20240309012725.1409949-8-seanjc@google.com>
+Subject: [PATCH v6 7/9] KVM VMX: Move MSR_IA32_VMX_MISC bit defines to asm/vmx.h
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -87,67 +87,131 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Shan Kang <shan.kang@intel.com>, Kai Huang <kai.huang@intel.com>, Xin Li <xin3.li@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Xin Li <xin3.li@intel.com>
+Move the handful of MSR_IA32_VMX_MISC bit defines that are currently in
+msr-indx.h to vmx.h so that all of the VMX_MISC defines and wrappers can
+be found in a single location.
 
-Use macros in vmx_restore_vmx_basic() instead of open coding everything
-using BIT_ULL() and GENMASK_ULL().  Opportunistically split feature bits
-and reserved bits into separate variables, and add a comment explaining
-the subset logic (it's not immediately obvious that the set of feature
-bits is NOT the set of _supported_ feature bits).
+Opportunistically use BIT_ULL() instead of open coding hex values, add
+defines for feature bits that are architectural defined, and move the
+defines down in the file so that they are colocated with the helpers for
+getting fields from VMX_MISC.
+
+No functional change intended.
 
 Cc: Shan Kang <shan.kang@intel.com>
 Cc: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
-[sean: split to separate patch, write changelog, drop #defines]
+[sean: split to separate patch, write changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/msr-index.h |  5 -----
+ arch/x86/include/asm/vmx.h       | 19 ++++++++++++-------
+ arch/x86/kvm/vmx/capabilities.h  |  4 ++--
+ arch/x86/kvm/vmx/nested.c        |  2 +-
+ arch/x86/kvm/vmx/nested.h        |  2 +-
+ 5 files changed, 16 insertions(+), 16 deletions(-)
 
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 5ca81ad509b5..3531856def3d 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -1138,11 +1138,6 @@
+ #define MSR_IA32_SMBA_BW_BASE		0xc0000280
+ #define MSR_IA32_EVT_CFG_BASE		0xc0000400
+ 
+-/* MSR_IA32_VMX_MISC bits */
+-#define MSR_IA32_VMX_MISC_INTEL_PT                 (1ULL << 14)
+-#define MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS (1ULL << 29)
+-#define MSR_IA32_VMX_MISC_PREEMPTION_TIMER_SCALE   0x1F
+-
+ /* AMD-V MSRs */
+ #define MSR_VM_CR                       0xc0010114
+ #define MSR_VM_IGNNE                    0xc0010115
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index ce6d166fc3c5..6ff179b11235 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -120,13 +120,6 @@
+ 
+ #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
+ 
+-#define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
+-#define VMX_MISC_SAVE_EFER_LMA			0x00000020
+-#define VMX_MISC_ACTIVITY_HLT			0x00000040
+-#define VMX_MISC_ACTIVITY_WAIT_SIPI		0x00000100
+-#define VMX_MISC_ZERO_LEN_INS			0x40000000
+-#define VMX_MISC_MSR_LIST_MULTIPLIER		512
+-
+ /* VMFUNC functions */
+ #define VMFUNC_CONTROL_BIT(x)	BIT((VMX_FEATURE_##x & 0x1f) - 28)
+ 
+@@ -155,6 +148,18 @@ static inline u32 vmx_basic_vmcs_mem_type(u64 vmx_basic)
+ 	return (vmx_basic & GENMASK_ULL(53, 50)) >> 50;
+ }
+ 
++#define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	GENMASK_ULL(4, 0)
++#define VMX_MISC_SAVE_EFER_LMA			BIT_ULL(5)
++#define VMX_MISC_ACTIVITY_HLT			BIT_ULL(6)
++#define VMX_MISC_ACTIVITY_SHUTDOWN		BIT_ULL(7)
++#define VMX_MISC_ACTIVITY_WAIT_SIPI		BIT_ULL(8)
++#define VMX_MISC_INTEL_PT			BIT_ULL(14)
++#define VMX_MISC_RDMSR_IN_SMM			BIT_ULL(15)
++#define VMX_MISC_VMXOFF_BLOCK_SMI		BIT_ULL(28)
++#define VMX_MISC_VMWRITE_SHADOW_RO_FIELDS	BIT_ULL(29)
++#define VMX_MISC_ZERO_LEN_INS			BIT_ULL(30)
++#define VMX_MISC_MSR_LIST_MULTIPLIER		512
++
+ static inline int vmx_misc_preemption_timer_rate(u64 vmx_misc)
+ {
+ 	return vmx_misc & VMX_MISC_PREEMPTION_TIMER_RATE_MASK;
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 86ce8bb96bed..cb6588238f46 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -223,7 +223,7 @@ static inline bool cpu_has_vmx_vmfunc(void)
+ static inline bool cpu_has_vmx_shadow_vmcs(void)
+ {
+ 	/* check if the cpu supports writing r/o exit information fields */
+-	if (!(vmcs_config.misc & MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS))
++	if (!(vmcs_config.misc & VMX_MISC_VMWRITE_SHADOW_RO_FIELDS))
+ 		return false;
+ 
+ 	return vmcs_config.cpu_based_2nd_exec_ctrl &
+@@ -365,7 +365,7 @@ static inline bool cpu_has_vmx_invvpid_global(void)
+ 
+ static inline bool cpu_has_vmx_intel_pt(void)
+ {
+-	return (vmcs_config.misc & MSR_IA32_VMX_MISC_INTEL_PT) &&
++	return (vmcs_config.misc & VMX_MISC_INTEL_PT) &&
+ 		(vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_PT_USE_GPA) &&
+ 		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_RTIT_CTL);
+ }
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 82a35aba7d2b..4ad8696c25af 100644
+index 4ad8696c25af..06512ee7a5c4 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1228,21 +1228,32 @@ static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
- 
- static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
+@@ -6998,7 +6998,7 @@ static void nested_vmx_setup_misc_data(struct vmcs_config *vmcs_conf,
  {
--	const u64 feature_and_reserved =
--		/* feature (except bit 48; see below) */
--		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
--		/* reserved */
--		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
-+	const u64 feature_bits = VMX_BASIC_DUAL_MONITOR_TREATMENT |
-+				 VMX_BASIC_INOUT |
-+				 VMX_BASIC_TRUE_CTLS;
-+
-+	const u64 reserved_bits = GENMASK_ULL(63, 56) |
-+				  GENMASK_ULL(47, 45) |
-+				  BIT_ULL(31);
-+
- 	u64 vmx_basic = vmcs_config.nested.basic;
+ 	msrs->misc_low = (u32)vmcs_conf->misc & VMX_MISC_SAVE_EFER_LMA;
+ 	msrs->misc_low |=
+-		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
++		VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
+ 		VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE |
+ 		VMX_MISC_ACTIVITY_HLT |
+ 		VMX_MISC_ACTIVITY_WAIT_SIPI;
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index cce4e2aa30fb..0782fe599757 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -109,7 +109,7 @@ static inline unsigned nested_cpu_vmx_misc_cr3_count(struct kvm_vcpu *vcpu)
+ static inline bool nested_cpu_has_vmwrite_any_field(struct kvm_vcpu *vcpu)
+ {
+ 	return to_vmx(vcpu)->nested.msrs.misc_low &
+-		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS;
++		VMX_MISC_VMWRITE_SHADOW_RO_FIELDS;
+ }
  
--	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
-+	BUILD_BUG_ON(feature_bits & reserved_bits);
-+
-+	/*
-+	 * Except for 32BIT_PHYS_ADDR_ONLY, which is an anti-feature bit (has
-+	 * inverted polarity), the incoming value must not set feature bits or
-+	 * reserved bits that aren't allowed/supported by KVM.  Fields, i.e.
-+	 * multi-bit values, are explicitly checked below.
-+	 */
-+	if (!is_bitwise_subset(vmx_basic, data, feature_bits | reserved_bits))
- 		return -EINVAL;
- 
- 	/*
- 	 * KVM does not emulate a version of VMX that constrains physical
- 	 * addresses of VMX structures (e.g. VMCS) to 32-bits.
- 	 */
--	if (data & BIT_ULL(48))
-+	if (data & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
- 		return -EINVAL;
- 
- 	if (vmx_basic_vmcs_revision_id(vmx_basic) !=
+ static inline bool nested_cpu_has_zero_length_injection(struct kvm_vcpu *vcpu)
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
