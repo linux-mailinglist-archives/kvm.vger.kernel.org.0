@@ -1,149 +1,127 @@
-Return-Path: <kvm+bounces-11438-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11439-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16E14876EA0
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:37:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F16B876ED5
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 03:46:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B27CC1F22233
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 01:37:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D573C2828FC
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 02:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E052D052;
-	Sat,  9 Mar 2024 01:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA552D638;
+	Sat,  9 Mar 2024 02:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1um5wWwV"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UOZxGP+S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9630B22F13
-	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 01:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0412C6AA
+	for <kvm@vger.kernel.org>; Sat,  9 Mar 2024 02:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709948210; cv=none; b=DAAZZkQ0+AmjG4LhMIh2cO0x29LvojVi1FBpjyMc6/Z4UMpMi7E6JL7x5VylzbTib15BH61dplp4SSk+WJPhLCajdt/vDBhpm2LFCcA6alpTCtRSJDJrBm3CiWhOCqhT8kV7c52FoHAj/QNbeWbr7q4E+04PEdvZi6PlEmnpFr8=
+	t=1709952366; cv=none; b=LEQb9yvJnJK7p7QozGIAeY68GE7/zoy45MeojXtwOmGsiBtoAgDiszok0brt3Vid1YQuL35TOxISuxl/iWAJRyWu0eGAJjZAqvu5tWPYkgAyUjCBMg528/CjBIjijVqEXRlCTIdRR0b0hhrbgn/NBTabMGke6NJ4WiazUXuxCgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709948210; c=relaxed/simple;
-	bh=SWsPpADQLluvQvp2PRySI9bpj5F6vQcm7E3y70V4Wao=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=USIlB3d8BBVPghac4LMgtq6gscuWS6RAwIYa/nM3heG0Xnt/NqIuGQUGHMsgAhHiyOMSbHQYr/OdNJBRqxLYe6eYJrTy9/nARnjFDOLUhb0p3VH83sH6r1VOxfs8NV9V5XihL8Dk3e0hlDEZb7QRhG8pOWwcIgAb6mQt+AQ0TB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1um5wWwV; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dccc49ef73eso2626616276.2
-        for <kvm@vger.kernel.org>; Fri, 08 Mar 2024 17:36:48 -0800 (PST)
+	s=arc-20240116; t=1709952366; c=relaxed/simple;
+	bh=FaGxOMw8hAeHVyQkCVZb0DCHhnDYyHKuxNIwAvfWDWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=R4GP+5m4sL7LmFKZZwbsB72EZF9rhNk0mAYfLmfCTZV130yeeuCjVW/0yK+XyXRyGlTrkVdMEjIhhblKpPZ+X84NhgvI/AehXE/e1ivFCGCvu8ziA+U9YTW9eX5L3lL6iL+xY1k1JrnaV1Ig1ja7MOsLDGneKUZ46+EaLi/YeBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UOZxGP+S; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709948207; x=1710553007; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=rCwYO/7ilSpOBa4ppOSKCckO3uqB/kQ100+4pH+GXZY=;
-        b=1um5wWwVzvKeIcQ4osLWCCjiUOwsPI8wZM+fFTDqJeGa3S5wAEA45vMVF4QvlTOvq6
-         0Hj24Hu/hHbZ1SEUCy+IuWQM43KaPE79KFDduwdeoo/ymuCe0krgG7mqfQY1Z/99JQt5
-         7NGSGkdtzaOLLEddIjY8WwMhgvvD2/9f8niXya6omOzXkWP0oXKUSlEbvaH6Z65LLjAC
-         KK9q8LSX4z9BQ6rJfk+ZhsMnNvAs6m42/GG157FGg81jtc1RA7luBv7xdpOop43RwqGE
-         gKtS38CzNrcGpG11inBe3vrMHOCZFffTdstcedBLbrO6BKHYMhFuBPHhzKQvwPfN/4/p
-         hNPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709948207; x=1710553007;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rCwYO/7ilSpOBa4ppOSKCckO3uqB/kQ100+4pH+GXZY=;
-        b=qr8oriFRBl6x5ogtJyuZc/tDLhlOhJSr9DKm1pblzFts8xePw+7T7PF693w8aG79TC
-         h6sfSPhhs1xsxI+mNVE9Yl5SlecmICsVTKAlcuEu1JzCrjAbwzyYXzkVpeiMCfrrGbQF
-         4eYx/V4V0iJgY3If+KlMcRcDdA1/JzFJ9mkMG6VylrYkjBMLXoOQbtVGuFsPVVKBtolQ
-         zVG8Yf72ubMkX5wMvziWQhRiiMz8AdWW51o/kBRaqxqp2plA9QJ5o/Z1X4qh5Algtgae
-         1rJfRWspdpkOtgzszbN/LxyDcu1U3IsmK/Cr07FgReLvScdeEXjbuui+mdhEUVaDOf8W
-         /iuA==
-X-Gm-Message-State: AOJu0YwHfqMb0WA6NHNcomYtNjYRKofol/Y5uxOuXRmkQvSHm1us+54W
-	b+R51YUJQ7MDyQ/z3hmjxnXe1QMiOLmouxtGYF5XR4JmI/Um2QddcPxykOTGiXrFTf153a++aN4
-	jwQ==
-X-Google-Smtp-Source: AGHT+IFvwDv/b0ydhsjPUXHw+jUb9gLdfBmL+i1F0ATMcxKeC9RIVzkgTlzWkZAwh4wYWsQF1XGiHgwcQwY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:100d:b0:dcc:8be2:7cb0 with SMTP id
- w13-20020a056902100d00b00dcc8be27cb0mr40937ybt.0.1709948207688; Fri, 08 Mar
- 2024 17:36:47 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  8 Mar 2024 17:36:41 -0800
-In-Reply-To: <20240309013641.1413400-1-seanjc@google.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1709952365; x=1741488365;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FaGxOMw8hAeHVyQkCVZb0DCHhnDYyHKuxNIwAvfWDWA=;
+  b=UOZxGP+SQ074FfySbKC37cep1lgEsuXLpRPWE4A/IO9giYAY3iVVc/L2
+   zStTNjtDS2DXgRh2mKu5bpMKScz22RWyCAsNfXLOzlygLoMBPGW/y6MUT
+   uGCOfzcsLAlnKCU8mCGygW16qYA+HJF4hv4o673ROn/+WCJIZ4ujbPlSS
+   4=;
+X-IronPort-AV: E=Sophos;i="6.07,111,1708387200"; 
+   d="scan'208";a="643486831"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2024 02:46:02 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:58391]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.222:2525] with esmtp (Farcaster)
+ id 8be3daf9-db1b-4473-aca9-d0c64320ade8; Sat, 9 Mar 2024 02:46:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 8be3daf9-db1b-4473-aca9-d0c64320ade8
+Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 9 Mar 2024 02:46:01 +0000
+Received: from [192.168.12.128] (10.106.101.5) by
+ EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 9 Mar 2024 02:45:59 +0000
+Message-ID: <8e3c2b45-356d-4ca9-bebc-012505235142@amazon.com>
+Date: Fri, 8 Mar 2024 19:45:57 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240309013641.1413400-1-seanjc@google.com>
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240309013641.1413400-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: selftests: Verify post-RESET value of
- PERF_GLOBAL_CTRL in PMCs test
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Babu Moger <babu.moger@amd.com>, Sandipan Das <sandipan.das@amd.com>, 
-	Like Xu <like.xu.linux@gmail.com>, Mingwei Zhang <mizhang@google.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Unmapping KVM Guest Memory from Host Kernel
+Content-Language: en-US
+To: David Matlack <dmatlack@google.com>, Brendan Jackman <jackmanb@google.com>
+CC: "Gowans, James" <jgowans@amazon.com>, "seanjc@google.com"
+	<seanjc@google.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"Roy, Patrick" <roypat@amazon.co.uk>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "rppt@kernel.org" <rppt@kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Woodhouse, David"
+	<dwmw@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"lstoakes@gmail.com" <lstoakes@gmail.com>, "Liam.Howlett@oracle.com"
+	<Liam.Howlett@oracle.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>, "mst@redhat.com" <mst@redhat.com>,
+	"somlo@cmu.edu" <somlo@cmu.edu>, "Graf (AWS), Alexander" <graf@amazon.de>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
+	<linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>, <tabba@google.com>,
+	<qperret@google.com>, <jason.cj.chen@intel.com>
+References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
+ <CA+i-1C34VT5oFQL7en1n+MdRrO7AXaAMdNVvjFPxOaTDGXu9Dw@mail.gmail.com>
+ <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com>
+From: "Manwaring, Derek" <derekmn@amazon.com>
+In-Reply-To: <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
+ EX19D003UWC002.ant.amazon.com (10.13.138.169)
 
-Add a guest assert in the PMU counters test to verify that KVM stuffs
-the vCPU's post-RESET value to globally enable all general purpose
-counters.  Per Intel's SDM,
+On 2024-03-08 10:36-0700, David Matlack wrote:
+> On Fri, Mar 8, 2024 at 8:25 AM Brendan Jackman <jackmanb@google.com> wrote:
+> > On Fri, 8 Mar 2024 at 16:50, Gowans, James <jgowans@amazon> wrote:
+> > > Our goal is to more completely address the class of issues whose leak
+> > > origin is categorized as "Mapped memory" [1].
+> >
+> > Did you forget a link below? I'm interested in hearing about that
+> > categorisation.
 
-  IA32_PERF_GLOBAL_CTRL:  Sets bits n-1:0 and clears the upper bits.
+The paper from Hertogh, et al. is https://download.vusec.net/papers/quarantine_raid23.pdf
+specifically Table 1.
 
-and
+> > It's perhaps a bigger hammer than you are looking for, but the
+> > solution we're working on at Google is "Address Space Isolation" (ASI)
+> > - the latest posting about that is [2].
+>
+> I think what James is looking for (and what we are also interested
+> in), is _eliminating_ the ability to access guest memory from the
+> direct map entirely.
 
-  Where "n" is the number of general-purpose counters available in
-  the processor.
+Actually, just preventing speculation of guest memory through the
+direct map is sufficient for our current focus.
 
-For the edge case where there are zero GP counters, follow the spirit
-of the architecture, not the SDM's literal wording, which doesn't account
-for this possibility and would require the CPU to set _all_ bits in
-PERF_GLOBAL_CTRL.
+Brendan,
+I will look into the general ASI approach, thank you. Did you consider
+memfd_secret or a guest_memfd-based approach for Userspace-ASI? Based on
+Sean's earlier reply to James it sounds like the vision of guest_memfd
+aligns with ASI's goals.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/x86_64/pmu_counters_test.c  | 20 ++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index 29609b52f8fa..26c85815f7e9 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -416,12 +416,30 @@ static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters
- 
- static void guest_test_gp_counters(void)
- {
-+	uint8_t pmu_version = guest_get_pmu_version();
- 	uint8_t nr_gp_counters = 0;
- 	uint32_t base_msr;
- 
--	if (guest_get_pmu_version())
-+	if (pmu_version)
- 		nr_gp_counters = this_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
- 
-+	/*
-+	 * For v2+ PMUs, PERF_GLOBAL_CTRL's architectural post-RESET value is
-+	 * "Sets bits n-1:0 and clears the upper bits", where 'n' is the number
-+	 * of GP counters.  If there are no GP counters, require KVM to leave
-+	 * PERF_GLOBAL_CTRL '0'.  This edge case isn't covered by the SDM, but
-+	 * follow the spirit of the architecture and only globally enable GP
-+	 * counters, of which there are none.
-+	 */
-+	if (pmu_version > 1) {
-+		uint64_t global_ctrl = rdmsr(MSR_CORE_PERF_GLOBAL_CTRL);
-+
-+		if (nr_gp_counters)
-+			GUEST_ASSERT_EQ(global_ctrl, GENMASK_ULL(nr_gp_counters - 1, 0));
-+		else
-+			GUEST_ASSERT_EQ(global_ctrl, 0);
-+	}
-+
- 	if (this_cpu_has(X86_FEATURE_PDCM) &&
- 	    rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES)
- 		base_msr = MSR_IA32_PMC0;
--- 
-2.44.0.278.ge034bb2e1d-goog
-
+Derek
 
