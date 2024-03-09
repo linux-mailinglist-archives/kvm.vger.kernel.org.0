@@ -1,121 +1,164 @@
-Return-Path: <kvm+bounces-11442-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11443-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ADC88770A2
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 12:15:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1139487713A
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 14:00:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98C2D1F21683
-	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 11:15:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42C8D1C20A33
+	for <lists+kvm@lfdr.de>; Sat,  9 Mar 2024 13:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048EB36B0E;
-	Sat,  9 Mar 2024 11:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5855F3BBDA;
+	Sat,  9 Mar 2024 13:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rl9M6geC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAC58Cfb"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6451D69E;
-	Sat,  9 Mar 2024 11:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809CC2E62E;
+	Sat,  9 Mar 2024 13:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709982924; cv=none; b=f1goCM8wyLYH13qFfBm0QSmMAubIQtRWeBXrPK9zul3nC57ilvgCeJHiv3DNPYycmLcNMBfJkp/TRR5vr1INxJTqaIrGRDs6wQETk2FLzyrl46+uzjiddf6XeZUcwnwNoYsN7sPRFS6PJXgFnPNNDjNoqnIp3CwxxFhjhqjdMxA=
+	t=1709989222; cv=none; b=KM9RYYkbvsy7z2QgAHsV/TzzVYbMs3HVKN4/wC+aKIqt60bbzLMdVMgN+4O4OKj2A33TqqfUJXuGdcxC+kXfBqNOGrd+FXpWj2brL3qw4BJCyEdgXpK5cWf1yAaBXMbEOsYcV3UZsECwQBWBCykk3B787LgZj2ywtkmJEwnTqlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709982924; c=relaxed/simple;
-	bh=YaUuuk7Crsl2a1PUUVlftTiGcGES7hvpa0gsLJH4zXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aa/W+KdyCHtD4zxfoUmF1tR5LrH9XJ/amfL8r2d8YlNodYG4Q67T3aCuB6IBQfLgHs5VSozdFySLft8HYmfuC+bcVahQcttrkXk/ED8mH/pTAN7Weg6/Q/PnW/e7Az+QrC+KOjAlKXyybbQZPguqmtBmags1677YStdoYIngl2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rl9M6geC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAB0EC433C7;
-	Sat,  9 Mar 2024 11:15:17 +0000 (UTC)
+	s=arc-20240116; t=1709989222; c=relaxed/simple;
+	bh=EQRrR2TRNjrh4HJhQWdHwRczLNwPKSMPTG3s7xq92mM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cIMng2yM2oqnbeEA14AY7KCWVCP5LiayiovaAOlMtco2CfzytBcWUa5wLruUbsc1aKheCZ+Y5KETYQedki+K8zTBSvqjJeOyWOwfY6r/sdGqg+dVh51aVd8IGvyQzimLK7BKQmj/VJ2e6nuJBkYIer5Z4namR/3jC6RtFH2geGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAC58Cfb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F392DC433F1;
+	Sat,  9 Mar 2024 13:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709982923;
-	bh=YaUuuk7Crsl2a1PUUVlftTiGcGES7hvpa0gsLJH4zXA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rl9M6geC4ebyRSg/d2wRXYZOIlzGBGevef0ILal/PwLTfJYHxWnepu1EFQhJSJqp1
-	 dqKzS8GKxJ+rhJToGRkhboVOZdHt+vU98vtpuGtVx1OYquHCjgIoWOt5kIIIUgUdkA
-	 zVhFg8xuVaI+nt//g1J0r8SZk/3Q7xTmCC8eOzhi9FBsQ9Y0h+puyEVimWTJnC8oYu
-	 Y7MxIveJTBKivuvGizPHVxJlu5YPSGFls3TxEPBEiRf30S5/tAKcIhqs0kqyYQkT4I
-	 tS6X5kYMX/52fcixiE4zhGRDtQidSASFWNKNftwdz9lcEYoKUFz7B7hl+61ijvjwHK
-	 DHGPLi3zffCQA==
-Date: Sat, 9 Mar 2024 13:14:24 +0200
-From: Mike Rapoport <rppt@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: James Gowans <jgowans@amazon.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	Patrick Roy <roypat@amazon.co.uk>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	Derek Manwaring <derekmn@amazon.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Nikita Kalyazin <kalyazin@amazon.co.uk>,
-	"lstoakes@gmail.com" <lstoakes@gmail.com>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>,
-	"mst@redhat.com" <mst@redhat.com>, "somlo@cmu.edu" <somlo@cmu.edu>,
-	Alexander Graf <graf@amazon.de>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
-Subject: Re: Unmapping KVM Guest Memory from Host Kernel
-Message-ID: <ZexEkGkNe_7UY7w6@kernel.org>
-References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
- <ZeudRmZz7M6fWPVM@google.com>
+	s=k20201202; t=1709989222;
+	bh=EQRrR2TRNjrh4HJhQWdHwRczLNwPKSMPTG3s7xq92mM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PAC58Cfb0ZHfe4VRPcJEfmCW51HFC+syzhrF8LRWD2Ue6baaByXVxzM7/KHFYAXVO
+	 lingc9tqWecO4C++NhFx6rT27xGI6x+0uJnz6EHDJc2B4Z4hZK6NYs40mgioLdV4xG
+	 3nrjCyycTElHJPL+hDLFJ7LM7/vkq4qsVhharPaE4DvyoUKdvSn3EXOWEYZEhXK11G
+	 QENJHEifdzd/5nQ4/NCeceHUFAk85b5araYd/faAAzjF69LxmC8h9/REuc7z81FQPh
+	 IE6p20NrzJemyGLgIKo9ELxLoyeyXSZXiVo/Tfi62IZvcSdBZ6+PCiNcInvdP/TkPV
+	 KnooU7lCiYljg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1riwJH-00AzHK-Mn;
+	Sat, 09 Mar 2024 13:00:19 +0000
+Date: Sat, 09 Mar 2024 13:00:18 +0000
+Message-ID: <87y1arpnkt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 1/5] KVM: arm64: Add accessor for per-CPU state
+In-Reply-To: <4eba8428-fe6c-4c42-b135-ab831e5cf436@arm.com>
+References: <20240302111935.129994-1-maz@kernel.org>
+	<20240302111935.129994-2-maz@kernel.org>
+	<4eba8428-fe6c-4c42-b135-ab831e5cf436@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZeudRmZz7M6fWPVM@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Mar 08, 2024 at 03:22:50PM -0800, Sean Christopherson wrote:
-> On Fri, Mar 08, 2024, James Gowans wrote:
-> > However, memfd_secret doesn’t work out the box for KVM guest memory; the
-> > main reason seems to be that the GUP path is intentionally disabled for
-> > memfd_secret, so if we use a memfd_secret backed VMA for a memslot then
-> > KVM is not able to fault the memory in. If it’s been pre-faulted in by
-> > userspace then it seems to work.
+On Mon, 04 Mar 2024 12:05:20 +0000,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> Huh, that _shouldn't_ work.  The folio_is_secretmem() in gup_pte_range() is
-> supposed to prevent the "fast gup" path from getting secretmem pages.
-
-I suspect this works because KVM only calls gup on faults and if the memory
-was pre-faulted via memfd_secret there won't be faults and no gups from
-KVM.
- 
-> > With this in mind, what’s the best way to solve getting guest RAM out of
-> > the direct map? Is memfd_secret integration with KVM the way to go, or
-> > should we build a solution on top of guest_memfd, for example via some
-> > flag that causes it to leave memory in the host userspace’s page tables,
-> > but removes it from the direct map? 
+> Hi Marc
 > 
-> memfd_secret obviously gets you a PoC much faster, but in the long term I'm quite
-> sure you'll be fighting memfd_secret all the way.  E.g. it's not dumpable, it
-> deliberately allocates at 4KiB granularity (though I suspect the bug you found
-> means that it can be inadvertantly mapped with 2MiB hugepages), it has no line
-> of sight to taking userspace out of the equation, etc.
+> On 02/03/2024 11:19, Marc Zyngier wrote:
+> > In order to facilitate the introduction of new per-CPU state,
+> > add a new host_data_ptr() helped that hides some of the per-CPU
+> > verbosity, and make it easier to move that state around in the
+> > future.
+> > 
 > 
-> With guest_memfd on the other hand, everyone contributing to and maintaining it
-> has goals that are *very* closely aligned with what you want to do.
+> This series looks like a good cleanup to make the whole host
+> data handling cleaner. One comment below.
+> 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/include/asm/kvm_host.h         | 13 +++++++++++++
+> >   arch/arm64/kvm/arm.c                      |  2 +-
+> >   arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  4 ++--
+> >   arch/arm64/kvm/hyp/include/hyp/switch.h   | 11 +++++------
+> >   arch/arm64/kvm/hyp/nvhe/psci-relay.c      |  2 +-
+> >   arch/arm64/kvm/hyp/nvhe/setup.c           |  3 +--
+> >   arch/arm64/kvm/hyp/nvhe/switch.c          |  4 ++--
+> >   arch/arm64/kvm/hyp/vhe/switch.c           |  4 ++--
+> >   arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |  4 ++--
+> >   arch/arm64/kvm/pmu.c                      |  2 +-
+> >   10 files changed, 30 insertions(+), 19 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 21c57b812569..3ca2a9444f21 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -492,6 +492,17 @@ struct kvm_cpu_context {
+> >   	u64 *vncr_array;
+> >   };
+> >   +/*
+> > + * This structure is instanciated on a per-CPU basis, and contains
+> > + * data that is:
+> > + *
+> > + * - tied to a single physical CPU, and
+> > + * - either have a lifetime that does not extend past vcpu_put()
+> > + * - or is an invariant for the lifetime of the system
+> > + *
+> > + * Use host_data_ptr(field) as a way to access a pointer to such a
+> > + * field.
+> > + */
+> >   struct kvm_host_data {
+> >   	struct kvm_cpu_context host_ctxt;
+> >   };
+> > @@ -1114,6 +1125,8 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+> >     DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
+> >   +#define host_data_ptr(f)	(&this_cpu_ptr(&kvm_host_data)->f)
+> > +
+> >   static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+> >   {
+> >   	/* The host's MPIDR is immutable, so let's set it up at boot time */
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index a25265aca432..d3d14cc41cb5 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1960,7 +1960,7 @@ static void cpu_set_hyp_vector(void)
+> >     static void cpu_hyp_init_context(void)
+> >   {
+> > -	kvm_init_host_cpu_context(&this_cpu_ptr_hyp_sym(kvm_host_data)->host_ctxt);
+> > +	kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
+> 
+> This silently changes the "this_cpu_ptr_hyp_sym" to "this_cpu_ptr()"
+> and thus we could be using the VHE host_data even in nVHE ?
+> Rest looks fine to me.
 
-I agree with Sean, guest_memfd seems a better interface to use. It's
-integrated by design with KVM and removing guest memory from the direct map
-looks like a natural enhancement to guest_memfd. 
+Huh, well spotted. I'll switch the definition of host_data_ptr()
+outside of the hypervisor code to use this_cpu_ptr_hyp_sym() instead,
+like we have for some of the other helpers.
 
-Unless I'm missing something, for fast-and-dirty POC it'll be a oneliner
-that adds set_memory_np() to kvm_gmem_get_folio() and then figuring out
-what to do with virtio :)
+Thanks again,
+
+	M.
 
 -- 
-Sincerely yours,
-Mike.
+Without deviation from the norm, progress is not possible.
 
