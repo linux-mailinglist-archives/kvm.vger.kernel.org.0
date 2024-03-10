@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-11462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11463-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAB688774FE
-	for <lists+kvm@lfdr.de>; Sun, 10 Mar 2024 03:08:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 874FE877503
+	for <lists+kvm@lfdr.de>; Sun, 10 Mar 2024 03:08:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 323AE1F213E9
-	for <lists+kvm@lfdr.de>; Sun, 10 Mar 2024 02:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B94A11C20BA2
+	for <lists+kvm@lfdr.de>; Sun, 10 Mar 2024 02:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C722B9A6;
-	Sun, 10 Mar 2024 02:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445112E400;
+	Sun, 10 Mar 2024 02:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yr9lT8nT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4RRJfEVF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F04F200DD
-	for <kvm@vger.kernel.org>; Sun, 10 Mar 2024 02:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AD72744C
+	for <kvm@vger.kernel.org>; Sun, 10 Mar 2024 02:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710036350; cv=none; b=rkuqZVnmOgO75Jxc3x4Iq/+fyaVr8z9O/IRELN8cq2sYy6cQi1k0rH44R/+p4g2eOd7w7p6jRUjTNv/pmvtbud1O3lXObvSdDEBP+Q1LBvoQ5topZDvfoEiHhPKdWwSyKZ630SR15hMqq/X5hw9IF9bkXOSp9Nyi9wPGh3r4Uhg=
+	t=1710036352; cv=none; b=g8+RWKs+A0/UHas7as9hERCbDAJwiHtBiR5Lze8OfZf5QbTlw2gboNSA9peFdYo5GSoIejSBLvCYWMakCIHqWjXv4U8ba8k2jV9Qvyxn9g80Hq2F3LTSvv0Ok1QFhUcy9sL5w0DrBcUeMn8pALr1dB2E+7s+7StPrTZaoD9IHXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710036350; c=relaxed/simple;
-	bh=I32YjdeuPxEte3yHw53IzkVFz3QD1fvyYmVpmCiJgX0=;
+	s=arc-20240116; t=1710036352; c=relaxed/simple;
+	bh=gXS4/PmUcr/u98E5bD8fZ0t4D/xMUtOLNVIZOZ/mooI=;
 	h=Date:In-Reply-To:Message-Id:Mime-Version:References:Subject:From:
-	 To:Content-Type; b=Hu25AzMjrxWAhtfxPCXZn9vtjGVnScV/NzdjEJw5u5+EQQgU9mfhREp2v+NQP1hSJgzhbxAYYKYLCCW62FvnVTC46YVxTLLw2dVIqMfFm8AmAuWMZvfglmSO3P34aA6AuE0Yr28+ObeDMd2LdEcyMP2PZtIpDl2TaTOt/Ns40os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yr9lT8nT; arc=none smtp.client-ip=209.85.128.201
+	 To:Content-Type; b=C2iE2ireC4WgMQ8YQZuNbaxoOMo+TOed2/BDKDq1KThFM8ZZIRaIloCBeILXkuR+R0r37PU/VGYs/Lkh4c/wiIUnXvIrV4TOhQXjvstxOAwNsdyOf3mMG9RaaHs+MxuiUSnAWl1l30oFuCNjP3nT2kZ7ULEOe4bQsDSADOOUVSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4RRJfEVF; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a20c33f07so8479477b3.3
-        for <kvm@vger.kernel.org>; Sat, 09 Mar 2024 18:05:47 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609f2920b53so48010857b3.0
+        for <kvm@vger.kernel.org>; Sat, 09 Mar 2024 18:05:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710036347; x=1710641147; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1710036349; x=1710641149; darn=vger.kernel.org;
         h=to:from:subject:references:mime-version:message-id:in-reply-to:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=JkunXUX2uPJsD4ImBjWANLyZP2gzb7/4b4n3BxJNzzE=;
-        b=Yr9lT8nT4flnIbHVDVMM+eBJx6uxDD/x6Fei9lIsf/OFxtudgFe5niqUap4uxkpmBJ
-         NdJg6H1zNWCcD+72LOjZyUPUYgcVeP6w8WMugyXDr4b6oTkA/Iir4ST2hIa0guzAV7Di
-         JY5SoHkpo/cZJ9cCV7lAC0cNRnzMCkU392Aqcvc7xZcZK7VPBPKFdVVKmnYOthlQCSO9
-         WQ6FT71i5pWYRIZs+7dcRVFoi8M3V9OPRagie2AfLoCJA/cwPgtG81ZAikEInxUZxsXR
-         qU3zkxlUA28IzlB9dIDnjTEzcj4r3SwT9eZWH4JbhP+r25Jo7fUwPInmb4wEpoFDObPw
-         ZvjA==
+        bh=vgONc26lvm/9ZOmPonAKLBWVK7kvQvvNgc4EWpL/eBk=;
+        b=4RRJfEVFPtrJeHkpe6FwktJhu6hedW8U/v/FPR5lEZLhqQphPs7rfv16DpEvOLsq3p
+         uJY87zLQNSikrSGbJjnZmvv3SXwvszzrcdKMS+PKtWJIUZtpzl7R0QEuJARFoL8xscwU
+         rLXoSBMrzfFNivUw+I2NtMiETimmNkJd6cd7MXkpMcOn3sAm3xhnGlM7JJ0agY8uLr+f
+         aziq4Fo6IxHBXY0idncI9OQeKuvL/Oh585fTQgef3OOR+7L7BZeWsnsPOiZaR5WeSN0K
+         OthKQCtrXWr5CHwo2KSZJcHxH72A5++tGB32b3HTV7eIH7HP5uHRbMBhpcBc9t59/bku
+         QaZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710036347; x=1710641147;
+        d=1e100.net; s=20230601; t=1710036349; x=1710641149;
         h=to:from:subject:references:mime-version:message-id:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JkunXUX2uPJsD4ImBjWANLyZP2gzb7/4b4n3BxJNzzE=;
-        b=vpE52/eOaXPFkpM/Wp9sHQ9Nr/KH8+Di697TQRxWQwRQtAjOYW/qtVXg6bzGoyjeNa
-         WpfJpIXjqy/c5vJ4HP8N/Am7GOoSErkqTzITdvk8KtppwUrkr5WiseIikBrtxWOUX9fI
-         YLJr3P04jt/Fj18dn026i/Pd5PNC/ARErmQ0+5dU6/RuMsBx/YCN6Oippvq/a21Y6Vbs
-         sE3tV3v3+Tslr4JhOA8EaZPNO6DrUm1G7FwEthRBAuh0Lg+6D7krMx0NHpKyDKQ3b486
-         tobUwBA22Sb2n9pra3+0v+YOqcRmtK7b4ZR6nqcr+NcoQtmr1T5H3AT7hxaaEh/rix97
-         KHKw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvWbEpLK87G7gSvjytDlNQW1Zam11e/El2lbRr5S0j2Pq9PxZ/7asEBBU/u92D4p2SKlM9Kp9aBx2z0DggJHdeGpbP
-X-Gm-Message-State: AOJu0YwsR9BIj0Rr0UChDkrlF9F5y0J8+bXSEs8ulyvQth+D5RYNCIFT
-	yrUdLw8b8Rle087cyxtIDqVpJHhlBH47al1aLje/BdyUOWDmf3movmgexCqPKQdaDzKmTKqwhGV
-	hxvdghw==
-X-Google-Smtp-Source: AGHT+IHC63LoVrlmn41wG0ObqneUHLqshrWIHBHCNg+aleXCyzso595+j1kkp1p9OAmoHd0xeF3N4e9YCjv3
+        bh=vgONc26lvm/9ZOmPonAKLBWVK7kvQvvNgc4EWpL/eBk=;
+        b=aZiVrf0yFBArJ7Kjlc/Uf43wj1NhJWyMBk3YB+2OXjx5GRUWlyK8IiSfpf3h8PqLeB
+         xGPmD2wvlHs4uLv0SaLk9RdZrcdcEntH66tfdGIK1J7jFCQ1WFMo337lRk9e+OtjAqZK
+         nY7U/wVx6oJw0/+59gobSH2Bxl0nsfqHLV04gg+Exz7T2rezzOj8Q81+lxhLt7y40/dP
+         N5gGALosiL3a91pxsV11BgpJqfKp6+/OxeuZxpOoBjJmEMeUWbjt6/obl4UO+m69Kvfo
+         nT22mcGMAWD3xC88skKdLyseXSz1/0qejDao++0Avf5fUewFzdeDvwvmsaaCMlTda/yH
+         O29Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVi5Vk0cg0hDvSXZERYmGjMvifTLYmMdBvxnGqMZ3b/829jGvmUEhjGB4qzyJX9leCTbMRM1Aurgs0P+gGCsOlUYf9Z
+X-Gm-Message-State: AOJu0YzjyE7uR/cFJsfjwS/m55mWz0ljj5PzFvgYSErGODVWgMxGdThF
+	4h2/PSpMwSuYkU2Rj9zWq9BNx6fFcwvrJ5vnZXu+/y1bFARcb/oY+De3dBBAMeJ9M/cbfMrgCEC
+	3l1sBcQ==
+X-Google-Smtp-Source: AGHT+IEHSaymlJ72bm2wFBwRFlyvHmM501SMsBRHMdMGbeCTQVSAZx2WeXRxeWUBMJJSsrdAYYWs4TJGUV9K
 X-Received: from irogers.svl.corp.google.com ([2620:15c:2a3:200:a63d:1b65:e810:3ad3])
- (user=irogers job=sendgmr) by 2002:a81:83d1:0:b0:609:f088:cf9c with SMTP id
- t200-20020a8183d1000000b00609f088cf9cmr962327ywf.1.1710036346612; Sat, 09 Mar
- 2024 18:05:46 -0800 (PST)
-Date: Sat,  9 Mar 2024 18:05:01 -0800
+ (user=irogers job=sendgmr) by 2002:a25:ab6f:0:b0:dcd:3a37:65 with SMTP id
+ u102-20020a25ab6f000000b00dcd3a370065mr144117ybi.7.1710036348960; Sat, 09 Mar
+ 2024 18:05:48 -0800 (PST)
+Date: Sat,  9 Mar 2024 18:05:02 -0800
 In-Reply-To: <20240310020509.647319-1-irogers@google.com>
-Message-Id: <20240310020509.647319-7-irogers@google.com>
+Message-Id: <20240310020509.647319-8-irogers@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,7 +75,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240310020509.647319-1-irogers@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Subject: [PATCH v1 06/13] perf debug: Add missing linux/types.h include
+Subject: [PATCH v1 07/13] perf cacheline: Add missing linux/types.h include
 From: Ian Rogers <irogers@google.com>
 To: Arnd Bergmann <arnd@arndb.de>, Andrii Nakryiko <andrii@kernel.org>, 
 	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
@@ -108,27 +108,27 @@ To: Arnd Bergmann <arnd@arndb.de>, Andrii Nakryiko <andrii@kernel.org>,
 	llvm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-u64 is used in this header for eprintf_time and so linux/types.h is
-necessary. Add to avoid compilation errors that aren't currently seen
-due to transitive dependencies.
+u64 is used in this header for cl_address and cl_offset, so
+linux/types.h is necessary. Add to avoid compilation errors that
+aren't currently seen due to transitive dependencies.
 
 Signed-off-by: Ian Rogers <irogers@google.com>
 ---
- tools/perf/util/debug.h | 1 +
+ tools/perf/util/cacheline.h | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/tools/perf/util/debug.h b/tools/perf/util/debug.h
-index 35a7a5ae762e..4160e633311d 100644
---- a/tools/perf/util/debug.h
-+++ b/tools/perf/util/debug.h
-@@ -7,6 +7,7 @@
- #include <stdbool.h>
- #include <stdio.h>
+diff --git a/tools/perf/util/cacheline.h b/tools/perf/util/cacheline.h
+index fe6d5b60a031..50b77129e1a4 100644
+--- a/tools/perf/util/cacheline.h
++++ b/tools/perf/util/cacheline.h
+@@ -3,6 +3,7 @@
+ #define PERF_CACHELINE_H
+ 
  #include <linux/compiler.h>
 +#include <linux/types.h>
  
- extern int verbose;
- extern int debug_kmaps;
+ int __pure cacheline_size(void);
+ 
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
