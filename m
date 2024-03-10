@@ -1,335 +1,118 @@
-Return-Path: <kvm+bounces-11469-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11470-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C1B1877521
-	for <lists+kvm@lfdr.de>; Sun, 10 Mar 2024 03:10:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C01C8775FA
+	for <lists+kvm@lfdr.de>; Sun, 10 Mar 2024 10:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 979751F21390
-	for <lists+kvm@lfdr.de>; Sun, 10 Mar 2024 02:10:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B2928184F
+	for <lists+kvm@lfdr.de>; Sun, 10 Mar 2024 09:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C5C3BB29;
-	Sun, 10 Mar 2024 02:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4809200A6;
+	Sun, 10 Mar 2024 09:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hV39oof8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U5txpaxj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB923A8FC
-	for <kvm@vger.kernel.org>; Sun, 10 Mar 2024 02:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4071DDD6;
+	Sun, 10 Mar 2024 09:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710036370; cv=none; b=ssd7KR3gU8KjrrPXcL/BVWLlYEJ2vUCSQEaLXVbXwd1l0bu5E0Mk8vqk3g9+jU2HxnY9iTtvFAk7RVktusmLp9aFziKSRIx2Lo5ki+V2gfwHJTfM7AjpYR9X6q3rIp/PMafpWX6bhNbLAaNgq4UqFf8PxrdCw8eEox2vpzZfDGM=
+	t=1710063319; cv=none; b=sDWapVDF8/QUsPU2PXtIrpWFVbhkqTZ5fOCe6oQ3KQWgD0BZwFTRHlPTmIbBUaAXcXyrI3exTGH4xzagDeIUkVtznMDi3oUkLVtq7WuSKCUsqDwpIzPxPMy+Hl70vSETWR53uRpL2RE46aHNFLePYFRCvzbVPsQXArd52rGQTuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710036370; c=relaxed/simple;
-	bh=qvu80I2tuIwczv3ewDN5Kf8bkfHfC9IP72lON4Zzmek=;
-	h=Date:In-Reply-To:Message-Id:Mime-Version:References:Subject:From:
-	 To:Cc:Content-Type; b=n4klPcgMRss7TZgO0LO64HNoUclb3sBDmwhnJTzNOWnGCz0X865ckhs5BrfR+D7Ws05QA7UeNfGzgiHOVIJscAtAyE0sTsLXcMG3oW5CnN9VYpFK0YsnmHhQNGQWWYcSbevEjBbeaA0BYjFYsJeqbKszyTJSdy2VyFZOuNZo7/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hV39oof8; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b2682870so5542688276.0
-        for <kvm@vger.kernel.org>; Sat, 09 Mar 2024 18:06:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710036365; x=1710641165; darn=vger.kernel.org;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z2TI3BR52BOETJMkXQVYiCvqxjFYb61EnnuV6r2EGgU=;
-        b=hV39oof8n6gQYhpoRdQBNKXrF9luve4Gjjy1Iibfj18oWaFulJIcW/K0a+36t6prcz
-         c2TirRz8836CT+nuHJYaKfcP8O3elPqWrHmJdhPhrYbIebqJVgH2tC4zE2I3VeLdlg23
-         ihbhVIuMkt4Fo+motqOpBgLeIqMlgh6bVwkPGzIwr78rsxBOM839rKLVNIweb/bB37oC
-         bee/hJw0Psd6q4+giekuPYhNzCCyOGVouxE66vuCTKa3h+WcMmDafItdyLDBzhIC+mvw
-         yus2gBGtfrawoxBl/bS0bvetjFoluac4zdUvlbymAVId8gCuS3ZZ+LOeQ0GGcBYxc1wG
-         mt4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710036365; x=1710641165;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z2TI3BR52BOETJMkXQVYiCvqxjFYb61EnnuV6r2EGgU=;
-        b=C08PmVgBH3UMShLECSgWQi58vz7uCtdotyfZ6yMzk0klHT8zoFvKGdC9cP/PdX6xsD
-         HU6pLYoQvw6s4KXsQ4VXCPGJANQL5MdK+HUPqQyBun9ICiMpGeLqIZ5bRou1KJVSMMud
-         D+FiVlYUzOVcnSAqq6YHvnPulzx0r7WSqE8gTnkhHqG1TGhKTR96JmnXVQSnq3rBtcMc
-         XWlM8n+5k6K47sv/WvzFGSQYALR/lt8bxsjXnamkzii1Ci/FPn4WEL9CwProF0jfILQJ
-         IJSPEFhwHkqS2JXZ+iaZo1hEThkiFoICXD1AmS8X4zqjBJSqOIypOzTGcLwHi6YIJC3A
-         CsOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDHXOVYAOufW+pAnDZGjyR8C6Xkwdz+pge3ow+418n42EaIy97El6sdQbHOSv18FoMCYoSStghYQJu+4ZDgvmoljzf
-X-Gm-Message-State: AOJu0Yx1FsfR4h5RrNIM8B/G+wuRdX1ZEgWZ7NQJusctYtqIarWlrbIh
-	Z5SjHhrQzPZgRpddZv4T4904RRcNZSFDojKm7xZzwMLYbrswC2UVEZNxUbB5/VjpmsuSuDVh1qx
-	slFnXLA==
-X-Google-Smtp-Source: AGHT+IHg84e8jFIAgnoZrRiN8Pu+L19uE2B6rig+tSx4eREFwobOlwuHge4FvzAmOSQKYE9pLZGbcXyYmOgE
-X-Received: from irogers.svl.corp.google.com ([2620:15c:2a3:200:a63d:1b65:e810:3ad3])
- (user=irogers job=sendgmr) by 2002:a05:6902:18c9:b0:dc6:fec4:1c26 with SMTP
- id ck9-20020a05690218c900b00dc6fec41c26mr897542ybb.1.1710036365375; Sat, 09
- Mar 2024 18:06:05 -0800 (PST)
-Date: Sat,  9 Mar 2024 18:05:08 -0800
-In-Reply-To: <20240310020509.647319-1-irogers@google.com>
-Message-Id: <20240310020509.647319-14-irogers@google.com>
+	s=arc-20240116; t=1710063319; c=relaxed/simple;
+	bh=A56j1ShXDrhKO97iz6szIVzteEyqKgRDBPAwzXDzikI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ac80HIwoLIvu7vjqhEQWCnCFgliPyi+AzvJOs3WTTu4fp0DVzpFlG+gI1OamZQRLSSEI1YMXIbjkfHSFB/OoPU4zSu/DYvj2CDlt7P87+eHhq+QbZPXiN8SYFC4u0g9bYTIAEI4++BgN0ABl+XkE7lzenWdyN2lrroYS2FDnSYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U5txpaxj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0B84C433F1;
+	Sun, 10 Mar 2024 09:35:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710063318;
+	bh=A56j1ShXDrhKO97iz6szIVzteEyqKgRDBPAwzXDzikI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U5txpaxjWhNjC2+i4ewRBUTMbOl9INv+8VjxpWaxk1WEUrjJg3az83iYX2Mn4D5SW
+	 yc6zUeCxxSQMhZvCdnpcpuT+AYCkhv/mL7iK7m+UeKVcbupJn2l7VTPaYgCjgBMOA/
+	 BVU6BAh38XlKsUBRkSdAb8irqFKw0ZmI0R/LcvETKy/DSscUI1S6TDxF2MskopGD0N
+	 xWRfW9nVMxCaiAkZIpVfqgVBd2dslnlH2l6ODPwVzq2OuPr97rODqlhU5Xm7KbNrxR
+	 R7fTvQEaz2EW6Wj0d9pT+Nk4jaz7CJCi9Qxf7jgVSWm1t3UiO2ayk7llGARr05mmDQ
+	 jSKO3qAwJxGPw==
+Date: Sun, 10 Mar 2024 11:35:13 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240310093513.GB12921@unreal>
+References: <20240306154328.GM9225@ziepe.ca>
+ <20240306162022.GB28427@lst.de>
+ <20240306174456.GO9225@ziepe.ca>
+ <20240306221400.GA8663@lst.de>
+ <20240307000036.GP9225@ziepe.ca>
+ <20240307150505.GA28978@lst.de>
+ <20240307210116.GQ9225@ziepe.ca>
+ <20240308164920.GA17991@lst.de>
+ <20240308202342.GZ9225@ziepe.ca>
+ <20240309161418.GA27113@lst.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240310020509.647319-1-irogers@google.com>
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Subject: [PATCH v1 13/13] tools headers: Rename noinline to __noinline
-From: Ian Rogers <irogers@google.com>
-To: Arnd Bergmann <arnd@arndb.de>, Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Ian Rogers <irogers@google.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Kees Cook <keescook@chromium.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Liam Howlett <liam.howlett@oracle.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>, 
-	David Laight <David.Laight@ACULAB.COM>, "Michael S. Tsirkin" <mst@redhat.com>, Shunsuke Mie <mie@igel.co.jp>, 
-	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>, 
-	James Clark <james.clark@arm.com>, Nick Forrington <nick.forrington@arm.com>, 
-	Leo Yan <leo.yan@linux.dev>, German Gomez <german.gomez@arm.com>, Rob Herring <robh@kernel.org>, 
-	John Garry <john.g.garry@oracle.com>, Sean Christopherson <seanjc@google.com>, 
-	Anup Patel <anup@brainfault.org>, Fuad Tabba <tabba@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Haibo Xu <haibo1.xu@intel.com>, Peter Xu <peterx@redhat.com>, 
-	Vishal Annapurve <vannapurve@google.com>, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	llvm@lists.linux.dev
-Cc: Christopher Di Bella <cjdb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240309161418.GA27113@lst.de>
 
-An issue was reported with clang and llvm libc where the noinline
-attribute [1] was being expanded due to the #define in
-linux/compiler.h (now in compiler_attributes.h). The expansion caused
-the __attribute__ to appear twice and break the build. To avoid this
-conflict, rename noinline to __noinline which is more consistent with
-other compiler attributes.
+On Sat, Mar 09, 2024 at 05:14:18PM +0100, Christoph Hellwig wrote:
+> On Fri, Mar 08, 2024 at 04:23:42PM -0400, Jason Gunthorpe wrote:
+> > > The DMA API callers really need to know what is P2P or not for
+> > > various reasons.  And they should generally have that information
+> > > available, either from pin_user_pages that needs to special case
+> > > it or from the in-kernel I/O submitter that build it from P2P and
+> > > normal memory.
+> > 
+> > I think that is a BIO thing. RDMA just calls with FOLL_PCI_P2PDMA and
+> > shoves the resulting page list into in a scattertable. It never checks
+> > if any returned page is P2P - it has no reason to care. dma_map_sg()
+> > does all the work.
+> 
+> Right now it does, but that's not really a good interface.  If we have
+> a pin_user_pages variant that only pins until the next relevant P2P
+> boundary and tells you about we can significantly simplify the overall
+> interface.
 
-[1] https://clang.llvm.org/docs/AttributeReference.html#noinline
-Reported-by: Christopher Di Bella <cjdb@google.com>
+And you will need to have a way to instruct that pin_user_pages() variant
+to continue anyway, because you asked for FOLL_PCI_P2PDMA. Without that
+force, you will have !FOLL_PCI_P2PDMA behaviour.
 
-Signed-off-by: Ian Rogers <irogers@google.com>
----
- tools/include/linux/compiler_attributes.h |  4 ++--
- tools/perf/arch/x86/tests/bp-modify.c     |  4 ++--
- tools/perf/bench/find-bit-bench.c         |  2 +-
- tools/perf/tests/bp_account.c             |  2 +-
- tools/perf/tests/bp_signal.c              |  2 +-
- tools/perf/tests/bp_signal_overflow.c     |  2 +-
- tools/perf/tests/dwarf-unwind.c           | 12 ++++++------
- tools/perf/tests/workloads/leafloop.c     |  8 ++++----
- tools/perf/tests/workloads/thloop.c       |  4 ++--
- 9 files changed, 20 insertions(+), 20 deletions(-)
+When you say "simplify the overall interface", which interface do you mean?
 
-diff --git a/tools/include/linux/compiler_attributes.h b/tools/include/linux/compiler_attributes.h
-index 9bfaec783e48..1ff3d85f5af3 100644
---- a/tools/include/linux/compiler_attributes.h
-+++ b/tools/include/linux/compiler_attributes.h
-@@ -267,12 +267,12 @@
- # define __flatten			__attribute__((flatten))
- 
- /*
-- * Note the missing underscores.
-+ * Note, the kernel version is missing the underscores.
-  *
-  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-noinline-function-attribute
-  * clang: mentioned
-  */
--#define   noinline                      __attribute__((__noinline__))
-+#define   __noinline                      __attribute__((__noinline__))
- 
- /*
-  * Optional: only supported since gcc >= 8
-diff --git a/tools/perf/arch/x86/tests/bp-modify.c b/tools/perf/arch/x86/tests/bp-modify.c
-index 0924ccd9e36d..65493ff7a76f 100644
---- a/tools/perf/arch/x86/tests/bp-modify.c
-+++ b/tools/perf/arch/x86/tests/bp-modify.c
-@@ -15,13 +15,13 @@
- #include "tests/tests.h"
- #include "arch-tests.h"
- 
--static noinline int bp_1(void)
-+static __noinline int bp_1(void)
- {
- 	pr_debug("in %s\n", __func__);
- 	return 0;
- }
- 
--static noinline int bp_2(void)
-+static __noinline int bp_2(void)
- {
- 	pr_debug("in %s\n", __func__);
- 	return 0;
-diff --git a/tools/perf/bench/find-bit-bench.c b/tools/perf/bench/find-bit-bench.c
-index 7e25b0e413f6..dd97a51649bc 100644
---- a/tools/perf/bench/find-bit-bench.c
-+++ b/tools/perf/bench/find-bit-bench.c
-@@ -31,7 +31,7 @@ static const char *const bench_usage[] = {
- static unsigned int accumulator;
- static unsigned int use_of_val;
- 
--static noinline void workload(int val)
-+static __noinline void workload(int val)
- {
- 	use_of_val += val;
- 	accumulator++;
-diff --git a/tools/perf/tests/bp_account.c b/tools/perf/tests/bp_account.c
-index 6f921db33cf9..459f61752a71 100644
---- a/tools/perf/tests/bp_account.c
-+++ b/tools/perf/tests/bp_account.c
-@@ -34,7 +34,7 @@
- 
- static volatile long the_var;
- 
--static noinline int test_function(void)
-+static __noinline int test_function(void)
- {
- 	return 0;
- }
-diff --git a/tools/perf/tests/bp_signal.c b/tools/perf/tests/bp_signal.c
-index 1f2908f02389..484a7e7f96ee 100644
---- a/tools/perf/tests/bp_signal.c
-+++ b/tools/perf/tests/bp_signal.c
-@@ -59,7 +59,7 @@ static void __test_function(volatile long *ptr)
- }
- #endif
- 
--static noinline int test_function(void)
-+static __noinline int test_function(void)
- {
- 	__test_function(&the_var);
- 	the_var++;
-diff --git a/tools/perf/tests/bp_signal_overflow.c b/tools/perf/tests/bp_signal_overflow.c
-index 4e897c2cf26b..9436bf2973f8 100644
---- a/tools/perf/tests/bp_signal_overflow.c
-+++ b/tools/perf/tests/bp_signal_overflow.c
-@@ -30,7 +30,7 @@
- 
- static int overflows;
- 
--static noinline int test_function(void)
-+static __noinline int test_function(void)
- {
- 	return time(NULL);
- }
-diff --git a/tools/perf/tests/dwarf-unwind.c b/tools/perf/tests/dwarf-unwind.c
-index d01aa931fe81..a669c69a9242 100644
---- a/tools/perf/tests/dwarf-unwind.c
-+++ b/tools/perf/tests/dwarf-unwind.c
-@@ -109,7 +109,7 @@ static int unwind_entry(struct unwind_entry *entry, void *arg)
- 	return strcmp((const char *) symbol, funcs[idx]);
- }
- 
--NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__thread(struct thread *thread)
-+NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__thread(struct thread *thread)
- {
- 	struct perf_sample sample;
- 	unsigned long cnt = 0;
-@@ -140,7 +140,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__thread(struct thread *thr
- 
- static int global_unwind_retval = -INT_MAX;
- 
--NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__compare(void *p1, void *p2)
-+NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__compare(void *p1, void *p2)
- {
- 	/* Any possible value should be 'thread' */
- 	struct thread *thread = *(struct thread **)p1;
-@@ -159,7 +159,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__compare(void *p1, void *p
- 	return p1 - p2;
- }
- 
--NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_3(struct thread *thread)
-+NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_3(struct thread *thread)
- {
- 	struct thread *array[2] = {thread, thread};
- 	void *fp = &bsearch;
-@@ -178,7 +178,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_3(struct thread *th
- 	return global_unwind_retval;
- }
- 
--NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_2(struct thread *thread)
-+NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_2(struct thread *thread)
- {
- 	int ret;
- 
-@@ -187,7 +187,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_2(struct thread *th
- 	return ret;
- }
- 
--NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_1(struct thread *thread)
-+NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_1(struct thread *thread)
- {
- 	int ret;
- 
-@@ -196,7 +196,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_1(struct thread *th
- 	return ret;
- }
- 
--noinline int test__dwarf_unwind(struct test_suite *test __maybe_unused,
-+__noinline int test__dwarf_unwind(struct test_suite *test __maybe_unused,
- 				int subtest __maybe_unused)
- {
- 	struct machine *machine;
-diff --git a/tools/perf/tests/workloads/leafloop.c b/tools/perf/tests/workloads/leafloop.c
-index 1bf5cc97649b..89d2cec2f461 100644
---- a/tools/perf/tests/workloads/leafloop.c
-+++ b/tools/perf/tests/workloads/leafloop.c
-@@ -4,18 +4,18 @@
- #include "../tests.h"
- 
- /* We want to check these symbols in perf script */
--noinline void leaf(volatile int b);
--noinline void parent(volatile int b);
-+__noinline void leaf(volatile int b);
-+__noinline void parent(volatile int b);
- 
- static volatile int a;
- 
--noinline void leaf(volatile int b)
-+__noinline void leaf(volatile int b)
- {
- 	for (;;)
- 		a += b;
- }
- 
--noinline void parent(volatile int b)
-+__noinline void parent(volatile int b)
- {
- 	leaf(b);
- }
-diff --git a/tools/perf/tests/workloads/thloop.c b/tools/perf/tests/workloads/thloop.c
-index 457b29f91c3e..e252efb76203 100644
---- a/tools/perf/tests/workloads/thloop.c
-+++ b/tools/perf/tests/workloads/thloop.c
-@@ -9,14 +9,14 @@
- static volatile sig_atomic_t done;
- 
- /* We want to check this symbol in perf report */
--noinline void test_loop(void);
-+__noinline void test_loop(void);
- 
- static void sighandler(int sig __maybe_unused)
- {
- 	done = 1;
- }
- 
--noinline void test_loop(void)
-+__noinline void test_loop(void)
- {
- 	while (!done);
- }
--- 
-2.44.0.278.ge034bb2e1d-goog
-
+Thanks
 
