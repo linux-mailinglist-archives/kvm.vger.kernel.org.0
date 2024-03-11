@@ -1,115 +1,137 @@
-Return-Path: <kvm+bounces-11569-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11570-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F42878557
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 17:27:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC64487855B
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 17:28:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBDF01C219CF
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 16:27:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A032D28268A
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 16:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F60256B71;
-	Mon, 11 Mar 2024 16:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A6956B7F;
+	Mon, 11 Mar 2024 16:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LZ4HJP/H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1tbydqMK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011A756B64
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 16:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0C056B7A
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 16:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710174078; cv=none; b=YnOD4RYx0H/wWSAKUGe22e3s9PN+ipkZgiX2yuDraF6Ca++siziFDYhtO0H9uRvuiE6TTbeDoDu0tRFIoSzoouNtk2Qp1kKl9HLKkIo4ZoANXUN5Y9n2MLALVRWEM3yHbJLAzDhgkcp1+/CKRwZPqid7r4RQ/WujtwtNupZCdJA=
+	t=1710174085; cv=none; b=OOZ1uwR1GhptptD4TXxGWMXDO06CSf8PVDN0JEaDzsY9G17oZ/ofB6cp909VPcvUQWnk94Uqu7guVWe4i2HqLtTfoHR+f46zwVHjo8NI8bdPPW5APTKZ+7Mqo0+hmRAW4wX68B/AI5golDeKYV58+zwyclYIr5T/Srcp++8vsUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710174078; c=relaxed/simple;
-	bh=qfW/kGk94of4yalWU1PdrhO6UqJZB7rHcs/wXkg7FPs=;
+	s=arc-20240116; t=1710174085; c=relaxed/simple;
+	bh=Aj2DDU2R3CP9L+cvs3h77l1rCBccotGIwcymgcAqh4U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XMWaSwNvaOqpAULHyRHs9uqhlzLEsucMH4D+OSxUXpPlxYDFnLWVWuPlkzAwFRDVvRxP/YdTaK3fKRTSrlci5sc1iMg8BL+4eaXeql/P6rERp9ml2boZ7Xo1Sk3QQWreW9vMmTredenkL15BZRvI14RmPLDsv/96/WCgwKrOnfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LZ4HJP/H; arc=none smtp.client-ip=209.85.221.53
+	 To:Cc:Content-Type; b=fYHZkqbYqxZBfNrd57qrkTOGNqdIMPWkAbafLJNTPFUQGddH8RImQB7SRobCIkvpRcabJKePamTk+f5HB21XXoWBs5Vg7Ci9b+gpn77+RzpLN5WOlNppACKuvrr/a0fi1DiJ9dn54JNOoOkklQVA1Rtl+FmFoXWa4p1haDHckOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1tbydqMK; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33e92b3b5c9so1601009f8f.2
-        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 09:21:16 -0700 (PDT)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51344bebe2fso3089213e87.2
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 09:21:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710174075; x=1710778875; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1710174082; x=1710778882; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GRHbM8iISI0NpUPhNykIpu2WvmXC88NjtQH+HPjZyOE=;
-        b=LZ4HJP/HRGUdLR2STDuvY3TAuLQqpaHKq1qZ3cFrQA2vO5Gu0pueDCy3NXZlzXILR8
-         qnV5tT6B/Nk1EPRrqkbfh6Gh0UyoclpVZVPkjW80lOvLLt9PdVCofE8sTzUxe0Ik0GEy
-         WvahT75LavGPvJvxrXS9IbcvK7OrVO7G3gmRmOkDyy/l14prO2amR4Aky27KahdEA8PI
-         RFVU1xcZO7ZMMTt2X/LmZynFAtPV7dVXNDlaP02mT7dYbEbQfOi3sd8UW5QPfv/i8qrr
-         Jr33ZiMX+byFoPwEacJv6mKtmJFZQVW/Vu+oownA229tgAMNE6tabzzMQXZO4o794xbz
-         f3og==
+        bh=Aj2DDU2R3CP9L+cvs3h77l1rCBccotGIwcymgcAqh4U=;
+        b=1tbydqMK5d47mP/AaFRs9nz1D/0UrgShdiSVhxxPlu+qsgZaWxGTY2sz/C6Jhx9iEU
+         huW8lbcM6IYIKN7X2pOKKaoWLojo7y3yyoEZfJSJYOulvBnuwavrcrztBTYy9avGuRH9
+         UUSQ0PFIyxzBRVD8SY61mjoMmOMNOB66kUqUG/Giq2ASBuGDqtnwzdO5eXx0c2PH7Tr3
+         7Px6Q5TjM+jTz2Ab5aw/sBaBGC6mbnqD5MvjunYczQ5xqj9oEgISprLXQIHDeKFUc7SK
+         NDiQkxAnaF8t5H/n7OuXbz8K1BEaXXru6a45u+MACSs8PlfdAgSBMi0CoWzuREmu6jvg
+         d//Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710174075; x=1710778875;
+        d=1e100.net; s=20230601; t=1710174082; x=1710778882;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GRHbM8iISI0NpUPhNykIpu2WvmXC88NjtQH+HPjZyOE=;
-        b=mMNCi0mhpT/fQG9KzUMCxVO3sIHsg8dgaJf1i01snl2i/1IshnV2kIJ/LPONtu8EF+
-         cfhOeDIich50la+4ayVoE0aFvhxfAZ6c+py6j1cUqwKNWbgS4e7t2EWXpc2x3ya5svmT
-         Py9zkVTS6tYkhn6dHPpw+Pv4UQVvr9iGkdqWGNQafOdwfDrP/AqZ976ERdszRQ6qkW4p
-         WNmP0Yn0KOo5SViC7xv/itP2qaqZB0TU95hyai/EAGD9Ou+ESYgTy6Nkt7dYqlDUftQY
-         CYsEU0HyY/RbyMmbj0UfJa125HWtr7lbA3EsUG+ZCqQlGlwuJPgh1GMu8nicnkwN774h
-         zfpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGjWXY/TlpFa4lCUQi5Ml/WKOa1G2TH21/RlFPy/v32i1WWk7apUpY0xFMoEXO6RjMTx8Z2RJ51LcKqn4WKckO2SWb
-X-Gm-Message-State: AOJu0YxiHAZ563MenQCZUunNJ8hMRLSJWfbJhCj7OQ8SUjafmL6IGXA9
-	CbtCHKvcqydM3RrtiwWyU/DIpDA10CyYtAFCvU4vMvh3NscYOzUWZmrV95r9YClqkTEjodbSNxT
-	MbZ+x0e73zxKbgu0y9kwqBIO2HcbtOUM/LKZL
-X-Google-Smtp-Source: AGHT+IF56DFAkN6EElW+sbMpfmisqZTBEkWDtxHyybNyRdtF973BKWpFHFSULcS7yyvYlMJ74IiC8WSzDEoEJJADSJA=
-X-Received: by 2002:adf:dd8a:0:b0:33e:69a5:68f9 with SMTP id
- x10-20020adfdd8a000000b0033e69a568f9mr5462424wrl.17.1710174075303; Mon, 11
- Mar 2024 09:21:15 -0700 (PDT)
+        bh=Aj2DDU2R3CP9L+cvs3h77l1rCBccotGIwcymgcAqh4U=;
+        b=qLcc/CWaoirJPFKXfyQX1I05Cpb9PXEJtg8Rz43eofuGEr4Pn+wHPPE95qf7+UGJW/
+         0E75NlaIY6kvrWCbhHt42hgQIyTjTmM74SuMg567k7XkKpfZbzu5DMJ0hkOqGhWpzhdE
+         0UF0pK0r9p2PnoPSRFwbk4pg0jXLQi/ZnfdvkeBxu/WZsR68C8Te+v65T4C1CSBuf7Hq
+         Qb9E/BpjgGtQ99a022C8mDNv3AKQLgn8KdtTarrwYe84jWtH8xpVSgaBV+/W8HcbU8Rw
+         FkK9RUeX7FejBcumFjBqqe3urj1Iy/NpvFLifwISYBxzoFHO5NhmvCW06OokTr+muMdv
+         o+Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9S0dxJG9bjfDY6mIpN0B6izOS6tz4nFw1CAW5ikGf6AmVQDDqdGLRicc56d4Js+DdKhCAoackBCORSyuIUjANTWg6
+X-Gm-Message-State: AOJu0Yy04P0mcZMWxu/rjNFT8Pyc5vPLikcbmCLOECliiJ5lGsoZCjGp
+	tMJEOj/gC+hGx1Y9ZryrEvvYbngSf1u6cV4RytMUpBKyzqlhLf/BpvrWjn4kLyb7I4/0Mq6G6nI
+	aABECs8lNRls5RAHLrYo3tuQpw2IBMGPhbjUv
+X-Google-Smtp-Source: AGHT+IHS01FCe9haSj8hz/MjlOpYjKoCZ7p5Q//xT1au7RU9ERgiqKLg8dLzsYObrWdNTUdk4e7k8GKHb5tETRrwm2g=
+X-Received: by 2002:a05:6512:3996:b0:513:4afa:a719 with SMTP id
+ j22-20020a056512399600b005134afaa719mr6647016lfu.59.1710174081606; Mon, 11
+ Mar 2024 09:21:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-7-amoorthy@google.com>
- <ZeuMEdQTFADDSFkX@google.com> <ZeuxaHlZzI4qnnFq@google.com> <Ze6Md/RF8Lbg38Rf@thinky-boi>
-In-Reply-To: <Ze6Md/RF8Lbg38Rf@thinky-boi>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 11 Mar 2024 09:20:48 -0700
-Message-ID: <CALzav=cMrt8jhCKZSJL+76L=PUZLBH7D=Uo-5Cd1vBOoEja0Nw@mail.gmail.com>
-Subject: Re: [PATCH v7 06/14] KVM: Add memslot flag to let userspace force an
- exit on missing hva mappings
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>, Anish Moorthy <amoorthy@google.com>, maz@kernel.org, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, axelrasmussen@google.com, peterx@redhat.com, 
-	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+References: <20240310020509.647319-1-irogers@google.com> <20240310020509.647319-14-irogers@google.com>
+ <20240311114009-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240311114009-mutt-send-email-mst@kernel.org>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 11 Mar 2024 09:21:06 -0700
+Message-ID: <CAKwvOdkGALie1d6oNXKNT8vwGmHbymsQ-dv-i0U_SQGFrhEJew@mail.gmail.com>
+Subject: Re: [PATCH v1 13/13] tools headers: Rename noinline to __noinline
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ian Rogers <irogers@google.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Kees Cook <keescook@chromium.org>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Liam Howlett <liam.howlett@oracle.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	David Laight <David.Laight@aculab.com>, Shunsuke Mie <mie@igel.co.jp>, 
+	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>, 
+	James Clark <james.clark@arm.com>, Nick Forrington <nick.forrington@arm.com>, 
+	Leo Yan <leo.yan@linux.dev>, German Gomez <german.gomez@arm.com>, Rob Herring <robh@kernel.org>, 
+	John Garry <john.g.garry@oracle.com>, Sean Christopherson <seanjc@google.com>, 
+	Anup Patel <anup@brainfault.org>, Fuad Tabba <tabba@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Haibo Xu <haibo1.xu@intel.com>, Peter Xu <peterx@redhat.com>, 
+	Vishal Annapurve <vannapurve@google.com>, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	llvm@lists.linux.dev, Christopher Di Bella <cjdb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 10, 2024 at 9:46=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
-> > >
-> > >   2. What is your best guess as to when KVM userfault patches will be=
- available,
-> > >      even if only in RFC form?
-> >
-> > We're aiming for the end of April for RFC with KVM/ARM support.
+On Mon, Mar 11, 2024 at 8:44=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
 >
-> Just to make sure everyone is read in on what this entails -- is this
-> the implementation that only worries about vCPUs touching non-present
-> memory, leaving the question of other UAPIs that consume guest memory
-> (e.g. GIC/ITS table save/restore) up for further discussion?
+> On Sat, Mar 09, 2024 at 06:05:08PM -0800, Ian Rogers wrote:
+> > An issue was reported with clang and llvm libc where the noinline
+> > attribute [1] was being expanded due to the #define in
+> > linux/compiler.h (now in compiler_attributes.h). The expansion caused
+> > the __attribute__ to appear twice and break the build. To avoid this
+> > conflict, rename noinline to __noinline which is more consistent with
+> > other compiler attributes.
+> >
+> > [1] https://clang.llvm.org/docs/AttributeReference.html#noinline
+>
+> Following this link, I don't see __noinline there - only __noinline__ and
+> noinline. What's up?
 
-Yes. The initial version will only support returning to userspace on
-invalid vCPU accesses with KVM_EXIT_MEMORY_FAULT. Non-vCPU accesses to
-invalid pages (e.g. GIC/ITS table save/restore) will trigger an error
-return from __gfn_to_hva_many() (which will cause the corresponding
-ioctl to fail). It will be userspace's responsibility to clear the
-invalid attribute before invoking those ioctls.
+__noinline (which is what this patch is changing the preprocessor
+define to) will not be expanded in the presence of
+__attribute__((__noinline__)), __attribute__((noinline)), or
+[[gnu::inline]], unlike the previous macro definition.
 
-For x86 we may need an blocking kernel-to-userspace notification
-mechanism for code paths in the emulator, but we'd like to investigate
-and discuss if there are any other cleaner alternatives before going
-too far down that route.
+--=20
+Thanks,
+~Nick Desaulniers
 
