@@ -1,209 +1,183 @@
-Return-Path: <kvm+bounces-11586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11587-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D92FD878832
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 19:52:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62EE7878865
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 19:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02A501C20F0B
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 18:52:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0729B2366D
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 18:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666EB54BFC;
-	Mon, 11 Mar 2024 18:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7009154F91;
+	Mon, 11 Mar 2024 18:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpuEq2nq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xey65aa7"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C3454BCC;
-	Mon, 11 Mar 2024 18:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AF053E0D
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 18:54:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710182552; cv=none; b=dLTFYNR3eGkf6H1q4Ql93r8lic4l4+mwOhrBr+VfxNU+pe1CP8VVi6+/KSS+/biuPZVV/jlrge39mGCSI1sBMTGk2vLFMvOdm5NgKej0rUPjTh7MbHLeeqp/KYYgbuh/M0kCFPDWFvJ175cKGtD2FgY5fYKJWjmDoXhBdT47aOo=
+	t=1710183287; cv=none; b=BNWFk+fO4hIVSIKTC9vsB6S2/ZVdRlqicoBmvZUragtTM2Q8FVNKVuuNBeS/lc0mg3grAInatEmUhyA11wN4/gOvopNu4mYhuBs1umirSK5oZ48HoW+IxVrd0sSkgMZKC5f7q5x76f2NexnmSXZZjyKswBoBuF+gEKnnGVTMKPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710182552; c=relaxed/simple;
-	bh=Kc9yLJoZjEazNZ+uf/PLacshqdOi5zfu6FUN3Wusjnw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pXEogzd6EpA+4BAFHYzTX0SDZqoWMgm/37+tGOpYg9Aa4erHVUKgRH41gqRToohM0E/YL8K9JyKH4SPqCHFDnIaDIVIq0S/sWGaYPSNtD/f5fk1Qz9eZqJLAIBtN/RH/EW24KBGf64K3GnKnxoIfRde+TbdNdnvDzcs2YCezjeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpuEq2nq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01AC9C433C7;
-	Mon, 11 Mar 2024 18:42:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710182552;
-	bh=Kc9yLJoZjEazNZ+uf/PLacshqdOi5zfu6FUN3Wusjnw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TpuEq2nqosdlFrvyzjeIJx7ay/njWzDEzO8GoLCEpQjeCvluXXfNKWagp0eArlqX+
-	 Klztx4s5rM55baeMyTdXF4if0iz152j5KwzUvPFSSHPV9pbq9kH49tlKtekckvX054
-	 Q1I6uWkbHkGQ7iLnBly1geygkthafXRuumbqBx3gwXlUCuWA7CiMmCtOQJmsUwU1gp
-	 pEnzCiaJuGOPn8q3DbBKYepcvkei4gMaPULuneiiZFMq0j05018UHyr8twmiSJSOf+
-	 5Txdf3aMjRfnLq3IbqAJqp8RVTrk3t2XS79tMpCNAgE1lgG0t0Uq6trNV/0KpULreF
-	 V6S8+AovemC9g==
-Date: Mon, 11 Mar 2024 18:42:27 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
-Message-ID: <420150f4-f6bf-4c23-a9b8-78651f139137@sirena.org.uk>
-References: <20240302111935.129994-1-maz@kernel.org>
- <20240302111935.129994-6-maz@kernel.org>
- <6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
- <87edcnr8zy.wl-maz@kernel.org>
- <a8416451-011c-4159-b9e4-b492b81f5a2c@sirena.org.uk>
- <86msra1emn.wl-maz@kernel.org>
- <3d731a55-300e-4a14-89bb-4effbd16b781@sirena.org.uk>
- <871q8jr7mj.wl-maz@kernel.org>
+	s=arc-20240116; t=1710183287; c=relaxed/simple;
+	bh=sg1d/ANVhdMJVWpfU8bbvkMp+uD3nzj9x9rv9aGU7ss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Li38A0c2drftaohUuBo0Cn5IK1kaqyw6w1HVMs0UJsSD9mA2PbhZ98qjTI6vq1KB/VOo2TC6j5WVdG6jNFoQMw2D56HIRLDN8HjrkZBg+km/yX5TFSLB40QHhNpj2+DC/DZWa+o3/5XtLquCnZX00S0ktzQP6lsQPpGR8A/4R78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xey65aa7; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3663528c0a5so15575ab.0
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 11:54:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710183284; x=1710788084; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9EWPj2I4xpYoZRjyOYAm/kocZbdOlLT2RiNEmzadKaY=;
+        b=xey65aa7VE1wIljt/ixV6xel+/R5udOqzmcbCiIrUaErlg1igTj+xHHwuQCYTzh9up
+         gwX6SRiXKyFi/2K6SzwjHRVVhUiSb/E6H1m293SMrMno++CElm7lah0vjw0nbxBPCKF1
+         1KggYhb+LqBJqmmZ+PjaihjMv1sfV3+JTNBadSbrM+lesNUkMK2Ws9704W07WK2+pPYc
+         6yNgIhKkmJeGhuWAccjBZ+gNrzM1cQggQKYtv4DqDvtm1uRcSM2laMjrvR4ONMWaJcGI
+         5Ebo4Df4MVwLcOu1UbbtZ/WX9SPh9X+w0fyq/yEgqaleOURfABAA6PjEc0YfhnymHV3M
+         re1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710183284; x=1710788084;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9EWPj2I4xpYoZRjyOYAm/kocZbdOlLT2RiNEmzadKaY=;
+        b=VzT8gOAIFIyrMcgL7iKfaT8C1ftlE5tw7B0Wz37eNixkK6W0uPZ2hVQTkPRRYmXRtt
+         ZMq+4v8jFIdATsCAZcm0RuTSBaHL+umE3spsN8cJhuOkcTPOCXWEM9FhGGPsOlObZNjp
+         5TDUbFL+vGCzbMu90Av8yM1lacesSiZwYEa5+TTwGdoNe3Ih7y6p3nHFzIyQ+PtBEn+m
+         by6SYhOg/G2u2YtHlHVoOmltoHNG9pEkcShLnr0GCU7ahjzpo+cFVogS9V1IXOcVlnfI
+         KmgASwlYrUJ7//hbF82iY00ULC6Rnl5A3lkXVff29OsHFNYMpiNSdZ4cpNEaOM/wjGir
+         GSTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUzKzpenJMNco//YFqtC8Xec9NFrPAzzy/IBbuq6nBZtxdk0gqMkRDOf7GKsM9mZBv+5fjfmBmAdeGcT7OZgnwlg6U8
+X-Gm-Message-State: AOJu0YydBigfviBzSiOYHtImjcZaMpqE/uFrgNSH+dL+Q5GVoqWgJYK8
+	CvAlpofYQylqXvkMt0zhZ0kTKRE/XJA7rlLwDn8Vc8CbPcPt2Hi3qgRmSaxBJjygUX60hGIr+mw
+	tu+IgQDqCT046rUPHJ9EuMDGnTPta1J6a3y3s
+X-Google-Smtp-Source: AGHT+IF9Y1AJY3TwC+yrKD+SLGX6DGVejGuk9zVLbhhSZF+Z1op/fddC1zPHT7AUjYPqnvQvkBSi2u31QCO6TEveBME=
+X-Received: by 2002:a05:6e02:1648:b0:366:444b:82d6 with SMTP id
+ v8-20020a056e02164800b00366444b82d6mr6714ilu.15.1710183283551; Mon, 11 Mar
+ 2024 11:54:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="JxquxlKQKGqK2/P1"
-Content-Disposition: inline
-In-Reply-To: <871q8jr7mj.wl-maz@kernel.org>
-X-Cookie: Sorry.  Nice try.
-
-
---JxquxlKQKGqK2/P1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240310020509.647319-1-irogers@google.com> <20240310020509.647319-3-irogers@google.com>
+ <CAEf4BzYiH6xRRLFBdUAkjn0uJP=safZod4=1EmEwTTH9PDmVvQ@mail.gmail.com>
+In-Reply-To: <CAEf4BzYiH6xRRLFBdUAkjn0uJP=safZod4=1EmEwTTH9PDmVvQ@mail.gmail.com>
+From: Ian Rogers <irogers@google.com>
+Date: Mon, 11 Mar 2024 11:54:32 -0700
+Message-ID: <CAP-5=fUQY=ho1OSk-wosw8=7Sjp8MB_kngggP00BXs+nVNj7Pg@mail.gmail.com>
+Subject: Re: [PATCH v1 02/13] libbpf: Make __printf define conditional
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Kees Cook <keescook@chromium.org>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Liam Howlett <liam.howlett@oracle.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	David Laight <David.Laight@aculab.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shunsuke Mie <mie@igel.co.jp>, 
+	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>, 
+	James Clark <james.clark@arm.com>, Nick Forrington <nick.forrington@arm.com>, 
+	Leo Yan <leo.yan@linux.dev>, German Gomez <german.gomez@arm.com>, Rob Herring <robh@kernel.org>, 
+	John Garry <john.g.garry@oracle.com>, Sean Christopherson <seanjc@google.com>, 
+	Anup Patel <anup@brainfault.org>, Fuad Tabba <tabba@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Haibo Xu <haibo1.xu@intel.com>, Peter Xu <peterx@redhat.com>, 
+	Vishal Annapurve <vannapurve@google.com>, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 09, 2024 at 11:01:56AM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+On Mon, Mar 11, 2024 at 10:49=E2=80=AFAM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Sat, Mar 9, 2024 at 6:05=E2=80=AFPM Ian Rogers <irogers@google.com> wr=
+ote:
+> >
+> > libbpf depends upon linux/err.h which has a linux/compiler.h
+> > dependency. In the kernel includes, as opposed to the tools version,
+> > linux/compiler.h includes linux/compiler_attributes.h which defines
+> > __printf. As the libbpf.c __printf definition isn't guarded by an
+> > ifndef, this leads to a duplicate definition compilation error when
+> > trying to update the tools/include/linux/compiler.h. Fix this by
+> > adding the missing ifndef.
+> >
+> > Signed-off-by: Ian Rogers <irogers@google.com>
+> > ---
+> >  tools/lib/bpf/libbpf.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> > index afd09571c482..2152360b4b18 100644
+> > --- a/tools/lib/bpf/libbpf.c
+> > +++ b/tools/lib/bpf/libbpf.c
+> > @@ -66,7 +66,9 @@
+> >   */
+> >  #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+> >
+> > -#define __printf(a, b) __attribute__((format(printf, a, b)))
+> > +#ifndef __printf
+> > +# define __printf(a, b)        __attribute__((format(printf, a, b)))
+>
+> styling nit: don't add spaces between # and define, please
+>
+> overall LGTM
+>
+> Acked-by: Andrii Nakryiko <andrii@kernel.org>
+>
+> Two questions, though.
+>
+> 1. It seems like just dropping #define __printf in libbpf.c compiles
+> fine (I checked both building libbpf directly, and BPF selftest, and
+> perf, and bpftool directly, all of them built fine). So we can
+> probably just drop this. I'll need to add __printf on Github, but
+> that's fine.
+>
+> 2. Logistics. Which tree should this patch go through? Can I land it
+> in bpf-next or it's too much inconvenience for you?
 
-> > I agree that we don't want to store multiple copies, the proposed
-> > implementation for SME does that - when converting between guest native
-> > and userspace formats we discard the original format after conversion
-> > and updates the metadata which says which format is stored.  That
-> > metadata is modeled as adding a new owner.
+Thanks Andrii,
 
-> What conversion? If userspace writes to FP, the upper bits of the SVE
-> registers should get zeroed. If it writes to SVE, it writes using the
-> current VL for the current streaming/non-streaming mode.
+dropping the #define (1) sgtm but the current compiler.h will fail to
+build libbpf.c without the later compiler.h update in this series.
+This causes another logistic issue for your point 2. Presumably if
+this patch goes through bpf-next, the first patch "tools bpf:
+Synchronize bpf.h with kernel uapi version" should also go through the
+bpf-next.
 
-> If the current userspace API doesn't give us the tools to do so, we
-> rev it.
+Thanks,
+Ian
 
-This is the conversion of vector lengths rather than something resulting
-=66rom acccessing from accessing the V registers via the sysreg interface
-(which is not supported by either upstream or the currently posted SME
-patches once either vector extension is enabled).  As previously
-mentioned the current implementation of SME support for KVM always
-presents the vector length sized registers to userspace with the maximum
-vector length, not the vector length currently selected by SVCR.
 
-> > > Nothing prevent you from storing the registers using the *current* VL,
-> > > since there is no data sharing between the SVE registers and the
-> > > streaming-SVE ones. All you need to do is to make sure you don't mix
-> > > the two.
-
-> > You seem to be suggesting modeling the streaming mode registers as a
-> > completely different set of registers in the KVM ABI.
-
-> Where are you reading this? I *never* said anything of the sort. There
-> is only one set of SVE registers. The fact that they change size and
-> get randomly zeroed when userspace flips bits is a property of the
-> architecture. The HW *can* implements them as two sets of registers if
-> SME is a separate accelerator, but that's not architectural.
-
-When you talk about there being "no data sharing" and "mixing the two"
-that sounds a lot like there might be two separate sets of data.  I've
-been inferring a lot of what you are looking for from statements that
-you make about other ideas and from the existing code and documentation
-so things are less clear than they might be and it's likely there's been
-some assumptions missed in places.  In order to try to clarify things
-I've written down a summary of what I currently understand you're
-looking for below.
-
-> All I'm saying is that you can have a *single* register file, spanning
-> both FPSIMD and SVE, using the maximum VL achievable in the guest, and
-
-When you say "using" there I take it that you mean "sized to store"
-rather than "written/accessed in the format for" since elsewhere you've
-been taking about storing the current native format and changing the VL
-in the ABI based on SVCR.SM?  I would have read "using the maximum VL
-achievable in the guest" as meaning we store in a format reflecting the
-larger VL but I'm pretty sure it's just the allocation you're
-referencing there.
-
-To be clear what I'm currently understanding for the userspace ABI is:
-
- - Create a requirement for userspace to set SVCR prior to setting any
-   vector impacted register to ensure the correct format and that data
-   isn't zeroed when SVCR is set.
- - Use the value of SVCR.SM and the guest maximum SVE and SME VLs to
-   select the currently visible vector length for the Z, P and FFR
-   registers.
- - This also implies discarding or failing all writes to ZA and ZT0
-   unless SVCR.ZA is set for consistency, though that's much less
-   impactful in terms of the implementation.
- - Add support for the V registers in the sysreg interface when SVE is
-   enabled.
-
-then the implementation can do what it likes to achieve that, the most
-obvious thing being to store in native format for the current hardware
-mode based on SVCR.{SM,ZA}.  Does that sound about right?
-
-If that's all good the main thing I'm unclear on your expectations for
-is what should happen with registers that are inaccessible in the
-current mode (Z, P and FFR when in non-streaming mode without SVE, FFR
-when in streaming mode without FA64, and ZA and ZT0 when SVCR.ZA is 0).
-Having these registers cause errors on access as they would in the
-architecture but I worry about complicating and potentially breaking the
-ABI by having enumerable but inaccessible registers, though I think
-that's more in line with your general thinking.  The main alternative
-would be RAZ/WI style behavior which isn't quite what the architecture
-does but does give what the guest would observe when it changes modes
-and looks at the contents of those registers.
-
-> be done with it. Yes, you'll have to refactor the code so that FPSIMD
-> lands at the right spot in the SVE register file. Big deal.
-
-At present the ABI just disables the V registers when SVE is enabled, I
-was slightly surprised at that implementation and was concerned there
-might be something that was considered desirable about the removal of
-ambiguity (the changelog for the relevant commit did mention that it was
-convenient to implement).
-
-> > My
-> > understanding was that it was intended that userspace should be able to
-> > do something like just enumerate all the registers, save them and then
-> > later on restore them without really understanding them.
-
-> And this statement doesn't get in the way of anything above. We own
-> the ABI, and can change it as we see fit when SME is enabled.
-
-If you're willing to require specific ordering knowledge to do guest
-state load then that makes life a bit easier for the implementation.  It
-had appeared that VMMs could have existing ABI expectations about how
-they can enumerate, store and load the state the guest implements which
-we would cause problems by breaking.
-
---JxquxlKQKGqK2/P1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXvUJIACgkQJNaLcl1U
-h9Anmwf+NQ0to9AAGq4vGRF7Im1hnws64OG/qVENspIUGMsioQEW2HD3I9OHohrP
-zgQhhMRnSn1x6crH6P68RLyyJLlROCrWQ1Rq3ipuHJT5NSW+yo9NuDzJBPJzEHrw
-V4zmc+PFlRIzMd9Wanii+FqV4Rnuplz4SqiIuIpcxDCy1x0Xw8fMSMpnTEqleJ4x
-KE/sPLuODP2lq5dft9rB51D4xDQHiSjx0HkudEatIq+RnonzVQkr0McCwesrf3RA
-q9LO68CqniGgRArxmio59ax5FCu1+9yd67E0fiJVLK5MCrE9f6e48UMtzHeHLCYU
-a6qq1AyFbaYkL5jx+7shi2Qhy9wC5Q==
-=uhWm
------END PGP SIGNATURE-----
-
---JxquxlKQKGqK2/P1--
+> > +#endif
+> >
+> >  static struct bpf_map *bpf_object__add_map(struct bpf_object *obj);
+> >  static bool prog_is_subprog(const struct bpf_object *obj, const struct=
+ bpf_program *prog);
+> > --
+> > 2.44.0.278.ge034bb2e1d-goog
+> >
 
