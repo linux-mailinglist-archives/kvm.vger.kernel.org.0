@@ -1,270 +1,255 @@
-Return-Path: <kvm+bounces-11490-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11491-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D558779FA
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 04:21:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D3B2877A3B
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 05:01:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCCF42816FC
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 03:21:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E96D1C21137
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 04:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF882570;
-	Mon, 11 Mar 2024 03:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C33E23AD;
+	Mon, 11 Mar 2024 04:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5STDrMIB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZFSRK0x"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2083.outbound.protection.outlook.com [40.107.243.83])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CF215A5;
-	Mon, 11 Mar 2024 03:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710127307; cv=fail; b=YQ8k5F7qTt3Sr6hpo2+9kJc0dIF75FfkZZCeAob0zh63x/OUJmzvCAt7jxN1CbV9vrG3LyWZwGd/QFqNPH/U0j9XmvNtzccjzD4uMPyNS55e2P7gtxDdVtR908tYD/1dbWHZXailRCwjqnxBsE5tkbs+TAzM6MdeVBlaxwhyZMI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710127307; c=relaxed/simple;
-	bh=eVa6zKJhCCp6BLH106HjwWgSTdWATjmTnVt0fVhGKnI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rgiuXnCDxmCpBV/CsLxs++nmJxvABhtQ/y13FXcIVrA1rnNrXm6Abf8gARSGaf9WYtlI5fixyi5eiJlr9QYudzdWWZxdtCOiLbUYEPH9xwvKXFT4bPJhZ/C8VOE6nrnkc29YYfXV2Mq2KFggV+/3N1DqvPyqAKEoSFuULe+t4Hw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5STDrMIB; arc=fail smtp.client-ip=40.107.243.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=My2D71n+6Vn6+Tr2OT3Chhkkwehb1DXX17fN3Axo9DW0xcJkQLEle2oZyUB/+Z2Zs9c1OXvQA6ngO90BLKUnpLqi8fxykailSV6uOCEsex31KT97/kvnTKLrd44aW8y73lp6NdU+E1zg115HPSZo48SUyunk8pH1rlQluzs090C+4M4O1Do7u9E5KjJ2sYvKTpwBmBhCamWnfbSncncS7oynt1vcuP3hYnX+LA1MpHt2BNozwt7rPhRrjmKxq1ufeB637wrWvoHCQ4Q4UXMq/bGWIml4NKuCKdh2vAyzq84f7GfgtWmG8RHx0TTxSE3dtPAH0RV2NFr40UgNZtRYHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/RCeBPSXL/h40RKQ1oEU5vFY7v22q6fL16/szpkn7ag=;
- b=XVf1xXKioXJZflmopqs8PFMTeeeYrSoOUwrnzbQWka75vPvnHGONWfFe9ZuQTVrnllAcuF5sjj9m36OwuCWP56BOOGEN3HxctSOhqqDIconbFxeCghHH/DcHfzPGyxE6o4td09QKurWhaQW76+9W3vJYI+OuylwnOoyhZTfJdJRx0q4BG3boo82XB8ARh44P093dBSA8n5H1vQuBtZnDZknWA8khw6veVI4x8d2zCFqPzN6SMTPcQSSBa6ELnw3Q2EHVFHBAVqTRltOArLJAaW6c76ND5wGclu3KHP5KySR7MS0F/rAoguI+xg5E0WK+CIgTmyXXe5NxZGW0drbGng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/RCeBPSXL/h40RKQ1oEU5vFY7v22q6fL16/szpkn7ag=;
- b=5STDrMIBVgcXUB1QnfdykX4ftL67rk85VVN7O54kO019uFtfbeB+4l51EeMwI4XPemzYTcyE6EbTetw6Kt5/5jppiCFuZm9jS2oe+ekfVQWI6EGjkG7I3umBp3+E5nPxJvirLsyGOLiWgS1npw9wARPPkIF1wKLeEO+tmmtNt0c=
-Received: from SA0PR12CA0018.namprd12.prod.outlook.com (2603:10b6:806:6f::23)
- by PH7PR12MB5976.namprd12.prod.outlook.com (2603:10b6:510:1db::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35; Mon, 11 Mar
- 2024 03:21:42 +0000
-Received: from SA2PEPF00001507.namprd04.prod.outlook.com
- (2603:10b6:806:6f:cafe::7b) by SA0PR12CA0018.outlook.office365.com
- (2603:10b6:806:6f::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35 via Frontend
- Transport; Mon, 11 Mar 2024 03:21:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF00001507.mail.protection.outlook.com (10.167.242.39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7386.12 via Frontend Transport; Mon, 11 Mar 2024 03:21:42 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sun, 10 Mar
- 2024 22:21:07 -0500
-Date: Sun, 10 Mar 2024 22:20:51 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: <isaku.yamahata@intel.com>
-CC: <kvm@vger.kernel.org>, <isaku.yamahata@gmail.com>,
-	<linux-kernel@vger.kernel.org>, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, David Matlack <dmatlack@google.com>,
-	Federico Parola <federico.parola@polito.it>
-Subject: Re: [RFC PATCH 0/8] KVM: Prepopulate guest memory API
-Message-ID: <20240311032051.prixfnqgbsohns2e@amd.com>
-References: <cover.1709288671.git.isaku.yamahata@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2773B17D2
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 04:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710129666; cv=none; b=Fw/d5VBIz3RqDSexNVbQfqhPvs0beBSAb4k1unnzkwrHM1sGtVShzHf9tJK8HfiVMLow9cqC6Br0a6zqEP/ScK7bJvYQ6h1PLOqxfvvYlx0HXawAr5nkJlfkwofQDdCP9+s7MEEO+myl3XsoYEiFvLdy52PofhahyvLGQmswgPE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710129666; c=relaxed/simple;
+	bh=rZi0TGzdyLW1WeqbJYHxPHjlp/Ci1sJz1HPaw88Nqks=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AM8Ot9A7ny2vWfRMBQ+Ny4dFBDs4Dkf9j3B/MW9RXibyCBNGe/kRpX0iRrZ1nBbKQcC80AWVp7noEn0a8xi0LbuDL+xWVwSqRJlqFp/VDOwnvazo0ukRslBdFAt7ggfReaqGKzMvWl5lf1stl3+wyK06t4YcmSWmudZVBk0v+Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cZFSRK0x; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710129663;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M2U/8cLx3dve7P4IJjHpYHx0RULwN13Wx0LsSxS6gyA=;
+	b=cZFSRK0xWKiZdPEUcCWtp6aCGldohi//gJIEqDvd1YNj1EB7m7fRhFXe07NKJVsrwNIQb9
+	XPm5r9kF9s9FSEmKlnYnc65o1qR1H73vK7zJtm81ZvSoeC7xzVnNvJOn4scUnN7xg6y/8G
+	TQjm41NMXQ8QAa4f+nErCLC5vnt619k=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-45-tO06AmL5O-6dFeQ0a3C7sg-1; Mon, 11 Mar 2024 00:01:00 -0400
+X-MC-Unique: tO06AmL5O-6dFeQ0a3C7sg-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-29bda2d3ea3so1301721a91.3
+        for <kvm@vger.kernel.org>; Sun, 10 Mar 2024 21:01:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710129660; x=1710734460;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M2U/8cLx3dve7P4IJjHpYHx0RULwN13Wx0LsSxS6gyA=;
+        b=kIypaxcJ2Wcp5v7I6qYsk2VCG+J3mwm8+x6vJgErUumBbLdsTR3oV6knViH/gmq8I3
+         OqEZU5dprZe2tU3macgT9txeSxJ1r33UeiNHln6sPfz80O/8H0ugC0Se4mivJwQDXQdt
+         lk41C3SItHaSfGqz8lX8+4b4J8/eCeklZdhw/ZKCI5nnSubZiGYzuBhvbPVHGHq8Gs4X
+         +zyhqQ1eNF9IFumM1RS5wdUs4pb0mNW7K4/Bt19ZrxsPAOoXAwHHIgWFK1AZa6E1H7iw
+         XPUOT3f76YBAvOSgBLOc0J12Vg8b/CDLSWyvyB1syAlDDEdZb9amymFXr8Ou5FdjPocR
+         RHrg==
+X-Forwarded-Encrypted: i=1; AJvYcCVGuDFJrpO+5i44uwiUVVVLl4YZ7yueenVEvrxXuvlYI9qXcKHLpudTRl5k09Oknc/GfteYauqiCF2U94u5GcyuQdTf
+X-Gm-Message-State: AOJu0YwK73QikS2OLyzYp4IqMqMBx4aWNLPS6eARhO9yOW9rWgxMj9JQ
+	E8nMsRL4WvNNkGh0SuuJFOYHdTz913BeOwbJyY9/rv/BI2r6UzURzthA88kT02V/eeWx7jvacIv
+	g/MAebIijosqmCZTpOaa0bDiPDxWcK5iUhQOmlN+J/NyZPo36eNuv0/FroshOXfwxUxzQDOxK/3
+	bN3tKULe6uw5M6lVbTS6wCJVFn
+X-Received: by 2002:a17:90a:fd92:b0:29b:bd2c:7238 with SMTP id cx18-20020a17090afd9200b0029bbd2c7238mr3908733pjb.7.1710129659789;
+        Sun, 10 Mar 2024 21:00:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFlzVpYifmiq3kPP1nBEaLaTDBKlwZXFbqzpZKku1ileIZWpeswDU4nOMch5iZXL/GpxbvnXQOshFnSjHN0OS4=
+X-Received: by 2002:a17:90a:fd92:b0:29b:bd2c:7238 with SMTP id
+ cx18-20020a17090afd9200b0029bbd2c7238mr3908714pjb.7.1710129659509; Sun, 10
+ Mar 2024 21:00:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cover.1709288671.git.isaku.yamahata@intel.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00001507:EE_|PH7PR12MB5976:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6f848bd1-74d1-4c50-10b4-08dc417a5f64
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yP4PJhjuDFUFLQ+Gl8MqA6rBe6seD25tFM1s+7rnM2ee/heqRIqgTo+ECasJjUIdiJz8T8PVRVm1ABN+VSEbhdSctp98lmJ09ekMwCS9JuCzblwOWwAr/RJbBB1FrnMSK4yGQdrZs41UTBgSZXUtubsjjF+16OVcMp3AEW3jWRkMTvI/HDRztULDjwAY+H35MGvqPkpvDGysEC4hiznQRKCx2fyaE754kZOQL5SXtyl7QoQIh0iPDvVBmjUEa+XL4MR7GQGXBEloideGR0ZWjaXPwO7X0vjT669+B/ULjeAL9bYKVdUT4RyqDPGIYZD1oalOTTwzLqrwlt2RJJLcKii1zrA15B7Xw7NA9Dz73+PD1ddyRdCIL9eo3wPueAOQiaCIvQrko4WDJHWl+3WB4A/ehw2w4WRHazlhTrUEIAd68meL7ps7v++S93qKe2vyHWaX9zuAxGDh8Gwngw8GvSE2CfEg3xWDqCWiQdo53PeMcz845h3W9TA2Ion4wYsUuOccjL0pWWgb2vOPp8sSgcymLikJm+8PtZhGziy2pgM3gs9Ag9dNYjy1mUt4tT6dN5KQNO6jqe8sd1GrolPg0ry0mk2OeKZU1HETIhTgJLHE8mVs8jyxXJqAPQ33d38Vjq+a1RlKrddvsmbvfHzP96UU6gKeRiQxtTLOWn70DQZN6cBiCxx3DxRnmVrIoOqAIsd5Zvc0rfn4scdkk57sPA==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(36860700004)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 03:21:42.1195
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f848bd1-74d1-4c50-10b4-08dc417a5f64
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00001507.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5976
+References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+ <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
+ <223aeca6435342ec8a4d57c959c23303@huawei.com> <20240301065141-mutt-send-email-mst@kernel.org>
+ <ffbe60c2732842a3b81e6ae0f58d2556@huawei.com>
+In-Reply-To: <ffbe60c2732842a3b81e6ae0f58d2556@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 11 Mar 2024 12:00:47 +0800
+Message-ID: <CACGkMEsFtJTMFVHt8pJ39Ge8nTJcsX=R_dYghz_93+_Yn--ZDQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+To: wangyunjian <wangyunjian@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"bjorn@kernel.org" <bjorn@kernel.org>, "magnus.karlsson@intel.com" <magnus.karlsson@intel.com>, 
+	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>, 
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke <xudingke@huawei.com>, 
+	"liwei (DT)" <liwei395@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 01, 2024 at 09:28:42AM -0800, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> The objective of this RFC patch series is to develop a uAPI aimed at
-> (pre)populating guest memory for various use cases and underlying VM
-> technologies.
-> 
-> - Pre-populate guest memory to mitigate excessive KVM page faults during guest
->   boot [1], a need not limited to any specific technology.
-> 
-> - Pre-populating guest memory (including encryption and measurement) for
->   confidential guests [2].  SEV-SNP, TDX, and SW-PROTECTED VM.  Potentially
->   other technologies and pKVM.
-> 
-> The patches are organized as follows.
-> - 1: documentation on uAPI KVM_MAP_MEMORY.
-> - 2: archtechture-independent implementation part.
-> - 3-4: refactoring of x86 KVM MMU as preparation.
-> - 5: x86 Helper function to map guest page.
-> - 6: x86 KVM arch implementation.
-> - 7: Add x86-ops necessary for TDX and SEV-SNP.
-> - 8: selftest for validation.
-> 
-> Discussion point:
-> 
-> uAPI design:
-> - access flags
->   Access flags are needed for the guest memory population.  We have options for
->   their exposure to uAPI.
->   - option 1. Introduce access flags, possibly with the addition of a private
->               access flag.
->   - option 2. Omit access flags from UAPI.
->     Allow the kernel to deduce the necessary flag based on the memory slot and
->     its memory attributes.
-> 
-> - SEV-SNP and byte vs. page size
->   The SEV correspondence is SEV_LAUNCH_UPDATE_DATA.  Which dictates memory
->   regions to be in 16-byte alignment, not page size.  Should we define struct
->   kvm_memory_mapping in bytes rather than page size?
+On Mon, Mar 4, 2024 at 9:45=E2=80=AFPM wangyunjian <wangyunjian@huawei.com>=
+ wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > Sent: Friday, March 1, 2024 7:53 PM
+> > To: wangyunjian <wangyunjian@huawei.com>
+> > Cc: Paolo Abeni <pabeni@redhat.com>; willemdebruijn.kernel@gmail.com;
+> > jasowang@redhat.com; kuba@kernel.org; bjorn@kernel.org;
+> > magnus.karlsson@intel.com; maciej.fijalkowski@intel.com;
+> > jonathan.lemon@gmail.com; davem@davemloft.net; bpf@vger.kernel.org;
+> > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kvm@vger.kernel.o=
+rg;
+> > virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>; liwei (=
+DT)
+> > <liwei395@huawei.com>
+> > Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+> >
+> > On Fri, Mar 01, 2024 at 11:45:52AM +0000, wangyunjian wrote:
+> > > > -----Original Message-----
+> > > > From: Paolo Abeni [mailto:pabeni@redhat.com]
+> > > > Sent: Thursday, February 29, 2024 7:13 PM
+> > > > To: wangyunjian <wangyunjian@huawei.com>; mst@redhat.com;
+> > > > willemdebruijn.kernel@gmail.com; jasowang@redhat.com;
+> > > > kuba@kernel.org; bjorn@kernel.org; magnus.karlsson@intel.com;
+> > > > maciej.fijalkowski@intel.com; jonathan.lemon@gmail.com;
+> > > > davem@davemloft.net
+> > > > Cc: bpf@vger.kernel.org; netdev@vger.kernel.org;
+> > > > linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
+> > > > virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>;
+> > > > liwei (DT) <liwei395@huawei.com>
+> > > > Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy
+> > > > support
+> > > >
+> > > > On Wed, 2024-02-28 at 19:05 +0800, Yunjian Wang wrote:
+> > > > > @@ -2661,6 +2776,54 @@ static int tun_ptr_peek_len(void *ptr)
+> > > > >         }
+> > > > >  }
+> > > > >
+> > > > > +static void tun_peek_xsk(struct tun_file *tfile) {
+> > > > > +       struct xsk_buff_pool *pool;
+> > > > > +       u32 i, batch, budget;
+> > > > > +       void *frame;
+> > > > > +
+> > > > > +       if (!ptr_ring_empty(&tfile->tx_ring))
+> > > > > +               return;
+> > > > > +
+> > > > > +       spin_lock(&tfile->pool_lock);
+> > > > > +       pool =3D tfile->xsk_pool;
+> > > > > +       if (!pool) {
+> > > > > +               spin_unlock(&tfile->pool_lock);
+> > > > > +               return;
+> > > > > +       }
+> > > > > +
+> > > > > +       if (tfile->nb_descs) {
+> > > > > +               xsk_tx_completed(pool, tfile->nb_descs);
+> > > > > +               if (xsk_uses_need_wakeup(pool))
+> > > > > +                       xsk_set_tx_need_wakeup(pool);
+> > > > > +       }
+> > > > > +
+> > > > > +       spin_lock(&tfile->tx_ring.producer_lock);
+> > > > > +       budget =3D min_t(u32, tfile->tx_ring.size, TUN_XDP_BATCH)=
+;
+> > > > > +
+> > > > > +       batch =3D xsk_tx_peek_release_desc_batch(pool, budget);
+> > > > > +       if (!batch) {
+> > > >
+> > > > This branch looks like an unneeded "optimization". The generic loop
+> > > > below should have the same effect with no measurable perf delta - a=
+nd
+> > smaller code.
+> > > > Just remove this.
+> > > >
+> > > > > +               tfile->nb_descs =3D 0;
+> > > > > +               spin_unlock(&tfile->tx_ring.producer_lock);
+> > > > > +               spin_unlock(&tfile->pool_lock);
+> > > > > +               return;
+> > > > > +       }
+> > > > > +
+> > > > > +       tfile->nb_descs =3D batch;
+> > > > > +       for (i =3D 0; i < batch; i++) {
+> > > > > +               /* Encode the XDP DESC flag into lowest bit for c=
+onsumer to
+> > differ
+> > > > > +                * XDP desc from XDP buffer and sk_buff.
+> > > > > +                */
+> > > > > +               frame =3D tun_xdp_desc_to_ptr(&pool->tx_descs[i])=
+;
+> > > > > +               /* The budget must be less than or equal to tx_ri=
+ng.size,
+> > > > > +                * so enqueuing will not fail.
+> > > > > +                */
+> > > > > +               __ptr_ring_produce(&tfile->tx_ring, frame);
+> > > > > +       }
+> > > > > +       spin_unlock(&tfile->tx_ring.producer_lock);
+> > > > > +       spin_unlock(&tfile->pool_lock);
+> > > >
+> > > > More related to the general design: it looks wrong. What if
+> > > > get_rx_bufs() will fail (ENOBUF) after successful peeking? With no
+> > > > more incoming packets, later peek will return 0 and it looks like
+> > > > that the half-processed packets will stay in the ring forever???
+> > > >
+> > > > I think the 'ring produce' part should be moved into tun_do_read().
+> > >
+> > > Currently, the vhost-net obtains a batch descriptors/sk_buffs from th=
+e
+> > > ptr_ring and enqueue the batch descriptors/sk_buffs to the
+> > > virtqueue'queue, and then consumes the descriptors/sk_buffs from the
+> > > virtqueue'queue in sequence. As a result, TUN does not know whether
+> > > the batch descriptors have been used up, and thus does not know when =
+to
+> > return the batch descriptors.
+> > >
+> > > So, I think it's reasonable that when vhost-net checks ptr_ring is
+> > > empty, it calls peek_len to get new xsk's descs and return the descri=
+ptors.
+> > >
+> > > Thanks
+> >
+> > What you need to think about is that if you peek, another call in paral=
+lel can get
+> > the same value at the same time.
+>
+> Thank you. I have identified a problem. The tx_descs array was created wi=
+thin xsk's pool.
+> When xsk is freed, the pool and tx_descs are also freed. Howerver, some d=
+escs may
+> remain in the virtqueue'queue, which could lead to a use-after-free scena=
+rio.
 
-For SNP it's multiples of page size only, and I'm not sure it's worth
-trying to work in legacy SEV support, since that pull in other
-requirements like how the backing memory also needs to be pre-pinned via
-a separate KVM ioctl that would need to be documented as an SEV-specific
-requirement for this interface... it just doesn't seem worth it. And SEV
-would still benefit from the more basic functionality of pre-mapping pages
-just like any other guest so it still benefits in that regard.
+This can probably solving by when xsk pool is disabled, signal the
+vhost_net to drop those descriptors.
 
-That said, it would be a shame if we needed to clutter up the API as
-soon as some user can along that required non-page-sized values. That
-seems unlikely for the pre-mapping use case, but for CoCo maybe it's
-worth checking if pKVM would have any requirements like that? Or just
-going with byte-size parameters to play it safe?
+Thanks
 
-> 
->   struct kvm_sev_launch_update_data {
->         __u64 uaddr;
->         __u32 len;
->   };
-> 
-> - TDX and measurement
->   The TDX correspondence is TDH.MEM.PAGE.ADD and TDH.MR.EXTEND.  TDH.MEM.EXTEND
->   extends its measurement by the page contents.
->   Option 1. Add an additional flag like KVM_MEMORY_MAPPING_FLAG_EXTEND to issue
->             TDH.MEM.EXTEND
->   Option 2. Don't handle extend. Let TDX vendor specific API
->             KVM_EMMORY_ENCRYPT_OP to handle it with the subcommand like
->             KVM_TDX_EXTEND_MEMORY.
+> Currently,
+> I do not have an idea to solve this concurrency problem and believe this =
+scenario may
+> not be appropriate for reusing the ptr_ring.
+>
+> Thanks
+>
+> >
+> >
+> > > >
+> > > > Cheers,
+> > > >
+> > > > Paolo
+> > >
+>
 
-For SNP this happens unconditionally via SNP_LAUNCH_UPDATE, and with some
-additional measurements via SNP_LAUNCH_FINISH, and down the road when live
-migration support is added that flow will be a bit different. So
-personally I think it's better to leave separate for now. Maybe down the
-road some common measurement/finalize interface can deprecate some of
-the other MEMORY_ENCRYPT ioctls.
-
-Even with this more narrowly-defined purpose it's really unfortunate we
-have to bake any CoCo stuff into this interface at all. It would be great
-if all it did was simply pre-map entries into nested page tables to boost
-boot performance, and we had some separate CoCo-specific API to handle
-intial loading/encryption of guest data. I understand with SecureEPT
-considerations why we sort of need it here for TDX, but it already ends
-up being awkward for the SNP_LAUNCH_UPDATE use-case because there's not
-really any good reason for that handling to live inside KVM MMU hooks
-like with TDX, so we'll probably end up putting it in a pre/post hook
-where all the handling is completely separate from TDX flow and in the
-process complicating the userspace API to with the additional parameters
-needed for that even though other guest types are likely to never need
-them.
-
-(Alternatively we can handle SNP_LAUNCH_UPDATE via KVM MMU hooks like with
-tdx_mem_page_add(), but then we'll need to plumb additional parameters
-down into the KVM MMU code for stuff like the SNP page type. But maybe
-it's worth it to have some level of commonality for x86 at least?)
-
-But I'd be hesitant to bake more requirements into this pre-mapping
-interface, it feels like we're already overloading it as is.
-
-> 
-> - TDX and struct kvm_memory_mapping:source
->   While the current patch series doesn't utilize
->   kvm_memory_mapping::source member.  TDX needs it to specify the source of
->   memory contents.
-
-SNP will need it too FWIW.
-
--Mike
-
-> 
-> Implementation:
-> - x86 KVM MMU
->   In x86 KVM MMU, I chose to use kvm_mmu_do_page_fault().  It's not confined to
->   KVM TDP MMU.  We can restrict it to KVM TDP MMU and introduce an optimized
->   version.
-> 
-> [1] https://lore.kernel.org/all/65262e67-7885-971a-896d-ad9c0a760907@polito.it/
-> [2] https://lore.kernel.org/all/6a4c029af70d41b63bcee3d6a1f0c2377f6eb4bd.1690322424.git.isaku.yamahata@intel.com
-> 
-> Thanks,
-> 
-> Isaku Yamahata (8):
->   KVM: Document KVM_MAP_MEMORY ioctl
->   KVM: Add KVM_MAP_MEMORY vcpu ioctl to pre-populate guest memory
->   KVM: x86/mmu: Introduce initialier macro for struct kvm_page_fault
->   KVM: x86/mmu: Factor out kvm_mmu_do_page_fault()
->   KVM: x86/mmu: Introduce kvm_mmu_map_page() for prepopulating guest
->     memory
->   KVM: x86: Implement kvm_arch_{, pre_}vcpu_map_memory()
->   KVM: x86: Add hooks in kvm_arch_vcpu_map_memory()
->   KVM: selftests: x86: Add test for KVM_MAP_MEMORY
-> 
->  Documentation/virt/kvm/api.rst                |  36 +++++
->  arch/x86/include/asm/kvm-x86-ops.h            |   2 +
->  arch/x86/include/asm/kvm_host.h               |   6 +
->  arch/x86/kvm/mmu.h                            |   3 +
->  arch/x86/kvm/mmu/mmu.c                        |  30 ++++
->  arch/x86/kvm/mmu/mmu_internal.h               |  70 +++++----
->  arch/x86/kvm/x86.c                            |  83 +++++++++++
->  include/linux/kvm_host.h                      |   4 +
->  include/uapi/linux/kvm.h                      |  15 ++
->  tools/include/uapi/linux/kvm.h                |  14 ++
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/x86_64/map_memory_test.c    | 136 ++++++++++++++++++
->  virt/kvm/kvm_main.c                           |  74 ++++++++++
->  13 files changed, 448 insertions(+), 26 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/map_memory_test.c
-> 
-> 
-> base-commit: 6a108bdc49138bcaa4f995ed87681ab9c65122ad
-> -- 
-> 2.25.1
-> 
-> 
 
