@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-11506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11507-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B23F9877B62
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 08:36:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66138877B65
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 08:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D694F1C20D90
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 07:36:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4C5B1F218BD
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 07:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296BE10A0A;
-	Mon, 11 Mar 2024 07:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9551010942;
+	Mon, 11 Mar 2024 07:38:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="is2LK21v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="divTIuJJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC89101F7
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC9E10782
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710142576; cv=none; b=A8ph+0GYokNCQdV/HPrjYwgNIubRmqJPMb51beJU8pKY5+N4+X43hcBw0lz7vv0McUi6JjyD8FFZmJDJ9/qcKbszbxEHdFbTMi3DKYRGp8qnhLEj+ujWPzzeOx5uHPO9wWksRpOKX87i5z+DNYVo9MmiMKwTULFt/wS/C1udo/k=
+	t=1710142698; cv=none; b=bgoMYF5GZ3+JdZ6hOimK4uKCRh4V/mKyP0zuDtUwsvaiMPu+6mZ8zmgDFHMMtWyJvrEjwvTXLmFn2HAGguapS1BJE3DiltO1Qe6qDlwcwI03a67XdqQX9SJbCkXpGBjNEtO+3cXjvB/L6Zm6KB8O49ARTRPAgXwRZL2rBCNyK4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710142576; c=relaxed/simple;
-	bh=ZwyyBrLsPrfkeRO/qCdBrDIYZKyn6HgHwL7Via+LdtA=;
+	s=arc-20240116; t=1710142698; c=relaxed/simple;
+	bh=TV2e/MmpgcuMkOm5Bd6slhmonWa2Puj6DcuIkBw3Pkg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jymeHOzY8Lxn7cUeRkORW2kpyV5yEquzr3lQ88U22COf90j/o3rH74GnjJqmkC7TzWA1YI7wztN2aO50jAa6bpI8TKRPYHj73+o/VeGxyX9uRQ/pu7o5rBYeRoOMXi411Te2p/RR6LkemiNWhOrrG7qq1gm53RdhpgEHPvyj7m8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=is2LK21v; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=PabTB4rciwX7u3D/fAUaAAGS4swJXexjbJcCTlay7MKgVOkSyTUrCTbZy1DIYmiP7Z1ZhxeF8gqqnecdlLChR9m8i3O+OBh0KZhiLuLhQ59JQoKfiQkgMXmLT01uaQC9ooRmpQOJ+eVhhMjmigBHU2cqEyvzu7bcseZeIIASdiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=divTIuJJ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710142573;
+	s=mimecast20190719; t=1710142696;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LZMHRbz3Q3TluA+ZN/XoJw1oDrEBRi2FsoIFf5g/d00=;
-	b=is2LK21vztTg97y6HTqez09H41YulqSIqbYcPDwxFReK3V6pGWUTJDsDJOWemYMBKucYNi
-	H2DbLf8PSvkLo35q45fqK6GeltZ89/4PieeteGUPkWT8dM+nADV64TE8TXZEdDrkP0qR7K
-	fBAnSlVyf+C6JrhxYZk0sV7OdQQFXBA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ZCx90yh96uJ9OtGCQ2JkgITu3TLMa4xU/HP5RQFSgdE=;
+	b=divTIuJJxgFlGqKudPd26fZD4OsLXFhh/3gp/W6ZZtYU0CgbNqAXNrJYsp2p6xl6HN+opw
+	/3RK65AF93E5M5LtzLvn6xpJEvSU0OGQcRkN606yWtT8AAYB0zZs50P9q37KmY25IbOIRS
+	MieQWf3yKyjHl6JIrFwQy7OfNX7RsH8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-392-mu1wQSolPdC7HLrusw5ybA-1; Mon, 11 Mar 2024 03:36:11 -0400
-X-MC-Unique: mu1wQSolPdC7HLrusw5ybA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33e78c1b314so1422142f8f.3
-        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 00:36:10 -0700 (PDT)
+ us-mta-43-D5IJNwFdMK2TBdxSS2NJeg-1; Mon, 11 Mar 2024 03:38:14 -0400
+X-MC-Unique: D5IJNwFdMK2TBdxSS2NJeg-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33e8adeffe6so633313f8f.2
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 00:38:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710142569; x=1710747369;
+        d=1e100.net; s=20230601; t=1710142693; x=1710747493;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LZMHRbz3Q3TluA+ZN/XoJw1oDrEBRi2FsoIFf5g/d00=;
-        b=q0UDkW1rsqXe6EX2uHPRFGlZ+MuiE60qbOEKocfPpHRZytgAgXybpF5UqDedrBPvUE
-         P757nejCV53nvojvViCHo6bJ6ht28Ix+09d3Efi4dd99HoRnFBfHEej7WtUcYZtwYvhS
-         2btzYQUPVhvbPRPfwHa9xVxPTDsaKog9Lq3fTnYzY8XqVg0Trzm6pAZxg4WjUywIFyXc
-         0c0J8ymaOj3iw+tiuBDLAwmP8LMsZUH1HWCz0KUffmLXq6zmQRt4KlJzn3i4pVOLZSoa
-         j7850GPJOb2XAcwhJzZGdH/s/UBF2zcYOdykDfWjWpJy2++yYDLtl2DyvURz8tSislII
-         Y9HA==
-X-Gm-Message-State: AOJu0YwXrPk/TnDKDfMZnC2JyjrY96VhARg5R+dJB0gi8PrTJp0jwPYZ
-	H3q8rbIjQDdCfahQm+m8zrbbjbevwadySoCJ2xoOG/cf20E8fm2xGds9hgTBVE0cyfiOEAxAdNP
-	9eEJuCuSMWvNrGhNAZAd9S53VNSIjmv1bpLmir1D5dBTlgNlLNRU39/bMoQ==
-X-Received: by 2002:adf:ee8c:0:b0:33e:7333:41e with SMTP id b12-20020adfee8c000000b0033e7333041emr4260959wro.11.1710142569384;
-        Mon, 11 Mar 2024 00:36:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEGnA+80vIVXmpFSNsV1K8rSwSHZO4dOGQ2TWjNGaeV7iBJ6lgek7BanByJKwojSGMFqJv4fA==
-X-Received: by 2002:adf:ee8c:0:b0:33e:7333:41e with SMTP id b12-20020adfee8c000000b0033e7333041emr4260942wro.11.1710142569014;
-        Mon, 11 Mar 2024 00:36:09 -0700 (PDT)
+        bh=ZCx90yh96uJ9OtGCQ2JkgITu3TLMa4xU/HP5RQFSgdE=;
+        b=vY3RtqGufBd9bq/AFjgi3kgnyb9yQndhTk5s1vQ/dVgOVNaUqEhvKJborHNoPQcvnS
+         AjZ3vB2PhtVy3Ph0ODVG2AtQlV3K3bYL3gTsVjphtBXVX4hD2Ol//X0nVNUqaeWbZS4V
+         x0OFV9krcdeD2hkHWF9pMYbAhMRcwVyxZYhSj7BmWQW3JFX4XlnzUoPQvzcfV9MypHDl
+         7zqRiNhxYxAk2tjZDMzafGBlifUUx/D7QFuOCZebppxj4B+xPXslVjIgitbiMpG+GWuM
+         RmvOaeKOkGpiMqawoEbD5FzUZWSb1koGA5XUb1gPE5GXcUjs6tQh7lbwALqaSZxAled1
+         /boQ==
+X-Gm-Message-State: AOJu0YzxGCctb8fJL1oVy1J7aDjuySATm5rCPI9V+b0O0hQSfha57M2R
+	/1NzcXNC1ThuVKh19GWlt8QYwTgvlULA/w1KbL5k/Dk7/mSh+UjOI/ZYjJWhxwChdwUgoEvEN75
+	uvo72/Vjbx7F0direJiX75hfij4oWxcqmSucznRGevFvw8Tq40A==
+X-Received: by 2002:a5d:56d2:0:b0:33e:745a:88f5 with SMTP id m18-20020a5d56d2000000b0033e745a88f5mr3362663wrw.57.1710142693482;
+        Mon, 11 Mar 2024 00:38:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHxnIVVoGGIdaMTxZ9ZZcgl//7B2CfcM+PI4GY4we8IWP+ixOfzGGZfeyZH4XM1aMrWKaAohg==
+X-Received: by 2002:a5d:56d2:0:b0:33e:745a:88f5 with SMTP id m18-20020a5d56d2000000b0033e745a88f5mr3362651wrw.57.1710142693185;
+        Mon, 11 Mar 2024 00:38:13 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id q11-20020adff94b000000b0033e95bf4796sm2121880wrr.27.2024.03.11.00.36.07
+        by smtp.gmail.com with ESMTPSA id q18-20020adf9dd2000000b0033e90e98886sm3032651wre.71.2024.03.11.00.38.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Mar 2024 00:36:08 -0700 (PDT)
-Message-ID: <d57f0df4-b155-4805-9121-53a9a1c23cee@redhat.com>
-Date: Mon, 11 Mar 2024 08:36:07 +0100
+        Mon, 11 Mar 2024 00:38:12 -0700 (PDT)
+Message-ID: <a1ea42a7-6670-486e-b75f-b8133efae9bb@redhat.com>
+Date: Mon, 11 Mar 2024 08:38:11 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,83 +84,72 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 1/7] vfio/pci: Disable auto-enable of exclusive INTx
- IRQ
+Subject: Re: [PATCH] vfio/platform: Convert to platform remove callback
+ returning void
 Content-Language: en-US
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, clg@redhat.com, reinette.chatre@intel.com,
- linux-kernel@vger.kernel.org, kevin.tian@intel.com, stable@vger.kernel.org
-References: <20240308230557.805580-1-alex.williamson@redhat.com>
- <20240308230557.805580-2-alex.williamson@redhat.com>
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, kernel@pengutronix.de
+References: <79d3df42fe5b359a05b8061631e72e5ed249b234.1709886922.git.u.kleine-koenig@pengutronix.de>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20240308230557.805580-2-alex.williamson@redhat.com>
+In-Reply-To: <79d3df42fe5b359a05b8061631e72e5ed249b234.1709886922.git.u.kleine-koenig@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Alex,
+Hi,
 
-On 3/9/24 00:05, Alex Williamson wrote:
-> Currently for devices requiring masking at the irqchip for INTx, ie.
-> devices without DisINTx support, the IRQ is enabled in request_irq()
-> and subsequently disabled as necessary to align with the masked status
-> flag.  This presents a window where the interrupt could fire between
-> these events, resulting in the IRQ incrementing the disable depth twice.
-> This would be unrecoverable for a user since the masked flag prevents
-> nested enables through vfio.
+On 3/8/24 09:51, Uwe Kleine-König wrote:
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
 >
-> Instead, invert the logic using IRQF_NO_AUTOEN such that exclusive INTx
-> is never auto-enabled, then unmask as required.
-> Cc: stable@vger.kernel.org
-> Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
+>
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+>
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Eric
 > ---
->  drivers/vfio/pci/vfio_pci_intrs.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
+>  drivers/vfio/platform/vfio_platform.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 237beac83809..136101179fcb 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -296,8 +296,15 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
+> diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
+> index 8cf22fa65baa..42d1462c5e19 100644
+> --- a/drivers/vfio/platform/vfio_platform.c
+> +++ b/drivers/vfio/platform/vfio_platform.c
+> @@ -85,14 +85,13 @@ static void vfio_platform_release_dev(struct vfio_device *core_vdev)
+>  	vfio_platform_release_common(vdev);
+>  }
 >  
->  	ctx->trigger = trigger;
+> -static int vfio_platform_remove(struct platform_device *pdev)
+> +static void vfio_platform_remove(struct platform_device *pdev)
+>  {
+>  	struct vfio_platform_device *vdev = dev_get_drvdata(&pdev->dev);
 >  
-> +	/*
-> +	 * Devices without DisINTx support require an exclusive interrupt,
-> +	 * IRQ masking is performed at the IRQ chip.  The masked status is
-> +	 * protected by vdev->irqlock. Setup the IRQ without auto-enable and
-> +	 * unmask as necessary below under lock.  DisINTx is unmodified by
-> +	 * the IRQ configuration and may therefore use auto-enable.
-If I remember correctly the main reason why the
-
-vdev->pci_2_3 path is left unchanged is due to the fact the irq may not be exclusive
-and setting IRQF_NO_AUTOEN could be wrong in that case. May be worth to
-precise in the commit msg or here? Besides Reviewed-by: Eric Auger
-<eric.auger@redhat.com> Eric   
-
-> +	 */
->  	if (!vdev->pci_2_3)
-> -		irqflags = 0;
-> +		irqflags = IRQF_NO_AUTOEN;
+>  	vfio_unregister_group_dev(&vdev->vdev);
+>  	pm_runtime_disable(vdev->device);
+>  	vfio_put_device(&vdev->vdev);
+> -	return 0;
+>  }
 >  
->  	ret = request_irq(pdev->irq, vfio_intx_handler,
->  			  irqflags, ctx->name, vdev);
-> @@ -308,13 +315,9 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
->  		return ret;
->  	}
+>  static const struct vfio_device_ops vfio_platform_ops = {
+> @@ -113,7 +112,7 @@ static const struct vfio_device_ops vfio_platform_ops = {
 >  
-> -	/*
-> -	 * INTx disable will stick across the new irq setup,
-> -	 * disable_irq won't.
-> -	 */
->  	spin_lock_irqsave(&vdev->irqlock, flags);
-> -	if (!vdev->pci_2_3 && ctx->masked)
-> -		disable_irq_nosync(pdev->irq);
-> +	if (!vdev->pci_2_3 && !ctx->masked)
-> +		enable_irq(pdev->irq);
->  	spin_unlock_irqrestore(&vdev->irqlock, flags);
->  
->  	return 0;
+>  static struct platform_driver vfio_platform_driver = {
+>  	.probe		= vfio_platform_probe,
+> -	.remove		= vfio_platform_remove,
+> +	.remove_new	= vfio_platform_remove,
+>  	.driver	= {
+>  		.name	= "vfio-platform",
+>  	},
+>
+> base-commit: 8ffc8b1bbd505e27e2c8439d326b6059c906c9dd
 
 
