@@ -1,115 +1,186 @@
-Return-Path: <kvm+bounces-11577-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11578-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19CC987862C
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 18:15:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA496878640
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 18:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43FA11C22232
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 17:15:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 909A21F22F0C
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 17:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A974D108;
-	Mon, 11 Mar 2024 17:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8D64D9E7;
+	Mon, 11 Mar 2024 17:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="OgbHhtDy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ztfqIqbC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DD729A9;
-	Mon, 11 Mar 2024 17:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CD94C61C
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 17:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710177345; cv=none; b=lC0lz3C7jSir1EgpdI2qfiiPp8x5QJJiKZZAneWa3QyAxbgqCw5m2L7It2MCulUbs9nqriQXK01AeMsLW3A9P3Y+5ChAU4aKReN2qHIApxtiXEMXNKc1IJxaCq4/hSlyeU775hZHn6rCPkZ0NJMtWh3jjBiuY0waTtTazJSkf+w=
+	t=1710177812; cv=none; b=YwgLHucwNKZqh2FJwSgLhOW1bdKyEQcwAhytsUo3xGSGUSUSB5VlWFZbd20nnLArQpIYR0Ou+oTXQuWie6Lk6k5zTw5AEwG8jPI8MIEx5EwKTdSfBNWjje8JFkz0u03AYarsF5DImU1FFBToBa9dru+4cm8kZJStXy+7BPhgJCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710177345; c=relaxed/simple;
-	bh=iVIU6NFyJNWSLU77UYtdSmBL6fAO1vYpAxCZgvTdLS8=;
-	h=MIME-Version:Content-Type:Date:Message-ID:CC:Subject:From:To:
-	 References:In-Reply-To; b=GcBKrOqSF8G/ngyWSV5QtWArG3gPD6lf6FzIJZqjlQHu919jJCQTcp1NqY6sOTFJ9/DprCGzMZJNcwrLT01LtBVSAwBrk/wfUaiodd4iqOE3rrrozqljm3ttZHMnT9VI+JcH4zc22nRR81ys+iBD4j5savu/19yh8HzFQw8Bz4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=OgbHhtDy; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+	s=arc-20240116; t=1710177812; c=relaxed/simple;
+	bh=yZFlhLhcrB6kOYi8DhWwE3UELCDKt6BcqMyQlgjCIUw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=g/Y/alRd+qLCoESq1Y7xgl1ebJWWU+PcEELQfQb9IwmoiN5yAvQd/sZHDicYxeZzhiPLzGoMA2QNaRIIRnZWEgG6/inVivF1cvo4jW5FAqlfdgQwq3XuaMu6lHqavZ3QUn4SZJPSyOEfUIKFjNwq4eG3HtrbAIImPGhyTDio5LY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ztfqIqbC; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dce775fa8adso7936388276.1
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 10:23:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1710177344; x=1741713344;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   cc:subject:from:to:references:in-reply-to;
-  bh=iVIU6NFyJNWSLU77UYtdSmBL6fAO1vYpAxCZgvTdLS8=;
-  b=OgbHhtDyMDj2FADfMOCJiGRWs13qJ9NY/pDHHEpaJgRDQ1wzhiUy9PPk
-   HbC1/Q4CxVJMILHPbIuq+6xCIDJmW9G0i4RN05u4lxL7KIFuiqddi+LLw
-   dxoinm/R8fwl2SQH0VmA8yPC1c3LSYgX7S+QRrdcGrq+J536b0XZN6tB9
-   8=;
-X-IronPort-AV: E=Sophos;i="6.07,117,1708387200"; 
-   d="scan'208";a="403096272"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 17:15:36 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:19422]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.37.30:2525] with esmtp (Farcaster)
- id 8ca03e87-99df-457e-b513-eae1e534586f; Mon, 11 Mar 2024 17:15:34 +0000 (UTC)
-X-Farcaster-Flow-ID: 8ca03e87-99df-457e-b513-eae1e534586f
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 11 Mar 2024 17:15:34 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Mon, 11 Mar
- 2024 17:15:30 +0000
+        d=google.com; s=20230601; t=1710177810; x=1710782610; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/HhEj7VyFIjZW59B2BWeffYMQd7D2SERuY842EgbKa4=;
+        b=ztfqIqbCzFZ/pFnoANMPCTO6KTWWGamV1tZz42QEOrkhRWh8G3wxmcTRIHsUrYwqE7
+         Lrk9rmExio4sApihshiBZ66l+u0Z+6gVWBLIBSEsDUd0b+mYKPX6hFdbo272SYcxvY6H
+         /Ft9lUy+yaHgKOH0fvFh2wH1le/LZx5MwCU880GXCd/D++qWb0I0OL93fpySu/sd2uvo
+         vkLDJVYzR/VE6+8Fk8Ac2x7KDNNrPQDnePObTsH0sy1PFFw3Vym+eebj+yWDaTEPXQ+F
+         VhcoQi67eYiTp/a0cBsfrDlQSAFEwsmb/9OTIvfy7dNHARU+MP4YV2idanzbB4Mi9brA
+         L9qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710177810; x=1710782610;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/HhEj7VyFIjZW59B2BWeffYMQd7D2SERuY842EgbKa4=;
+        b=TegvqZ1mAxGK6AHUPZBcv8MNBz55HVSw7NtmKaUmDtDgVTSynx4kaBIjSvL2bx/mJU
+         lztRMMtdxC5Zy9R2h7FsAHL4q4lPcvA2syFzLLEWcz59JyYPf4Bhbo9VmCG31uDwPkPu
+         Gn/I4XgGWfPZGSuFJ3MC2c/Uro52hqFP68S8NDn5wKLs7ZsHjgsKyBp+qmTVaxRDfIBc
+         VtIBWokkE0ZPXqvGr+dIdXdXxDHYkkkK8btLYCvcn6g4SpeJRrx0H9ihPWu+i02iB33D
+         keq7KIC4mPLDLLwwoj+Ouepu+zbogrOagW3fVSV1keRVREkXz+RbYaZ2stKFIWzTwhan
+         oKYg==
+X-Gm-Message-State: AOJu0Yzby6iWKdB2F1yHiotDZTfURsSA0Z4jI8sKXIU/UxGA6l8t5iBn
+	SXdAc8JGEXcuywxi/4eM6jU/7F6qRmx9yteCqC0uXxWY3eIX/DRL1qE+YmSrM5KfDhEwD2wxieK
+	ikQ==
+X-Google-Smtp-Source: AGHT+IG0mnBtxFHLaktut+V3gXYUB62C0a0lN7Q53NFVUdtJgunINK62Mbm+Ikuf1ZYr3tHtvitWzHlQ5kE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1889:b0:dc6:dfc6:4207 with SMTP id
+ cj9-20020a056902188900b00dc6dfc64207mr1961789ybb.10.1710177809878; Mon, 11
+ Mar 2024 10:23:29 -0700 (PDT)
+Date: Mon, 11 Mar 2024 10:23:28 -0700
+In-Reply-To: <012b59708114ba121735769de94756fa5af3204d.1709288671.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 11 Mar 2024 17:15:26 +0000
-Message-ID: <CZR39LW50A9F.1DWG2FYJ3OZP8@amazon.com>
-CC: <jalliste@amazon.co.uk>, <mhiramat@kernel.org>,
-	<akpm@linux-foundation.org>, <pmladek@suse.com>, <rdunlap@infradead.org>,
-	<tsi@tuyoix.net>, <nphamcs@gmail.com>, <gregkh@linuxfoundation.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <pbonzini@redhat.com>,
-	<seanjc@google.com>, <paulmck@kernel.org>, <nsaenz@amazon.com>
-Subject: Re: [RFC] cputime: Introduce option to force full dynticks
- accounting on NOHZ & NOHZ_IDLE CPUs
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: <frederic@kernel.org>
-X-Mailer: aerc 0.16.0-127-gec0f4a50cf77
-References: <20240219175735.33171-1-nsaenz@amazon.com>
-In-Reply-To: <20240219175735.33171-1-nsaenz@amazon.com>
-X-ClientProxiedBy: EX19D031UWA001.ant.amazon.com (10.13.139.88) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Mime-Version: 1.0
+References: <cover.1709288671.git.isaku.yamahata@intel.com> <012b59708114ba121735769de94756fa5af3204d.1709288671.git.isaku.yamahata@intel.com>
+Message-ID: <Ze8-EFtsIONMyO3o@google.com>
+Subject: Re: [RFC PATCH 2/8] KVM: Add KVM_MAP_MEMORY vcpu ioctl to
+ pre-populate guest memory
+From: Sean Christopherson <seanjc@google.com>
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, isaku.yamahata@gmail.com, 
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Michael Roth <michael.roth@amd.com>, David Matlack <dmatlack@google.com>, 
+	Federico Parola <federico.parola@polito.it>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Frederic,
+On Fri, Mar 01, 2024, isaku.yamahata@intel.com wrote:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d1fd9cb5d037..d77c9b79d76b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4419,6 +4419,69 @@ static int kvm_vcpu_ioctl_get_stats_fd(struct kvm_vcpu *vcpu)
+>  	return fd;
+>  }
+>  
+> +__weak int kvm_arch_vcpu_pre_map_memory(struct kvm_vcpu *vcpu)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +__weak int kvm_arch_vcpu_map_memory(struct kvm_vcpu *vcpu,
+> +				    struct kvm_memory_mapping *mapping)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int kvm_vcpu_map_memory(struct kvm_vcpu *vcpu,
+> +			       struct kvm_memory_mapping *mapping)
+> +{
+> +	bool added = false;
+> +	int idx, r = 0;
 
-On Mon Feb 19, 2024 at 5:57 PM UTC, Nicolas Saenz Julienne wrote:
-> Under certain extreme conditions, the tick-based cputime accounting may
-> produce inaccurate data. For instance, guest CPU usage is sensitive to
-> interrupts firing right before the tick's expiration. This forces the
-> guest into kernel context, and has that time slice wrongly accounted as
-> system time. This issue is exacerbated if the interrupt source is in
-> sync with the tick, significantly skewing usage metrics towards system
-> time.
->
-> On CPUs with full dynticks enabled, cputime accounting leverages the
-> context tracking subsystem to measure usage, and isn't susceptible to
-> this sort of race conditions. However, this imposes a bigger overhead,
-> including additional accounting and the extra dyntick tracking during
-> user<->kernel<->guest transitions (RmW + mb).
->
-> So, in order to get the best of both worlds, introduce a cputime
-> configuration option that allows using the full dynticks accounting
-> scheme on NOHZ & NOHZ_IDLE CPUs, while avoiding the expensive
-> user<->kernel<->guest dyntick transitions.
->
-> Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
-> Signed-off-by: Jack Allister <jalliste@amazon.co.uk>
-> ---
+Pointless initialization of 'r'.
 
-Would you be opposed to introducing a config option like this? Any
-alternatives you might have in mind?
+> +
+> +	if (mapping->flags & ~(KVM_MEMORY_MAPPING_FLAG_WRITE |
+> +			       KVM_MEMORY_MAPPING_FLAG_EXEC |
+> +			       KVM_MEMORY_MAPPING_FLAG_USER |
+> +			       KVM_MEMORY_MAPPING_FLAG_PRIVATE))
+> +		return -EINVAL;
+> +	if ((mapping->flags & KVM_MEMORY_MAPPING_FLAG_PRIVATE) &&
+> +	    !kvm_arch_has_private_mem(vcpu->kvm))
+> +		return -EINVAL;
+> +
+> +	/* Sanity check */
 
-Nicolas
+Pointless comment.
+
+> +	if (!IS_ALIGNED(mapping->source, PAGE_SIZE) ||
+> +	    !mapping->nr_pages ||
+
+> +	    mapping->base_gfn + mapping->nr_pages <= mapping->base_gfn)
+> +		return -EINVAL;
+> +
+> +	vcpu_load(vcpu);
+> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	r = kvm_arch_vcpu_pre_map_memory(vcpu);
+
+This hooks is unnecessary, x86's kvm_mmu_reload() is optimized for the happy path
+where the MMU is already loaded.  Just make the call from kvm_arch_vcpu_map_memory().
+
+> +	if (r)
+> +		return r;
+
+Which is a good thing, because this leaks the SRCU lock.
+
+> +
+> +	while (mapping->nr_pages) {
+> +		if (signal_pending(current)) {
+> +			r = -ERESTARTSYS;
+
+Why -ERESTARTSYS instead of -EINTR?  The latter is KVM's typical response to a
+pending signal.
+
+> +			break;
+> +		}
+> +
+> +		if (need_resched())
+
+No need to manually check need_resched(), the below is a _conditional_ resched.
+The reason KVM explicitly checks need_resched() in MMU flows is because KVM needs
+to drop mmu_lock before rescheduling, i.e. calling cond_resched() directly would
+try to schedule() while holding a spinlock.
+
+> +			cond_resched();
+> +
+> +		r = kvm_arch_vcpu_map_memory(vcpu, mapping);
+> +		if (r)
+> +			break;
+> +
+> +		added = true;
+> +	}
+> +
+> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +	vcpu_put(vcpu);
+> +
+> +	if (added && mapping->nr_pages > 0)
+> +		r = -EAGAIN;
+
+No, this clobbers 'r', which might hold a fatal error code.  I don't see any
+reason for common code to ever force -EAGAIN, it can't possibly know if trying
+again is reasonable.
+
+> +
+> +	return r;
+> +}
 
