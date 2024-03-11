@@ -1,225 +1,343 @@
-Return-Path: <kvm+bounces-11518-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11519-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5BD877CA9
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 10:26:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3035D877CAC
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 10:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F3AA28230F
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 09:26:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AEEE1F21075
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 09:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3345117BA1;
-	Mon, 11 Mar 2024 09:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52AB7179B7;
+	Mon, 11 Mar 2024 09:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lOElgtRq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jOO+QX60"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C1417548;
-	Mon, 11 Mar 2024 09:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710149185; cv=fail; b=eCVhLyqAvaDidFAPTFHBSRJDi5KrITzjOWBcx3U6JXTv8zgSZzoL+erFcdhxBsf81v2w/g0btcODhuCAgM//+fADtsxJIQ1wKrom4117QQXtDwiYdQpUy+QI7Beb7YNjXYroEqJuN04wEcmGoX7ZY8koy2iOX6iCzGCEXWEZkE4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710149185; c=relaxed/simple;
-	bh=YCNGlj83nw+S2HiJQGo8TsEC3dReQDapIJPe6doeBNA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NZGWU9lP+BovfCQdy8KMnOKmtnnj9+tb2chroJ1N7qIJLiHFFUPmn7XJIB3ucDWB2gLGKDg+bgNbMbL2+icvpR6H9xb8lpCNytJjqTZN0YzQjZjBBVdGmkQO0veY392xARf6soE3QwnxX2068w/4k+1ox8CoIhnvkJ2jli1sOH0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lOElgtRq; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710149182; x=1741685182;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=YCNGlj83nw+S2HiJQGo8TsEC3dReQDapIJPe6doeBNA=;
-  b=lOElgtRqKU6Ijfp2OXy+XoFyIqEhmvQEL6lVKGDU+6kzFy3mExcR7tSS
-   FtjU7WA4ZlHvEa5heI3cynZg0/X/4dcFCtrFCj57+wQ01pn4zzxOeFw2f
-   PRe3rluWaTuTpRkToAJ9aedaQArLh+24B+2OOuYq0xXd5/nT85V8USKg/
-   HxAiSy45WPxI6DgRhFXGlWaV7IYIU6/LX3TNAWNCnKtRPigg1Bne2L6u2
-   OZZb3/rZrIUNU0JOy6l7bOu7Y5NKVga9o2m46JJRQ1Dnf4A7cDWza5ziY
-   Gf2tvKPoV5GBO6+zT3U1JwLm7/gsf3JN5oBPagKQqQHJ2RM2jFoymTnmL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11009"; a="15440567"
-X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
-   d="scan'208";a="15440567"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 02:26:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
-   d="scan'208";a="42035044"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Mar 2024 02:26:18 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Mar 2024 02:26:17 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Mar 2024 02:26:16 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 11 Mar 2024 02:26:16 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 11 Mar 2024 02:26:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D9xC2HhcBTvC9CyFcbk9zfvMJLl+SoDqmI4EyND+uSwPj9vlRoLfjE/+vefrFbUR6cpOHXgJCAhBKxUDKvUBpFJG6htVEkRpACNuhUMPdzpH6i6LwpP7pDczG4AeOz88ARrRSrzvHWSlU2YpD9MDORsJKO9Q68h+LbEET2Lv6hgd4r0t38lCMxxZsK3rADRJchwtsyAGwh4dDqKGTbfTIw9vS265Z/h9qgj1YJUGmvCgNlckLFUr7DAIlHcnYxMuWsZrhXkueSc8dubi42/+FZl6EMd2aJS3zAgHw8dljM6BgfGaGJoAY7wxRDCWjRCYU483okmhDnskGEQZ1IBFmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YCNGlj83nw+S2HiJQGo8TsEC3dReQDapIJPe6doeBNA=;
- b=BXJPAFrepPHBXhY4Vf3I2YcWxYoH/87KroA4S9oYDRPMdryqy7DAJVJpF+3e8PJespvAtTf82ZgWDYZBfJ2NPp4KUxmub4Xkfp/Erk/Rg0XBr8k+4WZc07OJpOs70eurt0riXwfMOmC+ncHRFaf5mp6QRttyaaaXg44QO9l2DJhdbRor6OcOOkvLqd9JMW++/sUuiYBPmBUSp2WcJnvaMKSqouphRRwAqMFj11v7FJ/PSAwUqBHiMTShaQ/7+geP2KHMWBVsURyty/1yVa1fUjeInyXFDEEDYPbhZTKP92+CeBeRN5JGDuxM7sDvFfkAy9zcmE7iASwWsARmm6tsig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by CO1PR11MB5092.namprd11.prod.outlook.com (2603:10b6:303:6e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.16; Mon, 11 Mar
- 2024 09:26:15 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::39d:5a9c:c9f5:c327]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::39d:5a9c:c9f5:c327%5]) with mapi id 15.20.7386.016; Mon, 11 Mar 2024
- 09:26:14 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
-CC: "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "cohuck@redhat.com"
-	<cohuck@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>, "peterx@redhat.com"
-	<peterx@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
- Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
-	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>
-Subject: RE: [PATCH 1/8] iommu: Introduce a replace API for device pasid
-Thread-Topic: [PATCH 1/8] iommu: Introduce a replace API for device pasid
-Thread-Index: AQHaIPvLwYwLgeiapkWsYOVGHYVJTrDbbB8AgFYpTACAAVNM8A==
-Date: Mon, 11 Mar 2024 09:26:14 +0000
-Message-ID: <BN9PR11MB52766161477C2540969C83568C242@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231127063428.127436-1-yi.l.liu@intel.com>
- <20231127063428.127436-2-yi.l.liu@intel.com>
- <20240115171950.GL734935@nvidia.com>
- <c831bf5e-f623-402d-9347-8718987d1610@intel.com>
-In-Reply-To: <c831bf5e-f623-402d-9347-8718987d1610@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CO1PR11MB5092:EE_
-x-ms-office365-filtering-correlation-id: b2f5d572-797f-4755-63d1-08dc41ad4c7c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fynPnmOfw+fH98CT/zwHk+GSkQDMobH0MaSOHtyA4gyXYfAneStzYKurITIsSQlr2ER7UpLyG+dCijGGduisc3C+aks1JbItGCc8DPK6mBursibgzYkA+L4KTpGkiDgqVH8ejH3bmqGGM3XHMOVx9gDMZq58CsdQEABOKVMjUwuLB0Lna5B8ED4LJ09IbahUYGF1ufGp230iiqlGwRNiNeC3vUK1/40bPsXcIXvDFU8DKdlteTqOkmb2rj552uQ7Ky2GHdtBL4zX81pr8dlPheeJ6Ml6Nrku9FjVzni3+P8pZWWQ17U88FXto16wWBxkoHLOBqGrRjGJReU9By7+xr485sbfTrclMpA7vvcOjrS7fnHp0r/eOqMxXtFgGO+Q6HWtvPoAinN/gncW+yO6njBC6WHfWNqZm17DiqoG+iQtrwWYF4CDItyLp+xR5hHAhBtSfKSDwuIvPhrWjPFE11HD4sq3be/BnU6IsCVGlObnQCYij8mdyuAn71lI7lNWvjM1xTKx8rPyhTRBfFAlxPOMj0+uusaQX6ZRpzpGxJMGbb68ugIQiM0/uz5SbmhYzOMclI8XrDKsTaK+Z8MJYnAgfjN8uELY4ouWWYilEP5DSi9Cptt/ZrtM5iwp3x4N8h5/ixZiF+1vCmbmBPQ/m2VKNqct6MScobfMCzOhbrQ=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MjlUVTM3Z2sxdjl3VHcwdzV5YlV2SU5rbUkrN1lLWmJwYjE0ZUxHZG9McnVo?=
- =?utf-8?B?YTNLM2NSK0s3bC8ydjFkWmdiQldoS2ZBL2hLczdqdkFneU5GazlqOUY1MUU4?=
- =?utf-8?B?T1lxL1B5UHcrRVVtUzVTTENZTlA5dFcwRUpRbjZ3VVJaV1lETnZGcW01Ump1?=
- =?utf-8?B?UzgzMmF1QzNpSVppNnV6eUdZWVkwdC91RVpBQTRhUGlEU1ZJcWt1dDM3K0hW?=
- =?utf-8?B?Vk5pTnhhcjNiSDUwTGgxZEJFa2k3Y08vbnQ1T1dsQTRDc3dLelBmYlUvMUJ4?=
- =?utf-8?B?SFNZOGFuVkV4Q1hyaE1UWFU2Sysyc21IU3pHcnBPRDRQQWVpZklRK1NNaUdJ?=
- =?utf-8?B?czltdm1QbElXQlNQV2kxMU5ybFE1L0IwNW9Ma1VGZmNoVXB6WnJnU2VzQmpJ?=
- =?utf-8?B?ck9TbXZ1ekF4RnJWaTZUYUZjdUlFRHorRVBGR1dobjJ5c1pURDdiR0M2bDA5?=
- =?utf-8?B?T1dHRnBocHpJRElPc3hySCtXaDRtbTNJMnpLaVhCSHBsM2lHWkNEZ2xBekow?=
- =?utf-8?B?YzNnUXVDMXdMckV0Q3JPYVZCekZ0Y3huYnBEUTczTWdGWkFDdjM0Y01CRFFi?=
- =?utf-8?B?aU1ZZWlTK09rLzc2bjBUbmVlTHRVU2RLa3ZiL2xham5XbnJTbTJ2UEMvMktV?=
- =?utf-8?B?bXQyVzJLTVQyaEpIZWRvVGpheXYvT2ljT1lYd2xOU3VUVk5TeTJRblNsd0Rl?=
- =?utf-8?B?aVFkeUhzTkxoejlTaGhiNWFUWUlDb1BaZVhEM0hPVFpWdG11ekVOMzNzWDFu?=
- =?utf-8?B?WkxVUVI4OFlBMTlTa29EYTRXdkh3QUg4djl6eFIvSTNNWU41azRnS0wzVnBm?=
- =?utf-8?B?bmlHMlVFMDgwNXR2Z1lMV0VSa1cvRys0RFhEc2dIMG9LOHFzT3J4eHBkV2s2?=
- =?utf-8?B?UnNCRFk1SHhNeXBYUTdJUkc4eXdycFI0VThCYVBYR0N4MTYrYmJoWnBja3Na?=
- =?utf-8?B?Zk8zZzNEUXBseHM2L0RLeFMzbGFRejdid3diVVIybnUvY042RURRbWpERFlG?=
- =?utf-8?B?dWZCWlNwWlVyUThsOUlhc1pUcXpmcGx3VW1wbnpJKzN5bVdTemUyaGkrZlVo?=
- =?utf-8?B?ZnNmVTF0TmF1MklQeE9KMVlNSkRGeTRpQnZGTkM4QUh6ZWhIUWtJYk8zL2Mv?=
- =?utf-8?B?V1V4TVJxMzJXVi9vd3RJYXVvOEx2L1pkQkZVMUh4RnF1a0FZNENmNkVId09G?=
- =?utf-8?B?am5LZDhGYWEyREx0dktRY3Z2R0hNTjRzTmVzbVltSHE1enVIaEdKT1FESjBp?=
- =?utf-8?B?V09NTHczUkdrSzFLWHIreksxL3FSRTJyTUVmRWNrY3ZIclNubVdVeGRpL1Zt?=
- =?utf-8?B?b3VIMTIzdkwrd3VNTXVmdHV0ZEVvUGs0YmJESG1ZdjJnbzdWUTB5RU5nM0tH?=
- =?utf-8?B?K3N0WVN4ZWd4b1VieXNpNDl1R2s1dW5JUFYyQ0NBdEU5ZldqWmVQV2VZTWwx?=
- =?utf-8?B?cldqQ3JBUkoxamhMTllidHk3Rkx4UW1qakNhNjRxdk8weXA4bmp2d3hkMWNs?=
- =?utf-8?B?YlJuQ1hVdXF0ZXdGMSs4cHJSWDgwTTkreXVncTZmQ2JwLzBFZWpDUksvV0dW?=
- =?utf-8?B?NjNBS2lWdDFZczNhQ0NNb0VwbzNsd21NbVpPazVudWhwZ3l2bERCSGJDLzl4?=
- =?utf-8?B?SzZ6aUFhdXVlODdBd0FoR1p6c1JnUFVvZXV0TS9UQzE5d05vWVV6dkJxelVa?=
- =?utf-8?B?WlE3L2xrN2wreEk2cEVWYjlUR2FtMjhRbU1pTU5TWDVCWVB2cG56MmF5Ui9U?=
- =?utf-8?B?R3cwcHRRdlo1aHdUOTFIQmtSUTNsZjh5QWVRQ3JZN3lERDNhODJFa2hDUFNW?=
- =?utf-8?B?OWxmNjlVdzJFYTRxcXg0Und4Y1RUQlZjd25ScGFNQlJrdGNqb2dzYmU4UVo1?=
- =?utf-8?B?ZkVMM2tkdTZUdXJPTzJsRDVBUmNkdTExdkZUbE1rY1ZGckRsM1B2OXRFQlFv?=
- =?utf-8?B?bnMzNTh2NXRQd21aWlF1a0JiTHFuWUFHSHNUOWVOUTQ4TmdDTEV5THlVNlZv?=
- =?utf-8?B?dDFWY3drdEVxd2NuQXo0SXR4angzOTVnNVp5elZpR0NzSi9GK1BtNFNSM2M3?=
- =?utf-8?B?ekNOUE1yVFdKUDhpZVBDME5NUHc2T2dnUGlqUnJDTHlpZVJMQzRrNDVlbU90?=
- =?utf-8?Q?7oicmA7tELs+MMWt/ulP2NuB/?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BD617557
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 09:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710149229; cv=none; b=kyir81CvfmziSKldW+W6neD1eh1tvd9cX5A8k/y4T8oisyEfaaCFODr8Cr+k2Yw+T5TVFJ1FC5XBFisR+T4b5Cxdx+TshQLH7cGSLMPxZJVUT6S8tO6Sy2MGKJdLJO8FYNrO3i92J344wDo06MgCN+5RviELvPALl9ygQyMr9YY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710149229; c=relaxed/simple;
+	bh=lyEY/kP190mfWCxRhA4Oiyr095aRh4xG/WCZTghyHcA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m0cWuwKeRIrIEWTmcjyRUoWoQeGGcfNGRkyUm/CfKAZvuIZBDwzUmpNtTj7boLtKKb7oEY054qaC9hWkMto8udIDkFX7BO37wbmdUh60nsSOwUoVytdPJDR9YYcGbqJQxzjFASel5iJiqwGbYGfTTVL54p38EjajbV00ajx2fWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jOO+QX60; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710149226;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5yK1M+EQEYTnE/zk2rGApS6nKk3ISA1rDe7r5ZZ70CI=;
+	b=jOO+QX60We7QT/tgVF9Ni5epgxy/ar8h85ntiAGpph6g9An7oJ3Inm1MIQZEVS48uAtjOs
+	7mxy+5tJ3Mvt/RiW1OLaZouDPDg5ch7MS6QkOUvwJe5vecJ/0w0XJpnk+eN43D27HpqplT
+	Mm+GWpTOrZAQldLcF+q1T3LED1k6gY4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-52-2DH7XhtMOzSu4JQRju_nnQ-1; Mon, 11 Mar 2024 05:27:05 -0400
+X-MC-Unique: 2DH7XhtMOzSu4JQRju_nnQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-41312d583dfso17105075e9.0
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 02:27:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710149224; x=1710754024;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5yK1M+EQEYTnE/zk2rGApS6nKk3ISA1rDe7r5ZZ70CI=;
+        b=hfoc9NcSD/faoM1kBg12SYzT/19Bq8gt3Wep1e69L1QpiSSGdN/N/zW9sDdYR+VhY6
+         SEuoi5XXHIaeSfV8JYtVreAH+W8Hnc3fYfxQ5GSetSbvNySnyMw/oh5qy8vk2R15BtZl
+         twNQav0sdAnofWrUalZaKL4FA8x5//QzW4ED0TjFosEBDBd33ZlJFmeIQoLVlACqV0Q0
+         eOTns/g2DCnNzR/2JQQfR+nvt1gUcyMXj9h4pM9OUEGsUGDnbU0qi6FKXa1WTaeVtkzG
+         3aDyGmwMunH7M0XCUWGjOm31oK/jo44RAN7gM72ZLksrXn9Tyx6qU/pjRSVc/Rn0QRpj
+         nJwQ==
+X-Gm-Message-State: AOJu0YxvS2iffmH5UhtNVvvEE4PchI9YhB4lgqiZVruDCUpiez7ZzvFV
+	wigFK+58BMFtbVj5dpXjjjVJZYjbielzTsecvS1lM12bR/su3m8OiTNTiFBULxA82pRbN5tZaZn
+	KZWngPY9D8cwAaLiOfZuL8V5vQh6iloNBDqJsOe3KGEY+NX7Khw==
+X-Received: by 2002:a05:600c:19ca:b0:412:de1f:dd23 with SMTP id u10-20020a05600c19ca00b00412de1fdd23mr5105502wmq.7.1710149223830;
+        Mon, 11 Mar 2024 02:27:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH6lHRoMDaUX46Za4AIWLIXmVSXv2bmIdYL7n/uCeWGowZ1rgcWN1qvTVWvXr6sqdGSrCOevQ==
+X-Received: by 2002:a05:600c:19ca:b0:412:de1f:dd23 with SMTP id u10-20020a05600c19ca00b00412de1fdd23mr5105485wmq.7.1710149223461;
+        Mon, 11 Mar 2024 02:27:03 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id fs20-20020a05600c3f9400b004132b1385aesm1909711wmb.15.2024.03.11.02.27.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Mar 2024 02:27:02 -0700 (PDT)
+Message-ID: <15cccca9-aeb7-4886-b560-b116e2613901@redhat.com>
+Date: Mon, 11 Mar 2024 10:27:01 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2f5d572-797f-4755-63d1-08dc41ad4c7c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Mar 2024 09:26:14.8110
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nDO5saf8+gvYMbpLz4LGk7tVFyTCio3xWW226Izzb/a/A3pIqGyJRc6XhweFk2JvcXotClbD9848ficpliBNig==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5092
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v2 6/7] vfio/platform: Create persistent IRQ handlers
+Content-Language: en-US
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, clg@redhat.com, reinette.chatre@intel.com,
+ linux-kernel@vger.kernel.org, kevin.tian@intel.com, stable@vger.kernel.org
+References: <20240308230557.805580-1-alex.williamson@redhat.com>
+ <20240308230557.805580-7-alex.williamson@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20240308230557.805580-7-alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-PiBGcm9tOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gU2VudDogU3VuZGF5LCBN
-YXJjaCAxMCwgMjAyNCA5OjA2IFBNDQo+IA0KPiBPbiAyMDI0LzEvMTYgMDE6MTksIEphc29uIEd1
-bnRob3JwZSB3cm90ZToNCj4gPiBPbiBTdW4sIE5vdiAyNiwgMjAyMyBhdCAxMDozNDoyMVBNIC0w
-ODAwLCBZaSBMaXUgd3JvdGU6DQo+ID4+ICtpbnQgaW9tbXVfcmVwbGFjZV9kZXZpY2VfcGFzaWQo
-c3RydWN0IGlvbW11X2RvbWFpbiAqZG9tYWluLA0KPiA+PiArCQkJICAgICAgIHN0cnVjdCBkZXZp
-Y2UgKmRldiwgaW9hc2lkX3QgcGFzaWQpDQo+ID4+ICt7DQo+ID4+ICsJc3RydWN0IGlvbW11X2dy
-b3VwICpncm91cCA9IGRldi0+aW9tbXVfZ3JvdXA7DQo+ID4+ICsJc3RydWN0IGlvbW11X2RvbWFp
-biAqb2xkX2RvbWFpbjsNCj4gPj4gKwlpbnQgcmV0Ow0KPiA+PiArDQo+ID4+ICsJaWYgKCFkb21h
-aW4pDQo+ID4+ICsJCXJldHVybiAtRUlOVkFMOw0KPiA+PiArDQo+ID4+ICsJaWYgKCFncm91cCkN
-Cj4gPj4gKwkJcmV0dXJuIC1FTk9ERVY7DQo+ID4+ICsNCj4gPj4gKwltdXRleF9sb2NrKCZncm91
-cC0+bXV0ZXgpOw0KPiA+PiArCV9faW9tbXVfcmVtb3ZlX2dyb3VwX3Bhc2lkKGdyb3VwLCBwYXNp
-ZCk7DQo+ID4NCj4gPiBJdCBpcyBub3QgcmVwbGFjZSBpZiB5b3UgZG8gcmVtb3ZlIGZpcnN0Lg0K
-PiA+DQo+ID4gUmVwbGFjZSBtdXN0IGp1c3QgY2FsbCBzZXRfZGV2X3Bhc2lkIGFuZCBub3RoaW5n
-IG11Y2ggZWxzZS4uDQo+IA0KPiBTZWVtcyB1bmVhc3kgdG8gZG8gaXQgc28gZmFyLiBUaGUgVlQt
-ZCBkcml2ZXIgbmVlZHMgdG8gZ2V0IHRoZSBvbGQgZG9tYWluDQo+IGZpcnN0IGluIG9yZGVyIHRv
-IGRvIHJlcGxhY2VtZW50LiBIb3dldmVyLCBWVC1kIGRyaXZlciBkb2VzIG5vdCB0cmFjayB0aGUN
-Cj4gYXR0YWNoZWQgZG9tYWlucyBvZiBwYXNpZHMuIEl0IGdldHMgZG9tYWluIG9mIGEgcGFzaWQN
-Cj4gYnkgaW9tbXVfZ2V0X2RvbWFpbl9mb3JfZGV2X3Bhc2lkKCkuIExpa2UNCj4gaW50ZWxfaW9t
-bXVfcmVtb3ZlX2Rldl9wYXNpZCkNCj4gaW4gbGluayBbMV0uIFdoaWxlIHRoZSBpb21tdSBsYXll
-ciBleGNoYW5nZXMgdGhlIGRvbWFpbiBpbiB0aGUNCj4gZ3JvdXAtPnBhc2lkX2FycmF5IGJlZm9y
-ZSBjYWxsaW5nIGludG8gVlQtZCBkcml2ZXIuIFNvIHdoZW4gY2FsbGluZyBpbnRvDQo+IFZULWQg
-ZHJpdmVyLCB0aGUgZG9tYWluIGdvdCBieSBpb21tdV9nZXRfZG9tYWluX2Zvcl9kZXZfcGFzaWQo
-KSBpcw0KPiBhbHJlYWR5DQo+IHRoZSBuZXcgZG9tYWluLiBUbyBzb2x2ZSBpdCwgd2UgbWF5IG5l
-ZWQgdG8gbGV0IFZULWQgZHJpdmVyIGhhdmUgaXRzDQo+IG93biB0cmFja2luZyBvbiB0aGUgZG9t
-YWlucy4gSG93IGFib3V0IHlvdXIgdGhvdWdodHM/IEBKYXNvbiwgQEtldmluLA0KPiBAQmFvcGx1
-Pw0KPiANCj4gWzFdDQo+IGh0dHBzOi8vZ2l0aHViLmNvbS90b3J2YWxkcy9saW51eC9ibG9iL21h
-c3Rlci9kcml2ZXJzL2lvbW11L2ludGVsL2lvbW11DQo+IC5jI0w0NjIxQzE5LUw0NjIxQzIwDQo+
-IA0KDQpKYXNvbidzIHBvaW50IHdhcyB0aGF0IHRoZSBjb3JlIGhlbHBlciBzaG91bGQgZGlyZWN0
-bHkgY2FsbCBzZXRfZGV2X3Bhc2lkDQphbmQgdW5kZXJseWluZyBpb21tdSBkcml2ZXIgZGVjaWRl
-cyB3aGV0aGVyIGF0b21pYyByZXBsYWNlbWVudA0KY2FuIGJlIGltcGxlbWVudGVkIGluc2lkZSB0
-aGUgY2FsbGJhY2suIElmIHlvdSBmaXJzdCByZW1vdmUgaW4gdGhlIGNvcmUNCnRoZW4gb25lIGNh
-biBuZXZlciBpbXBsZW1lbnQgYSByZXBsYWNlIHNlbWFudGljcy4NCg==
+Hi Alex,
+
+On 3/9/24 00:05, Alex Williamson wrote:
+> The vfio-platform SET_IRQS ioctl currently allows loopback triggering of
+> an interrupt before a signaling eventfd has been configured by the user,
+> which thereby allows a NULL pointer dereference.
+>
+> Rather than register the IRQ relative to a valid trigger, register all
+> IRQs in a disabled state in the device open path.  This allows mask
+> operations on the IRQ to nest within the overall enable state governed
+> by a valid eventfd signal.  This decouples @masked, protected by the
+> @locked spinlock from @trigger, protected via the @igate mutex.
+>
+> In doing so, it's guaranteed that changes to @trigger cannot race the
+> IRQ handlers because the IRQ handler is synchronously disabled before
+> modifying the trigger, and loopback triggering of the IRQ via ioctl is
+> safe due to serialization with trigger changes via igate.
+>
+> For compatibility, request_irq() failures are maintained to be local to
+> the SET_IRQS ioctl rather than a fatal error in the open device path.
+> This allows, for example, a userspace driver with polling mode support
+> to continue to work regardless of moving the request_irq() call site.
+> This necessarily blocks all SET_IRQS access to the failed index.
+>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: stable@vger.kernel.org
+> Fixes: 57f972e2b341 ("vfio/platform: trigger an interrupt via eventfd")
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Eric
+> ---
+>  drivers/vfio/platform/vfio_platform_irq.c | 100 +++++++++++++++-------
+>  1 file changed, 68 insertions(+), 32 deletions(-)
+>
+> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+> index e5dcada9e86c..ef41ecef83af 100644
+> --- a/drivers/vfio/platform/vfio_platform_irq.c
+> +++ b/drivers/vfio/platform/vfio_platform_irq.c
+> @@ -136,6 +136,16 @@ static int vfio_platform_set_irq_unmask(struct vfio_platform_device *vdev,
+>  	return 0;
+>  }
+>  
+> +/*
+> + * The trigger eventfd is guaranteed valid in the interrupt path
+> + * and protected by the igate mutex when triggered via ioctl.
+> + */
+> +static void vfio_send_eventfd(struct vfio_platform_irq *irq_ctx)
+> +{
+> +	if (likely(irq_ctx->trigger))
+> +		eventfd_signal(irq_ctx->trigger);
+> +}
+> +
+>  static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
+>  {
+>  	struct vfio_platform_irq *irq_ctx = dev_id;
+> @@ -155,7 +165,7 @@ static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
+>  	spin_unlock_irqrestore(&irq_ctx->lock, flags);
+>  
+>  	if (ret == IRQ_HANDLED)
+> -		eventfd_signal(irq_ctx->trigger);
+> +		vfio_send_eventfd(irq_ctx);
+>  
+>  	return ret;
+>  }
+> @@ -164,52 +174,40 @@ static irqreturn_t vfio_irq_handler(int irq, void *dev_id)
+>  {
+>  	struct vfio_platform_irq *irq_ctx = dev_id;
+>  
+> -	eventfd_signal(irq_ctx->trigger);
+> +	vfio_send_eventfd(irq_ctx);
+>  
+>  	return IRQ_HANDLED;
+>  }
+>  
+>  static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+> -			    int fd, irq_handler_t handler)
+> +			    int fd)
+>  {
+>  	struct vfio_platform_irq *irq = &vdev->irqs[index];
+>  	struct eventfd_ctx *trigger;
+> -	int ret;
+>  
+>  	if (irq->trigger) {
+> -		irq_clear_status_flags(irq->hwirq, IRQ_NOAUTOEN);
+> -		free_irq(irq->hwirq, irq);
+> -		kfree(irq->name);
+> +		disable_irq(irq->hwirq);
+>  		eventfd_ctx_put(irq->trigger);
+>  		irq->trigger = NULL;
+>  	}
+>  
+>  	if (fd < 0) /* Disable only */
+>  		return 0;
+> -	irq->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-irq[%d](%s)",
+> -			      irq->hwirq, vdev->name);
+> -	if (!irq->name)
+> -		return -ENOMEM;
+>  
+>  	trigger = eventfd_ctx_fdget(fd);
+> -	if (IS_ERR(trigger)) {
+> -		kfree(irq->name);
+> +	if (IS_ERR(trigger))
+>  		return PTR_ERR(trigger);
+> -	}
+>  
+>  	irq->trigger = trigger;
+>  
+> -	irq_set_status_flags(irq->hwirq, IRQ_NOAUTOEN);
+> -	ret = request_irq(irq->hwirq, handler, 0, irq->name, irq);
+> -	if (ret) {
+> -		kfree(irq->name);
+> -		eventfd_ctx_put(trigger);
+> -		irq->trigger = NULL;
+> -		return ret;
+> -	}
+> -
+> -	if (!irq->masked)
+> -		enable_irq(irq->hwirq);
+> +	/*
+> +	 * irq->masked effectively provides nested disables within the overall
+> +	 * enable relative to trigger.  Specifically request_irq() is called
+> +	 * with NO_AUTOEN, therefore the IRQ is initially disabled.  The user
+> +	 * may only further disable the IRQ with a MASK operations because
+> +	 * irq->masked is initially false.
+> +	 */
+> +	enable_irq(irq->hwirq);
+>  
+>  	return 0;
+>  }
+> @@ -228,7 +226,7 @@ static int vfio_platform_set_irq_trigger(struct vfio_platform_device *vdev,
+>  		handler = vfio_irq_handler;
+>  
+>  	if (!count && (flags & VFIO_IRQ_SET_DATA_NONE))
+> -		return vfio_set_trigger(vdev, index, -1, handler);
+> +		return vfio_set_trigger(vdev, index, -1);
+>  
+>  	if (start != 0 || count != 1)
+>  		return -EINVAL;
+> @@ -236,7 +234,7 @@ static int vfio_platform_set_irq_trigger(struct vfio_platform_device *vdev,
+>  	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+>  		int32_t fd = *(int32_t *)data;
+>  
+> -		return vfio_set_trigger(vdev, index, fd, handler);
+> +		return vfio_set_trigger(vdev, index, fd);
+>  	}
+>  
+>  	if (flags & VFIO_IRQ_SET_DATA_NONE) {
+> @@ -260,6 +258,14 @@ int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+>  		    unsigned start, unsigned count, uint32_t flags,
+>  		    void *data) = NULL;
+>  
+> +	/*
+> +	 * For compatibility, errors from request_irq() are local to the
+> +	 * SET_IRQS path and reflected in the name pointer.  This allows,
+> +	 * for example, polling mode fallback for an exclusive IRQ failure.
+> +	 */
+> +	if (IS_ERR(vdev->irqs[index].name))
+> +		return PTR_ERR(vdev->irqs[index].name);
+> +
+>  	switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+>  	case VFIO_IRQ_SET_ACTION_MASK:
+>  		func = vfio_platform_set_irq_mask;
+> @@ -280,7 +286,7 @@ int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+>  
+>  int vfio_platform_irq_init(struct vfio_platform_device *vdev)
+>  {
+> -	int cnt = 0, i;
+> +	int cnt = 0, i, ret = 0;
+>  
+>  	while (vdev->get_irq(vdev, cnt) >= 0)
+>  		cnt++;
+> @@ -292,29 +298,54 @@ int vfio_platform_irq_init(struct vfio_platform_device *vdev)
+>  
+>  	for (i = 0; i < cnt; i++) {
+>  		int hwirq = vdev->get_irq(vdev, i);
+> +		irq_handler_t handler = vfio_irq_handler;
+>  
+> -		if (hwirq < 0)
+> +		if (hwirq < 0) {
+> +			ret = -EINVAL;
+>  			goto err;
+> +		}
+>  
+>  		spin_lock_init(&vdev->irqs[i].lock);
+>  
+>  		vdev->irqs[i].flags = VFIO_IRQ_INFO_EVENTFD;
+>  
+> -		if (irq_get_trigger_type(hwirq) & IRQ_TYPE_LEVEL_MASK)
+> +		if (irq_get_trigger_type(hwirq) & IRQ_TYPE_LEVEL_MASK) {
+>  			vdev->irqs[i].flags |= VFIO_IRQ_INFO_MASKABLE
+>  						| VFIO_IRQ_INFO_AUTOMASKED;
+> +			handler = vfio_automasked_irq_handler;
+> +		}
+>  
+>  		vdev->irqs[i].count = 1;
+>  		vdev->irqs[i].hwirq = hwirq;
+>  		vdev->irqs[i].masked = false;
+> +		vdev->irqs[i].name = kasprintf(GFP_KERNEL_ACCOUNT,
+> +					       "vfio-irq[%d](%s)", hwirq,
+> +					       vdev->name);
+> +		if (!vdev->irqs[i].name) {
+> +			ret = -ENOMEM;
+> +			goto err;
+> +		}
+> +
+> +		ret = request_irq(hwirq, handler, IRQF_NO_AUTOEN,
+> +				  vdev->irqs[i].name, &vdev->irqs[i]);
+> +		if (ret) {
+> +			kfree(vdev->irqs[i].name);
+> +			vdev->irqs[i].name = ERR_PTR(ret);
+> +		}
+>  	}
+>  
+>  	vdev->num_irqs = cnt;
+>  
+>  	return 0;
+>  err:
+> +	for (--i; i >= 0; i--) {
+> +		if (!IS_ERR(vdev->irqs[i].name)) {
+> +			free_irq(vdev->irqs[i].hwirq, &vdev->irqs[i]);
+> +			kfree(vdev->irqs[i].name);
+> +		}
+> +	}
+>  	kfree(vdev->irqs);
+> -	return -EINVAL;
+> +	return ret;
+>  }
+>  
+>  void vfio_platform_irq_cleanup(struct vfio_platform_device *vdev)
+> @@ -324,7 +355,12 @@ void vfio_platform_irq_cleanup(struct vfio_platform_device *vdev)
+>  	for (i = 0; i < vdev->num_irqs; i++) {
+>  		vfio_virqfd_disable(&vdev->irqs[i].mask);
+>  		vfio_virqfd_disable(&vdev->irqs[i].unmask);
+> -		vfio_set_trigger(vdev, i, -1, NULL);
+> +		if (!IS_ERR(vdev->irqs[i].name)) {
+> +			free_irq(vdev->irqs[i].hwirq, &vdev->irqs[i]);
+> +			if (vdev->irqs[i].trigger)
+> +				eventfd_ctx_put(vdev->irqs[i].trigger);
+> +			kfree(vdev->irqs[i].name);
+> +		}
+>  	}
+>  
+>  	vdev->num_irqs = 0;
+
 
