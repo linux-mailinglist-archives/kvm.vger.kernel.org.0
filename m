@@ -1,288 +1,228 @@
-Return-Path: <kvm+bounces-11558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11560-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B071878449
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 16:57:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 279588784D5
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 17:19:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 157171F20FA2
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:57:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A83ED1F24F2B
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 16:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E54F4597C;
-	Mon, 11 Mar 2024 15:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14794E1DD;
+	Mon, 11 Mar 2024 16:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YmdYOxDo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YEwLHWE+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE5D4207B;
-	Mon, 11 Mar 2024 15:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64114AEC3;
+	Mon, 11 Mar 2024 16:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710172614; cv=none; b=gyKNINkGsIr3/pM7UbQq282y+eQJz6SOdq7RgCmdZfKYxQGTyk0trgC9osmi+kjQdHBhyCzhX47gsKZQW7wfCAKGAb1N063Bz7CCp93JOSgbaK9/6DO0KyOQONuYw3EwH06TAwFFOoUIXWel0+5AKZBBZHL0wZsvpIGUY2gV66s=
+	t=1710173861; cv=none; b=qYghE8GeVpoqoUXW/322OwWt7K/3TypgfxT/iI+2kTnCmPSEAl7aLmeyGmukPiihxVMW3Qn8E668i3AEO+3t15dE+n31S9K2SyRsd6N846yvV0Ya4ynMzaLM2aUjLGXj8laiftB6iN+ldN2X5rKISCs0qppFWRumaCYrQzo3MOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710172614; c=relaxed/simple;
-	bh=DeVDHoqrlAAYXO82i9sgG6eEpZuSi3CQXTqHB7uSVqM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LD+IL+3Xbv37vtGn7rD+ZneYFvu2WniLCLqTlGNtgqr4VHwmV9vYnSrybGg18C529JuTRFLlSJBM1Qo4RKwDHuA2iTVZyjo51WyAjrz27B6M0yGwhw4fB/KFiA/+UyLGymuljpXMv5WZxo3bFqFqSkcExjpjGI6klNQHt3QI5Po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YmdYOxDo; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42BFsGpW014793;
-	Mon, 11 Mar 2024 15:54:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=YX+/25KQmDMtuk6beAw4gYUoyBzSATAPBx7GNiWq54Q=;
- b=YmdYOxDolyGbGPL9tNk9GWxfrU6bez1t6A6uuOAgfd3c6gPF7a8F1wV6/IEn6+LzkZJb
- mg9Hf5CQ05nV96S4Cp87LwWzUCJA3HogqsdJHQxWEYDWi4YWX2tgMekg8J2sAknj6B0H
- MM7RKnRQzTD2A9yM+iNhFtcKaFagcuiF/oIKVN22uKkHz7b42w8nG3JD+UuSEnRIxVQA
- u9duTtkS3VLU02VwH1MxYWgMrlS4Dv28MiKOO57SrmGm40faReKgcaU4jvZCBqdu298a
- h0v6nCOZ2YSRYC14JfkznihYWVDqsZIHpMGmyU+6RCcmc69cbk+fDTK2dQ1vtDl8MDqU Bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wt4p88ex0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Mar 2024 15:54:25 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42BFXPgD024404;
-	Mon, 11 Mar 2024 15:54:24 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wt4p88er3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Mar 2024 15:54:24 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42BCx5tT015485;
-	Mon, 11 Mar 2024 15:52:25 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ws2fyhk6h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Mar 2024 15:52:25 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42BFqMDW45548004
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Mar 2024 15:52:24 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0212C58053;
-	Mon, 11 Mar 2024 15:52:22 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9B30958059;
-	Mon, 11 Mar 2024 15:52:19 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.78.110])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 Mar 2024 15:52:19 +0000 (GMT)
-Message-ID: <77e02ecf8b87ab83ee6e34d1118f13c8fb83353b.camel@linux.ibm.com>
-Subject: Re: [PATCH vhost v2 1/4] virtio: find_vqs: pass struct instead of
- multi parameters
-From: Eric Farman <farman@linux.ibm.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev
-Cc: Richard Weinberger <richard@nod.at>,
-        Anton Ivanov
- <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg
- <johannes@sipsolutions.net>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Vadim
- Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck
- <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "Michael
- S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
-        platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Date: Mon, 11 Mar 2024 11:52:19 -0400
-In-Reply-To: <20240311072113.67673-2-xuanzhuo@linux.alibaba.com>
-References: <20240311072113.67673-1-xuanzhuo@linux.alibaba.com>
-	 <20240311072113.67673-2-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1710173861; c=relaxed/simple;
+	bh=dZ0oYtFBE/0c+pXjkBPcJJBxvUJ6uPY7Lm71TuKqwyo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r050mVtEi/Mp+gdf5TC0RgD/2MKxS1cKADzmWTNjZyh3tR7AZ6OXUBWlBhek8a8iLdRCSeWxhqg/zMJCclurRklRhee/9nA0tKOgAOWkq1W5ldDC7JVrG6MWuDqS0SdtP0Wb/RjxjFnd7eJwYJZUHEY14H2/I1lKz5z4ZDrNW6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YEwLHWE+; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4131b1f8c91so21100905e9.3;
+        Mon, 11 Mar 2024 09:17:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710173852; x=1710778652; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KhgroYwDHirsSK6NEpHEOPOQNxUnb5y1s4Aku7Fobs0=;
+        b=YEwLHWE+/71gjp0433qU6KzDuO7EBhtMZC7bmID5u7SJyHtDHDERtWEXDohqaREmES
+         wC26VQ+XfbQowoChSmm1CIlnnr3/9EvSBKV7cJ0vgwRJlFAAm+xDmdbTivYreEQCXc52
+         81/wN9dYGRhO6EtB/Y29T26s5/x0WyWmfSM8fyXklpOjwpjhmtmBKkXvWvPU4GwJ9851
+         ibiGlmZR1+QKtzxHdG3ZhJ6hMVby/m44ll5BoPw7nqwgNH6TJAbN8tVMLgg27JN+k+Di
+         Kh+8JvfTKuvVpXA0DENo10w03lMxXO26wNRCupqdXlv4XPLSQWzMxYOJV+1oPzo86xTs
+         fShA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710173852; x=1710778652;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KhgroYwDHirsSK6NEpHEOPOQNxUnb5y1s4Aku7Fobs0=;
+        b=eE8vL2vVmP1iddpSXU+NWY5E7zB1lJbSgfVLKI3lPE2n2N85zCz7NFiYRvDgf2R/jr
+         /qECSwLYANXihQtGvJhqNKUPD1sFw8we7ChNNEQVsVlChwpn9pmSAI1HrR5xX+0Vf6Pn
+         CEqdampYRglGB93xsJUzP8riv5fqNV/FR4z0leW3UhHIoL8yggQPKIXyRwQFM9AYzXey
+         1V4bLoT3Q/L3W7B6X+ogEso/uAoCBGfuf9NktVNCFRoaSEy/FsVyp9fpg8ek3/HpEbr2
+         dJVvhX6IvwqbbCmn4iMkDx7GEF7RJBK3A+kQhjZKxAF6KOeJEIn1DZ36CPu971Nu0Dvq
+         ahow==
+X-Forwarded-Encrypted: i=1; AJvYcCVzhotYt7sDwCVHRvXr5jcnVPSzwf5JOnFJHGRbfCpi74icD9XJXCKRtXSh6usif8M+ZaVDYK7LdfADAgG3q0dEM+5NHIrrveKuyLUPBADu98yj95z0eyHjelwcBFbC6VrKD8DJhDmKSuzJYpE5St3oYlIM3/QXLvwd
+X-Gm-Message-State: AOJu0Ywh01a4ICmWOt4DKJcgMFxeaQfTb6/k2csLiwIId5wDza84TdgL
+	3Cr+mqWXzObLFOiTIf4Q8U580zDDe2a5BkMAIKuAzqGpMit2sfKi
+X-Google-Smtp-Source: AGHT+IFOXZkK2STurIgXVxbzpgve2av/2k7r2YA7lYoWxFHnDOWhnUJF1kkXWaz1HUNUDRTofP3laA==
+X-Received: by 2002:a05:600c:5011:b0:413:2bcf:de2c with SMTP id n17-20020a05600c501100b004132bcfde2cmr1743625wmr.9.1710173852290;
+        Mon, 11 Mar 2024 09:17:32 -0700 (PDT)
+Received: from vasant-suse.suse.cz ([2001:9e8:ab47:8200:c3b9:43af:f8e1:76f9])
+        by smtp.gmail.com with ESMTPSA id ba14-20020a0560001c0e00b0033e96fe9479sm2823815wrb.89.2024.03.11.09.17.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 09:17:31 -0700 (PDT)
+From: Vasant Karasulli <vsntk18@gmail.com>
+To: x86@kernel.org
+Cc: joro@8bytes.org,
+	cfir@google.com,
+	dan.j.williams@intel.com,
+	dave.hansen@linux.intel.com,
+	ebiederm@xmission.com,
+	erdemaktas@google.com,
+	hpa@zytor.com,
+	jgross@suse.com,
+	jslaby@suse.cz,
+	keescook@chromium.org,
+	kexec@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	luto@kernel.org,
+	martin.b.radev@gmail.com,
+	mhiramat@kernel.org,
+	mstunes@vmware.com,
+	nivedita@alum.mit.edu,
+	peterz@infradead.org,
+	rientjes@google.com,
+	seanjc@google.com,
+	stable@vger.kernel.org,
+	thomas.lendacky@amd.com,
+	virtualization@lists.linux-foundation.org,
+	Vasant Karasulli <vkarasulli@suse.de>
+Subject: [PATCH v4 0/9] x86/sev: KEXEC/KDUMP support for SEV-ES guests
+Date: Mon, 11 Mar 2024 17:17:18 +0100
+Message-Id: <20240311161727.14916-1-vsntk18@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: FMt9OmBDBX8TW4TdSfNa-7EqZo2-lqc6
-X-Proofpoint-GUID: yINxBnMN9NkSpBInJ1GIjKG1RBbYvE1Y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-11_10,2024-03-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 mlxlogscore=999 mlxscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 malwarescore=0 phishscore=0 bulkscore=0
- priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311290000 definitions=main-2403110120
+Content-Transfer-Encoding: 8bit
 
-On Mon, 2024-03-11 at 15:21 +0800, Xuan Zhuo wrote:
-> Now, we pass multi parameters to find_vqs. These parameters
-> may work for transport or work for vring.
->=20
-> And find_vqs has multi implements in many places:
->=20
-> =C2=A0arch/um/drivers/virtio_uml.c
-> =C2=A0drivers/platform/mellanox/mlxbf-tmfifo.c
-> =C2=A0drivers/remoteproc/remoteproc_virtio.c
-> =C2=A0drivers/s390/virtio/virtio_ccw.c
-> =C2=A0drivers/virtio/virtio_mmio.c
-> =C2=A0drivers/virtio/virtio_pci_legacy.c
-> =C2=A0drivers/virtio/virtio_pci_modern.c
-> =C2=A0drivers/virtio/virtio_vdpa.c
->=20
-> Every time, we try to add a new parameter, that is difficult.
-> We must change every find_vqs implement.
->=20
-> One the other side, if we want to pass a parameter to vring,
-> we must change the call path from transport to vring.
-> Too many functions need to be changed.
->=20
-> So it is time to refactor the find_vqs. We pass a structure
-> cfg to find_vqs(), that will be passed to vring by transport.
->=20
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Acked-by: Johannes Berg <johannes@sipsolutions.net>
-> ---
-> =C2=A0arch/um/drivers/virtio_uml.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 23 +++----
-> =C2=A0drivers/platform/mellanox/mlxbf-tmfifo.c | 13 ++--
-> =C2=A0drivers/remoteproc/remoteproc_virtio.c=C2=A0=C2=A0 | 28 ++++-----
-> =C2=A0drivers/s390/virtio/virtio_ccw.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 | 29 +++++----
-> =C2=A0drivers/virtio/virtio_mmio.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 26 ++++----
-> =C2=A0drivers/virtio/virtio_pci_common.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 60 +++++++++---------
-> =C2=A0drivers/virtio/virtio_pci_common.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 9 +--
-> =C2=A0drivers/virtio/virtio_pci_legacy.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 11 ++--
-> =C2=A0drivers/virtio/virtio_pci_modern.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 33 ++++++----
-> =C2=A0drivers/virtio/virtio_vdpa.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 36 +++++------
-> =C2=A0include/linux/virtio_config.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 77 +++++++++++++++++++---
-> --
-> =C2=A011 files changed, 192 insertions(+), 153 deletions(-)
->=20
->=20
+From: Vasant Karasulli <vkarasulli@suse.de>
 
-...snip...
+Hi,
 
->=20
-> diff --git a/drivers/virtio/virtio_pci_modern.c
-> b/drivers/virtio/virtio_pci_modern.c
-> index f62b530aa3b5..b2cdf5d3824d 100644
-> --- a/drivers/virtio/virtio_pci_modern.c
-> +++ b/drivers/virtio/virtio_pci_modern.c
-> @@ -530,9 +530,7 @@ static bool vp_notify_with_data(struct virtqueue
-> *vq)
-> =C2=A0static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
-> =C2=A0				=C2=A0 struct virtio_pci_vq_info *info,
-> =C2=A0				=C2=A0 unsigned int index,
-> -				=C2=A0 void (*callback)(struct virtqueue
-> *vq),
-> -				=C2=A0 const char *name,
-> -				=C2=A0 bool ctx,
-> +				=C2=A0 struct virtio_vq_config *cfg,
-> =C2=A0				=C2=A0 u16 msix_vec)
-> =C2=A0{
-> =C2=A0
-> @@ -563,8 +561,11 @@ static struct virtqueue *setup_vq(struct
-> virtio_pci_device *vp_dev,
-> =C2=A0	/* create the vring */
-> =C2=A0	vq =3D vring_create_virtqueue(index, num,
-> =C2=A0				=C2=A0=C2=A0=C2=A0 SMP_CACHE_BYTES, &vp_dev->vdev,
-> -				=C2=A0=C2=A0=C2=A0 true, true, ctx,
-> -				=C2=A0=C2=A0=C2=A0 notify, callback, name);
-> +				=C2=A0=C2=A0=C2=A0 true, true,
-> +				=C2=A0=C2=A0=C2=A0 cfg->ctx ? cfg->ctx[cfg-
-> >cfg_idx] : false,
-> +				=C2=A0=C2=A0=C2=A0 notify,
-> +				=C2=A0=C2=A0=C2=A0 cfg->callbacks[cfg->cfg_idx],
-> +				=C2=A0=C2=A0=C2=A0 cfg->names[cfg->cfg_idx]);
-> =C2=A0	if (!vq)
-> =C2=A0		return ERR_PTR(-ENOMEM);
-> =C2=A0
-> @@ -593,15 +594,11 @@ static struct virtqueue *setup_vq(struct
-> virtio_pci_device *vp_dev,
-> =C2=A0	return ERR_PTR(err);
-> =C2=A0}
-> =C2=A0
-> -static int vp_modern_find_vqs(struct virtio_device *vdev, unsigned
-> int nvqs,
-> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct virtqueue *vqs[],
-> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vq_callback_t *callbacks[],
-> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char * const names[], const bool
-> *ctx,
-> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct irq_affinity *desc)
-> +static int vp_modern_find_vqs(struct virtio_device *vdev, struct
-> virtio_vq_config *cfg)
-> =C2=A0{
-> =C2=A0	struct virtio_pci_device *vp_dev =3D to_vp_device(vdev);
-> =C2=A0	struct virtqueue *vq;
-> -	int rc =3D vp_find_vqs(vdev, nvqs, vqs, callbacks, names, ctx,
-> desc);
-> +	int rc =3D vp_find_vqs(vdev, cfg);
-> =C2=A0
-> =C2=A0	if (rc)
-> =C2=A0		return rc;
-> @@ -739,10 +736,17 @@ static bool vp_get_shm_region(struct
-> virtio_device *vdev,
-> =C2=A0static int vp_modern_create_avq(struct virtio_device *vdev)
-> =C2=A0{
-> =C2=A0	struct virtio_pci_device *vp_dev =3D to_vp_device(vdev);
-> +	vq_callback_t *callbacks[] =3D { NULL };
-> +	struct virtio_vq_config cfg =3D {};
-> =C2=A0	struct virtio_pci_admin_vq *avq;
-> =C2=A0	struct virtqueue *vq;
-> +	const char *names[1];
-> =C2=A0	u16 admin_q_num;
-> =C2=A0
-> +	cfg.nvqs =3D 1;
-> +	cfg.callbacks =3D callbacks;
-> +	cfg.names =3D names;
-> +
-> =C2=A0	if (!virtio_has_feature(vdev, VIRTIO_F_ADMIN_VQ))
-> =C2=A0		return 0;
-> =C2=A0
-> @@ -753,8 +757,11 @@ static int vp_modern_create_avq(struct
-> virtio_device *vdev)
-> =C2=A0	avq =3D &vp_dev->admin_vq;
-> =C2=A0	avq->vq_index =3D vp_modern_avq_index(&vp_dev->mdev);
-> =C2=A0	sprintf(avq->name, "avq.%u", avq->vq_index);
-> -	vq =3D vp_dev->setup_vq(vp_dev, &vp_dev->admin_vq.info, avq-
-> >vq_index, NULL,
-> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 avq->name, NULL,
-> VIRTIO_MSI_NO_VECTOR);
-> +
-> +	cfg.names[0] =3D avq->name;
+here are changes to enable kexec/kdump in SEV-ES guests. The biggest
+problem for supporting kexec/kdump under SEV-ES is to find a way to
+hand the non-boot CPUs (APs) from one kernel to another.
 
-While looking at the s390 changes, I observe that the above fails to
-compile and is subsequently fixed in patch 2:
+Without SEV-ES the first kernel parks the CPUs in a HLT loop until
+they get reset by the kexec'ed kernel via an INIT-SIPI-SIPI sequence.
+For virtual machines the CPU reset is emulated by the hypervisor,
+which sets the vCPU registers back to reset state.
 
-drivers/virtio/virtio_pci_modern.c: In function =E2=80=98vp_modern_create_a=
-vq=E2=80=99:
-drivers/virtio/virtio_pci_modern.c:761:22: error: assignment of read-
-only location =E2=80=98*cfg.names=E2=80=99
-  761 |         cfg.names[0] =3D avq->name;
-      |                      ^
+This does not work under SEV-ES, because the hypervisor has no access
+to the vCPU registers and can't make modifications to them. So an
+SEV-ES guest needs to reset the vCPU itself and park it using the
+AP-reset-hold protocol. Upon wakeup the guest needs to jump to
+real-mode and to the reset-vector configured in the AP-Jump-Table.
 
+The code to do this is the main part of this patch-set. It works by
+placing code on the AP Jump-Table page itself to park the vCPU and for
+jumping to the reset vector upon wakeup. The code on the AP Jump Table
+runs in 16-bit protected mode with segment base set to the beginning
+of the page. The AP Jump-Table is usually not within the first 1MB of
+memory, so the code can't run in real-mode.
+
+The AP Jump-Table is the best place to put the parking code, because
+the memory is owned, but read-only by the firmware and writeable by
+the OS. Only the first 4 bytes are used for the reset-vector, leaving
+the rest of the page for code/data/stack to park a vCPU. The code
+can't be in kernel memory because by the time the vCPU wakes up the
+memory will be owned by the new kernel, which might have overwritten it
+already.
+
+The other patches add initial GHCB Version 2 protocol support, because
+kexec/kdump need the MSR-based (without a GHCB) AP-reset-hold VMGEXIT,
+which is a GHCB protocol version 2 feature.
+
+The kexec'ed kernel is also entered via the decompressor and needs
+MMIO support there, so this patch-set also adds MMIO #VC support to
+the decompressor and support for handling CLFLUSH instructions.
+
+Finally there is also code to disable kexec/kdump support at runtime
+when the environment does not support it (e.g. no GHCB protocol
+version 2 support or AP Jump Table over 4GB).
+
+The diffstat looks big, but most of it is moving code for MMIO #VC
+support around to make it available to the decompressor.
+
+The previous version of this patch-set can be found here:
+
+	https://lore.kernel.org/lkml/20220127101044.13803-1-joro@8bytes.org/
+
+Please review.
+
+Thanks,
+   Vasant
+
+Changes v3->v4:
+        - Rebased to v6.8 kernel
+	- Applied review comments by Sean Christopherson
+	- Combined sev_es_setup_ap_jump_table() and sev_setup_ap_jump_table()
+          into a single function which makes caching jump table address
+          unnecessary
+        - annotated struct sev_ap_jump_table_header with __packed attribute
+	- added code to set up real mode data segment at boot time instead of
+          hardcoding the value.
+
+Changes v2->v3:
+
+	- Rebased to v5.17-rc1
+	- Applied most review comments by Boris
+	- Use the name 'AP jump table' consistently
+	- Make kexec-disabling for unsupported guests x86-specific
+	- Cleanup and consolidate patches to detect GHCB v2 protocol
+	  support
+
+Joerg Roedel (9):
+  x86/kexec/64: Disable kexec when SEV-ES is active
+  x86/sev: Save and print negotiated GHCB protocol version
+  x86/sev: Set GHCB data structure version
+  x86/sev: Setup code to park APs in the AP Jump Table
+  x86/sev: Park APs on AP Jump Table with GHCB protocol version 2
+  x86/sev: Use AP Jump Table blob to stop CPU
+  x86/sev: Add MMIO handling support to boot/compressed/ code
+  x86/sev: Handle CLFLUSH MMIO events
+  x86/kexec/64: Support kexec under SEV-ES with AP Jump Table Blob
+
+ arch/x86/boot/compressed/sev.c          |  45 +-
+ arch/x86/include/asm/insn-eval.h        |   1 +
+ arch/x86/include/asm/realmode.h         |   5 +
+ arch/x86/include/asm/sev-ap-jumptable.h |  30 +
+ arch/x86/include/asm/sev.h              |   7 +
+ arch/x86/kernel/machine_kexec_64.c      |  12 +
+ arch/x86/kernel/process.c               |   8 +
+ arch/x86/kernel/sev-shared.c            | 234 +++++-
+ arch/x86/kernel/sev.c                   | 372 +++++-----
+ arch/x86/lib/insn-eval-shared.c         | 912 ++++++++++++++++++++++++
+ arch/x86/lib/insn-eval.c                | 911 +----------------------
+ arch/x86/realmode/Makefile              |   9 +-
+ arch/x86/realmode/rm/Makefile           |  11 +-
+ arch/x86/realmode/rm/header.S           |   3 +
+ arch/x86/realmode/rm/sev.S              |  85 +++
+ arch/x86/realmode/rmpiggy.S             |   6 +
+ arch/x86/realmode/sev/Makefile          |  33 +
+ arch/x86/realmode/sev/ap_jump_table.S   | 131 ++++
+ arch/x86/realmode/sev/ap_jump_table.lds |  24 +
+ 19 files changed, 1695 insertions(+), 1144 deletions(-)
+ create mode 100644 arch/x86/include/asm/sev-ap-jumptable.h
+ create mode 100644 arch/x86/lib/insn-eval-shared.c
+ create mode 100644 arch/x86/realmode/rm/sev.S
+ create mode 100644 arch/x86/realmode/sev/Makefile
+ create mode 100644 arch/x86/realmode/sev/ap_jump_table.S
+ create mode 100644 arch/x86/realmode/sev/ap_jump_table.lds
+
+
+base-commit: e8f897f4afef0031fe618a8e94127a0934896aba
+--
+2.34.1
 
 
