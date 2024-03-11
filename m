@@ -1,134 +1,157 @@
-Return-Path: <kvm+bounces-11590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D052987892D
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 20:58:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2609878960
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 21:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53AB0B21665
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 19:58:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C3172820E6
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 20:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B044F56B6A;
-	Mon, 11 Mar 2024 19:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AF956759;
+	Mon, 11 Mar 2024 20:22:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ga4H7MB+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iaFZeCiD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3B054F95;
-	Mon, 11 Mar 2024 19:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D534D9E7
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 20:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710187116; cv=none; b=fLSpYwdj/WQusaKWQB/JT0czjoqa80F6iJy7iheGBPXtOTHsp8PHLa+XpUnOJH7M6/HGyTRhx6E+J/o6PJ5ZFZrWYfAmquNlfDB9pkvyNYWurNe+vD3EJzpX/wmgqPUfBQLO82aem3vbqPr5GIvTdv3b4X5Hwxbr0O3WqyD0Fz8=
+	t=1710188559; cv=none; b=cVa1gEvhvZGEFC8Emdu7xNI9Khr9g5OImIafrc1g5VOfieuXc5lCMgq+qsWT4PRk+TKKbhWmeYlX05aoHJMjhJxUqIrRmSB1nLznfo4HDfZZGVsYAxtP6gmbHmDejLZuP3fgzWvvBaViRGzf09R0d01bxESpdNLBJEKGf5Q1CPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710187116; c=relaxed/simple;
-	bh=ssNflA7VlumiRNbQACID7MitO221/D8PNzUcKbsa064=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YYg0LoFrXRxkF7Vuq/T270Z52crJxSNj8Ik0gRidkSQPCWt+WGF31U8Mdg7sIFjKqqNof2lt1zY4TNCFm8/rNtIAPrIhj2tYJsvA6c0ngH/H5tZI8kXcWvRb+9VBqVSoriLOs1HG8X05mNChHx5Ju72jdeeMLLGvk/06hoyekRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ga4H7MB+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4714C433C7;
-	Mon, 11 Mar 2024 19:58:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710187116;
-	bh=ssNflA7VlumiRNbQACID7MitO221/D8PNzUcKbsa064=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ga4H7MB+n/UszT8fQQAyc+ZafKIC/IoT6PXlcO0UCBq+eoH1GEx/oe+cfs1WzM6E9
-	 7K1BfFeslSgIgq+An2+bRA5NGTjQKD6ZQ/35nUX7WLO6/RPlWpltiwgpApdKgojNzN
-	 uuhd/WghRDZC6KRkaajxhi08GN82/2o+tXriQTHiASR22+uFQB6FF6pn6odXas/cli
-	 AIMcBBvCG8omT6PVIcLfdRKpmjjIRCtQ9vxnBaFxs/QmBNTQjYCq+Ny5NOopW57PhH
-	 165aUX0uYO/MZqnp8tvTXi5BZurCChOZXOknCyHEWc6QxvvUwycAdIIEKxlPWZSIU7
-	 yws3clDWr5pMQ==
-Date: Mon, 11 Mar 2024 16:58:33 -0300
-From: Arnaldo Carvalho de Melo <acme@kernel.org>
-To: Ian Rogers <irogers@google.com>
-Cc: James Clark <james.clark@arm.com>, Arnd Bergmann <arnd@arndb.de>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Liam Howlett <liam.howlett@oracle.com>,
-	Miguel Ojeda <ojeda@kernel.org>, Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	David Laight <David.Laight@aculab.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Shunsuke Mie <mie@igel.co.jp>, Yafang Shao <laoar.shao@gmail.com>,
-	Kui-Feng Lee <kuifeng@meta.com>,
-	Nick Forrington <nick.forrington@arm.com>,
-	Leo Yan <leo.yan@linux.dev>, German Gomez <german.gomez@arm.com>,
-	Rob Herring <robh@kernel.org>, John Garry <john.g.garry@oracle.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Anup Patel <anup@brainfault.org>, Fuad Tabba <tabba@google.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Haibo Xu <haibo1.xu@intel.com>, Peter Xu <peterx@redhat.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-hardening@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v1 12/13] tools headers: Sync compiler.h headers
-Message-ID: <Ze9iaape_1Du4oAa@x1>
-References: <20240310020509.647319-1-irogers@google.com>
- <20240310020509.647319-13-irogers@google.com>
- <1ab20914-b6d2-fe39-7b14-c1ccebaa34f6@arm.com>
- <CAP-5=fWZVrpRufO4w-S4EcSi9STXcTAN2ERLwTSN7yrSSA-otQ@mail.gmail.com>
+	s=arc-20240116; t=1710188559; c=relaxed/simple;
+	bh=PXTxgpZmGzjgaB0iBTNVTwKqIaH2ekPNit+sP1QVzts=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FN0FKHRmRW955IfdreeTZW0g9f9azbN0bidt1SQC4BQs2KRx6OXvRVs+oj+PazxjzrwMepct3G/gxiVgeRvuDTHqo8gmaNnrByYgN5XlCCJa9mZIVnNKwJ1mSLAuWDBEEhwh93tIac8g6kChQeQIqkXkLjqhVtBdIStcGyKgJqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iaFZeCiD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710188556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LHLvc6j/leEFQxEnepP73T3VF/+cxxFUyaKJE+DM7f4=;
+	b=iaFZeCiDgrDduJLl3gPASQVG/nOv1fHRmsGvVfMRUTUMJ5Bi6PaQc+uSqs04rCmIiEle/q
+	tX6+P5rzZsMaf5c2/EIgSdMIrKuAl1u4FTQ9fCC4qg6UIS1MZTaMNBHvCdLV2ToRZbAv0D
+	hez6gYDF4IbDt+QEKMXAW9mLeDZWc4g=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-216-s1XZekS_MA6dfzI3qef5KA-1; Mon, 11 Mar 2024 16:22:34 -0400
+X-MC-Unique: s1XZekS_MA6dfzI3qef5KA-1
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3663022a5bdso36369845ab.3
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 13:22:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710188554; x=1710793354;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LHLvc6j/leEFQxEnepP73T3VF/+cxxFUyaKJE+DM7f4=;
+        b=FoaKhG4bVKzsmCm3nmw+6jQqGyUpnlSmIi2vuJ3fj48fPTbwcWDcfcvohOYHOukifi
+         8EZBhAkcv1IGu06DwLgDoUlTLoEdJoFArTLdjLw3MxHM0JmuyC9AvjVU1F1JSHP5S2Zk
+         peX4bxFKjph2h1KGj0hXrHtFJ84cQVdUOMGr66hWzWGHdhZO4y32STchLmhggV94FEEP
+         o6AC+/JO9fCGMU7P6baTjJnd9FVrJTpjB/YozUhYwDSNzugRXZHrMyH0OkQ8w/agxnK2
+         Af+0vnKn8qgBJI6148VTDBsjDsRuFUvYtCe945zJJK54jPKByTr7+U26OW7gtQrz5SJe
+         qa5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWZMCGHoP2JvQqfsXEi4GQh6IApIPK+x8OssY5lYVvOpsrMJ5mOMmTPO7p9FRlQI/CmDyNNuXqzsO16FpLfCJDtFnit
+X-Gm-Message-State: AOJu0Yz0rnGfUAMCyc47Ha8jhR+WzLFczuf/SPJR3EvSGZLZZcI2YYYC
+	qXd+arOr33W0qfSfH4wCdNlDWbVuPjWSvIuc1CAQlLML4tMoXsBLR0/f42ca3xSGd2Ux/p3n3xN
+	4gUTbfIp61JBQRpUSdUXMqCQYEsybuxRhq8AP9rrWbmni6AgchQ==
+X-Received: by 2002:a05:6e02:15c2:b0:365:1d36:91d7 with SMTP id q2-20020a056e0215c200b003651d3691d7mr1614153ilu.27.1710188554239;
+        Mon, 11 Mar 2024 13:22:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+6AYCrYloP6duQvlJoOc/JsANCrde7bA0oTqpiy2USPApJMD7r4MbFHEnlDYUpjN5qdE8zA==
+X-Received: by 2002:a05:6e02:15c2:b0:365:1d36:91d7 with SMTP id q2-20020a056e0215c200b003651d3691d7mr1614138ilu.27.1710188553999;
+        Mon, 11 Mar 2024 13:22:33 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id m2-20020a92d702000000b003641c81f897sm1920634iln.17.2024.03.11.13.22.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 13:22:33 -0700 (PDT)
+Date: Mon, 11 Mar 2024 14:22:32 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>
+Cc: Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+ kernel@pengutronix.de
+Subject: Re: [PATCH] vfio/platform: Convert to platform remove callback
+ returning void
+Message-ID: <20240311142232.59acd33e.alex.williamson@redhat.com>
+In-Reply-To: <79d3df42fe5b359a05b8061631e72e5ed249b234.1709886922.git.u.kleine-koenig@pengutronix.de>
+References: <79d3df42fe5b359a05b8061631e72e5ed249b234.1709886922.git.u.kleine-koenig@pengutronix.de>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAP-5=fWZVrpRufO4w-S4EcSi9STXcTAN2ERLwTSN7yrSSA-otQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 11, 2024 at 12:24:24PM -0700, Ian Rogers wrote:
-> 5) headers we have just so we can use shell scripts to scrape
-> constants for beautifying things in perf trace
+On Fri,  8 Mar 2024 09:51:19 +0100
+Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de> wrote:
 
-> (5) feels like the headers should be alongside the shell scripts to
-> avoid polluting tools/include.
-> Not that I propose fixing any of this here.
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
+>=20
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
+>=20
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+>=20
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+> ---
+>  drivers/vfio/platform/vfio_platform.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 
-Yeah, 5 is why we have things used just for scrapping in
-tools/perf/trace/beauty/include/, that now has just socket.h, used by
+Applied to vfio next branch for v6.9.  Thanks,
 
-⬢[acme@toolbox perf-tools-next]$ tools/perf/trace/beauty/socket.sh | head
-static const char *socket_ipproto[] = {
-	[0] = "IP",
-	[1] = "ICMP",
-	[2] = "IGMP",
-	[4] = "IPIP",
-	[6] = "TCP",
-	[8] = "EGP",
-	[12] = "PUP",
-	[17] = "UDP",
-	[22] = "IDP",
-⬢[acme@toolbox perf-tools-next]$
+Alex
 
-I'll see if I get a series moving things that are just for scrapping to
-that directory, then test on the container build images I have.
+>=20
+> diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platfor=
+m/vfio_platform.c
+> index 8cf22fa65baa..42d1462c5e19 100644
+> --- a/drivers/vfio/platform/vfio_platform.c
+> +++ b/drivers/vfio/platform/vfio_platform.c
+> @@ -85,14 +85,13 @@ static void vfio_platform_release_dev(struct vfio_dev=
+ice *core_vdev)
+>  	vfio_platform_release_common(vdev);
+>  }
+> =20
+> -static int vfio_platform_remove(struct platform_device *pdev)
+> +static void vfio_platform_remove(struct platform_device *pdev)
+>  {
+>  	struct vfio_platform_device *vdev =3D dev_get_drvdata(&pdev->dev);
+> =20
+>  	vfio_unregister_group_dev(&vdev->vdev);
+>  	pm_runtime_disable(vdev->device);
+>  	vfio_put_device(&vdev->vdev);
+> -	return 0;
+>  }
+> =20
+>  static const struct vfio_device_ops vfio_platform_ops =3D {
+> @@ -113,7 +112,7 @@ static const struct vfio_device_ops vfio_platform_ops=
+ =3D {
+> =20
+>  static struct platform_driver vfio_platform_driver =3D {
+>  	.probe		=3D vfio_platform_probe,
+> -	.remove		=3D vfio_platform_remove,
+> +	.remove_new	=3D vfio_platform_remove,
+>  	.driver	=3D {
+>  		.name	=3D "vfio-platform",
+>  	},
+>=20
+> base-commit: 8ffc8b1bbd505e27e2c8439d326b6059c906c9dd
 
-- Arnaldo
 
