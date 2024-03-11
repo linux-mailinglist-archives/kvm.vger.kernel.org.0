@@ -1,135 +1,370 @@
-Return-Path: <kvm+bounces-11556-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11557-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 499AD8783D3
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 16:35:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D36878416
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 16:44:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0025A1F22376
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:35:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C11E5282B0F
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3544144C6E;
-	Mon, 11 Mar 2024 15:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790684503F;
+	Mon, 11 Mar 2024 15:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dJwcv1pR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hExGqpMA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5414043AD8
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 15:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06F144C7E
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 15:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710171209; cv=none; b=gg9MZxv3i7mSAffu/KJbqXbLC+v4STBXifcnsgzHUybsxpX4GX2zi7bzhJkrqWBoSqz9+ruDttuujs7QnmHwjoBLk6bqehkaZLHu/XdqrlArICmwqfqG4qBy7Gsg0Duh7ipe1bx1J7LqVN9+ywshDkPDbvXh7k0pV6mLANwQf9s=
+	t=1710171854; cv=none; b=QbyaGqVceBnopfWMx4sAKTMD0obsjnraPJLPpYSWKl9Ev60250E33Fu9EstDvUZD9G1r8G1MnCvztuBvwUjbO9WIK8v3CWqSdY3FhJW3kvYYEi6G/y1VnyKvfgJ4U4sGaiZHwoleztYz1lE0S6hqS8LDyLTXHP3MB6R4KVUHhCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710171209; c=relaxed/simple;
-	bh=BgmEJ3rVgpfdYftpb1oT1hFKBsa+dHuEMI7KFS3YKKE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fybh6qJ3ethfKNW7mUPhERF2gCSZ2AnK2kBwsRANCv5VhRPuaDhvKCjqcgAHuyX5jjfaqu5raz9knugyfOTIg3733zkrYwN8obYk4JVQsf31368wNZ/eU4oVLBjigwKTU1t9WxGI6O9PUO/ZSmv8NzEh2wC9BuL8w54lpoqkG8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dJwcv1pR; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33e70d71756so2312034f8f.1
-        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 08:33:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710171205; x=1710776005; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BgmEJ3rVgpfdYftpb1oT1hFKBsa+dHuEMI7KFS3YKKE=;
-        b=dJwcv1pRXt1NEg8C6Yi1HmGKmM1bgJHlwO3TI4MW25AMUHS8M1M5SYPW2btsBfgyh7
-         mSt4zhfLAW/wjwuIXEySVOS7t/b5XIz+rRJYRAAO0ttvHXdio3VvMwqQKv8KJ48hOajd
-         EvkTyEs1vfmh5GWSDZk3Ga3Y2fQ/uHIsMr5wz3kp3mL8nOTPFFnNznGbu9wIMKHCEFhV
-         5MvMecm+GFcYyl5AAiY3huyliN44mQvXHWsLr3EZ2DtzKAPDc2z+Rlf52UQ5Rn+0rBEh
-         wQuwihdwA44f81upfJqwQKaMsWFzt0dVwQFqX3bn4MsVTsKJK4z03LRDqpWpGL2xDwUC
-         2uEA==
+	s=arc-20240116; t=1710171854; c=relaxed/simple;
+	bh=3Oa3RsGSvdw9ieQI+DuMhaX+rlnf3IE/372p879XosA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7CSADfe7Fbo4GPdUdBIxjfUdYzB4/0OGylFrVTIG3rQ+XEKj7npnZeHPdv/OhQFXtNMUlitfKHQJIcQVPa7E5XaVMAcqH8YjCyhHBOSsb4O/TZu/HWbLzpo8W9/HbwgqZvsom++slvalE0WVOKHdTqr4dGSR2416z05nH/FVuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hExGqpMA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710171852;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rjRB5OEegz21VQZYCihNrER37lmrZj8xbtZTO42XG8I=;
+	b=hExGqpMAFoqwhXMcKWAF/tUk4xfX/9GSMfOHfrUyJ0WEDWazPNWmR6hZXcA810NT09tvnZ
+	Z1JuVMZfZpjn8LIYLW6YJNziCvf9g61dTb1DNARM2tgw56ad7/43uqC9nf1HQjdUFKSnhF
+	0tJ4pHrHO0KNV+xBesa0OVN0mpXeUIg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-4iI0Snz1MBeFfvHO9IrTEw-1; Mon, 11 Mar 2024 11:44:05 -0400
+X-MC-Unique: 4iI0Snz1MBeFfvHO9IrTEw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4132cf5b950so3825145e9.0
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 08:44:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710171205; x=1710776005;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BgmEJ3rVgpfdYftpb1oT1hFKBsa+dHuEMI7KFS3YKKE=;
-        b=SumYH/sgpyirKR7uJyj8GRnK+FqDawUunwQhA3uCulchl+U4BYv7LKEeNNURYVWvWZ
-         ui7I0oENe9lotct/okhJGJ59BaPfXB/LMwS6boQfxF6nbkaGLCDVtRKqsoBG5oO2STjC
-         3g9o/nci4++sUA9czFAd/xlUxAzdmd2cmh5R28hL4cZT8agYXF5ADKV29jmjhr9TLlX4
-         Z1vbely/V/6Vl1Roc8SYeKB91N47dCkcZoxtF4NYU5JwlebAj5m/S2jszZ09oitxCeLn
-         x9PmBl6n6yBiOQ3pvjEOFA5NVTG1vRWtcC4q7D/F8SA9YH+yPV0Nxr/Jzgilfr2pywi5
-         JrDg==
-X-Forwarded-Encrypted: i=1; AJvYcCXrO9u9pgDLDi4Sr+JEYoCc4s/kVBSVMrLiaEnirLzUSm9wL+O34gRJrQAak7YOCDrXSWc+Jh5VK10Mal9Ne8LAOCZu
-X-Gm-Message-State: AOJu0YygVixX7mF8MgHEt54qL27QCzH0MaqvdiEjOH5hPt6lJCbZsZrT
-	GpXKzZLA4p75/axDeEafK6hxCgNmFgKCx4zjra9ZZuGWy6EdJhSsjjADFsIiTmTE8iudqvbiRt1
-	iYGJdG2X0Tf38c1U29zDUzrVBbCzQ8O18zlEN
-X-Google-Smtp-Source: AGHT+IE/th4Pg/GBs04QnTLC4gySgD/Ced3Hwsh9xlJGW37qnBqN80Ztb15KeaRy40uSPOSKwYSAYx2WXmVslFbnrPM=
-X-Received: by 2002:a5d:6751:0:b0:33e:1f2b:8cc5 with SMTP id
- l17-20020a5d6751000000b0033e1f2b8cc5mr6816452wrw.0.1710171205375; Mon, 11 Mar
- 2024 08:33:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710171844; x=1710776644;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rjRB5OEegz21VQZYCihNrER37lmrZj8xbtZTO42XG8I=;
+        b=DDlMRtLOzYuoMaphRK2x3R6ocO5A+Vf+p5LdFyxxmQILyOIovOQ/ugSVY94PWVqhI5
+         J48DiscejHyrkDT4AEBStYN4ze1yksuneLn5jhXTULCXkumqQVU1kE2xL5+wkj/Jdj5e
+         6uE0lQPj15h5JarXttWCdK6Ba0VRCPgJUL4Ult9JDQbcDBGzRtRP6gQGXoqoZfWmY9DJ
+         BUujSgohoYRKUJCGTlW8u/KXvM5xtm8UWqmlHxgMyUVczUxa1qvebAyUJYjIoPF1pmg+
+         MTTKb8l+iCxzGsyLpjMsINSdTcaP6nqnaucs1rWh2udYj5X6j4x07sYNjFLxu8n5QzBw
+         LpIA==
+X-Forwarded-Encrypted: i=1; AJvYcCWZ0fH8lfwQpVc3ZSmvu7OusSDdMIVc+r8tTqMAdTK5QKnsEKacS3ShuCv97EnS0rhladwaYeJYX2fPyNlFndewh/sb
+X-Gm-Message-State: AOJu0YzPxzpg5Ic9kHT5eXo1NKOnyouiFZfpmvFsbpEdcpLX3G9y9KFq
+	m+mHsBfYjtfF3YWpiMuJ+O7JSZv6tQHiZ5foaHzyl1FyH+TtSFbGmltr2wmHH6YS8nqsqlVEZ0c
+	4iFHrSwPlIFgiWb4rU/CgG0J2BZ4zxFIOKCjV4PYD7sdFN0Umfg==
+X-Received: by 2002:a05:600c:4f50:b0:412:ee33:db93 with SMTP id m16-20020a05600c4f5000b00412ee33db93mr6522990wmq.3.1710171843983;
+        Mon, 11 Mar 2024 08:44:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE/5sktpvpegVaASCOlK5EL5Vy2leF+9Us9Eqe6bRgnyxbBqI746LRD6lji5z/jRDmgA1oOjQ==
+X-Received: by 2002:a05:600c:4f50:b0:412:ee33:db93 with SMTP id m16-20020a05600c4f5000b00412ee33db93mr6522955wmq.3.1710171843276;
+        Mon, 11 Mar 2024 08:44:03 -0700 (PDT)
+Received: from redhat.com ([2.52.134.16])
+        by smtp.gmail.com with ESMTPSA id fc20-20020a05600c525400b00412ae4b45b3sm15756072wmb.30.2024.03.11.08.43.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 08:44:02 -0700 (PDT)
+Date: Mon, 11 Mar 2024 11:43:54 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Ian Rogers <irogers@google.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Liam Howlett <liam.howlett@oracle.com>,
+	Miguel Ojeda <ojeda@kernel.org>, Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	David Laight <David.Laight@aculab.com>,
+	Shunsuke Mie <mie@igel.co.jp>, Yafang Shao <laoar.shao@gmail.com>,
+	Kui-Feng Lee <kuifeng@meta.com>, James Clark <james.clark@arm.com>,
+	Nick Forrington <nick.forrington@arm.com>,
+	Leo Yan <leo.yan@linux.dev>, German Gomez <german.gomez@arm.com>,
+	Rob Herring <robh@kernel.org>, John Garry <john.g.garry@oracle.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Anup Patel <anup@brainfault.org>, Fuad Tabba <tabba@google.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Haibo Xu <haibo1.xu@intel.com>, Peter Xu <peterx@redhat.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-hardening@vger.kernel.org, llvm@lists.linux.dev,
+	Christopher Di Bella <cjdb@google.com>
+Subject: Re: [PATCH v1 13/13] tools headers: Rename noinline to __noinline
+Message-ID: <20240311114009-mutt-send-email-mst@kernel.org>
+References: <20240310020509.647319-1-irogers@google.com>
+ <20240310020509.647319-14-irogers@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240310020509.647319-1-irogers@google.com> <20240310020509.647319-14-irogers@google.com>
- <CANiq72=rgXk6oz65wb57ZP+jmSoD-a4SSVzU6s6SZLubV3cvBw@mail.gmail.com>
-In-Reply-To: <CANiq72=rgXk6oz65wb57ZP+jmSoD-a4SSVzU6s6SZLubV3cvBw@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 11 Mar 2024 08:33:10 -0700
-Message-ID: <CAKwvOdkMYnYO2hyJEFj-M_iur6BneEZjPHvsodZAGw=b7PmmzA@mail.gmail.com>
-Subject: Re: [PATCH v1 13/13] tools headers: Rename noinline to __noinline
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Ian Rogers <irogers@google.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Kees Cook <keescook@chromium.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Liam Howlett <liam.howlett@oracle.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>, 
-	David Laight <David.Laight@aculab.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shunsuke Mie <mie@igel.co.jp>, 
-	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>, 
-	James Clark <james.clark@arm.com>, Nick Forrington <nick.forrington@arm.com>, 
-	Leo Yan <leo.yan@linux.dev>, German Gomez <german.gomez@arm.com>, Rob Herring <robh@kernel.org>, 
-	John Garry <john.g.garry@oracle.com>, Sean Christopherson <seanjc@google.com>, 
-	Anup Patel <anup@brainfault.org>, Fuad Tabba <tabba@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Haibo Xu <haibo1.xu@intel.com>, Peter Xu <peterx@redhat.com>, 
-	Vishal Annapurve <vannapurve@google.com>, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	llvm@lists.linux.dev, Christopher Di Bella <cjdb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240310020509.647319-14-irogers@google.com>
 
-On Sun, Mar 10, 2024 at 4:25=E2=80=AFAM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> On Sun, Mar 10, 2024 at 3:06=E2=80=AFAM Ian Rogers <irogers@google.com> w=
-rote:
-> >
-> > [1] https://clang.llvm.org/docs/AttributeReference.html#noinline
-> > Reported-by: Christopher Di Bella <cjdb@google.com>
->
-> Out of curiosity, was this due to the `[[gnu::noinline]]` or similar
-> in e.g. `src/string/memset_explicit.h`?
+On Sat, Mar 09, 2024 at 06:05:08PM -0800, Ian Rogers wrote:
+> An issue was reported with clang and llvm libc where the noinline
+> attribute [1] was being expanded due to the #define in
+> linux/compiler.h (now in compiler_attributes.h). The expansion caused
+> the __attribute__ to appear twice and break the build. To avoid this
+> conflict, rename noinline to __noinline which is more consistent with
+> other compiler attributes.
+> 
+> [1] https://clang.llvm.org/docs/AttributeReference.html#noinline
 
-Yes, and in src/__support/threads/linux/thread.cpp's definition of
-start_thread().
+Following this link, I don't see __noinline there - only __noinline__ and
+noinline. What's up?
 
-Thanks for the patch!
 
-Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+Als, pls add an empty line before tags.
 
---=20
-Thanks,
-~Nick Desaulniers
+> Reported-by: Christopher Di Bella <cjdb@google.com>
+> 
+> Signed-off-by: Ian Rogers <irogers@google.com>
+
+
+tags should not have empty lines between them.
+
+> ---
+>  tools/include/linux/compiler_attributes.h |  4 ++--
+>  tools/perf/arch/x86/tests/bp-modify.c     |  4 ++--
+>  tools/perf/bench/find-bit-bench.c         |  2 +-
+>  tools/perf/tests/bp_account.c             |  2 +-
+>  tools/perf/tests/bp_signal.c              |  2 +-
+>  tools/perf/tests/bp_signal_overflow.c     |  2 +-
+>  tools/perf/tests/dwarf-unwind.c           | 12 ++++++------
+>  tools/perf/tests/workloads/leafloop.c     |  8 ++++----
+>  tools/perf/tests/workloads/thloop.c       |  4 ++--
+>  9 files changed, 20 insertions(+), 20 deletions(-)
+> 
+> diff --git a/tools/include/linux/compiler_attributes.h b/tools/include/linux/compiler_attributes.h
+> index 9bfaec783e48..1ff3d85f5af3 100644
+> --- a/tools/include/linux/compiler_attributes.h
+> +++ b/tools/include/linux/compiler_attributes.h
+> @@ -267,12 +267,12 @@
+>  # define __flatten			__attribute__((flatten))
+>  
+>  /*
+> - * Note the missing underscores.
+> + * Note, the kernel version is missing the underscores.
+>   *
+>   *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-noinline-function-attribute
+>   * clang: mentioned
+>   */
+> -#define   noinline                      __attribute__((__noinline__))
+> +#define   __noinline                      __attribute__((__noinline__))
+>  
+>  /*
+>   * Optional: only supported since gcc >= 8
+> diff --git a/tools/perf/arch/x86/tests/bp-modify.c b/tools/perf/arch/x86/tests/bp-modify.c
+> index 0924ccd9e36d..65493ff7a76f 100644
+> --- a/tools/perf/arch/x86/tests/bp-modify.c
+> +++ b/tools/perf/arch/x86/tests/bp-modify.c
+> @@ -15,13 +15,13 @@
+>  #include "tests/tests.h"
+>  #include "arch-tests.h"
+>  
+> -static noinline int bp_1(void)
+> +static __noinline int bp_1(void)
+>  {
+>  	pr_debug("in %s\n", __func__);
+>  	return 0;
+>  }
+>  
+> -static noinline int bp_2(void)
+> +static __noinline int bp_2(void)
+>  {
+>  	pr_debug("in %s\n", __func__);
+>  	return 0;
+> diff --git a/tools/perf/bench/find-bit-bench.c b/tools/perf/bench/find-bit-bench.c
+> index 7e25b0e413f6..dd97a51649bc 100644
+> --- a/tools/perf/bench/find-bit-bench.c
+> +++ b/tools/perf/bench/find-bit-bench.c
+> @@ -31,7 +31,7 @@ static const char *const bench_usage[] = {
+>  static unsigned int accumulator;
+>  static unsigned int use_of_val;
+>  
+> -static noinline void workload(int val)
+> +static __noinline void workload(int val)
+>  {
+>  	use_of_val += val;
+>  	accumulator++;
+> diff --git a/tools/perf/tests/bp_account.c b/tools/perf/tests/bp_account.c
+> index 6f921db33cf9..459f61752a71 100644
+> --- a/tools/perf/tests/bp_account.c
+> +++ b/tools/perf/tests/bp_account.c
+> @@ -34,7 +34,7 @@
+>  
+>  static volatile long the_var;
+>  
+> -static noinline int test_function(void)
+> +static __noinline int test_function(void)
+>  {
+>  	return 0;
+>  }
+> diff --git a/tools/perf/tests/bp_signal.c b/tools/perf/tests/bp_signal.c
+> index 1f2908f02389..484a7e7f96ee 100644
+> --- a/tools/perf/tests/bp_signal.c
+> +++ b/tools/perf/tests/bp_signal.c
+> @@ -59,7 +59,7 @@ static void __test_function(volatile long *ptr)
+>  }
+>  #endif
+>  
+> -static noinline int test_function(void)
+> +static __noinline int test_function(void)
+>  {
+>  	__test_function(&the_var);
+>  	the_var++;
+> diff --git a/tools/perf/tests/bp_signal_overflow.c b/tools/perf/tests/bp_signal_overflow.c
+> index 4e897c2cf26b..9436bf2973f8 100644
+> --- a/tools/perf/tests/bp_signal_overflow.c
+> +++ b/tools/perf/tests/bp_signal_overflow.c
+> @@ -30,7 +30,7 @@
+>  
+>  static int overflows;
+>  
+> -static noinline int test_function(void)
+> +static __noinline int test_function(void)
+>  {
+>  	return time(NULL);
+>  }
+> diff --git a/tools/perf/tests/dwarf-unwind.c b/tools/perf/tests/dwarf-unwind.c
+> index d01aa931fe81..a669c69a9242 100644
+> --- a/tools/perf/tests/dwarf-unwind.c
+> +++ b/tools/perf/tests/dwarf-unwind.c
+> @@ -109,7 +109,7 @@ static int unwind_entry(struct unwind_entry *entry, void *arg)
+>  	return strcmp((const char *) symbol, funcs[idx]);
+>  }
+>  
+> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__thread(struct thread *thread)
+> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__thread(struct thread *thread)
+>  {
+>  	struct perf_sample sample;
+>  	unsigned long cnt = 0;
+> @@ -140,7 +140,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__thread(struct thread *thr
+>  
+>  static int global_unwind_retval = -INT_MAX;
+>  
+> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__compare(void *p1, void *p2)
+> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__compare(void *p1, void *p2)
+>  {
+>  	/* Any possible value should be 'thread' */
+>  	struct thread *thread = *(struct thread **)p1;
+> @@ -159,7 +159,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__compare(void *p1, void *p
+>  	return p1 - p2;
+>  }
+>  
+> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_3(struct thread *thread)
+> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_3(struct thread *thread)
+>  {
+>  	struct thread *array[2] = {thread, thread};
+>  	void *fp = &bsearch;
+> @@ -178,7 +178,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_3(struct thread *th
+>  	return global_unwind_retval;
+>  }
+>  
+> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_2(struct thread *thread)
+> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_2(struct thread *thread)
+>  {
+>  	int ret;
+>  
+> @@ -187,7 +187,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_2(struct thread *th
+>  	return ret;
+>  }
+>  
+> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_1(struct thread *thread)
+> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_1(struct thread *thread)
+>  {
+>  	int ret;
+>  
+> @@ -196,7 +196,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_1(struct thread *th
+>  	return ret;
+>  }
+>  
+> -noinline int test__dwarf_unwind(struct test_suite *test __maybe_unused,
+> +__noinline int test__dwarf_unwind(struct test_suite *test __maybe_unused,
+>  				int subtest __maybe_unused)
+>  {
+>  	struct machine *machine;
+> diff --git a/tools/perf/tests/workloads/leafloop.c b/tools/perf/tests/workloads/leafloop.c
+> index 1bf5cc97649b..89d2cec2f461 100644
+> --- a/tools/perf/tests/workloads/leafloop.c
+> +++ b/tools/perf/tests/workloads/leafloop.c
+> @@ -4,18 +4,18 @@
+>  #include "../tests.h"
+>  
+>  /* We want to check these symbols in perf script */
+> -noinline void leaf(volatile int b);
+> -noinline void parent(volatile int b);
+> +__noinline void leaf(volatile int b);
+> +__noinline void parent(volatile int b);
+>  
+>  static volatile int a;
+>  
+> -noinline void leaf(volatile int b)
+> +__noinline void leaf(volatile int b)
+>  {
+>  	for (;;)
+>  		a += b;
+>  }
+>  
+> -noinline void parent(volatile int b)
+> +__noinline void parent(volatile int b)
+>  {
+>  	leaf(b);
+>  }
+> diff --git a/tools/perf/tests/workloads/thloop.c b/tools/perf/tests/workloads/thloop.c
+> index 457b29f91c3e..e252efb76203 100644
+> --- a/tools/perf/tests/workloads/thloop.c
+> +++ b/tools/perf/tests/workloads/thloop.c
+> @@ -9,14 +9,14 @@
+>  static volatile sig_atomic_t done;
+>  
+>  /* We want to check this symbol in perf report */
+> -noinline void test_loop(void);
+> +__noinline void test_loop(void);
+>  
+>  static void sighandler(int sig __maybe_unused)
+>  {
+>  	done = 1;
+>  }
+>  
+> -noinline void test_loop(void)
+> +__noinline void test_loop(void)
+>  {
+>  	while (!done);
+>  }
+> -- 
+> 2.44.0.278.ge034bb2e1d-goog
+
 
