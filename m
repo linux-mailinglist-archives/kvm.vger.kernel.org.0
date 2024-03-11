@@ -1,79 +1,81 @@
-Return-Path: <kvm+bounces-11540-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11541-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C1F87812D
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:02:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11DD3878133
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:02:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BFB7B231F5
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 14:02:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 920441F240A8
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 14:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43013FB3B;
-	Mon, 11 Mar 2024 14:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DE4405FE;
+	Mon, 11 Mar 2024 14:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WS4VDe4Q"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MZ1ENkeh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710D433CCD
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 14:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4B73FB97;
+	Mon, 11 Mar 2024 14:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710165734; cv=none; b=WVbb+1JcuJJJrk+/rlcDWB47OWc2g0EU30hwoA+M4kADSpBAZHc65Lq1VtpeNtEnhbvdouwtt7Jya59i1qsLsI7PJduZJfNVxJGU7pu4mw5d+pouhnfUTsDJCNlQFpmV2+9q2H8u5Wo8CJ07OjfL+wFhQFkkFP4XLRTgVtNTDmk=
+	t=1710165737; cv=none; b=oeRVHkPhxkyh5LpBJPlRM/hlroTIw2oqr/PlmSz1qf3KKGvzhskmDe+QG2Fqe1dhlqFwo2XrmHOeftEAi9t/a6Oq6FcyRxE/qzpTdB+qFBKpwBzbN0zKelGc7p6mx+2Sex/+W0FSOvZ3kE200AcgKXUQA4Qydk2R2Cdod/72ebY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710165734; c=relaxed/simple;
-	bh=zudfJPfGKCSXtqr6xD9riAWqn5x9WVfEjygW7Pep6XY=;
+	s=arc-20240116; t=1710165737; c=relaxed/simple;
+	bh=jcwR+qaWQ3qeFUVfrI45xivwRryg10Va6JVThuywTWA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eHJCVxJYLzMqyjSnKAwBcDZbrWNcpfpJwqSJ8jzoDuuS5LWJVrO/XTMjl5a5RorC47IYpSSwg8fOSemGAqN2g8RkWoh9vPlZrwM/yMNkaUv6U7IqRmerXAxHdrK+sR436CrdIYoEpsTyRNqbukwFrZc3Ahs710SgqdvQ2/i46Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WS4VDe4Q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710165732;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=l1lWiVrfJ9gyOKGKxf4UnXuQxCW1HqyRc+4zMGSrV/I=;
-	b=WS4VDe4QkhCgWEDd2pJNTLR8rM196JwtWsDjWlBx43lAjFWHdAnclrbTCA6UwV7LK+O3zQ
-	hR6QC1z46M0Ul84eB89W/JN66MPFiho3tY/sZvPmLlsoj4WwyLCZKJj6VrSUtGLXENtep4
-	EiKiZgwZtoYFGV+eXA9Jcrhj1a0up4g=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-tM3C6PaYNISiLwsD6KK0Ng-1; Mon, 11 Mar 2024 10:02:10 -0400
-X-MC-Unique: tM3C6PaYNISiLwsD6KK0Ng-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5684345c0ebso2100558a12.1
-        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:02:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710165730; x=1710770530;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l1lWiVrfJ9gyOKGKxf4UnXuQxCW1HqyRc+4zMGSrV/I=;
-        b=eTEu97lwxQegCE/D0f59ti6K6YMc5YyEAYKw4NCocr7BDsRBRIgWixGNC7dl395O9y
-         Ki8+o38uYonW5vpTbcajM64T+lcpXcNlG+guGIsRBkCEpvEBQnqNn6+ehNE53UEUISr9
-         ffMtsUCmuxGse2amh1By+r+XHwlMyoxaQXhmnriCd62XLt4I1J/UHVRiYG3daHoorQp8
-         lUfjhWPtrUU3YMcgX6hCHAJEiPfUD4g4/cLwS4AzrgaFz6+GKfsmwhbMK5b1AIsWyZIX
-         g7abfWuUqHTBDw+mu6UXXDl6vJb2OQ+rPqkxR1x4WCFyKysq46sYbzsLa21NZR1++TN9
-         y8tQ==
-X-Gm-Message-State: AOJu0YyqanqHouNaLkbfPgwABernfpgKKlG6YBk/YI+uxxyoJ4l19emC
-	HltBdJ5YZUCFqtQdry4aZz6crnWzwCuSykNDUAN2mQfYAfTKfozVrDiMNd4wY1sMK1CG/DqDyVU
-	sGuShBmRLIquaRGwRZt9ntGYs0IRuk73dvqCYxWDeFkElvBD2xQ==
-X-Received: by 2002:a50:aacf:0:b0:568:145a:4a22 with SMTP id r15-20020a50aacf000000b00568145a4a22mr6746904edc.4.1710165729762;
-        Mon, 11 Mar 2024 07:02:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGhwYbM7JAcmCY0rptcO+QyNgjUt45vXfxZecF/gFi6BgI9yjqaxTSgh8WfEds4aQs8p50SPQ==
-X-Received: by 2002:a50:aacf:0:b0:568:145a:4a22 with SMTP id r15-20020a50aacf000000b00568145a4a22mr6746863edc.4.1710165729367;
-        Mon, 11 Mar 2024 07:02:09 -0700 (PDT)
-Received: from [192.168.10.81] ([151.49.77.21])
-        by smtp.googlemail.com with ESMTPSA id b2-20020aa7c902000000b00564e489ce9asm3016297edt.12.2024.03.11.07.02.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Mar 2024 07:02:08 -0700 (PDT)
-Message-ID: <208e03b7-374b-4062-bed2-dda595fcad77@redhat.com>
-Date: Mon, 11 Mar 2024 15:02:03 +0100
+	 In-Reply-To:Content-Type; b=DrcbkINUKjiAI3MG3WPTnqKXTv+5l0wU6Dmb2CplsLW1oKO6tZRGKI6Y0pd01HOwDAdq6MW2eFTkBNQB/BlPETHqNfYZ24sd64gW67ZT88/LBc2tSL0nzwDuLrCRtHlKd7Nru5qzmxIOKvVmqWxDCvWYSvd7hKr6/Q1PHvgj1QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MZ1ENkeh; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42BDCXQc026274;
+	Mon, 11 Mar 2024 14:02:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Mj6tMYOMniFj3rRYjjqpPzyOmBCgYE6GXb1DnUwUI9I=;
+ b=MZ1ENkehcA1C3Osy/y38s+OTdulczErz2LedtmOMtfYt39xGIXIeORuZVspKb7+yS6k+
+ xQvtLl0ZN6NY1ssT2t87AwYZEVfAkMKUdyu96hBqBl8frtr4gfiLs+JgSSiphEe6Z5DY
+ 0nD69WEtu9+P64KO4m1cDQJtEQSbq0zcGy3HNN0wbUGwASmxJMUs34Pb5/hC6Ukt47NS
+ xOSwnEjFNMTN9zQB5au7PzQrORFiHAfRjEkmmK6ismbBFYV47hYhKe8njkaEqNZLmwfC
+ 1j4Ca0fqasmwRoRB33TJBYohSFO9aS53AcexSiIgvt325ac0O1qz7haIagjdo23/3fKv vQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wt2mrh8a5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 14:02:15 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42BE0JV2024838;
+	Mon, 11 Mar 2024 14:02:14 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wt2mrh891-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 14:02:14 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42BDwfpK020496;
+	Mon, 11 Mar 2024 14:02:11 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ws3kkrr7j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 14:02:11 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42BE25vf11600216
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Mar 2024 14:02:07 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9A68F2004E;
+	Mon, 11 Mar 2024 14:02:05 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3F51C20040;
+	Mon, 11 Mar 2024 14:02:05 +0000 (GMT)
+Received: from [9.179.13.163] (unknown [9.179.13.163])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 11 Mar 2024 14:02:05 +0000 (GMT)
+Message-ID: <24e827c3-ea16-4197-8699-f35d67fa9c6a@linux.ibm.com>
+Date: Mon, 11 Mar 2024 15:02:05 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,93 +83,88 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] LoongArch KVM changes for v6.9
+Subject: Re: [GIT PULL] KVM: Xen and gfn_to_pfn_cache changes for 6.9
+To: Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20240308223702.1350851-1-seanjc@google.com>
+ <20240308223702.1350851-9-seanjc@google.com>
 Content-Language: en-US
-To: Huacai Chen <chenhuacai@loongson.cn>, Huacai Chen
- <chenhuacai@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>,
- Bibo Mao <maobibo@loongson.cn>
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>
-References: <20240307144930.3919566-1-chenhuacai@loongson.cn>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240307144930.3919566-1-chenhuacai@loongson.cn>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20240308223702.1350851-9-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Lr-pq_b8FDsr2EEllcoSTLAvuXQwyf8n
+X-Proofpoint-ORIG-GUID: uKWxOcv7UD0kteOA8_CYjbhzv692nE2i
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-11_08,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ malwarescore=0 phishscore=0 lowpriorityscore=0 clxscore=1011 spamscore=0
+ priorityscore=1501 mlxlogscore=897 suspectscore=0 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2403110106
 
-On 3/7/24 15:49, Huacai Chen wrote:
-> The following changes since commit 90d35da658da8cff0d4ecbb5113f5fac9d00eb72:
+On 3/8/24 23:37, Sean Christopherson wrote:
+> Aaaand seeing my one commit in the shortlog made me realize I completely forgot
+> to get acks from s390 on the kvm_is_error_gpa() => kvm_is_gpa_in_memslot()
+> refactor.  Fudge.
 > 
->    Linux 6.8-rc7 (2024-03-03 13:02:52 -0800)
-> 
-> are available in the Git repository at:
-> 
->    git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.git tags/loongarch-kvm-6.9
-> 
-> for you to fetch changes up to b99f783106ea5b2f8c9d74f4d3b1e2f77af9ec6e:
-> 
->    LoongArch: KVM: Remove unnecessary CSR register saving during enter guest (2024-03-06 09:12:13 +0800)
+> s390 folks, my apologies for not reaching out earlier.  Please take a look at
+> commit 9e7325acb3dc ("KVM: s390: Refactor kvm_is_error_gpa() into
+> kvm_is_gpa_in_memslot()").  It *should* be a straight refactor, and I don't
+> expect the rename to be contentious, but I didn't intend to send this pull request
+> before getting an explicit ack.
 
-Pulled, thanks.
 
-Paolo
+kvm_is_gpa_in_memslot() is not my preferred name for this function but 
+it's way better than kvm_is_error_gpa() so I'm fine with it.
 
-> ----------------------------------------------------------------
-> LoongArch KVM changes for v6.9
-> 
-> 1. Set reserved bits as zero in CPUCFG.
-> 2. Start SW timer only when vcpu is blocking.
-> 3. Do not restart SW timer when it is expired.
-> 4. Remove unnecessary CSR register saving during enter guest.
-> 
-> KVM PV features are unfortunately missing in v6.9 for some
-> implementation controversies, sigh.
-> ----------------------------------------------------------------
-> Bibo Mao (4):
->        LoongArch: KVM: Set reserved bits as zero in CPUCFG
->        LoongArch: KVM: Start SW timer only when vcpu is blocking
->        LoongArch: KVM: Do not restart SW timer when it is expired
->        LoongArch: KVM: Remove unnecessary CSR register saving during enter guest
-> 
->   arch/loongarch/kvm/switch.S |  6 ------
->   arch/loongarch/kvm/timer.c  | 43 ++++++++++---------------------------------
->   arch/loongarch/kvm/vcpu.c   | 33 ++++++++++++++++++++++++++-------
->   3 files changed, 36 insertions(+), 46 deletions(-)
-> 
-
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
