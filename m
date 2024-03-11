@@ -1,80 +1,79 @@
-Return-Path: <kvm+bounces-11544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC93C87817E
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:19:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110B7878182
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 228C81C221F1
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 14:19:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 940F41F23919
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 14:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6D73FBBB;
-	Mon, 11 Mar 2024 14:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776593FBB4;
+	Mon, 11 Mar 2024 14:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QdrbjHje"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SpMTcSyk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08BE3D993
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 14:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160873FBBB
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 14:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710166777; cv=none; b=rri8vhVEK1G1NhQY7UohJqLj0hSYX80Nsx07rrTMuZWXbtWD0yDY7+lKIuIzz2mvfxqlzEm0/khsbaYiCIK2M9OVYjVgYur7X1yyEbr2/ZUx5opS1QaydI5+5OEPBK8QW0b9CuKWYkuIAvo5HzV50q2Dj2rPXlLVl7ZTmmjrirg=
+	t=1710166925; cv=none; b=LMgMv/2C1gJn1P1PaNHNVgzrJGHJhglq9f4GUcDFcGSD7MZNGHeijifsi6cb8+RvK5/n1Q2RvyyRppWMgsA2rQ1eOJAnIeimm58fSbIKlFlMhSyR3hv27xfcLXM7bGXl9+KDcrYNGW+K3MOs7aKr7NIcZ2h6O1wkY+uRHLeDnTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710166777; c=relaxed/simple;
-	bh=0gDp7T5P1OWvOqlOUx1gmTE7LgCMhGzx//xP9WYXFhk=;
+	s=arc-20240116; t=1710166925; c=relaxed/simple;
+	bh=56NMSsh78LIDXtUGQ15OJt1n/hifnfNYi6T6+1kMdJc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ay/QCypuE+EA5LH51dkU0gXbIbJdrDERtVEA04fww0pPXkKlv4ynBjacxP3Yd4bjfpxn8aKkg7qetRUN9I+J59EFOLrUTPZYiSqgGAhRK2NIDivSSR1s+t8BRF/iKRKDfNwqAKh9Hkh79vr9sZU8A1ApbK0y1dl1CF6wFbeiLZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QdrbjHje; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=eq6HAWem4I8sy0nB0UpgvAAcUzWmeLMybFicMgGkvpGZgAZ0/fkPw/yR8DRVWTM75MokodeDVwyAp8suMyLE6H1Rukg0FbWeyLlr8Qe3LvPwouULjvlTL2xh1+4E4IC+RuloPr22mfxgtyXV0POxmdpMOmtll8Bs9jXjXjLj0r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SpMTcSyk; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710166774;
+	s=mimecast20190719; t=1710166922;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=fjeIs11/GS4xnw7P/YbolbBH87bCSCu3+iV5r5aUsNM=;
-	b=QdrbjHjeKBfp+SlKKzqiL2JsUs9wipS5+WiyBsc5E1ejHOHmbMFiX/WxoteKeS9L11FkAJ
-	PM4nX2rVK9RUhVC204TzjGiBNdUkYOgtcj0uX7hvaMab2HMbpBSQt+PmFrlNz9xdj5D5RE
-	bB0HY04p4YrTNo+duxitA0pP+myjl/U=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=RAM/g6tP3EohpH0ynb9pjDy8L9dI16bvnaUHNHXa5y0=;
+	b=SpMTcSykS0R89oXjrmcRwnToZVUXvm/r/VfQfVVG/oniRoF2bpgvgAGVSm081E0GS96VV6
+	kUcrQEwGqdf7oXfxbxVVv2hfTGtWjO072F6yKFjoTaazbyQcGkpE4AzjCXiPqc1hThZP9V
+	hC1eDQJ3pQG2HlVrUmQHEx4+ZV9XgvU=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-127-4LfxYs4GNCuyFAQvsb9u1Q-1; Mon, 11 Mar 2024 10:19:31 -0400
-X-MC-Unique: 4LfxYs4GNCuyFAQvsb9u1Q-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2d449d68bc3so2968611fa.3
-        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:19:31 -0700 (PDT)
+ us-mta-636-GQifLuluMfOd0pJzzGE-oA-1; Mon, 11 Mar 2024 10:22:01 -0400
+X-MC-Unique: GQifLuluMfOd0pJzzGE-oA-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d449d68bc3so2991811fa.3
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:22:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710166770; x=1710771570;
+        d=1e100.net; s=20230601; t=1710166918; x=1710771718;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fjeIs11/GS4xnw7P/YbolbBH87bCSCu3+iV5r5aUsNM=;
-        b=j+0sii30RCbPgK42FVFeAS1ltke7uHfmSm88V5lKP0lbXe2u8X4ov0r4PyJTvYMFBt
-         4wYySQVIjXhFOaN6Wh3kF9wrIdviN4EioiNHTyr0VTM4aCDF3pRtucoxL8A1mRsRFhqy
-         3HNcUdTFF8OELr+yFD0x1t8XM2S2T8A/9UmB7O7fI3Nok4RH1TshYzIfcalLuMFBpLDe
-         JpokS3IywSrMFAh6brPLTnBTGLR/6oB7NWDO+jqmJnNSU3dHALRYR0mz6Vc1vJRN0PMX
-         qXXZYS6TsGy3klt/oMuQyburu2p7DiomufzR1jk/4V8dbC2l1EKuiVRsHpsRJnYohQNz
-         pEeg==
-X-Forwarded-Encrypted: i=1; AJvYcCVBfY89O6m0q20OYSTi7JRPWBXA8TBlFpQFj8Hep9XAvbfEX9A/boM9EKlMKLYbvTp70SsZsYFb069ArgDOeoOsOnG0
-X-Gm-Message-State: AOJu0Yy5UOserjSzpqg4gIa+0ossO3/VLhdofw+BNfx+tcPBe19lfFV0
-	ZFRD28srO4EAAPrKKzwvuloFPz261x4NKvr6jf45f3dx8gOmkk0PhliYKMbEq2bqSun3DlTOKUQ
-	li8O16gDG3D+PsILUT3PhtsrzJKc3UG/tLXZEgqsvV8NdzjWFaQ==
-X-Received: by 2002:a2e:869a:0:b0:2d2:c8c1:d844 with SMTP id l26-20020a2e869a000000b002d2c8c1d844mr4073996lji.13.1710166770309;
-        Mon, 11 Mar 2024 07:19:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHenKVxc5lk5fJfJlsecO5k6bHxo+uZ6RjbQWXqALB2AGcnuymWmVp/1W9o9nVZ3YZ3HK6MDA==
-X-Received: by 2002:a2e:869a:0:b0:2d2:c8c1:d844 with SMTP id l26-20020a2e869a000000b002d2c8c1d844mr4073977lji.13.1710166769909;
-        Mon, 11 Mar 2024 07:19:29 -0700 (PDT)
+        bh=RAM/g6tP3EohpH0ynb9pjDy8L9dI16bvnaUHNHXa5y0=;
+        b=Q4xrlLKbG3HJRgHiEmXJfy+9y7pCbHhexzyAM26ArTRspHdYZREyDct7g6drYfe/+h
+         ovI64bdpqk7dN7X67dF/K7bahVu90omuHHpvb9O678z876E5sVgi4Rz10i/QOPaPbmIL
+         Of/CsFr2fcuTYpV22AFbco3GkzyNaIJL/yi2KzSPCg0vVkvCf3xq9jzEd+NVw7FAtjFN
+         J6lpLOFjcJ9H50kkOaId1yIHUmi+JvoNbr175bpOkh28zdzjH9SkvAka7YaRfx/SAwwm
+         lepj6p+oUgbZwg3+2xL7lJngGBICWtyYkV4lhV+sUxyNOkZS9h+/06nrtuPVgfO/k/xW
+         8p8g==
+X-Gm-Message-State: AOJu0YyWxUhXlhNd8fpe8Feh9tgqgc9IzXuwh1s0854HaadoX+PwyynZ
+	5GZpiI8YGvAUU9SbIG7kN9FtTuw8gMjPJ9yKeM1jAdmajaXFJWozBEOkwUDuatwV9ZHVA6QyiiP
+	j0D4ykcarZ1tja6ED4UYqFquw4FM33XNhNerj5JhqzOaoqNguLQlafahoyw==
+X-Received: by 2002:a2e:928c:0:b0:2d2:7813:6ca3 with SMTP id d12-20020a2e928c000000b002d278136ca3mr3987056ljh.9.1710166917845;
+        Mon, 11 Mar 2024 07:21:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEudDoSlDrAPGJDZZw9T6E13NYse0casdKPoAa9Hjpb6Oa45x3X+Yn3zLjLLEayZ4IwFH+K1A==
+X-Received: by 2002:a2e:928c:0:b0:2d2:7813:6ca3 with SMTP id d12-20020a2e928c000000b002d278136ca3mr3987042ljh.9.1710166917408;
+        Mon, 11 Mar 2024 07:21:57 -0700 (PDT)
 Received: from [192.168.10.81] ([151.49.77.21])
-        by smtp.googlemail.com with ESMTPSA id x21-20020aa7d395000000b00567fa27e75fsm2940331edq.32.2024.03.11.07.19.25
+        by smtp.googlemail.com with ESMTPSA id et8-20020a056402378800b00566a4dec01fsm2972343edb.11.2024.03.11.07.21.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Mar 2024 07:19:28 -0700 (PDT)
-Message-ID: <f58fd876-3aa7-4c0c-80ef-586862ee9363@redhat.com>
-Date: Mon, 11 Mar 2024 15:19:24 +0100
+        Mon, 11 Mar 2024 07:21:56 -0700 (PDT)
+Message-ID: <f27274a9-fc5d-4be3-a364-5f5a471c20bd@redhat.com>
+Date: Mon, 11 Mar 2024 15:21:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,18 +81,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.9
+Subject: Re: [GIT PULL] KVM: x86: Selftests changes for 6.9
 Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt
- <palmer@rivosinc.com>, Andrew Jones <ajones@ventanamicro.com>,
- Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>,
- KVM General <kvm@vger.kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)"
- <kvm-riscv@lists.infradead.org>,
- linux-riscv <linux-riscv@lists.infradead.org>
-References: <CAAhSdy1rYFoYjCRWTPouiT=tiN26Z_v3Y36K2MyDrcCkRs1Luw@mail.gmail.com>
- <Zen8qGzVpaOB_vKa@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240308223702.1350851-1-seanjc@google.com>
+ <20240308223702.1350851-7-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -130,52 +123,139 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <Zen8qGzVpaOB_vKa@google.com>
+In-Reply-To: <20240308223702.1350851-7-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/7/24 18:43, Sean Christopherson wrote:
-> E.g.
-> if this were to happen with a less trivial conflict, the other sub-maintainer would
-> be left doing a late scramble to figure things out just before sending their own
-> pull requests.
-
-Nah, either I would fix it, or I would look at an older tree from 
-linux-next and ask whether it's okay to use that one.
-
->    tag kvm-riscv-6.9-1
->    Tagger:     Anup Patel<anup@brainfault.org>
->    TaggerDate: Thu Mar 7 11:54:34 2024 +0530
+On 3/8/24 23:36, Sean Christopherson wrote:
+> Add SEV(-ES) smoke tests, and start building out infrastructure to utilize the
+> "core" selftests harness and TAP.  In addition to provide TAP output, using the
+> infrastructure reduces boilerplate code and allows running all testscases in a
+> test, even if a previous testcase fails (compared with today, where a testcase
+> failure is terminal for the entire test).
 > 
-> ...
+> As noted in the PMU pull request, the "Use TAP interface" changes have a few
+> conflicts.  3 of 4 are relatively straightforward, but the one in
+> userspace_msr_exit_test.c's test_msr_filter_allow() is a pain.  At least, I
+> thought so as I botched it at least twice.  (LOL, make that three times, as I
+> just botched my test merge resolution).
 > 
->    commit d8c0831348e78fdaf67aa95070bae2ef8e819b05
->    Author:     Anup Patel<apatel@ventanamicro.com>
->    AuthorDate: Tue Feb 13 13:39:17 2024 +0530
->    Commit:     Anup Patel<anup@brainfault.org>
->    CommitDate: Wed Mar 6 20:53:44 2024 +0530
+> The code should end up looking like this:
 > 
-> The other reason this caught my eye is that the conflict happened in common code,
-> but the added helper is RISC-V specific and used only from RISC-V code.  ARM does
-> have an identical helper, but AFAICT ARM's helper is only used from ARM code.
+> ---
+> KVM_ONE_VCPU_TEST_SUITE(user_msr);
 > 
-> But the prototype of guest_get_vcpuid() is in common code.  Which isn't a huge
-> deal, but it's rather undesirable because there's no indication that its
-> implementation is arch-specific, and trying to use it in code built for s390 or
-> x86 (or MIPS or PPC, which are on the horizon), would fail.  I'm all for making
-> code common where possible, but going halfway and leaving a trap for other
-> architectures makes for a poor experience for developers.
+> KVM_ONE_VCPU_TEST(user_msr, msr_filter_allow, guest_code_filter_allow)
+> {
+> 	struct kvm_vm *vm = vcpu->vm;
+> 	uint64_t cmd;
+> 	int rc;
+> 
+> 	sync_global_to_guest(vm, fep_available);
+> 
+> 	rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
+> ---
+> 
+> The resolutions I've been using can be found in kvm-x86/next.
+> 
+> 
+> The following changes since commit db7d6fbc10447090bab8691a907a7c383ec66f58:
+> 
+>    KVM: remove unnecessary #ifdef (2024-02-08 08:41:06 -0500)
+> 
+> are available in the Git repository at:
+> 
+>    https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.9
+> 
+> for you to fetch changes up to e9da6f08edb0bd4c621165496778d77a222e1174:
+> 
+>    KVM: selftests: Explicitly close guest_memfd files in some gmem tests (2024-03-05 13:31:20 -0800)
+> 
+> ----------------------------------------------------------------
+> KVM selftests changes for 6.9:
+> 
+>   - Add macros to reduce the amount of boilerplate code needed to write "simple"
+>     selftests, and to utilize selftest TAP infrastructure, which is especially
+>     beneficial for KVM selftests with multiple testcases.
+> 
+>   - Add basic smoke tests for SEV and SEV-ES, along with a pile of library
+>     support for handling private/encrypted/protected memory.
+> 
+>   - Fix benign bugs where tests neglect to close() guest_memfd files.
+> 
+> ----------------------------------------------------------------
 
-I think it's okay if the _concept_ is reasonably arch-independent.  In 
-that case, the first who uses it from arch-independent tests has to 
-implement it for s390 and x86, but having a function in common code 
-makes it possible to use it from the partly-arch-dependent tests such as 
-arch_timer.c or get-reg-list.c.
-
-(Now - that is _not_ the case here, because the function is only used in 
-the aarch64 and RISC-V specific parts of the tests, but still to me it 
-makes sense to have the prototype there).
+Pulled, thanks.
 
 Paolo
+
+> Ackerley Tng (1):
+>        KVM: selftests: Add a macro to iterate over a sparsebit range
+> 
+> Dongli Zhang (1):
+>        KVM: selftests: Explicitly close guest_memfd files in some gmem tests
+> 
+> Michael Roth (2):
+>        KVM: selftests: Make sparsebit structs const where appropriate
+>        KVM: selftests: Add support for protected vm_vaddr_* allocations
+> 
+> Peter Gonda (5):
+>        KVM: selftests: Add support for allocating/managing protected guest memory
+>        KVM: selftests: Explicitly ucall pool from shared memory
+>        KVM: selftests: Allow tagging protected memory in guest page tables
+>        KVM: selftests: Add library for creating and interacting with SEV guests
+>        KVM: selftests: Add a basic SEV smoke test
+> 
+> Sean Christopherson (4):
+>        KVM: selftests: Move setting a vCPU's entry point to a dedicated API
+>        KVM: selftests: Extend VM creation's @shape to allow control of VM subtype
+>        KVM: selftests: Use the SEV library APIs in the intra-host migration test
+>        KVM: selftests: Add a basic SEV-ES smoke test
+> 
+> Thomas Huth (7):
+>        KVM: selftests: x86: sync_regs_test: Use vcpu_run() where appropriate
+>        KVM: selftests: x86: sync_regs_test: Get regs structure before modifying it
+>        KVM: selftests: Add a macro to define a test with one vcpu
+>        KVM: selftests: x86: Use TAP interface in the sync_regs test
+>        KVM: selftests: x86: Use TAP interface in the fix_hypercall test
+>        KVM: selftests: x86: Use TAP interface in the vmx_pmu_caps test
+>        KVM: selftests: x86: Use TAP interface in the userspace_msr_exit test
+> 
+>   tools/testing/selftests/kvm/Makefile               |   2 +
+>   tools/testing/selftests/kvm/guest_memfd_test.c     |   3 +
+>   .../selftests/kvm/include/aarch64/kvm_util_arch.h  |   7 ++
+>   .../selftests/kvm/include/kvm_test_harness.h       |  36 ++++++
+>   .../testing/selftests/kvm/include/kvm_util_base.h  |  61 +++++++++--
+>   .../selftests/kvm/include/riscv/kvm_util_arch.h    |   7 ++
+>   .../selftests/kvm/include/s390x/kvm_util_arch.h    |   7 ++
+>   tools/testing/selftests/kvm/include/sparsebit.h    |  56 +++++++---
+>   .../selftests/kvm/include/x86_64/kvm_util_arch.h   |  23 ++++
+>   .../selftests/kvm/include/x86_64/processor.h       |   8 ++
+>   tools/testing/selftests/kvm/include/x86_64/sev.h   | 107 ++++++++++++++++++
+>   .../testing/selftests/kvm/lib/aarch64/processor.c  |  24 +++-
+>   tools/testing/selftests/kvm/lib/kvm_util.c         |  67 ++++++++++--
+>   tools/testing/selftests/kvm/lib/riscv/processor.c  |   9 +-
+>   tools/testing/selftests/kvm/lib/s390x/processor.c  |  13 ++-
+>   tools/testing/selftests/kvm/lib/sparsebit.c        |  48 ++++----
+>   tools/testing/selftests/kvm/lib/ucall_common.c     |   3 +-
+>   tools/testing/selftests/kvm/lib/x86_64/processor.c |  45 +++++++-
+>   tools/testing/selftests/kvm/lib/x86_64/sev.c       | 114 +++++++++++++++++++
+>   .../selftests/kvm/x86_64/fix_hypercall_test.c      |  27 +++--
+>   .../kvm/x86_64/private_mem_conversions_test.c      |   2 +
+>   .../selftests/kvm/x86_64/sev_migrate_tests.c       |  60 +++-------
+>   .../testing/selftests/kvm/x86_64/sev_smoke_test.c  |  88 +++++++++++++++
+>   .../testing/selftests/kvm/x86_64/sync_regs_test.c  | 121 +++++++++++++++------
+>   .../selftests/kvm/x86_64/userspace_msr_exit_test.c |  52 +++------
+>   .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       |  52 ++-------
+>   26 files changed, 802 insertions(+), 240 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/include/aarch64/kvm_util_arch.h
+>   create mode 100644 tools/testing/selftests/kvm/include/kvm_test_harness.h
+>   create mode 100644 tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
+>   create mode 100644 tools/testing/selftests/kvm/include/s390x/kvm_util_arch.h
+>   create mode 100644 tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
+>   create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
+>   create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
+>   create mode 100644 tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
+> 
 
 
