@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-11542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41D287813B
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:03:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6634878156
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89BFB285536
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 14:03:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 064551C22022
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 14:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126FF3FE28;
-	Mon, 11 Mar 2024 14:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998E13FB95;
+	Mon, 11 Mar 2024 14:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bOcJSvXU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MfVyBrRP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBA63FB81
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 14:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243082BB19
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 14:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710165819; cv=none; b=BzeFw9qa8lZiYhGcZ25aQH2kQ/2QFSbSiTGZmKWOuod0I89GpWdNVsBzqSbGo/GBYswKRaBMnUa9GsmorkKqc1aH8+3qlMp/MzULVvB35yzkrTFmFVPboxevMAUHSpDn6dhnbosYpeTxOroZxHWP3WIOf3hiOlet91UH9ct6bG8=
+	t=1710166231; cv=none; b=PL4qtq2PHJjSrG5zUP93htdikUK9h2TAMo/9mQPJ6bqc6+8nNpl9bP9jsoEsJbvR0JOCLuG2uxU+eq3qCS9e7gpydwc/83+8E8ccmq2sJEPgdaaYOw8SL1ustHUQT1WaU/t9vr1DRh0a4LLgUWfF1AJuaQiiI1Gyae3IgGDkiUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710165819; c=relaxed/simple;
-	bh=uFwC0wKHNXk3x4j9pEfnsufSuDKMcsLEdD2GQK6haPk=;
+	s=arc-20240116; t=1710166231; c=relaxed/simple;
+	bh=Z4SSQaT52eZKD7Umt25pdDNozU2k30+g0F1G3C9wXyw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JdMlokjWerMnGvw67Ijn8FSEZXovgJ/VkBfWZfkGgv8iTpj3ILVXOOnhmyd7hZFAkeHqzoyX039SvXJMpkLPxh88QCKkkakvgLN96JoihhAeus/Y8nUyc3ae1bnI+qIhl3R4CQo0w2gTcWkZg/QOAmMgpqRORWDAPqPCg+WkFMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bOcJSvXU; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=e7/8MMd3Ikx+1KbHjUpOk27mga51j9BDlAWF/wqCr7PilYD1lvH+9itVuW6KdoBBFuJ2hpbMJjfJ/o7dhjYftz3kb2BYUYeB8T7Bo9NuIw+ZCPy6kvaAGj40JvV4UM25IVhRludP6p6SXIYDjF4sDAnYg+Bx9R5Gisps2Aq9CeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MfVyBrRP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710165816;
+	s=mimecast20190719; t=1710166228;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=SpjvKzONwN1WvYedl5HUfn8KeqjVQbSv8SD0MqULuGo=;
-	b=bOcJSvXUfg1Qmm7MjMy0AIk6ynEI71tiYH/Nvgc3Se+6bJou8CXHDzZ6gp4VTvmvRM8h3q
-	wg4VXRmHiS3eWBZOIP2IIwUWn+FxbfNjaXqSa7MqHLKf0TMDJ05Iax//A6jSnA8NLIqXwk
-	VRavy4DM8bF8+vvr1BCb1STBM5El+GQ=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=hYh5tQchtq2eZoOZpBdnN7mPdgsWGKOiIWfUojl7Cjw=;
+	b=MfVyBrRPPLLVS1nv711y/x1kdBCfu2ZdyemcnDXBN8GvIdXVF4GgFk0EWTQNqP4/dTYMIG
+	NdT69nfoaBJf9WNvYe4NgbZrj5S+ClsXIN6Md7hbhEbfwM0QHpuVd8IJKvkG5m/GuzYjVW
+	/O1pFG6fPx7lJfE7Cycz0isGErBWd9A=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-zpXl6FwCMDCW3tadPS7SYA-1; Mon, 11 Mar 2024 10:03:30 -0400
-X-MC-Unique: zpXl6FwCMDCW3tadPS7SYA-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2d3fe91d29dso34094461fa.3
-        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:03:29 -0700 (PDT)
+ us-mta-472-HwK9gRKpMkOWrkren2w_wA-1; Mon, 11 Mar 2024 10:10:22 -0400
+X-MC-Unique: HwK9gRKpMkOWrkren2w_wA-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-567002485e2so1834273a12.1
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:10:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710165808; x=1710770608;
+        d=1e100.net; s=20230601; t=1710166221; x=1710771021;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SpjvKzONwN1WvYedl5HUfn8KeqjVQbSv8SD0MqULuGo=;
-        b=az1bW20tufkRtFhPXCvD+bzIqLIaniqi4/Fyg1rppZDvZMOQzZJfOtbvJsx7Idzsj6
-         341XdROZ1WUduwh4CHxYk95r++hIA2WT+bZhwyNXWAVYoETc5WAlZAfjPRxXBwLLHrDW
-         yaO/eIfFu/jHcb+m9R/JA5HeqbYKJRROnTIM9VZcQT30l1pq0GsOE0cgTapwgzTNQT41
-         6bPEU7ajwDHRQnN+YPHSf0gJCNINAQUPbpgGorbPeiTq+LsewDdEfRUNS/7ECZ3zngCO
-         99SyvCIoZRQ8lM21Z5L3b3pq/H6AMmpdX1OOAdWTMdai2JEnldayuMMqm5eRvUjQmixZ
-         NxIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVieI/+LAsvW4LrbqcFC+VmgzTunPgDrhlGAx+vDV1Iemnpb6k1vnOSG/ylcAB6jyLEhPVksuVikkgKxLz6EA7vppfR
-X-Gm-Message-State: AOJu0Ywe2/LK7C70nDw44w3mog0SWj6FR+784mtQfqtwPKoDl6CQUr1E
-	p6r9R3aUvWE9zgC40bnvjuNu5YknXHB4zDMmVbIGli10+q1+UzzK1no9KialWOjZcMRFGvUXmL0
-	i/wXJ0TrQvaOblZxABOU4Ef26UKjLEOtt51x+hDeEc+k4wDTkJg==
-X-Received: by 2002:a05:651c:14f:b0:2d2:abf0:1c0d with SMTP id c15-20020a05651c014f00b002d2abf01c0dmr3939177ljd.47.1710165808452;
-        Mon, 11 Mar 2024 07:03:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFCA2GUDM9NamsljAMo439WsiCclbH+XYQaf2bCUMQ8lybA4XqUzWWAwlx0Cw9i8NHaUvaAxg==
-X-Received: by 2002:a05:651c:14f:b0:2d2:abf0:1c0d with SMTP id c15-20020a05651c014f00b002d2abf01c0dmr3939164ljd.47.1710165808078;
-        Mon, 11 Mar 2024 07:03:28 -0700 (PDT)
+        bh=hYh5tQchtq2eZoOZpBdnN7mPdgsWGKOiIWfUojl7Cjw=;
+        b=iSbwNU+8+n7GdsOkmFbjGS/dNzLYNHdgl99EeL96+ZQdbGEHB/1eJL4DrYH9qiXsSw
+         yXJx0t22QK6/3ztE7IcHSZXFaxUefkNkBWFXajLp2D1K+Sblk8edIg4X4+nhEEWso2cL
+         gHStrLUAPSA+FItqb4gYwvpcuExleVniQVcVnHvWQyqT4G6QMyhq7I+9jkOypJ3VNPyj
+         /f6+aflYpXw6D+gwUUGL3Qtg0z/NV9WzpDTYVDIR479RZCS7Oq6NEboE6R5hKP7vw0zE
+         XKm7SBJE9er74I1THnRhvihmcKXin/w5rpOF/jdk3oYmLHJIfhfqJkOnMsok3PZs1KvN
+         tx7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUfMSF+8H9KCEqdLnsQmvTM5ZHyYWn8LGMPK5QgxidKwFuRMa8cNOhZi9n1d77iIEeG8AkLKUsqYN461nbP1KFF8m1B
+X-Gm-Message-State: AOJu0Yxq3lkm9I3QCfLJkig+emTOfV0bQ6aP+bJKDJf2lQMGMfBgIlqy
+	5FI4UR5t8KeRYnqkImE/pj5Dhpxwlyp4CGHxXH3iEeEUsBMMUp9FUjpYrC25pNEU7j/RT317oS1
+	KPBo5i+9gnYsXAsEJXewPr3X4DsyyMHcuCl71SX9SRrZ80E/4iA==
+X-Received: by 2002:a17:906:e2c5:b0:a45:f9da:b683 with SMTP id gr5-20020a170906e2c500b00a45f9dab683mr4046329ejb.66.1710166221178;
+        Mon, 11 Mar 2024 07:10:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEY7olz2nnq89L389z4fKjNkFp+/5FWfOwUlOJt4408T6wNJTGHcVc/O4EzaY14GwTb/wlJkg==
+X-Received: by 2002:a17:906:e2c5:b0:a45:f9da:b683 with SMTP id gr5-20020a170906e2c500b00a45f9dab683mr4046305ejb.66.1710166220755;
+        Mon, 11 Mar 2024 07:10:20 -0700 (PDT)
 Received: from [192.168.10.81] ([151.49.77.21])
-        by smtp.googlemail.com with ESMTPSA id b2-20020aa7c902000000b00564e489ce9asm3016297edt.12.2024.03.11.07.03.25
+        by smtp.googlemail.com with ESMTPSA id c23-20020a1709060fd700b00a44180ab871sm2900654ejk.50.2024.03.11.07.10.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Mar 2024 07:03:26 -0700 (PDT)
-Message-ID: <bf5b1b4a-dfa2-4cb7-9f86-f5565bda2aab@redhat.com>
-Date: Mon, 11 Mar 2024 15:03:25 +0100
+        Mon, 11 Mar 2024 07:10:19 -0700 (PDT)
+Message-ID: <6091398f-a2b3-4dc9-9f33-d7459a0a9594@redhat.com>
+Date: Mon, 11 Mar 2024 15:10:17 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,14 +82,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.9
+Subject: Re: [GIT PULL] KVM/riscv changes for 6.9
 Content-Language: en-US
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: ankita@nvidia.com, bhelgaas@google.com, jingzhangos@google.com,
- joey.gouly@arm.com, maz@kernel.org, rananta@google.com,
- rdunlap@infradead.org, seanjc@google.com, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <ZeyQ5TK3pULYc32o@thinky-boi>
+To: Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt
+ <palmer@rivosinc.com>, Andrew Jones <ajones@ventanamicro.com>,
+ Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>,
+ KVM General <kvm@vger.kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)"
+ <kvm-riscv@lists.infradead.org>,
+ linux-riscv <linux-riscv@lists.infradead.org>
+References: <CAAhSdy1rYFoYjCRWTPouiT=tiN26Z_v3Y36K2MyDrcCkRs1Luw@mail.gmail.com>
+ <Zen8qGzVpaOB_vKa@google.com>
+ <CAAhSdy2Mu08RsBM+7FMjkcV49p9gOj3UKEoZnPAVk92e_3q=sw@mail.gmail.com>
+ <ZesxeoyFZUeo-Z9F@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -126,14 +132,35 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <ZeyQ5TK3pULYc32o@thinky-boi>
+In-Reply-To: <ZesxeoyFZUeo-Z9F@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/9/24 17:40, Oliver Upton wrote:
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.9
+On 3/8/24 16:40, Sean Christopherson wrote:
+> You're missing the point.  I don't care when patches land in the RISC-V tree, nor
+> do I care that you made a last minute tweak to fix a bug.  I care when commits
+> show up in linux-next, and*none*  of these commits were in linux-next until
+> yesterday.
+> 
+>    $ git tag -l --contains 2c5af1c8460376751d57c50af88a053a3b869926
+>    next-20240307
+>    next-20240308
+> 
+> The*entire*  purpose of linux-next is to integrate*all*  work destined for the
+> next kernel into a single tree, so that conflicts, bugs, etc. can be found and
+> fixed*before*  the next merge window.
 
-Pulled, thanks.
+Indeed, and this is more important as more work is routed towards 
+different trees.  At this point we have 5 more or less active 
+architectures, and especially in selftests land it's important to 
+coordinate with each other.
+
+Anup, ideally, when you say that a patch is "queued" it should only be a 
+short time before you're ready to send it to me - and that means putting 
+it in a place where linux-next picks it up.  For x86 I generally compile 
+test and run kvm-unit-tests on one of Intel or AMD, and leave the 
+remaining tests for later (because they take a day or two), but in 
+general it's a matter of days before linux-next get the patches.
 
 Paolo
 
