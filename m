@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-11597-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11598-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E3E0878B00
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 23:56:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62570878B03
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 23:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E65112824EA
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 22:56:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF5F71F21A8C
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 22:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48EF58AA1;
-	Mon, 11 Mar 2024 22:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B0C58AD1;
+	Mon, 11 Mar 2024 22:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d3/GJRCq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CsQiYdIz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219A55820E;
-	Mon, 11 Mar 2024 22:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FAAD58229;
+	Mon, 11 Mar 2024 22:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710197774; cv=none; b=iAd3V8ys+JKCGXb7zFfHcWDtztuc2r7zMdUauuxek5JzRNrbZDlrCZrjHPdmqlMtu18ynjSCAzx7xMOBkZm32c5jh+3lO9xiL97KWtvUO6KCeCJv1qe7v2d5U6qyotHP6CSOFD0qllaN4LvBBIAmYtojjy3BLuU8ozpaU6+bj+k=
+	t=1710197841; cv=none; b=p6S4PHl2HcQKxaYAqkc1UAhWT716nrdVTeJuu6Zu9Gg9SZfoQH2LZ2Dp5DHMlCK5LUh0Qo2ZYPSoiUdP6Jlap8HVukcGPte71jAA9mXoLhpHLsyaiLDkmRXi3wH6c6z/vvRKUdON/tSVy692ITAj4rel/sWmGuwti/eEJqI8G0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710197774; c=relaxed/simple;
-	bh=WF8Ohh64A76fCksRVYwYwuKxjTuUn10ghM+Q4PVZSRM=;
+	s=arc-20240116; t=1710197841; c=relaxed/simple;
+	bh=At91YnFA+zD7WzNl/tKfPuU3u/VczJAEILP0HPgM8GQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=itZMViIOCL0IuDgiDdpz02aN7OIMTlP90ONxVszhCFaT+/iwTkddnjsBQah3jq4rGFWv3ALWNKGMvIWv63c+iuWRD0svMXSLf6vuZn0KyebHzEtTSsMr/59jXtrhtkLlqz8PidLRaprTgWigQA2gsc0IV+EeUOT9Pucv/8s1yXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d3/GJRCq; arc=none smtp.client-ip=192.198.163.11
+	 Content-Type:Content-Disposition:In-Reply-To; b=GAiMX367iOVZxzJjqgom7/ssFnqYDsl5x5jJ5LZEG2sAWG1jrl18gjqmZ7M7LhZ1t0PvTCoK20JiZa2sYDya/jwvEUlD5yRSmvIRAnoz+TBKF5G86G8hW8P/y1CbvSGqUUPmkHsN+g5TJWWzdeWjcMX5jKsK3sLNG66Z05hY7fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CsQiYdIz; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710197773; x=1741733773;
+  t=1710197840; x=1741733840;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=WF8Ohh64A76fCksRVYwYwuKxjTuUn10ghM+Q4PVZSRM=;
-  b=d3/GJRCqe/Q8T48YKS/SDwMFJhTV+9YrPmSo2wFPiojStUwvYpELgR9/
-   lsDjfGPKBt6nm79Ca8cfXDdf9POcsdzCk0iaJ0/EvY89zJhLrzRoz94li
-   cOQHxPEbpx6oGDJB1O/o6r6xfVLTruFq36IEBatsggnQC5exRh+YTXAOQ
-   2EQqjOXEY3oSSvVZi0E/yaJTU5nri1zzRX0no2emeoVtJoYSpY1hZgCq3
-   gQqIQB+BMdwegkWt/FvKfqyNqQmYOLtOKaukKbDGRYO4Z5NZfC+J9eWmB
-   FJeQI5j+SA0gUxn2Xb2tOt8mpAs3GeBaHbZREG8D7jGvp9J/RUu+Hv0ZE
+  bh=At91YnFA+zD7WzNl/tKfPuU3u/VczJAEILP0HPgM8GQ=;
+  b=CsQiYdIzW9OTftrIkmWw/vnq/KGBdX6UymTHkYrmiHgLPKLcQBk5WhZA
+   14aphPCQ6cWob1K/mb01G63CHyZeLzXsl0iWlAn8BDdPFhz84b6etGHY4
+   eXebC3AjGsRPs/BLUA6d/NOBxTJmlO6JrbSeqTVrpZieoFMB9sEfQ5uuQ
+   QJfDhT4ESoPoXP5zdU2C4h0k7q2BJdR4J4ULCSA8+Nfx6dH1fVTEjrP2b
+   Pc3Eqd0YVwrO6nfJ4tQlSutbqYvTG36T3FNUNJn0I45YlBCBck6nIc1ks
+   RY4VC3iEKAaVVa9esQDe1CdVuZL0oWatvS36Ll1isghhKRLJUd1KVLqNH
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="15524628"
+X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="27362116"
 X-IronPort-AV: E=Sophos;i="6.07,117,1708416000"; 
-   d="scan'208";a="15524628"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 15:56:12 -0700
+   d="scan'208";a="27362116"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 15:57:19 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,117,1708416000"; 
-   d="scan'208";a="34497033"
+   d="scan'208";a="11388636"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 15:56:12 -0700
-Date: Mon, 11 Mar 2024 15:56:11 -0700
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 15:57:18 -0700
+Date: Mon, 11 Mar 2024 15:57:18 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 To: Sean Christopherson <seanjc@google.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, isaku.yamahata@gmail.com,
@@ -63,12 +63,12 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, isaku.yamahata@gmail.com,
 	David Matlack <dmatlack@google.com>,
 	Federico Parola <federico.parola@polito.it>,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [RFC PATCH 3/8] KVM: x86/mmu: Introduce initialier macro for
- struct kvm_page_fault
-Message-ID: <20240311225611.GB935089@ls.amr.corp.intel.com>
+Subject: Re: [RFC PATCH 5/8] KVM: x86/mmu: Introduce kvm_mmu_map_page() for
+ prepopulating guest memory
+Message-ID: <20240311225718.GC935089@ls.amr.corp.intel.com>
 References: <cover.1709288671.git.isaku.yamahata@intel.com>
- <b045dc17abd4f1330406964528ade5722ab63aa1.1709288671.git.isaku.yamahata@intel.com>
- <Ze8-YlvprcKou-Ho@google.com>
+ <7b7dd4d56249028aa0b84d439ffdf1b79e67322a.1709288671.git.isaku.yamahata@intel.com>
+ <Ze8_XfMN_mZBabKP@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,116 +77,84 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Ze8-YlvprcKou-Ho@google.com>
+In-Reply-To: <Ze8_XfMN_mZBabKP@google.com>
 
-On Mon, Mar 11, 2024 at 10:24:50AM -0700,
+On Mon, Mar 11, 2024 at 10:29:01AM -0700,
 Sean Christopherson <seanjc@google.com> wrote:
 
 > On Fri, Mar 01, 2024, isaku.yamahata@intel.com wrote:
 > > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > > 
-> > Another function will initialize struct kvm_page_fault.  Add initializer
-> > macro to unify the big struct initialization.
-> > 
-> > No functional change intended.
+> > Introduce a helper function to call kvm fault handler.  This allows
+> > a new ioctl to invoke kvm fault handler to populate without seeing
+> > RET_PF_* enums or other KVM MMU internal definitions.
 > > 
 > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > > ---
-> >  arch/x86/kvm/mmu/mmu_internal.h | 44 +++++++++++++++++++--------------
-> >  1 file changed, 26 insertions(+), 18 deletions(-)
+> >  arch/x86/kvm/mmu.h     |  3 +++
+> >  arch/x86/kvm/mmu/mmu.c | 30 ++++++++++++++++++++++++++++++
+> >  2 files changed, 33 insertions(+)
 > > 
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> > index 0669a8a668ca..72ef09fc9322 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -279,27 +279,35 @@ enum {
-> >  	RET_PF_SPURIOUS,
-> >  };
+> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> > index 60f21bb4c27b..48870c5e08ec 100644
+> > --- a/arch/x86/kvm/mmu.h
+> > +++ b/arch/x86/kvm/mmu.h
+> > @@ -183,6 +183,9 @@ static inline void kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+> >  	__kvm_mmu_refresh_passthrough_bits(vcpu, mmu);
+> >  }
 > >  
-> > +#define KVM_PAGE_FAULT_INIT(_vcpu, _cr2_or_gpa, _err, _prefetch, _max_level) {	\
-> > +	.addr = (_cr2_or_gpa),							\
-> > +	.error_code = (_err),							\
-> > +	.exec = (_err) & PFERR_FETCH_MASK,					\
-> > +	.write = (_err) & PFERR_WRITE_MASK,					\
-> > +	.present = (_err) & PFERR_PRESENT_MASK,					\
-> > +	.rsvd = (_err) & PFERR_RSVD_MASK,					\
-> > +	.user = (_err) & PFERR_USER_MASK,					\
-> > +	.prefetch = (_prefetch),						\
-> > +	.is_tdp =								\
-> > +	likely((_vcpu)->arch.mmu->page_fault == kvm_tdp_page_fault),		\
-> > +	.nx_huge_page_workaround_enabled =					\
-> > +	is_nx_huge_page_enabled((_vcpu)->kvm),					\
-> > +										\
-> > +	.max_level = (_max_level),						\
-> > +	.req_level = PG_LEVEL_4K,						\
-> > +	.goal_level = PG_LEVEL_4K,						\
-> > +	.is_private =								\
-> > +	kvm_mem_is_private((_vcpu)->kvm, (_cr2_or_gpa) >> PAGE_SHIFT),		\
-> > +										\
-> > +	.pfn = KVM_PFN_ERR_FAULT,						\
-> > +	.hva = KVM_HVA_ERR_BAD, }
+> > +int kvm_mmu_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> > +		     u8 max_level, u8 *goal_level);
 > > +
+> >  /*
+> >   * Check if a given access (described through the I/D, W/R and U/S bits of a
+> >   * page fault error code pfec) causes a permission fault with the given PTE
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index e4cc7f764980..7d5e80d17977 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4659,6 +4659,36 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >  	return direct_page_fault(vcpu, fault);
+> >  }
+> >  
+> > +int kvm_mmu_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> > +		     u8 max_level, u8 *goal_level)
+> > +{
+> > +	struct kvm_page_fault fault = KVM_PAGE_FAULT_INIT(vcpu, gpa, error_code,
+> > +							  false, max_level);
+> > +	int r;
+> > +
+> > +	r = __kvm_mmu_do_page_fault(vcpu, &fault);
+> > +
+> > +	if (is_error_noslot_pfn(fault.pfn) || vcpu->kvm->vm_bugged)
+> > +		return -EFAULT;
 > 
-> Oof, no.  I would much rather refactor kvm_mmu_do_page_fault() as needed than
-> have to maintain a macro like this.
+> This clobbers a non-zero 'r'.  And KVM return -EIO if the VM is bugged/dead, not
+> -EFAULT.  I also don't see why KVM needs to explicitly check is_error_noslot_pfn(),
+> that should be funneled to RET_PF_EMULATE.
 
-Ok, I updated it as follows.
+I'll drop this check.
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 0669a8a668ca..e57cc3c56a6d 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -279,8 +279,8 @@ enum {
- 	RET_PF_SPURIOUS,
- };
- 
--static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
--					u32 err, bool prefetch, int *emulation_type)
-+static inline int __kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-+					  u32 err, bool prefetch, int *emulation_type)
- {
- 	struct kvm_page_fault fault = {
- 		.addr = cr2_or_gpa,
-@@ -307,6 +307,21 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		fault.slot = kvm_vcpu_gfn_to_memslot(vcpu, fault.gfn);
- 	}
- 
-+	if (IS_ENABLED(CONFIG_RETPOLINE) && fault.is_tdp)
-+		r = kvm_tdp_page_fault(vcpu, &fault);
-+	else
-+		r = vcpu->arch.mmu->page_fault(vcpu, &fault);
-+
-+	if (fault.write_fault_to_shadow_pgtable && emulation_type)
-+		*emulation_type |= EMULTYPE_WRITE_PF_TO_SP;
-+	return r;
-+}
-+
-+static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-+					u32 err, bool prefetch, int *emulation_type)
-+{
-+	int r;
-+
- 	/*
- 	 * Async #PF "faults", a.k.a. prefetch faults, are not faults from the
- 	 * guest perspective and have already been counted at the time of the
-@@ -315,13 +330,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	if (!prefetch)
- 		vcpu->stat.pf_taken++;
- 
--	if (IS_ENABLED(CONFIG_RETPOLINE) && fault.is_tdp)
--		r = kvm_tdp_page_fault(vcpu, &fault);
--	else
--		r = vcpu->arch.mmu->page_fault(vcpu, &fault);
--
--	if (fault.write_fault_to_shadow_pgtable && emulation_type)
--		*emulation_type |= EMULTYPE_WRITE_PF_TO_SP;
-+	r = __kvm_mmu_do_page_fault(vcpu, cr2_or_gpa, err, prefetch, emulation_type);
- 
- 	/*
- 	 * Similar to above, prefetch faults aren't truly spurious, and the
--- 
-2.43.2
+> > +
+> > +	switch (r) {
+> > +	case RET_PF_RETRY:
+> > +		return -EAGAIN;
+> > +
+> > +	case RET_PF_FIXED:
+> > +	case RET_PF_SPURIOUS:
+> > +		*goal_level = fault.goal_level;
+> > +		return 0;
+> > +
+> > +	case RET_PF_CONTINUE:
+> > +	case RET_PF_EMULATE:
+> 
+> -EINVAL woud be more appropriate for RET_PF_EMULATE.
+> 
+> > +	case RET_PF_INVALID:
+> 
+> CONTINUE and INVALID should be WARN conditions.
 
+Will update them.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
