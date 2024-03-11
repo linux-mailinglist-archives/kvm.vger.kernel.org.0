@@ -1,134 +1,187 @@
-Return-Path: <kvm+bounces-11535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2899B877F61
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 12:59:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 442A9877FC8
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 13:16:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB5F1C218A3
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 11:59:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 682291C21198
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 12:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FC23BB36;
-	Mon, 11 Mar 2024 11:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456713C684;
+	Mon, 11 Mar 2024 12:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZ3+7taG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="s0czAKY7"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2040.outbound.protection.outlook.com [40.107.93.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B362C69A
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 11:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710158387; cv=none; b=hmj8CN/LoOHGyDzz70JQQCMA9S8CVuT3sEZBUAXIzaBHgyApBPtjMF7bhAl6sWoLSxKUZ87ZXSlZInNvaSDEDiWo04yPvK9tb+uRQGh6GV71BcGRg1JVkFVLdDPtr26jyJ1JAg/g23f/73NAQ0m4V8TP5PI7ON/2wo5FqrBK4yw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710158387; c=relaxed/simple;
-	bh=22id+7Sn4vYwNc4GCqkGYRy+xTHYzXGBDfO0D11nENM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DRgl1Wx1/oQiBcI8ZB8Lf2jKoHILnzAyC240ElZ0FlLRHgs2hQk6R5AtAU5kFi5LSGb86PHPTmNB2ogEroGlQSgcRmzxP6aVu2+qnJSRP51bnWD0Og458qxn19CGOvbTEq9RbHMEsMw3/AZdukR826sEIDR6qVPMvOA9mUyoTdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RZ3+7taG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710158384;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uRyEkCKNkPVnOj3uensDQWTBZOHL7iOI9MqexSDkxoM=;
-	b=RZ3+7taG1T+xhRyHZyIu+wT1AnwrPRUpGlMw4BDFAm7rA/59XeSNiHqdB2zBZmEiR+/CIQ
-	ICmm80We5dYe3e0LQA43w2yzw2/3YsOCLCIxziFZKSPMb1rBNzMXmv+NTk7xdeYUV6Mujj
-	jTVNCpHPqr+ShwPogUwCQTSI0o9sNbk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-393-pzQ_R8s9N2264nbHyKsxiA-1; Mon,
- 11 Mar 2024 07:59:30 -0400
-X-MC-Unique: pzQ_R8s9N2264nbHyKsxiA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E97BE1C04330;
-	Mon, 11 Mar 2024 11:59:29 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.160])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C60DB492BC4;
-	Mon, 11 Mar 2024 11:59:29 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 8FBC91801A82; Mon, 11 Mar 2024 12:59:28 +0100 (CET)
-Date: Mon, 11 Mar 2024 12:59:28 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] kvm: add support for guest physical bits
-Message-ID: <q6zckxcxwke2kdlootdq3s7m2ctcy7juuv3fsezhpw3nqyewxo@sqku62f25gdc>
-References: <20240305105233.617131-1-kraxel@redhat.com>
- <20240305105233.617131-3-kraxel@redhat.com>
- <CABgObfZ13WEHaGNzjy0GVE2EAZ=MHOSNHS_1iTOuBduOt5q_3g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42A03C47B
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 12:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710159374; cv=fail; b=ZaCBjRE35CRUXOlvwgn3aUMsFhlkHoVH4/vWxpv6Y3+Tc6FJHT1TDQje4beRSn8bPODyGb5J6FLTU270s+b+TUsI0dtkAHYhG6FQ2ePY8hTPf/Wmt0qP36Q7i+gbvZxEoXM1KVJS5Mruqw4mpy5gP+vsF+EjMpqdaKvNPthGvwg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710159374; c=relaxed/simple;
+	bh=o071ATZYOtOa9HK0Goylb7YSxp91ngnYqoUHdjtk08w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=c61zZrRJj3cgBWqGgRrPMsXV3wLMcyRCwkxd+7aomppJS8YwjFHplbK7UAQLmXqqtLGndIN8Zr53joATwzlHebvz7Q+CIHVs6DuX4DMEze4q5ohwtdGfvILYPnnw+/KTOXWhct0S+LKgItXoPoRIqaLwpgrQUuEehhK3W4rtDfU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=s0czAKY7; arc=fail smtp.client-ip=40.107.93.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CdFIPWZbW35cnjoWZxVS/lcsWz3PCbDlY8cXZrWAA67UGR9nYFWOBTx55t7x+mnpks1PQbqNbTRFmQ2u73R9uPkJkJ+riaIeoJw9/rZKr5kH873NfxIbWmFKl1Xifj5TT6C7oWGvLCusMHov+hY+2cMg9x2fm1GmYF7gDvKYqd64c4mEvp5YwSfjTjYeV2juWHdJGbKZldg2nWYK4OwNz8Ih+SKA13qrLbQlDzHc6VyJ9BfS1VgUwmyvLPIMK+fpjoQUNCWqEJCpyBjHiHPdmSDf5/FevpJ7COVgcqIUGNBQz65RTQaoconcZCM9IJ5OkmorLDBVCCZ2Oc5MLGtRKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tnYlo/jpCzeKmtItcUAolkia80g+SLSC9y26UXblya4=;
+ b=NjH8huwgq90mOy1TjhaO7fvbW/liNmLCgN0sRhhHMP93Vn141IeRc3QbzDfdufXQIs/hlWwaR05+G5acPk7aw0NA6/q+Qr8eMsxfEyejteMVnYGLTrA1LxbxgS+vIWl86jjGHIgCYxghqLV4HhRoshVSK9dH61KthsUT3BhIOig1BxdAqfuaPMDq//ZTHIvldRSS3nrV3BE91WXAFn78FDhbrO8mXdayneioAllCNFvcqvbNiid7ldvcqaw4Fv+EWJAdSfWqI1ILfhAjD0CzxkjQeP6XWrfETPY54OJvimKCMDwqG06C9f3CLQQSiNjyOi/T93tMPhe+CBsIlJ7CVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=nongnu.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tnYlo/jpCzeKmtItcUAolkia80g+SLSC9y26UXblya4=;
+ b=s0czAKY7and0gp6ScASvukO9okw370PvrQJhBGOjlld3YqG3W2KVcUAk4tScx97h5ORWLp2YZ9/Mzj4aKYT9cIf7QUy4XLVgdis/uNliLO0EuiQw9PV6sOlTL8SH3cpIEBpc11i3++KiVpkiI5jYA6ctng196CubXUcBRlXLsC47jGNDHL/HSpHXe1r8PT3OMfb8DLc5IrWdPyLphzHqx6y/imJrPxdtn85yTwYAHUJxQYdeJeahITVE4via4idFk2vjyUhgc+ZibAoVYNVDzlQb4Icuh5eoyNEI/ZzqaxojNBgW0ls4AZOWYSIMxTj0y2a3Y7M5aKtQgwCSxR+FnA==
+Received: from BN9P223CA0014.NAMP223.PROD.OUTLOOK.COM (2603:10b6:408:10b::19)
+ by BY5PR12MB4306.namprd12.prod.outlook.com (2603:10b6:a03:206::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35; Mon, 11 Mar
+ 2024 12:16:05 +0000
+Received: from BN2PEPF000044A6.namprd04.prod.outlook.com
+ (2603:10b6:408:10b:cafe::4d) by BN9P223CA0014.outlook.office365.com
+ (2603:10b6:408:10b::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35 via Frontend
+ Transport; Mon, 11 Mar 2024 12:16:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ BN2PEPF000044A6.mail.protection.outlook.com (10.167.243.100) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7386.12 via Frontend Transport; Mon, 11 Mar 2024 12:16:05 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Mar
+ 2024 05:15:53 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Mon, 11 Mar 2024 05:15:52 -0700
+Received: from vkale-dev-linux.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12 via Frontend
+ Transport; Mon, 11 Mar 2024 05:15:49 -0700
+From: Vinayak Kale <vkale@nvidia.com>
+To: <qemu-devel@nongnu.org>
+CC: <alex.williamson@redhat.com>, <mst@redhat.com>,
+	<marcel.apfelbaum@gmail.com>, <avihaih@nvidia.com>, <acurrid@nvidia.com>,
+	<cjia@nvidia.com>, <zhiw@nvidia.com>, <targupta@nvidia.com>,
+	<kvm@vger.kernel.org>, Vinayak Kale <vkale@nvidia.com>
+Subject: [PATCH v2] vfio/pci: migration: Skip config space check for vendor specific capability during restore/load
+Date: Mon, 11 Mar 2024 17:45:19 +0530
+Message-ID: <20240311121519.1481732-1-vkale@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfZ13WEHaGNzjy0GVE2EAZ=MHOSNHS_1iTOuBduOt5q_3g@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A6:EE_|BY5PR12MB4306:EE_
+X-MS-Office365-Filtering-Correlation-Id: 53078364-ad67-4d3d-1441-08dc41c50684
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	NXXpz8nRrLWeXJ3x4b+r5erAp2lUoRh+h8LJQ2iGL+8xQUm3ToCF6fEi72Qv1cO2UQEHOTt6tU1L324sYWylGVCogg4AXkwAzzJFtBIFNvEzNscdnPtcRQpycBx5M9j0CnrsUJHDYkyKQfuFPX9SrkX5F55Zn9xG2tCeUX6B5cMyybZ7P7YlWtKR8xM5U+dnM7m+UmPsleiiBIIpJXE9GhsgJ9FYwDNJuqhmebebGnK4ukgKwrDuaOLCU1p9MdbUYCils5aXAFsIObc6KxSUNTMcjAA7IkNyZE9j0mEbMl0NYSj1ZoToa+K0NdrY36XUe+wUUNSt0aa4Ye1yxrWPqf+NOsgmOcpO2+/jVgfbrEZN2kjd3EDDPL+IxkYsJJWSFORBnwzv1CAXg6FHO+uqPJWu+SsQkM+1bvR3NLxGX3bSfj52p3gEI07PHQvEpehdOKMGvgqQw+uaqKlheyvXKaxhcUiZaasAF2uB5H3+8lUELxN0qR3xsbneLTaRLSwkcGH3ZN1wOYZTjUPGcYFIld0roESEjSqXdgl3S8s/qy5xHDJeHg3w+jqyWKixMlxyEi7492zzkmYVV7nk/pJzi8MC6QAi3WHaet1UDq21OeLsWMDYfHHwnfpULFcdqwaGQI9bQlrcfwHFI8rgkLW9FJGMVTNS4GFRtCyUSe2zHdNqxm+NR93TvLt+sE/3QsqpOds2u8k17yHq6DiKn5D/YXk6oUhbM5/vVKJj7BUJzK81Faj8xHq5msWOLOd6XSLy
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(376005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 12:16:05.1574
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53078364-ad67-4d3d-1441-08dc41c50684
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044A6.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4306
 
-  Hi,
+In case of migration, during restore operation, qemu checks config space of the
+pci device with the config space in the migration stream captured during save
+operation. In case of config space data mismatch, restore operation is failed.
 
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 952174bb6f52..d427218827f6 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > +    guest_phys_bits = kvm_get_guest_phys_bits(cs->kvm_state);
-> > +    if (guest_phys_bits &&
-> > +        (cpu->guest_phys_bits == 0 ||
-> > +         cpu->guest_phys_bits > guest_phys_bits)) {
-> > +        cpu->guest_phys_bits = guest_phys_bits;
-> > +    }
-> 
-> Like Xiaoyao mentioned, the right place for this is kvm_cpu_realizefn,
-> after host_cpu_realizefn returns. It should also be conditional on
-> cpu->host_phys_bits.
+config space check is done in function get_pci_config_device(). By default VSC
+(vendor-specific-capability) in config space is checked.
 
-Ok.
+Ideally qemu should not check VSC for VFIO-PCI device during restore/load as
+qemu is not aware of VSC ABI.
 
-> It also makes sense to:
-> 
-> - make kvm_get_guest_phys_bits() return bits 7:0 if bits 23:16 are zero
-> 
-> - here, set cpu->guest_phys_bits only if it is not equal to
-> cpu->phys_bits (this undoes the previous suggestion, but I think it's
-> cleaner)
+This patch skips the check for VFIO-PCI device by clearing pdev->cmask[] for VSC
+offsets. If cmask[] is not set for an offset, then qemu skips config space check
+for that offset.
 
-Not sure about that.
+Signed-off-by: Vinayak Kale <vkale@nvidia.com>
+---
+Version History
+v1->v2:
+    - Limited scope of change to vfio-pci devices instead of all pci devices.
 
-I think it would be good to have a backward compatibility story.
-Currently neither the kernel nor qemu set guest_phys_bits.  So if the
-firmware finds guest_phys_bits == 0 it does not know whenever ...
+ hw/vfio/pci.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-  (a) kernel or qemu being too old, or
-  (b) no restrictions apply, it is safe to go with phys_bits.
-
-One easy option would be to always let qemu pass through guest_phys_bits
-from the kernel, even in case it is equal to phys_bits.
-
-> - add a property in x86_cpu_properties[] to allow configuration with TCG.
-
-Was thinking about configuration too.  Not sure it is a good idea to
-add yet another phys-bits config option to the mix of options we already
-have ...
-
-In case host_phys_bits=true qemu could simply use
-min(kernel guest-phys-bits,host-phys-bits-limit)
-
-For the host_phys_bits=false case it would probably be best to just
-not set guest_phys_bits.
-
-take care,
-  Gerd
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index d7fe06715c..9edaff4b37 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2132,6 +2132,22 @@ static void vfio_check_af_flr(VFIOPCIDevice *vdev, uint8_t pos)
+     }
+ }
+ 
++static int vfio_add_vendor_specific_cap(VFIOPCIDevice *vdev, int pos,
++                                        uint8_t size, Error **errp)
++{
++    PCIDevice *pdev = &vdev->pdev;
++
++    pos = pci_add_capability(pdev, PCI_CAP_ID_VNDR, pos, size, errp);
++    if (pos < 0) {
++        return pos;
++    }
++
++    /* Exempt config space check for VSC during restore/load  */
++    memset(pdev->cmask + pos, 0, size);
++
++    return pos;
++}
++
+ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+ {
+     PCIDevice *pdev = &vdev->pdev;
+@@ -2199,6 +2215,9 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+         vfio_check_af_flr(vdev, pos);
+         ret = pci_add_capability(pdev, cap_id, pos, size, errp);
+         break;
++    case PCI_CAP_ID_VNDR:
++        ret = vfio_add_vendor_specific_cap(vdev, pos, size, errp);
++        break;
+     default:
+         ret = pci_add_capability(pdev, cap_id, pos, size, errp);
+         break;
+-- 
+2.34.1
 
 
