@@ -1,370 +1,288 @@
-Return-Path: <kvm+bounces-11557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D36878416
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 16:44:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B071878449
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 16:57:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C11E5282B0F
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:44:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 157171F20FA2
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 15:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790684503F;
-	Mon, 11 Mar 2024 15:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E54F4597C;
+	Mon, 11 Mar 2024 15:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hExGqpMA"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YmdYOxDo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06F144C7E
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 15:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE5D4207B;
+	Mon, 11 Mar 2024 15:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710171854; cv=none; b=QbyaGqVceBnopfWMx4sAKTMD0obsjnraPJLPpYSWKl9Ev60250E33Fu9EstDvUZD9G1r8G1MnCvztuBvwUjbO9WIK8v3CWqSdY3FhJW3kvYYEi6G/y1VnyKvfgJ4U4sGaiZHwoleztYz1lE0S6hqS8LDyLTXHP3MB6R4KVUHhCk=
+	t=1710172614; cv=none; b=gyKNINkGsIr3/pM7UbQq282y+eQJz6SOdq7RgCmdZfKYxQGTyk0trgC9osmi+kjQdHBhyCzhX47gsKZQW7wfCAKGAb1N063Bz7CCp93JOSgbaK9/6DO0KyOQONuYw3EwH06TAwFFOoUIXWel0+5AKZBBZHL0wZsvpIGUY2gV66s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710171854; c=relaxed/simple;
-	bh=3Oa3RsGSvdw9ieQI+DuMhaX+rlnf3IE/372p879XosA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7CSADfe7Fbo4GPdUdBIxjfUdYzB4/0OGylFrVTIG3rQ+XEKj7npnZeHPdv/OhQFXtNMUlitfKHQJIcQVPa7E5XaVMAcqH8YjCyhHBOSsb4O/TZu/HWbLzpo8W9/HbwgqZvsom++slvalE0WVOKHdTqr4dGSR2416z05nH/FVuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hExGqpMA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710171852;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rjRB5OEegz21VQZYCihNrER37lmrZj8xbtZTO42XG8I=;
-	b=hExGqpMAFoqwhXMcKWAF/tUk4xfX/9GSMfOHfrUyJ0WEDWazPNWmR6hZXcA810NT09tvnZ
-	Z1JuVMZfZpjn8LIYLW6YJNziCvf9g61dTb1DNARM2tgw56ad7/43uqC9nf1HQjdUFKSnhF
-	0tJ4pHrHO0KNV+xBesa0OVN0mpXeUIg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-658-4iI0Snz1MBeFfvHO9IrTEw-1; Mon, 11 Mar 2024 11:44:05 -0400
-X-MC-Unique: 4iI0Snz1MBeFfvHO9IrTEw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4132cf5b950so3825145e9.0
-        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 08:44:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710171844; x=1710776644;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rjRB5OEegz21VQZYCihNrER37lmrZj8xbtZTO42XG8I=;
-        b=DDlMRtLOzYuoMaphRK2x3R6ocO5A+Vf+p5LdFyxxmQILyOIovOQ/ugSVY94PWVqhI5
-         J48DiscejHyrkDT4AEBStYN4ze1yksuneLn5jhXTULCXkumqQVU1kE2xL5+wkj/Jdj5e
-         6uE0lQPj15h5JarXttWCdK6Ba0VRCPgJUL4Ult9JDQbcDBGzRtRP6gQGXoqoZfWmY9DJ
-         BUujSgohoYRKUJCGTlW8u/KXvM5xtm8UWqmlHxgMyUVczUxa1qvebAyUJYjIoPF1pmg+
-         MTTKb8l+iCxzGsyLpjMsINSdTcaP6nqnaucs1rWh2udYj5X6j4x07sYNjFLxu8n5QzBw
-         LpIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWZ0fH8lfwQpVc3ZSmvu7OusSDdMIVc+r8tTqMAdTK5QKnsEKacS3ShuCv97EnS0rhladwaYeJYX2fPyNlFndewh/sb
-X-Gm-Message-State: AOJu0YzPxzpg5Ic9kHT5eXo1NKOnyouiFZfpmvFsbpEdcpLX3G9y9KFq
-	m+mHsBfYjtfF3YWpiMuJ+O7JSZv6tQHiZ5foaHzyl1FyH+TtSFbGmltr2wmHH6YS8nqsqlVEZ0c
-	4iFHrSwPlIFgiWb4rU/CgG0J2BZ4zxFIOKCjV4PYD7sdFN0Umfg==
-X-Received: by 2002:a05:600c:4f50:b0:412:ee33:db93 with SMTP id m16-20020a05600c4f5000b00412ee33db93mr6522990wmq.3.1710171843983;
-        Mon, 11 Mar 2024 08:44:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/5sktpvpegVaASCOlK5EL5Vy2leF+9Us9Eqe6bRgnyxbBqI746LRD6lji5z/jRDmgA1oOjQ==
-X-Received: by 2002:a05:600c:4f50:b0:412:ee33:db93 with SMTP id m16-20020a05600c4f5000b00412ee33db93mr6522955wmq.3.1710171843276;
-        Mon, 11 Mar 2024 08:44:03 -0700 (PDT)
-Received: from redhat.com ([2.52.134.16])
-        by smtp.gmail.com with ESMTPSA id fc20-20020a05600c525400b00412ae4b45b3sm15756072wmb.30.2024.03.11.08.43.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 08:44:02 -0700 (PDT)
-Date: Mon, 11 Mar 2024 11:43:54 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Ian Rogers <irogers@google.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Liam Howlett <liam.howlett@oracle.com>,
-	Miguel Ojeda <ojeda@kernel.org>, Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	David Laight <David.Laight@aculab.com>,
-	Shunsuke Mie <mie@igel.co.jp>, Yafang Shao <laoar.shao@gmail.com>,
-	Kui-Feng Lee <kuifeng@meta.com>, James Clark <james.clark@arm.com>,
-	Nick Forrington <nick.forrington@arm.com>,
-	Leo Yan <leo.yan@linux.dev>, German Gomez <german.gomez@arm.com>,
-	Rob Herring <robh@kernel.org>, John Garry <john.g.garry@oracle.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Anup Patel <anup@brainfault.org>, Fuad Tabba <tabba@google.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Haibo Xu <haibo1.xu@intel.com>, Peter Xu <peterx@redhat.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-hardening@vger.kernel.org, llvm@lists.linux.dev,
-	Christopher Di Bella <cjdb@google.com>
-Subject: Re: [PATCH v1 13/13] tools headers: Rename noinline to __noinline
-Message-ID: <20240311114009-mutt-send-email-mst@kernel.org>
-References: <20240310020509.647319-1-irogers@google.com>
- <20240310020509.647319-14-irogers@google.com>
+	s=arc-20240116; t=1710172614; c=relaxed/simple;
+	bh=DeVDHoqrlAAYXO82i9sgG6eEpZuSi3CQXTqHB7uSVqM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=LD+IL+3Xbv37vtGn7rD+ZneYFvu2WniLCLqTlGNtgqr4VHwmV9vYnSrybGg18C529JuTRFLlSJBM1Qo4RKwDHuA2iTVZyjo51WyAjrz27B6M0yGwhw4fB/KFiA/+UyLGymuljpXMv5WZxo3bFqFqSkcExjpjGI6klNQHt3QI5Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YmdYOxDo; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42BFsGpW014793;
+	Mon, 11 Mar 2024 15:54:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=YX+/25KQmDMtuk6beAw4gYUoyBzSATAPBx7GNiWq54Q=;
+ b=YmdYOxDolyGbGPL9tNk9GWxfrU6bez1t6A6uuOAgfd3c6gPF7a8F1wV6/IEn6+LzkZJb
+ mg9Hf5CQ05nV96S4Cp87LwWzUCJA3HogqsdJHQxWEYDWi4YWX2tgMekg8J2sAknj6B0H
+ MM7RKnRQzTD2A9yM+iNhFtcKaFagcuiF/oIKVN22uKkHz7b42w8nG3JD+UuSEnRIxVQA
+ u9duTtkS3VLU02VwH1MxYWgMrlS4Dv28MiKOO57SrmGm40faReKgcaU4jvZCBqdu298a
+ h0v6nCOZ2YSRYC14JfkznihYWVDqsZIHpMGmyU+6RCcmc69cbk+fDTK2dQ1vtDl8MDqU Bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wt4p88ex0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 15:54:25 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42BFXPgD024404;
+	Mon, 11 Mar 2024 15:54:24 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wt4p88er3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 15:54:24 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42BCx5tT015485;
+	Mon, 11 Mar 2024 15:52:25 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ws2fyhk6h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 15:52:25 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42BFqMDW45548004
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Mar 2024 15:52:24 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0212C58053;
+	Mon, 11 Mar 2024 15:52:22 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9B30958059;
+	Mon, 11 Mar 2024 15:52:19 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.78.110])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 11 Mar 2024 15:52:19 +0000 (GMT)
+Message-ID: <77e02ecf8b87ab83ee6e34d1118f13c8fb83353b.camel@linux.ibm.com>
+Subject: Re: [PATCH vhost v2 1/4] virtio: find_vqs: pass struct instead of
+ multi parameters
+From: Eric Farman <farman@linux.ibm.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev
+Cc: Richard Weinberger <richard@nod.at>,
+        Anton Ivanov
+ <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg
+ <johannes@sipsolutions.net>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+        Vadim
+ Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck
+ <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "Michael
+ S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
+        platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Date: Mon, 11 Mar 2024 11:52:19 -0400
+In-Reply-To: <20240311072113.67673-2-xuanzhuo@linux.alibaba.com>
+References: <20240311072113.67673-1-xuanzhuo@linux.alibaba.com>
+	 <20240311072113.67673-2-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240310020509.647319-14-irogers@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FMt9OmBDBX8TW4TdSfNa-7EqZo2-lqc6
+X-Proofpoint-GUID: yINxBnMN9NkSpBInJ1GIjKG1RBbYvE1Y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-11_10,2024-03-11_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 mlxlogscore=999 mlxscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 malwarescore=0 phishscore=0 bulkscore=0
+ priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311290000 definitions=main-2403110120
 
-On Sat, Mar 09, 2024 at 06:05:08PM -0800, Ian Rogers wrote:
-> An issue was reported with clang and llvm libc where the noinline
-> attribute [1] was being expanded due to the #define in
-> linux/compiler.h (now in compiler_attributes.h). The expansion caused
-> the __attribute__ to appear twice and break the build. To avoid this
-> conflict, rename noinline to __noinline which is more consistent with
-> other compiler attributes.
-> 
-> [1] https://clang.llvm.org/docs/AttributeReference.html#noinline
-
-Following this link, I don't see __noinline there - only __noinline__ and
-noinline. What's up?
-
-
-Als, pls add an empty line before tags.
-
-> Reported-by: Christopher Di Bella <cjdb@google.com>
-> 
-> Signed-off-by: Ian Rogers <irogers@google.com>
-
-
-tags should not have empty lines between them.
-
+On Mon, 2024-03-11 at 15:21 +0800, Xuan Zhuo wrote:
+> Now, we pass multi parameters to find_vqs. These parameters
+> may work for transport or work for vring.
+>=20
+> And find_vqs has multi implements in many places:
+>=20
+> =C2=A0arch/um/drivers/virtio_uml.c
+> =C2=A0drivers/platform/mellanox/mlxbf-tmfifo.c
+> =C2=A0drivers/remoteproc/remoteproc_virtio.c
+> =C2=A0drivers/s390/virtio/virtio_ccw.c
+> =C2=A0drivers/virtio/virtio_mmio.c
+> =C2=A0drivers/virtio/virtio_pci_legacy.c
+> =C2=A0drivers/virtio/virtio_pci_modern.c
+> =C2=A0drivers/virtio/virtio_vdpa.c
+>=20
+> Every time, we try to add a new parameter, that is difficult.
+> We must change every find_vqs implement.
+>=20
+> One the other side, if we want to pass a parameter to vring,
+> we must change the call path from transport to vring.
+> Too many functions need to be changed.
+>=20
+> So it is time to refactor the find_vqs. We pass a structure
+> cfg to find_vqs(), that will be passed to vring by transport.
+>=20
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Acked-by: Johannes Berg <johannes@sipsolutions.net>
 > ---
->  tools/include/linux/compiler_attributes.h |  4 ++--
->  tools/perf/arch/x86/tests/bp-modify.c     |  4 ++--
->  tools/perf/bench/find-bit-bench.c         |  2 +-
->  tools/perf/tests/bp_account.c             |  2 +-
->  tools/perf/tests/bp_signal.c              |  2 +-
->  tools/perf/tests/bp_signal_overflow.c     |  2 +-
->  tools/perf/tests/dwarf-unwind.c           | 12 ++++++------
->  tools/perf/tests/workloads/leafloop.c     |  8 ++++----
->  tools/perf/tests/workloads/thloop.c       |  4 ++--
->  9 files changed, 20 insertions(+), 20 deletions(-)
-> 
-> diff --git a/tools/include/linux/compiler_attributes.h b/tools/include/linux/compiler_attributes.h
-> index 9bfaec783e48..1ff3d85f5af3 100644
-> --- a/tools/include/linux/compiler_attributes.h
-> +++ b/tools/include/linux/compiler_attributes.h
-> @@ -267,12 +267,12 @@
->  # define __flatten			__attribute__((flatten))
->  
->  /*
-> - * Note the missing underscores.
-> + * Note, the kernel version is missing the underscores.
->   *
->   *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-noinline-function-attribute
->   * clang: mentioned
->   */
-> -#define   noinline                      __attribute__((__noinline__))
-> +#define   __noinline                      __attribute__((__noinline__))
->  
->  /*
->   * Optional: only supported since gcc >= 8
-> diff --git a/tools/perf/arch/x86/tests/bp-modify.c b/tools/perf/arch/x86/tests/bp-modify.c
-> index 0924ccd9e36d..65493ff7a76f 100644
-> --- a/tools/perf/arch/x86/tests/bp-modify.c
-> +++ b/tools/perf/arch/x86/tests/bp-modify.c
-> @@ -15,13 +15,13 @@
->  #include "tests/tests.h"
->  #include "arch-tests.h"
->  
-> -static noinline int bp_1(void)
-> +static __noinline int bp_1(void)
->  {
->  	pr_debug("in %s\n", __func__);
->  	return 0;
->  }
->  
-> -static noinline int bp_2(void)
-> +static __noinline int bp_2(void)
->  {
->  	pr_debug("in %s\n", __func__);
->  	return 0;
-> diff --git a/tools/perf/bench/find-bit-bench.c b/tools/perf/bench/find-bit-bench.c
-> index 7e25b0e413f6..dd97a51649bc 100644
-> --- a/tools/perf/bench/find-bit-bench.c
-> +++ b/tools/perf/bench/find-bit-bench.c
-> @@ -31,7 +31,7 @@ static const char *const bench_usage[] = {
->  static unsigned int accumulator;
->  static unsigned int use_of_val;
->  
-> -static noinline void workload(int val)
-> +static __noinline void workload(int val)
->  {
->  	use_of_val += val;
->  	accumulator++;
-> diff --git a/tools/perf/tests/bp_account.c b/tools/perf/tests/bp_account.c
-> index 6f921db33cf9..459f61752a71 100644
-> --- a/tools/perf/tests/bp_account.c
-> +++ b/tools/perf/tests/bp_account.c
-> @@ -34,7 +34,7 @@
->  
->  static volatile long the_var;
->  
-> -static noinline int test_function(void)
-> +static __noinline int test_function(void)
->  {
->  	return 0;
->  }
-> diff --git a/tools/perf/tests/bp_signal.c b/tools/perf/tests/bp_signal.c
-> index 1f2908f02389..484a7e7f96ee 100644
-> --- a/tools/perf/tests/bp_signal.c
-> +++ b/tools/perf/tests/bp_signal.c
-> @@ -59,7 +59,7 @@ static void __test_function(volatile long *ptr)
->  }
->  #endif
->  
-> -static noinline int test_function(void)
-> +static __noinline int test_function(void)
->  {
->  	__test_function(&the_var);
->  	the_var++;
-> diff --git a/tools/perf/tests/bp_signal_overflow.c b/tools/perf/tests/bp_signal_overflow.c
-> index 4e897c2cf26b..9436bf2973f8 100644
-> --- a/tools/perf/tests/bp_signal_overflow.c
-> +++ b/tools/perf/tests/bp_signal_overflow.c
-> @@ -30,7 +30,7 @@
->  
->  static int overflows;
->  
-> -static noinline int test_function(void)
-> +static __noinline int test_function(void)
->  {
->  	return time(NULL);
->  }
-> diff --git a/tools/perf/tests/dwarf-unwind.c b/tools/perf/tests/dwarf-unwind.c
-> index d01aa931fe81..a669c69a9242 100644
-> --- a/tools/perf/tests/dwarf-unwind.c
-> +++ b/tools/perf/tests/dwarf-unwind.c
-> @@ -109,7 +109,7 @@ static int unwind_entry(struct unwind_entry *entry, void *arg)
->  	return strcmp((const char *) symbol, funcs[idx]);
->  }
->  
-> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__thread(struct thread *thread)
-> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__thread(struct thread *thread)
->  {
->  	struct perf_sample sample;
->  	unsigned long cnt = 0;
-> @@ -140,7 +140,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__thread(struct thread *thr
->  
->  static int global_unwind_retval = -INT_MAX;
->  
-> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__compare(void *p1, void *p2)
-> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__compare(void *p1, void *p2)
->  {
->  	/* Any possible value should be 'thread' */
->  	struct thread *thread = *(struct thread **)p1;
-> @@ -159,7 +159,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__compare(void *p1, void *p
->  	return p1 - p2;
->  }
->  
-> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_3(struct thread *thread)
-> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_3(struct thread *thread)
->  {
->  	struct thread *array[2] = {thread, thread};
->  	void *fp = &bsearch;
-> @@ -178,7 +178,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_3(struct thread *th
->  	return global_unwind_retval;
->  }
->  
-> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_2(struct thread *thread)
-> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_2(struct thread *thread)
->  {
->  	int ret;
->  
-> @@ -187,7 +187,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_2(struct thread *th
->  	return ret;
->  }
->  
-> -NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_1(struct thread *thread)
-> +NO_TAIL_CALL_ATTRIBUTE __noinline int test_dwarf_unwind__krava_1(struct thread *thread)
->  {
->  	int ret;
->  
-> @@ -196,7 +196,7 @@ NO_TAIL_CALL_ATTRIBUTE noinline int test_dwarf_unwind__krava_1(struct thread *th
->  	return ret;
->  }
->  
-> -noinline int test__dwarf_unwind(struct test_suite *test __maybe_unused,
-> +__noinline int test__dwarf_unwind(struct test_suite *test __maybe_unused,
->  				int subtest __maybe_unused)
->  {
->  	struct machine *machine;
-> diff --git a/tools/perf/tests/workloads/leafloop.c b/tools/perf/tests/workloads/leafloop.c
-> index 1bf5cc97649b..89d2cec2f461 100644
-> --- a/tools/perf/tests/workloads/leafloop.c
-> +++ b/tools/perf/tests/workloads/leafloop.c
-> @@ -4,18 +4,18 @@
->  #include "../tests.h"
->  
->  /* We want to check these symbols in perf script */
-> -noinline void leaf(volatile int b);
-> -noinline void parent(volatile int b);
-> +__noinline void leaf(volatile int b);
-> +__noinline void parent(volatile int b);
->  
->  static volatile int a;
->  
-> -noinline void leaf(volatile int b)
-> +__noinline void leaf(volatile int b)
->  {
->  	for (;;)
->  		a += b;
->  }
->  
-> -noinline void parent(volatile int b)
-> +__noinline void parent(volatile int b)
->  {
->  	leaf(b);
->  }
-> diff --git a/tools/perf/tests/workloads/thloop.c b/tools/perf/tests/workloads/thloop.c
-> index 457b29f91c3e..e252efb76203 100644
-> --- a/tools/perf/tests/workloads/thloop.c
-> +++ b/tools/perf/tests/workloads/thloop.c
-> @@ -9,14 +9,14 @@
->  static volatile sig_atomic_t done;
->  
->  /* We want to check this symbol in perf report */
-> -noinline void test_loop(void);
-> +__noinline void test_loop(void);
->  
->  static void sighandler(int sig __maybe_unused)
->  {
->  	done = 1;
->  }
->  
-> -noinline void test_loop(void)
-> +__noinline void test_loop(void)
->  {
->  	while (!done);
->  }
-> -- 
-> 2.44.0.278.ge034bb2e1d-goog
+> =C2=A0arch/um/drivers/virtio_uml.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 23 +++----
+> =C2=A0drivers/platform/mellanox/mlxbf-tmfifo.c | 13 ++--
+> =C2=A0drivers/remoteproc/remoteproc_virtio.c=C2=A0=C2=A0 | 28 ++++-----
+> =C2=A0drivers/s390/virtio/virtio_ccw.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 | 29 +++++----
+> =C2=A0drivers/virtio/virtio_mmio.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 26 ++++----
+> =C2=A0drivers/virtio/virtio_pci_common.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 | 60 +++++++++---------
+> =C2=A0drivers/virtio/virtio_pci_common.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 9 +--
+> =C2=A0drivers/virtio/virtio_pci_legacy.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 | 11 ++--
+> =C2=A0drivers/virtio/virtio_pci_modern.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 | 33 ++++++----
+> =C2=A0drivers/virtio/virtio_vdpa.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 36 +++++------
+> =C2=A0include/linux/virtio_config.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 77 +++++++++++++++++++---
+> --
+> =C2=A011 files changed, 192 insertions(+), 153 deletions(-)
+>=20
+>=20
+
+...snip...
+
+>=20
+> diff --git a/drivers/virtio/virtio_pci_modern.c
+> b/drivers/virtio/virtio_pci_modern.c
+> index f62b530aa3b5..b2cdf5d3824d 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -530,9 +530,7 @@ static bool vp_notify_with_data(struct virtqueue
+> *vq)
+> =C2=A0static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> =C2=A0				=C2=A0 struct virtio_pci_vq_info *info,
+> =C2=A0				=C2=A0 unsigned int index,
+> -				=C2=A0 void (*callback)(struct virtqueue
+> *vq),
+> -				=C2=A0 const char *name,
+> -				=C2=A0 bool ctx,
+> +				=C2=A0 struct virtio_vq_config *cfg,
+> =C2=A0				=C2=A0 u16 msix_vec)
+> =C2=A0{
+> =C2=A0
+> @@ -563,8 +561,11 @@ static struct virtqueue *setup_vq(struct
+> virtio_pci_device *vp_dev,
+> =C2=A0	/* create the vring */
+> =C2=A0	vq =3D vring_create_virtqueue(index, num,
+> =C2=A0				=C2=A0=C2=A0=C2=A0 SMP_CACHE_BYTES, &vp_dev->vdev,
+> -				=C2=A0=C2=A0=C2=A0 true, true, ctx,
+> -				=C2=A0=C2=A0=C2=A0 notify, callback, name);
+> +				=C2=A0=C2=A0=C2=A0 true, true,
+> +				=C2=A0=C2=A0=C2=A0 cfg->ctx ? cfg->ctx[cfg-
+> >cfg_idx] : false,
+> +				=C2=A0=C2=A0=C2=A0 notify,
+> +				=C2=A0=C2=A0=C2=A0 cfg->callbacks[cfg->cfg_idx],
+> +				=C2=A0=C2=A0=C2=A0 cfg->names[cfg->cfg_idx]);
+> =C2=A0	if (!vq)
+> =C2=A0		return ERR_PTR(-ENOMEM);
+> =C2=A0
+> @@ -593,15 +594,11 @@ static struct virtqueue *setup_vq(struct
+> virtio_pci_device *vp_dev,
+> =C2=A0	return ERR_PTR(err);
+> =C2=A0}
+> =C2=A0
+> -static int vp_modern_find_vqs(struct virtio_device *vdev, unsigned
+> int nvqs,
+> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct virtqueue *vqs[],
+> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vq_callback_t *callbacks[],
+> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char * const names[], const bool
+> *ctx,
+> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct irq_affinity *desc)
+> +static int vp_modern_find_vqs(struct virtio_device *vdev, struct
+> virtio_vq_config *cfg)
+> =C2=A0{
+> =C2=A0	struct virtio_pci_device *vp_dev =3D to_vp_device(vdev);
+> =C2=A0	struct virtqueue *vq;
+> -	int rc =3D vp_find_vqs(vdev, nvqs, vqs, callbacks, names, ctx,
+> desc);
+> +	int rc =3D vp_find_vqs(vdev, cfg);
+> =C2=A0
+> =C2=A0	if (rc)
+> =C2=A0		return rc;
+> @@ -739,10 +736,17 @@ static bool vp_get_shm_region(struct
+> virtio_device *vdev,
+> =C2=A0static int vp_modern_create_avq(struct virtio_device *vdev)
+> =C2=A0{
+> =C2=A0	struct virtio_pci_device *vp_dev =3D to_vp_device(vdev);
+> +	vq_callback_t *callbacks[] =3D { NULL };
+> +	struct virtio_vq_config cfg =3D {};
+> =C2=A0	struct virtio_pci_admin_vq *avq;
+> =C2=A0	struct virtqueue *vq;
+> +	const char *names[1];
+> =C2=A0	u16 admin_q_num;
+> =C2=A0
+> +	cfg.nvqs =3D 1;
+> +	cfg.callbacks =3D callbacks;
+> +	cfg.names =3D names;
+> +
+> =C2=A0	if (!virtio_has_feature(vdev, VIRTIO_F_ADMIN_VQ))
+> =C2=A0		return 0;
+> =C2=A0
+> @@ -753,8 +757,11 @@ static int vp_modern_create_avq(struct
+> virtio_device *vdev)
+> =C2=A0	avq =3D &vp_dev->admin_vq;
+> =C2=A0	avq->vq_index =3D vp_modern_avq_index(&vp_dev->mdev);
+> =C2=A0	sprintf(avq->name, "avq.%u", avq->vq_index);
+> -	vq =3D vp_dev->setup_vq(vp_dev, &vp_dev->admin_vq.info, avq-
+> >vq_index, NULL,
+> -			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 avq->name, NULL,
+> VIRTIO_MSI_NO_VECTOR);
+> +
+> +	cfg.names[0] =3D avq->name;
+
+While looking at the s390 changes, I observe that the above fails to
+compile and is subsequently fixed in patch 2:
+
+drivers/virtio/virtio_pci_modern.c: In function =E2=80=98vp_modern_create_a=
+vq=E2=80=99:
+drivers/virtio/virtio_pci_modern.c:761:22: error: assignment of read-
+only location =E2=80=98*cfg.names=E2=80=99
+  761 |         cfg.names[0] =3D avq->name;
+      |                      ^
+
 
 
