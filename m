@@ -1,167 +1,206 @@
-Return-Path: <kvm+bounces-11583-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 193A28786AA
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 18:49:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E206E8786D1
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 18:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2C5AB20B6A
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 17:49:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E754281662
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 17:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2822253E11;
-	Mon, 11 Mar 2024 17:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFB6535C6;
+	Mon, 11 Mar 2024 17:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TwAZDQj7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CHZErjIC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C273D5467F;
-	Mon, 11 Mar 2024 17:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710179371; cv=none; b=GFYHSXQNiFhKTcDxCjfqppVooQy6UehSQY4yXQRtQTqodAB/E9juZ2Wror0ZbZM+xcN+x85DnpUWaZO33quAkap4Ch+C3Nw+xYhV05G7RW4p8683KGk1qBCoInd9BszwtufcWLhn0kk8glOCLEycZQDa9AHXToXF3OQ9Lw06y0Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710179371; c=relaxed/simple;
-	bh=FruVc137rIMV3xfiSwhivbMir0fGyRuBlxHaGRlShtM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DUF4r5YLgepXaM3UpuE/0wqOq8SJMtQw9+vHFYGrtWY+HaHQaZFg9MEpCQ8R2OUXNFm4j8eDy5l6QmSnKv9VsZYbITfbIycgAmiFsg/7KTdkjK/36VOOkjZ6XSG84FSMnkun08/7PvUYns81aI6H9UsVxEydDNfxbvKIfrCYTLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TwAZDQj7; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5bdbe2de25fso3955923a12.3;
-        Mon, 11 Mar 2024 10:49:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710179369; x=1710784169; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fbU798yjoe9QW28weq/V45GGj69Gs5hSFHP5NyuJ08o=;
-        b=TwAZDQj7Ve1xAmz6j70L/UFHTlK2nwUQ54hQPjVWTnwDDu+8q0kP6A2lRBN1Z55miy
-         vN4VUcOi27egSN9NPW6olGx/2FAHl5DK/1vwdVfcLkyqaPmhpqRpRLAmLRxahsKBHWxx
-         ZtHA8ZOd1Gcq6f355xmgDdxhkeXYNObOmGjovSllT/Wf8LVv4rRhvV7tRuKxlSTIPE6r
-         c+7mJkW31ocTJ2fmMJvr5zGRLe4QxQUyLLo0WPCe4X/fgOFnVR8EffqRMZi32OGMKeX9
-         MVomS77iLHQPpz8ijBOYp8JMEpGU3JnwhBNM3ACGESZM3q8F1lVRA590jZpOMgjITEjg
-         AJxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710179369; x=1710784169;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fbU798yjoe9QW28weq/V45GGj69Gs5hSFHP5NyuJ08o=;
-        b=poGM+8RxQw27f+id7lEoDsc6dXIE94TqrV43eB9/hc9ydZujE1nlrbsm+820lmLuIS
-         LIpXM00qxgnJWJdNyDk0RXLEIOIl5oB97iYhCP+V3wtlKHK297SLOrelFF1LEc3Vciq1
-         RtTo0AGEcxHCn0XVY+z2kz6AMapDiu29R69wx65BICbdspjnjai/9sHX5hBSmYluk7Uz
-         +ADgG9R2ya5XisgIPxlocPR/MeseNVSlmQRZPZDmVVjF3arDqArsriH3UJkxOBzhpTh5
-         XGnbEtHVH30mRK1kp6wh7cKrJB8bCZk6oyIzr7PTj4Zfo8mzi2xSriptUuS3WCqdEn4k
-         rxBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/0B10mEjr2FIeKTkcn7Tup854ejATWA/e+qFEVQQivhMRlrluZYlGVweeTlsGaenuNPH+mv0lfZsRx/mHpcJ9b3uRYI7bTqqJDaSDydDCf9F5vDs3dQOeEuMGaQFAZGluMTbDAp5/E51JDCRRY+ycmNok3ve69Xxx4sUPJLbR6N8Q7q60cAM2pcrxISGynPiRCKarfXhilcaII/3ZkJ8zuLYb0n4R33O4VUaWHTEvwrEOToKvnZhvIA/UtZAb7H+PDb8T9ci4DpbE7O4eB30d4IQGY8jfMNqswi7kGYr93ACjrM18q8Ze3o/ZfeaptcbOXDHVDBQ=
-X-Gm-Message-State: AOJu0YyXNSCqfjL1S/b/feLQMTWgOnllF/oByARruJeRwX2UonpcREa2
-	qyUUoCFtZQ1ULMyuuDsqC32lvYjHax3YWXsx5iN7+KwRHVZ6BkHPZGRkrKUswLgseVOKkmcQ1c2
-	E7WglPayOkW+AlFAOAJkMpFugbXA=
-X-Google-Smtp-Source: AGHT+IFoTIEdjqsxBYqxcW2ZvSOL+ezHdwHnCQaQtLgWWppeaIwje2I36qXoDeTn1HfSnWTODh8p84OGtT7sU7h7l88=
-X-Received: by 2002:a17:90a:7563:b0:29a:d7ba:2c99 with SMTP id
- q90-20020a17090a756300b0029ad7ba2c99mr5706073pjk.10.1710179369144; Mon, 11
- Mar 2024 10:49:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CC24D9E6;
+	Mon, 11 Mar 2024 17:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710179843; cv=fail; b=fmJrfqiWDVofN8yRnVHKiNtfFZG2xYddfa37Sgcq8TEljQawCAlE9+fQUuGpSJThMTKTckT7aNcA0IdsipzvDtHakhTCnSpKz+szuN5CrtW/ro++HvmuJNPUu8oVARlv7oa8ITm5duscIzw/KdKoWN7tKCNFU9/0M+9Ev4UcIYg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710179843; c=relaxed/simple;
+	bh=5c0xVlerk1QhXiO3mKiowjaVhtwK+YfJyEkOBQ/ErKs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=fh3iOBMaV9gLduzbdeYLCAFvdZgPpNT3Jl+uxw/2W/ttpyPzvwHPJkFLPs5iwRl6DCW+ZQv4P0n8tYAAc18XkR4tOR8ms9Gd34Y6YFBbYqbWZGyriMDUXfr1Fmpqgq9KaJDmgDwTGD6iLmiQmVcLcVVB27KHXSwZwj8XCTg1h4s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CHZErjIC; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710179842; x=1741715842;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=5c0xVlerk1QhXiO3mKiowjaVhtwK+YfJyEkOBQ/ErKs=;
+  b=CHZErjICOKcHFT8ULglqrgCRecb7H9qrjdpj/5G2L3zntIrKAyBBAqpK
+   7Inc7rMWcOY1N+67qUuOUGnpMwJ99djkiAB16BcYiyU8w83HMeEFEiS0e
+   04Nwfk+dkyneGsThEzKuHPzvZOYKPwA8bO1krwbbNUjOWBloC0M1RPAmh
+   tCwVQs9iaxRRFyzkLq6YiOF0O1JGkp13YDr5P8hWXc4L7Keetc9DT7F3V
+   O3kx9qOsEoPWtB2HEH/SF8JTBm66i9/1wPgROq2unzNfgFvZP3AGJuDla
+   QsVFmqDBIy83adnrdAKcyQ4SlI1ZegfspJ3xsHm6JAEiWuEmze+kHq2hE
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="22314342"
+X-IronPort-AV: E=Sophos;i="6.07,117,1708416000"; 
+   d="scan'208";a="22314342"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 10:57:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,117,1708416000"; 
+   d="scan'208";a="42226899"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Mar 2024 10:57:18 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 11 Mar 2024 10:57:17 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 11 Mar 2024 10:57:17 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 11 Mar 2024 10:57:17 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 11 Mar 2024 10:57:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a/M8hXfSTfRIIx4B4zZRrToLONa1zZJj/7IgwG8jXC6x9/dPkWdpqoeooMfCoRcaCGZN9ASkhfta8g7WG71XNIRMoldogqnxgLLiPwLgGGcLpsofN1s1bDhOfMAeSrMApaPX/rlh0Lr3QYGEgYO2pgep5Kyb9HAevZjrhLZYetYPWtXyAlZ6vqN5H7d30MXzQW+qbM/aoMgiiapA+Zvd75mHUAwzLxYn6QEsBwH5+6cx/GxkibwODTln8Z8IYfPUV8pQpw0sxgNRO/WK4nqpPPw8NKLXZlnw9czmCdLzDK1Yg0h/geFKpUQYXf3CUsIsGj6ymVi/c1ZVkOwNI4U9cA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CBg7TgttndQb84/dMt5J0hXqrUPuUhtqZK2f1FZUoMs=;
+ b=JFx+c/ETINkVYUeSlcvqWRxGwiLZdy7dk5CjNL7dDsrVD6mMJ9uoVJ+fb74gtsF/M+suNvnBVpXyDzX+4pyEC6AAY9Lw3larNzljEjqcvJiOsQmx0pd4O5gBSqciunxSPXsW6mn+rpfaNsP0qm3+rI1c5nKIsWHTKb48Llq/Gza0yb2XWUkRPeXoKpDdzp4ABxri3/GUutnqdv7iwnv8noiY5Mq73WcVXN6+PhHZBoOeNxLK9arQc4Q1+hitticGgBAezgxoh0/e7/r9FzQ+B9ItNXdYgb2XtBav5olSUO9vt14WkIKzMStuVh0XgH7VYiwHo722OqCi7/mKT13CgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by CH3PR11MB8494.namprd11.prod.outlook.com (2603:10b6:610:1ae::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.16; Mon, 11 Mar
+ 2024 17:57:15 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::90e5:7578:2fbf:b7c4]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::90e5:7578:2fbf:b7c4%4]) with mapi id 15.20.7362.019; Mon, 11 Mar 2024
+ 17:57:15 +0000
+Date: Mon, 11 Mar 2024 17:57:08 +0000
+From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Xin Zeng <xin.zeng@intel.com>, <herbert@gondor.apana.org.au>,
+	<alex.williamson@redhat.com>, <yishaih@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>, <qat-linux@intel.com>
+Subject: Re: [PATCH v5 08/10] crypto: qat - add interface for live migration
+Message-ID: <Ze9F9NSFSnasaN3Y@gcabiddu-mobl.ger.corp.intel.com>
+References: <20240306135855.4123535-1-xin.zeng@intel.com>
+ <20240306135855.4123535-9-xin.zeng@intel.com>
+ <20240308165232.GU9179@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240308165232.GU9179@nvidia.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: DU2P251CA0003.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:10:230::13) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240310020509.647319-1-irogers@google.com> <20240310020509.647319-3-irogers@google.com>
-In-Reply-To: <20240310020509.647319-3-irogers@google.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 11 Mar 2024 10:49:17 -0700
-Message-ID: <CAEf4BzYiH6xRRLFBdUAkjn0uJP=safZod4=1EmEwTTH9PDmVvQ@mail.gmail.com>
-Subject: Re: [PATCH v1 02/13] libbpf: Make __printf define conditional
-To: Ian Rogers <irogers@google.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Kees Cook <keescook@chromium.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Liam Howlett <liam.howlett@oracle.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>, 
-	David Laight <David.Laight@aculab.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shunsuke Mie <mie@igel.co.jp>, 
-	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>, 
-	James Clark <james.clark@arm.com>, Nick Forrington <nick.forrington@arm.com>, 
-	Leo Yan <leo.yan@linux.dev>, German Gomez <german.gomez@arm.com>, Rob Herring <robh@kernel.org>, 
-	John Garry <john.g.garry@oracle.com>, Sean Christopherson <seanjc@google.com>, 
-	Anup Patel <anup@brainfault.org>, Fuad Tabba <tabba@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Haibo Xu <haibo1.xu@intel.com>, Peter Xu <peterx@redhat.com>, 
-	Vishal Annapurve <vannapurve@google.com>, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|CH3PR11MB8494:EE_
+X-MS-Office365-Filtering-Correlation-Id: c0d58a6b-b00c-4d8a-a9e2-08dc41f4af75
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GJ29vgjh+vFEQbgCogUzcYUtPZbfzIzzNDfOQRspRSt1wh/Mn0N0OvXeSKJ/+5zGah7kjk4sOeSJx9qXF3e1hP+OCP5DgPIR5Jk5sD+Cq6PEx2QphwGDJv6RVzQiR2w6gQevj8vNP5LwrONmL4d3iq+G+iNkThCqRNiLwMARLm4HdUNp/JmMPEeCyfuc0fOOX18Rt2oNSnc+nmMG8cj0QDS1nIRe9JpT9MkJWufiASB8c3qxvaTXQF4dmKmPGVkU0S8O8nybDVaHp0Tp6hgQH4WISWe/30Jvz9pR8PWY4T6ZGLBiim7AWF4yaY6f/eQq24Gp0Uqgkd/tJsxLswhqYVd3aWZNGHBZAF7Ru8UrzXCUrs1rH5pCc1zP8a0yioWcYBy/b1bUR6UXNXZCzvcFK7+yXj2y25NMbuCoDqelXT5HUB1nyWB4kwHvO7uluyZM2liCCZxmbew0t1hiszk4t1tGLMSzalsTM7DH4Uz0SOxZio6PchIoKOLn24RgLzwektIn3zJOt52sklzexehhicEjYfOESnk8NM47A9ov64XbyK0ejV3O+gd8B2RC81pL4ov6oqoXRN+xuuN2ucH9Rl7LChYNOCgFaKpDVAgZeMXV2gEF+RnKTZsZlftlpjfmcCN3sPc06KNYr+6ZPEKZISchVN7JLQn0GdaMYITCc8o=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Tqi61FwTYHRL8fPgUVgxos0ADIpciOjXWwCuiHUMFnmvdP2wNG+hExbe4xfS?=
+ =?us-ascii?Q?W1budiP/JFbYD+QjAHduC9ViXTwNHGM3MniijFx+cDDevPh+Nhy42HDEqck/?=
+ =?us-ascii?Q?7XHc2JBtzWRtaCFFMupqK6fwe7vciO896MGKcB6NO2LFWXRiL/pC6JGf1zH1?=
+ =?us-ascii?Q?H4hYseU+bXhlDpbxYaNlROKxFL0zKS1Nb7mT6oHttnU/ubFpu2OsWab6Wxhd?=
+ =?us-ascii?Q?2UdkFdFxMCBZNUq8at8xf3y928M5zQMtbQz/5/YxhxAb/BnWLes2DDZn8TPT?=
+ =?us-ascii?Q?+JXtKDDXppXd1oGyFMYLZd+IHjZ6k/XEZ3OVZoRKEtRrfan9LsvKexfMFdur?=
+ =?us-ascii?Q?LY0C9pW2Qvru7pfpTnrQTjRUx0YNLCQMGaDQ0i6rBIFt1Tl6bG/6qL1UH+HN?=
+ =?us-ascii?Q?DQPvonF3hOM1x0QtLoPSrR48o4wkTbEV+eb+BY8BQs6XXrjh48yQLN9cIlLX?=
+ =?us-ascii?Q?7zCUBXpRYb6q7mJx/cWTqBF/aWRTZtgsvdPH/mZGUJbZRkiNL7cLUbEpqCdT?=
+ =?us-ascii?Q?DTwHLz0OauZCts2Ckrx1uL3DhHQCyDEJOazItXn1hXfqlK/fbyVowtqVQ33U?=
+ =?us-ascii?Q?8ej9XIw7XO+J7GrB4h2Z7ns6EcY6BsVZWorIJWHOc2zVHllvTxe3/J8Dum4t?=
+ =?us-ascii?Q?hJyRq3T9lGRasSIMK/e79z62pjesKYgcIdeftMYVQL7s6k4TEfK/XxUKZu+m?=
+ =?us-ascii?Q?LtOSZWLzzeXS5yQEobc0i4RU9QIhof5zvlStYHeM4K42BPfT7GIvn2/Lh0hb?=
+ =?us-ascii?Q?4fcJfVeWG2Tzlnil9SEcxEqFBWIaSkMyrfHEwqE9mROXD4sZyfhWcZ8rwoUJ?=
+ =?us-ascii?Q?X0Aq6ahkdFgoqCeOWl+/o3dJPbBwnzNIJ1Xu3Eq2gG9TSiPYMIZbBgM6rcam?=
+ =?us-ascii?Q?RoGVXaaYhJa0NSJkIAYW9Y2cWxzFuBk7gxvEbISq1wWbRKb/cEMx2e/yp4WG?=
+ =?us-ascii?Q?IIWtZjz1U0hdGMqAGT72ts+5AtkW6AiVjtOIyyu5HSDK8iZjm8CxPa8HO8DE?=
+ =?us-ascii?Q?GkwF/roNRa35p3DMoPIT4gz2seYR2kjbd9Wh3BeRtii/rBE3domtKc49yIUF?=
+ =?us-ascii?Q?hD4vXVMp7x2Uj0oLk/wFIBtD1O6hqNs35aFpGA6gOXL4cbwih31CEm81ce2w?=
+ =?us-ascii?Q?qsedq4Zmv/WgaMwxaXso+caueOAVGy81GSdbRTz09iK5/Z0lr8e7bs50J0Fa?=
+ =?us-ascii?Q?c95Bb1jcjVIdGt/4morVsdQamBxMmxqHsPpIoB59OdB7R7m0f76f7wTiaN5+?=
+ =?us-ascii?Q?P2wbFVyEKpnCcEKNl6Ly6MrJXWlIQtxgHgpoJkl7TBsr1G5tu5AaGjAc3oN4?=
+ =?us-ascii?Q?03SwItdfU3OVj2PdXo+qwU3XQdrFG+sQcsS73LZofy5hxEjqJT764K1gXGmH?=
+ =?us-ascii?Q?9DRO9hPUdWuwqSYIpaG4L89Scc/4abaIEUt9sUtZmCu9xV66P3lpK+cb4ktO?=
+ =?us-ascii?Q?fs3LFdqstX9kMmS6fBWVWxZv+4zNMDUs/T/3xtQin6mQwF6WNRsASK574wJC?=
+ =?us-ascii?Q?AJwaA7UuQ0Yl+QNT5GXG8ryy8aT+DdTtof08GY5PSbpQWzOVLUhleSvgp+vj?=
+ =?us-ascii?Q?4dl7CFfscT2JQcaKSWEnMAaUV+7TMWITFbIksJFBL5WQiPLt8phs6O9z+SCi?=
+ =?us-ascii?Q?6w=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0d58a6b-b00c-4d8a-a9e2-08dc41f4af75
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 17:57:15.2618
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IPDe2wgs5Mj5bgn0Srqsy83kZf2id8xg6f1DDg2SKWrVl+F855zEGJqCXaIHjE0VKjnz+7UCdAB+OMuXS3CN5MWKoo01bnbwZqYBBVpwu+8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8494
+X-OriginatorOrg: intel.com
 
-On Sat, Mar 9, 2024 at 6:05=E2=80=AFPM Ian Rogers <irogers@google.com> wrot=
-e:
->
-> libbpf depends upon linux/err.h which has a linux/compiler.h
-> dependency. In the kernel includes, as opposed to the tools version,
-> linux/compiler.h includes linux/compiler_attributes.h which defines
-> __printf. As the libbpf.c __printf definition isn't guarded by an
-> ifndef, this leads to a duplicate definition compilation error when
-> trying to update the tools/include/linux/compiler.h. Fix this by
-> adding the missing ifndef.
->
-> Signed-off-by: Ian Rogers <irogers@google.com>
-> ---
->  tools/lib/bpf/libbpf.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index afd09571c482..2152360b4b18 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
-> @@ -66,7 +66,9 @@
->   */
->  #pragma GCC diagnostic ignored "-Wformat-nonliteral"
->
-> -#define __printf(a, b) __attribute__((format(printf, a, b)))
-> +#ifndef __printf
-> +# define __printf(a, b)        __attribute__((format(printf, a, b)))
+Hi Jason,
 
-styling nit: don't add spaces between # and define, please
+On Fri, Mar 08, 2024 at 12:52:32PM -0400, Jason Gunthorpe wrote:
+> On Wed, Mar 06, 2024 at 09:58:53PM +0800, Xin Zeng wrote:
+> > @@ -258,6 +259,20 @@ struct adf_dc_ops {
+> >  	void (*build_deflate_ctx)(void *ctx);
+> >  };
+> >  
+> > +struct qat_migdev_ops {
+> > +	int (*init)(struct qat_mig_dev *mdev);
+> > +	void (*cleanup)(struct qat_mig_dev *mdev);
+> > +	void (*reset)(struct qat_mig_dev *mdev);
+> > +	int (*open)(struct qat_mig_dev *mdev);
+> > +	void (*close)(struct qat_mig_dev *mdev);
+> > +	int (*suspend)(struct qat_mig_dev *mdev);
+> > +	int (*resume)(struct qat_mig_dev *mdev);
+> > +	int (*save_state)(struct qat_mig_dev *mdev);
+> > +	int (*save_setup)(struct qat_mig_dev *mdev);
+> > +	int (*load_state)(struct qat_mig_dev *mdev);
+> > +	int (*load_setup)(struct qat_mig_dev *mdev, int size);
+> > +};
+> 
+> Why do we still have these ops? There is only one implementation
+This is related to the architecture of the QAT driver. The core QAT
+module (intel_qat.ko), which exposes the functions required for live
+migration, supports multiple devices. Each QAT specific driver registers
+the functions that it supports.
 
-overall LGTM
+Even if live migration is currently supported only by QAT GEN4 devices,
+my preference is to keep the qat_vfio_pci module to invoke GEN agnostic
+functions. Also, I would prefer to avoid having such functions calling
+directly the GEN4 specific implementation.
 
-Acked-by: Andrii Nakryiko <andrii@kernel.org>
+Regards,
 
-Two questions, though.
-
-1. It seems like just dropping #define __printf in libbpf.c compiles
-fine (I checked both building libbpf directly, and BPF selftest, and
-perf, and bpftool directly, all of them built fine). So we can
-probably just drop this. I'll need to add __printf on Github, but
-that's fine.
-
-2. Logistics. Which tree should this patch go through? Can I land it
-in bpf-next or it's too much inconvenience for you?
-
-
-> +#endif
->
->  static struct bpf_map *bpf_object__add_map(struct bpf_object *obj);
->  static bool prog_is_subprog(const struct bpf_object *obj, const struct b=
-pf_program *prog);
-> --
-> 2.44.0.278.ge034bb2e1d-goog
->
+-- 
+Giovanni
 
