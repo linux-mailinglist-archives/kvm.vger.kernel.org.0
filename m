@@ -1,223 +1,166 @@
-Return-Path: <kvm+bounces-11505-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11506-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F5B877B53
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 08:29:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B23F9877B62
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 08:36:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CC8A1F21191
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 07:29:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D694F1C20D90
+	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 07:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F3C107A6;
-	Mon, 11 Mar 2024 07:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296BE10A0A;
+	Mon, 11 Mar 2024 07:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2f+yMU2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="is2LK21v"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C02101E2
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC89101F7
+	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 07:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710142153; cv=none; b=W8SyfbRaBUrfm/PG12PyuZIbBGP+uQew27IHJvHUoT0mA6Ns8HAcZqPJu6XddZkihyQmsqkiJ0o6MMW+p5MFG0A7mfyIBRtPWvRLZFPcxkq4O2zzZEXpzA+D0IBuV7yqNDaiuq30r9Ml1u8QTY1YZwf3CpwQb6cgxuyvxJn8lMM=
+	t=1710142576; cv=none; b=A8ph+0GYokNCQdV/HPrjYwgNIubRmqJPMb51beJU8pKY5+N4+X43hcBw0lz7vv0McUi6JjyD8FFZmJDJ9/qcKbszbxEHdFbTMi3DKYRGp8qnhLEj+ujWPzzeOx5uHPO9wWksRpOKX87i5z+DNYVo9MmiMKwTULFt/wS/C1udo/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710142153; c=relaxed/simple;
-	bh=n99vdo5Gmb2UJvrWqk7Av+5gKCk9m7lilFjXP8Ljep0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=AwIKdFnpQ2c9laaWpc5XA4jl6xLWlToAMgVahFEfoPsz1zfS5yibkOqgBharQ6IRHxd7ZEK8pJz2G5TqWAJ44criWTUtVg0Orhtd9Pq/6B3ceOhGptU3XaFZCmgztSZFBIBsq6M3thWMn599FDOia+deAlt82YFtxcPtQh7MeYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X2f+yMU2; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1710142576; c=relaxed/simple;
+	bh=ZwyyBrLsPrfkeRO/qCdBrDIYZKyn6HgHwL7Via+LdtA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jymeHOzY8Lxn7cUeRkORW2kpyV5yEquzr3lQ88U22COf90j/o3rH74GnjJqmkC7TzWA1YI7wztN2aO50jAa6bpI8TKRPYHj73+o/VeGxyX9uRQ/pu7o5rBYeRoOMXi411Te2p/RR6LkemiNWhOrrG7qq1gm53RdhpgEHPvyj7m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=is2LK21v; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710142149;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1710142573;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EF/lQ6AcWDo9er79rF8lhoXUfncFaGy7PoQxJj8hn1s=;
-	b=X2f+yMU2ZAhjCt13yNGDO2P1RzKQGoDsjCPt3c+BFGRTa+g6KIoyWqzxwlK76QMT5vkRP3
-	jfXo2tCzvUa2a7kgFUpWhFG7k4KIW98ElDUAclmmtGnXX9GwGS4O4gl+SvAWmWGFEvPLmH
-	KYbIvWX5EezprWa8as0FHifuWCcbSgI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LZMHRbz3Q3TluA+ZN/XoJw1oDrEBRi2FsoIFf5g/d00=;
+	b=is2LK21vztTg97y6HTqez09H41YulqSIqbYcPDwxFReK3V6pGWUTJDsDJOWemYMBKucYNi
+	H2DbLf8PSvkLo35q45fqK6GeltZ89/4PieeteGUPkWT8dM+nADV64TE8TXZEdDrkP0qR7K
+	fBAnSlVyf+C6JrhxYZk0sV7OdQQFXBA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-98-xybE5VPSMHCNtQSbpKXdXA-1; Mon, 11 Mar 2024 03:29:05 -0400
-X-MC-Unique: xybE5VPSMHCNtQSbpKXdXA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 88083185A789;
-	Mon, 11 Mar 2024 07:29:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.138])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 437C71121306;
-	Mon, 11 Mar 2024 07:29:04 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 34B9A21E6A24; Mon, 11 Mar 2024 08:29:03 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  David Hildenbrand
- <david@redhat.com>,  Igor Mammedov <imammedo@redhat.com>,  Eduardo Habkost
- <eduardo@habkost.net>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Yanan Wang
- <wangyanan55@huawei.com>,  "Michael S. Tsirkin" <mst@redhat.com>,  Richard
- Henderson <richard.henderson@linaro.org>,  Ani Sinha
- <anisinha@redhat.com>,  Peter Xu <peterx@redhat.com>,  Cornelia Huck
- <cohuck@redhat.com>,  Daniel P. =?utf-8?Q?Berrang=C3=A9?=
- <berrange@redhat.com>,  Eric
- Blake <eblake@redhat.com>,  Marcelo Tosatti <mtosatti@redhat.com>,
-  kvm@vger.kernel.org,  qemu-devel@nongnu.org,  Michael Roth
- <michael.roth@amd.com>,  Claudio Fontana <cfontana@suse.de>,  Gerd
- Hoffmann <kraxel@redhat.com>,  Isaku Yamahata <isaku.yamahata@gmail.com>,
-  Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v5 52/65] i386/tdx: Wire TDX_REPORT_FATAL_ERROR with
- GuestPanic facility
-In-Reply-To: <95e623e1-ccf3-4d8f-9751-7767db100e2b@intel.com> (Xiaoyao Li's
-	message of "Mon, 11 Mar 2024 09:28:37 +0800")
-References: <20240229063726.610065-1-xiaoyao.li@intel.com>
-	<20240229063726.610065-53-xiaoyao.li@intel.com>
-	<874jdr1wmt.fsf@pond.sub.org>
-	<d5cb6e5e-0bc1-40bd-8fc1-50a03f42e9cf@intel.com>
-	<87y1au881k.fsf@pond.sub.org>
-	<95e623e1-ccf3-4d8f-9751-7767db100e2b@intel.com>
-Date: Mon, 11 Mar 2024 08:29:03 +0100
-Message-ID: <87plw1uszk.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+ us-mta-392-mu1wQSolPdC7HLrusw5ybA-1; Mon, 11 Mar 2024 03:36:11 -0400
+X-MC-Unique: mu1wQSolPdC7HLrusw5ybA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33e78c1b314so1422142f8f.3
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 00:36:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710142569; x=1710747369;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LZMHRbz3Q3TluA+ZN/XoJw1oDrEBRi2FsoIFf5g/d00=;
+        b=q0UDkW1rsqXe6EX2uHPRFGlZ+MuiE60qbOEKocfPpHRZytgAgXybpF5UqDedrBPvUE
+         P757nejCV53nvojvViCHo6bJ6ht28Ix+09d3Efi4dd99HoRnFBfHEej7WtUcYZtwYvhS
+         2btzYQUPVhvbPRPfwHa9xVxPTDsaKog9Lq3fTnYzY8XqVg0Trzm6pAZxg4WjUywIFyXc
+         0c0J8ymaOj3iw+tiuBDLAwmP8LMsZUH1HWCz0KUffmLXq6zmQRt4KlJzn3i4pVOLZSoa
+         j7850GPJOb2XAcwhJzZGdH/s/UBF2zcYOdykDfWjWpJy2++yYDLtl2DyvURz8tSislII
+         Y9HA==
+X-Gm-Message-State: AOJu0YwXrPk/TnDKDfMZnC2JyjrY96VhARg5R+dJB0gi8PrTJp0jwPYZ
+	H3q8rbIjQDdCfahQm+m8zrbbjbevwadySoCJ2xoOG/cf20E8fm2xGds9hgTBVE0cyfiOEAxAdNP
+	9eEJuCuSMWvNrGhNAZAd9S53VNSIjmv1bpLmir1D5dBTlgNlLNRU39/bMoQ==
+X-Received: by 2002:adf:ee8c:0:b0:33e:7333:41e with SMTP id b12-20020adfee8c000000b0033e7333041emr4260959wro.11.1710142569384;
+        Mon, 11 Mar 2024 00:36:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGnA+80vIVXmpFSNsV1K8rSwSHZO4dOGQ2TWjNGaeV7iBJ6lgek7BanByJKwojSGMFqJv4fA==
+X-Received: by 2002:adf:ee8c:0:b0:33e:7333:41e with SMTP id b12-20020adfee8c000000b0033e7333041emr4260942wro.11.1710142569014;
+        Mon, 11 Mar 2024 00:36:09 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id q11-20020adff94b000000b0033e95bf4796sm2121880wrr.27.2024.03.11.00.36.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Mar 2024 00:36:08 -0700 (PDT)
+Message-ID: <d57f0df4-b155-4805-9121-53a9a1c23cee@redhat.com>
+Date: Mon, 11 Mar 2024 08:36:07 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v2 1/7] vfio/pci: Disable auto-enable of exclusive INTx
+ IRQ
+Content-Language: en-US
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, clg@redhat.com, reinette.chatre@intel.com,
+ linux-kernel@vger.kernel.org, kevin.tian@intel.com, stable@vger.kernel.org
+References: <20240308230557.805580-1-alex.williamson@redhat.com>
+ <20240308230557.805580-2-alex.williamson@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20240308230557.805580-2-alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
+Hi Alex,
 
-> On 3/7/2024 9:51 PM, Markus Armbruster wrote:
->> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->>=20
->>> On 2/29/2024 4:51 PM, Markus Armbruster wrote:
->>>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->>>>
->>>>> Integrate TDX's TDX_REPORT_FATAL_ERROR into QEMU GuestPanic facility
->>>>>
->>>>> Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
->>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>>>> ---
->>>>> Changes in v5:
->>>>> - mention additional error information in gpa when it presents;
->>>>> - refine the documentation; (Markus)
->>>>>
->>>>> Changes in v4:
->>>>> - refine the documentation; (Markus)
->>>>>
->>>>> Changes in v3:
->>>>> - Add docmentation of new type and struct; (Daniel)
->>>>> - refine the error message handling; (Daniel)
->>>>> ---
->>>>>    qapi/run-state.json   | 31 +++++++++++++++++++++--
->>>>>    system/runstate.c     | 58 +++++++++++++++++++++++++++++++++++++++=
-++++
->>>>>    target/i386/kvm/tdx.c | 24 +++++++++++++++++-
->>>>>    3 files changed, 110 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/qapi/run-state.json b/qapi/run-state.json
->>>>> index dd0770b379e5..b71dd1884eb6 100644
->>>>> --- a/qapi/run-state.json
->>>>> +++ b/qapi/run-state.json
-
-[...]
-
->>>>> @@ -564,6 +567,30 @@
->>>>>              'psw-addr': 'uint64',
->>>>>              'reason': 'S390CrashReason'}}
->>>>> +##
->>>>> +# @GuestPanicInformationTdx:
->>>>> +#
->>>>> +# TDX Guest panic information specific to TDX, as specified in the
->>>>> +# "Guest-Hypervisor Communication Interface (GHCI) Specification",
->>>>> +# section TDG.VP.VMCALL<ReportFatalError>.
->>>>> +#
->>>>> +# @error-code: TD-specific error code
->>>>> +#
->>>>> +# @message: Human-readable error message provided by the guest. Not
->>>>> +#     to be trusted.
->>>>> +#
->>>>> +# @gpa: guest-physical address of a page that contains more verbose
->>>>> +#     error information, as zero-terminated string.  Present when the
->>>>> +#     "GPA valid" bit (bit 63) is set in @error-code.
->>>>
->>>> Uh, peeking at GHCI Spec section 3.4 TDG.VP.VMCALL<ReportFatalError>, I
->>>> see operand R12 consists of
->>>>
->>>>       bits    name                        description
->>>>       31:0    TD-specific error code      TD-specific error code
->>>>                                           Panic =E2=80=93 0x0.
->>>>                                           Values =E2=80=93 0x1 to 0xFF=
-FFFFFF
->>>>                                           reserved.
->>>>       62:32   TD-specific extended        TD-specific extended error c=
-ode.
->>>>               error code                  TD software defined.
->>>>       63      GPA Valid                   Set if the TD specified addi=
-tional
->>>>                                           information in the GPA param=
-eter
->>>>                                           (R13).
->>>> Is @error-code all of R12, or just bits 31:0?
->>>> If it's all of R12, description of @error-code as "TD-specific error
->>>> code" is misleading.
->>>
->>> We pass all of R12 to @error_code.
->>>
->>> Here it wants to use "error_code" as generic as the whole R12. Do you h=
-ave any better description of it ?
->>=20
->> Sadly, the spec is of no help: it doesn't name the entire thing, only
->> the three sub-fields TD-specific error code, TD-specific extended error
->> code, GPA valid.
->>=20
->> We could take the hint, and provide the sub-fields instead:
->>=20
->> * @error-code contains the TD-specific error code (bits 31:0)
->>=20
->> * @extended-error-code contains the TD-specific extended error code
->>    (bits 62:32)
->>=20
->> * we don't need @gpa-valid, because it's the same as "@gpa is present"
->>=20
->> If we decide to keep the single member, we do need another name for it.
->> @error-codes (plural) doesn't exactly feel wonderful, but it gives at
->> least a subtle hint that it's not just *the* error code.
+On 3/9/24 00:05, Alex Williamson wrote:
+> Currently for devices requiring masking at the irqchip for INTx, ie.
+> devices without DisINTx support, the IRQ is enabled in request_irq()
+> and subsequently disabled as necessary to align with the masked status
+> flag.  This presents a window where the interrupt could fire between
+> these events, resulting in the IRQ incrementing the disable depth twice.
+> This would be unrecoverable for a user since the masked flag prevents
+> nested enables through vfio.
 >
-> The reason we only defined one single member, is that the=20
-> extended-error-code is not used now, and I believe it won't be used in=20
-> the near future.
+> Instead, invert the logic using IRQF_NO_AUTOEN such that exclusive INTx
+> is never auto-enabled, then unmask as required.
+> Cc: stable@vger.kernel.org
+> Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_intrs.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+> index 237beac83809..136101179fcb 100644
+> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> @@ -296,8 +296,15 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
+>  
+>  	ctx->trigger = trigger;
+>  
+> +	/*
+> +	 * Devices without DisINTx support require an exclusive interrupt,
+> +	 * IRQ masking is performed at the IRQ chip.  The masked status is
+> +	 * protected by vdev->irqlock. Setup the IRQ without auto-enable and
+> +	 * unmask as necessary below under lock.  DisINTx is unmodified by
+> +	 * the IRQ configuration and may therefore use auto-enable.
+If I remember correctly the main reason why the
 
-Aha!  Then I recommend
+vdev->pci_2_3 path is left unchanged is due to the fact the irq may not be exclusive
+and setting IRQF_NO_AUTOEN could be wrong in that case. May be worth to
+precise in the commit msg or here? Besides Reviewed-by: Eric Auger
+<eric.auger@redhat.com> Eric   
 
-* @error-code contains the TD-specific error code (bits 31:0)
-
-* Omit bits 62:32 from the reply; if we later find an actual use for
-  them, we can add a suitable member
-
-* Omit bit 63, because it's the same as "@gpa is present"
-
-> If no objection from others, I will use @error-codes (plural) in the=20
-> next version.
-
-I recommend to keep the @error-code name, but narrow its value to the
-actual error code, i.e. bits 31:0.
-
->>>> If it's just bits 31:0, then 'Present when the "GPA valid" bit (bit 63)
->>>> is set in @error-code' is wrong.  Could go with 'Only present when the
->>>> guest provides this information'.
-
-[...]
+> +	 */
+>  	if (!vdev->pci_2_3)
+> -		irqflags = 0;
+> +		irqflags = IRQF_NO_AUTOEN;
+>  
+>  	ret = request_irq(pdev->irq, vfio_intx_handler,
+>  			  irqflags, ctx->name, vdev);
+> @@ -308,13 +315,9 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
+>  		return ret;
+>  	}
+>  
+> -	/*
+> -	 * INTx disable will stick across the new irq setup,
+> -	 * disable_irq won't.
+> -	 */
+>  	spin_lock_irqsave(&vdev->irqlock, flags);
+> -	if (!vdev->pci_2_3 && ctx->masked)
+> -		disable_irq_nosync(pdev->irq);
+> +	if (!vdev->pci_2_3 && !ctx->masked)
+> +		enable_irq(pdev->irq);
+>  	spin_unlock_irqrestore(&vdev->irqlock, flags);
+>  
+>  	return 0;
 
 
