@@ -1,245 +1,215 @@
-Return-Path: <kvm+bounces-11651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2F7F879150
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 10:49:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C22879184
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 10:57:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A5DFB22DE6
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 09:49:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C883E1F22212
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 09:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FD27A71F;
-	Tue, 12 Mar 2024 09:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF26F78291;
+	Tue, 12 Mar 2024 09:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="1MP4b0Fy";
-	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="1MP4b0Fy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QqH2FGc7"
 X-Original-To: kvm@vger.kernel.org
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2068.outbound.protection.outlook.com [40.107.6.68])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF83D30B;
-	Tue, 12 Mar 2024 09:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.6.68
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710236783; cv=fail; b=mquwnaVVrhtte6q//SxfWyEUBuX9Ba2XtzeM2SkzUk/SMRTywo3pYS1vjvX6Hf/QiC4RB/ppOMVJ6WwRo/dV08U98UHtWwJ9mCIV8LoyitszrC7DjC20rXRekyVMZn/vN0IkwbyiaBTp1cPWr89NVFLz+3LdkloCx2C+t+oo99E=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710236783; c=relaxed/simple;
-	bh=ROaYGzG7qXODKOC9T78z2j8KHmiFuS43MVLknuXbwdw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=AbgHq/rUOr0z45DnYdIJinma3yGCIqDQQHXb3AvzDFYw+vTVPN+dE+X9HX2hnQGwDxJcT5cKZRxje1ijxEqUs15kfZt6f92DmODjXlnzQXw9rU1/bYaH1ceLPASKnuW7jIP6ipPJ3f/mdSx2hLmX4jOyGoYlf0mU+ZE1qeo05Tg=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b=1MP4b0Fy; dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b=1MP4b0Fy; arc=fail smtp.client-ip=40.107.6.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
- b=iLNE50rZJx2pqxXLnuIebsqoIWtSeV5hKYFduI+87x7WUtusvpjNrY4nUL34wmbL3RvNT5xVV5utEYhqdf4losfuVoGOWb5/plFzUXy6XjKxwTwe2aaQaWEzBSrMFAruvHsxdNNjf+o8AP4hkn2VYUrs6luioJ2LBO1jmZmO/kd6Yic46HYYLebO6WB9b01/1gMJmp74tiLTtx6Wdoh7025d1zPGjxbaGNCijC94+emFWYMC7v3Fb8f7sWJ7SySql2xKn1pToIkKbzm90+zR23HcTbxnZCPlw8FAOQHCzSGOakOExjbQ7ES54+k33cslA2FNRMAMccLpm19mP/572A==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jOZOEMBbfhIll16JVp4hL3E155Tn8lUB9nsRtiiagdU=;
- b=JkToz2ITKmLmklHv2Pzcbhu+ffCupLu2PRBPhzSWOeNTrNxRaLHgRyWNEyvKZ3FsSx7MzaMluKHCH8peuA4y8oLDFpBJQCHVfaZEnz535N1yW8ZDlfFmaTM9Mugh1CWs5iI6VpfVv9k6XDeKFtZJcl6k95SJymeYKmMBfHxBW0cmRHk6VkOe/V0nQSs7AX2tWEhnTtbGGlXX2cD9MpIABUk7PPblquLTqdCDB6hnnsZ15kxDSz8etkYg6gaf8QbjbVKNN/R26/FNIF7Un9VOXvGcMa0fnS3NrbsYLy8Yexl7yjQf/cvGgod6A5XMHI5Wj2qJHdH/Q9/XT99A/FdkDw==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 63.35.35.123) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=armh.onmicrosoft.com; arc=pass (0
- oda=1 ltdi=1 spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jOZOEMBbfhIll16JVp4hL3E155Tn8lUB9nsRtiiagdU=;
- b=1MP4b0Fyuf6F5XZWMn64qEgzmuCNg/0GFHoFQmlvQensEVo3ZXe0Iu9nDOERfwPNKRcVcSzJN0bCW3Po6A1rdKTI49evF4L12L6BLL3lGErwhpWUAB12TrcPM0u/iHJbgt9c4Y2eQP+K7oA7bP2O/I5tALuL6tbLVkkbbAVhfZk=
-Received: from AS4P250CA0029.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:5e3::19)
- by PAWPR08MB9471.eurprd08.prod.outlook.com (2603:10a6:102:2e5::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35; Tue, 12 Mar
- 2024 09:46:14 +0000
-Received: from AM4PEPF00027A68.eurprd04.prod.outlook.com
- (2603:10a6:20b:5e3:cafe::34) by AS4P250CA0029.outlook.office365.com
- (2603:10a6:20b:5e3::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36 via Frontend
- Transport; Tue, 12 Mar 2024 09:46:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM4PEPF00027A68.mail.protection.outlook.com (10.167.16.85) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7386.12 via Frontend Transport; Tue, 12 Mar 2024 09:46:13 +0000
-Received: ("Tessian outbound 598157ceef91:v276"); Tue, 12 Mar 2024 09:46:13 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: 14f10f8ef0686210
-X-CR-MTA-TID: 64aa7808
-Received: from 17a47b054d21.1
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id F30F8C0D-CEB0-4DF5-812F-A58AC3CBD00C.1;
-	Tue, 12 Mar 2024 09:46:06 +0000
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 17a47b054d21.1
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Tue, 12 Mar 2024 09:46:06 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W9r8nhYR7VyJ9tVJIuYgn/iqfd0p2OFliNqWB9+GDPe7SRxZaSb3pTzzoD/2EGcjJf9Fq/ooMi7xicvzLweg2L3Clb37VwaNA5pqXH3BeEAVKYM0O9xtRm58RZr2sr2H7/gn5OCH0JjyEaYvS8i40YfNhfmIeER+SU7fzgvfas28ZjUtRFa2P/HAZjj9b/8Vp4wPkwa0aiG7OQ6De7M6Exp5oV9bvZYuUyDMO7u704ZbjP09ccuQIj1zYQabNguQbW0eE5nx2C977zbdwy4EydsKvPOVm98f6cJ0fpOYZ2q/g+xQpUOx0yBsy7J7hvX10QFgjXCqFKq6lJgApA8umQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jOZOEMBbfhIll16JVp4hL3E155Tn8lUB9nsRtiiagdU=;
- b=Y3e3BZ3qu+8zsJbj1kQvIaRrT5u+Nnj5dUJzUa4Mwn1xvEMBjkfgiTGe0XuJyRkW6ca33KXcw5ZjJtnkTeoCT9OiMobsOdaHrGBKYQTd3ZLbXoxc1DiL3YsiWF5Kx2749G9hHT2yawcVxKnshXzHDynaTPmBRAr47RjcEm2Z8Uc4j4ZLWtnQmgQoUqE/kQL/OFj+2wVf7q8RuShiqYEMT57i3XEfmTFln8kNfENMQ2myORhuV129gW+4w6dIIIxF70Rs1RpHcu0h+D/W1tL80l4xiyNyw6wm6QR9Nka/sydlZQpc+IqYTlPKT/7nX1JPY17Rq7fKje7PBCuCrkg0JA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jOZOEMBbfhIll16JVp4hL3E155Tn8lUB9nsRtiiagdU=;
- b=1MP4b0Fyuf6F5XZWMn64qEgzmuCNg/0GFHoFQmlvQensEVo3ZXe0Iu9nDOERfwPNKRcVcSzJN0bCW3Po6A1rdKTI49evF4L12L6BLL3lGErwhpWUAB12TrcPM0u/iHJbgt9c4Y2eQP+K7oA7bP2O/I5tALuL6tbLVkkbbAVhfZk=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from VI1PR08MB3919.eurprd08.prod.outlook.com (2603:10a6:803:c4::31)
- by DU2PR08MB10204.eurprd08.prod.outlook.com (2603:10a6:10:49b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35; Tue, 12 Mar
- 2024 09:46:03 +0000
-Received: from VI1PR08MB3919.eurprd08.prod.outlook.com
- ([fe80::363f:3fc8:fc36:58ed]) by VI1PR08MB3919.eurprd08.prod.outlook.com
- ([fe80::363f:3fc8:fc36:58ed%5]) with mapi id 15.20.7362.031; Tue, 12 Mar 2024
- 09:46:03 +0000
-Message-ID: <cf813f92-9806-4449-b099-1bb2bd492b3c@arm.com>
-Date: Tue, 12 Mar 2024 09:45:57 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
- lag based placement)
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- Tobias Huschle <huschle@linux.ibm.com>
-Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
- Peter Zijlstra <peterz@infradead.org>,
- Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org, nd <nd@arm.com>
-References: <42870.123121305373200110@us-mta-641.us.mimecast.lan>
- <20231213061719-mutt-send-email-mst@kernel.org>
- <25485.123121307454100283@us-mta-18.us.mimecast.lan>
- <20231213094854-mutt-send-email-mst@kernel.org>
- <20231214021328-mutt-send-email-mst@kernel.org>
- <92916.124010808133201076@us-mta-622.us.mimecast.lan>
- <20240121134311-mutt-send-email-mst@kernel.org>
- <07974.124020102385100135@us-mta-501.us.mimecast.lan>
- <20240201030341-mutt-send-email-mst@kernel.org>
- <89460.124020106474400877@us-mta-475.us.mimecast.lan>
- <20240311130446-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Luis Machado <luis.machado@arm.com>
-In-Reply-To: <20240311130446-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO6P123CA0038.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:2fe::15) To VI1PR08MB3919.eurprd08.prod.outlook.com
- (2603:10a6:803:c4::31)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E1E33994
+	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 09:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710237463; cv=none; b=rDLHw/PYVjw1RmV28TPTjmKKZL98x3Kt7iH4ZkcPTJMRSVsbftkH6rdgXMv6FrMSILNtmIZLSoGwBr2qa+skFA44srXiJL8IHcJbt02cpeAeONhD4TRGAKnsEZr4/QFH+Uqp+3nojglzqsprrZtF1lNhzZxiKPdenG+fLieHjGg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710237463; c=relaxed/simple;
+	bh=m4NiaKsQ27utBVnDv39yTWwqiXt/Umj7/8ZxBQI5cT4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QHjoZx43XgkFe6b6i6YvfozrWjm6m78W6Mc8mvxHMpI7/gHpP7KU9H7QWXwYX7RwHqQyKVCOU0PaGJ+fTjEmNcmiYTpGy5SKi6Ct/teXJphMotCYUtsIzrG+A5bgoftp3pnAF3YWs+OpobQp4l0+NpEwzzBXvB8SFA0lSyJr+ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QqH2FGc7; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710237461; x=1741773461;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=m4NiaKsQ27utBVnDv39yTWwqiXt/Umj7/8ZxBQI5cT4=;
+  b=QqH2FGc755PnI6kmG5WbctvBV65VdzydfIXKBPlmQB6IC8HTuLHB8cS8
+   yE+RHmdCu/vIDB3uclGPRPXScI4jp++aAY7LLu/y6xmXk6BIYt6kUW9rn
+   Ss5B5MA1NvvFI4cTl7ReHNwNmR5E3FFawA8GPoKZ5NarXHIzZTf8ZMDYd
+   uOiPIHvfopkQPY9LyPQ/intCTFHN2GRE3kGa6BM4ymVy3ZE1TYmb/+Exl
+   hiCO21jqLmqDoR7mc0j8EWT1NLvs7FGGqVv/bnLMnmIhKrpNd41asHE5S
+   9GVWI9qPWKgPPOySBIYOHDheqJ//zIFjHYOkmdOv6mtAVoHjIqZqm5h9B
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="4808985"
+X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
+   d="scan'208";a="4808985"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 02:57:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
+   d="scan'208";a="11550428"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa009.jf.intel.com with ESMTP; 12 Mar 2024 02:57:36 -0700
+Date: Tue, 12 Mar 2024 18:11:24 +0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	qemu-devel@nongnu.org, kvm@vger.kernel.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Zhuocheng Ding <zhuocheng.ding@intel.com>,
+	Babu Moger <babu.moger@amd.com>, Yongwei Ma <yongwei.ma@intel.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [PATCH v9 11/21] i386/cpu: Decouple CPUID[0x1F] subleaf with
+ specific topology level
+Message-ID: <ZfAqTEN8pvvgZ8IO@intel.com>
+References: <20240227103231.1556302-1-zhao1.liu@linux.intel.com>
+ <20240227103231.1556302-12-zhao1.liu@linux.intel.com>
+ <005c1649-43d3-494f-951a-166e7200ffd5@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	VI1PR08MB3919:EE_|DU2PR08MB10204:EE_|AM4PEPF00027A68:EE_|PAWPR08MB9471:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ccb1211-5ea4-4122-5db0-08dc42794142
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- F+mmDfTvH9FvVrcvJV3jWt6Zm67T4AFdXlDoWfjI7X3rZuJE3F/DjaXonnxzGrIM4NdFhQ7HCf535rZBO224nRtiK/V0DBaWVpeCAaf1OBWi7C487cq7NoUaEz3cIuVbQ1WJ3W7phETwZz6CdEq4LIxFGIT+mPgIENceKmxGy2cvJC44D4E+UoTWW4nOGtYsEWz850k/V4tKPT2nwW8FDJbM1srtzJnh5kAVePglJGob1xU3DkKZnk2Bmzvrt+fDL8A9BNILR1Png1J7v1uSGwvsLaMrvUeSIvECBuEqnErzkeiEujxd3nGMFx+6PnChfw/B795lmtMnG5xnQjq6E8pYmNT5J2ywxRwp591JZj/r6aT+YZtZw2XZpNUoorOyZOve5JIkfyeJEVJz8RQvDnqOQiURrzUWf6h4IOB/d6CdXKNsBOYOs3s73EaQ49ddsTggTZyDxfeYjv3qYyVK+FeLMIyC3gy/W7znzY+kLUOqLSbLrQhifypicItvYAzYTbI4/Xb1gWF2qDOZWTeC4k1M7P4SbmLGjkTI/jCOSvT+uInbLqlVNeyJDydwryaR1NoFxwSGwzrrGyFL28e3N7Yao7rnP31pc2ayXhamS4feT0ZjXv7khOZzEQ374J55
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR08MB3919.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR08MB10204
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM4PEPF00027A68.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	4a7e6c97-7969-42c6-1517-08dc42793b26
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yqlid8dSjJg4WpqPj7iqbMe39HPh4O0pyiPMr7KjDblPRLzGnulfvTsaS0S4SMjOGaWPQ5ZbhBQGOFoahen5iCtXcrv7mqEIh4zBZuDTZlOZZxBLaQRQhjBnCmLBBlpNEf2X2wTlIcbG3a113/F5ab4dLB0gu29CyNCIfaC6IrVnOlxTe2sopTa+GkMppjJx9+simg0oVABqA8JCJvS7/T64XDRsxm+7fQ38sgMx+cvWBAeypzLL9Nuk9SUQxWYkZRoeGftSiLm1puCOHmguDiPDKKkjfq4x09DwBqvkCz+SeMERCgfXS0RfQrUkE8qy4K0OBV/Dn9aMyY2K/5Fxb7Rud1EDqUboqoDOVBPxwgk7GD523UdNBpAY4HO9TEX6/SGUYCXgP7nIRZIf/44Nl3kSCLaVmi62ajDVi6FCsN/e4peJ7c1J/cYU89zh0qtL9aSLamSo6ofwsOMZTauHjsSUrFVqFk8VBgvK+HJoe3ssbACrLE02DS/NicoODSErbkz9nd6P9cKk3LEWCF8DI/oRSOhBqeHROJJM3AhgwEEq70tjXrS+rm8e5h0U/gkIskH+7dtzjLgDhYLH0bXorpYe07LEfEU5dZkuYURujU+SLmWCaoA+H3/ypGTZx4nl0qyXkVWC+fmCdbhXz3pWheSGge+PV0qAhxPrfbGBEeWVatSOc6yUnA45WnicjfpuUvISsWcNov9j89tTZkts4g==
-X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2024 09:46:13.2174
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ccb1211-5ea4-4122-5db0-08dc42794142
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00027A68.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB9471
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <005c1649-43d3-494f-951a-166e7200ffd5@intel.com>
 
-On 3/11/24 17:05, Michael S. Tsirkin wrote:
-> On Thu, Feb 01, 2024 at 12:47:39PM +0100, Tobias Huschle wrote:
->> On Thu, Feb 01, 2024 at 03:08:07AM -0500, Michael S. Tsirkin wrote:
->>> On Thu, Feb 01, 2024 at 08:38:43AM +0100, Tobias Huschle wrote:
->>>> On Sun, Jan 21, 2024 at 01:44:32PM -0500, Michael S. Tsirkin wrote:
->>>>> On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
->>>>>> On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
->>>>
->>>> -------- Summary --------
->>>>
->>>> In my (non-vhost experience) opinion the way to go would be either
->>>> replacing the cond_resched with a hard schedule or setting the
->>>> need_resched flag within vhost if the a data transfer was successfully
->>>> initiated. It will be necessary to check if this causes problems with
->>>> other workloads/benchmarks.
->>>
->>> Yes but conceptually I am still in the dark on whether the fact that
->>> periodically invoking cond_resched is no longer sufficient to be nice to
->>> others is a bug, or intentional.  So you feel it is intentional?
->>
->> I would assume that cond_resched is still a valid concept.
->> But, in this particular scenario we have the following problem:
->>
->> So far (with CFS) we had:
->> 1. vhost initiates data transfer
->> 2. kworker is woken up
->> 3. CFS gives priority to woken up task and schedules it
->> 4. kworker runs
->>
->> Now (with EEVDF) we have:
->> 0. In some cases, kworker has accumulated negative lag 
->> 1. vhost initiates data transfer
->> 2. kworker is woken up
->> -3a. EEVDF does not schedule kworker if it has negative lag
->> -4a. vhost continues running, kworker on same CPU starves
->> --
->> -3b. EEVDF schedules kworker if it has positive or no lag
->> -4b. kworker runs
->>
->> In the 3a/4a case, the kworker is given no chance to set the
->> necessary flag. The flag can only be set by another CPU now.
->> The schedule of the kworker was not caused by cond_resched, but
->> rather by the wakeup path of the scheduler.
->>
->> cond_resched works successfully once the load balancer (I suppose) 
->> decides to migrate the vhost off to another CPU. In that case, the
->> load balancer on another CPU sets that flag and we are good.
->> That then eventually allows the scheduler to pick kworker, but very
->> late.
+On Mon, Mar 11, 2024 at 04:45:41PM +0800, Xiaoyao Li wrote:
+> Date: Mon, 11 Mar 2024 16:45:41 +0800
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
+> Subject: Re: [PATCH v9 11/21] i386/cpu: Decouple CPUID[0x1F] subleaf with
+>  specific topology level
 > 
-> Are we going anywhere with this btw?
+> On 2/27/2024 6:32 PM, Zhao Liu wrote:
+> > From: Zhao Liu <zhao1.liu@intel.com>
+> > 
+> > At present, the subleaf 0x02 of CPUID[0x1F] is bound to the "die" level.
+> > 
+> > In fact, the specific topology level exposed in 0x1F depends on the
+> > platform's support for extension levels (module, tile and die).
+> > 
+> > To help expose "module" level in 0x1F, decouple CPUID[0x1F] subleaf
+> > with specific topology level.
+> > 
+> > Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > 
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+Thanks!
+
+> Besides, some nits below.
 >
 
-I think Tobias had a couple other threads related to this, with other potential fixes:
+[snip]
 
-https://lore.kernel.org/lkml/20240228161018.14253-1-huschle@linux.ibm.com/
+> > +static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
+> > +                                X86CPUTopoInfo *topo_info,
+> > +                                uint32_t *eax, uint32_t *ebx,
+> > +                                uint32_t *ecx, uint32_t *edx)
+> > +{
+> > +    X86CPU *cpu = env_archcpu(env);
+> > +    unsigned long level;
+> > +    uint32_t num_threads_next_level, offset_next_level;
+> > +
+> > +    assert(count + 1 < CPU_TOPO_LEVEL_MAX);
+> > +
+> > +    /*
+> > +     * Find the No.count topology levels in avail_cpu_topo bitmap.
+> > +     * Start from bit 0 (CPU_TOPO_LEVEL_INVALID).
+> 
+> AFAICS, it starts from bit 1 (CPU_TOPO_LEVEL_SMT). Because the initial value
+> of level is CPU_TOPO_LEVEL_INVALID, but the first round of the loop is to
+> find the valid bit starting from (level + 1).
 
-https://lore.kernel.org/lkml/20240228161023.14310-1-huschle@linux.ibm.com/
+Yes, this description is much clearer.
 
+> > +     */
+> > +    level = CPU_TOPO_LEVEL_INVALID;
+> > +    for (int i = 0; i <= count; i++) {
+> > +        level = find_next_bit(env->avail_cpu_topo,
+> > +                              CPU_TOPO_LEVEL_PACKAGE,
+> > +                              level + 1);
+> > +
+> > +        /*
+> > +         * CPUID[0x1f] doesn't explicitly encode the package level,
+> > +         * and it just encode the invalid level (all fields are 0)
+> > +         * into the last subleaf of 0x1f.
+> > +         */
+> 
+> QEMU will never set bit CPU_TOPO_LEVEL_PACKAGE in env->avail_cpu_topo.
+
+In the patch 9 [1], I set the CPU_TOPO_LEVEL_PACKAGE in bitmap. This
+level is a basic topology level in general, so it's worth being set.
+
+Only in Intel's 0x1F, it doesn't have a corresponding type, and where
+I use it as a termination condition for 0x1F encoding (not an error case).
+
+[1]: https://lore.kernel.org/qemu-devel/20240227103231.1556302-10-zhao1.liu@linux.intel.com/
+
+> So I think we should assert() it instead of fixing it silently.
+> 
+> > +        if (level == CPU_TOPO_LEVEL_PACKAGE) {
+> > +            level = CPU_TOPO_LEVEL_INVALID;
+> > +            break;
+> > +        }
+> > +    }
+> > +
+> > +    if (level == CPU_TOPO_LEVEL_INVALID) {
+> > +        num_threads_next_level = 0;
+> > +        offset_next_level = 0;
+> > +    } else {
+> > +        unsigned long next_level;
+> 
+> please define it at the beginning of the function. e.g.,
+
+Okay, I'll put the declaration of "next_level" at the beginning of this
+function with a current variable "level".
+
+> 
+> > +        next_level = find_next_bit(env->avail_cpu_topo,
+> > +                                   CPU_TOPO_LEVEL_PACKAGE,
+> > +                                   level + 1);
+> > +        num_threads_next_level = num_threads_by_topo_level(topo_info,
+> > +                                                           next_level);
+> > +        offset_next_level = apicid_offset_by_topo_level(topo_info,
+> > +                                                        next_level);
+> > +    }
+> > +
+> > +    *eax = offset_next_level;
+> > +    *ebx = num_threads_next_level;
+> > +    *ebx &= 0xffff; /* The count doesn't need to be reliable. */
+> 
+> we can combine them together. e.g.,
+> 
+> *ebx = num_threads_next_level & 0xffff; /* ... */
+> 
+> > +    *ecx = count & 0xff;
+> > +    *ecx |= cpuid1f_topo_type(level) << 8;
+> 
+> Ditto,
+> 
+> *ecx = count & 0xff | cpuid1f_topo_type(level) << 8;
+
+OK, will combine these.
+
+> > +    *edx = cpu->apic_id;
+> > +
+> > +    assert(!(*eax & ~0x1f));
+> > +}
+> > +
 
