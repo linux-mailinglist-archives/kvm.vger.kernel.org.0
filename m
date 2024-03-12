@@ -1,154 +1,158 @@
-Return-Path: <kvm+bounces-11636-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11637-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 354F1878E33
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 06:40:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98BC9878E38
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 06:44:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62DC61C21FBA
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 05:40:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7785B2176A
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 05:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257B41804C;
-	Tue, 12 Mar 2024 05:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E382D2E3F9;
+	Tue, 12 Mar 2024 05:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YYin5Bi7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="alu+yz/x"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C108BE8;
-	Tue, 12 Mar 2024 05:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F12720304;
+	Tue, 12 Mar 2024 05:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710222004; cv=none; b=LM809J3zMRJ4T7M7xcOV+GUjMoFougky8OCxzWuiTr+MCv0uhCYL1MW0vEWDVAFSICq8rlsps/yp6qpfHMteq45Qb/RKOwKBwU2uhVaA2kAti5vCb9BSX8ULBZT1DvuIpk4Z5zRS3G6ZT0c+0LKn/K/PuQSMP/6IiTLbxJYT+q4=
+	t=1710222252; cv=none; b=RpJyXoQls47gTklAp9W+FDb+213SSHWFEW6Lcsgau5b4awqM6Hf0sGuav7IV+rQ2svEiJIbf3ghweAbpDfP6yKkljieSmfUnsoTpV5EJJdvuFCYbCfhOLWe4KhdsVhlgjswIYq8wcVxpEH6v3sud898JA0Oc6ChPQoBUSS1/CME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710222004; c=relaxed/simple;
-	bh=MyR5SZ6Qdv2397G2tIiBKtYqWScOGbdaEX8EEBNOk34=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=HO4/arX3o32mSGfSQA90KzWlb5d2WKsAdYDLppRtZ1savMuyo7V7/GRI7tOxpzG+ghK2srfrFE9RbwcqbB3217tjp+Xwe35gq+X3VTYZv14Hu8fIosyV2PoIq0Pv7aU9CgEguZoKnxBw1uYfkjN9Xrpzx+bAl2P7wWmsQ0fjWNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YYin5Bi7; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-53fa455cd94so4420723a12.2;
-        Mon, 11 Mar 2024 22:40:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710222002; x=1710826802; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MeBpnbK0DvHBH0dxfOexxIi1maP8eZLnEL1BqVP6aUg=;
-        b=YYin5Bi7oQh8c+yQMsJJm8Cl9VfCkfYq2lOLBacB1gTunBu08c54xLTM9/+Gfq9Sle
-         lojrM1kcwaZ/aAG1lW6erPgxoXNNYiRMf7AbGj7gEysfnPeTM2oBvPX5JFg7zmrtddUU
-         m2L0GxLnjGOpdYv7TxlNNkmIanl3ZJKQudlIBqEuHAHsjtp5DQO6B08ea4LaPyN6RcCf
-         3G9PY7l1BLHd10gLywVHaKsadW6WOdkUgzav7Vmo4orz2I5rzu/OW7R/zCgPgIRHtTXn
-         ivmU6OqF4pLqqMxz0RNzTU3/Ep5p8pPQnCRUfZeW2WcbARCLvg3M5789LDqccQ4hvGMZ
-         O7UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710222002; x=1710826802;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MeBpnbK0DvHBH0dxfOexxIi1maP8eZLnEL1BqVP6aUg=;
-        b=YSbwaEB6f8J2edR2pf2lC2qA+y752QBizc3alnTlFMmav2Sd5ptOrAeL2R1hGrfBcE
-         AFZ/aSouR7KTgZRMKTbE1oQo9yyUo7TLfJQJSQjrg1jPe9b4Fl5wXRm7Y5i04Ezz6Q8/
-         cFqZB0jqF/5h1QLaekw5QIqPMpUEYVz7zeexm85GD4RJDuchcDt5X/XtEFbdjAhgBMre
-         SKVAmMq/AlH8ac/scWFOrmrUPBqOqY8p8WchbYtLKG5N6D0idj2iSkwlEhwqQpXWpBiM
-         qoKRQGPcEcqMu0aZRktkvdeiNn8nhzaviDAYQYywiyBl38Rt7IN9VcXYBNzKLxeh7Tzf
-         16WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWCaAVpzk9EJtxUudwgNFjhaQcEER0EndOLlQFWDkI+DqTZRBgXvwpRgHrzHYpa1n5MxpV/dU+DkEC1ZFsk2IYHxeODQNFdjggTw==
-X-Gm-Message-State: AOJu0Ywl0Wx0Rf/1A4Q7IwKDoWxJA0C+lkQcjVjfTf66iTvEppjZ/A3x
-	WSJy2B3rPfdHRZK/V/BrITSRvwJwuJvT4gNs07jjjaWf2Rg5y1Zh
-X-Google-Smtp-Source: AGHT+IEfWhr7gOrWQGM2j8IlK3aPvS8xBhmwURHugULmmR1T38gPS00vcgyHFnvxEwxEo9MERUoypA==
-X-Received: by 2002:a17:902:7084:b0:1dd:7de5:88fd with SMTP id z4-20020a170902708400b001dd7de588fdmr626637plk.66.1710222002099;
-        Mon, 11 Mar 2024 22:40:02 -0700 (PDT)
-Received: from localhost ([1.146.55.44])
-        by smtp.gmail.com with ESMTPSA id kq8-20020a170903284800b001dcb4ae9563sm5725703plb.33.2024.03.11.22.39.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Mar 2024 22:40:01 -0700 (PDT)
+	s=arc-20240116; t=1710222252; c=relaxed/simple;
+	bh=YUA5xCks3DL01daXHdbAKUuXLaWBHujC/db7Mi41JeM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PZLzNMq3myQmTdR2JiPl/67O/F0tM5KF10qMyO2Dic2L/noSvCtvxFqnbm5XLsk9ozVKFl+ep4Amwspko6dGiUAoHLWQY78+0Mseoh7QT6Tcq3q5ICF7/Yd2KuRhafzFAUbSoY6g+1GpezRX2OaGgk1MBYASqiQvMKS78eh9T88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=alu+yz/x; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710222251; x=1741758251;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=YUA5xCks3DL01daXHdbAKUuXLaWBHujC/db7Mi41JeM=;
+  b=alu+yz/x7b/HBgt+nH+JoDNpiXHA+61J/8+WZC4bXcHPDEBloksE7cid
+   04q2BfUTTBeNf8Y2gm7N1/io+j/8lWUf0r2UYApar2tOKuaXHKlJ8h8z5
+   S4atthKaOqTg1ZvTedQzz/8pj2KccsL4JOvyk/8UjxqUeC2OGZp6itiR2
+   nVOCfHiDi3ieASr00yRk250fkmlQH24LO3C2lLRqfmbhasmxjJJzTS+oS
+   q/s2zwAf/sFSdAL+Q5KHW6NhUB1ZAtgNFQojnKGMC6NoJb8yHquB0xgd+
+   XnWzox3Iqcn4DvmYds9M0cQB6cLG9Z5IIx+zIAb3zMMKKhn3EcFKsNMhy
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="5042637"
+X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
+   d="scan'208";a="5042637"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 22:44:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
+   d="scan'208";a="48866108"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.125.242.247]) ([10.125.242.247])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 22:44:07 -0700
+Message-ID: <f1e2d2f7-f5cb-488b-8f9d-647d2f4e7480@linux.intel.com>
+Date: Tue, 12 Mar 2024 13:44:04 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 12 Mar 2024 15:39:56 +1000
-Message-Id: <CZRJ3MUT6HWP.11KK3F4QNKUGH@wheely>
-Subject: Re: [kvm-unit-tests PATCH v1] arch-run: Wait for incoming socket
- being removed
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Nico Boehr" <nrb@linux.ibm.com>, "Marc Hartmayer"
- <mhartmay@linux.ibm.com>, <frankja@linux.ibm.com>,
- <imbrenda@linux.ibm.com>, <thuth@redhat.com>
-Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>
-X-Mailer: aerc 0.15.2
-References: <20240305141214.707046-1-nrb@linux.ibm.com>
- <87il20lf9b.fsf@linux.ibm.com>
- <170973018238.31923.4497119683216363940@t14-nrb>
-In-Reply-To: <170973018238.31923.4497119683216363940@t14-nrb>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 06/16] KVM: x86/mmu: WARN if upper 32 bits of legacy #PF
+ error code are non-zero
+To: Sean Christopherson <seanjc@google.com>, Kai Huang <kai.huang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+ David Matlack <dmatlack@google.com>
+References: <20240228024147.41573-1-seanjc@google.com>
+ <20240228024147.41573-7-seanjc@google.com>
+ <3779953f-4d07-41d7-b450-bbc2afffaa43@intel.com>
+ <ZeEOTxUTSkYnP9Y0@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZeEOTxUTSkYnP9Y0@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed Mar 6, 2024 at 11:03 PM AEST, Nico Boehr wrote:
-> Quoting Marc Hartmayer (2024-03-05 19:12:16)
-> [...]
-> > > diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> > > index 2214d940cf7d..413f3eda8cb8 100644
-> > > --- a/scripts/arch-run.bash
-> > > +++ b/scripts/arch-run.bash
-> > > @@ -237,12 +237,8 @@ do_migration ()
-> > >       echo > ${dst_infifo}
-> > >       rm ${dst_infifo}
-> > > =20
-> > > -     # Ensure the incoming socket is removed, ready for next destina=
-tion
-> > > -     if [ -S ${dst_incoming} ] ; then
-> > > -             echo "ERROR: Incoming migration socket not removed afte=
-r migration." >& 2
-> > > -             qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
-> > > -             return 2
-> > > -     fi
-> > > +     # Wait for the incoming socket being removed, ready for next de=
-stination
-> > > +     while [ -S ${dst_incoming} ] ; do sleep 0.1 ; done
-> >=20
-> > But now, you have removed the erroring out path completely. Maybe wait
-> > max. 3s and then bail out?
+
+
+On 3/1/2024 7:07 AM, Sean Christopherson wrote:
+> On Fri, Mar 01, 2024, Kai Huang wrote:
+>>
+>> On 28/02/2024 3:41 pm, Sean Christopherson wrote:
+>>> WARN if bits 63:32 are non-zero when handling an intercepted legacy #PF,
+>> I found "legacy #PF" is a little bit confusing but I couldn't figure out a
+>> better name either :-)
+
+Me too.
+
+>>
+>>> as the error code for #PF is limited to 32 bits (and in practice, 16 bits
+>>> on Intel CPUS).  This behavior is architectural, is part of KVM's ABI
+>>> (see kvm_vcpu_events.error_code), and is explicitly documented as being
+>>> preserved for intecerpted #PF in both the APM:
+
+"intecerpted" -> "intercepted"
+
+>>>
+>>>     The error code saved in EXITINFO1 is the same as would be pushed onto
+>>>     the stack by a non-intercepted #PF exception in protected mode.
+>>>
+>>> and even more explicitly in the SDM as VMCS.VM_EXIT_INTR_ERROR_CODE is a
+>>> 32-bit field.
+>>>
+>>> Simply drop the upper bits of hardware provides garbage, as spurious
+>> "of" -> "if" ?
+>>
+>>> information should do no harm (though in all likelihood hardware is buggy
+>>> and the kernel is doomed).
+>>>
+>>> Handling all upper 32 bits in the #PF path will allow moving the sanity
+>>> check on synthetic checks from kvm_mmu_page_fault() to npf_interception(),
+>>> which in turn will allow deriving PFERR_PRIVATE_ACCESS from AMD's
+>>> PFERR_GUEST_ENC_MASK without running afoul of the sanity check.
+>>>
+>>> Note, this also why Intel uses bit 15 for SGX (highest bit on Intel CPUs)
+>> "this" -> "this is" ?
+>>
+>>> and AMD uses bit 31 for RMP (highest bit on AMD CPUs); using the highest
+>>> bit minimizes the probability of a collision with the "other" vendor,
+>>> without needing to plumb more bits through microcode.
+>>>
+>>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>>> ---
+>>>    arch/x86/kvm/mmu/mmu.c | 7 +++++++
+>>>    1 file changed, 7 insertions(+)
+>>>
+>>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+>>> index 7807bdcd87e8..5d892bd59c97 100644
+>>> --- a/arch/x86/kvm/mmu/mmu.c
+>>> +++ b/arch/x86/kvm/mmu/mmu.c
+>>> @@ -4553,6 +4553,13 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+>>>    	if (WARN_ON_ONCE(fault_address >> 32))
+>>>    		return -EFAULT;
+>>>    #endif
+>>> +	/*
+>>> +	 * Legacy #PF exception only have a 32-bit error code.  Simply drop the
+>> "have" -> "has" ?
+> This one I'll fix by making "exception" plural.
 >
-> Well, I was considering that, but:
-> - I'm not a huge fan of fine-grained timeouts. Fine-tuning a gazillion
->   timeouts is not a fun task, I think you know what I'm talking about :)
-> - a number of other places that can potentially get stuck also don't have
->   proper timeouts (like waiting for the QMP socket or the migration
->   socket), so for a proper solution we'd need to touch a lot of other
->   places...
+> Thanks much for the reviews!
 >
-> What I think we really want is a migration timeout. That isn't quite simp=
-le
-> since we can't easily pull $(timeout_cmd) before $(panic_cmd) and
-> $(migration_cmd) in run-scripts...
->
-> My suggestion: let's fix this issue and work on the timeout as a seperate
-> fix.
-
-The migration tests as a whole have big trouble with timeouts already.
-The problem is timeouts are implemented with the 'timeout' command but
-that is specific to the QEMU process so especially the migration harness
-with lots of loops can easily hang.
-
-I tried a few ways to address this like starting a background 'sleep ;
-kill' shell, but that gets very complicated to handle interrupts properly
-that kill the stuck bits and having the harness report the error
-sanely. I'm thinking a subshell that runs the entire test case and start
-*that* with 'timeout' might be a better approach.
-
-So I agree, let's take patches that fix behaviour when there are no
-timeouts, and address the timeout problem as a whole as a separate
-effort rather than worrying too much about individual loops just yet.
-(It's a fair review comment to ask though).
-
-Thanks,
-Nick
+>>> +	 * upper bits as KVM doesn't use them for #PF (because they are never
+>>> +	 * set), and to ensure there are no collisions with KVM-defined bits.
+>>> +	 */
+>>> +	if (WARN_ON_ONCE(error_code >> 32))
+>>> +		error_code = lower_32_bits(error_code);
+>>>    	vcpu->arch.l1tf_flush_l1d = true;
+>>>    	if (!flags) {
+>> Reviewed-by: Kai Huang <kai.huang@intel.com>
 
 
