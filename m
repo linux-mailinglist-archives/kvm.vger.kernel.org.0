@@ -1,147 +1,163 @@
-Return-Path: <kvm+bounces-11649-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11650-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2254878FFA
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 09:50:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93DCA879149
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 10:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9820B1F21721
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 08:50:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CB261F216A4
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 09:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC2177F1B;
-	Tue, 12 Mar 2024 08:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAECB78283;
+	Tue, 12 Mar 2024 09:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eWQkwrkV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hkZETeDJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5435D77F03
-	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 08:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3310478281;
+	Tue, 12 Mar 2024 09:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710233438; cv=none; b=Mp5yNWgYQcy8ISzyxf2lwsomEoMHW8Bu2m+tsfjAvt7eOa1pqY3mj3mzZUF5UbIgjF542dCK6jMSfG4hmOnOkvsgtKreF3nno3S80cDEYdfd3GA6eTKMWuw0jdjFNW8+jpFoXwJfAj7u7IW7WceGZ34U/ndl7EKSoBqb6djgyYI=
+	t=1710236687; cv=none; b=S2mqsjHmbsU7QUi2wIReKH7JrAsjqjtfrMouDl59WtAXr98ifM+IMbQdn9ngMrGIICOzpTd2GOSf+21UEwqVOSdoJepc2vf/ZaQLSNGd49GsWRbHYUQmsb70pUrc+RjY9P/vWmlfwQy7NbFqYgTPi5rrbQ0GrO1jbi2lU5/p3eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710233438; c=relaxed/simple;
-	bh=tA7oWp+GjC17n46OR1Cu4CFWGzTsKORFW9MJUrRGwSc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zi9lU0rJiydSsMr0qnHuB2BqY81SyksvVRW08Sa1hS430CWS3RoDoGDJQNJWYxZCh+YC+doL3YA7E7RvJrCwsKbxn5vLdtdmU24v7lmR9ySM+ToR+mJu850vVcaIQbIXdGcWnmf6OREx81B91awyTRJNl/5z5hoQHQ6tZdjQZ54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eWQkwrkV; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1710236687; c=relaxed/simple;
+	bh=bQp+ziLFcrO8OM8ZoVaCOS6TWTCgAg7XPg2KUIQKb9c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RK1nnQYAHruyvN5oKHm9w/zfy5aTCxx/2GZbpJ8KhvhfCZsR3H/uNFrlWaPgUC1rQGLwORKmKxeMIyQqUJrUa3EGlAFWQwIhK0xAygOv6zAR00z8KMRgULBvKMV1MRha/MmxtAdCuWrc+nN64UmpQa8yfkh8U0MOaCC6QVT0DLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hkZETeDJ; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710233437; x=1741769437;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tA7oWp+GjC17n46OR1Cu4CFWGzTsKORFW9MJUrRGwSc=;
-  b=eWQkwrkVNBK9cOiZOintWsAuxf8b/zvKnm4DS73/UXgreN1x0DyW6Wxo
-   gbmNRxFoDmVofBSje4S9yrNgkspiZrACs9ot6QvN8lZxQTk/IzODM1GM5
-   6NGIYPpyCp4yz81IJs+9d624nuu6W8Y1FOZNCg9vdIFdO6U0xZeTurkk4
-   oRodNPkRGgC4f1LzBYHUCx4Inu5Nz8YzqHCa6qzIMmrG/eGiJi/3kxuDW
-   H8M221epNpyMTiArLlt3GeiglLKEAYI+zoMpcmbkh8ozSE4CwQU6168Ph
-   pjD6rWeSdXqbA779g53wv03Yfu5RCxYQjb/XK18901WKW4HAcROf5K/vl
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="27403851"
-X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
-   d="scan'208";a="27403851"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 01:50:37 -0700
+  t=1710236685; x=1741772685;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=bQp+ziLFcrO8OM8ZoVaCOS6TWTCgAg7XPg2KUIQKb9c=;
+  b=hkZETeDJV6IiGl4/KNKKnDPJanvwJyEgKUGsWsQ7YtSoQBg9wR583y94
+   fyoYGD1DFCadSdeaXQI6znkGbn2nc8eSOx6TDC2oZ5lQ9MnlO8toN2M9h
+   7RHkjpnqvjHbYyCGNmLAL/SYOKh5dWos5Sm/Gi/o3tf6nkbKfTh04s9ny
+   CdO4YdZrgufYPzQW9iwBDXtWtrH0DjCoL3AbmmXhz/hjkoU/BoJ+GAAeT
+   RFwtLgRUYVkIIGmOUdburH1k3zUDxJ9ctCFoz5PsU6LLDKRiyK2FKN4bD
+   3wxFh5n9LZpecl0drCI/PG+Pdvv9MS0WtO3jK4884QtyBwHtXwcLr06Wf
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="5069695"
+X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
+   d="scan'208";a="5069695"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 02:44:41 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
-   d="scan'208";a="16043565"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmviesa003.fm.intel.com with ESMTP; 12 Mar 2024 01:50:31 -0700
-Date: Tue, 12 Mar 2024 17:04:21 +0800
-From: Zhao Liu <zhao1.liu@linux.intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Babu Moger <babu.moger@amd.com>, Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Robert Hoo <robert.hu@linux.intel.com>
-Subject: Re: [PATCH v9 06/21] i386/cpu: Use APIC ID info to encode cache topo
- in CPUID[4]
-Message-ID: <ZfAalR49aErs2/M1@intel.com>
-References: <20240227103231.1556302-1-zhao1.liu@linux.intel.com>
- <20240227103231.1556302-7-zhao1.liu@linux.intel.com>
- <c88ee253-f212-4aa7-9db9-e90a99a9a1e3@intel.com>
- <Ze23y7UzGxnsyo6O@intel.com>
- <164e9fe1-c89d-4354-a7f7-a565c624934e@intel.com>
+X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
+   d="scan'208";a="34662417"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.125.242.247]) ([10.125.242.247])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 02:44:38 -0700
+Message-ID: <3a2ff24f-0f22-4718-835a-fbd8a0763dcb@linux.intel.com>
+Date: Tue, 12 Mar 2024 17:44:35 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <164e9fe1-c89d-4354-a7f7-a565c624934e@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/16] KVM: x86: Move synthetic PFERR_* sanity checks to
+ SVM's #NPF handler
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Michael Roth <michael.roth@amd.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+ David Matlack <dmatlack@google.com>
+References: <20240228024147.41573-1-seanjc@google.com>
+ <20240228024147.41573-8-seanjc@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240228024147.41573-8-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 11, 2024 at 05:03:02PM +0800, Xiaoyao Li wrote:
-> Date: Mon, 11 Mar 2024 17:03:02 +0800
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
-> Subject: Re: [PATCH v9 06/21] i386/cpu: Use APIC ID info to encode cache
->  topo in CPUID[4]
-> 
-> On 3/10/2024 9:38 PM, Zhao Liu wrote:
-> > Hi Xiaoyao,
-> > 
-> > > >                case 3: /* L3 cache info */
-> > > > -                die_offset = apicid_die_offset(&topo_info);
-> > > >                    if (cpu->enable_l3_cache) {
-> > > > +                    addressable_threads_width = apicid_die_offset(&topo_info);
-> > > 
-> > > Please get rid of the local variable @addressable_threads_width.
-> > > 
-> > > It is truly confusing.
-> > 
-> > There're several reasons for this:
-> > 
-> > 1. This commit is trying to use APIC ID topology layout to decode 2
-> > cache topology fields in CPUID[4], CPUID.04H:EAX[bits 25:14] and
-> > CPUID.04H:EAX[bits 31:26]. When there's a addressable_cores_width to map
-> > to CPUID.04H:EAX[bits 31:26], it's more clear to also map
-> > CPUID.04H:EAX[bits 25:14] to another variable.
-> 
-> I don't dislike using a variable. I dislike the name of that variable since
-> it's misleading
 
-Names are hard to choose...
 
-> 
-> > 2. All these 2 variables are temporary in this commit, and they will be
-> > replaed by 2 helpers in follow-up cleanup of this series.
-> 
-> you mean patch 20?
-> 
-> I don't see how removing the local variable @addressable_threads_width
-> conflicts with patch 20. As a con, it introduces code churn.
+On 2/28/2024 10:41 AM, Sean Christopherson wrote:
+> Move the sanity check that hardware never sets bits that collide with KVM-
+> define synthetic bits from kvm_mmu_page_fault() to npf_interception(),
+> i.e. make the sanity check #NPF specific.  The legacy #PF path already
+> WARNs if _any_ of bits 63:32 are set, and the error code that comes from
+> VMX's EPT Violatation and Misconfig is 100% synthesized (KVM morphs VMX's
 
-Yes...I prefer to wrap it in variables in advance, then the meaning of
-the fields is clearer I think.
+"Violatation" -> "Violation"
 
-> > 3. Similarly, to make it easier to clean up later with the helper and
-> > for more people to review, it's neater to explicitly indicate the
-> > CPUID.04H:EAX[bits 25:14] with a variable here.
-> 
-> If you do want keeping the variable. Please add a comment above it to
-> explain the meaning.
+> EXIT_QUALIFICATION into error code flags).
 >
+> Add a compile-time assert in the legacy #PF handler to make sure that KVM-
+> define flags are covered by its existing sanity check on the upper bits.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 12 +++---------
+>   arch/x86/kvm/svm/svm.c |  9 +++++++++
+>   2 files changed, 12 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 5d892bd59c97..bd342ebd0809 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4561,6 +4561,9 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+>   	if (WARN_ON_ONCE(error_code >> 32))
+>   		error_code = lower_32_bits(error_code);
+>   
+> +	/* Ensure the above sanity check also covers KVM-defined flags. */
+> +	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
+> +
+>   	vcpu->arch.l1tf_flush_l1d = true;
+>   	if (!flags) {
+>   		trace_kvm_page_fault(vcpu, fault_address, error_code);
+> @@ -5845,15 +5848,6 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+>   	int r, emulation_type = EMULTYPE_PF;
+>   	bool direct = vcpu->arch.mmu->root_role.direct;
+>   
+> -	/*
+> -	 * WARN if hardware generates a fault with an error code that collides
+> -	 * with KVM-defined sythentic flags.  Clear the flags and continue on,
+> -	 * i.e. don't terminate the VM, as KVM can't possibly be relying on a
+> -	 * flag that KVM doesn't know about.
+> -	 */
+> -	if (WARN_ON_ONCE(error_code & PFERR_SYNTHETIC_MASK))
+> -		error_code &= ~PFERR_SYNTHETIC_MASK;
+> -
+>   	if (WARN_ON_ONCE(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
+>   		return RET_PF_RETRY;
+>   
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index e90b429c84f1..199c4dd8d214 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2055,6 +2055,15 @@ static int npf_interception(struct kvm_vcpu *vcpu)
+>   	u64 fault_address = svm->vmcb->control.exit_info_2;
+>   	u64 error_code = svm->vmcb->control.exit_info_1;
+>   
+> +	/*
+> +	 * WARN if hardware generates a fault with an error code that collides
+> +	 * with KVM-defined sythentic flags.  Clear the flags and continue on,
 
-OK, I'll add comments for both 2 variables. Thanks!
+"sythentic" -> "synthetic"
+
+Two typos.
+
+Others,
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+> +	 * i.e. don't terminate the VM, as KVM can't possibly be relying on a
+> +	 * flag that KVM doesn't know about.
+> +	 */
+> +	if (WARN_ON_ONCE(error_code & PFERR_SYNTHETIC_MASK))
+> +		error_code &= ~PFERR_SYNTHETIC_MASK;
+> +
+>   	trace_kvm_page_fault(vcpu, fault_address, error_code);
+>   	return kvm_mmu_page_fault(vcpu, fault_address, error_code,
+>   			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
 
 
