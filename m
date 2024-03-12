@@ -1,128 +1,162 @@
-Return-Path: <kvm+bounces-11602-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11603-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6AA0878B9E
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 00:44:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2041878BC7
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 01:05:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDF341C210F8
-	for <lists+kvm@lfdr.de>; Mon, 11 Mar 2024 23:44:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40189B21226
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 00:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C80FF5916B;
-	Mon, 11 Mar 2024 23:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45524A2C;
+	Tue, 12 Mar 2024 00:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FnVt4pYb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wW581PCf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF5D58AD2
-	for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 23:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB954690
+	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 00:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710200671; cv=none; b=YJpdRE0muslCYbhLc+NdR8AWhNiBrAKscSX41rFSfcYTwiOa9bZeLMuOrDKfaluBe83TooKzEWB/gci9lnJyf793ysr6eAiM7s8/ITLJO1fsaX2trXAUNZSNbXSt4FjE+nyZ1VQLr7vgF7obwmXBYBxbGlcT8Wu/9RDnYg9OG9w=
+	t=1710201922; cv=none; b=eG2xZMl+IW3b5MtxEOU26cp7ZCF5k/BRJjBdltuU1VkddWUyqC765p+hSKvWHsdVJP8QvIb/9xCnNH+lLo9wJ4v0bkpi4NY9NI0b8E1eIa+vUtH/APVhU8JaVW8umUqB6lyf2+fhpB65LlCmv7Yh09Fv3okblecAL+AvJdt7o/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710200671; c=relaxed/simple;
-	bh=/7zACagJjW7/k71pULrkC1Ljk59pppVzE1FxfoB0cVw=;
+	s=arc-20240116; t=1710201922; c=relaxed/simple;
+	bh=oDgrXl5DBf/ssXVPKNHBj7+pNzDKZ/SShKKd7bU4p94=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pvayO4FAEK0gumog0152k5RkZpJr7inSUueSjpHnNxHDqX+DONs47gR7x1MuXn20bzhe+Oy+ey50cRdpa2OAoTOyOdco/TUm9KqtxzTGNxtLJ9E5nCHJWdsv+olGRUf+FnpgSD3K98w5cU38VQkZM677jVchAcE3xWCBqTPtldk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FnVt4pYb; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=lXjVaze9NnZ9Wz/1XdyKa72oIHRNBiOQQ3/VOjXMtH0rZcPStBGiugb4kDeA0yb4lempVawslC84OlnEUls10tuj/5YdWMfWarlJn1G6YMm/ibfvS1QlBS8WKXFlQxVWhMMFuXyV2W21lA5tnuHhLL2vJPvQdRZmLMzc/VzLelE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wW581PCf; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e657979d66so4334534b3a.2
-        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 16:44:29 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b26845cdso7485386276.3
+        for <kvm@vger.kernel.org>; Mon, 11 Mar 2024 17:05:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710200669; x=1710805469; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1710201920; x=1710806720; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EMI4Pmv/naxvAfPYroNwqy3j1VzI27ffy6ugcYk0ZHg=;
-        b=FnVt4pYb+2ELmWlUZ2Btw+0s2z+jVvroV4la/FOeKlT3vcKGCvB8K29okF9XvJ9TrG
-         DfQ1X2m/xkz4YM0RnHakZoYcTX7ifeo7N3282wLCtfNZxx1tgniZGSB3PUSx7427UmVc
-         RBHDERpvfk+c/xyhXi8rPNIW1WexLujwdE548u1onHqo6KZP31wxe2V29sKY8MkCEHYG
-         aYvV8Gzj3UvglQv4BNqIJJxa+oj4w5bqqNa1OrXNqTXdewWrrb6UBfHoqN0QOhW7HgZh
-         e2XNze2iWRgI1K2aW6iXo4AWoTvi6ZJ89dds8eFPdaSACC35FNwJ+lN8JESP6PZEgBmk
-         Zhcw==
+        bh=B7nbFkEwpwvreC3HB/EWWz0sBWfWHXMbipnFPkmSSNo=;
+        b=wW581PCfgXwlI5gR+v40BkrHXKr5/WjOoRLYzIexvBS5an5AT8T86FqlCu7MBWl9kr
+         PTUmgWUH9MdEqHSqQ20W8YoX5wqKXoBsLkgsHjRF/tCHUnVtS75TmtAhfkiinI0FQP8r
+         GV4IXEs7c05k2JOHIjk3D6gtbRDx80tJeXUVtyuYuA0pL7a8HKtFWpwCsSWt9ldgidR3
+         Ao6tVa36k53gBx70xbOWLTg0giHdP5eNKKaFO4CnoGMWLldBgr8r6zdyb30RTejL65UQ
+         JiBF1vYmMjJiYDbA14D0x9z9dg9m+GhwEwjBg2YjmTsmDxUAa0nMaQoWaXScJ+xjOkk/
+         Xyew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710200669; x=1710805469;
+        d=1e100.net; s=20230601; t=1710201920; x=1710806720;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EMI4Pmv/naxvAfPYroNwqy3j1VzI27ffy6ugcYk0ZHg=;
-        b=HNG2fc8UToLjO6XIk5oY1lIE4i8z0O2d+84kz3cWC5Nx3g2o94WhjtDzie4MgqOzeh
-         BwKLQU/hvd5OAZk57c6sz8Fj2UCI1b+m6+6QxNBW9nj1Px3JDv3SwGLIF04MppfZour2
-         14V4mm8Jf1Y8eW0X2upFepoyisBCdJwvf8fMGRqldp88Ziwjvt144hHvAjK4dVtmiRm/
-         RMHgM5jDsZFeJtewKeV7L7FUGdCApE4Ve0RyPeDuBJEwpmf1WD0jd30jj4QtaoWQOrUq
-         nBDd4pxB3TM0vzMaWsthspAwBiVtLTWrvLkNCRR4QDhn69qriurVLA+1vcI6BVPu4S4D
-         wy2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVpJzJPuQLEwEpEuUq7WPr2qsupA8lyjLYQcdJuvJMQxXU/8rHE0hfAbgatL5hVHelmBB0XNUJmAW8L53l22ZBVmlYK
-X-Gm-Message-State: AOJu0Yynh/Jc/hdlMiOKHAxZ5OVZa6pp0lGGs9O1vbjqjvAmV2mIwDbN
-	msECuea7IN3OIAoAocxEu554pJMz6wwROm10k+g584teKzFTf3ol9/3a9eXLYeK50zeUGspGdss
-	L4g==
-X-Google-Smtp-Source: AGHT+IE9YQgFrlRUqic5Eu0BhIJVUHsFx32+jIiT3xQh1aWbzRN3MucQw3uy7SAgNL6CyAqfvrWvMB5g/1M=
+        bh=B7nbFkEwpwvreC3HB/EWWz0sBWfWHXMbipnFPkmSSNo=;
+        b=nVm5Mv1vA89jusPf8T+2NpUEmoj724XWG2aStz60TCkbu4i+NPiHZQr2GPJJ5VzM6K
+         C4Tlo2s2hXuMZKREv/lL0hmXfG3ldU/Jj9MJlKe/CksdpJ9oMlx6cAhtDwqPnZahBnMz
+         9BY+4xSaqO/s7iilbtCeob7QYsfpFTjMRuEiTlhVETSgiHWoTNYlWDZUyrJud0dJSxRJ
+         h/e+sk+bpqeDuFnfe9+IFYYrbUFnVwitpUJ3NRI6FBJikLuf/5Omga0aowcOtn00a4Q7
+         eghzTiCR5v0tKPNVP4P0aqTjv28GvS2dLaNsDT7X+MdBKvBYLsPPYBkLi23RgWRkuKvP
+         BUkA==
+X-Gm-Message-State: AOJu0YymO+P4uoe48M8bRi+v780eywd3jkfUEmC/u4IIFFUpUlDpe3AW
+	zP9wRHgHVE0N8bEyS6FS9W/PC1YNYM4rLVCQIBvUARwJt0p1gjBQjAJcvOVatg/r3so6unBXNne
+	RGw==
+X-Google-Smtp-Source: AGHT+IFmJ3DibNwSJCV96918JM+8ES+/9EcjfPHD/sGVhKeOr2hd1X8USdSRj0ey2/+lQmXVc2jPSuAM2fw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2291:b0:6e5:94b0:68be with SMTP id
- f17-20020a056a00229100b006e594b068bemr695709pfe.2.1710200668905; Mon, 11 Mar
- 2024 16:44:28 -0700 (PDT)
-Date: Mon, 11 Mar 2024 16:44:27 -0700
-In-Reply-To: <20240311032051.prixfnqgbsohns2e@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1889:b0:dc6:dfc6:4207 with SMTP id
+ cj9-20020a056902188900b00dc6dfc64207mr2181207ybb.10.1710201920464; Mon, 11
+ Mar 2024 17:05:20 -0700 (PDT)
+Date: Mon, 11 Mar 2024 17:05:18 -0700
+In-Reply-To: <f39788063fc3e63edb8ba0490ff17ed8cb6598da.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1709288671.git.isaku.yamahata@intel.com> <20240311032051.prixfnqgbsohns2e@amd.com>
-Message-ID: <Ze-XW-EbT9vXaagC@google.com>
-Subject: Re: [RFC PATCH 0/8] KVM: Prepopulate guest memory API
+References: <f39788063fc3e63edb8ba0490ff17ed8cb6598da.camel@redhat.com>
+Message-ID: <Ze-cPqZDXnF-FEXj@google.com>
+Subject: Re: kernel selftest max_guest_memory_test fails when using more that
+ 256 vCPUs
 From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, isaku.yamahata@gmail.com, 
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	David Matlack <dmatlack@google.com>, Federico Parola <federico.parola@polito.it>
+To: mlevitsk@redhat.com
+Cc: kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Sun, Mar 10, 2024, Michael Roth wrote:
-> On Fri, Mar 01, 2024 at 09:28:42AM -0800, isaku.yamahata@intel.com wrote:
-> >   struct kvm_sev_launch_update_data {
-> >         __u64 uaddr;
-> >         __u32 len;
-> >   };
-> > 
-> > - TDX and measurement
-> >   The TDX correspondence is TDH.MEM.PAGE.ADD and TDH.MR.EXTEND.  TDH.MEM.EXTEND
-> >   extends its measurement by the page contents.
-> >   Option 1. Add an additional flag like KVM_MEMORY_MAPPING_FLAG_EXTEND to issue
-> >             TDH.MEM.EXTEND
-> >   Option 2. Don't handle extend. Let TDX vendor specific API
-> >             KVM_EMMORY_ENCRYPT_OP to handle it with the subcommand like
-> >             KVM_TDX_EXTEND_MEMORY.
+On Mon, Mar 11, 2024, mlevitsk@redhat.com wrote:
+> Hi,
 > 
-> For SNP this happens unconditionally via SNP_LAUNCH_UPDATE, and with some
-> additional measurements via SNP_LAUNCH_FINISH, and down the road when live
-> migration support is added that flow will be a bit different. So
-> personally I think it's better to leave separate for now.
+> Recently I debugged a failure of this selftest and this is what is happening:
+> 
+> For each vCPU this test runs the guest till it does the ucall, then it resets
+> all the vCPU registers to their initial values (including RIP) and runs the guest again.
+> I don't know if this is needed.
+> 
+> What happens however is that ucall code allocates the ucall struct prior to calling the host,
+> and then expects the host to resume the guest, at which point the guest frees the struct.
+> 
+> However since the host manually resets the guest registers, the code that frees the ucall struct
+> is never reached and thus the ucall struct is leaked.
+> 
+> Currently ucall code has a pool of KVM_MAX_VCPUS (512) objects, thus if the test is run with more
+> than 256 vCPUs, the pool is exhausted and the test fails.
+> 
+> So either we need to:
+>   - add a way to manually free the ucall struct for such tests from the host side.
 
-+1.  The only reason to do EXTEND at the same time as PAGE.ADD would be to
-optimize setups that want the measurement to be extended with the contents of a
-page immediately after the measurement is extended with the mapping metadata for
-said page.  And AFAIK, the only reason to prefer that approach is for backwards
-compatibility, which is not a concern for KVM.  I suppose maaaybe some memory
-locality performance benefits, but that seems like a stretch.
+Part of me wants to do something along these lines, as every GUEST_DONE() and
+failed GUEST_ASSERT() is "leaking" a ucall structure.  But practically speaking,
+freeing a ucall structure from anywhere except the vCPU context is bound to cause
+more problems than it solves.
 
-<time passes>
+>   - remove the manual reset of the vCPUs register state from this test and
+>   instead put the guest code in while(1) {} loop.
 
-And I think this whole conversation is moot, because I don't think there's a need
-to do PAGE.ADD during KVM_MAP_MEMORY[*].  If KVM_MAP_MEMORY does only the SEPT.ADD
-side of things, then both @source (PAGE.ADD) and the EXTEND flag go away.
+Definitely this one.  IIRC, the only reason I stuffed registers in the test was
+because I was trying to force MMU reloads.  I can't think of any reason why a
+simple infinite loop in the guest wouldn't work.  I'm pretty sure this is all
+that's needed?
 
-> But I'd be hesitant to bake more requirements into this pre-mapping
-> interface, it feels like we're already overloading it as is.
+diff --git a/tools/testing/selftests/kvm/max_guest_memory_test.c b/tools/testing/selftests/kvm/max_guest_memory_test.c
+index 6628dc4dda89..5f9950f41313 100644
+--- a/tools/testing/selftests/kvm/max_guest_memory_test.c
++++ b/tools/testing/selftests/kvm/max_guest_memory_test.c
+@@ -22,10 +22,12 @@ static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
+ {
+        uint64_t gpa;
+ 
+-       for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
+-               *((volatile uint64_t *)gpa) = gpa;
++       for (;;) {
++               for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
++                       *((volatile uint64_t *)gpa) = gpa;
+ 
+-       GUEST_DONE();
++               GUEST_DONE();
++       }
+ }
+ 
+ struct vcpu_info {
+@@ -64,17 +66,12 @@ static void *vcpu_worker(void *data)
+        struct kvm_vcpu *vcpu = info->vcpu;
+        struct kvm_vm *vm = vcpu->vm;
+        struct kvm_sregs sregs;
+-       struct kvm_regs regs;
+ 
+        vcpu_args_set(vcpu, 3, info->start_gpa, info->end_gpa, vm->page_size);
+-
+-       /* Snapshot regs before the first run. */
+-       vcpu_regs_get(vcpu, &regs);
+        rendezvous_with_boss();
+ 
+        run_vcpu(vcpu);
+        rendezvous_with_boss();
+-       vcpu_regs_set(vcpu, &regs);
+        vcpu_sregs_get(vcpu, &sregs);
+ #ifdef __x86_64__
+        /* Toggle CR0.WP to trigger a MMU context reset. */
 
-Agreed.  After being able to think more about this ioctl(), I think KVM_MAP_MEMORY
-should be as "pure" of a mapping operation as we can make it.  It'd be a little
-weird that using KVM_MAP_MEMORY is required for TDX VMs, but not other VMs.  But
-that's really just a reflection of S-EPT, so it's arguably not even a bad thing.
 
-[*] https://lore.kernel.org/all/Ze-TJh0BBOWm9spT@google.com
+>   - refactor the ucall code to not rely on a fixed pool of structs, making it
+>   possible to tolerate small memory leaks like that (I don't like this to be
+>   honest).
+
+Heh, me neither.
 
