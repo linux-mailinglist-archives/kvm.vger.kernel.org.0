@@ -1,135 +1,147 @@
-Return-Path: <kvm+bounces-11648-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11649-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A46A0878FDD
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 09:42:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2254878FFA
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 09:50:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54A76281DB6
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 08:42:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9820B1F21721
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 08:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F57377A1E;
-	Tue, 12 Mar 2024 08:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC2177F1B;
+	Tue, 12 Mar 2024 08:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="WL0F5bKh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eWQkwrkV"
 X-Original-To: kvm@vger.kernel.org
-Received: from out203-205-221-173.mail.qq.com (out203-205-221-173.mail.qq.com [203.205.221.173])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D563F2AD05;
-	Tue, 12 Mar 2024 08:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5435D77F03
+	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 08:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710232937; cv=none; b=M4EWYo8qNewSmn/tlrPq3aER4MY8cerSsHuA0LNEWSaf0u2xrLrzljO4NvBIuXQciwTPqRnEgAMpA36iLU9HVCCWiafi3+HmQn8HWjD97O5yRllebXGiic9r/wwUS4XNtEjmUh29csbs7Q+0nbaj1NflKQ10i1oKUPctxWfFpnk=
+	t=1710233438; cv=none; b=Mp5yNWgYQcy8ISzyxf2lwsomEoMHW8Bu2m+tsfjAvt7eOa1pqY3mj3mzZUF5UbIgjF542dCK6jMSfG4hmOnOkvsgtKreF3nno3S80cDEYdfd3GA6eTKMWuw0jdjFNW8+jpFoXwJfAj7u7IW7WceGZ34U/ndl7EKSoBqb6djgyYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710232937; c=relaxed/simple;
-	bh=TkQc0LJpx1K2SN7U/Lb6gwYCHyLR5+4QLPPXGZLIyYU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F9VKS4zS6MQwfP2EEQKDihHCTQfgLqXCwk5QxV1q4x/BwuuszYe3/LecQliYIvgLYAyRACxrLy1LtGPUQbo6tLUhEATwSceTS7gN6+LxLfALIMzCzH69TlRcf4+xhsVymuvUaPULL1gPda8jBlKklrak9KrG8HkFJ3yM2IJpEgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=WL0F5bKh; arc=none smtp.client-ip=203.205.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1710232926;
-	bh=nsWR5G0TESRsR1Ba3uGvn81H+502dSAJciQiGCQRQEo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=WL0F5bKhMC6WFiRirGDlx/wlOQJK+yuB6MG54Muc1lVyi9Nb4mTDmTvdfFWXFXXxS
-	 0O6DtSvtG3IK4UxFfsjURemUH1cnJLRJYiT62JrVCYql6rMvDGfJTTCSxRDuFPUeup
-	 YCt5e2m7oIEMPxfyz131+4gU/OLCdSnPyqof1kiY=
-Received: from [172.17.78.110] ([58.208.182.212])
-	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
-	id A818E4BD; Tue, 12 Mar 2024 16:42:01 +0800
-X-QQ-mid: xmsmtpt1710232921t1kfupkjf
-Message-ID: <tencent_AA5D14EAA36D58807959EE9AFC9E07548108@qq.com>
-X-QQ-XMAILINFO: MyIXMys/8kCtb9++LIiO4CpfoxdndEQDr5bx1HMICsi2UMMy2DzEGniMw+y23Q
-	 E7uoqJ7o8iktc6QJPbNFzpnu/S49SSdixvSbo6IPwNSicbLy1rGfFPogIJlpjpt6tYX81YfzqkYH
-	 klgr5trTVaOWzu1Ra+T55SQZrRE5ReZsTy5oBxs21zIehFBilU6/OppKDpvW43hLSVQhUSthQOxG
-	 Zk2u/val3VwSqexVS8wOsvrnHcg7G2vrfI18+t0q1vwZiUr9vX/M1MMQvXh78+OYGlfOxeq7XXbA
-	 WlEvjxzXHo9/1vrgCZS7MG9WL0n9n2Upg43MAxbtOjQ/Y5C9YIcZctchOPbNIcpBaWBkwyf28RJ6
-	 cRy0aRztYHERvGgruPGJ6Q5/vIJXRq8CplNWJOtcEyi1ZiPy/V4DA8TACtXs7+0k/2GDOMnhMtf8
-	 7KpgySW+lcyW6iPb38gFRJEZDMuYUQQa7cu/WbolSx3Ya5mdnySzXdN6JvepXN0JbW0+rGksShCp
-	 D4CODil0kg6c5U8J5N9R5FEQT9/kkwM+YfFts4XFrp7zWbCg1mlzVDGfOKZ0zM8+LGeu3o1IpKFo
-	 WD1Jf47pn68g0xbbIUxAf2Gl7WRP3JALn9VnjYik6u3clpnnATaomQDFCYiWcsmpvoWB+epai4pQ
-	 RBsl/ezwHEG5RH6w+NK0ZVycuSl3InCnFgSJBqHzZuvmKPehxkADfKPK11xldtLxN9pXThQ3R1h8
-	 ZThe5Tov7h04k5yRwoBmkL/gR4eCzKnkhc1WpogN0JsMOTG6gPtoH428MLq8mYuLtCe5NtALjJJ5
-	 H8TaxbcSITLGyPazIJdIaDr+cgBsG49ESLoGjaLnkHR8aKB3uUVVG6wnhAyFOaE9uElL314wA1eW
-	 aUq5257kVD7cSXhH36lnf8LNUVX+OYj2WSOtOKH0hIspa9MUf1mfOMhgHRh7vewL9hTccUPfErHQ
-	 5zGX1hhERh7R9mPMUHQkRiGpebFINNaVTC4C+yt6K1stGcNGN+/Q==
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-OQ-MSGID: <b05a6763-3c74-4da9-bcb7-6581aa0511d1@foxmail.com>
-Date: Tue, 12 Mar 2024 16:42:01 +0800
+	s=arc-20240116; t=1710233438; c=relaxed/simple;
+	bh=tA7oWp+GjC17n46OR1Cu4CFWGzTsKORFW9MJUrRGwSc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zi9lU0rJiydSsMr0qnHuB2BqY81SyksvVRW08Sa1hS430CWS3RoDoGDJQNJWYxZCh+YC+doL3YA7E7RvJrCwsKbxn5vLdtdmU24v7lmR9ySM+ToR+mJu850vVcaIQbIXdGcWnmf6OREx81B91awyTRJNl/5z5hoQHQ6tZdjQZ54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eWQkwrkV; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710233437; x=1741769437;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tA7oWp+GjC17n46OR1Cu4CFWGzTsKORFW9MJUrRGwSc=;
+  b=eWQkwrkVNBK9cOiZOintWsAuxf8b/zvKnm4DS73/UXgreN1x0DyW6Wxo
+   gbmNRxFoDmVofBSje4S9yrNgkspiZrACs9ot6QvN8lZxQTk/IzODM1GM5
+   6NGIYPpyCp4yz81IJs+9d624nuu6W8Y1FOZNCg9vdIFdO6U0xZeTurkk4
+   oRodNPkRGgC4f1LzBYHUCx4Inu5Nz8YzqHCa6qzIMmrG/eGiJi/3kxuDW
+   H8M221epNpyMTiArLlt3GeiglLKEAYI+zoMpcmbkh8ozSE4CwQU6168Ph
+   pjD6rWeSdXqbA779g53wv03Yfu5RCxYQjb/XK18901WKW4HAcROf5K/vl
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="27403851"
+X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
+   d="scan'208";a="27403851"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 01:50:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
+   d="scan'208";a="16043565"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa003.fm.intel.com with ESMTP; 12 Mar 2024 01:50:31 -0700
+Date: Tue, 12 Mar 2024 17:04:21 +0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	qemu-devel@nongnu.org, kvm@vger.kernel.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Zhuocheng Ding <zhuocheng.ding@intel.com>,
+	Babu Moger <babu.moger@amd.com>, Yongwei Ma <yongwei.ma@intel.com>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Robert Hoo <robert.hu@linux.intel.com>
+Subject: Re: [PATCH v9 06/21] i386/cpu: Use APIC ID info to encode cache topo
+ in CPUID[4]
+Message-ID: <ZfAalR49aErs2/M1@intel.com>
+References: <20240227103231.1556302-1-zhao1.liu@linux.intel.com>
+ <20240227103231.1556302-7-zhao1.liu@linux.intel.com>
+ <c88ee253-f212-4aa7-9db9-e90a99a9a1e3@intel.com>
+ <Ze23y7UzGxnsyo6O@intel.com>
+ <164e9fe1-c89d-4354-a7f7-a565c624934e@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86/mmu: treat WC memory as MMIO
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
- hpa@zytor.com, rdunlap@infradead.org, akpm@linux-foundation.org,
- bhelgaas@google.com, mawupeng1@huawei.com, linux-kernel@vger.kernel.org,
- pbonzini@redhat.com, peterz@infradead.org, bhelgaas@google.com,
- kvm@vger.kernel.org
-References: <tencent_4B50D08D2E6211E4F9B867F0531F2C05BA0A@qq.com>
- <Ze8vM6HcU4vnXVSS@google.com>
-From: francisco flynn <francisco_flynn@foxmail.com>
-In-Reply-To: <Ze8vM6HcU4vnXVSS@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <164e9fe1-c89d-4354-a7f7-a565c624934e@intel.com>
 
-
-
-On 2024/3/12 00:20, Sean Christopherson wrote:
-> On Mon, Mar 11, 2024, francisco_flynn wrote:
->> when doing kvm_tdp_mmu_map for WC memory, such as pages
->> allocated by amdgpu ttm driver for ttm_write_combined
->> caching mode(e.g. host coherent in vulkan),
->> the spte would be set to WB, in this case, vcpu write
->> to these pages would goes to cache first, and never
->> be write-combined and host-coherent anymore. so
->> WC memory should be treated as MMIO, and the effective
->> memory type is depending on guest PAT.
+On Mon, Mar 11, 2024 at 05:03:02PM +0800, Xiaoyao Li wrote:
+> Date: Mon, 11 Mar 2024 17:03:02 +0800
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
+> Subject: Re: [PATCH v9 06/21] i386/cpu: Use APIC ID info to encode cache
+>  topo in CPUID[4]
 > 
-> No, the effective memtype is not fully guest controlled.  By forcing the EPT memtype
-> to UC, the guest can only use UC or WC.  I don't know if there's a use case for
-
-Well,it's actually the host mapping memory WC and guest uses WC,
-one use case is virtio-gpu host blob, which is to map physical GPU buffers into guest
-
-> the host mapping memory WC while the guest uses WB, but it should be a moot point,
-> because this this series should do what you want (allow guest to map GPU buffers
-> as WC).
+> On 3/10/2024 9:38 PM, Zhao Liu wrote:
+> > Hi Xiaoyao,
+> > 
+> > > >                case 3: /* L3 cache info */
+> > > > -                die_offset = apicid_die_offset(&topo_info);
+> > > >                    if (cpu->enable_l3_cache) {
+> > > > +                    addressable_threads_width = apicid_die_offset(&topo_info);
+> > > 
+> > > Please get rid of the local variable @addressable_threads_width.
+> > > 
+> > > It is truly confusing.
+> > 
+> > There're several reasons for this:
+> > 
+> > 1. This commit is trying to use APIC ID topology layout to decode 2
+> > cache topology fields in CPUID[4], CPUID.04H:EAX[bits 25:14] and
+> > CPUID.04H:EAX[bits 31:26]. When there's a addressable_cores_width to map
+> > to CPUID.04H:EAX[bits 31:26], it's more clear to also map
+> > CPUID.04H:EAX[bits 25:14] to another variable.
 > 
-> https://lore.kernel.org/all/20240309010929.1403984-1-seanjc@google.com
-> 
+> I don't dislike using a variable. I dislike the name of that variable since
+> it's misleading
 
-yes, this is what i want, but for virtio-gpu device, if we mapping WC typed 
-GPU buffer into guest, kvm_arch_has_noncoherent_dma would return false, 
-so on cpu without self-snoop support, guest PAT will be ignored, the effective
-memory type would be set to WB, causing data inconsistency.
-
-+	if (!static_cpu_has(X86_FEATURE_SELFSNOOP) &&
-+	    !kvm_arch_has_noncoherent_dma(vcpu->kvm))
-                return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-
-
->> Signed-off-by: francisco_flynn <francisco_flynn@foxmail.com>
->> ---
->>  arch/x86/include/asm/memtype.h | 2 ++
->>  arch/x86/kvm/mmu/spte.c        | 5 +++--
-> 
-> Please use get_maintainers.pl.
-
-sure.
+Names are hard to choose...
 
 > 
->>  arch/x86/mm/pat/memtype.c      | 8 ++++++++
->>  3 files changed, 13 insertions(+), 2 deletions(-)
+> > 2. All these 2 variables are temporary in this commit, and they will be
+> > replaed by 2 helpers in follow-up cleanup of this series.
+> 
+> you mean patch 20?
+> 
+> I don't see how removing the local variable @addressable_threads_width
+> conflicts with patch 20. As a con, it introduces code churn.
+
+Yes...I prefer to wrap it in variables in advance, then the meaning of
+the fields is clearer I think.
+
+> > 3. Similarly, to make it easier to clean up later with the helper and
+> > for more people to review, it's neater to explicitly indicate the
+> > CPUID.04H:EAX[bits 25:14] with a variable here.
+> 
+> If you do want keeping the variable. Please add a comment above it to
+> explain the meaning.
+>
+
+OK, I'll add comments for both 2 variables. Thanks!
 
 
