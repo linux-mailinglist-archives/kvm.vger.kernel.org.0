@@ -1,190 +1,227 @@
-Return-Path: <kvm+bounces-11684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A593D879A55
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 18:10:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A081879AAD
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 18:33:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A09EA1C22343
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 17:10:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4E0FB21A8C
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 17:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A8613C9E1;
-	Tue, 12 Mar 2024 17:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709E31386B9;
+	Tue, 12 Mar 2024 17:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mdd623ZJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y4ZZ53nn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1851386BE
-	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 17:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2832A58107;
+	Tue, 12 Mar 2024 17:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710263286; cv=none; b=UHdQ7TO9f2+NqZC2kmhz34vIiIWBrAk9DNa39j0dLhAP1nAH3LN/l4ih6G9GhNA+GgB6t4VkfUaJdnJdtdQOMWxCznJoK1gRdcQhxzjQZeankEoxEvo61xNd0kexzh1QOUQKvnoQ8F0E1Oy0AcsrfzXgEjD4HZsdbTPI4X2hl3o=
+	t=1710264822; cv=none; b=tyhT9Gl/umg9Dqq3wAJWPqRIHTT0aevTvIWwlq9zra8p7qhN9WJsONqnylwxf5j+dA93uvefPtYoqXcZUReaVyUY4ykamZAUZtKHF4Sb0wrJC5wDS1BMQbv0k3YrlU31NasJtnrr5EFWLGiePobOMeAJrtWDUQqfHcuJf4SPi7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710263286; c=relaxed/simple;
-	bh=LCt3WWvGn4P8WKRrmZ370zHM2Olntl8aKMiYWPrEOpc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OqOGpkyafyihWIXcaOp6wj0Q0K8mkaT01sddqBwk/dhonxXnrCRxvJ1rFPbw90sto76ftikn5pNthwe+qovBiA7dIartPd5yNKOsUZiSlDMn0jjrqUG9u9cfFuxGFGOXrL8WOcVe6QFH6PIG+/jRCEKVvdduRKdAmZPOWcLrr3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mdd623ZJ; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5e5022b34faso2326702a12.0
-        for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 10:08:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710263284; x=1710868084; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WE8e1Ziotl3mZ18Tc3buOFiIUh2+sqQFXIcFrXQVlYE=;
-        b=Mdd623ZJ8ozdBoWFRe/vQqSnLlmzGLbDodzEDOBX19UTcrKd+OgXfShY7GlxGT4RMv
-         +sFVjEy6MV4eiYg9SzXgmTdgoBYEY30sO6NXqm+DlNr+vjC1C5koOVqSPQD2DfmHLZTP
-         IQ03Af9ObWtSr6X3SiHkvLlYOhJVPVUESqOMzTuxsj8+RHXN5hOPeuFInzIv2S1rdwMO
-         KH7JIv3ccdGVKTwnCsvJRjcyq2YnQSNdbae46eDDWMumtOjJwOxavTsfoSGRMqZKJwHt
-         lwcihTYhkb3CPfl0MXCt5Aapw6+wIC8bj730pa5gaJYvC76M9EDncMO3u/gsxfkcXuWF
-         V5pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710263284; x=1710868084;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WE8e1Ziotl3mZ18Tc3buOFiIUh2+sqQFXIcFrXQVlYE=;
-        b=Bx4pj2t5T0EB2GHc6jImtVp/fGeA4hm7kfbmzrJi8CPVeMaW+HQgpAqtz7qQg0/0o8
-         /xacBKJvAmTcUZUiuT07vOHFsrwNrCAMgLU7BtXKiibS4nGLmu+4kL/BOjUecmbnMr0N
-         +cB7oQteMZIy4Xao0W81ag9xB9PZRIcoOZFZOxc5tKnDgfMUEZZ24589mEglnd5DEKoJ
-         bWlkCvDobn/nULNa+tJVyAV58Z6ajBxhv2Ytv7FtC84rB4lQdNU+VDEtwy7JbzW2O6K1
-         SLrA/K5XOkrkj0tXcgCiUfvjhtVdhI3BfabFocHuWNq6i349wdlINsEvkYEgX+f5TsOj
-         1vKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUC5gjK3O+t5/j0hg/7PVLgxWq0JG78DgqhINbbDcgNvC8DPvwHm9QTPDY0O736Jc+03FP5TmYeN9ATqvmBq2Omb9DH
-X-Gm-Message-State: AOJu0YzePCzmXEw+95mNn/uGZBVZXnUZicLmAKgSvw4Ppcj9kdiO5+4Q
-	z4JYYA+uozkbyfm9gViQUC/7FGw3Z1U20iMMgdf+salsdYxIFTfKqczg3kfmHKgOQRmM7s+hImI
-	1hw==
-X-Google-Smtp-Source: AGHT+IE5t8MewLarAvjjhbmUaRutQbVD7rwK9cE51AMPD3wv7USN8MStB1z1W1pob50IpkZGEhvbJJKimsM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:e02:0:b0:5dc:6130:a914 with SMTP id
- d2-20020a630e02000000b005dc6130a914mr26681pgl.7.1710263284174; Tue, 12 Mar
- 2024 10:08:04 -0700 (PDT)
-Date: Tue, 12 Mar 2024 10:08:02 -0700
-In-Reply-To: <5ee34382-b45b-2069-ea33-ef58acacaa79@oracle.com>
+	s=arc-20240116; t=1710264822; c=relaxed/simple;
+	bh=NCbPjafC35X2dszbUimr93WO79ZvaDGjYwKw9cjmSfs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=CHg8zgmDT41arE62vhl6l6KyS6y7NckXE9g0dit+n9+i+w4ShASc09duWCHObDqQjSgsi6c/UiuLnopxp1J6r/z1ptThgm1szmBhanntI4QpcMftpF8h5gIQUI9i27lIuy42IfcK3dM310ZGN3/zexwgrArYTTv+iSONP0HKH7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y4ZZ53nn; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710264821; x=1741800821;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NCbPjafC35X2dszbUimr93WO79ZvaDGjYwKw9cjmSfs=;
+  b=Y4ZZ53nncCg9qGvBNOz6QryCZlBwcONU7m090xJXCKZpV/MuldQHZypV
+   OuFCZm9IC1E3I+T2wbuIMArRNsYy5mCNBPZSbCTKb5DrBzS+EaPvwO80J
+   eBZfvQS8kCr0NT+KRIeUxMBycICwnG3FSGCEcNV5D9X+sgqVyrMet2kpe
+   nGiOb2xyv3E2aEQN+R0XnrZquvKHwTDEeq1e5+xX+x720CPDUuwqs0XZa
+   csDr6LJx0dfG69EzpyDe8MYnt5kw4t6+zwTrr1KXaXlojI1MFeaBMKRi4
+   Gfa/+wputQqsEMlIF9rKau0EQMBj4Jll5x8ewBamYvNK5jNCb+ZQJXInp
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="4919787"
+X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
+   d="scan'208";a="4919787"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 10:33:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
+   d="scan'208";a="16271882"
+Received: from gargayus-mobl1.amr.corp.intel.com (HELO rpedgeco-desk4.intel.com) ([10.255.231.196])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 10:33:40 -0700
+From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	hao.p.peng@linux.intel.com,
+	isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rick.p.edgecombe@intel.com
+Subject: [PATCH] KVM: x86/mmu: x86: Don't overflow lpage_info when checking attributes
+Date: Tue, 12 Mar 2024 10:33:34 -0700
+Message-Id: <20240312173334.2484335-1-rick.p.edgecombe@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240309010929.1403984-1-seanjc@google.com> <20240309010929.1403984-2-seanjc@google.com>
- <5ee34382-b45b-2069-ea33-ef58acacaa79@oracle.com>
-Message-ID: <ZfCL8mCmmEx5wGwv@google.com>
-Subject: Re: [PATCH 1/5] KVM: x86: Remove VMX support for virtualizing guest
- MTRR memtypes
-From: Sean Christopherson <seanjc@google.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>, kvm@vger.kernel.org, 
-	rcu@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kevin Tian <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Yiwei Zhang <zzyiwei@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 11, 2024, Dongli Zhang wrote:
-> 
-> 
-> On 3/8/24 17:09, Sean Christopherson wrote:
-> > Remove KVM's support for virtualizing guest MTRR memtypes, as full MTRR
-> > adds no value, negatively impacts guest performance, and is a maintenance
-> > burden due to it's complexity and oddities.
-> > 
-> > KVM's approach to virtualizating MTRRs make no sense, at all.  KVM *only*
-> > honors guest MTRR memtypes if EPT is enabled *and* the guest has a device
-> > that may perform non-coherent DMA access.  From a hardware virtualization
-> > perspective of guest MTRRs, there is _nothing_ special about EPT.  Legacy
-> > shadowing paging doesn't magically account for guest MTRRs, nor does NPT.
-> 
-> [snip]
-> 
-> >  
-> > -bool __kvm_mmu_honors_guest_mtrrs(bool vm_has_noncoherent_dma)
-> > +bool kvm_mmu_may_ignore_guest_pat(void)
-> >  {
-> >  	/*
-> > -	 * If host MTRRs are ignored (shadow_memtype_mask is non-zero), and the
-> > -	 * VM has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is
-> > -	 * to honor the memtype from the guest's MTRRs so that guest accesses
-> > -	 * to memory that is DMA'd aren't cached against the guest's wishes.
-> > -	 *
-> > -	 * Note, KVM may still ultimately ignore guest MTRRs for certain PFNs,
-> > -	 * e.g. KVM will force UC memtype for host MMIO.
-> > +	 * When EPT is enabled (shadow_memtype_mask is non-zero), and the VM
-> > +	 * has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is to
-> > +	 * honor the memtype from the guest's PAT so that guest accesses to
-> > +	 * memory that is DMA'd aren't cached against the guest's wishes.  As a
-> > +	 * result, KVM _may_ ignore guest PAT, whereas without non-coherent DMA,
-> > +	 * KVM _always_ ignores guest PAT (when EPT is enabled).
-> >  	 */
-> > -	return vm_has_noncoherent_dma && shadow_memtype_mask;
-> > +	return shadow_memtype_mask;
-> >  }
-> >  
-> 
-> Any special reason to use the naming 'may_ignore_guest_pat', but not
-> 'may_honor_guest_pat'?
+Fix KVM_SET_MEMORY_ATTRIBUTES to not overflow lpage_info array and trigger
+KASAN splat, as seen in the private_mem_conversions_test selftest.
 
-Because which (after this series) is would either be misleading or outright wrong.
-If KVM returns true from the helper based solely on shadow_memtype_mask, then it's
-misleading because KVM will *always* honors guest PAT for such CPUs.  I.e. that
-name would yield this misleading statement.
+When memory attributes are set on a GFN range, that range will have
+specific properties applied to the TDP. A huge page cannot be used when
+the attributes are inconsistent, so they are disabled for those the
+specific huge pages. For internal KVM reasons, huge pages are also not
+allowed to span adjacent memslots regardless of whether the backing memory
+could be mapped as huge.
 
-  If the CPU supports self-snoop, KVM may honor guest PAT.
+What GFNs support which huge page sizes is tracked by an array of arrays
+'lpage_info' on the memslot, of ‘kvm_lpage_info’ structs. Each index of
+lpage_info contains a vmalloc allocated array of these for a specific
+supported page size. The kvm_lpage_info denotes whether a specific huge
+page (GFN and page size) on the memslot is supported. These arrays include
+indices for unaligned head and tail huge pages.
 
-If KVM returns true iff self-snoop is NOT available (as proposed in this series),
-then it's outright wrong as KVM would return false, i.e. would make this incorrect
-statement:
+Preventing huge pages from spanning adjacent memslot is covered by
+incrementing the count in head and tail kvm_lpage_info when the memslot is
+allocated, but disallowing huge pages for memory that has mixed attributes
+has to be done in a more complicated way. During the
+KVM_SET_MEMORY_ATTRIBUTES ioctl KVM updates lpage_info for each memslot in
+the range that has mismatched attributes. KVM does this a memslot at a
+time, and marks a special bit, KVM_LPAGE_MIXED_FLAG, in the kvm_lpage_info
+for any huge page. This bit is essentially a permanently elevated count.
+So huge pages will not be mapped for the GFN at that page size if the
+count is elevated in either case: a huge head or tail page unaligned to
+the memslot or if KVM_LPAGE_MIXED_FLAG is set because it has mixed
+attributes.
 
-  If the CPU supports self-snoop, KVM never honors guest PAT.
+To determine whether a huge page has consistent attributes, the
+KVM_SET_MEMORY_ATTRIBUTES operation checks an xarray to make sure it
+consistently has the incoming attribute. Since level - 1 huge pages are
+aligned to level huge pages, it employs an optimization. As long as the
+level - 1 huge pages are checked first, it can just check these and assume
+that if each level - 1 huge page contained within the level sized huge
+page is not mixed, then the level size huge page is not mixed. This
+optimization happens in the helper hugepage_has_attrs().
 
-As saying that KVM may not or cannot do something is saying that KVM will never
-do that thing.
+Unfortunately, although the kvm_lpage_info array representing page size
+'level' will contain an entry for an unaligned tail page of size level,
+the array for level - 1  will not contain an entry for each GFN at page
+size level. The level - 1 array will only contain an index for any
+unaligned region covered by level - 1 huge page size, which can be a
+smaller region. So this causes the optimization to overflow the level - 1
+kvm_lpage_info and perform a vmalloc out of bounds read.
 
-And because the EPT flag is "ignore guest PAT", not "honor guest PAT", but that's
-as much coincidence as it is anything else.
+In some cases of head and tail pages where an overflow could happen,
+callers skip the operation completely as KVM_LPAGE_MIXED_FLAG is not
+required to prevent huge pages as discussed earlier. But for memslots that
+are smaller than the 1GB page size, it does call hugepage_has_attrs(). The
+issue can be observed simply by compiling the kernel with
+CONFIG_KASAN_VMALLOC and running the selftest
+“private_mem_conversions_test”, which produces the output like the
+following:
 
-> Since it is also controlled by other cases, e.g., kvm_arch_has_noncoherent_dma()
-> at vmx_get_mt_mask(), it can be 'may_honor_guest_pat' too?
-> 
-> Therefore, why not directly use 'shadow_memtype_mask' (without the API), or some
-> naming like "ept_enabled_for_hardware".
+BUG: KASAN: vmalloc-out-of-bounds in hugepage_has_attrs+0x7e/0x110
+Read of size 4 at addr ffffc900000a3008 by task private_mem_con/169
+Call Trace:
+  dump_stack_lvl
+  print_report
+  ? __virt_addr_valid
+  ? hugepage_has_attrs
+  ? hugepage_has_attrs
+  kasan_report
+  ? hugepage_has_attrs
+  hugepage_has_attrs
+  kvm_arch_post_set_memory_attributes
+  kvm_vm_ioctl
 
-Again, after this series, KVM will *always* honor guest PAT for CPUs with self-snoop,
-i.e. KVM will *never* ignore guest PAT.  But for CPUs without self-snoop (or with
-errata), KVM conditionally honors/ignores guest PAT.
+It is a little ambiguous whether the unaligned tail page should be
+expected to have KVM_LPAGE_MIXED_FLAG set. It is not functionally
+required, as the unaligned tail pages will already have their
+kvm_lpage_info count incremented. The comments imply not setting it on
+unaligned head pages is intentional, so fix the callers to skip trying to
+set KVM_LPAGE_MIXED_FLAG in this case, and in doing so not call
+hugepage_has_attrs().
 
-> Even with the code from PATCH 5/5, we still have high chance that VM has
-> non-coherent DMA?
+Also rename hugepage_has_attrs() to __slot_hugepage_has_attrs() because it
+is a delicate function that should not be widely used, and only is valid
+for ranges covered by the passed slot.
 
-I don't follow.  On CPUs with self-snoop, whether or not the VM has non-coherent
-DMA (from VFIO!) is irrelevant.  If the CPU has self-snoop, then KVM can safely
-honor guest PAT at all times.
+Cc: stable@vger.kernel.org
+Fixes: 90b4fe17981e ("KVM: x86: Disallow hugepages when memory attributes are mixed")
+Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+---
+Hi,
 
->  bool kvm_mmu_may_ignore_guest_pat(void)
->  {
->  	/*
-> -	 * When EPT is enabled (shadow_memtype_mask is non-zero), and the VM
-> +	 * When EPT is enabled (shadow_memtype_mask is non-zero), the CPU does
-> +	 * not support self-snoop (or is affected by an erratum), and the VM
->  	 * has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is to
->  	 * honor the memtype from the guest's PAT so that guest accesses to
->  	 * memory that is DMA'd aren't cached against the guest's wishes.  As a
->  	 * result, KVM _may_ ignore guest PAT, whereas without non-coherent DMA,
-> -	 * KVM _always_ ignores guest PAT (when EPT is enabled).
-> +	 * KVM _always_ ignores or honors guest PAT, i.e. doesn't toggle SPTE
-> +	 * bits in response to non-coherent device (un)registration.
->  	 */
-> -	return shadow_memtype_mask;
-> +	return !static_cpu_has(X86_FEATURE_SELFSNOOP) && shadow_memtype_mask;
->  }
-> 
-> 
-> Thank you very much!
-> 
-> Dongli Zhang
+I added cc stable because I didn't rule out a way to trigger a non-kasan
+crash from userspace on non-x86. But of course this is a testing only
+feature at this point and shouldn't cause a crash for normal users.
+
+Testing was just the upstream selftests and a TDX guest boot on out of tree
+branch.
+
+Rick
+---
+ arch/x86/kvm/mmu/mmu.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 0544700ca50b..4dac778b2520 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7337,8 +7337,8 @@ static void hugepage_set_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
+ 	lpage_info_slot(gfn, slot, level)->disallow_lpage |= KVM_LPAGE_MIXED_FLAG;
+ }
+ 
+-static bool hugepage_has_attrs(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			       gfn_t gfn, int level, unsigned long attrs)
++static bool __slot_hugepage_has_attrs(struct kvm *kvm, struct kvm_memory_slot *slot,
++				      gfn_t gfn, int level, unsigned long attrs)
+ {
+ 	const unsigned long start = gfn;
+ 	const unsigned long end = start + KVM_PAGES_PER_HPAGE(level);
+@@ -7388,8 +7388,9 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+ 			 * by the memslot, KVM can't use a hugepage due to the
+ 			 * misaligned address regardless of memory attributes.
+ 			 */
+-			if (gfn >= slot->base_gfn) {
+-				if (hugepage_has_attrs(kvm, slot, gfn, level, attrs))
++			if (gfn >= slot->base_gfn &&
++			    gfn + nr_pages <= slot->base_gfn + slot->npages) {
++				if (__slot_hugepage_has_attrs(kvm, slot, gfn, level, attrs))
+ 					hugepage_clear_mixed(slot, gfn, level);
+ 				else
+ 					hugepage_set_mixed(slot, gfn, level);
+@@ -7411,7 +7412,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+ 		 */
+ 		if (gfn < range->end &&
+ 		    (gfn + nr_pages) <= (slot->base_gfn + slot->npages)) {
+-			if (hugepage_has_attrs(kvm, slot, gfn, level, attrs))
++			if (__slot_hugepage_has_attrs(kvm, slot, gfn, level, attrs))
+ 				hugepage_clear_mixed(slot, gfn, level);
+ 			else
+ 				hugepage_set_mixed(slot, gfn, level);
+@@ -7449,7 +7450,7 @@ void kvm_mmu_init_memslot_memory_attributes(struct kvm *kvm,
+ 		for (gfn = start; gfn < end; gfn += nr_pages) {
+ 			unsigned long attrs = kvm_get_memory_attributes(kvm, gfn);
+ 
+-			if (hugepage_has_attrs(kvm, slot, gfn, level, attrs))
++			if (__slot_hugepage_has_attrs(kvm, slot, gfn, level, attrs))
+ 				hugepage_clear_mixed(slot, gfn, level);
+ 			else
+ 				hugepage_set_mixed(slot, gfn, level);
+
+base-commit: 5abf6dceb066f2b02b225fd561440c98a8062681
+-- 
+2.34.1
+
 
