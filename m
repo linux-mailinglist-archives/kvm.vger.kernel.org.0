@@ -1,157 +1,201 @@
-Return-Path: <kvm+bounces-11676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8231D879874
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 16:58:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84938879887
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 17:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06D0AB231A2
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 15:58:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7AEE1C21781
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 16:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242257E567;
-	Tue, 12 Mar 2024 15:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829EE7D416;
+	Tue, 12 Mar 2024 16:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tuBTs/vq"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8996116FF3B;
-	Tue, 12 Mar 2024 15:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3957D082
+	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 16:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710259068; cv=none; b=tEny7+y/TOyiRf94sEyYvhA/DeSnlO8l1yfDUOei427PGRUp86bKgoER/FMjR4QeMen4Ld/Q7RRoBBV4bJ+wDt3yKSx5zT6ZK22YNXRVTpyZHotrK0vfxOmoNTGUTW9jDuNmGU1WWxduXgP/jpk02U0aVIk4EZLRS9Qmbd5M8Gc=
+	t=1710259635; cv=none; b=TWplKm7Qe+9jnKViElr0zuUIHeN/v9EjElt760cv4J2ZctMFa8jIcRsJhjLF+wGRtK5e2GXTRJUYE3f1cN72jiiszAskvo7GtL0Q58XSTYtHkiWWTqIen7uV1JcqT1n4ZNhSH+AxwBvsQz6TO81iob/szaS/9h1pR0CGJexBnBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710259068; c=relaxed/simple;
-	bh=qHTdrZJMFBSmWNwbyHjOmWb7ZpYhhu2kMlfqSqKfUEs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KfVPWif/5hLh1eZwRayH3q3lKC0h/JtC2u0n2NNk+gl3dQZzVJ9sFWU+PgDWjW+9mviMU5hFW/bjJQQek+jP9FLu8rh21hX9Sf+uBMRvSvGAzrIQ1XEDyoBAQ3QfkFmLvPXryrdcL+1BWmgGLQ1OcNoENtuHjlxc/FWsajPEzak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE2391007;
-	Tue, 12 Mar 2024 08:58:22 -0700 (PDT)
-Received: from bogus (e103737-lin.cambridge.arm.com [10.1.197.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 558A63F73F;
-	Tue, 12 Mar 2024 08:57:42 -0700 (PDT)
-Date: Tue, 12 Mar 2024 15:57:39 +0000
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Mostafa Saleh <smostafa@google.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] arm64: Use SYSTEM_OFF2 PSCI call to power off
- for hibernate
-Message-ID: <ZfB7c9ifUiZR6gy1@bogus>
-References: <20240312135958.727765-1-dwmw2@infradead.org>
- <20240312135958.727765-3-dwmw2@infradead.org>
+	s=arc-20240116; t=1710259635; c=relaxed/simple;
+	bh=47TghUwia3cDXWzAp+/WdYGMW2Xw4pp2SA8uGm+22R8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=p6gJK+eWbeZFGoBeWl0BkvqN1P450H4doqcjPRpwR3IR/4V9eN52yt2EN6kfvO67jzpG+OO9uNMk95ZWZGLNVv/MT8NaHUOt/m4O9Jnj3xyy+iph1CczNS11GPnqX0VH8i4R0gWph5dX7U+YlkMgQzZMTMb7XT25bmsCVYMVQJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tuBTs/vq; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc691f1f83aso74592276.1
+        for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 09:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710259633; x=1710864433; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S7e0yop2/9+XMKAheD47D9K6LZNyzgq+q+UXRKcgLqk=;
+        b=tuBTs/vqIOggA55Pl4RnrzAr7JOJPFsO9whNKTNbbCzAQJyuK7gWcZafNs/qdAIyMi
+         pnlGSJ3D6Swr26/Y9+iymRe3Rb5GfdOhPg3lZrsPw8sILHf8+pG8bsVfOVNeOIIjhLng
+         XvQxEKYvWTO6oQXAo9DAEP4QgIFRGUcc10t+oW/vVF59jAr4nXukwko/IfTlVhXT6LR9
+         GP1Jm7VRDAoGkPSHGCSndw7MoEMzk3x3YEUajoV5UHyiDSybNVp07FjsIF8wMdyA5dTL
+         8QKjRJwvf4/MgUFs9WdMn1QrtADb/gwwUJ0jAutwlreIgT04pvkKrCnGLnPXV1lmPvwv
+         MCaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710259633; x=1710864433;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=S7e0yop2/9+XMKAheD47D9K6LZNyzgq+q+UXRKcgLqk=;
+        b=nqfFiAuVhXA7QEYlGnuQcXPdOs69M1SyoIs2D19ipI1yJPWKOW4yYWaOWNcNduWGG5
+         lHnjNTRYIov1wBbGmthPeHEeRInShDppAFsYlZ7QKB9VivlU8fcCj8Bv/TqmfpBJ5+8V
+         kKO0IYUKbdcUHPiwakhMOGV578bHSy1qI4ysjk86nj2pMaOLReMDdp3DpGqL+Y8X5zQ3
+         Bi++67IEXx6tJTFmD1onDDpm4Td9TBtn5SMOaMRvj/9pa+wFHGYyd0TtotHe90VH4gSL
+         38AMnPzzsHWZgmQmMsKBwveXv4Z2Gk6dT6MHcvtvNdZ3zz5ASL/htBM9UfX2aNrq8pPg
+         o8Sg==
+X-Forwarded-Encrypted: i=1; AJvYcCVOfvMTXGW1gayvbJQF2c2CCQJMRdE+86axarub9B4V9nrFFV3J7AFPKey2XM6REAND48bbeuZ47YQYKhckkLRVx6IR
+X-Gm-Message-State: AOJu0Yx6m1b7UH96ll9v6ymrM659BOhJr3KYvs4sB1EA9HwjykZ62din
+	cMMkEJc39ycJIV/kX655bQ5IsT+fd7nmfmjObG6B3aNMyz/p0enQo2/zgVyOPbf0ouq9CTiUxW2
+	oUA==
+X-Google-Smtp-Source: AGHT+IFwdZ9eOBSFBgjZo0PZa4mDo+kneFiPsNfkgVCecBExcgqHC6KVLvlgXd85cKUbVjuC6QrJ/n9KmJc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:98c5:0:b0:dc6:e884:2342 with SMTP id
+ m5-20020a2598c5000000b00dc6e8842342mr3079063ybo.5.1710259633210; Tue, 12 Mar
+ 2024 09:07:13 -0700 (PDT)
+Date: Tue, 12 Mar 2024 09:07:11 -0700
+In-Reply-To: <BN9PR11MB527600EC915D668127B97E3C8C2B2@BN9PR11MB5276.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240312135958.727765-3-dwmw2@infradead.org>
+Mime-Version: 1.0
+References: <20240309010929.1403984-1-seanjc@google.com> <20240309010929.1403984-6-seanjc@google.com>
+ <Ze5bee/qJ41IESdk@yzhao56-desk.sh.intel.com> <Ze-hC8NozVbOQQIT@google.com> <BN9PR11MB527600EC915D668127B97E3C8C2B2@BN9PR11MB5276.namprd11.prod.outlook.com>
+Message-ID: <ZfB9rzqOWmbaOeHd@google.com>
+Subject: Re: [PATCH 5/5] KVM: VMX: Always honor guest PAT on CPUs that support self-snoop
+From: Sean Christopherson <seanjc@google.com>
+To: Kevin Tian <kevin.tian@intel.com>
+Cc: Yan Y Zhao <yan.y.zhao@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Lai Jiangshan <jiangshanlai@gmail.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Josh Triplett <josh@joshtriplett.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"rcu@vger.kernel.org" <rcu@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yiwei Zhang <zzyiwei@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 12, 2024 at 01:51:29PM +0000, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> The PSCI v1.3 specification (alpha) adds support for a SYSTEM_OFF2
-> function which is analogous to ACPI S4 state. This will allow hosting
-> environments to determine that a guest is hibernated rather than just
-> powered off, and handle that state appropriately on subsequent launches.
-> 
-> Since commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and
-> poweroff") the EFI shutdown method is deliberately preferred over PSCI
-> or other methods. So register a SYS_OFF_MODE_POWER_OFF handler which
-> *only* handles the hibernation, leaving the original PSCI SYSTEM_OFF as
-> a last resort via the legacy pm_power_off function pointer.
-> 
-> The hibernation code already exports a system_entering_hibernation()
-> function which is be used by the higher-priority handler to check for
-> hibernation. That existing function just returns the value of a static
-> boolean variable from hibernate.c, which was previously only set in the
-> hibernation_platform_enter() code path. Set the same flag in the simpler
-> code path around the call to kernel_power_off() too.
-> 
-> An alternative way to hook SYSTEM_OFF2 into the hibernation code would
-> be to register a platform_hibernation_ops structure with an ->enter()
-> method which makes the new SYSTEM_OFF2 call. But that would have the
-> unwanted side-effect of making hibernation take a completely different
-> code path in hibernation_platform_enter(), invoking a lot of special dpm
-> callbacks.
-> 
-> Another option might be to add a new SYS_OFF_MODE_HIBERNATE mode, with
-> fallback to SYS_OFF_MODE_POWER_OFF. Or to use the sys_off_data to
-> indicate whether the power off is for hibernation.
-> 
-> But this version works and is relatively simple.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  drivers/firmware/psci/psci.c | 35 +++++++++++++++++++++++++++++++++++
->  kernel/power/hibernate.c     |  5 ++++-
->  2 files changed, 39 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-> index d9629ff87861..69d2f6969438 100644
-> --- a/drivers/firmware/psci/psci.c
-> +++ b/drivers/firmware/psci/psci.c
-> @@ -78,6 +78,7 @@ struct psci_0_1_function_ids get_psci_0_1_function_ids(void)
->  
->  static u32 psci_cpu_suspend_feature;
->  static bool psci_system_reset2_supported;
-> +static bool psci_system_off2_supported;
->  
->  static inline bool psci_has_ext_power_state(void)
->  {
-> @@ -333,6 +334,28 @@ static void psci_sys_poweroff(void)
->  	invoke_psci_fn(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
->  }
->  
-> +#ifdef CONFIG_HIBERNATION
-> +static int psci_sys_hibernate(struct sys_off_data *data)
-> +{
-> +	if (system_entering_hibernation())
-> +		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2),
-> +			       PSCI_1_3_HIBERNATE_TYPE_OFF, 0, 0);
-> +	return NOTIFY_DONE;
-> +}
-> +
-> +static int __init psci_hibernate_init(void)
-> +{
-> +	if (psci_system_off2_supported) {
-> +		/* Higher priority than EFI shutdown, but only for hibernate */
-> +		register_sys_off_handler(SYS_OFF_MODE_POWER_OFF,
-> +					 SYS_OFF_PRIO_FIRMWARE + 2,
-> +					 psci_sys_hibernate, NULL);
-> +	}
-> +	return 0;
-> +}
-> +subsys_initcall(psci_hibernate_init);
+On Tue, Mar 12, 2024, Kevin Tian wrote:
+> > From: Sean Christopherson <seanjc@google.com>
+> > Sent: Tuesday, March 12, 2024 8:26 AM
+> >=20
+> > On Mon, Mar 11, 2024, Yan Zhao wrote:
+> > > For the case of !static_cpu_has(X86_FEATURE_SELFSNOOP) &&
+> > > kvm_arch_has_noncoherent_dma(vcpu->kvm), I think we at least should w=
+arn
+> > > about unsafe before honoring guest memory type.
+> >=20
+> > I don't think it gains us enough to offset the potential pain such a
+> > message would bring.  Assuming the warning isn't outright ignored, the =
+most
+> > likely scenario is that the warning will cause random end users to worr=
+y
+> > that the setup they've been running for years is broken, when in realit=
+y
+> > it's probably just fine for their
+> > use case.
+>=20
+> Isn't the 'worry' necessary to allow end users evaluate whether "it's
+> probably just fine for their use case"?
 
-Looked briefly at register_sys_off_handler and it should be OK to call
-it from psci_init_system_off2() below. Any particular reason for having
-separate initcall to do this ? We can even eliminate the need for
-psci_init_system_off2 if it can be called from there. What am I missing ?
+Realistically, outside of large scale deployments, no end user is going to =
+be able
+to make that evaluation, because practically speaking it requires someone w=
+ith
+quite low-level hardware knowledge to be able to make that judgment call.  =
+And
+counting by number of human end users (as opposed to number of VMs being ru=
+n), I
+am willing to bet that the overwhelming majority of KVM users aren't kernel=
+ or
+systems engineers.
 
---
-Regards,
-Sudeep
+Understandably, users tend to be alarmed by (or suspicious of) new warnings=
+ that
+show up.  E.g. see the ancient KVM_SET_TSS_ADDR pr_warn[*].  And recently, =
+we had
+an internal bug report filed against KVM because they observed a performanc=
+e
+regression when booting a KVM guest, and saw a new message about some CPU
+vulnerability being mitigated on VM-Exit that showed up in their *guest* ke=
+rnel.
+
+In short, my concern is that adding a new pr_warn() will generate noise for=
+ end
+users *and* for KVM developers/maintainers, because even if we phrase the m=
+essage
+to talk specifically about "untrusted workloads", the majority of affected =
+users
+will not have the necessary knowledge to make an informed decision.
+
+[*] https://lore.kernel.org/all/f1afa6c0-cde2-ab8b-ea71-bfa62a45b956@tarent=
+.de
+
+> I saw the old comment already mentioned that doing so may lead to unexpec=
+ted
+> behaviors. But I'm not sure whether such code-level caveat has been visib=
+le
+> enough to end users.
+
+Another point to consider: KVM is _always_ potentially broken on such CPUs,=
+ as
+KVM forces WB for guest accesses.  I.e. KVM will create memory aliasing if =
+the
+host has guest memory mapped as non-WB in the PAT, without non-coherent DMA
+exposed to the guest.
+
+> > I would be quite surprised if there are people running untrusted worklo=
+ads
+> > on 10+ year old silicon *and* have passthrough devices and non-coherent
+> > IOMMUs/DMA.
+>=20
+> this is probably true.
+>=20
+> > And anyone exposing a device directly to an untrusted workload really
+> > should have done their homework.
+>=20
+> or they run trusted workloads which might be tampered by virus to
+> exceed the scope of their homework. =F0=9F=98=8A
+
+If a workload is being run in a KVM guest for host isolation/security purpo=
+ses,
+and a device was exposed to said workload, then I would firmly consider ana=
+lyzing
+the impact of a compromised guest to be part of their homework.
+
+> > And it's not like we're going to change KVM's historical behavior at th=
+is point.
+>=20
+> I agree with your point of not breaking userspace. But still think a warn=
+ing
+> might be informative to let users evaluate their setup against a newly
+> identified "unexpected behavior"  which has security implication beyond
+> the guest, while the previous interpretation of "unexpected behavior"=20
+> might be that the guest can at most shoot its own foot...
+
+If this issue weren't limited to 10+ year old hardware, I would be more inc=
+lined
+to add a message.  But at this point, realistically the only thing KVM woul=
+d be
+saying is "you're running old hardware, that might be unsafe in today's wor=
+ld".
+
+For users that care about security, we'd be telling them something they alr=
+eady
+know (and if they don't know, they've got bigger problems).  And for everyo=
+ne
+else, it'd be scary noise without any meaningful benefit.
 
