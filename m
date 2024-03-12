@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-11682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36FF87998E
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 18:01:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CB6D879A45
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 18:09:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B90CCB22CEA
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 17:01:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75EC2849AD
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 17:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED626138485;
-	Tue, 12 Mar 2024 17:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888021384BB;
+	Tue, 12 Mar 2024 17:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VdoRE9oJ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pOQcaEEP"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E59137C28;
-	Tue, 12 Mar 2024 17:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0DC1384B0;
+	Tue, 12 Mar 2024 17:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710262879; cv=none; b=YRtDoCCXv/XplM343WQd/OT3tTuqkn545Ol7fzHhzCLCEuzCN/bEcBnTYa19n6UYqhvj1I7o5/qUElS2n8qfjqtA8TrS73CfQm4TXLk8IyZxyP8P104PhSvy8aFXJQ9c3eFcK+0r6yP8TWw+oAixZzVTHJ659kcrwuW8ivCjFVE=
+	t=1710263193; cv=none; b=QuS3jt70eZGf/+GfsXWopat2rkK+QZxEcaTALj6eaFE+Kz24Aom8mC92253n5jjPhRfVQ21MxfNdS8ikrpwpjmilhz5VrGx3BpGupYVavfSbrCMFvKO/ZB9sTPYoyi/HHlsowNDprJd+4LxL0m8llvGm0JVPSIAzSR50wW5Qcxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710262879; c=relaxed/simple;
-	bh=wczN6ONcPsv3u4bMYaJURLl1Tk2ambTBfG982J/TDOE=;
+	s=arc-20240116; t=1710263193; c=relaxed/simple;
+	bh=2nn6YXmxQYSag6nfYmeFHJ+3JIR2SJ+2Jtw++uEsGBE=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=c8t4NE0FeTOj4YPly+kMDtAKDY3Leo9eE/9Wdet/LLtGpZS/TpEVAc2jZjGIOy4HeQippRwLBI92HuFYKRd/x+XViIQCT/doHh0RwVbBIZAGM0ng4Mp71GMSNdwQw38gPxsbFF8celNwwEaSEbg43QEn3+7Z0yvDfggZ2S3oOUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VdoRE9oJ; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=p6ygEa+8+Yyb7wLJ4hPSWvcs4fz4i6rrK6QhsK9n7nbv18+nwx6AzZxrEwtartH53wb3DCsYBJbTw/A+osV/WABraGV/S9maVCE7uM5rDLKEsxXS8GjZzVAgjfSIkvTd9GOmm/qbc4Df1ueE58l59cOvJzkjIusdihp/AqmQnrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pOQcaEEP; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=wczN6ONcPsv3u4bMYaJURLl1Tk2ambTBfG982J/TDOE=; b=VdoRE9oJtim1ZNmvz3ClqdkxEA
-	uPnyNVBNhhW6vnTlo63JF5OWihyDC5q2XZDfhiOCLwJuU0ybu7NkeJlN3Jq3JMXB5Qnvsf1xELSmm
-	Dxim95GnOqrcFClWZMygV69WyTmBVU2UT54XOPe7CwLx9KlCYLPEMsuRl8Z6q7UaN+Nqiyx7/Tqom
-	MDOGBgPlGskO5+DRBXP6NHv3Lwsv4k9+jXtzKmouDU/DiIez23rJG5x9kVAZ6XE65UepETS3SL0sW
-	kKl5AFKuZycy0klGGBpaL9W5Jo7Y4CrhSj4p+CF+wilrrn9UYHPhpJuZAiN3g55slB385DnZREbAL
-	DuqedT5g==;
+	bh=2nn6YXmxQYSag6nfYmeFHJ+3JIR2SJ+2Jtw++uEsGBE=; b=pOQcaEEPdwjjRkC/RSHNdXP3M+
+	+P8dEDMAgCG9VT3xblXfh/743xuKRpHj12WcZL2RjhfhvqFfUeqDc1Mnbn1NowYunn1zDq5vS2dpw
+	SQN9ZR6DlBaQSBT+EIOdE41qoF1sXSLi47jzwbOSs97UgnEz2bhNiuMx+DG3hsjRhCbw4CRxIOxaQ
+	xW0rxZEjqrqfMep5uh/hi538uylm4D5Eb2C0nHWC3a5WXW1eR1oYiHEAFOV4eEY23cYvjHR1nyath
+	jhKCQMc/nt7HY/etaLKlcsmwBeM0nRiYxkS7Y5SC4zDeRv2nMQgY6isUS4b5hX4H75BYkxxBJbRWf
+	dhvWEYiw==;
 Received: from [2001:8b0:10b:5:4f46:ad9a:6045:e619] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rk5V1-00000003TMC-0Jcb;
-	Tue, 12 Mar 2024 17:01:13 +0000
-Message-ID: <0d95e9dc3304dd9a8ce31822b9d1b7b34dc3b042.camel@infradead.org>
-Subject: Re: [RFC PATCH 0/2] Add PSCI v1.3 SYSTEM_OFF2 support for
+	id 1rk5a8-00000003UK2-2h98;
+	Tue, 12 Mar 2024 17:06:28 +0000
+Message-ID: <ae19d48af7e7273b4382c3d1c69af02097eeb7ef.camel@infradead.org>
+Subject: Re: [RFC PATCH 1/2] KVM: arm64: Add PSCI SYSTEM_OFF2 function for
  hibernation
 From: David Woodhouse <dwmw2@infradead.org>
 To: Marc Zyngier <maz@kernel.org>
@@ -61,12 +61,13 @@ Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Paolo Bonzini
  <smostafa@google.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
  linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
  kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org
-Date: Tue, 12 Mar 2024 17:01:10 +0000
-In-Reply-To: <87wmq7pj6g.wl-maz@kernel.org>
+Date: Tue, 12 Mar 2024 17:06:27 +0000
+In-Reply-To: <87v85rpimk.wl-maz@kernel.org>
 References: <20240312135958.727765-1-dwmw2@infradead.org>
-	 <87wmq7pj6g.wl-maz@kernel.org>
+	 <20240312135958.727765-2-dwmw2@infradead.org>
+	 <87v85rpimk.wl-maz@kernel.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-PYSBJWkgtDSeh9Bv2a/S"
+	boundary="=-Ihk99/7NfW4sVUVFna9Y"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -77,43 +78,57 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-PYSBJWkgtDSeh9Bv2a/S
+--=-Ihk99/7NfW4sVUVFna9Y
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: base64
 
-On Tue, 2024-03-12 at 15:24 +0000, Marc Zyngier wrote:
->=20
-> > Strictly, we should perhaps also allow the guest to detect PSCI v1.3,=
-=20
-> > but when v1.1 was added in commit 512865d83fd9 it was done=20
-> > unconditionally, which seems wrong. Shouldn't we have a way for=20
-> > userspace to control what gets exposed, rather than silently changing=
-=20
-> > the guest behaviour with newer host kernels? Should I add a=20
-> > KVM_CAP_ARM_PSCI_VERSION?
->=20
-> Do you mean something like 85bd0ba1ff98?
+T24gVHVlLCAyMDI0LTAzLTEyIGF0IDE1OjM2ICswMDAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4g
+T24gVHVlLCAxMiBNYXIgMjAyNCAxMzo1MToyOCArMDAwMCwKPiBEYXZpZCBXb29kaG91c2UgPGR3
+bXcyQGluZnJhZGVhZC5vcmc+IHdyb3RlOgo+ID4gCj4gPiArSGliZXJuYXRpb24gdXNpbmcgdGhl
+IFBTQ0kgU1lTVEVNX09GRjIgY2FsbCBpcyBlbmFibGVkIHdpdGggdGhlCj4gPiArS1ZNX0NBUF9B
+Uk1fU1lTVEVNX09GRjIgVk0gY2FwYWJpbGl0eS4gSWYgYSBndWVzdCBpbnZva2VzIHRoZSBQU0NJ
+Cj4gCj4gQ2hlY2tpbmcgdGhhdCBQU0NJIDEuMyBpcyBlbmFibGVkIGZvciB0aGUgZ3Vlc3Qgc2hv
+dWxkIGJlIGVub3VnaCwgbm8/Cj4gSSBkb24ndCB0aGluayBwcm92aWRpbmcgeWV0IGFub3RoZXIg
+bGV2ZWwgb2Ygb3B0aW9uYWxseSBicmluZ3MgdXMKPiBtdWNoLCBvdGhlciB0aGFuIGNvbXBsZXhp
+dHkuCgpUaGlzIGlzIGp1c3QgZm9sbG93aW5nIHdoYXQgd2UgYWxyZWFkeSBkbyBmb3IgU1lTVEVN
+X1JFU0VUMi4gUmVnYXJkbGVzcwpvZiB0aGUgUFNDSSB2ZXJzaW9uLCB0aGVzZSBjYWxscyBhcmUg
+Km9wdGlvbmFsKi4gU2hvdWxkbid0IGV4cG9zaW5nCnRoZW0gdG8gdGhlIGd1ZXN0IGJlIGEgZGVs
+aWJlcmF0ZSBjaG9pY2Ugb24gdGhlIHBhcnQgb2YgdGhlIHVzZXJzcGFjZQpWTU0/CgpJIHdhcyBv
+cmlnaW5hbGx5IHRoaW5raW5nIG9mIGEgS1ZNX0NBUCB3aXRoIGEgYml0bWFzayBvZiB0aGUgb3B0
+aW9uYWwKZmVhdHVyZXMgdG8gYmUgZW5hYmxlZCAoYW5kIHdoaWNoIHdvdWxkIHJldHVybiB0aGUg
+Yml0bWFzayBvZiBzdXBwb3J0ZWQKZmVhdHVyZXMpLiBCdXQgdGhhdCBpc24ndCBob3cgaXQgd2Fz
+IGFscmVhZHkgYmVpbmcgZG9uZSwgc28gSSBqdXN0CmZvbGxvd2VkIHRoZSBleGlzdGluZyBwcmVj
+ZWRlbnQuCgo+ID4gLS0tIGEvYXJjaC9hcm02NC9rdm0vaHlwL252aGUvcHNjaS1yZWxheS5jCj4g
+PiArKysgYi9hcmNoL2FybTY0L2t2bS9oeXAvbnZoZS9wc2NpLXJlbGF5LmMKPiA+IEBAIC0yNjQs
+NiArMjY0LDggQEAgc3RhdGljIHVuc2lnbmVkIGxvbmcgcHNjaV8xXzBfaGFuZGxlcih1NjQgZnVu
+Y19pZCwgc3RydWN0IGt2bV9jcHVfY29udGV4dCAqaG9zdF8KPiA+IMKgwqDCoMKgwqDCoMKgwqBz
+d2l0Y2ggKGZ1bmNfaWQpIHsKPiA+IMKgwqDCoMKgwqDCoMKgwqBjYXNlIFBTQ0lfMV8wX0ZOX1BT
+Q0lfRkVBVFVSRVM6Cj4gPiDCoMKgwqDCoMKgwqDCoMKgY2FzZSBQU0NJXzFfMF9GTl9TRVRfU1VT
+UEVORF9NT0RFOgo+ID4gK8KgwqDCoMKgwqDCoMKgY2FzZSBQU0NJXzFfM19GTl9TWVNURU1fT0ZG
+MjoKPiA+ICvCoMKgwqDCoMKgwqDCoGNhc2UgUFNDSV8xXzNfRk42NF9TWVNURU1fT0ZGMjoKPiAK
+PiBuaXQ6IG9yZGVyIGJ5IHZlcnNpb24gbnVtYmVyLgoKQWNrLgoKPiA+IEBAIC0zNTMsNiArMzU5
+LDExIEBAIHN0YXRpYyBpbnQga3ZtX3BzY2lfMV94X2NhbGwoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
+LCB1MzIgbWlub3IpCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqBpZiAodGVzdF9iaXQoS1ZNX0FSQ0hfRkxBR19TWVNURU1fU1VTUEVORF9FTkFCTEVE
+LCAma3ZtLT5hcmNoLmZsYWdzKSkKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB2YWwgPSAwOwo+ID4gwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYnJlYWs7Cj4gPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgY2FzZSBQU0NJXzFfM19GTl9TWVNURU1fT0ZGMjoKPiA+ICvC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjYXNlIFBTQ0lfMV8zX0ZONjRfU1lTVEVNX09G
+RjI6Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlm
+ICh0ZXN0X2JpdChLVk1fQVJDSF9GTEFHX1NZU1RFTV9PRkYyX0VOQUJMRUQsICZrdm0tPmFyY2gu
+ZmxhZ3MpKQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgdmFsID0gMVVMIDw8IFBTQ0lfMV8zX0hJQkVSTkFURV9UWVBFX09G
+RjsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYnJl
+YWs7Cj4gCj4gVGVzdGluZyB0aGUgUFNDSSB2ZXJzaW9uIHNob3VsZCBiZSBlbm91Z2ggKG1pbm9y
+ID49IDMpLiBTYW1lIHRoaW5nCj4gZ29lcyB0aGUgdGhlIGNhcGFiaWxpdHk6IGNoZWNraW5nIHRo
+YXQgdGhlIGhvc3Qgc3VwcG9ydHMgMS4zIHNob3VsZCBiZQo+IGVub3VnaC4KCldvdWxkbid0IHRo
+YXQgbWVhbiB3ZSBzaG91bGQgaW1wbGVtZW50ICphbGwqIHRoZSBuZXcgZnVuY3Rpb25zIHdoaWNo
+CmFyZSBvcHRpb25hbCBpbiB2MS4zPyBJIHJlYWxseSB0aGluayB0aGUgb3B0LWluIHNob3VsZCBi
+ZSBwZXIgZmVhdHVyZSwKZm9yIHRoZSBvcHRpb25hbCBvbmVzLgoKCg==
 
-Ew :)
 
-That isn't quite what I was thinking, no. I wasn't thinking of
-something that would default to the latest, and would have a per-vCPU
-way of setting what's essentially a KVM-wide configuration.
-
-So if current userspace doesn't want the environment it exposes to
-guests to be randomly changed by a kernel upgrade in the future, it
-needs to explicitly use KVM_ARM_SET_REG on any one of the vCPUs, to set
-KVM_REG_ARM_PSCI_VERSION to KVM_ARM_PSCI_1_1?
-
-It isn't just new optional features; PSCI v1.2 added new error returns
-from CPU_ON for example. Should guests start to see those, just because
-the host kernel got upgraded?=20
-
-Now I see it, I suppose we can extend it to v1.2 (and v1.3 when that's
-eventually published for real). Should we really continue to increment
-the *default* though?
-
---=-PYSBJWkgtDSeh9Bv2a/S
+--=-Ihk99/7NfW4sVUVFna9Y
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -205,25 +220,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzEyMTcwMTEwWjAvBgkqhkiG9w0BCQQxIgQg0Tz9BRSl
-cTHOIjbzQqOfI0vDuzHLpSEBBA0AxDlEzM4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzEyMTcwNjI3WjAvBgkqhkiG9w0BCQQxIgQgfq7VGmgw
+0x3uSu8uJKz1s3sMZQ6oH9t6QEDw7MVFFigwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCfZbKheFnevZnPnlpJIs2R1hwlkSieCN4D
-gvBI3pNMQzKVG5yn+RXW1kwrRYDx2PPzoSBToH7ALi0tahIAGnJHN4O5n54Qyml6JvkMBnGlXlS8
-lGA6Veyd07vzgHkxse1md+Oy2cUVjeoBzfwMK3dDVr4YzWDgxvt7AW7KhtHLZSjOZGe6JVKdA8El
-cTGYvO2xcn1/Z21gLvIXWtp/mHe7VgzOqs2AGA5QLYbA0sFcl4tDvCyVZYHn/Q7ZKVyiXkjwsrOm
-xk8A4iGwz87lvGXxB7OJYfNEollUmqQYvDcH9e3jWmqdHcPKN+2Th0Ah5i8r4DCigLxRqU3jXrVq
-w81QtXAQmEAfWaUcpnc0rr40VkmqMeMN0HCLn7rI1RblxDZKJTYNjaePvAplkG1Yz+Efwskg3vna
-KDgPwIVD0jGMh+oxK7fJne/k+XZFZG5oKwSUktVXjv1ODhhhS3FAEc0/Qn2DXSYbxQOI8Al0pfIk
-JtWfUwazxogDpJ9HCRKJu+ZJfjO0codXZHR5tjQnmLgtSajudItsqAv7w1MwqWtIVfiLZfIqp4ro
-482/Wen0p836V13uLD1GpzFF6s/ZBstZv47k448T89kMznybXWwQKl6WgE9qF5XGzE2x/CuoHklY
-z6UjnGxWBGYfpuVIN7kC1ZTmjyfP1qbZWn358Uu20gAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBi04o896b/bX4AptwDs4A3GuwtVYaGv9OP
+riaUaHKH41eBFyqGBYYfU0ARgz/UI+Ng8moXEcf/sg/oNH5oRU5AyGXd67u5KEIhAIIAUFg6tSjm
+eLH9a2i+mYWBFviiMymhO0P1W6FFaSjy/O3h18VJr3d3QBgP8Cm6ImUFiIUZtbKwWPT0mAQwWkfu
+aperOU5aLY7VhTER3b4gTalsE/cFIX6/VKvaE99/CKl+cMk3pWiKTs+1x/IGrv4tuB3z4nAvsUYR
+oB9FTuU73iCnDq+GZ35p/ZX+SJGnlWq5/3yKvF4eFHPZ5eXvKZaL/zpPJWPCigLyd/8evLY46DSy
+EXmry7xWUoaYvVNVPhEnvWDm+ulKDMcd/+tpw56vVFvLnHA5odA/JL3W0GfktiZ3j6p3R61UDzP/
+xrbLJyvH0u6eQRJ/7y/BCmGnrgaZAmMtS/oP+PF1nQj4C596dlox6R89kNtCrWt/BWyMPJdS7irU
+UO9M8qEyCCGog8IhopSN9Ge4Ayuq7TOaSjOpHVHwVc2Q+mluZwgS5mBVEVM7U+uVW364QZmZROGE
+/RJD9oi9E9e1Mwy5hrBs0FodOjojfXy36g+7kTeEO2QbJao26eqH1L65BAYN+405tCYo6i3Fusuj
+kMC1qdiEdScunaZW9FNqo9llZc0grAcGo9nEXRmN0AAAAAAAAA==
 
 
---=-PYSBJWkgtDSeh9Bv2a/S--
+--=-Ihk99/7NfW4sVUVFna9Y--
 
