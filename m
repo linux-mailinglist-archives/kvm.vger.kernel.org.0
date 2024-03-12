@@ -1,244 +1,190 @@
-Return-Path: <kvm+bounces-11683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CB6D879A45
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 18:09:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A593D879A55
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 18:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75EC2849AD
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 17:09:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A09EA1C22343
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 17:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888021384BB;
-	Tue, 12 Mar 2024 17:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A8613C9E1;
+	Tue, 12 Mar 2024 17:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pOQcaEEP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mdd623ZJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0DC1384B0;
-	Tue, 12 Mar 2024 17:06:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1851386BE
+	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 17:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710263193; cv=none; b=QuS3jt70eZGf/+GfsXWopat2rkK+QZxEcaTALj6eaFE+Kz24Aom8mC92253n5jjPhRfVQ21MxfNdS8ikrpwpjmilhz5VrGx3BpGupYVavfSbrCMFvKO/ZB9sTPYoyi/HHlsowNDprJd+4LxL0m8llvGm0JVPSIAzSR50wW5Qcxk=
+	t=1710263286; cv=none; b=UHdQ7TO9f2+NqZC2kmhz34vIiIWBrAk9DNa39j0dLhAP1nAH3LN/l4ih6G9GhNA+GgB6t4VkfUaJdnJdtdQOMWxCznJoK1gRdcQhxzjQZeankEoxEvo61xNd0kexzh1QOUQKvnoQ8F0E1Oy0AcsrfzXgEjD4HZsdbTPI4X2hl3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710263193; c=relaxed/simple;
-	bh=2nn6YXmxQYSag6nfYmeFHJ+3JIR2SJ+2Jtw++uEsGBE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=p6ygEa+8+Yyb7wLJ4hPSWvcs4fz4i6rrK6QhsK9n7nbv18+nwx6AzZxrEwtartH53wb3DCsYBJbTw/A+osV/WABraGV/S9maVCE7uM5rDLKEsxXS8GjZzVAgjfSIkvTd9GOmm/qbc4Df1ueE58l59cOvJzkjIusdihp/AqmQnrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pOQcaEEP; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2nn6YXmxQYSag6nfYmeFHJ+3JIR2SJ+2Jtw++uEsGBE=; b=pOQcaEEPdwjjRkC/RSHNdXP3M+
-	+P8dEDMAgCG9VT3xblXfh/743xuKRpHj12WcZL2RjhfhvqFfUeqDc1Mnbn1NowYunn1zDq5vS2dpw
-	SQN9ZR6DlBaQSBT+EIOdE41qoF1sXSLi47jzwbOSs97UgnEz2bhNiuMx+DG3hsjRhCbw4CRxIOxaQ
-	xW0rxZEjqrqfMep5uh/hi538uylm4D5Eb2C0nHWC3a5WXW1eR1oYiHEAFOV4eEY23cYvjHR1nyath
-	jhKCQMc/nt7HY/etaLKlcsmwBeM0nRiYxkS7Y5SC4zDeRv2nMQgY6isUS4b5hX4H75BYkxxBJbRWf
-	dhvWEYiw==;
-Received: from [2001:8b0:10b:5:4f46:ad9a:6045:e619] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rk5a8-00000003UK2-2h98;
-	Tue, 12 Mar 2024 17:06:28 +0000
-Message-ID: <ae19d48af7e7273b4382c3d1c69af02097eeb7ef.camel@infradead.org>
-Subject: Re: [RFC PATCH 1/2] KVM: arm64: Add PSCI SYSTEM_OFF2 function for
- hibernation
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Paolo Bonzini
- <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Lorenzo Pieralisi
- <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown
- <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Mostafa Saleh
- <smostafa@google.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org
-Date: Tue, 12 Mar 2024 17:06:27 +0000
-In-Reply-To: <87v85rpimk.wl-maz@kernel.org>
-References: <20240312135958.727765-1-dwmw2@infradead.org>
-	 <20240312135958.727765-2-dwmw2@infradead.org>
-	 <87v85rpimk.wl-maz@kernel.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Ihk99/7NfW4sVUVFna9Y"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1710263286; c=relaxed/simple;
+	bh=LCt3WWvGn4P8WKRrmZ370zHM2Olntl8aKMiYWPrEOpc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OqOGpkyafyihWIXcaOp6wj0Q0K8mkaT01sddqBwk/dhonxXnrCRxvJ1rFPbw90sto76ftikn5pNthwe+qovBiA7dIartPd5yNKOsUZiSlDMn0jjrqUG9u9cfFuxGFGOXrL8WOcVe6QFH6PIG+/jRCEKVvdduRKdAmZPOWcLrr3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mdd623ZJ; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5e5022b34faso2326702a12.0
+        for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 10:08:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710263284; x=1710868084; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WE8e1Ziotl3mZ18Tc3buOFiIUh2+sqQFXIcFrXQVlYE=;
+        b=Mdd623ZJ8ozdBoWFRe/vQqSnLlmzGLbDodzEDOBX19UTcrKd+OgXfShY7GlxGT4RMv
+         +sFVjEy6MV4eiYg9SzXgmTdgoBYEY30sO6NXqm+DlNr+vjC1C5koOVqSPQD2DfmHLZTP
+         IQ03Af9ObWtSr6X3SiHkvLlYOhJVPVUESqOMzTuxsj8+RHXN5hOPeuFInzIv2S1rdwMO
+         KH7JIv3ccdGVKTwnCsvJRjcyq2YnQSNdbae46eDDWMumtOjJwOxavTsfoSGRMqZKJwHt
+         lwcihTYhkb3CPfl0MXCt5Aapw6+wIC8bj730pa5gaJYvC76M9EDncMO3u/gsxfkcXuWF
+         V5pQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710263284; x=1710868084;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WE8e1Ziotl3mZ18Tc3buOFiIUh2+sqQFXIcFrXQVlYE=;
+        b=Bx4pj2t5T0EB2GHc6jImtVp/fGeA4hm7kfbmzrJi8CPVeMaW+HQgpAqtz7qQg0/0o8
+         /xacBKJvAmTcUZUiuT07vOHFsrwNrCAMgLU7BtXKiibS4nGLmu+4kL/BOjUecmbnMr0N
+         +cB7oQteMZIy4Xao0W81ag9xB9PZRIcoOZFZOxc5tKnDgfMUEZZ24589mEglnd5DEKoJ
+         bWlkCvDobn/nULNa+tJVyAV58Z6ajBxhv2Ytv7FtC84rB4lQdNU+VDEtwy7JbzW2O6K1
+         SLrA/K5XOkrkj0tXcgCiUfvjhtVdhI3BfabFocHuWNq6i349wdlINsEvkYEgX+f5TsOj
+         1vKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUC5gjK3O+t5/j0hg/7PVLgxWq0JG78DgqhINbbDcgNvC8DPvwHm9QTPDY0O736Jc+03FP5TmYeN9ATqvmBq2Omb9DH
+X-Gm-Message-State: AOJu0YzePCzmXEw+95mNn/uGZBVZXnUZicLmAKgSvw4Ppcj9kdiO5+4Q
+	z4JYYA+uozkbyfm9gViQUC/7FGw3Z1U20iMMgdf+salsdYxIFTfKqczg3kfmHKgOQRmM7s+hImI
+	1hw==
+X-Google-Smtp-Source: AGHT+IE5t8MewLarAvjjhbmUaRutQbVD7rwK9cE51AMPD3wv7USN8MStB1z1W1pob50IpkZGEhvbJJKimsM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:e02:0:b0:5dc:6130:a914 with SMTP id
+ d2-20020a630e02000000b005dc6130a914mr26681pgl.7.1710263284174; Tue, 12 Mar
+ 2024 10:08:04 -0700 (PDT)
+Date: Tue, 12 Mar 2024 10:08:02 -0700
+In-Reply-To: <5ee34382-b45b-2069-ea33-ef58acacaa79@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+References: <20240309010929.1403984-1-seanjc@google.com> <20240309010929.1403984-2-seanjc@google.com>
+ <5ee34382-b45b-2069-ea33-ef58acacaa79@oracle.com>
+Message-ID: <ZfCL8mCmmEx5wGwv@google.com>
+Subject: Re: [PATCH 1/5] KVM: x86: Remove VMX support for virtualizing guest
+ MTRR memtypes
+From: Sean Christopherson <seanjc@google.com>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>, kvm@vger.kernel.org, 
+	rcu@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kevin Tian <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>, 
+	Yiwei Zhang <zzyiwei@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Mon, Mar 11, 2024, Dongli Zhang wrote:
+> 
+> 
+> On 3/8/24 17:09, Sean Christopherson wrote:
+> > Remove KVM's support for virtualizing guest MTRR memtypes, as full MTRR
+> > adds no value, negatively impacts guest performance, and is a maintenance
+> > burden due to it's complexity and oddities.
+> > 
+> > KVM's approach to virtualizating MTRRs make no sense, at all.  KVM *only*
+> > honors guest MTRR memtypes if EPT is enabled *and* the guest has a device
+> > that may perform non-coherent DMA access.  From a hardware virtualization
+> > perspective of guest MTRRs, there is _nothing_ special about EPT.  Legacy
+> > shadowing paging doesn't magically account for guest MTRRs, nor does NPT.
+> 
+> [snip]
+> 
+> >  
+> > -bool __kvm_mmu_honors_guest_mtrrs(bool vm_has_noncoherent_dma)
+> > +bool kvm_mmu_may_ignore_guest_pat(void)
+> >  {
+> >  	/*
+> > -	 * If host MTRRs are ignored (shadow_memtype_mask is non-zero), and the
+> > -	 * VM has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is
+> > -	 * to honor the memtype from the guest's MTRRs so that guest accesses
+> > -	 * to memory that is DMA'd aren't cached against the guest's wishes.
+> > -	 *
+> > -	 * Note, KVM may still ultimately ignore guest MTRRs for certain PFNs,
+> > -	 * e.g. KVM will force UC memtype for host MMIO.
+> > +	 * When EPT is enabled (shadow_memtype_mask is non-zero), and the VM
+> > +	 * has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is to
+> > +	 * honor the memtype from the guest's PAT so that guest accesses to
+> > +	 * memory that is DMA'd aren't cached against the guest's wishes.  As a
+> > +	 * result, KVM _may_ ignore guest PAT, whereas without non-coherent DMA,
+> > +	 * KVM _always_ ignores guest PAT (when EPT is enabled).
+> >  	 */
+> > -	return vm_has_noncoherent_dma && shadow_memtype_mask;
+> > +	return shadow_memtype_mask;
+> >  }
+> >  
+> 
+> Any special reason to use the naming 'may_ignore_guest_pat', but not
+> 'may_honor_guest_pat'?
 
---=-Ihk99/7NfW4sVUVFna9Y
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Because which (after this series) is would either be misleading or outright wrong.
+If KVM returns true from the helper based solely on shadow_memtype_mask, then it's
+misleading because KVM will *always* honors guest PAT for such CPUs.  I.e. that
+name would yield this misleading statement.
 
-T24gVHVlLCAyMDI0LTAzLTEyIGF0IDE1OjM2ICswMDAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4g
-T24gVHVlLCAxMiBNYXIgMjAyNCAxMzo1MToyOCArMDAwMCwKPiBEYXZpZCBXb29kaG91c2UgPGR3
-bXcyQGluZnJhZGVhZC5vcmc+IHdyb3RlOgo+ID4gCj4gPiArSGliZXJuYXRpb24gdXNpbmcgdGhl
-IFBTQ0kgU1lTVEVNX09GRjIgY2FsbCBpcyBlbmFibGVkIHdpdGggdGhlCj4gPiArS1ZNX0NBUF9B
-Uk1fU1lTVEVNX09GRjIgVk0gY2FwYWJpbGl0eS4gSWYgYSBndWVzdCBpbnZva2VzIHRoZSBQU0NJ
-Cj4gCj4gQ2hlY2tpbmcgdGhhdCBQU0NJIDEuMyBpcyBlbmFibGVkIGZvciB0aGUgZ3Vlc3Qgc2hv
-dWxkIGJlIGVub3VnaCwgbm8/Cj4gSSBkb24ndCB0aGluayBwcm92aWRpbmcgeWV0IGFub3RoZXIg
-bGV2ZWwgb2Ygb3B0aW9uYWxseSBicmluZ3MgdXMKPiBtdWNoLCBvdGhlciB0aGFuIGNvbXBsZXhp
-dHkuCgpUaGlzIGlzIGp1c3QgZm9sbG93aW5nIHdoYXQgd2UgYWxyZWFkeSBkbyBmb3IgU1lTVEVN
-X1JFU0VUMi4gUmVnYXJkbGVzcwpvZiB0aGUgUFNDSSB2ZXJzaW9uLCB0aGVzZSBjYWxscyBhcmUg
-Km9wdGlvbmFsKi4gU2hvdWxkbid0IGV4cG9zaW5nCnRoZW0gdG8gdGhlIGd1ZXN0IGJlIGEgZGVs
-aWJlcmF0ZSBjaG9pY2Ugb24gdGhlIHBhcnQgb2YgdGhlIHVzZXJzcGFjZQpWTU0/CgpJIHdhcyBv
-cmlnaW5hbGx5IHRoaW5raW5nIG9mIGEgS1ZNX0NBUCB3aXRoIGEgYml0bWFzayBvZiB0aGUgb3B0
-aW9uYWwKZmVhdHVyZXMgdG8gYmUgZW5hYmxlZCAoYW5kIHdoaWNoIHdvdWxkIHJldHVybiB0aGUg
-Yml0bWFzayBvZiBzdXBwb3J0ZWQKZmVhdHVyZXMpLiBCdXQgdGhhdCBpc24ndCBob3cgaXQgd2Fz
-IGFscmVhZHkgYmVpbmcgZG9uZSwgc28gSSBqdXN0CmZvbGxvd2VkIHRoZSBleGlzdGluZyBwcmVj
-ZWRlbnQuCgo+ID4gLS0tIGEvYXJjaC9hcm02NC9rdm0vaHlwL252aGUvcHNjaS1yZWxheS5jCj4g
-PiArKysgYi9hcmNoL2FybTY0L2t2bS9oeXAvbnZoZS9wc2NpLXJlbGF5LmMKPiA+IEBAIC0yNjQs
-NiArMjY0LDggQEAgc3RhdGljIHVuc2lnbmVkIGxvbmcgcHNjaV8xXzBfaGFuZGxlcih1NjQgZnVu
-Y19pZCwgc3RydWN0IGt2bV9jcHVfY29udGV4dCAqaG9zdF8KPiA+IMKgwqDCoMKgwqDCoMKgwqBz
-d2l0Y2ggKGZ1bmNfaWQpIHsKPiA+IMKgwqDCoMKgwqDCoMKgwqBjYXNlIFBTQ0lfMV8wX0ZOX1BT
-Q0lfRkVBVFVSRVM6Cj4gPiDCoMKgwqDCoMKgwqDCoMKgY2FzZSBQU0NJXzFfMF9GTl9TRVRfU1VT
-UEVORF9NT0RFOgo+ID4gK8KgwqDCoMKgwqDCoMKgY2FzZSBQU0NJXzFfM19GTl9TWVNURU1fT0ZG
-MjoKPiA+ICvCoMKgwqDCoMKgwqDCoGNhc2UgUFNDSV8xXzNfRk42NF9TWVNURU1fT0ZGMjoKPiAK
-PiBuaXQ6IG9yZGVyIGJ5IHZlcnNpb24gbnVtYmVyLgoKQWNrLgoKPiA+IEBAIC0zNTMsNiArMzU5
-LDExIEBAIHN0YXRpYyBpbnQga3ZtX3BzY2lfMV94X2NhbGwoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-LCB1MzIgbWlub3IpCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBpZiAodGVzdF9iaXQoS1ZNX0FSQ0hfRkxBR19TWVNURU1fU1VTUEVORF9FTkFCTEVE
-LCAma3ZtLT5hcmNoLmZsYWdzKSkKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB2YWwgPSAwOwo+ID4gwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYnJlYWs7Cj4gPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgY2FzZSBQU0NJXzFfM19GTl9TWVNURU1fT0ZGMjoKPiA+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjYXNlIFBTQ0lfMV8zX0ZONjRfU1lTVEVNX09G
-RjI6Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlm
-ICh0ZXN0X2JpdChLVk1fQVJDSF9GTEFHX1NZU1RFTV9PRkYyX0VOQUJMRUQsICZrdm0tPmFyY2gu
-ZmxhZ3MpKQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgdmFsID0gMVVMIDw8IFBTQ0lfMV8zX0hJQkVSTkFURV9UWVBFX09G
-RjsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYnJl
-YWs7Cj4gCj4gVGVzdGluZyB0aGUgUFNDSSB2ZXJzaW9uIHNob3VsZCBiZSBlbm91Z2ggKG1pbm9y
-ID49IDMpLiBTYW1lIHRoaW5nCj4gZ29lcyB0aGUgdGhlIGNhcGFiaWxpdHk6IGNoZWNraW5nIHRo
-YXQgdGhlIGhvc3Qgc3VwcG9ydHMgMS4zIHNob3VsZCBiZQo+IGVub3VnaC4KCldvdWxkbid0IHRo
-YXQgbWVhbiB3ZSBzaG91bGQgaW1wbGVtZW50ICphbGwqIHRoZSBuZXcgZnVuY3Rpb25zIHdoaWNo
-CmFyZSBvcHRpb25hbCBpbiB2MS4zPyBJIHJlYWxseSB0aGluayB0aGUgb3B0LWluIHNob3VsZCBi
-ZSBwZXIgZmVhdHVyZSwKZm9yIHRoZSBvcHRpb25hbCBvbmVzLgoKCg==
+  If the CPU supports self-snoop, KVM may honor guest PAT.
 
+If KVM returns true iff self-snoop is NOT available (as proposed in this series),
+then it's outright wrong as KVM would return false, i.e. would make this incorrect
+statement:
 
---=-Ihk99/7NfW4sVUVFna9Y
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+  If the CPU supports self-snoop, KVM never honors guest PAT.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzEyMTcwNjI3WjAvBgkqhkiG9w0BCQQxIgQgfq7VGmgw
-0x3uSu8uJKz1s3sMZQ6oH9t6QEDw7MVFFigwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBi04o896b/bX4AptwDs4A3GuwtVYaGv9OP
-riaUaHKH41eBFyqGBYYfU0ARgz/UI+Ng8moXEcf/sg/oNH5oRU5AyGXd67u5KEIhAIIAUFg6tSjm
-eLH9a2i+mYWBFviiMymhO0P1W6FFaSjy/O3h18VJr3d3QBgP8Cm6ImUFiIUZtbKwWPT0mAQwWkfu
-aperOU5aLY7VhTER3b4gTalsE/cFIX6/VKvaE99/CKl+cMk3pWiKTs+1x/IGrv4tuB3z4nAvsUYR
-oB9FTuU73iCnDq+GZ35p/ZX+SJGnlWq5/3yKvF4eFHPZ5eXvKZaL/zpPJWPCigLyd/8evLY46DSy
-EXmry7xWUoaYvVNVPhEnvWDm+ulKDMcd/+tpw56vVFvLnHA5odA/JL3W0GfktiZ3j6p3R61UDzP/
-xrbLJyvH0u6eQRJ/7y/BCmGnrgaZAmMtS/oP+PF1nQj4C596dlox6R89kNtCrWt/BWyMPJdS7irU
-UO9M8qEyCCGog8IhopSN9Ge4Ayuq7TOaSjOpHVHwVc2Q+mluZwgS5mBVEVM7U+uVW364QZmZROGE
-/RJD9oi9E9e1Mwy5hrBs0FodOjojfXy36g+7kTeEO2QbJao26eqH1L65BAYN+405tCYo6i3Fusuj
-kMC1qdiEdScunaZW9FNqo9llZc0grAcGo9nEXRmN0AAAAAAAAA==
+As saying that KVM may not or cannot do something is saying that KVM will never
+do that thing.
 
+And because the EPT flag is "ignore guest PAT", not "honor guest PAT", but that's
+as much coincidence as it is anything else.
 
---=-Ihk99/7NfW4sVUVFna9Y--
+> Since it is also controlled by other cases, e.g., kvm_arch_has_noncoherent_dma()
+> at vmx_get_mt_mask(), it can be 'may_honor_guest_pat' too?
+> 
+> Therefore, why not directly use 'shadow_memtype_mask' (without the API), or some
+> naming like "ept_enabled_for_hardware".
+
+Again, after this series, KVM will *always* honor guest PAT for CPUs with self-snoop,
+i.e. KVM will *never* ignore guest PAT.  But for CPUs without self-snoop (or with
+errata), KVM conditionally honors/ignores guest PAT.
+
+> Even with the code from PATCH 5/5, we still have high chance that VM has
+> non-coherent DMA?
+
+I don't follow.  On CPUs with self-snoop, whether or not the VM has non-coherent
+DMA (from VFIO!) is irrelevant.  If the CPU has self-snoop, then KVM can safely
+honor guest PAT at all times.
+
+>  bool kvm_mmu_may_ignore_guest_pat(void)
+>  {
+>  	/*
+> -	 * When EPT is enabled (shadow_memtype_mask is non-zero), and the VM
+> +	 * When EPT is enabled (shadow_memtype_mask is non-zero), the CPU does
+> +	 * not support self-snoop (or is affected by an erratum), and the VM
+>  	 * has non-coherent DMA (DMA doesn't snoop CPU caches), KVM's ABI is to
+>  	 * honor the memtype from the guest's PAT so that guest accesses to
+>  	 * memory that is DMA'd aren't cached against the guest's wishes.  As a
+>  	 * result, KVM _may_ ignore guest PAT, whereas without non-coherent DMA,
+> -	 * KVM _always_ ignores guest PAT (when EPT is enabled).
+> +	 * KVM _always_ ignores or honors guest PAT, i.e. doesn't toggle SPTE
+> +	 * bits in response to non-coherent device (un)registration.
+>  	 */
+> -	return shadow_memtype_mask;
+> +	return !static_cpu_has(X86_FEATURE_SELFSNOOP) && shadow_memtype_mask;
+>  }
+> 
+> 
+> Thank you very much!
+> 
+> Dongli Zhang
 
