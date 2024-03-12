@@ -1,103 +1,171 @@
-Return-Path: <kvm+bounces-11692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11693-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A48879BB5
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 19:41:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC9C4879CD7
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 21:27:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A73811F2476D
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 18:41:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D850B24277
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 20:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6519C145665;
-	Tue, 12 Mar 2024 18:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9A9143724;
+	Tue, 12 Mar 2024 20:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vP4DvnHD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PuyKhozq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318CB1428FE
-	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 18:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1791428F9
+	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 20:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710268696; cv=none; b=tmnY7XTFTL7NBNYs8xqCKvof7fn3Ds7xEskpiPziUZHp/c+Y0ON7XWxPCh69aw2z/EWeyeVKyu7MFq1QDYUU3BtGLlXs7aFmZPWlbS8PAZlVky8HV70UbPkcYZAGteiIjepWQCercZ054Dqo+eJWkgEB6wVEqiBH9+0fdPuZ1ZM=
+	t=1710275206; cv=none; b=NP0ERUUG+eSN1d8AGkj74IKjh1ew3Dh7U1T0pkT7zzYnHF7zQLaK9SYRTOausAhnMD9D1EhECctwFqCCJmROgIG5Xify0wt1WRMmIbOAiYYVaLtTLx7uBZe6cv5DgMcM+x8lpqz60FBH3wooFdgDYPNRfKPoxMOV8jajTZR7dik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710268696; c=relaxed/simple;
-	bh=wYX4U4mgWZDDTAVNg6/c0mwBAAO7KZiivCc6MfSMAN0=;
+	s=arc-20240116; t=1710275206; c=relaxed/simple;
+	bh=Yh+LhS5yhRkoUraEclEvC+FapyUA4I8kLPY2KFzzQ6E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WcJRyvJ+Ax4CMdfW3qnOHnfvwqJj1oInQZFEJM1OS1HtkCfmaEgeW5VCG8FM5DxcA7ETDUdoiO2nPQrFZkWMSO8kk1Kt1ct6PMIEAb01TzgkBGPYWVZwG8tmA4fG6ks7GM01ktWxIXjaGI1Q3wWZo9oJ6Jqmt94EqjpLBGN16iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vP4DvnHD; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=ZVrvBTY1Pk8FLeM8FYZacUyNZanUJ3oQX9zbCXKDcVCtFDyiKGfwm8XyuQgLYDcxU+1j5Z5KbZvXVTWaEXEKNwWtXq5fGwq5ke6Q1tkGl+xoVQ1G7eK/Pq9E9CoD7GHhRNULlEZxAq4nRqG7ufJaZUPgG9AMp4wOIrgcNx75fFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PuyKhozq; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1ddafc9a900so15360475ad.3
-        for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 11:38:14 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcf22e5b70bso8077810276.1
+        for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 13:26:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710268694; x=1710873494; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1710275203; x=1710880003; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kcNw7BbBTvDVZigmwhGYQ/p09R6CDgjmySJUJxjAXMQ=;
-        b=vP4DvnHDTUkfquUVXNOhtR4snNzWYxhhefeuYo664upQcJcp8vSuZ5x6uuGIohSYEI
-         4AT1tPiam+BYeXUBrqBDUM8KLyxsy1ZsfPqey/qr0SHCVLtfhWb0GKkdnibTIaV+Ilyf
-         PZbTt2/hWuhheexirbnprTSLvF5BSvLdMg1/iWp9LbnAeaqOQlaxaM8Ab8VrmDJQ6JBZ
-         gPnRb3v3mTBJ/YlA+K1S/wVpbeF7FhcDd+LLAbU7YLHArnjjvMlyjokJzcyDmONq9h7C
-         g7KT8LJJWz+VCdMLBzADIPipb9FwEQ7vO1TpQdnyqouigWiexZnEb98/4+8YOGC2Gxly
-         uFPg==
+        bh=qkdeVHiZ4dO2mKNOI6prWlI/035w5V9mRcS9wJoax+0=;
+        b=PuyKhozqlfbC+6hjQddM8pdLLVWSOXVaU+Qw5kWbrPZi8VvDIU6rEYnZ0YlPJults/
+         LnKpQhiNDnMV3RY1NbpN4XoQMk9zhOoeb1R2U4BqIYLaiYoxmc7S43aejdEjwf3z43d2
+         5AYQ+IATL+JlW3ZV4UKmKUUYmHegeYGcPbP1I29y8ZpOzpc2JMlFQ4L0dSIpgFKd8OQm
+         AHfasU3Jac1Mnzde8e3VyJ8atIrEg2Rh9pjE9y2VFye0CFBIVtoQ4kitdL3J0XaQsDTg
+         STsvy1rnghf+urEwTL7Qg4kISHFOIYms9zMTzVOn/i8H16Gn0yMGPGJYWx/jrLdeYCNc
+         Pofw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710268694; x=1710873494;
+        d=1e100.net; s=20230601; t=1710275203; x=1710880003;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kcNw7BbBTvDVZigmwhGYQ/p09R6CDgjmySJUJxjAXMQ=;
-        b=xNaWz+1iAEURKrIGi/fa9xyGYqqbxJ5mkj6GPuNttCC8c+/eNkdRwapGiYkpmpZFRG
-         /ulCtMNjyOFRTwXKQGN5nDNiuONTo5pT0k/Dq5JZnZNPvnbdJRA5taLPSKOou7XYyPjY
-         85hB+Neup4koCHP9uRFI4GVAyM1EP3S2ICgVf6Q84hIfWRN3e7CanRLMXiiXPQ8fCq4r
-         84sCzeGz7kmMGfMJNvlTw698u8hFEAJAu7D+EWVXXwVhdlROTiD+58hxHc1OkPEuhCFj
-         f9I1Yylb+UUyJLOi2UFx5Ol+H7tnzBpfUqii3IioyZURsxO4Auy2Rlj20jPLDiePnIZP
-         ELCw==
-X-Forwarded-Encrypted: i=1; AJvYcCV77ohONn1YlKf/gj6e/YkmBDQxwSNXMJXLPFlg97PbGpGdQWpnGBNz/XhMg4TaCfbR3eMu8kI0mhmVWlphtCC167BB
-X-Gm-Message-State: AOJu0YwmLygMFr3gOZg+VYD3Y86r78vgR/F2o3VPuB7YjAtZr0Q9Q20+
-	gq9tKFxXXRxfuqN0ohQzJgNn9G/4xWSfIzE25EO/t7zoLOlc4le5NX+ji2z2jndo9fONZJ5NNL1
-	4Rw==
-X-Google-Smtp-Source: AGHT+IHnTaoY80kiWglVX7HwtJTr9eNN/Iw0syp/e7CC8QvlnR6x+Dku2AN4fdTbxKX2GWg/wBPcHMFJMdE=
+        bh=qkdeVHiZ4dO2mKNOI6prWlI/035w5V9mRcS9wJoax+0=;
+        b=SAw19mFfWzhcssDTIOibNT/6V4Hpv0VLJk9ZW6BIJ+OO1VIUR7A4k/VnxC3u6t0yyz
+         gvZw1cNKu+IuDf8H+i9CG1An9OeOLT0bZmprHqUJ6216LUodAK1quYAtPCX5FOK/mn4P
+         yyaO/mhbFDpbb7CpA/FGB3De2pPLfZP9DzFNHc3bhjUFnIE9++tCuWY681UMbKjbB/jH
+         qhS7KcVthJ1z81UU74rdebzeft8vhWoaTFxR1ewlEjl/bgxrDe/hbCVfYM79x7EaMlDp
+         +oQzKefPWlDMlddGx0TxCOFKywLnuVY+vJnL5QzDJ01mIl3aGj5W60rtrqSv0mhBalqI
+         H2bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUagkDbNjQypIVDfRFVAERQY8AYAN7eqF1tE5+FF45Eezvx9qnVHAAErvLjpVZcn9R+PfikJ+EqgygFa/+9wqIgdO00
+X-Gm-Message-State: AOJu0YxjuGpIZK8RLy0Cogp82xrUxNKQD5eDcBzUHQW/vgtf8UGK/1BR
+	YERh+0EQPGnCqBJidGXwrfr4YQv1O5drmhFT4Jfxy7A4dBD1Obbq8ukhS5UKXNRhRBEzIaP7Nmz
+	Cug==
+X-Google-Smtp-Source: AGHT+IFUmGhOgcd89e4lrqvlrIUFlYT8TKtqW8wVsN51aYrWhEhHnUI06gztJWUkIbtg80Ly0GbAPRIO8Ug=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ecc2:b0:1dd:8360:df97 with SMTP id
- a2-20020a170902ecc200b001dd8360df97mr664667plh.13.1710268694242; Tue, 12 Mar
- 2024 11:38:14 -0700 (PDT)
-Date: Tue, 12 Mar 2024 11:38:09 -0700
-In-Reply-To: <c7619a3d3cbb36463531a7c73ccbde9db587986c.1710004509.git.christophe.jaillet@wanadoo.fr>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:114a:b0:dc6:d890:1a97 with SMTP id
+ p10-20020a056902114a00b00dc6d8901a97mr59614ybu.9.1710275203718; Tue, 12 Mar
+ 2024 13:26:43 -0700 (PDT)
+Date: Tue, 12 Mar 2024 13:26:42 -0700
+In-Reply-To: <20240311172431.zqymfqd4xlpd3pft@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <c7619a3d3cbb36463531a7c73ccbde9db587986c.1710004509.git.christophe.jaillet@wanadoo.fr>
-Message-ID: <ZfChEaiQ29qYzFaq@google.com>
-Subject: Re: [PATCH] KVM: SVM: Remove a useless zeroing of allocated memory
+References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-5-michael.roth@amd.com>
+ <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com> <ZcY2VRsRd03UQdF7@google.com>
+ <84d62953-527d-4837-acf8-315391f4b225@arm.com> <ZcZBCdTA2kBoSeL8@google.com> <20240311172431.zqymfqd4xlpd3pft@amd.com>
+Message-ID: <ZfC6gnqVhZQJnB_3@google.com>
+Subject: Re: [PATCH RFC gmem v1 4/8] KVM: x86: Add gmem hook for invalidating memory
 From: Sean Christopherson <seanjc@google.com>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org, kvm@vger.kernel.org
+To: Michael Roth <michael.roth@amd.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, "tabba@google.com" <tabba@google.com>, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	pbonzini@redhat.com, isaku.yamahata@intel.com, ackerleytng@google.com, 
+	vbabka@suse.cz, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	jroedel@suse.de, pankaj.gupta@amd.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Mar 09, 2024, Christophe JAILLET wrote:
-> Depending of the memory size needed, we clear or not the allocated memory.
-> This is not consistent.
+On Mon, Mar 11, 2024, Michael Roth wrote:
+> On Fri, Feb 09, 2024 at 07:13:13AM -0800, Sean Christopherson wrote:
+> > On Fri, Feb 09, 2024, Steven Price wrote:
+> > > >> One option that I've considered is to implement a seperate CCA ioctl to
+> > > >> notify KVM whether the memory should be mapped protected.
+> > > > 
+> > > > That's what KVM_SET_MEMORY_ATTRIBUTES+KVM_MEMORY_ATTRIBUTE_PRIVATE is for, no?
+> > > 
+> > > Sorry, I really didn't explain that well. Yes effectively this is the
+> > > attribute flag, but there's corner cases for destruction of the VM. My
+> > > thought was that if the VMM wanted to tear down part of the protected
+> > > range (without making it shared) then a separate ioctl would be needed
+> > > to notify KVM of the unmap.
+> > 
+> > No new uAPI should be needed, because the only scenario time a benign VMM should
+> > do this is if the guest also knows the memory is being removed, in which case
+> > PUNCH_HOLE will suffice.
+> > 
+> > > >> This 'solves' the problem nicely except for the case where the VMM
+> > > >> deliberately punches holes in memory which the guest is using.
+> > > > 
+> > > > I don't see what problem there is to solve in this case.  PUNCH_HOLE is destructive,
+> > > > so don't do that.
+> > > 
+> > > A well behaving VMM wouldn't PUNCH_HOLE when the guest is using it, but
+> > > my concern here is a VMM which is trying to break the host. In this case
+> > > either the PUNCH_HOLE needs to fail, or we actually need to recover the
+> > > memory from the guest (effectively killing the guest in the process).
+> > 
+> > The latter.  IIRC, we talked about this exact case somewhere in the hour-long
+> > rambling discussion on guest_memfd at PUCK[1].  And we've definitely discussed
+> > this multiple times on-list, though I don't know that there is a single thread
+> > that captures the entire plan.
+> > 
+> > The TL;DR is that gmem will invoke an arch hook for every "struct kvm_gmem"
+> > instance that's attached to a given guest_memfd inode when a page is being fully
+> > removed, i.e. when a page is being freed back to the normal memory pool.  Something
+> > like this proposed SNP patch[2].
+> > 
+> > Mike, do have WIP patches you can share?
 > 
-> So remove the zeroing of the memory in the __vmalloc() case.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> This is just a guess.
-> 
-> I don't know this code at all, but because of KVM, it is maybe safer to
-> clear the memory in both cases?
-> So, maybe it is better to use kzalloc() in the other path.
+> Sorry, I missed this query earlier. I'm a bit confused though, I thought
+> the kvm_arch_gmem_invalidate() hook provided in this patch was what we
+> ended up agreeing on during the PUCK call in question.
 
-Not zeroing should be totally fine, the array is only used to hold kernel pointers,
-if KVM leaks that state and/or accesses uninitialized data, we have bigger problems :-)
+Heh, I trust your memory of things far more than I trust mine.  I'm just proving
+Cunningham's Law.  :-)
+
+> There was an open question about what to do if a use-case came along
+> where we needed to pass additional parameters to
+> kvm_arch_gmem_invalidate() other than just the start/end PFN range for
+> the pages being freed, but we'd determined that SNP and TDX did not
+> currently need this, so I didn't have any changes planned in this
+> regard.
+> 
+> If we now have such a need, what we had proposed was to modify
+> __filemap_remove_folio()/page_cache_delete() to defer setting
+> folio->mapping to NULL so that we could still access it in
+> kvm_gmem_free_folio() so that we can still access mapping->i_private_list
+> to get the list of gmem/KVM instances and pass them on via
+> kvm_arch_gmem_invalidate().
+
+Yeah, this is what I was remembering.  I obviously forgot that we didn't have a
+need to iterate over all bindings at this time.
+
+> So that's doable, but it's not clear from this discussion that that's
+> needed.
+
+Same here.  And even if it is needed, it's not your problem to solve.  The above
+blurb about needing to preserve folio->mapping being free_folio() is sufficient
+to get the ARM code moving in the right direction.
+
+Thanks!
+
+> If the idea to block/kill the guest if VMM tries to hole-punch,
+> and ARM CCA already has plans to wire up the shared/private flags in
+> kvm_unmap_gfn_range(), wouldn't that have all the information needed to
+> kill that guest? At that point, kvm_gmem_free_folio() can handle
+> additional per-page cleanup (with additional gmem/KVM info plumbed in
+> if necessary).
 
