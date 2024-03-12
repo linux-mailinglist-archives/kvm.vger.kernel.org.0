@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-11661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71CB98793F4
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 13:16:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACDC38793FA
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 13:16:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 964A31C21F91
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 12:16:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24423B245D4
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 12:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A567A709;
-	Tue, 12 Mar 2024 12:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7F57AE5F;
+	Tue, 12 Mar 2024 12:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="NUnVJxRY"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="qAo3RkH4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-190f.mail.infomaniak.ch (smtp-190f.mail.infomaniak.ch [185.125.25.15])
+Received: from smtp-190c.mail.infomaniak.ch (smtp-190c.mail.infomaniak.ch [185.125.25.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1F47A15B
-	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 12:15:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F717A73F
+	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 12:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710245734; cv=none; b=tZ0wf+K8V6CSWTq+9KmuTFkYivcOAWEznM9ne+IgpESfEkPAx9u6qHJqKqpjFU5RFsChwxI29oN3MX4lWnPqZS8EtBBA4A0b2kr8MlbdklzmlkX1yghea27WBCTofc4NVjYfpalvAEvFK3SvKKZdDemtCgwlc0rewcx0E4xfbq0=
+	t=1710245766; cv=none; b=N/9M2/eX0lrYN/zmTGFsIDuWyi+QQcorN6dN84sLl8B0pcqt6cUCMOzhni0sxQZCWyJCMsuk4C1opWXxhJXuOSq9mDKyKdH+An6lJjih1lPvwoGDxcGFvaSlZCgl5Dqq9TH/K61SC+foQu6ci676lTfxpH9sbWeWfQN4VBM8/Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710245734; c=relaxed/simple;
-	bh=WX7qXSs24cTps5vDqV6KBl/rCQO0ApI2/1NKiye/aPg=;
+	s=arc-20240116; t=1710245766; c=relaxed/simple;
+	bh=toSAL6LOqqiAcHCFf2a7KtT/GkwF4PILGROHmUBWIwU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BS4p81dhivbQPkV+Zw7zkfXAPVuCYOHo0O9vaq4Gq2u7NLV7OnrQWchE7CEraNCJRRouey3yl1ZwXoqqiVMHlzDzaMIBkFpnqaYhcABzg42WdmK6emul5QhtBi4eV3sIFzMmCtk43bN6ZuldiGnMbTfjat4YeAGP/KZolSnHRdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=NUnVJxRY; arc=none smtp.client-ip=185.125.25.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=C0QSyTfYItHGxtebj/2ADCdkC8858Rd8gAmte6U4y+3bRHaTgzJH0gbRfv6umCxTA+UupkikchShbmnafT5iOHuhnSxRn3+V4+rE8YUKnBImhJfOW8zwxjz241Kopyf2cCJBBqkpSo0eZdS84WTtp416iJZiQvCXmmpfep9UwgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=qAo3RkH4; arc=none smtp.client-ip=185.125.25.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TvCJx5bG2z18J;
-	Tue, 12 Mar 2024 13:15:29 +0100 (CET)
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4TvCJx0DYKzPVG;
-	Tue, 12 Mar 2024 13:15:29 +0100 (CET)
+Received: from smtp-4-0001.mail.infomaniak.ch (unknown [10.7.10.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TvCKR2dbfzMq0WP;
+	Tue, 12 Mar 2024 13:15:55 +0100 (CET)
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4TvCKQ0rNKzhRP;
+	Tue, 12 Mar 2024 13:15:54 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1710245729;
-	bh=WX7qXSs24cTps5vDqV6KBl/rCQO0ApI2/1NKiye/aPg=;
+	s=20191114; t=1710245755;
+	bh=toSAL6LOqqiAcHCFf2a7KtT/GkwF4PILGROHmUBWIwU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NUnVJxRYdJnS/bDaGHsN4zHTKQQYb939oUZSg9Hnzp9TS11vnfyS8RSzxpwgGNAqb
-	 ETdL/dMhVuBpsQ5F1dYlSb30lEAXXBxaf5XJsDir9Ica/YQdv1Nk/pPd545PoDvBMX
-	 +YunhN+2oVgCX8Ef5ZrfP6LV2dWsbN2XHt/7TyxA=
-Date: Tue, 12 Mar 2024 13:15:18 +0100
+	b=qAo3RkH4vnvOXezdBsHKVdull/R1EkYTke/fr8cEyftmemu+MgRBRD/0RcN+EPCaG
+	 EUdqDuICfGoyovJLyRKBQ5wMhZjn3FSHKL9MM4TRX7SU5KCMHkdmzm5XJt5suSvpBx
+	 8B6TWfN5IyjrCbk70Iong7MQSOB1Kknnk8bSCZSo=
+Date: Tue, 12 Mar 2024 13:15:43 +0100
 From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
 To: David Gow <davidgow@google.com>
 Cc: Brendan Higgins <brendanhiggins@google.com>, 
@@ -59,11 +59,11 @@ Cc: Brendan Higgins <brendanhiggins@google.com>,
 	Wanpeng Li <wanpengli@tencent.com>, Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org, 
 	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-security-module@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org
-Subject: Re: [PATCH v2 4/7] kunit: Handle test faults
-Message-ID: <20240312.Ohfumeel9aes@digikod.net>
+Subject: Re: [PATCH v2 6/7] kunit: Print last test location on fault
+Message-ID: <20240312.ku4TaiC9uosh@digikod.net>
 References: <20240301194037.532117-1-mic@digikod.net>
- <20240301194037.532117-5-mic@digikod.net>
- <CABVgOSnzaO7EUdSW_xTZd22oc-q_yT9uVoSwTm2jn5pw5pP8Eg@mail.gmail.com>
+ <20240301194037.532117-7-mic@digikod.net>
+ <CABVgOSk_vea-LrPwJet6hQ4D3PBQOLVg32nZ_gE4c9kgGDEEnQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,28 +73,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABVgOSnzaO7EUdSW_xTZd22oc-q_yT9uVoSwTm2jn5pw5pP8Eg@mail.gmail.com>
+In-Reply-To: <CABVgOSk_vea-LrPwJet6hQ4D3PBQOLVg32nZ_gE4c9kgGDEEnQ@mail.gmail.com>
 X-Infomaniak-Routing: alpha
 
-On Tue, Mar 12, 2024 at 01:05:37PM +0800, David Gow wrote:
+On Tue, Mar 12, 2024 at 12:54:48PM +0800, David Gow wrote:
 > On Sat, 2 Mar 2024 at 03:40, Mickaël Salaün <mic@digikod.net> wrote:
 > >
-> > Previously, when a kernel test thread crashed (e.g. NULL pointer
-> > dereference, general protection fault), the KUnit test hanged for 30
-> > seconds and exited with a timeout error.
-> >
-> > Fix this issue by waiting on task_struct->vfork_done instead of the
-> > custom kunit_try_catch.try_completion, and track the execution state by
-> > initially setting try_result with -EFAULT and only setting it to 0 if
-> > the test passed.
-> >
-> > Fix kunit_generic_run_threadfn_adapter() signature by returning 0
-> > instead of calling kthread_complete_and_exit().  Because thread's exit
-> > code is never checked, always set it to 0 to make it clear.
-> >
-> > Fix the -EINTR error message, which couldn't be reached until now.
-> >
-> > This is tested with a following patch.
+> > This helps identify the location of test faults.
 > >
 > > Cc: Brendan Higgins <brendanhiggins@google.com>
 > > Cc: David Gow <davidgow@google.com>
@@ -102,130 +87,195 @@ On Tue, Mar 12, 2024 at 01:05:37PM +0800, David Gow wrote:
 > > Cc: Shuah Khan <skhan@linuxfoundation.org>
 > > Reviewed-by: Kees Cook <keescook@chromium.org>
 > > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> > Link: https://lore.kernel.org/r/20240301194037.532117-5-mic@digikod.net
+> > Link: https://lore.kernel.org/r/20240301194037.532117-7-mic@digikod.net
 > > ---
 > 
-> This works fine here, and looks good.
+> I like the idea of this, but am a little bit worried about how
+> confusing it might be, given that the location only updates on those
+> particular macros.
 > 
-> The use of task_struct->vfork_done is a bit confusing, as there's no
-> documentation (that I could find) about what vfork_done means for
-> kthreads. From the code, it looks to just be a copy of
-> kthread->exited, which is much more obvious a name.
-
-Indeed
-
+> Maybe the answer is to make the __KUNIT_SAVE_LOC() macro, or something
+> equivalent, a supported API.
 > 
-> Would it make sense to either (a) replace this with a call to
-> to_kthread(), and kthread->exited, or (b) add a comment explaining
-> what vfork_done means here. kthread_stop() itself is using
-> to_kthread() and kthread->exited -- even though task_struct is also
-> there -- so I'd feel a bit more comfortable with that option.
-
-I used vfork_done because to_kthread() and struct kthread are private.
-As for a vfork(2), vfork_done is useful to wait for the end of a task.
-Feel free to add a comment explaining vfork_done. Thanks
-
+> One possibility would be to have a KUNIT_MARKER() macro. If we really
+> wanted to, we could expand it to take a string so we can have a more
+> user-friendly KUNIT_MARKER(test, "parsing packet") description of
+> where things went wrong. Another could be to extend this to use the
+> code tagging framework[1], if that lands.
 > 
-> Otherwise,
-> Reviewed-by: David Gow <davidgow@google.com>
+> That being said, I think this is still an improvement without any of
+> those features. I've left a few comments below. Let me know what you
+> think.
+
+This patch adds opportunistic markers to test code.  Because an uncaught
+fault would be a bug, I think in practice nobody would use
+KUNIT_MARKER() explicitly.  I found _KUNIT_SAVE_LOC() to be useful while
+writing tests or debugging them.  With this patch, it is still possible
+to call KUNIT_SUCCESS() if someone wants to add an explicit mark, and I
+think it would make more sense.
+
 > 
 > Cheers,
 > -- David
 > 
+> [1]: https://lwn.net/Articles/906660/
 > >
 > > Changes since v1:
 > > * Added Kees's Reviewed-by.
 > > ---
-> >  include/kunit/try-catch.h |  3 ---
-> >  lib/kunit/try-catch.c     | 14 +++++++-------
-> >  2 files changed, 7 insertions(+), 10 deletions(-)
+> >  include/kunit/test.h  | 24 +++++++++++++++++++++---
+> >  lib/kunit/try-catch.c | 10 +++++++---
+> >  2 files changed, 28 insertions(+), 6 deletions(-)
 > >
-> > diff --git a/include/kunit/try-catch.h b/include/kunit/try-catch.h
-> > index c507dd43119d..7c966a1adbd3 100644
-> > --- a/include/kunit/try-catch.h
-> > +++ b/include/kunit/try-catch.h
-> > @@ -14,13 +14,11 @@
+> > diff --git a/include/kunit/test.h b/include/kunit/test.h
+> > index fcb4a4940ace..f3aa66eb0087 100644
+> > --- a/include/kunit/test.h
+> > +++ b/include/kunit/test.h
+> > @@ -301,6 +301,8 @@ struct kunit {
+> >         struct list_head resources; /* Protected by lock. */
 > >
-> >  typedef void (*kunit_try_catch_func_t)(void *);
+> >         char status_comment[KUNIT_STATUS_COMMENT_SIZE];
+> > +       /* Saves the last seen test. Useful to help with faults. */
+> > +       struct kunit_loc last_seen;
+> >  };
 > >
-> > -struct completion;
-> >  struct kunit;
+> >  static inline void kunit_set_failure(struct kunit *test)
+> > @@ -567,6 +569,15 @@ void __printf(2, 3) kunit_log_append(struct string_stream *log, const char *fmt,
+> >  #define kunit_err(test, fmt, ...) \
+> >         kunit_printk(KERN_ERR, test, fmt, ##__VA_ARGS__)
+> >
+> > +/*
+> > + * Must be called at the beginning of each KUNIT_*_ASSERTION().
+> > + * Cf. KUNIT_CURRENT_LOC.
+> > + */
+> > +#define _KUNIT_SAVE_LOC(test) do {                                            \
+> > +       WRITE_ONCE(test->last_seen.file, __FILE__);                            \
+> > +       WRITE_ONCE(test->last_seen.line, __LINE__);                            \
+> > +} while (0)
+> 
+> Can we get rid of the leading '_', make this public, and document it?
+> If we want to rename it to KUNIT_MARKER() or similar, that might work
+> better, too.
+
+We can do that but I'm not convinced it would be useful.
+
+> 
+> > +
+> >  /**
+> >   * KUNIT_SUCCEED() - A no-op expectation. Only exists for code clarity.
+> >   * @test: The test context object.
+> > @@ -575,7 +586,7 @@ void __printf(2, 3) kunit_log_append(struct string_stream *log, const char *fmt,
+> >   * words, it does nothing and only exists for code clarity. See
+> >   * KUNIT_EXPECT_TRUE() for more information.
+> >   */
+> > -#define KUNIT_SUCCEED(test) do {} while (0)
+> > +#define KUNIT_SUCCEED(test) _KUNIT_SAVE_LOC(test)
+> >
+> >  void __noreturn __kunit_abort(struct kunit *test);
+> >
+> > @@ -601,14 +612,16 @@ void __kunit_do_failed_assertion(struct kunit *test,
+> >  } while (0)
+> >
+> >
+> > -#define KUNIT_FAIL_ASSERTION(test, assert_type, fmt, ...)                     \
+> > +#define KUNIT_FAIL_ASSERTION(test, assert_type, fmt, ...) do {                \
+> > +       _KUNIT_SAVE_LOC(test);                                                 \
+> >         _KUNIT_FAILED(test,                                                    \
+> >                       assert_type,                                             \
+> >                       kunit_fail_assert,                                       \
+> >                       kunit_fail_assert_format,                                \
+> >                       {},                                                      \
+> >                       fmt,                                                     \
+> > -                     ##__VA_ARGS__)
+> > +                     ##__VA_ARGS__);                                          \
+> > +} while (0)
 > >
 > >  /**
-> >   * struct kunit_try_catch - provides a generic way to run code which might fail.
-> >   * @test: The test case that is currently being executed.
-> > - * @try_completion: Completion that the control thread waits on while test runs.
-> >   * @try_result: Contains any errno obtained while running test case.
-> >   * @try: The function, the test case, to attempt to run.
-> >   * @catch: The function called if @try bails out.
-> > @@ -46,7 +44,6 @@ struct kunit;
-> >  struct kunit_try_catch {
-> >         /* private: internal use only. */
-> >         struct kunit *test;
-> > -       struct completion *try_completion;
-> >         int try_result;
-> >         kunit_try_catch_func_t try;
-> >         kunit_try_catch_func_t catch;
+> >   * KUNIT_FAIL() - Always causes a test to fail when evaluated.
+> > @@ -637,6 +650,7 @@ void __kunit_do_failed_assertion(struct kunit *test,
+> >                               fmt,                                             \
+> >                               ...)                                             \
+> >  do {                                                                          \
+> > +       _KUNIT_SAVE_LOC(test);                                                 \
+> >         if (likely(!!(condition_) == !!expected_true_))                        \
+> >                 break;                                                         \
+> >                                                                                \
+> > @@ -698,6 +712,7 @@ do {                                                                               \
+> >                 .right_text = #right,                                          \
+> >         };                                                                     \
+> >                                                                                \
+> > +       _KUNIT_SAVE_LOC(test);                                                 \
+> >         if (likely(__left op __right))                                         \
+> >                 break;                                                         \
+> >                                                                                \
+> > @@ -758,6 +773,7 @@ do {                                                                               \
+> >                 .right_text = #right,                                          \
+> >         };                                                                     \
+> >                                                                                \
+> > +       _KUNIT_SAVE_LOC(test);                                                 \
+> >         if (likely((__left) && (__right) && (strcmp(__left, __right) op 0)))   \
+> >                 break;                                                         \
+> >                                                                                \
+> > @@ -791,6 +807,7 @@ do {                                                                               \
+> >                 .right_text = #right,                                          \
+> >         };                                                                     \
+> >                                                                                \
+> > +       _KUNIT_SAVE_LOC(test);                                                 \
+> >         if (likely(__left && __right))                                         \
+> >                 if (likely(memcmp(__left, __right, __size) op 0))              \
+> >                         break;                                                 \
+> > @@ -815,6 +832,7 @@ do {                                                                               \
+> >  do {                                                                          \
+> >         const typeof(ptr) __ptr = (ptr);                                       \
+> >                                                                                \
+> > +       _KUNIT_SAVE_LOC(test);                                                 \
+> >         if (!IS_ERR_OR_NULL(__ptr))                                            \
+> >                 break;                                                         \
+> >                                                                                \
 > > diff --git a/lib/kunit/try-catch.c b/lib/kunit/try-catch.c
-> > index cab8b24b5d5a..c6ee4db0b3bd 100644
+> > index c6ee4db0b3bd..2ec21c6918f3 100644
 > > --- a/lib/kunit/try-catch.c
 > > +++ b/lib/kunit/try-catch.c
-> > @@ -18,7 +18,7 @@
-> >  void __noreturn kunit_try_catch_throw(struct kunit_try_catch *try_catch)
-> >  {
-> >         try_catch->try_result = -EFAULT;
-> > -       kthread_complete_and_exit(try_catch->try_completion, -EFAULT);
-> > +       kthread_exit(0);
-> >  }
-> >  EXPORT_SYMBOL_GPL(kunit_try_catch_throw);
+> > @@ -91,9 +91,13 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
 > >
-> > @@ -26,9 +26,12 @@ static int kunit_generic_run_threadfn_adapter(void *data)
-> >  {
-> >         struct kunit_try_catch *try_catch = data;
-> >
-> > +       try_catch->try_result = -EINTR;
-> >         try_catch->try(try_catch->context);
-> > +       if (try_catch->try_result == -EINTR)
-> > +               try_catch->try_result = 0;
-> >
-> > -       kthread_complete_and_exit(try_catch->try_completion, 0);
-> > +       return 0;
-> >  }
-> >
-> >  static unsigned long kunit_test_timeout(void)
-> > @@ -58,13 +61,11 @@ static unsigned long kunit_test_timeout(void)
-> >
-> >  void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
-> >  {
-> > -       DECLARE_COMPLETION_ONSTACK(try_completion);
-> >         struct kunit *test = try_catch->test;
-> >         struct task_struct *task_struct;
-> >         int exit_code, time_remaining;
-> >
-> >         try_catch->context = context;
-> > -       try_catch->try_completion = &try_completion;
-> >         try_catch->try_result = 0;
-> >         task_struct = kthread_create(kunit_generic_run_threadfn_adapter,
-> >                                      try_catch, "kunit_try_catch_thread");
-> > @@ -75,8 +76,7 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
-> >         }
-> >         get_task_struct(task_struct);
-> >         wake_up_process(task_struct);
-> > -
-> > -       time_remaining = wait_for_completion_timeout(&try_completion,
-> > +       time_remaining = wait_for_completion_timeout(task_struct->vfork_done,
-> >                                                      kunit_test_timeout());
-> >         if (time_remaining == 0) {
-> >                 try_catch->try_result = -ETIMEDOUT;
-> > @@ -92,7 +92,7 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
 > >         if (exit_code == -EFAULT)
 > >                 try_catch->try_result = 0;
-> >         else if (exit_code == -EINTR)
-> > -               kunit_err(test, "wake_up_process() was never called\n");
-> > +               kunit_err(test, "try faulted\n");
-> >         else if (exit_code == -ETIMEDOUT)
+> > -       else if (exit_code == -EINTR)
+> > -               kunit_err(test, "try faulted\n");
+> > -       else if (exit_code == -ETIMEDOUT)
+> > +       else if (exit_code == -EINTR) {
+> > +               if (test->last_seen.file)
+> > +                       kunit_err(test, "try faulted after %s:%d\n",
+> > +                                 test->last_seen.file, test->last_seen.line);
+> 
+> It's possibly a bit confusing to just say "after file:line",
+> particularly if we then loop or call a function "higher up" in the
+> file. Maybe something like "try faulted: last line seen %s:%d" is
+> clearer.
+
+OK
+
+> 
+> > +               else
+> > +                       kunit_err(test, "try faulted before the first test\n");
+> 
+> I don't like using "test" here, as it introduces ambiguity between
+> "kunit tests" and "assertions/expectations" if we call them both
+> tests. Maybe just "try faulted" here, or "try faulted (no markers
+> seen)" or similar?
+
+I agree that "try faulted" would be enough.  I'm totally OK for you to
+update this patch directly. Please let me know if you'd prefer me to
+send another version with these fixes though.
+
+Do you plan to merge this patches with the v6.9 merge window?
+
+> 
+> 
+> > +       } else if (exit_code == -ETIMEDOUT)
 > >                 kunit_err(test, "try timed out\n");
 > >         else if (exit_code)
+> >                 kunit_err(test, "Unknown error: %d\n", exit_code);
 > > --
 > > 2.44.0
 > >
