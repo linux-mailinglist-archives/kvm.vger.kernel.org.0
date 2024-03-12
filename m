@@ -1,220 +1,152 @@
-Return-Path: <kvm+bounces-11701-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11702-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1913879F7E
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 00:03:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86285879F7F
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 00:03:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F6E02839E3
-	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 23:03:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BB992839F9
+	for <lists+kvm@lfdr.de>; Tue, 12 Mar 2024 23:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88E846449;
-	Tue, 12 Mar 2024 23:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF15F46B80;
+	Tue, 12 Mar 2024 23:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SOMxbBuE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gU+eK7wZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B804F14293
-	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 23:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FBB446AF
+	for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 23:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710284579; cv=none; b=ejlml5yHE9HWOm704l3XxsSFiuOqURZQIZJvTeRhSqavzSb7BJE5U3BfTiMMJwy/ex4W14KiGZeNmq70SpMf8UYtx3/pygQ9jwzouLG63/ZsB51wBcgfqINvs5q2KzUE//NRE9d1/CzYL/RejAVei/WNboJlIb91lNkKR+tXO7o=
+	t=1710284624; cv=none; b=Y003ZMn52SJ0S3WYfxw6TaTe2rX4j5kg8anjl2HlaYsSozL/iq0H/fgmxBXOEn6w8xLV6c4wnmzooxaUpICAuQHjueMh/g+/bYYCRQwnxEnBKnYmRQn31WAlnwjKROUTSpY8slg68NLxOytlU0PvQBmqeFxd8A0wgmjsvgywkZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710284579; c=relaxed/simple;
-	bh=IrT1/YF8DYrgsN6ccIFZAd6be3RlcYlS+yhDN8FYwes=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oNxGOwHuOujLsNcGarsgJQcNHleG9H3hUmIO45oNNx9WcWVo9qMb49FadM1bvc50pMH+Ezj6F1/w0Fk9HzfoUrFItGw5VBDKLDiQtn2z0q6pFSY9GWo2q6lrYgGTFVnMbZR0nI3Zql5Ly+gdrwi4hF1bgKVr1zYQgQVwU5594jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SOMxbBuE; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710284577; x=1741820577;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IrT1/YF8DYrgsN6ccIFZAd6be3RlcYlS+yhDN8FYwes=;
-  b=SOMxbBuEZ3kaXH4k8J1oSVeyHaEB5H4FezjcF5Kr2b/i0cns54ZyIqqc
-   VxnerWfRbMoZo/5XNh5Dn6HVhazBs6uVeMecUth6MfU0zBCzSFXjBPlVl
-   xAx5o4Z5FejiuIs7SqpmpdC1zUeYbj5zioX4NK+Q8YMJnblcXn2MWEcSD
-   kMrCDMbW9EnKI0v8QNGsHOv5YlISAi7rrewjxO6pcjhedx9/bfx8ZkYAF
-   vtcqNDjlULgnvqgDjn5llCrcRicVuQ6tTnB43X3kJMXJwoDQyXNI5maqO
-   5nOQ9Caj24QcyOftawZM+eif5vpGBzj0nPiDxhoaGQLRTSi0jn/3wgW25
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="5148060"
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="5148060"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 16:02:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="11598309"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 16:02:55 -0700
-Date: Tue, 12 Mar 2024 16:02:54 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-	qemu-devel@nongnu.org, Michael Roth <michael.roth@amd.com>,
-	Claudio Fontana <cfontana@suse.de>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>, isaku.yamahata@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v5 15/65] i386/tdx: Get tdx_capabilities via
- KVM_TDX_CAPABILITIES
-Message-ID: <20240312230254.GJ935089@ls.amr.corp.intel.com>
-References: <20240229063726.610065-1-xiaoyao.li@intel.com>
- <20240229063726.610065-16-xiaoyao.li@intel.com>
+	s=arc-20240116; t=1710284624; c=relaxed/simple;
+	bh=K83M/gOkLwVJy/iWndMZQ3/mNyjmwqZz2ejy3OkYwbg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=imAPK8+ne2Q0G+MzWabpBlaalaDI47bb1M4SIS5bowyiP7WIupypYPVghQcXSEttKfs2whjCdE1xC0taazvmUNi+achx7HhO/XL+Bph+ZyHWI04gjFT939ntQaZ7q7qOXTqQUaan0MBb7UnQYSSY91RzFPoy+5wir8xSjsR6Ujg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gU+eK7wZ; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a6051556dso14375137b3.0
+        for <kvm@vger.kernel.org>; Tue, 12 Mar 2024 16:03:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710284621; x=1710889421; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wycjXUpdcjRTIVTczU6imQHDHg2SNIM+Jho2dwX/OCo=;
+        b=gU+eK7wZOirO+4AKADjq8rdh5s3BlFPD3pS5rbtcxiI4ifhXJ2dbQeusGewybbbcke
+         acXJuxAIYPZAM76RVI8sp88E11IHRw1Oi8LBqe7B++9+UONOH21omNMKcad1Ykt/QV4K
+         8QrIVKuYGxg/FSQ2OQc018P+S9UjQqjnHeR/uwoy4vgnE8mWjz1pLrQ3BtcNZVBpEzwD
+         jjspoCH4sf+N5U9a4+3iCjzGVcfQOMX1TtDRcwisoslHHbnR5YBw//0n70jYEApqeQmK
+         QVl5KAMLGMi1WCFxKQU4XA9rVyjs9LTeAHWfEc9MhUzJqoWO89zG7fopj7AiS0eSJs2I
+         e0kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710284621; x=1710889421;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wycjXUpdcjRTIVTczU6imQHDHg2SNIM+Jho2dwX/OCo=;
+        b=npdq18kdvkOMAWjkxZroLH9sQJhWUgffflmUpxEyx16PiwWy6B+xczcE3R3OcJrqZ8
+         TU7Ed8pkeTECOJyLXAT6WvZvFsXVjWFjPbOmVR8EDugjkAsh90ubpuzld6H3MEYIHf2j
+         V5gHrsc+IoLWKmjbfLdoGtCh6w+GQIvJYj0AkmYLhoS5EmdI3zjzmk4JZEN3FehNnD0G
+         bTHVD68km7nT4i/mojOfPA1Iy31gOfimg+ul8hNuhkvzpNwPuBDsWpq9kjC+F9laKEdH
+         jqPVTJ1mMpD4zUT3HW4EKL0dWd4juGgQQPk4qDtjN82y3jyCIEP58nmtBNEc8ZCiDd2n
+         Hw7A==
+X-Forwarded-Encrypted: i=1; AJvYcCXbHbymX9IILO0gCCwx6crbjmb9oSbspUfmeBNPMkTqkXeyKgGeqQapLFbQgU+a//KV+AAbTlubXaLjWCyrlt+TggIh
+X-Gm-Message-State: AOJu0Yztcwhcrfumlpqr6iIHOWtBPBmzadeDZWdNAlFGVlbSV70MnceZ
+	HIM9FLTWh6YsneAJCg+RoCaBcu3yE6d5ftHqr0wVkdDOtg/WjyYMMqN8W1N808tgcdH6wcqf1AS
+	xDA==
+X-Google-Smtp-Source: AGHT+IHRIsSL43ZWHDYJyv+wWduH/mp7DvjWIBy12G8JAyQ7ZviuKBfYKWxrd22+duGrw/tAqkI65WqHd18=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:84c:b0:609:f189:1f59 with SMTP id
+ bz12-20020a05690c084c00b00609f1891f59mr169425ywb.4.1710284621474; Tue, 12 Mar
+ 2024 16:03:41 -0700 (PDT)
+Date: Tue, 12 Mar 2024 16:03:40 -0700
+In-Reply-To: <fc3102f42ef6a1efa93d5bc75c9ed8653554cde2.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240229063726.610065-16-xiaoyao.li@intel.com>
+Mime-Version: 1.0
+References: <cover.1709288671.git.isaku.yamahata@intel.com>
+ <66a957f4ec4a8591d2ff2550686e361ec648b308.1709288671.git.isaku.yamahata@intel.com>
+ <Ze-TJh0BBOWm9spT@google.com> <6b38d1ea3073cdda0f106313d9f0e032345b8b75.camel@intel.com>
+ <ZfBkle1eZFfjPI8l@google.com> <3c840ebd9b14d7a9abe0a563e2b6847273369dcd.camel@intel.com>
+ <fc3102f42ef6a1efa93d5bc75c9ed8653554cde2.camel@intel.com>
+Message-ID: <ZfDfTIIxVBhLzqqk@google.com>
+Subject: Re: [RFC PATCH 6/8] KVM: x86: Implement kvm_arch_{, pre_}vcpu_map_memory()
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "dmatlack@google.com" <dmatlack@google.com>, 
+	"federico.parola@polito.it" <federico.parola@polito.it>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Feb 29, 2024 at 01:36:36AM -0500,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On Tue, Mar 12, 2024, Kai Huang wrote:
+> On Tue, 2024-03-12 at 21:41 +0000, Huang, Kai wrote:
+> > On Tue, 2024-03-12 at 07:20 -0700, Sean Christopherson wrote:
+> > > On Tue, Mar 12, 2024, Kai Huang wrote:
+> > > > > Wait. KVM doesn't *need* to do PAGE.ADD from deep in the MMU.  The only inputs to
+> > > > > PAGE.ADD are the gfn, pfn, tdr (vm), and source.  The S-EPT structures need to be
+> > > > > pre-built, but when they are built is irrelevant, so long as they are in place
+> > > > > before PAGE.ADD.
+> > > > > 
+> > > > > Crazy idea.  For TDX S-EPT, what if KVM_MAP_MEMORY does all of the SEPT.ADD stuff,
+> > > > > which doesn't affect the measurement, and even fills in KVM's copy of the leaf EPTE, 
+> > > > > but tdx_sept_set_private_spte() doesn't do anything if the TD isn't finalized?
+> > > > > 
+> > > > > Then KVM provides a dedicated TDX ioctl(), i.e. what is/was KVM_TDX_INIT_MEM_REGION,
+> > > > > to do PAGE.ADD.  KVM_TDX_INIT_MEM_REGION wouldn't need to map anything, it would
+> > > > > simply need to verify that the pfn from guest_memfd() is the same as what's in
+> > > > > the TDP MMU.
+> > > > 
+> > > > One small question:
+> > > > 
+> > > > What if the memory region passed to KVM_TDX_INIT_MEM_REGION hasn't been pre-
+> > > > populated?  If we want to make KVM_TDX_INIT_MEM_REGION work with these regions,
+> > > > then we still need to do the real map.  Or we can make KVM_TDX_INIT_MEM_REGION
+> > > > return error when it finds the region hasn't been pre-populated?
+> > > 
+> > > Return an error.  I don't love the idea of bleeding so many TDX details into
+> > > userspace, but I'm pretty sure that ship sailed a long, long time ago.
+> > 
+> > In this case, IIUC the KVM_MAP_MEMORY ioctl() will be mandatory for TDX
+> > (presumbly also SNP) guests, but _optional_ for other VMs.  Not sure whether
+> > this is ideal.
 
-> KVM provides TDX capabilities via sub command KVM_TDX_CAPABILITIES of
-> IOCTL(KVM_MEMORY_ENCRYPT_OP). Get the capabilities when initializing
-> TDX context. It will be used to validate user's setting later.
-> 
-> Since there is no interface reporting how many cpuid configs contains in
-> KVM_TDX_CAPABILITIES, QEMU chooses to try starting with a known number
-> and abort when it exceeds KVM_MAX_CPUID_ENTRIES.
-> 
-> Besides, introduce the interfaces to invoke TDX "ioctls" at different
-> scope (KVM, VM and VCPU) in preparation.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
-> Changes in v4:
-> - use {} to initialize struct kvm_tdx_cmd, to avoid memset();
-> - remove tdx_platform_ioctl() because no user;
-> 
-> Changes in v3:
-> - rename __tdx_ioctl() to tdx_ioctl_internal()
-> - Pass errp in get_tdx_capabilities();
-> 
-> changes in v2:
->   - Make the error message more clear;
-> 
-> changes in v1:
->   - start from nr_cpuid_configs = 6 for the loop;
->   - stop the loop when nr_cpuid_configs exceeds KVM_MAX_CPUID_ENTRIES;
-> ---
->  target/i386/kvm/kvm.c      |  2 -
->  target/i386/kvm/kvm_i386.h |  2 +
->  target/i386/kvm/tdx.c      | 91 +++++++++++++++++++++++++++++++++++++-
->  3 files changed, 92 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 52d99d30bdc8..0e68e80f4291 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -1685,8 +1685,6 @@ static int hyperv_init_vcpu(X86CPU *cpu)
->  
->  static Error *invtsc_mig_blocker;
->  
-> -#define KVM_MAX_CPUID_ENTRIES  100
-> -
->  static void kvm_init_xsave(CPUX86State *env)
->  {
->      if (has_xsave2) {
-> diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
-> index 55fb25fa8e2e..c3ef46a97a7b 100644
-> --- a/target/i386/kvm/kvm_i386.h
-> +++ b/target/i386/kvm/kvm_i386.h
-> @@ -13,6 +13,8 @@
->  
->  #include "sysemu/kvm.h"
->  
-> +#define KVM_MAX_CPUID_ENTRIES  100
-> +
->  #ifdef CONFIG_KVM
->  
->  #define kvm_pit_in_kernel() \
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index d9a1dd46dc69..2b956450a083 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -12,18 +12,107 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qapi/error.h"
->  #include "qom/object_interfaces.h"
-> +#include "sysemu/kvm.h"
->  
->  #include "hw/i386/x86.h"
-> +#include "kvm_i386.h"
->  #include "tdx.h"
->  
-> +static struct kvm_tdx_capabilities *tdx_caps;
-> +
-> +enum tdx_ioctl_level{
-> +    TDX_VM_IOCTL,
-> +    TDX_VCPU_IOCTL,
-> +};
-> +
-> +static int tdx_ioctl_internal(void *state, enum tdx_ioctl_level level, int cmd_id,
-> +                        __u32 flags, void *data)
-> +{
-> +    struct kvm_tdx_cmd tdx_cmd = {};
-> +    int r;
-> +
-> +    tdx_cmd.id = cmd_id;
-> +    tdx_cmd.flags = flags;
-> +    tdx_cmd.data = (__u64)(unsigned long)data;
-> +
-> +    switch (level) {
-> +    case TDX_VM_IOCTL:
-> +        r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
-> +        break;
-> +    case TDX_VCPU_IOCTL:
-> +        r = kvm_vcpu_ioctl(state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
-> +        break;
-> +    default:
-> +        error_report("Invalid tdx_ioctl_level %d", level);
-> +        exit(1);
-> +    }
-> +
-> +    return r;
-> +}
-> +
-> +static inline int tdx_vm_ioctl(int cmd_id, __u32 flags, void *data)
-> +{
-> +    return tdx_ioctl_internal(NULL, TDX_VM_IOCTL, cmd_id, flags, data);
-> +}
-> +
-> +static inline int tdx_vcpu_ioctl(void *vcpu_fd, int cmd_id, __u32 flags,
-> +                                 void *data)
+No, just TDX.  SNP's RMP purely works with pfns, i.e. the enforcement layer comes
+into play *after* the stage-2 page table walks.  KVM can zap NPTs for SNP VMs at
+will.
 
-As kvm_vcpu_ioctl(CPUState *cpu, int type, ...) takes CPUState *, this can be
-tdx_vcpu_ioctl(CPUState *cpu, ) instead of void *.
-I struggled to fin my mistake to pass "int vcpu_fd" to this function.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+> > And just want to make sure I understand the background correctly:
+> > 
+> > The KVM_MAP_MEMORY ioctl() is supposed to be generic, and it should be able to
+> > be used by any VM but not just CoCo VMs (including SW_PROTECTED ones)?
+> > 
+> > But it is only supposed to be used by the VMs which use guest_memfd()?  Because
+> > IIUC for normal VMs using mmap() we already have MAP_POPULATE for this purpose.
+> > 
+> > Looking at [*], it doesn't say what kind of VM the sender was trying to use.
+> > 
+> > Therefore can we interpret KVM_MAP_MEMORY ioctl() is effectively for CoCo VMs? 
+> > SW_PROTECTED VMs can also use guest_memfd(), but I believe nobody is going to
+> > use it seriously.
+> > 
+> > [*] https://lore.kernel.org/all/65262e67-7885-971a-896d-ad9c0a760907@polito.it/
+> > 
+> > 
+> 
+> Hmm.. Just after sending I realized the MAP_POPULATE only pre-populate page
+> table at host side, not EPT...
+
+Yep, exactly.
+
+> So the KVM_MAP_MEMORY is indeed can be used by _ALL_ VMs.  My bad :-(
 
