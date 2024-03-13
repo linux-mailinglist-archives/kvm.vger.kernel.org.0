@@ -1,161 +1,143 @@
-Return-Path: <kvm+bounces-11763-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11764-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3624487B101
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 20:05:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 274B187B218
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 20:43:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A7D11C27D87
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 19:05:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB5761F2731D
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 19:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E25D6E2BD;
-	Wed, 13 Mar 2024 18:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D832F4C600;
+	Wed, 13 Mar 2024 19:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ufml1w12"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jQHCEXmc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F7B60B94
-	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 18:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FE24D59F
+	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 19:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710353921; cv=none; b=sGsqXRuGP6xy0jyKFNUQw1ghMn7TlQxMJ4PIx4BZGadY3PdVWD0QyBLUic+/HEY4a/cnosTIfa8FvDNqFI3GRNoYbQ1+ZTYz1mjR/LUfFTERig2lPQk4HgvICzF+0rq8rFOPMkmnjzfnb88akjO4lJieo9LXD2vmXWLaUWfYC2w=
+	t=1710358972; cv=none; b=MxkdlgAuldz4Dle0egXOPURgWtp14QLLBmtr52qeDDvCO+sMTZ1SMEme6qPe+4oEX/iyQweYEBJcHs7vXHoH+XKtSVVeWWOdXY60Qcq1zmysFeY7Wc6M7iMFae7AWATbtBIKs/KA4nddlJ+2VVlaFvyuPlhYVnBaYYMLHG+T6Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710353921; c=relaxed/simple;
-	bh=Bda/tnr2Gweo1vW+6mtT16FlcwdOgeaHwK/iuF0gX0k=;
+	s=arc-20240116; t=1710358972; c=relaxed/simple;
+	bh=E+jLFz1+KAMdfFOIEDPlUwPmAJ/O4s0jS/Ky0Fcqb9c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P9E/YNtyzwlCWPQPBTc9o4juBCWxMj8dsYiD/A28uk7L1DKcdTfTcET+1zX65OtdhmlkthexlEkGOCZXlNq8PijgeP3sPN5AMxnfXIKL1sB6WafF/2hyN6iQn8l0sXqnW9i13wPn4A2Qmq6E/tK5MUvKByqOwWATDWn/UBhLsx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ufml1w12; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1dd8dd198d0so704525ad.3
-        for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 11:18:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710353919; x=1710958719; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RTPa6mW4skZMTVBISgv1w+QSbNBfwtAG1NsTquu+3lU=;
-        b=Ufml1w12HVPXxivP0lU1rKd7wdFNwXCaWW7skbx6G4m+t6SI9MkgLgsDP7CmCVwwDa
-         RZ+JEZutR0+Le1rTe57BIrAPwdgSSuXHbAv5atVfnLKZd9Sd3t72hTRlbdxU1rv4pq0+
-         FURxrPT88DPw16vYrW28Y7ZO22bcKpvlGJT/4v2txUANoNSCZQvPKMr2uxQnTG2OuVjZ
-         qr5Z1zW3Gv58Ao19dumUMoO7YV0c8XmmfgqmCQPcxttFWzqhRT56Hd5YIqx//As6fGAM
-         Q+br0Uu+9SnbSmTrYdG1SO+izsF9KYJei5fRD2tHqcWvcQQ4r9ANi4k7ICgrlOAvLIjs
-         7DtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710353919; x=1710958719;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RTPa6mW4skZMTVBISgv1w+QSbNBfwtAG1NsTquu+3lU=;
-        b=cUBimUCyDnkknhxs6pxv40gOTkaqlX1r4cNChKw5oyGXNNxCyIb3yLPt4gmJ2RM7aK
-         shSJKOFb/QiYAHYqWuaXyeyg7ID/dIFPdmKpARddgj/Zx4J8RdjM3ujcX4KUwMgz0vsH
-         15tNzTeTpULAt0BSwxK4FcJTzjbldtwJ5cG2msPInsvKWwPoqfpkNaaJPvwLKk04kNvZ
-         ojpb5a8ov7EZoTHyAwbig/CKKjLyQyF+uR45D4Y01sd21wTfQt9Z21A4MtQ7SJ6gmpxp
-         OvOuRGk/jW6icu2QWU7Bnbn3fwB2EvhJTFQw5YuniDgY5SNUJdi2M2dUx1XwDuK26sAH
-         8c1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUIS0rE59wK6srRwXvxlkD2dQTFbQTUdQsNyrP4rGvOd1kGqARQJ5T1LRt1qkE95dA5IrAKjX+myoXOtmTXBCYfxe4D
-X-Gm-Message-State: AOJu0YxZzn7ezVqdpgwwcwTtLSiW7X7GgpGJmTgipj+AIqbos/DzpY3O
-	oWm5QAuWXCg3qDn3fciikcb3S1WLpRzGcyoDrRkEc5eGaz39Xua838mDcpF2MA==
-X-Google-Smtp-Source: AGHT+IEmI5dfjtwpySpmP5uQqwn0Y6a1ZEgkcPqkn1FgTjPpZVuBpetb7bRagRG+eKtRIr1qMm9j7g==
-X-Received: by 2002:a17:903:11c7:b0:1dd:22ec:7b22 with SMTP id q7-20020a17090311c700b001dd22ec7b22mr19318070plh.33.1710353919264;
-        Wed, 13 Mar 2024 11:18:39 -0700 (PDT)
-Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
-        by smtp.gmail.com with ESMTPSA id m4-20020a170902db0400b001dd6ebd88b0sm6828587plx.198.2024.03.13.11.18.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 11:18:38 -0700 (PDT)
-Date: Wed, 13 Mar 2024 18:18:35 +0000
-From: Mingwei Zhang <mizhang@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Wei W Wang <wei.w.wang@intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Aaron Lewis <aaronlewis@google.com>,
-	Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Return correct value of
- IA32_PERF_CAPABILITIES for userspace after vCPU has run
-Message-ID: <ZfHt-waLl3mg0Lbx@google.com>
-References: <20240313003739.3365845-1-mizhang@google.com>
- <DS0PR11MB63731F54EA26D14CF7D6A3FDDC2A2@DS0PR11MB6373.namprd11.prod.outlook.com>
- <ZfG7SgyqTTtqF3cw@google.com>
- <CABgObfYfAS2DBaW71iUcQgua7K3VY4nz8krGYGxyBt1+7i193A@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=na9VDQvn6SxAdoQQMNjN7alHw7FIZCFxPi3096B901a5Vr3i5vCKs7vBDYdApyEUomCkoy5i3sYFYoae3L3AYFulPDMFQuJUWaszojy0mIC6IyxcyPzFk+4A/409mRldR+PKVYAxKrVYc7iqGpIUOMgpGiRzw6UpnxxyQPrMOBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jQHCEXmc; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 13 Mar 2024 12:42:39 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1710358968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Dk+nf9vh0nOvWNFnphPCv/gkG9LNigZwfhqnSK2cUmQ=;
+	b=jQHCEXmcdKpEnoJmAzzx7S4DkZ6npgZkz9+EDG59h2VMgjNuBFBiLgcwV1NE2R7OgC0+Cj
+	KTWfhUFQcnFWNNmvdw2IXL8AcJYSVF1X75rL8yZlR6w4e/ppsGqaRzCLaAuqWVuOiR9V8l
+	RQ/hqGQkwmV1rszlm0/Y6IwwDmZzmAI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Mostafa Saleh <smostafa@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] KVM: arm64: Add PSCI SYSTEM_OFF2 function for
+ hibernation
+Message-ID: <ZfIBr25V0ulNGUHN@thinky-boi>
+References: <20240312135958.727765-1-dwmw2@infradead.org>
+ <20240312135958.727765-2-dwmw2@infradead.org>
+ <ZfB5BMfLHWhQXLZY@thinky-boi>
+ <d140bb65f02d2b0e33d176beef400d9e22bebafa.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfYfAS2DBaW71iUcQgua7K3VY4nz8krGYGxyBt1+7i193A@mail.gmail.com>
+In-Reply-To: <d140bb65f02d2b0e33d176beef400d9e22bebafa.camel@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Mar 13, 2024, Paolo Bonzini wrote:
-> On Wed, Mar 13, 2024 at 3:42â€¯PM Sean Christopherson <seanjc@google.com> wrote:
-> > We discussed this whole MSRs mess at PUCK this morning.  I forgot to hit RECORD,
-> > but Paolo took notes and will post them soon.
-> >
-> > Going from memory, the plan is to:
-> >
-> >   1. Commit to, and document, that userspace must do KVM_SET_CPUID{,2} prior to
-> >      KVM_SET_MSRS.
+On Wed, Mar 13, 2024 at 12:53:45PM +0000, David Woodhouse wrote:
+> On Tue, 2024-03-12 at 08:47 -0700, Oliver Upton wrote:
+> > Hi,
+> > 
+> > On Tue, Mar 12, 2024 at 01:51:28PM +0000, David Woodhouse wrote:
+> > > From: David Woodhouse <dwmw@amazon.co.uk>
+> > > 
+> > > The PSCI v1.3 specification (alpha) adds support for a SYSTEM_OFF2 function
+> > > which is analogous to ACPI S4 state. This will allow hosting environments
+> > > to determine that a guest is hibernated rather than just powered off, and
+> > > ensure that they preserve the virtual environment appropriately to allow
+> > > the guest to resume safely (or bump the hardware_signature in the FACS to
+> > > trigger a clean reboot instead).
+> > > 
+> > > The beta version will be changed to say that PSCI_FEATURES returns a bit
+> > > mask of the supported hibernate types, which is implemented here.
+> > 
+> > Have you considered doing the PSCI implementation in userspace? The
+> > SMCCC filter [*] was added for this exact purpose. 
+> > 
 > 
-> Correct.
+> For the purpose of deprecating the in-KVM PSCI implementation and
+> reimplementing it in VMMs? So we're never going to add new features and
+> versions to the kernel PSCI?
 
-This is clear to me now. Glad to have the direction settled down.
+I'm not against the idea of adding features to the in-kernel PSCI
+implementation when it has a clear reason to live in the kernel. For
+this hypercall in particular the actual implementation lives in
+userspace, the KVM code is just boilerplate for migration / UAPI
+compatibility.
 
-> 
-> >   2. Go with roughly what I proposed in the CET thread (for unsupported MSRS,
-> >      read 0 and drop writes of '0')[*].
-> 
-> More precisely, read a sensible default value corresponding to
-> "everything disabled", which generally speaking should be 0. And
-> generally speaking, commit to:
-> - allowing host_initiated reads independent of CPUID
-> - allowing host_initiated writes of the same value that was read
-> - blocking host_initiated writes of nonzero (or nondefault) values if
-> the corresponding guest CPUID bit is clear
+> If that's the case then I suppose I can send the patch to clearly
+> document the in-KVM PSCI as deprecated, and do it that way.
 
->
-> Right now some MSRs do not allow host initiated writes, for example
-> MSR_KVM_* (check for calls to guest_pv_has), and the VMX MSRs.
-> 
-> Generally speaking we want to fix them, unless it's an unholy pain
-> (for example the VMX capabilities MSRs are good candidates for pain,
-> because they have some "must be 1" bits in bits 63:32).
-> 
-> All this should be covered by selftests.
-> 
-> >   3. Add a quire for PERF_CAPABILITIES, ARCH_CAPABILITIES, and PLATFORM_INFO
-> >      (if quirk==enabled, keep KVM's current behavior; if quirk==disabled, zero-
-> >       initialize the MSRs).
-> 
-> More precisely, even if quirk==enabled we will move the setting of a
-> non-zero default value for the MSR from vCPU creation to
-> KVM_SET_CPUID2, and only set a non-zero default value if the CPUID bit
-> is set.
-> 
-> Another small thing in my notes was to look at the duplication between
-> emulated_msrs and msr_based_features_all_except_vmx. Right now
-> MSR_AMD64_DE_CFG is the only one that is not in both and, probably not
-> a coincidence, it's also the only one implemented only for one vendor.
-> There's probably some opportunity for both cleanups and fixes. It
-> looks like svm_has_emulated_msr(MSR_AMD64_DE_CFG) should return true
-> for example.
-> 
-> Paolo
-> 
+There probably isn't an awful lot to be gained from documenting the UAPI
+as deprecated, we will never actually get to delete it.
 
-Ack. Thanks.
+> But to answer your question directly, no I hadn't considered that. I
+> was just following the existing precedent of adding new optional PSCI
+> features like SYSTEM_RESET2.
 
-> > With those pieces in place, KVM can simply check X86_FEATURE_PDCM for both reads
-> > and writes to PERF_CAPABILITIES, and the common userspace MSR handling will
-> > convert "unsupported" to "success" as appropriate.
-> >
-> > [*] https://lore.kernel.org/all/ZfDdS8rtVtyEr0UR@google.com
-> 
+Understandable. And the infrastructure I'm recommending didn't exist
+around the time of THE SYSTEM_RESET2 addition.
+
+> I didn't think that the addition of SYSTEM_OFF2 in precisely the same
+> fashion would be the straw that broke the camel's back, and pushed us
+> to reimplement it in userspace instead.
+
+I do not believe using the SMCCC filter to take SYSTEM_OFF2 to userspace
+would necessitate a _full_ userspace reimplementation. You're free to
+leave the default handler in place for functions you don't care about.
+Forwarding PSCI_VERSION, PSCI_FEATURES, and SYSTEM_OFF2 would be sufficient
+to get this off the ground, and the VMM can still advertise the rest of
+the hypercalls implemented by KVM.
+
+That might get you where you want to go a bit faster, since it'd avoid
+any concerns about implementing a draft ABI in the kernel.
+
+-- 
+Thanks,
+Oliver
 
