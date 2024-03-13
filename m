@@ -1,157 +1,238 @@
-Return-Path: <kvm+bounces-11727-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11728-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D95D887A7D0
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 13:53:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D97A87A7DC
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 13:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 083481C20D9C
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 12:53:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15CAD1F243AD
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 12:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441E840BF5;
-	Wed, 13 Mar 2024 12:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA283FE54;
+	Wed, 13 Mar 2024 12:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="D9qsVO4T"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cK+N2M9q"
 X-Original-To: kvm@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67EF63D9E;
-	Wed, 13 Mar 2024 12:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4B947784;
+	Wed, 13 Mar 2024 12:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710334415; cv=none; b=r98zRarGeZEBi+8cfhZ6lpSMA06T+Qyj63g15PJeVS/wN1asaqfe0NA2DNZOKQKHKN0i0zV8YaWoJI8IWNSLLGB3HNNamSv86I87hkeXTVLJyjLVKNv81SjYJ5tNSFbdyvnJsDvgDVIB+N19Pl6WzvmHO1n5Db+kdLBhQMNOEak=
+	t=1710334435; cv=none; b=haUqDbglT3r0pu60TbIiGjA/I+r7e+7jKPEE+QitCyY4J1JpDM/blfyxObekn4DKv8DXs3oNasxxVvhferuovtuT8LvvVko7ifJq25hNbq3rG5Tna6WzkG11Hm09sN7YNDmh8xwMGk2kNt8rjiNDGbZPG1wFGpWAxgnRJPW7lvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710334415; c=relaxed/simple;
-	bh=JFpLv+BKn2mQz+jfIHO+FBVXuiWGmVu6uQT4zynTdI8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=pT9gJq8GlCCurtY4EXzP297NmSg306ll8I2tVTTNW+8imWej5EMRVtEDJszLfBwTiP2gB59O2rkA+zQu08UTAGoHkl0kAjh9xrcvPQo4tKJv9aYtKJS9oI4fxzfWWZK7pcEbyrWDvGZsx600C5VRWgWsR1dFSqx1K3enwkCbwfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=D9qsVO4T; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1710334408;
-	bh=pHJqCqZCSnBo7TibBzZr69lpF8JZp8rZX05ia5gTyLg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=D9qsVO4ToatVFVLije71EjN1eaIAzKjvSpzxBi2F2YQ9joA4cR2ieVDnB2pBRK1ht
-	 F/XSYGIaNeQo1zI0zEUEhvD2K3LFzQyh7LqA1t3Qj3UGMHprlB4GAawRGCnwJZDTs+
-	 k3hDWUTpJDIF8qKZ7NkiipUcOns0Ptf2gEqjtqTfVg0Ch+aima/HUgFGXb06DtBKtN
-	 17I6Zhnb/zuNBkN31It2/I9+EG0wRpMidcL+S2vGvFbczHWxFKfUcR48ehYUE0gxpE
-	 xosPYMCgOtX52oRISDqS4pPV1m6NjnssSkTJXeNaBC5ed3YBDE9cFYrLa7F1hy6G3u
-	 UGnq4+s6xFPUw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Tvr6D64K6z4wqM;
-	Wed, 13 Mar 2024 23:53:24 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>,
- tpearson@raptorengineering.com, alex.williamson@redhat.com,
- linuxppc-dev@lists.ozlabs.org
-Cc: npiggin@gmail.com, christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
- naveen.n.rao@linux.ibm.com, gbatra@linux.vnet.ibm.com,
- brking@linux.vnet.ibm.com, sbhat@linux.ibm.com, aik@ozlabs.ru,
- jgg@ziepe.ca, robh@kernel.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, aik@amd.com, msuchanek@suse.de, jroedel@suse.de,
- vaibhav@linux.ibm.com, svaidy@linux.ibm.com
-Subject: Re: [RFC PATCH 3/3] pseries/iommu: Enable DDW for VFIO TCE create
-In-Reply-To: <171026728072.8367.13581504605624115205.stgit@linux.ibm.com>
-References: <171026724548.8367.8321359354119254395.stgit@linux.ibm.com>
- <171026728072.8367.13581504605624115205.stgit@linux.ibm.com>
-Date: Wed, 13 Mar 2024 23:53:21 +1100
-Message-ID: <87zfv22szi.fsf@mail.lhotse>
+	s=arc-20240116; t=1710334435; c=relaxed/simple;
+	bh=2bkWqeBjdMH1Pf6rhubjFFeWLFL+x7SMasA5oLGOids=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=b9IFKewjFs0YR3O8wguyzJeHCTgM4flOG5QGIJbjtczAX194fQEjQQN4ApRfg1aq29JrBC/sDDPH1b5X6HXqx/mf14q+A3jb1PbqnAhef3pusW2ux5MPF9Urc4o3ZLHWNf0/SzHuEsNwHyHNGgNx3ISrf384LJGZqFeaxnuoxbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=cK+N2M9q; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=2bkWqeBjdMH1Pf6rhubjFFeWLFL+x7SMasA5oLGOids=; b=cK+N2M9qYUkiVAtBg2+PVt7Ffs
+	DklTnRhTbIxJlBqis+Ip7j6c6DDfHsY9Hp/ng9wLpirhFWFFm1INvpwpDWrWqj22ilmKqhHPgx180
+	Bq91Cs2L2PQ/XzXivxSbTHCWd4LP1reC9lFGd/iC8ev1PKUMohyY+6KE4+cq15Y/mEoDgNy8HdF4j
+	n2cRgtzUQBNHSVboc7OXLzaWsBV+Eml82B31tJ16SqGcM/PCABoQ+3pu5iPsq1B8PyDS/CEpMArF6
+	jzkMrst8jmITewHbnFWMjD3UKPilw+CNQRb3d2kSwcgEAp7k+3XffIdkds1i3oitjfKNLl5D2aN01
+	n2T1WZpg==;
+Received: from [2001:8b0:10b:5:4f46:ad9a:6045:e619] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rkO77-00000005QBu-3Jbe;
+	Wed, 13 Mar 2024 12:53:45 +0000
+Message-ID: <d140bb65f02d2b0e33d176beef400d9e22bebafa.camel@infradead.org>
+Subject: Re: [RFC PATCH 1/2] KVM: arm64: Add PSCI SYSTEM_OFF2 function for
+ hibernation
+From: David Woodhouse <dwmw2@infradead.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Paolo Bonzini
+ <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier
+ <maz@kernel.org>, James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Catalin
+ Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark
+ Rutland <mark.rutland@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <len.brown@intel.com>,
+ Pavel Machek <pavel@ucw.cz>, Mostafa Saleh <smostafa@google.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org
+Date: Wed, 13 Mar 2024 12:53:45 +0000
+In-Reply-To: <ZfB5BMfLHWhQXLZY@thinky-boi>
+References: <20240312135958.727765-1-dwmw2@infradead.org>
+	 <20240312135958.727765-2-dwmw2@infradead.org> <ZfB5BMfLHWhQXLZY@thinky-boi>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-0ta80y/i/t7SPSDn5TDI"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-
-Hi Shivaprasad,
-
-Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
-> The commit 9d67c9433509 ("powerpc/iommu: Add \"borrowing\"
-> iommu_table_group_ops") implemented the "borrow" mechanism for
-> the pSeries SPAPR TCE. It did implement this support partially
-> that it left out creating the DDW if not present already.
->
-> The patch here attempts to fix the missing gaps.
->  - Expose the DDW info to user by collecting it during probe.
->  - Create the window and the iommu table if not present during
->    VFIO_SPAPR_TCE_CREATE.
->  - Remove and recreate the window if the pageshift and window sizes
->    do not match.
->  - Restore the original window in enable_ddw() if the user had
->    created/modified the DDW. As there is preference for DIRECT mapping
->    on the host driver side, the user created window is removed.
->
-> The changes work only for the non-SRIOV-VF scenarios for PEs having
-> 2 DMA windows.
-
-This crashes on powernv.
-
-Full log at https://github.com/linuxppc/linux-snowpatch/actions/runs/8253875566/job/22577897225.
-
-[    0.958561][    T1] pci_bus 0002:01: Configuring PE for bus
-[    0.959699][    T1] pci 0002:01     : [PE# fd] Secondary bus 0x0000000000000001 associated with PE#fd
-[    0.961692][    T1] pci 0002:01:00.0: Configured PE#fd
-[    0.962424][    T1] pci 0002:01     : [PE# fd] Setting up 32-bit TCE table at 0..80000000
-[    0.966424][    T1] IOMMU table initialized, virtual merging enabled
-[    0.967544][    T1] pci 0002:01     : [PE# fd] Setting up window#0 0..ffffffff pg=10000
-[    0.969362][    T1] pci 0002:01     : [PE# fd] Enabling 64-bit DMA bypass
-[    0.971386][    T1] pci 0002:01:00.0: Adding to iommu group 0
-[    0.973481][    T1] BUG: Unable to handle kernel instruction fetch (NULL pointer?)
-[    0.974388][    T1] Faulting instruction address: 0x00000000
-[    0.975578][    T1] Oops: Kernel access of bad area, sig: 11 [#1]
-[    0.976476][    T1] LE PAGE_SIZE=64K MMU=Hash SMP ERROR: Error: saw oops/warning etc. while expecting NR_CPUS=2048 NUMA PowerNV
-[    0.977777][    T1] Modules linked in:
-[    0.978570][    T1] CPU: 1 PID: 1 Comm: swapper/1 Not tainted 6.8.0-rc6-g80dcb4e6d0aa #1
-[    0.979766][    T1] Hardware name: IBM PowerNV (emulated by qemu) POWER8 0x4d0200 opal:v6.8-104-g820d43c0 PowerNV
-[    0.981197][    T1] NIP:  0000000000000000 LR: c00000000005653c CTR: 0000000000000000
-[    0.982221][    T1] REGS: c000000003687420 TRAP: 0480   Not tainted  (6.8.0-rc6-g80dcb4e6d0aa)
-[    0.983400][    T1] MSR:  9000000000009033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 44004422  XER: 00000000
-[    0.984742][    T1] CFAR: c000000000056538 IRQMASK: 0 
-[    0.984742][    T1] GPR00: c000000000056520 c0000000036876c0 c0000000015b9800 c00000000363ae58 
-[    0.984742][    T1] GPR04: c00000000352f0a0 c0000000026d4748 0000000000000001 0000000000000000 
-[    0.984742][    T1] GPR08: 0000000000000000 c000000002716668 0000000000000003 0000000000008000 
-[    0.984742][    T1] GPR12: 0000000000000000 c000000002be0000 c0000000000110cc 0000000000000000 
-[    0.984742][    T1] GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
-[    0.984742][    T1] GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000001 
-[    0.984742][    T1] GPR24: c0000000014681d8 0000000000000000 c000000003068a00 0000000000000001 
-[    0.984742][    T1] GPR28: c000000003068a00 0000000000000000 c00000000363ae58 c00000000352f0a0 
-[    0.994647][    T1] NIP [0000000000000000] 0x0
-[    0.995699][    T1] LR [c00000000005653c] spapr_tce_platform_iommu_attach_dev+0x74/0xc8
-[    0.997399][    T1] Call Trace:
-[    0.997897][    T1] [c0000000036876c0] [c000000000056514] spapr_tce_platform_iommu_attach_dev+0x4c/0xc8 (unreliable)
-[    0.999383][    T1] [c000000003687700] [c000000000b383dc] __iommu_attach_device+0x44/0xfc
-[    1.000476][    T1] [c000000003687730] [c000000000b38574] __iommu_device_set_domain+0xe0/0x170
-[    1.001728][    T1] [c0000000036877c0] [c000000000b3869c] __iommu_group_set_domain_internal+0x98/0x1c0
-[    1.003014][    T1] [c000000003687820] [c000000000b3bb10] iommu_setup_default_domain+0x544/0x650
-[    1.004306][    T1] [c0000000036878e0] [c000000000b3d3b4] __iommu_probe_device+0x5b0/0x604
-[    1.005500][    T1] [c000000003687950] [c000000000b3d454] iommu_probe_device+0x4c/0xb0
-[    1.006563][    T1] [c000000003687990] [c00000000005648c] iommu_add_device+0x3c/0x78
-[    1.007590][    T1] [c0000000036879b0] [c0000000000db920] pnv_pci_ioda_dma_dev_setup+0x168/0x73c
-[    1.008918][    T1] [c000000003687a60] [c0000000000729f4] pcibios_bus_add_device+0x80/0x328
-[    1.010077][    T1] [c000000003687ac0] [c000000000a49fa0] pci_bus_add_device+0x30/0x11c
-[    1.011169][    T1] [c000000003687b30] [c000000000a4a0e4] pci_bus_add_devices+0x58/0xb4
-[    1.012230][    T1] [c000000003687b70] [c000000000a4a118] pci_bus_add_devices+0x8c/0xb4
-[    1.013301][    T1] [c000000003687bb0] [c00000000201a3c8] pcibios_init+0xd8/0x140
-[    1.014314][    T1] [c000000003687c30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-[    1.015349][    T1] [c000000003687d00] [c000000002005b0c] kernel_init_freeable+0x31c/0x510
-[    1.016470][    T1] [c000000003687de0] [c0000000000110f8] kernel_init+0x34/0x25c
-[    1.017527][    T1] [c000000003687e50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x1c
-[    1.018778][    T1] --- interrupt: 0 at 0x0
-[    1.019525][    T1] Code: XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX 
-[    1.022234][    T1] ---[ end trace 0000000000000000 ]---
-[    1.022983][    T1] 
-[    2.023819][    T1] note: swapper/1[1] exited with irqs disabled
-[    2.025051][    T1] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
-[    2.027371][    T1] Rebooting in 10 seconds.
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
-cheers
+--=-0ta80y/i/t7SPSDn5TDI
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, 2024-03-12 at 08:47 -0700, Oliver Upton wrote:
+> Hi,
+>=20
+> On Tue, Mar 12, 2024 at 01:51:28PM +0000, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > The PSCI v1.3 specification (alpha) adds support for a SYSTEM_OFF2 func=
+tion
+> > which is analogous to ACPI S4 state. This will allow hosting environmen=
+ts
+> > to determine that a guest is hibernated rather than just powered off, a=
+nd
+> > ensure that they preserve the virtual environment appropriately to allo=
+w
+> > the guest to resume safely (or bump the hardware_signature in the FACS =
+to
+> > trigger a clean reboot instead).
+> >=20
+> > The beta version will be changed to say that PSCI_FEATURES returns a bi=
+t
+> > mask of the supported hibernate types, which is implemented here.
+>=20
+> Have you considered doing the PSCI implementation in userspace? The
+> SMCCC filter [*] was added for this exact purpose.=C2=A0
+>=20
+
+For the purpose of deprecating the in-KVM PSCI implementation and
+reimplementing it in VMMs? So we're never going to add new features and
+versions to the kernel PSCI?
+
+If that's the case then I suppose I can send the patch to clearly
+document the in-KVM PSCI as deprecated, and do it that way.
+
+But to answer your question directly, no I hadn't considered that. I
+was just following the existing precedent of adding new optional PSCI
+features like SYSTEM_RESET2.
+
+I didn't think that the addition of SYSTEM_OFF2 in precisely the same
+fashion would be the straw that broke the camel's back, and pushed us
+to reimplement it in userspace instead.
+
+--=-0ta80y/i/t7SPSDn5TDI
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzEzMTI1MzQ1WjAvBgkqhkiG9w0BCQQxIgQgC4mmOD4h
+5g+iELLwQzIi9/IOjwqhas5H08euhI5YemAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCSgYS9ztXhCO7aY/WmGf+wdP6RJG1fDoUM
+NDECDUn9uFGDMOl46d4W2awx7TAjHEatPFHluJ6Ko0iN/72v29R0Kr/Ndint+c44WHANBA7DAlgY
+RK7o7I8/ksLGRjPxVuuL+f8z16wQk3F6z98xCRwkcHkKX5Q48qsXQ1ZfOcfAbghXWGecauQCkw/v
+XzQjhDPVWGQUmhogpS57+eCeF08Fu6LitYoDO7mPW5hTosrYwQsmuI3h2fasWYvC+Mek+c74Kz2C
+8CSw9quPm3iHpcxpwUavMxlSpVNZGF4ZVjglub8v8HWCW6hFHiuK5Svh+GLl0ezUacXQC6LXAa50
+NjYC1geanJ8sXhE8qSF/V2qQFHSsnpGk6WgcpuJOLFtoPgpKKJu671GAlPzhEhfQVwkBm4mtCLcY
+Q6txW/kcEE/y6/yIvg5o5o5H6Ifwik9574yHfK+LPGQq2ILXZUDzL3sbPgxB8AU8jxnzHh8wJg3+
+DwZfoeG+CWeFT81qneTKTvSDIediaGZi91vynsrBK4PsGoK3cuo6fV+53NS/Ts3eULybuuwgqtVE
+7pATsUomRX4k3YGzLIXrvRvtStFWA3jhmsZy1Lc3v6DZhVFrATCUqONqKx69T5mRIJOdCqnOjlZq
+Brk0KOhPDuIIC3mt5XCNQFXUPW1j04Rz6vxDi0/0rwAAAAAAAA==
+
+
+--=-0ta80y/i/t7SPSDn5TDI--
 
