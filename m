@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-11730-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11731-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FD8487A7F2
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 13:59:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC28587A7F3
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 13:59:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B1A8283801
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 12:59:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 262C01F2451B
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 12:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4850D433B3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1AE43AA4;
 	Wed, 13 Mar 2024 12:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XOVIoRJk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YmeZ0Kpu"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01304405E6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114F24085A
 	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 12:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710334734; cv=none; b=pne0Ga1qPkee1cMlXvYeP6MepRWzCz9MhuLWRlNmAxW/uLORKWah+bHndag6pdr9K8ZbnBwTtgfSTng9QJzq5Q0vb/wwek5PdkcWot6X2DGaj19w+kKUvOxs4a2GqvMEKa984TxeQ3wfCTKmkbeOgoreX/JZoWsEq04i0nXSvqQ=
+	t=1710334734; cv=none; b=jTuYHDn+Afa1ME4UU2vxbalYRVmik1n5smlhyAzDS5G0nxkze40hV7VWEJJgU13gSA9x2f8CnkyCufIrLmVjwC8J0DqXAM0KBZ7A8uDdD2kYWrRBCLwgWd28Ih429BnoyyaYFa1DgFDlHGI0+OVPBVLrCnssLQnOZq3coh+N+7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710334734; c=relaxed/simple;
-	bh=bSFQ6x++qyOcoKzfit8hgsY3myR8zf21zdavtZSurFc=;
+	bh=ds4LSmLFzqZm3/IqgZJ/IqJDdOGemJpXab4dvBlKsic=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B5IgBJmXo/6my1CtS5fYbfWshK39RWfBLPq6WxQ9XpHAGz2pxkQeUd/PmTo63tAX0oN2OSx2vRmfzmE7VF/SaTGdTgO+HqeGg2gmW+ogZ9QDP4ExD6oYMw50DuhND+qlMGh6XdVMeKsI3w9AwQDwQ5KWFJEf3k4s08xkdIVLtRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XOVIoRJk; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=p+fECPoDKiUBglOKXKdL+3FcS8YfJwwyS4A4lNTVd3BFHj7YcuUpevhOUXsSgzNGwhzUR9e4hsRIGYLhogBdn1bPoNOo4Q83cWUsS5Eg2WGlcQfGMv37CGsU0dgXc+IrZwxj32rT7PnaeFpXjMZvO7K6zMGOjheUWE5l25Z2g8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YmeZ0Kpu; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -37,26 +37,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JbI1Q06i15zBNLDlBPV6XMPyx/dQKcp3tORlZ+sJxOA=;
-	b=XOVIoRJkDvTwU4EttGS3kP3N4rWAZptZKWAUiIidKUZ5wAI5/PVG9jMdkbieWv2rDOrCHZ
-	OsLC9UZLefz9dSjJZQo+k0gkxwo8vF1Xf/U3mu/LcxpX/3DekOHT7aFABWP5JjcpuFtiIU
-	uHwta0u+bWITVC8gqwmA0n/k8TBbX9M=
+	bh=20mUBcwllGx12FWQlFMvjVnIzYpvKcCQQXjfzRSGeyc=;
+	b=YmeZ0KpudNm3KfNxv2Co8TGvC4LrRVvahIAAbgc3MGdNhiVw6FxL0mpOLF46oAGvOU0d67
+	SQ0iMc4ZFyxvI4yoZxY7uymJHCkCkH5nV1rdDapTbUAmcYIMYG3VUX9uErh8rp6JD8y/bN
+	Ql/Fc+/8Bk5eFkvo8vMR600/An6GDAc=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-505-JLbUjwwnNaKfpbgL-Pza5w-1; Wed, 13 Mar 2024 08:58:47 -0400
-X-MC-Unique: JLbUjwwnNaKfpbgL-Pza5w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-569-WnNgWH4XPSq_E3eQvcBrng-1; Wed, 13 Mar 2024 08:58:48 -0400
+X-MC-Unique: WnNgWH4XPSq_E3eQvcBrng-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5BDE3101A5B3;
-	Wed, 13 Mar 2024 12:58:46 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D0F1F80026F;
+	Wed, 13 Mar 2024 12:58:47 +0000 (UTC)
 Received: from sirius.home.kraxel.org (unknown [10.39.192.160])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BEA831C060A4;
-	Wed, 13 Mar 2024 12:58:45 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EB6340C6CB1;
+	Wed, 13 Mar 2024 12:58:47 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id CBFCC1800D6A; Wed, 13 Mar 2024 13:58:44 +0100 (CET)
+	id 262681801494; Wed, 13 Mar 2024 13:58:45 +0100 (CET)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: kvm@vger.kernel.org
 Cc: Tom Lendacky <thomas.lendacky@amd.com>,
@@ -71,9 +71,9 @@ Cc: Tom Lendacky <thomas.lendacky@amd.com>,
 	x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
 	"H. Peter Anvin" <hpa@zytor.com>,
 	linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND 64-BIT))
-Subject: [PATCH v4 1/2] kvm/cpuid: remove GuestPhysBits code.
-Date: Wed, 13 Mar 2024 13:58:42 +0100
-Message-ID: <20240313125844.912415-2-kraxel@redhat.com>
+Subject: [PATCH v4 2/2] kvm/cpuid: set proper GuestPhysBits in CPUID.0x80000008
+Date: Wed, 13 Mar 2024 13:58:43 +0100
+Message-ID: <20240313125844.912415-3-kraxel@redhat.com>
 In-Reply-To: <20240313125844.912415-1-kraxel@redhat.com>
 References: <20240313125844.912415-1-kraxel@redhat.com>
 Precedence: bulk
@@ -83,60 +83,120 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-GuestPhysBits (cpuid leaf 80000008, eax[23:16]) is intended for software
-use.  Physical CPUs do not set that field.  The current code which
-propagates the host's GuestPhysBits to the guest's PhysBits does not
-make sense.  Remove it.
+The AMD APM (3.35) defines GuestPhysBits (EAX[23:16]) as:
+
+  Maximum guest physical address size in bits.  This number applies
+  only to guests using nested paging.  When this field is zero, refer
+  to the PhysAddrSize field for the maximum guest physical address size.
+
+Tom Lendacky confirmed that the purpose of GuestPhysBits is software use
+and KVM can use it as described below.  Hardware always returns zero
+here.
+
+Use the GuestPhysBits field to communicate the max addressable GPA to
+the guest.  Typically this is identical to the max effective GPA, except
+in case the CPU supports MAXPHYADDR > 48 but does not support 5-level
+TDP.
+
+GuestPhysBits is set only in case TDP is enabled, otherwise it is left
+at zero.
+
+GuestPhysBits will be used by the guest firmware to make sure resources
+like PCI bars are mapped into the addressable GPA.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- arch/x86/kvm/cpuid.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ arch/x86/kvm/mmu.h     |  2 ++
+ arch/x86/kvm/cpuid.c   | 28 +++++++++++++++++++++++++---
+ arch/x86/kvm/mmu/mmu.c |  5 +++++
+ 3 files changed, 32 insertions(+), 3 deletions(-)
 
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 60f21bb4c27b..b410a227c601 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -100,6 +100,8 @@ static inline u8 kvm_get_shadow_phys_bits(void)
+ 	return boot_cpu_data.x86_phys_bits;
+ }
+ 
++u8 kvm_mmu_get_max_tdp_level(void);
++
+ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask);
+ void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
+ void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index adba49afb5fe..3235254724cf 100644
+index 3235254724cf..b54a85d7387e 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -1221,9 +1221,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+@@ -1221,8 +1221,22 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
  		entry->eax = entry->ebx = entry->ecx = 0;
  		break;
  	case 0x80000008: {
--		unsigned g_phys_as = (entry->eax >> 16) & 0xff;
--		unsigned virt_as = max((entry->eax >> 8) & 0xff, 48U);
--		unsigned phys_as = entry->eax & 0xff;
-+		unsigned int virt_as = max((entry->eax >> 8) & 0xff, 48U);
-+		unsigned int phys_as;
++		/*
++		 * GuestPhysAddrSize (EAX[23:16]) is intended for software
++		 * use.
++		 *
++		 * KVM's ABI is to report the effective MAXPHYADDR for the
++		 * guest in PhysAddrSize (phys_as), and the maximum
++		 * *addressable* GPA in GuestPhysAddrSize (g_phys_as).
++		 *
++		 * GuestPhysAddrSize is valid if and only if TDP is enabled,
++		 * in which case the max GPA that can be addressed by KVM may
++		 * be less than the max GPA that can be legally generated by
++		 * the guest, e.g. if MAXPHYADDR>48 but the CPU doesn't
++		 * support 5-level TDP.
++		 */
+ 		unsigned int virt_as = max((entry->eax >> 8) & 0xff, 48U);
+-		unsigned int phys_as;
++		unsigned int phys_as, g_phys_as;
  
  		/*
  		 * If TDP (NPT) is disabled use the adjusted host MAXPHYADDR as
-@@ -1231,16 +1230,16 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		 * reductions in MAXPHYADDR for memory encryption affect shadow
+@@ -1231,15 +1245,23 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
  		 * paging, too.
  		 *
--		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
--		 * provided, use the raw bare metal MAXPHYADDR as reductions to
--		 * the HPAs do not affect GPAs.
-+		 * If TDP is enabled, use the raw bare metal MAXPHYADDR as
-+		 * reductions to the HPAs do not affect GPAs.
+ 		 * If TDP is enabled, use the raw bare metal MAXPHYADDR as
+-		 * reductions to the HPAs do not affect GPAs.
++		 * reductions to the HPAs do not affect GPAs.  The max
++		 * addressable GPA is the same as the max effective GPA, except
++		 * that it's capped at 48 bits if 5-level TDP isn't supported
++		 * (hardware processes bits 51:48 only when walking the fifth
++		 * level page table).
  		 */
--		if (!tdp_enabled)
--			g_phys_as = boot_cpu_data.x86_phys_bits;
--		else if (!g_phys_as)
--			g_phys_as = phys_as;
-+		if (!tdp_enabled) {
-+			phys_as = boot_cpu_data.x86_phys_bits;
-+		} else {
-+			phys_as = entry->eax & 0xff;
-+		}
+ 		if (!tdp_enabled) {
+ 			phys_as = boot_cpu_data.x86_phys_bits;
++			g_phys_as = 0;
+ 		} else {
+ 			phys_as = entry->eax & 0xff;
++			g_phys_as = phys_as;
++			if (kvm_mmu_get_max_tdp_level() < 5)
++				g_phys_as = min(g_phys_as, 48);
+ 		}
  
--		entry->eax = g_phys_as | (virt_as << 8);
-+		entry->eax = phys_as | (virt_as << 8);
+-		entry->eax = phys_as | (virt_as << 8);
++		entry->eax = phys_as | (virt_as << 8) | (g_phys_as << 16);
  		entry->ecx &= ~(GENMASK(31, 16) | GENMASK(11, 8));
  		entry->edx = 0;
  		cpuid_entry_override(entry, CPUID_8000_0008_EBX);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 2b515acd8e72..74b9d0354bff 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5309,6 +5309,11 @@ static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
+ 	return max_tdp_level;
+ }
+ 
++u8 kvm_mmu_get_max_tdp_level(void)
++{
++	return tdp_root_level ? tdp_root_level : max_tdp_level;
++}
++
+ static union kvm_mmu_page_role
+ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
+ 				union kvm_cpu_role cpu_role)
 -- 
 2.44.0
 
