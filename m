@@ -1,145 +1,142 @@
-Return-Path: <kvm+bounces-11746-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11747-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A489587AA67
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 16:30:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC37E87AA74
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 16:32:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB4431C227AE
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 15:30:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78245B23F96
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 15:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB3A47A79;
-	Wed, 13 Mar 2024 15:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B2D47773;
+	Wed, 13 Mar 2024 15:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XGVxzUqE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G9Kve0Jy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1359147A52;
-	Wed, 13 Mar 2024 15:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB906FCC
+	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 15:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710343819; cv=none; b=iJctAn97m99WGnZFczDsElljdVpzUkZNG/TVUq99i47fiASRCtQER4MQWIpdtANTpRKr2dQekuycoNIMVWq4+pJef1mHjARgjyaYw87xnyojvvco6KDiLGzuLG6CcQuNfI03886/gpR3fQmJAKQqtQAfvQL0ZMvNYQZCjN90Hz0=
+	t=1710343918; cv=none; b=eHnSkh0gvV2DugZeNpQhs70rHSUYMaokW87L29Vf6nzw+l9Qvhj+aANuVOlt53/VvQ9DNGdOq7NE72bwmQWeFks6sJRzTzKJxaGFcLFJ/BN7wFKYCqenN7EvQFSm5tpgxgqxGM4g3OFWvtwAFwVfpXkiZO1k3Lt1WEDm5MxCuVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710343819; c=relaxed/simple;
-	bh=6YkpdduqF4HnEdxpbqFhxmHLrelbL/HBKCE3WIC3SQE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iGiMVzgr+quc+YyY4WH3P0P+PqNnY6fYHgtEXWmqaeohChPoMnl+KQIUPmE9lL68+TpGNS6WSsux4++Fnql/i18t78c4iK2i2J9Pnu0UJE+t4eU5YO1LUiF0actSaEgW2+MEd0NdXQA8PwFw7+lFNX3j920sqQXa2TTfZG7b8Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XGVxzUqE; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710343818; x=1741879818;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6YkpdduqF4HnEdxpbqFhxmHLrelbL/HBKCE3WIC3SQE=;
-  b=XGVxzUqE/ZMTl+vm4Eqxr0yqDFyC2T12AmD9mCLJYdJr84TIMHMRdwZg
-   wxx3B3kckp1De890W19mumDadkJVcSCiSboNUJ/juE7HuA7tjxbD5KB72
-   ojv79Xm2WPzh9oaT6BdwQq/O3pQIJP8nHz9xVVMSOh8fYI4Sh3KA1dLrf
-   GN/pbSC/gdgcg46+cAjUjeQTK+gutC5dZfR5rw11nFIxpOMqnzzjidYeb
-   Ms7aJgBbi4R6QXKsHte6pK/o78sQHrPLlh2Vvef5wVYu0SMnLcabmooR3
-   D6agQN+ML5gMKZPIkgujpWNvvZgNiFrGeXdXJNwMKQf33vX+rona0/Gri
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="27595144"
-X-IronPort-AV: E=Sophos;i="6.07,122,1708416000"; 
-   d="scan'208";a="27595144"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 08:30:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,122,1708416000"; 
-   d="scan'208";a="12532232"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.236.140]) ([10.124.236.140])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 08:30:14 -0700
-Message-ID: <c6279239-fb9c-41ca-a628-c0dd1e8c08a3@linux.intel.com>
-Date: Wed, 13 Mar 2024 23:30:11 +0800
+	s=arc-20240116; t=1710343918; c=relaxed/simple;
+	bh=8k4XRxeEeUFzks0oqLF2nkQgczOhu68aYm2cAA6bQ4c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rE9pQo4QLjsHCmnpGhZoUaf3V+Zt3i4VNPK4BIt9uL3daSp6CkSJK0k52uowimj5VgGQqZipSXMK2OWmRXZYLZBbkruD/BXlvjDS9vxDgiEWcKvbGLdpRE2naNVJCBVegsVVt2XyP56eHr4nIaxqvEM0LOE2dg6hGaaRWCDqKVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G9Kve0Jy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710343915;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=au0OWjWNaokB43YBD2j+M+et/AQDW8g5T4BuX7AN+yo=;
+	b=G9Kve0JyfBKc9CeOt0W9HKeWWpQLSVHSJ2tGMGXJZLs59TrSv8iStXDtH1haJcIPgTRoaT
+	JRvJk+uwdjW5M5Wf06nmdp1J1PinSOs/+zXpsZk4EzkE+nvmGZeqIHw6FwhNeWBPZMXcjY
+	srnph8cPf9Na1WAcTP7fUzrI73E26hQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-Mjx8gAxQPiabJp0QGzZ0Rw-1; Wed, 13 Mar 2024 11:31:49 -0400
+X-MC-Unique: Mjx8gAxQPiabJp0QGzZ0Rw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3A9FA8FA22B;
+	Wed, 13 Mar 2024 15:31:48 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.47])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 63109492BD0;
+	Wed, 13 Mar 2024 15:31:38 +0000 (UTC)
+Date: Wed, 13 Mar 2024 15:31:36 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+	qemu-devel@nongnu.org, Michael Roth <michael.roth@amd.com>,
+	Claudio Fontana <cfontana@suse.de>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v5 49/65] i386/tdx: handle TDG.VP.VMCALL<GetQuote>
+Message-ID: <ZfHG2DHqf_cnq5tk@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240229063726.610065-1-xiaoyao.li@intel.com>
+ <20240229063726.610065-50-xiaoyao.li@intel.com>
+ <Ze7Ojzty99AbShE3@redhat.com>
+ <0f5e1559-bd65-4f3b-bd7a-b166f53dce38@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 021/130] KVM: x86/vmx: initialize loaded_vmcss_on_cpu
- in vmx_init()
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- Yuan Yao <yuan.yao@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <c1b7f0e5c2476f9f565acda5c1e746b8d181499b.1708933498.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <c1b7f0e5c2476f9f565acda5c1e746b8d181499b.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0f5e1559-bd65-4f3b-bd7a-b166f53dce38@intel.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
+On Tue, Mar 12, 2024 at 03:44:32PM +0800, Xiaoyao Li wrote:
+> On 3/11/2024 5:27 PM, Daniel P. Berrangé wrote:
+> > On Thu, Feb 29, 2024 at 01:37:10AM -0500, Xiaoyao Li wrote:
+> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > 
+> > > Add property "quote-generation-socket" to tdx-guest, which is a property
+> > > of type SocketAddress to specify Quote Generation Service(QGS).
+> > > 
+> > > On request of GetQuote, it connects to the QGS socket, read request
+> > > data from shared guest memory, send the request data to the QGS,
+> > > and store the response into shared guest memory, at last notify
+> > > TD guest by interrupt.
+> > > 
+> > > command line example:
+> > >    qemu-system-x86_64 \
+> > >      -object '{"qom-type":"tdx-guest","id":"tdx0","quote-generation-socket":{"type": "vsock", "cid":"1","port":"1234"}}' \
+> > 
+> > Can you illustrate this with 'unix' sockets, not 'vsock'.
+> 
+> Are you suggesting only updating the commit message to an example of unix
+> socket? Or you want the code to test with some unix socket QGS?
+> 
+> (It seems the QGS I got for testing, only supports vsock socket. Because at
+> the time when it got developed, it was supposed to communicate with drivers
+> inside TD guest directly not via VMM (KVM+QEMU). Anyway, I will talk to
+> internal folks to see if any plan to support unix socket.)
 
+The QGS provided as part of DCAP supports running with both
+UNIX sockets and VSOCK, and I would expect QEMU to be made
+to work with this, since its is Intel's OSS reference impl.
 
-On 2/26/2024 4:25 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> vmx_hardware_disable() accesses loaded_vmcss_on_cpu via
-> hardware_disable_all().  To allow hardware_enable/disable_all() before
-> kvm_init(), initialize it in before kvm_x86_vendor_init() in vmx_init()
-> so that tdx module initialization, hardware_setup method, can reference
-> the variable.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+Exposing QGS to the guest when we only intend for it to be
+used by the host QEMU is needlessly expanding the attack
+surface.
 
-The shortlog should be this?
-KVM: VMX: Initialize loaded_vmcss_on_cpu in vmx_init()
-
-Others,
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-
->
-> ---
-> v19:
-> - Fix the subject to match the patch by Yuan
->
-> v18:
-> - Move the vmcss_on_cpu initialization from vmx_hardware_setup() to
->    early point of vmx_init() by Binbin
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/kvm/vmx/vmx.c | 9 +++++----
->   1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 434f5aaef030..8af0668e4dca 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -8539,6 +8539,10 @@ static int __init vmx_init(void)
->   	 */
->   	hv_init_evmcs();
->   
-> +	/* vmx_hardware_disable() accesses loaded_vmcss_on_cpu. */
-> +	for_each_possible_cpu(cpu)
-> +		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-> +
->   	r = kvm_x86_vendor_init(&vt_init_ops);
->   	if (r)
->   		return r;
-> @@ -8554,11 +8558,8 @@ static int __init vmx_init(void)
->   	if (r)
->   		goto err_l1d_flush;
->   
-> -	for_each_possible_cpu(cpu) {
-> -		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-> -
-> +	for_each_possible_cpu(cpu)
->   		pi_init_cpu(cpu);
-> -	}
->   
->   	cpu_emergency_register_virt_callback(vmx_emergency_disable);
->   
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
