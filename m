@@ -1,67 +1,66 @@
-Return-Path: <kvm+bounces-11761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7390F87B139
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 20:11:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E898687B0CC
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 20:01:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1056AB2E228
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 19:01:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3EBC28ED8D
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 19:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D38A5EE99;
-	Wed, 13 Mar 2024 18:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4AF612D1;
+	Wed, 13 Mar 2024 18:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QPByEZmy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e0CWS6P8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568B35DF2E
-	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 18:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4993460264
+	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 18:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710352943; cv=none; b=gQ8pjk+0vpqjPrFX/59BmvXVruX9Pn0QpmuEw21pERwSlgoqPJQriTizXm9bGMgeKITaAr0OoiXHj1a12UGcGcQ7fXreGwxeHDIEHzcbwH940jSYJX9xOn6APJzyOX9KrEs8VnfaTZYWeM6ln41M4m87suk/d+5IzDpHHjFPifg=
+	t=1710352951; cv=none; b=hTIxjc0na/AGlWDieY8CwK5jj/liM0Pz77YrDfUb2ydtV83JFcP9phfCb3xgL86XCF239/W69xF4LhRyqtR3eyZKZWmWRwq0rN07THjD7IB8d5xErUm0QH5Rtgm7NsLGGif6gk6gIrKZY+UnAO7gLi9ciYdwKNfOZJOYkXsM0YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710352943; c=relaxed/simple;
-	bh=s10C1zZjvwCXFycCx8SBZlUoJ+dZ4c7ymn57tEmK7hc=;
+	s=arc-20240116; t=1710352951; c=relaxed/simple;
+	bh=SmKZWZOsYB/pJ+10dsUo6FKTrviWROv7v/wIEMqhvPo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MFKMtEMMsVHW69botLELPJfAInjrHL6kf9S4rzhJx0TNzR/D3ZmI/drPMnzEQ8DiXVRra+iKqQYryI5ycvQtCppHd63qAiMDhZ5q5zyoi8nbwxfWpJc8IURqtlO+W4gu+2L8B3bcm6CSgzdmoY+iEst2IntZXI9ME501tO7pzdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QPByEZmy; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=NoOsVcl1cvurCKgejDKGhQkrMu896lp3pBLR1eAhnMv1iBh9hwwkvP4qhzYoVbAyvlJZGXVy8ODc8vwDH6EJrf3F59hRhNv2SMqqkN09+JC4vSxuDn3iUJHCu4Wncl4jG5p7xl3yLB/gFSKwop3Makv+n9mFamiiY3jjeY9jRAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e0CWS6P8; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710352941;
+	s=mimecast20190719; t=1710352949;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JXp0Mm4yGTLmvCcCdU6JXDu0ajdt7pw4zFh18lmT1BM=;
-	b=QPByEZmyPjcJ+tebuuaO2ik4IRzgt2GAoTvA9/EsneUnp0dgZQPJvi7DuWU5P+EDzDiEyi
-	VzVGxby7tuIE2b/r72r56I1RL3qOXxn29w3B7b2Y9MFextFn+4QD5sHGE6zdtLymiUgxaJ
-	yz0wlpbwOh2u9l1k+iwYB+cND8VomaM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-WJUtYtCGOfiw3dIR08-FwQ-1; Wed, 13 Mar 2024 14:02:16 -0400
-X-MC-Unique: WJUtYtCGOfiw3dIR08-FwQ-1
+	bh=XucXp3hxAwKTj7st+z6y9+02SpKNl75gXYBpv6v0s08=;
+	b=e0CWS6P8/oSVQWRcalaJDZ7s1AL6SftZgvsr1tkQt8lDXe4nYhOVfamRu7sGTVme0Zt0AJ
+	lHHkL25OJAM2SVULOc/FrieggE8hhgR47BLBm77EO9YdHriurvzofZceXfry8FeBPYytT3
+	GimwMZPhXhsQ5kuNqK1f6+b73Xr9YmY=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-270-kynu_JlIMbuON6sxRRgrVg-1; Wed,
+ 13 Mar 2024 14:02:22 -0400
+X-MC-Unique: kynu_JlIMbuON6sxRRgrVg-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E5AFD185A783;
-	Wed, 13 Mar 2024 18:02:14 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BCB8A1C05EAD;
+	Wed, 13 Mar 2024 18:02:20 +0000 (UTC)
 Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.194.115])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A985C04224;
-	Wed, 13 Mar 2024 18:02:09 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 40865C04221;
+	Wed, 13 Mar 2024 18:02:15 +0000 (UTC)
 From: Valentin Schneider <vschneid@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	linux-arch@vger.kernel.org,
 	x86@kernel.org
-Cc: Sean Christopherson <seanjc@google.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Borislav Petkov <bp@alien8.de>,
 	Peter Zijlstra <peterz@infradead.org>,
@@ -86,9 +85,9 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	"ndesaulniers@google.com" <ndesaulniers@google.com>,
 	Michael Kelley <mikelley@microsoft.com>,
 	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>
-Subject: [PATCH v3 3/4] x86/kvm: Make kvm_async_pf_enabled __ro_after_init
-Date: Wed, 13 Mar 2024 19:01:05 +0100
-Message-ID: <20240313180106.2917308-4-vschneid@redhat.com>
+Subject: [PATCH v3 4/4] x86/tsc: Make __use_tsc __ro_after_init
+Date: Wed, 13 Mar 2024 19:01:06 +0100
+Message-ID: <20240313180106.2917308-5-vschneid@redhat.com>
 In-Reply-To: <20240313180106.2917308-1-vschneid@redhat.com>
 References: <20240313180106.2917308-1-vschneid@redhat.com>
 Precedence: bulk
@@ -100,28 +99,27 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-kvm_async_pf_enabled is only ever enabled in __init kvm_guest_init(), so
-mark it as __ro_after_init.
+__use_tsc is only ever enabled in __init tsc_enable_sched_clock(), so mark
+it as __ro_after_init.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Valentin Schneider <vschneid@redhat.com>
 Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- arch/x86/kernel/kvm.c | 2 +-
+ arch/x86/kernel/tsc.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 101a7c1bf2008..6c6ff015b99fd 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -44,7 +44,7 @@
- #include <asm/svm.h>
- #include <asm/e820/api.h>
+diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+index 5a69a49acc963..0f7624ed1d1d0 100644
+--- a/arch/x86/kernel/tsc.c
++++ b/arch/x86/kernel/tsc.c
+@@ -44,7 +44,7 @@ EXPORT_SYMBOL(tsc_khz);
+ static int __read_mostly tsc_unstable;
+ static unsigned int __initdata tsc_early_khz;
  
--DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
-+DEFINE_STATIC_KEY_FALSE_RO(kvm_async_pf_enabled);
+-static DEFINE_STATIC_KEY_FALSE(__use_tsc);
++static DEFINE_STATIC_KEY_FALSE_RO(__use_tsc);
  
- static int kvmapf = 1;
+ int tsc_clocksource_reliable;
  
 -- 
 2.43.0
