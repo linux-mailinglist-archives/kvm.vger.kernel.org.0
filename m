@@ -1,201 +1,143 @@
-Return-Path: <kvm+bounces-11741-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11742-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F18887A9A8
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 15:42:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DCDB87A9BE
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 15:49:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2790A28291E
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 14:42:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 599E8281ED9
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 14:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049103D0DD;
-	Wed, 13 Mar 2024 14:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5B8446A2;
+	Wed, 13 Mar 2024 14:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JOmX3w+o"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fiTcRvfX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD8B4A07
-	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 14:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409AC3D0DD
+	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 14:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710340942; cv=none; b=bnFJdYorFrjDCQARr5GwesEkmRdmQ6VFpbOyIKHYgcX8m5mbHu951AAiJdo7V1jjm1j+c03fn2zpHv4yvxTC+z6Rzb7DchXhXw5K/3n9K4UgKP/MVjvZlczGruaRnQ5EHX7lDforcltrIN/LlHiG+YW3MszYZcLoz03gm9FbTW8=
+	t=1710341335; cv=none; b=Cdg/AgBNHYXCOEEoG3fCjkdYnEdGi3qW3qnhLfp2n4eHklFWkHOYRpodq1wGuFOvytOSkVOTvQGF2qluInV+vzKGxC7IAIaBBXI6/MLjTE8HMm7QR0W+oS6HLuzI0vdU3QiAfhlIrH/ZVN998BGGnQYlG2ksc4CqLkzW1fu9VZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710340942; c=relaxed/simple;
-	bh=chSdJDUtKzDuTUHtdpxMes7gNjiM378d/wKDulIvMMY=;
+	s=arc-20240116; t=1710341335; c=relaxed/simple;
+	bh=wYEkrJjWGVx0jUWCjYrd/YRNNm9Cl5QCj3a74RDOIV4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sAa7ms86WpR5jTd+FxpzyonzRNwAeT/bkSIRdmfSiO3IZe/dwhW+D2kJsrBwBuueLARDXK7ISEaadMbRFHLbd2ox3em25mY5U7ZUNxIPah67pZAEECjqHDk+qMkCiOdEguLJMdelO3ym9Wc6ut/2y9y1tnKyjXlOmqr08e46ahE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JOmX3w+o; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=HWLFWXBL0SFBkIqewPjdIQL7ZluYvucG+YpHImoDttGG8J97GHJREJWfNCwfqnsz2W45SOhW0eU07bUzs1LnvO3RIsBqKJcKAQDGE2xtbFVGXlY3eU2J1854vJUs4aW+0WnMam8ildfHSR/89rxBYiYqpIvuuvyUGqlaUwZJ4ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fiTcRvfX; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1dd8158ed26so12113995ad.1
-        for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 07:42:20 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dd0ae66422fso2061701276.0
+        for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 07:48:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710340940; x=1710945740; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1710341333; x=1710946133; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DsNKRRM5eqSpZG2xIM+UvbeP4kbCL6MaPJhxll06mGE=;
-        b=JOmX3w+oqIU6KuLkFHyDzPpwKe5G+DEeYBq48twDtZ5BBeXcmlYbUygc567atDUNcf
-         lRDKZdU88N4xBMJB0tPDWKuThr+fxzaFaxa87LkVzTdbGkrYEDiUzgiscT1x81P+stll
-         7V8fLehlMOt7md/z3HwTzm3PM38E78ZPKIK7HvwcL9HUxHjT3XBB8QodRq+jEeTcGcPA
-         ORPV5hcsg4LTMDqibuWdCyQ5mHxqSKodbkNzC+bLfay7eTiFBbAoL7QzK5VMPJNJKH12
-         15Gt8IgWkGsAyaotGbUMnh0wITvnZlKzdd6x9SDjuE1XLQe3VJSuN4ZtL/WFNYeFvdiE
-         gBYw==
+        bh=yZFsDiSg8Veluka6E47FAf82LDK/U1v1gTIe6ZTkV+A=;
+        b=fiTcRvfXD0T2fdrvNJoPF8f7tezf99bCT8HVRom32qbxhpubkE4z6+QWzVVkzHBo5b
+         wEpVHwOw4AeU3vgio7YI8BjR1JpRE/S2kk6xsg/7dGIRKK4X9H+X/MKGFW83+s+z9l4j
+         btjTj+iacauQI3mmZewJfVuIaPa68IMDlIFAHqbliSP5thKGiSPlQa6+xYfDTq5xc+Fi
+         G8kvzNTvJD0rvV5Qy5+pItUlS2DZSqpNyjKc0DRCfIF7uNQxg+tQViuD7FI2OeBHtMg6
+         rRkpFQbK+auso86TUp3XMowC2MMZzP3SZM2fc6oGsr8GLW/swWyXNbxjDagwdCpxnkfa
+         V8Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710340940; x=1710945740;
+        d=1e100.net; s=20230601; t=1710341333; x=1710946133;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=DsNKRRM5eqSpZG2xIM+UvbeP4kbCL6MaPJhxll06mGE=;
-        b=DNDenS7Ouud5H/yRDlliH3bHY5uLiw8zm4aRC//hR7rpmU5W8KY+1Aq/LeF3MLX4q4
-         2L2gbjf38ZmW6uZIdAfp2T0b1yB3wvUCTLUcXTmL1e6BzPe1r10/e+VwTdvi+59dhVIn
-         Qijx7FhwUx+qq8RS+utofB7nmYZ+/Xc0fuTAeFV2dj78Ir5kooUlnyY578zR2xtrNNJh
-         5OsAPNoGmK0t0iS03Yq5+tUtw/IKGyZk/27x8H0uZmKyp4vpENvwb0eLMabQhB3CHAyq
-         KJC6Iwf5bqohR3NoSfHOC4p/6s9KfNR9M0ld4X73whGsjSysinV09PjBGjxHKawXXbYp
-         UFBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxLo9lWBxzi4+tpAU+R5OcYQI1OZW93ZcA5wrV9d46V0KS2mKv+71D54Y0jYGmZuxicMnL0gkaeR2Ypc3Hl+HlODQ7
-X-Gm-Message-State: AOJu0Yyjmq1AiUAUsL6txxxlfvUi89pEBG1pHVZv77RTqNdfECWFgQ/A
-	CIgISm57ZlSEGT1+e8wwi4y3oqOjbqOvNJbhgoP1gKtgeQ76q25WrBKpvVbsXUam4fosf632hnL
-	KcQ==
-X-Google-Smtp-Source: AGHT+IHmi4XfzjW9EmfmQD9pOXVOy3+HJOzNMlldLJHQy/DYtS/xbnEr/IVuJdigkFptyFLAb8v8t0j5vGY=
+        bh=yZFsDiSg8Veluka6E47FAf82LDK/U1v1gTIe6ZTkV+A=;
+        b=JdsUBs+Yucp5JFsZnmia0OsLeBLqYLS4x7qIaO7LNwrLGU6SkihQ9MdSdHzsO4kwMd
+         NsO9s6VqW2SHtjaq9lE8A9dN+pwqaO+Syh4YBZFLGFtmUr1A8cyrfrsuwGKJ39sCgNkK
+         6VvO+AyY1itkmiMiUo4qlYZ9egoYg5WsozVZxSgM8mx12iQewkpUFqPRMGzIRIYF00fZ
+         XKJHBVM5MOBXuGuJN7QKGwTSf5zsxp+zUCcv1HxDGKmUHczxcKIeFR6FhVmzgJJ7juA1
+         3MCDq3sKfveUWN4wJRXWDjpOrgyt+ClmgyDKPd5cVZfVSFnh4L0YHlrrldoDpR2Dol0l
+         vXxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXXdxh6nCsD8Fjkre9gN4kISEVqk6NZOKD9TTRO4duYCPQRvUiUKiR+sZWO6ADjPGMfFz/RZ/3ca0qSjfqmqJ2z3USq
+X-Gm-Message-State: AOJu0YzuxBlWk++TIyl0wlguKlWaBdeB6dyflo96edW9DfwF2xnqsP7a
+	lcvxSHF434nARdCQ3Y/QtyQTKOUXjRz4ZdK9TA0V+cXFFKv4L5il88zvq1Aq5c1KXqMuJ+UcxZW
+	9YQ==
+X-Google-Smtp-Source: AGHT+IHgpPoNg9mBT3unR5ry0NDCq89tXvMg05S2JkM5aQGWQRzEQ3Jm9vXfbQ5VGa1cuXTitkvbJZ34Vco=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:41cc:b0:1dd:9250:2d5d with SMTP id
- u12-20020a17090341cc00b001dd92502d5dmr8798ple.9.1710340940087; Wed, 13 Mar
- 2024 07:42:20 -0700 (PDT)
-Date: Wed, 13 Mar 2024 07:42:18 -0700
-In-Reply-To: <DS0PR11MB63731F54EA26D14CF7D6A3FDDC2A2@DS0PR11MB6373.namprd11.prod.outlook.com>
+ (user=seanjc job=sendgmr) by 2002:a5b:388:0:b0:dcc:5463:49a8 with SMTP id
+ k8-20020a5b0388000000b00dcc546349a8mr522047ybp.6.1710341333372; Wed, 13 Mar
+ 2024 07:48:53 -0700 (PDT)
+Date: Wed, 13 Mar 2024 07:48:51 -0700
+In-Reply-To: <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240313003739.3365845-1-mizhang@google.com> <DS0PR11MB63731F54EA26D14CF7D6A3FDDC2A2@DS0PR11MB6373.namprd11.prod.outlook.com>
-Message-ID: <ZfG7SgyqTTtqF3cw@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Return correct value of IA32_PERF_CAPABILITIES
- for userspace after vCPU has run
+References: <20240229025759.1187910-1-stevensd@google.com> <ZeCIX5Aw5s1L0YEh@infradead.org>
+ <CAD=HUj7fT2CVXLfi5mty0rSzpG_jK9fhcKYGQnTf_H8Hg-541Q@mail.gmail.com>
+ <72285e50-6ffc-4f24-b97b-8c381b1ddf8e@amd.com> <ZfGrS4QS_WhBWiDl@google.com> <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com>
+Message-ID: <ZfG801lYHRxlhZGT@google.com>
+Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
 From: Sean Christopherson <seanjc@google.com>
-To: Wei W Wang <wei.w.wang@intel.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Aaron Lewis <aaronlewis@google.com>, 
-	Jim Mattson <jmattson@google.com>
+To: "Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>
+Cc: David Stevens <stevensd@chromium.org>, Christoph Hellwig <hch@infradead.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 13, 2024, Wei W Wang wrote:
-> On Wednesday, March 13, 2024 8:38 AM, Mingwei Zhang wrote:
-> > Return correct value of IA32_PERF_CAPABILITIES when userspace tries to =
-read
-> > it after vCPU has already run. Previously, KVM will always return the g=
-uest
-> > cached value on get_msr() even if guest CPUID lacks X86_FEATURE_PDCM. T=
-he
-> > guest cached value on default is kvm_caps.supported_perf_cap. However,
-> > when userspace sets the value during live migration, the call fails bec=
-ause of
-> > the check on X86_FEATURE_PDCM.
+On Wed, Mar 13, 2024, Christian K=C3=B6nig wrote:
+> Am 13.03.24 um 14:34 schrieb Sean Christopherson:
+> > On Wed, Mar 13, 2024, Christian K=C3=B6nig wrote:
+> > > And when you have either of those two functionalities the requirement=
+ to add
+> > > a long term reference to the struct page goes away completely. So whe=
+n this
+> > > is done right you don't need to grab a reference in the first place.
+> > The KVM issue that this series is solving isn't that KVM grabs a refere=
+nce, it's
+> > that KVM assumes that any non-reserved pfn that is backed by "struct pa=
+ge" is
+> > refcounted.
 >=20
-> Could you point where in the set_msr path that could fail?
-> (I don=E2=80=99t find there is a check of X86_FEATURE_PDCM in vmx_set_msr=
- and
-> kvm_set_msr_common)
+> Well why does it assumes that? When you have a MMU notifier that seems
+> unnecessary.
 
-The changelog is misleading, it's not the PDCM feature bit, it's the PMU ve=
-rsion
-check in vmx_set_msr():
+Indeed, it's legacy code that we're trying to clean up.  It's the bulk of t=
+his
+series.
 
-	case MSR_IA32_PERF_CAPABILITIES:
-		if (data && !vcpu_to_pmu(vcpu)->version)
-			return 1;
-
-> > Initially, it sounds like a pure userspace issue. It is not. After vCPU=
- has run,
-> > KVM should faithfully return correct value to satisify legitimate reque=
-sts from
-> > userspace such as VM suspend/resume and live migrartion. In this case, =
-KVM
-> > should return 0 when guest cpuid lacks X86_FEATURE_PDCM.=20
-> Some typos above (satisfy, migration, CPUID)
+> > What Christoph is objecting to is that, in this series, KVM is explicit=
+ly adding
+> > support for mapping non-compound (huge)pages into KVM guests.  David is=
+ arguing
+> > that Christoph's objection to _KVM_ adding support is unfair, because t=
+he real
+> > problem is that the kernel already maps such pages into host userspace.=
+  I.e. if
+> > the userspace mapping ceases to exist, then there are no mappings for K=
+VM to follow
+> > and propagate to KVM's stage-2 page tables.
 >=20
-> Seems the description here isn=E2=80=99t aligned to your code below?
-> The code below prevents userspace from reading the MSR value (not return =
-0 as the
-> read value) in that case.
+> And I have to agree with Christoph that this doesn't make much sense. KVM
+> should *never* map (huge) pages from VMAs marked with VM_PFNMAP into KVM
+> guests in the first place.
+>=20
+> What it should do instead is to mirror the PFN from the host page tables
+> into the guest page tables.
 
-Ya.
+That's exactly what this series does.  Christoph is objecting to KVM playin=
+g nice
+with non-compound hugepages, as he feels that such mappings should not exis=
+t
+*anywhere*.
 
-> >So fix the
-> > problem by adding an additional check in vmx_set_msr().
-> >=20
-> > Note that IA32_PERF_CAPABILITIES is emulated on AMD side, which is fine
-> > because it set_msr() is guarded by kvm_caps.supported_perf_cap which is
-> > always 0.
-> >=20
-> > Cc: Aaron Lewis <aaronlewis@google.com>
-> > Cc: Jim Mattson <jmattson@google.com>
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >=20
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c index
-> > 40e3780d73ae..6d8667b56091 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -2049,6 +2049,17 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu,
-> > struct msr_data *msr_info)
-> >  		msr_info->data =3D to_vmx(vcpu)->msr_ia32_sgxlepubkeyhash
-> >  			[msr_info->index - MSR_IA32_SGXLEPUBKEYHASH0];
-> >  		break;
-> > +	case MSR_IA32_PERF_CAPABILITIES:
-> > +		/*
-> > +		 * Host VMM should not get potentially invalid MSR value if
-> > vCPU
-> > +		 * has already run but guest cpuid lacks the support for the
-> > +		 * MSR.
-> > +		 */
-> > +		if (msr_info->host_initiated &&
-> > +		    kvm_vcpu_has_run(vcpu) &&
-> > +		    !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
-> > +			return 1;
-
-As Wei pointed out, this doesn't match the changelog.  And I don't think th=
-is is
-what we want, at least not in isolation.  Making KVM more restrictive on us=
-erspace
-reads doesn't solve the live migration save/restore issue, and the kvm_vcpu=
-_has_run()
-adds yet another flavor of MSR handling.
-
-We discussed this whole MSRs mess at PUCK this morning.  I forgot to hit RE=
-CORD,
-but Paolo took notes and will post them soon.
-
-Going from memory, the plan is to:
-
-  1. Commit to, and document, that userspace must do KVM_SET_CPUID{,2} prio=
-r to
-     KVM_SET_MSRS.
-
-  2. Go with roughly what I proposed in the CET thread (for unsupported MSR=
-S,
-     read 0 and drop writes of '0')[*].
-
-  3. Add a quire for PERF_CAPABILITIES, ARCH_CAPABILITIES, and PLATFORM_INF=
-O
-     (if quirk=3D=3Denabled, keep KVM's current behavior; if quirk=3D=3Ddis=
-abled, zero-
-      initialize the MSRs).
-
-With those pieces in place, KVM can simply check X86_FEATURE_PDCM for both =
-reads
-and writes to PERF_CAPABILITIES, and the common userspace MSR handling will
-convert "unsupported" to "success" as appropriate.
-
-[*] https://lore.kernel.org/all/ZfDdS8rtVtyEr0UR@google.com
+I.e. Christoph is (implicitly) saying that instead of modifying KVM to play=
+ nice,
+we should instead fix the TTM allocations.  And David pointed out that that=
+ was
+tried and got NAK'd.
 
