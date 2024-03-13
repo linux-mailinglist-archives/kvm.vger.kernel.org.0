@@ -1,216 +1,184 @@
-Return-Path: <kvm+bounces-11757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3234F87B05B
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 19:52:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09BEF87B0C0
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 20:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA08BB2BA38
-	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 18:47:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B991A289891
+	for <lists+kvm@lfdr.de>; Wed, 13 Mar 2024 19:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB5D65BB6;
-	Wed, 13 Mar 2024 17:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355875E06E;
+	Wed, 13 Mar 2024 18:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NSFIDmep"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OlkDG6Li"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5B6657DD;
-	Wed, 13 Mar 2024 17:44:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29715D8F0
+	for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 18:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710351877; cv=none; b=EcrA59Fe5P7haTrFEbJ5E8aXeghhweR7gNiMbpqkzbLsqSYJfBVAUIb7VL73LH533NBv+VEU+kFuw1c2B2YE/PshyyXCTnVr1t2oz5zdnNF6YiTF7YkLKD4oQa6wwBhJeOmF2iCg3OjLhNUQX4rS9YL9s3F2CVBYpKDt9LcDJTM=
+	t=1710352926; cv=none; b=que4c8ZsM2xVDwjFfh2gJZPFUOHtpGEmMT/BuA8Qq58sBnUfirD0EzhM9WkNlYBdbzuYxWNfCu2sbKn14m6up6WtmLbBJ+XrM+XcDaYHw0U7v1gUvRmgieDULiQlQSnvaGB4UgWcrZGV/HguH7Uik4Av/VpSAqlkcN/KKUuX+UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710351877; c=relaxed/simple;
-	bh=ma7upt0mkxCiGazRLZGR9ohMqsHaHdle+49JOWHsY4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SEeP+9w4lYbi6PDc1hP9PUrhOhWA2tyNTUFVQcfBmItlEdEAUI88XcJKFs79NBorz84iYFxrZUpspOnKN2UPzOtJuNSjVS9uXgTunC5fkDAssZaA2Hu61s5iYDSkruBtXfqfYmrafv5cJqqiaF65V84ekeScDvl4YEvX7HzGSb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NSFIDmep; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710351875; x=1741887875;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=ma7upt0mkxCiGazRLZGR9ohMqsHaHdle+49JOWHsY4E=;
-  b=NSFIDmepAoMopJ3ctPN7krsvaNLyvWxfi4VFfDfxWNeS8G8iH3ek3VYN
-   yidXFovEImepLvyeQh5f1JVbvq8jYiXL0JiX2R3xRRkE52V0Q3wEJy3BX
-   ju9d9mrNXdIZAZQ01SfK70Tp57qZ2cPuixMA77DMU8uX0/lmWPocNM6hd
-   Ycf0di0MEqcNpNu2CfBtDjDxfx+K44YyxgOx9QIOthKKfVhg21iiMkUxR
-   lyqmFE1VYVYDVfhJVQR2ULgHuHzlStcKSIL8axqSy7m/YXq9S4EeRzgLM
-   ssRhTMI5meto4nqz75YNpmCizUjGqG7aBDLyz1PkZ6dpTxQ9pQgCuyuoC
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="4997163"
-X-IronPort-AV: E=Sophos;i="6.07,123,1708416000"; 
-   d="scan'208";a="4997163"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 10:44:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,123,1708416000"; 
-   d="scan'208";a="16739287"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 10:44:35 -0700
-Date: Wed, 13 Mar 2024 10:44:34 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"Zhang, Tina" <tina.zhang@intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Yuan, Hang" <hang.yuan@intel.com>,
-	"Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
-	"sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 032/130] KVM: TDX: Add helper functions to
- allocate/free TDX private host key id
-Message-ID: <20240313174434.GM935089@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <7348e22ba8d0eeab7ba093f3e83bfa7ee4da1928.1708933498.git.isaku.yamahata@intel.com>
- <075322c9db65e2fa19d809357a98fe6067c80508.camel@intel.com>
+	s=arc-20240116; t=1710352926; c=relaxed/simple;
+	bh=YS/A//x6PCebh/TWonZTX7b84I7rd//vuuT12T+EEYU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h0Y55iFKZjGrI2DEQ02NnufjfY8VD6xUx7fXMgysMBKWJKaiwPm7GdcDUK5D0npaaCblsH5vatxDETndb1DSKBPp0XYjnzAmMNUkU/28IV9WpY/NOcN6EWhNqrrNUAfZUTAc46x7awm9pc6mXHCTPwmWI4Qu0T4UiQvGUwKE6zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OlkDG6Li; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710352923;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5UEYdMiZ1vcEMNvAnOtdk4ekyPB3q5c4UPNOfGmqfBI=;
+	b=OlkDG6LikueqxpWTgeUaC31XQ0MYdzZX1gb7PYGBbSYz00R2/UycZgcqQrea5yhQ2nYzvw
+	cIZsZMWQWZCHnV6TIAuUXuYykCUPH9cUMI1kjTjNETJICqKlSWw8YfZh10/zfBus47hvZm
+	B9/DDPS5/+Ym7FI1TWheqCf35tMVM7Q=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-336-ZvZIZRHwPJ6YkkSYFTIo-A-1; Wed,
+ 13 Mar 2024 14:02:00 -0400
+X-MC-Unique: ZvZIZRHwPJ6YkkSYFTIo-A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 200F53801F50;
+	Wed, 13 Mar 2024 18:01:59 +0000 (UTC)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.194.115])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E25F5C04221;
+	Wed, 13 Mar 2024 18:01:52 +0000 (UTC)
+From: Valentin Schneider <vschneid@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	x86@kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Jason Baron <jbaron@akamai.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Feng Tang <feng.tang@intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"Mike Rapoport (IBM)" <rppt@kernel.org>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	David Hildenbrand <david@redhat.com>,
+	"ndesaulniers@google.com" <ndesaulniers@google.com>,
+	Michael Kelley <mikelley@microsoft.com>,
+	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>
+Subject: [PATCH v3 0/4] jump_label: Fix __ro_after_init keys for modules & annotate some keys
+Date: Wed, 13 Mar 2024 19:01:02 +0100
+Message-ID: <20240313180106.2917308-1-vschneid@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <075322c9db65e2fa19d809357a98fe6067c80508.camel@intel.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On Wed, Mar 13, 2024 at 12:44:14AM +0000,
-"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
+Hi folks,
 
-> On Mon, 2024-02-26 at 00:25 -0800, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > Add helper functions to allocate/free TDX private host key id (HKID).
-> > 
-> > The memory controller encrypts TDX memory with the assigned TDX
-> > HKIDs.  The
-> > global TDX HKID is to encrypt the TDX module, its memory, and some
-> > dynamic
-> > data (TDR). 
-> 
-> I don't see any code about the global key id.
-> 
-> >  The private TDX HKID is assigned to guest TD to encrypt guest
-> > memory and the related data.  When VMM releases an encrypted page for
-> > reuse, the page needs a cache flush with the used HKID.
-> 
-> Not sure the cache part is pertinent to this patch. Sounds good for
-> some other patch.
-> 
-> >   VMM needs the
-> > global TDX HKID and the private TDX HKIDs to flush encrypted pages.
-> 
-> I think the commit log could have a bit more about what code is added.
-> What about adding something like this (some verbiage from Kai's setup
-> patch):
-> 
-> The memory controller encrypts TDX memory with the assigned TDX
-> HKIDs. Each TDX guest must be protected by its own unique TDX HKID.
-> 
-> The HW has a fixed set of these HKID keys. Out of those, some are set
-> aside for use by for other TDX components, but most are saved for guest
-> use. The code that does this partitioning, records the range chosen to
-> be available for guest use in the tdx_guest_keyid_start and
-> tdx_nr_guest_keyids variables.
-> 
-> Use this range of HKIDs reserved for guest use with the kernel's IDA
-> allocator library helper to create a mini TDX HKID allocator that can
-> be called when setting up a TD. This way it can have an exclusive HKID,
-> as is required. This allocator will be used in future changes.
-> 
-> 
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> > v19:
-> > - Removed stale comment in tdx_guest_keyid_alloc() by Binbin
-> > - Update sanity check in tdx_guest_keyid_free() by Binbin
-> > 
-> > v18:
-> > - Moved the functions to kvm tdx from arch/x86/virt/vmx/tdx/
-> > - Drop exporting symbols as the host tdx does.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/tdx.c | 28 ++++++++++++++++++++++++++++
-> >  1 file changed, 28 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index a7e096fd8361..cde971122c1e 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -11,6 +11,34 @@
-> >  #undef pr_fmt
-> >  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> >  
-> > +/*
-> > + * Key id globally used by TDX module: TDX module maps TDR with this
-> > TDX global
-> > + * key id.  TDR includes key id assigned to the TD.  Then TDX module
-> > maps other
-> > + * TD-related pages with the assigned key id.  TDR requires this TDX
-> > global key
-> > + * id for cache flush unlike other TD-related pages.
-> > + */
-> 
-> The above comment is about tdx_global_keyid, which is unrelated to the
-> patch and code.
+This series fixes __ro_after_init keys used in modules (courtesy of PeterZ) and
+flags more keys as __ro_after_init.
 
-Will delete this comment as it was moved into the host tdx patch series.
+Compile & boot tested for x86_64_defconfig and i386_defconfig.
 
-> 
-> > +/* TDX KeyID pool */
-> > +static DEFINE_IDA(tdx_guest_keyid_pool);
-> > +
-> > +static int __used tdx_guest_keyid_alloc(void)
-> > +{
-> > +       if (WARN_ON_ONCE(!tdx_guest_keyid_start ||
-> > !tdx_nr_guest_keyids))
-> > +               return -EINVAL;
-> 
-> I think the idea of this warnings is to check if TDX failed to init? It
-> could check X86_FEATURE_TDX_HOST_PLATFORM or enable_tdx, but that seems
-> to be a weird thing to check in a low level function that is called in
-> the middle of in progress setup.
-> 
-> Don't know, I'd probably drop this warning.
-> 
-> > +
-> > +       return ida_alloc_range(&tdx_guest_keyid_pool,
-> > tdx_guest_keyid_start,
-> > +                              tdx_guest_keyid_start +
-> > tdx_nr_guest_keyids - 1,
-> > +                              GFP_KERNEL);
-> > +}
-> > +
-> > +static void __used tdx_guest_keyid_free(int keyid)
-> > +{
-> > +       if (WARN_ON_ONCE(keyid < tdx_guest_keyid_start ||
-> > +                        keyid > tdx_guest_keyid_start +
-> > tdx_nr_guest_keyids - 1))
-> > +               return;
-> 
-> This seems like a more useful warning, but still not sure it's that
-> risky. I guess the point is to check for returning garbage. Because a
-> double free would not be caught, but would be possible to using
-> idr_find(). I would think if we are worried we should do the full
-> check, but I'm not sure we can't just drop this. There are very limited
-> callers or things that change the checked configuration (1 of each).
+@Peter, regarding making __use_tsc x86_32-only, I hit a few snags:
 
-The related code is stable now and I don't hit them recently.  I'll drop both
-of them.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Currently, for the static key to be enabled, we (mostly) need:
+o X86_FEATURE_TSC is in CPUID
+o determine_cpu_tsc_frequencies passes
+
+All X86_64 systems have a TSC, so the CPUID feature is a given there.
+
+Calibrating the TSC can end up depending on different things:
+o CPUID accepting 0x16 as eax input (cf. cpu_khz_from_cpuid())
+o MSR_FSB_FREQ being available (cf. cpu_khz_from_msr())
+o pit_hpet_ptimer_calibrate_cpu() doesn't mess up
+
+I couldn't find any guarantees for X86_64 on having the processor frequency
+information CPUID leaf, nor for the FSB_FREQ MSR (both tsc_msr_cpu_ids and
+the SDM seem to point at only a handful of models).
+
+pit_hpet_ptimer_calibrate_cpu() relies on having either HPET or the ACPI PM
+timer, the latter being widely available, though X86_PM_TIMER can be
+disabled via EXPERT.
+
+The question here is: are there any guarantees that at least one of these
+can be relied upon for x86_64?
+
+And with all of that, there is still the "apicpmtimer" cmdline option which
+currently invokes notsc_setup() on x86_64. The justification I found for it was
+in 0c3749c41f5e ("[PATCH] x86_64: Calibrate APIC timer using PM timer"):
+
+  """
+  On some broken motherboards (at least one NForce3 based AMD64 laptop)
+  the PIT timer runs at a incorrect frequency.  This patch adds a new
+  option "apicpmtimer" that allows to use the APIC timer and calibrate it
+  using the PMTimer.
+  """
+
+
+Revisions
+=========
+
+v2 -> v3
+++++++++
+
+o Rebased against latest upstream
+o Fixed up jump_label_del_module() error in first patch reported by kernel test
+  robot
+  http://lore.kernel.org/r/202402191313.3276317d-oliver.sang@intel.com
+o Removed mds_user_clear patch; key was switched to an ALTERNATIVE by
+  6613d82e617d ("x86/bugs: Use ALTERNATIVE() instead of mds_user_clear static key")
+
+
+v1 -> v2
+++++++++
+
+o Collected tags (Josh, Sean)
+o Fixed CONFIG_JUMP_LABEL=n compile fail (lkp)
+
+Cheers,
+Valentin
+
+Peter Zijlstra (1):
+  jump_label,module: Don't alloc static_key_mod for __ro_after_init keys
+
+Valentin Schneider (3):
+  context_tracking: Make context_tracking_key __ro_after_init
+  x86/kvm: Make kvm_async_pf_enabled __ro_after_init
+  x86/tsc: Make __use_tsc __ro_after_init
+
+ arch/x86/kernel/kvm.c          |  2 +-
+ arch/x86/kernel/tsc.c          |  2 +-
+ include/asm-generic/sections.h |  5 ++++
+ include/linux/jump_label.h     |  3 ++
+ init/main.c                    |  1 +
+ kernel/context_tracking.c      |  2 +-
+ kernel/jump_label.c            | 53 ++++++++++++++++++++++++++++++++++
+ 7 files changed, 65 insertions(+), 3 deletions(-)
+
+--
+2.43.0
+
 
