@@ -1,207 +1,177 @@
-Return-Path: <kvm+bounces-11776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11777-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A87D987B687
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 03:50:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A571D87B6A9
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 04:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC4D81C20E1D
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 02:50:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 304EF1F24E09
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 03:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9878B4A1B;
-	Thu, 14 Mar 2024 02:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="iB9tHFt6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16DC4C96;
+	Thu, 14 Mar 2024 03:04:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA98A55;
-	Thu, 14 Mar 2024 02:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710384631; cv=fail; b=ZwiXhxahljpKGEblUfYG9FwHU7pdR3D7QHoCCTMiZZmRPRFH+JnHGygU4RTUPqTiEjW8l67t5W11kbzmcOt/KQDEBE3yVM3wC9a5pYdl6X5yImSFpYRJqMj9kYtdlZEe5M3edMXGbk4VhPDFJvoyGl9vUJ/WUXZEff2W47jieUc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710384631; c=relaxed/simple;
-	bh=VcSIvDraVTQ0SoTqGV10kaXHzYhGjWL2DtQmHCqrs0I=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OmBZ9/TM8X8auBc4sKrAM2zbC8VpQa/wNbD35IAUXaYF5Yqt6ZkrMsMbXiQFmq28jde6CZ8zuf+gpIqzfO/yiMFpzONEXHitttJBYJA86bGrwoj4cKZmcEqHeqg8qXjkYClOFEpMLm+BYupYTWUhDVSv4e0BldK8xRAYx+T685o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=iB9tHFt6; arc=fail smtp.client-ip=40.107.93.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A/BbUMBdf2pTRa33JzFt0ppOVE/ai3yWpeV1ALDRd+FF+a+/tRx3KaVRmNA2UtdJhkOv8cZxZbFBlPz0hcIXtkmqPDUnmLgyIRqlmQNL7kT7IHPKuDcSrqZ3to1j2ncSvRFoVPTYVwbd2z6vMa/dm6tjWMWlrrB/mcwjgirdCOdIoOYypfwcXwlBT8RMx/tJX8UwC9OpK1H6cKPXFC6QHvMKgUSeFTDZzSbVImneyBB8csOx8hQiKR8j1ikjBIaGeu43Ga+57Wv2ePiduJqJ16MFZHrB+ziokMjbdHQNYje2Ly96DODmTAsmSlucQY6VhxRbqQeOO/UBEY7p+pC5AQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j/hLD2u8/doA1s3xZJgJWLcaS+GBoIW8R2SRxPBIJPE=;
- b=nX5kLydBbGYkuGDIFJe/wXONn5bgx71bLQvht/Siu2+co1Y2tfyCBRv9cjElcqop5QJtqJZgSdgVe4hLeTU6/dI741Gsxdz6f/d8WPCaxR43c4PIF7Ig8C0j7r4qVwkwgLmY1GxKfj5VlTGCuDH0qAISutTH1nTW0BTbjK0iCivAo+2DkVfGple1Ho1BIhGC6TUXkxJrlY88YEfVTMI+3pNZvxtvAbcHvRixzUE2g/nzDY0BpK7n6QV1JM/rq1S7Os0tzjchU8siwxX8MBxU6pvYfoE1pGtwFC5d0Tj5PlzDTIuyJFq8wdxieGfC7e6TIkDUVhclJoQZ2cEPy1DQnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j/hLD2u8/doA1s3xZJgJWLcaS+GBoIW8R2SRxPBIJPE=;
- b=iB9tHFt6oaoWjrAlc70pn32lRmUQqYrNHwLH4OKLfaDsoN48KG7qGVFEKNrDFJ0JBxWV+ULcTQ5gAcSnKe3PBxdCruYDqLRGW50qe9Bb++E8cGWninFMMwWBI3uF2xO3P0xVWjePa4axEIqWBZXzx4yspoISeuo8wScwm5EKPp8=
-Received: from MW4PR03CA0305.namprd03.prod.outlook.com (2603:10b6:303:dd::10)
- by PH0PR12MB7929.namprd12.prod.outlook.com (2603:10b6:510:284::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36; Thu, 14 Mar
- 2024 02:50:25 +0000
-Received: from MWH0EPF000971E3.namprd02.prod.outlook.com
- (2603:10b6:303:dd:cafe::a6) by MW4PR03CA0305.outlook.office365.com
- (2603:10b6:303:dd::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18 via Frontend
- Transport; Thu, 14 Mar 2024 02:50:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MWH0EPF000971E3.mail.protection.outlook.com (10.167.243.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7386.12 via Frontend Transport; Thu, 14 Mar 2024 02:50:25 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 13 Mar
- 2024 21:50:22 -0500
-Date: Wed, 13 Mar 2024 21:49:52 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<seanjc@google.com>, <aik@amd.com>, <pankaj.gupta@amd.com>
-Subject: Re: [PATCH v3 10/15] KVM: x86: add fields to struct kvm_arch for
- CoCo features
-Message-ID: <20240314024952.w6n6ol5hjzqayn2g@amd.com>
-References: <20240226190344.787149-1-pbonzini@redhat.com>
- <20240226190344.787149-11-pbonzini@redhat.com>
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C14B7E1;
+	Thu, 14 Mar 2024 03:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710385452; cv=none; b=Orw62CEscGUZkTsdO3Hqx6sIlcUPxGUI91Vg4Gm3LbvawEkYbpxqI/LBXDDe/Ax+6F+QiyShFRna84M/d4JN4e/+shekRdUV1BaTf38JZlXsygj6MBp2GbESn04wUQ8ghBuyAq7hlLkaNKajh1CT9ikiDk5crta/ERUoudVM4aw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710385452; c=relaxed/simple;
+	bh=WeupC+sep6l8TNqmhA+tJld0CwFHMTozvuXCDeX3nPE=;
+	h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=NeZ5SIF0BbqzHa5yisbg3arftB92SyHkppCkLJf5y33UoiAuPTTyxTW8cFTT45eDR9hcY6fjyHT5IvuLENfaLWSg2RcQc7Gruvh+pW6CZs9CTgneTaD6vtpapYd9S0LKcAjd+ZP81pq6aUiBSwT1OVHQJPOlk4qE5HMJLh6XU68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8CxmeggafJl6PEYAA--.40819S3;
+	Thu, 14 Mar 2024 11:04:00 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxTs0dafJlhHdZAA--.36976S3;
+	Thu, 14 Mar 2024 11:03:59 +0800 (CST)
+Subject: Re: [PATCH v7 0/4] KVM: selftests: Add LoongArch support
+From: maobibo <maobibo@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240202041046.3405779-1-maobibo@loongson.cn>
+Message-ID: <0276944f-0404-d09f-1e75-8e78e05a563b@loongson.cn>
+Date: Thu, 14 Mar 2024 11:03:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240226190344.787149-11-pbonzini@redhat.com>
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E3:EE_|PH0PR12MB7929:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9a38f629-c0f5-4ef2-6422-08dc43d1803b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	S48XOy0sKfNLXOLQi1Fn18IyPl/7PlA55JrQ4Mq4BlDqlE4GEa/At4MXO85/fm2+fHdeZ/X2wY8MXyeIZYdN7JkDdKG71s2ayNmxa066sCyQM9MnKJXRk6PwOy4XesjmitI9mRa3ujmYIys3/ybMIbRjnHm07hV7dtkQmKW0FWfM29F0zTRcpvKZcGL+NmFoTR6fuUxz/HHWGRsU2cRP1qm60eQIIoRcKPLJBknAmuqRBdATPQvgf6H9l1//fKnEkf9dAGTMu+E3RU8m6Kn+uqiIj/XdWugud7kp60GfHCPiBhK4FHK7REtBgQ3YUIv6Imtm5b68+i3zXAwAab8ySYuDJ3d1LnFodxaVDb4qU0VW6lcJni6P8qvZtEvhNDKEvlur2n5twejJW5JhK20wpml1rUq+Nmg448EuQ+78y+HvqTFDrruWHLTgzgjaaUjFtoBTvjzIWnyDYf6N7xTZE+u3V1pJSKUigUc76OpKEPahmeLDHqArreHxnneqwxf1Pycdjpd4lGOTAtlyGqx+mEeMoHE+ajS1gbwlRQdQt5v9AzdupWUpemp74BYn20H31PfBV6caloM+uUbAcB4J8vJG5MSVWJC3ZuPHuWPly4G6BTrHHLRcTPfV8bhetf1P+IZljXgoMa/GbQtMaKrdv93+kefzz/tLAzsaBzuYl8k6dqPJlWwdf1osVbDcm3F33+rnhxxkJJyw7leYmp8izk0IW4mp5sKXHhGlf/l/Lf+OmFCpeho0FhwogKHjdRn/
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(36860700004)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 02:50:25.6494
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a38f629-c0f5-4ef2-6422-08dc43d1803b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E3.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7929
+In-Reply-To: <20240202041046.3405779-1-maobibo@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxTs0dafJlhHdZAA--.36976S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxury3Xr45Jr4DWF1UAF1fuFX_yoWrXFWfpa
+	4I9Fn8Krs7JFyIq3Z7G34kWF1Sya1xKrWxCr1agryUuw42yry8JrWxKFWqyas5Z398XF10
+	v3W8twnrW3WUtacCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
+	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
+	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
+	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
+	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtw
+	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
+	67AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
+	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8j-
+	e5UUUUU==
 
-On Mon, Feb 26, 2024 at 02:03:39PM -0500, Paolo Bonzini wrote:
-> Some VM types have characteristics in common; in fact, the only use
-> of VM types right now is kvm_arch_has_private_mem and it assumes that
-> _all_ nonzero VM types have private memory.
+Paolo, Sean
+
+ping again -:)
+
+There is little materials for Loongarch. Can I apply merge privilege for 
+Loongarch kvm if you are not convenient to give the review comments?
+
+Regards
+Bibo Mao
+
+On 2024/2/2 下午12:10, Bibo Mao wrote:
+> This patchset adds KVM selftests for LoongArch system, currently only
+> some common test cases are supported and pass to run. These testcase
+> are listed as following:
+>          demand_paging_test
+>          dirty_log_perf_test
+>          dirty_log_test
+>          guest_print_test
+>          hardware_disable_test
+>          kvm_binary_stats_test
+>          kvm_create_max_vcpus
+>          kvm_page_table_test
+>          memslot_modification_stress_test
+>          memslot_perf_test
+>          set_memory_region_test
 > 
-> We will soon introduce a VM type for SEV and SEV-ES VMs, and at that
-> point we will have two special characteristics of confidential VMs
-> that depend on the VM type: not just if memory is private, but
-> also whether guest state is protected.  For the latter we have
-> kvm->arch.guest_state_protected, which is only set on a fully initialized
-> VM.
+> This patchset originally is posted from zhaotianrui, I continue to work
+> on his efforts.
 > 
-> For VM types with protected guest state, we can actually fix a problem in
-> the SEV-ES implementation, where ioctls to set registers do not cause an
-> error even if the VM has been initialized and the guest state encrypted.
-> Make sure that when using VM types that will become an error.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <20240209183743.22030-7-pbonzini@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  7 ++-
->  arch/x86/kvm/x86.c              | 95 +++++++++++++++++++++++++++------
->  2 files changed, 84 insertions(+), 18 deletions(-)
+> Changes in v7:
+> 1. Refine code to add LoongArch support in test case
+> set_memory_region_test.
 > 
-> @@ -5552,9 +5561,13 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
->  }
->  
->  
-> -static void kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
-> -					  u8 *state, unsigned int size)
-> +static int kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
-> +					 u8 *state, unsigned int size)
->  {
-> +	if (vcpu->kvm->arch.has_protected_state &&
-> +	    fpstate_is_confidential(&vcpu->arch.guest_fpu))
-> +		return -EINVAL;
-> +
->  	/*
->  	 * Only copy state for features that are enabled for the guest.  The
->  	 * state itself isn't problematic, but setting bits in the header for
-> @@ -5571,22 +5584,27 @@ static void kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
->  			     XFEATURE_MASK_FPSSE;
->  
->  	if (fpstate_is_confidential(&vcpu->arch.guest_fpu))
-> -		return;
-> +		return 0;
->  
->  	fpu_copy_guest_fpstate_to_uabi(&vcpu->arch.guest_fpu, state, size,
->  				       supported_xcr0, vcpu->arch.pkru);
-> +	return 0;
->  }
->  
-> -static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
-> -					 struct kvm_xsave *guest_xsave)
-> +static int kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
-> +					struct kvm_xsave *guest_xsave)
->  {
-> -	kvm_vcpu_ioctl_x86_get_xsave2(vcpu, (void *)guest_xsave->region,
-> -				      sizeof(guest_xsave->region));
-> +	return kvm_vcpu_ioctl_x86_get_xsave2(vcpu, (void *)guest_xsave->region,
-> +					     sizeof(guest_xsave->region));
->  }
->  
->  static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
->  					struct kvm_xsave *guest_xsave)
->  {
-> +	if (vcpu->kvm->arch.has_protected_state &&
-> +	    fpstate_is_confidential(&vcpu->arch.guest_fpu))
-> +		return -EINVAL;
-> +
->  	if (fpstate_is_confidential(&vcpu->arch.guest_fpu))
->  		return 0;
+> Changes in v6:
+> 1. Refresh the patch based on latest kernel 6.8-rc1, add LoongArch
+> support about testcase set_memory_region_test.
+> 2. Add hardware_disable_test test case.
+> 3. Drop modification about macro DEFAULT_GUEST_TEST_MEM, it is problem
+> of LoongArch binutils, this issue is raised to LoongArch binutils owners.
+> 
+> Changes in v5:
+> 1. In LoongArch kvm self tests, the DEFAULT_GUEST_TEST_MEM could be
+> 0x130000000, it is different from the default value in memstress.h.
+> So we Move the definition of DEFAULT_GUEST_TEST_MEM into LoongArch
+> ucall.h, and add 'ifndef' condition for DEFAULT_GUEST_TEST_MEM
+> in memstress.h.
+> 
+> Changes in v4:
+> 1. Remove the based-on flag, as the LoongArch KVM patch series
+> have been accepted by Linux kernel, so this can be applied directly
+> in kernel.
+> 
+> Changes in v3:
+> 1. Improve implementation of LoongArch VM page walk.
+> 2. Add exception handler for LoongArch.
+> 3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
+> test cases for LoongArch.
+> 4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
+> 5. Move ucall_arch_do_ucall to the header file and make it as
+> static inline to avoid function calls.
+> 6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
+> 
+> Changes in v2:
+> 1. We should use ".balign 4096" to align the assemble code with 4K in
+> exception.S instead of "align 12".
+> 2. LoongArch only supports 3 or 4 levels page tables, so we remove the
+> hanlders for 2-levels page table.
+> 3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
+> DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
+> 4. Reorganize the test cases supported by LoongArch.
+> 5. Fix some code comments.
+> 6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
+> 
+> ---
+> Tianrui Zhao (4):
+>    KVM: selftests: Add KVM selftests header files for LoongArch
+>    KVM: selftests: Add core KVM selftests support for LoongArch
+>    KVM: selftests: Add ucall test support for LoongArch
+>    KVM: selftests: Add test cases for LoongArch
+> 
+>   tools/testing/selftests/kvm/Makefile          |  16 +
+>   .../selftests/kvm/include/kvm_util_base.h     |   5 +
+>   .../kvm/include/loongarch/processor.h         | 133 +++++++
+>   .../selftests/kvm/include/loongarch/ucall.h   |  20 ++
+>   .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
+>   .../selftests/kvm/lib/loongarch/processor.c   | 332 ++++++++++++++++++
+>   .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
+>   .../selftests/kvm/set_memory_region_test.c    |   2 +-
+>   8 files changed, 604 insertions(+), 1 deletion(-)
+>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
+>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+> 
+> 
+> base-commit: 6764c317b6bb91bd806ef79adf6d9c0e428b191e
+> 
 
-I've been trying to get SNP running on top of these patches and hit and
-issue with these due to fpstate_set_confidential() being done during
-svm_vcpu_create(), so when QEMU tries to sync FPU state prior to calling
-SNP_LAUNCH_FINISH it errors out. I think the same would happen with
-SEV-ES as well.
-
-Maybe fpstate_set_confidential() should be relocated to SEV_LAUNCH_FINISH
-site as part of these patches?
-
-Also, do you happen to have a pointer to the WIP QEMU patches? Happy to
-help with posting/testing those since we'll need similar for
-SEV_INIT2-based SNP patches.
-
-Thanks,
-
-Mike
 
