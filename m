@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-11855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11856-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 964AB87C65C
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 00:33:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C04587C65E
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 00:33:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C714281E6A
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 23:33:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 371D3282A2B
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 23:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AAE23758;
-	Thu, 14 Mar 2024 23:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171032575B;
+	Thu, 14 Mar 2024 23:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YKpTtA5h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bw0QGiLH"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14D71B940
-	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 23:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD1B225CB
+	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 23:26:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710458813; cv=none; b=kTiOH5zrqsYMaIRcBl9A7LPteXcMGunJKEBYpqMsPWR/t8j6Crd8VX4tsZOR1bGbILTrZef1tod+d+Oq1Owb43EJFJxygnuzqM+sYZFpn8OBbFtwLooOmvR/FJxDFgXEorCnh+9z1JkPnh7IVn7UKYIGJuoZKx4COrDeu22Us5M=
+	t=1710458815; cv=none; b=At0cSyihsokb0Andh3a92htfy/HhSbwmHnTyqwch/HW0Y4pi8UtyXZtX20o30ImCG/uiNUXpd+DpUg8vx8MJe1p0Oe3eE3wTff8XcYdhAleRF7ZtAjCqxDX35Z+0AhCzl4WJ+cq8g2UigobjiN0j3sjuR9cSLMJfrpqbgSiNcTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710458813; c=relaxed/simple;
-	bh=meFKVgZcplsrdf4nThtnD2hQo2z4gltSGTp4DLCnmJ4=;
+	s=arc-20240116; t=1710458815; c=relaxed/simple;
+	bh=Y4lg842eyRtWuiU4N+Si7fkQtHRQlH6n5P6xF36CfXg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=b4idMfT6aSG4WdYv1qAN9otXAM1X/D0nJw+N7LfFP48irBefkxGilLKL5z0ikix2IYC8qi9Klbu5dYKEfTHGH50a6W7Y7iiaVof5dt2ijroiEEXUeELHH6Cv6aF8yaEjbBM5KYZaRM0nWuiJG8nrHDBBiYKyQ+HTfYuGinp8XA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YKpTtA5h; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=oyNQQDQR+c9osZD8R7AyYGjMs+h+hst1ZvIFdFAml2jE5rae46uTgI99H07/39iWb2qJsjGF4t+lusXKvt10U2V1euyTgdmjA7ky0tDcTDWJNG2egU7D0sCPz0dlGw+8fiz3+ZmTgq/N7AE0ReLJt91D+f4NPXZxWyhAXxASITA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bw0QGiLH; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a54004e9fso29376057b3.3
-        for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 16:26:51 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a0694df25so20582117b3.2
+        for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 16:26:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710458811; x=1711063611; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1710458813; x=1711063613; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=oB3ZfcSJ5G1gMIeNmqomMwFWPYu8/DXA5zj+kntGd24=;
-        b=YKpTtA5hr+jr+CBQWoKSxidJLely1oaPaScPz7o7y0zxRdBggmjFrU1JivphrW9UTa
-         PHkGjxx/pqZin797ThccwJEMwy7VI28g19gzfaCML5CLa5nP49IEWbiZAMfwhvxpQqlZ
-         f5pkTmB03wShEmrGl7BmxQSEME7CcBrVj55TWhZgHHtH3Xc/55nizKivnjC/Zbz52LoN
-         KLQXrPVhSlzEtDAs7wvNRTkiBT4EJ4Udop3BxjwXWjCTtE5n2pT+7prbWT5bS+utu4wc
-         nmgU7lp8jtjZoOf+Ic+c6BB2YHnktVJ5mlj2GAEM7qIz+HGiKK5gmNMjYFLjNe3bA+/s
-         IuPQ==
+        bh=bGD1oHLzIwlI71Um3uWf9rz8YDkt0fT9aZFmZxidv5s=;
+        b=bw0QGiLHlSL5PVie+rUleZ0Ihg8BETFGnSQKz+gbO6X++AHhbvg910zucl2B8xxvqz
+         OtFqTWPL0lF9plJhrLzF0COizAt/NINLn9PG/vKpunqeSzqTP6PFVGv1Aps8DQ0flllE
+         qVQArbIpVUBbUJCAAlrayUQgWVKRBnvj/3MUHZfJoW10pM9wW6LJSb3pFvtqS8vlY41g
+         /U8bEpmnSrycpzn2J80IyI6o7VAnlpgDV05t7dToGDbAw37RGZkSU3LmxcRIqNtWDmer
+         iRSPHeoHzc6LTK6b1b+DhG+Z7S/n+AHmfHf/oySnbdEnjW5IT5Moa3pZgMB2KFdHBSLK
+         EPeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710458811; x=1711063611;
+        d=1e100.net; s=20230601; t=1710458813; x=1711063613;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oB3ZfcSJ5G1gMIeNmqomMwFWPYu8/DXA5zj+kntGd24=;
-        b=UDvU9ohjNl1FSJ6bSxBEKVuJtvNN1JH2mCgWOFpOHCAOTekBzZkklKwWfvwiZvO6WF
-         zOvKWXnYqiQMEgxmGzBPV3LuOui4EEM+v9SidAu8ktu6BorX0EkTzDwb3oqEQwgyVjBf
-         87QsypJQFbDNLU/Jf/pwzj6bVDwo/qHS83qO2awPEb4+R+V9ua/YjnHJpfwvdPJmoj8P
-         dg7Np2qwDzv+TrPcriRvJe32arlyvdgpIB8wMeCr5TFdgcj5vcLf9Ff9Pl1voYWy0U2J
-         UR0VbzeYTy/J7s7Z4UI8ZVIk7pOU6ywTmzo2c2w4ir7lklnqQBgQXs7fItijXTPED5um
-         Hg1w==
-X-Forwarded-Encrypted: i=1; AJvYcCVwNDC4EHd5F5vWinQFoCZiYf/mJxUvf01VflWp9uVz672StDf644Lb/b/WBuOHW8/aq3Hripxbuk9KAqCTknX/qPfE
-X-Gm-Message-State: AOJu0YwQn4qbCgxsBUPDTdcUnln+1J+QQ6xed0oEF07XEFHsnILyGIgB
-	Lo8sna4V9sDBX2rJJD3B0iuZ6h8TTF/cueBYDxsZKU09Xv183gPV1UQuyVj+50DBR5mCmpDSsd1
-	lfw==
-X-Google-Smtp-Source: AGHT+IHtBiTnO989+qzsWd/+jqel2tzrmASDdXlpQSt9dAnbWaw8Q3AQpPaqLMF1m7pFqRCnpY9R0RVtBJU=
+        bh=bGD1oHLzIwlI71Um3uWf9rz8YDkt0fT9aZFmZxidv5s=;
+        b=BfZORDYPvz8HJvdxY4SXySPVJ6f2sj5Djh7q2EmHIdZfgnJoJynZZF/3o78wCIQyFQ
+         FWt0jXbHC39qk7pW+CYlaWEGnZMmE3Crt5Ue4gpubzl8pdErm3Db7qpULblvTXXEheJG
+         f+xOf3d1O4DL8S9jjz1jr88Ti15YOy8Aqq1sKFB287AugkHZ9PbxQYpGiHuuBs3G9WBf
+         Gke3jFjC4k4WvetgV9MbKdzw7cpdGT/cpXH1eYR2+VzrNhZilOGhEZhNit6MDzYbH5GX
+         YsgP75rUxS+iyXGKBj4aDWaAi0G/PsMVwMFHPeCiSZWYZEVmtB1mJoeEYcikCTazbZoG
+         UhQA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0zYf8y+KVUOn0r1oaqiZR/zTsteRrnBHiXDj2CyKMLlT2Ez1IYQAbI3M32mDiJ6H2nNsrvg9bdBQiCkomIo4uEp2E
+X-Gm-Message-State: AOJu0YwZOngNy3BA13cOO3+4owe3mJh0VhanJAbG0OgPlqioB7WeqaEw
+	H9N6RYDUQblKVUuVm2+LWW4/ZLuMx9ja6tF9rY3rRYDGvHzmsI/PhU6N4674mj4uKrZEw9OiJbI
+	rAQ==
+X-Google-Smtp-Source: AGHT+IEf2SHyoW7Ci/nXvsu/vvl6dD716Be1qw4xm14NPqmYsKQJNpbDJU6sbwjkwsuGTYDcc+4TPOzUy5A=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:e288:0:b0:60a:56c2:a61f with SMTP id
- l130-20020a0de288000000b0060a56c2a61fmr797989ywe.8.1710458810918; Thu, 14 Mar
- 2024 16:26:50 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1b85:b0:dbe:30cd:8fcb with SMTP id
+ ei5-20020a0569021b8500b00dbe30cd8fcbmr188618ybb.0.1710458812732; Thu, 14 Mar
+ 2024 16:26:52 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 14 Mar 2024 16:26:25 -0700
+Date: Thu, 14 Mar 2024 16:26:26 -0700
 In-Reply-To: <20240314232637.2538648-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240314232637.2538648-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
-Message-ID: <20240314232637.2538648-7-seanjc@google.com>
-Subject: [PATCH 06/18] KVM: selftests: Rework platform_info_test to actually
- verify #GP
+Message-ID: <20240314232637.2538648-8-seanjc@google.com>
+Subject: [PATCH 07/18] KVM: selftests: Explicitly clobber the IDT in the
+ "delete memslot" testcase
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
@@ -92,116 +92,49 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rework platform_info_test to actually handle and verify the expected #GP
-on RDMSR when the associated KVM capability is disabled.  Currently, the
-test _deliberately_ doesn't handle the #GP, and instead lets it escalated
-to a triple fault shutdown.
+Explicitly clobber the guest IDT in the "delete memslot" test, which
+expects the deleted memslot to result in either a KVM emulation error, or
+a triple fault shutdown.  A future change to the core selftests library
+will configuring the guest IDT and exception handlers by default, i.e.
+will install a guest #PF handler and put the guest into an infinite #NPF
+loop (the guest hits a !PRESENT SPTE when trying to vector a #PF, and KVM
+reinjects the #PF without fixing the #NPF, because there is no memslot).
 
-In addition to verifying that KVM generates the correct fault, handling
-the #GP will be necessary (without even more shenanigans) when a future
-change to the core KVM selftests library configures the IDT and exception
-handlers by default (the test subtly relies on the IDT limit being '0').
+Note, it's not clear whether or not KVM's behavior is reasonable in this
+case, e.g. arguably KVM should try (and fail) to emulate in response to
+the #NPF.  But barring a goofy/broken userspace, this scenario will likely
+never happen in practice.  Punt the KVM investigation to the future.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/x86_64/platform_info_test.c | 66 +++++++++----------
- 1 file changed, 33 insertions(+), 33 deletions(-)
+ tools/testing/selftests/kvm/set_memory_region_test.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/platform_info_test.c b/tools/testing/selftests/kvm/x86_64/platform_info_test.c
-index cdad7e2124c8..6300bb70f028 100644
---- a/tools/testing/selftests/kvm/x86_64/platform_info_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/platform_info_test.c
-@@ -26,40 +26,18 @@
- static void guest_code(void)
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index 06b43ed23580..9b814ea16eb4 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -221,8 +221,20 @@ static void test_move_memory_region(void)
+ 
+ static void guest_code_delete_memory_region(void)
  {
- 	uint64_t msr_platform_info;
-+	uint8_t vector;
++	struct desc_ptr idt;
+ 	uint64_t val;
  
--	for (;;) {
--		msr_platform_info = rdmsr(MSR_PLATFORM_INFO);
--		GUEST_ASSERT_EQ(msr_platform_info & MSR_PLATFORM_INFO_MAX_TURBO_RATIO,
--				MSR_PLATFORM_INFO_MAX_TURBO_RATIO);
--		GUEST_SYNC(0);
--		asm volatile ("inc %r11");
--	}
--}
-+	GUEST_SYNC(true);
-+	msr_platform_info = rdmsr(MSR_PLATFORM_INFO);
-+	GUEST_ASSERT_EQ(msr_platform_info & MSR_PLATFORM_INFO_MAX_TURBO_RATIO,
-+			MSR_PLATFORM_INFO_MAX_TURBO_RATIO);
- 
--static void test_msr_platform_info_enabled(struct kvm_vcpu *vcpu)
--{
--	struct ucall uc;
-+	GUEST_SYNC(false);
-+	vector = rdmsr_safe(MSR_PLATFORM_INFO, &msr_platform_info);
-+	GUEST_ASSERT_EQ(vector, GP_VECTOR);
- 
--	vm_enable_cap(vcpu->vm, KVM_CAP_MSR_PLATFORM_INFO, true);
--	vcpu_run(vcpu);
--	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
--
--	switch (get_ucall(vcpu, &uc)) {
--	case UCALL_SYNC:
--		break;
--	case UCALL_ABORT:
--		REPORT_GUEST_ASSERT(uc);
--	default:
--		TEST_FAIL("Unexpected ucall %lu", uc.cmd);
--		break;
--	}
--}
--
--static void test_msr_platform_info_disabled(struct kvm_vcpu *vcpu)
--{
--	vm_enable_cap(vcpu->vm, KVM_CAP_MSR_PLATFORM_INFO, false);
--	vcpu_run(vcpu);
--	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_SHUTDOWN);
-+	GUEST_DONE();
- }
- 
- int main(int argc, char *argv[])
-@@ -67,16 +45,38 @@ int main(int argc, char *argv[])
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
- 	uint64_t msr_platform_info;
-+	struct ucall uc;
- 
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_MSR_PLATFORM_INFO));
- 
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
++	/*
++	 * Clobber the IDT so that a #PF due to the memory region being deleted
++	 * escalates to triple-fault shutdown.  Because the memory region is
++	 * deleted, there will be no valid mappings.  As a result, KVM will
++	 * repeatedly intercepts the state-2 page fault that occurs when trying
++	 * to vector the guest's #PF.  I.e. trying to actually handle the #PF
++	 * in the guest will never succeed, and so isn't an option.
++	 */
++	memset(&idt, 0, sizeof(idt));
++	__asm__ __volatile__("lidt %0" :: "m"(idt));
 +
- 	msr_platform_info = vcpu_get_msr(vcpu, MSR_PLATFORM_INFO);
- 	vcpu_set_msr(vcpu, MSR_PLATFORM_INFO,
- 		     msr_platform_info | MSR_PLATFORM_INFO_MAX_TURBO_RATIO);
--	test_msr_platform_info_enabled(vcpu);
--	test_msr_platform_info_disabled(vcpu);
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			vm_enable_cap(vm, KVM_CAP_MSR_PLATFORM_INFO, uc.args[1]);
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+		default:
-+			TEST_FAIL("Unexpected ucall %lu", uc.cmd);
-+			break;
-+		}
-+	}
-+
-+done:
- 	vcpu_set_msr(vcpu, MSR_PLATFORM_INFO, msr_platform_info);
+ 	GUEST_SYNC(0);
  
- 	kvm_vm_free(vm);
+ 	/* Spin until the memory region is deleted. */
 -- 
 2.44.0.291.gc1ea87d7ee-goog
 
