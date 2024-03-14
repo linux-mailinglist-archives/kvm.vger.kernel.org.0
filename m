@@ -1,164 +1,431 @@
-Return-Path: <kvm+bounces-11778-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 310B687B6BA
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 04:12:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FFEB87B751
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 06:36:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A79F1F238EF
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 03:12:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434FB1C22126
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 05:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30530523C;
-	Thu, 14 Mar 2024 03:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580E7C13B;
+	Thu, 14 Mar 2024 05:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KjN35+a2"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="poDjluEU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2087.outbound.protection.outlook.com [40.107.94.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3880211C
-	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 03:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710385961; cv=none; b=JE2WZKg9bQv1tbVzyzR+5VvtEB5gcsGmBeLLRzuNG4kc65lYQ2nCtkffJvBqKO4vO1P2Sy5Rjtb/6ikOIjLxIHdfl4FKDgx3TLfXYZcB9IjDZkL+tA5lo0KX1WVoJLlVhV1+Kvn49Ep0SrNYL4vCvprc4upEAzjJsApahEHurCg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710385961; c=relaxed/simple;
-	bh=bXjlov1+xgNpyNB5/H0sUGt9aauzEi+JWNlLMri0PVk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pgnxqUeLUljLALnGZM3OfEbCVKH9bmBd4n2hOB5Cb8t8Q8ethkDSgseghh6/LDPIO2kbsjN/+y2yv29fiB/qq7h3ZCSng0hgxoXUGVYlhPlhHjyNuL5l3KDQzDINZTiqjpMfZGK3br+jeoEUTZe12nPwOsK1tor+nUrqbvQiGyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KjN35+a2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710385958;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ujVLStF8fNwjZHlFP85Jc/cq8HmkRWbLvyNFVb8jE2E=;
-	b=KjN35+a24zDpXSCcAyy1CY5AgZV287zRJg/H26Qg+Wul8D3iJ/vAquhZihpc1wszHJykGy
-	QTztO/fVtIvC3oSqp7WlYpjavbIp1OcISXCcp+40AQlqiPy4z/vrB50tOIQPVpoSynf/zV
-	IGM490uDeJLP2sBci9uD0wa3zBlb2Ao=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-472-BdktoEp4NTKMe8MWBfqJ4Q-1; Wed, 13 Mar 2024 23:12:36 -0400
-X-MC-Unique: BdktoEp4NTKMe8MWBfqJ4Q-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-29c367c23c6so538031a91.0
-        for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 20:12:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710385955; x=1710990755;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ujVLStF8fNwjZHlFP85Jc/cq8HmkRWbLvyNFVb8jE2E=;
-        b=O5IHZW/GGwWDlPewOT6OCblrB1IM6xnFeCvUOHn6xE9R30YIN9CBo9iZtkuog6Rvs8
-         zz3SvNNNd3GjJG627tgybep6N88uIs71j4CVxJC+sq0L5/9zSIxcWHlXTbakelpy4ImD
-         BpqWG9DKu/Xlu/uKkc3VMLAFSpYs+vQJL7VeYSWjUGI1KhZLS4H/r7ai+hFtVmML3DpH
-         UrDXkcIDKZKaIOgVORtUmC5sGI1quqvtPQ1LEdcOw8QblbvXvZ7R1ZzlGB3tcVSRT2P9
-         YfiYMFvy9JzVlP8HypJws9I/M+id19V1Lyi6Mca3e3FQ6xM1gQ3WtNBERMy6QYyT4hD5
-         h7+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWbfb25M/WUc/r5SR3dCEhZG1hvK3Gr5Xt9mW/qMs/S41UGcprZPiiSQUUq3jFCXZPpb8PCM8AfdbS6ofX9Gt5p5QPg
-X-Gm-Message-State: AOJu0YybRBwceeaTfRGo7bhihkgmoCxHXFer7U8upRuGWSDtoJk2+2BP
-	CVLROwJwTzoA5gB3w7KbvJB5nePsGoSesIpuxzbFi+tYEhVWvdOAZNgMhNAxdhziPMMaA6mV6Ph
-	n6+FJ1N5EQxcq0+d52NtrSu7vu9aYoTOad+ZLJo4vjIcC5m364JN6mE8gSA4dNvH71HT5Pvna6M
-	iD1APeWSIjSlZybCpndJ5LhHBY
-X-Received: by 2002:a17:90b:1115:b0:29b:dc5c:d534 with SMTP id gi21-20020a17090b111500b0029bdc5cd534mr556795pjb.29.1710385955617;
-        Wed, 13 Mar 2024 20:12:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHgnFIYDkamcOx1cys2VlJt8HrQE2eq5Dv8Fg1l35A9jQKw+iznC+SY6FdtZSdCDKBufcIfbsUlkHcDHjjBuKE=
-X-Received: by 2002:a17:90b:1115:b0:29b:dc5c:d534 with SMTP id
- gi21-20020a17090b111500b0029bdc5cd534mr556779pjb.29.1710385955375; Wed, 13
- Mar 2024 20:12:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597BAFC02;
+	Thu, 14 Mar 2024 05:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710394557; cv=fail; b=q78vwkbHG9taSwpGWdhB+3lz0DHHATszrAyYVuDQo7bKncBq/E9ftSLLwVlxoS1u8ST3MEHn+C88nQMraW/n96AiTJJ88IENQKDJWiW4yO3/+8ADN8S/7MXNYlceRnRZdYOelLH5twUiDaVDmuZFRzGN0YshgOurE8cNEwveoFs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710394557; c=relaxed/simple;
+	bh=z8yYhDp/NMwb7/SYGa+aLCdMbTuXNShlfpx/qgQhr4A=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=FKskRL3VyV8m3Cmy7mFOOMKi1OjoDDYUtW1f3gDlSifGS0fETLAbp+KAKV/BgVBKSdgREnTR1Pf8oArBpQFCqh8rN+HtLjsEzTz/a0Tt5yAVE1swnGHUd8zD7/3qxBwls28usRSrVdGUhNKAgCdVgdsKsRzHLW9Pe5qlBPw6iYA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=poDjluEU; arc=fail smtp.client-ip=40.107.94.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nJTV9K6t5KxX3UZb6Xfrv74/+yINkLy0avOkdI8xJ99PJzI0SCCe/XD+8wta4Q17zqK9RMemYCUfa1ue7T4AxZ1DTExtOlQ57rUJ7jeAjxmx7tK5K32azBEwUgY3YdgZiRKE/7/A4+Ax6vC7oIWRxGDuGjt+2DpCzh8BILXRBWlb94o8wtDLtSbXCqDrus653rU2YREUyQC8POFbCtkixWTzK6wbdMd3cFL9Rx4kH3n3VkayAlcEdkLZ7S4EsWaJZcAGh47KN3R7KvmaEf7UrRmYmgDpY9vzWAkAYnn/zjKjmqtoxpi/fGLOA/I4BM824zsARyIljdUDthPHgJvJZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I5l0DC2+krG6dOlNAl+kZ0w1LMhiaoY9OVqaxGRDWSU=;
+ b=kE67RZewxE9Boh8phHKag4LZcU1eSFBulZSJ+0iLGVljj2ycb8iLxgw7+X+TePRo4WGhaWTl2tTk1PCGHp8d6IIz+r+MeOrjuQo309CTpKXQuWF0qKZLYRAN4RhZRaENQOAhX+rVHHmJzrt5v3K9uQl5tchxjkmauhWQaS3ecFKBeeo0i39JOMzZo6ekgYeIqH2wska//eWEawiw1BCC1mL83BAAZ9vBW7V0XCBMFmJZIjbGE0y1xmgP0OrFVIAukycwky8pOxuIpUYCGUTz1SOPlr+qZjrI3vl4/l1Y1uQvrP/OUQgz2ZBIqjmq+3Ygao2I0ue4LPiyAh+P+KuJGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I5l0DC2+krG6dOlNAl+kZ0w1LMhiaoY9OVqaxGRDWSU=;
+ b=poDjluEUL0egGY/RLFvhK6jFKhUtCgXMHtms5l1RrAKwfj8BJgYi4ubZw9e/xlWTp99RGr4tB8h5XfZUQviDzXpTyICxGKjXvlmGKE7rhrNlh6ytdue+h/3cFS+PbXmr7Dfbs/EjLWMG8UsY2fwVbAmjWanQK+pJgIrctWWRuFI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
+ IA1PR12MB8405.namprd12.prod.outlook.com (2603:10b6:208:3d8::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Thu, 14 Mar
+ 2024 05:35:52 +0000
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::60b6:438a:bff1:cd14]) by DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::60b6:438a:bff1:cd14%5]) with mapi id 15.20.7362.035; Thu, 14 Mar 2024
+ 05:35:51 +0000
+Message-ID: <075ff472-67c7-4cb1-a344-9c1066821eb4@amd.com>
+Date: Thu, 14 Mar 2024 11:05:41 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v1 5/5] selftests: KVM: SVM: Add Idle HLT intercept test
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ pbonzini@redhat.com, shuah@kernel.org, nikunj@amd.com,
+ thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de,
+ Manali Shukla <manali.shukla@amd.com>
+References: <20240307054623.13632-1-manali.shukla@amd.com>
+ <20240307054623.13632-6-manali.shukla@amd.com> <ZeoF2vfrUMCja0x7@google.com>
+From: Manali Shukla <manali.shukla@amd.com>
+In-Reply-To: <ZeoF2vfrUMCja0x7@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0082.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:23::27) To DS7PR12MB6214.namprd12.prod.outlook.com
+ (2603:10b6:8:96::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240312021013.88656-1-xuanzhuo@linux.alibaba.com> <20240312021013.88656-2-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240312021013.88656-2-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 14 Mar 2024 11:12:24 +0800
-Message-ID: <CACGkMEvVgfgAxLoKeFTgy-1GR0W07ciPYFuqs6PiWtKCnXuWTw@mail.gmail.com>
-Subject: Re: [PATCH vhost v3 1/4] virtio: find_vqs: pass struct instead of
- multi parameters
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Hans de Goede <hdegoede@redhat.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Vadim Pasternak <vadimp@nvidia.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, Cornelia Huck <cohuck@redhat.com>, 
-	Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, linux-um@lists.infradead.org, 
-	platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
-	linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|IA1PR12MB8405:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1ba4bf74-8286-42f9-cd0f-08dc43e89c63
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	QDjN9Ih6UuWXLylSYhGXNu1xQ7+cSK4WzY60V/HaisZysPGNZJrqI66fCFHequEiWAKdmxxnae59/avyLpTQkim6NA05fGWsmA+zeNL/v8epizRS/3AWp55g+6NyEyagynvzMO2ErXg8diwopRS7AU7uZs5M8TL5K9FdoJ+eTrlmBEFYhO3EaaZot/c6S+rp6pf0N0jukeHV5pgqcoYeV/acMvKrn6LXtvtQDRXVnL7sTVlZuP99uAOb0HIemkCazPxD/ADrXfzBLZBRbI3gU/J5+ASZNhO1dGyNCXy4/ft6OuvjGA96JMSL+2/MEQX+cYj4WhEQ/GoVI/kKoicE1G9y2Nj3BEgJoMe2jfhJTGppLMBVrl+5+LPLvd0UBkobPJIC37J7gw8TdxP2iadSR0FSmIMAD/irPDppVova3Hzn38U6pXhnbltBuMay64ZT0IaIV0TjPZ6LAsPmt8n1A6eKIEzl1ZEwO+dfyIHpaJOco1xtb4lQlzT0WEEbFvjWmu20fvuONrroddrwYf9DTlcITlk7MTEO0D9diRmyZjVcolH94tvF4q6pjEb1bdEPBHksKTxm41yJgzfx7VaPPnND4o8USToiDPk98sW9KFq76I701UsOhkPD2CmT+Ipj7XSiXcPHyo9JAvYVGaqsWct/bmbXv/ywSny8lr30dpc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?U0R5VERXMXdXUk1EeWw1d3l5UzcyUkxOYTYvdllqWWl4SHphWUNsTENoWEVD?=
+ =?utf-8?B?SUZiZnp3NXJZcFdlN2V1TEY5SUhieGJRa0IxT0l2M0JXWVFrKzBwVVdiRHJ4?=
+ =?utf-8?B?c0FxTjdWYzdxenN4ZDl3eVJtMDMxTHpvWkU4OEdGdTlJS296VHBVSWNVVytY?=
+ =?utf-8?B?MU45bWlIeVJwM085eEU2V1YxbU05ZjBBQlYzUmVTeFdBbDE1blArUFdJY0c5?=
+ =?utf-8?B?aG1zUDBMM0oxcTd4dzNnRmFScDZ0eUZrUkduT2NvclNMOUdwUWd2aWRPbmJR?=
+ =?utf-8?B?OXhOcmJCSXhzZHM3Sm9UcmJlTGgrR01rbElTNjg2YURQZCtodnNXQWNxREs4?=
+ =?utf-8?B?RGdNVU53S2gyaC9mZzVRZEN5Nm03Rm90UllsZXQreVBRbzlmdkNqenB1Zks0?=
+ =?utf-8?B?ZzIvejRKODJ3K3owcTJWTnlRVFBBbTdwNDI0ajY3ZWI2NzIxb3ZPWFJveXo3?=
+ =?utf-8?B?M3RJY2FyNmlhdllxZTd1bmhwWUUrRENOcGFCNjFYMEtUcUdHSUFITHRobC9M?=
+ =?utf-8?B?cVpWQ0FIMUxNUVVNSkFuZ1Y4NDFXS2U2M3JYdjNIMnBrdGhVbC9TOEh2emlE?=
+ =?utf-8?B?L2RUUllmWmE0NVpMekpnbGM0QnJyQnVtcEhuRjU1Qlc4c2hvSjNoR1hYcEFu?=
+ =?utf-8?B?V3R0cDRrK1E2QzRrdlZQMXducStzcWJXTE5RVW1QaS84cG9IVVFtVzNPeW1a?=
+ =?utf-8?B?Ly9uNkNBc1NBcnJHU2NsUTRNOWZudDRBZDFXOVh5cHVWSEVINUppeXRKNEo3?=
+ =?utf-8?B?Nko2dVNkL2d6eTBYQ1RMNTdqZmNTT3VQd0lIaG5XT2FrTm9nRnNEc0VFL3I0?=
+ =?utf-8?B?N1VtVlQxa3lzQkluNDYxOEJRNXhkN2lnQ25PZENJd2IydmlTckJITEFFMUt2?=
+ =?utf-8?B?OFVoMHh0U3hxbjVZTzF6MmhrSWJpV0xtOWVBTlBaaktiNU5FbHJPZ3NtS0Z5?=
+ =?utf-8?B?NTlqUlA5TVhkc3hrNlI3MUZNb0M1aHpRZFRtRGY1WCsvZ3h3d3hNdEVmalhE?=
+ =?utf-8?B?azlPcFh3ZmNPUUlNaXFtdXJ1cFlzUldhQnpCaHNlSFJiWURIbXMyWFFsZzlH?=
+ =?utf-8?B?T1FtR2lRcnZmM2JwRGtBRkRIbG1EZ2NsanJ3SnJjM3Q3REtJNzBvZWtOWWZi?=
+ =?utf-8?B?dXJBdzhGMktZV2dIUDVzQnNoeGEyYzlmdHFiS1hjZ0VXcVZueDZvajZzVE90?=
+ =?utf-8?B?SE9CRHBJUS82dHBOWXYzZjVuemRVcXh5NlBDMzAzOVZsRUEwNkxpUTJrR1k5?=
+ =?utf-8?B?Q21RTFJ4QmFXaFJwUVRoWlhSMDRyUWFHYnJiUTNvZ2ZJdG5BQ0liTGZ6QnRX?=
+ =?utf-8?B?V0c2MFhxaGM0d3d3UHEySzcySjRqVE5lVmFDajdZc1p4bm9uU09VYStmenJn?=
+ =?utf-8?B?OEg2bmI0UmMycUNBWUVzNFF2ZENoT3ZUMnI2VThrcjNneWFNQ0ZzYktYdXlu?=
+ =?utf-8?B?NDFDMUkxKzdDVU5YNzVGRmExZzg4K2MyS3JsZGd6ZWJTcXBuWlk2VmJHQW5v?=
+ =?utf-8?B?V0xlK29Hb0ZqU2RQckpsWlRxZG5nN2VUNmV4M0ZVOWdMSXQrLzBtRGlIeGc5?=
+ =?utf-8?B?cUNmb3pOaW54K1Y1NlBhdDNITDNYUlFRNnhVQWpFTW05NEIyNXhML3ZiODFN?=
+ =?utf-8?B?NkFralMvS25Wa251ZDlOODdGRkpPWkViYm9LQkd3YWllQmRneWdlS3dMODBn?=
+ =?utf-8?B?RjN5ZUw3YVNDamc5S3k2MklyaEY5VHI1eDJBVjQ5TTdGMnFmR256MEs4a0xt?=
+ =?utf-8?B?dnd3RjNZbTFPZ0Z6YXJwUmh1T2QyMk9yeGZBa0JXQVJ2QVlhdVFmbWNzZ3FO?=
+ =?utf-8?B?ZVFCbkFYc0hNZ0kyVlhCWjEzL25VMEVGUEdqSWxRdjVidDNaNWxvTEFWbSsv?=
+ =?utf-8?B?NEhMK2lnNGJDalFEcEVKcnp1aGtDZ24rcVhUQ01YbEJrcTl5dGtYdnFyY2hS?=
+ =?utf-8?B?MHNhMWdFdW92RzZ6ZjdORUZWUXNkUU9zd1V5UlZBZWZVdXp1VjdCV1ROcWF2?=
+ =?utf-8?B?aGpMME83ejdvNERzdXcrQm9Jc1pmNjAyRjNwd2p4eUxoY2ZyazZOTHpmL09H?=
+ =?utf-8?B?L0RadnlydjlNOVFWYmhZUkorazFJUFdYZVpTcENodWppMG1JZHMvZ0RVdms2?=
+ =?utf-8?Q?fNbw0z3A9JjmZIdwwZ94/4Pym?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ba4bf74-8286-42f9-cd0f-08dc43e89c63
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 05:35:51.8797
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n8FoUI3fjRVV4vjY/oI7AqoSUIzjJNFdbVzevweEMLBeX7Sn4tF7mt6eSMWDbAgz3qrH5ZdM/6j6EkmjEIdDuw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8405
 
-On Tue, Mar 12, 2024 at 10:10=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
->
-> Now, we pass multi parameters to find_vqs. These parameters
-> may work for transport or work for vring.
->
-> And find_vqs has multi implements in many places:
->
->  arch/um/drivers/virtio_uml.c
->  drivers/platform/mellanox/mlxbf-tmfifo.c
->  drivers/remoteproc/remoteproc_virtio.c
->  drivers/s390/virtio/virtio_ccw.c
->  drivers/virtio/virtio_mmio.c
->  drivers/virtio/virtio_pci_legacy.c
->  drivers/virtio/virtio_pci_modern.c
->  drivers/virtio/virtio_vdpa.c
->
-> Every time, we try to add a new parameter, that is difficult.
-> We must change every find_vqs implement.
->
-> One the other side, if we want to pass a parameter to vring,
-> we must change the call path from transport to vring.
-> Too many functions need to be changed.
->
-> So it is time to refactor the find_vqs. We pass a structure
-> cfg to find_vqs(), that will be passed to vring by transport.
->
-> Because the vp_modern_create_avq() use the "const char *names[]",
-> and the virtio_uml.c changes the name in the subsequent commit, so
-> change the "names" inside the virtio_vq_config from "const char *const
-> *names" to "const char **names".
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Acked-by: Johannes Berg <johannes@sipsolutions.net>
-> Reviewed-by: Ilpo J=3DE4rvinen <ilpo.jarvinen@linux.intel.com>
+Hi Sean,
 
-The name seems broken here.
+Thank you for reviewing my patches.
 
-[...]
+On 3/7/2024 11:52 PM, Sean Christopherson wrote:
+> On Thu, Mar 07, 2024, Manali Shukla wrote:
+>> From: Manali Shukla <Manali.Shukla@amd.com>
+>>
+>> The Execution of the HLT instruction results in a VMEXIT. Hypervisor
+>> observes pending V_INTR and V_NMI events just after the VMEXIT
+>> generated by the HLT for the vCPU and causes VM entry to service the
+>> pending events.  The Idle HLT intercept feature avoids the wasteful
+>> VMEXIT during the halt if there are pending V_INTR and V_NMI events
+>> for the vCPU.
+>>
+>> The selftest for the Idle HLT intercept instruments the above-mentioned
+>> scenario.
+>>
+>> Signed-off-by: Manali Shukla <Manali.Shukla@amd.com>
+>> ---
+>>  tools/testing/selftests/kvm/Makefile          |   1 +
+>>  .../selftests/kvm/x86_64/svm_idlehlt_test.c   | 118 ++++++++++++++++++
+>>  2 files changed, 119 insertions(+)
+>>  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_idlehlt_test.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index 492e937fab00..7ad03dc4f35e 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -89,6 +89,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/state_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+>> +TEST_GEN_PROGS_x86_64 += x86_64/svm_idlehlt_test
+> 
+> Uber nit, maybe svm_idle_hlt_test?  I find "idlehlt" hard to parse.
+Sure I will change it to svm_idle_hlt_test.
 
->
->  typedef void vq_callback_t(struct virtqueue *);
->
-> +/**
-> + * struct virtio_vq_config - configure for find_vqs()
-> + * @cfg_idx: Used by virtio core. The drivers should set this to 0.
-> + *     During the initialization of each vq(vring setup), we need to kno=
-w which
-> + *     item in the array should be used at that time. But since the item=
- in
-> + *     names can be null, which causes some item of array to be skipped,=
- we
-> + *     cannot use vq.index as the current id. So add a cfg_idx to let vr=
-ing
-> + *     know how to get the current configuration from the array when
-> + *     initializing vq.
+> 
+>>  TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/svm_nested_shutdown_test
+>> diff --git a/tools/testing/selftests/kvm/x86_64/svm_idlehlt_test.c b/tools/testing/selftests/kvm/x86_64/svm_idlehlt_test.c
+>> new file mode 100644
+>> index 000000000000..1564511799d4
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/x86_64/svm_idlehlt_test.c
+>> @@ -0,0 +1,118 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + *  svm_idlehalt_test
+>> + *
+> 
+> Please omit this, file comments that state the name of the test inevitably
+> become stale (see above).
 
-So this design is not good. If it is not something that the driver
-needs to care about, the core needs to hide it from the API.
+Sure. I will remove it.
+> 
+>> + *  Copyright (C) 2024 Advanced Micro Devices, Inc.
+>> + *
+>> + *  For licencing details see kernel-base/COPYING
+> 
+> This seems gratuitous, doesn't the SPDX stuff take care this?
 
-Thanks
+Agreed, I will remove this.
+
+> 
+>> + *
+>> + *  Author:
+>> + *  Manali Shukla  <manali.shukla@amd.com>
+>> + */
+>> +#include "kvm_util.h"
+>> +#include "svm_util.h"
+>> +#include "processor.h"
+>> +#include "test_util.h"
+>> +#include "apic.h"
+>> +
+>> +#define VINTR_VECTOR     0x30
+>> +#define NUM_ITERATIONS 100000
+> 
+> What's the runtime?  If it's less than a second, then whatever, but if it's at
+> all longer than that, then I'd prefer to use a lower default and make this user-
+> configurable.
+
+It takes ~34s to run this test. 
+> 
+>> +/*
+>> + * Incremented in the VINTR handler. Provides evidence to the sender that the
+>> + * VINR is arrived at the destination.
+> 
+> Evidence is useless if there's no detective looking for it.  Yeah, it gets
+> printed out in the end, but in reality, no one is going to look at that.
+> 
+> Rather than read this from the host, just make it a non-volatile bool and assert
+> that it set after every 
+> 
+
+Sure. I can do that.
+
+>> + */
+>> +static volatile uint64_t vintr_rcvd;
+>> +
+>> +void verify_apic_base_addr(void)
+>> +{
+>> +	uint64_t msr = rdmsr(MSR_IA32_APICBASE);
+>> +	uint64_t base = GET_APIC_BASE(msr);
+>> +
+>> +	GUEST_ASSERT(base == APIC_DEFAULT_GPA);
+>> +}
+>> +
+>> +/*
+>> + * The halting guest code instruments the scenario where there is a V_INTR pending
+>> + * event available while hlt instruction is executed. The HLT VM Exit doesn't
+>> + * occur in above-mentioned scenario if the Idle HLT intercept feature is enabled.
+>> + */
+>> +
+>> +static void halter_guest_code(void)
+> 
+> Just "guest_code()".  Yeah, it's a weird generic name, but at this point it's so
+> ubiquitous that it's analogous to main(), i.e. readers know that guest_code() is
+> the entry point.  And deviating from that suggests that there is a second vCPU
+> running _other_ guest code (otherwise, why differentiate?), which isn't the case.
+> 
+
+Sure.
+
+>> +{
+>> +	uint32_t icr_val;
+>> +	int i;
+>> +
+>> +	verify_apic_base_addr();
+> 
+> Why?  The test will fail if the APIC is borked, this is just unnecessary noise
+> that distracts readers.
+> 
+> Sure. I will remove it in V2.
+
+>> +	xapic_enable();
+>> +
+>> +	icr_val = (APIC_DEST_SELF | APIC_INT_ASSERT | VINTR_VECTOR);
+>> +
+>> +	for (i = 0; i < NUM_ITERATIONS; i++) {
+>> +		xapic_write_reg(APIC_ICR, icr_val);
+>> +		asm volatile("sti; hlt; cli");
+> 
+> Please add safe_halt() and cli() helpers in processor.h.  And then do:
+> 
+> 		cli();
+> 		xapic_write_reg(APIC_ICR, icr_val);
+> 		safe_halt();
+> 
+> to guarantee that interrupts are disabled when the IPI is sent.  And as above,
+> 
+> 		GUEST_ASSERT(READ_ONCE(irq_received));
+> 		WRITE_ONCE(irq_received, false);
+> 
+
+Sure.
+>> +	}
+>> +	GUEST_DONE();
+>> +}
+>> +
+>> +static void guest_vintr_handler(struct ex_regs *regs)
+>> +{
+>> +	vintr_rcvd++;
+>> +	xapic_write_reg(APIC_EOI, 0x30);
+> 
+> EOI is typically written with '0', not the vector, because the legacy EOI register
+> clears the highest ISR vector, not whatever is specified.  IIRC, one of the Intel
+> or AMD specs even says to use '0'.
+> 
+> AMD's Specific EOI register does allow targeting a specific vector, but that's
+> not what's being used here.
+
+Sure.
+> 
+>> +}
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +	struct kvm_vm *vm;
+>> +	struct kvm_vcpu *vcpu;
+>> +	struct ucall uc;
+>> +	uint64_t  halt_exits, vintr_exits;
+>> +	uint64_t *pvintr_rcvd;
+>> +
+>> +	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
+> 
+> No, this test doesn't require SVM, which is KVM advertising *nested* SVM.  This
+> test does require idle-hlt support though...
+
+Sure. I will add it in V2.
+
+> 
+>> +	/* Check the extension for binary stats */
+>> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_BINARY_STATS_FD));
+>> +
+>> +	vm = vm_create_with_one_vcpu(&vcpu, halter_guest_code);
+>> +
+>> +	vm_init_descriptor_tables(vm);
+>> +	vcpu_init_descriptor_tables(vcpu);
+>> +	vm_install_exception_handler(vm, VINTR_VECTOR, guest_vintr_handler);
+>> +	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
+>> +
+>> +	vcpu_run(vcpu);
+>> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+>> +
+>> +	halt_exits = vcpu_get_stat(vcpu, "halt_exits");
+> 
+> Is there really no way to get binary stats without having to pass in strings?
+
+I could see one of the test case is passing the strings to get binary stats of
+vm. That is why I used strings to get binary stats of vcpu. I will try to find another
+way to get the binary stats.
+
+> 
+>> +	vintr_exits = vcpu_get_stat(vcpu, "irq_window_exits");
+>> +	pvintr_rcvd = (uint64_t *)addr_gva2hva(vm, (uint64_t)&vintr_rcvd);
+>> +
+>> +	switch (get_ucall(vcpu, &uc)) {
+>> +	case UCALL_ABORT:
+>> +		REPORT_GUEST_ASSERT(uc);
+>> +		/* NOT REACHED */
+> 
+> Eh, just put a "break;" here and drop the comment.
+> 
+Sure.
+
+>> +	case UCALL_DONE:
+>> +		goto done;
+> 
+> break;
+> 
+>> +	default:
+>> +		TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
+>> +	}
+>> +
+>> +done:
+>> +	TEST_ASSERT(halt_exits == 0,
+> 
+> So in all honesty, this isn't a very interesting test.  It's more of a CPU test
+> than a KVM test.  I do think it's worth adding, because why not.
+> 
+> But I'd also like to see a testcase for KVM_X86_DISABLE_EXITS_HLT.  It would be
+> a generic test, i.e. not specific to idle-hlt since there is no dependency and
+> the test shouldn't care.  I _think_ it would be fairly straightforward: create
+> a VM without an in-kernel APIC (so that HLT exits to userspace), disable HLT
+> interception, send a signal from a different task after some delay, and execute
+> HLT in the guest.  Then verify the vCPU exited because of -EINTR and not HLT.
+
+I will create this test.
+> 
+>> +		    "Test Failed:\n"
+>> +		    "Guest executed VINTR followed by halts: %d times\n"
+>> +		    "The guest exited due to halt: %ld times and number\n"
+>> +		    "of vintr exits: %ld and vintr got re-injected: %ld times\n",
+>> +		    NUM_ITERATIONS, halt_exits, vintr_exits, *pvintr_rcvd);
+> 
+> I appreciate the effort to provide more info, but this is way too noisy.  If
+> anything, print gory details in a pr_debug() *before* the assert (see below),
+> and then simply do:
+> 
+> 	TEST_ASSERT_EQ(halt_exits, 0);
+> 
+Sure.
+
+>> +	fprintf(stderr,
+>> +		"Test Successful:\n"
+>> +		"Guest executed VINTR followed by halts: %d times\n"
+>> +		"The guest exited due to halt: %ld times and number\n"
+>> +		"of vintr exits: %ld and vintr got re-injected: %ld times\n",
+>> +		NUM_ITERATIONS, halt_exits, vintr_exits, *pvintr_rcvd);
+> 
+> And this should be pr_debug(), because no human is going to look at this except
+> when the test isn't working correctly.
+
+I will change it to pr_debug() in V2.
+> 
+>> +
+>> +	kvm_vm_free(vm);
+>> +	return 0;
+>> +}
+>> -- 
+>> 2.34.1
+>> /pvintr_rcvd
+> 
 
 
