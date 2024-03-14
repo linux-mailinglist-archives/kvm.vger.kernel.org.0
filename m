@@ -1,184 +1,116 @@
-Return-Path: <kvm+bounces-11813-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11814-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DD4387C2CB
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 19:33:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 854F087C2E1
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 19:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 482AA282578
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 18:32:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24CB11F21BC3
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 18:38:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F0B762D3;
-	Thu, 14 Mar 2024 18:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19B774E11;
+	Thu, 14 Mar 2024 18:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dZ0Pu03x"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39117350B;
-	Thu, 14 Mar 2024 18:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525E51E480
+	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 18:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710441121; cv=none; b=EZoUVEHF++UUYYt9fb4/hpjdkwvysB7w0VUIEI9O2BDkfjP0eTCf6ipD2zul41ZM0Vay59ZbvyxbNemQA6K2KZ/JiceRnVHizaFGaAt7qQxyvwHP8orXEaXHYptopGpdU5Qq6kM/b2cyAyj/DouG1jAfxb0+2g+ND+dPzIeYFjc=
+	t=1710441491; cv=none; b=IBGbhAGe3a/HdY/NKxzqx+jLJBaaqQCduhzCW37G0TEqwOGNnkw9Ph7XovytdMwPAMC5F1+/M0bRSzt5q8Z4o/o5fBtxF31f3ZbD5T2GseyQW4PdovzLka4yNGAVkmriKRSsIO7N4tG8maFD6NnEQPPfJi2nOt1HzfCvAQ1gA34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710441121; c=relaxed/simple;
-	bh=mvdnoLfy3ROkxmfR7t2H/wROfPIdheF/nBqPtCWPX4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=caLa/U/pxbHZR3c2cgLYTWNfRiA+6oquCYVT0Zmwd3BR/OrkH/rbhZk1lY5pP3oWRjph2JZwAmOZLHBdGaQYp7AYEQdESRFcyNEAwWBKfS3IFbfttuB+96ugNrUdTjPMYwMOfjTBCQ7G8BRIlMWMFp5hWA2G/VbK2/563kweVw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A243FC43390;
-	Thu, 14 Mar 2024 18:31:55 +0000 (UTC)
-Date: Thu, 14 Mar 2024 14:34:06 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Alison Schofield <alison.schofield@intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
- <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
- linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
- iommu@lists.linux.dev, linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
- linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
- selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
- linux-sound@vger.kernel.org, bpf@vger.kernel.org,
- linux-wpan@vger.kernel.org, dev@openvswitch.org,
- linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net, Julia
- Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-Message-ID: <20240314143406.6289a060@gandalf.local.home>
-In-Reply-To: <ZfMslbCmCtyEaEWN@aschofie-mobl2>
-References: <20240223125634.2888c973@gandalf.local.home>
-	<ZfMslbCmCtyEaEWN@aschofie-mobl2>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1710441491; c=relaxed/simple;
+	bh=Sy3Ocyywo4dC2ab/PEmi6xwF/x3KCht5GPnpxYBLfdY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eY+vRH2hzRBk2Ujrv5DR/qb+OZ/yLb/2pZQYPAU7IoAT/QRu3Ni7Tinwld52GN6wfArKA+kD4PPxOJa+6X7c6f9WUZ95zyAtryP13rHak+licXmxasIx8ZpMQSmTh2D52SNFSAiLfKP9iHpNAqZIucJoumvfyYkjqZdIjR4NPz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dZ0Pu03x; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a0b18e52dso15302397b3.1
+        for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 11:38:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710441489; x=1711046289; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1XYJ7yiCtpnjjL7rWLIdC2OAlAqP3qehoMMVqNfcku0=;
+        b=dZ0Pu03xfi4x7+l668oqOi1tCkXCQEYPVWdYJCZF5aspNKXaJ7BvE5tOG2R+t4KVgk
+         qWCMWcmjzX6gDQqySusKh9AAuQMxXgBb03TNu+A22xDbV1LwDUGq7EAcwkvkDPRFAQ27
+         79MH9pLwDHIPHxwAL4FtVWxQvmebfu3LwVEn+ZfM+1L046dwNbce1rtj4s97EQyc40DO
+         RZ3ezHRvgH0wbrEoGNPFqmgdkU3HCbwfY/OzZVaJoNKG6kBt7MRDL5CijHJnleRXZeo9
+         /cWj+Z0itEXB5laFsdMnCuy+StGIIJMcdfwQdtth8bUBvoy//ylK2OKmaXGun87rEqyD
+         9cYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710441489; x=1711046289;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1XYJ7yiCtpnjjL7rWLIdC2OAlAqP3qehoMMVqNfcku0=;
+        b=iMPwCLT/Ix3PiBogO6JfC1j1qj8i3/P3Y4Zzk9BT2WyWlOVan5GywwIY302ZfZXypi
+         WWP3gC611WhdVO6eJWZbx7IHIZMQl4G436BsAb631Um4c2i6N1PFq2ktfcgl7O78S2Wf
+         Civ2b+VzX/qmFUovT376hrQgYjuvJLK4mIaT4233r+9Bfigex/4csraeo4hIoIs/0nis
+         fsbmSka4nsKOyhX6NwvSRijoYpBNsgIcDv9f/oJSv8fVg0n5KVCD8tEUyJmOBHC+7Yl/
+         7+B5UIy56oOega8+OHBG75pGp2YIKldCJKcJjPWghlNcWrzCLLH6zYfLLHxtrt495eC/
+         wRKw==
+X-Gm-Message-State: AOJu0YwxbQ6uiGmPI0rc8aDae26U1zQ140TPO4hGSSyUcvZkzt1k2PXm
+	9O6b25pEg8qG2yjW3TF/7HTMeFGD0SfvpTLhTVQzBpYQkKgN+Uny3VCMTpEj11bYusppnJ53m5e
+	z0g==
+X-Google-Smtp-Source: AGHT+IG0og3Q54ZAyEcdVlCBcIhLJRcWqFxI19oMJyI6eSeU5q6zLIISJPiN9kZgNCQNUie7WtclvNy+An4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4e8a:0:b0:60a:3c86:f1ea with SMTP id
+ c132-20020a814e8a000000b0060a3c86f1eamr1613279ywb.2.1710441489435; Thu, 14
+ Mar 2024 11:38:09 -0700 (PDT)
+Date: Thu, 14 Mar 2024 11:38:08 -0700
+In-Reply-To: <CABgObfa3By9GU9_8FmqHQK-AxWU3ocbBkQK0xXwx2XRDP828dg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240308223702.1350851-1-seanjc@google.com> <20240308223702.1350851-5-seanjc@google.com>
+ <CABgObfa3By9GU9_8FmqHQK-AxWU3ocbBkQK0xXwx2XRDP828dg@mail.gmail.com>
+Message-ID: <ZfNEEFmTkx-RVuix@google.com>
+Subject: Re: [GIT PULL] KVM: x86: MMU changes for 6.9
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 14 Mar 2024 09:57:57 -0700
-Alison Schofield <alison.schofield@intel.com> wrote:
+On Thu, Mar 14, 2024, Paolo Bonzini wrote:
+> On Fri, Mar 8, 2024 at 11:37=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> >  - Zap TDP MMU roots at 4KiB granularity to minimize the delay in yield=
+ing if
+> >    a reschedule is needed, e.g. if a high priority task needs to run.  =
+Because
+> >    KVM doesn't support yielding in the middle of processing a zapped no=
+n-leaf
+> >    SPTE, zapping at 1GiB granularity can result in multi-millisecond la=
+g when
+> >    attempting to schedule in a high priority.
+> >
+>=20
+> Would 2 MiB provide a nice middle ground?
 
-> On Fri, Feb 23, 2024 at 12:56:34PM -0500, Steven Rostedt wrote:
-> > From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
-> > 
-> > [
-> >    This is a treewide change. I will likely re-create this patch again in
-> >    the second week of the merge window of v6.9 and submit it then. Hoping
-> >    to keep the conflicts that it will cause to a minimum.
-> > ]
+Not really?
 
-Note, change of plans. I plan on sending this in the next merge window, as
-this merge window I have this patch:
+Zapping at 2MiB definitely fixes the worst of the tail latencies, but there=
+ is
+still a measurable difference between 2MiB and 4KiB.  And on the other side=
+ of the
+coing, I was unable to observe a meaningful difference in total runtime by =
+zapping
+at 2MiB, or even 1GiB, versus 4KiB.
 
-  https://lore.kernel.org/linux-trace-kernel/20240312113002.00031668@gandalf.local.home/
-
-That will warn if the source string of __string() is different than the
-source string of __assign_str(). I want to make sure they are identical
-before just dropping one of them.
-
-
-> 
-> > diff --git a/drivers/cxl/core/trace.h b/drivers/cxl/core/trace.h
-> > index bdf117a33744..07ba4e033347 100644
-> > --- a/drivers/cxl/core/trace.h
-> > +++ b/drivers/cxl/core/trace.h  
-> 
-> snip to poison
-> 
-> > @@ -668,8 +668,8 @@ TRACE_EVENT(cxl_poison,
-> >  	    ),
-> >  
-> >  	TP_fast_assign(
-> > -		__assign_str(memdev, dev_name(&cxlmd->dev));
-> > -		__assign_str(host, dev_name(cxlmd->dev.parent));
-> > +		__assign_str(memdev);
-> > +		__assign_str(host);  
-> 
-> I think I get that the above changes work because the TP_STRUCT__entry for
-> these did:
-> 	__string(memdev, dev_name(&cxlmd->dev))
-> 	__string(host, dev_name(cxlmd->dev.parent))
-
-That's the point. They have to be identical or you will likely bug.
-
-The __string(name, src) is used to find the string length of src which
-allocates the necessary length on the ring buffer. The __assign_str(name, src)
-will copy src into the ring buffer.
-
-Similar to:
-
-	len = strlen(src);
-	buf = malloc(len);
-	strcpy(buf, str);
-
-Where __string() is strlen() and __assign_str() is strcpy(). It doesn't
-make sense to use two different strings, and if you did, it would likely be
-a bug.
-
-But the magic behind __string() does much more than just get the length of
-the string, and it could easily save the pointer to the string (along with
-its length) and have it copy that in the __assign_str() call, making the
-src parameter of __assign_str() useless.
-
-> 
-> >  		__entry->serial = cxlmd->cxlds->serial;
-> >  		__entry->overflow_ts = cxl_poison_overflow(flags, overflow_ts);
-> >  		__entry->dpa = cxl_poison_record_dpa(record);
-> > @@ -678,12 +678,12 @@ TRACE_EVENT(cxl_poison,
-> >  		__entry->trace_type = trace_type;
-> >  		__entry->flags = flags;
-> >  		if (region) {
-> > -			__assign_str(region, dev_name(&region->dev));
-> > +			__assign_str(region);
-> >  			memcpy(__entry->uuid, &region->params.uuid, 16);
-> >  			__entry->hpa = cxl_trace_hpa(region, cxlmd,
-> >  						     __entry->dpa);
-> >  		} else {
-> > -			__assign_str(region, "");
-> > +			__assign_str(region);
-> >  			memset(__entry->uuid, 0, 16);
-> >  			__entry->hpa = ULLONG_MAX;  
-> 
-> For the above 2, there was no helper in TP_STRUCT__entry. A recently
-> posted patch is fixing that up to be __string(region, NULL) See [1],
-> with the actual assignment still happening in TP_fast_assign.
-
-__string(region, NULL) doesn't make sense. It's like:
-
-	len = strlen(NULL);
-	buf = malloc(len);
-	strcpy(buf, NULL);
-
-??
-
-I'll reply to that email.
-
--- Steve
-
-> 
-> Does that assign logic need to move to the TP_STRUCT__entry definition
-> when you merge these changes? I'm not clear how much logic is able to be
-> included, ie like 'C' style code in the TP_STRUCT__entry.
-> 
-> [1]
-> https://lore.kernel.org/linux-cxl/20240314044301.2108650-1-alison.schofield@intel.com/
+In other words, AFAICT, there's no need to shoot for a middle ground becaus=
+e trying
+to zap at larger granularities doesn't buy us anything.
 
