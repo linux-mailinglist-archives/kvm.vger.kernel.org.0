@@ -1,235 +1,204 @@
-Return-Path: <kvm+bounces-11848-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11849-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF1A87C5CE
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 00:14:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D541487C64F
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 00:31:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B8D51F2206D
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 23:14:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 445961F26234
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 23:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0487717BAF;
-	Thu, 14 Mar 2024 23:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03ED175A1;
+	Thu, 14 Mar 2024 23:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xJQdVpWg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IUfp/yck"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9113C179AB
-	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 23:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB04114A8D
+	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 23:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710458064; cv=none; b=JeuWWiJFGXU7neKuwQZuOh61BwwKZmE23jfWuUPYdsUuUYFR8cjqxjRq35Ixji2iDVBdS0pduA4LS6EPTVyM3qL0jPOFfkUlMmzAGAEPvcTYa0LSVz3YDCMwZ1xbw+4tg0Dhq4hfJK1FXg33DOpWd/hXBRnke05gOo+0EI+p11w=
+	t=1710458803; cv=none; b=XboxHepFF59JMj7MU8bVQeDYCWLeL1axO9KUMRJRciV26sWWKhlNi3we4HFHqxumbc2niR7nOhM5k5sa0OcRXjL45UxXnC2goj4KaxKfoNPzm1VZSaCVx/LRTiS+qKK0wGfvAp7a58lKq5zNGTKks9dmT1Bu+jeiLBYRmU2pIM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710458064; c=relaxed/simple;
-	bh=iyvfN2zMYG8PeuOq1sOUP4/DPmERJTi8qXuVaXp2b/0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bZflIe1ONzAulnYbj2F8rWG7h8hsju1K/G6EqMGqIYs/vEJscGb/7O0NgXAYo4TyqjHWnfTQ8OXQcf7n+Of1Gj0HCyEkPteRTt7W+f82ebJFXJxLQZuM2zrg62IwvINei79rulDRO2k+Kjj5Vf3C1X/wNBzv2eOMVuN8qI8gg94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xJQdVpWg; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1710458803; c=relaxed/simple;
+	bh=rHlVStDEOKpOujnyeMUdLxN9RPKooIOT8Uf7Wm0+6SM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bxwhNE7dMxQslb8Zxsr0bZy0/NHDKu9XbgNrFgHXGiDeYaYTrqEzuCXN7d5Vt8dkoJn6dvMlXYbv0elkngjsEwf0ITFpdCGPuYZZrDh8zHoaRT3Vc6Fh+cfNeFSikGXsbi8Ybtdf+83jJJhNCQ3tpqKbCuEUCsJwzJkF611FU+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IUfp/yck; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5ce12b4c1c9so984253a12.1
-        for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 16:14:22 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60cc00203faso32677117b3.2
+        for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 16:26:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710458062; x=1711062862; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G2gXkrk25ApWi0AZWQrl7oyv31LVyXSVxJ0dKarlmGM=;
-        b=xJQdVpWgoPVVgIu0+YzxdwIap7k0UlhxUSNL8NA515LMSIQJN/1C2FfkLncxWG5Y4T
-         hpfgnd8xrAsdup+k3p3ilBsEqE8RcOFHUGmUsGNxs/0EgcDdqqbpe00HWHoEexWNDvKY
-         RudJks6kR9FJSkrIfAjPEx4OhWa5rvVttO7iZtXPpqw7xiKP4QHlFWn0Orx+ktdwGzje
-         ahZKtw5hhBnXEfr8lRKu05oLICcNMvS83jdxxMxFsCHrgBrdePS0wv6hvihLykA2xR8+
-         /N5dyou9vu5d1ysSkIcLiaZDhaCg9GWaKJTQn1Zeo69ItsHtMKIbKLaBVi7jrC8H3rGd
-         AGXg==
+        d=google.com; s=20230601; t=1710458800; x=1711063600; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h7s5Hb/mvTE7PCNAe2dunBDM+z2TyWomMuHISUh3bYw=;
+        b=IUfp/yckBMOevaTR/EYIH+mSAnNCqKkyTHkRmc5zlC+7sqk8CPZXQYUtpsRPymGY+e
+         2SuDr7ClmVmJ3TGPBhD6aDX2+UZ0EWuO8O7dWluoTyHOgP9PCAsFe3RIwX5zT5LtTRwt
+         dtizexqvEcI48rj3GfbQyc0DlmWFnhYBkB2wQ2NFIkNft9qg/vybBt2yFowy9/jSt/Tg
+         3lgSw0YikYmwyBwc4xzz1LLZ5JDjDYy7EMWHjTufEV4zaXk7SQTY9BuhXEl9JthnBSNc
+         vmERERizPs4XNLCDBfZ1KPFbteE99SZefi9TaoFD0g0fYIlDRPUPioddvhCL0d6lBqET
+         k7UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710458062; x=1711062862;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=G2gXkrk25ApWi0AZWQrl7oyv31LVyXSVxJ0dKarlmGM=;
-        b=ToLDoRPyK/EvGhHvOrPyB/+jZv68kemu/nH8m3LG8BdliqWZ9RFfmtW8Hv5iAVoNZL
-         WqdUniBtFYPbXB5O/ZrJnBEPbwP+PX7nB/+HqER/mwHQNPhV3PExntzpaHw+24Hq9v2y
-         XBs8Pcgk0+jZ4CH22oJdxbOX8wEc1OlwVamQk3Oh7kPCSwfOg3TCflqPpwBTMp5LQLou
-         WNr+Hx59BtPj0gGdah+mm/VeV/78fscflXxIv5769NRsuqQwzC3cii1XfVf+BS6vDKJY
-         2vxa/zWoa2aIWAKEDX3GvHMcphc4AHO6h6VD323/quayxQ1Gt96c4SttTKN646YpwpqG
-         F2vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV2mafGn+aZ40K4lvZKEFOhmzBYCLxZ8RU4MryhpcCzJDGOmwn+VWUrzNGPYdmF9TGmlRl1va+HvjEWX4FkYlKlzysx
-X-Gm-Message-State: AOJu0YzoMsGRgXHeLLx0Mtu3TqJY8/ghPK0800+nv2gs5OL5b+4ewniA
-	EpYOlE0qOPvejnJzL6ZdcG6phXeTY1ao+D8YobigGIch9Daw/F088QrLAQqlAodX4F6oTqOPTo5
-	atw==
-X-Google-Smtp-Source: AGHT+IFiXTYK9GMo11ntza57cJEtjARh0bkS7xUvMkE6sH3xE3jj1bsUvg09KJ6XAocLLcqYBMMbu7T6pfo=
+        d=1e100.net; s=20230601; t=1710458800; x=1711063600;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h7s5Hb/mvTE7PCNAe2dunBDM+z2TyWomMuHISUh3bYw=;
+        b=XQsZ18EES7ryG+g88VCu4ssFtRwqUfOYa4eUMY5H1g+CpiylWahc0Ly2tK4VS1klG2
+         zBnrONuu01db3fcfY2wkR7RlWEuGJBykUumU7U1QAhkNZNVsCMHvPQFjMA2YOT3JcEuA
+         nElBCs/CYI0ORq9Y4cNS7BM0P3LnruYU3M1re+TK8Dt4+X4aKLdMvO/j1YxB+RoCiIWl
+         GPQccrEPUvhkO87SIMDYd62XnJml+5KFcOeYgFNLMtzKsBBDoGXXn8swEVPwHEpLlc3Z
+         9eYMFFzxyj+PdZMuo5Uus5fwWYu24Z/vRx22JXQj+MuyWhjj5YnwDXg24cYci4vtTBWS
+         i+Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCVSbVd+DOmCzDxpMsmGHAK/UwvWgAu+yB70qgpPfVIoDDLu/17M9SVEZu25DTXtK9jG4VQvw68cEgVDCoSEYainlVvM
+X-Gm-Message-State: AOJu0Yz45HCpFvbuvBY1SdTTBsqYm/1adhCdkJ55ifNm3tv+vqZtFPZ5
+	pQXTpTvO8XUMuxyWHe8YEH3pwYuCCSvLkf55Uzfjpb9XBQYYJjGQuwkU2gPSDpuE7CtBhQxfk4t
+	tJA==
+X-Google-Smtp-Source: AGHT+IHgAdumMdpyEXTw01m4vqKLDoztLrdIMo9Notb2dmLotdpfdICdJ17nIIZegdAzzB6H1KgUKYmEItw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:c18:0:b0:5d3:3a61:16a9 with SMTP id
- b24-20020a630c18000000b005d33a6116a9mr7517pgl.12.1710458061833; Thu, 14 Mar
- 2024 16:14:21 -0700 (PDT)
-Date: Thu, 14 Mar 2024 16:14:20 -0700
-In-Reply-To: <CALzav=fGUnYHiEc40Ym2Yh-H6wMRdw6biYj4+e1vZ0xmBDAnsg@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a81:f10f:0:b0:60d:47bf:235a with SMTP id
+ h15-20020a81f10f000000b0060d47bf235amr173723ywm.5.1710458799770; Thu, 14 Mar
+ 2024 16:26:39 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 14 Mar 2024 16:26:19 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240307194255.1367442-1-dmatlack@google.com> <ZepBlYLPSuhISTTc@google.com>
- <ZepNYLTPghJPYCtA@google.com> <CALzav=cSzbZXhasD7iAtB4u0xO-iQ+vMPiDeXXz5mYMfjOfwaw@mail.gmail.com>
- <ZfG41PbWqXXf6CF-@google.com> <CALzav=fGUnYHiEc40Ym2Yh-H6wMRdw6biYj4+e1vZ0xmBDAnsg@mail.gmail.com>
-Message-ID: <ZfOEzMxn73M0kZk_@google.com>
-Subject: Re: [PATCH] KVM: selftests: Create memslot 0 at GPA 0x100000000 on x86_64
+X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
+Message-ID: <20240314232637.2538648-1-seanjc@google.com>
+Subject: [PATCH 00/18] KVM: selftests: Clean up x86's DT initialization
 From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	Peter Gonda <pgonda@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
-	nrb@linux.ibm.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Mar 14, 2024, David Matlack wrote:
-> On Wed, Mar 13, 2024 at 7:31=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Thu, Mar 07, 2024, David Matlack wrote:
-> > > On Thu, Mar 7, 2024 at 3:27=E2=80=AFPM David Matlack <dmatlack@google=
-.com> wrote:
-> > > >
-> > > > On 2024-03-07 02:37 PM, Sean Christopherson wrote:
-> > > > > On Thu, Mar 07, 2024, David Matlack wrote:
-> > > > > > Create memslot 0 at 0x100000000 (4GiB) to avoid it overlapping =
-with
-> > > > > > KVM's private memslot for the APIC-access page.
-> > > > >
-> > > > > Any chance we can solve this by using huge pages in the guest, an=
-d adjusting the
-> > > > > gorilla math in vm_nr_pages_required() accordingly?  There's real=
-ly no reason to
-> > > > > use 4KiB pages for a VM with 256GiB of memory.  That'd also be mo=
-re represantitive
-> > > > > of real world workloads (at least, I hope real world workloads ar=
-e using 2MiB or
-> > > > > 1GiB pages in this case).
-> > > >
-> > > > There are real world workloads that use TiB of RAM with 4KiB mappin=
-gs
-> > > > (looking at you SAP HANA).
-> > > >
-> > > > What about giving tests an explicit "start" GPA they can use? That =
-would
-> > > > fix max_guest_memory_test and avoid tests making assumptions about =
-4GiB
-> > > > being a magically safe address to use.
-> >
-> > So, rather than more hardcoded addresses and/or a knob to control _all_=
- code
-> > allocations, I think we should provide knob to say that MEM_REGION_PT s=
-hould go
-> > to memory above 4GiB. And to make memslot handling maintainable in the =
-long term:
-> >
-> >   1. Add a knob to place MEM_REGION_PT at 4GiB (and as of this initial =
-patch,
-> >      conditionally in their own memslot).
-> >
-> >   2. Use the PT_AT_4GIB (not the real name) knob for the various memstr=
-ess tests
-> >      that need it.
->=20
-> Making tests pick when to place page tables at 4GiB seems unnecessary.
-> Tests that don't otherwise need a specific physical memory layout
-> should be able to create a VM with any amount of memory and have it
-> just work.
->=20
-> It's also not impossible that a test has 4GiB+ .bss because the guest
-> needs a big array for something. In that case we'd need a knob to move
-> MEM_REGION_CODE above 4GiB on x86_64 as well.
+The vast majority of this series is x86 specific, and aims to clean up the
+core library's handling of descriptor tables and segments.  Currently, the
+library (a) waits until vCPUs are created to allocate per-VM assets, and
+(b) forces tests to opt-in to allocate the structures needed to handler
+exceptions, which has result in some rather odd tests, and makes it
+unnecessarily difficult to debug unexpected exceptions.
 
-LOL, at that point, the test can darn well dynamically allocate its memory.
-Though I'd love to see a test that needs a 3GiB array :-)
+By the end of this series, the descriptor tables, segments, and exception
+handlers are allocated and installed when non-barebones VMs are created.
 
-> For x86_64 (which is the only architecture AFAIK that has a private
-> memslot in KVM the framework can overlap with), what's the downside of
-> always putting all memslots above 4GiB?
+Patch 1 is a selftests-tree-wide change to drop kvm_util_base.h.  The
+existence of that file has baffled (and annoyed) me for quite a long time.
+After rereading its initial changelog multiple times, I realized that the
+_only_ reason it exists is so that files don't need to manually #include
+ucall_common.h.
 
-Divergence from other architectures, divergence from "real" VM configuratio=
-ns,
-and a more compliciated programming environment for the vast majority of te=
-sts.
-E.g. a test that uses more than ~3GiB of memory would need to dynamically p=
-lace
-its test specific memslots, whereas if the core library keeps everything un=
-der
-4GiB by default, then on x86 every test knows it has 4GiB+ to play with.
+Patch 1 will obviously create conflicts all over the place, though with
+the help of meld, I've found them all trivially easy to resolve.  If no
+objects to the removal of kvm_util_base.h, I will try to bribe Paolo into
+grabbing it early in the 6.10 cycle so that everyone can bring it into
+the arch trees.
 
-One could argue that dynamically placing test specific would be more elegan=
-t,
-but I'd prefer to avoid that because I can't think of any value it would ad=
-d
-from a test coverage perspective, and static addresses are much easier when=
- it
-comes to debug.
+Ackerley Tng (1):
+  KVM: selftests: Fix off-by-one initialization of GDT limit
 
-Having tests use e.g. 2GiB-3GiB or 1GiB-3GiB, would kinda sorta work, but t=
-hat
-2GiB limit isn't a trivial, e.g. max_guest_memory_test creates TiBs of mems=
-lots.
+Sean Christopherson (17):
+  Revert "kvm: selftests: move base kvm_util.h declarations to
+    kvm_util_base.h"
+  KVM: sefltests: Add kvm_util_types.h to hold common types, e.g.
+    vm_vaddr_t
+  KVM: selftests: Move GDT, IDT, and TSS fields to x86's kvm_vm_arch
+  KVM: selftests: Move platform_info_test's main assert into guest code
+  KVM: selftests: Rework platform_info_test to actually verify #GP
+  KVM: selftests: Explicitly clobber the IDT in the "delete memslot"
+    testcase
+  KVM: selftests: Move x86's descriptor table helpers "up" in
+    processor.c
+  KVM: selftests: Rename x86's vcpu_setup() to vcpu_init_sregs()
+  KVM: selftests: Init IDT and exception handlers for all VMs/vCPUs on
+    x86
+  KVM: selftests: Map x86's exception_handlers at VM creation, not vCPU
+    setup
+  KVM: selftests: Allocate x86's GDT during VM creation
+  KVM: selftests: Drop superfluous switch() on vm->mode in
+    vcpu_init_sregs()
+  KVM: selftests: Fold x86's descriptor tables helpers into
+    vcpu_init_sregs()
+  KVM: selftests: Allocate x86's TSS at VM creation
+  KVM: selftests: Add macro for TSS selector, rename up code/data macros
+  KVM: selftests: Init x86's segments during VM creation
+  KVM: selftests: Drop @selector from segment helpers
 
-IMO, memstress is the odd one out, it should be the one that needs to do sp=
-ecial
-things.
+ .../selftests/kvm/aarch64/arch_timer.c        |    1 +
+ tools/testing/selftests/kvm/arch_timer.c      |    1 +
+ .../selftests/kvm/demand_paging_test.c        |    1 +
+ .../selftests/kvm/dirty_log_perf_test.c       |    1 +
+ tools/testing/selftests/kvm/dirty_log_test.c  |    1 +
+ .../testing/selftests/kvm/guest_memfd_test.c  |    2 +-
+ .../testing/selftests/kvm/guest_print_test.c  |    1 +
+ .../selftests/kvm/include/aarch64/processor.h |    2 +
+ .../selftests/kvm/include/aarch64/ucall.h     |    2 +-
+ .../testing/selftests/kvm/include/kvm_util.h  | 1111 +++++++++++++++-
+ .../selftests/kvm/include/kvm_util_base.h     | 1135 -----------------
+ .../selftests/kvm/include/kvm_util_types.h    |   20 +
+ .../selftests/kvm/include/s390x/ucall.h       |    2 +-
+ .../kvm/include/x86_64/kvm_util_arch.h        |    6 +
+ .../selftests/kvm/include/x86_64/processor.h  |    5 +-
+ .../selftests/kvm/include/x86_64/ucall.h      |    2 +-
+ .../selftests/kvm/kvm_page_table_test.c       |    1 +
+ .../selftests/kvm/lib/aarch64/processor.c     |    2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |    1 +
+ tools/testing/selftests/kvm/lib/memstress.c   |    1 +
+ .../selftests/kvm/lib/riscv/processor.c       |    1 +
+ .../testing/selftests/kvm/lib/ucall_common.c  |    5 +-
+ .../selftests/kvm/lib/x86_64/processor.c      |  305 ++---
+ .../testing/selftests/kvm/riscv/arch_timer.c  |    1 +
+ tools/testing/selftests/kvm/rseq_test.c       |    1 +
+ tools/testing/selftests/kvm/s390x/cmma_test.c |    1 +
+ tools/testing/selftests/kvm/s390x/memop.c     |    1 +
+ tools/testing/selftests/kvm/s390x/tprot.c     |    1 +
+ .../selftests/kvm/set_memory_region_test.c    |   12 +
+ tools/testing/selftests/kvm/steal_time.c      |    1 +
+ tools/testing/selftests/kvm/x86_64/amx_test.c |    2 -
+ .../x86_64/dirty_log_page_splitting_test.c    |    1 +
+ .../x86_64/exit_on_emulation_failure_test.c   |    2 +-
+ .../selftests/kvm/x86_64/fix_hypercall_test.c |    2 -
+ .../selftests/kvm/x86_64/hyperv_evmcs.c       |    2 -
+ .../selftests/kvm/x86_64/hyperv_features.c    |    6 -
+ .../testing/selftests/kvm/x86_64/hyperv_ipi.c |    3 -
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |    3 -
+ .../selftests/kvm/x86_64/monitor_mwait_test.c |    3 -
+ .../selftests/kvm/x86_64/platform_info_test.c |   59 +-
+ .../selftests/kvm/x86_64/pmu_counters_test.c  |    3 -
+ .../kvm/x86_64/pmu_event_filter_test.c        |    6 -
+ .../smaller_maxphyaddr_emulation_test.c       |    3 -
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c   |    3 -
+ .../kvm/x86_64/svm_nested_shutdown_test.c     |    5 +-
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |    5 +-
+ .../kvm/x86_64/ucna_injection_test.c          |    5 -
+ .../kvm/x86_64/userspace_msr_exit_test.c      |    3 -
+ .../vmx_exception_with_invalid_guest_state.c  |    3 -
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |    3 -
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |    2 -
+ .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |    3 -
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |    2 -
+ 53 files changed, 1335 insertions(+), 1421 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/include/kvm_util_base.h
+ create mode 100644 tools/testing/selftests/kvm/include/kvm_util_types.h
 
-> >   3. Formalize memslots 0..2 (CODE, DATA, and PT) as being owned by the=
- library,
-> >      with memslots 3..MAX available for test usage.
-> >
-> >   4. Modify tests that assume memslots 1..MAX are available, i.e. force=
- them to
-> >      start at MEM_REGION_TEST_DATA.
->=20
-> I think MEM_REGION_TEST_DATA is just where the framework will satisfy
-> test-initiated dynamic memory allocations. That's different from which
-> slots are free for the test to use.
->=20
-> But assuming I understand your intention, I agree in spirit... Tests
-> should be allowed to use slots TEST_SLOT..MAX and physical addresses
-> TEST_GPA..MAX. The framework should provide both TEST_SLOT and
-> TEST_GPA (names pending), and existing tests should use those instead
-> of random hard-coded values.
->=20
-> >
-> >   5. Use separate memslots for CODE, DATA, and PT by default.  This wil=
-l allow
-> >      for more precise sizing of the CODE and DATA slots.
->=20
-> What do you mean by "[separate memslots] will allow for more precise sizi=
-ng"?
 
-I suspect there is a _lot_ of slop in the arbitrary 512 pages that are tack=
-ed on
-by vm_nr_pages_required().  Those 2MiBs probably don't matter, I just don't=
- like
-completely magical numbers.
+base-commit: e9a2bba476c8332ed547fce485c158d03b0b9659
+-- 
+2.44.0.291.gc1ea87d7ee-goog
 
-> >   6. Shrink the number of pages for CODE to a more reasonable number.  =
-Currently
-> >      vm_nr_pages_required() reserves 512 pages / 2MiB for per-VM assets=
-, which
-> >      at a glance seems ridiculously excessive.
-> >
-> >   7. Use the PT_AT_4GIB knob in s390's CMMA test?  I suspect it does me=
-mslot
-> >      shenanigans purely so that a low gfn (4096 in the test) is guarant=
-eed to
-> >      be available.
->=20
-> +Nico
->=20
-> Hm, if this test _needs_ to use GFN 4096, then maybe the framework can
-> give tests two regions 0..KVM_FRAMEWORK_GPA and TEST_GPA..MAX.
->=20
-> If the test just needs any GFN then it can use TEST_GPA instead of
-> 4096 << page_shift.
 
