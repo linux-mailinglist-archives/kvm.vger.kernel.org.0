@@ -1,177 +1,164 @@
-Return-Path: <kvm+bounces-11777-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11778-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A571D87B6A9
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 04:04:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 310B687B6BA
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 04:12:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 304EF1F24E09
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 03:04:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A79F1F238EF
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 03:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16DC4C96;
-	Thu, 14 Mar 2024 03:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30530523C;
+	Thu, 14 Mar 2024 03:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KjN35+a2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C14B7E1;
-	Thu, 14 Mar 2024 03:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3880211C
+	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 03:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710385452; cv=none; b=Orw62CEscGUZkTsdO3Hqx6sIlcUPxGUI91Vg4Gm3LbvawEkYbpxqI/LBXDDe/Ax+6F+QiyShFRna84M/d4JN4e/+shekRdUV1BaTf38JZlXsygj6MBp2GbESn04wUQ8ghBuyAq7hlLkaNKajh1CT9ikiDk5crta/ERUoudVM4aw=
+	t=1710385961; cv=none; b=JE2WZKg9bQv1tbVzyzR+5VvtEB5gcsGmBeLLRzuNG4kc65lYQ2nCtkffJvBqKO4vO1P2Sy5Rjtb/6ikOIjLxIHdfl4FKDgx3TLfXYZcB9IjDZkL+tA5lo0KX1WVoJLlVhV1+Kvn49Ep0SrNYL4vCvprc4upEAzjJsApahEHurCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710385452; c=relaxed/simple;
-	bh=WeupC+sep6l8TNqmhA+tJld0CwFHMTozvuXCDeX3nPE=;
-	h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NeZ5SIF0BbqzHa5yisbg3arftB92SyHkppCkLJf5y33UoiAuPTTyxTW8cFTT45eDR9hcY6fjyHT5IvuLENfaLWSg2RcQc7Gruvh+pW6CZs9CTgneTaD6vtpapYd9S0LKcAjd+ZP81pq6aUiBSwT1OVHQJPOlk4qE5HMJLh6XU68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.173])
-	by gateway (Coremail) with SMTP id _____8CxmeggafJl6PEYAA--.40819S3;
-	Thu, 14 Mar 2024 11:04:00 +0800 (CST)
-Received: from [10.20.42.173] (unknown [10.20.42.173])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxTs0dafJlhHdZAA--.36976S3;
-	Thu, 14 Mar 2024 11:03:59 +0800 (CST)
-Subject: Re: [PATCH v7 0/4] KVM: selftests: Add LoongArch support
-From: maobibo <maobibo@loongson.cn>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20240202041046.3405779-1-maobibo@loongson.cn>
-Message-ID: <0276944f-0404-d09f-1e75-8e78e05a563b@loongson.cn>
-Date: Thu, 14 Mar 2024 11:03:57 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1710385961; c=relaxed/simple;
+	bh=bXjlov1+xgNpyNB5/H0sUGt9aauzEi+JWNlLMri0PVk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pgnxqUeLUljLALnGZM3OfEbCVKH9bmBd4n2hOB5Cb8t8Q8ethkDSgseghh6/LDPIO2kbsjN/+y2yv29fiB/qq7h3ZCSng0hgxoXUGVYlhPlhHjyNuL5l3KDQzDINZTiqjpMfZGK3br+jeoEUTZe12nPwOsK1tor+nUrqbvQiGyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KjN35+a2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710385958;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ujVLStF8fNwjZHlFP85Jc/cq8HmkRWbLvyNFVb8jE2E=;
+	b=KjN35+a24zDpXSCcAyy1CY5AgZV287zRJg/H26Qg+Wul8D3iJ/vAquhZihpc1wszHJykGy
+	QTztO/fVtIvC3oSqp7WlYpjavbIp1OcISXCcp+40AQlqiPy4z/vrB50tOIQPVpoSynf/zV
+	IGM490uDeJLP2sBci9uD0wa3zBlb2Ao=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-472-BdktoEp4NTKMe8MWBfqJ4Q-1; Wed, 13 Mar 2024 23:12:36 -0400
+X-MC-Unique: BdktoEp4NTKMe8MWBfqJ4Q-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-29c367c23c6so538031a91.0
+        for <kvm@vger.kernel.org>; Wed, 13 Mar 2024 20:12:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710385955; x=1710990755;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ujVLStF8fNwjZHlFP85Jc/cq8HmkRWbLvyNFVb8jE2E=;
+        b=O5IHZW/GGwWDlPewOT6OCblrB1IM6xnFeCvUOHn6xE9R30YIN9CBo9iZtkuog6Rvs8
+         zz3SvNNNd3GjJG627tgybep6N88uIs71j4CVxJC+sq0L5/9zSIxcWHlXTbakelpy4ImD
+         BpqWG9DKu/Xlu/uKkc3VMLAFSpYs+vQJL7VeYSWjUGI1KhZLS4H/r7ai+hFtVmML3DpH
+         UrDXkcIDKZKaIOgVORtUmC5sGI1quqvtPQ1LEdcOw8QblbvXvZ7R1ZzlGB3tcVSRT2P9
+         YfiYMFvy9JzVlP8HypJws9I/M+id19V1Lyi6Mca3e3FQ6xM1gQ3WtNBERMy6QYyT4hD5
+         h7+g==
+X-Forwarded-Encrypted: i=1; AJvYcCWbfb25M/WUc/r5SR3dCEhZG1hvK3Gr5Xt9mW/qMs/S41UGcprZPiiSQUUq3jFCXZPpb8PCM8AfdbS6ofX9Gt5p5QPg
+X-Gm-Message-State: AOJu0YybRBwceeaTfRGo7bhihkgmoCxHXFer7U8upRuGWSDtoJk2+2BP
+	CVLROwJwTzoA5gB3w7KbvJB5nePsGoSesIpuxzbFi+tYEhVWvdOAZNgMhNAxdhziPMMaA6mV6Ph
+	n6+FJ1N5EQxcq0+d52NtrSu7vu9aYoTOad+ZLJo4vjIcC5m364JN6mE8gSA4dNvH71HT5Pvna6M
+	iD1APeWSIjSlZybCpndJ5LhHBY
+X-Received: by 2002:a17:90b:1115:b0:29b:dc5c:d534 with SMTP id gi21-20020a17090b111500b0029bdc5cd534mr556795pjb.29.1710385955617;
+        Wed, 13 Mar 2024 20:12:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHgnFIYDkamcOx1cys2VlJt8HrQE2eq5Dv8Fg1l35A9jQKw+iznC+SY6FdtZSdCDKBufcIfbsUlkHcDHjjBuKE=
+X-Received: by 2002:a17:90b:1115:b0:29b:dc5c:d534 with SMTP id
+ gi21-20020a17090b111500b0029bdc5cd534mr556779pjb.29.1710385955375; Wed, 13
+ Mar 2024 20:12:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240202041046.3405779-1-maobibo@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxTs0dafJlhHdZAA--.36976S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxury3Xr45Jr4DWF1UAF1fuFX_yoWrXFWfpa
-	4I9Fn8Krs7JFyIq3Z7G34kWF1Sya1xKrWxCr1agryUuw42yry8JrWxKFWqyas5Z398XF10
-	v3W8twnrW3WUtacCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
-	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
-	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
-	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtw
-	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
-	67AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
-	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8j-
-	e5UUUUU==
+References: <20240312021013.88656-1-xuanzhuo@linux.alibaba.com> <20240312021013.88656-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240312021013.88656-2-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 14 Mar 2024 11:12:24 +0800
+Message-ID: <CACGkMEvVgfgAxLoKeFTgy-1GR0W07ciPYFuqs6PiWtKCnXuWTw@mail.gmail.com>
+Subject: Re: [PATCH vhost v3 1/4] virtio: find_vqs: pass struct instead of
+ multi parameters
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Hans de Goede <hdegoede@redhat.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Vadim Pasternak <vadimp@nvidia.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, Cornelia Huck <cohuck@redhat.com>, 
+	Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, linux-um@lists.infradead.org, 
+	platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo, Sean
+On Tue, Mar 12, 2024 at 10:10=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
+com> wrote:
+>
+> Now, we pass multi parameters to find_vqs. These parameters
+> may work for transport or work for vring.
+>
+> And find_vqs has multi implements in many places:
+>
+>  arch/um/drivers/virtio_uml.c
+>  drivers/platform/mellanox/mlxbf-tmfifo.c
+>  drivers/remoteproc/remoteproc_virtio.c
+>  drivers/s390/virtio/virtio_ccw.c
+>  drivers/virtio/virtio_mmio.c
+>  drivers/virtio/virtio_pci_legacy.c
+>  drivers/virtio/virtio_pci_modern.c
+>  drivers/virtio/virtio_vdpa.c
+>
+> Every time, we try to add a new parameter, that is difficult.
+> We must change every find_vqs implement.
+>
+> One the other side, if we want to pass a parameter to vring,
+> we must change the call path from transport to vring.
+> Too many functions need to be changed.
+>
+> So it is time to refactor the find_vqs. We pass a structure
+> cfg to find_vqs(), that will be passed to vring by transport.
+>
+> Because the vp_modern_create_avq() use the "const char *names[]",
+> and the virtio_uml.c changes the name in the subsequent commit, so
+> change the "names" inside the virtio_vq_config from "const char *const
+> *names" to "const char **names".
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Acked-by: Johannes Berg <johannes@sipsolutions.net>
+> Reviewed-by: Ilpo J=3DE4rvinen <ilpo.jarvinen@linux.intel.com>
 
-ping again -:)
+The name seems broken here.
 
-There is little materials for Loongarch. Can I apply merge privilege for 
-Loongarch kvm if you are not convenient to give the review comments?
+[...]
 
-Regards
-Bibo Mao
+>
+>  typedef void vq_callback_t(struct virtqueue *);
+>
+> +/**
+> + * struct virtio_vq_config - configure for find_vqs()
+> + * @cfg_idx: Used by virtio core. The drivers should set this to 0.
+> + *     During the initialization of each vq(vring setup), we need to kno=
+w which
+> + *     item in the array should be used at that time. But since the item=
+ in
+> + *     names can be null, which causes some item of array to be skipped,=
+ we
+> + *     cannot use vq.index as the current id. So add a cfg_idx to let vr=
+ing
+> + *     know how to get the current configuration from the array when
+> + *     initializing vq.
 
-On 2024/2/2 下午12:10, Bibo Mao wrote:
-> This patchset adds KVM selftests for LoongArch system, currently only
-> some common test cases are supported and pass to run. These testcase
-> are listed as following:
->          demand_paging_test
->          dirty_log_perf_test
->          dirty_log_test
->          guest_print_test
->          hardware_disable_test
->          kvm_binary_stats_test
->          kvm_create_max_vcpus
->          kvm_page_table_test
->          memslot_modification_stress_test
->          memslot_perf_test
->          set_memory_region_test
-> 
-> This patchset originally is posted from zhaotianrui, I continue to work
-> on his efforts.
-> 
-> ---
-> Changes in v7:
-> 1. Refine code to add LoongArch support in test case
-> set_memory_region_test.
-> 
-> Changes in v6:
-> 1. Refresh the patch based on latest kernel 6.8-rc1, add LoongArch
-> support about testcase set_memory_region_test.
-> 2. Add hardware_disable_test test case.
-> 3. Drop modification about macro DEFAULT_GUEST_TEST_MEM, it is problem
-> of LoongArch binutils, this issue is raised to LoongArch binutils owners.
-> 
-> Changes in v5:
-> 1. In LoongArch kvm self tests, the DEFAULT_GUEST_TEST_MEM could be
-> 0x130000000, it is different from the default value in memstress.h.
-> So we Move the definition of DEFAULT_GUEST_TEST_MEM into LoongArch
-> ucall.h, and add 'ifndef' condition for DEFAULT_GUEST_TEST_MEM
-> in memstress.h.
-> 
-> Changes in v4:
-> 1. Remove the based-on flag, as the LoongArch KVM patch series
-> have been accepted by Linux kernel, so this can be applied directly
-> in kernel.
-> 
-> Changes in v3:
-> 1. Improve implementation of LoongArch VM page walk.
-> 2. Add exception handler for LoongArch.
-> 3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
-> test cases for LoongArch.
-> 4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
-> 5. Move ucall_arch_do_ucall to the header file and make it as
-> static inline to avoid function calls.
-> 6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
-> 
-> Changes in v2:
-> 1. We should use ".balign 4096" to align the assemble code with 4K in
-> exception.S instead of "align 12".
-> 2. LoongArch only supports 3 or 4 levels page tables, so we remove the
-> hanlders for 2-levels page table.
-> 3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
-> DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
-> 4. Reorganize the test cases supported by LoongArch.
-> 5. Fix some code comments.
-> 6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
-> 
-> ---
-> Tianrui Zhao (4):
->    KVM: selftests: Add KVM selftests header files for LoongArch
->    KVM: selftests: Add core KVM selftests support for LoongArch
->    KVM: selftests: Add ucall test support for LoongArch
->    KVM: selftests: Add test cases for LoongArch
-> 
->   tools/testing/selftests/kvm/Makefile          |  16 +
->   .../selftests/kvm/include/kvm_util_base.h     |   5 +
->   .../kvm/include/loongarch/processor.h         | 133 +++++++
->   .../selftests/kvm/include/loongarch/ucall.h   |  20 ++
->   .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
->   .../selftests/kvm/lib/loongarch/processor.c   | 332 ++++++++++++++++++
->   .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
->   .../selftests/kvm/set_memory_region_test.c    |   2 +-
->   8 files changed, 604 insertions(+), 1 deletion(-)
->   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
->   create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
->   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
->   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
->   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
-> 
-> 
-> base-commit: 6764c317b6bb91bd806ef79adf6d9c0e428b191e
-> 
+So this design is not good. If it is not something that the driver
+needs to care about, the core needs to hide it from the API.
+
+Thanks
 
 
