@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-11831-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11832-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 892A487C440
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 21:25:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E85B87C442
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 21:25:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F287F1F22B96
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 20:25:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 516C61C20866
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 20:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5DF762C7;
-	Thu, 14 Mar 2024 20:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0950E76052;
+	Thu, 14 Mar 2024 20:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JFqPui9A"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KE3zsUxb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC647317E
-	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 20:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0A07605D
+	for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 20:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710447936; cv=none; b=e8ekpp3RAWMlP7mP/pwct4jfRfxDAQBnmbGc6xJXJjKf/l3Nlo+KOnNiYvs3JeEfI5yer3GmmFaxoLKHwLqAALbGsib2pEiWD9GMIFUyugNVUS+oAglqQSMZ0sexONjZa9YxQtB1zZQBNn6zuZ7IZaRiz+txyccxh+l+mCetdjc=
+	t=1710447951; cv=none; b=Z04MmJorvcqkU5ELqrSgQwmiC/qe/TZABnR+zj1XgQI1XUFGTAelMI99VsRuh5ZdADINPNJ3K0g88f7yKjjdvjRb0zwL6iniajd9QOUySMWXeXcjes/h/6slCf6pK0sZ2vM/VHdxB3RvBa5nmNmOcntYpqukY9ljg3j6dFvnr6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710447936; c=relaxed/simple;
-	bh=lkeAZpZwnGU6VpgChdZkLs5vz+1Qca88xONJCmcdPt0=;
+	s=arc-20240116; t=1710447951; c=relaxed/simple;
+	bh=t+Xjs0gyzs0q7A934MpYYmsAbai7ZXro++u99AU3aL4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UiwccHXpWyZOwCaLI/p/zkmP3kcaMzpIY4FwxCQbPkXyUT5GMizeM6AA4dtlEvWXmy0qi8Nrv5OLAmdl03yudzkvw1pU4Bu9NZxKm7Ox81aTN7nRfp1qug+AiY1jY9dF9dLcjm9QyLFqgdsc80l2TJzAWoedR+Ge1vxb7QUn+8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JFqPui9A; arc=none smtp.client-ip=209.85.218.45
+	 Content-Type:Content-Disposition:In-Reply-To; b=RheAq8UdEWKZxe4fjyNPQySoN1Hnp04hxxf//IyLaM3hrLyH2OR2GHyHBfHza+1tuX73jVds8jkcYfhED4dXgHGsPfpBj0qHyGS9h9z5h+pKK36qJRX9KU+WOLY219P3rt1/Bsg6mORPSmq5FEeuNgz1zCXFRzcHXhgHMCA8Cwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KE3zsUxb; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a45f257b81fso175900266b.0
-        for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 13:25:34 -0700 (PDT)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a466a256726so246679866b.1
+        for <kvm@vger.kernel.org>; Thu, 14 Mar 2024 13:25:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710447933; x=1711052733; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1710447948; x=1711052748; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=NdkPYJlECk/ZyZUB9HYwKBtygG9TYfy3Je51QsbOPR4=;
-        b=JFqPui9AM7fDE+9U0Lg+U60IfLIN51+kob/F5QFM3bfmoRVLwiuJehtJMNALQDk9lP
-         DNIpoFWlGH3iJ2fozigg4KfUpa4bwm213SBx8MbFQfjDPyGEztH9JZb0SKgstyqNpY0L
-         OrOb2egGgSWEQTKn5D1nmKU2BC7X3ph7Yk+gtP4Ti0Pr91Lhuw/gJ5r3zXdF/jqfunxe
-         5Qfb7BI88g4YtjxpPuk1MRc5dRrUMlfrGusllQF1NnYwbe4V11k51GLD2WqXR4YbIxsE
-         4Yfv+hwdhz3Jn3MI6TgkzrSFZTv3mvesI+g1QvdZXIFoc5lQV9yo8+H91bT2OcP5oltG
-         EAQg==
+        bh=uw5V0Ihfo7A0TVnpjJhXgB0vBa49XYRYilcTAeCdiBg=;
+        b=KE3zsUxblMtO7xe/B65ihVXw8TjllMZnWTsu3OBy/fKCxoMEalWLaazmqdbdhClZ/R
+         EJQgtxu0809DPzeBRCL+aBUEMq/f+FdgSedGGdPeX0qqxlnRpMkNweiBMfn1nA0fCvp2
+         +CpPXvOMMwI/HWtSF29AJxbDtbPwGEAUQ5bzQLF58AhhkbP6TLU340AUzo0WXFBpAglI
+         lJ+5uJdY0SAn/R3ao+2FmlQ8VTxEgqwnsMm7+0OkP+ye3+Oc0I2zrz4iF2oasfJeK3XW
+         1euNYeKtp/AE5OIhg0I1TfWXHZDuQe6PI8080XfzkTtQ8ypMwgjBi0EHSevZIg8T9eKY
+         BpBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710447933; x=1711052733;
+        d=1e100.net; s=20230601; t=1710447948; x=1711052748;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NdkPYJlECk/ZyZUB9HYwKBtygG9TYfy3Je51QsbOPR4=;
-        b=r2g+o8nCAm2+nD+LFJHwsF8cz3MaxPOjcqK83pxkmOWerHWSAYKI2HZAWBCvdtq3lP
-         2bNe7voK8Zj2VrgrrjGZwEryVjpE+XBybon8+G3lKT1jbGRzfqy8A/VAiNApWjiErJow
-         GM9PJbKNkellW/N8mPuedOcBmUiZVfzavGA25+KGH659HD5z8uv2Z3Py9NFDcOUa9GnD
-         EY/LYMuTxHufsMIqTr1PT9WFeyLlekC31KhwRS/5dlREU3dvbjLTlgu48Y40Fr8lQwj0
-         fDzv7/9XmXr0z1toAdNQbfP7nSl9VIGNvP+YHzAPTCgZg8DT44OfXA3JBjaLJfIjCsEE
-         ImgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVE6Tb1cVmqWjbemq8yIiZviFFVboSt0lh43yS4bnr8qLlbNJdY2kMJKyhq014GaKy4WE4w2EJGpARTX02kl6pJSShi
-X-Gm-Message-State: AOJu0YzIlqWmvvRwiMo+TJusV1OYevsy87T+d9iOfS6DJYXbfxhzYIgM
-	YwhT6wOjLshKd2G24GsAMh8jnA0dO6Pjh1wK0sP1cNPlTfn3hjDwgFzeZGA8kg==
-X-Google-Smtp-Source: AGHT+IEAguWOtI6oTSg0qIM4uQ4GgBItzXtzQUetPHeB42cik8WVSDP20zLH80zcpirES87Iw6GvQg==
-X-Received: by 2002:a17:906:d798:b0:a46:7cb1:51da with SMTP id pj24-20020a170906d79800b00a467cb151damr653684ejb.52.1710447933392;
-        Thu, 14 Mar 2024 13:25:33 -0700 (PDT)
+        bh=uw5V0Ihfo7A0TVnpjJhXgB0vBa49XYRYilcTAeCdiBg=;
+        b=WxkuZ1ZZ7zEm73vL/wPg6XK2bCqAXbJ5IIKMAjy653/P012uL/pTdw2P0SywV9qgaS
+         3S2gLN4F3O01snFa62mXyPAXshYjOctxWYqhj0qJQfV5dDOJOe4xJxu6UXFlz4ugs4m8
+         L3EokZ6tAsKbfmclweNo8NMSWteOo3G7TEenefA0TGUGh2GMG0xAxt81JHluYg+axbJw
+         JXW2zUt1MbCUEMk+U3p/KbursxYXvpl8qiVtvBQj2PF2U7mEHy/UUUKQD/t4c43yqWMZ
+         ek7FeNAA3gqN0WMk+9b9mMymtIxKZqxoU2wwELC/W4pcEJXCyvSWnTWY6uwaduoO9gkJ
+         q7WA==
+X-Forwarded-Encrypted: i=1; AJvYcCVcHM5fbQYg8dKg9ieo/p37ORPOOBrBLwh//Hv0ODasittB6p+yf8mwRs10C/DKUmGL78+AsjnK6OvSOTWidzPXYEbV
+X-Gm-Message-State: AOJu0YxBxnLkfrKyRnlxkutIudg/febdx4zINMfc6WXGR0Wxgh/DquuL
+	SkwGAN8nVfPCIhC2nxINA/yX1CTBM20Sf4OvxAqWY1awgJfjpXD6Ta918mTomA==
+X-Google-Smtp-Source: AGHT+IFSNYqhVQ94RVZXOtYFwx8fhGK4ErioR53gKmAPavaCWzXWnVTwxghHAngotsX6fUmwQ3r8tQ==
+X-Received: by 2002:a17:906:c359:b0:a44:806f:ad56 with SMTP id ci25-20020a170906c35900b00a44806fad56mr2381102ejb.11.1710447947559;
+        Thu, 14 Mar 2024 13:25:47 -0700 (PDT)
 Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id l15-20020a1709065a8f00b00a3d2d81daafsm1024436ejq.172.2024.03.14.13.25.32
+        by smtp.gmail.com with ESMTPSA id l5-20020a1709066b8500b00a4320e22b31sm1025683ejr.19.2024.03.14.13.25.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 13:25:33 -0700 (PDT)
-Date: Thu, 14 Mar 2024 20:25:29 +0000
+        Thu, 14 Mar 2024 13:25:47 -0700 (PDT)
+Date: Thu, 14 Mar 2024 20:25:43 +0000
 From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org
 Cc: James Morse <james.morse@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: [PATCH 08/10] arm64: Move esr_comment() to <asm/esr.h>
-Message-ID: <6374e3f9d15663e0ea55fa4261ac42f3348ad809.1710446682.git.ptosi@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>, Vincent Donnefort <vdonnefort@google.com>
+Subject: [PATCH 09/10] KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
+Message-ID: <87885c41627a033d9772dd368049e7f8f5fd4ef7.1710446682.git.ptosi@google.com>
 References: <cover.1710446682.git.ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -89,74 +89,116 @@ Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 In-Reply-To: <cover.1710446682.git.ptosi@google.com>
 
-As it is already defined twice and is about to be needed for CFI error
-detection, move esr_comment() to a header so that it can be reused.
+The compiler implements KCFI by adding type information (u32) above
+every function that might be indirectly called and, whenever a function
+pointer is called, injects a read-and-compare of that u32 against the
+value corresponding to the expected type. In case of a mismatch, a BRK
+instruction gets executed. When the hypervisor triggers such an
+exception, it panics.
+
+Therefore, teach hyp_panic() to detect KCFI errors from the ESR and
+report them. If necessary, remind the user that CONFIG_CFI_PERMISSIVE
+doesn't affect EL2 KCFI.
+
+Pass $(CC_FLAGS_CFI) to the compiler when building the nVHE hyp code.
+
+Use SYM_TYPED_FUNC_START() for __pkvm_init_switch_pgd, as nVHE can't
+call it directly and must use a PA function pointer from C (because it
+is part of the idmap page), which would trigger a KCFI failure if the
+type ID wasn't present.
 
 Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
 ---
- arch/arm64/include/asm/esr.h       | 5 +++++
- arch/arm64/kernel/debug-monitors.c | 4 +---
- arch/arm64/kernel/traps.c          | 2 --
- arch/arm64/kvm/handle_exit.c       | 2 +-
- 4 files changed, 7 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/esr.h       |  6 ++++++
+ arch/arm64/kvm/handle_exit.c       | 11 +++++++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile   |  6 +++---
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S |  3 ++-
+ 4 files changed, 22 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 353fe08546cf..b0c23e7d6595 100644
+index b0c23e7d6595..281e352a4c94 100644
 --- a/arch/arm64/include/asm/esr.h
 +++ b/arch/arm64/include/asm/esr.h
-@@ -385,6 +385,11 @@
- #ifndef __ASSEMBLY__
- #include <asm/types.h>
+@@ -397,6 +397,12 @@ static inline bool esr_is_data_abort(unsigned long esr)
+ 	return ec == ESR_ELx_EC_DABT_LOW || ec == ESR_ELx_EC_DABT_CUR;
+ }
  
-+static inline unsigned long esr_comment(unsigned long esr)
++static inline bool esr_is_cfi_brk(unsigned long esr)
 +{
-+	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
++	return ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
++	       (esr_comment(esr) & ~CFI_BRK_IMM_MASK) == CFI_BRK_IMM_BASE;
 +}
 +
- static inline bool esr_is_data_abort(unsigned long esr)
+ static inline bool esr_fsc_is_translation_fault(unsigned long esr)
  {
- 	const unsigned long ec = ESR_ELx_EC(esr);
-diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
-index 64f2ecbdfe5c..647134ffa9b9 100644
---- a/arch/arm64/kernel/debug-monitors.c
-+++ b/arch/arm64/kernel/debug-monitors.c
-@@ -312,9 +312,7 @@ static int call_break_hook(struct pt_regs *regs, unsigned long esr)
- 	 * entirely not preemptible, and we can use rcu list safely here.
- 	 */
- 	list_for_each_entry_rcu(hook, list, node) {
--		unsigned long comment = esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
--
--		if ((comment & ~hook->mask) == hook->imm)
-+		if ((esr_comment(esr) & ~hook->mask) == hook->imm)
- 			fn = hook->fn;
- 	}
- 
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index 215e6d7f2df8..56317ca48519 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -1105,8 +1105,6 @@ static struct break_hook ubsan_break_hook = {
- };
- #endif
- 
--#define esr_comment(esr) ((esr) & ESR_ELx_BRK64_ISS_COMMENT_MASK)
--
- /*
-  * Initial handler for AArch64 BRK exceptions
-  * This handler only used until debug_traps_init().
+ 	return (esr & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_FAULT;
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 617ae6dea5d5..ffa67ac6656c 100644
+index ffa67ac6656c..9b6574e50b13 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -395,7 +395,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 	if (mode != PSR_MODE_EL2t && mode != PSR_MODE_EL2h) {
- 		kvm_err("Invalid host exception to nVHE hyp!\n");
- 	} else if (ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
--		   (esr & ESR_ELx_BRK64_ISS_COMMENT_MASK) == BUG_BRK_IMM) {
-+		   esr_comment(esr) == BUG_BRK_IMM) {
- 		const char *file = NULL;
- 		unsigned int line = 0;
+@@ -383,6 +383,15 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+ 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
+ }
  
++static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
++{
++	kvm_err("nVHE hyp CFI failure at: [<%016llx>] %pB!\n", panic_addr,
++		(void *)(panic_addr + kaslr_offset()));
++
++	if (IS_ENABLED(CONFIG_CFI_PERMISSIVE))
++		kvm_err(" (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n");
++}
++
+ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+ 					      u64 elr_virt, u64 elr_phys,
+ 					      u64 par, uintptr_t vcpu,
+@@ -413,6 +422,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+ 		else
+ 			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
+ 					(void *)(panic_addr + kaslr_offset()));
++	} else if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr)) {
++		kvm_nvhe_report_cfi_failure(panic_addr);
+ 	} else {
+ 		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
+ 				(void *)(panic_addr + kaslr_offset()));
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 2250253a6429..2eb915d8943f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -89,9 +89,9 @@ quiet_cmd_hyprel = HYPREL  $@
+ quiet_cmd_hypcopy = HYPCOPY $@
+       cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
+ 
+-# Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
+-# This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
+-KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
++# Remove ftrace and Shadow Call Stack CFLAGS.
++# This is equivalent to the 'notrace' and '__noscs' annotations.
++KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
+ # Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
+ # when profile optimization is applied. gen-hyprel does not support SHT_REL and
+ # causes a build failure. Remove profile optimization flags.
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 8958dd761837..ade73fdfaad9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -5,6 +5,7 @@
+  */
+ 
+ #include <linux/arm-smccc.h>
++#include <linux/cfi_types.h>
+ #include <linux/linkage.h>
+ 
+ #include <asm/alternative.h>
+@@ -265,7 +266,7 @@ alternative_else_nop_endif
+ 
+ SYM_CODE_END(__kvm_handle_stub_hvc)
+ 
+-SYM_FUNC_START(__pkvm_init_switch_pgd)
++SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
+ 	/* Load the inputs from the VA pointer before turning the MMU off */
+ 	ldr	x5, [x0, #NVHE_INIT_PGD_PA]
+ 	ldr	x0, [x0, #NVHE_INIT_STACK_HYP_VA]
 
 -- 
 Pierre
