@@ -1,285 +1,223 @@
-Return-Path: <kvm+bounces-11841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23CA687C4F9
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 23:07:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 179A787C4FD
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 23:09:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4727D1C214CE
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 22:07:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FB99282E26
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 22:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1446C768FC;
-	Thu, 14 Mar 2024 22:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE3FC768FC;
+	Thu, 14 Mar 2024 22:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QQQe5nnn"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fagdtZhS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2064.outbound.protection.outlook.com [40.107.94.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A84E74BE8;
-	Thu, 14 Mar 2024 22:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB92E1A38EE;
+	Thu, 14 Mar 2024 22:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710454056; cv=fail; b=jQK62olY9ZZkbptAKlV1qa92KlG4wRyBNNF6hd2IEQrFuhQYGdRGF+1bMlWCHF7kNyOogQibvUk1aJnVhSzPwEvVgcPDuzIrTii31BTyWJGxeWOyO27wmnm4h7uLBh9f3kTiDTGAXfwKH3u5xFPLW3Pwa5r17boHBkzuB+IEfhE=
+	t=1710454185; cv=fail; b=uvJA1yoHurFCsbhUZU7XUBflHHVl4hjtEdBxXjbEsNRCIv/R943RAj8TVDbTs3+A3MypNQDFi/Ol40d4DcnSOGPZVUsIDK4sTn1yOBrTkh+0qK6nwQjqiwVe9x6ZH2Sjw7lcbJmhkawNf++yD299SDTwfkToIBj83hkD7acooNE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710454056; c=relaxed/simple;
-	bh=db3Qid7BKPlxfQZmwyniMSepdtk0gpbn/m4ZkuISdgo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=I+kpxwDA+By3IuCm4RnGjg1SwEEfA+fNBHUqcLf/pGVK6PXSTGeqfkQfwftAg9J1eTRQECHww9gKf7JF9gLEKlFfBnIRV47iEP4tJ5Q9x2j51V5L7/q3KKLnVhvZw6yGOSAm8Ov0255R8fSqcv1/V1guk4mjgcyLuCYU8OZdNZE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QQQe5nnn; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710454054; x=1741990054;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=db3Qid7BKPlxfQZmwyniMSepdtk0gpbn/m4ZkuISdgo=;
-  b=QQQe5nnnCXYOMr6o+BkxkIQcdOHZzXR6aoOBIkXYpYbBvtefSk1vPobo
-   cgkmelRL9Y1Xf6EyiHFmKt7fBxAcHoPP65NtPLNHx+XHLt9+UY8hEA2sZ
-   x5czAH2hwT9W0SV5ePColsDLN8tOlK1BH/vELRsnJcfXTK3IxHwjleHNi
-   gmJrxLeveb0+ZUEhjD8UBPcJV+CUlzlAiboBoxiLmD1Zn14iEjI9IFWpN
-   Wm+Aael11ONwC04mb2qMWHu9cAy4KfAgOaVTjaDw3vb/BKfuH0VdoEL5n
-   eGCzm85sB3GkBnH+7LVEeEDo/mTZN3TJs3wwT43jvrHCUfiYXST4Q/Rbo
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="8241979"
-X-IronPort-AV: E=Sophos;i="6.07,126,1708416000"; 
-   d="scan'208";a="8241979"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 15:07:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,126,1708416000"; 
-   d="scan'208";a="12363799"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Mar 2024 15:07:32 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Mar 2024 15:07:31 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Mar 2024 15:07:31 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 14 Mar 2024 15:07:31 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 14 Mar 2024 15:07:29 -0700
+	s=arc-20240116; t=1710454185; c=relaxed/simple;
+	bh=xbJ/HpVpN85F3hpUyXcMw0tKjoXP5KBu/UdSnRfsuqY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ccZzW36bGgNpnNtjMfPeUApby0wSLiwp1DA7s+pBLN3tNnIKhBzgVKdTju4bJEpke+xM7osKQ99qNAzAWiM/gBVbJYyiUrzFHpZ/iYuPYElvOSV7lP+XYSa3+X8po8WIDeXb3qJKXp7ek1isHu/B7TLy7r/SlsdHTeSGgUKYJUU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fagdtZhS; arc=fail smtp.client-ip=40.107.94.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gxs5krIHfXS8Clk00eGw+qhDr7tvGuikeKKq3n9s6aQ6bfTFOfbdGX50D+pPGbjVO/1ncnMXrX7Y1fSH+zZ+TzWtWEhyFQU8kHujoLWtBVQcRSiSmB7jlmoOOaXWbL+SHPRhkgI6gNA0gncl08ngp2WcMIZCbJFM8GNHOyFreMNt44ym+M0H+apEhmRJoXYq3MmttTMIqd+tDdvt1qo/tYDd0iesGu49pLQNZBkY1hndr5gWxvxzvFpNeCyoGk8GG+Kms1+i1kuUaHYBSzU/2v5XUoHhnYrQb+xRj+lzZOOklhyLHJD81DRh5+o0j8gU0AaP2rQkhCLQv7D8bROT1A==
+ b=OBi0pEj2MmJ0e2Pszkg/QXwvFOljyd0k16cJwy+wlgEsWSCleJ0HfQFN11pgkoUv0miIgjRMKuoNX52r73qH1unYejwsY8x1Y/6Vr93Nl31gOJj4bOMvbMKIqKKWwzFfsueM34sMlyEevsCaI/y+q9vVHMLZwZP+WfWYDgeUXqZ0f7LmxY2bA2xxVIb1FZYguS0sljlDp42hOtJLWk+zTn0L3vnvAnlHyno1kSly/790RIZvIMaHTT2YKuEkKzkMG5RerK4Hh7tBqxYXR4aopk2X3Q0tAoYClyea/SqngBbkkvmc+SBH77/G7gxPqK34/Hd2niWgSPfZh4oGb7X/mQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bPtctFigCcoR+2p2apDHmeXYl+1WGDgDFqdXGLCpLeY=;
- b=VQwDkjlMdioKtBSVNPHcEHEb3nxd0Ik+8Nw4tUntM6EZU47yi5vrprIMN/tujMp934QAL1nk3SllJCOhEV8R7m6c/mJ9VVH2Kr2FjgsC3fTug+bewa4n8BIE0JMqbx4Q3FAZxi8zNYjoz+3lhx4m8fAc7eTRnwAHydiOCthzy6DgWGiZC7FDedTBF3/JisGdNIa1ndLPzd+ABF1cmJ8zbPqWRLKzVJAARob++XpjQw5if/L/2KVaJOEUMHPha5QqkWjqgU7dbYI8t+mMxSBGcp6mqdFupFY3josyPHVgsXsF6pMyEoD0rB3dxRgwYN1ejoW1Xen6tqiNdSNrCgAZ2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by CH3PR11MB7722.namprd11.prod.outlook.com (2603:10b6:610:122::15) with
+ bh=mXIvD71kWbLc4036pgkLHCMUk+upxaIL7CurXA2uh04=;
+ b=nVhUHDSl06hT8gzKfvFMEbVjj7VxNH+TeFX5ZYEige3GyQ/LR8bnNUqoAmmLXh3YD+71oxMm+js22NexOhFbTJ0S0U30zVbUiF9JNiXgNWKxLBYwSeX0/3tdcf4DOFytOBJgrWobb4UqFlxOGYNtwIm3BTq3bIrpWmSqLr44kcVGcNFqg21uS+chw4Rcs6h9YmgcsWsfigqqDgFCeAiFMYzlBzAa48H2uWdLtNJe4ojKaiaPz3w5dk2leEtWR7QQvuK69NHuBcRyiIjNXyJbXSWNxyCVeIIspYRYPaVpa7eEBEKXvIRWwYcXpvVm+fwkp/7oYyeaiVDPfH+n3xrgQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mXIvD71kWbLc4036pgkLHCMUk+upxaIL7CurXA2uh04=;
+ b=fagdtZhS4vxdp6dXxMgUU6bnBq6GdUBzuybCByWgVCoiREaDHwS7fguybDoM4OYEYFmsHN9ejcYVzs7hswi9MxumyX4rBBpiSDbiWINQqF5gTjX1Md0hdHOJd5uPkBiw9vpJNtFsFZs0Zyts7es/hEgmPgt46rIOiTweeTegV7Q=
+Received: from MW3PR06CA0021.namprd06.prod.outlook.com (2603:10b6:303:2a::26)
+ by CH3PR12MB8581.namprd12.prod.outlook.com (2603:10b6:610:15d::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Thu, 14 Mar
- 2024 22:07:27 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7386.015; Thu, 14 Mar 2024
- 22:07:27 +0000
-Message-ID: <8f6d7c14-5341-4d13-9538-d34a18d3c117@intel.com>
-Date: Fri, 15 Mar 2024 11:07:18 +1300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: x86/mmu: x86: Don't overflow lpage_info when
- checking attributes
-Content-Language: en-US
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, <seanjc@google.com>,
-	<pbonzini@redhat.com>, <chao.p.peng@linux.intel.com>,
-	<isaku.yamahata@intel.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240314212902.2762507-1-rick.p.edgecombe@intel.com>
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <20240314212902.2762507-1-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4PR04CA0313.namprd04.prod.outlook.com
- (2603:10b6:303:82::18) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.21; Thu, 14 Mar
+ 2024 22:09:41 +0000
+Received: from MWH0EPF000A672F.namprd04.prod.outlook.com
+ (2603:10b6:303:2a:cafe::2b) by MW3PR06CA0021.outlook.office365.com
+ (2603:10b6:303:2a::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.21 via Frontend
+ Transport; Thu, 14 Mar 2024 22:09:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000A672F.mail.protection.outlook.com (10.167.249.21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7386.12 via Frontend Transport; Thu, 14 Mar 2024 22:09:41 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 14 Mar
+ 2024 17:09:39 -0500
+Date: Thu, 14 Mar 2024 17:09:23 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<seanjc@google.com>, <aik@amd.com>, <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v3 10/15] KVM: x86: add fields to struct kvm_arch for
+ CoCo features
+Message-ID: <20240314220923.htmb4qix4ct5m5om@amd.com>
+References: <20240226190344.787149-1-pbonzini@redhat.com>
+ <20240226190344.787149-11-pbonzini@redhat.com>
+ <20240314024952.w6n6ol5hjzqayn2g@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240314024952.w6n6ol5hjzqayn2g@amd.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|CH3PR11MB7722:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9588ce74-dd37-4783-42f0-08dc4473224e
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A672F:EE_|CH3PR12MB8581:EE_
+X-MS-Office365-Filtering-Correlation-Id: 183a1e12-e3ef-44a5-b79d-08dc44737280
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RTfX8srEImvQsn9qPSUsLDQvz4Vkvd88LlIcP/cnfZoVS8RG2x0GrwefjfyG9V1T5+HtB1fUQQRUyhhXzSBjcnSuyJdI64ZmafkVwkJSF2U8E6p/FoICk7buivwwwfGgbTyFJNTk2HW6T8vQaWa5tRrjelTHMNZDLz00Za64hrGoWdsKvxV6VDcz4z/yW/VbltmnQ+Uh8VrYDzt1GI3H7lq8W9hwDqngTrZ3/YSiiXlM+IUpz8yhq7euNoOuMgUT7iIVfoo63E5WYAy9isp/yhb2NdHREr3LDLXruiTPHL13/hY0TgoL3skT9gdDAkhl2Dh6tdVkuot4M5ezniSisL3OdoVZVNcKXaJf6voIXVhXYiSzB8cDs94h4uPRjB5SjPaBsYpyCVhFHUfJgmCIDs7ZZfH8Tpj4KIqDmZ0Ss9DFmEPBXgi1HoFVlHnOSKBEfEXwEOvlQHjqQGnLG/m1HC79FnC/8IMGpviF3YEA57QZy9/bHvneZboEZ1LnHruvd1JpQQjLbmDilWGjsD6PpYYQMCFB57ryqRI72lP3TopY1wfynHe8QklF0WxiPBbs6/jT/j38YqYA2zsrN7Q1BX2COjlIUddZK+SHjFG4sTVZLkqCr/m6PpVRrlet3X7MGMsnF9CB0yyVfedQ6ULajcYPUD0gBQ0spZdMyNwfmds=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OXF5RWF6S2ZjRWtnUklwNW1vRmw5YjUzM1dka0NjdEYveXBYZmJwSGRqNTda?=
- =?utf-8?B?cSthMEc5T1F5MkFhTnZ2cUVzVkwwOUF5QVpEUWNRNXhES1ZuTzVZeE93ektS?=
- =?utf-8?B?Q0dRek1UY3JyZFloSGhZQXBxTFY2VmticHZIMnZqZVRJUUkvbkFFUTJGejYv?=
- =?utf-8?B?ZkdQQ21nbTNLOEpTMkxrZlJ6cE9CZ2FFdGsyZEptZkFzbUhRa2FlUVpnclM2?=
- =?utf-8?B?VytVZWR6WXdaRjNkd1RtbE1Takk0OG5BeUhQK2xyenlTaVJzcmtYNHpZeFY0?=
- =?utf-8?B?bDhaNGFxT3F5bUtmcnZYZnYzOVFaVTIrR1Z2QzVBZDhYRmtwZGdSTHg0NnVD?=
- =?utf-8?B?Y3kvakxOYXZ3UzRTYTV5WTNhOEV6VnJQMW1Dd1RVREZCQ3dIR1VXLzdWRDNr?=
- =?utf-8?B?Y0ZQNzBHMER3SnBaMXM3bWdSdG1DaEZLWTVHbWFQa1Jub2p1WTkzcm10Ykxv?=
- =?utf-8?B?Qm1JR3krUEI3TG1xenZvcTZ4WUVCTDRxMEhiUU1kdkRtNkhCWWxrcUtUckJ3?=
- =?utf-8?B?YUwyVDh0S09oK2ZHN2JrN0Y3OGpwSUVBNy8xSWZBemZnQjBhL0pXampoTGl3?=
- =?utf-8?B?WDFmeE1qRmNobUhxMHhWT29OSHYyK0dEc2xpT3VUU25kWHhETVREL2p0OVRZ?=
- =?utf-8?B?Z0RHNElnT2hUZlFwcHlpYTZEMW5OS0MvNHVGMTZkTWFobDdQZzd2ZFMwVW5s?=
- =?utf-8?B?RWFISVFtRU9sRTF5dlFrbWNZdGJRVnRTdGRDVkdqODhLVGJOOGVZdmhQbHF0?=
- =?utf-8?B?QTdvUStoVWxoSTdCczRXcklTVEJzbnpZTUx1bG5QOEJiVkZhSjUxbXNBR0U5?=
- =?utf-8?B?eGt2NVdhTzNZYlo1L01oeUlTbUhLM1FsSE1LM2pwclN1SVovWmg3L0tSZzdJ?=
- =?utf-8?B?dWxvNGdxNitiUW15N1Nta0JXall1aGViYW5UbHNINTh5bXVjeGhJc2Y4QmJ1?=
- =?utf-8?B?anowQlFjYnFWQmszY0ROV29BS0ZNMHJiRWxkUEV5Z3c1SlNxYS8wUXovbEdK?=
- =?utf-8?B?Q1Aza0ZGbzZmSE9ZeFRYenVDQ3VtRXZYdTVsNlc5YkpIU3R6NzZkRGFrS1dJ?=
- =?utf-8?B?anZxMmtCZkVFUjhsSE5lY3o4QkFaSUliQVA0R2hyWUcwZkRscXc2c0xRazFj?=
- =?utf-8?B?OWNDN0JmcXVOWVdObDc3NFNaQUkxY2NiNUl1bmJyZ3pQZU5ZVzZOV0loWG1Z?=
- =?utf-8?B?bDJ6Y0lEN0FocEl0dmZNVm1POFlYb1hTY3NKL3pnUUJnSG9DdGVSeS9iQlFE?=
- =?utf-8?B?QnhCbUVjNzlXaVUwUWpHN2o5SjUzWGdVUlZJR0ZqVnR3WG5CTWMvMndEYUcz?=
- =?utf-8?B?OXFJemIvQ3lBaXF0UUFkZUY1SzMxd0xDcUdNQUZSZmdGaklTSUY0T1Z3UWh1?=
- =?utf-8?B?QjhEejllZTEzdThBV2oyZk44RjRHeGJBVktZT3RGQkY5TmNMVDUxZjRIUG1w?=
- =?utf-8?B?akYyWW5zaktsVnlXSEF1RXBndE1Yb0had2c4dUhjRVRSYWNrOEMyeUVqd050?=
- =?utf-8?B?ZDBWOEtDZ0s0b1hwZ2daQmJvWWdLanpIdlptc3VQMW9URnYxdC9lWHVpNjZt?=
- =?utf-8?B?TXE2eGtCQTEvbVZ5ZktOTXFTSGdqVlVpSlNTVE15SEFBelg3V0VoTmZrWFVM?=
- =?utf-8?B?T1FsYXNBbGpIdGlKT2RQTDhEalM1SzB6V2o2Q3l5YjB5V1FiTHR1Y2MrTnB6?=
- =?utf-8?B?VThxeGIzOXZOUUh4OTU3ZUExSnk2eXVBN2xTbWZYT05HUmJEdE12ci9hVXpo?=
- =?utf-8?B?cTVsdWJrUnQ1Q1FOSUVkcHU4SENKTTQwQ1B4MVoxdXBsZ0Nmc3FZMlNubnhD?=
- =?utf-8?B?ajBFTEhxczJZdXlPTkJoZzRKL0VoLzhNNlZkMDQvSFN0Vk0yOVNtb0JtYmZS?=
- =?utf-8?B?V2k2K0x1N2ZFYWRHdzh3T1RDY0UyU3BLaGJzWGZtY2RuMWx6S1NUQm5LeU1j?=
- =?utf-8?B?Q00xK2cwQkxzVmpkZnorM002YjY4aThrWjNGeWVOWlhHeWhHQTl2RkJ5VjFF?=
- =?utf-8?B?dEZXVTdISTErdG1od2ZmZnJJbXVKRGdZM2pRWXpLd3lqUWkxZ0hyUUdwcjBQ?=
- =?utf-8?B?YnpGZyt1MDZ5RDZUSEdzWlV4RUcvQ05GcGw5SzhOYjNDQ0dkUmZKK3JwOG5v?=
- =?utf-8?Q?buEqTBk9yQwQBw1mXNAmay2Gr?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9588ce74-dd37-4783-42f0-08dc4473224e
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 22:07:26.9035
+X-Microsoft-Antispam-Message-Info:
+	WMuIij8KHYyDvFZqgiYuWR/OMyspNaYhsDveJ23Kh6jIscnYlhMxYppczFk65PUzcKiVUtIqqwtILXZ2iq7IGiV3r4nfSTAOh2G727vk3QFEdD4UntAxNASS/QtyS3KdbqAoQY6evKuomuEI6Q1ALv8OseIPZbCFs7k3h5wAgvmhGugWsZr1b3yVbpv0DSlUihSEjRUKgy/fEG5hTYfkYP0OkJLZat6bQpeyrmhdkHATiHe6J9b99WxzLlFdUz2+sXL4KDoTC0zLkju/iXXlWcOHAvcG2mBPRd2PCfd/ADVHoEMq+vQp3Gg2mbE9oBnO9lMe++6GbvYwY8kGBDTd0ncfMta0hz0Y+bwRNOAurLehJqo8OWQqrPwxmUJvMsPM9am4+L2SIxQChJg14ilYhETxL2eNehcW4JmVT1jCAlMabHBbqZy2WLMnzF2eJEpmk/iaWQtHnXlWllPods3SLM790PtaGutXJxwiYYxqNwpSRsfUv1/G/2igHjUaqZZCaYwRLYfAeulH2oJm9svRBlb7frtqynCw/RAz3VTdjhlr4f8cK1KYTm5bjnJWANoeBUphUcFUwBc0hTwu2JyQeWWi4hTTfV2jAyOz9Zjr7vqoMQn9gzGinu5f4y/lLZy1gxCgrz5fVedUGeDkMTwDUl71LKhYwGkZY3RplmjYgEqsJBYfVrrbSVeS0ocSKHRqtB01FooAr/3j068L2LGFgfuCsU5rIQ/qES9LTskQu+erJOaIL7pKIiTVVBrW3ErY
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(376005)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 22:09:41.1015
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2mcApI6P4u+hg16xpspfSKE+pPWfKeyZc6ua4rElXT2WQZCHyAGxyJeTCPppLVqLSZLspkCUe+wMgyGJnyaH4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7722
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 183a1e12-e3ef-44a5-b79d-08dc44737280
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000A672F.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8581
 
+On Wed, Mar 13, 2024 at 09:49:52PM -0500, Michael Roth wrote:
+> On Mon, Feb 26, 2024 at 02:03:39PM -0500, Paolo Bonzini wrote:
+> > Some VM types have characteristics in common; in fact, the only use
+> > of VM types right now is kvm_arch_has_private_mem and it assumes that
+> > _all_ nonzero VM types have private memory.
+> > 
+> > We will soon introduce a VM type for SEV and SEV-ES VMs, and at that
+> > point we will have two special characteristics of confidential VMs
+> > that depend on the VM type: not just if memory is private, but
+> > also whether guest state is protected.  For the latter we have
+> > kvm->arch.guest_state_protected, which is only set on a fully initialized
+> > VM.
+> > 
+> > For VM types with protected guest state, we can actually fix a problem in
+> > the SEV-ES implementation, where ioctls to set registers do not cause an
+> > error even if the VM has been initialized and the guest state encrypted.
+> > Make sure that when using VM types that will become an error.
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Message-Id: <20240209183743.22030-7-pbonzini@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  7 ++-
+> >  arch/x86/kvm/x86.c              | 95 +++++++++++++++++++++++++++------
+> >  2 files changed, 84 insertions(+), 18 deletions(-)
+> > 
+> > @@ -5552,9 +5561,13 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
+> >  }
+> >  
+> >  
+> > -static void kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
+> > -					  u8 *state, unsigned int size)
+> > +static int kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
+> > +					 u8 *state, unsigned int size)
+> >  {
+> > +	if (vcpu->kvm->arch.has_protected_state &&
+> > +	    fpstate_is_confidential(&vcpu->arch.guest_fpu))
+> > +		return -EINVAL;
+> > +
+> >  	/*
+> >  	 * Only copy state for features that are enabled for the guest.  The
+> >  	 * state itself isn't problematic, but setting bits in the header for
+> > @@ -5571,22 +5584,27 @@ static void kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
+> >  			     XFEATURE_MASK_FPSSE;
+> >  
+> >  	if (fpstate_is_confidential(&vcpu->arch.guest_fpu))
+> > -		return;
+> > +		return 0;
+> >  
+> >  	fpu_copy_guest_fpstate_to_uabi(&vcpu->arch.guest_fpu, state, size,
+> >  				       supported_xcr0, vcpu->arch.pkru);
+> > +	return 0;
+> >  }
+> >  
+> > -static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
+> > -					 struct kvm_xsave *guest_xsave)
+> > +static int kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
+> > +					struct kvm_xsave *guest_xsave)
+> >  {
+> > -	kvm_vcpu_ioctl_x86_get_xsave2(vcpu, (void *)guest_xsave->region,
+> > -				      sizeof(guest_xsave->region));
+> > +	return kvm_vcpu_ioctl_x86_get_xsave2(vcpu, (void *)guest_xsave->region,
+> > +					     sizeof(guest_xsave->region));
+> >  }
+> >  
+> >  static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
+> >  					struct kvm_xsave *guest_xsave)
+> >  {
+> > +	if (vcpu->kvm->arch.has_protected_state &&
+> > +	    fpstate_is_confidential(&vcpu->arch.guest_fpu))
+> > +		return -EINVAL;
+> > +
+> >  	if (fpstate_is_confidential(&vcpu->arch.guest_fpu))
+> >  		return 0;
+> 
+> I've been trying to get SNP running on top of these patches and hit and
+> issue with these due to fpstate_set_confidential() being done during
+> svm_vcpu_create(), so when QEMU tries to sync FPU state prior to calling
+> SNP_LAUNCH_FINISH it errors out. I think the same would happen with
+> SEV-ES as well.
+> 
+> Maybe fpstate_set_confidential() should be relocated to SEV_LAUNCH_FINISH
+> site as part of these patches?
 
+Talked to Tom a bit about this and that might not make much sense unless
+we actually want to add some code to sync that FPU state into the VMSA
+prior to encryption/measurement. Otherwise, it might as well be set to
+confidential as soon as vCPU is created.
 
-On 15/03/2024 10:29 am, Rick Edgecombe wrote:
-> Fix KVM_SET_MEMORY_ATTRIBUTES to not overflow lpage_info array and trigger
-> KASAN splat, as seen in the private_mem_conversions_test selftest.
-> 
-> When memory attributes are set on a GFN range, that range will have
-> specific properties applied to the TDP. A huge page cannot be used when
-> the attributes are inconsistent, so they are disabled for those the
-> specific huge pages. For internal KVM reasons, huge pages are also not
-> allowed to span adjacent memslots regardless of whether the backing memory
-> could be mapped as huge.
-> 
-> What GFNs support which huge page sizes is tracked by an array of arrays
-> 'lpage_info' on the memslot, of ‘kvm_lpage_info’ structs. Each index of
-> lpage_info contains a vmalloc allocated array of these for a specific
-> supported page size. The kvm_lpage_info denotes whether a specific huge
-> page (GFN and page size) on the memslot is supported. These arrays include
-> indices for unaligned head and tail huge pages.
-> 
-> Preventing huge pages from spanning adjacent memslot is covered by
-> incrementing the count in head and tail kvm_lpage_info when the memslot is
-> allocated, but disallowing huge pages for memory that has mixed attributes
-> has to be done in a more complicated way. During the
-> KVM_SET_MEMORY_ATTRIBUTES ioctl KVM updates lpage_info for each memslot in
-> the range that has mismatched attributes. KVM does this a memslot at a
-> time, and marks a special bit, KVM_LPAGE_MIXED_FLAG, in the kvm_lpage_info
-> for any huge page. This bit is essentially a permanently elevated count.
-> So huge pages will not be mapped for the GFN at that page size if the
-> count is elevated in either case: a huge head or tail page unaligned to
-> the memslot or if KVM_LPAGE_MIXED_FLAG is set because it has mixed
-> attributes.
-> 
-> To determine whether a huge page has consistent attributes, the
-> KVM_SET_MEMORY_ATTRIBUTES operation checks an xarray to make sure it
-> consistently has the incoming attribute. Since level - 1 huge pages are
-> aligned to level huge pages, it employs an optimization. As long as the
-> level - 1 huge pages are checked first, it can just check these and assume
-> that if each level - 1 huge page contained within the level sized huge
-> page is not mixed, then the level size huge page is not mixed. This
-> optimization happens in the helper hugepage_has_attrs().
-> 
-> Unfortunately, although the kvm_lpage_info array representing page size
-> 'level' will contain an entry for an unaligned tail page of size level,
-> the array for level - 1  will not contain an entry for each GFN at page
-> size level. The level - 1 array will only contain an index for any
-> unaligned region covered by level - 1 huge page size, which can be a
-> smaller region. So this causes the optimization to overflow the level - 1
-> kvm_lpage_info and perform a vmalloc out of bounds read.
-> 
-> In some cases of head and tail pages where an overflow could happen,
-> callers skip the operation completely as KVM_LPAGE_MIXED_FLAG is not
-> required to prevent huge pages as discussed earlier. But for memslots that
-> are smaller than the 1GB page size, it does call hugepage_has_attrs(). In
-> this case the huge page is both the head and tail page. The issue can be
-> observed simply by compiling the kernel with CONFIG_KASAN_VMALLOC and
-> running the selftest “private_mem_conversions_test”, which produces the
-> output like the following:
-> 
-> BUG: KASAN: vmalloc-out-of-bounds in hugepage_has_attrs+0x7e/0x110
-> Read of size 4 at addr ffffc900000a3008 by task private_mem_con/169
-> Call Trace:
->    dump_stack_lvl
->    print_report
->    ? __virt_addr_valid
->    ? hugepage_has_attrs
->    ? hugepage_has_attrs
->    kasan_report
->    ? hugepage_has_attrs
->    hugepage_has_attrs
->    kvm_arch_post_set_memory_attributes
->    kvm_vm_ioctl
-> 
-> It is a little ambiguous whether the unaligned head page (in the bug case
-> also the tail page) should be expected to have KVM_LPAGE_MIXED_FLAG set.
-> It is not functionally required, as the unaligned head/tail pages will
-> already have their kvm_lpage_info count incremented. The comments imply
-> not setting it on unaligned head pages is intentional, so fix the callers
-> to skip trying to set KVM_LPAGE_MIXED_FLAG in this case, and in doing so
-> not call hugepage_has_attrs().
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 90b4fe17981e ("KVM: x86: Disallow hugepages when memory attributes are mixed")
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+And if userspace wants to write FPU register state that will not actually
+become part of the guest state, it probably does make sense to return an
+error for new VM types and leave it to userspace to deal with
+special-casing that vs. the other ioctls like SET_REGS/SREGS/etc.
 
-Reviewed-by: Kai Huang <kai.huang@intel.com>
+-Mike
 
-> ---
-> v2:
->   - Drop function rename (Sean)
->   - Clarify in commit log that this is only head pages that are also tail
->     pages (Sean)
-> ---
->   arch/x86/kvm/mmu/mmu.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0544700ca50b..42e7de604bb6 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -7388,7 +7388,8 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
->   			 * by the memslot, KVM can't use a hugepage due to the
->   			 * misaligned address regardless of memory attributes.
->   			 */
-> -			if (gfn >= slot->base_gfn) {
-> +			if (gfn >= slot->base_gfn &&
-> +			    gfn + nr_pages <= slot->base_gfn + slot->npages) {
->   				if (hugepage_has_attrs(kvm, slot, gfn, level, attrs))
->   					hugepage_clear_mixed(slot, gfn, level);
->   				else
+> Also, do you happen to have a pointer to the WIP QEMU patches? Happy to
+> help with posting/testing those since we'll need similar for
+> SEV_INIT2-based SNP patches.
+> 
+> Thanks,
+> 
+> Mike
+> 
 
