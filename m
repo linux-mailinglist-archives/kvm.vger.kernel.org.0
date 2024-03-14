@@ -1,174 +1,158 @@
-Return-Path: <kvm+bounces-11780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D9AF87B780
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 06:59:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72F1887B7CC
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 07:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADABE1F21F21
-	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 05:59:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCB42B22576
+	for <lists+kvm@lfdr.de>; Thu, 14 Mar 2024 06:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5CEFBFC;
-	Thu, 14 Mar 2024 05:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB3C17BAE;
+	Thu, 14 Mar 2024 06:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="X7xOAyTz"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp238.sjtu.edu.cn (smtp238.sjtu.edu.cn [202.120.2.238])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0EFD268;
-	Thu, 14 Mar 2024 05:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B72FD535;
+	Thu, 14 Mar 2024 06:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710395922; cv=none; b=JKrEDpnjKtMaG+Iv33sPa8nvHs0lUYUiTGeEXp6Q7QOAuwv+WP0/d26LUama4hQqYqHRKZ+vXzgj44UpugBdM8bKUVDO4hqMkm211HSGfYprLLPrSrEu1AzJvKm1fTuZTkWwpZFv6NVXfXzhxcchyL2LwbVGqNQ4Ez67IG2AgZ4=
+	t=1710396042; cv=none; b=KfKkBOV9PWnfG9r30GxLHN5mFfxbdUPWkxSpuB0zVSBQU4kLqt895KJdj5y3zFJmH80HHravWrQH8lzusm7zNevYaQ1mWE83bN0taInWCSTGGXiQayRGwRHjBp7+HnZu8f+B3/oN3wYcm1bDK3sXFBj+rC8UEguWHToFEKtnrMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710395922; c=relaxed/simple;
-	bh=d/DKMqpbLAl7Mt2vT4Z2A2rXSWnn3WDlmojM+dTlQBM=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type; b=PwgjvlWPtymiFbrGlVodsOYwn4T/Z4NEh/2wV1bXk6kSvR8IUQOr9KVfEpK7cTTyHxPsCD8qEP4qUB1+Ip3s0noWGTrUPXAqeJwY41Db84fHFGF5DGxbuuDMFadv4biBFfQ+s8pc58pNF9kycSrn+ipgdkw/Z/k6OxxaIUu8D90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
-Received: from mta90.sjtu.edu.cn (unknown [10.118.0.90])
-	by smtp238.sjtu.edu.cn (Postfix) with ESMTPS id 9035B340D;
-	Thu, 14 Mar 2024 13:58:28 +0800 (CST)
-Received: from mstore135.sjtu.edu.cn (unknown [10.118.0.135])
-	by mta90.sjtu.edu.cn (Postfix) with ESMTP id 60C2437C878;
-	Thu, 14 Mar 2024 13:58:28 +0800 (CST)
-Date: Thu, 14 Mar 2024 13:58:28 +0800 (CST)
-From: Zheyun Shen <szy0127@sjtu.edu.cn>
-To: thomas lendacky <thomas.lendacky@amd.com>, 
-	Sean Christopherson <seanjc@google.com>, 
-	pbonzini <pbonzini@redhat.com>, tglx <tglx@linutronix.de>
-Cc: kvm <kvm@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
-Message-ID: <1860502863.219296.1710395908135.JavaMail.zimbra@sjtu.edu.cn>
-Subject: [PATCH v3] KVM:SVM: Flush cache only on CPUs running SEV guest
+	s=arc-20240116; t=1710396042; c=relaxed/simple;
+	bh=4sZqY6J/YMhF2k8mvjAMYsqm1g9w7kkJUFdg7aHeAcU=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=jwiRey/Lcb1LWb7g0PkZp6OizifurU8LeXpaDJiJtQeceFXyxx7eALS597a5Bf0dbyrjv17PuWoG05vfSVY/Qc5sER3P99ECGJ81XjSMNucN7jxTpfK+VLNAMtcq/HBbHeg/hWsp7Nl5Zc4/5q7kfDEVnvON71DDQFYKQACvD7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=X7xOAyTz; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1710396031; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=/3auDq21P+3VIk5KDxp7XywdJJcGN1ChRwn63QuP8Pg=;
+	b=X7xOAyTzRU0zpryR83xAF8mV/cAk9wXeopwhTqHAt9t2ZsYcLM0nkGdosmTRIPvjAnoPJhhWQ75EZisafsDRMNYhXiuLZLAweUPheS6Ytiu+iN/agij3j+0iUXfpgjLjqFWjACUQg0R/hwmgyQfpqf9+/0200CIRYl7tJ3SSzWM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=24;SR=0;TI=SMTPD_---0W2RGslY_1710396029;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W2RGslY_1710396029)
+          by smtp.aliyun-inc.com;
+          Thu, 14 Mar 2024 14:00:29 +0800
+Message-ID: <1710395908.7915084-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v3 1/4] virtio: find_vqs: pass struct instead of multi parameters
+Date: Thu, 14 Mar 2024 13:58:28 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ linux-um@lists.infradead.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,
+ linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20240312021013.88656-1-xuanzhuo@linux.alibaba.com>
+ <20240312021013.88656-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvVgfgAxLoKeFTgy-1GR0W07ciPYFuqs6PiWtKCnXuWTw@mail.gmail.com>
+In-Reply-To: <CACGkMEvVgfgAxLoKeFTgy-1GR0W07ciPYFuqs6PiWtKCnXuWTw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=GB2312
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 10.0.7_GA_4598 (ZimbraWebClient - GC122 (Win)/10.0.7_GA_4598)
-Thread-Index: ni5XwuC1hBU2RnYJnZxX2YGyNjSrCA==
-Thread-Topic: Flush cache only on CPUs running SEV guest
 
-On AMD CPUs without ensuring cache consistency, each memory page
-reclamation in an SEV guest triggers a call to wbinvd_on_all_cpus(),
-thereby affecting the performance of other programs on the host.
+On Thu, 14 Mar 2024 11:12:24 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Tue, Mar 12, 2024 at 10:10=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
+> >
+> > Now, we pass multi parameters to find_vqs. These parameters
+> > may work for transport or work for vring.
+> >
+> > And find_vqs has multi implements in many places:
+> >
+> >  arch/um/drivers/virtio_uml.c
+> >  drivers/platform/mellanox/mlxbf-tmfifo.c
+> >  drivers/remoteproc/remoteproc_virtio.c
+> >  drivers/s390/virtio/virtio_ccw.c
+> >  drivers/virtio/virtio_mmio.c
+> >  drivers/virtio/virtio_pci_legacy.c
+> >  drivers/virtio/virtio_pci_modern.c
+> >  drivers/virtio/virtio_vdpa.c
+> >
+> > Every time, we try to add a new parameter, that is difficult.
+> > We must change every find_vqs implement.
+> >
+> > One the other side, if we want to pass a parameter to vring,
+> > we must change the call path from transport to vring.
+> > Too many functions need to be changed.
+> >
+> > So it is time to refactor the find_vqs. We pass a structure
+> > cfg to find_vqs(), that will be passed to vring by transport.
+> >
+> > Because the vp_modern_create_avq() use the "const char *names[]",
+> > and the virtio_uml.c changes the name in the subsequent commit, so
+> > change the "names" inside the virtio_vq_config from "const char *const
+> > *names" to "const char **names".
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > Acked-by: Johannes Berg <johannes@sipsolutions.net>
+> > Reviewed-by: Ilpo J=3DE4rvinen <ilpo.jarvinen@linux.intel.com>
+>
+> The name seems broken here.
 
-Typically, an AMD server may have 128 cores or more, while the SEV guest
-might only utilize 8 of these cores. Meanwhile, host can use qemu-affinity
-to bind these 8 vCPUs to specific physical CPUs.
+Email APP bug.
 
-Therefore, keeping a record of the physical core numbers each time a vCPU
-runs can help avoid flushing the cache for all CPUs every time.
+I will fix.
 
-Since the usage of sev_flush_asids() isn't tied to a single VM, we just
-replace all wbinvd_on_all_cpus() with sev_do_wbinvd() except for that
-in sev_flush_asids().
 
-Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
----
-v2 -> v3:
-- Replaced get_cpu() with parameter cpu in pre_sev_run().
+>
+> [...]
+>
+> >
+> >  typedef void vq_callback_t(struct virtqueue *);
+> >
+> > +/**
+> > + * struct virtio_vq_config - configure for find_vqs()
+> > + * @cfg_idx: Used by virtio core. The drivers should set this to 0.
+> > + *     During the initialization of each vq(vring setup), we need to k=
+now which
+> > + *     item in the array should be used at that time. But since the it=
+em in
+> > + *     names can be null, which causes some item of array to be skippe=
+d, we
+> > + *     cannot use vq.index as the current id. So add a cfg_idx to let =
+vring
+> > + *     know how to get the current configuration from the array when
+> > + *     initializing vq.
+>
+> So this design is not good. If it is not something that the driver
+> needs to care about, the core needs to hide it from the API.
 
-v1 -> v2:
-- Added sev_do_wbinvd() to wrap two operations.
-- Used cpumask_test_and_clear_cpu() to avoid concurrent problems.
----
- arch/x86/kvm/svm/sev.c | 27 +++++++++++++++++++++++----
- arch/x86/kvm/svm/svm.h |  3 +++
- 2 files changed, 26 insertions(+), 4 deletions(-)
+The driver just ignore it. That will be beneficial to the virtio core.
+Otherwise, we must pass one more parameter everywhere.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f760106c3..743931e33 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -215,6 +215,24 @@ static void sev_asid_free(struct kvm_sev_info *sev)
-         sev->misc_cg = NULL;
- }
- 
-+static struct cpumask *sev_get_wbinvd_dirty_mask(struct kvm *kvm)
-+{
-+        struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+
-+        return &sev->wbinvd_dirty_mask;
-+}
-+
-+static void sev_do_wbinvd(struct kvm *kvm)
-+{
-+        int cpu;
-+        struct cpumask *dirty_mask = sev_get_wbinvd_dirty_mask(kvm);
-+
-+        for_each_possible_cpu(cpu) {
-+                if (cpumask_test_and_clear_cpu(cpu, dirty_mask))
-+                        wbinvd_on_cpu(cpu);
-+        }
-+}
-+
- static void sev_decommission(unsigned int handle)
- {
-         struct sev_data_decommission decommission;
-@@ -2048,7 +2066,7 @@ int sev_mem_enc_unregister_region(struct kvm *kvm,
-          * releasing the pages back to the system for use. CLFLUSH will
-          * not do this, so issue a WBINVD.
-          */
--        wbinvd_on_all_cpus();
-+        sev_do_wbinvd(kvm);
- 
-         __unregister_enc_region_locked(kvm, region);
- 
-@@ -2152,7 +2170,7 @@ void sev_vm_destroy(struct kvm *kvm)
-          * releasing the pages back to the system for use. CLFLUSH will
-          * not do this, so issue a WBINVD.
-          */
--        wbinvd_on_all_cpus();
-+        sev_do_wbinvd(kvm);
- 
-         /*
-          * if userspace was terminated before unregistering the memory regions
-@@ -2343,7 +2361,7 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
-         return;
- 
- do_wbinvd:
--        wbinvd_on_all_cpus();
-+        sev_do_wbinvd(vcpu->kvm);
- }
- 
- void sev_guest_memory_reclaimed(struct kvm *kvm)
-@@ -2351,7 +2369,7 @@ void sev_guest_memory_reclaimed(struct kvm *kvm)
-         if (!sev_guest(kvm))
-                 return;
- 
--        wbinvd_on_all_cpus();
-+        sev_do_wbinvd(kvm);
- }
- 
- void sev_free_vcpu(struct kvm_vcpu *vcpu)
-@@ -2648,6 +2666,7 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
-         sd->sev_vmcbs[asid] = svm->vmcb;
-         svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
-         vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
-+        cpumask_set_cpu(cpu, sev_get_wbinvd_dirty_mask(svm->vcpu.kvm));
- }
- 
- #define GHCB_SCRATCH_AREA_LIMIT                (16ULL * PAGE_SIZE)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 8ef95139c..de240a9e9 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -90,6 +90,9 @@ struct kvm_sev_info {
-         struct list_head mirror_entry; /* Use as a list entry of mirrors */
-         struct misc_cg *misc_cg; /* For misc cgroup accounting */
-         atomic_t migration_in_progress;
-+
-+        /* CPUs invoked VMRUN should do wbinvd after guest memory is reclaimed */
-+        struct cpumask wbinvd_dirty_mask;
- };
- 
- struct kvm_svm {
---
-2.34.1
+Thanks.
+
+>
+> Thanks
+>
 
