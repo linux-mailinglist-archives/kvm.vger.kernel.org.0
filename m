@@ -1,211 +1,170 @@
-Return-Path: <kvm+bounces-11895-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11896-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B0CF87C9B5
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 09:11:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BD8587C9F4
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 09:34:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0A971F22D5A
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 08:11:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E7B71C22592
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 08:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9927E171A2;
-	Fri, 15 Mar 2024 08:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F18175A1;
+	Fri, 15 Mar 2024 08:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ECOghEEI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E3C1429B;
-	Fri, 15 Mar 2024 08:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F3317581;
+	Fri, 15 Mar 2024 08:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710490270; cv=none; b=kgFu6FfV4OXy9q8SeWccIm35XcQPPTlr+SgOmBkZKvN5r2aaALHzDsUg7pzhsT1I+9cK2eBdhGWzbJRgiE9XdAEnQkGK5k0gu7CIMa5MWW/cs1VHlL9DrKWzP07WMmxn4Uq9Jw+uM4Y5l6TQhwZR4ksMoig7nMteG5jfm3bD7z0=
+	t=1710491656; cv=none; b=EFJgmraaPPC0AUrVwNnsI2f0pLfrSGivQ6Yl8FiG1ID3wCguTE23J09rzHkuZYLK5WRoC8XxWHuxdCPcXTV2r6QXskcmSJagLF4HuufVZ/a2W3+erRbQDFUvcdJcz2wPfK9IOzGrriCg/ASX1fDSppbPTIrrCOspysPgvrPd0ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710490270; c=relaxed/simple;
-	bh=pXqz4qetKcexyld6lqrWVua3KVrcp3aKmnVf9vX3cr0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kJ72fEkXD1uaf+jxI1QycHm3cVQgC+e+FRv1Sx7lkF6p/WYO7qy+6v12ENfhoJ+ngCKbsWSKNRzJo+ZMeIE6AChCOrZPlp/XlfiapYeyZKcQkOrJU0uHqIi1tTrwEnk1HfUOxb6qHFQDWdWSLSZWxDApEtKky/RmvP52RxzQ1D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8AxeeiZAvRlAmYZAA--.41874S3;
-	Fri, 15 Mar 2024 16:11:05 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfROYAvRlv8haAA--.9838S2;
-	Fri, 15 Mar 2024 16:11:04 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Huacai Chen <chenhuacai@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [PATCH v7 7/7] Documentation: KVM: Add hypercall for LoongArch
-Date: Fri, 15 Mar 2024 16:11:04 +0800
-Message-Id: <20240315081104.2813031-1-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240315080710.2812974-1-maobibo@loongson.cn>
-References: <20240315080710.2812974-1-maobibo@loongson.cn>
+	s=arc-20240116; t=1710491656; c=relaxed/simple;
+	bh=uLD2+SRtcCTCMUCgmnjSj25HkrmEKJRC6VbmgO5duKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bx7mqQomC5FgQ16iNyemqB+eOnpRXVdikFBOtJ5TE8Y1BNZoLh2RntLbxbSYSjbUrQx9ZdeAfg6GluqP3RFXZ9rSPh96ZcmxE5J7Z0z2cWKYXr2Zs4Ko9NleUDJEdCwp1HW1aQqY3qyr9pFbg9u+Wj/iGHrAwiQK9nEal83fBGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ECOghEEI; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42F8VFEh005212;
+	Fri, 15 Mar 2024 08:33:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=h8UR0vcPeFHcPgZLJhsWdusEkhHzg6hgpaW3PTDECQM=;
+ b=ECOghEEIJRzNpAxo23Hnd0WzEskYr1XIMjeMjM18Ovqzx6zdcGT5mNwP20luumKEmATM
+ 3Q1zW0pZK6gZsbqxn5GAHV/TunBe6xFTXMSH9GiSDgbdJ5eihf7FVZ+YlsN2HH+6Rwcy
+ 3iC0wnxa9ZQHb45a/oCXp5ThmhF+z8oB1+nwtSrGkTfiCeRj5Eks+KpqjGm2o/rh6Wh2
+ Y83OFt4UYkW4QnkyiwtEEbgqoqSufnkExi1CbBSV81m5p0uaqQo/SjNmh7TgWutBsNua
+ m6Y/0S4G3arUz+aDQMEt9n7KD6NCsQHpay5rPrjM7syWjQmU8aL2HiQ8CbmdWtj7e7nX vw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wvgjdspmm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Mar 2024 08:33:56 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42F8VS27005858;
+	Fri, 15 Mar 2024 08:33:56 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wvgjdspm7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Mar 2024 08:33:56 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42F7wb1R020506;
+	Fri, 15 Mar 2024 08:33:54 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ws3kmjhyy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Mar 2024 08:33:54 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42F8Xovm35127556
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 15 Mar 2024 08:33:52 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BB2A42005A;
+	Fri, 15 Mar 2024 08:33:50 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 871132004B;
+	Fri, 15 Mar 2024 08:33:50 +0000 (GMT)
+Received: from DESKTOP-2CCOB1S. (unknown [9.171.202.216])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 15 Mar 2024 08:33:50 +0000 (GMT)
+Date: Fri, 15 Mar 2024 09:33:49 +0100
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Luis Machado <luis.machado@arm.com>, Jason Wang <jasowang@redhat.com>,
+        Abel Wu <wuyun.abel@bytedance.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        nd <nd@arm.com>
+Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
+ lag based placement)
+Message-ID: <ZfQH7b3ZBwqwV3G3@DESKTOP-2CCOB1S.>
+References: <20231214021328-mutt-send-email-mst@kernel.org>
+ <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+ <20240121134311-mutt-send-email-mst@kernel.org>
+ <07974.124020102385100135@us-mta-501.us.mimecast.lan>
+ <20240201030341-mutt-send-email-mst@kernel.org>
+ <89460.124020106474400877@us-mta-475.us.mimecast.lan>
+ <20240311130446-mutt-send-email-mst@kernel.org>
+ <cf813f92-9806-4449-b099-1bb2bd492b3c@arm.com>
+ <73123.124031407552500165@us-mta-156.us.mimecast.lan>
+ <20240314110649-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8DxfROYAvRlv8haAA--.9838S2
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxAFWUury5tw15XF47Kw1ktFc_yoWrtr4rpF
-	95G3s7Grn7Jry7A347JF1UXryYkryxJF47Ga18Jr1Fqr1Dtr1fJr4UtFyYy3W8G3y8AFy8
-	XF1Iqr1j9r1UAwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBvb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-	Wrv_ZF1lYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
-	Ij64vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
-	z7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Ar0_tr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6x
-	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Cr0_Gr1UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jxxhdUUUUU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240314110649-mutt-send-email-mst@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4U3YY95uVFkwJGPaq4gMrxxcn20Le5KY
+X-Proofpoint-ORIG-GUID: GM8yA1PPHFYC7BILomuwNiZdApPQ2qoL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-14_13,2024-03-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 priorityscore=1501 impostorscore=0 mlxscore=0
+ suspectscore=0 spamscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2403150069
 
-Add documentation topic for using pv_virt when running as a guest
-on KVM hypervisor.
+On Thu, Mar 14, 2024 at 11:09:25AM -0400, Michael S. Tsirkin wrote:
+> 
+> Thanks a lot! To clarify it is not that I am opposed to changing vhost.
+> I would like however for some documentation to exist saying that if you
+> do abc then call API xyz. Then I hope we can feel a bit safer that
+> future scheduler changes will not break vhost (though as usual, nothing
+> is for sure).  Right now we are going by the documentation and that says
+> cond_resched so we do that.
+> 
+> -- 
+> MST
+> 
 
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- Documentation/virt/kvm/index.rst              |  1 +
- .../virt/kvm/loongarch/hypercalls.rst         | 82 +++++++++++++++++++
- Documentation/virt/kvm/loongarch/index.rst    | 10 +++
- 3 files changed, 93 insertions(+)
- create mode 100644 Documentation/virt/kvm/loongarch/hypercalls.rst
- create mode 100644 Documentation/virt/kvm/loongarch/index.rst
+Here I'd like to add that we have two different problems:
 
-diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
-index ad13ec55ddfe..9ca5a45c2140 100644
---- a/Documentation/virt/kvm/index.rst
-+++ b/Documentation/virt/kvm/index.rst
-@@ -14,6 +14,7 @@ KVM
-    s390/index
-    ppc-pv
-    x86/index
-+   loongarch/index
- 
-    locking
-    vcpu-requests
-diff --git a/Documentation/virt/kvm/loongarch/hypercalls.rst b/Documentation/virt/kvm/loongarch/hypercalls.rst
-new file mode 100644
-index 000000000000..0f61a49c31a9
---- /dev/null
-+++ b/Documentation/virt/kvm/loongarch/hypercalls.rst
-@@ -0,0 +1,82 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===================================
-+The LoongArch paravirtual interface
-+===================================
-+
-+KVM hypercalls use the HVCL instruction with code 0x100, and the hypercall
-+number is put in a0 and up to five arguments may be placed in a1-a5, the
-+return value is placed in a0.
-+
-+The code for that interface can be found in arch/loongarch/kvm/*
-+
-+Querying for existence
-+======================
-+
-+To find out if we're running on KVM or not, cpucfg can be used with index
-+CPUCFG_KVM_BASE (0x40000000), cpucfg range between 0x40000000 - 0x400000FF
-+is marked as a specially reserved range. All existing and future processors
-+will not implement any features in this range.
-+
-+When Linux is running on KVM, cpucfg with index CPUCFG_KVM_BASE (0x40000000)
-+returns magic string "KVM\0"
-+
-+Once you determined you're running under a PV capable KVM, you can now use
-+hypercalls described as follows.
-+
-+KVM hypercall ABI
-+=================
-+
-+Hypercall ABI on KVM is simple, only one scratch register a0 and at most
-+five generic registers used as input parameter. FP register and vector register
-+is not used for input register and should not be modified during hypercall.
-+Hypercall function can be inlined since there is only one scratch register.
-+
-+The parameters are as follows:
-+
-+        ========	=========================	=====================
-+	Register	IN			        OUT
-+        ========	=========================	=====================
-+	a0		function number(Required)       Return code(Required)
-+	a1		1st parameter(Optional)		Keep Unmodified
-+	a2		2nd parameter(Optional)		Keep Unmodified
-+	a3		3rd parameter(Optional)		Keep Unmodified
-+	a4		4th parameter(Optional)		Keep Unmodified
-+	a5		5th parameter(Optional)		Keep Unmodified
-+        ========	=========================	=====================
-+
-+Return codes can be as follows:
-+
-+	====		=========================
-+	Code		Meaning
-+	====		=========================
-+	0		Success
-+	-1		Hypercall not implemented
-+	-2		Hypercall parameter error
-+	====		=========================
-+
-+KVM Hypercalls Documentation
-+============================
-+
-+The template for each hypercall is:
-+1. Hypercall name
-+2. Purpose
-+
-+1. KVM_HCALL_FUNC_PV_IPI
-+------------------------
-+
-+:Purpose: Send IPIs to multiple vCPUs.
-+
-+- a0: KVM_HCALL_FUNC_PV_IPI
-+- a1: lower part of the bitmap of destination physical cpu core id
-+- a2: higher part of the bitmap of destination physical cpu core id
-+- a3: the lowest physical cpu core id in bitmap
-+
-+The hypercall lets a guest send multicast IPIs, with at most 128
-+destinations per hypercall.  The destinations are represented by a bitmap
-+contained in the first two arguments (a1 and a2). Bit 0 of a1 corresponds
-+to the physical cpu core id in the third argument (a3), bit 1 corresponds
-+to the physical cpu core id a3+1, and so on.
-+
-+Returns success always, it skips current cpu and continues to send ipi to
-+next cpu in the bitmap mask if current physical cpu core id is invalid.
-diff --git a/Documentation/virt/kvm/loongarch/index.rst b/Documentation/virt/kvm/loongarch/index.rst
-new file mode 100644
-index 000000000000..83387b4c5345
---- /dev/null
-+++ b/Documentation/virt/kvm/loongarch/index.rst
-@@ -0,0 +1,10 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=========================
-+KVM for LoongArch systems
-+=========================
-+
-+.. toctree::
-+   :maxdepth: 2
-+
-+   hypercalls.rst
--- 
-2.39.3
+1. cond_resched not working as expected
+   This appears to me to be a bug in the scheduler where it lets the cgroup, 
+   which the vhost is running in, loop endlessly. In EEVDF terms, the cgroup
+   is allowed to surpass its own deadline without consequences. One of my RFCs
+   mentioned above adresses this issue (not happy yet with the implementation).
+   This issue only appears in that specific scenario, so it's not a general 
+   issue, rather a corner case.
+   But, this fix will still allow the vhost to reach its deadline, which is
+   one full time slice. This brings down the max delays from 300+ms to whatever
+   the timeslice is. This is not enough to fix the regression.
 
+2. vhost relying on kworker being scheduled on wake up
+   This is the bigger issue for the regression. There are rare cases, where
+   the vhost runs only for a very short amount of time before it wakes up 
+   the kworker. Simultaneously, the kworker takes longer than usual to 
+   complete its work and takes longer than the vhost did before. We
+   are talking 4digit to low 5digit nanosecond values.
+   With those two being the only tasks on the CPU, the scheduler now assumes
+   that the kworker wants to unfairly consume more than the vhost and denies
+   it being scheduled on wakeup.
+   In the regular cases, the kworker is faster than the vhost, so the 
+   scheduler assumes that the kworker needs help, which benefits the
+   scenario we are looking at.
+   In the bad case, this means unfortunately, that cond_resched cannot work
+   as good as before, for this particular case!
+   So, let's assume that problem 1 from above is fixed. It will take one 
+   full time slice to get the need_resched flag set by the scheduler
+   because vhost surpasses its deadline. Before, the scheduler cannot know
+   that the kworker should actually run. The kworker itself is unable
+   to communicate that by itself since it's not getting scheduled and there 
+   is no external entity that could intervene.
+   Hence my argumentation that cond_resched still works as expected. The
+   crucial part is that the wake up behavior has changed which is why I'm 
+   a bit reluctant to propose a documentation change on cond_resched.
+   I could see proposing a doc change, that cond_resched should not be
+   used if a task heavily relies on a woken up task being scheduled.
 
