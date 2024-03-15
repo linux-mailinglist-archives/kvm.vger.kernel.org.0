@@ -1,120 +1,144 @@
-Return-Path: <kvm+bounces-11876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498C587C743
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 02:35:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F7D87C763
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 03:11:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03564283251
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 01:35:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FB1C1C2171F
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 02:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908D16127;
-	Fri, 15 Mar 2024 01:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E802A7476;
+	Fri, 15 Mar 2024 02:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BdbsAzMd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AlQ57S/A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE4C17E9;
-	Fri, 15 Mar 2024 01:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BD7613D;
+	Fri, 15 Mar 2024 02:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710466515; cv=none; b=toJtBmFnzMF9A911yHIih5VbsIORHJul6w51W4830VLjV7iDdMme/3faNPPSUjGYj4pDOTccNAc1uUvD9Gqa2mdu0Ly6skqfVWkZ8bWdoj40UBKq8/udHZFbZdrLTJKOsbprWlfGQ0vfYp4lzoqbDkrTyqSAiwU5iGaV0pMICk0=
+	t=1710468669; cv=none; b=nFhwnGKtUOBdiuhF6FpQmck7FCN3GYaUPYeqd5f/PhWo09yxdPYs7kE5JRbA6/zMdGKtDtJvzG7dxsxXXDauDvC15KqGyEY2VaP4k3vdS6WWVFFifwrnMMWM8qe3KAk2XwrLzUkw9TwuluS6dKNbvan6OvPzc5Pxqp7nMX4aM3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710466515; c=relaxed/simple;
-	bh=Th7S+DhYrtzjGeSKsD9TjobPaMkl17CMIDV/Ixl5vvw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s237Ang+9s+Na+MdwrA83otVRXz9VGTixenN+q8HWfN1tv5k2JrealChSDgTOCy5qd8kDVemeXGRBSouwhHTrp8B65oD7Ealo1YmTC9TavgGwqSSGwddyUpQRM7PL+ucHFjWVq8McgdFnsjzcuqJDhwN1XPGFPitCjjbUKEgHRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BdbsAzMd; arc=none smtp.client-ip=192.198.163.11
+	s=arc-20240116; t=1710468669; c=relaxed/simple;
+	bh=8TkQWxUkIXsgjC9vDNQgkuuZuaa2KSqmPIJGceGkLew=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J0Vft+bmLiQbRztlOCJRe7d15J+8LXi2MFcZczPW5iWdK7NwsvrV8oz5gJL/8F2AbCy9RdN+uJyHKVdlcUbWnRtwlM/JO5GS6YPUP3juZICgs+v3Mgg8GYu2EdbLENIdT7LlM/ijJxjlhWO4ze6wjqQnb81HWlW2rIkW/tihMOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AlQ57S/A; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710466514; x=1742002514;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Th7S+DhYrtzjGeSKsD9TjobPaMkl17CMIDV/Ixl5vvw=;
-  b=BdbsAzMdlaYXXpYJJK9JzDsACVYIJgTFsOYqYdHcsCNsiFCvCYMDF2yr
-   TqjTJBqz/rvp7RqCUzuUeTi4dGArnCyVo9UktpkGHNTwgNm9X4i7TPeqD
-   c7BqDm/pAGzWIG7f2TY/QK90YhkbPbyvQUP1/K7OeNWkrP4SWUVTQeLg9
-   vg9XtV1Can6PO/JfyEMhOlD+TtxEYoBWNscCR7sMMIf7E0h19djiQBwnJ
-   Yi5p8gnIyJSolQPsHfGHExDvgBUxKcRwMfrlo2IbYsdeUUTEly1eJvupm
-   Xc7oy+jyTRN6SB2zWah29axIYV9EeLdsDaTNkr3aSk2ntEonB5gZR5EiF
+  t=1710468663; x=1742004663;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8TkQWxUkIXsgjC9vDNQgkuuZuaa2KSqmPIJGceGkLew=;
+  b=AlQ57S/AaJykU4ie0p+GdwQuR/T9fF7wwVkj7G7nKthTP5dF9rm14eep
+   Uz4cXG+OWO1qbWLB1CvjkMcIj0yJuEu3k3MZHY4nF1cmsVOmgUcd2OdeL
+   V1UC2YjBMz9Oyko2dbKpyVWM8+Ry3WTIlKTHHeFDMKFbboCyQXmycQArq
+   2cv+F51ygvggVdzpDVQ0M4pmzkNNyUFbXuwWuWOjAHqxgjNlUs7i0kgFt
+   b2+gz0G4g4vwJs+lW+po0c/xZTaTPoJkC/naA8uCuzmvxLVWF1RH/mdOn
+   xIb6rH6r+AemtWYp+oP5lePzhB3ifzcdx8Rtb7Ac2TFInpdsS5XK1QolJ
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="15963108"
+X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="5191960"
 X-IronPort-AV: E=Sophos;i="6.07,127,1708416000"; 
-   d="scan'208";a="15963108"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 18:35:13 -0700
+   d="scan'208";a="5191960"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 19:11:03 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,127,1708416000"; 
-   d="scan'208";a="43397230"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 18:35:12 -0700
-Date: Thu, 14 Mar 2024 18:35:11 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"Zhang, Tina" <tina.zhang@intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Yuan, Hang" <hang.yuan@intel.com>,
-	"Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
-	"sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 120/130] KVM: TDX: Add a method to ignore dirty
- logging
-Message-ID: <20240315013511.GF1258280@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <1491dd247829bf1a29df1904aeed5ed6b464d29c.1708933498.git.isaku.yamahata@intel.com>
- <b4cde44a884f2f048987826d59e2054cd1fa532b.camel@intel.com>
+   d="scan'208";a="12425872"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.125.243.127]) ([10.125.243.127])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 19:10:58 -0700
+Message-ID: <f492f669-4abb-406f-ad7b-2d134332644c@intel.com>
+Date: Fri, 15 Mar 2024 10:10:56 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] x86/virt/tdx: Export global metadata read
+ infrastructure
+Content-Language: en-US
+To: "Huang, Kai" <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: x86@kernel.org, dave.hansen@intel.com, kirill.shutemov@linux.intel.com,
+ peterz@infradead.org, tglx@linutronix.de, bp@alien8.de, mingo@redhat.com,
+ hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+ isaku.yamahata@intel.com, jgross@suse.com
+References: <cover.1709288433.git.kai.huang@intel.com>
+ <ec9fc9f1d45348ddfc73362ddfb310cc5f129646.1709288433.git.kai.huang@intel.com>
+ <bd61e29d-5842-4136-b30f-929b00bdf6f9@intel.com>
+ <1c8537b8-bb91-48ee-ae9a-5f54b828b49c@intel.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <1c8537b8-bb91-48ee-ae9a-5f54b828b49c@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b4cde44a884f2f048987826d59e2054cd1fa532b.camel@intel.com>
 
-On Fri, Mar 15, 2024 at 12:06:31AM +0000,
-"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
-
-> On Mon, 2024-02-26 at 00:27 -0800, isaku.yamahata@intel.com wrote:
-> >  
-> > +static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
-> > +{
-> > +       if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
-> > +               return;
-> > +
-> > +       vmx_update_cpu_dirty_logging(vcpu);
-> > +}
+On 3/15/2024 8:24 AM, Huang, Kai wrote:
 > 
-> Discussed this first part offline, but logging it here. Since
-> guest_memfd cannot have dirty logging, this is essentially bugging the
-> VM if somehow they manage anyway. But it should be blocked via the code
-> in check_memory_region_flags().
+> 
+> On 13/03/2024 4:44 pm, Xiaoyao Li wrote:
+>> On 3/1/2024 7:20 PM, Kai Huang wrote:
+>>> KVM will need to read a bunch of non-TDMR related metadata to create and
+>>> run TDX guests.  Export the metadata read infrastructure for KVM to use.
+>>>
+>>> Specifically, export two helpers:
+>>>
+>>> 1) The helper which reads multiple metadata fields to a buffer of a
+>>>     structure based on the "field ID -> structure member" mapping table.
+>>>
+>>> 2) The low level helper which just reads a given field ID.
+>>
+>> How about introducing a helper to read a single metadata field 
+>> comparing to 1) instead of the low level helper.
+>>
+>> The low level helper tdx_sys_metadata_field_read() requires the data 
+>> buf to be u64 *. So the caller needs to use a temporary variable and 
+>> handle the memcpy when the field is less than 8 bytes.
+>>
+>> so why not expose a high level helper to read single field, e.g.,
+>>
+>> +int tdx_sys_metadata_read_single(u64 field_id, int bytes, void *buf)
+>> +{
+>> +       return stbuf_read_sys_metadata_field(field_id, 0, bytes, buf);
+>> +}
+>> +EXPORT_SYMBOL_GPL(tdx_sys_metadata_read_single);
+> 
+> As replied here where these APIs are (supposedly) to be used:
+> 
+> https://lore.kernel.org/kvm/e88e5448-e354-4ec6-b7de-93dd8f7786b5@intel.com/
+> 
+> I don't see why we need to use a temporary 'u64'.  We can just use it 
+> directly or type cast to 'u16' when needed, which has the same result of 
+> doing explicit memory copy based on size.
 
-Will drop this patch.
+The way to cast a u64 to u16 is based on the fact that the variable is 
+u64 at first.
 
+Given
 
-> On the subject of warnings and KVM_BUG_ON(), my feeling so far is that
-> this series is quite aggressive about these. Is it due the complexity
-> of the series? I think maybe we can remove some of the simple ones, but
-> not sure if there was already some discussion on what level is
-> appropriate.
+	u16 feild_x;
 
-KVM_BUG_ON() was helpful at the early stage.  Because we don't hit them
-recently, it's okay to remove them.  Will remove them.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+We have to have a u64 tmp, passed to tdx_sys_metadata_field_read() to 
+hold the output of metadata read, then
+
+	filed_x = (u16) tmp;
+
+If we pass field_x into tdx_sys_metadata_field_read(), the following 
+(64-16) bits might be corrupted.
+
+> So I am not convinced at this stage that we need the code as you 
+> suggested.  At least I believe the current APIs are sufficient for KVM 
+> to use.
+> 
+> However I'll put more background on how KVM is going to use into the 
+> changelog to justify the current APIs are enough.
+
 
