@@ -1,141 +1,169 @@
-Return-Path: <kvm+bounces-11902-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11903-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1132E87CB4A
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 11:22:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEF687CB5B
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 11:29:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434C11C2148E
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 10:22:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7679D1F22604
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 10:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D26E1863F;
-	Fri, 15 Mar 2024 10:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32A6E18EAD;
+	Fri, 15 Mar 2024 10:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U6Zi57zx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dk1mQzM7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2969F182D8
-	for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 10:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8CE18E28
+	for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 10:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710498148; cv=none; b=Zkc5d9DK25U5Ejo05HTc2vuUE+GJiSlhUZZfbRY9+HbMLn92sf/CYH6PvBbDyILwJAH6dxhXfZiXXBd1DSWrjlUh+b734yxCY30hmb6MmrtIYrVoSjTuhMV6c1HGEh/w6ASVm2ICRxhVvUdY2DTspDmr2PsdQXbRocOKxW0kEBw=
+	t=1710498553; cv=none; b=I4Qq44u2otzTBIKx5keW/KN8eZVu9IHcM163gHvv0B0qLsXBrGcRfA7zppXWTQ+6T5etlnR2X5UJ6q4m81qwO4VZFkL/tNEDWDnALt3fJoQyY+f89yg2eCKT+dG492P7tOZidebd4tUucRqzAbTHW5xczn7MfhXel+3lBDDmTW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710498148; c=relaxed/simple;
-	bh=5U2FdyBJ9x2N/ZT3lykt6b/ppnU43zp52hERVtbnd4s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZKJE8IaYq8NF9AXG1drd3GVrLYlliYuORtRKuRZZdeYaDYH91Sln1JTj5cyBVHh9ZSdUm9uBjcOvAqt9TWkKvBIdYuQYdlx9vJNReS+t4Jupg7gk+ZmUzsv2qjsYJeT/PygXuXy9qD5mfcM8arZ76nfFceVS9VpxIRsTqN3brG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U6Zi57zx; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-51381021af1so2644128e87.0
-        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 03:22:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710498145; x=1711102945; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4hKS13cZNwTAuS0CQMQLil3nPF8VhVj/moqaBbt3e4Q=;
-        b=U6Zi57zxqfFdpJGE2hlDtNFINl84TbrlrJDB8cTu0KSfSvDQamaymuj1ZQH8iX12XO
-         79eMLqlIwG96MyqBFTUIV+pRs+79vKHMgkDUmucukf9cw8yPHcD3DTW0PTtT8ZMoTwJ1
-         MZXbRdfromKT7mofgC9Ex3Zf3VN8qPhWO80AhOftw/FgUIfedE3MEDM7FsE02hulDeUF
-         D7labFenUSlWbVJbwYKOGR6nvfYmZktAEl12RpsGNJ6ZLl8aZxQOgLRFssuAaQxAUZ/z
-         3mXntQ/B9oDZ5Kk5o0LM7s6XYSX/G044/FPdG9Yz9cs9tGPC2FuoT+Fnr86x0KuoXQvL
-         jq9g==
+	s=arc-20240116; t=1710498553; c=relaxed/simple;
+	bh=WjtDLSxpesB0ZqjiaU1pcR2XZxE+SssNvSi40zWY64k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uqLUevU1i/Ie7mmaK2DA/ZU7coMOdkFzLePmhtzvjgv3ruoT/cUumrRGhrpHbObKbyhmcbGiFTV3PS/DpN1rzCCZJyo2pS0pxoFSv3NvRoco3eT/XxKOlxunJNn/Y0kCHtuYj7Bmv692eI6C6VluG/7Fxp0z9VxiHo/zhxmJKGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dk1mQzM7; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710498550;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4LzVKYzDeMlNU7muM18EJurw+KHPOsJVd6gjVHme+u4=;
+	b=dk1mQzM7BoInPg8nQfUAp9O8EG+xMsgE3SJtdTdYfRwI4SGuHF8vRVxzdKyFnhAUwotNGS
+	VuqasmZkE+ICqMVUFitq7uOQzavFzhS0OPorNQp855dynZS4nxOKCulfqOmEQY7Iqc2ff7
+	vS6ng9HJeFr5+/fhk4W4YYNsD2Flrdg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-235-RRcDZrBaNMmzj0FIPpg3gA-1; Fri, 15 Mar 2024 06:29:09 -0400
+X-MC-Unique: RRcDZrBaNMmzj0FIPpg3gA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33ed63f7437so35561f8f.2
+        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 03:29:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710498145; x=1711102945;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4hKS13cZNwTAuS0CQMQLil3nPF8VhVj/moqaBbt3e4Q=;
-        b=GdfjgwKgs48CZuCby8F2lXf847LeMi80WSU49Bo0qGIJUB8e80XgjFiUvDt4Wc3uFl
-         ZuB/w0tg+CPG9+4YfEBHDH6z7sHJXNfdKfJfJTIenmckm+PeAS2q3laSuqF2Kwy6K2fZ
-         VfvYdMRA65nLpQcGyS7VCOEQCKcCGUq6xNcS5o/MrihvBUxoQdTOpyoEHVJdxhmLDLow
-         phHkhs32pClWqaUQZG+gTv//+uSh5yf2/XG90KRXo/5/C9iwG1FZyAUTIOAnKJJMkj/E
-         F5BV5qgwG4X1bu8qK6tmoSKUHxudwswurugSjKKQMt0gAB/CtslLv2qmxdfFkWHl1POq
-         418A==
-X-Forwarded-Encrypted: i=1; AJvYcCUpgEPyA1EpNT5pyvM8aPNGHGFlRqoGJKfDXSrV1M0UO6ZNzzB42oNdwaxMZMghZaIA4yT7jj32nUFEPEOazEgGToiw
-X-Gm-Message-State: AOJu0Yzlj/8cKrfpkIfJoIxTNwbArTiYz2f+FM5E1runMivfVEtQobPL
-	Gf579kmxXzZ5vU9Nmbs276MF2eBSyO5hTwMFBMJvw1BKFQR3n2wUV/DFOerDP8PwPNepgQ8kW2c
-	YHrFi
-X-Google-Smtp-Source: AGHT+IED8mmZANKTy9MzOwavrd3Hatz/1kDglj3tvY7tFGNBe5aHeRsc9tnZUPRJMEZX60J8/tNElQ==
-X-Received: by 2002:a05:6512:10d4:b0:513:db29:8905 with SMTP id k20-20020a05651210d400b00513db298905mr1317908lfg.69.1710498145116;
-        Fri, 15 Mar 2024 03:22:25 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id v23-20020a1709067d9700b00a461a7ba686sm1578047ejo.75.2024.03.15.03.22.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 03:22:24 -0700 (PDT)
-Date: Fri, 15 Mar 2024 10:22:16 +0000
-From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Sami Tolvanen <samitolvanen@google.com>, 
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 00/10] KVM: arm64: Add support for hypervisor kCFI
-Message-ID: <wlkwdcati2klte4u3xvjiacf7hbuvupd2gksaa6ekjgfjuiy7j@7jvkv45iwdkx>
-References: <cover.1710446682.git.ptosi@google.com>
- <86edcc1low.wl-maz@kernel.org>
+        d=1e100.net; s=20230601; t=1710498548; x=1711103348;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4LzVKYzDeMlNU7muM18EJurw+KHPOsJVd6gjVHme+u4=;
+        b=JMXSCK+SyaGUqqctiw+tX00RbtlP/r29LwPkrenWQ7hKILyK7nVmnlV/9e267XIveJ
+         MhFQPT7c3LzRfS8DIakZyehbV4f+RQkvRQm5RuaCd87rnArVRPOzm4+cRfmCjlZuII27
+         bJAIptv9PPsPJgdGT5AFyNs39/dHqv/NOzxbvllh38xWHRgyjvtjZAZKDbQpsV+ki4hm
+         djCgx9lVM4SQJH74EK7Jvzo5yVa6gJqq2uLOjgnfSSog/oC05S9/r96lf7R6XkILPxQa
+         dbfQF6+iAOJedg92aWfaV6a0w5rOMCDUJM4VKXLc8XHP9fkDV1vL0O0h0GHLEAG20LQm
+         tsAA==
+X-Gm-Message-State: AOJu0YwSm6+a264pldJE0nVPHOc47xahUdXq2AYwHzT71o7IV7zfBya2
+	U46yXiEmGrL0VeXSVDAkB+rFoiBhX0FteF4cNr4xaAZ04ZC3UjmxKYV2QZcpABYqzfdBzxTfF8F
+	LgSHJ4e63P8zksfcsCMU4YxCZpy9aX6c1rp2fH0o1+PN7jnjKYXzjPM0JnfhH2/8dneZAFrHKD9
+	OREcXWYbdXI9HumuldKBhaL1Qz
+X-Received: by 2002:a05:6000:ecc:b0:33d:365a:64ce with SMTP id ea12-20020a0560000ecc00b0033d365a64cemr3514067wrb.34.1710498548155;
+        Fri, 15 Mar 2024 03:29:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3IXpQwWRJk68QeroZGtOynXZQtN41Q8sdLnkfZ9rvuAhejnc7cGVhIoVWUvJFb9WshmjTEyYsi418JuDiY9c=
+X-Received: by 2002:a05:6000:ecc:b0:33d:365a:64ce with SMTP id
+ ea12-20020a0560000ecc00b0033d365a64cemr3514046wrb.34.1710498547787; Fri, 15
+ Mar 2024 03:29:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <86edcc1low.wl-maz@kernel.org>
+References: <20240226122059.58099-1-frankja@linux.ibm.com>
+In-Reply-To: <20240226122059.58099-1-frankja@linux.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 15 Mar 2024 11:28:54 +0100
+Message-ID: <CABgObfZA_=W1GoKaQ-OW05rfJAcxf3N5wC=Jj1bn6m3J9QNw+Q@mail.gmail.com>
+Subject: Re: [GIT PULL 0/3] KVM: s390: Changes for 6.9
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, david@redhat.com, borntraeger@linux.ibm.com, 
+	cohuck@redhat.com, linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, 
+	seiden@linux.ibm.com, nsg@linux.ibm.com, farman@linux.ibm.com, 
+	agordeev@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Mon, Feb 26, 2024 at 1:24=E2=80=AFPM Janosch Frank <frankja@linux.ibm.co=
+m> wrote:
+>
+> Paolo,
+>
+> please pull the 3 fixes that I've held on to as they were very low priori=
+ty:
+> - Memop selftest rotate fix
+> - SCLP event bits over indication fix
+> - Missing virt_to_phys for the CRYCB fix
+>
+>
+> Attention:
+> Three additional patches will go over the main s390 repository since
+> Heiko made changes to the FPU handling that caused a conflict with KVM
+> but we didn't want to create a feature branch.
 
-On Thu, Mar 14, 2024 at 10:40:47PM +0000, Marc Zyngier wrote:
-> Hi Pierre-Clément,
-> 
-> On Thu, 14 Mar 2024 20:23:00 +0000,
-> Pierre-Clément Tosi <ptosi@google.com> wrote:
-> > 
-> > CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler inject
-> > runtime type checks before any indirect function call. On AArch64, it generates
-> > a BRK instruction to be executed on type mismatch and encodes the indices of the
-> > registers holding the branch target and expected type in the immediate of the
-> > instruction. As a result, a synchronous exception gets triggered on kCFI failure
-> > and the fault handler can retrieve the immediate (and indices) from ESR_ELx.
-> > 
-> > This feature has been supported at EL1 ("host") since it was introduced by
-> > b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decodes
-> > ESR_EL1, giving informative panic messages such as
-> > 
-> >   [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
-> >   (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
-> >   [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
-> > 
-> > However, it is not or only partially supported at EL2: in nVHE (or pKVM),
-> > CONFIG_CFI_CLANG gets filtered out at build time, preventing the compiler from
-> > injecting the checks. In VHE (or hVHE), EL2 code gets compiled with the checks
-> 
-> Are you sure about hVHE? hVHE is essentially the nVHE object running
-> with a slightly different HCR_EL2 configuration. So if you don't have
-> the checks in the nVHE code, you don't have them for hVHE either.
+Pulled, thanks.
 
-No, I am not and my assumption that hVHE was running the VHE hyp code was wrong.
-FYI, these patches were tested in VHE, nVHE, and pKVM (with NVHE_EL2_DEBUG set
-and unset) but not in hVHE (clearly!). Thanks for pointing this out.
+Paolo
 
-> 
-> Or am I missing something obvious?
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> See:
+> https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/log/?h=3Df=
+or-next
+>
+> - KVM: s390: fix access register usage in ioctls
+> - KVM: s390: selftests: memop: add a simple AR test
+> - KVM: s390: introduce kvm_s390_fpu_(store|load)
+>
+>
+> Cheers,
+> Janosch
+>
+>
+> The following changes since commit 41bccc98fb7931d63d03f326a746ac4d429c1d=
+d3:
+>
+>   Linux 6.8-rc2 (2024-01-28 17:01:12 -0800)
+>
+> are available in the Git repository at:
+>
+>   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/=
+kvm-s390-next-6.9-1
+>
+> for you to fetch changes up to 00de073e2420df02ac0f1a19dbfb60ff8eb198be:
+>
+>   KVM: s390: selftest: memop: Fix undefined behavior (2024-02-23 14:02:27=
+ +0100)
+>
+> ----------------------------------------------------------------
+> - Memop selftest rotate fix
+> - SCLP event bits over indication fix
+> - Missing virt_to_phys for the CRYCB fix
+> ----------------------------------------------------------------
+> Alexander Gordeev (1):
+>       KVM: s390: fix virtual vs physical address confusion
+>
+> Eric Farman (1):
+>       KVM: s390: only deliver the set service event bits
+>
+> Nina Schoetterl-Glausch (1):
+>       KVM: s390: selftest: memop: Fix undefined behavior
+>
+>  arch/s390/kvm/interrupt.c                 | 4 ++--
+>  arch/s390/kvm/kvm-s390.c                  | 2 +-
+>  tools/testing/selftests/kvm/s390x/memop.c | 2 ++
+>  3 files changed, 5 insertions(+), 3 deletions(-)
+>
+>
+>
+>
+>
+> --
+> 2.43.2
+>
 
--- 
-Pierre
 
