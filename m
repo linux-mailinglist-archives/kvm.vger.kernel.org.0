@@ -1,166 +1,211 @@
-Return-Path: <kvm+bounces-11932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0087F87D393
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 19:29:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DA987D39A
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 19:29:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2393A1C21388
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 18:29:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F9732818E3
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 18:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488355103D;
-	Fri, 15 Mar 2024 18:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6461C50249;
+	Fri, 15 Mar 2024 18:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dJ7Mqpvw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3hLQDDI+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B4E4F1F8;
-	Fri, 15 Mar 2024 18:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C234EB5F
+	for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 18:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710527336; cv=none; b=lN334V/5qTEv4YC3ReC38e0dcTO89oZqbwerL1me8G3dgEmAGzyXAJcHvs1p46dvzGXfVG95eTf/HsjJwJXFt0DLmcCJBtS6dX6glJNnqZszbQl8/gv4a7idi5pPbw+UUGvkuLNcHtMG70GAi9ntsFwxIwlZHqJzySAA06jOFgU=
+	t=1710527380; cv=none; b=HI++OONASHsIJ2NSszK6HwsxMbKW57S67hlFh7jRk/pm2tRdYEeQok8vVD4/IB31ly2AC6C6TWEv6ntyVvXilr+HW5CXE6dnFrDB1DGBNAnuIkbZRIL6GM2cjPRGZ//RAfGZ0AWwmTrRtXv2dNYtHevvxFP77CeQTCwuWeo6AKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710527336; c=relaxed/simple;
-	bh=Ekhx1lKYY83e5ixwWk+vB7JzXnJuQVvVTUbPByEPsfU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E7mZmSoDcCP9gzNULos21u1t8L0jPIKsV4oRItLlCB1D0vXk0KTVDQDowAwornJfymC1IN8IGzWmkl4qnW9nsydZPlbHUcM/n1FxmNRIZP8Thuvou078ujQfFKShrCPQ0piyEyaLIXnD+aXYuQX1h5GXwqpF/Txk8XKkVROG17o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dJ7Mqpvw; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710527335; x=1742063335;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Ekhx1lKYY83e5ixwWk+vB7JzXnJuQVvVTUbPByEPsfU=;
-  b=dJ7Mqpvwh/3htHIXzKLIyqYp+EPAWFb2H/ckK19hdrP+77yqxLJY4nSp
-   Blph61ybGZEpwZq42XlOtMDfEMiY53ym67hxJeovNKDPWxF2boZ9Ypbhh
-   cbuRAQEBauzPUl8x4c15+Dwx/MAnYzMkoNhGSlaIDQ7lwGmca3weLDIFe
-   akfLtbLctF0pOPTXyPEhu1UZm3alZr+8Yh4mdj7U5moEGtOogSFEIZz3F
-   mLynNBJbVHsxp2aRM6ZVI2T+M4HsPGS35AdM0EODUFX9GC1QQYYtzRrS7
-   nuw8FLHIQND3NKUbSzmKBJVayM6kEpzLOKy/vQ/97YIgTgpAy8I+0IOEI
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11014"; a="5544587"
-X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
-   d="scan'208";a="5544587"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 11:28:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
-   d="scan'208";a="17460425"
-Received: from uagu-mobl.amr.corp.intel.com (HELO [10.209.27.9]) ([10.209.27.9])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 11:28:53 -0700
-Message-ID: <ea85f773-b5ef-4cf6-b2bd-2c0e7973a090@intel.com>
-Date: Fri, 15 Mar 2024 11:28:52 -0700
+	s=arc-20240116; t=1710527380; c=relaxed/simple;
+	bh=KUHOP8ehexowNIEsOotntCAdUefMeTgT8ndPqIvacRI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NBapMfoL2NR/4ATd88myzcWQAPPO79JqgJaVOyCbdUts7PtUIiUilytjsPIbtcO56rVCyvvqFc1CXvTEh+ceE5I7VRB+PXV6JadQqqPPrt4TNEGwqD1E/nqZEGiG2XHEjZqOfkEvF8Q5Y3icWJ22x2EHQ1PcRl3cBojK74Poxj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3hLQDDI+; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6e6ca8c8be2so2138289b3a.1
+        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 11:29:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710527376; x=1711132176; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8Yx8GBGZtm8giG+I86hNAaIO2ye/1iwJfeXfUGn8W+g=;
+        b=3hLQDDI+eEN3UTYekutR7sByJhxPou0i4tE2YGyQVOIZHWDIIHm4Zw7hynNsICviyr
+         zlKN76yJ3PiWSPj7NiT1q65DGOXLcovhqrKNS7Veb9FfdV+0zZ8P57O3iNLvqWYURdQq
+         IBuAd6069dIf4ZQh44QOO7ToDMXrhnYgflh+g67Kti/ohCcbiB8pfeKkxQs0ODMWQl7A
+         /2b+r8EgyK7cvFoPV2voZr8WxXUk6U6Q9fEUg9/9PMiau8ThgSvjM1YNWvq2rx4BeAbg
+         sSpRlSJGTDO9oRMfSAeuYg5J2HtpDf7chDJ7TRgpxcfPg/iwKSe++QghZysiop9LaG3C
+         IZkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710527376; x=1711132176;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Yx8GBGZtm8giG+I86hNAaIO2ye/1iwJfeXfUGn8W+g=;
+        b=CYLj6sJYuIhHzBa+zGwgyEFByJWcOAHADdBl8dm1P15Tn/4g8FhpXtzaECDOH/dMho
+         xPNrIn1kt03zU4xeQiaNVgg6PuiqK21uwkfN3btx+xtdjQO9hIhZHBxEkmUHZxvHvjsQ
+         ciO1QNSGsdHokKKQbCCIwetFXFdRZs3nz8UhvcmO/3bir08kVG/Jr1ysraTSttmd/td+
+         oejneKPvUGtZv3wwSYjB09W/1szRGaG4GfiQ5vHnp5uRpqavhgH053jv6fLU1NoZM9HE
+         JQ9M/u+gTlbgiV0QTtZUOohfYbEnLxq+H1hVs0tuQeKII5vDhg+FcDeibRzbaCs6Xixx
+         fdJw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJFlHyeIjqiJwi3UEZhnJiDzvOOkj/cEc6wGyDgaiL92gK/1a5UiIJ62Ru4RpbmlOnmw3HNIk8qvDguDZ9+wpRfQMa
+X-Gm-Message-State: AOJu0YweRXMI2In8M6sYCLEnL3kGJy02AgNMPzSx8/Z1JNJI53PYg62a
+	8wIXdI1U9yHbNJnWqvbRmHg1aDyVnu4W0cw2KCsJRGc4f9+SLtEqDqi9A82YgQ==
+X-Google-Smtp-Source: AGHT+IHf+8j7zKnvwbaJH/TUrJOU+u8aCZhENiidgnodEi0/+PKq1PeMhJI52e2EQ4QfYyAqDADIhg==
+X-Received: by 2002:a05:6a00:3d0d:b0:6e6:9f29:fc43 with SMTP id lo13-20020a056a003d0d00b006e69f29fc43mr7068182pfb.12.1710527375893;
+        Fri, 15 Mar 2024 11:29:35 -0700 (PDT)
+Received: from google.com (61.139.125.34.bc.googleusercontent.com. [34.125.139.61])
+        by smtp.gmail.com with ESMTPSA id dr23-20020a056a020fd700b005d67862799asm2480674pgb.44.2024.03.15.11.29.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Mar 2024 11:29:33 -0700 (PDT)
+Date: Fri, 15 Mar 2024 11:29:27 -0700
+From: David Matlack <dmatlack@google.com>
+To: syzbot <syzbot+900d58a45dcaab9e4821@syzkaller.appspotmail.com>
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com,
+	pbonzini@redhat.com, seanjc@google.com,
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org,
+	vipinsh@google.com
+Subject: Re: [syzbot] [kvm?] WARNING in clear_dirty_gfn_range
+Message-ID: <ZfSTh4bLuAMlF6Er@google.com>
+References: <000000000000c6526f06137f18cc@google.com>
+ <CALzav=euH_n9WXG29CFd10urh85O4Mw2L=StEizVmh27CYzrtQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 007/130] x86/virt/tdx: Export SEAMCALL functions
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
- "x86@kernel.org" <x86@kernel.org>, Tina Zhang <tina.zhang@intel.com>,
- Hang Yuan <hang.yuan@intel.com>, Bo2 Chen <chen.bo@intel.com>,
- "sagis@google.com" <sagis@google.com>,
- "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
- Erdem Aktas <erdemaktas@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <8f64043a6c393c017347bf8954d92b84b58603ec.1708933498.git.isaku.yamahata@intel.com>
- <e6e8f585-b718-4f53-88f6-89832a1e4b9f@intel.com>
- <bd21a37560d4d0695425245658a68fcc2a43f0c0.camel@intel.com>
- <54ae3bbb-34dc-4b10-a14e-2af9e9240ef1@intel.com>
- <ZfR4UHsW_Y1xWFF-@google.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <ZfR4UHsW_Y1xWFF-@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALzav=euH_n9WXG29CFd10urh85O4Mw2L=StEizVmh27CYzrtQ@mail.gmail.com>
 
-On 3/15/24 09:33, Sean Christopherson wrote:
->         static inline u64 tdh_mem_page_remove(hpa_t tdr, gpa_t gpa, int level,
->         				      struct tdx_module_args *out)
->         {
->         	struct tdx_module_args in = {
->         		.rcx = gpa | level,
->         		.rdx = tdr,
->         	};
+On 2024-03-15 11:07 AM, David Matlack wrote:
+> On Tue, Mar 12, 2024 at 4:34 PM syzbot
+> <syzbot+900d58a45dcaab9e4821@syzkaller.appspotmail.com> wrote:
+> >
+> > ------------[ cut here ]------------
+> > WARNING: CPU: 1 PID: 5165 at arch/x86/kvm/mmu/tdp_mmu.c:1526 clear_dirty_gfn_range+0x3d6/0x540 arch/x86/kvm/mmu/tdp_mmu.c:1526
+> > Modules linked in:
+> > CPU: 1 PID: 5165 Comm: syz-executor417 Not tainted 6.8.0-syzkaller-01185-g855684c7d938 #0
+> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+> > RIP: 0010:clear_dirty_gfn_range+0x3d6/0x540 arch/x86/kvm/mmu/tdp_mmu.c:1526
+> > Call Trace:
+> >  <TASK>
+> >  kvm_tdp_mmu_clear_dirty_slot+0x24f/0x2e0 arch/x86/kvm/mmu/tdp_mmu.c:1557
+> >  kvm_mmu_slot_leaf_clear_dirty+0x38b/0x490 arch/x86/kvm/mmu/mmu.c:6783
+> >  kvm_mmu_slot_apply_flags arch/x86/kvm/x86.c:12962 [inline]
+> >  kvm_arch_commit_memory_region+0x299/0x490 arch/x86/kvm/x86.c:13031
+> >  kvm_commit_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:1751 [inline]
+> >  kvm_set_memslot+0x4d3/0x13e0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1994
+> >  __kvm_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:2129 [inline]
+> >  __kvm_set_memory_region+0xdbc/0x1520 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2020
+> >  kvm_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:2150 [inline]
+> >  kvm_vm_ioctl_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:2162 [inline]
+> >  kvm_vm_ioctl+0x151c/0x3e20 arch/x86/kvm/../../../virt/kvm/kvm_main.c:5152
 > 
->         	return tdx_seamcall_sept(TDH_MEM_PAGE_REMOVE, &in, out);
->         }
+> The reproducer uses nested virtualization to launch an L2 with EPT
+> disabled. This creates a TDP MMU root with role.guest_mode=1, which
+> triggers the WARN_ON() in kvm_tdp_mmu_clear_dirty_slot() because
+> kvm_mmu_page_ad_need_write_protect() returns false whenever PML is
+> enabled and the shadow page role.guest_mode=1.
 > 
-> generates the below monstrosity with gcc-13.  And that's just one SEAMCALL wrapper,
-> *every* single one generates the same mess.  clang-16 is kinda sorta a little
-> better, as it at least inlines the helpers that have single callers.
+> If I'm reading prepare_vmcs02_constant_state() correctly, we always
+> disable PML when running in L2. So when enable_pml=1 and L2 runs with
+> EPT disabled we are blind to dirty tracking L2 accesses.
 
-Yeah, that's really awful.
++Vipin
 
-Is all the inlining making the compiler too ambitious?  Why is this all
-inlined in the first place?
+I believe this was introduced by 6.4 commit 5982a5392663 ("KVM: x86/mmu:
+Use kvm_ad_enabled() to determine if TDP MMU SPTEs need wrprot").
 
-tdh_mem_page_remove() _should_ just be logically:
+I see two options to fix:
 
-	* initialize tdx_module_args.  Move a few things into place on
-	  the stack and zero the rest.
-	* Put a pointer to tdx_module_args in a register
-	* Put TDH_MEM_PAGE_REMOVE immediate in a register
-	* Some register preservation, maybe
-	* call
-	* maybe some cleanup
-	* return
+  1. Allow PML to be enabled when L2 is running with EPT is disabled.
+  2. Fix the TDP MMU logic to write-protect role.guest_mode=1 SPTEs.
 
-Those logical things are *NOT* easy to spot in the disassembly.
+(1.) sounds more complicated and will require more testing. (2.) is
+quite simple since an entire TDP MMU tree is either guest_mode=0 or
+guest_mode=1.
+
+Example fix (fixes syzbot repro but otherwise untested):
+
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 6ae19b4ee5b1..eb6fb8d9c00c 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1498,6 +1498,24 @@ void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
+ 	}
+ }
+ 
++static inline u64 tdp_mmu_dirty_bit(struct kvm_mmu_page *root, bool force_wrprot)
++{
++	if (force_wrprot || kvm_mmu_page_ad_need_write_protect(root) || !kvm_ad_enabled())
++		return PT_WRITABLE_MASK;
++
++	return shadow_dirty_mask;
++}
++
++static inline bool tdp_mmu_dirty_bit_invalid_for_spte(struct tdp_iter *iter, u64 dbit)
++{
++	/*
++	 * The decision of whether to clear the D-bit or W-bit is made based on
++	 * the root, as all TDP MMU SPTEs within a root should require the same
++	 * modifications. This check ensures that is actually the case.
++	 */
++	return dbit == shadow_dirty_mask && spte_ad_need_write_protect(iter->old_spte);
++}
++
+ /*
+  * Clear the dirty status of all the SPTEs mapping GFNs in the memslot. If
+  * AD bits are enabled, this will involve clearing the dirty bit on each SPTE.
+@@ -1508,7 +1526,7 @@ void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
+ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			   gfn_t start, gfn_t end)
+ {
+-	u64 dbit = kvm_ad_enabled() ? shadow_dirty_mask : PT_WRITABLE_MASK;
++	u64 dbit = tdp_mmu_dirty_bit(root, false);
+ 	struct tdp_iter iter;
+ 	bool spte_set = false;
+ 
+@@ -1523,8 +1541,7 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
+ 			continue;
+ 
+-		KVM_MMU_WARN_ON(kvm_ad_enabled() &&
+-				spte_ad_need_write_protect(iter.old_spte));
++		KVM_MMU_WARN_ON(tdp_mmu_dirty_bit_invalid_for_spte(&iter, dbit));
+ 
+ 		if (!(iter.old_spte & dbit))
+ 			continue;
+@@ -1570,8 +1587,7 @@ bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
+ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+ 				  gfn_t gfn, unsigned long mask, bool wrprot)
+ {
+-	u64 dbit = (wrprot || !kvm_ad_enabled()) ? PT_WRITABLE_MASK :
+-						   shadow_dirty_mask;
++	u64 dbit = tdp_mmu_dirty_bit(root, wrprot);
+ 	struct tdp_iter iter;
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+@@ -1583,8 +1599,7 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		if (!mask)
+ 			break;
+ 
+-		KVM_MMU_WARN_ON(kvm_ad_enabled() &&
+-				spte_ad_need_write_protect(iter.old_spte));
++		KVM_MMU_WARN_ON(tdp_mmu_dirty_bit_invalid_for_spte(&iter, dbit));
+ 
+ 		if (iter.level > PG_LEVEL_4K ||
+ 		    !(mask & (1UL << (iter.gfn - gfn))))
 
