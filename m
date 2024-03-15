@@ -1,113 +1,141 @@
-Return-Path: <kvm+bounces-11901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6C087CAD0
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 10:36:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1132E87CB4A
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 11:22:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A3361F21F0F
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 09:36:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434C11C2148E
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 10:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECF517C96;
-	Fri, 15 Mar 2024 09:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D26E1863F;
+	Fri, 15 Mar 2024 10:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MJ4Y0VJO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U6Zi57zx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEDC17C66;
-	Fri, 15 Mar 2024 09:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2969F182D8
+	for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 10:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710495393; cv=none; b=g/TM81U8xb3xo6fAd+1yGcKB/XvVhzI4auLWU9GC3C5rG1Y8PAsj8LIImTLM5vsJKc2oKGJWqJ4DMyxksD7XLB5A+p/NgAqN+C4dHnSmYAmW990Am7fWiGvK7IFHQxF55wIL3a+iUeO/XNqwKYnegQwcGywaZrJigUBTS/CgEBQ=
+	t=1710498148; cv=none; b=Zkc5d9DK25U5Ejo05HTc2vuUE+GJiSlhUZZfbRY9+HbMLn92sf/CYH6PvBbDyILwJAH6dxhXfZiXXBd1DSWrjlUh+b734yxCY30hmb6MmrtIYrVoSjTuhMV6c1HGEh/w6ASVm2ICRxhVvUdY2DTspDmr2PsdQXbRocOKxW0kEBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710495393; c=relaxed/simple;
-	bh=VgyR9/qh5SvA5TrFhzFHvJ6YsXi9BlJT3v7qlQZYuoE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=S/Mg1/tK7qiu+2OB2bBfzgVIPJOAp6o8kTxw494MhvQjSMvtMG9Uv0PsPQSFFRepv/3ISqEGfyAgtKbgQ/CR3/gouhJq+IgoEm4Bhp5zU+1WrrXwhdpdDi6/3cLzItoGzd1KPQ18grsF3z7fshWInZCbHrtSdweFwAyprz8i/rU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MJ4Y0VJO; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41403b203e0so681105e9.3;
-        Fri, 15 Mar 2024 02:36:31 -0700 (PDT)
+	s=arc-20240116; t=1710498148; c=relaxed/simple;
+	bh=5U2FdyBJ9x2N/ZT3lykt6b/ppnU43zp52hERVtbnd4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZKJE8IaYq8NF9AXG1drd3GVrLYlliYuORtRKuRZZdeYaDYH91Sln1JTj5cyBVHh9ZSdUm9uBjcOvAqt9TWkKvBIdYuQYdlx9vJNReS+t4Jupg7gk+ZmUzsv2qjsYJeT/PygXuXy9qD5mfcM8arZ76nfFceVS9VpxIRsTqN3brG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U6Zi57zx; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-51381021af1so2644128e87.0
+        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 03:22:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710495390; x=1711100190; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fJTv+jCFSNgUGswO7FXJc0Lm26VLRiBRl5ZlHIS2q+A=;
-        b=MJ4Y0VJOI+Rj+ewA8IqIwzO4RHIyiLbT7yPIExDWJCq/tnOW2povxHgfOGFi+EVZe3
-         s/DtkpYC+uSmuBfH8x2NNUPsxpvuMNclnJ//IB3wr7sqSuFX1lBnKz0stiTfYtunQut5
-         owx/g0/igpO4hpUJ6Tfp21tqvo0Y9X8wuPlam68pSM02NpJw+ZXm5Pys7vUFqiFwpv3f
-         ckuQMPkVzLNfuALZ+50uZ117n97vUz6gaDD+i14AOC+qivQyMohnRoxnDC95Oc7QnMOe
-         ozu5FftmyOIHm04lULKY1PiH3VfikmZUaywIJFhOgWkbLa9PbTaX9WUaDXZKvlyt4qdc
-         pvmQ==
+        d=google.com; s=20230601; t=1710498145; x=1711102945; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4hKS13cZNwTAuS0CQMQLil3nPF8VhVj/moqaBbt3e4Q=;
+        b=U6Zi57zxqfFdpJGE2hlDtNFINl84TbrlrJDB8cTu0KSfSvDQamaymuj1ZQH8iX12XO
+         79eMLqlIwG96MyqBFTUIV+pRs+79vKHMgkDUmucukf9cw8yPHcD3DTW0PTtT8ZMoTwJ1
+         MZXbRdfromKT7mofgC9Ex3Zf3VN8qPhWO80AhOftw/FgUIfedE3MEDM7FsE02hulDeUF
+         D7labFenUSlWbVJbwYKOGR6nvfYmZktAEl12RpsGNJ6ZLl8aZxQOgLRFssuAaQxAUZ/z
+         3mXntQ/B9oDZ5Kk5o0LM7s6XYSX/G044/FPdG9Yz9cs9tGPC2FuoT+Fnr86x0KuoXQvL
+         jq9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710495390; x=1711100190;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fJTv+jCFSNgUGswO7FXJc0Lm26VLRiBRl5ZlHIS2q+A=;
-        b=jUbKsUkSG7e1Y549LTgunuJ5VxG31BHvVi63YDHD1YE1RWisWJzgQ7eeYdqvAKZmX5
-         I59O1uYYQ0zmCuPMKvD5Hw/fk+9FvRdmUOd3taidYWHc7IN+Y9XYNHW1inhibJFw84Mr
-         JSFygBfZ6/73G9OIgzTH7QZQSr+1GQyO2VSLr8qEYyn4Rxhrek6sAG87xNkL/S28LmKc
-         rzpYF/EUhY0Pt0BK58UrEKRs12qZw2UijzqofIo+y6vpZLiVI7zUX6zRB7Yws4b56AVO
-         /LnliewWPrxdNKqET91vK5wM2V6Z+kRQdnu1nVJkBowTWJ7AsTvNbvAD198mz5xjBZo2
-         Mjpw==
-X-Forwarded-Encrypted: i=1; AJvYcCWAlYTPu33e/JuU2mbPel5MuqdLpgycRPcHFCUbFOkv40TBa3krmkZWTySbMU0KPuGihLTKNdJLZWZVw5+VJl4EE4Rb6IRkeaSmlWDUajZpI4/lt9O4D7GgRbo0B9whDd0qaEIB/9SZO5+er2mGA8BQj+qArO3Lzx5SMW5fWarTG7EM
-X-Gm-Message-State: AOJu0YyiAfTuL+mhQb+2HFExq7JjSA/IjeBTjmC/w97e6NmtQMHzUsbb
-	h0xDVySD6/vloHnqBy3BJm1wrLta3dui5q6TlujkIG4bv3o2smMY
-X-Google-Smtp-Source: AGHT+IEoKXdqYZ7z7nKgWADnipOKrnv6Eesx2OFOohN1P1Y4ePV4yX8maQRJ2mf+EaidEc6k6Vm2nQ==
-X-Received: by 2002:a05:600c:19cd:b0:413:ea5a:7787 with SMTP id u13-20020a05600c19cd00b00413ea5a7787mr3018899wmq.22.1710495390374;
-        Fri, 15 Mar 2024 02:36:30 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id o18-20020a05600c4fd200b004132f9cf053sm8314827wmq.33.2024.03.15.02.36.29
+        d=1e100.net; s=20230601; t=1710498145; x=1711102945;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4hKS13cZNwTAuS0CQMQLil3nPF8VhVj/moqaBbt3e4Q=;
+        b=GdfjgwKgs48CZuCby8F2lXf847LeMi80WSU49Bo0qGIJUB8e80XgjFiUvDt4Wc3uFl
+         ZuB/w0tg+CPG9+4YfEBHDH6z7sHJXNfdKfJfJTIenmckm+PeAS2q3laSuqF2Kwy6K2fZ
+         VfvYdMRA65nLpQcGyS7VCOEQCKcCGUq6xNcS5o/MrihvBUxoQdTOpyoEHVJdxhmLDLow
+         phHkhs32pClWqaUQZG+gTv//+uSh5yf2/XG90KRXo/5/C9iwG1FZyAUTIOAnKJJMkj/E
+         F5BV5qgwG4X1bu8qK6tmoSKUHxudwswurugSjKKQMt0gAB/CtslLv2qmxdfFkWHl1POq
+         418A==
+X-Forwarded-Encrypted: i=1; AJvYcCUpgEPyA1EpNT5pyvM8aPNGHGFlRqoGJKfDXSrV1M0UO6ZNzzB42oNdwaxMZMghZaIA4yT7jj32nUFEPEOazEgGToiw
+X-Gm-Message-State: AOJu0Yzlj/8cKrfpkIfJoIxTNwbArTiYz2f+FM5E1runMivfVEtQobPL
+	Gf579kmxXzZ5vU9Nmbs276MF2eBSyO5hTwMFBMJvw1BKFQR3n2wUV/DFOerDP8PwPNepgQ8kW2c
+	YHrFi
+X-Google-Smtp-Source: AGHT+IED8mmZANKTy9MzOwavrd3Hatz/1kDglj3tvY7tFGNBe5aHeRsc9tnZUPRJMEZX60J8/tNElQ==
+X-Received: by 2002:a05:6512:10d4:b0:513:db29:8905 with SMTP id k20-20020a05651210d400b00513db298905mr1317908lfg.69.1710498145116;
+        Fri, 15 Mar 2024 03:22:25 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id v23-20020a1709067d9700b00a461a7ba686sm1578047ejo.75.2024.03.15.03.22.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 02:36:29 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] KVM: selftests: Remove second semicolon
-Date: Fri, 15 Mar 2024 09:36:29 +0000
-Message-Id: <20240315093629.2431491-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Fri, 15 Mar 2024 03:22:24 -0700 (PDT)
+Date: Fri, 15 Mar 2024 10:22:16 +0000
+From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Sami Tolvanen <samitolvanen@google.com>, 
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 00/10] KVM: arm64: Add support for hypervisor kCFI
+Message-ID: <wlkwdcati2klte4u3xvjiacf7hbuvupd2gksaa6ekjgfjuiy7j@7jvkv45iwdkx>
+References: <cover.1710446682.git.ptosi@google.com>
+ <86edcc1low.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <86edcc1low.wl-maz@kernel.org>
 
-There is a statement with two semicolons. Remove the second one, it
-is redundant.
+Hi Marc,
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Mar 14, 2024 at 10:40:47PM +0000, Marc Zyngier wrote:
+> Hi Pierre-Clément,
+> 
+> On Thu, 14 Mar 2024 20:23:00 +0000,
+> Pierre-Clément Tosi <ptosi@google.com> wrote:
+> > 
+> > CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler inject
+> > runtime type checks before any indirect function call. On AArch64, it generates
+> > a BRK instruction to be executed on type mismatch and encodes the indices of the
+> > registers holding the branch target and expected type in the immediate of the
+> > instruction. As a result, a synchronous exception gets triggered on kCFI failure
+> > and the fault handler can retrieve the immediate (and indices) from ESR_ELx.
+> > 
+> > This feature has been supported at EL1 ("host") since it was introduced by
+> > b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decodes
+> > ESR_EL1, giving informative panic messages such as
+> > 
+> >   [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
+> >   (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
+> >   [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
+> > 
+> > However, it is not or only partially supported at EL2: in nVHE (or pKVM),
+> > CONFIG_CFI_CLANG gets filtered out at build time, preventing the compiler from
+> > injecting the checks. In VHE (or hVHE), EL2 code gets compiled with the checks
+> 
+> Are you sure about hVHE? hVHE is essentially the nVHE object running
+> with a slightly different HCR_EL2 configuration. So if you don't have
+> the checks in the nVHE code, you don't have them for hVHE either.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index d2ea0435f4f7..7d707d8068a4 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -125,7 +125,7 @@ struct compat_vcpu_runstate_info {
- 	uint32_t state;
- 	uint64_t state_entry_time;
- 	uint64_t time[5];
--} __attribute__((__packed__));;
-+} __attribute__((__packed__));
- 
- struct arch_vcpu_info {
- 	unsigned long cr2;
+No, I am not and my assumption that hVHE was running the VHE hyp code was wrong.
+FYI, these patches were tested in VHE, nVHE, and pKVM (with NVHE_EL2_DEBUG set
+and unset) but not in hVHE (clearly!). Thanks for pointing this out.
+
+> 
+> Or am I missing something obvious?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+
 -- 
-2.39.2
-
+Pierre
 
