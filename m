@@ -1,314 +1,215 @@
-Return-Path: <kvm+bounces-11882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EBC887C871
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 06:12:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1DDD87C88B
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 06:39:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70D111C2228F
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 05:12:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E82611C21AEA
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 05:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D39FC1C;
-	Fri, 15 Mar 2024 05:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB7A101F2;
+	Fri, 15 Mar 2024 05:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R/jcyLfv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d+Kc6n1K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EABBDF43;
-	Fri, 15 Mar 2024 05:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710479512; cv=none; b=u+ril06hdVn096Kokz86/xl24s2MnSOxiaGuMijV/wpVVyxWpCI0qvXHwdrwY59lVLih434FpLyU5aYf33pMgTqIBdFM9LpIuFbXIcfZqenWBoUymCTIz4SefxJB798wo7DyEF+Kxs98DMaexmncNkqyQuvAeP4y/THjZ748dlA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710479512; c=relaxed/simple;
-	bh=Gi3R+/Q1NJs+2Ed2bS6L4K9DFuU1AoRGE03dZhlfigs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Enk4MQmrWPWG9hq9++sgiJh91sZ4YV++GJoQjpnwNx4nAQvyveag+3l1HslWRaYdoTK+r9Zu0meDzsxdYwoadalVd8wEXnNZMCEhEMeLfiWPThThwkGhFfQljwkk1CUGi16sVxx+9Ac2woKpAHnVLhtqxmvEAoPiLdJR/3Wka7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R/jcyLfv; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D05ADF51;
+	Fri, 15 Mar 2024 05:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710481181; cv=fail; b=rH5NPR6bMzuh5W1446QbiD9AhYThxDXkmwWdXDvA75lFDgPfcc3/umiisYHwhapSBdjlGNvm0MrX6FHGCcPspNs9vuq+b7qTZC2gY7fIBRwNeNbyb3Hp8tQ5H5bgyE4ERShzdl35YJikrgjiZ6epd+w11pxNWtINoBSpbrXfCOk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710481181; c=relaxed/simple;
+	bh=W3+tqwZiyLebs1Juz6egnWsZ2GroScCQ0Flj69jLqAM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=GMJXHlSJUfYeSmo9TIszP8Q5oWeVTWjZNVa40bNnZwN3IPgteBYY6BdPJOeSwvHozFXVNXc7/4DSqM3CSBv331YBh/mGAaSFqoK9/exczVOfGEK52qcrE0dLoF+IYV0XqI2ytNXmXtP+htpLO/6WM0v5Lb0vvJ4/da6ggQD+zAU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d+Kc6n1K; arc=fail smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710479510; x=1742015510;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Gi3R+/Q1NJs+2Ed2bS6L4K9DFuU1AoRGE03dZhlfigs=;
-  b=R/jcyLfvxejogBSFowWs7jnmdk29PQGEA/y+MzWUI6ypAB23mW4bBoew
-   LyJzv/uAcv6OpdLjtBv5kk3VpepaE39gu3bFanFZEYkg0ZQcD3bPw3fOf
-   i6jme2uEn6YA3HotnVsFV8Q5N6CFeq+YDpRl0Wjds6S5pUm5IcG0zpVSb
-   FFuoOQ5sEYInsa7e/QLHAD64T+Sm4aL+oxn07DefrU1RUUetCCDPDldnD
-   5totFo+Gx1v9a87+VNguHJsx6ShgVTkSLEej+q3fiZXilhTf3VfyNid/2
-   uqbVi7nusU0cSR3UeIm9wwQZTLMIUQwBJJ0TRO/PqXr2KE5vYTDj+HcGu
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="15884789"
+  t=1710481179; x=1742017179;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=W3+tqwZiyLebs1Juz6egnWsZ2GroScCQ0Flj69jLqAM=;
+  b=d+Kc6n1KZOYSmU6VQx+tpHD+JjuuWs3z9ISUf3PbSUSYnJ9ZUnp639I7
+   R1Jzpf9RvSTS39jtesjAodqzElNTIhCVA1BIwCGMhpnRxJCoHvXJ8Mt8K
+   jZg0ykWmTaVlDbF3lKso+/KQsPrvWSfcKThEf6Z4NaQqctqrgN9Tlx6Oj
+   PcQm4BLZy4ZmzwKklcwHymGEzt421AmQ7uhHg0BAeafov5SgV/2NCybxz
+   nr2vuzZ37LwQzp7st6BdBCksXISf6yIonNhBr9boHiCGXC7JwlzmQA88c
+   psj6Cx2zCzvBO4gaxn8DHNcJkENg+K4Qjk9IDbNpqxv0OpgqPhGfbzSzk
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="5191086"
 X-IronPort-AV: E=Sophos;i="6.07,127,1708416000"; 
-   d="scan'208";a="15884789"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 22:11:44 -0700
+   d="scan'208";a="5191086"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 22:39:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,127,1708416000"; 
-   d="scan'208";a="35680318"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.125.243.127]) ([10.125.243.127])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 22:11:40 -0700
-Message-ID: <10c41a88-d692-4ff5-a0c3-ae13a06a055c@intel.com>
-Date: Fri, 15 Mar 2024 13:11:37 +0800
+   d="scan'208";a="17280968"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Mar 2024 22:39:38 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Mar 2024 22:39:37 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Mar 2024 22:39:37 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 14 Mar 2024 22:39:37 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 14 Mar 2024 22:39:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GBBTwLCAGynqlLsOMypGQ8KOS7UwouXF3lGRRJjIMEkQ3LnPJ+4GArazXbKIna0LC+zJzeblfVpNOQrCMDdO/ricTgeDmHRh6WUMqXr9ndzN2xN/0dabOvFe5wIBkIdOCLxw4apItxxov64ypEo4a15EW480wzJ3+BeT8xC6VQCc+ncZ7pFx5zlsJO5Hz24KQtMN76lsxLHnXbLlfWODVmx5amNFp5C60xj6Bwv7iujmNj9lMzBf0D6xp68xNhZGFxSahTmEXs7SQ2crO5OWBIebpHnaH3Loj/M7RIFKAXryUjCdmqhvarGEB3He2bvB/uW79dIe9JyKngJpzNoDaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W3+tqwZiyLebs1Juz6egnWsZ2GroScCQ0Flj69jLqAM=;
+ b=NRKUHWZiPQzKMBIO3F4CRZYlDXL3fxxrFq9GyiPENc/oQw0tjmRJQ3aUxM8t1KcVyZjbwvfn38LCiHIPA/3BbNkcEekc726k1rU/7xYjLieuZk930LqXtukucgcmUvWlTYmRNfwHzVaorQ5QFwKAiloFNm/qai0MROF8/amGIXUzbYGepfwRlBLl089YT3RoPv7Buo9jq4+VEg3byMmOtmxh4ZWls/GMaZT15idqhplVqOl6bU+tY09i41/qPh8vwnVV+gkNUbiOei7pz8QzX7AhtBsae4jeYvGwIOAuTs3jgClJiYO7kxMFDBQwNCCZaZnLh41B0sFsyXQIss0jFA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH8PR11MB7096.namprd11.prod.outlook.com (2603:10b6:510:214::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.20; Fri, 15 Mar
+ 2024 05:39:07 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7386.015; Fri, 15 Mar 2024
+ 05:39:07 +0000
+From: "Huang, Kai" <kai.huang@intel.com>
+To: "Li, Xiaoyao" <xiaoyao.li@intel.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
+CC: "Zhang, Tina" <tina.zhang@intel.com>, "Yuan, Hang" <hang.yuan@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>, "isaku.yamahata@gmail.com"
+	<isaku.yamahata@gmail.com>, "Aktas, Erdem" <erdemaktas@google.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: Re: [PATCH v19 034/130] KVM: TDX: Get system-wide info about TDX
+ module on initialization
+Thread-Topic: [PATCH v19 034/130] KVM: TDX: Get system-wide info about TDX
+ module on initialization
+Thread-Index: AQHaaI26NdKryYpZXEuSi/e9HKO5abE3+DmAgAA06gCAACxugIAAA9aAgAAHqQA=
+Date: Fri, 15 Mar 2024 05:39:07 +0000
+Message-ID: <078ed2b1c3681c6c0ada9106d481d2f7d964815a.camel@intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+	 <eaa2c1e23971f058e5921681b0b84d7ea7d38dc1.1708933498.git.isaku.yamahata@intel.com>
+	 <e88e5448-e354-4ec6-b7de-93dd8f7786b5@intel.com>
+	 <15a13c5d-df88-46cf-8d88-2c8b94ff41ff@intel.com>
+	 <aa1ed4c118177e3e341eebccecac3b07bf75a47d.camel@intel.com>
+	 <10c41a88-d692-4ff5-a0c3-ae13a06a055c@intel.com>
+In-Reply-To: <10c41a88-d692-4ff5-a0c3-ae13a06a055c@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH8PR11MB7096:EE_
+x-ms-office365-filtering-correlation-id: 37294eb6-1fff-414e-f576-08dc44b23b78
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Cs+csQRhjXTrdnQV6CoWwYkHl/lA3RWsh7aBksvxezltPL9g6ZvodkwkWbF/EuSas8sPI63PY81ENK4DMhNjTEsprHc9uu3/2enkANOm0w5YzEfmGjLvoVOhupRbLkjxWJYQgEMSLNkBAJSc2GPlzEO19QebrYKX0iGjHBKA+Y/klf6pjP5dww7onEc7rAyDeJVoKsS1JGKquUHTIoPIPrBaHAYLVFwdUbaM/uRlaiZu+pI1ISkN0DtGdGC6paoOBDJsmyVxRXNha38f9VFcNf/cNntCQNzUnPewy3HULw1/bs5uceaZx6U12bt6zxAxTmZEPU5GArgHXrhOtn1c2mmivBY0CozLDE8PYV9DL2XVSCpkRXWYFrB276nY99BY4sYyfzPacYn1pzQ/24KmWNFAMoAeN775ERvwp/3abK+zj9suElpCM1Kr6D/Lvky9rdUsq15C6dHIZn52J4ZFRL7EfA1G3M4/eJbZXWHzTgoPeUlKQ0za0/8mhg/fbDqnZAh4WQE667B8QLvU1v1eZDjI9jmajS5PVUeE0AVuAWAhBMGQaj3iqY9lg25j8RbndXd0LMr/31unPzr2br+KW3tVfce/zOSAZi0qUYUfqeiGm4Mhh0gmpt7mJHl1cI1WnP+Dah4JEaAHyNaPK46T+gMfvgpjt9Y5MPdqUhTPxMb1YTF1w8vF6xxO9esedRXN/iraw8RWzXkuzPpj/fJY6cx5SU0Vkn4SFB+sIfiUmWE=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RmJwYytJcWxFZTRUN3VLalhsbHNMb2RvQ1crSUtZbHJrUXcrYWZRWE5QNTZM?=
+ =?utf-8?B?bC92QUt2ZXNaVmp1eCtUOTBlNUNVZDF3UllKRURobVpCZjNCbFF0eERQaWZP?=
+ =?utf-8?B?Q0VlMlcrSXhZOHBKamplSTYxdTRkdmJIbmtYb1VEckg4SVUxakJLOUpsbDFp?=
+ =?utf-8?B?T2V0RWRWWFliNjRNNGF0QlkxNzdIajdxTVZjckZsVURlWUJQR3VGNjNPcHJ2?=
+ =?utf-8?B?dURCTmRheldVY2phMUF6MGFFTDVtZXVMSU5UaEJoYVU4UVc3ckJzaDZCdVIz?=
+ =?utf-8?B?U2h6WVliaTNYeWlsdkVmV0dYSEZ2UmVCUXgwcTVSU0lNSVNqZ25jT1QrZ25R?=
+ =?utf-8?B?VGM2cks1RDVkYXFwQ0Z5Y0x3OU4wdW1hWm5DKzB2VEh6aGZsSVZta28xQzBj?=
+ =?utf-8?B?R0EyQ3ZDM3hKWWxKdnhaaGNKaG9zN0l4Rlg5a2dHVmNzMTY1YjI4TURKdXMr?=
+ =?utf-8?B?R2ExcW9aVTJpYmIyNEl5d1h4Zkhvc3BPRjl6eEYrSzBzbzYrRUhnZnRldjNw?=
+ =?utf-8?B?cHJFUk5vREhIMURFWm1aKzRoTVRUWXd0TFhwcHBSOVhZRDljRm96NWlqZ2hL?=
+ =?utf-8?B?NEt5YlgrQzQzd2NGZEVoTDJXRm5STHVWbkZ5aXU3aWhmK1lnZVpySXM4YWFt?=
+ =?utf-8?B?UElZTU90SlhiWXNMNVVTdk51Ri83VTlWVWFxem5kMDJiUkZMSHZ2ZWpyWnlE?=
+ =?utf-8?B?cUNTRjN2Q1pjaGF5UFo2YnBDS2VwOVU0ak16U09COFFUSEJ2cVFjYXdGeG1M?=
+ =?utf-8?B?RmV5ZnNDQ0RHcEJkWHpxakNtV3BjTVdmYzQ0YTdGTW1ucHRwOUZLcG5LY3k1?=
+ =?utf-8?B?WEFXQWQzbmdrcjNKY3dZRnJrTnB6WUZSeXc5ZSsxY0U4alI3WUQzN0tzdGtN?=
+ =?utf-8?B?TU8vYmFJTTlzMjlIZEpQRnV1VEQzb0lSd1kvQmFEMXc5S0tGRGcrbDdLRDV3?=
+ =?utf-8?B?bktwcnVycjNoSVdTQWFxVkdIbjExbkZMSFN4WFdtUm5SSXIvVStScDRLSkxx?=
+ =?utf-8?B?a3FQWDRZWUlYL3NsVzNYZmhpRld0NzJGNWlYdVlxbVkxamhzUndhMmdqWjJy?=
+ =?utf-8?B?QzFpY3ZDOVBmMXoxMlk5d2xCbklpbFBJdjRuWDY5WUhVTTdOV2NGU04vbVNL?=
+ =?utf-8?B?VXJsRk5qUk81bnhUZHB4WUczS1hsM2pSZklJQ2V0cmNHeDlINFJyWjg1ZkFE?=
+ =?utf-8?B?MjJER2l0Rmpmd05iMll5QWU3YjFKbjVlSW1vTkF4dTYwTWtjM2tyYzBxcG1R?=
+ =?utf-8?B?SDJoaFhQVFdsNmVjdC9LQjZWSHRnT1NSUTVhVUpoTVo2UEdQbGI0VHk3ZHhK?=
+ =?utf-8?B?dnk4bkN6bTQ0b2dGWlRXOXlGN1VJeWhWU2JqKzU2bGNSOS9IenBQdDBlYlFj?=
+ =?utf-8?B?RFFxT3ErUEN1TjZpZWRvb1V0eU9KbzNSeFpTeU1wZlZnaVhkV0xqdGlZbEE3?=
+ =?utf-8?B?YjZnVG1Cd1lQZzRjUEpjdzZ3a2J6ZmQ3SkdHbEZHRUNSaWg2WWhRL1pJZjRB?=
+ =?utf-8?B?ZFZMczYxNEZuWVpQdE9TT0p3M21HNDJZWUNYTEJ1d3hZb0o4RTZ6ZzUyL0dM?=
+ =?utf-8?B?ejJ4cmxjaGdlQXhzNjl5ODFRZVJVTmtrUDJxSUFtd2dHYmxHOE0yNHJFQ1M1?=
+ =?utf-8?B?NEMwS3lkSHdhTnkvNjJjWWhrT3VDaWhTRUdwY2lTMVZoM3RUWEIwbHM1WXhu?=
+ =?utf-8?B?cE00NEd5K2FkVDNiZk5weXhaeStBcHJjbHY4eEdCV0p2OE5ZVUQ2NXdBYXpF?=
+ =?utf-8?B?VVNuZ0VYR2dNYXUzSVhjVmNrRENBeTlkV083N2c4VG1WZy80UUxHZitDSVln?=
+ =?utf-8?B?OUdFd3V3UjJ2UEMxZXFVYmFRKzlxQXVnaUpQZTVDajU1YXRRWWthQndJWXUr?=
+ =?utf-8?B?OGlGSHhZQk4yM2NkekdaaUM2elcvV2EvOGpvamdxbEF1UFUxWllEZ1Z6Wm5p?=
+ =?utf-8?B?NnRXbUNJc1U4QXNMMzRKeUVmMGNPVk85ZHVvN1E3UXJvc3QwQ2F2b3FTanhG?=
+ =?utf-8?B?SmNSdGIwckw3MjRnT0xtUzllNGZmUzdRSC9RZ1I5TTFhL0dMbGZLTmRuUHh3?=
+ =?utf-8?B?OEV5aXlaWDN5RXdSYzdTRnptQWtmZUR0V0lzOWxJdkltbFlqaGVvNFpDZ2lD?=
+ =?utf-8?B?ZkoyMHZnNHhzWkdNNGZTSENxbjU3WFN4Tm52Vkd4QVpFZVk0N1hWZ3M3OUNC?=
+ =?utf-8?B?SUE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <43B1FE8D2DA28D4687D724B291435885@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 034/130] KVM: TDX: Get system-wide info about TDX
- module on initialization
-Content-Language: en-US
-To: "Huang, Kai" <kai.huang@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Cc: "Zhang, Tina" <tina.zhang@intel.com>,
- "seanjc@google.com" <seanjc@google.com>, "Yuan, Hang" <hang.yuan@intel.com>,
- "Chen, Bo2" <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
- "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
- "Aktas, Erdem" <erdemaktas@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <eaa2c1e23971f058e5921681b0b84d7ea7d38dc1.1708933498.git.isaku.yamahata@intel.com>
- <e88e5448-e354-4ec6-b7de-93dd8f7786b5@intel.com>
- <15a13c5d-df88-46cf-8d88-2c8b94ff41ff@intel.com>
- <aa1ed4c118177e3e341eebccecac3b07bf75a47d.camel@intel.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <aa1ed4c118177e3e341eebccecac3b07bf75a47d.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37294eb6-1fff-414e-f576-08dc44b23b78
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Mar 2024 05:39:07.2000
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: r9KKwPojiv8IbakRTlwgl0RGu0hPhSXivzwVCWydgs4U4faOes5k9hmgKHMCwx81qZ8TWi5bKd4868qf/NIkhg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7096
+X-OriginatorOrg: intel.com
 
-On 3/15/2024 12:57 PM, Huang, Kai wrote:
-> On Fri, 2024-03-15 at 10:18 +0800, Li, Xiaoyao wrote:
->> On 3/15/2024 7:09 AM, Huang, Kai wrote:
->>>
->>>> +struct tdx_info {
->>>> +    u64 features0;
->>>> +    u64 attributes_fixed0;
->>>> +    u64 attributes_fixed1;
->>>> +    u64 xfam_fixed0;
->>>> +    u64 xfam_fixed1;
->>>> +
->>>> +    u16 num_cpuid_config;
->>>> +    /* This must the last member. */
->>>> +    DECLARE_FLEX_ARRAY(struct kvm_tdx_cpuid_config, cpuid_configs);
->>>> +};
->>>> +
->>>> +/* Info about the TDX module. */
->>>> +static struct tdx_info *tdx_info;
->>>> +
->>>>    #define TDX_MD_MAP(_fid, _ptr)            \
->>>>        { .fid = MD_FIELD_ID_##_fid,        \
->>>>          .ptr = (_ptr), }
->>>> @@ -66,7 +81,7 @@ static size_t tdx_md_element_size(u64 fid)
->>>>        }
->>>>    }
->>>> -static int __used tdx_md_read(struct tdx_md_map *maps, int nr_maps)
->>>> +static int tdx_md_read(struct tdx_md_map *maps, int nr_maps)
->>>>    {
->>>>        struct tdx_md_map *m;
->>>>        int ret, i;
->>>> @@ -84,9 +99,26 @@ static int __used tdx_md_read(struct tdx_md_map
->>>> *maps, int nr_maps)
->>>>        return 0;
->>>>    }
->>>> +#define TDX_INFO_MAP(_field_id, _member)            \
->>>> +    TD_SYSINFO_MAP(_field_id, struct tdx_info, _member)
->>>> +
->>>>    static int __init tdx_module_setup(void)
->>>>    {
->>>> +    u16 num_cpuid_config;
->>>>        int ret;
->>>> +    u32 i;
->>>> +
->>>> +    struct tdx_md_map mds[] = {
->>>> +        TDX_MD_MAP(NUM_CPUID_CONFIG, &num_cpuid_config),
->>>> +    };
->>>> +
->>>> +    struct tdx_metadata_field_mapping fields[] = {
->>>> +        TDX_INFO_MAP(FEATURES0, features0),
->>>> +        TDX_INFO_MAP(ATTRS_FIXED0, attributes_fixed0),
->>>> +        TDX_INFO_MAP(ATTRS_FIXED1, attributes_fixed1),
->>>> +        TDX_INFO_MAP(XFAM_FIXED0, xfam_fixed0),
->>>> +        TDX_INFO_MAP(XFAM_FIXED1, xfam_fixed1),
->>>> +    };
->>>>        ret = tdx_enable();
->>>>        if (ret) {
->>>> @@ -94,7 +126,48 @@ static int __init tdx_module_setup(void)
->>>>            return ret;
->>>>        }
->>>> +    ret = tdx_md_read(mds, ARRAY_SIZE(mds));
->>>> +    if (ret)
->>>> +        return ret;
->>>> +
->>>> +    tdx_info = kzalloc(sizeof(*tdx_info) +
->>>> +               sizeof(*tdx_info->cpuid_configs) * num_cpuid_config,
->>>> +               GFP_KERNEL);
->>>> +    if (!tdx_info)
->>>> +        return -ENOMEM;
->>>> +    tdx_info->num_cpuid_config = num_cpuid_config;
->>>> +
->>>> +    ret = tdx_sys_metadata_read(fields, ARRAY_SIZE(fields), tdx_info);
->>>> +    if (ret)
->>>> +        goto error_out;
->>>> +
->>>> +    for (i = 0; i < num_cpuid_config; i++) {
->>>> +        struct kvm_tdx_cpuid_config *c = &tdx_info->cpuid_configs[i];
->>>> +        u64 leaf, eax_ebx, ecx_edx;
->>>> +        struct tdx_md_map cpuids[] = {
->>>> +            TDX_MD_MAP(CPUID_CONFIG_LEAVES + i, &leaf),
->>>> +            TDX_MD_MAP(CPUID_CONFIG_VALUES + i * 2, &eax_ebx),
->>>> +            TDX_MD_MAP(CPUID_CONFIG_VALUES + i * 2 + 1, &ecx_edx),
->>>> +        };
->>>> +
->>>> +        ret = tdx_md_read(cpuids, ARRAY_SIZE(cpuids));
->>>> +        if (ret)
->>>> +            goto error_out;
->>>> +
->>>> +        c->leaf = (u32)leaf;
->>>> +        c->sub_leaf = leaf >> 32;
->>>> +        c->eax = (u32)eax_ebx;
->>>> +        c->ebx = eax_ebx >> 32;
->>>> +        c->ecx = (u32)ecx_edx;
->>>> +        c->edx = ecx_edx >> 32;
->>>
->>> OK I can see why you don't want to use ...
->>>
->>>       struct tdx_metadata_field_mapping fields[] = {
->>>           TDX_INFO_MAP(NUM_CPUID_CONFIG, num_cpuid_config),
->>>       };
->>>
->>> ... to read num_cpuid_config first, because the memory to hold @tdx_info
->>> hasn't been allocated, because its size depends on the num_cpuid_config.
->>>
->>> And I confess it's because the tdx_sys_metadata_field_read() that got
->>> exposed in patch ("x86/virt/tdx: Export global metadata read
->>> infrastructure") only returns 'u64' for all metadata field, and you
->>> didn't want to use something like this:
->>>
->>>       u64 num_cpuid_config;
->>>
->>>       tdx_sys_metadata_field_read(..., &num_cpuid_config);
->>>
->>>       ...
->>>
->>>       tdx_info->num_cpuid_config = num_cpuid_config;
->>>
->>> Or you can explicitly cast:
->>>
->>>       tdx_info->num_cpuid_config = (u16)num_cpuid_config;
->>>
->>> (I know people may don't like the assigning 'u64' to 'u16', but it seems
->>> nothing wrong to me, because the way done in (1) below effectively has
->>> the same result comparing to type case).
->>>
->>> But there are other (better) ways to do:
->>>
->>> 1) you can introduce a helper as suggested by Xiaoyao in [*]:
->>>
->>>
->>>       int tdx_sys_metadata_read_single(u64 field_id,
->>>                       int bytes,  void *buf)
->>>       {
->>>           return stbuf_read_sys_metadata_field(field_id, 0,
->>>                           bytes, buf);
->>>       }
->>>
->>> And do:
->>>
->>>       tdx_sys_metadata_read_single(NUM_CPUID_CONFIG,
->>>           sizeof(num_cpuid_config), &num_cpuid_config);
->>>
->>> That's _much_ cleaner than the 'struct tdx_md_map', which only confuses
->>> people.
->>>
->>> But I don't think we need to do this as mentioned above -- we just do
->>> type cast.
->>
->> type cast needs another tmp variable to hold the output of u64.
->>
->> The reason I want to introduce tdx_sys_metadata_read_single() is to
->> provide a simple and unified interface for other codes to read one
->> metadata field, instead of letting the caller to use temporary u64
->> variable and handle the cast or memcpy itself.
->>
-> 
-> You can always use u64 to hold u16 metadata field AFAICT, so it doesn't have to
-> be temporary.
-> 
-> Here is what Isaku can do using the current API:
-> 
-> 	u64 num_cpuid_config;
- >
-> 
-> 	...
-> 
-> 	tdx_sys_metadata_field_read(NUM_CPUID_CONFIG, &num_cpuid_config);
-> 
-> 	tdx_info = kzalloc(calculate_tdx_info_size(num_cpuid_config), ...);
-> 
-> 	tdx_info->num_cpuid_config = num_cpuid_config;
-
-Dosen't num_cpuid_config serve as temporary variable in some sense?
-
-For this case, it needs to be used for calculating the size of tdx_info. 
-So we have to have it. But it's not the common case.
-
-E.g., if we have another non-u64 field (e.g., field_x) in tdx_info, we 
-cannot to read it via
-
-	tdx_sys_metadata_field_read(FIELD_X_ID, &tdx_info->field_x);
-
-we have to use a temporary u64 variable.
-
-> 	...
-> 
-> (you can do explicit (u16)num_cpuid_config type cast above if you want.)
-> 
-> With your suggestion, here is what Isaku can do:
-> 
-> 	u16 num_cpuid_config;
-> 
-> 	...
-> 
-> 	tdx_sys_metadata_read_single(NUM_CPUID_CONFIG,
-> sizeof(num_cpuid_config),
-> 				&num_cpuid_config);
-> 
-> 	tdx_info = kzalloc(calculate_tdx_info_size(num_cpuid_config), ...);
-> 
-> 	tdx_info->num_cpuid_config = num_cpuid_config;
-> 
-> 	...
-> 
-> I don't see big difference?
-> 
-> One example that the current tdx_sys_metadata_field_read() doesn't quite fit is
-> you have something like this:
-> 
-> 	struct {
-> 		u16 whatever;
-> 		...
-> 	} st;
-> 
-> 	tdx_sys_metadata_field_read(FIELD_ID_WHATEVER, &st.whatever);
-> 
-> But for this use case you are not supposed to use tdx_sys_metadata_field_read(),
-> but use tdx_sys_metadata_read() which has a mapping provided anyway.
-> 
-> So, while I don't quite object your proposal, I don't see it being quite
-> necessary.
-> 
-> I'll let other people to have a say.
-> 
-> 
-
+T24gRnJpLCAyMDI0LTAzLTE1IGF0IDEzOjExICswODAwLCBMaSwgWGlhb3lhbyB3cm90ZToNCj4g
+PiBIZXJlIGlzIHdoYXQgSXNha3UgY2FuIGRvIHVzaW5nIHRoZSBjdXJyZW50IEFQSToNCj4gPiAN
+Cj4gPiDCoAl1NjQgbnVtX2NwdWlkX2NvbmZpZzsNCj4gwqA+DQo+ID4gDQo+ID4gwqAJLi4uDQo+
+ID4gDQo+ID4gwqAJdGR4X3N5c19tZXRhZGF0YV9maWVsZF9yZWFkKE5VTV9DUFVJRF9DT05GSUcs
+ICZudW1fY3B1aWRfY29uZmlnKTsNCj4gPiANCj4gPiDCoAl0ZHhfaW5mbyA9IGt6YWxsb2MoY2Fs
+Y3VsYXRlX3RkeF9pbmZvX3NpemUobnVtX2NwdWlkX2NvbmZpZyksIC4uLik7DQo+ID4gDQo+ID4g
+wqAJdGR4X2luZm8tPm51bV9jcHVpZF9jb25maWcgPSBudW1fY3B1aWRfY29uZmlnOw0KPiANCj4g
+RG9zZW4ndCBudW1fY3B1aWRfY29uZmlnIHNlcnZlIGFzIHRlbXBvcmFyeSB2YXJpYWJsZSBpbiBz
+b21lIHNlbnNlPw0KDQpZb3UgbmVlZCBpdCwgcmVnYXJkbGVzcyB3aGV0aGVyIGl0IGlzIHU2NCBv
+ciB1MTYuDQoNCj4gDQo+IEZvciB0aGlzIGNhc2UsIGl0IG5lZWRzIHRvIGJlIHVzZWQgZm9yIGNh
+bGN1bGF0aW5nIHRoZSBzaXplIG9mIHRkeF9pbmZvLiANCj4gU28gd2UgaGF2ZSB0byBoYXZlIGl0
+LiBCdXQgaXQncyBub3QgdGhlIGNvbW1vbiBjYXNlLg0KPiANCj4gRS5nLiwgaWYgd2UgaGF2ZSBh
+bm90aGVyIG5vbi11NjQgZmllbGQgKGUuZy4sIGZpZWxkX3gpIGluIHRkeF9pbmZvLCB3ZSANCj4g
+Y2Fubm90IHRvIHJlYWQgaXQgdmlhDQo+IA0KPiAJdGR4X3N5c19tZXRhZGF0YV9maWVsZF9yZWFk
+KEZJRUxEX1hfSUQsICZ0ZHhfaW5mby0+ZmllbGRfeCk7DQo+IA0KPiB3ZSBoYXZlIHRvIHVzZSBh
+IHRlbXBvcmFyeSB1NjQgdmFyaWFibGUuDQoNCkxldCBtZSByZXBlYXQgYmVsb3cgaW4gbXkgX3By
+ZXZpb3VzXyByZXBseToNCg0KIg0KT25lIGV4YW1wbGUgdGhhdCB0aGUgY3VycmVudCB0ZHhfc3lz
+X21ldGFkYXRhX2ZpZWxkX3JlYWQoKSBkb2Vzbid0IHF1aXRlIGZpdCBpcw0KeW91IGhhdmUgc29t
+ZXRoaW5nIGxpa2UgdGhpczoNCg0KCXN0cnVjdCB7DQoJCXUxNiB3aGF0ZXZlcjsNCgkJLi4uDQoJ
+fSBzdDsNCg0KCXRkeF9zeXNfbWV0YWRhdGFfZmllbGRfcmVhZChGSUVMRF9JRF9XSEFURVZFUiwg
+JnN0LndoYXRldmVyKTsNCg0KQnV0IGZvciB0aGlzIHVzZSBjYXNlIHlvdSBhcmUgbm90IHN1cHBv
+c2VkIHRvIHVzZSB0ZHhfc3lzX21ldGFkYXRhX2ZpZWxkX3JlYWQoKSwNCmJ1dCB1c2UgdGR4X3N5
+c19tZXRhZGF0YV9yZWFkKCkgd2hpY2ggaGFzIGEgbWFwcGluZyBwcm92aWRlZCBhbnl3YXkuDQoi
+DQoNClNvIHNvcnJ5IEkgYW0gbm90IHNlZWluZyBhIHJlYWwgZXhhbXBsZSBmcm9tIHlvdS4NCg0K
 
