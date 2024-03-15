@@ -1,236 +1,269 @@
-Return-Path: <kvm+bounces-11916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11917-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 709B287D10A
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 17:17:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC1387D122
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 17:23:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E09DD1F23C9B
-	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 16:17:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 675221F24136
+	for <lists+kvm@lfdr.de>; Fri, 15 Mar 2024 16:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493D245970;
-	Fri, 15 Mar 2024 16:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D950E45970;
+	Fri, 15 Mar 2024 16:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cen7+Cvt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EubmOCNM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B04044C86
-	for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 16:17:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AEA9446BA;
+	Fri, 15 Mar 2024 16:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710519441; cv=none; b=mBFyaGMye/Mi1qKUMQpxWarXi+/yO5mrOXdr3IdaTkG4FqPNquk+ht3YPHfcVdWzUNrS9kZzkVnEgkexoRroCn0V/g/LQqx2WRWtxKEdu0klrQVJGrZHpoliRqA/rIBF09uSEUyF+bRFQi8a8X+jx0oMHIUw8O9kwaC4ntZtRo0=
+	t=1710519778; cv=none; b=JAK5EOh2b2AamqtucG9qsnoTs+a6siTiPocw0G0z7Y3wnQ6XFIjgb5c1kz/eBGK5Q44hulE0PWig973kAWfiCcBkEG7fkZzotRZEbFrlz83rpJordDw1IqSYDkTvNelGRvgmkHYmm9RlGlNqdf1qotCWc3qc21OqE8gjYVjs9iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710519441; c=relaxed/simple;
-	bh=fIvQ/7dT03a07rywBiZKwU4kbI9dFy8nHM66+ChDcHc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fBLsV0c/R4jXq4NdpW4tFl91EgbB+ywy0+NaW0/qSTrV4YQBiK/PlAmIMae0dqe3HKsGBREu93lJDxd1Mn8frhFJCMziuiGP4ulTWA9d97WtVDb1MqYDp4ZnR9lrMIjC97vZig/iQt3CjtW5XSjSV+0ZLWAljxy+yIabbytdiH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cen7+Cvt; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-513d717269fso1501001e87.0
-        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 09:17:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710519438; x=1711124238; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gg0TYzkl0UxVlxeIgrkhXJopu1CdOE320qaBHoGPlBg=;
-        b=Cen7+CvtGWHgT2NqRii20gy8BRFDt9gPBnTEZjHNn6vuR9VdzCIZwrT/FvGpkCziN/
-         fqzWh0wpmUmE3vB9iFWRorSVoqZWWPjsPVbgYkgpCg3mjGPtEdWjh0S7kplDrhHFoBT9
-         NHI2cRc+cVndZ/1wJ8mBApO9MJtwbx6v7J1uV8IjHcHFEd9uaqKJ3Xgu4VfLJdkChetD
-         f30Gfmwk3JmqSKh19NgC479FhchGYpCcszmjkgUVuulK4ga1HmEn0ALE6V3COwugPsI2
-         L76fh8skim4sfSOTxEzjDzpfNWar4ws3uXsf09SKfQHsXWonOVKKZ1FnAk2XrUFFQbeT
-         naoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710519438; x=1711124238;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gg0TYzkl0UxVlxeIgrkhXJopu1CdOE320qaBHoGPlBg=;
-        b=BSRmt5RTQZSzU/2CZhoygS0ep6xnm5vsVLXebBic2F1DGxccbk7dJx9+vbsP/56QZE
-         X9tQsvm1pOm4EYulH8NlEDem6WvEWWD5XOJZamllLVMezL0Jj8VfsmGFGuzTmqd4RHE3
-         ufM+9286JHwjOQmuQPO77RcwWduuZJ9tnQzyA1QuCC06hGX5ki2hM8gO8PPZ47hBFykP
-         PaEpdSD/r1rPi3FUJ/PuVQYfaLm4Xq9DbkC2BPUirr/kIQ5uUJa0zolXOOHI52FC4/M7
-         /CBpcSoMam6uHXZ/9rxRE4KMP4Sv61NDLSuysicRpoGPIVva4oXLGF8SkTowwnOmNPiT
-         6Nzw==
-X-Forwarded-Encrypted: i=1; AJvYcCUGmCZWKRrUMWSYr2Cwr+6svjTqls9qyUkCzaJGdqhIxUQsPWPZtMR7vv9E7r5C8eMKOecFws92NK9nOotXa90qphYQ
-X-Gm-Message-State: AOJu0Yw6NC7du0JZKUjln9dczPjNNq7GnCODSthFyCPzBfRf2KNeyJfa
-	0tHmvss5Mbn1QP4yuVbJZOQoNzQxu687Qv3y9ahhuES9Yp7zh4nXQg+Jgv3tO2WTr8L7gi4797C
-	RStxww2SKKWXgpx5ptSjeSpMhq6lpQ7zTI2G9
-X-Google-Smtp-Source: AGHT+IGp8kiRyTEWLA4+GiDAcMjnyRvEbCmpbYUPfI9r/tFeOzSYgxHCFIPwgAMDq50bEyd9emHZDLUHbVd3frfmk6I=
-X-Received: by 2002:a19:3810:0:b0:513:96ff:a04a with SMTP id
- f16-20020a193810000000b0051396ffa04amr2529285lfa.43.1710519437564; Fri, 15
- Mar 2024 09:17:17 -0700 (PDT)
+	s=arc-20240116; t=1710519778; c=relaxed/simple;
+	bh=lngc63T678kArJFG5DVBRqDftjyrgzERehYJN68mKOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j5aSz1mJ+kmwsmalCrDXnU5+DqyYNTFAiZLNDbREqADjeC4R6WOCSETVjK7kg4QoOm//7ye5Prko1Hdgjkgp3EGabU/BkUfBxSw0xGnir0HNwh0pzPXYAZwjHmzcVLc6vSPXgmfR5n9pd9+IVKKoV700kQX6oryIZThU5Vzg2PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EubmOCNM; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710519776; x=1742055776;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lngc63T678kArJFG5DVBRqDftjyrgzERehYJN68mKOM=;
+  b=EubmOCNMgzjOcoqS0FoLhv3siheocDs1VGbqA/ThyiaBJygYLWh41PZ/
+   7M6p4d8eLkS6FWb6rqLgdpKYtzGnYyFVAx3+ccEtzvQeGyJI47tCSBs83
+   +ZUNcxCt/UckKcwhKOmmZ2llOaPdWQCPyPgbnygJe3egldBVd1SICsvhX
+   GxVWDVAKrHuGUtJC1q4g0H4WWCjO8DhEvv5bGiQk/zWuU8jz+KCs5z/UF
+   r0oB7yGv/SLoWnrGyd8wUYV2Nm/GkAbdYe/IUgko5DKjlH1aF8NLR8jxw
+   v5NGgsTHPGRN1vHLW0Het2tFDEoFpss1VLGQkJ27zseZ77nCBnKLSDbXK
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11014"; a="5258725"
+X-IronPort-AV: E=Sophos;i="6.07,128,1708416000"; 
+   d="scan'208";a="5258725"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 09:22:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,128,1708416000"; 
+   d="scan'208";a="17186557"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 09:22:55 -0700
+Date: Fri, 15 Mar 2024 09:22:55 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, chen.bo@intel.com,
+	hang.yuan@intel.com, tina.zhang@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 034/130] KVM: TDX: Get system-wide info about TDX
+ module on initialization
+Message-ID: <20240315162255.GG1258280@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <eaa2c1e23971f058e5921681b0b84d7ea7d38dc1.1708933498.git.isaku.yamahata@intel.com>
+ <e88e5448-e354-4ec6-b7de-93dd8f7786b5@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240307194255.1367442-1-dmatlack@google.com> <ZepBlYLPSuhISTTc@google.com>
- <ZepNYLTPghJPYCtA@google.com> <CALzav=cSzbZXhasD7iAtB4u0xO-iQ+vMPiDeXXz5mYMfjOfwaw@mail.gmail.com>
- <ZfG41PbWqXXf6CF-@google.com> <CALzav=fGUnYHiEc40Ym2Yh-H6wMRdw6biYj4+e1vZ0xmBDAnsg@mail.gmail.com>
- <ZfOEzMxn73M0kZk_@google.com>
-In-Reply-To: <ZfOEzMxn73M0kZk_@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Fri, 15 Mar 2024 09:16:49 -0700
-Message-ID: <CALzav=cLRJOtCyY+DVRWBxBMaV5S8Cy9bBKxmfdUhGLwS0+_6A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: selftests: Create memslot 0 at GPA 0x100000000 on x86_64
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	Peter Gonda <pgonda@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
-	nrb@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e88e5448-e354-4ec6-b7de-93dd8f7786b5@intel.com>
 
-On Thu, Mar 14, 2024 at 4:14=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Thu, Mar 14, 2024, David Matlack wrote:
-> > On Wed, Mar 13, 2024 at 7:31=E2=80=AFAM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > >
-> > > On Thu, Mar 07, 2024, David Matlack wrote:
-> > > > On Thu, Mar 7, 2024 at 3:27=E2=80=AFPM David Matlack <dmatlack@goog=
-le.com> wrote:
-> > > > >
-> > > > > On 2024-03-07 02:37 PM, Sean Christopherson wrote:
-> > > > > > On Thu, Mar 07, 2024, David Matlack wrote:
-> > > > > > > Create memslot 0 at 0x100000000 (4GiB) to avoid it overlappin=
-g with
-> > > > > > > KVM's private memslot for the APIC-access page.
-> > > > > >
-> > > > > > Any chance we can solve this by using huge pages in the guest, =
-and adjusting the
-> > > > > > gorilla math in vm_nr_pages_required() accordingly?  There's re=
-ally no reason to
-> > > > > > use 4KiB pages for a VM with 256GiB of memory.  That'd also be =
-more represantitive
-> > > > > > of real world workloads (at least, I hope real world workloads =
-are using 2MiB or
-> > > > > > 1GiB pages in this case).
-> > > > >
-> > > > > There are real world workloads that use TiB of RAM with 4KiB mapp=
-ings
-> > > > > (looking at you SAP HANA).
-> > > > >
-> > > > > What about giving tests an explicit "start" GPA they can use? Tha=
-t would
-> > > > > fix max_guest_memory_test and avoid tests making assumptions abou=
-t 4GiB
-> > > > > being a magically safe address to use.
-> > >
-> > > So, rather than more hardcoded addresses and/or a knob to control _al=
-l_ code
-> > > allocations, I think we should provide knob to say that MEM_REGION_PT=
- should go
-> > > to memory above 4GiB. And to make memslot handling maintainable in th=
-e long term:
-> > >
-> > >   1. Add a knob to place MEM_REGION_PT at 4GiB (and as of this initia=
-l patch,
-> > >      conditionally in their own memslot).
-> > >
-> > >   2. Use the PT_AT_4GIB (not the real name) knob for the various mems=
-tress tests
-> > >      that need it.
-> >
-> > Making tests pick when to place page tables at 4GiB seems unnecessary.
-> > Tests that don't otherwise need a specific physical memory layout
-> > should be able to create a VM with any amount of memory and have it
-> > just work.
-> >
-> > It's also not impossible that a test has 4GiB+ .bss because the guest
-> > needs a big array for something. In that case we'd need a knob to move
-> > MEM_REGION_CODE above 4GiB on x86_64 as well.
->
-> LOL, at that point, the test can darn well dynamically allocate its memor=
-y.
-> Though I'd love to see a test that needs a 3GiB array :-)
->
-> > For x86_64 (which is the only architecture AFAIK that has a private
-> > memslot in KVM the framework can overlap with), what's the downside of
-> > always putting all memslots above 4GiB?
->
-> Divergence from other architectures, divergence from "real" VM configurat=
-ions,
-> and a more compliciated programming environment for the vast majority of =
-tests.
-> E.g. a test that uses more than ~3GiB of memory would need to dynamically=
- place
-> its test specific memslots, whereas if the core library keeps everything =
-under
-> 4GiB by default, then on x86 every test knows it has 4GiB+ to play with.
+On Fri, Mar 15, 2024 at 12:09:29PM +1300,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-Divergence from real VM configurations is a really good point. I was
-thinking we _could_ make all architectures start at 4GiB and make
-32GiB the new static address available for tests to solve the
-architecture divergence and complexity problems. But that would mean
-all KVM selftests don't use GPAs 0-4GiB, and that seems like a
-terrible idea now that you point it out.
+> 
+> > +struct tdx_info {
+> > +	u64 features0;
+> > +	u64 attributes_fixed0;
+> > +	u64 attributes_fixed1;
+> > +	u64 xfam_fixed0;
+> > +	u64 xfam_fixed1;
+> > +
+> > +	u16 num_cpuid_config;
+> > +	/* This must the last member. */
+> > +	DECLARE_FLEX_ARRAY(struct kvm_tdx_cpuid_config, cpuid_configs);
+> > +};
+> > +
+> > +/* Info about the TDX module. */
+> > +static struct tdx_info *tdx_info;
+> > +
+> >   #define TDX_MD_MAP(_fid, _ptr)			\
+> >   	{ .fid = MD_FIELD_ID_##_fid,		\
+> >   	  .ptr = (_ptr), }
+> > @@ -66,7 +81,7 @@ static size_t tdx_md_element_size(u64 fid)
+> >   	}
+> >   }
+> > -static int __used tdx_md_read(struct tdx_md_map *maps, int nr_maps)
+> > +static int tdx_md_read(struct tdx_md_map *maps, int nr_maps)
+> >   {
+> >   	struct tdx_md_map *m;
+> >   	int ret, i;
+> > @@ -84,9 +99,26 @@ static int __used tdx_md_read(struct tdx_md_map *maps, int nr_maps)
+> >   	return 0;
+> >   }
+> > +#define TDX_INFO_MAP(_field_id, _member)			\
+> > +	TD_SYSINFO_MAP(_field_id, struct tdx_info, _member)
+> > +
+> >   static int __init tdx_module_setup(void)
+> >   {
+> > +	u16 num_cpuid_config;
+> >   	int ret;
+> > +	u32 i;
+> > +
+> > +	struct tdx_md_map mds[] = {
+> > +		TDX_MD_MAP(NUM_CPUID_CONFIG, &num_cpuid_config),
+> > +	};
+> > +
+> > +	struct tdx_metadata_field_mapping fields[] = {
+> > +		TDX_INFO_MAP(FEATURES0, features0),
+> > +		TDX_INFO_MAP(ATTRS_FIXED0, attributes_fixed0),
+> > +		TDX_INFO_MAP(ATTRS_FIXED1, attributes_fixed1),
+> > +		TDX_INFO_MAP(XFAM_FIXED0, xfam_fixed0),
+> > +		TDX_INFO_MAP(XFAM_FIXED1, xfam_fixed1),
+> > +	};
+> >   	ret = tdx_enable();
+> >   	if (ret) {
+> > @@ -94,7 +126,48 @@ static int __init tdx_module_setup(void)
+> >   		return ret;
+> >   	}
+> > +	ret = tdx_md_read(mds, ARRAY_SIZE(mds));
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	tdx_info = kzalloc(sizeof(*tdx_info) +
+> > +			   sizeof(*tdx_info->cpuid_configs) * num_cpuid_config,
+> > +			   GFP_KERNEL);
+> > +	if (!tdx_info)
+> > +		return -ENOMEM;
+> > +	tdx_info->num_cpuid_config = num_cpuid_config;
+> > +
+> > +	ret = tdx_sys_metadata_read(fields, ARRAY_SIZE(fields), tdx_info);
+> > +	if (ret)
+> > +		goto error_out;
+> > +
+> > +	for (i = 0; i < num_cpuid_config; i++) {
+> > +		struct kvm_tdx_cpuid_config *c = &tdx_info->cpuid_configs[i];
+> > +		u64 leaf, eax_ebx, ecx_edx;
+> > +		struct tdx_md_map cpuids[] = {
+> > +			TDX_MD_MAP(CPUID_CONFIG_LEAVES + i, &leaf),
+> > +			TDX_MD_MAP(CPUID_CONFIG_VALUES + i * 2, &eax_ebx),
+> > +			TDX_MD_MAP(CPUID_CONFIG_VALUES + i * 2 + 1, &ecx_edx),
+> > +		};
+> > +
+> > +		ret = tdx_md_read(cpuids, ARRAY_SIZE(cpuids));
+> > +		if (ret)
+> > +			goto error_out;
+> > +
+> > +		c->leaf = (u32)leaf;
+> > +		c->sub_leaf = leaf >> 32;
+> > +		c->eax = (u32)eax_ebx;
+> > +		c->ebx = eax_ebx >> 32;
+> > +		c->ecx = (u32)ecx_edx;
+> > +		c->edx = ecx_edx >> 32;
+> 
+> OK I can see why you don't want to use ...
+> 
+> 	struct tdx_metadata_field_mapping fields[] = {
+> 		TDX_INFO_MAP(NUM_CPUID_CONFIG, num_cpuid_config),
+> 	};
+> 
+> ... to read num_cpuid_config first, because the memory to hold @tdx_info
+> hasn't been allocated, because its size depends on the num_cpuid_config.
+> 
+> And I confess it's because the tdx_sys_metadata_field_read() that got
+> exposed in patch ("x86/virt/tdx: Export global metadata read
+> infrastructure") only returns 'u64' for all metadata field, and you didn't
+> want to use something like this:
+> 
+> 	u64 num_cpuid_config;
+> 	
+> 	tdx_sys_metadata_field_read(..., &num_cpuid_config);
+> 
+> 	...
+> 
+> 	tdx_info->num_cpuid_config = num_cpuid_config;
+> 
+> Or you can explicitly cast:
+> 
+> 	tdx_info->num_cpuid_config = (u16)num_cpuid_config;
+> 
+> (I know people may don't like the assigning 'u64' to 'u16', but it seems
+> nothing wrong to me, because the way done in (1) below effectively has the
+> same result comparing to type case).
+> 
+> But there are other (better) ways to do:
+> 
+> 1) you can introduce a helper as suggested by Xiaoyao in [*]:
+> 
+> 
+> 	int tdx_sys_metadata_read_single(u64 field_id,
+> 					int bytes,  void *buf)
+> 	{
+> 		return stbuf_read_sys_metadata_field(field_id, 0,
+> 						bytes, buf);
+> 	}
+> 
+> And do:
+> 
+> 	tdx_sys_metadata_read_single(NUM_CPUID_CONFIG,
+> 		sizeof(num_cpuid_config), &num_cpuid_config);
+> 
+> That's _much_ cleaner than the 'struct tdx_md_map', which only confuses
+> people.
+> 
+> But I don't think we need to do this as mentioned above -- we just do type
+> cast.
+> 
+> 2) You can just preallocate enough memory.  It cannot be larger than 1024B,
+> right?  You can even just allocate one page.  It's just 4K, no one cares.
+> 
+> Then you can do:
+> 
+> 	struct tdx_metadata_field_mapping tdx_info_fields = {
+> 		...
+> 		TDX_INFO_MAP(NUM_CPUID_CONFIG, num_cpuid_config),
+> 	};
+> 
+> 	tdx_sys_metadata_read(tdx_info_fields,
+> 			ARRAY_SIZE(tdx_info_fields, tdx_info);
+> 
+> And then you read the CPUID_CONFIG array one by one using the same 'struct
+> tdx_metadata_field_mapping' and tdx_sys_metadata_read():
+> 
+> 
+> 	for (i = 0; i < tdx_info->num_cpuid_config; i++) {
+> 		struct tdx_metadata_field_mapping cpuid_fields = {
+> 			TDX_CPUID_CONFIG_MAP(CPUID_CONFIG_LEAVES + i,
+> 						leaf),
+> 			...
+> 		};
+> 		struct kvm_tdx_cpuid_config *c =
+> 				&tdx_info->cpuid_configs[i];
+> 
+> 		tdx_sys_metadata_read(cpuid_fields,
+> 				ARRAY_SIZE(cpuid_fields), c);
+> 
+> 		....
+> 	}
+> 
+> So stopping having the duplicated 'struct tdx_md_map' and related staff, as
+> they are absolutely unnecessary and only confuses people.
 
-Thanks for the thoughtful feedback. I'll give your suggestions a try in v2.
 
->
-> One could argue that dynamically placing test specific would be more eleg=
-ant,
-> but I'd prefer to avoid that because I can't think of any value it would =
-add
-> from a test coverage perspective, and static addresses are much easier wh=
-en it
-> comes to debug.
->
-> Having tests use e.g. 2GiB-3GiB or 1GiB-3GiB, would kinda sorta work, but=
- that
-> 2GiB limit isn't a trivial, e.g. max_guest_memory_test creates TiBs of me=
-mslots.
->
-> IMO, memstress is the odd one out, it should be the one that needs to do =
-special
-> things.
-
-Fair point.
-
->
-> > >   3. Formalize memslots 0..2 (CODE, DATA, and PT) as being owned by t=
-he library,
-> > >      with memslots 3..MAX available for test usage.
-> > >
-> > >   4. Modify tests that assume memslots 1..MAX are available, i.e. for=
-ce them to
-> > >      start at MEM_REGION_TEST_DATA.
-> >
-> > I think MEM_REGION_TEST_DATA is just where the framework will satisfy
-> > test-initiated dynamic memory allocations. That's different from which
-> > slots are free for the test to use.
-> >
-> > But assuming I understand your intention, I agree in spirit... Tests
-> > should be allowed to use slots TEST_SLOT..MAX and physical addresses
-> > TEST_GPA..MAX. The framework should provide both TEST_SLOT and
-> > TEST_GPA (names pending), and existing tests should use those instead
-> > of random hard-coded values.
-> >
-> > >
-> > >   5. Use separate memslots for CODE, DATA, and PT by default.  This w=
-ill allow
-> > >      for more precise sizing of the CODE and DATA slots.
-> >
-> > What do you mean by "[separate memslots] will allow for more precise si=
-zing"?
->
-> I suspect there is a _lot_ of slop in the arbitrary 512 pages that are ta=
-cked on
-> by vm_nr_pages_required().  Those 2MiBs probably don't matter, I just don=
-'t like
-> completely magical numbers.
-
-That makes sense, we can probably tighten up those heuristics and
-maybe even get rid of the magic numbers. But I wasn't following what
-_separate memslots_ has to do with it?
+Ok, I'll rewrite the code to use tdx_sys_metadata_read() by introducng
+tentative struct in a function scope.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
