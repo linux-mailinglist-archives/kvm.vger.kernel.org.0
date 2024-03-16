@@ -1,115 +1,250 @@
-Return-Path: <kvm+bounces-11957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A7187D8FB
-	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 06:26:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B0AF87D90C
+	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 07:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5808B2152C
-	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 05:26:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E9801C21041
+	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 06:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F436AB8;
-	Sat, 16 Mar 2024 05:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC1ED2FE;
+	Sat, 16 Mar 2024 06:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHQ99m0b"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bB0k2tLJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875846139
-	for <kvm@vger.kernel.org>; Sat, 16 Mar 2024 05:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1378EAD4;
+	Sat, 16 Mar 2024 06:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710566782; cv=none; b=Eza9L1fJRUhcJRD3/bctlg48bvMKpOsPNwDD4+dFS6FfTA+DjsNQ9TIRcSPRxGCF+DAyu40L4GAkh2WVSmEWehb3c8rhDBx5SKr9CnSjOQDAwcQP7dtsx66E2QtcK/FPGwtsvU2bU3vHV/6OdEb38BH5JcqQsaLHLx4CSTJZUTk=
+	t=1710570284; cv=none; b=LXwtUa24ED8pNwyy+ss7kPbgl2qhvdQouZ75mFGeS78+y03DSizkYikbTblktn/AF8mCyG2r817MUEEp8BVq+xCdTJvoBwybwGL7znmhKtcJm+LYWX7ncEB/5iYPAv3Q7FKGJOMOOl1NhwnXOyRek5KMDu6vOy5W6E92VW7Rx/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710566782; c=relaxed/simple;
-	bh=w/cDJ5u2SD+WucgKY2u+DrVQbPzmgF2ZF61wCT0ekrU=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=HJc419PmYxgZ1XoIcmqkpewJ5hfiGvcQALMx8zhIswBJX1Sjo4Ql/SwINcQf784yFLHkoArf3WRpyxFTj8tttrNXYVtwEaNODMQEbiSeMvcD4lqShQQ4RrR0dXRyXkg7a42Cmjwk58gioSWHenMzJl2pXHrUCGEQsmPJG9t1vGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHQ99m0b; arc=none smtp.client-ip=209.85.160.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-221816e3ab9so1572376fac.2
-        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 22:26:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710566779; x=1711171579; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6maJgO96ZsBUYbSJV41jMxtlMZ1mp4w+JL6cKZWUS2I=;
-        b=IHQ99m0bQy7dz489QNazXftmOfs7CNEe1lNqpewgIpQJEKvCNXfeLZ4Jiory9eJkG2
-         5Va7//rLjU0atqw+RGP3oLyEsgPuVqaJWtjFuLtDZLc+mNKVGjM2RNEXQcLvr+GzaY/b
-         XNX21Do5FLKGik31udM1Uqi0AQXBs1AoFnWg/EAKMJQIm059k1rFNqdKDv8R11lk/aB6
-         m/hCbtMeJzeVf/mIvy0ozltwp39E4m3kaxYsVNSM+dHt7wm9whCJQyLQmTntjvEBACmo
-         DxV5ImvfuksnBo3NvEN4J475QOttT49AV7KoTs17pB6OHwodP3h21pAp7dwnovnInDJI
-         3sVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710566779; x=1711171579;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6maJgO96ZsBUYbSJV41jMxtlMZ1mp4w+JL6cKZWUS2I=;
-        b=HkHEaODX3npvveWVWuaBcm5+1pZ/2xoKZFovnYNv4J5ikiPiyxU8wf1UUF/z2lt8s2
-         t4Llynp65Y5qsiq/XxTz+gAkFUjwHVyQieSNmiLHBftwzIhJIrk3j7loWFWcH9Fj63Dl
-         mMx/oPHAmY2T8s5xRIKuCEqLm1kMEPwpiXouhYpMiQCJ+LTIUywR4hJTMJgGM6ZfoVtd
-         yzrC+IjUQatx6IVS6+szeP/zCRng3QUGjkWLHRR3AdEMrVpzHnDPx51Kf4BuAHLxdX3Y
-         mlE2xw+x8TXjdIwYI8aoBSLRtfiXZbZ/zGKlsoGuM5rktFypM5H9EX1YU2dIH5QoBMhO
-         Q6Jw==
-X-Gm-Message-State: AOJu0YwWe/0aUBZkBqY6FJ/rEDCvD3efCbybkO2fwxsXOjYCj0DDJbPr
-	/8PW5pTIQfPeH0yA0dtaVhNQNreQScLqqy3ZCQPx5JBHZa0JrdEg7qAOx/piXPPFKjCn
-X-Google-Smtp-Source: AGHT+IHFeWQQ9gxANIbDujE2XKUphivMPAv2dSwGH5xJWGjlNJb2VFaFthj7P7+HBHFOhLiDqHkmfA==
-X-Received: by 2002:a05:6358:2909:b0:17b:57fb:aa72 with SMTP id y9-20020a056358290900b0017b57fbaa72mr8705862rwb.8.1710566779239;
-        Fri, 15 Mar 2024 22:26:19 -0700 (PDT)
-Received: from zlke.localdomain ([14.145.51.228])
-        by smtp.gmail.com with ESMTPSA id v22-20020a634816000000b005dc26144d96sm3366178pga.75.2024.03.15.22.26.16
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Mar 2024 22:26:18 -0700 (PDT)
-From: Li Zhang <zhanglikernel@gmail.com>
-To: kvm@vger.kernel.org
-Cc: Li Zhang <zhanglikernel@gmail.com>
-Subject: [PATCH]virtio-pci: Check if is_avq is NULL
-Date: Sat, 16 Mar 2024 13:25:54 +0800
-Message-Id: <1710566754-3532-1-git-send-email-zhanglikernel@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1710570284; c=relaxed/simple;
+	bh=Z9CPgMx4k6xbyqdhStgFoDUX8JdMY2zitvwklGw/CEw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:References:Cc:
+	 In-Reply-To:Content-Type; b=i8lAN4Spc+UrS26Lffoi2CW4rMGCoPnj23rxwpnVK/4Mmw7398wxs7lpGVM8li0wWxnf7qclgsbtKZwl9CmU/7MvbO40HWEMWM7mRRjDuoMfEGbNqNCgLhJU9OTCU4P5Yz1Ff7Wz1BWudWJdJPcUOk2OYq9aA1Y7jmcqocBzTwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bB0k2tLJ; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710570282; x=1742106282;
+  h=message-id:date:mime-version:from:subject:to:references:
+   cc:in-reply-to:content-transfer-encoding;
+  bh=Z9CPgMx4k6xbyqdhStgFoDUX8JdMY2zitvwklGw/CEw=;
+  b=bB0k2tLJwOS6DxRGtCGOfgbAtemIArROpuOt7uxVmBcjdwB071xpTPFK
+   Ii+lBdWu9CSBXJIOGmuAffkl3G/3+ejlRL007f8gubcKkwKSHALy+rsUL
+   1Krzv54wAPn6yXjdkeZBCf08N6voYtmbqFZ7QFG/k14YgUqq2cUd+Xu1Z
+   tGLkblI1tG0mfbS2d6USNCQJSgGBW+Soiga61uGaxorPw+iutuGAUrmvT
+   VfinWQLMAVcVaWiwyTq4ECEezNdR6hAAo4CFpSykIKOGl3JhYMI12ZzYL
+   5/kInIKJl2Cv1YFWzIELDTv8mG8JOKVQJQ6XelbKbci7CkGro/8likAax
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11014"; a="16099328"
+X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
+   d="scan'208";a="16099328"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 23:24:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
+   d="scan'208";a="43953437"
+Received: from jhanbaba-mobl.amr.corp.intel.com (HELO [10.124.36.86]) ([10.124.36.86])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 23:24:40 -0700
+Message-ID: <98b54b29-6f1d-4a3b-97d1-1e08b0ed0465@intel.com>
+Date: Fri, 15 Mar 2024 23:24:41 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: "Chen, Zide" <zide.chen@intel.com>
+Subject: Re: [RFC PATCH v5 22/29] KVM: selftests: Add functions to allow
+ mapping as shared
+To: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>,
+ "Afranji, Ryan" <afranji@google.com>, "Aktas, Erdem"
+ <erdemaktas@google.com>, Sagi Shahar <sagis@google.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
+References: <20231212204647.2170650-1-sagis@google.com>
+ <20231212204647.2170650-23-sagis@google.com>
+ <DS7PR11MB7886BD37E5E56DAB9A0087A3F6292@DS7PR11MB7886.namprd11.prod.outlook.com>
+Content-Language: en-US
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Peter Gonda <pgonda@google.com>, "Xu, Haibo1" <haibo1.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ "Annapurve, Vishal" <vannapurve@google.com>,
+ Roger Wang <runanwang@google.com>, Vipin Sharma <vipinsh@google.com>,
+ jmattson@google.com, dmatlack@google.com, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org
+In-Reply-To: <DS7PR11MB7886BD37E5E56DAB9A0087A3F6292@DS7PR11MB7886.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-[bug]
-In the virtio_pci_common.c function vp_del_vqs, vp_dev->is_avq is involved
-to determine whether it is admin virtqueue, but this function vp_dev->is_avq
- may be empty. For installations, virtio_pci_legacy does not assign a value
- to vp_dev->is_avq.
 
-[fix]
-Check whether it is vp_dev->is_avq before use.
 
-[test]
-Test with virsh Attach device
-Before this patch, the following command would crash the guest system
+On 12/12/2023 12:47 PM, Sagi Shahar wrote:
 
-After applying the patch, everything seems to be working fine.
+> 
+> 
+> -----Original Message-----
+> From: Sagi Shahar <sagis@google.com> 
+> Sent: Tuesday, December 12, 2023 12:47 PM
+> To: linux-kselftest@vger.kernel.org; Ackerley Tng <ackerleytng@google.com>; Afranji, Ryan <afranji@google.com>; Aktas, Erdem <erdemaktas@google.com>; Sagi Shahar <sagis@google.com>; Yamahata, Isaku <isaku.yamahata@intel.com>
+> Cc: Sean Christopherson <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>; Shuah Khan <shuah@kernel.org>; Peter Gonda <pgonda@google.com>; Xu, Haibo1 <haibo1.xu@intel.com>; Chao Peng <chao.p.peng@linux.intel.com>; Annapurve, Vishal <vannapurve@google.com>; Roger Wang <runanwang@google.com>; Vipin Sharma <vipinsh@google.com>; jmattson@google.com; dmatlack@google.com; linux-kernel@vger.kernel.org; kvm@vger.kernel.org; linux-mm@kvack.org
+> Subject: [RFC PATCH v5 22/29] KVM: selftests: Add functions to allow mapping as shared
 
-Signed-off-by: Li Zhang <zhanglikernel@gmail.com>
----
- drivers/virtio/virtio_pci_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Since protected_phy_pages is introduced to keep track of the guest
+memory's private/shared property, it's better to keep it consistent with
+the guest mappings.
 
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index b655fcc..3c18fc1 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -236,7 +236,7 @@ void vp_del_vqs(struct virtio_device *vdev)
- 	int i;
- 
- 	list_for_each_entry_safe(vq, n, &vdev->vqs, list) {
--		if (vp_dev->is_avq(vdev, vq->index))
-+		if (vp_dev->is_avq && vp_dev->is_avq(vdev, vq->index))
- 			continue;
- 
- 		if (vp_dev->per_vq_vectors) {
--- 
-1.8.3.1
+Instead of having a set of new APIs to force it to map shared guest
+pages, how about to update protected_phy_pages sparsebits right before
+the mapping, and just call the existing virt_pg_map() to do the mapping?
 
+
+> From: Ackerley Tng <ackerleytng@google.com>
+> 
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ryan Afranji <afranji@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> ---
+>  .../selftests/kvm/include/kvm_util_base.h     | 24 ++++++++++++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 32 +++++++++++++++++++
+>  .../selftests/kvm/lib/x86_64/processor.c      | 15 +++++++--
+>  3 files changed, 69 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index b353617fcdd1..efd7ae8abb20 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -574,6 +574,8 @@ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm);
+>  
+>  void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+>  	      unsigned int npages);
+> +void virt_map_shared(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> +		     unsigned int npages);
+>  void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa);  void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);  vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva); @@ -1034,6 +1036,28 @@ static inline void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr
+>  	virt_arch_pg_map(vm, vaddr, paddr);
+>  }
+>  
+> +/*
+> + * VM Virtual Page Map as Shared
+> + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   vaddr - VM Virtual Address
+> + *   paddr - VM Physical Address
+> + *   memslot - Memory region slot for new virtual translation tables
+> + *
+> + * Output Args: None
+> + *
+> + * Return: None
+> + *
+> + * Within @vm, creates a virtual translation for the page starting
+> + * at @vaddr to the page starting at @paddr.
+> + */
+> +void virt_arch_pg_map_shared(struct kvm_vm *vm, uint64_t vaddr, 
+> +uint64_t paddr);
+> +
+> +static inline void virt_pg_map_shared(struct kvm_vm *vm, uint64_t 
+> +vaddr, uint64_t paddr) {
+> +	virt_arch_pg_map_shared(vm, vaddr, paddr); }
+>  
+>  /*
+>   * Address Guest Virtual to Guest Physical diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 4f1ae0f1eef0..28780fa1f0f2 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1573,6 +1573,38 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+>  	}
+>  }
+>  
+> +/*
+> + * Map a range of VM virtual address to the VM's physical address as 
+> +shared
+> + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   vaddr - Virtuall address to map
+> + *   paddr - VM Physical Address
+> + *   npages - The number of pages to map
+> + *
+> + * Output Args: None
+> + *
+> + * Return: None
+> + *
+> + * Within the VM given by @vm, creates a virtual translation for
+> + * @npages starting at @vaddr to the page range starting at @paddr.
+> + */
+> +void virt_map_shared(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> +		     unsigned int npages)
+> +{
+> +	size_t page_size = vm->page_size;
+> +	size_t size = npages * page_size;
+> +
+> +	TEST_ASSERT(vaddr + size > vaddr, "Vaddr overflow");
+> +	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
+> +
+> +	while (npages--) {
+> +		virt_pg_map_shared(vm, vaddr, paddr);
+> +		vaddr += page_size;
+> +		paddr += page_size;
+> +	}
+> +}
+> +
+>  /*
+>   * Address VM Physical to Host Virtual
+>   *
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 566d82829da4..aa2a57ddb8d3 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -190,7 +190,8 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
+>  	return pte;
+>  }
+>  
+> -void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+> +static void ___virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> +			   int level, bool protected)
+>  {
+>  	const uint64_t pg_size = PG_LEVEL_SIZE(level);
+>  	uint64_t *pml4e, *pdpe, *pde;
+> @@ -235,17 +236,27 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+>  		    "PTE already present for 4k page at vaddr: 0x%lx\n", vaddr);
+>  	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
+>  
+> -	if (vm_is_gpa_protected(vm, paddr))
+> +	if (protected)>  		*pte |= vm->arch.c_bit;
+>  	else
+>  		*pte |= vm->arch.s_bit;
+>  }
+>  
+> +void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, 
+> +int level) {
+> +	___virt_pg_map(vm, vaddr, paddr, level, vm_is_gpa_protected(vm, 
+> +paddr)); }
+> +
+>  void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)  {
+>  	__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K);  }
+>  
+> +void virt_arch_pg_map_shared(struct kvm_vm *vm, uint64_t vaddr, 
+> +uint64_t paddr) {
+> +	___virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K, false); }
+
+Here, it tries to create the guest mappings regardless of what the value
+of protected_phy_pages is, which could create confusion.
+
+> +
+>  void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+>  		    uint64_t nr_bytes, int level)
+>  {
+> --
+> 2.43.0.472.g3155946c3a-goog
+> 
 
