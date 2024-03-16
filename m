@@ -1,105 +1,119 @@
-Return-Path: <kvm+bounces-11955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAE6187D7AE
-	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 01:51:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6378387D8C8
+	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 05:50:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49609282D74
-	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 00:51:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEFC228283B
+	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 04:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD76E1C36;
-	Sat, 16 Mar 2024 00:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E426ED2EE;
+	Sat, 16 Mar 2024 04:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="DhsaRMTY"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="p9Xcw31l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C778E1373
-	for <kvm@vger.kernel.org>; Sat, 16 Mar 2024 00:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A2D9460;
+	Sat, 16 Mar 2024 04:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710550309; cv=none; b=aZ9TifbjK49BiVLAChCO3rpGXD4x3gbSiFzvsYCD259z1KHDQKQBZF9uwKdSttn3wfyAnoMkO/esMTMomQ3IsKwygjoEccR1A36JkLKq/XWm8zx0V00e9TRBL5czAIZKRj3Ay1bO7ekdUFdf08TI+O0HRjBXr9x0hdZB+WTQ+bE=
+	t=1710564603; cv=none; b=d6ivrsbjJsyVXoEq7pCzJcdvG3+orZ9KVlvcp45Cp2EQhd5dLtH0jWRSvLu6ASOUQml/qSCpnFYIHjUSpxdAaEG5Vb8NXlPK3aAYGWUuBLhBnJXa9Yx1BRXb6DCZ7sFQDBk59Ht6vEnpmHPoRhML2tn47JzgG2fyxAkxVE8/Lv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710550309; c=relaxed/simple;
-	bh=veGHBF3H13JsJeE4FDnKI5tpEmZeeZRyQgx+bxMNAi0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=acaE6kZQz1rKwbBYt4U9fuL39WldlZmAkR3AumAnHRju09GkMaX2xKUeqy9nZsayVnj3RAQlIQYa+GXsfN5qSlnJK4VIal+01lNDXExrNj74zh2gc1Q8Rh86Jg46J0eXPJTqeknqsWcFcpqPRusyCXlovnQdOeyt8XUSMtQJaBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=DhsaRMTY; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a466f796fc1so319637066b.3
-        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 17:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1710550304; x=1711155104; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=krWZ+WRoA2zaA7Cdw3TM52PMtly6Zf/um2GekWUiV7E=;
-        b=DhsaRMTYKD6KBFla3XYneZZPu0dalWil4DjkZnfoVdYYdMVmS8ZTqybQi7qReC3Vcg
-         4QrSbvc88R6Muy3Z4S6exncnF2j4I5Fn2ksiVY+wQ2QLLaWNEkrbLnLYNToUFSsDFhZ3
-         Td43G97+UVvMp7GGkhv9ibc95ZrecoKFRT3PY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710550304; x=1711155104;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=krWZ+WRoA2zaA7Cdw3TM52PMtly6Zf/um2GekWUiV7E=;
-        b=JrUZXkP2u+YEMQ0CXOUv0vmTBChyMiYuyOf95QJOa2HJ4bEoETMfNfbST8i3SjBV2X
-         9Trdu1f5TG03lg5K4scPDVjyGravY3aFgYTlrQdc34Wb1xSER5/m+mfUkrmHQJsBW8N7
-         AS/tPRKWzKMwJxADZyzEmrxr/pwtHVnfKRhYD8jOl/QWcsl/earGUD9sSY0yL78RJakF
-         7mRdW/hpV2kelVvrquaA+/yLs8KYyUg6gtlz5We8gGQsuvsp0/6hA6TWwvE823fCFdDK
-         zkiX5+pIJvfThOdPca6F6n+zjgR3LlatoFOkumwKMYoXrXXKitF+fl2YvKH9xKENiY4I
-         aq6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUv39y1skVFhs4miMOgtpn8B2QswYLI0BfY3vHB+d18ftSVov8D693abm/2UALaqL/JlXfZyjiQp6pEiqp7pRXMmh+I
-X-Gm-Message-State: AOJu0YxiJjKQeqyGR/zP6hNAsWAAh8ySdsKtNVVnBNEtiknlQFzjc0vl
-	5iHYUmz3zfSod5nKuX1pGDvl2pwW4/BOm0kmceQjjjEYr8idp4XlQ86LxzA0ZhIKTBDNVEA0ksa
-	fKBipLA==
-X-Google-Smtp-Source: AGHT+IGjo0MbaijL5OyoWKTxcxbu3fJ5c16suchb07OVZi4QlKjapwbAYnZoyQXcyhNCcLbbpKal2g==
-X-Received: by 2002:a17:906:a18c:b0:a46:a17b:c44e with SMTP id s12-20020a170906a18c00b00a46a17bc44emr381354ejy.30.1710550304158;
-        Fri, 15 Mar 2024 17:51:44 -0700 (PDT)
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
-        by smtp.gmail.com with ESMTPSA id gx27-20020a1709068a5b00b00a3e5adf11c7sm2174180ejc.157.2024.03.15.17.51.42
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 17:51:42 -0700 (PDT)
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a466f796fc1so319635266b.3
-        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 17:51:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVIMbGGSa9CFJo3P79sGi5ByU0f6ZDeyQ6X8PRw/Q+AlKkokn4wr7LYDP1C3k1iB0t+nscrRVDud+fUqfZKew0YnGBa
-X-Received: by 2002:a17:906:eb0a:b0:a46:59c6:2a42 with SMTP id
- mb10-20020a170906eb0a00b00a4659c62a42mr4188815ejb.76.1710550302338; Fri, 15
- Mar 2024 17:51:42 -0700 (PDT)
+	s=arc-20240116; t=1710564603; c=relaxed/simple;
+	bh=dPSwwZ6Iwvp6jRWiJnju5ETNE2DnOwcwDZpt/mHWUcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aLTiO43JYyPNLNFnNp0yJApfdYZy2mcuVNGyiqdaT+j0QBtFHmDE580lqGlMP0Ntkmof8S7IDNSEntgRR4AIrLvs2xIXUnkFzADCaI65G13dMrZBv5uzaODYgdSqXvATNuGt5+VqcxHrT5HQZYF+qOUHXvBYkSMps5hVRIVCNIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=p9Xcw31l; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1710564597;
+	bh=SG8BQwRlZlj/5HtTLk6Dg+Q9Y6/N7rvpi85moJFhF/g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p9Xcw31lx3tkXB2wYza6UQZIYZQSgMu3U5F5GKlplYYXuY9eo/Oz5d6gl/Od/n9fc
+	 RHRxUfCLSQG4WMxkdmtZuBVyyoWlWJ3F2DWZWK9pfTUxBx7vQ4lzOtSUHwq3HaZHo7
+	 oHeqo5wU3Pf6TMQScYjDoCyy0P98V1X2SbEBtMJIQGw+tmehS5z6uPWQlnLmGFasFR
+	 czv+KKY6pkzUvJYN9hmqaDSNMXGbXWtVDT6dJNGVyQdC7Ac4xwITCqoF8woCO9UJ8t
+	 1MYV7UREZ6Wg7k1eHQPNVgn4wzpQwRSrJSHGerboCclWMlNMoB4K10XneGaUbmRgzr
+	 +A8OP6VnKSf0g==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TxTDz5SQjz4wcT;
+	Sat, 16 Mar 2024 15:49:55 +1100 (AEDT)
+Date: Sat, 16 Mar 2024 15:49:42 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Catalin Marinas
+ <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, Will Deacon
+ <will@kernel.org>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Joey
+ Gouly <joey.gouly@arm.com>, Christoffer Dall <cdall@cs.columbia.edu>
+Subject: Re: [GIT PULL] KVM changes for Linux 6.9 merge window
+Message-ID: <20240316154942.700ca013@canb.auug.org.au>
+In-Reply-To: <CAHk-=whCvkhc8BbFOUf1ddOsgSGgEjwoKv77=HEY1UiVCydGqw@mail.gmail.com>
+References: <20240315174939.2530483-1-pbonzini@redhat.com>
+	<CAHk-=whCvkhc8BbFOUf1ddOsgSGgEjwoKv77=HEY1UiVCydGqw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHk-=whCvkhc8BbFOUf1ddOsgSGgEjwoKv77=HEY1UiVCydGqw@mail.gmail.com>
- <20240316002457.3568887-1-oliver.upton@linux.dev>
-In-Reply-To: <20240316002457.3568887-1-oliver.upton@linux.dev>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 15 Mar 2024 17:51:25 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjJv-Y1ZXbusknXpQVTx_kWudtORoKQPc+Rh9F944+Rvw@mail.gmail.com>
-Message-ID: <CAHk-=wjJv-Y1ZXbusknXpQVTx_kWudtORoKQPc+Rh9F944+Rvw@mail.gmail.com>
-Subject: Re: [PATCH] Revert "KVM: arm64: Snapshot all non-zero RES0/RES1
- sysreg fields for later checking"
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/1RjDiGEdh3ebFoN9tfKiZhs";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Fri, 15 Mar 2024 at 17:25, Oliver Upton <oliver.upton@linux.dev> wrote:
+--Sig_/1RjDiGEdh3ebFoN9tfKiZhs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi Linus,
+
+On Fri, 15 Mar 2024 15:28:29 -0700 Linus Torvalds <torvalds@linux-foundatio=
+n.org> wrote:
 >
-> This reverts commits 99101dda29e3186b1356b0dc4dbb835c02c71ac9 and
-> b80b701d5a67d07f4df4a21e09cb31f6bc1feeca.
+> On Fri, 15 Mar 2024 at 10:49, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> >   https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus =20
+>=20
+> Argh.
+>=20
+> This causes my arm64 build to fail, but since I don't do that between
+> every pull, I didn't notice until after I had already pushed things
+> out.
+>=20
+> I get a failure on arch/arm64/kvm/check-res-bits.h (line 60):
+>=20
+>         BUILD_BUG_ON(ID_AA64DFR1_EL1_RES0       !=3D (GENMASK_ULL(63, 0))=
+);
 
-Applied.  Thanks,
+https://lore.kernel.org/linux-next/20240222220349.1889c728@canb.auug.org.au/
 
-          Linus
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/1RjDiGEdh3ebFoN9tfKiZhs
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmX1JOcACgkQAVBC80lX
+0GywgAgAnVPGH5WR28Q+y8x8ntv8nDQ0emR7khEcXXgLXCo/OYytPXwKSI+fpllo
+fvbYtHNlr1JD2swC0PC8p8f3NUbCzvEwSo71N5gzBa1RVgS51ibrTlLbPbEi/Tlf
+cAn0Rjbrqk3Uj6gfWjfh7FtEUgfXlYQW6V3z6aOnxPg5p8xejF+eEqNKTX/dHWuY
+Kw1yqUd4H+VRhFCITvHeNh4vBs7RXMjCMAjt1r26EXcL6eFNGVPV0Sa9bL/Yc8Eb
+HCUs1ENGsExGZfhnUIDBgMWGAw0NpDcryejr1C66zP03wpzRF32OapCk8Qj2nYdI
+opCU2Tps0FZxhOzzFhU8Zte3D/ew8w==
+=j5JE
+-----END PGP SIGNATURE-----
+
+--Sig_/1RjDiGEdh3ebFoN9tfKiZhs--
 
