@@ -1,179 +1,105 @@
-Return-Path: <kvm+bounces-11954-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F61587D7AB
-	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 01:50:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE6187D7AE
+	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 01:51:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B517282D03
-	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 00:50:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49609282D74
+	for <lists+kvm@lfdr.de>; Sat, 16 Mar 2024 00:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232A64C89;
-	Sat, 16 Mar 2024 00:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD76E1C36;
+	Sat, 16 Mar 2024 00:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IjM5n/xp"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="DhsaRMTY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347BF10FD;
-	Sat, 16 Mar 2024 00:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C778E1373
+	for <kvm@vger.kernel.org>; Sat, 16 Mar 2024 00:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710550192; cv=none; b=kdkk5CSCIh7MA6d0bRDjbyej+jJouDYeNj6E1M74cNPCbca7PfLAb4CXy48v8HhmC2YO5c6r8Dd67OEcKgPeJmJjLjkqut5Q6XSI20tLS7WkgB5fBVbz2AejNA1waPu11F7PzsSZoTK93PndSHxBmqgQ4Jhe3RI3vg1O1VI7RF8=
+	t=1710550309; cv=none; b=aZ9TifbjK49BiVLAChCO3rpGXD4x3gbSiFzvsYCD259z1KHDQKQBZF9uwKdSttn3wfyAnoMkO/esMTMomQ3IsKwygjoEccR1A36JkLKq/XWm8zx0V00e9TRBL5czAIZKRj3Ay1bO7ekdUFdf08TI+O0HRjBXr9x0hdZB+WTQ+bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710550192; c=relaxed/simple;
-	bh=sQQiicBhSeNqbbamPsWA7WiPkkdzlPRuFofio/wpKFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mZa3MnVCffYvg2WIk/zkeCzYb3gAUbmBv/ZXiqSoVM4hRAZZ5ct72xVzRyO8Q4IGYP4eqA7e2aT29Xjlsbdr1WI9mOwI5Y0bVXOuFHcs/LcflNjZX7fxvHU8FFHFYuYBzTHIs4GoBq00Ophr1cqbAmtyFY4BoIFMVNC9Jcn+57g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IjM5n/xp; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710550189; x=1742086189;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=sQQiicBhSeNqbbamPsWA7WiPkkdzlPRuFofio/wpKFk=;
-  b=IjM5n/xpi5ksKwq6ZZe/oOHvCxyqAXKGHJ+e71KlAHyzCUOH+D/pvliM
-   Ve6uK1FNd0guTJd+gQP/Zv5T4lLDNlaTOOG0udgn7YhlfnJxYf6JadKl+
-   jdoqodAxmxysswEk2zvR5Tr7CjfhOjVJg+lIgfTD09Pu6gXN4iyU1JMDe
-   j/MZLfUPJZXJjXIksmdT+S7lXFwkoOwrd+Jia5gAr3F4hR+AMx1yr6umj
-   VkxCDyn3qJ6ErqF6+S0SUrPOoM1p0lmq3bf/pxB3hLx6+zrNjgHMCsEN2
-   KmbAqvNaHOdYbXm3zJgYrPI/N0c4R6ICNAIs257dISSXTJT//9FQfKf3V
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11014"; a="16087892"
-X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
-   d="scan'208";a="16087892"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 17:49:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
-   d="scan'208";a="17449597"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 17:49:46 -0700
-Date: Fri, 15 Mar 2024 17:49:45 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-	dave.hansen@intel.com, kirill.shutemov@linux.intel.com,
-	peterz@infradead.org, tglx@linutronix.de, bp@alien8.de,
-	mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, isaku.yamahata@intel.com, jgross@suse.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH 4/5] x86/virt/tdx: Support global metadata read for all
- element sizes
-Message-ID: <20240316004945.GL1258280@ls.amr.corp.intel.com>
-References: <cover.1709288433.git.kai.huang@intel.com>
- <17f1c66ae6360b14f175c45aa486f4bdcf6e0a20.1709288433.git.kai.huang@intel.com>
+	s=arc-20240116; t=1710550309; c=relaxed/simple;
+	bh=veGHBF3H13JsJeE4FDnKI5tpEmZeeZRyQgx+bxMNAi0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=acaE6kZQz1rKwbBYt4U9fuL39WldlZmAkR3AumAnHRju09GkMaX2xKUeqy9nZsayVnj3RAQlIQYa+GXsfN5qSlnJK4VIal+01lNDXExrNj74zh2gc1Q8Rh86Jg46J0eXPJTqeknqsWcFcpqPRusyCXlovnQdOeyt8XUSMtQJaBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=DhsaRMTY; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a466f796fc1so319637066b.3
+        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 17:51:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1710550304; x=1711155104; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=krWZ+WRoA2zaA7Cdw3TM52PMtly6Zf/um2GekWUiV7E=;
+        b=DhsaRMTYKD6KBFla3XYneZZPu0dalWil4DjkZnfoVdYYdMVmS8ZTqybQi7qReC3Vcg
+         4QrSbvc88R6Muy3Z4S6exncnF2j4I5Fn2ksiVY+wQ2QLLaWNEkrbLnLYNToUFSsDFhZ3
+         Td43G97+UVvMp7GGkhv9ibc95ZrecoKFRT3PY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710550304; x=1711155104;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=krWZ+WRoA2zaA7Cdw3TM52PMtly6Zf/um2GekWUiV7E=;
+        b=JrUZXkP2u+YEMQ0CXOUv0vmTBChyMiYuyOf95QJOa2HJ4bEoETMfNfbST8i3SjBV2X
+         9Trdu1f5TG03lg5K4scPDVjyGravY3aFgYTlrQdc34Wb1xSER5/m+mfUkrmHQJsBW8N7
+         AS/tPRKWzKMwJxADZyzEmrxr/pwtHVnfKRhYD8jOl/QWcsl/earGUD9sSY0yL78RJakF
+         7mRdW/hpV2kelVvrquaA+/yLs8KYyUg6gtlz5We8gGQsuvsp0/6hA6TWwvE823fCFdDK
+         zkiX5+pIJvfThOdPca6F6n+zjgR3LlatoFOkumwKMYoXrXXKitF+fl2YvKH9xKENiY4I
+         aq6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUv39y1skVFhs4miMOgtpn8B2QswYLI0BfY3vHB+d18ftSVov8D693abm/2UALaqL/JlXfZyjiQp6pEiqp7pRXMmh+I
+X-Gm-Message-State: AOJu0YxiJjKQeqyGR/zP6hNAsWAAh8ySdsKtNVVnBNEtiknlQFzjc0vl
+	5iHYUmz3zfSod5nKuX1pGDvl2pwW4/BOm0kmceQjjjEYr8idp4XlQ86LxzA0ZhIKTBDNVEA0ksa
+	fKBipLA==
+X-Google-Smtp-Source: AGHT+IGjo0MbaijL5OyoWKTxcxbu3fJ5c16suchb07OVZi4QlKjapwbAYnZoyQXcyhNCcLbbpKal2g==
+X-Received: by 2002:a17:906:a18c:b0:a46:a17b:c44e with SMTP id s12-20020a170906a18c00b00a46a17bc44emr381354ejy.30.1710550304158;
+        Fri, 15 Mar 2024 17:51:44 -0700 (PDT)
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
+        by smtp.gmail.com with ESMTPSA id gx27-20020a1709068a5b00b00a3e5adf11c7sm2174180ejc.157.2024.03.15.17.51.42
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Mar 2024 17:51:42 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a466f796fc1so319635266b.3
+        for <kvm@vger.kernel.org>; Fri, 15 Mar 2024 17:51:42 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVIMbGGSa9CFJo3P79sGi5ByU0f6ZDeyQ6X8PRw/Q+AlKkokn4wr7LYDP1C3k1iB0t+nscrRVDud+fUqfZKew0YnGBa
+X-Received: by 2002:a17:906:eb0a:b0:a46:59c6:2a42 with SMTP id
+ mb10-20020a170906eb0a00b00a4659c62a42mr4188815ejb.76.1710550302338; Fri, 15
+ Mar 2024 17:51:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <17f1c66ae6360b14f175c45aa486f4bdcf6e0a20.1709288433.git.kai.huang@intel.com>
+References: <CAHk-=whCvkhc8BbFOUf1ddOsgSGgEjwoKv77=HEY1UiVCydGqw@mail.gmail.com>
+ <20240316002457.3568887-1-oliver.upton@linux.dev>
+In-Reply-To: <20240316002457.3568887-1-oliver.upton@linux.dev>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 15 Mar 2024 17:51:25 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjJv-Y1ZXbusknXpQVTx_kWudtORoKQPc+Rh9F944+Rvw@mail.gmail.com>
+Message-ID: <CAHk-=wjJv-Y1ZXbusknXpQVTx_kWudtORoKQPc+Rh9F944+Rvw@mail.gmail.com>
+Subject: Re: [PATCH] Revert "KVM: arm64: Snapshot all non-zero RES0/RES1
+ sysreg fields for later checking"
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Mar 02, 2024 at 12:20:36AM +1300,
-Kai Huang <kai.huang@intel.com> wrote:
+On Fri, 15 Mar 2024 at 17:25, Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> This reverts commits 99101dda29e3186b1356b0dc4dbb835c02c71ac9 and
+> b80b701d5a67d07f4df4a21e09cb31f6bc1feeca.
 
-> For now the kernel only reads TDMR related global metadata fields for
-> module initialization.  All these fields are 16-bits, and the kernel
-> only supports reading 16-bits fields.
-> 
-> KVM will need to read a bunch of non-TDMR related metadata to create and
-> run TDX guests.  It's essential to provide a generic metadata read
-> infrastructure which supports reading all 8/16/32/64 bits element sizes.
-> 
-> Extend the metadata read to support reading all these element sizes.
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ---
->  arch/x86/virt/vmx/tdx/tdx.c | 59 +++++++++++++++++++++++++------------
->  arch/x86/virt/vmx/tdx/tdx.h |  2 --
->  2 files changed, 40 insertions(+), 21 deletions(-)
-> 
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index eb208da4ff63..4ee4b8cf377c 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -271,23 +271,35 @@ static int read_sys_metadata_field(u64 field_id, u64 *data)
->  	return 0;
->  }
->  
-> -static int read_sys_metadata_field16(u64 field_id,
-> -				     int offset,
-> -				     void *stbuf)
-> +/* Return the metadata field element size in bytes */
-> +static int get_metadata_field_bytes(u64 field_id)
->  {
-> -	u16 *st_member = stbuf + offset;
-> +	/*
-> +	 * TDX supports 8/16/32/64 bits metadata field element sizes.
-> +	 * TDX module determines the metadata element size based on the
-> +	 * "element size code" encoded in the field ID (see the comment
-> +	 * of MD_FIELD_ID_ELE_SIZE_CODE macro for specific encodings).
-> +	 */
-> +	return 1 << MD_FIELD_ID_ELE_SIZE_CODE(field_id);
-> +}
-> +
-> +static int stbuf_read_sys_metadata_field(u64 field_id,
-> +					 int offset,
-> +					 int bytes,
-> +					 void *stbuf)
-> +{
-> +	void *st_member = stbuf + offset;
->  	u64 tmp;
->  	int ret;
->  
-> -	if (WARN_ON_ONCE(MD_FIELD_ID_ELE_SIZE_CODE(field_id) !=
-> -			MD_FIELD_ID_ELE_SIZE_16BIT))
-> +	if (WARN_ON_ONCE(get_metadata_field_bytes(field_id) != bytes))
->  		return -EINVAL;
->  
->  	ret = read_sys_metadata_field(field_id, &tmp);
->  	if (ret)
->  		return ret;
->  
-> -	*st_member = tmp;
-> +	memcpy(st_member, &tmp, bytes);
->  
->  	return 0;
->  }
-> @@ -295,11 +307,30 @@ static int read_sys_metadata_field16(u64 field_id,
->  struct field_mapping {
->  	u64 field_id;
->  	int offset;
-> +	int size;
->  };
->  
->  #define TD_SYSINFO_MAP(_field_id, _struct, _member)	\
->  	{ .field_id = MD_FIELD_ID_##_field_id,		\
-> -	  .offset   = offsetof(_struct, _member) }
-> +	  .offset   = offsetof(_struct, _member),	\
-> +	  .size     = sizeof(typeof(((_struct *)0)->_member)) }
+Applied.  Thanks,
 
-Because we use compile time constant for _field_id mostly, can we add build
-time check? Something like this.
-
-static inline metadata_size_check(u64 field_id, size_t size)
-{
-        BUILD_BUG_ON(get_metadata_field_bytes(field_id) != size);
-}
-
-#define TD_SYSINFO_MAP(_field_id, _struct, _member)	\
-	{ .field_id = MD_FIELD_ID_##_field_id,		\
-	  .offset   = offsetof(_struct, _member),	\
-	  .size     = \
-		({ size_t s = sizeof(typeof(((_struct *)0)->_member)); \
-                metadata_size_check(MD_FIELD_ID_##_field_id, s); \
-                s; }) }
-
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+          Linus
 
