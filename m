@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-11965-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11966-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196F287DD2B
-	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 13:26:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2387487DD37
+	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 13:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95C951F2131F
-	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 12:26:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B27B728151A
+	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 12:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B771BC30;
-	Sun, 17 Mar 2024 12:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BF21B95A;
+	Sun, 17 Mar 2024 12:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hj7oKJDa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Am52SrIx"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50BE1B7E4;
-	Sun, 17 Mar 2024 12:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6B318EAD;
+	Sun, 17 Mar 2024 12:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710678386; cv=none; b=A+Uu82QDOsUlDskZ+XCYtbTyZ4+5uTm7BzNMwjXs7wFVqADl2CxHqDdlEQUtrrrDg0aR0jTfvunMoSniAeOLyfRndTx2Vzykt94dNxROuFG3B8M/UDJEDsTWz5qZoIb1YmvlHuWlEahk8G6xqBly4nWMxGocQ36/0OfI4UHBPaQ=
+	t=1710679840; cv=none; b=QIjev5IFksTUpmTcOfsiKkhGIFYOtf8TfPyUQPvsIfQdbo8W1N38t2b1lTgi0EChCMNLeUUU+8lyrfka/xY+nTugYEGqidhknJyJBVWE4qYv0N0WYE3WHaYRM1aa3FY7FpH0+eSM2EylsoR6k6KGmptPl0WqPSB0F1BMifZ5tRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710678386; c=relaxed/simple;
-	bh=iYxTMqDgxfAqrpKM39EoXettOKZYey71bShInFhDSTk=;
+	s=arc-20240116; t=1710679840; c=relaxed/simple;
+	bh=u7B/Jvp7P9C5qB9irs/k5g8gIupz4K+Qm2duwLJlnSA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oGYzC50/wzXqZYrZivsXpZGah4WCitz9TRRdkaZfgBfB82+QW+imLyP82kbxGgSkszQlyWGzWzQpriOTFsuj6Bs52lwxOeiXxWQnwTi4A4crKuk8kwUh0sAoflCFM2VQ10qlPuYQmUocDOotnrxVo9uzlcDnD/6ji2Oh9oOcg0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hj7oKJDa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C889C433F1;
-	Sun, 17 Mar 2024 12:26:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CMYbciOVJYEdzQzRIwi8q7bjVUvZFm4FMKxQJHm6w/HjjYrxXSxSFkBZgv3jTZFtYnqOjQJo9skpIPYFDAZwvKmYSfNYZ/mozGNfpIGtvR4pL+2YjHwSdSuaFmx//7wybF4hj0bueyruEUIlL+LA+PVn6BLjbXVB4Ww3Ij3r0Ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Am52SrIx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C345C433F1;
+	Sun, 17 Mar 2024 12:50:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710678385;
-	bh=iYxTMqDgxfAqrpKM39EoXettOKZYey71bShInFhDSTk=;
+	s=k20201202; t=1710679840;
+	bh=u7B/Jvp7P9C5qB9irs/k5g8gIupz4K+Qm2duwLJlnSA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Hj7oKJDa6uvMGqLUWJJEr92TqIWE1Nolf84xYqoALjfpEXHvFzZh4PmeE5KKUWbF9
-	 IG8GULM/fNK7z//SG3PIR6xUT0PF4Eku0xao/q5XeIGnX6AJIQSHVzx88BjBjzMx7Z
-	 PLyTj5pkc2uH8AlqmTBJzApk9DgXHXjRMpNhUV9XzdbmnyGVVpuTJPerjeRy1ERW/0
-	 EDz+189kO2gR6R+cfdtF/+jdwgxz8PlefQZJjCxWqIn7doGg0wBjbI/cSRTipQqV/w
-	 Mal+kgdvMRo5Nk0ImnorLQR3obfj6xEyPCbYhFw2iSmVqPqqbr9Vo623edB9E56GBE
-	 kda1cKMNh1IZg==
+	b=Am52SrIxS7fDHll0FQ5mKHFmSnTl382wdOSYbvCr8RhIHlI414wIyqvoKQID9Gfjr
+	 DNKgeIsZ5ww06jlr7jbyLnN1Dr82A5V9zIgc7mQXLZY/ocOEf9CJBueWxnht6kYazu
+	 /ltd3mUGWnHbODLljGd65Th79MzTtoX882H+LPYNNO2nOwRT6U9jL1+pWdFhTU+vN7
+	 wK4yn3HJiiLBQqE1t/beKeg6GixVnXrTzFyjdtGCHuW+kIHXORdtGfrrkB3nXbjIPg
+	 q5XNsx6h6eF4VfLLxXug09llPi1w+zpcZpwcakMJQZ+ytMDGxlSED1r9kBmdiKbgPF
+	 segoGN0K1sI6g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rlpap-00D1nT-63;
-	Sun, 17 Mar 2024 12:26:23 +0000
-Date: Sun, 17 Mar 2024 12:26:22 +0000
-Message-ID: <86a5mx11u9.wl-maz@kernel.org>
+	id 1rlpyH-00D24G-Ox;
+	Sun, 17 Mar 2024 12:50:37 +0000
+Date: Sun, 17 Mar 2024 12:50:37 +0000
+Message-ID: <868r2h10pu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: =?UTF-8?B?UGllcnJlLUNsw6ltZW50?= Tosi <ptosi@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -58,11 +58,12 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH 01/10] KVM: arm64: Fix clobbered ELR in sync abort
-In-Reply-To: <0dfcc4c5c898941147723ba530c81ddc8399ef55.1710446682.git.ptosi@google.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 08/10] arm64: Move esr_comment() to <asm/esr.h>
+In-Reply-To: <6374e3f9d15663e0ea55fa4261ac42f3348ad809.1710446682.git.ptosi@google.com>
 References: <cover.1710446682.git.ptosi@google.com>
-	<0dfcc4c5c898941147723ba530c81ddc8399ef55.1710446682.git.ptosi@google.com>
+	<6374e3f9d15663e0ea55fa4261ac42f3348ad809.1710446682.git.ptosi@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -75,130 +76,40 @@ MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ascull@google.com
+X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 14 Mar 2024 20:23:22 +0000,
+On Thu, 14 Mar 2024 20:25:29 +0000,
 Pierre-Cl=C3=A9ment Tosi <ptosi@google.com> wrote:
 >=20
-> When the hypervisor receives a SError or synchronous exception (EL2h)
-
-nit: since this also affects SError, $subject seems wrong.
-
-> while running with the __kvm_hyp_vector and if ELR_EL2 doesn't point to
-> an extable entry, it panics indirectly by overwriting ELR with the
-> address of a panic handler in order for the asm routine it returns to to
-> ERET into the handler. This is done (instead of a simple function call)
-> to ensure that the panic handler runs with the SPSel that was in use
-> when the exception was triggered, necessary to support features such as
-> the shadow call stack.
-
-I don't understand this. Who changes SPsel? At any given point, SP_EL0
-is that of either the host or the guest, but never the hypervisor's.
-If something was touching SP_EL0 behind our back, it would result in
-corruption (see 6e977984f6d8 for a bit of rationale about it).
-
->
-> However, this clobbers ELR_EL2 for the handler itself. As a result,
-> hyp_panic(), when retrieving what it believes to be the PC where the
-> exception happened, actually ends up reading the address of the panic
-> handler that called it! This results in an erroneous and confusing panic
-> message where the source of any synchronous exception (e.g. BUG() or
-> kCFI) appears to be __guest_exit_panic, making it hard to locate the
-> actual BRK instruction.
+> As it is already defined twice and is about to be needed for CFI error
+> detection, move esr_comment() to a header so that it can be reused.
 >=20
-> Therefore, store the original ELR_EL2 in a per-CPU struct and point the
-
-Can you elaborate on *which* per-CPU structure you are using?
-
-> sysreg to a routine that first restores it to its previous value before
-> running __guest_exit_panic.
->=20
-> Fixes: 7db21530479f ("KVM: arm64: Restore hyp when panicking in guest con=
-text")
 > Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
 > ---
->  arch/arm64/kernel/asm-offsets.c         | 1 +
->  arch/arm64/kvm/hyp/entry.S              | 9 +++++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ++++--
->  3 files changed, 14 insertions(+), 2 deletions(-)
+>  arch/arm64/include/asm/esr.h       | 5 +++++
+>  arch/arm64/kernel/debug-monitors.c | 4 +---
+>  arch/arm64/kernel/traps.c          | 2 --
+>  arch/arm64/kvm/handle_exit.c       | 2 +-
+>  4 files changed, 7 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offs=
-ets.c
-> index 5a7dbbe0ce63..e62353168a57 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -128,6 +128,7 @@ int main(void)
->    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1)=
-);
->    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
->    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
-> +  DEFINE(CPU_ELR_EL2,		offsetof(struct kvm_cpu_context, sys_regs[ELR_EL2=
-]));
->    DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[RGSR_E=
-L1]));
->    DEFINE(CPU_GCR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[GCR_EL1=
-]));
->    DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[AP=
-IAKEYLO_EL1]));
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index f3aa7738b477..9cdf46da3051 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -83,6 +83,15 @@ alternative_else_nop_endif
->  	eret
->  	sb
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index 353fe08546cf..b0c23e7d6595 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -385,6 +385,11 @@
+>  #ifndef __ASSEMBLY__
+>  #include <asm/types.h>
 > =20
-> +SYM_INNER_LABEL(__guest_exit_panic_with_restored_elr, SYM_L_GLOBAL)
+> +static inline unsigned long esr_comment(unsigned long esr)
+> +{
+> +	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
+> +}
 
-The name of the function isn't great. Crucially, 'with_restored_elr'
-implies that ELR is already restored, while it is the hunk below that
-does the 'restore' part.
-
-Something like '__guest_exit_restore_elr_and_panic' seems more
-appropriate.
-
-> +	// x0-x29,lr: hyp regs
-> +
-> +	stp	x0, x1, [sp, #-16]!
-> +	adr_this_cpu x0, kvm_hyp_ctxt, x1
-> +	ldr	x0, [x0, #CPU_ELR_EL2]
-> +	msr	elr_el2, x0
-> +	ldp	x0, x1, [sp], #16
-> +
->  SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
->  	// x2-x29,lr: vcpu regs
->  	// vcpu x0-x1 on the stack
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp=
-/include/hyp/switch.h
-> index a038320cdb08..6a8dc8d3c193 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -747,7 +747,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *=
-vcpu, u64 *exit_code)
-> =20
->  static inline void __kvm_unexpected_el2_exception(void)
->  {
-> -	extern char __guest_exit_panic[];
-> +	extern char __guest_exit_panic_with_restored_elr[];
->  	unsigned long addr, fixup;
->  	struct kvm_exception_table_entry *entry, *end;
->  	unsigned long elr_el2 =3D read_sysreg(elr_el2);
-> @@ -769,7 +769,9 @@ static inline void __kvm_unexpected_el2_exception(voi=
-d)
->  	}
-> =20
->  	/* Trigger a panic after restoring the hyp context. */
-> -	write_sysreg(__guest_exit_panic, elr_el2);
-> +	write_sysreg(__guest_exit_panic_with_restored_elr, elr_el2);
-> +
-> +	this_cpu_ptr(&kvm_hyp_ctxt)->sys_regs[ELR_EL2] =3D elr_el2;
-
-nit: placing the saving of ELR_EL2 before overriding the sysreg makes
-the whole thing a bit more readable, specially given the poor choice
-of 'elr_el2' as a variable (visually clashing with 'elr_el2' as a
-system register).
+nit: naming it esr_brk_comment() would make it slightly clearer what
+this helper applies to, now that it is visible out of the limited
+context of traps.c.
 
 Thanks,
 
