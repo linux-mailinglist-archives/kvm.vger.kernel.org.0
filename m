@@ -1,240 +1,155 @@
-Return-Path: <kvm+bounces-11967-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11968-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A066087DD42
-	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 14:09:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A8E587DD4D
+	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 14:43:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08C2AB20D84
-	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 13:09:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B523F1F212DF
+	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 13:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B449F1BC40;
-	Sun, 17 Mar 2024 13:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F391C696;
+	Sun, 17 Mar 2024 13:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kp9UpsSY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HnSMXJqR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76931B95A;
-	Sun, 17 Mar 2024 13:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12C31BDDB
+	for <kvm@vger.kernel.org>; Sun, 17 Mar 2024 13:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710680944; cv=none; b=QR4oQnVjnXC2F/mBS+iBoXAhqS4fUu2ySEbFZV/cuZaFRf43EgeIViT2KJuaHCKdNychvmaRSYJYx7U4Hyu73dbq9N3Q3a+KNAek5+sHFJFzwQy8IdV4EvLhwfOqyEM3PbCfKH1kw4HVMNkt6J/e5V9sPKqY6HqOn/ADxH5diM4=
+	t=1710682964; cv=none; b=uob7GIktnUK1jdmC4o2eqAq0zOyx2ByI3H63XSPOAqsOGdvNV8dvstbQrDAqMSiGjknVT5cud7xSTU1o3gBByjZdL/tnjb9sJUVchlleNt8tfxpZkCTrX6g8Q1vGKwGWuDEIBCuPKk4MFeEcXuaZNa/TfMwCJCZtdbfWwAvvVYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710680944; c=relaxed/simple;
-	bh=YpH/O6L1fyZz4ZnrgUQq9DJ00JR7UqTznRXw4DqQ3B0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DvFnwlJcFt7aTfhlaiFI7gLt9UtrFHTV8DEJ2eYKivlMRQaLAP9xtjzjzxVkeYaryjLo9Dc7tIuEAQWmE7M+l4ZEn0T+D12F4vevQbN8lWPwr7mAJF+MIK5hkIoU6YnqKob4+U1MThig/b8Vu1wrk2zymmLFs80JBevfzyAt5c0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kp9UpsSY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95102C433F1;
-	Sun, 17 Mar 2024 13:09:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710680944;
-	bh=YpH/O6L1fyZz4ZnrgUQq9DJ00JR7UqTznRXw4DqQ3B0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Kp9UpsSYOyMMckcu4YnPpY6b6P0ntWvhuYh18hhC2iPCj2ImE08q06s5M7WI0WKzu
-	 dgwY0hCd4/8oA4/BN8d40ABJXq+a9/69ZPdYpnhB9BSIRJFbzdhmmYHofjyN9iYNbb
-	 3dpx3O01H+V6kQP/G4spZKQeXZx4jHdas83s2AbFW7EFfIqerTudaqI4meUUhyQHuv
-	 mv2YyGJVzpAUSoDNLuoiPNRLZEmESW3xA312nlWCMywSwlcJJzddgohFz3BFljjl53
-	 m7DpB8UBKRqq/NECNYU9FhjTCV8gZV4B409VnMHSedgoy+9dplJU3D0KUaIl+HnfZi
-	 H0morTVce7hxw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rlqG6-00D2GR-DS;
-	Sun, 17 Mar 2024 13:09:02 +0000
-Date: Sun, 17 Mar 2024 13:09:01 +0000
-Message-ID: <867ci10zv6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: =?UTF-8?B?UGllcnJlLUNsw6ltZW50?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH 09/10] KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
-In-Reply-To: <87885c41627a033d9772dd368049e7f8f5fd4ef7.1710446682.git.ptosi@google.com>
-References: <cover.1710446682.git.ptosi@google.com>
-	<87885c41627a033d9772dd368049e7f8f5fd4ef7.1710446682.git.ptosi@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1710682964; c=relaxed/simple;
+	bh=HKn+wSzPxAgbDRqOBP1YPX1DBZwiZhj/zwBVkf4MIT8=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=qnKy7bjMsIhLMf57ABSayX9p+T69POjfXcej7ll0PEi9TeVudrk5bcXbZHukeaukThPruusDXy8cSyTmwW2oZAoxDJcNW9zH/gPWkAuYhREogRlICjdlrPOOQVr7wZ2T5EP1/K/wLF8mWfy2zcqgFeB7/FSeInFu9Zb+pNXAp5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HnSMXJqR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710682961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lE5LN5pRZ0/6bku3pPgtdVGUxkTbfetlBUflbCRYp0s=;
+	b=HnSMXJqRmB0vDi/0IYqVUnyVwR13tol+6xjt+pqaPOE/A0w8LFU8U6vMKuonupLl2ZNKIu
+	yylPPm4wut+OI13A+L/nCzGj8nDzb9scICioXo5VDVDvr4kNWsCZlKtdnWiuzhbzFNPo/z
+	Wr7L8ySAwicpf/RwUpSUD7f28CkHC2M=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-577-Aqnk4dtcMO-E13Ttk-BjAw-1; Sun, 17 Mar 2024 09:42:37 -0400
+X-MC-Unique: Aqnk4dtcMO-E13Ttk-BjAw-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d449d68bc3so34255781fa.3
+        for <kvm@vger.kernel.org>; Sun, 17 Mar 2024 06:42:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710682956; x=1711287756;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lE5LN5pRZ0/6bku3pPgtdVGUxkTbfetlBUflbCRYp0s=;
+        b=OUCZR+QPiW8U8t4G9go+8ml3lvODEUCp6kxeVGCLumGu5nltRTr4y/dsIrIJgmlnK+
+         BqrZxOf0GsCDkhM7pjTKXrxcgTNji3sVFbsWwfbUoV+zclDSVEsWRG0T3B4d0NHp1Adt
+         RD49NYjdJ2RBg95WdEEgU/TqStNPdOjtaavFFAnqZP1rTpRfFZ+u4QxKENg8+0WbrmL9
+         OW4Ia7vi0eJvr5OWAIPuqX2jISPQd7OCUcfnMqFBSpK/II2/UzUStnhmLyze1+HhH+mV
+         11NtAGoNJ0EXYbzDJ2gMQ9Mkgqi/f9mQDA8//7pb7IlPqzvI6XwZr42pQpa20HDbI8j9
+         PSyw==
+X-Forwarded-Encrypted: i=1; AJvYcCXMyuQPULKAN3L6mO9T0v6IAJL5H3BqIJwC24NpXTxvvtMk8quNZIGupkrbcJIW2OFUKBoRjRSxlPqaY/UAAABmbdJe
+X-Gm-Message-State: AOJu0Ywy3ppvlGCx8mP/EYwP22Z17SZQqDTcH9zuUxlcg3G7kc+s2qQX
+	P8FXZwW3uAoHwsJEu0u0EcmOtGSPOYmTZLFsInGGoSDEO4DV/nCSxfxyGpnh1Yk21N3iYJPFuwI
+	PpdGcXlzktyBcJlEC+8Z2NUponUDW8EfuPGAmOuWdQG2FrJRkpQ==
+X-Received: by 2002:ac2:4db2:0:b0:513:e223:1959 with SMTP id h18-20020ac24db2000000b00513e2231959mr2789147lfe.23.1710682955895;
+        Sun, 17 Mar 2024 06:42:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFjeOo1KY2AdDRh6n3lebXG2sP7191wBJ4E4igHb0tO+gu4DHNA7iMBFowVrn06ww4A3teZ/Q==
+X-Received: by 2002:ac2:4db2:0:b0:513:e223:1959 with SMTP id h18-20020ac24db2000000b00513e2231959mr2789134lfe.23.1710682955497;
+        Sun, 17 Mar 2024 06:42:35 -0700 (PDT)
+Received: from [127.0.0.1] (93-45-170-156.ip103.fastwebnet.it. [93.45.170.156])
+        by smtp.gmail.com with ESMTPSA id r17-20020a1709067fd100b00a466782e438sm3787263ejs.139.2024.03.17.06.42.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 Mar 2024 06:42:34 -0700 (PDT)
+Date: Sun, 17 Mar 2024 14:42:32 +0100
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+CC: Oliver Upton <oliver.upton@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM changes for Linux 6.9 merge window
+User-Agent: K-9 Mail for Android
+In-Reply-To: <32892705-1A39-430A-9553-DBF254C723E7@redhat.com>
+References: <20240315174939.2530483-1-pbonzini@redhat.com> <CAHk-=whCvkhc8BbFOUf1ddOsgSGgEjwoKv77=HEY1UiVCydGqw@mail.gmail.com> <ZfTadCKIL7Ujxw3f@linux.dev> <ZfTepXx_lsriEg5U@linux.dev> <CABgObfaLzspX-eMOw3Mn0KgFzYJ1+FhN0d58VNQ088SoXfsvAA@mail.gmail.com> <CAHk-=whtnzTZ-9h6Su2aGDYUQJw2yyuZ04V0y_=V+=SBxkd38w@mail.gmail.com> <86cyrt16x6.wl-maz@kernel.org> <32892705-1A39-430A-9553-DBF254C723E7@redhat.com>
+Message-ID: <2A3D1FDC-CFA8-489E-AB00-FCE3FA36400C@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, qperret@google.com, vdonnefort@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 14 Mar 2024 20:25:43 +0000,
-Pierre-Cl=C3=A9ment Tosi <ptosi@google.com> wrote:
->=20
-> The compiler implements KCFI by adding type information (u32) above
-> every function that might be indirectly called and, whenever a function
-> pointer is called, injects a read-and-compare of that u32 against the
-> value corresponding to the expected type. In case of a mismatch, a BRK
-> instruction gets executed. When the hypervisor triggers such an
-> exception, it panics.
+Retrying without HTML=2E
 
-Importantly, this triggers an exception return to EL1. If you don't
-explain that, then nobody can really understand how you end-up in
-nvhe_hyp_panic_handler() the first place.
+Paolo
 
->=20
-> Therefore, teach hyp_panic() to detect KCFI errors from the ESR and
+Il 17 marzo 2024 14:34:02 CET, Paolo Bonzini <pbonzini@redhat=2Ecom> ha sc=
+ritto:
+>[first time writing to lkml from phone so I hope the formatting isn't too=
+ bad]
+>
+>Il 17 marzo 2024 11:36:37 CET, Marc Zyngier <maz@kernel=2Eorg> ha scritto=
+:
+>>On Sat, 16 Mar 2024 16:01:47 +0000,
+>>Linus Torvalds <torvalds@linux-foundation=2Eorg> wrote:
+>>> > You can also make CONFIG_KVM_ARM64_RES_BITS_PARANOIA depend on !COMP=
+ILE_TEST=2E
+>>>=20
+>>> No=2E
+>>>=20
+>>> WTF is wrong with you?
+>>>=20
+>>> You're saying "let's turn off this compile-time sanity check when
+>>> we're doing compile testing"=2E
+>>>     https://lore=2Ekernel=2Eorg/linux-next/20240222220349=2E1889c728@c=
+anb=2Eauug=2Eorg=2Eau/
+>>>=20
+>>> and you're still trying to just *HIDE* this garbage?
+>>>=20
+>>> Stop it=2E
+>>
+>>Well, if you really need to shout at someone, it should be me, as I
+>>was the one who didn't get Stephen's hint last time=2E
+>
+>No problem with being shouted at, but "depends on !COMPILE_TEST" is actua=
+lly something that *is* used for "maintainers will look at it, it shouldn't=
+ matter for linux-next compile testing"=2E Most notably it's used for -Werr=
+or=2E
+>
+>When Stephen reported the failure, I should have noticed that the bandaid=
+ doesn't do anything to fix allyesconfig/allmodconfig=2E If there's anythin=
+g I can blame you for, I thought/understood that you would be able to fix t=
+he failure between the report and the beginning of the merge window, so the=
+re's that small miscommunication but that's it=2E
+>
+>>I'll try to resurrect it as a selftest, or maybe just keep it out of
+>>tree for my own use=2E
+>
+>I still believe that "depends on !COMPILE_TEST" is what you want here, bu=
+t yeah keeping out of tree or even under a special make target is an option=
+ if Linus disagrees=2E
+>
+>Selftests have the advantage that they can be marked XFAIL, but I am not =
+sure they're a good match here (also because the flip side is that I think =
+XPASS fails the run)=2E
+>
+>Paolo
+Paolo
 
-nvhe_hyp_panic_handler() instead hyp_panic()?
-
-> report them. If necessary, remind the user that CONFIG_CFI_PERMISSIVE
-> doesn't affect EL2 KCFI.
->=20
-> Pass $(CC_FLAGS_CFI) to the compiler when building the nVHE hyp code.
->=20
-> Use SYM_TYPED_FUNC_START() for __pkvm_init_switch_pgd, as nVHE can't
-> call it directly and must use a PA function pointer from C (because it
-> is part of the idmap page), which would trigger a KCFI failure if the
-> type ID wasn't present.
->=20
-> Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
-> ---
->  arch/arm64/include/asm/esr.h       |  6 ++++++
->  arch/arm64/kvm/handle_exit.c       | 11 +++++++++++
->  arch/arm64/kvm/hyp/nvhe/Makefile   |  6 +++---
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S |  3 ++-
->  4 files changed, 22 insertions(+), 4 deletions(-)
->=20
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index b0c23e7d6595..281e352a4c94 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -397,6 +397,12 @@ static inline bool esr_is_data_abort(unsigned long e=
-sr)
->  	return ec =3D=3D ESR_ELx_EC_DABT_LOW || ec =3D=3D ESR_ELx_EC_DABT_CUR;
->  }
-> =20
-> +static inline bool esr_is_cfi_brk(unsigned long esr)
-> +{
-> +	return ESR_ELx_EC(esr) =3D=3D ESR_ELx_EC_BRK64 &&
-> +	       (esr_comment(esr) & ~CFI_BRK_IMM_MASK) =3D=3D CFI_BRK_IMM_BASE;
-> +}
-> +
-
-nit: since there is a single user, please place this helper in handle_exit.=
-c.
-
->  static inline bool esr_fsc_is_translation_fault(unsigned long esr)
->  {
->  	return (esr & ESR_ELx_FSC_TYPE) =3D=3D ESR_ELx_FSC_FAULT;
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index ffa67ac6656c..9b6574e50b13 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -383,6 +383,15 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int ex=
-ception_index)
->  		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
->  }
-> =20
-> +static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
-> +{
-> +	kvm_err("nVHE hyp CFI failure at: [<%016llx>] %pB!\n", panic_addr,
-> +		(void *)(panic_addr + kaslr_offset()));
-> +
-> +	if (IS_ENABLED(CONFIG_CFI_PERMISSIVE))
-> +		kvm_err(" (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n");
-> +}
-> +
->  void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
->  					      u64 elr_virt, u64 elr_phys,
->  					      u64 par, uintptr_t vcpu,
-> @@ -413,6 +422,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr=
-, u64 spsr,
->  		else
->  			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
->  					(void *)(panic_addr + kaslr_offset()));
-> +	} else if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr)) {
-
-It would seem logical to move the IS_ENABLED() into the ESR check helper.
-
-> +		kvm_nvhe_report_cfi_failure(panic_addr);
->  	} else {
->  		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
->  				(void *)(panic_addr + kaslr_offset()));
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/M=
-akefile
-> index 2250253a6429..2eb915d8943f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -89,9 +89,9 @@ quiet_cmd_hyprel =3D HYPREL  $@
->  quiet_cmd_hypcopy =3D HYPCOPY $@
->        cmd_hypcopy =3D $(OBJCOPY) --prefix-symbols=3D__kvm_nvhe_ $< $@
-> =20
-> -# Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
-> -# This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotati=
-ons.
-> -KBUILD_CFLAGS :=3D $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_=
-FLAGS_CFI), $(KBUILD_CFLAGS))
-> +# Remove ftrace and Shadow Call Stack CFLAGS.
-> +# This is equivalent to the 'notrace' and '__noscs' annotations.
-> +KBUILD_CFLAGS :=3D $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KB=
-UILD_CFLAGS))
->  # Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-prof=
-ile'
->  # when profile optimization is applied. gen-hyprel does not support SHT_=
-REL and
->  # causes a build failure. Remove profile optimization flags.
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe=
-/hyp-init.S
-> index 8958dd761837..ade73fdfaad9 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> @@ -5,6 +5,7 @@
->   */
-> =20
->  #include <linux/arm-smccc.h>
-> +#include <linux/cfi_types.h>
->  #include <linux/linkage.h>
-> =20
->  #include <asm/alternative.h>
-> @@ -265,7 +266,7 @@ alternative_else_nop_endif
-> =20
->  SYM_CODE_END(__kvm_handle_stub_hvc)
-> =20
-> -SYM_FUNC_START(__pkvm_init_switch_pgd)
-> +SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
-
-Please put a comment indicating why SYM_TYPED_FUNC_START() is
-necessary, because this will otherwise bitrot very quickly.
-
->  	/* Load the inputs from the VA pointer before turning the MMU off */
->  	ldr	x5, [x0, #NVHE_INIT_PGD_PA]
->  	ldr	x0, [x0, #NVHE_INIT_STACK_HYP_VA]
->=20
-
-Another question is how do we test that this still works down the
-line? In my experience, these features eventually bitrot because they
-have very little functional impact (just like the panic handler broke
-the ELR_EL2 handling). We really should have a way to exercise such
-failure path.
-
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
 
