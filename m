@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-11964-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11965-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74EB87DD14
-	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 12:42:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 196F287DD2B
+	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 13:26:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D162C1C2096B
-	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 11:42:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95C951F2131F
+	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 12:26:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A1B1BC31;
-	Sun, 17 Mar 2024 11:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B771BC30;
+	Sun, 17 Mar 2024 12:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqbwkovl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hj7oKJDa"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F861B947;
-	Sun, 17 Mar 2024 11:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50BE1B7E4;
+	Sun, 17 Mar 2024 12:26:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710675769; cv=none; b=tUjrUGR8b9x9NraWwj48DQEKx9z6x57p5k4p4YPnCGBcY3Y4vNElXStZSJlQJqBQuIa/qSak/FsWDYoxhkH8+xVL6FqG4bZmX9jZydVs9UXVVufkzp6xP2txlXhe+vXvvd5L4MG7eU+TMSruMN1dfpqqu57QAHuXUogaoS8e5GA=
+	t=1710678386; cv=none; b=A+Uu82QDOsUlDskZ+XCYtbTyZ4+5uTm7BzNMwjXs7wFVqADl2CxHqDdlEQUtrrrDg0aR0jTfvunMoSniAeOLyfRndTx2Vzykt94dNxROuFG3B8M/UDJEDsTWz5qZoIb1YmvlHuWlEahk8G6xqBly4nWMxGocQ36/0OfI4UHBPaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710675769; c=relaxed/simple;
-	bh=yIs6FmWfE+g2CBU9z0E91nMt7P9sDGyQXWi8VWIJaV4=;
+	s=arc-20240116; t=1710678386; c=relaxed/simple;
+	bh=iYxTMqDgxfAqrpKM39EoXettOKZYey71bShInFhDSTk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fKmP5fTe/z3jPpz0n8FgNvEAQ4iMc4lr+glso4Hx0TU1o6NWWh69PQ3c4JkLXV5LvHc/jPIP1k/aqGEdh/YK2fp9jxPTobhazQDHn8E/Kx5uLICL7+mwHgbEzDkJLluhzzyYKEOhz3IjWn2AKDIrrzrCw99r8dYD4k4XnWDXmpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqbwkovl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25E9C433F1;
-	Sun, 17 Mar 2024 11:42:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=oGYzC50/wzXqZYrZivsXpZGah4WCitz9TRRdkaZfgBfB82+QW+imLyP82kbxGgSkszQlyWGzWzQpriOTFsuj6Bs52lwxOeiXxWQnwTi4A4crKuk8kwUh0sAoflCFM2VQ10qlPuYQmUocDOotnrxVo9uzlcDnD/6ji2Oh9oOcg0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hj7oKJDa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C889C433F1;
+	Sun, 17 Mar 2024 12:26:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710675768;
-	bh=yIs6FmWfE+g2CBU9z0E91nMt7P9sDGyQXWi8VWIJaV4=;
+	s=k20201202; t=1710678385;
+	bh=iYxTMqDgxfAqrpKM39EoXettOKZYey71bShInFhDSTk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hqbwkovlvfUoXlY5ydcjEvUyjUsyhjG29LkaktzOCa5mdJsmPTJOdiRAcxGrXOPoN
-	 Fo8lOmhBOanUnDA6D4IvYcURviaTQpTT9afwL1ZSLgX+wbKRj/1/uutdjprNW5aZLn
-	 Oo9rA53m5P2vXKSr2TVNtBE0r1GIw3It+f2Sl6Hc0z+AS3bDAFeBWffWAyHzqKj20g
-	 hb101omTBtdaUhaENDy6Ci7TwgbmtNrHdjCW9zJbLL3pqv35DWpQEHPnlWoFk2+SKZ
-	 /HYfENlc7nY+DjMtYc+hIwm94Q+QwlN0f2dPnBX7AOk2n8pD17EZMB04WZb5y4Dgqd
-	 yRJWWyIpEy3QA==
+	b=Hj7oKJDa6uvMGqLUWJJEr92TqIWE1Nolf84xYqoALjfpEXHvFzZh4PmeE5KKUWbF9
+	 IG8GULM/fNK7z//SG3PIR6xUT0PF4Eku0xao/q5XeIGnX6AJIQSHVzx88BjBjzMx7Z
+	 PLyTj5pkc2uH8AlqmTBJzApk9DgXHXjRMpNhUV9XzdbmnyGVVpuTJPerjeRy1ERW/0
+	 EDz+189kO2gR6R+cfdtF/+jdwgxz8PlefQZJjCxWqIn7doGg0wBjbI/cSRTipQqV/w
+	 Mal+kgdvMRo5Nk0ImnorLQR3obfj6xEyPCbYhFw2iSmVqPqqbr9Vo623edB9E56GBE
+	 kda1cKMNh1IZg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rlouc-00D1X5-H0;
-	Sun, 17 Mar 2024 11:42:46 +0000
-Date: Sun, 17 Mar 2024 11:42:44 +0000
-Message-ID: <86bk7d13uz.wl-maz@kernel.org>
+	id 1rlpap-00D1nT-63;
+	Sun, 17 Mar 2024 12:26:23 +0000
+Date: Sun, 17 Mar 2024 12:26:22 +0000
+Message-ID: <86a5mx11u9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: =?UTF-8?B?UGllcnJlLUNsw6ltZW50?= Tosi <ptosi@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -57,11 +57,12 @@ Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 05/10] KVM: arm64: nVHE: Add EL2 sync exception handler
-In-Reply-To: <cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Andrew Scull <ascull@google.com>
+Subject: Re: [PATCH 01/10] KVM: arm64: Fix clobbered ELR in sync abort
+In-Reply-To: <0dfcc4c5c898941147723ba530c81ddc8399ef55.1710446682.git.ptosi@google.com>
 References: <cover.1710446682.git.ptosi@google.com>
-	<cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
+	<0dfcc4c5c898941147723ba530c81ddc8399ef55.1710446682.git.ptosi@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,67 +75,132 @@ MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ascull@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 14 Mar 2024 20:24:31 +0000,
+On Thu, 14 Mar 2024 20:23:22 +0000,
 Pierre-Cl=C3=A9ment Tosi <ptosi@google.com> wrote:
 >=20
-> Introduce handlers for EL2{t,h} synchronous exceptions distinct from
-> handlers for other "invalid" exceptions when running with the nVHE host
-> vector. This will allow a future patch to handle CFI (synchronous)
-> errors without affecting other classes of exceptions.
->=20
-> Remove superfluous SP overflow check from the non-synchronous
-> handlers.
+> When the hypervisor receives a SError or synchronous exception (EL2h)
 
-Why are they superfluous? Because we are panic'ing? Detecting a stack
-overflow is pretty valuable in any circumstances.
+nit: since this also affects SError, $subject seems wrong.
 
+> while running with the __kvm_hyp_vector and if ELR_EL2 doesn't point to
+> an extable entry, it panics indirectly by overwriting ELR with the
+> address of a panic handler in order for the asm routine it returns to to
+> ERET into the handler. This is done (instead of a simple function call)
+> to ensure that the panic handler runs with the SPSel that was in use
+> when the exception was triggered, necessary to support features such as
+> the shadow call stack.
+
+I don't understand this. Who changes SPsel? At any given point, SP_EL0
+is that of either the host or the guest, but never the hypervisor's.
+If something was touching SP_EL0 behind our back, it would result in
+corruption (see 6e977984f6d8 for a bit of rationale about it).
+
+>
+> However, this clobbers ELR_EL2 for the handler itself. As a result,
+> hyp_panic(), when retrieving what it believes to be the PC where the
+> exception happened, actually ends up reading the address of the panic
+> handler that called it! This results in an erroneous and confusing panic
+> message where the source of any synchronous exception (e.g. BUG() or
+> kCFI) appears to be __guest_exit_panic, making it hard to locate the
+> actual BRK instruction.
 >=20
+> Therefore, store the original ELR_EL2 in a per-CPU struct and point the
+
+Can you elaborate on *which* per-CPU structure you are using?
+
+> sysreg to a routine that first restores it to its previous value before
+> running __guest_exit_panic.
+>=20
+> Fixes: 7db21530479f ("KVM: arm64: Restore hyp when panicking in guest con=
+text")
 > Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/host.S | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+>  arch/arm64/kernel/asm-offsets.c         | 1 +
+>  arch/arm64/kvm/hyp/entry.S              | 9 +++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ++++--
+>  3 files changed, 14 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/hos=
-t.S
-> index 27c989c4976d..1b9111c2b480 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -183,7 +183,7 @@ SYM_FUNC_END(__host_hvc)
->  .endif
->  .endm
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offs=
+ets.c
+> index 5a7dbbe0ce63..e62353168a57 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -128,6 +128,7 @@ int main(void)
+>    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1)=
+);
+>    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
+>    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
+> +  DEFINE(CPU_ELR_EL2,		offsetof(struct kvm_cpu_context, sys_regs[ELR_EL2=
+]));
+>    DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[RGSR_E=
+L1]));
+>    DEFINE(CPU_GCR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[GCR_EL1=
+]));
+>    DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[AP=
+IAKEYLO_EL1]));
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index f3aa7738b477..9cdf46da3051 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -83,6 +83,15 @@ alternative_else_nop_endif
+>  	eret
+>  	sb
 > =20
-> -.macro invalid_host_el2_vect
-> +.macro host_el2_sync_vect
->  	.align 7
-> =20
->  	/*
-> @@ -221,6 +221,11 @@ SYM_FUNC_END(__host_hvc)
->  	b	__hyp_do_panic
->  .endm
-> =20
-> +.macro invalid_host_el2_vect
-> +	.align 7
-> +	b	__hyp_panic
-> +.endm
-> +
->  /*
->   * The host vector does not use an ESB instruction in order to avoid con=
-suming
->   * SErrors that should only be consumed by the host. Guest entry is defe=
-rred by
-> @@ -233,12 +238,12 @@ SYM_FUNC_END(__host_hvc)
->   */
->  	.align 11
->  SYM_CODE_START(__kvm_hyp_host_vector)
-> -	invalid_host_el2_vect			// Synchronous EL2t
-> +	host_el2_sync_vect			// Synchronous EL2t
+> +SYM_INNER_LABEL(__guest_exit_panic_with_restored_elr, SYM_L_GLOBAL)
 
-The real question is: under which circumstances would running with
-SP_EL0 be valid? I cannot see good reason for it.
+The name of the function isn't great. Crucially, 'with_restored_elr'
+implies that ELR is already restored, while it is the hunk below that
+does the 'restore' part.
+
+Something like '__guest_exit_restore_elr_and_panic' seems more
+appropriate.
+
+> +	// x0-x29,lr: hyp regs
+> +
+> +	stp	x0, x1, [sp, #-16]!
+> +	adr_this_cpu x0, kvm_hyp_ctxt, x1
+> +	ldr	x0, [x0, #CPU_ELR_EL2]
+> +	msr	elr_el2, x0
+> +	ldp	x0, x1, [sp], #16
+> +
+>  SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
+>  	// x2-x29,lr: vcpu regs
+>  	// vcpu x0-x1 on the stack
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp=
+/include/hyp/switch.h
+> index a038320cdb08..6a8dc8d3c193 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -747,7 +747,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *=
+vcpu, u64 *exit_code)
+> =20
+>  static inline void __kvm_unexpected_el2_exception(void)
+>  {
+> -	extern char __guest_exit_panic[];
+> +	extern char __guest_exit_panic_with_restored_elr[];
+>  	unsigned long addr, fixup;
+>  	struct kvm_exception_table_entry *entry, *end;
+>  	unsigned long elr_el2 =3D read_sysreg(elr_el2);
+> @@ -769,7 +769,9 @@ static inline void __kvm_unexpected_el2_exception(voi=
+d)
+>  	}
+> =20
+>  	/* Trigger a panic after restoring the hyp context. */
+> -	write_sysreg(__guest_exit_panic, elr_el2);
+> +	write_sysreg(__guest_exit_panic_with_restored_elr, elr_el2);
+> +
+> +	this_cpu_ptr(&kvm_hyp_ctxt)->sys_regs[ELR_EL2] =3D elr_el2;
+
+nit: placing the saving of ELR_EL2 before overriding the sysreg makes
+the whole thing a bit more readable, specially given the poor choice
+of 'elr_el2' as a variable (visually clashing with 'elr_el2' as a
+system register).
+
+Thanks,
 
 	M.
 
