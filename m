@@ -1,71 +1,67 @@
-Return-Path: <kvm+bounces-11963-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11964-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29BE587DCF7
-	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 11:36:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D74EB87DD14
+	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 12:42:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FF12B20EC0
-	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 10:36:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D162C1C2096B
+	for <lists+kvm@lfdr.de>; Sun, 17 Mar 2024 11:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8530E18E1E;
-	Sun, 17 Mar 2024 10:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A1B1BC31;
+	Sun, 17 Mar 2024 11:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UsNy7Pkj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqbwkovl"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937CCFC18;
-	Sun, 17 Mar 2024 10:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F861B947;
+	Sun, 17 Mar 2024 11:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710671802; cv=none; b=fj3QZSW107FYRltD5sFbVVB3yO+Hjk4bALRPlIDC8X/uKsYrKnPrJetUE2Djd7NvNE55u/FAGXSERui+Ysskz2fNcfDlqZIAWFCPs3dlpSmlmbIgvVNNoAIcf16fwCM3vLzEsWm378U+Bt4Z86m6nmUybjJzqwwwtpOBOsFNZB8=
+	t=1710675769; cv=none; b=tUjrUGR8b9x9NraWwj48DQEKx9z6x57p5k4p4YPnCGBcY3Y4vNElXStZSJlQJqBQuIa/qSak/FsWDYoxhkH8+xVL6FqG4bZmX9jZydVs9UXVVufkzp6xP2txlXhe+vXvvd5L4MG7eU+TMSruMN1dfpqqu57QAHuXUogaoS8e5GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710671802; c=relaxed/simple;
-	bh=NI86XXagyQJJYxe8I5WN4nL+kWt5gz7HTxGeqDnOfHY=;
+	s=arc-20240116; t=1710675769; c=relaxed/simple;
+	bh=yIs6FmWfE+g2CBU9z0E91nMt7P9sDGyQXWi8VWIJaV4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dHbvJNWBiCLJBDSvl4/H+No7Dd706FJn2r2rmyRNRE3umL9Wq4qOFWpyopskiBanBnEQc2EROT7QuN5u6R9g0U9VeSexg9hEOoOgywbTMgJnvNtprpBYLFROZT8q3H7oemKh/CIZExhvC4ZMFAkWU/5M3Si+eMvlvgD7nhKXFqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UsNy7Pkj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 038C7C433C7;
-	Sun, 17 Mar 2024 10:36:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fKmP5fTe/z3jPpz0n8FgNvEAQ4iMc4lr+glso4Hx0TU1o6NWWh69PQ3c4JkLXV5LvHc/jPIP1k/aqGEdh/YK2fp9jxPTobhazQDHn8E/Kx5uLICL7+mwHgbEzDkJLluhzzyYKEOhz3IjWn2AKDIrrzrCw99r8dYD4k4XnWDXmpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqbwkovl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25E9C433F1;
+	Sun, 17 Mar 2024 11:42:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710671802;
-	bh=NI86XXagyQJJYxe8I5WN4nL+kWt5gz7HTxGeqDnOfHY=;
+	s=k20201202; t=1710675768;
+	bh=yIs6FmWfE+g2CBU9z0E91nMt7P9sDGyQXWi8VWIJaV4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UsNy7PkjMYVd/YBXPBTh6WonjDQt8OhOKvutAkNdHYRDUnEWW5GaW6coAF0Ye2tzi
-	 +sbpF8Y15RJGBA5+aWMJEFSA28Lh7+68FplcOxFktwR50LRr4VkzMXK9RzPmCArl8L
-	 FIsj/E0FUm/qN4hH/N0e/GBFWHqHh0zGis7RBYMbDaAzgj8cSWRyT2n+GBArkGja5i
-	 BsqlKaUcyjIA7uwxjmI3G4xC1tYu4+xfrYjUnmbkSuQKT6TuUxct1Edix/2jHzYh36
-	 Ayu94nX+TD4BcL11UdHRdzqxphX25zs7YDDbMH4gElD3xh6dWBTNKLLHA8HNuBehSb
-	 3LfcnRTMTcRkA==
+	b=hqbwkovlvfUoXlY5ydcjEvUyjUsyhjG29LkaktzOCa5mdJsmPTJOdiRAcxGrXOPoN
+	 Fo8lOmhBOanUnDA6D4IvYcURviaTQpTT9afwL1ZSLgX+wbKRj/1/uutdjprNW5aZLn
+	 Oo9rA53m5P2vXKSr2TVNtBE0r1GIw3It+f2Sl6Hc0z+AS3bDAFeBWffWAyHzqKj20g
+	 hb101omTBtdaUhaENDy6Ci7TwgbmtNrHdjCW9zJbLL3pqv35DWpQEHPnlWoFk2+SKZ
+	 /HYfENlc7nY+DjMtYc+hIwm94Q+QwlN0f2dPnBX7AOk2n8pD17EZMB04WZb5y4Dgqd
+	 yRJWWyIpEy3QA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rlnsd-00D181-8o;
-	Sun, 17 Mar 2024 10:36:39 +0000
-Date: Sun, 17 Mar 2024 10:36:37 +0000
-Message-ID: <86cyrt16x6.wl-maz@kernel.org>
+	id 1rlouc-00D1X5-H0;
+	Sun, 17 Mar 2024 11:42:46 +0000
+Date: Sun, 17 Mar 2024 11:42:44 +0000
+Message-ID: <86bk7d13uz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+To: =?UTF-8?B?UGllcnJlLUNsw6ltZW50?= Tosi <ptosi@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM changes for Linux 6.9 merge window
-In-Reply-To: <CAHk-=whtnzTZ-9h6Su2aGDYUQJw2yyuZ04V0y_=V+=SBxkd38w@mail.gmail.com>
-References: <20240315174939.2530483-1-pbonzini@redhat.com>
-	<CAHk-=whCvkhc8BbFOUf1ddOsgSGgEjwoKv77=HEY1UiVCydGqw@mail.gmail.com>
-	<ZfTadCKIL7Ujxw3f@linux.dev>
-	<ZfTepXx_lsriEg5U@linux.dev>
-	<CABgObfaLzspX-eMOw3Mn0KgFzYJ1+FhN0d58VNQ088SoXfsvAA@mail.gmail.com>
-	<CAHk-=whtnzTZ-9h6Su2aGDYUQJw2yyuZ04V0y_=V+=SBxkd38w@mail.gmail.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 05/10] KVM: arm64: nVHE: Add EL2 sync exception handler
+In-Reply-To: <cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
+References: <cover.1710446682.git.ptosi@google.com>
+	<cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -75,50 +71,73 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: torvalds@linux-foundation.org, pbonzini@redhat.com, oliver.upton@linux.dev, catalin.marinas@arm.com, mark.rutland@arm.com, will@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 16 Mar 2024 16:01:47 +0000,
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
-> 
-> On Sat, 16 Mar 2024 at 01:48, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > Linus, were you compiling with allyesconfig so that you got
-> > CONFIG_KVM_ARM64_RES_BITS_PARANOIA on?
-> 
-> Regular allmodconfig.
-> 
-> > You can also make CONFIG_KVM_ARM64_RES_BITS_PARANOIA depend on !COMPILE_TEST.
-> 
-> No.
-> 
-> WTF is wrong with you?
-> 
-> You're saying "let's turn off this compile-time sanity check when
-> we're doing compile testing".
-> 
-> That's insane.
-> 
-> The sanity check was WRONG. People hadn't tested it. Stephen points
-> out that it was reported to you almost a month ago in
-> 
->     https://lore.kernel.org/linux-next/20240222220349.1889c728@canb.auug.org.au/
-> 
-> and you're still trying to just *HIDE* this garbage?
-> 
-> Stop it.
+On Thu, 14 Mar 2024 20:24:31 +0000,
+Pierre-Cl=C3=A9ment Tosi <ptosi@google.com> wrote:
+>=20
+> Introduce handlers for EL2{t,h} synchronous exceptions distinct from
+> handlers for other "invalid" exceptions when running with the nVHE host
+> vector. This will allow a future patch to handle CFI (synchronous)
+> errors without affecting other classes of exceptions.
+>=20
+> Remove superfluous SP overflow check from the non-synchronous
+> handlers.
 
-Well, if you really need to shout at someone, it should be me, as I
-was the one who didn't get Stephen's hint last time.
+Why are they superfluous? Because we are panic'ing? Detecting a stack
+overflow is pretty valuable in any circumstances.
 
-I'll try to resurrect it as a selftest, or maybe just keep it out of
-tree for my own use.
+>=20
+> Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/host.S | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/hos=
+t.S
+> index 27c989c4976d..1b9111c2b480 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -183,7 +183,7 @@ SYM_FUNC_END(__host_hvc)
+>  .endif
+>  .endm
+> =20
+> -.macro invalid_host_el2_vect
+> +.macro host_el2_sync_vect
+>  	.align 7
+> =20
+>  	/*
+> @@ -221,6 +221,11 @@ SYM_FUNC_END(__host_hvc)
+>  	b	__hyp_do_panic
+>  .endm
+> =20
+> +.macro invalid_host_el2_vect
+> +	.align 7
+> +	b	__hyp_panic
+> +.endm
+> +
+>  /*
+>   * The host vector does not use an ESB instruction in order to avoid con=
+suming
+>   * SErrors that should only be consumed by the host. Guest entry is defe=
+rred by
+> @@ -233,12 +238,12 @@ SYM_FUNC_END(__host_hvc)
+>   */
+>  	.align 11
+>  SYM_CODE_START(__kvm_hyp_host_vector)
+> -	invalid_host_el2_vect			// Synchronous EL2t
+> +	host_el2_sync_vect			// Synchronous EL2t
+
+The real question is: under which circumstances would running with
+SP_EL0 be valid? I cannot see good reason for it.
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
 
