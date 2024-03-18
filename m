@@ -1,264 +1,131 @@
-Return-Path: <kvm+bounces-12058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12062-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A1E087F419
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 00:36:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD52D87F42D
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 00:40:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08B59B22655
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 23:36:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DFD5B21A67
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 23:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BB560892;
-	Mon, 18 Mar 2024 23:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52125FB95;
+	Mon, 18 Mar 2024 23:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MhE1axWB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g+757ZKW"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B16D5FDD9
-	for <kvm@vger.kernel.org>; Mon, 18 Mar 2024 23:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE84E5FB81;
+	Mon, 18 Mar 2024 23:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710804845; cv=none; b=niKxpp8MKa9GukCJ/tAvcoQd6CGCAFjzlbPe12Jfyp7RqefX2KM1ZjAAAZl4sSd5L/jfueOdM4DZDAFR+iwPYQwc35mT3tUhES8UZuJdG74kLgn4eBUny5Y3F23B3+w07HtvpNUvqStIjQmbg+v0KVyWDOQSEjhpUzbDgxul6yE=
+	t=1710805214; cv=none; b=s0fUsFNRItF3WQ6RaLgaRrnAbUCjq8d0Y7ZDxqcitf2eqFMcrP1Nahwx+bsxqBQhOHTEgEr8fym3EsYDyyq6BnqtvElXipJJ7Ict6QOG9YQejJ2Sh/VGcfUI4WWIdfODOET+IGv3KltOVIJr51aje/Hu8stxn+8iqKxbU26h7L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710804845; c=relaxed/simple;
-	bh=lakjRFiT0lukCeh4K8Zyx/dJyjijrWfc33Dy/9fz4vk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LujxAYb5HiopNBe7wHLpWRO+CT/pJZsqCw9aNLe4omaJ6z1zXa6BTgMz/QLc7ferz2xmv9N1oE687nsl03EI7TIFIm81K/qbHdN8XkcxPruoY+FSPnIxy/QDowRTUH6PaKEhGDXY7fIjPi++PF3WD+La/1iqigH5XlM6+84jDO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MhE1axWB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710804842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LWH7Nu0YKW5hB7jovCCv/rZBiO+jaGasY/9lZsB9/tE=;
-	b=MhE1axWB+QifDCk3odbQImiWTnnE/GuNz7XwkR0PkdHBzNwymwzEbgKQHzyhmD5v98WZz9
-	jxy0LRvJ0zHTOJu7M2kXyulsya8fLffiN9LuqhZUXBdPAaL4/vTkvq5JHaTJMjtS/5R64c
-	sITEEizSr9rYSIjiksVHasHwGJGUskI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-132-oakasOPePISJMiayNMVSAQ-1; Mon, 18 Mar 2024 19:33:58 -0400
-X-MC-Unique: oakasOPePISJMiayNMVSAQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8F5E1869D20;
-	Mon, 18 Mar 2024 23:33:57 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B80031C060D9;
-	Mon, 18 Mar 2024 23:33:56 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: michael.roth@amd.com,
-	isaku.yamahata@intel.com,
-	seanjc@google.com
-Subject: [PATCH v4 15/15] selftests: kvm: switch to using KVM_X86_*_VM
-Date: Mon, 18 Mar 2024 19:33:52 -0400
-Message-ID: <20240318233352.2728327-16-pbonzini@redhat.com>
-In-Reply-To: <20240318233352.2728327-1-pbonzini@redhat.com>
-References: <20240318233352.2728327-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1710805214; c=relaxed/simple;
+	bh=oyx2Bz+RIgrwhRz3BjJO59HfmzWRjuo3TkptYTef3tM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HILsfOtF/9SH5F94S7Mu+LXFxRz8dyjiQkeBtgfMqDl9pM1fZo84MOSG7XcsIsBQHGg435c4mSyIzK+WCN1gMZBBdeZk+HVf+Q3+2UWjAy4kbEZqZQK6wC9pIOLZPD2UCTSXOByObyUhwm6+nAnVAuprb4Q5v1LQn1hSjK5EmDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g+757ZKW; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710805212; x=1742341212;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=oyx2Bz+RIgrwhRz3BjJO59HfmzWRjuo3TkptYTef3tM=;
+  b=g+757ZKWW3lPOEh1an26YkdfpIhDsEm0d/jHfHG2QUFZ86kCWiqHIqiR
+   be0f1u9LdovmjxtgmS9jbk6kHAxEZ0pVlEU3W2roYjhLw/gdJ4HkoB+WF
+   qlLBSKP/PkzL8NToaoRN6OIdsFItE0kFhv1P0TjQbFjtze0HvCO0GreF3
+   EELMD0tGKa5u9RkPhoaILdWxrYF1HB1Ro3MVgHdHdmoUFhYzv+J6gj22U
+   V1NKPOwCaiQ+6MT2BmYrSKl1CusuWFdITZxZRjC8Y0vd5XVCZc65598Yu
+   ghA6BV7NTgDNv/sTyisesItSZsmoupR87UMvEN/+pLJJJwWSs0QPVVzK8
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11017"; a="5516812"
+X-IronPort-AV: E=Sophos;i="6.07,135,1708416000"; 
+   d="scan'208";a="5516812"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2024 16:40:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,135,1708416000"; 
+   d="scan'208";a="18243367"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2024 16:40:11 -0700
+Date: Mon, 18 Mar 2024 16:40:10 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Yuan, Hang" <hang.yuan@intel.com>,
+	"Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 078/130] KVM: TDX: Implement TDX vcpu enter/exit path
+Message-ID: <20240318234010.GD1645738@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <dbaa6b1a6c4ebb1400be5f7099b4b9e3b54431bb.1708933498.git.isaku.yamahata@intel.com>
+ <7a24c01a03f68a87b0bbfa82a5d6ccbf3cbd6f4b.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+In-Reply-To: <7a24c01a03f68a87b0bbfa82a5d6ccbf3cbd6f4b.camel@intel.com>
 
-This removes the concept of "subtypes", instead letting the tests use proper
-VM types that were recently added.  While the sev_init_vm() and sev_es_init_vm()
-are still able to operate with the legacy KVM_SEV_INIT and KVM_SEV_ES_INIT
-ioctls, this is limited to VMs that are created manually with
-vm_create_barebones().
+On Mon, Mar 18, 2024 at 09:01:05PM +0000,
+"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .../selftests/kvm/include/kvm_util_base.h     |  5 ++--
- .../selftests/kvm/include/x86_64/processor.h  |  6 ----
- .../selftests/kvm/include/x86_64/sev.h        | 16 ++--------
- tools/testing/selftests/kvm/lib/kvm_util.c    |  1 -
- .../selftests/kvm/lib/x86_64/processor.c      | 14 +++++----
- tools/testing/selftests/kvm/lib/x86_64/sev.c  | 30 +++++++++++++++++--
- 6 files changed, 40 insertions(+), 32 deletions(-)
+> On Mon, 2024-02-26 at 00:26 -0800, isaku.yamahata@intel.com wrote:
+> > +fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+> > +{
+> > +       struct vcpu_tdx *tdx = to_tdx(vcpu);
+> > +
+> > +       if (unlikely(!tdx->initialized))
+> > +               return -EINVAL;
+> > +       if (unlikely(vcpu->kvm->vm_bugged)) {
+> > +               tdx->exit_reason.full = TDX_NON_RECOVERABLE_VCPU;
+> > +               return EXIT_FASTPATH_NONE;
+> > +       }
+> > +
+> 
+> Isaku, can you elaborate on why this needs special handling? There is a
+> check in vcpu_enter_guest() like:
+> 	if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
+> 		r = -EIO;
+> 		goto out;
+> 	}
+> 
+> Instead it returns a SEAM error code for something actuated by KVM. But
+> can it even be reached because of the other check? Not sure if there is
+> a problem, just sticks out to me and wondering whats going on.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 7c06ceb36643..8acca8237687 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -93,7 +93,6 @@ enum kvm_mem_region_type {
- struct kvm_vm {
- 	int mode;
- 	unsigned long type;
--	uint8_t subtype;
- 	int kvm_fd;
- 	int fd;
- 	unsigned int pgtable_levels;
-@@ -200,8 +199,8 @@ enum vm_guest_mode {
- struct vm_shape {
- 	uint32_t type;
- 	uint8_t  mode;
--	uint8_t  subtype;
--	uint16_t padding;
-+	uint8_t  pad0;
-+	uint16_t pad1;
- };
- 
- kvm_static_assert(sizeof(struct vm_shape) == sizeof(uint64_t));
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 3bd03b088dda..3c8dfd8180b1 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -23,12 +23,6 @@
- extern bool host_cpu_is_intel;
- extern bool host_cpu_is_amd;
- 
--enum vm_guest_x86_subtype {
--	VM_SUBTYPE_NONE = 0,
--	VM_SUBTYPE_SEV,
--	VM_SUBTYPE_SEV_ES,
--};
--
- /* Forced emulation prefix, used to invoke the emulator unconditionally. */
- #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
- 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
-index 8a1bf88474c9..0719f083351a 100644
---- a/tools/testing/selftests/kvm/include/x86_64/sev.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
-@@ -67,20 +67,8 @@ kvm_static_assert(SEV_RET_SUCCESS == 0);
- 	__TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd,	ret, vm);		\
- })
- 
--static inline void sev_vm_init(struct kvm_vm *vm)
--{
--	vm->arch.sev_fd = open_sev_dev_path_or_exit();
--
--	vm_sev_ioctl(vm, KVM_SEV_INIT, NULL);
--}
--
--
--static inline void sev_es_vm_init(struct kvm_vm *vm)
--{
--	vm->arch.sev_fd = open_sev_dev_path_or_exit();
--
--	vm_sev_ioctl(vm, KVM_SEV_ES_INIT, NULL);
--}
-+void sev_vm_init(struct kvm_vm *vm);
-+void sev_es_vm_init(struct kvm_vm *vm);
- 
- static inline void sev_register_encrypted_memory(struct kvm_vm *vm,
- 						 struct userspace_mem_region *region)
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index b2262b5fad9e..9da388100f3a 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -276,7 +276,6 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
- 
- 	vm->mode = shape.mode;
- 	vm->type = shape.type;
--	vm->subtype = shape.subtype;
- 
- 	vm->pa_bits = vm_guest_mode_params[vm->mode].pa_bits;
- 	vm->va_bits = vm_guest_mode_params[vm->mode].va_bits;
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 74a4c736c9ae..9f87ca8b7ab6 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -578,10 +578,11 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm)
- 	sync_global_to_guest(vm, host_cpu_is_intel);
- 	sync_global_to_guest(vm, host_cpu_is_amd);
- 
--	if (vm->subtype == VM_SUBTYPE_SEV)
--		sev_vm_init(vm);
--	else if (vm->subtype == VM_SUBTYPE_SEV_ES)
--		sev_es_vm_init(vm);
-+	if (vm->type == KVM_X86_SEV_VM || vm->type == KVM_X86_SEV_ES_VM) {
-+		struct kvm_sev_init init = { 0 };
-+
-+		vm_sev_ioctl(vm, KVM_SEV_INIT2, &init);
-+	}
- }
- 
- void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
-@@ -1081,9 +1082,12 @@ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
- 
- void kvm_init_vm_address_properties(struct kvm_vm *vm)
- {
--	if (vm->subtype == VM_SUBTYPE_SEV || vm->subtype == VM_SUBTYPE_SEV_ES) {
-+	if (vm->type == KVM_X86_SEV_VM || vm->type == KVM_X86_SEV_ES_VM) {
-+		vm->arch.sev_fd = open_sev_dev_path_or_exit();
- 		vm->arch.c_bit = BIT_ULL(this_cpu_property(X86_PROPERTY_SEV_C_BIT));
- 		vm->gpa_tag_mask = vm->arch.c_bit;
-+	} else {
-+		vm->arch.sev_fd = -1;
- 	}
- }
- 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-index e248d3364b9c..597994fa4f41 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-@@ -35,6 +35,32 @@ static void encrypt_region(struct kvm_vm *vm, struct userspace_mem_region *regio
- 	}
- }
- 
-+void sev_vm_init(struct kvm_vm *vm)
-+{
-+	if (vm->type == KVM_X86_DEFAULT_VM) {
-+		assert(vm->arch.sev_fd == -1);
-+		vm->arch.sev_fd = open_sev_dev_path_or_exit();
-+		vm_sev_ioctl(vm, KVM_SEV_INIT, NULL);
-+	} else {
-+		struct kvm_sev_init init = { 0 };
-+		assert(vm->type == KVM_X86_SEV_VM);
-+		vm_sev_ioctl(vm, KVM_SEV_INIT2, &init);
-+	}
-+}
-+
-+void sev_es_vm_init(struct kvm_vm *vm)
-+{
-+	if (vm->type == KVM_X86_DEFAULT_VM) {
-+		assert(vm->arch.sev_fd == -1);
-+		vm->arch.sev_fd = open_sev_dev_path_or_exit();
-+		vm_sev_ioctl(vm, KVM_SEV_ES_INIT, NULL);
-+	} else {
-+		struct kvm_sev_init init = { 0 };
-+		assert(vm->type == KVM_X86_SEV_ES_VM);
-+		vm_sev_ioctl(vm, KVM_SEV_INIT2, &init);
-+	}
-+}
-+
- void sev_vm_launch(struct kvm_vm *vm, uint32_t policy)
- {
- 	struct kvm_sev_launch_start launch_start = {
-@@ -91,10 +117,8 @@ struct kvm_vm *vm_sev_create_with_one_vcpu(uint32_t policy, void *guest_code,
- 					   struct kvm_vcpu **cpu)
- {
- 	struct vm_shape shape = {
--		.type = VM_TYPE_DEFAULT,
- 		.mode = VM_MODE_DEFAULT,
--		.subtype = policy & SEV_POLICY_ES ? VM_SUBTYPE_SEV_ES :
--						    VM_SUBTYPE_SEV,
-+		.type = policy & SEV_POLICY_ES ? KVM_X86_SEV_ES_VM : KVM_X86_SEV_VM,
- 	};
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *cpus[1];
--- 
-2.43.0
+The original intention is to get out the inner loop.  As Sean pointed it out,
+the current code does poor job to check error of
+__seamcall_saved_ret(TDH_VP_ENTER).  So it fails to call KVM_BUG_ON() when it
+returns unexcepted error.
 
+The right fix is to properly check an error from TDH_VP_ENTER and call
+KVM_BUG_ON().  Then the check you pointed out should go away.
+
+  for // out loop
+     if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
+         for // inner loop
+           vcpu_run()
+           kvm_vcpu_exit_request(vcpu).
 
 -- 
-2.43.0
-
+Isaku Yamahata <isaku.yamahata@intel.com>
 
