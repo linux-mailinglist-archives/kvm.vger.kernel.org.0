@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-12014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A02387EF85
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 19:15:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C47DD87EF93
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 19:17:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA0AA1C2177F
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 18:15:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3673F1F21CB1
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 18:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C461D55E7A;
-	Mon, 18 Mar 2024 18:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DB25646A;
+	Mon, 18 Mar 2024 18:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UO5GwSuC"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Pa23ESt8"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAAF5579D;
-	Mon, 18 Mar 2024 18:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9801356455;
+	Mon, 18 Mar 2024 18:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710785744; cv=none; b=kBirhhfr5E5QrfhT4AULpH+kga8+OUlQupXMiKY+bZKH00a2A7Xk3QmKj2WNYCAHmVJGn6qrnyXtddNQUcWYM4bBIF7lMN+odn2ZIPcgG6goKKb/lIFjfmsQK4xM6uesMlGxNW5UetDW9vZFABEwUVL292exdr8cGMJkS5LBQyU=
+	t=1710785831; cv=none; b=SOb6iXWQ3niofqY2oFG3EapfyENdf4/LpojiaIDxLalC1uF5YlHOq/Juf1rFAlmspsz4bTsUnPYC/OgfUxStgrXCWRMF3rpjDJ4q84JY4KtsHSK5ZW8iM2PYujuEz/VBckLYAMI72s/ISncpSBHS19J2c6B3l0XpIo4J2YCGNMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710785744; c=relaxed/simple;
-	bh=5YFmcYTQnbh05Ig6q9UJJIHbuLFfuf3jlOVIWPUkbuQ=;
+	s=arc-20240116; t=1710785831; c=relaxed/simple;
+	bh=3De8goOLTT5ZawEx689cKIyRbGEwZSMT/MPKUoIfwIk=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JHQuSki3dmBsbFMIl+iNTb6nJP30kkUwaYoIBDVyfzZ/ngjb1Ea87F/fdTxQSXLE0cNyAF5IDfO0uRY6er+KBqth8MOErQytf+b/a8kZGdYDc0zhfQGbjgk/Qko6iBRn9V3Nbwg1MqbpCkZqDWpr18tmxZC1gi8Ooi9zXiLtpKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UO5GwSuC; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=P2LQIC3nfCkLEXrA/5o57mLnfrTNlVU0S/2YDnh5brHLbe7UJtngNvPJdMCmFWy61koUmhkdFj/FV4yH2FaUFbZ9PTb0ZaqHYok0eKl0JDKUepLRhidQGFh/w/NRbBBwfedoPhqELOTzUReyIPl7JBdYfiZOsHMyxKZnxSS/v5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Pa23ESt8; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=5YFmcYTQnbh05Ig6q9UJJIHbuLFfuf3jlOVIWPUkbuQ=; b=UO5GwSuCfm262mPhhY5kAy9swy
-	o0DZNCSmWDNpwAk2/n2xGKyIgW0aP5F3lQgBWs68fG7F7/GTI5JupzJTAevlDAuZhqGb/XDOos5UP
-	WwyTuBRS7iqXXLaiktVTL8NPYnB3CK14OnRq9BsrJSuncjpoGbFqaI9NEF2bmQsqP7DpuudWy8BmS
-	yrwTt19ZItPcDPHCt0xxt4Ok4bDu1NZ7fPEGz4aTq4NYQDZ6AJJ4LXmITmkWCIlNDsa7fWGHUFVpS
-	7lXavpMA3OdEW6MYKfuRCTqJUpeFQuni7iZWH3h0M//r3Hn7HgV2gweFhynTKgJyMD8B6lW3DFHPO
-	7qzbD47w==;
+	bh=3De8goOLTT5ZawEx689cKIyRbGEwZSMT/MPKUoIfwIk=; b=Pa23ESt8Oj97MqcNViaAyKpgoD
+	UGY/MDE5iML8cQsYMVatfzK4xJc37nI27aPfBbUh5RMdhlvRTzPb0eQKMGM9ilni7WbZoC0w+86vC
+	9W9XuIbsIu+l0TutpgMyynYllyZ//ZipNeeWlQL680K6a+jNZj0Usl5EAFT6k12wwPmNAvATsGdJx
+	BSMfJu5XCALMBn0AEw2RsJOPNSkraYZpWlru8BIMIc7j+i8B8+PBG915MDiTTIz3DbJ9rLJYKKO8A
+	cKYRcu8PnVIGznAOkPAo1lyysIwTDRyhQMBYHN5WhdZT+AdDCG2x2F+YggNuB9v2T5sWa4PP9PSqd
+	07in5TlQ==;
 Received: from [2001:8b0:10b:5:d467:67b2:6675:b6a9] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rmHWL-000000007s5-0Cl2;
-	Mon, 18 Mar 2024 18:15:37 +0000
-Message-ID: <5d8394e6c2c77093eca0ecaf355da77eba710dc1.camel@infradead.org>
-Subject: Re: [RFC PATCH v2 0/4] arm64: Add PSCI v1.3 SYSTEM_OFF2 support for
- hibernation
+	id 1rmHXm-000000007vt-0zS1;
+	Mon, 18 Mar 2024 18:17:06 +0000
+Message-ID: <994a010d075fd7c0fb395b218342d69b64c09dc2.camel@infradead.org>
+Subject: Re: [RFC PATCH v2 2/4] KVM: arm64: Add PSCI SYSTEM_OFF2 function
+ for hibernation
 From: David Woodhouse <dwmw2@infradead.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Paolo Bonzini
@@ -61,14 +61,15 @@ Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Paolo Bonzini
  <smostafa@google.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
  linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
  kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org
-Date: Mon, 18 Mar 2024 18:15:36 +0000
-In-Reply-To: <86ttl3zbd3.wl-maz@kernel.org>
+Date: Mon, 18 Mar 2024 18:17:05 +0000
+In-Reply-To: <86r0g7za5s.wl-maz@kernel.org>
 References: <20240318164646.1010092-1-dwmw2@infradead.org>
-	 <86wmpzzdep.wl-maz@kernel.org>
-	 <eb9215850e8231ab8ef75f523925be671cc6f5a0.camel@infradead.org>
-	 <86ttl3zbd3.wl-maz@kernel.org>
+	 <20240318164646.1010092-3-dwmw2@infradead.org>
+	 <86v85jzbw8.wl-maz@kernel.org>
+	 <6a2107864d45bd6ac403c218d68bf97025eca971.camel@infradead.org>
+	 <86r0g7za5s.wl-maz@kernel.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-8XLOgAK1XPtWTNYLP9l3"
+	boundary="=-cxR0LKEOfdywKdA6GFzD"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -79,78 +80,72 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-8XLOgAK1XPtWTNYLP9l3
+--=-cxR0LKEOfdywKdA6GFzD
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2024-03-18 at 17:41 +0000, Marc Zyngier wrote:
-> On Mon, 18 Mar 2024 17:26:07 +0000,
+On Mon, 2024-03-18 at 18:07 +0000, Marc Zyngier wrote:
+> On Mon, 18 Mar 2024 17:54:06 +0000,
 > David Woodhouse <dwmw2@infradead.org> wrote:
 > >=20
 > > [1=C2=A0 <text/plain; UTF-8 (quoted-printable)>]
-> > On Mon, 2024-03-18 at 16:57 +0000, Marc Zyngier wrote:
+> > On Mon, 2024-03-18 at 17:29 +0000, Marc Zyngier wrote:
 > > >=20
-> > > >=20
-> > > > There *is* a way for a VMM to opt *out* of newer PSCI versions... b=
-y=20
-> > > > setting a per-vCPU "special" register that actually ends up setting=
- the=20
-> > > > PSCI version KVM-wide. Quite why this isn't just a simple KVM_CAP, =
-I=20
-> > > > have no idea.
-> > >=20
-> > > Because the expectations are that the VMM can blindly save/restore th=
-e
-> > > guest's state, including the PSCI version, and restore that blindly.
-> > > KVM CAPs are just a really bad design pattern for this sort of things=
-.
+> > > Again, I really oppose this way of doing things. We already have an
+> > > infrastructure for selecting PSCI levels. You may not like it, but it
+> > > exists, and I'm not going entertain supporting yet another bike-shed
+> > > model. Adding an orthogonal cap for a feature that is specific to a
+> > > new PSCI version is just awful.
 > >=20
-> > Hm, am I missing something here? Does the *guest* get to set the PSCI
-> > version somehow, and opt into the latest version that it understands
-> > regardless of what the firmware/host can support?
+> > Huh? This isn't a "new bike-shed model". This is a straight copy of
+> > what we *already* have for SYSTEM_RESET2.
 >=20
-> No. The *VMM* sets the PSCI version by writing to a pseudo register.
-> It means that when the guest migrates, the VMM saves and restores that
-> version, and the guest doesn't see any change.
+> There is no KVM capability for SYSTEM_RESET2. It is directly
+> advertised to the guest when PSCI 1.1 is supported.
 
-And when you boot a guest image which has been working for years under
-a new kernel+KVM, your guest suddenly experiences a new PSCI version.
-As I said that's not just new optional functions; it's potentially even
-returning new error codes to the functions that said guest was already
-using.
-
-And when you *hibernate* a guest and then launch it again under a newer
-kernel+KVM, it experiences the same incompatibility.
-
-Unless the VMM realises this problem and opts *out* of the newer KVM
-behaviour, of course. This is very much unlike how we *normally* expose
-new KVM capabilities.
-
-> > I don't think we ever aspired to be able to hand an arbitrary KVM fd to
-> > a userspace VMM and have the VMM be able to drive that VM without
-> > having any a priori context, did we?
+Apologies, I got that wrong. It's SYSTEM_SUSPEND and the corresponding
+KVM_CAP_ARM_SYSTEM_SUSPEND that I was thinking of. Not SYSTEM_RESET2.I
+mixed those up.
+=20
+> > If I were bike-shedding, I wouldn't do separate caps for them; I'd have
+> > done it as a *bitmask* of the optional PSCI calls that should be
+> > enabled.
+> >=20
+> > The *mandatory* ones should obviously come from the PSCI version alone,
+> > but I can't see how that makes sense for the optional ones...
 >=20
-> Arbitrary? No. This is actually very specific and pretty well
-> documented.
+> The guest is in a position to probe for what is supported or not with
+> the PSCI_FEATURES call.=C2=A0 Why would you add anything else?
+
+Because we don't want to silently *change* what's advertised to the
+guest with the VMM explicitly opting in.=20
+
+> > > Please make PSCI 1.3 the only version of PSCI supporting suspend in a
+> > > non-optional way, and be done with it.
+> >=20
+> > SYSTEM_OFF2 is an *optional* feature in PSCI v1.3. As are
+> > CLEAR_INV_MEMREGION and CLEAR_INV_MEMREGION_ATTRIBUTES.
+> >=20
+> > Are you suggesting that enabling v1.3 should automatically enable *all*
+> > of the optional features that were defined in that version (and
+> > previous versions) of the spec?
 >=20
-> Also, to answer your question about why we treat 0.1 differently from
-> 0.2+: 0.1 didn't specify the PSCI SMC/HCR encoding, meaning that KVM
-> implemented something that was never fully specified. The VMM has to
-> provide firmware tables that describe that. With 0.2+, there is a
-> standard encoding for all functions, and the VMM doesn't have to
-> provide the encoding to the guest.
+> No. We have everything we need to incrementally *add* features. So you
+> can perfectly implement PSCI 1.3 with only SYSTEM_OFF2, and only later
+> on add the rest, if ever.
 
-Gotcha. So for that case we were *forced* to do things correctly and
-allow userspace to opt-in to the capability. While for 0.2 onwards we
-got away with this awfulness of silently upgrading the version without
-VMM consent.
+OK. It's still awful, but I suppose can live with that since existing
+VMMs will just see the same KVM_SYSTEM_EVENT_SHUTDOWN as before, and
+hopefully just won't understand the flag (and won't notice) the extra
+flag which says it's a hibernate.
 
-I was hoping to just follow the existing model of SYSTEM_RESET2 and not
-have to touch this awfulness with a barge-pole, but sure, whatever you
-want.
+A VMM might *perhaps* check for flags it doesn't understand and
+complain about them, which is why we shouldn't really do that. But
+where PSCI is concerned it seems we've left best practice behind a long
+time ago, so I'll let it go.
 
 
---=-8XLOgAK1XPtWTNYLP9l3
+--=-cxR0LKEOfdywKdA6GFzD
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -242,25 +237,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzE4MTgxNTM2WjAvBgkqhkiG9w0BCQQxIgQgmtMYtUNM
-DWpPb4XRb8K7cz8BYxiw9a4tNKShJAEmLi4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzE4MTgxNzA1WjAvBgkqhkiG9w0BCQQxIgQgDtRn2gPu
+BfHzPhUpD4JHqr/0URSiCHUKocSZYxpp/N0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBc5D/gGp9rDZ0f5c2AC2CXq2j6jUG5NAQX
-SD6JJMF2UUhhmDHgniNqT5fFDMZIWNPChi1D8odd6AbYoP8irRZaJOVD8XuLcTXzb1enA03I4U2w
-EMf7VoYyxpMNJmuOlJCS5qZoR13+PmwoGvln9XV1rRUCEtQnH3Q3xUGR/EfvxF1zflKrm3RO26Hu
-+A+qyk6KJR2S7E+YXK71rOYIBZwHy/LN3h0p8OzGuPGr6k+kELpXbondWGjjdgztgzf2/d3jNGJo
-T18j83dRRmCl8WNS8twZlcFtz5Bcoy6gOrrO5pp/r2nABhWWMFl0K6RQAob3O1U/Ge3FIi2RGA2E
-fUxjt0xfB7k1MuQgxMEFCQlDwZDz9xrihdGQtdj0R8+9hchzWv7qP7feQdv14gagZyZl3Xn/TIpG
-aUqQr9T+HPpmTesP/VJ/wUt393lQkL5EHR9urL7cBxXcaYJbCMw5SSmA58mEFuPiGvX6wJ3nx79J
-jGgtcYza1hvSuUAQI0ON7on4Ub5HMpXNiqV36VYgZmwf1C9H66tgJeQ8CiWMgUQKy4b0ph7UZgQk
-FS/8GBPIfxqS+OUUi3bHuPYtZXvFeMX1gRrKYHv17h+whglOYUZGuOymYGJxEBAuOmHo6Kyd/CD4
-ZeYy0QKqeqL1J9GVyuUEomAAKKcBKY3CzUj+/8U3XQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAhbBVzAt8fQTlTELrHVGbQC2n5FOAYK5ct
+CIfnmW8EiPMufYjaFM08shE9UHF7VeHRd8hR/isbre5LEMRzMj851UhaVU+MltR86qc3cCwt6gt7
+T0xFpGtyvD6NftHiz3kCjUEl+j5cDgS7QLVx/iHVhA4OLYIEE9mSSo8CjEuJqWkYwb/nrkbjJvM5
+rKajw1H9q0WYIlxMFqMt9arPi07xbqHKfGZ90Hx1ifX3tOHWS/xNi3FTE2Mq5ZL5ERj4UNn/txSc
+fHpLEDCkHzdNNE1j8jwaBv74BCTVTrhe/WVK3akpwSOK8IhP2lBxct9rghX7tOG/t52Hcu1+sft3
+BNHvoSPIPFgS/fg9I2CkoSaEW7abaiVBBRT64FbJXEPblJq4SKFI46dahqpfWZycfbO0At5F+18z
+mqfDhTUo1jqQLVOo2+x0L2KPcq/ktLQqWnPiSJqNIF2bEJPnAxOT2NLKfRb5JiCNpQxzpI0cGTUM
+W1fZ1RmwsMvkZTIFBgMavpht0pMNnTGe/4l5foIUVIePS0n+RICSXYXNebKB9xS3COiz+mfJ3PQd
+OrMhV5Aclf8g3pcNwe8RZ9ETglba3l3++Rg0wwf1A+6XsbS3z2Ah0JB6d5CS8zs5kZunsBbwRA48
+E/4RjQ+Kn328m0RJw5e6uQ68bI5odF2ZCMezHXVSgAAAAAAAAA==
 
 
---=-8XLOgAK1XPtWTNYLP9l3--
+--=-cxR0LKEOfdywKdA6GFzD--
 
