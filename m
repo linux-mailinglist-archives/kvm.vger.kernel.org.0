@@ -1,172 +1,177 @@
-Return-Path: <kvm+bounces-12001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0C2A87EDF3
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 17:51:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D2CF87EE06
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 17:53:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C06C91C21EEA
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 16:51:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C0321F211F5
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 16:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832DD5647F;
-	Mon, 18 Mar 2024 16:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74C654BEC;
+	Mon, 18 Mar 2024 16:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6rUVJkD"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Om1KTh9r"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2081.outbound.protection.outlook.com [40.107.94.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBED5644D
-	for <kvm@vger.kernel.org>; Mon, 18 Mar 2024 16:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710780546; cv=none; b=U9oeq/bYa6YRwTAHCTjC/ckydmbm/wcGuga74d2mwwWKOp5PS4Vl/vTqCkEgK6Ek8An8rUA6RmM8nMlrCPUOcCOal81KPMvzA32+NidLGmuMry98eJY8ckA630jmFvgH5aPiqazDBB/SEeI4ln+iMG5Ypu7wYRY/8rYiZUxIY8E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710780546; c=relaxed/simple;
-	bh=stnly8HvasFMCvsYR1fbyuJtmkCcBTZ3FsH47hj2E1o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k2CB9rrXykDHtHL46R6F9WifIi2+jDxJ1BV4bC4YLlqbyQVEjk/kQXzT3n0vLZ5CwkhTDHWyzHIB+Lc/u1+SBL3xqpw1VVBbCZD8mMz9eaBPd/dl7awMYHrgPm4EqO/FAqaFjxPMwBobuhAXskO4t0DO1rXrvVkMiu1/CLsOyNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A6rUVJkD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710780544;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PBtKOdFjpK+3+Il0olwQK+Bw8samb3ue692p47qxRLg=;
-	b=A6rUVJkDBt+43nNeeksNMXEkWejmtRVd6ji5VJkXFVX1oCDI9v+5YOq+VVlo8wJnoG8j8v
-	XdYOTanou/dLKS3cbCVO4HhSfKzekPQHhDjqlrlScs2Mmo+/Mb2X39QiwU6LkPzN0kUkiN
-	gaceDE6Pw8FpAJVIjt57mxZHWQXWEu8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-FjMfDB-wPSmJNaf-WFZ8hQ-1; Mon, 18 Mar 2024 12:49:02 -0400
-X-MC-Unique: FjMfDB-wPSmJNaf-WFZ8hQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33ed8677d16so1323845f8f.1
-        for <kvm@vger.kernel.org>; Mon, 18 Mar 2024 09:49:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710780541; x=1711385341;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PBtKOdFjpK+3+Il0olwQK+Bw8samb3ue692p47qxRLg=;
-        b=EvrPJwBapXHYupev4XjnmadFZoJJtRdcIcNI3aFLhG6eWZiJD3vwifcBfMdAXxGy3x
-         qIZ1Eaayx9p5cgsLCgQ9k19d+6z1tz9//doAJiCE379Z9NbWBAV6tTczTdG8BKomQb8R
-         AXxgZByQzKBfuL/pEpm2bQ0FiIE98XxVkq13hmV2ijRsQDyjZjxM5aXcXsCXUKudlRZf
-         HVX2skrtYA1eeWCXQWpcJ58YmuVhA6kxnwcLLVncwes/S9mV3hheyzGEBYq5TSTrVlHR
-         w9quJMFE3VxTXY10QDC1SCRHEdxNhgy+7wU8z+eN2qeGWRBwBYGwmfrSlLuIEy96LNnz
-         W7ng==
-X-Forwarded-Encrypted: i=1; AJvYcCWBiR8NfaDebTLjXQikr/kWI4p51b4pmWYwwKtTKNMV183PFY+O6Nq3IK7LfTWstnMTxQALUwKQY6N5oLAlUsWSbeLP
-X-Gm-Message-State: AOJu0YwrZHX9GwF3IB3VK56PqRtDgyUfUG4raCjTMFHOX2ApsniRgaOz
-	dY7BH3lRGJlJA34aAfuqUWki1gEEEZM5PJU9YorbLm5B+nmlnvIlnbv+iXrrAI6FOfnw/QUo8xM
-	cVnbJvLJxi2axyCPLudKZImKZ+waY5C2EmGGbm3PzzUkQtCs0szYJY4VLh10jPMs87rAX35hqBK
-	37NoCsPkpjiD83IjlBdnV0qXPT
-X-Received: by 2002:adf:fd0b:0:b0:33e:6760:6def with SMTP id e11-20020adffd0b000000b0033e67606defmr10341242wrr.56.1710780541341;
-        Mon, 18 Mar 2024 09:49:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFepTlAmHpk5XYr52CmG+vr1oXsaNyDVNLRINU5cOCbpoo7rMo/2qyJQ4eDkMw6LiUrwInEBeyds8RYpJNHITE=
-X-Received: by 2002:adf:fd0b:0:b0:33e:6760:6def with SMTP id
- e11-20020adffd0b000000b0033e67606defmr10341226wrr.56.1710780540978; Mon, 18
- Mar 2024 09:49:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D26154BC4;
+	Mon, 18 Mar 2024 16:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710780773; cv=fail; b=Icr62kgpvwDf8GXKEWnGYOup/JM74brHkvZPrGE8OqPKWeg/ctGDL+knLVz/eCiVZ5wgrBaVcoxjURORThUqRA30ElUpRQJOyFVc+qU16OemX1piTPyz0TPqHjJnpjDl0yXgmYzjcLS+rOolq8rMrdd7Jhdu7jv9ovRxpT47nz8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710780773; c=relaxed/simple;
+	bh=hu4kaamYARxpag8T9MTVyXGBogmVdUbQ0hFsnhYppzA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=U9EpWWpS3BMKiKEKwSFojllFWC2OtXlvkXahtfvNxPJ9vGj8HDKgWzkmXswYSoNmUIrKP9j7z0QeZ0UkVs6qMux9zgrlwAkJ1KPaiBuC2SXDwfBWVexCFBUnpTFZ3UBEfQ2IySu6vNBm3zerWrPSzGjJRC8+PWE11VQqyZoPSKI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Om1KTh9r; arc=fail smtp.client-ip=40.107.94.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dzhlg/Qpu5DEaj+DPsTk+DDdw8769bbWvYxd1kdkxTyF7HF9Bc1M/t4BShx5xz3Y8qvs7OluAWctlfF4LFiJhgvhi8G6p0lNZWUBMwGdjYrgmf9Tbb9cml2EtMjC9oKNnVG+8kdFVQZWlfrkWZi43uLXJARpcB+OfY9eO1/yuKXJPnev+8f58DPZe7LlSq7YRJsF7DMBc5o+q7S8knDExCSL52xi2LHSVyAm7LUagjE41KHLtzZysOqlfDTd7F13qSUqSsXs5GyatH9E+Cb+WldHIC866ZcdmT/6RJwp1nEvnp57M7ULvlSwaHzztdhjfVXkB1A9SNfnUdjB7JjEIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hu4kaamYARxpag8T9MTVyXGBogmVdUbQ0hFsnhYppzA=;
+ b=XQMj+dDfHRTvZVP5lpNRwRvI9nsbQj1K13PDdtzgqUWzfO7FBOdIAh1oOmslRIcTr5m2mdMN8y/JDwMo0OXfzPdKW2fb91SSFSFIbXKXknxWiUCl2TE/MVCLJJwcrZ81IkcBRY1Y47qKD/uKnjuFrekJLnl9KO7t3FGOukC7rsb4RMzmd4V78udRXGnOit6YfRjTk9mM3YZmLsQJXsvegUBGbnad99Q1p9n7ac7nFhMNTr3vGVfI6xMX3vl0xdgnFg0BseYmdRJeGm4zP34eaiptpJs3kO+9UvBrsUV1Wjy5/KGowG/iavFtN+aP8dBaRXu9YJswNs7jOPLq67FrVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hu4kaamYARxpag8T9MTVyXGBogmVdUbQ0hFsnhYppzA=;
+ b=Om1KTh9rOITYi66q5UgSUIwGF7LIbdYhiHH/d7WUpTf2VGcnCvsNqhWU4Vp2vKo6pO8msIdiYi0xHqaY1xjei7yoDC1RoMrZ2zq8K6vflCEyiMOb1xnj8l6q40X0rdUtcVpz8WXLOTMU6h4KSmkSQg7IN43kA08kBzUj/oGt7lfiF/0CdyU1POpxe7UqhmCE9R+czgdIg4p+yJF1A+gFsQRkOO7M/2RBxnpT2liUzjwFU81ICuo5zo9/9Mv/7v3dK6VJG6h9TeQvXit7IqG+s2GnKrqzivSK24yrEPa+jr1ZBw/YIwc6SGPBq2AIOaU31rHLekGd1GGVYHmZrfFBUg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by SN7PR12MB7811.namprd12.prod.outlook.com (2603:10b6:806:34f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27; Mon, 18 Mar
+ 2024 16:52:49 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7386.025; Mon, 18 Mar 2024
+ 16:52:49 +0000
+Date: Mon, 18 Mar 2024 13:52:47 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: Baolu Lu <baolu.lu@linux.intel.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>,
+	"joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+	"peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
+	"lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+	"Zeng, Xin" <xin.zeng@intel.com>,
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: Re: [PATCH 1/8] iommu: Introduce a replace API for device pasid
+Message-ID: <20240318165247.GD5825@nvidia.com>
+References: <20231127063428.127436-1-yi.l.liu@intel.com>
+ <20231127063428.127436-2-yi.l.liu@intel.com>
+ <20240115171950.GL734935@nvidia.com>
+ <c831bf5e-f623-402d-9347-8718987d1610@intel.com>
+ <BN9PR11MB52766161477C2540969C83568C242@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <585423de-9173-4c97-b596-71e1564d8b4e@intel.com>
+ <87a2be0d-6a24-4ca8-be30-35287072dda4@linux.intel.com>
+ <749b23c7-ab0e-42b4-9992-e1867fc7d4d7@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <749b23c7-ab0e-42b4-9992-e1867fc7d4d7@intel.com>
+X-ClientProxiedBy: SA9PR11CA0005.namprd11.prod.outlook.com
+ (2603:10b6:806:6e::10) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240226190344.787149-1-pbonzini@redhat.com> <20240226190344.787149-11-pbonzini@redhat.com>
- <20240314024952.w6n6ol5hjzqayn2g@amd.com> <20240314220923.htmb4qix4ct5m5om@amd.com>
- <ZfOAm8HtAaazpc5O@google.com> <20240314234850.js4gvwv7wh43v3y5@amd.com> <ZfRhu0GVjWeAAJMB@google.com>
-In-Reply-To: <ZfRhu0GVjWeAAJMB@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 18 Mar 2024 17:48:48 +0100
-Message-ID: <CABgObfYNnDXvPU7OMDHzq-yjRYGHaS-M0E_tE2UB4ucv6E1x2Q@mail.gmail.com>
-Subject: Re: [PATCH v3 10/15] KVM: x86: add fields to struct kvm_arch for CoCo features
-To: Sean Christopherson <seanjc@google.com>
-Cc: Michael Roth <michael.roth@amd.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	aik@amd.com, pankaj.gupta@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SN7PR12MB7811:EE_
+X-MS-Office365-Filtering-Correlation-Id: fbf7d8d9-f7d3-4a3d-5ca1-08dc476bd806
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	e137eC/KURWKfYfMNY8jlcdP30HXzg/9Akpm3PNtzjmqCwyBv3s4+cADxSv1qzCN9sde0WzmSzYEnTA4H5FIDylCohWqNpUbO2EMg0G1ZA3SVjkEDrK45p9K4Qvbz2HFxWKb/G95qosglvLr7KEOqF3aOa9aefd7l1LGR4IDn78AM8oo8WPiM17CoAvTwtp3oKVjhqvSJW3ZJzouYkPx/Dle89QzTrxr7IjwftFag1AuPgPQt04o3oud3osmlbhL61jI7PharnCbY2xADve3uFSrrwfWbWqJhCp+cjBkYJ2nvBuujoCBgV0nKKsKtHcRF0RWIVYnFMpld0WfrwixX6i0M2DNF49gbZbEXNqRCBtg1NawC5ufeQeaGOIkwGegziz2hKrEvm4eknjbahnI3UyOk+x57qOnafBoeLjw1uHuEyqQq2dApQ4b37lycsm1IpuD1QcpG0b0r93R7DB/B8fpk5eq3wKSLD0VQrPGVnk1eUCWa3UsAJsrkv18f3LoMviOR+bONJwE/wL4RwRyh16iSrJakw+0Ltn6wqjKOS6+nOMhye8n8cXesvZ+UT9BHTgm9XGSi4uSKght50XHGXXNhaLZQrnRpn2wFuI2AxuU9ZVap4Nt5WGtsMkh39ZeMax+IzAEh0hhfPjFdAsHKCnShm+X5l40qnx6MupkIw4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(7416005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gx2eKSpQVBLE7ZcFhg3eK87MKLmEzI1QqYXJz9/PbprV7uCyE6PdBw0dfp1V?=
+ =?us-ascii?Q?Z4OSzz2SwK+PbirAJGqqJaxHXmgZuJ52xWo3iox3V7ubfjdspWgsUk4Fa4mo?=
+ =?us-ascii?Q?treFl7wBrzRqnb7igBS4NJvBBtNFzdcrB4Si7Q3y3TmCGiM3+hPAS/jUg43C?=
+ =?us-ascii?Q?lzTVb/aBH4y9oyKdIRkk1V3UrPv/NyJ/mWy86jYIFU2Loe2AM5qLxvNMF4KG?=
+ =?us-ascii?Q?FIiU6XtmKRRkODyPdiS5rIymwu1wP3rKI42zCU4+k+7lOAvU+yOlpEorushU?=
+ =?us-ascii?Q?x101URgQXJnGBeEHjejQavyu7Qz5wFnOr2VLOtsu5O/U3f/wJKzIqIF4tFHl?=
+ =?us-ascii?Q?O3uXkgfp1yqTwSTyiIWpCNfNAXdJP5cHbFcxnTop64pXv5wRuvwG9te4Hz1Z?=
+ =?us-ascii?Q?TzhBtLVpRz+A+bITcNB13UTB6HhFP0j7/+YGijucNRjXkd9crO+nIgX6hs/7?=
+ =?us-ascii?Q?DN3+4vwXdD/7zT/9+9tCUeECMEaNVMZXb0kyEQrp7KP+7IPZ/BG41wYPkGdy?=
+ =?us-ascii?Q?QMRly4yWNyIZIpn7KcrAL+f2qHz0BJ4Qxl6o+y5/uImdbkqDvaxbM8M8HBzW?=
+ =?us-ascii?Q?M5I1ywcVwt67OKd3o+6LHqMa8TwucppLwaj7oegRRrASkg9n0diMORYqkLAp?=
+ =?us-ascii?Q?hGEUjomkSYgOiVEwKoWxu1TYUeHMi6RONNLVqqAjAL2Qtezi9TGw1WZ1lIfZ?=
+ =?us-ascii?Q?cNKIr94UWSxCPwGDVMJ9jJDwvlrXHzq+9P2Xhl/VLPmDOwAX9bBimVG/iEEh?=
+ =?us-ascii?Q?CzRGd0Ftkrfxl7o3NU/zRGYB9UonvbKYbgDdYrKtwDIL8+Kjm2rA+k7h4adn?=
+ =?us-ascii?Q?gP7dGT3HADYgXB+d8vy4IyCfc6IjdgX1IbQ3riBq0cvmCIzERD+j0s1fdhBJ?=
+ =?us-ascii?Q?hA2AWXrEkjGRsTN+OtsslZ2OU6gXz3CfyWJvUMtyE9UTikIEExf6s2VFJElP?=
+ =?us-ascii?Q?+GEukTcwkoWF4q3CdollasjfExDz/WP67wpdNfZQQUowxzcRrfOn6UtCofAa?=
+ =?us-ascii?Q?sEGE8oPGRwLONbvU6PscVYcTnPzjr9LDzitpuuGDNHpK69vAZihdplvWK9RV?=
+ =?us-ascii?Q?84OyChefbairpXq2iN93X+CaWQoBgBKpkYDFp214o62Z/sSWQlQORdHHbKHq?=
+ =?us-ascii?Q?CZk9BKhQQo0tNozOxeNhukrsGH/KKSSupHJDNXR4PpmXFV82mxK3ZWtiwUb7?=
+ =?us-ascii?Q?Ht+CWATCqGdOkBYO0pO78QTeKrlFmzMNvVaMP1bNd+OHgyouX2xk+DpyAVVn?=
+ =?us-ascii?Q?v8o3UZFHnim+j7XSjig9dC2HMzf095ShSyYuDcx4EuQh2fwbGYhEsYOnKsXR?=
+ =?us-ascii?Q?AEvRdCIz6iRIIycjtI3dXaDmbiJQcChcmLLCH+FXaLmf+1zPd487bZNacuDm?=
+ =?us-ascii?Q?KD6TTSxpR/piwbDywu4K4A1eUrjORsazqc3QBtCs5IO0coAUKJm2CuL8hbmw?=
+ =?us-ascii?Q?+mb6BoGC66saag7tCmbiD8t/wWj0fTjfXlkX6ZcIj1zLKS6qSdc0018HQw01?=
+ =?us-ascii?Q?ts6BL4mgE00aI0/mmlsQyDf4Qab85Z9IOjwZl8+xDub3BqOXNUCCHqNsJ//K?=
+ =?us-ascii?Q?rgsQHsGeNTQjd4iGsic=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbf7d8d9-f7d3-4a3d-5ca1-08dc476bd806
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2024 16:52:49.2962
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +QvpoKhpLVGMngN7qGUEaBK0XN0oW1ZVhQQuWECLBvnF0FzBrNGC/HL3C/+dVpcM
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7811
 
-On Fri, Mar 15, 2024 at 3:57=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Thu, Mar 14, 2024, Michael Roth wrote:
-> > On Thu, Mar 14, 2024 at 03:56:27PM -0700, Sean Christopherson wrote:
-> > > On Thu, Mar 14, 2024, Michael Roth wrote:
-> > > > On Wed, Mar 13, 2024 at 09:49:52PM -0500, Michael Roth wrote:
-> > > > > I've been trying to get SNP running on top of these patches and h=
-it and
-> > > > > issue with these due to fpstate_set_confidential() being done dur=
-ing
-> > > > > svm_vcpu_create(), so when QEMU tries to sync FPU state prior to =
-calling
-> > > > > SNP_LAUNCH_FINISH it errors out. I think the same would happen wi=
-th
-> > > > > SEV-ES as well.
-> > > > > Maybe fpstate_set_confidential() should be relocated to SEV_LAUNC=
-H_FINISH
-> > > > > site as part of these patches?
-> > > >
-> > > > Talked to Tom a bit about this and that might not make much sense u=
-nless
-> > > > we actually want to add some code to sync that FPU state into the V=
-MSA
->
-> Is manually copying required for register state?  If so, manually copying=
- everything
-> seems like the way to go, otherwise we'll end up with a confusing ABI whe=
-re a
-> rather arbitrary set of bits are (not) configurable by userspace.
+On Wed, Mar 13, 2024 at 04:11:41PM +0800, Yi Liu wrote:
 
-Yes, see sev_es_sync_vmsa. I'll add FPU as well.
+> yes. how about your opinion? @Jason. I noticed the set_dev_pasid callback
+> and pasid_array update is under the group->lock, so update it should be
+> fine to adjust the order to update pasid_array after set_dev_pasid returns.
 
-> > SET_REGS/SREGS and the others only throw an error when
-> > vcpu->arch.guest_state_protected gets set, which doesn't happen until
->
-> Ah, I misread the diff and didn't see the existing check on fpstate_is_co=
-nfidential().
->
-> Side topic, I could have sworn KVM didn't allocate the guest fpstate for =
-SEV-ES,
-> but git blame says otherwise.  Avoiding that allocation would have been a=
-n argument
-> for immediately marking the fpstate confidential.
->
-> That said, any reason not to free the state when the fpstate is marked co=
-nfidential?
+Yes, it makes some sense
 
-No reason not to do it, except not wanting to add more cases to code
-that's already pretty hairy.
+But, also I would like it very much if we just have the core pass in
+the actual old domain as a an addition function argument.
 
-> > sev_launch_update_vmsa(). So in those cases userspace is still able to =
-sync
-> > additional/non-reset state prior initial launch. It's just XSAVE/XSAVE2=
- that
-> > are a bit more restrictive because they check fpstate_is_confidential()
-> > instead, which gets set during vCPU creation.
-> >
-> > Somewhat related, but just noticed that KVM_SET_FPU also relies on
-> > fpstate_is_confidential() but still silently returns 0 with this series=
-.
-> > Seems like it should be handled the same way as XSAVE/XSAVE2, whatever =
-we
-> > end up doing.
->
-> +1
->
-> Also, I think a less confusing and more robust way to deal with the new V=
-M types
-> would be to condition only the return code on whether or not the VM has p=
-rotected
-> state
+I think we have some small mistakes in multi-device group error
+unwinding for remove because the global xarray can't isn't actually
+going to be correct in all scenarios.
 
-Makes sense (I found KVM_GET/SET_FPU independently and will fix that
-as well in the next submission).
-
-Paolo
+Jason
 
 
