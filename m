@@ -1,182 +1,246 @@
-Return-Path: <kvm+bounces-11972-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33AC887E266
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 04:09:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 134D887E2BB
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 05:18:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D09E7280EA9
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 03:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D5241C20EBA
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 04:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA3D1E878;
-	Mon, 18 Mar 2024 03:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758B4208CE;
+	Mon, 18 Mar 2024 04:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SXCWONBf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C1338eso"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2671E864
-	for <kvm@vger.kernel.org>; Mon, 18 Mar 2024 03:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD9920332
+	for <kvm@vger.kernel.org>; Mon, 18 Mar 2024 04:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710731378; cv=none; b=iwlwo1eVcLwoFtgI6xILg6EMX3lFIvD5b8AsF9H0ydBADL2coC6wR2S9WjjzYSV42D4PLhZpMHkM/EV2pXShWnSTLeKOBPR3P5MqddFZP9Layvj+d3nHdACWz6xnj6wnStD8D9zA+P1Ey0TXBn7qYejDWta9mY3hxZLg1Uv4FA0=
+	t=1710735520; cv=none; b=MuVD8gNsvWE7UbdOvRF0Q5X9/RxvjttUB+dQeXWzm1qz4t3j7sBXRjXPRMG12x+vsJT21N8hoi0FdMJ3ofdjE9RZdD5Eim0Nu1PrP5LNJwzG4UexkxVlhojd+a+shZR3xhbtr1YtiXPkwwqLymJCKHMJjlg6r1AJh6JfP7DffF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710731378; c=relaxed/simple;
-	bh=0SIo5nnH8rXWWo/PKZWu5xaHib3sujSo/4+YK3yVEhE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=afANlo49Jf6W3lT4npf2OS/BQuST+uwAjNDTiMcpc5/j7oX5yzMqwwbWJmSxuKn5lmpDTXqau097CFP5ujcFbp0hpJr7jlfcJTNThlRi/yQLKeppGMSG+1fmOiH7Ae5VzgGbEPZej9t7jvNRSyaFpqMv5LNp6D8F9q5i1xghZq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SXCWONBf; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710731376; x=1742267376;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0SIo5nnH8rXWWo/PKZWu5xaHib3sujSo/4+YK3yVEhE=;
-  b=SXCWONBfMCYmWk8nUz80z2SoUbD1cFppUULT1r4HrJEpTwptNSDiEwoV
-   P2zcibyBKmbpc+BAUkBC8w0nYDP2yU20OfX4jAt2KnrgyQZbM1wvxDY4+
-   trNKfFS09xshVpvgzbypKlU/bcz0owXodDLyvBCZuAJDnbY+0p7IBcTIk
-   7tYJM3BmLirjmK7GOLyFH9CUr2HyMqRuVrnprH/3UJZOGLf/DEJjZAgFE
-   I0hmw/RDYHGUE2xeN0dmQHpZojh4oVXXviyeEBF6hs7O2nwiGdRRT2O2b
-   hf8NX6qah1PnT879vTAwjAB3TTAYHRK0V3LQvIA4jXu241Fuyu9tW37mI
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11016"; a="5660370"
-X-IronPort-AV: E=Sophos;i="6.07,134,1708416000"; 
-   d="scan'208";a="5660370"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2024 20:09:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,134,1708416000"; 
-   d="scan'208";a="44264959"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2024 20:09:33 -0700
-Message-ID: <4cbf6d9c-3916-4436-abfe-10b35734b67a@intel.com>
-Date: Mon, 18 Mar 2024 11:09:30 +0800
+	s=arc-20240116; t=1710735520; c=relaxed/simple;
+	bh=ekPFn+KMupcA3DsAmtHNfwNQA8+5dgvbgt0ROt0BcLg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AnnabO3EdnXuD5kUTY8Le4h/5j3mU44hKZxVYAmNQVWry2uOiBK3mvUdJJKkek3Stq3lAzFkhfPlaGlm5UYt5ZYHv3owjb5GF5BkpjEsuDVnWWmgZmhbm4i18k2pAoqSpsfm7gjZs2tgEWNDPcv5ipv4O09cIg9rIi4z9sW/IkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C1338eso; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710735517;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YcMIvlcXZmHfP6Yrf0ho0KeclSMy8eBKOPAz1pFY4gM=;
+	b=C1338esorfYIWaTdvC199pMQy+poifxpT8hHednsRLB8cnRW1+xB1570GPZg9mxfaA6rZv
+	ie2P7VNTpyCsrE+i40Kl+EhnHlLB1hyJiUbaBJQWJcgy1CaV5OwMV30f995585Isuzdk3/
+	WNnbIAKfINY1jmfgXo3GgjZy3c0siFU=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-130-Eh6a3WoANi2l8dpm-0yGiQ-1; Mon, 18 Mar 2024 00:18:35 -0400
+X-MC-Unique: Eh6a3WoANi2l8dpm-0yGiQ-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1defc12f8c1so26811495ad.2
+        for <kvm@vger.kernel.org>; Sun, 17 Mar 2024 21:18:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710735515; x=1711340315;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YcMIvlcXZmHfP6Yrf0ho0KeclSMy8eBKOPAz1pFY4gM=;
+        b=MgMOQGt5vobkrDJv2dn4oQe5BolJQEEyko4Kevi3TBRh0puMOUPgEfc9eafdxn84d6
+         xD0Le+jWSonuw66k6f44Al/IKb9ivdH5tsrH4/JKQHJUFtUQ7HdWfylCjg+BblcxtXzf
+         2lLUPgzZUcqL91C3TDYSL4Dx8JG9Mf5FzVjXD3OYpfTbjZyMyaP7T7MJt2cLin1fWeXb
+         Pxg9sWxOVHMf43R0zcPyuyErwe3q3nCb1WX5uQXU6duIaHedwTlpTSUIBTVGF3DHYT40
+         iP1GMsOIuYq5syp6AIVsKcTSkh98oXq9v4YRrV4iRURIK71bKUXHWguekVc8srhty/Cc
+         +LHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVv3bk/dj7eeDgGNuYXbovz6NZXFBM/8nj0TadtZBHvDzJqhhG15Zm0ld2vjWjofiLC4dfnQjF3nCBy8T83J340k8zE
+X-Gm-Message-State: AOJu0Yxr0OgGti1Cst8YlvIo3SW57lQBDAOEG/P5YYAEnVJQenXzALt/
+	XtrjkVOR4dEi3RDk5U0wXCB5cteO1ENCGhfZE9VlmcJpn0vyynStEVoUNYdXBt0z59mMhkxc6zA
+	3tLQPNg4vEo47V/oDBTDwSVExHd2gGtvlYJ/hI9jBT08uaU7nsoH76BK9hDcS14ctZ8Ju+Wfm+U
+	FDMlwxkgvdp+xj0dVtXicn9eB1
+X-Received: by 2002:a17:902:d68b:b0:1de:f91:3cf3 with SMTP id v11-20020a170902d68b00b001de0f913cf3mr9020709ply.55.1710735514600;
+        Sun, 17 Mar 2024 21:18:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFC9oB0f9oW121Bvau3zWELRsInCawRgYQJTSjt+TRvAgqSmbvs/LBhfOLf7eU9EldQFzvUZZSWPwuwPejjiP0=
+X-Received: by 2002:a17:902:d68b:b0:1de:f91:3cf3 with SMTP id
+ v11-20020a170902d68b00b001de0f913cf3mr9020679ply.55.1710735514309; Sun, 17
+ Mar 2024 21:18:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] kvm: add support for guest physical bits
-Content-Language: en-US
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvm@vger.kernel.org
-References: <20240313132719.939417-1-kraxel@redhat.com>
- <20240313132719.939417-3-kraxel@redhat.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20240313132719.939417-3-kraxel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240312021013.88656-1-xuanzhuo@linux.alibaba.com>
+ <20240312021013.88656-2-xuanzhuo@linux.alibaba.com> <CACGkMEvVgfgAxLoKeFTgy-1GR0W07ciPYFuqs6PiWtKCnXuWTw@mail.gmail.com>
+ <1710395908.7915084-1-xuanzhuo@linux.alibaba.com> <CACGkMEsT2JqJ1r_kStUzW0+-f+qT0C05n2A+Yrjpc-mHMZD_mQ@mail.gmail.com>
+ <1710487245.6843069-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1710487245.6843069-1-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 18 Mar 2024 12:18:23 +0800
+Message-ID: <CACGkMEspzDTZP1yxkBz17MgU9meyfCUBDxG8mjm=acXHNxAxhg@mail.gmail.com>
+Subject: Re: [PATCH vhost v3 1/4] virtio: find_vqs: pass struct instead of
+ multi parameters
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Hans de Goede <hdegoede@redhat.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Vadim Pasternak <vadimp@nvidia.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, Cornelia Huck <cohuck@redhat.com>, 
+	Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, linux-um@lists.infradead.org, 
+	platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/13/2024 9:27 PM, Gerd Hoffmann wrote:
-> Query kvm for supported guest physical address bits, in cpuid
-> function 80000008, eax[23:16].  Usually this is identical to host
-> physical address bits.  With NPT or EPT being used this might be
-> restricted to 48 (max 4-level paging address space size) even if
-> the host cpu supports more physical address bits.
-> 
-> When set pass this to the guest, using cpuid too.  Guest firmware
-> can use this to figure how big the usable guest physical address
-> space is, so PCI bar mapping are actually reachable.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->   target/i386/cpu.h         |  1 +
->   target/i386/cpu.c         |  1 +
->   target/i386/kvm/kvm-cpu.c | 32 +++++++++++++++++++++++++++++++-
->   3 files changed, 33 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 952174bb6f52..d427218827f6 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -2026,6 +2026,7 @@ struct ArchCPU {
->   
->       /* Number of physical address bits supported */
->       uint32_t phys_bits;
-> +    uint32_t guest_phys_bits;
->   
->       /* in order to simplify APIC support, we leave this pointer to the
->          user */
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 9a210d8d9290..c88c895a5b3e 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -6570,6 +6570,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->           if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
->               /* 64 bit processor */
->                *eax |= (cpu_x86_virtual_addr_width(env) << 8);
-> +             *eax |= (cpu->guest_phys_bits << 16);
->           }
->           *ebx = env->features[FEAT_8000_0008_EBX];
->           if (cs->nr_cores * cs->nr_threads > 1) {
-> diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
-> index 9c791b7b0520..a2b7bfaeadf8 100644
-> --- a/target/i386/kvm/kvm-cpu.c
-> +++ b/target/i386/kvm/kvm-cpu.c
-> @@ -18,10 +18,36 @@
->   #include "kvm_i386.h"
->   #include "hw/core/accel-cpu.h"
->   
-> +static void kvm_set_guest_phys_bits(CPUState *cs)
-> +{
-> +    X86CPU *cpu = X86_CPU(cs);
-> +    uint32_t eax, guest_phys_bits;
-> +
-> +    if (!cpu->host_phys_bits) {
-> +        return;
-> +    }
+On Fri, Mar 15, 2024 at 3:26=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> On Fri, 15 Mar 2024 11:51:48 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Thu, Mar 14, 2024 at 2:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > On Thu, 14 Mar 2024 11:12:24 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Tue, Mar 12, 2024 at 10:10=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.=
+alibaba.com> wrote:
+> > > > >
+> > > > > Now, we pass multi parameters to find_vqs. These parameters
+> > > > > may work for transport or work for vring.
+> > > > >
+> > > > > And find_vqs has multi implements in many places:
+> > > > >
+> > > > >  arch/um/drivers/virtio_uml.c
+> > > > >  drivers/platform/mellanox/mlxbf-tmfifo.c
+> > > > >  drivers/remoteproc/remoteproc_virtio.c
+> > > > >  drivers/s390/virtio/virtio_ccw.c
+> > > > >  drivers/virtio/virtio_mmio.c
+> > > > >  drivers/virtio/virtio_pci_legacy.c
+> > > > >  drivers/virtio/virtio_pci_modern.c
+> > > > >  drivers/virtio/virtio_vdpa.c
+> > > > >
+> > > > > Every time, we try to add a new parameter, that is difficult.
+> > > > > We must change every find_vqs implement.
+> > > > >
+> > > > > One the other side, if we want to pass a parameter to vring,
+> > > > > we must change the call path from transport to vring.
+> > > > > Too many functions need to be changed.
+> > > > >
+> > > > > So it is time to refactor the find_vqs. We pass a structure
+> > > > > cfg to find_vqs(), that will be passed to vring by transport.
+> > > > >
+> > > > > Because the vp_modern_create_avq() use the "const char *names[]",
+> > > > > and the virtio_uml.c changes the name in the subsequent commit, s=
+o
+> > > > > change the "names" inside the virtio_vq_config from "const char *=
+const
+> > > > > *names" to "const char **names".
+> > > > >
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > Acked-by: Johannes Berg <johannes@sipsolutions.net>
+> > > > > Reviewed-by: Ilpo J=3DE4rvinen <ilpo.jarvinen@linux.intel.com>
+> > > >
+> > > > The name seems broken here.
+> > >
+> > > Email APP bug.
+> > >
+> > > I will fix.
+> > >
+> > >
+> > > >
+> > > > [...]
+> > > >
+> > > > >
+> > > > >  typedef void vq_callback_t(struct virtqueue *);
+> > > > >
+> > > > > +/**
+> > > > > + * struct virtio_vq_config - configure for find_vqs()
+> > > > > + * @cfg_idx: Used by virtio core. The drivers should set this to=
+ 0.
+> > > > > + *     During the initialization of each vq(vring setup), we nee=
+d to know which
+> > > > > + *     item in the array should be used at that time. But since =
+the item in
+> > > > > + *     names can be null, which causes some item of array to be =
+skipped, we
+> > > > > + *     cannot use vq.index as the current id. So add a cfg_idx t=
+o let vring
+> > > > > + *     know how to get the current configuration from the array =
+when
+> > > > > + *     initializing vq.
+> > > >
+> > > > So this design is not good. If it is not something that the driver
+> > > > needs to care about, the core needs to hide it from the API.
+> > >
+> > > The driver just ignore it. That will be beneficial to the virtio core=
+.
+> > > Otherwise, we must pass one more parameter everywhere.
+> >
+> > I don't get here, it's an internal logic and we've already done that.
+>
+>
+> ## Then these must add one param "cfg_idx";
+>
+>  struct virtqueue *vring_create_virtqueue(struct virtio_device *vdev,
+>                                          unsigned int index,
+>                                          struct vq_transport_config *tp_c=
+fg,
+>                                          struct virtio_vq_config *cfg,
+> -->                                      uint cfg_idx);
+>
+>  struct virtqueue *vring_new_virtqueue(struct virtio_device *vdev,
+>                                       unsigned int index,
+>                                       void *pages,
+>                                       struct vq_transport_config *tp_cfg,
+>                                       struct virtio_vq_config *cfg,
+> -->                                      uint cfg_idx);
+>
+>
+> ## The functions inside virtio_ring also need to add a new param, such as=
+:
+>
+>  static struct virtqueue *vring_create_virtqueue_split(struct virtio_devi=
+ce *vdev,
+>                                                       unsigned int index,
+>                                                       struct vq_transport=
+_config *tp_cfg,
+>                                                       struct virtio_vq_co=
+nfig,
+> -->                                                   uint cfg_idx);
+>
+>
+>
 
-This needs explanation of why. What if users set the phys-bits to 
-exactly host's value, via "-cpu xxx,phys-bits=host's value"?
+I guess what I'm missing is when could the index differ from cfg_idx?
 
+Thanks
 
-> +    eax = kvm_arch_get_supported_cpuid(cs->kvm_state, 0x80000008, 0, R_EAX);
-> +    guest_phys_bits = (eax >> 16) & 0xff;
-> +    if (!guest_phys_bits) {
-> +        return;
-> +    }
-> +
-> +    if (cpu->guest_phys_bits == 0 ||
-> +        cpu->guest_phys_bits > guest_phys_bits) {
-> +        cpu->guest_phys_bits = guest_phys_bits;
-> +    }
-> +
-> +    if (cpu->guest_phys_bits > cpu->host_phys_bits_limit) {
-> +        cpu->guest_phys_bits = cpu->host_phys_bits_limit;
-> +    }
-> +}
-> +
->   static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
->   {
->       X86CPU *cpu = X86_CPU(cs);
->       CPUX86State *env = &cpu->env;
-> +    bool ret;
->   
->       /*
->        * The realize order is important, since x86_cpu_realize() checks if
-> @@ -50,7 +76,11 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
->                                                      MSR_IA32_UCODE_REV);
->           }
->       }
-> -    return host_cpu_realizefn(cs, errp);
-> +    ret = host_cpu_realizefn(cs, errp);
-
-We need to check ret and return if !ret;
-
-> +    kvm_set_guest_phys_bits(cs);
-> +
-> +    return ret;
->   }
->   
->   static bool lmce_supported(void)
+> Thanks.
+>
+>
+>
+>
+> >
+> > Thanks
+> >
+> > >
+> > > Thanks.
+> > >
+> > > >
+> > > > Thanks
+> > > >
+> > >
+> >
+>
 
 
