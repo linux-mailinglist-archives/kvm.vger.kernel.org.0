@@ -1,135 +1,172 @@
-Return-Path: <kvm+bounces-12000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12001-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47C0187EDEC
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 17:50:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C2A87EDF3
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 17:51:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D9D5B22DA2
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 16:50:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C06C91C21EEA
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 16:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739285821B;
-	Mon, 18 Mar 2024 16:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832DD5647F;
+	Mon, 18 Mar 2024 16:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uvq+TOp2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6rUVJkD"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2085787B
-	for <kvm@vger.kernel.org>; Mon, 18 Mar 2024 16:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBED5644D
+	for <kvm@vger.kernel.org>; Mon, 18 Mar 2024 16:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710780487; cv=none; b=t2ABSnHRHez7DeOrSlVSINzjErsQEugwkUM3WOLFlbBvafEZpc8PP2jqCx/G58m4HNsy9H2tBsi53znjLVu6Vha+fXJ5er7uj+CfEn43uno3DaWj7X432kcTGRCHZpFZCt8Ub7Ym42EUOLcILuIHTQKl0ERb340N6pCdAV8ieOM=
+	t=1710780546; cv=none; b=U9oeq/bYa6YRwTAHCTjC/ckydmbm/wcGuga74d2mwwWKOp5PS4Vl/vTqCkEgK6Ek8An8rUA6RmM8nMlrCPUOcCOal81KPMvzA32+NidLGmuMry98eJY8ckA630jmFvgH5aPiqazDBB/SEeI4ln+iMG5Ypu7wYRY/8rYiZUxIY8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710780487; c=relaxed/simple;
-	bh=byVLjBQ+PDKkjG98lJBvuTPI9sOWJC+KcaUGTHpUfw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tua+fz9JRp3gRkdQraIoBvoykBuCYyqeItVHOhc1zn20b4R8LNFa58774YrPxFw4L/TPY1fC85gF0twU/t233ujScG+gqFicyhtTOQVKtczVuGZwYGzKWmuCc4M0KS6pF5ooXPXYYZUyIu56+FXvaDf2d+z2PCn/wYmSvvyKO4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uvq+TOp2; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 18 Mar 2024 17:47:57 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710780482;
+	s=arc-20240116; t=1710780546; c=relaxed/simple;
+	bh=stnly8HvasFMCvsYR1fbyuJtmkCcBTZ3FsH47hj2E1o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k2CB9rrXykDHtHL46R6F9WifIi2+jDxJ1BV4bC4YLlqbyQVEjk/kQXzT3n0vLZ5CwkhTDHWyzHIB+Lc/u1+SBL3xqpw1VVBbCZD8mMz9eaBPd/dl7awMYHrgPm4EqO/FAqaFjxPMwBobuhAXskO4t0DO1rXrvVkMiu1/CLsOyNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A6rUVJkD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710780544;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dfWnUvJx9zSzTytX26V2scFE+BhFjwp/e/8ZZRBVnVk=;
-	b=uvq+TOp2eTS3R0SZ2xSLxaoQVYzgCuUP3YVelBKPW+bNEuoO8V8vvX/kxJD0HTGNUY5FXN
-	DWgu67/tTk3UfrJ0Zivp7gm03tXhrC+n9KpX62zKmX9huAfmEm1ex89dRVH2OfrxEwrT8g
-	qtEJ+7vPiXNmjjtaiyT7E0rb1YJlIes=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	nikos.nikoleris@arm.com, shahuang@redhat.com, pbonzini@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 00/18] arm64: EFI improvements
-Message-ID: <20240318-28422707d47001e973cc5a37@orel>
-References: <20240305164623.379149-20-andrew.jones@linux.dev>
+	bh=PBtKOdFjpK+3+Il0olwQK+Bw8samb3ue692p47qxRLg=;
+	b=A6rUVJkDBt+43nNeeksNMXEkWejmtRVd6ji5VJkXFVX1oCDI9v+5YOq+VVlo8wJnoG8j8v
+	XdYOTanou/dLKS3cbCVO4HhSfKzekPQHhDjqlrlScs2Mmo+/Mb2X39QiwU6LkPzN0kUkiN
+	gaceDE6Pw8FpAJVIjt57mxZHWQXWEu8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-587-FjMfDB-wPSmJNaf-WFZ8hQ-1; Mon, 18 Mar 2024 12:49:02 -0400
+X-MC-Unique: FjMfDB-wPSmJNaf-WFZ8hQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33ed8677d16so1323845f8f.1
+        for <kvm@vger.kernel.org>; Mon, 18 Mar 2024 09:49:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710780541; x=1711385341;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PBtKOdFjpK+3+Il0olwQK+Bw8samb3ue692p47qxRLg=;
+        b=EvrPJwBapXHYupev4XjnmadFZoJJtRdcIcNI3aFLhG6eWZiJD3vwifcBfMdAXxGy3x
+         qIZ1Eaayx9p5cgsLCgQ9k19d+6z1tz9//doAJiCE379Z9NbWBAV6tTczTdG8BKomQb8R
+         AXxgZByQzKBfuL/pEpm2bQ0FiIE98XxVkq13hmV2ijRsQDyjZjxM5aXcXsCXUKudlRZf
+         HVX2skrtYA1eeWCXQWpcJ58YmuVhA6kxnwcLLVncwes/S9mV3hheyzGEBYq5TSTrVlHR
+         w9quJMFE3VxTXY10QDC1SCRHEdxNhgy+7wU8z+eN2qeGWRBwBYGwmfrSlLuIEy96LNnz
+         W7ng==
+X-Forwarded-Encrypted: i=1; AJvYcCWBiR8NfaDebTLjXQikr/kWI4p51b4pmWYwwKtTKNMV183PFY+O6Nq3IK7LfTWstnMTxQALUwKQY6N5oLAlUsWSbeLP
+X-Gm-Message-State: AOJu0YwrZHX9GwF3IB3VK56PqRtDgyUfUG4raCjTMFHOX2ApsniRgaOz
+	dY7BH3lRGJlJA34aAfuqUWki1gEEEZM5PJU9YorbLm5B+nmlnvIlnbv+iXrrAI6FOfnw/QUo8xM
+	cVnbJvLJxi2axyCPLudKZImKZ+waY5C2EmGGbm3PzzUkQtCs0szYJY4VLh10jPMs87rAX35hqBK
+	37NoCsPkpjiD83IjlBdnV0qXPT
+X-Received: by 2002:adf:fd0b:0:b0:33e:6760:6def with SMTP id e11-20020adffd0b000000b0033e67606defmr10341242wrr.56.1710780541341;
+        Mon, 18 Mar 2024 09:49:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFepTlAmHpk5XYr52CmG+vr1oXsaNyDVNLRINU5cOCbpoo7rMo/2qyJQ4eDkMw6LiUrwInEBeyds8RYpJNHITE=
+X-Received: by 2002:adf:fd0b:0:b0:33e:6760:6def with SMTP id
+ e11-20020adffd0b000000b0033e67606defmr10341226wrr.56.1710780540978; Mon, 18
+ Mar 2024 09:49:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240305164623.379149-20-andrew.jones@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+References: <20240226190344.787149-1-pbonzini@redhat.com> <20240226190344.787149-11-pbonzini@redhat.com>
+ <20240314024952.w6n6ol5hjzqayn2g@amd.com> <20240314220923.htmb4qix4ct5m5om@amd.com>
+ <ZfOAm8HtAaazpc5O@google.com> <20240314234850.js4gvwv7wh43v3y5@amd.com> <ZfRhu0GVjWeAAJMB@google.com>
+In-Reply-To: <ZfRhu0GVjWeAAJMB@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 18 Mar 2024 17:48:48 +0100
+Message-ID: <CABgObfYNnDXvPU7OMDHzq-yjRYGHaS-M0E_tE2UB4ucv6E1x2Q@mail.gmail.com>
+Subject: Re: [PATCH v3 10/15] KVM: x86: add fields to struct kvm_arch for CoCo features
+To: Sean Christopherson <seanjc@google.com>
+Cc: Michael Roth <michael.roth@amd.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	aik@amd.com, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 05, 2024 at 05:46:24PM +0100, Andrew Jones wrote:
-> This series collects one fix ("Update MAX_SMP probe") with a bunch of
-> improvements to the EFI setup code and run script. With the series
-> applied one can add --enable-efi-direct when configuring and then
-> run the EFI tests on QEMU much, much faster by using direct kernel
-> boot for them (and environment variables will work too). The non-
-> direct (original) way of running the EFI tests has also been sped up
-> a bit by not running the dummy test and not generating the dtb twice.
-> The cleanups in the setup code allow duplicated code to be removed
-> (by sharing with the non-EFI setup code) and eventually for riscv
-> to share some code too with the introduction of memregions_efi_init().
-> 
-> v3:
->  - Dropped fdt_valid
->  - Factored out qemu_args+=(-machine acpi=off) [Nikos]
->  - Ensure etext is page aligned
->  - Picked up Nikos's r-b's
-> 
-> v2:
->  - Add another improvement (patches 15-17), which is to stop mapping
->    EFI regions which we consider reserved (including
->    EFI_BOOT_SERVICES_DATA regions which requires moving the primary stack)
->  - Add EFI gitlab CI tests
->  - Fix one typo in configure help text
-> 
-> 
-> Andrew Jones (17):
->   runtime: Update MAX_SMP probe
->   runtime: Add yet another 'no kernel' error message
->   arm64: efi: Don't create dummy test
->   arm64: efi: Remove redundant dtb generation
->   arm64: efi: Move run code into a function
->   arm64: efi: Remove EFI_USE_DTB
->   arm64: efi: Improve device tree discovery
->   lib/efi: Add support for loading the initrd
->   arm64: efi: Allow running tests directly
->   arm/arm64: Factor out some initial setup
->   arm/arm64: Factor out allocator init from mem_init
->   arm64: Simplify efi_mem_init
->   arm64: Add memregions_efi_init
->   arm64: efi: Don't map reserved regions
->   arm64: efi: Fix _start returns from failed _relocate
->   arm64: efi: Switch to our own stack
->   arm64: efi: Add gitlab CI
-> 
-> Shaoqin Huang (1):
->   arm64: efi: Make running tests on EFI can be parallel
-> 
->  .gitlab-ci.yml              |  32 ++++-
->  arm/efi/crt0-efi-aarch64.S  |  37 ++++--
->  arm/efi/elf_aarch64_efi.lds |   1 +
->  arm/efi/run                 |  64 ++++++----
->  arm/run                     |   6 +-
->  configure                   |  17 +++
->  lib/arm/mmu.c               |   6 +-
->  lib/arm/setup.c             | 227 ++++++++++++++----------------------
->  lib/efi.c                   |  84 +++++++++++--
->  lib/linux/efi.h             |  29 +++++
->  lib/memregions.c            |  53 +++++++++
->  lib/memregions.h            |   6 +
->  run_tests.sh                |   5 +-
->  scripts/runtime.bash        |  21 ++--
->  14 files changed, 389 insertions(+), 199 deletions(-)
-> 
-> -- 
-> 2.44.0
+On Fri, Mar 15, 2024 at 3:57=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
+> On Thu, Mar 14, 2024, Michael Roth wrote:
+> > On Thu, Mar 14, 2024 at 03:56:27PM -0700, Sean Christopherson wrote:
+> > > On Thu, Mar 14, 2024, Michael Roth wrote:
+> > > > On Wed, Mar 13, 2024 at 09:49:52PM -0500, Michael Roth wrote:
+> > > > > I've been trying to get SNP running on top of these patches and h=
+it and
+> > > > > issue with these due to fpstate_set_confidential() being done dur=
+ing
+> > > > > svm_vcpu_create(), so when QEMU tries to sync FPU state prior to =
+calling
+> > > > > SNP_LAUNCH_FINISH it errors out. I think the same would happen wi=
+th
+> > > > > SEV-ES as well.
+> > > > > Maybe fpstate_set_confidential() should be relocated to SEV_LAUNC=
+H_FINISH
+> > > > > site as part of these patches?
+> > > >
+> > > > Talked to Tom a bit about this and that might not make much sense u=
+nless
+> > > > we actually want to add some code to sync that FPU state into the V=
+MSA
+>
+> Is manually copying required for register state?  If so, manually copying=
+ everything
+> seems like the way to go, otherwise we'll end up with a confusing ABI whe=
+re a
+> rather arbitrary set of bits are (not) configurable by userspace.
 
-Merged.
+Yes, see sev_es_sync_vmsa. I'll add FPU as well.
 
-Thanks,
-drew
+> > SET_REGS/SREGS and the others only throw an error when
+> > vcpu->arch.guest_state_protected gets set, which doesn't happen until
+>
+> Ah, I misread the diff and didn't see the existing check on fpstate_is_co=
+nfidential().
+>
+> Side topic, I could have sworn KVM didn't allocate the guest fpstate for =
+SEV-ES,
+> but git blame says otherwise.  Avoiding that allocation would have been a=
+n argument
+> for immediately marking the fpstate confidential.
+>
+> That said, any reason not to free the state when the fpstate is marked co=
+nfidential?
+
+No reason not to do it, except not wanting to add more cases to code
+that's already pretty hairy.
+
+> > sev_launch_update_vmsa(). So in those cases userspace is still able to =
+sync
+> > additional/non-reset state prior initial launch. It's just XSAVE/XSAVE2=
+ that
+> > are a bit more restrictive because they check fpstate_is_confidential()
+> > instead, which gets set during vCPU creation.
+> >
+> > Somewhat related, but just noticed that KVM_SET_FPU also relies on
+> > fpstate_is_confidential() but still silently returns 0 with this series=
+.
+> > Seems like it should be handled the same way as XSAVE/XSAVE2, whatever =
+we
+> > end up doing.
+>
+> +1
+>
+> Also, I think a less confusing and more robust way to deal with the new V=
+M types
+> would be to condition only the return code on whether or not the VM has p=
+rotected
+> state
+
+Makes sense (I found KVM_GET/SET_FPU independently and will fix that
+as well in the next submission).
+
+Paolo
+
 
