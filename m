@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-11975-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-11976-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB0A87E3DF
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 08:04:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A783987E3F5
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 08:17:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F2161F21763
-	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 07:04:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CAEB1F21643
+	for <lists+kvm@lfdr.de>; Mon, 18 Mar 2024 07:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D3322069;
-	Mon, 18 Mar 2024 07:03:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA096224DC;
+	Mon, 18 Mar 2024 07:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="v3m9tVgQ"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="UzwalN86"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2130.outbound.protection.outlook.com [40.107.92.130])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2130.outbound.protection.outlook.com [40.107.243.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4018922EE5;
-	Mon, 18 Mar 2024 07:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B951523741;
+	Mon, 18 Mar 2024 07:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.130
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710745435; cv=fail; b=sKJU765+ApNj+anas+ilSBI2SAUOnJf5ZryTNZBBc5Yqn4w+lS14dtWCk4hftwP8szzV7HEBTnQW6NxqGxH6rZcFrjiPJWqUOXEcGvi2hzZSIfHADWkaMs/+vn0bJFf/kxN38KV3apaKY92Y6FpVEEhQVBmx2sQyefygtRP1A6s=
+	t=1710746262; cv=fail; b=YVzNWqJtYxd68kVurdLiU3jpM3CLAYk5aWCJTbShp7Jo/ZaEecr0teHTMJkj9zpzpi42JTZy4BBnzWFzucFO/pyhlbcIUZIgHE4qirx7Lh1jksjrKkF31Nsl0NxdrMUZ5KwrRXYqLVg395HDg2B29vYB+Z2dHvKRB/epCaPZlLs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710745435; c=relaxed/simple;
-	bh=2Nfhux9MmYuj73BDBWvXhlhfMM/VmWLXd9ALj4gG88w=;
+	s=arc-20240116; t=1710746262; c=relaxed/simple;
+	bh=Q2WYZ56znIOudsqNTmhEgcjCuf4TP6gNUzAVI/zLUZw=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RffHwT7G2GLm5eBk/GwOALeC9Uhipi6klwvXk6bxVATv5BoDp5q56QIuY5r3Om3JVYCNlyYDS+P0ANQJVhO1O6hXKqE0WZOy7Sy55CoqYkH4vsrw5/CY1VewZzI/3+ja9F+6ciNqA7lB8LVdRwftTM0rEEthGVDdUHM1o38zh0E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=v3m9tVgQ; arc=fail smtp.client-ip=40.107.92.130
+	 Content-Type:MIME-Version; b=akpxx0lRjum/lX8vCiCjnA1MeIYoXo/2vgRIQ3h30an7CKnryaT7gHLyUdRX/j2q4tdXwykzPcEEz07C9KokzOowcnQnyoyrJvCdA0r5poxiXqTKlLxIkkbilJNfb0kXhWT/N0zxolhEw6PuAmHsiNyt4Q0J1ERVamxM77035t0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=UzwalN86; arc=fail smtp.client-ip=40.107.243.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cQE4XzblOMJR5b8arnv4p45wLLxEjJ/0WrzX72YHohJROQECXTnVy66gs44sAFgw4FuzDJKEydPbuFUmJauFYYm/k9wPV3YNPYuK9ZMdpw3umUsWesmpwe8W0pk6JTJvytXkrR0msGS3SY9MisRfTE3JCUwszEo5s+Pabl8lDYUGTKlfd5e3jRKDe5kfI6lr7tWl3pWAjwSqao5zNG9CvwfphALsS7gxsvl/dowJe/ORHXldneOtKqjaoOVXCPUjAbirxq5yoHcUeDGNgbON8s+LzcXG1qtDRUQiqa8XUQTaO2GJIgwMX487dFkYHtXi7JfQkIcW8OW5MR93MTfluA==
+ b=ite+GNJsanYn+V4oTjqIVdZpmrjJi85wQe9NaZQ/y1m8b+vCvxHPDpG3fcSUVnmWF7e9OlAoogxTpg7S3xrLy4Ra2r1SyXJjaCJQyrHbKMNcX2Vdm74+0Adw6kE9TwaPhi0/a3doGijatLGHV8G98TLs+wFVsocJkdsAOF7FfxgWfakuL133lcgvBsQZl4bLGtsxH96wVlvYiZgpW/Gn2JKKymb1X95LbYhvP/YqM2eWT3w0zAYNtWTIPS/WHZzn10s8df/wNArhTnvwt1lRPaWE9PmZy5APgsPm3ChPaeS+fnl+9WeX12Kfxi9ZhP5LsURgtSzTpSPG8xKFXPCuAg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=anAnmk5BmAO/1JV6SIU9HcG4NDo+kycBOv8dI1swjUU=;
- b=fmjrmJgrdF65mh8+GlMKruo37dAioe5zTNBmxexzIBPGJcJvHteGEOjKglUUtoYSxhRlkXKDFZMR3zmm1ppo9S1BmOcUf8dMTEIWgWeFaEITClNbZCyxdO59z7TJDEskSLC/Du0/+KzJzdPGciLaRgBzrmgc/UTwa8j7AAU2Jg4IspfSWvtXj1zhhJXoz1X4wLargV86ap9e2rvLClSSaKOci7pyrrERtDhjQGRx2WK5eejjRyubmpVMlotmg5EE7B4ZYUC3s/F/m7JIkdkPssMrAUwnMfJE6h7azSSK9tEYpJBiSeYtq5dwC+D39jj0tw52fYgTKBxZdzYoMaMxPQ==
+ bh=b0ZQ9GyWRwaw9VO8UZTGHzkd0dSLOp7iG0Nc1a2y+U0=;
+ b=D9jsJOqpXNq2l1rNaLc9nAxX1kPoo83EO4SL2740RXp2Pk7Tcyhdfg7RmO64XhUSL2GwB6X/ONJSv/vSdcqJG82dbOhGRpjhHjEvtC+/i/LeaLePbfh9+58QHGAngklseLpLzx8Ki2Q/ppNTEsb0dGuAJsCXxny6TQIlLS6SBayQSE2b8R/fVkPJBlFJDOBopovX0B39d7y5R3XFhDX7+5t9NqWrCpzsTlqoQMmEgUpkXrU1YVo+IIwY5IEF2zygQUL5dZCAfJzpzbqTjpmmZ/RHT2JauixazWfmA5vELr9l1iaRCoUlLqA+lvdok0AzAafkrhkTWA+OD7iD8CNHSA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -45,22 +45,22 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=anAnmk5BmAO/1JV6SIU9HcG4NDo+kycBOv8dI1swjUU=;
- b=v3m9tVgQbkfaAkrOlYSIWDqWMl1leV/WbmTRE3iphXgJphx4/rIR8IDnhs12rynLwkwrn6jntaeAHnyi7qJvbWyv51WWiVAO3IBEmkERIAcgU7UtBWdRiQcuJQ8HsJZUA3OIYbNFQY6+f97yRYrdnK5bpGZbv0Jb/brUPMs27Ow=
+ bh=b0ZQ9GyWRwaw9VO8UZTGHzkd0dSLOp7iG0Nc1a2y+U0=;
+ b=UzwalN86aB6rS1Y2IvTyisN5Vb4b2nWUgfrWvIXoIJc5a19RJ3PmCuF1a8pKIQeZb9/ULCdowiAYSPxZlZLZOY4y9+gfun9C3tZMszjv4q1pROKhYlB+NiXBcRijxvwgFRK5mRNq2v5N+VQRGSvSCiIG2745CGqXytBmA9WpMhA=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
- CH0PR01MB7019.prod.exchangelabs.com (2603:10b6:610:108::10) with Microsoft
+ BL3PR01MB6849.prod.exchangelabs.com (2603:10b6:208:350::5) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7386.27; Mon, 18 Mar 2024 07:03:48 +0000
+ 15.20.7362.35; Mon, 18 Mar 2024 07:17:36 +0000
 Received: from SJ2PR01MB8101.prod.exchangelabs.com
  ([fe80::d3dd:ece:637f:bde9]) by SJ2PR01MB8101.prod.exchangelabs.com
  ([fe80::d3dd:ece:637f:bde9%3]) with mapi id 15.20.7386.025; Mon, 18 Mar 2024
- 07:03:47 +0000
-Message-ID: <aaf10e76-657f-4667-a920-e71b93419efd@os.amperecomputing.com>
-Date: Mon, 18 Mar 2024 12:33:35 +0530
+ 07:17:36 +0000
+Message-ID: <d5a1adac-d0d1-4eac-b5ad-b2b8f4d9d971@os.amperecomputing.com>
+Date: Mon, 18 Mar 2024 12:47:24 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 03/28] arm64: RME: Add wrappers for RMI calls
+Subject: Re: [RFC PATCH 04/28] arm64: RME: Check for RME support at KVM init
 Content-Language: en-US
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
@@ -75,13 +75,13 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  linux-coco@lists.linux.dev
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
  <20230127112932.38045-1-steven.price@arm.com>
- <20230127112932.38045-4-steven.price@arm.com>
+ <20230127112932.38045-5-steven.price@arm.com>
 From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <20230127112932.38045-4-steven.price@arm.com>
+In-Reply-To: <20230127112932.38045-5-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR13CA0059.namprd13.prod.outlook.com
- (2603:10b6:610:b2::34) To SJ2PR01MB8101.prod.exchangelabs.com
+X-ClientProxiedBy: CH2PR03CA0023.namprd03.prod.outlook.com
+ (2603:10b6:610:59::33) To SJ2PR01MB8101.prod.exchangelabs.com
  (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -90,351 +90,283 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|CH0PR01MB7019:EE_
-X-MS-Office365-Filtering-Correlation-Id: bdc93212-92db-4b1a-f417-08dc47198ef2
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|BL3PR01MB6849:EE_
+X-MS-Office365-Filtering-Correlation-Id: a28495ff-301d-45b1-5500-08dc471b7cf1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	P+1LQS5uj3jdMe4KbK/szEd7O6ZL34TnkIGzhrha8hVmAH7uQe1st834CSLEjPHpFhzEQKeZ7Zz0ZejdTeWCk4+H+OkEbz8/7nSMNMpUs+SqH1s0LliRAvLXUcHiCT+6fq+258bm6eZdDZsPwQ0Vcd/9TSYhEOZsGRwDgIrTjnzy7MZpuQlttL7NCLDVwSrRWqHit//QyE9w2se/gTHpcz6Aoz8Lq6n8bBBX/Zq9Vg961ZcDkjhw84FgiEznhUUl2sNJvLrtsIf5wxeIJRX9vVyi6NWxZ0FNIDiiuKFU6V5YOh1Sd5GSbRVX7eM50nAfuXbUTNFnsWneHQ7n/GVrSdqjNJsZIrkuhK15Q8PhQvu9qAkgy/MqmFoqYLITJuHViVXAYi84HE0xRf73J1Zr0Krt8Ar3J+2DJHu15gCjLY8PsJPtV+uItjzquhp+Mn0LoOzHZg57HZwKDZmlmAiKpCz0zr4wWn8timp5d3EykFG3spn7niiMbTZfm/h+PmYS1H2Nrdtk+pFrvG70UjVTbZ5bgxXUsrGQ29MZCdvXJjwfOJKXSAY3lxvGxoA+hC+I58hoUx/gUIeqUMnsq38b+BdbPk/wPi687iOGLAjtiu9OWeQYlXbiRNwnnokgW2Pk4S99kp0qTYADYHZ67BU5dsnp8UzKqDUx12+UI3zmFDo=
+	4dAHXPx7QS0mDvlbBV+fUdEebqwmLL9sRDox0bbYNDfcfsUo+0u70+fUkBb4utck9stHE/HRBp1Gs9Esi/ZE06c9+jTpuh1vWeQS/SbY+9rO81VBPK+RccNByu2vo9oG1YWqI1pWGm561vJl811PTlezqBqZPQ7+J6yC34+Ift9o2aDm5mChO4S9i+/11x6Dw1xi7H6qAQkHcExnKQg+ViN9/63lwxZoHyC3s/VheM5DZXWiBvcLIAYVon6O4hNlPQ7Fn3OlJLwgzqqG5bouGjtvG/48+hnwaH61jKjHu/OiOTV4eMe3rxXgUz6FfCyaBhWqm85onCXeT5dELa4ATE7/KZuwC9mzMZZrZBPNOA+Hxz0Kxv3M+o9PUg8R/Khb3bWRP4y8wn8rKSg0MGU80Xu2NASrVS7ptDNylsuBdRn5Fft7NWV2Fu2FFE102+ksgr2WdlvLK25TUIvMwZsK7qDkzNXGBiNlNdhNP7H/T98IKd+3aLrieMa7BRy5w3DvywgseDHoXq+KcyBgwxVY6ediDgmfYlS4ldl9oFcBxpp3AWPbBvG497xaS0qzquOO/suSRfgaaRAeNsWFyD24wxn3QLsshismow+gRUTEdschYelFP+nnlvntQ0Ra7M/T21CMb+rewV7Stw8i0bzAlt+izD4RM8qcq5d5jKRuw2A=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dGdHcXdnMnN5OVEzeTF3RC9XYVM4SGtIK0pQREozTER6YWJqTFVuTUtKZWJu?=
- =?utf-8?B?YUsxVXdkM2RqczJmTmNBRmpSckdsOVFuOXFZUTNLSTcvOFliNkJuNVlpQWtt?=
- =?utf-8?B?aWFFOVNsTnRxQzY2QThNVmJBRlQ4U3o2N2ZBd3lDS1Y3RW1vYUY1RktkMVF2?=
- =?utf-8?B?dTZRME5keGVvU3FIa2hwM2dtdGFiWWtld1pMQTlkL0tia3lhbzVtRkh6V0h4?=
- =?utf-8?B?UG9lWk01aGxWWWYySFpFalF4VEtWSGF0ZXFvUm41V1hWeXFaVnlYR2RNb1NJ?=
- =?utf-8?B?TGYzQW90S1RqRzNLenUrOHhmcUMrZnY0WC9lNDAzbEVSa2JZVWovSVRwVXow?=
- =?utf-8?B?ekVNcWhwQkNCcFY0UEVOK29Jdmp5ckUzZkdoTEZ2cEFOdmcwWDg1T01HUERL?=
- =?utf-8?B?UGp2Q2FTWlhyRExIdzVMN3QxWERLV0JrRFpwWFNScmlBVUhGeFhKMm84N1A3?=
- =?utf-8?B?NXBNa3cwQ3BxSXhnTGFvRERXb3RRK0t5RDJNUkN2NVpUY0ZCN1Y1ZHpyZ1JE?=
- =?utf-8?B?V2N4L281OGl1NUs4dTVxOFE3NVhyb0I0VFZWc0JiRll1d0VoVkROazRUYm1h?=
- =?utf-8?B?Z2pxcFJkV29XZ3pNWFJFNUE4d1VhT3d1UTdxTWJGbkwwNFJKdlBad25XT2x3?=
- =?utf-8?B?ZzRxeS9xTXdMSTBWWEVVT3hKY3Y0a29FQXFWOTJDSzBIRnhZblF4emxiWno5?=
- =?utf-8?B?WXUxQTRVdjFHbktLSmR1MjN0aCtXeFV1Nk9JV0tsZ21QM2hYeTFDY1Z2NGJq?=
- =?utf-8?B?SWErQklJOGQ5RHVRMW95RFI2aEs1cjhUZEM5eG5Va2lDSXdnTTNNYXZDbFlh?=
- =?utf-8?B?aXFmbDFhU2s3dW9ROXhaelg1ampBeFNyN0lZTDc1QS9RYUg5cXIrVVh4MnhN?=
- =?utf-8?B?YkxsNWFjcXZxR1BadnAxdEYyaWJRc0ROaUpHYXlvM0tpOG53OWV2SWxEZlZ3?=
- =?utf-8?B?NC9RMVFWc095ZVdQWnVoTXlDdmdvNThHNVVqZHFza2k5NGJhMjBLOU9VZDhv?=
- =?utf-8?B?QkRGditxa0JwS2JIVmlLcUJsWHY1ZnVpb1Z6cnByWGN2MzlQWloreVZ5VVZU?=
- =?utf-8?B?N05QY1BIbVg2WjZVN1BNWXhyMHNYU3JBVkoza1ZpMERtTlpRS3FXZjVKNXVW?=
- =?utf-8?B?YmFNMGxRNkI1VHViRzNidWdwQitzdlpsc2EzdC9VOHpEMEZEUHVGNU84NnVr?=
- =?utf-8?B?alpQVnZnNndRWWJHdzQzU0NLZ1kzWG4vQlhuQ1ZqOWZLMjBadXhDajY3clZj?=
- =?utf-8?B?eW41NlI1c2ZJUE1kYXVjdlF1NlE3RmhNMzFQSE1RQXRKV1RCSzFHVTNXaXFS?=
- =?utf-8?B?bUdLYjV3T3I2RzJmVy8rWU5lSFlTQzBzK0FtTVNzTEpsMllCTkVRYy9XQ2Jo?=
- =?utf-8?B?aktJRkxTcnYrQXJpRUNyZER2UXQrY3QrVUVwMVYzWXV4Rm1selhLd2NnTDlh?=
- =?utf-8?B?STNGcWtUUlVxV1cwZDJvTEpJT2F0dFlvOG12MnVpYXdkNmpzSHpmMmdaMHBX?=
- =?utf-8?B?NHBzb3Nza1B0SzJ4NjJaWUxOZlhIUVdwQUZHa3JaajR1SFhDVDluUUxUdHNH?=
- =?utf-8?B?NVpicDQraTNGQ001d2hnWVl2aTFCQmdmOGJOU2wvWkxLZCt1SCthOGJXeDVY?=
- =?utf-8?B?MDZvTWJLSEpjWlQ3SUlJQlIzVkRhWEQ0R0VqY1VYajJKZXRjV0hoZTNOSktL?=
- =?utf-8?B?dEhZWTBDYTZCSFlXMnh4VlNtR0M0WU1Vc3BMcEcyVzhIMS9DNkxSQkFOUVN1?=
- =?utf-8?B?djlPSjNLSlJFbHVTeWQ4TjBjUlNtQzNsOWdRZ3gxT01GU2tzaTBVL21JZ2Ir?=
- =?utf-8?B?YUNIc2NrL2RDSW1sTEVCOWZUVW1jNnYxUExJUnlTTXdIZTd2WWJkT0FVbDc5?=
- =?utf-8?B?eGNmQXo5WlpwNE45cnIwMkNNV0xFR2ZndmlsTFlhazhPQU0ralowa21OcmNl?=
- =?utf-8?B?UFpIY0d4M0VGL0tnUWd1enY1LzdJRnhRVGtDK0tkN2FEOFlMRS8wUlJ5Y0Vx?=
- =?utf-8?B?Qm5DWllsdUlqK0JadlowZ1ZkSTV0cU1Od3lyQmhrTUVZcWxJRHNpcTRsZTJL?=
- =?utf-8?B?OVRVY01zY01HTkdrdFlJUEt4amE2bXpwY3BQb0pCejVNNU1saVZxQXhJUmVh?=
- =?utf-8?B?YjluZ0Q5MnZZOXg2VTVVckZuUGlKS2JWZmYzT1dMNDRIUVVoNWNYVGh3eklz?=
- =?utf-8?Q?nZUVyoGN1Pj1lGcJBtfgUQmOapSNAkV2lNpyGjZXHGsA?=
+	=?utf-8?B?ZElOc1NMS2hITHVORE9abTNGcmNvR2Yxdk9rMlBNWjVSd2tuNSswWE9KbzYz?=
+ =?utf-8?B?SUJ1UkhlVU5zWXBMT3FVK0N4NFU3TFAzZDlQamNEa2xHaVZlNVFsVmQ0ZzlK?=
+ =?utf-8?B?ZDNrb1dmdlZ1YTN5a1dhWjQ4ZXdTNkdqR3VGQ2xnaXhqaFNNVmozWHFOQnkx?=
+ =?utf-8?B?Vm5YTDZoeW5zOEcybEJkeW1GbEdBUVRyZkhmM29MSi9BdmxQZmlmR0Y0S1pa?=
+ =?utf-8?B?OTdUNENPOW83c2t6NFZwN0NBVmRjbkNjZEJPOEpWMXpwYnN5RHdycXRJcUVE?=
+ =?utf-8?B?T2tDN1hUUFlvckxkWlcyNnlyT2ZmM2N5RUF5aEU2K0NJSTFXYnpKY0xsTisx?=
+ =?utf-8?B?eFZGM3ZRZDFDV3FhT2duV292dTRlRVpucktvdlZxNG9wTElYQVRuUVpVd2xs?=
+ =?utf-8?B?SVJUQ0Y4MU9NemQrRC9TYng5bExndHBYTWJoL0x4TzBjWDczYW8zN1oxYmdS?=
+ =?utf-8?B?QnByYmQyZTdSbFBFYTlkdGZRZkFrRGxGRVI2cWplMVMxTFVrMy9zUm9TTmVZ?=
+ =?utf-8?B?ZXdJRzVDd0dWRXlCaE81MlV2OCtYbWVIL1ZTVFdTMWxhSVFqN21sQUtRb0pG?=
+ =?utf-8?B?R21mdG9Hb0owNEtCc0MxT0ZKRG1SVGREbXhTRGZjVDdqd3FWVVplcVJwdWFm?=
+ =?utf-8?B?RFJLZGg0TXU5UkdFdXRwMHZCOEt6dlZxRDZZcWVDd3JVR1Uxc2p1K25RbHVZ?=
+ =?utf-8?B?ZzhrV3FIUktFc3ExUHBCNTRkY0hGUWR2SmVKd1N5dGppdUJqY3F0cjMrRUlF?=
+ =?utf-8?B?Nk51MHV0WEZWQjhmNldsaTB4a0xFb3h3em5xL2YrTzhaeUx2RUVZY205elNa?=
+ =?utf-8?B?cUl1empVRDQyRGUwS2xWNm9uekFiMTA3OEpROS9BbHVkWncwcTF2T0N4WHI4?=
+ =?utf-8?B?YU9rNTFPak5kbXQ3S0h1L3RnV0hubCtoRmlaak82U05BSU5wa29ucEgrTWZw?=
+ =?utf-8?B?SEs1K0hodWRvNnlHYnBmVmF1L2ZPeXp4cWpremhvQVk3VUgxeXUrN1l5TUFG?=
+ =?utf-8?B?OTFBVDdCWG9iN1llMVdIOWNrS3pYRjd6NXNwMm9EMzRTb3ZRK085djR2YjQ3?=
+ =?utf-8?B?VjlDcVlmSGZtZVNsWmdJOFppbGF2ZXhaamZwQjJ3Q3hZSXZlalNtZWlhZ3BX?=
+ =?utf-8?B?eEFwOEplTExoRGtISzRoMkN1KzROcWxiZjUvUmZ3TmNQYXlRazJpaExsUGw4?=
+ =?utf-8?B?QWUzQUtSMC80MUp3cGVUWWtJd0ViWFlUZHhYcHZ1SHhQVi9IWkQ3ZFJRWTRD?=
+ =?utf-8?B?Y3d2Q0ZFS3lrUHFDYTE2Y2dlUm1MUVhWWDBSN3k1TDRtWWxETDVQais5aXB4?=
+ =?utf-8?B?K25UVmhuemJ1WTh2bGMxSlMxbi9aYThUSDhVck5KYllaZjBicis4eU5aaXVW?=
+ =?utf-8?B?UE81NjZaSktEbFZHemNGZHRaayttWlJRRnNhMStDL0UvWUtvUVEzaE95YzRh?=
+ =?utf-8?B?cWVzaVVIYUNaejJNUFNqUFVDVTV3bldoU3k5cjJMSnVGa3BjTWp5R2JuNThi?=
+ =?utf-8?B?NHpiRUtFcW1WN1FKanpKYzBrNmdmeUxPNndsMHRWcXhlbmpnS016clJRcDd5?=
+ =?utf-8?B?WjVNaVJaNFpxaGkrdy9FQUlTeWpST3dDeWwzL21NVHFMaE9VaitHTnpkQjJ5?=
+ =?utf-8?B?Q1lDS2NJS1NVYndQSUxGd24xZVR1MnVGVFlsbzBwMjR6aEVOUWFNSlQ4VFVG?=
+ =?utf-8?B?d2Y5ZW40TGFKUmJvN2ZpQmhPZzhOUEV1VkVnYVlZOGFnczhROEt5RHVnWXNV?=
+ =?utf-8?B?YjkrUml1RmIvWDZjSm04QWNjVEs4TUx3Sko5Y05xRlFFSFNQQ3kzSXpVZEVM?=
+ =?utf-8?B?VUV1VDZ4VjVUMzZBR0IxOHMyVU5zbG5OZzdab0hWZlF6djVxOVA5c1lGVUdN?=
+ =?utf-8?B?WXZDbmFDQWVkM3VoQklWTW91QlJiTHNUT3NHMDZrR05yZ3RVYjUxOHZtV3NB?=
+ =?utf-8?B?VTlrajZ6NDg3SDJUaVByaXQwbjY0dWFSb3J2OG9qRlJUSkF4dW9xY3kwWGlD?=
+ =?utf-8?B?ZXFKaW5SMVhoenVQWlRYRytrUUFheWR3Vk15aEFMSHBlN1BVdi9MNk9rc243?=
+ =?utf-8?B?S1lxT0ZsWTBCbS90bDhreUx5L3p4QWx3Z3YwVmgxOXZNK0lxSUczYk1iclNN?=
+ =?utf-8?B?UU95MTBaaEpwTnJwVXV3SmdzcjV2TURGdnMyYkhzTjVPbXd2UG9PNERVdTUy?=
+ =?utf-8?Q?sWLLmy11DWWwcPjSMT2MittFzyo+pTI0l1zzyFguVEE7?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdc93212-92db-4b1a-f417-08dc47198ef2
+X-MS-Exchange-CrossTenant-Network-Message-Id: a28495ff-301d-45b1-5500-08dc471b7cf1
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2024 07:03:47.8906
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2024 07:17:36.6590
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4ZFqcD3bv/BuCrj/J4v2+ZNjtw78UaLyd9QGABlLxKwpHJ7CprdngnAbWkKpIAsYWY7NCHV4JV15oDvi2wDb7iGrQeLHuDdf0120BjDsGhmwpc6oLZLfC3p5k9gZvbEh
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR01MB7019
+X-MS-Exchange-CrossTenant-UserPrincipalName: VHfQiaFc1VNnMHnXSx5lLmqpW35zINsxWH6Y/41GxVf+uU0lk2kNkV9bK27vnx0IPcrqrwVGANMEzxG3qHKL06Qj0uNASyLw5Wr5TxyEamT06IIutD0FDpVqJ+f7VaXa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR01MB6849
 
 
-Hi Steven,
 
 On 27-01-2023 04:59 pm, Steven Price wrote:
-> The wrappers make the call sites easier to read and deal with the
-> boiler plate of handling the error codes from the RMM.
+> Query the RMI version number and check if it is a compatible version. A
+> static key is also provided to signal that a supported RMM is available.
+> 
+> Functions are provided to query if a VM or VCPU is a realm (or rec)
+> which currently will always return false.
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->   arch/arm64/include/asm/rmi_cmds.h | 259 ++++++++++++++++++++++++++++++
->   1 file changed, 259 insertions(+)
->   create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+>   arch/arm64/include/asm/kvm_emulate.h | 17 ++++++++++
+>   arch/arm64/include/asm/kvm_host.h    |  4 +++
+>   arch/arm64/include/asm/kvm_rme.h     | 22 +++++++++++++
+>   arch/arm64/include/asm/virt.h        |  1 +
+>   arch/arm64/kvm/Makefile              |  3 +-
+>   arch/arm64/kvm/arm.c                 |  8 +++++
+>   arch/arm64/kvm/rme.c                 | 49 ++++++++++++++++++++++++++++
+>   7 files changed, 103 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/arm64/include/asm/kvm_rme.h
+>   create mode 100644 arch/arm64/kvm/rme.c
 > 
-> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 9bdba47f7e14..5a2b7229e83f 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -490,4 +490,21 @@ static inline bool vcpu_has_feature(struct kvm_vcpu *vcpu, int feature)
+>   	return test_bit(feature, vcpu->arch.features);
+>   }
+>   
+> +static inline bool kvm_is_realm(struct kvm *kvm)
+> +{
+> +	if (static_branch_unlikely(&kvm_rme_is_available))
+> +		return kvm->arch.is_realm;
+> +	return false;
+> +}
+> +
+> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
+> +{
+> +	return READ_ONCE(kvm->arch.realm.state);
+> +}
+> +
+> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+>   #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 35a159d131b5..04347c3a8c6b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -26,6 +26,7 @@
+>   #include <asm/fpsimd.h>
+>   #include <asm/kvm.h>
+>   #include <asm/kvm_asm.h>
+> +#include <asm/kvm_rme.h>
+>   
+>   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>   
+> @@ -240,6 +241,9 @@ struct kvm_arch {
+>   	 * the associated pKVM instance in the hypervisor.
+>   	 */
+>   	struct kvm_protected_vm pkvm;
+> +
+> +	bool is_realm;
+> +	struct realm realm;
+>   };
+>   
+>   struct kvm_vcpu_fault_info {
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
 > new file mode 100644
-> index 000000000000..d5468ee46f35
+> index 000000000000..c26bc2c6770d
 > --- /dev/null
-> +++ b/arch/arm64/include/asm/rmi_cmds.h
-> @@ -0,0 +1,259 @@
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -0,0 +1,22 @@
 > +/* SPDX-License-Identifier: GPL-2.0 */
 > +/*
 > + * Copyright (C) 2023 ARM Ltd.
 > + */
 > +
-> +#ifndef __ASM_RMI_CMDS_H
-> +#define __ASM_RMI_CMDS_H
+> +#ifndef __ASM_KVM_RME_H
+> +#define __ASM_KVM_RME_H
 > +
-> +#include <linux/arm-smccc.h>
-> +
-> +#include <asm/rmi_smc.h>
-> +
-> +struct rtt_entry {
-> +	unsigned long walk_level;
-> +	unsigned long desc;
-> +	int state;
-> +	bool ripas;
+> +enum realm_state {
+> +	REALM_STATE_NONE,
+> +	REALM_STATE_NEW,
+> +	REALM_STATE_ACTIVE,
+> +	REALM_STATE_DYING
 > +};
 > +
-> +static inline int rmi_data_create(unsigned long data, unsigned long rd,
-> +				  unsigned long map_addr, unsigned long src,
-> +				  unsigned long flags)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_CREATE, data, rd, map_addr, src,
-> +			     flags, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_data_create_unknown(unsigned long data,
-> +					  unsigned long rd,
-> +					  unsigned long map_addr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_CREATE_UNKNOWN, data, rd, map_addr,
-> +			     &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_data_destroy(unsigned long rd, unsigned long map_addr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_DESTROY, rd, map_addr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_features(unsigned long index, unsigned long *out)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_FEATURES, index, &res);
-> +
-> +	*out = res.a1;
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_granule_delegate(unsigned long phys)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_DELEGATE, phys, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_granule_undelegate(unsigned long phys)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_UNDELEGATE, phys, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_psci_complete(unsigned long calling_rec,
-> +				    unsigned long target_rec)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_PSCI_COMPLETE, calling_rec, target_rec,
-> +			     &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_realm_activate(unsigned long rd)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_ACTIVATE, rd, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_realm_create(unsigned long rd, unsigned long params_ptr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_CREATE, rd, params_ptr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_realm_destroy(unsigned long rd)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_DESTROY, rd, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rec_aux_count(unsigned long rd, unsigned long *aux_count)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REC_AUX_COUNT, rd, &res);
-> +
-> +	*aux_count = res.a1;
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rec_create(unsigned long rec, unsigned long rd,
-> +				 unsigned long params_ptr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REC_CREATE, rec, rd, params_ptr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rec_destroy(unsigned long rec)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REC_DESTROY, rec, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REC_ENTER, rec, run_ptr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rtt_create(unsigned long rtt, unsigned long rd,
-> +				 unsigned long map_addr, unsigned long level)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_CREATE, rtt, rd, map_addr, level,
-> +			     &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rtt_destroy(unsigned long rtt, unsigned long rd,
-> +				  unsigned long map_addr, unsigned long level)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_DESTROY, rtt, rd, map_addr, level,
-> +			     &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rtt_fold(unsigned long rtt, unsigned long rd,
-> +			       unsigned long map_addr, unsigned long level)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_FOLD, rtt, rd, map_addr, level, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rtt_init_ripas(unsigned long rd, unsigned long map_addr,
-> +				     unsigned long level)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_INIT_RIPAS, rd, map_addr, level, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rtt_map_unprotected(unsigned long rd,
-> +					  unsigned long map_addr,
-> +					  unsigned long level,
-> +					  unsigned long desc)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_MAP_UNPROTECTED, rd, map_addr, level,
-> +			     desc, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rtt_read_entry(unsigned long rd, unsigned long map_addr,
-> +				     unsigned long level, struct rtt_entry *rtt)
-> +{
-> +	struct arm_smccc_1_2_regs regs = {
-> +		SMC_RMI_RTT_READ_ENTRY,
-> +		rd, map_addr, level
-> +	};
-> +
-> +	arm_smccc_1_2_smc(&regs, &regs);
-> +
-> +	rtt->walk_level = regs.a1;
-> +	rtt->state = regs.a2 & 0xFF;
-> +	rtt->desc = regs.a3;
-> +	rtt->ripas = regs.a4 & 1;
-> +
-> +	return regs.a0;
-> +}
-> +
-> +static inline int rmi_rtt_set_ripas(unsigned long rd, unsigned long rec,
-> +				    unsigned long map_addr, unsigned long level,
-> +				    unsigned long ripas)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_SET_RIPAS, rd, rec, map_addr, level,
-> +			     ripas, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline int rmi_rtt_unmap_unprotected(unsigned long rd,
-> +					    unsigned long map_addr,
-> +					    unsigned long level)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_UNMAP_UNPROTECTED, rd, map_addr,
-> +			     level, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline phys_addr_t rmi_rtt_get_phys(struct rtt_entry *rtt)
-> +{
-> +	return rtt->desc & GENMASK(47, 12);
-> +}
+> +struct realm {
+> +	enum realm_state state;
+> +};
+> +
+> +int kvm_init_rme(void);
 > +
 > +#endif
+> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> index 4eb601e7de50..be1383e26626 100644
+> --- a/arch/arm64/include/asm/virt.h
+> +++ b/arch/arm64/include/asm/virt.h
+> @@ -80,6 +80,7 @@ void __hyp_set_vectors(phys_addr_t phys_vector_base);
+>   void __hyp_reset_vectors(void);
+>   
+>   DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
+> +DECLARE_STATIC_KEY_FALSE(kvm_rme_is_available);
+>   
+>   /* Reports the availability of HYP mode */
+>   static inline bool is_hyp_mode_available(void)
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 5e33c2d4645a..d2f0400c50da 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -20,7 +20,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>   	 vgic/vgic-v3.o vgic/vgic-v4.o \
+>   	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+>   	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+> -	 vgic/vgic-its.o vgic/vgic-debug.o
+> +	 vgic/vgic-its.o vgic/vgic-debug.o \
+> +	 rme.o
+>   
+>   kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+>   
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9c5573bc4614..d97b39d042ab 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -38,6 +38,7 @@
+>   #include <asm/kvm_asm.h>
+>   #include <asm/kvm_mmu.h>
+>   #include <asm/kvm_pkvm.h>
+> +#include <asm/kvm_rme.h>
+>   #include <asm/kvm_emulate.h>
+>   #include <asm/sections.h>
+>   
+> @@ -47,6 +48,7 @@
+>   
+>   static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
+>   DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
+> +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
+>   
+>   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+>   
+> @@ -2213,6 +2215,12 @@ int kvm_arch_init(void *opaque)
+>   
+>   	in_hyp_mode = is_kernel_in_hyp_mode();
+>   
+> +	if (in_hyp_mode) {
+> +		err = kvm_init_rme();
+> +		if (err)
+> +			return err;
+> +	}
+> +
+>   	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+>   	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
+>   		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> new file mode 100644
+> index 000000000000..f6b587bc116e
+> --- /dev/null
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -0,0 +1,49 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/rmi_cmds.h>
+> +#include <asm/virt.h>
+> +
+> +static int rmi_check_version(void)
+> +{
+> +	struct arm_smccc_res res;
+> +	int version_major, version_minor;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, &res);
+> +
+> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
+> +		return -ENXIO;
+> +
+> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a0);
+> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a0);
+> +
+> +	if (version_major != RMI_ABI_MAJOR_VERSION) {
+> +		kvm_err("Unsupported RMI ABI (version %d.%d) we support %d\n",
 
-Can we please replace all occurrence of "unsigned long" with u64?
-Also as per spec, RTT level is Int64, can we change accordingly?
+Can we please replace "we support" to host supports.
+Also in the patch present in the repo, you are using variable 
+our_version, can this be changed to host_version?
 
-Please CC me in future cca patch-sets.
-gankulkarni@os.amperecomputing.com
-
+> +			version_major, version_minor,
+> +			RMI_ABI_MAJOR_VERSION);
+> +		return -ENXIO;
+> +	}
+> +
+> +	kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
+> +
+> +	return 0;
+> +}
+> +
+> +int kvm_init_rme(void)
+> +{
+> +	if (PAGE_SIZE != SZ_4K)
+> +		/* Only 4k page size on the host is supported */
+> +		return 0;
+> +
+> +	if (rmi_check_version())
+> +		/* Continue without realm support */
+> +		return 0;
+> +
+> +	/* Future patch will enable static branch kvm_rme_is_available */
+> +
+> +	return 0;
+> +}
 
 Thanks,
 Ganapat
