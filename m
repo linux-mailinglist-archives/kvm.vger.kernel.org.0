@@ -1,89 +1,97 @@
-Return-Path: <kvm+bounces-12113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12114-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDB3A87FA02
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 09:34:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15FA787FA35
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 10:00:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BAFC1C21BFE
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 08:34:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3A6B1F21F15
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 09:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1171C7B3F6;
-	Tue, 19 Mar 2024 08:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BF37C0B9;
+	Tue, 19 Mar 2024 08:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J3vZ0b6X"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hoh38pHS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7132364
-	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 08:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEEB54BE2;
+	Tue, 19 Mar 2024 08:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710837287; cv=none; b=RusdPr90chFXsMOCWKe+nAAR6/3W6RA/92l9R0LsCayMb+70dDZGD8+tC7iLXkf1goGSCvFQIo2n2nux6IfEhPnJyJJ7QB+sf4g/+TBXMJA1yIo/6UNtiS1zSil/5yF6UpGQ55BQ4MRqKVZBRN2YukLOE1aXXXZnSX9wEA7IVAo=
+	t=1710838794; cv=none; b=HWmKQWTg45KdaB7FvustEpD0Y6nEzvOYpqVbb4nBUs6CWjQbYWCbelTDy3Mjdnjd0HMAVHWgD8x8GxTJfDF8XP7f+7qbnkV4D5QavPqY/ItrSdj9hq/0fDhPFHUYGneMMCzrDuynGcMhgsjA1q5dI0v/vCTA5TFsZ/1/lq669nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710837287; c=relaxed/simple;
-	bh=Uhw7X37ePZrOYI/rJry/tZ9rI468Mam9nGel7TLxUcI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pp7rd+3f+hi/aUYw+8SFCFlGUYyEvFaFpZZd46dGRZt7ukkN2Q/p0AA/GF+tubvifKBlKIMu8KdwH6mup+168L8YbVjylVI8yta7FiGzUnkwf7coHNDYcPF9x1QODVG8uXEGL000asiYeLyL/xSzazf0CzZfEi5rX9jR0ZBnemk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J3vZ0b6X; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710837284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bidhNprDIaXErWo++B8NK9gU1Mr0P973Tkk526SOsxc=;
-	b=J3vZ0b6X0dOzxKLwq78pmBhv2yFBYNaN1+G9Uc0v0+Rals2hBpKzBv2QmaeqmymONSHj2j
-	ezv11gzKFQQQZanWGpgF88Z43BvXnUqaNin7b9aTQG79a0lIkqEpL9vaIw5MDome3CzKCt
-	RKQAPmSRbTZi7kpu3NlZQp237PNZSsQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-130-DPemvRFmNMCwaOXsbk4pfw-1; Tue, 19 Mar 2024 04:34:42 -0400
-X-MC-Unique: DPemvRFmNMCwaOXsbk4pfw-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-56b924de243so287166a12.1
-        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 01:34:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710837281; x=1711442081;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bidhNprDIaXErWo++B8NK9gU1Mr0P973Tkk526SOsxc=;
-        b=BtfQFzVD9F2z+EsYq7WhIvuL93FtG+TL2hGYrDo1LTxYRXSnvNXyE/klyQJJbtTSSS
-         K94PotAsuGHPc81u/99/r79VRwTzVryOqaiRiOZH1gnaqffqrn/GQ5FaTEbA2G1jmW+K
-         CkKGmCZFGDb+r29FyNEZgHN3ayeCedsHqUfyNnE5h3N7X8RsrMxvEQkYrFH6rFFeRZyr
-         RKJ4YBaGNtkqJxeTnqCb8YeQBWfHndsPrGARuXzUhC1/qLgG0Q2f1AIY8lSxNxbeerrV
-         IyA4xcPDrNf5nHsiIua9yd0YPAIwtTtZfPqB1HFCPkISC/y+DOIXWjUuUc7VDsFK7NwU
-         LeZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWk1/K/zM2iHw1dTEhl1H2w2s4iTR+o+iZQ5Qic++428oiiJhy7GSx49sGmh31cgn3wJTek7JVdkU53pGzF7ZrxeF+
-X-Gm-Message-State: AOJu0YxRmlmMH+hJIV16zCPPaVYzl+b44eWuf2v5/fUSl42MzwVXxkI3
-	hTv3+Xa5BoNwIZh3paGm2FJpyJ2+i5hneuwoLjy/cUpz0zGqiBjRfCKZRHcfbh3WpbkMsNVJT8z
-	55DPR5j3W0K78T5V1wZP4ZPvSk8IiGtAnDojfgw7RaRcfPc/dzpGYGMEavg==
-X-Received: by 2002:a05:6402:1cd0:b0:566:ca0:4a91 with SMTP id ds16-20020a0564021cd000b005660ca04a91mr10498306edb.2.1710837281378;
-        Tue, 19 Mar 2024 01:34:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2M46P0WU30p/kI4KM147xUw+jHFCsikBReD0bxprbCUbp1whXFumyfQAXLRkNAFtveWMugw==
-X-Received: by 2002:a05:6512:68c:b0:513:db96:2be9 with SMTP id t12-20020a056512068c00b00513db962be9mr10460157lfe.64.1710836978279;
-        Tue, 19 Mar 2024 01:29:38 -0700 (PDT)
-Received: from redhat.com ([2.52.6.254])
-        by smtp.gmail.com with ESMTPSA id g14-20020a5d540e000000b0033e95bf4796sm11737388wrv.27.2024.03.19.01.29.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 01:29:37 -0700 (PDT)
-Date: Tue, 19 Mar 2024 04:29:33 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Tobias Huschle <huschle@linux.ibm.com>
+	s=arc-20240116; t=1710838794; c=relaxed/simple;
+	bh=zsdYz3jN/6SotqZabyYZjBZs275r8CvOSdZhCKiQW8Q=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=Vgs+zO/Nc7LjODemseNa6/gTc6/HQDZEee+eMxVvlw0afDeo+wGnOyg3FioPco1Cswf6uDT/nNDk1r1RWZT+EH/xqhTarMJ9wkQ4U7ZOHIoQIpFYzdSLO0VI4ZaMgXBvWnx3+9qgZKRtseo3E4ftKZyMLbCOSx3wZyh47Si8QBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hoh38pHS; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42J8UJxc019881;
+	Tue, 19 Mar 2024 08:59:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=mime-version : date :
+ from : to : cc : subject : in-reply-to : references : message-id :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=LUbKQi10BhRRdxGcjFBVGH4lzCf1fHSjHP8L558ZR/U=;
+ b=hoh38pHSBNRV6IF4S14G4mLMwItWsnfMYQ5lOLWbBp3l5kWcgGAdlYsYsBZnfjNerXUK
+ ld6eBCyKGmQppMiZAjdQr1RRsuS0oQZRT+dhlHQyOpgR1T5sZ0ROXENtGLP4bPQh1oG5
+ xR2MpM5lh8yDwNQ1EPnNkvbzLxIxJIZDcQeuvT599qG+YvaxZ7VawCiiC8q2bUEHf98B
+ EZX9P9GPSyzVtxmPlKGx30Y1tejWCsEU1Hb/L37PbExBZ5m8g/M/7B0+Nnxrx01T5nIn
+ /Nx1sqbjiTi+nkwjSQiovjq2W0Z16uk2kAB0yORTA3V7KYrjfeSFM1iI2DsFhRfALGkP Kg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wy74u87er-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 08:59:38 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42J8pns8029795;
+	Tue, 19 Mar 2024 08:59:37 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wy74u87eg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 08:59:37 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42J8c63x011543;
+	Tue, 19 Mar 2024 08:59:36 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wwq8kx5nk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 08:59:36 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42J8xXKJ45089124
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 19 Mar 2024 08:59:35 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C99E458067;
+	Tue, 19 Mar 2024 08:59:31 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1C5CA58061;
+	Tue, 19 Mar 2024 08:59:31 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 19 Mar 2024 08:59:30 +0000 (GMT)
+Precedence: bulk
+X-Mailing-List: kvm@vger.kernel.org
+List-Id: <kvm.vger.kernel.org>
+List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Date: Tue, 19 Mar 2024 09:59:30 +0100
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Luis Machado <luis.machado@arm.com>, Jason Wang <jasowang@redhat.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	nd <nd@arm.com>
+        Abel Wu <wuyun.abel@bytedance.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        nd <nd@arm.com>
 Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
  lag based placement)
-Message-ID: <20240319042829-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240319042829-mutt-send-email-mst@kernel.org>
 References: <07974.124020102385100135@us-mta-501.us.mimecast.lan>
  <20240201030341-mutt-send-email-mst@kernel.org>
  <89460.124020106474400877@us-mta-475.us.mimecast.lan>
@@ -94,29 +102,47 @@ References: <07974.124020102385100135@us-mta-501.us.mimecast.lan>
  <84704.124031504335801509@us-mta-515.us.mimecast.lan>
  <20240315062839-mutt-send-email-mst@kernel.org>
  <b3fd680c675208370fc4560bb3b4d5b8@linux.ibm.com>
-Precedence: bulk
-X-Mailing-List: kvm@vger.kernel.org
-List-Id: <kvm.vger.kernel.org>
-List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3fd680c675208370fc4560bb3b4d5b8@linux.ibm.com>
+ <20240319042829-mutt-send-email-mst@kernel.org>
+Message-ID: <4808eab5fc5c85f12fe7d923de697a78@linux.ibm.com>
+X-Sender: huschle@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: cHsvNv2I2RC7P1ZN_n6udKs2m42vkLbJ
+X-Proofpoint-GUID: rV_1Qssz0DqjdkKHbbVWtMepfcwTjcBL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-18_12,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ mlxlogscore=843 impostorscore=0 spamscore=0 bulkscore=0 suspectscore=0
+ priorityscore=1501 phishscore=0 adultscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403140000 definitions=main-2403190068
 
-On Tue, Mar 19, 2024 at 09:21:06AM +0100, Tobias Huschle wrote:
-> On 2024-03-15 11:31, Michael S. Tsirkin wrote:
-> > On Fri, Mar 15, 2024 at 09:33:49AM +0100, Tobias Huschle wrote:
-> > > On Thu, Mar 14, 2024 at 11:09:25AM -0400, Michael S. Tsirkin wrote:
-> > > >
-> > 
-> > Could you remind me pls, what is the kworker doing specifically that
-> > vhost is relying on?
+On 2024-03-19 09:29, Michael S. Tsirkin wrote:
+> On Tue, Mar 19, 2024 at 09:21:06AM +0100, Tobias Huschle wrote:
+>> On 2024-03-15 11:31, Michael S. Tsirkin wrote:
+>> > On Fri, Mar 15, 2024 at 09:33:49AM +0100, Tobias Huschle wrote:
+>> > > On Thu, Mar 14, 2024 at 11:09:25AM -0400, Michael S. Tsirkin wrote:
+>> > > >
+>> >
+>> > Could you remind me pls, what is the kworker doing specifically that
+>> > vhost is relying on?
+>> 
+>> The kworker is handling the actual data moving in memory if I'm not
+>> mistaking.
 > 
-> The kworker is handling the actual data moving in memory if I'm not
-> mistaking.
+> I think that is the vhost process itself. Maybe you mean the
+> guest thread versus the vhost thread then?
 
-I think that is the vhost process itself. Maybe you mean the
-guest thread versus the vhost thread then?
+My understanding was that vhost writes data into a file descriptor which 
+then triggers eventfd.
 
+That's at least how I read the vhost code if I remember correctly.
+
+The handler beneath (the kworker) then runs the actual instructions that 
+move the data to the receiving vhost on the other end of the connection.
+
+Again, I might be wrong here.
 
