@@ -1,260 +1,391 @@
-Return-Path: <kvm+bounces-12139-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12140-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDF2787FE8A
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 14:20:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D625987FEB4
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 14:22:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 568F01F22A8A
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 13:20:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46E1A1F245BB
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 13:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778EC80BEB;
-	Tue, 19 Mar 2024 13:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACB88004F;
+	Tue, 19 Mar 2024 13:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gd84Hvm1"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="bkEzRDNl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBAC80BF4
-	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 13:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD4B80025
+	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 13:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710854386; cv=none; b=WrR1djtCoIKLUgkpEsc2ngEWtCr30hNrpyO2ftgLl+1EzlDc4hkoMo7Y7fcsPRCQx4fIeGERxSLO/5Y12ibXAsaAQXFGWOugY6L+1jmvznQxpqXKr2QCzzXEgBO6N3K0WpFdbK/uSXsqvSu2mLutR3xCB965WKWRSvPlJVZujTE=
+	t=1710854565; cv=none; b=oADNCdsQmy/oBu//K2qy2xE5rNKxvVyE1NyKtbH08Pg8YK8apafFnk93EzcOGodZTP0pNsq1WyFw0b5tT2H09DzXc+y+A1j7YZxWSFNf7vLmhBvTtUXRla9zlfZgiSHjc8M4o6nHWkpVB6S4MdEYjD16F6mVX0R14bCD3qJfW2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710854386; c=relaxed/simple;
-	bh=pqLK5r+6glGRViAulW3S3Y5ve9BzKiH6gJ4YPllNek0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ClzqGCg7VKwbgmqCrjPUAe1snzOBBBEnEsMa+XFjOlhSmlVNlMe8/DGvK2Kyn8dEnM0xjxCCQ1j6UCZxWooRRDSEccDmEA02CctfvUR8RJuFu2TggV8N3DVY+A2BC5J71TaYg9OEBbm5aMyC/L/rd+YW6813Ag/WLQJPdcWtG6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gd84Hvm1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710854384;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=pUA4jyYPpyLWZ5GdB21IaWHY0bnpxN+yp5QXHB7m1nw=;
-	b=gd84Hvm1qhFCDHpBQsScGlY35yVL/16A6eF64jN3VCvzbtQsrCfuD5kUG9G/uwB67AOxIx
-	TRBfk/nw7+nnt8MkTKWNSBULBK/oy7pc83H1/MEVFGCwujrxYhCpG79cqvfVWpTp/vDaBI
-	hDFfvCI6+RCKR/5T8cMAeKjSng+H/y0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-357-48NCowcjNdqG8FclrMpLsQ-1; Tue, 19 Mar 2024 09:19:42 -0400
-X-MC-Unique: 48NCowcjNdqG8FclrMpLsQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-41401f598cfso18562335e9.2
-        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 06:19:42 -0700 (PDT)
+	s=arc-20240116; t=1710854565; c=relaxed/simple;
+	bh=ceyUFa+1h2Yidy+EM1QZ0yCy8TdZ3VPzWMPZy8Tcc+Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EQemCxPvhTpu1qZ53abnozFn6uJwKlwlUE29ODh/UES61I4RgSGrfvbqOTXoiwJ4pLmOz5QsWhEA1IaIYvqxKXjRSq+HApkhmsSlqO2YoFP1PEK27X2KYYYqoFfFXkWawotiotWjIDwIdUQLCodbnaUxPxIoP5j5OSUHff9sz/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=bkEzRDNl; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d46d729d89so73808671fa.3
+        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 06:22:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1710854561; x=1711459361; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mo2rJNvRzcSLBS0OMR24ACous5GRqe0gNI/Yh78X9XM=;
+        b=bkEzRDNlByOzNUAmLjsJqEixGnmzAA0gmzgubzW0gkVCAfJLE9BCqenqzSS/opt6jz
+         Hhww/iNFol+0arcRgmRKlEvx1Y04EewgtHz3AVHozq+ivi2RARq1TdIWuPn7envGqTF4
+         994N4P8+1OucbpbyG//J4qQqS8T4i5AkBo1ao=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710854381; x=1711459181;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :references:cc:to:from:content-language:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pUA4jyYPpyLWZ5GdB21IaWHY0bnpxN+yp5QXHB7m1nw=;
-        b=P+p5mEfD4F3t6qwqb/xp/GwtMQ3bl7JuP2wq261wDM71ScO58OH3tIANaAHD6RJqym
-         +GvlF6esqMddoiIx7OPlfWhWgkNjh3oYigvegLLc7y+qwrJOgqlkzWvzeEjQTo/Nl5Im
-         YyMN5sXTjiI+MCbBMjNrW3EnR7eIyApOEJ3c6fe7Ot35z8yFsuBWvPDXFfhnbnb8rTUL
-         vK4Y4becQ71FirZIwsbMhQKzj0OHZy1AOcfBFU6S+BuYlW4j60BE5eWOpzj3LJzodrxi
-         58VydvrRnGP4Z+P3oNp7k5Q902ZQ7d6JDXW7islyU2YlDlssw4CCLvzqgFej9NFeEB3t
-         /RbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWnRONEKoAg6ygbVdz7nUEkSvp2gXGH91j+HONCdEA6zUTYVcYtbG5mGNeMdpOiA9IRznx3MkF/Noffapwi2fFHOidX
-X-Gm-Message-State: AOJu0YwrORTpJ1h5L/0xCeIrEuM+QbvwH41JtFoB+yu1TLbL2O9TxNYz
-	cUrzCQaThD1Ad8ggFLF/yoqYMJRJnN9Ncj3Ne4aToeqG2kMtA1tQhPZX1N5dQ2ccaJvaIfZiGCt
-	wVzGa5i4Q2EghF9UKdIVMZ54Njr7HPe0qb5zg5Gz92Ztr3uiObg==
-X-Received: by 2002:a05:600c:1d0e:b0:413:3941:d9ae with SMTP id l14-20020a05600c1d0e00b004133941d9aemr10729855wms.31.1710854381273;
-        Tue, 19 Mar 2024 06:19:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQggSEygSN3zjaUeleSU2az0Hn2tbOnGs4AaLWZpa++FmT1PitVXiZZMyXBncQjc3UEteHOA==
-X-Received: by 2002:a05:600c:1d0e:b0:413:3941:d9ae with SMTP id l14-20020a05600c1d0e00b004133941d9aemr10729813wms.31.1710854380767;
-        Tue, 19 Mar 2024 06:19:40 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c741:2200:2adc:9a8d:ae91:2e9f? (p200300cbc74122002adc9a8dae912e9f.dip0.t-ipconnect.de. [2003:cb:c741:2200:2adc:9a8d:ae91:2e9f])
-        by smtp.gmail.com with ESMTPSA id fj14-20020a05600c0c8e00b00413385ec7e6sm21514330wmb.47.2024.03.19.06.19.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Mar 2024 06:19:40 -0700 (PDT)
-Message-ID: <0b1e1054-012f-4cc3-9d25-1147fa8cd6f0@redhat.com>
-Date: Tue, 19 Mar 2024 14:19:37 +0100
+        d=1e100.net; s=20230601; t=1710854561; x=1711459361;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mo2rJNvRzcSLBS0OMR24ACous5GRqe0gNI/Yh78X9XM=;
+        b=LbKRyQbjWTZOimOZgKqWK7IhZ2Hra2p+KC+1XDlc5GFhdwMsqUVcZlHpI3otluN2be
+         QIibtNPTYQSf/tpbPG4mD0H6/BIQKedIgLCtXEA02W0UYJHuUFNXBDKdteQ/E9jUI5v1
+         USrK5KArjmHDWt6I/7izUSe4XB3gSKweI+e7omlG2rIS7wRidE1a7jKJr+G1NivC1LX/
+         oDalyzF9t4lqvq2qP85oQ8kB/33JyM3MM7ZItkopR3B/0sZeu0ALG9BbYgYXVkCdGzHR
+         Ye9y0QuzgaHbi8LzKLUtk6S8B/WCCZqVYuBN4wY0HVPh27WogsgSE1hU1tO99jNyQIvn
+         FW6A==
+X-Gm-Message-State: AOJu0YzWO6YzsDk1XkdQwUK7iD9OdutJRwht3CI3XqFlYO4UcTO3UPhd
+	kNeUk2RHE8qvcfU+VnIecbsDzTHLtynt5ZEhpfRjatBi8/Vr7Fw2ujxgz5KpQsEXoerJUY7WyFO
+	mHYjPGKQIFxgkXrR23ZVmjKiKMW3adKpFl3iT
+X-Google-Smtp-Source: AGHT+IEJRFpGVRuilAPbB0KAykXFZONq+dwYfKvbD6SIn4UJNJBMOctoDBcrQ2WQFvjc+45QzIjn9d0p/y5uyTvLW58=
+X-Received: by 2002:a05:651c:1986:b0:2d4:a925:d5bc with SMTP id
+ bx6-20020a05651c198600b002d4a925d5bcmr4706080ljb.16.1710854561485; Tue, 19
+ Mar 2024 06:22:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: folio_mmapped
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-To: Sean Christopherson <seanjc@google.com>,
- Vishal Annapurve <vannapurve@google.com>
-Cc: Quentin Perret <qperret@google.com>, Matthew Wilcox
- <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
- mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk,
- brauner@kernel.org, akpm@linux-foundation.org, xiaoyao.li@intel.com,
- yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
- amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com,
- wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <Zd8qvwQ05xBDXEkp@google.com>
- <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
- <Zd82V1aY-ZDyaG8U@google.com>
- <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
- <ZeXAOit6O0stdxw3@google.com> <ZeYbUjiIkPevjrRR@google.com>
- <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
- <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
- <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
- <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
- <ZfjYBxXeh9lcudxp@google.com>
- <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <65f98e5b99604_11543d29415@willemb.c.googlers.com.notmuch>
+In-Reply-To: <65f98e5b99604_11543d29415@willemb.c.googlers.com.notmuch>
+From: Igor Raits <igor@gooddata.com>
+Date: Tue, 19 Mar 2024 14:22:30 +0100
+Message-ID: <CA+9S74gRyDn3_=aAm7XkGKEzTg7KF=pPEHFsvENYpv80kczqZg@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->>> I had started a discussion for this [2] using an RFC series.
->>
->> David is talking about the host side of things, AFAICT you're talking about the
->> guest side...
->>
->>> challenge here remain:
->>> 1) Unifying all the conversions under one layer
->>> 2) Ensuring shared memory allocations are huge page aligned at boot
->>> time and runtime.
->>>
->>> Using any kind of unified shared memory allocator (today this part is
->>> played by SWIOTLB) will need to support huge page aligned dynamic
->>> increments, which can be only guaranteed by carving out enough memory
->>> at boot time for CMA area and using CMA area for allocation at
->>> runtime.
->>>      - Since it's hard to come up with a maximum amount of shared memory
->>> needed by VM, especially with GPUs/TPUs around, it's difficult to come
->>> up with CMA area size at boot time.
->>
->> ...which is very relevant as carving out memory in the guest is nigh impossible,
->> but carving out memory in the host for systems whose sole purpose is to run VMs
->> is very doable.
->>
->>> I think it's arguable that even if a VM converts 10 % of its memory to
->>> shared using 4k granularity, we still have fewer page table walks on
->>> the rest of the memory when using 1G/2M pages, which is a significant
->>> portion.
->>
->> Performance is a secondary concern.  If this were _just_ about guest performance,
->> I would unequivocally side with David: the guest gets to keep the pieces if it
->> fragments a 1GiB page.
->>
->> The main problem we're trying to solve is that we want to provision a host such
->> that the host can serve 1GiB pages for non-CoCo VMs, and can also simultaneously
->> run CoCo VMs, with 100% fungibility.  I.e. a host could run 100% non-CoCo VMs,
->> 100% CoCo VMs, or more likely, some sliding mix of the two.  Ideally, CoCo VMs
->> would also get the benefits of 1GiB mappings, that's not the driving motiviation
->> for this discussion.
-> 
-> Supporting 1 GiB mappings there sounds like unnecessary complexity and
-> opening a big can of worms, especially if "it's not the driving motivation".
-> 
-> If I understand you correctly, the scenario is
-> 
-> (1) We have free 1 GiB hugetlb pages lying around
-> (2) We want to start a CoCo VM
-> (3) We don't care about 1 GiB mappings for that CoCo VM, but hguetlb
->       pages is all we have.
-> (4) We want to be able to use the 1 GiB hugetlb page in the future.
-> 
-> With hugetlb, it's possible to reserve a CMA area from which to later
-> allocate 1 GiB pages. While not allocated, they can be used for movable
-> allocations.
-> 
-> So in the scenario above, free the hugetlb pages back to CMA. Then,
-> consume them as 4K pages for the CoCo VM. When wanting to start a
-> non-CoCo VM, re-allocate them from CMA.
-> 
-> One catch with that is that
-> (a) CMA pages cannot get longterm-pinned: for obvious reasons, we
->       wouldn't be able to migrate them in order to free up the 1 GiB page.
-> (b) guest_memfd pages are not movable and cannot currently end up on CMA
->       memory.
-> 
-> But maybe that's not actually required in this scenario and we'd like to
-> have slightly different semantics: if you were to give the CoCo VM the 1
-> GiB pages, they would similarly be unusable until that VM quit and freed
-> up the memory!
-> 
-> So it might be acceptable to get "selected" unmovable allocations (from
-> guest_memfd) on selected (hugetlb) CMA area, that the "owner" will free
-> up when wanting to re-allocate that memory. Otherwise, the CMA
-> allocation will simply fail.
-> 
-> If we need improvements in that area to support this case, we can talk.
-> Just an idea to avoid HGM and friends just to make it somehow work with
-> 1 GiB pages ...
+Hello Willem,
+
+On Tue, Mar 19, 2024 at 2:08=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Igor Raits wrote:
+> > Hello,
+> >
+> > We have started to observe kernel crashes on 6.7.y kernels (atm we
+> > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
+> > have nodes of cluster it looks stable. Please see stacktrace below. If
+> > you need more information please let me know.
+> >
+> > We do not have a consistent reproducer but when we put some bigger
+> > network load on a VM, the hypervisor's kernel crashes.
+> >
+> > Help is much appreciated! We are happy to test any patches.
+> >
+> > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
+>
+> Did you miss the first part of the Oops?
+
+Actually I copied it as-is from our log system. As it is a physical
+server, such logs are sent via netconsole to another server. This is
+the first line I see in the log in the time segment.
+
+>
+> > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
+> >    E      6.7.10-1.gdc.el9.x86_64 #1
+> > [62254.183743] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
+> > 2.14.1 12/17/2023
+> > [62254.192083] RIP: 0010:skb_release_data+0xb8/0x1e0
+> > [62254.197357] Code: 48 83 c3 01 39 d8 7e 54 48 89 d8 48 c1 e0 04 41
+> > 80 7d 7e 00 49 8b 6c 04 30 79 0f 44 89 f6 48 89 ef e8 4c e4 ff ff 84
+> > c0 75 d0 <48> 8b 45 08 a8 01 0f 85 09 01 00 00 e9 d9 00 00 00 0f 1f 44
+> > 00 00
+> > [62254.217013] RSP: 0018:ffffa975a0247ba8 EFLAGS: 00010206
+> > [62254.222692] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000=
+000000785
+> > [62254.230263] RDX: 0000000000000016 RSI: 0000000000000002 RDI: ffff989=
+862b32b00
+> > [62254.237878] RBP: 4f2b318c69a8b0f9 R08: 000000000001fe4d R09: 0000000=
+00000003a
+> > [62254.245417] R10: 0000000000000000 R11: 0000000000001736 R12: ffff988=
+0b819aec0
+> > [62254.252963] R13: ffff989862b32b00 R14: 0000000000000000 R15: 0000000=
+000000002
+> > [62254.260591] FS:  00007f6cf388bf80(0000) GS:ffff98b85fbc0000(0000)
+> > knlGS:0000000000000000
+> > [62254.269061] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [62254.275170] CR2: 000000c002236020 CR3: 000000387d37a002 CR4: 0000000=
+000770ef0
+> > [62254.282733] PKRU: 55555554
+> > [62254.285911] Call Trace:
+> > [62254.288884]  <TASK>
+> > [62254.291549]  ? die+0x33/0x90
+> > [62254.294769]  ? do_trap+0xe0/0x110
+> > [62254.298405]  ? do_error_trap+0x65/0x80
+> > [62254.302471]  ? exc_stack_segment+0x35/0x50
+> > [62254.306884]  ? asm_exc_stack_segment+0x22/0x30
+> > [62254.311637]  ? skb_release_data+0xb8/0x1e0
+> > [62254.316047]  kfree_skb_list_reason+0x6d/0x210
+> > [62254.320697]  ? free_unref_page_commit+0x80/0x2f0
+> > [62254.325700]  ? free_unref_page+0xe9/0x130
+> > [62254.330013]  skb_release_data+0xfc/0x1e0
+> > [62254.334261]  consume_skb+0x45/0xd0
+> > [62254.338077]  tun_do_read+0x68/0x1f0 [tun]
+> > [62254.342414]  tun_recvmsg+0x7e/0x160 [tun]
+> > [62254.346696]  handle_rx+0x3ab/0x750 [vhost_net]
+> > [62254.351488]  vhost_worker+0x42/0x70 [vhost]
+> > [62254.355934]  vhost_task_fn+0x4b/0xb0
+>
+> Neither tun nor vhost_net saw significant changes between the two
+> reported kernels.
+>
+>     $ git log --oneline v6.6..v6.7 -- drivers/net/tun.c drivers/vhost/net=
+.c | wc -l
+>     0
+>
+>     $ git log --oneline linux/v6.6.9..linux/v6.7.5 -- drivers/net/tun.c d=
+rivers/vhost/net.c
+>     6438382dd9f8 tun: add missing rx stats accounting in tun_xdp_act
+>     4efd09da0d49 tun: fix missing dropped counter in tun_xdp_act
+>
+> So the cause is likely in the code that generated the skb or something
+> that modified it along the way.
+>
+> It could be helpful if it is possible to bisect further. Though odds
+> are that the issue is between v6.6 and v6.7, not introduced in the
+> stable backports after that. So it is a large target.
+
+Yeah, as I replied later to my original message - we actually also see
+the issue on 6.6.9 as well but it looks slightly different.
+
+Actually while writing reply got 6.6.9 crashed too:
+
+[13330.391004] tun: unexpected GSO type: 0x4ec1c942, gso_size 20948,
+hdr_len 3072
+[13330.398267] tun: 17 03 03 40 11 47 37 88 2c cb 02 ea 2b 5b c1 b0
+...@.G7.,...+[..
+[13330.405879] tun: f5 b7 2d b6 52 36 66 3e a4 33 f5 97 74 75 e8 31
+..-.R6f>.3..tu.1
+[13330.413483] tun: 50 69 54 2e f7 d0 30 b6 c9 b4 51 74 b8 32 f2 8d
+PiT...0...Qt.2..
+[13330.421072] tun: 01 2e ea 80 6c d0 b3 1d 56 ac eb ef da 4c 5a 24
+....l...V....LZ$
+[13330.428686] ------------[ cut here ]------------
+[13330.433317] WARNING: CPU: 59 PID: 9587 at drivers/net/tun.c:2136
+tun_put_user.constprop.0+0x356/0x370 [tun]
+[13330.443078] Modules linked in: nf_tables(E) mptcp_diag(E)
+xsk_diag(E) raw_diag(E) unix_diag(E) af_packet_diag(E) netlink_diag(E)
+udp_diag(E) tcp_diag(E) inet_diag(E) rpcsec_gss_krb5(E) auth_rpcgss(E)
+nfsv4(E) dns_resolver(E) nfs(E) lockd(E) grace(E) fscache(E) netfs(E)
+netconsole(E) nf_conntrack_netlink(E) vhost_net(E) vhost(E)
+vhost_iotlb(E) tap(E) tun(E) ib_core(E) scsi_transport_iscsi(E)
+sch_ingress(E) target_core_user(E) uio(E) target_core_pscsi(E)
+target_core_file(E) target_core_iblock(E) iscsi_target_mod(E)
+target_core_mod(E) 8021q(E) garp(E) mrp(E) bonding(E) tls(E)
+nfnetlink_cttimeout(E) nfnetlink(E) openvswitch(E) nf_conncount(E)
+nf_nat(E) binfmt_misc(E) dell_rbu(E) sunrpc(E) vfat(E) fat(E)
+dm_service_time(E) dm_multipath(E) btrfs(E) intel_rapl_msr(E)
+intel_rapl_common(E) xor(E) zstd_compress(E) ipmi_ssif(E)
+amd64_edac(E) edac_mce_amd(E) raid6_pq(E) kvm_amd(E) dell_smbios(E)
+kvm(E) acpi_ipmi(E) irqbypass(E) dell_wmi_descriptor(E) dcdbas(E)
+wmi_bmof(E) ipmi_si(E) rapl(E) acpi_cpufreq(E) ipmi_devintf(E)
+[13330.443122]  ptdma(E) wmi(E) k10temp(E) i2c_piix4(E)
+ipmi_msghandler(E) acpi_power_meter(E) fuse(E) drm(E) zram(E) ext4(E)
+mbcache(E) jbd2(E) dm_crypt(E) sd_mod(E) t10_pi(E) sg(E)
+crct10dif_pclmul(E) ahci(E) crc32_pclmul(E) polyval_clmulni(E)
+polyval_generic(E) libahci(E) ice(E) ghash_clmulni_intel(E)
+sha512_ssse3(E) libata(E) ccp(E) gnss(E) megaraid_sas(E) sp5100_tco(E)
+dm_mirror(E) dm_region_hash(E) dm_log(E) dm_mod(E) nf_conntrack(E)
+libcrc32c(E) crc32c_intel(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E)
+br_netfilter(E) bridge(E) stp(E) llc(E)
+[13330.532534] Unloaded tainted modules: fjes(E):2
+[13330.584831] CPU: 59 PID: 9587 Comm: vhost-9526 Tainted: G
+ E      6.6.9-2.gdc.el9.x86_64 #1
+[13330.594063] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
+2.14.1 12/17/2023
+[13330.601746] RIP: 0010:tun_put_user.constprop.0+0x356/0x370 [tun]
+[13330.607783] Code: 00 00 6a 01 0f b7 44 24 18 b9 10 00 00 00 48 c7
+c6 08 85 d5 c1 48 c7 c7 0e 85 d5 c1 39 d0 48 0f 4f c2 31 d2 50 e8 1a
+54 27 d2 <0f> 0b 49 c7 c4 ea ff ff ff 58 5a e9 3b fe ff ff e8 85 22 89
+d2 0f
+[13330.626566] RSP: 0018:ffffc90027497c70 EFLAGS: 00010282
+[13330.631816] RAX: 0000000000000000 RBX: ffff888865149e00 RCX: 00000000000=
+00000
+[13330.638970] RDX: 0000000000000000 RSI: ffff88b85fddf700 RDI: ffff88b85fd=
+df700
+[13330.646119] RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000fff=
+f7fff
+[13330.653266] R10: ffffc90027497a40 R11: ffffffff95be26a8 R12: 00000000000=
+02342
+[13330.660416] R13: 0000000000000000 R14: ffffc90027497e10 R15: ffff88982b6=
+5c980
+[13330.667567] FS:  00007fd272854f80(0000) GS:ffff88b85fdc0000(0000)
+knlGS:0000000000000000
+[13330.675681] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[13330.681439] CR2: 000000c2bdeae000 CR3: 000000386fcea003 CR4: 00000000007=
+70ee0
+[13330.688580] PKRU: 55555554
+[13330.691301] Call Trace:
+[13330.693767]  <TASK>
+[13330.695891]  ? __warn+0x80/0x130
+[13330.699151]  ? tun_put_user.constprop.0+0x356/0x370 [tun]
+[13330.704579]  ? report_bug+0x195/0x1a0
+[13330.708265]  ? handle_bug+0x3c/0x70
+[13330.711768]  ? exc_invalid_op+0x14/0x70
+[13330.715620]  ? asm_exc_invalid_op+0x16/0x20
+[13330.719829]  ? tun_put_user.constprop.0+0x356/0x370 [tun]
+[13330.725248]  tun_do_read+0x54/0x1f0 [tun]
+[13330.729293]  tun_recvmsg+0x7e/0x160 [tun]
+[13330.733327]  handle_rx+0x3ab/0x750 [vhost_net]
+[13330.737794]  vhost_worker+0x42/0x70 [vhost]
+[13330.741995]  vhost_task_fn+0x4b/0xb0
+[13330.745589]  ? finish_task_switch.isra.0+0x8f/0x2a0
+[13330.750484]  ? __pfx_vhost_task_fn+0x10/0x10
+[13330.754774]  ? __pfx_vhost_task_fn+0x10/0x10
+[13330.759062]  ret_from_fork+0x2d/0x50
+[13330.762656]  ? __pfx_vhost_task_fn+0x10/0x10
+[13330.766941]  ret_from_fork_asm+0x1b/0x30
+[13330.770888]  </TASK>
+[13330.773091] ---[ end trace 0000000000000000 ]---
+[13332.560592] usercopy: Kernel memory exposure attempt detected from
+page alloc (offset 0, size 16384)!
+[13332.569869] ------------[ cut here ]------------
+[13332.574499] kernel BUG at mm/usercopy.c:102!
+[13332.578790] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+[13332.584027] CPU: 49 PID: 9692 Comm: vhost-9660 Tainted: G        W
+ E      6.6.9-2.gdc.el9.x86_64 #1
+[13332.593249] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
+2.14.1 12/17/2023
+[13332.600913] RIP: 0010:usercopy_abort+0x6a/0x80
+[13332.605372] Code: 61 18 95 50 48 c7 c2 62 61 18 95 57 48 c7 c7 28
+df 19 95 48 0f 44 d6 48 c7 c6 88 df 19 95 4c 89 d1 49 0f 44 f3 e8 f6
+f1 d5 ff <0f> 0b 49 c7 c1 d0 40 1b 95 4c 89 cf 4d 89 c8 eb a9 0f 1f 44
+00 00
+[13332.624129] RSP: 0018:ffffc9002773fb60 EFLAGS: 00010246
+[13332.629359] RAX: 0000000000000059 RBX: 0000000000000001 RCX: 00000000000=
+00000
+[13332.636491] RDX: 0000000000000000 RSI: ffff88a85fd5f700 RDI: ffff88a85fd=
+5f700
+[13332.643627] RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000fff=
+f7fff
+[13332.650767] R10: ffffc9002773fa18 R11: ffffffff95be26a8 R12: 00000000000=
+04000
+[13332.657901] R13: 0000000000000001 R14: 0000000000000000 R15: ffff8888640=
+1ae00
+[13332.665041] FS:  00007fcbae82cf80(0000) GS:ffff88a85fd40000(0000)
+knlGS:0000000000000000
+[13332.673133] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[13332.678879] CR2: 00007f60f35721d8 CR3: 000000307edbe006 CR4: 00000000007=
+70ee0
+[13332.686017] PKRU: 55555554
+[13332.688734] Call Trace:
+[13332.691187]  <TASK>
+[13332.693293]  ? die+0x33/0x90
+[13332.696187]  ? do_trap+0xe0/0x110
+[13332.699519]  ? usercopy_abort+0x6a/0x80
+[13332.703370]  ? do_error_trap+0x65/0x80
+[13332.707128]  ? usercopy_abort+0x6a/0x80
+[13332.710976]  ? exc_invalid_op+0x4e/0x70
+[13332.714823]  ? usercopy_abort+0x6a/0x80
+[13332.718671]  ? asm_exc_invalid_op+0x16/0x20
+[13332.722867]  ? usercopy_abort+0x6a/0x80
+[13332.726714]  check_heap_object+0xea/0x190
+[13332.730736]  __check_object_size.part.0+0x5e/0x140
+[13332.735534]  simple_copy_to_iter+0x26/0x50
+[13332.739643]  __skb_datagram_iter+0x199/0x2e0
+[13332.743918]  ? __pfx_simple_copy_to_iter+0x10/0x10
+[13332.748717]  skb_copy_datagram_iter+0x33/0x90
+[13332.753087]  tun_put_user.constprop.0+0x16b/0x370 [tun]
+[13332.758321]  tun_do_read+0x54/0x1f0 [tun]
+[13332.762342]  tun_recvmsg+0x7e/0x160 [tun]
+[13332.766361]  handle_rx+0x3ab/0x750 [vhost_net]
+[13332.770817]  vhost_worker+0x42/0x70 [vhost]
+[13332.775011]  vhost_task_fn+0x4b/0xb0
+[13332.778599]  ? finish_task_switch.isra.0+0x8f/0x2a0
+[13332.783485]  ? __pfx_vhost_task_fn+0x10/0x10
+[13332.787758]  ? __pfx_vhost_task_fn+0x10/0x10
+[13332.792032]  ret_from_fork+0x2d/0x50
+[13332.795621]  ? __pfx_vhost_task_fn+0x10/0x10
+[13332.799893]  ret_from_fork_asm+0x1b/0x30
+[13332.803827]  </TASK>
+[13332.806018] Modules linked in: nf_tables(E) mptcp_diag(E)
+xsk_diag(E) raw_diag(E) unix_diag(E) af_packet_diag(E) netlink_diag(E)
+udp_diag(E) tcp_diag(E) inet_diag(E) rpcsec_gss_krb5(E) auth_rpcgss(E)
+nfsv4(E) dns_resolver(E) nfs(E) lockd(E) grace(E) fscache(E) netfs(E)
+netconsole(E) nf_conntrack_netlink(E) vhost_net(E) vhost(E)
+vhost_iotlb(E) tap(E) tun(E) ib_core(E) scsi_transport_iscsi(E)
+sch_ingress(E) target_core_user(E) uio(E) target_core_pscsi(E)
+target_core_file(E) target_core_iblock(E) iscsi_target_mod(E)
+target_core_mod(E) 8021q(E) garp(E) mrp(E) bonding(E) tls(E)
+nfnetlink_cttimeout(E) nfnetlink(E) openvswitch(E) nf_conncount(E)
+nf_nat(E) binfmt_misc(E) dell_rbu(E) sunrpc(E) vfat(E) fat(E)
+dm_service_time(E) dm_multipath(E) btrfs(E) intel_rapl_msr(E)
+intel_rapl_common(E) xor(E) zstd_compress(E) ipmi_ssif(E)
+amd64_edac(E) edac_mce_amd(E) raid6_pq(E) kvm_amd(E) dell_smbios(E)
+kvm(E) acpi_ipmi(E) irqbypass(E) dell_wmi_descriptor(E) dcdbas(E)
+wmi_bmof(E) ipmi_si(E) rapl(E) acpi_cpufreq(E) ipmi_devintf(E)
+[13332.806060]  ptdma(E) wmi(E) k10temp(E) i2c_piix4(E)
+ipmi_msghandler(E) acpi_power_meter(E) fuse(E) drm(E) zram(E) ext4(E)
+mbcache(E) jbd2(E) dm_crypt(E) sd_mod(E) t10_pi(E) sg(E)
+crct10dif_pclmul(E) ahci(E) crc32_pclmul(E) polyval_clmulni(E)
+polyval_generic(E) libahci(E) ice(E) ghash_clmulni_intel(E)
+sha512_ssse3(E) libata(E) ccp(E) gnss(E) megaraid_sas(E) sp5100_tco(E)
+dm_mirror(E) dm_region_hash(E) dm_log(E) dm_mod(E) nf_conntrack(E)
+libcrc32c(E) crc32c_intel(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E)
+br_netfilter(E) bridge(E) stp(E) llc(E)
+[13332.895399] Unloaded tainted modules: fjes(E):2
+[13332.947668] ---[ end trace 0000000000000000 ]---
+[13333.036158] pstore: backend (erst) writing error (-22)
+[13333.041336] RIP: 0010:usercopy_abort+0x6a/0x80
+[13333.045791] Code: 61 18 95 50 48 c7 c2 62 61 18 95 57 48 c7 c7 28
+df 19 95 48 0f 44 d6 48 c7 c6 88 df 19 95 4c 89 d1 49 0f 44 f3 e8 f6
+f1 d5 ff <0f> 0b 49 c7 c1 d0 40 1b 95 4c 89 cf 4d 89 c8 eb a9 0f 1f 44
+00 00
+[13333.064553] RSP: 0018:ffffc9002773fb60 EFLAGS: 00010246
+[13333.069789] RAX: 0000000000000059 RBX: 0000000000000001 RCX: 00000000000=
+00000
+[13333.076926] RDX: 0000000000000000 RSI: ffff88a85fd5f700 RDI: ffff88a85fd=
+5f700
+[13333.084071] RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000fff=
+f7fff
+[13333.091209] R10: ffffc9002773fa18 R11: ffffffff95be26a8 R12: 00000000000=
+04000
+[13333.098350] R13: 0000000000000001 R14: 0000000000000000 R15: ffff8888640=
+1ae00
+[13333.105493] FS:  00007fcbae82cf80(0000) GS:ffff88a85fd40000(0000)
+knlGS:0000000000000000
+[13333.113587] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[13333.119341] CR2: 00007f60f35721d8 CR3: 000000307edbe006 CR4: 00000000007=
+70ee0
+[13333.126482] PKRU: 55555554
+[13333.129205] Kernel panic - not syncing: Fatal exception
+[13333.338519] Kernel Offset: disabled
+[13333.365480] ---[ end Kernel panic - not syncing: Fatal exception ]---
 
 
-Thought about that some more and some cases can also be tricky (avoiding 
-fragmenting multiple 1 GiB pages ...).
+> Getting the exact line in skb_release_data that causes the Oops
+> would be helpful too, e.g.,
+>
+> gdb vmlinux
+> list *(skb_release_data+0xb8)
 
-It's all tricky, especially once multiple (guest_)memfds are involved 
-and we really want to avoid most waste. Knowing that large mappings for 
-CoCo are rather "optional" and that the challenge is in "reusing" large 
-pages is valuable, though.
-
--- 
-Cheers,
-
-David / dhildenb
-
+Unfortunately we do not collect kdumps so this is not going to be easy
+:( We will investigate the possibility of getting the dump though.
 
