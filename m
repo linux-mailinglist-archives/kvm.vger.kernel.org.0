@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-12095-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12096-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE04687F8B6
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 09:01:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BCB687F8B7
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 09:02:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E11461C2037B
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 08:01:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5494282C75
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 08:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E2167CF0F;
-	Tue, 19 Mar 2024 08:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01F67CF1B;
+	Tue, 19 Mar 2024 08:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="at3DcSj0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kgXwbcsv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5407C6DB
-	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 08:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05BD54656
+	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 08:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710835249; cv=none; b=OieKxUaXSp4gbyr+WbQnrsA8b6gjzV5ScAmvhHU0g3MSljbqslCMUINOboZ2VykWbV0UScGCigHG1T4fxtaiMdL9M3wuFH1T9bZsNPf4wSEiiS/wUyvWamoNCdwinZbsm4vUelbWu9QKh5tNdZIe/nTtiQ8BNzM9VzFx/B7B2K4=
+	t=1710835253; cv=none; b=iyp1ElXPWDM/4ds0js7qLP4rZQofjcl6oBDx9lrBzDxkeMjH0gaJUsLQrqdeJDK96pzMQTBkQ0Ec05My1QyPE3YLgdibyKTt1i1yuPlnyNfQX+z8JyL0kpzbE7uaYFMEx1FrH7GEMcw3DaCIfo47ss5/9e3FyhzvXmBUfOMymt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710835249; c=relaxed/simple;
-	bh=w1d/5WcD330HEQMK+yQsqI+VN9cMkCsER3paH8UKvOw=;
+	s=arc-20240116; t=1710835253; c=relaxed/simple;
+	bh=2mWB4+rKz27VWu7Hw2xoeaMURh2u+mdmUKhygbx5uKE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RxCKKIHVhCVw8zNeiBEdHRrbkz2RknGs3sewwbXHp7mXJnj/v3PTah4TOYW/trOxr7+fT71UmEofGbDx6GMRlPdKISrA076dy7dZ+xVLTb6Nv7BSgBeXaD+zOyDeGHarhihRiv8rKb94f+3BV3V9Y7qtRy+OA5nudQYWJkf5XN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=at3DcSj0; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version; b=rhYilkeFd1lIfHnfLc/gj7qbDPp17SiA/KCKqmxXOB54yXNHvqRMi9sOxB6iQpQdBLjdZjhNn2hOW6piWYEZPVjhZZj6Rm5PzEaWIBRtZkeGnHpezTU8jjFPNhZ+FFZkbWXaAzoAn8Y2udWzrXnOCVFMiMro+g/5XUV9pQPw980=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kgXwbcsv; arc=none smtp.client-ip=209.85.210.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6e6b6e000a4so3798830b3a.0
-        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 01:00:47 -0700 (PDT)
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6e4e51b0bfcso2491623a34.0
+        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 01:00:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710835247; x=1711440047; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710835251; x=1711440051; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=s+3RoOfc/EiUQ/8sMOu4GgA6whcTEdJrTaOoRFd5C9o=;
-        b=at3DcSj0B69ZbbieNh0k/ffuAPac8/IfyNxc3LI7FkVHfbxnYqey00c4bkFR+U7gis
-         PusUZLGEdFgS23KKMVawGpqTB0X5pJvo1QD6xFK/mSUv0lggOWmxVcrnR0O5UMVnGBzm
-         Trj7MFz7SPI0PHEkCKvIzFcKTwQ7OnRJbl827dRK/i1k9aGe8x0i+1xtzNGyS09nAsjy
-         8j0nS7IFPtybKhPEMqsYFacwigm78Bc3MfK3Djp5M53rD2vtMU14iCAVazsHWNPC6Uuv
-         lcO+4DLE6fhjTqlVFNSUqdu1t727MUwKC8Rju/0FkhSy9qH+xFt04zc/3P8yN/SwxJFc
-         YMCQ==
+        bh=fmYXUw1NFQqCkvaC1UircBJTaa68tPuVL3/2t/uANro=;
+        b=kgXwbcsvQBEWheQXX+jg/G3Ak4AsNyEJ9Va+6kPqQPhCUwLNo7UTrV3Q8NWIS4j70i
+         68RbmC6SskqBllfwx5LMM5NN3rU37LkFBYLPLU4+FllH3QmtOYNZSWXJcaKJrYjolR3h
+         YhRkJCci2meY9iQS8QwLvcAF2QZNW880kfyFxjXcoa5Wruy1CK9o7Ycm0FVtX9G/yX1C
+         3kguP7xmejDQ592DSKc+kzt3TjM+035mADlr+Hwe1R2+56+rFqALoxDOg5PTqeL0NFGf
+         TF3pZvMgrqAdSn/tCjkWwFeBswdYGgFJaiqFApLK29ShGG+/o1Y9EPfIp4Dij+RB/lGW
+         K5ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710835247; x=1711440047;
+        d=1e100.net; s=20230601; t=1710835251; x=1711440051;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=s+3RoOfc/EiUQ/8sMOu4GgA6whcTEdJrTaOoRFd5C9o=;
-        b=llTg5CEPspC9N1xH30ikb9KzSRlMSmpMFSXsLzZT7nwLsEDH6388RGuE/N7BUvdU3V
-         CJJ4YnNFgOwAxFlFm2tVW52oN1YNiSl6uqqpxs/9f6H6HYj4F1krvHxCS1WzJ8OBP7es
-         c+m9cc2XqhjGwuYP/AVGIys1iLnQD/pn9dkBjTjyvRueM8pULqC3HvZPB80DwAmOpfts
-         ndcYXgjP6/iZjxqEga2RW5qk3hIlKiVD4vPqFE02lztNUiisrPJBxaD3pnTVrGursTw1
-         DzWLLacSKOdwiNP+TggjVqzNb0lwbze/qQmYgYGOICOF02PDAj/Dl5Pysom1/wVpieM/
-         JMmg==
-X-Forwarded-Encrypted: i=1; AJvYcCXemviI+aIVX0b3LAMoa4sviO8pi+S/h6au2f4V63K0wxzVfnRSh5QSRiB5I6iLnOeCJKPBxn+rgB9uyCoPU/16RX9S
-X-Gm-Message-State: AOJu0YxFYjacY+rCP6W6mmx7sEEZIsqJUgxdDzKrMSiFuLX//Kh0yZgt
-	2tI2KeP1d1iGC0e3eEhuwvy7WbVNtXa1IkaqA0U7OMyWo2gV7T+0
-X-Google-Smtp-Source: AGHT+IEoJ2QYv4qOrrK/lVq7fq9Cz61EqlqwkAbdQgEs9ItG8puo2idHO4Sk7HaN3YX9Wpqm2/OsXQ==
-X-Received: by 2002:a05:6a21:1508:b0:1a3:54aa:b5dd with SMTP id nq8-20020a056a21150800b001a354aab5ddmr2650151pzb.3.1710835246432;
-        Tue, 19 Mar 2024 01:00:46 -0700 (PDT)
+        bh=fmYXUw1NFQqCkvaC1UircBJTaa68tPuVL3/2t/uANro=;
+        b=wlzWmM+5PMKXBMk4byolfDebaWvgGHBEpaRBB75t11qcOoipiy0kqBeJWNXJhYL4cK
+         gE0WxkNJWQ/EiiSB30Dedqj74XWB0EwAztlp1ZdDpnjd7B8Y7RoCrY/gEjUfY/ieZHa+
+         qYaLvOe5rX6JWAcwGfiC+MTTaP67dFjomJJSBxLus24R/lswwVkQE/2w5nvaw4AYYrxx
+         E8irWs0HpPgOYYzjg3KmOnH0sJV5nrE/05nhsMkDTt06HbBY0Saq2Sn08BupD30/nKM9
+         7x7YmbQd1zt35Pip0xAlqHpY8n9j7g1Ka8ebqW9+RzS9wm5LHwtFOWCEjPQE5ZsCoSi7
+         l40Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWjkvd7Si+2OshOge9loGkqWK+U++qbPDqtJDIB7Upz+X98pCk9rgd+VTFDqE0j1E5F9e8opccdQt+O22WbEAB3ZjLo
+X-Gm-Message-State: AOJu0Yy4Lna855WV47YzdZ1T8wkq1GDqybk2S2DGeohf1y9ZBQe6KK5C
+	gVGpS4HIHJfvz0dRCDY6cgX6Yzu3tJ6gYQrVyhuM5+3BzlyPBqkL
+X-Google-Smtp-Source: AGHT+IFfHuNzVGIE29NF+n08DtvfpVDdYpSp3yZpBjdFnpuN+dbSWe0Rtn2wUlx4d+yiEmJX+pa07w==
+X-Received: by 2002:a05:6870:e9a9:b0:21e:8590:6a5 with SMTP id r41-20020a056870e9a900b0021e859006a5mr15351073oao.2.1710835250874;
+        Tue, 19 Mar 2024 01:00:50 -0700 (PDT)
 Received: from wheely.local0.net (193-116-208-39.tpgi.com.au. [193.116.208.39])
-        by smtp.gmail.com with ESMTPSA id q23-20020a62ae17000000b006e5c464c0a9sm9121283pff.23.2024.03.19.01.00.43
+        by smtp.gmail.com with ESMTPSA id q23-20020a62ae17000000b006e5c464c0a9sm9121283pff.23.2024.03.19.01.00.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 01:00:46 -0700 (PDT)
+        Tue, 19 Mar 2024 01:00:50 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -75,9 +75,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v7 19/35] powerpc: general interrupt tests
-Date: Tue, 19 Mar 2024 17:59:10 +1000
-Message-ID: <20240319075926.2422707-20-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v7 20/35] powerpc: Add rtas stop-self support
+Date: Tue, 19 Mar 2024 17:59:11 +1000
+Message-ID: <20240319075926.2422707-21-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240319075926.2422707-1-npiggin@gmail.com>
 References: <20240319075926.2422707-1-npiggin@gmail.com>
@@ -89,611 +89,148 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add basic testing of various kinds of interrupts, machine check,
-page fault, illegal, decrementer, trace, syscall, etc.
+In preparation for improved SMP support, add stop-self support to the
+harness. This is non-trivial because it requires an unlocked rtas
+call: a CPU can't be holding a spin lock when it goes offline or it
+will deadlock other CPUs. rtas permits stop-self to be called without
+serialising all other rtas operations.
 
-This has a known failure on QEMU TCG pseries machines where MSR[ME]
-can be incorrectly set to 0.
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- lib/powerpc/asm/processor.h |   4 +
- lib/powerpc/asm/reg.h       |  17 ++
- lib/powerpc/setup.c         |  11 +
- lib/ppc64/asm/ptrace.h      |  16 ++
- powerpc/Makefile.common     |   3 +-
- powerpc/interrupts.c        | 414 ++++++++++++++++++++++++++++++++++++
- powerpc/unittests.cfg       |   3 +
- 7 files changed, 467 insertions(+), 1 deletion(-)
- create mode 100644 powerpc/interrupts.c
+ lib/powerpc/asm/rtas.h |  2 ++
+ lib/powerpc/rtas.c     | 78 +++++++++++++++++++++++++++++++++---------
+ 2 files changed, 64 insertions(+), 16 deletions(-)
 
-diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
-index cf1b9d8ff..eed37d1f4 100644
---- a/lib/powerpc/asm/processor.h
-+++ b/lib/powerpc/asm/processor.h
-@@ -11,7 +11,11 @@ void do_handle_exception(struct pt_regs *regs);
+diff --git a/lib/powerpc/asm/rtas.h b/lib/powerpc/asm/rtas.h
+index 6fb407a18..364bf9355 100644
+--- a/lib/powerpc/asm/rtas.h
++++ b/lib/powerpc/asm/rtas.h
+@@ -23,8 +23,10 @@ struct rtas_args {
+ extern void rtas_init(void);
+ extern int rtas_token(const char *service, uint32_t *token);
+ extern int rtas_call(int token, int nargs, int nret, int *outputs, ...);
++extern int rtas_call_unlocked(struct rtas_args *args, int token, int nargs, int nret, int *outputs, ...);
+ 
+ extern void rtas_power_off(void);
++extern void rtas_stop_self(void);
  #endif /* __ASSEMBLY__ */
  
- extern bool cpu_has_hv;
-+extern bool cpu_has_power_mce;
-+extern bool cpu_has_siar;
- extern bool cpu_has_heai;
-+extern bool cpu_has_prefix;
-+extern bool cpu_has_sc_lev;
- 
- static inline uint64_t mfspr(int nr)
- {
-diff --git a/lib/powerpc/asm/reg.h b/lib/powerpc/asm/reg.h
-index 782e75527..d6097f48f 100644
---- a/lib/powerpc/asm/reg.h
-+++ b/lib/powerpc/asm/reg.h
-@@ -5,8 +5,15 @@
- 
- #define UL(x) _AC(x, UL)
- 
-+#define SPR_DSISR	0x012
-+#define SPR_DAR		0x013
-+#define SPR_DEC		0x016
- #define SPR_SRR0	0x01a
- #define SPR_SRR1	0x01b
-+#define   SRR1_PREFIX		UL(0x20000000)
-+#define SPR_FSCR	0x099
-+#define   FSCR_PREFIX		UL(0x2000)
-+#define SPR_HFSCR	0x0be
- #define SPR_TB		0x10c
- #define SPR_SPRG0	0x110
- #define SPR_SPRG1	0x111
-@@ -22,12 +29,17 @@
- #define   PVR_VER_POWER8	UL(0x004d0000)
- #define   PVR_VER_POWER9	UL(0x004e0000)
- #define   PVR_VER_POWER10	UL(0x00800000)
-+#define SPR_HDEC	0x136
- #define SPR_HSRR0	0x13a
- #define SPR_HSRR1	0x13b
-+#define SPR_LPCR	0x13e
-+#define   LPCR_HDICE		UL(0x1)
-+#define SPR_HEIR	0x153
- #define SPR_MMCR0	0x31b
- #define   MMCR0_FC		UL(0x80000000)
- #define   MMCR0_PMAE		UL(0x04000000)
- #define   MMCR0_PMAO		UL(0x00000080)
-+#define SPR_SIAR	0x31c
- 
- /* Machine State Register definitions: */
- #define MSR_LE_BIT	0
-@@ -35,6 +47,11 @@
- #define MSR_HV_BIT	60			/* Hypervisor mode */
- #define MSR_SF_BIT	63			/* 64-bit mode */
- 
-+#define MSR_DR		UL(0x0010)
-+#define MSR_IR		UL(0x0020)
-+#define MSR_BE		UL(0x0200)		/* Branch Trace Enable */
-+#define MSR_SE		UL(0x0400)		/* Single Step Enable */
-+#define MSR_EE		UL(0x8000)
- #define MSR_ME		UL(0x1000)
- 
- #endif
-diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
-index 3c81aee9e..9b665f59c 100644
---- a/lib/powerpc/setup.c
-+++ b/lib/powerpc/setup.c
-@@ -87,7 +87,11 @@ static void cpu_set(int fdtnode, u64 regval, void *info)
+ #define RTAS_MSR_MASK 0xfffffffffffffffe
+diff --git a/lib/powerpc/rtas.c b/lib/powerpc/rtas.c
+index 41c0a243e..b477a38e0 100644
+--- a/lib/powerpc/rtas.c
++++ b/lib/powerpc/rtas.c
+@@ -87,40 +87,86 @@ int rtas_token(const char *service, uint32_t *token)
+ 	return 0;
  }
  
- bool cpu_has_hv;
-+bool cpu_has_power_mce; /* POWER CPU machine checks */
-+bool cpu_has_siar;
- bool cpu_has_heai;
-+bool cpu_has_prefix;
-+bool cpu_has_sc_lev; /* sc interrupt has LEV field in SRR1 */
- 
- static void cpu_init(void)
+-int rtas_call(int token, int nargs, int nret, int *outputs, ...)
++static void __rtas_call(struct rtas_args *args)
  {
-@@ -112,15 +116,22 @@ static void cpu_init(void)
+-	va_list list;
+-	int ret, i;
++	enter_rtas(__pa(args));
++}
  
- 	switch (mfspr(SPR_PVR) & PVR_VERSION_MASK) {
- 	case PVR_VER_POWER10:
-+		cpu_has_prefix = true;
-+		cpu_has_sc_lev = true;
- 	case PVR_VER_POWER9:
- 	case PVR_VER_POWER8E:
- 	case PVR_VER_POWER8NVL:
- 	case PVR_VER_POWER8:
-+		cpu_has_power_mce = true;
- 		cpu_has_heai = true;
-+		cpu_has_siar = true;
- 		break;
- 	default:
- 		break;
+-	spin_lock(&rtas_lock);
++static int rtas_call_unlocked_va(struct rtas_args *args,
++			  int token, int nargs, int nret, int *outputs,
++			  va_list list)
++{
++	int ret, i;
+ 
+-	rtas_args.token = cpu_to_be32(token);
+-	rtas_args.nargs = cpu_to_be32(nargs);
+-	rtas_args.nret = cpu_to_be32(nret);
+-	rtas_args.rets = &rtas_args.args[nargs];
++	args->token = cpu_to_be32(token);
++	args->nargs = cpu_to_be32(nargs);
++	args->nret = cpu_to_be32(nret);
++	args->rets = &args->args[nargs];
+ 
+-	va_start(list, outputs);
+ 	for (i = 0; i < nargs; ++i)
+-		rtas_args.args[i] = cpu_to_be32(va_arg(list, u32));
+-	va_end(list);
++		args->args[i] = cpu_to_be32(va_arg(list, u32));
+ 
+ 	for (i = 0; i < nret; ++i)
+-		rtas_args.rets[i] = 0;
++		args->rets[i] = 0;
+ 
+-	enter_rtas(__pa(&rtas_args));
++	__rtas_call(args);
+ 
+ 	if (nret > 1 && outputs != NULL)
+ 		for (i = 0; i < nret - 1; ++i)
+-			outputs[i] = be32_to_cpu(rtas_args.rets[i + 1]);
++			outputs[i] = be32_to_cpu(args->rets[i + 1]);
++
++	ret = nret > 0 ? be32_to_cpu(args->rets[0]) : 0;
++
++	return ret;
++}
++
++int rtas_call_unlocked(struct rtas_args *args, int token, int nargs, int nret, int *outputs, ...)
++{
++	va_list list;
++	int ret;
+ 
+-	ret = nret > 0 ? be32_to_cpu(rtas_args.rets[0]) : 0;
++	va_start(list, outputs);
++	ret = rtas_call_unlocked_va(args, token, nargs, nret, outputs, list);
++	va_end(list);
++
++	return ret;
++}
++
++int rtas_call(int token, int nargs, int nret, int *outputs, ...)
++{
++	va_list list;
++	int ret;
++
++	spin_lock(&rtas_lock);
++
++	va_start(list, outputs);
++	ret = rtas_call_unlocked_va(&rtas_args, token, nargs, nret, outputs, list);
++	va_end(list);
+ 
+ 	spin_unlock(&rtas_lock);
++
+ 	return ret;
+ }
+ 
++void rtas_stop_self(void)
++{
++	struct rtas_args args;
++	uint32_t token;
++	int ret;
++
++	ret = rtas_token("stop-self", &token);
++	if (ret) {
++		puts("RTAS stop-self not available\n");
++		return;
++	}
++
++	ret = rtas_call_unlocked(&args, token, 0, 1, NULL);
++	printf("RTAS stop-self returned %d\n", ret);
++}
++
+ void rtas_power_off(void)
+ {
++	struct rtas_args args;
+ 	uint32_t token;
+ 	int ret;
+ 
+@@ -130,6 +176,6 @@ void rtas_power_off(void)
+ 		return;
  	}
-+
-+	if (!cpu_has_hv) /* HEIR is HV register */
-+		cpu_has_heai = false;
+ 
+-	ret = rtas_call(token, 2, 1, NULL, -1, -1);
++	ret = rtas_call_unlocked(&args, token, 2, 1, NULL, -1, -1);
+ 	printf("RTAS power-off returned %d\n", ret);
  }
- 
- static void mem_init(phys_addr_t freemem_start)
-diff --git a/lib/ppc64/asm/ptrace.h b/lib/ppc64/asm/ptrace.h
-index 12de7499b..db263a59e 100644
---- a/lib/ppc64/asm/ptrace.h
-+++ b/lib/ppc64/asm/ptrace.h
-@@ -5,6 +5,9 @@
- #define STACK_FRAME_OVERHEAD    112     /* size of minimum stack frame */
- 
- #ifndef __ASSEMBLY__
-+
-+#include <asm/reg.h>
-+
- struct pt_regs {
- 	unsigned long gpr[32];
- 	unsigned long nip;
-@@ -17,6 +20,19 @@ struct pt_regs {
- 	unsigned long _pad; /* stack must be 16-byte aligned */
- };
- 
-+static inline bool regs_is_prefix(volatile struct pt_regs *regs)
-+{
-+	return regs->msr & SRR1_PREFIX;
-+}
-+
-+static inline void regs_advance_insn(struct pt_regs *regs)
-+{
-+	if (regs_is_prefix(regs))
-+		regs->nip += 8;
-+	else
-+		regs->nip += 4;
-+}
-+
- #define STACK_INT_FRAME_SIZE    (sizeof(struct pt_regs) + \
- 				 STACK_FRAME_OVERHEAD + KERNEL_REDZONE_SIZE)
- 
-diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-index 1e181da69..68165fc25 100644
---- a/powerpc/Makefile.common
-+++ b/powerpc/Makefile.common
-@@ -12,7 +12,8 @@ tests-common = \
- 	$(TEST_DIR)/rtas.elf \
- 	$(TEST_DIR)/emulator.elf \
- 	$(TEST_DIR)/tm.elf \
--	$(TEST_DIR)/sprs.elf
-+	$(TEST_DIR)/sprs.elf \
-+	$(TEST_DIR)/interrupts.elf
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(TEST_DIR)/boot_rom.bin $(tests-all)
-diff --git a/powerpc/interrupts.c b/powerpc/interrupts.c
-new file mode 100644
-index 000000000..552c48ef2
---- /dev/null
-+++ b/powerpc/interrupts.c
-@@ -0,0 +1,414 @@
-+/* SPDX-License-Identifier: LGPL-2.0-only */
-+/*
-+ * Test interrupts
-+ *
-+ * Copyright 2024 Nicholas Piggin, IBM Corp.
-+ */
-+#include <libcflat.h>
-+#include <util.h>
-+#include <migrate.h>
-+#include <alloc.h>
-+#include <asm/setup.h>
-+#include <asm/handlers.h>
-+#include <asm/hcall.h>
-+#include <asm/processor.h>
-+#include <asm/time.h>
-+#include <asm/barrier.h>
-+
-+static volatile bool got_interrupt;
-+static volatile struct pt_regs recorded_regs;
-+
-+static void mce_handler(struct pt_regs *regs, void *opaque)
-+{
-+	bool *is_fetch = opaque;
-+
-+	got_interrupt = true;
-+	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-+	if (*is_fetch)
-+		regs->nip = regs->link;
-+	else
-+		regs_advance_insn(regs);
-+}
-+
-+static void fault_handler(struct pt_regs *regs, void *opaque)
-+{
-+	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-+	if (regs->trap == 0x400 || regs->trap == 0x480)
-+		regs->nip = regs->link;
-+	else
-+		regs_advance_insn(regs);
-+}
-+
-+static void test_mce(void)
-+{
-+	unsigned long addr = -4ULL;
-+	uint8_t tmp;
-+	bool is_fetch;
-+
-+	report_prefix_push("mce");
-+
-+	handle_exception(0x200, mce_handler, &is_fetch);
-+	handle_exception(0x300, fault_handler, NULL);
-+	handle_exception(0x380, fault_handler, NULL);
-+	handle_exception(0x400, fault_handler, NULL);
-+	handle_exception(0x480, fault_handler, NULL);
-+
-+	if (machine_is_powernv()) {
-+		enable_mcheck();
-+	} else {
-+		report(mfmsr() & MSR_ME, "pseries machine has MSR[ME]=1");
-+		if (!(mfmsr() & MSR_ME)) { /* try to fix it */
-+			enable_mcheck();
-+		}
-+		if (mfmsr() & MSR_ME) {
-+			disable_mcheck();
-+			report(mfmsr() & MSR_ME, "pseries is unable to change MSR[ME]");
-+			if (!(mfmsr() & MSR_ME)) { /* try to fix it */
-+				enable_mcheck();
-+			}
-+		}
-+	}
-+
-+	is_fetch = false;
-+	asm volatile("lbz %0,0(%1)" : "=r"(tmp) : "r"(addr));
-+
-+	report(got_interrupt, "MCE on access to invalid real address");
-+	if (got_interrupt) {
-+		report(mfspr(SPR_DAR) == addr, "MCE sets DAR correctly");
-+		if (cpu_has_power_mce)
-+			report(recorded_regs.msr & (1ULL << 21), "d-side MCE sets SRR1[42]");
-+		got_interrupt = false;
-+	}
-+
-+	is_fetch = true;
-+	asm volatile("mtctr %0 ; bctrl" :: "r"(addr) : "ctr", "lr");
-+	report(got_interrupt, "MCE on fetch from invalid real address");
-+	if (got_interrupt) {
-+		report(recorded_regs.nip == addr, "MCE sets SRR0 correctly");
-+		if (cpu_has_power_mce)
-+			report(!(recorded_regs.msr & (1ULL << 21)), "i-side MCE clears SRR1[42]");
-+		got_interrupt = false;
-+	}
-+
-+	handle_exception(0x200, NULL, NULL);
-+	handle_exception(0x300, NULL, NULL);
-+	handle_exception(0x380, NULL, NULL);
-+	handle_exception(0x400, NULL, NULL);
-+	handle_exception(0x480, NULL, NULL);
-+
-+	report_prefix_pop();
-+}
-+
-+static void dseg_handler(struct pt_regs *regs, void *data)
-+{
-+	got_interrupt = true;
-+	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-+	regs_advance_insn(regs);
-+	regs->msr &= ~MSR_DR;
-+}
-+
-+static void test_dseg(void)
-+{
-+	uint64_t msr, tmp;
-+
-+	report_prefix_push("data segment");
-+
-+	/* Some HV start in radix mode and need 0x300 */
-+	handle_exception(0x300, &dseg_handler, NULL);
-+	handle_exception(0x380, &dseg_handler, NULL);
-+
-+	asm volatile(
-+"		mfmsr	%0		\n \
-+		ori	%0,%0,%2	\n \
-+		mtmsrd	%0		\n \
-+		lbz	%1,0(0)		"
-+		: "=r"(msr), "=r"(tmp) : "i"(MSR_DR): "memory");
-+
-+	report(got_interrupt, "interrupt on NULL dereference");
-+	got_interrupt = false;
-+
-+	handle_exception(0x300, NULL, NULL);
-+	handle_exception(0x380, NULL, NULL);
-+
-+	report_prefix_pop();
-+}
-+
-+static void dec_handler(struct pt_regs *regs, void *data)
-+{
-+	got_interrupt = true;
-+	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-+	regs->msr &= ~MSR_EE;
-+}
-+
-+static void test_dec(void)
-+{
-+	uint64_t msr;
-+	uint64_t tb;
-+
-+	report_prefix_push("decrementer");
-+
-+	handle_exception(0x900, &dec_handler, NULL);
-+
-+	asm volatile(
-+"		mtdec	%1		\n \
-+		mfmsr	%0		\n \
-+		ori	%0,%0,%2	\n \
-+		mtmsrd	%0,1		"
-+		: "=r"(msr) : "r"(10000), "i"(MSR_EE): "memory");
-+
-+	tb = get_tb();
-+	while (!got_interrupt) {
-+		if (get_tb() - tb > tb_hz * 5)
-+			break; /* timeout 5s */
-+	}
-+
-+	report(got_interrupt, "interrupt on decrementer underflow");
-+	got_interrupt = false;
-+
-+	handle_exception(0x900, NULL, NULL);
-+
-+	if (!machine_is_powernv())
-+		goto done; /* Skip HV tests */
-+
-+	handle_exception(0x980, &dec_handler, NULL);
-+
-+	mtspr(SPR_LPCR, mfspr(SPR_LPCR) | LPCR_HDICE);
-+	asm volatile(
-+"		mtspr	0x136,%1	\n \
-+		mtdec	%3		\n \
-+		mfmsr	%0		\n \
-+		ori	%0,%0,%2	\n \
-+		mtmsrd	%0,1		"
-+		: "=r"(msr) : "r"(10000), "i"(MSR_EE), "r"(0x7fffffff): "memory");
-+
-+	tb = get_tb();
-+	while (!got_interrupt) {
-+		if (get_tb() - tb > tb_hz * 5)
-+			break; /* timeout 5s */
-+	}
-+
-+	mtspr(SPR_LPCR, mfspr(SPR_LPCR) & ~LPCR_HDICE);
-+
-+	report(got_interrupt, "interrupt on hdecrementer underflow");
-+	got_interrupt = false;
-+
-+	handle_exception(0x980, NULL, NULL);
-+
-+done:
-+	report_prefix_pop();
-+}
-+
-+
-+static volatile uint64_t recorded_heir;
-+
-+static void heai_handler(struct pt_regs *regs, void *data)
-+{
-+	got_interrupt = true;
-+	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-+	regs_advance_insn(regs);
-+	if (cpu_has_heai)
-+		recorded_heir = mfspr(SPR_HEIR);
-+}
-+
-+static void program_handler(struct pt_regs *regs, void *data)
-+{
-+	got_interrupt = true;
-+	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-+	regs_advance_insn(regs);
-+}
-+
-+/*
-+ * This tests invalid instruction handling. powernv (HV) should take an
-+ * HEAI interrupt with the HEIR SPR set to the instruction image. pseries
-+ * (guest) should take a program interrupt. CPUs which support prefix
-+ * should report prefix instruction in (H)SRR1[34].
-+ */
-+static void test_illegal(void)
-+{
-+	report_prefix_push("illegal instruction");
-+
-+	if (machine_is_powernv()) {
-+		handle_exception(0xe40, &heai_handler, NULL);
-+	} else {
-+		handle_exception(0x700, &program_handler, NULL);
-+	}
-+
-+	asm volatile(".long 0x12345678" ::: "memory");
-+	report(got_interrupt, "interrupt on invalid instruction");
-+	got_interrupt = false;
-+	if (cpu_has_heai)
-+		report(recorded_heir == 0x12345678, "HEIR: 0x%08lx", recorded_heir);
-+	report(!regs_is_prefix(&recorded_regs), "(H)SRR1 prefix bit clear");
-+
-+	if (cpu_has_prefix) {
-+		asm volatile(".balign 8 ; .long 0x04000123; .long 0x00badc0d");
-+		report(got_interrupt, "interrupt on invalid prefix instruction");
-+		got_interrupt = false;
-+		if (cpu_has_heai)
-+			report(recorded_heir == 0x0400012300badc0d, "HEIR: 0x%08lx", recorded_heir);
-+		report(regs_is_prefix(&recorded_regs), "(H)SRR1 prefix bit set");
-+	}
-+
-+	handle_exception(0xe40, NULL, NULL);
-+	handle_exception(0x700, NULL, NULL);
-+
-+	report_prefix_pop();
-+}
-+
-+static void sc_handler(struct pt_regs *regs, void *data)
-+{
-+	got_interrupt = true;
-+	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-+}
-+
-+static void test_sc(void)
-+{
-+	report_prefix_push("syscall");
-+
-+	handle_exception(0xc00, &sc_handler, NULL);
-+
-+	asm volatile("sc 0" ::: "memory");
-+
-+	report(got_interrupt, "interrupt on sc 0 instruction");
-+	got_interrupt = false;
-+	if (cpu_has_sc_lev)
-+		report(((recorded_regs.msr >> 20) & 0x3) == 0, "SRR1 set LEV=0");
-+	if (machine_is_powernv()) {
-+		asm volatile("sc 1" ::: "memory");
-+
-+		report(got_interrupt, "interrupt on sc 1 instruction");
-+		got_interrupt = false;
-+		if (cpu_has_sc_lev)
-+			report(((recorded_regs.msr >> 20) & 0x3) == 1, "SRR1 set LEV=1");
-+	}
-+
-+	handle_exception(0xc00, NULL, NULL);
-+
-+	report_prefix_pop();
-+}
-+
-+
-+static void trace_handler(struct pt_regs *regs, void *data)
-+{
-+	got_interrupt = true;
-+	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-+	regs->msr &= ~(MSR_SE | MSR_BE);
-+}
-+
-+static void program_trace_handler(struct pt_regs *regs, void *data)
-+{
-+	regs->msr &= ~(MSR_SE | MSR_BE);
-+	regs->nip += 4;
-+}
-+
-+extern char trace_insn[];
-+extern char trace_insn2[];
-+extern char trace_insn3[];
-+extern char trace_rfid[];
-+
-+static void test_trace(void)
-+{
-+	unsigned long msr;
-+
-+	report_prefix_push("trace");
-+
-+	handle_exception(0xd00, &trace_handler, NULL);
-+
-+	msr = mfmsr() | MSR_SE;
-+	asm volatile(
-+	"	mtmsr	%0		\n"
-+	".global trace_insn		\n"
-+	"trace_insn:			\n"
-+	"	nop			\n"
-+	: : "r"(msr) : "memory");
-+
-+	report(got_interrupt, "interrupt on single step");
-+	got_interrupt = false;
-+	report(recorded_regs.nip == (unsigned long)trace_insn + 4,
-+			"single step interrupt at the correct address");
-+	if (cpu_has_siar)
-+		report(mfspr(SPR_SIAR) == (unsigned long)trace_insn,
-+			"single step recorded SIAR at the correct address");
-+
-+	msr = mfmsr() | MSR_SE;
-+	asm volatile(
-+	"	mtmsr	%0		\n"
-+	".global trace_insn2		\n"
-+	"trace_insn2:			\n"
-+	"	b	1f		\n"
-+	"	nop			\n"
-+	"1:				\n"
-+	: : "r"(msr) : "memory");
-+
-+	report(got_interrupt, "interrupt on single step branch");
-+	got_interrupt = false;
-+	report(recorded_regs.nip == (unsigned long)trace_insn2 + 8,
-+			"single step interrupt at the correct address");
-+	if (cpu_has_siar)
-+		report(mfspr(SPR_SIAR) == (unsigned long)trace_insn2,
-+			"single step recorded SIAR at the correct address");
-+
-+	msr = mfmsr() | MSR_BE;
-+	asm volatile(
-+	"	mtmsr	%0		\n"
-+	".global trace_insn3		\n"
-+	"trace_insn3:			\n"
-+	"	nop			\n"
-+	"	b	1f		\n"
-+	"	nop			\n"
-+	"1:				\n"
-+	: : "r"(msr) : "memory");
-+
-+	report(got_interrupt, "interrupt on branch trace");
-+	got_interrupt = false;
-+	report(recorded_regs.nip == (unsigned long)trace_insn3 + 12,
-+			"branch trace interrupt at the correct address");
-+	if (cpu_has_siar)
-+		report(mfspr(SPR_SIAR) == (unsigned long)trace_insn3 + 4,
-+			"branch trace recorded SIAR at the correct address");
-+
-+	handle_exception(0x700, &program_trace_handler, NULL);
-+	msr = mfmsr() | MSR_SE;
-+	asm volatile(
-+	"	mtmsr	%0		\n"
-+	"	trap			\n"
-+	: : "r"(msr) : "memory");
-+
-+	report(!got_interrupt, "no interrupt on single step trap");
-+	got_interrupt = false;
-+	handle_exception(0x700, NULL, NULL);
-+
-+	msr = mfmsr() | MSR_SE;
-+	mtspr(SPR_SRR0, (unsigned long)trace_rfid);
-+	mtspr(SPR_SRR1, mfmsr());
-+	asm volatile(
-+	"	mtmsr	%0		\n"
-+	"	rfid			\n"
-+	".global trace_rfid		\n"
-+	"trace_rfid:			\n"
-+	: : "r"(msr) : "memory");
-+
-+	report(!got_interrupt, "no interrupt on single step rfid");
-+	got_interrupt = false;
-+	handle_exception(0xd00, NULL, NULL);
-+
-+	report_prefix_pop();
-+}
-+
-+
-+int main(int argc, char **argv)
-+{
-+	report_prefix_push("interrupts");
-+
-+	if (cpu_has_power_mce)
-+		test_mce();
-+	test_dseg();
-+	test_illegal();
-+	test_dec();
-+	test_sc();
-+	test_trace();
-+
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-index 3c3783ba6..9fdc86b66 100644
---- a/powerpc/unittests.cfg
-+++ b/powerpc/unittests.cfg
-@@ -71,6 +71,9 @@ groups = rtas
- [emulator]
- file = emulator.elf
- 
-+[interrupts]
-+file = interrupts.elf
-+
- [h_cede_tm]
- file = tm.elf
- machine = pseries
 -- 
 2.42.0
 
