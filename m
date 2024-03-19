@@ -1,205 +1,308 @@
-Return-Path: <kvm+bounces-12075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4718487F889
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 08:42:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17F0787F89C
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 08:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D13DCB21478
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 07:42:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 853201F21A02
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 07:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DBC54657;
-	Tue, 19 Mar 2024 07:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA520537ED;
+	Tue, 19 Mar 2024 07:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUpEDfKx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="djK39U+S"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5771853818
-	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 07:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4791E536
+	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 07:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710834114; cv=none; b=PbHd5oIiga3Xo71uTCFMcWB5HnTm0d5PzbVlOi1pojiz1w+5sopPhOpLBPF5PsEvngh+aq15lGmkNyGyxI+WckkMZnwsORuLnSMbD0vT2pWTzY4CMZLF5MZBqIiYL/Cu6c2yS32omimd6sNvLnaGSvLnGAKQwVTudrhixuBkelI=
+	t=1710835177; cv=none; b=ffLmlAD7S1zWTA7sbhVtIuNLblnSBk9iekd3tfDlGDdE+QIRpTrsubaa9NJ0quMBS7GskslhjaoYicUIPrEd0PjqN4Pn0fGSqZd17Jye6u1tQ4ks/A/vRf6o0v9M3IT086EguzUwZ+Kr0eSanDtvUkXcqp7J+PM0p/VG1a5JQx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710834114; c=relaxed/simple;
-	bh=2crLoEVLnwiq99cE6HQUHEb+ylseepzZNYcoRSHN6zw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=PqjXbTv1n/a5mUmQUKKbMGmwbyJm5SpFAmZT04hQER5yR43NV3EnkeENCVRAfeRIgL9C4d7wgvVnAN5xHtX9wIZuui7zH73WC1sDVz2yLsTH4v+dgDnbFjjtxZpaaFtusZV5/UGJTNQedDMMZoF7Ji0AI0vY2AlKBTwIOlKh+Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gUpEDfKx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710834111;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=sTsSPri+D6Wdelir2mIVSESP1KmjuvB/LjDkRovj8pE=;
-	b=gUpEDfKx2cA7200XkIVh3Xb/TR6xcVWTaNRi7kAaxtu1VM8XxKqfaQ4ozngpKQnjAdk8pQ
-	Wvxfi/e4XwyB0eXHByS9Wj7P5BGumz7Kn9dGpKA1x6xSQC7U9KHJJ5kY7pyKo++USiijXY
-	QH7M5PF2iBcuHEsWbMri2D8SWMju5ao=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-394-QlyWR_c4MAaLRJmSGZPD2w-1; Tue, 19 Mar 2024 03:41:49 -0400
-X-MC-Unique: QlyWR_c4MAaLRJmSGZPD2w-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33ed22facfeso2055351f8f.0
-        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 00:41:49 -0700 (PDT)
+	s=arc-20240116; t=1710835177; c=relaxed/simple;
+	bh=LYqlEe7KTEL9YfH1NQT246lS9Kn0hd3sQkIbCBTgYDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ByoBKNkGB44u+S99DD+eA6OOMlJJHbWNlzD5n07zuiuGjJR3tM0+3QPwCfeBXhzKrC2rHx/1gN9/Iyb2lTB8UG1lqYT/BEN4H6Mx+SJO9QXoukj56oxkIyW9V3HdVBw4/qlpTS26t4ECQMQ1TKmMhuHt+7cXmOMFLC1iG8D1v5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=djK39U+S; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e6ca2ac094so4735281b3a.0
+        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 00:59:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710835175; x=1711439975; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/fQl+aBLc/vpQz7SyONYn8N3lgkZT1awNMICSaZyEFc=;
+        b=djK39U+SdQoqO3SfJccB7SCxFk9+L3j3sMAJ2k3oBAHOXD5V7o19WJU5Q4ILefpicd
+         MdFhEMzGO0dTFlLg3rhBbtGrBZ8kBAZlNlscINAW7vswz9w0JHYfFKlEoe46pYatFazT
+         g8TJdsOC230amYHNnjNFzL8xe8Eyvq2g70itlLzLwzsmcdrL7UnVMsimNVlkBM14beIV
+         tIRwfZGDfeCyDGzhK+jGJliIefnHXx8UwK9ZnGDu3OkGTThUUiRVEz66boSeb3lmFpeN
+         I64tNojG6eNxpWvQUM64MSOUG5rYqYAW7i9vDAU/ywxeZNr5MPbkWKFgPUpqYj3ef6yL
+         UTZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710834109; x=1711438909;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sTsSPri+D6Wdelir2mIVSESP1KmjuvB/LjDkRovj8pE=;
-        b=glJ+CcBJlpv1MWZd46L2D4hbjuLY/liQS1y4kMt03HHfL2ItzpCbkPWOkUrKH4Zhby
-         E+rTRk39SJLheb24WFX6BLwSHO9BbI8i1T6SraRK5T35sL7fTYTNwfxIAKiZKcrAibDH
-         RuizPbyZLBRLe7h0CLQG3uvGdm0GCenQyOMEC0RybtDcdLFbDVxnTngwOBFOHmVkFVMG
-         SUzj8LfdPFk0yKcRhDsbLIEyabjCmGc2wD1W0i9llPCYM1z3bEuiogmQvYNpHRuqDpqU
-         hCOAhbAasI3pSX7/loQbY8IDzT1Xv5ukO6TjBFqRoiLVSafrxZH6K/E9evM6e7r2WaVf
-         KtPA==
-X-Gm-Message-State: AOJu0YyVx3v0lYyf1A4OduYyee+b12V98Ouy54K21JWFOoQ4pyS6HiwJ
-	V5WWgydEL10T+5WLkNxUfX8ZVrib3rOurfT/W4LFuPL3xUVX0z+Cqei/6psvAfcQGDv4Hxxvli/
-	nui55ha2O2Jwf/dsvbi2ZSOmbrXxHTYHgrvqhxPR/lwjlLP7ugA==
-X-Received: by 2002:a5d:4e11:0:b0:33e:7adc:516c with SMTP id p17-20020a5d4e11000000b0033e7adc516cmr10534528wrt.57.1710834108686;
-        Tue, 19 Mar 2024 00:41:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFAK2WGJat4vmdPSy7ECLAOOCSKt1cm0uCh7BMlmPoT49BMQqI0q9+XAAprgAMQmNyXP8ysuQ==
-X-Received: by 2002:a5d:4e11:0:b0:33e:7adc:516c with SMTP id p17-20020a5d4e11000000b0033e7adc516cmr10534503wrt.57.1710834108096;
-        Tue, 19 Mar 2024 00:41:48 -0700 (PDT)
-Received: from redhat.com ([2.52.6.254])
-        by smtp.gmail.com with ESMTPSA id t18-20020a5d42d2000000b0033e456f6e7csm11781382wrr.1.2024.03.19.00.41.44
+        d=1e100.net; s=20230601; t=1710835175; x=1711439975;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/fQl+aBLc/vpQz7SyONYn8N3lgkZT1awNMICSaZyEFc=;
+        b=w3QK8VEeY4HYimrpHQIWJfkRTfJbeX46/58wBbWQLK/K7DSRCVtCyeCuavkt/2CuUQ
+         QW23nIHLlugaBEMeaWL8KdJmvS3VFTCGYWJSAaEt0HHXQh/RjMXyKvET4bDCriTiWY60
+         PMtY4ICWLxkCdCaVEiE9JZ/3aPKrUjnDskpDDVtLodymNH0OQbYBy0WslXD54d+PtzL0
+         THNGbJ6b+u1o5Mz3P+r8VvLsWhue40BRSshNT0B3D7tgMiEV6BkgX0DwXwhatsG3wszZ
+         VEPp2jFdDxt3+qzACq0WM5RG+U02BcyPiI5Vg3/zuflAz7LWi5Z1Mo0MDB7DeOpNx3am
+         CtOA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1exdv+sRtggQp/9oXR/Kkms8w1TKT8zMJzTYRMgB/0cQp6InavFFlfquNhwfTYX4i5RffuMMP3PV57tubA+JRsU7p
+X-Gm-Message-State: AOJu0Yxn8m8ulHR+R10pi2cHZrfdxamjt+ql0mH+y4UecSdGVO02PbEQ
+	nNmP358m0n9d+5gqHSPQuFOn3eEOyvj0j9KscobAgXaJF5yOjbl0gxy7xfhTwHA=
+X-Google-Smtp-Source: AGHT+IEXcaZ+nCpbskQUwrx6BQ/MLiJbPCS2B1Ghxjxr9Qzo0j0OmbjqEbdMoyNbFA/iW3gLzs4tgg==
+X-Received: by 2002:a05:6a00:1a88:b0:6e6:ce9e:fed0 with SMTP id e8-20020a056a001a8800b006e6ce9efed0mr2243761pfv.27.1710835175445;
+        Tue, 19 Mar 2024 00:59:35 -0700 (PDT)
+Received: from wheely.local0.net (193-116-208-39.tpgi.com.au. [193.116.208.39])
+        by smtp.gmail.com with ESMTPSA id q23-20020a62ae17000000b006e5c464c0a9sm9121283pff.23.2024.03.19.00.59.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 00:41:47 -0700 (PDT)
-Date: Tue, 19 Mar 2024 03:41:43 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alex.williamson@redhat.com, andrew@daynix.com, david@redhat.com,
-	dtatulea@nvidia.com, eperezma@redhat.com, feliu@nvidia.com,
-	gregkh@linuxfoundation.org, jasowang@redhat.com,
-	jean-philippe@linaro.org, jonah.palmer@oracle.com,
-	leiyang@redhat.com, lingshan.zhu@intel.com,
-	maxime.coquelin@redhat.com, mst@redhat.com, ricardo@marliere.net,
-	shannon.nelson@amd.com, stable@kernel.org,
-	steven.sistare@oracle.com, suzuki.poulose@arm.com,
-	xuanzhuo@linux.alibaba.com, yishaih@nvidia.com
-Subject: [GIT PULL] virtio: features, fixes
-Message-ID: <20240319034143-mutt-send-email-mst@kernel.org>
+        Tue, 19 Mar 2024 00:59:35 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v7 00/35] migration, powerpc improvements
+Date: Tue, 19 Mar 2024 17:58:51 +1000
+Message-ID: <20240319075926.2422707-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The following changes since commit e8f897f4afef0031fe618a8e94127a0934896aba:
+Tree here
+https://gitlab.com/npiggin/kvm-unit-tests/-/tree/powerpc?ref_type=heads
 
-  Linux 6.8 (2024-03-10 13:38:09 -0700)
+Sorry I lost the v6 tag on the previous series. Since then,
+I merged the series with the migration ones since they touch
+the same things.
 
-are available in the Git repository at:
+Addressed almost all comments since the last post, I think just
+one case where a "elif kvm" branch was kept in the powerpc/run
+script because I find it convenient to add KVM specific things
+there if needed.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Main changes since v6 (thanks to reviewers):
+- Rebased on new stack backtrace patches, and cherry picks
+  from v6.
+- Move new files to SPDX headers.
+- Improve comments on and simplify interrupt stack frame and
+  backtracing.
+- Add a docs/ directory with unittests.cfg documentation
+  deduplicated from arch code and moved there, and document
+  new machine= option. Not exactly 1:1 move of comments, so
+  suggestions and improvements welcome there.
+- Made new shell script a bit more consistent with style. I
+  do have shellcheck working and some patches started, btw.,
+  will look at submitting that after this series.
+- Fix up a few unittests and gitlab CI to avoid failing on the
+  QEMU TCG migration bug. Reduced runtime of some of the new
+  migration tests.
 
-for you to fetch changes up to 5da7137de79ca6ffae3ace77050588cdf5263d33:
+Thanks,
+Nick
 
-  virtio_net: rename free_old_xmit_skbs to free_old_xmit (2024-03-19 03:19:22 -0400)
+Nicholas Piggin (35):
+  arch-run: Add functions to help handle migration directives from test
+  arch-run: Keep infifo open
+  migration: Add a migrate_skip command
+  (arm|s390): Use migrate_skip in test cases
+  arch-run: Add a "continuous" migration option for tests
+  gitlab-ci: Run migration selftest on s390x and powerpc
+  common: add memory dirtying vs migration test
+  powerpc: Fix KVM caps on POWER9 hosts
+  powerpc: Fix stack backtrace termination
+  powerpc: interrupt stack backtracing
+  powerpc/sprs: Specify SPRs with data rather than code
+  powerpc/sprs: Avoid taking PMU interrupts caused by register fuzzing
+  doc: start documentation directory with unittests.cfg doc
+  scripts: allow machine option to be specified in unittests.cfg
+  scripts: Accommodate powerpc powernv machine differences
+  powerpc: Support powernv machine with QEMU TCG
+  powerpc: Fix emulator illegal instruction test for powernv
+  powerpc/sprs: Test hypervisor registers on powernv machine
+  powerpc: general interrupt tests
+  powerpc: Add rtas stop-self support
+  powerpc: Remove broken SMP exception stack setup
+  powerpc: add SMP and IPI support
+  powerpc: Permit ACCEL=tcg,thread=single
+  powerpc: Avoid using larx/stcx. in spinlocks when only one CPU is
+    running
+  powerpc: Add atomics tests
+  powerpc: Add timebase tests
+  powerpc: Add MMU support
+  common/sieve: Use vmalloc.h for setup_mmu definition
+  common/sieve: Support machines without MMU
+  powerpc: Add sieve.c common test
+  powerpc: add usermode support
+  powerpc: add pmu tests
+  configure: Make arch_libdir a first-class entity
+  powerpc: Remove remnants of ppc64 directory and build structure
+  powerpc: gitlab CI update
 
-----------------------------------------------------------------
-virtio: features, fixes
+ .gitlab-ci.yml                           |  26 +-
+ MAINTAINERS                              |   1 -
+ Makefile                                 |   2 +-
+ arm/gic.c                                |  21 +-
+ arm/unittests.cfg                        |  26 +-
+ common/memory-verify.c                   |  67 +++
+ common/selftest-migration.c              |  26 +-
+ common/sieve.c                           |  15 +-
+ configure                                |  58 +-
+ docs/unittests.txt                       |  95 ++++
+ lib/libcflat.h                           |   2 -
+ lib/migrate.c                            |  37 +-
+ lib/migrate.h                            |   5 +
+ lib/{ppc64 => powerpc}/asm-offsets.c     |   7 +
+ lib/{ppc64 => powerpc}/asm/asm-offsets.h |   0
+ lib/powerpc/asm/atomic.h                 |   6 +
+ lib/powerpc/asm/barrier.h                |  12 +
+ lib/{ppc64 => powerpc}/asm/bitops.h      |   4 +-
+ lib/powerpc/asm/hcall.h                  |   6 +
+ lib/{ppc64 => powerpc}/asm/io.h          |   4 +-
+ lib/powerpc/asm/mmu.h                    |  10 +
+ lib/powerpc/asm/opal.h                   |  22 +
+ lib/powerpc/asm/page.h                   |  65 +++
+ lib/powerpc/asm/pgtable-hwdef.h          |  66 +++
+ lib/powerpc/asm/pgtable.h                | 125 +++++
+ lib/powerpc/asm/processor.h              |  63 +++
+ lib/{ppc64 => powerpc}/asm/ptrace.h      |  22 +-
+ lib/powerpc/asm/reg.h                    |  42 ++
+ lib/powerpc/asm/rtas.h                   |   2 +
+ lib/powerpc/asm/setup.h                  |   3 +-
+ lib/powerpc/asm/smp.h                    |  50 +-
+ lib/powerpc/asm/spinlock.h               |  11 +
+ lib/powerpc/asm/stack.h                  |   3 +
+ lib/{ppc64 => powerpc}/asm/vpa.h         |   0
+ lib/powerpc/hcall.c                      |   4 +-
+ lib/powerpc/io.c                         |  41 +-
+ lib/powerpc/io.h                         |   6 +
+ lib/powerpc/mmu.c                        | 274 ++++++++++
+ lib/powerpc/opal-calls.S                 |  50 ++
+ lib/powerpc/opal.c                       |  76 +++
+ lib/powerpc/processor.c                  |  91 +++-
+ lib/powerpc/rtas.c                       |  81 ++-
+ lib/powerpc/setup.c                      | 159 +++++-
+ lib/powerpc/smp.c                        | 287 ++++++++--
+ lib/powerpc/spinlock.c                   |  33 ++
+ lib/powerpc/stack.c                      |  53 ++
+ lib/ppc64/.gitignore                     |   1 -
+ lib/ppc64/asm/barrier.h                  |   9 -
+ lib/ppc64/asm/handlers.h                 |   1 -
+ lib/ppc64/asm/hcall.h                    |   1 -
+ lib/ppc64/asm/memory_areas.h             |   6 -
+ lib/ppc64/asm/page.h                     |   1 -
+ lib/ppc64/asm/ppc_asm.h                  |   1 -
+ lib/ppc64/asm/processor.h                |   1 -
+ lib/ppc64/asm/reg.h                      |   1 -
+ lib/ppc64/asm/rtas.h                     |   1 -
+ lib/ppc64/asm/setup.h                    |   1 -
+ lib/ppc64/asm/smp.h                      |   1 -
+ lib/ppc64/asm/spinlock.h                 |   6 -
+ lib/ppc64/asm/stack.h                    |   8 -
+ lib/s390x/io.c                           |   1 +
+ lib/s390x/uv.h                           |   1 +
+ lib/vmalloc.c                            |   7 +
+ lib/vmalloc.h                            |   2 +
+ lib/x86/vm.h                             |   1 +
+ powerpc/Makefile                         | 111 +++-
+ powerpc/Makefile.common                  |  85 ---
+ powerpc/Makefile.ppc64                   |  27 -
+ powerpc/atomics.c                        | 374 +++++++++++++
+ powerpc/cstart64.S                       |  66 ++-
+ powerpc/emulator.c                       |  16 +
+ powerpc/interrupts.c                     | 516 ++++++++++++++++++
+ powerpc/memory-verify.c                  |   1 +
+ powerpc/pmu.c                            | 336 ++++++++++++
+ powerpc/run                              |  42 +-
+ powerpc/selftest.c                       |   4 +-
+ powerpc/sieve.c                          |   1 +
+ powerpc/smp.c                            | 348 ++++++++++++
+ powerpc/sprs.c                           | 659 ++++++++++++++++-------
+ powerpc/timebase.c                       | 329 +++++++++++
+ powerpc/tm.c                             |   4 +-
+ powerpc/unittests.cfg                    | 101 +++-
+ riscv/unittests.cfg                      |  26 +-
+ s390x/Makefile                           |   1 +
+ s390x/memory-verify.c                    |   1 +
+ s390x/migration-cmm.c                    |   8 +-
+ s390x/migration-skey.c                   |   4 +-
+ s390x/migration.c                        |   1 +
+ s390x/mvpg.c                             |   1 +
+ s390x/selftest.c                         |   1 +
+ s390x/unittests.cfg                      |  37 +-
+ scripts/arch-run.bash                    | 116 +++-
+ scripts/common.bash                      |   8 +-
+ scripts/runtime.bash                     |  22 +-
+ x86/pmu.c                                |   1 +
+ x86/pmu_lbr.c                            |   1 +
+ x86/unittests.cfg                        |  26 +-
+ x86/vmexit.c                             |   1 +
+ x86/vmware_backdoors.c                   |   1 +
+ 99 files changed, 4729 insertions(+), 657 deletions(-)
+ create mode 100644 common/memory-verify.c
+ create mode 100644 docs/unittests.txt
+ rename lib/{ppc64 => powerpc}/asm-offsets.c (94%)
+ rename lib/{ppc64 => powerpc}/asm/asm-offsets.h (100%)
+ create mode 100644 lib/powerpc/asm/atomic.h
+ create mode 100644 lib/powerpc/asm/barrier.h
+ rename lib/{ppc64 => powerpc}/asm/bitops.h (69%)
+ rename lib/{ppc64 => powerpc}/asm/io.h (50%)
+ create mode 100644 lib/powerpc/asm/mmu.h
+ create mode 100644 lib/powerpc/asm/opal.h
+ create mode 100644 lib/powerpc/asm/page.h
+ create mode 100644 lib/powerpc/asm/pgtable-hwdef.h
+ create mode 100644 lib/powerpc/asm/pgtable.h
+ rename lib/{ppc64 => powerpc}/asm/ptrace.h (59%)
+ create mode 100644 lib/powerpc/asm/spinlock.h
+ rename lib/{ppc64 => powerpc}/asm/vpa.h (100%)
+ create mode 100644 lib/powerpc/mmu.c
+ create mode 100644 lib/powerpc/opal-calls.S
+ create mode 100644 lib/powerpc/opal.c
+ create mode 100644 lib/powerpc/spinlock.c
+ create mode 100644 lib/powerpc/stack.c
+ delete mode 100644 lib/ppc64/.gitignore
+ delete mode 100644 lib/ppc64/asm/barrier.h
+ delete mode 100644 lib/ppc64/asm/handlers.h
+ delete mode 100644 lib/ppc64/asm/hcall.h
+ delete mode 100644 lib/ppc64/asm/memory_areas.h
+ delete mode 100644 lib/ppc64/asm/page.h
+ delete mode 100644 lib/ppc64/asm/ppc_asm.h
+ delete mode 100644 lib/ppc64/asm/processor.h
+ delete mode 100644 lib/ppc64/asm/reg.h
+ delete mode 100644 lib/ppc64/asm/rtas.h
+ delete mode 100644 lib/ppc64/asm/setup.h
+ delete mode 100644 lib/ppc64/asm/smp.h
+ delete mode 100644 lib/ppc64/asm/spinlock.h
+ delete mode 100644 lib/ppc64/asm/stack.h
+ delete mode 100644 powerpc/Makefile.common
+ delete mode 100644 powerpc/Makefile.ppc64
+ create mode 100644 powerpc/atomics.c
+ create mode 100644 powerpc/interrupts.c
+ create mode 120000 powerpc/memory-verify.c
+ create mode 100644 powerpc/pmu.c
+ create mode 120000 powerpc/sieve.c
+ create mode 100644 powerpc/smp.c
+ create mode 100644 powerpc/timebase.c
+ create mode 120000 s390x/memory-verify.c
 
-Per vq sizes in vdpa.
-Info query for block devices support in vdpa.
-DMA sync callbacks in vduse.
-
-Fixes, cleanups.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Andrew Melnychenko (1):
-      vhost: Added pad cleanup if vnet_hdr is not present.
-
-David Hildenbrand (1):
-      virtio: reenable config if freezing device failed
-
-Jason Wang (2):
-      virtio-net: convert rx mode setting to use workqueue
-      virtio-net: add cond_resched() to the command waiting loop
-
-Jonah Palmer (1):
-      vdpa/mlx5: Allow CVQ size changes
-
-Maxime Coquelin (1):
-      vduse: implement DMA sync callbacks
-
-Ricardo B. Marliere (2):
-      vdpa: make vdpa_bus const
-      virtio: make virtio_bus const
-
-Shannon Nelson (1):
-      vdpa/pds: fixes for VF vdpa flr-aer handling
-
-Steve Sistare (2):
-      vdpa_sim: reset must not run
-      vdpa: skip suspend/resume ops if not DRIVER_OK
-
-Suzuki K Poulose (1):
-      virtio: uapi: Drop __packed attribute in linux/virtio_pci.h
-
-Xuan Zhuo (3):
-      virtio: packed: fix unmap leak for indirect desc table
-      virtio_net: unify the code for recycling the xmit ptr
-      virtio_net: rename free_old_xmit_skbs to free_old_xmit
-
-Zhu Lingshan (20):
-      vhost-vdpa: uapi to support reporting per vq size
-      vDPA: introduce get_vq_size to vdpa_config_ops
-      vDPA/ifcvf: implement vdpa_config_ops.get_vq_size
-      vp_vdpa: implement vdpa_config_ops.get_vq_size
-      eni_vdpa: implement vdpa_config_ops.get_vq_size
-      vdpa_sim: implement vdpa_config_ops.get_vq_size for vDPA simulator
-      vduse: implement vdpa_config_ops.get_vq_size for vduse
-      virtio_vdpa: create vqs with the actual size
-      vDPA/ifcvf: get_max_vq_size to return max size
-      vDPA/ifcvf: implement vdpa_config_ops.get_vq_num_min
-      vDPA: report virtio-block capacity to user space
-      vDPA: report virtio-block max segment size to user space
-      vDPA: report virtio-block block-size to user space
-      vDPA: report virtio-block max segments in a request to user space
-      vDPA: report virtio-block MQ info to user space
-      vDPA: report virtio-block topology info to user space
-      vDPA: report virtio-block discarding configuration to user space
-      vDPA: report virtio-block write zeroes configuration to user space
-      vDPA: report virtio-block read-only info to user space
-      vDPA: report virtio-blk flush info to user space
-
- drivers/net/virtio_net.c             | 151 +++++++++++++++---------
- drivers/vdpa/alibaba/eni_vdpa.c      |   8 ++
- drivers/vdpa/ifcvf/ifcvf_base.c      |  11 +-
- drivers/vdpa/ifcvf/ifcvf_base.h      |   2 +
- drivers/vdpa/ifcvf/ifcvf_main.c      |  15 +++
- drivers/vdpa/mlx5/net/mlx5_vnet.c    |  13 ++-
- drivers/vdpa/pds/aux_drv.c           |   2 +-
- drivers/vdpa/pds/vdpa_dev.c          |  20 +++-
- drivers/vdpa/pds/vdpa_dev.h          |   1 +
- drivers/vdpa/vdpa.c                  | 214 ++++++++++++++++++++++++++++++++++-
- drivers/vdpa/vdpa_sim/vdpa_sim.c     |  15 ++-
- drivers/vdpa/vdpa_user/iova_domain.c |  27 ++++-
- drivers/vdpa/vdpa_user/iova_domain.h |   8 ++
- drivers/vdpa/vdpa_user/vduse_dev.c   |  34 ++++++
- drivers/vdpa/virtio_pci/vp_vdpa.c    |   8 ++
- drivers/vhost/net.c                  |   3 +
- drivers/vhost/vdpa.c                 |  14 +++
- drivers/virtio/virtio.c              |   6 +-
- drivers/virtio/virtio_ring.c         |   6 +-
- drivers/virtio/virtio_vdpa.c         |   5 +-
- include/linux/vdpa.h                 |   6 +
- include/uapi/linux/vdpa.h            |  17 +++
- include/uapi/linux/vhost.h           |   7 ++
- include/uapi/linux/virtio_pci.h      |  10 +-
- 24 files changed, 521 insertions(+), 82 deletions(-)
+-- 
+2.42.0
 
 
