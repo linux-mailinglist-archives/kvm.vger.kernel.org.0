@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-12082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D6B787F8A3
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 09:00:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E8687F8A4
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 09:00:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01A781F21D55
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 08:00:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42C291F21A45
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 08:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E0A53E06;
-	Tue, 19 Mar 2024 07:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E2D54670;
+	Tue, 19 Mar 2024 08:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HbToG0Dq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHum/wfl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E1F537E6
-	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 07:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD456537E5
+	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 08:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710835199; cv=none; b=sPJBd6874Qnavqx3tezC2i14RsZPVxpPOUU5QsE6MXkBMgeIsrwWk5Vsa3GTLWhKsbsqhEbc745W/gFTqKPF4K1JPpetnJA8+YQEyzPbm4HZm/W5dYTKJHRe3+eXVG3pzhT1Yha9dZc2SpDkkkEQoWt9pjmcm41b+XImLRqnRag=
+	t=1710835203; cv=none; b=cRMMoLHFSV500lg1fthjFgGE6ZGAppdfe+VE9+I4jYYFJljZL/iHgYbaAOZP7PFsBWKRX1LihLe+MhJeOionqrHWn1CPLxZdqw1s12oxHFyU0E1Q6Vy0sWAHQZVEXtgJp3ivFPF1xG6kZHudh9BBuz+6XZOuqwX0FdG2OKXck+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710835199; c=relaxed/simple;
-	bh=ugB7R5C4IpGns7+Agj87mAt4ntbe1SqdP4ZPTlaPMOY=;
+	s=arc-20240116; t=1710835203; c=relaxed/simple;
+	bh=UtWLDDYVYPHKOBruijpVxeKE5JWhKmvc8cgSjQJk+tE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aLbPc2ETirt1QfJ5VIwsbITzSRfa4gNc2YqEwF40AMC2RvN3bKEtpajCWF532RkdzmHCHmMiDOWepOovoGxY1i/SkQE4aXj8MOZZwyd4yAQKQ8TmQIdm+s3odOVwo4xoo2jiQt4AkKM7+HdmYwvzKZlN/R2CD3GHvnygmy9oeic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HbToG0Dq; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=ppxwIrrgoFpl1g2daaQ1ICZeHUwY7cUPNuGqIjHQ7f5BzT2tUVMIiv0AVPWdiYqLjBnWtfJsYJuBQTp5tAgNsIhaYFDq7XMQmzbMhoKjjBPEILeUMe8kVaua2+fu4VJgs6ZCqLBMj7J5Zl9o6jd7B4393VgR5p3Tkl7qPuqyN4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHum/wfl; arc=none smtp.client-ip=209.85.167.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6e704078860so2434144b3a.0
-        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 00:59:57 -0700 (PDT)
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3c1e992f060so2981250b6e.0
+        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 01:00:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710835197; x=1711439997; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710835201; x=1711440001; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cYcSW/ibSMj6iVuV1sk8Zdj3J66OqbMWoQwMjKPP3FU=;
-        b=HbToG0Dqty8bG0tD+Dr+jenWVYyVdEM32/OwODAo/m8MZ33odS627GOg+OF0y9yI6j
-         IBtDJPAFd+ek2ZybBlR8zAoTPoq+bd5u57peh/Rdc67LIg4+5liudvY+KPfoq4UptmcS
-         KIVPkfAFivK3C+z8pzvvPG039hWwiQ/2G6okwPJOd1LTGj1wP9NpehRPv7H4981J1VDn
-         n8+HQaFQo3KjsuU0m0fFokHkzp+Uuq5dfDkOAJMG4obNnO5dkngf3ijeor0aakmgXdOV
-         0EUflQ6hMV6CuMRRHJjqL4Vaofox+5qU3XhHv6dPt2zKy29PBrv4WhSFt+hkTe6jq6/G
-         sIgg==
+        bh=yeFiA3EfY+1JD1RuYQnw5HbvsQt45vIrT0LQVWviu8g=;
+        b=IHum/wflfzQA6TESzbpQlbCSSJ78lIshTIIqugIP7CqBoPvyu4XyWlmmEc9VsNBIGz
+         N4KunubkWHwuE5tSjX/z4c+8lSnOgq/jYqV+ajfQnXvrx6CosfkWg/MAskVrDr3LaTqb
+         athYqG9PGtRbNgpdFBJJnBkI1FOdzGkcevMtoKzonmvyFwFr+P0TkOaBqCZ/9qEfsHm6
+         hU7xcxhsO/e0P/Ty2YWzRsgUT8sFigmq40sqGFJMFKv8CJixOoGNED7c20X+87/XljHG
+         tDju+koZ2LFRppd6WwpRG5fvbrzNjcsa7VzAtGg/nCqc01Nn5G4eYoFDh4ErQYKwYlyz
+         1fnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710835197; x=1711439997;
+        d=1e100.net; s=20230601; t=1710835201; x=1711440001;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cYcSW/ibSMj6iVuV1sk8Zdj3J66OqbMWoQwMjKPP3FU=;
-        b=hMbIaNn1MD2DEe/imbU+UOUATJvQLdvkFmtpHd0z/RjDziJoN4jaM9HRrtxe6DFE5z
-         Pib/3PbNp7jSdHkHXsHniOD5DeMUFr/ueKFSDo4++bjIioGvYz38quTqNoFIbJ2v9TvN
-         w1GoICKXKtyZUpscmA83y43s3rlIq6sM7mEXff+KNU7VDjI7oCQXTw28k0i3cpRmOzCT
-         7MmUBvICemAkGjgXpM6CA/tpmJ74fMcCtgYTOveqfac2ekBEPchW+Q0tVz+o/VWPaIfO
-         4faXtE0a507Yol0sPRVRaYxwSluJ9Xf1IFMFJGvu2/tWbOwNLXSdBpDOI1M3+rlK0by0
-         eUfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVf1lW3dheceL0H/Yp0t3VFOrS0iSldbiQRXLR5jBMKqsCZM4pF8gSjls8e8QladGoJvow2cmJ6mo1nymPjjHFsxAV9
-X-Gm-Message-State: AOJu0YzNy2wLiAAVceSQ6qnuBqJt8iJIf0ZIGe6Vt7zjtxGbLs5kHux6
-	jIcTdFNAcQX2ZclS+b+Z3w7dS4V7Pn4ZY4q27APBw7aSj5XoRYQk
-X-Google-Smtp-Source: AGHT+IFMGBRGfTdm1Xi8PAhIoZeRYeQWIYa6zNRyD2io/DMVYPLb1oYyq/AdJHPXtgA/PjJTjuJEng==
-X-Received: by 2002:a05:6a00:2309:b0:6e6:bb2b:882c with SMTP id h9-20020a056a00230900b006e6bb2b882cmr16430185pfh.13.1710835197183;
-        Tue, 19 Mar 2024 00:59:57 -0700 (PDT)
+        bh=yeFiA3EfY+1JD1RuYQnw5HbvsQt45vIrT0LQVWviu8g=;
+        b=JOnB99MnN6Yi5ffH11xM2P4clczeTBhyYmK4wkySOXzijmtdynoxRYW8giY9bdzSfH
+         Ro/1UcFuHdB+AWnXWTBtzhmrJh2R/bhDw6/XSBjn2M/D3iB+CQgLx/vdmRDzIqLs9qQx
+         9BrHubx8B+jZyJ7VoTnz0zfxAj9qt6NKFmSynd+SvZldOzpo0zhk8ypYHcbdWceQ4aaq
+         lbcj2TouAcApqVQZ+ai3E1u5o9JbaGsuuUjquOhpkEU4bAeo3n4HHXTGiDj0zR4ptMnx
+         +4xtbEzSWF8SOp6woN8o4PmjWd531NyZvxjtcl4L2hR7KVNVh0q2fPC4RKx0ET6+XLRj
+         Ol8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWJJSSweUEfNSKveU87qK+VwgcdZ9gyBgMpjVHoKcUc0zXh8tFJblZOM8PJmUzhQQ14Iou6bW87I0RWPpHYall+jwk3
+X-Gm-Message-State: AOJu0Yw4xUi3NhmhY6cCWv3nv/e4/lugpt5zCbIdGZ3SRib+XKmO79WP
+	hPCxa7K0vYJ7VIwjxqsqYlxz8wJlg2NCcmEec1RsQ6OIaKcsnGai
+X-Google-Smtp-Source: AGHT+IEKjVgOynnGlounTLvOmvJWwFgatUFePuOrHk3/ueXtGI7nUei9T7Qa+BG/xrhoE5qSdYaWUg==
+X-Received: by 2002:a05:6808:1b24:b0:3c3:8540:8641 with SMTP id bx36-20020a0568081b2400b003c385408641mr6963268oib.9.1710835200772;
+        Tue, 19 Mar 2024 01:00:00 -0700 (PDT)
 Received: from wheely.local0.net (193-116-208-39.tpgi.com.au. [193.116.208.39])
-        by smtp.gmail.com with ESMTPSA id q23-20020a62ae17000000b006e5c464c0a9sm9121283pff.23.2024.03.19.00.59.54
+        by smtp.gmail.com with ESMTPSA id q23-20020a62ae17000000b006e5c464c0a9sm9121283pff.23.2024.03.19.00.59.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 00:59:57 -0700 (PDT)
+        Tue, 19 Mar 2024 01:00:00 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -75,9 +75,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v7 06/35] gitlab-ci: Run migration selftest on s390x and powerpc
-Date: Tue, 19 Mar 2024 17:58:57 +1000
-Message-ID: <20240319075926.2422707-7-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v7 07/35] common: add memory dirtying vs migration test
+Date: Tue, 19 Mar 2024 17:58:58 +1000
+Message-ID: <20240319075926.2422707-8-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240319075926.2422707-1-npiggin@gmail.com>
 References: <20240319075926.2422707-1-npiggin@gmail.com>
@@ -89,91 +89,206 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The migration harness is complicated and easy to break so CI will
-be helpful.
+This test stores to a bunch of pages and verifies previous stores,
+while being continually migrated. Default runtime is 5 seconds.
+
+Add this test to ppc64 and s390x builds. This can fail due to a QEMU
+TCG physical memory dirty bitmap bug, so it is not enabled in unittests
+for TCG yet.
+
+The selftest-migration test time is reduced significantly because
+this test
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- .gitlab-ci.yml      | 18 +++++++++++-------
- s390x/unittests.cfg |  8 ++++++++
- 2 files changed, 19 insertions(+), 7 deletions(-)
+ common/memory-verify.c      | 67 +++++++++++++++++++++++++++++++++++++
+ common/selftest-migration.c |  8 ++---
+ powerpc/Makefile.common     |  1 +
+ powerpc/memory-verify.c     |  1 +
+ powerpc/unittests.cfg       |  7 ++++
+ s390x/Makefile              |  1 +
+ s390x/memory-verify.c       |  1 +
+ s390x/unittests.cfg         |  6 ++++
+ 8 files changed, 88 insertions(+), 4 deletions(-)
+ create mode 100644 common/memory-verify.c
+ create mode 120000 powerpc/memory-verify.c
+ create mode 120000 s390x/memory-verify.c
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index ff34b1f50..bd34da04f 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -92,26 +92,28 @@ build-arm:
- build-ppc64be:
-  extends: .outoftree_template
-  script:
-- - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
-+ - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
-  - mkdir build
-  - cd build
-  - ../configure --arch=ppc64 --endian=big --cross-prefix=powerpc64-linux-gnu-
-  - make -j2
-  - ACCEL=tcg ./run_tests.sh
--     selftest-setup spapr_hcall rtas-get-time-of-day rtas-get-time-of-day-base
--     rtas-set-time-of-day emulator
-+     selftest-setup selftest-migration selftest-migration-skip spapr_hcall
-+     rtas-get-time-of-day rtas-get-time-of-day-base rtas-set-time-of-day
-+     emulator
-      | tee results.txt
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
+diff --git a/common/memory-verify.c b/common/memory-verify.c
+new file mode 100644
+index 000000000..e78fb4338
+--- /dev/null
++++ b/common/memory-verify.c
+@@ -0,0 +1,67 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Simple memory verification test, used to exercise dirty memory migration.
++ */
++#include <libcflat.h>
++#include <migrate.h>
++#include <alloc.h>
++#include <asm/page.h>
++#include <asm/time.h>
++
++#define NR_PAGES 32
++
++static unsigned time_sec = 5;
++
++static void do_getopts(int argc, char **argv)
++{
++	int i;
++
++	for (i = 0; i < argc; ++i) {
++		if (strcmp(argv[i], "-t") == 0) {
++			i++;
++			if (i == argc)
++				break;
++			time_sec = atol(argv[i]);
++		}
++	}
++
++	printf("running for %d secs\n", time_sec);
++}
++
++int main(int argc, char **argv)
++{
++	void *mem = malloc(NR_PAGES*PAGE_SIZE);
++	bool success = true;
++	uint64_t ms;
++	long i;
++
++	do_getopts(argc, argv);
++
++	report_prefix_push("memory");
++
++	memset(mem, 0, NR_PAGES*PAGE_SIZE);
++
++	migrate_begin_continuous();
++	ms = get_clock_ms();
++	i = 0;
++	do {
++		int j;
++
++		for (j = 0; j < NR_PAGES*PAGE_SIZE; j += PAGE_SIZE) {
++			if (*(volatile long *)(mem + j) != i) {
++				success = false;
++				goto out;
++			}
++			*(volatile long *)(mem + j) = i + 1;
++		}
++		i++;
++	} while (get_clock_ms() - ms < time_sec * 1000);
++out:
++	migrate_end_continuous();
++
++	report(success, "memory verification stress test");
++
++	report_prefix_pop();
++
++	return report_summary();
++}
+diff --git a/common/selftest-migration.c b/common/selftest-migration.c
+index 9a9b61835..3693148aa 100644
+--- a/common/selftest-migration.c
++++ b/common/selftest-migration.c
+@@ -11,7 +11,7 @@
+ #include <migrate.h>
+ #include <asm/time.h>
  
- build-ppc64le:
-  extends: .intree_template
-  script:
-- - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
-+ - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
-  - ./configure --arch=ppc64 --endian=little --cross-prefix=powerpc64-linux-gnu-
-  - make -j2
-  - ACCEL=tcg ./run_tests.sh
--     selftest-setup spapr_hcall rtas-get-time-of-day rtas-get-time-of-day-base
--     rtas-set-time-of-day emulator
-+     selftest-setup selftest-migration selftest-migration-skip spapr_hcall
-+     rtas-get-time-of-day rtas-get-time-of-day-base rtas-set-time-of-day
-+     emulator
-      | tee results.txt
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
+-#define NR_MIGRATIONS 15
++#define NR_MIGRATIONS 5
  
-@@ -135,7 +137,7 @@ build-riscv64:
- build-s390x:
-  extends: .outoftree_template
-  script:
-- - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu
-+ - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu nmap-ncat
-  - mkdir build
-  - cd build
-  - ../configure --arch=s390x --cross-prefix=s390x-linux-gnu-
-@@ -161,6 +163,8 @@ build-s390x:
-       sclp-1g
-       sclp-3g
-       selftest-setup
-+      selftest-migration-kvm
-+      selftest-migration-skip
-       sieve
-       smp
-       stsi
+ int main(int argc, char **argv)
+ {
+@@ -28,11 +28,11 @@ int main(int argc, char **argv)
+ 		report(true, "cooperative migration");
+ 
+ 		migrate_begin_continuous();
+-		mdelay(2000);
+-		migrate_end_continuous();
+ 		mdelay(1000);
++		migrate_end_continuous();
++		mdelay(500);
+ 		migrate_begin_continuous();
+-		mdelay(2000);
++		mdelay(1000);
+ 		migrate_end_continuous();
+ 		report(true, "continuous migration");
+ 	}
+diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
+index da4a7bbb8..1e181da69 100644
+--- a/powerpc/Makefile.common
++++ b/powerpc/Makefile.common
+@@ -7,6 +7,7 @@
+ tests-common = \
+ 	$(TEST_DIR)/selftest.elf \
+ 	$(TEST_DIR)/selftest-migration.elf \
++	$(TEST_DIR)/memory-verify.elf \
+ 	$(TEST_DIR)/spapr_hcall.elf \
+ 	$(TEST_DIR)/rtas.elf \
+ 	$(TEST_DIR)/emulator.elf \
+diff --git a/powerpc/memory-verify.c b/powerpc/memory-verify.c
+new file mode 120000
+index 000000000..5985c730f
+--- /dev/null
++++ b/powerpc/memory-verify.c
+@@ -0,0 +1 @@
++../common/memory-verify.c
+\ No newline at end of file
+diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
+index cae4949e8..e65217c18 100644
+--- a/powerpc/unittests.cfg
++++ b/powerpc/unittests.cfg
+@@ -49,6 +49,13 @@ machine = pseries
+ groups = selftest migration
+ extra_params = -append "skip"
+ 
++# This fails due to a QEMU TCG bug so KVM-only until QEMU is fixed upstream
++[migration-memory]
++file = memory-verify.elf
++accel = kvm
++machine = pseries
++groups = migration
++
+ [spapr_hcall]
+ file = spapr_hcall.elf
+ 
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 344d46d68..ddc0969f3 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -1,5 +1,6 @@
+ tests = $(TEST_DIR)/selftest.elf
+ tests += $(TEST_DIR)/selftest-migration.elf
++tests += $(TEST_DIR)/memory-verify.elf
+ tests += $(TEST_DIR)/intercept.elf
+ tests += $(TEST_DIR)/emulator.elf
+ tests += $(TEST_DIR)/sieve.elf
+diff --git a/s390x/memory-verify.c b/s390x/memory-verify.c
+new file mode 120000
+index 000000000..5985c730f
+--- /dev/null
++++ b/s390x/memory-verify.c
+@@ -0,0 +1 @@
++../common/memory-verify.c
+\ No newline at end of file
 diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 49e3e4608..b79b99416 100644
+index b79b99416..550eff787 100644
 --- a/s390x/unittests.cfg
 +++ b/s390x/unittests.cfg
-@@ -31,6 +31,14 @@ groups = selftest migration
- # https://lore.kernel.org/qemu-devel/20240219061731.232570-1-npiggin@gmail.com/
- accel = kvm
- 
-+[selftest-migration-kvm]
-+file = selftest-migration.elf
-+groups = nodefault
-+accel = kvm
-+# This is a special test for gitlab-ci that can must not use TCG until the
-+# TCG migration fix has made its way into CI environment's QEMU.
-+# https://lore.kernel.org/qemu-devel/20240219061731.232570-1-npiggin@gmail.com/
-+
- [selftest-migration-skip]
- file = selftest-migration.elf
+@@ -44,6 +44,12 @@ file = selftest-migration.elf
  groups = selftest migration
+ extra_params = -append "skip"
+ 
++# This fails due to a QEMU TCG bug so KVM-only until QEMU is fixed upstream
++[migration-memory]
++file = memory-verify.elf
++accel = kvm
++groups = migration
++
+ [intercept]
+ file = intercept.elf
+ 
 -- 
 2.42.0
 
