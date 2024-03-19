@@ -1,221 +1,253 @@
-Return-Path: <kvm+bounces-12143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B6487FF19
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 14:53:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0824987FF9B
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 15:28:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E44F1F2354D
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 13:53:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C2311F22461
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 14:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9459681731;
-	Tue, 19 Mar 2024 13:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF9E81ABA;
+	Tue, 19 Mar 2024 14:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="CgQCONdW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fqy/iEfT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCED180BFD
-	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 13:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE8E81AA7;
+	Tue, 19 Mar 2024 14:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710856370; cv=none; b=u3HPUSSBikm+2y2NLN/pA0A/nE5Iu5ITvbi17hFhy4Na7ds2E7XHTAfqeVDMjEognw98xF7qpbPZuDw2A9zsgTgYM4sKBGK8SdN3Y+xHE0FvqhemKa7gESosBSSjJmGQOeH3NK49V7Pzu6k30WTfdGxM8HI3G4CRGssJX5JRppY=
+	t=1710858519; cv=none; b=eTe54tKnEjWFjfk09LdZGWo27l6KJXr8H9RlKMGLvK1b2DtHQbofqUhEoK+ZLGGJPB58FzVSECk8pPRvBYGTI4V5PKAuLrk6gXNkQV/szUe+015UAP4nI+L7e6iGbxz4md0L4uaFZKWjiQxN6rLe6C60D+RF/0FRfWNS1E2AmgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710856370; c=relaxed/simple;
-	bh=PcG3jFbqv0ADhPWyUGZnOImkMAkNB3NPh4hM6Mbrikg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CFyZXizHwLa+/e59yXwl8W7Msp0Bg6WoIbAxIMx8Xfjs/S5SlgiAQLylePmN8f3B/9fQ/CHqTZiqvTu15903GxX5AZlqwp+LdGPRB9SHzVH7AOACpHiibDuRoPmFk9A9oV+KBovCzB6XHYndL07BRhGy5DSSnRmwZq/0gNkoQUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=CgQCONdW; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d23114b19dso68205881fa.3
-        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 06:52:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1710856367; x=1711461167; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ut2L92w+ObuYD4zPtPTxf87RPDeymugk8HmMDNtUuFg=;
-        b=CgQCONdWAchmHt8jPmBMcNksquEauyQbI16PwNwXTIPufqI6paZRHtkZr1BhxNkVcf
-         kIXUpjaQzHsWlp+/xxERS3UkP3Idb0F6cRIcx9kM+pmvL6Hpk4cQZCkm0vK/OpjNSr/8
-         u3ZtrucKaCPDbGdNjEAGa/etP5exyk8+NKuCk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710856367; x=1711461167;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ut2L92w+ObuYD4zPtPTxf87RPDeymugk8HmMDNtUuFg=;
-        b=D5xCFF0Sv/vkPcUw52QfVJDrniN+jbp7BNxJL0E0l54qGIgEn/C0Q3TW2i7yjx81/t
-         Qf9rUkgrnnmUiwCvOgSTKfQXuFj3/AsdGUYzBK0PgaQ/1+79oCkF10PLbeyrj0+fZ8SP
-         cNMjU0HqKS+Kn2BOF0OYEkQT6dzk5aijPuVEkYoXOIi8z9tGL06KokT3p6SgzVzfaJoC
-         M8PJZvvDKEychFjsI7pqJfECqw9qXuqfI9re4GITFSxhgMxolZeekAbLenkwa4V6m/gU
-         TVGNxidE4+RE1TeMV3Jon0kDm9ijrt3JRNLaXtgjY9pZ94dy5DrFkIDv3+0Lp9/Qlqr6
-         mW8g==
-X-Gm-Message-State: AOJu0YyC82XHKYMk1UmqVhVDqaFl4BJ5cbv4aNvZa1WvYpx/KpZQzGi/
-	JxHqNX6KXdhThd0ZxUZE1BICl+T9vXTW175VKWAkd+PtXYarcgXGaXJprEHhDWhdvmwA3FkN5m6
-	hOqcfcqW7yyF9arPHhagcdp1ZMtnxNEvqMcDt
-X-Google-Smtp-Source: AGHT+IFXHxgD3fXqutUxcbGPNF7lCHHbHvdpYnRAQbeX/Dh/4OYt1xBfYn2yNdQj0qSxPddGgEipTsmHaV3Vw2ydS2Q=
-X-Received: by 2002:a2e:9396:0:b0:2d4:6c1a:ee6f with SMTP id
- g22-20020a2e9396000000b002d46c1aee6fmr11047346ljh.35.1710856366998; Tue, 19
- Mar 2024 06:52:46 -0700 (PDT)
+	s=arc-20240116; t=1710858519; c=relaxed/simple;
+	bh=Dl20teuF0LcyaprwKl4zkyFxg7kNAs+oNxyc1Ln7iF0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XqykYqyVAs1d8p1eZotIFD7oHl572HmvrCSzmNFpPRxr5L2REso7MBjPpksE5DT0vAtoxEtKb9PD94SH441L5H4+euCpUlJ9lq59BjksWxG10dobFANflGkTXQ3mIzxs9pMWfs+W9s/AgKlrc9DGOk+PkZ7OeaZnowiOi12d42c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fqy/iEfT; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42JEQcbe023407;
+	Tue, 19 Mar 2024 14:28:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=VXexiXBKopZYjzbOhqUXZ+UbaH9CdHlMt8VeoGUFPvg=;
+ b=fqy/iEfTzbQskEzrVIId4HL6XZ6YWk71MpEnqFsLWw5zDCtDKRKwrPomfpqr733jz8CS
+ 5I22Lk76Hgo+BO+qeuki5BMjWLSAeH+USslSYaN9Gi2CJgUBqet4Mta1/sgI+mpQTgOT
+ 8+h8YiqppzwUSQ5zQjfdI9QTpwAbCm1ks37Y3VWxF2zMIsNlX2Xl+FMZS0+SFEP3Z7wp
+ J+OLC0537DGRE2h9bJq8JkiG93Wge8tK/J69+dLdvdEOV/e9bgHpgk/xei1wfYxN3Ifu
+ f7/W+QUqyUbQDaybSHhH6FGUZ6q1PxAk7xRGD8FLiyHpU2dZ2ygROv7HfRH1eBjolnwo Ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wyb39rnqj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 14:28:18 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42JESIhi027738;
+	Tue, 19 Mar 2024 14:28:18 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wyb39rnqf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 14:28:18 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42JCbUFY019843;
+	Tue, 19 Mar 2024 14:28:17 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wwqykftet-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 14:28:17 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42JESBdY17367448
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 19 Mar 2024 14:28:13 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9B8A82004E;
+	Tue, 19 Mar 2024 14:28:11 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AACA920043;
+	Tue, 19 Mar 2024 14:28:09 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.in.ibm.com (unknown [9.204.206.66])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 19 Mar 2024 14:28:09 +0000 (GMT)
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+        aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com
+Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vaibhav Jain <vaibhav@linux.ibm.com>
+Subject: [PATCH] arch/powerpc/kvm: Add support for reading VPA counters for pseries guests
+Date: Tue, 19 Mar 2024 19:58:04 +0530
+Message-ID: <20240319142807.95547-1-gautam@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
- <65f98e5b99604_11543d29415@willemb.c.googlers.com.notmuch>
- <CA+9S74gRyDn3_=aAm7XkGKEzTg7KF=pPEHFsvENYpv80kczqZg@mail.gmail.com> <65f995ec3cd43_118bb1294f3@willemb.c.googlers.com.notmuch>
-In-Reply-To: <65f995ec3cd43_118bb1294f3@willemb.c.googlers.com.notmuch>
-From: Igor Raits <igor@gooddata.com>
-Date: Tue, 19 Mar 2024 14:52:35 +0100
-Message-ID: <CA+9S74heujyHmUJ6-+9xWNN+nFvtTO8mX2N5pWyhO-4hu9dFQQ@mail.gmail.com>
-Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: J8x6r8YAIRMIrqFXNi6zJfskGvl25iTG
+X-Proofpoint-ORIG-GUID: OPxV9XhGccYgCGoYTruZ4lgh7ZSTpv4V
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-19_04,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
+ clxscore=1011 phishscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403140000 definitions=main-2403190109
 
-On Tue, Mar 19, 2024 at 2:41=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Igor Raits wrote:
-> > Hello Willem,
-> >
-> > On Tue, Mar 19, 2024 at 2:08=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Igor Raits wrote:
-> > > > Hello,
-> > > >
-> > > > We have started to observe kernel crashes on 6.7.y kernels (atm we
-> > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
-> > > > have nodes of cluster it looks stable. Please see stacktrace below.=
- If
-> > > > you need more information please let me know.
-> > > >
-> > > > We do not have a consistent reproducer but when we put some bigger
-> > > > network load on a VM, the hypervisor's kernel crashes.
-> > > >
-> > > > Help is much appreciated! We are happy to test any patches.
-> > > >
-> > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
-> > >
-> > > Did you miss the first part of the Oops?
-> >
-> > Actually I copied it as-is from our log system. As it is a physical
-> > server, such logs are sent via netconsole to another server. This is
-> > the first line I see in the log in the time segment.
-> >
-> > >
-> > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
-> > > >    E      6.7.10-1.gdc.el9.x86_64 #1
-> > > > [62254.183743] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIO=
-S
-> > > > 2.14.1 12/17/2023
-> > > > [62254.192083] RIP: 0010:skb_release_data+0xb8/0x1e0
-> > > > [62254.197357] Code: 48 83 c3 01 39 d8 7e 54 48 89 d8 48 c1 e0 04 4=
-1
-> > > > 80 7d 7e 00 49 8b 6c 04 30 79 0f 44 89 f6 48 89 ef e8 4c e4 ff ff 8=
-4
-> > > > c0 75 d0 <48> 8b 45 08 a8 01 0f 85 09 01 00 00 e9 d9 00 00 00 0f 1f=
- 44
-> > > > 00 00
-> > > > [62254.217013] RSP: 0018:ffffa975a0247ba8 EFLAGS: 00010206
-> > > > [62254.222692] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000=
-0000000000785
-> > > > [62254.230263] RDX: 0000000000000016 RSI: 0000000000000002 RDI: fff=
-f989862b32b00
-> > > > [62254.237878] RBP: 4f2b318c69a8b0f9 R08: 000000000001fe4d R09: 000=
-000000000003a
-> > > > [62254.245417] R10: 0000000000000000 R11: 0000000000001736 R12: fff=
-f9880b819aec0
-> > > > [62254.252963] R13: ffff989862b32b00 R14: 0000000000000000 R15: 000=
-0000000000002
-> > > > [62254.260591] FS:  00007f6cf388bf80(0000) GS:ffff98b85fbc0000(0000=
-)
-> > > > knlGS:0000000000000000
-> > > > [62254.269061] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > [62254.275170] CR2: 000000c002236020 CR3: 000000387d37a002 CR4: 000=
-0000000770ef0
-> > > > [62254.282733] PKRU: 55555554
-> > > > [62254.285911] Call Trace:
-> > > > [62254.288884]  <TASK>
-> > > > [62254.291549]  ? die+0x33/0x90
-> > > > [62254.294769]  ? do_trap+0xe0/0x110
-> > > > [62254.298405]  ? do_error_trap+0x65/0x80
-> > > > [62254.302471]  ? exc_stack_segment+0x35/0x50
-> > > > [62254.306884]  ? asm_exc_stack_segment+0x22/0x30
-> > > > [62254.311637]  ? skb_release_data+0xb8/0x1e0
-> > > > [62254.316047]  kfree_skb_list_reason+0x6d/0x210
-> > > > [62254.320697]  ? free_unref_page_commit+0x80/0x2f0
-> > > > [62254.325700]  ? free_unref_page+0xe9/0x130
-> > > > [62254.330013]  skb_release_data+0xfc/0x1e0
-> > > > [62254.334261]  consume_skb+0x45/0xd0
-> > > > [62254.338077]  tun_do_read+0x68/0x1f0 [tun]
-> > > > [62254.342414]  tun_recvmsg+0x7e/0x160 [tun]
-> > > > [62254.346696]  handle_rx+0x3ab/0x750 [vhost_net]
-> > > > [62254.351488]  vhost_worker+0x42/0x70 [vhost]
-> > > > [62254.355934]  vhost_task_fn+0x4b/0xb0
-> > >
-> > > Neither tun nor vhost_net saw significant changes between the two
-> > > reported kernels.
-> > >
-> > >     $ git log --oneline v6.6..v6.7 -- drivers/net/tun.c drivers/vhost=
-/net.c | wc -l
-> > >     0
-> > >
-> > >     $ git log --oneline linux/v6.6.9..linux/v6.7.5 -- drivers/net/tun=
-.c drivers/vhost/net.c
-> > >     6438382dd9f8 tun: add missing rx stats accounting in tun_xdp_act
-> > >     4efd09da0d49 tun: fix missing dropped counter in tun_xdp_act
-> > >
-> > > So the cause is likely in the code that generated the skb or somethin=
-g
-> > > that modified it along the way.
-> > >
-> > > It could be helpful if it is possible to bisect further. Though odds
-> > > are that the issue is between v6.6 and v6.7, not introduced in the
-> > > stable backports after that. So it is a large target.
-> >
-> > Yeah, as I replied later to my original message - we actually also see
-> > the issue on 6.6.9 as well but it looks slightly different.
-> >
-> > Actually while writing reply got 6.6.9 crashed too:
-> >
-> > [13330.391004] tun: unexpected GSO type: 0x4ec1c942, gso_size 20948,
-> > hdr_len 3072
->
-> This looks like memory corruption
->
-> > > Getting the exact line in skb_release_data that causes the Oops
-> > > would be helpful too, e.g.,
-> > >
-> > > gdb vmlinux
-> > > list *(skb_release_data+0xb8)
-> >
-> > Unfortunately we do not collect kdumps so this is not going to be easy
-> > :( We will investigate the possibility of getting the dump though.
->
-> No need for a kdump. As long as you have the vmlinux of the kernel.
+PAPR hypervisor has introduced three new counters in the VPA area of
+LPAR CPUs for KVM L2 guest (see [1] for terminology) observability - 2
+for context switches from host to guest and vice versa, and 1 counter
+for getting the total time spent inside the KVM guest. Add a tracepoint
+that enables reading the counters for use by ftrace/perf. Note that this
+tracepoint is only available for nestedv2 API (i.e, KVM on PowerVM).
 
-(gdb) list *(skb_release_data+0xb8)
-0xffffffff81a36088 is in skb_release_data (./include/linux/page-flags.h:247=
-).
-242 return page_fixed_fake_head(page) !=3D page;
-243 }
-244
-245 static inline unsigned long _compound_head(const struct page *page)
-246 {
-247 unsigned long head =3D READ_ONCE(page->compound_head);
-248
-249 if (unlikely(head & 1))
-250 return head - 1;
-251 return (unsigned long)page_fixed_fake_head(page);
+[1] Terminology:
+a. L1 refers to the VM (LPAR) booted on top of PAPR hypervisor
+b. L2 refers to the KVM guest booted on top of L1.
+
+Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
+---
+ arch/powerpc/include/asm/kvm_host.h |  5 +++++
+ arch/powerpc/include/asm/lppaca.h   | 11 ++++++++---
+ arch/powerpc/kvm/book3s_hv.c        | 20 ++++++++++++++++++++
+ arch/powerpc/kvm/trace_hv.h         | 24 ++++++++++++++++++++++++
+ 4 files changed, 57 insertions(+), 3 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 8abac5321..26d7bb4b9 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -847,6 +847,11 @@ struct kvm_vcpu_arch {
+ 	gpa_t nested_io_gpr;
+ 	/* For nested APIv2 guests*/
+ 	struct kvmhv_nestedv2_io nestedv2_io;
++
++	/* For VPA counters having context switch and guest run time info (in ns) */
++	u64 l1_to_l2_cs;
++	u64 l2_to_l1_cs;
++	u64 l2_runtime;
+ #endif
+ 
+ #ifdef CONFIG_KVM_BOOK3S_HV_EXIT_TIMING
+diff --git a/arch/powerpc/include/asm/lppaca.h b/arch/powerpc/include/asm/lppaca.h
+index 61ec2447d..bda6b86b9 100644
+--- a/arch/powerpc/include/asm/lppaca.h
++++ b/arch/powerpc/include/asm/lppaca.h
+@@ -62,7 +62,8 @@ struct lppaca {
+ 	u8	donate_dedicated_cpu;	/* Donate dedicated CPU cycles */
+ 	u8	fpregs_in_use;
+ 	u8	pmcregs_in_use;
+-	u8	reserved8[28];
++	u8	l2_accumul_cntrs_enable;  /* Enable usage of counters for KVM guest */
++	u8	reserved8[27];
+ 	__be64	wait_state_cycles;	/* Wait cycles for this proc */
+ 	u8	reserved9[28];
+ 	__be16	slb_count;		/* # of SLBs to maintain */
+@@ -92,9 +93,13 @@ struct lppaca {
+ 	/* cacheline 4-5 */
+ 
+ 	__be32	page_ins;		/* CMO Hint - # page ins by OS */
+-	u8	reserved12[148];
++	u8	reserved12[28];
++	volatile __be64 l1_to_l2_cs_tb;
++	volatile __be64 l2_to_l1_cs_tb;
++	volatile __be64 l2_runtime_tb;
++	u8 reserved13[96];
+ 	volatile __be64 dtl_idx;	/* Dispatch Trace Log head index */
+-	u8	reserved13[96];
++	u8	reserved14[96];
+ } ____cacheline_aligned;
+ 
+ #define lppaca_of(cpu)	(*paca_ptrs[cpu]->lppaca_ptr)
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 2b04eba90..b94461b5f 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -4092,6 +4092,7 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	unsigned long msr, i;
+ 	int trap;
+ 	long rc;
++	struct lppaca *lp = get_lppaca();
+ 
+ 	io = &vcpu->arch.nestedv2_io;
+ 
+@@ -4107,6 +4108,17 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	kvmppc_gse_put_u64(io->vcpu_run_input, KVMPPC_GSID_LPCR, lpcr);
+ 
+ 	accumulate_time(vcpu, &vcpu->arch.in_guest);
++
++	/* Reset the guest host context switch timing */
++	if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled())) {
++		lp->l2_accumul_cntrs_enable = 1;
++		lp->l1_to_l2_cs_tb = 0;
++		lp->l2_to_l1_cs_tb = 0;
++		lp->l2_runtime_tb = 0;
++	} else {
++		lp->l2_accumul_cntrs_enable = 0;
++	}
++
+ 	rc = plpar_guest_run_vcpu(0, vcpu->kvm->arch.lpid, vcpu->vcpu_id,
+ 				  &trap, &i);
+ 
+@@ -4133,6 +4145,14 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	timer_rearm_host_dec(*tb);
+ 
++	/* Record context switch and guest_run_time data */
++	if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled())) {
++		vcpu->arch.l1_to_l2_cs = tb_to_ns(be64_to_cpu(lp->l1_to_l2_cs_tb));
++		vcpu->arch.l2_to_l1_cs = tb_to_ns(be64_to_cpu(lp->l2_to_l1_cs_tb));
++		vcpu->arch.l2_runtime = tb_to_ns(be64_to_cpu(lp->l2_runtime_tb));
++		trace_kvmppc_vcpu_exit_cs_time(vcpu);
++	}
++
+ 	return trap;
+ }
+ 
+diff --git a/arch/powerpc/kvm/trace_hv.h b/arch/powerpc/kvm/trace_hv.h
+index 8d57c8428..10b8f6e5a 100644
+--- a/arch/powerpc/kvm/trace_hv.h
++++ b/arch/powerpc/kvm/trace_hv.h
+@@ -491,6 +491,30 @@ TRACE_EVENT(kvmppc_run_vcpu_enter,
+ 	TP_printk("VCPU %d: tgid=%d", __entry->vcpu_id, __entry->tgid)
+ );
+ 
++TRACE_EVENT(kvmppc_vcpu_exit_cs_time,
++	TP_PROTO(struct kvm_vcpu *vcpu),
++
++	TP_ARGS(vcpu),
++
++	TP_STRUCT__entry(
++		__field(int,		vcpu_id)
++		__field(__u64,		l1_to_l2_cs_ns)
++		__field(__u64,		l2_to_l1_cs_ns)
++		__field(__u64,		l2_runtime_ns)
++	),
++
++	TP_fast_assign(
++		__entry->vcpu_id  = vcpu->vcpu_id;
++		__entry->l1_to_l2_cs_ns = vcpu->arch.l1_to_l2_cs;
++		__entry->l2_to_l1_cs_ns = vcpu->arch.l2_to_l1_cs;
++		__entry->l2_runtime_ns = vcpu->l2_runtime;
++	),
++
++	TP_printk("VCPU %d: l1_to_l2_cs_time=%llu-ns l2_to_l1_cs_time=%llu-ns l2_runtime=%llu-ns",
++		__entry->vcpu_id,  __entry->l1_to_l2_cs_ns,
++		__entry->l2_to_l1_cs_ns, __entry->l2_runtime_ns)
++);
++
+ TRACE_EVENT(kvmppc_run_vcpu_exit,
+ 	TP_PROTO(struct kvm_vcpu *vcpu),
+ 
+-- 
+2.43.2
+
 
