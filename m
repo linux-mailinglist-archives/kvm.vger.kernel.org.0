@@ -1,70 +1,72 @@
-Return-Path: <kvm+bounces-12127-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12128-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14DEE87FD50
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 13:04:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E9CF87FD52
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 13:04:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A04821F22483
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 12:04:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F8021C21DD2
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 12:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC477F499;
-	Tue, 19 Mar 2024 12:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664107F7EA;
+	Tue, 19 Mar 2024 12:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J5lspP0G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="neRnQCxX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9947CF03;
-	Tue, 19 Mar 2024 12:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001917EEEA;
+	Tue, 19 Mar 2024 12:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710849877; cv=none; b=rTSkUnqAlDcCWlSDwlnEhknfTIKgg9KpvYXgm/8uX3+ZrjmP6VSo3Im8ZaceV3pJWXUCfnfu7JKMyYJVpsLD0E1e2unb4Mi/sJB8DivqzzBGvRrXaCzCt0ZjIpHMGebBV7kptQbPq/w6QnRCR4jeNTOW3mN9NpD/KNl5FRb5jQY=
+	t=1710849878; cv=none; b=oNonPs2bfqBHfNOQNNIvGArzMCOdpNQCC/msg3yvc/AVudqVb+HLlcLDz04hH6IwSlhiuyyV38QJlzx9nm1oDsW1FZ+XK7AyMxbifZe8TLNdkkeY0BWrPU7PidXfyFRBj9Lf6sx8gYpq9zc9dFiErRokiHQbhLd/0853Z2g6Vog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710849877; c=relaxed/simple;
-	bh=MgJW5voqxFyNFIDyqHRb3NG7cNiaAkj/78PRZlkZUUY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aTulveindf9QzWKmNoI7BcTLfETy+ozTkPr937xI7XEiVQRjx9UkFEqD6rDl9HRYsjRpraWa7JnMkUtz+r6wxp1FUr53LsgqfV7upreZnO3L1hfbfWwB0WTwfUkZeSunrm65Cv1YqGOue8QSgMZHF0pwXtUzY+s9HV5KZfdUz7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J5lspP0G; arc=none smtp.client-ip=209.85.208.170
+	s=arc-20240116; t=1710849878; c=relaxed/simple;
+	bh=2whijhBAm4dx6QwkeeGpNsVaN2Kx4eOfqHixS++YrtA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ELuxscNUJyCYsZPPXlhHv96vKJB8tbR7s5dMc3j/6zLUXdFH0tL2F1g7C0y7N9nIMtgVr+bAc9LQlwg2l2/353w6Tzxc0lowgG7E+2gnkq+uyrM9ljTCuucVZJD2eg+5fkPfuHBSqM822TTSirAgum/y/C0s4pAmvj3nfRewhNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=neRnQCxX; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d4a901e284so41658701fa.1;
-        Tue, 19 Mar 2024 05:04:35 -0700 (PDT)
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d41d1bedc9so95113291fa.3;
+        Tue, 19 Mar 2024 05:04:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710849874; x=1711454674; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=p3nTBtfAkkkz32UQKuz5vte+Epjvb/kCDDdWznm9o78=;
-        b=J5lspP0GnF4R5QyfeFtL2tdyh1n7Jf9zgxkXVOaSkiybUYeyfHypjlM+dYZet8cgWh
-         BWBkfd7uV0/Ey4fN7htU7nHSsbXE0Jja50VwRNj5Uq+Xwria3v6F01TwbtDPlhCSWtbL
-         bz3NM7SQdPhdBa+z4csl2A1nceEUvVRRd+82e+MRix8GC33aLiOQLS6EvhsbLkMkC3/K
-         oudcvrOL2R0iw9v5lZFfktJoeAo7+xHCVs95zIZTKEOhpN94Oiy8USoFbvAh0Jb/dYTo
-         RySwo1knnjKIbq+KgwUEW25qFFFoZ3Scwc+d2rUdu8XmsOAVCf/re/ll1iGyjb2OyTSj
-         KZ6A==
+        d=gmail.com; s=20230601; t=1710849875; x=1711454675; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IN3wN3yRolVo19T+AVLYl3UCmMVfUc/5cyFO6aotwr0=;
+        b=neRnQCxX95jGvRifRf8JpVO0QYJk3uibDJ2sOv534maQ8vPtpp2KKvrUe1QEmFsCWE
+         kDD7mtSrXA+QRUM/19GjSsc+hHHfQNmv1tD9RJfGd8ZNN/Rm0kLQ8BqFyPxwn2iLEjZd
+         buhjnalX9MzmjC1+W8HAfW7rHr5OkuKv1HCJ9di3AQW0nUCrzqxcVu3QoZ/zDQlLXvJn
+         3jeXDmarmHP/jRfDm6OQghvLlntioQdfcptRcxrK1CJ6TFF2LvWdHUOlcYwGiNyGiVz8
+         8YNPDXi/nP8Z+YfjdIb0aOJttQXNTqltholb3fJd+SnUUvPr6OYrdsCcCdANVZSS3V4d
+         OUXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710849874; x=1711454674;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p3nTBtfAkkkz32UQKuz5vte+Epjvb/kCDDdWznm9o78=;
-        b=XrbLfJ8mKSvr8EsmHM7JBmO2zQZFXfWEWfFppQxuKIoSPtxyKMLNRX22Oy49GOxH7E
-         V46ED3K13mmcobecuTHWdIAii91/+DulDQuR1p0fxghriEg32TM6XcujZWnsd16mc5pb
-         LXGHkdFgYlfmvxky60wLvq3zHRkQ2E/xv/uXvbDOz9hcAfMI7YwphIMeCygr3m4bGcWH
-         VPib7QRYqECpKCFd3NcV/qZIUazjE3IRzZLm7Q5b80HmosMfhIYxCQn7bFpwPq3v01wQ
-         dQc0tmElo8cg7ViMaD8RxaUDmZsmeT/viUXTRnVqPTf/WOSymCybC2jmrBEw0FIz9VGM
-         rt2A==
-X-Forwarded-Encrypted: i=1; AJvYcCXJuU5UwFxjEQLBmiMrxOONqoMTxXlUX+3JTfmZgpkaE8/z6yp/1SiejSIqTgv7gdhKYcoem0kYChmQzXzbWQ+7jqMA4qNCFWWsddmratnRXDDplkDwESqNnT/cS8O6vEeW
-X-Gm-Message-State: AOJu0YwmEvhUkKQT0pMLRWg6CHPJXpUyk5mTyIhQlMyzspFjTeaO8UMB
-	blKFynfciK9+qO11gD6/uhObUC4UHCcVDHuHrGdSiIzQw2HgiGh3
-X-Google-Smtp-Source: AGHT+IFGmeUnYwFisUej1wxB8IsFlGhW1N1ljK8ou50CU7bNS77G8yv5k3TExvjgcerTVTvdTFLKFw==
-X-Received: by 2002:a2e:95d3:0:b0:2d4:68ef:c714 with SMTP id y19-20020a2e95d3000000b002d468efc714mr8332249ljh.38.1710849873544;
-        Tue, 19 Mar 2024 05:04:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710849875; x=1711454675;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IN3wN3yRolVo19T+AVLYl3UCmMVfUc/5cyFO6aotwr0=;
+        b=s+nX+BeHSYtxG4zbnqdPfIbGkyGijwQfrZKJbFcNEaoSf4VMCXq3zhpWvZm8GwT7ai
+         OxjeB7qI9pzVVXQZNmhaAJVK0hEyltu91PeVjbb2hTQUUb2hpITKpJTu/NaRFsJqViq7
+         K5BFGlAiPMHOBiq3p1hmiBOs0UwXkgXTSQneLXvUVPSKr+A+dFv0dVQ35izMhTQI+eIc
+         J6MSPdECUaDwZgkMnpmlvyYsyOp/9HS1TEQtShWfT5EfNGrTGuWz4nNJk8FAg+ggpFXO
+         hezaYpyI6ffhmJYSfytsqhFw7NfeSGORYBfn52wypPjahhPDcNBUx2IpSpqNyDOIsJQ/
+         0kxw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHRa6kn4KNZN0tThEkuNBcpxzgjGCeYG+xtANnTHsifviSM/113PzM00fxzN8wzLqFKm+GQPAdNe8tVefKG2T+IN0/kQI5ykOfzjfUpVsK1J2M0MIJ6PnaKG1a6+9aS0/C
+X-Gm-Message-State: AOJu0YyF6hnBmYHavZtlJiWdb8vU2WK4MCzr4e0+hyD1SvryxT9q6rJr
+	jp9Tiwcrqmg75KMExDnS/7Im1mFaMJSV1CMXqXVesEIHAowT/3EXa+0h+WKBgwQM9Q==
+X-Google-Smtp-Source: AGHT+IEhOOYjcdGfgitwor41R2Ak270M2lC5BoeDuwljNKRdjdoEA5HsuucUaxu5WJnx4+4kYgD4/g==
+X-Received: by 2002:a2e:a412:0:b0:2d4:6893:24e1 with SMTP id p18-20020a2ea412000000b002d4689324e1mr6883968ljn.50.1710849874999;
+        Tue, 19 Mar 2024 05:04:34 -0700 (PDT)
 Received: from linguini.. ([62.96.37.222])
-        by smtp.gmail.com with ESMTPSA id f23-20020a170906049700b00a4588098c5esm5989722eja.132.2024.03.19.05.04.32
+        by smtp.gmail.com with ESMTPSA id f23-20020a170906049700b00a4588098c5esm5989722eja.132.2024.03.19.05.04.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 05:04:32 -0700 (PDT)
+        Tue, 19 Mar 2024 05:04:34 -0700 (PDT)
 From: Mikhail Malyshev <mike.malyshev@gmail.com>
 To: alex.williamson@redhat.com,
 	jgg@ziepe.ca,
@@ -77,10 +79,12 @@ Cc: abhsahu@nvidia.com,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Mikhail Malyshev <mike.malyshev@gmail.com>
-Subject: [PATCH 0/1] Reenable runtime PM for dynamically unbound devices
-Date: Tue, 19 Mar 2024 12:04:09 +0000
-Message-Id: <20240319120410.1477713-1-mike.malyshev@gmail.com>
+Subject: [PATCH 1/1] vfio/pci: Reenable runtime PM for dynamically unbound devices
+Date: Tue, 19 Mar 2024 12:04:10 +0000
+Message-Id: <20240319120410.1477713-2-mike.malyshev@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240319120410.1477713-1-mike.malyshev@gmail.com>
+References: <20240319120410.1477713-1-mike.malyshev@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,46 +93,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When trying to run a VM with PCI passthrough of intel-eth-pci ETH device
-QEMU fails with "Permission denied" error. This happens only if
-intel-eth-pci driver is dynamically unbound from the device using
-"echo -n $DEV > /sys/bus/pci/drivers/stmmac/unbind" command. If
-"vfio-pci.ids=..." is used to bind the device to vfio-pci driver and the
-device is never probed by intel-eth-pci driver the problem does not occur.
+When a device is unbound from its driver it may call pm_runtime_disable()
+in its ->remove() callback. When such device is bound to vfio-pci driver
+VFIO framework should reenable runtime PM before calling pm_runtime_xxx
+functions.
 
-When intel-eth-pci driver is dynamically unbound from the device
-.remove()
-  intel_eth_pci_remove()
-    stmmac_dvr_remove()
-      pm_runtime_disable();
+The problem was introduced by
+commit 7ab5e10eda02 ("vfio/pci: Move the unused device into low power state
+ with runtime PM")
 
-Later when QEMU tries to get the device file descriptor by calling
-VFIO_GROUP_GET_DEVICE_FD ioctl pm_runtime_resume_and_get returns -EACCES.
-It happens because dev->power.disable_depth == 1 .
-
-vfio_group_fops_unl_ioctl(VFIO_GROUP_GET_DEVICE_FD)
-  vfio_group_ioctl_get_device_fd()
-    vfio_device_open()
-      ret = device->ops->open_device()
-        vfio_pci_open_device()
-          vfio_pci_core_enable()
-              ret = pm_runtime_resume_and_get();
-
-This behavior was introduced by
-commit 7ab5e10eda02 ("vfio/pci: Move the unused device into low power state with runtime PM")
-
-This may be the case for any driver calling pm_runtime_disable() in its
-.remove() callback.
-
-The case when a runtime PM may be disable for a device is not handled so we
-call pm_runtime_enable() in vfio_pci_core_register_device to re-enable it.
-
-Mikhail Malyshev (1):
-  vfio/pci: Reenable runtime PM for dynamically unbound devices
-
+Signed-off-by: Mikhail Malyshev <mike.malyshev@gmail.com>
+---
  drivers/vfio/pci/vfio_pci_core.c | 10 ++++++++++
  1 file changed, 10 insertions(+)
 
---
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 1cbc990d42e0..05c25ee66ee1 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -2258,6 +2258,16 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
+ 	vfio_pci_set_power_state(vdev, PCI_D0);
+ 
+ 	dev->driver->pm = &vfio_pci_core_pm_ops;
++
++	/*
++	 * If the device was previously associated with a driver, the
++	 * driver might have invoked pm_runtime_disable in its remove()
++	 * callback. We must re-enable runtime PM here to ensure the
++	 * device can be managed.
++	 */
++	if (!pm_runtime_enabled(dev))
++		pm_runtime_enable(dev);
++
+ 	pm_runtime_allow(dev);
+ 	if (!disable_idle_d3)
+ 		pm_runtime_put(dev);
+-- 
 2.34.1
+
 
