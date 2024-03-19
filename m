@@ -1,253 +1,153 @@
-Return-Path: <kvm+bounces-12144-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12145-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0824987FF9B
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 15:28:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F06B87FFA2
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 15:31:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C2311F22461
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 14:28:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50D391F23757
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 14:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF9E81ABA;
-	Tue, 19 Mar 2024 14:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47AC8D2F5;
+	Tue, 19 Mar 2024 14:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fqy/iEfT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HRbcx+aq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE8E81AA7;
-	Tue, 19 Mar 2024 14:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C01A38;
+	Tue, 19 Mar 2024 14:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710858519; cv=none; b=eTe54tKnEjWFjfk09LdZGWo27l6KJXr8H9RlKMGLvK1b2DtHQbofqUhEoK+ZLGGJPB58FzVSECk8pPRvBYGTI4V5PKAuLrk6gXNkQV/szUe+015UAP4nI+L7e6iGbxz4md0L4uaFZKWjiQxN6rLe6C60D+RF/0FRfWNS1E2AmgU=
+	t=1710858692; cv=none; b=iSPUDoP/cB7ACL1X6SdpzO5e/nVOqtex41fqZCzEDzgzBUcCclXhQR1NUzJevGFT5EVRCgNgMngzRhUujhSYroYu/AVlVP902vptrN5CNu+Cdy3BWBhG8J6JPczb/+RTO0nEKzvv4D/KaYpDhDu8ZeuOpYlbIwXCAZZWpy1/l3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710858519; c=relaxed/simple;
-	bh=Dl20teuF0LcyaprwKl4zkyFxg7kNAs+oNxyc1Ln7iF0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XqykYqyVAs1d8p1eZotIFD7oHl572HmvrCSzmNFpPRxr5L2REso7MBjPpksE5DT0vAtoxEtKb9PD94SH441L5H4+euCpUlJ9lq59BjksWxG10dobFANflGkTXQ3mIzxs9pMWfs+W9s/AgKlrc9DGOk+PkZ7OeaZnowiOi12d42c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fqy/iEfT; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42JEQcbe023407;
-	Tue, 19 Mar 2024 14:28:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=VXexiXBKopZYjzbOhqUXZ+UbaH9CdHlMt8VeoGUFPvg=;
- b=fqy/iEfTzbQskEzrVIId4HL6XZ6YWk71MpEnqFsLWw5zDCtDKRKwrPomfpqr733jz8CS
- 5I22Lk76Hgo+BO+qeuki5BMjWLSAeH+USslSYaN9Gi2CJgUBqet4Mta1/sgI+mpQTgOT
- 8+h8YiqppzwUSQ5zQjfdI9QTpwAbCm1ks37Y3VWxF2zMIsNlX2Xl+FMZS0+SFEP3Z7wp
- J+OLC0537DGRE2h9bJq8JkiG93Wge8tK/J69+dLdvdEOV/e9bgHpgk/xei1wfYxN3Ifu
- f7/W+QUqyUbQDaybSHhH6FGUZ6q1PxAk7xRGD8FLiyHpU2dZ2ygROv7HfRH1eBjolnwo Ww== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wyb39rnqj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Mar 2024 14:28:18 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42JESIhi027738;
-	Tue, 19 Mar 2024 14:28:18 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wyb39rnqf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Mar 2024 14:28:18 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42JCbUFY019843;
-	Tue, 19 Mar 2024 14:28:17 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wwqykftet-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Mar 2024 14:28:17 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42JESBdY17367448
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 19 Mar 2024 14:28:13 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9B8A82004E;
-	Tue, 19 Mar 2024 14:28:11 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AACA920043;
-	Tue, 19 Mar 2024 14:28:09 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.in.ibm.com (unknown [9.204.206.66])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 19 Mar 2024 14:28:09 +0000 (GMT)
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com
-Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vaibhav Jain <vaibhav@linux.ibm.com>
-Subject: [PATCH] arch/powerpc/kvm: Add support for reading VPA counters for pseries guests
-Date: Tue, 19 Mar 2024 19:58:04 +0530
-Message-ID: <20240319142807.95547-1-gautam@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1710858692; c=relaxed/simple;
+	bh=B2nNsMgTQoGiY+9DrWE4Iy06KAEbLYr9Yr2Q6LU9biw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j8XDXFM03tGXqjSkyAMROiX7OGqbd+0xXJ/AHHR2+PGNBbIa+Osu0zacjS5/+D7WQjAkyTnzcBs2wMTlTBaYTzVlk+k4myJGmYSk4hXOj1HGgSWCqh0b6kYEew4qaIaER1r5b72hNcn9NxoDpVMAvpOWQpni9AYZ00ojPa3hRXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HRbcx+aq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 538DEC433F1;
+	Tue, 19 Mar 2024 14:31:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710858691;
+	bh=B2nNsMgTQoGiY+9DrWE4Iy06KAEbLYr9Yr2Q6LU9biw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HRbcx+aqsnD235Gmo6ZS0BUy+UtZNPrrsIgLfeUIj5FTkXgYhyJnxr8MxTT4KC6P/
+	 oaYUBGbaBIjv4yOhLRhNIiDZkB5qsip6SGPmMNK3kUDDcIwcUiLjbl/pj3bkv0zqhP
+	 MOubasfq34FoyqnYFT7o2cXA6uKG6crkZJ7FPaq6pCsMqomIA4PO5WJjGqQNFun1O6
+	 SdCyBEJ3OsdJCVZIoRF4XAWzNUSI6OmrstURUatt/K65EPKpmzT8T/O10XpbrkBlwd
+	 9oMgu48MBrzuWabJbFE/vmYiN00N2b05/XkwNANP6AVRLux3t5Z4+bY+yGcAFtIr2E
+	 ELCHEJVtWYo9A==
+Date: Tue, 19 Mar 2024 14:31:19 +0000
+From: Will Deacon <will@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	viro@zeniv.linux.org.uk, brauner@kernel.org,
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	ackerleytng@google.com, mail@maciej.szmigiero.name,
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com, steven.price@arm.com,
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com,
+	linux-mm@kvack.org
+Subject: Re: folio_mmapped
+Message-ID: <20240319143119.GA2736@willie-the-truck>
+References: <Zd82V1aY-ZDyaG8U@google.com>
+ <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
+ <ZeXAOit6O0stdxw3@google.com>
+ <ZeYbUjiIkPevjrRR@google.com>
+ <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
+ <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
+ <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
+ <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
+ <ZfjYBxXeh9lcudxp@google.com>
+ <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: J8x6r8YAIRMIrqFXNi6zJfskGvl25iTG
-X-Proofpoint-ORIG-GUID: OPxV9XhGccYgCGoYTruZ4lgh7ZSTpv4V
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-19_04,2024-03-18_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- adultscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
- clxscore=1011 phishscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403140000 definitions=main-2403190109
+In-Reply-To: <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-PAPR hypervisor has introduced three new counters in the VPA area of
-LPAR CPUs for KVM L2 guest (see [1] for terminology) observability - 2
-for context switches from host to guest and vice versa, and 1 counter
-for getting the total time spent inside the KVM guest. Add a tracepoint
-that enables reading the counters for use by ftrace/perf. Note that this
-tracepoint is only available for nestedv2 API (i.e, KVM on PowerVM).
+Hi David,
 
-[1] Terminology:
-a. L1 refers to the VM (LPAR) booted on top of PAPR hypervisor
-b. L2 refers to the KVM guest booted on top of L1.
+On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
+> On 19.03.24 01:10, Sean Christopherson wrote:
+> > On Mon, Mar 18, 2024, Vishal Annapurve wrote:
+> > > On Mon, Mar 18, 2024 at 3:02 PM David Hildenbrand <david@redhat.com> wrote:
+> > > > Second, we should find better ways to let an IOMMU map these pages,
+> > > > *not* using GUP. There were already discussions on providing a similar
+> > > > fd+offset-style interface instead. GUP really sounds like the wrong
+> > > > approach here. Maybe we should look into passing not only guest_memfd,
+> > > > but also "ordinary" memfds.
+> > 
+> > +1.  I am not completely opposed to letting SNP and TDX effectively convert
+> > pages between private and shared, but I also completely agree that letting
+> > anything gup() guest_memfd memory is likely to end in tears.
+> 
+> Yes. Avoid it right from the start, if possible.
+> 
+> People wanted guest_memfd to *not* have to mmap guest memory ("even for
+> ordinary VMs"). Now people are saying we have to be able to mmap it in order
+> to GUP it. It's getting tiring, really.
 
-Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
-Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
----
- arch/powerpc/include/asm/kvm_host.h |  5 +++++
- arch/powerpc/include/asm/lppaca.h   | 11 ++++++++---
- arch/powerpc/kvm/book3s_hv.c        | 20 ++++++++++++++++++++
- arch/powerpc/kvm/trace_hv.h         | 24 ++++++++++++++++++++++++
- 4 files changed, 57 insertions(+), 3 deletions(-)
+From the pKVM side, we're working on guest_memfd primarily to avoid
+diverging from what other CoCo solutions end up using, but if it gets
+de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
+today with anonymous memory, then it's a really hard sell to switch over
+from what we have in production. We're also hoping that, over time,
+guest_memfd will become more closely integrated with the mm subsystem to
+enable things like hypervisor-assisted page migration, which we would
+love to have.
 
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 8abac5321..26d7bb4b9 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -847,6 +847,11 @@ struct kvm_vcpu_arch {
- 	gpa_t nested_io_gpr;
- 	/* For nested APIv2 guests*/
- 	struct kvmhv_nestedv2_io nestedv2_io;
-+
-+	/* For VPA counters having context switch and guest run time info (in ns) */
-+	u64 l1_to_l2_cs;
-+	u64 l2_to_l1_cs;
-+	u64 l2_runtime;
- #endif
- 
- #ifdef CONFIG_KVM_BOOK3S_HV_EXIT_TIMING
-diff --git a/arch/powerpc/include/asm/lppaca.h b/arch/powerpc/include/asm/lppaca.h
-index 61ec2447d..bda6b86b9 100644
---- a/arch/powerpc/include/asm/lppaca.h
-+++ b/arch/powerpc/include/asm/lppaca.h
-@@ -62,7 +62,8 @@ struct lppaca {
- 	u8	donate_dedicated_cpu;	/* Donate dedicated CPU cycles */
- 	u8	fpregs_in_use;
- 	u8	pmcregs_in_use;
--	u8	reserved8[28];
-+	u8	l2_accumul_cntrs_enable;  /* Enable usage of counters for KVM guest */
-+	u8	reserved8[27];
- 	__be64	wait_state_cycles;	/* Wait cycles for this proc */
- 	u8	reserved9[28];
- 	__be16	slb_count;		/* # of SLBs to maintain */
-@@ -92,9 +93,13 @@ struct lppaca {
- 	/* cacheline 4-5 */
- 
- 	__be32	page_ins;		/* CMO Hint - # page ins by OS */
--	u8	reserved12[148];
-+	u8	reserved12[28];
-+	volatile __be64 l1_to_l2_cs_tb;
-+	volatile __be64 l2_to_l1_cs_tb;
-+	volatile __be64 l2_runtime_tb;
-+	u8 reserved13[96];
- 	volatile __be64 dtl_idx;	/* Dispatch Trace Log head index */
--	u8	reserved13[96];
-+	u8	reserved14[96];
- } ____cacheline_aligned;
- 
- #define lppaca_of(cpu)	(*paca_ptrs[cpu]->lppaca_ptr)
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 2b04eba90..b94461b5f 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4092,6 +4092,7 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
- 	unsigned long msr, i;
- 	int trap;
- 	long rc;
-+	struct lppaca *lp = get_lppaca();
- 
- 	io = &vcpu->arch.nestedv2_io;
- 
-@@ -4107,6 +4108,17 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
- 	kvmppc_gse_put_u64(io->vcpu_run_input, KVMPPC_GSID_LPCR, lpcr);
- 
- 	accumulate_time(vcpu, &vcpu->arch.in_guest);
-+
-+	/* Reset the guest host context switch timing */
-+	if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled())) {
-+		lp->l2_accumul_cntrs_enable = 1;
-+		lp->l1_to_l2_cs_tb = 0;
-+		lp->l2_to_l1_cs_tb = 0;
-+		lp->l2_runtime_tb = 0;
-+	} else {
-+		lp->l2_accumul_cntrs_enable = 0;
-+	}
-+
- 	rc = plpar_guest_run_vcpu(0, vcpu->kvm->arch.lpid, vcpu->vcpu_id,
- 				  &trap, &i);
- 
-@@ -4133,6 +4145,14 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	timer_rearm_host_dec(*tb);
- 
-+	/* Record context switch and guest_run_time data */
-+	if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled())) {
-+		vcpu->arch.l1_to_l2_cs = tb_to_ns(be64_to_cpu(lp->l1_to_l2_cs_tb));
-+		vcpu->arch.l2_to_l1_cs = tb_to_ns(be64_to_cpu(lp->l2_to_l1_cs_tb));
-+		vcpu->arch.l2_runtime = tb_to_ns(be64_to_cpu(lp->l2_runtime_tb));
-+		trace_kvmppc_vcpu_exit_cs_time(vcpu);
-+	}
-+
- 	return trap;
- }
- 
-diff --git a/arch/powerpc/kvm/trace_hv.h b/arch/powerpc/kvm/trace_hv.h
-index 8d57c8428..10b8f6e5a 100644
---- a/arch/powerpc/kvm/trace_hv.h
-+++ b/arch/powerpc/kvm/trace_hv.h
-@@ -491,6 +491,30 @@ TRACE_EVENT(kvmppc_run_vcpu_enter,
- 	TP_printk("VCPU %d: tgid=%d", __entry->vcpu_id, __entry->tgid)
- );
- 
-+TRACE_EVENT(kvmppc_vcpu_exit_cs_time,
-+	TP_PROTO(struct kvm_vcpu *vcpu),
-+
-+	TP_ARGS(vcpu),
-+
-+	TP_STRUCT__entry(
-+		__field(int,		vcpu_id)
-+		__field(__u64,		l1_to_l2_cs_ns)
-+		__field(__u64,		l2_to_l1_cs_ns)
-+		__field(__u64,		l2_runtime_ns)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_id  = vcpu->vcpu_id;
-+		__entry->l1_to_l2_cs_ns = vcpu->arch.l1_to_l2_cs;
-+		__entry->l2_to_l1_cs_ns = vcpu->arch.l2_to_l1_cs;
-+		__entry->l2_runtime_ns = vcpu->l2_runtime;
-+	),
-+
-+	TP_printk("VCPU %d: l1_to_l2_cs_time=%llu-ns l2_to_l1_cs_time=%llu-ns l2_runtime=%llu-ns",
-+		__entry->vcpu_id,  __entry->l1_to_l2_cs_ns,
-+		__entry->l2_to_l1_cs_ns, __entry->l2_runtime_ns)
-+);
-+
- TRACE_EVENT(kvmppc_run_vcpu_exit,
- 	TP_PROTO(struct kvm_vcpu *vcpu),
- 
--- 
-2.43.2
+Today, we use the existing KVM interfaces (i.e. based on anonymous
+memory) and it mostly works with the one significant exception that
+accessing private memory via a GUP pin will crash the host kernel. If
+all guest_memfd() can offer to solve that problem is preventing GUP
+altogether, then I'd sooner just add that same restriction to what we
+currently have instead of overhauling the user ABI in favour of
+something which offers us very little in return.
 
+On the mmap() side of things for guest_memfd, a simpler option for us
+than what has currently been proposed might be to enforce that the VMM
+has unmapped all private pages on vCPU run, failing the ioctl if that's
+not the case. It needs a little more tracking in guest_memfd but I think
+GUP will then fall out in the wash because only shared pages will be
+mapped by userspace and so GUP will fail by construction for private
+pages.
+
+We're happy to pursue alternative approaches using anonymous memory if
+you'd prefer to keep guest_memfd limited in functionality (e.g.
+preventing GUP of private pages by extending mapping_flags as per [1]),
+but we're equally willing to contribute to guest_memfd if extensions are
+welcome.
+
+What do you prefer?
+
+Cheers,
+
+Will
+
+[1] https://lore.kernel.org/r/4b0fd46a-cc4f-4cb7-9f6f-ce19a2d3064e@redhat.com
 
