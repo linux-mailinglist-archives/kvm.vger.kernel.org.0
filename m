@@ -1,227 +1,372 @@
-Return-Path: <kvm+bounces-12191-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12192-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21EA488084C
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 00:55:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EC20880850
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 00:57:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2C98283C3A
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 23:55:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DD6A1F22B8E
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 23:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFA45FBAC;
-	Tue, 19 Mar 2024 23:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4905FBB3;
+	Tue, 19 Mar 2024 23:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EPKR0POT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YdbXE44Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35163FBAF
-	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 23:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5173FBAF;
+	Tue, 19 Mar 2024 23:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710892509; cv=none; b=geedQq3qGoRp4ilM7gJtNdUUVE/Aj67e8rcKs2MEnv5+aQDwR57Ck5FO6+v36MA0UJY49UJ7J2lODfj+giIGT5BoyWXCmIeErNch1RfSTSwvRhjk5Ic4Oy95GIcQfumKVq+T6y1vCi7X6zaJ8Id6HLws/NgGLQpUch171sjCZZQ=
+	t=1710892619; cv=none; b=SlLg02jBD8L1Qu4O0TmI6cU1FL/ZtFEiR5rXhvd0lRDjbXAfnCRaYJ73LOGt9aSF7p9ySoQL9sqVEdmeYhrSRYCnTXMFEcP1D4LdM31RRp8UTPjQ7Q+xHsHPM/7jVLJIqlQYM/7zpQM9hbx9eWciAXo7+bBRRic8brJmkfZMdTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710892509; c=relaxed/simple;
-	bh=LyLfsXArmpaIz1dWIS+ezi31pdNTzLESJRdI9KREBIk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G2bUYRxLetk1d1Q9Hv0ODHPr3XFAVHL/xNkTGaqmCrQgbtyYkxnWx/kNHBYSZM0Dc6+mKID9nOtlPi7K/bpoE8RwPLM5ovg9qBDK1myfPhi3gGl/nUuGBdaooxTbKTyuIb1OuDh31Sy/q1O60xXoJM0pJR1T2/m2PBS2P6EDjek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=EPKR0POT; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42JMfNxS000987;
-	Tue, 19 Mar 2024 23:54:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:content-transfer-encoding:in-reply-to; s=
-	qcppdkim1; bh=aeq5QRLdnBnxL7CPkUwlT7Hq5FWu/MXH5rgdftDhMUE=; b=EP
-	KR0POTMpUHtBZ6m2OzvR66QXx487ED+ItB/VzztJtiMhmhYv1mupobx0MSesEaWD
-	bvgiYbnkdL6T41Ob7m8uuiOKh4kME9BVsw0Kt77FOuZJ+BUzCyuH767UPNN5Nn8Q
-	z2zY7A63E5HkxIkwonqY/ffJxNK8vSDfp8Jr8uCAb4IFdJzYAioB9O3aj7c7RmqR
-	H0Zzz/cDrAPYvxXhekUjQxE0rVFa7T/eetY3tbyQssKrDUhIMnDWa3YrrZyy5sD8
-	YGmDiLJvR/4SnzKN9uCYEcin3dijLJcDKqN9q7f8Ux/f2ggzWq8+TDZHnTYbPEoL
-	nFR+IJo9PCVbfdWup7/w==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wy9ee9qcy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Mar 2024 23:54:13 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42JNsC0b001314
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Mar 2024 23:54:12 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 19 Mar 2024 16:54:11 -0700
-Date: Tue, 19 Mar 2024 16:54:10 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Will Deacon <will@kernel.org>
-CC: David Hildenbrand <david@redhat.com>,
-        Sean Christopherson
-	<seanjc@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Quentin Perret
-	<qperret@google.com>,
-        Matthew Wilcox <willy@infradead.org>, Fuad Tabba
-	<tabba@google.com>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
-        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
-        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <viro@zeniv.linux.org.uk>,
-        <brauner@kernel.org>, <akpm@linux-foundation.org>,
-        <xiaoyao.li@intel.com>, <yilun.xu@intel.com>,
-        <chao.p.peng@linux.intel.com>, <jarkko@kernel.org>,
-        <amoorthy@google.com>, <dmatlack@google.com>,
-        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
-        <mic@digikod.net>, <vbabka@suse.cz>, <ackerleytng@google.com>,
-        <mail@maciej.szmigiero.name>, <michael.roth@amd.com>,
-        <wei.w.wang@intel.com>, <liam.merwick@oracle.com>,
-        <isaku.yamahata@gmail.com>, <kirill.shutemov@linux.intel.com>,
-        <suzuki.poulose@arm.com>, <steven.price@arm.com>,
-        <quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
-        <quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
-        <quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
-        <catalin.marinas@arm.com>, <james.morse@arm.com>,
-        <yuzenghui@huawei.com>, <oliver.upton@linux.dev>, <maz@kernel.org>,
-        <keirf@google.com>, <linux-mm@kvack.org>
-Subject: Re: Re: folio_mmapped
-Message-ID: <20240319155648990-0700.eberman@hu-eberman-lv.qualcomm.com>
-Mail-Followup-To: Will Deacon <will@kernel.org>, 
-	David Hildenbrand <david@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Quentin Perret <qperret@google.com>, 
-	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
- <ZeXAOit6O0stdxw3@google.com>
- <ZeYbUjiIkPevjrRR@google.com>
- <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
- <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
- <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
- <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
- <ZfjYBxXeh9lcudxp@google.com>
- <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
- <20240319143119.GA2736@willie-the-truck>
+	s=arc-20240116; t=1710892619; c=relaxed/simple;
+	bh=xAQ54bb5DATBkchqYBlDNiISG+vhHK0QxIY50S0dNOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VsFh6zZJqXoHOxwdfRhWtCrwIFNQxZBPj/CZNgrEYaGYLIzXw3CK6oXooWLFArk1ye6LSYzE6or97eV8m5M0XmcHeb6sbJjSHMLPuiM+V29iOBWfl2s0GzR+uADIS8pQjfrY4FuD9LG66xFeP055UqD1+ZpJtpVQ7PTqilHck8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YdbXE44Q; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710892616; x=1742428616;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=xAQ54bb5DATBkchqYBlDNiISG+vhHK0QxIY50S0dNOo=;
+  b=YdbXE44QBEax67bfJbGvAfNTloypIrIZEE2BeHv2nmYWZmgR5OrFt2my
+   Aim6/9ss2G5QJfKq9mnC8t9nAJSeV/treAPwXxYXsbpLI4uIpHIfZWx3S
+   RuWnx2eAmfwnGD7pEL8EJyNwxL1hmz0u+rww6fF8JnK1G1gXIbvbJA35m
+   2XQ1BDuH5dTCUFwQ4fN/23zlgqlZeg1YGsEGTMQwyrknZQqRyvuGQHQ5f
+   Oo5pDuDvp9mfgySHxSUJbeQZASQ2Wri7BE/AUgx7A2KoHZstj/KZIVbRE
+   MDgRJzf9FK02iUkEDqNGHq5j3BO+0xIKlN5DHwCSNJvToK5XoWXD6QZjS
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="5971856"
+X-IronPort-AV: E=Sophos;i="6.07,138,1708416000"; 
+   d="scan'208";a="5971856"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2024 16:56:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,138,1708416000"; 
+   d="scan'208";a="18697127"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2024 16:56:55 -0700
+Date: Tue, 19 Mar 2024 16:56:54 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Yuan, Hang" <hang.yuan@intel.com>,
+	"Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 059/130] KVM: x86/tdp_mmu: Don't zap private pages
+ for unsupported cases
+Message-ID: <20240319235654.GC1994522@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <1ed955a44cd81738b498fe52823766622d8ad57f.1708933498.git.isaku.yamahata@intel.com>
+ <618614fa6c62a232d95da55546137251e1847f48.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240319143119.GA2736@willie-the-truck>
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: FEqxfT4Zfq9jRu8C0SNX6rBbDdaZhX_-
-X-Proofpoint-ORIG-GUID: FEqxfT4Zfq9jRu8C0SNX6rBbDdaZhX_-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-19_10,2024-03-18_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
- impostorscore=0 clxscore=1011 phishscore=0 spamscore=0 suspectscore=0
- adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2403140001 definitions=main-2403190185
+In-Reply-To: <618614fa6c62a232d95da55546137251e1847f48.camel@intel.com>
 
-On Tue, Mar 19, 2024 at 02:31:19PM +0000, Will Deacon wrote:
-> On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
-> > On 19.03.24 01:10, Sean Christopherson wrote:
-> > > On Mon, Mar 18, 2024, Vishal Annapurve wrote:
-> > > > On Mon, Mar 18, 2024 at 3:02 PM David Hildenbrand <david@redhat.com> wrote:
-> > > > > Second, we should find better ways to let an IOMMU map these pages,
-> > > > > *not* using GUP. There were already discussions on providing a similar
-> > > > > fd+offset-style interface instead. GUP really sounds like the wrong
-> > > > > approach here. Maybe we should look into passing not only guest_memfd,
-> > > > > but also "ordinary" memfds.
-> > > 
-> > > +1.  I am not completely opposed to letting SNP and TDX effectively convert
-> > > pages between private and shared, but I also completely agree that letting
-> > > anything gup() guest_memfd memory is likely to end in tears.
+On Mon, Mar 18, 2024 at 11:46:11PM +0000,
+"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
+
+> On Mon, 2024-02-26 at 00:26 -0800, isaku.yamahata@intel.com wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
 > > 
-> > Yes. Avoid it right from the start, if possible.
+> > TDX supports only write-back(WB) memory type for private memory
+> > architecturally so that (virtualized) memory type change doesn't make
+> > sense
+> > for private memory.  Also currently, page migration isn't supported
+> > for TDX
+> > yet. (TDX architecturally supports page migration. it's KVM and
+> > kernel
+> > implementation issue.)
 > > 
-> > People wanted guest_memfd to *not* have to mmap guest memory ("even for
-> > ordinary VMs"). Now people are saying we have to be able to mmap it in order
-> > to GUP it. It's getting tiring, really.
+> > Regarding memory type change (mtrr virtualization and lapic page
+> > mapping
+> > change), pages are zapped by kvm_zap_gfn_range().  On the next KVM
+> > page
+> > fault, the SPTE entry with a new memory type for the page is
+> > populated.
+> > Regarding page migration, pages are zapped by the mmu notifier. On
+> > the next
+> > KVM page fault, the new migrated page is populated.  Don't zap
+> > private
+> > pages on unmapping for those two cases.
 > 
-> From the pKVM side, we're working on guest_memfd primarily to avoid
-> diverging from what other CoCo solutions end up using, but if it gets
-> de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
-> today with anonymous memory, then it's a really hard sell to switch over
-> from what we have in production. We're also hoping that, over time,
-> guest_memfd will become more closely integrated with the mm subsystem to
-> enable things like hypervisor-assisted page migration, which we would
-> love to have.
+> Is the migration case relevant to TDX?
+
+We can forget about it because the page migration isn't supported yet.
+
+
+> > When deleting/moving a KVM memory slot, zap private pages. Typically
+> > tearing down VM.  Don't invalidate private page tables. i.e. zap only
+> > leaf
+> > SPTEs for KVM mmu that has a shared bit mask. The existing
+> > kvm_tdp_mmu_invalidate_all_roots() depends on role.invalid with read-
+> > lock
+> > of mmu_lock so that other vcpu can operate on KVM mmu concurrently. 
+> > It
+> > marks the root page table invalid and zaps SPTEs of the root page
+> > tables. The TDX module doesn't allow to unlink a protected root page
+> > table
+> > from the hardware and then allocate a new one for it. i.e. replacing
+> > a
+> > protected root page table.  Instead, zap only leaf SPTEs for KVM mmu
+> > with a
+> > shared bit mask set.
 > 
-> Today, we use the existing KVM interfaces (i.e. based on anonymous
-> memory) and it mostly works with the one significant exception that
-> accessing private memory via a GUP pin will crash the host kernel. If
-> all guest_memfd() can offer to solve that problem is preventing GUP
-> altogether, then I'd sooner just add that same restriction to what we
-> currently have instead of overhauling the user ABI in favour of
-> something which offers us very little in return.
+> I get the part about only zapping leafs and not the root and mid-level
+> PTEs. But why the MTRR, lapic page and migration part? Why should those
+> not be zapped? Why is migration a consideration when it is not
+> supported?
 
-How would we add the restriction to anonymous memory?
 
-Thinking aloud -- do you mean like some sort of "exclusive GUP" flag
-where mm can ensure that the exclusive GUP pin is the only pin? If the
-refcount for the page is >1, then the exclusive GUP fails. Any future
-GUP pin attempts would fail if the refcount has the EXCLUSIVE_BIAS.
+When we zap a page from the guest, and add it again on TDX even with the same
+GPA, the page is zeroed.  We'd like to keep memory contents for those cases.
 
-> On the mmap() side of things for guest_memfd, a simpler option for us
-> than what has currently been proposed might be to enforce that the VMM
-> has unmapped all private pages on vCPU run, failing the ioctl if that's
-> not the case. It needs a little more tracking in guest_memfd but I think
-> GUP will then fall out in the wash because only shared pages will be
-> mapped by userspace and so GUP will fail by construction for private
-> pages.
+Ok, let me add those whys and drop migration part. Here is the updated one.
 
-We can prevent GUP after the pages are marked private, but the pages
-could be marked private after the pages were already GUP'd. I don't have
-a good way to detect this, so converting a page to private is difficult.
+TDX supports only write-back(WB) memory type for private memory
+architecturally so that (virtualized) memory type change doesn't make
+sense for private memory.  When we remove the private page from the guest
+and re-add it with the same GPA, the page is zeroed.
 
-> We're happy to pursue alternative approaches using anonymous memory if
-> you'd prefer to keep guest_memfd limited in functionality (e.g.
-> preventing GUP of private pages by extending mapping_flags as per [1]),
-> but we're equally willing to contribute to guest_memfd if extensions are
-> welcome.
+Regarding memory type change (mtrr virtualization and lapic page
+mapping change), the current implementation zaps pages, and populate
+the page with new memory type on the next KVM page fault.  It doesn't
+work for TDX to have zeroed pages. Because TDX supports only WB, we
+ignore the request for MTRR and lapic page change to not zap private
+pages on unmapping for those two cases
+
+TDX Secure-EPT requires removing the guest pages first and leaf
+Secure-EPT pages in order. It doesn't allow zap a Secure-EPT entry
+that has child pages.  It doesn't work with the current TDP MMU
+zapping logic that zaps the root page table without touching child
+pages.  Instead, zap only leaf SPTEs for KVM mmu that has a shared bit
+mask.
+
 > 
-> What do you prefer?
+> > 
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c     | 61
+> > ++++++++++++++++++++++++++++++++++++--
+> >  arch/x86/kvm/mmu/tdp_mmu.c | 37 +++++++++++++++++++----
+> >  arch/x86/kvm/mmu/tdp_mmu.h |  5 ++--
+> >  3 files changed, 92 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 0d6d4506ec97..30c86e858ae4 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -6339,7 +6339,7 @@ static void kvm_mmu_zap_all_fast(struct kvm
+> > *kvm)
+> >          * e.g. before kvm_zap_obsolete_pages() could drop mmu_lock
+> > and yield.
+> >          */
+> >         if (tdp_mmu_enabled)
+> > -               kvm_tdp_mmu_invalidate_all_roots(kvm);
+> > +               kvm_tdp_mmu_invalidate_all_roots(kvm, true);
+> >  
+> >         /*
+> >          * Notify all vcpus to reload its shadow page table and flush
+> > TLB.
+> > @@ -6459,7 +6459,16 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t
+> > gfn_start, gfn_t gfn_end)
+> >         flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
+> >  
+> >         if (tdp_mmu_enabled)
+> > -               flush = kvm_tdp_mmu_zap_leafs(kvm, gfn_start,
+> > gfn_end, flush);
+> > +               /*
+> > +                * zap_private = false. Zap only shared pages.
+> > +                *
+> > +                * kvm_zap_gfn_range() is used when MTRR or PAT
+> > memory
+> > +                * type was changed.  Later on the next kvm page
+> > fault,
+> > +                * populate it with updated spte entry.
+> > +                * Because only WB is supported for private pages,
+> > don't
+> > +                * care of private pages.
+> > +                */
+> > +               flush = kvm_tdp_mmu_zap_leafs(kvm, gfn_start,
+> > gfn_end, flush, false);
+> >  
+> >         if (flush)
+> >                 kvm_flush_remote_tlbs_range(kvm, gfn_start, gfn_end -
+> > gfn_start);
+> > @@ -6905,10 +6914,56 @@ void kvm_arch_flush_shadow_all(struct kvm
+> > *kvm)
+> >         kvm_mmu_zap_all(kvm);
+> >  }
+> >  
+> > +static void kvm_mmu_zap_memslot(struct kvm *kvm, struct
+> > kvm_memory_slot *slot)
 > 
+> What about kvm_mmu_zap_memslot_leafs() instead?
 
-I like this as a stepping stone. For the Android use cases, we don't
-need to be able to convert a private page to shared and then also be
-able to GUP it. If you want to GUP a page, use anonymous memory and that
-memory will always be shared. If you don't care about GUP'ing (e.g. it's
-going to be guest-private or you otherwise know you won't be GUP'ing),
-you can use guest_memfd.
+Ok.
 
-I don't think this design prevents us from adding "sometimes you can
-GUP" to guest_memfd in the future. I don't think it creates extra
-changes for KVM since anonymous memory is already supported; although
-I'd have to add the support for Gunyah.
 
-> [1] https://lore.kernel.org/r/4b0fd46a-cc4f-4cb7-9f6f-ce19a2d3064e@redhat.com
+> > +{
+> > +       bool flush = false;
+> 
+> It doesn't need to be initialized if it passes false directly into
+> kvm_tdp_mmu_unmap_gfn_range(). It would make the code easier to
+> understand.
+> 
+> > +
+> > +       write_lock(&kvm->mmu_lock);
+> > +
+> > +       /*
+> > +        * Zapping non-leaf SPTEs, a.k.a. not-last SPTEs, isn't
+> > required, worst
+> > +        * case scenario we'll have unused shadow pages lying around
+> > until they
+> > +        * are recycled due to age or when the VM is destroyed.
+> > +        */
+> > +       if (tdp_mmu_enabled) {
+> > +               struct kvm_gfn_range range = {
+> > +                     .slot = slot,
+> > +                     .start = slot->base_gfn,
+> > +                     .end = slot->base_gfn + slot->npages,
+> > +                     .may_block = true,
+> > +
+> > +                     /*
+> > +                      * This handles both private gfn and shared
+> > gfn.
+> > +                      * All private page should be zapped on memslot
+> > deletion.
+> > +                      */
+> > +                     .only_private = true,
+> > +                     .only_shared = true,
+> 
+> only_private and only_shared are both true? Shouldn't they both be
+> false? (or just unset)
 
-Thanks,
-Elliot
+I replied at.
+https://lore.kernel.org/kvm/ZUO1Giju0GkUdF0o@google.com/
 
+> 
+> > +               };
+> > +
+> > +               flush = kvm_tdp_mmu_unmap_gfn_range(kvm, &range,
+> > flush);
+> > +       } else {
+> > +               /* TDX supports only TDP-MMU case. */
+> > +               WARN_ON_ONCE(1);
+> 
+> How about a KVM_BUG_ON() instead? If somehow this is reached, we don't
+> want the caller thinking the pages are zapped, then enter the guest
+> with pages mapped that have gone elsewhere.
+> 
+> > +               flush = true;
+> 
+> Why flush?
+
+Those are only safe guard. TDX supports only TDP MMU. Let me drop them.
+
+
+> > +       }
+> > +       if (flush)
+> > +               kvm_flush_remote_tlbs(kvm);
+> > +
+> > +       write_unlock(&kvm->mmu_lock);
+> > +}
+> > +
+> >  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+> >                                    struct kvm_memory_slot *slot)
+> >  {
+> > -       kvm_mmu_zap_all_fast(kvm);
+> > +       if (kvm_gfn_shared_mask(kvm))
+> 
+> There seems to be an attempt to abstract away the existence of Secure-
+> EPT in mmu.c, that is not fully successful. In this case the code
+> checks kvm_gfn_shared_mask() to see if it needs to handle the zapping
+> in a way specific needed by S-EPT. It ends up being a little confusing
+> because the actual check is about whether there is a shared bit. It
+> only works because only S-EPT is the only thing that has a
+> kvm_gfn_shared_mask().
+> 
+> Doing something like (kvm->arch.vm_type == KVM_X86_TDX_VM) looks wrong,
+> but is more honest about what we are getting up to here. I'm not sure
+> though, what do you think?
+
+Right, I attempted and failed in zapping case.  This is due to the restriction
+that the Secure-EPT pages must be removed from the leaves.  the VMX case (also
+NPT, even SNP) heavily depends on zapping root entry as optimization.
+
+I can think of
+- add TDX check. Looks wrong
+- Use kvm_gfn_shared_mask(kvm). confusing
+- Give other name for this check like zap_from_leafs (or better name?)
+  The implementation is same to kvm_gfn_shared_mask() with comment.
+  - Or we can add a boolean variable to struct kvm
+  
+
+> >  void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index d47f0daf1b03..e7514a807134 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -37,7 +37,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+> >          * for zapping and thus puts the TDP MMU's reference to each
+> > root, i.e.
+> >          * ultimately frees all roots.
+> >          */
+> > -       kvm_tdp_mmu_invalidate_all_roots(kvm);
+> > +       kvm_tdp_mmu_invalidate_all_roots(kvm, false);
+> >         kvm_tdp_mmu_zap_invalidated_roots(kvm);
+> >  
+> >         WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
+> > @@ -771,7 +771,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct
+> > kvm_mmu_page *sp)
+> >   * operation can cause a soft lockup.
+> >   */
+> >  static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page
+> > *root,
+> > -                             gfn_t start, gfn_t end, bool can_yield,
+> > bool flush)
+> > +                             gfn_t start, gfn_t end, bool can_yield,
+> > bool flush,
+> > +                             bool zap_private)
+> >  {
+> >         struct tdp_iter iter;
+> >  
+> > @@ -779,6 +780,10 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm,
+> > struct kvm_mmu_page *root,
+> >  
+> >         lockdep_assert_held_write(&kvm->mmu_lock);
+> >  
+> > +       WARN_ON_ONCE(zap_private && !is_private_sp(root));
+> 
+> All the callers have zap_private as zap_private && is_private_sp(root).
+> What badness is it trying to uncover?
+
+I added this during debug. Let me drop it.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
