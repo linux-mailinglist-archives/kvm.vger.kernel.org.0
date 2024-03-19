@@ -1,165 +1,181 @@
-Return-Path: <kvm+bounces-12115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8158F87FA3E
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 10:00:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 847F887FB0C
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 10:47:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FCD41F2203E
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 09:00:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CC772822BB
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 09:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386B87CF07;
-	Tue, 19 Mar 2024 09:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889437D095;
+	Tue, 19 Mar 2024 09:47:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="Q+V2F3gu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tJoP+lQ/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BA87C092
-	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 09:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3F71E536
+	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 09:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710838824; cv=none; b=qY4TvyF6Iq01V27EPphHB0/xseVKOsX/zwXTzMEjSDY6wfoQYFcSEsaP+NZSSXtLaCQuEPn/ZoApy0fW7o93wCCR49/6oJJUZOgWEwFQUyMOPzQhpgcFukUZxLuiANEClymL6N2DIjBF3FTBGDKT80KHBkdcXNJGlRB2EFqGY7o=
+	t=1710841668; cv=none; b=Lu5KQdLoXju+lG8n+EPvRpzqofX11hwkVePMUHKp4jVH27jTm9PyvACZGtx5M0eO60TFl3J9PZ45phFhKQrWbb8erDxP7CqK+DS2g1XNVKsBYKE/Tj7DMJSQXyOtgx0E4sKrGpabJpdF/aEk5ofGDpUqTm3/EtMTShHaQNVig4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710838824; c=relaxed/simple;
-	bh=LYZBi+bUQakFekCjRxf78pErckbW983ar7dUR9YXSYU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=RV23Y5ZY+UgM6IQn/BMMuUI68qaffnnMV8SbYLY+SekZBQXpY40CmFZdzkbbWs6T0L7bvemku9/kXs50astZ6j5Q1OfW1/s32ZXHjJ77q1l6mDAVQFLPcAkbjSG4ZXrTYh5jfLcktgN8xlJNhsgKg9KTMllt1bPpHBo8W+syGEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=Q+V2F3gu; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d220e39907so76170791fa.1
-        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 02:00:22 -0700 (PDT)
+	s=arc-20240116; t=1710841668; c=relaxed/simple;
+	bh=tB59vQHrrWfNtXgOa+QXun/KGjIcXOV4U0cREwm/b3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GVNaqUpHx3eTZWff4GVxs5uObTqvBkmvUAVvkIlk59lRkQPNdQMea41KlkJ+jds2Ar35DjrV9k9kIh8AguCvkVNhJ2rmawfVn3YIWPX52W9Jlj9Up7gj+P/fMnrYJztYbWTjvIZYvbfb/5UZPXBTS/vqU8J65i886htvuVKA/Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tJoP+lQ/; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a466a1f9ea0so358967966b.1
+        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 02:47:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1710838819; x=1711443619; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7WRXNz8lUy0QV9/Mo1M3xURlEYVlBAf//6FRdDs8S4U=;
-        b=Q+V2F3gu70TALyVuEdiRcmgpZAM/vSHwlhw9d1i83Mx0MGjZo7iT3J57xljEvY6RZA
-         TpT9GBUywr+W7WmjCQI6ZA9qJs/q9X9H9dey+rjyOxskRz9AL6jIzzNvf4eyIs64tfWk
-         MA5ifEg68aVK0HMxwBsmMHHPYj5MH5LbIgX4E=
+        d=google.com; s=20230601; t=1710841665; x=1711446465; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/HHhyDwGvRCaPjjju0RIkoEll4g5zmeDctgezA6gAMo=;
+        b=tJoP+lQ/a6jFixhtP3WPuGkd0n2eYXDa6zvMYMLIKh2qVUnJKtj6iFcPhHQbWX3I/H
+         xUc7ksE6YiylkeA5HbuqUki8P7QwMoTtad23/40wg++njdRPLIFofqUiQTmpQI3iBzAK
+         Mds6eh8m3vKJOzFbgWF6GEkZGUY/nVsvlwBg/8koPH+lAMuYO0BdYBZ7ys/lF317tXFQ
+         NmEQKPYQWrftM4HyaFjyu0/5q5jgbSr6mj1fA6PE9w58Vh2xEj+nyx24+34k8jlDodIF
+         r9I3XdnjZ1K4A6nQr0L+3V2LL8x6Mhr3xxpFZCL8NxhP22rpBnASn9ukcXVAUvy/hz0M
+         gxXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710838819; x=1711443619;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7WRXNz8lUy0QV9/Mo1M3xURlEYVlBAf//6FRdDs8S4U=;
-        b=ZKkOi13QaUc6RYwxjdO0ECQrM3ZlpdrsfatauHreMiQrw3dzsy1v4euwSFIYZZHAjd
-         k6roCUhpdXsRV90tNNB21gNIS+JzBfFq25exYL3hilRPByWvExUtSGssg2RhD9ayabY8
-         HLhSDkKCpCy6VflaHHY18NtZWF5z3loLYzqU3XV6wOjfiMZ6Skbw9+oxoPVeK9b8yVSn
-         0h6esW5q5XcCOWZjy/0V6K1AryJEWnI+O/3abg+LupVcfh51iADhJHKW3wsY1fBD9TCO
-         KyQA0i2qfIC63632wNZf87ZhsKp9x+DPuf2NNptl1yVnm2NpiWmuJRzbb2+miPQAwEsi
-         J/Bw==
-X-Gm-Message-State: AOJu0YzTxZC5EDyuYmo+iR8t/N9fcvvx9V7Hdql+k4i1+0Drni2dbsUw
-	bhoeG0/LJydKYrDJMXHt0usztyKeROQqKJax43DSw6W+hdr1hL3dEC9IRfUvdSVExMWJTdpEaD8
-	Mv1ZyjceGChGYUmgXCYCUbJrNxwty+hDGdgA6JTCOEevLTtXh9A==
-X-Google-Smtp-Source: AGHT+IFs5BUm4uuBapI+f/gOF/bcQhLF0wHkL1zPCcd0XaPcTT0m7DPRL82yKadrmbcnu13Unijcju8bKu9rpDCoJds=
-X-Received: by 2002:a2e:a30b:0:b0:2d4:72be:e2c6 with SMTP id
- l11-20020a2ea30b000000b002d472bee2c6mr9584001lje.52.1710838819457; Tue, 19
- Mar 2024 02:00:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710841665; x=1711446465;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/HHhyDwGvRCaPjjju0RIkoEll4g5zmeDctgezA6gAMo=;
+        b=XT0eRfJGd9asUUwMFhSTlFUgpAARpfRboI/6CUct6XzMSYHiHwB/wyvG9CfeICNflB
+         x4lZHlHn+NAtCImTfFyzACaWzzdZBWqPHj7N2MGTkZiNThQvzTGYrJagJHAfevvvIZPX
+         q3GSj7Q/jG04wm5ZfU2bgrEoOmAjozJUqyp3LqfedCtSU7NJUlBlEZ6eNrGvSmUAiOtF
+         gvdVTEAwTrop52QFIVS88cu1rIyJTD2pfrg75VJ6IjfhatRblEFzGRbVeSpQ/kGLOQFu
+         smYhctV3PlKorh84syyG0NtQHsk5CpnCqtdkUW+X0nyvZqxPQvijeSZymB+z5vUUJ6t9
+         ugNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVvUhEz4nHlfd/1TUwpHm6b0/zwCFQGI1gW5n/OA4VxKT+T2BfMZaXU2PMadDnZ5pICNm2ipEFtdy4aFbYn3LbcPJgP
+X-Gm-Message-State: AOJu0Yz52X/8kH4h7AnVn+aCk/aeRC5M7rKQEix3qA7q7QgKyhxEtYEb
+	/pg/2LanItW8jPByNwX9TpCJZemAB59tngnFhyY5PrpK5x/CoKBV2HrgPffk/Q==
+X-Google-Smtp-Source: AGHT+IF/puef8zhuN1727aKfDCay8r7kOdm59liIzFTyv3w/POjfIRKnd9fb5D53y8VNfxHFZefOTw==
+X-Received: by 2002:a05:6402:448c:b0:568:1599:b854 with SMTP id er12-20020a056402448c00b005681599b854mr6246355edb.42.1710841665168;
+        Tue, 19 Mar 2024 02:47:45 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id p11-20020a056402044b00b00568d325acf8sm2526799edw.20.2024.03.19.02.47.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 02:47:44 -0700 (PDT)
+Date: Tue, 19 Mar 2024 09:47:40 +0000
+From: Quentin Perret <qperret@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	viro@zeniv.linux.org.uk, brauner@kernel.org,
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	vannapurve@google.com, ackerleytng@google.com,
+	mail@maciej.szmigiero.name, michael.roth@amd.com,
+	wei.w.wang@intel.com, liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com, steven.price@arm.com,
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
+	keirf@google.com, linux-mm@kvack.org
+Subject: Re: folio_mmapped
+Message-ID: <ZflfPDhZFufZdmp0@google.com>
+References: <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
+ <Zd8qvwQ05xBDXEkp@google.com>
+ <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
+ <Zd82V1aY-ZDyaG8U@google.com>
+ <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
+ <ZeXAOit6O0stdxw3@google.com>
+ <ZeYbUjiIkPevjrRR@google.com>
+ <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
+ <20240304132732963-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <4b0fd46a-cc4f-4cb7-9f6f-ce19a2d3064e@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Igor Raits <igor@gooddata.com>
-Date: Tue, 19 Mar 2024 10:00:08 +0100
-Message-ID: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
-Subject: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
-To: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b0fd46a-cc4f-4cb7-9f6f-ce19a2d3064e@redhat.com>
 
-Hello,
+On Monday 04 Mar 2024 at 22:58:49 (+0100), David Hildenbrand wrote:
+> On 04.03.24 22:43, Elliot Berman wrote:
+> > On Mon, Mar 04, 2024 at 09:17:05PM +0100, David Hildenbrand wrote:
+> > > On 04.03.24 20:04, Sean Christopherson wrote:
+> > > > On Mon, Mar 04, 2024, Quentin Perret wrote:
+> > > > > > As discussed in the sub-thread, that might still be required.
+> > > > > > 
+> > > > > > One could think about completely forbidding GUP on these mmap'ed
+> > > > > > guest-memfds. But likely, there might be use cases in the future where you
+> > > > > > want to use GUP on shared memory inside a guest_memfd.
+> > > > > > 
+> > > > > > (the iouring example I gave might currently not work because
+> > > > > > FOLL_PIN|FOLL_LONGTERM|FOLL_WRITE only works on shmem+hugetlb, and
+> > > > > > guest_memfd will likely not be detected as shmem; 8ac268436e6d contains some
+> > > > > > details)
+> > > > > 
+> > > > > Perhaps it would be wise to start with GUP being forbidden if the
+> > > > > current users do not need it (not sure if that is the case in Android,
+> > > > > I'll check) ? We can always relax this constraint later when/if the
+> > > > > use-cases arise, which is obviously much harder to do the other way
+> > > > > around.
+> > > > 
+> > > > +1000.  At least on the KVM side, I would like to be as conservative as possible
+> > > > when it comes to letting anything other than the guest access guest_memfd.
+> > > 
+> > > So we'll have to do it similar to any occurrences of "secretmem" in gup.c.
+> > > We'll have to see how to marry KVM guest_memfd with core-mm code similar to
+> > > e.g., folio_is_secretmem().
+> > > 
+> > > IIRC, we might not be able to de-reference the actual mapping because it
+> > > could get free concurrently ...
+> > > 
+> > > That will then prohibit any kind of GUP access to these pages, including
+> > > reading/writing for ptrace/debugging purposes, for core dumping purposes
+> > > etc. But at least, you know that nobody was able to optain page references
+> > > using GUP that might be used for reading/writing later.
+> > 
+> > Do you have any concerns to add to enum mapping_flags, AS_NOGUP, and
+> > replacing folio_is_secretmem() with a test of this bit instead of
+> > comparing the a_ops? I think it scales better.
+> 
+> The only concern I have are races, but let's look into the details:
+> 
+> In GUP-fast, we can essentially race with unmap of folios, munmap() of VMAs
+> etc.
+> 
+> We had a similar discussion recently about possible races. It's documented
+> in folio_fast_pin_allowed() regarding disabled IRQs and RCU grace periods.
+> 
+> "inodes and thus their mappings are freed under RCU, which means the mapping
+> cannot be freed beneath us and thus we can safely dereference it."
+> 
+> So if we follow the same rules as folio_fast_pin_allowed(), we can
+> de-reference folio->mapping, for example comparing mapping->a_ops.
+> 
+> [folio_is_secretmem should better follow the same approach]
 
-We have started to observe kernel crashes on 6.7.y kernels (atm we
-have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
-have nodes of cluster it looks stable. Please see stacktrace below. If
-you need more information please let me know.
+Resurecting this discussion, I had discussions internally and as it
+turns out Android makes extensive use of vhost/vsock when communicating
+with guest VMs, which requires GUP. So, my bad, not supporting GUP for
+the pKVM variant of guest_memfd is a bit of a non-starter, we'll need to
+support it from the start. But again this should be a matter of 'simply'
+having a dedicated KVM exit reason so hopefully it's not too bad.
 
-We do not have a consistent reproducer but when we put some bigger
-network load on a VM, the hypervisor's kernel crashes.
-
-Help is much appreciated! We are happy to test any patches.
-
-[62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
-[62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
-   E      6.7.10-1.gdc.el9.x86_64 #1
-[62254.183743] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
-2.14.1 12/17/2023
-[62254.192083] RIP: 0010:skb_release_data+0xb8/0x1e0
-[62254.197357] Code: 48 83 c3 01 39 d8 7e 54 48 89 d8 48 c1 e0 04 41
-80 7d 7e 00 49 8b 6c 04 30 79 0f 44 89 f6 48 89 ef e8 4c e4 ff ff 84
-c0 75 d0 <48> 8b 45 08 a8 01 0f 85 09 01 00 00 e9 d9 00 00 00 0f 1f 44
-00 00
-[62254.217013] RSP: 0018:ffffa975a0247ba8 EFLAGS: 00010206
-[62254.222692] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000785
-[62254.230263] RDX: 0000000000000016 RSI: 0000000000000002 RDI: ffff989862b32b00
-[62254.237878] RBP: 4f2b318c69a8b0f9 R08: 000000000001fe4d R09: 000000000000003a
-[62254.245417] R10: 0000000000000000 R11: 0000000000001736 R12: ffff9880b819aec0
-[62254.252963] R13: ffff989862b32b00 R14: 0000000000000000 R15: 0000000000000002
-[62254.260591] FS:  00007f6cf388bf80(0000) GS:ffff98b85fbc0000(0000)
-knlGS:0000000000000000
-[62254.269061] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[62254.275170] CR2: 000000c002236020 CR3: 000000387d37a002 CR4: 0000000000770ef0
-[62254.282733] PKRU: 55555554
-[62254.285911] Call Trace:
-[62254.288884]  <TASK>
-[62254.291549]  ? die+0x33/0x90
-[62254.294769]  ? do_trap+0xe0/0x110
-[62254.298405]  ? do_error_trap+0x65/0x80
-[62254.302471]  ? exc_stack_segment+0x35/0x50
-[62254.306884]  ? asm_exc_stack_segment+0x22/0x30
-[62254.311637]  ? skb_release_data+0xb8/0x1e0
-[62254.316047]  kfree_skb_list_reason+0x6d/0x210
-[62254.320697]  ? free_unref_page_commit+0x80/0x2f0
-[62254.325700]  ? free_unref_page+0xe9/0x130
-[62254.330013]  skb_release_data+0xfc/0x1e0
-[62254.334261]  consume_skb+0x45/0xd0
-[62254.338077]  tun_do_read+0x68/0x1f0 [tun]
-[62254.342414]  tun_recvmsg+0x7e/0x160 [tun]
-[62254.346696]  handle_rx+0x3ab/0x750 [vhost_net]
-[62254.351488]  vhost_worker+0x42/0x70 [vhost]
-[62254.355934]  vhost_task_fn+0x4b/0xb0
-[62254.359758]  ? finish_task_switch.isra.0+0x8f/0x2a0
-[62254.364882]  ? __pfx_vhost_task_fn+0x10/0x10
-[62254.369390]  ? __pfx_vhost_task_fn+0x10/0x10
-[62254.373888]  ret_from_fork+0x2d/0x50
-[62254.377687]  ? __pfx_vhost_task_fn+0x10/0x10
-[62254.382169]  ret_from_fork_asm+0x1b/0x30
-[62254.386310]  </TASK>
-[62254.388705] Modules linked in: nf_tables(E) nf_conntrack_netlink(E)
-vhost_net(E) vhost(E) vhost_iotlb(E) tap(E) tun(E) mptcp_diag(E)
-xsk_diag(E) udp_diag(E) raw_diag(E) unix_diag(E) af_packet_diag(E)
-netlink_diag(E) tcp_diag(E) inet_diag(E) rpcsec_gss_krb5(E)
-auth_rpcgss(E) nfsv4(E) dns_resolver(E) nfs(E) lockd(E) grace(E)
-fscache(E) netfs(E) netconsole(E) ib_core(E) scsi_transport_iscsi(E)
-sch_ingress(E) target_core_user(E) uio(E) target_core_pscsi(E)
-target_core_file(E) target_core_iblock(E) iscsi_target_mod(E)
-target_core_mod(E) 8021q(E) garp(E) mrp(E) bonding(E) tls(E)
-nfnetlink_cttimeout(E) nfnetlink(E) openvswitch(E) nf_conncount(E)
-nf_nat(E) binfmt_misc(E) dell_rbu(E) sunrpc(E) vfat(E) fat(E)
-dm_service_time(E) dm_multipath(E) btrfs(E) xor(E) zstd_compress(E)
-raid6_pq(E) ipmi_ssif(E) intel_rapl_msr(E) intel_rapl_common(E)
-amd64_edac(E) edac_mce_amd(E) kvm_amd(E) kvm(E) irqbypass(E)
-dell_smbios(E) acpi_ipmi(E) dcdbas(E) dell_wmi_descriptor(E)
-wmi_bmof(E) rapl(E) ipmi_si(E) acp
-Mar 19 09:40:16 10.12.17.70 i_cpufreq(E) ipmi_devintf(E)
-[62254.388751]  mgag200(E) i2c_algo_bit(E) ptdma(E) wmi(E)
-i2c_piix4(E) k10temp(E) ipmi_msghandler(E) acpi_power_meter(E) fuse(E)
-zram(E) ext4(E) mbcache(E) jbd2(E) dm_crypt(E) sd_mod(E) t10_pi(E)
-sg(E) ice(E) crct10dif_pclmul(E) crc32_pclmul(E) polyval_clmulni(E)
-polyval_generic(E) ahci(E) libahci(E) ghash_clmulni_intel(E)
-sha512_ssse3(E) libata(E) megaraid_sas(E) ccp(E) gnss(E) sp5100_tco(E)
-dm_mirror(E) dm_region_hash(E) dm_log(E) dm_mod(E) nf_conntrack(E)
-libcrc32c(E) crc32c_intel(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E)
-br_netfilter(E) bridge(E) stp(E) llc(E)
-[62254.480070] Unloaded tainted modules: fjes(E):2 padlock_aes(E):3
-[62254.537711] ---[ end trace 0000000000000000 ]---
-
-Thanks in advance!
+Thanks,
+Quentin
 
