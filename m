@@ -1,124 +1,138 @@
-Return-Path: <kvm+bounces-12176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6047B880502
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 19:42:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C102880558
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 20:24:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14B881F23AFD
-	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 18:42:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA405283DCC
+	for <lists+kvm@lfdr.de>; Tue, 19 Mar 2024 19:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A6539AFD;
-	Tue, 19 Mar 2024 18:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E27939FFE;
+	Tue, 19 Mar 2024 19:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b="bZRSuirt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PZe70Yz7"
 X-Original-To: kvm@vger.kernel.org
-Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1383838F;
-	Tue, 19 Mar 2024 18:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.155.224.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE0839FC1
+	for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 19:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710873743; cv=none; b=ut+VYbSRXHZyxkAFEhTTPa9oXM0w17A09TEynD1lCP9Uaipct+DRv02DSkDQIiYOoMQPPoME3LBekTSgvj2WB4RDsimwtJU67+rjh/zHMdhqNlVkGmQPNuKHJwzoFFB7D+EAvaEdL29p3m/fDV+YFdkWFsWFk8V77AXeKCJ3tuo=
+	t=1710876282; cv=none; b=KtOlKZ9RukTHEFR1ot2Qumr56CN6TB7EUHsd/6LJ3Ol7mr+loUoLQofk5MfCf3f6dlDSyJGosNio5SbJQI8RK3cg29zWnkN+bbuPTo2ZpSOVXBOvTXmHJ1ym1oEsdqkh60CyjtTAGjniN3sMeMyTvBcCgX52zSjCg3avlNWBtqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710873743; c=relaxed/simple;
-	bh=VN/elIqf9LElJlgNTtPrq8H9FEwfVHcaHoZhKnOzMuw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=AQ/n38V5DJK+f9aLNkuRxOAH5Mf/d4Hbl0TQKQvfoKrvuTK3UEn7HLi3mh+EQG/e91bZuZk7p8DgavimUh09+JI9WY/gsNW3F0SAqlvdHFxQwGNVY2NqcF6kbV8xH5KdPNJOzDdD50DtBCfFarjFWO0j7Ijz5cxbkq0oxoE9uKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com; spf=pass smtp.mailfrom=raptorengineering.com; dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b=bZRSuirt; arc=none smtp.client-ip=23.155.224.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raptorengineering.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 6486482853FD;
-	Tue, 19 Mar 2024 13:36:55 -0500 (CDT)
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id zNGRQb1hjFIX; Tue, 19 Mar 2024 13:36:53 -0500 (CDT)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 95ED982857C6;
-	Tue, 19 Mar 2024 13:36:53 -0500 (CDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com 95ED982857C6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
-	t=1710873413; bh=jjl+qmMtiRVpAUsU+d+UXWZRLmd8K+2jgNQsp7lj+04=;
-	h=Date:From:To:Message-ID:MIME-Version;
-	b=bZRSuirtYJVJx6DLzBTldOSSqPcXRGEoyzhi4eq6ezoK3oOseSQDCxWemf+VcT27i
-	 P/2bOL4Vy81473wmz5gBDMJvZNe96fzmvW6jtLHauh0qPnwNM/o/JoLAm8dX1OX4HK
-	 pEZEQTCZDnUY8x8A6J7bhD/nF/t+H+0XQdN7gKfc=
-X-Virus-Scanned: amavisd-new at rptsys.com
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id C_5K4lh6-1JZ; Tue, 19 Mar 2024 13:36:53 -0500 (CDT)
-Received: from vali.starlink.edu (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 531A182853FD;
-	Tue, 19 Mar 2024 13:36:53 -0500 (CDT)
-Date: Tue, 19 Mar 2024 13:36:51 -0500 (CDT)
-From: Timothy Pearson <tpearson@raptorengineering.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Shivaprasad G Bhat <sbhat@linux.ibm.com>, 
-	Timothy Pearson <tpearson@raptorengineering.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, 
-	linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, npiggin <npiggin@gmail.com>, 
-	christophe leroy <christophe.leroy@csgroup.eu>, 
-	aneesh kumar <aneesh.kumar@kernel.org>, 
-	naveen n rao <naveen.n.rao@linux.ibm.com>, 
-	gbatra <gbatra@linux.vnet.ibm.com>, brking@linux.vnet.ibm.com, 
-	Alexey Kardashevskiy <aik@ozlabs.ru>, robh@kernel.org, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	kvm <kvm@vger.kernel.org>, aik <aik@amd.com>, msuchanek@suse.de, 
-	jroedel <jroedel@suse.de>, vaibhav <vaibhav@linux.ibm.com>, 
-	svaidy@linux.ibm.com
-Message-ID: <1386271253.24278379.1710873411133.JavaMail.zimbra@raptorengineeringinc.com>
-In-Reply-To: <20240319143202.GA66976@ziepe.ca>
-References: <171026724548.8367.8321359354119254395.stgit@linux.ibm.com> <171026725393.8367.17497620074051138306.stgit@linux.ibm.com> <20240319143202.GA66976@ziepe.ca>
-Subject: Re: [RFC PATCH 1/3] powerpc/pseries/iommu: Bring back userspace
- view for single level TCE tables
+	s=arc-20240116; t=1710876282; c=relaxed/simple;
+	bh=SPOcqFOa4IEJC4nSqQwjCzcE1cmOqlod9iEJDt4l1Tk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b7GjqSY/Zb+wpEUoJYsJwavaUOz2e9emGs5nUbFYHD/xzlB1FrHDsYOpLd8gMwXTyWvyOeUysDGLlQAXANiI6i9F4jBBWowluBbupPNI6A2f+KIWjg8GFeyaytuWOCo7RempyW4pAHmKOFJG3oFrzqfxgJQyD/KGpRvtROcVEVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PZe70Yz7; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710876279;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=054PSwUxcEoyTTyT0YXDp5Ih5pKTqj1jctjnvFZE9RA=;
+	b=PZe70Yz7POOFOTaicoaaPjvQmXajtstRibO8+6qqDwpGZ/qoF3BH9xNv4FyhzIN/kKKj/i
+	ROrF83qYX5wOUboYDxgd6LNQYLT8zjKC1cB6ykXH1ytPmoFgjc9ZRAfHOmxBP+SYk9+sSn
+	4WVoRoHj1nXqRrSn91pvaTwrxy1C7ck=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-683-ajv8IHgKOKqmbY8Fs0tW_A-1; Tue, 19 Mar 2024 15:24:38 -0400
+X-MC-Unique: ajv8IHgKOKqmbY8Fs0tW_A-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3416632aeffso1537239f8f.1
+        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 12:24:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710876277; x=1711481077;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=054PSwUxcEoyTTyT0YXDp5Ih5pKTqj1jctjnvFZE9RA=;
+        b=jB/Y0IbnXXgF9xwxQqLYQS6El8pZz8c7SUinEeWNSmo899Jzztgu9PBuU/YR2OH9+0
+         P0fuq6rRCGr2SZRdHEEJXClCCM7GElP2Q0Egn6ePBDBbFDx+9fKEqamfwkNUhHNp0aIi
+         DH1I3gEUWQR3dAj6WWT4X+CAe/09YphoGm7aguE4rImkMlCPkvwgUkBS/Bk/O+RhMC+w
+         quQ0AezVGAmFfMBOVHJcv3sABqtHdI/5aY9JRaKkdvjA196IR5EF6mq2C14N85Orcq2o
+         QZK/jZziL8g2cx87zqLFztov/jitRty8w3rLjEeJA4kERkldvw+IucgMUb8ob5IEdRdy
+         ccMA==
+X-Gm-Message-State: AOJu0YyfSOyN42gK1qWB2GvofDLQPlyLLJNe96/nnHtHnq5yLq54XdeM
+	4Y+pMzTeMg6k+CSunhOGFI6VmNeMw/8jbpVvf6PgsjNYs6TEJvaYV+MRsovqd9O+jvNjCKoVQU7
+	/NsW9w1Ccz6ihgnHP2e4I85k7KBQNbjdsMDgwh81ATvH12NQJVg==
+X-Received: by 2002:a05:6000:104e:b0:33e:d1fa:6627 with SMTP id c14-20020a056000104e00b0033ed1fa6627mr7835983wrx.50.1710876277023;
+        Tue, 19 Mar 2024 12:24:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQZid9lWxUAfX9KUhv4EBBJ2gUziSxS4M3VUS2nzuzhpo41M0C+zkRsiu9Q7+Z7XgReUIshA==
+X-Received: by 2002:a05:6000:104e:b0:33e:d1fa:6627 with SMTP id c14-20020a056000104e00b0033ed1fa6627mr7835957wrx.50.1710876276421;
+        Tue, 19 Mar 2024 12:24:36 -0700 (PDT)
+Received: from redhat.com ([2.52.6.254])
+        by smtp.gmail.com with ESMTPSA id v3-20020adfe4c3000000b0033e052be14fsm12994886wrm.98.2024.03.19.12.24.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 12:24:35 -0700 (PDT)
+Date: Tue, 19 Mar 2024 15:24:31 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	alex.williamson@redhat.com, andrew@daynix.com, david@redhat.com,
+	dtatulea@nvidia.com, eperezma@redhat.com, feliu@nvidia.com,
+	gregkh@linuxfoundation.org, jasowang@redhat.com,
+	jean-philippe@linaro.org, jonah.palmer@oracle.com,
+	leiyang@redhat.com, lingshan.zhu@intel.com,
+	maxime.coquelin@redhat.com, ricardo@marliere.net,
+	shannon.nelson@amd.com, stable@kernel.org,
+	steven.sistare@oracle.com, suzuki.poulose@arm.com,
+	xuanzhuo@linux.alibaba.com, yishaih@nvidia.com
+Subject: Re: [GIT PULL] virtio: features, fixes
+Message-ID: <20240319152109-mutt-send-email-mst@kernel.org>
+References: <20240319034143-mutt-send-email-mst@kernel.org>
+ <CAHk-=wi363CLXBm=jB=eAtJQ18E-h4Vwrgmd6_7Q=DN+9u8z6w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC122 (Linux)/8.5.0_GA_3042)
-Thread-Topic: powerpc/pseries/iommu: Bring back userspace view for single level TCE tables
-Thread-Index: eRa4lP8lSoGisWT5ua6Vo0RITwt14g==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wi363CLXBm=jB=eAtJQ18E-h4Vwrgmd6_7Q=DN+9u8z6w@mail.gmail.com>
 
-
-
------ Original Message -----
-> From: "Jason Gunthorpe" <jgg@ziepe.ca>
-> To: "Shivaprasad G Bhat" <sbhat@linux.ibm.com>
-> Cc: "Timothy Pearson" <tpearson@raptorengineering.com>, "Alex Williamson" <alex.williamson@redhat.com>, "linuxppc-dev"
-> <linuxppc-dev@lists.ozlabs.org>, "Michael Ellerman" <mpe@ellerman.id.au>, "npiggin" <npiggin@gmail.com>, "christophe
-> leroy" <christophe.leroy@csgroup.eu>, "aneesh kumar" <aneesh.kumar@kernel.org>, "naveen n rao"
-> <naveen.n.rao@linux.ibm.com>, "gbatra" <gbatra@linux.vnet.ibm.com>, brking@linux.vnet.ibm.com, "Alexey Kardashevskiy"
-> <aik@ozlabs.ru>, robh@kernel.org, "linux-kernel" <linux-kernel@vger.kernel.org>, "kvm" <kvm@vger.kernel.org>, "aik"
-> <aik@amd.com>, msuchanek@suse.de, "jroedel" <jroedel@suse.de>, "vaibhav" <vaibhav@linux.ibm.com>, svaidy@linux.ibm.com
-> Sent: Tuesday, March 19, 2024 9:32:02 AM
-> Subject: Re: [RFC PATCH 1/3] powerpc/pseries/iommu: Bring back userspace view for single level TCE tables
-
-> On Tue, Mar 12, 2024 at 01:14:20PM -0500, Shivaprasad G Bhat wrote:
->> The commit 090bad39b237a ("powerpc/powernv: Add indirect levels to
->> it_userspace") which implemented the tce indirect levels
->> support for PowerNV ended up removing the single level support
->> which existed by default(generic tce_iommu_userspace_view_alloc/free()
->> calls). On pSeries the TCEs are single level, and the allocation
->> of userspace view is lost with the removal of generic code.
+On Tue, Mar 19, 2024 at 11:03:44AM -0700, Linus Torvalds wrote:
+> On Tue, 19 Mar 2024 at 00:41, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > virtio: features, fixes
+> >
+> > Per vq sizes in vdpa.
+> > Info query for block devices support in vdpa.
+> > DMA sync callbacks in vduse.
+> >
+> > Fixes, cleanups.
 > 
-> :( :(
+> Grr. I thought the merge message was a bit too terse, but I let it slide.
 > 
-> If this has been broken since 2018 and nobody cared till now can we
-> please go in a direction of moving this code to the new iommu APIs
-> instead of doubling down on more of this old stuff that apparently
-> almost nobody cares about ??
+> But only after pushing it out do I notice that not only was the pull
+> request message overly terse, you had also rebased this all just
+> moments before sending the pull request and didn't even give a hit of
+> a reason for that.
 > 
-> Jason
+> So I missed that, and the merge is out now, but this was NOT OK.
+> 
+> Yes, rebasing happens. But last-minute rebasing needs to be explained,
+> not some kind of nasty surprise after-the-fact.
+> 
+> And that pull request explanation was really borderline even *without*
+> that issue.
+> 
+>                 Linus
 
-Just FYI Raptor is working on porting things over to the new APIs.  RFC patches should be posted in the next week or two.
+OK thanks Linus and sorry. I did that rebase for testing then I thought
+hey history looks much nicer now why don't I switch to that.  Just goes
+to show not to do this thing past midnight, I write better merge
+messages at sane hours, too.
+
+-- 
+MST
+
 
