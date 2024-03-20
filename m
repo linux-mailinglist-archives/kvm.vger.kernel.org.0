@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-12313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12314-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF6B881595
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 17:26:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9CE08815C2
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 17:39:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3837B2341B
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 16:26:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83927281A84
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 16:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DEA56443;
-	Wed, 20 Mar 2024 16:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508EB1C20;
+	Wed, 20 Mar 2024 16:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fkP3NkHP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pj9Tm7Ye"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB16D5579F
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 16:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32D015A5
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 16:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710951968; cv=none; b=FqWE98lBeODtld4nyfeU+i3uCTfnzp6aQmpiZ4teNbQ7I2JW9vvOiLCOOt9LiPVdOHB67m85sgs8+BVqcpX8V+pvBZXE0orme7vxBMEh6wxz32Lor41YUsdzKXOA06gtHAdRUNrDfUEPHCBmwmjut/mZn4w6qVsSvOUdFP3aFbU=
+	t=1710952736; cv=none; b=Q+iGoalu6SWYT0e57zA9SX5HLGB78V+xra2MpQNtf9I0j281Rx/8Qbx2gfEhUWPdUwyc7aaNYY6+r+NDylgvBpv6EyI4Peh41eGNIrJwHLI/AR6bu+WGudpliWQVcDjKsuT5yvrCk+ukyXWM1OPx5o7UhqByZlPlNeCdxgjUpfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710951968; c=relaxed/simple;
-	bh=zT+Y3Qivz045pR+6YsoZ/22z9NQIth+Iho5aemONUcQ=;
+	s=arc-20240116; t=1710952736; c=relaxed/simple;
+	bh=IB76lUs9IPAV243Xf3gz2nKBTSymIpnEUH+xLc8LLpQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cuALe56hMaZYzX/R4sLxcVUFph+I9IHtjQrckL98eT8Wxfc9F8LJr2hienOdCIQxlYpaS9npf9hZciYzh67irTqt7QG/+beV+YxInaYFH4BSfiGvlRxZJL0cpC1HLKk3gJ2GqLsr1Xq0POvaCOUei1cOLCtrMTbPgoNmMl4w7Uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fkP3NkHP; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=EXDcbaJTrITuGn6a6lRmikwLbUospCfEdAIRJ3m29Ziq2a31pjLM3LYBE9LlFiruhr/OfLaw7LRqNIYFnucBobruwaEyBNmoNUkSmdwaC1PHrEezEdsyWUruQHU/72YOO6fXJ9tu+Yz+JDa+GGyJFwSOkeUMbgCsz3m4OAJDGxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pj9Tm7Ye; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710951965;
+	s=mimecast20190719; t=1710952733;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Q9mtthpbOAXg4sQmVeVli7IjhrEU+ZtiX0vSYDAWRFU=;
-	b=fkP3NkHPGKuLxstbNZPoVO+dCyvCeOC8HaldrPmUNxBuOSi9UOwAOrYFTDNYNUkzXLfyXT
-	qFT/jpN9hcR+HQ2C6TU3geDUZUUzPCFzzQvwZzHFtBz8paRt+L3WxnduqiVTEPIu4wG5sF
-	EkqFH4jL2BIZMPwJ7rWF8WRahKrKG6s=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=K5r5p+TdefoFVY2Sm9HFnen4qIuY7gJN6xyg80IowfU=;
+	b=Pj9Tm7Yeze9+oGM3+JmUWyTXUkCxuxu/aUyL4BIVgymH73GKorcaRSq2ZdAue4lGMYuzfC
+	l7gJ7h5Yh+6mU/5AzTgoeZGCM2lwCkhG4JdKuHx6QhF0YTIkVnHqRO0MzaG5vh5iUfjwi+
+	CXcvdJr2+7PHaWkrxapOb4sxEsKnV9g=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-Z7WvU2UXPiqjRQ9zEwfV2Q-1; Wed, 20 Mar 2024 12:26:04 -0400
-X-MC-Unique: Z7WvU2UXPiqjRQ9zEwfV2Q-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a466c77307eso103755066b.0
-        for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 09:26:03 -0700 (PDT)
+ us-mta-90-TIGXQ6vqNhS_DGk_P2YPKQ-1; Wed, 20 Mar 2024 12:38:52 -0400
+X-MC-Unique: TIGXQ6vqNhS_DGk_P2YPKQ-1
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-4767d683821so1220568137.1
+        for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 09:38:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710951963; x=1711556763;
+        d=1e100.net; s=20230601; t=1710952730; x=1711557530;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q9mtthpbOAXg4sQmVeVli7IjhrEU+ZtiX0vSYDAWRFU=;
-        b=VOiyMGj9ODcNg2JmDQYosfx6tKycxLZeQ8NVhIMsJ3eFMePvdb+JUz3X0/7caIm7id
-         Ykd1Xks025pKUqQYFR1rPvQBdCEK01MFkS9v4dpmsXeeR/hJ+RFM3bacMGUi/RJ93dDN
-         +iPVXUQLPeZ6TGTznu5RMBOxdCxlhHV33V3ffrqwyjQwX9ydBs8qMDvyPKaXCapCvzqK
-         +gSt3lmx8As17bamK+/UucNevITgDwJsNpNE1Qla8WLCDqaB/0ChdCbDHyfuIMF6GNFd
-         sKtppXOt+MhO0erYgdXLvSC2nhyDFmF1NN87nboQdAhIuRjV0dHxMCIVwWcjEVvqVCD0
-         Djrg==
-X-Gm-Message-State: AOJu0YzLCOT21BkmMgCV4VZNIdx1vaOnIrxusnzp6B7W4k9Eal9CLUVk
-	a0cPp3+udkqrhbWCzbYh16gxHcoAR1fXNihzctnm1DYTnLi61XHj8GH6IxU0jgKDvmX9/5Omtk5
-	47u3x5cMrtlFAbb9MJATbc6u0feet/vXbTDB/IOQm0FqL3td2Ew==
-X-Received: by 2002:a17:906:5387:b0:a46:9f12:ca2a with SMTP id g7-20020a170906538700b00a469f12ca2amr131914ejo.22.1710951963011;
-        Wed, 20 Mar 2024 09:26:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IECLA18nqUOxI+h+v1n/cHVmjwkTvIzsjJjO+lGm4cMUYzEvTsYkEVQt6PI24bSP3DzE+CZ8Q==
-X-Received: by 2002:a17:906:5387:b0:a46:9f12:ca2a with SMTP id g7-20020a170906538700b00a469f12ca2amr131895ejo.22.1710951962682;
-        Wed, 20 Mar 2024 09:26:02 -0700 (PDT)
+        bh=K5r5p+TdefoFVY2Sm9HFnen4qIuY7gJN6xyg80IowfU=;
+        b=AsX1qPMJCc5zLeT2KCjvKgJPixvmccyElOKJTDGvJhvhqK496X9Qzqiid2x6OrDwSK
+         kAASMNOLb1ykb7Xdmu3FqOgVqNkkNDpAD4Fyf45AeKwtIFXsVOe5o4cJ1VbrGe5n3m8K
+         n01/3FdslCdt9N7VcRp/P2qVAip6Ecs7He3hp1jJLT7zwPrpLEBPJGr6SWiIA9jKCnem
+         /lZnYY96dRa1/QntrOpntW7aRVItltuOqKySmz+Kwpn73PpRJ/rOITliGVXIZ+huS+uQ
+         RINX0gkEJE/SgHp4UuUJkEn2uSfBu2vhbgHvbt6xyEmPIFrffYjCujer+iSsQhc9fIQT
+         9wug==
+X-Gm-Message-State: AOJu0Yzd/qoDCefSBtXgVUQEq3sQyHHBAHvu/xGrJmN5Llx2WZTUQOnP
+	cw9HJBmOP5sIkuAAEUXnZoqp80rf08XsVLTZx3eH5dwRze1cBjhduC9fNG6McQSggeRKUIP6NEV
+	Tn/gLiao5NUVExYj5tOIjhS8Ka6exX0CMmmxW/PBg40cV324wSQ==
+X-Received: by 2002:a67:f744:0:b0:475:fb4c:7945 with SMTP id w4-20020a67f744000000b00475fb4c7945mr17255618vso.26.1710952730751;
+        Wed, 20 Mar 2024 09:38:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHjdSZzCVJ68iThyIsGzMXH+YUdcqituas/ZbaBs84fPj14wkD26kaOdp/88pPYCe+J59FWmg==
+X-Received: by 2002:a67:f744:0:b0:475:fb4c:7945 with SMTP id w4-20020a67f744000000b00475fb4c7945mr17255600vso.26.1710952730493;
+        Wed, 20 Mar 2024 09:38:50 -0700 (PDT)
 Received: from [192.168.10.118] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id bx21-20020a170906a1d500b00a4655976025sm7391435ejb.82.2024.03.20.09.26.00
+        by smtp.googlemail.com with ESMTPSA id d24-20020ab07258000000b007dc1a45e05fsm1572801uap.39.2024.03.20.09.38.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Mar 2024 09:26:01 -0700 (PDT)
-Message-ID: <d6acfbef-96a1-42bc-8866-c12a4de8c57c@redhat.com>
-Date: Wed, 20 Mar 2024 17:26:00 +0100
+        Wed, 20 Mar 2024 09:38:49 -0700 (PDT)
+Message-ID: <08fc19f0-fa0a-40c5-b77f-90ea55c140a2@redhat.com>
+Date: Wed, 20 Mar 2024 17:38:46 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,17 +81,17 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 19/49] kvm: Make kvm_convert_memory() obey
- ram_block_discard_is_enabled()
+Subject: Re: [PATCH v3 06/49] RAMBlock: Add support of KVM private guest memfd
 Content-Language: en-US
 To: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
  =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pankaj.gupta@amd.com>,
  Xiaoyao Li <xiaoyao.li@intel.com>,
- Isaku Yamahata <isaku.yamahata@linux.intel.com>
+ Isaku Yamahata <isaku.yamahata@linux.intel.com>,
+ David Hildenbrand <david@redhat.com>
 References: <20240320083945.991426-1-michael.roth@amd.com>
- <20240320083945.991426-20-michael.roth@amd.com>
+ <20240320083945.991426-7-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -128,68 +128,71 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240320083945.991426-20-michael.roth@amd.com>
+In-Reply-To: <20240320083945.991426-7-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/20/24 09:39, Michael Roth wrote:
-> Some subsystems like VFIO might disable ram block discard for
-> uncoordinated cases. Since kvm_convert_memory()/guest_memfd don't
-> implement a RamDiscardManager handler to convey discard operations to
-> various listeners like VFIO. > Because of this, sequences like the
-> following can result due to stale IOMMU mappings:
-
-Alternatively, should guest-memfd memory regions call 
-ram_block_discard_require(true)?  This will prevent VFIO from operating, 
-but it will avoid consuming twice the memory.
-
-If desirable, guest-memfd support can be changed to implement an 
-extension of RamDiscardManager that notifies about private/shared memory 
-changes, and then guest-memfd would be able to support coordinated 
-discard.  But I wonder if that's doable at all - how common are 
-shared<->private flips, and is it feasible to change the IOMMU page 
-tables every time?
-
-If the real solution is SEV-TIO (which means essentially guest_memfd 
-support for VFIO), calling ram_block_discard_require(true) may be the 
-simplest stopgap solution.
-
-Paolo
-
->    - convert page shared->private
->    - discard shared page
->    - convert page private->shared
->    - new page is allocated
->    - issue DMA operations against that shared page
-> 
-> Address this by taking ram_block_discard_is_enabled() into account when
-> deciding whether or not to discard pages.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->   accel/kvm/kvm-all.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 53ce4f091e..6ae03c880f 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2962,10 +2962,14 @@ static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
->                   */
->                   return 0;
->               } else {
-> -                ret = ram_block_discard_range(rb, offset, size);
-> +                ret = ram_block_discard_is_disabled()
-> +                      ? ram_block_discard_range(rb, offset, size)
-> +                      : 0;
->               }
->           } else {
-> -            ret = ram_block_discard_guest_memfd_range(rb, offset, size);
-> +            ret = ram_block_discard_is_disabled()
-> +                  ? ram_block_discard_guest_memfd_range(rb, offset, size)
-> +                  : 0;
+> @@ -1842,6 +1842,17 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
 >           }
->       } else {
->           error_report("Convert non guest_memfd backed memory region "
+>       }
+>   
+> +    if (kvm_enabled() && (new_block->flags & RAM_GUEST_MEMFD)) {
+> +        assert(new_block->guest_memfd < 0);
+> +
+> +        new_block->guest_memfd = kvm_create_guest_memfd(new_block->max_length,
+> +                                                        0, errp);
+> +        if (new_block->guest_memfd < 0) {
+> +            qemu_mutex_unlock_ramlist();
+> +            return;
+> +        }
+> +    }
+> +
+
+This potentially leaks new_block->host.  This can be squashed into the patch:
+
+diff --git a/system/physmem.c b/system/physmem.c
+index 3a4a3f10d5a..0836aff190e 100644
+--- a/system/physmem.c
++++ b/system/physmem.c
+@@ -1810,6 +1810,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+      const bool shared = qemu_ram_is_shared(new_block);
+      RAMBlock *block;
+      RAMBlock *last_block = NULL;
++    bool free_on_error = false;
+      ram_addr_t old_ram_size, new_ram_size;
+      Error *err = NULL;
+  
+@@ -1839,6 +1841,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+                  return;
+              }
+              memory_try_enable_merging(new_block->host, new_block->max_length);
++            free_on_error = true;
+          }
+      }
+  
+@@ -1849,7 +1852,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+                                                          0, errp);
+          if (new_block->guest_memfd < 0) {
+              qemu_mutex_unlock_ramlist();
+-            return;
++            goto out_free;
+          }
+      }
+  
+@@ -1901,6 +1904,13 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+          ram_block_notify_add(new_block->host, new_block->used_length,
+                               new_block->max_length);
+      }
++    return;
++
++out_free:
++    if (free_on_error) {
++        qemu_anon_ram_free(new_block->host, new_block->max_length);
++        new_block->host = NULL;
++    }
+  }
+  
+  #ifdef CONFIG_POSIX
 
 
