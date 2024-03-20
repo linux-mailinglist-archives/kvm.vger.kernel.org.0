@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-12216-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12217-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C01FB880CEC
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:21:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32590880CEF
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:21:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66787283F6A
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:21:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 536AD1C22AA3
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A367381BB;
-	Wed, 20 Mar 2024 08:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6465B3A1BF;
+	Wed, 20 Mar 2024 08:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eZLO8H6H"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MY+w7G1E"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB8A33CD0;
-	Wed, 20 Mar 2024 08:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9DC38DEC;
+	Wed, 20 Mar 2024 08:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710922849; cv=none; b=tjR/kvtTttpQ5hnLRH+e8x16rPFXuy8lVokxADKx+CN+vjSYzERTUuSk3s28Y7cvMZekgnVKvPe5etTYS7bfdGwV7H2+t93icX7TDJxwLw2EnBFSNAwZU8u7rPHiWVTYTNx3ecSQkLqgGlECeMayZDmMksm27qIdIh4c4/PyDFY=
+	t=1710922852; cv=none; b=NAyQui5KLwcplPfNk0E/wV/Z0dO08cNALX+sXc6BK2e7gFsVwtbsJFmef7zecQUT5d8F5i+jNAmXy2cWoFPK0HzjMOamTD/2RzL7lpCeTl36GpnpP6NJIcheDbbGhhBOvzZdNZ2ib38Vt3DxBhE/7XETc2he8/s8v/Bfd9WneD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710922849; c=relaxed/simple;
-	bh=azsICJZ26uVyLu/xZxYBLurT38mAkc6uUCquI0A4F0k=;
+	s=arc-20240116; t=1710922852; c=relaxed/simple;
+	bh=9q2vQspK/LQpJx8uEGSBsWDx2vKHjn//HOo6dVbxJtc=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=AKzbZrl+LZBNNaDQhGg7kMdJeisEonPIhRQVatr/RK9GW8kVVvs42k/m7zV1SQxY7LSlybzMPWq8zLQzHNMIhi8rzhV4jP4N571JpPb/1QnX5emmwpvBweQfqgkY7eDKDilbA7Knx70psiP0vvXg/48qEFHfgViQR8EcFYVlJRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eZLO8H6H; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=bg8j0tBs6GNak4IsJsgLQv+2sFzxfr8pO/muEqMfJus2Y34SG8EW7tFZbhPlgrAg/koHyGuXctYGG3U5e2kmHKywSBqtdK2gfVmILs1slA9oi5xoRJlUedGUQe88Bpjn7IWyvIaDYcc4EN+eSzXYPo1VlY85KjE4nvApPQ30rII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MY+w7G1E; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=azsICJZ26uVyLu/xZxYBLurT38mAkc6uUCquI0A4F0k=; b=eZLO8H6HdxjZL/u3sCYSfKeyGL
-	Re118rHAWTjzs2WPbGV3QNRaFbvmbtjjWh3G35krMklSzApIIXa3r7ALvjjEaCGlRdnMFKE8EMwRM
-	xp1Q0JTnoyBeTVRBLtJddGYNaKYNzsW73XDcovv0fxuvz2XHo98iCqeuh3SWHO4dhtUiWQ4LHF6HQ
-	Ie0pQcjzVwCpjbSm/mZq87Nu0wIaIcm/0gsgbeAXCthLZP2Bya6l9RNmUvpDACvhBG+WXCebJl8LP
-	sWD7L/X0sCT8Rsq0ay5JQOy5Qec8FOOpwQm6ThSrnYeSOM4WC/sPnD4jLlKOfDlDj0yFIp4jXn5tk
-	b1B+uY9A==;
+	bh=9q2vQspK/LQpJx8uEGSBsWDx2vKHjn//HOo6dVbxJtc=; b=MY+w7G1EO6VSamixD6RR8f6r+Z
+	kthC4SARhmhWun+0hWk82N64j94VgtQVXutWgPfeSVoxeFn9TxUoReo6rnjWBMSXNudEu2VnvZtmB
+	FLJtL1uCZu/qyrzZHYCXUSI6StewHeCrFcYz7/oCNBZVS5VpuyIYc7WKVgZcYhnGRl/HBB9M/JU0d
+	+NWM8W0zWNOQVhMntTPe/Jcy0tueYtK4Imwc9XcHWZth6hniwPeUUTlQxtrn3O6UPFNB4stSTy8oQ
+	PtNlxgrJ/qInsxMxbYC43eMn2PJ0vMYy0GHNeexP+MpCslLWg8ng2gOyOpbucZ3UZE1Oll25jm/vR
+	K0W33Gvg==;
 Received: from [2001:8b0:10b:5:8879:b0f0:4282:ed8] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rmrBl-00000003slP-0HG0;
-	Wed, 20 Mar 2024 08:20:45 +0000
-Message-ID: <f80574d1bb81acefc43fe6e016c9e51e7cf754b3.camel@infradead.org>
-Subject: Re: [PATCH 2/3] KVM: Check validity of offset+length of
- gfn_to_pfn_cache prior to activation
+	id 1rmrBo-00000003sli-3S8S;
+	Wed, 20 Mar 2024 08:20:48 +0000
+Message-ID: <9d414a3cadb3e0c6845bebdd805a91a76e56b4d0.camel@infradead.org>
+Subject: Re: [PATCH 3/3] KVM: Explicitly disallow activatating a
+ gfn_to_pfn_cache with INVALID_GPA
 From: David Woodhouse <dwmw2@infradead.org>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	syzbot+106a4f72b0474e1d1b33@syzkaller.appspotmail.com, Paul Durrant
 	 <paul@xen.org>
-Date: Wed, 20 Mar 2024 08:20:44 +0000
-In-Reply-To: <20240320001542.3203871-3-seanjc@google.com>
+Date: Wed, 20 Mar 2024 08:20:48 +0000
+In-Reply-To: <20240320001542.3203871-4-seanjc@google.com>
 References: <20240320001542.3203871-1-seanjc@google.com>
-	 <20240320001542.3203871-3-seanjc@google.com>
+	 <20240320001542.3203871-4-seanjc@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-QEiVCk/haAVwdnCBACZm"
+	boundary="=-4BQ2OcF8Bu8UC8OOBKBm"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -70,33 +70,31 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-QEiVCk/haAVwdnCBACZm
+--=-4BQ2OcF8Bu8UC8OOBKBm
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, 2024-03-19 at 17:15 -0700, Sean Christopherson wrote:
-> When activating a gfn_to_pfn_cache, verify that the offset+length is sane
-> and usable before marking the cache active.=C2=A0 Letting __kvm_gpc_refre=
-sh()
-> detect the problem results in a cache being marked active without setting
-> the GPA (or any other fields), which in turn results in KVM trying to
-> refresh a cache with INVALID_GPA.
+> Explicit disallow activating a gfn_to_pfn_cache with an error gpa, i.e.
+> INVALID_GPA, to ensure that KVM doesn't mistake a GPA-based cache for an
+> HVA-based cache (KVM uses INVALID_GPA as a magic value to differentiate
+> between GPA-based and HVA-based caches).
 >=20
-> Attempting to refresh a cache with INVALID_GPA isn't functionally
-> problematic, but it runs afoul of the sanity check that exactly one of
-> GPA or userspace HVA is valid, i.e. that a cache is either GPA-based or
-> HVA-based.
+> WARN if KVM attempts to activate a cache with INVALID_GPA, purely so that
+> new caches need to at least consider what to do with a "bad" GPA, as all
+> existing usage of kvm_gpc_activate() guarantees gpa !=3D INVALID_GPA.=C2=
+=A0 I.e.
+> removing the WARN in the future is completely reasonable if doing so woul=
+d
+> yield cleaner/better code overall.
 >=20
-> Reported-by: syzbot+106a4f72b0474e1d1b33@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/0000000000005fa5cc0613f1cebd@google.c=
-om
-> Fixes: 721f5b0dda78 ("KVM: pfncache: allow a cache to be activated with a=
- fixed (userspace) HVA")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
 
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
 
---=-QEiVCk/haAVwdnCBACZm
+--=-4BQ2OcF8Bu8UC8OOBKBm
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -188,25 +186,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzIwMDgyMDQ0WjAvBgkqhkiG9w0BCQQxIgQgpQ2/0gY8
-7GMNuAWHmIPSnadahF9ODetdpoixTc1iMLcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzIwMDgyMDQ4WjAvBgkqhkiG9w0BCQQxIgQgOdFhlbnT
+QqUCRjv364J3a8niK8aShX2T049jZHs978owgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCwrOikPkKTcrCQGYLz2tzCE0Eb/N4zaXry
-obye6XmQr3U9TLdd/0YYkx0cX38C7RnhuEQlc39kOPLhEPdZwUt5r360sDUZ8z2kMMatxddlAc4O
-MUHkg6vdzlfUVg/P7k94xutb0n5A7oifgwilVtNrd/w5/BSyExhP7ODodWrZM5K3j8EBWsGoJhBk
-9gcipcLMiHIo2MxnbFLawBBmAnRXxY7omeHDDtw8S31Mn8ZKuoE9ZfMyf9wnWHoVaUZQCUyDblYK
-L9JHPSnx272bkutzjwWYZsj/caoDq0/LsnRN5bRW/YTnrPt3MnJ7yJLXkbMqaIDy1vVTM2AmjIgY
-Gz1zClBcw8irOTnojnvjjzuQrmZqmFyaGrpO2fUVt1nHY2DdojgT+kVHIfBLlGHTKcnta7/35nss
-p4vaoMqpUOFxgVL4pXjGln85keHK38mfDBwsO8jORBeIxN4vnWeXy9YviT0ptv8wZRe1E/FFCcP6
-nFuoMJF7sk4CGZ2D9WvqPA+Nnq1y/0YAHMNWoRoyjZ9LD5iJOOO/M+bXPyvGAslQd2ZA8IohQc7m
-spURDgpHKS1WPkCV247ld4DWoWPJ+tbx+/Wx8wwRLo78TszXZ2RIvnKwjn4OcwP/GHz28mtV1i8Y
-ZWDyVfqh0sccGXR0f8XuVglsvpRkG296N/LwIC1JYQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA898hJz70C9pG0kXOpjwlTJfSkiGELJ7Nc
+cZXpy36lsNcK/DkSxzMFmFF+9XV3IwUG7nRKQgJNx1qO9RIkBhQiQd6is+nthCh3Svq85sLZlf4Y
+23MkBgap4vug1jS9SOmVMMOY+coqhuVu4UD5FvUqtxrBHz+TCIk2hIOA5ARi4hzQD8chCFqoe1Q0
+3LGepkJuWq8Vqeio/VuzFn7UqTSnp/ne+pa7sDyTKXGjRRQscQG9fSXHw7VjgjXsMQQT2c+5W401
+qPkybe/3eZd/5IXihL8+9MtsiQspLUzBlg0jeFP9unkh/2PicSwSBYf2EUNmAz0+psRcMWBLFDhA
+RWVouRqZgMmGzsc8HOl0QUZtFVcJsCEyBHCHHwhyadcL1xFlIqYNZ1PZK6UEjQwhrntJWPbcl7S1
++dhl/+KQVhU+Pgz3jfmNBj1yTlXyyN42eupc+secdoc647/k4TVY+GosmhdGq5tQwxoLpcOkd3pj
+E4KBtKHey6ANtyitPDE4VSiGwWBcWblsH4qnvsivj+HyhnLvpt+eo0dEbSoppVpkLRU1/EqRiMPs
+KRe5tkJY5ZR74NJ85a3VDDhionTklqZ6FRx+peAOWtsskmrhAMkupzdv1N6J4IML3kKaVl07dj9S
+x6zAydCjgbfvbZpE7SFEFGxEQ48wL6q1ZL6yNIcoCgAAAAAAAA==
 
 
---=-QEiVCk/haAVwdnCBACZm--
+--=-4BQ2OcF8Bu8UC8OOBKBm--
 
