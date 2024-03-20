@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-12311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D16488150B
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 16:56:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36FFB881517
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 17:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D9251F23511
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 15:56:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADCCEB226C9
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 16:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDE65472A;
-	Wed, 20 Mar 2024 15:56:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4C653E2C;
+	Wed, 20 Mar 2024 16:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NToduvWh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HKEny5p/"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4061C53E13
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 15:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE1E53E0D
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 16:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710950211; cv=none; b=RtJu0bweqLakfQ2qJMbVVyTLG1mJtkr8JdDFrEakCrUUUqZdnmN3pQIj/Cuf2GF+zL8v2TwjYSNtHQf7Sr1rRf4+iLxui270ZMUF/w081XdwnSX4PDNtaoDw2Mti4Rmdp/KGroi3YKM4qu7McjNWSXPJBriLarEh9sw13pDDhHs=
+	t=1710950437; cv=none; b=P7Z2uN7N2NwyuolcvZrEzpapFnpIK0e95NoX4/6ZMCxxVTeKB7suJmvyHWIhDkoQfTEQWNQ2CZxCjTpKKUetgM+DbC/8dUfDtrHvar3AfOf9xE3jFAReS/Q0fMLw6msmnGaNFcYS7lTvkFRm05eH9yygyJluMNnuHaT05hDaMqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710950211; c=relaxed/simple;
-	bh=bOHKtDEhoXhJows+Igj9EdRp+fNi5RwpCozskNd6TaU=;
+	s=arc-20240116; t=1710950437; c=relaxed/simple;
+	bh=7koadSzSpCSId506igO+9dskgpNoE02fAzKwkBPk7h0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OvpMVZRM65n3snVtUNs9BSPztZwdsCgeCGmFvYTDWIQI+fQTtJYRmofU98S0+ehvIMbu3bche/FaoN51o73TFWDKimCDy168ivkG/PxoxRXQjJW63YkaZC4J39SWMCSVHW0u4mOIiVBazKj+0TZW+l6ZQJn7OgUE2G1z+uxP3Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NToduvWh; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=hrmTFLs85o8fr66v3yoSda3/7DYepJEh+pF3euMz0IZ9CrCqGvo41YIXPUmKUyylLos02sJF6LR2SxHcb5v31riZKTazIseQ5LL89JS2aGqRE8gzxXIagmAzc3Iy2FS60xKAzcRGopylZa9tzG2Qk6cPThfh8xROiUdyKE1bqqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HKEny5p/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710950208;
+	s=mimecast20190719; t=1710950434;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=qrzp2WX9G4fGi7FWFHFjHhR3/T8Nfe24Fjm+GgjHxDE=;
-	b=NToduvWhHTC+My6rg8xWINop1aB6z3oYCE/p9zhe+GH9M6/RLVoqGQhDzJmjTFc/7pr6Wo
-	ZdZ0cXz9EZMMLK05M20cjEIp7bco41Psg70lV14yc7TKUAIQv81omTPjf0lNiZyslwaqUK
-	o5PPYn8OQ7OzK3zrz0ElCcBmg0tgedA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7SLCMTM7Rllrcd/kdHSOwjAZzSpMFurH3MxGFxfxyJc=;
+	b=HKEny5p/Hy5CNwt59KjLXHegObSiPxr6XkluHW9yoUrJ4XQvIOKDKZ19DgMQasyl3j+me4
+	8Krl75BxtJqu0qloV06YB25GiSLDFdHpTnY2KYyNi/sn0dNX97OAYHZJMM7TAi08uAqFzF
+	sDm/e4nPIuPD1Ucg9ol4+wCPHLRWTr8=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-Cbs2jbXENHK1W9rnR_C_Qg-1; Wed, 20 Mar 2024 11:56:46 -0400
-X-MC-Unique: Cbs2jbXENHK1W9rnR_C_Qg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a469d3547c7so4501466b.0
-        for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 08:56:46 -0700 (PDT)
+ us-mta-682-NDdCr4y_OZ-wo10c0etpLQ-1; Wed, 20 Mar 2024 12:00:32 -0400
+X-MC-Unique: NDdCr4y_OZ-wo10c0etpLQ-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d423128355so407411fa.0
+        for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 09:00:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710950205; x=1711555005;
+        d=1e100.net; s=20230601; t=1710950431; x=1711555231;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qrzp2WX9G4fGi7FWFHFjHhR3/T8Nfe24Fjm+GgjHxDE=;
-        b=s7N/e6P+OAJI2JtJFLJMLIXNOz7PKNKRzEXTUYOKQ4Pg1YSDCIYk2EHsY7EXG+AyuK
-         3D86kFF4vy/aLwjc4fh6WUUVgRqYnslOBRX/DvXAigH+6DLYx8p2m3hQyDo4Y29hqIJ3
-         1lKiBY+UtsJ4QoJ2GyObTFShsJ37Mv6zi+/xayKiPuhtAScTnGpZBKst0ITIQN5pjKcT
-         Wz0WdKPOEso7yoqpoXxrCw/d6EDHFH3w6/UqtioNOxlzP+ok700b26nFxyWK7Rkcy2KZ
-         E0ZqEU0G6KYpIm0onudToH9QSVuqkqoVA4G7LXArre6IdjnKWZQpdp35veqCvVhTyCIk
-         mcaw==
-X-Gm-Message-State: AOJu0YwNfQWZytJhwYZVUYLikpCqeemuF9gd0fNd0ayxpo/p2xkVYjTS
-	FvqP8owPYhqXi9czX32Qj2JbzMPxZlP8GmbpSlX+98bmOZv4hCcJitES/B2/zGUmpEr+9kAx84i
-	oCA7TNTyOcP56KxcCigKZ/RuP62+6PaSs7bGWX4lnPZvNSkuICw==
-X-Received: by 2002:a17:906:fd3:b0:a46:d786:3672 with SMTP id c19-20020a1709060fd300b00a46d7863672mr79681ejk.13.1710950205101;
-        Wed, 20 Mar 2024 08:56:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFL9lb9JU6u29HDH1ruhW2E+dvTvzRu/d44yRA/zPFQeK1CKRp96jbDh+2Z61dbYWZINepF3A==
-X-Received: by 2002:a17:906:fd3:b0:a46:d786:3672 with SMTP id c19-20020a1709060fd300b00a46d7863672mr79667ejk.13.1710950204786;
-        Wed, 20 Mar 2024 08:56:44 -0700 (PDT)
+        bh=7SLCMTM7Rllrcd/kdHSOwjAZzSpMFurH3MxGFxfxyJc=;
+        b=spFgmIHrPEg9Zal1PHZNu4BSwpSbl9zkenxX8N4jjIswaAwNfVLbVIWXfmYx++ZSj5
+         Ug7A5G6lJAiADsQzusNZc/60JJVoW9P2qrGqpdMtvE8l+pbHyRW1KCPYSvXU6DvbromU
+         eZw0iDptl5rD2+/eYjanlLhfNfN0eY1ozdQHIFZIboYoFKa9BZPOj5U6HrAEr8RHfp/N
+         SyZVtu16AtGL8XSoaIdct9AJrkQjYlkWrLL7UVOhTb3zVvklmIXxiZuC1siHwnDwU1zP
+         Yrogfk9biWu6FWjkVwF/5P/L7RIEiYiESouGKXaBk1DDuic5AODHR6XtUePpprwXPgz3
+         t3UA==
+X-Gm-Message-State: AOJu0YwZJl11IBZvUbIxX89jaieulwExeI076j8qxBexeQf3udsFX2Zg
+	JMRNfkZEG8RgdovUtNYFyMhM0967j+bNGhN6sFvUgVJzcV4efyhfsj+NljAf5PpkPggiCcoMdhc
+	hGIxjw3DmfM7Zi/XkvKK6aVfO66OQoJgu/8GzNr1oMtZqtZApRA==
+X-Received: by 2002:a2e:9396:0:b0:2d4:2640:2eaa with SMTP id g22-20020a2e9396000000b002d426402eaamr11434551ljh.49.1710950430771;
+        Wed, 20 Mar 2024 09:00:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH4FhH1Bax01abjQpxGAlTxNovLWHXMtN1mTBZxO3xxDMETxUDpmQj7wF3qX1CUkxG9w9QT/Q==
+X-Received: by 2002:a2e:9396:0:b0:2d4:2640:2eaa with SMTP id g22-20020a2e9396000000b002d426402eaamr11434526ljh.49.1710950430327;
+        Wed, 20 Mar 2024 09:00:30 -0700 (PDT)
 Received: from [192.168.10.118] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id gf9-20020a170906e20900b00a46a27794f6sm5377774ejb.123.2024.03.20.08.56.41
+        by smtp.googlemail.com with ESMTPSA id r8-20020a056402018800b00568d5e737b0sm3962667edv.57.2024.03.20.09.00.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Mar 2024 08:56:42 -0700 (PDT)
-Message-ID: <86baf9cb-ba7b-4701-a96d-b34edfe3d1de@redhat.com>
-Date: Wed, 20 Mar 2024 16:56:40 +0100
+        Wed, 20 Mar 2024 09:00:29 -0700 (PDT)
+Message-ID: <5fe262bc-7226-4d99-9bf7-ed357b8fdf7a@redhat.com>
+Date: Wed, 20 Mar 2024 17:00:28 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,18 +81,16 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/49] kvm: Enable KVM_SET_USER_MEMORY_REGION2 for
- memslot
+Subject: Re: [PATCH v3 10/49] kvm: Introduce support for memory_attributes
 Content-Language: en-US
 To: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
  =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pankaj.gupta@amd.com>,
  Xiaoyao Li <xiaoyao.li@intel.com>,
- Isaku Yamahata <isaku.yamahata@linux.intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>
+ Isaku Yamahata <isaku.yamahata@linux.intel.com>
 References: <20240320083945.991426-1-michael.roth@amd.com>
- <20240320083945.991426-10-michael.roth@amd.com>
+ <20240320083945.991426-11-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -129,93 +127,120 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240320083945.991426-10-michael.roth@amd.com>
+In-Reply-To: <20240320083945.991426-11-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/20/24 09:39, Michael Roth wrote:
-> +    if (cap_user_memory2 == -1) {
-> +        cap_user_memory2 = kvm_check_extension(s, KVM_CAP_USER_MEMORY2);
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
+> 
+> Introduce the helper functions to set the attributes of a range of
+> memory to private or shared.
+> 
+> This is necessary to notify KVM the private/shared attribute of each gpa
+> range. KVM needs the information to decide the GPA needs to be mapped at
+> hva-based shared memory or guest_memfd based private memory.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+> Changes in v4:
+> - move the check of kvm_supported_memory_attributes to the common
+>    kvm_set_memory_attributes(); (Wang Wei)
+> - change warn_report() to error_report() in kvm_set_memory_attributes()
+>    and drop the __func__; (Daniel)
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>   accel/kvm/kvm-all.c  | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>   include/sysemu/kvm.h |  3 +++
+>   2 files changed, 47 insertions(+)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index e83429b31e..df7a32735a 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -92,6 +92,7 @@ static bool kvm_has_guest_debug;
+>   static int kvm_sstep_flags;
+>   static bool kvm_immediate_exit;
+>   static bool kvm_guest_memfd_supported;
+> +static uint64_t kvm_supported_memory_attributes;
+>   static hwaddr kvm_max_slot_size = ~0;
+>   
+>   static const KVMCapabilityInfo kvm_required_capabilites[] = {
+> @@ -1304,6 +1305,46 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
+>       kvm_max_slot_size = max_slot_size;
+>   }
+>   
+> +static int kvm_set_memory_attributes(hwaddr start, hwaddr size, uint64_t attr)
+> +{
+> +    struct kvm_memory_attributes attrs;
+> +    int r;
+> +
+> +    if (kvm_supported_memory_attributes == 0) {
+> +        error_report("No memory attribute supported by KVM\n");
+> +        return -EINVAL;
 > +    }
 > +
-> +    if (!cap_user_memory2 && slot->guest_memfd >= 0) {
-> +        error_report("%s, KVM doesn't support KVM_CAP_USER_MEMORY2,"
-> +                     " which is required by guest memfd!", __func__);
-> +        exit(1);
+> +    if ((attr & kvm_supported_memory_attributes) != attr) {
+> +        error_report("memory attribute 0x%lx not supported by KVM,"
+> +                     " supported bits are 0x%lx\n",
+> +                     attr, kvm_supported_memory_attributes);
+> +        return -EINVAL;
 > +    }
 
-It's easier and more robust (for error reporting purposes) to check both
-KVM_CAP_GUEST_MEMFD and KVM_CAP_USER_MEMORY2 at once in the earlier
-patches:
+This should also be tested at the same time as kvm_guest_memfd_supported.
 
--    kvm_guest_memfd_supported = kvm_check_extension(s, KVM_CAP_GUEST_MEMFD);
-+    kvm_guest_memfd_supported =
-+        kvm_check_extension(s, KVM_CAP_GUEST_MEMFD) &&
-+        kvm_check_extension(s, KVM_CAP_USER_MEMORY2);
+Paolo
 
-since KVM cannot really support guest_memfd if it cannot then use it
-to create private memory slots.
+> +    attrs.attributes = attr;
+> +    attrs.address = start;
+> +    attrs.size = size;
+> +    attrs.flags = 0;
+> +
+> +    r = kvm_vm_ioctl(kvm_state, KVM_SET_MEMORY_ATTRIBUTES, &attrs);
+> +    if (r) {
+> +        error_report("failed to set memory (0x%lx+%#zx) with attr 0x%lx error '%s'",
+> +                     start, size, attr, strerror(errno));
+> +    }
+> +    return r;
+> +}
+> +
+> +int kvm_set_memory_attributes_private(hwaddr start, hwaddr size)
+> +{
+> +    return kvm_set_memory_attributes(start, size, KVM_MEMORY_ATTRIBUTE_PRIVATE);
+> +}
+> +
+> +int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size)
+> +{
+> +    return kvm_set_memory_attributes(start, size, 0);
+> +}
+> +
+>   /* Called with KVMMemoryListener.slots_lock held */
+>   static void kvm_set_phys_mem(KVMMemoryListener *kml,
+>                                MemoryRegionSection *section, bool add)
+> @@ -2439,6 +2480,9 @@ static int kvm_init(MachineState *ms)
+>   
+>       kvm_guest_memfd_supported = kvm_check_extension(s, KVM_CAP_GUEST_MEMFD);
+>   
+> +    ret = kvm_check_extension(s, KVM_CAP_MEMORY_ATTRIBUTES);
+> +    kvm_supported_memory_attributes = ret > 0 ? ret : 0;
+> +
+>       if (object_property_find(OBJECT(current_machine), "kvm-type")) {
+>           g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
+>                                                               "kvm-type",
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index b4913281e2..2cb3192509 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -538,4 +538,7 @@ void kvm_mark_guest_state_protected(void);
+>   bool kvm_hwpoisoned_mem(void);
+>   
+>   int kvm_create_guest_memfd(uint64_t size, uint64_t flags, Error **errp);
+> +
+> +int kvm_set_memory_attributes_private(hwaddr start, hwaddr size);
+> +int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size);
+>   #endif
 
-And then, this one can be changed to also use kvm_guest_memfd_supported:
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index e83429b31eb..afcf6f87045 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -284,19 +284,8 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
-  {
-      KVMState *s = kvm_state;
-      struct kvm_userspace_memory_region2 mem;
--    static int cap_user_memory2 = -1;
-      int ret;
-
--    if (cap_user_memory2 == -1) {
--        cap_user_memory2 = kvm_check_extension(s, KVM_CAP_USER_MEMORY2);
--    }
--
--    if (!cap_user_memory2 && slot->guest_memfd >= 0) {
--        error_report("%s, KVM doesn't support KVM_CAP_USER_MEMORY2,"
--                     " which is required by guest memfd!", __func__);
--        exit(1);
--    }
--
-      mem.slot = slot->slot | (kml->as_id << 16);
-      mem.guest_phys_addr = slot->start_addr;
-      mem.userspace_addr = (unsigned long)slot->ram;
-@@ -309,7 +298,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
-           * value. This is needed based on KVM commit 75d61fbc. */
-          mem.memory_size = 0;
-
--        if (cap_user_memory2) {
-+        if (kvm_guest_memfd_supported) {
-              ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION2, &mem);
-          } else {
-              ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-@@ -319,7 +308,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
-          }
-      }
-      mem.memory_size = slot->memory_size;
--    if (cap_user_memory2) {
-+    if (kvm_guest_memfd_supported) {
-          ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION2, &mem);
-      } else {
-          ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-@@ -331,7 +320,7 @@ err:
-                                mem.userspace_addr, mem.guest_memfd,
-                                mem.guest_memfd_offset, ret);
-      if (ret < 0) {
--        if (cap_user_memory2) {
-+        if (kvm_guest_memfd_supported) {
-                  error_report("%s: KVM_SET_USER_MEMORY_REGION2 failed, slot=%d,"
-                          " start=0x%" PRIx64 ", size=0x%" PRIx64 ","
-                          " flags=0x%" PRIx32 ", guest_memfd=%" PRId32 ","
-@@ -501,6 +490,7 @@ static int kvm_mem_flags(MemoryRegion *mr)
-          flags |= KVM_MEM_READONLY;
-      }
-      if (memory_region_has_guest_memfd(mr)) {
-+        assert(kvm_guest_memfd_supported);
-          flags |= KVM_MEM_GUEST_MEMFD;
-      }
-      return flags;
+This suggests that
 
 
