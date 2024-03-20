@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-12220-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12222-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37684880D45
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:42:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E16F880D49
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:42:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80C8CB21D8F
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:42:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03B681F21F0C
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664D439846;
-	Wed, 20 Mar 2024 08:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D636B38DE5;
+	Wed, 20 Mar 2024 08:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="16Jo6+Kr"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EF6CpeQ8"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2077.outbound.protection.outlook.com [40.107.93.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945FC22079
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 08:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723D638DC0
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 08:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.77
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710924094; cv=fail; b=bYLaVfN4E5yDJbiE915Y4ok/4RSNmc85eH/JHOSwOlIEYv4c/sk6XJwNJqwhsRFLt+8fqvv81KbcWekeNeBJrKGnLsIjRYYw/RouVYZde7hKTF8+KxwoNeQ2R2yjm0DMVflmQjMJ/ckRf1qyNZcTYr07Gbuz4/L1ymACobUDgQY=
+	t=1710924139; cv=fail; b=fdEaXBAWiL5gRPgra3075M1ACnkSvZwfhAEtRF+qM008tftLWQABRFJM9dYSlJFdDlQNus+hjvxudUO5qKH75rjwBQ8HYeQmLA/HP++h9e060TpXeAmjbpn3e0KnPowSaP6wxUy14hlTpgQ6jtYQohhywqsggTSc3l97OzoWpcw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710924094; c=relaxed/simple;
-	bh=DtF/yOfQ5gWkXYix/40+KWfGIDDbVj4/Sij4PsMr0E4=;
+	s=arc-20240116; t=1710924139; c=relaxed/simple;
+	bh=cbhZv7YRZSPl/gMvLiudJfeteDV0kg3dAT7g5BFUzh0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X37cbniTqtdwl22/1Xa7bhk1SD1tj93CcntHtQjn4r0JMsWSRaFeWT/djTEf7+qw9TF8lqRJF1p5WRFZxz2kJF9kefsmSi2Bo/Cje/vujcMm8LmED++dI8TcArc1dvhAFPc/p3i40oMkJL6ViET4vwefhpRyO8V9GWaIiuqByFY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=16Jo6+Kr; arc=fail smtp.client-ip=40.107.237.79
+	 MIME-Version:Content-Type; b=g3K82UjbVyo6zmZrD39IluTSOlYd81V8xl2c9clKfaye6a8rT//MumO7WO6y76xa1GgUjE5YtI5u99U4ORczBUuw/jqiTXB3yS/uW0sYekEnklZwRFn+0VVXpGw4IMPTHCCFVkmitxpbyZ58Hz9wPBf1Mn/y7hm0COmb4ncbd80=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EF6CpeQ8; arc=fail smtp.client-ip=40.107.93.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nydfsR9nHYnLp9EV8UmoqiDHBVVKRCQ69K3o2UgkShHFBvelK4Z87F2gCFIvpCJSQ420INB/WmpZr+/13QULUmvip/dhUM4t+n6O1GEHGxpcGGSjhLlhTpQ0qpnJdgx/K6rIWzSjB6bi8YmMQTeZFPp06WKdLpee0nThKizzQ9WOeXfRagxIufA9CvPQtkevoUnpTtypivcKMJKKJNpTWbIAdzstbzA6g2mA9TQn7H1cZ21s0s0Nup3eLvaohRXoRm1Y+bG5dM3/FQnZ1NVPFyo+BO4qxw8wyRpglaBH3AaEUNJE5bFmgi5uD0geFDmHnGSsVmp8bN447wy8PCpsTg==
+ b=Zs7bFV8hc6uuicIA7e8/OGoqoUHwGGsU6cxkabjS5OdhOzqywtZsnCaD0mKlgl16LzpNl2MxEh0v9wJ/Q1o8d1Vzf3dU6+s7NI2iZbsi++uE6oDW6aQnq93IrSJB5ww1DBJlnwv5nqIPE2USt/TwD28anHUmvvQ/ngGvQuGUZdjIBbTcTndFlg77ZbUhAk+alNJhDrSlpGYHvkPpNtLH0/Q8moGthgh+FE+3CkL2NMM9T9a2LVxNlzNppDoB61MQ8Uyems+JU3WsaN5uhsitjwe3eRY2yzIe2y9kglJdmOwiqxP3oEQfwVZKqh7s3K3JgtnnjmIVWzKACxBp7+XNQw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wQuSWpKvcj4+ThgJHs6oUIdcE/w2mjZN6UvE7iEMxHA=;
- b=NcHBAWmORP3wRIHave7BpxQ/++zsLaIbAqFLVfTaQv25euT1S1HAPG1ETgHY8PBWlRfB/G5CR7PlxUEA2qx5Yoqnhej2IBigp0GBI4kgudItirRS/k1VW8/FVx1PiHGFnus2LBTY832dmpS77lk/g3gayo5UxcuVDQIU7w3TJj1aVn6gE8aRd3Js/dPgw/yAiMM7z6qNnWd9LiajI7gX/lh/pUAuk+Zrh0C8o4CcAMiGXotyfJ2b6Eqi4y0WgBeBumx7u854lCCPmza/AsUBBExy8/FPePKt3yPzxbvoeD/pYkNcgOhi84tFQKazT2jT6x7udqp4fF+SWAd++/3ATA==
+ bh=Nb5xn8wWzGmLkl9z1YSLuY3GvBtE0Frzq/FHmDOAUrA=;
+ b=nXRI0sXwF21y1p0k6SvYsR3j+9+sUeahoMcFZQ+1qejxDiF1UjpDMHLlK9Z3Qdz5pTNXTFrUfvNy0wgUS0zaR0ie3W6U95QdfydYIVAlNr4nISjC3a+bl34ht2PQWy0alk4DCSB08tHPrAFeA0iuK6uiywGNx07QIVTkfCvUwzMUb2Ziq7hnLbEyHaI5M9hQBDfxNa8WoaOcZnZJ74SDEXNiEYoU0k1+hbWLecFmTBvleECuXKye5+l7Cracl9bhS7hw8DtvxMsFPrgr2xoVuLZxsexLsxgK2jFkrNV6pKEz8Hn7ho9dmM7BuFtzH8ifwv5qNZLrTQZ1gzwaG2KHMg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wQuSWpKvcj4+ThgJHs6oUIdcE/w2mjZN6UvE7iEMxHA=;
- b=16Jo6+Kr0DMskBhsROQKFF/an4MMQiHuY+ZrpjPT7W7xd+6vJhGxW7rsTLp38GUDbRbroIGyCBynhf54MZHPKTl+kvTolLAC8pgaZxBM87+DDN5Pr1P/VLjGDbwsjepNI1DcMnbPT1+Uf3f5kwB+fC4XsEruK4XjhdVYBC2zqzg=
-Received: from SA1PR02CA0022.namprd02.prod.outlook.com (2603:10b6:806:2cf::29)
- by LV8PR12MB9133.namprd12.prod.outlook.com (2603:10b6:408:188::15) with
+ bh=Nb5xn8wWzGmLkl9z1YSLuY3GvBtE0Frzq/FHmDOAUrA=;
+ b=EF6CpeQ8gW0fMgC4FfjU2NE/ZWe9I+UWcvaRNAf/gDbE5blyCQRqV8OgVCZ5EOrmK9hd7ejVM0wFnOxhuO6Kh0/CJWOWl8abXgwCdz7/XnJ7rKLSEMxi+TyXaJOC6Dmrro7lemgwTvfcsKdNV4MMsDmOHTmi2NPzMHjmkcGYorc=
+Received: from SA1PR02CA0013.namprd02.prod.outlook.com (2603:10b6:806:2cf::11)
+ by CYYPR12MB8922.namprd12.prod.outlook.com (2603:10b6:930:b8::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.28; Wed, 20 Mar
- 2024 08:41:30 +0000
+ 2024 08:42:15 +0000
 Received: from SN1PEPF000252A4.namprd05.prod.outlook.com
- (2603:10b6:806:2cf:cafe::b3) by SA1PR02CA0022.outlook.office365.com
- (2603:10b6:806:2cf::29) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:806:2cf:cafe::73) by SA1PR02CA0013.outlook.office365.com
+ (2603:10b6:806:2cf::11) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.28 via Frontend
- Transport; Wed, 20 Mar 2024 08:41:29 +0000
+ Transport; Wed, 20 Mar 2024 08:42:15 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,21 +65,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  SN1PEPF000252A4.mail.protection.outlook.com (10.167.242.11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 08:41:29 +0000
+ 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 08:42:15 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 20 Mar
- 2024 03:41:28 -0500
+ 2024 03:42:10 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <qemu-devel@nongnu.org>
 CC: <kvm@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, "Paolo
  Bonzini" <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?=
 	<berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta
 	<pankaj.gupta@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata
-	<isaku.yamahata@linux.intel.com>
-Subject: [PATCH v3 10/49] kvm: Introduce support for memory_attributes
-Date: Wed, 20 Mar 2024 03:39:06 -0500
-Message-ID: <20240320083945.991426-11-michael.roth@amd.com>
+	<isaku.yamahata@linux.intel.com>, David Hildenbrand <david@redhat.com>
+Subject: [PATCH v3 11/49] physmem: Introduce ram_block_discard_guest_memfd_range()
+Date: Wed, 20 Mar 2024 03:39:07 -0500
+Message-ID: <20240320083945.991426-12-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240320083945.991426-1-michael.roth@amd.com>
 References: <20240320083945.991426-1-michael.roth@amd.com>
@@ -95,131 +95,99 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A4:EE_|LV8PR12MB9133:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1a896c60-b326-4287-707b-08dc48b989a9
+X-MS-TrafficTypeDiagnostic: SN1PEPF000252A4:EE_|CYYPR12MB8922:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1d58d843-0fe7-4a5b-a42c-08dc48b9a4dd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	vCEhPJuIetAjTxcR0qlVNHmEFwvu4yY63xa40DbpgSNvGc2dyoN/0oBCGEsERq7U7S3F8er90K0A1PQ7y4rKSgol61DD0ZAwrNfXhBG1Eta1PmrsQFDeXz7saw6vn5qi8ZcvRSdDP9s94CO004ARsI0e0fgySZ2GUVc90gKeOAW0AUrZ3Y3GHi6AqOcBrT4ILnywCnnYLPgHkLAMO5EwCGAvv0shS6eDxzVJI+hrtOD3KYPTVjCpnU8twmuZ8U8pDZHTXR3IZiG3rryxODPj0GB5dMPQ+cidWSbf05eydXGaSnJBsZkRYjZWPiHF3vSJMT1IgbsgpHKpZqpaIIqPqd8dNgosndQxWILNRWZ56+eD2PfcnGy8KoB6VM2OMO4tKnNNqmZM6a+Vo8hQ9sAfny8Yvb1oVZFw+0q9l7SREmDen2GRzr6APeksraH8jy8mhwP+JGuE5vNHmlaqdjtL1OEWvn2fSua5ggmD+xu2xk/CwEqU9I5V8VsbQRSaVxKv4Y62WCyrvH3bCebyNXtd5AEAwWaAeFru05/ICp0PLT/pJBuNIDuRuMp4RDrfArtAhO1RI+eG217j2fuVG1fSOll3hOEhNhVVeNPh5tgOxRzqScAfrnZ4j1mcoAZinHiobNQh6lmPHIKhyKWFTClqMRBBiejnjPWOJB+u8I9OhdEuxwlPQYn8W9cZcLTLjpzO4BYGBBOS6R41S5uEtNA091boZPBHdpg2l1RrBvKKTy85/1w7+4u8dbV2iV48NyNy
+	oXd3BXwSVsKOooEJTZz2EmA76bwt3Yqb2YCWeK8kF4FexrdCVxGl90rEsMxBzxxDdT65AIbfraBgB2SzLEbX7K6N+0VdBNBGFB95NQYJLx9vwaes4v/K7cutnpZiLdKfTItNep9h7B7fohcJHwWI9R1oJH3BnztdJ864Bj8pzx6Q1EN544ipeh7vySRWQ+xhkqoMd2RdkQLF+zd+8SxdmwF1oYUx18p0qzTb8cc+kgXDhPVzdcbYMTPswLxoIsLW3QF/JcZW8dW/inuas9HzTloiiGaDIktUq5dTwkokStK1MSuUu6tvowp5Yp05FExHcp1YUjd2BsQh0PBAV3hUqFZ9eE57Y3jWSmuG/2TK1e/x1iTA9JLEEE7P6yySvLqDj2mut1faRbQpbQEew+35p4r4ftVCN/nkVkg9ksOpoeU6TixJ12ZnWLvL9pml+LAgT8x+fUkf9GpbiuFR6pZD/gEAkwbReIJk6pOhGUZSbrYX1UWYqsMYuqFEK5QMi5tsBptkRS9nv2UDas2oLsqvo2wCUMGSPhYbmjWfalWfENS+S4YBEezM7Yv2XK05YqI0s/1ZUCC/aCuusSFJ+FV1XRjNXKhUuYsua3/+znM8hmeVe7rOTTFkjTDf4KDguai1a4EILmIABQttW35PNqjV31KUh/XddvZvlLG/CVCUJA9jXxRJB3SeLz2UZyZMUcEbEXGsEEL4xkbg/TxXj76hObk6NTqUsxXJs6mpVt9gTlZQef2ZpftsdFBHO472PiGg
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014)(1800799015);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(1800799015)(376005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 08:41:29.4719
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 08:42:15.1125
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a896c60-b326-4287-707b-08dc48b989a9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d58d843-0fe7-4a5b-a42c-08dc48b9a4dd
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	SN1PEPF000252A4.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9133
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8922
 
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Introduce the helper functions to set the attributes of a range of
-memory to private or shared.
+When memory page is converted from private to shared, the original
+private memory is back'ed by guest_memfd. Introduce
+ram_block_discard_guest_memfd_range() for discarding memory in
+guest_memfd.
 
-This is necessary to notify KVM the private/shared attribute of each gpa
-range. KVM needs the information to decide the GPA needs to be mapped at
-hva-based shared memory or guest_memfd based private memory.
-
+Originally-from: Isaku Yamahata <isaku.yamahata@intel.com>
+Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
-Changes in v4:
-- move the check of kvm_supported_memory_attributes to the common
-  kvm_set_memory_attributes(); (Wang Wei)
-- change warn_report() to error_report() in kvm_set_memory_attributes()
-  and drop the __func__; (Daniel)
+Changes in v5:
+- Collect Reviewed-by from David;
+
+Changes in in v4:
+- Drop ram_block_convert_range() and open code its implementation in the
+  next Patch.
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- accel/kvm/kvm-all.c  | 44 ++++++++++++++++++++++++++++++++++++++++++++
- include/sysemu/kvm.h |  3 +++
- 2 files changed, 47 insertions(+)
+ include/exec/cpu-common.h |  2 ++
+ system/physmem.c          | 23 +++++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index e83429b31e..df7a32735a 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -92,6 +92,7 @@ static bool kvm_has_guest_debug;
- static int kvm_sstep_flags;
- static bool kvm_immediate_exit;
- static bool kvm_guest_memfd_supported;
-+static uint64_t kvm_supported_memory_attributes;
- static hwaddr kvm_max_slot_size = ~0;
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 6346df17ce..6d5318895a 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -159,6 +159,8 @@ typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
  
- static const KVMCapabilityInfo kvm_required_capabilites[] = {
-@@ -1304,6 +1305,46 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
-     kvm_max_slot_size = max_slot_size;
+ int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
+ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length);
++int ram_block_discard_guest_memfd_range(RAMBlock *rb, uint64_t start,
++                                        size_t length);
+ 
+ #endif
+ 
+diff --git a/system/physmem.c b/system/physmem.c
+index 3a4a3f10d5..8be8053cf7 100644
+--- a/system/physmem.c
++++ b/system/physmem.c
+@@ -3705,6 +3705,29 @@ err:
+     return ret;
  }
  
-+static int kvm_set_memory_attributes(hwaddr start, hwaddr size, uint64_t attr)
++int ram_block_discard_guest_memfd_range(RAMBlock *rb, uint64_t start,
++                                        size_t length)
 +{
-+    struct kvm_memory_attributes attrs;
-+    int r;
++    int ret = -1;
 +
-+    if (kvm_supported_memory_attributes == 0) {
-+        error_report("No memory attribute supported by KVM\n");
-+        return -EINVAL;
++#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
++    ret = fallocate(rb->guest_memfd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
++                    start, length);
++
++    if (ret) {
++        ret = -errno;
++        error_report("%s: Failed to fallocate %s:%" PRIx64 " +%zx (%d)",
++                     __func__, rb->idstr, start, length, ret);
 +    }
++#else
++    ret = -ENOSYS;
++    error_report("%s: fallocate not available %s:%" PRIx64 " +%zx (%d)",
++                 __func__, rb->idstr, start, length, ret);
++#endif
 +
-+    if ((attr & kvm_supported_memory_attributes) != attr) {
-+        error_report("memory attribute 0x%lx not supported by KVM,"
-+                     " supported bits are 0x%lx\n",
-+                     attr, kvm_supported_memory_attributes);
-+        return -EINVAL;
-+    }
-+
-+    attrs.attributes = attr;
-+    attrs.address = start;
-+    attrs.size = size;
-+    attrs.flags = 0;
-+
-+    r = kvm_vm_ioctl(kvm_state, KVM_SET_MEMORY_ATTRIBUTES, &attrs);
-+    if (r) {
-+        error_report("failed to set memory (0x%lx+%#zx) with attr 0x%lx error '%s'",
-+                     start, size, attr, strerror(errno));
-+    }
-+    return r;
++    return ret;
 +}
 +
-+int kvm_set_memory_attributes_private(hwaddr start, hwaddr size)
-+{
-+    return kvm_set_memory_attributes(start, size, KVM_MEMORY_ATTRIBUTE_PRIVATE);
-+}
-+
-+int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size)
-+{
-+    return kvm_set_memory_attributes(start, size, 0);
-+}
-+
- /* Called with KVMMemoryListener.slots_lock held */
- static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                              MemoryRegionSection *section, bool add)
-@@ -2439,6 +2480,9 @@ static int kvm_init(MachineState *ms)
- 
-     kvm_guest_memfd_supported = kvm_check_extension(s, KVM_CAP_GUEST_MEMFD);
- 
-+    ret = kvm_check_extension(s, KVM_CAP_MEMORY_ATTRIBUTES);
-+    kvm_supported_memory_attributes = ret > 0 ? ret : 0;
-+
-     if (object_property_find(OBJECT(current_machine), "kvm-type")) {
-         g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
-                                                             "kvm-type",
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index b4913281e2..2cb3192509 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -538,4 +538,7 @@ void kvm_mark_guest_state_protected(void);
- bool kvm_hwpoisoned_mem(void);
- 
- int kvm_create_guest_memfd(uint64_t size, uint64_t flags, Error **errp);
-+
-+int kvm_set_memory_attributes_private(hwaddr start, hwaddr size);
-+int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size);
- #endif
+ bool ramblock_is_pmem(RAMBlock *rb)
+ {
+     return rb->flags & RAM_PMEM;
 -- 
 2.25.1
 
