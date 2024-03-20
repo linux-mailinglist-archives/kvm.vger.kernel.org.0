@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-12233-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12234-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52E2880D6A
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:46:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ADC2880D6F
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:46:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8673C281D7C
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:46:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96482B22F6D
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D0C38F9A;
-	Wed, 20 Mar 2024 08:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762EA38DE1;
+	Wed, 20 Mar 2024 08:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="r0IAJplK"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="HWEe7NY3"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2063.outbound.protection.outlook.com [40.107.92.63])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2047.outbound.protection.outlook.com [40.107.220.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA2A38DE5
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 08:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70655374C3
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 08:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710924368; cv=fail; b=SYKis9LzVAlwepjr1O7rtSdlzV03pvo3lGlk5z7peXoKQWoIHb+kTjWDgFGxM3o9X+mxdH5Nd0J7xMXY5PCObiBQ0ioLr+ZTR6n49lFZjV/KHxW1UjMn/TkCFbO2e3eJ/G1kC2pDiAnc4Hbjw8pBNzXwSedPKORi9DLk8avZcM4=
+	t=1710924388; cv=fail; b=piKH9eUr0EeO+BQMesUAA3HPlD9HDqZyS/lKSFwxC3i1hiJet4ozJt/6EIBN6h1nNsbBHFA0S/RKVTMhfH2AJCViaiMDPbVmjBF4qTl365QvIaKZM/d5k5h3CJOc7n7DrLKtLJdIbKStXeaWrbl1ofIxcjvNs9eGxmHuNb1NRzE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710924368; c=relaxed/simple;
-	bh=2otGYn1OBsulKlSd+nuR7CaCz60pziEmc+mcFm6p6H4=;
+	s=arc-20240116; t=1710924388; c=relaxed/simple;
+	bh=QGlInYhHqaGsCojxB797NOspOtFxvpCA+Mf97xMjNb0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nX2WpC9eKuuKPsp3KIeEXCiMiRfkrY4UaLsc6saNrnu4wXcJ4rEG8kuch+B3hn6yt1BVCsyc5nSPwztFz3J/OXPMzWKLuI+htjNBOxsGJvAnyW9D5eWCDfd30qTWOsFIp0LNnjKsGcYjSMRvkw2jN2N8BwV9LpK7AVk4EKsBP7E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=r0IAJplK; arc=fail smtp.client-ip=40.107.92.63
+	 MIME-Version:Content-Type; b=HsY3QrgdhjHjKnru3Ym1vdSweZvTFDiVrd3JwhwhmFJgYvYO6prHUogI+KZhzhSJokN91VM0qKkvzWmfydFd8Z4J7SIDCjLHAnTjxI/kHdF/+b1uoOT/cAIo79h2LSRW4BrWzs8Zkywp0uC+XOdP8qN1cKvTzLVncDjC7HwtIPo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=HWEe7NY3; arc=fail smtp.client-ip=40.107.220.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RKBbO0CaEhuTxCJXfv5scGZ7R1aKOKP84OZU1haI/uLUYLvB9nS0U3Xqf+qjk3OW4f/hR3kxJDJl51nDIQ/TpP2RNDlL67XkYs64NmDhiWiEQdr5YdOTEXeDjLB3odnRsn1xe2lWfWahC/Y3zn0aV2ppmAGO3wyolP3Z66X+DUhTlvFPmbHchs/iRG99NmH+WOsZW428fCaxS2blmmWy9eLhGfET9GmmJui5t9SXgYLADERtRUAq8Dsr09CTTqPZa2SdnkdTFNLAmIpeqrOYjJy1QJo6bL/dNg4O5IHJJLbRmtEiEWnnWwP/PXNYq6912Izd6rjDcQJWlRUwcNQfcQ==
+ b=fz2ug7+qrWkRcIY4L4czPnlJkR1SsIVHiukyDUdEiaX6adK8eAskx/l5NzCY1QK5Epud5X/1ChWmh5Se41k9X/tXwjguVLFmHOH2ITo+6+9Tn1caqxu51zs+Ra9qr+5UaAkxcRtlASrmy//AFJxUuLmhHea/uSFCn2eJCxjpQOPs8H8eQ3dF13NhdEd1P4JpfHu3k5YuojxoLk0iEh96L9PTAY/sBckpJ4+1abp2SfUS7khCbvb6+5HfH/xMmer6f1uw5VEqdoPAXN9qnmyJv4Oj75JIOlrKGXf2rtPK6CpUCgVEMI2B4Ay+6q1QzqQwsjEBIzxMcJHt2Htv1ZnSLg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Nabb/ZLx53NOJVnViJd0UclO546NdwaLnwg/o8wtWdk=;
- b=fNq8sPtDF1f+Off4dYGGCWe9fSst9RPGi9AXEcggpkx5rZxMsK6waVwaUdeRlqtD/ykMLSlgoHJq08BtE9t9K5cis0uVSU1Wk6LFSAr4EPAc2RcU8Dn5IBhij9SVAnM1y1eoBI+JAmZgGwhVfnWBevcE7x3El/m641g4OsLURr1eqwKhQf7ldjtnJn0ItAS1LsNHz5+lRoIhMW3X99InoNmNq+4BSsh6ZSvy2Bj/cS8LHmLfDRXUA8WM8l9vy8fg/OuqVinv7Gp4wLC7TlEfU8oJ1IYJ4lpVpKIW3zF8MnntPj6n+vM/kbt8BK2F3n62ALLmOsYmxtm8eHdrTUZgpA==
+ bh=Gehi5mbMRnwlaPpR38+1auwvPqqhEjZFuH/Zj2vP/Fg=;
+ b=EU8kzYPAHL/41N7iLQrBZlUKKsJ5VJEwG9Cd1gXHWqWz/mJY+b6BVEVl9UpTz/EdkTHpllbAD0wWTYAI0/BJHLUZG7cBcvUGuAFFGx4q0hay/LlMkgvijRhiYEw/4MLFTSgx10ZGQWVZv3cV/kKEkiU7YyD0Nol+J0iz3ZclslnXAmYDVmcAGz4CS2UtlHIglZA8FBvg4RErpV1g6SG98PlmReiRWNFfAGO/9Zlo+GgjcRpS8oo+Oq2Id+4tXtMbhYFhB2JUQVm+/4oZJFQ9qiE51JGPMy1NFEfZ7BYgDjzTXctkRBl4Ow+tf8J+n4AjCmS8AAUycj67bDpB48dAKg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Nabb/ZLx53NOJVnViJd0UclO546NdwaLnwg/o8wtWdk=;
- b=r0IAJplKY5pn5RAIyatyXWoHMRZABPkiEyy8t5wv4w0ZDnjBMTQA9pHikHe8DDwH+Vd21b43ENoxmjMuelfMDSmgkxznPpQEU/xV47IiivsXsGqqTRMSyzOV6EV2Wuf0/sA+XLP4Z8POCBLn4grOjMo3qSj0qQNEFQQDPmhCFM0=
-Received: from MW4PR03CA0239.namprd03.prod.outlook.com (2603:10b6:303:b9::34)
- by MW4PR12MB7360.namprd12.prod.outlook.com (2603:10b6:303:21a::20) with
+ bh=Gehi5mbMRnwlaPpR38+1auwvPqqhEjZFuH/Zj2vP/Fg=;
+ b=HWEe7NY3Og5ETAxh0Abq9eYwgwlxljsp43DSTERuTh0KPZ8S03KOpB0ABp+Z1V6xbKwavWLzvn6Nd+YdZsZkoHwm4qp0jstT/JWHDKucGpXTZ+6pXLavNngk8+OtWfDj37635Ffgu7I0CVE5hjS/vwG9Ba+kJ7J1GZdWIPwDW/s=
+Received: from MW4PR03CA0285.namprd03.prod.outlook.com (2603:10b6:303:b5::20)
+ by LV2PR12MB5728.namprd12.prod.outlook.com (2603:10b6:408:17c::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27; Wed, 20 Mar
- 2024 08:46:02 +0000
-Received: from MWH0EPF000A6734.namprd04.prod.outlook.com
- (2603:10b6:303:b9:cafe::a) by MW4PR03CA0239.outlook.office365.com
- (2603:10b6:303:b9::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.30; Wed, 20 Mar
+ 2024 08:46:23 +0000
+Received: from MWH0EPF000A672F.namprd04.prod.outlook.com
+ (2603:10b6:303:b5:cafe::4f) by MW4PR03CA0285.outlook.office365.com
+ (2603:10b6:303:b5::20) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.28 via Frontend
- Transport; Wed, 20 Mar 2024 08:46:02 +0000
+ Transport; Wed, 20 Mar 2024 08:46:23 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,23 +63,23 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MWH0EPF000A6734.mail.protection.outlook.com (10.167.249.26) with Microsoft
+ MWH0EPF000A672F.mail.protection.outlook.com (10.167.249.21) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 08:46:02 +0000
+ 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 08:46:23 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 20 Mar
- 2024 03:46:01 -0500
+ 2024 03:46:22 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <qemu-devel@nongnu.org>
 CC: <kvm@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, "Paolo
  Bonzini" <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?=
 	<berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta
 	<pankaj.gupta@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata
-	<isaku.yamahata@linux.intel.com>
-Subject: [PATCH v3 21/49] i386/sev: Introduce "sev-common" type to encapsulate common SEV state
-Date: Wed, 20 Mar 2024 03:39:17 -0500
-Message-ID: <20240320083945.991426-22-michael.roth@amd.com>
+	<isaku.yamahata@linux.intel.com>, Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH v3 22/49] i386/sev: Introduce 'sev-snp-guest' object
+Date: Wed, 20 Mar 2024 03:39:18 -0500
+Message-ID: <20240320083945.991426-23-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240320083945.991426-1-michael.roth@amd.com>
 References: <20240320083945.991426-1-michael.roth@amd.com>
@@ -95,1067 +95,526 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6734:EE_|MW4PR12MB7360:EE_
-X-MS-Office365-Filtering-Correlation-Id: d4244442-135b-4a37-0801-08dc48ba2c63
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A672F:EE_|LV2PR12MB5728:EE_
+X-MS-Office365-Filtering-Correlation-Id: b43a353e-9e38-4ea7-3b64-08dc48ba38e0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	jp6Qf+XRkjYfcTKRknvwQbeCHAGGxfKeFht2AwnAO2dmXY68uWg0xjZpjWF0Uw03d5uDwcSuCKVpgIIUNYWb+yVvunAL5xvdFcBXtKtaImrJbRO+VMDcJlMEt5MzjDzEu/ZZXaDJAtar4HxkIESTVKv8Baw8JqJOcyv7Op8qpHYtiYmSjFGRHitMsBcQo1mZSdRIIvKo92fo4cTC18EbwVm1mzqjSvbUmABPvH7Ze6WA7PxrAzh51btxE7QFS4yc2bbOqmFTzNIAnHV4uhf+HgWPFn3Om0Bx6eMpKUKlI5NhNotHNzcLO1eGrAFjvfyfD2Tk59eJ3dHDHIbeyVsaildB4GuGu3jhpcoi6rdCX2djigYRkuxupZ2hzWAAAq5QVKfbimhmXSEerf2pNkEW7jz05UPsdZZc0MHIbysulwhN0ZEC2lcHUUZKGNwR4v9ddutLQ6cm8uHKU4RHKitMZ9xiMb9/zHW75KwcWkn+LkGPQ0W3kDFjwLIa+3kR/0wdZDzwqjEf2oydXVh6/1LISF71MljxL7nyhqP92wB3le5qRQpGkYOulT1w63xXpoDT0EFs/IDm7pKcgb+uLgrhgXvPQgKJPaGm+pmECgF1ATO3alqdQZW0bA9krAsYZH7bzlxnAfS99jj7o03geTKDIWRk60npTP2lQt5VrGGRXStyJZeTWanxR/yJ0irZF64OfZsOF8VdFupzq3AxAWA3IizVKfujEMw9TnYdu3crSAI2SyN1uL4+rQDIZlmgETJw
+	Jja47tWWSdv4sFz7EWQTcBA3xzjFFiIgRDyifsFKQ5e5M2CIIhhMxeMuX7xngHt+sXzDZxTmUV0QevvJuEpMxhZzvbDA7/mM8SOKzvl8imLS3bOk/SnEHHWLIpRx0EXTQRKzY+xJDwqIss2TXQP69uLROlNO3wUhff/Ets0gs/zHnsgI6i0CWGLv8jrKO3111Z7ZByWCnBfJbSIhBccj5eMs0YOW6IRlrnHgvpNi0RXJhlsDZ4GXc83S6Kcv8kkRb6ftAISWhoANoCRgGW5QabJ+xZ1Ssd1H69vPGsR28JB2qSE/q4Nmn9URspwid21X761l12X2q8pEza33YfVqBOG4e4HtFI13OTbi/Hm0NtmKUioOlMW5GI2hFasLV8KoFNYG97AW7yxeRyJsk/83uSndapqHwWf4w3OQzrRNK/Fuw7CBi4f8ZdyplREzFj44TSIrHllTxpHeZ0b8uDc6xrS0ktbhygZXYdUmQpLBG2E0vrDoB1j/K1kiVY1irV+c8DZ4PBhdg4cBisISdY3o1RAoY6cXHZft54VR0H/H2OXb+9pizrTxg3hCXSUYBeHbicCBLhKSP0Vnkg7wSaMGD1lECH2Ql03kRt9rYQ68cyfaW+5f3yq4+LmJqR/yJS61eV+kSN2BY/tVvRXDPTg/nx7YAtFtYSbi6keyyZgHRXNt2IbGEK49s1VoJ9GaU243fOReRpjz7+zeyKssK9ad+G+KcKat9+BTskDs763an5djuCB1KClzZ+KGUGOA/IFD
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(82310400014)(376005);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(376005)(1800799015);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 08:46:02.4009
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 08:46:23.3541
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d4244442-135b-4a37-0801-08dc48ba2c63
+X-MS-Exchange-CrossTenant-Network-Message-Id: b43a353e-9e38-4ea7-3b64-08dc48ba38e0
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A6734.namprd04.prod.outlook.com
+	MWH0EPF000A672F.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7360
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5728
 
-Currently all SEV/SEV-ES functionality is managed through a single
-'sev-guest' QOM type. With upcoming support for SEV-SNP, taking this
-same approach won't work well since some of the properties/state
-managed by 'sev-guest' is not applicable to SEV-SNP, which will instead
-rely on a new QOM type with its own set of properties/state.
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-To prepare for this, this patch moves common state into an abstract
-'sev-common' parent type to encapsulate properties/state that are
-common to both SEV/SEV-ES and SEV-SNP, leaving only SEV/SEV-ES-specific
-properties/state in the current 'sev-guest' type. This should not
-affect current behavior or command-line options.
+SEV-SNP support relies on a different set of properties/state than the
+existing 'sev-guest' object. This patch introduces the 'sev-snp-guest'
+object, which can be used to configure an SEV-SNP guest. For example,
+a default-configured SEV-SNP guest with no additional information
+passed in for use with attestation:
 
-As part of this patch, some related changes are also made:
+  -object sev-snp-guest,id=sev0
 
-  - a static 'sev_guest' variable is currently used to keep track of
-    the 'sev-guest' instance. SEV-SNP would similarly introduce an
-    'sev_snp_guest' static variable. But these instances are now
-    available via qdev_get_machine()->cgs, so switch to using that
-    instead and drop the static variable.
+or a fully-specified SEV-SNP guest where all spec-defined binary
+blobs are passed in as base64-encoded strings:
 
-  - 'sev_guest' is currently used as the name for the static variable
-    holding a pointer to the 'sev-guest' instance. Re-purpose the name
-    as a local variable referring the 'sev-guest' instance, and use
-    that consistently throughout the code so it can be easily
-    distinguished from sev-common/sev-snp-guest instances.
+  -object sev-snp-guest,id=sev0, \
+    policy=0x30000, \
+    init-flags=0, \
+    id-block=YWFhYWFhYWFhYWFhYWFhCg==, \
+    id-auth=CxHK/OKLkXGn/KpAC7Wl1FSiisWDbGTEKz..., \
+    auth-key-enabled=on, \
+    host-data=LNkCWBRC5CcdGXirbNUV1OrsR28s..., \
+    guest-visible-workarounds=AA==, \
 
-  - 'sev' is generally used as the name for local variables holding a
-    pointer to the 'sev-guest' instance. In cases where that now points
-    to common state, use the name 'sev_common'; in cases where that now
-    points to state specific to 'sev-guest' instance, use the name
-    'sev_guest'
+See the QAPI schema updates included in this patch for more usage
+details.
 
+In some cases these blobs may be up to 4096 characters, but this is
+generally well below the default limit for linux hosts where
+command-line sizes are defined by the sysconf-configurable ARG_MAX
+value, which defaults to 2097152 characters for Ubuntu hosts, for
+example.
+
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Co-developed-by: Michael Roth <michael.roth@amd.com>
+Acked-by: Markus Armbruster <armbru@redhat.com> (for QAPI schema)
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- qapi/qom.json     |  32 ++--
- target/i386/sev.c | 457 ++++++++++++++++++++++++++--------------------
- target/i386/sev.h |   3 +
- 3 files changed, 281 insertions(+), 211 deletions(-)
+ docs/system/i386/amd-memory-encryption.rst |  78 ++++++-
+ qapi/qom.json                              |  51 +++++
+ target/i386/sev.c                          | 241 +++++++++++++++++++++
+ target/i386/sev.h                          |   1 +
+ 4 files changed, 369 insertions(+), 2 deletions(-)
 
+diff --git a/docs/system/i386/amd-memory-encryption.rst b/docs/system/i386/amd-memory-encryption.rst
+index e9bc142bc1..9d6b63acd9 100644
+--- a/docs/system/i386/amd-memory-encryption.rst
++++ b/docs/system/i386/amd-memory-encryption.rst
+@@ -25,8 +25,8 @@ support for notifying a guest's operating system when certain types of VMEXITs
+ are about to occur. This allows the guest to selectively share information with
+ the hypervisor to satisfy the requested function.
+ 
+-Launching
+----------
++Launching (SEV and SEV-ES)
++--------------------------
+ 
+ Boot images (such as bios) must be encrypted before a guest can be booted. The
+ ``MEMORY_ENCRYPT_OP`` ioctl provides commands to encrypt the images: ``LAUNCH_START``,
+@@ -161,6 +161,80 @@ The value of GCTX.LD is
+ If kernel hashes are not used, or SEV-ES is disabled, use empty blobs for
+ ``kernel_hashes_blob`` and ``vmsas_blob`` as needed.
+ 
++Launching (SEV-SNP)
++-------------------
++Boot images (such as bios) must be encrypted before a guest can be booted. The
++``MEMORY_ENCRYPT_OP`` ioctl provides commands to encrypt the images:
++``KVM_SNP_INIT``, ``SNP_LAUNCH_START``, ``SNP_LAUNCH_UPDATE``, and
++``SNP_LAUNCH_FINISH``. These four commands together generate a fresh memory
++encryption key for the VM, encrypt the boot images for a successful launch.
++
++KVM_SNP_INIT is called first to initialize the SEV-SNP firmware and SNP
++features in the KVM. The feature flags value can be provided through the
++init-flags property of the sev-snp-guest object.
++
+++------------+-------+----------+---------------------------------+
++| key        | type  | default  | meaning                         |
+++------------+-------+----------+---------------------------------+
++| init_flags | hex   | 0        | SNP feature flags               |
+++-----------------------------------------------------------------+
++
++Note: currently the init_flags must be zero.
++
++``SNP_LAUNCH_START`` is called first to create a cryptographic launch context
++within the firmware. To create this context, guest owner must provide a guest
++policy and other parameters as described in the SEV-SNP firmware
++specification. The launch parameters should be specified as described in the
++QAPI schema for the sev-snp-guest object.
++
++The ``SNP_LAUNCH_START`` uses the following parameters (see the SEV-SNP
++specification for more details):
++
+++--------+-------+----------+----------------------------------------------+
++| key    | type  | default  | meaning                                      |
+++--------+-------+----------+----------------------------------------------+
++| policy | hex   | 0x30000  | a 64-bit guest policy                        |
++| imi_en | bool  | 0        | 1 when IMI is enabled                        |
++| ma_end | bool  | 0        | 1 when migration agent is used               |
++| gosvw  | string| 0        | 16-byte base64 encoded string for the guest  |
++|        |       |          | OS visible workaround.                       |
+++--------+-------+----------+----------------------------------------------+
++
++``SNP_LAUNCH_UPDATE`` encrypts the memory region using the cryptographic context
++created via the ``SNP_LAUNCH_START`` command. If required, this command can be
++called multiple times to encrypt different memory regions. The command also
++calculates the measurement of the memory contents as it encrypts.
++
++``SNP_LAUNCH_FINISH`` finalizes the guest launch flow. Optionally, while
++finalizing the launch the firmware can perform checks on the launch digest
++computing through the ``SNP_LAUNCH_UPDATE``. To perform the check the user must
++supply the id block, authentication blob and host data that should be included
++in the attestation report. See the SEV-SNP spec for further details.
++
++The ``SNP_LAUNCH_FINISH`` uses the following parameters, which can be configured
++by the corresponding parameters documented in the QAPI schema for the
++'sev-snp-guest' object.
++
+++------------+-------+----------+----------------------------------------------+
++| key        | type  | default  | meaning                                      |
+++------------+-------+----------+----------------------------------------------+
++| id_block   | string| none     | base64 encoded ID block                      |
+++------------+-------+----------+----------------------------------------------+
++| id_auth    | string| none     | base64 encoded authentication information    |
+++------------+-------+----------+----------------------------------------------+
++| auth_key_en| bool  | 0        | auth block contains author key               |
+++------------+-------+----------+----------------------------------------------+
++| host_data  | string| none     | host provided data                           |
+++------------+-------+----------+----------------------------------------------+
++
++To launch a SEV-SNP guest (additional parameters are documented in the QAPI
++schema for the 'sev-snp-guest' object)::
++
++  # ${QEMU} \
++    -machine ...,confidential-guest-support=sev0 \
++    -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1
++
++
+ Debugging
+ ---------
+ 
 diff --git a/qapi/qom.json b/qapi/qom.json
-index baae3a183f..66b5781ca6 100644
+index 66b5781ca6..b25a3043da 100644
 --- a/qapi/qom.json
 +++ b/qapi/qom.json
-@@ -875,12 +875,29 @@
-   'data': { '*filename': 'str' } }
- 
- ##
--# @SevGuestProperties:
-+# @SevCommonProperties:
- #
--# Properties for sev-guest objects.
-+# Properties common to objects that are derivatives of sev-common.
- #
- # @sev-device: SEV device to use (default: "/dev/sev")
- #
-+# @cbitpos: C-bit location in page table entry (default: 0)
-+#
-+# @reduced-phys-bits: number of bits in physical addresses that become
-+#     unavailable when SEV is enabled
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'SevCommonProperties',
-+  'data': { '*sev-device': 'str',
-+            '*cbitpos': 'uint32',
-+            'reduced-phys-bits': 'uint32' } }
-+
-+##
-+# @SevGuestProperties:
-+#
-+# Properties for sev-guest objects.
-+#
- # @dh-cert-file: guest owners DH certificate (encoded with base64)
- #
- # @session-file: guest owners session parameters (encoded with base64)
-@@ -889,11 +906,6 @@
- #
- # @handle: SEV firmware handle (default: 0)
- #
--# @cbitpos: C-bit location in page table entry (default: 0)
--#
--# @reduced-phys-bits: number of bits in physical addresses that become
--#     unavailable when SEV is enabled
--#
- # @kernel-hashes: if true, add hashes of kernel/initrd/cmdline to a
- #     designated guest firmware page for measured boot with -kernel
- #     (default: false) (since 6.2)
-@@ -901,13 +913,11 @@
- # Since: 2.12
- ##
- { 'struct': 'SevGuestProperties',
--  'data': { '*sev-device': 'str',
--            '*dh-cert-file': 'str',
-+  'base': 'SevCommonProperties',
-+  'data': { '*dh-cert-file': 'str',
-             '*session-file': 'str',
-             '*policy': 'uint32',
+@@ -920,6 +920,55 @@
              '*handle': 'uint32',
--            '*cbitpos': 'uint32',
--            'reduced-phys-bits': 'uint32',
              '*kernel-hashes': 'bool' } }
  
++##
++# @SevSnpGuestProperties:
++#
++# Properties for sev-snp-guest objects. Most of these are direct arguments
++# for the KVM_SNP_* interfaces documented in the linux kernel source
++# under Documentation/virt/kvm/amd-memory-encryption.rst, which are in
++# turn closely coupled with the SNP_INIT/SNP_LAUNCH_* firmware commands
++# documented in the SEV-SNP Firmware ABI Specification (Rev 0.9).
++#
++# More usage information is also available in the QEMU source tree under
++# docs/amd-memory-encryption.
++#
++# @policy: the 'POLICY' parameter to the SNP_LAUNCH_START command, as
++#          defined in the SEV-SNP firmware ABI (default: 0x30000)
++#
++# @guest-visible-workarounds: 16-byte, base64-encoded blob to report
++#                             hypervisor-defined workarounds, corresponding
++#                             to the 'GOSVW' parameter of the
++#                             SNP_LAUNCH_START command defined in the
++#                             SEV-SNP firmware ABI (default: all-zero)
++#
++# @id-block: 96-byte, base64-encoded blob to provide the 'ID Block'
++#            structure for the SNP_LAUNCH_FINISH command defined in the
++#            SEV-SNP firmware ABI (default: all-zero)
++#
++# @id-auth: 4096-byte, base64-encoded blob to provide the 'ID Authentication
++#           Information Structure' for the SNP_LAUNCH_FINISH command defined
++#           in the SEV-SNP firmware ABI (default: all-zero)
++#
++# @auth-key-enabled: true if 'id-auth' blob contains the 'AUTHOR_KEY' field
++#                    defined SEV-SNP firmware ABI (default: false)
++#
++# @host-data: 32-byte, base64-encoded, user-defined blob to provide to the
++#             guest, as documented for the 'HOST_DATA' parameter of the
++#             SNP_LAUNCH_FINISH command in the SEV-SNP firmware ABI
++#             (default: all-zero)
++#
++# Since: 7.2
++##
++{ 'struct': 'SevSnpGuestProperties',
++  'base': 'SevCommonProperties',
++  'data': {
++            '*policy': 'uint64',
++            '*guest-visible-workarounds': 'str',
++            '*id-block': 'str',
++            '*id-auth': 'str',
++            '*auth-key-enabled': 'bool',
++            '*host-data': 'str' } }
++
  ##
+ # @ThreadContextProperties:
+ #
+@@ -998,6 +1047,7 @@
+     { 'name': 'secret_keyring',
+       'if': 'CONFIG_SECRET_KEYRING' },
+     'sev-guest',
++    'sev-snp-guest',
+     'thread-context',
+     's390-pv-guest',
+     'throttle-group',
+@@ -1068,6 +1118,7 @@
+       'secret_keyring':             { 'type': 'SecretKeyringProperties',
+                                       'if': 'CONFIG_SECRET_KEYRING' },
+       'sev-guest':                  'SevGuestProperties',
++      'sev-snp-guest':              'SevSnpGuestProperties',
+       'thread-context':             'ThreadContextProperties',
+       'throttle-group':             'ThrottleGroupProperties',
+       'tls-creds-anon':             'TlsCredsAnonProperties',
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 9dab4060b8..63a220de5e 100644
+index 63a220de5e..7e6dab642a 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -40,48 +40,53 @@
- #include "hw/i386/pc.h"
- #include "exec/address-spaces.h"
+@@ -42,6 +42,7 @@
  
--#define TYPE_SEV_GUEST "sev-guest"
-+OBJECT_DECLARE_SIMPLE_TYPE(SevCommonState, SEV_COMMON)
+ OBJECT_DECLARE_SIMPLE_TYPE(SevCommonState, SEV_COMMON)
  OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
++OBJECT_DECLARE_SIMPLE_TYPE(SevSnpGuestState, SEV_SNP_GUEST)
  
--
--/**
-- * SevGuestState:
-- *
-- * The SevGuestState object is used for creating and managing a SEV
-- * guest.
-- *
-- * # $QEMU \
-- *         -object sev-guest,id=sev0 \
-- *         -machine ...,memory-encryption=sev0
-- */
--struct SevGuestState {
-+struct SevCommonState {
+ struct SevCommonState {
      X86ConfidentialGuest parent_obj;
- 
-     int kvm_type;
- 
-     /* configuration parameters */
-     char *sev_device;
--    uint32_t policy;
--    char *dh_cert_file;
--    char *session_file;
-     uint32_t cbitpos;
-     uint32_t reduced_phys_bits;
--    bool kernel_hashes;
- 
-     /* runtime state */
--    uint32_t handle;
-     uint8_t api_major;
-     uint8_t api_minor;
-     uint8_t build_id;
-     int sev_fd;
-     SevState state;
--    gchar *measurement;
- 
-     uint32_t reset_cs;
-     uint32_t reset_ip;
-     bool reset_data_valid;
+@@ -87,8 +88,22 @@ struct SevGuestState {
+     bool kernel_hashes;
  };
  
-+/**
-+ * SevGuestState:
-+ *
-+ * The SevGuestState object is used for creating and managing a SEV
-+ * guest.
-+ *
-+ * # $QEMU \
-+ *         -object sev-guest,id=sev0 \
-+ *         -machine ...,memory-encryption=sev0
-+ */
-+struct SevGuestState {
++struct SevSnpGuestState {
 +    SevCommonState sev_common;
-+    gchar *measurement;
 +
 +    /* configuration parameters */
-+    uint32_t handle;
-+    uint32_t policy;
-+    char *dh_cert_file;
-+    char *session_file;
-+    bool kernel_hashes;
++    char *guest_visible_workarounds;
++    char *id_block;
++    char *id_auth;
++    char *host_data;
++
++    struct kvm_sev_snp_launch_start kvm_start_conf;
++    struct kvm_sev_snp_launch_finish kvm_finish_conf;
 +};
 +
  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
  #define DEFAULT_SEV_DEVICE      "/dev/sev"
++#define DEFAULT_SEV_SNP_POLICY  0x30000
  
-@@ -127,7 +132,6 @@ typedef struct QEMU_PACKED PaddedSevHashTable {
- 
- QEMU_BUILD_BUG_ON(sizeof(PaddedSevHashTable) % 16 != 0);
- 
--static SevGuestState *sev_guest;
- static Error *sev_mig_blocker;
- 
- static const char *const sev_fw_errlist[] = {
-@@ -208,21 +212,21 @@ fw_error_to_str(int code)
- }
- 
- static bool
--sev_check_state(const SevGuestState *sev, SevState state)
-+sev_check_state(const SevCommonState *sev_common, SevState state)
- {
--    assert(sev);
--    return sev->state == state ? true : false;
-+    assert(sev_common);
-+    return sev_common->state == state ? true : false;
- }
- 
- static void
--sev_set_guest_state(SevGuestState *sev, SevState new_state)
-+sev_set_guest_state(SevCommonState *sev_common, SevState new_state)
- {
-     assert(new_state < SEV_STATE__MAX);
--    assert(sev);
-+    assert(sev_common);
- 
--    trace_kvm_sev_change_state(SevState_str(sev->state),
-+    trace_kvm_sev_change_state(SevState_str(sev_common->state),
-                                SevState_str(new_state));
--    sev->state = new_state;
-+    sev_common->state = new_state;
- }
- 
- static void
-@@ -289,111 +293,61 @@ static struct RAMBlockNotifier sev_ram_notifier = {
-     .ram_block_removed = sev_ram_block_removed,
+ #define SEV_INFO_BLOCK_GUID     "00f771de-1a7e-4fcb-890e-68c77e2fb44e"
+ typedef struct __attribute__((__packed__)) SevInfoBlock {
+@@ -1473,11 +1488,237 @@ static const TypeInfo sev_guest_info = {
+     .class_init = sev_guest_class_init,
  };
  
--static void
--sev_guest_finalize(Object *obj)
--{
--}
--
--static char *
--sev_guest_get_session_file(Object *obj, Error **errp)
--{
--    SevGuestState *s = SEV_GUEST(obj);
--
--    return s->session_file ? g_strdup(s->session_file) : NULL;
--}
--
--static void
--sev_guest_set_session_file(Object *obj, const char *value, Error **errp)
--{
--    SevGuestState *s = SEV_GUEST(obj);
--
--    s->session_file = g_strdup(value);
--}
--
--static char *
--sev_guest_get_dh_cert_file(Object *obj, Error **errp)
--{
--    SevGuestState *s = SEV_GUEST(obj);
--
--    return g_strdup(s->dh_cert_file);
--}
--
--static void
--sev_guest_set_dh_cert_file(Object *obj, const char *value, Error **errp)
--{
--    SevGuestState *s = SEV_GUEST(obj);
--
--    s->dh_cert_file = g_strdup(value);
--}
--
--static char *
--sev_guest_get_sev_device(Object *obj, Error **errp)
--{
--    SevGuestState *sev = SEV_GUEST(obj);
--
--    return g_strdup(sev->sev_device);
--}
--
--static void
--sev_guest_set_sev_device(Object *obj, const char *value, Error **errp)
--{
--    SevGuestState *sev = SEV_GUEST(obj);
--
--    sev->sev_device = g_strdup(value);
--}
--
--static bool sev_guest_get_kernel_hashes(Object *obj, Error **errp)
--{
--    SevGuestState *sev = SEV_GUEST(obj);
--
--    return sev->kernel_hashes;
--}
--
--static void sev_guest_set_kernel_hashes(Object *obj, bool value, Error **errp)
--{
--    SevGuestState *sev = SEV_GUEST(obj);
--
--    sev->kernel_hashes = value;
--}
--
- bool
- sev_enabled(void)
- {
--    return !!sev_guest;
-+    ConfidentialGuestSupport *cgs = MACHINE(qdev_get_machine())->cgs;
++static void
++sev_snp_guest_get_policy(Object *obj, Visitor *v, const char *name,
++                         void *opaque, Error **errp)
++{
++    visit_type_uint64(v, name,
++                      (uint64_t *)&SEV_SNP_GUEST(obj)->kvm_start_conf.policy,
++                      errp);
++}
 +
-+    return !!object_dynamic_cast(OBJECT(cgs), TYPE_SEV_COMMON);
- }
- 
- bool
- sev_es_enabled(void)
- {
--    return sev_enabled() && (sev_guest->policy & SEV_POLICY_ES);
-+    ConfidentialGuestSupport *cgs = MACHINE(qdev_get_machine())->cgs;
++static void
++sev_snp_guest_set_policy(Object *obj, Visitor *v, const char *name,
++                         void *opaque, Error **errp)
++{
++    visit_type_uint64(v, name,
++                      (uint64_t *)&SEV_SNP_GUEST(obj)->kvm_start_conf.policy,
++                      errp);
++}
 +
-+    return sev_enabled() && (SEV_GUEST(cgs)->policy & SEV_POLICY_ES);
- }
- 
- uint32_t
- sev_get_cbit_position(void)
- {
--    return sev_guest ? sev_guest->cbitpos : 0;
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-+
-+    return sev_common ? sev_common->cbitpos : 0;
- }
- 
- uint32_t
- sev_get_reduced_phys_bits(void)
- {
--    return sev_guest ? sev_guest->reduced_phys_bits : 0;
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-+
-+    return sev_common ? sev_common->reduced_phys_bits : 0;
- }
- 
- static SevInfo *sev_get_info(void)
- {
-     SevInfo *info;
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-+    SevGuestState *sev_guest =
-+        (SevGuestState *)object_dynamic_cast(OBJECT(sev_common),
-+                                             TYPE_SEV_GUEST);
- 
-     info = g_new0(SevInfo, 1);
-     info->enabled = sev_enabled();
- 
-     if (info->enabled) {
--        info->api_major = sev_guest->api_major;
--        info->api_minor = sev_guest->api_minor;
--        info->build_id = sev_guest->build_id;
--        info->policy = sev_guest->policy;
--        info->state = sev_guest->state;
--        info->handle = sev_guest->handle;
-+        if (sev_guest) {
-+            info->handle = sev_guest->handle;
-+        }
-+        info->api_major = sev_common->api_major;
-+        info->api_minor = sev_common->api_minor;
-+        info->build_id = sev_common->build_id;
-+        info->state = sev_common->state;
-+        /* we only report the lower 32-bits of policy for SNP, ok for now... */
-+        info->policy =
-+            (uint32_t)object_property_get_uint(OBJECT(sev_common),
-+                                               "policy", NULL);
-     }
- 
-     return info;
-@@ -519,6 +473,8 @@ static SevCapability *sev_get_capabilities(Error **errp)
-     size_t pdh_len = 0, cert_chain_len = 0, cpu0_id_len = 0;
-     uint32_t ebx;
-     int fd;
-+    SevCommonState *sev_common;
-+    char *sev_device;
- 
-     if (!kvm_enabled()) {
-         error_setg(errp, "KVM not enabled");
-@@ -529,12 +485,21 @@ static SevCapability *sev_get_capabilities(Error **errp)
-         return NULL;
-     }
- 
--    fd = open(DEFAULT_SEV_DEVICE, O_RDWR);
-+    sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-+    if (!sev_common) {
-+        error_setg(errp, "SEV is not configured");
-+    }
-+
-+    sev_device = object_property_get_str(OBJECT(sev_common), "sev-device",
-+                                         &error_abort);
-+    fd = open(sev_device, O_RDWR);
-     if (fd < 0) {
-         error_setg_errno(errp, errno, "SEV: Failed to open %s",
-                          DEFAULT_SEV_DEVICE);
-+        g_free(sev_device);
-         return NULL;
-     }
-+    g_free(sev_device);
- 
-     if (sev_get_pdh_info(fd, &pdh_data, &pdh_len,
-                          &cert_chain_data, &cert_chain_len, errp)) {
-@@ -577,7 +542,7 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
- {
-     struct kvm_sev_attestation_report input = {};
-     SevAttestationReport *report = NULL;
--    SevGuestState *sev = sev_guest;
-+    SevCommonState *sev_common;
-     g_autofree guchar *data = NULL;
-     g_autofree guchar *buf = NULL;
-     gsize len;
-@@ -602,8 +567,10 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
-         return NULL;
-     }
- 
-+    sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-+
-     /* Query the report length */
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-+    ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-             &input, &err);
-     if (ret < 0) {
-         if (err != SEV_RET_INVALID_LEN) {
-@@ -619,7 +586,7 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
-     memcpy(input.mnonce, buf, sizeof(input.mnonce));
- 
-     /* Query the report */
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-+    ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-             &input, &err);
-     if (ret) {
-         error_setg_errno(errp, errno, "SEV: Failed to get attestation report"
-@@ -659,26 +626,27 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
- }
- 
- static int
--sev_launch_start(SevGuestState *sev)
-+sev_launch_start(SevGuestState *sev_guest)
- {
-     gsize sz;
-     int ret = 1;
-     int fw_error, rc;
-     struct kvm_sev_launch_start start = {
--        .handle = sev->handle, .policy = sev->policy
-+        .handle = sev_guest->handle, .policy = sev_guest->policy
-     };
-     guchar *session = NULL, *dh_cert = NULL;
-+    SevCommonState *sev_common = SEV_COMMON(sev_guest);
- 
--    if (sev->session_file) {
--        if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
-+    if (sev_guest->session_file) {
-+        if (sev_read_file_base64(sev_guest->session_file, &session, &sz) < 0) {
-             goto out;
-         }
-         start.session_uaddr = (unsigned long)session;
-         start.session_len = sz;
-     }
- 
--    if (sev->dh_cert_file) {
--        if (sev_read_file_base64(sev->dh_cert_file, &dh_cert, &sz) < 0) {
-+    if (sev_guest->dh_cert_file) {
-+        if (sev_read_file_base64(sev_guest->dh_cert_file, &dh_cert, &sz) < 0) {
-             goto out;
-         }
-         start.dh_uaddr = (unsigned long)dh_cert;
-@@ -686,15 +654,15 @@ sev_launch_start(SevGuestState *sev)
-     }
- 
-     trace_kvm_sev_launch_start(start.policy, session, dh_cert);
--    rc = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_START, &start, &fw_error);
-+    rc = sev_ioctl(sev_common->sev_fd, KVM_SEV_LAUNCH_START, &start, &fw_error);
-     if (rc < 0) {
-         error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
-                 __func__, ret, fw_error, fw_error_to_str(fw_error));
-         goto out;
-     }
- 
--    sev_set_guest_state(sev, SEV_STATE_LAUNCH_UPDATE);
--    sev->handle = start.handle;
-+    sev_set_guest_state(sev_common, SEV_STATE_LAUNCH_UPDATE);
-+    sev_guest->handle = start.handle;
-     ret = 0;
- 
- out:
-@@ -704,7 +672,7 @@ out:
- }
- 
- static int
--sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
-+sev_launch_update_data(SevGuestState *sev_guest, uint8_t *addr, uint64_t len)
- {
-     int ret, fw_error;
-     struct kvm_sev_launch_update_data update;
-@@ -716,7 +684,7 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
-     update.uaddr = (uintptr_t)addr;
-     update.len = len;
-     trace_kvm_sev_launch_update_data(addr, len);
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-+    ret = sev_ioctl(SEV_COMMON(sev_guest)->sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-                     &update, &fw_error);
-     if (ret) {
-         error_report("%s: LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
-@@ -727,11 +695,12 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
- }
- 
- static int
--sev_launch_update_vmsa(SevGuestState *sev)
-+sev_launch_update_vmsa(SevGuestState *sev_guest)
- {
-     int ret, fw_error;
- 
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
-+    ret = sev_ioctl(SEV_COMMON(sev_guest)->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA,
-+                    NULL, &fw_error);
-     if (ret) {
-         error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
-                 __func__, ret, fw_error, fw_error_to_str(fw_error));
-@@ -743,18 +712,19 @@ sev_launch_update_vmsa(SevGuestState *sev)
- static void
- sev_launch_get_measure(Notifier *notifier, void *unused)
- {
--    SevGuestState *sev = sev_guest;
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-+    SevGuestState *sev_guest = SEV_GUEST(sev_common);
-     int ret, error;
-     g_autofree guchar *data = NULL;
-     struct kvm_sev_launch_measure measurement = {};
- 
--    if (!sev_check_state(sev, SEV_STATE_LAUNCH_UPDATE)) {
-+    if (!sev_check_state(sev_common, SEV_STATE_LAUNCH_UPDATE)) {
-         return;
-     }
- 
-     if (sev_es_enabled()) {
-         /* measure all the VM save areas before getting launch_measure */
--        ret = sev_launch_update_vmsa(sev);
-+        ret = sev_launch_update_vmsa(sev_guest);
-         if (ret) {
-             exit(1);
-         }
-@@ -762,7 +732,7 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     }
- 
-     /* query the measurement blob length */
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+    ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-                     &measurement, &error);
-     if (!measurement.len) {
-         error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-@@ -774,7 +744,7 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     measurement.uaddr = (unsigned long)data;
- 
-     /* get the measurement blob */
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+    ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-                     &measurement, &error);
-     if (ret) {
-         error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-@@ -782,17 +752,19 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-         return;
-     }
- 
--    sev_set_guest_state(sev, SEV_STATE_LAUNCH_SECRET);
-+    sev_set_guest_state(sev_common, SEV_STATE_LAUNCH_SECRET);
- 
-     /* encode the measurement value and emit the event */
--    sev->measurement = g_base64_encode(data, measurement.len);
--    trace_kvm_sev_launch_measurement(sev->measurement);
-+    sev_guest->measurement = g_base64_encode(data, measurement.len);
-+    trace_kvm_sev_launch_measurement(sev_guest->measurement);
- }
- 
- static char *sev_get_launch_measurement(void)
- {
-+    SevGuestState *sev_guest = SEV_GUEST(MACHINE(qdev_get_machine())->cgs);
-+
-     if (sev_guest &&
--        sev_guest->state >= SEV_STATE_LAUNCH_SECRET) {
-+        SEV_COMMON(sev_guest)->state >= SEV_STATE_LAUNCH_SECRET) {
-         return g_strdup(sev_guest->measurement);
-     }
- 
-@@ -821,19 +793,20 @@ static Notifier sev_machine_done_notify = {
- };
- 
- static void
--sev_launch_finish(SevGuestState *sev)
-+sev_launch_finish(SevGuestState *sev_guest)
- {
-     int ret, error;
- 
-     trace_kvm_sev_launch_finish();
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_FINISH, 0, &error);
-+    ret = sev_ioctl(SEV_COMMON(sev_guest)->sev_fd, KVM_SEV_LAUNCH_FINISH, 0,
-+                    &error);
-     if (ret) {
-         error_report("%s: LAUNCH_FINISH ret=%d fw_error=%d '%s'",
-                      __func__, ret, error, fw_error_to_str(error));
-         exit(1);
-     }
- 
--    sev_set_guest_state(sev, SEV_STATE_RUNNING);
-+    sev_set_guest_state(SEV_COMMON(sev_guest), SEV_STATE_RUNNING);
- 
-     /* add migration blocker */
-     error_setg(&sev_mig_blocker,
-@@ -844,38 +817,39 @@ sev_launch_finish(SevGuestState *sev)
- static void
- sev_vm_state_change(void *opaque, bool running, RunState state)
- {
--    SevGuestState *sev = opaque;
-+    SevCommonState *sev_common = opaque;
- 
-     if (running) {
--        if (!sev_check_state(sev, SEV_STATE_RUNNING)) {
--            sev_launch_finish(sev);
-+        if (!sev_check_state(sev_common, SEV_STATE_RUNNING)) {
-+            sev_launch_finish(SEV_GUEST(sev_common));
-         }
-     }
- }
- 
- static int sev_kvm_type(X86ConfidentialGuest *cg)
- {
--    SevGuestState *sev = SEV_GUEST(cg);
-+    SevCommonState *sev_common = SEV_COMMON(cg);
-+    SevGuestState *sev_guest = SEV_GUEST(sev_common);
-     int kvm_type;
- 
--    if (sev->kvm_type != -1) {
-+    if (sev_common->kvm_type != -1) {
-         goto out;
-     }
- 
--    kvm_type = (sev->policy & SEV_POLICY_ES) ? KVM_X86_SEV_ES_VM : KVM_X86_SEV_VM;
-+    kvm_type = (sev_guest->policy & SEV_POLICY_ES) ? KVM_X86_SEV_ES_VM : KVM_X86_SEV_VM;
-     if (kvm_is_vm_type_supported(kvm_type)) {
--        sev->kvm_type = kvm_type;
-+        sev_common->kvm_type = kvm_type;
-     } else {
--        sev->kvm_type = KVM_X86_DEFAULT_VM;
-+        sev_common->kvm_type = KVM_X86_DEFAULT_VM;
-     }
- 
- out:
--    return sev->kvm_type;
-+    return sev_common->kvm_type;
- }
- 
- static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
- {
--    SevGuestState *sev = SEV_GUEST(cgs);
-+    SevCommonState *sev_common = SEV_COMMON(cgs);
-     char *devname;
-     int ret, fw_error, cmd;
-     uint32_t ebx;
-@@ -888,8 +862,7 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-         return -1;
-     }
- 
--    sev_guest = sev;
--    sev->state = SEV_STATE_UNINIT;
-+    sev_common->state = SEV_STATE_UNINIT;
- 
-     host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
-     host_cbitpos = ebx & 0x3f;
-@@ -899,9 +872,9 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-      * register of CPUID 0x8000001F. No need to verify the range as the
-      * comparison against the host value accomplishes that.
-      */
--    if (host_cbitpos != sev->cbitpos) {
-+    if (host_cbitpos != sev_common->cbitpos) {
-         error_setg(errp, "%s: cbitpos check failed, host '%d' requested '%d'",
--                   __func__, host_cbitpos, sev->cbitpos);
-+                   __func__, host_cbitpos, sev_common->cbitpos);
-         goto err;
-     }
- 
-@@ -910,16 +883,16 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-      * the EBX register of CPUID 0x8000001F, so verify the supplied value
-      * is in the range of 1 to 63.
-      */
--    if (sev->reduced_phys_bits < 1 || sev->reduced_phys_bits > 63) {
-+    if (sev_common->reduced_phys_bits < 1 || sev_common->reduced_phys_bits > 63) {
-         error_setg(errp, "%s: reduced_phys_bits check failed,"
-                    " it should be in the range of 1 to 63, requested '%d'",
--                   __func__, sev->reduced_phys_bits);
-+                   __func__, sev_common->reduced_phys_bits);
-         goto err;
-     }
- 
--    devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
--    sev->sev_fd = open(devname, O_RDWR);
--    if (sev->sev_fd < 0) {
-+    devname = object_property_get_str(OBJECT(sev_common), "sev-device", NULL);
-+    sev_common->sev_fd = open(devname, O_RDWR);
-+    if (sev_common->sev_fd < 0) {
-         error_setg(errp, "%s: Failed to open %s '%s'", __func__,
-                    devname, strerror(errno));
-         g_free(devname);
-@@ -927,7 +900,7 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-     }
-     g_free(devname);
- 
--    ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
-+    ret = sev_platform_ioctl(sev_common->sev_fd, SEV_PLATFORM_STATUS, &status,
-                              &fw_error);
-     if (ret) {
-         error_setg(errp, "%s: failed to get platform status ret=%d "
-@@ -935,9 +908,9 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-                    fw_error_to_str(fw_error));
-         goto err;
-     }
--    sev->build_id = status.build;
--    sev->api_major = status.api_major;
--    sev->api_minor = status.api_minor;
-+    sev_common->build_id = status.build;
-+    sev_common->api_major = status.api_major;
-+    sev_common->api_minor = status.api_minor;
- 
-     if (sev_es_enabled()) {
-         if (!kvm_kernel_irqchip_allowed()) {
-@@ -955,14 +928,14 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-     }
- 
-     trace_kvm_sev_init();
--    if (sev_kvm_type(X86_CONFIDENTIAL_GUEST(sev)) == KVM_X86_DEFAULT_VM) {
-+    if (sev_kvm_type(X86_CONFIDENTIAL_GUEST(sev_common)) == KVM_X86_DEFAULT_VM) {
-         cmd = sev_es_enabled() ? KVM_SEV_ES_INIT : KVM_SEV_INIT;
- 
--        ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
-+        ret = sev_ioctl(sev_common->sev_fd, cmd, NULL, &fw_error);
-     } else {
-         struct kvm_sev_init args = { 0 };
- 
--        ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT2, &args, &fw_error);
-+        ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_INIT2, &args, &fw_error);
-     }
- 
-     if (ret) {
-@@ -971,7 +944,7 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-         goto err;
-     }
- 
--    ret = sev_launch_start(sev);
-+    ret = sev_launch_start(SEV_GUEST(sev_common));
-     if (ret) {
-         error_setg(errp, "%s: failed to create encryption context", __func__);
-         goto err;
-@@ -979,13 +952,12 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
- 
-     ram_block_notifier_add(&sev_ram_notifier);
-     qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
--    qemu_add_vm_change_state_handler(sev_vm_state_change, sev);
-+    qemu_add_vm_change_state_handler(sev_vm_state_change, sev_common);
- 
-     cgs->ready = true;
- 
-     return 0;
- err:
--    sev_guest = NULL;
-     ram_block_discard_disable(false);
-     return -1;
- }
-@@ -993,13 +965,15 @@ err:
- int
- sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
- {
--    if (!sev_guest) {
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-+
-+    if (!sev_common) {
-         return 0;
-     }
- 
-     /* if SEV is in update state then encrypt the data else do nothing */
--    if (sev_check_state(sev_guest, SEV_STATE_LAUNCH_UPDATE)) {
--        int ret = sev_launch_update_data(sev_guest, ptr, len);
-+    if (sev_check_state(sev_common, SEV_STATE_LAUNCH_UPDATE)) {
-+        int ret = sev_launch_update_data(SEV_GUEST(sev_common), ptr, len);
-         if (ret < 0) {
-             error_setg(errp, "SEV: Failed to encrypt pflash rom");
-             return ret;
-@@ -1019,16 +993,17 @@ int sev_inject_launch_secret(const char *packet_hdr, const char *secret,
-     void *hva;
-     gsize hdr_sz = 0, data_sz = 0;
-     MemoryRegion *mr = NULL;
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
- 
--    if (!sev_guest) {
-+    if (!sev_common) {
-         error_setg(errp, "SEV not enabled for guest");
-         return 1;
-     }
- 
-     /* secret can be injected only in this state */
--    if (!sev_check_state(sev_guest, SEV_STATE_LAUNCH_SECRET)) {
-+    if (!sev_check_state(sev_common, SEV_STATE_LAUNCH_SECRET)) {
-         error_setg(errp, "SEV: Not in correct state. (LSECRET) %x",
--                     sev_guest->state);
-+                   sev_common->state);
-         return 1;
-     }
- 
-@@ -1062,7 +1037,7 @@ int sev_inject_launch_secret(const char *packet_hdr, const char *secret,
-     trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
-                                 input.trans_uaddr, input.trans_len);
- 
--    ret = sev_ioctl(sev_guest->sev_fd, KVM_SEV_LAUNCH_SECRET,
-+    ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_LAUNCH_SECRET,
-                     &input, &error);
-     if (ret) {
-         error_setg(errp, "SEV: failed to inject secret ret=%d fw_error=%d '%s'",
-@@ -1169,9 +1144,10 @@ void sev_es_set_reset_vector(CPUState *cpu)
- {
-     X86CPU *x86;
-     CPUX86State *env;
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
- 
-     /* Only update if we have valid reset information */
--    if (!sev_guest || !sev_guest->reset_data_valid) {
-+    if (!sev_common || !sev_common->reset_data_valid) {
-         return;
-     }
- 
-@@ -1183,11 +1159,11 @@ void sev_es_set_reset_vector(CPUState *cpu)
-     x86 = X86_CPU(cpu);
-     env = &x86->env;
- 
--    cpu_x86_load_seg_cache(env, R_CS, 0xf000, sev_guest->reset_cs, 0xffff,
-+    cpu_x86_load_seg_cache(env, R_CS, 0xf000, sev_common->reset_cs, 0xffff,
-                            DESC_P_MASK | DESC_S_MASK | DESC_CS_MASK |
-                            DESC_R_MASK | DESC_A_MASK);
- 
--    env->eip = sev_guest->reset_ip;
-+    env->eip = sev_common->reset_ip;
- }
- 
- int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
-@@ -1195,6 +1171,7 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
-     CPUState *cpu;
-     uint32_t addr;
-     int ret;
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
- 
-     if (!sev_es_enabled()) {
-         return 0;
-@@ -1208,9 +1185,9 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
-     }
- 
-     if (addr) {
--        sev_guest->reset_cs = addr & 0xffff0000;
--        sev_guest->reset_ip = addr & 0x0000ffff;
--        sev_guest->reset_data_valid = true;
-+        sev_common->reset_cs = addr & 0xffff0000;
-+        sev_common->reset_ip = addr & 0x0000ffff;
-+        sev_common->reset_data_valid = true;
- 
-         CPU_FOREACH(cpu) {
-             sev_es_set_reset_vector(cpu);
-@@ -1256,12 +1233,17 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
-     hwaddr mapped_len = sizeof(*padded_ht);
-     MemTxAttrs attrs = { 0 };
-     bool ret = true;
-+    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-+    SevGuestState *sev_guest =
-+        (SevGuestState *)object_dynamic_cast(OBJECT(sev_common),
-+                                             TYPE_SEV_GUEST);
- 
-     /*
-      * Only add the kernel hashes if the sev-guest configuration explicitly
--     * stated kernel-hashes=on.
-+     * stated kernel-hashes=on. Currently only enabled for SEV/SEV-ES guests,
-+     * so check for TYPE_SEV_GUEST as well.
-      */
--    if (!sev_guest->kernel_hashes) {
-+    if (sev_guest && !sev_guest->kernel_hashes) {
-         return false;
-     }
- 
-@@ -1352,8 +1334,20 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
-     return ret;
- }
- 
 +static char *
-+sev_common_get_sev_device(Object *obj, Error **errp)
++sev_snp_guest_get_guest_visible_workarounds(Object *obj, Error **errp)
 +{
-+    return g_strdup(SEV_COMMON(obj)->sev_device);
-+}
-+
- static void
--sev_guest_class_init(ObjectClass *oc, void *data)
-+sev_common_set_sev_device(Object *obj, const char *value, Error **errp)
-+{
-+    SEV_COMMON(obj)->sev_device = g_strdup(value);
++    return g_strdup(SEV_SNP_GUEST(obj)->guest_visible_workarounds);
 +}
 +
 +static void
-+sev_common_class_init(ObjectClass *oc, void *data)
- {
-     ConfidentialGuestSupportClass *klass = CONFIDENTIAL_GUEST_SUPPORT_CLASS(oc);
-     X86ConfidentialGuestClass *x86_klass = X86_CONFIDENTIAL_GUEST_CLASS(oc);
-@@ -1362,10 +1356,85 @@ sev_guest_class_init(ObjectClass *oc, void *data)
-     x86_klass->kvm_type = sev_kvm_type;
- 
-     object_class_property_add_str(oc, "sev-device",
--                                  sev_guest_get_sev_device,
--                                  sev_guest_set_sev_device);
-+                                  sev_common_get_sev_device,
-+                                  sev_common_set_sev_device);
-     object_class_property_set_description(oc, "sev-device",
-             "SEV device to use");
-+}
-+
-+static void
-+sev_common_instance_init(Object *obj)
++sev_snp_guest_set_guest_visible_workarounds(Object *obj, const char *value,
++                                            Error **errp)
 +{
-+    SevCommonState *sev_common = SEV_COMMON(obj);
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++    struct kvm_sev_snp_launch_start *start = &sev_snp_guest->kvm_start_conf;
++    g_autofree guchar *blob;
++    gsize len;
 +
-+    sev_common->kvm_type = -1;
-+
-+    sev_common->sev_device = g_strdup(DEFAULT_SEV_DEVICE);
-+
-+    object_property_add_uint32_ptr(obj, "cbitpos", &sev_common->cbitpos,
-+                                   OBJ_PROP_FLAG_READWRITE);
-+    object_property_add_uint32_ptr(obj, "reduced-phys-bits",
-+                                   &sev_common->reduced_phys_bits,
-+                                   OBJ_PROP_FLAG_READWRITE);
-+}
-+
-+/* sev guest info common to sev/sev-es/sev-snp */
-+static const TypeInfo sev_common_info = {
-+    .parent = TYPE_X86_CONFIDENTIAL_GUEST,
-+    .name = TYPE_SEV_COMMON,
-+    .instance_size = sizeof(SevCommonState),
-+    .class_init = sev_common_class_init,
-+    .instance_init = sev_common_instance_init,
-+    .abstract = true,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
++    if (sev_snp_guest->guest_visible_workarounds) {
++        g_free(sev_snp_guest->guest_visible_workarounds);
 +    }
++
++    /* store the base64 str so we don't need to re-encode in getter */
++    sev_snp_guest->guest_visible_workarounds = g_strdup(value);
++
++    blob = qbase64_decode(sev_snp_guest->guest_visible_workarounds, -1, &len, errp);
++    if (!blob) {
++        return;
++    }
++
++    if (len > sizeof(start->gosvw)) {
++        error_setg(errp, "parameter length of %lu exceeds max of %lu",
++                   len, sizeof(start->gosvw));
++        return;
++    }
++
++    memcpy(start->gosvw, blob, len);
++}
++
++static char *
++sev_snp_guest_get_id_block(Object *obj, Error **errp)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++
++    return g_strdup(sev_snp_guest->id_block);
++}
++
++static void
++sev_snp_guest_set_id_block(Object *obj, const char *value, Error **errp)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++    struct kvm_sev_snp_launch_finish *finish = &sev_snp_guest->kvm_finish_conf;
++    gsize len;
++
++    if (sev_snp_guest->id_block) {
++        g_free(sev_snp_guest->id_block);
++        g_free((guchar *)finish->id_block_uaddr);
++    }
++
++    /* store the base64 str so we don't need to re-encode in getter */
++    sev_snp_guest->id_block = g_strdup(value);
++
++    finish->id_block_uaddr =
++        (uint64_t)qbase64_decode(sev_snp_guest->id_block, -1, &len, errp);
++
++    if (!finish->id_block_uaddr) {
++        return;
++    }
++
++    if (len > KVM_SEV_SNP_ID_BLOCK_SIZE) {
++        error_setg(errp, "parameter length of %lu exceeds max of %u",
++                   len, KVM_SEV_SNP_ID_BLOCK_SIZE);
++        return;
++    }
++
++    finish->id_block_en = (len) ? 1 : 0;
++}
++
++static char *
++sev_snp_guest_get_id_auth(Object *obj, Error **errp)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++
++    return g_strdup(sev_snp_guest->id_auth);
++}
++
++static void
++sev_snp_guest_set_id_auth(Object *obj, const char *value, Error **errp)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++    struct kvm_sev_snp_launch_finish *finish = &sev_snp_guest->kvm_finish_conf;
++    gsize len;
++
++    if (sev_snp_guest->id_auth) {
++        g_free(sev_snp_guest->id_auth);
++        g_free((guchar *)finish->id_auth_uaddr);
++    }
++
++    /* store the base64 str so we don't need to re-encode in getter */
++    sev_snp_guest->id_auth = g_strdup(value);
++
++    finish->id_auth_uaddr =
++        (uint64_t)qbase64_decode(sev_snp_guest->id_auth, -1, &len, errp);
++
++    if (!finish->id_auth_uaddr) {
++        return;
++    }
++
++    if (len > KVM_SEV_SNP_ID_AUTH_SIZE) {
++        error_setg(errp, "parameter length of %lu exceeds max of %u",
++                   len, KVM_SEV_SNP_ID_AUTH_SIZE);
++        return;
++    }
++}
++
++static bool
++sev_snp_guest_get_auth_key_en(Object *obj, Error **errp)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++
++    return !!sev_snp_guest->kvm_finish_conf.auth_key_en;
++}
++
++static void
++sev_snp_guest_set_auth_key_en(Object *obj, bool value, Error **errp)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++
++    sev_snp_guest->kvm_finish_conf.auth_key_en = value;
++}
++
++static char *
++sev_snp_guest_get_host_data(Object *obj, Error **errp)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++
++    return g_strdup(sev_snp_guest->host_data);
++}
++
++static void
++sev_snp_guest_set_host_data(Object *obj, const char *value, Error **errp)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++    struct kvm_sev_snp_launch_finish *finish = &sev_snp_guest->kvm_finish_conf;
++    g_autofree guchar *blob;
++    gsize len;
++
++    if (sev_snp_guest->host_data) {
++        g_free(sev_snp_guest->host_data);
++    }
++
++    /* store the base64 str so we don't need to re-encode in getter */
++    sev_snp_guest->host_data = g_strdup(value);
++
++    blob = qbase64_decode(sev_snp_guest->host_data, -1, &len, errp);
++
++    if (!blob) {
++        return;
++    }
++
++    if (len > sizeof(finish->host_data)) {
++        error_setg(errp, "parameter length of %lu exceeds max of %lu",
++                   len, sizeof(finish->host_data));
++        return;
++    }
++
++    memcpy(finish->host_data, blob, len);
++}
++
++static void
++sev_snp_guest_class_init(ObjectClass *oc, void *data)
++{
++    object_class_property_add(oc, "policy", "uint64",
++                              sev_snp_guest_get_policy,
++                              sev_snp_guest_set_policy, NULL, NULL);
++    object_class_property_add_str(oc, "guest-visible-workarounds",
++                                  sev_snp_guest_get_guest_visible_workarounds,
++                                  sev_snp_guest_set_guest_visible_workarounds);
++    object_class_property_add_str(oc, "id-block",
++                                  sev_snp_guest_get_id_block,
++                                  sev_snp_guest_set_id_block);
++    object_class_property_add_str(oc, "id-auth",
++                                  sev_snp_guest_get_id_auth,
++                                  sev_snp_guest_set_id_auth);
++    object_class_property_add_bool(oc, "auth-key-enabled",
++                                   sev_snp_guest_get_auth_key_en,
++                                   sev_snp_guest_set_auth_key_en);
++    object_class_property_add_str(oc, "host-data",
++                                  sev_snp_guest_get_host_data,
++                                  sev_snp_guest_set_host_data);
++}
++
++static void
++sev_snp_guest_instance_init(Object *obj)
++{
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(obj);
++
++    /* default init/start/finish params for kvm */
++    sev_snp_guest->kvm_start_conf.policy = DEFAULT_SEV_SNP_POLICY;
++}
++
++/* guest info specific to sev-snp */
++static const TypeInfo sev_snp_guest_info = {
++    .parent = TYPE_SEV_COMMON,
++    .name = TYPE_SEV_SNP_GUEST,
++    .instance_size = sizeof(SevSnpGuestState),
++    .class_init = sev_snp_guest_class_init,
++    .instance_init = sev_snp_guest_instance_init,
 +};
 +
-+static char *
-+sev_guest_get_dh_cert_file(Object *obj, Error **errp)
-+{
-+    return g_strdup(SEV_GUEST(obj)->dh_cert_file);
-+}
-+
-+static void
-+sev_guest_set_dh_cert_file(Object *obj, const char *value, Error **errp)
-+{
-+    SEV_GUEST(obj)->dh_cert_file = g_strdup(value);
-+}
-+
-+static char *
-+sev_guest_get_session_file(Object *obj, Error **errp)
-+{
-+    SevGuestState *sev_guest = SEV_GUEST(obj);
-+
-+    return sev_guest->session_file ? g_strdup(sev_guest->session_file) : NULL;
-+}
-+
-+static void
-+sev_guest_set_session_file(Object *obj, const char *value, Error **errp)
-+{
-+    SEV_GUEST(obj)->session_file = g_strdup(value);
-+}
-+
-+static bool sev_guest_get_kernel_hashes(Object *obj, Error **errp)
-+{
-+    SevGuestState *sev_guest = SEV_GUEST(obj);
-+
-+    return sev_guest->kernel_hashes;
-+}
-+
-+static void sev_guest_set_kernel_hashes(Object *obj, bool value, Error **errp)
-+{
-+    SevGuestState *sev = SEV_GUEST(obj);
-+
-+    sev->kernel_hashes = value;
-+}
-+
-+static void
-+sev_guest_class_init(ObjectClass *oc, void *data)
-+{
-     object_class_property_add_str(oc, "dh-cert-file",
-                                   sev_guest_get_dh_cert_file,
-                                   sev_guest_set_dh_cert_file);
-@@ -1386,40 +1455,28 @@ sev_guest_class_init(ObjectClass *oc, void *data)
- static void
- sev_guest_instance_init(Object *obj)
- {
--    SevGuestState *sev = SEV_GUEST(obj);
-+    SevGuestState *sev_guest = SEV_GUEST(obj);
- 
--    sev->kvm_type = -1;
--
--    sev->sev_device = g_strdup(DEFAULT_SEV_DEVICE);
--    sev->policy = DEFAULT_GUEST_POLICY;
--    object_property_add_uint32_ptr(obj, "policy", &sev->policy,
--                                   OBJ_PROP_FLAG_READWRITE);
--    object_property_add_uint32_ptr(obj, "handle", &sev->handle,
--                                   OBJ_PROP_FLAG_READWRITE);
--    object_property_add_uint32_ptr(obj, "cbitpos", &sev->cbitpos,
-+    sev_guest->policy = DEFAULT_GUEST_POLICY;
-+    object_property_add_uint32_ptr(obj, "handle", &sev_guest->handle,
-                                    OBJ_PROP_FLAG_READWRITE);
--    object_property_add_uint32_ptr(obj, "reduced-phys-bits",
--                                   &sev->reduced_phys_bits,
-+    object_property_add_uint32_ptr(obj, "policy", &sev_guest->policy,
-                                    OBJ_PROP_FLAG_READWRITE);
- }
- 
--/* sev guest info */
-+/* guest info specific sev/sev-es */
- static const TypeInfo sev_guest_info = {
--    .parent = TYPE_X86_CONFIDENTIAL_GUEST,
-+    .parent = TYPE_SEV_COMMON,
-     .name = TYPE_SEV_GUEST,
-     .instance_size = sizeof(SevGuestState),
--    .instance_finalize = sev_guest_finalize,
--    .class_init = sev_guest_class_init,
-     .instance_init = sev_guest_instance_init,
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_USER_CREATABLE },
--        { }
--    }
-+    .class_init = sev_guest_class_init,
- };
- 
  static void
  sev_register_types(void)
  {
-+    type_register_static(&sev_common_info);
+     type_register_static(&sev_common_info);
      type_register_static(&sev_guest_info);
++    type_register_static(&sev_snp_guest_info);
  }
  
+ type_init(sev_register_types);
 diff --git a/target/i386/sev.h b/target/i386/sev.h
-index 9e10d09539..668374eef3 100644
+index 668374eef3..bedc667eeb 100644
 --- a/target/i386/sev.h
 +++ b/target/i386/sev.h
-@@ -20,6 +20,9 @@
+@@ -22,6 +22,7 @@
  
- #include "exec/confidential-guest-support.h"
+ #define TYPE_SEV_COMMON "sev-common"
+ #define TYPE_SEV_GUEST "sev-guest"
++#define TYPE_SEV_SNP_GUEST "sev-snp-guest"
  
-+#define TYPE_SEV_COMMON "sev-common"
-+#define TYPE_SEV_GUEST "sev-guest"
-+
  #define SEV_POLICY_NODBG        0x1
  #define SEV_POLICY_NOKS         0x2
- #define SEV_POLICY_ES           0x4
 -- 
 2.25.1
 
