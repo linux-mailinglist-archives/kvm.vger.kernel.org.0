@@ -1,78 +1,83 @@
-Return-Path: <kvm+bounces-12196-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12197-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 519D6880871
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 01:15:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2439880873
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 01:16:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83F321C22267
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 00:15:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7617284129
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 00:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32A4A23;
-	Wed, 20 Mar 2024 00:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236C733D0;
+	Wed, 20 Mar 2024 00:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bfSxA5jO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dft+e1h4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E91718E
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 00:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC67801
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 00:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710893747; cv=none; b=HAQPa1YrrGIB+wW72zr7NEDh6JqMGviXvRWfue9QzdLRK/6w2lhCoGvO1AB/dW0mNaVqa0v3btln2l8IjrHOYqjNl0DtaZQm3GMUemJp+4K8Rp2FqVYNoEwlOmKFUCqgb4MT1YNmP/piVuIBR58Q7whKFy0+9uM0rABdHu3z8wc=
+	t=1710893749; cv=none; b=E3LLfv68wSDiOGbmk0+7FMDPskNc4M1DH1/qzCpSLjnYs0fPmcNH71vj5W2NUK7QHdAOVs95aFftxP2g5C3YpnDZRGOm1J/QJMHd7oofSPKJbqj3NTgSC33o8V7xPyyztv147wnNloPYoUcLVt1RE9qthHSp3of4jv09ORG9LLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710893747; c=relaxed/simple;
-	bh=9M12NXD3dtnNHAjqsgvhN+VjqoN4vkfcG3ZC8N7PFng=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Kxetj1beTCtKmpLprrbZ3tTgd3ut9VxTQ/QPGT/2uEUzaQyosY391GgKTvn8NYE5iBbE0DmOihkgJNzUkD5DkipKWygJKTcEG/RrG7vQfa9/XOVS7TX0nNxjR0VYsdVrsVLD5SZm911pcFpiRgJiF3ILnTG8KJWQG73smnkvuTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bfSxA5jO; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1710893749; c=relaxed/simple;
+	bh=YyvaQnQJdiY8Q7R4CiMT+UezwhRShOi5cPHWawz2f9s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=liQClu3iyTuzo7sgUT/iTU89HwOaQln5S1cpgEeQUKCEZZ0ot1uADdAqkHuv28AhQghhNmPfN1cEPHi/DnmTUIOtWRPrWXyiSheD3TqG066QLFbDCRU3c31GTkLlwQZYdvXI51NrmZI4KV4ydBHP5nBqmPmOdmm4ShynJfrmem0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dft+e1h4; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a03635590so94753007b3.0
-        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 17:15:45 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60cbba6f571so118210057b3.1
+        for <kvm@vger.kernel.org>; Tue, 19 Mar 2024 17:15:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710893744; x=1711498544; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yXW69hbgzeuHAbIm4Wagg4PsoRhn/DM4eoDcBzj7jGA=;
-        b=bfSxA5jO6WLFqYM/QYdG6x+P7A6SrHNYOauytlV1Stj/eb/IOQ9Giu8lw0RVTooWKE
-         d2z8sq0p0nx5EqxP+RMd4JRY85hlVXgz8YXbZg16cwQ3gKtf149TJkIGaqgeHkkfGS+N
-         yPsrkFNaG5x3qx3jMf4CO2GfQPTjzVq9JMBPz4chUrOW/3DiiS3uLmPlO/QGmQW1Oafs
-         lY/vfp12nrzQkoV6utK/7XdXjBwdJHKe6vP6ngdCbjylibiDvtPsvvxCqIIeQY4ItxRT
-         z6OvDs8FlGxZesyuESIVb0lczaNXeXysrcHMw/3/RJpyqIwz1B/3TI/bI7ZpcuIQQw2b
-         vfvA==
+        d=google.com; s=20230601; t=1710893746; x=1711498546; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=i9kVuQFqGWveMSm1GQ8GItZlMlvWOz6Hx+yWjI9J9D0=;
+        b=dft+e1h4Nh8crW2PYZK9Wc/PQ3LW8gKEhxHBn0x64lcmPtwmgTIW21PgdkJ5S42sS/
+         Pmlcadj0i4zwmPC1fx5sFT3boRtHkaV3jogEkosH/84RWf1nGwB9Sr6xtk3vHuO2dmLO
+         WNyCeHEgy/5Be4Tl9LzRkX1AuVXcnAGwhsw2ezspFv0MFKQavvxySNpZzQlAmF6KbhQu
+         JF46oCgdu5DbrC3IbFadILDqW6xUnfXjqw6zcBY40NCxmm8ey6DUaQkgvLXPIYnesBEL
+         UUfbP8gv/yVvEyBij/bRHX3ejd96LVCEv79BVUyBaTKGlaP4EL8eAHlEtuk9DHgIlTGu
+         DzEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710893744; x=1711498544;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yXW69hbgzeuHAbIm4Wagg4PsoRhn/DM4eoDcBzj7jGA=;
-        b=Tcf7HCZrGdQNT92BlfIJbo1RxeItGcooeLPnxScy8hsU6x2fj8ORi8dOHctb0Lu2K9
-         uQF6t7JZWxLVoXCQuDjnzQIcPIHfn0TrRfJFsHXgDhbv/3ZlzQhSHaFDucA2sPOPvEim
-         f6CftUbNDvEOqwXCTG8Gr/WXPBf1nnhPbkNrROqLe2iyBCj2tGY1QfKOV29nwr07yCxb
-         H+v8UBga2E/YacGYWUPADJAKrPXbEr7NXgjFr6j8Eo4EuO3fVSksgB3bJaLnXR4ox611
-         XW4R8CswFviLjZlSN0Scmt5OYupycc2uGOKdQEFRKk1lVbPeb5bHbEy6+ZSBiTTwFF2T
-         z0sQ==
-X-Gm-Message-State: AOJu0YxuBo6g4bndcMnINnhGb4DIf32foG3fZmRuUXaTQUPCxDtLPhHZ
-	SderYNCdXQkn9M6/iGQsJZ0FDLVzccWY+7D3Syp6wtOKKVEXkFFDQ4GvL/s1CjHvjdeEn0o4GtC
-	HAg==
-X-Google-Smtp-Source: AGHT+IHHuREo88zfsLYjwlL9BxdoOQBVpLscWZ5Kr2wwv2FwKsKbCP/+PnxUJqClFUMwX0gBtriS9OH+Kuw=
+        d=1e100.net; s=20230601; t=1710893746; x=1711498546;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i9kVuQFqGWveMSm1GQ8GItZlMlvWOz6Hx+yWjI9J9D0=;
+        b=BDgPzy/AeyHg6J06sDe1YVX8oI4omEBxPnrBgOIYmpkpqR8xzFaMOrdxRFg95FJW8P
+         zAglyb10Qo3X64tbU/ASSgbw5NEPpZq2bH3K/Sy85YD3fBjyBat1bqO8xmQoD4BrYBUB
+         EIjRq+lWdRlzdpaKOml0sLTwEknBq/MeYzKx3ybz11tT4dRJd0ddLPA73DT1tBrmxtSb
+         xGf8837ODpWaW2LfnUVFPDVNvc3YGOefTsXUVGtAbJV3RabJNwAcMatdGZF8Y9ACWCWk
+         9T9Kkj5icNuDku5sK5echR0ESTeB8KLknPK733YXHdebvn1DqL/qZhm2ZYhvLxjL35EG
+         dIog==
+X-Gm-Message-State: AOJu0YyrsoIPCN81gIOGCVvPBuTfLPL/+ajkmv0xRZNhUrNdoV/1Hr7w
+	453E4BSu+ZDDae03q6SpWZ8QJgMEJtqCcRDKolCDcdjp5eu9jQsUZDDMq4An9h1xz7yKBop6H38
+	VFg==
+X-Google-Smtp-Source: AGHT+IF0fWCYk6aKjKkWi7E/zeckbR9RpV3kVXyudQGGVegRGO/dQ5GmRozoHp9hQmE7pRVxq/v7aqYk34A=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:d7cf:0:b0:610:f2d3:d33 with SMTP id
- z198-20020a0dd7cf000000b00610f2d30d33mr275348ywd.6.1710893744675; Tue, 19 Mar
- 2024 17:15:44 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1507:b0:dcd:ad52:6932 with SMTP id
+ q7-20020a056902150700b00dcdad526932mr4330305ybu.5.1710893746735; Tue, 19 Mar
+ 2024 17:15:46 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 19 Mar 2024 17:15:39 -0700
+Date: Tue, 19 Mar 2024 17:15:40 -0700
+In-Reply-To: <20240320001542.3203871-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240320001542.3203871-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
-Message-ID: <20240320001542.3203871-1-seanjc@google.com>
-Subject: [PATCH 0/3] KVM: Fix for a mostly benign gpc WARN
+Message-ID: <20240320001542.3203871-2-seanjc@google.com>
+Subject: [PATCH 1/3] KVM: Add helpers to consolidate gfn_to_pfn_cache's page
+ split check
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -80,30 +85,93 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Fix a bug found by syzkaller, thanks to a new WARN sanity check, where KVM
-marks a gfn_to_pfn_cache as active without actually setting gpc->gpa or any
-other metadata.  On top, harden against _directly_ setting gpc->gpa to KVM's
-magic INVALID_GPA, which would also fail the sanity check.
+Add a helper to check that the incoming length for a gfn_to_pfn_cache is
+valid with respect to the cache's GPA and/or HVA.  To avoid activating a
+cache with a bogus GPA, a future fix will fork the page split check in
+the inner refresh path into activate() and the public rerfresh() APIs, at
+which point KVM will check the length in three separate places.
 
-Sean Christopherson (3):
-  KVM: Add helpers to consolidate gfn_to_pfn_cache's page split check
-  KVM: Check validity of offset+length of gfn_to_pfn_cache prior to
-    activation
-  KVM: Explicitly disallow activatating a gfn_to_pfn_cache with
-    INVALID_GPA
+Deliberately keep the "page offset" logic open coded, as the only other
+path that consumes the offset, __kvm_gpc_refresh(), already needs to
+differentiate between GPA-based and HVA-based caches, and it's not obvious
+that using a helper is a net positive in overall code readability.
 
-Sean Christopherson (3):
-  KVM: Add helpers to consolidate gfn_to_pfn_cache's page split check
-  KVM: Check validity of offset+length of gfn_to_pfn_cache prior to
-    activation
-  KVM: Explicitly disallow activatating a gfn_to_pfn_cache with
-    INVALID_GPA
+Note, for GPA-based caches, this has a subtle side effect of using the GPA
+instead of the resolved HVA in the check() path, but that should be a nop
+as the HVA offset is derived from the GPA, i.e. the two offsets are
+identical, barring a KVM bug.
 
- virt/kvm/pfncache.c | 48 ++++++++++++++++++++++++++++++++-------------
- 1 file changed, 34 insertions(+), 14 deletions(-)
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/pfncache.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-
-base-commit: 964d0c614c7f71917305a5afdca9178fe8231434
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 4e07112a24c2..8f2121b5f2a0 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -57,6 +57,19 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
+ 	spin_unlock(&kvm->gpc_lock);
+ }
+ 
++static bool kvm_gpc_is_valid_len(gpa_t gpa, unsigned long uhva,
++				 unsigned long len)
++{
++	unsigned long offset = kvm_is_error_gpa(gpa) ? offset_in_page(uhva) :
++						       offset_in_page(gpa);
++
++	/*
++	 * The cached access must fit within a single page. The 'len' argument
++	 * to activate() and refresh() exists only to enforce that.
++	 */
++	return offset + len <= PAGE_SIZE;
++}
++
+ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
+ {
+ 	struct kvm_memslots *slots = kvm_memslots(gpc->kvm);
+@@ -74,7 +87,7 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
+ 	if (kvm_is_error_hva(gpc->uhva))
+ 		return false;
+ 
+-	if (offset_in_page(gpc->uhva) + len > PAGE_SIZE)
++	if (!kvm_gpc_is_valid_len(gpc->gpa, gpc->uhva, len))
+ 		return false;
+ 
+ 	if (!gpc->valid)
+@@ -247,13 +260,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 	if (WARN_ON_ONCE(kvm_is_error_gpa(gpa) == kvm_is_error_hva(uhva)))
+ 		return -EINVAL;
+ 
+-	/*
+-	 * The cached acces must fit within a single page. The 'len' argument
+-	 * exists only to enforce that.
+-	 */
+-	page_offset = kvm_is_error_gpa(gpa) ? offset_in_page(uhva) :
+-					      offset_in_page(gpa);
+-	if (page_offset + len > PAGE_SIZE)
++	if (!kvm_gpc_is_valid_len(gpa, uhva, len))
+ 		return -EINVAL;
+ 
+ 	lockdep_assert_held(&gpc->refresh_lock);
+@@ -270,6 +277,8 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 	old_uhva = PAGE_ALIGN_DOWN(gpc->uhva);
+ 
+ 	if (kvm_is_error_gpa(gpa)) {
++		page_offset = offset_in_page(uhva);
++
+ 		gpc->gpa = INVALID_GPA;
+ 		gpc->memslot = NULL;
+ 		gpc->uhva = PAGE_ALIGN_DOWN(uhva);
+@@ -279,6 +288,8 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 	} else {
+ 		struct kvm_memslots *slots = kvm_memslots(gpc->kvm);
+ 
++		page_offset = offset_in_page(gpa);
++
+ 		if (gpc->gpa != gpa || gpc->generation != slots->generation ||
+ 		    kvm_is_error_hva(gpc->uhva)) {
+ 			gfn_t gfn = gpa_to_gfn(gpa);
 -- 
 2.44.0.291.gc1ea87d7ee-goog
 
