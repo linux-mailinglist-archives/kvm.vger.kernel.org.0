@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-12256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F11A880DEE
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:54:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3F11880DEF
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD72F1F26C18
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:54:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A754281C32
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76940FC17;
-	Wed, 20 Mar 2024 08:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A068F3BBFB;
+	Wed, 20 Mar 2024 08:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Dnjbqh2i"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bmGrQo43"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2065.outbound.protection.outlook.com [40.107.94.65])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2054.outbound.protection.outlook.com [40.107.244.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88E939AF2
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 08:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9963BBDD
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 08:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710924851; cv=fail; b=lkAKvaVCbv1ve/tf4RLVscUFAFpT1H+tl4d5tCguEPn85iyvk6YtLTtNrQJ4AwBWbyGKdpOQqZhaADPex4wvbP9PEWdt2lAgQrILaCfY5kIqSMHoM0B2NI6lLRUyl11bTpZ1a/UAAx4hjeOfAIyH9SzgA3rDOqbw0tmjH0LStns=
+	t=1710924875; cv=fail; b=XbQnzV2fKfe6G+ahWV4/8zksl03l35Vg8+eu/ERaFZQ+w3pxg1rJCAf8hjBbVZfXZ7O0ocUTnlJqfoa1rhiYaOo9Pc5y1bWcBGSZD5QdBDXWMESW32rRvtoNij7knr2973yqiAdl2PoI6SaLG6UTsDiTM/xS+WSLDvt7lzEALS8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710924851; c=relaxed/simple;
-	bh=lb4GWtIr8IzJRVaErzWC4+W67sMnNbSx8qdiIq725zY=;
+	s=arc-20240116; t=1710924875; c=relaxed/simple;
+	bh=KO8/dvZTtls1HKti5f2Etl8pDSJZyJ8nKw2VntqoRwM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J/HFsyWpcdV5qXWlaabzdeAdNF/pMs7jkOW1YFOZFN62jWk/NwLVm1HGi+9k1wfS2gaEJGg8T6HmsOqjHcJ0YRJDqJjlF1/dTLYhD/qS0NmhS/4S9xPBqxEuhVOpOsn1lNWVOWE8m4MTt9uRTJTsQGUEtXzRS4G3WyMdDNmLG0c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Dnjbqh2i; arc=fail smtp.client-ip=40.107.94.65
+	 MIME-Version:Content-Type; b=phx5s2sEpAo59FqI9uZTBBLzWEJM69j2na8EUSnuRXh5sEfdLW3UF97IgD7v81Du985LYf+JH7NCzEN9GmgDMKfelrmFZKljO3ohHRKvGH8zAU25sWfKkl1MppNMMrd+kRsL8zFNYDOFOWs8ftmUAEWwk9g0JMcU+tbuUIQOQLY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bmGrQo43; arc=fail smtp.client-ip=40.107.244.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IvdUX1X9Sk+l9AmzX+dgav5yA2eQn8hpKnOBiKHiJo5b70JRBei4Xy8266pwflKp20MgRZpeWsp5EOKp/VUBHa8JJHZdWZzRUVBK5mHCOIWymuRyk2Zc8WzgQ2xs8cOVJS2VhiuVHGvfQZmxcPL9mbtRRVZ55oQgc4GhOcVYpVB/IJEoPh4t4M2V3O6qslIPEMFTtddGY5jX+wR3IvMhCHVS1spqisyUm/sJHhOzx8bzMHFM+JyfINel8DrzfuwhmRvn2UoBiN8+kG+Hfv2zeWiInj7T6v6kgGrr3BYpJnBzVyXaeIcbnB0zazi3tk0kwdWe4f6u9XLKVlxoIfrIYw==
+ b=HsR9AWqVBYq5IFCwrq5S25hEttgBSBwjExY1EfPBQaqxzuTKgI+7YwYRBuNbRMRkQsvj5ipgU0X41kbbWYykG3308/V38cXHp/zS5lDSs+F3K3gEnfUNC0ikTGb+Z6mgo6ypMr9SI+wTRqrGUIsEu3MgHIMPbl8Uk1zHkMoNwL14jhg2DEOUEkO/oE+MfiUp43hL5Bn6O45sVxTv0mM3SuCqB/pQgm/ABgANnZXPKa6CZRmgGZAHaF073eDBiPUhVZlXzU33X/jtRyBx1si+D2l81oE7xGaRzpXBn5g1v7R5DkMQutV5M72zIpCgOgq2PoGQEvmVJzu6a0A+imR5iw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MvxwD5kwhSj5IdGp8kKYpvsxTiNI/x8OnjdWm8PBU3s=;
- b=h1Cxbigz2Imu5syq3wki2nN/EH/lY6VQLfFrjpxtluYAM1FCikGjkOrUUxQ/8Upxflyh6Y/Zd2/ogopLmKOR0UD51tXLXG/H5Z31Owbo7y4F8SwKCefZjQn1lMdlq4eiBPnSHVlnNM1RY9JuHZYkVu0kOpKN+dun+dtvuGRvkcJRM5+iYOuAkSWXN24aF9QJXOA8EOX1izpSJnhfzO+/aSs3MsEORy/7vUP6YbLx7QzBsA9ltQxcgNdX0bYZ8RwljvITlxEAz9daNYxiR95oVzEV1gCYMEpMoBVauYvV19kuMLk8HPA5oaSd6Ig/OiG07GyfyA9Gby9VKw28ObMa/g==
+ bh=46Y1YUFzn4ag32XDe16B1pD4yA1plw2W8p/d0aiXcY0=;
+ b=h1ikS38qMtdIQrckqg5ehOYisv7Mikx0R723eT1iJRwMQ7kNSNFYRX78x4hxEJACkVph7AIxBkqnFKC/sMy8DJTLCg0gKMQEEQFCmGCitEOjiBujHk/FaK82I0eRxao3+lspcxosDcH/DC1zvoq537MOk1p5TrrZG6Q7kKiW3EPNsjIeAgk9I+mFUmiTfWds+qZDo0rOhvYNSp7Z/3MlLib0TnlAMQ+LMWStFg3W1ezfGFnKNbn989fmmPDhlFkldiY7Eqb/XPJEqWOFgt6Ewqeoog+nTLs2HcXjNVybeCJW8YPwVQF50u4UySV67l/tJkS3gygHbDwMdqjHDVydPQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MvxwD5kwhSj5IdGp8kKYpvsxTiNI/x8OnjdWm8PBU3s=;
- b=Dnjbqh2ivkPAfCCjM4y1fYpOg60ng0SAOpDOkxeXOuOO1TVm8Z3RZpOTcMNkFlmw6ltN4EbdF4zlZwjJO2VU8i0VJwCbBdiaE3FWTq33jhE68WSlba/4jvxeTAMwhZxMQlyj8bWzj58ZaQtawAwEhMgpxZMXpMKvdTYf731hezo=
-Received: from BN9PR03CA0799.namprd03.prod.outlook.com (2603:10b6:408:13f::24)
- by PH8PR12MB7160.namprd12.prod.outlook.com (2603:10b6:510:228::6) with
+ bh=46Y1YUFzn4ag32XDe16B1pD4yA1plw2W8p/d0aiXcY0=;
+ b=bmGrQo43wJeSZRlpNfSNYuBU5ly8j+FJNUd+6nadC1LR/b9S3uSG3YIUF1bKa6Mc/nE7xuJGs8ffDZl4o2sMuVdrBLPPc04OhmrrlH8u2yiSX5EKxicC+UPiUYzg3WmFCRtNuAKKUsj4hLPH/U78s/38nip/F0gCPtISt+rkuAg=
+Received: from SJ0PR05CA0042.namprd05.prod.outlook.com (2603:10b6:a03:33f::17)
+ by PH7PR12MB6442.namprd12.prod.outlook.com (2603:10b6:510:1fa::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27; Wed, 20 Mar
- 2024 08:54:04 +0000
-Received: from BN1PEPF00004681.namprd03.prod.outlook.com
- (2603:10b6:408:13f:cafe::aa) by BN9PR03CA0799.outlook.office365.com
- (2603:10b6:408:13f::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.37 via Frontend
- Transport; Wed, 20 Mar 2024 08:54:04 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.34; Wed, 20 Mar
+ 2024 08:54:27 +0000
+Received: from CO1PEPF000044F5.namprd05.prod.outlook.com
+ (2603:10b6:a03:33f:cafe::66) by SJ0PR05CA0042.outlook.office365.com
+ (2603:10b6:a03:33f::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.12 via Frontend
+ Transport; Wed, 20 Mar 2024 08:54:27 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,23 +63,23 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN1PEPF00004681.mail.protection.outlook.com (10.167.243.87) with Microsoft
+ CO1PEPF000044F5.mail.protection.outlook.com (10.167.241.75) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 08:54:04 +0000
+ 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 08:54:27 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 20 Mar
- 2024 03:54:03 -0500
+ 2024 03:54:24 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <qemu-devel@nongnu.org>
 CC: <kvm@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, "Paolo
  Bonzini" <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?=
 	<berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta
 	<pankaj.gupta@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata
-	<isaku.yamahata@linux.intel.com>
-Subject: [PATCH v3 42/49] i386/sev: Add support for SNP CPUID validation
-Date: Wed, 20 Mar 2024 03:39:38 -0500
-Message-ID: <20240320083945.991426-43-michael.roth@amd.com>
+	<isaku.yamahata@linux.intel.com>, Dov Murik <dovmurik@linux.ibm.com>
+Subject: [PATCH v3 43/49] qapi, i386: Move kernel-hashes to SevCommonProperties
+Date: Wed, 20 Mar 2024 03:39:39 -0500
+Message-ID: <20240320083945.991426-44-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240320083945.991426-1-michael.roth@amd.com>
 References: <20240320083945.991426-1-michael.roth@amd.com>
@@ -95,256 +95,185 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004681:EE_|PH8PR12MB7160:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f7ce8e1-d022-498b-e829-08dc48bb4b95
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F5:EE_|PH7PR12MB6442:EE_
+X-MS-Office365-Filtering-Correlation-Id: 76ebdcf3-3a7d-419c-c57d-08dc48bb593d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	cu+CuNi3mjP7xT1WKkZ3gPcmNhJ6ov6icitFitxov1kFlZTFiCUmnFPWNFR3ZreDnoyvfc4UEYVf8pEaN+LmWxFzph36unYkNVtHtgwCikvUgzzUh4AFFgnfJ5gERgLIPWCJUa6gl6oF5Nm5L/ZB3tH0FMibOx0wBrb4Wo4FDmde3bRw13CMhkO0X6fdzCikn0a7YMHF3JVGiBgG//qmyDaCFBLIKUkHgrIz9Xq4SkQK+TwDBNbMwNnNSQTHtG0vTXMuVf3Fdh95nJfrAN3MBzX7ZKVG1ev52eNxYJ0Gdb9RJb8SOBjFyqPN7DMQ5SKeTHitJSfjSOeLV0BKxVdLEsNhi8xrXOWzWfhsHSoGkrUuKRW3azRDx21u0Lpmb0INN2rPstQMMwpCB0jcf+Iy6hlVUi/gbgrGNw3yYx/j4vqG16YG60mfyOJgwqQ5hU88SM7hxOybmDc/4BTja/B2rJ6UkVY7ODMxa0immPgTloRMI8hWDWNErZeHKAXlwYWXsXf803iTbXYRcKxMALH9M+bmAN/sb8VA0inRiggSaAwnqPDnwHoR+zjShhXOJkoOaVsyrJXxalr+tcTXdC8vr3f6p/ZIBxtChmIeV9M1YwzorScxy+fCB8dPeiLj/C9z9IC+qirCQQYML6F9J5mgijJPQzggqa5ho4MnbFLcBKLdr4U42PGe7+/oSGvBBr7k6I0RT/V4vYQQhVoUPk21bawe6oWWmBDx/3aKAZOzo971yt3O/Mr5zXK3gd01krPg
+	AhFU7LT1aypHTXClsR+Gk7dUa3WwySkRKT1gpusJc5QZtlw6gZ2DkZH/lCmfbFMhdc689D96od1ghp8DfYAe4CKMRchYBB4vmzwtfU3QmOmnVc93fQf7uanLUR9Ub1tlJpS/zejwbjDc5qza7shajr74ES+vpf+SSrDVx4PPREGlmu0cLt+CUbje302e0XzSEPZqG8Rc2CEiT/L+stYoQ2ZuBxiK0gWy899WIOafQhRabxTWDjY7OmOK8oTb9Nln5cStNhFjFwasjWx9Z4ekG5irUUYsF6lLitJ9b8Su5q0ey9TEUAXadOuUYG+Hd8hRIhJixGRLrTbYP4y/E/dcw+gPqF0ku5+1LXDPL6iCoBSicDDkHu9G4fSisnwC3uEv3kqhS2ymIfFov8WzsQ5cCNc0edrAD1GPdvAbuIBPYdAOiQa5jpMA1JdmftK79A3rTCnS86nnMW5IeRcogLuyPQP7CDMamXGjMypRZdvYiyebBvUvf8ckzwLUDRKS0q2CU1Z/IgwFCf7cIerA+AKKOZCw7XFB1ycAdigmmJhWM8y/OdNAq9gESvCD/Y3uuuC2ca3QssZGF+iWbsO/sbMz5wiECHw60tK8AGxTOxM5eGNJ7Y/h+64hhiNDlAPSCGfiFRn38QaIBcr9Qv0cezfnC6OcLvlXE1mteEgF5zw7Pfb6pAqUsg8ShxZQa45hHjbU5y0w+vUF0oTcWaOnZnV0osBst7FEMvn63TyWcyYjkKNxBNQJHpBcHWmv7Ymxau3m
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(376005)(82310400014)(36860700004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014)(1800799015);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 08:54:04.3498
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 08:54:27.1509
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f7ce8e1-d022-498b-e829-08dc48bb4b95
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76ebdcf3-3a7d-419c-c57d-08dc48bb593d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004681.namprd03.prod.outlook.com
+	CO1PEPF000044F5.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7160
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6442
 
-SEV-SNP firmware allows a special guest page to be populated with a
-table of guest CPUID values so that they can be validated through
-firmware before being loaded into encrypted guest memory where they can
-be used in place of hypervisor-provided values[1].
+From: Dov Murik <dovmurik@linux.ibm.com>
 
-As part of SEV-SNP guest initialization, use this interface to validate
-the CPUID entries reported by KVM_GET_CPUID2 prior to initial guest
-start and populate the CPUID page reserved by OVMF with the resulting
-encrypted data.
+In order to enable kernel-hashes for SNP, pull it from
+SevGuestProperties to its parent SevCommonProperties so
+it will be available for both SEV and SNP.
 
-[1] SEV SNP Firmware ABI Specification, Rev. 0.8, 8.13.2.6
-
+Signed-off-by: Dov Murik <dovmurik@linux.ibm.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- target/i386/sev.c | 159 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 158 insertions(+), 1 deletion(-)
+ qapi/qom.json     | 14 +++++++-------
+ target/i386/sev.c | 44 ++++++++++++++++++--------------------------
+ 2 files changed, 25 insertions(+), 33 deletions(-)
 
+diff --git a/qapi/qom.json b/qapi/qom.json
+index 7ba778af91..ea8832a8c3 100644
+--- a/qapi/qom.json
++++ b/qapi/qom.json
+@@ -886,12 +886,17 @@
+ # @reduced-phys-bits: number of bits in physical addresses that become
+ #     unavailable when SEV is enabled
+ #
++# @kernel-hashes: if true, add hashes of kernel/initrd/cmdline to a
++#     designated guest firmware page for measured boot with -kernel
++#     (default: false) (since 6.2)
++#
+ # Since: 2.12
+ ##
+ { 'struct': 'SevCommonProperties',
+   'data': { '*sev-device': 'str',
+             '*cbitpos': 'uint32',
+-            'reduced-phys-bits': 'uint32' } }
++            'reduced-phys-bits': 'uint32',
++            '*kernel-hashes': 'bool' } }
+ 
+ ##
+ # @SevGuestProperties:
+@@ -906,10 +911,6 @@
+ #
+ # @handle: SEV firmware handle (default: 0)
+ #
+-# @kernel-hashes: if true, add hashes of kernel/initrd/cmdline to a
+-#     designated guest firmware page for measured boot with -kernel
+-#     (default: false) (since 6.2)
+-#
+ # Since: 2.12
+ ##
+ { 'struct': 'SevGuestProperties',
+@@ -917,8 +918,7 @@
+   'data': { '*dh-cert-file': 'str',
+             '*session-file': 'str',
+             '*policy': 'uint32',
+-            '*handle': 'uint32',
+-            '*kernel-hashes': 'bool' } }
++            '*handle': 'uint32' } }
+ 
+ ##
+ # @SevSnpGuestProperties:
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 6c5166c729..db888afb53 100644
+index db888afb53..3187b3dee8 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -191,6 +191,36 @@ static const char *const sev_fw_errlist[] = {
+@@ -54,6 +54,7 @@ struct SevCommonState {
+     char *sev_device;
+     uint32_t cbitpos;
+     uint32_t reduced_phys_bits;
++    bool kernel_hashes;
  
- #define SEV_FW_MAX_ERROR      ARRAY_SIZE(sev_fw_errlist)
+     /* runtime state */
+     uint8_t api_major;
+@@ -86,7 +87,6 @@ struct SevGuestState {
+     uint32_t policy;
+     char *dh_cert_file;
+     char *session_file;
+-    bool kernel_hashes;
+ };
  
-+/* <linux/kvm.h> doesn't expose this, so re-use the max from kvm.c */
-+#define KVM_MAX_CPUID_ENTRIES 100
-+
-+typedef struct KvmCpuidInfo {
-+    struct kvm_cpuid2 cpuid;
-+    struct kvm_cpuid_entry2 entries[KVM_MAX_CPUID_ENTRIES];
-+} KvmCpuidInfo;
-+
-+#define SNP_CPUID_FUNCTION_MAXCOUNT 64
-+#define SNP_CPUID_FUNCTION_UNKNOWN 0xFFFFFFFF
-+
-+typedef struct {
-+    uint32_t eax_in;
-+    uint32_t ecx_in;
-+    uint64_t xcr0_in;
-+    uint64_t xss_in;
-+    uint32_t eax;
-+    uint32_t ebx;
-+    uint32_t ecx;
-+    uint32_t edx;
-+    uint64_t reserved;
-+} __attribute__((packed)) SnpCpuidFunc;
-+
-+typedef struct {
-+    uint32_t count;
-+    uint32_t reserved1;
-+    uint64_t reserved2;
-+    SnpCpuidFunc entries[SNP_CPUID_FUNCTION_MAXCOUNT];
-+} __attribute__((packed)) SnpCpuidInfo;
-+
- static int
- sev_ioctl(int fd, int cmd, void *data, int *error)
- {
-@@ -749,6 +779,34 @@ out:
-     return ret;
- }
+ struct SevSnpGuestState {
+@@ -1696,16 +1696,12 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
+     MemTxAttrs attrs = { 0 };
+     bool ret = true;
+     SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+-    SevGuestState *sev_guest =
+-        (SevGuestState *)object_dynamic_cast(OBJECT(sev_common),
+-                                             TYPE_SEV_GUEST);
  
-+static void
-+sev_snp_cpuid_report_mismatches(SnpCpuidInfo *old,
-+                                SnpCpuidInfo *new)
-+{
-+    size_t i;
-+
-+    if (old->count != new->count) {
-+        error_report("SEV-SNP: CPUID validation failed due to count mismatch, provided: %d, expected: %d",
-+                     old->count, new->count);
-+    }
-+
-+    for (i = 0; i < old->count; i++) {
-+        SnpCpuidFunc *old_func, *new_func;
-+
-+        old_func = &old->entries[i];
-+        new_func = &new->entries[i];
-+
-+        if (memcmp(old_func, new_func, sizeof(SnpCpuidFunc))) {
-+            error_report("SEV-SNP: CPUID validation failed for function 0x%x, index: 0x%x.\n"
-+                         "provided: eax:0x%08x, ebx: 0x%08x, ecx: 0x%08x, edx: 0x%08x\n"
-+                         "expected: eax:0x%08x, ebx: 0x%08x, ecx: 0x%08x, edx: 0x%08x",
-+                         old_func->eax_in, old_func->ecx_in,
-+                         old_func->eax, old_func->ebx, old_func->ecx, old_func->edx,
-+                         new_func->eax, new_func->ebx, new_func->ecx, new_func->edx);
-+        }
-+    }
-+}
-+
- static const char *
- snp_page_type_to_str(int type)
- {
-@@ -766,6 +824,7 @@ static int
- sev_snp_launch_update(SevSnpGuestState *sev_snp_guest, SevLaunchUpdateData *data)
- {
-     int ret, fw_error;
-+    SnpCpuidInfo snp_cpuid_info;
-     struct kvm_sev_snp_launch_update update = {0};
- 
-     if (!data->hva || !data->len) {
-@@ -774,6 +833,11 @@ sev_snp_launch_update(SevSnpGuestState *sev_snp_guest, SevLaunchUpdateData *data
-         return 1;
+     /*
+      * Only add the kernel hashes if the sev-guest configuration explicitly
+-     * stated kernel-hashes=on. Currently only enabled for SEV/SEV-ES guests,
+-     * so check for TYPE_SEV_GUEST as well.
++     * stated kernel-hashes=on.
+      */
+-    if (sev_guest && !sev_guest->kernel_hashes) {
++    if (!sev_common->kernel_hashes) {
+         return false;
      }
  
-+    if (data->type == KVM_SEV_SNP_PAGE_TYPE_CPUID) {
-+        /* Save a copy for comparison in case the LAUNCH_UPDATE fails */
-+        memcpy(&snp_cpuid_info, data->hva, sizeof(snp_cpuid_info));
-+    }
-+
-     update.uaddr = (__u64)(unsigned long)data->hva;
-     update.gfn_start = data->gpa >> TARGET_PAGE_BITS;
-     update.len = data->len;
-@@ -798,6 +862,11 @@ sev_snp_launch_update(SevSnpGuestState *sev_snp_guest, SevLaunchUpdateData *data
-     if (ret) {
-         error_report("SNP_LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
-                      ret, fw_error, fw_error_to_str(fw_error));
-+
-+        if (data->type == KVM_SEV_SNP_PAGE_TYPE_CPUID) {
-+            sev_snp_cpuid_report_mismatches(&snp_cpuid_info, data->hva);
-+            error_report("SEV-SNP: failed update CPUID page");
-+        }
-     }
- 
- out:
-@@ -965,6 +1034,89 @@ snp_launch_update_data(uint64_t gpa, void *hva, uint32_t len, int type)
-     return 0;
+@@ -2037,6 +2033,16 @@ sev_common_set_sev_device(Object *obj, const char *value, Error **errp)
+     SEV_COMMON(obj)->sev_device = g_strdup(value);
  }
  
-+static int
-+sev_snp_cpuid_info_fill(SnpCpuidInfo *snp_cpuid_info,
-+                        const KvmCpuidInfo *kvm_cpuid_info)
++static bool sev_common_get_kernel_hashes(Object *obj, Error **errp)
 +{
-+    size_t i;
-+
-+    if (kvm_cpuid_info->cpuid.nent > SNP_CPUID_FUNCTION_MAXCOUNT) {
-+        error_report("SEV-SNP: CPUID entry count (%d) exceeds max (%d)",
-+                     kvm_cpuid_info->cpuid.nent, SNP_CPUID_FUNCTION_MAXCOUNT);
-+        return -1;
-+    }
-+
-+    memset(snp_cpuid_info, 0, sizeof(*snp_cpuid_info));
-+
-+    for (i = 0; i < kvm_cpuid_info->cpuid.nent; i++) {
-+        const struct kvm_cpuid_entry2 *kvm_cpuid_entry;
-+        SnpCpuidFunc *snp_cpuid_entry;
-+
-+        kvm_cpuid_entry = &kvm_cpuid_info->entries[i];
-+        snp_cpuid_entry = &snp_cpuid_info->entries[i];
-+
-+        snp_cpuid_entry->eax_in = kvm_cpuid_entry->function;
-+        if (kvm_cpuid_entry->flags == KVM_CPUID_FLAG_SIGNIFCANT_INDEX) {
-+            snp_cpuid_entry->ecx_in = kvm_cpuid_entry->index;
-+        }
-+        snp_cpuid_entry->eax = kvm_cpuid_entry->eax;
-+        snp_cpuid_entry->ebx = kvm_cpuid_entry->ebx;
-+        snp_cpuid_entry->ecx = kvm_cpuid_entry->ecx;
-+        snp_cpuid_entry->edx = kvm_cpuid_entry->edx;
-+
-+        /*
-+         * Guest kernels will calculate EBX themselves using the 0xD
-+         * subfunctions corresponding to the individual XSAVE areas, so only
-+         * encode the base XSAVE size in the initial leaves, corresponding
-+         * to the initial XCR0=1 state.
-+         */
-+        if (snp_cpuid_entry->eax_in == 0xD &&
-+            (snp_cpuid_entry->ecx_in == 0x0 || snp_cpuid_entry->ecx_in == 0x1)) {
-+            snp_cpuid_entry->ebx = 0x240;
-+            snp_cpuid_entry->xcr0_in = 1;
-+            snp_cpuid_entry->xss_in = 0;
-+        }
-+    }
-+
-+    snp_cpuid_info->count = i;
-+
-+    return 0;
++    return SEV_COMMON(obj)->kernel_hashes;
 +}
 +
-+static int
-+snp_launch_update_cpuid(uint32_t cpuid_addr, void *hva, uint32_t cpuid_len)
++static void sev_common_set_kernel_hashes(Object *obj, bool value, Error **errp)
 +{
-+    KvmCpuidInfo kvm_cpuid_info = {0};
-+    SnpCpuidInfo snp_cpuid_info;
-+    CPUState *cs = first_cpu;
-+    int ret;
-+    uint32_t i = 0;
-+
-+    assert(sizeof(snp_cpuid_info) <= cpuid_len);
-+
-+    /* get the cpuid list from KVM */
-+    do {
-+        kvm_cpuid_info.cpuid.nent = ++i;
-+        ret = kvm_vcpu_ioctl(cs, KVM_GET_CPUID2, &kvm_cpuid_info);
-+    } while (ret == -E2BIG);
-+
-+    if (ret) {
-+        error_report("SEV-SNP: unable to query CPUID values for CPU: '%s'",
-+                     strerror(-ret));
-+        return 1;
-+    }
-+
-+    ret = sev_snp_cpuid_info_fill(&snp_cpuid_info, &kvm_cpuid_info);
-+    if (ret) {
-+        error_report("SEV-SNP: failed to generate CPUID table information");
-+        return 1;
-+    }
-+
-+    memcpy(hva, &snp_cpuid_info, sizeof(snp_cpuid_info));
-+
-+    return snp_launch_update_data(cpuid_addr, hva, cpuid_len, KVM_SEV_SNP_PAGE_TYPE_CPUID);
++    SEV_COMMON(obj)->kernel_hashes = value;
 +}
 +
- static int
- snp_metadata_desc_to_page_type(int desc_type)
+ static void
+ sev_common_class_init(ObjectClass *oc, void *data)
  {
-@@ -1001,7 +1153,12 @@ snp_populate_metadata_pages(SevSnpGuestState *sev_snp, OvmfSevMetadata *metadata
-             exit(1);
-         }
+@@ -2051,6 +2057,11 @@ sev_common_class_init(ObjectClass *oc, void *data)
+                                   sev_common_set_sev_device);
+     object_class_property_set_description(oc, "sev-device",
+             "SEV device to use");
++    object_class_property_add_bool(oc, "kernel-hashes",
++                                   sev_common_get_kernel_hashes,
++                                   sev_common_set_kernel_hashes);
++    object_class_property_set_description(oc, "kernel-hashes",
++            "add kernel hashes to guest firmware for measured Linux boot");
+ }
  
--        ret = snp_launch_update_data(desc->base, hva, desc->len, type);
-+        if (type == KVM_SEV_SNP_PAGE_TYPE_CPUID) {
-+            ret = snp_launch_update_cpuid(desc->base, hva, desc->len);
-+        } else {
-+            ret = snp_launch_update_data(desc->base, hva, desc->len, type);
-+        }
-+
-         if (ret) {
-             error_report("%s: Failed to add metadata page gpa 0x%x+%x type %d\n",
-                          __func__, desc->base, desc->len, desc->type);
+ static void
+@@ -2109,20 +2120,6 @@ sev_guest_set_session_file(Object *obj, const char *value, Error **errp)
+     SEV_GUEST(obj)->session_file = g_strdup(value);
+ }
+ 
+-static bool sev_guest_get_kernel_hashes(Object *obj, Error **errp)
+-{
+-    SevGuestState *sev_guest = SEV_GUEST(obj);
+-
+-    return sev_guest->kernel_hashes;
+-}
+-
+-static void sev_guest_set_kernel_hashes(Object *obj, bool value, Error **errp)
+-{
+-    SevGuestState *sev = SEV_GUEST(obj);
+-
+-    sev->kernel_hashes = value;
+-}
+-
+ static void
+ sev_guest_class_init(ObjectClass *oc, void *data)
+ {
+@@ -2136,11 +2133,6 @@ sev_guest_class_init(ObjectClass *oc, void *data)
+                                   sev_guest_set_session_file);
+     object_class_property_set_description(oc, "session-file",
+             "guest owners session parameters (encoded with base64)");
+-    object_class_property_add_bool(oc, "kernel-hashes",
+-                                   sev_guest_get_kernel_hashes,
+-                                   sev_guest_set_kernel_hashes);
+-    object_class_property_set_description(oc, "kernel-hashes",
+-            "add kernel hashes to guest firmware for measured Linux boot");
+ }
+ 
+ static void
 -- 
 2.25.1
 
