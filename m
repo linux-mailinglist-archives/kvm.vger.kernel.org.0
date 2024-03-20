@@ -1,259 +1,166 @@
-Return-Path: <kvm+bounces-12308-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12309-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7A7F881325
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 15:15:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 824A6881425
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 16:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E0D9289BB9
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 14:15:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3E2AB21EF8
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 15:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6D74AEC1;
-	Wed, 20 Mar 2024 14:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F594EB47;
+	Wed, 20 Mar 2024 15:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BT9v+W6U"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XosE7mzi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B44942073;
-	Wed, 20 Mar 2024 14:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB4A40843;
+	Wed, 20 Mar 2024 15:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710944109; cv=none; b=u6/jYh2zH4MSsLojtLk0W1O87Sto63oFClJpVTjPKsVgfRmZazDWJWhBqsxkSsGjtkkTNbmuS7ob9a7f2z/i/39Yd1/XssHPQKJyYp1LFqNMZ9QLRDogH+9uZCZgdsd0buUwGRdeyugf3trj06R4NJqol1K1CrGzE7lMcEaHNV0=
+	t=1710947239; cv=none; b=Iia9Q2HNzu+VMEJegRH+FOdIyzH1afH0lMnh0/AVvKj1+grcQ6BNV4AzzOVeUEBV/mXZwQB9ysWasT6NjDPAvDUyuK2GA3iOodfGaN/vIVa/KgoEUbnhpaTY+ELMf0JRXfunwKckI4OxwvOGsYB1P9Uj2xc0NbSYLGlOuFc8v2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710944109; c=relaxed/simple;
-	bh=UMYuPLOrQ5QFAar/1uhGdEWKpj3OE4Mi7ol0aibRfxA=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=SDeT8504u1Y1wFv3T8jeU4ArZ8ZANRG3sjVSwGycZztNc2ow4qHF8NMdrp8a19O3wQxbVinvhUuBVXtGcsUWc6YYwwrVnb6KhYXpZ34r6DA1MFimyrCBXUGM97AjAh/JjpJPKEhjfJUosL6bgAAP+jO2JlCtfqp0x7CVWJmyjVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BT9v+W6U; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e6f6d782e4so4608592b3a.0;
-        Wed, 20 Mar 2024 07:15:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710944107; x=1711548907; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cyMQ+8dkMkvcjrYhj/YbvYKdLMOP0zpLYG0B4M+Jlis=;
-        b=BT9v+W6UUsNMWV7VfsAxak6yFMlKNrSgWkb/iSiCsIcJ8PmOFSUr39MPYFYuRMwfcE
-         7x6abV82vUrA6Nsh+FJTbeGFKZiHhe/Po2jVmHvsAPi3qlSpsz1yOzL9Wc5cnVXe3FBd
-         dhZwTuo0VtBJn/famCkQpqBalpAiLQ3HSS5xPk7pU1yyb94X1sSQnjH2Y/3h4327zJPv
-         ANe6fF0sEyUiH3XDZ7K7dttIW+0CujdESsOQ1IJmtrzmylv6DBOVp9VADrYx/GZJ6jn8
-         bVImeouaLtuLgfGN6FJanCd80tm05+Ulsp84b6DlqeBoXvBMwTR7ULeX1lr/zSdn5RV6
-         IX7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710944107; x=1711548907;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cyMQ+8dkMkvcjrYhj/YbvYKdLMOP0zpLYG0B4M+Jlis=;
-        b=kRn450RMvh5jlGVnqEu7Gcw8rGJ1IIFcuXEj77CvMN8lm0CefJeoJ9dNTaYphlkVdH
-         QaadqXT9DEYPuak82zV2vadOJFQkp83SPMUnNyF4s4pPsRL5nEuMgv/RWLJZwRkcew2p
-         Pn9pQUlIUnSXYYt66Ott9c15A2jrF5h1JdfJrmkysgABBgcyTS0Goe7LoUdRvZosMhM3
-         qWjlvVZbJW2XuMndKPD9PeeZq6tlzTFU5FvfvYbQ9LViW1LIjYRNDR2Gl6yRehmAAk2w
-         6mFLTz3S3z6uLyyq9amq0jeFlkebdoZTaG8GN099/6ndjZ67ePK2p0vKFbpuG4As9rea
-         4NLw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+Zy6P8v4V67TAUJ2+jXqmwqvwOTi6PwmNjp3YrxB0v8nvCBsAOQA9iQmTG+uKhhUqovQfD95fGmzFe7q0yG0gYLGWdPXhoQLTIlKK2RMSIJAuQGM3UtWYSAa1gBuhlQcI
-X-Gm-Message-State: AOJu0YzuYrG4/XiQXwKbl1LzAK5h6NGNKpDo15Oslnk4vfYITx9mA5mW
-	EVFuZNUCOgm8ssyVW8PVL2B8Rci9p7rWIuYQEAFYhAApEKSGnxFH
-X-Google-Smtp-Source: AGHT+IEBoSbM9cPtFd7ZC+s4hE1kj4RJvDY5Pf8+BlYELGhMMMflFhnxv7spDETq1/cWJeznnbL6PQ==
-X-Received: by 2002:a05:6a00:2d8f:b0:6e7:8218:e75 with SMTP id fb15-20020a056a002d8f00b006e782180e75mr2504299pfb.7.1710944107582;
-        Wed, 20 Mar 2024 07:15:07 -0700 (PDT)
-Received: from localhost (193-116-208-39.tpgi.com.au. [193.116.208.39])
-        by smtp.gmail.com with ESMTPSA id gu25-20020a056a004e5900b006e7040519a1sm8260357pfb.216.2024.03.20.07.15.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Mar 2024 07:15:07 -0700 (PDT)
+	s=arc-20240116; t=1710947239; c=relaxed/simple;
+	bh=vslDf433kFGORuqoUyvzLY62zpBxBN0EMQBlmxC8xnA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FVOhq8Hk1w5H03Z3W5v3a/jlZaMjTThG1EWfR4k4/8hwHL1hCivDs5n4Uj0uk2cfwy3x5gDeesypzjpcfxYkrF5/z1K9CB8Mhnew/nrSoMmN8WUz+vmwmUZsMpqCR4jNJnGzUboZvmn+IB5eB4TbnuYOYw3y8H4AcrNHxS1fYL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XosE7mzi; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710947237; x=1742483237;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=vslDf433kFGORuqoUyvzLY62zpBxBN0EMQBlmxC8xnA=;
+  b=XosE7mziwtaqhZ9XIBpjZGFrEUsptCv025fb6WtUxX/G3ismCilaqylq
+   oTfDfAxoLEhEfBIZNorV/TDKhdSYRsRL57C9c7h/L7V45U9OzpAELSxDb
+   tA9c9UlenX8Wa5bwCmVZP9H0+CT5yx+CujLXVr/jxLiDsSWFZORQ9PBi0
+   qMXCnVlF4qxajp3Bxx05YL22+ZBBIvvEyBOrsZMpiXe5HYhdMSm2ZcL1u
+   //xZCTBr5bJiIpCuqYgC3Bd6SYF13OYu5bbFxSXtB4fbNe4RM9QxrP5n7
+   2WOCSS0uKWNfo8+d1hANjcoQEaA7rrwjTM2FTEyBqk4o22TdHbDLsGYcb
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11019"; a="5753255"
+X-IronPort-AV: E=Sophos;i="6.07,140,1708416000"; 
+   d="scan'208";a="5753255"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 08:07:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,140,1708416000"; 
+   d="scan'208";a="14581030"
+Received: from ticeal-or-008.amr.corp.intel.com (HELO [10.209.76.219]) ([10.209.76.219])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 08:07:16 -0700
+Message-ID: <70d7a20a-72dc-4ded-a35f-684de44eb6e6@intel.com>
+Date: Wed, 20 Mar 2024 08:07:16 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 007/130] x86/virt/tdx: Export SEAMCALL functions
+Content-Language: en-US
+To: "Huang, Kai" <kai.huang@intel.com>, "seanjc@google.com"
+ <seanjc@google.com>
+Cc: "Zhang, Tina" <tina.zhang@intel.com>,
+ "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "Yuan, Hang" <hang.yuan@intel.com>, "x86@kernel.org" <x86@kernel.org>,
+ "Chen, Bo2" <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+ "Aktas, Erdem" <erdemaktas@google.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <8f64043a6c393c017347bf8954d92b84b58603ec.1708933498.git.isaku.yamahata@intel.com>
+ <e6e8f585-b718-4f53-88f6-89832a1e4b9f@intel.com>
+ <bd21a37560d4d0695425245658a68fcc2a43f0c0.camel@intel.com>
+ <54ae3bbb-34dc-4b10-a14e-2af9e9240ef1@intel.com>
+ <ZfR4UHsW_Y1xWFF-@google.com>
+ <ea85f773-b5ef-4cf6-b2bd-2c0e7973a090@intel.com>
+ <ZfSjvwdJqFJhxjth@google.com>
+ <8d79db2af4e0629ad5dea6d8276fc5cda86a890a.camel@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <8d79db2af4e0629ad5dea6d8276fc5cda86a890a.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 21 Mar 2024 00:15:01 +1000
-Message-Id: <CZYN2DBLH8Q2.U5H1A6VDAUY7@wheely>
-Cc: <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "Vaibhav Jain" <vaibhav@linux.ibm.com>
-Subject: Re: [PATCH] arch/powerpc/kvm: Add support for reading VPA counters
- for pseries guests
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Gautam Menghani" <gautam@linux.ibm.com>, <mpe@ellerman.id.au>,
- <christophe.leroy@csgroup.eu>, <aneesh.kumar@kernel.org>,
- <naveen.n.rao@linux.ibm.com>
-X-Mailer: aerc 0.15.2
-References: <20240319142807.95547-1-gautam@linux.ibm.com>
-In-Reply-To: <20240319142807.95547-1-gautam@linux.ibm.com>
+Content-Transfer-Encoding: 7bit
 
-On Wed Mar 20, 2024 at 12:28 AM AEST, Gautam Menghani wrote:
-> PAPR hypervisor has introduced three new counters in the VPA area of
-> LPAR CPUs for KVM L2 guest (see [1] for terminology) observability - 2
-> for context switches from host to guest and vice versa, and 1 counter
-> for getting the total time spent inside the KVM guest. Add a tracepoint
-> that enables reading the counters for use by ftrace/perf. Note that this
-> tracepoint is only available for nestedv2 API (i.e, KVM on PowerVM).
->
-> [1] Terminology:
-> a. L1 refers to the VM (LPAR) booted on top of PAPR hypervisor
-> b. L2 refers to the KVM guest booted on top of L1.
->
-> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
-> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
-> ---
->  arch/powerpc/include/asm/kvm_host.h |  5 +++++
->  arch/powerpc/include/asm/lppaca.h   | 11 ++++++++---
->  arch/powerpc/kvm/book3s_hv.c        | 20 ++++++++++++++++++++
->  arch/powerpc/kvm/trace_hv.h         | 24 ++++++++++++++++++++++++
->  4 files changed, 57 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/a=
-sm/kvm_host.h
-> index 8abac5321..26d7bb4b9 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -847,6 +847,11 @@ struct kvm_vcpu_arch {
->  	gpa_t nested_io_gpr;
->  	/* For nested APIv2 guests*/
->  	struct kvmhv_nestedv2_io nestedv2_io;
-> +
-> +	/* For VPA counters having context switch and guest run time info (in n=
-s) */
-> +	u64 l1_to_l2_cs;
-> +	u64 l2_to_l1_cs;
-> +	u64 l2_runtime;
->  #endif
-> =20
->  #ifdef CONFIG_KVM_BOOK3S_HV_EXIT_TIMING
+On 3/20/24 05:09, Huang, Kai wrote:
+> I can try to do if you guys believe this should be done, and should be done
+> earlier than later, but I am not sure _ANY_ optimization around SEAMCALL will
+> have meaningful performance improvement.
 
-These aren't required here if it's just used for tracing over
-a single run vcpu call are they?
+I don't think Sean had performance concerns.
 
-> diff --git a/arch/powerpc/include/asm/lppaca.h b/arch/powerpc/include/asm=
-/lppaca.h
-> index 61ec2447d..bda6b86b9 100644
-> --- a/arch/powerpc/include/asm/lppaca.h
-> +++ b/arch/powerpc/include/asm/lppaca.h
-> @@ -62,7 +62,8 @@ struct lppaca {
->  	u8	donate_dedicated_cpu;	/* Donate dedicated CPU cycles */
->  	u8	fpregs_in_use;
->  	u8	pmcregs_in_use;
-> -	u8	reserved8[28];
-> +	u8	l2_accumul_cntrs_enable;  /* Enable usage of counters for KVM guest =
-*/
-> +	u8	reserved8[27];
->  	__be64	wait_state_cycles;	/* Wait cycles for this proc */
->  	u8	reserved9[28];
->  	__be16	slb_count;		/* # of SLBs to maintain */
-> @@ -92,9 +93,13 @@ struct lppaca {
->  	/* cacheline 4-5 */
-> =20
->  	__be32	page_ins;		/* CMO Hint - # page ins by OS */
-> -	u8	reserved12[148];
-> +	u8	reserved12[28];
-> +	volatile __be64 l1_to_l2_cs_tb;
-> +	volatile __be64 l2_to_l1_cs_tb;
-> +	volatile __be64 l2_runtime_tb;
-> +	u8 reserved13[96];
->  	volatile __be64 dtl_idx;	/* Dispatch Trace Log head index */
-> -	u8	reserved13[96];
-> +	u8	reserved14[96];
->  } ____cacheline_aligned;
-> =20
->  #define lppaca_of(cpu)	(*paca_ptrs[cpu]->lppaca_ptr)
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 2b04eba90..b94461b5f 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4092,6 +4092,7 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcp=
-u *vcpu, u64 time_limit,
->  	unsigned long msr, i;
->  	int trap;
->  	long rc;
-> +	struct lppaca *lp =3D get_lppaca();
+I think he was having a justifiably violent reaction to how much more
+complicated the generated code is to do a SEAMCALL versus a good ol' KVM
+hypercall.
 
-Does get_lppaca() emit some inline asm that can't be optimised?
-Could move it under the unlikely branches if so.
+"Complicated" in this case means lots more instructions and control
+flow.  That's slower, sure, but the main impact is that when you go to
+debug it, it's *MUCH* harder to debug the SEAMCALL entry assembly than a
+KVM hypercall.
 
-> =20
->  	io =3D &vcpu->arch.nestedv2_io;
-> =20
+My takeaway from this, though, is that we are relying on the compiler
+for a *LOT*.  There are also so many levels in the helpers that it's
+hard to avoid silly things like two _separate_ retry loops.
 
-KVM L0 could in theory provide this for v1 L1s too, so could this
-be done at a higher level to cover both?
+We should probably be looking at the generated code a _bit_ more often
+than never, and it's OK to tinker a _bit_ to make things out-of-line or
+make sure that the compiler optimizes everything that we think that it
+should.
 
-> @@ -4107,6 +4108,17 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vc=
-pu *vcpu, u64 time_limit,
->  	kvmppc_gse_put_u64(io->vcpu_run_input, KVMPPC_GSID_LPCR, lpcr);
-> =20
->  	accumulate_time(vcpu, &vcpu->arch.in_guest);
-> +
-> +	/* Reset the guest host context switch timing */
-> +	if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled())) {
-> +		lp->l2_accumul_cntrs_enable =3D 1;
-> +		lp->l1_to_l2_cs_tb =3D 0;
-> +		lp->l2_to_l1_cs_tb =3D 0;
-> +		lp->l2_runtime_tb =3D 0;
-> +	} else {
-> +		lp->l2_accumul_cntrs_enable =3D 0;
-> +	}
+Also remember that there are very fun tools out there that can make this
+much easier than recompiling the kernel a billion times:
 
-Instead of zeroing here zero after the exit, which avoids the
-else branch and possibly avoids an obscure race with the counters.
-What if trace_kvmppc_vcpu_exit_cs_time_enabled() is false here...
-
-> +
->  	rc =3D plpar_guest_run_vcpu(0, vcpu->kvm->arch.lpid, vcpu->vcpu_id,
->  				  &trap, &i);
-> =20
-> @@ -4133,6 +4145,14 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vc=
-pu *vcpu, u64 time_limit,
-> =20
->  	timer_rearm_host_dec(*tb);
-> =20
-> +	/* Record context switch and guest_run_time data */
-> +	if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled())) {
-> +		vcpu->arch.l1_to_l2_cs =3D tb_to_ns(be64_to_cpu(lp->l1_to_l2_cs_tb));
-> +		vcpu->arch.l2_to_l1_cs =3D tb_to_ns(be64_to_cpu(lp->l2_to_l1_cs_tb));
-> +		vcpu->arch.l2_runtime =3D tb_to_ns(be64_to_cpu(lp->l2_runtime_tb));
-> +		trace_kvmppc_vcpu_exit_cs_time(vcpu);
-> +	}
-
-... and true here. If it had been previously true then it would trace
-stale values I think?
-
-Would something like this work?
-
-  if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled()))
-    get_lppaca()->l2_accumul_cntrs_enable =3D 1;
-
-  [run vcpu ; ...]
-
-  if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled()))
-    do_trace_nested_cs_time(vcpu);=20
-
- ...
-
-static void do_trace_nested_cs_time(struct vcpu *vcpu)
-{
-    struct lppaca *lp =3D get_lppaca();
-    u64 l1_to_l2, l2_to_l1, l2_runtime;
-
-    if (!lp->l2_accumul_cntrs_enable)
-      return;
-
-    l1_to_l2 =3D tb_to_ns(be64_to_cpu(lp->l1_to_l2_cs_tb));
-    l2_to_l1 =3D tb_to_ns(be64_to_cpu(lp->l2_to_l1_cs_tb));
-    l2_runtime =3D tb_to_ns(be64_to_cpu(lp->l2_runtime_tb));
-    trace_kvmppc_vcpu_exit_cs_time(vcpu->cpu_id, l1_to_l2,
-                                   l2_to_l1, l2_runtime);
-    lp->l1_to_l2_cs_tb =3D 0;
-    lp->l2_to_l1_cs_tb =3D 0;
-    lp->l2_runtime_tb =3D 0;
-    lp->l2_accumul_cntrs_enable =3D 0;
-}
-
+	https://godbolt.org/z/8ooE4d465
 
