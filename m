@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-12337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EF27881974
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 23:33:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C2D4881982
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 23:37:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFDAF1F22E5E
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 22:33:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B07D91F21A5B
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 22:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF9B224D7;
-	Wed, 20 Mar 2024 22:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CE53FBBC;
+	Wed, 20 Mar 2024 22:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0GpkH1ql"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aiFhvLxp"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2042.outbound.protection.outlook.com [40.107.94.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F170712E52
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 22:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52E612E52
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 22:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710973986; cv=fail; b=lFZrry/bAcBZf06pQMDp743KtmC7HO5wDFgLEGIzqmLeoQffZ6mbqoj7qnbjeShX6QgCcFw1lUycvcuXblDaIZEauNV91X6/lMAD3TiWsm8eLevxJBQ1nKs/KNQS5DCSka05rL64oh/li2cMqi1Q/wWj//zv0iXOwM2iUlcA5F8=
+	t=1710974240; cv=fail; b=Gj8BP1zE2PnMI66kVX75e/cAPNK/n1kGV6wCiU5K5bDDvym2XSU3f0n+x5mHKf1TTHMZU9hogevpCK/1ML3H9yXRo9sKZ63YCyxQGx9mpIHpkkNksTQsodC9VdI68xD7Y2mfAEr4zBnvUIR8kwCP5QFhg6IwKOkw8lYuKBolKsM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710973986; c=relaxed/simple;
-	bh=Qw9f9akCP4xHHYhppFaXesoK9PbEuAvKmDLmVkFVk5k=;
+	s=arc-20240116; t=1710974240; c=relaxed/simple;
+	bh=62doaNZqHtKBKf5RxSIEgsBKW8gD8VV5VA4nYlbufD0=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eH6NVXtvcwIAQ0p24jElDiImJRy2JYDtzOYf2GBxA50YKInIYJbFPGhPinrrgpOTRJU/yTmCfjyX3TQGENT9VEFoaHpbnQng1l7gSvqvssBPZTJTzWhUAQljacqT3AubBmhVN2HeDiwbz/Vo1Cj+XK+QSP23L7fbxZxbAVmszoc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0GpkH1ql; arc=fail smtp.client-ip=40.107.236.40
+	 Content-Type:Content-Disposition:In-Reply-To; b=f06G/BFFD+dmMG/x6kRRmJpbbgDVd5vkZ9aKWfc8dFgLgTGo3Y1Fg6/I2lTbhhg9zQPfn8cb6Uu3w5ejB/AP5OuiuOObRPITeFhfMsLqs/EzWErvzhIkCG2DPpy56KF2ZLahc/cUtdOGIpdfK+xvifKXE3gOb1PNV4Nq1IlSPQA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=aiFhvLxp; arc=fail smtp.client-ip=40.107.94.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bTJLE+qYG0En/TbdqjIV1jmE7cHd+7Lo9YzWE1ec2d7NSQQ3Vf3DyJObi7lBJF/Gd2C0LwsYhPXchpd4BBCiqM/DA0pV/YtJeUw0E34dGBJPP+N2d39IxSESA1TH9wnoMPsDqfguesT7nYtgSstrK/AFPMV2ufXozIHRu0r/dPEpAIjoZGJHjBsvyj0Pq36DDREuQ5jiLDt5zkQEGxjYcU8uGaE1g2//ZONcy56+ClfgchBbhDgy0Osk0VmTohSw/iiiHbhgwZ9zn4LjxJIhoNVp7tUE22T02diNu7bbFqzf8zhmT0BPYshN/1Aj//vVms+OVaqpwoiINHJfwAYKnw==
+ b=nZ0sRL8wMJzpZ2YCRJ/H37HxRbe9bW88dZNyq+A6i8aHUWYSKQflaV71v7MPL20iMcHH0XGG3q7V3DTWBUyPVUU4cPVtGYlKKsv9iNu5tl6qXpp1n8+/Y4v5gewQUUgVCvQAU4QBDr0dtwmwmpqk+UO49mXw8r/Bpks78HX7Oh5509BzakyDuTa03Xsmi22DnZoUkMJCZSBc1iSV7z3JTsy419qFNS2JMwBMrPUEdmEzXsd0N0gmpYNXjQmYnkECel58muTzmIj/2AOz/Q95qdG9f44ageSXnBNVtlCm/sWUO/xiBwtuRXTYTe+aMZhv83aPdcDSQCToD73RDnOuEA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UppUIdAOFx0Viz0/HWQ5mdjEx8xCAbThMCG58c8GLXc=;
- b=V4nVoRJbs2LQ0fSb0ibKb4UIbKJ9L2lDAc4Ot7awTmfvssD/TM8DWLMTnbVOJ6BoKc5dbZE/WVmzAWvIXYjDrEhMkfAjtxphiIn1/JjHSJo5Gta9OEb9cMSZorhBEWN3CPnv4wzUsUw+ddJjJpWyjd3usKV5ri9Zm58b/pcz68gCcDm5RqvU6P2TQmfGViluh9qVjoPea7YvwFEAmeRxdIfF2Nb+IJTjuGzpzC6EGtOD2Rhoo3XsMb4hYZSqS+PqfrmjVJuNM73ecsK0HGnNLNP5B3hZIkvy69l634wnR5LqPkGMTtYNfRGyTejgLIDI9Qap1UFbVOsN4C1npRXzfw==
+ bh=hAgkw2lDwUQFUmAsDYTj7fITv+GAJ5DtAlbGggYq0UI=;
+ b=CB9ZEui19KW4Sog2HBLxb7DJZSyBVvAOtvy5litfX7pwGspShW+6OoP5YBbIpVih6GeWaLW9wv7xE8wmI/FYt4NCLd3algTMvP9iOwJuUKYUDp+4JZbYaTY8qnzTv4WIbHG26oaR5nZzNEVD/0jWHlVTG/AAOfm7uWEfXjqHmjDqy4iW7eIFI4b9KDjWpw4YBw4lWic4LDs5wl23LxPWDxv4/4OVwHV5g5i/DQc4RJQVg702cnEgWLkIjQfn2rDBOpFx1menNg9W6e4Orgyemxxs4INldaTs+VWB8ODzSi2e/6UTN6GL5QIK2bQ0E/Ye2X9aPjjZq1KDA9KddrlQNw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UppUIdAOFx0Viz0/HWQ5mdjEx8xCAbThMCG58c8GLXc=;
- b=0GpkH1qlBBIfwvzgQtVwGxl3YNIjN17ULCvnfslDS69O11aYvY14+LSdJncZvxU2ssQUDCmL9+zwtAapI/D4uXzuXrgD3rGRTFWbRzsFvXFkBFUoWkvF+xOS29g+CEJJ8wIZRZEwbUU4MPsgVwr6t2+A9u7l+2f9tk717iFsjUc=
-Received: from MN2PR02CA0026.namprd02.prod.outlook.com (2603:10b6:208:fc::39)
- by SN7PR12MB7321.namprd12.prod.outlook.com (2603:10b6:806:298::14) with
+ bh=hAgkw2lDwUQFUmAsDYTj7fITv+GAJ5DtAlbGggYq0UI=;
+ b=aiFhvLxp0Ya7VQPp3t5Tel7nJWnFNFxEx4hq1AChECYMpQl8pnIgeJmVeMmoutNsyyoJuDftbMklYfiDPmh7OixGu3do8dG/dh5sIyveeGvpG1nH8+gHxUnmH6BU7DK9Yp1tuCI8FHFOAiJLAKzA/4MjlhDbKPVJpV7Y5PJuOSo=
+Received: from CH2PR12CA0008.namprd12.prod.outlook.com (2603:10b6:610:57::18)
+ by SJ2PR12MB8805.namprd12.prod.outlook.com (2603:10b6:a03:4d0::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.34; Wed, 20 Mar
- 2024 22:32:59 +0000
-Received: from BL02EPF0001A105.namprd05.prod.outlook.com
- (2603:10b6:208:fc:cafe::f1) by MN2PR02CA0026.outlook.office365.com
- (2603:10b6:208:fc::39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27 via Frontend
- Transport; Wed, 20 Mar 2024 22:32:57 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27; Wed, 20 Mar
+ 2024 22:37:16 +0000
+Received: from CH2PEPF0000013D.namprd02.prod.outlook.com
+ (2603:10b6:610:57:cafe::78) by CH2PR12CA0008.outlook.office365.com
+ (2603:10b6:610:57::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18 via Frontend
+ Transport; Wed, 20 Mar 2024 22:37:16 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,26 +63,28 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF0001A105.mail.protection.outlook.com (10.167.241.137) with Microsoft
+ CH2PEPF0000013D.mail.protection.outlook.com (10.167.244.69) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 22:32:57 +0000
+ 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 22:37:15 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 20 Mar
- 2024 17:32:56 -0500
-Date: Wed, 20 Mar 2024 17:32:44 -0500
+ 2024 17:37:15 -0500
+Date: Wed, 20 Mar 2024 17:35:34 -0500
 From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Isaku Yamahata <isaku.yamahata@intel.com>
 CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Tom Lendacky
-	<thomas.lendacky@amd.com>, Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?=
-	<berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta
-	<pankaj.gupta@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata
-	<isaku.yamahata@linux.intel.com>, Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v3 37/49] i386/sev: Add the SNP launch start context
-Message-ID: <20240320223244.5i7xufnc6u5wyvox@amd.com>
+	<thomas.lendacky@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel P
+ =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>, Markus Armbruster
+	<armbru@redhat.com>, Pankaj Gupta <pankaj.gupta@amd.com>, Xiaoyao Li
+	<xiaoyao.li@intel.com>, Isaku Yamahata <isaku.yamahata@linux.intel.com>,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v3 40/49] hw/i386/sev: Add function to get SEV metadata
+ from OVMF header
+Message-ID: <20240320223534.7pfvv365dtv3nr4u@amd.com>
 References: <20240320083945.991426-1-michael.roth@amd.com>
- <20240320083945.991426-38-michael.roth@amd.com>
- <366370f2-3d2d-4d14-81db-11fddadc2f24@redhat.com>
+ <20240320083945.991426-41-michael.roth@amd.com>
+ <20240320175535.GF1994522@ls.amr.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,157 +93,167 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <366370f2-3d2d-4d14-81db-11fddadc2f24@redhat.com>
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+In-Reply-To: <20240320175535.GF1994522@ls.amr.corp.intel.com>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A105:EE_|SN7PR12MB7321:EE_
-X-MS-Office365-Filtering-Correlation-Id: c5ee24cd-5ec2-420a-e36b-08dc492db12d
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000013D:EE_|SJ2PR12MB8805:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a171387-64c2-4ba8-b2e0-08dc492e4b3c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	+WJnpy7vIlOoPiEjSLgf1CpylOhlnDY715nC4cVs+NHKBsycw0/S1AGpDiDc9X379Uoq3woyDoYLNExkJEw30WDoKq7JJE2SSvPWtwmbePfpnZDTApQn8seCHv63fFS1uC/FXay3giVLQs3Km3AR5Rnw4AlMxcdDSBtz4tyDpJ7kXoV6inMwEqjsIHoOnuWBokaQL+pg144AJbAucgS8dyMRleBprLiMk47MmwFwDlRxvN1u5pMEAftwSHcTc466hpdkr9dvJfKSdOp0B1P1aKt05wt8LD9sNVfQHDlIyi9zZkFflo4IxfFx48DeRleI7CxYQ1wVEsUYvEkcmNfC9WJixyZ0uLuXfBlKXSN1jLBcsIBI7OPt3sZGh4x+moY5AxwAiW0SUYZx8lqif68E20qhqwwqsANPtEkm+H5XwWvMeo02+kOKUYkJN6iQDJT671SUIBs4ct/Yj3EB+6VqeIjKcnew1o123eID+4xP/TIczKzM6pEs8cFBJuGvbziDPM4aPzWFpYI903rDgrPjtcp76AXywpOyjAg0mg8rHg2IeHz4qHuHwbL/OAdPo5XhDaoxxoLDDQcYMaHuFDqFx/0Rj3lE780T1eA/pKwYquLwGqktlPhbUWqzmUJshOang977v4P3rBssQ2fEiqPboABqBEbQVuHw5SG0+WB8YmQtQjcQrpwDFlRWn2aXn3WKrw5M/iaJkOGYosgXSyHWBOFw3X3oMLK4Siek9e/WzkAQRzYG9LLjm0l8b4Bpn0pn
+	cdF5P8hgEzTbIhMcPFAqZHR0r3oWVyCS9EX2l7Ee5atjX5WMB6RCPpxibO2RfoFOi79i/jJwZvz+Dng8FTqnUsTvOK5NiX6ECsYGNGVlAdXWDXC8mDJeujjvMVSbbcVEukIg6X6kYQESqBijxh6tGDd/BbVzT1+iQDWnJ7kogmdwFdVEcuU/ic/+njCDUaIgeCqJ1J4yiN9/xdysSqQkrWB834j33q51+PEub8RrRboKumeHjGm38HUXQhfyxOhp8UjMZUTwgVJq9C+uk/gQopcpRNU7b0dmr08fotqY/QdnBk7KXqetD4dOTqF889grlGOK057NsPLADLPpW+7junIF8NTYK958vJk3DqJHZxY18OEj+U8gN97pkAt5334i2asjnuHdOcghMQ9mLK5jSX5hU0wc2XM4Gq+47Nyz5WPb7Crt+41144TKnC3Zy3dW4GFz5dw4gOnrUVDEodv2s5yyWZ7B/LkAxkjyh+3c5nMVyUSS3EKss7j5mMtHuL/ipLbJ6UEzUidYakN592VINotelYvJI7vOZYL+YESVDEprxzd7KUrslTkM1C7qSGvo9lYR9C8J0zDL8THKaWZdPGaOM6eeHBEYi2ScC2zGKP+ovH7oM0TsgUam3Utp00gRyalMZPHHaprIj40tZavLTYP4aSnFa1TKNa9rHcMyTFrvX/syJJ74h3SWkwRMVZepGayCmSjjNXo2UwUSNWsjzgKMoHetghPaDGGQ/iTrMVDgZDwd8k0AHI+60ww6ACwD
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(376005)(36860700004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(36860700004)(376005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 22:32:57.4229
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 22:37:15.8735
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5ee24cd-5ec2-420a-e36b-08dc492db12d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a171387-64c2-4ba8-b2e0-08dc492e4b3c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A105.namprd05.prod.outlook.com
+	CH2PEPF0000013D.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7321
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8805
 
-On Wed, Mar 20, 2024 at 10:58:30AM +0100, Paolo Bonzini wrote:
-> On 3/20/24 09:39, Michael Roth wrote:
+On Wed, Mar 20, 2024 at 10:55:35AM -0700, Isaku Yamahata wrote:
+> On Wed, Mar 20, 2024 at 03:39:36AM -0500,
+> Michael Roth <michael.roth@amd.com> wrote:
+> 
 > > From: Brijesh Singh <brijesh.singh@amd.com>
 > > 
-> > The SNP_LAUNCH_START is called first to create a cryptographic launch
-> > context within the firmware.
+> > A recent version of OVMF expanded the reset vector GUID list to add
+> > SEV-specific metadata GUID. The SEV metadata describes the reserved
+> > memory regions such as the secrets and CPUID page used during the SEV-SNP
+> > guest launch.
+> > 
+> > The pc_system_get_ovmf_sev_metadata_ptr() is used to retieve the SEV
+> > metadata pointer from the OVMF GUID list.
 > > 
 > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > > ---
-> >   target/i386/sev.c        | 42 +++++++++++++++++++++++++++++++++++++++-
-> >   target/i386/trace-events |  1 +
-> >   2 files changed, 42 insertions(+), 1 deletion(-)
+> >  hw/i386/pc_sysfw_ovmf.c | 33 +++++++++++++++++++++++++++++++++
+> >  include/hw/i386/pc.h    | 26 ++++++++++++++++++++++++++
+> >  2 files changed, 59 insertions(+)
 > > 
-> > diff --git a/target/i386/sev.c b/target/i386/sev.c
-> > index 3b4dbc63b1..9f63a41f08 100644
-> > --- a/target/i386/sev.c
-> > +++ b/target/i386/sev.c
-> > @@ -39,6 +39,7 @@
-> >   #include "confidential-guest.h"
-> >   #include "hw/i386/pc.h"
-> >   #include "exec/address-spaces.h"
-> > +#include "qemu/queue.h"
-> >   OBJECT_DECLARE_SIMPLE_TYPE(SevCommonState, SEV_COMMON)
-> >   OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
-> > @@ -106,6 +107,16 @@ struct SevSnpGuestState {
-> >   #define DEFAULT_SEV_DEVICE      "/dev/sev"
-> >   #define DEFAULT_SEV_SNP_POLICY  0x30000
-> > +typedef struct SevLaunchUpdateData {
-> > +    QTAILQ_ENTRY(SevLaunchUpdateData) next;
-> > +    hwaddr gpa;
-> > +    void *hva;
-> > +    uint64_t len;
-> > +    int type;
-> > +} SevLaunchUpdateData;
+> > diff --git a/hw/i386/pc_sysfw_ovmf.c b/hw/i386/pc_sysfw_ovmf.c
+> > index 07a4c267fa..32efa34614 100644
+> > --- a/hw/i386/pc_sysfw_ovmf.c
+> > +++ b/hw/i386/pc_sysfw_ovmf.c
+> > @@ -35,6 +35,31 @@ static const int bytes_after_table_footer = 32;
+> >  static bool ovmf_flash_parsed;
+> >  static uint8_t *ovmf_table;
+> >  static int ovmf_table_len;
+> > +static OvmfSevMetadata *ovmf_sev_metadata_table;
 > > +
-> > +static QTAILQ_HEAD(, SevLaunchUpdateData) launch_update;
+> > +#define OVMF_SEV_META_DATA_GUID "dc886566-984a-4798-A75e-5585a7bf67cc"
+> > +typedef struct __attribute__((__packed__)) OvmfSevMetadataOffset {
+> > +    uint32_t offset;
+> > +} OvmfSevMetadataOffset;
 > > +
-> >   #define SEV_INFO_BLOCK_GUID     "00f771de-1a7e-4fcb-890e-68c77e2fb44e"
-> >   typedef struct __attribute__((__packed__)) SevInfoBlock {
-> >       /* SEV-ES Reset Vector Address */
-> > @@ -668,6 +679,30 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
-> >       return 0;
-> >   }
-> > +static int
-> > +sev_snp_launch_start(SevSnpGuestState *sev_snp_guest)
+> > +static void pc_system_parse_sev_metadata(uint8_t *flash_ptr, size_t flash_size)
 > > +{
-> > +    int fw_error, rc;
-> > +    SevCommonState *sev_common = SEV_COMMON(sev_snp_guest);
-> > +    struct kvm_sev_snp_launch_start *start = &sev_snp_guest->kvm_start_conf;
+> > +    OvmfSevMetadata     *metadata;
+> > +    OvmfSevMetadataOffset  *data;
 > > +
-> > +    trace_kvm_sev_snp_launch_start(start->policy, sev_snp_guest->guest_visible_workarounds);
-> > +
-> > +    rc = sev_ioctl(sev_common->sev_fd, KVM_SEV_SNP_LAUNCH_START,
-> > +                   start, &fw_error);
-> > +    if (rc < 0) {
-> > +        error_report("%s: SNP_LAUNCH_START ret=%d fw_error=%d '%s'",
-> > +                __func__, rc, fw_error, fw_error_to_str(fw_error));
-> > +        return 1;
+> > +    if (!pc_system_ovmf_table_find(OVMF_SEV_META_DATA_GUID, (uint8_t **)&data,
+> > +                                   NULL)) {
+> > +        return;
 > > +    }
 > > +
-> > +    QTAILQ_INIT(&launch_update);
+> > +    metadata = (OvmfSevMetadata *)(flash_ptr + flash_size - data->offset);
+> > +    if (memcmp(metadata->signature, "ASEV", 4) != 0) {
+> > +        return;
+> > +    }
 > > +
-> > +    sev_set_guest_state(sev_common, SEV_STATE_LAUNCH_UPDATE);
-> > +
-> > +    return 0;
+> > +    ovmf_sev_metadata_table = g_malloc(metadata->len);
+> > +    memcpy(ovmf_sev_metadata_table, metadata, metadata->len);
 > > +}
+> >  
+> >  void pc_system_parse_ovmf_flash(uint8_t *flash_ptr, size_t flash_size)
+> >  {
+> > @@ -90,6 +115,9 @@ void pc_system_parse_ovmf_flash(uint8_t *flash_ptr, size_t flash_size)
+> >       */
+> >      memcpy(ovmf_table, ptr - tot_len, tot_len);
+> >      ovmf_table += tot_len;
 > > +
-> >   static int
-> >   sev_launch_start(SevGuestState *sev_guest)
-> >   {
-> > @@ -1007,7 +1042,12 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-> >           goto err;
-> >       }
-> > -    ret = sev_launch_start(SEV_GUEST(sev_common));
-> > +    if (sev_snp_enabled()) {
-> > +        ret = sev_snp_launch_start(SEV_SNP_GUEST(sev_common));
-> > +    } else {
-> > +        ret = sev_launch_start(SEV_GUEST(sev_common));
-> > +    }
+> > +    /* Copy the SEV metadata table (if exist) */
+> > +    pc_system_parse_sev_metadata(flash_ptr, flash_size);
+> >  }
 > 
-> Instead of an "if", this should be a method in sev-common.  Likewise for
-> launch_finish in the next patch.
-
-Makes sense.
-
+> Can we move this call to x86_firmware_configure() @ pc_sysfw.c, and move sev
+> specific bits to somewhere to sev specific file?  We don't have to parse sev
+> metadata for non-SEV case, right?
 > 
-> Also, patch 47 should introduce an "int (*launch_update_data)(hwaddr gpa,
-> uint8_t *ptr, uint64_t len)" method whose implementation is either the
-> existing sev_launch_update_data() for sev-guest, or a wrapper around
-> snp_launch_update_data() (to add KVM_SEV_SNP_PAGE_TYPE_NORMAL) for
-> sev-snp-guest.
+> We don't have to touch common ovmf file. It also will be consistent with tdx
+> case.  TDX patch series adds tdx_parse_tdvf() to x86_firmware_configure().
 
-I suppose if we end up introducing an unused 'gpa' parameter in the case
-of sev_launch_update_data() that's still worth the change? Seems
-reasonable to me.
-
-> 
-> In general, the only uses of sev_snp_enabled() should be in
-> sev_add_kernel_loader_hashes() and kvm_handle_vmgexit_ext_req().  I would
-> not be that strict for the QMP and HMP functions, but if you want to make
-> those methods of sev-common I wouldn't complain.
-
-There's a good bit of duplication in those cases which is a little
-awkward to break out into a common helper. Will consider these as well
-though.
+Yep, makes sense to handle it similarly for SNP.
 
 Thanks,
 
 Mike
 
 > 
-> Paolo
+> thanks,
 > 
-> >       if (ret) {
-> >           error_setg(errp, "%s: failed to create encryption context", __func__);
-> >           goto err;
-> > diff --git a/target/i386/trace-events b/target/i386/trace-events
-> > index 2cd8726eeb..cb26d8a925 100644
-> > --- a/target/i386/trace-events
-> > +++ b/target/i386/trace-events
-> > @@ -11,3 +11,4 @@ kvm_sev_launch_measurement(const char *value) "data %s"
-> >   kvm_sev_launch_finish(void) ""
-> >   kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
-> >   kvm_sev_attestation_report(const char *mnonce, const char *data) "mnonce %s data %s"
-> > +kvm_sev_snp_launch_start(uint64_t policy, char *gosvw) "policy 0x%" PRIx64 " gosvw %s"
+> >  
+> >  /**
+> > @@ -159,3 +187,8 @@ bool pc_system_ovmf_table_find(const char *entry, uint8_t **data,
+> >      }
+> >      return false;
+> >  }
+> > +
+> > +OvmfSevMetadata *pc_system_get_ovmf_sev_metadata_ptr(void)
+> > +{
+> > +    return ovmf_sev_metadata_table;
+> > +}
+> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > index fb1d4106e5..df9a61540d 100644
+> > --- a/include/hw/i386/pc.h
+> > +++ b/include/hw/i386/pc.h
+> > @@ -163,6 +163,32 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
+> >  #define PCI_HOST_ABOVE_4G_MEM_SIZE     "above-4g-mem-size"
+> >  #define PCI_HOST_PROP_SMM_RANGES       "smm-ranges"
+> >  
+> > +typedef enum {
+> > +    SEV_DESC_TYPE_UNDEF,
+> > +    /* The section contains the region that must be validated by the VMM. */
+> > +    SEV_DESC_TYPE_SNP_SEC_MEM,
+> > +    /* The section contains the SNP secrets page */
+> > +    SEV_DESC_TYPE_SNP_SECRETS,
+> > +    /* The section contains address that can be used as a CPUID page */
+> > +    SEV_DESC_TYPE_CPUID,
+> > +
+> > +} ovmf_sev_metadata_desc_type;
+> > +
+> > +typedef struct __attribute__((__packed__)) OvmfSevMetadataDesc {
+> > +    uint32_t base;
+> > +    uint32_t len;
+> > +    ovmf_sev_metadata_desc_type type;
+> > +} OvmfSevMetadataDesc;
+> > +
+> > +typedef struct __attribute__((__packed__)) OvmfSevMetadata {
+> > +    uint8_t signature[4];
+> > +    uint32_t len;
+> > +    uint32_t version;
+> > +    uint32_t num_desc;
+> > +    OvmfSevMetadataDesc descs[];
+> > +} OvmfSevMetadata;
+> > +
+> > +OvmfSevMetadata *pc_system_get_ovmf_sev_metadata_ptr(void);
+> >  
+> >  void pc_pci_as_mapping_init(MemoryRegion *system_memory,
+> >                              MemoryRegion *pci_address_space);
+> > -- 
+> > 2.25.1
+> > 
+> > 
 > 
+> -- 
+> Isaku Yamahata <isaku.yamahata@intel.com>
 
