@@ -1,174 +1,246 @@
-Return-Path: <kvm+bounces-12321-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12323-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD1F881738
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 19:12:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 234C888181F
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 20:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 456B61F254A6
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 18:12:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD384285ED9
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 19:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF586AFB9;
-	Wed, 20 Mar 2024 18:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2082885925;
+	Wed, 20 Mar 2024 19:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CZ3rkZ0A"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3aZFfbXA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2047.outbound.protection.outlook.com [40.107.237.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693C3320B
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 18:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710958347; cv=none; b=U1Yh61gPHgNfi8/HCME/miDxuYdk+P/xLgDMk0E1ybCOPaeyCWsZ4/VYyFI/wcpt0uUUhAlJT3sV8YYrMjlrN+ZMg2yZN0UYtLICojk7wvTguxMFjkk2Odmj3pxC8oNQRHg3y3ayVdjplvmVtiwMj6jaYhBn3f0s2m2ZHu6owZ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710958347; c=relaxed/simple;
-	bh=Vnbag9q3xQRvF0qzbjgLy7tYXm8Ph98PFJ3DvYqpeYA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oAlFsJvFetl2AVxBWbSvc70rhubPqmfp4nTWdxc1GwE9GqAiIHEtRkZVhMlH3eYoIcwFRfJJSKOQceRYM4H2LFnmyYfhgkNO+xQyfNmZ/MpxoMGnXcFd9qvsljr+FuqZiARYXzJSXzBqFL5YtytA1ChPlGMQ3BJGtMLMfHMTovw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CZ3rkZ0A; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710958345; x=1742494345;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Vnbag9q3xQRvF0qzbjgLy7tYXm8Ph98PFJ3DvYqpeYA=;
-  b=CZ3rkZ0AZWNfAecYmn27qM8faFTVIq+O7GfSr/0zl0bYYlPV3WBzBOfG
-   FlYEWLeyT6A1tNaJ1QdwsADftMyOt5wQuzewkyFvr+gtRagsOIQPsmRvE
-   FB7wuBBT06HaHcw7VSDt6NovpcuXQgz49XfhZ1CiOT8gRa96uVuvThbz2
-   umbhC853+/645VuYm0hLpPgIF9SAO4L5soORSfMuhzs9yhLvOQMXDAdl7
-   r8AaoS/s6srvnFmNhEZ3+KU1YU1loZ6jXVJhFWqHbxTqVKAX61x8gqpGh
-   DyovV7OHcoruqOMEku/rc2+9CVd93WqMmIOt8ZuIljgr7E0hKDpG/xJ49
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11019"; a="9697213"
-X-IronPort-AV: E=Sophos;i="6.07,140,1708416000"; 
-   d="scan'208";a="9697213"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 11:12:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,140,1708416000"; 
-   d="scan'208";a="14142999"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 11:12:24 -0700
-Date: Wed, 20 Mar 2024 11:12:23 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Pankaj Gupta <pankaj.gupta@amd.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Isaku Yamahata <isaku.yamahata@linux.intel.com>,
-	isaku.yamahata@intel.com
-Subject: Re: [PATCH v3 48/49] hw/i386/sev: Use guest_memfd for legacy ROMs
-Message-ID: <20240320181223.GG1994522@ls.amr.corp.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC506A34D
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 19:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710964121; cv=fail; b=EB9X3RGvVRALY1R/47U2EzgLgJViHAXb5Ix2i+ObiLCH3Th2XWNtrIg1uPLwmD3HZ9048hJwgcfU5IKx75K+LiwsK3hLJ2P5qOpNj9sjPBJSp41OPkE1nR2SECTM5zKC7fy2dZBPcv26vVIxHqB9t+G1uL5kA7Ktbo1jLiPjk9c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710964121; c=relaxed/simple;
+	bh=qdvIUwOT+97cSefb4DrXihuZQUwuLnstHkpso2XUZx8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OHjl6aOZHCmufYwtG2hw+LYCf8XElDZHA6ntN6cVpTCqNEPCRUqJu13owoAxEonyhKdcOSZ84fOO7zHUA0sKycL2n+huhzkM0y6KiyRra7+26Gc7hU5ZtZ9na5yEsXX7UXx09NxXcumkkhcw8ZR35UlPqIgqLSip1z2ovJ1BJoc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3aZFfbXA; arc=fail smtp.client-ip=40.107.237.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i6UxG+pvGUcZKQ4BqFFJZBCunEpA8CJOVO2rpHcuGY/NFNsEChTECYtLpcnH3XnabKXE+k5uJqY3Mmyw4NXJ/AnXqgfYJbSO2L2Pw1Psa4B22EQmsjZkgg8fUM37ZIlwyhJHdFrpJPB4K0vLauG/24O5PVa+aiuydKmUNz4xNY7hbKwynIX7YgYlJ6Qw/I26R6BIy/tIeJjUwyGaeQDwMlRn6mfkKbD+rlKMEtbG1tdBvo/1kDrdsaE7qXozEBJORVaHderGvLb0RjuL7ArxeFJ/nQQDbZBW1kFEqoFtQ1xWteeG4XyNi+Jatu/mQ49f43iskL5bqNraKRwoIHxbkw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZOB7bEVoZCnQ1QqKsleDnjUv2vl2SO9ocRy1UYKddww=;
+ b=SWHEDd+t764/zoGUd+c/GYQwKeCFBmXVIiM5TJPHNXLmdyPAkkO7ruTPQ/YsaWahMeRRXchMGsjVAghsbME2lFNcv8Js1c4PJ+jumvl8FDntrFh7pP2a2hz3TRZHYNK9V8cyct7mHreeGDQT4MCy8Q4SIWR8CnHrNG+O4SA7nWajqC+QcTPV7Br1jhtEI9Aamfh+3X9RLvtkPMcXlKADl4KexOstg8AFZp8YE35AMBi94Xvzjvu5TUov7TYSwpFc2WM7LZHqZUh9v9zctoN+w890xgcdhHRTH7qniGIC02VIPLtJVY7F7odxMVh5vOOfakgkQXf2oCzidJ/ZCoTDjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZOB7bEVoZCnQ1QqKsleDnjUv2vl2SO9ocRy1UYKddww=;
+ b=3aZFfbXAjoRCIWI5IHKmzhHjLQV8/srLHnX+uG3PoaqKa0OZgUuGKke0zDHCRd0K0ZU+QzOu0EHZHz3O9/0Pa7AtYGQOp6Crv0Qw5P8U107HVQI9HZcmxQvAxix+8dxNvJyMpSuAi0rT7qS/QXGJZZYhhe7x1O7RgZrVQ4+6K9s=
+Received: from BY3PR10CA0008.namprd10.prod.outlook.com (2603:10b6:a03:255::13)
+ by SA3PR12MB8021.namprd12.prod.outlook.com (2603:10b6:806:305::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.26; Wed, 20 Mar
+ 2024 19:48:34 +0000
+Received: from SJ1PEPF00001CDC.namprd05.prod.outlook.com
+ (2603:10b6:a03:255:cafe::28) by BY3PR10CA0008.outlook.office365.com
+ (2603:10b6:a03:255::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27 via Frontend
+ Transport; Wed, 20 Mar 2024 19:48:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SJ1PEPF00001CDC.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 19:48:34 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 20 Mar
+ 2024 14:48:29 -0500
+Date: Wed, 20 Mar 2024 14:47:54 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Tom Lendacky
+	<thomas.lendacky@amd.com>, Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?=
+	<berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta
+	<pankaj.gupta@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata
+	<isaku.yamahata@linux.intel.com>
+Subject: Re: [PATCH v3 19/49] kvm: Make kvm_convert_memory() obey
+ ram_block_discard_is_enabled()
+Message-ID: <20240320194754.yfu7zrfwvzdwuw23@amd.com>
 References: <20240320083945.991426-1-michael.roth@amd.com>
- <20240320083945.991426-49-michael.roth@amd.com>
+ <20240320083945.991426-20-michael.roth@amd.com>
+ <d6acfbef-96a1-42bc-8866-c12a4de8c57c@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20240320083945.991426-49-michael.roth@amd.com>
+In-Reply-To: <d6acfbef-96a1-42bc-8866-c12a4de8c57c@redhat.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDC:EE_|SA3PR12MB8021:EE_
+X-MS-Office365-Filtering-Correlation-Id: d997ffaa-1d3e-4ad1-7b3e-08dc4916ba5f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	mAscZMIM5gHuN67KsoMjy3ZIY/VdOMsrBa4MahnFXeHY8YFEJDXdpsQRB+hsFCSm0OD12R1OviYysnslJp3ETJ6t/eiwkdEQrLYBrqcCez3nUZfbhFpNNz4dulQn+4MDEW06IMTg7YcmYNkNG49EmbrNXpuJhZIhpv53Dcd9kCFFyeTe9jby2lRXgbFu/dYJe26fi52Dp44G8n/p040coWYLDMr9/250KAxpdpbgT8BbpD/GzniTiWwITZeZZeNuS650uBkRik4uaF1pqiU1LxIlgJYha/38ykppb/5ntZlJWOTmDTdVtLKK2M+hZfL+6SR65RCLkbqHBF5GFHpBshGmfqGUiC3MxWZX9cU8aoIzp2Vke17LMiOMW8m17vTStuOHOEQtXW4JLzRsMR6sy0QgrTLr3jhepvnnAL0xlYk/k4BLFPWZDn+1jDxBG/75gmCu+zSF9o3xh4fZ3Da3js8qRxuF8bJPrS4OEioc9JHQt6sPYXSfzSMjcUUTuQjaMBj0PmmEBDwZPk5FfIlLMypcihd0s+vPPiceJ/G5dx1SiEb6Dv+9zXDvmgU0NSDHpR6oNgC1zemZUOY+6hCuTcHrTzer9i4g/uGJo3/47+QAyYxjHfsDjx5Lwayj7yf7snzSPsn+q+Qcw0NTsUZ9cbS82NvdXSwRcm6nxqz4GfjBrSzvYE+NFp48pGV63NDBoq+spEmMGdcQtF0xnJIesA==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(82310400014)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 19:48:34.3289
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d997ffaa-1d3e-4ad1-7b3e-08dc4916ba5f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CDC.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8021
 
-On Wed, Mar 20, 2024 at 03:39:44AM -0500,
-Michael Roth <michael.roth@amd.com> wrote:
+On Wed, Mar 20, 2024 at 05:26:00PM +0100, Paolo Bonzini wrote:
+> On 3/20/24 09:39, Michael Roth wrote:
+> > Some subsystems like VFIO might disable ram block discard for
+> > uncoordinated cases. Since kvm_convert_memory()/guest_memfd don't
+> > implement a RamDiscardManager handler to convey discard operations to
+> > various listeners like VFIO. > Because of this, sequences like the
+> > following can result due to stale IOMMU mappings:
+> 
+> Alternatively, should guest-memfd memory regions call
+> ram_block_discard_require(true)?  This will prevent VFIO from operating, but
+> it will avoid consuming twice the memory.
+> 
+> If desirable, guest-memfd support can be changed to implement an extension
+> of RamDiscardManager that notifies about private/shared memory changes, and
+> then guest-memfd would be able to support coordinated discard.  But I wonder
 
-> TODO: make this SNP-specific if TDX disables legacy ROMs in general
+In an earlier/internal version of the SNP+gmem patches (when there was still
+a dedicated hostmem-memfd-private backend for restrictedmem/gmem), we had a
+rough implementation of RamDiscardManager that did this:
 
-TDX disables pc.rom, not disable isa-bios. IIRC, TDX doesn't need pc pflash.
-Xiaoyao can chime in.
+  https://github.com/AMDESE/qemu/blob/snp-latest-gmem-v12/backends/hostmem-memfd-private.c#L75
 
-Thanks,
+Now that gmem handling is mostly done transparently to the HostMem
+backend in use I'm not sure what the right place would be to implement
+something similar, but maybe it can be done in a more generic way.
+
+There were some notable downsides to that approach though that I'm a
+little hazy on now, but I think they were both kernel limitations:
+
+  - VFIO seemed to have some limitation where it expects that the
+    DMA mapping for a particular iova will be unmapped/mapped with
+    the same granularity, but for an SNP guest there's no guarantee
+    that if you flip a 2MB page from shared->private, that it won't
+    later be flipped private->shared again but this time with a 4K
+    granularity/sub-range. I think the current code still treats
+    this as an -EINVAL case. So we end up needing to do everything
+    with 4K granularity, which I *think* results in 4K IOMMU page
+    table mappings, but I'd need to confirm.
+
+  - VFIO doesn't seem to be optimized for this sort of use case and
+    generally expects a much larger granularity and defaults to 64K
+    max DMA entries, so for a 16GB guest you need to configure VFIO
+    with something like:
+
+      vfio_iommu_type1.dma_entry_limit=4194304
+
+    I didn't see any reason to suggest that's problematic but it
+    makes we wonder if there's other stuff me might run into.
+
+> if that's doable at all - how common are shared<->private flips, and is it
+> feasible to change the IOMMU page tables every time?
+
+- For OVMF+guest kernel that don't do lazy-acceptance:
+
+  I think the bulk of the flipping is during boot where most of
+  shared GPA ranges get converted to private memory, and then
+  later on the guest kernel switches memory back to to shared
+  for stuff like SWIOTLB, and after that I think DMA mappings
+  would be fairly stable.
+
+- For OVMF+guest kernel that support lazy-acceptance:
+
+  The first 4GB get converted to private, and the rest remains
+  shared until guest kernel needs to allocate memory from it.
+  I'm not sure if SWIOTLB allocation is optimized to avoid
+  unecessary flipping if it's allocated from that pool of
+  still-shared memory, but normal/private allocations will
+  result in a steady stream of DMA unmap operations as the
+  guest faults in its working set.
 
 > 
-> Current SNP guest kernels will attempt to access these regions with
-> with C-bit set, so guest_memfd is needed to handle that. Otherwise,
-> kvm_convert_memory() will fail when the guest kernel tries to access it
-> and QEMU attempts to call KVM_SET_MEMORY_ATTRIBUTES to set these ranges
-> to private.
-> 
-> Whether guests should actually try to access ROM regions in this way (or
-> need to deal with legacy ROM regions at all), is a separate issue to be
-> addressed on kernel side, but current SNP guest kernels will exhibit
-> this behavior and so this handling is needed to allow QEMU to continue
-> running existing SNP guest kernels.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  hw/i386/pc.c       | 13 +++++++++----
->  hw/i386/pc_sysfw.c | 13 ++++++++++---
->  2 files changed, 19 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index feb7a93083..5feaeb43ee 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1011,10 +1011,15 @@ void pc_memory_init(PCMachineState *pcms,
->      pc_system_firmware_init(pcms, rom_memory);
->  
->      option_rom_mr = g_malloc(sizeof(*option_rom_mr));
-> -    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
-> -                           &error_fatal);
-> -    if (pcmc->pci_enabled) {
-> -        memory_region_set_readonly(option_rom_mr, true);
-> +    if (machine_require_guest_memfd(machine)) {
-> +        memory_region_init_ram_guest_memfd(option_rom_mr, NULL, "pc.rom",
-> +                                           PC_ROM_SIZE, &error_fatal);
-> +    } else {
-> +        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
-> +                               &error_fatal);
-> +        if (pcmc->pci_enabled) {
-> +            memory_region_set_readonly(option_rom_mr, true);
-> +        }
->      }
->      memory_region_add_subregion_overlap(rom_memory,
->                                          PC_ROM_MIN_VGA,
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index 9dbb3f7337..850f86edd4 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -54,8 +54,13 @@ static void pc_isa_bios_init(MemoryRegion *rom_memory,
->      /* map the last 128KB of the BIOS in ISA space */
->      isa_bios_size = MIN(flash_size, 128 * KiB);
->      isa_bios = g_malloc(sizeof(*isa_bios));
-> -    memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
-> -                           &error_fatal);
-> +    if (machine_require_guest_memfd(current_machine)) {
-> +        memory_region_init_ram_guest_memfd(isa_bios, NULL, "isa-bios",
-> +                                           isa_bios_size, &error_fatal);
-> +    } else {
-> +        memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
-> +                               &error_fatal);
-> +    }
->      memory_region_add_subregion_overlap(rom_memory,
->                                          0x100000 - isa_bios_size,
->                                          isa_bios,
-> @@ -68,7 +73,9 @@ static void pc_isa_bios_init(MemoryRegion *rom_memory,
->             ((uint8_t*)flash_ptr) + (flash_size - isa_bios_size),
->             isa_bios_size);
->  
-> -    memory_region_set_readonly(isa_bios, true);
-> +    if (!machine_require_guest_memfd(current_machine)) {
-> +        memory_region_set_readonly(isa_bios, true);
-> +    }
->  }
->  
->  static PFlashCFI01 *pc_pflash_create(PCMachineState *pcms,
-> -- 
-> 2.25.1
-> 
-> 
+> If the real solution is SEV-TIO (which means essentially guest_memfd support
+> for VFIO), calling ram_block_discard_require(true) may be the simplest
+> stopgap solution.
 
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Hard to guess how cloud vendors will feel about waiting for trusted I/O.
+It does make sense in the context of CoCo to expect them to wait, but
+would be nice to have a stop-gap to offer like disabling discard, since
+it has minimal requirements on the QEMU/VFIO side and might be enough to
+get early adopters up and running at least.
+
+All that said, if you think something based around RamDiscardManager
+seems tenable given all above then we can re-visit that approach as well.
+
+-Mike
+
+> 
+> Paolo
+> 
+> >    - convert page shared->private
+> >    - discard shared page
+> >    - convert page private->shared
+> >    - new page is allocated
+> >    - issue DMA operations against that shared page
+> > 
+> > Address this by taking ram_block_discard_is_enabled() into account when
+> > deciding whether or not to discard pages.
+> > 
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >   accel/kvm/kvm-all.c | 8 ++++++--
+> >   1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> > index 53ce4f091e..6ae03c880f 100644
+> > --- a/accel/kvm/kvm-all.c
+> > +++ b/accel/kvm/kvm-all.c
+> > @@ -2962,10 +2962,14 @@ static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+> >                   */
+> >                   return 0;
+> >               } else {
+> > -                ret = ram_block_discard_range(rb, offset, size);
+> > +                ret = ram_block_discard_is_disabled()
+> > +                      ? ram_block_discard_range(rb, offset, size)
+> > +                      : 0;
+> >               }
+> >           } else {
+> > -            ret = ram_block_discard_guest_memfd_range(rb, offset, size);
+> > +            ret = ram_block_discard_is_disabled()
+> > +                  ? ram_block_discard_guest_memfd_range(rb, offset, size)
+> > +                  : 0;
+> >           }
+> >       } else {
+> >           error_report("Convert non guest_memfd backed memory region "
+> 
 
