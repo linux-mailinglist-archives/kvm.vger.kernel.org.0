@@ -1,256 +1,204 @@
-Return-Path: <kvm+bounces-12261-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12270-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9F52880DFA
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:55:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C606880E6F
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 10:19:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 516C51F27187
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 08:55:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB13B1C20B94
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FAC439FEB;
-	Wed, 20 Mar 2024 08:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5A83A267;
+	Wed, 20 Mar 2024 09:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/LiyTzX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i40DusDC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF7838DED;
-	Wed, 20 Mar 2024 08:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEFB3A1A1
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 09:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710924941; cv=none; b=UHdM1Hg8r1muRhWJkYOF3F2Dex7naIiCUMny0+Nu8k4vZ+gbYU6DEHZUQ4ra8hx8y5mk8O0pDC3gUJTsbj+NtZMeIoB9DvWxqkWc7QZQ6iI51NTfy0NHJwQ6EnTLmpxnPLC8jfK5l4h8MQxPd4P1dVlXBekNSasw6jONQ1D7gkc=
+	t=1710926382; cv=none; b=TH5iqTFw/Gz1ofpXO/7lfTKBy/38mlybBlqbBZ7VYvn1M17Vvs0xJN+6Yex5PJky4JKIkjZPAsGYbHneoBmfrLDtDK9pxc3cStt3W5m8RD4FGMivZFvpL1rX9hKhMUl7LUOfTRiEygt2AcZjVTUCGISYyhRoF5VOYyG9DfsfPdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710924941; c=relaxed/simple;
-	bh=gdJJxHO47QTHX7IJIQn/yNoS/qXqccMa+6/0bsPpjEQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BYL9g3lml6ieP4sXRl2bvE2Za2nD+nGZDMxw5YERMPe9wGS+63JyLTVqK1R9wfq4DMIbLxdZ/MzYetllVDTFe/nRcDNc4s+BNj+HFsyZcW7fvkqlsl7i1/Y1Uzj9nj64r7HfRZmCMjKdsMgynY7dQsXxUVRSnXrG29huU0w3wBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/LiyTzX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66867C433C7;
-	Wed, 20 Mar 2024 08:55:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710924941;
-	bh=gdJJxHO47QTHX7IJIQn/yNoS/qXqccMa+6/0bsPpjEQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k/LiyTzXOZm/bpwg/R7K7z83777XKyGQEoOkmI0+JirTc+A3Irgqqlo/MTqIaHAuT
-	 LaDz5/N89UQYLdibXxPlCFj22TikvtLMQmCsrzfiu9c8ExWvxD7lgnlxbCUAnPTxSu
-	 ovGWRjpBoZtNhTrQF2nDJYdWAWTZvyEET/dz7cc/V7Of5+KdYPv3eTw24b9yYI6Vth
-	 LvOmZtFkDBkj+IBOqsu96vPj5qqCbR/FSCbJ8WT6U9SUo/vlTPTqZ2qWSWdndiAJJg
-	 HA55nQnMV03il6CwCvqo9aY5LSDVcJcESBRt/qQPtJTao2MeNigIFRqvGlKDldCtwy
-	 dX0egkjrYM2eg==
-Date: Wed, 20 Mar 2024 10:55:36 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Message-ID: <20240320085536.GA14887@unreal>
-References: <20240306162022.GB28427@lst.de>
- <20240306174456.GO9225@ziepe.ca>
- <20240306221400.GA8663@lst.de>
- <20240307000036.GP9225@ziepe.ca>
- <20240307150505.GA28978@lst.de>
- <20240307210116.GQ9225@ziepe.ca>
- <20240308164920.GA17991@lst.de>
- <20240308202342.GZ9225@ziepe.ca>
- <20240309161418.GA27113@lst.de>
- <20240319153620.GB66976@ziepe.ca>
+	s=arc-20240116; t=1710926382; c=relaxed/simple;
+	bh=nhA27sbNs6f8vkAPDzCBpOnGkwrWQhfxKwjNEHlIDGw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SViy7TfX5HdxdFrydQuhyEyRdJrGjhl/zxfinfi2ymArLWr7RBHURQuhtg5hg+5lMedmVLHkkT9cZlh4aY9u5V/Qn88xLPMy+3f+W7LCx9PpknCD3vvykIl0LHlk69FjKi/SAHBk8Aej70fKrjk+XvBQEEH/NCkUrozSmzGqWlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i40DusDC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710926379;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=DB0vWT0Z+EdyohLleucWWp9JAYZ/tAwg+pOedU6RK+o=;
+	b=i40DusDC/gtyV20KhSfmoVeuCNj27jjPZokdu0plKqlAwe5bGsR7qPgg3r8fcTD+e1vZ0c
+	s/fyvqNZZKOZGyA3YTFbAP/6a36WyAyPHKlnLVCmm5YCQUU5KIYsKOsiHyJ8gyQQwGDgkH
+	WqqEQwYj1M5IDhNkSKATAIovIBHMgd0=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-kVpIlA7qPN-cZJOAN5IwQw-1; Wed, 20 Mar 2024 05:19:36 -0400
+X-MC-Unique: kVpIlA7qPN-cZJOAN5IwQw-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d4b150c9a0so31123681fa.0
+        for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 02:19:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710926375; x=1711531175;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DB0vWT0Z+EdyohLleucWWp9JAYZ/tAwg+pOedU6RK+o=;
+        b=a3XUk/+sAVX/daOPovMJZCAQ17DsLnLoryLReKZSb0pft/M7h41gaD2jUIKzFpOCR4
+         O5Dxuuj/IHhONvR10l5zQGXqZz6p0Ari14nOdMRZ1tE0WJ9Ud6mtcFqWb5n76CIlv42z
+         yHG41wGM3LY/CX/zVQH6/5x6U2X2IS2mI1pmiCslB+p9gepotNAisyErclSB5RFn/KJt
+         iUQLeY6cjYKwMPrBKQjHxO0tVYrx+keFCzD/hMhqBDeSEifjhSyog1/7PT1uQMJ/xmjO
+         24KabZGpp/cD5CTFZFaNErFfh6TObLntU33d1l27gpnpndij3Mdvx4PWooUYPyHTO6w4
+         hftQ==
+X-Gm-Message-State: AOJu0YyBZxFMPW5LKePt73fF3HjawIijyZdcWNE9w94LSMxv2ZDWWQu6
+	kuA0nEvsFAlHGkg4Wf5EayTnM5F92WM2r7GHjxQL/9zOlt9Qwmjs3IBMZq+iMjg8lhTTFZ0eOwV
+	WhIStEPCWkx7CF2cEx7PXLw+6V4pSqKxjBhBBexgQ4aXQKkIb/g==
+X-Received: by 2002:a2e:6814:0:b0:2d4:6a34:97bf with SMTP id c20-20020a2e6814000000b002d46a3497bfmr8736677lja.49.1710926375429;
+        Wed, 20 Mar 2024 02:19:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGo9MnXlyB54dCqjWyQGfrcUBLZH6ZyGSEV7fXznWcU684+dMRzEE2pe3w31FiYYiJ+Qe8ogw==
+X-Received: by 2002:a2e:6814:0:b0:2d4:6a34:97bf with SMTP id c20-20020a2e6814000000b002d46a3497bfmr8736644lja.49.1710926374359;
+        Wed, 20 Mar 2024 02:19:34 -0700 (PDT)
+Received: from [192.168.10.118] ([151.95.49.219])
+        by smtp.googlemail.com with ESMTPSA id an14-20020a17090656ce00b00a465b72a1f3sm4560080ejc.85.2024.03.20.02.19.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Mar 2024 02:19:33 -0700 (PDT)
+Message-ID: <8386f7ac-418d-4d94-9553-1d2baac17cc1@redhat.com>
+Date: Wed, 20 Mar 2024 10:19:32 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240319153620.GB66976@ziepe.ca>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/49] scripts/update-linux-headers: Add setup_data.h
+ to import list
+Content-Language: en-US
+To: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pankaj.gupta@amd.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>,
+ Isaku Yamahata <isaku.yamahata@linux.intel.com>
+References: <20240320083945.991426-1-michael.roth@amd.com>
+ <20240320083945.991426-3-michael.roth@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20240320083945.991426-3-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 19, 2024 at 12:36:20PM -0300, Jason Gunthorpe wrote:
-> On Sat, Mar 09, 2024 at 05:14:18PM +0100, Christoph Hellwig wrote:
-> > On Fri, Mar 08, 2024 at 04:23:42PM -0400, Jason Gunthorpe wrote:
-> > > > The DMA API callers really need to know what is P2P or not for
-> > > > various reasons.  And they should generally have that information
-> > > > available, either from pin_user_pages that needs to special case
-> > > > it or from the in-kernel I/O submitter that build it from P2P and
-> > > > normal memory.
-> > > 
-> > > I think that is a BIO thing. RDMA just calls with FOLL_PCI_P2PDMA and
-> > > shoves the resulting page list into in a scattertable. It never checks
-> > > if any returned page is P2P - it has no reason to care. dma_map_sg()
-> > > does all the work.
-> > 
-> > Right now it does, but that's not really a good interface.  If we have
-> > a pin_user_pages variant that only pins until the next relevant P2P
-> > boundary and tells you about we can significantly simplify the overall
-> > interface.
+On 3/20/24 09:38, Michael Roth wrote:
+> Data structures like struct setup_data have been moved to a separate
+> setup_data.h header which bootparam.h relies on. Add setup_data.h to
+> the cp_portable() list and sync it along with the other header files.
 > 
-> Sorry for the delay, I was away..
+> Note that currently struct setup_data is stripped away as part of
+> generating bootparam.h, but that handling is no currently needed for
+> setup_data.h since it doesn't pull in many external
+> headers/dependencies. However, QEMU currently redefines struct
+> setup_data in hw/i386/x86.c, so that will need to be removed as part of
+> any header update that pulls in the new setup_data.h to avoid build
+> bisect breakage.
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
-<...>
+Including Linux headers from standard-headers breaks build on
+non-Linux systems, and <asm/setup_data.h> is the first architecture
+specific #include in include/standard-headers/.
 
-> Can we tweak what Leon has done to keep the hmm_range_fault support
-> and non-uniformity for RDMA but add a uniformity optimized flow for
-> BIO?
+So this needs a small fixup, to rewrite asm/ include to the
+standard-headers/asm-* subdirectory for the current architecture.
+     
+While at it, we should remove asm-generic/kvm_para.h from the list of
+allowed includes: it does not have a matching substitution, so if it
+appeared it would break the build it on non-Linux systems where there
+is no /usr/include/asm-generic/ directory.
 
-Something like this will do the trick.
+Applied patches 2-5 to my QEMU coco tree - still temporary, but
+certainly better than the hack that I posted yesterday.  By the time
+QEMU 9.1 opens there will be something more stable to import from.
 
-From 45e739e7073fb04bc168624f77320130bb3f9267 Mon Sep 17 00:00:00 2001
-Message-ID: <45e739e7073fb04bc168624f77320130bb3f9267.1710924764.git.leonro@nvidia.com>
-From: Leon Romanovsky <leonro@nvidia.com>
-Date: Mon, 18 Mar 2024 11:16:41 +0200
-Subject: [PATCH] mm/gup: add strict interface to pin user pages according to
- FOLL flag
+Paolo
 
-All pin_user_pages*() and get_user_pages*() callbacks allocate user
-pages by partially taking into account their p2p vs. non-p2p properties.
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 579b03dc824..d48856f9e24 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -61,7 +61,6 @@ cp_portable() {
+                                       -e 'linux/const' \
+                                       -e 'linux/kernel' \
+                                       -e 'linux/sysinfo' \
+-                                     -e 'asm-generic/kvm_para' \
+                                       -e 'asm/setup_data.h' \
+                                       > /dev/null
+      then
+@@ -78,6 +77,7 @@ cp_portable() {
+          -e 's/__be\([0-9][0-9]*\)/uint\1_t/g' \
+          -e 's/"\(input-event-codes\.h\)"/"standard-headers\/linux\/\1"/' \
+          -e 's/<linux\/\([^>]*\)>/"standard-headers\/linux\/\1"/' \
++        -e 's/<asm\/\([^>]*\)>/"standard-headers\/asm-'$arch'\/\1"/' \
+          -e 's/__bitwise//' \
+          -e 's/__attribute__((packed))/QEMU_PACKED/' \
+          -e 's/__inline__/inline/' \
+@@ -157,12 +157,13 @@ for arch in $ARCHLIST; do
+          cp_portable "$tmpdir/bootparam.h" \
+                      "$output/include/standard-headers/asm-$arch"
+          cp_portable "$tmpdir/include/asm/setup_data.h" \
+-                    "$output/linux-headers/asm-x86"
++                    "$output/standard-headers/asm-x86"
+      fi
+      if [ $arch = riscv ]; then
+          cp "$tmpdir/include/asm/ptrace.h" "$output/linux-headers/asm-riscv/"
+      fi
+  done
++arch=
+  
+  rm -rf "$output/linux-headers/linux"
+  mkdir -p "$output/linux-headers/linux"
 
-In case, user sets FOLL_PCI_P2PDMA flag, the allocated pages will include
-both p2p and "regular" pages, while if FOLL_PCI_P2PDMA flag is not provided,
-only regular pages are returned.
-
-In order to make sure that with FOLL_PCI_P2PDMA flag, only p2p pages are
-returned, let's introduce new internal FOLL_STRICT flag and provide special
-pin_user_pages_fast_strict() API call.
-
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- include/linux/mm.h |  3 +++
- mm/gup.c           | 36 +++++++++++++++++++++++++++++++++++-
- mm/internal.h      |  4 +++-
- 3 files changed, 41 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index f5a97dec5169..910b65dde24a 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2491,6 +2491,9 @@ int pin_user_pages_fast(unsigned long start, int nr_pages,
- 			unsigned int gup_flags, struct page **pages);
- void folio_add_pin(struct folio *folio);
- 
-+int pin_user_pages_fast_strict(unsigned long start, int nr_pages,
-+			       unsigned int gup_flags, struct page **pages);
-+
- int account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc);
- int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
- 			struct task_struct *task, bool bypass_rlim);
-diff --git a/mm/gup.c b/mm/gup.c
-index df83182ec72d..11b5c626a4ab 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -133,6 +133,10 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
- 	if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page)))
- 		return NULL;
- 
-+	if (flags & FOLL_STRICT)
-+		if (flags & FOLL_PCI_P2PDMA && !is_pci_p2pdma_page(page))
-+			return NULL;
-+
- 	if (flags & FOLL_GET)
- 		return try_get_folio(page, refs);
- 
-@@ -232,6 +236,10 @@ int __must_check try_grab_page(struct page *page, unsigned int flags)
- 	if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page)))
- 		return -EREMOTEIO;
- 
-+	if (flags & FOLL_STRICT)
-+		if (flags & FOLL_PCI_P2PDMA && !is_pci_p2pdma_page(page))
-+			return -EREMOTEIO;
-+
- 	if (flags & FOLL_GET)
- 		folio_ref_inc(folio);
- 	else if (flags & FOLL_PIN) {
-@@ -2243,6 +2251,8 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
- 	 * - FOLL_TOUCH/FOLL_PIN/FOLL_TRIED/FOLL_FAST_ONLY are internal only
- 	 * - FOLL_REMOTE is internal only and used on follow_page()
- 	 * - FOLL_UNLOCKABLE is internal only and used if locked is !NULL
-+	 * - FOLL_STRICT is internal only and used to distinguish between p2p
-+	 *   and "regular" pages.
- 	 */
- 	if (WARN_ON_ONCE(gup_flags & INTERNAL_GUP_FLAGS))
- 		return false;
-@@ -3187,7 +3197,8 @@ static int internal_get_user_pages_fast(unsigned long start,
- 	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM |
- 				       FOLL_FORCE | FOLL_PIN | FOLL_GET |
- 				       FOLL_FAST_ONLY | FOLL_NOFAULT |
--				       FOLL_PCI_P2PDMA | FOLL_HONOR_NUMA_FAULT)))
-+				       FOLL_PCI_P2PDMA | FOLL_HONOR_NUMA_FAULT |
-+				       FOLL_STRICT)))
- 		return -EINVAL;
- 
- 	if (gup_flags & FOLL_PIN)
-@@ -3322,6 +3333,29 @@ int pin_user_pages_fast(unsigned long start, int nr_pages,
- }
- EXPORT_SYMBOL_GPL(pin_user_pages_fast);
- 
-+/**
-+ * pin_user_pages_fast_strict() - this is pin_user_pages_fast() variant, which
-+ * makes sure that only pages with same properties are pinned.
-+ *
-+ * @start:      starting user address
-+ * @nr_pages:   number of pages from start to pin
-+ * @gup_flags:  flags modifying pin behaviour
-+ * @pages:      array that receives pointers to the pages pinned.
-+ *              Should be at least nr_pages long.
-+ *
-+ * Nearly the same as pin_user_pages_fastt(), except that FOLL_STRICT is set.
-+ *
-+ * FOLL_STRICT means that the pages are allocated with specific FOLL_* properties.
-+ */
-+int pin_user_pages_fast_strict(unsigned long start, int nr_pages,
-+			       unsigned int gup_flags, struct page **pages)
-+{
-+	if (!is_valid_gup_args(pages, NULL, &gup_flags, FOLL_PIN | FOLL_STRICT))
-+		return -EINVAL;
-+	return internal_get_user_pages_fast(start, nr_pages, gup_flags, pages);
-+}
-+EXPORT_SYMBOL_GPL(pin_user_pages_fast_strict);
-+
- /**
-  * pin_user_pages_remote() - pin pages of a remote process
-  *
-diff --git a/mm/internal.h b/mm/internal.h
-index f309a010d50f..7578837a0444 100644
---- a/mm/internal.h
-+++ b/mm/internal.h
-@@ -1031,10 +1031,12 @@ enum {
- 	FOLL_FAST_ONLY = 1 << 20,
- 	/* allow unlocking the mmap lock */
- 	FOLL_UNLOCKABLE = 1 << 21,
-+	/* don't mix pages with different properties, e.g. p2p with "regular" ones */
-+	FOLL_STRICT = 1 << 22,
- };
- 
- #define INTERNAL_GUP_FLAGS (FOLL_TOUCH | FOLL_TRIED | FOLL_REMOTE | FOLL_PIN | \
--			    FOLL_FAST_ONLY | FOLL_UNLOCKABLE)
-+			    FOLL_FAST_ONLY | FOLL_UNLOCKABLE | FOLL_STRICT)
- 
- /*
-  * Indicates for which pages that are write-protected in the page table,
--- 
-2.44.0
 
