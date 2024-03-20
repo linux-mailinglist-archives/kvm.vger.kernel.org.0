@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-12302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DB1A8811CA
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 13:44:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 965B48811D5
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 13:47:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28EE71F244C2
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 12:44:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 130E1B23110
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 12:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DFD3FE3D;
-	Wed, 20 Mar 2024 12:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F2A40BF9;
+	Wed, 20 Mar 2024 12:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bdSn6R/V"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BxKYWdZ8"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5CB36AF9
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 12:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D70240866
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 12:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710938679; cv=none; b=hCCRfSkq4yPq6N2653zD0lAh3y6/uNY7aljdWQp1cTTlwXB0+87RQzVK1VZRUf1zZ1I50m2e6sOvDF9+77BwTcOcm9m1o2Yf1kLj93S2vGGQtfUmFuD2S4uV7yNMi0ItEfViwax4kF56SfKf7FGzMUV4U4uiIxow5sZ2ZfWm1+8=
+	t=1710938818; cv=none; b=cnds5wqLrTkg6leL9OAEGv/6DjGy3AGATmklzSrlVDNz1+YWKnfDQEiFfMewv8t70CLpfPMTuGup68CDfhuJ0ifm7B+3ra5Lk9ZImg62ZSB9X0JUETJnjegexFMQHVdMNWQEl1bfU6I2KoFigK4uJvfafR6Ci9ia40cZpZSVXEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710938679; c=relaxed/simple;
-	bh=bFqvZxHKRsZyymilWY2dauLtOBypXV5U9yYI3vXV++k=;
+	s=arc-20240116; t=1710938818; c=relaxed/simple;
+	bh=5Pc5otTiuaW1G2T2W/OHh2HBC5/VGR6g8aNIheIBxfg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FB0k7fWMVH617gaSnYXCfCq/lLUDG/SlnDybO5IADPVNUI0dOhwcH60//azn47y2RxXeRsm1/SWFHAYO3p0JkBaiNi6uduJ+2v2KwTw/V8m/DMhVVi0YtP8px//5lz1TUVu+3c3fXeLgK5PxZAftdTqYN9sDbO1jsqGeMxkyfKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bdSn6R/V; arc=none smtp.client-ip=198.175.65.18
+	 In-Reply-To:Content-Type; b=lvC+vFpL15STL2K30VPsQECM0gdlNlGw2JFsUeIJdqGw8aFYv0Lr3ASo2kExHz1KFPhVxUVCFjouJho+o/2y/2QWSb3kntdJT9TqDMYelgvldy8e6OFzJHr29i0InjpHYLiG1901eWWeDCrOAkV6oUJWaOl0Gnamyrvcw7ypF84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BxKYWdZ8; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710938678; x=1742474678;
+  t=1710938817; x=1742474817;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=bFqvZxHKRsZyymilWY2dauLtOBypXV5U9yYI3vXV++k=;
-  b=bdSn6R/Vq9vzixXAr9bXonC93KR5AVTV0ScdaJE8vz2XxvrdITM5ZO/7
-   Zr7d7C5Yy5Ojild5O02CLButdZNLUqYTcPyzhqlgrRmJXfH248UXjmlzI
-   41gRBzC5ZhCNGrL9gj97Kn/8VDHd9b+aOIAqwlQav5LTBcUMIhX3Sgeov
-   7maPkBaPFIZ3r/69w2uU9jzflqc6TYQApjRLjF4L890rAoyE6irOA0ANM
-   S/YtXg+Ux6XxHLOuQMDGrbJgGnQm7MhpmIxrpzBYo/UGVUPdmhaBAqZyy
-   li3MmyPbitowwPU5ptisUk7xsaZl3vy34q2KifhF3SD/IT1sASqSRugl4
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="5980179"
+  bh=5Pc5otTiuaW1G2T2W/OHh2HBC5/VGR6g8aNIheIBxfg=;
+  b=BxKYWdZ81X1KvPNI3JM8EfzVDz/7FWxOWUF4AYYyeO8xB85VHEzbKFFY
+   xkPAKthjyH8BBcEsTKrNcITdsVwjreOqjhMrr6NwkODbQ7yEkViR3eJV5
+   QlNMrdXJN17aAfMUNVvMnGH0YgkgNwRu4WTDe5PytFFl8XorP5mDNGwM+
+   l2MUyaIOcoQkjJZJGCShh5oV+qzMGSLeHA0Y3MTiju46GAhuKGF9Awuuj
+   S5f0JwSNLCHmtRCZ6KO1hwBIk2/uFW2lz5WNANhwmXEs3y46fU42XsrRR
+   ygSccaiUfbqILoGeiezLPCcipfLfcgDiWqFdmxRxRUizCFKPVWFRBTY/A
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="5980510"
 X-IronPort-AV: E=Sophos;i="6.07,140,1708416000"; 
-   d="scan'208";a="5980179"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 05:44:37 -0700
+   d="scan'208";a="5980510"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 05:46:56 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,140,1708416000"; 
-   d="scan'208";a="14119430"
+   d="scan'208";a="14785336"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 05:44:29 -0700
-Message-ID: <a86deafd-a13b-4382-9012-f58431839e24@intel.com>
-Date: Wed, 20 Mar 2024 20:44:29 +0800
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 05:46:54 -0700
+Message-ID: <e9def9a5-8669-4246-8c81-c4a0fe350051@intel.com>
+Date: Wed, 20 Mar 2024 20:46:51 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,138 +63,60 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 06/65] kvm: Introduce support for memory_attributes
+Subject: Re: [PATCH v3 13/49] [FIXUP] "kvm: handle KVM_EXIT_MEMORY_FAULT":
+ drop qemu_host_page_size
 Content-Language: en-US
-To: "Wang, Lei" <lei4.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org,
- Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20240229063726.610065-1-xiaoyao.li@intel.com>
- <20240229063726.610065-7-xiaoyao.li@intel.com>
- <5b4ba4d8-3e18-4feb-8cb6-f78d21da77f9@intel.com>
+To: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pankaj.gupta@amd.com>,
+ Isaku Yamahata <isaku.yamahata@linux.intel.com>
+References: <20240320083945.991426-1-michael.roth@amd.com>
+ <20240320083945.991426-14-michael.roth@amd.com>
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <5b4ba4d8-3e18-4feb-8cb6-f78d21da77f9@intel.com>
+In-Reply-To: <20240320083945.991426-14-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/19/2024 10:03 AM, Wang, Lei wrote:
-> On 2/29/2024 14:36, Xiaoyao Li wrote:> Introduce the helper functions to set the attributes of a range of
->> memory to private or shared.
->>
->> This is necessary to notify KVM the private/shared attribute of each gpa
->> range. KVM needs the information to decide the GPA needs to be mapped at
->> hva-based shared memory or guest_memfd based private memory.
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->> Changes in v4:
->> - move the check of kvm_supported_memory_attributes to the common
->>    kvm_set_memory_attributes(); (Wang Wei)
->> - change warn_report() to error_report() in kvm_set_memory_attributes()
->>    and drop the __func__; (Daniel)
->> ---
->>   accel/kvm/kvm-all.c  | 44 ++++++++++++++++++++++++++++++++++++++++++++
->>   include/sysemu/kvm.h |  3 +++
->>   2 files changed, 47 insertions(+)
->>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index cd0aa7545a1f..70d482a2c936 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -92,6 +92,7 @@ static bool kvm_has_guest_debug;
->>   static int kvm_sstep_flags;
->>   static bool kvm_immediate_exit;
->>   static bool kvm_guest_memfd_supported;
->> +static uint64_t kvm_supported_memory_attributes;
->>   static hwaddr kvm_max_slot_size = ~0;
->>   
->>   static const KVMCapabilityInfo kvm_required_capabilites[] = {
->> @@ -1304,6 +1305,46 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
->>       kvm_max_slot_size = max_slot_size;
->>   }
->>   
->> +static int kvm_set_memory_attributes(hwaddr start, hwaddr size, uint64_t attr)
->> +{
->> +    struct kvm_memory_attributes attrs;
->> +    int r;
->> +
->> +    if (kvm_supported_memory_attributes == 0) {
->> +        error_report("No memory attribute supported by KVM\n");
->> +        return -EINVAL;
->> +    }
->> +
->> +    if ((attr & kvm_supported_memory_attributes) != attr) {
->> +        error_report("memory attribute 0x%lx not supported by KVM,"
->> +                     " supported bits are 0x%lx\n",
->> +                     attr, kvm_supported_memory_attributes);
->> +        return -EINVAL;
->> +    }
->> +
->> +    attrs.attributes = attr;
->> +    attrs.address = start;
->> +    attrs.size = size;
->> +    attrs.flags = 0;
->> +
->> +    r = kvm_vm_ioctl(kvm_state, KVM_SET_MEMORY_ATTRIBUTES, &attrs);
->> +    if (r) {
->> +        error_report("failed to set memory (0x%lx+%#zx) with attr 0x%lx error '%s'",
->> +                     start, size, attr, strerror(errno));
->> +    }
->> +    return r;
->> +}
->> +
->> +int kvm_set_memory_attributes_private(hwaddr start, hwaddr size)
->> +{
->> +    return kvm_set_memory_attributes(start, size, KVM_MEMORY_ATTRIBUTE_PRIVATE);
->> +}
->> +
->> +int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size)
->> +{
->> +    return kvm_set_memory_attributes(start, size, 0);
->> +}
->> +
->>   /* Called with KVMMemoryListener.slots_lock held */
->>   static void kvm_set_phys_mem(KVMMemoryListener *kml,
->>                                MemoryRegionSection *section, bool add)
->> @@ -2439,6 +2480,9 @@ static int kvm_init(MachineState *ms)
->>   
->>       kvm_guest_memfd_supported = kvm_check_extension(s, KVM_CAP_GUEST_MEMFD);
->>   
->> +    ret = kvm_check_extension(s, KVM_CAP_MEMORY_ATTRIBUTES);
->> +    kvm_supported_memory_attributes = ret > 0 ? ret : 0;
+On 3/20/2024 4:39 PM, Michael Roth wrote:
+> TODO: squash into "kvm: handle KVM_EXIT_MEMORY_FAULT"
 > 
-> kvm_check_extension() only returns non-negative value, so we can just
->
-> kvm_supported_memory_attributes = kvm_check_extension(s, KVM_CAP_MEMORY_ATTRIBUTES);
+> qemu_host_page_size has been superseded by qemu_real_host_page_size()
+> in newer QEMU, so update the patch accordingly.
 
-Good catch, I will update it in next version.
+I found it today as well when rebase to qemu v9.0.0-rc0.
 
->> +
->>       if (object_property_find(OBJECT(current_machine), "kvm-type")) {
->>           g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
->>                                                               "kvm-type",
->> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
->> index 6cdf82de8372..8e83adfbbd19 100644
->> --- a/include/sysemu/kvm.h
->> +++ b/include/sysemu/kvm.h
->> @@ -546,4 +546,7 @@ uint32_t kvm_dirty_ring_size(void);
->>   bool kvm_hwpoisoned_mem(void);
->>   
->>   int kvm_create_guest_memfd(uint64_t size, uint64_t flags, Error **errp);
->> +
->> +int kvm_set_memory_attributes_private(hwaddr start, hwaddr size);
->> +int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size);
->>   #endif
+Fix it locally, will show up on my next post of TDX-QEMU patches. :)
+
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>   accel/kvm/kvm-all.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 2fdc07a472..a9c19ab9a1 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2912,8 +2912,8 @@ static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+>       void *addr;
+>       int ret = -1;
+>   
+> -    if (!QEMU_PTR_IS_ALIGNED(start, qemu_host_page_size) ||
+> -        !QEMU_PTR_IS_ALIGNED(size, qemu_host_page_size)) {
+> +    if (!QEMU_PTR_IS_ALIGNED(start, qemu_real_host_page_size()) ||
+> +        !QEMU_PTR_IS_ALIGNED(size, qemu_real_host_page_size())) {
+>           return -1;
+>       }
+>   
+> @@ -2943,7 +2943,7 @@ static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+>           rb = qemu_ram_block_from_host(addr, false, &offset);
+>   
+>           if (to_private) {
+> -            if (rb->page_size != qemu_host_page_size) {
+> +            if (rb->page_size != qemu_real_host_page_size()) {
+>                   /*
+>                   * shared memory is back'ed by  hugetlb, which is supposed to be
+>                   * pre-allocated and doesn't need to be discarded
 
 
