@@ -1,223 +1,322 @@
-Return-Path: <kvm+bounces-12289-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12290-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C83A88117B
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 13:10:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8294E88117D
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 13:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E66A91F24365
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 12:10:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B24131C2349E
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 12:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BA53FB97;
-	Wed, 20 Mar 2024 12:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27CCC4084A;
+	Wed, 20 Mar 2024 12:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NEWYXUZa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JjMnmFLl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665533FBBB;
-	Wed, 20 Mar 2024 12:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710936596; cv=fail; b=HeMVMnluMj7OZwSvSkTDReNH1WebKZ20jUO1snbNbeQDGaVyLzkFdLLBj6GrvWNb3FxPBtlDId9eS4rPv4HSNNK/70JPvQ3olTDRvXdoE33uVLdEtkRsq02Qfa+00iOW3zBwoXteKUF5rUnBVEe3zQ/i8Lpv4XXhhy/a1zCaAWw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710936596; c=relaxed/simple;
-	bh=UC3UZK+wxDVBParVUgcx05qpmB2Bo/s6US8bOXX2AcM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ifkoN+KJf+ulRPdHnQ69Z9TNcmpn1r321TRHR4yueaSjaaVFrrUb7TK+G7gAbdrL3FEr9+lib5/sIoWz6S4orgGHuefPAdQSzA5dFl6kTJZgytNzGO3NdlETEDZHddeGDVaWhRNWGUoAwFu6yOFIwLaYHz0ycjd7w16SzM7xERk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NEWYXUZa; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710936594; x=1742472594;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=UC3UZK+wxDVBParVUgcx05qpmB2Bo/s6US8bOXX2AcM=;
-  b=NEWYXUZa2vUN7hTdZ831hfs5GM77qLRIrUfr6oagkxKrWaecEWGU9uyK
-   RtMlFiWcS4ZPCAUI1r80Ncn4XWvJk6cgmOmJInrBTnAZlkvat+yqh37+x
-   gXRQMpkQoYo2Th5ByOqwaxEG9kaZru7wILPCkFThXrr+/q8OYtg+0EcmT
-   O+sbGaDQWPfr5+Tjf8tnH6yupG1tyoMdrVwHjUSiblodKoa0qCoXUe6hB
-   gYVblZlnm/I0iPURJRD3Psl+KcpOLa6pEvVUmVEYbWgs/GRLmNtxyi+0s
-   YiXCnzgjVOU6ZEEDSSeblQySiTC4Ra9X3LpoxqTNaMa2RH78VmW65bvUv
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="17309988"
-X-IronPort-AV: E=Sophos;i="6.07,140,1708416000"; 
-   d="scan'208";a="17309988"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 05:09:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,140,1708416000"; 
-   d="scan'208";a="14020010"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Mar 2024 05:09:52 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 20 Mar 2024 05:09:51 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 20 Mar 2024 05:09:51 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 20 Mar 2024 05:09:50 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hKg4+TrsvJdjNwDOK5uugOse4JMpM8p+/nDbCGhEqoyBRegUwU/g2OqUqBWi7odyAQxZDAjnQY+tWpVz93QfMTN7xyClSIgIB+4THhH4bedKDV283byNrHeACbBmnU6/pu8r+sGzvblzzorVIZY7T2qFgBLnTa4bCZGSKtjtGF30a+ADt2F84X4jyG/vGT4YLrGsD0dGbEBXWpdSjsk9RofuuNXOvTuCjPKNdKOdwe2E0HBd1EvKqwA0M8fPwl3LfuDO8pPvAft6rzTCtjX5rRVtXTdwqHSAV+OkB7XpwryKWSUYDbMPgsoVcjsJou52gTYDIll/EKKB+VHa8kDgow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UC3UZK+wxDVBParVUgcx05qpmB2Bo/s6US8bOXX2AcM=;
- b=LtlBApwAHYAq4dFNgXbCuB68NjT9nbew5nYO7N0w1OBbIMcAWdfMXd7HV3As5Ux25WONpjq1obVnlLRNLMoHzggHk/ErwKuKFjeEesQ2og40GhQVPOSbQFTxdD/Fi2os09rEutO3769LJKie87O3+zhHRZGEhorkMHrjDrMc4MkvNE1YqEYiYTgqhmJcmCi1Un3auUFXaccK+4ieEE/Echl1gt6bpXmtwTny/FsLZfxRiqqE3e0RnRepBOLekBJezmfBMiiPLlNKfdhr6QBl0Q5hY0mfEcdFJman7YWrZhrfM71OB/8kJ+sRYHEIiN24YtXx8YaOj8dwVl7evyMq6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by SA1PR11MB7085.namprd11.prod.outlook.com (2603:10b6:806:2ba::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.10; Wed, 20 Mar
- 2024 12:09:47 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7409.010; Wed, 20 Mar 2024
- 12:09:47 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "Hansen, Dave" <dave.hansen@intel.com>, "seanjc@google.com"
-	<seanjc@google.com>
-CC: "Zhang, Tina" <tina.zhang@intel.com>, "Edgecombe, Rick P"
-	<rick.p.edgecombe@intel.com>, "Yuan, Hang" <hang.yuan@intel.com>,
-	"x86@kernel.org" <x86@kernel.org>, "Chen, Bo2" <chen.bo@intel.com>,
-	"sagis@google.com" <sagis@google.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "isaku.yamahata@gmail.com"
-	<isaku.yamahata@gmail.com>, "Aktas, Erdem" <erdemaktas@google.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Subject: Re: [PATCH v19 007/130] x86/virt/tdx: Export SEAMCALL functions
-Thread-Topic: [PATCH v19 007/130] x86/virt/tdx: Export SEAMCALL functions
-Thread-Index: AQHaaI2wTkj5owjSpkGpHZWdVA22/bE4BueAgAAU+4CAAASeAIAA+18AgAAgSACAABN/gIAHXjsA
-Date: Wed, 20 Mar 2024 12:09:47 +0000
-Message-ID: <8d79db2af4e0629ad5dea6d8276fc5cda86a890a.camel@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
-	 <8f64043a6c393c017347bf8954d92b84b58603ec.1708933498.git.isaku.yamahata@intel.com>
-	 <e6e8f585-b718-4f53-88f6-89832a1e4b9f@intel.com>
-	 <bd21a37560d4d0695425245658a68fcc2a43f0c0.camel@intel.com>
-	 <54ae3bbb-34dc-4b10-a14e-2af9e9240ef1@intel.com>
-	 <ZfR4UHsW_Y1xWFF-@google.com>
-	 <ea85f773-b5ef-4cf6-b2bd-2c0e7973a090@intel.com>
-	 <ZfSjvwdJqFJhxjth@google.com>
-In-Reply-To: <ZfSjvwdJqFJhxjth@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.50.3 (3.50.3-1.fc39) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SA1PR11MB7085:EE_
-x-ms-office365-filtering-correlation-id: bc203797-00a6-4f6b-16e2-08dc48d6a304
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: YXkVzYxBC1EgiY/QOABZdGiyKYTBS4kOBOxQOsaUNU8LQioV5vqxwgJtMft5iJpCB2FkpkiucZRSU+nd38/PnyQn5bxPLu2Cj2NTAIgIYq7auJVSnRoXTVDjo5hsuw4XE/owCwNB4ZGiUf0wR8dnLAo4lmol10vubAFDoYDQWx6stm3+9+AdRyVr1oqHsByarBk4YcWiMje5RTo00HNYtBX4WBsqGDY6+hTFmDtINh/+VQow4sTP6xdcqhjR/Mp8eBSilqLcC1sOiFcOQ4k59WCjJkUvgOzUMyHKQHY5Asz2NmxvcC8Ghz3G37V27emS5IYsTWHFa9IIZJBbyKkWQYOJlwEJKg84rkSH9wPywQQ5LGb9HJPbTfIXMcca5ZL3L7Fk7gACEdoHkLFJcyH8uBPPS/dXBN3l+osDXCFlGMiXiCV9Hq9k5l5tQ5yOwkwJfXjRCbUctL2EsCSomKBctMrWJHLgz1R6Lyc5VcBlM3WNEDUVFRm1V0QQQ25PcAYxSg4J5gH+YbzMS2u8XGiNj0b0PmSZ8iTWgtKGIXyCzyMTLofJjq3eO+zl8VrnLzDztYC+8v4DQ2x6gHtuMNcOaNGNdPFf4V+Fjc0bn5K3DBvW/FQJ/6UeZIz4YHjlDVhWD5tbsa2h/nn9BRaFOwm72AaAn7lVuLEUcY7XoHWm1vtoVWTMKGZ/uOi6wKU70ZJ61U/d3ufynKz4BThX7bMhlA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?d0kyckZiYURjOFN3M1VDZkhQUUQwbmY0S3hvbDBTMktPaHlLRXVyR1ZFQTU0?=
- =?utf-8?B?dEdUalhpWUt6SDQvK1RSZ0ZwTUUvbzlseUl0QTNvdzlEWEE1eWE1MTVqbG12?=
- =?utf-8?B?cWtUWmd0NExVNUl0ajBFU1ZhNWFUbjNjWkQrVVZhY1l5Vk1LUUljSW9DUklr?=
- =?utf-8?B?VmJBVEQ3K2Z1MEpCcGF0alo5OFVEYmx5ODdRVEo4NnVhUWpoNnRiR2JHeXhm?=
- =?utf-8?B?cDhUVEljaHpqeTRMdFFLaUw1RTBQU0xHR3NTcU9SOTF3YWhLNDcvZkd0NlY5?=
- =?utf-8?B?Q2I5cTJpTXlHaWl0RSthbHA2WEdGQlllbC9acHY5VWdwQXhFbDNWVUNhMzN3?=
- =?utf-8?B?NFNKV0pYV1J4b1loMHBORDdTZ05wNXAyZjRPeUh1cjlKOFRtcGlIMGFOejN1?=
- =?utf-8?B?RVk4NDByN2VsSlhCQk04dDUrUDVUd0ZpejNFeUYwTThiQVJMZ2pBTHN0SE9m?=
- =?utf-8?B?dGlyY1ljd2hzeUhwUnhmdWJXVXA3R0VxZGluOUthUFM1bnIxZExPWjZCWGg4?=
- =?utf-8?B?RitiWWtDalpoT05OVVdna1FvMmNoa3BGbU44eVhPSnFaa0wyNitpS2ZEaVZU?=
- =?utf-8?B?dlJKTFpwSnN2M2hEN0k5d0xnamZ1WWlpSW5NQ3RYQmNWVjd1UytXVnFlKzJt?=
- =?utf-8?B?dVJqdXhKL3RLYmRNYW9LL2tFNW1Ga2FxU2lIU1cyTkZzbDNhOE8zYWptZ3Iy?=
- =?utf-8?B?U3c2WjZmbkRYaXZjekMvMDVMWTAwV29Jc25oVTM2Z3lWT0FlQWg2dmszSjRp?=
- =?utf-8?B?QUY2cmFSNDNHczh0RGxpZTZuKzlHUG81TWtGQUdHRGd6ZDJTQmZxd3RtYnl5?=
- =?utf-8?B?akxKT2M1S2tENHlTcWpEemg3b1hkWUpLS1lQZ0dISW5uNVNENXZpSnNNeGtC?=
- =?utf-8?B?cnVGWXhITzRkbklIWkNhbVk5clZ0SFFWc1Y2ZTdWTmswOU1NbHNKTGlINVZ1?=
- =?utf-8?B?WlJSM29rNzBPb2toVy9NNUdFM1RUVGJlcUVkVzJoS09pSWJFSlZKbTNnWGU5?=
- =?utf-8?B?L0VwNGZmLzRkeXNHZE1oTGd2NXJOaGpIL2pYQ2xXcjAvT3EzNkloS2lBYVNx?=
- =?utf-8?B?S1dVRWdhWTBBRGNJS2IzVHhiUzBrNXJuQ0F5M25yUUg5WG03TjZYbFFZL2d3?=
- =?utf-8?B?Qy9sa1p5OEhaU3ArR0xjS0VJRnZwVDhWc0JJUXhZR2g0eDA1aU0zMWNiZ05K?=
- =?utf-8?B?cVgrZ1JKQ05CV0lpRVJnazVrdWg5UHBFSnlhY3RjcUxuUEpVQldJUUtZZyt6?=
- =?utf-8?B?ZWovRlJRcUtWYkV5TG9IT0M3SExwVUIyY256bllJQjY2TGtwSGdCcG84YmNK?=
- =?utf-8?B?SG03bjlvRGhmR3hBRGJadTE5MVJBbG01ZUpiY085dmZGZWpDcUIrdElNdVVJ?=
- =?utf-8?B?dUJXcitXNElDdzh6NThSTkdFcDRpREs2OWdmdVVDQ2RLdGtkUnkwMkordno4?=
- =?utf-8?B?UlA4bklrR3FoQ0ZrSzZYdmJWeTEySWZrQnFtQmlsdzFFN2RFNGxsWXM5NzZo?=
- =?utf-8?B?MHdUZGQ3QXZ0Y0JVSC9GRCs3aVBza1Rtd3RxRmlZYUg3UUIwTjczbDArZEtk?=
- =?utf-8?B?cldmQjRBU0RsQTEwVHVoTlQ1a2Q5dGdsMDlqRS9PV1RGQzlJWG5qYzh2OWZZ?=
- =?utf-8?B?R2tISU14K1JLVnFQWmRtMlIxaGpVdFRZSDZqeU12aFdRRjZRT0lwaXdsWFJR?=
- =?utf-8?B?SElqUFFheW9QeWRaZTlHT3ZmY2ExaGZLUzZjQ002SlVqVndVVTZERnoxUU4w?=
- =?utf-8?B?Q0kwT0pEVjBwZWRlaEY0K2NzdWVwd1JpRk1CZ2tWTTRjdk1WNGZvYUplOVQy?=
- =?utf-8?B?ZXgrSGo0UEhaTzZISDgwblFGV1lwUUFUK2lWMkhod2lIZTZXVmMvYnRZN3ZF?=
- =?utf-8?B?aElQTXhPUTRQWWNnZlMxeDFKRnQ2UnRzaWZsSDJFRFZKUTdyZ08wdEhpQlpJ?=
- =?utf-8?B?bnhuL2pVVm0vVERZNjU1akJFc3RRSkhLYzkvby8vayt4K0VoV2FyRUw2aVRa?=
- =?utf-8?B?a0k1NU53WWtvd0RDNS85dDNmZjYvK2J4Lzk5d1pCbjRKZUsrWU5QNVV0R0xm?=
- =?utf-8?B?UmVUNmxMbkRRRnF4Sk92WnVMWnlFaG9WMkFLZWtld3pIbUZZdWljbkI5T2M3?=
- =?utf-8?B?YVNwTTJvMWlmSGRQM3dzVjZqMG04ZGZIWm82TkxZd2Rrb2pSZjFBblIvc1FO?=
- =?utf-8?B?aFE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9C9B15AF7DEBA64D810C360EB0EC7901@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F447405CD
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 12:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710936622; cv=none; b=LQ+vEyNyHVcALHtf4wE5DVI6u8qF5sEiv5s5vdRuYO12Pk6bGnHKRuRNJEg/UvvCLP6aFm5u7nkH+iE2EaCfH2sLoOW/3f7ic7rlTpX4f4Ny37TaZXFETrmi9LodJxWXA7qvvVbCHBDfmQrRo+uFVSWEkcBUmlJCgL+7gCR9zyk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710936622; c=relaxed/simple;
+	bh=wr13amLyLyWLiHhex9AKDFxNQkiobxd9XLbWQawyvPo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ez8LSTwlbrhWWs14sfu2nZG+MIyaAb/vQdzNPmD4slVIYDjmtOE0XeLdox6os/9zGTZ0maHbArIY38JSSoEUGIav2GuxoOQTxmuAoAEefuB7+5IwuqljHEIwHZSI3BkXZruKN5wA19G5KNGc2vHBM8SuRZbfyFRhghm19mjKpJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JjMnmFLl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710936616;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=8PeOoDi8onYWwvP/YHpzt0z4gl9LDIT4Cjf/SoY/Aro=;
+	b=JjMnmFLl4he9sDDWbhhokcam0YBuB2VQ5lZLp1h7riaFyeGHGmx/aAFWK3PKc8VXvxiEb6
+	a0MSgzzXrVI/+uXuMavhnG4P1pzpuBwDc/M9Sw1eIrOVLL4zhEIpqFFbkrPGms5k+0ruO2
+	Ed7j8hXd1nFnEH6xlL7+zFvWReytLwY=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-446--7SzT4i6MheJDfrddV_-vA-1; Wed,
+ 20 Mar 2024 08:10:12 -0400
+X-MC-Unique: -7SzT4i6MheJDfrddV_-vA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 89BFA380673F;
+	Wed, 20 Mar 2024 12:10:11 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.205])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 35C1D2166B35;
+	Wed, 20 Mar 2024 12:10:10 +0000 (UTC)
+Date: Wed, 20 Mar 2024 12:10:04 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Pankaj Gupta <pankaj.gupta@amd.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Subject: Re: [PATCH v3 31/49] i386/sev: Update query-sev QAPI format to
+ handle SEV-SNP
+Message-ID: <ZfrSHOWHb3qt3Ap8@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240320083945.991426-1-michael.roth@amd.com>
+ <20240320083945.991426-32-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc203797-00a6-4f6b-16e2-08dc48d6a304
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Mar 2024 12:09:47.4676
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZhMvF3kPZsNp/jEXxNBpAKOhoZHtojo39VYIa3tELZeeYC+r71mMAbEpa6uvb1qwbuwoJ7R8TNCWdwDCG2HdxA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7085
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240320083945.991426-32-michael.roth@amd.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-DQo+IA0KPiB0aGVuIGxvYWRzIGFuZCB6ZXJvcyBhIHRvbiBvZiBtZW1vcnkgKHRkeF9rdm1faHlw
-ZXJjYWxsKCkpOg0KPiANCj4gDQpbLi4uXQ0KDQo+IA0KPiBhbmQgdGhlbiB1bnBhY2tzIGFsbCBv
-ZiB0aGF0IG1lbW9yeSBiYWNrIGludG8gcmVnaXN0ZXJzLCBhbmQgcmV2ZXJzZXMgdGhhdCBsYXN0
-DQo+IHBhcnQgb24gdGhlIHdheSBiYWNrLCAoX190ZGNhbGxfc2F2ZWRfcmV0KCkpOg0KPiANCj4g
-DQpbLi4uXQ0KDQo+IA0KPiBJdCdzIGhvbmVzdGx5IHF1aXRlIGFtdXNpbmcsIGJlY2F1c2UgeSdh
-bGwgdG9vayBvbmUgd2hhdCBJIHNlZSBhcyBvbmUgb2YgdGhlIGJpZw0KPiBhZHZhbnRhZ2VzIG9m
-IFREWCBvdmVyIFNFViAodXNpbmcgcmVnaXN0ZXJzIGluc3RlYWQgb2Ygc2hhcmVkIG1lbW9yeSks
-IGFuZCBtYW5hZ2VkDQo+IHRvIGVmZmVjdGl2ZWx5IHR1cm4gaXQgaW50byBhIGRpc2FkdmFudGFn
-ZS4NCj4gDQo+IEFnYWluLCBJIGNvbXBsZXRlbHkgdW5kZXJzdGFuZCB0aGUgbWFpbnRlbmFuY2Ug
-YW5kIHJvYnVzdG5lc3MgYmVuZWZpdHMsIGJ1dCBJTU8NCj4gdGhlIHBlbmR1bHVtIHN3dW5nIGEg
-Yml0IHRvbyBmYXIgaW4gdGhhdCBkaXJlY3Rpb24uDQoNCkhhdmluZyB0byB6ZXJvLWFuZC1pbml0
-IHRoZSBzdHJ1Y3R1cmUgYW5kIHN0b3JlIG91dHB1dCByZWdzIHRvIHRoZSBzdHJ1Y3R1cmUgaXMN
-CmFuIHVuZm9ydHVuYXRlbHkgYnVyZGVuIGlmIHdlIHdhbnQgdG8gaGF2ZSBhIHNpbmdsZSBBUEkg
-X19zZWFtY2FsbCgpIGZvciBhbGwNClNFQU1DQUxMIGxlYWZzLg0KDQpUbyAocHJlY2lzZWx5KSBh
-dm9pZCB3cml0aW5nIHRvIHRoZSB1bm5lY2Vzc2FyeSBzdHJ1Y3R1cmUgbWVtYmVycyBiZWZvcmUg
-YW5kDQphZnRlciB0aGUgU0VBTUNBTEwgaW5zdHJ1Y3Rpb24sIHdlIG5lZWQgdG8gdXNlIHlvdXIg
-b2xkIHdheSB0byBoYXZlIGJ1bmNoIG9mDQptYWNyb3MuICBCdXQgd2UgbWF5IGVuZCB1cCB3aXRo
-ICphIGxvdCogbWFjcm9zIGR1ZSB0byBuZWVkaW5nIHRvIGNvdmVyIG5ldw0KKGUuZy4sIGxpdmUg
-bWlncmF0aW9uKSBTRUFNQ0FMTHMuDQoNCkJlY2F1c2UgZXNzZW50aWFsbHkgaXQncyBhIGdhbWUg
-dG8gaW1wbGVtZW50IHdyYXBwZXJzIGZvciBidW5jaCBvZiBjb21iaW5hdGlvbnMNCm9mIGVhY2gg
-aW5kaXZpZHVhbCBpbnB1dC9vdXRwdXQgcmVncy4NCg0KSSBkb24ndCB3YW50IHRvIGp1ZGdlIHdo
-aWNoIHdheSBpcyBiZXR0ZXIsIGJ1dCB0byBiZSBob25lc3QgSSB0aGluayBjb21wbGV0ZWx5DQpz
-d2l0Y2hpbmcgdG8gdGhlIG9sZCB3YXkgKHVzaW5nIGJ1bmNoIG9mIG1hY3JvcykgaXNuJ3QgYSBy
-ZWFsaXN0aWMgb3B0aW9uIGF0DQp0aGlzIHN0YWdlLg0KDQpIb3dldmVyLCBJIHRoaW5rIHdlIG1p
-Z2h0IGJlIGFibGUgdG8gY2hhbmdlIC4uLg0KDQogICAgdTY0IF9fc2VhbWNhbGwodTY0IGZuLCBz
-dHJ1Y3QgdGR4X21vZHVsZV9hcmdzICphcmdzKTsNCg0KLi4uIHRvDQoNCiAgICB1NjQgX19zZWFt
-Y2FsbCh1NjQgZm4sIHN0cnVjdCB0ZHhfbW9kdWxlX2FyZ3MgKmluLA0KCQkJc3RydWN0IHRkeF9t
-b2R1bGVfYXJncyAqb3V0KTsNCg0KLi4gc28gdGhhdCB0aGUgYXNzZW1ibHkgY2FuIGFjdHVhbGx5
-IHNraXAgInN0b3Jpbmcgb3V0cHV0IHJlZ3MgdG8gdGhlIHN0cnVjdHVyZSINCmlmIHRoZSBTRUFN
-Q0FMTCBkb2Vzbid0IHJlYWxseSBoYXZlIGFueSBvdXRwdXQgcmVncyBleGNlcHQgUkFYLg0KDQpJ
-IGNhbiB0cnkgdG8gZG8gaWYgeW91IGd1eXMgYmVsaWV2ZSB0aGlzIHNob3VsZCBiZSBkb25lLCBh
-bmQgc2hvdWxkIGJlIGRvbmUNCmVhcmxpZXIgdGhhbiBsYXRlciwgYnV0IEkgYW0gbm90IHN1cmUg
-X0FOWV8gb3B0aW1pemF0aW9uIGFyb3VuZCBTRUFNQ0FMTCB3aWxsDQpoYXZlIG1lYW5pbmdmdWwg
-cGVyZm9ybWFuY2UgaW1wcm92ZW1lbnQuDQo=
+On Wed, Mar 20, 2024 at 03:39:27AM -0500, Michael Roth wrote:
+> Most of the current 'query-sev' command is relevant to both legacy
+> SEV/SEV-ES guests and SEV-SNP guests, with 2 exceptions:
+> 
+>   - 'policy' is a 64-bit field for SEV-SNP, not 32-bit, and
+>     the meaning of the bit positions has changed
+>   - 'handle' is not relevant to SEV-SNP
+> 
+> To address this, this patch adds a new 'sev-type' field that can be
+> used as a discriminator to select between SEV and SEV-SNP-specific
+> fields/formats without breaking compatibility for existing management
+> tools (so long as management tools that add support for launching
+> SEV-SNP guest update their handling of query-sev appropriately).
+> 
+> The corresponding HMP command has also been fixed up similarly.
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  qapi/misc-target.json | 71 ++++++++++++++++++++++++++++++++++---------
+>  target/i386/sev.c     | 50 ++++++++++++++++++++----------
+>  target/i386/sev.h     |  3 ++
+>  3 files changed, 94 insertions(+), 30 deletions(-)
+> 
+> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+> index 4e0a6492a9..daceb85d95 100644
+> --- a/qapi/misc-target.json
+> +++ b/qapi/misc-target.json
+> @@ -47,6 +47,49 @@
+>             'send-update', 'receive-update' ],
+>    'if': 'TARGET_I386' }
+>  
+> +##
+> +# @SevGuestType:
+> +#
+> +# An enumeration indicating the type of SEV guest being run.
+> +#
+> +# @sev:     The guest is a legacy SEV or SEV-ES guest.
+> +# @sev-snp: The guest is an SEV-SNP guest.
+> +#
+> +# Since: 6.2
+
+Now 9.1 at the earliest.
+
+> +##
+> +{ 'enum': 'SevGuestType',
+> +  'data': [ 'sev', 'sev-snp' ],
+> +  'if': 'TARGET_I386' }
+> +
+> +##
+> +# @SevGuestInfo:
+> +#
+> +# Information specific to legacy SEV/SEV-ES guests.
+> +#
+> +# @policy: SEV policy value
+> +#
+> +# @handle: SEV firmware handle
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'SevGuestInfo',
+> +  'data': { 'policy': 'uint32',
+> +            'handle': 'uint32' },
+> +  'if': 'TARGET_I386' }
+> +
+> +##
+> +# @SevSnpGuestInfo:
+> +#
+> +# Information specific to SEV-SNP guests.
+> +#
+> +# @snp-policy: SEV-SNP policy value
+> +#
+> +# Since: 6.2
+> +##
+> +{ 'struct': 'SevSnpGuestInfo',
+> +  'data': { 'snp-policy': 'uint64' },
+> +  'if': 'TARGET_I386' }
+
+IMHO it can just be called 'policy' still, since
+it is implicitly within a 'Snp' specific type.
+
+
+> +
+>  ##
+>  # @SevInfo:
+>  #
+> @@ -60,25 +103,25 @@
+>  #
+>  # @build-id: SEV FW build id
+>  #
+> -# @policy: SEV policy value
+> -#
+>  # @state: SEV guest state
+>  #
+> -# @handle: SEV firmware handle
+> +# @sev-type: Type of SEV guest being run
+>  #
+>  # Since: 2.12
+>  ##
+> -{ 'struct': 'SevInfo',
+> -    'data': { 'enabled': 'bool',
+> -              'api-major': 'uint8',
+> -              'api-minor' : 'uint8',
+> -              'build-id' : 'uint8',
+> -              'policy' : 'uint32',
+> -              'state' : 'SevState',
+> -              'handle' : 'uint32'
+> -            },
+> -  'if': 'TARGET_I386'
+> -}
+> +{ 'union': 'SevInfo',
+> +  'base': { 'enabled': 'bool',
+> +            'api-major': 'uint8',
+> +            'api-minor' : 'uint8',
+> +            'build-id' : 'uint8',
+> +            'state' : 'SevState',
+> +            'sev-type' : 'SevGuestType' },
+> +  'discriminator': 'sev-type',
+> +  'data': {
+> +      'sev': 'SevGuestInfo',
+> +      'sev-snp': 'SevSnpGuestInfo' },
+> +  'if': 'TARGET_I386' }
+> +
+>  
+>  ##
+>  # @query-sev:
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 43e6c0172f..b03d70a3d1 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -353,25 +353,27 @@ static SevInfo *sev_get_info(void)
+>  {
+>      SevInfo *info;
+>      SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+> -    SevGuestState *sev_guest =
+> -        (SevGuestState *)object_dynamic_cast(OBJECT(sev_common),
+> -                                             TYPE_SEV_GUEST);
+>  
+>      info = g_new0(SevInfo, 1);
+>      info->enabled = sev_enabled();
+>  
+>      if (info->enabled) {
+> -        if (sev_guest) {
+> -            info->handle = sev_guest->handle;
+> -        }
+>          info->api_major = sev_common->api_major;
+>          info->api_minor = sev_common->api_minor;
+>          info->build_id = sev_common->build_id;
+>          info->state = sev_common->state;
+> -        /* we only report the lower 32-bits of policy for SNP, ok for now... */
+> -        info->policy =
+> -            (uint32_t)object_property_get_uint(OBJECT(sev_common),
+> -                                               "policy", NULL);
+> +
+> +        if (sev_snp_enabled()) {
+> +            info->sev_type = SEV_GUEST_TYPE_SEV_SNP;
+> +            info->u.sev_snp.snp_policy =
+> +                object_property_get_uint(OBJECT(sev_common), "policy", NULL);
+> +        } else {
+> +            info->sev_type = SEV_GUEST_TYPE_SEV;
+> +            info->u.sev.handle = SEV_GUEST(sev_common)->handle;
+> +            info->u.sev.policy =
+> +                (uint32_t)object_property_get_uint(OBJECT(sev_common),
+> +                                                   "policy", NULL);
+> +        }
+>      }
+
+Ok, this is fixing the issues I reported earlier.
+
+For 'policy' I do wonder if we really need to push it into the
+type specific part of the union, as oppposed to having a common
+'policy' field that is uint64 in size.
+
+As mentioned earlier, on the wire there's no distinction between
+int32/int64s, so there's no compat issues with changing it from
+int32 to int64.
+
+>  
+>      return info;
+> @@ -394,20 +396,36 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
+>  {
+>      SevInfo *info = sev_get_info();
+>  
+> -    if (info && info->enabled) {
+> -        monitor_printf(mon, "handle: %d\n", info->handle);
+> +    if (!info || !info->enabled) {
+> +        monitor_printf(mon, "SEV is not enabled\n");
+> +        goto out;
+> +    }
+> +
+> +    if (sev_snp_enabled()) {
+>          monitor_printf(mon, "state: %s\n", SevState_str(info->state));
+>          monitor_printf(mon, "build: %d\n", info->build_id);
+>          monitor_printf(mon, "api version: %d.%d\n",
+>                         info->api_major, info->api_minor);
+>          monitor_printf(mon, "debug: %s\n",
+> -                       info->policy & SEV_POLICY_NODBG ? "off" : "on");
+> -        monitor_printf(mon, "key-sharing: %s\n",
+> -                       info->policy & SEV_POLICY_NOKS ? "off" : "on");
+> +                       info->u.sev_snp.snp_policy & SEV_SNP_POLICY_DBG ? "on"
+> +                                                                       : "off");
+> +        monitor_printf(mon, "SMT allowed: %s\n",
+> +                       info->u.sev_snp.snp_policy & SEV_SNP_POLICY_SMT ? "on"
+> +                                                                       : "off");
+>      } else {
+> -        monitor_printf(mon, "SEV is not enabled\n");
+> +        monitor_printf(mon, "handle: %d\n", info->u.sev.handle);
+> +        monitor_printf(mon, "state: %s\n", SevState_str(info->state));
+> +        monitor_printf(mon, "build: %d\n", info->build_id);
+> +        monitor_printf(mon, "api version: %d.%d\n",
+> +                       info->api_major, info->api_minor);
+
+This set of three fields is identical in both branches, so the duplication
+in printing it should be eliminated.
+
+> +        monitor_printf(mon, "debug: %s\n",
+> +                       info->u.sev.policy & SEV_POLICY_NODBG ? "off" : "on");
+> +        monitor_printf(mon, "key-sharing: %s\n",
+> +                       info->u.sev.policy & SEV_POLICY_NOKS ? "off" : "on");
+>      }
+> +    monitor_printf(mon, "SEV type: %s\n", SevGuestType_str(info->sev_type));
+
+I'd say 'SEV type' should be printed  before everything else, since
+that value is the discriminator for interpreting the other data that
+is printed.
+
+>  
+> +out:
+>      qapi_free_SevInfo(info);
+>  }
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
