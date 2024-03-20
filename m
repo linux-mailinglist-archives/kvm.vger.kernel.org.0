@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-12277-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12278-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2884880EF8
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 10:46:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F1A0880F04
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 10:49:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A09F1F22393
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:46:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 901C61C220A3
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 09:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356703BB29;
-	Wed, 20 Mar 2024 09:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8CD3C48D;
+	Wed, 20 Mar 2024 09:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JMhPB4cB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TKVXZWlg"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E01171C2
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 09:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC3E3BBFB
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 09:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710927997; cv=none; b=G7ncHwCMYhh7T/BS0rWxX8MvpSxW1ZkdG0/vB9GhJ/rJSZsjw2zSnHX12ZJ364BB/12wYxpdSqpxoXZkK2y8JNN3P8Wcqd7Qb3NncOQnXREBKj+pYML1G11Zf26LeTfFpiYwKlJ7I/cahKEfWSFXwiyVc3h2RYWOu6FRArenjro=
+	t=1710928130; cv=none; b=iin6HVjt7cHnfN7Gnz666Cm+zEllMaAxzc7gDMWWXoVyrLtki8Ly1Unfn+2Y8jc84orPqgctoa4622wqnRWWmbg7O2gTisTnIqzNI+cW4CcpJOq1V95oji70/cWrkaueavrmMnP5Md5h76WDBBvvGpUTmZEhccyTOwXh4YagWvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710927997; c=relaxed/simple;
-	bh=JYS75+mEXjUw09pqAXR3mKOlMrZwWFjYkegIv795lfY=;
+	s=arc-20240116; t=1710928130; c=relaxed/simple;
+	bh=zPP2pS5iCc/716nm6tB3GifQvq3fkacNtRvxnBwcqhk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KtS3beErNSiFt6miPCTVqlZs8bGwsrrS9vSe3sap52ENXfjuEnrHFJRs3WwPZptqs7SXj+eLCHIy98u2CuM8LCl/DtqAFrjre96wVk6ZeBjY0fBPNc+KSPXRR+WModraKIEdxqoByarFrpxFzhb1mBNp1VdXfrBHUV7338fmbao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JMhPB4cB; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=SbMMLYLSOAjQONmTOs8VTye3/H3qk/2ItOxIdNg6k+QQxgdS+dFa2QBtBs9tyR7JIhtMhzNoOtwJKvy0q+QfgPQR6bCC1MJYQh6/vdHp1skiTdPL6LG4fnmoBoX2wEUm/6PQXRoFqa+ktU5hHpWQ0S2Pi4EuDLk8vqN/FUxusfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TKVXZWlg; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710927994;
+	s=mimecast20190719; t=1710928127;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+WZs6qFUYItA5gvCkkHLzU1au93L0AnahHvuXruBMKk=;
-	b=JMhPB4cBVqoI8lBYg/66fzV6bP1A9QbNE9R4NuhSs1cPUQPxoxmNKMkxSrchSIN7LR/Bco
-	dzA67BSQDZOomVdc7V9X1ZXOLCXMq2RIYy+dgX5Itc+6r2fQF0y7hCl44T0zgH8UIuXbI8
-	xyrUbNVOaC6R2cQjTFkwYz+HKk9NlUo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=BQPHNj5HNBSMyuoftz28f+ScBc7BnpscC2alH68qkWQ=;
+	b=TKVXZWlgi21Pr2/fkuL6JWEKnrkpbqPqyoYxABUYuXeVJ5R12miqkXOfOIz4/0NR+tDrm2
+	Qoius7jmJk1uHeqXe72fw8t363keGPctwvm7mTW+7045pKSSP9Z6360iorCzxeqgEDNiuu
+	IWloyGc01RbZAPflT2Kfr1o8zsddpMU=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-Tsb0pRuqMGKcpgSp6T1oXw-1; Wed, 20 Mar 2024 05:46:32 -0400
-X-MC-Unique: Tsb0pRuqMGKcpgSp6T1oXw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a46bae02169so71400366b.1
-        for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 02:46:31 -0700 (PDT)
+ us-mta-34-VWUnDUQUPJiaBVNJmX3UVA-1; Wed, 20 Mar 2024 05:48:45 -0400
+X-MC-Unique: VWUnDUQUPJiaBVNJmX3UVA-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-568d55c3b83so2299957a12.1
+        for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 02:48:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710927991; x=1711532791;
+        d=1e100.net; s=20230601; t=1710928124; x=1711532924;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+WZs6qFUYItA5gvCkkHLzU1au93L0AnahHvuXruBMKk=;
-        b=Eic9lrtjxDVjmJxXU8EY15fiqg5tlC7QwEEeNRmio8v7seY2NE0pZJHwd1n9PmS1+f
-         8HsYxYfK+mXdeU24XOjQwWgx+fKjsGOsUXsJ5LA5jFLjHD5m7GVMxsjQihpEhyKn4Kx0
-         8Yu3l7VZ4fl0mofO5eWgEenLW4/rFLbtCtN7t/xGqZKTWOwnIezsrbkY7uIJSblF/crn
-         uVfA7lbY298edDPLa7pqEoDuxarRvq7lXCP0NIxsBysSZH8if3TSDK3YZQwQdYdl2Tlo
-         G2nrBHY1MXSw8vr+hxcccbUkfon1nJzMghMnzS/c4Bi9BAO/ZjsmHujinAT8pCBqjkip
-         EtsA==
-X-Gm-Message-State: AOJu0YyU1A/gsBjIq2z9n4UuQMRynvnaRGM9GPd2eFvxYUYzLxK1zSKW
-	gcXg/e3/TByG0ch1+8Bv35j1RmegKsv5LDqWXANGbSpLbym22w3f8CF5Yc80Pt2KWU2O+fRR6NA
-	8e2gabap5cCmZ5KVyjF6Z3CC/60ZM94Dvk3blWqWnMzjWCE3CYw==
-X-Received: by 2002:a17:906:af8a:b0:a45:bde1:a334 with SMTP id mj10-20020a170906af8a00b00a45bde1a334mr1652428ejb.27.1710927990924;
-        Wed, 20 Mar 2024 02:46:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHYWyHr39ieL8VW6sq78MqBLPco9oQ7sYS8RNzT+os3VOZljrCtsjVKViXIi+OETXikeC19vw==
-X-Received: by 2002:a17:906:af8a:b0:a45:bde1:a334 with SMTP id mj10-20020a170906af8a00b00a45bde1a334mr1652414ejb.27.1710927990617;
-        Wed, 20 Mar 2024 02:46:30 -0700 (PDT)
+        bh=BQPHNj5HNBSMyuoftz28f+ScBc7BnpscC2alH68qkWQ=;
+        b=OLfrLah5o6vHqhb5hnGOfIHejjKT+EpGAStniOcQUID0IqA9n7KBtAwPAJspOfqTcI
+         1flNlgsqjkfUcLJ0ReRG/5maRrl33vC1E+x5QHsIusbJwwy5YZjhbCq4WUystkmxYI3r
+         phuFaNr3kliqhH+vqi5ou131xSI2eBxdc9je4tXDbwNa9K3pY3Rlk1eBGFopwBg+kik5
+         c75wdzm3ephjZJYY03tMsT2jvCkcyRRlTThBIqiJHss887CPMuMS/EgY9KVggOM9UgeE
+         rqsp8gPhW/JPjv0hjoR6tyCCr94u4tbaO/aK1Kc9DRUDdQwgnWc/0DDV40tWbP906IJP
+         pEoA==
+X-Gm-Message-State: AOJu0Yx/dt++tfXLdGhb/d4BIHM23B1lHhT6s1taBLyUMN/vdI7S3jtJ
+	S8aG+SsoADJQt40SzpOFHDkmlN2YiHSS2BJZ3yxCiYptWnMmyrSOtMoLAxLLV0tHmubwJ2mRNkv
+	nRAoOJQDQ4N7LY/YF87cB+ydUBJm5y17aGGIfODE+yA9upvCupg==
+X-Received: by 2002:aa7:dac3:0:b0:56b:b5a2:f8bb with SMTP id x3-20020aa7dac3000000b0056bb5a2f8bbmr407504eds.3.1710928124593;
+        Wed, 20 Mar 2024 02:48:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERx4OIqJeH1xeNZL2HDSL0K9OjfpG6J7/cAG0JM1w8983tChGajXSMWG/nuORYnUhGGTQtGQ==
+X-Received: by 2002:aa7:dac3:0:b0:56b:b5a2:f8bb with SMTP id x3-20020aa7dac3000000b0056bb5a2f8bbmr407492eds.3.1710928124289;
+        Wed, 20 Mar 2024 02:48:44 -0700 (PDT)
 Received: from [192.168.10.118] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id j1-20020a1709062a0100b00a46af0fbf5dsm4271330eje.103.2024.03.20.02.46.29
+        by smtp.googlemail.com with ESMTPSA id a89-20020a509ee2000000b00568c299eaedsm4763686edf.81.2024.03.20.02.48.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Mar 2024 02:46:30 -0700 (PDT)
-Message-ID: <7727f1f2-2a30-45d2-85a9-db22ec5a9be5@redhat.com>
-Date: Wed, 20 Mar 2024 10:46:29 +0100
+        Wed, 20 Mar 2024 02:48:43 -0700 (PDT)
+Message-ID: <45d636a5-c3b2-4125-9837-097b07bbc963@redhat.com>
+Date: Wed, 20 Mar 2024 10:48:43 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,7 +81,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 25/49] i386/sev: Skip RAMBlock notifiers for SNP
+Subject: Re: [PATCH v3 27/49] i386/sev: Set ms->require_guest_memfd for SNP
 Content-Language: en-US
 To: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
@@ -90,7 +90,7 @@ Cc: kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
  Xiaoyao Li <xiaoyao.li@intel.com>,
  Isaku Yamahata <isaku.yamahata@linux.intel.com>
 References: <20240320083945.991426-1-michael.roth@amd.com>
- <20240320083945.991426-26-michael.roth@amd.com>
+ <20240320083945.991426-28-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -127,52 +127,47 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240320083945.991426-26-michael.roth@amd.com>
+In-Reply-To: <20240320083945.991426-28-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/20/24 09:39, Michael Roth wrote:
-> SEV uses these notifiers to register/pin pages prior to guest use, since
-> they could potentially be used for private memory where page migration
-> is not supported. But SNP only uses guest_memfd-provided pages for
-> private memory, which has its own kernel-internal mechanisms for
-> registering/pinning memory.
+> SNP requires guest_memfd for private guest memory, so enable it so that
+> the appropriate guest_memfd backend will be available for normal RAM
+> regions.
 > 
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->   target/i386/sev.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
+>   target/i386/sev.c | 5 +++++
+>   1 file changed, 5 insertions(+)
 > 
 > diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 61af312a11..774262d834 100644
+> index e4deb7b41e..b06c796aae 100644
 > --- a/target/i386/sev.c
 > +++ b/target/i386/sev.c
-> @@ -982,7 +982,15 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->           goto err;
+> @@ -880,6 +880,7 @@ out:
+>   static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+>   {
+>       SevCommonState *sev_common = SEV_COMMON(cgs);
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>       char *devname;
+>       int ret, fw_error, cmd;
+>       uint32_t ebx;
+> @@ -1000,6 +1001,10 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+>           qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
 >       }
 >   
-> -    ram_block_notifier_add(&sev_ram_notifier);
-> +    if (!sev_snp_enabled()) {
-> +        /*
-> +         * SEV uses these notifiers to register/pin pages prior to guest use,
-> +         * but SNP relies on guest_memfd for private pages, which has it's
-> +         * own internal mechanisms for registering/pinning private memory.
-> +         */
-> +        ram_block_notifier_add(&sev_ram_notifier);
+> +    if (sev_snp_enabled()) {
+> +        ms->require_guest_memfd = true;
 > +    }
-> +
->       qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
->       qemu_add_vm_change_state_handler(sev_vm_state_change, sev_common);
->   
 
-These three lines can be done in any order, so I suggest removing 
-ram_block_notifier_add + qemu_add_machine_init_done_notifier from the 
-sev-common implementation of kvm_init (let's call it 
-sev_common_kvm_init); and add an override in sev-guest that calls them 
-if sev_common_kvm_init() succeeds.
-
-(treat this as a review for 25/26/29).
+Likewise, this and the following patch should be done in the 
+sev-snp-guest's override of kvm_init.
 
 Paolo
+
+>       qemu_add_vm_change_state_handler(sev_vm_state_change, sev_common);
+>   
+>       cgs->ready = true;
 
 
