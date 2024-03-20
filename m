@@ -1,168 +1,582 @@
-Return-Path: <kvm+bounces-12285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 986E7881116
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 12:35:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3934D881127
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 12:44:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FBE3282E22
-	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 11:35:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E210E2818F6
+	for <lists+kvm@lfdr.de>; Wed, 20 Mar 2024 11:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3363EA98;
-	Wed, 20 Mar 2024 11:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBAE3EA76;
+	Wed, 20 Mar 2024 11:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LOk2N/pR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UoPeDmaF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657E73DB89
-	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 11:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053D03D0C4
+	for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 11:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710934540; cv=none; b=tdYq5bHGT9ubHVwSGykOIxvkvhJgB2xohn6zauwuYSsxc8hQlpjQjvTBCdTaSy3EA62Oo49/Z5uMBb36P5cbv+y/Nm/MAlrdMfvVaT2q5MhFaGlSGgdNyqGWR1ZjhLkyXj/xZm3STnUYDtgc9/uxiLL9OiEjCCLeE63UFx5u+7Q=
+	t=1710935084; cv=none; b=I2b7MwraSxr184gklpBHjJkMI6ptFPSJRpU6P9lbZR5uDr0Wr9WAG3habCwAJsaQe6awf5z1nZi1E4Cf2+bU3OisiIwyVD0TAW8Dg0CwGP4tpN95ex7aCPcIUZqyeYUk/hw/5ypuGlRVLE/BcOYtXzSh9p/Q2IA09duAorzKFAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710934540; c=relaxed/simple;
-	bh=SLiFCfY4b3lVXzFCGGs9sIbiGRlF4bB6wOUpWVI6vOQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a+z/9wKt5GjZH6Dq7yOzhbQBlJiZjUYOuOQ28Q3+Z2RU4B/E+gGKqtNP5AfnPLLXi4VRi99Y4TBYiauJq33Wq5BcVIIygwx6irvp1/baappfC7wAnZpPTSf9+qltVTdvr7zlSYkYIQLX+z+EQI+GTEQBO0hxZRK9eiJHjJipPic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LOk2N/pR; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1710935084; c=relaxed/simple;
+	bh=7yPr+/fzHv8HEdeqQ0yykS7LxjZKEKKhrljmyL9/2l4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uCmsMGnyL7BEFl/Eb+mNAadEkpr7I/SEN7iiAm81y/+1rwaZ1nyZiqxGeAU5Aq3fhvDCq6QKd4cbi0PTgjlGeG8MlaEgZsQkmGsh0owO16TdRXjKW1zk2FPaikpjCOwHPmopiK+u2qd3dB9+DGUthA9vszRYR66Jia2SuRh/k2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UoPeDmaF; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710934537;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WxTD2hB5MDacVjwhAlli2Ecjh1dJfTB2r6xn0IlYg78=;
-	b=LOk2N/pRG60IaQgbVf+aChN6C4QvaU3b2ruIHUUZow9XoDG2+3BKFcdrWGA56Rj9PXMggt
-	ZkSfbA3w29iIbsAhWkNHnKmLIFioUVvIrNetg9SXFK5ju1m9WjJFhedwZ4iYsvWfj2Yy3L
-	6yuu8L5c/z4am45qy5A+B78sLRMr4+0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	s=mimecast20190719; t=1710935080;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=caJB97+iohvjmPt5J8Pk8XyfnDlkj9PniJFqzu0+JW4=;
+	b=UoPeDmaFJpD09QLdlZ7AMPrUvy0ZVVxLX2ybi8F9XU+prAoZGQX5vv5HXPqSkD2EMe8LQ1
+	CQiswf8VaowPeV11kxNm1Eijy3Lriyt9ZliH3/bagVd7CvM0FSTGWbMi8npWibjtDZ4JU5
+	nLU7F1+xdJs57D2B/jOvPoH7rRGB//o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-458-nNLrbdXfOvehfwmih9M9lA-1; Wed, 20 Mar 2024 07:35:35 -0400
-X-MC-Unique: nNLrbdXfOvehfwmih9M9lA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4140f58ac00so18776795e9.3
-        for <kvm@vger.kernel.org>; Wed, 20 Mar 2024 04:35:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710934534; x=1711539334;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WxTD2hB5MDacVjwhAlli2Ecjh1dJfTB2r6xn0IlYg78=;
-        b=i08beH2mW3a5RkXNEgTlyB2zSTeRhpAeixd4Zsv6zlxUa4woujWs1fhPuMqy6nFRz2
-         EiQHEni5+pYxhTFjjUL7a62VCjxwBX1Y2pKBVI/mb0ibpYnDAW5R6RG4vNVH4l2261ew
-         dryJYcgHEOprH0f8RdIVNPufztziFqDx92pb3qLhuW+dTqC5u/G7DMqen1TkzqPAMp6F
-         4jIMb+NbfcZLheeSi/EcawVsEZZkYBIavQJwa5FXyak5CWECYY17CVJ2QOWGUEgMU3LK
-         enzpA7FuSUVYzf+xEGDTmjpDDJ0Ae/Rr5kAxxEPkg63xiXjH+svo7rKyItZ5Q9kF5x1Z
-         v3tw==
-X-Forwarded-Encrypted: i=1; AJvYcCXrxGFVKIP+gIwNJYPU6+Kriesx3QOpgMchBMoQOjYgykCbDbhl6NpsHnFNeva0D5kj5WK2t5YswuyUWsll86HjqgDH
-X-Gm-Message-State: AOJu0Ywcj23eCP1PWt+GnpdIMjdUu4E8YG4jQOsWcvZvnNQL0fDhIPyc
-	+bPXSiGyngGVlsCBN5UBSpzwOv3e12BhzCcdV100YQzxVQv//DtRYYbrUS5UN9d4fBrAT0PVam0
-	ymQNWO4yQsgwCXZmYrNgx/wJz0IpuXkSx15IF2wzid/a/KR+hKw==
-X-Received: by 2002:a05:600c:16d3:b0:414:a75:7457 with SMTP id l19-20020a05600c16d300b004140a757457mr4053435wmn.10.1710934534418;
-        Wed, 20 Mar 2024 04:35:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFjoZC9y4pciiC3OvTk2Rvtxv60Pt4OK8yPKuhguUJbDVj7YETGt4ivST4/40otF+ZlcB3qwQ==
-X-Received: by 2002:a05:600c:16d3:b0:414:a75:7457 with SMTP id l19-20020a05600c16d300b004140a757457mr4053418wmn.10.1710934534036;
-        Wed, 20 Mar 2024 04:35:34 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c709:c400:9a2:3872:9372:fbc? (p200300cbc709c40009a2387293720fbc.dip0.t-ipconnect.de. [2003:cb:c709:c400:9a2:3872:9372:fbc])
-        by smtp.gmail.com with ESMTPSA id q14-20020a05600c46ce00b004140a757256sm1962413wmo.31.2024.03.20.04.35.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Mar 2024 04:35:33 -0700 (PDT)
-Message-ID: <a25db70e-2e17-48cd-bfb3-58cddc99af7b@redhat.com>
-Date: Wed, 20 Mar 2024 12:35:32 +0100
+ us-mta-629-pd-k7ZWIMm6_f9L5o9HK4g-1; Wed, 20 Mar 2024 07:44:37 -0400
+X-MC-Unique: pd-k7ZWIMm6_f9L5o9HK4g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C245C803F61;
+	Wed, 20 Mar 2024 11:44:36 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.205])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1292540C6DB7;
+	Wed, 20 Mar 2024 11:44:34 +0000 (UTC)
+Date: Wed, 20 Mar 2024 11:44:13 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Pankaj Gupta <pankaj.gupta@amd.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Subject: Re: [PATCH v3 21/49] i386/sev: Introduce "sev-common" type to
+ encapsulate common SEV state
+Message-ID: <ZfrMDYk-gSQF04gQ@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240320083945.991426-1-michael.roth@amd.com>
+ <20240320083945.991426-22-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: s390: vsie: Use virt_to_phys for facility
- control block
-Content-Language: en-US
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
- kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20240319164420.4053380-1-nsg@linux.ibm.com>
- <20240319164420.4053380-3-nsg@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240319164420.4053380-3-nsg@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240320083945.991426-22-michael.roth@amd.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On 19.03.24 17:44, Nina Schoetterl-Glausch wrote:
-> In order for SIE to interpretively execute STFLE, it requires the real
-> or absolute address of a facility-list control block.
-> Before writing the location into the shadow SIE control block, convert
-> it from a virtual address.
-> We currently do not run into this bug because the lower 31 bits are the
-> same for virtual and physical addresses.
+On Wed, Mar 20, 2024 at 03:39:17AM -0500, Michael Roth wrote:
+> Currently all SEV/SEV-ES functionality is managed through a single
+> 'sev-guest' QOM type. With upcoming support for SEV-SNP, taking this
+> same approach won't work well since some of the properties/state
+> managed by 'sev-guest' is not applicable to SEV-SNP, which will instead
+> rely on a new QOM type with its own set of properties/state.
+> 
+> To prepare for this, this patch moves common state into an abstract
+> 'sev-common' parent type to encapsulate properties/state that are
+> common to both SEV/SEV-ES and SEV-SNP, leaving only SEV/SEV-ES-specific
+> properties/state in the current 'sev-guest' type. This should not
+> affect current behavior or command-line options.
+> 
+> As part of this patch, some related changes are also made:
+> 
+>   - a static 'sev_guest' variable is currently used to keep track of
+>     the 'sev-guest' instance. SEV-SNP would similarly introduce an
+>     'sev_snp_guest' static variable. But these instances are now
+>     available via qdev_get_machine()->cgs, so switch to using that
+>     instead and drop the static variable.
+> 
+>   - 'sev_guest' is currently used as the name for the static variable
+>     holding a pointer to the 'sev-guest' instance. Re-purpose the name
+>     as a local variable referring the 'sev-guest' instance, and use
+>     that consistently throughout the code so it can be easily
+>     distinguished from sev-common/sev-snp-guest instances.
+> 
+>   - 'sev' is generally used as the name for local variables holding a
+>     pointer to the 'sev-guest' instance. In cases where that now points
+>     to common state, use the name 'sev_common'; in cases where that now
+>     points to state specific to 'sev-guest' instance, use the name
+>     'sev_guest'
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  qapi/qom.json     |  32 ++--
+>  target/i386/sev.c | 457 ++++++++++++++++++++++++++--------------------
+>  target/i386/sev.h |   3 +
+>  3 files changed, 281 insertions(+), 211 deletions(-)
+> 
+> diff --git a/qapi/qom.json b/qapi/qom.json
+> index baae3a183f..66b5781ca6 100644
+> --- a/qapi/qom.json
+> +++ b/qapi/qom.json
+> @@ -875,12 +875,29 @@
+>    'data': { '*filename': 'str' } }
+>  
+>  ##
+> -# @SevGuestProperties:
+> +# @SevCommonProperties:
+>  #
+> -# Properties for sev-guest objects.
+> +# Properties common to objects that are derivatives of sev-common.
+>  #
+>  # @sev-device: SEV device to use (default: "/dev/sev")
+>  #
+> +# @cbitpos: C-bit location in page table entry (default: 0)
+> +#
+> +# @reduced-phys-bits: number of bits in physical addresses that become
+> +#     unavailable when SEV is enabled
+> +#
+> +# Since: 2.12
 
-So it's not a bug (yet) :)
+Not quite sure what we've done in this scenario before.
+It feels wierd to use '2.12' for the new base type, even
+though in effect the properties all existed since 2.12 in
+the sub-class.
 
-But certainly the right thing to do and more future-proof.
+Perhaps 'Since: 9.1' for the type, but 'Since: 2.12' for the
+properties, along with an explanatory comment about stuff
+moving into the new base type ?
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Markus, opinions ?
 
+> +##
+> +{ 'struct': 'SevCommonProperties',
+> +  'data': { '*sev-device': 'str',
+> +            '*cbitpos': 'uint32',
+> +            'reduced-phys-bits': 'uint32' } }
+> +
+> +##
+> +# @SevGuestProperties:
+> +#
+> +# Properties for sev-guest objects.
+> +#
+>  # @dh-cert-file: guest owners DH certificate (encoded with base64)
+>  #
+>  # @session-file: guest owners session parameters (encoded with base64)
+> @@ -889,11 +906,6 @@
+>  #
+>  # @handle: SEV firmware handle (default: 0)
+>  #
+> -# @cbitpos: C-bit location in page table entry (default: 0)
+> -#
+> -# @reduced-phys-bits: number of bits in physical addresses that become
+> -#     unavailable when SEV is enabled
+> -#
+>  # @kernel-hashes: if true, add hashes of kernel/initrd/cmdline to a
+>  #     designated guest firmware page for measured boot with -kernel
+>  #     (default: false) (since 6.2)
+> @@ -901,13 +913,11 @@
+>  # Since: 2.12
+>  ##
+>  { 'struct': 'SevGuestProperties',
+> -  'data': { '*sev-device': 'str',
+> -            '*dh-cert-file': 'str',
+> +  'base': 'SevCommonProperties',
+> +  'data': { '*dh-cert-file': 'str',
+>              '*session-file': 'str',
+>              '*policy': 'uint32',
+>              '*handle': 'uint32',
+> -            '*cbitpos': 'uint32',
+> -            'reduced-phys-bits': 'uint32',
+>              '*kernel-hashes': 'bool' } }
+>  
+>  ##
+
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 9dab4060b8..63a220de5e 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -40,48 +40,53 @@
+>  #include "hw/i386/pc.h"
+>  #include "exec/address-spaces.h"
+>  
+> -#define TYPE_SEV_GUEST "sev-guest"
+> +OBJECT_DECLARE_SIMPLE_TYPE(SevCommonState, SEV_COMMON)
+>  OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+>  
+> -
+> -/**
+> - * SevGuestState:
+> - *
+> - * The SevGuestState object is used for creating and managing a SEV
+> - * guest.
+> - *
+> - * # $QEMU \
+> - *         -object sev-guest,id=sev0 \
+> - *         -machine ...,memory-encryption=sev0
+> - */
+> -struct SevGuestState {
+> +struct SevCommonState {
+>      X86ConfidentialGuest parent_obj;
+>  
+>      int kvm_type;
+>  
+>      /* configuration parameters */
+>      char *sev_device;
+> -    uint32_t policy;
+> -    char *dh_cert_file;
+> -    char *session_file;
+>      uint32_t cbitpos;
+>      uint32_t reduced_phys_bits;
+> -    bool kernel_hashes;
+>  
+>      /* runtime state */
+> -    uint32_t handle;
+>      uint8_t api_major;
+>      uint8_t api_minor;
+>      uint8_t build_id;
+>      int sev_fd;
+>      SevState state;
+> -    gchar *measurement;
+>  
+>      uint32_t reset_cs;
+>      uint32_t reset_ip;
+>      bool reset_data_valid;
+>  };
+>  
+> +/**
+> + * SevGuestState:
+> + *
+> + * The SevGuestState object is used for creating and managing a SEV
+> + * guest.
+> + *
+> + * # $QEMU \
+> + *         -object sev-guest,id=sev0 \
+> + *         -machine ...,memory-encryption=sev0
+> + */
+> +struct SevGuestState {
+> +    SevCommonState sev_common;
+> +    gchar *measurement;
+> +
+> +    /* configuration parameters */
+> +    uint32_t handle;
+> +    uint32_t policy;
+> +    char *dh_cert_file;
+> +    char *session_file;
+> +    bool kernel_hashes;
+> +};
+> +
+>  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+>  #define DEFAULT_SEV_DEVICE      "/dev/sev"
+>  
+> @@ -127,7 +132,6 @@ typedef struct QEMU_PACKED PaddedSevHashTable {
+>  
+>  QEMU_BUILD_BUG_ON(sizeof(PaddedSevHashTable) % 16 != 0);
+>  
+> -static SevGuestState *sev_guest;
+>  static Error *sev_mig_blocker;
+>  
+>  static const char *const sev_fw_errlist[] = {
+> @@ -208,21 +212,21 @@ fw_error_to_str(int code)
+>  }
+>  
+>  static bool
+> -sev_check_state(const SevGuestState *sev, SevState state)
+> +sev_check_state(const SevCommonState *sev_common, SevState state)
+>  {
+> -    assert(sev);
+> -    return sev->state == state ? true : false;
+> +    assert(sev_common);
+> +    return sev_common->state == state ? true : false;
+>  }
+>  
+>  static void
+> -sev_set_guest_state(SevGuestState *sev, SevState new_state)
+> +sev_set_guest_state(SevCommonState *sev_common, SevState new_state)
+>  {
+>      assert(new_state < SEV_STATE__MAX);
+> -    assert(sev);
+> +    assert(sev_common);
+>  
+> -    trace_kvm_sev_change_state(SevState_str(sev->state),
+> +    trace_kvm_sev_change_state(SevState_str(sev_common->state),
+>                                 SevState_str(new_state));
+> -    sev->state = new_state;
+> +    sev_common->state = new_state;
+>  }
+>  
+>  static void
+> @@ -289,111 +293,61 @@ static struct RAMBlockNotifier sev_ram_notifier = {
+>      .ram_block_removed = sev_ram_block_removed,
+>  };
+>  
+> -static void
+> -sev_guest_finalize(Object *obj)
+> -{
+> -}
+> -
+> -static char *
+> -sev_guest_get_session_file(Object *obj, Error **errp)
+> -{
+> -    SevGuestState *s = SEV_GUEST(obj);
+> -
+> -    return s->session_file ? g_strdup(s->session_file) : NULL;
+> -}
+> -
+> -static void
+> -sev_guest_set_session_file(Object *obj, const char *value, Error **errp)
+> -{
+> -    SevGuestState *s = SEV_GUEST(obj);
+> -
+> -    s->session_file = g_strdup(value);
+> -}
+> -
+> -static char *
+> -sev_guest_get_dh_cert_file(Object *obj, Error **errp)
+> -{
+> -    SevGuestState *s = SEV_GUEST(obj);
+> -
+> -    return g_strdup(s->dh_cert_file);
+> -}
+> -
+> -static void
+> -sev_guest_set_dh_cert_file(Object *obj, const char *value, Error **errp)
+> -{
+> -    SevGuestState *s = SEV_GUEST(obj);
+> -
+> -    s->dh_cert_file = g_strdup(value);
+> -}
+> -
+> -static char *
+> -sev_guest_get_sev_device(Object *obj, Error **errp)
+> -{
+> -    SevGuestState *sev = SEV_GUEST(obj);
+> -
+> -    return g_strdup(sev->sev_device);
+> -}
+> -
+> -static void
+> -sev_guest_set_sev_device(Object *obj, const char *value, Error **errp)
+> -{
+> -    SevGuestState *sev = SEV_GUEST(obj);
+> -
+> -    sev->sev_device = g_strdup(value);
+> -}
+> -
+> -static bool sev_guest_get_kernel_hashes(Object *obj, Error **errp)
+> -{
+> -    SevGuestState *sev = SEV_GUEST(obj);
+> -
+> -    return sev->kernel_hashes;
+> -}
+> -
+> -static void sev_guest_set_kernel_hashes(Object *obj, bool value, Error **errp)
+> -{
+> -    SevGuestState *sev = SEV_GUEST(obj);
+> -
+> -    sev->kernel_hashes = value;
+> -}
+> -
+>  bool
+>  sev_enabled(void)
+>  {
+> -    return !!sev_guest;
+> +    ConfidentialGuestSupport *cgs = MACHINE(qdev_get_machine())->cgs;
+> +
+> +    return !!object_dynamic_cast(OBJECT(cgs), TYPE_SEV_COMMON);
+>  }
+>  
+>  bool
+>  sev_es_enabled(void)
+>  {
+> -    return sev_enabled() && (sev_guest->policy & SEV_POLICY_ES);
+> +    ConfidentialGuestSupport *cgs = MACHINE(qdev_get_machine())->cgs;
+> +
+> +    return sev_enabled() && (SEV_GUEST(cgs)->policy & SEV_POLICY_ES);
+>  }
+>  
+>  uint32_t
+>  sev_get_cbit_position(void)
+>  {
+> -    return sev_guest ? sev_guest->cbitpos : 0;
+> +    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+> +
+> +    return sev_common ? sev_common->cbitpos : 0;
+>  }
+>  
+>  uint32_t
+>  sev_get_reduced_phys_bits(void)
+>  {
+> -    return sev_guest ? sev_guest->reduced_phys_bits : 0;
+> +    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+> +
+> +    return sev_common ? sev_common->reduced_phys_bits : 0;
+>  }
+>  
+>  static SevInfo *sev_get_info(void)
+>  {
+>      SevInfo *info;
+> +    SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+> +    SevGuestState *sev_guest =
+> +        (SevGuestState *)object_dynamic_cast(OBJECT(sev_common),
+> +                                             TYPE_SEV_GUEST);
+>  
+>      info = g_new0(SevInfo, 1);
+>      info->enabled = sev_enabled();
+>  
+>      if (info->enabled) {
+> -        info->api_major = sev_guest->api_major;
+> -        info->api_minor = sev_guest->api_minor;
+> -        info->build_id = sev_guest->build_id;
+> -        info->policy = sev_guest->policy;
+> -        info->state = sev_guest->state;
+> -        info->handle = sev_guest->handle;
+> +        if (sev_guest) {
+> +            info->handle = sev_guest->handle;
+> +        }
+> +        info->api_major = sev_common->api_major;
+> +        info->api_minor = sev_common->api_minor;
+> +        info->build_id = sev_common->build_id;
+> +        info->state = sev_common->state;
+> +        /* we only report the lower 32-bits of policy for SNP, ok for now... */
+> +        info->policy =
+> +            (uint32_t)object_property_get_uint(OBJECT(sev_common),
+> +                                               "policy", NULL);
+>      }
+
+I think we can change this 'policy' field to 'int64'.
+
+Going from int32 to int64 doesn't change the encoding in JSON
+or cli properites. SEV/SEV-ES guests will still only use values
+that fit within int32, so existing users of QEMU won't notice
+a change.
+
+Apps that want to use SEV-SNP will know that they can have
+policy values exceeding int32, but since that's net new code
+to suupport SEV-SNP there's no back compat issue.
+
+
+> @@ -519,6 +473,8 @@ static SevCapability *sev_get_capabilities(Error **errp)
+>      size_t pdh_len = 0, cert_chain_len = 0, cpu0_id_len = 0;
+>      uint32_t ebx;
+>      int fd;
+> +    SevCommonState *sev_common;
+> +    char *sev_device;
+
+Declare 'g_autofree char *sev_device = NULL;'
+
+>  
+>      if (!kvm_enabled()) {
+>          error_setg(errp, "KVM not enabled");
+> @@ -529,12 +485,21 @@ static SevCapability *sev_get_capabilities(Error **errp)
+>          return NULL;
+>      }
+>  
+> -    fd = open(DEFAULT_SEV_DEVICE, O_RDWR);
+> +    sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+> +    if (!sev_common) {
+> +        error_setg(errp, "SEV is not configured");
+> +    }
+
+Missing 'return' ?
+
+> +
+> +    sev_device = object_property_get_str(OBJECT(sev_common), "sev-device",
+> +                                         &error_abort);
+> +    fd = open(sev_device, O_RDWR);
+>      if (fd < 0) {
+>          error_setg_errno(errp, errno, "SEV: Failed to open %s",
+>                           DEFAULT_SEV_DEVICE);
+> +        g_free(sev_device);
+>          return NULL;
+>      }
+> +    g_free(sev_device);
+
+These 'g_free' are redundant with g_autofree usage on the declaration.
+
+>  
+>      if (sev_get_pdh_info(fd, &pdh_data, &pdh_len,
+>                           &cert_chain_data, &cert_chain_len, errp)) {
+> @@ -577,7 +542,7 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
+>  {
+>      struct kvm_sev_attestation_report input = {};
+>      SevAttestationReport *report = NULL;
+> -    SevGuestState *sev = sev_guest;
+> +    SevCommonState *sev_common;
+
+I think it would have been nicer to just keep the variable
+just called 'sev', except in the few cases where you needed to
+have variables for both parent & subclass in the same method.
+This diff would be much smaller too.
+
+That's a bit bikeshedding though, so not too bothered either
+way.
+
+>      g_autofree guchar *data = NULL;
+>      g_autofree guchar *buf = NULL;
+>      gsize len;
+> @@ -602,8 +567,10 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
+>          return NULL;
+>      }
+>  
+> +    sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+> +
+>      /* Query the report length */
+> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
+> +    ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
+>              &input, &err);
+>      if (ret < 0) {
+>          if (err != SEV_RET_INVALID_LEN) {
+> @@ -619,7 +586,7 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
+>      memcpy(input.mnonce, buf, sizeof(input.mnonce));
+>  
+>      /* Query the report */
+> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
+> +    ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
+>              &input, &err);
+>      if (ret) {
+>          error_setg_errno(errp, errno, "SEV: Failed to get attestation report"
+
+> +
+> +/* sev guest info common to sev/sev-es/sev-snp */
+> +static const TypeInfo sev_common_info = {
+> +    .parent = TYPE_X86_CONFIDENTIAL_GUEST,
+> +    .name = TYPE_SEV_COMMON,
+> +    .instance_size = sizeof(SevCommonState),
+> +    .class_init = sev_common_class_init,
+> +    .instance_init = sev_common_instance_init,
+> +    .abstract = true,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_USER_CREATABLE },
+> +        { }
+> +    }
+> +};
+
+It feels wierd to declare a type as "abstract", and at
+the same time declare it "user creatable". I know this
+was a simple short-cut to avoid repeating the .interfaces
+on every sub-class, but I still think it would be better
+to put the "user creatable" marker on the concrete impls
+instead.
+
+Also how about using OBJECT_DEFINE_ABSTRACT_TYPE here
+and also converting the subclasses to use
+OBJECT_DEFINE_TYPE_WITH_INTERFACES ?
+
+
+
+With regards,
+Daniel
 -- 
-Cheers,
-
-David / dhildenb
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
