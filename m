@@ -1,333 +1,141 @@
-Return-Path: <kvm+bounces-12425-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3FB885E68
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 17:48:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12121885FC4
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 18:31:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D50112825B2
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 16:48:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B402F283907
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 17:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2386813F45C;
-	Thu, 21 Mar 2024 16:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD57E8592F;
+	Thu, 21 Mar 2024 17:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FDdqjMCl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WBeCzKEC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B74A13B7A6;
-	Thu, 21 Mar 2024 16:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C3BC2E9;
+	Thu, 21 Mar 2024 17:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711039087; cv=none; b=Q8L6TxvArGj/b9V+n7uQelnJxnDBmzKaVHOF2QF5SG6/RypYQkzruzi8GXmKr8SsYSncx7oc/VPFztcJ++0iIDNen2LxcEK9hJ0R0aHw+8thnWX7T3eo08tSiusf2fX4lSyNiaUy0ZYp3eayI/F582zsaBXRpGRkqSGbw/b/TkQ=
+	t=1711042252; cv=none; b=CQuQ1eRbz+l41I9y8l6urzI3AlAi33ocf0rLIhpwWA+cNStJ96KGe6kt0BGvmlCWBa5MU2nUWxdSzrTsYLMtwqtDEqPMnNx47AdLHraY0x/zMrN/x7W4LUuaXKVIRv8kO0+z+LAwsKyvbqfCQNZwkZK9i31vQ1+qKWDhDz/iBRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711039087; c=relaxed/simple;
-	bh=VRSMWFCZT0oWTvcVrVc6zm0WXxmKtdud0NjIamWAcNM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oHaKZzjtC+5guoFPDbnAG5LLVOhQnEXtEh8cexgPU/Yf28pzLP2NRKYo5wURaWUtcLDUgadmwY7LyTXUH3/+PKmnACMGvErcKbv4KonwqlD8/Ig+WLDX8qPvlJgZjQxfM8XoRfGQRaNWokiziKSIz7oo/1MFIz28L8RsBbs53Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FDdqjMCl; arc=none smtp.client-ip=192.198.163.7
+	s=arc-20240116; t=1711042252; c=relaxed/simple;
+	bh=JBLJEKTf/KkuhDCxb+brKIpIFlLuBd/PKeVfqKF77IM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UOBYSnCydJGD9eMwvc/AwGqo1/vCx0AlSs9AYzMpTIbupsD/En27vnvX2XefviGY6E7UjaOM7QVmtIfWXFLseW/nJYRNSCGccxQM5lxKNFK/M6xNwUsDG2jKkg99n4pwtOwpMHtbf+Xtjiq+8MMwGzsNgLJAedaRsbFB43wAfeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WBeCzKEC; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711039085; x=1742575085;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=VRSMWFCZT0oWTvcVrVc6zm0WXxmKtdud0NjIamWAcNM=;
-  b=FDdqjMClR6UgoL7iorUdaqKqdCzNeF/VKUN6ku428cXHBMuxyqpN5GXC
-   Eb3r/gnAE9yI4i7TO9b/zm/6XWQWAYpk65oFuRMUCgFzLenyShAORYArG
-   xL6pj1jyUzJVKp8LDKyrIh62x/fuhNKfHnxAEbiOjzsnyE/AUw1IddyFa
-   1Hl94IGyEGEJRE6xodsUQAA3iQ60uqG8A2XxV8YoiGZf51hfAgPcgU/gh
-   wQUZ8/GYyWV7oUdHyHDBcO/wOLa5jf/ubs2AAQaSlrWC5iWqrP01eFKN3
-   NgqgqIDtlrFnGoaKD/5qDBNUulRG6C7Szyu8Kxd0b60ystfOglhCQuIgL
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="31477564"
+  t=1711042250; x=1742578250;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JBLJEKTf/KkuhDCxb+brKIpIFlLuBd/PKeVfqKF77IM=;
+  b=WBeCzKEC5yY0DLvSmCADAbZnDgHFtzQo9MHvc1wIidB4biheFPZL+L43
+   fK9xByi5NZgjHWlXBu7YONhNmIif9rnhrNsxKZSVxRd6nBIeiOIf9aVMI
+   8ezuMjN3P9DLQIjCEesoecjQuVCOq1h1ePwj3grJT44xqjc4w/KlDg3/2
+   Ut4rq6h+r7PxtlKp9YPDd+Fay0LfwbaFrmJbgTqsGNmq9UWMPVWkLX2lq
+   YzW2XX5afuzBBDADuZSh1U1e2h8LBxw/wpYr9xbyaiXh1mSsrR1VdMYQH
+   vUbDIZi8+f2Ri3m7v9HtA+yyp3yy4WuxaSmrVtNnWFqYdMS7QoFiekEqd
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="6236039"
 X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
-   d="scan'208";a="31477564"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 09:37:58 -0700
+   d="scan'208";a="6236039"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 10:30:24 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
-   d="scan'208";a="19280019"
-Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 09:37:58 -0700
-From: Reinette Chatre <reinette.chatre@intel.com>
-To: isaku.yamahata@intel.com,
-	pbonzini@redhat.com,
-	erdemaktas@google.com,
-	vkuznets@redhat.com,
-	seanjc@google.com,
-	vannapurve@google.com,
-	jmattson@google.com,
-	mlevitsk@redhat.com,
-	xiaoyao.li@intel.com,
-	chao.gao@intel.com,
-	rick.p.edgecombe@intel.com
-Cc: reinette.chatre@intel.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH V4 4/4] KVM: selftests: Add test for configure of x86 APIC bus frequency
-Date: Thu, 21 Mar 2024 09:37:44 -0700
-Message-Id: <731f6bd293d298f8cbd313d1e8e7d472d6d6d8e6.1711035400.git.reinette.chatre@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1711035400.git.reinette.chatre@intel.com>
-References: <cover.1711035400.git.reinette.chatre@intel.com>
+   d="scan'208";a="19157301"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 10:30:24 -0700
+Date: Thu, 21 Mar 2024 10:30:24 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 039/130] KVM: TDX: initialize VM with TDX specific
+ parameters
+Message-ID: <20240321173024.GM1994522@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <5eca97e6a3978cf4dcf1cff21be6ec8b639a66b9.1708933498.git.isaku.yamahata@intel.com>
+ <5702443b-510e-4ce5-823f-999582a6aced@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5702443b-510e-4ce5-823f-999582a6aced@intel.com>
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Wed, Mar 20, 2024 at 04:15:23PM +0800,
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-Test if the APIC bus clock frequency is the expected configured value.
+> On 2/26/2024 4:25 PM, isaku.yamahata@intel.com wrote:
+> 
+> ...
+> 
+> > +static int setup_tdparams_xfam(struct kvm_cpuid2 *cpuid, struct td_params *td_params)
+> > +{
+> > +	const struct kvm_cpuid_entry2 *entry;
+> > +	u64 guest_supported_xcr0;
+> > +	u64 guest_supported_xss;
+> > +
+> > +	/* Setup td_params.xfam */
+> > +	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0xd, 0);
+> > +	if (entry)
+> > +		guest_supported_xcr0 = (entry->eax | ((u64)entry->edx << 32));
+> > +	else
+> > +		guest_supported_xcr0 = 0;
+> > +	guest_supported_xcr0 &= kvm_caps.supported_xcr0;
+> > +
+> > +	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0xd, 1);
+> > +	if (entry)
+> > +		guest_supported_xss = (entry->ecx | ((u64)entry->edx << 32));
+> > +	else
+> > +		guest_supported_xss = 0;
+> > +
+> > +	/*
+> > +	 * PT and CET can be exposed to TD guest regardless of KVM's XSS, PT
+> > +	 * and, CET support.
+> > +	 */
+> > +	guest_supported_xss &=
+> > +		(kvm_caps.supported_xss | XFEATURE_MASK_PT | TDX_TD_XFAM_CET);
+> > +
+> > +	td_params->xfam = guest_supported_xcr0 | guest_supported_xss;
+> > +	if (td_params->xfam & XFEATURE_MASK_LBR) {
+> > +		/*
+> > +		 * TODO: once KVM supports LBR(save/restore LBR related
+> > +		 * registers around TDENTER), remove this guard.
+> > +		 */
+> > +#define MSG_LBR	"TD doesn't support LBR yet. KVM needs to save/restore IA32_LBR_DEPTH properly.\n"
+> > +		pr_warn(MSG_LBR);
+> > +		return -EOPNOTSUPP;
+> 
+> This unsupported behavior is totally decided by KVM even if TDX module
+> supports it. I think we need to reflect it in tdx_info->xfam_fixed0, which
+> gets reported to userspace via KVM_TDX_CAPABILITIES. So userspace will aware
+> that LBR is not supported for TDs.
 
-Set APIC timer's initial count to the maximum value and busy wait for 100
-msec (any value is okay) with TSC value. Read the APIC timer's "current
-count" to calculate the actual APIC bus clock frequency based on TSC
-frequency.
+Yes, we can suppress KVM unpported features. I replied at
+https://lore.kernel.org/kvm/20240321155513.GL1994522@ls.amr.corp.intel.com/
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Co-developed-by: Reinette Chatre <reinette.chatre@intel.com>
-Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
----
+So far we used KVM_TDX_CAPABILITIES for feature enumeration. I'm wondering about
+KVM_GET_DEVICE_ATTR [1].  It's future extensible. It's also consistent with SEV.
 
-Changes v4:
-- Rework changelog.
-- Add Sean's "Suggested-by" to acknowledge guidance received in
-  https://lore.kernel.org/all/ZU0BASXWcck85r90@google.com/
-- Add copyright.
-- Add test description to file header.
-- Consistent capitalization for acronyms.
-- Rebase to kvm-x86/next.
-- Update to v4 change of providing bus clock rate in nanoseconds.
-- Add a "TEST_REQUIRE()" for the new capability so that the test can
-  work on kernels that do not support the new capability.
-- Address checkpatch warnings and use tabs instead of spaces in header
-  file to match existing code.
-
-Changes v3:
-- Use 1.5GHz instead of 1GHz as frequency.
-
-Changes v2:
-- Newly added.
-
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/x86_64/apic.h       |   7 +
- .../kvm/x86_64/apic_bus_clock_test.c          | 166 ++++++++++++++++++
- 3 files changed, 174 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index da20e6bb43ed..05b9a942a878 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -110,6 +110,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_invalid_nested_guest_state
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_nested_tsc_scaling_test
-+TEST_GEN_PROGS_x86_64 += x86_64/apic_bus_clock_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_ipi_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/xcr0_cpuid_test
-diff --git a/tools/testing/selftests/kvm/include/x86_64/apic.h b/tools/testing/selftests/kvm/include/x86_64/apic.h
-index bed316fdecd5..b0d2fc62e172 100644
---- a/tools/testing/selftests/kvm/include/x86_64/apic.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/apic.h
-@@ -60,6 +60,13 @@
- #define		APIC_VECTOR_MASK	0x000FF
- #define	APIC_ICR2	0x310
- #define		SET_APIC_DEST_FIELD(x)	((x) << 24)
-+#define APIC_LVT0	0x350
-+#define		APIC_LVT_TIMER_ONESHOT		(0 << 17)
-+#define		APIC_LVT_TIMER_PERIODIC		(1 << 17)
-+#define		APIC_LVT_TIMER_TSCDEADLINE	(2 << 17)
-+#define	APIC_TMICT	0x380
-+#define	APIC_TMCCT	0x390
-+#define	APIC_TDCR	0x3E0
- 
- void apic_disable(void);
- void xapic_enable(void);
-diff --git a/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-new file mode 100644
-index 000000000000..ee0cae056827
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-@@ -0,0 +1,166 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test configure of APIC bus frequency.
-+ *
-+ * Copyright (c) 2024 Intel Corporation
-+ *
-+ * To verify if the APIC bus frequency can be configured this test starts
-+ * by setting the TSC frequency in KVM, and then:
-+ * For every APIC timer frequency supported:
-+ * * In the guest:
-+ * * * Start the APIC timer by programming the APIC TMICT (initial count
-+ *       register) to the largest value possible to guarantee that it will
-+ *       not expire during the test,
-+ * * * Wait for a known duration based on previously set TSC frequency,
-+ * * * Stop the timer and read the APIC TMCCT (current count) register to
-+ *       determine the count at that time (TMCCT is loaded from TMICT when
-+ *       TMICT is programmed and then starts counting down).
-+ * * In the host:
-+ * * * Determine if the APIC counts close to configured APIC bus frequency
-+ *     while taking into account how the APIC timer frequency was modified
-+ *     using the APIC TDCR (divide configuration register).
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+
-+#include "apic.h"
-+#include "test_util.h"
-+
-+/*
-+ * Pick one convenient value, 1.5GHz. No special meaning and different from
-+ * the default value, 1GHz.
-+ */
-+#define TSC_HZ			(1500 * 1000 * 1000ULL)
-+
-+/* Wait for 100 msec, not too long, not too short value. */
-+#define LOOP_MSEC		100ULL
-+#define TSC_WAIT_DELTA		(TSC_HZ / 1000 * LOOP_MSEC)
-+
-+/*
-+ * Pick a typical value, 25MHz. Different enough from the default value, 1GHz.
-+ */
-+#define APIC_BUS_CLOCK_FREQ	(25 * 1000 * 1000ULL)
-+
-+static void guest_code(void)
-+{
-+	/*
-+	 * Possible TDCR values and its divide count. Used to modify APIC
-+	 * timer frequency.
-+	 */
-+	struct {
-+		u32 tdcr;
-+		u32 divide_count;
-+	} tdcrs[] = {
-+		{0x0, 2},
-+		{0x1, 4},
-+		{0x2, 8},
-+		{0x3, 16},
-+		{0x8, 32},
-+		{0x9, 64},
-+		{0xa, 128},
-+		{0xb, 1},
-+	};
-+
-+	u32 tmict, tmcct;
-+	u64 tsc0, tsc1;
-+	int i;
-+
-+	asm volatile("cli");
-+
-+	xapic_enable();
-+
-+	/*
-+	 * Setup one-shot timer.  The vector does not matter because the
-+	 * interrupt does not fire.
-+	 */
-+	xapic_write_reg(APIC_LVT0, APIC_LVT_TIMER_ONESHOT);
-+
-+	for (i = 0; i < ARRAY_SIZE(tdcrs); i++) {
-+		xapic_write_reg(APIC_TDCR, tdcrs[i].tdcr);
-+
-+		/* Set the largest value to not trigger the interrupt. */
-+		tmict = ~0;
-+		xapic_write_reg(APIC_TMICT, tmict);
-+
-+		/* Busy wait for LOOP_MSEC */
-+		tsc0 = rdtsc();
-+		tsc1 = tsc0;
-+		while (tsc1 - tsc0 < TSC_WAIT_DELTA)
-+			tsc1 = rdtsc();
-+
-+		/* Read APIC timer and TSC */
-+		tmcct = xapic_read_reg(APIC_TMCCT);
-+		tsc1 = rdtsc();
-+
-+		/* Stop timer */
-+		xapic_write_reg(APIC_TMICT, 0);
-+
-+		/* Report it. */
-+		GUEST_SYNC_ARGS(tdcrs[i].divide_count, tmict - tmcct,
-+				tsc1 - tsc0, 0, 0);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+void test_apic_bus_clock(struct kvm_vcpu *vcpu)
-+{
-+	bool done = false;
-+	struct ucall uc;
-+
-+	while (!done) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_DONE:
-+			done = true;
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC: {
-+			u32 divide_counter = uc.args[1];
-+			u32 apic_cycles = uc.args[2];
-+			u64 tsc_cycles = uc.args[3];
-+			u64 freq;
-+
-+			TEST_ASSERT(tsc_cycles > 0,
-+				    "TSC cycles must not be zero.");
-+
-+			/* Allow 1% slack. */
-+			freq = apic_cycles * divide_counter * TSC_HZ / tsc_cycles;
-+			TEST_ASSERT(freq < APIC_BUS_CLOCK_FREQ * 101 / 100,
-+				    "APIC bus clock frequency is too large");
-+			TEST_ASSERT(freq > APIC_BUS_CLOCK_FREQ * 99 / 100,
-+				    "APIC bus clock frequency is too small");
-+			break;
-+		}
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+			break;
-+		}
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_APIC_BUS_FREQUENCY));
-+
-+	vm = __vm_create(VM_SHAPE_DEFAULT, 1, 0);
-+	vm_ioctl(vm, KVM_SET_TSC_KHZ, (void *)(TSC_HZ / 1000));
-+	/*
-+	 * KVM_CAP_X86_APIC_BUS_FREQUENCY expects APIC bus clock rate in
-+	 * nanoseconds and requires that no vCPU is created.
-+	 */
-+	vm_enable_cap(vm, KVM_CAP_X86_APIC_BUS_FREQUENCY,
-+		      NSEC_PER_SEC / APIC_BUS_CLOCK_FREQ);
-+	vcpu = vm_vcpu_add(vm, 0, guest_code);
-+
-+	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
-+
-+	test_apic_bus_clock(vcpu);
-+	kvm_vm_free(vm);
-+}
+[1] https://lore.kernel.org/r/20240226190344.787149-7-pbonzini@redhat.com
 -- 
-2.34.1
-
+Isaku Yamahata <isaku.yamahata@intel.com>
 
