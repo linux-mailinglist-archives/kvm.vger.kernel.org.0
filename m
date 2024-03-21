@@ -1,206 +1,524 @@
-Return-Path: <kvm+bounces-12453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 239708863E1
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 00:12:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA8F78863ED
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 00:20:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43E711C22441
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 23:12:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEDEA1C21E77
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 23:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5D6134C0;
-	Thu, 21 Mar 2024 23:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BF53D393;
+	Thu, 21 Mar 2024 23:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dmY/gsQu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HsdTBOAR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5070279CB;
-	Thu, 21 Mar 2024 23:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711062764; cv=fail; b=GRruwSvXhYxySuSZW+vfD3cuLAu+haxdBv9Tz/AhqOB8JDAGlLhWQMG77I7dWwBos7dHaKWaz2nzyKNU//IBz7x3RVjaZRHpEyyH4igCKMv2Qp0/aDsmpNuB1uUUZCrrBnnvk2N967eNm6eu00ulAIqPd9IN1lYFQQX+64ncWm8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711062764; c=relaxed/simple;
-	bh=+47F1NXJ/mSVuETkb7qqHj3gQi/XrSX0TnCO5OfBuao=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=CpWLvEgZLsEbwG7uPPLKBd46wB8kzBEFoYnLSAxmkUi0n3j0JFZ50YQ3p8v4ORpuFDukR7Kbfp7YSktDaxKlS6JVXGQiNpPzQVTr0h1ifV7PiJKqAspDCqpPVKlakoTxeWVBX8a1dEM29OsCy3aPEpO6QXXtQkj8gmw1AQ4UIyM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dmY/gsQu; arc=fail smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD0FDDB6;
+	Thu, 21 Mar 2024 23:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711063235; cv=none; b=ZvbQS7qKYSWhTAcIa43qGGFfDhJvTnoX2fwj20CKn8CrZeJbL8CutNMRlvg29DM+/rXSq9WLUaT1sbPlKQZgM6t7V9a/bbON3fTVYOhiBar+XG/BatCdAdV79fnqjfa/6Lz/7p3vxIdxYSngTACAAFtGpo09LI7hvSTkXo5voqA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711063235; c=relaxed/simple;
+	bh=rn8Qn9qw9/Kj7GSIKaK3zfcKLJizNs0PSEigwK0XSes=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iPHL0CQaj6kHQxBEw4THVies3uiuoXPNZmkKabunyyPCin+d0fGxIezE8hjbOf72Lm1KuF2zL0h9BTO6/O4L9z1B+mZUXAIK9zN3g5HbTtL9HcUdebK016FYOdyk3FDqLFUGHi37so8fekx7o1M+IYNsM10nnMzCL1aU5zM3KuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HsdTBOAR; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711062763; x=1742598763;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=+47F1NXJ/mSVuETkb7qqHj3gQi/XrSX0TnCO5OfBuao=;
-  b=dmY/gsQuBNfRZfLUhDFjkZOLIK/7v5C3BABnwN7Z1FQQQ16Oria/onGJ
-   JhiNDMuUhX9G6i0sS+O4PcVy8Dgif0T6UnnK4ZmKZ48QPLe61c4ZB7Gf+
-   rHjKMTPR6PDQURMgWgT1r33wvY60sLM7eNquNyNCmdvG6MK7EFaXuj+PY
-   ckbGYO3oZ0IRdCqo2r0Gk7TFXAvZJm5oe4FzdqNx0kPFCcvJnqnYMc9XV
-   rijPlbOsHwB09aay4Jx2TxvPoMlBl3A5as6mSkavQhL728Q1jFfaZIEvA
-   3ul6tsZ6h4ILOdYY2VrAl2mOpEUosKZVIX2FdRW4xhE7VCrgscoqWRb2I
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="23545250"
+  t=1711063232; x=1742599232;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rn8Qn9qw9/Kj7GSIKaK3zfcKLJizNs0PSEigwK0XSes=;
+  b=HsdTBOAR9u5okLjgnYbCqv/LyXG9N+d1QKGv+PQA60HNZpZWFe1TICnh
+   eAfswXuoIisULQM9dBXh5cK5X5EzA/LWK0oDwwzlo/o8KMiwghHbGq9cq
+   Mi0wLnWvJGZPzBal/Uueh/QRWJFWJEQzm9c+/EH3mXEN4o8Z9/n6FTOoh
+   fGKE+bB2b0RwJ2gtcQDVXMDJh/ki2Rf9tw5h5rtdRNd3i0IeyALP6z3kw
+   Rw5rfmLJSQibyagJz5zGqBIXNOQ1JZuFvCxK8zU22M8yj5sba8M3LFOrb
+   YL6z774zTZAGhnh4jeFYD5eyChvPfkLD3hXdJH82EPLfcWPhtbn8QXa9h
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="6209003"
 X-IronPort-AV: E=Sophos;i="6.07,144,1708416000"; 
-   d="scan'208";a="23545250"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 16:12:42 -0700
+   d="scan'208";a="6209003"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 16:20:31 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,144,1708416000"; 
-   d="scan'208";a="15098913"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Mar 2024 16:12:41 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 21 Mar 2024 16:12:41 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 21 Mar 2024 16:12:41 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 21 Mar 2024 16:12:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mFD2I28IB3xFTBLm7WlMWQERvkaiDo8njgeP0huuNgG4zL06HcoTw8th3ATDJn35hdWpu0kmJjOIZY0jbuJ7NqdBurMMGmzWojKQdwNfj48wHQ1UFRfOcGC2n5y6+cmGlDV2CjHM+yTWWlT8z65/aUcBlKzVf0F53f6vmwNrXu/qM6APN5MockxNZ0c99n3EmwKc9TqsRcUIreTJhRXRJBvpMHP1gnHGDDasUO/yEDIjh0aoW6ijUtUSjniLhOn4KTvqZxPr8uhn9BTBgqo3ZPQJdDUUaANizE+25H8jBUz2kPYOFS8QnscLisqf/D7r7VXnMjqzK9L2QL93njy+8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+47F1NXJ/mSVuETkb7qqHj3gQi/XrSX0TnCO5OfBuao=;
- b=OnmQOJn+boIkiRxARt6qP7EyhaQh9pp57OU9e/Z5W2zcPf3gbj5A+GAZdqmz+p3vZ7KJ3Mg4M4zDBkex/EHUS7jdxt4aw7VH+wm+qH6Dqw3DAvF+zgAM9dAxwEZ4vKI2eKUz0lDGrAcE/RQROAQpG3LoUeU8Olm7HxV5NhWtRwI/rzJtuQ30IsPk+btSMF0E0YDDfSGa1DPJORX/eiGCKkbw/nTPaKH+HXJnzym2pU9v7zmd1/H+Xz21pawGra2f13UiPX5SBuAQyPsKa05LEDaxnK2xyxf2lfDCBDEZ4ehZySj5xv4WZlkLGwz4gZ3euY0vXQe0pdE97AHNJDiYug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by CH3PR11MB8435.namprd11.prod.outlook.com (2603:10b6:610:169::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.12; Thu, 21 Mar
- 2024 23:12:03 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::1761:33ae:729c:a795]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::1761:33ae:729c:a795%5]) with mapi id 15.20.7409.023; Thu, 21 Mar 2024
- 23:12:02 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Yamahata,
- Isaku" <isaku.yamahata@intel.com>
-CC: "Zhang, Tina" <tina.zhang@intel.com>, "seanjc@google.com"
-	<seanjc@google.com>, "Yuan, Hang" <hang.yuan@intel.com>, "Huang, Kai"
-	<kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>, "sagis@google.com"
-	<sagis@google.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>
-Subject: Re: [PATCH v19 130/130] RFC: KVM: x86, TDX: Add check for
- KVM_SET_CPUID2
-Thread-Topic: [PATCH v19 130/130] RFC: KVM: x86, TDX: Add check for
- KVM_SET_CPUID2
-Thread-Index: AQHadnriF1ZBxh+AQEWxyxeO2jbjmbFC3WOA
-Date: Thu, 21 Mar 2024 23:12:02 +0000
-Message-ID: <e1eb51e258138cd145ec9a461677304cb404cc43.camel@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
-	 <d394938197044b40bbe6d9ce2402f72a66a99e80.1708933498.git.isaku.yamahata@intel.com>
-In-Reply-To: <d394938197044b40bbe6d9ce2402f72a66a99e80.1708933498.git.isaku.yamahata@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CH3PR11MB8435:EE_
-x-ms-office365-filtering-correlation-id: afa76212-605f-4fe5-f5a8-08dc49fc5169
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: bL5DXaGIBuM/Yyggyp10UQiZwW81mYgKblqMdssQ/6fvgRfOVYltdAMx6jpDaif2qhecZPwgsjFMDYcvF1cKzJ0P5B/KzAkGUkdDAotfBij9bYwQktmFvaA/ZFMzCLBrePSwvWIJmYM+UR69Z4r3hwC5Z405VuIbhK2DRkWFgskxiGhEOmenoogwW0GCfanKqsQq4iFan+4KAIzvUfY0gxgoCyBNWnhOSnxw88S/nI2joSUw1ct4+MDROqe7wSzwwLPkrXAainX59bbnzHcBCrG0JzgLVBFW1sQNSYzNYk5rrvkXZuyZnMSKNUY2e+7Wzi3TPuZgixbUVWSio0faQMJcaISfjQLxr0mfRAWYWWBLCDWIderB0kp3WmnNx3PW8m8yvXXJCdNKSopWlTcoruSltm30vODMhOZpg7h5A8Uw9v+gBjlaFxg1mRVla6L6PubqCRxqG5EyaU7uslghhHWVkkxaStME6xJ7OgCeumG/K3IVnszrn4gEUFS17tmFqi2p2FXcluYbtxjQl3z4roGCAdunV2JnuXa2Wsm7f4N6DJMOCzKqDlzd5WhAuzBvKWjrhQiFg34SCa4UtuLjVUXb0aVRNl8ZCYFLHqoxErgR1w/eRi6a8/s8V2Bs6i1ltqq7B7yvJuAbSaEMuEp1T//NF4/jbNsfgZ2N1sf6D2N5oziQuXGh9yXz1VtQCG/cKccRihYI83UQucsroSL+L+/l0l71ZZBXuTAXDeHdsyI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V2dSZ1ZvcVMyL3lkRi9YSE8wQkx2TjBMbmxMNzFMcHVxeWxuMVFoOE1xWXFp?=
- =?utf-8?B?MEU2RVY1WHp1cUIyQkRHWmx1c0sxUUZLUlVteGI2cllXb3N2WlU5TnZNYlF3?=
- =?utf-8?B?MlRiVks2blVSRno3anQ0bFFzMXNoTlRaNTJJbDJSYmhXZ0xwdERkSGl4VzZZ?=
- =?utf-8?B?a0FCYysxYXVMYm9sN1V6Q3ZvSFo0bUhjRkZ0RHRwbTV4YnplRVVSRTRnaDBk?=
- =?utf-8?B?VjFpbGRmcU80dFE4UkI3amRXa0JwQzJVQ09pS00yK2ZTNEYzS2taWFFPN0oz?=
- =?utf-8?B?UTZNeWd6Z1JQM0E5c3gzUTJ1QmJDcVFtZENPb3ltWUE1Ym1JcjZRb0llRmZw?=
- =?utf-8?B?YjB2TjR6NTNuVmF6VWUyMUNQZHFnZ1NLNmdkN2taeFIrazg3ZFZRZlE5WkdN?=
- =?utf-8?B?VWRIYzNndTlUTTd0aSt4NGsyMkhsL24rdzBnOGhGOWxjVi9mQndCaTZvZmJ6?=
- =?utf-8?B?alI1TVRldVo0U082NVRJSFRSSjNPVkRweUpLRUZOT1VycC9Da1VnUjhLMnpv?=
- =?utf-8?B?WlNwbDR5clhRcHF6bDg1VDlQZnlreFF3MUhDeVUxTmJYQm1xbjZNK1g0QWQ3?=
- =?utf-8?B?UkJseldhVEVrbGE5Szc0WUVxRUtHa0hEbmdtSUhEeHNzWC85QlFERm0zWUxm?=
- =?utf-8?B?RXBmdlEvaDRaYmV4MVV2blpnMlAxY3FmK1UyZW1yV3M0dVptMzlHNkI3N0Fs?=
- =?utf-8?B?dlA1ckhBYzZHWndYYXRKaUJHcVVFa1R2TFZMSGlaZHFWcHJhWmc5TnQ3QUR6?=
- =?utf-8?B?N1FWWmxzdWlGM0VUaXA3cVhESCtKWEh1M2hxS2lwcUxVemt0dGxsQkN6M3pY?=
- =?utf-8?B?cC9oT0NiczE3ZmcrWjROSnZEVXk5bERVditYMEtrZklIdDVZMEZnZUdBWmMz?=
- =?utf-8?B?MEI1YWZGNFNYblAvNDBtL3VURlo4dFB5U0FRb1o4azJVVXphN29iUkF2T3VV?=
- =?utf-8?B?QjNKNGxVL0dQVkJrckR0aGxaeW1ldU9razZGYTBQeXZtaWNJRjBoRFFPZDYz?=
- =?utf-8?B?ZkJ0aytKYm5OOHhIMFp5U2pTVTlHNDlHMzVyRUw4ZVE3NUk4dGJBMGpvc2I0?=
- =?utf-8?B?clhMWjZWa3dnRmJlVDJ3R21SWHRrSDNSYzBpazBIZ3VPaVVMMjNSWjhLVHFi?=
- =?utf-8?B?anhvL09sRTZhK3h3MDNmNDFxYkx2d29DaGk0dVBoUndONEg4MWtLOE5OSjdz?=
- =?utf-8?B?cUFVOU1iWllleVF0dVJ6TmFJSGtHVHFYYm1UMlc0R2FGeTdERmhROGV6SE5z?=
- =?utf-8?B?N29uQlpVdEtUeUdiR1FWYTljTDRJbGlKTEpITVVGTU1DR3pzeFdVVWNGbnd4?=
- =?utf-8?B?YVhpaGFGc21TUHZZU3FFeWNiL3A3T2dDbG9EN1IwandsR1k4Um4vdnVDRFR2?=
- =?utf-8?B?dWxrKy9VR3lVNHN2ZGZHWnJpRUZqNzFxWkZjTXYzY1pHVUVTR3V1NWR4WGI1?=
- =?utf-8?B?d1hhQkE2cVE1YkpTZkdyN2xQOFBXSENpSmxBU2RNNnBPb0ZIWUNteDMzSXlh?=
- =?utf-8?B?SGd0V3BYZmJGTkVZQURUN0pDd1BuUmh1ejlpa3pqbjhNSUpyR3k4NXdkcHVY?=
- =?utf-8?B?ZmRyK1lXYkNwSm4ydGh3ZzUxK2U2YnZRZ2NUa3RpNVlwQ2RRbEhLUmRWd0ti?=
- =?utf-8?B?NHRjR0cwNHp3d0VBMEVSc05IYXlMb2RCQlI3RnFvZzhpUGV0MGQrNU5DMjNm?=
- =?utf-8?B?eTFtcHkram1JanBNV21xdWJnalZhaGJISjRCam1qdDBOak1Zdk1Ub0puYnM4?=
- =?utf-8?B?WXpGVC91bkxjbldHdU9XRVl4Ui9aMnRnbUFxdlorZSt2QVFiRFl0Yzd0VjVT?=
- =?utf-8?B?ZkFMeWFkczkrSktodkZKODhlakFkTzZvVUNiVVBBUXRVTDdvLzRkUVIvZTZs?=
- =?utf-8?B?ZHZpaW02RDZvWmJtMllpeUVybHdXVzFDRFJUbjdmNTZFMERSR3NFM0F2QkRm?=
- =?utf-8?B?YTlFVFNzd1k0NTE3OHdvM2Y5RG5ReVlHTm1FV1pGUHROcUlRTGxrbWFjNDNS?=
- =?utf-8?B?TmR6dHdHY3VpbWZwRVFMaEdObjN6TlBiYUFIUlpsLzQ4V0FaMS82T3VSd2JX?=
- =?utf-8?B?aVBrd3ozVW9JR2c4Mi80eDBaT0lQVU1STW4veS9raE5MOUJMSmg4dDVaSW9o?=
- =?utf-8?B?QWF2OE5HU2tVYytVSUhmMHA3bXBVbDRrUjcwUUJDNDN0Q0FwczBjOGZJZGlh?=
- =?utf-8?B?YlE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2263C105CE0BD24C9031A3A5D73110DB@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+   d="scan'208";a="19395353"
+Received: from dongshen-mobl1.amr.corp.intel.com (HELO [10.212.116.150]) ([10.212.116.150])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 16:20:30 -0700
+Message-ID: <75fde3c3-17a1-466f-a920-30769730808c@intel.com>
+Date: Thu, 21 Mar 2024 16:20:28 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: afa76212-605f-4fe5-f5a8-08dc49fc5169
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Mar 2024 23:12:02.6002
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VsIil3T95cCUKnYZ4fTOimIZ/3WWqbhjVT/tMvop0P5eb5H8jU0RvDAks/FFlyKofYmHr3lKOJCt0a/xf8r6QFs0iLjV74E6oCHz/brvjJg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8435
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v5 08/29] KVM: selftests: TDX: Add TDX lifecycle test
+To: Sagi Shahar <sagis@google.com>, linux-kselftest@vger.kernel.org,
+ Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
+ Erdem Aktas <erdemaktas@google.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>,
+ Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <20231212204647.2170650-1-sagis@google.com>
+ <20231212204647.2170650-9-sagis@google.com>
+Content-Language: en-US
+From: "Zhang, Dongsheng X" <dongsheng.x.zhang@intel.com>
+In-Reply-To: <20231212204647.2170650-9-sagis@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-T24gTW9uLCAyMDI0LTAyLTI2IGF0IDAwOjI3IC0wODAwLCBpc2FrdS55YW1haGF0YUBpbnRlbC5j
-b20gd3JvdGU6DQo+IEltcGxlbWVudCBhIGhvb2sgb2YgS1ZNX1NFVF9DUFVJRDIgZm9yIGFkZGl0
-aW9uYWwgY29uc2lzdGVuY3kgY2hlY2suDQo+IA0KPiBJbnRlbCBURFggb3IgQU1EIFNFViBoYXMg
-YSByZXN0cmljdGlvbiBvbiB0aGUgdmFsdWUgb2YgY3B1aWQuwqAgRm9yDQo+IGV4YW1wbGUsDQo+
-IHNvbWUgdmFsdWVzIG11c3QgYmUgdGhlIHNhbWUgYmV0d2VlbiBhbGwgdmNwdXMuwqAgQ2hlY2sg
-aWYgdGhlIG5ldw0KPiB2YWx1ZXMNCj4gYXJlIGNvbnNpc3RlbnQgd2l0aCB0aGUgb2xkIHZhbHVl
-cy7CoCBUaGUgY2hlY2sgaXMgbGlnaHQgYmVjYXVzZSB0aGUNCj4gY3B1aWQNCj4gY29uc2lzdGVu
-Y3kgaXMgdmVyeSBtb2RlbCBzcGVjaWZpYyBhbmQgY29tcGxpY2F0ZWQuwqAgVGhlIHVzZXIgc3Bh
-Y2UNCj4gVk1NDQo+IHNob3VsZCBzZXQgY3B1aWQgYW5kIE1TUnMgY29uc2lzdGVudGx5Lg0KDQpJ
-IHNlZSB0aGF0IHRoaXMgd2FzIHN1Z2dlc3RlZCBieSBTZWFuLCBidXQgY2FuIHlvdSBleHBsYWlu
-IHRoZSBwcm9ibGVtDQp0aGF0IHRoaXMgaXMgd29ya2luZyBhcm91bmQ/IEZyb20gdGhlIGxpbmtl
-ZCB0aHJlYWQsIGl0IHNlZW1zIGxpa2UgdGhlDQpwcm9ibGVtIGlzIHdoYXQgdG8gZG8gd2hlbiB1
-c2Vyc3BhY2UgYWxzbyBjYWxscyBTRVRfQ1BVSUQgYWZ0ZXIgYWxyZWFkeQ0KY29uZmlndXJpbmcg
-Q1BVSUQgdG8gdGhlIFREWCBtb2R1bGUgaW4gdGhlIHNwZWNpYWwgd2F5LiBUaGUgY2hvaWNlcw0K
-ZGlzY3Vzc2VkIGluY2x1ZGVkOg0KMS4gUmVqZWN0IHRoZSBjYWxsDQoyLiBDaGVjayB0aGUgY29u
-c2lzdGVuY3kgYmV0d2VlbiB0aGUgZmlyc3QgQ1BVSUQgY29uZmlndXJhdGlvbiBhbmQgdGhlDQpz
-ZWNvbmQgb25lLg0KDQoxIGlzIGEgbG90IHNpbXBsZXIsIGJ1dCB0aGUgcmVhc29uaW5nIGZvciAy
-IGlzIGJlY2F1c2UgInNvbWUgS1ZNIGNvZGUNCnBhdGhzIHJlbHkgb24gZ3Vlc3QgQ1BVSUQgY29u
-ZmlndXJhdGlvbiIgaXQgc2VlbXMuIElzIHRoaXMgYQ0KaHlwb3RoZXRpY2FsIG9yIHJlYWwgaXNz
-dWU/IFdoaWNoIGNvZGUgcGF0aHMgYXJlIHByb2JsZW1hdGljIGZvcg0KVERYL1NOUD8NCg0KSnVz
-dCB0cnlpbmcgdG8gYXNzZXNzIHdoYXQgd2Ugc2hvdWxkIGRvIHdpdGggdGhlc2UgdHdvIHBhdGNo
-ZXMuDQo=
+
+
+On 12/12/2023 12:46 PM, Sagi Shahar wrote:
+> From: Erdem Aktas <erdemaktas@google.com>
+> 
+> Adding a test to verify TDX lifecycle by creating a TD and running a
+> dummy TDG.VP.VMCALL <Instruction.IO> inside it.
+> 
+> Signed-off-by: Erdem Aktas <erdemaktas@google.com>
+> Signed-off-by: Ryan Afranji <afranji@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile          |  4 +
+>  .../selftests/kvm/include/x86_64/tdx/tdcall.h | 35 ++++++++
+>  .../selftests/kvm/include/x86_64/tdx/tdx.h    | 12 +++
+>  .../kvm/include/x86_64/tdx/test_util.h        | 52 +++++++++++
+>  .../selftests/kvm/lib/x86_64/tdx/tdcall.S     | 90 +++++++++++++++++++
+>  .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 27 ++++++
+>  .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   |  1 +
+>  .../selftests/kvm/lib/x86_64/tdx/test_util.c  | 34 +++++++
+>  .../selftests/kvm/x86_64/tdx_vm_tests.c       | 45 ++++++++++
+>  9 files changed, 300 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
+>  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+>  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+>  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+>  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a35150ab855f..80d4a50eeb9f 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -52,6 +52,9 @@ LIBKVM_x86_64 += lib/x86_64/vmx.c
+>  LIBKVM_x86_64 += lib/x86_64/sev.c
+>  LIBKVM_x86_64 += lib/x86_64/tdx/tdx_util.c
+>  LIBKVM_x86_64 += lib/x86_64/tdx/td_boot.S
+> +LIBKVM_x86_64 += lib/x86_64/tdx/tdcall.S
+> +LIBKVM_x86_64 += lib/x86_64/tdx/tdx.c
+> +LIBKVM_x86_64 += lib/x86_64/tdx/test_util.c
+>  
+>  LIBKVM_aarch64 += lib/aarch64/gic.c
+>  LIBKVM_aarch64 += lib/aarch64/gic_v3.c
+> @@ -152,6 +155,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
+>  TEST_GEN_PROGS_x86_64 += steal_time
+>  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
+>  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/tdx_vm_tests
+>  
+>  # Compiled outputs used by test targets
+>  TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
+> new file mode 100644
+> index 000000000000..78001bfec9c8
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
+> @@ -0,0 +1,35 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* Adapted from arch/x86/include/asm/shared/tdx.h */
+> +
+> +#ifndef SELFTESTS_TDX_TDCALL_H
+> +#define SELFTESTS_TDX_TDCALL_H
+> +
+> +#include <linux/bits.h>
+> +#include <linux/types.h>
+> +
+> +#define TDG_VP_VMCALL_INSTRUCTION_IO_READ 0
+> +#define TDG_VP_VMCALL_INSTRUCTION_IO_WRITE 1
+
+Nit:
+Probably we can define the following instead in test_util.c?
+/* Port I/O direction */
+#define PORT_READ	0
+#define PORT_WRITE	1
+
+Then use them in place of TDG_VP_VMCALL_INSTRUCTION_IO_READ/TDG_VP_VMCALL_INSTRUCTION_IO_WRITE?
+which are too long
+
+> +
+> +#define TDX_HCALL_HAS_OUTPUT BIT(0)
+> +
+> +#define TDX_HYPERCALL_STANDARD 0
+> +
+> +/*
+> + * Used in __tdx_hypercall() to pass down and get back registers' values of
+> + * the TDCALL instruction when requesting services from the VMM.
+> + *
+> + * This is a software only structure and not part of the TDX module/VMM ABI.
+> + */
+> +struct tdx_hypercall_args {
+> +	u64 r10;
+> +	u64 r11;
+> +	u64 r12;
+> +	u64 r13;
+> +	u64 r14;
+> +	u64 r15;
+> +};
+> +
+> +/* Used to request services from the VMM */
+> +u64 __tdx_hypercall(struct tdx_hypercall_args *args, unsigned long flags);
+> +
+> +#endif // SELFTESTS_TDX_TDCALL_H
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+> new file mode 100644
+> index 000000000000..a7161efe4ee2
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+> @@ -0,0 +1,12 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef SELFTEST_TDX_TDX_H
+> +#define SELFTEST_TDX_TDX_H
+> +
+> +#include <stdint.h>
+> +
+> +#define TDG_VP_VMCALL_INSTRUCTION_IO 30
+
+Nit:
+arch/x86/include/uapi/asm/vmx.h already exports the following define:
+#define EXIT_REASON_IO_INSTRUCTION      30
+
+Linux kernel example (arch/x86/coco/tdx/tdx.c):
+static bool handle_in(struct pt_regs *regs, int size, int port)
+{
+	struct tdx_module_args args = {
+		.r10 = TDX_HYPERCALL_STANDARD,
+		.r11 = hcall_func(EXIT_REASON_IO_INSTRUCTION),
+		.r12 = size,
+		.r13 = PORT_READ,
+		.r14 = port,
+	};
+
+So just like the kernel, here we can also use EXIT_REASON_IO_INSTRUCTION in place of TDG_VP_VMCALL_INSTRUCTION_IO,
+just need to do a '#include "vmx.h"' or '#include <asm/vmx.h>' to bring in the define
+
+> +
+> +uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+> +				      uint64_t write, uint64_t *data);
+> +
+> +#endif // SELFTEST_TDX_TDX_H
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+> new file mode 100644
+> index 000000000000..b570b6d978ff
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+> @@ -0,0 +1,52 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef SELFTEST_TDX_TEST_UTIL_H
+> +#define SELFTEST_TDX_TEST_UTIL_H
+> +
+> +#include <stdbool.h>
+> +
+> +#include "tdcall.h"
+> +
+> +#define TDX_TEST_SUCCESS_PORT 0x30
+> +#define TDX_TEST_SUCCESS_SIZE 4
+> +
+> +/**
+> + * Assert that tdx_test_success() was called in the guest.
+> + */
+> +#define TDX_TEST_ASSERT_SUCCESS(VCPU)					\
+> +	(TEST_ASSERT(							\
+> +		((VCPU)->run->exit_reason == KVM_EXIT_IO) &&		\
+> +		((VCPU)->run->io.port == TDX_TEST_SUCCESS_PORT) &&	\
+> +		((VCPU)->run->io.size == TDX_TEST_SUCCESS_SIZE) &&	\
+> +		((VCPU)->run->io.direction ==				\
+> +			TDG_VP_VMCALL_INSTRUCTION_IO_WRITE),		\
+> +		"Unexpected exit values while waiting for test completion: %u (%s) %d %d %d\n", \
+> +		(VCPU)->run->exit_reason,				\
+> +		exit_reason_str((VCPU)->run->exit_reason),		\
+> +		(VCPU)->run->io.port, (VCPU)->run->io.size,		\
+> +		(VCPU)->run->io.direction))
+> +
+> +/**
+> + * Run a test in a new process.
+> + *
+> + * There might be multiple tests we are running and if one test fails, it will
+> + * prevent the subsequent tests to run due to how tests are failing with
+> + * TEST_ASSERT function. The run_in_new_process function will run a test in a
+> + * new process context and wait for it to finish or fail to prevent TEST_ASSERT
+> + * to kill the main testing process.
+> + */
+> +void run_in_new_process(void (*func)(void));
+> +
+> +/**
+> + * Verify that the TDX is supported by KVM.
+> + */
+> +bool is_tdx_enabled(void);
+> +
+> +/**
+> + * Report test success to userspace.
+> + *
+> + * Use TDX_TEST_ASSERT_SUCCESS() to assert that this function was called in the
+> + * guest.
+> + */
+> +void tdx_test_success(void);
+> +
+> +#endif // SELFTEST_TDX_TEST_UTIL_H
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+> new file mode 100644
+> index 000000000000..df9c1ed4bb2d
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+> @@ -0,0 +1,90 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* Adapted from arch/x86/coco/tdx/tdcall.S */
+> +
+> +#define TDX_HYPERCALL_r10 0 /* offsetof(struct tdx_hypercall_args, r10) */
+> +#define TDX_HYPERCALL_r11 8 /* offsetof(struct tdx_hypercall_args, r11) */
+> +#define TDX_HYPERCALL_r12 16 /* offsetof(struct tdx_hypercall_args, r12) */
+> +#define TDX_HYPERCALL_r13 24 /* offsetof(struct tdx_hypercall_args, r13) */
+> +#define TDX_HYPERCALL_r14 32 /* offsetof(struct tdx_hypercall_args, r14) */
+> +#define TDX_HYPERCALL_r15 40 /* offsetof(struct tdx_hypercall_args, r15) */
+> +
+> +/*
+> + * Bitmasks of exposed registers (with VMM).
+> + */
+> +#define TDX_R10 0x400
+> +#define TDX_R11 0x800
+> +#define TDX_R12 0x1000
+> +#define TDX_R13 0x2000
+> +#define TDX_R14 0x4000
+> +#define TDX_R15 0x8000
+> +
+> +#define TDX_HCALL_HAS_OUTPUT 0x1
+> +
+> +/*
+> + * These registers are clobbered to hold arguments for each
+> + * TDVMCALL. They are safe to expose to the VMM.
+> + * Each bit in this mask represents a register ID. Bit field
+> + * details can be found in TDX GHCI specification, section
+> + * titled "TDCALL [TDG.VP.VMCALL] leaf".
+> + */
+> +#define TDVMCALL_EXPOSE_REGS_MASK	( TDX_R10 | TDX_R11 | \
+> +					  TDX_R12 | TDX_R13 | \
+> +					  TDX_R14 | TDX_R15 )
+> +
+> +.code64
+> +.section .text
+> +
+> +.globl __tdx_hypercall
+> +.type __tdx_hypercall, @function
+> +__tdx_hypercall:
+> +	/* Set up stack frame */
+> +	push %rbp
+> +	movq %rsp, %rbp
+> +
+> +	/* Save callee-saved GPRs as mandated by the x86_64 ABI */
+> +	push %r15
+> +	push %r14
+> +	push %r13
+> +	push %r12
+> +
+> +	/* Mangle function call ABI into TDCALL ABI: */
+> +	/* Set TDCALL leaf ID (TDVMCALL (0)) in RAX */
+> +	xor %eax, %eax
+> +
+> +	/* Copy hypercall registers from arg struct: */
+> +	movq TDX_HYPERCALL_r10(%rdi), %r10
+> +	movq TDX_HYPERCALL_r11(%rdi), %r11
+> +	movq TDX_HYPERCALL_r12(%rdi), %r12
+> +	movq TDX_HYPERCALL_r13(%rdi), %r13
+> +	movq TDX_HYPERCALL_r14(%rdi), %r14
+> +	movq TDX_HYPERCALL_r15(%rdi), %r15
+> +
+> +	movl $TDVMCALL_EXPOSE_REGS_MASK, %ecx
+> +
+> +	tdcall
+> +
+> +	/* TDVMCALL leaf return code is in R10 */
+> +	movq %r10, %rax
+> +
+> +	/* Copy hypercall result registers to arg struct if needed */
+> +	testq $TDX_HCALL_HAS_OUTPUT, %rsi
+> +	jz .Lout
+> +
+> +	movq %r10, TDX_HYPERCALL_r10(%rdi)
+> +	movq %r11, TDX_HYPERCALL_r11(%rdi)
+> +	movq %r12, TDX_HYPERCALL_r12(%rdi)
+> +	movq %r13, TDX_HYPERCALL_r13(%rdi)
+> +	movq %r14, TDX_HYPERCALL_r14(%rdi)
+> +	movq %r15, TDX_HYPERCALL_r15(%rdi)
+> +.Lout:
+> +	/* Restore callee-saved GPRs as mandated by the x86_64 ABI */
+> +	pop %r12
+> +	pop %r13
+> +	pop %r14
+> +	pop %r15
+> +
+> +	pop %rbp
+> +	ret
+> +
+> +/* Disable executable stack */
+> +.section .note.GNU-stack,"",%progbits
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+> new file mode 100644
+> index 000000000000..c2414523487a
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+> @@ -0,0 +1,27 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include "tdx/tdcall.h"
+> +#include "tdx/tdx.h"
+> +
+> +uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+> +				      uint64_t write, uint64_t *data)
+> +{
+> +	uint64_t ret;
+> +	struct tdx_hypercall_args args = {
+> +		.r10 = TDX_HYPERCALL_STANDARD,
+> +		.r11 = TDG_VP_VMCALL_INSTRUCTION_IO,
+> +		.r12 = size,
+> +		.r13 = write,
+> +		.r14 = port,
+> +	};
+> +
+> +	if (write)
+> +		args.r15 = *data;
+> +
+> +	ret = __tdx_hypercall(&args, write ? 0 : TDX_HCALL_HAS_OUTPUT);
+> +
+> +	if (!write)
+> +		*data = args.r11;
+> +
+> +	return ret;
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> index 063ff486fb86..b302060049d5 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> @@ -224,6 +224,7 @@ static void tdx_enable_capabilities(struct kvm_vm *vm)
+>  		      KVM_X2APIC_API_USE_32BIT_IDS |
+>  			      KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK);
+>  	vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
+> +	vm_enable_cap(vm, KVM_CAP_MAX_VCPUS, 512);
+>  }
+>  
+>  static void tdx_configure_memory_encryption(struct kvm_vm *vm)
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+> new file mode 100644
+> index 000000000000..6905d0ca3877
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+> @@ -0,0 +1,34 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include <stdbool.h>
+> +#include <stdint.h>
+> +#include <stdlib.h>
+> +#include <sys/wait.h>
+> +#include <unistd.h>
+> +
+> +#include "kvm_util_base.h"
+> +#include "tdx/tdx.h"
+> +#include "tdx/test_util.h"
+> +
+> +void run_in_new_process(void (*func)(void))
+> +{
+> +	if (fork() == 0) {
+> +		func();
+> +		exit(0);
+> +	}
+> +	wait(NULL);
+> +}
+> +
+> +bool is_tdx_enabled(void)
+> +{
+> +	return !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_TDX_VM));
+> +}
+> +
+> +void tdx_test_success(void)
+> +{
+> +	uint64_t code = 0;
+> +
+> +	tdg_vp_vmcall_instruction_io(TDX_TEST_SUCCESS_PORT,
+> +				     TDX_TEST_SUCCESS_SIZE,
+> +				     TDG_VP_VMCALL_INSTRUCTION_IO_WRITE, &code);
+> +}
+> diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+> new file mode 100644
+> index 000000000000..a18d1c9d6026
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+> @@ -0,0 +1,45 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include <signal.h>
+> +#include "kvm_util_base.h"
+> +#include "tdx/tdx_util.h"
+> +#include "tdx/test_util.h"
+> +#include "test_util.h"
+> +
+> +void guest_code_lifecycle(void)
+> +{
+> +	tdx_test_success();
+> +}
+> +
+> +void verify_td_lifecycle(void)
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	vm = td_create();
+> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
+> +	vcpu = td_vcpu_add(vm, 0, guest_code_lifecycle);
+> +	td_finalize(vm);
+> +
+> +	printf("Verifying TD lifecycle:\n");
+> +
+> +	vcpu_run(vcpu);
+> +	TDX_TEST_ASSERT_SUCCESS(vcpu);
+> +
+> +	kvm_vm_free(vm);
+> +	printf("\t ... PASSED\n");
+> +}
+
+Nit:
+All the functions used locally inside tdx_vm_tests.c can be declared static:
+static void guest_code_lifecycle(void)
+static void verify_td_lifecycle(void)
+
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	setbuf(stdout, NULL);
+> +
+> +	if (!is_tdx_enabled()) {
+> +		print_skip("TDX is not supported by the KVM");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+> +	run_in_new_process(&verify_td_lifecycle);
+> +
+> +	return 0;
+> +}
 
