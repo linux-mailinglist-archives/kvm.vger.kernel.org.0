@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-12426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12427-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12121885FC4
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 18:31:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBC8886000
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 18:46:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B402F283907
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 17:31:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75A921F22164
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 17:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD57E8592F;
-	Thu, 21 Mar 2024 17:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5384E84A28;
+	Thu, 21 Mar 2024 17:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WBeCzKEC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TW6T4b4M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C3BC2E9;
-	Thu, 21 Mar 2024 17:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C412012CD8A;
+	Thu, 21 Mar 2024 17:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711042252; cv=none; b=CQuQ1eRbz+l41I9y8l6urzI3AlAi33ocf0rLIhpwWA+cNStJ96KGe6kt0BGvmlCWBa5MU2nUWxdSzrTsYLMtwqtDEqPMnNx47AdLHraY0x/zMrN/x7W4LUuaXKVIRv8kO0+z+LAwsKyvbqfCQNZwkZK9i31vQ1+qKWDhDz/iBRA=
+	t=1711043195; cv=none; b=ukqrFm3jTx9260y9k3sEpqyWWeLwutPve2Vam8vgQLne2QDBYiN2QDIcdRmwPufvq+iJjROsMPOdM+ZT2VoWlYB6Apnq71VhtxAWMbWPynKKkURNBW43BD3H9jSpbxwKIbSx+/vd/zS6Kl83iaLS69ajzbHlH+Tx7YbOo+Ogv7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711042252; c=relaxed/simple;
-	bh=JBLJEKTf/KkuhDCxb+brKIpIFlLuBd/PKeVfqKF77IM=;
+	s=arc-20240116; t=1711043195; c=relaxed/simple;
+	bh=IHxP3sB8iCV2zZ3+AjpVxUeAnWuqZDXVivAsG8utYjo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UOBYSnCydJGD9eMwvc/AwGqo1/vCx0AlSs9AYzMpTIbupsD/En27vnvX2XefviGY6E7UjaOM7QVmtIfWXFLseW/nJYRNSCGccxQM5lxKNFK/M6xNwUsDG2jKkg99n4pwtOwpMHtbf+Xtjiq+8MMwGzsNgLJAedaRsbFB43wAfeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WBeCzKEC; arc=none smtp.client-ip=192.198.163.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=cA0gF90QWijx5yUn+eSG36hIQ5kzc7QoM9TGs4AyZvccpWvNOoBnaZpXcX1CI3TSp4f7gabubNvE5Ip9XE85vq2IOEyiyNHiO6+c8h4e3sGXf19Ve/LBgGwgSa/oKMIRwb1k7qY4UXk2qbreC2H15PddgYP2eAx3r0VdpmmrnCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TW6T4b4M; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711042250; x=1742578250;
+  t=1711043193; x=1742579193;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=JBLJEKTf/KkuhDCxb+brKIpIFlLuBd/PKeVfqKF77IM=;
-  b=WBeCzKEC5yY0DLvSmCADAbZnDgHFtzQo9MHvc1wIidB4biheFPZL+L43
-   fK9xByi5NZgjHWlXBu7YONhNmIif9rnhrNsxKZSVxRd6nBIeiOIf9aVMI
-   8ezuMjN3P9DLQIjCEesoecjQuVCOq1h1ePwj3grJT44xqjc4w/KlDg3/2
-   Ut4rq6h+r7PxtlKp9YPDd+Fay0LfwbaFrmJbgTqsGNmq9UWMPVWkLX2lq
-   YzW2XX5afuzBBDADuZSh1U1e2h8LBxw/wpYr9xbyaiXh1mSsrR1VdMYQH
-   vUbDIZi8+f2Ri3m7v9HtA+yyp3yy4WuxaSmrVtNnWFqYdMS7QoFiekEqd
+  bh=IHxP3sB8iCV2zZ3+AjpVxUeAnWuqZDXVivAsG8utYjo=;
+  b=TW6T4b4M2bMRIeG1s3FpBQraj4ilSXnGQqieA/tHL3/WcksI3w65cmb6
+   nmInAcx45qvC2UIGRYc82ReDbywxTWJ9L0129on4KUEt8lQqoOjFyOK+X
+   bIbp8eR5NUSqOMlAQYgu2GybT+aVSlNftHyIUIP1MwQcNlYuL2OCcF85z
+   sFWWKvAVJEu2JzrXp8/kQ/rHBr+DCkGbjhLJ/+mEswgoYNQ7M92a03YCU
+   92FGaLzV8pm3OLRrvAOUS+wbYmAdR84Hjn0QZlORql8PXGIqWlvC0kCbv
+   G5mfqhUXjTBXz+wCyho5FPF3k4QGrIZnP1AHZxzKVZtTBKvnrXpNQI0+0
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="6236039"
+X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="6264287"
 X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
-   d="scan'208";a="6236039"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 10:30:24 -0700
+   d="scan'208";a="6264287"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 10:46:32 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
-   d="scan'208";a="19157301"
+   d="scan'208";a="45707260"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 10:30:24 -0700
-Date: Thu, 21 Mar 2024 10:30:24 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 10:46:32 -0700
+Date: Thu, 21 Mar 2024 10:46:31 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Chao Gao <chao.gao@intel.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
 	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
@@ -64,12 +64,12 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 039/130] KVM: TDX: initialize VM with TDX specific
- parameters
-Message-ID: <20240321173024.GM1994522@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v19 040/130] KVM: TDX: Make pmu_intel.c ignore guest TD
+ case
+Message-ID: <20240321174631.GN1994522@ls.amr.corp.intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <5eca97e6a3978cf4dcf1cff21be6ec8b639a66b9.1708933498.git.isaku.yamahata@intel.com>
- <5702443b-510e-4ce5-823f-999582a6aced@intel.com>
+ <2eb2e7205d23ec858e6d800fee7da2306216e8f0.1708933498.git.isaku.yamahata@intel.com>
+ <ZfqJ3LkYrwR/qpsX@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,64 +78,40 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5702443b-510e-4ce5-823f-999582a6aced@intel.com>
+In-Reply-To: <ZfqJ3LkYrwR/qpsX@chao-email>
 
-On Wed, Mar 20, 2024 at 04:15:23PM +0800,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On Wed, Mar 20, 2024 at 03:01:48PM +0800,
+Chao Gao <chao.gao@intel.com> wrote:
 
-> On 2/26/2024 4:25 PM, isaku.yamahata@intel.com wrote:
+> On Mon, Feb 26, 2024 at 12:25:42AM -0800, isaku.yamahata@intel.com wrote:
+> >From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >
+> >Because TDX KVM doesn't support PMU yet (it's future work of TDX KVM
+> >support as another patch series) and pmu_intel.c touches vmx specific
+> >structure in vcpu initialization, as workaround add dummy structure to
+> >struct vcpu_tdx and pmu_intel.c can ignore TDX case.
 > 
-> ...
+> Can we instead factor pmu_intel.c to avoid corrupting memory? how hard would it
+> be?
+
+Do you mean sprinkling "if (tdx) return"? It's easy. Just add it to all hooks
+in kvm_pmu_ops.
+
+I chose this approach because we'll soon support vPMU support. For simplicity,
+will switch to sprinkle "if (tdx) return".
+
+> >+bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
+> >+{
+> >+	struct x86_pmu_lbr *lbr = vcpu_to_lbr_records(vcpu);
+> >+
+> >+	if (is_td_vcpu(vcpu))
+> >+		return false;
+> >+
+> >+	return lbr->nr && (vcpu_get_perf_capabilities(vcpu) & PMU_CAP_LBR_FMT);
 > 
-> > +static int setup_tdparams_xfam(struct kvm_cpuid2 *cpuid, struct td_params *td_params)
-> > +{
-> > +	const struct kvm_cpuid_entry2 *entry;
-> > +	u64 guest_supported_xcr0;
-> > +	u64 guest_supported_xss;
-> > +
-> > +	/* Setup td_params.xfam */
-> > +	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0xd, 0);
-> > +	if (entry)
-> > +		guest_supported_xcr0 = (entry->eax | ((u64)entry->edx << 32));
-> > +	else
-> > +		guest_supported_xcr0 = 0;
-> > +	guest_supported_xcr0 &= kvm_caps.supported_xcr0;
-> > +
-> > +	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0xd, 1);
-> > +	if (entry)
-> > +		guest_supported_xss = (entry->ecx | ((u64)entry->edx << 32));
-> > +	else
-> > +		guest_supported_xss = 0;
-> > +
-> > +	/*
-> > +	 * PT and CET can be exposed to TD guest regardless of KVM's XSS, PT
-> > +	 * and, CET support.
-> > +	 */
-> > +	guest_supported_xss &=
-> > +		(kvm_caps.supported_xss | XFEATURE_MASK_PT | TDX_TD_XFAM_CET);
-> > +
-> > +	td_params->xfam = guest_supported_xcr0 | guest_supported_xss;
-> > +	if (td_params->xfam & XFEATURE_MASK_LBR) {
-> > +		/*
-> > +		 * TODO: once KVM supports LBR(save/restore LBR related
-> > +		 * registers around TDENTER), remove this guard.
-> > +		 */
-> > +#define MSG_LBR	"TD doesn't support LBR yet. KVM needs to save/restore IA32_LBR_DEPTH properly.\n"
-> > +		pr_warn(MSG_LBR);
-> > +		return -EOPNOTSUPP;
-> 
-> This unsupported behavior is totally decided by KVM even if TDX module
-> supports it. I think we need to reflect it in tdx_info->xfam_fixed0, which
-> gets reported to userspace via KVM_TDX_CAPABILITIES. So userspace will aware
-> that LBR is not supported for TDs.
+> The check about vcpu's perf capabilities is new. is it necessary?
 
-Yes, we can suppress KVM unpported features. I replied at
-https://lore.kernel.org/kvm/20240321155513.GL1994522@ls.amr.corp.intel.com/
-
-So far we used KVM_TDX_CAPABILITIES for feature enumeration. I'm wondering about
-KVM_GET_DEVICE_ATTR [1].  It's future extensible. It's also consistent with SEV.
-
-[1] https://lore.kernel.org/r/20240226190344.787149-7-pbonzini@redhat.com
+No. Will delete it. It crept in during rebase.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
