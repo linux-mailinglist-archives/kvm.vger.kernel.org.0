@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-12411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFC1D885CAF
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 16:55:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4867F885CB4
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 16:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D18A1C22A74
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 15:55:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01345281A35
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 15:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C8C12C527;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6944712C533;
 	Thu, 21 Mar 2024 15:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dGoYtpM3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SZnBJARK"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED2F12BEBB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFE612BF09;
 	Thu, 21 Mar 2024 15:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711036473; cv=none; b=og8qN/h43KtoStdZDCZGaH0T/J+pMj8zRMF/QhxFVFsApoqPlf1eWMTENglHvr5k6QGBlK6g+s4xtE1qV+SlNuaKQuiWv0gqlQxR1GQMkCpKzf6kdsOblTOTK+1LLUU6l3xpdM63E7GFktATSxUGaoP1dGDhrRfR1XSoe9HkyAY=
+	t=1711036473; cv=none; b=B0+rbJ6cdpJg1milaBZHu4i9LeYUO3B4Qd8vCZesoRy/rz52b3loNQyHJ6lcJXK6UQZjjzXN+KEI1OYAHAQSAFsDlBrDqL6to+fMpuy39c1MY1NbCmPE+LvPgrHmgp6MZ9UDgpdPzAnjuqlx+Snaf8C7zrcX0hpDgnZzbgCm2iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711036473; c=relaxed/simple;
-	bh=Alk8DkWcPcruQ5um5KDrpSCEo4m97neZZIMYfFIrE54=;
+	bh=rx2CXyS8Z2B7PlM560/Mg4cctxPW0BXZTrgvo90EaJw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tJCKcny0xy5dP5YCmiOpBxFa1SSF+6DlC5el1QfDCF27x0Q7kIEqkIXvA43KLL+1GyDo+JCEJj1sVvD7FPmkZ4WJeJV92NOCcIgFgZ6qCujyRFTywD9Z/faC4T+zCPWZkrA/8LXmgKgaeWSfly83h9xsJHSb3T5PgU2A0L6GVns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dGoYtpM3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31928C433B2;
+	 MIME-Version; b=sqEFul0nccMScIuYoM020G7NlSuR+XioKREp+ydYVRug8YBZymT/ASL/XCjevAt9BgmhoWrB5p1Ns0uP5r/4QI/9ZN9lOXJzmPZONV8zJwMnlDK9NWqSW+gpGQizRxhI8/bWknTqUcdHlN52NN8d2o1UY46M/4KbD6oNWuzhyoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SZnBJARK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B706C43330;
 	Thu, 21 Mar 2024 15:54:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711036473;
-	bh=Alk8DkWcPcruQ5um5KDrpSCEo4m97neZZIMYfFIrE54=;
+	bh=rx2CXyS8Z2B7PlM560/Mg4cctxPW0BXZTrgvo90EaJw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dGoYtpM3N6vZ95Ko9I0Yrbu05V1XWVGT0WqDp+7KGDAfB59iZI2fMKWkEuR9n3rfE
-	 JSJF6NzQpno54qAnrwbI3vIAkVo5Dd3iSSttgb91faaxk5Eoe5iEyf2IlzudZiTXAq
-	 5oZBh3OpQ7sdYsdCvRP6xrZ3He/FuzHO+Z8E5wuA/pBHxT2Ak4fxi0WtiayLVd4hIN
-	 gVD/nkcSYTMePf+hveYrHU9o/WHDk4UmUjEm5UJsHBjrn0LEttCvrO3fsHVTy1bm47
-	 yk4VWZV2aybRsRHw2NXi0Yc6tXCMgVYp0HlZCJltwlA9v51+zkEPL+dknGDIUUUEpZ
-	 D5oLaS5M2QXUw==
+	b=SZnBJARKJl73lcaMHtHmRm4e1stVo2Gw0o5rg5xFXwPxs6sbCqJenaqBXSontmKFy
+	 fL7eY7MyXtcAIIU1ddGKjBOcfIIu25Qpwb5H4/IUr2HCEuIIO5I2oMleKxaTgatNCk
+	 wyjkEOkfJhjWdLgDkgvDz65nl07h8MpLieI5tFarNUpR3RwR2B1dWKOeHixHvnWFAv
+	 Q/D7iyEurk936SLwaPKudOGnaoq2m2Be2FulQWS2OVtAiaQpY85dS7KCxUEERfZuk3
+	 34aFpACD7xmrcjtoeuRZmk+pdCSBpVz2eHXgN4xRXQEFxwknb1m9dcLZAJ/7IclACt
+	 aQWYRLlVYms2A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rnKkR-00EEqz-EO;
+	id 1rnKkR-00EEqz-Ks;
 	Thu, 21 Mar 2024 15:54:31 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -58,9 +58,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 10/15] KVM: arm64: nv: Reinject PAC exceptions caused by HCR_EL2.API==0
-Date: Thu, 21 Mar 2024 15:53:51 +0000
-Message-Id: <20240321155356.3236459-11-maz@kernel.org>
+Subject: [PATCH v3 11/15] KVM: arm64: nv: Add kvm_has_pauth() helper
+Date: Thu, 21 Mar 2024 15:53:52 +0000
+Message-Id: <20240321155356.3236459-12-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240321155356.3236459-1-maz@kernel.org>
 References: <20240321155356.3236459-1-maz@kernel.org>
@@ -76,62 +76,42 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In order for a L1 hypervisor to correctly handle PAuth instructions,
-it must observe traps caused by a L1 PAuth instruction when
-HCR_EL2.API==0. Since we already handle the case for API==1 as
-a fixup, only the exception injection case needs to be handled.
+Pointer Authentication comes in many flavors, and a faithful emulation
+relies on correctly handling the flavour implemented by the HW.
 
-Rework the kvm_handle_ptrauth() callback to reinject the trap
-in this case. Note that APK==0 is already handled by the exising
-triage_sysreg_trap() helper.
+For this, provide a new kvm_has_pauth() that checks whether we
+expose to the guest a particular level of support. This checks
+across all 3 possible authentication algorithms (Q5, Q3 and IMPDEF).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/handle_exit.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 6a88ec024e2f..1ba2f788b2c3 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -214,12 +214,34 @@ static int handle_sve(struct kvm_vcpu *vcpu)
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3f1c3c91e5c2..a65701b95078 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1335,4 +1335,19 @@ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+ 	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, min) && \
+ 	 get_idreg_field((kvm), id, fld) <= expand_field_sign(id, fld, max))
  
- /*
-- * Guest usage of a ptrauth instruction (which the guest EL1 did not turn into
-- * a NOP). If we get here, it is that we didn't fixup ptrauth on exit, and all
-- * that we can do is give the guest an UNDEF.
-+ * Two possibilities to handle a trapping ptrauth instruction:
-+ *
-+ * - Guest usage of a ptrauth instruction (which the guest EL1 did not
-+ *   turn into a NOP). If we get here, it is that we didn't fixup
-+ *   ptrauth on exit, and all that we can do is give the guest an
-+ *   UNDEF (as the guest isn't supposed to use ptrauth without being
-+ *   told it could).
-+ *
-+ * - Running an L2 NV guest while L1 has left HCR_EL2.API==0, and for
-+ *   which we reinject the exception into L1. API==1 is handled as a
-+ *   fixup so the only way to get here is when API==0.
-+ *
-+ * Anything else is an emulation bug (hence the WARN_ON + UNDEF).
-  */
- static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
- {
-+	if (!vcpu_has_ptrauth(vcpu)) {
-+		kvm_inject_undefined(vcpu);
-+		return 1;
-+	}
++/* Check for a given level of PAuth support */
++#define kvm_has_pauth(k, l)						\
++	({								\
++		bool pa, pi, pa3;					\
++									\
++		pa  = kvm_has_feat((k), ID_AA64ISAR1_EL1, APA, l);	\
++		pa &= kvm_has_feat((k), ID_AA64ISAR1_EL1, GPA, IMP);	\
++		pi  = kvm_has_feat((k), ID_AA64ISAR1_EL1, API, l);	\
++		pi &= kvm_has_feat((k), ID_AA64ISAR1_EL1, GPI, IMP);	\
++		pa3  = kvm_has_feat((k), ID_AA64ISAR2_EL1, APA3, l);	\
++		pa3 &= kvm_has_feat((k), ID_AA64ISAR2_EL1, GPA3, IMP);	\
++									\
++		(pa + pi + pa3) == 1;					\
++	})
 +
-+	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-+		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+		return 1;
-+	}
-+
-+	/* Really shouldn't be here! */
-+	WARN_ON_ONCE(1);
- 	kvm_inject_undefined(vcpu);
- 	return 1;
- }
+ #endif /* __ARM64_KVM_HOST_H__ */
 -- 
 2.39.2
 
