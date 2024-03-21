@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-12410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12412-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C91D2885CB3
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 16:55:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ABB9885CB0
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 16:55:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3E88B232CF
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 15:55:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CD431C22FC0
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 15:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D61812C52B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D57B12C528;
 	Thu, 21 Mar 2024 15:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nnClQDZW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBC7EUGv"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634CB12BE87;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0B712BEB2;
 	Thu, 21 Mar 2024 15:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711036472; cv=none; b=QG3Q4DXm7ygFjRbUNxNeuBFf5GvXEwrlxfKsGyMI11vi/ui+llFR8HgIbNQ/TJmyPjCTcmuyIqZd4XpVsecDOluK4b19PpRcvy0yl62Apjwz03dj8Vp+Hffhpn6B/AgtUYFmTRVPiY7X9zoVhUFYaJfr9CBV7fHcWd0ABbWYTZY=
+	t=1711036473; cv=none; b=L744Y5i1sDo1yegTQMTDl1uHqd+u0b2rNG7SGnm8t+OB73RG/W/A3JrevSSa25taYN+JayHNZb/2GOk+2YA+NUfgMTIqMkGklNO8wBmArsmLogVs54C3mM57DTjb3yJJDjK/9KyxoILBZZa9oJFWriKYPjJCrzEhavxJKpWPhqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711036472; c=relaxed/simple;
-	bh=nuP68np28bnX5e9ek2TaXzYB9gLQsB4wYLjkmlaziwg=;
+	s=arc-20240116; t=1711036473; c=relaxed/simple;
+	bh=xE8hNSFxmpy+AAOQpa+KgTdZLT8PINd+Cx6eo/7x5E0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=k7UhKQBXiCO/SRXZQqTWAuR6AodS1IEjR07NLYkQ1idluuqfkFIpJGtERKTpuw9ivenEOlFeM25wK4r5rMhMpQZ1M57ISQZmGBl8BDujYYtxogd3B/yPrcNTPHqxApoZ6hXvyjx7PhjuuOmj8Mc4La03c4onGv7X+TiXM/rdU20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nnClQDZW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E161C43141;
+	 MIME-Version; b=eqU7nMGJwicOvbT/FzJvqj1X6SAu35kAQEplbeOeQ4F26GqmFfodMts4thlSVIakFVd8FVgMdLNpsVzjuHEfzsah9EcJwk14Vb30qWXQqeQqHNfkINqCcazdvfF3Q/UMc21hPS38rS2urC+4Pv4mN1oQk1fM6C/35JkV+fVzzFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBC7EUGv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEAE0C43390;
 	Thu, 21 Mar 2024 15:54:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711036472;
-	bh=nuP68np28bnX5e9ek2TaXzYB9gLQsB4wYLjkmlaziwg=;
+	bh=xE8hNSFxmpy+AAOQpa+KgTdZLT8PINd+Cx6eo/7x5E0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nnClQDZWyqAwQa9iAdvLpqZsNNFFT4J/rlRnCJITGgHSDaHLjpE9YMNBi04Qk8b9e
-	 LtuBoy+lRd6/uvrpNdgI/saNFzPP2phdXQWMuRJcKzvsJnbNw7P+S99UdFdSsEXahf
-	 aslN++Rareoluak0BnmJHv9hQTxurhX+9nQgu6PVQAxOzMrlme3qci8RtvjRyXubrn
-	 +UgG4pTD+dNs3PrAmrx6j8LPKpaaUMdMLsthbrCN1YHoaBuNDgvtTBTsoEdMyFhHW+
-	 scwMLMA4hPSpW2tKH2XFpXZPx02y0HzgTtJTuJ0G1qPQ4evYrVrHL5gu4RTQrjDp7p
-	 xZxHVSW75qU5w==
+	b=kBC7EUGvEylb3Q9Oz7Mej+5ytDs4Sff40klQ9PmhBXIqckSNFn41iO44oVr4GMnEl
+	 PFdxpCmfOwTc8mc/lcIWCc1pCHbRP+nghS2hflHUO91wei3irPfuFMGWyM5wCm7x3G
+	 MYP8WewX0rmMVzzhtAkikHB6lDZUn/j12mQhmMk52KMsASOIe/qovvC7nuB0bHS0DU
+	 Iir+OEMx9/cjhIn5flNAJmlmWrg6/W7omArY+nruRxeLkig14tFUZyrEb7k+B32GL/
+	 p6PRQE5q8M1bhN7g+d1ReZHiHTOLeit8uQCfcsFSVeyweBSuwc9HVceKffHFpbLKjG
+	 nffKTB2OP3PQA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rnKkQ-00EEqz-CK;
+	id 1rnKkQ-00EEqz-JO;
 	Thu, 21 Mar 2024 15:54:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -58,9 +58,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 05/15] KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
-Date: Thu, 21 Mar 2024 15:53:46 +0000
-Message-Id: <20240321155356.3236459-6-maz@kernel.org>
+Subject: [PATCH v3 06/15] KVM: arm64: nv: Add trap forwarding for ERET and SMC
+Date: Thu, 21 Mar 2024 15:53:47 +0000
+Message-Id: <20240321155356.3236459-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240321155356.3236459-1-maz@kernel.org>
 References: <20240321155356.3236459-1-maz@kernel.org>
@@ -76,103 +76,94 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the HCR_EL2 configuration for FEAT_NV2, adding the required
-bits for running a guest hypervisor, and overall merging the
-allowed bits provided by the guest.
-
-This heavily replies on unavaliable features being sanitised
-when the HCR_EL2 shadow register is accessed, and only a couple
-of bits must be explicitly disabled.
-
-Non-NV guests are completely unaffected by any of this.
+Honor the trap forwarding bits for both ERET and SMC, using a new
+helper that checks for common conditions.
 
 Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
- arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
- arch/arm64/kvm/hyp/vhe/switch.c         | 35 ++++++++++++++++++++++++-
- 3 files changed, 36 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  1 +
+ arch/arm64/kvm/emulate-nested.c     | 27 +++++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c        |  7 +++++++
+ 3 files changed, 35 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index e3fcf8c4d5b4..f5f701f309a9 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -271,10 +271,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 	__deactivate_traps_hfgxtr(vcpu);
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index c77d795556e1..dbc4e3a67356 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -60,6 +60,7 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
+ 	return ttbr0 & ~GENMASK_ULL(63, 48);
  }
  
--static inline void ___activate_traps(struct kvm_vcpu *vcpu)
-+static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
- {
--	u64 hcr = vcpu->arch.hcr_el2;
--
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
- 		hcr |= HCR_TVM;
++extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
  
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index c50f8459e4fc..4103625e46c5 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
+ int kvm_init_nv_sysregs(struct kvm *kvm);
  
--	___activate_traps(vcpu);
-+	___activate_traps(vcpu, vcpu->arch.hcr_el2);
- 	__activate_traps_common(vcpu);
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 4697ba41b3a9..2d80e81ae650 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2117,6 +2117,26 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
+ 	return true;
+ }
  
- 	val = vcpu->arch.cptr_el2;
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 58415783fd53..d5fdcea2b366 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -33,11 +33,44 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
- DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- 
-+/*
-+ * HCR_EL2 bits that the NV guest can freely change (no RES0/RES1
-+ * semantics, irrespective of the configuration), but that cannot be
-+ * applied to the actual HW as things would otherwise break badly.
-+ *
-+ * - TGE: we want the guest to use EL1, which is incompatible with
-+ *   this bit being set
-+ *
-+ * - API/APK: for hysterical raisins, we enable PAuth lazily, which
-+ *   means that the guest's bits cannot be directly applied (we really
-+ *   want to see the traps). Revisit this at some point.
-+ */
-+#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK)
-+
-+static u64 __compute_hcr(struct kvm_vcpu *vcpu)
++static bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
 +{
-+	u64 hcr = vcpu->arch.hcr_el2;
++	bool control_bit_set;
 +
 +	if (!vcpu_has_nv(vcpu))
-+		return hcr;
++		return false;
 +
-+	if (is_hyp_ctxt(vcpu)) {
-+		hcr |= HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB;
-+
-+		if (!vcpu_el2_e2h_is_set(vcpu))
-+			hcr |= HCR_NV1;
-+
-+		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
++	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
++	if (!is_hyp_ctxt(vcpu) && control_bit_set) {
++		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++		return true;
 +	}
-+
-+	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
++	return false;
 +}
 +
- static void __activate_traps(struct kvm_vcpu *vcpu)
++bool forward_smc_trap(struct kvm_vcpu *vcpu)
++{
++	return forward_traps(vcpu, HCR_TSC);
++}
++
+ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
  {
- 	u64 val;
+ 	u64 mode = spsr & PSR_MODE_MASK;
+@@ -2155,6 +2175,13 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	u64 spsr, elr, mode;
+ 	bool direct_eret;
  
--	___activate_traps(vcpu);
-+	___activate_traps(vcpu, __compute_hcr(vcpu));
++	/*
++	 * Forward this trap to the virtual EL2 if the virtual
++	 * HCR_EL2.NV bit is set and this is coming from !EL2.
++	 */
++	if (forward_traps(vcpu, HCR_NV))
++		return;
++
+ 	/*
+ 	 * Going through the whole put/load motions is a waste of time
+ 	 * if this is a VHE guest hypervisor returning to its own
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 15221e481ccd..6a88ec024e2f 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -55,6 +55,13 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
  
- 	if (has_cntpoff()) {
- 		struct timer_map map;
+ static int handle_smc(struct kvm_vcpu *vcpu)
+ {
++	/*
++	 * Forward this trapped smc instruction to the virtual EL2 if
++	 * the guest has asked for it.
++	 */
++	if (forward_smc_trap(vcpu))
++		return 1;
++
+ 	/*
+ 	 * "If an SMC instruction executed at Non-secure EL1 is
+ 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
 -- 
 2.39.2
 
