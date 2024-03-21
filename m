@@ -1,156 +1,151 @@
-Return-Path: <kvm+bounces-12360-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12361-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C59C885610
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 09:51:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C558856A8
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 10:44:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E174E1F221AF
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 08:51:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C1F01F21AA8
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 09:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE884383B5;
-	Thu, 21 Mar 2024 08:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E4C53361;
+	Thu, 21 Mar 2024 09:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="CNUJSkW5"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="SrLB9TdI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8205653E0D
-	for <kvm@vger.kernel.org>; Thu, 21 Mar 2024 08:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A28E446DC
+	for <kvm@vger.kernel.org>; Thu, 21 Mar 2024 09:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711011069; cv=none; b=cLr9Sl+4rAhzXQOrIRTZmVAq8siz/9TiH9mRnYXbsjddjYh3QdXO4CjFHlNlLGDUbZCMvMzDnWoanTK2usFBWwph4ouimwGxrmWOM9GwVnoQSU+HKHyqAJ5p+PB3M8dDDk9Sd4vvEKZ5NrqLiVJSgKroDe/Zh2k2vx0NIrhwwNk=
+	t=1711014257; cv=none; b=HCkQvshgG4wY9CnYExjJbuf3rQNoJmGi6NDWfg69vAZ+i/eAjp9F23DEZeYUjbqjUBN6Sb37BUBolNKuTh9AGNnKrFG7fOE+6pjKXXFE5pm7aOpFPIGBgVsigQIdkdOn7SqKac3Oq8MfHzCehtOKK2fFmJt04ppfuVtJoeILQFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711011069; c=relaxed/simple;
-	bh=Qv0uJqFhMtAx1X6+XG2ureaXkoHplsppJbmPG09HXsM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QiXYK7kCX9+bf+AARmA0gyU8/41vbc4f/8svQQNKGEr3r05Y9578HuJNgcvrSXrEmvsgIN6AW2mssMhpOF90SD0olt/Xropr4vbNCs7Lx9nwq0Q0YwQj0w7e9a5hsh0MRkM5RUEPUhkLqQET+e8YW7FPykQnqhKOfVtSU9v/6nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=CNUJSkW5; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3c3b256ab5eso20313b6e.0
-        for <kvm@vger.kernel.org>; Thu, 21 Mar 2024 01:51:06 -0700 (PDT)
+	s=arc-20240116; t=1711014257; c=relaxed/simple;
+	bh=+BddkWmVb2KxQclyW5gI/MMg+/38KCLwOvq0RB+zoRg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CiZSO0wXeU8tdflmGgs4DLv6HWsDWm3GPsSNestD3Ih8QcPFuWe+bse5a0NKHFPiB40RGJeb03lR4Vt15qt/6EXlZQuJfF2IH2LqOMtwW028/HWFwPm4/kRp+sOcGdUXHcyl6YpELStfT9GR9u1aZNlpcS5mtuc/i73GgIciXZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=SrLB9TdI; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d28051376eso15546281fa.0
+        for <kvm@vger.kernel.org>; Thu, 21 Mar 2024 02:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1711011065; x=1711615865; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gooddata.com; s=google; t=1711014253; x=1711619053; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aqNG2RpJPlr1g6cb+Y3gz6tpiaBtzhG+qVD6/FBVn0g=;
-        b=CNUJSkW5GE0NLx2WDDlZa5mENellXTjS28tHso8Setqg/Oq/YJXk3DHFbdX52mel+Z
-         C7JLamXfQdHk0/0jSnMFPsfia+ZaUzDZcQFfWwajSSUrhgrhI8OBoAWtPgA6tVqEzov3
-         /z0/FPFMzefB1RZ7Owy7Z1nD0M4WelocyCpcR9zRbwcE2HFcqYYnty/vXmQ3veW+aPJv
-         xwjybwou5bQeqz8KrUm6U3Pq1PLUkin9j1q1pVpqqbeCa3vl5LDVCzwI1/DZ6EKEYgNS
-         BH+exQUu0Zpj5tdJ24/g2jMml80h0tQ383DCOmigJ1earr98MO7es4wfuOb8+8MKWAyx
-         hO1Q==
+        bh=7bnysIZLRHuJugMNjksHZ7KgXRP8kfnV+ELbUklK0tQ=;
+        b=SrLB9TdIyj9HcCaj0X+Zn/aLZYsDDZf7O0uwLhSDuVfyjGTFcYh1O7x7oVh5zrZ0GB
+         2ZyeDI30c4f4vGNiSYHExKSEE/UIOdWA2gc/PgVXaROnsB/Afu2v+Mk6TXKa4TMYal1L
+         1KEq/waaaGrDznKytiA2CHOZMSsHZyl7YL6Mc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711011065; x=1711615865;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1711014253; x=1711619053;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aqNG2RpJPlr1g6cb+Y3gz6tpiaBtzhG+qVD6/FBVn0g=;
-        b=VZU7ZR9SZlPeCZgEPJ6qLyk+8iM2ZKBhgVUKcO6xmjhWMAMWB/eSZHxUsNy3ZoQaxb
-         rBEgQMRPxmWXrIIzj/ALW2pbNUU+nwFvP/aco02Le70o0p7PwYoVX1YYl2qfEzb8MTEX
-         Si9Wi5yeXyWfMPgjoszkK/KckWqQ7ijUTJ3kfznmO8jI20D5bsZZWMOE3Oo6ypFKWm89
-         96sFt/BJms3gSBZmbT+DQdpuUZ4VmCDW0BGK8QRfKCOk8EcwUmCaw3xrw/9ch9S7DPJm
-         WxVZdqta+PClP6H+RNH7DWqcigUHXXTVhJMlFtFeq9CDXNxcO/T68TwHGJkbD7pvyZaA
-         t98w==
-X-Forwarded-Encrypted: i=1; AJvYcCWSgEf2Ytv5LHQJZILujWfSHwt65IBxh3/y7L2SIEipRgGx7rPFZm3uiuvUpuSBbXClqemzvYwCqiNbNfXnnl7KnXYv
-X-Gm-Message-State: AOJu0YzxjLTxKbyvy60HY8F5mZ/jG0IXng4pwZQ48e3bijT5w/VeUtiH
-	w+depacbxSUbLCYt4q19oJSIqEYYPmsicMCJWFIk3WJbyZktQE4EC3N+MgtjJ+0=
-X-Google-Smtp-Source: AGHT+IHwDM9ixAq9INkO3i418iZWmEpmXTd0fk8UuLCRGi37vLFEzQGRGixGXgfcb4sMkROFJd9img==
-X-Received: by 2002:a05:6808:2102:b0:3c3:980d:3700 with SMTP id r2-20020a056808210200b003c3980d3700mr1825504oiw.8.1711011065475;
-        Thu, 21 Mar 2024 01:51:05 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id x3-20020a544003000000b003c3753dd869sm2275409oie.58.2024.03.21.01.51.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 01:51:05 -0700 (PDT)
-From: Anup Patel <apatel@ventanamicro.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH 2/2] RISC-V: KVM: Fix APLIC in_clrip[x] read emulation
-Date: Thu, 21 Mar 2024 14:20:41 +0530
-Message-Id: <20240321085041.1955293-3-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240321085041.1955293-1-apatel@ventanamicro.com>
-References: <20240321085041.1955293-1-apatel@ventanamicro.com>
+        bh=7bnysIZLRHuJugMNjksHZ7KgXRP8kfnV+ELbUklK0tQ=;
+        b=xM8PLRQqJpxIltcNBkHjvo7Q+nHXRi9k97vT0NKIGGwTkp3CG1D+c4ZyX6jGiQnGqz
+         PBkovOEx9LXNKn3yIPJeVpJ4cXyve3unJdszfFC+78DM3ojG6wQjzC+rQ+6Q8gjsPmPS
+         eynODKYhw8W0DGTynZ7/NQxugOhTA99KWMymvonKxkKvqrJyqLTOuUn45YEbw+/V2ns5
+         1+mlyr0i0G51IKcbZNPUo9a0AVYoK6mGrwbzisTXlRxz/fYmeJjB4+m4wn7Bf+A1d1E5
+         CUBOVrKo74oXyRXXvHY9l+HgsaPTYYMWEUT3IFfmQofPExbD7bfF/2qMaX+CO9d6eW8f
+         7ULw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwpXzk131zZkl68rNTEJPKNYK33chShbUFT10uv9409p9zMV/jRMUJkcIHgOBWZ2656ctJk/ITwHdT2x3F4/jmguea
+X-Gm-Message-State: AOJu0Yy6V7DCdfDsEyFobgIKp6+2tq4zXKaAyuTGMKfbnTivv7Pg1KRA
+	Wv2Z6+X8dM2hua9+oZD2wnIs7vJdHYjwoSMuTAkKXtQdD7SGauG07gB6LO/UhnHdBlEnYpFcA1P
+	npHkX0KswU2ov+2hrJ3XS+/xFgScj+G9aX6Sk
+X-Google-Smtp-Source: AGHT+IEuiJ3gPiBp0utLLCSVFQZk+rtPf3Lsyn4LSIs5SyTRd+I+8Eds85ZIqUIGPgvT//dxXReBQprBN392uYZNzpA=
+X-Received: by 2002:a05:651c:3cf:b0:2d4:132b:9f21 with SMTP id
+ f15-20020a05651c03cf00b002d4132b9f21mr1205215ljp.6.1711014253330; Thu, 21 Mar
+ 2024 02:44:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
+ <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+In-Reply-To: <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+From: Igor Raits <igor@gooddata.com>
+Date: Thu, 21 Mar 2024 10:44:01 +0100
+Message-ID: <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Jason Wang <jasowang@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	Stefano Garzarella <sgarzare@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The reads to APLIC in_clrip[x] registers returns rectified input values
-of the interrupt sources.
+Hello Jason & others,
 
-A rectified input value of an interrupt source is defined by the section
-"4.5.2 Source configurations (sourcecfg[1]–sourcecfg[1023])" of the
-RISC-V AIA specification as:
+On Wed, Mar 20, 2024 at 10:33=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
+rote:
+>
+> On Tue, Mar 19, 2024 at 9:15=E2=80=AFPM Igor Raits <igor@gooddata.com> wr=
+ote:
+> >
+> > Hello Stefan,
+> >
+> > On Tue, Mar 19, 2024 at 2:12=E2=80=AFPM Stefan Hajnoczi <stefanha@redha=
+t.com> wrote:
+> > >
+> > > On Tue, Mar 19, 2024 at 10:00:08AM +0100, Igor Raits wrote:
+> > > > Hello,
+> > > >
+> > > > We have started to observe kernel crashes on 6.7.y kernels (atm we
+> > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
+> > > > have nodes of cluster it looks stable. Please see stacktrace below.=
+ If
+> > > > you need more information please let me know.
+> > > >
+> > > > We do not have a consistent reproducer but when we put some bigger
+> > > > network load on a VM, the hypervisor's kernel crashes.
+> > > >
+> > > > Help is much appreciated! We are happy to test any patches.
+> > >
+> > > CCing Michael Tsirkin and Jason Wang for vhost_net.
+> > >
+> > > >
+> > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
+> > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
+> > > >    E      6.7.10-1.gdc.el9.x86_64 #1
+> > >
+> > > Are there any patches in this kernel?
+> >
+> > Only one, unrelated to this part. Removal of pr_err("EEVDF scheduling
+> > fail, picking leftmost\n"); line (reported somewhere few months ago
+> > and it was suggested workaround until proper solution comes).
+>
+> Btw, a bisection would help as well.
 
-    rectified input value = (incoming wire value) XOR (source is inverted)
+In the end it seems like we don't really have "stable" setup, so
+bisection looks to be useless but we did find few things meantime:
 
-Update the riscv_aplic_input() implementation to match the above.
+1. On 6.6.9 it crashes either with unexpected GSO type or usercopy:
+Kernel memory exposure attempt detected from SLUB object
+'skbuff_head_cache'
+2. On 6.7.5, 6.7.10 and 6.8.1 it crashes with RIP:
+0010:skb_release_data+0xb8/0x1e0
+3. It does NOT crash on 6.8.1 when VM does not have multi-queue setup
 
-Fixes: 74967aa208e2 ("RISC-V: KVM: Add in-kernel emulation of AIA APLIC")
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- arch/riscv/kvm/aia_aplic.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+Looks like the multi-queue setup (we have 2 interfaces =C3=97 3 virtio
+queues for each) is causing problems as if we set only one queue for
+each interface the issue is gone.
+Maybe there is some race condition in __pfx_vhost_task_fn+0x10/0x10 or
+somewhere around? We have noticed that there are 3 of such functions
+in the stacktrace that gave us hints about what we could try=E2=80=A6
 
-diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
-index 5e842b92dc46..b467ba5ed910 100644
---- a/arch/riscv/kvm/aia_aplic.c
-+++ b/arch/riscv/kvm/aia_aplic.c
-@@ -197,16 +197,31 @@ static void aplic_write_enabled(struct aplic *aplic, u32 irq, bool enabled)
- 
- static bool aplic_read_input(struct aplic *aplic, u32 irq)
- {
--	bool ret;
--	unsigned long flags;
-+	u32 sourcecfg, sm, raw_input, irq_inverted;
- 	struct aplic_irq *irqd;
-+	unsigned long flags;
-+	bool ret = false;
- 
- 	if (!irq || aplic->nr_irqs <= irq)
- 		return false;
- 	irqd = &aplic->irqs[irq];
- 
- 	raw_spin_lock_irqsave(&irqd->lock, flags);
--	ret = (irqd->state & APLIC_IRQ_STATE_INPUT) ? true : false;
-+
-+	sourcecfg = irqd->sourcecfg;
-+	if (sourcecfg & APLIC_SOURCECFG_D)
-+		goto skip;
-+
-+	sm = sourcecfg & APLIC_SOURCECFG_SM_MASK;
-+	if (sm == APLIC_SOURCECFG_SM_INACTIVE)
-+		goto skip;
-+
-+	raw_input = (irqd->state & APLIC_IRQ_STATE_INPUT) ? 1 : 0;
-+	irq_inverted = (sm == APLIC_SOURCECFG_SM_LEVEL_LOW ||
-+			sm == APLIC_SOURCECFG_SM_EDGE_FALL) ? 1 : 0;
-+	ret = !!(raw_input ^ irq_inverted);
-+
-+skip:
- 	raw_spin_unlock_irqrestore(&irqd->lock, flags);
- 
- 	return ret;
--- 
-2.34.1
+>
+> Thanks
+>
 
+Thank you!
 
