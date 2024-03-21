@@ -1,197 +1,168 @@
-Return-Path: <kvm+bounces-12375-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12376-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFEC98858F9
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 13:21:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADE75885906
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 13:23:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FF2A1C2132F
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 12:21:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09DA7B21949
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 12:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF2A75811;
-	Thu, 21 Mar 2024 12:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DF1762C0;
+	Thu, 21 Mar 2024 12:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="n9SEt14e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKVtGhTu"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2060.outbound.protection.outlook.com [40.107.102.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B77776036;
-	Thu, 21 Mar 2024 12:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711023666; cv=fail; b=jfyC+IPk8wAA9MzfaIdHKnIMhqM8KZ2dsE2O3eCk+mTTT+N9r2QPJg8JJR7hqtoIVNM51R6AqdfEWM8WOReujHffH5W44DpGaxnNRB2hHD7xbmlPvLqN1tSUoHK40VfOevVAcK9/cmKBMRmPzAAfKvlmU3QcdcZ9RLdOPyQq7Cs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711023666; c=relaxed/simple;
-	bh=jQPd6cvsVu4mQktSqBfgcngJrfIVtb/wBXVFYZ9GB64=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ST6c+IhgmZ6y73JyjvJT6lOxuCH5N5vnuml65+0vzujAKxSicnpMtckp217yDhJ1Qu6eAMtOmOR/85ROANJ4Zg3XK8IM4Hl6CjFyNTS4z/tGoWykwT8Gy6gnUXhhUI7K8hQuUMSGndKTBjJPuGOsE9YUnDnhwoZv4pIVrCQvI7U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=n9SEt14e; arc=fail smtp.client-ip=40.107.102.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cC8UEQcqAKhpJXfGmiY1NL5KGD2DOALOh8owgQ1kGepnDQcNmRfM+2BYSRPfhmjHUhcNRpKOFkHyI0F4G+TPI0Pi9b/EJ9NHGtwhNQSiW+5sZOLGy6c5d9JichG8JW8p/RZXE6dPPZHaooYLPvESy12nSsfhMdPWp4SOmRMHTqSKbAXBtyuhFCljyhdg67DzoaANuo3qpoMoSW7lAc1H0XWThyKZtY4hHEpMHYxmnRsq3ET0qDTz1iPyAlZcMFTcsO+2v8E8AoHDStCOD4lCfBiiflF7y/p+OS9Qkr/OpPcTgVDLwgJzTqKEn9uw2jVwbQ7OTRTBY3FcWsus5BdXeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LT8nA4i0LOk5junzXH5nk+eGkTi7XKyhTzr6VFE9vCI=;
- b=hhVhcasvSADADVGK1nNKIZ+8R5bTqbtX3ErszqF5jbIsre6Vauf06uZUMSm8iK9TiL0cw8jbfIIE+ctuIw6SA74j0arv9KkNKQkpT012S4eg2z32Uy9U0g4fnbvSmlCtJC1A5AKG6ath0GNUWT/Epeo4RGc0wQCaXXZqF/blIb6L/P7ddpBRKGttq9r/2wEDFCLocFnMwmfqa3U+60hxlbyfEK9Icye06KNY3RgP18c4HL5xIEJnW0/gsIe4QlUXs2vDH3U/GTRVGEuwohPpWN8vdH+9916tvmt1b7P6+Jwp5ogxqg+Skk39iQHCfI82PmSA5rNBn6+/eT6rOK+Tcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LT8nA4i0LOk5junzXH5nk+eGkTi7XKyhTzr6VFE9vCI=;
- b=n9SEt14ehqdlXCbRrcaESHK7qDSoqiwspTn2ABikmIjj+5o+OBSAFyExhu8jb2NXyiemE2cRrMVApcjRgBO8yt04TNjSZ/iMSqO2SWsix1mYbj7jeiAAjXPn/Ck1Qg7tbS6bkQ6ORIUyglaXogDtwu74HTycpbtBKZxAXcge76dvC+sJgiJ0L3A9Lvfe+fkEmVFIcNef1tc2xBSF7kif+ybomXWBK7mmEYxO+dZZsoKC47JPVBPWF7d4PlP+GU6AFk73M8Fo25rA8h+tGvw/4ITG5l57E6cLE+mueistEaWR0HKDow4d0pBnLFQyTFNzqlG8GTg5XC3bqwWOZbkcTA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by SJ2PR12MB8689.namprd12.prod.outlook.com (2603:10b6:a03:53d::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.29; Thu, 21 Mar
- 2024 12:21:00 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7386.030; Thu, 21 Mar 2024
- 12:21:00 +0000
-Date: Thu, 21 Mar 2024 09:20:59 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Yi Liu <yi.l.liu@intel.com>
-Cc: Baolu Lu <baolu.lu@linux.intel.com>,
-	"Tian, Kevin" <kevin.tian@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-	"peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"Zeng, Xin" <xin.zeng@intel.com>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 1/8] iommu: Introduce a replace API for device pasid
-Message-ID: <20240321122059.GF159172@nvidia.com>
-References: <c831bf5e-f623-402d-9347-8718987d1610@intel.com>
- <BN9PR11MB52766161477C2540969C83568C242@BN9PR11MB5276.namprd11.prod.outlook.com>
- <585423de-9173-4c97-b596-71e1564d8b4e@intel.com>
- <87a2be0d-6a24-4ca8-be30-35287072dda4@linux.intel.com>
- <749b23c7-ab0e-42b4-9992-e1867fc7d4d7@intel.com>
- <20240318165247.GD5825@nvidia.com>
- <13645a9f-239a-46c9-bde2-a1d5c365df4f@intel.com>
- <20240320123803.GD159172@nvidia.com>
- <65c517a9-72dc-4342-b2f2-c3c44735bfad@intel.com>
- <7a4777dd-2359-4bcd-839e-c2d0b5f6be14@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7a4777dd-2359-4bcd-839e-c2d0b5f6be14@intel.com>
-X-ClientProxiedBy: BLAPR05CA0047.namprd05.prod.outlook.com
- (2603:10b6:208:335::28) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1749428379;
+	Thu, 21 Mar 2024 12:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711023790; cv=none; b=dN7MyVKnVIX2mj0L6iuoF7lrOTAhtbu9Fq4qxuOLka2d/jtEVKDcJjYkN0w9OB1MDNp206kfI9eG+LAyE+nveq2qGMZaLbN3pL1VhSvPYLTBuQhqcRgn/Ur/NPl6vuezmboZmz7TI/u4z8ybhK4/PPejmseC0cilI3HfDWGWR3s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711023790; c=relaxed/simple;
+	bh=zPQPtG8FlPDzdRl/IlTPYX+93JqW3jbsX1nFS16TQpY=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YpOm4mMaNhk5M1R2reSmgbgeFLgjvQv+01s6Ec6NIFNktM8POSLQXLEHkNJ0XsJWPCzFZLolIMHzAxShL7jsfJWU0Iv+UF9P5iocYK9zOr011gCtWSCvk0SVd9MywuVLUDsHhrA/UiX0sqpWuinUapmZxl8wrxwFAke5WLqC3cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKVtGhTu; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a46f97b8a1bso117075866b.0;
+        Thu, 21 Mar 2024 05:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711023787; x=1711628587; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VPsUYtU0/oIu1g6pXqWAWl6e/kRaRRBG+QVumvEzpho=;
+        b=PKVtGhTu7kJJS1v90wkTRH0VMeTi1VWGMMyno2B5iNh/m7Aoy8en/1s9uuBHFjZvDD
+         ckFCnoJozydgPRDVPSkaBYr+LcUfcRKk3SlaXwmjLWtPY5n3gWv0pT/5gyGZuGqVUUKH
+         /5YsZ4q/qF1e6oB0tJd7+mNynIOkRVhvIrLG7pKF+wZ/awR9Og3Yl3e4PbEzhLyuYRtl
+         quEXEb8/BCaP8TcgEfgnfojaJcv/R4g0+CYawfP8Ja6QEnk1ymaa9V39Y+GOuJBjro/8
+         S+4xthJvr7DwtJ4bGTA91tX8AcBgBnGvDsHecDm0KQJP+xxmve/oSKZwV+mppTYwXJfX
+         PzkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711023787; x=1711628587;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VPsUYtU0/oIu1g6pXqWAWl6e/kRaRRBG+QVumvEzpho=;
+        b=jHfWAQMoalrfD71HCCLGAcRd2wtBr5y3g8q4HQisLYpIPRVmLG5sqK+ozFf7dZxD0y
+         aqCn+SX5Jjol0FSgQ1TGbF5gKH7+hJY3IJ8vD6xtjPyNv1RkhPaSgpfHLS2syxEF9gTV
+         XBZd85Tou+HXi9T4XfGaFFRoDboZw6k500hLPDHy9jEAn43vmklgXG2H8KHlXAyH3tfn
+         IbD23WcPXC8tuOd+rDWB+TYfcP2CMJTt2ZVKFZ67ZLLV8u7By7tNZ3VD9x1NNUPMdKRg
+         q4tm7Vcll6D9lYhpmfMm8ONS4+Djj+znytVkkrcQYU7w3TJFaZKL1ZLXQhMZmNCMrPqf
+         Rg3g==
+X-Forwarded-Encrypted: i=1; AJvYcCX1a0dwZuQSPH/dioimdXKeVVt2FnkMkbH2h9EXRZ9xdtFhWeT4F3z8gs6d3WgN8EqV03KZD9S75trRD5LUxGP3xhWbazRKZMfmNuBWVzAmn12iQdRYDUWtcWCGYnQznrWp
+X-Gm-Message-State: AOJu0YwCGHRiXobez0myGL8JBMdrHEu1FtyLJRzXYO++Dslb4UWeRYua
+	mcUQRUsonrhW8JbvRaksdbFkKRua5eHo7zSh7Wo1tzMPs7DTn1iG
+X-Google-Smtp-Source: AGHT+IEzDCrv2Y2A3UeDXzKt7t5e/ypEKGDj3d7eSdRbJ6MGDn65UZ9b0bq9orAPSjMTHBB+6+O4kQ==
+X-Received: by 2002:a17:906:280f:b0:a46:d6f7:e82c with SMTP id r15-20020a170906280f00b00a46d6f7e82cmr5898972ejc.22.1711023787063;
+        Thu, 21 Mar 2024 05:23:07 -0700 (PDT)
+Received: from bxlr ([62.96.37.222])
+        by smtp.gmail.com with ESMTPSA id lg21-20020a170906f89500b00a46cc25b550sm4129120ejb.5.2024.03.21.05.23.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Mar 2024 05:23:06 -0700 (PDT)
+From: Mikhail Malyshev <mike.malyshev@gmail.com>
+X-Google-Original-From: Mikhail Malyshev <mikem>
+Date: Thu, 21 Mar 2024 13:23:04 +0100
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Mikhail Malyshev <mike.malyshev@gmail.com>, jgg@ziepe.ca, 
+	yi.l.liu@intel.com, kevin.tian@intel.com, tglx@linutronix.de, 
+	reinette.chatre@intel.com, stefanha@redhat.com, abhsahu@nvidia.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/1] Reenable runtime PM for dynamically unbound devices
+Message-ID: <23maxefvqgcelvlpckq6jmnzqeo5e3j7ku2pquykwvupgzyl6k@f6tt4wtzsxnj>
+References: <20240319120410.1477713-1-mike.malyshev@gmail.com>
+ <20240319085011.2da113ae.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SJ2PR12MB8689:EE_
-X-MS-Office365-Filtering-Correlation-Id: c0d5742d-4024-4f24-33af-08dc49a15e5a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	VwPUh74zcyOir6DFPClVxZFKgm6l8KhFwvb93BWMlGc1GpprObBqMXMDeHnfual6Fu11hvtEDMmEe4YMh/SlJfrb/R2od9jpGOC3U1ubZsdXGHzT7fylR8wZhF6a44LHYl34uuMiXaaZne+wMuVGaHd+sc5w69WZECryMTrblix2iVaIap/tZHBLfg5gp2RopdASJoMakeIMdY8WmIlRNJJJ7+iljAp2CwsxDhF2uI9gZlIu+82reMef3N43yzGi/1/WEykY8+TUnxiaLTApDPDTlXCgxW776l3UY6Frum/rUot80V8s973mf3bOC85mBNejYJXAY6TZDN72W9mDqo/FjWmGGuqipDbsqcwIY3SnDK/Cv0KnTXewCvCkShJ7m9bE2+gDS+QDlZdET80aKuMniDwXgdVy39ypsc762RIe61YiEpH/KEmWuFr0ijPJbPeRkqzFIF7n9MLGSI3BuCYvt5FS6rG802jpBMXxjCo6ruKSw75STZfUsKVk5pYCmNMiE3Pq3bQEyWPCspydgfzBbNToZt8+/IaPmJyz7G0jBa2NlVu7tEQ830TN7n82B3uSDMKLZ5FSkOoOCh9kxBIwC2LzO3x5qY56Lhh4C83lIU9yt5jDjEsSc3mLehlCIjUZ+MQOnHs1qmJUVt9OVxwrX7gDLPMHbryWH1AV7nw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7zWrlVUZyxNYv7TY/qnbzek2HMFETLZ/Kh4rRtLn5TB0ZM7G/7Yhh5vans7x?=
- =?us-ascii?Q?scHwusie6tucSdOy1yWDPgEbczh5wfh1OVZFMa9yqT8mF3fgTMPb47NSGVHN?=
- =?us-ascii?Q?JYeMZqFnBAy1EKKfT2nwzBBKHFppUXlhsSIvrgIUdEnwGO+I6AcUM9RaipOM?=
- =?us-ascii?Q?9kNm59lrlBf+JtqoYp2ZykRr6sXXULSODOWraTL82GfrHd12PG/Z/PWz3KXc?=
- =?us-ascii?Q?RQXNaj0QhdmmCn7GnV1RhSkxYBzPKFaCrC8FYv3GSR1UdLBTKYziedE4RbwN?=
- =?us-ascii?Q?5TSy24h6zGvRE1GzHroO04A/OfMNEDX809Z5RxCeA/ZGmKzpNl7EoEyuZ2R8?=
- =?us-ascii?Q?4lDSKKmM6HEPpA3J6C/vVcr0vfwWTfA+C70G2KOKAsVPOlvwP58a2fWrrEWS?=
- =?us-ascii?Q?Z2b91y4AWOm2RQfWntpXDluRGpwpL4GixAZc5hPruS7Mcoriu2VvQ1w73nXN?=
- =?us-ascii?Q?jBQJTykxV/fBVEs+o4COmstn/hNmMAc7mDbevizymJLkmHK4tKBCNAjm6KW7?=
- =?us-ascii?Q?eRoCw/EFCUy8LSC42vHHjcOgNQgDJginBiU8goB4vXo6r3MNeHcWlmWwqerQ?=
- =?us-ascii?Q?4M0skb24uPns7XAOxUPr0+YYL/InDBLNrL95/kFPsHP+3/uX517t2LDv66St?=
- =?us-ascii?Q?A0mYo21z00/KIKPJ0ZrFDij3JyQs7GUXzFe9lJpzH/weO+7df+RGTf1GONqe?=
- =?us-ascii?Q?7DAXOORGPacvlh2srtCc5Sl4MS1opD6KPxdWC+c5NkSfc50YU7xyWOZgo0pk?=
- =?us-ascii?Q?Q4KkQmaNI5IScCEolRLkL/C4U7XhsOQahgrnKAz1sMq1m9XeLjQRvtG6Pxre?=
- =?us-ascii?Q?jXLs00HZ4SX/O5qUddbmg0U1uz01FVmDv+SN6sye2mAy8lzEvrbL3WP4+Km9?=
- =?us-ascii?Q?B0ekQKrRLVaMG9+P3e3fAXKoZWW8qa/OUQB+3bzg/W6h/VtUPs9f2HbsKxp8?=
- =?us-ascii?Q?MPxY237fGf9q+BMLOCeJl/1Pc8mNdfuFQubVxYN+S17xH2BGNg1v9GchZXEp?=
- =?us-ascii?Q?yAV3iC7fos8WRO2kHdyTVZ0HPeclT0ULe7gWdM3fNtf3kGiV/KQLVRthLIkJ?=
- =?us-ascii?Q?u1RT4ydfytDf0UAVmYIFTXMV7Yb5z3q3Tn4tdK736kOr+TIdeqHiHNnZuY1o?=
- =?us-ascii?Q?VLkIVmpRDZJxHxK84ajoDOXo/3ikKxXi0EMuQcCqn07lMqdowBCXZ9InLIRt?=
- =?us-ascii?Q?95e4Zu7Tiit0NU745j61mIE716N4A+X0qPSJoIpDkKPYNSbpCij5J9NYUgOo?=
- =?us-ascii?Q?as5Ku2uzWaG3njFNQrubckEfusc8qlWrEdP39dusi6z1yg5K1TmWMF7iW0gr?=
- =?us-ascii?Q?4qAL2SqyHFYNJFd+y2I1ce6QYq7xjVBUmmk6Kqd//NyO6+bd9X/bKlsdaNyt?=
- =?us-ascii?Q?QSKmbNzMBazGcSPli44PM6bnFWbkz6b24GGclq2sH28bi6tZuB+KCDK8MpQF?=
- =?us-ascii?Q?RnsPVa2i4hNXSYPo3Swssvjz3feZSv4+vNL5XNRjYjTB6RMDhHpS09SKmVyb?=
- =?us-ascii?Q?8Tdll1v6la+3+WUIOFJPR1i+F/pPK8Hx+cct4Y+oEdkorV6hmxNra0tTuMqV?=
- =?us-ascii?Q?4DDIZmCMZqDV/22SxmYUUd57fuqPh8tiadviIAnR?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c0d5742d-4024-4f24-33af-08dc49a15e5a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2024 12:21:00.2374
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DzOUFdPR9Mpb3auK80b61qne9uemaiYPO8MvN7CUqyU4Y3cbS2n5NqrdohcqoEwu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8689
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240319085011.2da113ae.alex.williamson@redhat.com>
 
-On Thu, Mar 21, 2024 at 07:26:41PM +0800, Yi Liu wrote:
-> > yes, the correct way is to undo what have been done before the fail
-> > device. However, I somehow remember that pasid capability is only
-> > available when the group is singleton. So iterate all devices of the
-> > devices just means one device in fact. If this is true, then the
-> > current code is fine although a bit confusing.
-
-Platform devicse don't have that limitation.. It is PCI only.
-
-> > > And the whole thing is easier to reason about if an input argument
-> > > specifies the current attached domain instead of having the driver
-> > > read it from the xarray.
+On Tue, Mar 19, 2024 at 08:50:11AM -0600, Alex Williamson wrote:
+> On Tue, 19 Mar 2024 12:04:09 +0000
+> Mikhail Malyshev <mike.malyshev@gmail.com> wrote:
+> 
+> > When trying to run a VM with PCI passthrough of intel-eth-pci ETH device
+> > QEMU fails with "Permission denied" error. This happens only if
+> > intel-eth-pci driver is dynamically unbound from the device using
+> > "echo -n $DEV > /sys/bus/pci/drivers/stmmac/unbind" command. If
+> > "vfio-pci.ids=..." is used to bind the device to vfio-pci driver and the
+> > device is never probed by intel-eth-pci driver the problem does not occur.
 > > 
-> > yep, will correct it as a fix patch.
+> > When intel-eth-pci driver is dynamically unbound from the device
+> > .remove()
+> >   intel_eth_pci_remove()
+> >     stmmac_dvr_remove()
+> >       pm_runtime_disable();
 > 
-> Hi Jason,
+> Why isn't the issue in intel-eth-pci?
 > 
-> It appears there are two solutions here.
+> For example stmmac_dvr_remove() does indeed call pm_runtime_disable()
+> unconditionally, but stmmac_dvr_probe() only conditionally calls
+> pm_runtime_enable() with logic like proposed here for vfio-pci.  Isn't
+> it this conditional enabling which causes an unbalanced disable depth
+> that's the core of the problem?
 > 
-> First, only undo the devices that have set_dev_pasid successfully in
-> the __iommu_set_group_pasid(), so the problematic
-> __iommu_remove_group_pasid() call at line 3378 [1] would go away.
-> This also makes the helper more self-contained. Draft patch in [2]
-> 
-> Second, pass in the domain to remove_dev_pasid(). Draft patch in [3]
-> 
-> Either of the above two should be able to solve the mistake you mentioned.
-> BTW. They are orthogonal, so it's also possible to apply both of them.
-> Which one is your preference then?
+The common code in the stmmac driver is used for both PCI and non-PCI
+drivers and this code doen't handle this correctly. That condition is
+actually wrong
 
-I would do both because I also think it is not nice that the drivers
-always have to have the boiler plate to read the xarray in their
-remove..
+> It doesn't seem like it should be the responsibility of the next driver
+> to correct the state from the previous driver.  You've indicated that
+> the device works with vfio-pci if there's no previous driver, so
+> clearly intel-eth-pci isn't leaving the device in the same runtime pm
+> state that it found it.  Thanks,
+yes, I agree. I was confused by a number of driver calling
+pm_runtime_disabe in their remove() function but those are not PCI
+drivers. Unfortunataly runtime PM documentation is not very clear on
+this topic. I'll submit another patch for the driver. Are there any
+subsystems other than PCI that call pm_runtime_enable/disable? Right now
+my patch for the driver do not call them only for PCI case.
 
-Jason
+BR,
+Mikhail
+> 
+> Alex
+> 
+> > Later when QEMU tries to get the device file descriptor by calling
+> > VFIO_GROUP_GET_DEVICE_FD ioctl pm_runtime_resume_and_get returns -EACCES.
+> > It happens because dev->power.disable_depth == 1 .
+> > 
+> > vfio_group_fops_unl_ioctl(VFIO_GROUP_GET_DEVICE_FD)
+> >   vfio_group_ioctl_get_device_fd()
+> >     vfio_device_open()
+> >       ret = device->ops->open_device()
+> >         vfio_pci_open_device()
+> >           vfio_pci_core_enable()
+> >               ret = pm_runtime_resume_and_get();
+> > 
+> > This behavior was introduced by
+> > commit 7ab5e10eda02 ("vfio/pci: Move the unused device into low power state with runtime PM")
+> > 
+> > This may be the case for any driver calling pm_runtime_disable() in its
+> > .remove() callback.
+> > 
+> > The case when a runtime PM may be disable for a device is not handled so we
+> > call pm_runtime_enable() in vfio_pci_core_register_device to re-enable it.
+> > 
+> > Mikhail Malyshev (1):
+> >   vfio/pci: Reenable runtime PM for dynamically unbound devices
+> > 
+> >  drivers/vfio/pci/vfio_pci_core.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> > 
+> > --
+> > 2.34.1
+> > 
+> 
 
