@@ -1,151 +1,146 @@
-Return-Path: <kvm+bounces-12361-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12363-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C558856A8
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 10:44:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4A5885735
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 11:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C1F01F21AA8
-	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 09:44:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B605E1F21DB5
+	for <lists+kvm@lfdr.de>; Thu, 21 Mar 2024 10:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E4C53361;
-	Thu, 21 Mar 2024 09:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B84A56B69;
+	Thu, 21 Mar 2024 10:15:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="SrLB9TdI"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cW+DnKQG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A28E446DC
-	for <kvm@vger.kernel.org>; Thu, 21 Mar 2024 09:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009415674D;
+	Thu, 21 Mar 2024 10:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711014257; cv=none; b=HCkQvshgG4wY9CnYExjJbuf3rQNoJmGi6NDWfg69vAZ+i/eAjp9F23DEZeYUjbqjUBN6Sb37BUBolNKuTh9AGNnKrFG7fOE+6pjKXXFE5pm7aOpFPIGBgVsigQIdkdOn7SqKac3Oq8MfHzCehtOKK2fFmJt04ppfuVtJoeILQFk=
+	t=1711016146; cv=none; b=u45pqDKFLiVt9A/TElaoAOJtgNMVdBLMuLq1ieQCY8XVTBe2AdwZEy8h/97PnTuwe0mPjnUXtgAjsF+3sUOlv6Ant5C2/P05YkXZVaGaQCmcCabhol/6j6iRK9Shnid9U5mgRq3LX0W46NaAsj3Kll29nFm/od4X/BzTaV90b+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711014257; c=relaxed/simple;
-	bh=+BddkWmVb2KxQclyW5gI/MMg+/38KCLwOvq0RB+zoRg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CiZSO0wXeU8tdflmGgs4DLv6HWsDWm3GPsSNestD3Ih8QcPFuWe+bse5a0NKHFPiB40RGJeb03lR4Vt15qt/6EXlZQuJfF2IH2LqOMtwW028/HWFwPm4/kRp+sOcGdUXHcyl6YpELStfT9GR9u1aZNlpcS5mtuc/i73GgIciXZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=SrLB9TdI; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d28051376eso15546281fa.0
-        for <kvm@vger.kernel.org>; Thu, 21 Mar 2024 02:44:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1711014253; x=1711619053; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7bnysIZLRHuJugMNjksHZ7KgXRP8kfnV+ELbUklK0tQ=;
-        b=SrLB9TdIyj9HcCaj0X+Zn/aLZYsDDZf7O0uwLhSDuVfyjGTFcYh1O7x7oVh5zrZ0GB
-         2ZyeDI30c4f4vGNiSYHExKSEE/UIOdWA2gc/PgVXaROnsB/Afu2v+Mk6TXKa4TMYal1L
-         1KEq/waaaGrDznKytiA2CHOZMSsHZyl7YL6Mc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711014253; x=1711619053;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7bnysIZLRHuJugMNjksHZ7KgXRP8kfnV+ELbUklK0tQ=;
-        b=xM8PLRQqJpxIltcNBkHjvo7Q+nHXRi9k97vT0NKIGGwTkp3CG1D+c4ZyX6jGiQnGqz
-         PBkovOEx9LXNKn3yIPJeVpJ4cXyve3unJdszfFC+78DM3ojG6wQjzC+rQ+6Q8gjsPmPS
-         eynODKYhw8W0DGTynZ7/NQxugOhTA99KWMymvonKxkKvqrJyqLTOuUn45YEbw+/V2ns5
-         1+mlyr0i0G51IKcbZNPUo9a0AVYoK6mGrwbzisTXlRxz/fYmeJjB4+m4wn7Bf+A1d1E5
-         CUBOVrKo74oXyRXXvHY9l+HgsaPTYYMWEUT3IFfmQofPExbD7bfF/2qMaX+CO9d6eW8f
-         7ULw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwpXzk131zZkl68rNTEJPKNYK33chShbUFT10uv9409p9zMV/jRMUJkcIHgOBWZ2656ctJk/ITwHdT2x3F4/jmguea
-X-Gm-Message-State: AOJu0Yy6V7DCdfDsEyFobgIKp6+2tq4zXKaAyuTGMKfbnTivv7Pg1KRA
-	Wv2Z6+X8dM2hua9+oZD2wnIs7vJdHYjwoSMuTAkKXtQdD7SGauG07gB6LO/UhnHdBlEnYpFcA1P
-	npHkX0KswU2ov+2hrJ3XS+/xFgScj+G9aX6Sk
-X-Google-Smtp-Source: AGHT+IEuiJ3gPiBp0utLLCSVFQZk+rtPf3Lsyn4LSIs5SyTRd+I+8Eds85ZIqUIGPgvT//dxXReBQprBN392uYZNzpA=
-X-Received: by 2002:a05:651c:3cf:b0:2d4:132b:9f21 with SMTP id
- f15-20020a05651c03cf00b002d4132b9f21mr1205215ljp.6.1711014253330; Thu, 21 Mar
- 2024 02:44:13 -0700 (PDT)
+	s=arc-20240116; t=1711016146; c=relaxed/simple;
+	bh=Ytjv8h8VxWFEtKyURrSyYJai3ajSqv0ktqO6cwRpnLU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=otBgS+uzhuoMNSUtY1SHVyOkw6oKqwFrUYjOyRzcUz2EFLTM1amcwgWarSIqkPfzRYB6LMEMTlYkFuORzIfzJ11qr5tV9rw09JqMTSK+y+C6rt5OlNwsQCIoD3MPL8nMV2ecAZHvTq8dU5MJULpTzb6mKRWIsg1FVllT+atIeFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cW+DnKQG; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711016135; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+	bh=wTxDitpguc7D9IOv4I5f29Qm8gzbpWNMt1WDDHf3HJ8=;
+	b=cW+DnKQGQ2T6P7z4VjeNzcoBHtQlBaOSJEEToiw8p6TXwtvSr+9nwQF1tAbXngtDQHzwkFe3VeE05963e6fR2mGPyzACMK4+hayaf0LOBJLa+J1eIWnhTsm0kImr6q7uygARAApXv4AY6w+bUyIlLcJIHgyQBB2qPE0QyqElQUw=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R351e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=26;SR=0;TI=SMTPD_---0W3-MA6N_1711016132;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3-MA6N_1711016132)
+          by smtp.aliyun-inc.com;
+          Thu, 21 Mar 2024 18:15:33 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: virtualization@lists.linux.dev
+Cc: Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Hans de Goede <hdegoede@redhat.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	linux-um@lists.infradead.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [PATCH vhost v4 0/6] refactor the params of find_vqs()
+Date: Thu, 21 Mar 2024 18:15:26 +0800
+Message-Id: <20240321101532.59272-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
- <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
- <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
-In-Reply-To: <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
-From: Igor Raits <igor@gooddata.com>
-Date: Thu, 21 Mar 2024 10:44:01 +0100
-Message-ID: <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
-Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
-To: Jason Wang <jasowang@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	Stefano Garzarella <sgarzare@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+X-Git-Hash: 571c18a30348
+Content-Transfer-Encoding: 8bit
 
-Hello Jason & others,
+This pathset is splited from the
 
-On Wed, Mar 20, 2024 at 10:33=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
-rote:
->
-> On Tue, Mar 19, 2024 at 9:15=E2=80=AFPM Igor Raits <igor@gooddata.com> wr=
-ote:
-> >
-> > Hello Stefan,
-> >
-> > On Tue, Mar 19, 2024 at 2:12=E2=80=AFPM Stefan Hajnoczi <stefanha@redha=
-t.com> wrote:
-> > >
-> > > On Tue, Mar 19, 2024 at 10:00:08AM +0100, Igor Raits wrote:
-> > > > Hello,
-> > > >
-> > > > We have started to observe kernel crashes on 6.7.y kernels (atm we
-> > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
-> > > > have nodes of cluster it looks stable. Please see stacktrace below.=
- If
-> > > > you need more information please let me know.
-> > > >
-> > > > We do not have a consistent reproducer but when we put some bigger
-> > > > network load on a VM, the hypervisor's kernel crashes.
-> > > >
-> > > > Help is much appreciated! We are happy to test any patches.
-> > >
-> > > CCing Michael Tsirkin and Jason Wang for vhost_net.
-> > >
-> > > >
-> > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
-> > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
-> > > >    E      6.7.10-1.gdc.el9.x86_64 #1
-> > >
-> > > Are there any patches in this kernel?
-> >
-> > Only one, unrelated to this part. Removal of pr_err("EEVDF scheduling
-> > fail, picking leftmost\n"); line (reported somewhere few months ago
-> > and it was suggested workaround until proper solution comes).
->
-> Btw, a bisection would help as well.
+     http://lore.kernel.org/all/20240229072044.77388-1-xuanzhuo@linux.alibaba.com
 
-In the end it seems like we don't really have "stable" setup, so
-bisection looks to be useless but we did find few things meantime:
+That may needs some cycles to discuss. But that notifies too many people.
 
-1. On 6.6.9 it crashes either with unexpected GSO type or usercopy:
-Kernel memory exposure attempt detected from SLUB object
-'skbuff_head_cache'
-2. On 6.7.5, 6.7.10 and 6.8.1 it crashes with RIP:
-0010:skb_release_data+0xb8/0x1e0
-3. It does NOT crash on 6.8.1 when VM does not have multi-queue setup
+But just the four commits need to notify so many people.
+And four commits are independent. So I split that patch set,
+let us review these first.
 
-Looks like the multi-queue setup (we have 2 interfaces =C3=97 3 virtio
-queues for each) is causing problems as if we set only one queue for
-each interface the issue is gone.
-Maybe there is some race condition in __pfx_vhost_task_fn+0x10/0x10 or
-somewhere around? We have noticed that there are 3 of such functions
-in the stacktrace that gave us hints about what we could try=E2=80=A6
+The patch set try to  refactor the params of find_vqs().
+Then we can just change the structure, when introducing new
+features.
 
->
-> Thanks
->
+Thanks.
 
-Thank you!
+v4:
+  1. remove support for names array entries being null
+  2. remove cfg_idx from virtio_vq_config
+
+v3:
+  1. fix the bug: "assignment of read-only location '*cfg.names'"
+
+v2:
+  1. add kerneldoc for "struct vq_transport_config" @ilpo.jarvinen
+
+v1:
+  1. fix some comments from ilpo.jarvinen@linux.intel.com
+
+
+
+
+Xuan Zhuo (6):
+  virtio_balloon: remove the dependence where names[] is null
+  virtio: remove support for names array entries being null.
+  virtio: find_vqs: pass struct instead of multi parameters
+  virtio: vring_create_virtqueue: pass struct instead of multi
+    parameters
+  virtio: vring_new_virtqueue(): pass struct instead of multi parameters
+  virtio_ring: simplify the parameters of the funcs related to
+    vring_create/new_virtqueue()
+
+ arch/um/drivers/virtio_uml.c             |  33 ++---
+ drivers/platform/mellanox/mlxbf-tmfifo.c |  25 ++--
+ drivers/remoteproc/remoteproc_virtio.c   |  34 ++---
+ drivers/s390/virtio/virtio_ccw.c         |  35 ++---
+ drivers/virtio/virtio_balloon.c          |  41 +++---
+ drivers/virtio/virtio_mmio.c             |  33 ++---
+ drivers/virtio/virtio_pci_common.c       |  62 +++-----
+ drivers/virtio/virtio_pci_common.h       |   9 +-
+ drivers/virtio/virtio_pci_legacy.c       |  16 ++-
+ drivers/virtio/virtio_pci_modern.c       |  37 +++--
+ drivers/virtio/virtio_ring.c             | 173 ++++++++---------------
+ drivers/virtio/virtio_vdpa.c             |  48 +++----
+ include/linux/virtio_config.h            |  75 +++++++---
+ include/linux/virtio_ring.h              |  93 +++++++-----
+ tools/virtio/virtio_test.c               |   4 +-
+ tools/virtio/vringh_test.c               |  28 ++--
+ 16 files changed, 351 insertions(+), 395 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
