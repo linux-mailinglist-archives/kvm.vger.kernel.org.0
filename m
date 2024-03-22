@@ -1,273 +1,252 @@
-Return-Path: <kvm+bounces-12522-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D4E887355
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 19:43:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 386D9887359
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 19:47:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCB381C21261
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 18:43:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA13E1F22A0F
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 18:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ECB6CDBB;
-	Fri, 22 Mar 2024 18:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355D76F08C;
+	Fri, 22 Mar 2024 18:47:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="K7rdjqQl"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Tw2OjtgO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029FB6BB5F
-	for <kvm@vger.kernel.org>; Fri, 22 Mar 2024 18:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AAB6E60D
+	for <kvm@vger.kernel.org>; Fri, 22 Mar 2024 18:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711133015; cv=none; b=qO9QgMhJMCLLjxlbEkh0Gy/a8MQo07kUWBCWj06IKFaKl+Hi1np6N9JyREivrIzlkuidmia/uPjEKjfCoRS+tAE3urBG24gRbCR+XzvCtLudP0Z9RNhlbcy6SH0zzGCpxltBwHDsbcmUIkHKl/QMJyV2WeKntQkLpy1TUNNfQoE=
+	t=1711133247; cv=none; b=UOWiUlG82Jh+tlE4KA3NsTwVjcB+7D+62W6r0kkD5DNxUeEnyrjli+7nU0uM4o61ccswGa/7YvRMf3x7zRakatguC+jZS1jQd3IAFU7VPK/5MKKLuQj1bpYWQeXVJF4T5kx7nbkKuFCflHvujqFIYoTvQXYN8D/AdepDg7XTLuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711133015; c=relaxed/simple;
-	bh=GvQkjDWyqo+rghsqOlGEglCNlFD0oHAv/CYM8uzWhmE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ub/KCfOxuV+e+4sNlWMi7CLT005mzFPMBtAIq/Q/T00Fj/r9pdaIUiYJgL1/Pta5SeqBVoY7zZAFDo7yYrtAU5q2m6vSWerch/pR04QprOewJAybQQucGAp6ASz/gE9T7TOvRq+H/DgzukGg7gG0Yrjyt59e9K9ueOh5A2iQvcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=K7rdjqQl; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6962e6fbf60so23585566d6.1
-        for <kvm@vger.kernel.org>; Fri, 22 Mar 2024 11:43:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1711133012; x=1711737812; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=07q//JdJmCCvVOn8q/irpx1t9tAUng9qf5/QnHEsi64=;
-        b=K7rdjqQliWI1TNqJz8KGw71PRrpl8qkRcqLOkRH8/6709xbL0qE4wJ0HaoCqRmIoWX
-         wAPgxZ1XoIn5zlaKvmi6RhSv0rJXioRdrI+8jjqBfZ3s7nMJ+ZFLNH77QiaeyXIEl8iP
-         pFKbmTgihrXr367Isdswg9geTJmOC178pnmyU/Fd5I7in7PPJDcHP7bubht99eioh85P
-         FamcMzVbG5p2smLx+7/gk8P50jdl924WQK43uF4rFCMRpZ00CaB2DrOo/PJ21Y9jM0Pb
-         LDWBs7rVMF+6qiqSHK3gcb6yytbIhCDcWLAzYpXOSWA3TVUzxDHf7vJq8+RHeXvRGLnx
-         LGxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711133012; x=1711737812;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=07q//JdJmCCvVOn8q/irpx1t9tAUng9qf5/QnHEsi64=;
-        b=LMz7wjmVGcEQ1KZ2w5ehB2SJIXIxdcFi0R69afE88+yWbI5p2wZw1oR/qAN1pjizd0
-         AhZi4Y5qDiH+dbflFFs2E9JMZujQvNc4B7btzuwoBWcVVaUn7YYUanThu2d9NLH6r+xH
-         Df9757fRM9HvrRrzjWdCFiFwcpHs98d+fgx867xsvhqtd5tzxOzoMMEiSuF68tPwcMuu
-         USBDPeZCypGqzvnLiQ1rAFHEofs2Hc+jiIEnIMb/zHJ9NapsYpcwmLo8owmqAl/LRyz1
-         yKOic09KFYrSIk98f2pcTm53Yqt4Z8VMTi0HHJr/bjWN13zbdmhZg47Q897cuqL80I7a
-         wLlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrEVltyTB9elqfAy0Pe2zGMmvU3QLVByvFdCKSn0lPS12Arobxu9Izaz7vvwIkvlzMdFSz/95EYws4gN1b+uKsmXHr
-X-Gm-Message-State: AOJu0Yxsjaviuvct85JKCxLKa0aJG2jYx7rGPGMNDiH3+kMDo/MkGBgg
-	Z5IyapmSACI7QAyBZciTbHZaOoTm7aPNUk46vetniowth8Xv5ntzvVaAausrA+Y=
-X-Google-Smtp-Source: AGHT+IGXOk5dcQgdVkv6EYgSp4tZ+XXQ52Ta863vabfcwug61wLkQ0Ayg5iISSk/K2qeTKcn+PXm/w==
-X-Received: by 2002:a05:6214:21ab:b0:690:3ca2:1858 with SMTP id t11-20020a05621421ab00b006903ca21858mr295314qvc.4.1711133011811;
-        Fri, 22 Mar 2024 11:43:31 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id n13-20020a0cfbcd000000b00696731ceef6sm435222qvp.2.2024.03.22.11.43.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Mar 2024 11:43:31 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rnjrW-00Cg1F-Pb;
-	Fri, 22 Mar 2024 15:43:30 -0300
-Date: Fri, 22 Mar 2024 15:43:30 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Message-ID: <20240322184330.GL66976@ziepe.ca>
-References: <20240306174456.GO9225@ziepe.ca>
- <20240306221400.GA8663@lst.de>
- <20240307000036.GP9225@ziepe.ca>
- <20240307150505.GA28978@lst.de>
- <20240307210116.GQ9225@ziepe.ca>
- <20240308164920.GA17991@lst.de>
- <20240308202342.GZ9225@ziepe.ca>
- <20240309161418.GA27113@lst.de>
- <20240319153620.GB66976@ziepe.ca>
- <20240321223910.GA22663@lst.de>
+	s=arc-20240116; t=1711133247; c=relaxed/simple;
+	bh=yLasx7ugjnbHtxzYsdod1oyAUG0e2zmPgE7e4gE2eoE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VIPnnSTQrf9T5q0wxfDsUvGpXs2BMbGHSWYPmefprfmpXgjCxm2pUJ7IHZItj3h3YOuI9YvpGb4ki2FzcRl6lMph8NKsY64epyqP+Z4ncGwJDWMfoFXj2HFQ66PCMF2Et+4OXUhw2EaQBhKVqBBY0kLxnOQsbNtALF7sj3BaZh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Tw2OjtgO; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42MBQklN024736;
+	Fri, 22 Mar 2024 18:46:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=qcppdkim1; bh=d9aPd7iDjqttzRs468Xk9
+	dTSHBIOlc/IfTxqCu9i+pI=; b=Tw2OjtgOb88MSB3+gu+9gYRUUQsGeYp2sUiz6
+	JptKVzKgAB0yW1Pk0Y3rT3qHOFdSKBhTuXro+vvk5CLuY+XaU3lmHkkiWtvXSf2h
+	LDBZciCrlnW3F+4+QrZJnhEPyf4vRxhw9XH9XOySQ3eTuRwq0yJvowB1ZlTcccOR
+	JiC20aPuODkiRrIj/mV+FSDJ7irYvx+GZttBXrK2mywMbPM3PhylwblmQ4gbGNn1
+	tOLi56EiM+LktAlk5BLUKRhTUlC95zYwRUMut9Fmws4PZ8y8ECdgvPUmPPEjZ96o
+	JA+okuyyPT1nfLSU5ASBRKFMFuBpivSSdh9OMDskBUtnXXs2Q==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x0wy8u13q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Mar 2024 18:46:26 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42MIkCWQ032407
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Mar 2024 18:46:12 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 22 Mar 2024 11:46:10 -0700
+Date: Fri, 22 Mar 2024 11:46:10 -0700
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: Will Deacon <will@kernel.org>
+CC: David Hildenbrand <david@redhat.com>,
+        Sean Christopherson
+	<seanjc@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Quentin Perret
+	<qperret@google.com>,
+        Matthew Wilcox <willy@infradead.org>, Fuad Tabba
+	<tabba@google.com>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
+        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
+        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+        <aou@eecs.berkeley.edu>, <viro@zeniv.linux.org.uk>,
+        <brauner@kernel.org>, <akpm@linux-foundation.org>,
+        <xiaoyao.li@intel.com>, <yilun.xu@intel.com>,
+        <chao.p.peng@linux.intel.com>, <jarkko@kernel.org>,
+        <amoorthy@google.com>, <dmatlack@google.com>,
+        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
+        <mic@digikod.net>, <vbabka@suse.cz>, <ackerleytng@google.com>,
+        <mail@maciej.szmigiero.name>, <michael.roth@amd.com>,
+        <wei.w.wang@intel.com>, <liam.merwick@oracle.com>,
+        <isaku.yamahata@gmail.com>, <kirill.shutemov@linux.intel.com>,
+        <suzuki.poulose@arm.com>, <steven.price@arm.com>,
+        <quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
+        <quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
+        <quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
+        <catalin.marinas@arm.com>, <james.morse@arm.com>,
+        <yuzenghui@huawei.com>, <oliver.upton@linux.dev>, <maz@kernel.org>,
+        <keirf@google.com>, <linux-mm@kvack.org>
+Subject: Re: Re: Re: folio_mmapped
+Message-ID: <20240322111214274-0700.eberman@hu-eberman-lv.qualcomm.com>
+Mail-Followup-To: Will Deacon <will@kernel.org>, 
+	David Hildenbrand <david@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Quentin Perret <qperret@google.com>, 
+	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com, linux-mm@kvack.org
+References: <ZeYbUjiIkPevjrRR@google.com>
+ <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
+ <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
+ <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
+ <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
+ <ZfjYBxXeh9lcudxp@google.com>
+ <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
+ <20240319143119.GA2736@willie-the-truck>
+ <20240319155648990-0700.eberman@hu-eberman-lv.qualcomm.com>
+ <20240322163654.GG5634@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20240321223910.GA22663@lst.de>
+In-Reply-To: <20240322163654.GG5634@willie-the-truck>
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 4Iv94yt67x3r7p0CElbDGTl-2mqX9tDX
+X-Proofpoint-GUID: 4Iv94yt67x3r7p0CElbDGTl-2mqX9tDX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-22_11,2024-03-21_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 impostorscore=0 phishscore=0 mlxlogscore=999 adultscore=0
+ priorityscore=1501 mlxscore=0 spamscore=0 bulkscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403210001 definitions=main-2403220135
 
-On Thu, Mar 21, 2024 at 11:39:10PM +0100, Christoph Hellwig wrote:
-> On Tue, Mar 19, 2024 at 12:36:20PM -0300, Jason Gunthorpe wrote:
-> > I kind of understand your thinking on the DMA side, but I don't see
-> > how this is good for users of the API beyond BIO.
+On Fri, Mar 22, 2024 at 04:36:55PM +0000, Will Deacon wrote:
+> Hi Elliot,
+> 
+> On Tue, Mar 19, 2024 at 04:54:10PM -0700, Elliot Berman wrote:
+> > On Tue, Mar 19, 2024 at 02:31:19PM +0000, Will Deacon wrote:
+> > > On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
+> > > > On 19.03.24 01:10, Sean Christopherson wrote:
+> > > > > +1.  I am not completely opposed to letting SNP and TDX effectively convert
+> > > > > pages between private and shared, but I also completely agree that letting
+> > > > > anything gup() guest_memfd memory is likely to end in tears.
+> > > > 
+> > > > Yes. Avoid it right from the start, if possible.
+> > > > 
+> > > > People wanted guest_memfd to *not* have to mmap guest memory ("even for
+> > > > ordinary VMs"). Now people are saying we have to be able to mmap it in order
+> > > > to GUP it. It's getting tiring, really.
+> > > 
+> > > From the pKVM side, we're working on guest_memfd primarily to avoid
+> > > diverging from what other CoCo solutions end up using, but if it gets
+> > > de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
+> > > today with anonymous memory, then it's a really hard sell to switch over
+> > > from what we have in production. We're also hoping that, over time,
+> > > guest_memfd will become more closely integrated with the mm subsystem to
+> > > enable things like hypervisor-assisted page migration, which we would
+> > > love to have.
+> > > 
+> > > Today, we use the existing KVM interfaces (i.e. based on anonymous
+> > > memory) and it mostly works with the one significant exception that
+> > > accessing private memory via a GUP pin will crash the host kernel. If
+> > > all guest_memfd() can offer to solve that problem is preventing GUP
+> > > altogether, then I'd sooner just add that same restriction to what we
+> > > currently have instead of overhauling the user ABI in favour of
+> > > something which offers us very little in return.
 > > 
-> > How will this make RDMA better? We have one MR, the MR has pages, the
-> > HW doesn't care about the SW distinction of p2p, swiotlb, direct,
-> > encrypted, iommu, etc. It needs to create one HW page list for
-> > whatever user VA range was given.
-> 
-> Well, the hardware (as in the PCIe card) never cares.  But the setup
-> path for the IOMMU does, and something in the OS needs to know about
-> it.  So unless we want to stash away a 'is this P2P' flag in every
-> page / SG entry / bvec, or a do a lookup to find that out for each
-> of them we need to manage chunks at these boundaries.  And that's
-> what I'm proposing.
-
-Okay, if we look at the struct-page-less world (which we want for
-DMABUF) then we need to keep track for sure. What I had drafted was to
-keep track in the new "per-SG entry" because that seemed easiest to
-migrate existing code into.
-
-Though the datastructure could also be written to be a list of uniform
-memory types and then a list of SG entries. (more like how bio is
-organized)
-
-No idea right now which is better, and I'm happy make it go either
-way.
-
-But Leon's series is not quite getting to this, it it still struct
-page based and struct page itself has all the metadata - though as you
-say it is a bit expensive to access.
-
-> > Or worse, whatever thing is inside a DMABUF from a DRM
-> > driver. DMABUF's can have a (dynamic!) mixture of P2P and regular
-> > AFAIK based on the GPU's migration behavior.
-> 
-> And that's fine.  We just need to track it efficiently.
-
-Right, DMABUF/etc will return a something that has a list of physical
-addresses and some meta-data to indicate the "p2p memory provider" for
-the P2P part.
-
-Perhaps it could be as simple as 1 bit in the physical address/length
-and a global "P2P memory provider" pointer for the entire DMA
-BUF. Unclear to me right now, but sure.
-
-> > Or triple worse, ODP can dynamically change on a page by page basis
-> > the type depending on what hmm_range_fault() returns.
-> 
-> Same.  If this changes all the time you need to track it.  And we
-> should find a way to shared the code if we have multiple users for it.
-
-ODP (for at least the forseeable furture) is simpler because it is
-always struct page based so we don't need more metadata if we pay the
-cost to reach into the struct page. I suspect that is the right trade
-off for hmm_range_fault users.
-
-> But most DMA API consumers will never see P2P, and when they see it
-> it will be static.  So don't build the DMA API to automically do
-> the (not exactly super cheap) checks and add complexity for it.
-
-Okay, I think I get what you'd like to see.
-
-If we are going to make caller provided uniformity a requirement, lets
-imagine a formal memory type idea to help keep this a little
-abstracted?
-
- DMA_MEMORY_TYPE_NORMAL
- DMA_MEMORY_TYPE_P2P_NOT_ACS
- DMA_MEMORY_TYPE_ENCRYPTED
- DMA_MEMORY_TYPE_BOUNCE_BUFFER  // ??
-
-Then maybe the driver flow looks like:
-
-	if (transaction.memory_type == DMA_MEMORY_TYPE_NORMAL && dma_api_has_iommu(dev)) {
-		struct dma_api_iommu_state state;
-
-		dma_api_iommu_start(&state, transaction.num_pages);
-		for_each_range(transaction, range)
-			dma_api_iommu_map_range(&state, range.start_page, range.length);
-		num_hwsgls = 1;
-		hwsgl.addr = state.iova;
-		hwsgl.length = transaction.length
-		dma_api_iommu_batch_done(&state);
-	} else if (transaction.memory_type == DMA_MEMORY_TYPE_P2P_NOT_ACS) {
-		num_hwsgls = transcation.num_sgls;
-		for_each_range(transaction, range) {
-			hwsgl[i].addr = dma_api_p2p_not_acs_map(range.start_physical, range.length, p2p_memory_provider);
-			hwsgl[i].len = range.size;
-		}
-	} else {
-		/* Must be DMA_MEMORY_TYPE_NORMAL, DMA_MEMORY_TYPE_ENCRYPTED, DMA_MEMORY_TYPE_BOUNCE_BUFFER? */
-		num_hwsgls = transcation.num_sgls;
-		for_each_range(transaction, range) {
-			hwsgl[i].addr = dma_api_map_cpu_page(range.start_page, range.length);
-			hwsgl[i].len = range.size;
-		}
-	}
-
-And the hmm_range_fault case is sort of like:
-
-		struct dma_api_iommu_state state;
-		dma_api_iommu_start(&state, mr.num_pages);
-
-		[..]
-		hmm_range_fault(...)
-		if (present)
-			dma_link_page(&state, faulting_address_offset, page);
-		else
-			dma_unlink_page(&state, faulting_address_offset, page);
-
-Is this looking closer?
-
-> > So I take it as a requirement that RDMA MUST make single MR's out of a
-> > hodgepodge of page types. RDMA MRs cannot be split. Multiple MR's are
-> > not a functional replacement for a single MR.
-> 
-> But MRs consolidate multiple dma addresses anyway.
-
-I'm not sure I understand this?
- 
-> > Go back to the start of what are we trying to do here:
-> >  1) Make a DMA API that can support hmm_range_fault() users in a
-> >     sensible and performant way
-> >  2) Make a DMA API that can support RDMA MR's backed by DMABUF's, and
-> >     user VA's without restriction
-> >  3) Allow to remove scatterlist from BIO paths
-> >  4) Provide a DMABUF API that is not scatterlist that can feed into
-> >     the new DMA API - again supporting DMABUF's hodgepodge of types.
+> > How would we add the restriction to anonymous memory?
 > > 
-> > I'd like to do all of these things. I know 3 is your highest priority,
-> > but it is my lowest :)
+> > Thinking aloud -- do you mean like some sort of "exclusive GUP" flag
+> > where mm can ensure that the exclusive GUP pin is the only pin? If the
+> > refcount for the page is >1, then the exclusive GUP fails. Any future
+> > GUP pin attempts would fail if the refcount has the EXCLUSIVE_BIAS.
 > 
-> Well, 3 an 4.  And 3 is not just limited to bio, but all the other
-> pointless scatterlist uses.
+> Yes, I think we'd want something like that, but I don't think using a
+> bias on its own is a good idea as false positives due to a large number
+> of page references will then actually lead to problems (i.e. rejecting
+> GUP spuriously), no? I suppose if you only considered the new bias in
+> conjunction with the AS_NOGUP flag you proposed then it might be ok
+> (i.e. when you see the bias, you then go check the address space to
+> confirm). What do you think?
+> 
 
-Well, I didn't write a '5) remove all the other pointless scatterlist
-case' :)
+I think the AS_NOGUP would prevent GUPing the first place. If we set the
+EXCLUSIVE_BIAS value to something like INT_MAX, do we need to be worried
+about there being INT_MAX-1 valid GUPs and wanting to add another?  From
+the GUPer's perspective, I don't think it would be much different from
+overflowing the refcount.
 
-Anyhow, I think we all agree on the high level objective, we just need
-to get to an API that fuses all of these goals together.
+> > > On the mmap() side of things for guest_memfd, a simpler option for us
+> > > than what has currently been proposed might be to enforce that the VMM
+> > > has unmapped all private pages on vCPU run, failing the ioctl if that's
+> > > not the case. It needs a little more tracking in guest_memfd but I think
+> > > GUP will then fall out in the wash because only shared pages will be
+> > > mapped by userspace and so GUP will fail by construction for private
+> > > pages.
+> > 
+> > We can prevent GUP after the pages are marked private, but the pages
+> > could be marked private after the pages were already GUP'd. I don't have
+> > a good way to detect this, so converting a page to private is difficult.
+> 
+> For anonymous memory, marking the page as private is going to involve an
+> exclusive GUP so that the page can safely be donated to the guest. In
+> that case, any existing GUP pin should cause that to fail gracefully.
+> What is the situation you are concerned about here?
+> 
 
-To go back to my main thesis - I would like a high performance low
-level DMA API that is capable enough that it could implement
-scatterlist dma_map_sg() and thus also implement any future
-scatterlist_v2, bio, hmm_range_fault or any other thing we come up
-with on top of it. This is broadly what I thought we agreed to at LSF
-last year.
+I wasn't thinking about exclusive GUP here. The exclusive GUP should be
+able to get the guarantees we need.
 
-Jason
+I was thinking about making sure we gracefully handle a race to provide
+the same page. The kernel should detect the difference between "we're
+already providing the page" and "somebody has an unexpected pin". We can
+easily read the refcount if we couldn't take the exclusive pin to know.
+
+Thanks,
+Elliot
+
+> > > We're happy to pursue alternative approaches using anonymous memory if
+> > > you'd prefer to keep guest_memfd limited in functionality (e.g.
+> > > preventing GUP of private pages by extending mapping_flags as per [1]),
+> > > but we're equally willing to contribute to guest_memfd if extensions are
+> > > welcome.
+> > > 
+> > > What do you prefer?
+> > > 
+> > 
+> > I like this as a stepping stone. For the Android use cases, we don't
+> > need to be able to convert a private page to shared and then also be
+> > able to GUP it.
+> 
+> I wouldn't want to rule that out, though. The VMM should be able to use
+> shared pages just like it can with normal anonymous pages.
+> 
+> > I don't think this design prevents us from adding "sometimes you can
+> > GUP" to guest_memfd in the future.
+> 
+> Technically, I think we can add all the stuff we need to guest_memfd,
+> but there's a desire to keep that as simple as possible for now, which
+> is why I'm keen to explore alternatives to unblock the pKVM upstreaming.
+> 
+> Will
+> 
 
