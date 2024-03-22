@@ -1,185 +1,198 @@
-Return-Path: <kvm+bounces-12479-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12482-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C008886A23
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 11:22:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16759886B36
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 12:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D61502822A2
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 10:22:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C11AC285710
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 11:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC32836AF3;
-	Fri, 22 Mar 2024 10:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB573F9C5;
+	Fri, 22 Mar 2024 11:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OCumWId4"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="S9tZLIyF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CDF39AC5;
-	Fri, 22 Mar 2024 10:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981233F9CB
+	for <kvm@vger.kernel.org>; Fri, 22 Mar 2024 11:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711102950; cv=none; b=qYtJ3u2Rj386j7gmsPnHdzFI+Aoa5w+SyhY2lufc+/L+1tQiuQJwDHKdGwkZVMPHgOVz1kbuiU6m/um8v1IXi++A4wZpQUx81YdbjS+4pKF8O/zbpdqXqE3qE4x9p6UMGsPk8LOTL8R1zBv8IQ5DxACkWn5c0hJycFbKQnaYBiM=
+	t=1711106413; cv=none; b=bL2WJayjI8BhnQ6RT5NFpljQbNUYwmoFexByfgSvYDupd6WzxTcg0yvQrIIPLvKOSzwDr5Uw3XiJbX8VdXDLu/yuNlWPbz5UqQfpHwePRr+iUJNIFBBoAn9neskK/0V1L5R0qdl8M14hcH/kXIY3asJ1jEd7798V0oMGP8nNyYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711102950; c=relaxed/simple;
-	bh=vMwYb4avxUZsb6Vz24fjsEAOtzod3kHSa/OcSBljTCc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WJG/2ful8/knSRCOb4wjRU3toYRCy50kp3jGStHAIHyZsjETcjnzngE9RZ8jGuXpGXy4xVDR3cr3011J+EeVOpW773Klpd3YWqYD2BgZDf+T4YzEFAtDlooJ3dk7IAhGZPp0UPoIO9KWqbnlFMOQ5p8ikGkD/HmLY2RzTcCnz9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OCumWId4; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42M7D0oO029705;
-	Fri, 22 Mar 2024 10:22:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=t4EtCupj1AZsWtQ2aOS+eqQ4iFxWWbTe9gpwh+nYbgo=;
- b=OCumWId4GftXCC+x8XAN+4LzM5nfQc2Vt/51ofVBaheILkrNgywAF5nxxOT3ugMMfwbA
- 1j5by1l1X8hD/dPcSokAsNhZQLcXz8nqpLC+Cu9zYl0eS1zXrKF4DX7eTP2hP4jZOhlx
- o1dJkNZqgSVbr4Ls/DqVHnLHaHi16bwnPxADpGBOxYuNj2PuyOuROQrTgkRAByE28Erw
- oTIUczGUPaIVhc+8YtXnQkXdcDeqTeLiLoc8RaopVRYflvAYekQkr+c+ijVVQ1lpoUAl
- njxfj2pDb7jDT7OCs/USg4OVicIPam4oA9xB1eNAGfqoXjxMcH3Oy0ne/uQchOaBQKIP AA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x15d30c1v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Mar 2024 10:22:21 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42MAMLB0015406;
-	Fri, 22 Mar 2024 10:22:21 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x15d30c1s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Mar 2024 10:22:21 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42M8kq8w015722;
-	Fri, 22 Mar 2024 10:22:20 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x0x15k3nh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Mar 2024 10:22:20 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42MAMEqP47382980
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Mar 2024 10:22:16 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9EE7620067;
-	Fri, 22 Mar 2024 10:22:14 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5DC812004F;
-	Fri, 22 Mar 2024 10:22:14 +0000 (GMT)
-Received: from [9.152.224.222] (unknown [9.152.224.222])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 22 Mar 2024 10:22:14 +0000 (GMT)
-Message-ID: <ed0f05de-0e17-41ec-85b2-be8603b0556a@linux.ibm.com>
-Date: Fri, 22 Mar 2024 11:22:13 +0100
+	s=arc-20240116; t=1711106413; c=relaxed/simple;
+	bh=Dc1VXE9yH2PnZcGdcCavMP4IzoG/6X0QQBcgmuwQZpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SLBuEcJYV4XyAACuO9npBChZW4IHlchfKebbBsSV/VC/zjOhONHK1jDqTCxn+eX7fcO6gFE543rCYJRvy5YJgQGDCaH2xPtbUCH0I8K7CuiVfCrjtigEaQ7kygxMmJRmed6+lUhDLVKNyxFGvKNdiWJwtP27uvImFif4FjtQtfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=S9tZLIyF; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d52e65d4a8so27642191fa.0
+        for <kvm@vger.kernel.org>; Fri, 22 Mar 2024 04:20:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1711106409; x=1711711209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b8Z2cPio152grV1Iquho6qxXho3Ihem2O1xD4vwJq7w=;
+        b=S9tZLIyFstIgTFDEee22A8izkJsXyBOsfVQmbrbRWiwsp/WoxxomFuUt5gxiYFQHYH
+         dhZJnVyT7ZXrp/szD9BcfG6ye/yxnEobkAXyuPodMRon08mhvcOO929gcNvSomgLKdSu
+         YKoDmq3+ayU+oB9BsZtkaFrClsi4cyu7GsXf8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711106409; x=1711711209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b8Z2cPio152grV1Iquho6qxXho3Ihem2O1xD4vwJq7w=;
+        b=ZztLvWqUUamePtxVAJ2Ep+WztXCJal57oxk5NzjAjqhP7+RTP/sNtNwHLWvyRwimte
+         2ziAfncztq/rmh52ed2GXkM8COSkdV6TVg1s68EXoydXHuJnplcp94BkLZMeuZF0gJPt
+         8i8iPTY5TP60Of2mTZsppCPqhwk9hk7nVU/KoqF0LIQTeyirySjr3jKM/z86zc/0lYrG
+         XwcA5i6+fRIdfmzbXl8EG0FmUTtOemX2msILEgmkPSb5b76q7qPUa46gjwH8eoFJB1aB
+         7+CSmuBVu8UqyfMNN150SSQcV1IKaheMLuRy5weBjUhjImOVNqZQDb/bLYxXeLUzvc54
+         MicQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0Tbk5+kqn2ncXcCsufcrnJpQMW/IPwpsqL8t1EJj4Yh0O6JZC+4aoIp7p+lUM8depCjVg7St/UNdge4dSyuy8K8vx
+X-Gm-Message-State: AOJu0Yw+cY7zVwh1nlZ2dl3IofO36JWa4E5sA9PFai91FvlPAsmKWTVt
+	gfh4yrMVWZiOBkDtquS8RIDNoEvOfEJV/TjE23vB613YEntG3yzceaE5Ps5vpIL/U1Lm2bUc3Vv
+	fnMQ6X1Hg9LsPrv/pVWRJ3LgWQKToqo7x3KZkJbZtVNm7gJfTHg==
+X-Google-Smtp-Source: AGHT+IE5B/6o5n4TIUzWoHJA0LUv6jqqQxDzWAjlw9/W/j757fLkHrcsphOrz4YqKMe0il4fcrriHnRTf6nOt7T/eGA=
+X-Received: by 2002:a2e:9b48:0:b0:2d2:b840:1c78 with SMTP id
+ o8-20020a2e9b48000000b002d2b8401c78mr1383212ljj.48.1711106408602; Fri, 22 Mar
+ 2024 04:20:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/2] s390/mm: re-enable the shared zeropage for !PV and
- !skeys KVM guests
-Content-Language: en-US
-To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Peter Xu <peterx@redhat.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20240321215954.177730-1-david@redhat.com>
- <20240321215954.177730-3-david@redhat.com>
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20240321215954.177730-3-david@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ztFlzz80v3ERALXfSy3FTl3bPX6Bi31k
-X-Proofpoint-ORIG-GUID: 3N0heez5LomRZyHLGJD7rvjWaDPGsK2B
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-22_06,2024-03-21_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- clxscore=1011 priorityscore=1501 impostorscore=0 bulkscore=0 adultscore=0
- spamscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2403210000
- definitions=main-2403220074
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
+ <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+ <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
+ <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com> <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
+In-Reply-To: <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
+From: Igor Raits <igor@gooddata.com>
+Date: Fri, 22 Mar 2024 12:19:57 +0100
+Message-ID: <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Jason Wang <jasowang@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	Stefano Garzarella <sgarzare@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Jason,
 
+On Fri, Mar 22, 2024 at 9:39=E2=80=AFAM Igor Raits <igor@gooddata.com> wrot=
+e:
+>
+> Hi Jason,
+>
+> On Fri, Mar 22, 2024 at 6:31=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
+wrote:
+> >
+> > On Thu, Mar 21, 2024 at 5:44=E2=80=AFPM Igor Raits <igor@gooddata.com> =
+wrote:
+> > >
+> > > Hello Jason & others,
+> > >
+> > > On Wed, Mar 20, 2024 at 10:33=E2=80=AFAM Jason Wang <jasowang@redhat.=
+com> wrote:
+> > > >
+> > > > On Tue, Mar 19, 2024 at 9:15=E2=80=AFPM Igor Raits <igor@gooddata.c=
+om> wrote:
+> > > > >
+> > > > > Hello Stefan,
+> > > > >
+> > > > > On Tue, Mar 19, 2024 at 2:12=E2=80=AFPM Stefan Hajnoczi <stefanha=
+@redhat.com> wrote:
+> > > > > >
+> > > > > > On Tue, Mar 19, 2024 at 10:00:08AM +0100, Igor Raits wrote:
+> > > > > > > Hello,
+> > > > > > >
+> > > > > > > We have started to observe kernel crashes on 6.7.y kernels (a=
+tm we
+> > > > > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 whe=
+re we
+> > > > > > > have nodes of cluster it looks stable. Please see stacktrace =
+below. If
+> > > > > > > you need more information please let me know.
+> > > > > > >
+> > > > > > > We do not have a consistent reproducer but when we put some b=
+igger
+> > > > > > > network load on a VM, the hypervisor's kernel crashes.
+> > > > > > >
+> > > > > > > Help is much appreciated! We are happy to test any patches.
+> > > > > >
+> > > > > > CCing Michael Tsirkin and Jason Wang for vhost_net.
+> > > > > >
+> > > > > > >
+> > > > > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
+> > > > > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: =
+G
+> > > > > > >    E      6.7.10-1.gdc.el9.x86_64 #1
+> > > > > >
+> > > > > > Are there any patches in this kernel?
+> > > > >
+> > > > > Only one, unrelated to this part. Removal of pr_err("EEVDF schedu=
+ling
+> > > > > fail, picking leftmost\n"); line (reported somewhere few months a=
+go
+> > > > > and it was suggested workaround until proper solution comes).
+> > > >
+> > > > Btw, a bisection would help as well.
+> > >
+> > > In the end it seems like we don't really have "stable" setup, so
+> > > bisection looks to be useless but we did find few things meantime:
+> > >
+> > > 1. On 6.6.9 it crashes either with unexpected GSO type or usercopy:
+> > > Kernel memory exposure attempt detected from SLUB object
+> > > 'skbuff_head_cache'
+> >
+> > Do you have a full calltrace for this?
+>
+> I have shared it in one of the messages in this thread.
+> https://marc.info/?l=3Dlinux-virtualization&m=3D171085443512001&w=3D2
+>
+> > > 2. On 6.7.5, 6.7.10 and 6.8.1 it crashes with RIP:
+> > > 0010:skb_release_data+0xb8/0x1e0
+> >
+> > And for this?
+>
+> https://marc.info/?l=3Dlinux-netdev&m=3D171083870801761&w=3D2
+>
+> > > 3. It does NOT crash on 6.8.1 when VM does not have multi-queue setup
+> > >
+> > > Looks like the multi-queue setup (we have 2 interfaces =C3=97 3 virti=
+o
+> > > queues for each) is causing problems as if we set only one queue for
+> > > each interface the issue is gone.
+> > > Maybe there is some race condition in __pfx_vhost_task_fn+0x10/0x10 o=
+r
+> > > somewhere around?
+> >
+> > I can't tell now, but it seems not because if we have 3 queue pairs we
+> > will have 3 vhost threads.
+> >
+> > > We have noticed that there are 3 of such functions
+> > > in the stacktrace that gave us hints about what we could try=E2=80=A6
+> >
+> > Let's try to enable SLUB_DEBUG and KASAN to see if we can get
+> > something interesting.
+>
+> We were able to reproduce it even with 1 vhost queue... And now we
+> have slub_debug + kasan so I hopefully have more useful data for you
+> now.
+> I have attached it for better readability.
 
-Am 21.03.24 um 22:59 schrieb David Hildenbrand:
-> commit fa41ba0d08de ("s390/mm: avoid empty zero pages for KVM guests to
-> avoid postcopy hangs") introduced an undesired side effect when combined
-> with memory ballooning and VM migration: memory part of the inflated
-> memory balloon will consume memory.
-> 
-> Assuming we have a 100GiB VM and inflated the balloon to 40GiB. Our VM
-> will consume ~60GiB of memory. If we now trigger a VM migration,
-> hypervisors like QEMU will read all VM memory. As s390x does not support
-> the shared zeropage, we'll end up allocating for all previously-inflated
-> memory part of the memory balloon: 50 GiB. So we might easily
-> (unexpectedly) crash the VM on the migration source.
-> 
-> Even worse, hypervisors like QEMU optimize for zeropage migration to not
-> consume memory on the migration destination: when migrating a
-> "page full of zeroes", on the migration destination they check whether the
-> target memory is already zero (by reading the destination memory) and avoid
-> writing to the memory to not allocate memory: however, s390x will also
-> allocate memory here, implying that also on the migration destination, we
-> will end up allocating all previously-inflated memory part of the memory
-> balloon.
-> 
-> This is especially bad if actual memory overcommit was not desired, when
-> memory ballooning is used for dynamic VM memory resizing, setting aside
-> some memory during boot that can be added later on demand. Alternatives
-> like virtio-mem that would avoid this issue are not yet available on
-> s390x.
-> 
-> There could be ways to optimize some cases in user space: before reading
-> memory in an anonymous private mapping on the migration source, check via
-> /proc/self/pagemap if anything is already populated. Similarly check on
-> the migration destination before reading. While that would avoid
-> populating tables full of shared zeropages on all architectures, it's
-> harder to get right and performant, and requires user space changes.
-> 
-> Further, with posctopy live migration we must place a page, so there,
-> "avoid touching memory to avoid allocating memory" is not really
-> possible. (Note that a previously we would have falsely inserted
-> shared zeropages into processes using UFFDIO_ZEROPAGE where
-> mm_forbids_zeropage() would have actually forbidden it)
-> 
-> PV is currently incompatible with memory ballooning, and in the common
-> case, KVM guests don't make use of storage keys. Instead of zapping
-> zeropages when enabling storage keys / PV, that turned out to be
-> problematic in the past, let's do exactly the same we do with KSM pages:
-> trigger unsharing faults to replace the shared zeropages by proper
-> anonymous folios.
-> 
-> What about added latency when enabling storage kes? Having a lot of
-> zeropages in applicable environments (PV, legacy guests, unittests) is
-> unexpected. Further, KSM could today already unshare the zeropages
-> and unmerging KSM pages when enabling storage kets would unshare the
-> KSM-placed zeropages in the same way, resulting in the same latency.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Nice work. Looks good to me and indeed it fixes the memory
-over-consumption that you mentioned.
-
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Tested-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-(can also be seen with virsh managedsave; virsh start)
-
-I guess its too invasive for stable, but I would say it is real fix.
+Looks like we have found a "stable" kernel and that is 6.1.32. The
+6.3.y is broken and we are testing 6.2.y now.
+My guess it would be related to virtio/vsock: replace virtio_vsock_pkt
+with sk_buff that was done around that time but we are going to test,
+bisect and let you know more.
 
