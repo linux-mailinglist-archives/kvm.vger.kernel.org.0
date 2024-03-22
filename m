@@ -1,206 +1,108 @@
-Return-Path: <kvm+bounces-12517-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12518-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CA938871EE
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 18:39:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1CD88721D
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 18:46:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B77B31C22D29
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 17:39:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE474283648
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 17:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5275FDA1;
-	Fri, 22 Mar 2024 17:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5036026C;
+	Fri, 22 Mar 2024 17:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gQNFYkF5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHS5yTT4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3661CD25;
-	Fri, 22 Mar 2024 17:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B2E5FDDD;
+	Fri, 22 Mar 2024 17:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711129150; cv=none; b=r+frcscOmZtTi14bXBJuaSwHYKXxwEiaKb63DgFDheSwKuDgxmkdoZrMohRwafQN3AJN0SSIFOdPcG+oOJRZwRU0U9PGHiKYdDuFhkoIJk0sf40BY35rzgFj2++gL9CDn347e2178IIvgsSdet2wYoPjJUSfKoYCe1oRhxCCdR4=
+	t=1711129581; cv=none; b=oHQQzj2pe6g0c89w0nZB+6tgP87sT3/zpcVGkG/2Du8ys3O16yuYdAwjeb4gxPo3fJK06eLFTHIsKiDIIeSZxQwmnsD4uaKIVNq84tLpgzIRoRa9KoRJZJYkDsTn9UJTPH6xYqT+pWtUrQhB77AYYUanjex9kc+JNp8Y1nYWzHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711129150; c=relaxed/simple;
-	bh=M10HBP0QHr0blsaz7VID9hCSGi9EAm/Vle9sr0Fgh0g=;
+	s=arc-20240116; t=1711129581; c=relaxed/simple;
+	bh=tPnSfU7iDXbv5Aanu3qQZ/bdHhZW5HEkKrMaj/r/t3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDxry4AsDjijMgjXmzovKY2LEWfto1szHO8xd83jdBSprIsbamylKrCZEyWSWBWz97hBZMmGXnNmq33VLJFG032zV6Xs8+dVyOOmghW1Z+dzieu4iR9Qk76qRBiamSeOk568s6uuO85h3Xl7dXqgNt5dCG5ut+eUaRAtT3c/S0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gQNFYkF5; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711129148; x=1742665148;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=M10HBP0QHr0blsaz7VID9hCSGi9EAm/Vle9sr0Fgh0g=;
-  b=gQNFYkF5NrpFsZfjyXsV25QLuNUqolNNbyAl4U5m8H1R5mca8lrEsn5f
-   OWGBlPLBhXiGIOloeFY6oDoPMr357wjrioZQmk2kF/f/Qe9fph02DoJcZ
-   q1K7z66Ne8o367/vbp46txGB79ms8Y2H05lNm+IUj3s7aaLp3jM5sJ0PI
-   Ce0v1RTu0sfyEuyCjacZB+4qK0tGH3L1r34HNoHC33bjqRWB4s+zqm351
-   AktkEV1ChoqhPJYza6QOwBCvnstS9l0D5V2fOLDV0KQjiXMcb56xCK/1j
-   BzMy5vKOEta5ewflqkWqFH8HdHUSJxP2ssd0JuMp1uukgY1OuQfkoN0Oh
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="17623621"
-X-IronPort-AV: E=Sophos;i="6.07,146,1708416000"; 
-   d="scan'208";a="17623621"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 10:39:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,146,1708416000"; 
-   d="scan'208";a="14986058"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 10:39:07 -0700
-Date: Fri, 22 Mar 2024 10:39:06 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"Zhang, Tina" <tina.zhang@intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Yuan, Hang" <hang.yuan@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
-	"sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 022/130] KVM: x86/vmx: Refactor KVM VMX module
- init/exit functions
-Message-ID: <20240322173906.GY1994522@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <11d5ae6a1102a50b0e773fc7efd949bb0bd2b776.1708933498.git.isaku.yamahata@intel.com>
- <0f466c5845e9d75b25392ecb5129c4e984052c1b.camel@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1fFWZ00mlSUzvKAV2Tn9hcnz8Hhk9dbnHULQI5Hs4Z3yauEUBxYICPy43tNMnRh7j0PLSM8RCDZI4N4DIvdTAzciqqvPetms2v/8nzV4IjiNj+ki2T+ou3zyNZHNryywghdwYmcNkLL5VHz8FzEK4vJzXD9/rdjt6Rb2NKYB3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHS5yTT4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B06FDC43390;
+	Fri, 22 Mar 2024 17:46:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711129581;
+	bh=tPnSfU7iDXbv5Aanu3qQZ/bdHhZW5HEkKrMaj/r/t3E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZHS5yTT4bbaMRlgftNPH4s3/BHy6Y/pMfuNyl8v8f5cbM9wT0nJywOThE9XO9o+Yo
+	 sQrbBVvHpfJ/GkmHADMgsyejjED5TS3WA9xA7CAd8LGMMBj72qkOP6L4xJgAnibISZ
+	 qNFyWWuGRtKqmNbYceSiJMbEfqG1Js9LGbaa9G2SXsAMGNlvbn99etRqhzGPHQquR2
+	 /pbuuEEFXd6WzmZyO515+46vj9pZRkjqcnsndSlqoffLvES8FRzNSO3QY42zxkNADr
+	 DC5hb9KvKEkeYTKUZ64FdwpBihsRuGbAw0oCeOVQ5Q/D7ca6clZI9B8s4YtiHLB9rj
+	 nO/n9c2+vHn/w==
+Date: Fri, 22 Mar 2024 19:46:17 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240322174617.GD14887@unreal>
+References: <20240306221400.GA8663@lst.de>
+ <20240307000036.GP9225@ziepe.ca>
+ <20240307150505.GA28978@lst.de>
+ <20240307210116.GQ9225@ziepe.ca>
+ <20240308164920.GA17991@lst.de>
+ <20240308202342.GZ9225@ziepe.ca>
+ <20240309161418.GA27113@lst.de>
+ <20240319153620.GB66976@ziepe.ca>
+ <20240320085536.GA14887@unreal>
+ <20240321224013.GB22663@lst.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0f466c5845e9d75b25392ecb5129c4e984052c1b.camel@intel.com>
+In-Reply-To: <20240321224013.GB22663@lst.de>
 
-On Thu, Mar 21, 2024 at 11:27:46AM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
-
-> On Mon, 2024-02-26 at 00:25 -0800, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > Currently, KVM VMX module initialization/exit functions are a single
-> > function each.  Refactor KVM VMX module initialization functions into KVM
-> > common part and VMX part so that TDX specific part can be added cleanly.
-> > Opportunistically refactor module exit function as well.
-> > 
-> > The current module initialization flow is,
+On Thu, Mar 21, 2024 at 11:40:13PM +0100, Christoph Hellwig wrote:
+> On Wed, Mar 20, 2024 at 10:55:36AM +0200, Leon Romanovsky wrote:
+> > Something like this will do the trick.
 > 
-> 					  ^ ',' -> ':'
-> 
-> And please add an empty line to make text more breathable.
-> 
-> > 0.) Check if VMX is supported,
-> > 1.) hyper-v specific initialization,
-> > 2.) system-wide x86 specific and vendor specific initialization,
-> > 3.) Final VMX specific system-wide initialization,
-> > 4.) calculate the sizes of VMX kvm structure and VMX vcpu structure,
-> > 5.) report those sizes to the KVM common layer and KVM common
-> >     initialization
-> 
-> Is there any difference between "KVM common layer" and "KVM common
-> initialization"?  I think you can remove the former.
+> As far as I can tell it totally misses the point.  Which is not to never
+> return non-P2P if the flag is set, but to return either all P2P or non-P2
+> P and not create a boundary in the single call.
 
-Ok.
+You are treating FOLL_PCI_P2PDMA as a hint, but in iov_iter_extract_user_pages()
+you set it only for p2p queues. I was under impression that you want only p2p pages
+in these queues.
 
-> > Refactor the KVM VMX module initialization function into functions with a
-> > wrapper function to separate VMX logic in vmx.c from a file, main.c, common
-> > among VMX and TDX.  Introduce a wrapper function for vmx_init().
-> 
-> Sorry I don't quite follow what your are trying to say in the above paragraph.
-> 
-> You have adequately put what is the _current_ flow, and I am expecting to see
-> the flow _after_ the refactor here.
+Anyway, I can prepare other patch that will return or p2p or non-p2p pages in one shot.
 
-Will add it.
-
-
-> > The KVM architecture common layer allocates struct kvm with reported size
-> > for architecture-specific code.  The KVM VMX module defines its structure
-> > as struct vmx_kvm { struct kvm; VMX specific members;} and uses it as
-> > struct vmx kvm.  Similar for vcpu structure. TDX KVM patches will define
-> 
-> 	 ^vmx_kvm.
-> 
-> Please be more consistent on the words.
-> 
-> > TDX specific kvm and vcpu structures.
-> 
-> Is this paragraph related to the changes in this patch?
-> 
-> For instance, why do you need to point out we will have TDX-specific 'kvm and
-> vcpu' structures?
-
-The point of this refactoring is to make room for TDX-specific code.  The
-consideration point is data size/alignment difference and VMX-dependency.
-Let me re-order the sentences.
-
-
-> > The current module exit function is also a single function, a combination
-> > of VMX specific logic and common KVM logic.  Refactor it into VMX specific
-> > logic and KVM common logic.  
-> > 
-> 
-> [...]
-> 
-> > This is just refactoring to keep the VMX
-> > specific logic in vmx.c from main.c.
-> 
-> It's better to make this as a separate paragraph, because it is a summary to
-> this patch.
-> 
-> And in other words: No functional change intended?
-
-Thanks for the feedback.  Here is the revised version.
-
-KVM: x86/vmx: Refactor KVM VMX module init/exit functions
-
-Split KVM VMX kernel module initialization into one specific to VMX in
-vmx.c and one common for VMX and TDX in main.c to make room for
-TDX-specific logic to fit in.  Opportunistically, refactor module exit
-function as well.
-
-The key points are data structure difference and TDX dependency on
-VMX.  The data structures for TDX are different from VMX.  So are its
-size and alignment.  Because TDX depends on VMX, TDX initialization
-must be after VMX initialization.  TDX cleanup must be before VMX
-cleanup.
-
-The current module initialization flow is:
-
-0.) Check if VMX is supported,
-1.) Hyper-v specific initialization,
-2.) System-wide x86 specific and vendor-specific initialization,
-3.) Final VMX-specific system-wide initialization,
-4.) Calculate the sizes of the kvm and vcpu structure for VMX,
-5.) Report those sizes to the KVM-common initialization
-
-After refactoring and TDX, the flow will be:
-
-0.) Check if VMX is supported (main.c),
-1.) Hyper-v specific initialization (main.c),
-2.) System-wide x86 specific and vendor-specific initialization,
-    2.1) VMX-specific initialization (vmx.c)
-    2.2) TDX-specific initialization (tdx.c)
-3.) Final VMX-specific system-wide initialization (vmx.c),
-    TDX doesn't need this step.
-4.) Calculate the sizes of the kvm and vcpu structure for both VMX and
-    TDX, (main.c)
-5.) Report those sizes to the KVM-common initialization (main.c)
-
-No functional change intended.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Thanks
 
