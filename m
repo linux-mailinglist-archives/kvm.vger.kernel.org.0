@@ -1,207 +1,387 @@
-Return-Path: <kvm+bounces-12470-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12471-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86858866F5
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 07:43:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E83D88674E
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 08:06:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08EE61C23587
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 06:43:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9441282A0F
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 07:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD9010A2E;
-	Fri, 22 Mar 2024 06:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA93111CB0;
+	Fri, 22 Mar 2024 07:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HsAXL0Aa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mHu6o8PT"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2055.outbound.protection.outlook.com [40.107.243.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D1810A11
-	for <kvm@vger.kernel.org>; Fri, 22 Mar 2024 06:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711089769; cv=fail; b=BVcrtOt/mUr2lOFrtMxwy5x7uyWx8bdp3JtX0mR+YJXb6ZZPRLOQcGwHk3qrZWRaqQ4G0vN2npFsCm7TmgAvZBNGySbRk48/BkCozUsDVpOoqU50E0oPkHuDjQanFs5xEYsWVwoQ3DX9jp+4vNJ5ufhz39RIgBXYiZ58pZjbhYw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711089769; c=relaxed/simple;
-	bh=X3lMJhdZmt3bGBjW2wfocqtVpzBue9y7mDdnvWXi8oE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Z6S4zCmR/Rd/SGTtnaZleLHNvlcI6lJBMbrrV8WH8u0aPAYfDSdv6yQDD6MgpfO5KV2wPiRlVlCI4FW0B932PdVnpzbxp6QtF2TKloHOTzmHVNSnE1S485klhPVIWRF8navKxS3ff5vzI4EFsAY+aUXlK6QT/29+gmojty43GsI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HsAXL0Aa; arc=fail smtp.client-ip=40.107.243.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KLMGoXvbme2xrZQMR8SqZW4mWTzFcdh/wxMtb5SKSIzED00mArQwd+XYJGTDqap6unEOFrx0fj+Jy8RykhGbNMy0sv8VPrzq8gwLjAAN3LRp9vDt1mc7iznWz8ZYrOrG4yHihtXMiUpLy6LGxt4kMBlKAdyylXhUhcbWydgJK4F4dwNRrle/eUONc2sjpq6/jG3mqA1QOYLY5c6JWCKjoHADkl5MZj3CeuyuJVO0LL6UtfAPjdyK4LDOlf6RRbZVZDAjVRlfZeG+wmOXzJokf/5092tA2qM7MKFrY/JmV7mfktaSOV2duyvUbFSyEJC2kdv/kxwgT/VkqxsNgDubUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mbbxXrcwvRYtjYm83Z3muw0qSHQbsXQVykRIti2Lau0=;
- b=B6kX0L9B4y0f61KUmTt8w63ppQkFhIdMQ59cPyoIcH7xVHOKob/vqL7fSmcUb8svyFxmxRQyIFLAECoHc2Lf6pPWioUTUKNnBgKHCmd6gzwY1nWjuUtuz3bfRl+cDfVcvO+NjvqfBTzmm4RCRTLeswbp77JQsYgIGdoBi1cit369sP/TAQ87/7k3X21u5P4+MBrhC/V7QhhKrN0z2XHIjClGLe8+JIWPV0bIaWQYKFLSi49UA37GPERT8MMgEmZ4DFW/YkldCzN5loa80OMr0mSl0zh13j6aQrSrXE4o8y1ZIjg4+ID9PCQ70WmM9IwhWr9nTIrz8Ejn3rSfuZXMvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=nongnu.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mbbxXrcwvRYtjYm83Z3muw0qSHQbsXQVykRIti2Lau0=;
- b=HsAXL0Aa2R1xMBDY1zfOYDySpXENg5iojwDaY3A+VqvWyyhipINIYwWfQeHpLYcWObTGhZLBp5Pz+dTx0kWH7GOwhOsiOtxTPSSnBkr7g1abyAGegtl/exHR1VIKd/FEAZqncPzl3nc9gz8CBM5No1AYOVaOWKSPYu1sQRG7ho+gp4qIuuzUtlgQpT9iyfsppCKQ1LOlryqzI+LTTmjRwe4f0uFvwcW4azierQsXoDBbJ1S0yMeoe5VF3j4bYqcR80JjGCibZ62FVHr7vBBdWKEMAdmIQsgT9aXY/7hC+NiOTmW3rnqn3YfIjPDaxnwLNOeXlqa8DmiCcr6OARJRzQ==
-Received: from SJ0PR03CA0107.namprd03.prod.outlook.com (2603:10b6:a03:333::22)
- by CH3PR12MB8259.namprd12.prod.outlook.com (2603:10b6:610:124::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.31; Fri, 22 Mar
- 2024 06:42:44 +0000
-Received: from SJ1PEPF00001CE7.namprd03.prod.outlook.com
- (2603:10b6:a03:333:cafe::99) by SJ0PR03CA0107.outlook.office365.com
- (2603:10b6:a03:333::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.28 via Frontend
- Transport; Fri, 22 Mar 2024 06:42:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- SJ1PEPF00001CE7.mail.protection.outlook.com (10.167.242.23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.10 via Frontend Transport; Fri, 22 Mar 2024 06:42:43 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 21 Mar
- 2024 23:42:33 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Thu, 21 Mar 2024 23:42:33 -0700
-Received: from vkale-dev-linux.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12 via Frontend
- Transport; Thu, 21 Mar 2024 23:42:30 -0700
-From: Vinayak Kale <vkale@nvidia.com>
-To: <qemu-devel@nongnu.org>
-CC: <alex.williamson@redhat.com>, <mst@redhat.com>,
-	<marcel.apfelbaum@gmail.com>, <avihaih@nvidia.com>, <acurrid@nvidia.com>,
-	<cjia@nvidia.com>, <zhiw@nvidia.com>, <targupta@nvidia.com>,
-	<kvm@vger.kernel.org>, Vinayak Kale <vkale@nvidia.com>
-Subject: [PATCH v3] vfio/pci: migration: Skip config space check for Vendor Specific Information in VSC during restore/load
-Date: Fri, 22 Mar 2024 12:12:10 +0530
-Message-ID: <20240322064210.1520394-1-vkale@nvidia.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8953F10A2E;
+	Fri, 22 Mar 2024 07:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711091202; cv=none; b=u6g3r6JAgkwJcr33NjDTstfeGfZa/IQ0aEGP4z8HSFnBvXElV1BDNGxH00fDXVnNf+JVzyAiWGZQY7z8bbFvgiSCvxcuPryWRjz92S866POby1JxSy9PWpjacUfkTL8Zy9g5NTV88qISmPVt7uuTsgXRHY2lCkdcaQEcI9kK2mE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711091202; c=relaxed/simple;
+	bh=X6KWO0JkFQmX9DisdsBko7gEf7srau9Hv1mi627ATLo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ld3JzJZU343dV0vKvjb1WnFbWr6JmoIhNfMR0P/gnAKbeyRG4P23HYTWGlogqEUMyoKYp38VcTMIkMewaKHU0FuBXf0BkpdEbXazCzz2gN+8ZcR2farC8vyGZ2DiKT08gcemSXkQSJlDlpos8a8H1M39uAEAMemzHwRmMqwsdSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mHu6o8PT; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711091201; x=1742627201;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=X6KWO0JkFQmX9DisdsBko7gEf7srau9Hv1mi627ATLo=;
+  b=mHu6o8PTgsKe/fwFxaPndujNqv6mv905OZCucoDLWH9xh6uI+HDFH6PL
+   umGLSLXhiQ3LkhzBY1nNvDQOpiND3uIi82rt8z6WLyrIEgdljzbWwIzO1
+   8DJi48U5RksAmmUogzrogHUmELBEihJpdIpQGp67vcMn6FxBjBzVQYH8h
+   ZG0gMNDF0jAM6xhtRXciubA4TRH0+29qvn/UAV8PXIZjLZrMSsJycgXg9
+   Gpv1p3SkVTbC7XBpgE7/3yZlT0zDDH8F0umrdSIlmJPuEHYkqku1ngaqs
+   L6N/S3S+fXzCm8FHxkAa9QZV012ia84U+cWSyki3nVzvURL3GrWXY1xOC
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="17273410"
+X-IronPort-AV: E=Sophos;i="6.07,145,1708416000"; 
+   d="scan'208";a="17273410"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 00:06:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,145,1708416000"; 
+   d="scan'208";a="19496114"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orviesa003.jf.intel.com with ESMTP; 22 Mar 2024 00:06:36 -0700
+Date: Fri, 22 Mar 2024 15:06:35 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH v19 027/130] KVM: TDX: Define TDX architectural
+ definitions
+Message-ID: <20240322070635.jwqlqzo2x2ddf5c3@yy-desk-7060>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <522cbfe6e5a351f88480790fe3c3be36c82ca4b1.1708933498.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE7:EE_|CH3PR12MB8259:EE_
-X-MS-Office365-Filtering-Correlation-Id: 21273839-0d7d-42f0-43f7-08dc4a3b46fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ePcYB+IfMUqbPjnGOa8R/WF2Vul0nIOPbEZ8dU2D5kbImBFxeBbr8KPGLKBhjKB/WNuIE8bbLMciCZjUhrdEfgoRvr/OyE5UM6O9xY9CNXGMxxWD5zPCGgsCLyQoXX+XI0jygwvCgdUlAiPVc9HjGAaEXP6B+X2eco16ZkXQdg2BNEhzIriSlG/qdUvZwiyhoLhOCIRal7y+KGUZ71vD9XR9wrclEFOA6IHeiadC223ovt/dtj9apjYsR+4H5SMRn7cZsfZVKGS0zaIpbbM+x2iF1luj3SrYJz7CaDBmbxaTOwFrM9ZYDoMGmUe573gGBYC/btaLBHvvvrYa1QzpiseBKNFNKQiy1okUrdYZCjQWWfLSYxrp3Z4cR7tk1gKC+bDe+R+bb98hEtvG/iQV+Bt0d7sdYgNwBPm3ipEXOBPbYT1LHYJ2kqfUMN1G9jKH6JKKM5S7w6BgLhRadE+k2Qs+On16T4yh2ysf9fgPJDlZsuG9ccmJy3nNQCwEW8uZCAQrq4O8+mGqS8vo3g4QQyAnQgPYGuOM0FUS1p3MX9fpFC/McYLRLwCOa/v47p6nlRiZO4n3Req3/LSeP5Ri9PrPFC2xCBKaxPPDL1Hlv2oxNpCOWijGG+JCaikRyMI/c8l/jhTR1ytXGvTu5jxaW0ylu/AbYZDbF/qOyArEMHwr+J1IGhE15S/Kx3LvAeFfuwtHEVeO08EKplY9j/0AZfyNmhYETUS2NzxFA+26wYH9+B9evskLzv0AwdgWrDVO
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(376005)(36860700004)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2024 06:42:43.3918
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21273839-0d7d-42f0-43f7-08dc4a3b46fc
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE7.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8259
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <522cbfe6e5a351f88480790fe3c3be36c82ca4b1.1708933498.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
 
-In case of migration, during restore operation, qemu checks config space of the
-pci device with the config space in the migration stream captured during save
-operation. In case of config space data mismatch, restore operation is failed.
+On Mon, Feb 26, 2024 at 12:25:29AM -0800, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> Define architectural definitions for KVM to issue the TDX SEAMCALLs.
+>
+> Structures and values that are architecturally defined in the TDX module
+> specifications the chapter of ABI Reference.
+>
+> Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+> v19:
+> - drop tdvmcall constants by Xiaoyao
+>
+> v18:
+> - Add metadata field id
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/vmx/tdx_arch.h | 265 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 265 insertions(+)
+>  create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
+>
+> diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+> new file mode 100644
+> index 000000000000..e2c1a6f429d7
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx_arch.h
+> @@ -0,0 +1,265 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* architectural constants/data definitions for TDX SEAMCALLs */
+> +
+> +#ifndef __KVM_X86_TDX_ARCH_H
+> +#define __KVM_X86_TDX_ARCH_H
+> +
+> +#include <linux/types.h>
+> +
+> +/*
+> + * TDX SEAMCALL API function leaves
+> + */
+> +#define TDH_VP_ENTER			0
+> +#define TDH_MNG_ADDCX			1
+> +#define TDH_MEM_PAGE_ADD		2
+> +#define TDH_MEM_SEPT_ADD		3
+> +#define TDH_VP_ADDCX			4
+> +#define TDH_MEM_PAGE_RELOCATE		5
+> +#define TDH_MEM_PAGE_AUG		6
+> +#define TDH_MEM_RANGE_BLOCK		7
+> +#define TDH_MNG_KEY_CONFIG		8
+> +#define TDH_MNG_CREATE			9
+> +#define TDH_VP_CREATE			10
+> +#define TDH_MNG_RD			11
+> +#define TDH_MR_EXTEND			16
+> +#define TDH_MR_FINALIZE			17
+> +#define TDH_VP_FLUSH			18
+> +#define TDH_MNG_VPFLUSHDONE		19
+> +#define TDH_MNG_KEY_FREEID		20
+> +#define TDH_MNG_INIT			21
+> +#define TDH_VP_INIT			22
+> +#define TDH_MEM_SEPT_RD			25
+> +#define TDH_VP_RD			26
+> +#define TDH_MNG_KEY_RECLAIMID		27
+> +#define TDH_PHYMEM_PAGE_RECLAIM		28
+> +#define TDH_MEM_PAGE_REMOVE		29
+> +#define TDH_MEM_SEPT_REMOVE		30
+> +#define TDH_SYS_RD			34
+> +#define TDH_MEM_TRACK			38
+> +#define TDH_MEM_RANGE_UNBLOCK		39
+> +#define TDH_PHYMEM_CACHE_WB		40
+> +#define TDH_PHYMEM_PAGE_WBINVD		41
+> +#define TDH_VP_WR			43
+> +#define TDH_SYS_LP_SHUTDOWN		44
+> +
+> +/* TDX control structure (TDR/TDCS/TDVPS) field access codes */
+> +#define TDX_NON_ARCH			BIT_ULL(63)
+> +#define TDX_CLASS_SHIFT			56
+> +#define TDX_FIELD_MASK			GENMASK_ULL(31, 0)
+> +
+> +#define __BUILD_TDX_FIELD(non_arch, class, field)	\
+> +	(((non_arch) ? TDX_NON_ARCH : 0) |		\
+> +	 ((u64)(class) << TDX_CLASS_SHIFT) |		\
+> +	 ((u64)(field) & TDX_FIELD_MASK))
+> +
+> +#define BUILD_TDX_FIELD(class, field)			\
+> +	__BUILD_TDX_FIELD(false, (class), (field))
+> +
+> +#define BUILD_TDX_FIELD_NON_ARCH(class, field)		\
+> +	__BUILD_TDX_FIELD(true, (class), (field))
+> +
+> +
+> +/* Class code for TD */
+> +#define TD_CLASS_EXECUTION_CONTROLS	17ULL
+> +
+> +/* Class code for TDVPS */
+> +#define TDVPS_CLASS_VMCS		0ULL
+> +#define TDVPS_CLASS_GUEST_GPR		16ULL
+> +#define TDVPS_CLASS_OTHER_GUEST		17ULL
+> +#define TDVPS_CLASS_MANAGEMENT		32ULL
+> +
+> +enum tdx_tdcs_execution_control {
+> +	TD_TDCS_EXEC_TSC_OFFSET = 10,
+> +};
+> +
+> +/* @field is any of enum tdx_tdcs_execution_control */
+> +#define TDCS_EXEC(field)		BUILD_TDX_FIELD(TD_CLASS_EXECUTION_CONTROLS, (field))
+> +
+> +/* @field is the VMCS field encoding */
+> +#define TDVPS_VMCS(field)		BUILD_TDX_FIELD(TDVPS_CLASS_VMCS, (field))
+> +
+> +enum tdx_vcpu_guest_other_state {
+> +	TD_VCPU_STATE_DETAILS_NON_ARCH = 0x100,
+> +};
+> +
+> +union tdx_vcpu_state_details {
+> +	struct {
+> +		u64 vmxip	: 1;
+> +		u64 reserved	: 63;
+> +	};
+> +	u64 full;
+> +};
+> +
+> +/* @field is any of enum tdx_guest_other_state */
+> +#define TDVPS_STATE(field)		BUILD_TDX_FIELD(TDVPS_CLASS_OTHER_GUEST, (field))
+> +#define TDVPS_STATE_NON_ARCH(field)	BUILD_TDX_FIELD_NON_ARCH(TDVPS_CLASS_OTHER_GUEST, (field))
+> +
+> +/* Management class fields */
+> +enum tdx_vcpu_guest_management {
+> +	TD_VCPU_PEND_NMI = 11,
+> +};
+> +
+> +/* @field is any of enum tdx_vcpu_guest_management */
+> +#define TDVPS_MANAGEMENT(field)		BUILD_TDX_FIELD(TDVPS_CLASS_MANAGEMENT, (field))
+> +
+> +#define TDX_EXTENDMR_CHUNKSIZE		256
+> +
+> +struct tdx_cpuid_value {
+> +	u32 eax;
+> +	u32 ebx;
+> +	u32 ecx;
+> +	u32 edx;
+> +} __packed;
+> +
+> +#define TDX_TD_ATTRIBUTE_DEBUG		BIT_ULL(0)
 
-config space check is done in function get_pci_config_device(). By default VSC
-(vendor-specific-capability) in config space is checked.
+This series doesn't really touch off-TD things, so you can remove this.
 
-Due to qemu's config space check for VSC, live migration is broken across NVIDIA
-vGPU devices in situation where source and destination host driver is different.
-In this situation, Vendor Specific Information in VSC varies on the destination
-to ensure vGPU feature capabilities exposed to the guest driver are compatible
-with destination host.
-
-If a vfio-pci device is migration capable and vfio-pci vendor driver is OK with
-volatile Vendor Specific Info in VSC then qemu should exempt config space check
-for Vendor Specific Info. It is vendor driver's responsibility to ensure that
-VSC is consistent across migration. Here consistency could mean that VSC format
-should be same on source and destination, however actual Vendor Specific Info
-may not be byte-to-byte identical.
-
-This patch skips the check for Vendor Specific Information in VSC for VFIO-PCI
-device by clearing pdev->cmask[] offsets. Config space check is still enforced
-for 3 byte VSC header. If cmask[] is not set for an offset, then qemu skips
-config space check for that offset.
-
-Signed-off-by: Vinayak Kale <vkale@nvidia.com>
----
-Version History
-v2->v3:
-    - Config space check skipped only for Vendor Specific Info in VSC, check is
-      still enforced for 3 byte VSC header.
-    - Updated commit description with live migration failure scenario.
-v1->v2:
-    - Limited scope of change to vfio-pci devices instead of all pci devices.
-
- hw/vfio/pci.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index d7fe06715c..1026cdba18 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2132,6 +2132,27 @@ static void vfio_check_af_flr(VFIOPCIDevice *vdev, uint8_t pos)
-     }
- }
- 
-+static int vfio_add_vendor_specific_cap(VFIOPCIDevice *vdev, int pos,
-+                                        uint8_t size, Error **errp)
-+{
-+    PCIDevice *pdev = &vdev->pdev;
-+
-+    pos = pci_add_capability(pdev, PCI_CAP_ID_VNDR, pos, size, errp);
-+    if (pos < 0) {
-+        return pos;
-+    }
-+
-+    /*
-+     * Exempt config space check for Vendor Specific Information during restore/load.
-+     * Config space check is still enforced for 3 byte VSC header.
-+     */
-+    if (size > 3) {
-+        memset(pdev->cmask + pos + 3, 0, size - 3);
-+    }
-+
-+    return pos;
-+}
-+
- static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
- {
-     PCIDevice *pdev = &vdev->pdev;
-@@ -2199,6 +2220,9 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
-         vfio_check_af_flr(vdev, pos);
-         ret = pci_add_capability(pdev, cap_id, pos, size, errp);
-         break;
-+    case PCI_CAP_ID_VNDR:
-+        ret = vfio_add_vendor_specific_cap(vdev, pos, size, errp);
-+        break;
-     default:
-         ret = pci_add_capability(pdev, cap_id, pos, size, errp);
-         break;
--- 
-2.34.1
-
+> +#define TDX_TD_ATTR_SEPT_VE_DISABLE	BIT_ULL(28)
+> +#define TDX_TD_ATTRIBUTE_PKS		BIT_ULL(30)
+> +#define TDX_TD_ATTRIBUTE_KL		BIT_ULL(31)
+> +#define TDX_TD_ATTRIBUTE_PERFMON	BIT_ULL(63)
+> +
+> +/*
+> + * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
+> + */
+> +#define TDX_MAX_VCPUS	(~(u16)0)
+> +
+> +struct td_params {
+> +	u64 attributes;
+> +	u64 xfam;
+> +	u16 max_vcpus;
+> +	u8 reserved0[6];
+> +
+> +	u64 eptp_controls;
+> +	u64 exec_controls;
+> +	u16 tsc_frequency;
+> +	u8  reserved1[38];
+> +
+> +	u64 mrconfigid[6];
+> +	u64 mrowner[6];
+> +	u64 mrownerconfig[6];
+> +	u64 reserved2[4];
+> +
+> +	union {
+> +		DECLARE_FLEX_ARRAY(struct tdx_cpuid_value, cpuid_values);
+> +		u8 reserved3[768];
+> +	};
+> +} __packed __aligned(1024);
+> +
+> +/*
+> + * Guest uses MAX_PA for GPAW when set.
+> + * 0: GPA.SHARED bit is GPA[47]
+> + * 1: GPA.SHARED bit is GPA[51]
+> + */
+> +#define TDX_EXEC_CONTROL_MAX_GPAW      BIT_ULL(0)
+> +
+> +/*
+> + * TDH.VP.ENTER, TDG.VP.VMCALL preserves RBP
+> + * 0: RBP can be used for TDG.VP.VMCALL input. RBP is clobbered.
+> + * 1: RBP can't be used for TDG.VP.VMCALL input. RBP is preserved.
+> + */
+> +#define TDX_CONTROL_FLAG_NO_RBP_MOD	BIT_ULL(2)
+> +
+> +
+> +/*
+> + * TDX requires the frequency to be defined in units of 25MHz, which is the
+> + * frequency of the core crystal clock on TDX-capable platforms, i.e. the TDX
+> + * module can only program frequencies that are multiples of 25MHz.  The
+> + * frequency must be between 100mhz and 10ghz (inclusive).
+> + */
+> +#define TDX_TSC_KHZ_TO_25MHZ(tsc_in_khz)	((tsc_in_khz) / (25 * 1000))
+> +#define TDX_TSC_25MHZ_TO_KHZ(tsc_in_25mhz)	((tsc_in_25mhz) * (25 * 1000))
+> +#define TDX_MIN_TSC_FREQUENCY_KHZ		(100 * 1000)
+> +#define TDX_MAX_TSC_FREQUENCY_KHZ		(10 * 1000 * 1000)
+> +
+> +union tdx_sept_entry {
+> +	struct {
+> +		u64 r		:  1;
+> +		u64 w		:  1;
+> +		u64 x		:  1;
+> +		u64 mt		:  3;
+> +		u64 ipat	:  1;
+> +		u64 leaf	:  1;
+> +		u64 a		:  1;
+> +		u64 d		:  1;
+> +		u64 xu		:  1;
+> +		u64 ignored0	:  1;
+> +		u64 pfn		: 40;
+> +		u64 reserved	:  5;
+> +		u64 vgp		:  1;
+> +		u64 pwa		:  1;
+> +		u64 ignored1	:  1;
+> +		u64 sss		:  1;
+> +		u64 spp		:  1;
+> +		u64 ignored2	:  1;
+> +		u64 sve		:  1;
+> +	};
+> +	u64 raw;
+> +};
+> +
+> +enum tdx_sept_entry_state {
+> +	TDX_SEPT_FREE = 0,
+> +	TDX_SEPT_BLOCKED = 1,
+> +	TDX_SEPT_PENDING = 2,
+> +	TDX_SEPT_PENDING_BLOCKED = 3,
+> +	TDX_SEPT_PRESENT = 4,
+> +};
+> +
+> +union tdx_sept_level_state {
+> +	struct {
+> +		u64 level	:  3;
+> +		u64 reserved0	:  5;
+> +		u64 state	:  8;
+> +		u64 reserved1	: 48;
+> +	};
+> +	u64 raw;
+> +};
+> +
+> +/*
+> + * Global scope metadata field ID.
+> + * See Table "Global Scope Metadata", TDX module 1.5 ABI spec.
+> + */
+> +#define MD_FIELD_ID_SYS_ATTRIBUTES		0x0A00000200000000ULL
+> +#define MD_FIELD_ID_FEATURES0			0x0A00000300000008ULL
+> +#define MD_FIELD_ID_ATTRS_FIXED0		0x1900000300000000ULL
+> +#define MD_FIELD_ID_ATTRS_FIXED1		0x1900000300000001ULL
+> +#define MD_FIELD_ID_XFAM_FIXED0			0x1900000300000002ULL
+> +#define MD_FIELD_ID_XFAM_FIXED1			0x1900000300000003ULL
+> +
+> +#define MD_FIELD_ID_TDCS_BASE_SIZE		0x9800000100000100ULL
+> +#define MD_FIELD_ID_TDVPS_BASE_SIZE		0x9800000100000200ULL
+> +
+> +#define MD_FIELD_ID_NUM_CPUID_CONFIG		0x9900000100000004ULL
+> +#define MD_FIELD_ID_CPUID_CONFIG_LEAVES		0x9900000300000400ULL
+> +#define MD_FIELD_ID_CPUID_CONFIG_VALUES		0x9900000300000500ULL
+> +
+> +#define MD_FIELD_ID_FEATURES0_NO_RBP_MOD	BIT_ULL(18)
+> +
+> +#define TDX_MAX_NR_CPUID_CONFIGS       37
+> +
+> +#define TDX_MD_ELEMENT_SIZE_8BITS      0
+> +#define TDX_MD_ELEMENT_SIZE_16BITS     1
+> +#define TDX_MD_ELEMENT_SIZE_32BITS     2
+> +#define TDX_MD_ELEMENT_SIZE_64BITS     3
+> +
+> +union tdx_md_field_id {
+> +	struct {
+> +		u64 field                       : 24;
+> +		u64 reserved0                   : 8;
+> +		u64 element_size_code           : 2;
+> +		u64 last_element_in_field       : 4;
+> +		u64 reserved1                   : 3;
+> +		u64 inc_size                    : 1;
+> +		u64 write_mask_valid            : 1;
+> +		u64 context                     : 3;
+> +		u64 reserved2                   : 1;
+> +		u64 class                       : 6;
+> +		u64 reserved3                   : 1;
+> +		u64 non_arch                    : 1;
+> +	};
+> +	u64 raw;
+> +};
+> +
+> +#define TDX_MD_ELEMENT_SIZE_CODE(_field_id)			\
+> +	({ union tdx_md_field_id _fid = { .raw = (_field_id)};  \
+> +		_fid.element_size_code; })
+> +
+> +#endif /* __KVM_X86_TDX_ARCH_H */
+> --
+> 2.25.1
+>
+>
 
