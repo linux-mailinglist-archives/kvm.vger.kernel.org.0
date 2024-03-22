@@ -1,226 +1,206 @@
-Return-Path: <kvm+bounces-12516-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97428871EA
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 18:33:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CA938871EE
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 18:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD50D1C21C63
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 17:33:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B77B31C22D29
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 17:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F335FDA3;
-	Fri, 22 Mar 2024 17:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5275FDA1;
+	Fri, 22 Mar 2024 17:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hDV+Gsar"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gQNFYkF5"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52FBD47793;
-	Fri, 22 Mar 2024 17:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3661CD25;
+	Fri, 22 Mar 2024 17:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711128817; cv=none; b=Q6bN/t/qArh5crq+1x/EXTowaEHnSxjLntVm029A0zrPy91OFBayYtOwI3tkmHq4qAOnh/CDJBdK+M5xzeodI8FBqHBZLxAT5mxz7wwaERFTXWWI7HxRlXt12zEq5EUhEavVTOcxXJn+PqMX2veEcbzRj6JLiqOBKhcF+QxYgJI=
+	t=1711129150; cv=none; b=r+frcscOmZtTi14bXBJuaSwHYKXxwEiaKb63DgFDheSwKuDgxmkdoZrMohRwafQN3AJN0SSIFOdPcG+oOJRZwRU0U9PGHiKYdDuFhkoIJk0sf40BY35rzgFj2++gL9CDn347e2178IIvgsSdet2wYoPjJUSfKoYCe1oRhxCCdR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711128817; c=relaxed/simple;
-	bh=q7JrrZOo5+hDRmBzvN6hqsChrFOx8TL6QdxH1nPbXi0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UIFHwWitNLhGwzaJmE8fPWOCACMK1AGHTBBeI3M0iTlLuH18lTaN6RgvYmq2hxNmPpnheVQixCtEZe7QewSoIwZbhMtBzip5FBSx1pN88yDpO5x1r38bDiFrLsGKPz5stTDY6gsteWAQyOq8UtSJwLGXu2kBQsyktAWWtLIEKp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hDV+Gsar; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=q7JrrZOo5+hDRmBzvN6hqsChrFOx8TL6QdxH1nPbXi0=; b=hDV+GsarAMswANiPSzZVSI6aya
-	3ZGnTr9/kRt8YK+k5u7fXM1I9HxHEyvYkPrjveia29W/ffSUzXlOI2O2hJ4NMZ9DDyiqzxy0cMxop
-	eevJS3SbIidU4rhMhe5Fl8gBQBT+HAL1/SerEAbZWc+o1xKVOBUr3uIq/sKO91CJZ6FRbWf+Rdzdx
-	JHGGRvxATaAEOGD13Ywo/wTtWVdLZFWwF61Dn+7xozDrcplLtBORsSV1xQd5jdY96G5/a+slvU38C
-	48A3syXLzPpDftPk/xdWIJBVpwMXyA9KOnFWJ+daVeWtyNvLK8aabiQdgIW3TkL/8yCFeZmGHXVph
-	OGfOtF4w==;
-Received: from [2001:8b0:10b:5:244c:6ee0:3d43:8a85] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rnili-00000009uux-0lzX;
-	Fri, 22 Mar 2024 17:33:26 +0000
-Message-ID: <66fd33e9d113669cdeb46a008bd69acff1d1aa74.camel@infradead.org>
-Subject: Re: [RFC PATCH v3 0/5] Add PSCI v1.3 SYSTEM_OFF2 support for
- hibernation
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, 
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Paolo Bonzini
- <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui
- Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Lorenzo
- Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Mostafa Saleh
- <smostafa@google.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org
-Date: Fri, 22 Mar 2024 17:33:25 +0000
-In-Reply-To: <86frwiz1rs.wl-maz@kernel.org>
-References: <20240319130957.1050637-1-dwmw2@infradead.org>
-	 <Zfmu3wnFbIGQZD-j@linux.dev>
-	 <9e7a6e0f9c290a4b84c5bcc8cf3d4aba3cae2be5.camel@infradead.org>
-	 <Zfnpj2FShq05QZpf@linux.dev>
-	 <248ec30e7b5c8a42d184f029c1cc9b664656b356.camel@infradead.org>
-	 <86frwiz1rs.wl-maz@kernel.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-4348LFrQyy97fOemnDcW"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1711129150; c=relaxed/simple;
+	bh=M10HBP0QHr0blsaz7VID9hCSGi9EAm/Vle9sr0Fgh0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MDxry4AsDjijMgjXmzovKY2LEWfto1szHO8xd83jdBSprIsbamylKrCZEyWSWBWz97hBZMmGXnNmq33VLJFG032zV6Xs8+dVyOOmghW1Z+dzieu4iR9Qk76qRBiamSeOk568s6uuO85h3Xl7dXqgNt5dCG5ut+eUaRAtT3c/S0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gQNFYkF5; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711129148; x=1742665148;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=M10HBP0QHr0blsaz7VID9hCSGi9EAm/Vle9sr0Fgh0g=;
+  b=gQNFYkF5NrpFsZfjyXsV25QLuNUqolNNbyAl4U5m8H1R5mca8lrEsn5f
+   OWGBlPLBhXiGIOloeFY6oDoPMr357wjrioZQmk2kF/f/Qe9fph02DoJcZ
+   q1K7z66Ne8o367/vbp46txGB79ms8Y2H05lNm+IUj3s7aaLp3jM5sJ0PI
+   Ce0v1RTu0sfyEuyCjacZB+4qK0tGH3L1r34HNoHC33bjqRWB4s+zqm351
+   AktkEV1ChoqhPJYza6QOwBCvnstS9l0D5V2fOLDV0KQjiXMcb56xCK/1j
+   BzMy5vKOEta5ewflqkWqFH8HdHUSJxP2ssd0JuMp1uukgY1OuQfkoN0Oh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="17623621"
+X-IronPort-AV: E=Sophos;i="6.07,146,1708416000"; 
+   d="scan'208";a="17623621"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 10:39:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,146,1708416000"; 
+   d="scan'208";a="14986058"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 10:39:07 -0700
+Date: Fri, 22 Mar 2024 10:39:06 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Yuan, Hang" <hang.yuan@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 022/130] KVM: x86/vmx: Refactor KVM VMX module
+ init/exit functions
+Message-ID: <20240322173906.GY1994522@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <11d5ae6a1102a50b0e773fc7efd949bb0bd2b776.1708933498.git.isaku.yamahata@intel.com>
+ <0f466c5845e9d75b25392ecb5129c4e984052c1b.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0f466c5845e9d75b25392ecb5129c4e984052c1b.camel@intel.com>
+
+On Thu, Mar 21, 2024 at 11:27:46AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
+
+> On Mon, 2024-02-26 at 00:25 -0800, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > Currently, KVM VMX module initialization/exit functions are a single
+> > function each.  Refactor KVM VMX module initialization functions into KVM
+> > common part and VMX part so that TDX specific part can be added cleanly.
+> > Opportunistically refactor module exit function as well.
+> > 
+> > The current module initialization flow is,
+> 
+> 					  ^ ',' -> ':'
+> 
+> And please add an empty line to make text more breathable.
+> 
+> > 0.) Check if VMX is supported,
+> > 1.) hyper-v specific initialization,
+> > 2.) system-wide x86 specific and vendor specific initialization,
+> > 3.) Final VMX specific system-wide initialization,
+> > 4.) calculate the sizes of VMX kvm structure and VMX vcpu structure,
+> > 5.) report those sizes to the KVM common layer and KVM common
+> >     initialization
+> 
+> Is there any difference between "KVM common layer" and "KVM common
+> initialization"?  I think you can remove the former.
+
+Ok.
+
+> > Refactor the KVM VMX module initialization function into functions with a
+> > wrapper function to separate VMX logic in vmx.c from a file, main.c, common
+> > among VMX and TDX.  Introduce a wrapper function for vmx_init().
+> 
+> Sorry I don't quite follow what your are trying to say in the above paragraph.
+> 
+> You have adequately put what is the _current_ flow, and I am expecting to see
+> the flow _after_ the refactor here.
+
+Will add it.
 
 
---=-4348LFrQyy97fOemnDcW
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> > The KVM architecture common layer allocates struct kvm with reported size
+> > for architecture-specific code.  The KVM VMX module defines its structure
+> > as struct vmx_kvm { struct kvm; VMX specific members;} and uses it as
+> > struct vmx kvm.  Similar for vcpu structure. TDX KVM patches will define
+> 
+> 	 ^vmx_kvm.
+> 
+> Please be more consistent on the words.
+> 
+> > TDX specific kvm and vcpu structures.
+> 
+> Is this paragraph related to the changes in this patch?
+> 
+> For instance, why do you need to point out we will have TDX-specific 'kvm and
+> vcpu' structures?
 
-On Fri, 2024-03-22 at 16:09 +0000, Marc Zyngier wrote:
->=20
-> > Marc, I think I've also addressed your feedback? Is there anything else
-> > to do other than wait for the spec to be published?
->=20
-> Other than the couple of minor nits I mentioned in replies to the
-> individual patches, this looks good to me.
-
-I believe I've handled all that. And also Sudeep's implicit nudge to
-use BIT() instead of manually shifting (1<<PSCI_1_3_HIBERNATE_TYPE_OFF).
-
-Rebased onto 6.8 and pushed to
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/psci-hi=
-bernate-6.8
-
-> > Shall I post a v4 with PSCI v1.3 as default and the self-test? Would
-> > you apply that into a branch ready for merging when the spec is ready,
-> > or should I just wait and repost it all then?
->=20
-> I think this can wait for the final spec. I assume that you are
-> directly tracking this anyway, so we don't need to poll for the spec
-> update.
-
-Indeed, will post again when the spec is published. Thanks.
-
---=-4348LFrQyy97fOemnDcW
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzIyMTczMzI1WjAvBgkqhkiG9w0BCQQxIgQgr30gcu5A
-XM04pBs2LzfEtzWH1hHwcK89alPrbvcB+T0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAGlSyjJ73U0nQa8i6tMFLpOZoMe5NiUhcg
-BUceMEQ9CLMTuBKNmV+ILAvQWLQngvwJ7ksICWqqr/8PFYDyqk6WpbmmThq3pEQvpJP6Ra2PcU8B
-26SRfTI9pJgZg3Gz/bChL9lIiTvACYEYo+wtsMAAfwEX4LT613Ch0NNnqFInPcoWY8y/LyvySwwv
-6aT1WsP5/i3hOMJny4EFU2GexDHO7TWDi2Kt0Q2f+trd57S8HV4r3oc8rUFF8AGpC+X3uXySY+bB
-89xQC/oaiJ6FrkO2cA30Jvkcu7qZYmT3J54WiNTkL2tvkbbi4w2hPmhMI7Ok+fKAbBmpAuQl1JgY
-FHWekwUtV6q1KXn9CjV95izX//fsBXqlFUlCM0xqpBfxjcN70QlqMSZVBNTuM2dCFWulJcDsObnU
-2F8bHCRyM4l/3m96Hj6629KkWfUdVV5lu7B/Iec2GU1WVsyHmyqTl54lkCuv8z9a/t21jYcLZBPL
-t+N5IxsVoMiS47NcH+wt+hnacRRcnoae4Q9iBpxl+BkOLLtyJXmJ0m8JIiF2T5Ni2RKDqRicbRWg
-JKqNzzP6STvxK5YuyMVvwX+kFES1ebPDq5JS3ueYdbNRJsMbj5PRjQ/3XXcqt5cJ9y4EcdT6pIXW
-Sfpzyr+DcM+y1nyIaOXwm9QEi3ruQQiJiuqETUQQaQAAAAAAAA==
+The point of this refactoring is to make room for TDX-specific code.  The
+consideration point is data size/alignment difference and VMX-dependency.
+Let me re-order the sentences.
 
 
---=-4348LFrQyy97fOemnDcW--
+> > The current module exit function is also a single function, a combination
+> > of VMX specific logic and common KVM logic.  Refactor it into VMX specific
+> > logic and KVM common logic.  
+> > 
+> 
+> [...]
+> 
+> > This is just refactoring to keep the VMX
+> > specific logic in vmx.c from main.c.
+> 
+> It's better to make this as a separate paragraph, because it is a summary to
+> this patch.
+> 
+> And in other words: No functional change intended?
+
+Thanks for the feedback.  Here is the revised version.
+
+KVM: x86/vmx: Refactor KVM VMX module init/exit functions
+
+Split KVM VMX kernel module initialization into one specific to VMX in
+vmx.c and one common for VMX and TDX in main.c to make room for
+TDX-specific logic to fit in.  Opportunistically, refactor module exit
+function as well.
+
+The key points are data structure difference and TDX dependency on
+VMX.  The data structures for TDX are different from VMX.  So are its
+size and alignment.  Because TDX depends on VMX, TDX initialization
+must be after VMX initialization.  TDX cleanup must be before VMX
+cleanup.
+
+The current module initialization flow is:
+
+0.) Check if VMX is supported,
+1.) Hyper-v specific initialization,
+2.) System-wide x86 specific and vendor-specific initialization,
+3.) Final VMX-specific system-wide initialization,
+4.) Calculate the sizes of the kvm and vcpu structure for VMX,
+5.) Report those sizes to the KVM-common initialization
+
+After refactoring and TDX, the flow will be:
+
+0.) Check if VMX is supported (main.c),
+1.) Hyper-v specific initialization (main.c),
+2.) System-wide x86 specific and vendor-specific initialization,
+    2.1) VMX-specific initialization (vmx.c)
+    2.2) TDX-specific initialization (tdx.c)
+3.) Final VMX-specific system-wide initialization (vmx.c),
+    TDX doesn't need this step.
+4.) Calculate the sizes of the kvm and vcpu structure for both VMX and
+    TDX, (main.c)
+5.) Report those sizes to the KVM-common initialization (main.c)
+
+No functional change intended.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
