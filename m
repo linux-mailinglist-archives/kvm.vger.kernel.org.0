@@ -1,173 +1,121 @@
-Return-Path: <kvm+bounces-12493-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12494-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8210886FB4
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 16:19:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B1B88702D
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 17:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 111611C21737
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 15:19:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52C601C22B73
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 16:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B49B4E1C4;
-	Fri, 22 Mar 2024 15:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F3356B98;
+	Fri, 22 Mar 2024 16:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FCVGPm17"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jmV2lbD8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F08545BE4;
-	Fri, 22 Mar 2024 15:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8652A55C26;
+	Fri, 22 Mar 2024 16:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711120767; cv=none; b=GwkzQ5UPeEZicd7m6X9wfmNNSt99FY7p7NepJqO8e3xwCAh+rxAZBpbSIf6cPQ8w0viF0VvPl+d5VMkX7NUeaqs3EVolHksZnzNwGamfgQLw5da2SK5nIaGSg5OLU9IiczSsa1lFIoA4pVKRJlD3Mw8deWI49zfDes+PzO1zGqI=
+	t=1711123336; cv=none; b=KWu4diiDc996oYNK0XhntUbwrSlXfLlp7CoyNHgtz3xLRO10EnK69PcnFO8J5R9grl097zzEG/otSD3d1t2kR4Xo0PA62zYcDW24M+f53TGLyOrJui/vOf6rlhLH6iM/fLMCyvxYhKOJ/4n770j6ZFa8vvRz0w8B/IA87CtBt4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711120767; c=relaxed/simple;
-	bh=EmauFkFzSgc/qDZcww6tdS37MuHANiCdzNtCEy1AVn0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e5jlvprQKumPhA/Kgd+9efW5AElCAwFJnVG+AHGadPgNB15PcPHV6iIiZ8Vu8CCFzjOWPVo0iDxcfo6HB8HPvP1vuSQpwtEBlZyBTOWzpVr4R1YtV3NGEuq3fbTK9wreAlkqnD4j2uvZzHxUk5kb6Y7zk1OFPckioG2bE6y2OFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FCVGPm17; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711120765; x=1742656765;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=EmauFkFzSgc/qDZcww6tdS37MuHANiCdzNtCEy1AVn0=;
-  b=FCVGPm17XL3MhKWPPtccQYru53bUjbRvZtUL1U+SeFthCgUOXwRvZoxs
-   FuwEOkNRxAEPVzXAFz3AkqmnUVRF1C9o8E7EpJhdca1frjSrhNEbsMPWe
-   ScXXEdbsQuoboMXIuSVkfW0E1AGdPbJwl/C7yy/eQi+drRC5BbXMW3eXe
-   f4AQcz2w+iZjGzALl/wFmU3nKll3KXF1tr7ProzTDhllOHwNjCBCEJSYr
-   wlDCwESaqagE5lQCglnkNSFAkimsCrOaO3KBQp9v8Uqu2LYvoySFrHovM
-   kzCqX/bZAnAaxlSv+MWph01srOxvQJTaoEgHn2zbIA/kxvv7Njqw8a7x5
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="6359140"
-X-IronPort-AV: E=Sophos;i="6.07,146,1708416000"; 
-   d="scan'208";a="6359140"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 08:19:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,146,1708416000"; 
-   d="scan'208";a="19636008"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 08:19:24 -0700
-Date: Fri, 22 Mar 2024 08:19:23 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Zhang, Tina" <tina.zhang@intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Yuan, Hang" <hang.yuan@intel.com>,
-	"Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
-	"sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 056/130] KVM: x86/tdp_mmu: Init role member of struct
- kvm_mmu_page at allocation
-Message-ID: <20240322151923.GX1994522@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <5d2307efb227b927cc9fa3e18787fde8e1cb13e2.1708933498.git.isaku.yamahata@intel.com>
- <9c58ad553facc17296019a8dad6a262bbf1118bd.camel@intel.com>
- <20240321212412.GR1994522@ls.amr.corp.intel.com>
- <Zf0wz82nQoL0VsAd@chao-email>
+	s=arc-20240116; t=1711123336; c=relaxed/simple;
+	bh=aoF4dmwFvyElelkcyMu8PBXHligJrfzMuWeep9NvMbE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o++SgCsi1gVOqrHHhuslc+4blCyIZ/pJESI3B9ed5GLVh8AqZeJEGSP84Y/EpayIofmsSgbimmEmUWEouizamzLhBxcqfFCjKRhs4TKX0BaalchySLSq9kzQPvYXjCWPiBvXDN6kKImCMSa6I6Fg9VTqKM2DHcAEoeL+e2AFdx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jmV2lbD8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 029EEC43390;
+	Fri, 22 Mar 2024 16:02:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711123336;
+	bh=aoF4dmwFvyElelkcyMu8PBXHligJrfzMuWeep9NvMbE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jmV2lbD8c9m4XS0wNhC398FxSmiqjv7s7Bi+bn9P468s7vuNLU2ruoJ3MPBccLCWs
+	 rgwR/pvDFZf1bWj6jd0Dhd4gZ+9bGE3/APLKNs/Iz9t5EVO+9zTe7NInnlSLFwKNSZ
+	 2W8bmvrhS3UOcgseDjzYAtGUKnv56maI6uA8aFjAG2gdnlMhDvIwIH4t4hM/J6SJzU
+	 r/BuncZ/jwB6zYWPobFYoj5YxFXNaz7o1HU+Ndw1WKVgcghEDT7KTWf77RYOFGopG3
+	 QJC8nmcK+OiFRLvPxkAuADC7fJND5aBOwvL6kB9t1Cb8eXSZLedn73exd+6T3u8RJ0
+	 lp62WtpQCKA6Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rnhLR-00EYDl-8X;
+	Fri, 22 Mar 2024 16:02:13 +0000
+Date: Fri, 22 Mar 2024 16:02:12 +0000
+Message-ID: <86jzluz24b.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <len.brown@intel.com>,
+	Pavel Machek <pavel@ucw.cz>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Mostafa Saleh <smostafa@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-pm@vger.kernel.org
+Subject: Re: [RFC PATCH v3 5/5] arm64: Use SYSTEM_OFF2 PSCI call to power off for hibernate
+In-Reply-To: <20240319130957.1050637-6-dwmw2@infradead.org>
+References: <20240319130957.1050637-1-dwmw2@infradead.org>
+	<20240319130957.1050637-6-dwmw2@infradead.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zf0wz82nQoL0VsAd@chao-email>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dwmw2@infradead.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, rafael@kernel.org, len.brown@intel.com, pavel@ucw.cz, dwmw@amazon.co.uk, smostafa@google.com, jean-philippe@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-pm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Mar 22, 2024 at 03:18:39PM +0800,
-Chao Gao <chao.gao@intel.com> wrote:
+On Tue, 19 Mar 2024 12:59:06 +0000,
+David Woodhouse <dwmw2@infradead.org> wrote:
 
-> On Thu, Mar 21, 2024 at 02:24:12PM -0700, Isaku Yamahata wrote:
-> >On Thu, Mar 21, 2024 at 12:11:11AM +0000,
-> >"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
-> >
-> >> On Mon, 2024-02-26 at 00:25 -0800, isaku.yamahata@intel.com wrote:
-> >> > To handle private page tables, argument of is_private needs to be
-> >> > passed
-> >> > down.  Given that already page level is passed down, it would be
-> >> > cumbersome
-> >> > to add one more parameter about sp. Instead replace the level
-> >> > argument with
-> >> > union kvm_mmu_page_role.  Thus the number of argument won't be
-> >> > increased
-> >> > and more info about sp can be passed down.
-> >> > 
-> >> > For private sp, secure page table will be also allocated in addition
-> >> > to
-> >> > struct kvm_mmu_page and page table (spt member).  The allocation
-> >> > functions
-> >> > (tdp_mmu_alloc_sp() and __tdp_mmu_alloc_sp_for_split()) need to know
-> >> > if the
-> >> > allocation is for the conventional page table or private page table. 
-> >> > Pass
-> >> > union kvm_mmu_role to those functions and initialize role member of
-> >> > struct
-> >> > kvm_mmu_page.
-> >> 
-> >> tdp_mmu_alloc_sp() is only called in two places. One for the root, and
-> >> one for the mid-level tables.
-> >> 
-> >> In later patches when the kvm_mmu_alloc_private_spt() part is added,
-> >> the root case doesn't need anything done. So the code has to take
-> >> special care in tdp_mmu_alloc_sp() to avoid doing anything for the
-> >> root.
-> >> 
-> >> It only needs to do the special private spt allocation in non-root
-> >> case. If we open code that case, I think maybe we could drop this
-> >> patch, like the below.
-> >> 
-> >> The benefits are to drop this patch (which looks to already be part of
-> >> Paolo's series), and simplify "KVM: x86/mmu: Add a private pointer to
-> >> struct kvm_mmu_page". I'm not sure though, what do you think? Only
-> >> build tested.
-> >
-> >Makes sense.  Until v18, it had config to disable private mmu part at
-> >compile time.  Those functions have #ifdef in mmu_internal.h.  v19
-> >dropped the config for the feedback.
-> >  https://lore.kernel.org/kvm/Zcrarct88veirZx7@google.com/
-> >
-> >After looking at mmu_internal.h, I think the following three function could be
-> >open coded.
-> >kvm_mmu_private_spt(), kvm_mmu_init_private_spt(), kvm_mmu_alloc_private_spt(),
-> >and kvm_mmu_free_private_spt().
-> 
-> It took me a few minutes to figure out why the mirror root page doesn't need
-> a private_spt.
-> 
-> Per TDX module spec:
-> 
->   Secure EPT’s root page (EPML4 or EPML5, depending on whether the host VMM uses
->   4-level or 5-level EPT) does not need to be explicitly added. It is created
->   during TD initialization (TDH.MNG.INIT) and is stored as part of TDCS.
-> 
-> I suggest adding the above as a comment somewhere even if we decide to open-code
-> kvm_mmu_alloc_private_spt().
+[...]
 
+> +static void __init psci_init_system_off2(void)
+> +{
+> +	int ret;
+> +
+> +	ret = psci_features(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2));
+> +
+> +	if (ret != PSCI_RET_NOT_SUPPORTED)
+> +		psci_system_off2_supported = true;
 
-058/130 has such comment.  The citation from the spec would be better.
+It'd be worth considering the (slightly broken) case where SYSTEM_OFF2
+is supported, but HIBERNATE_OFF is not set in the response, as the
+spec doesn't say that this bit is mandatory (it seems legal to
+implement SYSTEM_OFF2 without any hibernate type, making it similar to
+SYSTEM_OFF).
 
+Thanks,
 
-
-> IMO, some TDX details bleed into KVM MMU regardless of whether we open-code
-> kvm_mmu_alloc_private_spt() or not. This isn't good though I cannot think of
-> a better solution.
-> 
+	M.
 
 -- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Without deviation from the norm, progress is not possible.
 
