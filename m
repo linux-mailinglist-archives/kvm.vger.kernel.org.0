@@ -1,331 +1,442 @@
-Return-Path: <kvm+bounces-12527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CFDC887466
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 22:21:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2931B88746A
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 22:23:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04C301F22BD8
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 21:21:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3E59283281
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 21:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E9B7FBC2;
-	Fri, 22 Mar 2024 21:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDF67FBD2;
+	Fri, 22 Mar 2024 21:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NXdBBYET"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HfcGhKp+"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0F47F483
-	for <kvm@vger.kernel.org>; Fri, 22 Mar 2024 21:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102F67FBBD;
+	Fri, 22 Mar 2024 21:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711142479; cv=none; b=oz2I89ns8aImlvKlhpBf0BdLbIdS7GduVRUzO0QafPmqmjyfJ0z8haBNj6+EW7ZX9I/TUNYd32USQTPJAesKuGdfFkKuAkXvJF7XwRD8G6Tap/3+vlCv70UiLNuCB/T4zoviHKurIRH/Q5Z5kR6ayOai3mB6lg2sZ1BvIRrxS8Q=
+	t=1711142605; cv=none; b=hpw3y/lE5XSust11gom9GGDYI4LWvYbGQITGenmKpgXPpMMxzKcDhoVp109FBZLQQP7TY9LHEaP3Rru2HAnxKMtDngDDbdqbtLNjtArZgkoDCXzTetwoV5AAYqyi8l3dZlhGDO7HQUsg6j4fkgsUUueaXNNGn7ysK9Ce525nwcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711142479; c=relaxed/simple;
-	bh=xFwdii2/VVY5k98pGS3dbOhA33m6x1IRSLqol7l7oOs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DMduw8pLAquFir0TGaM3pTegq7ATST+cDAPAB2X2HKXWXf52aai8ylCTOnmyaAQ5ZBCYxaf5Hsse5C69xEoF7PtSxzlizfki37Rit8SZHn9TArxZeJaypfbtkT7s2an8lINTuaT9dye4RYL6i0Ei1pyT5os5m+qRBI9cbyEmBNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NXdBBYET; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711142476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/2NHAkcAhytdyju8HTzX8/9lOwZ6eY2/n5U6+M1doi0=;
-	b=NXdBBYETl0Dv39TtcVBTAYdtW0PNOknHtcrPzkA7nW2vNri+dO6yZnbN1ULAWCVMk30NF1
-	IGtLPV4t7oBuFxeThnbRWO0qMkxzyO5ecyTv/9XcdyEX3RDMQvjdg3G7R+ZNkjEUVBGsuF
-	J7aTg9WpwucViwGhK0HJVXGAoQ7/7yk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-613-tN-7kWLtNCKwzZOdsUJCQQ-1; Fri, 22 Mar 2024 17:21:14 -0400
-X-MC-Unique: tN-7kWLtNCKwzZOdsUJCQQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33ec6c43a9cso1903597f8f.1
-        for <kvm@vger.kernel.org>; Fri, 22 Mar 2024 14:21:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711142473; x=1711747273;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :references:cc:to:from:content-language:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/2NHAkcAhytdyju8HTzX8/9lOwZ6eY2/n5U6+M1doi0=;
-        b=Hme+OBvQAttCa2S78st+9TyaQWEUCCuQ1m/pzfz9umzPjHCNuaA322fJUojPgFV6PW
-         FUWxGcwFFtQCy5TurV58D1/oI1vAJoFUT6d0K5w7UKGMKBD12GQWQF130y+ZL4hKHg2e
-         TCUWAnoo7eFGIgFP66J25KIQHJYFOo3MwKSs9Pq/dhQ25q1A7vMKFs3WWL687HGAJYuI
-         c79/I6JMzoxUVuaXrhuPby/qA6koKunUpShwxilFQhFDN8/a30dUSNsuvgNgj3CQ1uFQ
-         N/TU2HbhIUKA98myao/wOBSefZnNnZUbuItd1XWO0b6lgiRfHpN6x+o/f7296zfsb2s/
-         mfaw==
-X-Forwarded-Encrypted: i=1; AJvYcCX3utq3Wo5ultO/QDDIrx/Bw7yQLsFql/NYTVXWF/vOw0WZHggeX1zvdVQ5OF4dyqhxaFFVMEYWIXO+Jw/UxN2OwIkW
-X-Gm-Message-State: AOJu0YwUCzthMcEo9lSV3gXQi3b7DMu/y+YIp2CF8IgzKZMvFQW11Iyh
-	gajdN3+eg5/4iNUXTkNTXgdfpTek6khK9UfZA+NNOIm4SmneuAylTwRRnszVxiiT7JX/m+qhVGG
-	YSFwU9Fb8+Rn/kciyOG8zZtg7vefDlpT/1EXFieaUrU0jYnUIqA==
-X-Received: by 2002:adf:eccd:0:b0:341:906b:3351 with SMTP id s13-20020adfeccd000000b00341906b3351mr565211wro.0.1711142473358;
-        Fri, 22 Mar 2024 14:21:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEaBcj1kdVlkLNKjKedUTQg6bQ687/NvosXDtUD9LYVEMlbn+oUlfZ+Cbt6AQmQivUD+3LR2A==
-X-Received: by 2002:adf:eccd:0:b0:341:906b:3351 with SMTP id s13-20020adfeccd000000b00341906b3351mr565177wro.0.1711142472816;
-        Fri, 22 Mar 2024 14:21:12 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c71b:7e00:9339:4017:7111:82d0? (p200300cbc71b7e0093394017711182d0.dip0.t-ipconnect.de. [2003:cb:c71b:7e00:9339:4017:7111:82d0])
-        by smtp.gmail.com with ESMTPSA id i5-20020a5d5585000000b0033ed7181fd1sm2894975wrv.62.2024.03.22.14.21.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Mar 2024 14:21:12 -0700 (PDT)
-Message-ID: <f8a8c432-728a-4a79-8200-4c3f282ba415@redhat.com>
-Date: Fri, 22 Mar 2024 22:21:09 +0100
+	s=arc-20240116; t=1711142605; c=relaxed/simple;
+	bh=aNXR6cp4GNyqYOIZ5rINxHxXA0qK9zVACqy7F5CseQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mf9PIUH2T8Nm1kjrvlisnr+/vo2S5Y4inPptPSWgAB1TzKdxwPeIzBTViSRw2igmGiCrFVhE/dc+06dWFvrYoBpqPmjxEivwryD41iUKJj8ERcMoKThKqJrUG8JZo6tvWkFuGe1BMFTW0nceZAV2GlL0CiRsKPJAY7rKrIg+NMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HfcGhKp+; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711142603; x=1742678603;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=aNXR6cp4GNyqYOIZ5rINxHxXA0qK9zVACqy7F5CseQ0=;
+  b=HfcGhKp+6aKkgcI1vM9/fV0A6nfz0GN5vFWp0g55u4UVQ3PvmDKCG034
+   w7DZ9i7CyImjrOOPdXV8Qe1lL+N8MVo4DxmRrmnt9BaK30vdn+sIQGo8x
+   RUh8oCaKa3QkMU/p/ht486XZ6aoeRtKasp9e4w0BzIY1p5GSyJPx7Vpmq
+   DEHBJoYxDirqAeWIbL3GydS3EihDrpu61Vds2ho6AntjQxJerWufA1Gox
+   fZJHG4Kkzjnxdt1aO97jRGkQbOhdCbbVHqGa11vFXumFyHaFewdnvuabr
+   XVqsftI+tdBm9oRpHJEIMhSaVGY2NBrFroVDbE+3N8R3Dj8axn3VOf1Bf
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11021"; a="6066222"
+X-IronPort-AV: E=Sophos;i="6.07,147,1708416000"; 
+   d="scan'208";a="6066222"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 14:23:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,147,1708416000"; 
+   d="scan'208";a="15132322"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 14:23:22 -0700
+Date: Fri, 22 Mar 2024 14:23:21 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Yuan, Hang" <hang.yuan@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+Message-ID: <20240322212321.GA1994522@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <f028d43abeadaa3134297d28fb99f283445c0333.1708933498.git.isaku.yamahata@intel.com>
+ <d45bb93fb5fc18e7cda97d587dad4a1c987496a1.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: folio_mmapped
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-To: Will Deacon <will@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>,
- Vishal Annapurve <vannapurve@google.com>, Quentin Perret
- <qperret@google.com>, Matthew Wilcox <willy@infradead.org>,
- Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org,
- akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
- chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
- dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, ackerleytng@google.com,
- mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <Zd82V1aY-ZDyaG8U@google.com>
- <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
- <ZeXAOit6O0stdxw3@google.com> <ZeYbUjiIkPevjrRR@google.com>
- <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
- <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
- <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
- <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
- <ZfjYBxXeh9lcudxp@google.com>
- <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
- <20240319143119.GA2736@willie-the-truck>
- <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <d45bb93fb5fc18e7cda97d587dad4a1c987496a1.camel@intel.com>
 
-On 22.03.24 18:52, David Hildenbrand wrote:
-> On 19.03.24 15:31, Will Deacon wrote:
->> Hi David,
-> 
-> Hi Will,
-> 
-> sorry for the late reply!
-> 
->>
->> On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
->>> On 19.03.24 01:10, Sean Christopherson wrote:
->>>> On Mon, Mar 18, 2024, Vishal Annapurve wrote:
->>>>> On Mon, Mar 18, 2024 at 3:02 PM David Hildenbrand <david@redhat.com> wrote:
->>>>>> Second, we should find better ways to let an IOMMU map these pages,
->>>>>> *not* using GUP. There were already discussions on providing a similar
->>>>>> fd+offset-style interface instead. GUP really sounds like the wrong
->>>>>> approach here. Maybe we should look into passing not only guest_memfd,
->>>>>> but also "ordinary" memfds.
->>>>
->>>> +1.  I am not completely opposed to letting SNP and TDX effectively convert
->>>> pages between private and shared, but I also completely agree that letting
->>>> anything gup() guest_memfd memory is likely to end in tears.
->>>
->>> Yes. Avoid it right from the start, if possible.
->>>
->>> People wanted guest_memfd to *not* have to mmap guest memory ("even for
->>> ordinary VMs"). Now people are saying we have to be able to mmap it in order
->>> to GUP it. It's getting tiring, really.
->>
->>   From the pKVM side, we're working on guest_memfd primarily to avoid
->> diverging from what other CoCo solutions end up using, but if it gets
->> de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
->> today with anonymous memory, then it's a really hard sell to switch over
->> from what we have in production. We're also hoping that, over time,
->> guest_memfd will become more closely integrated with the mm subsystem to
->> enable things like hypervisor-assisted page migration, which we would
->> love to have.
-> 
-> Reading Sean's reply, he has a different view on that. And I think
-> that's the main issue: there are too many different use cases and too
-> many different requirements that could turn guest_memfd into something
-> that maybe it really shouldn't be.
-> 
->>
->> Today, we use the existing KVM interfaces (i.e. based on anonymous
->> memory) and it mostly works with the one significant exception that
->> accessing private memory via a GUP pin will crash the host kernel. If
->> all guest_memfd() can offer to solve that problem is preventing GUP
->> altogether, then I'd sooner just add that same restriction to what we
->> currently have instead of overhauling the user ABI in favour of
->> something which offers us very little in return.
->>
->> On the mmap() side of things for guest_memfd, a simpler option for us
->> than what has currently been proposed might be to enforce that the VMM
->> has unmapped all private pages on vCPU run, failing the ioctl if that's
->> not the case. It needs a little more tracking in guest_memfd but I think
->> GUP will then fall out in the wash because only shared pages will be
->> mapped by userspace and so GUP will fail by construction for private
->> pages.
->>
->> We're happy to pursue alternative approaches using anonymous memory if
->> you'd prefer to keep guest_memfd limited in functionality (e.g.
->> preventing GUP of private pages by extending mapping_flags as per [1]),
->> but we're equally willing to contribute to guest_memfd if extensions are
->> welcome.
->>
->> What do you prefer?
-> 
-> Let me summarize the history:
-> 
-> AMD had its thing running and it worked for them (but I recall it was
-> hacky :) ).
-> 
-> TDX made it possible to crash the machine when accessing secure memory
-> from user space (MCE).
-> 
-> So secure memory must not be mapped into user space -- no page tables.
-> Prototypes with anonymous memory existed (and I didn't hate them,
-> although hacky), but one of the other selling points of guest_memfd was
-> that we could create VMs that wouldn't need any page tables at all,
-> which I found interesting.
-> 
-> There was a bit more to that (easier conversion, avoiding GUP,
-> specifying on allocation that the memory was unmovable ...), but I'll
-> get to that later.
-> 
-> The design principle was: nasty private memory (unmovable, unswappable,
-> inaccessible, un-GUPable) is allocated from guest_memfd, ordinary
-> "shared" memory is allocated from an ordinary memfd.
-> 
-> This makes sense: shared memory is neither nasty nor special. You can
-> migrate it, swap it out, map it into page tables, GUP it, ... without
-> any issues.
-> 
-> 
-> So if I would describe some key characteristics of guest_memfd as of
-> today, it would probably be:
-> 
-> 1) Memory is unmovable and unswappable. Right from the beginning, it is
->      allocated as unmovable (e.g., not placed on ZONE_MOVABLE, CMA, ...).
-> 2) Memory is inaccessible. It cannot be read from user space, the
->      kernel, it cannot be GUP'ed ... only some mechanisms might end up
->      touching that memory (e.g., hibernation, /proc/kcore) might end up
->      touching it "by accident", and we usually can handle these cases.
-> 3) Memory can be discarded in page granularity. There should be no cases
->      where you cannot discard memory to over-allocate memory for private
->      pages that have been replaced by shared pages otherwise.
-> 4) Page tables are not required (well, it's an memfd), and the fd could
->      in theory be passed to other processes.
-> 
-> Having "ordinary shared" memory in there implies that 1) and 2) will
-> have to be adjusted for them, which kind-of turns it "partially" into
-> ordinary shmem again.
-> 
-> 
-> Going back to the beginning: with pKVM, we likely want the following
-> 
-> 1) Convert pages private<->shared in-place
-> 2) Stop user space + kernel from accessing private memory in process
->      context. Likely for pKVM we would only crash the process, which
->      would be acceptable.
-> 3) Prevent GUP to private memory. Otherwise we could crash the kernel.
-> 4) Prevent private pages from swapout+migration until supported.
-> 
-> 
-> I suspect your current solution with anonymous memory gets all but 3)
-> sorted out, correct?
-> 
-> I'm curious, may there be a requirement in the future that shared memory
-> could be mapped into other processes? (thinking vhost-user and such
-> things). Of course that's impossible with anonymous memory; teaching
-> shmem to contain private memory would kind-of lead to ... guest_memfd,
-> just that we don't have shared memory there.
-> 
+On Thu, Mar 21, 2024 at 01:07:27PM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-I was just thinking of something stupid, not sure if it makes any sense. 
-I'll raise it here before I forget over the weekend.
+> On Mon, 2024-02-26 at 00:25 -0800, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > TDX requires several initialization steps for KVM to create guest TDs.
+> > Detect CPU feature, enable VMX (TDX is based on VMX) on all online CPUs,
+> > detect the TDX module availability, initialize it and disable VMX.
+> 
+> Before KVM can use TDX to create and run TDX guests, the kernel needs to
+> initialize TDX from two perspectives:
+> 
+> 1) Initialize the TDX module.
+> 1) Do the "per-cpu initialization" on any logical cpu before running any TDX   
+> code on that cpu.
+> 
+> The host kernel provides two functions to do them respectively: tdx_cpu_enable()
+> and tdx_enable().  
+> 
+> Currently, tdx_enable() requires all online cpus being in VMX operation with CPU
+> hotplug disabled, and tdx_cpu_enable() needs to be called on local cpu with that
+> cpu being in VMX operation and IRQ disabled.
+> 
+> > 
+> > To enable/disable VMX on all online CPUs, utilize
+> > vmx_hardware_enable/disable().  The method also initializes each CPU for
+> > TDX.  
+> > 
+> 
+> I don't understand what you are saying here.
+> 
+> Did you mean you put tdx_cpu_enable() inside vmx_hardware_enable()?
 
-... what if we glued one guest_memfd and a memfd (shmem) together in the 
-kernel somehow?
-
-(1) A to-shared conversion moves a page from the guest_memfd to the memfd.
-
-(2) A to-private conversion moves a page from the memfd to the guest_memfd.
-
-Only the memfd can be mmap'ed/read/written/GUP'ed. Pages in the memfd 
-behave like any shmem pages: migratable, swappable etc.
+Now the section doesn't make sense. Will remove it.
 
 
-Of course, (2) is only possible if the page is not pinned, not mapped 
-(we can unmap it). AND, the page must not reside on ZONE_MOVABLE / 
-MIGRATE_CMA.
+> > TDX requires calling a TDX initialization function per logical
+> > processor (LP) before the LP uses TDX.  
+> > 
+> 
+> [...]
+> 
+> > When the CPU is becoming online,
+> > call the TDX LP initialization API.  If it fails to initialize TDX, refuse
+> > CPU online for simplicity instead of TDX avoiding the failed LP.
+> 
+> Unless I am missing something, I don't see this has been done in the code.
 
-We'd have to decide what to do when we access a "hole" in the memfd -- 
-instead of allocating a fresh page and filling the hole, we'd want to 
-SIGBUS.
+You're right. Somehow the code was lost.  Let me revive it with the next
+version.
 
+
+> > There are several options on when to initialize the TDX module.  A.) kernel
+> > module loading time, B.) the first guest TD creation time.  A.) was chosen.
+> 
+> A.) was chosen -> Choose A).
+> 
+> Describe your change in "imperative mood".
+> 
+> > With B.), a user may hit an error of the TDX initialization when trying to
+> > create the first guest TD.  The machine that fails to initialize the TDX
+> > module can't boot any guest TD further.  Such failure is undesirable and a
+> > surprise because the user expects that the machine can accommodate guest
+> > TD, but not.  So A.) is better than B.).
+> > 
+> > Introduce a module parameter, kvm_intel.tdx, to explicitly enable TDX KVM
+> 
+> You don't have to say the name of the new parameter.  It's shown in the code.
+> 
+> > support.  It's off by default to keep the same behavior for those who don't
+> > use TDX.  
+> > 
+> 
+> [...]
+> 
+> 
+> > Implement hardware_setup method to detect TDX feature of CPU and
+> > initialize TDX module.
+> 
+> You are not detecting TDX feature anymore.
+> 
+> And put this in a separate paragraph (at a better place), as I don't see how
+> this is connected to "introduce a module parameter".
+
+Let me update those sentences.
+
+
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> > v19:
+> > - fixed vt_hardware_enable() to use vmx_hardware_enable()
+> > - renamed vmx_tdx_enabled => tdx_enabled
+> > - renamed vmx_tdx_on() => tdx_on()
+> > 
+> > v18:
+> > - Added comment in vt_hardware_enable() by Binbin.
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/kvm/Makefile      |  1 +
+> >  arch/x86/kvm/vmx/main.c    | 19 ++++++++-
+> >  arch/x86/kvm/vmx/tdx.c     | 84 ++++++++++++++++++++++++++++++++++++++
+> >  arch/x86/kvm/vmx/x86_ops.h |  6 +++
+> >  4 files changed, 109 insertions(+), 1 deletion(-)
+> >  create mode 100644 arch/x86/kvm/vmx/tdx.c
+> > 
+> > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> > index 274df24b647f..5b85ef84b2e9 100644
+> > --- a/arch/x86/kvm/Makefile
+> > +++ b/arch/x86/kvm/Makefile
+> > @@ -24,6 +24,7 @@ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+> >  
+> >  kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> >  kvm-intel-$(CONFIG_KVM_HYPERV)	+= vmx/hyperv.o vmx/hyperv_evmcs.o
+> > +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+> >  
+> >  kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+> >  			   svm/sev.o
+> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> > index 18cecf12c7c8..18aef6e23aab 100644
+> > --- a/arch/x86/kvm/vmx/main.c
+> > +++ b/arch/x86/kvm/vmx/main.c
+> > @@ -6,6 +6,22 @@
+> >  #include "nested.h"
+> >  #include "pmu.h"
+> >  
+> > +static bool enable_tdx __ro_after_init;
+> > +module_param_named(tdx, enable_tdx, bool, 0444);
+> > +
+> > +static __init int vt_hardware_setup(void)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = vmx_hardware_setup();
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  #define VMX_REQUIRED_APICV_INHIBITS				\
+> >  	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
+> >  	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
+> > @@ -22,6 +38,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+> >  
+> >  	.hardware_unsetup = vmx_hardware_unsetup,
+> >  
+> > +	/* TDX cpu enablement is done by tdx_hardware_setup(). */
+> 
+> What's the point of this comment?  I don't understand it either.
+
+Will delete the comment.
+
+
+> >  	.hardware_enable = vmx_hardware_enable,
+> >  	.hardware_disable = vmx_hardware_disable,
+> 
+> Shouldn't you also implement vt_hardware_enable(), which also does
+> tdx_cpu_enable()? 
+> 
+> Because I don't see vmx_hardware_enable() is changed to call tdx_cpu_enable() to
+> make CPU hotplug work with TDX.
+
+hardware_enable() doesn't help for cpu hot plug support. See below.
+
+
+> >  	.has_emulated_msr = vmx_has_emulated_msr,
+> > @@ -161,7 +178,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+> >  };
+> >  
+> >  struct kvm_x86_init_ops vt_init_ops __initdata = {
+> > -	.hardware_setup = vmx_hardware_setup,
+> > +	.hardware_setup = vt_hardware_setup,
+> >  	.handle_intel_pt_intr = NULL,
+> >  
+> >  	.runtime_ops = &vt_x86_ops,
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > new file mode 100644
+> > index 000000000000..43c504fb4fed
+> > --- /dev/null
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -0,0 +1,84 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +#include <linux/cpu.h>
+> > +
+> > +#include <asm/tdx.h>
+> > +
+> > +#include "capabilities.h"
+> > +#include "x86_ops.h"
+> > +#include "x86.h"
+> > +
+> > +#undef pr_fmt
+> > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> > +
+> > +static int __init tdx_module_setup(void)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = tdx_enable();
+> > +	if (ret) {
+> > +		pr_info("Failed to initialize TDX module.\n");
+> 
+> As I commented before, tdx_enable() itself will print similar message when it
+> fails, so no need to print again.
+> 
+> > +		return ret;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> 
+> That being said, I don't think tdx_module_setup() is necessary.  Just call
+> tdx_enable() directly.
+
+Ok, Will move this funciton to the patch that uses it first.
+
+
+> > +
+> > +struct tdx_enabled {
+> > +	cpumask_var_t enabled;
+> > +	atomic_t err;
+> > +};
+> 
+> struct cpu_tdx_init_ctx {
+> 	cpumask_var_t vmx_enabled_cpumask;
+> 	atomic_t err;
+> };
+> 
+> ?
+> 
+> > +
+> > +static void __init tdx_on(void *_enable)
+> 
+> tdx_on() -> cpu_tdx_init(), or cpu_tdx_on()?
+> 
+> > +{
+> > +	struct tdx_enabled *enable = _enable;
+> > +	int r;
+> > +
+> > +	r = vmx_hardware_enable();
+> > +	if (!r) {
+> > +		cpumask_set_cpu(smp_processor_id(), enable->enabled);
+> > +		r = tdx_cpu_enable();
+> > +	}
+> > +	if (r)
+> > +		atomic_set(&enable->err, r);
+> > +}
+> > +
+> > +static void __init vmx_off(void *_enabled)
+> 
+> cpu_vmx_off() ?
+
+Ok, let's add cpu_ prefix.
+
+
+> > +{
+> > +	cpumask_var_t *enabled = (cpumask_var_t *)_enabled;
+> > +
+> > +	if (cpumask_test_cpu(smp_processor_id(), *enabled))
+> > +		vmx_hardware_disable();
+> > +}
+> > +
+> > +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> 
+> Why do you need the 'x86_ops' function argument?  I don't see it is used?
+
+Will move it to the patch that uses it first.
+
+
+> > +{
+> > +	struct tdx_enabled enable = {
+> > +		.err = ATOMIC_INIT(0),
+> > +	};
+> > +	int r = 0;
+> > +
+> > +	if (!enable_ept) {
+> > +		pr_warn("Cannot enable TDX with EPT disabled\n");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	if (!zalloc_cpumask_var(&enable.enabled, GFP_KERNEL)) {
+> > +		r = -ENOMEM;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/* tdx_enable() in tdx_module_setup() requires cpus lock. */
+> 
+> 	/* tdx_enable() must be called with CPU hotplug disabled */
+> 
+> > +	cpus_read_lock();
+> > +	on_each_cpu(tdx_on, &enable, true); /* TDX requires vmxon. */
+> 
+> I don't think you need this comment _here_.
+> 
+> If you want keep it, move to the tdx_on() where the code does what this comment
+> say.
+
+Will move the comment into cpu_tdx_on().
+
+
+> > +	r = atomic_read(&enable.err);
+> > +	if (!r)
+> > +		r = tdx_module_setup();
+> > +	else
+> > +		r = -EIO;
+> > +	on_each_cpu(vmx_off, &enable.enabled, true);
+> > +	cpus_read_unlock();
+> > +	free_cpumask_var(enable.enabled);
+> > +
+> > +out:
+> > +	return r;
+> > +}
+> 
+> At last, I think there's one problem here:
+> 
+> KVM actually only registers CPU hotplug callback in kvm_init(), which happens
+> way after tdx_hardware_setup().
+> 
+> What happens if any CPU goes online *BETWEEN* tdx_hardware_setup() and
+> kvm_init()?
+> 
+> Looks we have two options:
+> 
+> 1) move registering CPU hotplug callback before tdx_hardware_setup(), or
+> 2) we need to disable CPU hotplug until callbacks have been registered.
+> 
+> Perhaps the second one is easier, because for the first one we need to make sure
+> the kvm_cpu_online() is ready to be called right after tdx_hardware_setup().
+> 
+> And no one cares if CPU hotplug is disabled during KVM module loading.
+> 
+> That being said, we can even just disable CPU hotplug during the entire
+> vt_init(), if in this way the code change is simple?
+> 
+> But anyway, to make this patch complete, I think you need to replace
+> vmx_hardware_enable() to vt_hardware_enable() and do tdx_cpu_enable() to handle
+> TDX vs CPU hotplug in _this_ patch.
+
+The option 2 sounds easier. But hardware_enable() doesn't help because it's
+called when the first guest is created. It's risky to change it's semantics
+because it's arch-independent callback.
+
+- Disable CPU hot plug during TDX module initialization.
+- During hardware_setup(), enable VMX, tdx_cpu_enable(), disable VMX
+  on online cpu. Don't rely on KVM hooks.
+- Add a new arch-independent hook, int kvm_arch_online_cpu(). It's called always
+  on cpu onlining. It eventually calls tdx_cpu_enabel(). If it fails, refuse
+  onlining.
 -- 
-Cheers,
-
-David / dhildenb
-
+Isaku Yamahata <isaku.yamahata@intel.com>
 
