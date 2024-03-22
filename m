@@ -1,79 +1,85 @@
-Return-Path: <kvm+bounces-12530-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12531-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B078874E6
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 23:45:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 530AA88754E
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 23:57:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D39D1F242C8
-	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 22:45:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F27E28377A
+	for <lists+kvm@lfdr.de>; Fri, 22 Mar 2024 22:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2516682891;
-	Fri, 22 Mar 2024 22:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C4782C7D;
+	Fri, 22 Mar 2024 22:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kRlENm+9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DidtImfK"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5694B26AD4;
-	Fri, 22 Mar 2024 22:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E0D82891;
+	Fri, 22 Mar 2024 22:57:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711147535; cv=none; b=FeaCYtmB+PMRNpeiNe5OhibP6FQzN3Bsns0oTQObU7oMsd8LZS7SUFylqOx3IPZqdhWKy5DpaVa8W98jody6WHzHp7jJIEZAYF56xjZOgiSx1TIMW43Cw1lvWfQqfzDpAJntHfwOVbnZ2o25Ei3c9y+dJU2O7gOWyvwqwCzK4bk=
+	t=1711148259; cv=none; b=i20D8vnpfn9RwiLAZfvQSXB/+LF04Oa7TK7bbyncdovrOr8Gp88sxHRDoqc/Yym+Am4jy3YWjY4+kwAEKq2Y7rgpzRtmLis/oIZVwMYK84eQ9gOijQ4ocoYP4dpYawdpTRpNnOXQToPXGkZ6CY/9uYxt1Bug68r1jzg861Lbats=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711147535; c=relaxed/simple;
-	bh=5DSDTqIBgL+u9vNQy3dkqKf3CogV46CDwNHk/7o9d6c=;
+	s=arc-20240116; t=1711148259; c=relaxed/simple;
+	bh=96QHhdKY87Blduh4L8mp6CXq1rB2HO56b84NtbHpKTg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j1fZPfiBa3smEVffE/naX1c6faa105lNmnEKZwUAZimEKb/DEXa0yl2pb2GFQsG9zXLS1cxyhC+Iu+4n1/MW8a2vCYhLQDajnsTlybTLQtf3xGVKKEYRn51hCab8MQdQouZ9nsnWnyfg9q37NfGHMBQSVuHU65ckF0HiuYrZLsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kRlENm+9; arc=none smtp.client-ip=192.198.163.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=HmN5Q7td3Cg/yXxRLB+aTC5x4UjfexbUz75sYtClnbkPv0Lyy5Lmh5AtKffyXnXTmoUR/ESE6vjw9wzMeJLKOuUN9Oq5doJdq3KlQ5Qzx61QaYxRzHZX7+bKqQ3rH2TyLjLY2AXNa2duRAh4yhysiGpf6J/nhv2jd3TYE2ftvpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DidtImfK; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711147533; x=1742683533;
+  t=1711148258; x=1742684258;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5DSDTqIBgL+u9vNQy3dkqKf3CogV46CDwNHk/7o9d6c=;
-  b=kRlENm+95+nXP81zvxksBEYaZGIZjXqAwUwG9wAbkBuRspB9OmZ8/0zE
-   SijarbFU8cc9t5KKjxZIdhWsp6RHn0M6Z1aujbbS5kdJBBjL7NDVADM8L
-   tIR8zkGY24xUkiuzusqp4Tq08yC+lGlL/bIAZVS00ky+OiEPoBChKXbsF
-   ozP0VvRDJ2nyj84AWip5D/6i4nHnzRHkfzpx4NH1hp+3mcVPPbrdKtUlq
-   uU2TFEgV38ylGbjAMykCnUqGvu6jx3om2Chl541vsU/vOFExLa1q+tzp0
-   k5RiG3ag+At1QXbmQbDe2wQv9srlAv3duSKf4fA7ed1fLdBUin7FTlSOy
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11021"; a="6047224"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=96QHhdKY87Blduh4L8mp6CXq1rB2HO56b84NtbHpKTg=;
+  b=DidtImfKk6SE3o7GTC3TQNt/lRaMslL2pJDqquj3aXsczfbgLSkFY/T6
+   GioOZPeqjMX6fIm6kPi7jVw8Ac42lo2V1C3KX5rfZNwAH7SOMj5ZrPgbl
+   h13KqMuA5QD03KD1KSzM+lpBG9dK12G0MQ/LLnX7573n3l1TbIvW2JiB3
+   Ke4HEAI2nrP0KXy8u63Vwfr5vej2xKa0AwhAJnpmewV/8uAvu1uUg1B09
+   jf7FnqqtUS8c2TCrDW1Q9UFCE+Y5l7Ujzk9qfVpC+UPv+s6XGRdx9YYYZ
+   lU3uhi9G6lM0JUt/qfWRoT6M+ygTaALVGtVe90ii9ZXQrFt55nlVIUZjf
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11021"; a="6048104"
 X-IronPort-AV: E=Sophos;i="6.07,147,1708416000"; 
-   d="scan'208";a="6047224"
+   d="scan'208";a="6048104"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 15:45:32 -0700
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 15:57:37 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,147,1708416000"; 
-   d="scan'208";a="15467874"
+   d="scan'208";a="15470498"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 15:45:32 -0700
-Date: Fri, 22 Mar 2024 15:45:31 -0700
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 15:57:38 -0700
+Date: Fri, 22 Mar 2024 15:57:36 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
 Cc: "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, "Chen, Bo2" <chen.bo@intel.com>,
-	"Yuan, Hang" <hang.yuan@intel.com>,
 	"Zhang, Tina" <tina.zhang@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 024/130] KVM: TDX: Add placeholders for TDX VM/vcpu
- structure
-Message-ID: <20240322224531.GB1994522@ls.amr.corp.intel.com>
+	"Yuan, Hang" <hang.yuan@intel.com>,
+	"Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
+Subject: Re: [PATCH v19 120/130] KVM: TDX: Add a method to ignore dirty
+ logging
+Message-ID: <20240322225736.GC1994522@ls.amr.corp.intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <c857863a346e692837b0c35da8a0e03c45311496.1708933498.git.isaku.yamahata@intel.com>
- <dd389847-6f67-4f5d-8358-5d6b6a493797@intel.com>
+ <1491dd247829bf1a29df1904aeed5ed6b464d29c.1708933498.git.isaku.yamahata@intel.com>
+ <b4cde44a884f2f048987826d59e2054cd1fa532b.camel@intel.com>
+ <20240315013511.GF1258280@ls.amr.corp.intel.com>
+ <fc6278a55deeccf8c67fba818647829a1dddcf0a.camel@intel.com>
+ <20240318171218.GA1645738@ls.amr.corp.intel.com>
+ <6986b1ddf25f064d3609793979ca315567d7e875.camel@intel.com>
+ <20240318231656.GC1645738@ls.amr.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,146 +88,43 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <dd389847-6f67-4f5d-8358-5d6b6a493797@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240318231656.GC1645738@ls.amr.corp.intel.com>
 
-On Fri, Mar 22, 2024 at 10:37:20AM +1300,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Mon, Mar 18, 2024 at 04:16:56PM -0700,
+Isaku Yamahata <isaku.yamahata@intel.com> wrote:
 
+> On Mon, Mar 18, 2024 at 05:43:33PM +0000,
+> "Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
 > 
+> > On Mon, 2024-03-18 at 10:12 -0700, Isaku Yamahata wrote:
+> > > I categorize as follows. Unless otherwise, I'll update this series.
+> > > 
+> > > - dirty log check
+> > >   As we will drop this ptach, we'll have no call site.
+> > > 
+> > > - KVM_BUG_ON() in main.c
+> > >   We should drop them because their logic isn't complex.
+> > What about "KVM: TDX: Add methods to ignore guest instruction
+> > emulation"? Is it cleanly blocked somehow?
 > 
-> On 26/02/2024 9:25 pm, Yamahata, Isaku wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > Add placeholders TDX VM/vcpu structure that overlays with VMX VM/vcpu
-> > structures.  Initialize VM structure size and vcpu size/align so that x86
-> > KVM common code knows those size irrespective of VMX or TDX.  Those
-> > structures will be populated as guest creation logic develops.
-> > 
-> > Add helper functions to check if the VM is guest TD and add conversion
-> > functions between KVM VM/VCPU and TDX VM/VCPU.
+> KVM fault handler, kvm_mmu_page_fault(), is the caller into the emulation,
+> It should skip the emulation.
 > 
-> The changelog is essentially only saying "doing what" w/o "why".
-> 
-> Please at least explain why you invented the 'struct kvm_tdx' and 'struct
-> vcpu_tdx', and why they are invented in this way.
-> 
-> E.g., can we extend 'struct kvm_vmx' for TDX?
-> 
-> struct kvm_tdx {
-> 	struct kvm_vmx vmx;
-> 	...
-> };
+> As the second guard, x86_emulate_instruction(), calls
+> check_emulate_instruction() callback to check if the emulation can/should be
+> done.  TDX callback can return it as X86EMUL_UNHANDLEABLE.  Then, the flow goes
+> to user space as error.  I'll update the vt_check_emulate_instruction().
 
-Here is the updated version.
+Oops. It was wrong. It should be X86EMUL_RETRY_INSTR.  RETRY_INSTR means, let
+vcpu execute the intrusion again, UNHANDLEABLE means, emulator can't emulate,
+inject exception or give up with KVM_EXIT_INTERNAL_ERROR.
 
-KVM: TDX: Add placeholders for TDX VM/vcpu structure
-
-Add placeholders TDX VM/vCPU structure, overlaying with the existing
-VMX VM/vCPU structures.  Initialize VM structure size and vCPU
-size/align so that x86 KVM-common code knows those sizes irrespective
-of VMX or TDX.  Those structures will be populated as guest creation
-logic develops.
-
-TDX requires its data structure for guest and vcpu.  For VMX, we
-already have struct kvm_vmx and struct vcpu_vmx.  Two options to add
-TDX-specific members.
-
-1. Append TDX-specific members to kvm_vmx and vcpu_vmx.  Use the same
-    struct for both VMX and TDX.
-2. Define TDX-specific data struct and overlay.
-
-Choose option two because it has less memory overhead and what member
-is needed is clearer
-
-Add helper functions to check if the VM is guest TD and add the conversion
-functions between KVM VM/vCPU and TDX VM/vCPU.
-
-
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > ---
-> > v19:
-> > - correctly update ops.vm_size, vcpu_size and, vcpu_align by Xiaoyao
-> > 
-> > v14 -> v15:
-> > - use KVM_X86_TDX_VM
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/kvm/vmx/main.c | 14 ++++++++++++
-> >   arch/x86/kvm/vmx/tdx.c  |  1 +
-> >   arch/x86/kvm/vmx/tdx.h  | 50 +++++++++++++++++++++++++++++++++++++++++
-> >   3 files changed, 65 insertions(+)
-> >   create mode 100644 arch/x86/kvm/vmx/tdx.h
-> > 
-> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> > index 18aef6e23aab..e11edbd19e7c 100644
-> > --- a/arch/x86/kvm/vmx/main.c
-> > +++ b/arch/x86/kvm/vmx/main.c
-> > @@ -5,6 +5,7 @@
-> >   #include "vmx.h"
-> >   #include "nested.h"
-> >   #include "pmu.h"
-> > +#include "tdx.h"
-> >   static bool enable_tdx __ro_after_init;
-> >   module_param_named(tdx, enable_tdx, bool, 0444);
-> > @@ -18,6 +19,9 @@ static __init int vt_hardware_setup(void)
-> >   		return ret;
-> >   	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
-> > +	if (enable_tdx)
-> > +		vt_x86_ops.vm_size = max_t(unsigned int, vt_x86_ops.vm_size,
-> > +					   sizeof(struct kvm_tdx));
-> 
-> Now I see why you included 'struct kvm_x86_ops' as function parameter.
-> 
-> Please move it to this patch.
-
-Sure.
-
-> >   	return 0;
-> >   }
-> > @@ -215,8 +219,18 @@ static int __init vt_init(void)
-> >   	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
-> >   	 * exposed to userspace!
-> >   	 */
-> > +	/*
-> > +	 * kvm_x86_ops is updated with vt_x86_ops.  vt_x86_ops.vm_size must
-> > +	 * be set before kvm_x86_vendor_init().
-> > +	 */
-> >   	vcpu_size = sizeof(struct vcpu_vmx);
-> >   	vcpu_align = __alignof__(struct vcpu_vmx);
-> > +	if (enable_tdx) {
-> > +		vcpu_size = max_t(unsigned int, vcpu_size,
-> > +				  sizeof(struct vcpu_tdx));
-> > +		vcpu_align = max_t(unsigned int, vcpu_align,
-> > +				   __alignof__(struct vcpu_tdx));
-> > +	}
-> 
-> Since you are updating vm_size in vt_hardware_setup(), I am wondering
-> whether we can do similar thing for vcpu_size and vcpu_align.
-> 
-> That is, we put them both to 'struct kvm_x86_ops', and you update them in
-> vt_hardware_setup().
-> 
-> kvm_init() can then just access them directly in this way both 'vcpu_size'
-> and 'vcpu_align' function parameters can be removed.
-
-Hmm, now I noticed the vm_size can be moved here.  We have
-
- 	vcpu_size = sizeof(struct vcpu_vmx);
- 	vcpu_align = __alignof__(struct vcpu_vmx);
-	if (enable_tdx) {
-		vcpu_size = max_t(unsigned int, vcpu_size,
-				  sizeof(struct vcpu_tdx));
-		vcpu_align = max_t(unsigned int, vcpu_align,
-				   __alignof__(struct vcpu_tdx));
-                vt_x86_ops.vm_size = max_t(unsigned int, vt_x86_ops.vm_size,
-                                          sizeof(struct kvm_tdx));
-	}
-
-
-We can add vcpu_size, vcpu_align to struct kvm_x86_ops. If we do so, we have
-to touch svm code unnecessarily.
+For TDX, we'd like to inject #VE to the guest so that the guest #VE handler
+can issue TDG.VP.VMCALL<MMIO>.  The default non-present sept value has
+#VE suppress bit set.  As first step, EPT violation occurs. then KVM sets
+up mmio_spte with #VE suppress bit cleared. Then X86EMUL_RETRY_INSTR tells
+kvm to resume vcpu to inject #VE.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
