@@ -1,134 +1,141 @@
-Return-Path: <kvm+bounces-12548-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12549-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9CE3887A0F
-	for <lists+kvm@lfdr.de>; Sat, 23 Mar 2024 20:02:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A353E887A13
+	for <lists+kvm@lfdr.de>; Sat, 23 Mar 2024 20:06:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9263F1C20C52
-	for <lists+kvm@lfdr.de>; Sat, 23 Mar 2024 19:02:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EC49282015
+	for <lists+kvm@lfdr.de>; Sat, 23 Mar 2024 19:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FE247A70;
-	Sat, 23 Mar 2024 19:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C505A4C0;
+	Sat, 23 Mar 2024 19:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="ExGVrAu/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ewY/xmNM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6C63A8FF;
-	Sat, 23 Mar 2024 19:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF185A0ED;
+	Sat, 23 Mar 2024 19:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711220544; cv=none; b=uOXEK2tBHPSEKhRc3L9Kv3DikyGdhvxnMOYRTT9JSvLTjvx0vPzDdndE+bH4G3Fx0Qlsfmoc/kR5MIWfG5AOptYeLhVC7fa+XJLOtvcepIlmPFEzJoyy6GnWdjCc1WVeAIKWulZRWYTDkJEz0KGd+zyX/z2f8GQGpEIXQ26eYQ8=
+	t=1711220788; cv=none; b=ilbbAtr2HcLqVb/Z7L/CZHRfixy2OLbGwhKEUbmidOy5e0TWfZNFt1meiLVXr22dSl6SXPGpUjI7ArrYQQpAuoNzSoe77cMlqCM1p0HPy5WlFe0jPatQLKYhU+7tRd+oraffPbieIeN6dk93IFcVaM/bw4vqH34GzZMpvRWUje0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711220544; c=relaxed/simple;
-	bh=tFoKc1U020apqjY0CyTn0PLkWp/8f59KT4myiLC5PH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YdBo7j13RMneFf3PXswFto5b+8yqsMjyhkL22wvz6cNHxnHDVGopZaN01AEVQRJ7nRZV/l+sRO9pFJJNVpereBg0Bpji9/l8LJL6AR3jbVnrftFXUho788p1tIkDURKedepIjoxFoxtY0uG4BNxyF3EIX1b22YBtRaNT2PzX/tU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=ExGVrAu/; arc=none smtp.client-ip=115.28.160.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1711220539; bh=tFoKc1U020apqjY0CyTn0PLkWp/8f59KT4myiLC5PH4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ExGVrAu/5SFYnug9FVfmW9AU5A4FlDHPTXX9W8cY+kxaBK1DgNwGWCfWo/O0VEWTx
-	 ZHNygDTnQ97aMEQOdKPQSi7o75izdTUhmIvu709DdWihl+1be7sP0NBJ3mWhFghB2m
-	 SojDik3yNPgo/XZyJA7ok+vj+uiGTba3DwFphci0=
-Received: from [IPV6:240e:388:8d00:6500:cccf:e2b8:7fab:4dfb] (unknown [IPv6:240e:388:8d00:6500:cccf:e2b8:7fab:4dfb])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 20B3C600A6;
-	Sun, 24 Mar 2024 03:02:19 +0800 (CST)
-Message-ID: <4668e606-a7b5-49b7-a68d-1c2af86f7d76@xen0n.name>
-Date: Sun, 24 Mar 2024 03:02:18 +0800
+	s=arc-20240116; t=1711220788; c=relaxed/simple;
+	bh=WTfe3lrUHJOBTlsrGu5xz4DGupXjIeeLGswZjNtLNKw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ga6uMkp9Zyu4FMnnKYv6Jb9zRLMHDomGFPTBxTWvEXrbY4piiHqlsXQSxvgrAQhtWLl4rPQO+vG8b7kkG/L6dihl/P8OAC9eRrqRbN7+gV9YFP4Ofnz0jPtIL0s+OL0y2qBGSwrQjj1bcien2A+u6wEFGM1YI2q7GJdE7b9ae1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ewY/xmNM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52363C43330;
+	Sat, 23 Mar 2024 19:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711220788;
+	bh=WTfe3lrUHJOBTlsrGu5xz4DGupXjIeeLGswZjNtLNKw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ewY/xmNMicY9KBujm8nTwKaPZEkpJUu9YP0YFoPDNyhQKhPG17lNqqkWuQol6f/HK
+	 oS1DHZB4d2NZ16svZG0yKOGjy/qhdTVyQPKTiSGZQmreAuDy7S331KvQjYbChPA9qd
+	 rT6ErZygXBTjrlnfpMgqWxd3mXxJgwwaJFjbvuWikGmvwlFZFIjtUgDBPrM9BTuRhB
+	 v1ZDNt7UvTES0YihzKYAMwqwWevZr/BzR2SBcW8iRBGdvBbif+/16U2wz1XRk9fUOt
+	 q0w0eqXDJ5g5HReSoJjctgHw8RCRJmd7YDP6HrYik8MUZ9ehZkLKXM+v6ZdElJ6NeD
+	 zf9ppz8Qtbblw==
+Received: from [193.117.140.69] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ro6hF-00EtFe-Ve;
+	Sat, 23 Mar 2024 19:06:26 +0000
+Date: Sat, 23 Mar 2024 19:06:24 +0000
+Message-ID: <87edc0sr7z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Dongli Zhang <dongli.zhang@oracle.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
+In-Reply-To: <fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
+References: <20240322170945.3292593-1-maz@kernel.org>
+	<20240322170945.3292593-6-maz@kernel.org>
+	<fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 3/7] LoongArch: KVM: Add cpucfg area for kvm hypervisor
-Content-Language: en-US
-To: Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>
-Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, kvm@vger.kernel.org
-References: <20240315080710.2812974-1-maobibo@loongson.cn>
- <20240315080710.2812974-4-maobibo@loongson.cn>
-From: WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <20240315080710.2812974-4-maobibo@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 193.117.140.69
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com, dongli.zhang@oracle.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 3/15/24 16:07, Bibo Mao wrote:
-> Instruction cpucfg can be used to get processor features. And there
-> is trap exception when it is executed in VM mode, and also it is
-> to provide cpu features to VM. On real hardware cpucfg area 0 - 20
-> is used.  Here one specified area 0x40000000 -- 0x400000ff is used
-> for KVM hypervisor to privide PV features, and the area can be extended
-> for other hypervisors in future. This area will never be used for
-> real HW, it is only used by software.
+On Fri, 22 Mar 2024 17:52:45 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
->   arch/loongarch/include/asm/inst.h      |  1 +
->   arch/loongarch/include/asm/loongarch.h | 10 +++++
->   arch/loongarch/kvm/exit.c              | 59 +++++++++++++++++++-------
->   3 files changed, 54 insertions(+), 16 deletions(-)
+> On Fri, Mar 22, 2024 at 05:09:45PM +0000, Marc Zyngier wrote:
+> > In retrospect, it is fairly obvious that the FP state ownership
+> > is only meaningful for a given CPU, and that locating this
+> > information in the vcpu was just a mistake.
+> > 
+> > Move the ownership tracking into the host data structure, and
+> > rename it from fp_state to fp_owner, which is a better description
+> > (name suggested by Mark Brown).
 > 
+> There's still the thing with the interaction with SME support - to
+> summarise what I think you're asking for the userspace ABI there:
 
-Sorry for the late reply, but I think it may be a bit non-constructive 
-to repeatedly submit the same code without due explanation in our 
-previous review threads. Let me try to recollect some of the details 
-though...
+Well, the SME support is still pretty prospective, and this patch has
+no impact on an existing ABI.
 
-If I remember correctly, during the previous reviews, it was mentioned 
-that the only upsides of using CPUCFG were:
+> 
+>  - Create a requirement for userspace to set SVCR prior to setting any
+>    vector impacted register to ensure the correct format and that data
+>    isn't zeroed when SVCR is set.
+>  - Use the value of SVCR.SM and the guest maximum SVE and SME VLs to
+>    select the currently visible vector length for the Z, P and FFR
+>    registers, and if FFR can be accessed if not available in streaming
+>    mode.
+>  - Changes to SVCR.SM zero register data in the same way writes to the
+>    physical register do.
+>  - This also implies discarding or failing all writes to ZA and ZT0
+>    unless SVCR.ZA is set for consistency.
 
-- it was exactly identical to the x86 approach,
-- it would not require access to the LoongArch Reference Manual Volume 3 
-to use, and
-- it was plain old data.
+All of that seems reasonable, as long as it is comes as a consequence
+of enabling SME. It should be run by the QEMU people though, as they
+are the ones that will make use of it. Please Cc them when you post
+the patches or even better, reach out to them beforehand.
 
-But, for the first point, we don't have to follow x86 convention after 
-all. The second reason might be compelling, but on the one hand that's 
-another problem orthogonal to the current one, and on the other hand 
-HVCL is:
+>  - Add support for the V registers in the sysreg interface when SVE is
+>    enabled.
 
-- already effectively public because of the fact that this very patchset 
-is public,
-- its semantics is trivial to implement even without access to the LVZ 
-manual, because of its striking similarity with SYSCALL, and
-- by being a function call, we reserve the possibility for hypervisors 
-to invoke logic for self-identification purposes, even if this is likely 
-overkill from today's perspective.
+We already support the V registers with KVM_REG_ARM_CORE_REG(). Why
+would you add any new interface for this?  The kernel should be
+perfectly capable of dealing with the placement of the data in the
+internal structures, and there is no need to tie the userspace ABI to
+how we deal with that placement (kvm_regs is already purely
+userspace).
 
-And, even if we decide that using HVCL for self-identification is 
-overkill after all, we still have another choice that's IOCSR. We 
-already read LOONGARCH_IOCSR_FEATURES (0x8) for its bit 11 (IOCSRF_VM) 
-to populate the CPU_FEATURE_HYPERVISOR bit, and it's only natural that 
-we put the identification word in the IOCSR space. As far as I can see, 
-the IOCSR space is plenty and equally available for making reservations; 
-it can only be even easier when it's done by a Loongson team.
+> then the implementation can do what it likes to achieve that, the most
+> obvious thing being to store in native format for the current hardware
+> mode based on SVCR.{SM,ZA}.  Does that sound about right?
 
-Finally, I've mentioned multiple times, that varying CPUCFG behavior 
-based on PLV is not something well documented on the manuals, hence not 
-friendly to low-level developers. Devs of third-party firmware and/or 
-kernels do exist, I've personally spoken to some of them on the 
-2023-11-18 3A6000 release event; in order for the varying CPUCFG 
-behavior approach to pass for me, at the very least, the LoongArch 
-reference manual must be amended to explicitly include an explanation of 
-it, and a reference to potential use cases.
+Apart from the statement about the V registers, this seems OK. But
+again, I want to see this agreed with the QEMU folks.
+
+	M.
 
 -- 
-WANG "xen0n" Xuerui
-
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
-
+Without deviation from the norm, progress is not possible.
 
