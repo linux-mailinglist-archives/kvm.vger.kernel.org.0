@@ -1,151 +1,151 @@
-Return-Path: <kvm+bounces-12625-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12626-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D1188B5CA
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 01:07:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1444188B361
+	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 23:05:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4473B62B5A
-	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 21:59:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C00D630561F
+	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 22:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F8070CB3;
-	Mon, 25 Mar 2024 21:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D827175F;
+	Mon, 25 Mar 2024 22:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZyX6lYvU"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4FA6FE1C
-	for <kvm@vger.kernel.org>; Mon, 25 Mar 2024 21:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187F56D1C8;
+	Mon, 25 Mar 2024 22:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711403946; cv=none; b=fhUnE3u5Wo6f9FBhh5AL8sBXqqHwnMbI1rc2INvvSFyiJ3FnpaLkl7oAuZLWnvxQ7pFHbdp0/j422K4ItuAfmI7NGsDnAeQWHEvvLlpOV9ikgRTPeIvCU9ieqPQ37TXFziB0TfMQ0SNf4f07yXQ876ilJWiquAUDUz5VL4kAoDI=
+	t=1711404301; cv=none; b=KDgQSqid7tIrG+gNlp1zT2jjZj9pL3eVH7PU/8t+lfN2hngcKa8M/mCA8lMAw5NgwnvudBycBTXrjY+aXfy2LV9E3+sXp0Yi6AAfmwC9/BcHIFCJaKF6KblZQ0WWnVWainT0wZOJSgBt3Dwt/crU3GxrBLWhZL3OA2yxNqToDbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711403946; c=relaxed/simple;
-	bh=Y4nc67WpaM6F71EsZCC2P9fcf1/dtUO8c5BEqGBiVNg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cJyM7Gxtfi1pte3KGMfDAP0DCgCmw2F+w8gN8XpJsWQVx4KdV1xm+SL8MGnt34ScUbjigQSidseIFWszsWsNpfDcT+PSEjeOA8Xllvvrq20qVx3zXuhr9tu/KCNXCFqvGT7nTmP1rqtgbyb9KMhGG96+y1YfpHmlzboYt93Njn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE4D32F4;
-	Mon, 25 Mar 2024 14:59:36 -0700 (PDT)
-Received: from [10.57.72.244] (unknown [10.57.72.244])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED6D93F694;
-	Mon, 25 Mar 2024 14:59:01 -0700 (PDT)
-Message-ID: <b7ca796b-8883-4048-b441-fd5c5bdc4d52@arm.com>
-Date: Mon, 25 Mar 2024 21:59:00 +0000
+	s=arc-20240116; t=1711404301; c=relaxed/simple;
+	bh=+ovNKGBLi1gXj1YmUYOIgIN0QJaeJZCivM4A+DNQztk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=npuioVY/Z9gyVgcl0uHGkTgkEZpjmJ2Xkf80k7L3nwjSmyR6MWpC16d8alImk3qNaltwOiFG0OxFHzZkORC6YYBrhp2uHxKl70nlU9bLjCjKX6vbeWk3ZOVrJaL5SKpK/OJbwTcBhMZX3zu6LksPL8/Z0lfPwLigjKjlGXNHn0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZyX6lYvU; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711404299; x=1742940299;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+ovNKGBLi1gXj1YmUYOIgIN0QJaeJZCivM4A+DNQztk=;
+  b=ZyX6lYvUjE851fFzzkwZAqpTAhonAWVuvhjXJ4OjFtyMD5tIlXwbb9Uw
+   M4ISFQL8RuEjzLXIFAuJybNAjV+y30jdV0v3USn4tmmU3OlpmOOYqwU73
+   4Vcr5o1xNpJrJFAj62iRXdCxymFo7Fo7HgBwQXG7c+TMEM2NXNvsKpv+n
+   7LPge4M60oY1N20B/j6rBYrga1D+0Odo9DsCcJeXYR0xovh5Ni+o4/3ch
+   zjgVO7e0N69uqlKxzDnXeEUsUrmX0VjNFpxWY7lzciE/52IdB1kSC9XeM
+   QcAfB7+2OuB2Mwb77ugJD4pBOdnuIxu1X1Y/dPka3THRg3pjDd1rEin9U
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="6561311"
+X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
+   d="scan'208";a="6561311"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 15:04:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
+   d="scan'208";a="20222690"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 15:04:58 -0700
+Date: Mon, 25 Mar 2024 15:04:57 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Yuan, Hang" <hang.yuan@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>
+Subject: Re: [PATCH v19 039/130] KVM: TDX: initialize VM with TDX specific
+ parameters
+Message-ID: <20240325220457.GN2357401@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <5eca97e6a3978cf4dcf1cff21be6ec8b639a66b9.1708933498.git.isaku.yamahata@intel.com>
+ <5f0c798cf242bafe9810556f711b703e9efec304.camel@intel.com>
+ <20240323012224.GD2357401@ls.amr.corp.intel.com>
+ <59fbe690d1765337b4b1785b4cef900415bd5df2.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 08/18] arm64: efi: Improve device tree
- discovery
-To: "Paluri, PavanKumar" <papaluri@amd.com>,
- Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, shahuang@redhat.com,
- pbonzini@redhat.com, thuth@redhat.com
-References: <20240305164623.379149-20-andrew.jones@linux.dev>
- <20240305164623.379149-28-andrew.jones@linux.dev>
- <39d0ed49-a6a2-c812-c4e7-444a460cb18b@amd.com>
-Content-Language: en-GB
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <39d0ed49-a6a2-c812-c4e7-444a460cb18b@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <59fbe690d1765337b4b1785b4cef900415bd5df2.camel@intel.com>
 
-On 25/03/2024 16:24, Paluri, PavanKumar wrote:
-> Hi,
+On Mon, Mar 25, 2024 at 10:39:10AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
+
+> On Fri, 2024-03-22 at 18:22 -0700, Yamahata, Isaku wrote:
+> > On Fri, Mar 22, 2024 at 11:20:01AM +0000,
+> > "Huang, Kai" <kai.huang@intel.com> wrote:
+> > 
+> > > On Mon, 2024-02-26 at 00:25 -0800, isaku.yamahata@intel.com wrote:
+> > > > +struct kvm_tdx_init_vm {
+> > > > +	__u64 attributes;
+> > > > +	__u64 mrconfigid[6];	/* sha384 digest */
+> > > > +	__u64 mrowner[6];	/* sha384 digest */
+> > > > +	__u64 mrownerconfig[6];	/* sha384 digest */
+> > > > +	/*
+> > > > +	 * For future extensibility to make sizeof(struct kvm_tdx_init_vm) = 8KB.
+> > > > +	 * This should be enough given sizeof(TD_PARAMS) = 1024.
+> > > > +	 * 8KB was chosen given because
+> > > > +	 * sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES(=256) = 8KB.
+> > > > +	 */
+> > > > +	__u64 reserved[1004];
+> > > 
+> > > This is insane.
+> > > 
+> > > You said you want to reserve 8K for CPUID entries, but how can these 1004 * 8
+> > > bytes be used for CPUID entries since ...
+> > 
+> > I tried to overestimate it. It's too much, how about to make it
+> > 1024, reserved[109]?
+> > 
 > 
-> On 3/5/2024 10:46 AM, Andrew Jones wrote:
->> Check the device tree GUID when the environment variable is missing,
->> which allows directly loading the unit test with QEMU's '-kernel'
->> command line parameter, which is much faster than putting the test
->> in the EFI file system and then running it from the UEFI shell.
->>
->> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
->> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
->> ---
->>   lib/efi.c       | 19 ++++++++++++-------
->>   lib/linux/efi.h |  2 ++
->>   2 files changed, 14 insertions(+), 7 deletions(-)
->>
->> diff --git a/lib/efi.c b/lib/efi.c
->> index d94f0fa16fc0..4d1126b4a64e 100644
->> --- a/lib/efi.c
->> +++ b/lib/efi.c
->> @@ -6,13 +6,13 @@
->>    *
->>    * SPDX-License-Identifier: LGPL-2.0-or-later
->>    */
->> -
->> -#include "efi.h"
->> +#include <libcflat.h>
->>   #include <argv.h>
->> -#include <stdlib.h>
->>   #include <ctype.h>
->> -#include <libcflat.h>
->> +#include <stdlib.h>
->>   #include <asm/setup.h>
->> +#include "efi.h"
->> +#include "libfdt/libfdt.h"
->>   
->>   /* From lib/argv.c */
->>   extern int __argc, __envc;
->> @@ -288,13 +288,18 @@ static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
->>   	efi_char16_t var[] = ENV_VARNAME_DTBFILE;
->>   	efi_char16_t *val;
->>   	void *fdt = NULL;
->> -	int fdtsize;
->> +	int fdtsize = 0;
->>   
->>   	val = efi_get_var(handle, image, var);
->> -	if (val)
->> +	if (val) {
->>   		efi_load_image(handle, image, &fdt, &fdtsize, val);
->> +		if (fdtsize == 0)
->> +			return NULL;
->> +	} else if (efi_get_system_config_table(DEVICE_TREE_GUID, &fdt) != EFI_SUCCESS) {
->> +		return NULL;
->> +	}
->>   
->> -	return fdt;
->> +	return fdt_check_header(fdt) == 0 ? fdt : NULL;
+> I am not sure why we need 1024B either.
 > 
-> The call to fdt_check_header() seems to be breaking x86 based UEFI
-> tests. I have tested it with .x86/efi/run ./x86/smptest.efi
-
-I am not familiar with the x86 boot process but I would have thought 
-that the efi shell variable "fdtfile" is not set and as a result val 
-would be NULL. Then efi_get_system_config_table(DEVICE_TREE_GUID, &fdt) 
-would return EFI_NOT_FOUND and efi_get_fdt would return NULL without 
-executing the line fdt_check_header(fdt).
-
-Thanks,
-
-Nikos
-
+> IIUC, the inputs here in 'kvm_tdx_init_vm' should be a subset of the members in
+> TD_PARAMS.  This IOCTL() isn't intended to carry any additional input besides
+> these defined in TD_PARAMS, right?
 > 
-> Thanks,
-> Pavan
->>   }
->>   
->>   efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
->> diff --git a/lib/linux/efi.h b/lib/linux/efi.h
->> index 410f0b1a0da1..92d798f79767 100644
->> --- a/lib/linux/efi.h
->> +++ b/lib/linux/efi.h
->> @@ -66,6 +66,8 @@ typedef guid_t efi_guid_t;
->>   #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
->>   #define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
->>   
->> +#define DEVICE_TREE_GUID EFI_GUID(0xb1b621d5, 0xf19c, 0x41a5,  0x83, 0x0b, 0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0)
->> +
->>   #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
->>   
->>   typedef struct {
+> If so, then it seems to me you "at most" only need to reserve the space for the
+> members excluding the CPUID entries, because for the CPUID entries we will
+> always pass them as a flexible array at the end of the structure.
+> 
+> Based on the spec, the "non-CPUID-entry" part only occupies 256 bytes.  To me it
+> seems we have no reason to reserve more space than 256 bytes.
+
+Ok, I'll make it 256 bytes.
+
+The alternative is to use key-value.  The user space loops to set all necessary
+parameters.  Something like as follows.
+
+KVM_TDX_SET_VM_PARAM
+
+struct kvm_tdx_vm_param {
+        /* TDCS metadata field. */
+        __u64 field_id;
+        /*
+         * value for attributes or data less or qeual to __u64.
+         * pointer for sha384, cpuid, or data larger than __u64.
+         */
+        __u64 value_or_ptr;
+};
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
