@@ -1,139 +1,194 @@
-Return-Path: <kvm+bounces-12561-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF30E88A07A
-	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 13:56:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94ABD88A11C
+	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 14:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB15A2C3B83
-	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 12:56:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63195BC4305
+	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 13:02:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B48537F6;
-	Mon, 25 Mar 2024 07:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B481304B9;
+	Mon, 25 Mar 2024 08:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4Cdfu9H"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ukYZTjjr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7E613A898
-	for <kvm@vger.kernel.org>; Mon, 25 Mar 2024 05:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C8514F9F6;
+	Mon, 25 Mar 2024 06:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711344973; cv=none; b=ORFL+mx4N/G8bicyF7/mU0k/J5P32g9Iuew6/t9Tpyy/UyWc7QcReEpCl5GDd/8EtKiOW/2+BIiuhiYJK3yQn1SRkOpe3TVA/WH4CA/QOxA6CNEn5l7LYWAXtU/oKmGD3GO56rMV4pSjT/qOkv+emmeSR9hEIqUr8lOpIxda2DI=
+	t=1711346637; cv=none; b=cQCISauqLhTqp4tl3qd/1GI1EnaettVebp4OkUEbADsuaWGGUTQoQ8Tsv/lrX3UYabozxCZOeQLoI/XIREBill9ltlK245MmSne0ctxs7+8an3BeidTdblhGh4Cgyh83ZzV3yTocaD8RNfwxcUjfxxgt5JR1rfS/oWOpJTPffcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711344973; c=relaxed/simple;
-	bh=EU8rMwSTrTyQnsbvgXpnauDmYsPiuPv39ABTahNuuu8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fUmsj7M/ujhYXRX0MZnFsXGFMuvMdH9Yb7Xvvu0vQ8sgRZ+mlWZ5zCM6Dgu6y04idnYMbAJLQ+NecLsWxrECqe9J3jqL0xHEWBabuNPE1cw3g+L34kYAVvx+QYp5tVB51WzddyvIhg048eFcfGmMPNsMVUQTrrw7bnnThkBG/oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F4Cdfu9H; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711344969;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8TgtQ+DMtiPQkrYAgbAtmlSjXgOjNaIxWS+xe0Zj6hc=;
-	b=F4Cdfu9HDHKtpyIQ9/HtJ5dFtKSytNaetQj7cBY2MYjVXIgksBTTP+2LEI8hOXpqhSxV7L
-	ukOPoRggegDpKHHZHN6pPP3hs0reINbsxhpc/yQn8NtDPvrRv/2dEK0Zm6ZuIUw4ewtkoN
-	u9GT8KQnnElTAlHecJd5EGZngyKgohM=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-180-BSpIFEOMOmGROyCGtm8tPQ-1; Mon, 25 Mar 2024 01:36:06 -0400
-X-MC-Unique: BSpIFEOMOmGROyCGtm8tPQ-1
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6dea8b7e74aso1225626a34.1
-        for <kvm@vger.kernel.org>; Sun, 24 Mar 2024 22:36:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711344965; x=1711949765;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8TgtQ+DMtiPQkrYAgbAtmlSjXgOjNaIxWS+xe0Zj6hc=;
-        b=HZF1J/KfN7Cc7z+Ser3eR0dPDB3Z3DUJH6h8Ask9O+4yBcPmmMji6l5UcKDakR3gxD
-         sngKHXwfBdJILFwuqVRK5r/wuIg9LlqMNuGD7XfH3/PoNB64xjykemA4bkzcHXUhgNIA
-         LVEqxcv1lbSihL8mNOD/WYpjtCsBSKyCJoM5eSsTjT1XjDAH9woOJkRWBq0ZdqEbDn38
-         Ao3u6egbk1oEVGSFdKBwKkCrZVP6y1kITPqEj6SQIB4lQFANj/h0GZKXlmzHhs2oU1va
-         UsYNcj9W1UJwR2drWmu47WkBQx2gBatEt/Pwiw6lGDe7+rglb9wR0HcJBh12WQvFXi/N
-         cG/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVpV/raYupnSXihEMN9KRFaYYJ9HHn27b0CXoGvjYxnKDFmU+cp6LyF/YrwYU2YxvRLgCK7UxpEFhl8Cr+DEeVEsNHs
-X-Gm-Message-State: AOJu0YxCTLCqFRrv+WfZ9CFuhWMiDCPUq4wdH7/YDaoVRb3xZIhW2svt
-	CODnYPfdOi7ucw6aLbVNVXrgDY1dG957/5Tqnr/TynytBygqZd22/ESEmHjfDJk2PUs7o5H75nA
-	fyghERIl6NzOU6qo+9hUIFvdvDXKGkoKJszVY4hkYGEKJ9KRubQ==
-X-Received: by 2002:a05:6808:1588:b0:3c3:cd59:8bca with SMTP id t8-20020a056808158800b003c3cd598bcamr2572138oiw.1.1711344964745;
-        Sun, 24 Mar 2024 22:36:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFt9oJb2ITIcGjhwp3JVbL956AzSVHe3VrG3isWxPLgundOEN5rJCSjnl5ChB1nirQXPylzVw==
-X-Received: by 2002:a05:6808:1588:b0:3c3:cd59:8bca with SMTP id t8-20020a056808158800b003c3cd598bcamr2572113oiw.1.1711344963897;
-        Sun, 24 Mar 2024 22:36:03 -0700 (PDT)
-Received: from [10.72.116.135] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id z3-20020aa79903000000b006e6b4613de1sm3417819pff.104.2024.03.24.22.36.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Mar 2024 22:36:03 -0700 (PDT)
-Message-ID: <1881554f-9183-4e01-8cda-0934f7829abf@redhat.com>
-Date: Mon, 25 Mar 2024 13:35:58 +0800
+	s=arc-20240116; t=1711346637; c=relaxed/simple;
+	bh=nh7RRQLuaSddz65FK3Wb9wuNv3HNQBBH9TtjgCZM/8o=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=A7tIcPQgNaob80xGsfi49mwhPIEy9qh+e11mL2LDg86SBDYW5+/xwjZxvLjsOr+Z+vAD3wp6qEs3csOvsxJ+ahw9QGtS2mmPpM4I79HAVUmGjoEGV4LyNDbdvGQAlyvtznWY9CY3mslAR8jFIv4YDsyhJTTLmedVgTxEA9WT9VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ukYZTjjr; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711346627; h=Message-ID:Subject:Date:From:To;
+	bh=2wvKbE33fAJ4kNFKPB3UPmddRQV+uumgQtNtBaMBvfA=;
+	b=ukYZTjjrjHhX2o2r+fAJbe9hE47/vJ9QzoRWspS7blS1koKFCbZ/3vknAEdHiAOdkxI0NGp7J15hs7NNdAWXCrjRsk6vxaknMn9fbB8cczRF4NlXPEeJ6SQnYf4V2twbyf6PJYHNFsk6xh2rS8qJURNumzjj/nRgcttCQ+imAIE=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=25;SR=0;TI=SMTPD_---0W39d4bX_1711346625;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W39d4bX_1711346625)
+          by smtp.aliyun-inc.com;
+          Mon, 25 Mar 2024 14:03:46 +0800
+Message-ID: <1711346600.0136697-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v4 1/6] virtio_balloon: remove the dependence where names[] is null
+Date: Mon, 25 Mar 2024 14:03:20 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ linux-um@lists.infradead.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,
+ linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <20240321101532.59272-1-xuanzhuo@linux.alibaba.com>
+ <20240321101532.59272-2-xuanzhuo@linux.alibaba.com>
+ <3620be9c-e288-4ff2-a7be-1fcf806e6e6e@redhat.com>
+In-Reply-To: <3620be9c-e288-4ff2-a7be-1fcf806e6e6e@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-Content-Language: en-US
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-arm@nongnu.org, Eric Auger <eauger@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-References: <20240312074849.71475-1-shahuang@redhat.com>
- <Zf2bbcpWYMWKZpNy@redhat.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <Zf2bbcpWYMWKZpNy@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-Hi Daniel,
+On Fri, 22 Mar 2024 12:56:46 +0100, David Hildenbrand <david@redhat.com> wrote:
+> On 21.03.24 11:15, Xuan Zhuo wrote:
+> > Currently, the init_vqs function within the virtio_balloon driver relies
+> > on the condition that certain names array entries are null in order to
+> > skip the initialization of some virtual queues (vqs). This behavior is
+> > unique to this part of the codebase. In an upcoming commit, we plan to
+> > eliminate this dependency by removing the function entirely. Therefore,
+> > with this change, we are ensuring that the virtio_balloon no longer
+> > depends on the aforementioned function.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >   drivers/virtio/virtio_balloon.c | 41 +++++++++++++++------------------
+> >   1 file changed, 19 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+> > index 1f5b3dd31fcf..becc12a05407 100644
+> > --- a/drivers/virtio/virtio_balloon.c
+> > +++ b/drivers/virtio/virtio_balloon.c
+> > @@ -531,49 +531,46 @@ static int init_vqs(struct virtio_balloon *vb)
+> >   	struct virtqueue *vqs[VIRTIO_BALLOON_VQ_MAX];
+> >   	vq_callback_t *callbacks[VIRTIO_BALLOON_VQ_MAX];
+> >   	const char *names[VIRTIO_BALLOON_VQ_MAX];
+> > -	int err;
+> > +	int err, nvqs, idx;
+> >
+> > -	/*
+> > -	 * Inflateq and deflateq are used unconditionally. The names[]
+> > -	 * will be NULL if the related feature is not enabled, which will
+> > -	 * cause no allocation for the corresponding virtqueue in find_vqs.
+> > -	 */
+> >   	callbacks[VIRTIO_BALLOON_VQ_INFLATE] = balloon_ack;
+> >   	names[VIRTIO_BALLOON_VQ_INFLATE] = "inflate";
+> >   	callbacks[VIRTIO_BALLOON_VQ_DEFLATE] = balloon_ack;
+> >   	names[VIRTIO_BALLOON_VQ_DEFLATE] = "deflate";
+>
+> I'd remove the static dependencies here completely and do it
+> consistently:
+>
+> nvqs = 0;
+>
+> callbacks[nvqs] = balloon_ack;
+> names[nvqs++] = "inflate";
+> callbacks[nvqs] = balloon_ack;
+> names[nvqs++] = "deflate";
+>
+>
+> > -	callbacks[VIRTIO_BALLOON_VQ_STATS] = NULL;
+> > -	names[VIRTIO_BALLOON_VQ_STATS] = NULL;
+> > -	callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
+> > -	names[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
+> > -	names[VIRTIO_BALLOON_VQ_REPORTING] = NULL;
+> > +
+> > +	nvqs = VIRTIO_BALLOON_VQ_DEFLATE + 1;
+> >
+> >   	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> > -		names[VIRTIO_BALLOON_VQ_STATS] = "stats";
+> > -		callbacks[VIRTIO_BALLOON_VQ_STATS] = stats_request;
+> > +		names[nvqs] = "stats";
+> > +		callbacks[nvqs] = stats_request;
+> > +		++nvqs;
+>
+> callbacks[nvqs++] = stats_request;
+>
+> If you prefer to keep it separate, "nvqs++" please.
+>
+> ... same here:
+>
+> idx = 0;
+> vb->inflate_vq = vqs[idx++];
+> vb->deflate_vq = vqs[idx++];
+>
+> ...
+>
+> >
+> >   	vb->inflate_vq = vqs[VIRTIO_BALLOON_VQ_INFLATE];
+> >   	vb->deflate_vq = vqs[VIRTIO_BALLOON_VQ_DEFLATE];
+> > +
+> > +	idx = VIRTIO_BALLOON_VQ_DEFLATE + 1;
+> > +
+> >   	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> >   		struct scatterlist sg;
+> >   		unsigned int num_stats;
+> > -		vb->stats_vq = vqs[VIRTIO_BALLOON_VQ_STATS];
+> > +		vb->stats_vq = vqs[idx++];
+> >
+> >   		/*
+> >   		 * Prime this virtqueue with one buffer so the hypervisor can
+> > @@ -593,10 +590,10 @@ static int init_vqs(struct virtio_balloon *vb)
+> >   	}
+> >
+> >   	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT))
+> > -		vb->free_page_vq = vqs[VIRTIO_BALLOON_VQ_FREE_PAGE];
+> > +		vb->free_page_vq = vqs[idx++];
+> >
+> >   	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
+> > -		vb->reporting_vq = vqs[VIRTIO_BALLOON_VQ_REPORTING];
+> > +		vb->reporting_vq = vqs[idx++];
+> >
+>
+> Apart from that LGTM
 
-Thanks for your reviewing. I see your comments in the v7.
+Will fix in next version.
 
-I have some doubts about what you said about the QAPI. Do you want me to 
-convert the current design into the QAPI parsing like the 
-IOThreadVirtQueueMapping? And we need to add new json definition in the 
-qapi/ directory?
+Thanks.
 
-Thanks,
-Shaoqin
 
-On 3/22/24 22:53, Daniel P. Berrangé wrote:
-> On Tue, Mar 12, 2024 at 03:48:49AM -0400, Shaoqin Huang wrote:
->> The KVM_ARM_VCPU_PMU_V3_FILTER provides the ability to let the VMM decide
->> which PMU events are provided to the guest. Add a new option
->> `kvm-pmu-filter` as -cpu sub-option to set the PMU Event Filtering.
->> Without the filter, all PMU events are exposed from host to guest by
->> default. The usage of the new sub-option can be found from the updated
->> document (docs/system/arm/cpu-features.rst).
->>
->> Here is an example which shows how to use the PMU Event Filtering, when
->> we launch a guest by use kvm, add such command line:
->>
->>    # qemu-system-aarch64 \
->>          -accel kvm \
->>          -cpu host,kvm-pmu-filter="D:0x11-0x11"
-> 
-> I mistakenly sent some comments to the older v7 (despite this v8 already
-> existing) about the design of this syntax So for linking up the threads:
-> 
->   https://lists.nongnu.org/archive/html/qemu-devel/2024-03/msg04703.html
-> 
-> With regards,
-> Daniel
-
--- 
-Shaoqin
-
+>
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
