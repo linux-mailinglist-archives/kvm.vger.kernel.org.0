@@ -1,130 +1,126 @@
-Return-Path: <kvm+bounces-12590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F85C88A9A3
-	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 17:39:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F115988A9E1
+	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 17:45:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8227F1C61255
-	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 16:39:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EC8A1C2D8AA
+	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 16:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F57314D2B2;
-	Mon, 25 Mar 2024 14:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A1C13249F;
+	Mon, 25 Mar 2024 14:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HXJEK8IE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HppgJVyw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDD314D2A7
-	for <kvm@vger.kernel.org>; Mon, 25 Mar 2024 14:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8071417109E;
+	Mon, 25 Mar 2024 14:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711378061; cv=none; b=BC2tgEGH1MXcGrLfXwtZoF9dKQyoXsS93szUF1XNHhht98HNjKf6Y18qOU7nbAY6Ie5h9rcKsntUmabkOI+IKk8jZA8BO2qslfgrEBtAMrFbr+ptxlCeuxOXU+35omg4r1uhhXsZMNLQA06+Hzjn91gbSMa3ANfMDbZFzMl9s4g=
+	t=1711378653; cv=none; b=W6E0M9OCq1EteYXyhzrOdcBu8j8XCGCjcnvobZVME918R/IuTTFmLGMPkjL4v0WVEn8J79dwjPTPyfDnmxbSNxHeoh8s5uJdzDyhobFGpVJQSWIm7NX0tD/fcWgvKhoAWmvT3uLOtPF5abbEVo5b1LIIZRgS81DteiIlAdKAcSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711378061; c=relaxed/simple;
-	bh=GTmM8vLVnfDJNCDlIZTuXHQn6avz5v/tLGQoeLNr+EE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pdnrUu8gocima0AH33JP9McY396phcWmvgjpnTzJGumlqklWBuk4ky12PLJtFVwHODLsgYUzmf34sIW46zyA8w9IIy64Ju84pJWKlR1cpYSy1wDWiXmWmYE2lNHBr3nUmwB4xkqMnSjSaUl2o2pIfJHqHkNsoVCr5msYYc2Gao4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HXJEK8IE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711378059;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DsJzNPnYlAzllKzELoC8ajG8VB6UCIrLwt5d6+Usjys=;
-	b=HXJEK8IEvDflafCBM+Kth2QcSdulio0SwAqWjd9UTBTPDQ2bJSq7gaT3kfGYT1UFAei0ER
-	KKQCQtPuXSqiVqAXG/bPU9S57j4oBKIvl7o3CyrEt32Mec6H5AdqPcXUjQWBN48cR+MBxn
-	aWYil7kl4e35xH/LFl5mrFYmQla7qHk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-403-XMZUEqHON_e8BDus4gvrKg-1; Mon,
- 25 Mar 2024 10:47:36 -0400
-X-MC-Unique: XMZUEqHON_e8BDus4gvrKg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 60FDB2800E8F;
-	Mon, 25 Mar 2024 14:47:36 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.158])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 05EA51121306;
-	Mon, 25 Mar 2024 14:47:36 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 9AB551801CDC; Mon, 25 Mar 2024 15:47:25 +0100 (CET)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v5 2/2] target/i386: add guest-phys-bits cpu property
-Date: Mon, 25 Mar 2024 15:47:24 +0100
-Message-ID: <20240325144725.1089192-3-kraxel@redhat.com>
-In-Reply-To: <20240325144725.1089192-1-kraxel@redhat.com>
-References: <20240325144725.1089192-1-kraxel@redhat.com>
+	s=arc-20240116; t=1711378653; c=relaxed/simple;
+	bh=4iYKYravWH9cBjEWpiEgWot/Rprt2Qy66JfxmdpsEds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sWDrESUfPsl7MngNDGyT6Hun4wPRLodOtpCHAG6dKPqq8hNaNYxsgqMBYRp0WHRq48jg9rej+J0x2OyW1R2QU0sA0gdDQfsoCooWj0hxb4IlIBI2uChBvfDF0FlDIsQnk7uy4TcPQd74y3a/qxIxxkKGD/ucOeic4Q1QCPIDJU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HppgJVyw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5168C43399;
+	Mon, 25 Mar 2024 14:57:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711378652;
+	bh=4iYKYravWH9cBjEWpiEgWot/Rprt2Qy66JfxmdpsEds=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HppgJVywSnViwY+ifBCk3LJ/5bTDtvM5hTK94hEq7ilMYe7NnVlmoqPbx2aLGiDeT
+	 yZyPfhlUcBEGT+FY5G9KUnkEpt074+dVr20q4MoKpnzIQpY0tZZ/MYQR6OjD/9A9QM
+	 pce7M5gVIrqDkpZM/PjZRTgPCnpZ7UMd7EIsjMeG9mspvdSzYKooXMFKDi9z+vJeNU
+	 4B9BAICFWNBh7rS8EuBOZpcg+65Q/N+0JIWbJG1xUUlAANoBv+uaAf8XxHECNFodXX
+	 ar6jUxdk7ZyC8TYum99LQnZ1zQCzRHF6h3if2qH5UCXIASQfNvrXtgxxqXsUWxasZk
+	 Px3BBUoz6+GWA==
+Date: Mon, 25 Mar 2024 14:57:27 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Dongli Zhang <dongli.zhang@oracle.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: Exclude FP ownership from
+ kvm_vcpu_arch
+Message-ID: <55f2f1f7-6f23-45f2-ae6c-a1111e3271db@sirena.org.uk>
+References: <20240322170945.3292593-1-maz@kernel.org>
+ <20240322170945.3292593-6-maz@kernel.org>
+ <fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
+ <87edc0sr7z.wl-maz@kernel.org>
+ <252bc993-e93d-4412-bfc6-13930b80dbd8@sirena.org.uk>
+ <87cyrism0p.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="TZBBMhFGqQPVUNeD"
+Content-Disposition: inline
+In-Reply-To: <87cyrism0p.wl-maz@kernel.org>
+X-Cookie: Evil isn't all bad.
 
-Allows to set guest-phys-bits (cpuid leaf 80000008, eax[23:16])
-via -cpu $model,guest-phys-bits=$nr.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- target/i386/cpu.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+--TZBBMhFGqQPVUNeD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3b7bd506baf1..79bea83b7b1c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -7380,6 +7380,14 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         if (cpu->phys_bits == 0) {
-             cpu->phys_bits = TCG_PHYS_ADDR_BITS;
-         }
-+        if (cpu->guest_phys_bits &&
-+            (cpu->guest_phys_bits > cpu->phys_bits ||
-+            cpu->guest_phys_bits < 32)) {
-+            error_setg(errp, "guest-phys-bits should be between 32 and %u "
-+                             " (but is %u)",
-+                             cpu->phys_bits, cpu->guest_phys_bits);
-+            return;
-+        }
-     } else {
-         /* For 32 bit systems don't use the user set value, but keep
-          * phys_bits consistent with what we tell the guest.
-@@ -7388,6 +7396,10 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-             error_setg(errp, "phys-bits is not user-configurable in 32 bit");
-             return;
-         }
-+        if (cpu->guest_phys_bits != 0) {
-+            error_setg(errp, "guest-phys-bits is not user-configurable in 32 bit");
-+            return;
-+        }
- 
-         if (env->features[FEAT_1_EDX] & (CPUID_PSE36 | CPUID_PAE)) {
-             cpu->phys_bits = 36;
-@@ -7888,6 +7900,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("x-force-features", X86CPU, force_features, false),
-     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
-     DEFINE_PROP_UINT32("phys-bits", X86CPU, phys_bits, 0),
-+    DEFINE_PROP_UINT32("guest-phys-bits", X86CPU, guest_phys_bits, 0),
-     DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
-     DEFINE_PROP_UINT8("host-phys-bits-limit", X86CPU, host_phys_bits_limit, 0),
-     DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true),
--- 
-2.44.0
+On Mon, Mar 25, 2024 at 09:23:18AM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
+> > This was referring to the fact that currently when SVE is enabled access
+> > to the V registers as V registers via _CORE_REG() is blocked and they
+> > can only be accessed as a subset of the Z registers (see the check at
+> > the end of core_reg_size_from_offset() in guest.c).
+
+> But what behaviour do you expect from allowing such a write? Insert in
+> place? Or zero the upper bits of the vector, as per R_WKYLB? One is
+> wrong, and the other wrecks havoc on unsuspecting userspace.
+
+It would have to be the former due to the ABI issue I think.
+
+> My take on this is that when a VM is S*E aware, only the writes to the
+> largest *enabled* registers should take place. This is similar to what
+> we do for FP/SIMD: we only allow writes to the V registers, and not to
+> Q, D, S, H or B, although that happens by construction. For S*E,
+> dropping the write on the floor (or return some error that userspace
+> will understand as benign) is the least bad option.
+
+OK, this does mean that in the case of a SME only guest we'll end up
+with registers not just changing size but appearing and disappearing
+depending on SVCR.SM.  It wasn't clear to me that this was a good idea
+=66rom an ABI point of view, it's a level up beyond the size changing
+thing and there's a tradeoff with the "model what the architecture does"
+model.
+
+--TZBBMhFGqQPVUNeD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYBkNYACgkQJNaLcl1U
+h9ByJwf/U/oIV6AVIVoNAwLZzAornj6Pob8m36s2usB/NGn2FM/OBCqaAjCYBPPO
+G+h3JWn4Esv2fR2rPsmObyN4hUuYb9YORvoEzt7o37u9BPCwnk89KfIDBMxZBQ2c
+dhZ8wF69nYwATMf0JrVqPi7QkXAMoFy4kbaGVavuYksABFnqH8IfL4PpSrKulmJL
++IQ1x7rrPAPWiUpoH2bFBvlxHxETYrCQNNakQ6BiGvQ8FZsUvOBXkmFpX24tBhvm
+6TItHxSAIJIiHPXbuMcJ32CTCa/0BccsQBfOVoAAGX86x8voLVRMufVIImbnUYnJ
+/XjM6kyFpFkPyV2gx+HkNoDLyURW3g==
+=pUvj
+-----END PGP SIGNATURE-----
+
+--TZBBMhFGqQPVUNeD--
 
