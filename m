@@ -1,127 +1,135 @@
-Return-Path: <kvm+bounces-12623-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12624-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD16D88B2FE
-	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 22:42:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB6FC88B318
+	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 22:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69B5D1FA009C
-	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 21:42:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FB4D1F29C24
+	for <lists+kvm@lfdr.de>; Mon, 25 Mar 2024 21:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03C66FE2A;
-	Mon, 25 Mar 2024 21:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79126FE08;
+	Mon, 25 Mar 2024 21:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jYIp0by4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e4Z+9Ajx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CFA6F533
-	for <kvm@vger.kernel.org>; Mon, 25 Mar 2024 21:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7195D8E0;
+	Mon, 25 Mar 2024 21:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711402909; cv=none; b=SQ+UY3XvIWn/t3thgJzvsUdyiaqn328qlGS2WM1EpLEbF3KVzm0GP0lJU4k71QrnepFYCb6U1aQUu3WSEwlxDiyCoPnykio1SMjdfNnJ+H7dreQlf5nL0XIjSGNR9uYrhrTuYIpOdOWzuoSyyVuWpDYTb9JpAyiQAol2WQeLBAY=
+	t=1711403333; cv=none; b=rjBxv336riJTFnthZDP3ChVEEY3xG7v/uPcMCCJFe9u0OhLwB9obSavzGuRy1qSoi+lw74o3DpQIxgCiePEhIdhDg7N1c8fpfH/wE80YOqJIh5pJ9A4N9IJ5RHMyNJzkiSymIRDXAnLkGduOJl224D2GX+Akb+rITWBRIpy/9e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711402909; c=relaxed/simple;
-	bh=hD9XsIBzAV/bPhZwOQmQep3NyRgaTjUJYFuVVNQO7Yw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UDiRcJs+nmLRZWK1Phv5YET7ryYgLRFZW4a5nj0iacE4hEUFSiWKXWmNmAQJGrRcvlawVIM+xV8WtUCCXlENUI6GtdF3NmF+D0QDpeBzKnRFJq+dOGGXMw0iJshKWhs8Ifb/9nb0OpXlFYqsnDEns8h8H+Vms4bDW3Jklu1cVbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jYIp0by4; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56c1a50b004so2652a12.0
-        for <kvm@vger.kernel.org>; Mon, 25 Mar 2024 14:41:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711402906; x=1712007706; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O/KboFRJyODJZyWJydsADn20bl4YX3uVsNj1S+g1jiA=;
-        b=jYIp0by4RD9yx8iqDLdDhq7bozzs5ImXfzfVIyurahnTYqKNA8NpOkkwK5Ih7jS5WN
-         a/KKp5qwN+tfCs4eWb2XgEQpw3G4zzFwF71mEQS2++87NKl+x709eq3esV1HxbwrzFnG
-         gTWACJXfsjJ27HeH5sfcBbFt9TI37vdZqaP8bo4aIuhINPlCjxNl09va5SprMhvGBf+i
-         +gNbsv8J8p1VTXM4S9yrFjtq+VG4l2jH35/6nmk0MS/KsDdKYqKQV2o3k8tmEs1pl0bw
-         tSG6O/aQ0nzUqXkL6XD0X8O1jLtiJwypqHNfJmo+jC1BSIpCT9eLFVBI/3+YXcqkK/7I
-         9oLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711402906; x=1712007706;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O/KboFRJyODJZyWJydsADn20bl4YX3uVsNj1S+g1jiA=;
-        b=wggOgKXtO9Ka1yQV3i411YKhG1suC4I91Bk9ph4sTqgulj1Gmdr4mAzYHPb8AmiFDf
-         f/WvNprhrIz/FPxMGRr4vJ7f+XnS3ilwu4vBvN2Qp6rsTHCtKWLISctL2Kkdz9oX8g5Y
-         +e4Ioiaq5RsvjVeES4KbRt31zpn/6veg4KS4dPVY9JXyCyw2bUDp3znPs8m7tizbDWqk
-         Rm8/PjIspObS+/FOBrfP/JNz1zNms0DonPNdmx1EJGpnQM9A6LchIyT0KzRBw+deeAJ2
-         wbO8Y/Yxs3NC9ZHvl6zVqwiPb89IX5cqE4gp0BgyMimSVt/TRmvblDJJbH1lN08BA8dL
-         obHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUN+Vy/NpbZSrqUmK3t+EC58KEkDR2767VSmpYklY9zOmoOQeagjx8Ds8cNS5iQrqEM0CBF98v5bWa2dlReV4DcYFn5
-X-Gm-Message-State: AOJu0Yw55ATZMXdAMJxJ/S7TaF841vPTo0hJy30SfDI5YLsaMrRaOLVj
-	DvlkXsIXJKQsU1kABlkh/ZnHZaBGdFnrSYdnXM4ywwq+ssMfzAhPTVqHaRjxq+RWmfS46UIBqaJ
-	0f4/F0IpdsJ7IA+S/9jnZq4lOR6fajZxiapv+
-X-Google-Smtp-Source: AGHT+IHgkwX8y9U03a0Hq2u9cOn7hIzoMZsLqoGAIZkeovc4m2XkeHedXDRkFuGzeQSfjLbAnvGesQj0WAvl+cOCr+U=
-X-Received: by 2002:aa7:c44d:0:b0:568:7767:14fd with SMTP id
- n13-20020aa7c44d000000b00568776714fdmr27919edr.7.1711402906313; Mon, 25 Mar
- 2024 14:41:46 -0700 (PDT)
+	s=arc-20240116; t=1711403333; c=relaxed/simple;
+	bh=eIyEkdLme3YwP3nX80zt2BK9NvuG/TevdkijeZMdiO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lUWGrRYQ4rvcvvjvqN3zHABthrG8oKnt9HQUm1Cz04CruoRqWS6pcmjZ5cA2KaqTdphP+7LSKjvikWEmw/8Ba6JDVhXFw/hDDkceQ2HomkOiM6HY++wI3JbEqp0dOfhjEcTDyjotb38Clq1HAhaySGQKPLu9Vi70qSzElEKtDNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e4Z+9Ajx; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711403331; x=1742939331;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eIyEkdLme3YwP3nX80zt2BK9NvuG/TevdkijeZMdiO4=;
+  b=e4Z+9AjxlWXbZYeyyBTtPtdkZlnka0GADBY8ucu1BlSmP6sWkz2wVXvq
+   Rj8HtvFMkONap0f/7di08dIkH25zcnmKUdGMIJaBSO9n0LHIXjzoLIvTo
+   2PlLge+8ujDn5Unr15NepujRW0mtwPnfX/H1cVhcfvRsmJVeWkdzZsiN9
+   XFWQHjicYLfQQ+kaC7dzy9dOs4qQzvDEzZOIv3rkHY98j/yNyUDa/5Olw
+   tlLG5bY1tCqXrSHBA1uOEa9mMV1ztjtTPEnRDBgMP3VigBeC/sjF+2oOE
+   viSvKYpx6Jt52lL09LYybFQQ/cq1euiSoOwTTPQNcXvZHAd/xREbMBCfA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="6294608"
+X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
+   d="scan'208";a="6294608"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 14:48:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
+   d="scan'208";a="38868640"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 14:48:51 -0700
+Date: Mon, 25 Mar 2024 14:48:49 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 038/130] KVM: TDX: create/destroy VM structure
+Message-ID: <20240325214849.GM2357401@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <7a508f88e8c8b5199da85b7a9959882ddf390796.1708933498.git.isaku.yamahata@intel.com>
+ <ba217de2-cdcb-4f50-80cc-c61a0e8255b2@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com> <20240103031409.2504051-3-dapeng1.mi@linux.intel.com>
-In-Reply-To: <20240103031409.2504051-3-dapeng1.mi@linux.intel.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 25 Mar 2024 14:41:31 -0700
-Message-ID: <CALMp9eSsF22203ZR6o+qMxySDrPpjVNYe-nBRjf1vSRq9aBLDA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests Patch v3 02/11] x86: pmu: Enlarge cnt[] length to
- 64 in check_counters_many()
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>, 
-	Zhang Xiong <xiong.y.zhang@intel.com>, Mingwei Zhang <mizhang@google.com>, 
-	Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>, 
-	Dapeng Mi <dapeng1.mi@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ba217de2-cdcb-4f50-80cc-c61a0e8255b2@linux.intel.com>
 
-On Tue, Jan 2, 2024 at 7:09=E2=80=AFPM Dapeng Mi <dapeng1.mi@linux.intel.co=
-m> wrote:
->
-> Considering there are already 8 GP counters and 4 fixed counters on
-> latest Intel processors, like Sapphire Rapids. The original cnt[] array
-> length 10 is definitely not enough to cover all supported PMU counters on=
- these
-> new processors even through currently KVM only supports 3 fixed counters
-> at most. This would cause out of bound memory access and may trigger
-> false alarm on PMU counter validation
->
-> It's probably more and more GP and fixed counters are introduced in the
-> future and then directly extends the cnt[] array length to 64 once and
-> for all.
->
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> ---
->  x86/pmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index 0def28695c70..a13b8a8398c6 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -254,7 +254,7 @@ static void check_fixed_counters(void)
->
->  static void check_counters_many(void)
->  {
-> -       pmu_counter_t cnt[10];
-> +       pmu_counter_t cnt[64];
+On Mon, Mar 25, 2024 at 05:58:47PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-I think 48 should be sufficient, based on the layout of
-IA32_PERF_GLOBAL_CTRL and IA32_PERF_GLOBAL_STATUS.
+> > +static void tdx_clear_page(unsigned long page_pa)
+> > +{
+> > +	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
+> > +	void *page = __va(page_pa);
+> > +	unsigned long i;
+> > +
+> > +	/*
+> > +	 * When re-assign one page from old keyid to a new keyid, MOVDIR64B is
+> > +	 * required to clear/write the page with new keyid to prevent integrity
+> > +	 * error when read on the page with new keyid.
+> > +	 *
+> > +	 * clflush doesn't flush cache with HKID set.  The cache line could be
+> > +	 * poisoned (even without MKTME-i), clear the poison bit.
+> > +	 */
+> > +	for (i = 0; i < PAGE_SIZE; i += 64)
+> > +		movdir64b(page + i, zero_page);
+> > +	/*
+> > +	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
+> > +	 * from seeing potentially poisoned cache.
+> > +	 */
+> > +	__mb();
+> 
+> Is __wmb() sufficient for this case?
 
-In any event, let's bump this up!
+I don't think so because sfence is for other store. Here we care other load.
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> > +
+> > +static int tdx_do_tdh_mng_key_config(void *param)
+> > +{
+> > +	hpa_t *tdr_p = param;
+> > +	u64 err;
+> > +
+> > +	do {
+> > +		err = tdh_mng_key_config(*tdr_p);
+> > +
+> > +		/*
+> > +		 * If it failed to generate a random key, retry it because this
+> > +		 * is typically caused by an entropy error of the CPU's random
+> 
+> Here you say "typically", is there other cause and is it safe to loop on
+> retry?
+
+
+No as long as I know. the TDX module returns KEY_GENERATION_FAILED only when
+rdrnd (or equivalent) failed.  But I don't know the future.
+
+Let's delete "tyepically" because it seems confusing.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
