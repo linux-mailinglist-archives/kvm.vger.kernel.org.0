@@ -1,156 +1,148 @@
-Return-Path: <kvm+bounces-12713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D9B88CB0E
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 18:35:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B1B188CB05
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 18:34:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7B743237DF
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 17:35:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C7E71C65CB2
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 17:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3378C71749;
-	Tue, 26 Mar 2024 17:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6894B208A7;
+	Tue, 26 Mar 2024 17:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TUrTeuFL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vds0Pkbf"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2047.outbound.protection.outlook.com [40.107.237.47])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D094C1CD32
-	for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 17:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711474498; cv=fail; b=q6cRrBNedJjoxc+HDU0rX3ubbjYZq3s6A2VKLHLhJ0/emznhgXnWvEhVt4mwNqZIYreJ7vf6PYXmjpjK489bm6UQvu48YJw1k6kulyg2KhwZVF9kcKu4rC1/Fzz5VRiGxgL5KuH6ExUtzhb4Chd79Oqj9jSvGdK+C65h6wy6EzY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711474498; c=relaxed/simple;
-	bh=FoilVzfWr4MAehofgksYR0krpj8svqHfS8SNRCVDmnk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JvBCR18ZzsLgMOKwFd9BkWUOlp57JzJZSbjk4it/wDhcqUETdrpIp90dYi+UjxGJ/5w6bu+AEUXU/n+NN9zHgdCZJbiXl2nQ2sFxO5ByKyIvS8xN8DA8fIGCmBKvLnnx8RHvpvi3IuoAq4QrmC8GBqZnxYv3RG45Ka+F27yyd8g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TUrTeuFL; arc=fail smtp.client-ip=40.107.237.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D/1kAZjDUvvUi3hE8cFgODa1jLW9ukP7/Hq6nPC3ilEPFoL4tNfCmnUzocAxrXgizrdVD97cZfZFc+pCVQVZr7QFTnYACHpBYCRz9Qye71LsGHfh2iJ4MpOl8nKeNT58VduZtQfNYAWb3d8E4fmh/xsWOR2HThK3T8N8ivt6dImPbAtQlMBfVWyORPGheGBrMyIxHu0SuhQ8tNWVcre0Bx8hBu6nj+PXyMqoZWZ0fpUL8Zn3PuN/wVGbZHCKnWVxzEemMChNZe6AclT7I0Auyhis5HCZ5XticL1i7Pdorg1QQxzNx3e29UmoViaC2UJpoLIAiVo1rusKoJX6QdB7Kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=38GtvsUbergKtNwWt8qv6uxU2WvNf8p6l32I3typL9U=;
- b=mXovD25tfCd9f1XwKKS8S9g04TP5IqSynEnpFd71yliw2D7an/A2TnSbsbw40M3A3jYLCrGaNF27KQjWDUKBX77V5UdvaheHp+iyHkUkqoWDHQiMWWGGrLJbfY0zrfFB01z4vd3vUgho2uVG9BZ1SItj2ZJIgYIEF3rhJ5g8wAngxJipzSgtdquOuA7Mok+ASfKJxg/S2efg7xc22kK2vNJg90R7uOswqUInkC5xzSykBmgQhrjHTN9uoMWZtKoSUp2aPTu/1Ym/JyuP/P4EYOkEH72RqzOipSwi3jSRz8oVVHpDjy7XkmMGe/7Nd18FXjQC29gAsWKDtM8HTMzPqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=38GtvsUbergKtNwWt8qv6uxU2WvNf8p6l32I3typL9U=;
- b=TUrTeuFL/g4pB6fpRwc0eHlXREY/m07+e3tnqn4QqR1wpXnK/0CNKKdh2NhfZqzq0O3uJcopMv9UV5rjrbV0PKjXj0M2qZYAMXWGczcXd0hWTFK5XIbb76mFq5PkPo1xbI4U/ee2kMunfvyQbSTUrzcjCYajg+dThnOr/08mACU=
-Received: from DS7PR03CA0256.namprd03.prod.outlook.com (2603:10b6:5:3b3::21)
- by DM4PR12MB8557.namprd12.prod.outlook.com (2603:10b6:8:18b::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Tue, 26 Mar
- 2024 17:34:54 +0000
-Received: from CY4PEPF0000E9DB.namprd05.prod.outlook.com
- (2603:10b6:5:3b3:cafe::2c) by DS7PR03CA0256.outlook.office365.com
- (2603:10b6:5:3b3::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.13 via Frontend
- Transport; Tue, 26 Mar 2024 17:34:54 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000E9DB.mail.protection.outlook.com (10.167.241.81) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Tue, 26 Mar 2024 17:34:50 +0000
-Received: from ethanolx16dchost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 26 Mar
- 2024 12:34:46 -0500
-From: Pavan Kumar Paluri <papaluri@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <andrew.jones@linux.dev>, <thomas.lendacky@amd.com>,
-	<michael.roth@amd.com>, <papaluri@amd.com>, <amit.shah@amd.com>
-Subject: [kvm-unit-tests PATCH v2 4/4] x86 AMD SEV-ES: Setup a new page table and install level-1 PTEs
-Date: Tue, 26 Mar 2024 12:34:00 -0500
-Message-ID: <20240326173400.773733-4-papaluri@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240326173400.773733-1-papaluri@amd.com>
-References: <20240326173400.773733-1-papaluri@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C941CD3F;
+	Tue, 26 Mar 2024 17:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711474461; cv=none; b=Cw5E19fgtlfu8jRekLiV81vvJH5oP7QyOwmLcJprrmIPhLVsXpkudSTAluLucSEi7tNudNz71tA76/v5Dl7DQGUiUbqnPSNRhGmEBDWNNAOUJBR1mi6nEhNgk7CSlNMTHUfn7FtK2xWs0aybDygYY/sYSt/rUGFEQ8JLCfqXEv8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711474461; c=relaxed/simple;
+	bh=PP2+ULTolFHZ6Yk2NHBFIy4YY1fXuiQgaFH7sDpUkzY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gQzyKMHyIm13AUX8V5Mee7eQxqk9q872+dDKcF14k+ELSqgtqmewByi1NCNkyXkt6Hrmkhr2DP35rolwTk4QB3ZsHWA/ZLOgUnsWHljhzvQ3dsn9eM6HiPHmL9M7nA18IZozv6QDtBvJxaJZFb2x452xsr+oXqZZzhw6kQ9B6Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vds0Pkbf; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711474459; x=1743010459;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PP2+ULTolFHZ6Yk2NHBFIy4YY1fXuiQgaFH7sDpUkzY=;
+  b=Vds0PkbfEO3VkHWO/9dODTzy7j5+RvjPDSIxRoC4KkDQjmlQfUvL9tpN
+   Ngh+5dPhG3drcHLlU1/0GEGDe68CNZIUBChCpaw3yyxvS25RPp12e4pP1
+   QjkBQviektM4PP/F8m4aHRKUrEUocvnsRBZSAfs4LBEn5lJDB3QhrjIft
+   3onDqCq9/+nrCU8x5Tk4hIDGVCZ0+YXoyV0vuXiUMvs6JG87NDGkr3Jxk
+   F/Mhq9GZLdRT63enVnzrThEruzTZXM7gUOad35zo9q4B/YG/F+cIkyLsB
+   iYWZoxIiYW0Eh7qusbpMy39xck/dpZWRe9z7BuFeyLfpvKAWYvhZoQWHl
+   A==;
+X-CSE-ConnectionGUID: sbjI3EQWQu+oLngKAChAUg==
+X-CSE-MsgGUID: INtoZqSVTPGD4JqUIPVsuQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="29020005"
+X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
+   d="scan'208";a="29020005"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 10:34:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
+   d="scan'208";a="15942645"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 10:34:16 -0700
+Date: Tue, 26 Mar 2024 10:34:14 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 048/130] KVM: Allow page-sized MMU caches to be
+ initialized with custom 64-bit values
+Message-ID: <20240326173414.GA2444378@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <9c392612eac4f3c489ad12dd4a4d505cf10d36dc.1708933498.git.isaku.yamahata@intel.com>
+ <d2ea2f8e-80b1-4dda-bf47-2145859e7463@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9DB:EE_|DM4PR12MB8557:EE_
-X-MS-Office365-Filtering-Correlation-Id: 16ff3f74-7020-44b3-31ae-08dc4dbb0b76
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	vWg48bSWZ6UTq1Y8rpTiLfYxRZiubGWfpMe+8F3jfYDQAcpDIF5urYq3BAKAdgnYn+wl9v5Ca/86oTekp1xKF6v5M/y2azhrUcdZhF9VeciBt2hKKC3dz6Bhcwx64e+nPCN34WGdLHYu8cGKrKM81ir0onSpAdeqrzrFvcDGGyJtfmwEdjn+uoKXOM4nSiOsvz4ikN+LzbLTf6SdOUin5eS6eaGSH1OyIsYoQhjrtI+RYhH64zbFaFsb8uxaQBHpLME2clG6v65Tk3cxK61o1oN48af1T+X8AEjZmDpxlpCsdhNwC9vcUNBQgGic7gwbECBwb1ezgE0ty2KcYsOW5DYd99v6d4TccgR4UOfuNWvC26q+aYYzC3yWCsnHEwHcr+fgqVDf1WdZEbiaasNTjhexB0odztq4SzFbm+ScyOKXnYdZL16RaNbNHBJ6bZ0laEmpr/PVvw/xUyYxwIXserMg7Awg+dQlnij3z8zWSLRFr8dgHQb/ZHLtspifJ9haXN1H+g8gVreMKPJ8BVlB8l28NhTxDWhpJHsWKBD0Fybd6MMGb897vAv5u+lHbPvFVQvI1YtsHcEef87olmNa8x2UNBCsfZJFKa77vfpI/v1RK8TZ7dhvFYWtAEigwD4MAJIZz+d89atlanxf4R/ilhN/ypZuVO4mcZA0SroiRBvgW/IAv2a1FnNxyz5l2WsJZ2uWngPNyTBNUAP6IEN+ZaD9UOLlicVdEJFWli/YdlqwLMJZQN0HsIPrkDPHC8px
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(82310400014)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2024 17:34:50.9098
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16ff3f74-7020-44b3-31ae-08dc4dbb0b76
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9DB.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8557
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d2ea2f8e-80b1-4dda-bf47-2145859e7463@linux.intel.com>
 
-KUT's UEFI tests don't currently have support for page allocation.
-SEV-ES/SNP tests will need this later, so the support for page
-allocation is provided via setup_vm().
+On Tue, Mar 26, 2024 at 11:53:02PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
----
- x86/amd_sev.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+> 
+> 
+> On 2/26/2024 4:25 PM, isaku.yamahata@intel.com wrote:
+> > From: Sean Christopherson <seanjc@google.com>
+> > 
+> > Add support to MMU caches for initializing a page with a custom 64-bit
+> > value, e.g. to pre-fill an entire page table with non-zero PTE values.
+> > The functionality will be used by x86 to support Intel's TDX, which needs
+> > to set bit 63 in all non-present PTEs in order to prevent !PRESENT page
+> > faults from getting reflected into the guest (Intel's EPT Violation #VE
+> > architecture made the less than brilliant decision of having the per-PTE
+> > behavior be opt-out instead of opt-in).
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >   include/linux/kvm_types.h |  1 +
+> >   virt/kvm/kvm_main.c       | 16 ++++++++++++++--
+> >   2 files changed, 15 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> > index 9d1f7835d8c1..60c8d5c9eab9 100644
+> > --- a/include/linux/kvm_types.h
+> > +++ b/include/linux/kvm_types.h
+> > @@ -94,6 +94,7 @@ struct gfn_to_pfn_cache {
+> >   struct kvm_mmu_memory_cache {
+> >   	gfp_t gfp_zero;
+> >   	gfp_t gfp_custom;
+> > +	u64 init_value;
+> >   	struct kmem_cache *kmem_cache;
+> >   	int capacity;
+> >   	int nobjs;
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index de38f308738e..d399009ef1d7 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -401,12 +401,17 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
+> >   static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+> >   					       gfp_t gfp_flags)
+> >   {
+> > +	void *page;
+> > +
+> >   	gfp_flags |= mc->gfp_zero;
+> >   	if (mc->kmem_cache)
+> >   		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
+> > -	else
+> > -		return (void *)__get_free_page(gfp_flags);
+> > +
+> > +	page = (void *)__get_free_page(gfp_flags);
+> > +	if (page && mc->init_value)
+> > +		memset64(page, mc->init_value, PAGE_SIZE / sizeof(mc->init_value));
+> 
+> Do we need a static_assert() to make sure mc->init_value is 64bit?
 
-diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-index 7757d4f85b7a..bdf14055e46a 100644
---- a/x86/amd_sev.c
-+++ b/x86/amd_sev.c
-@@ -14,6 +14,8 @@
- #include "x86/processor.h"
- #include "x86/amd_sev.h"
- #include "msr.h"
-+#include "x86/vm.h"
-+#include "alloc_page.h"
- 
- #define EXIT_SUCCESS 0
- #define EXIT_FAILURE 1
-@@ -89,9 +91,14 @@ static void test_stringio(void)
- int main(void)
- {
- 	int rtn;
-+	unsigned long *vaddr;
- 	rtn = test_sev_activation();
- 	report(rtn == EXIT_SUCCESS, "SEV activation test.");
- 	test_sev_es_activation();
- 	test_stringio();
-+	setup_vm();
-+	vaddr = alloc_page();
-+	if (!vaddr)
-+		assert_msg(vaddr, "Page allocation failure");
- 	return report_summary();
- }
+I don't see much value.  Is your concern sizeof() part?
+If so, we can replace it with 8.
+
+        memset64(page, mc->init_value, PAGE_SIZE / 8);
 -- 
-2.34.1
-
+Isaku Yamahata <isaku.yamahata@intel.com>
 
