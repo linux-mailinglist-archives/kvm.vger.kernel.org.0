@@ -1,77 +1,91 @@
-Return-Path: <kvm+bounces-12710-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B1B188CB05
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 18:34:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12FCA88CB48
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 18:49:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C7E71C65CB2
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 17:34:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD1621F2FC5E
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 17:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6894B208A7;
-	Tue, 26 Mar 2024 17:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60683763E6;
+	Tue, 26 Mar 2024 17:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vds0Pkbf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fsDoUcEu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C941CD3F;
-	Tue, 26 Mar 2024 17:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC631CD31;
+	Tue, 26 Mar 2024 17:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711474461; cv=none; b=Cw5E19fgtlfu8jRekLiV81vvJH5oP7QyOwmLcJprrmIPhLVsXpkudSTAluLucSEi7tNudNz71tA76/v5Dl7DQGUiUbqnPSNRhGmEBDWNNAOUJBR1mi6nEhNgk7CSlNMTHUfn7FtK2xWs0aybDygYY/sYSt/rUGFEQ8JLCfqXEv8=
+	t=1711475343; cv=none; b=IZBTNh2gPEX8ybu1nihldfw20Ju6Pkpgac6QJGBfKneX3OPp3myjtRnCkIi6vdWUTimvcDwzIoDi19p4OCDZKgQTSkiG4ustsQBd3D7B44pPXmwA1ME1j31VqLvcX7SL/J7+eWCVgrs1GAe6C929J28MhF/gzvn0NJMkpaoEnz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711474461; c=relaxed/simple;
-	bh=PP2+ULTolFHZ6Yk2NHBFIy4YY1fXuiQgaFH7sDpUkzY=;
+	s=arc-20240116; t=1711475343; c=relaxed/simple;
+	bh=x0X3KIjo28KMgDBY7G4N3EMgX+0BDWgru26mZ2+VhDo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gQzyKMHyIm13AUX8V5Mee7eQxqk9q872+dDKcF14k+ELSqgtqmewByi1NCNkyXkt6Hrmkhr2DP35rolwTk4QB3ZsHWA/ZLOgUnsWHljhzvQ3dsn9eM6HiPHmL9M7nA18IZozv6QDtBvJxaJZFb2x452xsr+oXqZZzhw6kQ9B6Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vds0Pkbf; arc=none smtp.client-ip=198.175.65.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=ixq5cOqFMgQvS18dn5eJ7r67A0FjwuyP7gSFKBAz3p+Kyk29c2Poteky6jv0M7TX347Zu7s/6ugbfHLhk35rvfict1IILo6TnrmEoNDl16q8Vt2/tVBd0SIky/e/yeddV93nqnUoDE2V0WOLozKxYFVF7nqcm/ydLIO/UPPBIrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fsDoUcEu; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711474459; x=1743010459;
+  t=1711475342; x=1743011342;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PP2+ULTolFHZ6Yk2NHBFIy4YY1fXuiQgaFH7sDpUkzY=;
-  b=Vds0PkbfEO3VkHWO/9dODTzy7j5+RvjPDSIxRoC4KkDQjmlQfUvL9tpN
-   Ngh+5dPhG3drcHLlU1/0GEGDe68CNZIUBChCpaw3yyxvS25RPp12e4pP1
-   QjkBQviektM4PP/F8m4aHRKUrEUocvnsRBZSAfs4LBEn5lJDB3QhrjIft
-   3onDqCq9/+nrCU8x5Tk4hIDGVCZ0+YXoyV0vuXiUMvs6JG87NDGkr3Jxk
-   F/Mhq9GZLdRT63enVnzrThEruzTZXM7gUOad35zo9q4B/YG/F+cIkyLsB
-   iYWZoxIiYW0Eh7qusbpMy39xck/dpZWRe9z7BuFeyLfpvKAWYvhZoQWHl
-   A==;
-X-CSE-ConnectionGUID: sbjI3EQWQu+oLngKAChAUg==
-X-CSE-MsgGUID: INtoZqSVTPGD4JqUIPVsuQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="29020005"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=x0X3KIjo28KMgDBY7G4N3EMgX+0BDWgru26mZ2+VhDo=;
+  b=fsDoUcEuyeAYt94FCd7K2Cb4hkRIhdBRnQnasbGyOEU1kEfVvozZkqCB
+   Q9nFg4Ze3DGnVJFEyoNr7aWPKg9gDMnWDnn429kptwZ4fIrR/aw4YxPQA
+   nb1j38hSKnv6kbnIo5/AXZ10K8EiW4BJUvhekJZVBEpX8qEJ5sNn4VLfi
+   wFRmZCchnThQff83gORbs/98TPgTLhhRQlVrpOIcOhbjdXSv2zV105X3n
+   Y0T+gRo06wR1oF0fAiLcHlrY/uWfkWS5RnB5yTR5c4u3zAd4x152KO7Av
+   bhKl26ZYPM8Tv4/CNcFtf7LBZeslsgx4bC9Gwk635F9GeDojOeW6wWc8c
+   Q==;
+X-CSE-ConnectionGUID: fL5uzmBxSfahbE/0TFvSrg==
+X-CSE-MsgGUID: zrRDr491SHOqt5KaU5elOQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="6650937"
 X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
-   d="scan'208";a="29020005"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 10:34:18 -0700
+   d="scan'208";a="6650937"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 10:49:01 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
-   d="scan'208";a="15942645"
+   d="scan'208";a="53498965"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 10:34:16 -0700
-Date: Tue, 26 Mar 2024 10:34:14 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 10:49:01 -0700
+Date: Tue, 26 Mar 2024 10:48:59 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 048/130] KVM: Allow page-sized MMU caches to be
- initialized with custom 64-bit values
-Message-ID: <20240326173414.GA2444378@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <9c392612eac4f3c489ad12dd4a4d505cf10d36dc.1708933498.git.isaku.yamahata@intel.com>
- <d2ea2f8e-80b1-4dda-bf47-2145859e7463@linux.intel.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"Yuan, Hang" <hang.yuan@intel.com>,
+	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v19 059/130] KVM: x86/tdp_mmu: Don't zap private pages
+ for unsupported cases
+Message-ID: <20240326174859.GB2444378@ls.amr.corp.intel.com>
+References: <96fcb59cd53ece2c0d269f39c424d087876b3c73.camel@intel.com>
+ <20240325190525.GG2357401@ls.amr.corp.intel.com>
+ <5917c0ee26cf2bb82a4ff14d35e46c219b40a13f.camel@intel.com>
+ <20240325221836.GO2357401@ls.amr.corp.intel.com>
+ <20240325231058.GP2357401@ls.amr.corp.intel.com>
+ <edcfc04cf358e6f885f65d881ef2f2165e059d7e.camel@intel.com>
+ <20240325233528.GQ2357401@ls.amr.corp.intel.com>
+ <ZgIzvHKobT2K8LZb@chao-email>
+ <20db87741e356e22a72fadeda8ab982260f26705.camel@intel.com>
+ <ZgKt6ljcmnfSbqG/@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,69 +94,53 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <d2ea2f8e-80b1-4dda-bf47-2145859e7463@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZgKt6ljcmnfSbqG/@chao-email>
 
-On Tue, Mar 26, 2024 at 11:53:02PM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
+On Tue, Mar 26, 2024 at 07:13:46PM +0800,
+Chao Gao <chao.gao@intel.com> wrote:
 
+> On Tue, Mar 26, 2024 at 10:42:36AM +0800, Edgecombe, Rick P wrote:
+> >On Tue, 2024-03-26 at 10:32 +0800, Chao Gao wrote:
+> >> > > > Something like this for "112/130 KVM: TDX: Handle TDX PV rdmsr/wrmsr hypercall"
+> >> > > > Compile only tested at this point.
+> >> > > 
+> >> > > Seems reasonable to me. Does QEMU configure a special set of MSRs to filter for TDX currently?
+> >> > 
+> >> > No for TDX at the moment.  We need to add such logic.
+> >> 
+> >> What if QEMU doesn't configure the set of MSRs to filter? In this case, KVM
+> >> still needs to handle the MSR accesses.
+> >
+> >Do you see a problem for the kernel? I think if any issues are limited to only the guest, then we
+> >should count on userspace to configure the msr list.
 > 
-> 
-> On 2/26/2024 4:25 PM, isaku.yamahata@intel.com wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > 
-> > Add support to MMU caches for initializing a page with a custom 64-bit
-> > value, e.g. to pre-fill an entire page table with non-zero PTE values.
-> > The functionality will be used by x86 to support Intel's TDX, which needs
-> > to set bit 63 in all non-present PTEs in order to prevent !PRESENT page
-> > faults from getting reflected into the guest (Intel's EPT Violation #VE
-> > architecture made the less than brilliant decision of having the per-PTE
-> > behavior be opt-out instead of opt-in).
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   include/linux/kvm_types.h |  1 +
-> >   virt/kvm/kvm_main.c       | 16 ++++++++++++++--
-> >   2 files changed, 15 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> > index 9d1f7835d8c1..60c8d5c9eab9 100644
-> > --- a/include/linux/kvm_types.h
-> > +++ b/include/linux/kvm_types.h
-> > @@ -94,6 +94,7 @@ struct gfn_to_pfn_cache {
-> >   struct kvm_mmu_memory_cache {
-> >   	gfp_t gfp_zero;
-> >   	gfp_t gfp_custom;
-> > +	u64 init_value;
-> >   	struct kmem_cache *kmem_cache;
-> >   	int capacity;
-> >   	int nobjs;
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index de38f308738e..d399009ef1d7 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -401,12 +401,17 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
-> >   static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
-> >   					       gfp_t gfp_flags)
-> >   {
-> > +	void *page;
-> > +
-> >   	gfp_flags |= mc->gfp_zero;
-> >   	if (mc->kmem_cache)
-> >   		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
-> > -	else
-> > -		return (void *)__get_free_page(gfp_flags);
-> > +
-> > +	page = (void *)__get_free_page(gfp_flags);
-> > +	if (page && mc->init_value)
-> > +		memset64(page, mc->init_value, PAGE_SIZE / sizeof(mc->init_value));
-> 
-> Do we need a static_assert() to make sure mc->init_value is 64bit?
+> How can QEMU handle MTRR MSR accesses if KVM exits to QEMU? I am not sure if
+> QEMU needs to do a lot of work to virtualize MTRR.
 
-I don't see much value.  Is your concern sizeof() part?
-If so, we can replace it with 8.
+The default kernel logic will to return error for
+TDG.VP.VMCALL<RDMSR or WRMSR MTRR registers>.
+Qemu can have mostly same in the current kernel logic.
 
-        memset64(page, mc->init_value, PAGE_SIZE / 8);
+rdmsr:
+MTRRCAP: 0
+MTRRDEFTYPE: MTRR_TYPE_WRBACK
+
+wrmsr:
+MTRRDEFTYPE: If write back, nop. Otherwise error.
+
+
+> If QEMU doesn't configure the msr filter list correctly, KVM has to handle
+> guest's MTRR MSR accesses. In my understanding, the suggestion is KVM zap
+> private memory mappings. But guests won't accept memory again because no one
+> currently requests guests to do this after writes to MTRR MSRs. In this case,
+> guests may access unaccepted memory, causing infinite EPT violation loop
+> (assume SEPT_VE_DISABLE is set). This won't impact other guests/workloads on
+> the host. But I think it would be better if we can avoid wasting CPU resource
+> on the useless EPT violation loop.
+
+Qemu is expected to do it correctly.  There are manyways for userspace to go
+wrong.  This isn't specific to MTRR MSR.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
