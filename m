@@ -1,68 +1,55 @@
-Return-Path: <kvm+bounces-12665-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E78488BC1D
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 09:16:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E6688BCD1
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 09:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 010DD1F3F348
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 08:16:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FBF01F3B8B6
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 08:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7A8134422;
-	Tue, 26 Mar 2024 08:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A46518E10;
+	Tue, 26 Mar 2024 08:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DVd5tMVx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tx8p0GFt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0456412AADB;
-	Tue, 26 Mar 2024 08:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2327317722
+	for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 08:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711440979; cv=none; b=CUuOFFRFYi+O5Ria73UWk+e5X8Lli/LNBgiIw/eUydaOfhemN9k1+/vQ9ff11DqNgNJxQX+2ZWMfWYAWNQ7D1nNvChHfpWyJf+jiZ3IHNCwJKQUE07VYK5/h9/2TATVlcBwfgcYPZhqmcFnldgqk6TgXZv7ZySvwb3yNkHd72h8=
+	t=1711443092; cv=none; b=dbS0j80cosvThW3XsHBEqNi3FaIcyiieTWzNneAhTi8/SFfIrPUikoVBUdTzN5vtmv8kl7JGdQzJMoLwy4gS92AaHSas5yN0ZHRGeuD7yshaXMYNLArMuqrZyWNe7KIHL6fAoJxuUhCK16P80HIVmQ+7tq/55YncrIZFjOrp6xY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711440979; c=relaxed/simple;
-	bh=cfHV3so/oLbM3PTbry+d/EPObawsMb4Bf5kpaemSprk=;
+	s=arc-20240116; t=1711443092; c=relaxed/simple;
+	bh=x3j3ASsaNJKvJgVOz5PhjLTryTPuiGxYCymQSsKSpjY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RBGdkkbHr/cFCV+eNtWGzTsdJwwj3VpLc6OPUo9e4AnPUmYgbKmSnVJHRGcfCH/YFQA3XlNEhaXQ5bCoEeiR4hSEebDNRgjyW7ANb1Ye1CDjo3boOSr/ByopJiLQsEYVmUJotQBrvvpRBr2aOBIlMyDJlUOMS/4tjs6AsUZKoQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DVd5tMVx; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711440977; x=1742976977;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cfHV3so/oLbM3PTbry+d/EPObawsMb4Bf5kpaemSprk=;
-  b=DVd5tMVxZ6ZyvZLGyjYshZlSIrnjODBR0j35FKLth35S8zuwLEXICJMH
-   i0y5yyeNGfeM76nSB7+a8I/64e0UCB/ERv+JWokXcvqL1jMImduFDFEjX
-   G4cKHpx+MIC20c/O1aBZH7yxLSNIjSSOiTTgU66VoMAgr7DzVLZ0flFhn
-   wJCKzA3NbwJphzosTDjqWIHc5OGm+jQjVrf0RzT2qbPutbNfs028ocLYs
-   ig+e5+dxylMJnKZ12whF5wJyFAVecSZvZki6xGpdlm4OXM6MBJ+Wft2Ly
-   +ykoQI202+5hyh1SPbdmAPWPrwrS8eL09K9PkX/JRGuCeRe93OFwNtX7T
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="6370621"
-X-IronPort-AV: E=Sophos;i="6.07,155,1708416000"; 
-   d="scan'208";a="6370621"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 01:16:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,155,1708416000"; 
-   d="scan'208";a="20603139"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orviesa005.jf.intel.com with ESMTP; 26 Mar 2024 01:16:14 -0700
-Date: Tue, 26 Mar 2024 16:30:09 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Use TAP in the steal_time test
-Message-ID: <ZgKHkd+qpE4XsiOI@intel.com>
-References: <20231019095900.450467-1-thuth@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kwJecfDtDISEg5SrUoKotgzUPlPiZBi9M9eksNT7RXPltKt8k4/0wqDDLhlCh+0a88ZKnjWm1nNY75yK+FFr9zOdbmvbqgLjDY5Yy2cgUMI9xalvQyRrXWJRJAvWGqDkYTwLgNoStq+Cijf3VeoLgWdXOYB5MYgV4sDWTracApU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tx8p0GFt; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 26 Mar 2024 09:51:25 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711443088;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cZ0W1vc5CoMYLqnQ1vE/8VN3DrpyI+i3su1ZtOs0aVY=;
+	b=tx8p0GFtRV5hClIcFkvh6xqr5Zos3GOmXkK9PZS0IXnJkjIIwM6r+RZDNKU0arPC0b7QL1
+	zCBOdKBXreVBE7WixM9NwIs5anCEaEt0WplaCiy+QnGfdzBUKGrYOzaGzBlP0gy2uGIxu3
+	x7ZUIk1tabB1KB97AQ7E0Pmd6KDmmL8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Pavan Kumar Paluri <papaluri@amd.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, nikos.nikoleris@arm.com, 
+	thomas.lendacky@amd.com, michael.roth@amd.com, amit.shah@amd.com
+Subject: Re: [kvm-unit-tests RFC PATCH 1/3] x86 EFI: Bypass call to
+ fdt_check_header()
+Message-ID: <20240326-663042e3295513fb8814f80d@orel>
+References: <20240325213623.747590-1-papaluri@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,26 +58,68 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231019095900.450467-1-thuth@redhat.com>
+In-Reply-To: <20240325213623.747590-1-papaluri@amd.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Oct 19, 2023 at 11:59:00AM +0200, Thomas Huth wrote:
-> Date:   Thu, 19 Oct 2023 11:59:00 +0200
-> From: Thomas Huth <thuth@redhat.com>
-> Subject: [PATCH] KVM: selftests: Use TAP in the steal_time test
+On Mon, Mar 25, 2024 at 04:36:21PM -0500, Pavan Kumar Paluri wrote:
+> Issuing a call to fdt_check_header() prevents running any of x86 UEFI
+> enabled tests. Bypass this call for x86 in order to enable UEFI
+> supported tests for KUT x86 arch.
+
+Ouch! Sorry about that. I think I prefer something like below, though.
+
+Thanks,
+drew
+
+diff --git a/lib/efi.c b/lib/efi.c
+index 5314eaa81e66..335b66d26092 100644
+--- a/lib/efi.c
++++ b/lib/efi.c
+@@ -312,6 +312,7 @@ static void* efi_get_var(efi_handle_t handle, struct efi_loaded_image_64 *image,
+        return val;
+ }
+ 
++#if defined(__aarch64__) || defined(__riscv)
+ static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
+ {
+        efi_char16_t var[] = ENV_VARNAME_DTBFILE;
+@@ -330,6 +331,12 @@ static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
+ 
+        return fdt_check_header(fdt) == 0 ? fdt : NULL;
+ }
++#else
++static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
++{
++       return NULL;
++}
++#endif
+ 
+ static const struct {
+        struct efi_vendor_dev_path      vendor;
+
 > 
-> For easier use of the tests in automation and for having some
-> status information for the user while the test is running, let's
-> provide some TAP output in this test.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Fixes: 9632ce446b8f ("arm64: efi: Improve device tree discovery")
+> Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
 > ---
->  NB: This patch does not use the interface from kselftest_harness.h
->      since it is not very suitable for the for-loop in this patch.
+>  lib/efi.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
->  tools/testing/selftests/kvm/steal_time.c | 46 ++++++++++++------------
->  1 file changed, 23 insertions(+), 23 deletions(-)
->
-
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-
+> diff --git a/lib/efi.c b/lib/efi.c
+> index 5314eaa81e66..124e77685230 100644
+> --- a/lib/efi.c
+> +++ b/lib/efi.c
+> @@ -328,6 +328,10 @@ static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
+>  		return NULL;
+>  	}
+>  
+> +#ifdef __x86_64__
+> +	return fdt;
+> +#endif
+> +
+>  	return fdt_check_header(fdt) == 0 ? fdt : NULL;
+>  }
+>  
+> -- 
+> 2.34.1
+> 
 
