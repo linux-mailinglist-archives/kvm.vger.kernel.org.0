@@ -1,157 +1,116 @@
-Return-Path: <kvm+bounces-12688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9503B88BEFA
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 11:11:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D26FF88BF1E
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 11:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C58CC1C3D512
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 10:11:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86C781F62D2B
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 10:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C696CDB6;
-	Tue, 26 Mar 2024 10:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCA36BB39;
+	Tue, 26 Mar 2024 10:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="napLaSpR"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ItdxkdOe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1E16F061
-	for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 10:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922A7EAF6;
+	Tue, 26 Mar 2024 10:17:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711447862; cv=none; b=iQXWCKzeeut1lU9/AgOVCzHArvIhgL1k5iWXk08g7WzMb6BtTvi6YBMp/+7E95rMLaRVEqArJ46UmUkSmMDjY0KMWR3cKkLp3RT+U7vHu5a/7aNoOe1pNyZBUZd7YJVA9Hpj7HCsK8W+r2aF6QTXIoiejaaMMHpV5rfdAuGlNGY=
+	t=1711448240; cv=none; b=qzmMfqKVaFObqiR7eXXMUgBDUKggpeJDlpS7OWrJaiFlpAFbtej27uOLDShkks7abhcm7KRfU06JfzBwUjmadhXNUvTj+vN/xgaUjMdBTPK5CFAQZ7kvMh2mt60C9GUrt4UV9AGImRnLDoAIrnpzSffprTqCXmOEj2nckzH9fuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711447862; c=relaxed/simple;
-	bh=luF0DePhOxP9hOcT/xfXxKnxXQoPebGiYwffl+rfHkI=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=JsYU8YbSnOUZ7EeyNdue0MQGuIMl2WtTkVDR4Ch1DjABywejQyezFFjAl2Yf5C/eWCtTBywEGQxIeZYsqQddScot0PfuWnHLDf6XOjyttrMVpBgVLKulNasMbgOrmH1p19SrcMShPc122E+jK7WAmxWXENrRCgUtB+W+V2+IExM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=napLaSpR; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1e0878b76f3so27408395ad.0
-        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 03:11:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1711447860; x=1712052660; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IiNYGBSxUvNgdPnHEJE/xU3metbwCHzJuKT0A3W7MYI=;
-        b=napLaSpR4hUxSSrL5css7LToxJ7dJ9Ld/wYk1saMy7j2g2mJ+1JPH/+8oY+YHHhFO1
-         rCepsIh3Cpbw9Ar8cDlhbo8Dgkj8Cb24t6lLgcLGQ6QszFELu4s2lHeRy7RtK0iFx5eQ
-         NzBVHbH8skQlYyV749zEdIwznvdarL0yMDSzflBGlr4yfgMdjf+D+MFU2O1sgpHGKcOu
-         5h+gm6MsMm/VZQ5VxoE7beJGRSv2VqgUaV7JOEPeDbJQQ9LTKk8xmZka3VVqE6SGg63p
-         x5KzlK0aaumwAoBaSsCr+vaInki7q9hOD3Q75mJXGyuOtrdidTMfiR+ywDzC0tW5o5s7
-         03Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711447860; x=1712052660;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IiNYGBSxUvNgdPnHEJE/xU3metbwCHzJuKT0A3W7MYI=;
-        b=Q0Azka6+TAol84fBQ0+sf6pDUu9hfszo6hCAP1peGTLV+gcTAkILuuJ/e3AdiRdzYg
-         /e1Hmlcagmjq2cejBXJZnN3/mTjQ7Yg5M1hcUTRKvXerZaZVMgnf8EO/1MwBdJ9WP2/o
-         tu2M/dsm2qk8z2360zD/EQ/C3iFj1ExbF8KO9QpxEGDwCSJBE4AX64DWCqSGW2MTT3vQ
-         faky91F8g1fsXK5kCrbkU/fTXpFyw+d9ZHfbrBS/SHuY8ih3C22Gt0dGoVD1yMwywtad
-         zcZ8+NFpo6dHeohP6R7k8762vtCX7iJ4DE11r4qYotqX3oVqW4Xl7vuU9oWBSCo1I5/D
-         5ndQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYWvGsAbzMa3YxqwJOrbHu28XJNx0hLGInAhFN7+o8ASg7u45xiXZ72t6ALvyyfP7e+XixYBL6+c9Fywp4wPQwvm1r
-X-Gm-Message-State: AOJu0YxLGOjwKRQeUQD0gJXA6FkwTYKdu9JKetACsECKzfppzHavcITe
-	YXrHCFsmbd8EluMm2EcQoL5XF5VRZLlo3gmmKN8hAbwLHkDXWN4v8jb+LgP+4TuJlBFrwgbTzSx
-	U
-X-Google-Smtp-Source: AGHT+IEqMrxzRfAQyyX5BWY+o9kj4fYO6R0c9EdEEs+a7j40uL9Tbsf27ODXSAN5Mbodl3JqSYvUug==
-X-Received: by 2002:a17:902:e842:b0:1e0:188c:ad4f with SMTP id t2-20020a170902e84200b001e0188cad4fmr1519731plg.26.1711447859767;
-        Tue, 26 Mar 2024 03:10:59 -0700 (PDT)
-Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id c7-20020a170903234700b001e0e2b848dbsm1633240plh.83.2024.03.26.03.10.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 03:10:59 -0700 (PDT)
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-To: linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org
-Cc: greentime.hu@sifive.com,
-	vincent.chen@sifive.com,
-	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] RISC-V: KVM: Avoid lock inversion in SBI_EXT_HSM_HART_START
-Date: Tue, 26 Mar 2024 18:10:52 +0800
-Message-Id: <20240326101054.13088-1-yongxuan.wang@sifive.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1711448240; c=relaxed/simple;
+	bh=f8P+HvRNSxwumEsUKb4t+yPV/HhejyzHEDnEZXjEd1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RzFiULKDRhWFzecEbSf47lmwZ4wNfVr7TVWWofP5SkGu779sCSsljctvqjS0j46CugNwJAvnkrUcj4EkPfzQkmdJV58SmjhxyJw3C31SNtWBWaiNJEW5m/0m+wbU888oNS6P2UslXJpFMsaPBGMewhzzOd877ZhIrs3ue1WdIDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ItdxkdOe; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9A44840E024C;
+	Tue, 26 Mar 2024 10:17:13 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id NfdiRrir3uHM; Tue, 26 Mar 2024 10:17:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1711448229; bh=CDmK/0QYSIOIpZwH6go7HxA/MlzIItJgpVzSJbzTjCY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ItdxkdOebiOZcO2glgj9DRQyiSPYumneMfig51XeVVNYwEHdJgq9ar+rwNG1WgnGr
+	 w307OggfvCRulmidXKSHutFuUykq5gPqFTVJWf5Vg3OSUhy/uymWxTw4LzEyLt5TkQ
+	 mEnFlJ0Lp9bjiqR6i8AWQqyYnGA3SY3c2jyueID7NT0iIjvKMDKFJbVUV1NVq4b1zC
+	 0Q8ZsaPxdUfUnmq9IR7XD2JPwKm5AYuUv93QTm8+5ZhlOjlCjvepT3M3Ll5YhsIhF1
+	 JiPClqwXr5nqNf3kyKHQqemMauaoxwYmZSYxs3GYIgxRZ40IQDhx2csWRSDPMQdGUf
+	 NPosDN6vj/m3ubr4vATQpNbhjl3xbRnE+dhQqZpgYFKnlO4vd7VwdioWxF4w5g4j+y
+	 lfyM/U9SNWXHJABlWu55+Xht1+K2DKOMV7oIa8oBTLdQkjTRUiey4R04RiqagjFioS
+	 tg41yPJ2K2nSliMprEbOydXf3n0UHL9smJnaK3XaJHZAp9wWZFnDVmq1OrFR+YmycR
+	 kgAJpS7PC6o4XlbiOzMuhyFAoK0cpSJHOWsFGvmyXIiDm1ammvUOzCDloTzvKKwElG
+	 lI9AX8ynroWDaBPYNjQSPFAZoWr0XSYBLFIcZ/6cZSb93ktFRTYftnRb7SpDzPTPmr
+	 kPlsWj2T3kBiLm3GV19+Ip5w=
+Received: from zn.tnic (p5de8ecf7.dip0.t-ipconnect.de [93.232.236.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8D69840E02A2;
+	Tue, 26 Mar 2024 10:16:51 +0000 (UTC)
+Date: Tue, 26 Mar 2024 11:16:42 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: x86@kernel.org, Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>, Marc Zyngier <maz@kernel.org>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	David Matlack <dmatlack@google.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Breno Leitao <leitao@debian.org>, kvm@vger.kernel.org
+Subject: Re: [BUG net-next] arch/x86/kernel/cpu/bugs.c:2935: "Unpatched
+ return thunk in use. This should not happen!" [STACKTRACE]
+Message-ID: <20240326101642.GAZgKgisKXLvggu8Cz@fat_crate.local>
+References: <1d10cd73-2ae7-42d5-a318-2f9facc42bbe@alu.unizg.hr>
+ <20240318202124.GCZfiiRGVV0angYI9j@fat_crate.local>
+ <12619bd4-9e9e-4883-8706-55d050a4d11a@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <12619bd4-9e9e-4883-8706-55d050a4d11a@alu.unizg.hr>
 
-Documentation/virt/kvm/locking.rst advises that kvm->lock should be
-acquired outside vcpu->mutex and kvm->srcu. However, when KVM/RISC-V
-handling SBI_EXT_HSM_HART_START, the lock ordering is vcpu->mutex,
-kvm->srcu then kvm->lock.
+On Wed, Mar 20, 2024 at 02:28:57AM +0100, Mirsad Todorovac wrote:
+> Please find the kernel .config attached.
 
-Although the lockdep checking no longer complains about this after commit
-f0f44752f5f6 ("rcu: Annotate SRCU's update-side lockdep dependencies"),
-it's necessary to replace kvm->lock with a new dedicated lock to ensure
-only one hart can execute the SBI_EXT_HSM_HART_START call for the target
-hart simultaneously.
+Thanks, that's one huuuge kernel you're building. :)
 
-Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
----
- arch/riscv/include/asm/kvm_host.h | 1 +
- arch/riscv/kvm/vcpu.c             | 1 +
- arch/riscv/kvm/vcpu_sbi_hsm.c     | 5 ++---
- 3 files changed, 4 insertions(+), 3 deletions(-)
+> I got another one of these "Unpatched thunk" and it seems connected
+> with selftest/kvm.
+>
+> But running selftests/kvm one by one did not trigger the bug.
 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 484d04a92fa6..537099413344 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -254,6 +254,7 @@ struct kvm_vcpu_arch {
- 
- 	/* VCPU power-off state */
- 	bool power_off;
-+	struct mutex hsm_start_lock;
- 
- 	/* Don't run the VCPU (blocked) */
- 	bool pause;
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index b5ca9f2e98ac..4d89b5b5afbf 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -119,6 +119,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	spin_lock_init(&vcpu->arch.hfence_lock);
- 
- 	/* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
-+	mutex_init(&vcpu->arch.hsm_start_lock);
- 	cntx = &vcpu->arch.guest_reset_context;
- 	cntx->sstatus = SR_SPP | SR_SPIE;
- 	cntx->hstatus = 0;
-diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.c
-index 7dca0e9381d9..b528f6e880ae 100644
---- a/arch/riscv/kvm/vcpu_sbi_hsm.c
-+++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
-@@ -71,14 +71,13 @@ static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- {
- 	int ret = 0;
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
--	struct kvm *kvm = vcpu->kvm;
- 	unsigned long funcid = cp->a6;
- 
- 	switch (funcid) {
- 	case SBI_EXT_HSM_HART_START:
--		mutex_lock(&kvm->lock);
-+		mutex_lock(&vcpu->arch.hsm_start_lock);
- 		ret = kvm_sbi_hsm_vcpu_start(vcpu);
--		mutex_unlock(&kvm->lock);
-+		mutex_unlock(&vcpu->arch.hsm_start_lock);
- 		break;
- 	case SBI_EXT_HSM_HART_STOP:
- 		ret = kvm_sbi_hsm_vcpu_stop(vcpu);
+Which commands are you exactly running?
+
+I'll try to reproduce here.
+
+Thx.
+
 -- 
-2.17.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
