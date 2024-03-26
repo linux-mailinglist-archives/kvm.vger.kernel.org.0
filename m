@@ -1,221 +1,146 @@
-Return-Path: <kvm+bounces-12731-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D0E88CEA7
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 21:29:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18E8688CE7A
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 21:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D06811F86A7D
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 20:29:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98C421F822D4
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 20:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F24213FD8F;
-	Tue, 26 Mar 2024 20:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C141413E3FE;
+	Tue, 26 Mar 2024 20:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iigD2u00"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h/2rzaFz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CA413E6C5
-	for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 20:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C22913DDA3
+	for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 20:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711484669; cv=none; b=s4iA4MVDdfoqkRlFAbLPayOH8+VqCzZHQbU27zFE1vz65BICXYbLrR+7O7qmP3E4xE1F4y1iWSoVNc6mW+Jy+LqKIIW/CBYTLi5Ftk7fgyU2zlXk6ck+KeLT4fYx72TpqE09IqRiOTp5M0E761Mjl5uOIq6tnvuKYQLqG52A1OQ=
+	t=1711484655; cv=none; b=Esu5GawgR+AB65YYH1XZ4VDCe4BCHH+VO+2I5RL4QaqR6xrKQ+1Ou9cB3owrQu6LGq+WizAaNXpWJWz1NgBrFgx4GJNGEhhqzcDH3SzbhnPpF9tCvBKyrRtcVZsrgVz3l+NrgFlfA1Z7aRBG2s9gGLEaKrwKzrA7+gfMIhwCH+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711484669; c=relaxed/simple;
-	bh=mWwfdGmaJI5/v599SuFLYqcN0BETsqK70kzkErBfIJ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kzsYAXvi5sf4fng67UmQ06ktbZsjLqN2cyUunQ/VDBEw45m4cptczUzC20tB4sFbfx420+KREuZa7/1EZpbIm4hpAl0DYutcRrWs7VWQf/ODPLfi1lA7MxmSbl2Iq4JQAN4V09wZpKHEuo5amOmvhN1Nc9qxflCGxwXJJklq/XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=iigD2u00; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-513edc88d3cso6613926e87.0
-        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 13:24:26 -0700 (PDT)
+	s=arc-20240116; t=1711484655; c=relaxed/simple;
+	bh=qJLPwum/AqfspnIzmOWzjV1qrgzPZNJu8uLTx/4rahU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=KaHuZjiIrxpXScMdQmAzkiWe+P0uwjJR6JJGZhQHRN9sVegu8q9NzWrOuDLMMo4gVC0BZp4fPoOGodD5vDlPlZ9nfvtxz+xgdJBkLR1mIw2OzMTdK9bOsmEGRNwCgdCJgx2V51c3x7Dp5LI2xpjgpFVA03xWmFsdma4eGm8oA0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=h/2rzaFz; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a4644bde1d4so771262066b.3
+        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 13:24:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1711484665; x=1712089465; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pnO3hfDzNJhG1W8n4621OnBzOy9cpmEtEz5rXGN5tRg=;
-        b=iigD2u00Dron5vI7RDvjnhKEOtKfz8ourxPe+bsVuOOmUhW2R9LxQbL1SLLuBOG6dW
-         IfJeXftFdMb0DMQumKbDIFt6wC/2qftGgskmVPBKcB6HYekMFQusimP3EV6vaN3I3xVB
-         WMlThF5J8HeTP0pRIznh3dksZxC2ZZhjLs7Rw=
+        d=linaro.org; s=google; t=1711484651; x=1712089451; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r8vNMvR/OqCzTXRIjmHHetW4mCviwFQpqMvTFrU4HAQ=;
+        b=h/2rzaFz8etYmFuESE+xgJ7y8EAtjxXIdBlvXeq4T+krto9Y2POz+/k3mz5YWn38sm
+         gIb8bcF1u1AvOtf5LG5kFJdWCbeldOYpa50m+/iZPT/3qwIpakGYk5qmyo8doIeDE/I7
+         d81XAmjbXYbcLrgyvTB48fozu/b4hKN5xIRhB5huN1bmynbkJAOpNzCBKbJty5Ye4w48
+         ztcabBJbPXiY1QyclVeiSyl6KmKlmsongCQcmFugSgZt2+tQEpYQ+7Hswnl7jai1Y0wT
+         JC9X6vAQUTj5Kj6aaDwuSMxMMlaadal8XRkIv1xdt79GbCFm0UczDLR4KDmelFyQOj5z
+         ACmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711484665; x=1712089465;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1711484651; x=1712089451;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pnO3hfDzNJhG1W8n4621OnBzOy9cpmEtEz5rXGN5tRg=;
-        b=HNLrrum8fvD6j/q3Fb4vcwKXNTcYCYY+rfPJMjHuZGXC76CdyT+aFD1pItEzjyCTPs
-         LQzMn1sZ2DrE59hgLVKe1QcX+Xc/Kx9oouOyVw+GMdHjcYS8r28ebhtmRRxDQAMmSTpp
-         5UhRgij/muPRPZ5PSR4VRH60KEDZY2VYsQipvLNw5TIixPHA6Ft5WwoGheAP+OkiiJWQ
-         zX1GRZwipZDAebi0yV7uz31BGobkcsari6fCukDgAwem79d0jsNRgcPjNvkR4TJNfQ6/
-         /mYSA+LQEJyp0XhRW2ZK8ralslu/JnmqrhiYcLUp0upW9wWRZNto5HMiWp7bUHR7Mi7J
-         bGew==
-X-Forwarded-Encrypted: i=1; AJvYcCWrn17yNFXQg3r7reJ8mNftR2dMsCXBi4TmS6soLFWpTfC+T5rfXVzOLQlx9TCUS29Bxk4Jm4fRi3gJuGMRb2nRhliZ
-X-Gm-Message-State: AOJu0YzNK/iJv4qBO21Y1ewpqbbemHfaocaF0JgYvhN7H3xjA64hcKZh
-	YiXZkRNjIiK+zOOKVgV5QnshgB0b+OxW/puM+FAyijMlwSiMAoeCawDF18y79vTb0d+9J1mpRul
-	MJg==
-X-Google-Smtp-Source: AGHT+IEtZtUhRz32ByOPKf37x3we+eyKsQ58SpOQsD2TUfx39XrqQmUK4XUOKVpkzJ93Op2y1InEKg==
-X-Received: by 2002:a19:e050:0:b0:513:a257:919b with SMTP id g16-20020a19e050000000b00513a257919bmr1595741lfj.14.1711484664974;
-        Tue, 26 Mar 2024 13:24:24 -0700 (PDT)
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com. [209.85.167.53])
-        by smtp.gmail.com with ESMTPSA id i16-20020a056512341000b00515b1a6ed4bsm583603lfr.124.2024.03.26.13.24.24
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Mar 2024 13:24:24 -0700 (PDT)
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-513e10a4083so6849014e87.1
-        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 13:24:24 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUNEGXTbD+3MRyzBeKU5Yx+It/ccorgC1cSAqCgVwpZ4oZsEE2H1hVX70TMqiN6qLXg9zcawgENGAmq1qt13PD3eQy8
-X-Received: by 2002:a17:907:2686:b0:a47:3c66:b396 with SMTP id
- bn6-20020a170907268600b00a473c66b396mr1888708ejc.64.1711484642859; Tue, 26
- Mar 2024 13:24:02 -0700 (PDT)
+        bh=r8vNMvR/OqCzTXRIjmHHetW4mCviwFQpqMvTFrU4HAQ=;
+        b=LUFGrU2IfT2RSLhNl0np57zQgbvh3xVXHJWYNDCRVdpjAaUZFB35SmO+7JiG4ULXEE
+         Ol4KoDmhl6v00+Kf22s0YVeg+GAkjWUffCrKkOXROHtJN/st8leRZqkFC0gFdI7a+km/
+         jH+eiYPXbIR4F4LpVvgOcU0md03rQNh1mEKEa/o+DPlBnU4UkGRQtwGFBrsqD6ncbarv
+         mFJPKP1kHPBn4vT6j1WeW8Lc2bB0Apn7HIOrw/pHDLZuZNvYHanopeTD6yCfr66sojDj
+         6M0AEA+aq4oZ24xHHsYxZFR8LuVSFMaaKJcjK7Vj92HEDedkIywbRCmr4knbWXKw4kER
+         NZDw==
+X-Forwarded-Encrypted: i=1; AJvYcCWK9AAFyv5ksOR++4TNYH19lMErsKtlFwZAhAJgDZyauuwlUAZssj5s1VPFTzYkc5IGUbCumChOgOlU2DkYqeuUKUVq
+X-Gm-Message-State: AOJu0YxR9gR+rnZfGZ8fb+odMhdPw0BOimc6kKY9Mcc5zgmcQqOrpGmP
+	1afN2hkkz6HzjRgzLFr5ZLZRQsqUspHywN70ccl6uEXN7tUNBle3NICixHbMh0Y=
+X-Google-Smtp-Source: AGHT+IFb4JEt2HEwLreIO/b4GLNhMD6s6Nzsjk02Z8m3sgEQ5lUEmRg8HRX0TbD5U8VN/PyYeY8C4w==
+X-Received: by 2002:a17:906:1713:b0:a47:3378:48f4 with SMTP id c19-20020a170906171300b00a47337848f4mr534451eje.35.1711484651709;
+        Tue, 26 Mar 2024 13:24:11 -0700 (PDT)
+Received: from [127.0.1.1] ([178.197.222.44])
+        by smtp.gmail.com with ESMTPSA id b2-20020a1709062b4200b00a4725e4f53asm4584492ejg.40.2024.03.26.13.24.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 13:24:11 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Date: Tue, 26 Mar 2024 21:23:36 +0100
+Subject: [PATCH 06/19] coresight: funnel: drop owner assignment
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240321101532.59272-1-xuanzhuo@linux.alibaba.com>
- <20240321101532.59272-2-xuanzhuo@linux.alibaba.com> <CABVzXAkwcKMb7pC21aUDLEM=RoyOtGA2Vim+LF0oWQ7mjUx68g@mail.gmail.com>
- <b420a545-0a7a-431c-aa48-c5db3d221420@redhat.com> <1711346901.0977402-2-xuanzhuo@linux.alibaba.com>
- <041867ab-6cff-4bd1-9a44-2ca847c1ad63@redhat.com>
-In-Reply-To: <041867ab-6cff-4bd1-9a44-2ca847c1ad63@redhat.com>
-From: Daniel Verkamp <dverkamp@chromium.org>
-Date: Tue, 26 Mar 2024 13:23:35 -0700
-X-Gmail-Original-Message-ID: <CABVzXA=QHxAbkN5qorb5e8gKtd-c9P61z_ft07PPkkzaDMxB_A@mail.gmail.com>
-Message-ID: <CABVzXA=QHxAbkN5qorb5e8gKtd-c9P61z_ft07PPkkzaDMxB_A@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 1/6] virtio_balloon: remove the dependence where
- names[] is null
-To: David Hildenbrand <david@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Hans de Goede <hdegoede@redhat.com>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Vadim Pasternak <vadimp@nvidia.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, Cornelia Huck <cohuck@redhat.com>, 
-	Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
-	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240326-module-owner-amba-v1-6-4517b091385b@linaro.org>
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+In-Reply-To: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+To: Russell King <linux@armlinux.org.uk>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Mike Leach <mike.leach@linaro.org>, James Clark <james.clark@arm.com>, 
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Andi Shyti <andi.shyti@kernel.org>, Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>, 
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+ Miquel Raynal <miquel.raynal@bootlin.com>, 
+ Michal Simek <michal.simek@amd.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+ Eric Auger <eric.auger@redhat.com>, 
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-kernel@vger.kernel.org, coresight@lists.linaro.org, 
+ linux-arm-kernel@lists.infradead.org, 
+ linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+ linux-input@vger.kernel.org, kvm@vger.kernel.org
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=771;
+ i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
+ bh=qJLPwum/AqfspnIzmOWzjV1qrgzPZNJu8uLTx/4rahU=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmAy7Qj2fX0r64FyoRM6EkM5j80xY3af0pmQvFg
+ 5BtZqFcjQmJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgMu0AAKCRDBN2bmhouD
+ 1yzGD/4+JGxstrlsdoGYXZj4Ccq4FlQ4VMQFVLyDR7OuFttT2Y1L6Ak9C3zCZZH3Tb/bTppGteK
+ ERowKV3waVO5ki0+f6G1rO3fqJn4srZhbqcx70gZurYIkOx8fX4j2qOJAOeYJtVm3ZiQTMsXQAv
+ +cPaJulOwu1vBCC7/VjmfQz3ZWkQzHhV3gOQ/6RCjlmflitrfMC3T3v7bqUf2Jm/4MFTW+vYd6K
+ dcOUoVmnwq0YDW+IECWoEawjWsU/IeJb64FZDnTF73pcwbZGi8QLGoC0WFO61LjqAXC0tNK1dUr
+ hw/oFUL8O9uuhglMRm6kE0XdanRQUedGCFzK0ouqZZow4/x7EMa5C+X8JvVkrASkB2VfWVJmbOm
+ DTIeVDfzcI6hr+ZZbAc1dvIqWf2TMTUKKGt4tPz/pOUwVg1KLi7nsDd+r5P6WZHlqvnhwpzusCQ
+ CxPZrqUXumahYa5rssLLQWl8N2pE7qWBeFKJMpagZo409EEo5KuHWjU9j2p3378JVPiiInfmaxE
+ JawL+ByFkETQw7RNwMOHJlUY6hQYCaGUmGzyx7FsIQR/86JIsrARRnq2M3qx+sKqHR+e6OFbpGx
+ bwqotl6/tN4sf28DppeTKsvCy9FiaYdFjeGGb4FzBiW/sEXNLFoPXIGrmvztGjfYYVstUpVC4Sl
+ 9Wf5eZ2xqdbvs2w==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
+ fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-On Mon, Mar 25, 2024 at 2:11=E2=80=AFAM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> On 25.03.24 07:08, Xuan Zhuo wrote:
-> > On Fri, 22 Mar 2024 22:02:27 +0100, David Hildenbrand <david@redhat.com=
-> wrote:
-> >> On 22.03.24 20:16, Daniel Verkamp wrote:
-> >>> On Thu, Mar 21, 2024 at 3:16=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> >>>>
-> >>>> Currently, the init_vqs function within the virtio_balloon driver re=
-lies
-> >>>> on the condition that certain names array entries are null in order =
-to
-> >>>> skip the initialization of some virtual queues (vqs). This behavior =
-is
-> >>>> unique to this part of the codebase. In an upcoming commit, we plan =
-to
-> >>>> eliminate this dependency by removing the function entirely. Therefo=
-re,
-> >>>> with this change, we are ensuring that the virtio_balloon no longer
-> >>>> depends on the aforementioned function.
-> >>>
-> >>> This is a behavior change, and I believe means that the driver no
-> >>> longer follows the spec [1].
-> >>>
-> >>> For example, the spec says that virtqueue 4 is reporting_vq, and
-> >>> reporting_vq only exists if VIRTIO_BALLOON_F_PAGE_REPORTING is set,
-> >>> but there is no mention of its virtqueue number changing if other
-> >>> features are not set. If a device/driver combination negotiates
-> >>> VIRTIO_BALLOON_F_PAGE_REPORTING but not VIRTIO_BALLOON_F_STATS_VQ or
-> >>> VIRTIO_BALLOON_F_FREE_PAGE_HINT, my reading of the specification is
-> >>> that reporting_vq should still be vq number 4, and vq 2 and 3 should
-> >>> be unused. This patch would make the reporting_vq use vq 2 instead in
-> >>> this case.
-> >>>
-> >>> If the new behavior is truly intended, then the spec does not match
-> >>> reality, and it would need to be changed first (IMO); however,
-> >>> changing the spec would mean that any devices implemented correctly
-> >>> per the previous spec would now be wrong, so some kind of mechanism
-> >>> for detecting the new behavior would be warranted, e.g. a new
-> >>> non-device-specific virtio feature flag.
-> >>>
-> >>> I have brought this up previously on the virtio-comment list [2], but
-> >>> it did not receive any satisfying answers at that time.
-> >>
-> >> Rings a bell, but staring at this patch, I thought that there would be
-> >> no behavioral change. Maybe I missed it :/
-> >>
-> >> I stared at virtio_ccw_find_vqs(), and it contains:
-> >>
-> >>      for (i =3D 0; i < nvqs; ++i) {
-> >>              if (!names[i]) {
-> >>                      vqs[i] =3D NULL;
-> >>                      continue;
-> >>              }
-> >>
-> >>              vqs[i] =3D virtio_ccw_setup_vq(vdev, queue_idx++, callbac=
-ks[i],
-> >>                                           names[i], ctx ? ctx[i] : fal=
-se,
-> >>                                           ccw);
-> >>              if (IS_ERR(vqs[i])) {
-> >>                      ret =3D PTR_ERR(vqs[i]);
-> >>                      vqs[i] =3D NULL;
-> >>                      goto out;
-> >>              }
-> >>      }
-> >>
-> >> We increment queue_idx only if an entry was not NULL. SO I thought no
-> >> behavioral change? (at least on s390x :) )
-> >>
-> >> It's late here in Germany, so maybe I'm missing something.
-> >
-> > I think we've encountered a tricky issue. Currently, all transports han=
-dle queue
-> > id by incrementing them in order, without skipping any queue id. So, I'=
-m quite
-> > surprised that my changes would affect the spec. The fact that the
-> > 'names' value is null is just a small trick in the Linux kernel impleme=
-ntation
-> > and should not have an impact on the queue id.
-> >
-> > I believe that my recent modification will not affect the spec. So, let=
-'s
-> > consider the issues with this patch set separately for now. Regarding t=
-he Memory
-> > Balloon Device, it has been operational for many years, and perhaps we =
-should
-> > add to the spec that if a certain vq does not exist, then subsequent vq=
-s will
-> > take over its id.
->
-> Right, if I am not missing something your patch should have no
-> functional change in that regard (that the current
-> behavior/implementation might not match the spec is a different discussio=
-n).
->
-> @Daniel, if I'm missing something, please shout.
+Amba bus core already sets owner, so driver does not need to.
 
-Thanks for digging into that - I think you're correct in that the
-patch does not change the behavior, due to changes elsewhere in the
-generic virtio and virtio-pci code. So in that sense, I guess this
-should not block this particular patch.
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ drivers/hwtracing/coresight/coresight-funnel.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-It would be good to have the spec situation cleared up, though - I
-guess in practice, all relevant drivers and device implementations are
-already following the model where there are no gaps in the queue
-numbering, rather than what the spec seems to indicate.
+diff --git a/drivers/hwtracing/coresight/coresight-funnel.c b/drivers/hwtracing/coresight/coresight-funnel.c
+index ef1a0abfee4e..5ab1f592917a 100644
+--- a/drivers/hwtracing/coresight/coresight-funnel.c
++++ b/drivers/hwtracing/coresight/coresight-funnel.c
+@@ -399,7 +399,6 @@ MODULE_DEVICE_TABLE(amba, dynamic_funnel_ids);
+ static struct amba_driver dynamic_funnel_driver = {
+ 	.drv = {
+ 		.name	= "coresight-dynamic-funnel",
+-		.owner	= THIS_MODULE,
+ 		.pm	= &funnel_dev_pm_ops,
+ 		.suppress_bind_attrs = true,
+ 	},
 
-Thanks,
--- Daniel
+-- 
+2.34.1
+
 
