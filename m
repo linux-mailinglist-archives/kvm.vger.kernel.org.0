@@ -1,53 +1,84 @@
-Return-Path: <kvm+bounces-12669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12664-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0759288BC95
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 09:36:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9E0488BC0D
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 09:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C04B1C33192
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 08:36:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 607D52E37F7
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 08:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC023F9ED;
-	Tue, 26 Mar 2024 08:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E1E13665C;
+	Tue, 26 Mar 2024 08:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mUW1I4P/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680BA18EB1;
-	Tue, 26 Mar 2024 08:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711442134; cv=none; b=PcRlUnxE1SBzLKib052/g/schZsIY9NxSKeouemeTISY/LkYrVNyeIi3Z7VPC5s0Em9GNugvBj8ga1dVjhdR6kguG4M1VqWQJiO4cGq2qUFj1lHSyafQtRGB4qHD6SQ2iWmahnM8T/QyKsjxRUkqVYOtcwawQY2BPg71/W5UYxU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711442134; c=relaxed/simple;
-	bh=h9EeJQUPGscodmSjnmp0D/vEOTmiEFfN3yvTqvtFhuk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pxOwuA+f8aUkSAQWlAXcT1eQbEVXYfdZdn/HBbx8nx0BIv+CppaMLEQTRLMRZZILSOHVR6/hjNonnQYMt0WoTOzQpWnE7YUZVB9UuCPCX1IM1N6np+ifsanBUGFd7IR4SmbQkVDec1lnwaZYZUDMULeMt214XklPfVtYWiRlTtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8DxbOkGggJmE0oeAA--.60907S3;
-	Tue, 26 Mar 2024 16:06:30 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxbRMBggJmhaRoAA--.9600S4;
-	Tue, 26 Mar 2024 16:06:29 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>
-Cc: Juergen Gross <jgross@suse.com>,
-	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	x86@kernel.org
-Subject: [PATCH 2/2] LoongArch: Add steal time support in guest side
-Date: Tue, 26 Mar 2024 16:06:25 +0800
-Message-Id: <20240326080625.898051-3-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240326080625.898051-1-maobibo@loongson.cn>
-References: <20240326080625.898051-1-maobibo@loongson.cn>
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981A512AADB;
+	Tue, 26 Mar 2024 08:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711440732; cv=fail; b=ccyJ6SKghozE2gDb5rLIccEo5yIgIPmPCSc853vmrIh+s/+A7TI2zXCvYRbZ7z7OIROfo0WfNLNCu/fT35wA6GyDkOedGCFcKFr12RcosNofhIkGzuRsBohqtoMTZixa0hFm8fGxZ2nDDOjMjv9dnJBTUid5KLJiK8p08+FphFk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711440732; c=relaxed/simple;
+	bh=WFKIX0RsmCMf7RSqDF5ypGZbCyOrl0LGXnCxWogA8uA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D938dIjR/UOkCKSfjfkYYPC+xDJdmmJzlQfWZFlBQO5aTkOftTyV03uLhgzrvBXeiKXk1ZuIi7Pm92t96+x5YvryB5tyQzrqeGcei+IO1k/uL+Z3CXmMkRazGeSyiSNfz5aemtU25iiHfuoJA/I186zYa9eJNKQex77F9U3gQ1g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mUW1I4P/; arc=fail smtp.client-ip=40.107.236.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bN7W+pUd1lMN2pLVNwHyl6X98ps8kyjvCzIMwdOtLkhPJF2i3FmZ77WwAxpo9Zw/xBwl0f2Omb3RCieoKuHDa26nIaJ50RkIhFCgZVDYzGsV1Lv8m4QMWh9ktZdu92SHOV1gxw7+uDoAFnewpIPuQMa00PNjhhUdSuV1y3/nnbxcGAPBS5vElexe1u9m74UjWiDIGug040pmDwrF7AsBtlQ5zdvchTfAyYIyEYBZOuL/h90eLPJdshSeNacM09NbaRKvSLk145lDYv5HRjDeSsY3fIydbaanp6pW8MZ8+4dZbL2gplP4CGdy/hsVxOLk09fTWuAFbudBmZuXSlom3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6BHIzc9SrkeuuDQVM7Ulxlc4VlYV2lBzNgCL5M0Oqic=;
+ b=ijNT7r/yzrXWGn5iZAtKpZkCCl+Uj7RtZZeq/s2uQmv43uD19KAkpwvpPD18jj9T63xg9aiHv5ROt2Msc9ChYIQw0N2zQub8JUX0addU19zU2OO+Gp3hsfeuFivaLcDmQkNJWRgsP2GGdYtB86fMid5xY8Ra8WQgeOxbHPD8MkTiBNYBLlgrSVVq/C44/0xDRdB83o5teugsXEolidV9xP7oeez39koAEym3HrsWNnDgf9RilVHSPUWJ0Qpk5Rh/zaSmq/kqy3ayi0/btM7j1HvLU5dbmWpVGOrspZVnmaJBjhh0zS5Iozux1nvEzOjJl7NBMtP3Lx4fdV3y7e+ebw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6BHIzc9SrkeuuDQVM7Ulxlc4VlYV2lBzNgCL5M0Oqic=;
+ b=mUW1I4P/f9zfRjUqtKX2qfj/sOQ1Zbgs/Ah8y0sOw7cw08T92V9xrsEURvEDVAlo0EQHu2eHHugUDfx0/7udUZvUSthJcMo1nUpYFK2KANuLWb1vn5b0L/mmVNBGkaK0yIwx49ZyNcio7W17+a8w6HGkXKRdEhhzcnbdqj0weDM=
+Received: from DS7PR03CA0041.namprd03.prod.outlook.com (2603:10b6:5:3b5::16)
+ by DS7PR12MB8084.namprd12.prod.outlook.com (2603:10b6:8:ef::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.33; Tue, 26 Mar 2024 08:12:07 +0000
+Received: from CY4PEPF0000FCC2.namprd03.prod.outlook.com
+ (2603:10b6:5:3b5:cafe::42) by DS7PR03CA0041.outlook.office365.com
+ (2603:10b6:5:3b5::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.13 via Frontend
+ Transport; Tue, 26 Mar 2024 08:12:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000FCC2.mail.protection.outlook.com (10.167.242.104) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7409.10 via Frontend Transport; Tue, 26 Mar 2024 08:12:07 +0000
+Received: from BLR-5CG113396H.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 26 Mar
+ 2024 03:11:58 -0500
+From: Ravi Bangoria <ravi.bangoria@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <thomas.lendacky@amd.com>
+CC: <ravi.bangoria@amd.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	<hpa@zytor.com>, <michael.roth@amd.com>, <nikunj.dadhania@amd.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<santosh.shukla@amd.com>
+Subject: [PATCH] KVM: SEV-ES: Don't intercept MSR_IA32_DEBUGCTLMSR for SEV-ES guests
+Date: Tue, 26 Mar 2024 13:41:43 +0530
+Message-ID: <20240326081143.715-1-ravi.bangoria@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,232 +86,98 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8CxbRMBggJmhaRoAA--.9600S4
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
-X-Gw-Check: e5acd0b5fd9bcff5
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC2:EE_|DS7PR12MB8084:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8007e184-6791-4944-6347-08dc4d6c6dff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ZSba2vr7NdTsi1LDnxt5nml1yt6+mJZwx5MBQFldMh+nuPIOecvgwE6DwiH3AqPihfIfFq4lzV7uXTaTABZ0Gnmf8WrP+DaISAwmvCC7xvyYJdYti4VVuaTwv415FhZaE6IAiHhMgAbOkX1nQbCXKy14RaH2/rWa9+JcgWgxNeonibAPkhXEReSzehD3h+oAyOFgF9o6svnp5XlEJSh3Uo0GwqJiPZTMMvhVzXjVUPc9Zu+oKZ1BDeXe3izC1/Af/eCs0CoS+4eAmXYXHOg1R1EUxIQeGSEEI0nPSF9qmBL8XgMBIOWBI+eOQMETBdzwxWkgnxZRoF/wDG4JXvkIfTxfHksOg+tJzmm/inCzZxdVt0bGBtrFYj1M9Hk3uUeQQXoFIYgcIoiE4G7Ka6AG+/IwpFKB0cFYDYcZ1MliVeymqP9YfdrXk/fWOhNtNPyPT4q4k6VYSsSym/X2ZCiAPFEEwN8pHbTuOzK1bTGztPfI1MALYlD6urnm26wgGzTLGbtWFw2fMZQEA1wm9uWHA49viTLl5vFBNBVNxNRx8+OQDr+8LVNiA8Rl70AUIJvIdR3sKfv5f3IChOjXOAu14jzc0Ts1zxEfnf0N747b7X7FODrYIL/cd/8DhWYv1Klo7dBEmeKCKHbQSwD5Jt5rkbhy1S2yCXCqQ4805SnEkvoPuXkPAH2y975O2s6YCXoskiUHUbA46jWB1jGqMy1c8Q==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2024 08:12:07.5934
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8007e184-6791-4944-6347-08dc4d6c6dff
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000FCC2.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8084
 
-Percpu struct kvm_steal_time is added here, its size is 64 bytes and
-also defined as 64 bytes, so that the whole structure is in one physical
-page.
+Currently, LBR Virtualization is dynamically enabled and disabled for
+a vcpu by intercepting writes to MSR_IA32_DEBUGCTLMSR. This helps by
+avoiding unnecessary save/restore of LBR MSRs when nobody is using it
+in the guest. However, SEV-ES guest mandates LBR Virtualization to be
+_always_ ON[1] and thus this dynamic toggling doesn't work for SEV-ES
+guest, in fact it results into fatal error:
 
-When vcpu is onlined, function pv_register_steal_time() is called. This
-function will pass physical address of struct kvm_steal_time and tells
-hypervisor to enable steal time. When vcpu is offline, physical address
-is set as 0 and tells hypervisor to disable steal time.
+SEV-ES guest on Zen3, kvm-amd.ko loaded with lbrv=1
 
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+  [guest ~]# wrmsr 0x1d9 0x4
+  KVM: entry failed, hardware error 0xffffffff
+  EAX=00000004 EBX=00000000 ECX=000001d9 EDX=00000000
+  ...
+
+Fix this by never intercepting MSR_IA32_DEBUGCTLMSR for SEV-ES guests.
+
+[1]: AMD64 Architecture Programmer's Manual Pub. 40332, Rev. 4.07 - June
+     2023, Vol 2, 15.35.2 Enabling SEV-ES.
+     https://bugzilla.kernel.org/attachment.cgi?id=304653
+
+Fixes: 376c6d285017 ("KVM: SVM: Provide support for SEV-ES vCPU creation/loading")
+Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
 ---
- arch/loongarch/include/asm/paravirt.h |   5 +
- arch/loongarch/kernel/paravirt.c      | 130 ++++++++++++++++++++++++++
- arch/loongarch/kernel/time.c          |   2 +
- 3 files changed, 137 insertions(+)
+ arch/x86/kvm/svm/sev.c | 1 +
+ arch/x86/kvm/svm/svm.c | 1 +
+ arch/x86/kvm/svm/svm.h | 2 +-
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/loongarch/include/asm/paravirt.h b/arch/loongarch/include/asm/paravirt.h
-index 58f7b7b89f2c..fe27fb5e82b8 100644
---- a/arch/loongarch/include/asm/paravirt.h
-+++ b/arch/loongarch/include/asm/paravirt.h
-@@ -17,11 +17,16 @@ static inline u64 paravirt_steal_clock(int cpu)
- }
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index a8ce5226b3b5..ef932a7ff9bd 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3073,6 +3073,7 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
+ 	/* Clear intercepts on selected MSRs */
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_EFER, 1, 1);
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_CR_PAT, 1, 1);
++	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_DEBUGCTLMSR, 1, 1);
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTBRANCHFROMIP, 1, 1);
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTBRANCHTOIP, 1, 1);
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTFROMIP, 1, 1);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index e90b429c84f1..5a82135ae84e 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -99,6 +99,7 @@ static const struct svm_direct_access_msrs {
+ 	{ .index = MSR_IA32_SPEC_CTRL,			.always = false },
+ 	{ .index = MSR_IA32_PRED_CMD,			.always = false },
+ 	{ .index = MSR_IA32_FLUSH_CMD,			.always = false },
++	{ .index = MSR_IA32_DEBUGCTLMSR,		.always = false },
+ 	{ .index = MSR_IA32_LASTBRANCHFROMIP,		.always = false },
+ 	{ .index = MSR_IA32_LASTBRANCHTOIP,		.always = false },
+ 	{ .index = MSR_IA32_LASTINTFROMIP,		.always = false },
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 8ef95139cd24..7a1b60bcebff 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -30,7 +30,7 @@
+ #define	IOPM_SIZE PAGE_SIZE * 3
+ #define	MSRPM_SIZE PAGE_SIZE * 2
  
- int pv_ipi_init(void);
-+int __init pv_time_init(void);
- #else
- static inline int pv_ipi_init(void)
- {
- 	return 0;
- }
- 
-+static inline int pv_time_init(void)
-+{
-+	return 0;
-+}
- #endif // CONFIG_PARAVIRT
- #endif
-diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/paravirt.c
-index 9044ed62045c..56182c64ab38 100644
---- a/arch/loongarch/kernel/paravirt.c
-+++ b/arch/loongarch/kernel/paravirt.c
-@@ -5,10 +5,13 @@
- #include <linux/jump_label.h>
- #include <linux/kvm_para.h>
- #include <asm/paravirt.h>
-+#include <linux/reboot.h>
- #include <linux/static_call.h>
- 
- struct static_key paravirt_steal_enabled;
- struct static_key paravirt_steal_rq_enabled;
-+static DEFINE_PER_CPU(struct kvm_steal_time, steal_time) __aligned(64);
-+static int has_steal_clock;
- 
- static u64 native_steal_clock(int cpu)
- {
-@@ -17,6 +20,57 @@ static u64 native_steal_clock(int cpu)
- 
- DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
- 
-+static bool steal_acc = true;
-+static int __init parse_no_stealacc(char *arg)
-+{
-+	steal_acc = false;
-+	return 0;
-+}
-+early_param("no-steal-acc", parse_no_stealacc);
-+
-+static u64 para_steal_clock(int cpu)
-+{
-+	u64 steal;
-+	struct kvm_steal_time *src;
-+	int version;
-+
-+	src = &per_cpu(steal_time, cpu);
-+	do {
-+
-+		version = src->version;
-+		/* Make sure that the version is read before the steal */
-+		virt_rmb();
-+		steal = src->steal;
-+		/* Make sure that the steal is read before the next version */
-+		virt_rmb();
-+
-+	} while ((version & 1) || (version != src->version));
-+	return steal;
-+}
-+
-+static int pv_register_steal_time(void)
-+{
-+	int cpu = smp_processor_id();
-+	struct kvm_steal_time *st;
-+	unsigned long addr;
-+
-+	if (!has_steal_clock)
-+		return -EPERM;
-+
-+	st = &per_cpu(steal_time, cpu);
-+	addr = per_cpu_ptr_to_phys(st);
-+
-+	/* The whole structure kvm_steal_time should be one page */
-+	if (PFN_DOWN(addr) != PFN_DOWN(addr + sizeof(*st))) {
-+		pr_warn("Illegal PV steal time addr %lx\n", addr);
-+		return -EFAULT;
-+	}
-+
-+	addr |= KVM_STEAL_PHYS_VALID;
-+	kvm_hypercall2(KVM_HCALL_FUNC_NOTIFY, KVM_FEATURE_STEAL_TIME, addr);
-+	return 0;
-+}
-+
- #ifdef CONFIG_SMP
- static void pv_send_ipi_single(int cpu, unsigned int action)
- {
-@@ -110,6 +164,32 @@ static void pv_init_ipi(void)
- 	if (r < 0)
- 		panic("SWI0 IRQ request failed\n");
- }
-+
-+static void pv_disable_steal_time(void)
-+{
-+	if (has_steal_clock)
-+		kvm_hypercall2(KVM_HCALL_FUNC_NOTIFY, KVM_FEATURE_STEAL_TIME, 0);
-+}
-+
-+static int pv_cpu_online(unsigned int cpu)
-+{
-+	unsigned long flags;
-+
-+	local_irq_save(flags);
-+	pv_register_steal_time();
-+	local_irq_restore(flags);
-+	return 0;
-+}
-+
-+static int pv_cpu_down_prepare(unsigned int cpu)
-+{
-+	unsigned long flags;
-+
-+	local_irq_save(flags);
-+	pv_disable_steal_time();
-+	local_irq_restore(flags);
-+	return 0;
-+}
- #endif
- 
- static bool kvm_para_available(void)
-@@ -149,3 +229,53 @@ int __init pv_ipi_init(void)
- 
- 	return 1;
- }
-+
-+static void pv_cpu_reboot(void *unused)
-+{
-+	pv_disable_steal_time();
-+}
-+
-+static int pv_reboot_notify(struct notifier_block *nb, unsigned long code,
-+		void *unused)
-+{
-+	on_each_cpu(pv_cpu_reboot, NULL, 1);
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block pv_reboot_nb = {
-+	.notifier_call  = pv_reboot_notify,
-+};
-+
-+int __init pv_time_init(void)
-+{
-+	int feature;
-+
-+	if (!cpu_has_hypervisor)
-+		return 0;
-+	if (!kvm_para_available())
-+		return 0;
-+
-+	feature = read_cpucfg(CPUCFG_KVM_FEATURE);
-+	if (!(feature & KVM_FEATURE_STEAL_TIME))
-+		return 0;
-+
-+	has_steal_clock = 1;
-+	if (pv_register_steal_time()) {
-+		has_steal_clock = 0;
-+		return 0;
-+	}
-+
-+	register_reboot_notifier(&pv_reboot_nb);
-+	static_call_update(pv_steal_clock, para_steal_clock);
-+	static_key_slow_inc(&paravirt_steal_enabled);
-+	if (steal_acc)
-+		static_key_slow_inc(&paravirt_steal_rq_enabled);
-+
-+#ifdef CONFIG_SMP
-+	if (cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "loongarch/pv:online",
-+				pv_cpu_online, pv_cpu_down_prepare) < 0)
-+		pr_err("Failed to install cpu hotplug callbacks\n");
-+#endif
-+	pr_info("Using stolen time PV\n");
-+	return 0;
-+}
-diff --git a/arch/loongarch/kernel/time.c b/arch/loongarch/kernel/time.c
-index fd5354f9be7c..46d7d40c87e3 100644
---- a/arch/loongarch/kernel/time.c
-+++ b/arch/loongarch/kernel/time.c
-@@ -15,6 +15,7 @@
- 
- #include <asm/cpu-features.h>
- #include <asm/loongarch.h>
-+#include <asm/paravirt.h>
- #include <asm/time.h>
- 
- u64 cpu_clock_freq;
-@@ -214,4 +215,5 @@ void __init time_init(void)
- 
- 	constant_clockevent_init();
- 	constant_clocksource_init();
-+	pv_time_init();
- }
+-#define MAX_DIRECT_ACCESS_MSRS	47
++#define MAX_DIRECT_ACCESS_MSRS	48
+ #define MSRPM_OFFSETS	32
+ extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+ extern bool npt_enabled;
 -- 
-2.39.3
+2.44.0
 
 
