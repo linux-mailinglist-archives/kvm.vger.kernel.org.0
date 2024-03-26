@@ -1,126 +1,166 @@
-Return-Path: <kvm+bounces-12660-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12661-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D873F88BB74
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 08:39:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 008CE88BB95
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 08:45:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08F5A1C30EB9
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 07:39:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32DB51C326DE
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 07:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E2B1327F7;
-	Tue, 26 Mar 2024 07:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A516713280F;
+	Tue, 26 Mar 2024 07:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MuUFQBYC"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="tEGC+yMt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD45839E2;
-	Tue, 26 Mar 2024 07:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DD41804F;
+	Tue, 26 Mar 2024 07:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711438729; cv=none; b=VFriFRScN4hw8ibcc7bG+rtomZfDsoW3tHArxWHINHz+Tc4GtZaAuHMhNOxhDc6iNGUF3NfZ3B8Mmrta5kYLEV6ZtabNDl4frJSQZFiFOauekHtghrn/W7B0uKi+nXzcKysvh4Zw9b56CVc5iAmDcDGsruY0hTG71jCR51Ln/yU=
+	t=1711439121; cv=none; b=kqkhdDDIlpCFEnyYPl3AkKZqS9tousLAK3TyY4R1BDyjgRpC7L+vivbvov5daqLZTulPDV4OuAszq2m0319m8Y/cgnSwFQUCcyyQREF9hiFgd1jGGoyj8/D+wF20Zf2yVCind2FhSDvPWybj8ohlsTPITx4jHqb18exWbRzhOGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711438729; c=relaxed/simple;
-	bh=zasrgEQ8PpQSnTnjWuIuknfRyFZDN6ocuqsuM92kjzQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zei3cahctvIGHu13OO8WyvgZVRlNj3tdYKINllze5SRNS7KKm6mnfFRZ9zAvkUByELZsDGFaJku8z4ZPUP8cZZR6/IoN8zP6mO5iVnS58WcOW2/HZNoIvGQmNazi2SQbybmrOndu5CEu+35ib18847JwTUQVBCHzDzck7Q39Qew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MuUFQBYC; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42Q5LbsP026333;
-	Tue, 26 Mar 2024 07:38:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=oB4/YmzW/XBsuEVbbPCASdcRnc5ejjoZ5/zY1M4QVqw=;
- b=MuUFQBYC+X5LOzvVKpOzWltKuUBvsdfLgvkn6JVxiJ0rx3/fDuZlsi8STc/zbvhuLpac
- dYVOKiEGFnNTH2j0QKmaKpqYrTF+WP+AfITlSJeKxAg4rDjsqFR3S6KA6T8VdC5r34Lx
- 8QjY1cfYJh7QW8UOnkGJU0BhMhZzW9icIZkJ3uqMjmtZLMitkkTRPmswjnoko40AbkPV
- +Z2vqp2gZfGo0VK+R+wLQvkddDLClCJ8TmkqdXAL7SU5rbvk6CTbwgpSrw312mxseWjJ
- QPnZapmXpoc49x+0nnkq66IzwX8IpwaTb1/KoXQEq2lz8MRptZ26KfDTJJdnPPmVKKih hw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x3kb10ukp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Mar 2024 07:38:42 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42Q7cf4l000915;
-	Tue, 26 Mar 2024 07:38:41 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x3kb10ukj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Mar 2024 07:38:41 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42Q4bnhE003780;
-	Tue, 26 Mar 2024 07:38:40 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x2c42nu9a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Mar 2024 07:38:40 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42Q7cZTB44958184
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 Mar 2024 07:38:37 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 40ED32004E;
-	Tue, 26 Mar 2024 07:38:35 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 02B1420040;
-	Tue, 26 Mar 2024 07:38:35 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.60])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 26 Mar 2024 07:38:34 +0000 (GMT)
-Date: Tue, 26 Mar 2024 08:38:33 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v1 0/2] s390/mm: shared zeropage + KVM fix and
- optimization
-Message-ID: <20240326073833.6078-A-hca@linux.ibm.com>
-References: <20240321215954.177730-1-david@redhat.com>
- <20240321151353.68f9a3c9c0b261887e4e5411@linux-foundation.org>
+	s=arc-20240116; t=1711439121; c=relaxed/simple;
+	bh=qvUOTvrFfow3JtcT79klmW6KJs5WhOYeRCmam/JfN9s=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=pFAVcWn0aqswRF1I6yBmQhRtnSr2YpOYZKof6wOzhUw4mhC8wmSNZGmRp0Lp1pFQZbhmml9vWEBo+2Sq42t9xYcvOO+FQwg9rZOQHXJr+LnTKwxTEt1GdffJYhfbNNwKQihEhhK2nrvT6+3G3Pn9whXbSEDgrGZW6HogDSev+Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tEGC+yMt; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711439116; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=Ba4I0Bd+6onGK25mYl7fzEyLNywF5unBrX0VUtEKFgw=;
+	b=tEGC+yMtyx4tcKC/0UKnpLTjWuB7DybhR2j1m7rU0rgQHfGhtcCvJFEUQdIZEu2SgVfL5KK4WmT9dLcMtOJKit58XETr6XtPVgc4jzk41FSVKDeMuvoWc9QMR+LxPMunx0B/jj/t/X2AXxkFSgiUA+FS83DIW2F1Lc5HSbuAAww=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R841e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=25;SR=0;TI=SMTPD_---0W3KMp1M_1711439114;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3KMp1M_1711439114)
+          by smtp.aliyun-inc.com;
+          Tue, 26 Mar 2024 15:45:14 +0800
+Message-ID: <1711438956.7547545-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v5 2/6] virtio: remove support for names array entries being null.
+Date: Tue, 26 Mar 2024 15:42:36 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ David Hildenbrand <david@redhat.com>,
+ linux-um@lists.infradead.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,
+ linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20240325090419.33677-1-xuanzhuo@linux.alibaba.com>
+ <20240325090419.33677-3-xuanzhuo@linux.alibaba.com>
+ <CACGkMEuuNrDkEUnnES-APDVag2=4wjyZi3aEg0+8vY+Bho=BRg@mail.gmail.com>
+In-Reply-To: <CACGkMEuuNrDkEUnnES-APDVag2=4wjyZi3aEg0+8vY+Bho=BRg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240321151353.68f9a3c9c0b261887e4e5411@linux-foundation.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: S0IbuxD46Xgg4Qw0IOpeHf3APGY4p-aQ
-X-Proofpoint-ORIG-GUID: Y3fTsNA5ux-kI7T0fse-O9DbeqeHt6go
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-26_04,2024-03-21_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 clxscore=1011 spamscore=0
- phishscore=0 bulkscore=0 suspectscore=0 malwarescore=0 adultscore=0
- mlxscore=0 mlxlogscore=480 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2403260051
 
-On Thu, Mar 21, 2024 at 03:13:53PM -0700, Andrew Morton wrote:
-> On Thu, 21 Mar 2024 22:59:52 +0100 David Hildenbrand <david@redhat.com> wrote:
-> 
-> > Based on current mm-unstable. Maybe at least the second patch should
-> > go via the s390x tree, I think patch #1 could go that route as well.
-> 
-> Taking both via the s390 tree is OK by me.  I'll drop the mm.git copies
-> if/when these turn up in the linux-next feed.
+On Tue, 26 Mar 2024 12:28:34 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Mar 25, 2024 at 5:04=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > commit 6457f126c888 ("virtio: support reserved vqs") introduced this
+> > support. Multiqueue virtio-net use 2N as ctrl vq finally, so the logic
+> > doesn't apply. And not one uses this.
+> >
+> > On the other side, that makes some trouble for us to refactor the
+> > find_vqs() params.
+> >
+> > So I remove this support.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  arch/um/drivers/virtio_uml.c             | 5 -----
+> >  drivers/platform/mellanox/mlxbf-tmfifo.c | 4 ----
+> >  drivers/remoteproc/remoteproc_virtio.c   | 5 -----
+> >  drivers/s390/virtio/virtio_ccw.c         | 5 -----
+> >  drivers/virtio/virtio_mmio.c             | 5 -----
+> >  drivers/virtio/virtio_pci_common.c       | 9 ---------
+> >  drivers/virtio/virtio_vdpa.c             | 5 -----
+> >  include/linux/virtio_config.h            | 1 -
+> >  8 files changed, 39 deletions(-)
+> >
+> > diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
+> > index 8adca2000e51..1d1e8654b7fc 100644
+> > --- a/arch/um/drivers/virtio_uml.c
+> > +++ b/arch/um/drivers/virtio_uml.c
+> > @@ -1031,11 +1031,6 @@ static int vu_find_vqs(struct virtio_device *vde=
+v, unsigned nvqs,
+> >                 return rc;
+> >
+> >         for (i =3D 0; i < nvqs; ++i) {
+> > -               if (!names[i]) {
+> > -                       vqs[i] =3D NULL;
+> > -                       continue;
+> > -               }
+>
+> Does this mean names[i] must not be NULL? If yes, should we fail or
+> not? If not, do we need to change the doc?
 
-Considering the comments I would expect a v2 of this series at some
-time in the future.
+I think we should make sure that the names[i] must not be NULL.
+We should return fail.
+
+>
+> [...]
+>
+> > --- a/include/linux/virtio_config.h
+> > +++ b/include/linux/virtio_config.h
+> > @@ -56,7 +56,6 @@ typedef void vq_callback_t(struct virtqueue *);
+> >   *     callbacks: array of callbacks, for each virtqueue
+> >   *             include a NULL entry for vqs that do not need a callback
+> >   *     names: array of virtqueue names (mainly for debugging)
+> > - *             include a NULL entry for vqs unused by driver
+> >   *     Returns 0 on success or error status
+> >   * @del_vqs: free virtqueues found by find_vqs().
+> >   * @synchronize_cbs: synchronize with the virtqueue callbacks (optiona=
+l)
+>
+>
+> Since we had other check for names[i] like:
+>
+>         if (per_vq_vectors) {
+>                 /* Best option: one for change interrupt, one per vq. */
+>                 nvectors =3D 1;
+>                 for (i =3D 0; i < nvqs; ++i)
+>                         if (names[i] && callbacks[i])
+>                                 ++nvectors;
+>
+> in vp_find_vqs_msix() and maybe other places.
+
+names[i] should always be true. I will check this.
+
+Thanks
+
+
+>
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
