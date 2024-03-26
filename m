@@ -1,264 +1,177 @@
-Return-Path: <kvm+bounces-12677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF51588BD6B
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 10:16:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D58588BDF5
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 10:37:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3FF82E60B5
-	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 09:16:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FA6D1F31681
+	for <lists+kvm@lfdr.de>; Tue, 26 Mar 2024 09:37:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30B24CB3D;
-	Tue, 26 Mar 2024 09:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0C46BB4A;
+	Tue, 26 Mar 2024 09:23:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="nxjU2nqr"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="V8Cimmlx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3898441A85
-	for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 09:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF29482FE;
+	Tue, 26 Mar 2024 09:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711444556; cv=none; b=VaPWN2JIIxJaL8d3oyK/7VAssQfH7lN3Kvo/wa9AV0jriQ7z0hLw2/kF/cVkFEABulvw6nTjAIySW9mZRPvAwT2ooXGKvD1bkqpePeA5k7LUPso9rdKIGC8xcFG3KArbQVX+s+W1eZiRVLLfA70BG8I3eZzsrvnwXfmijWWc4zM=
+	t=1711445038; cv=none; b=nmIfS/rotu6LlzRwLr3hYicbaeXLEonEbMVwobuMuo6yfn6uWISEWA4aqC3yERMMbnPoEojt2GiJdeL5JGTh0yhk9cP4gSPrD0lfkxmDcCxhEB7bNwdKxwIwVl5C/HwzeTyZ0STQbN+UMyWCs9gdR9LexiXDgjfyGK4YWlfOiNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711444556; c=relaxed/simple;
-	bh=XLHFvcnPjTEDcrZ7qtocNMJeEvkNunE37tgelkHYaEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U9BJGefhNzSdR/vsZwKljFvcupl5JiwazklGIuDeA9udg4ED8+MTaEaeHKenQysVBPjfu71tK/OtbvQAmFSqZYZlRN7f3BnShuXUBwwcvvQjU/o3jV0Mmik4lQTSLW+YCk4FKk8xsLByOUL0VwXrxd/tcZS0opr7PoqLRfA0xNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=nxjU2nqr; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56bdf81706aso5272346a12.2
-        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 02:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1711444553; x=1712049353; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VlCNflLBPKDMrEvVoV3CR1TjZvh2RoiIM/bv6ClNrh8=;
-        b=nxjU2nqrEjrI0purgfgrPp09esS1B77/MpyKJM/ksmHW6pdwDPG5cHEGYaIBAZiATe
-         pfEeu52VVyCF4PjaXqX2ADTriGHf+Ob31UzHmI6pb4iXfqFThyIu6rguAKDTvYXwQ50H
-         d4U7axiMmMOGBy9oRoo4hPfxy4555NmU5zjQ9lKLCND2uM6sLUAeaTIqG6Zpu2jUI3u3
-         dRLxdernWg72q2YL0pzeB9LYrDQ1T5trj6oX2Teo7TRdIGCCKjXCb31oCcOhvdGqmDPu
-         4s2xxlsRlHkjP5FDZSzaBcwp4BYGqntlmH8mcVIHrHdBVngiw4w/AQNl87OKI2Kb2bOS
-         ULKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711444553; x=1712049353;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VlCNflLBPKDMrEvVoV3CR1TjZvh2RoiIM/bv6ClNrh8=;
-        b=rw3ENwEyF/ot3+K7dA8vMgE/taN1GQ8qjnNNsGul+8cduY0B/7tOKotQiyRYqjnyYM
-         J2BA98YwxUPlBMxHVfxnmNp/i/pMnyehFYlEd0k6+7Aag4xqpoKlzuUQGYqgIpQk2Y01
-         Y+Cabq+spr7Yg8ec6lfTMBlHDt0/mFjIIJBkabT56baSMLLJFKFArMVkXKV1pCZeDUJr
-         zuePRS7lL5rdvrWA2PFkLmFDt285Z9GsaYh9wB39Shp0Wd+l4J2IP/KgfhlExhuNPBgi
-         uMkEoR8nEbkQZD2TUhSH48zBQ0PKDBIHXhCMo6iSvBCkFaUqF4+FRY4V5w+ThjFIKvFo
-         UFWg==
-X-Forwarded-Encrypted: i=1; AJvYcCWwB2l0MHJA2AaNCZqxhNfYIxOdKoXdh3HHuphThESikMCtWslLbNGy1s7PvjZdPt1ndYTh+QNM5NSddNLkoNa9+WOS
-X-Gm-Message-State: AOJu0Yyh2yIhg5f4Dxs6UjdW6l2FXpQLP5UTmTLMXTQMkFSLygNX/pM7
-	xNQGmWqM7LU3pWE64z4pkymvZx3EfwozYwXs4EFgYWiYyEMS1oJSC8ClYcR9TH7PYQn6FcOTbX3
-	e/O0=
-X-Google-Smtp-Source: AGHT+IGYtMJ8dRY4Rj/5t5yzp/k0rZV6v7R3WaDJiXGBPtthp2P3PUfDTlvIW99jVKiYagK4jOS27Q==
-X-Received: by 2002:a50:d5c5:0:b0:56b:6ec6:af2f with SMTP id g5-20020a50d5c5000000b0056b6ec6af2fmr434471edj.6.1711444553580;
-        Tue, 26 Mar 2024 02:15:53 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id c13-20020a056402100d00b00568abb329a3sm3938382edu.88.2024.03.26.02.15.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 02:15:53 -0700 (PDT)
-Date: Tue, 26 Mar 2024 10:15:52 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com, 
-	maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [kvmtool PATCH v2 04/10] riscv: Add scalar crypto extensions
- support
-Message-ID: <20240326-c6bc7026dec7fb55764ff728@orel>
-References: <20240325153141.6816-1-apatel@ventanamicro.com>
- <20240325153141.6816-5-apatel@ventanamicro.com>
+	s=arc-20240116; t=1711445038; c=relaxed/simple;
+	bh=T4wnvnOffzTLpIPRwQQWSDDDt431HpMY8RhCicsc/Mo=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=TjuLsKOs+w3zHL2jqUL3zbd8xfW5rbWf0jA9BsdwUaNBZQOG02xu+FOtdZipuXbbHc5gUrBZ8biYHmdqvhkRB7E+NgxUcLqjbdQ8Dt8Hs1pUJW7VbYoFBlz8qXslGo6pcO+SdQk38X0mybwcjEaQImbteBm0/WsbPitUKprb0cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=V8Cimmlx; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1711445034;
+	bh=T4wnvnOffzTLpIPRwQQWSDDDt431HpMY8RhCicsc/Mo=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=V8CimmlxEYx6zepbCze4CZSx4oilJpLz+AVX00iN65uOwMjul0jnBdiK3UPhuvwLn
+	 XHcrZ2UeISLsYBxa4UzM02s9K/SDnEVhtNUaWCzGmngRndn7M2vMG+o30FFcu3F6vn
+	 OCh5s1Lc/0FDO/R/l5hkNQWTeHKYwUEpHpyu/bQHf+ro7flockyIr6CVcnIlntHz7N
+	 H45AfcQLVtLPUynJyjVYPFFROugi4eddJ0YfW/+Vkr90/QUgTIlikXh5INZ0Dp8O/o
+	 yicLSzO0SY3VEeZcKeIfIoAkryh4cHBKkmAKDz87VT5Iv+IhvKcQtrb2yUZ7NRwmZA
+	 TnQ/WhNoMzb/w==
+Received: from [10.193.1.1] (broslavsky.collaboradmins.com [68.183.210.73])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id AD5B037813E4;
+	Tue, 26 Mar 2024 09:23:52 +0000 (UTC)
+Message-ID: <2099346e-c657-4781-97e1-7dcb41f66c43@collabora.com>
+Date: Tue, 26 Mar 2024 14:24:22 +0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240325153141.6816-5-apatel@ventanamicro.com>
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Use TAP in the steal_time test
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvm@vger.kernel.org
+References: <20231019095900.450467-1-thuth@redhat.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <20231019095900.450467-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 25, 2024 at 09:01:35PM +0530, Anup Patel wrote:
-> When the scalar extensions are available expose them to the guest
-> via device tree so that guest can use it. This includes extensions
-> Zbkb, Zbkc, Zbkx, Zknd, Zkne, Zknh, Zkr, Zksed, Zksh, and Zkt.
+On 10/19/23 2:59 PM, Thomas Huth wrote:
+> For easier use of the tests in automation and for having some
+> status information for the user while the test is running, let's
+> provide some TAP output in this test.
+LGTM. I was thinking why kselftest.h hasn't been included. I found out that
+test_util.h includes kselftest.h.
+
 > 
-> The Zkr extension requires SEED CSR emulation in user space so
-> we also add related KVM_EXIT_RISCV_CSR handling.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+
 > ---
->  riscv/fdt.c                         | 10 +++++++++
->  riscv/include/kvm/csr.h             | 16 +++++++++++++++
->  riscv/include/kvm/kvm-config-arch.h | 30 +++++++++++++++++++++++++++
->  riscv/kvm-cpu.c                     | 32 +++++++++++++++++++++++++++++
->  4 files changed, 88 insertions(+)
->  create mode 100644 riscv/include/kvm/csr.h
+>  NB: This patch does not use the interface from kselftest_harness.h
+>      since it is not very suitable for the for-loop in this patch.
 > 
-> diff --git a/riscv/fdt.c b/riscv/fdt.c
-> index 84b6087..be87e9a 100644
-> --- a/riscv/fdt.c
-> +++ b/riscv/fdt.c
-> @@ -25,6 +25,9 @@ struct isa_ext_info isa_info_arr[] = {
->  	{"zba", KVM_RISCV_ISA_EXT_ZBA},
->  	{"zbb", KVM_RISCV_ISA_EXT_ZBB},
->  	{"zbc", KVM_RISCV_ISA_EXT_ZBC},
-> +	{"zbkb", KVM_RISCV_ISA_EXT_ZBKB},
-> +	{"zbkc", KVM_RISCV_ISA_EXT_ZBKC},
-> +	{"zbkx", KVM_RISCV_ISA_EXT_ZBKX},
->  	{"zbs", KVM_RISCV_ISA_EXT_ZBS},
->  	{"zicbom", KVM_RISCV_ISA_EXT_ZICBOM},
->  	{"zicboz", KVM_RISCV_ISA_EXT_ZICBOZ},
-> @@ -34,6 +37,13 @@ struct isa_ext_info isa_info_arr[] = {
->  	{"zifencei", KVM_RISCV_ISA_EXT_ZIFENCEI},
->  	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
->  	{"zihpm", KVM_RISCV_ISA_EXT_ZIHPM},
-> +	{"zknd", KVM_RISCV_ISA_EXT_ZKND},
-> +	{"zkne", KVM_RISCV_ISA_EXT_ZKNE},
-> +	{"zknh", KVM_RISCV_ISA_EXT_ZKNH},
-> +	{"zkr", KVM_RISCV_ISA_EXT_ZKR},
-> +	{"zksed", KVM_RISCV_ISA_EXT_ZKSED},
-> +	{"zksh", KVM_RISCV_ISA_EXT_ZKSH},
-> +	{"zkt", KVM_RISCV_ISA_EXT_ZKT},
->  };
+>  tools/testing/selftests/kvm/steal_time.c | 46 ++++++++++++------------
+>  1 file changed, 23 insertions(+), 23 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+> index 171adfb2a6cb..aa6149eb9ea1 100644
+> --- a/tools/testing/selftests/kvm/steal_time.c
+> +++ b/tools/testing/selftests/kvm/steal_time.c
+> @@ -81,20 +81,18 @@ static void steal_time_init(struct kvm_vcpu *vcpu, uint32_t i)
+>  static void steal_time_dump(struct kvm_vm *vm, uint32_t vcpu_idx)
+>  {
+>  	struct kvm_steal_time *st = addr_gva2hva(vm, (ulong)st_gva[vcpu_idx]);
+> -	int i;
 >  
->  static void dump_fdt(const char *dtb_file, void *fdt)
-> diff --git a/riscv/include/kvm/csr.h b/riscv/include/kvm/csr.h
-> new file mode 100644
-> index 0000000..bcbf61d
-> --- /dev/null
-> +++ b/riscv/include/kvm/csr.h
-> @@ -0,0 +1,16 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +#ifndef KVM__KVM_CSR_H
-> +#define KVM__KVM_CSR_H
-> +
-> +#include <linux/const.h>
-> +
-> +/* Scalar Crypto Extension - Entropy */
-> +#define CSR_SEED		0x015
-> +#define SEED_OPST_MASK		_AC(0xC0000000, UL)
-> +#define SEED_OPST_BIST		_AC(0x00000000, UL)
-> +#define SEED_OPST_WAIT		_AC(0x40000000, UL)
-> +#define SEED_OPST_ES16		_AC(0x80000000, UL)
-> +#define SEED_OPST_DEAD		_AC(0xC0000000, UL)
-> +#define SEED_ENTROPY_MASK	_AC(0xFFFF, UL)
-> +
-> +#endif /* KVM__KVM_CSR_H */
-> diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-> index 6d09eee..3764d7c 100644
-> --- a/riscv/include/kvm/kvm-config-arch.h
-> +++ b/riscv/include/kvm/kvm-config-arch.h
-> @@ -52,6 +52,15 @@ struct kvm_config_arch {
->  	OPT_BOOLEAN('\0', "disable-zbc",				\
->  		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBC],	\
->  		    "Disable Zbc Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zbkb",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBKB],	\
-> +		    "Disable Zbkb Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zbkc",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBKC],	\
-> +		    "Disable Zbkc Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zbkx",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBKX],	\
-> +		    "Disable Zbkx Extension"),				\
->  	OPT_BOOLEAN('\0', "disable-zbs",				\
->  		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBS],	\
->  		    "Disable Zbs Extension"),				\
-> @@ -79,6 +88,27 @@ struct kvm_config_arch {
->  	OPT_BOOLEAN('\0', "disable-zihpm",				\
->  		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZIHPM],	\
->  		    "Disable Zihpm Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zknd",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZKND],	\
-> +		    "Disable Zknd Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zkne",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZKNE],	\
-> +		    "Disable Zkne Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zknh",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZKNH],	\
-> +		    "Disable Zknh Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zkr",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZKR],	\
-> +		    "Disable Zkr Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zksed",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZKSED],	\
-> +		    "Disable Zksed Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zksh",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZKSH],	\
-> +		    "Disable Zksh Extension"),				\
-> +	OPT_BOOLEAN('\0', "disable-zkt",				\
-> +		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZKT],	\
-> +		    "Disable Zkt Extension"),				\
->  	OPT_BOOLEAN('\0', "disable-sbi-legacy",				\
->  		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_V01],	\
->  		    "Disable SBI Legacy Extensions"),			\
-> diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
-> index c4e83c4..ae87848 100644
-> --- a/riscv/kvm-cpu.c
-> +++ b/riscv/kvm-cpu.c
-> @@ -1,3 +1,4 @@
-> +#include "kvm/csr.h"
->  #include "kvm/kvm-cpu.h"
->  #include "kvm/kvm.h"
->  #include "kvm/virtio.h"
-> @@ -222,11 +223,42 @@ static bool kvm_cpu_riscv_sbi(struct kvm_cpu *vcpu)
->  	return ret;
+> -	pr_info("VCPU%d:\n", vcpu_idx);
+> -	pr_info("    steal:     %lld\n", st->steal);
+> -	pr_info("    version:   %d\n", st->version);
+> -	pr_info("    flags:     %d\n", st->flags);
+> -	pr_info("    preempted: %d\n", st->preempted);
+> -	pr_info("    u8_pad:    ");
+> -	for (i = 0; i < 3; ++i)
+> -		pr_info("%d", st->u8_pad[i]);
+> -	pr_info("\n    pad:       ");
+> -	for (i = 0; i < 11; ++i)
+> -		pr_info("%d", st->pad[i]);
+> -	pr_info("\n");
+> +	ksft_print_msg("VCPU%d:\n", vcpu_idx);
+> +	ksft_print_msg("    steal:     %lld\n", st->steal);
+> +	ksft_print_msg("    version:   %d\n", st->version);
+> +	ksft_print_msg("    flags:     %d\n", st->flags);
+> +	ksft_print_msg("    preempted: %d\n", st->preempted);
+> +	ksft_print_msg("    u8_pad:    %d %d %d\n",
+> +			st->u8_pad[0], st->u8_pad[1], st->u8_pad[2]);
+> +	ksft_print_msg("    pad:       %d %d %d %d %d %d %d %d %d %d %d\n",
+> +			st->pad[0], st->pad[1], st->pad[2], st->pad[3],
+> +			st->pad[4], st->pad[5], st->pad[6], st->pad[7],
+> +			st->pad[8], st->pad[9], st->pad[10]);
 >  }
 >  
-> +static bool kvm_cpu_riscv_csr(struct kvm_cpu *vcpu)
-> +{
-> +	int dfd = kvm_cpu__get_debug_fd();
-> +	bool ret = true;
-> +
-> +	switch (vcpu->kvm_run->riscv_csr.csr_num) {
-> +	case CSR_SEED:
-> +		/*
-> +		 * We ignore the new_value and write_mask and simply
-> +		 * return a random value as SEED.
-> +		 */
-> +		vcpu->kvm_run->riscv_csr.ret_value = SEED_OPST_ES16;
-> +		vcpu->kvm_run->riscv_csr.ret_value |= rand() & SEED_ENTROPY_MASK;
-> +		break;
-> +	default:
-> +		dprintf(dfd, "Unhandled CSR access\n");
-> +		dprintf(dfd, "csr_num=0x%lx new_value=0x%lx\n",
-> +			vcpu->kvm_run->riscv_csr.csr_num,
-> +			vcpu->kvm_run->riscv_csr.new_value);
-> +		dprintf(dfd, "write_mask=0x%lx ret_value=0x%lx\n",
-> +			vcpu->kvm_run->riscv_csr.write_mask,
-> +			vcpu->kvm_run->riscv_csr.ret_value);
-> +		ret = false;
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+>  #elif defined(__aarch64__)
+> @@ -197,10 +195,10 @@ static void steal_time_dump(struct kvm_vm *vm, uint32_t vcpu_idx)
 >  {
->  	switch (vcpu->kvm_run->exit_reason) {
->  	case KVM_EXIT_RISCV_SBI:
->  		return kvm_cpu_riscv_sbi(vcpu);
-> +	case KVM_EXIT_RISCV_CSR:
-> +		return kvm_cpu_riscv_csr(vcpu);
->  	default:
->  		break;
->  	};
-> -- 
-> 2.34.1
->
+>  	struct st_time *st = addr_gva2hva(vm, (ulong)st_gva[vcpu_idx]);
+>  
+> -	pr_info("VCPU%d:\n", vcpu_idx);
+> -	pr_info("    rev:     %d\n", st->rev);
+> -	pr_info("    attr:    %d\n", st->attr);
+> -	pr_info("    st_time: %ld\n", st->st_time);
+> +	ksft_print_msg("VCPU%d:\n", vcpu_idx);
+> +	ksft_print_msg("    rev:     %d\n", st->rev);
+> +	ksft_print_msg("    attr:    %d\n", st->attr);
+> +	ksft_print_msg("    st_time: %ld\n", st->st_time);
+>  }
+>  
+>  #endif
+> @@ -267,7 +265,9 @@ int main(int ac, char **av)
+>  	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
+>  	virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, gpages);
+>  
+> +	ksft_print_header();
+>  	TEST_REQUIRE(is_steal_time_supported(vcpus[0]));
+> +	ksft_set_plan(NR_VCPUS);
+>  
+>  	/* Run test on each VCPU */
+>  	for (i = 0; i < NR_VCPUS; ++i) {
+> @@ -308,14 +308,14 @@ int main(int ac, char **av)
+>  			    run_delay, stolen_time);
+>  
+>  		if (verbose) {
+> -			pr_info("VCPU%d: total-stolen-time=%ld test-stolen-time=%ld", i,
+> -				guest_stolen_time[i], stolen_time);
+> -			if (stolen_time == run_delay)
+> -				pr_info(" (BONUS: guest test-stolen-time even exactly matches test-run_delay)");
+> -			pr_info("\n");
+> +			ksft_print_msg("VCPU%d: total-stolen-time=%ld test-stolen-time=%ld%s\n",
+> +				       i, guest_stolen_time[i], stolen_time,
+> +				       stolen_time == run_delay ?
+> +				       " (BONUS: guest test-stolen-time even exactly matches test-run_delay)" : "");
+>  			steal_time_dump(vm, i);
+>  		}
+> +		ksft_test_result_pass("vcpu%d\n", i);
+>  	}
+>  
+> -	return 0;
+> +	ksft_finished();        /* Print results and exit() accordingly */
+>  }
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+-- 
+BR,
+Muhammad Usama Anjum
 
