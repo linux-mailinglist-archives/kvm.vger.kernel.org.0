@@ -1,121 +1,152 @@
-Return-Path: <kvm+bounces-12752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E2B588D5EC
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:38:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607E588D5FD
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:43:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8EC29BC3B
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 05:38:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83BFB1C22DF3
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 05:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9B914288;
-	Wed, 27 Mar 2024 05:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88EC1A26E;
+	Wed, 27 Mar 2024 05:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YCqO/Mxy"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="X0RmUpBR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2071.outbound.protection.outlook.com [40.107.243.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918AF10949
-	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 05:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711517929; cv=none; b=CQ/+SJXjcKoxjSs/GpHfU+O0YvDk7QnbncnJOywb75SkK3LnP3O1WHjZ02cPQ72XrT2/B+A0mc3R/GHX+52sx8PWmPXJst9DlUJ9nVSxuJes7zTOBtDmnEc0YZRlZBEWStS5UE3bfQm6go6ikJyCW0LiY7zmIvTldxUoJjZTEKA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711517929; c=relaxed/simple;
-	bh=c8Qxz3GjemwSldg1rtEYBEhGGs00Vj4gZEX2g47vXU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qG/E7Ul92XWz0M6vLyGSvDIMn3IzTG/VtWDpOk8M9Ol//Rwu+vUIQWV8LP7XM/UoziwcAUUhuLq/sIyMM8SR+pGvl1vyMdFUPPcSG1KCevnys1sMkjWzvCIS3Xc8cjQLb5cWJcm/Qv0GIvAw6bgcU5uHOvAo0nJNemKgWqjLgjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YCqO/Mxy; arc=none smtp.client-ip=209.85.167.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3c36ecdb8cdso2954564b6e.1
-        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 22:38:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711517926; x=1712122726; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GEa1wJbE96+0XdxLOBaQ/cWqz0eCFh0pN8QmBlQTfhY=;
-        b=YCqO/Mxybl+uDfTb5WvMPYlwKhKl4q3hDmbBb/BevaL1jgjFDjyC+S6nyAbbpGoz3m
-         vVBQESkcXLhwLGmbltQMxoLbGl47/QvQBgda/v9gUuWWV8R3xHBdaTxKS1ytZHe/CLam
-         fudmpnB8YpxOV3Oa8BKTz+fbDrzIn29rcZ/6siLVcCh0y6qMuAZVU69leGsqVd4QLs5o
-         jjN9C+a9i5B0G6vo8HQF4RJl71kG0GlFL/gCWXBR2Zp5ZaxpYHKtkH3YcB5lDS2Qpr/h
-         hwuWJJx5eMMgrB/PEkkmCihttdTwSj1J96hjm1Dlv+aPKxwLTCMlpWxtLUwlIum02TaD
-         iCOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711517926; x=1712122726;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GEa1wJbE96+0XdxLOBaQ/cWqz0eCFh0pN8QmBlQTfhY=;
-        b=XEYVrteyAyPGktkmTB+48NZ1fsre6q3iXNCf0dNbAdPzgYGH+aRxoQawu00kWihztM
-         PAV3HKvPr65QH2l0Mh4ViqX8RMKo97NoFRiaOWGKGCGYWIHKLiFVMfTw2Ll1X9FM8bq0
-         Mc0DrOoOMtQ0FA1TFUw/7t7EMjwmlV6EHfQASdTJgoBTII/nQTVyufIPc/E8xb/jcuC0
-         wuOY58fqP2aG993sbqN6TzKXBis2koS35k8UVWlo99xJF4sTtUWJo5vvMaiVoeU9CpRC
-         v325sm/uSTN8lG/65r0A7WIzDk9XKpgPkNllVXcLwplTG1Ulluyq/3bSPXGap5ZzDFTO
-         RxeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/v9SXs4W+vvRdWLJftf4t9St9dfW0jEYwHBz1C40rUHhefN6qMCysTsG+qCGhQRoYJeaGA4UfDejSWyewrgJfAgma
-X-Gm-Message-State: AOJu0YzJ4hg23NgVSeb6XEb/hRuAVT1UjXbt250X8rEAzn1VyRlZ1qU0
-	rX7g9eMoS3TReP1Tl6pCc3AZyNY3GUZ/HZ7200FexJ15gNHyv0ol2kpyndlV5A==
-X-Google-Smtp-Source: AGHT+IGp1R8GmfW8HUNyHIR3uCDgu524YP5Rj7c/dj/PXh/ZNJ7GIsh+Jq6UmTViK5/nupAbScuJgQ==
-X-Received: by 2002:a05:6808:1381:b0:3c3:ccf2:7f5e with SMTP id c1-20020a056808138100b003c3ccf27f5emr353054oiw.11.1711517926472;
-        Tue, 26 Mar 2024 22:38:46 -0700 (PDT)
-Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
-        by smtp.gmail.com with ESMTPSA id g16-20020aa79f10000000b006e669357e83sm6941515pfr.189.2024.03.26.22.38.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 22:38:45 -0700 (PDT)
-Date: Wed, 27 Mar 2024 05:38:42 +0000
-From: Mingwei Zhang <mizhang@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>,
-	Zhang Xiong <xiong.y.zhang@intel.com>,
-	Like Xu <like.xu.linux@gmail.com>,
-	Jinrong Liang <cloudliang@tencent.com>,
-	Dapeng Mi <dapeng1.mi@intel.com>
-Subject: Re: [kvm-unit-tests Patch v3 06/11] x86: pmu: Remove blank line and
- redundant space
-Message-ID: <ZgOw4g61ejwD8oQ5@google.com>
-References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
- <20240103031409.2504051-7-dapeng1.mi@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521251170F;
+	Wed, 27 Mar 2024 05:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711518195; cv=fail; b=PQ0hMKNHEcnkC7xYCjXk3OSBBO6fZiHcu6lgmJ96+g0pfHXfHE0Gw3xKANSgLx7f4SarCKD/8lypqH2y9wZurJ4kFeYI8eYowN8IvsPMVV5m44eWhkxHZB3BUDuP34u16su4YDg1Gtt5zXZsixiIPQZXRTCGPfWl39v6idy6YTE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711518195; c=relaxed/simple;
+	bh=NG9hMChcaCi+j6JGdaNZjk9tvIzR7RSDJ2hDKYwkoUQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qDCaS1QHSxteVWCHYUiuXbJqhLlU17oPGl2QBnWi3FHZ9L6S7TUBImosML2w8bf3V/SPjaC9Er/VHcW1A2EVHEsCgFwP22njqkFwY3b8MPUZQL1jGZaIBa6Nv8z2IXGl8tcSjzC6rzZ7Xec1WFJNC0ko9UWKGpT9rmptmYSwt0A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=X0RmUpBR; arc=fail smtp.client-ip=40.107.243.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FMxiYlLIT9lQYQJnBnvRVtpuuka5TiisVT/IUC1kI3ZgbH3pKZrasAql2qO81d9naFW2EGQ6Iz0CZAWF779czM8p5ZN5IsYyiOw6p2/ltH7obVTyn3N0BAmwMjXq4V6uTSD+QXg1o3606V/PNtXQoH1xWBenapnG6cerSpvt/89AkLDrKDALQCR+LGktLTMypOXPJYEB23O+HssppV7GhOI0P21HGxndHC32X0HcTG8FYjaR9Eu8rxk/Y2iaYPzip4cFLe90X4wfQusw1ZbzcBP3LUjLWBW/Wt5uvsqANvumMhl80TmIzGVmMquVvKeLI4qvSLR1YO1/FlQBP9ecXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0CprrxlFKK3LRhWtZVs5VPT03qjw8ehkvVoW0C8gwK4=;
+ b=HQUsrTnuc/UY8OYpNwl1+5oBXjqhsL+FVxKmBUDpEzWxPy4HnWEXcpUrcVExZj3NfpBj0e+6Evy8BTFPY3X9vZXbwOmdw9VzNLCRG1vkeqbiQtBPoxdgFUD7bleYgFjx1wCxhjMI4+rBVzx0VENEA+lKNoc8WDcP0kdIqaz99rxDe4rTgVUW3pIhtjY9E0De3aeJIQcanoSXswN1eozgYrVJCLHZ3VGMXMbTKtZocTT0mUvUsNtT6lQrTkXkJYB/SukyEen8ewKWuvSkb0ZB36e9OQnwZHvnDaCibVx6/Hcb3FV6q7dhmKupeqkBRiZnEL9AeE0NQd2JBqMzlIlh3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0CprrxlFKK3LRhWtZVs5VPT03qjw8ehkvVoW0C8gwK4=;
+ b=X0RmUpBRq6A0rPVhO8zUoAXd4bU/gggm4Cikw1eMs5d8cPzN7jF1Ej5Oxrq1IpwraL9DJtzIynPa67a8vMBPNOeP6c3fnzIhStZ1hJWUbL5o3uV+05ib+J4suWx80DB8KUNqYOQp/j9iuW/v7BXIXQKRFADswi8zNxCsNt/JtVQ=
+Received: from CH0PR04CA0017.namprd04.prod.outlook.com (2603:10b6:610:76::22)
+ by SA1PR12MB7222.namprd12.prod.outlook.com (2603:10b6:806:2bf::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Wed, 27 Mar
+ 2024 05:43:11 +0000
+Received: from CH1PEPF0000AD75.namprd04.prod.outlook.com
+ (2603:10b6:610:76:cafe::61) by CH0PR04CA0017.outlook.office365.com
+ (2603:10b6:610:76::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.13 via Frontend
+ Transport; Wed, 27 Mar 2024 05:43:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH1PEPF0000AD75.mail.protection.outlook.com (10.167.244.54) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7409.10 via Frontend Transport; Wed, 27 Mar 2024 05:43:10 +0000
+Received: from chalupa-4a00host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 27 Mar
+ 2024 00:43:09 -0500
+From: Manali Shukla <manali.shukla@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+CC: <pbonzini@redhat.com>, <seanjc@google.com>, <shuah@kernel.org>,
+	<nikunj@amd.com>, <thomas.lendacky@amd.com>, <manali.shukla@amd.com>
+Subject: [PATCH v1 0/3] Add a test case for KVM_X86_DISABLE_EXIT
+Date: Wed, 27 Mar 2024 05:42:52 +0000
+Message-ID: <20240327054255.24626-1-manali.shukla@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240103031409.2504051-7-dapeng1.mi@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD75:EE_|SA1PR12MB7222:EE_
+X-MS-Office365-Filtering-Correlation-Id: e9c3fd63-e98f-4ef3-9c34-08dc4e20c999
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	oOMSimNS9azvlS9wtPL0mTHReGdrGbfWfXuAVrSdYwOWWu2PHryvqbJKMDX8+yDGzdbd6iuuJN0Y7vE/bGcqqKN1hZVXqIy/v8JRwLL9ateSAlROVByOFjl6OhqZXGc8NuyryS4/xSkAs0RTTlKKVPzR2bFc7A242wiOWAWmas72roI/VtfCco6rMQLpDE02xPnnYbUdQsxatqSVqPwle+8aFFVV/nw8cqfVGHS6B2tQWse8p/DuFwRd5p7A32VKPjy77SBPQGc8HuMa2NKc7wQBxpB7aaz3EmrDK6wgqes3tWRDqvbaT/TC8WAfqAdBQN3uxyhLWJlRWNab9tC6JkITUTiGS0FUyQeVkT1RqpvKBXQnJ7nyAIG7qPhZ0QAN3Rcxtf/z8jjpg2l/tf8M8oiy+lRMhLmpdymYdHziu6LOCw6buDHNaBn/FjYRWSH+z0pgybI6oOY5arLuzvvDFu0XFUF3UcjeUevNflpK+nP0XICQeSLATnZAhchcrQQP8iDpp+26CvCz4jhoc7shejiTS8UyqD9lGW+OOcvELoIw2CHD3y47QqLGX2njnpXayLSIb4iQxw6bPiJMDdSn+maB9uQ6jiFCDVr4TRsWJWuIld+dbShwowXOvtebw5otaPb2T4+DEDFEG1evrd7l3RbfC1dbHB3pr4d0wcn9IALeLLx7Ws4rImSzl5uv9XBseHocWZ2mvAxyfdUmT+3T69qo/UWYlqnctRROLHP4rEC/lEfHlVGFb6tWRc/P7tpP
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(376005)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2024 05:43:10.7350
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9c3fd63-e98f-4ef3-9c34-08dc4e20c999
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD75.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7222
 
-On Wed, Jan 03, 2024, Dapeng Mi wrote:
-> code style changes.
-> 
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  x86/pmu.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index a2c64a1ce95b..46bed66c5c9f 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -207,8 +207,7 @@ static noinline void __measure(pmu_counter_t *evt, uint64_t count)
->  static bool verify_event(uint64_t count, struct pmu_event *e)
->  {
->  	// printf("%d <= %ld <= %d\n", e->min, count, e->max);
-> -	return count >= e->min  && count <= e->max;
-> -
-> +	return count >= e->min && count <= e->max;
->  }
->  
->  static bool verify_counter(pmu_counter_t *cnt)
-> -- 
-> 2.34.1
-> 
+By default, HLT instruction executed by guest is intercepted by hypervisor.
+However, KVM_CAP_X86_DISABLE_EXITS capability can be used to not intercept
+HLT by setting KVM_X86_DISABLE_EXITS_HLT.
+
+By default, vms are created with in-kernel APIC support in KVM selftests.
+VM needs to be created without in-kernel APIC support for this test, so
+that HLT will exit to userspace. To do so, __vm_create() is modified to not
+call KVM_CREATE_IRQCHIP ioctl while creating vm.
+
+Add a test case to test KVM_X86_DISABLE_EXITS_HLT functionality.
+
+Patch 1, 2 -> Preparatory patches to add the KVM_X86_DISABLE_EXITS_HLT test
+              case 
+Patch 3 -> Adds a test case for KVM_X86_DISABLE_EXITS_HLT
+
+Testing done:
+Tested KVM_X86_DISABLE_EXITS_HLT test case on AMD and Intel machines.
+
+Manali Shukla (3):
+  KVM: selftests: Add safe_halt() and cli() helpers to common code
+  KVM: selftests: Change __vm_create() to create a vm without in-kernel
+    APIC
+  KVM: selftests: Add a test case for KVM_X86_DISABLE_EXITS_HLT
+
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ tools/testing/selftests/kvm/dirty_log_test.c  |   2 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   4 +-
+ .../selftests/kvm/include/x86_64/processor.h  |  17 +++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  11 +-
+ .../kvm/x86_64/halt_disable_exit_test.c       | 113 ++++++++++++++++++
+ .../kvm/x86_64/ucna_injection_test.c          |   2 +-
+ 7 files changed, 143 insertions(+), 7 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+
+
+base-commit: e9da6f08edb0bd4c621165496778d77a222e1174
+-- 
+2.34.1
+
 
