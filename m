@@ -1,276 +1,112 @@
-Return-Path: <kvm+bounces-12892-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12893-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6491E88EC96
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 18:26:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18FC788EC9B
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 18:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD4F61F32843
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 17:26:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A9EE1C2F2DC
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 17:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EFEC14D704;
-	Wed, 27 Mar 2024 17:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1AE314E2CC;
+	Wed, 27 Mar 2024 17:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kr9k3wRh"
+	dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b="l2dylyxA"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E242112D747
-	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 17:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B39A14C5A2
+	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 17:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711560396; cv=none; b=LQtsjAWrXseBDtXORYmkrlS7lrnSvC3rkQ5JnSJsJVl6udl9HujHvpZCsWfLa4GhfXlJj5hlebX5XMaul7ucyliQfTM3p6UMtA9SScV7J/mvB30dq3FFGXnotyjvsXfX+kJz+aOL5VEEflI83E1OrYJETVNGRu7vZVAY2D8cqiA=
+	t=1711560428; cv=none; b=J9WMQDZihHplAYp+UBL1r4GKNlnkou2lgyaYtP4Dn2tAWWUzt9BpzjvzBDe/uvcfwPa78tZ1TcnH/l4wMqAgAC+tnhBCLJF+dZ1MCAq4qmSuR89leKMtjRPeNsihgnw5OjNSR99Fy41kMHvolq9w6gr71Hn3aAUnMl5SQ6MijV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711560396; c=relaxed/simple;
-	bh=KO68VCsBjC7YXYAlyG5RlT0YZwWtlqL82EO6khY7yOQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=PFZAR53Z5xYM6R+46uLWwU6CpFoRrsIR6q0mMZIQXzWG6mHGcU0sFfY4FphSJMP5euWTBIQUmAXjQjRZUTKTdZk6IX/dvX3bPlgrlRRMJpdUczW1zSyUO4QBmU8c6uV2Ugf66+HnOtvL/HIlawtLqY1C8IjzfGqSJ9AuyRrJ/OM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kr9k3wRh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711560393;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=/EOUB4d8qVh5umKC4okNLh+AeZuN4LrBRasgfUriSZs=;
-	b=Kr9k3wRhs+jRMmK8xERAYfP/2j426IngGWf/b8QoIl7OPxMphQ+wRy/ZF7J+alHDml1j5+
-	UlZgod6SGhkG1E7fLLWxRBNCMr0CBOlaQ0kJBLxrX9EdT7GhRWq9HWuf3FjLlX69CeIt3b
-	iCpXu/WlpPI3dbrUadYK6ok4yJsP+gE=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653--q4wM3kqOAiAJX96UCY4jQ-1; Wed, 27 Mar 2024 13:26:32 -0400
-X-MC-Unique: -q4wM3kqOAiAJX96UCY4jQ-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d491456df2so5634111fa.1
-        for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 10:26:32 -0700 (PDT)
+	s=arc-20240116; t=1711560428; c=relaxed/simple;
+	bh=suC0aon1kO1lvMDpWuInYC5evdT1O6yjZOLLAzUj1LM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gx/JPogbJYriUEcx89ROsAyKCO9b13KILdANeeEa1plxsAbKTeQt5o2XNwgV5Mw4ozUuc3cK0VoSEpIkcTgyE1PkkkfbcjgQEbHkXwE+yN7ZpifOjHF8gMGuBNgSXE7V4XaTLgGFXBTGpmIX6+d1dOUYSVyKdd7E2TDiw7L7grI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b=l2dylyxA; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33ececeb19eso4607599f8f.3
+        for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 10:27:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.com; s=cloud; t=1711560425; x=1712165225; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LOeWq64vcMpyC+dfgqU4qcoJI/qjRuI1jSd1ZXO7Aa8=;
+        b=l2dylyxA65PK9Z3lLHrq/lQC04cpXAcYmTg2rn9Lp9ouE9XXLLUoWBqywnWcnivtSE
+         FE82ONie3wv7bZn3vIA1BntOQkz/VFrvNWUG8DOFhXA2Ujf65TeAr/otMpp82dukofiL
+         WoFWVFsmc1/u+rkDvfyspwWcyu+w5Kpug51Xo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711560391; x=1712165191;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1711560425; x=1712165225;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/EOUB4d8qVh5umKC4okNLh+AeZuN4LrBRasgfUriSZs=;
-        b=SciYOGD1r9rZtA/xO90boZll/l54dzV5OZiVMQ6vghR57TtofsrJt4n8ihDZQbAP3z
-         c21Tv0EBls2Sj2dvMUegNEV3UC6+e9vd+ZkMhbOBSxjVX8vlRE0uKx2BHEqdp7etCom3
-         3/T9dpt8FTyYHu7lqPnduZejk3+D8SHwnObLhUXaYZIMDZq41Ofx9HizL9x/vsFuviYa
-         Y7QKZTEO21UjWRybME/w/V9dgDSzbmdSEOmPgOgORIoGvExR8uceCJoHezacbXE9wxyM
-         +ipLMEYn0am4+R+xRdFIj1ZwoTrVhsq/GLgIKXNXyuf1LpjUhU7/l0ETWn1KcBLS4w28
-         XaZg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+bZUxTZtHcXDNV2QYMU0l6xMdb1L4PScQatSI28UlcyC3zPsoatzrPamHg7ccc+HPuexDzw6cfrLPMf/jfNqfyICF
-X-Gm-Message-State: AOJu0Yzv+lQEMAMBUU2aCLIpozu7rXBN2ZjAPU14jCrcoR+lMUvvl+Oi
-	I1VNo+mxRNf0WB2ht/x7xB8EIGqzYfr82P7fYiJ1yDr504iJ0uPtaZwwuUcAfYOzYMJHh/lV0Bb
-	VejG9gXQrFmRoxGNn0RlSAJ8roVJshBQ9P3Y+puGwstsqUBkmcQ==
-X-Received: by 2002:a19:ca4b:0:b0:513:e69a:a1ff with SMTP id h11-20020a19ca4b000000b00513e69aa1ffmr72100lfj.33.1711560390555;
-        Wed, 27 Mar 2024 10:26:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFsrrH9Se2ailCE8t/vJCFLbo93g75ddmuCiDF++8BsJ7zx/RU+W9ujlWe6Cep9MzUutd5uVA==
-X-Received: by 2002:a19:ca4b:0:b0:513:e69a:a1ff with SMTP id h11-20020a19ca4b000000b00513e69aa1ffmr72081lfj.33.1711560389862;
-        Wed, 27 Mar 2024 10:26:29 -0700 (PDT)
-Received: from redhat.com ([2.52.20.36])
-        by smtp.gmail.com with ESMTPSA id e5-20020a196905000000b00515904f7ba3sm1947672lfc.198.2024.03.27.10.26.25
+        bh=LOeWq64vcMpyC+dfgqU4qcoJI/qjRuI1jSd1ZXO7Aa8=;
+        b=D+GP/KCLsSd3mcQ+UKjZL2VNbGNb1mSdI54FG5Hi8w11qoO8o2AjHRkFPY8zH8zeEb
+         2diIIAiHNC+mChCdJgRpjdMk1SQy+TdtTF2Wf4NnjT83FvGiVuTvMCLiqa/SoFKcw3R1
+         9uoTDs2WjXK0lesjK4cY3Ba7j8BDxBQC70JIPvuGEKp82VAbtgMP8EsgObpmA94pszWC
+         6TErcZ2HFHCRiZxIAdtC26+1IiypQWxjRbXUTnkIEj2k5uTKnkKUFdtOBKIo/4FsSaA1
+         VHUjQe7AMzbJNR7rZkIoNNqdbihXUtXPlQgLr+zzs0W+NMx+N71Fh3j/S0OuKE7wzi6P
+         lpxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVIPXIIQSFPbuTM1H+tz5u2cxGhFD5P84TImGpUGQdjXvysGXQoGlTwLSVgBrE2KmQPoOxNXizU/4wu7hbVpm+P9u9f
+X-Gm-Message-State: AOJu0YweU6/SM0cN+onjgbuxfosefJwL9eMiLPBhy1QtnTZLxPgio9+Y
+	hOepvw7qxYh84xicrZjmwdiqmVGc/rUzWpmjYVvaEw64XLjBoKtVMSvN89sS5x0=
+X-Google-Smtp-Source: AGHT+IHr9JM+c5QDCOdkTDoDNItACvq5s9onzO3m1fxTIw9ef9+p/5BHroxQSnJUYc67vBX8mZewQg==
+X-Received: by 2002:adf:eccc:0:b0:341:d64e:4966 with SMTP id s12-20020adfeccc000000b00341d64e4966mr424121wro.61.1711560425465;
+        Wed, 27 Mar 2024 10:27:05 -0700 (PDT)
+Received: from perard.uk.xensource.com (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
+        by smtp.gmail.com with ESMTPSA id fa7-20020a056000258700b00341c6b53358sm10953709wrb.66.2024.03.27.10.27.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 10:26:29 -0700 (PDT)
-Date: Wed, 27 Mar 2024 13:26:23 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
-	Will Deacon <will@kernel.org>, Jason Wang <jasowang@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: [PATCH untested] vhost: order avail ring reads after index updates
-Message-ID: <f7be6f4ed4bc5405e9a6b848e5ac3dd1f9955c2a.1711560268.git.mst@redhat.com>
+        Wed, 27 Mar 2024 10:27:05 -0700 (PDT)
+Date: Wed, 27 Mar 2024 17:27:04 +0000
+From: Anthony PERARD <anthony.perard@cloud.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: David Woodhouse <dwmw@amazon.co.uk>, qemu-devel@nongnu.org,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Paul Durrant <paul@xen.org>, qemu-arm@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	xen-devel@lists.xenproject.org, qemu-block@nongnu.org,
+	kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH-for-9.0 v2 16/19] hw/xen/xen_pt: Add missing license
+Message-ID: <71182998-214b-4e38-8420-79edb92ec09c@perard>
+References: <20231114143816.71079-1-philmd@linaro.org>
+ <20231114143816.71079-17-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231114143816.71079-17-philmd@linaro.org>
 
-vhost_get_vq_desc (correctly) uses smp_rmb to order
-avail ring reads after index reads.
-However, over time we added two more places that read the
-index and do not bother with barriers.
-Since vhost_get_vq_desc when it was written assumed it is the
-only reader when it sees a new index value is cached
-it does not bother with a barrier either, as a result,
-on the nvidia-gracehopper platform (arm64) available ring
-entry reads have been observed bypassing ring reads, causing
-a ring corruption.
+On Tue, Nov 14, 2023 at 03:38:12PM +0100, Philippe Mathieu-Daudé wrote:
+> Commit eaab4d60d3 ("Introduce Xen PCI Passthrough, qdevice")
+> introduced both xen_pt.[ch], but only added the license to
+> xen_pt.c. Use the same license for xen_pt.h.
+> 
+> Suggested-by: David Woodhouse <dwmw@amazon.co.uk>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-To fix, factor out the correct index access code from vhost_get_vq_desc.
-As a side benefit, we also validate the index on all paths now, which
-will hopefully help catch future errors earlier.
+Fine by me. Looks like there was a license header before:
+https://xenbits.xen.org/gitweb/?p=qemu-xen-unstable.git;a=blob;f=hw/pass-through.h;h=0b5822414e24d199a064abccc4d378dcaf569bd6;hb=HEAD
+I don't know why I didn't copied it over here.
 
-Note: current code is inconsistent in how it handles errors:
-some places treat it as an empty ring, others - non empty.
-This patch does not attempt to change the existing behaviour.
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Cc: stable@vger.kernel.org
-Reported-by: Gavin Shan <gshan@redhat.com>
-Reported-by: Will Deacon <will@kernel.org>
-Suggested-by: Will Deacon <will@kernel.org>
-Fixes: 275bf960ac69 ("vhost: better detection of available buffers")
-Cc: "Jason Wang" <jasowang@redhat.com>
-Fixes: d3bb267bbdcb ("vhost: cache avail index in vhost_enable_notify()")
-Cc: "Stefano Garzarella" <sgarzare@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+Thanks,
 
-I think it's better to bite the bullet and clean up the code.
-Note: this is still only built, not tested.
-Gavin could you help test please?
-Especially on the arm platform you have?
-
-Will thanks so much for finding this race!
-
-
- drivers/vhost/vhost.c | 80 +++++++++++++++++++++++--------------------
- 1 file changed, 42 insertions(+), 38 deletions(-)
-
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 045f666b4f12..26b70b1fd9ff 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1290,10 +1290,38 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
- 		mutex_unlock(&d->vqs[i]->mutex);
- }
- 
--static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq,
--				      __virtio16 *idx)
-+static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
- {
--	return vhost_get_avail(vq, *idx, &vq->avail->idx);
-+	__virtio16 idx;
-+	u16 avail_idx;
-+	int r = vhost_get_avail(vq, idx, &vq->avail->idx);
-+
-+	if (unlikely(r < 0)) {
-+		vq_err(vq, "Failed to access avail idx at %p: %d\n",
-+		       &vq->avail->idx, r);
-+		return -EFAULT;
-+	}
-+
-+	avail_idx = vhost16_to_cpu(vq, idx);
-+
-+	/* Check it isn't doing very strange things with descriptor numbers. */
-+	if (unlikely((u16)(avail_idx - vq->last_avail_idx) > vq->num)) {
-+		vq_err(vq, "Guest moved used index from %u to %u",
-+		       vq->last_avail_idx, vq->avail_idx);
-+		return -EFAULT;
-+	}
-+
-+	/* Nothing new? We are done. */
-+	if (avail_idx == vq->avail_idx)
-+		return 0;
-+
-+	vq->avail_idx = avail_idx;
-+
-+	/* We updated vq->avail_idx so we need a memory barrier between
-+	 * the index read above and the caller reading avail ring entries.
-+	 */
-+	smp_rmb();
-+	return 1;
- }
- 
- static inline int vhost_get_avail_head(struct vhost_virtqueue *vq,
-@@ -2498,38 +2526,21 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
- {
- 	struct vring_desc desc;
- 	unsigned int i, head, found = 0;
--	u16 last_avail_idx;
--	__virtio16 avail_idx;
-+	u16 last_avail_idx = vq->last_avail_idx;
- 	__virtio16 ring_head;
- 	int ret, access;
- 
--	/* Check it isn't doing very strange things with descriptor numbers. */
--	last_avail_idx = vq->last_avail_idx;
- 
- 	if (vq->avail_idx == vq->last_avail_idx) {
--		if (unlikely(vhost_get_avail_idx(vq, &avail_idx))) {
--			vq_err(vq, "Failed to access avail idx at %p\n",
--				&vq->avail->idx);
--			return -EFAULT;
--		}
--		vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
--
--		if (unlikely((u16)(vq->avail_idx - last_avail_idx) > vq->num)) {
--			vq_err(vq, "Guest moved used index from %u to %u",
--				last_avail_idx, vq->avail_idx);
--			return -EFAULT;
--		}
-+		ret = vhost_get_avail_idx(vq);
-+		if (unlikely(ret < 0))
-+			return ret;
- 
- 		/* If there's nothing new since last we looked, return
- 		 * invalid.
- 		 */
--		if (vq->avail_idx == last_avail_idx)
-+		if (!ret)
- 			return vq->num;
--
--		/* Only get avail ring entries after they have been
--		 * exposed by guest.
--		 */
--		smp_rmb();
- 	}
- 
- 	/* Grab the next descriptor number they're advertising, and increment
-@@ -2790,25 +2801,21 @@ EXPORT_SYMBOL_GPL(vhost_add_used_and_signal_n);
- /* return true if we're sure that avaiable ring is empty */
- bool vhost_vq_avail_empty(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- {
--	__virtio16 avail_idx;
- 	int r;
- 
- 	if (vq->avail_idx != vq->last_avail_idx)
- 		return false;
- 
--	r = vhost_get_avail_idx(vq, &avail_idx);
--	if (unlikely(r))
--		return false;
--	vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
-+	r = vhost_get_avail_idx(vq);
- 
--	return vq->avail_idx == vq->last_avail_idx;
-+	/* Note: we treat error as non-empty here */
-+	return r == 0;
- }
- EXPORT_SYMBOL_GPL(vhost_vq_avail_empty);
- 
- /* OK, now we need to know about added descriptors. */
- bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- {
--	__virtio16 avail_idx;
- 	int r;
- 
- 	if (!(vq->used_flags & VRING_USED_F_NO_NOTIFY))
-@@ -2832,13 +2839,10 @@ bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- 	/* They could have slipped one in as we were doing that: make
- 	 * sure it's written, then check again. */
- 	smp_mb();
--	r = vhost_get_avail_idx(vq, &avail_idx);
--	if (r) {
--		vq_err(vq, "Failed to check avail idx at %p: %d\n",
--		       &vq->avail->idx, r);
-+	r = vhost_get_avail_idx(vq);
-+	/* Note: we treat error as empty here */
-+	if (r < 0)
- 		return false;
--	}
--	vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
- 
- 	return vq->avail_idx != vq->last_avail_idx;
- }
 -- 
-MST
-
+Anthony PERARD
 
