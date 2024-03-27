@@ -1,263 +1,175 @@
-Return-Path: <kvm+bounces-12756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AD9988D600
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:44:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B314A88D623
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:57:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E84351F28190
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 05:44:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B3911F2A0BC
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 05:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76EF1C6B4;
-	Wed, 27 Mar 2024 05:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF7E1DA21;
+	Wed, 27 Mar 2024 05:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DIMxxUda"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YQ7unryc"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2046.outbound.protection.outlook.com [40.107.92.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86E1171CC;
-	Wed, 27 Mar 2024 05:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711518197; cv=fail; b=nD/mcdsS4in6p+bhyjCYhjunR5UkW468zYZNPZOSwvCNvm9DumxGm7KwkuaT1n4E3NAZHlLhYTZwr3xU7tNjv7Lus+v5Z48klUrvbnVUWgDXjiFrSIF+AkgAn2V+qHw4CEJhVigNCSd1HNqT09j6e632qnSPWiLsMN42BeHGFPA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711518197; c=relaxed/simple;
-	bh=dw8dBinq3tE3t53/PPwMenGmaGsRyDZL+du91C9yWnQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LAGCF9dszhErcoM5iRgEV3KcaVKoVWWj54QNcoxEGpV7jDvg2zUtlO2D2BwQLViYPoxn0zKs8mSAKvSn1gi62iFQ2rYq6KJtMUiMO+rYpYwFiZ0GJ3KphAu/Uj9HO9Cct25durcKMvlBus0+b5ZfocgznWsLru4n904Nhk3p2dY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DIMxxUda; arc=fail smtp.client-ip=40.107.92.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BGGG1mwLvI2a8psol5ueVmfPVxRocquNoAtZoXOgh4q3bHSp2uB6L8BQyPK0c4mnq1aYAM8f9oYksQ5SB2Z7rS6zqOMejGG4lO9ks9mIGujHnhHxpxK9L0KE1xUb+mSf6YY0cEK46BxKX88oBMl/eU27+/oLXN19O4a2jgUUCfB9o/+oZIH3RVDpnrLzkb2VAwoITIVdqbIn9J17BpIj54CWFQEN4oj0PCN8sSTsHXZdnUmczoHdja+IQiRdSb3QsE62zhKPDJrV1G0TfKCTyVom+B5O35gA8ECOkyFM9Ly/bz+BjuYOHzemuVxNJCpdNDep1CP7i03qWzNbwGJ6aw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4Ejoj9ojfpD7FEqtatnIcbZZK+y1kNu1zg+AMRd/T/E=;
- b=DA4fldq9rkf3/bBeLdXU10U5sCLo3IBwYt6w2RD/JiJ1C0Uqb6bGdj9Qsnq6K412ZlAexe2W5xtBMfVxxYumvqP6xBy1k0zd/SvrFBXMHqvQcDqxblZSDuqdAYj54LX5vqRTd1Swdnz8fKuRl/7Wt/LuJdTsTDO8WcApHsmWMtu5V9C+RKBKxhl0tCp3ZWo3wvFSV/a7oLu2IRx4hF+Pmor+iwZZfC/zcGVSGwediFulwPnMXqxa+LKKKAiwe+5sIdLovNA4Uc+cQHgkVQVYYDZsOT6KSOcqaPl0ndHJXLYEOgd1FDFXCktspq0FZH+tyjdzn6ldAhY0G7jmun677w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4Ejoj9ojfpD7FEqtatnIcbZZK+y1kNu1zg+AMRd/T/E=;
- b=DIMxxUdaSs0kQcS4MWMnI2zn0ASIqKJma8/vkn3pCsFPSyx8EQbhTwV+GBx0REVM5pqjLEa0lmx4cOO5kFkRBUqDJTCwEMC6PGByeRQ4u6lbh/8szvmeW9alVIrS0rL3vRMOpFm37Rtw+x9uGj1tZKdp45CuQbM3HStd1m2Z1oA=
-Received: from CH5PR03CA0019.namprd03.prod.outlook.com (2603:10b6:610:1f1::27)
- by DM4PR12MB5866.namprd12.prod.outlook.com (2603:10b6:8:65::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.32; Wed, 27 Mar 2024 05:43:13 +0000
-Received: from CH1PEPF0000AD77.namprd04.prod.outlook.com
- (2603:10b6:610:1f1:cafe::99) by CH5PR03CA0019.outlook.office365.com
- (2603:10b6:610:1f1::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.13 via Frontend
- Transport; Wed, 27 Mar 2024 05:43:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH1PEPF0000AD77.mail.protection.outlook.com (10.167.244.55) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Wed, 27 Mar 2024 05:43:12 +0000
-Received: from chalupa-4a00host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 27 Mar
- 2024 00:43:11 -0500
-From: Manali Shukla <manali.shukla@amd.com>
-To: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <shuah@kernel.org>,
-	<nikunj@amd.com>, <thomas.lendacky@amd.com>, <manali.shukla@amd.com>
-Subject: [PATCH v1 3/3] KVM: selftests: Add a test case for KVM_X86_DISABLE_EXITS_HLT
-Date: Wed, 27 Mar 2024 05:42:55 +0000
-Message-ID: <20240327054255.24626-4-manali.shukla@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240327054255.24626-1-manali.shukla@amd.com>
-References: <20240327054255.24626-1-manali.shukla@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4908E572
+	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 05:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711519056; cv=none; b=iudHCY1CPcL9vsjlsiANha3CsOtwv2/56PONWV5WCHApVvKxqpx/OmthN5e3rBmaKZ3zyVltbtsUrHXo5YSn8MrqyY9mb8MJ8d6J2N5wssJG3yABOnfEk5OXpASNoA5OQwcu+6JprcTlnYZttEBNU+KSEyNxGrd85dfiCWS9jZs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711519056; c=relaxed/simple;
+	bh=A+E6Q8O/+odDiW3CmDioCMgwZfI7X8h9ZMP4WmUHwBE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g+kgy3J5ktk2iZWdZv74IsRbgLT2UuMZRqtEjKNN5hIZpYLlW6wlkaX4hXnbzaWjjtfD+2rFssQscQydg532ZM4YQR5uH+HcfAYpc17AEyJ7LCh2j2xUjNkTqRZinpvgJUlz2Bdz7pvr0O6AhHWtDPA+ZiH2r9m/qfHNH43s7Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YQ7unryc; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a466fc8fcccso805009966b.1
+        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 22:57:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711519053; x=1712123853; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vauhzS1zFrSoAno2ebrQWSRp6RiLw20nALTCk+DSh4A=;
+        b=YQ7unrycEQzcL0CpfY7iaq8l+p0vR5BmeT1rDhDj4xbxg2DhKiY1Kf1CgvA1o4geDC
+         zb9ZsQsBKmIrmKceYOpf6HSVIGcPhIQsCbsIdKnovz4uZnJiuMZRzFTwr7TacgYlP9zr
+         FPi1hmr7ifb1dhK5hP4NWXNpr8NL0Pa3ETyumrif0HRQuABgeUoqE7RqpqFI1hn3sm8v
+         BuwQyJCArIgpNbx/fqzwaAINx9dRolmNZovSG+3A5PyoErSPVbP3q2pC2ngr1VL1Fqb4
+         Yk5xBBygI+nz87qnXovPxXIijSJRrS3pvhZr2u6Ouwl/sXzsYjxQto9H9xkXk+6+ZOUi
+         sH8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711519053; x=1712123853;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vauhzS1zFrSoAno2ebrQWSRp6RiLw20nALTCk+DSh4A=;
+        b=PkWG+feGKsAAtTlMcWRwCdV8ZQpBOo9nlPdMq5ycp3OsAQ6Wun0ieaZNvw9wZMkFfg
+         7UQCd5QvqhJ2fnbyk4olWbIxk4reF600Dev/QnN0S4aaoi6JRW/744LjapmE9Stuhq32
+         SIuVm1/WRi7Csz1tDYs9bsJ121I7kU9tacR2RAq9bXC+wogYX5TuUI3mBJksxnikxuHx
+         4eG6vh7/CipLhr0QeZErY8l5i51rB3W0Fw1Szij+KeXGwPzzAFlgddFlj4djnL9V55X0
+         xPy4SrJcKcbGd7UlvvOHXSHpV7FNp7JyzVtvS6/GKNz9sfgjNVfRz3tW/RnFkcu6d88e
+         GsiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHT340lHElGx9IGjHOhevTo587/kRWqvRsYmOQpNI8VF9VVPGBCV8KPnwgNkO5/qPpyd1/cmHExyWi79439EGOa0ZK
+X-Gm-Message-State: AOJu0YyfygbcU7RstRteEfLOIQamNHRrA//xPTgdCcWzeEX0RD6hNVBI
+	173XsQUyuI8J04sPtrE56PTuXQ1y6g9VTwzeuxdY9AfUJNTeGltMNskdDT/6NxY=
+X-Google-Smtp-Source: AGHT+IHgkILYmFrhP+1BUm5J8vIOXx7XAe6AnD/e+QIq7e6Sav87TDQXgMfr4F3e8r5OX6uegtkhNg==
+X-Received: by 2002:a17:906:c35a:b0:a47:223f:2285 with SMTP id ci26-20020a170906c35a00b00a47223f2285mr2239743ejb.7.1711519053181;
+        Tue, 26 Mar 2024 22:57:33 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.199.128])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170906354a00b00a47a33b3aa2sm3466993eja.157.2024.03.26.22.57.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Mar 2024 22:57:32 -0700 (PDT)
+Message-ID: <f23f2e60-e5c0-4c3c-9722-dba63a6e7ef6@linaro.org>
+Date: Wed, 27 Mar 2024 06:57:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD77:EE_|DM4PR12MB5866:EE_
-X-MS-Office365-Filtering-Correlation-Id: 527d1de0-10e3-4892-894c-08dc4e20cac9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	mxSGyvqr/0OSg7d8IYXr7ZUxEEWW17zdnBkU8Wr6vArJBZjjzKlFGEZgoVLIGAyr4EmoYGfVNWE/5YqDp4lHMab8XAvGSbFT56V6HJJdrbuVbMvJXqw12Gofaewxe1IuefaT6mpA1bIwPLWlEmhNwdFqHol2Pik2fvylHSxzi3rnLMneyi8f08b6j8JGkAzEQ+HgbJ7GBrjFwnkI3atePiToozKTT71wGCsGKSI12F9QQ1Ae0XPBUHTk6/C/uIkwuRdp8PxpMHwbUORJW+b+9LdBs+oX2lQNwzZS+tQtRdjuBeP7JG5zXa7VXZZqDG23BORJ1nQcagEYf14d13V8jjfzJ4sRsofzqEVqGc2eVWuSKovhK8zQypBaHw6zY7LQefQlQd6/9svMl4scC0yCNz+Gh+uuA6VUgw98UwkQKrhZaSVcQIQ6LQkcSZFPBv5j53fcE1E+nH/UlTZKJbuiZGfF5eMjYSgVlX8MTVScHh7WCtfOn9qIz2d6nUu4Q75RorWjwZJYIx8XslzTBQWB65iJFtqUDoso/LDj9rfXfg8kQ9wba0ls/+632zxGrJ2Kj3A5Jwit+TsBnwx9fSF1lTgCeIBvC0aRrxOqSHQuwJ5oZPP5T4OCsmfECG1D87YenoTl7NCQu5uv6iw/6YkWNgKIoc7islohKczA+HFx4KWOE907UCMnL4DP66Gq4TFMSGAbW6dyGD2HftNG8wfi9fsE9EWpYpxvO10mDheRVq28r0SPFaAbdsEjZ3w91YQM
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(82310400014)(36860700004)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2024 05:43:12.7268
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 527d1de0-10e3-4892-894c-08dc4e20cac9
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD77.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5866
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/19] amba: store owner from modules with
+ amba_driver_register()
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Russell King <linux@armlinux.org.uk>, Mike Leach <mike.leach@linaro.org>,
+ James Clark <james.clark@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Andi Shyti
+ <andi.shyti@kernel.org>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-input@vger.kernel.org, kvm@vger.kernel.org
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+ <3f61d6d3-a0d6-4c49-b094-6ba62d09ab14@arm.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <3f61d6d3-a0d6-4c49-b094-6ba62d09ab14@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-By default, HLT instruction executed by guest is intercepted by hypervisor.
-However, KVM_CAP_X86_DISABLE_EXITS capability can be used to not intercept
-HLT by setting KVM_X86_DISABLE_EXITS_HLT.
+On 27/03/2024 00:24, Suzuki K Poulose wrote:
+> Hi Krzysztof
+> 
+> On 26/03/2024 20:23, Krzysztof Kozlowski wrote:
+>> Merging
+>> =======
+>> All further patches depend on the first amba patch, therefore please ack
+>> and this should go via one tree.
+> 
+> Are you able to provide a stable branch with these patches once you pull
 
-Add a test case to test KVM_X86_DISABLE_EXITS_HLT functionality.
+I doubt I will be merging this. I think amba code goes through Russell.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Manali Shukla <manali.shukla@amd.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/halt_disable_exit_test.c       | 113 ++++++++++++++++++
- 2 files changed, 114 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+> them in to "one tree" here ? We have changes coming up in the coresight
+> tree, which would conflict with the changes here (horribly).
+> 
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c75251d5c97c..9f72abb95d2e 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -89,6 +89,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
- TEST_GEN_PROGS_x86_64 += x86_64/state_test
-+TEST_GEN_PROGS_x86_64 += x86_64/halt_disable_exit_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
- TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
- TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
-diff --git a/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
-new file mode 100644
-index 000000000000..b7279dd0eaff
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
-@@ -0,0 +1,113 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KVM disable halt exit test
-+ *
-+ *  Copyright (C) 2024 Advanced Micro Devices, Inc.
-+ */
-+#include <pthread.h>
-+#include <signal.h>
-+#include "kvm_util.h"
-+#include "svm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+pthread_t task_thread, vcpu_thread;
-+#define SIG_IPI SIGUSR1
-+
-+static void guest_code(uint8_t is_hlt_exec)
-+{
-+	while (!READ_ONCE(is_hlt_exec))
-+		;
-+
-+	safe_halt();
-+	GUEST_DONE();
-+}
-+
-+static void *task_worker(void *arg)
-+{
-+	uint8_t *is_hlt_exec = (uint8_t *)arg;
-+
-+	usleep(1000);
-+	WRITE_ONCE(*is_hlt_exec, 1);
-+	pthread_kill(vcpu_thread, SIG_IPI);
-+	return 0;
-+}
-+
-+static void *vcpu_worker(void *arg)
-+{
-+	int ret;
-+	int sig = -1;
-+	uint8_t *is_hlt_exec = (uint8_t *)arg;
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_signal_mask *sigmask = alloca(offsetof(struct kvm_signal_mask, sigset)
-+						 + sizeof(sigset_t));
-+	sigset_t *sigset = (sigset_t *) &sigmask->sigset;
-+
-+	/* Create a VM without in kernel APIC support */
-+	vm = __vm_create(VM_SHAPE_DEFAULT, 1, 0, false);
-+	vm_enable_cap(vm, KVM_CAP_X86_DISABLE_EXITS, KVM_X86_DISABLE_EXITS_HLT);
-+	vcpu = vm_vcpu_add(vm, 0, guest_code);
-+	vcpu_args_set(vcpu, 1, *is_hlt_exec);
-+
-+	/*
-+	 * SIG_IPI is unblocked atomically while in KVM_RUN.  It causes the
-+	 * ioctl to return with -EINTR, but it is still pending and we need
-+	 * to accept it with the sigwait.
-+	 */
-+	sigmask->len = 8;
-+	pthread_sigmask(0, NULL, sigset);
-+	sigdelset(sigset, SIG_IPI);
-+	vcpu_ioctl(vcpu, KVM_SET_SIGNAL_MASK, sigmask);
-+	sigemptyset(sigset);
-+	sigaddset(sigset, SIG_IPI);
-+	run = vcpu->run;
-+
-+again:
-+	ret = __vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(errno, EINTR);
-+
-+	if (ret == -1 && errno == EINTR) {
-+		sigwait(sigset, &sig);
-+		assert(sig == SIG_IPI);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTR);
-+		goto again;
-+	}
-+
-+	if (run->exit_reason == KVM_EXIT_HLT)
-+		TEST_FAIL("Expected KVM_EXIT_INTR, got KVM_EXIT_HLT");
-+
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+	kvm_vm_free(vm);
-+	return 0;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int ret;
-+	void *retval;
-+	uint8_t is_halt_exec;
-+	sigset_t sigset;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_DISABLE_EXITS));
-+
-+	/* Ensure that vCPU threads start with SIG_IPI blocked.  */
-+	sigemptyset(&sigset);
-+	sigaddset(&sigset, SIG_IPI);
-+	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
-+
-+	ret = pthread_create(&vcpu_thread, NULL, vcpu_worker, &is_halt_exec);
-+	TEST_ASSERT(ret == 0, "pthread_create vcpu thread failed errno=%d", errno);
-+
-+	ret = pthread_create(&task_thread, NULL, task_worker, &is_halt_exec);
-+	TEST_ASSERT(ret == 0, "pthread_create task thread failed errno=%d", errno);
-+
-+	pthread_join(vcpu_thread, &retval);
-+	TEST_ASSERT(ret == 0, "pthread_join on vcpu thread failed with errno=%d", ret);
-+
-+	pthread_join(task_thread, &retval);
-+	TEST_ASSERT(ret == 0, "pthread_join on task thread failed with errno=%d", ret);
-+
-+	return 0;
-+}
--- 
-2.34.1
+You mean conflict with  coresight conversion to platform driver? Worst
+case it is solveable: just drop .owner.
+
+Best regards,
+Krzysztof
 
 
