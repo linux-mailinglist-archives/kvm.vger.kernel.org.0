@@ -1,175 +1,143 @@
-Return-Path: <kvm+bounces-12907-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12910-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB82788F23F
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 23:57:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0284988F353
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 352171F272A4
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 22:57:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F57129A81A
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 23:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED92E15443F;
-	Wed, 27 Mar 2024 22:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87AB415530E;
+	Wed, 27 Mar 2024 23:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LVgMZSPb"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="G+/0RXGe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D10C15219B;
-	Wed, 27 Mar 2024 22:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BFD1534EC
+	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 23:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711580220; cv=none; b=iRLBAhayXbnnDx5whRkNhsijBp2t9f7Py+JdPEH5yhPXL1Ihh6ppcAZmMHM1xxUdpWOIRfLi+HLZETVXf8g7RQMqR0Gkwh4DkzVxHbOXBwFyOIrqJGM/LPj+Xb4rhl1H5c4etpkEpSUKbuHOrS+MohKmA1Uwl1+qMiLkQULKERE=
+	t=1711583058; cv=none; b=vDstBDi7b7mCoUd65NyqsxtGvQPSB8XYBNUKkzHjsZ6JVD51bQoLMJPoKbd19MpXTW2G4ki8blMaiCDc+ZgbVWWLQ/wJR2I/flgHsnF029eH8W5ELxJNcO5VTgQEdHWYX5hwS3g4CSAW/0nglTFZTRlGNosm+JcHm1kDAHkByJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711580220; c=relaxed/simple;
-	bh=/WsGRor0OcIsp5twq3DCqyZDYfUawzcDpORqySW5HmA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tl7UAlYLttComqwwtB3X+KLm6KiTmQXvfYkZPRpMQGGlVFT2ENPOXfzw8ChPdvfeF67pw8XRITUEQ21lWuOvn9cxG/QKdhqfUuSc3YCTS583wbxLajdEzpkUsmZXVBLrdXedN4lqkqO93KzMrrx3B+9r2bkV5e0WcvJZVUqrTUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LVgMZSPb; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711580219; x=1743116219;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=/WsGRor0OcIsp5twq3DCqyZDYfUawzcDpORqySW5HmA=;
-  b=LVgMZSPbAN6AyEYdupw5c1D4LgSVjIgCvMtzQ4W94q/4NdHqMSwmGoVf
-   YSQkxKmvqbngcTh+w+UE2FNo5ksLyoN4zB2NvOojSpQdkOyitlgIfe2Ve
-   GLAbT1fkyFLHYI4FJgH7rAVzSU3pYV6aYuj8DyUB6CVZTzzbISuO01Pw9
-   EEu7VxtdOpHRJqjUzuZe/TRpSoozXn9c2ueZGp4yh+pSgj6UW34Uhn2cr
-   vF9LnEyZgxy1IzH7Z29bcwLvZQQVHZ1DE+2lbV48fun2RU2o5o9uKPOj/
-   h3/IRJ1TBObpAtrz4Qmrz+UyJH6C2vm1V/katakx0lqqdcXnMlLwrtEee
-   g==;
-X-CSE-ConnectionGUID: grbU7zUGRre0mD/XMJ3rGw==
-X-CSE-MsgGUID: iNaUGVOFQbOtwhDJw4Bo+g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6575146"
-X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="6575146"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 15:56:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="16285299"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 15:56:57 -0700
-Date: Wed, 27 Mar 2024 15:56:57 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"Zhang, Tina" <tina.zhang@intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Yuan, Hang" <hang.yuan@intel.com>,
-	"Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
-	"sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 044/130] KVM: TDX: Do TDX specific vcpu initialization
-Message-ID: <20240327225657.GG2444378@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <d6a21fe6ea9eb53c24b6527ef8e5a07f0c2e8806.1708933498.git.isaku.yamahata@intel.com>
- <3f4f164a6375c8ada364dd2a83562a506019db86.camel@intel.com>
+	s=arc-20240116; t=1711583058; c=relaxed/simple;
+	bh=dzBreCw05Zj1z2WXknwvtlBCs0CVANyQ6oNok2B+YWI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mcz6Bnc+Shp2gbf+xRfRR9nPI2i+dZz0B4uzQ/KUaeMGXQJE7qZqsWwhoe+kggTPfN39v6KuA71x9rMFCsX33MAOrBVs6PIaNzQ/yhLBAU42qJcw9I6y+L4tdnyif2BDIYsVzLohTjK00lsTgSclowTv4rk6JPgXy8atV4DHJpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=G+/0RXGe; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a465ddc2c09so19777666b.2
+        for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 16:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1711583055; x=1712187855; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uafOqS8+Hx03UMEMNJ98UkxQPudcualGmS525ViN+u4=;
+        b=G+/0RXGemv25P/Hg9aic/QOJWWkPl3ECvxPJ5Z8ILPNBe41hiuMiw7rnT95hKNdUMW
+         w3FzNtE11lJdGGK+mjV+Nde35g4YUELzWMGPZRURdsj0xmuyOnEe3MXOdNYtSqIGePfJ
+         hrukdWGqK6iCM73WjsVfVJSOpLbjG4XABs2bcRay+WM0v1hnfe9J/MmCRy5d+7M08Qw3
+         2deBSbvtz/8Ox2BrbkSOyJmIUgSnymNtX/rwm8cWOezqJ8pkjsAYXGQ+zUCuj6w3kJ6R
+         eG7zc4ifb3iFLkEK+0YTW8pg67F5XLJQ/CdqTiArIFbgB94X6J1gURX3BYzDkyJQpdEy
+         NH/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711583055; x=1712187855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uafOqS8+Hx03UMEMNJ98UkxQPudcualGmS525ViN+u4=;
+        b=okux54zBYOxrwkMXJV97e07MUQQPOgrwdeNHPtxJtz8WF1LT/vrQlvBuKlv6Aix/Lu
+         mhfrIunZPCo7xPJDoB8Oa1yzU/BZq5AK01EY1GgH1e6sgrsBnWLaftwqM5yKP6lDSifL
+         Jjg75SeMotHyBE3lrkr+yrclq0sK02oPG1qeblhb3tT2xknqTgPa45KDsggMWHh14Hxh
+         V3ZQMMOuzcLIARkg9Lc3CxBUZBQgL2CM55eSw+pfEsim++T0+PBq7k+cXMgkCOCPQtnG
+         rPVzIu1vVuosWZQdPRhFXYRhG1xdOX4C45A4MwCYWL1a/FdzTEumlsNTUWiayDegsaah
+         GtPA==
+X-Forwarded-Encrypted: i=1; AJvYcCWG/1jmj4UfCICnRksJ2z+dgu6XGS/+J440m/DyWhSUgsfHi7lpZXQgIGQcz6XdEKaELM5x6/rDuRVkOU50Iuiieyau
+X-Gm-Message-State: AOJu0YxKP/dPD9XDhOX4U0R9cp/9C7wqwz7ii1s+22DwTHh2QnEcrxSs
+	P+1cBF0cse/igGjeUv6afcCc23tiY4lcgRtZBHP3dYj2/ML3Bgn+3ZrPvhV5+LM=
+X-Google-Smtp-Source: AGHT+IG7URuP7axjuQKV/J+VTSyGmCmmaOiCo+Mv3EERteoqR/3prQyrSPwxKzpmfIt9Ury01gmlHg==
+X-Received: by 2002:a50:8a93:0:b0:56c:18b4:d2ab with SMTP id j19-20020a508a93000000b0056c18b4d2abmr1042066edj.42.1711583054754;
+        Wed, 27 Mar 2024 16:44:14 -0700 (PDT)
+Received: from localhost.localdomain (178.165.195.38.wireless.dyn.drei.com. [178.165.195.38])
+        by smtp.gmail.com with ESMTPSA id eo12-20020a056402530c00b00568afb0e731sm139243edb.63.2024.03.27.16.44.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 16:44:14 -0700 (PDT)
+From: Andrew Melnychenko <andrew@daynix.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: yuri.benditovich@daynix.com,
+	yan@daynix.com
+Subject: [PATCH v2 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
+Date: Thu, 28 Mar 2024 01:18:26 +0200
+Message-ID: <20240327231826.1725488-1-andrew@daynix.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <3f4f164a6375c8ada364dd2a83562a506019db86.camel@intel.com>
 
-On Wed, Mar 27, 2024 at 12:27:03AM +0000,
-"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
+When the Qemu launched with vhost but without tap vnet_hdr,
+vhost tries to copy vnet_hdr from socket iter with size 0
+to the page that may contain some trash.
+That trash can be interpreted as unpredictable values for
+vnet_hdr.
+That leads to dropping some packets and in some cases to
+stalling vhost routine when the vhost_net tries to process
+packets and fails in a loop.
 
-> On Mon, 2024-02-26 at 00:25 -0800, isaku.yamahata@intel.com wrote:
-> > +/* VMM can pass one 64bit auxiliary data to vcpu via RCX for guest BIOS. */
-> > +static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
-> > +{
-> > +       struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> > +       struct vcpu_tdx *tdx = to_tdx(vcpu);
-> > +       unsigned long *tdvpx_pa = NULL;
-> > +       unsigned long tdvpr_pa;
-> 
-> 
-> I think we could drop theselocal variables and just use tdx->tdvpr_pa and tdx->tdvpx_pa. Then we
-> don't have to have the assignments later.
+Qemu options:
+  -netdev tap,vhost=on,vnet_hdr=off,...
 
-Yes, let me clean it up. The old version acquired spin lock in the middle. Now
-we don't have it.
+From security point of view, wrong values on field used later
+tap's tap_get_user_xdp() and will affect skb gso and options.
+Later the header(and data in headroom) should not be used by the stack.
+Using custom socket as a backend to vhost_net can reveal some data
+in the vnet_hdr, although it would require kernel access to implement.
 
+The issue happens because the value of sock_len in virtqueue is 0.
+That value is set at vhost_net_set_features() with
+VHOST_NET_F_VIRTIO_NET_HDR, also it's set to zero at device open()
+and reset() routine.
+So, currently, to trigger the issue, we need to set up qemu with
+vhost=on,vnet_hdr=off, or do not configure vhost in the custom program.
 
-> > +       unsigned long va;
-> > +       int ret, i;
-> > +       u64 err;
-> > +
-> > +       if (is_td_vcpu_created(tdx))
-> > +               return -EINVAL;
-> > +
-> > +       /*
-> > +        * vcpu_free method frees allocated pages.  Avoid partial setup so
-> > +        * that the method can't handle it.
-> > +        */
-> > +       va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> > +       if (!va)
-> > +               return -ENOMEM;
-> > +       tdvpr_pa = __pa(va);
-> > +
-> > +       tdvpx_pa = kcalloc(tdx_info->nr_tdvpx_pages, sizeof(*tdx->tdvpx_pa),
-> > +                          GFP_KERNEL_ACCOUNT);
-> > +       if (!tdvpx_pa) {
-> > +               ret = -ENOMEM;
-> > +               goto free_tdvpr;
-> > +       }
-> > +       for (i = 0; i < tdx_info->nr_tdvpx_pages; i++) {
-> > +               va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> > +               if (!va) {
-> > +                       ret = -ENOMEM;
-> > +                       goto free_tdvpx;
-> > +               }
-> > +               tdvpx_pa[i] = __pa(va);
-> > +       }
-> > +
-> > +       err = tdh_vp_create(kvm_tdx->tdr_pa, tdvpr_pa);
-> > +       if (KVM_BUG_ON(err, vcpu->kvm)) {
-> > +               ret = -EIO;
-> > +               pr_tdx_error(TDH_VP_CREATE, err, NULL);
-> > +               goto free_tdvpx;
-> > +       }
-> > +       tdx->tdvpr_pa = tdvpr_pa;
-> > +
-> > +       tdx->tdvpx_pa = tdvpx_pa;
-> 
-> Or alternatively let's move these to right before they are used. (in the current branch 
-> 
-> > +       for (i = 0; i < tdx_info->nr_tdvpx_pages; i++) {
-> > +               err = tdh_vp_addcx(tdx->tdvpr_pa, tdvpx_pa[i]);
-> > +               if (KVM_BUG_ON(err, vcpu->kvm)) {
-> > +                       pr_tdx_error(TDH_VP_ADDCX, err, NULL);
-> > +                       for (; i < tdx_info->nr_tdvpx_pages; i++) {
-> > +                               free_page((unsigned long)__va(tdvpx_pa[i]));
-> > +                               tdvpx_pa[i] = 0;
-> > +                       }
-> > +                       /* vcpu_free method frees TDVPX and TDR donated to TDX */
-> > +                       return -EIO;
-> > +               }
-> > +       }
-> > 
-> > 
-> In the current branch tdh_vp_init() takes struct vcpu_tdx, so they would be moved right here.
-> 
-> What do you think?
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+---
+ drivers/vhost/net.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Yes, I should revise the error recovery path.
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f2ed7167c848..57411ac2d08b 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	hdr = buf;
+ 	gso = &hdr->gso;
+ 
++	if (!sock_hlen)
++		memset(buf, 0, pad);
++
+ 	if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+ 	    vhost16_to_cpu(vq, gso->csum_start) +
+ 	    vhost16_to_cpu(vq, gso->csum_offset) + 2 >
 -- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+2.43.0
+
 
