@@ -1,55 +1,56 @@
-Return-Path: <kvm+bounces-12818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A4888E19D
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 14:07:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE5FD88E1EC
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 14:15:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD5D71F25886
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 13:07:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0D1C1C2A3E1
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 13:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B4415AD80;
-	Wed, 27 Mar 2024 12:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5077415F3F4;
+	Wed, 27 Mar 2024 12:19:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSMH6NVa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHavZUA2"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317E315AACC;
-	Wed, 27 Mar 2024 12:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738F915F3E0;
+	Wed, 27 Mar 2024 12:19:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711541878; cv=none; b=VWBmX4YVhTSfzdAjdptyMsxnbsakBoh24sL4nPWb82xL2zjjFSZOjyX2xOQjGMPUIzyE875pyg1UJCnNsGc1+XKKyOxn+MIHIhy7Lk3wcLJ5YrdhUBxJFcVKQOY6K5HlC65Ypw+p0YcAynDT8LvKoqaTi0GIJ+54jZSsgOCAj4A=
+	t=1711541963; cv=none; b=cDpCL/zCbavUThvToLx05MXUCBOP4IBlcgl+BlLPav6a7pTmjMojTdK0QmulEP7GF4QrJgldHjViuQzin+ZizHxE9sua9tRB7zd3AYXoz3WvIjTlySUJne08+3rDh/PYTrrMaH6nYTshZNBEO/KqIUojnN4bKZST2/hoCoGBsr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711541878; c=relaxed/simple;
-	bh=Oho3RLGD+vio64BA6XLXZiOtGInp5Ez4xdhlbdvEnuI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bB+8d+8OoRlP4YOEkwiWTokAv1FZieOdhDf7d2Ycd9rm7KIx+C4VEfEEqKVVZ3ekkDe+eZY0zo37oKTH8l1bJycW/Qj0k+o8L5vxg+J+CoLoPVa9lyhk44pXohCSowzA5CBRWMWj+mBHX+ECu/XRCOCKmE+YBtmA77tP8xplZHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSMH6NVa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59424C433C7;
-	Wed, 27 Mar 2024 12:17:57 +0000 (UTC)
+	s=arc-20240116; t=1711541963; c=relaxed/simple;
+	bh=6y8QCnpHEVSwUIL96dKvPc4U0vMl4U0y6S/JyANItlM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dr7c5K2lDf1YzEARBrfMRS62DoTV1PcsrQ7qErjFKnXbOiWirDKQK1LAKM3ehk4zl1yJ+g/RuMWk4M+N7I3U5uxOxeegA8KR9yMT7eDyk0/tOTD5IMV6R7QIpOmsEgpsouyND91B4g2OGn6cMg0UnbyFqMpRDAwbv1z0D9UMmL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHavZUA2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8567FC433F1;
+	Wed, 27 Mar 2024 12:19:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711541878;
-	bh=Oho3RLGD+vio64BA6XLXZiOtGInp5Ez4xdhlbdvEnuI=;
+	s=k20201202; t=1711541963;
+	bh=6y8QCnpHEVSwUIL96dKvPc4U0vMl4U0y6S/JyANItlM=;
 	h=From:To:Cc:Subject:Date:From;
-	b=uSMH6NVa48n87muUVJdpG/fqVyAxEdGX5JgTYKjMaFGSQwtf+twpw542ErGjNSNDu
-	 jKUlmIoFbMTaR8Qq5eUbZL9fFrwLdj3RDG/8U59PcLebP8sYNHHowrk3j6TlP4j0KE
-	 eArmvkNOGy1aVgP6PonA3747RICYGObGv6JlSah4GJ0dhY1f6ufONdIUge643GhXhO
-	 aYGwk/ZMA+Pqhh7rVDB3ZVaR6p/VXNmypSoIJOrheHDwXIZZXjVZpltL6p+Vs45YVc
-	 MFE4+vM8fx0FqiB7W2iZ28EJb2wFG7Cvlkh2yOc+j773mCsiNE6sMOc+XxpXKVKG9Y
-	 thtttoU2e5kdA==
+	b=CHavZUA2Xsw6bEF8H9bJ8AH8f/0kasaxE1+eSlPk3SnSEwxyk2CZrH3BEpaRvpen9
+	 p4jPjRX7sMPHEKNOHt8Lh7ScF7su1GOiOnX5blIA8eEtMlww7x4ISa7VlRGdtwl6Gf
+	 zpWdS1ZUYJqxdmlgq75aIcAx3Afkx8Qjgmt41W7aA73wxxUHoO/G198lb7MU6lFNbm
+	 Xvf+ey+ftuBvH4DPBm1deBRY+HMqOpXxkKOikP21n3/zRvk3QHjD22l/3Ef0vAkvz2
+	 vK6d5nzdWp3Sf+m5UVAv8weCQMWDI5EYgpuUageaT0ncvd52wmMDI5WrbupSNsnlUC
+	 4qypbbHdzsEDw==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	alex.williamson@redhat.com
-Cc: Kevin Tian <kevin.tian@intel.com>,
+Cc: Diana Craciun <diana.craciun@oss.nxp.com>,
+	Kevin Tian <kevin.tian@intel.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "vfio/pci: Disable auto-enable of exclusive INTx IRQ" failed to apply to 5.10-stable tree
-Date: Wed, 27 Mar 2024 08:17:56 -0400
-Message-ID: <20240327121756.2833918-1-sashal@kernel.org>
+Subject: FAILED: Patch "vfio/fsl-mc: Block calling interrupt handler without trigger" failed to apply to 5.10-stable tree
+Date: Wed, 27 Mar 2024 08:19:21 -0400
+Message-ID: <20240327121921.2835117-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -71,67 +72,54 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From fe9a7082684eb059b925c535682e68c34d487d43 Mon Sep 17 00:00:00 2001
+From 7447d911af699a15f8d050dfcb7c680a86f87012 Mon Sep 17 00:00:00 2001
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 8 Mar 2024 16:05:22 -0700
-Subject: [PATCH] vfio/pci: Disable auto-enable of exclusive INTx IRQ
+Date: Fri, 8 Mar 2024 16:05:28 -0700
+Subject: [PATCH] vfio/fsl-mc: Block calling interrupt handler without trigger
 
-Currently for devices requiring masking at the irqchip for INTx, ie.
-devices without DisINTx support, the IRQ is enabled in request_irq()
-and subsequently disabled as necessary to align with the masked status
-flag.  This presents a window where the interrupt could fire between
-these events, resulting in the IRQ incrementing the disable depth twice.
-This would be unrecoverable for a user since the masked flag prevents
-nested enables through vfio.
+The eventfd_ctx trigger pointer of the vfio_fsl_mc_irq object is
+initially NULL and may become NULL if the user sets the trigger
+eventfd to -1.  The interrupt handler itself is guaranteed that
+trigger is always valid between request_irq() and free_irq(), but
+the loopback testing mechanisms to invoke the handler function
+need to test the trigger.  The triggering and setting ioctl paths
+both make use of igate and are therefore mutually exclusive.
 
-Instead, invert the logic using IRQF_NO_AUTOEN such that exclusive INTx
-is never auto-enabled, then unmask as required.
+The vfio-fsl-mc driver does not make use of irqfds, nor does it
+support any sort of masking operations, therefore unlike vfio-pci
+and vfio-platform, the flow can remain essentially unchanged.
 
+Cc: Diana Craciun <diana.craciun@oss.nxp.com>
 Cc:  <stable@vger.kernel.org>
-Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+Fixes: cc0ee20bd969 ("vfio/fsl-mc: trigger an interrupt via eventfd")
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Link: https://lore.kernel.org/r/20240308230557.805580-2-alex.williamson@redhat.com
+Link: https://lore.kernel.org/r/20240308230557.805580-8-alex.williamson@redhat.com
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- drivers/vfio/pci/vfio_pci_intrs.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 237beac838097..136101179fcbd 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -296,8 +296,15 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
+diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+index d62fbfff20b82..82b2afa9b7e31 100644
+--- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
++++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+@@ -141,13 +141,14 @@ static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
+ 	irq = &vdev->mc_irqs[index];
  
- 	ctx->trigger = trigger;
+ 	if (flags & VFIO_IRQ_SET_DATA_NONE) {
+-		vfio_fsl_mc_irq_handler(hwirq, irq);
++		if (irq->trigger)
++			eventfd_signal(irq->trigger);
  
-+	/*
-+	 * Devices without DisINTx support require an exclusive interrupt,
-+	 * IRQ masking is performed at the IRQ chip.  The masked status is
-+	 * protected by vdev->irqlock. Setup the IRQ without auto-enable and
-+	 * unmask as necessary below under lock.  DisINTx is unmodified by
-+	 * the IRQ configuration and may therefore use auto-enable.
-+	 */
- 	if (!vdev->pci_2_3)
--		irqflags = 0;
-+		irqflags = IRQF_NO_AUTOEN;
+ 	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+ 		u8 trigger = *(u8 *)data;
  
- 	ret = request_irq(pdev->irq, vfio_intx_handler,
- 			  irqflags, ctx->name, vdev);
-@@ -308,13 +315,9 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
- 		return ret;
+-		if (trigger)
+-			vfio_fsl_mc_irq_handler(hwirq, irq);
++		if (trigger && irq->trigger)
++			eventfd_signal(irq->trigger);
  	}
- 
--	/*
--	 * INTx disable will stick across the new irq setup,
--	 * disable_irq won't.
--	 */
- 	spin_lock_irqsave(&vdev->irqlock, flags);
--	if (!vdev->pci_2_3 && ctx->masked)
--		disable_irq_nosync(pdev->irq);
-+	if (!vdev->pci_2_3 && !ctx->masked)
-+		enable_irq(pdev->irq);
- 	spin_unlock_irqrestore(&vdev->irqlock, flags);
  
  	return 0;
 -- 
