@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-12767-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C20E88D852
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 09:02:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A5D88D853
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 09:02:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AF7D1C25FF8
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 08:02:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB9F9B22E9C
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 08:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E443612C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E9C936133;
 	Wed, 27 Mar 2024 07:59:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0B42C862
-	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 07:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.89.151.119
+Received: from sgoci-sdnproxy-3.icoremail.net (sgoci-sdnproxy-3.icoremail.net [129.150.43.208])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1D432182
+	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 07:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.43.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711526384; cv=none; b=NoVeJYnxANz7X7oIbK3QDuaG3DiEqQ0bkssa9ajPqQyR0RVSAb4pF8Sooh8xcapVx6zGmQWOuDJpqanPkSPvY1LnyzyHay1gZJWC1WKzDVEENobCqSnkFb7r7FHaxzK8BtYCLleqyhHkbBINjHfRn+/7Kj9mxlmY6tNbzOYm+Mc=
+	t=1711526385; cv=none; b=avODZon2OomTafBWWWpSY9uQB/S7SibCGpLqClnQSR0Gt1oKefMnjCIvJefXDXQbkgXX17QzG58EWtGQbcxOPhIldoDOQcCTTmVUbOd4DVwBHT5KaITLbQcVdhT7D7iv4stVg94yhnST81csmd/WRwcM2NXyw6n6DGcdeeHIc80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711526384; c=relaxed/simple;
-	bh=xDQhIil/nsFCOoC/0bSgfNr7zHH3INIDPe39EthX3sM=;
-	h=From:To:Subject:Date:Message-Id; b=L3D1XXd9ajoSx1s2uxiMuwPv22w5rvWIfjEbTu5l+HP+qCTm3fEAEzX3GEiOKxvEn2SwgBfjScDboY0bRGGk/1lTYdx+mzUoN28B5vRF/0oJrNvKG0tcOwdfGcMcUWLZBc9cVNcs/dxZqCrt0MHZu7QmMfdSFqPNQNWNZ39Sspg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=159.89.151.119
+	s=arc-20240116; t=1711526385; c=relaxed/simple;
+	bh=dVTucbNvlJYSuuZB4Ti41YInzCzg9KuDkn2E1c8sxEI=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References; b=ckiBNcTPjZ5w5EOTNnHk7oWwG0IkjUcU+JTHu2I5+2YYwrtKWl2YhxTFoMKPtVP96R28t4GB8TlT3a0HGMAl7yPkiiLOF5p+1WG4M841bZGuqKG/SY0Uteg6TldkQpXbPJISNKBTZV8JYcFIER/NyMW7C+XxTsU6gy57JQQAMRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=129.150.43.208
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
 Received: from localhost.localdomain (unknown [10.12.130.31])
-	by app1 (Coremail) with SMTP id TAJkCgBn++KS0QNmzA4DAA--.6945S4;
-	Wed, 27 Mar 2024 15:58:11 +0800 (CST)
+	by app1 (Coremail) with SMTP id TAJkCgBn++KS0QNmzA4DAA--.6945S5;
+	Wed, 27 Mar 2024 15:58:17 +0800 (CST)
 From: Chao Du <duchao@eswincomputing.com>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -42,27 +42,30 @@ To: kvm@vger.kernel.org,
 	aou@eecs.berkeley.edu,
 	haibo1.xu@intel.com,
 	duchao713@qq.com
-Subject: [PATCH v3 0/3] RISC-V: KVM: Guest Debug Support - Software Breakpoint Part
-Date: Wed, 27 Mar 2024 07:55:23 +0000
-Message-Id: <20240327075526.31855-1-duchao@eswincomputing.com>
+Subject: [PATCH v3 1/3] RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+Date: Wed, 27 Mar 2024 07:55:24 +0000
+Message-Id: <20240327075526.31855-2-duchao@eswincomputing.com>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:TAJkCgBn++KS0QNmzA4DAA--.6945S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxJr1xJr48Gw1rAFyrWrW7Arb_yoW8tw17pF
-	WrGr909rZ3Xr1fGayfCFnF9r4fXrs5ur4fWw1fW3y3Zw4jkFyFyrs2grWYyr98CrykWFyS
-	y3Z2g3Wkua4UJ37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvIb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwV
-	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY
-	04v7MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s
-	026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_
-	Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20x
-	vEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE
-	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-	9x07beAp5UUUUU=
+In-Reply-To: <20240327075526.31855-1-duchao@eswincomputing.com>
+References: <20240327075526.31855-1-duchao@eswincomputing.com>
+X-CM-TRANSID:TAJkCgBn++KS0QNmzA4DAA--.6945S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxXFW8CF1xZw1fuFWktF4fKrg_yoWrtr48pa
+	9xC3s093yrKr1xK3WxAFZ5ur43WrZYgwn2grW2vFyYyr4YkrWFvanY9rZxJFy5XrWrWrWI
+	kFy5CFyruFn0qwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP2b7Iv0xC_KF4lb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI
+	8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF
+	64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcV
+	CY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv
+	6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c
+	02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE
+	4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc2
+	xSY4AK6svPMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
+	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8Zw
+	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
+	67AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
+	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0ep
+	B3UUUUU==
 X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -70,65 +73,138 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-This series implements the "KVM Guset Debug" feature on RISC-V. This is
-an existing feature which is already supported by some other arches.
-It allows us to debug a RISC-V KVM guest from GDB in host side.
+kvm_vm_ioctl_check_extension(): Return 1 if KVM_CAP_SET_GUEST_DEBUG is
+been checked.
 
-As the first stage, the software breakpoints (ebreak instruction) is
-implemented. HW breakpoints support will come later after a synthetically
-consideration with the SBI debug trigger extension.
+kvm_arch_vcpu_ioctl_set_guest_debug(): Update the guest_debug flags
+from userspace accordingly. Route the breakpoint exceptions to HS mode
+if the VCPU is being debugged by userspace, by clearing the
+corresponding bit in hedeleg.
 
-A selftest case was added in this series. Manual test was done on QEMU
-RISC-V hypervisor emulator. (add '-s' to enable the gdbserver in QEMU)
+Initialize the hedeleg configuration in kvm_riscv_vcpu_setup_config().
+Write the actual CSR in kvm_arch_vcpu_load().
 
-This series is based on Linux 6.9-rc1 and also available at:
-https://github.com/Du-Chao/kvm-riscv/tree/guest_debug_sw_v3_6.9-rc1
+Signed-off-by: Chao Du <duchao@eswincomputing.com>
+---
+ arch/riscv/include/asm/kvm_host.h | 12 ++++++++++++
+ arch/riscv/kvm/main.c             | 18 ++----------------
+ arch/riscv/kvm/vcpu.c             | 16 ++++++++++++++--
+ arch/riscv/kvm/vm.c               |  1 +
+ 4 files changed, 29 insertions(+), 18 deletions(-)
 
-The matched QEMU is available at:
-https://github.com/Du-Chao/qemu/tree/riscv_gd_sw
-
-
-Changes from v2->v3:
-- Rebased on Linux 6.9-rc1.
-- Use BIT() in the macro definition.
-- set/clear the bit EXC_BREAKPOINT explicitly.
-- change the testcase name to ebreak_test.
-- test the scenario without GUEST_DEBUG. vm_install_exception_handler() is used
-  thanks to Haibo's patch.
-
-Changes from v1->v2:
-- Rebased on Linux 6.8-rc6.
-- Maintain a hedeleg in "struct kvm_vcpu_config" for each VCPU.
-- Update the HEDELEG csr in kvm_arch_vcpu_load().
-
-Changes from RFC->v1:
-- Rebased on Linux 6.8-rc2.
-- Merge PATCH1 and PATCH2 into one patch.
-- kselftest case added.
-
-v2 link:
-https://lore.kernel.org/kvm/20240301013545.10403-1-duchao@eswincomputing.com
-v1 link:
-https://lore.kernel.org/kvm/20240206074931.22930-1-duchao@eswincomputing.com
-RFC link:
-https://lore.kernel.org/kvm/20231221095002.7404-1-duchao@eswincomputing.com
-
-Chao Du (3):
-  RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
-  RISC-V: KVM: Handle breakpoint exits for VCPU
-  RISC-V: KVM: selftests: Add ebreak test support
-
- arch/riscv/include/asm/kvm_host.h             | 12 +++
- arch/riscv/kvm/main.c                         | 18 +---
- arch/riscv/kvm/vcpu.c                         | 16 +++-
- arch/riscv/kvm/vcpu_exit.c                    |  4 +
- arch/riscv/kvm/vm.c                           |  1 +
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../testing/selftests/kvm/riscv/ebreak_test.c | 84 +++++++++++++++++++
- 7 files changed, 118 insertions(+), 18 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/riscv/ebreak_test.c
-
---
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index 484d04a92fa6..da4ab7e175ff 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -43,6 +43,17 @@
+ 	KVM_ARCH_REQ_FLAGS(5, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(6)
+ 
++#define KVM_HEDELEG_DEFAULT		(BIT(EXC_INST_MISALIGNED) | \
++					 BIT(EXC_BREAKPOINT)      | \
++					 BIT(EXC_SYSCALL)         | \
++					 BIT(EXC_INST_PAGE_FAULT) | \
++					 BIT(EXC_LOAD_PAGE_FAULT) | \
++					 BIT(EXC_STORE_PAGE_FAULT))
++
++#define KVM_HIDELEG_DEFAULT		(BIT(IRQ_VS_SOFT)  | \
++					 BIT(IRQ_VS_TIMER) | \
++					 BIT(IRQ_VS_EXT))
++
+ enum kvm_riscv_hfence_type {
+ 	KVM_RISCV_HFENCE_UNKNOWN = 0,
+ 	KVM_RISCV_HFENCE_GVMA_VMID_GPA,
+@@ -169,6 +180,7 @@ struct kvm_vcpu_csr {
+ struct kvm_vcpu_config {
+ 	u64 henvcfg;
+ 	u64 hstateen0;
++	unsigned long hedeleg;
+ };
+ 
+ struct kvm_vcpu_smstateen_csr {
+diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+index 225a435d9c9a..bab2ec34cd87 100644
+--- a/arch/riscv/kvm/main.c
++++ b/arch/riscv/kvm/main.c
+@@ -22,22 +22,8 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 
+ int kvm_arch_hardware_enable(void)
+ {
+-	unsigned long hideleg, hedeleg;
+-
+-	hedeleg = 0;
+-	hedeleg |= (1UL << EXC_INST_MISALIGNED);
+-	hedeleg |= (1UL << EXC_BREAKPOINT);
+-	hedeleg |= (1UL << EXC_SYSCALL);
+-	hedeleg |= (1UL << EXC_INST_PAGE_FAULT);
+-	hedeleg |= (1UL << EXC_LOAD_PAGE_FAULT);
+-	hedeleg |= (1UL << EXC_STORE_PAGE_FAULT);
+-	csr_write(CSR_HEDELEG, hedeleg);
+-
+-	hideleg = 0;
+-	hideleg |= (1UL << IRQ_VS_SOFT);
+-	hideleg |= (1UL << IRQ_VS_TIMER);
+-	hideleg |= (1UL << IRQ_VS_EXT);
+-	csr_write(CSR_HIDELEG, hideleg);
++	csr_write(CSR_HEDELEG, KVM_HEDELEG_DEFAULT);
++	csr_write(CSR_HIDELEG, KVM_HIDELEG_DEFAULT);
+ 
+ 	/* VS should access only the time counter directly. Everything else should trap */
+ 	csr_write(CSR_HCOUNTEREN, 0x02);
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index b5ca9f2e98ac..f3c87f0c93ba 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -475,8 +475,15 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 					struct kvm_guest_debug *dbg)
+ {
+-	/* TODO; To be implemented later. */
+-	return -EINVAL;
++	if (dbg->control & KVM_GUESTDBG_ENABLE) {
++		vcpu->guest_debug = dbg->control;
++		vcpu->arch.cfg.hedeleg &= ~BIT(EXC_BREAKPOINT);
++	} else {
++		vcpu->guest_debug = 0;
++		vcpu->arch.cfg.hedeleg |= BIT(EXC_BREAKPOINT);
++	}
++
++	return 0;
+ }
+ 
+ static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
+@@ -505,6 +512,10 @@ static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
+ 		if (riscv_isa_extension_available(isa, SMSTATEEN))
+ 			cfg->hstateen0 |= SMSTATEEN0_SSTATEEN0;
+ 	}
++
++	cfg->hedeleg = KVM_HEDELEG_DEFAULT;
++	if (vcpu->guest_debug)
++		cfg->hedeleg &= ~BIT(EXC_BREAKPOINT);
+ }
+ 
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+@@ -519,6 +530,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	csr_write(CSR_VSEPC, csr->vsepc);
+ 	csr_write(CSR_VSCAUSE, csr->vscause);
+ 	csr_write(CSR_VSTVAL, csr->vstval);
++	csr_write(CSR_HEDELEG, cfg->hedeleg);
+ 	csr_write(CSR_HVIP, csr->hvip);
+ 	csr_write(CSR_VSATP, csr->vsatp);
+ 	csr_write(CSR_HENVCFG, cfg->henvcfg);
+diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+index ce58bc48e5b8..7396b8654f45 100644
+--- a/arch/riscv/kvm/vm.c
++++ b/arch/riscv/kvm/vm.c
+@@ -186,6 +186,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_MP_STATE:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
++	case KVM_CAP_SET_GUEST_DEBUG:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_NR_VCPUS:
+-- 
 2.17.1
 
 
