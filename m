@@ -1,116 +1,147 @@
-Return-Path: <kvm+bounces-12748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12749-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C5488D564
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 05:15:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6C088D5DC
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72AF7B2241C
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 04:15:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D182D1F2546C
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 05:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6717249ED;
-	Wed, 27 Mar 2024 04:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056A6134A5;
+	Wed, 27 Mar 2024 05:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q5bA11QD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k419Lh9f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA041F606;
-	Wed, 27 Mar 2024 04:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA9079C4
+	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 05:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711512923; cv=none; b=uNQzGXlRxZ13T+80uYNY5sNPTlWmeY6j44Oz0E4y5m74mTicQr/Rn7Vq/Pk+4Hdwrtn/MwBadwIZGWFIJ75dKqsdVEoW+aZt+VNUtZRglSq0cNNGeVOuOvJRtTl6Tu4GUOY4yN296cXcBJOUCLgLUmQfRksplRRttDmTVAKGwT8=
+	t=1711517420; cv=none; b=G6UtE61u/9mXcek7zPDX3FKfahQgoRA1Sge7T/JwpOz+IrAXZjAwpjObMJf4+rO6nAO4i3FrIOq6an1hnJDw5STOnuaa8wrZSpbAzmWk6TehsGWI9gGMVARBghOFSb9jMvrOk7HSKoaX8E0MdcDGGEP3wXKlWJ6lHHiOvNtu6NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711512923; c=relaxed/simple;
-	bh=qB/KEL44AGHMfXjIlk8PCDDNe1jhwM4n+f9N6et7kDk=;
+	s=arc-20240116; t=1711517420; c=relaxed/simple;
+	bh=NQc7nRPv1d9S3Xkgl83x4eUWpFOJrO1ZnLvgPWT83h8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kkXASn+W3GdcS/ojxpF5Eotf2ctiArkQ03+hcy6Obe1IQuyFcF+RkKoxwIgnUrj3JCEFUu6LWv/lIrefyxul0G6Z/kYpMGVmNVRw4uz4UXgC/TiS2lhjX46qF+6nlV/kyoibVddf784lZanc0BzmeMoCniJ3uuJh2ujrieK4nLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q5bA11QD; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711512921; x=1743048921;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qB/KEL44AGHMfXjIlk8PCDDNe1jhwM4n+f9N6et7kDk=;
-  b=Q5bA11QDEUFWH1u5KsRUPxC9bVhhXyVjqhb5f7K66TVriSXnhRatwg1K
-   MWgjajyeLlEJqTgu13aEBjx+QC9KyFinc6KLfo3t8oCRdL43ImTKPlF02
-   HwwhjdR1YS4Sspcfb0nm53e/KSQTSN8oe147x4F/D0MHaEuIdKvd7Rda7
-   8OdDIZcYAIR737XVC/CkaU2kiv3+giCnZKdCuvWpBLqwRU9LSiZvy0Gje
-   xHArvJtzn5P9F8lk6wkymJ5ogNEh177J9oBKbSrsd6lydlfNhZ5WxkZQd
-   1xbgRXslZ1/xPjZPLgc059iHX5y/jpt5McKGmJtVnXX22+o0aN+NKniwU
-   A==;
-X-CSE-ConnectionGUID: RPj1Og3HSHesU9lzgFkQ9A==
-X-CSE-MsgGUID: XktGjLIJSjOugUKM/MDRmg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="6457968"
-X-IronPort-AV: E=Sophos;i="6.07,157,1708416000"; 
-   d="scan'208";a="6457968"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 21:15:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,157,1708416000"; 
-   d="scan'208";a="20891413"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 21:15:19 -0700
-Date: Tue, 26 Mar 2024 21:15:19 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Yin, Fengwei" <fengwei.yin@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v8 00/14] KVM TDX: TDP MMU: large page support
-Message-ID: <20240327041519.GD2444378@ls.amr.corp.intel.com>
-References: <cover.1708933624.git.isaku.yamahata@intel.com>
- <8f7735aa-517f-4bb3-8e33-d58a27c2a822@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HByF/jUSlNB1hL/uaJNOCwNMmSu+f38EeaWB5D3py3Z9/c5JCORoz4tpf2Sr8fopUSvwhPfAq88ugETVfnrjXFLf/lV++rdN1CI50Sov0XC9CZvZSNP8a+CfsczH2YRpLasQKw8qqzqA5jxlyfkoS5eGuQNcaZlZdx+voPK9r7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k419Lh9f; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5ce2aada130so4505651a12.1
+        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 22:30:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711517418; x=1712122218; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kVMXtjqW+QAkMGD+S/kOxyuhWzew87XrBM54rG8SDqk=;
+        b=k419Lh9f2tiioctwLHMaSjGEC9861SF+kzimK+oDK+nG/hBwok+RFV1MVenzr7ug6Y
+         1gJYgDj3CT6j5ufXbnXOLhiKf4Rlzl1UntTViubQ5/Eivo3WSYAmqD6BtUffmkuhJ/33
+         heZDNFAwDQ3byHccrhnqEH1RkcRRJV37iI7YGcmOga4/E50jsyVItUvysKDKfCwIUnJk
+         9bxNBNfjNlEfWMptN2ER1QvU0LhFdP00GMauoTcYCqYtccx/KrP2r5CpJ/cydeoXrxgK
+         O8Ft+cgpevudVVZ6JKcwBoh9KibBruXhKsnaRdGx9IIbq+1wEx6V9Zk9n3BAXSrjxqWj
+         v7pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711517418; x=1712122218;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kVMXtjqW+QAkMGD+S/kOxyuhWzew87XrBM54rG8SDqk=;
+        b=iXp20b0XzfPOe6IC/4AbNv29txyY3i/Oa5NORwoG5kwLluQ748Pz8RRYadKHRrb5Bk
+         39ZG1/5zPcn47xsB8f+uqK47ac9yan4x5YBrW3o6e83vZuPbp/gdYDjNTIkV0Az/u1EW
+         pZIkogjGfHuoDkOA81dDbQsU2/QJMuCu3B3EQtvClFcLAgk8If4GHpR9d8hnVjsrhQS1
+         bzM0Yi2LEydy9EMAzaoqApJA1PusWdEjI6Z72KmS71Q1ZUiuY2lZEjoVCBCfr2YBMD9h
+         yWqsP4ToUufpAVmEIDZl4g63F7FfwtMHjoDFT/+Aryg/aVw8ofcBmi8XrXGbK1ykutVE
+         MCHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVInKodtFvgLih9zk0k6XET1/lYGI47TfuMNO4TQ4z8KcRiobZ+xzuPqNodZomhZvYZJKgTWqAZTl0xSUO/Kv7J1eJw
+X-Gm-Message-State: AOJu0YwsAyyPZW38lQ0QCbQZNVaYPaVE2GRUyNfNn/YX/6r29Wp+T1QX
+	i/DcG/2OkdMGGySIUOMOvyy2PVxtm09Mz1ERgGLhgnXJZdg173cZr/Szl1tc0w==
+X-Google-Smtp-Source: AGHT+IHhkks7dIOvaFXe2jmlSHjqEQtmU6xHx/LKBsOUAj+YdfH3VVrKnf/kxA0qJ5GUlcEYRTkyZw==
+X-Received: by 2002:a05:6a21:350f:b0:1a3:e297:ff17 with SMTP id zc15-20020a056a21350f00b001a3e297ff17mr1455211pzb.50.1711517417622;
+        Tue, 26 Mar 2024 22:30:17 -0700 (PDT)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id d15-20020a170902cecf00b001defd404efdsm5338953plg.13.2024.03.26.22.30.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 22:30:16 -0700 (PDT)
+Date: Wed, 27 Mar 2024 05:30:12 +0000
+From: Mingwei Zhang <mizhang@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Zhang Xiong <xiong.y.zhang@intel.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Jinrong Liang <cloudliang@tencent.com>,
+	Dapeng Mi <dapeng1.mi@intel.com>
+Subject: Re: [kvm-unit-tests Patch v3 03/11] x86: pmu: Add asserts to warn
+ inconsistent fixed events and counters
+Message-ID: <ZgOu5PP2qXhbflRc@google.com>
+References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
+ <20240103031409.2504051-4-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8f7735aa-517f-4bb3-8e33-d58a27c2a822@intel.com>
+In-Reply-To: <20240103031409.2504051-4-dapeng1.mi@linux.intel.com>
 
-On Wed, Mar 27, 2024 at 08:53:50AM +0800,
-"Yin, Fengwei" <fengwei.yin@intel.com> wrote:
-
-> Hi Isaku,
+On Wed, Jan 03, 2024, Dapeng Mi wrote:
+> Current PMU code deosn't check whether PMU fixed counter number is
+> larger than pre-defined fixed events. If so, it would cause memory
+> access out of range.
 > 
-> On 2/26/2024 4:29 PM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > This patch series is based on "v19 KVM TDX: basic feature support".  It
-> > implements large page support for TDP MMU by allowing populating of the large
-> > page and splitting it when necessary.
-> To test the hugepage for TDX guest, we need to apply Qemu patch
-> from Xiaoyao:
-> https://lore.kernel.org/qemu-devel/20231115071519.2864957-4-xiaoyao.li@intel.com/
+> So add assert to warn this invalid case.
 > 
-> According to Xiaoyao, it's still under discussion. So he didn't
-> send updated version patch. For folks want to try this series,
-> it may be better to mention above link in this cover letter?
-
-Makes sense.  Let me include it from the next versions.
-
-
-> Test in my side showed several benchmarks got 10+% performance
-> gain which is really nice. So:
-
-So nice.
-
-> Tested-by: Yin Fengwei <fengwei.yin@intel.com>
-
-Thanks,
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  x86/pmu.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index a13b8a8398c6..a42fff8d8b36 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -111,8 +111,12 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+>  		for (i = 0; i < gp_events_size; i++)
+>  			if (gp_events[i].unit_sel == (cnt->config & 0xffff))
+>  				return &gp_events[i];
+> -	} else
+> -		return &fixed_events[cnt->ctr - MSR_CORE_PERF_FIXED_CTR0];
+> +	} else {
+> +		int idx = cnt->ctr - MSR_CORE_PERF_FIXED_CTR0;
+maybe unsigned int is better?
+> +
+> +		assert(idx < ARRAY_SIZE(fixed_events));
+> +		return &fixed_events[idx];
+> +	}
+>  
+>  	return (void*)0;
+>  }
+> @@ -245,6 +249,7 @@ static void check_fixed_counters(void)
+>  	};
+>  	int i;
+>  
+> +	assert(pmu.nr_fixed_counters <= ARRAY_SIZE(fixed_events));
+>  	for (i = 0; i < pmu.nr_fixed_counters; i++) {
+>  		cnt.ctr = fixed_events[i].unit_sel;
+>  		measure_one(&cnt);
+> @@ -266,6 +271,7 @@ static void check_counters_many(void)
+>  			gp_events[i % gp_events_size].unit_sel;
+>  		n++;
+>  	}
+> +	assert(pmu.nr_fixed_counters <= ARRAY_SIZE(fixed_events));
+>  	for (i = 0; i < pmu.nr_fixed_counters; i++) {
+>  		cnt[n].ctr = fixed_events[i].unit_sel;
+>  		cnt[n].config = EVNTSEL_OS | EVNTSEL_USR;
+> -- 
+> 2.34.1
+> 
 
