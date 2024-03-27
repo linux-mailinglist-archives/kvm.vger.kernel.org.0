@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-12751-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12752-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0833688D5E9
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:38:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E2B588D5EC
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:38:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3F5C29B453
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 05:38:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8EC29BC3B
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 05:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A06514273;
-	Wed, 27 Mar 2024 05:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9B914288;
+	Wed, 27 Mar 2024 05:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oa/DEGd0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YCqO/Mxy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6333DAC14
-	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 05:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918AF10949
+	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 05:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711517891; cv=none; b=U2cSQv5pDrXAJJkD8OTu7219AzUDxoPtD16QKhNcMpWXYwGYGdgjZ7idndbzd02EUB8CyT2O0QpD/nrk4BpGVBEgaGE/8kIdwmLeOElOL5CCo4hKZUcROGzYY2cVHzC0Q4eEp5Dm/t6LmJfn9hp1e459k51Y+l/HIukWTbKgmaA=
+	t=1711517929; cv=none; b=CQ/+SJXjcKoxjSs/GpHfU+O0YvDk7QnbncnJOywb75SkK3LnP3O1WHjZ02cPQ72XrT2/B+A0mc3R/GHX+52sx8PWmPXJst9DlUJ9nVSxuJes7zTOBtDmnEc0YZRlZBEWStS5UE3bfQm6go6ikJyCW0LiY7zmIvTldxUoJjZTEKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711517891; c=relaxed/simple;
-	bh=jxc+ifoFr0vgBSifpzL8V8mividmrbHl9bnUpbSaOyw=;
+	s=arc-20240116; t=1711517929; c=relaxed/simple;
+	bh=c8Qxz3GjemwSldg1rtEYBEhGGs00Vj4gZEX2g47vXU8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pU0LbEc7d9mTFk29KlBKyAMXQnNdNdpyJyAVjw2VXiajx/aih3u1hcVLN1TF1zlm5hm1/UANhFaMoXBPQeT639/i3sacC5Ej8K2hOK8kH6T1/Mz12JVIsHf0vTQnnAPye3A8usGaxFDXlwn9dlhNvoE+ZLqTCgwIMrL3VpiskdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oa/DEGd0; arc=none smtp.client-ip=209.85.214.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=qG/E7Ul92XWz0M6vLyGSvDIMn3IzTG/VtWDpOk8M9Ol//Rwu+vUIQWV8LP7XM/UoziwcAUUhuLq/sIyMM8SR+pGvl1vyMdFUPPcSG1KCevnys1sMkjWzvCIS3Xc8cjQLb5cWJcm/Qv0GIvAw6bgcU5uHOvAo0nJNemKgWqjLgjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YCqO/Mxy; arc=none smtp.client-ip=209.85.167.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e0fa980d55so11756165ad.3
-        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 22:38:10 -0700 (PDT)
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3c36ecdb8cdso2954564b6e.1
+        for <kvm@vger.kernel.org>; Tue, 26 Mar 2024 22:38:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711517889; x=1712122689; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1711517926; x=1712122726; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p+fNf8kwFz9hjq+tSfSz7ViPMcYhwL+6JOaYs7sM0+E=;
-        b=oa/DEGd0yovKgc5TNRYErhX7KbrtZ20H/npE9XkgpH+0jQXBC1fEi6OrVpCXbuHimm
-         spy2+Alg54Uquex7Xf6npavkiS4HsrJpgT+nhVge2H99YubGN00kBVsmjTkR1VhwkNRa
-         ordcTCvz907yrvC50ib+uHa+9it8cVUdWs55AIgam28imOyVOK7+7C86d/Tp207AYujg
-         zSArMWlVHMgcZq5E8PfIeHKb/MQTIsYyfC5/MVetG7IoLSRck4LrkLb7oqNdVoj9LIEO
-         L8cbFfkYlLb9D7ZoANYb6/b44ZQr0fZdfuZoIIfaOLD6VSZ9iQZPr20QjPNHxSZI8ecu
-         ZyJA==
+        bh=GEa1wJbE96+0XdxLOBaQ/cWqz0eCFh0pN8QmBlQTfhY=;
+        b=YCqO/Mxybl+uDfTb5WvMPYlwKhKl4q3hDmbBb/BevaL1jgjFDjyC+S6nyAbbpGoz3m
+         vVBQESkcXLhwLGmbltQMxoLbGl47/QvQBgda/v9gUuWWV8R3xHBdaTxKS1ytZHe/CLam
+         fudmpnB8YpxOV3Oa8BKTz+fbDrzIn29rcZ/6siLVcCh0y6qMuAZVU69leGsqVd4QLs5o
+         jjN9C+a9i5B0G6vo8HQF4RJl71kG0GlFL/gCWXBR2Zp5ZaxpYHKtkH3YcB5lDS2Qpr/h
+         hwuWJJx5eMMgrB/PEkkmCihttdTwSj1J96hjm1Dlv+aPKxwLTCMlpWxtLUwlIum02TaD
+         iCOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711517889; x=1712122689;
+        d=1e100.net; s=20230601; t=1711517926; x=1712122726;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=p+fNf8kwFz9hjq+tSfSz7ViPMcYhwL+6JOaYs7sM0+E=;
-        b=eZzmpqIxdKdnHgTTI7HmVdk4ZqtfORgHVGt/LNw0I7HXcG5U6/Rf3ThFATNlZ6PgZC
-         solBEw3x7pKu1CRntUzZEU97gY6a/SaylpVYnGytc6jQGwtNGvtcapNIYdhP2dFRr+oE
-         GvCQ/pPBuyjPbQHoAHS/SBvN209qOq1FxwYKDRf8HPWfb0mYovajoDMoq/fduH5YaCyT
-         BWjipOkjlGAcd/fZ/Xye4T/riXY7a8h2iimq2Vt3BOYl+9JywXBlNGQysc8fe09ObtDJ
-         oo5LVb4u9UNabzmJBq720fYWHL6eiIjhCLyclce+oG8OEYlknFVPU5Rz7iUyz8LdiIp3
-         3hxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVvwK/rhWxjBbA93DRinti6wppdGnAoySaQ33V5WQAAzF29+Om2zhFn4VgMY0tQOc+eQXs6ZYIrTYez1QiPQlv2JRO
-X-Gm-Message-State: AOJu0YwoEKDZLAFUNFZVfmfGKiE9Qs8IZawFU5VPtS9NPANBK5ElAY1U
-	AiEDwInXMIrkS1770rwf9Q0eD2dFAntcknQx88xIhI1mhDiyjL+GYz625v/nWw==
-X-Google-Smtp-Source: AGHT+IFfDJJu8eU5vpeHwdnNhSO9hlVbXO/frk+1YOkjU00bY6YbyW2aBR6BF2q3X4HfdBGyzFXKuQ==
-X-Received: by 2002:a17:90a:eb04:b0:29d:dbaf:bd77 with SMTP id j4-20020a17090aeb0400b0029ddbafbd77mr2908734pjz.43.1711517889217;
-        Tue, 26 Mar 2024 22:38:09 -0700 (PDT)
+        bh=GEa1wJbE96+0XdxLOBaQ/cWqz0eCFh0pN8QmBlQTfhY=;
+        b=XEYVrteyAyPGktkmTB+48NZ1fsre6q3iXNCf0dNbAdPzgYGH+aRxoQawu00kWihztM
+         PAV3HKvPr65QH2l0Mh4ViqX8RMKo97NoFRiaOWGKGCGYWIHKLiFVMfTw2Ll1X9FM8bq0
+         Mc0DrOoOMtQ0FA1TFUw/7t7EMjwmlV6EHfQASdTJgoBTII/nQTVyufIPc/E8xb/jcuC0
+         wuOY58fqP2aG993sbqN6TzKXBis2koS35k8UVWlo99xJF4sTtUWJo5vvMaiVoeU9CpRC
+         v325sm/uSTN8lG/65r0A7WIzDk9XKpgPkNllVXcLwplTG1Ulluyq/3bSPXGap5ZzDFTO
+         RxeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/v9SXs4W+vvRdWLJftf4t9St9dfW0jEYwHBz1C40rUHhefN6qMCysTsG+qCGhQRoYJeaGA4UfDejSWyewrgJfAgma
+X-Gm-Message-State: AOJu0YzJ4hg23NgVSeb6XEb/hRuAVT1UjXbt250X8rEAzn1VyRlZ1qU0
+	rX7g9eMoS3TReP1Tl6pCc3AZyNY3GUZ/HZ7200FexJ15gNHyv0ol2kpyndlV5A==
+X-Google-Smtp-Source: AGHT+IGp1R8GmfW8HUNyHIR3uCDgu524YP5Rj7c/dj/PXh/ZNJ7GIsh+Jq6UmTViK5/nupAbScuJgQ==
+X-Received: by 2002:a05:6808:1381:b0:3c3:ccf2:7f5e with SMTP id c1-20020a056808138100b003c3ccf27f5emr353054oiw.11.1711517926472;
+        Tue, 26 Mar 2024 22:38:46 -0700 (PDT)
 Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
-        by smtp.gmail.com with ESMTPSA id pd15-20020a17090b1dcf00b0029fc4b3596bsm662952pjb.7.2024.03.26.22.38.08
+        by smtp.gmail.com with ESMTPSA id g16-20020aa79f10000000b006e669357e83sm6941515pfr.189.2024.03.26.22.38.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 22:38:08 -0700 (PDT)
-Date: Wed, 27 Mar 2024 05:38:05 +0000
+        Tue, 26 Mar 2024 22:38:45 -0700 (PDT)
+Date: Wed, 27 Mar 2024 05:38:42 +0000
 From: Mingwei Zhang <mizhang@google.com>
 To: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Cc: Sean Christopherson <seanjc@google.com>,
@@ -77,11 +77,11 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	Like Xu <like.xu.linux@gmail.com>,
 	Jinrong Liang <cloudliang@tencent.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>
-Subject: Re: [kvm-unit-tests Patch v3 05/11] x86: pmu: Refine fixed_events[]
- names
-Message-ID: <ZgOwvZREoyINiMwP@google.com>
+Subject: Re: [kvm-unit-tests Patch v3 06/11] x86: pmu: Remove blank line and
+ redundant space
+Message-ID: <ZgOw4g61ejwD8oQ5@google.com>
 References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
- <20240103031409.2504051-6-dapeng1.mi@linux.intel.com>
+ <20240103031409.2504051-7-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,37 +90,31 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240103031409.2504051-6-dapeng1.mi@linux.intel.com>
+In-Reply-To: <20240103031409.2504051-7-dapeng1.mi@linux.intel.com>
 
 On Wed, Jan 03, 2024, Dapeng Mi wrote:
-> In SDM the fixed counter is numbered from 0 but currently the
-> fixed_events names are numbered from 1. It would cause confusion for
-> users. So Change the fixed_events[] names to number from 0 as well and
-> keep identical with SDM.
+> code style changes.
 > 
 > Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Reviewed-by: Mingwei Zhang <mizhang@google.com>
 > ---
->  x86/pmu.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  x86/pmu.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
 > diff --git a/x86/pmu.c b/x86/pmu.c
-> index 67ebfbe55b49..a2c64a1ce95b 100644
+> index a2c64a1ce95b..46bed66c5c9f 100644
 > --- a/x86/pmu.c
 > +++ b/x86/pmu.c
-> @@ -44,9 +44,9 @@ struct pmu_event {
->  	{"branches", 0x00c2, 1*N, 1.1*N},
->  	{"branch misses", 0x00c3, 0, 0.1*N},
->  }, fixed_events[] = {
-> -	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
-> -	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
-> -	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
-> +	{"fixed 0", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
-> +	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
-> +	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
->  };
+> @@ -207,8 +207,7 @@ static noinline void __measure(pmu_counter_t *evt, uint64_t count)
+>  static bool verify_event(uint64_t count, struct pmu_event *e)
+>  {
+>  	// printf("%d <= %ld <= %d\n", e->min, count, e->max);
+> -	return count >= e->min  && count <= e->max;
+> -
+> +	return count >= e->min && count <= e->max;
+>  }
 >  
->  char *buf;
+>  static bool verify_counter(pmu_counter_t *cnt)
 > -- 
 > 2.34.1
 > 
