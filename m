@@ -1,113 +1,173 @@
-Return-Path: <kvm+bounces-12868-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12869-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB32088E70A
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 15:47:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D4788E72B
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 15:49:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC3721C2E9AF
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 14:47:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA321F23016
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 14:49:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3A915884B;
-	Wed, 27 Mar 2024 13:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99AB15AADD;
+	Wed, 27 Mar 2024 13:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b="kWAOXb8P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oPiIZP5u"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A313212FF93
-	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 13:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09C913E3E8;
+	Wed, 27 Mar 2024 13:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711546656; cv=none; b=LShWn/NMKSO81sGaAc+zBLN2aZR4Kj0eyVpDE8Az6rct/U1bg4M4VgBxqmcwUBefUFKVYVpokRLrYqL5FmlvGNUJpNpwL8qt4oozSnaw2C1PcEPhKNnMuBZMnFWNGbU5E/jAt2OP8gOL3qGrGmfW0rf3c971sthWvr7VfjGHka4=
+	t=1711546858; cv=none; b=VAt1LxQ/FNkDKls+8aSxBQMO+NRYZ7ZT9y+O8XmpBKzdyES49hNRSGYhVsGArR/SDxw3BUCblMRp3m3gEdl9DiBTKSGV0QnJmg4kM5INIZwiAyVWd47K23OVSlrT7qDsIFpSKWRPm1pJuQ3TyjYo9pM0XDqWDJIaxNtGj5dz5Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711546656; c=relaxed/simple;
-	bh=paoSEf4ZM5IsUSOLesj1TKibOzOe4X8nq0RS77nHBuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PBCBltf4WRQfncj69r+D+D1yNfMm9iA4im8Pu8uNAllyx8yKRqXqQ90VFAOVUz5W0xhQzh5idk8oCTSy5hHm/g9gRYiMyxodQUX7I4SxWLjSVuKCX7rrdk/s9cfR3YvE0rQ+xvWFMtpGJsaoM0LjdRIJp0gO83ryUBZw6+cXdAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b=kWAOXb8P; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-414946b418dso4336795e9.0
-        for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 06:37:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.com; s=cloud; t=1711546653; x=1712151453; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=smTZluOGn/fUn3D+QqeEnI8LdPKMkXjE5Ourcjod5Ew=;
-        b=kWAOXb8PMmnC5tF4zrZRGKvsKAFGLB0wX0yP5ZIYQj1CyVixInkftrqEAu1ei48n+u
-         QUCmLEJF2BnLEWWvhSp8G9a1MXgBCaRWh0URHmKFzuzaTlAV8BMcGfQXuk5AX9jgzI5b
-         uf2u9QYirkHo6fiIH3zmKhE/ow8l2Ib67L0i8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711546653; x=1712151453;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=smTZluOGn/fUn3D+QqeEnI8LdPKMkXjE5Ourcjod5Ew=;
-        b=DSsBLQIuk4G02jFK8lPFgns0Z4cCZXMpdeZ+o8nlH4eGD69aZNkSUdKFJaFpmmNDH+
-         9Y++iAoXL0hcqddgbtulMg/veCK2kAIroaOC5Wa3zFe/5T0kBC9PMCYYnsGp0f58Htn+
-         RMB+dAMC71kNt6yEd4m4I+O6N8CXEi9K27K7Femalvgjs+Lf20cCgjOn6NldY6vhY7A+
-         /GQvZs6ZHobWr46mbPR/se/9TBhhjVkDHbfJgSMuGnTaLz0XdkvnrxgnnxU41OAUW3Nd
-         VMdyVaaXEwmUaWjbz1qdAhyG2ACGq46X5UqcMXzdoTGste3loWeE2lMhSB2xrP1dHiN3
-         o4CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWCzojQTji5CIDhPUFh6w9UwqTi8D4wyevVCZ8gMfzSJOqiAmG+AZCR/D6L9e+NjTg0eYDIWXFuKpRiuLsCz08tDwWX
-X-Gm-Message-State: AOJu0YxcWgD9zUWwBJiLddgwkUDHDsZgjHQCQWcvlVEClWECq9oYt2q8
-	k8iZuRNE2e6hNqOnb0GoRxiYZ9ttQatAPfd7nQdTLhUUUVgfm0p78b29k0Wbu4o=
-X-Google-Smtp-Source: AGHT+IHmCd6Z7pLRTa8judRkvI7RAqt4OfBOEutc0X/kcSqKXxmUpEJ5ND/lGGVRsxmC7KvW/3fTRQ==
-X-Received: by 2002:a05:600c:1c8f:b0:414:669b:aa9 with SMTP id k15-20020a05600c1c8f00b00414669b0aa9mr9727wms.28.1711546653009;
-        Wed, 27 Mar 2024 06:37:33 -0700 (PDT)
-Received: from perard.uk.xensource.com (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
-        by smtp.gmail.com with ESMTPSA id q18-20020a05600c46d200b0041488978873sm2166371wmo.44.2024.03.27.06.37.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 06:37:32 -0700 (PDT)
-Date: Wed, 27 Mar 2024 13:37:31 +0000
-From: Anthony PERARD <anthony.perard@cloud.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Cc: David Woodhouse <dwmw@amazon.co.uk>, qemu-devel@nongnu.org,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Paul Durrant <paul@xen.org>, qemu-arm@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	xen-devel@lists.xenproject.org, qemu-block@nongnu.org,
-	kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Eduardo Habkost <eduardo@habkost.net>
-Subject: Re: [PATCH-for-9.0 v2 11/19] hw/xen/xen_arch_hvm: Rename prototypes
- using 'xen_arch_' prefix
-Message-ID: <3c553c67-c54c-4156-8d69-bef3476b63a2@perard>
-References: <20231114143816.71079-1-philmd@linaro.org>
- <20231114143816.71079-12-philmd@linaro.org>
+	s=arc-20240116; t=1711546858; c=relaxed/simple;
+	bh=C2xZuYuE0bMiGZGvxAUBs6jO3wA1ouACC5SZ95LnNFI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H2rrBb1C5d9l0npNiT4AJ/7e1mlhdm7eGFQVfaRiAxc3xftIBKSEuEmS7auvPstY5+v6kR464R+ur6BapcFzqbt2Ue4+1qC6SkKspBXsQn+LHpLFOT5mlg+JX/cc/GNWQPwGGaQOgNuOUkGt1TTQDBci8sWYE2aiT5dmf+HleBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oPiIZP5u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75359C433F1;
+	Wed, 27 Mar 2024 13:40:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711546858;
+	bh=C2xZuYuE0bMiGZGvxAUBs6jO3wA1ouACC5SZ95LnNFI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oPiIZP5uFcf+EPPe0Khf+td7enUVTphKFH5O8Sjh5QbDTvvzxp4AusoSouDyd+Qty
+	 uNykdMuMQa/3MK9HnwK2YnaNpcAkwziUq3reFV1RYyomG0PJxIZXbdnBqsRsQE9wiW
+	 wLj47B9Lgf9HG3GyHbTyRd/K5ZRm0z/GNEI3Qdrq6LztHDzJTooMaR+NhVqj52gD0M
+	 xPi7oVVfb+oKYpuBiBykgSVcS4Id3gpKilRn/2SvMis2yzYd4XdG+svbKALT31FoRB
+	 xxZViWevf40SnxPCloRb8CPdyibhYtQ48bc87rBCAC3LEnn5pSTNManFgzx2MRjCoV
+	 EzPw7kha0wNtQ==
+Message-ID: <94590f14-f17f-4d07-a2d7-6dfc5f1e171e@kernel.org>
+Date: Wed, 27 Mar 2024 14:40:33 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231114143816.71079-12-philmd@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/22] um: virt-pci: drop owner assignment
+To: Johannes Berg <johannes@sipsolutions.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Olivia Mackall <olivia@selenic.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
+ <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
+ Latchesar Ionkov <lucho@ionkov.net>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Christian Schoenebeck <linux_oss@crudebyte.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
+ <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+ Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+ kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
+ linux-sound@vger.kernel.org
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-2-0feffab77d99@linaro.org>
+ <46e9539f59c82762e3468a9519fa4123566910d5.camel@sipsolutions.net>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <46e9539f59c82762e3468a9519fa4123566910d5.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 14, 2023 at 03:38:07PM +0100, Philippe Mathieu-Daudé wrote:
-> Use a common 'xen_arch_' prefix for architecture-specific functions.
-> Rename xen_arch_set_memory() and xen_arch_handle_ioreq().
+On 27/03/2024 14:34, Johannes Berg wrote:
+> On Wed, 2024-03-27 at 13:40 +0100, Krzysztof Kozlowski wrote:
+>> virtio core already sets the .owner, so driver does not need to.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> All further patches depend on the first virtio patch, therefore please ack
+>> and this should go via one tree: virtio?
+> 
+> Sure. Though it's not really actually necessary, you can set it in the
+> core and merge the other patches in the next cycle; those drivers that
+> _have_ an .owner aren't broken after all.
+> 
+> Acked-by: Johannes Berg <johannes@sipsolutions.net>
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+True, this can be spread over two cycles. What I wanted to express, is
+that maintainers should not pick individual patches.
 
-Thanks,
+Thanks for the Ack and apologies for a bit too big CC-list. I need to
+learn how to ask b4 to make Cc-per-patch for such case.
 
--- 
-Anthony PERARD
+
+
+Best regards,
+Krzysztof
+
 
