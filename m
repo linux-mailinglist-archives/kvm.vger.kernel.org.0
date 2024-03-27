@@ -1,131 +1,137 @@
-Return-Path: <kvm+bounces-12809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78CB88E076
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 13:36:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A8CC88E089
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 13:38:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D90661C28940
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 12:36:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A57B1F2E054
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 12:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A6F149C4D;
-	Wed, 27 Mar 2024 12:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE42D149DE6;
+	Wed, 27 Mar 2024 12:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAczGo8f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iYutqEe5"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9E11494D3;
-	Wed, 27 Mar 2024 12:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA1C14A0BB;
+	Wed, 27 Mar 2024 12:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711541574; cv=none; b=OxKbLyboXhnlklakYHgvDgXrdMBbaJPWes5Yoo+tfaRjLIBx7JgaWyuxXe4MoHju8dIBKggJ3L4j7OuKWeRRJySd7ua4y8OPw2xV7s453n15WUwHLPO+iIRtBdeZHz6+uu5MKcxYI87/vyRBIGqEZEvCSSYltMvRE/h5CVRGGLI=
+	t=1711541591; cv=none; b=bqYerT1RdXaeFHxWaHd27CrAi6PFVuewyTC3pJzv4HENQva0Qt3JU+v9xmTFVJyLczO2v8T4i3uc8fDGtJ7iFGv86uomdm2/2tmZPWG2OwZMLnd/VyAkg7tIa4f7m+n25ecnBV65oUljDAglkZVCKfVoiyF7LTuxDPTP0Okpqw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711541574; c=relaxed/simple;
-	bh=5RV/UDyTKc5U6zXvHzqIJGRIHgJyA4wBy0rSI8lYSvM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Oa/fUwAJ/XeYCrcBYlmOhUYUWMukmFIW7Gy6928m14XDoyCyWm2SzSzIkHm0AK7I4nXkdv5xYMc7w+zqIqffvUezvZIHAOnSydFwyjXp5pIh0hrl+npM/oomkJ7G+dG7Xnq1vZUKsNNPZ6nM2EKAdSo68XRsXifglO/iKuvt7qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAczGo8f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0237C433A6;
-	Wed, 27 Mar 2024 12:12:52 +0000 (UTC)
+	s=arc-20240116; t=1711541591; c=relaxed/simple;
+	bh=6nzb64oC/aS+38eYkHxWrJnO/Ec/5COHzsOHpbHjwq8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aTPFQRFl42qPfCNEDy9nL/3QaBNhNub0f4WGXKbUU4KIdomxnEr8Iafk+9o0Z2G0IUzcg13Kr33XjitQlCQ1xx4pcXSCZ1HnybFS9+s5VchCkLLV4QVcBfQyLiP7IzZ14zx8qwvkX8VaMxiUPnnLI5EbfL6t5XKVA/bzLYlCVNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iYutqEe5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E52E3C43390;
+	Wed, 27 Mar 2024 12:13:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711541573;
-	bh=5RV/UDyTKc5U6zXvHzqIJGRIHgJyA4wBy0rSI8lYSvM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eAczGo8fMecX2BOwouZmYnFfGYfzR7XOLAX/6nd47cL9GDz8+6Tqa6+MuZs9jvJ4i
-	 J/SxSX9cp9+2WipfPyZGeQjiYEVGsCn0+A/FoziRqKbaLeOx96Tjk5/zFJV9WLYLuG
-	 4KG/2Ro4TPTVBXIN6E3bh/bdPacusypq9uL0Cx63P3IuS2tLOUdTlj0/eCRQu9tbqn
-	 fYH8pHjdk5W9k3doPMQCd6N1A9biwjZPu4PFSKUsCxMu0VkuMjsYE38R+KpSfj2Nat
-	 s4dL9WMp/SNLxnj8kQ1sI94UF+a5sO3QEgq8YAKveFAN7Xpf7JGxIlPynLk9VK9yif
-	 SXpTajehN8mzw==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org,
-	alex.williamson@redhat.com
-Cc: Diana Craciun <diana.craciun@oss.nxp.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "vfio/fsl-mc: Block calling interrupt handler without trigger" failed to apply to 6.1-stable tree
-Date: Wed, 27 Mar 2024 08:12:51 -0400
-Message-ID: <20240327121252.2829855-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=k20201202; t=1711541590;
+	bh=6nzb64oC/aS+38eYkHxWrJnO/Ec/5COHzsOHpbHjwq8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iYutqEe5s0N9gvqdYsI1i59tc58latUbZgDX0+SbW82UFYr6MrNmzMRo7wACyvb7T
+	 DeHYGvTc8P1teXK1vtA0zmcQnp/3o+jMFUsAHinGhBHgQ81ebMqkoeWBDXCDCYQcsZ
+	 QGqrxYvnlRfSjvflGkmodVfCCHNPwaXxwyRyhUvOylTvTpqSV26GH8GwTjeO6PiDjt
+	 mDzTByGBUWz16Ja1pwIvm9yBf8uPgmymQ/cJmUvSkVNCtAmZP9cbHCsowYebcxImZZ
+	 S69O/cz21T+WpcKOtQsuyGDnlm38KPeYjL7eLslJr3Z5EnMoOvXBgwRKXcP5Xp0DVb
+	 Thlxr2JmBSx/g==
+Received: from 82-132-225-99.dab.02.net ([82.132.225.99] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rpS9U-00GHA1-83;
+	Wed, 27 Mar 2024 12:13:08 +0000
+Date: Wed, 27 Mar 2024 12:12:55 +0000
+Message-ID: <87ttkrswjc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm@lists.linux.dev,	kvm@vger.kernel.org,	linux-arm-kernel@lists.infradead.org,	linux-kernel@vger.kernel.org,	oliver.upton@linux.dev,	darren@os.amperecomputing.com,	d.scott.phillips@amperecomputing.com
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
+In-Reply-To: <92117ba1-54ff-4752-b446-0ed09bde7201@os.amperecomputing.com>
+References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+	<86sf150w4t.wl-maz@kernel.org>
+	<6685c3a6-2017-4bc2-ad26-d11949097050@os.amperecomputing.com>
+	<86r0go201z.wl-maz@kernel.org>
+	<92117ba1-54ff-4752-b446-0ed09bde7201@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Patchwork-Hint: ignore
-X-stable: review
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.225.99
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The patch below does not apply to the 6.1-stable tree.
-If someone wants it applied there, or to any other stable or longterm
-tree, then please email the backport, including the original git commit
-id to <stable@vger.kernel.org>.
+On Tue, 26 Mar 2024 11:33:27 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> Hi Marc,
+> 
+> On 05-03-2024 08:33 pm, Marc Zyngier wrote:
+> > On Tue, 05 Mar 2024 13:29:08 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> 
+> >> What are the core issues (please forgive me if you mentioned already)?
+> >> certainly we will prioritise them than this.
+> > 
+> > AT is a big one. Maintenance interrupts are more or less broken. I'm
+> > slowly plugging PAuth, but there's no testing whatsoever (running
+> > Linux doesn't count). Lack of SVE support is also definitely a
+> > blocker.
+> > 
+> 
+> I am debugging an issue where EDK2(ArmVirtPkg) boot hangs when tried
+> to boot from L1 using QEMU.
+> 
+> The hang is due to failure of AT instruction and resulting in
+> immediate return to Guest(L2) and the loop continues...
+>
+> AT instruction is executed in function of
+> __get_fault_info(__translate_far_to_hpfar) in L1 when data abort is
+> forwarded. Then AT instruction is trapped and executed/emulated in L0
+> in function "__kvm_at_s1e01" is failing and resulting in the return to
+> guest.
+> 
+> Is this also the manifestation of the issue of AT that you are referring to?
 
-Thanks,
-Sasha
+It's possible, but you are looking at the symptom and not necessarily
+the problem.
 
------------------- original commit in Linus's tree ------------------
+FWIW, I can boot EDK2 as built by debian as an L2 using QEMU without
+any problem, but I'm not using QEMU for L1 (it shouldn't have much of
+an impact anyway).
 
-From 7447d911af699a15f8d050dfcb7c680a86f87012 Mon Sep 17 00:00:00 2001
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 8 Mar 2024 16:05:28 -0700
-Subject: [PATCH] vfio/fsl-mc: Block calling interrupt handler without trigger
+I expect AT S1E1R to fail if any of the following are true:
 
-The eventfd_ctx trigger pointer of the vfio_fsl_mc_irq object is
-initially NULL and may become NULL if the user sets the trigger
-eventfd to -1.  The interrupt handler itself is guaranteed that
-trigger is always valid between request_irq() and free_irq(), but
-the loopback testing mechanisms to invoke the handler function
-need to test the trigger.  The triggering and setting ioctl paths
-both make use of igate and are therefore mutually exclusive.
+- the guest S1 page tables have been swapped out in the interval
+  between the fault and the AT emulation
 
-The vfio-fsl-mc driver does not make use of irqfds, nor does it
-support any sort of masking operations, therefore unlike vfio-pci
-and vfio-platform, the flow can remain essentially unchanged.
+- the shadow S2 page tables do not have a translation for the output
+  of the S1 page tables yet
 
-Cc: Diana Craciun <diana.craciun@oss.nxp.com>
-Cc:  <stable@vger.kernel.org>
-Fixes: cc0ee20bd969 ("vfio/fsl-mc: trigger an interrupt via eventfd")
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Link: https://lore.kernel.org/r/20240308230557.805580-8-alex.williamson@redhat.com
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+You will need to work out which of these two are true. It is perfectly
+possible that there are more edge cases that need addressing, as what
+you describe just works with my setup. It could also be that 4kB page
+support at L1 is broken (as I have no way to test it and only run with
+a 16kB L1).
 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-index d62fbfff20b82..82b2afa9b7e31 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-@@ -141,13 +141,14 @@ static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
- 	irq = &vdev->mc_irqs[index];
- 
- 	if (flags & VFIO_IRQ_SET_DATA_NONE) {
--		vfio_fsl_mc_irq_handler(hwirq, irq);
-+		if (irq->trigger)
-+			eventfd_signal(irq->trigger);
- 
- 	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
- 		u8 trigger = *(u8 *)data;
- 
--		if (trigger)
--			vfio_fsl_mc_irq_handler(hwirq, irq);
-+		if (trigger && irq->trigger)
-+			eventfd_signal(irq->trigger);
- 	}
- 
- 	return 0;
+	M.
+
 -- 
-2.43.0
-
-
-
-
+Without deviation from the norm, progress is not possible.
 
