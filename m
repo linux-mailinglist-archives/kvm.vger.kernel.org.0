@@ -1,56 +1,56 @@
-Return-Path: <kvm+bounces-12814-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12815-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CEAB88E134
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 13:55:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4A1B88E142
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 13:56:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BDFD1C2A244
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 12:55:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3E5F1C2A2E0
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 12:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00136156645;
-	Wed, 27 Mar 2024 12:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9CD6156669;
+	Wed, 27 Mar 2024 12:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iov2eyRt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYzQ1n+Z"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A71B156255;
-	Wed, 27 Mar 2024 12:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94C5156861;
+	Wed, 27 Mar 2024 12:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711541762; cv=none; b=tW63tvoHZjZ+3NPv81BQZbsmMVbXgPGtjuJVxpp/0xBACabFjLoI4Gz5W83umFu1XKidXtSUipIaQLOvfT3s4U4HnnvkOLUGFKk7phxL3umeFOo+Td4Vz8Vtdma/xjXJeprqo3KpVCME4RD192YWN5SFdAm8OCwAkaGyR9alfgQ=
+	t=1711541772; cv=none; b=miNsx6Mc92sRALM2+9lzSnjysB26/tdj/vHIh/zho47VQoDEcv1Y3cjteQ3Cf5AUrFrGOo5arDV+sbqfibtvEpX/HOPNmNtMMew2WdxymU19Qj0hzZdC94asty5lrKB1EsE8sfzZQQy5beVYm0LpiNFSR7JyIkgZEmRmrhpFkdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711541762; c=relaxed/simple;
-	bh=nYxfiqXAgwCuN9FhY224C7MV4EWYfSXT1YcuSPNgbUw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JPE+gmC7xQosOLt04HhcnfYW6CRdmNq9cf6xqIlOiOLhTJP89dlg4zWf3aadLq8fnq7cTPFwr6W68cfD4qn2eDHnCfM/iOeaYHNQNCf8JZu9hub21eK8U2rlvweMoCEc5RL3AARsW0ZgL9jus58bkJ3U5CZyeTcukkFHKcd4GCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iov2eyRt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0F24C433F1;
-	Wed, 27 Mar 2024 12:16:00 +0000 (UTC)
+	s=arc-20240116; t=1711541772; c=relaxed/simple;
+	bh=9RyTMMwBIF8uAtriar+c5TuJAZDF70y2ckZWzIn2edE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hVSdeVEo/aV+5ZW2EKnsSmIlBnSDOofhbwdCF5syWohrQQUejxBo5ojoZ5rJKENGSmFYVAxwxMadcJWvWqv6xEBuVzk/ZroBDx5EDrTm0NF0c0TnxbCjI4Tn6c6nGuRAjJWbupzp4/6/5pIOu+Py2yD1bvhWd4DAW2jG2rTDLFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYzQ1n+Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE871C433F1;
+	Wed, 27 Mar 2024 12:16:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711541761;
-	bh=nYxfiqXAgwCuN9FhY224C7MV4EWYfSXT1YcuSPNgbUw=;
+	s=k20201202; t=1711541772;
+	bh=9RyTMMwBIF8uAtriar+c5TuJAZDF70y2ckZWzIn2edE=;
 	h=From:To:Cc:Subject:Date:From;
-	b=iov2eyRtMuW3oF3K0CFETNSnIZfX6LY7vfl/jdVhLQMpFcn8zvriq+HpK8aUiAasG
-	 JLQBYuwtObY5mTVwTHVIMdwX9hhsbNix6RkY79zBLcY9JEDo/auc0nSkgXkdFZ6YLD
-	 4hRKekz8k27c5B4QlAEK6NsCoMXMFFc31YUchvY0NNKLkZu+J/kttkCb2ENsves7WF
-	 iJ6VFypFn7LhaKqmcZA715XfnFpNqcV9voF5+oHJLC4F5GJYCHZit2HRIU1ern2U5M
-	 l8WGWpZTv3Zx1b+LUEOvOsbvF6LaANndtrbavYVXL9ums+XTjmaOgY2yg+ol2Y6kDd
-	 ZKY94KEufoa6Q==
+	b=tYzQ1n+Z2zbMNEZNUcKJ+ivw9hMQokaBMROedsZgNvXs6ticRB8c14iyUSnHXk09E
+	 se4OJqoFKMbTzH8EusiMCdMk/7OeoRg7aktPaJp9sxm8OuBTf8J+qT3+KtQuqm29Nd
+	 Fk7xM/npgqwfMJSw4/dTueJCB+qDl18+cJvt9IKlSyPFId9CUzGb8XMQ2aRuh7P7Ph
+	 iyGc21CZxkZroCVxulM7ly1yaBIpRPzJhP5qLq1467KmhUJ4cf2o/X4EGc4kzzTCTO
+	 oK9m4ohYqjwnSO61WVIhy6vTtV+FWX0+vcx2knVZG/97022cu6AFcxfcH4s+5X86/R
+	 CZJqi9MJpyHzQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	alex.williamson@redhat.com
-Cc: Diana Craciun <diana.craciun@oss.nxp.com>,
+Cc: Reinette Chatre <reinette.chatre@intel.com>,
 	Kevin Tian <kevin.tian@intel.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "vfio/fsl-mc: Block calling interrupt handler without trigger" failed to apply to 5.15-stable tree
-Date: Wed, 27 Mar 2024 08:15:59 -0400
-Message-ID: <20240327121559.2832347-1-sashal@kernel.org>
+Subject: FAILED: Patch "vfio/pci: Lock external INTx masking ops" failed to apply to 5.15-stable tree
+Date: Wed, 27 Mar 2024 08:16:10 -0400
+Message-ID: <20240327121610.2832499-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,56 +72,126 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 7447d911af699a15f8d050dfcb7c680a86f87012 Mon Sep 17 00:00:00 2001
+From 810cd4bb53456d0503cc4e7934e063835152c1b7 Mon Sep 17 00:00:00 2001
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 8 Mar 2024 16:05:28 -0700
-Subject: [PATCH] vfio/fsl-mc: Block calling interrupt handler without trigger
+Date: Fri, 8 Mar 2024 16:05:23 -0700
+Subject: [PATCH] vfio/pci: Lock external INTx masking ops
 
-The eventfd_ctx trigger pointer of the vfio_fsl_mc_irq object is
-initially NULL and may become NULL if the user sets the trigger
-eventfd to -1.  The interrupt handler itself is guaranteed that
-trigger is always valid between request_irq() and free_irq(), but
-the loopback testing mechanisms to invoke the handler function
-need to test the trigger.  The triggering and setting ioctl paths
-both make use of igate and are therefore mutually exclusive.
+Mask operations through config space changes to DisINTx may race INTx
+configuration changes via ioctl.  Create wrappers that add locking for
+paths outside of the core interrupt code.
 
-The vfio-fsl-mc driver does not make use of irqfds, nor does it
-support any sort of masking operations, therefore unlike vfio-pci
-and vfio-platform, the flow can remain essentially unchanged.
+In particular, irq_type is updated holding igate, therefore testing
+is_intx() requires holding igate.  For example clearing DisINTx from
+config space can otherwise race changes of the interrupt configuration.
 
-Cc: Diana Craciun <diana.craciun@oss.nxp.com>
+This aligns interfaces which may trigger the INTx eventfd into two
+camps, one side serialized by igate and the other only enabled while
+INTx is configured.  A subsequent patch introduces synchronization for
+the latter flows.
+
 Cc:  <stable@vger.kernel.org>
-Fixes: cc0ee20bd969 ("vfio/fsl-mc: trigger an interrupt via eventfd")
+Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+Reported-by: Reinette Chatre <reinette.chatre@intel.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Reviewed-by: Reinette Chatre <reinette.chatre@intel.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Link: https://lore.kernel.org/r/20240308230557.805580-8-alex.williamson@redhat.com
+Link: https://lore.kernel.org/r/20240308230557.805580-3-alex.williamson@redhat.com
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/vfio/pci/vfio_pci_intrs.c | 34 +++++++++++++++++++++++++------
+ 1 file changed, 28 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-index d62fbfff20b82..82b2afa9b7e31 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-@@ -141,13 +141,14 @@ static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
- 	irq = &vdev->mc_irqs[index];
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 136101179fcbd..75c85eec21b3c 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -99,13 +99,15 @@ static void vfio_send_intx_eventfd(void *opaque, void *unused)
+ }
+ 
+ /* Returns true if the INTx vfio_pci_irq_ctx.masked value is changed. */
+-bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
++static bool __vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	struct vfio_pci_irq_ctx *ctx;
+ 	unsigned long flags;
+ 	bool masked_changed = false;
+ 
++	lockdep_assert_held(&vdev->igate);
++
+ 	spin_lock_irqsave(&vdev->irqlock, flags);
+ 
+ 	/*
+@@ -143,6 +145,17 @@ bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
+ 	return masked_changed;
+ }
+ 
++bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
++{
++	bool mask_changed;
++
++	mutex_lock(&vdev->igate);
++	mask_changed = __vfio_pci_intx_mask(vdev);
++	mutex_unlock(&vdev->igate);
++
++	return mask_changed;
++}
++
+ /*
+  * If this is triggered by an eventfd, we can't call eventfd_signal
+  * or else we'll deadlock on the eventfd wait queue.  Return >0 when
+@@ -194,12 +207,21 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
+ 	return ret;
+ }
+ 
+-void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev)
++static void __vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev)
+ {
++	lockdep_assert_held(&vdev->igate);
++
+ 	if (vfio_pci_intx_unmask_handler(vdev, NULL) > 0)
+ 		vfio_send_intx_eventfd(vdev, NULL);
+ }
+ 
++void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev)
++{
++	mutex_lock(&vdev->igate);
++	__vfio_pci_intx_unmask(vdev);
++	mutex_unlock(&vdev->igate);
++}
++
+ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+ {
+ 	struct vfio_pci_core_device *vdev = dev_id;
+@@ -563,11 +585,11 @@ static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
+ 		return -EINVAL;
  
  	if (flags & VFIO_IRQ_SET_DATA_NONE) {
--		vfio_fsl_mc_irq_handler(hwirq, irq);
-+		if (irq->trigger)
-+			eventfd_signal(irq->trigger);
- 
+-		vfio_pci_intx_unmask(vdev);
++		__vfio_pci_intx_unmask(vdev);
  	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
- 		u8 trigger = *(u8 *)data;
+ 		uint8_t unmask = *(uint8_t *)data;
+ 		if (unmask)
+-			vfio_pci_intx_unmask(vdev);
++			__vfio_pci_intx_unmask(vdev);
+ 	} else if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+ 		struct vfio_pci_irq_ctx *ctx = vfio_irq_ctx_get(vdev, 0);
+ 		int32_t fd = *(int32_t *)data;
+@@ -594,11 +616,11 @@ static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
+ 		return -EINVAL;
  
--		if (trigger)
--			vfio_fsl_mc_irq_handler(hwirq, irq);
-+		if (trigger && irq->trigger)
-+			eventfd_signal(irq->trigger);
+ 	if (flags & VFIO_IRQ_SET_DATA_NONE) {
+-		vfio_pci_intx_mask(vdev);
++		__vfio_pci_intx_mask(vdev);
+ 	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+ 		uint8_t mask = *(uint8_t *)data;
+ 		if (mask)
+-			vfio_pci_intx_mask(vdev);
++			__vfio_pci_intx_mask(vdev);
+ 	} else if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+ 		return -ENOTTY; /* XXX implement me */
  	}
- 
- 	return 0;
 -- 
 2.43.0
 
