@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-12803-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E0D88DCDF
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 12:51:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDB7788DCEB
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 12:54:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ED2DB2548B
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 11:51:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 961B61F29A8E
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 11:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96EE12C7E2;
-	Wed, 27 Mar 2024 11:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEB412C805;
+	Wed, 27 Mar 2024 11:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b="lB/2GNDf"
+	dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b="bWXQaFvz"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD2D12B15F
-	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 11:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA86712C7F2
+	for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 11:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711540226; cv=none; b=IvDXUxYSZYTRwdw/j0w6N23+dsew8WI+bc822IsKcMhsfxfLvKGVgZ9UQUeiMpeWBO3tnY8heLcVxMtlon6y4SGtORUMVTLhLKxlA28X+EYIPx2MeQtXA+QC/np/ZhA+GGsKMma18sAE1xpQ6YUWpjmDC2ZcnNnacTdjf1Oj9bs=
+	t=1711540470; cv=none; b=bAAk/OyNau3UE1rFiwmjxkjKpXpwVQWGItW/SNpOrwAoTNROa0uG7j3Ff9lmelyE83ENCHQ3hH/3kXyRp1PHB95oUtOafqXTeD2KW8l+yLMBUngR6ZsSxgdEGOnGPzNiMcrK4O0/mMgcvtA7Owqyag+WZGiGmiMZbwi8vF8+ucA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711540226; c=relaxed/simple;
-	bh=I6XcDgr1EShu8zJctZvYMkKHpS4Yx6165q2gwZkVqxM=;
+	s=arc-20240116; t=1711540470; c=relaxed/simple;
+	bh=DzYz2HhNcAcZLiLQYG0ve/CZMNuHGe4PjgfBC/pC1Z8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DV7k0HDAznATI0+exTUYzj/jposPmjT/CJ21T11ZyhsXY6N1q98m/DjZ+ruJTxBg3e2DrNLdZCGKjkUW4BRcjCYdfyD/qB7cz1maYZc8sUsfTiTcPgnkI85YKeLdFYI03eWaeK4oT0PtJ4MgQPPK8UaN4Z2mJzbC00X1rV2N7jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b=lB/2GNDf; arc=none smtp.client-ip=209.85.218.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=oSG7b5T9yJGNEkKIqcJ1vKV+DUEIdLwqubNflNxjp5xyfzS3S0benxA7xXtQ7nHNWqVHsQrqQvnAKYbZeViAxYj/5/THaVcmnxZ/cfd0vuRhP1HsYNeOwWJd+0o2v6K7bscn5tV2FFcWagKJ8Fa9/PqyGaLe1tk0zIEDxgr9ff8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=cloud.com header.i=@cloud.com header.b=bWXQaFvz; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a46d0a8399aso133131966b.1
-        for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 04:50:24 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a46ba938de0so883071966b.3
+        for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 04:54:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.com; s=cloud; t=1711540223; x=1712145023; darn=vger.kernel.org;
+        d=cloud.com; s=cloud; t=1711540467; x=1712145267; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=4FC6f2CiQL5W1YZBJ6SK7a0UwL0NwwFJDhTY6Z9yEh8=;
-        b=lB/2GNDfvtR7eAF50dP1r9QoC45Ui3fFj0EM1eNCbhsBVwSOdNkIoyuU5M0Bysw0wH
-         uC2kIkuAQCFnpRhQ4V/QZAZHCCNj8LDkhpz+mDFiru1j9p3PU20U9UuD+1PNf05igvp+
-         Y0lxri9fC9hQ88BJy//F+gsl1vn4H/z9fO2AU=
+        bh=Xo2nfZBTCiRDB2jtZRoNWpjUBE4WiCL6rnHvacWUBJM=;
+        b=bWXQaFvzdtTK+5s2jiS8u0XyDdH4FVfl8tz2vb9V82ONn+JfqyO98jDz3GVcBnMFJW
+         9JFpLhMYSGSxybLa7F5zQePSY4HHk1O64YTZP0InTDByD43QKtoE2vf8njueruDNxE3t
+         GAtpS8IaB5PP+fehT8vBPaF0fvm3TrFxQrbmE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711540223; x=1712145023;
+        d=1e100.net; s=20230601; t=1711540467; x=1712145267;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4FC6f2CiQL5W1YZBJ6SK7a0UwL0NwwFJDhTY6Z9yEh8=;
-        b=dVQwcBDzyOlJqOWL8TZqGTWwDkulndc/2m9ovrXHx7nP78dL/aZ/+KwBsnONCom+Tj
-         XRBCyKkIoNMYXE2cC2iuNnPPx2Vqb35hZ9HyrBkUsNALbLDkjuMtMbZdSi70FBo17tTA
-         95LgVAS4/smLFT222ceekECK9FkZA4l/U81yB/o/zohqWn5uL8X5uLjV29iVFMM19ITX
-         H5NNm1WOYSzJNjwTrfKF5UJuiCkMPpxk7heEZdykc5FhQQtvWuLhG7vVDS9afFLwjN1J
-         Er+KZ7SeS0vpGbB4////S7lHPBJ6tOacKhinZhdu8pUA5fB7THzPYI60LQLwwJa4YgoH
-         VGCw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSiAgCyLZ/woMzKOQ5Wm1jnEHVnaWdFxIiG+ii2tNWKcToljD178h2LmR+ZQV4B+t+T+9RqQ8TxgJ5axU8maSj/mzY
-X-Gm-Message-State: AOJu0Yzv7eHLfGfdsYI4Zk3OPyHUfNgE0xcgD2jPG7Mef1wrNgW5lvei
-	nGpug/R8pN7rwRKZC3+ni0pfX19b56TrhPEq2QmeGWQM1Zx8UArMGcrPjly5SQ8=
-X-Google-Smtp-Source: AGHT+IHjrlueyINri3BcwMN7nzklq3D6QJVA6wmS9ETMB5MPCffXe1tqgCTZZJIf53/O2Hw5bsVZmw==
-X-Received: by 2002:a17:906:a890:b0:a47:134d:2fc8 with SMTP id ha16-20020a170906a89000b00a47134d2fc8mr3629567ejb.10.1711540223416;
-        Wed, 27 Mar 2024 04:50:23 -0700 (PDT)
+        bh=Xo2nfZBTCiRDB2jtZRoNWpjUBE4WiCL6rnHvacWUBJM=;
+        b=c5St5fq9EBfxxrDywO8d6sc1CcBtjQU+F6Ut/ZvpQzj7q4EPgGqQUPVoM+e9Oo7T1s
+         5/sMHlglnRddzYJPA8HZq/27Nwnlp8h7wIzdyJAVtldw+BRgSkukwap1YUVPlpZ4pTqv
+         Ms+cnMnt8510xSmNsUofW3ZJxzl20tmjMDkhl+s1nAZJPc0ixlTFFxRxuAsfNLfZ2v+v
+         vOOllW0+f365CARgdEZuJMy9OmX08PnBawC1URcbS1mwLKoX7+8WBCOWe3uu35jcuQPB
+         FkR2C+R+cW5DSDimisfLw0VqRDbbDv/NFgyiA0bfDH4CtmeNHOyiE0QsCUFHNT7ifPu8
+         vq7A==
+X-Forwarded-Encrypted: i=1; AJvYcCVYNibguOg004zJuW8CRlcJHC95NRQzoI1SAj+2pi1LgtxS8QpTVn9ehpcHyeDRj9ZhKuQmhL2sJSK6K4jGetqhzNDA
+X-Gm-Message-State: AOJu0YzyEZP3vdApuR8jwe9zyymszkwuE8ufAXYHzZm0mffPECbrz13W
+	J4IOMLR6H1sramtrlFcQDYJjz/zVsghDHvnIQMbgyk63EP23Vo9uXeNUfVjs3/g=
+X-Google-Smtp-Source: AGHT+IG9GlCL2qsgWyuFSglCpOBIwZX7MMRogX3VsIf8avJI3j19EV0AuKmIO9P0kiOttKpgN9U6dQ==
+X-Received: by 2002:a17:906:1911:b0:a4d:f2a3:9c37 with SMTP id a17-20020a170906191100b00a4df2a39c37mr3310934eje.4.1711540467139;
+        Wed, 27 Mar 2024 04:54:27 -0700 (PDT)
 Received: from perard.uk.xensource.com (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
-        by smtp.gmail.com with ESMTPSA id u1-20020a1709063b8100b00a46fbff47a6sm5322360ejf.168.2024.03.27.04.50.22
+        by smtp.gmail.com with ESMTPSA id x20-20020a170906b09400b00a469e55767dsm5334791ejy.214.2024.03.27.04.54.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 04:50:22 -0700 (PDT)
-Date: Wed, 27 Mar 2024 11:50:21 +0000
+        Wed, 27 Mar 2024 04:54:26 -0700 (PDT)
+Date: Wed, 27 Mar 2024 11:54:26 +0000
 From: Anthony PERARD <anthony.perard@cloud.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
 Cc: David Woodhouse <dwmw@amazon.co.uk>, qemu-devel@nongnu.org,
@@ -75,13 +75,11 @@ Cc: David Woodhouse <dwmw@amazon.co.uk>, qemu-devel@nongnu.org,
 	Stefano Stabellini <sstabellini@kernel.org>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	xen-devel@lists.xenproject.org, qemu-block@nongnu.org,
-	kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH-for-9.0 v2 05/19] hw/display: Restrict
- xen_register_framebuffer() call to Xen
-Message-ID: <7e08a2d5-7d90-4d48-85e5-4c7e39d59c11@perard>
+	kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH-for-9.0 v2 08/19] hw/xen: Remove unused Xen stubs
+Message-ID: <7af32170-a282-4f28-9db6-913087960acf@perard>
 References: <20231114143816.71079-1-philmd@linaro.org>
- <20231114143816.71079-6-philmd@linaro.org>
+ <20231114143816.71079-9-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,17 +89,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231114143816.71079-6-philmd@linaro.org>
+In-Reply-To: <20231114143816.71079-9-philmd@linaro.org>
 
-On Tue, Nov 14, 2023 at 03:38:01PM +0100, Philippe Mathieu-Daudé wrote:
-> Only call xen_register_framebuffer() when Xen is enabled.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+On Tue, Nov 14, 2023 at 03:38:04PM +0100, Philippe Mathieu-Daudé wrote:
+> All these stubs are protected by a 'if (xen_enabled())' check.
 
-I don't think this patch is very useful but it's fine, so:
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Are you sure? There's still nothing that prevent a compiler from wanting
+those, I don't think.
 
-Thanks,
+Sure, often compilers will remove dead code in `if(0){...}`, but there's
+no guaranty, is there?
+
+Cheers,
 
 -- 
 Anthony PERARD
