@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-12761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14BA788D6C2
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 07:41:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B25A88D6CA
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 07:44:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A58A1F226F7
-	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:41:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B97D1C25ACF
+	for <lists+kvm@lfdr.de>; Wed, 27 Mar 2024 06:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0414F241E1;
-	Wed, 27 Mar 2024 06:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154FB22089;
+	Wed, 27 Mar 2024 06:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SGiQ55l2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M0F6D7d8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02609E574;
-	Wed, 27 Mar 2024 06:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C974C9D;
+	Wed, 27 Mar 2024 06:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711521649; cv=none; b=JXlxJuk+f8rLJ0BC+qtMrfDuM5tJPp1hHKnWAKRNeCExniZswdP2XPCNy+0Og8PpPY4lrROZelBB4wbMpi5PFligWiII02hw4ueKhqTw+acL0+aSDssEdeNZ2yh6kkaN/0elLrnPxOcTVbAjUtC9rNZs1+is8JCAAev+8zYZ5TQ=
+	t=1711521841; cv=none; b=QLBXSn4I5D5KBipdk9qmvCOu9MSnYx2fu+D+3ED6hFOfPMtbMRo+pl/nySolvVN7/N4PJHbuUQcDMqD/4Ixvl+opZknm67l/99X5t4uVTgpcTMqRyExP3apUEgDyORAIMYRfE2kelqZVMJgAMfFN2aQAWCRHX88MbPSuxsXx43E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711521649; c=relaxed/simple;
-	bh=sJSXWPv7y3LAtlgAf4xNkAZyP7p6P6pUlbW8YJObejY=;
+	s=arc-20240116; t=1711521841; c=relaxed/simple;
+	bh=gjxD+4XwapFfO+Ut0KmYydbgFTnH0aPydPXYf435b9o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NXyHtPOMmySxLlVgA5hs+7EhgmwO4HH838tN4ni3D0Fkm6f7q9xjF9E+qqGmVDjc1eibhVHWTiuTL82WOy7M3Zw8xNJFPPd8b4VFB+ztS1UP2UklzxmOj3g2sBZlfAhwI6jpzsOdn34PH68wQtuKzMD9L9ZyXDhp5dxE0Ju2ehI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SGiQ55l2; arc=none smtp.client-ip=192.198.163.8
+	 In-Reply-To:Content-Type; b=rdIbXgA9R4vIOAgpp4QqWrpA4UGOxJ0BOdERHHf8KuXBoGo7HHbA+wqaT930szkhJDdSZhlvWUE8Nbe1ncnUz/UKuKHqclPgo67op6zrXx2BHlFn3u5s64Liwu2/2t2uKijYPC4giaxWLGE0BtSKCmckXk6xGFlK8b9EalFzDvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M0F6D7d8; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711521647; x=1743057647;
+  t=1711521840; x=1743057840;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=sJSXWPv7y3LAtlgAf4xNkAZyP7p6P6pUlbW8YJObejY=;
-  b=SGiQ55l2Kez/KwuQArBfWGA+KU4nObNUpTQ7Kd8sBfs/Xl1eeg+9+nf0
-   Yc1jviMv1M+iuCUh3q22dw+rgpLP8CjHjB51wg0Fy0+mcvsoNe9RJOy3C
-   aJRxZqfreUAzGh112YP+KCzrJhKcfQX47b+q+lHigrqjl0+Q5HbeSbjH9
-   yFNSMI9ZfeGumvXImvLxUTRHdbfg4UiOJesvksgWjhBILEol6S6EcoVlA
-   7vhno58B7DOmvJhfXwpka0HN8/9ziZh4SGuBqr5D0gPXBEC8ByVvhcuK+
-   p1hChCD/G+4ncR+8EG8tPEU3JZBzRJAnRjWMEDc3g3FlfG+pnqfv3l190
+  bh=gjxD+4XwapFfO+Ut0KmYydbgFTnH0aPydPXYf435b9o=;
+  b=M0F6D7d8kfGuBzYatjKPF+uZ0rWCmkRjfEZSh6pj/Q6+NtSMqfLTetCk
+   nUv2ZZ5rqkEoL5C+3BdntCN73H8phJANG8QRcGHpigYKLeaCoIzRnMQ9G
+   bs+/PRN9yLNtoqnKkThFHVeW4eKL7sSzUBNq8ErvJMA0AV36USA3p55U/
+   qxw7x8v7UVdADoIYvQo31Or9J0DNZpvOYjvi9Fq25zGRQdcc722GzqyDe
+   7k5npCNdgZ0jPVzsfXAXYS1lB+JmYopXFxEQuTRi9/RTeYyhcIDgZdwIZ
+   dFZz3BiyOhclqolBiQJtn5Ob0XWF+POTIwGKlJnBduGWMXnBiCC7rBhc+
    w==;
-X-CSE-ConnectionGUID: bP4EfQunQrSz2H+HVIWyFA==
-X-CSE-MsgGUID: f+uys+qiSgWKzCQXEe+hWQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="24094012"
+X-CSE-ConnectionGUID: pwNbSCW7Tt2t2El/7gYn0A==
+X-CSE-MsgGUID: UN6wFzF2R0Oh1FN8W1q1dw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="6735529"
 X-IronPort-AV: E=Sophos;i="6.07,158,1708416000"; 
-   d="scan'208";a="24094012"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 23:40:46 -0700
+   d="scan'208";a="6735529"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 23:43:59 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,158,1708416000"; 
-   d="scan'208";a="53666527"
+   d="scan'208";a="16577421"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.125.242.198]) ([10.125.242.198])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 23:40:43 -0700
-Message-ID: <715a9591-a913-4b79-a07b-9599a67e60e7@linux.intel.com>
-Date: Wed, 27 Mar 2024 14:40:25 +0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 23:43:56 -0700
+Message-ID: <894d480c-5785-4896-bb79-9560611347cb@linux.intel.com>
+Date: Wed, 27 Mar 2024 14:43:54 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,63 +65,79 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests Patch v3 02/11] x86: pmu: Enlarge cnt[] length to
- 64 in check_counters_many()
-To: Jim Mattson <jmattson@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>,
- Zhang Xiong <xiong.y.zhang@intel.com>, Mingwei Zhang <mizhang@google.com>,
- Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>,
- Dapeng Mi <dapeng1.mi@intel.com>
-References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
- <20240103031409.2504051-3-dapeng1.mi@linux.intel.com>
- <CALMp9eSsF22203ZR6o+qMxySDrPpjVNYe-nBRjf1vSRq9aBLDA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests Patch v3 03/11] x86: pmu: Add asserts to warn
+ inconsistent fixed events and counters
 Content-Language: en-US
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Zhang Xiong
+ <xiong.y.zhang@intel.com>, Like Xu <like.xu.linux@gmail.com>,
+ Jinrong Liang <cloudliang@tencent.com>, Dapeng Mi <dapeng1.mi@intel.com>
+References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
+ <20240103031409.2504051-4-dapeng1.mi@linux.intel.com>
+ <ZgOu5PP2qXhbflRc@google.com>
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <CALMp9eSsF22203ZR6o+qMxySDrPpjVNYe-nBRjf1vSRq9aBLDA@mail.gmail.com>
+In-Reply-To: <ZgOu5PP2qXhbflRc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
-On 3/26/2024 5:41 AM, Jim Mattson wrote:
-> On Tue, Jan 2, 2024 at 7:09 PM Dapeng Mi <dapeng1.mi@linux.intel.com> wrote:
->> Considering there are already 8 GP counters and 4 fixed counters on
->> latest Intel processors, like Sapphire Rapids. The original cnt[] array
->> length 10 is definitely not enough to cover all supported PMU counters on these
->> new processors even through currently KVM only supports 3 fixed counters
->> at most. This would cause out of bound memory access and may trigger
->> false alarm on PMU counter validation
+On 3/27/2024 1:30 PM, Mingwei Zhang wrote:
+> On Wed, Jan 03, 2024, Dapeng Mi wrote:
+>> Current PMU code deosn't check whether PMU fixed counter number is
+>> larger than pre-defined fixed events. If so, it would cause memory
+>> access out of range.
 >>
->> It's probably more and more GP and fixed counters are introduced in the
->> future and then directly extends the cnt[] array length to 64 once and
->> for all.
+>> So add assert to warn this invalid case.
 >>
 >> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Reviewed-by: Mingwei Zhang <mizhang@google.com>
 >> ---
->>   x86/pmu.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>   x86/pmu.c | 10 ++++++++--
+>>   1 file changed, 8 insertions(+), 2 deletions(-)
 >>
 >> diff --git a/x86/pmu.c b/x86/pmu.c
->> index 0def28695c70..a13b8a8398c6 100644
+>> index a13b8a8398c6..a42fff8d8b36 100644
 >> --- a/x86/pmu.c
 >> +++ b/x86/pmu.c
->> @@ -254,7 +254,7 @@ static void check_fixed_counters(void)
+>> @@ -111,8 +111,12 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+>>   		for (i = 0; i < gp_events_size; i++)
+>>   			if (gp_events[i].unit_sel == (cnt->config & 0xffff))
+>>   				return &gp_events[i];
+>> -	} else
+>> -		return &fixed_events[cnt->ctr - MSR_CORE_PERF_FIXED_CTR0];
+>> +	} else {
+>> +		int idx = cnt->ctr - MSR_CORE_PERF_FIXED_CTR0;
+> maybe unsigned int is better?
+
+Make sense. Thanks for review.
+
+>> +
+>> +		assert(idx < ARRAY_SIZE(fixed_events));
+>> +		return &fixed_events[idx];
+>> +	}
+>>   
+>>   	return (void*)0;
+>>   }
+>> @@ -245,6 +249,7 @@ static void check_fixed_counters(void)
+>>   	};
+>>   	int i;
+>>   
+>> +	assert(pmu.nr_fixed_counters <= ARRAY_SIZE(fixed_events));
+>>   	for (i = 0; i < pmu.nr_fixed_counters; i++) {
+>>   		cnt.ctr = fixed_events[i].unit_sel;
+>>   		measure_one(&cnt);
+>> @@ -266,6 +271,7 @@ static void check_counters_many(void)
+>>   			gp_events[i % gp_events_size].unit_sel;
+>>   		n++;
+>>   	}
+>> +	assert(pmu.nr_fixed_counters <= ARRAY_SIZE(fixed_events));
+>>   	for (i = 0; i < pmu.nr_fixed_counters; i++) {
+>>   		cnt[n].ctr = fixed_events[i].unit_sel;
+>>   		cnt[n].config = EVNTSEL_OS | EVNTSEL_USR;
+>> -- 
+>> 2.34.1
 >>
->>   static void check_counters_many(void)
->>   {
->> -       pmu_counter_t cnt[10];
->> +       pmu_counter_t cnt[64];
-> I think 48 should be sufficient, based on the layout of
-> IA32_PERF_GLOBAL_CTRL and IA32_PERF_GLOBAL_STATUS.
->
-> In any event, let's bump this up!
->
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-
-Yeah, would shrink to 48.
-
-Thanks Jim. I'm glad you have time to review this patchset. Not sure if 
-you have time to review other patches?
-
 
