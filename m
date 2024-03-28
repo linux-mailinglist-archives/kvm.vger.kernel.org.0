@@ -1,171 +1,182 @@
-Return-Path: <kvm+bounces-12918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B9988F3BD
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:36:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 337BC88F42B
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B7F2A6B36
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:36:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 568D51C333A2
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902D410A1C;
-	Thu, 28 Mar 2024 00:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CC325776;
+	Thu, 28 Mar 2024 00:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="axSgu3pI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fohkXO9Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B5D817;
-	Thu, 28 Mar 2024 00:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12FAD25601
+	for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 00:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711586202; cv=none; b=OL3jiqniUZIABEl5RYDZZa0J0WNsBvvgZVFp8bMsH7Y+MHMYCeG9BBycOnfedd507bM5kUsLxcSBCL5rfaJ1d4Qgeoyxj81FxfsgVxA/AKOjJ/cPCb5dtfgAHNVKCw5mjA5g4Q2dN9/jZQG8RlGueRV+PGvwGykj+hnj5qzXabo=
+	t=1711586711; cv=none; b=bUrd5svjWbgzZ7XUOFhD4pqZp5bfiwVKoWABt6GtNBntl3ZjMi56mqm/It+BBbKgoIjG+yophCQDN4tI3maXLp5n5+6sooSzIbpw8QtwrJLRq2iI23L4SpyMPIembmOopyVQBXRrMQHzLWozYikrJ8V9s0nnZi2CQWQdSOA0Kc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711586202; c=relaxed/simple;
-	bh=bKy2b8DlGeDsZdgu01uYDVooRH0V8usjwDuPx2wkFeY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ViDXYriBLRe/nBPtrpomUICQeRt1xiub+EG7i+nScqTIuRAnOOPBTKu8x/ESEfqLQ6XrlS/CsyOHVITGLI8VaQqZJMyu9t3sfBZ2q0LSbZg3nI5NwTRltGEsBvTJRSjeumDWsYlCjJ2+Wl5tZbRZtgWrMaQ35+DXGLes6v8VchY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=axSgu3pI; arc=none smtp.client-ip=192.198.163.17
+	s=arc-20240116; t=1711586711; c=relaxed/simple;
+	bh=qMr1lni1QD7AcsTQhnj6Msn8Z5FbVcK5sLp+/58NNJ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YJs3m8pXQfnII7ZL80mpfikjxeurNsoZG/nskeeiN+fY5fBLvSYowugGv3m+I11ThbfMu4GUsgk4xKpxlsIpraZsnb6go5eFOUK0tJRJ/uj8XpCyzxgJqFrd7nCWGOeeLDqRij7+PHCSaGZRQMTs88nm0EDgmNcOBXpWR16Hcuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fohkXO9Y; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711586201; x=1743122201;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=bKy2b8DlGeDsZdgu01uYDVooRH0V8usjwDuPx2wkFeY=;
-  b=axSgu3pINFmv37lkmwRFemEsboFFSATzLbisc/0W+tlYCNnnJ+FADXuJ
-   VBluXruQNqmAw8Puny6YberExQax+RPQUrFc65DCDFYLksrobfOYYh3+o
-   e8KzwmZbEqd69AJ7aulCM/UKJvC76hxi+EJgC78oMz+QwPGgYKy7RM3Uz
-   yG6XubL3bGDC0+7P/3d8p9zBrd6/2MJujf9rM2SzLiNfg+e96dXDpi403
-   UVQ4pSgyJmwXktRDKbkCP+CZmObtMWgchacVUV+XOCkdHZPWZVjdX/q3Y
-   K9qq33Sc4Wk8mgqPC+c2dkbeM4tm163PVgO9S5RMfWQkRYOJ2O5wMNBls
-   w==;
-X-CSE-ConnectionGUID: YwhkT75tSr+/lG7ggSTZHQ==
-X-CSE-MsgGUID: uXuYcLYeS+mAqyXyuYF93w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6583777"
+  t=1711586709; x=1743122709;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=qMr1lni1QD7AcsTQhnj6Msn8Z5FbVcK5sLp+/58NNJ0=;
+  b=fohkXO9YWKoP8oaG0EcfIhT/CSYJdKKVOILPzaNsVcjSk7M5OjsqrTn9
+   GNF3F2XWqOO09p2+8khjsJ/pHbDSz9cy+MwOEc82KC4Sjq+iqVnPCNiUT
+   inFW2layjE9YtdZ4hwWqeO8Q3GAW4+YgXLTBcLQOY2SgPUNV4h+fBfUSa
+   RSiwbSvYhvhGV6pG1sZQ+ZWxNOAEY4BhwpPjY2j2BM88CjUHQT4jQYT9I
+   l0pCq9/B453/R0BTsvlN1MOxn14bi2mCoaCgKNTCjh0RmTX0RJuM25qTq
+   Fr3Otgm/SgR4IoYqehkWJjX917LbMur5XxCVX+9OW9l8zDmVS7Qb4CMlq
+   g==;
+X-CSE-ConnectionGUID: VXEmuAUQS6qPSFPumBVP/g==
+X-CSE-MsgGUID: 6nKbEaeNTgil5aDAqSflnQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="29200853"
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="6583777"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:36:38 -0700
+   d="scan'208";a="29200853"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:45:08 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="21121383"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:36:38 -0700
-Date: Wed, 27 Mar 2024 17:36:37 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"Gao, Chao" <chao.gao@intel.com>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"Zhang, Tina" <tina.zhang@intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Huang, Kai" <kai.huang@intel.com>,
-	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-	"Chen, Bo2" <chen.bo@intel.com>,
-	"sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Aktas, Erdem" <erdemaktas@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"Yuan, Hang" <hang.yuan@intel.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>
-Subject: Re: [PATCH v19 059/130] KVM: x86/tdp_mmu: Don't zap private pages
- for unsupported cases
-Message-ID: <20240328003637.GM2444378@ls.amr.corp.intel.com>
-References: <20240325231058.GP2357401@ls.amr.corp.intel.com>
- <edcfc04cf358e6f885f65d881ef2f2165e059d7e.camel@intel.com>
- <20240325233528.GQ2357401@ls.amr.corp.intel.com>
- <ZgIzvHKobT2K8LZb@chao-email>
- <20db87741e356e22a72fadeda8ab982260f26705.camel@intel.com>
- <ZgKt6ljcmnfSbqG/@chao-email>
- <20240326174859.GB2444378@ls.amr.corp.intel.com>
- <481141ba-4bdf-40f3-9c32-585281c7aa6f@intel.com>
- <34ca8222fcfebf1d9b2ceb20e44582176d2cef24.camel@intel.com>
- <873263e8-371a-47a0-bba3-ed28fcc1fac0@intel.com>
+   d="scan'208";a="47683047"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.224.7]) ([10.124.224.7])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:45:06 -0700
+Message-ID: <61462f83-1406-48ea-8f1a-fae848ff1443@intel.com>
+Date: Thu, 28 Mar 2024 08:45:03 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <873263e8-371a-47a0-bba3-ed28fcc1fac0@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 48/49] hw/i386/sev: Use guest_memfd for legacy ROMs
+To: Isaku Yamahata <isaku.yamahata@intel.com>,
+ Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Tom Lendacky <thomas.lendacky@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pankaj.gupta@amd.com>,
+ Isaku Yamahata <isaku.yamahata@linux.intel.com>
+References: <20240320083945.991426-1-michael.roth@amd.com>
+ <20240320083945.991426-49-michael.roth@amd.com>
+ <20240320181223.GG1994522@ls.amr.corp.intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20240320181223.GG1994522@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 28, 2024 at 08:06:53AM +0800,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On 3/21/2024 2:12 AM, Isaku Yamahata wrote:
+> On Wed, Mar 20, 2024 at 03:39:44AM -0500,
+> Michael Roth <michael.roth@amd.com> wrote:
+> 
+>> TODO: make this SNP-specific if TDX disables legacy ROMs in general
+> 
+> TDX disables pc.rom, not disable isa-bios. IIRC, TDX doesn't need pc pflash.
 
-> On 3/28/2024 1:36 AM, Edgecombe, Rick P wrote:
-> > On Wed, 2024-03-27 at 10:54 +0800, Xiaoyao Li wrote:
-> > > > > If QEMU doesn't configure the msr filter list correctly, KVM has to handle
-> > > > > guest's MTRR MSR accesses. In my understanding, the
-> > > > > suggestion is KVM zap private memory mappings.
-> 
-> TDX spec states that
-> 
->   18.2.1.4.1 Memory Type for Private and Opaque Access
-> 
->   The memory type for private and opaque access semantics, which use a
->   private HKID, is WB.
-> 
->   18.2.1.4.2 Memory Type for Shared Accesses
-> 
->   Intel SDM, Vol. 3, 28.2.7.2 Memory Type Used for Translated Guest-
->   Physical Addresses
-> 
->   The memory type for shared access semantics, which use a shared HKID,
->   is determined as described below. Note that this is different from the
->   way memory type is determined by the hardware during non-root mode
->   operation. Rather, it is a best-effort approximation that is designed
->   to still allow the host VMM some control over memory type.
->     • For shared access during host-side (SEAMCALL) flows, the memory
->       type is determined by MTRRs.
->     • For shared access during guest-side flows (VM exit from the guest
->       TD), the memory type is determined by a combination of the Shared
->       EPT and MTRRs.
->       o If the memory type determined during Shared EPT walk is WB, then
->         the effective memory type for the access is determined by MTRRs.
->       o Else, the effective memory type for the access is UC.
-> 
-> My understanding is that guest MTRR doesn't affect the memory type for
-> private memory. So we don't need to zap private memory mappings.
+Not TDX doesn't need pc pflash, but TDX cannot support pflash.
 
-So, there is no point to (try to) emulate MTRR.  The direction is, don't
-advertise MTRR to the guest (new TDX module is needed.) or enforce
-the guest to not use MTRR (guest command line clearcpuid=mtrr).  KVM will
-simply return error to guest access to MTRR related registers.
+Can SNP support the behavior of pflash? That what's got changed will be 
+synced back to OVMF file?
 
-QEMU or user space VMM can use the MSR filter if they want.
-
-
-> > > > > But guests won't accept memory again because no one
-> > > > > currently requests guests to do this after writes to MTRR MSRs. In this case,
-> > > > > guests may access unaccepted memory, causing infinite EPT violation loop
-> > > > > (assume SEPT_VE_DISABLE is set). This won't impact other guests/workloads on
-> > > > > the host. But I think it would be better if we can avoid wasting CPU resource
-> > > > > on the useless EPT violation loop.
-> > > > 
-> > > > Qemu is expected to do it correctly.  There are manyways for userspace to go
-> > > > wrong.  This isn't specific to MTRR MSR.
-> > > 
-> > > This seems incorrect. KVM shouldn't force userspace to filter some
-> > > specific MSRs. The semantic of MSR filter is userspace configures it on
-> > > its own will, not KVM requires to do so.
-> > 
-> > I'm ok just always doing the exit to userspace on attempt to use MTRRs in a TD, and not rely on the
-> > MSR list. At least I don't see the problem.
+> Xiaoyao can chime in.
 > 
-> What is the exit reason in vcpu->run->exit_reason? KVM_EXIT_X86_RDMSR/WRMSR?
-> If so, it breaks the ABI on KVM_EXIT_X86_RDMSR/WRMSR.
+> Thanks,
+> 
+>>
+>> Current SNP guest kernels will attempt to access these regions with
+>> with C-bit set, so guest_memfd is needed to handle that. Otherwise,
+>> kvm_convert_memory() will fail when the guest kernel tries to access it
+>> and QEMU attempts to call KVM_SET_MEMORY_ATTRIBUTES to set these ranges
+>> to private.
+>>
+>> Whether guests should actually try to access ROM regions in this way (or
+>> need to deal with legacy ROM regions at all), is a separate issue to be
+>> addressed on kernel side, but current SNP guest kernels will exhibit
+>> this behavior and so this handling is needed to allow QEMU to continue
+>> running existing SNP guest kernels.
+>>
+>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+>> ---
+>>   hw/i386/pc.c       | 13 +++++++++----
+>>   hw/i386/pc_sysfw.c | 13 ++++++++++---
+>>   2 files changed, 19 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index feb7a93083..5feaeb43ee 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -1011,10 +1011,15 @@ void pc_memory_init(PCMachineState *pcms,
+>>       pc_system_firmware_init(pcms, rom_memory);
+>>   
+>>       option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+>> -    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+>> -                           &error_fatal);
+>> -    if (pcmc->pci_enabled) {
+>> -        memory_region_set_readonly(option_rom_mr, true);
+>> +    if (machine_require_guest_memfd(machine)) {
+>> +        memory_region_init_ram_guest_memfd(option_rom_mr, NULL, "pc.rom",
+>> +                                           PC_ROM_SIZE, &error_fatal);
+>> +    } else {
+>> +        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+>> +                               &error_fatal);
+>> +        if (pcmc->pci_enabled) {
+>> +            memory_region_set_readonly(option_rom_mr, true);
+>> +        }
+>>       }
+>>       memory_region_add_subregion_overlap(rom_memory,
+>>                                           PC_ROM_MIN_VGA,
+>> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+>> index 9dbb3f7337..850f86edd4 100644
+>> --- a/hw/i386/pc_sysfw.c
+>> +++ b/hw/i386/pc_sysfw.c
+>> @@ -54,8 +54,13 @@ static void pc_isa_bios_init(MemoryRegion *rom_memory,
+>>       /* map the last 128KB of the BIOS in ISA space */
+>>       isa_bios_size = MIN(flash_size, 128 * KiB);
+>>       isa_bios = g_malloc(sizeof(*isa_bios));
+>> -    memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
+>> -                           &error_fatal);
+>> +    if (machine_require_guest_memfd(current_machine)) {
+>> +        memory_region_init_ram_guest_memfd(isa_bios, NULL, "isa-bios",
+>> +                                           isa_bios_size, &error_fatal);
+>> +    } else {
+>> +        memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
+>> +                               &error_fatal);
+>> +    }
+>>       memory_region_add_subregion_overlap(rom_memory,
+>>                                           0x100000 - isa_bios_size,
+>>                                           isa_bios,
+>> @@ -68,7 +73,9 @@ static void pc_isa_bios_init(MemoryRegion *rom_memory,
+>>              ((uint8_t*)flash_ptr) + (flash_size - isa_bios_size),
+>>              isa_bios_size);
+>>   
+>> -    memory_region_set_readonly(isa_bios, true);
+>> +    if (!machine_require_guest_memfd(current_machine)) {
+>> +        memory_region_set_readonly(isa_bios, true);
+>> +    }
+>>   }
+>>   
+>>   static PFlashCFI01 *pc_pflash_create(PCMachineState *pcms,
+>> -- 
+>> 2.25.1
+>>
+>>
+> 
 
-It's only when the user space requested it with the MSR filter.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
 
