@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-12928-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12929-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 467F788F4A1
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 02:30:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 930C888F4C7
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 02:37:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 784D21C2D726
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:30:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE54C282BDA
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2FF210EC;
-	Thu, 28 Mar 2024 01:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DDA2943C;
+	Thu, 28 Mar 2024 01:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qcz63bWB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g7zdxgAN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90D0200D5;
-	Thu, 28 Mar 2024 01:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05505286AD;
+	Thu, 28 Mar 2024 01:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711589420; cv=none; b=pSTL5P1zNyLZqnBZ6Mlpy6NWfEVTyV4ZEBYtGY2v3k/X4r2GfxtGhSbs7GBw/Jo9y2PmlIUPGDBI9q8IwA/qP06l9bqzeGBFVOe4k8AZ+Q2r0Jjk/skLYWYzrgFYmBvtS5PurQvj+n3idicSH+psa6Xwogn2u7ZvArIFO6sYYxQ=
+	t=1711589789; cv=none; b=IuaMjEHrMnCDgN8fzZdONzEICVArbh+uZ0crlOAV3isqUuAYElHh6VwDPmmWYEoki7tHcC5wIvmPHOeabZsm9c/Rq3AR+RmYpzxnMr7hvVAkKJhfOVOha+b3SzBu1Wndg/R9TsnM7v3ifWewd1Z7FEuaHIhu1OpDNYVqZRihv14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711589420; c=relaxed/simple;
-	bh=5aCurHOHta8QRuhaeNAeu28tMitK//VvdG5YQ9yPLRU=;
+	s=arc-20240116; t=1711589789; c=relaxed/simple;
+	bh=lhvQ3bL3zEzra6sPz4mYh3SCJYXmuoBa5F3CVmZ09oY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CcQe9YMDwxBhTD5ZmhAbcCOTUR73idTvt/m37UFBlhvbFt9u9aK0BKqcTtxC7KRHkBtAU81E7SCMHMEqf7+JyuH5p5X1LkEH/Dtq8GY2hUmYEUKy/FW4dcYXsT9LmpUi5f09khHV/ivND4jv9H7ymWhTbyM9R8uoalfyz5atwAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qcz63bWB; arc=none smtp.client-ip=192.198.163.12
+	 In-Reply-To:Content-Type; b=fM+guDBdeXQyODTAm2u29ZhHiyNt3E/msywpkrX0IQvMpIJDgxTRRGLXp/RpG9P07EG8gwonSuQbmyfwktlfptM4NONCJiht3dd8gl2q1EAiEZIpvh1jinUjfx+OqQMoimesXmI4vYJNWH6yw3QHcX6gc3quj59a3n9rNeOYmDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g7zdxgAN; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711589419; x=1743125419;
+  t=1711589788; x=1743125788;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=5aCurHOHta8QRuhaeNAeu28tMitK//VvdG5YQ9yPLRU=;
-  b=Qcz63bWBPtmy7lOkscUGrcUQECXgbPvX+Yz31sppPlo4YO8BDsqW0GJT
-   nt+iI3bBhVDhfljeYRql7Ql5CFLnRQm5gI+kVv8OPvHYMFuNbvwW3sxSB
-   bryATcOyfMuvfKmPouCAHm9ZuKWfglTCYm9W2f2lWK7cdy0HRqrrBu2bN
-   H98JYGr/fLhz5oqXqJzlse2jBILHBiNdutO3WR1gS6dgbSmjH98sw8Gft
-   zB5Ba5m6AgZCQfgVk8Db01TBqPo6FzIVjCdOqXJI+25BXd7TcA+cjX7rM
-   uzmour0+YU/7o9B30RFfozS3m2PTrkakK5aqoo4Hd4ikDLWs4Yoq/hldV
-   A==;
-X-CSE-ConnectionGUID: dj0kqkB6S5Wm/jj9/XyOaw==
-X-CSE-MsgGUID: AuSX9eYQTLKZ/X2D64uq/A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="10505872"
+  bh=lhvQ3bL3zEzra6sPz4mYh3SCJYXmuoBa5F3CVmZ09oY=;
+  b=g7zdxgANnSweXA7Yt+5AvoDFy7DzpYSVF8yf0v+co1fuxTPnrS331CFA
+   sn3AQT8KYGzsO8pZCGB5GWHE1Fj8PTlpO7DarFqSSvAH3UhYylGOmmHtm
+   6CkH4XliCgcXK5y4ajkI1tfgIXSaC5GGj8NvobDnWW9XGiVoIwU1m70Pb
+   1aBNtjLMLMDGG+KvvcqnwVezsXKez33of64R9tu/ihM2wXUudylKKEe6I
+   5iQ0S8OnaR3yDtQeaqj7+kNWbZsLeUksG5r4gb2qJLJw2hbKge5OMrLMC
+   UShIVCA3wL9Qau0xkoN0b0QDgWPD4LEqfWkFz9sFCT/Csg/3GdDH/g7B9
+   g==;
+X-CSE-ConnectionGUID: LFX268AtRvewW9KbKX3XbA==
+X-CSE-MsgGUID: bhA4xmoFTRSYbywfoxBkMA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="7325620"
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="10505872"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 18:30:18 -0700
+   d="scan'208";a="7325620"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 18:36:27 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="21145884"
+   d="scan'208";a="20999108"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.224.7]) ([10.124.224.7])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 18:30:15 -0700
-Message-ID: <20ef977a-75e5-4bbc-9acf-fa1250132138@intel.com>
-Date: Thu, 28 Mar 2024 09:30:11 +0800
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 18:36:24 -0700
+Message-ID: <b065cf99-74bc-42d1-95a3-8a0b018218ee@intel.com>
+Date: Thu, 28 Mar 2024 09:36:21 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,69 +65,80 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 059/130] KVM: x86/tdp_mmu: Don't zap private pages for
- unsupported cases
+Subject: Re: [PATCH v19 039/130] KVM: TDX: initialize VM with TDX specific
+ parameters
 To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
  "Gao, Chao" <chao.gao@intel.com>, "Yamahata, Isaku"
  <isaku.yamahata@intel.com>
 Cc: "Zhang, Tina" <tina.zhang@intel.com>,
- "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
- "seanjc@google.com" <seanjc@google.com>, "Huang, Kai" <kai.huang@intel.com>,
- "Chen, Bo2" <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
  "isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "seanjc@google.com" <seanjc@google.com>, "Huang, Kai" <kai.huang@intel.com>,
+ "sagis@google.com" <sagis@google.com>, "Chen, Bo2" <chen.bo@intel.com>,
+ "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
  "Aktas, Erdem" <erdemaktas@google.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "pbonzini@redhat.com" <pbonzini@redhat.com>, "Yuan, Hang"
- <hang.yuan@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <96fcb59cd53ece2c0d269f39c424d087876b3c73.camel@intel.com>
- <20240325190525.GG2357401@ls.amr.corp.intel.com>
- <5917c0ee26cf2bb82a4ff14d35e46c219b40a13f.camel@intel.com>
- <20240325221836.GO2357401@ls.amr.corp.intel.com>
- <20240325231058.GP2357401@ls.amr.corp.intel.com>
- <edcfc04cf358e6f885f65d881ef2f2165e059d7e.camel@intel.com>
- <20240325233528.GQ2357401@ls.amr.corp.intel.com>
- <ZgIzvHKobT2K8LZb@chao-email>
- <20db87741e356e22a72fadeda8ab982260f26705.camel@intel.com>
- <ZgKt6ljcmnfSbqG/@chao-email>
- <20240326174859.GB2444378@ls.amr.corp.intel.com>
- <481141ba-4bdf-40f3-9c32-585281c7aa6f@intel.com>
- <34ca8222fcfebf1d9b2ceb20e44582176d2cef24.camel@intel.com>
- <873263e8-371a-47a0-bba3-ed28fcc1fac0@intel.com>
- <e0ac83c57da3c853ffc752636a4a50fe7b490884.camel@intel.com>
- <5f07dd6c-b06a-49ed-ab16-24797c9f1bf7@intel.com>
- <d7a0ed833909551c24bf1c2c52b8955d75359249.camel@intel.com>
+ <hang.yuan@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <5eca97e6a3978cf4dcf1cff21be6ec8b639a66b9.1708933498.git.isaku.yamahata@intel.com>
+ <Zfp+YWzHV0DxVf1+@chao-email>
+ <20240321155513.GL1994522@ls.amr.corp.intel.com>
+ <5470570d804b52dcf24b454d5fdfc2320f735e80.camel@intel.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <d7a0ed833909551c24bf1c2c52b8955d75359249.camel@intel.com>
+In-Reply-To: <5470570d804b52dcf24b454d5fdfc2320f735e80.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/28/2024 9:06 AM, Edgecombe, Rick P wrote:
-> On Thu, 2024-03-28 at 08:58 +0800, Xiaoyao Li wrote:
->>> How so? Userspace needs to learn to create a TD first.
+On 3/28/2024 9:12 AM, Edgecombe, Rick P wrote:
+> On Thu, 2024-03-21 at 08:55 -0700, Isaku Yamahata wrote:
+>> On Wed, Mar 20, 2024 at 02:12:49PM +0800,
+>> Chao Gao <chao.gao@intel.com> wrote:
 >>
->> The current ABI of KVM_EXIT_X86_RDMSR/WRMSR is that userspace itself
->> sets up MSR fitler at first, then it will get such EXIT_REASON when
->> guest accesses the MSRs being filtered.
+>>>> +static void setup_tdparams_cpuids(struct kvm_cpuid2 *cpuid,
+>>>> +                                 struct td_params *td_params)
+>>>> +{
+>>>> +       int i;
+>>>> +
+>>>> +       /*
+>>>> +        * td_params.cpuid_values: The number and the order of cpuid_value must
+>>>> +        * be same to the one of struct tdsysinfo.{num_cpuid_config, cpuid_configs}
+>>>> +        * It's assumed that td_params was zeroed.
+>>>> +        */
+>>>> +       for (i = 0; i < tdx_info->num_cpuid_config; i++) {
+>>>> +               const struct kvm_tdx_cpuid_config *c = &tdx_info->cpuid_configs[i];
+>>>> +               /* KVM_TDX_CPUID_NO_SUBLEAF means index = 0. */
+>>>> +               u32 index = c->sub_leaf == KVM_TDX_CPUID_NO_SUBLEAF ? 0 : c->sub_leaf;
+>>>> +               const struct kvm_cpuid_entry2 *entry =
+>>>> +                       kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent,
+>>>> +                                             c->leaf, index);
+>>>> +               struct tdx_cpuid_value *value = &td_params->cpuid_values[i];
+>>>> +
+>>>> +               if (!entry)
+>>>> +                       continue;
+>>>> +
+>>>> +               /*
+>>>> +                * tdsysinfo.cpuid_configs[].{eax, ebx, ecx, edx}
+>>>> +                * bit 1 means it can be configured to zero or one.
+>>>> +                * bit 0 means it must be zero.
+>>>> +                * Mask out non-configurable bits.
+>>>> +                */
+>>>> +               value->eax = entry->eax & c->eax;
+>>>> +               value->ebx = entry->ebx & c->ebx;
+>>>> +               value->ecx = entry->ecx & c->ecx;
+>>>> +               value->edx = entry->edx & c->edx;
+>>>
+>>> Any reason to mask off non-configurable bits rather than return an error? this
+>>> is misleading to userspace because guest sees the values emulated by TDX module
+>>> instead of the values passed from userspace (i.e., the request from userspace
+>>> isn't done but there is no indication of that to userspace).
 >>
->> If you want to use this EXIT reason, then you need to enforce userspace
->> setting up the MSR filter. How to enforce?
+>> Ok, I'll eliminate them.  If user space passes wrong cpuids, TDX module will
+>> return error. I'll leave the error check to the TDX module.
 > 
-> I think Isaku's proposal was to let userspace configure it.
-> 
-> For the sake of conversation, what if we don't enforce it? The downside of not enforcing it is that
-> we then need to worry about code paths in KVM the MTRRs would call. But what goes wrong
-> functionally? If userspace doesn't fully setup a TD things can go wrong for the TD.
-> 
-> A plus side of using the MSR filter stuff is it reuses existing functionality.
-> 
->>   If not enforce, but exit with
->> KVM_EXIT_X86_RDMSR/WRMSR no matter usersapce sets up MSR filter or not.
->> Then you are trying to introduce divergent behavior in KVM.
-> 
-> The current ABI of KVM_EXIT_X86_RDMSR when TDs are created is nothing. So I don't see how this is
-> any kind of ABI break. If you agree we shouldn't try to support MTRRs, do you have a different exit
-> reason or behavior in mind?
+> I was just looking at this. Agreed. It breaks the selftests though.
 
-Just return error on TDVMCALL of RDMSR/WRMSR on TD's access of MTRR MSRs.
+If all you prefer to go this direction, then please update the error 
+handling of this specific SEAMCALL.
 
