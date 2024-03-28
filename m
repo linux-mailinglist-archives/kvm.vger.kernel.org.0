@@ -1,168 +1,126 @@
-Return-Path: <kvm+bounces-13025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E07890340
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 16:39:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3521689034C
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 16:40:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 490861C2AAA2
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 15:39:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7D491F2438D
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 15:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FA6130A40;
-	Thu, 28 Mar 2024 15:39:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE40131184;
+	Thu, 28 Mar 2024 15:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yiXFFCxU"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="QngdAr6+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F54312FB00
-	for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 15:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA2912FF9C;
+	Thu, 28 Mar 2024 15:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711640361; cv=none; b=pqPBa+3+lC6JPYv440ZhPB4sVyX7fOcCy3a8M+HmLToznp4OFgHXECUiVY/F28HxT+E19NmBYBNjVeFJQnbhdnVT+NLrFcjGC8ZsGOqd23F+2hvyaiQenMNpmk7I60g58GLl2tETMgDP60P/8HdCFEvsuHK/d+bUF5kBCmzs5qg=
+	t=1711640380; cv=none; b=UzW8WJIEo6viKfhibEP1JFeZPmgSPCrd/spwoeDp42kqqrJ14+6qBbKQHNDQ5jxWRRGc4s17TS89R5jyhA73KbHNaxc8whEOyCQV2Dw5Ssx3Zsw7gQU2ncRNU9F6StsJ0qsuF9vsoiXHKZU0Hqv4s0UVUvbYrmAmgIEjhwSmxzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711640361; c=relaxed/simple;
-	bh=G1iRW2zHIY2/EiULrJ1nqfVUKDfTimjQj7b8q3dHoFc=;
+	s=arc-20240116; t=1711640380; c=relaxed/simple;
+	bh=qFpjInxBSRGeS4eLn5//waKAvTtSRtM80g21c3bF4XU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JKpHWhXTf52UiMbZkaPXexW/RWPHEasxAN9mpmnOw5ofav0YGrEZE59WPmLlJGu4RrteSNj0L3etUJXUKc6HXuQhxMo45tp+C8V0R/7ayOjpBH4orFR9BFWvV1Sc00tq9FMrJQNiXBEr7eObSpIDxThlm6zmO4jF0gx2W8NAlqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yiXFFCxU; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e6f69e850bso1287565b3a.0
-        for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 08:39:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711640358; x=1712245158; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mPjQD/vT8EW8FIsS5EhEUvjw7Yq2DPw74odbleQjQC0=;
-        b=yiXFFCxUidOur1Yje4vLUgh6HPAPLTa0A8Jr+L02ErZCnLUGyA5cbWRfLbW2anYSXf
-         OBw4ySIQT0uhUbGcSG01jSnXmA99UGDz+ieVFtksloTDysGebITCGl5U79aib5tRot4U
-         R4S1ExbeBqVsmWInB4bb8zRKX9QyP7Ax6Eh5Ma6rjz8KpZ8v4vKS3+LuOQnifxodUaJY
-         zzOk4VHwBPO7tnFwFYmLG1MzB7aHaa3xKXAwElEJjPQS4p0yDYFN/Ey+1PpWehd8HZdj
-         vYgMf7EihG/MeLThCAKSbALwA7sdiXDqthcdvgmkCW/VSJ7MQdHCJb7IT9nDNTdo6+e8
-         nNWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711640358; x=1712245158;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mPjQD/vT8EW8FIsS5EhEUvjw7Yq2DPw74odbleQjQC0=;
-        b=UgWT7CXhGaVASYpO7PcKMo9y6h2bw/KTKcmaOLwjpGvpvfgcAK5lmxUJ4i3itxkCkl
-         nyj3Qpj5cRSzQi0rJfhey/5cM3VL+7GR6zKdj4eigYgyoNQechFcAt1R3HwmrEdSkLik
-         6RDeXacAu9FYLbH0XhD36i/f4xWmyjog1+lbjTg29i63YR9FraHcltWG7gnuDawOSamj
-         IxNoAVMQeTU4OizFBxpoO2NWMLADMyKwMxDutyY7w11bNLP5UFVI/2dJO9PjO1Kjjs9K
-         AzubTCbzb3t/LO1dCJIVEBqTul4fi7Bp0M/2jB/bFq8aB43znLW9prFBog4tMcTjvZ6R
-         y5VQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjFuuzDVb8mdxG8uK/NRKfeRTAgb6GK576RfqNw4U+4t0r3NM6MgsGWx/WBDRuj6c0dJGCmulZ7tA+117zug8NFvoX
-X-Gm-Message-State: AOJu0YzLx6kbMqSaM7e8L+k7/YCe9Z5iKOUN8flhSN/wyMkKt0EUKF6D
-	1xWxQJc/DLoVICQF48fPvIN7HHKLjyPqf2y9FybywDEsS/tu5GsadV7toNRN9E8=
-X-Google-Smtp-Source: AGHT+IGhUQYINGDQ7hWfiGCoXweY10vLCz/e/x+HjJ8dVvYs43ivIcKXZCgoqnZGIv+19J3DIwIpug==
-X-Received: by 2002:a05:6a00:a12:b0:6ea:92a7:fb82 with SMTP id p18-20020a056a000a1200b006ea92a7fb82mr3800870pfh.27.1711640357806;
-        Thu, 28 Mar 2024 08:39:17 -0700 (PDT)
-Received: from p14s ([2604:3d09:148c:c800:ff63:c57b:4625:b68c])
-        by smtp.gmail.com with ESMTPSA id e2-20020aa798c2000000b006ea923678a6sm1505830pfm.137.2024.03.28.08.39.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 08:39:17 -0700 (PDT)
-Date: Thu, 28 Mar 2024 09:39:10 -0600
-From: Mathieu Poirier <mathieu.poirier@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Airlie <airlied@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 19/22] rpmsg: virtio: drop owner assignment
-Message-ID: <ZgWPHntosUk+5qac@p14s>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-19-0feffab77d99@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oVOqdQbY3AwN5lTgtIeFM7tbExTz38/wszShAXV0m1SLNTfVaCyODOX+uYnnrqjoVW1G93ocHEB8N0Gtnv6u9m56gDYBOIf9D5cUX1xk7Cu/FAUQvcvCW+/KTYGtL4SLvh0yELgd7PCJnVuVjo/Q5GMsaEIRjoNjVZqPB8qtsjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=QngdAr6+; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id BE37B40E016B;
+	Thu, 28 Mar 2024 15:39:33 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id br_Jfh_3Oy_y; Thu, 28 Mar 2024 15:39:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1711640369; bh=Ejb8lv3Vq0VWJRdrieqp/miwPgnvt0ExrNRBJ+G7hRs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QngdAr6+2bgCXZFKu1pL1PYr7qPFjAEUCQY3ZG4jc91Bsrw+KhNEbs4LDjqfZtGjk
+	 gKl4ibxnSgNTP77wiATk1HnVEZTcu9RLFaMqa12AWvOPqRhd1DwUkpqyvLpDIjWtPu
+	 ZdETPhAo+c3JNE+X90NzitgpwIguinfJe4pzBrlAyR3PRmg4pHFYdtcfaI+gX3Stbk
+	 03MrPGidKcGyjja/AUzeaOFI918ntiQVr0KCCxlFXl+/ml2cZ3GEoCrxLoy0WTilw2
+	 3YICcDtx52a5DBALC+kii4UmrCyS2AQxYDBCCcOxsyX1SVBn9hq6e/tY3nzv3xZjm9
+	 FWTy3SQGTnZq25HcxMpTqxOvNRUafQIMRxeLmLxQPgqYPeukc1Q3Z9uHqPt2fz43+P
+	 Y8HyhS5ZweVUoX5qxJFzzHGkKmO1bW59PDihVAv27yVyPkFWm/k4jjQSI5xNcisBGJ
+	 Gm09COvxMkXrCdUOymegXpFzJo0NNtH3OmWkSWMg6zrfY1jd/6CNAtIZ/zkT4503re
+	 dHg+tZKQr6pp+l/xE27XQV8W4iOyjU6VSApJMqTURZl64eYzb3sB4Fhg7W4PoAd9yz
+	 uzfzKGG0/+elQ3l+P2/nMITTWSLofdO0+rQpEN5fGGn4/+V40XxLjXNC8fkEwvWAsu
+	 fQtSfl7P7bTeLlmGM5J5a9Lo=
+Received: from zn.tnic (p5de8ecf7.dip0.t-ipconnect.de [93.232.236.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9F55040E00B2;
+	Thu, 28 Mar 2024 15:39:21 +0000 (UTC)
+Date: Thu, 28 Mar 2024 16:39:14 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc: X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+	KVM <kvm@vger.kernel.org>, Ashish Kalra <ashish.kalra@amd.com>,
+	Joerg Roedel <joro@8bytes.org>, Michael Roth <michael.roth@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 5/5] x86/CPU/AMD: Track SNP host status with
+ cc_platform_*()
+Message-ID: <20240328153914.GBZgWPIvLT6EXAPJci@fat_crate.local>
+References: <20240327154317.29909-1-bp@alien8.de>
+ <20240327154317.29909-6-bp@alien8.de>
+ <f6bb6f62-c114-4a82-bbaf-9994da8999cd@linux.microsoft.com>
+ <20240328134109.GAZgVzdfQob43XAIr9@fat_crate.local>
+ <ac4f34a0-036a-48b9-ab56-8257700842fc@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240327-module-owner-virtio-v1-19-0feffab77d99@linaro.org>
+In-Reply-To: <ac4f34a0-036a-48b9-ab56-8257700842fc@linux.microsoft.com>
 
-On Wed, Mar 27, 2024 at 01:41:12PM +0100, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> ---
-> 
-> Depends on the first patch.
-> ---
->  drivers/rpmsg/virtio_rpmsg_bus.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
-> index 1062939c3264..e9e8c1f7829f 100644
-> --- a/drivers/rpmsg/virtio_rpmsg_bus.c
-> +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
-> @@ -1053,7 +1053,6 @@ static struct virtio_driver virtio_ipc_driver = {
->  	.feature_table	= features,
->  	.feature_table_size = ARRAY_SIZE(features),
->  	.driver.name	= KBUILD_MODNAME,
-> -	.driver.owner	= THIS_MODULE,
->  	.id_table	= id_table,
->  	.probe		= rpmsg_probe,
->  	.remove		= rpmsg_remove,
+On Thu, Mar 28, 2024 at 03:24:29PM +0100, Jeremi Piotrowski wrote:
+> It's not but if you set it before the check it will be set for all AMD
+> systems, even if they are neither CC hosts nor CC guests.
 
-Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+That a problem?
 
+It is under a CONFIG_ARCH_HAS_CC_PLATFORM...
+
+> To leave open the possibility of an SNP hypervisor running nested.
+
+But !CC_ATTR_GUEST_SEV_SNP doesn't mean that. It means it is not
+a SEV-SNP guest.
+
+> I thought you wanted to filter out SEV-SNP guests, which also have
+> X86_FEATURE_SEV_SNP CPUID bit set.
+
+I want to run snp_probe_rmptable_info() only on baremetal where it makes
+sense.
+
+> My understanding is that these are the cases:
 > 
-> -- 
-> 2.34.1
-> 
+> CPUID(SEV_SNP) | MSR(SEV_SNP)     | what am I
+> ---------------------------------------------
+> set            | set              | SNP-guest
+> set            | unset            | SNP-host
+> unset          | ??               | not SNP
+
+So as you can see, we can't use X86_FEATURE_SEV_SNP for anything due to
+the late disable need. So we should be moving away from it.
+
+So we need a test for "am I a nested SNP hypervisor?"
+
+So, can your thing clear X86_FEATURE_HYPERVISOR and thus "emulate"
+baremetal?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
