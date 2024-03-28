@@ -1,167 +1,148 @@
-Return-Path: <kvm+bounces-12963-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12964-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE5288F718
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 06:17:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E848B88F727
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 06:24:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47F4D1C2494B
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 05:17:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74ABBB21A98
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 05:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F75A4DA06;
-	Thu, 28 Mar 2024 05:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6FB45951;
+	Thu, 28 Mar 2024 05:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gXPbjKTb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aej5HGLk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFE340867
-	for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 05:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5313D304;
+	Thu, 28 Mar 2024 05:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711602998; cv=none; b=gEbh05ziVV/Nb1slyjkDwUxAc5kizKdTO+tUQjJOH9pQouhVVrLGUZ3H4lHf4BYjNIqwblKTmKuVUf/+fG1JdUsF0cNAd1YL8x+XB9NTVhdJ8QkJgQnMN8BbtGlr2h8hYzzbCxKFyp4rHAzg1/1E1KBg1fE5rjZGL6UZQbBj6Fk=
+	t=1711603477; cv=none; b=HIKzsOJxeRrvk3PilAHtHzRNHcloKJYXvr8umThhATsI4NadZ0MXmMfVbG0JlpWk1dJU7/Su1K3TmMLjSWSH+OYJxamsYNvhl+lolMucHdEpYpW/ulXQk2+cCoqfEnJpmumP2jR082GixlmwjtiTN9dlzZcScBxPM+UFthQduAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711602998; c=relaxed/simple;
-	bh=sBPTJcGEYTbv3hcgUwqNauzYtskOKb+GWpnb7br0MOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lbSKhW5A/+hpvvIL1eV++hH/cbKIwU4PeM849tC0zZfq6YP6K2P0umvdJ7Y8mrcxfFNssLMcygGXHWjHYuVrC6tUtTEIVrSbv/eBR3RPtl2deNwZ8Th02pL7PhmFmOL4qpj7QckhwOeRaEZzH+4cQF9NhwwWtfLZ8LB6IaIUFd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gXPbjKTb; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5a58009fe88so308068eaf.0
-        for <kvm@vger.kernel.org>; Wed, 27 Mar 2024 22:16:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711602994; x=1712207794; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NCBBqATkrmhAqNvcc7V5yUc6Bj0MDD2J9Hd2vuTQUac=;
-        b=gXPbjKTbrvtfpT6/qEmVUxns+A30LH6QOiAjT4F0xLZUPzUZg0ordNOvATabg2F/Wl
-         kPv7rlwtWOxfgPm2w1j9yiVchrEqiifXfpuqKbM3c55rO+d/cQmcOVsJtdO/BdsefRN9
-         RxOKLZQ8lQKHo0Up3S4+54dabwBIgvbFJlg0eTR2NGULCedimJYCVi8NEO/uINa2jv1N
-         m9SrGDUqniaEzEwLDKjTqPO6IIW3ujVusL7p6WPrXVYciMFtPwv7L9mAU+/qpWitn5fr
-         hH1CJycNEicAhv28MTJZUrDtXoqvUlSPCv54sDagwBcdt6nzOokgIGUCvI13cWlf71La
-         jDOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711602994; x=1712207794;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NCBBqATkrmhAqNvcc7V5yUc6Bj0MDD2J9Hd2vuTQUac=;
-        b=onNeyqN5lFaHIsxHkN79KoX4lK8ToLj/SASOCv/cnoM6mYS+1fZm1TzdeyJG/U6l5g
-         ajm6SSCQ6FZYvOPdGxsTdGdgWLrFU3IQUbV2tCN3nj362UTJnZUvB7hX2QHUNZXZULnU
-         D48hCs5yhcsnFIGp6bn9U1Q11S0AVFbSvumeLQhbRbPzf9jCrV6JWycfwRzIbIbjrVHP
-         YzaaH01TnnOyy8iBc2v0JC4IiBTjeSdI0OWWcGyGnFhpy6BYKLTvG3eKC9uoV8BN41MI
-         sne0B8HIIq6MRlMzVw+GGeVLqu3efIA7O9j2XHrfkSaXtNpH7ZkxXG9vXicx1JAFUt69
-         WrSg==
-X-Forwarded-Encrypted: i=1; AJvYcCVbYpBa361K4LNiM+2VzkH1msBgJ49EFUGYtJGilqD8/tV5wSN9+Y7VS3aGz98lbQS6uwmbuHn/FQileruI9bGjIC4a
-X-Gm-Message-State: AOJu0YyPJbsAz9RpC/VgyhufrnlmMsFlyoqfd5KDHeo+0402cEkSGa/W
-	iKv80zoSrTzbDDNmBCT+2X6kodgpJz/sE87DD4xWDkq6WSeTgtQPxy218D1+/mU=
-X-Google-Smtp-Source: AGHT+IENjWm30W77Sho1F7STKjVDKRSghd/5qoLRwkalJNx2D7PN+W1+MnXgZZvq+TiwN/1tI/fojA==
-X-Received: by 2002:a05:6358:5307:b0:17e:8f90:dd31 with SMTP id n7-20020a056358530700b0017e8f90dd31mr1555244rwf.32.1711602994298;
-        Wed, 27 Mar 2024 22:16:34 -0700 (PDT)
-Received: from localhost ([122.172.85.206])
-        by smtp.gmail.com with ESMTPSA id u23-20020a63df17000000b005e857bba96csm433309pgg.10.2024.03.27.22.16.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 22:16:33 -0700 (PDT)
-Date: Thu, 28 Mar 2024 10:46:31 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Airlie <airlied@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
-Message-ID: <20240328051631.c5eitp4mzaj4bh6i@vireshk-i7>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+	s=arc-20240116; t=1711603477; c=relaxed/simple;
+	bh=yw8GtftqZAvBx8gq5uIPgpQrdVhodSjj57djQ9gazmw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LRmJiN0eSlAWXOGzfXg1/wAjFjBCbCdfwha3VUvZQ7PHz2gKDRYTEGp2UVkyBSb+jZnGQYcEoNKkynnZW30+R2GyDPEj9KXsAco58gtm9TSC77YsIgpNgBdlR3NrzWZi+ytkOvO648JFKibp22S79R01roatmfTDQ62KkxmhXJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aej5HGLk; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711603475; x=1743139475;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=yw8GtftqZAvBx8gq5uIPgpQrdVhodSjj57djQ9gazmw=;
+  b=aej5HGLkC7WNktrTgwapzJ25tmYqLhx/oekmXP2Y6p/GU0GRcNG0VmDs
+   QAy1toxoH9qhN4JfbRBDEcBGiqda/vWoP8fK+YI86dlWBBfZxF4neIQDy
+   P7ZKLv9QzLFVqb6RqEcSAeB7LcaOlVI3eiGw8qYLOed1TFVolqOqFKuhU
+   b+ye1/2KO3CYBVwZEOmCKlN9PrvchyIyQU5sGCP/ITDU4Msor1rAFHMs5
+   ny1smJuF7WoBOLTVf21zGWZNXLKAzNF/2iLTXAemg9o+fsTy8aE2BUlt5
+   mlTCTDgqQsrmi1cWKlXXVdiM/dwYZ2d2QU7SLJ4l8WMR+j5ZAXGcC7ZZo
+   w==;
+X-CSE-ConnectionGUID: +AvnARNfRDCEr4oVfXFxYw==
+X-CSE-MsgGUID: qnhfdNPxTLa47TH7sQHCSA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6602122"
+X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
+   d="scan'208";a="6602122"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 22:24:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
+   d="scan'208";a="21179122"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.225]) ([10.238.10.225])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 22:24:30 -0700
+Message-ID: <94fb2094-d8ee-4bcc-a65d-489dc777b024@linux.intel.com>
+Date: Thu, 28 Mar 2024 13:24:27 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 069/130] KVM: TDX: Require TDP MMU and mmio caching
+ for TDX
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <f6a80dd212e8c3fd14b40049eed33187008cf35a.1708933498.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <f6a80dd212e8c3fd14b40049eed33187008cf35a.1708933498.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 27-03-24, 13:41, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
+
+
+On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> As TDP MMU is becoming main stream than the legacy MMU, the legacy MMU
+> support for TDX isn't implemented.  TDX requires KVM mmio caching.
+
+Can you add some description about why TDX requires mmio caching in the 
+changelog?
+
+
+>   Disable
+> TDX support when TDP MMU or mmio caching aren't supported.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
-> 
-> Depends on the first patch.
-> ---
->  drivers/gpio/gpio-virtio.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-> index fcc5e8c08973..9fae8e396c58 100644
-> --- a/drivers/gpio/gpio-virtio.c
-> +++ b/drivers/gpio/gpio-virtio.c
-> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver = {
->  	.remove			= virtio_gpio_remove,
->  	.driver			= {
->  		.name		= KBUILD_MODNAME,
-> -		.owner		= THIS_MODULE,
->  	},
->  };
->  module_virtio_driver(virtio_gpio_driver);
+>   arch/x86/kvm/mmu/mmu.c  |  1 +
+>   arch/x86/kvm/vmx/main.c | 13 +++++++++++++
+>   2 files changed, 14 insertions(+)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 0e0321ad9ca2..b8d6ce02e66d 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -104,6 +104,7 @@ module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
+>    * If the hardware supports that we don't need to do shadow paging.
+>    */
+>   bool tdp_enabled = false;
+> +EXPORT_SYMBOL_GPL(tdp_enabled);
+>   
+>   static bool __ro_after_init tdp_mmu_allowed;
+>   
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 076a471d9aea..54df6653193e 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -3,6 +3,7 @@
+>   
+>   #include "x86_ops.h"
+>   #include "vmx.h"
+> +#include "mmu.h"
+>   #include "nested.h"
+>   #include "pmu.h"
+>   #include "tdx.h"
+> @@ -36,6 +37,18 @@ static __init int vt_hardware_setup(void)
+>   	if (ret)
+>   		return ret;
+>   
+> +	/* TDX requires KVM TDP MMU. */
+> +	if (enable_tdx && !tdp_enabled) {
+> +		enable_tdx = false;
+> +		pr_warn_ratelimited("TDX requires TDP MMU.  Please enable TDP MMU for TDX.\n");
+> +	}
+> +
+> +	/* TDX requires MMIO caching. */
+> +	if (enable_tdx && !enable_mmio_caching) {
+> +		enable_tdx = false;
+> +		pr_warn_ratelimited("TDX requires mmio caching.  Please enable mmio caching for TDX.\n");
+> +	}
+> +
+>   	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+>   	if (enable_tdx)
+>   		vt_x86_ops.vm_size = max_t(unsigned int, vt_x86_ops.vm_size,
 
-Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
-
--- 
-viresh
 
