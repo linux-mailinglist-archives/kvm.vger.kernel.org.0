@@ -1,77 +1,93 @@
-Return-Path: <kvm+bounces-12917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11AFF88F3B0
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:27:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70B9988F3BD
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:36:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB5222A7682
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:27:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B7F2A6B36
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B252AF9E4;
-	Thu, 28 Mar 2024 00:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902D410A1C;
+	Thu, 28 Mar 2024 00:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="akOphw9O"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="axSgu3pI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24FBBE4F;
-	Thu, 28 Mar 2024 00:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B5D817;
+	Thu, 28 Mar 2024 00:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711585505; cv=none; b=dElDsgcr1r8evbqgqVU507GXVK0EJ2VyJqp3Rs1PCOpgNaH823gJ3uN7G8ykHLXWhGhx+F6HL3JkhydLh9n36rqXMk3FIDfx3f8ke+Ut6YqGB+wz+9egFebCoEcjT22ju3VuE9pFvukKY+5Nwr/ksfXCCOIBZ+t3rTEbAdEZWik=
+	t=1711586202; cv=none; b=OL3jiqniUZIABEl5RYDZZa0J0WNsBvvgZVFp8bMsH7Y+MHMYCeG9BBycOnfedd507bM5kUsLxcSBCL5rfaJ1d4Qgeoyxj81FxfsgVxA/AKOjJ/cPCb5dtfgAHNVKCw5mjA5g4Q2dN9/jZQG8RlGueRV+PGvwGykj+hnj5qzXabo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711585505; c=relaxed/simple;
-	bh=wpGIuibnrkqUFYM1zvbRlOwDJNADae7qqIAevX/+Jks=;
+	s=arc-20240116; t=1711586202; c=relaxed/simple;
+	bh=bKy2b8DlGeDsZdgu01uYDVooRH0V8usjwDuPx2wkFeY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qLtui+ZtmvOXJ3N8UdRjFWpeHMgib3ReGuu6IoL12/jD9SxEg5BqfMSSwNHzYr4hM3PT1F0CSVnPmg+D3Nc5+g3yPvYG3MvkwdLYVhBwGg599TCoIQWR9AgxxwTt9w0Vj7m8TbS4bOwWARIZ+Xv3Fwd7uruckPSxq+JftlXa4VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=akOphw9O; arc=none smtp.client-ip=192.198.163.12
+	 Content-Type:Content-Disposition:In-Reply-To; b=ViDXYriBLRe/nBPtrpomUICQeRt1xiub+EG7i+nScqTIuRAnOOPBTKu8x/ESEfqLQ6XrlS/CsyOHVITGLI8VaQqZJMyu9t3sfBZ2q0LSbZg3nI5NwTRltGEsBvTJRSjeumDWsYlCjJ2+Wl5tZbRZtgWrMaQ35+DXGLes6v8VchY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=axSgu3pI; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711585504; x=1743121504;
+  t=1711586201; x=1743122201;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wpGIuibnrkqUFYM1zvbRlOwDJNADae7qqIAevX/+Jks=;
-  b=akOphw9ONMJB+DARg9bBCz08J7T8QqNGSlGJGMAzoPmTZ5saCxQvuWzN
-   HP0OIz0dhVl/UyhXCtsU1OJxy+6AmZUPX2YQsxGmhaj8/ntywFRtGG9Yr
-   TeWmYvOYEdNQxuvMcfVzB3pSf9l+8RyxXB3H/ipqLqcpwzZJI6feII0/y
-   dXimntZLH/zM9GCunKzRk1V/ylPwxaxHpN2mTn9vRLO6+WvqHAhWprIRL
-   qPTwccAcyKt/05+luevH/8i/jsnnbt4AjBlRSqxYMepE6Wg6ZH7nHB7Dg
-   Z9vDCcRxzq7wSo/WFmO1IQfm7HSb6UjVTi18RMs2gKYOM6tOxm8dvj55O
-   g==;
-X-CSE-ConnectionGUID: 9iKD8o90S+uRNcyKYUQZ8A==
-X-CSE-MsgGUID: ceDbED2sTDy4UijyvmRVuA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="10501479"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=bKy2b8DlGeDsZdgu01uYDVooRH0V8usjwDuPx2wkFeY=;
+  b=axSgu3pINFmv37lkmwRFemEsboFFSATzLbisc/0W+tlYCNnnJ+FADXuJ
+   VBluXruQNqmAw8Puny6YberExQax+RPQUrFc65DCDFYLksrobfOYYh3+o
+   e8KzwmZbEqd69AJ7aulCM/UKJvC76hxi+EJgC78oMz+QwPGgYKy7RM3Uz
+   yG6XubL3bGDC0+7P/3d8p9zBrd6/2MJujf9rM2SzLiNfg+e96dXDpi403
+   UVQ4pSgyJmwXktRDKbkCP+CZmObtMWgchacVUV+XOCkdHZPWZVjdX/q3Y
+   K9qq33Sc4Wk8mgqPC+c2dkbeM4tm163PVgO9S5RMfWQkRYOJ2O5wMNBls
+   w==;
+X-CSE-ConnectionGUID: YwhkT75tSr+/lG7ggSTZHQ==
+X-CSE-MsgGUID: uXuYcLYeS+mAqyXyuYF93w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6583777"
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="10501479"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:25:03 -0700
+   d="scan'208";a="6583777"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:36:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="21183958"
+   d="scan'208";a="21121383"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:25:03 -0700
-Date: Wed, 27 Mar 2024 17:25:02 -0700
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:36:38 -0700
+Date: Wed, 27 Mar 2024 17:36:37 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 062/130] KVM: x86/tdp_mmu: Support TDX private
- mapping for TDP MMU
-Message-ID: <20240328002502.GL2444378@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <fc97847d04f2b469d8f4cfceee84c7ef055ab1ac.1708933498.git.isaku.yamahata@intel.com>
- <ZgQaCcdb4AshplI6@chao-email>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"Gao, Chao" <chao.gao@intel.com>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Huang, Kai" <kai.huang@intel.com>,
+	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+	"Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"Yuan, Hang" <hang.yuan@intel.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: Re: [PATCH v19 059/130] KVM: x86/tdp_mmu: Don't zap private pages
+ for unsupported cases
+Message-ID: <20240328003637.GM2444378@ls.amr.corp.intel.com>
+References: <20240325231058.GP2357401@ls.amr.corp.intel.com>
+ <edcfc04cf358e6f885f65d881ef2f2165e059d7e.camel@intel.com>
+ <20240325233528.GQ2357401@ls.amr.corp.intel.com>
+ <ZgIzvHKobT2K8LZb@chao-email>
+ <20db87741e356e22a72fadeda8ab982260f26705.camel@intel.com>
+ <ZgKt6ljcmnfSbqG/@chao-email>
+ <20240326174859.GB2444378@ls.amr.corp.intel.com>
+ <481141ba-4bdf-40f3-9c32-585281c7aa6f@intel.com>
+ <34ca8222fcfebf1d9b2ceb20e44582176d2cef24.camel@intel.com>
+ <873263e8-371a-47a0-bba3-ed28fcc1fac0@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,193 +96,76 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZgQaCcdb4AshplI6@chao-email>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <873263e8-371a-47a0-bba3-ed28fcc1fac0@intel.com>
 
-On Wed, Mar 27, 2024 at 09:07:21PM +0800,
-Chao Gao <chao.gao@intel.com> wrote:
+On Thu, Mar 28, 2024 at 08:06:53AM +0800,
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-> > 			if (kvm_mtrr_check_gfn_range_consistency(vcpu, base, page_num))
-> >@@ -4662,6 +4667,7 @@ int kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
-> > 	};
+> On 3/28/2024 1:36 AM, Edgecombe, Rick P wrote:
+> > On Wed, 2024-03-27 at 10:54 +0800, Xiaoyao Li wrote:
+> > > > > If QEMU doesn't configure the msr filter list correctly, KVM has to handle
+> > > > > guest's MTRR MSR accesses. In my understanding, the
+> > > > > suggestion is KVM zap private memory mappings.
+> 
+> TDX spec states that
+> 
+>   18.2.1.4.1 Memory Type for Private and Opaque Access
+> 
+>   The memory type for private and opaque access semantics, which use a
+>   private HKID, is WB.
+> 
+>   18.2.1.4.2 Memory Type for Shared Accesses
+> 
+>   Intel SDM, Vol. 3, 28.2.7.2 Memory Type Used for Translated Guest-
+>   Physical Addresses
+> 
+>   The memory type for shared access semantics, which use a shared HKID,
+>   is determined as described below. Note that this is different from the
+>   way memory type is determined by the hardware during non-root mode
+>   operation. Rather, it is a best-effort approximation that is designed
+>   to still allow the host VMM some control over memory type.
+>     • For shared access during host-side (SEAMCALL) flows, the memory
+>       type is determined by MTRRs.
+>     • For shared access during guest-side flows (VM exit from the guest
+>       TD), the memory type is determined by a combination of the Shared
+>       EPT and MTRRs.
+>       o If the memory type determined during Shared EPT walk is WB, then
+>         the effective memory type for the access is determined by MTRRs.
+>       o Else, the effective memory type for the access is UC.
+> 
+> My understanding is that guest MTRR doesn't affect the memory type for
+> private memory. So we don't need to zap private memory mappings.
+
+So, there is no point to (try to) emulate MTRR.  The direction is, don't
+advertise MTRR to the guest (new TDX module is needed.) or enforce
+the guest to not use MTRR (guest command line clearcpuid=mtrr).  KVM will
+simply return error to guest access to MTRR related registers.
+
+QEMU or user space VMM can use the MSR filter if they want.
+
+
+> > > > > But guests won't accept memory again because no one
+> > > > > currently requests guests to do this after writes to MTRR MSRs. In this case,
+> > > > > guests may access unaccepted memory, causing infinite EPT violation loop
+> > > > > (assume SEPT_VE_DISABLE is set). This won't impact other guests/workloads on
+> > > > > the host. But I think it would be better if we can avoid wasting CPU resource
+> > > > > on the useless EPT violation loop.
+> > > > 
+> > > > Qemu is expected to do it correctly.  There are manyways for userspace to go
+> > > > wrong.  This isn't specific to MTRR MSR.
+> > > 
+> > > This seems incorrect. KVM shouldn't force userspace to filter some
+> > > specific MSRs. The semantic of MSR filter is userspace configures it on
+> > > its own will, not KVM requires to do so.
 > > 
-> > 	WARN_ON_ONCE(!vcpu->arch.mmu->root_role.direct);
-> >+	fault.gfn = gpa_to_gfn(fault.addr) & ~kvm_gfn_shared_mask(vcpu->kvm);
+> > I'm ok just always doing the exit to userspace on attempt to use MTRRs in a TD, and not rely on the
+> > MSR list. At least I don't see the problem.
 > 
-> Could you clarify when shared bits need to be masked out or kept? shared bits
-> are masked out here but kept in the hunk right above and ..
+> What is the exit reason in vcpu->run->exit_reason? KVM_EXIT_X86_RDMSR/WRMSR?
+> If so, it breaks the ABI on KVM_EXIT_X86_RDMSR/WRMSR.
 
-Sure, it deserves comment. I'll add a comment.
-
-When we gets pfn, kvm_faultin_pfn() or loop with kvm memslot,
-drop shared bits because KVM memslot doesn't know about shared bit.
-
-When walks in EPT tables, keep the shared bit because we need to find the EPT
-entry including shared bit.
-
-
-
-> >+++ b/arch/x86/kvm/mmu/tdp_iter.h
-> >@@ -91,7 +91,7 @@ struct tdp_iter {
-> > 	tdp_ptep_t pt_path[PT64_ROOT_MAX_LEVEL];
-> > 	/* A pointer to the current SPTE */
-> > 	tdp_ptep_t sptep;
-> >-	/* The lowest GFN mapped by the current SPTE */
-> >+	/* The lowest GFN (shared bits included) mapped by the current SPTE */
-> > 	gfn_t gfn;
-> 
-> .. in @gfn of tdp_iter.
-> 
-> > 	/* The level of the root page given to the iterator */
-> > 	int root_level;
-> 
-> 
-> > 
-> >-hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
-> >+static struct kvm_mmu_page *kvm_tdp_mmu_get_vcpu_root(struct kvm_vcpu *vcpu,
-> 
-> Maybe fold it into its sole caller.
-
-Sure.
-
-
-> 
-> >+						      bool private)
-> > {
-> > 	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
-> > 	struct kvm *kvm = vcpu->kvm;
-> >@@ -221,6 +225,8 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
-> > 	 * Check for an existing root before allocating a new one.  Note, the
-> > 	 * role check prevents consuming an invalid root.
-> > 	 */
-> >+	if (private)
-> >+		kvm_mmu_page_role_set_private(&role);
-> > 	for_each_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
-> > 		if (root->role.word == role.word &&
-> > 		    kvm_tdp_mmu_get_root(root))
-> >@@ -244,12 +250,17 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
-> > 	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> > 
-> > out:
-> >-	return __pa(root->spt);
-> >+	return root;
-> >+}
-> >+
-> >+hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu, bool private)
-> >+{
-> >+	return __pa(kvm_tdp_mmu_get_vcpu_root(vcpu, private)->spt);
-> > }
-> > 
-> > static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> >-				u64 old_spte, u64 new_spte, int level,
-> >-				bool shared);
-> >+				u64 old_spte, u64 new_spte,
-> >+				union kvm_mmu_page_role role, bool shared);
-> > 
-> > static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-> > {
-> >@@ -376,12 +387,78 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
-> > 							  REMOVED_SPTE, level);
-> > 		}
-> > 		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
-> >-				    old_spte, REMOVED_SPTE, level, shared);
-> >+				    old_spte, REMOVED_SPTE, sp->role,
-> >+				    shared);
-> >+	}
-> >+
-> >+	if (is_private_sp(sp) &&
-> >+	    WARN_ON(static_call(kvm_x86_free_private_spt)(kvm, sp->gfn, sp->role.level,
-> 
-> WARN_ON_ONCE()?
-> 
-> >+							  kvm_mmu_private_spt(sp)))) {
-> >+		/*
-> >+		 * Failed to unlink Secure EPT page and there is nothing to do
-> >+		 * further.  Intentionally leak the page to prevent the kernel
-> >+		 * from accessing the encrypted page.
-> >+		 */
-> >+		kvm_mmu_init_private_spt(sp, NULL);
-> > 	}
-> > 
-> > 	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> > }
-> > 
-> 
-> > 	rcu_read_lock();
-> > 
-> > 	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end) {
-> >@@ -960,10 +1158,26 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
-> > 
-> > 	if (unlikely(!fault->slot))
-> > 		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
-> >-	else
-> >-		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
-> >-					 fault->pfn, iter->old_spte, fault->prefetch, true,
-> >-					 fault->map_writable, &new_spte);
-> >+	else {
-> >+		unsigned long pte_access = ACC_ALL;
-> >+		gfn_t gfn = iter->gfn;
-> >+
-> >+		if (kvm_gfn_shared_mask(vcpu->kvm)) {
-> >+			if (fault->is_private)
-> >+				gfn |= kvm_gfn_shared_mask(vcpu->kvm);
-> 
-> this is an open-coded kvm_gfn_to_shared().
-> 
-> I don't get why a spte is installed for a shared gfn when fault->is_private
-> is true. could you elaborate?
-
-This is stale code. And you're right. I'll remove this part.
-
-
-> >+			else
-> >+				/*
-> >+				 * TDX shared GPAs are no executable, enforce
-> >+				 * this for the SDV.
-> >+				 */
-> 
-> what do you mean by the SDV?
-
-That's development nonsense. I'll remove the second sentence.
-
-
-> >+				pte_access &= ~ACC_EXEC_MASK;
-> >+		}
-> >+
-> >+		wrprot = make_spte(vcpu, sp, fault->slot, pte_access, gfn,
-> >+				   fault->pfn, iter->old_spte,
-> >+				   fault->prefetch, true, fault->map_writable,
-> >+				   &new_spte);
-> >+	}
-> > 
-> > 	if (new_spte == iter->old_spte)
-> > 		ret = RET_PF_SPURIOUS;
-> >@@ -1041,6 +1255,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> > 	struct kvm *kvm = vcpu->kvm;
-> > 	struct tdp_iter iter;
-> > 	struct kvm_mmu_page *sp;
-> >+	gfn_t raw_gfn;
-> >+	bool is_private = fault->is_private && kvm_gfn_shared_mask(kvm);
-> > 	int ret = RET_PF_RETRY;
-> > 
-> > 	kvm_mmu_hugepage_adjust(vcpu, fault);
-> >@@ -1049,7 +1265,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> > 
-> > 	rcu_read_lock();
-> > 
-> >-	tdp_mmu_for_each_pte(iter, mmu, fault->gfn, fault->gfn + 1) {
-> >+	raw_gfn = gpa_to_gfn(fault->addr);
-> >+
-> >+	if (is_error_noslot_pfn(fault->pfn) ||
-> >+	    !kvm_pfn_to_refcounted_page(fault->pfn)) {
-> >+		if (is_private) {
-> >+			rcu_read_unlock();
-> >+			return -EFAULT;
-> 
-> This needs a comment. why this check is necessary? does this imply some
-> kernel bugs?
-
-Will add a comment. It's due to the current TDX KVM implementation that
-increments the page refcount.
+It's only when the user space requested it with the MSR filter.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
