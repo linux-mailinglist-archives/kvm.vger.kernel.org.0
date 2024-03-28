@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-12952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E5288F5E1
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 04:21:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8267188F5DD
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 04:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99D7AB213B1
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 03:21:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 371CA2A3B9C
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 03:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A7920B29;
-	Thu, 28 Mar 2024 03:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513A2364A5;
+	Thu, 28 Mar 2024 03:20:27 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from zg8tmja2lje4os43os4xodqa.icoremail.net (zg8tmja2lje4os43os4xodqa.icoremail.net [206.189.79.184])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8B418E3A;
-	Thu, 28 Mar 2024 03:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.79.184
+Received: from zg8tmja5ljk3lje4ms43mwaa.icoremail.net (zg8tmja5ljk3lje4ms43mwaa.icoremail.net [209.97.181.73])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF821C680;
+	Thu, 28 Mar 2024 03:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.181.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711596035; cv=none; b=hxjVw0aJoOFQht1HZ0QU/kKvsxpnvhKUjfUS8C05I2mkLyEYGie8WtHIRQ1+L1bHVYEZ/tS3VJH4IKXSpt/cZNc1GRempHhjRtU87CdjXli0vB/XY9frQZdeyXQNGsvS36ActSSrW+7zzI4hfkz1WPetGWjWVH6XRX8Mq1o8KSg=
+	t=1711596026; cv=none; b=QLZNggBduo85VkQ6WN43/yNEWa+MjbJz4ODHvcaoXILKsv72l9TgmqOuw97/suGse7bdaCb+ISh+cxCrxn1QaY1uJjjhyeRhWtFpk5gaYTw8DGfS65nB3DOvQ25t/NAmyHToy0eyFfVhDO5XBy+0KOO8VveNydU/s59+jCdQUFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711596035; c=relaxed/simple;
-	bh=KlaiVtfYSCsq/OB72jZXVuY5TbYDjBR2Y3JKUDaziGE=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=l51QxDvfGRJq+oiEn3LwYfzIc9OJCgl9RU2DMSMaOZfkXE931okUTVdA8elJUgQALBSJ9D7ET6TySw+3Vk4zp7VwhRQC3PIa5F0QZdP0c2LveBdvZFzsjIzgYgdVf4iwqYeGI3AMYyN/3MdbLfum6ZOdeuS5BCLyp4DFAXzME1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=206.189.79.184
+	s=arc-20240116; t=1711596026; c=relaxed/simple;
+	bh=lK/aYNgNeC3tGBp/BVxjGcGiyPKFhFWCXSbJr7n/9Mc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=aoicRmz3ujElWe2BS7z4BlAwGZ7i1sk1AYaU84y0lnhX9jzmeKJ25u8Yj/mBzR5t/1b4dawvq40wkN9fwFrLXE1vhF3wTay99ANZdXllzx2S0mzGWEuNEcAJjCL8FeZqu8hUxhRD9AUcoUbL2k5vE/yuUBWAmz4CPzpQJ3QOzfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=209.97.181.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
 Received: from localhost.localdomain (unknown [10.12.130.31])
-	by app1 (Coremail) with SMTP id TAJkCgDniOWq4QRmwD8DAA--.28501S4;
-	Thu, 28 Mar 2024 11:19:07 +0800 (CST)
+	by app1 (Coremail) with SMTP id TAJkCgDniOWq4QRmwD8DAA--.28501S5;
+	Thu, 28 Mar 2024 11:19:09 +0800 (CST)
 From: Shenlin Liang <liangshenlin@eswincomputing.com>
 To: anup@brainfault.org,
 	atishp@atishpatra.org,
@@ -50,28 +50,30 @@ To: anup@brainfault.org,
 	adrian.hunter@intel.com,
 	linux-perf-users@vger.kernel.org
 Cc: Shenlin Liang <liangshenlin@eswincomputing.com>
-Subject: [PATCH 0/2] perf kvm: Add kvm stat support on riscv 
-Date: Thu, 28 Mar 2024 03:12:18 +0000
-Message-Id: <20240328031220.1287-1-liangshenlin@eswincomputing.com>
+Subject: [PATCH 1/2] RISCV: KVM: add tracepoints for entry and exit events
+Date: Thu, 28 Mar 2024 03:12:19 +0000
+Message-Id: <20240328031220.1287-2-liangshenlin@eswincomputing.com>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:TAJkCgDniOWq4QRmwD8DAA--.28501S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7urWUGrykZr47XF4UZFWxXrb_yoW8KFyUpa
-	y2krn0kws5tFy3Krs3C3WDWrWruws7ur1aqryIyrWUC3y0vryDXF1kKr9FyrZ8JF1UtrWk
-	AF1Dur1rKrW5JaUanT9S1TB71UUUUUJqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPl14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8JVWxJwAm72
-	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
-	M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r126r1DMxkIecxEwVCm-wCF04
-	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC2
-	0s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI
-	0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv2
-	0xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2js
-	IE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZF
-	pf9x0JUxMa5UUUUU=
+In-Reply-To: <20240328031220.1287-1-liangshenlin@eswincomputing.com>
+References: <20240328031220.1287-1-liangshenlin@eswincomputing.com>
+X-CM-TRANSID:TAJkCgDniOWq4QRmwD8DAA--.28501S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxXFWfJF15Cry5AFy7uw1xKrg_yoW5AFyrpF
+	1Dur98W3yrJrW7C34fZwnYgr45Zr9Y9r17try7WrW5Jr4vyF1kJrsagFWDtry5Ary09a4S
+	vF95WFyqk3W5XaUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUml14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxY
+	O2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGV
+	WUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_
+	JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rV
+	WUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4U
+	JbIYCTnIWIevJa73UjIFyTuYvjfUbpnQUUUUU
 X-CM-SenderInfo: xold0whvkh0z1lq6v25zlqu0xpsx3x1qjou0bp/
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -79,59 +81,114 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-'perf kvm stat report/record' generates a statistical analysis of KVM
-events and can be used to analyze guest exit reasons. This patch tries
-to add stat support on riscv.
+Like other architectures, RISCV KVM also needs to add these event
+tracepoints to count the number of times kvm guest entry/exit.
 
-Map the return value of trace_kvm_exit() to the specific cause of the 
-exception, and export it to userspace.
-
-It records on two available KVM tracepoints for riscv: "kvm:kvm_entry"
-and "kvm:kvm_exit", and reports statistical data which includes events
-handles time, samples, and so on.
-
-Simple tests go below:
-
-# ./perf kvm record -e "kvm:kvm_entry" -e "kvm:kvm_exit"
-Lowering default frequency rate from 4000 to 2500.
-Please consider tweaking /proc/sys/kernel/perf_event_max_sample_rate.
-[ perf record: Woken up 18 times to write data ]
-[ perf record: Captured and wrote 5.433 MB perf.data.guest (62519 samples) 
-
-# ./perf kvm report
-31K kvm:kvm_entry
-31K kvm:kvm_exit
-
-# ./perf kvm stat record -a
-[ perf record: Woken up 3 times to write data ]
-[ perf record: Captured and wrote 8.502 MB perf.data.guest (99338 samples) ]
-
-# ./perf kvm stat report --event=vmexit
-Event name                Samples   Sample%    Time (ns)     Time%   Max Time (ns)   Min Time (ns)  Mean Time (ns)
-STORE_GUEST_PAGE_FAULT     26968     54.00%    2003031800    40.00%     3361400         27600          74274
-LOAD_GUEST_PAGE_FAULT      17645     35.00%    1153338100    23.00%     2513400         30800          65363
-VIRTUAL_INST_FAULT         1247      2.00%     340820800     6.00%      1190800         43300          273312
-INST_GUEST_PAGE_FAULT      1128      2.00%     340645800     6.00%      2123200         30200          301990
-SUPERVISOR_SYSCALL         1019      2.00%     245989900     4.00%      1851500         29300          241403
-LOAD_ACCESS                986       1.00%     671556200     13.00%     4180200         100700         681091
-INST_ACCESS                655       1.00%     170054800     3.00%      1808300         54600          259625
-HYPERVISOR_SYSCALL         21        0.00%     4276400       0.00%      716500          116000         203638 
-
-Shenlin Liang (2):
-  RISCV: KVM: add tracepoints for entry and exit events
-  perf kvm/riscv: Port perf kvm stat to RISC-V
-
- arch/riscv/kvm/trace_riscv.h                  | 60 ++++++++++++++
- arch/riscv/kvm/vcpu.c                         |  7 ++
- tools/perf/arch/riscv/Makefile                |  1 +
- tools/perf/arch/riscv/util/Build              |  1 +
- tools/perf/arch/riscv/util/kvm-stat.c         | 78 +++++++++++++++++++
- .../arch/riscv/util/riscv_exception_types.h   | 41 ++++++++++
- 6 files changed, 188 insertions(+)
+Signed-off-by: Shenlin Liang <liangshenlin@eswincomputing.com>
+---
+ arch/riscv/kvm/trace_riscv.h | 60 ++++++++++++++++++++++++++++++++++++
+ arch/riscv/kvm/vcpu.c        |  7 +++++
+ 2 files changed, 67 insertions(+)
  create mode 100644 arch/riscv/kvm/trace_riscv.h
- create mode 100644 tools/perf/arch/riscv/util/kvm-stat.c
- create mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
 
+diff --git a/arch/riscv/kvm/trace_riscv.h b/arch/riscv/kvm/trace_riscv.h
+new file mode 100644
+index 000000000000..5848083c7a5e
+--- /dev/null
++++ b/arch/riscv/kvm/trace_riscv.h
+@@ -0,0 +1,60 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Tracepoints for RISC-V KVM
++ *
++ * Copyright 2024 Beijing ESWIN Computing Technology Co., Ltd.
++ *
++ */
++#if !defined(_TRACE_RSICV_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_RSICV_KVM_H
++
++#include <linux/tracepoint.h>
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM kvm
++
++TRACE_EVENT(kvm_entry,
++	TP_PROTO(struct kvm_vcpu *vcpu),
++	TP_ARGS(vcpu),
++
++	TP_STRUCT__entry(
++		__field(unsigned long, pc)
++	),
++
++	TP_fast_assign(
++		__entry->pc	= vcpu->arch.guest_context.sepc;
++	),
++
++	TP_printk("PC: 0x%016lx", __entry->pc)
++);
++
++TRACE_EVENT(kvm_exit,
++	TP_PROTO(struct kvm_vcpu *vcpu, unsigned long exit_reason,
++			unsigned long scause),
++	TP_ARGS(vcpu, exit_reason, scause),
++
++	TP_STRUCT__entry(
++		__field(unsigned long, pc)
++		__field(unsigned long, exit_reason)
++		__field(unsigned long, scause)
++	),
++
++	TP_fast_assign(
++		__entry->pc		= vcpu->arch.guest_context.sepc;
++		__entry->exit_reason	= exit_reason;
++		__entry->scause		= scause;
++	),
++
++	TP_printk("EXIT_REASON:0x%lx,PC: 0x%016lx,SCAUSE:0x%lx",
++			__entry->exit_reason, __entry->pc, __entry->scause)
++);
++
++#endif /* _TRACE_RSICV_KVM_H */
++
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH .
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE trace_riscv
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index b5ca9f2e98ac..ed0932f0d514 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -21,6 +21,9 @@
+ #include <asm/cacheflush.h>
+ #include <asm/kvm_vcpu_vector.h>
+ 
++#define CREATE_TRACE_POINTS
++#include "trace_riscv.h"
++
+ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+ 	KVM_GENERIC_VCPU_STATS(),
+ 	STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
+@@ -782,6 +785,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 */
+ 		kvm_riscv_local_tlb_sanitize(vcpu);
+ 
++		trace_kvm_entry(vcpu);
++
+ 		guest_timing_enter_irqoff();
+ 
+ 		kvm_riscv_vcpu_enter_exit(vcpu);
+@@ -820,6 +825,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ 		local_irq_enable();
+ 
++		trace_kvm_exit(vcpu, run->exit_reason, trap.scause);
++
+ 		preempt_enable();
+ 
+ 		kvm_vcpu_srcu_read_lock(vcpu);
 -- 
 2.37.2
 
