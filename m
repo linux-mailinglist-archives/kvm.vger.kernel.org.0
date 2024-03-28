@@ -1,249 +1,234 @@
-Return-Path: <kvm+bounces-12993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12994-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA01E88FC7C
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 11:09:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 494BD88FC88
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 11:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDD7A1C27AF4
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 10:09:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2D8129850E
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 10:10:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A537BB1C;
-	Thu, 28 Mar 2024 10:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B597C6C8;
+	Thu, 28 Mar 2024 10:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hiDYjDdc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y8v9Xx6w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2963D7D081;
-	Thu, 28 Mar 2024 10:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE694E1C3
+	for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 10:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711620569; cv=none; b=qy5MBRcAjhp1o24I0fydco5Bt+6k/teZMv+Kok4OATLg+TiYSg1iSeWD1q2HGKG+l4Zpq1QV4nzis7SGy+1JLQfe4pjAzmnd5cJPAADjGdPrg+MZQRmHHZV6MBUxVhgVNZyxt/kqmxWpwYTUsmJS+bEnNcm1KsBN6mmyNNEgc9g=
+	t=1711620628; cv=none; b=MCazUPAtSAxH1nIDjlyHvm+aAe9AYIgnsV/9SeB6Q3rua/k03xQJWcZrk8QMmd2xAgbuqoMIludqFX6Ga8sAkbTkIWyuFQ+Gn6ZCMT2qlGGl0QVZWjt9t9lYVYfgT/WjcoPFtDoBTquqbSL/LzJG6/ZldDo2+gKV3hYu07tdX9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711620569; c=relaxed/simple;
-	bh=vWXeQU2KQO42RPmw/5gfcrKLDwqxa+yTVOBVA9d+7Jo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ohHUCwIwz3/Ddmbf2b23hKTrKCbENOBTjJpqcWZiFkdHx72eb/sTvjQganP8zgCGGY7C59TKPrY+T9CAYw9GZ86T0JUj8snGc6xXRg37TgygSOou65bAsXHXUnc2K8xB9jpI6Kg4hTZJWHmTO51deXC6jO3Gula3Wqm/vL6vGFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hiDYjDdc; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711620567; x=1743156567;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vWXeQU2KQO42RPmw/5gfcrKLDwqxa+yTVOBVA9d+7Jo=;
-  b=hiDYjDdcRAzSwJi60fI2LzFOZtr9Vyad3QbULwUBnDbrHTjbL58uvr+O
-   p5vqeslBMjju34eT03zxrGF+yzitwUzlcWGUNdq4Ue288ya3PqlyDsBjm
-   Eu+HY9WvNAQeZt5va6Sj2Ua3Jcj6CVp7p+J4gq8O4IDvNBL3yFv/QiM/I
-   KNSCjU4E3LG4ZoxgzpZFSfLMOxLEBIGVrJ48el16Lnu2ZbhQZY6vCKuH+
-   tBDZ+2Rwf1blXpa/ybXHxi0OQ79VnCcsD2hV2SYUm16A9KWgd20j8UknG
-   11E7vp7Jm224YKwXVLP1LYLwJ/0eapz093gI0waC/Uc4WzoB0SM5t9AIv
-   A==;
-X-CSE-ConnectionGUID: gR8vQ817Rba2RpoFp+XlzQ==
-X-CSE-MsgGUID: FvvGUwmhQ0y90fPjtBaKEQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6622487"
-X-IronPort-AV: E=Sophos;i="6.07,161,1708416000"; 
-   d="scan'208";a="6622487"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 03:09:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,161,1708416000"; 
-   d="scan'208";a="21322227"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.125.242.198]) ([10.125.242.198])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 03:09:23 -0700
-Message-ID: <e230e2e2-9b51-4ad7-bbc5-a90e6d169e92@linux.intel.com>
-Date: Thu, 28 Mar 2024 18:09:20 +0800
+	s=arc-20240116; t=1711620628; c=relaxed/simple;
+	bh=b/Wtm7QHudbi6Mcs0lI5n1QIOiQrRafrMMNW8RqO18s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LNDWViA6LQ3WGoG/32j9NJGP0955EdN9HOYGFilXep4v1qUUMlReLkN/pil0jeF6CSqzJfOlmlo8O6bcZU5WNI8daD1nmVOoewJW4MJBo+W643IXFeF5xmmwQatPLBg34hBlmyV9jN78Vvt4M4wHqUBOI/yQ2WeL8XpnObGox/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y8v9Xx6w; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56890b533aaso807560a12.3
+        for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 03:10:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711620625; x=1712225425; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Puyk1VksZOZMOoSvwfN6vEXC/OypwIzDynZuRboVTDQ=;
+        b=Y8v9Xx6wi/I6LmHV31xIQaKaBoEyWvkgfZiAdy17i6WwuwjOfpm2LavZzxJbkVpKki
+         kfc7ZZjFqgly3t/OsD9sNOSQlzGvZ9jOQamXYC8cX5Gi0bX29w38U/q9LrsX9uVCD1Tz
+         k4LOeW83l5CZxj3ISYLY7eBAX2ioLnPEQvm+fU0YWIBeAc80MCCCSyA+TaOB73E9y+ii
+         htE2MxcA0JEB6/wxe52pFJ1IFoo3Fiar4oZezRlq3lx5fo2eLwUvQbBkZGeevbBSo+++
+         YTpE487VQgaHRmTXxpMM0S3fVjTe6jKgV387Ex9txCtSxqKQSg/FhbLELp7fs5ZunjzK
+         BphA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711620625; x=1712225425;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Puyk1VksZOZMOoSvwfN6vEXC/OypwIzDynZuRboVTDQ=;
+        b=SLpZE1Wuofo47DmybaV8K5zNf24dP4xE29vgtWbal9+DlmbyIJ5fxQVhNkHl3k8DH/
+         4aAevo1EnENlRMk3vZ87pnd331CyKledDwCu1MREOPNOYbvFLMYMzJTh6K1aTKRVEGXn
+         ZsPs6s5j2YW3ksxSJYhp/7HTyeiBHUT3H2T/B7jukRQ1tIhMaUzVaCYf147un16eBc95
+         iSGG2OLrwSTh2wm1IWb6EiNZZU6OdBmYli8JBM8BC4cKNcg7llnRSqLOk8PlNiyCoiYX
+         9EmTn1P/C/ho1cs5Q1SGfCwvGjAlD0HiGGOulcxoOip0oVB3qdSd/dCexUGlJogJM7uI
+         5b1A==
+X-Forwarded-Encrypted: i=1; AJvYcCU+88UUBRgTQFPM+tIKoyEd5wZZkiDwDyaC2JcMvZHzpjUvflc3i6DFsqTUYVlEzWHwCA5dW5t2BY+vsTVZTflbNlTA
+X-Gm-Message-State: AOJu0YyI20J3rFQBCZ7MtqtgfZcC4V4+frLcF/XEtdcwvtixlTBHZGnf
+	bpc71L6+/CXlY7GVJm4B7AEOiorzEQqOY1rbhiE2MNUnGciZRZxy/NzImtXO5+7Xe/0U07uafmr
+	s7GA6
+X-Google-Smtp-Source: AGHT+IGXnI9D0/a/dDSyK30CUeRiI6B81YbRt4vqKAzIHpgoErhg2X2EKKArBQHecRRX/nEjQaIWXQ==
+X-Received: by 2002:a17:906:f0d0:b0:a4e:e20:df53 with SMTP id dk16-20020a170906f0d000b00a4e0e20df53mr1476586ejb.59.1711620624947;
+        Thu, 28 Mar 2024 03:10:24 -0700 (PDT)
+Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
+        by smtp.gmail.com with ESMTPSA id kg26-20020a17090776fa00b00a449026672esm571212ejc.81.2024.03.28.03.10.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 03:10:23 -0700 (PDT)
+Date: Thu, 28 Mar 2024 10:10:20 +0000
+From: Quentin Perret <qperret@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	viro@zeniv.linux.org.uk, brauner@kernel.org,
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	ackerleytng@google.com, mail@maciej.szmigiero.name,
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com, steven.price@arm.com,
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com,
+	linux-mm@kvack.org
+Subject: Re: folio_mmapped
+Message-ID: <ZgVCDPoQbbXjTBQp@google.com>
+References: <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
+ <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
+ <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
+ <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
+ <ZfjYBxXeh9lcudxp@google.com>
+ <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
+ <20240319143119.GA2736@willie-the-truck>
+ <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
+ <20240327193454.GB11880@willie-the-truck>
+ <d0500f89-df3b-42cd-aa5a-5b3005f67638@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests Patch v3 04/11] x86: pmu: Switch instructions and
- core cycles events sequence
-Content-Language: en-US
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Zhang Xiong
- <xiong.y.zhang@intel.com>, Like Xu <like.xu.linux@gmail.com>,
- Jinrong Liang <cloudliang@tencent.com>, Dapeng Mi <dapeng1.mi@intel.com>
-References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
- <20240103031409.2504051-5-dapeng1.mi@linux.intel.com>
- <ZgOwVvTVlvk3iN3x@google.com>
- <c838c85e-c448-4f83-a79f-deb20c6aaf90@linux.intel.com>
- <ZgRSBITQNIRIgu8N@google.com>
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <ZgRSBITQNIRIgu8N@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d0500f89-df3b-42cd-aa5a-5b3005f67638@redhat.com>
 
+Hey David,
 
-On 3/28/2024 1:06 AM, Mingwei Zhang wrote:
-> On Wed, Mar 27, 2024, Mi, Dapeng wrote:
->> On 3/27/2024 1:36 PM, Mingwei Zhang wrote:
->>> On Wed, Jan 03, 2024, Dapeng Mi wrote:
->>>> When running pmu test on SPR, sometimes the following failure is
->>>> reported.
->>>>
->>>> PMU version:         2
->>>> GP counters:         8
->>>> GP counter width:    48
->>>> Mask length:         8
->>>> Fixed counters:      3
->>>> Fixed counter width: 48
->>>> 1000000 <= 55109398 <= 50000000
->>>> FAIL: Intel: core cycles-0
->>>> 1000000 <= 18279571 <= 50000000
->>>> PASS: Intel: core cycles-1
->>>> 1000000 <= 12238092 <= 50000000
->>>> PASS: Intel: core cycles-2
->>>> 1000000 <= 7981727 <= 50000000
->>>> PASS: Intel: core cycles-3
->>>> 1000000 <= 6984711 <= 50000000
->>>> PASS: Intel: core cycles-4
->>>> 1000000 <= 6773673 <= 50000000
->>>> PASS: Intel: core cycles-5
->>>> 1000000 <= 6697842 <= 50000000
->>>> PASS: Intel: core cycles-6
->>>> 1000000 <= 6747947 <= 50000000
->>>> PASS: Intel: core cycles-7
->>>>
->>>> The count of the "core cycles" on first counter would exceed the upper
->>>> boundary and leads to a failure, and then the "core cycles" count would
->>>> drop gradually and reach a stable state.
->>>>
->>>> That looks reasonable. The "core cycles" event is defined as the 1st
->>>> event in xxx_gp_events[] array and it is always verified at first.
->>>> when the program loop() is executed at the first time it needs to warm
->>>> up the pipeline and cache, such as it has to wait for cache is filled.
->>>> All these warm-up work leads to a quite large core cycles count which
->>>> may exceeds the verification range.
->>>>
->>>> The event "instructions" instead of "core cycles" is a good choice as
->>>> the warm-up event since it would always return a fixed count. Thus
->>>> switch instructions and core cycles events sequence in the
->>>> xxx_gp_events[] array.
->>> The observation is great. However, it is hard to agree that we fix the
->>> problem by switching the order. Maybe directly tweaking the N from 50 to
->>> a larger value makes more sense.
->>>
->>> Thanks.
->>> -Mingwei
->> yeah, a larger upper boundary can fix the fault as well, but the question is
->> how large it would be enough. For different CPU model, the needed cycles
->> could be different for warming up. So we may have to set a quite large upper
->> boundary but a large boundary would decrease credibility of this validation.
->> Not sure which one is better. Any inputs from other ones?
->>
-> Just checked with an expert from our side, so "core cycles" (0x003c)
-> is affected the current CPU state/frequency, ie., its counting value
-> could vary largely. In that sense, "warming" up seems reasonable.
-> However, switching the order would be a terrible idea for maintanence
-> since people will forget it and the problem will come back.
->
->  From another perspective, "warming" up seems just a best effort. Nobody
-> knows how warm is really warm. Besides, some systems might turn off some
-> C-State and may set a cap on max turbo frequency. All of these will
-> directly affect the warm-up process and the counting result of 0x003c.
->
-> So, while adding a warm-up blob is reasonable, tweaking the heuristics
-> seems to be same for me. Regarding the value, I think I will rely on
-> your experiments and observation.
+I'll try to pick up the baton while Will is away :-)
 
-Per my understanding, most of extra cpu cycles should come from the warm 
-up for cache. If we don't want to change the validation order,  it may 
-be doable to add an extra warm-up phase before starting the validation. 
-Thus we don't need to enlarge the upper boundary. It looks not a 
-preferred way since it would decrease the credibility of the validation.
+On Thursday 28 Mar 2024 at 10:06:52 (+0100), David Hildenbrand wrote:
+> On 27.03.24 20:34, Will Deacon wrote:
+> > I suppose the main thing is that the architecture backend can deal with
+> > these states, so the core code shouldn't really care as long as it's
+> > aware that shared memory may be pinned.
+> 
+> So IIUC, the states are:
+> 
+> (1) Private: inaccesible by the host, accessible by the guest, "owned by
+>     the guest"
+> 
+> (2) Host Shared: accessible by the host + guest, "owned by the host"
+> 
+> (3) Guest Shared: accessible by the host, "owned by the guest"
 
-Let me try to add a warm-up phase first and check if it works as expect.
+Yup.
 
+> Memory ballooning is simply transitioning from (3) to (2), and then
+> discarding the memory.
 
->
-> Thanks.
-> -Mingwei
->>>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
->>>> ---
->>>>    x86/pmu.c | 16 ++++++++--------
->>>>    1 file changed, 8 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/x86/pmu.c b/x86/pmu.c
->>>> index a42fff8d8b36..67ebfbe55b49 100644
->>>> --- a/x86/pmu.c
->>>> +++ b/x86/pmu.c
->>>> @@ -31,16 +31,16 @@ struct pmu_event {
->>>>    	int min;
->>>>    	int max;
->>>>    } intel_gp_events[] = {
->>>> -	{"core cycles", 0x003c, 1*N, 50*N},
->>>>    	{"instructions", 0x00c0, 10*N, 10.2*N},
->>>> +	{"core cycles", 0x003c, 1*N, 50*N},
->>>>    	{"ref cycles", 0x013c, 1*N, 30*N},
->>>>    	{"llc references", 0x4f2e, 1, 2*N},
->>>>    	{"llc misses", 0x412e, 1, 1*N},
->>>>    	{"branches", 0x00c4, 1*N, 1.1*N},
->>>>    	{"branch misses", 0x00c5, 0, 0.1*N},
->>>>    }, amd_gp_events[] = {
->>>> -	{"core cycles", 0x0076, 1*N, 50*N},
->>>>    	{"instructions", 0x00c0, 10*N, 10.2*N},
->>>> +	{"core cycles", 0x0076, 1*N, 50*N},
->>>>    	{"branches", 0x00c2, 1*N, 1.1*N},
->>>>    	{"branch misses", 0x00c3, 0, 0.1*N},
->>>>    }, fixed_events[] = {
->>>> @@ -307,7 +307,7 @@ static void check_counter_overflow(void)
->>>>    	int i;
->>>>    	pmu_counter_t cnt = {
->>>>    		.ctr = MSR_GP_COUNTERx(0),
->>>> -		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
->>>> +		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[0].unit_sel /* instructions */,
->>>>    	};
->>>>    	overflow_preset = measure_for_overflow(&cnt);
->>>> @@ -365,11 +365,11 @@ static void check_gp_counter_cmask(void)
->>>>    {
->>>>    	pmu_counter_t cnt = {
->>>>    		.ctr = MSR_GP_COUNTERx(0),
->>>> -		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
->>>> +		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[0].unit_sel /* instructions */,
->>>>    	};
->>>>    	cnt.config |= (0x2 << EVNTSEL_CMASK_SHIFT);
->>>>    	measure_one(&cnt);
->>>> -	report(cnt.count < gp_events[1].min, "cmask");
->>>> +	report(cnt.count < gp_events[0].min, "cmask");
->>>>    }
->>>>    static void do_rdpmc_fast(void *ptr)
->>>> @@ -446,7 +446,7 @@ static void check_running_counter_wrmsr(void)
->>>>    	uint64_t count;
->>>>    	pmu_counter_t evt = {
->>>>    		.ctr = MSR_GP_COUNTERx(0),
->>>> -		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
->>>> +		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[0].unit_sel,
->>>>    	};
->>>>    	report_prefix_push("running counter wrmsr");
->>>> @@ -455,7 +455,7 @@ static void check_running_counter_wrmsr(void)
->>>>    	loop();
->>>>    	wrmsr(MSR_GP_COUNTERx(0), 0);
->>>>    	stop_event(&evt);
->>>> -	report(evt.count < gp_events[1].min, "cntr");
->>>> +	report(evt.count < gp_events[0].min, "cntr");
->>>>    	/* clear status before overflow test */
->>>>    	if (this_cpu_has_perf_global_status())
->>>> @@ -493,7 +493,7 @@ static void check_emulated_instr(void)
->>>>    	pmu_counter_t instr_cnt = {
->>>>    		.ctr = MSR_GP_COUNTERx(1),
->>>>    		/* instructions */
->>>> -		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
->>>> +		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[0].unit_sel,
->>>>    	};
->>>>    	report_prefix_push("emulated instruction");
->>>> -- 
->>>> 2.34.1
->>>>
+Well, not quite actually, see below.
+
+> Any state I am missing?
+
+So there is probably state (0) which is 'owned only by the host'. It's a
+bit obvious, but I'll make it explicit because it has its importance for
+the rest of the discussion.
+
+And while at it, there are other cases (memory shared/owned with/by the
+hypervisor and/or TrustZone) but they're somewhat irrelevant to this
+discussion. These pages are usually backed by kernel allocations, so
+much less problematic to deal with. So let's ignore those.
+
+> Which transitions are possible?
+
+Basically a page must be in the 'exclusively owned' state for an owner
+to initiate a share or donation. So e.g. a shared page must be unshared
+before it can be donated to someone else (that is true regardless of the
+owner, host, guest, hypervisor, ...). That simplifies significantly the
+state tracking in pKVM.
+
+> (1) <-> (2) ? Not sure if the direct transition is possible.
+
+Yep, not possible.
+
+> (2) <-> (3) ? IIUC yes.
+
+Actually it's not directly possible as is. The ballooning procedure is
+essentially a (1) -> (0) transition. (We also tolerate (3) -> (0) in a
+single hypercall when doing ballooning, but it's technically just a
+(3) -> (1) -> (0) sequence that has been micro-optimized).
+
+Note that state (2) is actually never used for protected VMs. It's
+mainly used to implement standard non-protected VMs. The biggest
+difference in pKVM between protected and non-protected VMs is basically
+that in the former case, in the fault path KVM does a (0) -> (1)
+transition, but in the latter it's (0) -> (2). That implies that in the
+unprotected case, the host remains the page owner and is allowed to
+decide to unshare arbitrary pages, to restrict the guest permissions for
+the shared pages etc, which paves the way for implementing migration,
+swap, ... relatively easily.
+
+> (1) <-> (3) ? IIUC yes.
+
+Yep.
+
+<snip>
+> > I agree on all of these and, yes, (3) is the problem for us. We've also
+> > been thinking a bit about CoW recently and I suspect the use of
+> > vm_normal_page() in do_wp_page() could lead to issues similar to those
+> > we hit with GUP. There are various ways to approach that, but I'm not
+> > sure what's best.
+> 
+> Would COW be required or is that just the nasty side-effect of trying to use
+> anonymous memory?
+
+That'd qualify as an undesirable side effect I think.
+
+> > 
+> > > I'm curious, may there be a requirement in the future that shared memory
+> > > could be mapped into other processes? (thinking vhost-user and such things).
+> > 
+> > It's not impossible. We use crosvm as our VMM, and that has a
+> > multi-process sandbox mode which I think relies on just that...
+> > 
+> 
+> Okay, so basing the design on anonymous memory might not be the best choice
+> ... :/
+
+So, while we're at this stage, let me throw another idea at the wall to
+see if it sticks :-)
+
+One observation is that a standard memfd would work relatively well for
+pKVM if we had a way to enforce that all mappings to it are MAP_SHARED.
+KVM would still need to take an 'exclusive GUP' from the fault path
+(which may fail in case of a pre-existing GUP, but that's fine), but
+then CoW and friends largely become a non-issue by construction I think.
+Is there any way we could enforce that cleanly? Perhaps introducing a
+sort of 'mmap notifier' would do the trick? By that I mean something a
+bit similar to an MMU notifier offered by memfd that KVM could register
+against whenever the memfd is attached to a protected VM memslot.
+
+One of the nice things here is that we could retain an entire mapping of
+the whole of guest memory in userspace, conversions wouldn't require any
+additional efforts from userspace. A bad thing is that a process that is
+being passed such a memfd may not expect the new semantic and the
+inability to map !MAP_SHARED. But I guess a process that receives a
+handle to private memory must be enlightened regardless of the type of
+fd, so maybe it's not so bad.
+
+Thoughts?
+
+Thanks,
+Quentin
 
