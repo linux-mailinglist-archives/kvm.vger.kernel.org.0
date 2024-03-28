@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-13038-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13039-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2180890C47
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 22:10:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEFC5890C4E
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 22:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2D5F1C2B6F8
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 21:10:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7286B1F24A54
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 21:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D2413AA23;
-	Thu, 28 Mar 2024 21:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1302D13A890;
+	Thu, 28 Mar 2024 21:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gt8adpfT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Juk/qcjE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0894B52F62;
-	Thu, 28 Mar 2024 21:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B970D52F62;
+	Thu, 28 Mar 2024 21:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711660240; cv=none; b=BDceeqXebqQbDXPBKvZ1Y8vem3UmZZZsgBnJEpb0W7vN5H+BpnfPG2OHRKvFgCDp9GTQLgzXLEXImFWW2sNkkEIi9hPmcALxDplnMmQBxQh92PJVkPTlidk417eAeG1BOZEkqjFPkVM+3mXSIv7gcn0sMvG4jFhWEceL60U5NZo=
+	t=1711660325; cv=none; b=SMoXZTj8Ke8nKnvz2ixM8XgiiS0w3REYdfAy3sg4HaAZ3T9ARjxHJNLdcTFjBrdFS3qVmUTPm/q9zJh2LZI9r05jPKuK2kmDelHTh8O3XTtYR1jQHH9xOLv9GeNMAf2cjv9i5JydSw/ABzBSBEeaK5qjpw71hkQ8M20QlnDOnXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711660240; c=relaxed/simple;
-	bh=GR+8vhdZaMF0jMh5JD8q+n8JbP3PzmlEhT9CqXSNA70=;
+	s=arc-20240116; t=1711660325; c=relaxed/simple;
+	bh=yngr6HDotAuV0LR72q3d5ZVpN+T8z4EOF6b3Ti3s9X0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HuYUeb/3rdE9eXEEAw0VzGqee1fOXQqPiJQCh/0zQzmlJgPOUDQYgBa9eZAeesdHddUtzwW+5FQTTMDQvHZ8ByQucB6bF3ZtZAPa8aInVkKeQB2cjSTRXryll7rYsH8iu1252N2vRgb7NzOYebBCbk1+3+76cclG8RZevBXV8vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gt8adpfT; arc=none smtp.client-ip=198.175.65.16
+	 Content-Type:Content-Disposition:In-Reply-To; b=MY64ovDjoSTcTkqRivJWQaIY9xGXvOyF8GbpLH7TDBhVDM93fCrhRwFYGWH7EaegOqYGCzUvedSV01XJDG3lvA0vp3J2FoS8EdK3IOgzvMFtCS1ccN0dKJag5qQhT4YKRYj2lQqY3A10GR9BaVEIAvMuVBSC3MYwz37LSeNtz4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Juk/qcjE; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711660238; x=1743196238;
+  t=1711660324; x=1743196324;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=GR+8vhdZaMF0jMh5JD8q+n8JbP3PzmlEhT9CqXSNA70=;
-  b=Gt8adpfThIuDKUzLWYmz0pj5cTq+D0mMwFD7vxmNd/1O8AJd/mgG1rs9
-   1XQL2vxh3/jTMiNT47ju0WI2kVrOdVF1nRQcL0WNBw47soy4Z0ujcTubh
-   yDlLKRI3zkvac/QvEV8zirmVRP4AvShabdFC0oeGetU1WfASb9IRjjUXF
-   w/+Qzy4nyzPa4KqFOsmpkvg7+bJOhJ1k82Qkhtsn746gMnlw/sNubVKPm
-   15otbGuVTFFU1I2txFkhqIQQQYgvdHtO4X6qAXDG4e8IkS/WhVoMHt3Fb
-   7q78ShxrxC4sddjc8CfsjEAOmgWHL1jGjBw88E/CDZtoX4bSCXdIxoGtZ
-   w==;
-X-CSE-ConnectionGUID: a6FstP4gSNmV1iT1kg7uDQ==
-X-CSE-MsgGUID: KBNOV1JLTYiy0CIBGCkCbQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6956294"
+  bh=yngr6HDotAuV0LR72q3d5ZVpN+T8z4EOF6b3Ti3s9X0=;
+  b=Juk/qcjEv3HR2WRYWmo/665+1TVIy3eBI8SbNzNjZXl/ylu9XwdeY9kB
+   K/ejLKbDjD0Ob06JS2PNEvgZGHtpKlRPeaV2h6lct2ye/zo304k5AMKg9
+   5Rh+2BjXbqATdTksRBlkRCAYiqz+IqRbh8ZJL+2J1HZLVbgfjpoG7nu8I
+   vJt7m7mhjXWTXfye/7u9dRHY9dMDRJKY+HVEmwrjgdZeIIk1NJZJ2nSW5
+   dwodLgVHqOQyrcX/X6YSh7NPjGndJm8f4klwRK9x2m5yJ75dDCirPjPAp
+   mTJFzZDS0VDoUxpc5GORzSpPljilmwd3ainOl1IQS+dEQQiE6UrwnIvBv
+   g==;
+X-CSE-ConnectionGUID: oYlcoPYVQhGJLYRmckojEA==
+X-CSE-MsgGUID: z6hH4Fr8TwGQUeMwLs3agg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6955602"
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="6956294"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 14:10:37 -0700
+   d="scan'208";a="6955602"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 14:12:04 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="16824858"
+   d="scan'208";a="16805142"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 14:10:37 -0700
-Date: Thu, 28 Mar 2024 14:10:36 -0700
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 14:12:03 -0700
+Date: Thu, 28 Mar 2024 14:12:02 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 To: Chao Gao <chao.gao@intel.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
@@ -66,12 +66,11 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 091/130] KVM: TDX: remove use of struct vcpu_vmx from
- posted_interrupt.c
-Message-ID: <20240328211036.GS2444378@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v19 092/130] KVM: TDX: Implement interrupt injection
+Message-ID: <20240328211202.GT2444378@ls.amr.corp.intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <6c7774a44515d6787c9512cb05c3b305e9b5855c.1708933498.git.isaku.yamahata@intel.com>
- <ZgUmdIM67dybDTCn@chao-email>
+ <b2d9539b23f155b95864db3eacce55e0e24eed4d.1708933498.git.isaku.yamahata@intel.com>
+ <ZgVM2kJTx1p4BjbM@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,45 +79,23 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZgUmdIM67dybDTCn@chao-email>
+In-Reply-To: <ZgVM2kJTx1p4BjbM@chao-email>
 
-On Thu, Mar 28, 2024 at 04:12:36PM +0800,
+On Thu, Mar 28, 2024 at 06:56:26PM +0800,
 Chao Gao <chao.gao@intel.com> wrote:
 
-> On Mon, Feb 26, 2024 at 12:26:33AM -0800, isaku.yamahata@intel.com wrote:
-> >@@ -190,7 +211,8 @@ static bool vmx_needs_pi_wakeup(struct kvm_vcpu *vcpu)
-> > 	 * notification vector is switched to the one that calls
-> > 	 * back to the pi_wakeup_handler() function.
-> > 	 */
-> >-	return vmx_can_use_ipiv(vcpu) || vmx_can_use_vtd_pi(vcpu->kvm);
-> >+	return (vmx_can_use_ipiv(vcpu) && !is_td_vcpu(vcpu)) ||
-> >+		vmx_can_use_vtd_pi(vcpu->kvm);
-> 
-> It is better to separate this functional change from the code refactoring.
-
-Agreed. Let's split this patch.
-
-
-> > }
+> >@@ -848,6 +853,12 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
 > > 
-> > void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
-> >@@ -200,7 +222,8 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
-> > 	if (!vmx_needs_pi_wakeup(vcpu))
-> > 		return;
+> > 	trace_kvm_entry(vcpu);
 > > 
-> >-	if (kvm_vcpu_is_blocking(vcpu) && !vmx_interrupt_blocked(vcpu))
-> >+	if (kvm_vcpu_is_blocking(vcpu) &&
-> >+	    (is_td_vcpu(vcpu) || !vmx_interrupt_blocked(vcpu)))
+> >+	if (pi_test_on(&tdx->pi_desc)) {
+> >+		apic->send_IPI_self(POSTED_INTR_VECTOR);
+> >+
+> >+		kvm_wait_lapic_expire(vcpu);
 > 
-> Ditto.
-> 
-> This looks incorrect to me. here we assume interrupt is always enabled for TD.
-> But on TDVMCALL(HLT), the guest tells KVM if hlt is called with interrupt
-> disabled. KVM can just check that interrupt status passed from the guest.
+> it seems the APIC timer change was inadvertently included.
 
-That's true.  We can complicate this function and HLT emulation.  But I don't
-think it's worthwhile because HLT with interrupt masked is rare.  Only for
-CPU online.
+Oops. Thanks for catching it.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
