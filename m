@@ -1,136 +1,105 @@
-Return-Path: <kvm+bounces-12955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3C3588F613
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 04:55:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AAA988F60C
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 04:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F98B29785B
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 03:55:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BED41C23AE6
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 03:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6EF37714;
-	Thu, 28 Mar 2024 03:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A5332C9C;
+	Thu, 28 Mar 2024 03:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BP9MJb+0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ImyjkFsG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A583612C;
-	Thu, 28 Mar 2024 03:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E58128DD1
+	for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 03:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711598140; cv=none; b=S0aPknb66aCTLZjd7EECHySR1XPkQb9R/a8G9wBTsorLVpMhdfZhh+kDCwjxBA3YN8VT9SMGgst2Biy8gDjzRwbgu/ArmRexstoYHKH5wzQZa58MeDksbN9NkP2c40BcafQCjVqpgXvsZAvgsQO+IxIMMQnuMJ4Oy4U++4grfcg=
+	t=1711597679; cv=none; b=dp3kHAsKpg870n9RQl5mvgXG/s/BfbqMUGbgHmfyLvy22yKMDBvIQfSGuo3357MkLAnUoGPXlbywHkzow26tvLONPbPZnEHWHhLDvE94IcF2pNBUlsI0OQSlWBwGlIETGYPl7cm3CJ1+UG1X2yJl2NEoKI4EXg4n2u4Y/Kyh6pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711598140; c=relaxed/simple;
-	bh=psUKbddsJmKuRN0FxEaMP6+4Pw98qpDcMTXQZ/jyzjU=;
+	s=arc-20240116; t=1711597679; c=relaxed/simple;
+	bh=CZmyMDYmLGJt1aVeM7GMIos7pinDxlgS7ivSaGO4u00=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cvi1YJYe2HJhwyd2CYxuxZAPBlOcrgu1jo2cbxz5t3dJUaYx6n/5rT2KXnqOekLNxHv04J9mlvlzyFMUrxczFZNTdw+eOhoJ+UtRqlFIj8wM5CBLpK0cJ3Q4uGJMbQ1zoi5hDHx+M20s0hqE7FV6l/vHA/984gkfiVgKhj/mfgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BP9MJb+0; arc=none smtp.client-ip=198.175.65.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=cGNGje3b3o1H2ccnyHbnn+V4Scrihu98oX02BHs+vFz0fSrU3SwAnTfg/DgSHcWR4UlB/PO0Tvu2fmRa4TbFNuMThwsCsRHSvGxVDVlHHpoevisvpofkQUl1JlTaMEaWVfGNKDAwmh3sIH8C5f7E2TUiytij0TLkck4Q+14Utls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ImyjkFsG; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711598139; x=1743134139;
+  t=1711597677; x=1743133677;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=psUKbddsJmKuRN0FxEaMP6+4Pw98qpDcMTXQZ/jyzjU=;
-  b=BP9MJb+0qDIsDdy2IFPgGTCifXLoK1KL1rjAghKSnAHgbTlBJJsZX8lc
-   emgCoF6ugmFZMvkLuX5O1uGDI50XrW0tVIgKiAB//EpubUSKmUvY61xFC
-   MeD00QDiokcPHxZDb+ZCc6ZJXdEU51es9nMmdJTkA9fJffcjd5x+o9aQ2
-   sUdWVjbSIbopXSNrkUL7J/CUN8AK45WwVc1O39zgugJDcMGwkuRE6wJrB
-   oNtDvHoHgoopnUm9joE/rMPnWWq/vwiaEqi9YflnSOrks8gp1u3NAv5BJ
-   LeAj12YtdL8rwyOiJos9AqJ2u8J71rP2aC7z5i5XCyjNJ+qM4CzEMawie
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=CZmyMDYmLGJt1aVeM7GMIos7pinDxlgS7ivSaGO4u00=;
+  b=ImyjkFsGoJnduxMpgo6tMAR8ftDSAMwmm8pwUE3n144++QiTqNYEVJq+
+   33BR7GS+Es/3zY+um8oecBUXts2GwDK6irr2unqkjjVxhtrPmSNtgN68U
+   0lNAJNJ9Mw4t4b+PyjUH9qbmwMTKbboYd8FZfx8+XVmV4xUVFLinR+CYI
+   I6X/mRoS8ov693fTMKbyu7km/u61DbVMvCqBU1GgNvRbd9wyysa7um1LL
+   7E6NPldTuk5Emg8TyETzC+2CZBS5WCT0j4JAt013pvUUKMsECJRdUi4K0
+   EmoUhkWAcvqEYmus/B8Id9OjPyB2s3wUdJMGKLAGZJf8z5IMYqx/VISTI
    Q==;
-X-CSE-ConnectionGUID: jTcjWVpuStOwHbTTUNTTTg==
-X-CSE-MsgGUID: L728brDDQIuk3HS+QmG1nQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6863664"
+X-CSE-ConnectionGUID: mVmscYw1TPuA4isp8yF5yA==
+X-CSE-MsgGUID: Lcjsim5jR8KecKAUhl7E2Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6597090"
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="6863664"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 20:55:39 -0700
+   d="scan'208";a="6597090"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 20:47:57 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="16912482"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 20:55:38 -0700
-Date: Wed, 27 Mar 2024 20:55:37 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 070/130] KVM: TDX: TDP MMU TDX support
-Message-ID: <20240328035537.GN2444378@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <56cdb0da8bbf17dc293a2a6b4ff74f6e3e034bbd.1708933498.git.isaku.yamahata@intel.com>
- <ZgTgOVNmyVVgfvFM@chao-email>
+   d="scan'208";a="16538537"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa009.fm.intel.com with ESMTP; 27 Mar 2024 20:47:54 -0700
+Date: Thu, 28 Mar 2024 12:01:49 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+	Igor Mammedov <imammedo@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, devel@lists.libvirt.org,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH-for-9.1 v2 20/21] target/i386: Remove
+ X86CPU::kvm_no_smi_migration field
+Message-ID: <ZgTrrZVam/hEdcU0@intel.com>
+References: <20240327095124.73639-1-philmd@linaro.org>
+ <20240327095124.73639-21-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ZgTgOVNmyVVgfvFM@chao-email>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240327095124.73639-21-philmd@linaro.org>
 
-On Thu, Mar 28, 2024 at 11:12:57AM +0800,
-Chao Gao <chao.gao@intel.com> wrote:
+On Wed, Mar 27, 2024 at 10:51:22AM +0100, Philippe Mathieu-Daudé wrote:
+> Date: Wed, 27 Mar 2024 10:51:22 +0100
+> From: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Subject: [PATCH-for-9.1 v2 20/21] target/i386: Remove
+>  X86CPU::kvm_no_smi_migration field
+> X-Mailer: git-send-email 2.41.0
+> 
+> X86CPU::kvm_no_smi_migration was only used by the
+> pc-i440fx-2.3 machine, which got removed. Remove it
+> and simplify kvm_put_vcpu_events().
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>  target/i386/cpu.h     | 3 ---
+>  target/i386/cpu.c     | 2 --
+>  target/i386/kvm/kvm.c | 7 +------
+>  3 files changed, 1 insertion(+), 11 deletions(-)
 
-> >+#if IS_ENABLED(CONFIG_HYPERV)
-> >+static int vt_flush_remote_tlbs(struct kvm *kvm);
-> >+#endif
-> >+
-> > static __init int vt_hardware_setup(void)
-> > {
-> > 	int ret;
-> >@@ -49,11 +53,29 @@ static __init int vt_hardware_setup(void)
-> > 		pr_warn_ratelimited("TDX requires mmio caching.  Please enable mmio caching for TDX.\n");
-> > 	}
-> > 
-> >+#if IS_ENABLED(CONFIG_HYPERV)
-> >+	/*
-> >+	 * TDX KVM overrides flush_remote_tlbs method and assumes
-> >+	 * flush_remote_tlbs_range = NULL that falls back to
-> >+	 * flush_remote_tlbs.  Disable TDX if there are conflicts.
-> >+	 */
-> >+	if (vt_x86_ops.flush_remote_tlbs ||
-> >+	    vt_x86_ops.flush_remote_tlbs_range) {
-> >+		enable_tdx = false;
-> >+		pr_warn_ratelimited("TDX requires baremetal. Not Supported on VMM guest.\n");
-> >+	}
-> >+#endif
-> >+
-> > 	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
-> > 	if (enable_tdx)
-> > 		vt_x86_ops.vm_size = max_t(unsigned int, vt_x86_ops.vm_size,
-> > 					   sizeof(struct kvm_tdx));
-> > 
-> >+#if IS_ENABLED(CONFIG_HYPERV)
-> >+	if (enable_tdx)
-> >+		vt_x86_ops.flush_remote_tlbs = vt_flush_remote_tlbs;
-> 
-> Is this hook necessary/beneficial to TDX?
-> 
-> if no, we can leave .flush_remote_tlbs as NULL. if yes, we should do:
-> 
-> struct kvm_x86_ops {
-> ...
-> #if IS_ENABLED(CONFIG_HYPERV) || IS_ENABLED(TDX...)
-> 	int  (*flush_remote_tlbs)(struct kvm *kvm);
-> 	int  (*flush_remote_tlbs_range)(struct kvm *kvm, gfn_t gfn,
-> 					gfn_t nr_pages);
-> #endif
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
-Will fix it. I made mistake when I rebased it. Now those hooks are only for
-CONFIG_HPYERV.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
 
