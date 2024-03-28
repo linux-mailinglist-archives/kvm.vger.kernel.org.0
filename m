@@ -1,119 +1,338 @@
-Return-Path: <kvm+bounces-13034-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13035-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3003B890B53
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 21:27:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B2D890B87
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 21:39:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF10929AC3C
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 20:27:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C32D297417
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 20:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E33B13A88D;
-	Thu, 28 Mar 2024 20:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FAE13A885;
+	Thu, 28 Mar 2024 20:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWtZDdfu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f+rbttlR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23D7137779;
-	Thu, 28 Mar 2024 20:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A77A17EF;
+	Thu, 28 Mar 2024 20:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711657562; cv=none; b=lxXDD8ZTfuCv/gnJgbpkx/o7QI0Cq9LVQONczDVAG9ytksiVaYxJgBm0e2or0cb3xqdJe6sSJymNvAy4SomALMCqDfO5BAvsJev8fLXsHeCzfCmRqV8O3x5aiaApiopBVVTeUjJxaV/XLH5DbIJxcktT4fbhYF/QCpK7u9wze/Q=
+	t=1711658346; cv=none; b=gW615JZiK3UJq4popaQq9MrWmZzyPi/QqSPsJvS/rIloAZWtdoFuenXAIxtMTrDk1+3V1wqhM7tvdW+VKxp/TniMWab1HzqqsrPeeUMGC+aYv5HgOFZuL65uPbBhTJnpI9z/oxE08/EkPWS3n11eTuDaHJpl21oHxdMHpRoNZpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711657562; c=relaxed/simple;
-	bh=CbPk/DbLGKN7XwAP4qrp84AXgQM56BgTWNeXFQBg5io=;
+	s=arc-20240116; t=1711658346; c=relaxed/simple;
+	bh=zp2qL6ydfBycrCAW9nXS8bSJZLCcBUydjvSCCE1BPt0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sN4m3IUKAvK6gh2ueHYon4wkW5GhXce2mdiI25qv/uJri88nemPhGrzey8IwWdTXhgS+PcTLMmUWoCna7fi2hrVFIxQUV4I3fUyMaXIhbCKJU56ZgonHMf8MAS+4bD8kuq+bOBLcdbMRBkrgbtgFGmcAlraEseZB89YP6NmJYAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nWtZDdfu; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso955311a12.3;
-        Thu, 28 Mar 2024 13:26:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711657560; x=1712262360; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DjTzWFlNYBOpXQ3CKmgioPdo4KwHiFtc75RCFzmDGfc=;
-        b=nWtZDdfuVl8C7GhM2e8bgp0QN/0MfPfpuOy1ew9BhF3McF/Dt96zVXUQB2h8kD+ihW
-         DCVoT8Jh7gldb3ROyPf1Yuh6gB9X4oi2HXurkG1oB6/lilhpY3kUC+RfO8cckzFU2DTy
-         r5i+R4qlnH1a/z6r7a1R8Nv6R1fSE7gO89B5Pfxw1lyCqti4F3FhsMAh+MhTIN62TwyW
-         rhLK290sBf+6vTe1g+s4ItgNwOUu8x/NgcpLuDL9PyNauY8lrJFkdOQ/hjw86KpO0Zu7
-         TLSpU2PUhpUppDNVNFKlcwW+tALF6qDyP0IACrZcfs/c4ovooheLgxQNKEDaNYypj/UF
-         zl1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711657560; x=1712262360;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DjTzWFlNYBOpXQ3CKmgioPdo4KwHiFtc75RCFzmDGfc=;
-        b=CHk4e8AJOBx5KXCVHdgKazmoujGPIb6BZoF5MU9au9t+uBz3cTeYu1J0bFnYfx9ERQ
-         c2lUV13M7SpazP/seoNzBzs2dT1d2DqRN0fXt2uI3z3EINC0hYzkb6wvVEOX+c0pqiRE
-         e0Ud+U44jgZkViS7LU3hF4Trv5U0Hb7oXeOrdYymSG1mE8np9XeYcSBOX0qsj8ABPnbQ
-         8MzN2kYoM+SsB8kWBBU0rPH+BieiWXh7cM6COeUGuoyG8jvOamAtiWP503T9pHgy29tZ
-         S/tLn03Lwr2fLXlytd7kWByhxNXhu2dxzGZyxYkQa+HQNv+rRolNr3qod3CP3UdRLmU+
-         TYHw==
-X-Forwarded-Encrypted: i=1; AJvYcCW46Dga7urW7lLvwYPbf5UZ+bfHL2IbVLW90KNxHScKw9VrIGb2CFzU6DuZ9eook9Fpsg+V8Gpdw6zONECssSMkQOBePBaKDP5OBcIkfTuDiRvaUox3q/PBdM6yb4+cStDA02w+bAwzKdLFNxMLdXCxwt1WPEkqlOjH21DHmvC9CeZeUd4N+3Qqvt7MSSO28TaNKnwCt8WkE6Ybqfbdwt1Wx796rNBm5ziYtXjwozT+nS/pnfu+YFem8MeklGRUmusELo/txWUHdgeERmtK/HG5dSM=
-X-Gm-Message-State: AOJu0YxJ1IJPSUtzdzQJ3gF0wf+Jibjtsg8tfUX7w+t6AspJKWSEYHUl
-	f194JMzgYUVwBx2QZ7pc6Ls7/0GE8Fgb7Ma58VwrkVN9B73vHGX1
-X-Google-Smtp-Source: AGHT+IEx1w9caaaypQCI9yAm8E6MJQGwAU1nwtoauXZOhkZ6zuitYlyEc3oh95Bbc7PPnl5r2KW7ZQ==
-X-Received: by 2002:a05:6a21:3384:b0:1a3:c407:39d8 with SMTP id yy4-20020a056a21338400b001a3c40739d8mr288558pzb.45.1711657560070;
-        Thu, 28 Mar 2024 13:26:00 -0700 (PDT)
-Received: from google.com ([2620:15c:9d:2:493e:82a3:49f9:d88])
-        by smtp.gmail.com with ESMTPSA id fk12-20020a056a003a8c00b006ea858e6e78sm1795975pfb.45.2024.03.28.13.25.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 13:25:59 -0700 (PDT)
-Date: Thu, 28 Mar 2024 13:25:56 -0700
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Russell King <linux@armlinux.org.uk>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mike Leach <mike.leach@linaro.org>,
-	James Clark <james.clark@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Vinod Koul <vkoul@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Michal Simek <michal.simek@amd.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-input@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 17/19] Input: ambakmi - drop owner assignment
-Message-ID: <ZgXSVB4gsKlhsPCz@google.com>
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
- <20240326-module-owner-amba-v1-17-4517b091385b@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jXsvCEorZXaBrvvKh4/Z/2lD9CAR5QNmflKrA/VdiNZGp+cSTw+7bd5tt2j5UX9nthH/vEMcY32HgJoGywuI55ReX+AQTxokTJIPfAbqX1qWbzZHU1eAWrMPjt5d3zjt3e7MowZg07JwYzNB7H3n6kUktxydpDG4GfKLiVlD71I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f+rbttlR; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711658344; x=1743194344;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zp2qL6ydfBycrCAW9nXS8bSJZLCcBUydjvSCCE1BPt0=;
+  b=f+rbttlRzNYNt3VGUdAfAABpfFncBRX6VuTD3g6fnP2wXQXPTpxk4IY3
+   tXlAK3vufN5oi2EBIM52RJs5o/hHXgVLn14uN2mdbJkIebaBobxdfiWFW
+   YJnK5SB2aYv2ojfXgm3EXOBQ2UJ/kfm3LH1jcnK2OZEzvdwr2YH+v/DGp
+   cvTlhumJNcrbLRZvzmpz8ujyn8Q48NRZgEFaKpfJjVLSQInviZenoUCCu
+   lOhvGtR3X2i3g5OcYzPzkObYPlqLGnWB2ma17H2v+GZLr+BCgqw8UQvr9
+   xjdt89mO9n/dptIPeLrjGk/i2qkq9ABNwzOjbFdra8taPc1l57xgPMX8R
+   A==;
+X-CSE-ConnectionGUID: LlRI8Bi+SkuUtP8CV4OpDA==
+X-CSE-MsgGUID: +t/WAQ5IRaiPWRTT8+WU8A==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6734012"
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="6734012"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 13:39:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="16595289"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 13:39:03 -0700
+Date: Thu, 28 Mar 2024 13:39:02 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Yuan, Hang" <hang.yuan@intel.com>,
+	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+	"Chen, Bo2" <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v19 038/130] KVM: TDX: create/destroy VM structure
+Message-ID: <20240328203902.GP2444378@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <7a508f88e8c8b5199da85b7a9959882ddf390796.1708933498.git.isaku.yamahata@intel.com>
+ <a0627c0f-5c2d-4403-807f-fc800b43fd3b@intel.com>
+ <20240327225337.GF2444378@ls.amr.corp.intel.com>
+ <4d925a79-d3cf-4555-9c00-209be445310d@intel.com>
+ <20240328053432.GO2444378@ls.amr.corp.intel.com>
+ <65a1a35e0a3b9a6f0a123e50ec9ddb755f70da52.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240326-module-owner-amba-v1-17-4517b091385b@linaro.org>
+In-Reply-To: <65a1a35e0a3b9a6f0a123e50ec9ddb755f70da52.camel@intel.com>
 
-On Tue, Mar 26, 2024 at 09:23:47PM +0100, Krzysztof Kozlowski wrote:
-> Amba bus core already sets owner, so driver does not need to.
+On Thu, Mar 28, 2024 at 11:14:42AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
+
+> On Wed, 2024-03-27 at 22:34 -0700, Isaku Yamahata wrote:
+> > On Thu, Mar 28, 2024 at 02:49:56PM +1300,
+> > "Huang, Kai" <kai.huang@intel.com> wrote:
+> > 
+> > > 
+> > > 
+> > > On 28/03/2024 11:53 am, Isaku Yamahata wrote:
+> > > > On Tue, Mar 26, 2024 at 02:43:54PM +1300,
+> > > > "Huang, Kai" <kai.huang@intel.com> wrote:
+> > > > 
+> > > > > ... continue the previous review ...
+> > > > > 
+> > > > > > +
+> > > > > > +static void tdx_reclaim_control_page(unsigned long td_page_pa)
+> > > > > > +{
+> > > > > > +	WARN_ON_ONCE(!td_page_pa);
+> > > > > 
+> > > > >  From the name 'td_page_pa' we cannot tell whether it is a control page, but
+> > > > > this function is only intended for control page AFAICT, so perhaps a more
+> > > > > specific name.
+> > > > > 
+> > > > > > +
+> > > > > > +	/*
+> > > > > > +	 * TDCX are being reclaimed.  TDX module maps TDCX with HKID
+> > > > > 
+> > > > > "are" -> "is".
+> > > > > 
+> > > > > Are you sure it is TDCX, but not TDCS?
+> > > > > 
+> > > > > AFAICT TDCX is the control structure for 'vcpu', but here you are handling
+> > > > > the control structure for the VM.
+> > > > 
+> > > > TDCS, TDVPR, and TDCX.  Will update the comment.
+> > > 
+> > > But TDCX, TDVPR are vcpu-scoped.  Do you want to mention them _here_?
+> > 
+> > So I'll make the patch that frees TDVPR, TDCX will change this comment.
+> > 
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Hmm.. Looking again, I am not sure why do we even need
+> tdx_reclaim_control_page()?
 > 
+> It basically does tdx_reclaim_page() + free_page():
+> 
+> +static void tdx_reclaim_control_page(unsigned long td_page_pa)
+> +{
+> +	WARN_ON_ONCE(!td_page_pa);
+> +
+> +	/*
+> +	 * TDCX are being reclaimed.  TDX module maps TDCX with HKID
+> +	 * assigned to the TD.  Here the cache associated to the TD
+> +	 * was already flushed by TDH.PHYMEM.CACHE.WB before here, So
+> +	 * cache doesn't need to be flushed again.
+> +	 */
+> +	if (tdx_reclaim_page(td_page_pa))
+> +		/*
+> +		 * Leak the page on failure:
+> +		 * tdx_reclaim_page() returns an error if and only if there's
+> an
+> +		 * unexpected, fatal error, e.g. a SEAMCALL with bad params,
+> +		 * incorrect concurrency in KVM, a TDX Module bug, etc.
+> +		 * Retrying at a later point is highly unlikely to be
+> +		 * successful.
+> +		 * No log here as tdx_reclaim_page() already did.
+> +		 */
+> +		return;
+> +	free_page((unsigned long)__va(td_page_pa));
+> +}
+> 
+> And why do you need a special function just for control page(s)?
 
-Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+We can revise the code to have common function for reclaiming page.
 
-Thanks.
 
+> > > Otherwise you will have to explain them.
+> > > 
+> > > [...]
+> > > 
+> > > > > > +
+> > > > > > +void tdx_mmu_release_hkid(struct kvm *kvm)
+> > > > > > +{
+> > > > > > +	bool packages_allocated, targets_allocated;
+> > > > > > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > > > > > +	cpumask_var_t packages, targets;
+> > > > > > +	u64 err;
+> > > > > > +	int i;
+> > > > > > +
+> > > > > > +	if (!is_hkid_assigned(kvm_tdx))
+> > > > > > +		return;
+> > > > > > +
+> > > > > > +	if (!is_td_created(kvm_tdx)) {
+> > > > > > +		tdx_hkid_free(kvm_tdx);
+> > > > > > +		return;
+> > > > > > +	}
+> > > > > 
+> > > > > I lost tracking what does "td_created()" mean.
+> > > > > 
+> > > > > I guess it means: KeyID has been allocated to the TDX guest, but not yet
+> > > > > programmed/configured.
+> > > > > 
+> > > > > Perhaps add a comment to remind the reviewer?
+> > > > 
+> > > > As Chao suggested, will introduce state machine for vm and vcpu.
+> > > > 
+> > > > https://lore.kernel.org/kvm/ZfvI8t7SlfIsxbmT@chao-email/
+> > > 
+> > > Could you elaborate what will the state machine look like?
+> > > 
+> > > I need to understand it.
+> > 
+> > Not yet. Chao only propose to introduce state machine. Right now it's just an
+> > idea.
+> 
+> Then why state machine is better?  I guess we need some concrete example to tell
+> which is better?
+
+At this point we don't know which is better.  I personally think it's worthwhile
+to give it a try.  After experiment, we may discard or adapt the idea.
+
+Because the TDX spec already defines its state machine, we could follow it.
+
+
+> > > > How about this?
+> > > > 
+> > > > /*
+> > > >   * We need three SEAMCALLs, TDH.MNG.VPFLUSHDONE(), TDH.PHYMEM.CACHE.WB(), and
+> > > >   * TDH.MNG.KEY.FREEID() to free the HKID.
+> > > >   * Other threads can remove pages from TD.  When the HKID is assigned, we need
+> > > >   * to use TDH.MEM.SEPT.REMOVE() or TDH.MEM.PAGE.REMOVE().
+> > > >   * TDH.PHYMEM.PAGE.RECLAIM() is needed when the HKID is free.  Get lock to not
+> > > >   * present transient state of HKID.
+> > > >   */
+> > > 
+> > > Could you elaborate why it is still possible to have other thread removing
+> > > pages from TD?
+> > > 
+> > > I am probably missing something, but the thing I don't understand is why
+> > > this function is triggered by MMU release?  All the things done in this
+> > > function don't seem to be related to MMU at all.
+> > 
+> > The KVM releases EPT pages on MMU notifier release.  kvm_mmu_zap_all() does. If
+> > we follow that way, kvm_mmu_zap_all() zaps all the Secure-EPTs by
+> > TDH.MEM.SEPT.REMOVE() or TDH.MEM.PAGE.REMOVE().  Because
+> > TDH.MEM.{SEPT, PAGE}.REMOVE() is slow, we can free HKID before kvm_mmu_zap_all()
+> > to use TDH.PHYMEM.PAGE.RECLAIM().
+> 
+> Can you elaborate why TDH.MEM.{SEPT,PAGE}.REMOVE is slower than
+> TDH.PHYMEM.PAGE.RECLAIM()?
+> 
+> And does the difference matter in practice, i.e. did you see using the former
+> having noticeable performance downgrade?
+
+Yes. With HKID alive, we have to assume that vcpu can run still. It means TLB
+shootdown. The difference is 2 extra SEAMCALL + IPI synchronization for each
+guest private page.  If the guest has hundreds of GB, the difference can be
+tens of minutes.
+
+With HKID alive, we need to assume vcpu is alive.
+- TDH.MEM.PAGE.REMOVE()
+- TDH.PHYMEM.PAGE_WBINVD()
+- TLB shoot down
+  - TDH.MEM.TRACK()
+  - IPI to other vcpus
+  - wait for other vcpu to exit
+
+After freeing HKID
+- TDH.PHYMEM.PAGE.RECLAIM()
+  We already flushed TLBs and memory cache.
+
+
+> > > Freeing vcpus is done in
+> > > kvm_arch_destroy_vm(), which is _after_ mmu_notifier->release(), in which
+> > > this tdx_mmu_release_keyid() is called?
+> > 
+> > guest memfd complicates things.  The race is between guest memfd release and mmu
+> > notifier release.  kvm_arch_destroy_vm() is called after closing all kvm fds
+> > including guest memfd.
+> > 
+> > Here is the example.  Let's say, we have fds for vhost, guest_memfd, kvm vcpu,
+> > and kvm vm.  The process is exiting.  Please notice vhost increments the
+> > reference of the mmu to access guest (shared) memory.
+> > 
+> > exit_mmap():
+> >   Usually mmu notifier release is fired. But not yet because of vhost.
+> > 
+> > exit_files()
+> >   close vhost fd. vhost starts timer to issue mmput().
+> 
+> Why does it need to start a timer to issue mmput(), but not call mmput()
+> directly?
+
+That's how vhost implements it.  It's out of KVM control.  Other component or
+user space as other thread can get reference to mmu or FDs.  They can keep/free
+them as they like.
+
+
+> >   close guest_memfd.  kvm_gmem_release() calls kvm_mmu_unmap_gfn_range().
+> >     kvm_mmu_unmap_gfn_range() eventually this calls TDH.MEM.SEPT.REMOVE()
+> >     and TDH.MEM.PAGE.REMOVE().  This takes time because it processes whole
+> >     guest memory. Call kvm_put_kvm() at last.
+> > 
+> >   During unmapping on behalf of guest memfd, the timer of vhost fires to call
+> >   mmput().  It triggers mmu notifier release.
+> > 
+> >   Close kvm vcpus/vm. they call kvm_put_kvm().  The last one calls
+> >   kvm_destroy_vm().  
+> > 
+> > It's ideal to free HKID first for efficiency. But KVM doesn't have control on
+> > the order of fds.
+> 
+> Firstly, what kinda performance efficiency gain are we talking about?
+
+2 extra SEAMCALL + IPI sync for each guest private page.  If the guest memory
+is hundreds of GB, the difference can be tens of minutes.
+
+
+> We cannot really tell whether it can be justified to use two different methods
+> to tear down SEPT page because of this.
+> 
+> Even if it's worth to do, it is an optimization, which can/should be done later
+> after you have put all building blocks together.
+> 
+> That being said, you are putting too many logic in this patch, i.e., it just
+> doesn't make sense to release TDX keyID in the MMU code path in _this_ patch.
+
+I agree that this patch is too huge, and that we should break it into smaller
+patches.
+
+
+> > > But here we are depending vcpus to be freed before tdx_mmu_release_hkid()?
+> > 
+> > Not necessarily.
+> 
+> I am wondering when is TDH.VP.FLUSH done?  Supposedly it should be called when
+> we free vcpus?  But again this means you need to call TDH.MNG.VPFLUSHDONE
+> _after_ freeing vcpus.  And this  looks conflicting if you make
+> tdx_mmu_release_keyid() being called from MMU notifier.
+
+tdx_mmu_release_keyid() call it explicitly for all vcpus.
 -- 
-Dmitry
+Isaku Yamahata <isaku.yamahata@intel.com>
 
