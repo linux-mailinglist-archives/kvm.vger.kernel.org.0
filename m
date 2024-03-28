@@ -1,88 +1,92 @@
-Return-Path: <kvm+bounces-12913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 774AF88F362
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:02:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C398688F369
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:06:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAE1C1F2A9BB
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:02:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05238298833
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C5B4A18;
-	Thu, 28 Mar 2024 00:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C7CBE55;
+	Thu, 28 Mar 2024 00:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FPF5b7nX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YCZfPsFH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B119620;
-	Thu, 28 Mar 2024 00:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAAF8BE2;
+	Thu, 28 Mar 2024 00:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711584129; cv=none; b=ijLF5uyQqsjlyo/vic4tyea4j3dr+5EXI2H+hfY+7nAX+rFvcTDfhf1urKWsH0rs7m9BeEb3YePqmo8urUipJaeW2pWWpfxBGEmGZpsH4AerlU+tZh5Rmsuomk2P9xcFU2SVGi7OKtXuhxJsokvWJG6hhvzKckvzHGkN+fJEp0w=
+	t=1711584378; cv=none; b=T6rm55V31RvQWm7PC17T0fxnSx4NmDq9mbJTinQigfE7kGBHiFLFBPxON1KrAx/Ki7VzRorgft0xFwwDaijpgZJriuVu89YrvPwbJy07kwNe+E6HroQQ3/apaP9lf2uxtd/a2aRLUVqR1TImizjUgweTlqlUC2WH8l5Xr/hFvr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711584129; c=relaxed/simple;
-	bh=ehCURjPDH0bWZCXEKOnfCcIV3SG5PydW3duDhNeYwys=;
+	s=arc-20240116; t=1711584378; c=relaxed/simple;
+	bh=pRLS2DCZN5I+ZZ+IhNPfBauVbFYzP3ERVdibBb6qDKg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GpE/h4ll1HfaboBeoYedDUF9PP9FlXj2FEX2gKrgFgZtPQfEhGNUp54GHR6eoV7GXS7WnQ0+4i1OBzFKchgwpx3XkNNWSqRkBu+WUF9KWA41qiwhhzywPfBQTN6stCc0F4M68PlFt0vA5mrV60DgAuWCDBWJ8fSF6MdRCdSeTS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FPF5b7nX; arc=none smtp.client-ip=192.198.163.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=A32DfR0gKMW+qfzLqkiduxA+r5W7mjv9HghnaCrxFulFaTP8k1pCfsCFYj6EMbr2rn3xA+AGFQu4UtIP7sGc6T6x1WqTgsJ9SfRxy8MMhkFxENExtIa8m5YT31a+42mQ5lmoOycJw3/3f46Uggw3wxuiyjSFA2mgTkDUjmpkD6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YCZfPsFH; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711584127; x=1743120127;
+  t=1711584376; x=1743120376;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ehCURjPDH0bWZCXEKOnfCcIV3SG5PydW3duDhNeYwys=;
-  b=FPF5b7nXrFvysFuVnpCJQOFFONORwBD0kk+jG+T6hbwHsO9AzR5mm0DS
-   WRjeL8p8Q+eBNWeCYi14ks6pNlEF09N7pcjXvKwJ6XZUhTGDCMzxPTqdR
-   0GdXqlUBNKJQ6pRPre6m9P3iYklLtjVLbv3hYK2swoOf+itDrQpYLi7+q
-   Mu8maQAx/ayCr3vfF8yyETCPZrMQjlGrjyivr9zw93cSSNoPxuhJFXZjT
-   pGmyE5mQCB/6JNitq0bOo4Uy134rfrloYDZ0qBJXixJCpik8KA73dSFnJ
-   EBQFW4bylhaaxlkSsXMnxbUUd1wMbMwDgVS634RKq0UJ7kXa2xOX1kKRH
-   A==;
-X-CSE-ConnectionGUID: EzFcRKeARqGxegn1krt22Q==
-X-CSE-MsgGUID: LCPqfNiZQna0IkxKJIUPYQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="9677786"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=pRLS2DCZN5I+ZZ+IhNPfBauVbFYzP3ERVdibBb6qDKg=;
+  b=YCZfPsFHqEXsKue0K8aOEz9Ec4U+C33pNR49wRdkX/06epCsvJRUdgqr
+   L4zQcar7blz/QhEsiJVu7zsuZ2YDC/tYnW+xsakU5Z68uNZk5Rngwm6h3
+   sbPXMZl//PKCXm7GnQZkhQQOEC4coejggZRIochGjeMKZXtcnVebewMDX
+   J7kd2XQoHkSXAurGxmGSWgPXj0t6fauUCCR/Ave5lwah0PbZH6aGs9ets
+   FjeDW8G7krd+cJISq5waC6kYovKe3ufUjs0Uafx5yXz9ZNYuh6FFObXhk
+   8xuWHQ4fGQv3DRPkJEsdP5wO9fjGfXUg/sQs6hc+e1XfWWZYPsqFUsXEo
+   Q==;
+X-CSE-ConnectionGUID: zqCg8kZlSXaHZ6INnZ3ihQ==
+X-CSE-MsgGUID: 27JB/c6zTOiUXmiIVBaWRg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6937198"
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="9677786"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:02:06 -0700
+   d="scan'208";a="6937198"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:06:15 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="16916865"
+   d="scan'208";a="16406929"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:02:05 -0700
-Date: Wed, 27 Mar 2024 17:02:05 -0700
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:06:15 -0700
+Date: Wed, 27 Mar 2024 17:06:14 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"Huang, Kai" <kai.huang@intel.com>,
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "Li, Xiaoyao" <xiaoyao.li@intel.com>, "Gao, Chao" <chao.gao@intel.com>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
 	"Zhang, Tina" <tina.zhang@intel.com>,
 	"seanjc@google.com" <seanjc@google.com>,
-	"Yuan, Hang" <hang.yuan@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"Huang, Kai" <kai.huang@intel.com>,
+	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+	"Chen, Bo2" <chen.bo@intel.com>,
 	"sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"Aktas, Erdem" <erdemaktas@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
 	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>
-Subject: Re: [PATCH v19 058/130] KVM: x86/mmu: Add a private pointer to
- struct kvm_mmu_page
-Message-ID: <20240328000205.GJ2444378@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <9d86b5a2787d20ffb5a58f86e43601a660521f16.1708933498.git.isaku.yamahata@intel.com>
- <50dc7be78be29bbf412e1d6a330d97b29adadb76.camel@intel.com>
- <20240314181000.GC1258280@ls.amr.corp.intel.com>
- <bfde1328-2d1c-4b75-970f-69c74f3a74f9@intel.com>
- <ada65e3e977c8cde0044b7fa9de5f918e3b1b638.camel@intel.com>
- <20240315010940.GE1258280@ls.amr.corp.intel.com>
- <35090f7e-4f4d-403c-b95e-f09248fc272d@linux.intel.com>
+	"Yuan, Hang" <hang.yuan@intel.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: Re: [PATCH v19 059/130] KVM: x86/tdp_mmu: Don't zap private pages
+ for unsupported cases
+Message-ID: <20240328000614.GK2444378@ls.amr.corp.intel.com>
+References: <20240325221836.GO2357401@ls.amr.corp.intel.com>
+ <20240325231058.GP2357401@ls.amr.corp.intel.com>
+ <edcfc04cf358e6f885f65d881ef2f2165e059d7e.camel@intel.com>
+ <20240325233528.GQ2357401@ls.amr.corp.intel.com>
+ <ZgIzvHKobT2K8LZb@chao-email>
+ <20db87741e356e22a72fadeda8ab982260f26705.camel@intel.com>
+ <ZgKt6ljcmnfSbqG/@chao-email>
+ <20240326174859.GB2444378@ls.amr.corp.intel.com>
+ <481141ba-4bdf-40f3-9c32-585281c7aa6f@intel.com>
+ <34ca8222fcfebf1d9b2ceb20e44582176d2cef24.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,65 +95,35 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <35090f7e-4f4d-403c-b95e-f09248fc272d@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <34ca8222fcfebf1d9b2ceb20e44582176d2cef24.camel@intel.com>
 
-On Wed, Mar 27, 2024 at 09:49:14PM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
+On Wed, Mar 27, 2024 at 05:36:07PM +0000,
+"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
 
-> 
-> 
-> On 3/15/2024 9:09 AM, Isaku Yamahata wrote:
-> > Here is the updated one. Renamed dummy -> mirroed.
+> On Wed, 2024-03-27 at 10:54 +0800, Xiaoyao Li wrote:
+> > > > If QEMU doesn't configure the msr filter list correctly, KVM has to handle
+> > > > guest's MTRR MSR accesses. In my understanding, the suggestion is KVM zap
+> > > > private memory mappings. But guests won't accept memory again because no one
+> > > > currently requests guests to do this after writes to MTRR MSRs. In this case,
+> > > > guests may access unaccepted memory, causing infinite EPT violation loop
+> > > > (assume SEPT_VE_DISABLE is set). This won't impact other guests/workloads on
+> > > > the host. But I think it would be better if we can avoid wasting CPU resource
+> > > > on the useless EPT violation loop.
+> > > 
+> > > Qemu is expected to do it correctly.  There are manyways for userspace to go
+> > > wrong.  This isn't specific to MTRR MSR.
 > > 
-> > When KVM resolves the KVM page fault, it walks the page tables.  To reuse
-> > the existing KVM MMU code and mitigate the heavy cost of directly walking
-> > the private page table, allocate one more page to copy the mirrored page
+> > This seems incorrect. KVM shouldn't force userspace to filter some 
+> > specific MSRs. The semantic of MSR filter is userspace configures it on 
+> > its own will, not KVM requires to do so.
 > 
-> Here "copy" is a bit confusing for me.
-> The mirrored page table is maintained by KVM, not copied from anywhere.
+> I'm ok just always doing the exit to userspace on attempt to use MTRRs in a TD, and not rely on the
+> MSR list. At least I don't see the problem.
 
-How about, "maintain" or "keep"?
-
-> 
-> > table for the KVM MMU code to directly walk.  Resolve the KVM page fault
-> > with the existing code, and do additional operations necessary for the
-> > private page table.  To distinguish such cases, the existing KVM page table
-> > is called a shared page table (i.e., not associated with a private page
-> > table), and the page table with a private page table is called a mirrored
-> > page table.  The relationship is depicted below.
-> > 
-> > 
-> >                KVM page fault                     |
-> >                       |                           |
-> >                       V                           |
-> >          -------------+----------                 |
-> >          |                      |                 |
-> >          V                      V                 |
-> >       shared GPA           private GPA            |
-> >          |                      |                 |
-> >          V                      V                 |
-> >      shared PT root      mirrored PT root         |    private PT root
-> >          |                      |                 |           |
-> >          V                      V                 |           V
-> >       shared PT           mirrored PT ----propagate---->  private PT
-> >          |                      |                 |           |
-> >          |                      \-----------------+------\    |
-> >          |                                        |      |    |
-> >          V                                        |      V    V
-> >    shared guest page                              |    private guest page
-> >                                                   |
-> >                             non-encrypted memory  |    encrypted memory
-> >                                                   |
-> > PT: Page table
-> > Shared PT: visible to KVM, and the CPU uses it for shared mappings.
-> > Private PT: the CPU uses it, but it is invisible to KVM.  TDX module
-> >              updates this table to map private guest pages.
-> > Mirrored PT: It is visible to KVM, but the CPU doesn't use it.  KVM uses it
-> >               to propagate PT change to the actual private PT.
-> > 
-> 
-> 
-
+KVM doesn't force it.  KVM allows QEMU to use the MSR filter for TDX.
+(v19 doesn't allow it.) If QEMU chooses to use the MSR filter, QEMU has to
+handle the MSR access correctly.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
