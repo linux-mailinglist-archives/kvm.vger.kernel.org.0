@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-13036-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F49890C0F
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 21:55:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6D2890C2B
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 22:03:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74BF8B256B7
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 20:55:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9832291BA8
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 21:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B8813A879;
-	Thu, 28 Mar 2024 20:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209F313AA23;
+	Thu, 28 Mar 2024 21:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="myihduew"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SuEDEiXY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C18C4594C;
-	Thu, 28 Mar 2024 20:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746DD2C6B1;
+	Thu, 28 Mar 2024 21:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711659321; cv=none; b=uM2bP9lJk1I5PG29XP/h0cFbIJROAjsNw28W+oZoEP5nHV8urzR/dK5ikcahnfvmUBiLZF/52g6hrmS3GSghGMVGMkVNzjo1r/QgI0q/I8xYbMjpjkj7Ru/vCdyUKAynA/2UmKNevDibPHJ9+mPaAuUWbn+6m1RMpMTuKnuwYL4=
+	t=1711659825; cv=none; b=R7X7a147nRAAwf3UXHNtdHh7X+3gUWsrz4LGC44YCsqghijXCd+DTao4AoiU4gp/M2xoamBx8HkkMRi7MwdBXxR9RpM0NpNzMDpRYePrnuoObD98wdGw+3WNPJP7Otp4L/ahW2ABK42d0FI3/KknaAJClvafauhm66MOnEFD/jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711659321; c=relaxed/simple;
-	bh=NlPf3KGnVETWty2mAwv7g0uKCHiSOl4SH1FWESdoYrc=;
+	s=arc-20240116; t=1711659825; c=relaxed/simple;
+	bh=qDO/Lsc7ctYZ55C9yGW6FnXjoaC1dk7OvyZr6dxE3pE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FCY2KMC0Rpg4GVZIah8JnDhXFMR8kj2WrO++MYWvZIZ6TtESs2OprhvnaQc3WXC1YucyJCcP658uQWmkKBY0UNsHZa18YwkMeAmMNxX71akKxaID38pPcN/SVurF4AbmcuwUuhV5XznVb2I7Si2ocB6Hl2QEoJdIFEkJkAxn/hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=myihduew; arc=none smtp.client-ip=198.175.65.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=WU0/u/A02wMTX1pLhb8IhHtQ3eYtxqiWweU9xGq4WHsxohxsucseutqMwsh7em31xLlLJ63OChA1+HYLkdRzhhB8J/3fYben/jUSjSLy/YufDIFwxTID1RB03dk6eiX4+FBsqOjN3I3PHcUQ6fgP9wIaVocDhu7/VdRb62R/C3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SuEDEiXY; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711659320; x=1743195320;
+  t=1711659823; x=1743195823;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=NlPf3KGnVETWty2mAwv7g0uKCHiSOl4SH1FWESdoYrc=;
-  b=myihduewvEXAcX8PwFO4zNnu8OkGdhIIDzfQQzKaXWvYT969xpz/KkG2
-   TFCExXj/YLq/EYs2NQzhwwo4AYTggA08bxkIFDWLa60vQpxtdFkTyuc29
-   jYuK9t4Rqtg1nCp7U5eKDkTDH6JuMaX5eMD2vrT5wWz1V333D3QGf+8S+
-   lYOnZmviPIwvp+FHO/1O2ehusrTU2Oiqh9lY7lJ05muWd/Iq7Hja1Cmu/
-   TXua6DBQgtqPJbK1nI7WM7EKcYexG2NglRCxNToi5U/H/VV9an85IWp9K
-   z78J50ra+ug8x7j4aNDHhaZWtiJTpFM5eKDWc1AKUc23KB0LQik2hcnuG
-   Q==;
-X-CSE-ConnectionGUID: rj9XjWBdTMal1W0jh5KYag==
-X-CSE-MsgGUID: tusWMITURbOSzByzs43GwA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="10655603"
+   mime-version:in-reply-to;
+  bh=qDO/Lsc7ctYZ55C9yGW6FnXjoaC1dk7OvyZr6dxE3pE=;
+  b=SuEDEiXYimNwEpm6gO+1dKWcVmmfFlB/x7D+ULQBt+JLJqoZRh8V3tx/
+   n2WIW+9nShvdBxsFnI9gIvmh3JyMvSNnBYYl/tDP6KvKnrYvgLMi5E6VO
+   0QXqywr5heo51fjkyi/lDaQny+hgX8Nwp6w0b7eqDvG0IGhu6YVhgyGfa
+   9FQ9z2rc+2bUDSXZ4cjV//8O97xnTonODUi3OUMCNzVlwPGbrnWla+DOL
+   tRXWh4b8Wx3iAaN5pGoEZ5lw4On1YtXZwPqyc0Ik7aeMozpjbBLG6VH/a
+   AZzT5W3p2OABV8weyb3VS6N0PE7KEG9uxPpj/tUSVQNxlf5TE2q1EGs2c
+   w==;
+X-CSE-ConnectionGUID: F2lfdrbCRWO0Rttqxy0xlA==
+X-CSE-MsgGUID: /nwJawbqRoKRlsgb+U+szw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6955395"
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="10655603"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 13:55:19 -0700
+   d="scan'208";a="6955395"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 14:03:42 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="17408469"
+   d="scan'208";a="21281747"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 13:55:19 -0700
-Date: Thu, 28 Mar 2024 13:55:17 -0700
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 14:03:42 -0700
+Date: Thu, 28 Mar 2024 14:03:42 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 To: Binbin Wu <binbin.wu@linux.intel.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
@@ -66,12 +66,12 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 060/130] KVM: x86/tdp_mmu: Apply mmu notifier
- callback to only shared GPA
-Message-ID: <20240328205517.GQ2444378@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v19 069/130] KVM: TDX: Require TDP MMU and mmio caching
+ for TDX
+Message-ID: <20240328210342.GR2444378@ls.amr.corp.intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <dead197f278d047a00996f636d7eef4f0c8a67e8.1708933498.git.isaku.yamahata@intel.com>
- <2f2b4b37-2b99-4373-8d0d-cc6bc5eed33f@linux.intel.com>
+ <f6a80dd212e8c3fd14b40049eed33187008cf35a.1708933498.git.isaku.yamahata@intel.com>
+ <94fb2094-d8ee-4bcc-a65d-489dc777b024@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,10 +80,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2f2b4b37-2b99-4373-8d0d-cc6bc5eed33f@linux.intel.com>
+In-Reply-To: <94fb2094-d8ee-4bcc-a65d-489dc777b024@linux.intel.com>
 
-On Thu, Mar 28, 2024 at 04:29:50PM +0800,
+On Thu, Mar 28, 2024 at 01:24:27PM +0800,
 Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
 > 
@@ -91,25 +90,23 @@ Binbin Wu <binbin.wu@linux.intel.com> wrote:
 > On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
 > > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > > 
-> > The private GPAs that typically guest memfd backs aren't subject to MMU
-> > notifier because it isn't mapped into virtual address of user process.
-> > kvm_tdp_mmu_handle_gfn() handles the callback of the MMU notifier,
-> > clear_flush_young(), clear_young(), test_young()() and change_pte().  Make
->                                                    ^
->                                                    an extra "()"
-
-Will fix it. Thanks.
-
-> > kvm_tdp_mmu_handle_gfn() aware of private mapping and skip private mapping.
-> > 
-> > Even with AS_UNMOVABLE set, those mmu notifier are called.  For example,
-> > ksmd triggers change_pte().
+> > As TDP MMU is becoming main stream than the legacy MMU, the legacy MMU
+> > support for TDX isn't implemented.  TDX requires KVM mmio caching.
 > 
-> The description about the "AS_UNMOVABLE", you are refering to shared memory,
-> right?
-> Then, it seems not related to the change of this patch.
+> Can you add some description about why TDX requires mmio caching in the
+> changelog?
 
-Ok, will remove this sentence.
+Sure, will update the commit log.
+
+As the TDX guest is protected, the guest has to issue TDG.VP.VMCALL<MMIO> on
+VE.  The VMM has to setup Shared-EPT entry to inject VE by setting the entry
+value with VE suppress bit cleared.
+
+KVM mmio caching is a feature to set the EPT entry to special value for MMIO GFN
+instead of the default value with suppress VE bit set.  So TDX KVM wants to
+utilize it.
+
+Thanks,
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
