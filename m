@@ -1,154 +1,188 @@
-Return-Path: <kvm+bounces-12982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C0D988F9C6
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 09:12:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F39488F92D
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 08:53:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1641729995F
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 08:12:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E84E71F28A3B
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 07:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DEEE42A88;
-	Thu, 28 Mar 2024 08:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8987656B6E;
+	Thu, 28 Mar 2024 07:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="Sz3KYgQ7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bSQ2IEQM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9292441C62
-	for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 08:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AEA53E11
+	for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 07:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711613548; cv=none; b=iuIUGwA+y9Exd/1YnG/gRY5uattMRDB2kCBQnm+LFm1o3MopOGbrLJ4b1QMLJ7ff74jg/ng2vjAccqZqLfhnpzS2g5zMLI2IW/J08ZDRN6oE7QslfctvuOgH48mIUNLcbhkTDa2xm0DVJKByc9QsE5YwabZQK/tT2mTZYvBFnUE=
+	t=1711612321; cv=none; b=Bo2H/NhMApnpbUQ8jP/HtdHoa5bOMLMQvJlCvcImTTF2NwbXV1G7zqaqRNa8IopCAGdI7eOXjdF6yQSf5o1J9hhhGYnUBElWLf62Bja4t4stuVf3iRHflnZB3YEiiiuvRu7mnuFZx+vtQ5/KN4bPunB2o66sAfl5k1g40VeMEWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711613548; c=relaxed/simple;
-	bh=gb6MKVyB1Z8XbC5BzK8Z2vs4Yz7PgGAmQ7D3YG5+8D4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G+BfOHscyuZ2igH05lxX3lzAcujyKp9h5soV+DHW9hRJ/a75037zWm/ByLXFgAwjO1UdRCPIaaAy6JNFc6v5b3sU2Nn0X6yytVpw+VfNIrUGuac92JrNlhbT4SOvPn42MfpEDkUZq/A84WxaZ3KdMcdit9s9pV8An2bwLWvXjE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=Sz3KYgQ7; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56c2b4850d2so754436a12.2
-        for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 01:12:26 -0700 (PDT)
+	s=arc-20240116; t=1711612321; c=relaxed/simple;
+	bh=Oi4D9lTrBK5LxMVsvn+m+xvSmAC6nHrSQxGDBSqviBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E+XAgWjhYoukV8hhsbsN9gBD9PVdW4Q7/Ng1PnLYdVTdT7IJBXzoSAUQkG67yptxPMgM9seq6lu+9FLsanfnxdbXBEf6sazUgVxouZf3Rp0KSxJ7DVp3srMUqKucOPE8gcMlK53BDZbr6SHH/NjCDiCzKAZZN2eHVfdGBh60aO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bSQ2IEQM; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4150cd01febso4601895e9.2
+        for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 00:51:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1711613545; x=1712218345; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j7rvoFRBKxf0yE7YY8RQnWrAo8fviROdMGC4hs1RKLE=;
-        b=Sz3KYgQ7g2JZNBQ1+wrfP7/MNRWdJ1TLoLN0kDTWwxQJns/xx7qtHS8+RHVteDUra1
-         91PA8T1WqO8BM/9GPZlLWzwfwmKkqHAdhjUoDjvxes+GqDGjRuHpHXmbPp14286YGU8z
-         xC1KHBeE2ww9fOnIpkNxzvuJ+8FvbOcIQawEJQzB3Kec7DoF1vzDpHMbusiLFhsNGGuy
-         kmxeVBZ1Um/oZCoQDGxo+7m2pjFqCJHpeCOSz7YhpvR9BoukfdE/jYPdHP7L4IlBiBFR
-         9hi8JY19fw9CzJmBUqI9UtcXg/tZcBnooD3FuKRbe8clRRwXYo74fguza3ngLXD9tJfQ
-         faog==
+        d=linaro.org; s=google; t=1711612318; x=1712217118; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2WIu5epjAJHOEWnR5hcLu+XP8J82cuP3g6jjZF3M8iI=;
+        b=bSQ2IEQMn8xpszHJwx/k5kzPvGQr1aJ7xVN5DDD3Q2yUVDq2H279NO9BAhSXDUmVub
+         FW7i3yzc23EQkUbIb1OsW5oo/OfJsa/jtIRd+6QmGlUXsWDFlX1fbO9MUJUmuE1pMoBr
+         Hl8o05NVG5NPAQPAi4yJGW9msXrdun3cxgOdJKHGqrtQhm269hv59GHXgiUdGqmkSLFA
+         kB4mwv9Mh+RExoRZEAN2vfcD6pQIW4IuzvhcOoR0aYRMXbW9y51Qua1KT0JdNv8JEuos
+         r5uwYO6CQcmjY3puG/6Wk1Ea3j7OD2DjXhaZqBLEdEXR0v/s3JMEkBaE09R5y5RhPS+P
+         PeFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711613545; x=1712218345;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j7rvoFRBKxf0yE7YY8RQnWrAo8fviROdMGC4hs1RKLE=;
-        b=CH1fqCriQ9Jlpjih5Aj4O9pFyVCKLpM+y7A3cxmKBQMwPNaQeYZTulr561TrsHhPJh
-         Up4ziCz4sejX/U77n/oYUYeOYogdqi9hxjI5X/ZucjmIV+C/H0vKdvdlZMwGTBgEf/N+
-         Usjejig1SAo7FkFcgIw3ffWuulD9ROhLE9ev/OIX7VL1rGX6K0hcnWf5GkKelZeno6w0
-         1Bb8UB7p+6Aov8ja1mwm6jDBSA8IYcNyBjomR0pJd6ydqG/2BnPLbgtRbTiTLqlwtAvG
-         VQQM9kQjXyl7kn2MtaB9KnoIYqJS/HzIK17GoHSUlFZQPCNAjnzZnNV8/pPxAlJqkN6Z
-         D7ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVPUFSAAl4/nFQnCDCG/FpUU6JdYWoln/b4XMoXKy+LbgRxoxUutERaUEAizrXnmmW0Z/7oAJdgUrTPuDotXzOE9fYF
-X-Gm-Message-State: AOJu0Yw0Mu1RcY+rCUQ3MP2CKQEUsUD0KlTtanKIirA34uNi0W318fUM
-	vBTrrtoMBSzN1rxstJGmOH7xfcWnOHomZYZZeVad0iUEdXRp7f3LkP8lFn5Q8Y5dPJ3xXaIMdak
-	/1ioWCkih30PaymwbOD2W7tOK4nhf5BqSKYX4DA==
-X-Google-Smtp-Source: AGHT+IFhAfd17DEM8g97DoHFH/S7dRUsoNxHZs84UzKZHQqH0hGnUpb1JsLJhLdhVjny84cLIFvqAV6Qd+lOthHSzAA=
-X-Received: by 2002:a50:c318:0:b0:56c:d64:26b2 with SMTP id
- a24-20020a50c318000000b0056c0d6426b2mr1397511edb.9.1711613544772; Thu, 28 Mar
- 2024 01:12:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711612318; x=1712217118;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2WIu5epjAJHOEWnR5hcLu+XP8J82cuP3g6jjZF3M8iI=;
+        b=cojh8IF9Enj35QG1h1I7lj5dSdEcZVgYoJDAU/NDSciFLBrtO5qGEndL8hp7lr/uzO
+         f1TQg/QklKXyPY6O7cov0IIdKr5lv2Xvovctoi+mlomWT8xWtg7jhDrj97tHt2x6JoxZ
+         rvjsdGiv/mNoa6gFNs28tJFO0mpRckfU23cbM1izcL/A1MC1vekR+m2xnDsurEnEvByJ
+         tFgNDGNkoYdLl3XJFRnX821RDMyP6KaG0QPFceUSc5y0QFxpU+scdGij6YtDi7gFdxVd
+         bLPFgFT0fqUqydbwyaiHZzNvO8ejqzZ91ESOkfYRCoOz64aq4tsxRO6WgQCrnvfjmUen
+         Nqsg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1ruud023TihxXuJgbBoTZ8PBr4ZQZd1SGZASIKEtdF1ebiTqsc6+K2lqb3VhKM+dJadFVI6lj00Y+ia5c2xDksDpf
+X-Gm-Message-State: AOJu0Ywij/9AkKZ3P7OwveI7okXzjtukL9NTzGGFTKoruI8Bf7N9TigP
+	ODGz6K8Af1jRV6EHM3Qi/zZFfUw+22UP9WFCMJWFr1vOKgR84rziBkxDBZlm7x4=
+X-Google-Smtp-Source: AGHT+IFXMQWdOmZhU5YF1GpARsMqHvRsZ6j2ByO2I8Vygrxh4HD+auy0yyJigMMJuCmYaSgf3lHGDg==
+X-Received: by 2002:a05:600c:3c9f:b0:414:6211:14a7 with SMTP id bg31-20020a05600c3c9f00b00414621114a7mr1475302wmb.14.1711612318113;
+        Thu, 28 Mar 2024 00:51:58 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.148])
+        by smtp.gmail.com with ESMTPSA id bg34-20020a05600c3ca200b004148cd4d484sm4594451wmb.9.2024.03.28.00.51.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 00:51:57 -0700 (PDT)
+Message-ID: <c33833ad-9102-40e6-97bf-9a4e1bf0a3d9@linaro.org>
+Date: Thu, 28 Mar 2024 08:51:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327231826.1725488-1-andrew@daynix.com> <CACGkMEuW8jLvje0_oqCT=-ih9JEgxOrWRsvjvfwQXw=OWT_RtQ@mail.gmail.com>
-In-Reply-To: <CACGkMEuW8jLvje0_oqCT=-ih9JEgxOrWRsvjvfwQXw=OWT_RtQ@mail.gmail.com>
-From: Andrew Melnichenko <andrew@daynix.com>
-Date: Thu, 28 Mar 2024 09:46:36 +0200
-Message-ID: <CABcq3pFRookhQ8a8Sf9ri2ONOhHME9mXBMUZEOG1eGkJvAxQNw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	yuri.benditovich@daynix.com, yan@daynix.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/19] amba: store owner from modules with
+ amba_driver_register()
+To: Andi Shyti <andi.shyti@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach
+ <mike.leach@linaro.org>, James Clark <james.clark@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Olivia Mackall
+ <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Vinod Koul <vkoul@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>, linux-kernel@vger.kernel.org,
+ coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-input@vger.kernel.org, kvm@vger.kernel.org
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+ <20240326-module-owner-amba-v1-1-4517b091385b@linaro.org>
+ <6p4cdmbhrezm7fqbe3kgrkblqgrhaq4fgiw5x4n5dnptii7kjp@vmbj2pkjglp7>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
+ m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
+ HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
+ XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
+ mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
+ v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
+ cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
+ rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
+ qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
+ aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
+ gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
+ dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
+ NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
+ hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
+ oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
+ H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
+ yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
+ 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
+ 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
+ +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
+ FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
+ 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
+ DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
+ oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
+ 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
+ Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
+ qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
+ /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
+ qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
+ EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
+ KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
+ fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <6p4cdmbhrezm7fqbe3kgrkblqgrhaq4fgiw5x4n5dnptii7kjp@vmbj2pkjglp7>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks, I'll look into it.
+On 27/03/2024 21:33, Andi Shyti wrote:
+> Hi Krzysztof,
+> 
+> ...
+> 
+>>  /**
+>> - *	amba_driver_register - register an AMBA device driver
+>> + *	__amba_driver_register - register an AMBA device driver
+>>   *	@drv: amba device driver structure
+>> + *	@owner: owning module/driver
+>>   *
+>>   *	Register an AMBA device driver with the Linux device model
+>>   *	core.  If devices pre-exist, the drivers probe function will
+>>   *	be called.
+>>   */
+>> -int amba_driver_register(struct amba_driver *drv)
+>> +int __amba_driver_register(struct amba_driver *drv,
+> 
+> ...
+> 
+>> +/*
+>> + * use a macro to avoid include chaining to get THIS_MODULE
+>> + */
+> 
+> Should the documentation be moved here? Well... I don't see any
+> documentation linking this file yet, but in case it comes we want
+> documented amba_driver_register() rather than
+> __amba_driver_register().
+> 
 
-On Thu, Mar 28, 2024 at 6:03=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Thu, Mar 28, 2024 at 7:44=E2=80=AFAM Andrew Melnychenko <andrew@daynix=
-.com> wrote:
-> >
-> > When the Qemu launched with vhost but without tap vnet_hdr,
-> > vhost tries to copy vnet_hdr from socket iter with size 0
-> > to the page that may contain some trash.
-> > That trash can be interpreted as unpredictable values for
-> > vnet_hdr.
-> > That leads to dropping some packets and in some cases to
-> > stalling vhost routine when the vhost_net tries to process
-> > packets and fails in a loop.
-> >
-> > Qemu options:
-> >   -netdev tap,vhost=3Don,vnet_hdr=3Doff,...
-> >
-> > From security point of view, wrong values on field used later
-> > tap's tap_get_user_xdp() and will affect skb gso and options.
-> > Later the header(and data in headroom) should not be used by the stack.
-> > Using custom socket as a backend to vhost_net can reveal some data
-> > in the vnet_hdr, although it would require kernel access to implement.
-> >
-> > The issue happens because the value of sock_len in virtqueue is 0.
-> > That value is set at vhost_net_set_features() with
-> > VHOST_NET_F_VIRTIO_NET_HDR, also it's set to zero at device open()
-> > and reset() routine.
-> > So, currently, to trigger the issue, we need to set up qemu with
-> > vhost=3Don,vnet_hdr=3Doff, or do not configure vhost in the custom prog=
-ram.
-> >
-> > Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> It seems it has been merged by Michael.
->
-> Thanks
->
-> > ---
-> >  drivers/vhost/net.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > index f2ed7167c848..57411ac2d08b 100644
-> > --- a/drivers/vhost/net.c
-> > +++ b/drivers/vhost/net.c
-> > @@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_vir=
-tqueue *nvq,
-> >         hdr =3D buf;
-> >         gso =3D &hdr->gso;
-> >
-> > +       if (!sock_hlen)
-> > +               memset(buf, 0, pad);
-> > +
-> >         if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
-> >             vhost16_to_cpu(vq, gso->csum_start) +
-> >             vhost16_to_cpu(vq, gso->csum_offset) + 2 >
-> > --
-> > 2.43.0
-> >
->
+That's just a wrapper, not API... why would we care to have kerneldoc
+for it?
+
+Best regards,
+Krzysztof
+
 
