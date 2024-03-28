@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-12915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DDF488F36A
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:07:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8A6988F3AA
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 01:26:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB8F1C26A58
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:07:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D93821C32533
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 00:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18EC11FBA;
-	Thu, 28 Mar 2024 00:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9436B14277;
+	Thu, 28 Mar 2024 00:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D9S5p5Gv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WcRTjBq6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FD8363;
-	Thu, 28 Mar 2024 00:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA044FBF0;
+	Thu, 28 Mar 2024 00:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711584422; cv=none; b=hAJzBpBlcq/FaycVFRVeBrtXXnw6RRpkhZQVB0oJ0gxla/4DbY01H2plaMX1KKWneOX2xSMjCZQ/4pcHh5Hk+dUxOpacI3nAMVsFn0jnm2YeU52L384kIt/AkoMZzP6IzjuIVHboitJ8JwuFhukF4vwrextetjFEJuJ6JCsPMpk=
+	t=1711585401; cv=none; b=ZeSXFThYtPXlQ8ZuxcMq85RsS3ADXyGAgawxtdczaLy2h+Qce3RrufO4egSQ9dNWKsLV1RjnryV6cOdmvQ/+i6qhNHtYlZQqhjtJLo8JEClsuJ8mI1bmzDTeoBf9HlgZail5zHhAmzaZwTyTj1oQZCubFJLAVTS3fJ4BUbRu97Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711584422; c=relaxed/simple;
-	bh=3hEkNgmQddH/2BXruNuYCtM/9XJkyRMeb2eNMB6zyP0=;
+	s=arc-20240116; t=1711585401; c=relaxed/simple;
+	bh=adqtvT35VWw2tK6LKPCT9cc6amygwx8QBJXdyBFlnOg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QCC58BxhnAuDYk9s5TOIeKRcfV1jHOW48XRoC/7KtDpvCWs5lC0WEnqfPVxaZGcEX/8yb6e4cpY9AF/JnYiGRtbMAyLFYoHlxjGjO2UeGTC4F0t+JSygtpRBfDqpzXPUIByyyKOzIOGnDqFmEeSA0qqGfgvdj5PWa2Mc6CC/taE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D9S5p5Gv; arc=none smtp.client-ip=192.198.163.15
+	 In-Reply-To:Content-Type; b=dSIuCEVxv5cl90zLYJ4MRp1pRiYY7qqMqmPxm4GB0S0oSHftt+4q4GJKl+rkLorjknJ5ztZeHySbzEYRtYgZV+W6NVMubzZiTlJSnmm9U/CNK33u5uU7lCDUqXAfH9vOzsqgo3QpamqyFn2jDLoXFDBQYp++wXcEY4Y6QspQIPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WcRTjBq6; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711584420; x=1743120420;
+  t=1711585400; x=1743121400;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=3hEkNgmQddH/2BXruNuYCtM/9XJkyRMeb2eNMB6zyP0=;
-  b=D9S5p5GvPs/p8N+jPcgUyv/bVPMVFoYOVJngL5v5B3D8v6EIiSXia6a0
-   SfFj33PsKqG9/Q19m00jxgIFwLbFqDWH+rkfMxwgMj3WfDK4Vrs5+Vv4r
-   bOPzinnTddrnEunEr/G/YlRXboXulVzqbPZ5y3jL5yA/ePHkTUNlb2awK
-   RGvEkl175IdktLn4rzHU8nLsS8Q5I4azBDQYkWn2Dk2DTrrjY6enHgTzy
-   1MWABQTeY6nINqcmxv8nWSjaICkPtzNJp16NoNpd4Xoo5+voQPdxORI26
-   lQ2yib9JFn85ujiApw2lViC2IbQygA5VGkkoiVhA+MUyNEAURRY1vGOAX
+  bh=adqtvT35VWw2tK6LKPCT9cc6amygwx8QBJXdyBFlnOg=;
+  b=WcRTjBq6Z08n4Q5+kDlJxD1pb5P7vpmfKSYaumjjNN6a3jm2sMRZQ96r
+   e2Pm5/o2h41ks2Eu6RWIGFhF2r/iixkNYkz04lIeFkPRAWKHnvi7yqxqE
+   KymllMhTX7umzGdtFGDtjvPzab71anFlhwHfUKAhy+N8O4yqPkIP4zbbQ
+   JpErv86abRpAeIprQQpNeFRgX3otv0+LZxnhs7Sgo3WzLPq7nXdAQdLX6
+   khwypgxXnHgX/AUMbB3zVALs07VFJAckGOK533P+PtvrgtI+0wLFLaXjw
+   szmJWKRY//CQo/kYdysc2wDIEg+xEuTkTy5mLn0S7fNRDyljk0TqkFufY
    w==;
-X-CSE-ConnectionGUID: XXCtWHNUSFilZN2cioTzog==
-X-CSE-MsgGUID: mrEVqmV+Q06BYOLWv6uGkg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6908643"
+X-CSE-ConnectionGUID: HIR7DxGmTSS7AnDdQe6Hvg==
+X-CSE-MsgGUID: DMbFAspsT/KhgjvHtQsidQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="10501379"
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="6908643"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:06:59 -0700
+   d="scan'208";a="10501379"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:23:19 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="20937873"
+   d="scan'208";a="21183889"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.224.7]) ([10.124.224.7])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:06:56 -0700
-Message-ID: <873263e8-371a-47a0-bba3-ed28fcc1fac0@intel.com>
-Date: Thu, 28 Mar 2024 08:06:53 +0800
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 17:23:15 -0700
+Message-ID: <8fd5caa9-c606-49e1-90a0-bfc407f0c016@intel.com>
+Date: Thu, 28 Mar 2024 08:23:12 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,90 +68,88 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v19 059/130] KVM: x86/tdp_mmu: Don't zap private pages for
  unsupported cases
 To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "Gao, Chao" <chao.gao@intel.com>, "Yamahata, Isaku"
- <isaku.yamahata@intel.com>
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
 Cc: "Zhang, Tina" <tina.zhang@intel.com>,
  "seanjc@google.com" <seanjc@google.com>, "Huang, Kai" <kai.huang@intel.com>,
- "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
- "Chen, Bo2" <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
- "isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Chen, Bo2"
+ <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
+ "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
  "Aktas, Erdem" <erdemaktas@google.com>,
- "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Yuan, Hang"
- <hang.yuan@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-References: <96fcb59cd53ece2c0d269f39c424d087876b3c73.camel@intel.com>
+ "isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
+ "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+ "Yuan, Hang" <hang.yuan@intel.com>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <1ed955a44cd81738b498fe52823766622d8ad57f.1708933498.git.isaku.yamahata@intel.com>
+ <618614fa6c62a232d95da55546137251e1847f48.camel@intel.com>
+ <20240319235654.GC1994522@ls.amr.corp.intel.com>
+ <1c2283aab681bd882111d14e8e71b4b35549e345.camel@intel.com>
+ <f63d19a8fe6d14186aecc8fcf777284879441ef6.camel@intel.com>
+ <20240321225910.GU1994522@ls.amr.corp.intel.com>
+ <96fcb59cd53ece2c0d269f39c424d087876b3c73.camel@intel.com>
  <20240325190525.GG2357401@ls.amr.corp.intel.com>
  <5917c0ee26cf2bb82a4ff14d35e46c219b40a13f.camel@intel.com>
- <20240325221836.GO2357401@ls.amr.corp.intel.com>
- <20240325231058.GP2357401@ls.amr.corp.intel.com>
- <edcfc04cf358e6f885f65d881ef2f2165e059d7e.camel@intel.com>
- <20240325233528.GQ2357401@ls.amr.corp.intel.com>
- <ZgIzvHKobT2K8LZb@chao-email>
- <20db87741e356e22a72fadeda8ab982260f26705.camel@intel.com>
- <ZgKt6ljcmnfSbqG/@chao-email>
- <20240326174859.GB2444378@ls.amr.corp.intel.com>
- <481141ba-4bdf-40f3-9c32-585281c7aa6f@intel.com>
- <34ca8222fcfebf1d9b2ceb20e44582176d2cef24.camel@intel.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <34ca8222fcfebf1d9b2ceb20e44582176d2cef24.camel@intel.com>
+In-Reply-To: <5917c0ee26cf2bb82a4ff14d35e46c219b40a13f.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 3/28/2024 1:36 AM, Edgecombe, Rick P wrote:
-> On Wed, 2024-03-27 at 10:54 +0800, Xiaoyao Li wrote:
->>>> If QEMU doesn't configure the msr filter list correctly, KVM has to handle
->>>> guest's MTRR MSR accesses. 
->>>> In my understanding, the suggestion is KVM zap private memory mappings. 
-
-TDX spec states that
-
-   18.2.1.4.1 Memory Type for Private and Opaque Access
-
-   The memory type for private and opaque access semantics, which use a
-   private HKID, is WB.
-
-   18.2.1.4.2 Memory Type for Shared Accesses
-
-   Intel SDM, Vol. 3, 28.2.7.2 Memory Type Used for Translated Guest-
-   Physical Addresses
-
-   The memory type for shared access semantics, which use a shared HKID,
-   is determined as described below. Note that this is different from the
-   way memory type is determined by the hardware during non-root mode
-   operation. Rather, it is a best-effort approximation that is designed
-   to still allow the host VMM some control over memory type.
-     • For shared access during host-side (SEAMCALL) flows, the memory
-       type is determined by MTRRs.
-     • For shared access during guest-side flows (VM exit from the guest
-       TD), the memory type is determined by a combination of the Shared
-       EPT and MTRRs.
-       o If the memory type determined during Shared EPT walk is WB, then
-         the effective memory type for the access is determined by MTRRs.
-       o Else, the effective memory type for the access is UC.
-
-My understanding is that guest MTRR doesn't affect the memory type for 
-private memory. So we don't need to zap private memory mappings.
-
->>>> But guests won't accept memory again because no one
->>>> currently requests guests to do this after writes to MTRR MSRs. In this case,
->>>> guests may access unaccepted memory, causing infinite EPT violation loop
->>>> (assume SEPT_VE_DISABLE is set). This won't impact other guests/workloads on
->>>> the host. But I think it would be better if we can avoid wasting CPU resource
->>>> on the useless EPT violation loop.
->>>
->>> Qemu is expected to do it correctly.  There are manyways for userspace to go
->>> wrong.  This isn't specific to MTRR MSR.
+On 3/26/2024 3:55 AM, Edgecombe, Rick P wrote:
+> On Mon, 2024-03-25 at 12:05 -0700, Isaku Yamahata wrote:
+>> Right, the guest has to accept it on VE.  If the unmap was intentional by guest,
+>> that's fine.  The unmap is unintentional (with vMTRR), the guest doesn't expect
+>> VE with the GPA.
 >>
->> This seems incorrect. KVM shouldn't force userspace to filter some
->> specific MSRs. The semantic of MSR filter is userspace configures it on
->> its own will, not KVM requires to do so.
+>>
+>>> But, I guess we should punt to userspace is the guest tries to use
+>>> MTRRs, not that userspace can handle it happening in a TD...  But it
+>>> seems cleaner and safer then skipping zapping some pages inside the
+>>> zapping code.
+>>>
+>>> I'm still not sure if I understand the intention and constraints fully.
+>>> So please correct. This (the skipping the zapping for some operations)
+>>> is a theoretical correctness issue right? It doesn't resolve a TD
+>>> crash?
+>>
+>> For lapic, it's safe guard. Because TDX KVM disables APICv with
+>> APICV_INHIBIT_REASON_TDX, apicv won't call kvm_zap_gfn_range().
+> Ah, I see it:
+> https://lore.kernel.org/lkml/38e2f8a77e89301534d82325946eb74db3e47815.1708933498.git.isaku.yamahata@intel.com/
 > 
-> I'm ok just always doing the exit to userspace on attempt to use MTRRs in a TD, and not rely on the
-> MSR list. At least I don't see the problem.
+> Then it seems a warning would be more appropriate if we are worried there might be a way to still
+> call it. If we are confident it can't, then we can just ignore this case.
+> 
+>>
+>> For MTRR, the purpose is to make the guest boot (without the guest kernel
+>> command line like clearcpuid=mtrr) .
+>> If we can assume the guest won't touch MTRR registers somehow, KVM can return an
+>> error to TDG.VP.VMCALL<RDMSR, WRMSR>(MTRR registers). So it doesn't call
+>> kvm_zap_gfn_range(). Or we can use KVM_EXIT_X86_{RDMSR, WRMSR} as you suggested.
+> 
+> My understanding is that Sean prefers to exit to userspace when KVM can't handle something, versus
+> making up behavior that keeps known guests alive. So I would think we should change this patch to
+> only be about not using the zapping roots optimization. Then a separate patch should exit to
+> userspace on attempt to use MTRRs. And we ignore the APIC one.
 
-What is the exit reason in vcpu->run->exit_reason? 
-KVM_EXIT_X86_RDMSR/WRMSR? If so, it breaks the ABI on 
-KVM_EXIT_X86_RDMSR/WRMSR.
+Certainly no. If exit to userspace, what is the exit reason and what is 
+expected for userspace to do? userspace can do nothing, except either 
+kill the TD or eat the RDMSR/WRMSR.
+
+There is nothing to do with userspace. MTRR is virtualized as fixed1 for 
+TD (by current TDX architecture). Userspace can do nothing on it and 
+it's not userspace's fault to let TD guest manipulate on MTRR MSRs.
+
+This is the bad design of current TDX, what KVM should do is return 
+error to TD on TDVMCALL of WR/RDMSR on MTRR MSRs. This should be a known 
+flaw of TDX that MTRR is not supported though TD guest reads the MTRR 
+CPUID as 1.
+
+This flaw should be fixed by TDX architecture that making MTRR 
+configurable. At that time, userspace is responsible to set MSR filter 
+on MTRR MSRs if it wants to configure the MTRR CPUID to 1.
+
+> This is trying to guess what maintainers would want here. I'm less sure what Paolo prefers.
+
 
