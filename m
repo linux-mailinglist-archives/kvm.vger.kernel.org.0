@@ -1,120 +1,141 @@
-Return-Path: <kvm+bounces-12989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AD2C88FACB
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 10:10:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B8C488FB79
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 10:29:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5B5B1F25E51
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 09:10:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31930296466
+	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 09:29:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CAA5FBA2;
-	Thu, 28 Mar 2024 09:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52AA554745;
+	Thu, 28 Mar 2024 09:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFLlSdaF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O4jkjKCA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405BF3C0B;
-	Thu, 28 Mar 2024 09:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBF42594;
+	Thu, 28 Mar 2024 09:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711617001; cv=none; b=lbtHWiyLLQa+F4ct5N0vjDYAYFDUsEi0qArHcVoy6YrRKDzIWbId3BF37ZOIz4mUsYfEHue9VLXraYep4Rt5eGVb5TDQOnz6zJuHphr8zFrR5SwPZ5NF4LTKwgLjHhzaaABA1WgRbOJ4DP8rei/Z1HA2NDHCK3oFSFEUP0ct8Xc=
+	t=1711618184; cv=none; b=qr13+cnl+fXLVr5vpnnxculw8h/Fqbllsv32HlY9O+KfpHGj6ALr+aDcu82YmHIqi+97TA79CJ3ZI5NhkR8eICca6V9Knt7NEDV1m2J8KabnlmidPqu+QVtaWn6xBUpIXsAG/OOlI6eGpOxypbNtOMwe1K+WQ107xAjQBpcLF3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711617001; c=relaxed/simple;
-	bh=buN5Ppu9AGNZtC/if8g17RcZZEQzgqGlib2VdnuWvYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=llnRjhtlzYMgw9mR22yVZWJIz/eVD+RxtsnbndqRTfr3ths1g80V92Jk4Q8QoNii8e04StK1eEeITfG9bqzhHNWT0IuIOuEcQkyiO9DAVl0CsPwTshgg2Jt2KQpz13Qofgek37N2gpByTQ4i8U2jZCDoUlAISgbzeGst2QfCGj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFLlSdaF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DAA8C433F1;
-	Thu, 28 Mar 2024 09:10:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711617000;
-	bh=buN5Ppu9AGNZtC/if8g17RcZZEQzgqGlib2VdnuWvYg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OFLlSdaFgLJfwlccYTUQ07QIz60FOyuC8o6pcVV92LZbtE4gq7IAodXVpi6MWqQKD
-	 /P4Fl8Qvp5yVtqoZgDTztgedrMv69WkJQHT0+Txctf1PpT/Xt7GN34m4JFuIr7B2Ob
-	 ZenIk9jv0ixo23yCmoRslgOW7owKOyIYOaTT9eixAfQmT/MLYqxgdsDEciF2ow33fx
-	 8Bp/LnCK2rxFLnCW0HllcXCOe0nR3LyIMLLjxk5pVqhide4zeg+ntfoRA3RYM/BQBD
-	 2/XHLh2NMuIq7tdO8199Pn4n+qV0Z9Lu1bznDyMzbl74t5Y9igoKy2SgIRxUTfCqJ8
-	 VO6OdnuV01Mcg==
-Date: Thu, 28 Mar 2024 10:09:57 +0100
-From: Andi Shyti <andi.shyti@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Russell King <linux@armlinux.org.uk>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach <mike.leach@linaro.org>, 
-	James Clark <james.clark@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>, 
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, linux-kernel@vger.kernel.org, coresight@lists.linaro.org, 
-	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-input@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 01/19] amba: store owner from modules with
- amba_driver_register()
-Message-ID: <bm7xoej6ihtzw63mhocvkkb7j5no2wnhztwrvvlogmuxjycviv@7frc2s3dsi5h>
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
- <20240326-module-owner-amba-v1-1-4517b091385b@linaro.org>
- <6p4cdmbhrezm7fqbe3kgrkblqgrhaq4fgiw5x4n5dnptii7kjp@vmbj2pkjglp7>
- <c33833ad-9102-40e6-97bf-9a4e1bf0a3d9@linaro.org>
+	s=arc-20240116; t=1711618184; c=relaxed/simple;
+	bh=v3ajfryQVZH7lWMblKAdRzpy7eCW+nx7XKEL/vmZWBo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HR/AOqpXfX10+IlsH/yi3KBA74G6vOqWo5L8KCmNq96h2uZrXM9zBIVTPkCSRHuaOGclnFT9bOsBEgafRxEf/crcUTOa1+/4XbwyMDa0gxuEUiFc3aeYldOcyhUes5n0iv2pDj42aL0TN7y9DKZUfS2QC0UgVkM6UIKFdvY4V5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O4jkjKCA; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711618183; x=1743154183;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=v3ajfryQVZH7lWMblKAdRzpy7eCW+nx7XKEL/vmZWBo=;
+  b=O4jkjKCAPoJ+09icwo9QkzlfcGb9f/qYPNry6j0cn/K0Zaqa9Fxo+51x
+   D/SqzOAhvPhXYJImO0UPlehlZa8YHYVBTyuO3y6Qoy14Mvu6RDx/Jc6Qj
+   eck9q/LgHYKDNW4cG8vexzH11X7Xo2/ROR18sDMAfct+H2EbbxHgkHKXt
+   nhgd92GK+OeNHtHYd0mb06pTRiBgSnxdyAI0gU1ur49vAInwm1TPfnkVW
+   RHb9MW8MSENG5/6yQQhzk2pJYg6PkbVugWO3DqpSvd+cnw4/3tg4ZhIn+
+   m1QuXbw8+cLeLpG8yQwDrcqmFxLNRhtcDDnaloUaXQyog54YfbKKg74Qv
+   A==;
+X-CSE-ConnectionGUID: NJVoyxKJSHKMOth5TAQB5g==
+X-CSE-MsgGUID: Wp35oWLDRH+BZUYvgamC0Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="29240432"
+X-IronPort-AV: E=Sophos;i="6.07,161,1708416000"; 
+   d="scan'208";a="29240432"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 02:29:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,161,1708416000"; 
+   d="scan'208";a="21063871"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.125.242.198]) ([10.125.242.198])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 02:29:39 -0700
+Message-ID: <a4e33c84-416d-4bdb-a8ff-2bab70527877@linux.intel.com>
+Date: Thu, 28 Mar 2024 17:29:37 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c33833ad-9102-40e6-97bf-9a4e1bf0a3d9@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests Patch v3 03/11] x86: pmu: Add asserts to warn
+ inconsistent fixed events and counters
+Content-Language: en-US
+To: Jim Mattson <jmattson@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>,
+ Zhang Xiong <xiong.y.zhang@intel.com>, Mingwei Zhang <mizhang@google.com>,
+ Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>,
+ Dapeng Mi <dapeng1.mi@intel.com>
+References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
+ <20240103031409.2504051-4-dapeng1.mi@linux.intel.com>
+ <CALMp9eRLVJrGORS5RrXefLOiMkhvbSAMgHLcPHM1Y0sLbQ4MmA@mail.gmail.com>
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <CALMp9eRLVJrGORS5RrXefLOiMkhvbSAMgHLcPHM1Y0sLbQ4MmA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Krzysztof,
 
-> >>  /**
-> >> - *	amba_driver_register - register an AMBA device driver
-> >> + *	__amba_driver_register - register an AMBA device driver
-> >>   *	@drv: amba device driver structure
-> >> + *	@owner: owning module/driver
-> >>   *
-> >>   *	Register an AMBA device driver with the Linux device model
-> >>   *	core.  If devices pre-exist, the drivers probe function will
-> >>   *	be called.
-> >>   */
-> >> -int amba_driver_register(struct amba_driver *drv)
-> >> +int __amba_driver_register(struct amba_driver *drv,
-> > 
-> > ...
-> > 
-> >> +/*
-> >> + * use a macro to avoid include chaining to get THIS_MODULE
-> >> + */
-> > 
-> > Should the documentation be moved here? Well... I don't see any
-> > documentation linking this file yet, but in case it comes we want
-> > documented amba_driver_register() rather than
-> > __amba_driver_register().
-> > 
-> 
-> That's just a wrapper, not API... why would we care to have kerneldoc
-> for it?
-
-Because everyone should use the wrapper while the real function
-will be used only once or twice.
-
-I see also that this is a common practice which I don't surely
-like.
-
-In any case there is no documentation exported for AMBA so that
-this discussion does not bring any tangible benefit.
-
-So that, considering that it's a good improvement,
-
-Reviewed-by: Andi Shyti <andi.shyti@kernel.org>
-
-Andi
+On 3/27/2024 9:11 PM, Jim Mattson wrote:
+> On Tue, Jan 2, 2024 at 7:09 PM Dapeng Mi <dapeng1.mi@linux.intel.com> wrote:
+>> Current PMU code deosn't check whether PMU fixed counter number is
+>> larger than pre-defined fixed events. If so, it would cause memory
+>> access out of range.
+>>
+>> So add assert to warn this invalid case.
+>>
+>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>> ---
+>>   x86/pmu.c | 10 ++++++++--
+>>   1 file changed, 8 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/x86/pmu.c b/x86/pmu.c
+>> index a13b8a8398c6..a42fff8d8b36 100644
+>> --- a/x86/pmu.c
+>> +++ b/x86/pmu.c
+>> @@ -111,8 +111,12 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+>>                  for (i = 0; i < gp_events_size; i++)
+>>                          if (gp_events[i].unit_sel == (cnt->config & 0xffff))
+>>                                  return &gp_events[i];
+>> -       } else
+>> -               return &fixed_events[cnt->ctr - MSR_CORE_PERF_FIXED_CTR0];
+>> +       } else {
+>> +               int idx = cnt->ctr - MSR_CORE_PERF_FIXED_CTR0;
+>> +
+>> +               assert(idx < ARRAY_SIZE(fixed_events));
+>> +               return &fixed_events[idx];
+>> +       }
+>>
+>>          return (void*)0;
+>>   }
+>> @@ -245,6 +249,7 @@ static void check_fixed_counters(void)
+>>          };
+>>          int i;
+>>
+>> +       assert(pmu.nr_fixed_counters <= ARRAY_SIZE(fixed_events));
+>>          for (i = 0; i < pmu.nr_fixed_counters; i++) {
+>>                  cnt.ctr = fixed_events[i].unit_sel;
+>>                  measure_one(&cnt);
+>> @@ -266,6 +271,7 @@ static void check_counters_many(void)
+>>                          gp_events[i % gp_events_size].unit_sel;
+>>                  n++;
+>>          }
+>> +       assert(pmu.nr_fixed_counters <= ARRAY_SIZE(fixed_events));
+> Can we assert this just once, in main()?
+sure. would do.
+>
+>>          for (i = 0; i < pmu.nr_fixed_counters; i++) {
+>>                  cnt[n].ctr = fixed_events[i].unit_sel;
+>>                  cnt[n].config = EVNTSEL_OS | EVNTSEL_USR;
+>> --
+>> 2.34.1
+>>
 
