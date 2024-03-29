@@ -1,79 +1,111 @@
-Return-Path: <kvm+bounces-13041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4D6B890CA8
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 22:49:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D00348910C2
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 02:58:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B62E1F24127
-	for <lists+kvm@lfdr.de>; Thu, 28 Mar 2024 21:49:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02B47B244EB
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 01:57:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D7413A875;
-	Thu, 28 Mar 2024 21:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C9593D38E;
+	Fri, 29 Mar 2024 01:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GGSV3zMu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PyVaOg7L"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2108.outbound.protection.outlook.com [40.107.244.108])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C52840852
-	for <kvm@vger.kernel.org>; Thu, 28 Mar 2024 21:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C044B1E515;
+	Fri, 29 Mar 2024 01:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711662540; cv=fail; b=lHndPex0TSqsb/y18vNOj5WXl87yp88R7eLCbWBGJE/CNL+1fwXxAlhWYeST6Qv5gwC9VSG2aSJNgiCpQYwiFsRD0KmJNlTQZwuuKbsifHtsH7WQHhfAnWtu8BY7ZsbwBdgqAMcHXbXzMP9BmtoF9RHp+1/lKsa4SK7o5n7D8oI=
+	t=1711677261; cv=fail; b=C0O/fQv21Za+ZsppSwJehhvpipf5uzCuaUwd/jj+MUwlysNAA03Je+qDFdPLL9U2OsCzkGkYF4oXUHFuEYwXiIWUgpQ77BiWcaC6a86lKB6V4dX/HDEv4C6ZuXNcbm4e5VpXP4TUROAI8bZjaB/mGHb6VogauQ4R8JUAQSJ4Mj8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711662540; c=relaxed/simple;
-	bh=lmADtYatAJ4CgV39H0F3HC9VnyMZIEnsoP4hjs6qGAk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UodRLYdiMqii2h6wx5IeFpa1s6GLeqSd0sTR/jdZbyAw4stALPkCk+G6V4cg3JkiYiIC0nYPnPkmaDEB0STOnHhW5e0Qf1uyOgpJRYniHuQlrzyVgrp8LPc3bbe+J1W3hfBFdWCR4kGivvBoauNpEeYM4F2Zp/PMjDXUMqJKwzE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GGSV3zMu; arc=fail smtp.client-ip=40.107.244.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1711677261; c=relaxed/simple;
+	bh=nK3dCJ9Je5oHu6hcgw0gvRABj723iVfvHwrQPykJvi4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=VESf8KK4AweZipjuBlCDZ25sUBllA8zBncWeQbhxQL/JyXbom3GRRbeDDnX0puWKtTQZCoatP/UFgXQnWzW4CvYIPf7Mu0TPoOM/aTCJy7mGFW1SSjNUcpEEdLxxtB81vr0/+LV+9N2wZ29WXzCy4fdfW8kA2Cwpn2UZOCtDNoc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PyVaOg7L; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711677258; x=1743213258;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=nK3dCJ9Je5oHu6hcgw0gvRABj723iVfvHwrQPykJvi4=;
+  b=PyVaOg7Li6nRBeRkJHhal8NT8H16SZh/de1Bb+HDw3uzQO5npsQzV3Tw
+   uBomltQKfQCTdZ7naiPJowNDVo5npbD8sTc4uJMTHdwPxa5qqUxFRWUDe
+   2IujSuJW4YRiXV2e4rRW5jWL7hPEN0/kZUDvCtrpOdUcfKjXVHy+FohMN
+   oM0DaH+YvAD6lklU9vKNabURkEaN33rccFSOU0rRbwEaLweS6GL+e8MNb
+   2cNwxEI7CvfnArjV0njgEf6uCgbamw8l+61EVNDbYMjUzAOaxj23gNR9U
+   0LBNhctkgv9XUSDQrIq+LdEW50UChPlYW8T03S6TpKu/s2mUA4cmL+8hL
+   A==;
+X-CSE-ConnectionGUID: 0tIKzPXwTamGgz/sKpCOBQ==
+X-CSE-MsgGUID: WcRQn2UDThOTZJu2JjqUtg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="18244334"
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="18244334"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 18:54:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="21508073"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Mar 2024 18:54:17 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 28 Mar 2024 18:54:17 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 28 Mar 2024 18:54:17 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 28 Mar 2024 18:54:16 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ART/wjsZjQxDvu6tsK6PsP9sVFqlWX3TYql+HO9hr/4SH8FdCJhyWH6iUbioBrkgHINRHQMo1JolRuPDH1QLmnOSfyYKWmJuV+jzM4sm3LQilLN8KrHMx10Ol9ZyfB/JtzpciLwgpEMeNnYWDxORF7GGMxUmMW1hgVObgM6pHR8Mf9klJrtpAjpcCRtx13Vs4LocyDrpFZ4mlEg5LCEgEHKrvHE1SxKAgsE7l/3lZWEk9m9eS2P1BGbT4p3ESwmM0hw1suDuEEbTLQOdXIzZUo8sf19Uu+l6W79wkWiJYeGMexV6GR04YyYYUwXacJRVyzRJPykiANiJyAWXKtgn5w==
+ b=VmZMoFenRoS/l86vWbY9Jb+HitMYlx4ex4/oO9GNZO9VmvfilGUL/LkJ1WS2qczDd0NMq0kHLkalvRtlC5q5ycEZhRJJcGkBWWVmpiVDGqk4i8uuD3MNkqTAM5aBM5/+9XLwT0kPLUe05mSggrrEOaAj/RZrkMaH64i784aEHKc9Su+J+8Lz1oIfRrG8OM5ciaNIw6+R2+XoIwiLQE5XwfNSuoyqSFAbEZMHqRVReue6j+IRO/JmgYOd78hu7+NN+sgMgmVT7++4Vkv21JO+8qsoK9/VSKRNE6GuF0R5pMSKc5vyEYVb5ZrxLafYYhqgbrKzlMeh9XH6wWi+Ev5hAw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CiPVEl20v5cgOAW6U9JbaIWt5DIrDJy17f35xfr8am4=;
- b=SQuvjtAHiR3uAQ0aMlRsxjoRC/ZU6ngRy70qUnxIuaP2+bgSNcHSmCof3Ue3LHvAv85O+5a0ECKsJ3d8AFc7tXn89b0h+mkuiBxgSNxVikfrmIqrD00cJ5yn4B29BulEV6+L36RRZD+5NKHn5KQN0wgiS5QUSqdCW8jzile26YBztJnIaxBGul6knjRrMxv1uMOJ+VDgJupGI8m5/vscAMBg6giQyzD8X03dtA8qyheM0BJZTQjpfpVlLrlDzKhdiuzH8oOoqYhofvrpYuCDQ4S61A0RH4qOai+byml2Znvk8pbT3Gc4d2sC2rCnxobd//f4tlBHJRNYcy6DUMUr3A==
+ bh=EDrvEidbFvTK/9Igk3FeBTB78ieeqvb5fX/O56pJV+s=;
+ b=OvzkH1VXqJdAZqX7v1cyniU/2qhO3Fczfq7T3BKzokThR8v4ivTtCnncgLA+M56TbNIxIewyggg+4zYhBG2dlc7LoMSCNmEevW37pQHnmiFaZJQ9VFtZcFPSEd5LbLopMHZFh8HPQn18jNlMEHyO6XYvniDc97HYDgopdU/lVUQOjgOiCWS5pXEigMUCfNMnjBrGoscJSQ3VFOPAGA9DcmKmEwB9uqIV5WGJxpkrGMjuo7KCyKGbMg9f1/ETfYHFL0xL/qBrSr8IfkSylMIGHmhq1UwD0BxTKIEUqTVhRhWstKEeL76/6wB1kBTZ+SRgJnbZr71ZogtKCc/UFOPLMw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CiPVEl20v5cgOAW6U9JbaIWt5DIrDJy17f35xfr8am4=;
- b=GGSV3zMuY7gxbptR3AVGvNXTBKFyHk2KtSuWIwNJTehZHKFGRTdHVjNJYx5zm4Hnp/3KP9oblBu2WyRv6+c26bFSugHLeY5n+uX9iThR4XBcqBFz3n5ElMJuCQ3GW5mMCFQvbGNAFtdMWAu1iqqR9h9wqggsVWa2lJLNeaHAb8E=
-Received: from SA0PR12MB4447.namprd12.prod.outlook.com (2603:10b6:806:9b::23)
- by PH0PR12MB8030.namprd12.prod.outlook.com (2603:10b6:510:28d::21) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by PH7PR11MB5819.namprd11.prod.outlook.com (2603:10b6:510:13b::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Thu, 28 Mar
- 2024 21:48:54 +0000
-Received: from SA0PR12MB4447.namprd12.prod.outlook.com
- ([fe80::b6fb:23e5:a2a5:88c9]) by SA0PR12MB4447.namprd12.prod.outlook.com
- ([fe80::b6fb:23e5:a2a5:88c9%3]) with mapi id 15.20.7409.038; Thu, 28 Mar 2024
- 21:48:54 +0000
-Message-ID: <5541d533-becf-e527-e68f-d9f2cdca3382@amd.com>
-Date: Thu, 28 Mar 2024 16:48:53 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [kvm-unit-tests PATCH v3 2/4] x86/efi: Retry call to efi exit
- boot services
-Content-Language: en-US
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, thomas.lendacky@amd.com,
- michael.roth@amd.com
-References: <20240328152112.800177-1-papaluri@amd.com>
- <20240328152112.800177-2-papaluri@amd.com>
- <20240328-47ec1cd5ebf2292beed09e77@orel>
-From: "Paluri, PavanKumar" <papaluri@amd.com>
-In-Reply-To: <20240328-47ec1cd5ebf2292beed09e77@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR04CA0079.namprd04.prod.outlook.com
- (2603:10b6:805:f2::20) To SA0PR12MB4447.namprd12.prod.outlook.com
- (2603:10b6:806:9b::23)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Fri, 29 Mar
+ 2024 01:54:14 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::5135:2255:52ba:c64e]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::5135:2255:52ba:c64e%4]) with mapi id 15.20.7409.031; Fri, 29 Mar 2024
+ 01:54:14 +0000
+Date: Fri, 29 Mar 2024 09:54:04 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: <isaku.yamahata@intel.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	<erdemaktas@google.com>, Sean Christopherson <seanjc@google.com>, Sagi Shahar
+	<sagis@google.com>, Kai Huang <kai.huang@intel.com>, <chen.bo@intel.com>,
+	<hang.yuan@intel.com>, <tina.zhang@intel.com>
+Subject: Re: [PATCH v19 093/130] KVM: TDX: Implements vcpu
+ request_immediate_exit
+Message-ID: <ZgYfPAPToxbgGZLp@chao-email>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <3fd2824a8f77412476b58155776e88dfe84a8c73.1708933498.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <3fd2824a8f77412476b58155776e88dfe84a8c73.1708933498.git.isaku.yamahata@intel.com>
+X-ClientProxiedBy: SI1PR02CA0035.apcprd02.prod.outlook.com
+ (2603:1096:4:1f6::8) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,170 +113,107 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4447:EE_|PH0PR12MB8030:EE_
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|PH7PR11MB5819:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	RyHmhrOetmJOevMFHTLH1Ayy3cfjQKMCIirFI+HMtfPFJh9jhJmOGRFx3bRNObio6k8OLK0Y5UZfq9Q+jJo2cWf8U6w/mRH24Xfg5Te10Nhha8KAWeznL8XySnm8deyk3I4UFUltUi2BOhR/CqptnKlXeo9belbBYrgpEy2Y7vdoDQNDZwnrwdPdKaXiLYVnSDUS362YYtX9QHrVakyrQDf65EXK4iJMIOxbI2SJPj0oPhvMC9n+PTm+QsGZM7dcxx+MQrkJFny5TqgiKJcfyCF6wZvjHEzEOmeGNS7o4yullBGkNTYHF/+em8C5YNiJZPc6cNYEa7jyW4W5NUuKyX5bGRrC7P8Fc00tItKwPwWjptfUiE23W9jT8hfOrdqMco4qiV95BzeDhlUdYt5YqsFuayvTaaSHcnAK4jgxiYpdZeBuDFQSJkgG8qR/elLJNqBMDZrYtZk9ufyYE5wveyTaw9hh7JSKTRr5R4b3kSCKGE3KTo+8l+9VSBxmF99GRabu3CPwyLpiFki16qIIuQoFQP3mhom951sDj2o0DBVuyuxNLM69GFmKJOcAuvM8aD9cpZNxJgU/efJXfcSK51OpHlOHZ12VhVMK0phUuSGdYAiaooVKEFt4Tr99jnNUYrNnHDJj69vc90pUoS+JLirSsnjw2rZdmWH0wuneqyk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR12MB4447.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: GiJmcHyanj9PDWMV4J+PxHVxAgLkfy+yHs/ErnMIsJgC1pPrLu0bH5RCxJHasdonOXdyqiabzZ9BDvkU2W0339V/rrs0hAqdcpy1QkvI//HUY1AGP7mXWpAIOuL3qrYSAH4X41YvF/w8rLzhdkLT55+/TXBYDe1vZm1UCVLpuR6DW6S6YEoTk0VnPEJO2XoEUoDYgO5q9komDlQ8Com1GNGD/nBsjta1PElPlS34ZLeQKouizWog20bq496jnLKgAdv9xcNvY/u84P11OXuSExTaG3f2FVFWM3KL4rHGkheQyAjs/m9MyjBTfzi1c4vJPhPARYyXrT3mYfnGuLOgOecqZkhDygq1WqBNm/Ucxff3e5hyGZ7h17jvfdRYz/eqY3vHir8M+8rSmnj4CNw++dT389uZ1sasY22Xb8zEsrDBhjlGs/yv9p8+rfHDjNwGdr2DRpWhXAJlRXSEQThs69qHLLnmKS/TcqQy5deLkV2fvaPAxvZJd5N0PQHHRaHJjHpI9dgZokjV8XnmeqildWvMsdFi0zotcqhTpy9E8J45LTWkEgNgU3HwBvWdpsC8OVpIsTj/sH0COyNjHzXRQH913/fjTgv4vkAfTxZBbHaHhYvY8dpPfwuBnpL7yTHCMDK9xa0Bato2g7e3zNsHNw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cE5kRytqWkZWbmxZZTZlMTBZQWdnYk10ZWZNUEZJYkFNYk00amhuL3pLUVg2?=
- =?utf-8?B?R1d3MFArUmJMMDVDekNCbjdLeSttMUg0dndwV05IUFRwQzRNdUxnUTVDa2dz?=
- =?utf-8?B?RDFPRlBrWUJYUnNieGpSQ2UwM09LcXpGbzMwNnF0Y1krSlU0K1ZCem9KSWtn?=
- =?utf-8?B?MW13UnczaEVBZ0VUaCtxbUpWd1lIM1huckdEYnd6cUk0MUpCdS9la1FsWXNi?=
- =?utf-8?B?bGxqV1BPYm4vdmxZa0lrZGFuc2h5VjVrOTVjL0lUV3h2bmhXRWlwZnFqVUVh?=
- =?utf-8?B?VFVOZC9WYTgxVjd1enEvK3h2QXoxWXdocmNMaHdURWhFUWcxdHR5ZCtWeFNH?=
- =?utf-8?B?dGkwZ0Y1WEhoc1BNdzF3bElxSWJmV1IxM1htL0tURkFCbGR6YzVUSUUwa2lS?=
- =?utf-8?B?dStPSnBZaTB3bUF2WWorU2JRVjdSTU9QanRvTG8yMnR2K0Y5dFE2dDh0N1l4?=
- =?utf-8?B?VGZITE1kcFdrY0ZIVTYwZEo5L0paT0E5SERhQWZKOG50MnlDckZpQ3NtYll1?=
- =?utf-8?B?K2FwMk1jNS81TWV5VytjWUJJZllxcEFGNVQzS0VoVFlyUnR5ckt2UWV5aGN3?=
- =?utf-8?B?dlZmSDE4b3Axem41KzRTOW54WFdaOGpGa0RYQk16U0hJMUxpZEZqbWRBKzUw?=
- =?utf-8?B?L2FjK3NNNXViRVAzUFBlTXpaNCt1QzVHOGtwS0xWVFg2dVFzRnljSldsRlpu?=
- =?utf-8?B?eXlHenRZdDdEdXlYMi9BYTAwNkVBbXVWYWJGbDQwQXJOVTA5ZktOdE5xb29V?=
- =?utf-8?B?cHBZMHBwRm5YMkNZZXBVVlBBZFUvdTIxZUVGcldCNUJHTy95S1BqRnB1TTA4?=
- =?utf-8?B?bnFqQTh1dDc3WWpZOGJaSm1NbHM5NmExdGJPV1pNbzd3dmhydHBsR1VMSXdw?=
- =?utf-8?B?WDRmdGdZRHpHNkNIT3hmYlkybEY4L2l3cjFoM1k4ejdxeDdSWUpuZnc0azVz?=
- =?utf-8?B?OFlpU1Z6NlVZNWZsbForSlVNTmprT21PUm84eTFWYnFmYVpXdm45cm5JTVp6?=
- =?utf-8?B?ZEhNdG0rbmtza0dqd0lRRlZ6Mk50TnNKeHJGK2Z0WXVTZFBacE9VekdWTWJF?=
- =?utf-8?B?RG5vZWVwWlc3MFFEaDNrWEpLcGZYU01Fc0YyREQ0S2RHY0pjd1JWVWtGYURq?=
- =?utf-8?B?eHhtWWtFZTNLRm9YZGd0bU5FTnVMZDUrU2lZZ2NOb0JNa3NIK2tmMzlwMTF2?=
- =?utf-8?B?L1cxK0RzWjlGL3JiVjAvU2lXNzIzdmRta1hwOVRHb21jNTFQZUtvNWxWak94?=
- =?utf-8?B?c0JraEUvbFgxK1BzV1h1N0l2Y2NFOUJBdDc1a3Zqbk11d2tremJwd3doWmZW?=
- =?utf-8?B?M2UzZmJqTlp2Uy9KdGtVMndRNHI3dTZVVGhaQ2d4Z0xoN0EwMDJwZ2xJR3B6?=
- =?utf-8?B?UWFLMllWWGgwbXNUdndsczhxbmtOVEJkc3ZTeG9XZkVQSFc5blp3VnNkZ3Iz?=
- =?utf-8?B?dnlFbUN2TXFWellISUhhWXFsUmhmTlM5TWZiaTlVbWRsTUNIOVpNZlZHeG5N?=
- =?utf-8?B?M0FmWVpTcGxyTjREWVNUc1NESVZUOXB5Zlk1L3hFYzVVUDh3WGYyUWhLMUVK?=
- =?utf-8?B?aWkxc01YcmY3OVk1eW53WkROQUpDNzRXUkd4Q2JnWWxwbnBMdEEvUDVkVmlh?=
- =?utf-8?B?VWtjWnNucnhpWVBoWG90ZndISG9EcHRESjZYNFZubGJuRHA3WG1XWWhRZ2J1?=
- =?utf-8?B?OXZ2N0NYSGN5dWloYm5JZCtwNnpnSE5WbDYySHpDdFYwS2oyVGZwUVBFVjhK?=
- =?utf-8?B?UFpqME9pU3pEWDcvOHZJUjdKaGVMc2pjM3dhSE5tMytqR2Y0M0pQREx5MXow?=
- =?utf-8?B?UmNMYm0vdXM2ZmlKOUg5Mmw2Nkc0M1NvTy9GamVOd2pPMmNjcS9RSStaRit3?=
- =?utf-8?B?RFJKemJ3dTA2anhTTGMveXZhS3A5Q0pkc1RVZmQ2VlVVZnUrN21zaTNmb3Zp?=
- =?utf-8?B?TzdPeWYzUzY2Z0VBazNVSkMzOW9qUnpvdWtoUU5vZytyMGRvVkc2WHR1VjAz?=
- =?utf-8?B?aWgxMVhySi9zeVg2M2h5UUlPWE9MOGV3RXRjbWNSNFhtL1I2cG9KYlArVFFp?=
- =?utf-8?B?YVgzamVNcU9vbTcxMklvbWxzMEtpUURkYk9QbjdoTnZ6TFZGSHlQNCt1OTFB?=
- =?utf-8?Q?bCUlQE6NK/6nlCOCGz+iXfbkw?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0820b0f1-5d35-4bd2-2105-08dc4f70dd2b
-X-MS-Exchange-CrossTenant-AuthSource: SA0PR12MB4447.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?E/aRR9ObiLfdbadr9iBOuapVz+uCJiacv4DS/3mi0AjL/FLHtQdzSq6sQgjz?=
+ =?us-ascii?Q?qHESUohHEAMTDew8q7OtEvq4JJIOBVbPiM9gvsR2OoEsOzpyAkCGm2scmZTH?=
+ =?us-ascii?Q?rvGOpmimNkwtekKz156MZKYRd29LdQ/ti0cz45vAK09Zr4SXrCagKtLXIpvr?=
+ =?us-ascii?Q?p+XUiMDxi97L3dhrrhdlA73mlvbeLJMRTO9epOtf7pRdNIxTY4SbUD5EsYhY?=
+ =?us-ascii?Q?I7gVSym2miWPD1S8m0S3hSHg+1idOoJtUYFxgZcEdXPtNVRMSPCmxsZcwAYf?=
+ =?us-ascii?Q?UhGiDwXEdBGHLy6ngWG0FYFWqqrKN863C2P8KxfCcOviJEL2DSb1wru1+2Dj?=
+ =?us-ascii?Q?U+gHNu1jyN3FyRFkDh4aDpLfm01nrPaFCXUjIDq6/1jokZFV0QGWw7ueqj8d?=
+ =?us-ascii?Q?FicPnODDjEjyQdDnLbqz4xBk7VXlu5eEPFRLlFfFyR6LbsMyHwo2O4TcPJEq?=
+ =?us-ascii?Q?Z7gt8A4tGO03uXuQeg+CItQNKEi+8/b/+dQLd28LKuc5grKp68LSb+95vZeP?=
+ =?us-ascii?Q?GQyy7Pp6P8OjzWoQPF3Z9IcQdfA2jKLS5ZFAM1JHYSXoBP/X6MuLf90unDKu?=
+ =?us-ascii?Q?EKlcI+rX+dVN5G1/oOMIbVCsF3ouO/OxTATf7RLpjaqTQxIVMdkakFtwvPPq?=
+ =?us-ascii?Q?YZ7acWKn1Bv7FjW3DW8r+gZ5vBoNZhHN5ql0HQCB3olAqS/gv/5vPG13IF1I?=
+ =?us-ascii?Q?lD9PNBXPSdEoAUa0jtVh9bogTFi3maVDDjBGOH9sOrfX90MhvGC/l+YTZlXp?=
+ =?us-ascii?Q?LsOjsrIxJtpJlAoWCYJzSzo6D1ovAI0VFB+7HtfR8dZ7O+jr28dDAXE/DpNX?=
+ =?us-ascii?Q?uC1a9CK9+XoDfsS5VIQAqidbnUm1NbnQX1PryeQtCYAe9di2sNwqUF73Z/w0?=
+ =?us-ascii?Q?ElNK05h7GAakpjVnIJTAx89qaL2j3Vi2jKudHH933cTj8H64dONl3V7hBER8?=
+ =?us-ascii?Q?Sdv09QxLtIwPYgzp/+XBRdwxlx4sJZqlRg8Cozd8d9FN1MzZvgZFZnz2u9fP?=
+ =?us-ascii?Q?/a/lgPa5Gq1sHMO54U5c1GFRCpb9EH+Ui5uZQT7wKcXax94C527FmVE3HEen?=
+ =?us-ascii?Q?qQymqiUXOYDP6NOZiOkGh2w11nz04eyJ+F1y0VBVa/7o0c4KmUZCcWKMQJFM?=
+ =?us-ascii?Q?L6fiP3zZr9ldkqBHQnA4QlC0o6IbjU2IHZm18q3G4N0bHPRxZr00+Ui7xfk5?=
+ =?us-ascii?Q?x9YDW2G7oVs6BImcic/za66rxQq0svPe62kNVFvl18vX+Z8BHSxR8fCAhzt4?=
+ =?us-ascii?Q?TrU3vAsj5YVaDXK2m2vn46YtWns8g4h+Qbnqyo6bvI8XUx7VydIzckaPQKdL?=
+ =?us-ascii?Q?+7qkzJTMMCLSUHhOhbsHsRbvvguhjWguUt7NNsAyGKpJj+dpvpMJOs0xzjVl?=
+ =?us-ascii?Q?I5bPNMliIl9U6WnUCgAz5XbpuKxEZLbBI2ZWSwbBZqELUq0c2/uxTP4TfAXt?=
+ =?us-ascii?Q?FMpDXrKyjqYQ/LYfKx02/oXybv3GOjC6QRztBHzQPYKFQDlu7m6hmBwpjyW/?=
+ =?us-ascii?Q?CoTnduNGo6SvRnwbjYnNN+TG5unSFN5wDhPNc4S1wvz3sm/F+71zu1WsgpVU?=
+ =?us-ascii?Q?U0by+AP2K8Ww4YYqC/xFNVpDvZMZdtMUP+9Zqilh?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82b81dc0-482e-40e3-b0f0-08dc4f932291
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2024 21:48:54.6005
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 01:54:13.9805
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VwjXmUN81VoLUoVAYYyROItRjE+rY5N9Y58lARwFn/0q8mALf68vVJC4J1tncX9QyK2E7RLpQ0FZE1Vdyjrebg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8030
+X-MS-Exchange-CrossTenant-UserPrincipalName: 55IyzqrnCEnTU8DbZYVLHCd/CKrjbsoSBLCfFHDAXBXFTIRrHVM6iioNIDat90U/bSPcVelDOVbWEJ6qtZ1Uyg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5819
+X-OriginatorOrg: intel.com
 
-
-
-On 3/28/2024 11:33 AM, Andrew Jones wrote:
-> On Thu, Mar 28, 2024 at 10:21:10AM -0500, Pavan Kumar Paluri wrote:
->> In some cases, KUT guest might fail to exit boot services due to a
->> possible memory map update that might have taken place between
->> efi_get_memory_map() and efi_exit_boot_services() calls. As per UEFI
->> spec 2.10 (Section 7.4.6 EFI_BOOT_SERVICES.ExitBootServices()), we need
->> to keep trying to update the memory map and calls to exit boot
->> services as long as case status is EFI_INVALID_PARAMETER. Keep freeing
->> the old memory map before obtaining new memory map via
->> efi_get_memory_map() in case of exit boot services failure.
->>
->> Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
->> ---
->>  lib/efi.c | 34 ++++++++++++++++++++--------------
->>  1 file changed, 20 insertions(+), 14 deletions(-)
->>
->> diff --git a/lib/efi.c b/lib/efi.c
->> index 8a74a22834a4..d2569b22b4f2 100644
->> --- a/lib/efi.c
->> +++ b/lib/efi.c
->> @@ -406,8 +406,8 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
->>  	efi_system_table = sys_tab;
->>  
->>  	/* Memory map struct values */
->> -	efi_memory_desc_t *map = NULL;
->> -	unsigned long map_size = 0, desc_size = 0, key = 0, buff_size = 0;
->> +	efi_memory_desc_t *map;
->> +	unsigned long map_size, desc_size, key, buff_size;
->>  	u32 desc_ver;
->>  
->>  	/* Helper variables needed to get the cmdline */
->> @@ -446,13 +446,6 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
->>  	efi_bootinfo.mem_map.key_ptr = &key;
->>  	efi_bootinfo.mem_map.buff_size = &buff_size;
->>  
->> -	/* Get EFI memory map */
->> -	status = efi_get_memory_map(&efi_bootinfo.mem_map);
->> -	if (status != EFI_SUCCESS) {
->> -		printf("Failed to get memory map\n");
->> -		goto efi_main_error;
->> -	}
->> -
->>  #ifdef __riscv
->>  	status = efi_get_boot_hartid();
->>  	if (status != EFI_SUCCESS) {
->> @@ -461,11 +454,24 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
->>  	}
->>  #endif
->>  
->> -	/* 
->> -	 * Exit EFI boot services, let kvm-unit-tests take full control of the
->> -	 * guest
->> -	 */
->> -	status = efi_exit_boot_services(handle, &efi_bootinfo.mem_map);
->> +	status = EFI_INVALID_PARAMETER;
->> +	while (status == EFI_INVALID_PARAMETER) {
->> +		/* Get EFI memory map */
-> 
-> I tried to get rid of this comment since it states the exact same thing
-> as the function name below does.
+On Mon, Feb 26, 2024 at 12:26:35AM -0800, isaku.yamahata@intel.com wrote:
+>From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-Will make the change.
+>Now we are able to inject interrupts into TDX vcpu, it's ready to block TDX
+>vcpu.  Wire up kvm x86 methods for blocking/unblocking vcpu for TDX.  To
+>unblock on pending events, request immediate exit methods is also needed.
 
->> +		status = efi_get_memory_map(&efi_bootinfo.mem_map);
->> +		if (status != EFI_SUCCESS) {
->> +			printf("Failed to get memory map\n");
->> +			goto efi_main_error;
->> +		}
->> +		/*
->> +		 * Exit EFI boot services, let kvm-unit-tests take full
->> +		 * control of the guest.
->> +		 */
->> +		status = efi_exit_boot_services(handle,
->> +						&efi_bootinfo.mem_map);
-> 
-> We have 100 char lines (and that's just a soft limit) so this would look
-> better sticking out.
-> 
-Will do.
->> +		if (status == EFI_INVALID_PARAMETER)
->> +			efi_free_pool(*efi_bootinfo.mem_map.map);
->> +	}
->> +
->>  	if (status != EFI_SUCCESS) {
->>  		printf("Failed to exit boot services\n");
->>  		goto efi_main_error;
->> -- 
->> 2.34.1
->>
-> 
-> Besides the nits,
-> 
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-> 
-> (A general comment for the series is that we're on v3 but there's no
-> changelog anywhere. Please use cover letters for a series and then
-> put the changelog in the cover letter.)
-> 
-Ah, I missed out on that. I will include a cover-letter for v4 and also
-plan to drop patches 3 & 4 and send them separately as they aren't very
-relevant to UEFI fixes and for easier upstreaming.
+TDX doesn't support this immediate exit. It is considered as a potential
+attack to TDs. TDX module deploys 0/1-step mitigations to prevent this.
+Even KVM issues a self-IPI before TD-entry, TD-exit will happen after
+the guest runs a random number of instructions.
 
-Thanks,
-Pavan
-> Thanks,
-> drew
+KVM shouldn't request immediate exits in the first place. Just emit a
+warning if KVM tries to do this.
+
+>
+>Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>---
+> arch/x86/kvm/vmx/main.c | 12 +++++++++++-
+> 1 file changed, 11 insertions(+), 1 deletion(-)
+>
+>diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+>index f2c9d6358f9e..ee6c04959d4c 100644
+>--- a/arch/x86/kvm/vmx/main.c
+>+++ b/arch/x86/kvm/vmx/main.c
+>@@ -372,6 +372,16 @@ static void vt_enable_irq_window(struct kvm_vcpu *vcpu)
+> 	vmx_enable_irq_window(vcpu);
+> }
+> 
+>+static void vt_request_immediate_exit(struct kvm_vcpu *vcpu)
+>+{
+>+	if (is_td_vcpu(vcpu)) {
+>+		__kvm_request_immediate_exit(vcpu);
+>+		return;
+>+	}
+>+
+>+	vmx_request_immediate_exit(vcpu);
+>+}
+>+
+> static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+> {
+> 	if (is_td_vcpu(vcpu))
+>@@ -549,7 +559,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+> 	.check_intercept = vmx_check_intercept,
+> 	.handle_exit_irqoff = vmx_handle_exit_irqoff,
+> 
+>-	.request_immediate_exit = vmx_request_immediate_exit,
+>+	.request_immediate_exit = vt_request_immediate_exit,
+> 
+> 	.sched_in = vt_sched_in,
+> 
+>-- 
+>2.25.1
+>
+>
 
