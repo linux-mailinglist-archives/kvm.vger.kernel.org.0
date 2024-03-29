@@ -1,209 +1,136 @@
-Return-Path: <kvm+bounces-13069-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13070-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8661891603
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 10:32:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B79891629
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 10:39:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D308B20F23
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 09:32:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C222B212BF
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 09:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE2E8562E;
-	Fri, 29 Mar 2024 09:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4490144C92;
+	Fri, 29 Mar 2024 09:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Z8YTS1mX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fAxyWxyC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C770B81752
-	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 09:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB288134BC
+	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 09:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711704502; cv=none; b=m/aJvwUQS/3Z7cYUmGyezyY8RsF2hCPpZddp7pvYJZmJoOrkd+X5r4rrl7UxBneK6jAHynX5I82U2m73XhjkWw4OhOqwku3A88E3WiTWNSWC/ClH7FS6gWct0dYFzdAh3IIHke0vCWYi6deRgSfu4RaLIX28R2cQo/YVDRqV+bc=
+	t=1711705130; cv=none; b=TUhyqPpsO719SQYHW47w+r53UvakxXZQYOdFXKi3OPSUIGOjFzG55IedttE2Zurm1fdI0JwKxzfNZULjHGxJV5cfJNFPKNWl626jIQilgGawU+8TETVx5Q1wFnFYiiR5u3WKk9sNTxhRn+pw0LCyCnVz2zevM8trWkjwv+KBEiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711704502; c=relaxed/simple;
-	bh=wCFKSKMKTlZBWK3ZXaR4BvVSeSCHMmEnNsjJo8lvTyY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=da7rh150cxPwS73LUuwo13/Scye4bvllkT/5PdEyrEzlm5weIpq81kgR9h59bjl2v59s9vG1P07ylKJHhq3IaT2Qx3rDbHm4YLOIY+2JCHvl+w9hP/Rv95yz6rt48txtQT8BTcC8QnxO7xXKWFy1OXcK7r8ME3iHpT36nL2r95c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=Z8YTS1mX; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5d42e7ab8a9so1070077a12.3
-        for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 02:28:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1711704500; x=1712309300; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PDqUNVfVcL5Rx2dx6lOA54ZEoR9Eohs4e4oftX2EMwM=;
-        b=Z8YTS1mXlorb4QJ+VKgpjh1j737YZEyXRBcxuYkfsv+qaXxJpKTIyvzJfVZ667X5sb
-         Dfv68oz+XWbhqUqPo2xOON/WfvfwXXlyIS6A8bsPD2l3f1ws6/S/JyCTY+Dwl3QMI9L3
-         4X2tfogzJb1Mmw3qWnYQnQBZ3ByTp9K7RHH1HRiqS+0aC5Rkc8HMNtrPox+Uev0HV3be
-         YRag0tagInmGSKgX9Qx+GzmdRBssG2sUn0ce5X1We9K9j9tHrxcX+bRXY8tf87XaVqgM
-         RgPiBH5JHeb/y+cr9IprPEjqF5PIQ2KNg29Qen7oEiKgdDaU69oLlmxoFIPr4fkC7Hj+
-         YtCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711704500; x=1712309300;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PDqUNVfVcL5Rx2dx6lOA54ZEoR9Eohs4e4oftX2EMwM=;
-        b=K3+UWqhLcRxDcFYvn3ehPGyus3W34CDe/Jx5blvkz0Y1WX3mlokTEjPvGA1zFo6EyE
-         7D9+0iMNEJCseQLdzMg7/3daUvn0X/COS1hadZnTeMeB1uqydMdwJHF5tMOMbio6R9wB
-         LAwbhIAYNMAvvQmDl9ubxMTHomn1eg5mS3uABJPjH4Kv6FyoVin0k987FH5W2VhIzsAR
-         tEUg+fVEwDYcLY/QQfx35MRdBxwZbGRltxXSz7XshN09CA+DYYQhXKB2yXc5xK50d6GA
-         wfdPQqMR7wgp5aUVj3nuixECqS4LyO1StWQPSIjAYyQFteX536aaN8mZkTd3J4RP3bD0
-         zL8w==
-X-Forwarded-Encrypted: i=1; AJvYcCXHd4ZS2uCUmZjgnMztjrgfi+5M0RqGamQ7bRBWz6J38qoWz02BT2APnejfsxw39ur0RK2VoRI5iNCnGPSNcm+6b2CD
-X-Gm-Message-State: AOJu0Yw/A2Mr/j2AxU6oCsuWaQtNXKYctJNmZl1SNmQHfsXOA2bJJlVV
-	ych/t5YJriZxxoOxBGHVTzr5F3rIE12m3+Y9XR4GPWtlbSZ0krFQHJG6RjS0Zqc=
-X-Google-Smtp-Source: AGHT+IEFn6lnpp94KNj8bwQ5NgWC2ILdPrLL6jG7Xd8BF08mkXal/x6HNlt14p0P0bkYq09hEnt/mA==
-X-Received: by 2002:a17:90a:ea06:b0:2a0:310b:2cac with SMTP id w6-20020a17090aea0600b002a0310b2cacmr1663501pjy.25.1711704499969;
-        Fri, 29 Mar 2024 02:28:19 -0700 (PDT)
-Received: from [127.0.1.1] (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id cv17-20020a17090afd1100b002a02f8d350fsm2628830pjb.53.2024.03.29.02.28.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 02:28:19 -0700 (PDT)
-From: Max Hsu <max.hsu@sifive.com>
-Date: Fri, 29 Mar 2024 17:26:27 +0800
-Subject: [PATCH RFC 11/11] KVM: riscv: selftests: Add Sdtrig Extension to
- get-reg-list test
+	s=arc-20240116; t=1711705130; c=relaxed/simple;
+	bh=hlgRWAsqEYqPaeCmYoojJySYxpwBfhEhiWetVJsND38=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=RgVNkkQo071n7oFL6uyLjGlZXwaHf4QN7L/KjjNBMH0LG9ZtkMIRru1vCO9py0sjtnSRzg7D4HmSSXJM1cC9cuqihIMGF3SShOtPRpHTnGYBsRLbHJZ0j2AqU4+dEzm2FlQtK4a0C1bf3rbSbbZFjsXsZ7CuRGjsLjI+/OB38fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fAxyWxyC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711705127;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9TfOEZSUpizBDk/7ZlbtcyuX+Zuz/XZGsV/0/N9TVsY=;
+	b=fAxyWxyCoCHiXru8U8/3tusovyDs2w9GJkOHecM5q5Uc75O/D5NV0mCRCBTbBPHGHjeF2N
+	sdrKm4qZdpwb55v2RLGkSkVAsKAx1/nHgTKmBS5NlSv8I1xx++zVFs8PNEgodDTgFAsDyK
+	f42PaV0AuXpl9eeeXMHLqM9Z/BKKxSI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-455-jz36XEyxNSOsNelDtdEUBA-1; Fri, 29 Mar 2024 05:38:45 -0400
+X-MC-Unique: jz36XEyxNSOsNelDtdEUBA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 718DD811E81;
+	Fri, 29 Mar 2024 09:38:45 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.204])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6484D202451F;
+	Fri, 29 Mar 2024 09:38:42 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2] Documentation: Add reconnect process for VDUSE
+Date: Fri, 29 Mar 2024 17:38:25 +0800
+Message-ID: <20240329093832.140690-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240329-dev-maxh-lin-452-6-9-v1-11-1534f93b94a7@sifive.com>
-References: <20240329-dev-maxh-lin-452-6-9-v1-0-1534f93b94a7@sifive.com>
-In-Reply-To: <20240329-dev-maxh-lin-452-6-9-v1-0-1534f93b94a7@sifive.com>
-To: Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>, 
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: Palmer Dabbelt <palmer@sifive.com>, linux-riscv@lists.infradead.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-pm@vger.kernel.org, kvm@vger.kernel.org, 
- kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
- Max Hsu <max.hsu@sifive.com>, Yong-Xuan Wang <yongxuan.wang@sifive.com>
-X-Mailer: b4 0.13.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Add a document explaining the reconnect process, including what the
+Userspace App needs to do and how it works with the kernel.
 
-Update the get-reg-list test to test the Sdtrig Extension is available
-for guest OS.
-
-Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Co-developed-by: Max Hsu <max.hsu@sifive.com>
-Signed-off-by: Max Hsu <max.hsu@sifive.com>
+Signed-off-by: Cindy Lu <lulu@redhat.com>
 ---
- tools/testing/selftests/kvm/riscv/get-reg-list.c | 27 ++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ Documentation/userspace-api/vduse.rst | 41 +++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-index b882b7b9b785..f2696e308509 100644
---- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-@@ -41,6 +41,7 @@ bool filter_reg(__u64 reg)
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_I:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_M:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_V:
-+	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SDTRIG:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SMSTATEEN:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SSAIA:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SSTC:
-@@ -247,6 +248,8 @@ static const char *core_id_to_str(const char *prefix, __u64 id)
- 	"KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_REG(" #csr ")"
- #define RISCV_CSR_SMSTATEEN(csr) \
- 	"KVM_REG_RISCV_CSR_SMSTATEEN | KVM_REG_RISCV_CSR_REG(" #csr ")"
-+#define RISCV_CSR_SDTRIG(csr) \
-+	"KVM_REG_RISCV_CSR_SDTRIG | KVM_REG_RISCV_CSR_REG(" #csr ")"
+diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/userspace-api/vduse.rst
+index bdb880e01132..f903aed714d1 100644
+--- a/Documentation/userspace-api/vduse.rst
++++ b/Documentation/userspace-api/vduse.rst
+@@ -231,3 +231,44 @@ able to start the dataplane processing as follows:
+    after the used ring is filled.
  
- static const char *general_csr_id_to_str(__u64 reg_off)
- {
-@@ -314,6 +317,18 @@ static const char *smstateen_csr_id_to_str(__u64 reg_off)
- 	return NULL;
- }
- 
-+static const char *sdtrig_csr_id_to_str(__u64 reg_off)
-+{
-+	/* reg_off is the offset into struct kvm_riscv_smstateen_csr */
-+	switch (reg_off) {
-+	case KVM_REG_RISCV_CSR_SDTRIG_REG(scontext):
-+		return RISCV_CSR_SDTRIG(scontext);
-+	}
+ For more details on the uAPI, please see include/uapi/linux/vduse.h.
 +
-+	TEST_FAIL("Unknown sdtrig csr reg: 0x%llx", reg_off);
-+	return NULL;
-+}
++HOW VDUSE devices reconnectoin works
++------------------------------------
++1. What is reconnection?
 +
- static const char *csr_id_to_str(const char *prefix, __u64 id)
- {
- 	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_CSR);
-@@ -330,6 +345,8 @@ static const char *csr_id_to_str(const char *prefix, __u64 id)
- 		return aia_csr_id_to_str(reg_off);
- 	case KVM_REG_RISCV_CSR_SMSTATEEN:
- 		return smstateen_csr_id_to_str(reg_off);
-+	case KVM_REG_RISCV_CSR_SDTRIG:
-+		return sdtrig_csr_id_to_str(reg_off);
- 	}
- 
- 	return strdup_printf("%lld | %lld /* UNKNOWN */", reg_subtype, reg_off);
-@@ -406,6 +423,7 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
- 		KVM_ISA_EXT_ARR(I),
- 		KVM_ISA_EXT_ARR(M),
- 		KVM_ISA_EXT_ARR(V),
-+		KVM_ISA_EXT_ARR(SDTRIG),
- 		KVM_ISA_EXT_ARR(SMSTATEEN),
- 		KVM_ISA_EXT_ARR(SSAIA),
- 		KVM_ISA_EXT_ARR(SSTC),
-@@ -764,6 +782,11 @@ static __u64 smstateen_regs[] = {
- 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SMSTATEEN,
- };
- 
-+static __u64 sdtrig_regs[] = {
-+	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_SDTRIG | KVM_REG_RISCV_CSR_SDTRIG_REG(scontext),
-+	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SDTRIG,
-+};
++   When the userspace application loads, it should establish a connection
++   to the vduse kernel device. Sometimes,the userspace application exists,
++   and we want to support its restart and connect to the kernel device again
 +
- static __u64 fp_f_regs[] = {
- 	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[0]),
- 	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[1]),
-@@ -853,6 +876,8 @@ static __u64 fp_d_regs[] = {
- 	{"zicboz", .feature = KVM_RISCV_ISA_EXT_ZICBOZ, .regs = zicboz_regs, .regs_n = ARRAY_SIZE(zicboz_regs),}
- #define SUBLIST_AIA \
- 	{"aia", .feature = KVM_RISCV_ISA_EXT_SSAIA, .regs = aia_regs, .regs_n = ARRAY_SIZE(aia_regs),}
-+#define SUBLIST_SDTRIG \
-+	{"sdtrig", .feature = KVM_RISCV_ISA_EXT_SDTRIG, .regs = sdtrig_regs, .regs_n = ARRAY_SIZE(sdtrig_regs),}
- #define SUBLIST_SMSTATEEN \
- 	{"smstateen", .feature = KVM_RISCV_ISA_EXT_SMSTATEEN, .regs = smstateen_regs, .regs_n = ARRAY_SIZE(smstateen_regs),}
- #define SUBLIST_FP_F \
-@@ -930,6 +955,7 @@ KVM_ISA_EXT_SUBLIST_CONFIG(aia, AIA);
- KVM_ISA_EXT_SUBLIST_CONFIG(fp_f, FP_F);
- KVM_ISA_EXT_SUBLIST_CONFIG(fp_d, FP_D);
- KVM_ISA_EXT_SIMPLE_CONFIG(h, H);
-+KVM_ISA_EXT_SUBLIST_CONFIG(sdtrig, SDTRIG);
- KVM_ISA_EXT_SUBLIST_CONFIG(smstateen, SMSTATEEN);
- KVM_ISA_EXT_SIMPLE_CONFIG(sstc, SSTC);
- KVM_ISA_EXT_SIMPLE_CONFIG(svinval, SVINVAL);
-@@ -985,6 +1011,7 @@ struct vcpu_reg_list *vcpu_configs[] = {
- 	&config_fp_f,
- 	&config_fp_d,
- 	&config_h,
-+	&config_sdtrig,
- 	&config_smstateen,
- 	&config_sstc,
- 	&config_svinval,
-
++2. How can I support reconnection in a userspace application?
++
++2.1 During initialization, the userspace application should first verify the
++    existence of the device "/dev/vduse/vduse_name".
++    If it doesn't exist, it means this is the first-time for connection. goto step 2.2
++    If it exists, it means this is a reconnection, and we should goto step 2.3
++
++2.2 Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
++    /dev/vduse/control.
++    When ioctl(VDUSE_CREATE_DEV) is called, kernel allocates memory for
++    the reconnect information. The total memory size is PAGE_SIZE*vq_mumber.
++
++2.3 Check if the information is suitable for reconnect
++    If this is reconnection :
++    Before attempting to reconnect, The userspace application needs to use the
++    ioctl(VDUSE_DEV_GET_CONFIG, VDUSE_DEV_GET_STATUS, VDUSE_DEV_GET_FEATURES...)
++    to get the information from kernel.
++    Please review the information and confirm if it is suitable to reconnect.
++
++2.4 Userspace application needs to mmap the memory to userspace
++    The userspace application requires mapping one page for every vq. These pages
++    should be used to save vq-related information during system running. Additionally,
++    the application must define its own structure to store information for reconnection.
++
++2.5 Completed the initialization and running the application.
++    While the application is running, it is important to store relevant information
++    about reconnections in mapped pages. When calling the ioctl VDUSE_VQ_GET_INFO to
++    get vq information, it's necessary to check whether it's a reconnection. If it is
++    a reconnection, the vq-related information must be get from the mapped pages.
++
++2.6 When the Userspace application exits, it is necessary to unmap all the
++    pages for reconnection
 -- 
-2.43.2
+2.43.0
 
 
