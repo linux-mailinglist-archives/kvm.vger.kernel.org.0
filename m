@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-13109-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13110-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88421892617
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 22:30:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1E0C892618
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 22:30:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DC6C284E21
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 21:30:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D32981C21804
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 21:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B46A13BC00;
-	Fri, 29 Mar 2024 21:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F38113BC02;
+	Fri, 29 Mar 2024 21:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="I0OxUuk5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="49eW2WWB"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2088.outbound.protection.outlook.com [40.107.243.88])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2073.outbound.protection.outlook.com [40.107.102.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC3613B2B8
-	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 21:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D0413792C
+	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 21:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.73
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711747820; cv=fail; b=uJHie/BDHTojfwVCUvfbzBZaXj6EO8K+1nLVOEC0S5Se+ck0QvaNHvxyXcRbAixPi8qrK1yDTGDwg5jLj1NCfURqENvWcjbo4F7j6koF+nTOv1ZYrPJ+PeqtNkaDQFL7cOzmhOx4DFs27eU97gmRDM8uSRYy0UcZGhn402+54jI=
+	t=1711747844; cv=fail; b=YIkjwuNUzzOeRWU1I3zn+uRiXo0UOTNW5Wv4i24y52AR+VJKjh4MCVxYj6ri3mI43ovXaCz7cRcka/61NHzDOsCJiOjRiZ/9RF7xdmi0TxK8RshospfmyhZTbBsD0ZSlfLxtngr8fsw3kUTOaIvHq4QWwfhjqCx/TAZkdw1kAbo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711747820; c=relaxed/simple;
-	bh=gK8DGPzYq88zeYTnm4BLo5RO69l2leggmduUCcWn5ks=;
+	s=arc-20240116; t=1711747844; c=relaxed/simple;
+	bh=XK+D24Mus0Fd07JBujOKIkrDHXMbMMVpD3gupVHk9as=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RQWjE+eotfUOGt43oJgofy75GlXWxXo4J1FqN4K4HBg1GVxJtNvaSO7omwxgfXDq/HFTk+/1EtSZOra5Rc4lfOAC4AxoGKrsnBZx4Si5E2JYOOxcImtu9Ynik1MHcYbk62ewTZIkdIdFLppaMRQ8DTnTZscmVZaGFfQWJtNRAak=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=I0OxUuk5; arc=fail smtp.client-ip=40.107.243.88
+	 MIME-Version:Content-Type; b=XRG1K8LvSKHuPy+pIIjc7uu1l51w0tZp0D7tC4z4too2NPcVKD5pi/+Yh+RbWu3dVUiqiKM7xZWrcnTUVovojDGKCLPAo2Z1HRrnEmUi+79ygyNmmUedP/SItwmhYCVHe8OrZnAfvRT7gNgrejGS/+Jm/zWC362ZD4NkopOvuKo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=49eW2WWB; arc=fail smtp.client-ip=40.107.102.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GIzLPiWYYXRS6jZu1/DLGPxxm8GyY8tgfpRT07QYLlG2lcG1NLZ1qPCecdbUWLcNobuoizOzf0s0fzuHrj4DwuXOYZE2Jv3SdMGVOv6DFD0XEeP0Uiv9Zl1zUT+MqYHmot9Vk3Hs49j3b+IFNrjkbC49CzyqhF1K/o3l+OuQRrgFvkD5fb9oUAUDi68hSGbdeDxTVJIbamsY8m2K0WNkFgTWeIYubs+gGWh/j1OLnTHlmi4um1pObKUpn8Df9re/y2rv8tnpsZRJ8o6tsnPXa/HgmMpvA47KXBSxxAbtlNy+Klejmo5Lp3Qh9faipVdabv4ufWOieCIu94tCMX83Zg==
+ b=GT1g8yvH1XiIyMv3WZzJr0f9OR4m2qNQEHYbpJNU2yS7QR0WxcABB+vft30MgudoqtusO2GADtOaEeK3/EDoaS0HmeKEVElxkdxnL1rT3vLf/6c/pO58VwLbtRhXgu44DCWEMjLzLbICMvKX4aa3LUFtKPEQoICO0Lu6wTz7sHy9aqttyb8HX0DwxcdKHeMURTPFDV26zRDJ7X1Y+MaTnrX+t+HeP+mCT95eGTVFix+i003o3SqYUP1ZrJWely38NM56W949SMYjn4Dg2ybjM/tOPyUhyOKmBmKYh8OQMPXxP8gAMs7/KEav6ltTzvqYmU7fZfH9iYFbZVWpK7hWLg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/lCLdHSXtJkYud82fzvTsYFf0+WNYAHh8Ljl4KMQ/Uk=;
- b=U6cfLNBe5CnuZH+mpB7z/mf4+cMdcAI3MPEG8HX815I4ZXcaHGXLUh4wQKl7acZ9s8/fO/CymAJ5jkJpOH9/5jdJiDw3X5QsTtA3j3LOBOSjBLhKfyxVaB/YbFDb6X4x+aGGhQMVd00tE2G0XU063+g3mer/+TGgxq7rU65o8w4qFAZmHi/7RlhCzcd+ya9QlnRP9jDdRFxdhWRPlYQJea87XRiWmyA7kEOVBkhXNdNQ9iUE+pPk0NuVzSgRBDLkMVwNhEFcX0PM086xFfKdPhoRs3Fz6a7CTxwmxgIvYeGKWbNXAaBgyxE/EaD0H5ZCXaWaICt7ITzI3c6NLyGtMw==
+ bh=SDJ9GNkgsvqUYnrui+dCPye3Ifpx9eOhVld2KHe7Kfg=;
+ b=OhPSblThE+RenDPgf1HcXqsiDoZSm+4u9ni3LITnCRIyrK4j9MfHlIZfFaHF0tVdIrjncJVI3XnZGVWAENmEVPI/BkL0GpEusP95ea/+RiJ1U2t6eZW5PkRSMpnIXYOxfAtmUw49NdnZtX3vOy0gAAf2cRCOiKeO4zwRoBkk0aXeILbTJ5jLGZy8nvNF+UnEijqC1nOmhGGXLDRRFqsM9GgmoM4MFvf2rU2QYsx5dWNUMKPYx+roJtCW/iiOXh2BzLy+jWHUORKxx4mYlKPQlmknIhzwFWtpvllfOhgXd98MZ70NJk1+hovCcV/E5+jvONqwj2M+f/qqtl8OevvyFw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/lCLdHSXtJkYud82fzvTsYFf0+WNYAHh8Ljl4KMQ/Uk=;
- b=I0OxUuk5bx/pL8E8s0m5wNtPqy8K9sfE73Y/Ocr4sxKzEzGq6+Ech6XZ7pyuaiu7aOYceuuARqi5FU/3vXUPLATfUYKEXH6kdqX0iRIPmHHSPFowfkxxsyXpSYI2CxhO9BYl74QieJlTiN+iB1/XvaV0jRQbNyPEydOR5Jbqam8=
-Received: from SJ0PR05CA0003.namprd05.prod.outlook.com (2603:10b6:a03:33b::8)
- by SA3PR12MB8802.namprd12.prod.outlook.com (2603:10b6:806:314::18) with
+ bh=SDJ9GNkgsvqUYnrui+dCPye3Ifpx9eOhVld2KHe7Kfg=;
+ b=49eW2WWBX2d+bcp8GLInaCtH2PP/79KfcBPSjFAWhqUhYnziwuMReilySXJMi63SrZFe/e3aXvaX9W0/wMndJMXOSaRpkPfFdNfyRyL9yVH6ZcUKFNY4Pe++bH8Cki5fvp6jz6I4K1wgi5CVblObyjMCMqafjR4CYTdaaDWa/b4=
+Received: from BY3PR03CA0001.namprd03.prod.outlook.com (2603:10b6:a03:39a::6)
+ by CH3PR12MB8329.namprd12.prod.outlook.com (2603:10b6:610:12e::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 Mar
- 2024 21:30:15 +0000
-Received: from SJ5PEPF000001C8.namprd05.prod.outlook.com
- (2603:10b6:a03:33b:cafe::4) by SJ0PR05CA0003.outlook.office365.com
- (2603:10b6:a03:33b::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.16 via Frontend
- Transport; Fri, 29 Mar 2024 21:30:15 +0000
+ 2024 21:30:40 +0000
+Received: from SJ5PEPF000001C9.namprd05.prod.outlook.com
+ (2603:10b6:a03:39a:cafe::6c) by BY3PR03CA0001.outlook.office365.com
+ (2603:10b6:a03:39a::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Frontend
+ Transport; Fri, 29 Mar 2024 21:30:36 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,23 +63,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001C8.mail.protection.outlook.com (10.167.242.36) with Microsoft
+ SJ5PEPF000001C9.mail.protection.outlook.com (10.167.242.37) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 21:30:15 +0000
+ 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 21:30:36 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 Mar
- 2024 16:30:14 -0500
+ 2024 16:30:35 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, Sean
  Christopherson <seanjc@google.com>, Isaku Yamahata
 	<isaku.yamahata@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>, Binbin
- Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Matthew
- Wilcox <willy@infradead.org>
-Subject: [PATCH gmem 4/6] mm: Introduce AS_INACCESSIBLE for encrypted/confidential memory
-Date: Fri, 29 Mar 2024 16:24:42 -0500
-Message-ID: <20240329212444.395559-5-michael.roth@amd.com>
+ Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH gmem 5/6] KVM: guest_memfd: Use AS_INACCESSIBLE when creating guest_memfd inode
+Date: Fri, 29 Mar 2024 16:24:43 -0500
+Message-ID: <20240329212444.395559-6-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329212444.395559-1-michael.roth@amd.com>
 References: <20240329212444.395559-1-michael.roth@amd.com>
@@ -95,75 +94,64 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C8:EE_|SA3PR12MB8802:EE_
-X-MS-Office365-Filtering-Correlation-Id: efbb0557-2739-4477-af96-08dc50376c9c
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C9:EE_|CH3PR12MB8329:EE_
+X-MS-Office365-Filtering-Correlation-Id: b0fa828f-dd22-4374-38d9-08dc5037791f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	v1zGjQ2zkewG9+btQMndrwTMoEiqcqx4husXYADoETD0zdrS3sHPUPBOhZuuBSk26eEsLFPs6wng57p4gnD8s+bwfVScYMWUDNVWOPwmYQ32YRMeBahwRPcD6wo9dbvmVjmqcm5MKSjLiT3NensqbhtTwS2vyPNGBH3PupZBkK8LZdpVoacuCoH589AsDWAuQcVITlpZ5i/B5vlh/iGoTDMmuaG3iKMQfbNGhGDryjZXaLEqX1KTAHnzvT+d7rfeR1OF8F3bHJXWyCE4hDDtezopcf/eu94mkA9LfmmEz8qtf71e9ig+dc8nohXBJ91ASsLAQZrOenSSN+t2Su5UFDK9vdUTNSB9EM/A/O3RyyazHSl3etkPIW5Ge6ooy/GdbIF3toSgFdnuxNKVYHeFRb+DLhWpNdPxhcnLM0I8rEbWbaMjon9paYZqIBG30ezU6hIY5EuLulypQOYGzFPvldm/qLPLwNl3duTXlY/vwFkVaE6Dmbzs93brGA9B9ZZNmgaq67Lta98r9GtD3AjjMOXi0fiLGCzqousXqgS7fz0q6H5VpIoIMcslxz03GHikd3BFqPGYwDbVijynMKYGw2rJ2hBd/MAz/ECnVb7ZDhxiXgxkxj+SA+LkihVPQwbaUAxrhAEsvtX6/uRAtaV769g+vwF8D0EWHDz12VTdmz1s9pwVHoHQkMp9FbFsPGaR/D1UFVUgSX1vhBGbymfSGg==
+	1Ah85ZJzdT1MmfwJUT1oLJ/mt5e06IV2F58zgUgMHG23CNVKp3VkSiuqNB6UfYaF4BEAE/r8jioyKjBpqnoQzYmBtQrMmSG4/60Bjb5x6+SUby31c2/TwWanex8taFGN/2hx0b+u9o6/Z6mlmd5EhXbtvU7EoQrhw46NTANnUDA4wdsIIBjruwWGLWuZmR0cLtW1bcrpKCoGhjjr6bPj2Z9SAzjn+FIa+VgaZdF6G0TO0sVRsE9kcOMFCHG0T476tXu5Ev5FSyiyaN/QY3k9Z2l918fdSepmREEqsIboP3BtrVtfsFxU9YRwaU8rWioBaa/teG5K6RmyT9CcfUzHOEMaRuqFpN64a05/ooAmXGZus86jbBNsN1Cr84GJpDcNQHsICgd19QcVgiZFrJo8+0aAm6HREvEJ06TtfeKRhuKpTxT77gE90sBhdCQ9Pau8V1D0SQodZnvsyOrQyLADSoxuooCwaj7Ras5kidhixfpqV/+F0dNuP5Zg0e5pN4HoM7L9/uRMEak1PYe0tXP2eINgP211TCnxK3KcNToC5NHJ9eJ8D8V+71y3LulvnmokXllkot8aSygikf1WG+tLJxrE42SSYM7Fbyo93G4oucvCL47Gr9zv4aNDUnw/x84yF555AIUjV4ZIZFGvz+JPtFm5s0Z3Tz/xK5uYrfIZA0i7ecFHzwamf5/g9M6Nss7HOIuhxn16Q4dydFvmDltcPw==
 X-Forefront-Antispam-Report:
 	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(82310400014)(1800799015);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 21:30:15.3992
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 21:30:36.4030
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: efbb0557-2739-4477-af96-08dc50376c9c
+X-MS-Exchange-CrossTenant-Network-Message-Id: b0fa828f-dd22-4374-38d9-08dc5037791f
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001C8.namprd05.prod.outlook.com
+	SJ5PEPF000001C9.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8802
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8329
 
-filemap users like guest_memfd may use page cache pages to
-allocate/manage memory that is only intended to be accessed by guests
-via hardware protections like encryption. Writes to memory of this sort
-in common paths like truncation may cause unexpected behavior such
-writing garbage instead of zeros when attempting to zero pages, or
-worse, triggering hardware protections that are considered fatal as far
-as the kernel is concerned.
+truncate_inode_pages_range() may attempt to zero pages before truncating
+them, and this will occur before arch-specific invalidations can be
+triggered via .invalidate_folio/.free_folio hooks via kvm_gmem_aops. For
+AMD SEV-SNP this would result in an RMP #PF being generated by the
+hardware, which is currently treated as fatal (and even if specifically
+allowed for, would not result in anything other than garbage being
+written to guest pages due to encryption). On Intel TDX this would also
+result in undesirable behavior.
 
-Introduce a new address_space flag, AS_INACCESSIBLE, and use this
-initially to prevent zero'ing of pages during truncation, with the
-understanding that it is up to the owner of the mapping to handle this
-specially if needed.
+Set the AS_INACCESSIBLE flag to prevent the MM from attempting
+unexpected accesses of this sort during operations like truncation.
+
+This may also in some cases yield a decent performance improvement for
+guest_memfd userspace implementations that hole-punch ranges immediately
+after private->shared conversions via KVM_SET_MEMORY_ATTRIBUTES, since
+the current implementation of truncate_inode_pages_range() always ends
+up zero'ing an entire 4K range if it is backing by a 2M folio.
 
 Link: https://lore.kernel.org/lkml/ZR9LYhpxTaTk6PJX@google.com/
-Cc: Matthew Wilcox <willy@infradead.org>
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- include/linux/pagemap.h | 1 +
- mm/truncate.c           | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ virt/kvm/guest_memfd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index e8ac0b32f84d..a7c3f43d1d22 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -207,6 +207,7 @@ enum mapping_flags {
- 	AS_STABLE_WRITES,	/* must wait for writeback before modifying
- 				   folio contents */
- 	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
-+	AS_INACCESSIBLE,	/* Do not attempt direct R/W access to the mapping */
- };
- 
- /**
-diff --git a/mm/truncate.c b/mm/truncate.c
-index 725b150e47ac..c501338c7ebd 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -233,7 +233,8 @@ bool truncate_inode_partial_folio(struct folio *folio, loff_t start, loff_t end)
- 	 * doing a complex calculation here, and then doing the zeroing
- 	 * anyway if the page split fails.
- 	 */
--	folio_zero_range(folio, offset, length);
-+	if (!(folio->mapping->flags & AS_INACCESSIBLE))
-+		folio_zero_range(folio, offset, length);
- 
- 	if (folio_has_private(folio))
- 		folio_invalidate(folio, offset, length);
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 4ce0056d1149..3668a5f1d82b 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -428,6 +428,7 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ 	inode->i_private = (void *)(unsigned long)flags;
+ 	inode->i_op = &kvm_gmem_iops;
+ 	inode->i_mapping->a_ops = &kvm_gmem_aops;
++	inode->i_mapping->flags |= AS_INACCESSIBLE;
+ 	inode->i_mode |= S_IFREG;
+ 	inode->i_size = size;
+ 	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
 -- 
 2.25.1
 
