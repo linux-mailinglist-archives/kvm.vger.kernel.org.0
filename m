@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-13226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13247-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122288934D0
-	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 19:14:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00E96893512
+	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 19:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27AB91C23E16
-	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 17:14:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A64A528CAC9
+	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 17:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA6316D316;
-	Sun, 31 Mar 2024 16:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4A514D6EA;
+	Sun, 31 Mar 2024 16:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="q9r7dIZC"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ZP/7DMTG"
 X-Original-To: kvm@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E2816D4CE;
-	Sun, 31 Mar 2024 16:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6762816F91D;
+	Sun, 31 Mar 2024 16:47:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711903583; cv=fail; b=Oz4l/AD2b2l9TjmU1Evo9WnTZd6Gzno1ZcdrpZhn6VtX6a+RogukkqdimTZHPCnh4RxLi3NTiEbATnTxF+p+xwl+Grdx2h/ZsqwtZ/68DLXaSvNQjiwTIUSxoWeuz3xT/wfmicl5Bq3rYZBOljwyP9XuIu+Xtbx1nMO5wlgbi/I=
+	t=1711903653; cv=fail; b=cbs7Ov4Zs6wAJGIOEf52cxS73dsmEFUlQlt3z1s5IBbdBLpXQIe/peZNQCcouTA+5/CoITylCroLctvRE8eHP7lYFbfpZwAxvVeuRP8zC/Ne1ipzNqgBm2bFJQVkybVSfRXUuFGWlD6A0Fls1VdBAQm/DEnMLK+WQPpATov2IqQ=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711903583; c=relaxed/simple;
-	bh=szS4npT6jtaCxmPKhqq/c0JnOD82MDpgeVFEycWV5YM=;
+	s=arc-20240116; t=1711903653; c=relaxed/simple;
+	bh=MgaLjQ/x5PlwV7lmlvb+D4K+1qFZkfJj7vQady8Oci4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nQPyjx7MooQ42olmWmKEH9biDUO4Ji+vgOXNcQMHVUqNAwV5+MwumnQmBL2MHNYx0tg8Fk1he+Hln9r4gkkU9owflYY6xE31Y6tVStiYHJ005i2UF2+9WNDczuhjoRZi9xvuB7wg2Kx5wxPE3te+NImSHgVwi9VbaS0HuIrEvOY=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=q9r7dIZC reason="signature verification failed"; arc=fail smtp.client-ip=40.107.212.79; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=YsZWt/uWzux+pdXzuTzkrQW52INVNI2Pc9nWFimBiec5fb8/pOrSOUWsnSHmUr6gGkSNWmSGyuLZZejkLwqT6M+rnZ8haSAwBF4fG1GG5rT2qWT9tQTOa3tMQKm7XISvdxNpEX9sDjG2XrZxFu15LnSDWpFQFVvglu9s0F0LIlg=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ZP/7DMTG reason="signature verification failed"; arc=fail smtp.client-ip=40.107.236.40; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 4C3C82084A;
-	Sun, 31 Mar 2024 18:46:18 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 37CE220754;
+	Sun, 31 Mar 2024 18:47:27 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oMhpr9twxCJU; Sun, 31 Mar 2024 18:46:15 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	with ESMTP id MmzESzuzFWdA; Sun, 31 Mar 2024 18:47:24 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 21B15208DE;
-	Sun, 31 Mar 2024 18:46:13 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 21B15208DE
+	by a.mx.secunet.com (Postfix) with ESMTPS id 256EA2083F;
+	Sun, 31 Mar 2024 18:47:16 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 256EA2083F
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 7EB8280004E;
+	by mailout2.secunet.com (Postfix) with ESMTP id 5359C800050;
 	Sun, 31 Mar 2024 18:40:15 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
@@ -53,47 +53,49 @@ Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  15.1.2507.35; Sun, 31 Mar 2024 18:40:15 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
  15.1.2507.17; Sun, 31 Mar 2024 16:36:17 +0000
-X-sender: <kvm+bounces-13112-martin.weber=secunet.com@vger.kernel.org>
+X-sender: <kvm+bounces-13113-martin.weber=secunet.com@vger.kernel.org>
 X-Receiver: <martin.weber@secunet.com> ORCPT=rfc822;martin.weber@secunet.com
  NOTIFY=NEVER;
- X-ExtendedProps=BQBYABcARgAAAJuYHy0vkvxLoOu7fW2WcxdDTj1XZWJlciBNYXJ0aW4sT1U9VXNlcnMsT1U9TWlncmF0aW9uLERDPXNlY3VuZXQsREM9ZGUFAGwAAgAABQAMAAIAAA8ANgAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5EaXNwbGF5TmFtZQ8ADQAAAFdlYmVyLCBNYXJ0aW4FADwAAgAABQAdAA8ADAAAAG1ieC1lc3Nlbi0wMQUADgARAEAJ/dJgSQNPjrUVnMO/4HsFAAsAFwC+AAAAsylSdUnj6k+wvjsUej6W+0NOPURCMixDTj1EYXRhYmFzZXMsQ049RXhjaGFuZ2UgQWRtaW5pc3RyYXRpdmUgR3JvdXAgKEZZRElCT0hGMjNTUERMVCksQ049QWRtaW5pc3RyYXRpdmUgR3JvdXBzLENOPXNlY3VuZXQsQ049TWljcm9zb2Z0IEV4Y2hhbmdlLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAEgAPAF4AAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249V2ViZXIgTWFydGluOTU1BQBHAAIAAAUARgAHAAMAAAAFAEMAAgAABQAWAAIAAAUAagAJAAEAAAAAAAAABQAUABEAm5gfLS+S/Eug67t9bZZzFwUAFQAWAAIAAAAPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAIwACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8AL
-	wAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAmAAIAAQ==
+ X-ExtendedProps=BQAVABYAAgAAAAUAFAARAJuYHy0vkvxLoOu7fW2WcxcPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAF4AAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249V2ViZXIgTWFydGluOTU1BQALABcAvgAAALMpUnVJ4+pPsL47FHo+lvtDTj1EQjIsQ049RGF0YWJhc2VzLENOPUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpLENOPUFkbWluaXN0cmF0aXZlIEdyb3VwcyxDTj1zZWN1bmV0LENOPU1pY3Jvc29mdCBFeGNoYW5nZSxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPXNlY3VuZXQsREM9ZGUFAA4AEQBACf3SYEkDT461FZzDv+B7BQAdAA8ADAAAAG1ieC1lc3Nlbi0wMQUAPAACAAAPADYAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0Lk1haWxSZWNpcGllbnQuRGlzcGxheU5hbWUPAA0AAABXZWJlciwgTWFydGluBQAMAAIAAAUAbAACAAAFAFgAFwBGAAAAm5gfLS+S/Eug67t9bZZzF0NOPVdlYmVyIE1hcnRpbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8AL
+	wAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
-X-HeloDomain: a.mx.secunet.com
-X-ExtendedProps: BQBjAAoAWUmmlidQ3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAGAAAAG1hcnRpbi53ZWJlckBzZWN1bmV0LmNvbQUABgACAAEPACoAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LlJlc3VibWl0Q291bnQHAAEAAAAPAAkAAABDSUF1ZGl0ZWQCAAEFAAIABwABAAAABQADAAcAAAAAAAUABQACAAEFAGIACgB5AAAAzYoAAAUAZAAPAAMAAABIdWIFACkAAgAB
+X-HeloDomain: b.mx.secunet.com
+X-ExtendedProps: BQBjAAoAWUmmlidQ3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAGAAAAG1hcnRpbi53ZWJlckBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQACAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBiAAoAfgAAAM2KAAAFAGQADwADAAAASHVi
 X-Source: SMTP:Default MBX-ESSEN-02
-X-SourceIPAddress: 62.96.220.36
-X-EndOfInjectedXHeaders: 26372
+X-SourceIPAddress: 62.96.220.37
+X-EndOfInjectedXHeaders: 33107
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.80.249; helo=am.mirrors.kernel.org; envelope-from=kvm+bounces-13112-martin.weber=secunet.com@vger.kernel.org; receiver=martin.weber@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 43159208AC
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.199.223; helo=ny.mirrors.kernel.org; envelope-from=kvm+bounces-13113-martin.weber=secunet.com@vger.kernel.org; receiver=martin.weber@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 075B02032C
+Authentication-Results: b.mx.secunet.com;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ZP/7DMTG"
 X-Original-To: kvm@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.79
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
 ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711753153; cv=fail; b=BYbUnnfXmxEtv1PkrIHV+7kzVO0y3a1Ye+F4TRsm29EL0omYnNLvNDSQwPMrK6Z80fnDzyU2l8EfE3Fm6gpXmT0qiFAbN87V7eOZwJzuqVAJ70gFqLeQEMXZ56g8tSRZScOkyyPbWGrEyHg/1rRmBrm3pQuOvLWGoHZ3WptkQF8=
+	t=1711753171; cv=fail; b=jcayv/9uC4T8P77oFK+iKjXiPda/yTMegLjI59U/clJBPkoiIJ8ErPpZ2PlVQhoCTfRelgXTfdoP81/auei39z7Cd+/bYhHK1kWn9a7Bvok5bTqu5bHX6Oh9HXIEAG/I1mo5CmXHqmq8CJD8B6FuQfwggWQv2BLlvWl7lGpJl/c=
 ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711753153; c=relaxed/simple;
-	bh=32N0Xx4fpPiGgE4gdCbkfdfNikRkU8p14GCc9880qic=;
+	s=arc-20240116; t=1711753171; c=relaxed/simple;
+	bh=5c8zhDfcMbpsXLVQsZOnYPgv5aHR2rf5q1ILo5PbHMc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X6h1fEpizL+9h9BpHNiFVub3+3P5w3JD0lfdk8PZptPGziwiP5AnrmvxqeGRjE4W5Le1zkKGCVue4EUqS+y04Y+rXUZSUK9J9lyDqkdMCJHY1wU1Byy/7PBF40xIkza8bvGO9bcWbA8C/FJ2d55TKdQO+/guAX1pBzwbXtegNUk=
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=q9r7dIZC; arc=fail smtp.client-ip=40.107.212.79
+	 MIME-Version:Content-Type; b=Os3eu02qBp9/vs/KmBhy0MByeKMmof1Cz6+cmle3GZn2HF2mjuOHlQxn88FJPntD1wD3KvaU3RnDv3A9zndXKrH0+tFsRL9gUg8bKaQoUHSLW9u5+sS3GG9GM14Ye0v2tQwbx9QP/AAJjn0ixq30DIYE8a+1Zs6zma9Q7Yslmbs=
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ZP/7DMTG; arc=fail smtp.client-ip=40.107.236.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CA9+EpoNiZ9ayMmuF+uTwSeBjPBlCFrkeWODbOoFlUQYPDABUEHwtqo28a8PW/imB4XHrnE6Mt7E6/eCJocLwL2ciZisEmC7AJ22GL9xbPbPArTsRqEhdNCCbYLP8qWdMy7FpFKDiSu99P3EtkWJOVuZR6wJ1zXPkVsxJAHxQ1NZ77Qa85K/ObPQ8AXhBmWwf+YD98Gd+ZIg+6gXsRxooicVQa7Y3DkW94F4Dp2asJhZho3IOy1uRIKUanolI+9CLEqcJE1wd8Pj9ElUfYP1G1okbc8A1YOlkTe5b9ULGwMufalRk2pkDIBD7XR36PUU/mnLms1Qwwj+VM+0nGkajg==
+ b=a+RJHf/rVZH530XT1GCJWPwJ6Mpc1hKrcQvYd4xL54lLlm+ytsJmysKthG2vCa7fCEw8QUSV/HKIe5jFMCkHOeRvUw/7+pN3VsWTxZBOw4PlFqBlrXYiTuXB/4wrqxVKhAzhd+t1QS506zNTd5y0Cxu+NJgrOgizSjsM6VQMZH2sMSKLGTBt9M4kkFoy9FMLN1nINWolJ6fhtFXgOKJr0UpIf9xsGnln6A+V3apqvIG2W/EDB2VaA9d1jPe/7fPbOVSKSJOegSLtF11EvPOlwvwjald09QeoJHYDsST+dXS0IE+zgnR/GlQAfIg/IfoSDFINh5htMZ3UDkg9ssVd9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=85xfxLH74OdKCMM2bG4Ka/efKmeDa+urj4S6khYBEhI=;
- b=XUVPXyEnaWzdYWoJNkvqerhl6Svq2T8m2knayzG2+AeIbpHftkICKGYxj3BhyGshE2fO6TH9GpjHVrVPkK/+CpJ64AIdKw86jsY6ZbM8HQwf8klvQ5RxPozzGqx8MCi//iIwzzm3KPNqhj3Ww+jF4+8AE9bU9otOpkMOebIPanjg1MidwxVrLnfjkq7hfRkk/I+aj940z2p1XCAH17I0WNoHu8EhR4AyoCVtX/44RDF24bsnopzDbUsoOPAjhJ/fk/qtp+XVd5ANyraXcDOdxzpXNzWDFF6h5vNh9oBEnYh/p27lBZGuXOhT4rZfFcCDSYu2vULKOAr2b0ovUb+ebg==
+ bh=g4F0v4TXhVkzuRwLgbfEWUQkfmsL+Uf1rI69FDB8x/8=;
+ b=TuqSH36JyOXmYccLiUXWdFEih5He/146zy7PY2/vd0g6VC/PTWaQFiHts+uuRyJcYKnTRWf5+UtbofHWWFYZ5O11xxJvCkGBNuMF20+G7x/HYtz3/W0Djy2WtYCsNU4892Bzp72PRz4MMl/IlwWbmbDSddD97KPirj9rKQ4SL4PyskhEalF9gp+b8JyZzdJwUWS65A/DUikIgoAImTNHuL83Qo1onV/Ag8TxdPXhlLiD9knQ61afh+kEMZesJL3c/ZkDtJ41VGGBndZa3ntrzJqc+jZ79GZ8sPg3HcmRjoH5eKw0+iHfEdbRxal2pS+if8CN1RNOAAOOhiOXfwwgqg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=85xfxLH74OdKCMM2bG4Ka/efKmeDa+urj4S6khYBEhI=;
- b=q9r7dIZCmGAMsb5Qf5qevjsO+u2qguOTQwgvMMQeTMWFxL30f5651Ih1rIv4M6gqyWlZAEDGO0VJA6/trmWh7JWA1JQmddseBxmacNU4bozvpuXx54+2xHpPUF3BfBuyIDYp3RuPMt3lUtS6+dQfKoYUuLkX31Den1QT9hFH4FA=
+ bh=g4F0v4TXhVkzuRwLgbfEWUQkfmsL+Uf1rI69FDB8x/8=;
+ b=ZP/7DMTGJLB9Yii5sXMLLSiTJTEwT+kEdYoYzl0aGj81F+Dh5bNz2ZpxpgG6OKG/7RH7DifdvlDGg5ioSSL4KWF/dfpgDwucUIToufxWW7twWOS3RzAqReBBqpa83c9GfG8/jtbTIfxTgGCX4d2X78viqbON2UTpouGMWD1B19A=
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -117,9 +119,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
 	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
 	<brijesh.singh@amd.com>
-Subject: [PATCH v12 09/29] KVM: SEV: Add initial SEV-SNP support
-Date: Fri, 29 Mar 2024 17:58:15 -0500
-Message-ID: <20240329225835.400662-10-michael.roth@amd.com>
+Subject: [PATCH v12 10/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command
+Date: Fri, 29 Mar 2024 17:58:16 -0500
+Message-ID: <20240329225835.400662-11-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
@@ -136,823 +138,405 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC4:EE_|SN7PR12MB6861:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a450cd9-fdcd-4e47-ed16-08dc5043d334
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDF:EE_|PH8PR12MB6721:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9179cff-2565-428c-c1f4-08dc5043e056
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nsYawN22RK6vpJl8VU3uLdBNz2wKwfigLe9u15MYJjT0NXQV3Yzjn6a1OjYj4LPzeDO8cf52t0bld23f73IhgDjhPepqbc7IwHTzPhZ/pO0fb1Dc4F6dPKSdnsPrwbyyhJI21uoEBXlb9DpAIEIBOyVjZmH+wtq/OnN34HGIHNnAASx0iEdmOS44o1oEugf+lFgXmiA6AQWu+IikoKRj2YItSH3Txq0G7BC/TRGiWq2KqdmgFh+n5Hsot5lhcjxEP+iWzkso8UiBcRHFE8Sju6gjTCdVv1uIDSSjI3OvUAubuGZeTloeeL4ALMLAdXglcVDTAeML83k7xVUpdU2UJQx0wb/97jBfBau1zhrRC78B3NehLm2mU8sjwnExhuP/MfHsbmuX5VvLn2CPH9T81lSMjdxVYlZI/ytN2lzlTQ6vcxI+8hSPG9PpG923elprnKSAI7fsLuCaIOF+SPmZqnI+RcAfIX4fms89ZDSC6lffhLHDFAraZ3I86fN9ZemKTUgctwPvboQCfEG3mDxYzLPPQYhchCxYb1wWaG8jFR5sFSVsrE7JQ/SDBGTYpRHKn9KLxD3rVWSX7nTCof7mJAPHXd2W0DPkpcx9TiDMdcZ4+2WH9Ez1YUqwMRjAYVmxwirJl9RK3NI4in6GXQmovhcw4JB7RQikwOS3iiudBKTtfKGD6mR80tiSkJb9G8Bw9pvoQHQlT6bQl8BXfRTgx5cMzVuv0ny3ytgj4cr3PKrxvNDbOm6IUcK3cMc8E9Ls
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(7416005)(376005)(36860700004);DIR:OUT;SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:59:01.5166
+X-Microsoft-Antispam-Message-Info: N0Q/ob1ES6c3vUyxIlbqNB1kiL8OchYZphqdYFkdXJpTeOncGhrxGWgpCPK3lwltWnf6Oi2ReoR2DcLJUy+jBMH9sC0SYt3rWAAol+BcQ7Jhf2NEHsziRkhN1DSQ1Dl+zorUbf0dQl9qJSO9/jFwPuJ53q/yhLZAN9Cx5sipS9ZxyPaBmuhSScBnshrZnTUScfBuq6KXgc6hm+a8ba6nC9pw5J/u1BKP6Vi7t4jpT5Pnrv/GYBHQRJ++N5tWPHBFMHwONq3UGpHOQEjboXryDCoBsahNlrjw8O9Fhx5u9dfruz5kBDa1M7EXOTC2FRiK0McBIhsrbp/pu/h9xbfiNz/rYkbHHj6+pt2BbW/e0yQzyRRO4fCGwMUyryyv3wV1Y0/CGDHJMwcf/+KEwK5sfbvJzkNIPB9BWrvh+J7FBHoLiD1sPPbJM+EwI0hSU/J85LJsGzpGDcmTvkASBALQkAriYslf9x8KopxE/h1aHB3jxThDLZZoruvoTKonOZ/K17BI//ZZac0gITuyIqitRIiWcYTmxozfE5O94AO0yXbmGkXAN656jwxiw59sppRQWWHK/lxH3E0mDKpu7nZ+dUOb1PO3cTy/3nw0Wn7hTGUEBVAtgazKKPxEh3iUp6pU1stIxfRcV6vWBay3UcQ1YVZiEBjzohCsXR2NabzELLKGFdknfV/2XZZHzZk/eUNmjdRmQOIMz6qCBgJr4CsQww==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230031)(7416005)(36860700004)(82310400014)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:59:23.5330
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a450cd9-fdcd-4e47-ed16-08dc5043d334
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9179cff-2565-428c-c1f4-08dc5043e056
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000FCC4.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PEPF00001CDF.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6861
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6721
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-SEV-SNP builds upon existing SEV and SEV-ES functionality while adding
-new hardware-based security protection. SEV-SNP adds strong memory
-encryption and integrity protection to help prevent malicious
-hypervisor-based attacks such as data replay, memory re-mapping, and
-more, to create an isolated execution environment.
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-Define a new KVM_X86_SNP_VM type which makes use of these capabilities
-and extend the KVM_SEV_INIT2 ioctl to support it. Also add a basic
-helper to check whether SNP is enabled.
+KVM_SEV_SNP_LAUNCH_START begins the launch process for an SEV-SNP guest.
+The command initializes a cryptographic digest context used to construct
+the measurement of the guest. Other commands can then at that point be
+used to load/encrypt data into the guest's initial launch image.
+
+For more information see the SEV-SNP specification.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: commit fixups, use similar ASID reporting as with SEV/SEV-ES]
+[mdr: hold sev_deactivate_lock when calling SEV_CMD_SNP_DECOMMISSION]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/include/asm/svm.h      |  3 ++-
- arch/x86/include/uapi/asm/kvm.h |  1 +
- arch/x86/kvm/svm/sev.c          | 21 ++++++++++++++++++++-
- arch/x86/kvm/svm/svm.c          |  3 ++-
- arch/x86/kvm/svm/svm.h          | 12 ++++++++++++
- arch/x86/kvm/x86.c              |  2 +-
- 6 files changed, 38 insertions(+), 4 deletions(-)
+ .../virt/kvm/x86/amd-memory-encryption.rst    |  23 ++-
+ arch/x86/include/uapi/asm/kvm.h               |   8 +
+ arch/x86/kvm/svm/sev.c                        | 152 +++++++++++++++++-
+ arch/x86/kvm/svm/svm.h                        |   1 +
+ 4 files changed, 180 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 728c98175b9c..544a43c1cf11 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -285,7 +285,8 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_M=
-AX_INDEX_MASK) =3D=3D X2AVIC_
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documen=
+tation/virt/kvm/x86/amd-memory-encryption.rst
+index f7c007d34114..a10b817c162d 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -459,6 +459,25 @@ issued by the hypervisor to make the guest ready for e=
+xecution.
 =20
- #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
+ Returns: 0 on success, -negative on error
 =20
--#define SVM_SEV_FEAT_DEBUG_SWAP                        BIT(5)
-+#define SVM_SEV_FEAT_SNP_ACTIVE				BIT(0)
-+#define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
++18. KVM_SEV_SNP_LAUNCH_START
++----------------------------
++
++The KVM_SNP_LAUNCH_START command is used for creating the memory encryptio=
+n
++context for the SEV-SNP guest.
++
++Parameters (in): struct  kvm_sev_snp_launch_start
++
++Returns: 0 on success, -negative on error
++
++::
++
++        struct kvm_sev_snp_launch_start {
++                __u64 policy;           /* Guest policy to use. */
++                __u8 gosvw[16];         /* Guest OS visible workarounds. *=
+/
++        };
++
++See the SEV-SNP spec [snp-fw-abi]_ for further detail on the launch input.
++
+ Device attribute API
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 =20
- struct vmcb_seg {
- 	u16 selector;
+@@ -490,9 +509,11 @@ References
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=20
+=20
+-See [white-paper]_, [api-spec]_, [amd-apm]_ and [kvm-forum]_ for more info=
+.
++See [white-paper]_, [api-spec]_, [amd-apm]_, [kvm-forum]_, and [snp-fw-abi=
+]_
++for more info.
+=20
+ .. [white-paper] https://developer.amd.com/wordpress/media/2013/12/AMD_Mem=
+ory_Encryption_Whitepaper_v7-Public.pdf
+ .. [api-spec] https://support.amd.com/TechDocs/55766_SEV-KM_API_Specificat=
+ion.pdf
+ .. [amd-apm] https://support.amd.com/TechDocs/24593.pdf (section 15.34)
+ .. [kvm-forum]  https://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendac=
+ky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
++.. [snp-fw-abi] https://www.amd.com/system/files/TechDocs/56860.pdf
 diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
 m.h
-index 51b13080ed4b..725b75cfe9ff 100644
+index 725b75cfe9ff..350ddd5264ea 100644
 --- a/arch/x86/include/uapi/asm/kvm.h
 +++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -868,5 +868,6 @@ struct kvm_hyperv_eventfd {
- #define KVM_X86_SW_PROTECTED_VM	1
- #define KVM_X86_SEV_VM		2
- #define KVM_X86_SEV_ES_VM	3
-+#define KVM_X86_SNP_VM		4
+@@ -693,6 +693,9 @@ enum sev_cmd_id {
+ 	/* Second time is the charm; improved versions of the above ioctls.  */
+ 	KVM_SEV_INIT2,
 =20
- #endif /* _ASM_X86_KVM_H */
++	/* SNP-specific commands */
++	KVM_SEV_SNP_LAUNCH_START,
++
+ 	KVM_SEV_NR_MAX,
+ };
+=20
+@@ -818,6 +821,11 @@ struct kvm_sev_receive_update_data {
+ 	__u32 pad2;
+ };
+=20
++struct kvm_sev_snp_launch_start {
++	__u64 policy;
++	__u8 gosvw[16];
++};
++
+ #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+ #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+=20
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1e65f5634ad3..3d9771163562 100644
+index 3d9771163562..6c7c77e33e62 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -46,6 +46,9 @@ module_param_named(sev, sev_enabled, bool, 0444);
- static bool sev_es_enabled =3D true;
- module_param_named(sev_es, sev_es_enabled, bool, 0444);
+@@ -25,6 +25,7 @@
+ #include <asm/fpu/xcr.h>
+ #include <asm/fpu/xstate.h>
+ #include <asm/debugreg.h>
++#include <asm/sev.h>
 =20
-+/* enable/disable SEV-SNP support */
-+static bool sev_snp_enabled;
-+
- /* enable/disable SEV-ES DebugSwap support */
- static bool sev_es_debug_swap_enabled =3D true;
- module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
-@@ -275,6 +278,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm=
-_sev_cmd *argp,
- 	sev->es_active =3D es_active;
- 	sev->vmsa_features =3D data->vmsa_features;
+ #include "mmu.h"
+ #include "x86.h"
+@@ -58,6 +59,10 @@ static u64 sev_supported_vmsa_features;
+ #define AP_RESET_HOLD_NAE_EVENT		1
+ #define AP_RESET_HOLD_MSR_PROTO		2
 =20
-+	if (vm_type =3D=3D KVM_X86_SNP_VM)
-+		sev->vmsa_features |=3D SVM_SEV_FEAT_SNP_ACTIVE;
++/* As defined by SEV-SNP Firmware ABI, under "Guest Policy". */
++#define SNP_POLICY_MASK_SMT		BIT_ULL(16)
++#define SNP_POLICY_MASK_SINGLE_SOCKET	BIT_ULL(20)
 +
- 	ret =3D sev_asid_new(sev);
+ static u8 sev_enc_bit;
+ static DECLARE_RWSEM(sev_deactivate_lock);
+ static DEFINE_MUTEX(sev_bitmap_lock);
+@@ -68,6 +73,8 @@ static unsigned int nr_asids;
+ static unsigned long *sev_asid_bitmap;
+ static unsigned long *sev_reclaim_asid_bitmap;
+=20
++static int snp_decommission_context(struct kvm *kvm);
++
+ struct enc_region {
+ 	struct list_head list;
+ 	unsigned long npages;
+@@ -94,12 +101,17 @@ static int sev_flush_asids(unsigned int min_asid, unsi=
+gned int max_asid)
+ 	down_write(&sev_deactivate_lock);
+=20
+ 	wbinvd_on_all_cpus();
+-	ret =3D sev_guest_df_flush(&error);
++
++	if (sev_snp_enabled)
++		ret =3D sev_do_cmd(SEV_CMD_SNP_DF_FLUSH, NULL, &error);
++	else
++		ret =3D sev_guest_df_flush(&error);
+=20
+ 	up_write(&sev_deactivate_lock);
+=20
  	if (ret)
- 		goto e_no_asid;
-@@ -326,7 +332,8 @@ static int sev_guest_init2(struct kvm *kvm, struct kvm_=
-sev_cmd *argp)
- 		return -EINVAL;
+-		pr_err("SEV: DF_FLUSH failed, ret=3D%d, error=3D%#x\n", ret, error);
++		pr_err("SEV%s: DF_FLUSH failed, ret=3D%d, error=3D%#x\n",
++		       sev_snp_enabled ? "-SNP" : "", ret, error);
 =20
- 	if (kvm->arch.vm_type !=3D KVM_X86_SEV_VM &&
--	    kvm->arch.vm_type !=3D KVM_X86_SEV_ES_VM)
-+	    kvm->arch.vm_type !=3D KVM_X86_SEV_ES_VM &&
-+	    kvm->arch.vm_type !=3D KVM_X86_SNP_VM)
- 		return -EINVAL;
-=20
- 	if (copy_from_user(&data, u64_to_user_ptr(argp->data), sizeof(data)))
-@@ -2297,11 +2304,16 @@ void __init sev_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
- 		kvm_caps.supported_vm_types |=3D BIT(KVM_X86_SEV_ES_VM);
+ 	return ret;
+ }
+@@ -1967,6 +1979,102 @@ int sev_dev_get_attr(u64 attr, u64 *val)
  	}
-+	if (sev_snp_enabled) {
-+		kvm_cpu_cap_set(X86_FEATURE_SEV_SNP);
-+		kvm_caps.supported_vm_types |=3D BIT(KVM_X86_SNP_VM);
-+	}
  }
 =20
- void __init sev_hardware_setup(void)
- {
- 	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
-+	bool sev_snp_supported =3D false;
- 	bool sev_es_supported =3D false;
- 	bool sev_supported =3D false;
-=20
-@@ -2382,6 +2394,7 @@ void __init sev_hardware_setup(void)
- 	sev_es_asid_count =3D min_sev_asid - 1;
- 	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))=
-;
- 	sev_es_supported =3D true;
-+	sev_snp_supported =3D sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV=
-_SNP);
-=20
- out:
- 	if (boot_cpu_has(X86_FEATURE_SEV))
-@@ -2394,9 +2407,15 @@ void __init sev_hardware_setup(void)
- 		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
- 			sev_es_supported ? "enabled" : "disabled",
- 			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
-+	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
-+		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
-+			sev_snp_supported ? "enabled" : "disabled",
-+			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
-=20
- 	sev_enabled =3D sev_supported;
- 	sev_es_enabled =3D sev_es_supported;
-+	sev_snp_enabled =3D sev_snp_supported;
-+
- 	if (!sev_es_enabled || !cpu_feature_enabled(X86_FEATURE_DEBUG_SWAP) ||
- 	    !cpu_feature_enabled(X86_FEATURE_NO_NESTED_DATA_BP))
- 		sev_es_debug_swap_enabled =3D false;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0f3b59da0d4a..2c162f6a1d78 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4890,7 +4890,8 @@ static int svm_vm_init(struct kvm *kvm)
-=20
- 	if (type !=3D KVM_X86_DEFAULT_VM &&
- 	    type !=3D KVM_X86_SW_PROTECTED_VM) {
--		kvm->arch.has_protected_state =3D (type =3D=3D KVM_X86_SEV_ES_VM);
-+		kvm->arch.has_protected_state =3D
-+			(type =3D=3D KVM_X86_SEV_ES_VM || type =3D=3D KVM_X86_SNP_VM);
- 		to_kvm_sev_info(kvm)->need_init =3D true;
- 	}
-=20
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 157eb3f65269..4a01a81dd9b9 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -348,6 +348,18 @@ static __always_inline bool sev_es_guest(struct kvm *k=
-vm)
- #endif
- }
-=20
-+static __always_inline bool sev_snp_guest(struct kvm *kvm)
++/*
++ * The guest context contains all the information, keys and metadata
++ * associated with the guest that the firmware tracks to implement SEV
++ * and SNP features. The firmware stores the guest context in hypervisor
++ * provide page via the SNP_GCTX_CREATE command.
++ */
++static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
 +{
-+#ifdef CONFIG_KVM_AMD_SEV
-+	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_addr data =3D {};
++	void *context;
++	int rc;
 +
-+	return (sev->vmsa_features & SVM_SEV_FEAT_SNP_ACTIVE) &&
-+	       !WARN_ON_ONCE(!sev_es_guest(kvm));
-+#else
-+	return false;
-+#endif
++	/* Allocate memory for context page */
++	context =3D snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
++	if (!context)
++		return NULL;
++
++	data.address =3D __psp_pa(context);
++	rc =3D __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &arg=
+p->error);
++	if (rc) {
++		pr_warn("Failed to create SEV-SNP context, rc %d fw_error %d",
++			rc, argp->error);
++		snp_free_firmware_page(context);
++		return NULL;
++	}
++
++	return context;
 +}
 +
- static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
++static int snp_bind_asid(struct kvm *kvm, int *error)
++{
++	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_activate data =3D {0};
++
++	data.gctx_paddr =3D __psp_pa(sev->snp_context);
++	data.asid =3D sev_get_asid(kvm);
++	return sev_issue_cmd(kvm, SEV_CMD_SNP_ACTIVATE, &data, error);
++}
++
++static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_launch_start start =3D {0};
++	struct kvm_sev_snp_launch_start params;
++	int rc;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++
++	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(params)))
++		return -EFAULT;
++
++	/* Don't allow userspace to allocate memory for more than 1 SNP context. =
+*/
++	if (sev->snp_context) {
++		pr_debug("SEV-SNP context already exists. Refusing to allocate an additi=
+onal one.");
++		return -EINVAL;
++	}
++
++	sev->snp_context =3D snp_context_create(kvm, argp);
++	if (!sev->snp_context)
++		return -ENOTTY;
++
++	if (params.policy & SNP_POLICY_MASK_SINGLE_SOCKET) {
++		pr_debug("SEV-SNP hypervisor does not support limiting guests to a singl=
+e socket.");
++		return -EINVAL;
++	}
++
++	if (!(params.policy & SNP_POLICY_MASK_SMT)) {
++		pr_debug("SEV-SNP hypervisor does not support limiting guests to a singl=
+e SMT thread.");
++		return -EINVAL;
++	}
++
++	start.gctx_paddr =3D __psp_pa(sev->snp_context);
++	start.policy =3D params.policy;
++	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
++	rc =3D __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &a=
+rgp->error);
++	if (rc) {
++		pr_debug("SEV_CMD_SNP_LAUNCH_START command failed, rc %d\n", rc);
++		goto e_free_context;
++	}
++
++	sev->fd =3D argp->sev_fd;
++	rc =3D snp_bind_asid(kvm, &argp->error);
++	if (rc) {
++		pr_debug("Failed to bind ASID to SEV-SNP context, rc %d\n", rc);
++		goto e_free_context;
++	}
++
++	return 0;
++
++e_free_context:
++	snp_decommission_context(kvm);
++
++	return rc;
++}
++
+ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	vmcb->control.clean =3D 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 64eda7949f09..f85735b6235d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12603,7 +12603,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
- type)
+ 	struct kvm_sev_cmd sev_cmd;
+@@ -2054,6 +2162,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *a=
+rgp)
+ 	case KVM_SEV_RECEIVE_FINISH:
+ 		r =3D sev_receive_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_LAUNCH_START:
++		r =3D snp_launch_start(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r =3D -EINVAL;
+ 		goto out;
+@@ -2249,6 +2360,33 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, un=
+signed int source_fd)
+ 	return ret;
+ }
 =20
- 	kvm->arch.vm_type =3D type;
- 	kvm->arch.has_private_mem =3D
--		(type =3D=3D KVM_X86_SW_PROTECTED_VM);
-+		(type =3D=3D KVM_X86_SW_PROTECTED_VM || type =3D=3D KVM_X86_SNP_VM);
++static int snp_decommission_context(struct kvm *kvm)
++{
++	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_addr data =3D {};
++	int ret;
++
++	/* If context is not created then do nothing */
++	if (!sev->snp_context)
++		return 0;
++
++	data.address =3D __sme_pa(sev->snp_context);
++	down_write(&sev_deactivate_lock);
++	ret =3D sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, &data, NULL);
++	if (WARN_ONCE(ret, "failed to release guest context")) {
++		up_write(&sev_deactivate_lock);
++		return ret;
++	}
++
++	up_write(&sev_deactivate_lock);
++
++	/* free the context page now */
++	snp_free_firmware_page(sev->snp_context);
++	sev->snp_context =3D NULL;
++
++	return 0;
++}
++
+ void sev_vm_destroy(struct kvm *kvm)
+ {
+ 	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
+@@ -2290,7 +2428,15 @@ void sev_vm_destroy(struct kvm *kvm)
+ 		}
+ 	}
 =20
- 	ret =3D kvm_page_track_init(kvm);
- 	if (ret)
+-	sev_unbind_asid(kvm, sev->handle);
++	if (sev_snp_guest(kvm)) {
++		if (snp_decommission_context(kvm)) {
++			WARN_ONCE(1, "Failed to free SNP guest context, leaking asid!\n");
++			return;
++		}
++	} else {
++		sev_unbind_asid(kvm, sev->handle);
++	}
++
+ 	sev_asid_free(sev);
+ }
+=20
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 4a01a81dd9b9..a3c190642c57 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -92,6 +92,7 @@ struct kvm_sev_info {
+ 	struct list_head mirror_entry; /* Use as a list entry of mirrors */
+ 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+ 	atomic_t migration_in_progress;
++	void *snp_context;      /* SNP guest context page */
+ };
+=20
+ struct kvm_svm {
 --=20
 2.25.1
 
 
-X-sender: <linux-crypto+bounces-3086-steffen.klassert=3Dsecunet.com@vger.ke=
-rnel.org>
+X-sender: <linux-kernel+bounces-125487-steffen.klassert=3Dsecunet.com@vger.=
+kernel.org>
 X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Drfc822;steffen.klassert@=
-secunet.com; X-ExtendedProps=3DDwA1AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9y=
-dC5EaXJlY3RvcnlEYXRhLklzUmVzb3VyY2UCAAAFABUAFgACAAAABQAUABEA8MUJLbkECUOS0gj=
-aDTZ+uAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAG=
-IAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IR=
-jIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwAXAL4AAACh=
-eZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG1pbmlzdHJ=
-hdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHcm91cHMsQ0=
-49c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29uZmlndXJhd=
-GlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAwAAABtYngt=
-ZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmV=
-jaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAGwAAgAABQBYABcASg=
-AAAPDFCS25BAlDktII2g02frhDTj1LbGFzc2VydCBTdGVmZmVuLE9VPVVzZXJzLE9VPU1pZ3Jhd=
-GlvbixEQz1zZWN1bmV0LERDPWRlBQAMAAIAAAUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNl=
-U3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1pY3Jvc29mdC5FeGN=
-oYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW=
-5zaW9uBQAjAAIAAQ=3D=3D
+secunet.com NOTIFY=3DNEVER; X-ExtendedProps=3DBQAVABYAAgAAAAUAFAARAPDFCS25B=
+AlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURh=
+dGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQB=
+HAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3=
+VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4Y=
+wUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5n=
+ZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl=
+2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ0=
+49Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAH=
+QAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5z=
+cG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAw=
+AAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbi=
+xPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQ=
+XV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1p=
+Y3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmV=
+yc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ=3D=3D
 X-CreatedBy: MSExchange15
-X-HeloDomain: a.mx.secunet.com
+X-HeloDomain: b.mx.secunet.com
 X-ExtendedProps: BQBjAAoAWUmmlidQ3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
 9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
 AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2Vj=
-dW5ldC5jb20FAAYAAgABDwAqAAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5SZXN1Ym1=
-pdENvdW50BwACAAAADwAJAAAAQ0lBdWRpdGVkAgABBQACAAcAAQAAAAUAAwAHAAAAAAAFAAUAAg=
-ABBQBiAAoAeAAAAM2KAAAFAGQADwADAAAASHViBQApAAIAAQ8APwAAAE1pY3Jvc29mdC5FeGNoY=
-W5nZS5UcmFuc3BvcnQuRGlyZWN0b3J5RGF0YS5NYWlsRGVsaXZlcnlQcmlvcml0eQ8AAwAAAExv=
-dw=3D=3D
+dW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwA=
+AAAAABQAFAAIAAQUAYgAKAIEAAADNigAABQBkAA8AAwAAAEh1Yg=3D=3D
 X-Source: SMTP:Default MBX-ESSEN-02
-X-SourceIPAddress: 62.96.220.36
-X-EndOfInjectedXHeaders: 26564
+X-SourceIPAddress: 62.96.220.37
+X-EndOfInjectedXHeaders: 33241
 Received: from cas-essen-01.secunet.de (10.53.40.201) by
  mbx-essen-02.secunet.de (10.53.40.198) with Microsoft SMTP Server
  (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.37; Fri, 29 Mar 2024 23:59:24 +0100
-Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-01.secunet.de
+ 15.1.2507.37; Fri, 29 Mar 2024 23:59:53 +0100
+Received: from b.mx.secunet.com (62.96.220.37) by cas-essen-01.secunet.de
  (10.53.40.201) with Microsoft SMTP Server (version=3DTLS1_2,
  cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Fronte=
 nd
- Transport; Fri, 29 Mar 2024 23:59:24 +0100
+ Transport; Fri, 29 Mar 2024 23:59:53 +0100
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id E4791208B4
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:59:24 +0100 (CET)
-X-Virus-Scanned: by secunet
-X-Spam-Flag: NO
-X-Spam-Score: -2.85
-X-Spam-Level:
-X-Spam-Status: No, score=3D-2.85 tagged_above=3D-999 required=3D2.1
-	tests=3D[BAYES_00=3D-1.9, DKIMWL_WL_HIGH=3D-0.099, DKIM_SIGNED=3D0.1,
-	DKIM_VALID=3D-0.1, DKIM_VALID_AU=3D-0.1,
-	HEADER_FROM_DIFFERENT_DOMAINS=3D0.249, MAILING_LIST_MULTI=3D-1,
-	RCVD_IN_DNSWL_NONE=3D-0.0001, SPF_HELO_NONE=3D0.001, SPF_PASS=3D-0.001]
-	autolearn=3Dham autolearn_force=3Dno
-Authentication-Results: a.mx.secunet.com (amavisd-new);
-	dkim=3Dpass (1024-bit key) header.d=3Damd.com
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QnZlk_tCllH0 for <steffen.klassert@secunet.com>;
-	Fri, 29 Mar 2024 23:59:20 +0100 (CET)
-Received-SPF: Pass (sender SPF authorized) identity=3Dmailfrom; client-ip=
-=3D147.75.80.249; helo=3Dam.mirrors.kernel.org; envelope-from=3Dlinux-crypt=
-o+bounces-3086-steffen.klassert=3Dsecunet.com@vger.kernel.org; receiver=3Ds=
-teffen.klassert@secunet.com=20
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 7F82D2087B
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249]=
-)
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 7F82D2087B
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:59:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
-5.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED7B51F23BD2
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:59:19 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE14613CFAE;
-	Fri, 29 Mar 2024 22:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
-=3D"q9r7dIZC"
-X-Original-To: linux-crypto@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02=
-on2079.outbound.protection.outlook.com [40.107.212.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DAD13EFEE;
-	Fri, 29 Mar 2024 22:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=3Dfail smtp.client-ip=
-=3D40.107.212.79
-ARC-Seal: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org; s=3Darc-20240116;
-	t=3D1711753153; cv=3Dfail; b=3DBYbUnnfXmxEtv1PkrIHV+7kzVO0y3a1Ye+F4TRsm29E=
-L0omYnNLvNDSQwPMrK6Z80fnDzyU2l8EfE3Fm6gpXmT0qiFAbN87V7eOZwJzuqVAJ70gFqLeQEM=
-XZ56g8tSRZScOkyyPbWGrEyHg/1rRmBrm3pQuOvLWGoHZ3WptkQF8=3D
-ARC-Message-Signature: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org;
-	s=3Darc-20240116; t=3D1711753153; c=3Drelaxed/simple;
-	bh=3D32N0Xx4fpPiGgE4gdCbkfdfNikRkU8p14GCc9880qic=3D;
-	h=3DFrom:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=3DX6h1fEpizL+9h9BpHNiFVub3+3P5w3JD0lfdk8PZpt=
-PGziwiP5AnrmvxqeGRjE4W5Le1zkKGCVue4EUqS+y04Y+rXUZSUK9J9lyDqkdMCJHY1wU1Byy/7=
-PBF40xIkza8bvGO9bcWbA8C/FJ2d55TKdQO+/guAX1pBzwbXtegNUk=3D
-ARC-Authentication-Results: i=3D2; smtp.subspace.kernel.org; dmarc=3Dpass (=
-p=3Dquarantine dis=3Dnone) header.from=3Damd.com; spf=3Dfail smtp.mailfrom=
-=3Damd.com; dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.c=
-om header.b=3Dq9r7dIZC; arc=3Dfail smtp.client-ip=3D40.107.212.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dpass (p=3Dquarant=
-ine dis=3Dnone) header.from=3Damd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=3Dfail smtp.mailfrom=
-=3Damd.com
-ARC-Seal: i=3D1; a=3Drsa-sha256; s=3Darcselector9901; d=3Dmicrosoft.com; cv=
-=3Dnone;
- b=3DCA9+EpoNiZ9ayMmuF+uTwSeBjPBlCFrkeWODbOoFlUQYPDABUEHwtqo28a8PW/imB4XHrn=
-E6Mt7E6/eCJocLwL2ciZisEmC7AJ22GL9xbPbPArTsRqEhdNCCbYLP8qWdMy7FpFKDiSu99P3Et=
-kWJOVuZR6wJ1zXPkVsxJAHxQ1NZ77Qa85K/ObPQ8AXhBmWwf+YD98Gd+ZIg+6gXsRxooicVQa7Y=
-3DkW94F4Dp2asJhZho3IOy1uRIKUanolI+9CLEqcJE1wd8Pj9ElUfYP1G1okbc8A1YOlkTe5b9U=
-LGwMufalRk2pkDIBD7XR36PUU/mnLms1Qwwj+VM+0nGkajg=3D=3D
-ARC-Message-Signature: i=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Dmicr=
-osoft.com;
- s=3Darcselector9901;
- h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-A=
-ntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Ex=
-change-AntiSpam-MessageData-1;
- bh=3D85xfxLH74OdKCMM2bG4Ka/efKmeDa+urj4S6khYBEhI=3D;
- b=3DXUVPXyEnaWzdYWoJNkvqerhl6Svq2T8m2knayzG2+AeIbpHftkICKGYxj3BhyGshE2fO6T=
-H9GpjHVrVPkK/+CpJ64AIdKw86jsY6ZbM8HQwf8klvQ5RxPozzGqx8MCi//iIwzzm3KPNqhj3Ww=
-+jF4+8AE9bU9otOpkMOebIPanjg1MidwxVrLnfjkq7hfRkk/I+aj940z2p1XCAH17I0WNoHu8Eh=
-R4AyoCVtX/44RDF24bsnopzDbUsoOPAjhJ/fk/qtp+XVd5ANyraXcDOdxzpXNzWDFF6h5vNh9oB=
-EnYh/p27lBZGuXOhT4rZfFcCDSYu2vULKOAr2b0ovUb+ebg=3D=3D
-ARC-Authentication-Results: i=3D1; mx.microsoft.com 1; spf=3Dpass (sender i=
-p is
- 165.204.84.17) smtp.rcpttodomain=3Dvger.kernel.org smtp.mailfrom=3Damd.com=
-;
- dmarc=3Dpass (p=3Dquarantine sp=3Dquarantine pct=3D100) action=3Dnone
- header.from=3Damd.com; dkim=3Dnone (message not signed); arc=3Dnone (0)
-DKIM-Signature: v=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Damd.com; s=
-=3Dselector1;
- h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-S=
-enderADCheck;
- bh=3D85xfxLH74OdKCMM2bG4Ka/efKmeDa+urj4S6khYBEhI=3D;
- b=3Dq9r7dIZCmGAMsb5Qf5qevjsO+u2qguOTQwgvMMQeTMWFxL30f5651Ih1rIv4M6gqyWlZAE=
-DGO0VJA6/trmWh7JWA1JQmddseBxmacNU4bozvpuXx54+2xHpPUF3BfBuyIDYp3RuPMt3lUtS6+=
-dQfKoYUuLkX31Den1QT9hFH4FA=3D
-Received: from DS7PR03CA0074.namprd03.prod.outlook.com (2603:10b6:5:3bb::19=
-)
- by SN7PR12MB6861.namprd12.prod.outlook.com (2603:10b6:806:266::14) with
- Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 =
-Mar
- 2024 22:59:07 +0000
-Received: from CY4PEPF0000FCC4.namprd03.prod.outlook.com
- (2603:10b6:5:3bb:cafe::79) by DS7PR03CA0074.outlook.office365.com
- (2603:10b6:5:3bb::19) with Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40 via Front=
-end
- Transport; Fri, 29 Mar 2024 22:59:02 +0000
-X-MS-Exchange-Authentication-Results: spf=3Dpass (sender IP is 165.204.84.1=
-7)
- smtp.mailfrom=3Damd.com; dkim=3Dnone (message not signed)
- header.d=3Dnone;dmarc=3Dpass action=3Dnone header.from=3Damd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=3Dprotection.outlook.com;
- client-ip=3D165.204.84.17; helo=3DSATLEXMB04.amd.com; pr=3DC
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000FCC4.mail.protection.outlook.com (10.167.242.106) with Microsof=
-t
- SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA=
-256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 22:59:01 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 M=
-ar
- 2024 17:59:00 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
-	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
-	<brijesh.singh@amd.com>
-Subject: [PATCH v12 09/29] KVM: SEV: Add initial SEV-SNP support
-Date: Fri, 29 Mar 2024 17:58:15 -0500
-Message-ID: <20240329225835.400662-10-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
-References: <20240329225835.400662-1-michael.roth@amd.com>
-Precedence: bulk
-X-Mailing-List: linux-crypto@vger.kernel.org
-List-Id: <linux-crypto.vger.kernel.org>
-List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC4:EE_|SN7PR12MB6861:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a450cd9-fdcd-4e47-ed16-08dc5043d3=
-34
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nsYawN22RK6vpJl8VU3uLdBNz2wKwfigLe9u15MY=
-JjT0NXQV3Yzjn6a1OjYj4LPzeDO8cf52t0bld23f73IhgDjhPepqbc7IwHTzPhZ/pO0fb1Dc4F6=
-dPKSdnsPrwbyyhJI21uoEBXlb9DpAIEIBOyVjZmH+wtq/OnN34HGIHNnAASx0iEdmOS44o1oEug=
-f+lFgXmiA6AQWu+IikoKRj2YItSH3Txq0G7BC/TRGiWq2KqdmgFh+n5Hsot5lhcjxEP+iWzkso8=
-UiBcRHFE8Sju6gjTCdVv1uIDSSjI3OvUAubuGZeTloeeL4ALMLAdXglcVDTAeML83k7xVUpdU2U=
-JQx0wb/97jBfBau1zhrRC78B3NehLm2mU8sjwnExhuP/MfHsbmuX5VvLn2CPH9T81lSMjdxVYlZ=
-I/ytN2lzlTQ6vcxI+8hSPG9PpG923elprnKSAI7fsLuCaIOF+SPmZqnI+RcAfIX4fms89ZDSC6l=
-ffhLHDFAraZ3I86fN9ZemKTUgctwPvboQCfEG3mDxYzLPPQYhchCxYb1wWaG8jFR5sFSVsrE7JQ=
-/SDBGTYpRHKn9KLxD3rVWSX7nTCof7mJAPHXd2W0DPkpcx9TiDMdcZ4+2WH9Ez1YUqwMRjAYVmx=
-wirJl9RK3NI4in6GXQmovhcw4JB7RQikwOS3iiudBKTtfKGD6mR80tiSkJb9G8Bw9pvoQHQlT6b=
-Ql8BXfRTgx5cMzVuv0ny3ytgj4cr3PKrxvNDbOm6IUcK3cMc8E9Ls
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;I=
-PV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS=
-:(13230031)(82310400014)(1800799015)(7416005)(376005)(36860700004);DIR:OUT;=
-SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:59:01.5166
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a450cd9-fdcd-4e47-ed16-08dc5=
-043d334
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3D=
-3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=3D[165.204.84.17];Helo=3D[SATLEXMB0=
-4.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000FCC4.namprd03.prod.outlook=
-.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6861
-Return-Path: linux-crypto+bounces-3086-steffen.klassert=3Dsecunet.com@vger.=
-kernel.org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 22:59:24.9586
- (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: eddbe8a6-9ce3-4b49-8303-08dc=
-5043e11d
-X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
-X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.201
-X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-01.s=
-ecunet.de
-X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-es=
-sen-02.secunet.de:TOTAL-HUB=3D33580.402|SMR=3D0.327(SMRDE=3D0.005|SMRC=3D0.=
-321(SMRCL=3D0.104|X-SMRCR=3D0.321))|CAT=3D0.070(CATOS=3D0.001
- |CATRESL=3D0.032(CATRESLP2R=3D0.009)|CATORES=3D0.034(CATRS=3D0.033(CATRS-I=
-ndex
- Routing Agent=3D0.032
- ))|CATORT=3D0.001(CATRT=3D0.001))|UNK=3D0.001|QDM=3D10280.358|SMSC=3D0.594=
-(X-SMSDR=3D0.020)|SMS=3D5.978
- (SMSMBXD-INC=3D5.461)|QDM=3D20522.747|SMSC=3D0.486(X-SMSDR=3D0.011)|SMS=3D=
-5.643(SMSMBXD-INC=3D5.142
- )|QDM=3D2759.061|PSC=3D0.010|CAT=3D0.007(CATRESL=3D0.005(CATRESLP2R=3D0.00=
-2))|QDM=3D5.364|CAT=3D0.009
- (CATRESL=3D0.007(CATRESLP2R=3D0.003));2024-03-30T08:19:05.378Z
-X-MS-Exchange-Forest-ArrivalHubServer: mbx-essen-02.secunet.de
-X-MS-Exchange-Organization-AuthSource: cas-essen-01.secunet.de
-X-MS-Exchange-Organization-AuthAs: Anonymous
-X-MS-Exchange-Organization-FromEntityHeader: Internet
-X-MS-Exchange-Organization-OriginalSize: 18350
-X-MS-Exchange-Organization-HygienePolicy: Standard
-X-MS-Exchange-Organization-MessageLatency: SRV=3Dcas-essen-01.secunet.de:TO=
-TAL-FE=3D0.017|SMR=3D0.007(SMRPI=3D0.005(SMRPI-FrontendProxyAgent=3D0.005))=
-|SMS=3D0.010
-X-MS-Exchange-Organization-Recipient-Limit-Verified: True
-X-MS-Exchange-Organization-TotalRecipientCount: 1
-X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
--482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
-0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
-6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
-X-MS-Exchange-Forest-RulesExecuted: mbx-essen-02
-X-MS-Exchange-Organization-RulesExecuted: mbx-essen-02
-X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAW8OAAAPAAADH4sIAAAAAAAEAL1Ze3Pb=
-xhEH+BQpUlJkx0
- 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
- Xb1zCFge2WIK4kO6FupNgNK+22gqlY/KPgX4t8FHbAHDndlE8sx97N
- a8c9/tI83fg5gjUZiaFTO8s7HD8IC5LMKtI3sYEdR4xG5g7H/8bydp
- B2+xneWssJfoLj+H8Gwi1LSisAAAEK1QM8P3htbCB2ZXJzaW9uPSIx
- LjAiIGVuY29kaW5nPSJ1dGYtMTYiPz4NCjxFbWFpbFNldD4NCiAgPF
- ZlcnNpb24+MTUuMC4wLjA8L1ZlcnNpb24+DQogIDxFbWFpbHM+DQog
- ICAgPEVtYWlsIFN0YXJ0SW5kZXg9IjU0MCIgUG9zaXRpb249Ik90aG
- VyIj4NCiAgICAgIDxFbWFpbFN0cmluZz5icmlqZXNoLnNpbmdoQGFt
- ZC5jb208L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogICAgPE
- VtYWlsIFN0YXJ0SW5kZXg9IjU5MyIgUG9zaXRpb249Ik90aGVyIj4N
- CiAgICAgIDxFbWFpbFN0cmluZz5hc2hpc2gua2FscmFAYW1kLmNvbT
- wvRW1haWxTdHJpbmc+DQogICAgPC9FbWFpbD4NCiAgICA8RW1haWwg
- U3RhcnRJbmRleD0iNzE0IiBQb3NpdGlvbj0iT3RoZXIiPg0KICAgIC
- AgPEVtYWlsU3RyaW5nPm1pY2hhZWwucm90aEBhbWQuY29tPC9FbWFp
- bFN0cmluZz4NCiAgICA8L0VtYWlsPg0KICA8L0VtYWlscz4NCjwvRW
- 1haWxTZXQ+AQ7PAVJldHJpZXZlck9wZXJhdG9yLDEwLDE7UmV0cmll
- dmVyT3BlcmF0b3IsMTEsMjtQb3N0RG9jUGFyc2VyT3BlcmF0b3IsMT
- AsMDtQb3N0RG9jUGFyc2VyT3BlcmF0b3IsMTEsMDtQb3N0V29yZEJy
- ZWFrZXJEaWFnbm9zdGljT3BlcmF0b3IsMTAsNDtQb3N0V29yZEJyZW
- FrZXJEaWFnbm9zdGljT3BlcmF0b3IsMTEsMDtUcmFuc3BvcnRXcml0
- ZXJQcm9kdWNlciwyMCwxNA=3D=3D
-X-MS-Exchange-Forest-IndexAgent: 1 4390
-X-MS-Exchange-Forest-EmailMessageHash: 1CBD1271
-X-MS-Exchange-Forest-Language: en
-X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
-X-MS-Exchange-Organization-Transport-Properties: DeliveryPriority=3DLow
-X-MS-Exchange-Organization-Prioritization: 2:RC:REDACTED-af51df60fd698f80b0=
-64826f9ee192ca@secunet.com:84/10|SR
-X-MS-Exchange-Organization-IncludeInSla: False:RecipientCountThresholdExcee=
-ded
-
-SEV-SNP builds upon existing SEV and SEV-ES functionality while adding
-new hardware-based security protection. SEV-SNP adds strong memory
-encryption and integrity protection to help prevent malicious
-hypervisor-based attacks such as data replay, memory re-mapping, and
-more, to create an isolated execution environment.
-
-Define a new KVM_X86_SNP_VM type which makes use of these capabilities
-and extend the KVM_SEV_INIT2 ioctl to support it. Also add a basic
-helper to check whether SNP is enabled.
-
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: commit fixups, use similar ASID reporting as with SEV/SEV-ES]
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- arch/x86/include/asm/svm.h      |  3 ++-
- arch/x86/include/uapi/asm/kvm.h |  1 +
- arch/x86/kvm/svm/sev.c          | 21 ++++++++++++++++++++-
- arch/x86/kvm/svm/svm.c          |  3 ++-
- arch/x86/kvm/svm/svm.h          | 12 ++++++++++++
- arch/x86/kvm/x86.c              |  2 +-
- 6 files changed, 38 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 728c98175b9c..544a43c1cf11 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -285,7 +285,8 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_M=
-AX_INDEX_MASK) =3D=3D X2AVIC_
-=20
- #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
-=20
--#define SVM_SEV_FEAT_DEBUG_SWAP                        BIT(5)
-+#define SVM_SEV_FEAT_SNP_ACTIVE				BIT(0)
-+#define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
-=20
- struct vmcb_seg {
- 	u16 selector;
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
-m.h
-index 51b13080ed4b..725b75cfe9ff 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -868,5 +868,6 @@ struct kvm_hyperv_eventfd {
- #define KVM_X86_SW_PROTECTED_VM	1
- #define KVM_X86_SEV_VM		2
- #define KVM_X86_SEV_ES_VM	3
-+#define KVM_X86_SNP_VM		4
-=20
- #endif /* _ASM_X86_KVM_H */
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1e65f5634ad3..3d9771163562 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -46,6 +46,9 @@ module_param_named(sev, sev_enabled, bool, 0444);
- static bool sev_es_enabled =3D true;
- module_param_named(sev_es, sev_es_enabled, bool, 0444);
-=20
-+/* enable/disable SEV-SNP support */
-+static bool sev_snp_enabled;
-+
- /* enable/disable SEV-ES DebugSwap support */
- static bool sev_es_debug_swap_enabled =3D true;
- module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
-@@ -275,6 +278,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm=
-_sev_cmd *argp,
- 	sev->es_active =3D es_active;
- 	sev->vmsa_features =3D data->vmsa_features;
-=20
-+	if (vm_type =3D=3D KVM_X86_SNP_VM)
-+		sev->vmsa_features |=3D SVM_SEV_FEAT_SNP_ACTIVE;
-+
- 	ret =3D sev_asid_new(sev);
- 	if (ret)
- 		goto e_no_asid;
-@@ -326,7 +332,8 @@ static int sev_guest_init2(struct kvm *kvm, struct kvm_=
-sev_cmd *argp)
- 		return -EINVAL;
-=20
- 	if (kvm->arch.vm_type !=3D KVM_X86_SEV_VM &&
--	    kvm->arch.vm_type !=3D KVM_X86_SEV_ES_VM)
-+	    kvm->arch.vm_type !=3D KVM_X86_SEV_ES_VM &&
-+	    kvm->arch.vm_type !=3D KVM_X86_SNP_VM)
- 		return -EINVAL;
-=20
- 	if (copy_from_user(&data, u64_to_user_ptr(argp->data), sizeof(data)))
-@@ -2297,11 +2304,16 @@ void __init sev_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
- 		kvm_caps.supported_vm_types |=3D BIT(KVM_X86_SEV_ES_VM);
- 	}
-+	if (sev_snp_enabled) {
-+		kvm_cpu_cap_set(X86_FEATURE_SEV_SNP);
-+		kvm_caps.supported_vm_types |=3D BIT(KVM_X86_SNP_VM);
-+	}
- }
-=20
- void __init sev_hardware_setup(void)
- {
- 	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
-+	bool sev_snp_supported =3D false;
- 	bool sev_es_supported =3D false;
- 	bool sev_supported =3D false;
-=20
-@@ -2382,6 +2394,7 @@ void __init sev_hardware_setup(void)
- 	sev_es_asid_count =3D min_sev_asid - 1;
- 	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))=
-;
- 	sev_es_supported =3D true;
-+	sev_snp_supported =3D sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV=
-_SNP);
-=20
- out:
- 	if (boot_cpu_has(X86_FEATURE_SEV))
-@@ -2394,9 +2407,15 @@ void __init sev_hardware_setup(void)
- 		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
- 			sev_es_supported ? "enabled" : "disabled",
- 			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
-+	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
-+		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
-+			sev_snp_supported ? "enabled" : "disabled",
-+			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
-=20
- 	sev_enabled =3D sev_supported;
- 	sev_es_enabled =3D sev_es_supported;
-+	sev_snp_enabled =3D sev_snp_supported;
-+
- 	if (!sev_es_enabled || !cpu_feature_enabled(X86_FEATURE_DEBUG_SWAP) ||
- 	    !cpu_feature_enabled(X86_FEATURE_NO_NESTED_DATA_BP))
- 		sev_es_debug_swap_enabled =3D false;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0f3b59da0d4a..2c162f6a1d78 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4890,7 +4890,8 @@ static int svm_vm_init(struct kvm *kvm)
-=20
- 	if (type !=3D KVM_X86_DEFAULT_VM &&
- 	    type !=3D KVM_X86_SW_PROTECTED_VM) {
--		kvm->arch.has_protected_state =3D (type =3D=3D KVM_X86_SEV_ES_VM);
-+		kvm->arch.has_protected_state =3D
-+			(type =3D=3D KVM_X86_SEV_ES_VM || type =3D=3D KVM_X86_SNP_VM);
- 		to_kvm_sev_info(kvm)->need_init =3D true;
- 	}
-=20
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 157eb3f65269..4a01a81dd9b9 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -348,6 +348,18 @@ static __always_inline bool sev_es_guest(struct kvm *k=
-vm)
- #endif
- }
-=20
-+static __always_inline bool sev_snp_guest(struct kvm *kvm)
-+{
-+#ifdef CONFIG_KVM_AMD_SEV
-+	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
-+
-+	return (sev->vmsa_features & SVM_SEV_FEAT_SNP_ACTIVE) &&
-+	       !WARN_ON_ONCE(!sev_es_guest(kvm));
-+#else
-+	return false;
-+#endif
-+}
-+
- static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
- {
- 	vmcb->control.clean =3D 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 64eda7949f09..f85735b6235d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12603,7 +12603,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
- type)
-=20
- 	kvm->arch.vm_type =3D type;
- 	kvm->arch.has_private_mem =3D
--		(type =3D=3D KVM_X86_SW_PROTECTED_VM);
-+		(type =3D=3D KVM_X86_SW_PROTECTED_VM || type =3D=3D KVM_X86_SNP_VM);
-=20
- 	ret =3D kvm_page_track_init(kvm);
- 	if (ret)
---=20
-2.25.1
-
-
-X-sender: <linux-kernel+bounces-125486-steffen.klassert=3Dsecunet.com@vger.=
-kernel.org>
-X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Drfc822;steffen.klassert@=
-secunet.com
-X-CreatedBy: MSExchange15
-X-HeloDomain: mbx-essen-01.secunet.de
-X-ExtendedProps: BQBjAAoAk0mmlidQ3AgFADcAAgAADwA8AAAATWljcm9zb2Z0LkV4Y2hhbm=
-dlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50Lk9yZ2FuaXphdGlvblNjb3BlEQAAAAAAAAAAAAAAA=
-AAAAAAADwA/AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLk1h=
-aWxEZWxpdmVyeVByaW9yaXR5DwADAAAATG93
-X-Source: SMTP:Default MBX-ESSEN-02
-X-SourceIPAddress: 10.53.40.197
-X-EndOfInjectedXHeaders: 18857
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- mbx-essen-02.secunet.de (10.53.40.198) with Microsoft SMTP Server
- (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.37; Fri, 29 Mar 2024 23:59:35 +0100
-Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-02.secunet.de
- (10.53.40.202) with Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Fronte=
-nd
- Transport; Fri, 29 Mar 2024 23:59:35 +0100
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id D2F4D208AC
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:59:35 +0100 (CET)
+	by b.mx.secunet.com (Postfix) with ESMTP id A97F12032C
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:59:53 +0100 (CET)
 X-Virus-Scanned: by secunet
 X-Spam-Flag: NO
 X-Spam-Score: -5.15
@@ -965,79 +549,82 @@ X-Spam-Status: No, score=3D-5.15 tagged_above=3D-999 required=3D2.1
 	autolearn=3Dunavailable autolearn_force=3Dno
 Authentication-Results: a.mx.secunet.com (amavisd-new);
 	dkim=3Dpass (1024-bit key) header.d=3Damd.com
-Received: from a.mx.secunet.com ([127.0.0.1])
+Received: from b.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l7qOXSrzZ9yR for <steffen.klassert@secunet.com>;
-	Fri, 29 Mar 2024 23:59:35 +0100 (CET)
+	with ESMTP id UKNPQtZCaYj3 for <steffen.klassert@secunet.com>;
+	Fri, 29 Mar 2024 23:59:52 +0100 (CET)
 Received-SPF: Pass (sender SPF authorized) identity=3Dmailfrom; client-ip=
 =3D139.178.88.99; helo=3Dsv.mirrors.kernel.org; envelope-from=3Dlinux-kerne=
-l+bounces-125486-steffen.klassert=3Dsecunet.com@vger.kernel.org; receiver=
+l+bounces-125487-steffen.klassert=3Dsecunet.com@vger.kernel.org; receiver=
 =3Dsteffen.klassert@secunet.com=20
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D4D7B2087B
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 46151200BB
+Authentication-Results: b.mx.secunet.com;
+	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
+=3D"ZP/7DMTG"
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99]=
 )
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id D4D7B2087B
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:59:34 +0100 (CET)
+	by b.mx.secunet.com (Postfix) with ESMTPS id 46151200BB
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:59:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
 5.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95E5728327E
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:59:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AABE284496
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7214D13E6AD;
-	Fri, 29 Mar 2024 22:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A601513E6A0;
+	Fri, 29 Mar 2024 22:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
 	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
-=3D"q9r7dIZC"
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02=
-on2079.outbound.protection.outlook.com [40.107.212.79])
+=3D"ZP/7DMTG"
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11=
+on2040.outbound.protection.outlook.com [40.107.236.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DAD13EFEE;
-	Fri, 29 Mar 2024 22:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF1313CF91;
+	Fri, 29 Mar 2024 22:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=3Dfail smtp.client-ip=
-=3D40.107.212.79
+=3D40.107.236.40
 ARC-Seal: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org; s=3Darc-20240116;
-	t=3D1711753153; cv=3Dfail; b=3DBYbUnnfXmxEtv1PkrIHV+7kzVO0y3a1Ye+F4TRsm29E=
-L0omYnNLvNDSQwPMrK6Z80fnDzyU2l8EfE3Fm6gpXmT0qiFAbN87V7eOZwJzuqVAJ70gFqLeQEM=
-XZ56g8tSRZScOkyyPbWGrEyHg/1rRmBrm3pQuOvLWGoHZ3WptkQF8=3D
+	t=3D1711753171; cv=3Dfail; b=3Djcayv/9uC4T8P77oFK+iKjXiPda/yTMegLjI59U/clJ=
+BPkoiIJ8ErPpZ2PlVQhoCTfRelgXTfdoP81/auei39z7Cd+/bYhHK1kWn9a7Bvok5bTqu5bHX6O=
+h9HXIEAG/I1mo5CmXHqmq8CJD8B6FuQfwggWQv2BLlvWl7lGpJl/c=3D
 ARC-Message-Signature: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org;
-	s=3Darc-20240116; t=3D1711753153; c=3Drelaxed/simple;
-	bh=3D32N0Xx4fpPiGgE4gdCbkfdfNikRkU8p14GCc9880qic=3D;
+	s=3Darc-20240116; t=3D1711753171; c=3Drelaxed/simple;
+	bh=3D5c8zhDfcMbpsXLVQsZOnYPgv5aHR2rf5q1ILo5PbHMc=3D;
 	h=3DFrom:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=3DX6h1fEpizL+9h9BpHNiFVub3+3P5w3JD0lfdk8PZpt=
-PGziwiP5AnrmvxqeGRjE4W5Le1zkKGCVue4EUqS+y04Y+rXUZSUK9J9lyDqkdMCJHY1wU1Byy/7=
-PBF40xIkza8bvGO9bcWbA8C/FJ2d55TKdQO+/guAX1pBzwbXtegNUk=3D
+	 MIME-Version:Content-Type; b=3DOs3eu02qBp9/vs/KmBhy0MByeKMmof1Cz6+cmle3GZ=
+n2HF2mjuOHlQxn88FJPntD1wD3KvaU3RnDv3A9zndXKrH0+tFsRL9gUg8bKaQoUHSLW9u5+sS3G=
+G9GM14Ye0v2tQwbx9QP/AAJjn0ixq30DIYE8a+1Zs6zma9Q7Yslmbs=3D
 ARC-Authentication-Results: i=3D2; smtp.subspace.kernel.org; dmarc=3Dpass (=
 p=3Dquarantine dis=3Dnone) header.from=3Damd.com; spf=3Dfail smtp.mailfrom=
 =3Damd.com; dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.c=
-om header.b=3Dq9r7dIZC; arc=3Dfail smtp.client-ip=3D40.107.212.79
+om header.b=3DZP/7DMTG; arc=3Dfail smtp.client-ip=3D40.107.236.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dpass (p=3Dquarant=
 ine dis=3Dnone) header.from=3Damd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=3Dfail smtp.mailfrom=
 =3Damd.com
 ARC-Seal: i=3D1; a=3Drsa-sha256; s=3Darcselector9901; d=3Dmicrosoft.com; cv=
 =3Dnone;
- b=3DCA9+EpoNiZ9ayMmuF+uTwSeBjPBlCFrkeWODbOoFlUQYPDABUEHwtqo28a8PW/imB4XHrn=
-E6Mt7E6/eCJocLwL2ciZisEmC7AJ22GL9xbPbPArTsRqEhdNCCbYLP8qWdMy7FpFKDiSu99P3Et=
-kWJOVuZR6wJ1zXPkVsxJAHxQ1NZ77Qa85K/ObPQ8AXhBmWwf+YD98Gd+ZIg+6gXsRxooicVQa7Y=
-3DkW94F4Dp2asJhZho3IOy1uRIKUanolI+9CLEqcJE1wd8Pj9ElUfYP1G1okbc8A1YOlkTe5b9U=
-LGwMufalRk2pkDIBD7XR36PUU/mnLms1Qwwj+VM+0nGkajg=3D=3D
+ b=3Da+RJHf/rVZH530XT1GCJWPwJ6Mpc1hKrcQvYd4xL54lLlm+ytsJmysKthG2vCa7fCEw8QU=
+SV/HKIe5jFMCkHOeRvUw/7+pN3VsWTxZBOw4PlFqBlrXYiTuXB/4wrqxVKhAzhd+t1QS506zNTd=
+5y0Cxu+NJgrOgizSjsM6VQMZH2sMSKLGTBt9M4kkFoy9FMLN1nINWolJ6fhtFXgOKJr0UpIf9xs=
+Gnln6A+V3apqvIG2W/EDB2VaA9d1jPe/7fPbOVSKSJOegSLtF11EvPOlwvwjald09QeoJHYDsST=
++dXS0IE+zgnR/GlQAfIg/IfoSDFINh5htMZ3UDkg9ssVd9g=3D=3D
 ARC-Message-Signature: i=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Dmicr=
 osoft.com;
  s=3Darcselector9901;
  h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-A=
 ntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Ex=
 change-AntiSpam-MessageData-1;
- bh=3D85xfxLH74OdKCMM2bG4Ka/efKmeDa+urj4S6khYBEhI=3D;
- b=3DXUVPXyEnaWzdYWoJNkvqerhl6Svq2T8m2knayzG2+AeIbpHftkICKGYxj3BhyGshE2fO6T=
-H9GpjHVrVPkK/+CpJ64AIdKw86jsY6ZbM8HQwf8klvQ5RxPozzGqx8MCi//iIwzzm3KPNqhj3Ww=
-+jF4+8AE9bU9otOpkMOebIPanjg1MidwxVrLnfjkq7hfRkk/I+aj940z2p1XCAH17I0WNoHu8Eh=
-R4AyoCVtX/44RDF24bsnopzDbUsoOPAjhJ/fk/qtp+XVd5ANyraXcDOdxzpXNzWDFF6h5vNh9oB=
-EnYh/p27lBZGuXOhT4rZfFcCDSYu2vULKOAr2b0ovUb+ebg=3D=3D
+ bh=3Dg4F0v4TXhVkzuRwLgbfEWUQkfmsL+Uf1rI69FDB8x/8=3D;
+ b=3DTuqSH36JyOXmYccLiUXWdFEih5He/146zy7PY2/vd0g6VC/PTWaQFiHts+uuRyJcYKnTRW=
+f5+UtbofHWWFYZ5O11xxJvCkGBNuMF20+G7x/HYtz3/W0Djy2WtYCsNU4892Bzp72PRz4MMl/Il=
+wWbmbDSddD97KPirj9rKQ4SL4PyskhEalF9gp+b8JyZzdJwUWS65A/DUikIgoAImTNHuL83Qo1o=
+nV/Ag8TxdPXhlLiD9knQ61afh+kEMZesJL3c/ZkDtJ41VGGBndZa3ntrzJqc+jZ79GZ8sPg3Hcm=
+RjoH5eKw0+iHfEdbRxal2pS+if8CN1RNOAAOOhiOXfwwgqg=3D=3D
 ARC-Authentication-Results: i=3D1; mx.microsoft.com 1; spf=3Dpass (sender i=
 p is
  165.204.84.17) smtp.rcpttodomain=3Dvger.kernel.org smtp.mailfrom=3Damd.com=
@@ -1048,23 +635,23 @@ DKIM-Signature: v=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Damd.com; s=
 =3Dselector1;
  h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-S=
 enderADCheck;
- bh=3D85xfxLH74OdKCMM2bG4Ka/efKmeDa+urj4S6khYBEhI=3D;
- b=3Dq9r7dIZCmGAMsb5Qf5qevjsO+u2qguOTQwgvMMQeTMWFxL30f5651Ih1rIv4M6gqyWlZAE=
-DGO0VJA6/trmWh7JWA1JQmddseBxmacNU4bozvpuXx54+2xHpPUF3BfBuyIDYp3RuPMt3lUtS6+=
-dQfKoYUuLkX31Den1QT9hFH4FA=3D
-Received: from DS7PR03CA0074.namprd03.prod.outlook.com (2603:10b6:5:3bb::19=
-)
- by SN7PR12MB6861.namprd12.prod.outlook.com (2603:10b6:806:266::14) with
+ bh=3Dg4F0v4TXhVkzuRwLgbfEWUQkfmsL+Uf1rI69FDB8x/8=3D;
+ b=3DZP/7DMTGJLB9Yii5sXMLLSiTJTEwT+kEdYoYzl0aGj81F+Dh5bNz2ZpxpgG6OKG/7RH7Di=
+fdvlDGg5ioSSL4KWF/dfpgDwucUIToufxWW7twWOS3RzAqReBBqpa83c9GfG8/jtbTIfxTgGCX4=
+d2X78viqbON2UTpouGMWD1B19A=3D
+Received: from BYAPR06CA0006.namprd06.prod.outlook.com (2603:10b6:a03:d4::1=
+9)
+ by PH8PR12MB6721.namprd12.prod.outlook.com (2603:10b6:510:1cc::18) with
  Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 =
+ cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Fri, 29 =
 Mar
- 2024 22:59:07 +0000
-Received: from CY4PEPF0000FCC4.namprd03.prod.outlook.com
- (2603:10b6:5:3bb:cafe::79) by DS7PR03CA0074.outlook.office365.com
- (2603:10b6:5:3bb::19) with Microsoft SMTP Server (version=3DTLS1_2,
+ 2024 22:59:25 +0000
+Received: from SJ1PEPF00001CDF.namprd05.prod.outlook.com
+ (2603:10b6:a03:d4:cafe::54) by BYAPR06CA0006.outlook.office365.com
+ (2603:10b6:a03:d4::19) with Microsoft SMTP Server (version=3DTLS1_2,
  cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40 via Front=
 end
- Transport; Fri, 29 Mar 2024 22:59:02 +0000
+ Transport; Fri, 29 Mar 2024 22:59:25 +0000
 X-MS-Exchange-Authentication-Results: spf=3Dpass (sender IP is 165.204.84.1=
 7)
  smtp.mailfrom=3Damd.com; dkim=3Dnone (message not signed)
@@ -1073,16 +660,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=3Dprotection.outlook.com;
  client-ip=3D165.204.84.17; helo=3DSATLEXMB04.amd.com; pr=3DC
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000FCC4.mail.protection.outlook.com (10.167.242.106) with Microsof=
-t
+ SJ1PEPF00001CDF.mail.protection.outlook.com (10.167.242.7) with Microsoft
  SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA=
 256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 22:59:01 +0000
+ 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 22:59:23 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=3DTLS1_2,
  cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 M=
 ar
- 2024 17:59:00 -0500
+ 2024 17:59:21 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -1100,9 +686,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
 	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
 	<brijesh.singh@amd.com>
-Subject: [PATCH v12 09/29] KVM: SEV: Add initial SEV-SNP support
-Date: Fri, 29 Mar 2024 17:58:15 -0500
-Message-ID: <20240329225835.400662-10-michael.roth@amd.com>
+Subject: [PATCH v12 10/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command
+Date: Fri, 29 Mar 2024 17:58:16 -0500
+Message-ID: <20240329225835.400662-11-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
@@ -1118,242 +704,585 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC4:EE_|SN7PR12MB6861:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a450cd9-fdcd-4e47-ed16-08dc5043d3=
-34
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDF:EE_|PH8PR12MB6721:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9179cff-2565-428c-c1f4-08dc5043e0=
+56
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nsYawN22RK6vpJl8VU3uLdBNz2wKwfigLe9u15MY=
-JjT0NXQV3Yzjn6a1OjYj4LPzeDO8cf52t0bld23f73IhgDjhPepqbc7IwHTzPhZ/pO0fb1Dc4F6=
-dPKSdnsPrwbyyhJI21uoEBXlb9DpAIEIBOyVjZmH+wtq/OnN34HGIHNnAASx0iEdmOS44o1oEug=
-f+lFgXmiA6AQWu+IikoKRj2YItSH3Txq0G7BC/TRGiWq2KqdmgFh+n5Hsot5lhcjxEP+iWzkso8=
-UiBcRHFE8Sju6gjTCdVv1uIDSSjI3OvUAubuGZeTloeeL4ALMLAdXglcVDTAeML83k7xVUpdU2U=
-JQx0wb/97jBfBau1zhrRC78B3NehLm2mU8sjwnExhuP/MfHsbmuX5VvLn2CPH9T81lSMjdxVYlZ=
-I/ytN2lzlTQ6vcxI+8hSPG9PpG923elprnKSAI7fsLuCaIOF+SPmZqnI+RcAfIX4fms89ZDSC6l=
-ffhLHDFAraZ3I86fN9ZemKTUgctwPvboQCfEG3mDxYzLPPQYhchCxYb1wWaG8jFR5sFSVsrE7JQ=
-/SDBGTYpRHKn9KLxD3rVWSX7nTCof7mJAPHXd2W0DPkpcx9TiDMdcZ4+2WH9Ez1YUqwMRjAYVmx=
-wirJl9RK3NI4in6GXQmovhcw4JB7RQikwOS3iiudBKTtfKGD6mR80tiSkJb9G8Bw9pvoQHQlT6b=
-Ql8BXfRTgx5cMzVuv0ny3ytgj4cr3PKrxvNDbOm6IUcK3cMc8E9Ls
+X-Microsoft-Antispam-Message-Info: N0Q/ob1ES6c3vUyxIlbqNB1kiL8OchYZphqdYFkd=
+XJpTeOncGhrxGWgpCPK3lwltWnf6Oi2ReoR2DcLJUy+jBMH9sC0SYt3rWAAol+BcQ7Jhf2NEHsz=
+iRkhN1DSQ1Dl+zorUbf0dQl9qJSO9/jFwPuJ53q/yhLZAN9Cx5sipS9ZxyPaBmuhSScBnshrZnT=
+UScfBuq6KXgc6hm+a8ba6nC9pw5J/u1BKP6Vi7t4jpT5Pnrv/GYBHQRJ++N5tWPHBFMHwONq3UG=
+pHOQEjboXryDCoBsahNlrjw8O9Fhx5u9dfruz5kBDa1M7EXOTC2FRiK0McBIhsrbp/pu/h9xbfi=
+Nz/rYkbHHj6+pt2BbW/e0yQzyRRO4fCGwMUyryyv3wV1Y0/CGDHJMwcf/+KEwK5sfbvJzkNIPB9=
+BWrvh+J7FBHoLiD1sPPbJM+EwI0hSU/J85LJsGzpGDcmTvkASBALQkAriYslf9x8KopxE/h1aHB=
+3jxThDLZZoruvoTKonOZ/K17BI//ZZac0gITuyIqitRIiWcYTmxozfE5O94AO0yXbmGkXAN656j=
+wxiw59sppRQWWHK/lxH3E0mDKpu7nZ+dUOb1PO3cTy/3nw0Wn7hTGUEBVAtgazKKPxEh3iUp6pU=
+1stIxfRcV6vWBay3UcQ1YVZiEBjzohCsXR2NabzELLKGFdknfV/2XZZHzZk/eUNmjdRmQOIMz6q=
+CBgJr4CsQww=3D=3D
 X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;I=
-PV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS=
-:(13230031)(82310400014)(1800799015)(7416005)(376005)(36860700004);DIR:OUT;=
-SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:59:01.5166
+PV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230031)=
+(7416005)(36860700004)(82310400014)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:59:23.5330
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a450cd9-fdcd-4e47-ed16-08dc5=
-043d334
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9179cff-2565-428c-c1f4-08dc5=
+043e056
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3D=
 3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=3D[165.204.84.17];Helo=3D[SATLEXMB0=
 4.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000FCC4.namprd03.prod.outlook=
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PEPF00001CDF.namprd05.prod.outlook=
 .com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6861
-Return-Path: linux-kernel+bounces-125486-steffen.klassert=3Dsecunet.com@vge=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6721
+Return-Path: linux-kernel+bounces-125487-steffen.klassert=3Dsecunet.com@vge=
 r.kernel.org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 22:59:35.8868
+X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 22:59:53.7218
  (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: d8a1fa16-8869-482d-0488-08dc=
-5043e7a1
-X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
-X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
-X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.s=
+X-MS-Exchange-Organization-Network-Message-Id: 1095868b-7c5a-431c-6ffb-08dc=
+5043f242
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.37
+X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.201
+X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-01.s=
 ecunet.de
-X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dcas-es=
-sen-02.secunet.de:TOTAL-FE=3D0.008|SMR=3D0.008(SMRPI=3D0.005(SMRPI-Frontend=
-ProxyAgent=3D0.005));2024-03-29T22:59:35.895Z
+X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-es=
+sen-02.secunet.de:TOTAL-HUB=3D0.416|SMR=3D0.329(SMRDE=3D0.005|SMRC=3D0.323(=
+SMRCL=3D0.103|X-SMRCR=3D0.322))|CAT=3D0.086(CATOS=3D0.001
+ |CATRESL=3D0.029(CATRESLP2R=3D0.020)|CATORES=3D0.051(CATRS=3D0.051(CATRS-T=
+ransport
+ Rule Agent=3D0.001 (X-ETREX=3D0.001)|CATRS-Index Routing
+ Agent=3D0.048))|CATORT=3D0.001(CATRT=3D0.001));2024-03-29T22:59:54.158Z
 X-MS-Exchange-Forest-ArrivalHubServer: mbx-essen-02.secunet.de
-X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
+X-MS-Exchange-Organization-AuthSource: cas-essen-01.secunet.de
 X-MS-Exchange-Organization-AuthAs: Anonymous
-X-MS-Exchange-Organization-OriginalSize: 18312
-X-MS-Exchange-Organization-Transport-Properties: DeliveryPriority=3DLow
-X-MS-Exchange-Organization-Prioritization: 2:ShadowRedundancy
-X-MS-Exchange-Organization-IncludeInSla: False:ShadowRedundancy
+X-MS-Exchange-Organization-FromEntityHeader: Internet
+X-MS-Exchange-Organization-OriginalSize: 22023
+X-MS-Exchange-Organization-HygienePolicy: Standard
+X-MS-Exchange-Organization-MessageLatency: SRV=3Dcas-essen-01.secunet.de:TO=
+TAL-FE=3D0.020|SMR=3D0.009(SMRPI=3D0.007(SMRPI-FrontendProxyAgent=3D0.007))=
+|SMS=3D0.011
+X-MS-Exchange-Organization-Recipient-Limit-Verified: True
+X-MS-Exchange-Organization-TotalRecipientCount: 1
+X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
+-482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
+0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
+6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
+X-MS-Exchange-Forest-RulesExecuted: mbx-essen-02
+X-MS-Exchange-Organization-RulesExecuted: mbx-essen-02
+X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAZcVAAAPAAADH4sIAAAAAAAEAMVaC3fb=
+tpKmZEuy5Sh23k
+ 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
+ 3XXCyXqQar9EU1m5jjDYGBm0EK/nSHp/LjMDBGc3lYLcs0mhXFWyQj
+ PExHkTChfR/4LSD2yTCKZeUzLQ6yUtp3We0x+C1pIBblh8L/9xYsE/
+ XznFrAy/1FXsBPqJVnMneFZA4xPCkvcrI6yuUhpeICoTHTWHWI/HhH
+ sCXB4FZYMU6KIiGgoBlhpNgs4PX/AFRqziAVQQAAAQrDAzw/eG1sIH
+ ZlcnNpb249IjEuMCIgZW5jb2Rpbmc9InV0Zi0xNiI/Pg0KPEVtYWls
+ U2V0Pg0KICA8VmVyc2lvbj4xNS4wLjAuMDwvVmVyc2lvbj4NCiAgPE
+ VtYWlscz4NCiAgICA8RW1haWwgU3RhcnRJbmRleD0iMjEiPg0KICAg
+ ICAgPEVtYWlsU3RyaW5nPmJyaWplc2guc2luZ2hAYW1kLmNvbTwvRW
+ 1haWxTdHJpbmc+DQogICAgPC9FbWFpbD4NCiAgICA8RW1haWwgU3Rh
+ cnRJbmRleD0iNDczIiBQb3NpdGlvbj0iT3RoZXIiPg0KICAgICAgPE
+ VtYWlsU3RyaW5nPmFzaGlzaC5rYWxyYUBhbWQuY29tPC9FbWFpbFN0
+ cmluZz4NCiAgICA8L0VtYWlsPg0KICAgIDxFbWFpbCBTdGFydEluZG
+ V4PSI1OTYiIFBvc2l0aW9uPSJPdGhlciI+DQogICAgICA8RW1haWxT
+ dHJpbmc+bWljaGFlbC5yb3RoQGFtZC5jb208L0VtYWlsU3RyaW5nPg
+ 0KICAgIDwvRW1haWw+DQogIDwvRW1haWxzPg0KPC9FbWFpbFNldD4B
+ DJ0FPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTE2Ij
+ 8+DQo8Q29udGFjdFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8L1Zl
+ cnNpb24+DQogIDxDb250YWN0cz4NCiAgICA8Q29udGFjdCBTdGFydE
+ luZGV4PSI2Ij4NCiAgICAgIDxQZXJzb24gU3RhcnRJbmRleD0iNiI+
+ DQogICAgICAgIDxQZXJzb25TdHJpbmc+QnJpamVzaCBTaW5naDwvUG
+ Vyc29uU3RyaW5nPg0KICAgICAgPC9QZXJzb24+DQogICAgICA8QnVz
+ aW5lc3MgU3RhcnRJbmRleD0iMTA5Ij4NCiAgICAgICAgPEJ1c2luZX
+ NzU3RyaW5nPlNOUDwvQnVzaW5lc3NTdHJpbmc+DQogICAgICA8L0J1
+ c2luZXNzPg0KICAgICAgPEVtYWlscz4NCiAgICAgICAgPEVtYWlsIF
+ N0YXJ0SW5kZXg9IjIxIj4NCiAgICAgICAgICA8RW1haWxTdHJpbmc+
+ YnJpamVzaC5zaW5naEBhbWQuY29tPC9FbWFpbFN0cmluZz4NCiAgIC
+ AgICAgPC9FbWFpbD4NCiAgICAgIDwvRW1haWxzPg0KICAgICAgPENv
+ bnRhY3RTdHJpbmc+QnJpamVzaCBTaW5naCAmbHQ7YnJpamVzaC5zaW
+ 5naEBhbWQuY29tJmd0Ow0KDQpLVk1fU0VWX1NOUF9MQVVOQ0hfU1RB
+ UlQgYmVnaW5zIHRoZSBsYXVuY2ggcHJvY2VzcyBmb3IgYW4gU0VWLV
+ NOUDwvQ29udGFjdFN0cmluZz4NCiAgICA8L0NvbnRhY3Q+DQogIDwv
+ Q29udGFjdHM+DQo8L0NvbnRhY3RTZXQ+AQ7QAVJldHJpZXZlck9wZX
+ JhdG9yLDEwLDA7UmV0cmlldmVyT3BlcmF0b3IsMTEsNDtQb3N0RG9j
+ UGFyc2VyT3BlcmF0b3IsMTAsMTtQb3N0RG9jUGFyc2VyT3BlcmF0b3
+ IsMTEsMDtQb3N0V29yZEJyZWFrZXJEaWFnbm9zdGljT3BlcmF0b3Is
+ MTAsMTA7UG9zdFdvcmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLD
+ ExLDA7VHJhbnNwb3J0V3JpdGVyUHJvZHVjZXIsMjAsMTI=3D
+X-MS-Exchange-Forest-IndexAgent: 1 6878
+X-MS-Exchange-Forest-EmailMessageHash: 10974F98
+X-MS-Exchange-Forest-Language: en
+X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
 
-SEV-SNP builds upon existing SEV and SEV-ES functionality while adding
-new hardware-based security protection. SEV-SNP adds strong memory
-encryption and integrity protection to help prevent malicious
-hypervisor-based attacks such as data replay, memory re-mapping, and
-more, to create an isolated execution environment.
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-Define a new KVM_X86_SNP_VM type which makes use of these capabilities
-and extend the KVM_SEV_INIT2 ioctl to support it. Also add a basic
-helper to check whether SNP is enabled.
+KVM_SEV_SNP_LAUNCH_START begins the launch process for an SEV-SNP guest.
+The command initializes a cryptographic digest context used to construct
+the measurement of the guest. Other commands can then at that point be
+used to load/encrypt data into the guest's initial launch image.
+
+For more information see the SEV-SNP specification.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: commit fixups, use similar ASID reporting as with SEV/SEV-ES]
+[mdr: hold sev_deactivate_lock when calling SEV_CMD_SNP_DECOMMISSION]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/include/asm/svm.h      |  3 ++-
- arch/x86/include/uapi/asm/kvm.h |  1 +
- arch/x86/kvm/svm/sev.c          | 21 ++++++++++++++++++++-
- arch/x86/kvm/svm/svm.c          |  3 ++-
- arch/x86/kvm/svm/svm.h          | 12 ++++++++++++
- arch/x86/kvm/x86.c              |  2 +-
- 6 files changed, 38 insertions(+), 4 deletions(-)
+ .../virt/kvm/x86/amd-memory-encryption.rst    |  23 ++-
+ arch/x86/include/uapi/asm/kvm.h               |   8 +
+ arch/x86/kvm/svm/sev.c                        | 152 +++++++++++++++++-
+ arch/x86/kvm/svm/svm.h                        |   1 +
+ 4 files changed, 180 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 728c98175b9c..544a43c1cf11 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -285,7 +285,8 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_M=
-AX_INDEX_MASK) =3D=3D X2AVIC_
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documen=
+tation/virt/kvm/x86/amd-memory-encryption.rst
+index f7c007d34114..a10b817c162d 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -459,6 +459,25 @@ issued by the hypervisor to make the guest ready for e=
+xecution.
 =20
- #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
+ Returns: 0 on success, -negative on error
 =20
--#define SVM_SEV_FEAT_DEBUG_SWAP                        BIT(5)
-+#define SVM_SEV_FEAT_SNP_ACTIVE				BIT(0)
-+#define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
++18. KVM_SEV_SNP_LAUNCH_START
++----------------------------
++
++The KVM_SNP_LAUNCH_START command is used for creating the memory encryptio=
+n
++context for the SEV-SNP guest.
++
++Parameters (in): struct  kvm_sev_snp_launch_start
++
++Returns: 0 on success, -negative on error
++
++::
++
++        struct kvm_sev_snp_launch_start {
++                __u64 policy;           /* Guest policy to use. */
++                __u8 gosvw[16];         /* Guest OS visible workarounds. *=
+/
++        };
++
++See the SEV-SNP spec [snp-fw-abi]_ for further detail on the launch input.
++
+ Device attribute API
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 =20
- struct vmcb_seg {
- 	u16 selector;
+@@ -490,9 +509,11 @@ References
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=20
+=20
+-See [white-paper]_, [api-spec]_, [amd-apm]_ and [kvm-forum]_ for more info=
+.
++See [white-paper]_, [api-spec]_, [amd-apm]_, [kvm-forum]_, and [snp-fw-abi=
+]_
++for more info.
+=20
+ .. [white-paper] https://developer.amd.com/wordpress/media/2013/12/AMD_Mem=
+ory_Encryption_Whitepaper_v7-Public.pdf
+ .. [api-spec] https://support.amd.com/TechDocs/55766_SEV-KM_API_Specificat=
+ion.pdf
+ .. [amd-apm] https://support.amd.com/TechDocs/24593.pdf (section 15.34)
+ .. [kvm-forum]  https://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendac=
+ky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
++.. [snp-fw-abi] https://www.amd.com/system/files/TechDocs/56860.pdf
 diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
 m.h
-index 51b13080ed4b..725b75cfe9ff 100644
+index 725b75cfe9ff..350ddd5264ea 100644
 --- a/arch/x86/include/uapi/asm/kvm.h
 +++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -868,5 +868,6 @@ struct kvm_hyperv_eventfd {
- #define KVM_X86_SW_PROTECTED_VM	1
- #define KVM_X86_SEV_VM		2
- #define KVM_X86_SEV_ES_VM	3
-+#define KVM_X86_SNP_VM		4
+@@ -693,6 +693,9 @@ enum sev_cmd_id {
+ 	/* Second time is the charm; improved versions of the above ioctls.  */
+ 	KVM_SEV_INIT2,
 =20
- #endif /* _ASM_X86_KVM_H */
++	/* SNP-specific commands */
++	KVM_SEV_SNP_LAUNCH_START,
++
+ 	KVM_SEV_NR_MAX,
+ };
+=20
+@@ -818,6 +821,11 @@ struct kvm_sev_receive_update_data {
+ 	__u32 pad2;
+ };
+=20
++struct kvm_sev_snp_launch_start {
++	__u64 policy;
++	__u8 gosvw[16];
++};
++
+ #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+ #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+=20
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1e65f5634ad3..3d9771163562 100644
+index 3d9771163562..6c7c77e33e62 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -46,6 +46,9 @@ module_param_named(sev, sev_enabled, bool, 0444);
- static bool sev_es_enabled =3D true;
- module_param_named(sev_es, sev_es_enabled, bool, 0444);
+@@ -25,6 +25,7 @@
+ #include <asm/fpu/xcr.h>
+ #include <asm/fpu/xstate.h>
+ #include <asm/debugreg.h>
++#include <asm/sev.h>
 =20
-+/* enable/disable SEV-SNP support */
-+static bool sev_snp_enabled;
-+
- /* enable/disable SEV-ES DebugSwap support */
- static bool sev_es_debug_swap_enabled =3D true;
- module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
-@@ -275,6 +278,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm=
-_sev_cmd *argp,
- 	sev->es_active =3D es_active;
- 	sev->vmsa_features =3D data->vmsa_features;
+ #include "mmu.h"
+ #include "x86.h"
+@@ -58,6 +59,10 @@ static u64 sev_supported_vmsa_features;
+ #define AP_RESET_HOLD_NAE_EVENT		1
+ #define AP_RESET_HOLD_MSR_PROTO		2
 =20
-+	if (vm_type =3D=3D KVM_X86_SNP_VM)
-+		sev->vmsa_features |=3D SVM_SEV_FEAT_SNP_ACTIVE;
++/* As defined by SEV-SNP Firmware ABI, under "Guest Policy". */
++#define SNP_POLICY_MASK_SMT		BIT_ULL(16)
++#define SNP_POLICY_MASK_SINGLE_SOCKET	BIT_ULL(20)
 +
- 	ret =3D sev_asid_new(sev);
+ static u8 sev_enc_bit;
+ static DECLARE_RWSEM(sev_deactivate_lock);
+ static DEFINE_MUTEX(sev_bitmap_lock);
+@@ -68,6 +73,8 @@ static unsigned int nr_asids;
+ static unsigned long *sev_asid_bitmap;
+ static unsigned long *sev_reclaim_asid_bitmap;
+=20
++static int snp_decommission_context(struct kvm *kvm);
++
+ struct enc_region {
+ 	struct list_head list;
+ 	unsigned long npages;
+@@ -94,12 +101,17 @@ static int sev_flush_asids(unsigned int min_asid, unsi=
+gned int max_asid)
+ 	down_write(&sev_deactivate_lock);
+=20
+ 	wbinvd_on_all_cpus();
+-	ret =3D sev_guest_df_flush(&error);
++
++	if (sev_snp_enabled)
++		ret =3D sev_do_cmd(SEV_CMD_SNP_DF_FLUSH, NULL, &error);
++	else
++		ret =3D sev_guest_df_flush(&error);
+=20
+ 	up_write(&sev_deactivate_lock);
+=20
  	if (ret)
- 		goto e_no_asid;
-@@ -326,7 +332,8 @@ static int sev_guest_init2(struct kvm *kvm, struct kvm_=
-sev_cmd *argp)
- 		return -EINVAL;
+-		pr_err("SEV: DF_FLUSH failed, ret=3D%d, error=3D%#x\n", ret, error);
++		pr_err("SEV%s: DF_FLUSH failed, ret=3D%d, error=3D%#x\n",
++		       sev_snp_enabled ? "-SNP" : "", ret, error);
 =20
- 	if (kvm->arch.vm_type !=3D KVM_X86_SEV_VM &&
--	    kvm->arch.vm_type !=3D KVM_X86_SEV_ES_VM)
-+	    kvm->arch.vm_type !=3D KVM_X86_SEV_ES_VM &&
-+	    kvm->arch.vm_type !=3D KVM_X86_SNP_VM)
- 		return -EINVAL;
-=20
- 	if (copy_from_user(&data, u64_to_user_ptr(argp->data), sizeof(data)))
-@@ -2297,11 +2304,16 @@ void __init sev_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
- 		kvm_caps.supported_vm_types |=3D BIT(KVM_X86_SEV_ES_VM);
+ 	return ret;
+ }
+@@ -1967,6 +1979,102 @@ int sev_dev_get_attr(u64 attr, u64 *val)
  	}
-+	if (sev_snp_enabled) {
-+		kvm_cpu_cap_set(X86_FEATURE_SEV_SNP);
-+		kvm_caps.supported_vm_types |=3D BIT(KVM_X86_SNP_VM);
-+	}
  }
 =20
- void __init sev_hardware_setup(void)
- {
- 	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
-+	bool sev_snp_supported =3D false;
- 	bool sev_es_supported =3D false;
- 	bool sev_supported =3D false;
-=20
-@@ -2382,6 +2394,7 @@ void __init sev_hardware_setup(void)
- 	sev_es_asid_count =3D min_sev_asid - 1;
- 	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))=
-;
- 	sev_es_supported =3D true;
-+	sev_snp_supported =3D sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV=
-_SNP);
-=20
- out:
- 	if (boot_cpu_has(X86_FEATURE_SEV))
-@@ -2394,9 +2407,15 @@ void __init sev_hardware_setup(void)
- 		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
- 			sev_es_supported ? "enabled" : "disabled",
- 			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
-+	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
-+		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
-+			sev_snp_supported ? "enabled" : "disabled",
-+			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
-=20
- 	sev_enabled =3D sev_supported;
- 	sev_es_enabled =3D sev_es_supported;
-+	sev_snp_enabled =3D sev_snp_supported;
-+
- 	if (!sev_es_enabled || !cpu_feature_enabled(X86_FEATURE_DEBUG_SWAP) ||
- 	    !cpu_feature_enabled(X86_FEATURE_NO_NESTED_DATA_BP))
- 		sev_es_debug_swap_enabled =3D false;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0f3b59da0d4a..2c162f6a1d78 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4890,7 +4890,8 @@ static int svm_vm_init(struct kvm *kvm)
-=20
- 	if (type !=3D KVM_X86_DEFAULT_VM &&
- 	    type !=3D KVM_X86_SW_PROTECTED_VM) {
--		kvm->arch.has_protected_state =3D (type =3D=3D KVM_X86_SEV_ES_VM);
-+		kvm->arch.has_protected_state =3D
-+			(type =3D=3D KVM_X86_SEV_ES_VM || type =3D=3D KVM_X86_SNP_VM);
- 		to_kvm_sev_info(kvm)->need_init =3D true;
- 	}
-=20
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 157eb3f65269..4a01a81dd9b9 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -348,6 +348,18 @@ static __always_inline bool sev_es_guest(struct kvm *k=
-vm)
- #endif
- }
-=20
-+static __always_inline bool sev_snp_guest(struct kvm *kvm)
++/*
++ * The guest context contains all the information, keys and metadata
++ * associated with the guest that the firmware tracks to implement SEV
++ * and SNP features. The firmware stores the guest context in hypervisor
++ * provide page via the SNP_GCTX_CREATE command.
++ */
++static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
 +{
-+#ifdef CONFIG_KVM_AMD_SEV
-+	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_addr data =3D {};
++	void *context;
++	int rc;
 +
-+	return (sev->vmsa_features & SVM_SEV_FEAT_SNP_ACTIVE) &&
-+	       !WARN_ON_ONCE(!sev_es_guest(kvm));
-+#else
-+	return false;
-+#endif
++	/* Allocate memory for context page */
++	context =3D snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
++	if (!context)
++		return NULL;
++
++	data.address =3D __psp_pa(context);
++	rc =3D __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &arg=
+p->error);
++	if (rc) {
++		pr_warn("Failed to create SEV-SNP context, rc %d fw_error %d",
++			rc, argp->error);
++		snp_free_firmware_page(context);
++		return NULL;
++	}
++
++	return context;
 +}
 +
- static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
++static int snp_bind_asid(struct kvm *kvm, int *error)
++{
++	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_activate data =3D {0};
++
++	data.gctx_paddr =3D __psp_pa(sev->snp_context);
++	data.asid =3D sev_get_asid(kvm);
++	return sev_issue_cmd(kvm, SEV_CMD_SNP_ACTIVATE, &data, error);
++}
++
++static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_launch_start start =3D {0};
++	struct kvm_sev_snp_launch_start params;
++	int rc;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++
++	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(params)))
++		return -EFAULT;
++
++	/* Don't allow userspace to allocate memory for more than 1 SNP context. =
+*/
++	if (sev->snp_context) {
++		pr_debug("SEV-SNP context already exists. Refusing to allocate an additi=
+onal one.");
++		return -EINVAL;
++	}
++
++	sev->snp_context =3D snp_context_create(kvm, argp);
++	if (!sev->snp_context)
++		return -ENOTTY;
++
++	if (params.policy & SNP_POLICY_MASK_SINGLE_SOCKET) {
++		pr_debug("SEV-SNP hypervisor does not support limiting guests to a singl=
+e socket.");
++		return -EINVAL;
++	}
++
++	if (!(params.policy & SNP_POLICY_MASK_SMT)) {
++		pr_debug("SEV-SNP hypervisor does not support limiting guests to a singl=
+e SMT thread.");
++		return -EINVAL;
++	}
++
++	start.gctx_paddr =3D __psp_pa(sev->snp_context);
++	start.policy =3D params.policy;
++	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
++	rc =3D __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &a=
+rgp->error);
++	if (rc) {
++		pr_debug("SEV_CMD_SNP_LAUNCH_START command failed, rc %d\n", rc);
++		goto e_free_context;
++	}
++
++	sev->fd =3D argp->sev_fd;
++	rc =3D snp_bind_asid(kvm, &argp->error);
++	if (rc) {
++		pr_debug("Failed to bind ASID to SEV-SNP context, rc %d\n", rc);
++		goto e_free_context;
++	}
++
++	return 0;
++
++e_free_context:
++	snp_decommission_context(kvm);
++
++	return rc;
++}
++
+ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	vmcb->control.clean =3D 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 64eda7949f09..f85735b6235d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12603,7 +12603,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
- type)
+ 	struct kvm_sev_cmd sev_cmd;
+@@ -2054,6 +2162,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *a=
+rgp)
+ 	case KVM_SEV_RECEIVE_FINISH:
+ 		r =3D sev_receive_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_LAUNCH_START:
++		r =3D snp_launch_start(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r =3D -EINVAL;
+ 		goto out;
+@@ -2249,6 +2360,33 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, un=
+signed int source_fd)
+ 	return ret;
+ }
 =20
- 	kvm->arch.vm_type =3D type;
- 	kvm->arch.has_private_mem =3D
--		(type =3D=3D KVM_X86_SW_PROTECTED_VM);
-+		(type =3D=3D KVM_X86_SW_PROTECTED_VM || type =3D=3D KVM_X86_SNP_VM);
++static int snp_decommission_context(struct kvm *kvm)
++{
++	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_addr data =3D {};
++	int ret;
++
++	/* If context is not created then do nothing */
++	if (!sev->snp_context)
++		return 0;
++
++	data.address =3D __sme_pa(sev->snp_context);
++	down_write(&sev_deactivate_lock);
++	ret =3D sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, &data, NULL);
++	if (WARN_ONCE(ret, "failed to release guest context")) {
++		up_write(&sev_deactivate_lock);
++		return ret;
++	}
++
++	up_write(&sev_deactivate_lock);
++
++	/* free the context page now */
++	snp_free_firmware_page(sev->snp_context);
++	sev->snp_context =3D NULL;
++
++	return 0;
++}
++
+ void sev_vm_destroy(struct kvm *kvm)
+ {
+ 	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
+@@ -2290,7 +2428,15 @@ void sev_vm_destroy(struct kvm *kvm)
+ 		}
+ 	}
 =20
- 	ret =3D kvm_page_track_init(kvm);
- 	if (ret)
+-	sev_unbind_asid(kvm, sev->handle);
++	if (sev_snp_guest(kvm)) {
++		if (snp_decommission_context(kvm)) {
++			WARN_ONCE(1, "Failed to free SNP guest context, leaking asid!\n");
++			return;
++		}
++	} else {
++		sev_unbind_asid(kvm, sev->handle);
++	}
++
+ 	sev_asid_free(sev);
+ }
+=20
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 4a01a81dd9b9..a3c190642c57 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -92,6 +92,7 @@ struct kvm_sev_info {
+ 	struct list_head mirror_entry; /* Use as a list entry of mirrors */
+ 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+ 	atomic_t migration_in_progress;
++	void *snp_context;      /* SNP guest context page */
+ };
+=20
+ struct kvm_svm {
 --=20
 2.25.1
 
