@@ -1,101 +1,100 @@
-Return-Path: <kvm+bounces-13244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13225-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E45D893508
-	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 19:19:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ADC48934D1
+	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 19:14:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43D8B28CAA0
-	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 17:19:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95860B26CB7
+	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 17:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2669D16F848;
-	Sun, 31 Mar 2024 16:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B937716C6A9;
+	Sun, 31 Mar 2024 16:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0OzfLPfd"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zeCqVAyj"
 X-Original-To: kvm@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC056152512;
-	Sun, 31 Mar 2024 16:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA17414D436;
+	Sun, 31 Mar 2024 16:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711903648; cv=fail; b=d93ywBaIxePXDVW+OmIGS6cBntOMoIbJjG1Y6CfxTZPwUaUFUWfDUj9BTBGmzfuqHp5nVqKTlUy1vwGYOYX/YIF7+rDc8O8oI8/6YhrQbAClmh9ApUg/AXNDhjMhF2K6cBMeYxGlnsEkEUFKWn4O+77wID5dtpyOrel5F0DoZAQ=
+	t=1711903583; cv=fail; b=B76QHJq1XO3CvPwtjthfXsrW4vqv3FMarBSxE++eRm36Z5H3MsWRWvBY/d2Nn6VXwp9ezzcLURDvfgenKK6+K/hn2hu9U0vn1in/GfO+y3/pQHOv+9fxdFnBxahlbn+O7be99FxsTJxaB55kFTUG/DCG5L/DKFz2/vqrnWav4gY=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711903648; c=relaxed/simple;
-	bh=VHIiWOVkfAy+1ZRJPL5d94ZuAwTJ85rhICnJa09syzk=;
+	s=arc-20240116; t=1711903583; c=relaxed/simple;
+	bh=E3pLmvHIMuvTZpDoFEVFcYRZ22dwBuXR45Nz5EzdTTs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JOJ89fofe0eyBH18U/GoILZsbdrjmatgBnlNWkC41OExa169JimpkBi07SOBxbeLy8yvFmAStIicO7xIx4C5Xi3+BCdFq32uXL7LVxpl+WQvbWdQ7tAUdwYIdiMN4mwwgjAUSg1wEGKb8cogPMbklusEzEO7fJXjzEg1+MV3LqM=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0OzfLPfd reason="signature verification failed"; arc=fail smtp.client-ip=40.107.93.84; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=JjY5I+Ha6f2B7Yud0bHusQV6gBdSgoggYjfWEuKQoX58oRBpd++yYUQS10fIVbr8C0CXW5y+m5LNKZP8b4KTvXVz0IrlnCXXJlN1zYdARxC8hgbGqTmSeniAKcMVgUUcbkJXDbbUFg4i7edWHN4o/2FwHn85BbS+be9Bmh1IYus=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zeCqVAyj reason="signature verification failed"; arc=fail smtp.client-ip=40.107.100.70; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 13E502082B;
-	Sun, 31 Mar 2024 18:47:22 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id BB4A920851;
+	Sun, 31 Mar 2024 18:46:19 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id k2_0NNgFfPVD; Sun, 31 Mar 2024 18:47:20 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	with ESMTP id 18pgTe3Sq70m; Sun, 31 Mar 2024 18:46:18 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 2346E20826;
-	Sun, 31 Mar 2024 18:47:16 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2346E20826
+	by a.mx.secunet.com (Postfix) with ESMTPS id 232AA208DF;
+	Sun, 31 Mar 2024 18:46:13 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 232AA208DF
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id EB1B9800059;
-	Sun, 31 Mar 2024 18:40:20 +0200 (CEST)
+	by mailout1.secunet.com (Postfix) with ESMTP id 8FCCF800058;
+	Sun, 31 Mar 2024 18:40:24 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:40:20 +0200
+ 15.1.2507.35; Sun, 31 Mar 2024 18:40:24 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 16:36:18 +0000
-X-sender: <kvm+bounces-13128-martin.weber=secunet.com@vger.kernel.org>
-X-Receiver: <martin.weber@secunet.com> ORCPT=rfc822;martin.weber@secunet.com
- NOTIFY=NEVER;
- X-ExtendedProps=BQAVABYAAgAAAAUAFAARAJuYHy0vkvxLoOu7fW2WcxcPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAF4AAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249V2ViZXIgTWFydGluOTU1BQALABcAvgAAALMpUnVJ4+pPsL47FHo+lvtDTj1EQjIsQ049RGF0YWJhc2VzLENOPUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpLENOPUFkbWluaXN0cmF0aXZlIEdyb3VwcyxDTj1zZWN1bmV0LENOPU1pY3Jvc29mdCBFeGNoYW5nZSxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPXNlY3VuZXQsREM9ZGUFAA4AEQBACf3SYEkDT461FZzDv+B7BQAdAA8ADAAAAG1ieC1lc3Nlbi0wMQUAPAACAAAPADYAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0Lk1haWxSZWNpcGllbnQuRGlzcGxheU5hbWUPAA0AAABXZWJlciwgTWFydGluBQAMAAIAAAUAbAACAAAFAFgAFwBGAAAAm5gfLS+S/Eug67t9bZZzF0NOPVdlYmVyIE1hcnRpbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8AL
-	wAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
+ 15.1.2507.17; Sun, 31 Mar 2024 16:36:43 +0000
+X-sender: <linux-kernel+bounces-125509-steffen.klassert=secunet.com@vger.kernel.org>
+X-Receiver: <steffen.klassert@secunet.com>
+ ORCPT=rfc822;steffen.klassert@secunet.com NOTIFY=NEVER;
+ X-ExtendedProps=DwA1AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLklzUmVzb3VyY2UCAAAFABUAFgACAAAABQAUABEA8MUJLbkECUOS0gjaDTZ+uAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAGwAAgAABQBYABcASgAAAPDFCS25BAlDktII2g02frhDTj1LbGFzc2VydCBTdGVmZmVuLE9VPVVzZXJzLE9VPU1pZ3JhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAMAAIAAAUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9ye
+	TogRmFsc2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
 X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoA6kmmlidQ3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAGAAAAG1hcnRpbi53ZWJlckBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQACAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBiAAoAQQAAAM6KAAAFAGQADwADAAAASHVi
+X-ExtendedProps: BQBjAAoA6kmmlidQ3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2VjdW5ldC5jb20FAAYAAgABDwAqAAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5SZXN1Ym1pdENvdW50BwACAAAADwAJAAAAQ0lBdWRpdGVkAgABBQACAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBiAAoATQAAAM6KAAAFAGQADwADAAAASHViBQApAAIAAQ8APwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRGlyZWN0b3J5RGF0YS5NYWlsRGVsaXZlcnlQcmlvcml0eQ8AAwAAAExvdw==
 X-Source: SMTP:Default MBX-ESSEN-02
 X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 21882
+X-EndOfInjectedXHeaders: 25367
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.80.249; helo=am.mirrors.kernel.org; envelope-from=kvm+bounces-13128-martin.weber=secunet.com@vger.kernel.org; receiver=martin.weber@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 09E0D200BB
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=linux-kernel+bounces-125509-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 3E8FA200BB
 Authentication-Results: b.mx.secunet.com;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0OzfLPfd"
-X-Original-To: kvm@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.84
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zeCqVAyj"
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.70
 ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711753482; cv=fail; b=dd/YUqMpHBY7oBs5X7SJOiSD3bZfm6eJnCuVCTszpQqnzTDkDKUeRP0iv9EciozkVY8bezMtlbRHd/iLI+yvb+p1bQFsmu/OsIPjT00dM5IAY1m6ISG6JDINDEjBldjIWObBWi6T/XnIiSdV7e32gep2BJbGzysEKgdgHqoO7UY=
+	t=1711753544; cv=fail; b=BlqqvbGwutAw8URHIgMH30kvA5QpTzs/EidijFPe0fjFy5pMt6gU3Of58WmRgtLC5HdAFWEnpY91icLlr7eYlVXCT6T10fN7aOeDR+taYs5wJQZoRJMsxCRbI3XvUrIl79N5OhELjsPxchrIPeXAKecY7/mL+08bVpQeDnTw0Tg=
 ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711753482; c=relaxed/simple;
-	bh=qoE8VoSWxjBvaAC97qUKIp53Zv00INjbIDhNg0iLQGE=;
+	s=arc-20240116; t=1711753544; c=relaxed/simple;
+	bh=WgjSuePq/wBpCSmmzUyRKNJcA65Zw60gyFDJt37grOw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B9CB091b0+dhtD6NETV1KuvYYZmR5dKUqin7Zm8T2FAZKou24eKMBSaitIZydavGd9wMfihrYo5fpuyyxi73UKVMX9dl/E2+di82Uo5+Tl1lNZrIUtpP28gsDD5evwDmGss43HrhW5J52SYODJ9ubqFlXvOsxa/UKRJkIzyO9as=
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0OzfLPfd; arc=fail smtp.client-ip=40.107.93.84
+	 MIME-Version:Content-Type; b=tadVHjYp3xUeM32EvMaNxfyZwQQAKHmOqhQQ1XMBg9kHp+gJAurvOy+zAHBwq9zTbGuP/KUoD7IDeUX0jGzYICO/4kQRtEwkvcoBPNOkgirp3exZt3Mu9Ku4Nua7UCArN/3crAiO/9CE+CnJguzPNZzA3jmWHwQHpZ5TSvlUC9c=
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zeCqVAyj; arc=fail smtp.client-ip=40.107.100.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NmzppQt3HHdjSlx0Gcjy/1PafDG91jVT2gWT6ZmmBD1P5Oy7FzF6ZAELsthIFY4l4NjcT4q9mF3jH9rEI/XxZLC4W+Krss0yyIqiU7QKwXoNN+p+S2leM1L8gjm1SsHxQxhB1mRlAbhefkjg/XjHeybpqc8l9rmvJxQ2NXtbno2NgOkS4vbbVkruSJJDO8S1QLsf4N4r7v8M6TcrzLEkG2Ejvq5E5kzu3/w3AHwMHw6pakgYdZVr60jlVvBdL++32/krngqO04PDcwZjiPK5sKJabSVmgcT3XzQmtF5JJgVbUIJuP7mjmqMS2rXM7s888oQkAFmXbxfxc0b14ZgNUA==
+ b=LTdfnSa1VhLOPKJevSaKvpUEM+ibK4JR/D4A9skjpRANTv9ZzuAloP8//3oASD3IdNwrh+OSRxi+9Iwq7hxH6bm72GCC8DmsKuP2rDNCei5s/4ioa7Mt0Rgv1Y/9zANhJ5bTNBTPlIJK6vKpaQdARBJ53qfdQwGiJ48PzqDufYciLrHxwSuTMItPHCXugbz1V3S9i0NMupUEJi2oKI/eevatNkz7jMPkOWb7myAeNRT+nOWgFlh4B1G5PybIF2KIVcmpb5vavCiFv2nXckLeBWe3CjlMqZJgIR/2tMwEHDDQjFAfKr1bkg0JIiZoKD5UYARcmLysUNDUnBW6ZIkQcA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aN5dRXX67F3gVsuDDIwedEmcnOL9iN4vQ9udAxqxhqc=;
- b=m9mGWEjH0U3miudpcZmIumfJrISSJe9DcuZa8ArNfPdM/TIhHhtVyMzMvJBWKpUzXeAvelyQ+uXjxYOFJOvVVZ+k7FCsWBgNe2pUaz8u1IRSOgOh8savUt/pneP5I5XO+hfDPFDXLGYwmf/uCt+NSnyO8jmG8+Q0J75I9Rn2Loh211AqxMWFEfAB7iGNkzOzSZIVCWpY4c7r1/mXbKgE2/uULmFVhqVL8xny3t7zea3GzgEJzxoI+Ww3RH9+hEvCuWV213vSpwp0gpHYUJEJy7N8t5z7HFWlsIyz01+nOCVXLbhhUysz88QVvWfnJsNadcR2GsggrzZIfoNCjx4YLQ==
+ bh=nBu38l4H29f7TDioCJxMHGn5H0K24coARDh1fYxp94g=;
+ b=Tm4mgAX85xml0c02ymLsi9tk5C41IzMLRHOGWwLnQtBjp1JDzL/nwJeVbnGSnlpvk1POZGeLGRF7uiH/vidV2sDKC96d1S85+P55F8F6RGYjLbU4K7b/V5SjUD5EXMBtRAVnjp0PDyxJrRMJyeAM6BYi8RyT7/DfjMT8G35q9tTlJjCWFv6owwahTlfvcX2HoILzjyrKqGAeDieGHKbYsmZOPTPErMVnPAJ8B7I8++OtLIDDvWXeDmrmLRbHlIemWx0QFJKcVf8k3aQiK3tidiyMuCzDuSs0Ua3O7Upae61Gh50WMtQDWQCbIiKYt0jiqt4Exm8sSBJz6uwIWduLZQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aN5dRXX67F3gVsuDDIwedEmcnOL9iN4vQ9udAxqxhqc=;
- b=0OzfLPfdr5awgBaOBCPyFx1LEtkyYimJdcJO9s39y5mukIUnCecs8bCnDqPw0s9Yi6eBCfJoFR8qhbo2SyzxtmFZjPrJiu6nk58F16qzNsdmUNb/mhANHx72woZ3d7YnyY6SbLOwYfHJlrKhIAOitM0TWuofnBsofRvp0j5afl0=
+ bh=nBu38l4H29f7TDioCJxMHGn5H0K24coARDh1fYxp94g=;
+ b=zeCqVAyjfRxDQher1AZ5EaOKxM5xY4BftFJ208BZWqiiAjXdof/d4iUhbP36IlOA01+A1BhxmrUQU0P14395af+BJG1LpGQu/iQfEYn8iwN6tfjzVCRINDzlsxLRvhiEfBgRdVKJmno9WURcApRABBx4LkwYntw5GkcQBk5RGlA=
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -117,10 +116,11 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v12 23/29] KVM: x86: Implement gmem hook for determining max NPT mapping level
-Date: Fri, 29 Mar 2024 17:58:29 -0500
-Message-ID: <20240329225835.400662-24-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
+	<brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
+Subject: [PATCH v12 26/29] KVM: SEV: Provide support for SNP_GUEST_REQUEST NAE event
+Date: Fri, 29 Mar 2024 17:58:32 -0500
+Message-ID: <20240329225835.400662-27-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
@@ -137,227 +137,288 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|CH3PR12MB8755:EE_
-X-MS-Office365-Filtering-Correlation-Id: e38e48d9-38a0-4b49-1d02-08dc50449b4f
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017091:EE_|DS7PR12MB8346:EE_
+X-MS-Office365-Filtering-Correlation-Id: 29793531-e2ca-491c-1a60-08dc5044c08d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WM4cVZMM979iNHWUqg/R2qcnt+pYRBbuuCYpB3Fbz+oMUwGukB7l5dTzoGYJ1QuNky1ktimVX8cuhGtUgxBhYpn47T6T2eGyQhnk7eFm8sbikzk757e2b4xCdHGMolMOLIMFfSDyV8ZyJkaRB+H7HJnzvEhaSpj+YANSzx7jPPss9B4M9w0plIWzPvZkcq9JI506ArfELOZSJ6fTz8CWxidzPGf3mqvyewtgxcp9qLS6LwWQTbw5b8otbYADH1b0jWIrgye3c7sniPOhv6kECmI13mWJuVjJeaZ8R5peOO6TiMFUBqP52DovBAqt+x3XLRjmSxJSwoLN/hV7UaFlwZVPqfU+xDdRTf+AoQ5FmH9tTR3JRUc8uuwA6MlSp449hDpBwyNaTJsYLU+9LTCdGc3OLoa5xG5jqilSk/qclO5m/hHpQhd23abF4Vq4k0Pkt56LWJFyfKuQAfwoTgmjkjJ//4Zy9+bgqDPPkgtMDhM2cmqv/Ongly+IWlbsz3O9LAAf3sGFEy6UL7OgAsfL71pe/84AtNPeRr+b3D7U2W1aw/o08N5EPdnWxKJysjJrZfeKc7leOpKvxpp6qr+46mFUlafO89kBQy474AgtI+Sjz28UvkgW5DoCE/LyNst6sNyMfhXSoBldD5N+H5PsSpMZdGp7N5LJ1rVjaSmCvf7Z0JSh5SJlG8P9adn/znoTe1fgeegHa3PZRXOK1J/pjEPBGDIIwTAj0cKlOBybOYPUcFfhtXyx39Mz0URsw6kg
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(7416005)(36860700004);DIR:OUT;SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:04:37.2636
+X-Microsoft-Antispam-Message-Info: wFSuaKTvRQfOtdiiZggI/1E9juK+oJc2TRSGXFVjNQH6K1wlm9lAuRi2AABfWovQilmwMVXe1l6T4YxvGuuFifLSCpmtPQOHKjm6x+FajgbzHsEgtMX93cx5A0nttMe/qTI13yLMvcscLwhbPBIdodHYHhzKupmGusDKEUfIkuXqgoS46ONELQ8DpRVI7AvlT51VRqxW6w6SmGYUURqbArpcwis5lJT+cTvGNv8CqPtGPlIy7qfPPfuhv1nCIO9qPPfvEGlgl/Ec+LypJxBtqOEfg2pBgc02cbfF15t+YO5/ue5hwWk2QeyLY/PtzpC6Bue+8ZYMaLgW7iEG237ohWzAvDkoO5JuB0YjPr9df90ZKqzIesdCLnSdeqdDO9BO09jMyX5hg+vOmQmDRLp5MGJZ0CLEXxryinRjW60G57b7aoliHs448u+dW9OMhumg4geX6Ys+dNVlqiUHttX7q1i79Zld8UWIVQxAemTDG5c93reIn0O1bo2r+FTQzyNA60sU19YLtjGrE2CeHrS8UBmvPCHb+dNs/bwEdkpHaysGHJoMSSvphTWHY/GTjqyl61EyVKEXMAdKGOoJEKagRrWl4eg4UKhIYmIVTQyAvx7i9Y2qCbTYlvo+hUPDKlFswU7rnoRM5q0SJo084BAULraS65dFTt/wwZaFs/sG/Pn1sk4sqy3xCY8HS+L4Ka6jAqFvX2LdWGEJVaix3MvIE7CGKTb/0UI+9e3423/5muTUjwuXnqr/9ldh5/UD03xC
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:05:39.7301
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e38e48d9-38a0-4b49-1d02-08dc50449b4f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29793531-e2ca-491c-1a60-08dc5044c08d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017092.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017091.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8755
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8346
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-In the case of SEV-SNP, whether or not a 2MB page can be mapped via a
-2MB mapping in the guest's nested page table depends on whether or not
-any subpages within the range have already been initialized as private
-in the RMP table. The existing mixed-attribute tracking in KVM is
-insufficient here, for instance:
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-  - gmem allocates 2MB page
-  - guest issues PVALIDATE on 2MB page
-  - guest later converts a subpage to shared
-  - SNP host code issues PSMASH to split 2MB RMP mapping to 4K
-  - KVM MMU splits NPT mapping to 4K
-  - guest later converts that shared page back to private
+Version 2 of GHCB specification added support for the SNP Guest Request
+Message NAE event. The event allows for an SEV-SNP guest to make
+requests to the SEV-SNP firmware through hypervisor using the
+SNP_GUEST_REQUEST API defined in the SEV-SNP firmware specification.
 
-At this point there are no mixed attributes, and KVM would normally
-allow for 2MB NPT mappings again, but this is actually not allowed
-because the RMP table mappings are 4K and cannot be promoted on the
-hypervisor side, so the NPT mappings must still be limited to 4K to
-match this.
+This is used by guests primarily to request attestation reports from
+firmware. There are other request types are available as well, but the
+specifics of what guest requests are being made are opaque to the
+hypervisor, which only serves as a proxy for the guest requests and
+firmware responses.
 
-Implement a kvm_x86_ops.gmem_validate_fault() hook for SEV that checks
-for this condition and adjusts the mapping level accordingly.
+Implement handling for these events.
 
+Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
+Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+[mdr: ensure FW command failures are indicated to guest, drop extended
+ request handling to be re-written as separate patch, massage commit]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 32 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c |  1 +
- arch/x86/kvm/svm/svm.h |  7 +++++++
- 3 files changed, 40 insertions(+)
+ arch/x86/kvm/svm/sev.c         | 83 ++++++++++++++++++++++++++++++++++
+ include/uapi/linux/sev-guest.h |  9 ++++
+ 2 files changed, 92 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 87d621d013a4..31f6f4786503 100644
+index 658116537f3f..f56f04553e81 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -4443,3 +4443,35 @@ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
- 		pfn += use_2m_update ? PTRS_PER_PMD : 1;
- 	}
+@@ -19,6 +19,7 @@
+ #include <linux/misc_cgroup.h>
+ #include <linux/processor.h>
+ #include <linux/trace_events.h>
++#include <uapi/linux/sev-guest.h>
+ 
+ #include <asm/pkru.h>
+ #include <asm/trapnr.h>
+@@ -3223,6 +3224,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 	case SVM_VMGEXIT_HV_FEATURES:
+ 	case SVM_VMGEXIT_PSC:
+ 	case SVM_VMGEXIT_TERM_REQUEST:
++	case SVM_VMGEXIT_GUEST_REQUEST:
+ 		break;
+ 	default:
+ 		reason = GHCB_ERR_INVALID_EVENT;
+@@ -3646,6 +3648,83 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
+ 	return ret;
  }
-+
-+/*
-+ * Re-check whether an #NPF for a private/gmem page can still be serviced, and
-+ * adjust maximum mapping level if needed.
-+ */
-+int sev_gmem_validate_fault(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, bool is_private,
-+			    u8 *max_level)
+ 
++static bool snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest_request *data,
++				gpa_t req_gpa, gpa_t resp_gpa)
 +{
-+	int level, rc;
-+	bool assigned;
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	kvm_pfn_t req_pfn, resp_pfn;
++
++	if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE))
++		return false;
++
++	req_pfn = gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
++	if (is_error_noslot_pfn(req_pfn))
++		return false;
++
++	resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
++	if (is_error_noslot_pfn(resp_pfn))
++		return false;
++
++	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true))
++		return false;
++
++	data->gctx_paddr = __psp_pa(sev->snp_context);
++	data->req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
++	data->res_paddr = __sme_set(resp_pfn << PAGE_SHIFT);
++
++	return true;
++}
++
++static bool snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data)
++{
++	u64 pfn = __sme_clr(data->res_paddr) >> PAGE_SHIFT;
++
++	if (snp_page_reclaim(pfn))
++		return false;
++
++	if (rmp_make_shared(pfn, PG_LEVEL_4K))
++		return false;
++
++	return true;
++}
++
++static bool __snp_handle_guest_req(struct kvm *kvm, gpa_t req_gpa, gpa_t resp_gpa,
++				   sev_ret_code *fw_err)
++{
++	struct sev_data_snp_guest_request data = {0};
++	struct kvm_sev_info *sev;
++	bool ret = true;
 +
 +	if (!sev_snp_guest(kvm))
-+		return 0;
++		return false;
 +
-+	rc = snp_lookup_rmpentry(pfn, &assigned, &level);
-+	if (rc) {
-+		pr_err_ratelimited("SEV: RMP entry not found: GFN %llx PFN %llx level %d error %d\n",
-+				   gfn, pfn, level, rc);
-+		return -ENOENT;
-+	}
++	sev = &to_kvm_svm(kvm)->sev_info;
 +
-+	if (!assigned) {
-+		pr_err_ratelimited("SEV: RMP entry is not assigned: GFN %llx PFN %llx level %d\n",
-+				   gfn, pfn, level);
-+		return -EINVAL;
-+	}
++	if (!snp_setup_guest_buf(kvm, &data, req_gpa, resp_gpa))
++		return false;
 +
-+	if (level < *max_level)
-+		*max_level = level;
++	if (sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, fw_err))
++		ret = false;
 +
-+	return 0;
++	if (!snp_cleanup_guest_buf(&data))
++		ret = false;
++
++	return ret;
 +}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b456906f2670..298b4ce77a5f 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5081,6 +5081,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 
- 	.gmem_prepare = sev_gmem_prepare,
- 	.gmem_invalidate = sev_gmem_invalidate,
-+	.gmem_validate_fault = sev_gmem_validate_fault,
- };
- 
- /*
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 3f1f6d3d3ade..746f819a6de4 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -732,6 +732,8 @@ void sev_vcpu_unblocking(struct kvm_vcpu *vcpu);
- void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
- int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
- void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
-+int sev_gmem_validate_fault(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, bool is_private,
-+			    u8 *max_level);
- #else
- static inline struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu) {
- 	return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-@@ -753,6 +755,11 @@ static inline int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, in
- 	return 0;
- }
- static inline void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end) {}
-+static inline int sev_gmem_validate_fault(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn,
-+					  bool is_private, u8 *max_level)
++
++static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
 +{
-+	return 0;
++	struct kvm_vcpu *vcpu = &svm->vcpu;
++	struct kvm *kvm = vcpu->kvm;
++	sev_ret_code fw_err = 0;
++	int vmm_ret = 0;
++
++	if (!__snp_handle_guest_req(kvm, req_gpa, resp_gpa, &fw_err))
++		vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
++
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
 +}
++
+ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+@@ -3906,6 +3985,10 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		vcpu->run->system_event.ndata = 1;
+ 		vcpu->run->system_event.data[0] = control->ghcb_gpa;
+ 		break;
++	case SVM_VMGEXIT_GUEST_REQUEST:
++		snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
++		ret = 1;
++		break;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+diff --git a/include/uapi/linux/sev-guest.h b/include/uapi/linux/sev-guest.h
+index 154a87a1eca9..7bd78e258569 100644
+--- a/include/uapi/linux/sev-guest.h
++++ b/include/uapi/linux/sev-guest.h
+@@ -89,8 +89,17 @@ struct snp_ext_report_req {
+ #define SNP_GUEST_FW_ERR_MASK		GENMASK_ULL(31, 0)
+ #define SNP_GUEST_VMM_ERR_SHIFT		32
+ #define SNP_GUEST_VMM_ERR(x)		(((u64)x) << SNP_GUEST_VMM_ERR_SHIFT)
++#define SNP_GUEST_FW_ERR(x)		((x) & SNP_GUEST_FW_ERR_MASK)
++#define SNP_GUEST_ERR(vmm_err, fw_err)	(SNP_GUEST_VMM_ERR(vmm_err) | \
++					 SNP_GUEST_FW_ERR(fw_err))
  
- #endif
++/*
++ * The GHCB spec only formally defines INVALID_LEN/BUSY VMM errors, but define
++ * a GENERIC error code such that it won't ever conflict with GHCB-defined
++ * errors if any get added in the future.
++ */
+ #define SNP_GUEST_VMM_ERR_INVALID_LEN	1
+ #define SNP_GUEST_VMM_ERR_BUSY		2
++#define SNP_GUEST_VMM_ERR_GENERIC	BIT(31)
  
+ #endif /* __UAPI_LINUX_SEV_GUEST_H_ */
 -- 
 2.25.1
 
 
-X-sender: <linux-kernel+bounces-125504-steffen.klassert=secunet.com@vger.kernel.org>
-X-Receiver: <steffen.klassert@secunet.com> ORCPT=rfc822;steffen.klassert@secunet.com
+X-sender: <kvm+bounces-13131-martin.weber=secunet.com@vger.kernel.org>
+X-Receiver: <martin.weber@secunet.com> ORCPT=rfc822;martin.weber@secunet.com
 X-CreatedBy: MSExchange15
 X-HeloDomain: mbx-essen-01.secunet.de
-X-ExtendedProps: BQBjAAoA/0mmlidQ3AgFADcAAgAADwA8AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50Lk9yZ2FuaXphdGlvblNjb3BlEQAAAAAAAAAAAAAAAAAAAAAADwA/AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLk1haWxEZWxpdmVyeVByaW9yaXR5DwADAAAATG93
+X-ExtendedProps: BQBjAAoACEqmlidQ3AgFADcAAgAADwA8AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50Lk9yZ2FuaXphdGlvblNjb3BlEQAAAAAAAAAAAAAAAAAAAAAADwA/AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLk1haWxEZWxpdmVyeVByaW9yaXR5DwADAAAATG93
 X-Source: SMTP:Default MBX-ESSEN-02
 X-SourceIPAddress: 10.53.40.197
-X-EndOfInjectedXHeaders: 16161
+X-EndOfInjectedXHeaders: 18094
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  mbx-essen-02.secunet.de (10.53.40.198) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.37; Sat, 30 Mar 2024 00:05:02 +0100
-Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-02.secunet.de
+ 15.1.2507.37; Sat, 30 Mar 2024 00:06:10 +0100
+Received: from b.mx.secunet.com (62.96.220.37) by cas-essen-02.secunet.de
  (10.53.40.202) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Sat, 30 Mar 2024 00:05:02 +0100
+ Transport; Sat, 30 Mar 2024 00:06:10 +0100
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 5C22D208AC
-	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 00:05:02 +0100 (CET)
+	by b.mx.secunet.com (Postfix) with ESMTP id D1805202BD
+	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:06:10 +0100 (CET)
 X-Virus-Scanned: by secunet
 X-Spam-Flag: NO
-X-Spam-Score: -2.85
+X-Spam-Score: -5.15
 X-Spam-Level:
-X-Spam-Status: No, score=-2.85 tagged_above=-999 required=2.1
+X-Spam-Status: No, score=-5.15 tagged_above=-999 required=2.1
 	tests=[BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.099, DKIM_SIGNED=0.1,
 	DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
 	HEADER_FROM_DIFFERENT_DOMAINS=0.249, MAILING_LIST_MULTI=-1,
-	RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001]
-	autolearn=ham autolearn_force=no
+	RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001, SPF_PASS=-0.001]
+	autolearn=unavailable autolearn_force=no
 Authentication-Results: a.mx.secunet.com (amavisd-new);
 	dkim=pass (1024-bit key) header.d=amd.com
-Received: from a.mx.secunet.com ([127.0.0.1])
+Received: from b.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id C9d0pOCtIuDe for <steffen.klassert@secunet.com>;
-	Sat, 30 Mar 2024 00:05:00 +0100 (CET)
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.80.249; helo=am.mirrors.kernel.org; envelope-from=linux-kernel+bounces-125504-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com F2C682087D
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	with ESMTP id oAJd4B0w3R4K for <martin.weber@secunet.com>;
+	Sat, 30 Mar 2024 00:06:10 +0100 (CET)
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.199.223; helo=ny.mirrors.kernel.org; envelope-from=kvm+bounces-13131-martin.weber=secunet.com@vger.kernel.org; receiver=martin.weber@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 03E3A200BB
+Authentication-Results: b.mx.secunet.com;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zeCqVAyj"
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id F2C682087D
-	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 00:04:59 +0100 (CET)
+	by b.mx.secunet.com (Postfix) with ESMTPS id 03E3A200BB
+	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:06:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AC961F268C0
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:04:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F61B1C212A9
+	for <martin.weber@secunet.com>; Fri, 29 Mar 2024 23:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DC413DBB3;
-	Fri, 29 Mar 2024 23:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1806913F012;
+	Fri, 29 Mar 2024 23:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0OzfLPfd"
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2084.outbound.protection.outlook.com [40.107.93.84])
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zeCqVAyj"
+X-Original-To: kvm@vger.kernel.org
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2070.outbound.protection.outlook.com [40.107.100.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FF7383A5;
-	Fri, 29 Mar 2024 23:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E9C13E6B9;
+	Fri, 29 Mar 2024 23:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.70
 ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711753482; cv=fail; b=dd/YUqMpHBY7oBs5X7SJOiSD3bZfm6eJnCuVCTszpQqnzTDkDKUeRP0iv9EciozkVY8bezMtlbRHd/iLI+yvb+p1bQFsmu/OsIPjT00dM5IAY1m6ISG6JDINDEjBldjIWObBWi6T/XnIiSdV7e32gep2BJbGzysEKgdgHqoO7UY=
+	t=1711753544; cv=fail; b=BlqqvbGwutAw8URHIgMH30kvA5QpTzs/EidijFPe0fjFy5pMt6gU3Of58WmRgtLC5HdAFWEnpY91icLlr7eYlVXCT6T10fN7aOeDR+taYs5wJQZoRJMsxCRbI3XvUrIl79N5OhELjsPxchrIPeXAKecY7/mL+08bVpQeDnTw0Tg=
 ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711753482; c=relaxed/simple;
-	bh=qoE8VoSWxjBvaAC97qUKIp53Zv00INjbIDhNg0iLQGE=;
+	s=arc-20240116; t=1711753544; c=relaxed/simple;
+	bh=WgjSuePq/wBpCSmmzUyRKNJcA65Zw60gyFDJt37grOw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B9CB091b0+dhtD6NETV1KuvYYZmR5dKUqin7Zm8T2FAZKou24eKMBSaitIZydavGd9wMfihrYo5fpuyyxi73UKVMX9dl/E2+di82Uo5+Tl1lNZrIUtpP28gsDD5evwDmGss43HrhW5J52SYODJ9ubqFlXvOsxa/UKRJkIzyO9as=
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0OzfLPfd; arc=fail smtp.client-ip=40.107.93.84
+	 MIME-Version:Content-Type; b=tadVHjYp3xUeM32EvMaNxfyZwQQAKHmOqhQQ1XMBg9kHp+gJAurvOy+zAHBwq9zTbGuP/KUoD7IDeUX0jGzYICO/4kQRtEwkvcoBPNOkgirp3exZt3Mu9Ku4Nua7UCArN/3crAiO/9CE+CnJguzPNZzA3jmWHwQHpZ5TSvlUC9c=
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zeCqVAyj; arc=fail smtp.client-ip=40.107.100.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NmzppQt3HHdjSlx0Gcjy/1PafDG91jVT2gWT6ZmmBD1P5Oy7FzF6ZAELsthIFY4l4NjcT4q9mF3jH9rEI/XxZLC4W+Krss0yyIqiU7QKwXoNN+p+S2leM1L8gjm1SsHxQxhB1mRlAbhefkjg/XjHeybpqc8l9rmvJxQ2NXtbno2NgOkS4vbbVkruSJJDO8S1QLsf4N4r7v8M6TcrzLEkG2Ejvq5E5kzu3/w3AHwMHw6pakgYdZVr60jlVvBdL++32/krngqO04PDcwZjiPK5sKJabSVmgcT3XzQmtF5JJgVbUIJuP7mjmqMS2rXM7s888oQkAFmXbxfxc0b14ZgNUA==
+ b=LTdfnSa1VhLOPKJevSaKvpUEM+ibK4JR/D4A9skjpRANTv9ZzuAloP8//3oASD3IdNwrh+OSRxi+9Iwq7hxH6bm72GCC8DmsKuP2rDNCei5s/4ioa7Mt0Rgv1Y/9zANhJ5bTNBTPlIJK6vKpaQdARBJ53qfdQwGiJ48PzqDufYciLrHxwSuTMItPHCXugbz1V3S9i0NMupUEJi2oKI/eevatNkz7jMPkOWb7myAeNRT+nOWgFlh4B1G5PybIF2KIVcmpb5vavCiFv2nXckLeBWe3CjlMqZJgIR/2tMwEHDDQjFAfKr1bkg0JIiZoKD5UYARcmLysUNDUnBW6ZIkQcA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aN5dRXX67F3gVsuDDIwedEmcnOL9iN4vQ9udAxqxhqc=;
- b=m9mGWEjH0U3miudpcZmIumfJrISSJe9DcuZa8ArNfPdM/TIhHhtVyMzMvJBWKpUzXeAvelyQ+uXjxYOFJOvVVZ+k7FCsWBgNe2pUaz8u1IRSOgOh8savUt/pneP5I5XO+hfDPFDXLGYwmf/uCt+NSnyO8jmG8+Q0J75I9Rn2Loh211AqxMWFEfAB7iGNkzOzSZIVCWpY4c7r1/mXbKgE2/uULmFVhqVL8xny3t7zea3GzgEJzxoI+Ww3RH9+hEvCuWV213vSpwp0gpHYUJEJy7N8t5z7HFWlsIyz01+nOCVXLbhhUysz88QVvWfnJsNadcR2GsggrzZIfoNCjx4YLQ==
+ bh=nBu38l4H29f7TDioCJxMHGn5H0K24coARDh1fYxp94g=;
+ b=Tm4mgAX85xml0c02ymLsi9tk5C41IzMLRHOGWwLnQtBjp1JDzL/nwJeVbnGSnlpvk1POZGeLGRF7uiH/vidV2sDKC96d1S85+P55F8F6RGYjLbU4K7b/V5SjUD5EXMBtRAVnjp0PDyxJrRMJyeAM6BYi8RyT7/DfjMT8G35q9tTlJjCWFv6owwahTlfvcX2HoILzjyrKqGAeDieGHKbYsmZOPTPErMVnPAJ8B7I8++OtLIDDvWXeDmrmLRbHlIemWx0QFJKcVf8k3aQiK3tidiyMuCzDuSs0Ua3O7Upae61Gh50WMtQDWQCbIiKYt0jiqt4Exm8sSBJz6uwIWduLZQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aN5dRXX67F3gVsuDDIwedEmcnOL9iN4vQ9udAxqxhqc=;
- b=0OzfLPfdr5awgBaOBCPyFx1LEtkyYimJdcJO9s39y5mukIUnCecs8bCnDqPw0s9Yi6eBCfJoFR8qhbo2SyzxtmFZjPrJiu6nk58F16qzNsdmUNb/mhANHx72woZ3d7YnyY6SbLOwYfHJlrKhIAOitM0TWuofnBsofRvp0j5afl0=
-Received: from DM6PR01CA0002.prod.exchangelabs.com (2603:10b6:5:296::7) by
- CH3PR12MB8755.namprd12.prod.outlook.com (2603:10b6:610:17e::16) with
+ bh=nBu38l4H29f7TDioCJxMHGn5H0K24coARDh1fYxp94g=;
+ b=zeCqVAyjfRxDQher1AZ5EaOKxM5xY4BftFJ208BZWqiiAjXdof/d4iUhbP36IlOA01+A1BhxmrUQU0P14395af+BJG1LpGQu/iQfEYn8iwN6tfjzVCRINDzlsxLRvhiEfBgRdVKJmno9WURcApRABBx4LkwYntw5GkcQBk5RGlA=
+Received: from DS0PR17CA0021.namprd17.prod.outlook.com (2603:10b6:8:191::16)
+ by DS7PR12MB8346.namprd12.prod.outlook.com (2603:10b6:8:e5::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 Mar
- 2024 23:04:37 +0000
-Received: from DS1PEPF00017092.namprd03.prod.outlook.com
- (2603:10b6:5:296:cafe::7) by DM6PR01CA0002.outlook.office365.com
- (2603:10b6:5:296::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40 via Frontend
- Transport; Fri, 29 Mar 2024 23:04:37 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Fri, 29 Mar
+ 2024 23:05:39 +0000
+Received: from DS1PEPF00017091.namprd03.prod.outlook.com
+ (2603:10b6:8:191:cafe::70) by DS0PR17CA0021.outlook.office365.com
+ (2603:10b6:8:191::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Frontend
+ Transport; Fri, 29 Mar 2024 23:05:39 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -365,13 +426,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017092.mail.protection.outlook.com (10.167.17.135) with Microsoft
+ DS1PEPF00017091.mail.protection.outlook.com (10.167.17.133) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:04:37 +0000
+ 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:05:39 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 Mar
- 2024 18:04:36 -0500
+ 2024 18:05:39 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -387,18 +448,19 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v12 23/29] KVM: x86: Implement gmem hook for determining max NPT mapping level
-Date: Fri, 29 Mar 2024 17:58:29 -0500
-Message-ID: <20240329225835.400662-24-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
+	<brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
+Subject: [PATCH v12 26/29] KVM: SEV: Provide support for SNP_GUEST_REQUEST NAE event
+Date: Fri, 29 Mar 2024 17:58:32 -0500
+Message-ID: <20240329225835.400662-27-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
 Precedence: bulk
-X-Mailing-List: linux-kernel@vger.kernel.org
-List-Id: <linux-kernel.vger.kernel.org>
-List-Subscribe: <mailto:linux-kernel+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-kernel+unsubscribe@vger.kernel.org>
+X-Mailing-List: kvm@vger.kernel.org
+List-Id: <kvm.vger.kernel.org>
+List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -406,144 +468,202 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|CH3PR12MB8755:EE_
-X-MS-Office365-Filtering-Correlation-Id: e38e48d9-38a0-4b49-1d02-08dc50449b4f
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017091:EE_|DS7PR12MB8346:EE_
+X-MS-Office365-Filtering-Correlation-Id: 29793531-e2ca-491c-1a60-08dc5044c08d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WM4cVZMM979iNHWUqg/R2qcnt+pYRBbuuCYpB3Fbz+oMUwGukB7l5dTzoGYJ1QuNky1ktimVX8cuhGtUgxBhYpn47T6T2eGyQhnk7eFm8sbikzk757e2b4xCdHGMolMOLIMFfSDyV8ZyJkaRB+H7HJnzvEhaSpj+YANSzx7jPPss9B4M9w0plIWzPvZkcq9JI506ArfELOZSJ6fTz8CWxidzPGf3mqvyewtgxcp9qLS6LwWQTbw5b8otbYADH1b0jWIrgye3c7sniPOhv6kECmI13mWJuVjJeaZ8R5peOO6TiMFUBqP52DovBAqt+x3XLRjmSxJSwoLN/hV7UaFlwZVPqfU+xDdRTf+AoQ5FmH9tTR3JRUc8uuwA6MlSp449hDpBwyNaTJsYLU+9LTCdGc3OLoa5xG5jqilSk/qclO5m/hHpQhd23abF4Vq4k0Pkt56LWJFyfKuQAfwoTgmjkjJ//4Zy9+bgqDPPkgtMDhM2cmqv/Ongly+IWlbsz3O9LAAf3sGFEy6UL7OgAsfL71pe/84AtNPeRr+b3D7U2W1aw/o08N5EPdnWxKJysjJrZfeKc7leOpKvxpp6qr+46mFUlafO89kBQy474AgtI+Sjz28UvkgW5DoCE/LyNst6sNyMfhXSoBldD5N+H5PsSpMZdGp7N5LJ1rVjaSmCvf7Z0JSh5SJlG8P9adn/znoTe1fgeegHa3PZRXOK1J/pjEPBGDIIwTAj0cKlOBybOYPUcFfhtXyx39Mz0URsw6kg
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(7416005)(36860700004);DIR:OUT;SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:04:37.2636
+X-Microsoft-Antispam-Message-Info: wFSuaKTvRQfOtdiiZggI/1E9juK+oJc2TRSGXFVjNQH6K1wlm9lAuRi2AABfWovQilmwMVXe1l6T4YxvGuuFifLSCpmtPQOHKjm6x+FajgbzHsEgtMX93cx5A0nttMe/qTI13yLMvcscLwhbPBIdodHYHhzKupmGusDKEUfIkuXqgoS46ONELQ8DpRVI7AvlT51VRqxW6w6SmGYUURqbArpcwis5lJT+cTvGNv8CqPtGPlIy7qfPPfuhv1nCIO9qPPfvEGlgl/Ec+LypJxBtqOEfg2pBgc02cbfF15t+YO5/ue5hwWk2QeyLY/PtzpC6Bue+8ZYMaLgW7iEG237ohWzAvDkoO5JuB0YjPr9df90ZKqzIesdCLnSdeqdDO9BO09jMyX5hg+vOmQmDRLp5MGJZ0CLEXxryinRjW60G57b7aoliHs448u+dW9OMhumg4geX6Ys+dNVlqiUHttX7q1i79Zld8UWIVQxAemTDG5c93reIn0O1bo2r+FTQzyNA60sU19YLtjGrE2CeHrS8UBmvPCHb+dNs/bwEdkpHaysGHJoMSSvphTWHY/GTjqyl61EyVKEXMAdKGOoJEKagRrWl4eg4UKhIYmIVTQyAvx7i9Y2qCbTYlvo+hUPDKlFswU7rnoRM5q0SJo084BAULraS65dFTt/wwZaFs/sG/Pn1sk4sqy3xCY8HS+L4Ka6jAqFvX2LdWGEJVaix3MvIE7CGKTb/0UI+9e3423/5muTUjwuXnqr/9ldh5/UD03xC
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:05:39.7301
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e38e48d9-38a0-4b49-1d02-08dc50449b4f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29793531-e2ca-491c-1a60-08dc5044c08d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017092.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017091.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8755
-Return-Path: linux-kernel+bounces-125504-steffen.klassert=secunet.com@vger.kernel.org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:05:02.4011
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8346
+Return-Path: kvm+bounces-13131-martin.weber=secunet.com@vger.kernel.org
+X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:06:10.8900
  (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: 799a2402-d345-4053-2529-08dc5044aa3f
-X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
+X-MS-Exchange-Organization-Network-Message-Id: e82b8a82-3a8d-482a-ba73-08dc5044d311
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.37
 X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
 X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.secunet.de
-X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=cas-essen-02.secunet.de:TOTAL-FE=0.005|SMR=0.005(SMRPI=0.003(SMRPI-FrontendProxyAgent=0.003));2024-03-29T23:05:02.407Z
+X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=cas-essen-02.secunet.de:TOTAL-FE=0.008|SMR=0.008(SMRPI=0.005(SMRPI-FrontendProxyAgent=0.005));2024-03-29T23:06:10.899Z
 X-MS-Exchange-Forest-ArrivalHubServer: mbx-essen-02.secunet.de
 X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
 X-MS-Exchange-Organization-AuthAs: Anonymous
-X-MS-Exchange-Organization-OriginalSize: 15616
+X-MS-Exchange-Organization-OriginalSize: 17547
 X-MS-Exchange-Organization-Transport-Properties: DeliveryPriority=Low
 X-MS-Exchange-Organization-Prioritization: 2:ShadowRedundancy
 X-MS-Exchange-Organization-IncludeInSla: False:ShadowRedundancy
 
-In the case of SEV-SNP, whether or not a 2MB page can be mapped via a
-2MB mapping in the guest's nested page table depends on whether or not
-any subpages within the range have already been initialized as private
-in the RMP table. The existing mixed-attribute tracking in KVM is
-insufficient here, for instance:
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-  - gmem allocates 2MB page
-  - guest issues PVALIDATE on 2MB page
-  - guest later converts a subpage to shared
-  - SNP host code issues PSMASH to split 2MB RMP mapping to 4K
-  - KVM MMU splits NPT mapping to 4K
-  - guest later converts that shared page back to private
+Version 2 of GHCB specification added support for the SNP Guest Request
+Message NAE event. The event allows for an SEV-SNP guest to make
+requests to the SEV-SNP firmware through hypervisor using the
+SNP_GUEST_REQUEST API defined in the SEV-SNP firmware specification.
 
-At this point there are no mixed attributes, and KVM would normally
-allow for 2MB NPT mappings again, but this is actually not allowed
-because the RMP table mappings are 4K and cannot be promoted on the
-hypervisor side, so the NPT mappings must still be limited to 4K to
-match this.
+This is used by guests primarily to request attestation reports from
+firmware. There are other request types are available as well, but the
+specifics of what guest requests are being made are opaque to the
+hypervisor, which only serves as a proxy for the guest requests and
+firmware responses.
 
-Implement a kvm_x86_ops.gmem_validate_fault() hook for SEV that checks
-for this condition and adjusts the mapping level accordingly.
+Implement handling for these events.
 
+Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
+Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+[mdr: ensure FW command failures are indicated to guest, drop extended
+ request handling to be re-written as separate patch, massage commit]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 32 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c |  1 +
- arch/x86/kvm/svm/svm.h |  7 +++++++
- 3 files changed, 40 insertions(+)
+ arch/x86/kvm/svm/sev.c         | 83 ++++++++++++++++++++++++++++++++++
+ include/uapi/linux/sev-guest.h |  9 ++++
+ 2 files changed, 92 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 87d621d013a4..31f6f4786503 100644
+index 658116537f3f..f56f04553e81 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -4443,3 +4443,35 @@ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
- 		pfn += use_2m_update ? PTRS_PER_PMD : 1;
- 	}
+@@ -19,6 +19,7 @@
+ #include <linux/misc_cgroup.h>
+ #include <linux/processor.h>
+ #include <linux/trace_events.h>
++#include <uapi/linux/sev-guest.h>
+ 
+ #include <asm/pkru.h>
+ #include <asm/trapnr.h>
+@@ -3223,6 +3224,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 	case SVM_VMGEXIT_HV_FEATURES:
+ 	case SVM_VMGEXIT_PSC:
+ 	case SVM_VMGEXIT_TERM_REQUEST:
++	case SVM_VMGEXIT_GUEST_REQUEST:
+ 		break;
+ 	default:
+ 		reason = GHCB_ERR_INVALID_EVENT;
+@@ -3646,6 +3648,83 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
+ 	return ret;
  }
-+
-+/*
-+ * Re-check whether an #NPF for a private/gmem page can still be serviced, and
-+ * adjust maximum mapping level if needed.
-+ */
-+int sev_gmem_validate_fault(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, bool is_private,
-+			    u8 *max_level)
+ 
++static bool snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest_request *data,
++				gpa_t req_gpa, gpa_t resp_gpa)
 +{
-+	int level, rc;
-+	bool assigned;
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	kvm_pfn_t req_pfn, resp_pfn;
++
++	if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE))
++		return false;
++
++	req_pfn = gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
++	if (is_error_noslot_pfn(req_pfn))
++		return false;
++
++	resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
++	if (is_error_noslot_pfn(resp_pfn))
++		return false;
++
++	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true))
++		return false;
++
++	data->gctx_paddr = __psp_pa(sev->snp_context);
++	data->req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
++	data->res_paddr = __sme_set(resp_pfn << PAGE_SHIFT);
++
++	return true;
++}
++
++static bool snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data)
++{
++	u64 pfn = __sme_clr(data->res_paddr) >> PAGE_SHIFT;
++
++	if (snp_page_reclaim(pfn))
++		return false;
++
++	if (rmp_make_shared(pfn, PG_LEVEL_4K))
++		return false;
++
++	return true;
++}
++
++static bool __snp_handle_guest_req(struct kvm *kvm, gpa_t req_gpa, gpa_t resp_gpa,
++				   sev_ret_code *fw_err)
++{
++	struct sev_data_snp_guest_request data = {0};
++	struct kvm_sev_info *sev;
++	bool ret = true;
 +
 +	if (!sev_snp_guest(kvm))
-+		return 0;
++		return false;
 +
-+	rc = snp_lookup_rmpentry(pfn, &assigned, &level);
-+	if (rc) {
-+		pr_err_ratelimited("SEV: RMP entry not found: GFN %llx PFN %llx level %d error %d\n",
-+				   gfn, pfn, level, rc);
-+		return -ENOENT;
-+	}
++	sev = &to_kvm_svm(kvm)->sev_info;
 +
-+	if (!assigned) {
-+		pr_err_ratelimited("SEV: RMP entry is not assigned: GFN %llx PFN %llx level %d\n",
-+				   gfn, pfn, level);
-+		return -EINVAL;
-+	}
++	if (!snp_setup_guest_buf(kvm, &data, req_gpa, resp_gpa))
++		return false;
 +
-+	if (level < *max_level)
-+		*max_level = level;
++	if (sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, fw_err))
++		ret = false;
 +
-+	return 0;
++	if (!snp_cleanup_guest_buf(&data))
++		ret = false;
++
++	return ret;
 +}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b456906f2670..298b4ce77a5f 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5081,6 +5081,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 
- 	.gmem_prepare = sev_gmem_prepare,
- 	.gmem_invalidate = sev_gmem_invalidate,
-+	.gmem_validate_fault = sev_gmem_validate_fault,
- };
- 
- /*
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 3f1f6d3d3ade..746f819a6de4 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -732,6 +732,8 @@ void sev_vcpu_unblocking(struct kvm_vcpu *vcpu);
- void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
- int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
- void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
-+int sev_gmem_validate_fault(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, bool is_private,
-+			    u8 *max_level);
- #else
- static inline struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu) {
- 	return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-@@ -753,6 +755,11 @@ static inline int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, in
- 	return 0;
- }
- static inline void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end) {}
-+static inline int sev_gmem_validate_fault(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn,
-+					  bool is_private, u8 *max_level)
++
++static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
 +{
-+	return 0;
++	struct kvm_vcpu *vcpu = &svm->vcpu;
++	struct kvm *kvm = vcpu->kvm;
++	sev_ret_code fw_err = 0;
++	int vmm_ret = 0;
++
++	if (!__snp_handle_guest_req(kvm, req_gpa, resp_gpa, &fw_err))
++		vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
++
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
 +}
++
+ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+@@ -3906,6 +3985,10 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		vcpu->run->system_event.ndata = 1;
+ 		vcpu->run->system_event.data[0] = control->ghcb_gpa;
+ 		break;
++	case SVM_VMGEXIT_GUEST_REQUEST:
++		snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
++		ret = 1;
++		break;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+diff --git a/include/uapi/linux/sev-guest.h b/include/uapi/linux/sev-guest.h
+index 154a87a1eca9..7bd78e258569 100644
+--- a/include/uapi/linux/sev-guest.h
++++ b/include/uapi/linux/sev-guest.h
+@@ -89,8 +89,17 @@ struct snp_ext_report_req {
+ #define SNP_GUEST_FW_ERR_MASK		GENMASK_ULL(31, 0)
+ #define SNP_GUEST_VMM_ERR_SHIFT		32
+ #define SNP_GUEST_VMM_ERR(x)		(((u64)x) << SNP_GUEST_VMM_ERR_SHIFT)
++#define SNP_GUEST_FW_ERR(x)		((x) & SNP_GUEST_FW_ERR_MASK)
++#define SNP_GUEST_ERR(vmm_err, fw_err)	(SNP_GUEST_VMM_ERR(vmm_err) | \
++					 SNP_GUEST_FW_ERR(fw_err))
  
- #endif
++/*
++ * The GHCB spec only formally defines INVALID_LEN/BUSY VMM errors, but define
++ * a GENERIC error code such that it won't ever conflict with GHCB-defined
++ * errors if any get added in the future.
++ */
+ #define SNP_GUEST_VMM_ERR_INVALID_LEN	1
+ #define SNP_GUEST_VMM_ERR_BUSY		2
++#define SNP_GUEST_VMM_ERR_GENERIC	BIT(31)
  
+ #endif /* __UAPI_LINUX_SEV_GUEST_H_ */
 -- 
 2.25.1
 
