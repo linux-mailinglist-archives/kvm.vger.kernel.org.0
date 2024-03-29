@@ -1,182 +1,230 @@
-Return-Path: <kvm+bounces-13102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3786A892372
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 19:39:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F39948924FB
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 21:13:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDB42286AFC
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 18:39:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DCDD1F220AD
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 20:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCBA3B1AC;
-	Fri, 29 Mar 2024 18:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03D713B5AE;
+	Fri, 29 Mar 2024 20:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NFelVSIg"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="vsW+1Wmw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA7722075
-	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 18:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7739113AA3C;
+	Fri, 29 Mar 2024 20:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711737546; cv=none; b=ucJh49T0Y9FnOkJMRpJJXc+dGII4EsVhqY5FJWsocxSHyq0MgLWP5Y/Gwu6lTkra0Y95cHDPgeRylsZ6mn9fV47XX0eiieG7lBeTQde8TOY14noxXGKIxhHKHJMPY+9uvumXIGgrGJ4YALNIkUPMiQ2HpPXW95YSB/obA/QrLDY=
+	t=1711743187; cv=none; b=kIUbYBk/ffU6L878tGsFRTOgn8oIHkHB4okH6xmY5a95+dsOfozaSf/ZOG5ltLhqilEtSXGMOS7XQQDMtt1O1rVoza73gVEd80pOA2a1Zy/LrL16eOSlxdi2iXcDCSRfAD5QpT6sTX+Sd91tPafEKwqMiVqRCrqVYEUZEvC6jBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711737546; c=relaxed/simple;
-	bh=5ibrp1oeF0vrPYyOhZOAc9lDini/4uj3SGxdDGuzUEg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XM9Hpciul9TqYCnxFkvkDAH4uyjJEjhdmW+pyJjRv1GUGQz4dO0cvTWVx4bwbzYbUH2OkVIeR6Dq5KaU4GOXoTh6KFK+YB3GW/k9A1jdtOMGjhbGZGuspnAxMpI8F4BCFEYOBm9wWDGSxXOlbEYHUJXsV1Bao+0Z3RkPx5NzLlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NFelVSIg; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-69185f093f5so14523956d6.3
-        for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 11:39:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711737543; x=1712342343; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YfjikohpzOAjLlRqO+6UBB6wPr/KvkMvVqtQCBtLFjM=;
-        b=NFelVSIgCnhtm/WeduxadIDtZs/2b5hMQImNaMEw1lJ8BnIyeGttLhTUXgLRYnNUe/
-         DuRldVf8yzp3aWinyz9OEE7A0IwgYBEUO+7Hs0L4hs5qNo8fK5rySuezhisIdCxXUX8J
-         s4Lr8YVdoHKZETJE56lRzjXI1iQxNB7DMCHdzq72AeoSLNyXQusTmohyMqiDvbkenFWj
-         zdiJv7rY9M3oCCu3f9oYMXAq4PYBMYp+IZrM6ytfY2mR7/fhtxFVsit7XyH7RUUxADu6
-         CLxR38QE+FnXak9aQs/xQKko7z2O+2KDShh5lCxxSjYEE+65PChnjoMt+y13e6N0OpQu
-         gZYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711737543; x=1712342343;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YfjikohpzOAjLlRqO+6UBB6wPr/KvkMvVqtQCBtLFjM=;
-        b=wkgfZzi2V2Blg3ic+fY6rzQMfqrZyMJdG50+XAqAfia/+3H34UgKbyvIpqU1CnMC2/
-         7/iAj5C5RKZWxLGmesmW+FVFR3x4reqeEpBDYmXdzPOEQvzKxNkE6jSXK5Nnu2iNuQQr
-         HiWnvJDkdGICTC/v5z6jCrm5NtMbgOJSFXvMHy4jSmp5X5Pdeg7RzcGDsjJoFDioN7Qf
-         M21Qzmg6RZD4HjvFOnem0OZcbmzmlNmwu4ufr4MApdOZa8QfXR2Thh06Yst76zzmIBPp
-         1lgGsY8xAMBnOtsFPQmy0u5bLnWTLXJnDxxCBqrq9bQ/k4J/CDQsWD8r0r4sSsow7vgf
-         kmUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeQbrX3e3FxtRtLflaULzEiPKMQ99FoffybKSAGFMql6jU4V14gZ2sem6dAzHckTmdZL++4CDgCzgntKLFRHkeB6aw
-X-Gm-Message-State: AOJu0YwygvGHNJFcevOQgw3ZTAqnzGDjX22LhLUv0gY+KmwEFwhC0FTr
-	d9t1y6n1hmR+4c+grF/B0s4ImMNURybJ8g599BeVtohYwg0kudqcNoo/O7eVlN2LWwAltHINIyv
-	yzWqf9mr1RXueuIC7Kea3rgOAx/hd2NIadN/+
-X-Google-Smtp-Source: AGHT+IEGZkO07vUNWHTkATHpD6cSAfR3qyRiodjl+lF3pDCMbKLcZEvPgUlbFDmsNYBTPFujyi00g9r2gwkWpfIbMD0=
-X-Received: by 2002:a0c:f547:0:b0:696:2e0c:8b82 with SMTP id
- p7-20020a0cf547000000b006962e0c8b82mr3021116qvm.15.1711737543030; Fri, 29 Mar
- 2024 11:39:03 -0700 (PDT)
+	s=arc-20240116; t=1711743187; c=relaxed/simple;
+	bh=MZT0ymOUKS9bqmG/EqJP/LWTpw3IOaXEuyQQkWpQTWY=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=O/DTliv8V0jKnEglblhx9GuyoO/I4uinV1358xbfrFRnJMfZ+IKOso8WFMCZqsYLoo8UjQEwqQh8gbunoOlrJgXKOdn5dcUArfBwJdznTPmsfWOhWxDTEWbEa7Sllm54Grl0s8qDHHUtDut2LVpUddigjtTM2yA11V7+ZoOUWsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=vsW+1Wmw; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1711743183;
+	bh=MZT0ymOUKS9bqmG/EqJP/LWTpw3IOaXEuyQQkWpQTWY=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=vsW+1WmwvXULHL5/oTl46RwDJILVmkme3i83Y4hsNch7o8Qxa0Cdj57ZOoR6P/ucj
+	 V2f2Q7u3nlY1gYT0lb5qjZHkVD3ZgNPzYOLKIWhJjCxJnSXPJr6Pdyl9eDeDxjMusJ
+	 pECQf+pF7dwxl+Ufsr8He/ZBMm2gGmYJFLaWWOEM/RDdQcm222kdTMQNjmyATzifQH
+	 Q25JPNkUYtx4TFEPk1fPkhOegAROK/rWV8Nj91M55oevEP10coZw5CCkXwFZ3xw2mn
+	 tuwbQo3OWcNF1hItum7n46qSgQLglBxTWqOc7c3/Z4y0bfnp0S6+2N62uqSxMmkbfY
+	 A30k0w10cNPkg==
+Received: from [100.113.15.66] (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 418673780C22;
+	Fri, 29 Mar 2024 20:12:59 +0000 (UTC)
+Message-ID: <7e093e45-9349-4cfd-a0ad-78ae66edda90@collabora.com>
+Date: Sat, 30 Mar 2024 01:13:30 +0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
- <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
- <ZfjYBxXeh9lcudxp@google.com> <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
- <20240319143119.GA2736@willie-the-truck> <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
- <20240327193454.GB11880@willie-the-truck> <d0500f89-df3b-42cd-aa5a-5b3005f67638@redhat.com>
- <ZgVCDPoQbbXjTBQp@google.com> <5cec1f98-17a5-4120-bbf4-b487c2caf92c@redhat.com>
- <ZgVNXpUS8Ku37BLp@google.com> <3448a9d6-58a8-475f-aff6-a39a62eee8c1@redhat.com>
-In-Reply-To: <3448a9d6-58a8-475f-aff6-a39a62eee8c1@redhat.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Fri, 29 Mar 2024 11:38:49 -0700
-Message-ID: <CAGtprH_cFxK3Wb0KVKMkVef8G=52aPiRonxee6+kqhmBqQbXYA@mail.gmail.com>
-Subject: Re: folio_mmapped
-To: David Hildenbrand <david@redhat.com>
-Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_mnalajal@quicinc.com, 
-	quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, keirf@google.com, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>, pbonzini@redhat.com,
+ seanjc@google.com, shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com
+Subject: Re: [PATCH v1 3/3] KVM: selftests: Add a test case for
+ KVM_X86_DISABLE_EXITS_HLT
+To: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20240327054255.24626-1-manali.shukla@amd.com>
+ <20240327054255.24626-4-manali.shukla@amd.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <20240327054255.24626-4-manali.shukla@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 28, 2024 at 4:41=E2=80=AFAM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> ....
-> >
-> >> The whole reason I brought up the guest_memfd+memfd pair idea is that =
-you
-> >> would similarly be able to do the conversion in the kernel, BUT, you'd=
- never
-> >> be able to mmap+GUP encrypted pages.
-> >>
-> >> Essentially you're using guest_memfd for what it was designed for: pri=
-vate
-> >> memory that is inaccessible.
-> >
-> > Ack, that sounds pretty reasonable to me. But I think we'd still want t=
-o
-> > make sure the other users of guest_memfd have the _desire_ to support
-> > huge pages,  migration, swap (probably longer term), and related
-> > features, otherwise I don't think a guest_memfd-based option will
-> > really work for us :-)
->
-> *Probably* some easy way to get hugetlb pages into a guest_memfd would
-> be by allocating them for an memfd and then converting/moving them into
-> the guest_memfd part of the "fd pair" on conversion to private :)
->
-> (but the "partial shared, partial private" case is and remains the ugly
-> thing that is hard and I still don't think it makes sense. Maybe it
-> could be handles somehow in such a dual approach with some enlightment
-> in the fds ... hard to find solutions for things that don't make any
-> sense :P )
->
+On 3/27/24 10:42 AM, Manali Shukla wrote:
+> By default, HLT instruction executed by guest is intercepted by hypervisor.
+> However, KVM_CAP_X86_DISABLE_EXITS capability can be used to not intercept
+> HLT by setting KVM_X86_DISABLE_EXITS_HLT.
+> 
+> Add a test case to test KVM_X86_DISABLE_EXITS_HLT functionality.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+Thank you for the new test patch. We have been trying to ensure TAP
+conformance for tests which cannot be achieved if new tests aren't using
+TAP already. Please make your test TAP compliant.
 
-I would again emphasize that this usecase exists for Confidential VMs,
-whether we like it or not.
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../kvm/x86_64/halt_disable_exit_test.c       | 113 ++++++++++++++++++
+Add generated object to .gitignore file.
 
-1) TDX hardware allows usage of 1G pages to back guest memory.
-2) Larger VM sizes benefit more with 1G page sizes, which would be a
-norm with VMs exposing GPU/TPU devices.
-3) Confidential VMs will need to share host resources with
-non-confidential VMs using 1G pages.
-4) When using normal shmem/hugetlbfs files to back guest memory, this
-usecase was achievable by just manipulating guest page tables
-(although at the cost of host safety which led to invention of guest
-memfd). Something equivalent "might be possible" with guest memfd.
+>  2 files changed, 114 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index c75251d5c97c..9f72abb95d2e 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -89,6 +89,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/state_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/halt_disable_exit_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
+> diff --git a/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+> new file mode 100644
+> index 000000000000..b7279dd0eaff
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+> @@ -0,0 +1,113 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * KVM disable halt exit test
+> + *
+> + *  Copyright (C) 2024 Advanced Micro Devices, Inc.
+> + */
+> +#include <pthread.h>
+> +#include <signal.h>
+> +#include "kvm_util.h"
+> +#include "svm_util.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +
+> +pthread_t task_thread, vcpu_thread;
+> +#define SIG_IPI SIGUSR1
+> +
+> +static void guest_code(uint8_t is_hlt_exec)
+> +{
+> +	while (!READ_ONCE(is_hlt_exec))
+> +		;
+> +
+> +	safe_halt();
+> +	GUEST_DONE();
+> +}
+> +
+> +static void *task_worker(void *arg)
+> +{
+> +	uint8_t *is_hlt_exec = (uint8_t *)arg;
+> +
+> +	usleep(1000);
+> +	WRITE_ONCE(*is_hlt_exec, 1);
+> +	pthread_kill(vcpu_thread, SIG_IPI);
+> +	return 0;
+> +}
+> +
+> +static void *vcpu_worker(void *arg)
+> +{
+> +	int ret;
+> +	int sig = -1;
+> +	uint8_t *is_hlt_exec = (uint8_t *)arg;
+> +	struct kvm_vm *vm;
+> +	struct kvm_run *run;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_signal_mask *sigmask = alloca(offsetof(struct kvm_signal_mask, sigset)
+> +						 + sizeof(sigset_t));
+> +	sigset_t *sigset = (sigset_t *) &sigmask->sigset;
+> +
+> +	/* Create a VM without in kernel APIC support */
+> +	vm = __vm_create(VM_SHAPE_DEFAULT, 1, 0, false);
+> +	vm_enable_cap(vm, KVM_CAP_X86_DISABLE_EXITS, KVM_X86_DISABLE_EXITS_HLT);
+> +	vcpu = vm_vcpu_add(vm, 0, guest_code);
+> +	vcpu_args_set(vcpu, 1, *is_hlt_exec);
+> +
+> +	/*
+> +	 * SIG_IPI is unblocked atomically while in KVM_RUN.  It causes the
+> +	 * ioctl to return with -EINTR, but it is still pending and we need
+> +	 * to accept it with the sigwait.
+> +	 */
+> +	sigmask->len = 8;
+> +	pthread_sigmask(0, NULL, sigset);
+> +	sigdelset(sigset, SIG_IPI);
+> +	vcpu_ioctl(vcpu, KVM_SET_SIGNAL_MASK, sigmask);
+> +	sigemptyset(sigset);
+> +	sigaddset(sigset, SIG_IPI);
+> +	run = vcpu->run;
+> +
+> +again:
+> +	ret = __vcpu_run(vcpu);
+> +	TEST_ASSERT_EQ(errno, EINTR);
+> +
+> +	if (ret == -1 && errno == EINTR) {
+> +		sigwait(sigset, &sig);
+> +		assert(sig == SIG_IPI);
+> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTR);
+> +		goto again;
+> +	}
+> +
+> +	if (run->exit_reason == KVM_EXIT_HLT)
+> +		TEST_FAIL("Expected KVM_EXIT_INTR, got KVM_EXIT_HLT");
+> +
+> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+> +	kvm_vm_free(vm);
+> +	return 0;
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	int ret;
+> +	void *retval;
+> +	uint8_t is_halt_exec;
+> +	sigset_t sigset;
+> +
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_DISABLE_EXITS));
+> +
+> +	/* Ensure that vCPU threads start with SIG_IPI blocked.  */
+> +	sigemptyset(&sigset);
+> +	sigaddset(&sigset, SIG_IPI);
+> +	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+> +
+> +	ret = pthread_create(&vcpu_thread, NULL, vcpu_worker, &is_halt_exec);
+> +	TEST_ASSERT(ret == 0, "pthread_create vcpu thread failed errno=%d", errno);
+> +
+> +	ret = pthread_create(&task_thread, NULL, task_worker, &is_halt_exec);
+> +	TEST_ASSERT(ret == 0, "pthread_create task thread failed errno=%d", errno);
+> +
+> +	pthread_join(vcpu_thread, &retval);
+> +	TEST_ASSERT(ret == 0, "pthread_join on vcpu thread failed with errno=%d", ret);
+> +
+> +	pthread_join(task_thread, &retval);
+> +	TEST_ASSERT(ret == 0, "pthread_join on task thread failed with errno=%d", ret);
+> +
+> +	return 0;
+> +}
 
-Without handling "partial shared, partial private", it is impractical
-to support 1G pages for Confidential VMs (discounting any long term
-efforts to tame the guest VMs to play nice).
-
-Maybe to handle this usecase, all the host side shared memory usage of
-guest memfd (userspace, IOMMU etc) should be associated with (or
-tracked via) file ranges rather than offsets within huge pages (like
-it's done for faulting in private memory pages when populating guest
-EPTs/NPTs). Given the current guest behavior, host MMU and IOMMU may
-have to be forced to map shared memory regions always via 4KB
-mappings.
-
-
-
-
-> I also do strongly believe that we want to see some HW-assisted
-> migration support for guest_memfd pages. Swap, as you say, maybe in the
-> long-term. After all, we're not interested in having MM features for
-> backing memory that you could similarly find under Windows 95. Wait,
-> that one did support swapping! :P
->
-> But unfortunately, that's what the shiny new CoCo world currently
-> offers. Well, excluding s390x secure execution, as discussed.
->
-> --
-> Cheers,
->
-> David / dhildenb
->
+-- 
+BR,
+Muhammad Usama Anjum
 
