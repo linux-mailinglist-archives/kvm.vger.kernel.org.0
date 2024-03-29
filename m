@@ -1,169 +1,154 @@
-Return-Path: <kvm+bounces-13092-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13093-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A34489189F
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 13:23:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EF55891F4B
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 16:02:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB2D1F24569
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 12:23:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24B442890B3
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 15:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA7212DD97;
-	Fri, 29 Mar 2024 12:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F221311B3;
+	Fri, 29 Mar 2024 13:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="O7Fi0g/C"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TR1F/wU1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5994985930
-	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 12:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711714951; cv=none; b=EcJCKYjHwAA/1CfxJwjNDH+5voKRfFIiTrWTLIMMx66yocJ2e8KcuMScW90oG4YrD28Egn1YxwlpWxjjU97SZKBeCOMkUwKaAkScPESyC2MavMkVSt6Ths0KJ4KxknruTryQjKlHIP8ky5nz+0Rkq+82eBbCnM+CeYn/g0bJF+c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711714951; c=relaxed/simple;
-	bh=leo+Yi4AfSnMVg8mcM4Xju1MFqd5FSUEovb4t8XjI+U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ns+FLlgXQrP5/V5qZBNjt9XZ/cRTJ3dzceTIvFNCsC2ckvjenVuz7vLUzWvhReW+VOt5+ceONAYC+r6TKWLFKPfDfP7TGuLS61izjRWn/fhksc1p0kOnWpFS384l6uVre8MIkstwZ8q/lpJ8OeYh+XCsL1MFumSYQ2hs/TpWTWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=O7Fi0g/C; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so19048061fa.0
-        for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 05:22:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711714946; x=1712319746; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
-        b=O7Fi0g/C5yTqgLj7PJ0zyXIg+iImbY+SKVFGN4a9Zq5xCNky6TjQyYrzlUaERurNpf
-         7LwKDBDW9EciAYhebOlUrfpp7gkwdxw3ffcHgzjAsYvU5YXkkSuF6xm7T7Dgu9iSQ5kl
-         +qqXXyD8PAwdjUTX/VSPOgkEthVy/fYMcmg7/Pdkk27h8K4cpeyzmcdoVIWAeGJYcA4p
-         vgxV5p/AfEY+VZYpyf4uBNc2jICO/cR9owEcZUd+mnQwV27PeBiF08/M0whYSW9XQNrn
-         V/j9jsc5tyhLkFsz1U2crr4Z9BGHhaJ+fjWQ7temGRIJI9xLKbhip75WdFHFUSwGtyRq
-         rj0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711714946; x=1712319746;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
-        b=hImFizC/gFUnacssgM+buyGykT8YZUx+2CXy2U6r3mqVZS1cLmiuQNIDuj+qvXOdFm
-         FDhVp3cGz3oCPgwa4UER5HwDK4ZCWv0e+EodfhqavWgfmeCbwY+IOl87HDhrPHicGJbC
-         WL4rmug7xxnyxbEgwGbj+2uMQSZ3LMv6iYJlvB/P5KybB/J+/bQrWqSxvshc8/fFg/hC
-         r0T6mNQIWRA05ZgbiyWxcNf2mRnXlPo6txMhMBImXbZEPKVmc94AIB5anGzSeZstq8J0
-         8CbLJHKq1L15sqbWuhZFYHN/RrKap0GeTVFkPACeCDbbCTkpsL0BJQCjv4H7QDBepLT4
-         xibA==
-X-Forwarded-Encrypted: i=1; AJvYcCUaiO80An0tTpNtltjURmQSpnXd4cNezDHON2kpaLp3eGWHuj06D0QAJYaG/p8iN+ydhdFyVmCaahedN1N4WD1Pdj8+
-X-Gm-Message-State: AOJu0Yz7Ncb0zT31DjS6iJW68Hg6tLHIOCjFFtswAQKAHQBhy/hnM0fu
-	KGRbIh6BN3jGeSRbbgMDAkYLTV9coi+w5O8llDVWJwGLtZsCLPqHo9PCTPbP/dmNmO7pVAfYkKH
-	UAzGR9sygp4o9eXHqWCCGnl0g7SqrMFKa4sJS4A==
-X-Google-Smtp-Source: AGHT+IE+HnSCJL2quawa1K1lMrp38Nm79TgJqcEd/z4x+7H7IfVDrdpUOVuBJN0I2Fw0lOyMRLNfqEQZZUdPpNwT2ZM=
-X-Received: by 2002:a2e:8350:0:b0:2d3:5480:92aa with SMTP id
- l16-20020a2e8350000000b002d3548092aamr644831ljh.25.1711714946358; Fri, 29 Mar
- 2024 05:22:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F5885C6C
+	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 13:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711718138; cv=fail; b=ZWKGEVVQqt8O7/6i3ctaeH3+W/T5heT0A/8kpUN586cdzgFfw+Kd2XFU5tdIoz+b7DQFw9AdlizEUWSkaoGVTDtpU2zgm7U6GKlAh0z07gHYBHB6SJGY6PsE7jEc1D/nSoKqpwehAzRkq0r1oW1YkgqRS31Mtg6FkfQjPe4U9iI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711718138; c=relaxed/simple;
+	bh=wYiYQj0kie14jv7UGYUeia4l5fHUjUfPrIa6COaDOMI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jrUxONmDeZlFjDsPSwP3w90PhB4XEXQIKyTDo1zAcLdrU1575cgLfFGTzHNAHjoQO4aCbBe9k30JgsCABDHVlvoCVo2jFYj2fPlPtIhWXKTA/kDgDIU/dQiIvzbNc8YcNyoRrUNTemGqK9ujcwamtUwTW7BI4r4Swjv78C/+GW8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TR1F/wU1; arc=fail smtp.client-ip=40.107.236.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bPGTRFv3LGGUAsudVMxvhF1zyeqmdLkEotTScqw1Z3J0J4luzUKhMQAIeJo18yt2w1WW+Oeoi2VKIXZvNj6nUft+SuWUGkiRJBlwuvDNpJ+gUpOQ6fxQ/0eYvUJtY+lavHVb882nzBYxjq0Xme+kdQNEdsHfZmw0mEgSmp8Z1a4hYavzdTrRyuWahe+ZKABMwMR3szRGhoKQ+ETkJHo39x07Bgh812SR91UdNr5SsZ8y7dQeyodZJvsHZyReojbfTiL9zsLZCAN1GQ5qeebxv6k7R2aC0kNNlsqGkkZB7nYXsC65AKFZhPN4dCja53y/eSNXa49UNnJ4uzuXwh+1cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=t++pxeaQYg1B05ixZqu0eMrYLhgdNCzzP4BMHNWc/ko=;
+ b=KKWWXJCUXYiw0O2MqsJTErcKVdu+ARYW44xqjZjCWhYcILZoz2ARdpgOgIJYJl3DE7Ia0VGmflYbM8XLzBNqxNwx6jZcncyZ+c6CUQb2JnBJhrdm01yY5sSbN4RS5LLbMzwoxphtxTW0ydJnrYD2N/nEVLtpkL0DGnnYN8qwyrADW1lbiT8c3KTPelzVITc6BsS3XLLox0s7X44Jenkz0miq5vHcZ/Cl4xoDb8Pj80eHsWltMtNWVPFuIntY+RGGXqIByLylH6aGkN8LMs80mkHZy1alq2TS+QAuzN85UQHEFguTCQzRnYi8nIaIKbluE4+WDUrdkudz36SHCAam9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=t++pxeaQYg1B05ixZqu0eMrYLhgdNCzzP4BMHNWc/ko=;
+ b=TR1F/wU1WRZkuRPHKRD4eF63xPyjJ9LhIiSgXeOPWXkZLEDrAbCnAh/yj/Rhfy8gcfhJavqFEXe8tspCJcJNzrVY6K8Un+hCRs1fd5j909MzmSSgoYAISqSA6UDxWi5o/l8dr0m/4QxBkIlPCPyMNtdHQ8YH1VvqMguKF0N6vEQ=
+Received: from MW4PR04CA0185.namprd04.prod.outlook.com (2603:10b6:303:86::10)
+ by DS0PR12MB6414.namprd12.prod.outlook.com (2603:10b6:8:cd::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 Mar
+ 2024 13:15:30 +0000
+Received: from CO1PEPF000044FD.namprd21.prod.outlook.com
+ (2603:10b6:303:86:cafe::87) by MW4PR04CA0185.outlook.office365.com
+ (2603:10b6:303:86::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Frontend
+ Transport; Fri, 29 Mar 2024 13:15:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000044FD.mail.protection.outlook.com (10.167.241.203) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7452.0 via Frontend Transport; Fri, 29 Mar 2024 13:15:30 +0000
+Received: from ethanolx16dchost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 Mar
+ 2024 08:15:29 -0500
+From: Pavan Kumar Paluri <papaluri@amd.com>
+To: <kvm@vger.kernel.org>
+CC: <andrew.jones@linux.dev>, <thomas.lendacky@amd.com>,
+	<michael.roth@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>
+Subject: [kvm-unit-tests PATCH v4 0/2] UEFI Improvements
+Date: Fri, 29 Mar 2024 08:15:20 -0500
+Message-ID: <20240329131522.806983-1-papaluri@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
- <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com> <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
-In-Reply-To: <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 29 Mar 2024 13:22:15 +0100
-Message-ID: <CAMRc=Mfeez9kXkkVxdmUk5dy=L=rbnYkYujO6jSCT5WAyUw2HA@mail.gmail.com>
-Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, David Airlie <airlied@redhat.com>, 
-	Gerd Hoffmann <kraxel@redhat.com>, Gurchetan Singh <gurchetansingh@chromium.org>, 
-	Chia-I Wu <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
-	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
-	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
-	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
-	linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044FD:EE_|DS0PR12MB6414:EE_
+X-MS-Office365-Filtering-Correlation-Id: 836527f7-bf13-4d1f-7e4b-08dc4ff24efe
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	7tZf++Lj9anNRDEeNyIpDlhY7MIdS0WnjkJyg4LkNF+ci02ilgTeErvfwSJSN7mdqTkEmuDXV1/7lmF2mJ7/CUU/0AmUZumJPBOdy5OwHSbVankhEAO0bS9Zm/GVynCYT5ld7oCf6vUhUeIXjM4BkbRMst8y5IKfsY21CRlJV+F5Mt5xCzzVRyojwMmwSZ5FxGX4gHtgYc4Sy9USwpoBdsBTzq+QH/p34KcjHiOEyKp6sEWjjWrzkyq4dgi8Ti0mOZ4CCxpPuTTkVf3dNjEhRQ7ib5cnDex9b9+hvDOOmvuIc7NtvEqLUAkNqrpy/5NwlubBE8ZtCLjUX+9/hFblulENjh4eUCICWiXTOmFqOBMCjfR6cGMzF54Zob5hfgeWNP/zu8MxGGYhRUyGM51IKBQ37BY9FRNi52Esm7YAGIT9gqRfl5L63WzwtYLIA0L4OdpRcklhih14h2eG29/Fx77OG1Ml3bD8eINJnelnHa3rNUjtgGh1i3ZX83o97N9gCbTAWcn7AnYAuIPpadPGwm+YpVGUlkFFPZUZ1LGl28n37um38i1rM6CCOLtsKS+THVRBXPEDRaAxpzR8/ZGu9MDwq/sBano8Vvdl65RXEi6JNi+TdE/DFueBxbNqDWRxnG0lJVVFCegWoMOCrYRhUFDWeg3ycODQ7bMYXN+wyUxphNZV1l5c3hk45HGzopOkNAzfNi6Xsa1Ye1W63Xkz2W02zGabumy7D5e5d6RMzqiMIeSBw5TvCodj6gYghat2
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(82310400014)(36860700004)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 13:15:30.4186
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 836527f7-bf13-4d1f-7e4b-08dc4ff24efe
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044FD.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6414
 
-On Fri, Mar 29, 2024 at 12:35=E2=80=AFPM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 29/03/2024 11:27, Bartosz Golaszewski wrote:
-> > On Wed, Mar 27, 2024 at 1:45=E2=80=AFPM Krzysztof Kozlowski
-> > <krzysztof.kozlowski@linaro.org> wrote:
-> >>
-> >> virtio core already sets the .owner, so driver does not need to.
-> >>
-> >> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> >>
-> >> ---
-> >>
-> >> Depends on the first patch.
-> >> ---
-> >>  drivers/gpio/gpio-virtio.c | 1 -
-> >>  1 file changed, 1 deletion(-)
-> >>
-> >> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-> >> index fcc5e8c08973..9fae8e396c58 100644
-> >> --- a/drivers/gpio/gpio-virtio.c
-> >> +++ b/drivers/gpio/gpio-virtio.c
-> >> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver =3D=
- {
-> >>         .remove                 =3D virtio_gpio_remove,
-> >>         .driver                 =3D {
-> >>                 .name           =3D KBUILD_MODNAME,
-> >> -               .owner          =3D THIS_MODULE,
-> >>         },
-> >>  };
-> >>  module_virtio_driver(virtio_gpio_driver);
-> >>
-> >> --
-> >> 2.34.1
-> >>
-> >
-> > Applied, thanks!
->
-> I expressed dependency in two places: cover letter and this patch.
-> Please drop it, because without dependency this won't work. Patch could
-> go with the dependency and with your ack or next cycle.
->
-> Best regards,
-> Krzysztof
->
+Patch-1: Introduces a fix for x86 arch which is ACPI-based to not get
+	 into the path of fdt.
 
-Dropped, and:
+Patch-2: KUT UEFI-based guest may sometimes fail to exit boot services
+	 due to a possible memory map update that might have taken place
+	 between efi_get_memory_map() call and efi_exit_boot_services()
+	call. As per UEFI specification (2.10), we need to try and keep
+	updating the memory map as long as we get Invalid key failure.
 
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+=========
+Changelog
+=========
+v3 -> v4:
+    * Dropped patches 3 & 4 from the series as they are not relevant to 
+      UEFI improvements introduced in this patchset. This would aid in 
+      easier review and upstreaming.
+    * Addressed feedback (Andrew)
+    * Included R-b tag from Andrew Jones.
+
+v2 -> v3:
+    * Included R-b tag from Andrew for Patch-1.
+    * Updated patch-2 to not leak memory map information during 
+      re-trials to efi_get_memory_map().
+
+v1 -> v2:
+    * Incorporated feedback (Andrew, Mike, Tom)
+    * Updated patch-2 to keep trying to update memory map and calls to 
+      exit boot services as long as there is a failure.
+    * Split Page allocation and GHCB page attributes patch into two 
+      patches.
+ 
+Pavan Kumar Paluri (2):
+  x86 EFI: Bypass call to fdt_check_header()
+  x86/efi: Retry call to efi exit boot services
+
+ lib/efi.c | 39 +++++++++++++++++++++++++--------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
+
+-- 
+2.34.1
+
 
