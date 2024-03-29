@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-13053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED18F8913B9
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 07:22:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C76A891448
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 08:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6141288443
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 06:22:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D5628387C
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 07:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD5C3FE4F;
-	Fri, 29 Mar 2024 06:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91C542054;
+	Fri, 29 Mar 2024 07:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F2lNdD50"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NZInWLE4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3DB3F9D2;
-	Fri, 29 Mar 2024 06:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF1A4176B;
+	Fri, 29 Mar 2024 07:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711693340; cv=none; b=VKb9jZPYFnX7GYTQx6MnR9PhITp0r2RgTMQsnz1mK2LgXqv8rwgk4nhpDYKkRJV0TvCQrSpZ0LvxB/yynlw3Pv9D2YMaiz4T5tO0+7zupd5+erivdQHbKuStMJvJfn7SRgAxhRctM+0TX14450tJKZ451L6MfbXMRTWe8PLiUGw=
+	t=1711697154; cv=none; b=ML2EMNNfPbc89u21nUoL2y2MQxK7LI2YbbEqamDW29uZ9aIl6bODgsRw2sOxVPbiYLeINrP4JsIqEPDvX8G+xPEz+wXFohCaGBXZEzPLqo/dbz134GMAHQlhodhXSqH0gnEZC4eC69o1+DO9/2E7EJ/m3fE6gvqhtPGJ+Wfom6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711693340; c=relaxed/simple;
-	bh=qqijB1DYYP8h60w+Z5syxz5vz3KMKyQUPWPlyBOGC7M=;
+	s=arc-20240116; t=1711697154; c=relaxed/simple;
+	bh=q/qIYXt+0gsDpQDFJZuqnL/uaIcsR0UZmn8FB/WzRQY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qMM4ksJCE+1xp8AoKp+BZ3ykvbDB7y1YlzsMg//BwRUYSYuO+BLrzrmWd7Oma5YOuJn486HWFH+Ru5c6ryeNNzylIB0KvGsGZxF01SXW4fEtC32XzjVLSWyhOqRApxZwF0MQ3P3Z9U7H4TT6ZgJHmPOTuzTlf8BE3LHV/+0K0nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F2lNdD50; arc=none smtp.client-ip=192.198.163.12
+	 In-Reply-To:Content-Type; b=ihz4vb+jH5/qt1AI9qvSVUJBwtjcZ/BkfZ/z9Rc8GD4WbCJGye/CQz6PX3U7Mo86ryOvUBn9UvFdny5h4nW/TO3ogLuKStZvceiBPWapypGSKzxbEFxwIKCb30YoT1POq7udPfcEo+apaWfZzFUmPeK5LdmwDngeVP1AB9/Bdt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NZInWLE4; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711693339; x=1743229339;
+  t=1711697153; x=1743233153;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=qqijB1DYYP8h60w+Z5syxz5vz3KMKyQUPWPlyBOGC7M=;
-  b=F2lNdD50QwHYi43qCM0C0kbLWJ/13EarTAaouT9qJuHox+Ns+r8y16dR
-   YSPBXzgsUxh/Au9s6cAUDjdv9WEKXRpgmXmYVt2KKNtVG75ayrU+YIvv3
-   dU3+gncj2iPcmc0XDHrvpdkhGUhqndi9rJWmixQf8WsRCus5wt0jN/mA6
-   EYXpTWiSohVOmDMZDqzpfb39o0tAmmTpMNyxxKpBT88GA1IaVoaYSwiJM
-   3VqJulB04ZN46igdcecnR6BP8YwPHGzHDMNrpUdXtqJm6D7m1uGYlTj9A
-   oxaOlxJMbZLaQyH5Vk+2clAyn8hh7AhoRxtc7HRmJ7q+LnVKsG0t1nqmS
-   Q==;
-X-CSE-ConnectionGUID: Rv+gWfS3SB2ns6iTu8rQug==
-X-CSE-MsgGUID: 3dr3UbaaT5efevOpuARAkQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="10663142"
+  bh=q/qIYXt+0gsDpQDFJZuqnL/uaIcsR0UZmn8FB/WzRQY=;
+  b=NZInWLE4oFMovUkwjVB3eiV7m3mDOX48Q/luXQWwHeAs69sS1fzhnULx
+   PmakBtq6tM5taroawbprq+S5LvByZYxYc/Gu1XCxdKixBqs3P+IK+uw01
+   BFelHp9Pk6HJyz34DyTvGviH3elM2Z558vCBQgk/HZ8xFWwus+d75su21
+   REKzx2obCN184srcY+9S/PwrnwMyZNC1FX+b5GpifwjgI0XHaVkgLxawn
+   8x36GYN0IawpIYi/8tpv9fQ3mWMv7ML7SU5Szl1iUUbvDdy7uAC0K9mgv
+   hOyGI+FpoI1zZsIksuqJwUkRIZHSGeyD1qz6pDZ6afLQ5RU82HAnaWr8E
+   g==;
+X-CSE-ConnectionGUID: up4BqJDSSvWnK9r7qAc69Q==
+X-CSE-MsgGUID: 9GqpmMeTTfG7FvTJG66UXw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6996731"
 X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
-   d="scan'208";a="10663142"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 23:22:18 -0700
+   d="scan'208";a="6996731"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 00:25:53 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
-   d="scan'208";a="54345229"
+   d="scan'208";a="16942869"
 Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.225]) ([10.238.10.225])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 23:22:15 -0700
-Message-ID: <f52734ac-704a-49f7-bbee-de5909d53b14@linux.intel.com>
-Date: Fri, 29 Mar 2024 14:22:12 +0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 00:25:49 -0700
+Message-ID: <71e6fa91-065c-4b28-ac99-fa71dfd499b9@linux.intel.com>
+Date: Fri, 29 Mar 2024 15:25:47 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,54 +66,144 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v19 038/130] KVM: TDX: create/destroy VM structure
-To: Isaku Yamahata <isaku.yamahata@intel.com>, Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- isaku.yamahata@linux.intel.com
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: "Huang, Kai" <kai.huang@intel.com>, "Zhang, Tina" <tina.zhang@intel.com>,
+ "isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
+ "seanjc@google.com" <seanjc@google.com>, "Yuan, Hang" <hang.yuan@intel.com>,
+ "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+ "Chen, Bo2" <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
+ "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+ "Aktas, Erdem" <erdemaktas@google.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
  <7a508f88e8c8b5199da85b7a9959882ddf390796.1708933498.git.isaku.yamahata@intel.com>
- <ZfpwIespKy8qxWWE@chao-email>
- <20240321141709.GK1994522@ls.amr.corp.intel.com>
+ <a0627c0f-5c2d-4403-807f-fc800b43fd3b@intel.com>
+ <20240327225337.GF2444378@ls.amr.corp.intel.com>
+ <4d925a79-d3cf-4555-9c00-209be445310d@intel.com>
+ <20240328053432.GO2444378@ls.amr.corp.intel.com>
+ <65a1a35e0a3b9a6f0a123e50ec9ddb755f70da52.camel@intel.com>
+ <20240328203902.GP2444378@ls.amr.corp.intel.com>
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240321141709.GK1994522@ls.amr.corp.intel.com>
+In-Reply-To: <20240328203902.GP2444378@ls.amr.corp.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 3/21/2024 10:17 PM, Isaku Yamahata wrote:
-> On Wed, Mar 20, 2024 at 01:12:01PM +0800,
-> Chao Gao <chao.gao@intel.com> wrote:
->
->>> config KVM_SW_PROTECTED_VM
->>> 	bool "Enable support for KVM software-protected VMs"
->>> -	depends on EXPERT
+On 3/29/2024 4:39 AM, Isaku Yamahata wrote:
 
-This change is not needed, right?
-Since you intended to use KVM_GENERIC_PRIVATE_MEM, not KVM_SW_PROTECTED_VM.
-
->>> 	depends on KVM && X86_64
->>> 	select KVM_GENERIC_PRIVATE_MEM
->>> 	help
->>> @@ -89,6 +88,8 @@ config KVM_SW_PROTECTED_VM
->>> config KVM_INTEL
->>> 	tristate "KVM for Intel (and compatible) processors support"
->>> 	depends on KVM && IA32_FEAT_CTL
->>> +	select KVM_SW_PROTECTED_VM if INTEL_TDX_HOST
->> why does INTEL_TDX_HOST select KVM_SW_PROTECTED_VM?
-> I wanted KVM_GENERIC_PRIVATE_MEM.  Ah, we should do
->
->          select KKVM_GENERIC_PRIVATE_MEM if INTEL_TDX_HOST
->
->
->>> +	select KVM_GENERIC_MEMORY_ATTRIBUTES if INTEL_TDX_HOST
->>> 	help
->>> 	.vcpu_precreate = vmx_vcpu_precreate,
->>> 	.vcpu_create = vmx_vcpu_create,
->>
 [...]
+>>>>> How about this?
+>>>>>
+>>>>> /*
+>>>>>    * We need three SEAMCALLs, TDH.MNG.VPFLUSHDONE(), TDH.PHYMEM.CACHE.WB(), and
+>>>>>    * TDH.MNG.KEY.FREEID() to free the HKID.
+>>>>>    * Other threads can remove pages from TD.  When the HKID is assigned, we need
+>>>>>    * to use TDH.MEM.SEPT.REMOVE() or TDH.MEM.PAGE.REMOVE().
+>>>>>    * TDH.PHYMEM.PAGE.RECLAIM() is needed when the HKID is free.  Get lock to not
+>>>>>    * present transient state of HKID.
+>>>>>    */
+>>>> Could you elaborate why it is still possible to have other thread removing
+>>>> pages from TD?
+>>>>
+>>>> I am probably missing something, but the thing I don't understand is why
+>>>> this function is triggered by MMU release?  All the things done in this
+>>>> function don't seem to be related to MMU at all.
+>>> The KVM releases EPT pages on MMU notifier release.  kvm_mmu_zap_all() does. If
+>>> we follow that way, kvm_mmu_zap_all() zaps all the Secure-EPTs by
+>>> TDH.MEM.SEPT.REMOVE() or TDH.MEM.PAGE.REMOVE().  Because
+>>> TDH.MEM.{SEPT, PAGE}.REMOVE() is slow, we can free HKID before kvm_mmu_zap_all()
+>>> to use TDH.PHYMEM.PAGE.RECLAIM().
+>> Can you elaborate why TDH.MEM.{SEPT,PAGE}.REMOVE is slower than
+>> TDH.PHYMEM.PAGE.RECLAIM()?
+>>
+>> And does the difference matter in practice, i.e. did you see using the former
+>> having noticeable performance downgrade?
+> Yes. With HKID alive, we have to assume that vcpu can run still. It means TLB
+> shootdown. The difference is 2 extra SEAMCALL + IPI synchronization for each
+> guest private page.  If the guest has hundreds of GB, the difference can be
+> tens of minutes.
+>
+> With HKID alive, we need to assume vcpu is alive.
+> - TDH.MEM.PAGE.REMOVE()
+> - TDH.PHYMEM.PAGE_WBINVD()
+> - TLB shoot down
+>    - TDH.MEM.TRACK()
+>    - IPI to other vcpus
+>    - wait for other vcpu to exit
+
+Do we have a way to batch the TLB shoot down.
+IIUC, in current implementation, TLB shoot down needs to be done for 
+each page remove, right?
+
+
+>
+> After freeing HKID
+> - TDH.PHYMEM.PAGE.RECLAIM()
+>    We already flushed TLBs and memory cache.
+>
+>
+>>>> Freeing vcpus is done in
+>>>> kvm_arch_destroy_vm(), which is _after_ mmu_notifier->release(), in which
+>>>> this tdx_mmu_release_keyid() is called?
+>>> guest memfd complicates things.  The race is between guest memfd release and mmu
+>>> notifier release.  kvm_arch_destroy_vm() is called after closing all kvm fds
+>>> including guest memfd.
+>>>
+>>> Here is the example.  Let's say, we have fds for vhost, guest_memfd, kvm vcpu,
+>>> and kvm vm.  The process is exiting.  Please notice vhost increments the
+>>> reference of the mmu to access guest (shared) memory.
+>>>
+>>> exit_mmap():
+>>>    Usually mmu notifier release is fired. But not yet because of vhost.
+>>>
+>>> exit_files()
+>>>    close vhost fd. vhost starts timer to issue mmput().
+>> Why does it need to start a timer to issue mmput(), but not call mmput()
+>> directly?
+> That's how vhost implements it.  It's out of KVM control.  Other component or
+> user space as other thread can get reference to mmu or FDs.  They can keep/free
+> them as they like.
+>
+>
+>>>    close guest_memfd.  kvm_gmem_release() calls kvm_mmu_unmap_gfn_range().
+>>>      kvm_mmu_unmap_gfn_range() eventually this calls TDH.MEM.SEPT.REMOVE()
+>>>      and TDH.MEM.PAGE.REMOVE().  This takes time because it processes whole
+>>>      guest memory. Call kvm_put_kvm() at last.
+>>>
+>>>    During unmapping on behalf of guest memfd, the timer of vhost fires to call
+>>>    mmput().  It triggers mmu notifier release.
+>>>
+>>>    Close kvm vcpus/vm. they call kvm_put_kvm().  The last one calls
+>>>    kvm_destroy_vm().
+>>>
+>>> It's ideal to free HKID first for efficiency. But KVM doesn't have control on
+>>> the order of fds.
+>> Firstly, what kinda performance efficiency gain are we talking about?
+> 2 extra SEAMCALL + IPI sync for each guest private page.  If the guest memory
+> is hundreds of GB, the difference can be tens of minutes.
+>
+>
+>> We cannot really tell whether it can be justified to use two different methods
+>> to tear down SEPT page because of this.
+>>
+>> Even if it's worth to do, it is an optimization, which can/should be done later
+>> after you have put all building blocks together.
+>>
+>> That being said, you are putting too many logic in this patch, i.e., it just
+>> doesn't make sense to release TDX keyID in the MMU code path in _this_ patch.
+> I agree that this patch is too huge, and that we should break it into smaller
+> patches.
+>
+>
+>>>> But here we are depending vcpus to be freed before tdx_mmu_release_hkid()?
+>>> Not necessarily.
+>> I am wondering when is TDH.VP.FLUSH done?  Supposedly it should be called when
+>> we free vcpus?  But again this means you need to call TDH.MNG.VPFLUSHDONE
+>> _after_ freeing vcpus.  And this  looks conflicting if you make
+>> tdx_mmu_release_keyid() being called from MMU notifier.
+> tdx_mmu_release_keyid() call it explicitly for all vcpus.
+
 
