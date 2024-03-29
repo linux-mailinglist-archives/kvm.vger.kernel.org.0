@@ -1,96 +1,169 @@
-Return-Path: <kvm+bounces-13091-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13092-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FFAA891892
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 13:21:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A34489189F
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 13:23:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B95A91F23C03
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 12:21:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB2D1F24569
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 12:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3903585927;
-	Fri, 29 Mar 2024 12:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA7212DD97;
+	Fri, 29 Mar 2024 12:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="EU+TObV2"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="O7Fi0g/C"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620B169E1E;
-	Fri, 29 Mar 2024 12:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5994985930
+	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 12:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711714885; cv=none; b=ZeKLwTkhvPJBEapEseSOa6axjmN7qljyfbAbSGEoIjbV/Rgtl3ChjOqcgLgOOOY8e7sWq8tSTrCB0TIX8pU0ewfSzXjePFKOp5pl9sRdIg07A/bRSiuvstn/WsWHYNUaJ/bI1gi1/9XD6DRwvHP2K76l+PWDdZ+h67paGeoxn9c=
+	t=1711714951; cv=none; b=EcJCKYjHwAA/1CfxJwjNDH+5voKRfFIiTrWTLIMMx66yocJ2e8KcuMScW90oG4YrD28Egn1YxwlpWxjjU97SZKBeCOMkUwKaAkScPESyC2MavMkVSt6Ths0KJ4KxknruTryQjKlHIP8ky5nz+0Rkq+82eBbCnM+CeYn/g0bJF+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711714885; c=relaxed/simple;
-	bh=KV8MAW0WMd10XKbpiyQdNKyGugobmHYXrd9fx5ETW1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PyjGh1NUnVnMcB/fj10fD2+UMXpdGsbdc9+AxvwDcckW+gvn7MbME7SpotgCHDl/JN389nyyaTTLNBtf1i3BxMjQrqeEzCVa4P29i8Fj9NhSr2UH4QQNxWQy31nozPH5bPoDP4WZRr/MM0Ej5XGtsBUk9rKCa8DWveovgRQJYqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=EU+TObV2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56AAAC433C7;
-	Fri, 29 Mar 2024 12:21:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1711714884;
-	bh=KV8MAW0WMd10XKbpiyQdNKyGugobmHYXrd9fx5ETW1w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EU+TObV27sH3T1plQcMKQCAMobCr39kitiKz2UNFsknh5jVOovWZmZRYESJoMaHBQ
-	 9gQgJ2daodiXNx4nEyBjd6fpjrJ2c8NK3M0AXpnWFT8opMjvf2rnP4vMFpXIcqfYTH
-	 YdcAdUIZWnCBB25uLSu/vIiVceFap4eqANvApsGk=
-Date: Fri, 29 Mar 2024 13:21:20 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Krister Johansen <kjlx@templeofstupid.com>, stable@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 5.15.y v2 0/2] fix softlockups in stage2_apply_range()
-Message-ID: <2024032913-felt-tip-fasting-5fab@gregkh>
-References: <cover.1709665227.git.kjlx@templeofstupid.com>
- <cover.1709685364.git.kjlx@templeofstupid.com>
- <878r2vr7tj.wl-maz@kernel.org>
+	s=arc-20240116; t=1711714951; c=relaxed/simple;
+	bh=leo+Yi4AfSnMVg8mcM4Xju1MFqd5FSUEovb4t8XjI+U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ns+FLlgXQrP5/V5qZBNjt9XZ/cRTJ3dzceTIvFNCsC2ckvjenVuz7vLUzWvhReW+VOt5+ceONAYC+r6TKWLFKPfDfP7TGuLS61izjRWn/fhksc1p0kOnWpFS384l6uVre8MIkstwZ8q/lpJ8OeYh+XCsL1MFumSYQ2hs/TpWTWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=O7Fi0g/C; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so19048061fa.0
+        for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 05:22:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711714946; x=1712319746; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
+        b=O7Fi0g/C5yTqgLj7PJ0zyXIg+iImbY+SKVFGN4a9Zq5xCNky6TjQyYrzlUaERurNpf
+         7LwKDBDW9EciAYhebOlUrfpp7gkwdxw3ffcHgzjAsYvU5YXkkSuF6xm7T7Dgu9iSQ5kl
+         +qqXXyD8PAwdjUTX/VSPOgkEthVy/fYMcmg7/Pdkk27h8K4cpeyzmcdoVIWAeGJYcA4p
+         vgxV5p/AfEY+VZYpyf4uBNc2jICO/cR9owEcZUd+mnQwV27PeBiF08/M0whYSW9XQNrn
+         V/j9jsc5tyhLkFsz1U2crr4Z9BGHhaJ+fjWQ7temGRIJI9xLKbhip75WdFHFUSwGtyRq
+         rj0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711714946; x=1712319746;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
+        b=hImFizC/gFUnacssgM+buyGykT8YZUx+2CXy2U6r3mqVZS1cLmiuQNIDuj+qvXOdFm
+         FDhVp3cGz3oCPgwa4UER5HwDK4ZCWv0e+EodfhqavWgfmeCbwY+IOl87HDhrPHicGJbC
+         WL4rmug7xxnyxbEgwGbj+2uMQSZ3LMv6iYJlvB/P5KybB/J+/bQrWqSxvshc8/fFg/hC
+         r0T6mNQIWRA05ZgbiyWxcNf2mRnXlPo6txMhMBImXbZEPKVmc94AIB5anGzSeZstq8J0
+         8CbLJHKq1L15sqbWuhZFYHN/RrKap0GeTVFkPACeCDbbCTkpsL0BJQCjv4H7QDBepLT4
+         xibA==
+X-Forwarded-Encrypted: i=1; AJvYcCUaiO80An0tTpNtltjURmQSpnXd4cNezDHON2kpaLp3eGWHuj06D0QAJYaG/p8iN+ydhdFyVmCaahedN1N4WD1Pdj8+
+X-Gm-Message-State: AOJu0Yz7Ncb0zT31DjS6iJW68Hg6tLHIOCjFFtswAQKAHQBhy/hnM0fu
+	KGRbIh6BN3jGeSRbbgMDAkYLTV9coi+w5O8llDVWJwGLtZsCLPqHo9PCTPbP/dmNmO7pVAfYkKH
+	UAzGR9sygp4o9eXHqWCCGnl0g7SqrMFKa4sJS4A==
+X-Google-Smtp-Source: AGHT+IE+HnSCJL2quawa1K1lMrp38Nm79TgJqcEd/z4x+7H7IfVDrdpUOVuBJN0I2Fw0lOyMRLNfqEQZZUdPpNwT2ZM=
+X-Received: by 2002:a2e:8350:0:b0:2d3:5480:92aa with SMTP id
+ l16-20020a2e8350000000b002d3548092aamr644831ljh.25.1711714946358; Fri, 29 Mar
+ 2024 05:22:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <878r2vr7tj.wl-maz@kernel.org>
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+ <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com> <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
+In-Reply-To: <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 29 Mar 2024 13:22:15 +0100
+Message-ID: <CAMRc=Mfeez9kXkkVxdmUk5dy=L=rbnYkYujO6jSCT5WAyUw2HA@mail.gmail.com>
+Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
+	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, David Airlie <airlied@redhat.com>, 
+	Gerd Hoffmann <kraxel@redhat.com>, Gurchetan Singh <gurchetansingh@chromium.org>, 
+	Chia-I Wu <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
+	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
+	linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 06, 2024 at 10:08:40AM +0000, Marc Zyngier wrote:
-> On Wed, 06 Mar 2024 00:49:34 +0000,
-> Krister Johansen <kjlx@templeofstupid.com> wrote:
-> > 
-> > Hi Stable Team,
-> > In 5.15, unmapping large kvm vms on arm64 can generate softlockups.  My team has
-> > been hitting this when tearing down VMs > 100Gb in size.
-> > 
-> > Oliver fixed this with the attached patches.  They've been in mainline since
-> > 6.1.
-> > 
-> > I tested on 5.15.150 with these patches applied. When they're present,
-> > both the dirty_log_perf_test detailed in the second patch, and
-> > kvm_page_table_test no longer generate softlockups when unmapping VMs
-> > with large memory configurations.
-> > 
-> > Would you please consider these patches for inclusion in an upcoming 5.15
-> > release?
-> > 
-> > Change in v2:  I ran format-patch without the --from option which incorrectly
-> > generated the first series without leaving Oliver in place as the author.  The
-> > v2 should retain the correct authorship.  Apologies for the mistake.
-> 
-> Thanks for this.
-> 
-> FWIW,
-> 
-> Acked-by: Marc Zyngier <maz@kernel.org>
+On Fri, Mar 29, 2024 at 12:35=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> On 29/03/2024 11:27, Bartosz Golaszewski wrote:
+> > On Wed, Mar 27, 2024 at 1:45=E2=80=AFPM Krzysztof Kozlowski
+> > <krzysztof.kozlowski@linaro.org> wrote:
+> >>
+> >> virtio core already sets the .owner, so driver does not need to.
+> >>
+> >> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> >>
+> >> ---
+> >>
+> >> Depends on the first patch.
+> >> ---
+> >>  drivers/gpio/gpio-virtio.c | 1 -
+> >>  1 file changed, 1 deletion(-)
+> >>
+> >> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
+> >> index fcc5e8c08973..9fae8e396c58 100644
+> >> --- a/drivers/gpio/gpio-virtio.c
+> >> +++ b/drivers/gpio/gpio-virtio.c
+> >> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver =3D=
+ {
+> >>         .remove                 =3D virtio_gpio_remove,
+> >>         .driver                 =3D {
+> >>                 .name           =3D KBUILD_MODNAME,
+> >> -               .owner          =3D THIS_MODULE,
+> >>         },
+> >>  };
+> >>  module_virtio_driver(virtio_gpio_driver);
+> >>
+> >> --
+> >> 2.34.1
+> >>
+> >
+> > Applied, thanks!
+>
+> I expressed dependency in two places: cover letter and this patch.
+> Please drop it, because without dependency this won't work. Patch could
+> go with the dependency and with your ack or next cycle.
+>
+> Best regards,
+> Krzysztof
+>
 
-Now queued up,t hanks.
+Dropped, and:
 
-greg k-h
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
