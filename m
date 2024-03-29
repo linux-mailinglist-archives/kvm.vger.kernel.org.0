@@ -1,69 +1,66 @@
-Return-Path: <kvm+bounces-13202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FD168932EB
-	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 18:30:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5346893408
+	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 18:53:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB75728130C
-	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 16:30:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CA191F2139E
+	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 16:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1A214A097;
-	Sun, 31 Mar 2024 16:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B470C157E8D;
+	Sun, 31 Mar 2024 16:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
 	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="49eW2WWB"
 X-Original-To: kvm@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A129148854
-	for <kvm@vger.kernel.org>; Sun, 31 Mar 2024 16:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C65F156F56
+	for <kvm@vger.kernel.org>; Sun, 31 Mar 2024 16:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711902392; cv=fail; b=Ag2J3EgNlrWtj1aWSCCUEOXtTSO1DQDbUt5X4Nr8VEQwsz4QGGFKBpBE8sEuCv8gsiZspGRtuXz54smKkFvEltSEglpOQbIThTc19nI+KIslSu7YRKS8gqsqfhC6FvnEiCDgpkHCSyWBvI8e+Rl5p7srnDbnC7bIIkIU/s1ifmM=
+	t=1711903223; cv=fail; b=VYpUBZBCuMIacPcwIUyaiXoFHGkPLF00naKT6PG8tq08UghFyaVkmj+SD+YTXqB8h3vpFP1+ZbGkwxyy2HzrrbFSC+5QVz2hSqNMl9nn2NPBfFgKAz1kgZK1KO8a37K/mFYplmGUhJ0hgsUnyuOVyloYSfJDMWJpCb6vIn+jj2g=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711902392; c=relaxed/simple;
+	s=arc-20240116; t=1711903223; c=relaxed/simple;
 	bh=XK+D24Mus0Fd07JBujOKIkrDHXMbMMVpD3gupVHk9as=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Axw0qjx1vZIHRnG13eUiHvIMb/swgt85FVlqLEocUv6oBHLyModHSialpeJMBEYcw2CJh6Nk4fQRk39OjQR38icXaUgUEV8omUej5jyIMTgsEUYFuH3Cvh5+Jxnt2P772xhRAXelUswNcLIAZ6cOnYWvr0jXe6TfbIikjIrIUGo=
+	 MIME-Version:Content-Type; b=ViosM8/mmE7JWNNWChrNiQvjOXb8MC/yOWl2dkqrgASR6O79UiHcqNG3f6o2zFoGCWE3sx6yeO1sTCpIeQ0CJHYVVCi+JmFXrTJCappnHXVsvtC/TnnODFe2fOLJYRuovJn3jvTI9D+RPsONUPk1T1cusNOLjrA5FJYrECU/Q38=
 ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=49eW2WWB; arc=fail smtp.client-ip=40.107.102.73; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id D55EB208AC;
-	Sun, 31 Mar 2024 18:26:27 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id D4046207C6;
+	Sun, 31 Mar 2024 18:40:17 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FLuhegHijFFD; Sun, 31 Mar 2024 18:26:27 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	with ESMTP id g6Jx0-kGxK7F; Sun, 31 Mar 2024 18:40:17 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id B3D18208B9;
-	Sun, 31 Mar 2024 18:26:25 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com B3D18208B9
+	by a.mx.secunet.com (Postfix) with ESMTPS id 7F364208B2;
+	Sun, 31 Mar 2024 18:40:14 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 7F364208B2
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id A801880004A;
-	Sun, 31 Mar 2024 18:26:25 +0200 (CEST)
+	by mailout1.secunet.com (Postfix) with ESMTP id 71BCC80004A;
+	Sun, 31 Mar 2024 18:40:14 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:26:25 +0200
+ 15.1.2507.35; Sun, 31 Mar 2024 18:40:14 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 16:23:32 +0000
+ 15.1.2507.17; Sun, 31 Mar 2024 16:36:42 +0000
 X-sender: <kvm+bounces-13110-martin.weber=secunet.com@vger.kernel.org>
 X-Receiver: <martin.weber@secunet.com> ORCPT=rfc822;martin.weber@secunet.com
- NOTIFY=NEVER;
- X-ExtendedProps=BQAVABYAAgAAAAUAFAARAJuYHy0vkvxLoOu7fW2WcxcPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAF4AAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249V2ViZXIgTWFydGluOTU1BQALABcAvgAAALMpUnVJ4+pPsL47FHo+lvtDTj1EQjIsQ049RGF0YWJhc2VzLENOPUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpLENOPUFkbWluaXN0cmF0aXZlIEdyb3VwcyxDTj1zZWN1bmV0LENOPU1pY3Jvc29mdCBFeGNoYW5nZSxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPXNlY3VuZXQsREM9ZGUFAA4AEQBACf3SYEkDT461FZzDv+B7BQAdAA8ADAAAAG1ieC1lc3Nlbi0wMQUAPAACAAAPADYAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0Lk1haWxSZWNpcGllbnQuRGlzcGxheU5hbWUPAA0AAABXZWJlciwgTWFydGluBQAMAAIAAAUAbAACAAAFAFgAFwBGAAAAm5gfLS+S/Eug67t9bZZzF0NOPVdlYmVyIE1hcnRpbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8AL
-	wAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
-X-HeloDomain: a.mx.secunet.com
-X-ExtendedProps: BQBjAAoAtpHp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgB3AAAAi4oAAAUABAAUIAEAAAAYAAAAbWFydGluLndlYmVyQHNlY3VuZXQuY29tBQAGAAIAAQUAKQACAAEPAAkAAABDSUF1ZGl0ZWQCAAEFAAIABwABAAAABQADAAcAAAAAAAUABQACAAEFAGQADwADAAAASHVi
-X-Source: SMTP:Default MBX-DRESDEN-01
-X-SourceIPAddress: 62.96.220.36
-X-EndOfInjectedXHeaders: 17865
+X-HeloDomain: mbx-dresden-01.secunet.de
+X-ExtendedProps: BQBjAAoAkUemlidQ3AgFADcAAgAADwA8AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50Lk9yZ2FuaXphdGlvblNjb3BlEQAAAAAAAAAAAAAAAAAAAAAADwA/AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLk1haWxEZWxpdmVyeVByaW9yaXR5DwADAAAATG93
+X-Source: SMTP:Default MBX-ESSEN-02
+X-SourceIPAddress: 10.53.40.199
+X-EndOfInjectedXHeaders: 13521
 X-Virus-Scanned: by secunet
 Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=kvm+bounces-13110-martin.weber=secunet.com@vger.kernel.org; receiver=martin.weber@secunet.com 
 DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 6BA7220892
@@ -104,8 +101,8 @@ From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, "Sean
  Christopherson" <seanjc@google.com>, Isaku Yamahata
-	<isaku.yamahata@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>,
-	"Binbin Wu" <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+	<isaku.yamahata@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>, Binbin
+ Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
 Subject: [PATCH gmem 5/6] KVM: guest_memfd: Use AS_INACCESSIBLE when creating guest_memfd inode
 Date: Fri, 29 Mar 2024 16:24:43 -0500
 Message-ID: <20240329212444.395559-6-michael.roth@amd.com>
