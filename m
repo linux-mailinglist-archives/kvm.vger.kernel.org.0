@@ -1,191 +1,158 @@
-Return-Path: <kvm+bounces-13095-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13096-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78B6891F4E
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 16:02:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72EEC891F7D
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 16:05:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 526801F30A96
-	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 15:02:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3D4B1C28DC8
+	for <lists+kvm@lfdr.de>; Fri, 29 Mar 2024 15:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B811813FD99;
-	Fri, 29 Mar 2024 13:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C42155A5F;
+	Fri, 29 Mar 2024 13:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YXzXFO5k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S+quUCH2"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2076.outbound.protection.outlook.com [40.107.93.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AEE85C65
-	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 13:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711718158; cv=fail; b=UagO34n9rltewXm4HPE9PY8eixZshUH3tkiScaqAvvNQTOL9irKeg0vj3dx2NyLE5znmzODcnGkQIvtdAkZpKtEFPtgdkyGHHZWJ93H1n9fUm9l6XunNvUj/uBrARHQh/qpGlOfOQdSd9cviT71h3/4HXzxYH6nzFQvuQByBXUA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711718158; c=relaxed/simple;
-	bh=x+Y/+2mBpnxTVq8MAx2KMGQv+Ql8+PBJabdLak7n0Ew=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rTSWvLdmXAJY/OaHygAJRkVqDVsAuPQ0z/+Vdxp8DamJsz49amqtLk3h8zX4hxDzBDqhmNKzyj1pH9yePn0xGiUigQu6ZVsD3HMTIz3foXS4M3shxzbL2Mreq/bh9Vx9xeddtnjIMLxYpq5H+eMFFGZMPq+rDBgAFBDvEpjFBOc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YXzXFO5k; arc=fail smtp.client-ip=40.107.93.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TtUMsUaAaNQJLxf4sAk+rWMDZ52SPOfw/VmsMYtfTxSUQVJbMTA7WOCp6Lp1jFKWxYslcAooezRp6qwC/xWxhpmG+tcfT+gWtQ6+cRIcFGCMVCv6hgsPev/UlQoKS2o1p0q8pq1Wl/euX4+j7WAmiCvWIEvx/uH2REb4JO4uN7JN77GnMBQbZRFJIZRrTvNwoenAGW50tCnRBYNzxChnKghEo6X5Tzor4ANk1n6BXHxYYUpRwx8rwfizdPZoeBDLdzsTuQAjEQQ+hdEJLik/24KI/MsvkdAVKWvdtvg6JGRAXAtQe3NseWCqHFeUukBs9+Cy8IGO6wNMLlZFym4p0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d8kJYXi7M3CzOSYESIwKnPebntDJfZZiuZ9g3gk7tKs=;
- b=H70ZWBeUlEKTvN7N92Nh55J1wSQUQLJfC+vW1muUeT/qth1txRIxcwgB49fEGvGhAitwnCD2gNDFFP4YduHFPEhLGMY7QR//KodBSKxKsIL/0Ete2vV+EdPIMWASV2i0e0UzqEbrItcXJVBnrrF+7S9FJNTt4yIThmI7JjgGr7mYkmwqwm05oXumsMMezdOnbpgu2yDzNuSxdCVITjzQMWz/3Oti50GunTtzTfYRCR3P8Ru8c87EB+lAtIRKp+vvUTWd9XRcXEU8b2QMZBuqVQRymaGEfLChD5K29zP0tCmOlDx8u71xNcZv00tdHapCq+DyyebgCCoQxz16AtvohQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d8kJYXi7M3CzOSYESIwKnPebntDJfZZiuZ9g3gk7tKs=;
- b=YXzXFO5kd4yMLgX8PuK2cxnqiMx7m+CxvV5mO4AKhvz6LGUuXJoTMPM6WQWe8UoQzCjyD+kyJFQ8fxBAsm0d9GB17f3baXA3ka6ajRuTUEXPfh+6t+noKI8hJQrzRIEePNbNKoKF5IwALi5LTHOFNyBd+UejQiJHBT21r5tNH38=
-Received: from MW4PR04CA0210.namprd04.prod.outlook.com (2603:10b6:303:86::35)
- by LV2PR12MB5846.namprd12.prod.outlook.com (2603:10b6:408:175::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Fri, 29 Mar
- 2024 13:15:55 +0000
-Received: from CO1PEPF000044FD.namprd21.prod.outlook.com
- (2603:10b6:303:86:cafe::6b) by MW4PR04CA0210.outlook.office365.com
- (2603:10b6:303:86::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Frontend
- Transport; Fri, 29 Mar 2024 13:15:52 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000044FD.mail.protection.outlook.com (10.167.241.203) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.0 via Frontend Transport; Fri, 29 Mar 2024 13:15:51 +0000
-Received: from ethanolx16dchost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 Mar
- 2024 08:15:50 -0500
-From: Pavan Kumar Paluri <papaluri@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <andrew.jones@linux.dev>, <thomas.lendacky@amd.com>,
-	<michael.roth@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>
-Subject: [kvm-unit-tests PATCH v4 2/2] x86/efi: Retry call to efi exit boot services
-Date: Fri, 29 Mar 2024 08:15:22 -0500
-Message-ID: <20240329131522.806983-3-papaluri@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240329131522.806983-1-papaluri@amd.com>
-References: <20240329131522.806983-1-papaluri@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCD8155A46
+	for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 13:28:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711718927; cv=none; b=OfhIXL7ppLMXRIxdQjF2o8Fs7AEPryZ2iFE0vI3hyr1dT81qahBAgM5xyFEe6D6f48aSxUds/Rk12ahESryz9AXQwTdlgeVB17Xhd5nWoyK9XYjoqOOzkZ8A7A1JvPAd3DOtMW7y5ZlBeIVbly3r8Ama9vTyL/ai5blvLhj13WM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711718927; c=relaxed/simple;
+	bh=zlmV0sBDPPllGZWjPqa2/c1/r7nXDK5/rzJZO9Fvals=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mhYo96Xasp9B19vAjSANnpTspb3Isoo7aw3/rPDTBM3zuTWC9i4DqKzku/PMZuC9X3RgXOx5M5Cr3KD3uJ8fVRcSjsLy2sE1AfAcmNsRosnj8NTkKcYCTBInIeZRgITVmS7bam8JdfSkPnf5c32DuUFQNE8zi/05F/mY6dxZ4NM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S+quUCH2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711718925;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9b2+syugljaMrrOP++3j3QqL3+aM8ytb7iOaLk3Q4wQ=;
+	b=S+quUCH2AVxFUWI8ays1z6iM+Jv8/SFTHHrSHQlfFqY75RoKW4avjNvcu3du+1S28VWYEj
+	/2skUku1lsFTy5vJvLtCxHro+YOneDB2/zI1Nj/maKWxzLToftr3Jr5hxWRIDcnk4/br97
+	8QHTinJ3InCcd4o9FJad6wjPWpjJ/QE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-554-FA8kuZpKP8mcGYKlA9132A-1; Fri, 29 Mar 2024 09:28:36 -0400
+X-MC-Unique: FA8kuZpKP8mcGYKlA9132A-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33ed44cb765so1145152f8f.2
+        for <kvm@vger.kernel.org>; Fri, 29 Mar 2024 06:28:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711718915; x=1712323715;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9b2+syugljaMrrOP++3j3QqL3+aM8ytb7iOaLk3Q4wQ=;
+        b=wNYmmRkJF1+hwIQpbHJB6YXcHtR4XUafNm6N+/AkNAnrb4xdUqbGzZGydAC5CIGcte
+         J2D9j4RNKHbggfHdD6cL/GMABAoNFcJTRL19KNiRypkYQAipdo4oEH4EyevQwJ10oBhP
+         foLmukE1PRMJUB8DITIsQXUYtuBUqN+XPq9ddrkqvQ5PTJ9VhaP/nYSzV2w2OuIVYsTK
+         DiYsDKzMRDAM4fiGOzflCkI8tIGE7XaH+Eqtx03UeCIkbR7zmCNsXHrhyjyaPS5gF2VT
+         5KMDRW9gTYplG4AlZHkd3oqsUhWZh7DJ8oyc03JT7MTh+BIZFzJKWQh2qPNl6L8z1YQH
+         LHVw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvtiepAQXmxPPcD661c6cHynPJshJLL9kfIux7jWXW1rKUmWnZG5KtDlwCw5NRNDroHlDqwCZflkRGjxF7js5h+Xny
+X-Gm-Message-State: AOJu0Yw+YAyBPq57Mo4+osmSuhURSkwCNK1zH4+zy26VKVxeTlJUd7Nz
+	auFoP+J7vpkxc5KmXfu0MMxapCBlOJV3IQogGWByhgTXutYY3Q/ZNzRpbYCTxbH5ePs1y6NufiU
+	Eoh3QxcLggH8T1sj0Aogl3GskIgKXutitDDGyu1yN1FqxXeTY/w==
+X-Received: by 2002:a05:6000:258:b0:343:3e54:6208 with SMTP id m24-20020a056000025800b003433e546208mr405100wrz.55.1711718915577;
+        Fri, 29 Mar 2024 06:28:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG0y693U6Mrafzyu7YFm6f17FVsvRLIAvGL111PeLg9URymVxfxN4rrw7+XNw571qiaGR1ycw==
+X-Received: by 2002:a05:6000:258:b0:343:3e54:6208 with SMTP id m24-20020a056000025800b003433e546208mr405040wrz.55.1711718915211;
+        Fri, 29 Mar 2024 06:28:35 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-33.business.telecomitalia.it. [87.12.25.33])
+        by smtp.gmail.com with ESMTPSA id e11-20020a056000194b00b00341c6b53358sm4171063wry.66.2024.03.29.06.28.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 06:28:34 -0700 (PDT)
+Date: Fri, 29 Mar 2024 14:28:27 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
+	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	David Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
+	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
+	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
+	Christian Schoenebeck <linux_oss@crudebyte.com>, Kalle Valo <kvalo@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	virtualization@lists.linux.dev, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, netdev@vger.kernel.org, 
+	v9fs@lists.linux.dev, kvm@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 01/22] virtio: store owner from modules with
+ register_virtio_driver()
+Message-ID: <e2xy5kjdctpitcrev2byqc5gcwntvsd6pfutrvp3l2kfe3llgs@l2xp5opj7xu2>
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
+ <oaoiehcpkjs3wrhc22pwx676pompxml2z5dcq32a6fvsyntonw@hnohrbbp6wpm>
+ <d01cc73e-a365-4ce8-a25f-780ea45bc581@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044FD:EE_|LV2PR12MB5846:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96194bf5-96a0-400a-1f58-08dc4ff25bcf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	tX/pA/ZiiwyEgsLMC1EYQz7CMAZugnkXtp4hIdyMbv10DWoQCI2w4yyHoyBzeYIPPSNHFyHHOkrnwlTC2pltkwCNZcVxD4Z5krONS9j1p4Z8JdscikBUjJNCf7EokUec37duFpNsc6ljBEKxMb40+cS8JHbpPprAwttiyXAXHoB8bMdYNEsDtk/8Tp1jo8e4CcXYBIqdoVjvqy5BTtbbuFfX/EN321jjLvCUe5qGCQ/oHssfCpjrlrIxv+Bcyn7Q/rK3vzQomSW7mB/T07acIngS7MzWmb413uySqE7YkLd8nONyDGmHObAIBGGK5z75v7q3dY8mo3ms6sio/iyd7PBymvvQe8lMueTMXf0iBhVRhb7/1Mjdo2quvwpQp7LYKubb3YObYl4fuK4iF6k5neFUSUdsDLPtgb17c6J5xzGEDikazH/iM9Gd6JrwTzqlz1b9n9/NSL8UtSjdJRQAkv1yV6fek9Z8QW4X3tbfzuP+zg/W4BkS1rxgUlQq9KDciiyom8fEHZ1KVhfGBFq2Mo0Hc2cP6gr64OqBOWXjW2YR8OUZTR7IYtbpEt+Opm9WVf+sfmDXs2dfxPIbRu5XipeZJIROhlvay6MIj8JjPPFhJEWbyRyH/nvX7BdNpWIlnfIgDM0dH6Jx19d8FHxMp+BASupnYGIOCK7u0O2eosT6fr65c6FKdFgsjmegBZPWAyuOzyX/mQ+BqNSrjPVvbj7d3nyLPOb7cYaM4fDlrGlwWtci+2o2mtexOWPnHI1K
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 13:15:51.9029
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96194bf5-96a0-400a-1f58-08dc4ff25bcf
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044FD.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5846
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <d01cc73e-a365-4ce8-a25f-780ea45bc581@linaro.org>
 
-In some cases, KUT guest might fail to exit boot services due to a
-possible memory map update that might have taken place between
-efi_get_memory_map() and efi_exit_boot_services() calls. As per UEFI
-spec 2.10 (Section 7.4.6 EFI_BOOT_SERVICES.ExitBootServices()), we need
-to keep trying to update the memory map and calls to exit boot
-services as long as case status is EFI_INVALID_PARAMETER. Keep freeing
-the old memory map before obtaining new memory map via
-efi_get_memory_map() in case of exit boot services failure.
+On Fri, Mar 29, 2024 at 01:07:31PM +0100, Krzysztof Kozlowski wrote:
+>On 29/03/2024 12:42, Stefano Garzarella wrote:
+>>> };
+>>>
+>>> -int register_virtio_driver(struct virtio_driver *driver)
+>>> +int __register_virtio_driver(struct virtio_driver *driver, struct module *owner)
+>>> {
+>>> 	/* Catch this early. */
+>>> 	BUG_ON(driver->feature_table_size && !driver->feature_table);
+>>> 	driver->driver.bus = &virtio_bus;
+>>> +	driver->driver.owner = owner;
+>>> +
+>>
+>> `.driver.name =  KBUILD_MODNAME` also seems very common, should we put
+>> that in the macro as well?
+>
+>This is a bit different thing. Every driver is expected to set owner to
+>itself (THIS_MODULE), but is every driver name KBUILD_MODNAME?
 
-Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
----
- lib/efi.c | 32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+Nope, IIUC we have 2 exceptions:
+- drivers/firmware/arm_scmi/virtio.c
+- arch/um/drivers/virt-pci.c
 
-diff --git a/lib/efi.c b/lib/efi.c
-index 8a74a22834a4..44337837705d 100644
---- a/lib/efi.c
-+++ b/lib/efi.c
-@@ -406,8 +406,8 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- 	efi_system_table = sys_tab;
- 
- 	/* Memory map struct values */
--	efi_memory_desc_t *map = NULL;
--	unsigned long map_size = 0, desc_size = 0, key = 0, buff_size = 0;
-+	efi_memory_desc_t *map;
-+	unsigned long map_size, desc_size, key, buff_size;
- 	u32 desc_ver;
- 
- 	/* Helper variables needed to get the cmdline */
-@@ -446,13 +446,6 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- 	efi_bootinfo.mem_map.key_ptr = &key;
- 	efi_bootinfo.mem_map.buff_size = &buff_size;
- 
--	/* Get EFI memory map */
--	status = efi_get_memory_map(&efi_bootinfo.mem_map);
--	if (status != EFI_SUCCESS) {
--		printf("Failed to get memory map\n");
--		goto efi_main_error;
--	}
--
- #ifdef __riscv
- 	status = efi_get_boot_hartid();
- 	if (status != EFI_SUCCESS) {
-@@ -461,11 +454,22 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- 	}
- #endif
- 
--	/* 
--	 * Exit EFI boot services, let kvm-unit-tests take full control of the
--	 * guest
--	 */
--	status = efi_exit_boot_services(handle, &efi_bootinfo.mem_map);
-+	status = EFI_INVALID_PARAMETER;
-+	while (status == EFI_INVALID_PARAMETER) {
-+		status = efi_get_memory_map(&efi_bootinfo.mem_map);
-+		if (status != EFI_SUCCESS) {
-+			printf("Failed to get memory map\n");
-+			goto efi_main_error;
-+		}
-+		/*
-+		 * Exit EFI boot services, let kvm-unit-tests take full
-+		 * control of the guest.
-+		 */
-+		status = efi_exit_boot_services(handle, &efi_bootinfo.mem_map);
-+		if (status == EFI_INVALID_PARAMETER)
-+			efi_free_pool(*efi_bootinfo.mem_map.map);
-+	}
-+
- 	if (status != EFI_SUCCESS) {
- 		printf("Failed to exit boot services\n");
- 		goto efi_main_error;
--- 
-2.34.1
+>Remember that this overrides whatever driver actually put there.
+
+They can call __register_virtio_driver() where we can add the `name`
+parameter. That said, I don't have a strong opinion, we can leave it
+as it is.
+
+Thanks,
+Stefano
 
 
