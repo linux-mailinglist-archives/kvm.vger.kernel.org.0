@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-13154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D639892D52
-	for <lists+kvm@lfdr.de>; Sat, 30 Mar 2024 21:52:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 704F8892D5C
+	for <lists+kvm@lfdr.de>; Sat, 30 Mar 2024 21:56:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 325E8282DEC
-	for <lists+kvm@lfdr.de>; Sat, 30 Mar 2024 20:52:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCDA6B2193A
+	for <lists+kvm@lfdr.de>; Sat, 30 Mar 2024 20:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4712A482D8;
-	Sat, 30 Mar 2024 20:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18304AED6;
+	Sat, 30 Mar 2024 20:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GvQEOb9I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hl6eELnV"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A781119F
-	for <kvm@vger.kernel.org>; Sat, 30 Mar 2024 20:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44B340C1F
+	for <kvm@vger.kernel.org>; Sat, 30 Mar 2024 20:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711831918; cv=none; b=E3Hpq0/3+LEqrHWKPxj6cBr8D5Ci58defHLZ/Ne4QaI3Iz6qEGx1PgrCv7hSfcDsLKgYNd4PobeEKR62wsfgFyDh0cdW0P0uWtAEx87GZEfScJIEgK1zEIBShgiM131m7WkwMEbSNFMrIro8kkkxlE8BF4m9OwmODHMC5JSqFcc=
+	t=1711832147; cv=none; b=fQ8HjcHYqnU9ozl9BU3lMSIvX93cFZ/PS9hLZ/eOtROdz9PMS4Hbv0N53+A6J6CkVrRw1+WBSwfwcv5Tnvf/puwHfrZ7s6xCxZN7tl0hfzUz/5/bB0iijRhpg154UMGIgo2fRIMepjmsDhFK46zhpbeqm12zEBsVJiJKDLI4iyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711831918; c=relaxed/simple;
-	bh=eo76hJ5KgggZKPYnrOo0bwJDa2FPFvtChdiC2X3NlIs=;
+	s=arc-20240116; t=1711832147; c=relaxed/simple;
+	bh=z7TmabSrZt9asoh9147M/NyurNg5SlDymoLAfpK3VzY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YFxoAWgnUCBSG6rOqCuPbsAtIGfzU9uxTIB4lfFVuPLgQqpFjBK7RrvClz7R6DPoVBA31HCDTMSa5f+USfYDgxeWdhWrOQrBIM623UQ1kahUKJiE2d/VazwfuIHP87/JOY/y/iTp0AwpCIY7zclUvKcM6Yaqo7yb+Fk5uHEer0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GvQEOb9I; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=mGCpbAjirk5UQJ/ZPpG4hGjsn5+yXvEdUcSjrkpu1srJZkHIsfU+FbtVl9sPiavOMu4AClTK0YkqsoQriw1bbj21Ceo621rTjIUYpWxurCIdRunX4AZFH2zk0k7TZHdmYnkJL2WcmyfwfhKP4FKPC294SFIOFhH7Buz3trgU5gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hl6eELnV; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711831916;
+	s=mimecast20190719; t=1711832144;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=OZ3Ciau6EpVtoog0PBxIAt4mBisJnFBL8QU+3ujOsIY=;
-	b=GvQEOb9Inztvo8KFkcxl/+MZWVTYtDclyMRAeOoIW2WXZS7LdiFJWyiR7ItwkCI1GLxY8k
-	6ErdHLBZeNToPzWKhfZXLJiELM0GbBUeeMKyoJHvzdpKFuElQkq4H/hkbLQoM0MdKcGQ3D
-	fFwPWGRPPOBa6bVrJXsfFmCDOfmsqGM=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jyi6SED43RWjiHARW2FnY3B2JhkS1d2lHNCRYyCsMcg=;
+	b=hl6eELnV0t7CvxcVkDU/ihH+xSbaVr3a1Ryu2cp8yTwlDXYVlvf4JZNv0aSBSyfLIO/W8I
+	4qijzh02FFkamT+YlxopeY3ykUQh4UvZ8dNV8pmrJZ9i1Xmdcp7qGBAQJLCrawF7NbT4J8
+	MB0nW2/Jbb5eNzBRk1WL854Hks4hK1k=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-43-yh9vNM9WOp2dVlZun9gJ2Q-1; Sat, 30 Mar 2024 16:51:53 -0400
-X-MC-Unique: yh9vNM9WOp2dVlZun9gJ2Q-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a46852c2239so192215166b.1
-        for <kvm@vger.kernel.org>; Sat, 30 Mar 2024 13:51:53 -0700 (PDT)
+ us-mta-121-W-jBIofLMSG12qC295Zcuw-1; Sat, 30 Mar 2024 16:55:42 -0400
+X-MC-Unique: W-jBIofLMSG12qC295Zcuw-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d6d3815f9bso29366531fa.0
+        for <kvm@vger.kernel.org>; Sat, 30 Mar 2024 13:55:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711831912; x=1712436712;
+        d=1e100.net; s=20230601; t=1711832141; x=1712436941;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OZ3Ciau6EpVtoog0PBxIAt4mBisJnFBL8QU+3ujOsIY=;
-        b=N2l4UR7yDDh9qKVFdwNjIRR4hmcyCYamzGzreIGkxQkbjpbjLoxOb8vpLIOmZvWOyt
-         +rvo8PK9o+VtDZtRHL9+RXDrhMox7uZDXLsGV5/cpgKn6XMSLpDV3GVY80/9L5jNIYRh
-         Tdt31QDBXD+KU5nOUzYPUcUwpovgYB5Nc3B0rsFNSqEXKNo0h05kslvZ1d6EbBy81gds
-         AH2oFT41Uh6OTBa3V5pbfVAjtCIEu2ZKFvFydfV4rScAsk5cog9rK5BjQHQeuQerhsg2
-         wgmMMjXS5myrVh3xmxdJcAUb+c/nxbOP+10UMuFQHrFTOqSE5hHn7hbPIwbQaADDVdkC
-         7eWw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+DHv9G71rixT+fhGsJUTcnO3Kg78R9kv8VSFfAXzK1p/u4KZ6M1PKcuz34BYqno5D1FF+/YbxzVo1DiiAUnEK5OKX
-X-Gm-Message-State: AOJu0YxS68KzsjILnYDpy1w4160CQ1Dr2MBxFSo0fWzmkl97U/wkTGMS
-	VdirJdua1uF25jTaZmiSAN0yPxhpDOyXdf8LCYSQg4MZKkk4OTz35fpM6ikuCBrdz7HNT97gs/n
-	YgzskGkz81SlpCkvgYOoCzrq06kkTbBSISyqMflmYNao5wVgfhw==
-X-Received: by 2002:a17:906:1253:b0:a4d:ff5f:98ad with SMTP id u19-20020a170906125300b00a4dff5f98admr3545171eja.37.1711831912737;
-        Sat, 30 Mar 2024 13:51:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE01IT9TeNxfmx0zF5Xk6kwBCeppMFBPly3IZPz1shqv6ixk8RRaNFkk5C/OVE5TsIYrwjytA==
-X-Received: by 2002:a17:906:1253:b0:a4d:ff5f:98ad with SMTP id u19-20020a170906125300b00a4dff5f98admr3545135eja.37.1711831912424;
-        Sat, 30 Mar 2024 13:51:52 -0700 (PDT)
+        bh=jyi6SED43RWjiHARW2FnY3B2JhkS1d2lHNCRYyCsMcg=;
+        b=lz3WutbOnh0Gqnvi9h4DXWgBQZ1r1BP8qQ7b6gNRX6M9KqjzsUj03ejpOlshJgoYbP
+         uecp92f9PpnIFOu2eEEToef6cwL2LQAzXLPLg8RF1ypSRnEVSlB6q9YfEqQIAJxyDcqN
+         6wJwZp24dkSwfjOd+KX4KOBfNX1uHB0AQWmOzTdShbKNggFSUVDJcCPVYAO++uTaYJg4
+         +XKEN52dL9M5JRYG+0rW9FQ2OoFs8ljkKq8trcf5p3QJMKC3bOHibEitrV0WDgZ80DE0
+         7qMBbou6jsadKPt55/Xyts/SiyPNq8d76PwhuqwhyjU7QuUqTBbzkjrY/qTJdLil7viK
+         yn0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXUKdB7S8jIgCfdIu2E94++HE1hY4Q7eNJW0J+PGfmvwc98PW/zvSN2jLKglmAoM5fD+oU34zeVwWxucXIJAOeiqYnp
+X-Gm-Message-State: AOJu0YwGRXluDLVscngwRj85oIHAPCPr9QQih/yEp4V3rPsofCa6dyfO
+	v21a6O/uTtQbIbBnrHBfFZRj7QBXyPo691Lnlv3pMM2QjqcfUxMr+MHQpQqcu5txHJdtAxlZGwY
+	jy1642ENt1ulmSfxF1uZkRC0W6UARAWaAV8l0UKPY8S6sMJHsrg==
+X-Received: by 2002:a2e:3307:0:b0:2d8:1096:6913 with SMTP id d7-20020a2e3307000000b002d810966913mr136889ljc.20.1711832141161;
+        Sat, 30 Mar 2024 13:55:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3w4cwAv4h4Eb58plOtyeNT/FqmpU2M4qH41wQ1IThyW9pWf1IBmQXNxSRhgLNhjfSlLWhkg==
+X-Received: by 2002:a2e:3307:0:b0:2d8:1096:6913 with SMTP id d7-20020a2e3307000000b002d810966913mr136864ljc.20.1711832140682;
+        Sat, 30 Mar 2024 13:55:40 -0700 (PDT)
 Received: from [192.168.10.4] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id z3-20020a170906714300b00a4650ec48d0sm3489665ejj.140.2024.03.30.13.51.49
+        by smtp.googlemail.com with ESMTPSA id 17-20020a170906301100b00a45c9945251sm3414724ejz.192.2024.03.30.13.55.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Mar 2024 13:51:51 -0700 (PDT)
-Message-ID: <30c5f2f3-ff1e-4b0d-bb1f-eba95f578376@redhat.com>
-Date: Sat, 30 Mar 2024 21:51:49 +0100
+        Sat, 30 Mar 2024 13:55:40 -0700 (PDT)
+Message-ID: <37941671-9ece-4078-b308-b185579e8d7a@redhat.com>
+Date: Sat, 30 Mar 2024 21:55:37 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 16/29] KVM: x86: Export the kvm_zap_gfn_range() for
- the SNP use
+Subject: Re: [PATCH v12 17/29] KVM: SEV: Add support to handle RMP nested page
+ faults
 To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
@@ -100,7 +100,7 @@ Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
  Brijesh Singh <brijesh.singh@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-17-michael.roth@amd.com>
+ <20240329225835.400662-18-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -138,71 +138,35 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240329225835.400662-17-michael.roth@amd.com>
+In-Reply-To: <20240329225835.400662-18-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/29/24 23:58, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> While resolving the RMP page fault, there may be cases where the page
-> level between the RMP entry and TDP does not match and the 2M RMP entry
-> must be split into 4K RMP entries. Or a 2M TDP page need to be broken
-> into multiple of 4K pages.
-> 
-> To keep the RMP and TDP page level in sync, zap the gfn range after
-> splitting the pages in the RMP entry. The zap should force the TDP to
-> gets rebuilt with the new page level.
+> +	if (rmp_level == PG_LEVEL_4K) {
+> +		pr_debug_ratelimited("%s: Spurious RMP fault for GPA 0x%llx, error_code 0x%llx",
+> +				     __func__, gpa, error_code);
+> +		goto out;
+> +	}
+> +
+> +	pr_debug_ratelimited("%s: Splitting 2M RMP entry for GPA 0x%llx, error_code 0x%llx",
+> +			     __func__, gpa, error_code);
+> +	ret = snp_rmptable_psmash(pfn);
+> +	if (ret && ret != PSMASH_FAIL_INUSE) {
+> +		/*
+> +		 * Look it up again. If it's 4K now then the PSMASH may have raced with
+> +		 * another process and the issue has already resolved itself.
+> +		 */
+> +		if (!snp_lookup_rmpentry(pfn, &assigned, &rmp_level) && assigned &&
+> +		    rmp_level == PG_LEVEL_4K) {
+> +			pr_debug_ratelimited("%s: PSMASH for GPA 0x%llx failed with ret %d due to potential race",
+> +					     __func__, gpa, ret);
+> +			goto out;
+> +		}
 
-Just squash this in patch 17.
+Please change these pr_debug_ratelimited() to just a single trace point 
+after the call to snp_rmptable_psmash().
 
 Paolo
-
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->   arch/x86/include/asm/kvm_host.h | 1 +
->   arch/x86/kvm/mmu.h              | 2 --
->   arch/x86/kvm/mmu/mmu.c          | 1 +
->   3 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index a3f8eba8d8b6..49b294a8d917 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1950,6 +1950,7 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
->   				   const struct kvm_memory_slot *memslot);
->   void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
->   void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
-> +void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
->   
->   int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3);
->   
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 2c54ba5b0a28..89da37be241a 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -253,8 +253,6 @@ static inline bool kvm_mmu_honors_guest_mtrrs(struct kvm *kvm)
->   	return __kvm_mmu_honors_guest_mtrrs(kvm_arch_has_noncoherent_dma(kvm));
->   }
->   
-> -void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
-> -
->   int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
->   
->   int kvm_mmu_post_init_vm(struct kvm *kvm);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0049d49aa913..c5af52e3f0c5 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6772,6 +6772,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
->   
->   	return need_tlb_flush;
->   }
-> +EXPORT_SYMBOL_GPL(kvm_zap_gfn_range);
->   
->   static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
->   					   const struct kvm_memory_slot *slot)
 
 
