@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-13155-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 704F8892D5C
-	for <lists+kvm@lfdr.de>; Sat, 30 Mar 2024 21:56:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D8AF892D67
+	for <lists+kvm@lfdr.de>; Sat, 30 Mar 2024 22:02:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCDA6B2193A
-	for <lists+kvm@lfdr.de>; Sat, 30 Mar 2024 20:56:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8781B2182A
+	for <lists+kvm@lfdr.de>; Sat, 30 Mar 2024 21:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18304AED6;
-	Sat, 30 Mar 2024 20:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213984B5CD;
+	Sat, 30 Mar 2024 21:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hl6eELnV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="exwnZ8KZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44B340C1F
-	for <kvm@vger.kernel.org>; Sat, 30 Mar 2024 20:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D095843ADA
+	for <kvm@vger.kernel.org>; Sat, 30 Mar 2024 21:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711832147; cv=none; b=fQ8HjcHYqnU9ozl9BU3lMSIvX93cFZ/PS9hLZ/eOtROdz9PMS4Hbv0N53+A6J6CkVrRw1+WBSwfwcv5Tnvf/puwHfrZ7s6xCxZN7tl0hfzUz/5/bB0iijRhpg154UMGIgo2fRIMepjmsDhFK46zhpbeqm12zEBsVJiJKDLI4iyk=
+	t=1711832506; cv=none; b=GC+a1j2DNqhys6llZw68pevOkGIxaAJD+byyY8rMNad12IibksAnCLMAvdAd7wPNOdcaOvDBpsnJsdwsZjNIunY/xwnCwC7LkaTQdf16CGLUIZaRw2Vy2JO0siHo6mL088BMF7qzbEu5MDMPsABNbJX7qaY5tunEMpcGD62zXk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711832147; c=relaxed/simple;
-	bh=z7TmabSrZt9asoh9147M/NyurNg5SlDymoLAfpK3VzY=;
+	s=arc-20240116; t=1711832506; c=relaxed/simple;
+	bh=+sVaxRP9koJKMlgsM79KsaeETdqLzifuShLZ62f6aLs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mGCpbAjirk5UQJ/ZPpG4hGjsn5+yXvEdUcSjrkpu1srJZkHIsfU+FbtVl9sPiavOMu4AClTK0YkqsoQriw1bbj21Ceo621rTjIUYpWxurCIdRunX4AZFH2zk0k7TZHdmYnkJL2WcmyfwfhKP4FKPC294SFIOFhH7Buz3trgU5gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hl6eELnV; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=n7hd/apOCpvDDZdBSu0778OpnvChP39rejsRj+VEGp4isHDC41VpXw/Fbxg5XjvQApNA37ukuev2H/JZNo1Ifvs8vzSpATGghFBJsxi9YMCsqWsFNMHhgH6ZDt8mJ6jeefuoBiMF1Pz4mvVc9WmJ5HHquVPtjmf2hL6eBR2lX6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=exwnZ8KZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711832144;
+	s=mimecast20190719; t=1711832503;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jyi6SED43RWjiHARW2FnY3B2JhkS1d2lHNCRYyCsMcg=;
-	b=hl6eELnV0t7CvxcVkDU/ihH+xSbaVr3a1Ryu2cp8yTwlDXYVlvf4JZNv0aSBSyfLIO/W8I
-	4qijzh02FFkamT+YlxopeY3ykUQh4UvZ8dNV8pmrJZ9i1Xmdcp7qGBAQJLCrawF7NbT4J8
-	MB0nW2/Jbb5eNzBRk1WL854Hks4hK1k=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3aR1QfAUho179PK9ExgLrz9xfYuI8M+7PWwcDQKY80w=;
+	b=exwnZ8KZxPHLtReqseT5rRA3hHVb+ogXdRR0CTb/vI0ykKP/Yt/1wHyyb0CkGfbELj1WWz
+	ybkApI6qfuNil23YsQAyNhLdHwJBbY2sEnCcrJa6WMm7Lky3dLSDLJJwwsILykyJJE3ouF
+	JeifG7EfOvthaZHSqlPIaj0SUHYOO+0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-W-jBIofLMSG12qC295Zcuw-1; Sat, 30 Mar 2024 16:55:42 -0400
-X-MC-Unique: W-jBIofLMSG12qC295Zcuw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d6d3815f9bso29366531fa.0
-        for <kvm@vger.kernel.org>; Sat, 30 Mar 2024 13:55:42 -0700 (PDT)
+ us-mta-140-hF_JVh-rOGWwbLxqs-a86A-1; Sat, 30 Mar 2024 17:01:42 -0400
+X-MC-Unique: hF_JVh-rOGWwbLxqs-a86A-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a46bae02169so343857466b.1
+        for <kvm@vger.kernel.org>; Sat, 30 Mar 2024 14:01:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711832141; x=1712436941;
+        d=1e100.net; s=20230601; t=1711832499; x=1712437299;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jyi6SED43RWjiHARW2FnY3B2JhkS1d2lHNCRYyCsMcg=;
-        b=lz3WutbOnh0Gqnvi9h4DXWgBQZ1r1BP8qQ7b6gNRX6M9KqjzsUj03ejpOlshJgoYbP
-         uecp92f9PpnIFOu2eEEToef6cwL2LQAzXLPLg8RF1ypSRnEVSlB6q9YfEqQIAJxyDcqN
-         6wJwZp24dkSwfjOd+KX4KOBfNX1uHB0AQWmOzTdShbKNggFSUVDJcCPVYAO++uTaYJg4
-         +XKEN52dL9M5JRYG+0rW9FQ2OoFs8ljkKq8trcf5p3QJMKC3bOHibEitrV0WDgZ80DE0
-         7qMBbou6jsadKPt55/Xyts/SiyPNq8d76PwhuqwhyjU7QuUqTBbzkjrY/qTJdLil7viK
-         yn0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXUKdB7S8jIgCfdIu2E94++HE1hY4Q7eNJW0J+PGfmvwc98PW/zvSN2jLKglmAoM5fD+oU34zeVwWxucXIJAOeiqYnp
-X-Gm-Message-State: AOJu0YwGRXluDLVscngwRj85oIHAPCPr9QQih/yEp4V3rPsofCa6dyfO
-	v21a6O/uTtQbIbBnrHBfFZRj7QBXyPo691Lnlv3pMM2QjqcfUxMr+MHQpQqcu5txHJdtAxlZGwY
-	jy1642ENt1ulmSfxF1uZkRC0W6UARAWaAV8l0UKPY8S6sMJHsrg==
-X-Received: by 2002:a2e:3307:0:b0:2d8:1096:6913 with SMTP id d7-20020a2e3307000000b002d810966913mr136889ljc.20.1711832141161;
-        Sat, 30 Mar 2024 13:55:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE3w4cwAv4h4Eb58plOtyeNT/FqmpU2M4qH41wQ1IThyW9pWf1IBmQXNxSRhgLNhjfSlLWhkg==
-X-Received: by 2002:a2e:3307:0:b0:2d8:1096:6913 with SMTP id d7-20020a2e3307000000b002d810966913mr136864ljc.20.1711832140682;
-        Sat, 30 Mar 2024 13:55:40 -0700 (PDT)
+        bh=3aR1QfAUho179PK9ExgLrz9xfYuI8M+7PWwcDQKY80w=;
+        b=di+woCwYhafQXrkdDsB00EyGfYk408npmlJ2D2iZyl7qiR5AnmRw1eJOulKRfp05AO
+         PWRgX5i7+l/yqlnEB+MRrenzh+kyijoVZeyrl6+TCgyFitCmSnt9OfaIxDRiMwiTBquM
+         pedJmc250c6FUCvMfMxQumCdwbKUDyShylP1FY8i/ycYS5kns70ak5zhXYlPYbUNJMit
+         T0zsvTc+iyZwLCdYglrREX4NcZPMwabqJguWyYuw36QVW9pt5WXBL/1UDXeTSGJoRu+B
+         GDrtBMUoWL+IQCuVidHRyk8lr6dG8qt2hH+PFwKyoz7sL4tqKlqrtZqFOk8j5olOxbFg
+         UoJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+Y5gTdu9tQabjc8OBV2BuRPWzQ1mBw6v6OaJCxiAMLqX5WTQkc/NwF4WcMVStDwHYpxq2LoC5sMqU//dANj4ZWn7v
+X-Gm-Message-State: AOJu0YxIAf26qtXtkIjMaYc7DAvpAeE6NZnEvp0D8XAQK7f7DVrddvl1
+	zAKJKCW50Hbs7PU/diCQhOY//WwgK/jcp8iktY3+oEziDexC4yOYTifJU1oZ/fke6kwe3130bG5
+	cxERYWlqzZnAGW6ROc69OF0kZLU4AppW1DuXvO+2XWseRW4iSdKsrOVg/Bg==
+X-Received: by 2002:a17:906:ca57:b0:a46:852e:2a63 with SMTP id jx23-20020a170906ca5700b00a46852e2a63mr4759116ejb.29.1711832499444;
+        Sat, 30 Mar 2024 14:01:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGjYcQ/p/ZWPvUybSYRA9ioGIQldmtvB4OHml9EDdOMi31JHX8p4fWJUmWvRXNJIZ92pNVhYw==
+X-Received: by 2002:a17:906:ca57:b0:a46:852e:2a63 with SMTP id jx23-20020a170906ca5700b00a46852e2a63mr4759076ejb.29.1711832499005;
+        Sat, 30 Mar 2024 14:01:39 -0700 (PDT)
 Received: from [192.168.10.4] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id 17-20020a170906301100b00a45c9945251sm3414724ejz.192.2024.03.30.13.55.38
+        by smtp.googlemail.com with ESMTPSA id ef14-20020a17090697ce00b00a4e44f724e8sm1398812ejb.186.2024.03.30.14.01.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Mar 2024 13:55:40 -0700 (PDT)
-Message-ID: <37941671-9ece-4078-b308-b185579e8d7a@redhat.com>
-Date: Sat, 30 Mar 2024 21:55:37 +0100
+        Sat, 30 Mar 2024 14:01:38 -0700 (PDT)
+Message-ID: <67685ec7-ca61-43f1-8ecd-120ec137e93a@redhat.com>
+Date: Sat, 30 Mar 2024 22:01:35 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 17/29] KVM: SEV: Add support to handle RMP nested page
- faults
+Subject: Re: [PATCH v12 18/29] KVM: SEV: Use a VMSA physical address variable
+ for populating VMCB
 To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
@@ -97,10 +97,9 @@ Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
  tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
  alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- Brijesh Singh <brijesh.singh@amd.com>
+ nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com
 References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-18-michael.roth@amd.com>
+ <20240329225835.400662-19-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -138,34 +137,25 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240329225835.400662-18-michael.roth@amd.com>
+In-Reply-To: <20240329225835.400662-19-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/29/24 23:58, Michael Roth wrote:
-> +	if (rmp_level == PG_LEVEL_4K) {
-> +		pr_debug_ratelimited("%s: Spurious RMP fault for GPA 0x%llx, error_code 0x%llx",
-> +				     __func__, gpa, error_code);
-> +		goto out;
-> +	}
-> +
-> +	pr_debug_ratelimited("%s: Splitting 2M RMP entry for GPA 0x%llx, error_code 0x%llx",
-> +			     __func__, gpa, error_code);
-> +	ret = snp_rmptable_psmash(pfn);
-> +	if (ret && ret != PSMASH_FAIL_INUSE) {
-> +		/*
-> +		 * Look it up again. If it's 4K now then the PSMASH may have raced with
-> +		 * another process and the issue has already resolved itself.
-> +		 */
-> +		if (!snp_lookup_rmpentry(pfn, &assigned, &rmp_level) && assigned &&
-> +		    rmp_level == PG_LEVEL_4K) {
-> +			pr_debug_ratelimited("%s: PSMASH for GPA 0x%llx failed with ret %d due to potential race",
-> +					     __func__, gpa, ret);
-> +			goto out;
-> +		}
+> From: Tom Lendacky<thomas.lendacky@amd.com>
+> 
+> In preparation to support SEV-SNP AP Creation, use a variable that holds
+> the VMSA physical address rather than converting the virtual address.
+> This will allow SEV-SNP AP Creation to set the new physical address that
+> will be used should the vCPU reset path be taken.
+> 
+> Signed-off-by: Tom Lendacky<thomas.lendacky@amd.com>
+> Signed-off-by: Ashish Kalra<ashish.kalra@amd.com>
+> Signed-off-by: Michael Roth<michael.roth@amd.com>
+> ---
 
-Please change these pr_debug_ratelimited() to just a single trace point 
-after the call to snp_rmptable_psmash().
+I'll get back to this one after Easter, but it looks like Sean had some 
+objections at https://lore.kernel.org/lkml/ZeCqnq7dLcJI41O9@google.com/.
 
 Paolo
 
