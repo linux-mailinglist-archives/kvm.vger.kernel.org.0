@@ -1,213 +1,136 @@
-Return-Path: <kvm+bounces-13203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10D2893353
-	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 18:38:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DD118932A9
+	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 18:22:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5606A2842C0
-	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 16:38:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF04F1C209FE
+	for <lists+kvm@lfdr.de>; Sun, 31 Mar 2024 16:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362E615666C;
-	Sun, 31 Mar 2024 16:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eJnKUWex"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2711F145321;
+	Sun, 31 Mar 2024 16:22:52 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.v2201612906741603.powersrv.de (mail.weilnetz.de [37.120.169.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBEB155A35;
-	Sun, 31 Mar 2024 16:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711902524; cv=fail; b=FhXKl1CEd5+lwx45gJ+G9kKeotup4rkxLPaoGum+8hkua1siEYBzPhH/rHYgxoX0L6u0xTrES6TPm4AkOLchftq6uO5xAIfjAsA2r8x0TCRoU8nfywpOFXWsxvsO1Sk2KiH0wJ4l/ijc/gEmV485Xiu/n0WWq9/QzPjbvRpCemo=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711902524; c=relaxed/simple;
-	bh=+CtUzNfteMVDHRuwIX5781fsmaFIlHZcyPlcQv4zDZc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=X9VvsWzDMUWHnfiiryXo0vdKl7aEFToXfcfOEs2hCxautptqT7yEu1OanKu2cJdauYeawAnIH9w3W7eMfqk8q9z9felxWiDs8Em/7rfD4K+SQAic9ZYJfWx3pU5DBubgy8NgF2IUpK/qJCIS5LV3xwVgRkce9r73XGKHskB2TZ0=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=fail smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eJnKUWex; arc=fail smtp.client-ip=192.198.163.8; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; arc=fail smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=intel.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id AAD87208E3;
-	Sun, 31 Mar 2024 18:28:40 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JSbHoVMtdQhV; Sun, 31 Mar 2024 18:28:40 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 2E675208DE;
-	Sun, 31 Mar 2024 18:28:40 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2E675208DE
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 1EF5480005A;
-	Sun, 31 Mar 2024 18:28:40 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:28:39 +0200
-Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 16:24:06 +0000
-X-sender: <kvm+bounces-13190-martin.weber=secunet.com@vger.kernel.org>
-X-Receiver: <martin.weber@secunet.com> ORCPT=rfc822;martin.weber@secunet.com
- NOTIFY=NEVER;
- X-ExtendedProps=BQAVABYAAgAAAAUAFAARAJuYHy0vkvxLoOu7fW2WcxcPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAF4AAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249V2ViZXIgTWFydGluOTU1BQALABcAvgAAALMpUnVJ4+pPsL47FHo+lvtDTj1EQjIsQ049RGF0YWJhc2VzLENOPUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpLENOPUFkbWluaXN0cmF0aXZlIEdyb3VwcyxDTj1zZWN1bmV0LENOPU1pY3Jvc29mdCBFeGNoYW5nZSxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPXNlY3VuZXQsREM9ZGUFAA4AEQBACf3SYEkDT461FZzDv+B7BQAdAA8ADAAAAG1ieC1lc3Nlbi0wMQUAPAACAAAPADYAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0Lk1haWxSZWNpcGllbnQuRGlzcGxheU5hbWUPAA0AAABXZWJlciwgTWFydGluBQAMAAIAAAUAbAACAAAFAFgAFwBGAAAAm5gfLS+S/Eug67t9bZZzF0NOPVdlYmVyIE1hcnRpbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8AL
-	wAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
-X-CreatedBy: MSExchange15
-X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoAftJAQuxQ3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgAQAAAAs4oAAAUABAAUIAEAAAAYAAAAbWFydGluLndlYmVyQHNlY3VuZXQuY29tBQAGAAIAAQUAKQACAAEPAAkAAABDSUF1ZGl0ZWQCAAEFAAIABwABAAAABQADAAcAAAAAAAUABQACAAEFAGQADwADAAAASHVi
-X-Source: SMTP:Default MBX-DRESDEN-01
-X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 19233
-X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.199.223; helo=ny.mirrors.kernel.org; envelope-from=kvm+bounces-13190-martin.weber=secunet.com@vger.kernel.org; receiver=martin.weber@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 0F7D520199
-Authentication-Results: b.mx.secunet.com;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eJnKUWex"
-X-Original-To: kvm@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711890086; cv=fail; b=a3hiClgmYEgg6PsCeDXEgoyzWxc8dB3E0sZLjHDmXAbxOMTfO+tjG1bvf4PiERYPvhGZbRKcIHnr+q7CtN5tIlf+kMLxZD4E7ykBeksXGWhtSkXCBJw9slnJqRhXWGWVHgNYsARqDo+50qxmVdVxEr+P02lWdTwVylnBdk4ZfBc=
-ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711890086; c=relaxed/simple;
-	bh=+CtUzNfteMVDHRuwIX5781fsmaFIlHZcyPlcQv4zDZc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Hsf4Eq0/nQxGKbWFZS7VuDw0WznDMnzSYMs9rUrx2VGPY+ZRBGxNESLTIpjHsGRnWn648Z2kdZh8Ri/J1yLuRN6kzMsKH+zZhsohatpGg2qepVc0pMs/Yy9552APnsRpLDkVExgRus/nvOI6cToLsW7IZx0gKpWdaeMCI9LO04s=
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eJnKUWex; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711890084; x=1743426084;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=+CtUzNfteMVDHRuwIX5781fsmaFIlHZcyPlcQv4zDZc=;
-  b=eJnKUWexGjflXeP+jYDmhHbpZLyVNN9GppFJ1EVpa6Wz34tbK/5mBB+w
-   C/50vXqD8mvKAp/DBxawj/C/DC7oCitZnoW2x35SiF0yRSts9ImWnMV56
-   fyPOLS0HsdbzZPBp7AkZdRW6G3b0Y85y7x2WNU01dfaICNuPHJZyDZsON
-   Q+maFT0XztgbHGGGit8eUpAkmTV3sfXZt89ZJQL+zS7FVHeTzuJH5GNBC
-   h8dtJZftTkO687fyG5x3I6b9Oa+Vzs1lq5uW2HMNCtw0d/pS3UwVpTJhM
-   kzcYb8BXiBRMx3LC5b8wLC+XyLAbPGyuuS9ijYP6rrZ/R+5BS0np90LG5
-   w==;
-X-CSE-ConnectionGUID: 626C+LZ8TBeS18zb+phhYA==
-X-CSE-MsgGUID: ky71nFTkQBGE9RDPFjzKMQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11029"; a="24513264"
-X-IronPort-AV: E=Sophos;i="6.07,170,1708416000"; 
-   d="scan'208";a="24513264"
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,170,1708416000"; 
-   d="scan'208";a="22133090"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aID8BjwRCmRaqH3tzxEKd9og1erEG+uKa+J+hCHKZikQ8YRQoEdn+4twiQ0zHRhG+IyPyf025UILojTK3/sg/yQN91zKxrWZLQNeyuVJ5nchtSnXXUGcrZYWfF0afg6bBiBYw76lCyRID+XkuGcKr7nji4vWvtUiWt1BEe++9NNw83AkusD9lxuTLXkX9006YMS/p0ryLs+9OaLwhYTbm5jm89zJUyP/6pLxYou0DsL6ikxFlEFkM4gCU0HH+gpguuUsYXa9Qu8OunlKcYdipFRDiwATFsV2nzP+10j5PCcM5HBZLuluzuXzFEDx6jEp0SNkj+oYLrm9b4Jtpz46lQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+CtUzNfteMVDHRuwIX5781fsmaFIlHZcyPlcQv4zDZc=;
- b=G9H0k2LGO7S5UAA9/s6wCZ1nNJ13gr/rXbQdwUhc6CZi0JdGZU8hjUwRpFBw3TLR7r1xSKcGuqeaYMybdiY8RaPQTwFlEznE2d4WvXnsTH/CzASvBw/GJatRiAL3oIv/4iXoNIIH81L3FVucmjj4zpJlmkbRF/cNIjyl4pjN13e/WOw7a9Xxk0fEhetWFpFH37JrBJtlAY5hhiOO2QXrWoN5J4vsz/wGK/0ApF4k4btTPoKaCbBIbQQ8MYAwjy13an11Mo+927inpsssThArav8Azk1B71ffe1BwnFQzli+4EgvmS7uKNrOp7wN2/HZslcZNkVBLglQJgzVDMky8oA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, David Skidmore
-	<davidskidmore@google.com>, Steve Rutherford <srutherford@google.com>,
-	"Gupta, Pankaj" <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: RE: [ANNOUNCE] PUCK Agenda - 2024.03.13 - No topic
-Thread-Topic: [ANNOUNCE] PUCK Agenda - 2024.03.13 - No topic
-Thread-Index: AQHadN35f9AVk6ft0UyFv8Aerb6gU7FR5xUQ
-Date: Sun, 31 Mar 2024 13:01:20 +0000
-Message-ID: <DS0PR11MB6373543451F0505C220F2C8ADC382@DS0PR11MB6373.namprd11.prod.outlook.com>
-References: <20240313003211.1900117-1-seanjc@google.com>
-In-Reply-To: <20240313003211.1900117-1-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|SA2PR11MB5132:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QgBcP03amZ53dI/UAmFRc2tlaOj1ZKCJpRu6fFucFd98i31/PGN1DPJispkPDLxf3P1xGfPAbfZODY7/y+FSMcjruBNXne0TmpusX/srwABWDTp5Rh1HglCcIep2YJbRaid1mZZytkV8tZxe0YiGWiNUEMrOSKSAFhO4nycLqyQiDuRRKbZVZw1m+HqeSMaMFs5cWMg5k6/GrIXuQP1wKGtjAqAB4Hh6D2ChXUIU2DdCXcO3JtKxuXKH3k4+7i6b4k+t3hNwx7tzqIph3STTm6TxtnE8L+u4uQ5BZlkF8CeRVlsEkp8aSadslgRFjnc/vrOhpdbwZwE8d7rsJzyZBcVGoTQSXEekJ9Y/05NoYZBqjxGzcACBMRwbWzb3oxuMfyHxWMVZxiyfBxEI3aiK0IjTzD84lVcC7L6R7970AyJt+7PusTkqIafS/MXhCsscg8/+Q9aNf99hpJEloJ2Uwpy9JKLYAm43ohLAYE+zDBYKe+qUMXpsbYZ6/DNytCsl8jzvATgkdq1oUjUjY+P3sUH9/QijMyJ3ZCMsPykbW26cU/S70dMJWHx7H7mngZ9hNAkL360qvbQ2QCliSbYWgCQNvoEwdL2jbwy+9NDdQDezd6IfPSMhK33J1FmZVKRChuVkl2oOvQB3fYKd9yEV1A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MnBKOUZzOUF2aTlsbnEwaXJ4UGFyeExyTkNob2c5d2JISDBEY3lNNFo1VzMw?=
- =?utf-8?B?cDBCWlhHbFpzQk1Hcm9SckdIY2h3UW1BM1lyTUlablZmMWZUc0tVZW95S2N0?=
- =?utf-8?B?Szl6Vi9BZHowL1VPV3BhZFk4VC9wbEowTnZGcG5IWXBKcXRxakEzMXJFOEtz?=
- =?utf-8?B?M1huWVhIZFk5bjRYK2xqT1BoYlVaODdIakxaR2p2OUIvNVc5V3VqMisyUHRU?=
- =?utf-8?B?aWdZMTFvZGVlMWZTOGdWMHFTOWFrbk5LdkYyMTRMc3dkNVc1VkZBN1BSa1Fu?=
- =?utf-8?B?SnpBVEtwODExczFyb2NGTU5lTFVJWm9mekdvQ3gxcDVWN3JYaE5jbTlaMmVU?=
- =?utf-8?B?SWkzcnlFL0xVMWhDZUdsSGZkNXBIaWtGWmc2T3p2R2lCMStZRS8zdXZ1VzJT?=
- =?utf-8?B?R3l5TWRVVmFsYVVkK1gvRm1qdUtBeFViVVJLa1Z1Rm1VVks1TWsrdnRZVWZo?=
- =?utf-8?B?WDlYRlloeElnMUZvYmJwR0FhYzM1aTJVVDF2MlhNV3dyYXByNDJVZS9lK2JW?=
- =?utf-8?B?dm80QnNCU21oc3l3Ti9Da3lsK0pxaThRL2lPSzY2RjlPZlNuWmtyTHl5M3ZO?=
- =?utf-8?B?T1pKa3RPcWlWWTltNnFPNDJ2b0V0MHkyNjJLVFc4UURnZk5HVHZ0OGhiU2lF?=
- =?utf-8?B?QktqL09JV1R2NEFyclFuZHhZTE5lTDhoOHRxeVBmTlFxRkc3alNxYUtlODFi?=
- =?utf-8?B?ZjZ3clRzcWJ0ZVlPV0c4ZkM4S2xmTHZQTW5QMVdmWUhaUzY4VEdGNWJweDFp?=
- =?utf-8?B?bHNyaFNiSU5qWjBYQVZRSW9qdDFZN0lHRVZiNkNpeEZ6K3FsSmFiUmFicEJk?=
- =?utf-8?B?cE45TDN6d0JjN3FrejhHNmhhTEVPM3Z4TmV3QmNhR1ZFYXcyNEhzL05XQWVK?=
- =?utf-8?B?ampWTllyeGlKbG1LdXlUNmJwck5EVzkxUFp2eE5hZTF5NmViMDlKQ08wSG9K?=
- =?utf-8?B?UGNOcUFaaHo1azdSSWxDSC9jd0NXQU5vbVBqVVhYU04yeXdJSk1tYzVoOERC?=
- =?utf-8?B?WHI3WHdxdmxzMXZVQ3pmamhYWG5DWDMxVkxpNEtLdGhhZGV3SlZTbXdWOXBT?=
- =?utf-8?B?TEt1VXNHWXRsZXcrakE0cy9wUjNLZ3IzTGNwRlRWaUhtU1dFWmJraTd1TDBQ?=
- =?utf-8?B?d0FKREcyNWlWWHNEZlA0Uno3OXJKVUdGYUMvL0c2TzlSSWI3UUd0Ym1LRW1v?=
- =?utf-8?B?UnIvQXRUUEpIa0lNUnloMmYrdklQeFBNUHZKenlpVmpKaDFsNVNhUFNhWlZr?=
- =?utf-8?B?Y2VrZE8wRTJqd3Z3MzBGdjFFN3IraWFNSUhpWmZWNDNYNTgrajdLSStFc2JT?=
- =?utf-8?B?NTdDYXc0SEdDNU5qa2JWVndmZ25DeEQyeXJKMmVLRkRTYW8rUUdhY001cHlJ?=
- =?utf-8?B?N1E5NDFVVlpqaVl3bHo0VjQxK3h0bEF5SXB4cFhTZnF3MkFISUFRckJ5QWh5?=
- =?utf-8?B?eHBCOVFuRWRUYTM4NjFGbUpZeVNXZmQ1cnFaL1VuSFZ2Ujg0L2QzTnlURUJ2?=
- =?utf-8?B?WkMrQUx3Q2plNWNZUWJSU0xpTG90L3lmMXQ0eDVJRG1OSEFzZm9MNUhESmEz?=
- =?utf-8?B?a0liVExBcFZVWlRPWkR4L0Z5ZUlrMGhGUC9GNVRGRUd5N0NPSy94U0FaNWlT?=
- =?utf-8?B?dXBTVUJtSy84YXg4SFlaakdUTHpXU0Y4ZUtnZllqVlFUWXNmVFcweHY4T25u?=
- =?utf-8?B?WjdIQTdrdDd4cUo4TGpndWJsbDduOE1sV1JJM2ZqNWp2bEhYbmVpM2k3cnZG?=
- =?utf-8?B?VXZMaG1RYW93YjNQUlN3elRLUG9jOUdNRGtKRHdidlV2UVAvUWxjSENRYWFt?=
- =?utf-8?B?WExrL3Y1eVdrN09pMmI1QlRUdDZLZUJLUDFpd2FQVFA4Y3FLUnhCN1ZESytG?=
- =?utf-8?B?L1RHWmR0dHJRYktxTHUxL1drVHBDNVRXcXRBOFNOS3lFdndObWhGZ3FFNkEx?=
- =?utf-8?B?bHlCc3BRWk4xUjZvd0xoMjBQK1BSOFV3TktDRlI4TU9xU0MrMDdQL08zWlAx?=
- =?utf-8?B?Mm5UOFhpTWtyYkhuM3U3WHF2UzRmdkdrSVo2NThoM3pOODVlSS9WY2RNSGdG?=
- =?utf-8?B?MVR2UDJhRk11bHJQWmp1bzM1cVZTQmptY09pa0VsWkJUWHljQ01LUkNOb2Rj?=
- =?utf-8?Q?KNcHc3Hrny7KnugxNfoXxhdvj?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Precedence: bulk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A719E1E531
+	for <kvm@vger.kernel.org>; Sun, 31 Mar 2024 16:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.120.169.71
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711902171; cv=none; b=m1FIw8FbSVlD6zU1bVRNYuL/ZJBdFNb10+3erl61xJdBg5Wli0+ffQRBDSzhsQIKPDMQ81wEJrTnH411rgzgpbX9yZkMPcmaipWGeGFEjurZbtMlinVy5mqtAoMxq4HhyCYdzMBk3CMAt3kPJjYJsvkJQIVcMaEWNC4y0rSyN7A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711902171; c=relaxed/simple;
+	bh=+OvOe02XCO4hD2WKRR3hasQMTHZAjHLlPU4vLOEQVPM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fbsQFuCm6iawXE6mtBwuJBM63Rmlb9yDypyUouh5iJk5TgOAv4JNn1tHhQNl+F/rddRfIWEpWy1wpaR9HxIJB3Yrupt08hWg1UEYEPtkKRDn/xffUKfQC6/qBAcPyQ/FKQi45tSGsHw3PhsxO4WO/Xx8CJF2JAeJBc0KiNqNcPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weilnetz.de; spf=pass smtp.mailfrom=weilnetz.de; arc=none smtp.client-ip=37.120.169.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weilnetz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weilnetz.de
+Received: from qemu.weilnetz.de (qemu.weilnetz.de [188.68.58.204])
+	by mail.v2201612906741603.powersrv.de (Postfix) with ESMTP id 76012DA06D4;
+	Sun, 31 Mar 2024 18:16:03 +0200 (CEST)
+Received: by qemu.weilnetz.de (Postfix, from userid 1000)
+	id F073D460023; Sun, 31 Mar 2024 18:16:02 +0200 (CEST)
+From: Stefan Weil <sw@weilnetz.de>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Thomas Huth <thuth@redhat.com>,
+	Luc Michel <luc@lmichel.fr>,
+	Eric Blake <eblake@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org,
+	qemu-devel@nongnu.org,
+	qemu-trivial@nongnu.org,
+	Stefan Weil <sw@weilnetz.de>
+Subject: [PATCH for-9.0] Fix some typos in documentation (found by codespell)
+Date: Sun, 31 Mar 2024 18:15:26 +0200
+Message-Id: <20240331161526.1746598-1-sw@weilnetz.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB6373.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3194b329-bec7-4299-4972-08dc5182a91c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Mar 2024 13:01:20.4431
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZYB8fLIBd7IEgM3h/0CG0yZ0++vphMrcWLRFWpnyBCQN6W+E+nycDOsodwBUmti0OXWvG7kXYRH9Th7VyZdK4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5132
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
 
-T24gV2VkbmVzZGF5LCBNYXJjaCAxMywgMjAyNCA4OjMyIEFNLCBTZWFuIENocmlzdG9waGVyc29u
-IHdyb3RlOg0KPiBUbzogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+
-IENjOiBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+
-IFN1YmplY3Q6IFtBTk5PVU5DRV0gUFVDSyBBZ2VuZGEgLSAyMDI0LjAzLjEzIC0gTm8gdG9waWMN
-Cj4gDQo+IE5vIHRvcGljIGZvciB0b21vcnJvdywgYnV0IEknbGwgYmUgb25saW5lLg0KPiANCj4g
-Tm90ZSwgdGhlIFVTIGp1c3QgZGlkIGl0cyBEYXlsaWdodCBTYXZpbmdzIHRoaW5nLCBzbyB0aGUg
-bG9jYWwgdGltZSBtaWdodCBiZQ0KPiBkaWZmZXJlbnQgZm9yIHlvdSB0aGlzIHdlZWsuDQo+IA0K
-PiBOb3RlICMyLCBQVUNLIGlzIGNhbmNlbGVkIGZvciB0aGUgbmV4dCB0d28gd2Vla3MgYXMgSSds
-bCBiZSBvZmZsaW5lLg0KPiANCj4gRnV0dXJlIFNjaGVkdWxlOg0KPiBNYXJjaCAgICAyMHRoIC0g
-Q0FOQ0VMRUQNCj4gTWFyY2ggICAgMjd0aCAtIENBTkNFTEVEDQoNCldvdWxkIHRoZXJlIGJlIGEg
-c2xvdCBhdmFpbGFibGUgb24gQXByaWwgM3JkPw0KSSdkIGxpa2UgdG8gaGF2ZSBhIGRpc2N1c3Np
-b24gYWJvdXQgS1ZNIHVBUElzIGZvciBURFggYW5kIFNOUCBMaXZlIE1pZ3JhdGlvbi4NCg0KQ0Mg
-dGhlIG9uZXMgd2hvIHdvdWxkIGJlIGludGVyZXN0ZWQgaW4gam9pbmluZyB0aGUgZGlzY3Vzc2lv
-bi4NCihIb3BlIG1vcmUgZm9sa3Mgd29ya2luZyBvbiB0aGUgU05QIG1pZ3JhdGlvbiBwYXJ0IGNv
-dWxkIGpvaW4pDQoNClRoYW5rcywNCldlaQ0K
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
+ docs/devel/atomics.rst     | 2 +-
+ docs/devel/ci-jobs.rst.inc | 2 +-
+ docs/devel/clocks.rst      | 2 +-
+ docs/system/i386/sgx.rst   | 2 +-
+ qapi/qom.json              | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/docs/devel/atomics.rst b/docs/devel/atomics.rst
+index ff9b5ee30c..b77c6e13e1 100644
+--- a/docs/devel/atomics.rst
++++ b/docs/devel/atomics.rst
+@@ -119,7 +119,7 @@ The only guarantees that you can rely upon in this case are:
+   ordinary accesses instead cause data races if they are concurrent with
+   other accesses of which at least one is a write.  In order to ensure this,
+   the compiler will not optimize accesses out of existence, create unsolicited
+-  accesses, or perform other similar optimzations.
++  accesses, or perform other similar optimizations.
+ 
+ - acquire operations will appear to happen, with respect to the other
+   components of the system, before all the LOAD or STORE operations
+diff --git a/docs/devel/ci-jobs.rst.inc b/docs/devel/ci-jobs.rst.inc
+index ec33e6ee2b..be06322279 100644
+--- a/docs/devel/ci-jobs.rst.inc
++++ b/docs/devel/ci-jobs.rst.inc
+@@ -115,7 +115,7 @@ CI pipeline.
+ QEMU_JOB_SKIPPED
+ ~~~~~~~~~~~~~~~~
+ 
+-The job is not reliably successsful in general, so is not
++The job is not reliably successful in general, so is not
+ currently suitable to be run by default. Ideally this should
+ be a temporary marker until the problems can be addressed, or
+ the job permanently removed.
+diff --git a/docs/devel/clocks.rst b/docs/devel/clocks.rst
+index b2d1148cdb..177ee1c90d 100644
+--- a/docs/devel/clocks.rst
++++ b/docs/devel/clocks.rst
+@@ -279,7 +279,7 @@ You can change the multiplier and divider of a clock at runtime,
+ so you can use this to model clock controller devices which
+ have guest-programmable frequency multipliers or dividers.
+ 
+-Similary to ``clock_set()``, ``clock_set_mul_div()`` returns ``true`` if
++Similarly to ``clock_set()``, ``clock_set_mul_div()`` returns ``true`` if
+ the clock state was modified; that is, if the multiplier or the diviser
+ or both were changed by the call.
+ 
+diff --git a/docs/system/i386/sgx.rst b/docs/system/i386/sgx.rst
+index 0f0a73f758..c293f7f44e 100644
+--- a/docs/system/i386/sgx.rst
++++ b/docs/system/i386/sgx.rst
+@@ -6,7 +6,7 @@ Overview
+ 
+ Intel Software Guard eXtensions (SGX) is a set of instructions and mechanisms
+ for memory accesses in order to provide security accesses for sensitive
+-applications and data. SGX allows an application to use it's pariticular
++applications and data. SGX allows an application to use its particular
+ address space as an *enclave*, which is a protected area provides confidentiality
+ and integrity even in the presence of privileged malware. Accesses to the
+ enclave memory area from any software not resident in the enclave are prevented,
+diff --git a/qapi/qom.json b/qapi/qom.json
+index 8d4ca8ed92..85e6b4f84a 100644
+--- a/qapi/qom.json
++++ b/qapi/qom.json
+@@ -802,7 +802,7 @@
+ #
+ # @fd: file descriptor name previously passed via 'getfd' command,
+ #     which represents a pre-opened /dev/iommu.  This allows the
+-#     iommufd object to be shared accross several subsystems (VFIO,
++#     iommufd object to be shared across several subsystems (VFIO,
+ #     VDPA, ...), and the file descriptor to be shared with other
+ #     process, e.g. DPDK.  (default: QEMU opens /dev/iommu by itself)
+ #
+-- 
+2.39.2
 
 
