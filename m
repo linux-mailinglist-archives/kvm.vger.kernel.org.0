@@ -1,131 +1,176 @@
-Return-Path: <kvm+bounces-13301-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13302-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4A5889477D
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 00:55:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99F14894795
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 01:18:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11C211C21A14
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 22:55:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E994283710
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 23:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3F556B95;
-	Mon,  1 Apr 2024 22:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAA556B94;
+	Mon,  1 Apr 2024 23:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DU2sZgTd"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mhKAi9LL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2083.outbound.protection.outlook.com [40.107.94.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDBC33982;
-	Mon,  1 Apr 2024 22:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712012118; cv=none; b=bgdZZlntpojsCm9MCWA/OjbByIVey/aPxRUWC59sGo9dv3K29QSItbZcIpdMJUeXsv/pondPZI4eQNQPavw/g8J0ktUoqRBPAXAfK1aDPlitabo/rAWhrhGHvcayODY1Ka8dzLlO5Ha33o+hSxPdPPDyPigRjUSIJ+LITW3epOM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712012118; c=relaxed/simple;
-	bh=fBRLXb8M1oUe7xHcHZtau0o3gCJ7+yXoMO8c301gkPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pNEiOc7imi/zgbDYCWNnNzsT5EOZF4bqdpBt4OyBWliwceK3VuOy9WqdqmcQP86VNcF16rdEUEfB748IRQlTxM6ZjpI0bbfrgFrxNgkhGGUVHsQwWD19DjtRV98BB2gE5KgyDs8DaCZly7zPQfTkPQZnir8Rlv6mDXZ/JFv/Xwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DU2sZgTd; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712012117; x=1743548117;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fBRLXb8M1oUe7xHcHZtau0o3gCJ7+yXoMO8c301gkPs=;
-  b=DU2sZgTdNXzaHfb46UznpYjlUWQHWAiJ5o0Hp8K07pampC9gGbqVBhRw
-   5nwhc3/TDXrAKuLGadB8YZp43M861hmuZVREJk1M66qTK1ZxVhSBa+X9U
-   x6V/EkDOb/PAbl+zKqGonSesZc5nmG4TUqhJzy5Gx88nGIoWnxM8JX6eC
-   etCJzJk6BWcdXGjYnvU62DZ2cHloDyve4pJfsdMvBODDddXAm0iBWOhoz
-   QFyPRfiozYQgJiFxFwg5wi5m+puL1ZF2O2K/3VFTt7VNfJoHvtcbCHk/Q
-   MGgr+gK6r4UE3I3E55EkHE8HpaNyQNq/TP+wV64e+OS3LbllENSfcb2zU
-   Q==;
-X-CSE-ConnectionGUID: rF6H24LXR4WTsSTT1sdFeg==
-X-CSE-MsgGUID: 1SFXi37wRJGtaLgcMZo8Tg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="7058422"
-X-IronPort-AV: E=Sophos;i="6.07,173,1708416000"; 
-   d="scan'208";a="7058422"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 15:55:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,173,1708416000"; 
-   d="scan'208";a="18322003"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 15:55:16 -0700
-Date: Mon, 1 Apr 2024 15:55:15 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>,
-	Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 038/130] KVM: TDX: create/destroy VM structure
-Message-ID: <20240401225515.GU2444378@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <7a508f88e8c8b5199da85b7a9959882ddf390796.1708933498.git.isaku.yamahata@intel.com>
- <ZfpwIespKy8qxWWE@chao-email>
- <20240321141709.GK1994522@ls.amr.corp.intel.com>
- <f52734ac-704a-49f7-bbee-de5909d53b14@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B606B482D1;
+	Mon,  1 Apr 2024 23:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712013475; cv=fail; b=qXsrn+SLdLkBLchudCeMvB48tIL+hd8O6ijNATGYo1T7G7hjdQoFEJhS4/K5+GvjpXkYb1zIX2kN8IcRwAXYMo/ilk2hgYdBZ03OYvinr2XjCoy+qciQciTOnROAcP9voIdzDuFmfYWu3Z8l7RmVYufalDTXLoZSeO+oFzKESSw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712013475; c=relaxed/simple;
+	bh=EAKUqVPDRFaknzwGM9rGXUEhvQ3/84EJbHbazsUSb6o=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TjyV37oYxLOiC37hSBrALPHH6bbtXvxHz+D4sJN/NMHZIkBYAa/JLo2wa/5V83TiDLcHgzlyxahTiylO1p4WWm1k6djTSz898fvRv1wX5TUOeX4Gj+KDixwkOaILTR5+qv2Yxd9QAj4T86xwu8fqr3B9ouKhUAnpLhsnSNkqHXE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mhKAi9LL; arc=fail smtp.client-ip=40.107.94.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c4RAYT3ECo6+vnjlIiBg6SAqID5B6UYdl3isqKEgXBugoJxVHb3Po1FrEZ5cggogW/ncEYRLSysJmLGS1ktT1gQFy8IrKMhz4K2PC8YY8SGiqlSfvOcLUfOBoHZsDAPU2kFU+z91cpgoG3Vk5zptoDwYoUYGU3BKII6URILBW5+PD/LS9kTAyZHYuAyj5YenyhaJEg2c5uEIajqT8Vihf+sPXpI5gr2D85ygR+Vay5brPLeU4Qk64JxfPiE2lVXZi7J4Lol+yrS0VlrMtaVjDzAuHUAKPGjN73puy1rNobzaQPPsH5EMmw82kQW1f33MuuKwMf+z73k1PHqS/MMVfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JLYAJJ4tsw0f/Qw28CdWImlMCEVMjV5TcDIPF0Bjsr4=;
+ b=Z7LzpzV6KmcbOVMyiRNE8JH3+QjO6UafMyXSaydFcNK0dhkW1LGC+bp9SRydF7tNjErFy6IW7Vewqwplrzyay2W/GpC3YImAoJGAS9tp2iypFMIKmg4ahy2s/B3HGbul2k+xVFUIvf52KaA+4L0oNlOOSXiaxN2KMuvZP9LzyhGbrKTi4HqQQaSXqcvPnqsFPaQ9xCcBUF5GQPut+b9gIqeZx8k2Hfne8CGWUXZ0iDA0QD+JVb7FL3KWV4TMi4h2YKxabMUIWufIP5e9NjdY+MvY6QPIVUVLDq8ZbnF51P+UddiK2nmWdT17mE4cuEXlemvUwnBCQozyxzvdR8tHxA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JLYAJJ4tsw0f/Qw28CdWImlMCEVMjV5TcDIPF0Bjsr4=;
+ b=mhKAi9LL1fdKTnN1yMM0VpgMO+N0wjUhIQQmh7ASKsuf72cr4LRAMweaq/dTHbj0KEQPaGolovF6W9+tLP94Iw0sdiim++bzgJTa6FXdCoyltf+f4E3Au+VOu0xRaKTz9KnZC0NvnipC7DAHPpTpR2BqnSLhgtBvS+SzfeFUj+c=
+Received: from CH2PR08CA0011.namprd08.prod.outlook.com (2603:10b6:610:5a::21)
+ by PH7PR12MB6740.namprd12.prod.outlook.com (2603:10b6:510:1ab::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 1 Apr
+ 2024 23:17:48 +0000
+Received: from DS3PEPF000099D9.namprd04.prod.outlook.com
+ (2603:10b6:610:5a:cafe::b3) by CH2PR08CA0011.outlook.office365.com
+ (2603:10b6:610:5a::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
+ Transport; Mon, 1 Apr 2024 23:17:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF000099D9.mail.protection.outlook.com (10.167.17.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7452.22 via Frontend Transport; Mon, 1 Apr 2024 23:17:48 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 1 Apr
+ 2024 18:17:47 -0500
+Date: Mon, 1 Apr 2024 18:17:31 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
+	<brijesh.singh@amd.com>, Harald Hoyer <harald@profian.com>
+Subject: Re: [PATCH v12 12/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_FINISH command
+Message-ID: <20240401231731.kjvse7m7oqni7uyg@amd.com>
+References: <20240329225835.400662-1-michael.roth@amd.com>
+ <20240329225835.400662-13-michael.roth@amd.com>
+ <40382494-7253-442b-91a8-e80c38fb4f2c@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <f52734ac-704a-49f7-bbee-de5909d53b14@linux.intel.com>
+In-Reply-To: <40382494-7253-442b-91a8-e80c38fb4f2c@redhat.com>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D9:EE_|PH7PR12MB6740:EE_
+X-MS-Office365-Filtering-Correlation-Id: b09a6e0b-d136-43aa-2f94-08dc52a1f1e7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	tqhk+885Ya1I0c4Q/QDz0FOIY9cplYaBhd3HQCXjCZG8GTjuvgcWlBMOewP6CYx6iirQfhlatVrXe40dNqKLJTZnS78FrJkM5DglNn2n/Eb1FLXktPjZkfk8XDeuEjxjIXuCio+3xPcJSLmjvEwLWffpdNFyjAY7A7wlm7oso5nfSD6K5f3zvjMvje95oJiptXafYRWkBFkVlVCI+nKJqCQ5HvYH8ZUSaUDfft7nKYObA9pY0AgJYaGQMAnil5nHM/KRGvH1vTbqaJpg6CO3las9iq0iS9QTojNi+SY8b9C3he3bqTkO9vy4yAb3EUDm8D3bCsZVO78DMgQeINW6esEjIYMKhkPtJcsVqqCj9phAi7Wkc806v8LkDE7kd4W7mwgtyAff3X4Ce9ItECZ1sz8ig476kJgBSOBK9okQ6vTR9DxNuIJCqJuv1EmmUcHYjqMUkMYM+dUx/J08RMhF/+8iuGTVIlOfWLceQjz/d0u3foqyCcLVmcrw3Pyg7AzYrIedXDNZbA4OunowR/laSq/rPpkb2BkCWQJyUnja0c7985s53c5Wl9+YbU1h/JhS0BVa7I+ZQtvPKupSvprI3Xxx6k5Jhzz56DLSHRDvdFjJKEJERG5y41TMWoghfJbErvjkoJCVxBfJ13ojCQ+sIorBVdZU2/evMEZYLszojEuH/h3MR4c84AkzTDnLZik0Pr44NPUQuHAlu/cwFKwfo5lNkslqkeBCQJ4OD+seQPJW7IXhWEel4wZwvQPtHcGA
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2024 23:17:48.0658
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b09a6e0b-d136-43aa-2f94-08dc52a1f1e7
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099D9.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6740
 
-On Fri, Mar 29, 2024 at 02:22:12PM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
-
-> 
-> 
-> On 3/21/2024 10:17 PM, Isaku Yamahata wrote:
-> > On Wed, Mar 20, 2024 at 01:12:01PM +0800,
-> > Chao Gao <chao.gao@intel.com> wrote:
+On Sat, Mar 30, 2024 at 09:41:30PM +0100, Paolo Bonzini wrote:
+> On 3/29/24 23:58, Michael Roth wrote:
 > > 
-> > > > config KVM_SW_PROTECTED_VM
-> > > > 	bool "Enable support for KVM software-protected VMs"
-> > > > -	depends on EXPERT
+> > +		/* Handle boot vCPU first to ensure consistent measurement of initial state. */
+> > +		if (!boot_vcpu_handled && vcpu->vcpu_id != 0)
+> > +			continue;
+> > +
+> > +		if (boot_vcpu_handled && vcpu->vcpu_id == 0)
+> > +			continue;
 > 
-> This change is not needed, right?
-> Since you intended to use KVM_GENERIC_PRIVATE_MEM, not KVM_SW_PROTECTED_VM.
+> Why was this not necessary for KVM_SEV_LAUNCH_UPDATE_VMSA?  Do we need it
+> now?
 
-Right. The fix will be something as follows.
+I tried to find the original discussion for more context, but can't seem to
+locate it. But AIUI, there are cases where a VMM may create AP vCPUs earlier
+than it does the BSP, in which case kvm_for_each_vcpu() might return an AP
+as it's first entry and cause that VMSA to get measured before, leading
+to a different measurement depending on the creation ordering.
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index f2bc78ceaa9a..e912b128bddb 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -77,6 +77,7 @@ config KVM_WERROR
- 
- config KVM_SW_PROTECTED_VM
-        bool "Enable support for KVM software-protected VMs"
-+       depends on EXPERT
-        depends on KVM && X86_64
-        select KVM_GENERIC_PRIVATE_MEM
-        help
-@@ -90,7 +91,7 @@ config KVM_SW_PROTECTED_VM
- config KVM_INTEL
-        tristate "KVM for Intel (and compatible) processors support"
-        depends on KVM && IA32_FEAT_CTL
--       select KVM_SW_PROTECTED_VM if INTEL_TDX_HOST
-+       select KVM_GENERIC_PRIVATE_MEM if INTEL_TDX_HOST
-        select KVM_GENERIC_MEMORY_ATTRIBUTES if INTEL_TDX_HOST
-        help
-          Provides support for KVM on processors equipped with Intel's VT
--- 
-2.43.2
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Measuring the BSP first ensures consistent measurement, since the
+initial AP contents are all identical so their ordering doesn't matter.
+
+For SNP, it makes sense to take the more consistent approach right off
+the bat. But for SEV-ES, it's possible that there are VMMs/userspaces
+out there that have already accounted for this in their measurement
+calculations, so it could cause issues if we should the behavior for all
+SEV-ES. We could however limit the change to KVM_X86_SEV_ES_VM and
+document that as part of KVM_SEV_INIT2, since there is similarly chance
+for measurement changes their WRT to the new FPU/XSAVE sync'ing that was
+added.
+
+
+> 
+> > +See SEV-SNP specification [snp-fw-abi]_ for SNP_LAUNCH_FINISH further details
+> > +on launch finish input parameters.
+> 
+> See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+> details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+
+Will make similar changes for the others as well. Thanks!
+
+-Mike
+
+> 
+> Paolo
+> 
+> 
 
