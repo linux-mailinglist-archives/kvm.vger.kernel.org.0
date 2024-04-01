@@ -1,172 +1,89 @@
-Return-Path: <kvm+bounces-13289-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13290-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC0BB894548
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 21:08:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52CF08945C6
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 21:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E009A1C21932
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 19:08:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BF5028205F
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 19:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED574524DD;
-	Mon,  1 Apr 2024 19:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04C1253E0C;
+	Mon,  1 Apr 2024 19:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="h8kngFWD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TmrkzcUm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69428F9DF;
-	Mon,  1 Apr 2024 19:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D56339B1
+	for <kvm@vger.kernel.org>; Mon,  1 Apr 2024 19:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711998475; cv=none; b=MPyVmYcV/lWErSIXrTkVeObExN/GjzlfBDWY7XrAvVN0kWqDv9HP6QIuK2SimK4N/8ynXdRfSmEbdZB+O22zzphSs0KO8uO7id9JxJnpRqsTxmWcqOv2h0Zmhbx2gV0Kw4XVOxZsm8NDpSysR8i2gzGcgP3FxvsVDgcbJzanXO0=
+	t=1712001253; cv=none; b=ro5JBqVTSz3Y12KoEWCUIqtXywSi1HEb83KNBVSXh6YTVrvq0xM1qvhvY87UgroRqDRUh/3zeGabjI0w3FrcXYZmKX81UlovqyVq0ttEriosxlMh+Fg7ZI6no6i+3eSOHMYLYsLEN96BTdFB4fEcmiUxazMfQc0pYtJ9yKvlXMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711998475; c=relaxed/simple;
-	bh=/Zzsl+Bkc3z9NpQG00hOGWdteA94EcSnyYVSA5spADQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EEJjbja9Hy7FhbKFpZvqqfEEfD6aJ90qyQAuAT6sPpOFrCrzwTaRN7onr/avqhcN+RguoTdijc0LVlhNYRor34YyymY+WSSLp/vUCVFGKgFdHfNVP6fuj323mggTyCb0GKDxn6O824zS/Z+l7hMSZwCrL1Zbge8B88CupUt/wBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=h8kngFWD; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 431J3Bsq027876;
-	Mon, 1 Apr 2024 19:07:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=/Zzsl+Bkc3z9NpQG00hOGWdteA94EcSnyYVSA5spADQ=;
- b=h8kngFWDGj4HGyH/fr/piW0YeLuVa2s2IAGvNTjGwsDN/g6F4gE4LSqXCXOLLZkT4QV7
- ZMIwG+lr4glBhpvd2zW/LqovGYk0HO6hKj0rVJl6LITxrRlojirADhKhWCUpILYxbD95
- +DYDf2cpMvNdHO+zRHTw7YPz4I/fSctrlgSbwwd9Dx3xmCwo0Lt+9JHN59x8cj4vDA3z
- I6cHYfs1hLABzR54cry5cekh6PC3tBLjxb5i/F4KH9AZ9/rG+QteQh5AAxa6t2Ur83Bb
- k9BFjjPWeGKWIWvtnNL2NBWmCGXS4e1V9D1D38/W4/ehPi2zwzfIRTllUJZfVwlJwa7l VA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x82r2g090-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Apr 2024 19:07:33 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 431J7Xm7000549;
-	Mon, 1 Apr 2024 19:07:33 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x82r2g08w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Apr 2024 19:07:33 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 431H2k6B008425;
-	Mon, 1 Apr 2024 19:07:32 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x6w2tt8a1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Apr 2024 19:07:32 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 431J7SLR22479482
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 1 Apr 2024 19:07:30 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 60B555805A;
-	Mon,  1 Apr 2024 19:07:28 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AC2EA5806E;
-	Mon,  1 Apr 2024 19:07:26 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.184.184])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  1 Apr 2024 19:07:26 +0000 (GMT)
-Message-ID: <64ab5c9cc88caa904e76f650b19849d39be7038b.camel@linux.ibm.com>
-Subject: Re: [PATCH vhost v7 4/6] virtio: vring_create_virtqueue: pass
- struct instead of multi parameters
-From: Eric Farman <farman@linux.ibm.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev
-Cc: Richard Weinberger <richard@nod.at>,
-        Anton Ivanov
- <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg
- <johannes@sipsolutions.net>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Vadim
- Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck
- <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "Michael
- S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason
- Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
-        platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Date: Mon, 01 Apr 2024 15:07:26 -0400
-In-Reply-To: <20240328080348.3620-5-xuanzhuo@linux.alibaba.com>
-References: <20240328080348.3620-1-xuanzhuo@linux.alibaba.com>
-	 <20240328080348.3620-5-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1712001253; c=relaxed/simple;
+	bh=HbRVqQE1EV16RcohXbUt7WAwP79IiVHV4lafbt7aH08=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F7okcjqzreXLkSC0A+TV0crjqNpDnWXjxCM//frp/Fkveu/UCfrovQlXILgs1dBN/5n1lI+T3THY+OGaHNGHrHaAQoUkqnsoxqnkesfKf+yVILPWvMgq7lCf4cPL22TAlgcmltsxdY8HUqvayWqoW3GsB5kdqEGsInU6riIm4Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TmrkzcUm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712001250;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=afsrJRwR5vMiIQi4YOQOSeVi5uveXzbpM83HdBD8sGU=;
+	b=TmrkzcUmKk98jIkt+w3bhNbBu2vQ81uruTWIleFheQaM3XhcIQxoRSXujXJ2BLWFhuZSQc
+	Jc6A+XGVonqxfIx5GN4k21zm59kvHIjcy8K9xutwR+Ro5JzvsKOBZBnOZPKbHFOsgF0S24
+	xdtS3dSz1PhTCGgTLFREjajErf6q5PM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-i2EY1ZI-PHeQXDTGDnzd1Q-1; Mon, 01 Apr 2024 15:54:09 -0400
+X-MC-Unique: i2EY1ZI-PHeQXDTGDnzd1Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A24AF800269;
+	Mon,  1 Apr 2024 19:54:08 +0000 (UTC)
+Received: from omen.home.shazbot.org (unknown [10.22.34.212])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1B543112C5;
+	Mon,  1 Apr 2024 19:54:08 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	reinette.chatre@intel.com
+Subject: [PATCH 0/2] vfio/pci: Improve INTx opaque data use
+Date: Mon,  1 Apr 2024 13:54:01 -0600
+Message-ID: <20240401195406.3720453-1-alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1K2BfUVYRRE0SvKwv6mgrRPJ9DAZrLuc
-X-Proofpoint-GUID: fFVMYXoCuPhDEznBbvUxsMiJXZL01SvC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-01_14,2024-04-01_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- mlxscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
- impostorscore=0 priorityscore=1501 spamscore=0 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2404010134
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On Thu, 2024-03-28 at 16:03 +0800, Xuan Zhuo wrote:
-> Now, we pass multi parameters to vring_create_virtqueue. These
-> parameters
-> may from transport or from driver.
->=20
-> vring_create_virtqueue is called by many places.
-> Every time, we try to add a new parameter, that is difficult.
->=20
-> If parameters from the driver, that should directly be passed to
-> vring.
-> Then the vring can access the config from driver directly.
->=20
-> If parameters from the transport, we squish the parameters to a
-> structure. That will be helpful to add new parameter.
->=20
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Acked-by: Johannes Berg <johannes@sipsolutions.net>
-> Reviewed-by: Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com>
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> ---
-> =C2=A0arch/um/drivers/virtio_uml.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
-14 +++++---
-> =C2=A0drivers/s390/virtio/virtio_ccw.c=C2=A0=C2=A0 | 14 ++++----
-> =C2=A0drivers/virtio/virtio_mmio.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
-14 ++++----
-> =C2=A0drivers/virtio/virtio_pci_legacy.c | 15 ++++----
-> =C2=A0drivers/virtio/virtio_pci_modern.c | 15 ++++----
-> =C2=A0drivers/virtio/virtio_ring.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
-57 ++++++++++++----------------
-> --
-> =C2=A0drivers/virtio/virtio_vdpa.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
-21 +++++------
-> =C2=A0include/linux/virtio_ring.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 51 +++++++++++++-------------
-> =C2=A08 files changed, 101 insertions(+), 100 deletions(-)
+Now that the interrupt handler and eventfd context object are persistent
+across the configuration of INTx, make better use of the opaque data
+fields when registering the IRQ and irqfd to avoid lookup of the eventfd
+context object.  No functional change intended.  Thanks,
 
-Acked-by: Eric Farman <farman@linux.ibm.com> # s390
+Alex
+
+Alex Williamson (2):
+  vfio/pci: Pass eventfd context to IRQ handler
+  vfio/pci: Pass eventfd context object through irqfd
+
+ drivers/vfio/pci/vfio_pci_intrs.c | 57 +++++++++++++------------------
+ 1 file changed, 24 insertions(+), 33 deletions(-)
+
+-- 
+2.44.0
+
 
