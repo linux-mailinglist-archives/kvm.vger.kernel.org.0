@@ -1,186 +1,150 @@
-Return-Path: <kvm+bounces-13291-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB87C8945C7
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 21:54:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CFAB8945CF
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 21:58:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A71B0281D91
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 19:54:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E86372825FF
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 19:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BA9537EE;
-	Mon,  1 Apr 2024 19:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3369453E14;
+	Mon,  1 Apr 2024 19:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QvxGfDVu"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MtHMONJu"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D458D3A1C2
-	for <kvm@vger.kernel.org>; Mon,  1 Apr 2024 19:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7404E20304;
+	Mon,  1 Apr 2024 19:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712001254; cv=none; b=uh/UBER3llfwiU+fmqF0pLL7DyHKpSRaojPrwjvqwxHRbQFHvGeqnnfHvU/DmYl8dQbeLbi3o3vYw5afY1c+Y371cmU5tgSB7g8LE3po+ADrkEsiGgcJ1CtIa7vy7lw/ajDwJcoGPd3uCJeU9dpwEpDGXRphCEl4RexwIAVZJ9k=
+	t=1712001503; cv=none; b=Jt0uFy1YJuVOC0WMAO3WSC4h6BqB+p4K/Gb6oUeM+hOR1rFqdbP5DXiQap9MmH4Hc0QnRoNTrDNXq64KUSmQK+HY0nvMRYbqHotW/oKgiG1GmpsnORHI39ZC10/REMP+kdWJscCggNfYOqxbxG2jdwnFHZAQxe4u8o7InvJBYIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712001254; c=relaxed/simple;
-	bh=scWXpCAT9dT7ypzrNF9sUQ6d/qzac4JOJZnG/vZg+6U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UPelW9ykOwO3vsRKdl2/UEJ8+B7S5QJK8kIiZy6VkrP6Uhs7cFiVE+/LrJoUD7bHZttn7o6W84pYKLjrTL8gLgFE6s2BLFo9xJzVtt4I4uaCN2yHDLnC0189yw8jtQ3tQpIjhu0RharFSL9MqBi9IMkBP6S0wFx2A4YY+e4AhgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QvxGfDVu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712001251;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=krAekByOofHdP2r+nyjt4OOMwmwtcMCyd3rWh6waJ7g=;
-	b=QvxGfDVunc8PsDkcfNPpBZtUMzFUHz4ZSmQNeyquClu7LIr1xl0242dEHCFncqtcW9ksqR
-	aE56BKUEly6PfDRHiOG8fNQ4K+hUqcXUW13oZUqGPENIheuC5qYR8z2iFK6SOcjWWggWFz
-	7da5idH0CkaBZIkKs53RYp3VZGQ60aM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-295-Zu2Ij7VjNVOwDclD1ztE_g-1; Mon,
- 01 Apr 2024 15:54:10 -0400
-X-MC-Unique: Zu2Ij7VjNVOwDclD1ztE_g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E0E833826110;
-	Mon,  1 Apr 2024 19:54:09 +0000 (UTC)
-Received: from omen.home.shazbot.org (unknown [10.22.34.212])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 605938CED;
-	Mon,  1 Apr 2024 19:54:09 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-To: kvm@vger.kernel.org
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	reinette.chatre@intel.com
-Subject: [PATCH 2/2] vfio/pci: Pass eventfd context object through irqfd
-Date: Mon,  1 Apr 2024 13:54:03 -0600
-Message-ID: <20240401195406.3720453-3-alex.williamson@redhat.com>
-In-Reply-To: <20240401195406.3720453-1-alex.williamson@redhat.com>
-References: <20240401195406.3720453-1-alex.williamson@redhat.com>
+	s=arc-20240116; t=1712001503; c=relaxed/simple;
+	bh=aZXSfjaMBc291x0r5s10KrZuyuUQ5nACgOTXqz/o1xA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Z7Z9cuDMKJCDV5yUgNV+Y012eg6zM0P0gniJSfqpJ3BTzH651zFPdRVNrfcIyzQAG+hgj9HAa+v4wPBe6Obq1QSyGVgSM2pBb/yUYiTMSCvodrMaRiZvmMf0ar6lBYGgn2g7tsnddqryg4EsKMMKT51jKcz+8cWOLKCuFNfhvq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MtHMONJu; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 431JvMSh031777;
+	Mon, 1 Apr 2024 19:58:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=aZXSfjaMBc291x0r5s10KrZuyuUQ5nACgOTXqz/o1xA=;
+ b=MtHMONJuWI4BS/OncPb0G7UrCd5a1+upLwg++2BRNDWxwG8OTvS/RePABsXe2if5KM4C
+ dDkuazOhECPw8qR+s4101+Zft/cEIzyqHsY2YIa3hX88Q4l4oF1oTV8QcQXF6cFvOIZj
+ zDCxyI5AksU/IVWVVJWYJE3daa6gbNXDjDjlm6ThtFbOc8GsVoB4cM3v040OVga5p6G1
+ AuBAWS0Kz/yOzSBGzC10SPzScenKFWuo+7fKvyVdiJLyo/JpI5j+onOnzcxnq+0Z6mfL
+ PpUIV1+gheVFXjFIE3250QLz8q6OL2F+0ET4DDid0vH0rgpTPAtaImyepWK6lc0tYfGj Eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x83hhg036-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Apr 2024 19:58:01 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 431Jw1S8032297;
+	Mon, 1 Apr 2024 19:58:01 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x83hhg030-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Apr 2024 19:58:01 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 431Ixw7p002194;
+	Mon, 1 Apr 2024 19:57:59 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x6xjma0by-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Apr 2024 19:57:59 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 431Jvu8Q27067096
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 1 Apr 2024 19:57:58 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A7F5B58054;
+	Mon,  1 Apr 2024 19:57:56 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AAFE65805A;
+	Mon,  1 Apr 2024 19:57:53 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.184.184])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  1 Apr 2024 19:57:53 +0000 (GMT)
+Message-ID: <cbdce01bbf2843062f4afd7e5c9af767e69cc70b.camel@linux.ibm.com>
+Subject: Re: [PATCH vhost v7 0/6] refactor the params of find_vqs()
+From: Eric Farman <farman@linux.ibm.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev
+Cc: Richard Weinberger <richard@nod.at>,
+        Anton Ivanov
+ <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg
+ <johannes@sipsolutions.net>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+        Vadim
+ Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck
+ <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "Michael
+ S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jason
+ Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
+        platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Date: Mon, 01 Apr 2024 15:57:53 -0400
+In-Reply-To: <20240328080348.3620-1-xuanzhuo@linux.alibaba.com>
+References: <20240328080348.3620-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: CVJdQ_e6TRRp_yDfdRwGfh273GvCB2h1
+X-Proofpoint-ORIG-GUID: Ruk7klDLWbFbZ4w-u3ObzCq-1Zf9Ly1V
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-01_14,2024-04-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 malwarescore=0
+ phishscore=0 spamscore=0 mlxscore=0 suspectscore=0 mlxlogscore=924
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403210000 definitions=main-2404010139
 
-Further avoid lookup of the context object by passing it through the
-irqfd data field.
+On Thu, 2024-03-28 at 16:03 +0800, Xuan Zhuo wrote:
+> This pathset is splited from the
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0
+> http://lore.kernel.org/all/20240229072044.77388-1-xuanzhuo@linux.alibaba.=
+com
+>=20
+> That may needs some cycles to discuss. But that notifies too many
+> people.
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/pci/vfio_pci_intrs.c | 33 ++++++++++++-------------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
+This will need to be rebased to 6.9; there were some conflicts when I
+tried to apply this locally which I didn't chase down, but it works
+fine on 6.8.
 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 31dbc2d061f3..d52825a096ad 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -85,19 +85,14 @@ vfio_irq_ctx_alloc(struct vfio_pci_core_device *vdev, unsigned long index)
- /*
-  * INTx
-  */
--static void vfio_send_intx_eventfd(void *opaque, void *unused)
-+static void vfio_send_intx_eventfd(void *opaque, void *data)
- {
- 	struct vfio_pci_core_device *vdev = opaque;
- 
- 	if (likely(is_intx(vdev) && !vdev->virq_disabled)) {
--		struct vfio_pci_irq_ctx *ctx;
--		struct eventfd_ctx *trigger;
-+		struct vfio_pci_irq_ctx *ctx = data;
-+		struct eventfd_ctx *trigger = READ_ONCE(ctx->trigger);
- 
--		ctx = vfio_irq_ctx_get(vdev, 0);
--		if (WARN_ON_ONCE(!ctx))
--			return;
--
--		trigger = READ_ONCE(ctx->trigger);
- 		if (likely(trigger))
- 			eventfd_signal(trigger);
- 	}
-@@ -167,11 +162,11 @@ bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
-  * a signal is necessary, which can then be handled via a work queue
-  * or directly depending on the caller.
-  */
--static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
-+static int vfio_pci_intx_unmask_handler(void *opaque, void *data)
- {
- 	struct vfio_pci_core_device *vdev = opaque;
- 	struct pci_dev *pdev = vdev->pdev;
--	struct vfio_pci_irq_ctx *ctx;
-+	struct vfio_pci_irq_ctx *ctx = data;
- 	unsigned long flags;
- 	int ret = 0;
- 
-@@ -187,10 +182,6 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
- 		goto out_unlock;
- 	}
- 
--	ctx = vfio_irq_ctx_get(vdev, 0);
--	if (WARN_ON_ONCE(!ctx))
--		goto out_unlock;
--
- 	if (ctx->masked && !vdev->virq_disabled) {
- 		/*
- 		 * A pending interrupt here would immediately trigger,
-@@ -214,10 +205,12 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
- 
- static void __vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev)
- {
-+	struct vfio_pci_irq_ctx *ctx = vfio_irq_ctx_get(vdev, 0);
-+
- 	lockdep_assert_held(&vdev->igate);
- 
--	if (vfio_pci_intx_unmask_handler(vdev, NULL) > 0)
--		vfio_send_intx_eventfd(vdev, NULL);
-+	if (vfio_pci_intx_unmask_handler(vdev, ctx) > 0)
-+		vfio_send_intx_eventfd(vdev, ctx);
- }
- 
- void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev)
-@@ -249,7 +242,7 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
- 	spin_unlock_irqrestore(&vdev->irqlock, flags);
- 
- 	if (ret == IRQ_HANDLED)
--		vfio_send_intx_eventfd(vdev, NULL);
-+		vfio_send_intx_eventfd(vdev, ctx);
- 
- 	return ret;
- }
-@@ -604,7 +597,7 @@ static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
- 		if (fd >= 0)
- 			return vfio_virqfd_enable((void *) vdev,
- 						  vfio_pci_intx_unmask_handler,
--						  vfio_send_intx_eventfd, NULL,
-+						  vfio_send_intx_eventfd, ctx,
- 						  &ctx->unmask, fd);
- 
- 		vfio_virqfd_disable(&ctx->unmask);
-@@ -671,11 +664,11 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
- 		return -EINVAL;
- 
- 	if (flags & VFIO_IRQ_SET_DATA_NONE) {
--		vfio_send_intx_eventfd(vdev, NULL);
-+		vfio_send_intx_eventfd(vdev, vfio_irq_ctx_get(vdev, 0));
- 	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
- 		uint8_t trigger = *(uint8_t *)data;
- 		if (trigger)
--			vfio_send_intx_eventfd(vdev, NULL);
-+			vfio_send_intx_eventfd(vdev, vfio_irq_ctx_get(vdev, 0));
- 	}
- 	return 0;
- }
--- 
-2.44.0
-
+Thanks,
+Eric
 
