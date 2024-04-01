@@ -1,176 +1,187 @@
-Return-Path: <kvm+bounces-13302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F14894795
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 01:18:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A1BE8947B2
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 01:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E994283710
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 23:18:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEC81283725
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 23:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAA556B94;
-	Mon,  1 Apr 2024 23:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4F557864;
+	Mon,  1 Apr 2024 23:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mhKAi9LL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rcUf3/3H"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2083.outbound.protection.outlook.com [40.107.94.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B606B482D1;
-	Mon,  1 Apr 2024 23:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712013475; cv=fail; b=qXsrn+SLdLkBLchudCeMvB48tIL+hd8O6ijNATGYo1T7G7hjdQoFEJhS4/K5+GvjpXkYb1zIX2kN8IcRwAXYMo/ilk2hgYdBZ03OYvinr2XjCoy+qciQciTOnROAcP9voIdzDuFmfYWu3Z8l7RmVYufalDTXLoZSeO+oFzKESSw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712013475; c=relaxed/simple;
-	bh=EAKUqVPDRFaknzwGM9rGXUEhvQ3/84EJbHbazsUSb6o=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TjyV37oYxLOiC37hSBrALPHH6bbtXvxHz+D4sJN/NMHZIkBYAa/JLo2wa/5V83TiDLcHgzlyxahTiylO1p4WWm1k6djTSz898fvRv1wX5TUOeX4Gj+KDixwkOaILTR5+qv2Yxd9QAj4T86xwu8fqr3B9ouKhUAnpLhsnSNkqHXE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mhKAi9LL; arc=fail smtp.client-ip=40.107.94.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=c4RAYT3ECo6+vnjlIiBg6SAqID5B6UYdl3isqKEgXBugoJxVHb3Po1FrEZ5cggogW/ncEYRLSysJmLGS1ktT1gQFy8IrKMhz4K2PC8YY8SGiqlSfvOcLUfOBoHZsDAPU2kFU+z91cpgoG3Vk5zptoDwYoUYGU3BKII6URILBW5+PD/LS9kTAyZHYuAyj5YenyhaJEg2c5uEIajqT8Vihf+sPXpI5gr2D85ygR+Vay5brPLeU4Qk64JxfPiE2lVXZi7J4Lol+yrS0VlrMtaVjDzAuHUAKPGjN73puy1rNobzaQPPsH5EMmw82kQW1f33MuuKwMf+z73k1PHqS/MMVfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JLYAJJ4tsw0f/Qw28CdWImlMCEVMjV5TcDIPF0Bjsr4=;
- b=Z7LzpzV6KmcbOVMyiRNE8JH3+QjO6UafMyXSaydFcNK0dhkW1LGC+bp9SRydF7tNjErFy6IW7Vewqwplrzyay2W/GpC3YImAoJGAS9tp2iypFMIKmg4ahy2s/B3HGbul2k+xVFUIvf52KaA+4L0oNlOOSXiaxN2KMuvZP9LzyhGbrKTi4HqQQaSXqcvPnqsFPaQ9xCcBUF5GQPut+b9gIqeZx8k2Hfne8CGWUXZ0iDA0QD+JVb7FL3KWV4TMi4h2YKxabMUIWufIP5e9NjdY+MvY6QPIVUVLDq8ZbnF51P+UddiK2nmWdT17mE4cuEXlemvUwnBCQozyxzvdR8tHxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JLYAJJ4tsw0f/Qw28CdWImlMCEVMjV5TcDIPF0Bjsr4=;
- b=mhKAi9LL1fdKTnN1yMM0VpgMO+N0wjUhIQQmh7ASKsuf72cr4LRAMweaq/dTHbj0KEQPaGolovF6W9+tLP94Iw0sdiim++bzgJTa6FXdCoyltf+f4E3Au+VOu0xRaKTz9KnZC0NvnipC7DAHPpTpR2BqnSLhgtBvS+SzfeFUj+c=
-Received: from CH2PR08CA0011.namprd08.prod.outlook.com (2603:10b6:610:5a::21)
- by PH7PR12MB6740.namprd12.prod.outlook.com (2603:10b6:510:1ab::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 1 Apr
- 2024 23:17:48 +0000
-Received: from DS3PEPF000099D9.namprd04.prod.outlook.com
- (2603:10b6:610:5a:cafe::b3) by CH2PR08CA0011.outlook.office365.com
- (2603:10b6:610:5a::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
- Transport; Mon, 1 Apr 2024 23:17:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF000099D9.mail.protection.outlook.com (10.167.17.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Mon, 1 Apr 2024 23:17:48 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 1 Apr
- 2024 18:17:47 -0500
-Date: Mon, 1 Apr 2024 18:17:31 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
-	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
-	<brijesh.singh@amd.com>, Harald Hoyer <harald@profian.com>
-Subject: Re: [PATCH v12 12/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_FINISH command
-Message-ID: <20240401231731.kjvse7m7oqni7uyg@amd.com>
-References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-13-michael.roth@amd.com>
- <40382494-7253-442b-91a8-e80c38fb4f2c@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4FA56B8F
+	for <kvm@vger.kernel.org>; Mon,  1 Apr 2024 23:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712014200; cv=none; b=EIUYaspl+gaC+tmrEZ4Qx7y5+u3y4pkjTdb5KiBg7xZiKm4njqhqJzUb4mnElmi1gCgHBQTGOi/f3BTCXxnLGS5ruOA/C+bzCKGsdATWUBOeE7eNjDnoyuOcrHoueLZ+NaV9rsO96T+3g80KvsQJPwCPGjX+VAne8RupTTAf7mw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712014200; c=relaxed/simple;
+	bh=LIU3srPkuAU2Il0Ayu4Wz3ZF0a3r6V03GyttaxoyE9Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PtitfUFqfI1x40AxjbbnStVn/ZfjSVsDHs1mdAQ2VtOi+GymBFmbfvR8Y+lVa0cqEsxMTTfZXgs/PSEUZ7PB+g56tkymee5mGnZSpGDfNEK+Zu3UbHukUY9nCtlqE7aAx9RMUTjHhCjDFnRPDrnkYR91tgdhvLqUJK0Lki2fHeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rcUf3/3H; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a61b31993so81552287b3.1
+        for <kvm@vger.kernel.org>; Mon, 01 Apr 2024 16:29:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712014196; x=1712618996; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3wg9CCGpIdLpfDRqh60QLQofCQe0biAtvSj1Gdo5bk8=;
+        b=rcUf3/3Hx79SQpAY7DJI+A7c4PJxcLpRh9bjArXZWq5RmH8UM59RZPPelNnD82Zs2v
+         UYJAGIA2LNKy5g0kCM+Tdp+TrzmMGXUIfhOkF4TC95s0ATZG3/vMyIwARciwcG/O/gmF
+         6+X9vHutCcV5cnN+YoSUptFqxNDv85n87KX4kICeyLKyMYwtkQRGJLxOClKGqzneIe0H
+         qUlvjbHRsiBu8lP4wG+NsScN5NednQGAv8Yk1N7Qe+Ml6hd7+M0z4KxtuvJlAZPied4s
+         GwOQQd1hW1LyUQqaybsLrbpsRpdhUUjWidmwDeflXEnhFB+OpHvNA55KUD966PLllaKH
+         g2UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712014196; x=1712618996;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3wg9CCGpIdLpfDRqh60QLQofCQe0biAtvSj1Gdo5bk8=;
+        b=odpZ3FLvWUedREur2vGCUW3wFJ+sJhZlXKxWd2UlivQmYU5G9rGE3XtMGiFKBvDa9s
+         zmFk0I6V7VF+LuT6PhjuThPnvKrntCvT/ZxYBxQcOTQWSHEwl+PP25OZE/8XVgr1nw9i
+         6B0bZ/ZFkqCcETVuluSTAiFiLJ/KEoSlAEHkaqYRfXEnFS1dxG+hdd6mPag9JhyPtbdC
+         lEAORChaVAJIw/NxkRNJcseU0VA9H2fu8aCI+Wl9pT1+O5+xi56/FwJqbhAtKUJTvGLe
+         2f9yyRcqx+vOnzXT5dMC2eSih4vUcWvsoPAysabJN2zrQSqrpp248PQHRDMcDzAT+j98
+         4vfA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1PJC23UNttWnTJaCNUXb3D0+vgpbnqkq7/81O8SHzGzPDUAxGxd0n6ANABev/rWKTZBUKfYTyxENLY4vUvlH9JQqy
+X-Gm-Message-State: AOJu0YzPkn6uJaIOoLD4KiuqY1e57FwtRQPfD9CDtz3lVbQCND0PzoF5
+	p6tc5lbLP6jfghlFZwJsLBisPvkfyeXQfWsTcF5E8ZSerROtnFeT8SzhvvqAGJmbDU4bsAZnvQX
+	0CodSxeRAIizMMMeUgQ==
+X-Google-Smtp-Source: AGHT+IGQKV963bGOmZkg1qJdb4wkJ3JL7Okh/SQUhgB3vOnWcX/gauefdkact4kTuSTRZOisDp+cn6EF/9Mo2eKk
+X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
+ (user=jthoughton job=sendgmr) by 2002:a05:690c:f83:b0:614:e20c:d423 with SMTP
+ id df3-20020a05690c0f8300b00614e20cd423mr823185ywb.10.1712014196503; Mon, 01
+ Apr 2024 16:29:56 -0700 (PDT)
+Date: Mon,  1 Apr 2024 23:29:39 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <40382494-7253-442b-91a8-e80c38fb4f2c@redhat.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099D9:EE_|PH7PR12MB6740:EE_
-X-MS-Office365-Filtering-Correlation-Id: b09a6e0b-d136-43aa-2f94-08dc52a1f1e7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	tqhk+885Ya1I0c4Q/QDz0FOIY9cplYaBhd3HQCXjCZG8GTjuvgcWlBMOewP6CYx6iirQfhlatVrXe40dNqKLJTZnS78FrJkM5DglNn2n/Eb1FLXktPjZkfk8XDeuEjxjIXuCio+3xPcJSLmjvEwLWffpdNFyjAY7A7wlm7oso5nfSD6K5f3zvjMvje95oJiptXafYRWkBFkVlVCI+nKJqCQ5HvYH8ZUSaUDfft7nKYObA9pY0AgJYaGQMAnil5nHM/KRGvH1vTbqaJpg6CO3las9iq0iS9QTojNi+SY8b9C3he3bqTkO9vy4yAb3EUDm8D3bCsZVO78DMgQeINW6esEjIYMKhkPtJcsVqqCj9phAi7Wkc806v8LkDE7kd4W7mwgtyAff3X4Ce9ItECZ1sz8ig476kJgBSOBK9okQ6vTR9DxNuIJCqJuv1EmmUcHYjqMUkMYM+dUx/J08RMhF/+8iuGTVIlOfWLceQjz/d0u3foqyCcLVmcrw3Pyg7AzYrIedXDNZbA4OunowR/laSq/rPpkb2BkCWQJyUnja0c7985s53c5Wl9+YbU1h/JhS0BVa7I+ZQtvPKupSvprI3Xxx6k5Jhzz56DLSHRDvdFjJKEJERG5y41TMWoghfJbErvjkoJCVxBfJ13ojCQ+sIorBVdZU2/evMEZYLszojEuH/h3MR4c84AkzTDnLZik0Pr44NPUQuHAlu/cwFKwfo5lNkslqkeBCQJ4OD+seQPJW7IXhWEel4wZwvQPtHcGA
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2024 23:17:48.0658
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b09a6e0b-d136-43aa-2f94-08dc52a1f1e7
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099D9.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6740
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240401232946.1837665-1-jthoughton@google.com>
+Subject: [PATCH v3 0/7] mm/kvm: Improve parallelism for access bit harvesting
+From: James Houghton <jthoughton@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yu Zhao <yuzhao@google.com>, David Matlack <dmatlack@google.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Sean Christopherson <seanjc@google.com>, Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Gavin Shan <gshan@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	David Rientjes <rientjes@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org, James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Mar 30, 2024 at 09:41:30PM +0100, Paolo Bonzini wrote:
-> On 3/29/24 23:58, Michael Roth wrote:
-> > 
-> > +		/* Handle boot vCPU first to ensure consistent measurement of initial state. */
-> > +		if (!boot_vcpu_handled && vcpu->vcpu_id != 0)
-> > +			continue;
-> > +
-> > +		if (boot_vcpu_handled && vcpu->vcpu_id == 0)
-> > +			continue;
-> 
-> Why was this not necessary for KVM_SEV_LAUNCH_UPDATE_VMSA?  Do we need it
-> now?
+This patchset adds a fast path in KVM to test and clear access bits on
+sptes without taking the mmu_lock. It also adds support for using a
+bitmap to (1) test the access bits for many sptes in a single call to
+mmu_notifier_test_young, and to (2) clear the access bits for many ptes
+in a single call to mmu_notifier_clear_young.
 
-I tried to find the original discussion for more context, but can't seem to
-locate it. But AIUI, there are cases where a VMM may create AP vCPUs earlier
-than it does the BSP, in which case kvm_for_each_vcpu() might return an AP
-as it's first entry and cause that VMSA to get measured before, leading
-to a different measurement depending on the creation ordering.
+With Yu's permission, I'm now working on getting this series into a
+mergeable state.
 
-Measuring the BSP first ensures consistent measurement, since the
-initial AP contents are all identical so their ordering doesn't matter.
+I'm posting this as an RFC because I'm not sure if the arm64 bits are
+correct, and I haven't done complete performance testing. I want to do
+broader experimentation to see how much this improves VM performance in
+a cloud environment, but I want to be sure that the code is mergeable
+first.
 
-For SNP, it makes sense to take the more consistent approach right off
-the bat. But for SEV-ES, it's possible that there are VMMs/userspaces
-out there that have already accounted for this in their measurement
-calculations, so it could cause issues if we should the behavior for all
-SEV-ES. We could however limit the change to KVM_X86_SEV_ES_VM and
-document that as part of KVM_SEV_INIT2, since there is similarly chance
-for measurement changes their WRT to the new FPU/XSAVE sync'ing that was
-added.
+Yu has posted other performance results[1], [2]. This v3 shouldn't
+significantly change the x86 results, but the arm64 results may have
+changed.
+
+The most important changes since v2[3]:
+
+- Split the test_clear_young MMU notifier back into test_young and
+  clear_young. I did this because the bitmap passed in has a distinct
+  meaning for each of them, and I felt that this was cleaner.
+
+- The return value of test_young / clear_young now indicates if the
+  bitmap was used.
+
+- Removed the custom spte walker to implement the lockless path. This
+  was important for arm64 to be functionally correct (thanks Oliver),
+  and it avoids a lot of problems brought up in review of v2 (for
+  example[4]).
+
+- Add kvm_arch_prepare_bitmap_age and kvm_arch_finish_bitmap_age to
+  allow for arm64 to implement its bitmap-based aging to grab the MMU
+  lock for reading while allowing x86 to be lockless.
+
+- The powerpc changes have been dropped.
+
+- The logic to inform architectures how to use the bitmap has been
+  cleaned up (kvm_should_clear_young has been split into
+  kvm_gfn_should_age and kvm_gfn_record_young) (thanks Nicolas).
+
+There were some smaller changes too:
+- Added test_clear_young_metadata (thanks Sean).
+- MMU_NOTIFIER_RANGE_LOCKLESS has been renamed to
+  MMU_NOTIFIER_YOUNG_FAST, to indicate to the caller that passing a
+  bitmap for MGLRU look-around is likely to be beneficial.
+- Cleaned up comments that describe the changes to
+  mmu_notifier_test_young / mmu_notifier_clear_young (thanks Nicolas).
+
+[1]: https://lore.kernel.org/all/20230609005943.43041-1-yuzhao@google.com/
+[2]: https://lore.kernel.org/all/20230609005935.42390-1-yuzhao@google.com/
+[3]: https://lore.kernel.org/kvmarm/20230526234435.662652-1-yuzhao@google.com/
+[4]: https://lore.kernel.org/all/ZItX64Bbx5vdjo9M@google.com/
+
+James Houghton (5):
+  mm: Add a bitmap into mmu_notifier_{clear,test}_young
+  KVM: Move MMU notifier function declarations
+  KVM: Add basic bitmap support into kvm_mmu_notifier_test/clear_young
+  KVM: x86: Participate in bitmap-based PTE aging
+  KVM: arm64: Participate in bitmap-based PTE aging
+
+Yu Zhao (2):
+  KVM: x86: Move tdp_mmu_enabled and shadow_accessed_mask
+  mm: multi-gen LRU: use mmu_notifier_test_clear_young()
+
+ Documentation/admin-guide/mm/multigen_lru.rst |   6 +-
+ arch/arm64/include/asm/kvm_host.h             |   5 +
+ arch/arm64/include/asm/kvm_pgtable.h          |   4 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |  21 +-
+ arch/arm64/kvm/mmu.c                          |  23 ++-
+ arch/x86/include/asm/kvm_host.h               |  20 ++
+ arch/x86/kvm/mmu.h                            |   6 -
+ arch/x86/kvm/mmu/mmu.c                        |  16 +-
+ arch/x86/kvm/mmu/spte.h                       |   1 -
+ arch/x86/kvm/mmu/tdp_mmu.c                    |  10 +-
+ include/linux/kvm_host.h                      | 101 ++++++++--
+ include/linux/mmu_notifier.h                  |  93 ++++++++-
+ include/linux/mmzone.h                        |   6 +-
+ include/trace/events/kvm.h                    |  13 +-
+ mm/mmu_notifier.c                             |  20 +-
+ mm/rmap.c                                     |   9 +-
+ mm/vmscan.c                                   | 183 ++++++++++++++----
+ virt/kvm/kvm_main.c                           | 100 +++++++---
+ 18 files changed, 509 insertions(+), 128 deletions(-)
 
 
-> 
-> > +See SEV-SNP specification [snp-fw-abi]_ for SNP_LAUNCH_FINISH further details
-> > +on launch finish input parameters.
-> 
-> See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
-> details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+base-commit: 0cef2c0a2a356137b170c3cb46cb9c1dd2ca3e6b
+-- 
+2.44.0.478.gd926399ef9-goog
 
-Will make similar changes for the others as well. Thanks!
-
--Mike
-
-> 
-> Paolo
-> 
-> 
 
