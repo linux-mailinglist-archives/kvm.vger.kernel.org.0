@@ -1,150 +1,162 @@
-Return-Path: <kvm+bounces-13293-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13294-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CFAB8945CF
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 21:58:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 189798945EC
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 22:21:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E86372825FF
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 19:58:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAD5C282EC9
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 20:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3369453E14;
-	Mon,  1 Apr 2024 19:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C074253E1E;
+	Mon,  1 Apr 2024 20:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MtHMONJu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xq+anBcx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7404E20304;
-	Mon,  1 Apr 2024 19:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738042E410
+	for <kvm@vger.kernel.org>; Mon,  1 Apr 2024 20:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712001503; cv=none; b=Jt0uFy1YJuVOC0WMAO3WSC4h6BqB+p4K/Gb6oUeM+hOR1rFqdbP5DXiQap9MmH4Hc0QnRoNTrDNXq64KUSmQK+HY0nvMRYbqHotW/oKgiG1GmpsnORHI39ZC10/REMP+kdWJscCggNfYOqxbxG2jdwnFHZAQxe4u8o7InvJBYIE=
+	t=1712002889; cv=none; b=MjO6YnqeZfvzv3zcGau1JU5MG4h1l+OAzRoEThHhoqhNxyurvGeaiizpjyme0hYDPza88yllzSw0LWemcXmx3Qpf+3O80ST94p1ydls9ai0JXwo43lNCUrIRoI7a4lW31STTYsBDVeBKRCzaKWMtfT0Co7U/gjOXuLh9SJC/BA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712001503; c=relaxed/simple;
-	bh=aZXSfjaMBc291x0r5s10KrZuyuUQ5nACgOTXqz/o1xA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Z7Z9cuDMKJCDV5yUgNV+Y012eg6zM0P0gniJSfqpJ3BTzH651zFPdRVNrfcIyzQAG+hgj9HAa+v4wPBe6Obq1QSyGVgSM2pBb/yUYiTMSCvodrMaRiZvmMf0ar6lBYGgn2g7tsnddqryg4EsKMMKT51jKcz+8cWOLKCuFNfhvq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MtHMONJu; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 431JvMSh031777;
-	Mon, 1 Apr 2024 19:58:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=aZXSfjaMBc291x0r5s10KrZuyuUQ5nACgOTXqz/o1xA=;
- b=MtHMONJuWI4BS/OncPb0G7UrCd5a1+upLwg++2BRNDWxwG8OTvS/RePABsXe2if5KM4C
- dDkuazOhECPw8qR+s4101+Zft/cEIzyqHsY2YIa3hX88Q4l4oF1oTV8QcQXF6cFvOIZj
- zDCxyI5AksU/IVWVVJWYJE3daa6gbNXDjDjlm6ThtFbOc8GsVoB4cM3v040OVga5p6G1
- AuBAWS0Kz/yOzSBGzC10SPzScenKFWuo+7fKvyVdiJLyo/JpI5j+onOnzcxnq+0Z6mfL
- PpUIV1+gheVFXjFIE3250QLz8q6OL2F+0ET4DDid0vH0rgpTPAtaImyepWK6lc0tYfGj Eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x83hhg036-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Apr 2024 19:58:01 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 431Jw1S8032297;
-	Mon, 1 Apr 2024 19:58:01 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x83hhg030-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Apr 2024 19:58:01 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 431Ixw7p002194;
-	Mon, 1 Apr 2024 19:57:59 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x6xjma0by-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Apr 2024 19:57:59 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 431Jvu8Q27067096
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 1 Apr 2024 19:57:58 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A7F5B58054;
-	Mon,  1 Apr 2024 19:57:56 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AAFE65805A;
-	Mon,  1 Apr 2024 19:57:53 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.184.184])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  1 Apr 2024 19:57:53 +0000 (GMT)
-Message-ID: <cbdce01bbf2843062f4afd7e5c9af767e69cc70b.camel@linux.ibm.com>
-Subject: Re: [PATCH vhost v7 0/6] refactor the params of find_vqs()
-From: Eric Farman <farman@linux.ibm.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev
-Cc: Richard Weinberger <richard@nod.at>,
-        Anton Ivanov
- <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg
- <johannes@sipsolutions.net>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Vadim
- Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck
- <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "Michael
- S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason
- Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
-        platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Date: Mon, 01 Apr 2024 15:57:53 -0400
-In-Reply-To: <20240328080348.3620-1-xuanzhuo@linux.alibaba.com>
-References: <20240328080348.3620-1-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CVJdQ_e6TRRp_yDfdRwGfh273GvCB2h1
-X-Proofpoint-ORIG-GUID: Ruk7klDLWbFbZ4w-u3ObzCq-1Zf9Ly1V
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1712002889; c=relaxed/simple;
+	bh=xi8fNfb+f7ixAYxOIg8qOE321OOUGkU+4oppUXoLRsU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WhfB65KVSLZgayJaXSOMHGWJRYqZpJ2C1Sii4nHJukISvQUoNobRkQYdGUYg08PeeXPIpVaJ1k4zBIdaLNXGDQLOEbL9GIMDLrSNZ7oZLWqrGps/qIVCACU9MXPLATxJ3jMzeV2QOVyvMwI8zPNWF6T9bwhRLz+RqoxQ8dfnwd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xq+anBcx; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcc58cddb50so7577060276.0
+        for <kvm@vger.kernel.org>; Mon, 01 Apr 2024 13:21:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712002886; x=1712607686; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EXuQrJxq8hh4Q4PrrL+1pUvmc/UlgSCH8mpU+iMNc/A=;
+        b=xq+anBcx66qyZQercVDaUpKLfhNQcMjDe9r/pF6FsIdAtQkudxq3maBQbSZorqZvmT
+         jKmG6Gdmtt0FGbFKmwiFqEc+TR7OcM484R2qtboyVX7xZ14iGnj1BB5wbRYnY6VVgxQF
+         6h1nBWVlrdqyMoijeIzIHwz5SvKaUSdg+bxs63BQqb7FqrpGcOwi1lXNVJzhqewhZLOs
+         w+ZyPSap7dXcSfBUopbT0wRr4yonEEQqtj/P6YUgAmZ9daRhXLEbM7+nF5qo8NYLRZmN
+         tPD4/sX4OHNKtHdz+l+mxNULNvUS2+HqqbJTy6lFUn+fFmbGPFKsqitnMosApJFCfHxf
+         nHYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712002886; x=1712607686;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EXuQrJxq8hh4Q4PrrL+1pUvmc/UlgSCH8mpU+iMNc/A=;
+        b=v2azzYEsGgWnMUPWkzJ0TzKLPdr1CHs5hkXYls9/vYiVR6/AqmVbkoDyAUQY8edbfe
+         8ecGU93W9k5GcKpUKl9MN/Tqh1KR2E+9y/63NQC7tQdezXyDzJABVJdySHFnf/1rVKlK
+         f5WYmTXQPWolv4Xu2h9wF/hJQHYplNxQld6KG/xXydNlrSIE3TeceAhzuXSL2SNAj4eW
+         ukFlFgvlEvH2K+FXs9LSCyn0lCopZ9EDDf426VWBnkUlMoCqNQjNSZzR5IbKa53RckVb
+         Giy93PoK+/OacibAboU4i/vv50y8imLZkqSje1RRZbbfP/IHC4R5CZp9dwvrCHShLfDv
+         MeKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUG/7WCrLfUZ5XMiO94R+MLw+9R+ykjO+gz4ueSf268Qt2Vd1AKr4KFSm7Mcgd5v5Fpi0ZVGiLv/KLOkTgHtubsF+oS
+X-Gm-Message-State: AOJu0YzhmMavMWEhZxB9x+HeKPoWEcgMAHuidUpdzmgMtvyLId4BjPnn
+	Oq4ifCncd4qnYxOSMJnpNx8lvdWR+xu+b7m5GZ27bp7tzq+/HAAFVho1L+hOBifOs9RqdYMKBDq
+	ZWQ==
+X-Google-Smtp-Source: AGHT+IF9bN9rMKRDiKGIJtYfo638VzxlHSURX9J2Qs9hT7nu5H17e7f7Ql/BLpIFbwZluzOjprKPqs6RiH8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1002:b0:dc9:5ef8:2b2d with SMTP id
+ w2-20020a056902100200b00dc95ef82b2dmr3291799ybt.4.1712002886627; Mon, 01 Apr
+ 2024 13:21:26 -0700 (PDT)
+Date: Mon, 1 Apr 2024 13:21:25 -0700
+In-Reply-To: <20240328171949.743211-1-leobras@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-01_14,2024-04-01_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 malwarescore=0
- phishscore=0 spamscore=0 mlxscore=0 suspectscore=0 mlxlogscore=924
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2404010139
+Mime-Version: 1.0
+References: <20240328171949.743211-1-leobras@redhat.com>
+Message-ID: <ZgsXRUTj40LmXVS4@google.com>
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+From: Sean Christopherson <seanjc@google.com>
+To: Leonardo Bras <leobras@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay <quic_neeraju@quicinc.com>, 
+	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Zqiang <qiang.zhang1211@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 2024-03-28 at 16:03 +0800, Xuan Zhuo wrote:
-> This pathset is splited from the
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0
-> http://lore.kernel.org/all/20240229072044.77388-1-xuanzhuo@linux.alibaba.=
-com
->=20
-> That may needs some cycles to discuss. But that notifies too many
-> people.
+On Thu, Mar 28, 2024, Leonardo Bras wrote:
+> I am dealing with a latency issue inside a KVM guest, which is caused by
+> a sched_switch to rcuc[1].
+> 
+> During guest entry, kernel code will signal to RCU that current CPU was on
+> a quiescent state, making sure no other CPU is waiting for this one.
+> 
+> If a vcpu just stopped running (guest_exit), and a syncronize_rcu() was
+> issued somewhere since guest entry, there is a chance a timer interrupt
+> will happen in that CPU, which will cause rcu_sched_clock_irq() to run.
+> 
+> rcu_sched_clock_irq() will check rcu_pending() which will return true,
+> and cause invoke_rcu_core() to be called, which will (in current config)
+> cause rcuc/N to be scheduled into the current cpu.
+> 
+> On rcu_pending(), I noticed we can avoid returning true (and thus invoking
+> rcu_core()) if the current cpu is nohz_full, and the cpu came from either
+> idle or userspace, since both are considered quiescent states.
+> 
+> Since this is also true to guest context, my idea to solve this latency
+> issue by avoiding rcu_core() invocation if it was running a guest vcpu.
+> 
+> On the other hand, I could not find a way of reliably saying the current
+> cpu was running a guest vcpu, so patch #1 implements a per-cpu variable
+> for keeping the time (jiffies) of the last guest exit.
+> 
+> In patch #2 I compare current time to that time, and if less than a second
+> has past, we just skip rcu_core() invocation, since there is a high chance
+> it will just go back to the guest in a moment.
 
-This will need to be rebased to 6.9; there were some conflicts when I
-tried to apply this locally which I didn't chase down, but it works
-fine on 6.8.
+What's the downside if there's a false positive?
 
-Thanks,
-Eric
+> What I know it's weird with this patch:
+> 1 - Not sure if this is the best way of finding out if the cpu was
+>     running a guest recently.
+> 
+> 2 - This per-cpu variable needs to get set at each guest_exit(), so it's
+>     overhead, even though it's supposed to be in local cache. If that's
+>     an issue, I would suggest having this part compiled out on 
+>     !CONFIG_NO_HZ_FULL, but further checking each cpu for being nohz_full
+>     enabled seems more expensive than just setting this out.
+
+A per-CPU write isn't problematic, but I suspect reading jiffies will be quite
+imprecise, e.g. it'll be a full tick "behind" on many exits.
+
+> 3 - It checks if the guest exit happened over than 1 second ago. This 1
+>     second value was copied from rcu_nohz_full_cpu() which checks if the
+>     grace period started over than a second ago. If this value is bad,
+>     I have no issue changing it.
+
+IMO, checking if a CPU "recently" ran a KVM vCPU is a suboptimal heuristic regardless
+of what magic time threshold is used.  IIUC, what you want is a way to detect if
+a CPU is likely to _run_ a KVM vCPU in the near future.  KVM can provide that
+information with much better precision, e.g. KVM knows when when it's in the core
+vCPU run loop.
+
+> 4 - Even though I could detect no issue, I included linux/kvm_host.h into 
+>     rcu/tree_plugin.h, which is the first time it's getting included
+>     outside of kvm or arch code, and can be weird.
+
+Heh, kvm_host.h isn't included outside of KVM because several architectures can
+build KVM as a module, which means referencing global KVM varibles from the kernel
+proper won't work.
+
+>     An alternative would be to create a new header for providing data for
+>     non-kvm code.
+
+I doubt a new .h or .c file is needed just for this, there's gotta be a decent
+landing spot for a one-off variable.  E.g. I wouldn't be at all surprised if there
+is additional usefulness in knowing if a CPU is in KVM's core run loop and thus
+likely to do a VM-Enter in the near future, at which point you could probably make
+a good argument for adding a flag in "struct context_tracking".  Even without a
+separate use case, there's a good argument for adding that info to context_tracking.
 
