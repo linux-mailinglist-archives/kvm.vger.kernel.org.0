@@ -1,271 +1,201 @@
-Return-Path: <kvm+bounces-13280-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13281-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07809893CC6
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 17:21:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE16893D22
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 17:50:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABB0B282D9C
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 15:21:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7B4528165C
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 15:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F37481B7;
-	Mon,  1 Apr 2024 15:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B5B47A62;
+	Mon,  1 Apr 2024 15:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ago/TfE2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VPzvmXCn"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2076.outbound.protection.outlook.com [40.107.243.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738A445BF9;
-	Mon,  1 Apr 2024 15:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711984856; cv=fail; b=VMlFGD1hwtgqNNzVctqpjUFCilhxHABxqFdS/6a3wT/ndM5sVHDMTJ9y+cWmsDLQ799URvFGGSfZIBD9iWVQ0qZ3U6AtsK0DVDrWLzV5apDSbp6RCnYlwB5DEOdlWh47fq9RnZAYo0hsiO+uCwlULTRPKEI6Wfa64uyTbSWICJY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711984856; c=relaxed/simple;
-	bh=SkgcnncwvNsa46ffTlhRMbwEsfaM2MErO8EH2oIJcGQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PZaXT9/eDxaeiqypSZCacjC1eBv8ssrZqgA9Mtoowyo6Gc3mVYpZAWWsgxP761RupOrSkulw5wgE1IhmXn6eygdkX6YmVY4bRjvubRM3/6LiA7ndaiAFWljYSwGwVuN5p7c54Gbjbu1pdU68WZchN0RVgZkVLuLRbgat7xw0jPI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ago/TfE2; arc=fail smtp.client-ip=40.107.243.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aWERJmw8UzHUOl4vqxhm78TKmgbQOwUWorrmIDxM3ZAcETkWfetseQrRPvoZ9EH3SluPy5+aGaDKVGjJzkkqHeK/kAtK/kWNpdB9h64psyFsNE1HR/HVjUv2KBy2zwU8yDA95EiQ5boryNmJxqanVRsYTG+pu1pd96OfOFNehzsyP3C6ZNWjGfOfnTBXZBTuJcxURHj+b9le01I9WLDYSPLzceWB0ibDndQOZWQ36aVhSGJdGMVD8rmWKAZDL+mAVlUciieUBHpEbvU4+oY3kerZZlhqvuVAM/wJBIazcG+gxoIbBQduL7iY05IJalKdDPZaX7vCM9hPGAXYjNu9BQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YWy0BvLzcmDiATFcGPlFYN2W1W9D2CiwcqjK082S9/8=;
- b=GHtyChryJuvRq1wuM87hNt4QLsZYbh7LZ+S37qKa0pCNq+SRqMihCXLQlBJSX0mJucO6MNrSR/+3HZdFHTRgQiY2v5epk2RRBlVUoN1P6oKoV4AYq3LnYpPqiQ6qe6Q0ZmX/ebN5+rZNYW9RTXMd4YFvvcQtokobHnvXIyssu2cp2A4Ii2d+rVZ2te6jO0Pb7l9o4I2qKmDvxy2qGW6Z+586oK6CxVmyDSdFZzj2jz5a9bRbnWeiOr+VgjQhXsLwGuFT1iiHFLYBYvMspa5JqWwtvbYmjUn3wEcyN2SLPO17LA0WF0ShnEVI+K+jPEC/R/S99qHkO9JZSRV1gNOSnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YWy0BvLzcmDiATFcGPlFYN2W1W9D2CiwcqjK082S9/8=;
- b=ago/TfE2FKDZlv5VxQZgbBj9uPp10ZzdVSV4BAam2DGRxbguMrcKXL9M0fEtzkjOHhtKyfATr/l17C+9qJfao4WPNTiznvcuO4CnkWGI9kfO3Mlvi5/jbrJBOQqysWljN0Ir2GXpMb1qGfg1faEGKOn1AtCQyR/fz6mELc23I4s=
-Received: from SJ0PR05CA0113.namprd05.prod.outlook.com (2603:10b6:a03:334::28)
- by PH0PR12MB5679.namprd12.prod.outlook.com (2603:10b6:510:14f::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 1 Apr
- 2024 15:20:51 +0000
-Received: from SJ5PEPF000001C9.namprd05.prod.outlook.com
- (2603:10b6:a03:334:cafe::33) by SJ0PR05CA0113.outlook.office365.com
- (2603:10b6:a03:334::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.24 via Frontend
- Transport; Mon, 1 Apr 2024 15:20:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001C9.mail.protection.outlook.com (10.167.242.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Mon, 1 Apr 2024 15:20:51 +0000
-Received: from chalupa-4a00host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 1 Apr
- 2024 10:20:48 -0500
-From: Manali Shukla <manali.shukla@amd.com>
-To: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <shuah@kernel.org>,
-	<nikunj@amd.com>, <thomas.lendacky@amd.com>, <manali.shukla@amd.com>,
-	<ajones@ventanamicro.com>
-Subject: [PATCH v2 3/3] KVM: selftests: Add a test case for KVM_X86_DISABLE_EXITS_HLT
-Date: Mon, 1 Apr 2024 15:20:32 +0000
-Message-ID: <20240401152032.4284-4-manali.shukla@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240401152032.4284-1-manali.shukla@amd.com>
-References: <20240401152032.4284-1-manali.shukla@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C900D47772;
+	Mon,  1 Apr 2024 15:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711986592; cv=none; b=BtVkJ3n8bb/nyb9/5yDJyC8E8RHA9gKhS0PgE75uNguT3f9wtqBOMnScFIBMubhFSQLujVr3+W0LEUnCheG7J+sTA5DaOMSfsH4LEBZieqJhHvKOBkOPN5tPmJ1Jd2vKJIDieh6Waxsl34R6K1e6q/uyTrCdPO+jvdPuKzQxdaY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711986592; c=relaxed/simple;
+	bh=cKwZwSgMO3iwMGS0fBSShtKckUnmLG4vV6uS8ze9XNw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oeaOMJ+glJ6Rd6tedxFjyWaH0D1GKTQwmKD5WMelxWbFNaTUDMKI5xWYP3aLvdLNMAV0NxP5E0GUROSXsrbOUIiksvyv7Vw2xefUyrUtRSSJUei9RiTC4moSg39ksLCVHKWxBTe/Nvtw8dkWun0xpTbYr4/2xUx0lWTxaEv73UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VPzvmXCn; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711986590; x=1743522590;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=cKwZwSgMO3iwMGS0fBSShtKckUnmLG4vV6uS8ze9XNw=;
+  b=VPzvmXCnaNTPeV9iQMKxA9k3F0kVcljHWMo2ujbLMSJYb899gbq2s1SP
+   bJXmqGHIvGfMWQLvOZwYWhTdKa/0RQpNevuQ5m+iN26Wl0HrNs95SlinP
+   NHNcgmgwO+z3wT4TCAJf1vO2ic9arO2gHGseWd2ntXqvVJRJsGiYYoJnq
+   oC0LCCccZbFxiik2D75sYZXvCk1bea075MDrT0AUOeErFkKrocSEMQClQ
+   MY74xEg/oeHPQEJRl6hWuMhigZPlKaMvwtDtYyUMm/YegoXfG35TZ/uvT
+   uZ5O9jlex9TsUXYqLhEC2BFyVrmZleToNufJL5ordWhNFZduPPilmAHtP
+   g==;
+X-CSE-ConnectionGUID: jJCJw5gOTGWquGpoYMepxA==
+X-CSE-MsgGUID: OQ0t/Tp4QSq9a/qPbWqtwQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="17738552"
+X-IronPort-AV: E=Sophos;i="6.07,172,1708416000"; 
+   d="scan'208";a="17738552"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 08:49:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,172,1708416000"; 
+   d="scan'208";a="22243457"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.236.140]) ([10.124.236.140])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 08:49:45 -0700
+Message-ID: <331fbd0d-f560-4bde-858f-e05678b42ff0@linux.intel.com>
+Date: Mon, 1 Apr 2024 23:49:43 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C9:EE_|PH0PR12MB5679:EE_
-X-MS-Office365-Filtering-Correlation-Id: 77800e54-0342-40e5-608e-08dc525f511b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	MYenObSioRc/rn5ywvKzNvcwg4SumH1nayU1ELxm2FlSbZbR+ai7YUB1LBjI00TWdbGhcBknvFLFhwApVsERB3mwNvbsavW3g8dQM9pvUocDguIKcKUEALEmV/AUL3IE/zmu5aDU/1fB3XXsYU7NxVHwMVjqiKx/S6Qa+jia7jcRO7/cFA6DU8spy67BQDbQX/9qpiRnzER1pWih7xd4YvBYkjIRn3xUOBhPmjlfbDo/ohzyzZhLw0zfA6shhMZ3+JNbEiJi6tl+0LqylW4p9lDrsXbuimtNRuxXtlP3DUV2F73gasRQpE0zDJ14UzHTzZqiOiicSdngCxdkRXorJLXp3Gz+BYvvrJNpXmZmuBN9j0dhduX+vHKlhLFixuhvlM3IA6EcpTtpR9yzU85NmIFPnvuwiw9fzWkQ9jRSHpQ79jEs0y/RdnBD0K6EFXwtSnQMMioXro7qrUBqffFgpwX6EAkayiCR5mROkun6CiPIpAq91lgRHMsdrNSPJlWcMMG1gXmIHOADFyvntGjomaKenct1aHqBk7BdDndtO1mZhLsQEtc5ILbCQnTVCgFQJ17/7O44urSm3U6lYQmJg4o9S2ObGJatfuNudjobHKf82oPW4e5TiQl0NhrG949lnKL+dcPZOqRjbVO2+1oE92cQQ6pmYDMfdkPl2gX36Hs/5TBfMl7TYF4JcK1ayx75x9gCS5N4qIv+k9tGdewCY7oTzX4vI3hjSaPv3MavPjlbCtbwCkRJKkzo3EJQvXs8
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(1800799015)(82310400014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2024 15:20:51.4481
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77800e54-0342-40e5-608e-08dc525f511b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001C9.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5679
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 067/130] KVM: TDX: Add load_mmu_pgd method for TDX
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ Sean Christopherson <sean.j.christopherson@intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <bef7033b687e75c5436c0aee07691327d36734ea.1708933498.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <bef7033b687e75c5436c0aee07691327d36734ea.1708933498.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-By default, HLT instruction executed by guest is intercepted by hypervisor.
-However, KVM_CAP_X86_DISABLE_EXITS capability can be used to not intercept
-HLT by setting KVM_X86_DISABLE_EXITS_HLT.
 
-Add a test case to test KVM_X86_DISABLE_EXITS_HLT functionality.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Manali Shukla <manali.shukla@amd.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/halt_disable_exit_test.c       | 119 ++++++++++++++++++
- 2 files changed, 120 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>
+> For virtual IO, the guest TD shares guest pages with VMM without
+> encryption.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c75251d5c97c..9f72abb95d2e 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -89,6 +89,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
- TEST_GEN_PROGS_x86_64 += x86_64/state_test
-+TEST_GEN_PROGS_x86_64 += x86_64/halt_disable_exit_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
- TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
- TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
-diff --git a/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
-new file mode 100644
-index 000000000000..4cc6a09906a2
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
-@@ -0,0 +1,119 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KVM disable halt exit test
-+ *
-+ *  Copyright (C) 2024 Advanced Micro Devices, Inc.
-+ */
-+#include <pthread.h>
-+#include <signal.h>
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define SIG_IPI SIGUSR1
-+static pthread_t task_thread, vcpu_thread;
-+
-+static void guest_code(uint64_t *is_hlt_exec)
-+{
-+	while (!READ_ONCE(*is_hlt_exec))
-+		;
-+
-+	safe_halt();
-+	GUEST_DONE();
-+}
-+
-+static void *task_worker(void *arg)
-+{
-+	uint64_t *is_hlt_exec = (uint64_t *)arg;
-+
-+	usleep(100000);
-+	WRITE_ONCE(*is_hlt_exec, 1);
-+	pthread_kill(vcpu_thread, SIG_IPI);
-+	return 0;
-+}
-+
-+static void *vcpu_worker(void *arg)
-+{
-+	int ret;
-+	int sig = -1;
-+	struct kvm_vcpu *vcpu = (struct kvm_vcpu *) arg;
-+	struct kvm_run *run;
-+
-+	struct kvm_signal_mask *sigmask = alloca(offsetof(struct kvm_signal_mask, sigset)
-+						 + sizeof(sigset_t));
-+	sigset_t *sigset = (sigset_t *) &sigmask->sigset;
-+
-+	/*
-+	 * SIG_IPI is unblocked atomically while in KVM_RUN.  It causes the
-+	 * ioctl to return with -EINTR, but it is still pending and we need
-+	 * to accept it with the sigwait.
-+	 */
-+	sigmask->len = 8;
-+	pthread_sigmask(0, NULL, sigset);
-+	sigdelset(sigset, SIG_IPI);
-+	vcpu_ioctl(vcpu, KVM_SET_SIGNAL_MASK, sigmask);
-+	sigemptyset(sigset);
-+	sigaddset(sigset, SIG_IPI);
-+	run = vcpu->run;
-+
-+again:
-+	ret = __vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(errno, EINTR);
-+
-+	if (ret == -1 && errno == EINTR) {
-+		sigwait(sigset, &sig);
-+		assert(sig == SIG_IPI);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTR);
-+		goto again;
-+	}
-+
-+	if (run->exit_reason == KVM_EXIT_HLT)
-+		TEST_FAIL("Expected KVM_EXIT_INTR, got KVM_EXIT_HLT");
-+
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+	return 0;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t hlt_vm_addr;
-+
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	uint64_t *host_hlt_addr;
-+	void *retval;
-+	sigset_t sigset;
-+	int ret;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_DISABLE_EXITS));
-+
-+	/* Create a VM without in kernel APIC support */
-+	vm = __vm_create(VM_SHAPE_FLAGS(NO_IRQCHIP), 1, 0);
-+	vm_enable_cap(vm, KVM_CAP_X86_DISABLE_EXITS, KVM_X86_DISABLE_EXITS_HLT);
-+	vcpu = vm_vcpu_add(vm, 0, guest_code);
-+
-+
-+	hlt_vm_addr = vm_vaddr_alloc_page(vm);
-+	host_hlt_addr = (uint64_t *)addr_gva2hva(vm, hlt_vm_addr);
-+	vcpu_args_set(vcpu, 1, hlt_vm_addr);
-+
-+	/* Ensure that vCPU threads start with SIG_IPI blocked.  */
-+	sigemptyset(&sigset);
-+	sigaddset(&sigset, SIG_IPI);
-+	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
-+
-+	ret = pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);
-+	TEST_ASSERT(ret == 0, "pthread_create vcpu thread failed errno=%d", errno);
-+
-+	ret = pthread_create(&task_thread, NULL, task_worker, host_hlt_addr);
-+	TEST_ASSERT(ret == 0, "pthread_create task thread failed errno=%d", errno);
-+
-+	ret = pthread_join(vcpu_thread, &retval);
-+	TEST_ASSERT(ret == 0, "pthread_join on vcpu thread failed with errno=%d", ret);
-+
-+	ret = pthread_join(task_thread, &retval);
-+	TEST_ASSERT(ret == 0, "pthread_join on task thread failed with errno=%d", ret);
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.34.1
+Virtual IO is a use case of shared memory, it's better to use it
+as a example instead of putting it at the beginning of the sentence.
+
+
+>   Shared EPT is used to map guest pages in unprotected way.
+>
+> Add the VMCS field encoding for the shared EPTP, which will be used by
+> TDX to have separate EPT walks for private GPAs (existing EPTP) versus
+> shared GPAs (new shared EPTP).
+>
+> Set shared EPT pointer value for the TDX guest to initialize TDX MMU.
+May have a mention that the EPTP for priavet GPAs is set by TDX module.
+
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+> v19:
+> - Add WARN_ON_ONCE() to tdx_load_mmu_pgd() and drop unconditional mask
+> ---
+>   arch/x86/include/asm/vmx.h |  1 +
+>   arch/x86/kvm/vmx/main.c    | 13 ++++++++++++-
+>   arch/x86/kvm/vmx/tdx.c     |  6 ++++++
+>   arch/x86/kvm/vmx/x86_ops.h |  4 ++++
+>   4 files changed, 23 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index f703bae0c4ac..9deb663a42e3 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -236,6 +236,7 @@ enum vmcs_field {
+>   	TSC_MULTIPLIER_HIGH             = 0x00002033,
+>   	TERTIARY_VM_EXEC_CONTROL	= 0x00002034,
+>   	TERTIARY_VM_EXEC_CONTROL_HIGH	= 0x00002035,
+> +	SHARED_EPT_POINTER		= 0x0000203C,
+>   	PID_POINTER_TABLE		= 0x00002042,
+>   	PID_POINTER_TABLE_HIGH		= 0x00002043,
+>   	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index d0f75020579f..076a471d9aea 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -123,6 +123,17 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   	vmx_vcpu_reset(vcpu, init_event);
+>   }
+>   
+> +static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+> +			int pgd_level)
+> +{
+> +	if (is_td_vcpu(vcpu)) {
+> +		tdx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
+> +		return;
+> +	}
+> +
+> +	vmx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
+> +}
+> +
+>   static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>   {
+>   	if (!is_td(kvm))
+> @@ -256,7 +267,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   	.write_tsc_offset = vmx_write_tsc_offset,
+>   	.write_tsc_multiplier = vmx_write_tsc_multiplier,
+>   
+> -	.load_mmu_pgd = vmx_load_mmu_pgd,
+> +	.load_mmu_pgd = vt_load_mmu_pgd,
+>   
+>   	.check_intercept = vmx_check_intercept,
+>   	.handle_exit_irqoff = vmx_handle_exit_irqoff,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 54e0d4efa2bd..143a3c2a16bc 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -453,6 +453,12 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   	 */
+>   }
+>   
+> +void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+> +{
+> +	WARN_ON_ONCE(root_hpa & ~PAGE_MASK);
+> +	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa);
+> +}
+> +
+>   static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+>   {
+>   	struct kvm_tdx_capabilities __user *user_caps;
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index f5820f617b2e..24161fa404aa 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -152,6 +152,8 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+>   void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+>   
+>   int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+> +
+> +void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+>   #else
+>   static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
+>   static inline void tdx_hardware_unsetup(void) {}
+> @@ -173,6 +175,8 @@ static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+>   static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
+>   
+>   static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+> +
+> +static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
+>   #endif
+>   
+>   #endif /* __KVM_X86_VMX_X86_OPS_H */
 
 
