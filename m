@@ -1,212 +1,241 @@
-Return-Path: <kvm+bounces-13282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF7F893D85
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 17:54:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AB7689431C
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 18:59:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FFF81C21D5A
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 15:54:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F177283551
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 16:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356884D5A0;
-	Mon,  1 Apr 2024 15:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC6D487BC;
+	Mon,  1 Apr 2024 16:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="maCQSVj7"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lsR6dA9e";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="YrUdKE9X"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455C04CDEC;
-	Mon,  1 Apr 2024 15:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711986743; cv=none; b=OroiuCmroVElvS7YGl3RW+VD76LOEXW5O6caTs4ddjMGwUv1mX0yyo8T1gdp8ss0iykXVpYK3cp1vFAFfd6Qlx5DgeTKUQnY6aIgsxhbzkdFmE9lhfgZfVSQ5jc0LTEmLyKu8DRcCBOe+yP28sEm8zlRhGhc0qV501sCNxTOZFI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711986743; c=relaxed/simple;
-	bh=uIutiB+eFvtzipMrxJvLjeiPeG6GFWVZ0ZS/y6LRjGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iELN8PJUlEdb1Rb2sDOGaepP8gwSG5rW5wj0zyghbUXbOxwd/wyG6iobALQrfaHGHieN79tOz6NM9fQqls1hgRzUsl+rYVPFTrsxsaM5CexdO/oz3jUa3C0ATHhh9Iq/iLECJ8kKLRWn3bIG2vIkgEmTp4tfVlnMqpJ90siZ+OM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=maCQSVj7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1527DC433C7;
-	Mon,  1 Apr 2024 15:52:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711986743;
-	bh=uIutiB+eFvtzipMrxJvLjeiPeG6GFWVZ0ZS/y6LRjGU=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=maCQSVj7j4KkshiBSoREmRa4yq4iZt5uxfMsJkGTonSY3n/GY7KWRMQcANBFLHif1
-	 rvM8fOo4rvJL3owxfRJzk7Dit/OugetLeKm3FrjVgbTHoSy1lNNf3JlRvRsPbPQBj4
-	 J0sjdd+xgI1vQbuEy+n3dqwLNO0FMYyzLPhMiuRxlaAJPC+qaQqT9riuzQ4oVhVwIz
-	 J5g5jHiqD+sexrW+EzhJnH/YBKDOls2OvdzKbgV3NY82+pG064WikCinLrmVc8FDOh
-	 Tve5M4RStj9v9/OmJjakhVxaGvvBLVg+Q1j2eqn+UD3AuFebHEWfmZCl0WN0VqwgHD
-	 d1krplPPRuwnw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id B2B10CE0738; Mon,  1 Apr 2024 08:52:22 -0700 (PDT)
-Date: Mon, 1 Apr 2024 08:52:22 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Leonardo Bras <leobras@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [RFC PATCH v1 2/2] rcu: Ignore RCU in nohz_full cpus if it was
- running a guest recently
-Message-ID: <b616a57b-56bf-4cdd-abc3-f2064b14abf6@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240328171949.743211-1-leobras@redhat.com>
- <20240328171949.743211-3-leobras@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A02BA3F;
+	Mon,  1 Apr 2024 16:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711990787; cv=fail; b=HoHfwvtKMy2T/G9b/8HZMotfdyfJd7ZWiUO1n4MCph1BG9TApF4Enm5mIYwSGWY2+kZwwsibIFTdDId0ng7omzw1tw10pYT89VXo0nHpVS+zntttam7p6RYjcC3PH1+AVojnNjr18RR5tutS/VbOHQqhjEa67/+o73xQACmzbUA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711990787; c=relaxed/simple;
+	bh=ju4ziC3yo39cTVnlwIZcdJmlhNZzMPMHbwr1dO7io1Y=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=rxyVdfFVHjBsUgRGxsQ0Bu6HgOiMMm+EEegPkhXnKD2r9isni+eFXSbUFGSUB44jpom7jgBY7RfLwlaJTNiwKgASku3efm32/fHUr/z7n38PEUjUR9u+M3/6BX+6NsHVVn52NRyUrmUJF8hcXL7jE3G+B+S6dHq/1qcCtoRKIkE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lsR6dA9e; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=YrUdKE9X; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4318iBCC027630;
+	Mon, 1 Apr 2024 16:59:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=kQnkzRdQS5qPMxNAk0RvR7a2e5DFOE3kDzc43WcE728=;
+ b=lsR6dA9eK/WrY7BoGO6tuzwlj+SFQOs8tdPCi1u3B0Jl4nrUQWPWT39z4JDuV4RTAFdA
+ CBUCT6BzZyu5QDAPHVPoGb46hBm373+osi+8H1q4fXf/qzPB0WY+86rFliYPbo1jKmVm
+ ShjCCCurIIPitH5q/1zwc1obT+0/UuF724CkffWh9cesNG5Zg3WpQesd7m/HvUpI2xmy
+ V/KNaEXOmI4JFVo8a63z3GNelKYlE9PXt5h2nrEK/aJRecpMbvlSby6cbGfsdzyxTpi8
+ NRd1CAg+kNKhreOO15alqdBocLjZp3Ah2KPOoHOylYyyGhNTFFy+4ktJOsL3M2BUjZn6 zg== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3x6abuas8j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 01 Apr 2024 16:59:37 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 431G4AoK011663;
+	Mon, 1 Apr 2024 16:59:36 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3x696c53b1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 01 Apr 2024 16:59:36 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eOOqUekVjrdC4voKGLDL7LUD1ZvsjxeH81iCunHS+QdO0gwAXPUtZd67v+kRb0pCqhaYAPhVpBDQQOi53ISFkIdd4Sk699pGqoDmpv5pc5uXhwfz1UF/b8v/IbNwPsw58DGqFsriBAswTzUANhL5LrKlhBufwfto5X9CfjUo7WTKOjYeQGM+1ejgoPK+xerhAbnwTD8uCbHgxlhvz0G6cDjKbS9NjE5sanhedQTCLIXwRema1CikHLmPm/SM7OijZ4Q2U5vLSQxgUpKi45gil/N1hjYnQxQN1GG+zvCRm3HAykom6Ngjr9TMyq7C2EksxzHn4t/GyLoXrGrJuOgbkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kQnkzRdQS5qPMxNAk0RvR7a2e5DFOE3kDzc43WcE728=;
+ b=FlzJlF6Ozi2aLfFeotWDzvywzmBPQjbUYEK+0dR0p9v6xXhHFlAmW7XR2Nd/cIN3JSAeSO9t7R5KHqcCVGQmSlwR/YrUDNrUsSUNQKecZdA11o78oyxNfHJn6Y4LNN2deIL4th5jdvwIkosFLqJcFvRqd01f5igaSMXRsEX+LF10/ChvvfPrF2XcYCz/mWhx01Fktu+eEkMftuCn/ohpXzY+UeI9QwvjWcIUvary2BGGIrBL/dezpda34AUXVP0vlfDKprZkB1Spkg6eIfRhfGH0/OmhDrzivU5BHi5yqepQNjhdhibzQKmQ7yHCtDbj/x97CHoTAKUq1D2joCYfvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kQnkzRdQS5qPMxNAk0RvR7a2e5DFOE3kDzc43WcE728=;
+ b=YrUdKE9X7xQT1X8niQD5C4X7HeIP/Xj4Ih8hVNER6fvl6RqJTVdHzuVfv1q+yvCx1q7p8hiiDXOXX4rudW+Yi7hcNdhU5NTHJUBCSrc8JqjFs8z4FkrFkSYfh2WMcnGFobY7IotfYNmp2F0QnGLFZN7cDhcNqvXDiV5RZwlH0qQ=
+Received: from SA0PR10MB6425.namprd10.prod.outlook.com (2603:10b6:806:2c0::8)
+ by CH0PR10MB4907.namprd10.prod.outlook.com (2603:10b6:610:db::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 1 Apr
+ 2024 16:59:34 +0000
+Received: from SA0PR10MB6425.namprd10.prod.outlook.com
+ ([fe80::894:70b7:573e:da46]) by SA0PR10MB6425.namprd10.prod.outlook.com
+ ([fe80::894:70b7:573e:da46%5]) with mapi id 15.20.7409.042; Mon, 1 Apr 2024
+ 16:59:34 +0000
+Message-ID: <59714cae-4b69-9a3f-87c9-b934f8b7cc3e@oracle.com>
+Date: Mon, 1 Apr 2024 09:59:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2 3/3] KVM: selftests: Add a test case for
+ KVM_X86_DISABLE_EXITS_HLT
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, nikunj@amd.com,
+        thomas.lendacky@amd.com, ajones@ventanamicro.com, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20240401152032.4284-1-manali.shukla@amd.com>
+ <20240401152032.4284-4-manali.shukla@amd.com>
+Content-Language: en-US
+From: Dongli Zhang <dongli.zhang@oracle.com>
+In-Reply-To: <20240401152032.4284-4-manali.shukla@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR04CA0020.namprd04.prod.outlook.com
+ (2603:10b6:a03:217::25) To SA0PR10MB6425.namprd10.prod.outlook.com
+ (2603:10b6:806:2c0::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240328171949.743211-3-leobras@redhat.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR10MB6425:EE_|CH0PR10MB4907:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	WzKcAETCzSWkfoo5UuCk2WDhWYfYcKuf906kz6kNqgKBhkCSbEC0/4f5BB8p2asf4LLcpus8NS7YiWxWUizMNp1niofT+t/BMHxwf0SyVUOjmNRryN0TP2mq7dHDfCqgqg4QgMZkHZRSD2ErIIDeRVJ7beccG3EmaDwYqFta6Bv3y4X8YnbslhHdoTb3g1mxBmkXUEi/lDfc47VmtEivSQGrFmQ+PHxtNO4tviYoaMnUS6A1hE2/wlircIFwg6P7JdRFZai3UprZIpFIDoqJJIrEVyxkhFpsO3NfyLk+t9uhWt6pY0khYpHGbb/Vp96Fa8U5e58XkD5BygV4nbQKWbIM/NNU572EsNCL+A7oACSUsyrVNiWfySYfm/Cj0A5G+9OsU3W46dOszmmIJkUjJGWrcl7RxuKe8STQpSHk/Xsd/aWMfoO3t1c66/wA9B95HDghMfe/tBucFcsPupn8QwXLmY8mIjSXsDuBkpuMGhfs8OtW9RY0XkADo/aW9cu54bzzujR8P8sG8qbq/4xD8uvier5iehi2Hl3cHWtlSl6TevShqBiXKRlxk5awFOG4KBIuKHB8MRhrq1rKwN4hwJY5yj//u5flbZ/eWyYVkaYsuf0uO3m2J8vnqqtmYn/A3MjAvdjYP9zBHJ1gzuVz/FUXl2XGdAeFsE+UcAObdMs=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR10MB6425.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?V1FUNHRER1VndGNES3pnK1ZPUUh4WEJzemEzYzg5MEp3NHhkVld4OVBLU0Uy?=
+ =?utf-8?B?WiswWEhsSGcvK2M2dVljNkVLWlhMMTBxRktWM0lFWEFuM09aU1Z4YktJZG5y?=
+ =?utf-8?B?V3pNMDRpeWErZlBPMWZCMkU5TUw0cm0vMlRaa2UvOWl6b2pLZERST3NYSjZD?=
+ =?utf-8?B?ejhzNEZteFFKb3czSTZoNDJOYi9qQnlhZHlyUVgwbHRXaFRGbGkvbnIvclVL?=
+ =?utf-8?B?V21ZVjBkRW9Wdk1GNDl2eENYb283YnJsc2VFakFxM0hYKzN1V0w3Qm1pTk12?=
+ =?utf-8?B?YmV0RmlTbmwxYldHQWVlT0VuMmMvbzFIdU5iU3lBYW4wYWhic0pNTW1kL0gz?=
+ =?utf-8?B?SHltR1NERTdGNDBVdmhDVkhIQUxlUHBiK0hZRllRQlFnV0J6dHZYZlorcVI4?=
+ =?utf-8?B?ZFNDNWhxNmdISFlDZzBTWU9ITVRHZU5XcXVxYjMybUdyYWw4d21sV2t2SmhQ?=
+ =?utf-8?B?VzVUakx2UENXcVJuUk1USmlNQmRVeFQyWlJZWnVOLzJmRDFkQnVSMmJQNGtq?=
+ =?utf-8?B?V081OFhPWERXUm9Yandwb3BKT3U4OXRpTGYwdU16cWExL1BrOEErQkNvYzZn?=
+ =?utf-8?B?cVY0Rk5oNzdXaU1QYVBLLzhnaVkzcjVORVQ1TFZVSW9ia1FIQmR0UHA4Skpt?=
+ =?utf-8?B?MG1wR0liUU13QitMRkN2TjB6YTRuMzQzdnUzam5lVTIzeUdENitsektTOGFa?=
+ =?utf-8?B?VEZtbG4xZ1p3NFNuR0h1K1lmYTAwYkRpUkVmV0hENmQrR1lqZVgwZUVUeWtq?=
+ =?utf-8?B?aE5CTTFHaytCQXFSQnhUZ1NkWTBBWEdNMWdWQ2tDNThIK0lEcitMY1ZVVHZL?=
+ =?utf-8?B?d3ZiZktPUFJVOU9HMDhjOXNuNmhQRU84T1ltVVZNNTUwREpXNFE2QXRPbTZI?=
+ =?utf-8?B?OGxTRFh5dkI3Q3QwNmNISmVadFFYbFkvTGFtRXRyT29Nd2JYNmNXMmpnRlFP?=
+ =?utf-8?B?RVVBWmdYNDc1eDluOUdMOGFjalJzNlFzWFRtKytDcFJIYnhiSFV6ZnIxb3A3?=
+ =?utf-8?B?TDVLUW9OZ3lYWEhMSDRYa0dYeGxrdjJUZmR6ZE9DODZVbVkzL1h0NGRiZ1V0?=
+ =?utf-8?B?OHc3NWtCZUpGZEgyRkkwZ2lNZVNYdCt1eUJ2NVk2cFpTWUNveHRXWWJzNjBo?=
+ =?utf-8?B?M0lqdnBkWlVSdWs0Q2dLeTBYaG1CRlYzaHhzSXhGYWZpUXpNZVlhWUFwc0pL?=
+ =?utf-8?B?bU9jalg4aUE3dnNJdlVDc0xtN3czNDZsTkxaOG9uM1lBN1pINWp3Slh5WGUy?=
+ =?utf-8?B?SzhuWUM5RURkTGs4dytGN1FxZzc4YWJrdnhPcDN4K2xsOUpBQWxjZnRiaUNQ?=
+ =?utf-8?B?RzcxazI1cUlHOUFXWWV1QzB1bDBJL25sRXBUQUh6YkxoV1RKU0pkWU9kSHI1?=
+ =?utf-8?B?bU1LaFAyN2tsaVZZRm1IeUMwSzBQMElhVHdvM0lJejUvcE9zdldBbGx0TVlo?=
+ =?utf-8?B?MGZxeEF5MXpxY3FOWjU0cWxNN2piY1RSblRTYThlVlludGxNdFlTZ2ZrcDcz?=
+ =?utf-8?B?anhkbDUwSXNMZG9CM0lDOXdScWtIeEtpMWtoLy93bHNlcis3QVJXV3k1RW1H?=
+ =?utf-8?B?OFBVQjhMelRHbGNXdjZrbnlUaTJSdHVFV25CWDBIVm9hMjRCMnk3bCtXVDlI?=
+ =?utf-8?B?WUh3Qm9qS1MwUTJNcHhOL3EzdzFlQ3FxTmhFUVo0RnY3YUVETVMyRkpTaUJY?=
+ =?utf-8?B?clpkcWpyYkh3QTdpNENMOWR2RVg0TFgvS3hOejRxY1Vsa3VxU0FaZGdSa3Ns?=
+ =?utf-8?B?Y1NkTnpoWkkwKzJxMmorY2dBMmRFbURvck01VVBaTzgrN0d0eFN0S2NnU2ha?=
+ =?utf-8?B?bm5Vb0hGclZhVExDYVprVEd3RThTajdxZDJHcUlMcHFCTXdSOGRRWnR0eGJL?=
+ =?utf-8?B?VkoxY0V6TnVabURRWVZyWFEyY0hRWkg0QXVQNHBEUmwxeTNGMEpSK2o3YmxB?=
+ =?utf-8?B?b2ZiSThLMjhLMXlsc0VEMXVHWjFaQ2xjZ1RxcXYrL2ZMR3kxUTR0QXZsQWJj?=
+ =?utf-8?B?UVdZWDBETkxPNnpjWVMzRTE0UDRVS0tDdkpwb2theHpKWEd1UkVUdWk2bEpk?=
+ =?utf-8?B?U3hoRHVxZnJMQTFlcW1Tci9rY0ZIWjZlOThOSUtsSUJidlZJaHNpdG82Rmxw?=
+ =?utf-8?Q?tdFjB6KgsTN7u1sETZs23JC0D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	6Rfcoqzmftp3ezTJn7eyC6+VD+fVLl0KvXMYA296Xwg+N4GzlJ4PrQQHpZXFKukTUfNErt4qkFjbqDvH/w0FzH3ssEjWuAkFLPNWTfHkfuMHWvcIKU1Zmrvro3pVKWmicjFkFUmpwsxlp+BiEFhkrKSPC6ngj1Hz04jAJ/STZ9BgRQbAhVskmHtnP5+EZULMHbVQTDIs35uhgHdQrRDTbJAarrffSpGlIYW1twJMpP2bw+UmPHE1dsW3tjn0+8domIDqFC0gE20q1oRAPFOeiFztYRgulzWfUGMb/2WBqN/TkElQxAO8DvimioxRNiDpqZUx3jiw/pdvEXh2zMQJua5kez+klpzpAc1SMdLnwjtzH8b9bSY8CFICJbVjkHvPB4dT7EQyNtXLExej54UErr8IUV4eP/EZoixCgx6c+N8nrhTgXVWItQ1rtQkbI9n1ydosGzF43kfgfcBLto8lg2it1fcMNwKWk+vpc8WiP/vQV24bBrG9jHUnMyI7/eTo4QkCg890pWkw+21UrBr2ebYYHwxWVa60BLwgOziHqous0S+FQSJaoqBxQO/zo3ldQXqaCjrqeZakSzww9+8vjZxzPC8yH6G6nYcVIxY/zeY=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a709464-df58-4e3f-9810-08dc526d1b1d
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR10MB6425.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2024 16:59:34.0808
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jqeE+poEQ5gMbp+ox28nMrCvCG+6YSY4f/IptoSuIjUGzfkjllf90gFwWjsssvNjDkw3MLsrNSRs/sc/Zbh7rA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB4907
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-01_12,2024-04-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ phishscore=0 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403210000 definitions=main-2404010119
+X-Proofpoint-ORIG-GUID: BBufE6BbQMtVvI8KcBrFs7Fq9XYmFi_A
+X-Proofpoint-GUID: BBufE6BbQMtVvI8KcBrFs7Fq9XYmFi_A
 
-On Thu, Mar 28, 2024 at 02:19:47PM -0300, Leonardo Bras wrote:
-> In current code, we can ignore the RCU request on a nohz_full cpu for up to
-> a second if it has interrupted idle or userspace tasks, since those are
-> quiescent states, and will probably return to it soon thus not requiring
-> to run a softirq or a rcuc thread.
+
+
+On 4/1/24 08:20, Manali Shukla wrote:
+> By default, HLT instruction executed by guest is intercepted by hypervisor.
+> However, KVM_CAP_X86_DISABLE_EXITS capability can be used to not intercept
+> HLT by setting KVM_X86_DISABLE_EXITS_HLT.
 > 
-> Running a guest is also considered to be a quiescent state, and will
-> follow the same logic, so it makes sense to also ignore the RCU request in
-> this case.
+> Add a test case to test KVM_X86_DISABLE_EXITS_HLT functionality.
 > 
-> This solves a latency issue of a latency-sensitive workload running on a
-> guest pinned in nohz_full cpu: if the guest goes out for any reason, and a
-> synchronize_rcu() is requested between guest exit and a timer interrupt,
-> then invoke_rcu_core() is called, and introduce latency due to either a
-> softirq, or a reschedule to run rcuc, if the host is a PREEMPT_RT kernel.
-> 
-> Suggested-by: Marcelo Tosatti <mtosatti@redhat.com>
-> Signed-off-by: Leonardo Bras <leobras@redhat.com>
-
-Looks plausible to me!
-
-Acked-by: Paul E. McKenney <paulmck@kernel.org>
-
-Or let me know if you would rather these go through -rcu.
-
-							Thanx, Paul
-
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 > ---
->  kernel/rcu/tree_plugin.h | 14 ++++++++++++++
->  kernel/rcu/tree.c        |  4 +++-
->  2 files changed, 17 insertions(+), 1 deletion(-)
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../kvm/x86_64/halt_disable_exit_test.c       | 119 ++++++++++++++++++
+>  2 files changed, 120 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
 > 
-> diff --git a/kernel/rcu/tree_plugin.h b/kernel/rcu/tree_plugin.h
-> index 36a8b5dbf5b5..16f3cf2e15df 100644
-> --- a/kernel/rcu/tree_plugin.h
-> +++ b/kernel/rcu/tree_plugin.h
-> @@ -5,20 +5,21 @@
->   * or preemptible semantics.
->   *
->   * Copyright Red Hat, 2009
->   * Copyright IBM Corporation, 2009
->   *
->   * Author: Ingo Molnar <mingo@elte.hu>
->   *	   Paul E. McKenney <paulmck@linux.ibm.com>
->   */
->  
->  #include "../locking/rtmutex_common.h"
-> +#include "linux/kvm_host.h"
->  
->  static bool rcu_rdp_is_offloaded(struct rcu_data *rdp)
->  {
->  	/*
->  	 * In order to read the offloaded state of an rdp in a safe
->  	 * and stable way and prevent from its value to be changed
->  	 * under us, we must either hold the barrier mutex, the cpu
->  	 * hotplug lock (read or write) or the nocb lock. Local
->  	 * non-preemptible reads are also safe. NOCB kthreads and
->  	 * timers have their own means of synchronization against the
-> @@ -1260,10 +1261,23 @@ static bool rcu_nohz_full_cpu(void)
->  
->  /*
->   * Bind the RCU grace-period kthreads to the housekeeping CPU.
->   */
->  static void rcu_bind_gp_kthread(void)
->  {
->  	if (!tick_nohz_full_enabled())
->  		return;
->  	housekeeping_affine(current, HK_TYPE_RCU);
->  }
-> +
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index c75251d5c97c..9f72abb95d2e 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -89,6 +89,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/state_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/halt_disable_exit_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
+> diff --git a/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+> new file mode 100644
+> index 000000000000..4cc6a09906a2
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+> @@ -0,0 +1,119 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
 > +/*
-> + * true if for this cpu guest exit is at most over a second ago,
-> + * false otherwise
+> + * KVM disable halt exit test
+> + *
+> + *  Copyright (C) 2024 Advanced Micro Devices, Inc.
 > + */
-> +static bool rcu_recent_guest_exit(void)
+> +#include <pthread.h>
+> +#include <signal.h>
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +
+> +#define SIG_IPI SIGUSR1
+> +static pthread_t task_thread, vcpu_thread;
+> +
+> +static void guest_code(uint64_t *is_hlt_exec)
 > +{
-> +#ifdef CONFIG_KVM
-> +	return time_before(jiffies, guest_exit_last_time() + HZ);
-> +#else
-> +	return false;
-> +#endif
-> +}
-> diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
-> index d9642dd06c25..e5ce00bf1898 100644
-> --- a/kernel/rcu/tree.c
-> +++ b/kernel/rcu/tree.c
-> @@ -148,20 +148,21 @@ static void rcu_report_qs_rnp(unsigned long mask, struct rcu_node *rnp,
->  static struct task_struct *rcu_boost_task(struct rcu_node *rnp);
->  static void invoke_rcu_core(void);
->  static void rcu_report_exp_rdp(struct rcu_data *rdp);
->  static void sync_sched_exp_online_cleanup(int cpu);
->  static void check_cb_ovld_locked(struct rcu_data *rdp, struct rcu_node *rnp);
->  static bool rcu_rdp_is_offloaded(struct rcu_data *rdp);
->  static bool rcu_rdp_cpu_online(struct rcu_data *rdp);
->  static bool rcu_init_invoked(void);
->  static void rcu_cleanup_dead_rnp(struct rcu_node *rnp_leaf);
->  static void rcu_init_new_rnp(struct rcu_node *rnp_leaf);
-> +static bool rcu_recent_guest_exit(void);
->  
->  /*
->   * rcuc/rcub/rcuop kthread realtime priority. The "rcuop"
->   * real-time priority(enabling/disabling) is controlled by
->   * the extra CONFIG_RCU_NOCB_CPU_CB_BOOST configuration.
->   */
->  static int kthread_prio = IS_ENABLED(CONFIG_RCU_BOOST) ? 1 : 0;
->  module_param(kthread_prio, int, 0444);
->  
->  /* Delay in jiffies for grace-period initialization delays, debug only. */
-> @@ -3931,21 +3932,22 @@ static int rcu_pending(int user)
->  	lockdep_assert_irqs_disabled();
->  
->  	/* Check for CPU stalls, if enabled. */
->  	check_cpu_stall(rdp);
->  
->  	/* Does this CPU need a deferred NOCB wakeup? */
->  	if (rcu_nocb_need_deferred_wakeup(rdp, RCU_NOCB_WAKE))
->  		return 1;
->  
->  	/* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if so.) */
-> -	if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu())
-> +	if ((user || rcu_is_cpu_rrupt_from_idle() || rcu_recent_guest_exit()) &&
-> +	    rcu_nohz_full_cpu())
->  		return 0;
->  
->  	/* Is the RCU core waiting for a quiescent state from this CPU? */
->  	gp_in_progress = rcu_gp_in_progress();
->  	if (rdp->core_needs_qs && !rdp->cpu_no_qs.b.norm && gp_in_progress)
->  		return 1;
->  
->  	/* Does this CPU have callbacks ready to invoke? */
->  	if (!rcu_rdp_is_offloaded(rdp) &&
->  	    rcu_segcblist_ready_cbs(&rdp->cblist))
-> -- 
-> 2.44.0
-> 
+> +	while (!READ_ONCE(*is_hlt_exec))
+> +		;
+> +
+> +	safe_halt();
+
+May I confirm if this selftest works on nested L1 VM as a hypervisor?
+
+Thank you very much!
+
+Dongli Zhang
 
