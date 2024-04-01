@@ -1,156 +1,311 @@
-Return-Path: <kvm+bounces-13257-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13259-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11816893809
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 07:06:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F88893818
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 07:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCD6D1F21431
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 05:06:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D1781F21408
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 05:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77BE8F44;
-	Mon,  1 Apr 2024 05:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629A79475;
+	Mon,  1 Apr 2024 05:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S8claIly"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QO0gxodT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2131.outbound.protection.outlook.com [40.107.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABC4320C
-	for <kvm@vger.kernel.org>; Mon,  1 Apr 2024 05:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711947975; cv=none; b=HDmTwowBz69DNXWTXsCpnWHXranDUmk7lG11esg6cjjHBEhwhIpA+vX4/T1eahdWNL5HbTrXhXALZp4ZklDjo0GiQGn392gboWakTe8BLDEwVLvMgqy1KZrdWtbn2ETRLwEJun/KFWZU6ZT9hvJ/RDc05jpkilafMnaukuZ4MIY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711947975; c=relaxed/simple;
-	bh=lAnFIXPsMqEx1PIRHECT6EIpKl4ob5ivc4XO1J5She8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gpBtODzy9Hryop8wkq7niWNGQiH/5QAQ+I4Yc7mRaloUecTCBYqiqHhQsWg2QnbGzph93nfroZ3b0J0FZBBXm28AwnplJ1pXlFVftzmM8e1XQiEk+3jx+T5hiRYu2SK8q5NPZxiKySdA1BsvZJUpxb5kjScR0DhBY3o/Sm0M+Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S8claIly; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711947973; x=1743483973;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=lAnFIXPsMqEx1PIRHECT6EIpKl4ob5ivc4XO1J5She8=;
-  b=S8claIlyAW5d8hb9SnvIRPiFmlslUkyjUUzYHzud4KzMK/dQyQI0TnmV
-   bnEt6mWSaS59A/xdqLfunqn6NjjC5Y/zRhN80V2EOcYF2U2Urv9CtP2Oy
-   Sz4sZhKpn8pNfFqRcP3PXdn9+2PVaAkQ+jvI9BpXZF8lelgNzKq8GwMkZ
-   q41LN78Xd6iuCKx4Hx+t2R/6/D9CT+qsQlk4fyZ6UtmM6zipx/lx+ErhU
-   NVC+xHjSEkH0xIitnmno0dSLcXVWKeaF4PyJpfz4zbaKvrwIdHzq2SNoI
-   duf1rRJpA8rY+mmlUMCZfPDHbKNDxZLyRf/gwOrjwyqHOzQLz9equaPv2
-   Q==;
-X-CSE-ConnectionGUID: 09/tEOl3R42Dg0hZaGXA/w==
-X-CSE-MsgGUID: 4O0XBqZXQ7G1TCw2RJRgtQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11030"; a="17686543"
-X-IronPort-AV: E=Sophos;i="6.07,171,1708416000"; 
-   d="scan'208";a="17686543"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2024 22:06:12 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,171,1708416000"; 
-   d="scan'208";a="48586391"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.225]) ([10.238.10.225])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2024 22:06:10 -0700
-Message-ID: <297fd9b8-9321-40e3-816b-2de92cb1a3ae@linux.intel.com>
-Date: Mon, 1 Apr 2024 13:06:07 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705D31C0DD3;
+	Mon,  1 Apr 2024 05:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711949330; cv=fail; b=VxqZRbhOd5N0IhtiMLGbDrzLS6cKjDs1jwVszs5Ku8lEPmizPowGkU0hfKJJCvNBblrBCFT1pxarwpwAfJNZsW8N2gmnKKZk7KF4g+O1AAcG9Cy0hEBOJo2bCUhoxzdjU0XehFTzOzRkWAFR39wzhCclzFpF7vSy8WeLYM3pCdE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711949330; c=relaxed/simple;
+	bh=JAaBtA0Oxt3mABjyHCPU7QXFZ1I+oQxeliLLPmf943E=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=mcAdQZEIRLfCGNXZilTSFRsqSGcz+zJzto+b7WWLah+KgPYCQWIvqeqhAKOMIvYhmabdhr/DqM6c+aGKuswODlFWMkn0Ca+QxqC9ehwrXF2wtkvVJBCFGMoCapwqMoAPIOQZ+Z5NgEvg9PhdspSmXT3yEkT8rgZjt03CJlMSigM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QO0gxodT; arc=fail smtp.client-ip=40.107.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YMnLWOhP5yHQ0wxpmKeYl71Bps6LnpnS594PsqMwiwR2LAe4gPjpKqDItcE3H9FbqpDZc8823Id2K8v57OMl2wY3d+SpRTjIWjMiCiEqnEsyIgjlffnQvAxdyHEz6Q1CDr6DBLViGb/x2vg5bRnFZrInrzypZiL8A4nyUo+Xl1g+Cb7LS2FIISmkuc3YTMsUQ/Q02ZaqnPuAfcCmc5xC2If/S3Lvpm3CryilwZ+xDWoT4rO00A9hQZ+7g6kXy2BxaKCBdwXici7xUOA4oVCeA6c4N/3bs8BH0njQ/PRoDaQc88oKYcuzUfR7WHNmU4mh2vx6ibNt9mjNeESh2ij8gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8z4RAHVWU2vt5tQSIhTVKASopLjqKu7Qgqpsh3DGndk=;
+ b=C0A5gwyHSs74jDKEMwNg/F+xoWFn261hMi9l2DBrR4SedFtLIX9DTh/ahLBNWQFofSP6MxPY30kdXKdguzTK2pwlH371QlD6ETxF3NjMfCh4XzlNg0vSlPDVxKUdHg9vakjUDFZEMg8oT5DliiBmBCgBXoQT1RTOn9eB+ElDn7kqcNhcGmP3Uz9+VIdKWeIUUG9PaoxD5aHZoeNekqAO8ah1WmkNYsoufhpjXtroXJ0kaFYpo9YWRDoYq6U6n0TJUoTOGvRKcDvRi9ITUdX11+++iBzZF2CRglakypMMnmQCufXx/0ifuPOkai8CU9u/dLhRt4CrUpSnn8W0LgwbYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8z4RAHVWU2vt5tQSIhTVKASopLjqKu7Qgqpsh3DGndk=;
+ b=QO0gxodTYLvDm8bMKbLmZHSZYyHpUnkB/3uWWq5cg65XVOqlsElXeoevPSdKrl6zDd01LhiLLqZAbFYFLpobFWen1HZTyMI8UYu+IbihuymysgO7lRQdI4E31skKUmDxi51kGvhqCFSEWuyyFA368uBlV+YQL7NRSiwwplvtlaw=
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
+ CY5PR12MB6597.namprd12.prod.outlook.com (2603:10b6:930:43::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.46; Mon, 1 Apr 2024 05:28:45 +0000
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::60b6:438a:bff1:cd14]) by DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::60b6:438a:bff1:cd14%6]) with mapi id 15.20.7409.031; Mon, 1 Apr 2024
+ 05:28:45 +0000
+Message-ID: <5d667c81-56a8-95bd-4aa1-4df16c42dabf@amd.com>
+Date: Mon, 1 Apr 2024 10:58:36 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v1 3/3] KVM: selftests: Add a test case for
+ KVM_X86_DISABLE_EXITS_HLT
+To: Muhammad Usama Anjum <usama.anjum@collabora.com>, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, nikunj@amd.com,
+ thomas.lendacky@amd.com, Manali Shukla <manali.shukla@amd.com>
+References: <20240327054255.24626-1-manali.shukla@amd.com>
+ <20240327054255.24626-4-manali.shukla@amd.com>
+ <7e093e45-9349-4cfd-a0ad-78ae66edda90@collabora.com>
+From: Manali Shukla <manali.shukla@amd.com>
+In-Reply-To: <7e093e45-9349-4cfd-a0ad-78ae66edda90@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0240.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:eb::17) To DS7PR12MB6214.namprd12.prod.outlook.com
+ (2603:10b6:8:96::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH gmem 2/6] KVM: guest_memfd: Only call
- kvm_arch_gmem_prepare hook if necessary
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>,
- Isaku Yamahata <isaku.yamahata@linux.intel.com>,
- Xu Yilun <yilun.xu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20240329212444.395559-1-michael.roth@amd.com>
- <20240329212444.395559-3-michael.roth@amd.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240329212444.395559-3-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|CY5PR12MB6597:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	7lpP1UJ+nL0SHumYi+UN/PFv3sbovrtq5Bs6s96R/rZ+atk/j9UMQKcVEhfliqDMHJK2Fpthg6mJNMRSOl21pq4NwVr/lzqltrbXKLZqMgr1mKgznlmTe+9qpIczaxBKloL+IPwOaXRrCPccdNKIcBLTLYTtqlZc6UTFs5S9RtJI3RoUtmp3DAExeTIXWI881hDrRbjd/8FMAJthUPFioiUPKV1XjG25zUzZJsvijku3a+wtVv7zRz6ieaOntx56/MomYY88/VMIrbG21vPB//XR03f9EwLX2b+2lB5jxxjl7azHvEHZc28AcDQEUivgr0WyxkfmtxKk3E6a56bgnz1+XSfJiyQLPO+cJLfbHOfI/kAyBOkr5k4Loav5htr0ypOZWD05ByshWJmFgeQCQbEoHLSIwwVCqVJbHu+pfft2ndHk6MH6AOkgAeGwoiwAJsci057OV7ZWJLPV56RQnkavOgpCusgwFyY2uAKlAKVLTeF1qWW0cSw9qBonUNDdnVUxpqVJd6UfXLAk5umQ8EPIdiKuRChf740a/69dxTNGLg4qmRUJij24e4rvOJzyMO4Do+Pefbvb7c7SFL7UYSmmPy6aTKwoP9Y/+S7Ig5flbVoqJ4agQxTOsoGWL8RGN686s3iwQhhJJQmLYK/cILtSUEXx+LRGtryeAOJ3vFQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SUM5eHJBQ3hZWU0wY0YxMlp5YWI1V0FVYTY1dXFEVit6bkNJYjJKb2Y4ZEVi?=
+ =?utf-8?B?SEFVRFhQcm5jTHE1bW56dG93YWFwZTRiYVM3NURpVnJpMTlJc0UzK2RqVzl5?=
+ =?utf-8?B?MjFuSzZBaDVqd01yQ0Q4N1UrTnVheUlkeFo5eDRWdkN0b3FaTGlyUk9leW0z?=
+ =?utf-8?B?MVkxRnJiUmRuQzdWaEY3aC9sUEVJK2t4OURXNGU3WTBJZDVMc0c5d1haekVr?=
+ =?utf-8?B?UjFoOU9Fcnl6YUdzSUtTVmhNNDhxeDMvSUNpY3Y5QlJwSUFOcUtwbWFWTU5k?=
+ =?utf-8?B?QWhMS09LcDF5ZWpVVjlJczdyQmlxNGFsQnFTYVd6UFFxSm5kb0xxNmR4QUtD?=
+ =?utf-8?B?Z1JoZEVpVFYxZjNSa1lCT3UrK3krMk1yak5BUHpaTEJqNVVuS3lOU1dvNmFM?=
+ =?utf-8?B?K1BNd2psdjFQdFdWTmFoNWlnOUplR1FjcEhkTGlheGpzZ1crWmZ2b3pZQWZV?=
+ =?utf-8?B?dmwvWUZlT0gxREp0YXA4MDZKd3QxWWZweDZ2RlhVbk1oYUsvWmRmYnRaRHVm?=
+ =?utf-8?B?RFc4Sk9LNUE0RTJ1RUtTcFFQeFZ3S1YxSVZ4Ry9teVhqUVkrcTZIc21LTmJC?=
+ =?utf-8?B?eFZNNjh1YWhCcVlBdGg1dndXU2dhaVNpREpzeko4bUpDdTdwTEdjenBYbkRo?=
+ =?utf-8?B?cGxnd3g5ak1YZkxzTkpzTTBDY0VaUkFFMGVxbVpsSElCUEJ0ZTVxZXVOUmVH?=
+ =?utf-8?B?UytzWVFhaXowWUtYbThBKytuUjhUTERGK0dDT3JBTVJlOWxpLzlocS90cTJy?=
+ =?utf-8?B?MUlvN2wrUzhpM25veUhwLzVmYkVLN3RCTnZmUEVFL1M3VFoxUmxnVVd5Y3NV?=
+ =?utf-8?B?dm5YQVpSL210dlByNU82a091NmxnZ1JybitVelJXdUhidzVxTS9BUm1ZQUpS?=
+ =?utf-8?B?TU1KeC9RWXNuaHQ1eno3QkVGMU9qeWY5dGZBV09lTGd6R3IxVUtVek5kKzZ0?=
+ =?utf-8?B?bnAwUDBlbVRFS3hIa0NzcXpGMUd2K3k5djNJNmNxTUpaRXkyekZnY09OZXQv?=
+ =?utf-8?B?d3psbmpqWm5EUUtjQ1NKWEphWGdJRXpTb1cxTXRTbVA1SDE0TGk5ZURZSGlq?=
+ =?utf-8?B?T1o5cjhQR3lRVG56UE13TEdTaU8ydFd1angva1ZpMCtYNFZiOWR4UFlqd1p1?=
+ =?utf-8?B?alVoMjdCOGVTTzJ5YmFteG9tb2VXTk9JU2JsOVFuR2Z0VElQcmJib1dadldh?=
+ =?utf-8?B?MG10eFA0Q3U1S2dYMFRqSGc5cGs1dWR2VFQ1bXNhN0NUVGR0V3M2UzVCd05l?=
+ =?utf-8?B?TUhpSUhNaXRibWZrMTRhSWVveVpZYkJ6a2lZUXlrY1A4Y2ZQdU1LY0hvdm4y?=
+ =?utf-8?B?Z04xVnhWc3lhYTFsc1FkY1pEWGhxaEU2MHQ5NlhpVGhFVVRidWtic2tIREJa?=
+ =?utf-8?B?dDJsaDJvRTkyZFkySVVNOGtWMloyWFY2Ynh0LzVPcGlIaFhQWVhUbGhpRldX?=
+ =?utf-8?B?NTVKdGZTZkxWL2FCY1JRMG9OZUhxY0ZaZjhrekZHSTlaWGNFSjVQYmFOcHhN?=
+ =?utf-8?B?L1hqcUZRNC9uZEU2ODE4a1llY1pWRlV4QzJxV3lOdHdYQTVvWXVVWmVKbUd0?=
+ =?utf-8?B?Z2ZlRFlQQVpaY0R3NTVnZHpkekM0elFBMXZZWlk3ZlE3bG95OFJMQ2ordExD?=
+ =?utf-8?B?RUZEUmlQZkpxQ1JFbWhrL1RVV1lxR2ltbFFvb1FTZ2NmS2M3TTJRNW1RaTlH?=
+ =?utf-8?B?ZFIyeHVLemYxcWFocnlhaFBHNElGdXZmYVBvZ3NDVmFYQWMxaEdkV09CZE1P?=
+ =?utf-8?B?ZzR5KzdnL1dzWldmSEJ1cVkwbTRrMnoxcFM4OC9wUkdyT0ZIUzErN1RWTTlh?=
+ =?utf-8?B?T2FVRjMreng4UzY4a1FYWEM2T3I0VkFQTDd3RGVuc2Evb0M0UVJSYnU4ZTJt?=
+ =?utf-8?B?R25aVmw0Z29RK3dIYTlMdDQxM1dwckpMVURJNHVRQ0RiOXRDSllwMURqZUNT?=
+ =?utf-8?B?L2tmc0xYaXpEQVduN0tWZlZQSklyMFlMK3NRazBaYTVsakR6MjNid1pjVW5x?=
+ =?utf-8?B?Tm1JTnJwcnhXMGN6SnBHelNKV3Z5Y2lsQTR0Rlo2VTJzS21rR25kT3pRVGZU?=
+ =?utf-8?B?M2FJbnB5SUxkNloxMnpUYnBJQ0I3djVyMS8wK2pNb0ZycjVMZG0vN0VPbzcx?=
+ =?utf-8?Q?x8wkd7CJz4C18dWmnTwQXsyWr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8cb22a2e-ee94-4f85-470c-08dc520c995b
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2024 05:28:44.9476
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EAMcuUGemC0swOyd7aU1w+ofusjIprfPv87fZ+vE0T+lCIAHxx25a88JiGMjOf9j6H7YLq1sEyyUFVoDXdv0Ow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6597
 
+Hi Muhammad Usama Anjum,
 
+Thank you for reviewing my patch.
 
-On 3/30/2024 5:24 AM, Michael Roth wrote:
-> It has been reported that the internal workings of
-> kvm_gmem_prepare_folio() incurs noticeable overhead for large guests
-> even for platforms where kvm_arch_gmem_prepare() is a no-op.
->
-> Provide a new kvm_arch_gmem_prepare_needed() hook so that architectures
-> that set CONFIG_HAVE_KVM_GMEM_PREPARE can still opt-out of issuing the
-> kvm_arch_gmem_prepare() callback
+On 3/30/2024 1:43 AM, Muhammad Usama Anjum wrote:
+> On 3/27/24 10:42 AM, Manali Shukla wrote:
+>> By default, HLT instruction executed by guest is intercepted by hypervisor.
+>> However, KVM_CAP_X86_DISABLE_EXITS capability can be used to not intercept
+>> HLT by setting KVM_X86_DISABLE_EXITS_HLT.
+>>
+>> Add a test case to test KVM_X86_DISABLE_EXITS_HLT functionality.
+>>
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+> Thank you for the new test patch. We have been trying to ensure TAP
+> conformance for tests which cannot be achieved if new tests aren't using
+> TAP already. Please make your test TAP compliant.
 
-Just wondering which part has big impact on performance,
-the issue of kvm_arch_gmem_prepare() callback or the preparation code for
-the kvm_arch_gmem_prepare()?
+As per my understanding about TAP interface, kvm_test_harness.h file includes a MACRO,
+which is used to create VM with one vcpu using vm_create_with_one_vcpu(), but
+halt_disable_exit_test creates a customized VM with KVM_CAP_X86_DISABLE_EXITS
+capability set and different vm_shape parameters to start a VM without in-kernel
+APIC support. AFAIU, I won't be able to use KVM_ONE_VCPU_TEST_SUITE MACRO as is.
+How do you suggest to proceed with this issue? 
 
+> 
+>> ---
+>>  tools/testing/selftests/kvm/Makefile          |   1 +
+>>  .../kvm/x86_64/halt_disable_exit_test.c       | 113 ++++++++++++++++++
+> Add generated object to .gitignore file.
 
-> if the particular KVM instance doesn't
-> require any sort of special preparation of its gmem pages prior to use.
->
-> Link: https://lore.kernel.org/lkml/20240228202906.GB10568@ls.amr.corp.intel.com/
-> Suggested-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->   include/linux/kvm_host.h |  1 +
->   virt/kvm/guest_memfd.c   | 10 ++++++++++
->   2 files changed, 11 insertions(+)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 2f5074eff958..5b8308b5e4af 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2466,6 +2466,7 @@ static inline int kvm_gmem_undo_get_pfn(struct kvm *kvm,
->   
->   #ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
->   int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order);
-> +bool kvm_arch_gmem_prepare_needed(struct kvm *kvm);
->   #endif
->   
->   #ifdef CONFIG_HAVE_KVM_GMEM_INVALIDATE
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 74e19170af8a..4ce0056d1149 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -13,6 +13,13 @@ struct kvm_gmem {
->   	struct list_head entry;
->   };
->   
-> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> +bool __weak kvm_arch_gmem_prepare_needed(struct kvm *kvm)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +
->   static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
->   {
->   #ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> @@ -27,6 +34,9 @@ static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct fol
->   		gfn_t gfn;
->   		int rc;
->   
-> +		if (!kvm_arch_gmem_prepare_needed(kvm))
-> +			continue;
-
-Can multiple gmems (if any) bound to the same inode's address space 
-belong to different kvm instances?
-If not, just return here?
-
-> +
->   		slot = xa_load(&gmem->bindings, index);
->   		if (!slot)
->   			continue;
+Sure. I will do it.
+> 
+>>  2 files changed, 114 insertions(+)
+>>  create mode 100644 tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index c75251d5c97c..9f72abb95d2e 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -89,6 +89,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/state_test
+>> +TEST_GEN_PROGS_x86_64 += x86_64/halt_disable_exit_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
+>> diff --git a/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+>> new file mode 100644
+>> index 000000000000..b7279dd0eaff
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+>> @@ -0,0 +1,113 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * KVM disable halt exit test
+>> + *
+>> + *  Copyright (C) 2024 Advanced Micro Devices, Inc.
+>> + */
+>> +#include <pthread.h>
+>> +#include <signal.h>
+>> +#include "kvm_util.h"
+>> +#include "svm_util.h"
+>> +#include "processor.h"
+>> +#include "test_util.h"
+>> +
+>> +pthread_t task_thread, vcpu_thread;
+>> +#define SIG_IPI SIGUSR1
+>> +
+>> +static void guest_code(uint8_t is_hlt_exec)
+>> +{
+>> +	while (!READ_ONCE(is_hlt_exec))
+>> +		;
+>> +
+>> +	safe_halt();
+>> +	GUEST_DONE();
+>> +}
+>> +
+>> +static void *task_worker(void *arg)
+>> +{
+>> +	uint8_t *is_hlt_exec = (uint8_t *)arg;
+>> +
+>> +	usleep(1000);
+>> +	WRITE_ONCE(*is_hlt_exec, 1);
+>> +	pthread_kill(vcpu_thread, SIG_IPI);
+>> +	return 0;
+>> +}
+>> +
+>> +static void *vcpu_worker(void *arg)
+>> +{
+>> +	int ret;
+>> +	int sig = -1;
+>> +	uint8_t *is_hlt_exec = (uint8_t *)arg;
+>> +	struct kvm_vm *vm;
+>> +	struct kvm_run *run;
+>> +	struct kvm_vcpu *vcpu;
+>> +	struct kvm_signal_mask *sigmask = alloca(offsetof(struct kvm_signal_mask, sigset)
+>> +						 + sizeof(sigset_t));
+>> +	sigset_t *sigset = (sigset_t *) &sigmask->sigset;
+>> +
+>> +	/* Create a VM without in kernel APIC support */
+>> +	vm = __vm_create(VM_SHAPE_DEFAULT, 1, 0, false);
+>> +	vm_enable_cap(vm, KVM_CAP_X86_DISABLE_EXITS, KVM_X86_DISABLE_EXITS_HLT);
+>> +	vcpu = vm_vcpu_add(vm, 0, guest_code);
+>> +	vcpu_args_set(vcpu, 1, *is_hlt_exec);
+>> +
+>> +	/*
+>> +	 * SIG_IPI is unblocked atomically while in KVM_RUN.  It causes the
+>> +	 * ioctl to return with -EINTR, but it is still pending and we need
+>> +	 * to accept it with the sigwait.
+>> +	 */
+>> +	sigmask->len = 8;
+>> +	pthread_sigmask(0, NULL, sigset);
+>> +	sigdelset(sigset, SIG_IPI);
+>> +	vcpu_ioctl(vcpu, KVM_SET_SIGNAL_MASK, sigmask);
+>> +	sigemptyset(sigset);
+>> +	sigaddset(sigset, SIG_IPI);
+>> +	run = vcpu->run;
+>> +
+>> +again:
+>> +	ret = __vcpu_run(vcpu);
+>> +	TEST_ASSERT_EQ(errno, EINTR);
+>> +
+>> +	if (ret == -1 && errno == EINTR) {
+>> +		sigwait(sigset, &sig);
+>> +		assert(sig == SIG_IPI);
+>> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTR);
+>> +		goto again;
+>> +	}
+>> +
+>> +	if (run->exit_reason == KVM_EXIT_HLT)
+>> +		TEST_FAIL("Expected KVM_EXIT_INTR, got KVM_EXIT_HLT");
+>> +
+>> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+>> +	kvm_vm_free(vm);
+>> +	return 0;
+>> +}
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +	int ret;
+>> +	void *retval;
+>> +	uint8_t is_halt_exec;
+>> +	sigset_t sigset;
+>> +
+>> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_DISABLE_EXITS));
+>> +
+>> +	/* Ensure that vCPU threads start with SIG_IPI blocked.  */
+>> +	sigemptyset(&sigset);
+>> +	sigaddset(&sigset, SIG_IPI);
+>> +	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+>> +
+>> +	ret = pthread_create(&vcpu_thread, NULL, vcpu_worker, &is_halt_exec);
+>> +	TEST_ASSERT(ret == 0, "pthread_create vcpu thread failed errno=%d", errno);
+>> +
+>> +	ret = pthread_create(&task_thread, NULL, task_worker, &is_halt_exec);
+>> +	TEST_ASSERT(ret == 0, "pthread_create task thread failed errno=%d", errno);
+>> +
+>> +	pthread_join(vcpu_thread, &retval);
+>> +	TEST_ASSERT(ret == 0, "pthread_join on vcpu thread failed with errno=%d", ret);
+>> +
+>> +	pthread_join(task_thread, &retval);
+>> +	TEST_ASSERT(ret == 0, "pthread_join on task thread failed with errno=%d", ret);
+>> +
+>> +	return 0;
+>> +}
+> 
+- Manali
 
 
