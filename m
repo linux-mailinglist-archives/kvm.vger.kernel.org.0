@@ -1,282 +1,260 @@
-Return-Path: <kvm+bounces-13271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59ACB89394B
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 11:14:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D1A58939A5
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 11:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02BCE2815B5
-	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 09:14:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E60ADB219F8
+	for <lists+kvm@lfdr.de>; Mon,  1 Apr 2024 09:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF7A10961;
-	Mon,  1 Apr 2024 09:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7E310A12;
+	Mon,  1 Apr 2024 09:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d34HkjT+"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="UiwlZdnz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9ABDDCD;
-	Mon,  1 Apr 2024 09:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711962857; cv=fail; b=JeOml6LtRLH1TFKP2V/W/lFQK8yZX2SxHmYhS1NiUIh7ntWYIiCbBMHeHtIKTXUuXCQKY90OWLkme7OgS4iz6efT5EKjmq66lc/99mUc8qOULcxhh71jpxhpBbnOXzCv3z1MS9+Qt2jcRG6ciZmilAP1u10ZhrYEnP5GYEFUsFo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711962857; c=relaxed/simple;
-	bh=2udzXw6nnmNsTcKPHJtQg3VtWxBz/QQZCnjtNL19iNI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XvLQZAoiKsG6DcWIcwrQ0bhoE5BZCe94YmvN7cXdL28VIp23uLgRPWCweiyxYwV78EqPnHSeP/VTKNFttbyeYTPKsyj65qX76rwNuFRkW4wfvFeEUONlgbffBwkkn/x6HPiQ6aHGkMUnZrk4l5cOKLcCOveenIu2pIU9e0go7ZU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d34HkjT+; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711962856; x=1743498856;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=2udzXw6nnmNsTcKPHJtQg3VtWxBz/QQZCnjtNL19iNI=;
-  b=d34HkjT+o8d5j6DE8LJZXqrd4nCmfxG5qca1TF0uP9XrsDWUepDwRukb
-   kqVqqGD8kueCAs5nQe6KfMOVHG9TWkAhqXVjlYkgcBbb80b0+jYT9KRSy
-   ZuEJ5zUWXlLXaLVtY+mb6Wl/iCculC6vhEuc6okN/1Jbzpyu9bCxmFEd5
-   xu2CGm98rYrdRTq7LtPmxasEZ6S0LxMJ9xfKQCZ+sntYEnlf3wqS86vLS
-   jMa5zsF7orlwS3bGtsw3v7r2IyoV5H/02hXOwHeU2nuUS8H2kEb54223k
-   dbT9cM0u45mboEpAYJJhHkjGXxQF3E618IOY0pcy3gJrWHdkOvPOikk1D
-   A==;
-X-CSE-ConnectionGUID: VZQ7T1psSZmXLOc68zckMg==
-X-CSE-MsgGUID: +X1j2BGwQU2Vyt8c/jfvgg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11030"; a="24534581"
-X-IronPort-AV: E=Sophos;i="6.07,171,1708416000"; 
-   d="scan'208";a="24534581"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 02:14:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,171,1708416000"; 
-   d="scan'208";a="22399068"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Apr 2024 02:14:15 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 1 Apr 2024 02:14:14 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 1 Apr 2024 02:14:14 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 1 Apr 2024 02:14:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Sed9Ot6E/F2dJhRpzy0kOO5k4Z2s7CvS/lsS+cgBLK0EGRZqAeC4DzzX9QgS0OtY2qsvHWFGarKfzk5mllTQIHsmo7AgLVq1ejwPPXEfYOlAn6xM3mkIlJ+E+N84e85x284OqKvoozukGLCbZk0TvQX3CNDMUt5PZf4knY5j8wFdBNQqrhDUkTzekskG3LN9sAtpCjmCetJiPGcDNjQUXPK6TS+iD9zFAGj7sOpoNJon9l/B1UlyxVMaxi4K1n2GIjXVwNn6h86hFA60r+IhiPYooHtr2rhnHs0TkckRnti5qqHW14pZ/NjC54EhUxfLINIknHEQosfH9cyDfdMIfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=meSVaoU8CLqwXgGFwm8Q4Krzua+SDbXQYuWolKJ0Roo=;
- b=MNV+qf3QUR6F1Lezmm3vPhjA6kIynYXXsHHqP8ISh9YGnKccqFK9HIhX8GjWCRc7WqaA27hH2GIQUTUQ8zQ7/49VKzCZ3GzLS8vu2RGI7GIfxebF89TRysDhKV89aPRdzmJHZwCRATXqwnmtTglm9pljDigBXXV0brJM+sGGmxg1pSs7mYjDtkur06EZSZdgUapWvhbwls1K6/6dPi2LY0JeaY/5msd8agjJQfemCfZdPgdg/EmRwV2e1Su3ZeWytp0WJReWd0CUCaTMN92YO4xguU9yS8nvgYDtrETXzKpWQ0Pe007SvkBUBxUpWEr6E/FffMd3nk8cTU+6PTcfOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by CO1PR11MB5140.namprd11.prod.outlook.com (2603:10b6:303:9e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Mon, 1 Apr
- 2024 09:14:12 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::5135:2255:52ba:c64e]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::5135:2255:52ba:c64e%4]) with mapi id 15.20.7452.019; Mon, 1 Apr 2024
- 09:14:12 +0000
-Date: Mon, 1 Apr 2024 17:14:02 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: <isaku.yamahata@intel.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	<erdemaktas@google.com>, Sean Christopherson <seanjc@google.com>, Sagi Shahar
-	<sagis@google.com>, Kai Huang <kai.huang@intel.com>, <chen.bo@intel.com>,
-	<hang.yuan@intel.com>, <tina.zhang@intel.com>
-Subject: Re: [PATCH v19 103/130] KVM: TDX: Handle EXIT_REASON_OTHER_SMI with
- MSMI
-Message-ID: <Zgp62iK3HQEvcDyQ@chao-email>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <4a96a33c01b547f6e89ecf40224c80afa59c6aa4.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <4a96a33c01b547f6e89ecf40224c80afa59c6aa4.1708933498.git.isaku.yamahata@intel.com>
-X-ClientProxiedBy: SGAP274CA0006.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::18)
- To CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D3210A11;
+	Mon,  1 Apr 2024 09:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711964649; cv=none; b=qWt6FCFi3Va5yn41Eb8w5AeT6Z+rJQxo5Ywcqk8iUlzAtj7PtrlbD0fcafEd7a6FXKb1cp5+wL/+nnrHspve2M0Xwlnzyy4qEMQK01VBG7MUNCyZ9Mgr4jrJ46hePARS/D2mQ0YUA2SrMijfEO+7xguOId8QbMps6SnpfEYX8jo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711964649; c=relaxed/simple;
+	bh=B4rIpTmUjg9j2qff3gHUT9sWnc6MSWWI4r1UzmPXbFI=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=NDEmGKx8kIKpBsXsvDjS2GCo9czOJSkmmniy8KU8X4+xwKh+V3WOS7LcMs+D8FEdzpoW+/RrmqDkqFccZW7oxvYQNucGEH+OdmtGtY/4C3VudWAiOKjOmDcjBDRKD995wOgVxuOX8cuGPuxqMpOk0WXdru4PKE+pqB6JC0l3V9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=UiwlZdnz; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1711964645;
+	bh=B4rIpTmUjg9j2qff3gHUT9sWnc6MSWWI4r1UzmPXbFI=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=UiwlZdnzsIsJo9/MsBqbv/PXEH9C5l/ri0QkFm+9h089XGKLgGV08+j/C4JkIBiUD
+	 LksWymBQQbfZd/bkEh9AGgl1y6VK1cB211LXUbDUQsh2cNUAZLQ56r2sCzybAg2fJX
+	 o4GuKSEHenjbVIkgS9G6rs4UfZ/Vat/mHpQ2zH/TdYpUYVTBzifNlTBmuPVGCXd2WO
+	 eexwGZul2YuuXk0gDGt20z4WfgJH7D9UDytZsGv4dBjwBHamUtYl7xIJw6WiTU5dGL
+	 0AnpRd5lHZMb1JIAuebI1WDuVLLByRubJq/CDxs556WaUGTlW4PtGggy94BYFRJC24
+	 Fp/6Ok7R4UAvA==
+Received: from [10.193.1.1] (broslavsky.collaboradmins.com [68.183.210.73])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id CDB80378148F;
+	Mon,  1 Apr 2024 09:41:31 +0000 (UTC)
+Message-ID: <de7835fe-0f60-451c-9f7b-b380e1c65273@collabora.com>
+Date: Mon, 1 Apr 2024 14:41:26 +0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|CO1PR11MB5140:EE_
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: v/yRZ9jLwjlz0u4uqGjs8gAHZxZrKxKN9ilQ3Kdz8O1wiGInj1vBDr0QsyiU0AcECxnSe0w4/FMSlKhg4WsvVlYNB7NKNu7swsHk/5VcB9A5Xw1TGZTKnQ32ZM536xljfF/qrBQMIqZSUNshNF6D/4WJQGnqwXzkArKeJLxOqVouwWWEVKUGnjpoWIqmwJVwQouwhzCkdXKV96w5vEwQy/Nrqxkyj2iQMKYXYqpQD8QiQZUuRGKiLWbrtVDddMXFx8RIUqUo3lvLhGciI7awvzcJNYmRUHOkhi0C3Z+BRwqMef8J2+hvd7CBZEELp6E2Kq6wkYDlQhG4ztftGJyjtiLbfBeIHlsgNMG4c/HysdLLHFv7EmN/c6gZZz2axEdIlq/HrkvrtSlz5tHbA2TyUoR3YjIl4Z6gtoCpcgo6a0PbHeYi+Z39+EoyW1OuO4Y3CQBuHYvG5t0IKxgdBR52d7JaWqhIPaBsLz/9fVTmZMp8mITtmEP3TnmssLgb1533nbKGN/sD7SHU53Uhm4/i0RBolw7oxqfHDXvWe1npUg7/AyfNxMnp+TU+vyXV4e+M0T9OwzW0BlobaFhdvDHtxBmejC0ZS1ugCcB+tSDLI2RfmGezgUlEAnJ3raX75yrTgj1oW2gtxmNTw3bAXPe4i9x47apEYzu1MDwUYEc8ndQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ujAg4lTmf9AB7bxOqmZ1E66gIzJj/73/xICBO9GU27ZU63lgoGrfPuiLAq51?=
- =?us-ascii?Q?P8bEEJbx1aXMy22OLARtzlEm7d2Qa6rHjcfoXC7K+caak2g/DaQ4FQf/UtxT?=
- =?us-ascii?Q?XGCGOxtD+WYNKNoFPN+q6crxiFFD57Tk0A4BJT0Mx6BZwKXlKMIpEZPLd+h5?=
- =?us-ascii?Q?5mwUKf3GqWKjEw3DS0/Vvlqw7we9GVYORrM5Eo2sSB3Z+VHV3rU8g6lYsS1U?=
- =?us-ascii?Q?DInfuYipWoVRJWREqh8eoX9hpD7+t94Jz4Q6+3rc6udq4+T4OLhZP/2cugQz?=
- =?us-ascii?Q?800GToD1F/NqhGVF0elSwO8E9erYDRT9QJkAV1m/H0Gg6TOa9ZBvtkQMSc9S?=
- =?us-ascii?Q?BcZnR5b8CldFpFj9BR5V+DYrO/AqxzpiFTb1Qea2rueu//QMwnyFKyFHTZUA?=
- =?us-ascii?Q?ngmK2/wVyLY2SzYMhbpifYCvUOKOmvYyIkQ69OSN7NxNFYAN72xB7XxcKxsq?=
- =?us-ascii?Q?51ijziiQoLKkfG/aBB6Tybwxq18Wq72KGbWXIYWbvDhvDUL1jmspG/sr+zmy?=
- =?us-ascii?Q?Ng1AtA8WuM7gmbUyqsBkPE08JaYo5/0Q5dwAeF5vTNcY6fssJOK23j2IoVXF?=
- =?us-ascii?Q?WXuHaFDfjHvX5cR8YnK8zKUNnY/kjNc+/VG1mK6C+OXgxCWwSasj02+R8rDf?=
- =?us-ascii?Q?ABI1/s7Q27YLlqx7ho1uVHu5yi32B9XGAw+IpRDr6eMcT4Po4Om/JEZdHHen?=
- =?us-ascii?Q?NWz2r1Hlj5Lyv7IHIsNWONKAhefXmmRH1NdE9NKgSjl3g9YTw7UufTq1BBWv?=
- =?us-ascii?Q?GtxgTWOC2hmhT0PRRan8jT8cJ0OemEzvUKjtdiv1jMw/DqXTNaQY0qKu+NR3?=
- =?us-ascii?Q?YkQFskTNims8Dnk6PVHzbeTfo15tb4veAQKuvZlgM/PwyHuamYfE3mNNeNHF?=
- =?us-ascii?Q?f2tj3SLkWGEvQ7r8hrm4/pEPJOojULtyJdrjBNq+s5A+Uqd32Mm2L8YvDA0s?=
- =?us-ascii?Q?QCkkbMjnE7b6O1pYWfZAaQNJynSG3LqPyh+c6vkKOFR34hvPCAx2wyKFOPJR?=
- =?us-ascii?Q?J79WajSDUJX/tdnqI6xZGJQmJcTIYuh6z4gsmTN4YSeu3QXEASGGgGzzhcKF?=
- =?us-ascii?Q?zfsePCaKhr+AbcRd1SasvpfLGXhLQ/duUEfYkZXftcr2PV7l37BRSTYMYsS7?=
- =?us-ascii?Q?fJJgTIQQt/s9tfsEXe0KfiqTVO9eEx6+3F7U9hykj6TsNBRR/MwkPnyokBLT?=
- =?us-ascii?Q?aysgc5+Jx1iL+gP8xoldwU3gXJvBmkdjVh1fQgG0sEEp15SRid6lMmzJoEQp?=
- =?us-ascii?Q?kuYB7Jd+cbcrniaYGvRGq5eTqSmhtAfkYeQBjMnM+Lpp0a8Tgi2R5EuZbky7?=
- =?us-ascii?Q?l9JYNaQ/+WP2YRy83wlP5dGmZ3k2xybZF9rbYMiZuxBuC2dpYWg4pVlc51u9?=
- =?us-ascii?Q?613omIqsoSN4yvpHLcQj2Q5X8VD1rqedOOp3RMeGOAEyjfM3/Ug2O/z0rUFC?=
- =?us-ascii?Q?U9JlMB1nHN+1/M5n/Gd9KFFk4RuG2RHpcNmDFbLf3cKs59vS/IjG7HAVbxYt?=
- =?us-ascii?Q?irJvUB7GZw1F/zwYRozTfVNofLFJuA++YBvNwFGPJnvjYiOXqtqWsjxzvNGI?=
- =?us-ascii?Q?NXGtwvfGVQWAHzwwBoXczVHnWtLHYeLMgJDer0uV?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2257274-788b-456e-f932-08dc522c1816
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2024 09:14:11.9517
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HaQdeHcYTFVdp/ERhyY33fHWnbUBebhOZPP+5VKRv7G98iHb5N0gt6p/ltKwNWA6VSnPZJMGexjHCpkJzzNo9Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5140
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>, kvm@vger.kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, nikunj@amd.com,
+ thomas.lendacky@amd.com, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v1 3/3] KVM: selftests: Add a test case for
+ KVM_X86_DISABLE_EXITS_HLT
+To: Manali Shukla <manali.shukla@amd.com>
+References: <20240327054255.24626-1-manali.shukla@amd.com>
+ <20240327054255.24626-4-manali.shukla@amd.com>
+ <7e093e45-9349-4cfd-a0ad-78ae66edda90@collabora.com>
+ <5d667c81-56a8-95bd-4aa1-4df16c42dabf@amd.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <5d667c81-56a8-95bd-4aa1-4df16c42dabf@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 26, 2024 at 12:26:45AM -0800, isaku.yamahata@intel.com wrote:
->From: Isaku Yamahata <isaku.yamahata@intel.com>
->
->When BIOS eMCA MCE-SMI morphing is enabled, the #MC is morphed to MSMI
->(Machine Check System Management Interrupt).  Then the SMI causes TD exit
->with the read reason of EXIT_REASON_OTHER_SMI with MSMI bit set in the exit
->qualification to KVM instead of EXIT_REASON_EXCEPTION_NMI with MC
->exception.
->
->Handle EXIT_REASON_OTHER_SMI with MSMI bit set in the exit qualification as
->MCE(Machine Check Exception) happened during TD guest running.
->
->Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->---
-> arch/x86/kvm/vmx/tdx.c      | 40 ++++++++++++++++++++++++++++++++++---
-> arch/x86/kvm/vmx/tdx_arch.h |  2 ++
-> 2 files changed, 39 insertions(+), 3 deletions(-)
->
->diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->index bdd74682b474..117c2315f087 100644
->--- a/arch/x86/kvm/vmx/tdx.c
->+++ b/arch/x86/kvm/vmx/tdx.c
->@@ -916,6 +916,30 @@ void tdx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
-> 						     tdexit_intr_info(vcpu));
-> 	else if (exit_reason == EXIT_REASON_EXCEPTION_NMI)
-> 		vmx_handle_exception_irqoff(vcpu, tdexit_intr_info(vcpu));
->+	else if (unlikely(tdx->exit_reason.non_recoverable ||
->+		 tdx->exit_reason.error)) {
-
-why not just:
-	else if (tdx->exit_reason.basic == EXIT_REASON_OTHER_SMI) {
-
-
-i.e., does EXIT_REASON_OTHER_SMI imply exit_reason.non_recoverable or
-exit_reason.error?
-
->+		/*
->+		 * The only reason it gets EXIT_REASON_OTHER_SMI is there is an
->+		 * #MSMI(Machine Check System Management Interrupt) with
->+		 * exit_qualification bit 0 set in TD guest.
->+		 * The #MSMI is delivered right after SEAMCALL returns,
->+		 * and an #MC is delivered to host kernel after SMI handler
->+		 * returns.
->+		 *
->+		 * The #MC right after SEAMCALL is fixed up and skipped in #MC
-
-Looks fixing up and skipping #MC on the first instruction after TD-exit is
-missing in v19?
-
->+		 * handler because it's an #MC happens in TD guest we cannot
->+		 * handle it with host's context.
->+		 *
->+		 * Call KVM's machine check handler explicitly here.
->+		 */
->+		if (tdx->exit_reason.basic == EXIT_REASON_OTHER_SMI) {
->+			unsigned long exit_qual;
->+
->+			exit_qual = tdexit_exit_qual(vcpu);
->+			if (exit_qual & TD_EXIT_OTHER_SMI_IS_MSMI)
-
->+				kvm_machine_check();
->+		}
->+	}
-> }
+On 4/1/24 10:28 AM, Manali Shukla wrote:
+> Hi Muhammad Usama Anjum,
 > 
-> static int tdx_handle_exception(struct kvm_vcpu *vcpu)
->@@ -1381,6 +1405,11 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
-> 			      exit_reason.full, exit_reason.basic,
-> 			      to_kvm_tdx(vcpu->kvm)->hkid,
-> 			      set_hkid_to_hpa(0, to_kvm_tdx(vcpu->kvm)->hkid));
->+
->+		/*
->+		 * tdx_handle_exit_irqoff() handled EXIT_REASON_OTHER_SMI.  It
->+		 * must be handled before enabling preemption because it's #MC.
->+		 */
-
-Then EXIT_REASON_OTHER_SMI is handled, why still go to unhandled_exit?
-
-> 		goto unhandled_exit;
-> 	}
+> Thank you for reviewing my patch.
 > 
->@@ -1419,9 +1448,14 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
-> 		return tdx_handle_ept_misconfig(vcpu);
-> 	case EXIT_REASON_OTHER_SMI:
-> 		/*
->-		 * If reach here, it's not a Machine Check System Management
->-		 * Interrupt(MSMI).  #SMI is delivered and handled right after
->-		 * SEAMRET, nothing needs to be done in KVM.
->+		 * Unlike VMX, all the SMI in SEAM non-root mode (i.e. when
->+		 * TD guest vcpu is running) will cause TD exit to TDX module,
->+		 * then SEAMRET to KVM. Once it exits to KVM, SMI is delivered
->+		 * and handled right away.
->+		 *
->+		 * - If it's an Machine Check System Management Interrupt
->+		 *   (MSMI), it's handled above due to non_recoverable bit set.
->+		 * - If it's not an MSMI, don't need to do anything here.
-
-This corrects a comment added in patch 100. Maybe we can just merge patch 100 into 
-this one?
-
-> 		 */
-> 		return 1;
-> 	default:
->diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
->index efc3c61c14ab..87ef22e9cd49 100644
->--- a/arch/x86/kvm/vmx/tdx_arch.h
->+++ b/arch/x86/kvm/vmx/tdx_arch.h
->@@ -42,6 +42,8 @@
-> #define TDH_VP_WR			43
-> #define TDH_SYS_LP_SHUTDOWN		44
+> On 3/30/2024 1:43 AM, Muhammad Usama Anjum wrote:
+>> On 3/27/24 10:42 AM, Manali Shukla wrote:
+>>> By default, HLT instruction executed by guest is intercepted by hypervisor.
+>>> However, KVM_CAP_X86_DISABLE_EXITS capability can be used to not intercept
+>>> HLT by setting KVM_X86_DISABLE_EXITS_HLT.
+>>>
+>>> Add a test case to test KVM_X86_DISABLE_EXITS_HLT functionality.
+>>>
+>>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>>> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+>> Thank you for the new test patch. We have been trying to ensure TAP
+>> conformance for tests which cannot be achieved if new tests aren't using
+>> TAP already. Please make your test TAP compliant.
 > 
->+#define TD_EXIT_OTHER_SMI_IS_MSMI	BIT(1)
->+
-> /* TDX control structure (TDR/TDCS/TDVPS) field access codes */
-> #define TDX_NON_ARCH			BIT_ULL(63)
-> #define TDX_CLASS_SHIFT			56
->-- 
->2.25.1
->
->
+> As per my understanding about TAP interface, kvm_test_harness.h file includes a MACRO,
+> which is used to create VM with one vcpu using vm_create_with_one_vcpu(), but
+> halt_disable_exit_test creates a customized VM with KVM_CAP_X86_DISABLE_EXITS
+> capability set and different vm_shape parameters to start a VM without in-kernel
+> APIC support. AFAIU, I won't be able to use KVM_ONE_VCPU_TEST_SUITE MACRO as is.
+> How do you suggest to proceed with this issue? 
+TAP interface is just a way to print logs which are machine readable for
+CIs. So log messages, test pass or fail should be marked by
+tools/testing/selftests/kselftest.h or
+tools/testing/selftests/kselftest_harness.h. It depends on the design of
+your test that which would be suitable.
+
+It seems that most tests in KVM suite aren't TAP compliant. In this case,
+I'm okay with non-TAP compliant test as the whole suite is far from compliance.
+
+> 
+>>
+>>> ---
+>>>  tools/testing/selftests/kvm/Makefile          |   1 +
+>>>  .../kvm/x86_64/halt_disable_exit_test.c       | 113 ++++++++++++++++++
+>> Add generated object to .gitignore file.
+> 
+> Sure. I will do it.
+>>
+>>>  2 files changed, 114 insertions(+)
+>>>  create mode 100644 tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+>>>
+>>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>>> index c75251d5c97c..9f72abb95d2e 100644
+>>> --- a/tools/testing/selftests/kvm/Makefile
+>>> +++ b/tools/testing/selftests/kvm/Makefile
+>>> @@ -89,6 +89,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+>>>  TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+>>>  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+>>>  TEST_GEN_PROGS_x86_64 += x86_64/state_test
+>>> +TEST_GEN_PROGS_x86_64 += x86_64/halt_disable_exit_test
+>>>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+>>>  TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+>>>  TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
+>>> diff --git a/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+>>> new file mode 100644
+>>> index 000000000000..b7279dd0eaff
+>>> --- /dev/null
+>>> +++ b/tools/testing/selftests/kvm/x86_64/halt_disable_exit_test.c
+>>> @@ -0,0 +1,113 @@
+>>> +// SPDX-License-Identifier: GPL-2.0-only
+>>> +/*
+>>> + * KVM disable halt exit test
+>>> + *
+>>> + *  Copyright (C) 2024 Advanced Micro Devices, Inc.
+>>> + */
+>>> +#include <pthread.h>
+>>> +#include <signal.h>
+>>> +#include "kvm_util.h"
+>>> +#include "svm_util.h"
+>>> +#include "processor.h"
+>>> +#include "test_util.h"
+>>> +
+>>> +pthread_t task_thread, vcpu_thread;
+>>> +#define SIG_IPI SIGUSR1
+>>> +
+>>> +static void guest_code(uint8_t is_hlt_exec)
+>>> +{
+>>> +	while (!READ_ONCE(is_hlt_exec))
+>>> +		;
+>>> +
+>>> +	safe_halt();
+>>> +	GUEST_DONE();
+>>> +}
+>>> +
+>>> +static void *task_worker(void *arg)
+>>> +{
+>>> +	uint8_t *is_hlt_exec = (uint8_t *)arg;
+>>> +
+>>> +	usleep(1000);
+>>> +	WRITE_ONCE(*is_hlt_exec, 1);
+>>> +	pthread_kill(vcpu_thread, SIG_IPI);
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static void *vcpu_worker(void *arg)
+>>> +{
+>>> +	int ret;
+>>> +	int sig = -1;
+>>> +	uint8_t *is_hlt_exec = (uint8_t *)arg;
+>>> +	struct kvm_vm *vm;
+>>> +	struct kvm_run *run;
+>>> +	struct kvm_vcpu *vcpu;
+>>> +	struct kvm_signal_mask *sigmask = alloca(offsetof(struct kvm_signal_mask, sigset)
+>>> +						 + sizeof(sigset_t));
+>>> +	sigset_t *sigset = (sigset_t *) &sigmask->sigset;
+>>> +
+>>> +	/* Create a VM without in kernel APIC support */
+>>> +	vm = __vm_create(VM_SHAPE_DEFAULT, 1, 0, false);
+>>> +	vm_enable_cap(vm, KVM_CAP_X86_DISABLE_EXITS, KVM_X86_DISABLE_EXITS_HLT);
+>>> +	vcpu = vm_vcpu_add(vm, 0, guest_code);
+>>> +	vcpu_args_set(vcpu, 1, *is_hlt_exec);
+>>> +
+>>> +	/*
+>>> +	 * SIG_IPI is unblocked atomically while in KVM_RUN.  It causes the
+>>> +	 * ioctl to return with -EINTR, but it is still pending and we need
+>>> +	 * to accept it with the sigwait.
+>>> +	 */
+>>> +	sigmask->len = 8;
+>>> +	pthread_sigmask(0, NULL, sigset);
+>>> +	sigdelset(sigset, SIG_IPI);
+>>> +	vcpu_ioctl(vcpu, KVM_SET_SIGNAL_MASK, sigmask);
+>>> +	sigemptyset(sigset);
+>>> +	sigaddset(sigset, SIG_IPI);
+>>> +	run = vcpu->run;
+>>> +
+>>> +again:
+>>> +	ret = __vcpu_run(vcpu);
+>>> +	TEST_ASSERT_EQ(errno, EINTR);
+>>> +
+>>> +	if (ret == -1 && errno == EINTR) {
+>>> +		sigwait(sigset, &sig);
+>>> +		assert(sig == SIG_IPI);
+>>> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTR);
+>>> +		goto again;
+>>> +	}
+>>> +
+>>> +	if (run->exit_reason == KVM_EXIT_HLT)
+>>> +		TEST_FAIL("Expected KVM_EXIT_INTR, got KVM_EXIT_HLT");
+>>> +
+>>> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+>>> +	kvm_vm_free(vm);
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +int main(int argc, char *argv[])
+>>> +{
+>>> +	int ret;
+>>> +	void *retval;
+>>> +	uint8_t is_halt_exec;
+>>> +	sigset_t sigset;
+>>> +
+>>> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_DISABLE_EXITS));
+>>> +
+>>> +	/* Ensure that vCPU threads start with SIG_IPI blocked.  */
+>>> +	sigemptyset(&sigset);
+>>> +	sigaddset(&sigset, SIG_IPI);
+>>> +	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+>>> +
+>>> +	ret = pthread_create(&vcpu_thread, NULL, vcpu_worker, &is_halt_exec);
+>>> +	TEST_ASSERT(ret == 0, "pthread_create vcpu thread failed errno=%d", errno);
+>>> +
+>>> +	ret = pthread_create(&task_thread, NULL, task_worker, &is_halt_exec);
+>>> +	TEST_ASSERT(ret == 0, "pthread_create task thread failed errno=%d", errno);
+>>> +
+>>> +	pthread_join(vcpu_thread, &retval);
+>>> +	TEST_ASSERT(ret == 0, "pthread_join on vcpu thread failed with errno=%d", ret);
+>>> +
+>>> +	pthread_join(task_thread, &retval);
+>>> +	TEST_ASSERT(ret == 0, "pthread_join on task thread failed with errno=%d", ret);
+>>> +
+>>> +	return 0;
+>>> +}
+>>
+> - Manali
+> 
+
+-- 
+BR,
+Muhammad Usama Anjum
 
