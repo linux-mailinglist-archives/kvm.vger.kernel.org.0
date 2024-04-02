@@ -1,206 +1,183 @@
-Return-Path: <kvm+bounces-13355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFB62894E02
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 10:53:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6883894E43
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 11:05:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EA551F22C35
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 08:53:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53A181F211EE
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 09:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C7251C4A;
-	Tue,  2 Apr 2024 08:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B812E5812D;
+	Tue,  2 Apr 2024 09:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YiP66Yvp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pCC4bfr3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5AD4778E;
-	Tue,  2 Apr 2024 08:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712047984; cv=fail; b=BufsiJo+YeF9scAi8tSTOaUzVuUIY2FloxN0Ol/jvx+I6QOo+mQbjt8L7tZiHPq8AxKQuCEhDlguqtufxMQnSVnl5WUNJZf/h4gMB3lPH8MrYlllkLtWU+lM89i8okmAttGYeTHT+JuERoNDrhl4cfvfgSGog/yScy24raFyih4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712047984; c=relaxed/simple;
-	bh=dSCEziGDFic31y8YzwKT/HbEkbttIioh73ScuveSlI4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=FS8fYiBTAkxHZLn3v3DcIpgLIIRL1EClcUhihhVdKIGnvqvB39rKDxH3PmleZy7vFJUJ/oswrfzS4TkvFCu7h0OUaIVbxOXfDCUjouAHgPC59jcBL5nt7e6ZA6i1melpKCwBfPytu/GYeGf0Mn7amcbi7DupiR9P+n/b9GHLymQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YiP66Yvp; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712047983; x=1743583983;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=dSCEziGDFic31y8YzwKT/HbEkbttIioh73ScuveSlI4=;
-  b=YiP66Yvp5q/TLgP+gYnhQKQcH7XXmwt95gNbyh9yk6m+0fXon8mDOMKR
-   P0Pos1tnSHUSe/5JXnybMWmTyODa+IFcI5PlS3PgXUfiGlODxNidkExBj
-   6AtwAinzrS7pSDeR/Lr0MvJj9MT0yRkewwITlhHSTUa7Oi0Hju32LjimM
-   2rgNEuKh9x3TglJ4dvh2LIV+p7NwPx+un9tXu5LvSWGGp4v+VHp50K00S
-   3YmYmnxweDVcGN5Lo4z9P2NfWJ2cWxOyOom80S3ONoykJ24O/GUyATCRb
-   VgudVX9d02TP48jgfq7uVH3IKH/W9P+wqMbSySOafTqn3CzMFinSgQhUG
-   g==;
-X-CSE-ConnectionGUID: Or+j1kkXRhizbVC/7PSJMA==
-X-CSE-MsgGUID: dJ4cvGnxRx6TZdXeUBh5EQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="17930784"
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="17930784"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 01:53:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="22474905"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Apr 2024 01:52:58 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Apr 2024 01:52:58 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Apr 2024 01:52:57 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 01:52:57 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 2 Apr 2024 01:52:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CopLGe1j3HV8Hg3qYWq7/drJQzB4xA1H0V2q4A9ETAnTUY8qG+RxN0UbnlzDlKVPSER90I89Zaguel+0wHBru+9NUprSysQ0XRJCqq//dppIbMIAzY07vAkpEaMvvqpLgyEjIPK8vZ0i8NNXVO30HWdeO4SR8p26iNd8nwse4dgvWzQaE18nbT/rCDFzLnlwwPn62hsZ6x8LgWGbJE7jhzay5ubD8rf+J/q6PCc3hfWrM1sA7C8oTQdBCyELZpkpepSWC5DHYtb+mI/2vtELZGVaBnj9cfLumrWE26sbatPv3CpmfweXbo9FfDAz9Q20hHWL2p688aGoj1VJThhXnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xbpPE8aHgca/VbPgEgwsgHZCtYlj8VIiMNFTWrl8McQ=;
- b=XD4OL7+LIpW2957xjyB8yt03Ys6KmhfUkGLrIxF2fFpenCqxpICqI9NCYC6eTSswqtfJ+mGKUga6Gy9tvmd3QFRQ3TwtdlhImaE8GmJC+trBh0SCIpO1jCqbVaMlXR7LLrrK/v84pMnXxjU+bJsxy4yAgZWv7JvdnjV9hNVxSL/of7Df6m2z8EjYyJgxMSIYQHpMJI1kc3X2Zjdv1OTcg4MsUeBtemIIcTby4u88mbxXNZa56ZFR8PxuLPdDDtLyVtn8ZlvQDuk0ZtJ6dvGd3qJIUYCVUEX3SPlSAiVnlQvrlqygOPj1miXJ9/sCchcmFffrgcAxF+wOStoosLyKuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by LV8PR11MB8700.namprd11.prod.outlook.com (2603:10b6:408:201::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.25; Tue, 2 Apr
- 2024 08:52:54 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::5135:2255:52ba:c64e]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::5135:2255:52ba:c64e%4]) with mapi id 15.20.7452.019; Tue, 2 Apr 2024
- 08:52:54 +0000
-Date: Tue, 2 Apr 2024 16:52:46 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: <isaku.yamahata@intel.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	<erdemaktas@google.com>, Sean Christopherson <seanjc@google.com>, Sagi Shahar
-	<sagis@google.com>, Kai Huang <kai.huang@intel.com>, <chen.bo@intel.com>,
-	<hang.yuan@intel.com>, <tina.zhang@intel.com>
-Subject: Re: [PATCH v19 105/130] KVM: TDX: handle KVM hypercall with
- TDG.VP.VMCALL
-Message-ID: <ZgvHXk/jiWzTrcWM@chao-email>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <ab54980da397e6e9b7b8d6636dc88c11c303364f.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ab54980da397e6e9b7b8d6636dc88c11c303364f.1708933498.git.isaku.yamahata@intel.com>
-X-ClientProxiedBy: SG2PR01CA0181.apcprd01.prod.exchangelabs.com
- (2603:1096:4:189::13) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADB157305;
+	Tue,  2 Apr 2024 09:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712048688; cv=none; b=n3qtJF5qpdQE5O1EcgdH/k5Hef1IxUPvEtNb8oRqe6AZj/ZlJK4swbfcUzIG8AM/bt5tjYo8QfwmoIBLCUeT95DE395FCN9JFMZpafqsSW5Y8MvzpYLmlY6igTI8i3Mt7hpwtXCAxS6S/9xKyGUuIOdyHuevbsAjK9nMggXdYxo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712048688; c=relaxed/simple;
+	bh=YvAxsRirqP9WIUZqYwF0tiTfjgDxAvwrGrHJaBMhnbg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJw0pWL92Na0iVJzfb+DbQLpuoRT3SiwP2Hzyq8x8XGkDZr9hSixS+AHGfNyVGcNFLIZCEoKEoqECIlKSQiadZA913auzQp1lAqgBYqa5SV3nvziOTuh4CE8g+FcX4eQxHsH9DJXkTLWR0fbqm4fN5jy9CVsBt4c71SP6cYuFnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pCC4bfr3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/sLPoPRj7yaTMRifvssA4ocGQZQ13k50t3gTbGc6at4=; b=pCC4bfr3tEL7rd4uaTZq+6Fpyu
+	d+b3YySnKJPGaKKYgvve+kH+pO/ODBmZxycpxzsqacSBSdWqeYQDiEntqiuyA5cau6k33vgQiFDsO
+	qTlXke5NWkvtiCNdtwLxqrMeHOqaPZAmWI1PdAVLlcOnyjRqTOfUDAgYt7IIyRB97bgcLAVGHikxE
+	6FDGpSBr+ssVKqsGTlUYERTuxv8xLEMlCVg1uHs/VSLGiOfXKS+hO9Wxmm/9/x+Mpwtl6Z95AWH3e
+	Q6UlRsos1rowDkHF5p/nblE1JIq7nT7xR6M/TLYUUxuWJoHm2dDiLno9T0narThxj9NxMVoafbYWi
+	Xo6yfp7Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39088)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rrZwT-00061T-21;
+	Tue, 02 Apr 2024 09:56:29 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rrZwH-0006pd-Kx; Tue, 02 Apr 2024 09:56:17 +0100
+Date: Tue, 2 Apr 2024 09:56:17 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mike Leach <mike.leach@linaro.org>,
+	James Clark <james.clark@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Vinod Koul <vkoul@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-input@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 00/19] amba: store owner from modules with
+ amba_driver_register()
+Message-ID: <ZgvIMRDfeQaeVxYt@shell.armlinux.org.uk>
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+ <f514d9e1-61fa-4c55-aea1-d70c955bb96a@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|LV8PR11MB8700:EE_
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Q/hCyoi4BkRhJoRGz4fymdcsjsW9KiqprCJUkZh/tLP2RKGlgdtb+EcDNpoV3adWGG+jtRAKa7n/WL1kxCZJB2Qf7A0VgqEqAWsCbO/bNkyu49lSUt1nWEgvKYreWxGMBQLlGWH5N7XlhUM9QGVAO1ARJLE8Yz0TSFZtyeeM8jlJrc3tJWiERqxQHf87oDTb9GhWRnlIqJS8E1SaklqIsXac0WqrWtuJea8REoxvf4xsgXuk7I7yQDb9B1hY36QKwG2DRKWYzvV7Fe5ytMGfKjEfrWJDyLE0PTFP/DmRCUzf85y93c5iUfe/S4YX/R3VvpuS1lUPD9m1781GiLVexBoyZXJH6Ag0YeSfCmDd+FF3MFZlspuN7kl5T/aiGU/J6Tmdmx8ZEE6K6bJhQc8lNxkJK3ly6u+SmRVGZonRy79uydSYpdRxkx7rHLvfcgX12bzEo0pDO7YK3lyTOqNF3itd6uvWhv0knv23A4lX085tzXWDFUzMxRBVrnJeTEYWNcnjTW3YHDPT8EPNtp2777TK3AgB/viV97HwmlWmQCGFWZMOcDqdoOB8OVzXW8CND26Qjpg+0HO09mGOUiJEudjQLeIexSMKduSfok0vrTlM8GbCC0F4QH4kH36RyhUqjo2kdpQp1PXRwq3u+VU5aDWWuyDxOkeFrIJ0ATddcKA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XR66TyzM6MmCBgjHLfCUO2Zyuz4rfVZjg5V/p2Mn/RFoIbxII1YWuwVw4NJw?=
- =?us-ascii?Q?2fAC44nb89MRLlHs53odMOlLmzjz2zuTHvKhgwYlhrlWSNyLlg5PkUGwEZPK?=
- =?us-ascii?Q?iK4/KxPPH2ZG2QZcJMx9e0dAP6O+KSi/JF8LkVJU9yozMKcpltazK4OGyfTP?=
- =?us-ascii?Q?sozSfMte7GetGbDvfw03883Agh6Z1sPosXhBArcfBjhoHnIWE+km1Zohg253?=
- =?us-ascii?Q?2qwuoVCGGgTftpo+pXm7c35Khnn88bceA513WhwIjWUtXyPk4fgeJG9SXfir?=
- =?us-ascii?Q?2vsCMOLw8At4eaGe+59QF8c5mWlc47RsZSaZlZdYgoM6C+nxm2B8Mw7sHk77?=
- =?us-ascii?Q?Inp34fsWozmRfeo7uxl+1hRvhcsbK/wgwEBsdC1UxYZGI+bn13er/pVVBl8J?=
- =?us-ascii?Q?vuhczFZ4Hyxq/Ocq3hWCYlE1kzkhll5rZYmtkHt5U05ETnxM+2zL8TAxa7la?=
- =?us-ascii?Q?kLj0bqGuqEmTJ6yvPN0R0S+C/caHM5iahmpH68am6y7dR9EnGs5IcKY6GCP6?=
- =?us-ascii?Q?r8OY0vrkc9B1EJ5IBfO0h41sZ+2hkN4P0+5em4DQ50e67NCMa4WDnJj/2l5h?=
- =?us-ascii?Q?PSwoTXldZzoJHvP8NWiJT4+sqktwJMeDW6vDarLCr/xVKwGBnkXr05TpTUjT?=
- =?us-ascii?Q?P5BNxC85Tuel/59d90FaZhIlP1F4orw2OCZW5JULbrwDlKNfB3Qd7X3fZCzN?=
- =?us-ascii?Q?iauwuZi7eN7UQYUWg89jO/mQ/ALGeAlDosN8rzrh50KZBLmk31EtWGUVQJOU?=
- =?us-ascii?Q?5+bk9TRjcBHZJhEWnCo+RfH+W43R71qWdWqiyDbQclzPeGtuJm6HJfJg7a5F?=
- =?us-ascii?Q?P0PXE8QG9DQe5egUBQSFfqeu3l8UVUL3naRotgr4aE4wQjkC0ALI2qCC4/g7?=
- =?us-ascii?Q?n00FPdhT1T7VrCdK4us4o9UhUvPTDX/pR9dYlO5mLPaELlKM1bj7j0ZlRWCv?=
- =?us-ascii?Q?xN542r3xPgVxoovBVDOTov7knZByFGm6bnqZUq8Txg5JzuHbKrr5v+/JTwt3?=
- =?us-ascii?Q?J9w8sjmfMpyVUwZCXw+FVtb/q9e0ZaOk8nRGiv0RLzIdndKr+dhb8zBUek7P?=
- =?us-ascii?Q?yTdUB9/G1jvaIfp1PLzItuGXFWgEvgHyHQT9DK2MyuotOythl79oAC1ITMwB?=
- =?us-ascii?Q?TXP1c5diOoH5cYEOcHHuCwM1ruiBWqBjxXblDN57UPyMbFEwyNnyB0IqjHTO?=
- =?us-ascii?Q?h54b64NP4Mn02Uu0co4m/AQ0gs/2G2AArH/W421khffASLkmHSYXtaxBuAVE?=
- =?us-ascii?Q?kIfU53zGB2LpecZB/g6zYE5N6MIOmG1GMzh34M/a4/1dfF9stsmX/Bxv3ORd?=
- =?us-ascii?Q?5dUULPFP5qO2GV4jfHG8vBOjzh9/Frjj3YKQDd87yfTf4Kg+CIsuo734c7Nq?=
- =?us-ascii?Q?DcrxgKCidYmFIwzAAuq9oJjQzxE9ZBA9J7PDI06uat6kRaqr21jCxxSCulO8?=
- =?us-ascii?Q?RHBVtvXfw0hqNZ84bmbJ8yJ9rBp3Kd6GO7Wagc7xwmxRDGQYD1dEyMxto21J?=
- =?us-ascii?Q?WJHwPiViAQl6OjtCOrg/NkiQ3ZZ29gJeZA1LdsJHaw8h+zSky4HWI1RUGSXN?=
- =?us-ascii?Q?7ncTujEKFOsJAMj2dTkF/kmQ+9Fq8abz9c0a6OBR?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: cbf73535-3304-4c33-6a79-08dc52f24967
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 08:52:54.8052
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EjVsKh/Zo/YYh+P2idGu9LQe5VF+UEDzJt1FarTsVE37FHAjUZ5FlvXKyMUqM+af0Ks2MjudT56bTScga8PzEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8700
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f514d9e1-61fa-4c55-aea1-d70c955bb96a@linaro.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
->+static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
->+{
->+	unsigned long nr, a0, a1, a2, a3, ret;
->+
+On Sat, Mar 30, 2024 at 01:18:30PM +0100, Krzysztof Kozlowski wrote:
+> On 26/03/2024 21:23, Krzysztof Kozlowski wrote:
+> > Merging
+> > =======
+> > All further patches depend on the first amba patch, therefore please ack
+> > and this should go via one tree.
+> > 
+> > Description
+> > ===========
+> > Modules registering driver with amba_driver_register() often forget to
+> > set .owner field.
+> > 
+> > Solve the problem by moving this task away from the drivers to the core
+> > amba bus code, just like we did for platform_driver in commit
+> > 9447057eaff8 ("platform_device: use a macro instead of
+> > platform_driver_register").
+> > 
+> > Best regards,
+> 
+> I tried to submit this series to Russell patch tracker and failed. This
+> is ridiculous. It's 2024 and instead of normal process, like every other
+> maintainer, so b4 or Patchwork, we have some unusable system rejecting
+> standard patches.
 
-do you need to emulate xen/hyper-v hypercalls here?
+Sorry but no. Stop being offensive.
 
-Nothing tells userspace that xen/hyper-v hypercalls are not supported and
-so userspace may expose related CPUID leafs to TD guests.
+> First, it depends some weird, duplicated signed-off-by's.
 
->+	/*
->+	 * ABI for KVM tdvmcall argument:
->+	 * In Guest-Hypervisor Communication Interface(GHCI) specification,
->+	 * Non-zero leaf number (R10 != 0) is defined to indicate
->+	 * vendor-specific.  KVM uses this for KVM hypercall.  NOTE: KVM
->+	 * hypercall number starts from one.  Zero isn't used for KVM hypercall
->+	 * number.
->+	 *
->+	 * R10: KVM hypercall number
->+	 * arguments: R11, R12, R13, R14.
->+	 */
->+	nr = kvm_r10_read(vcpu);
->+	a0 = kvm_r11_read(vcpu);
->+	a1 = kvm_r12_read(vcpu);
->+	a2 = kvm_r13_read(vcpu);
->+	a3 = kvm_r14_read(vcpu);
->+
->+	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, true, 0);
->+
->+	tdvmcall_set_return_code(vcpu, ret);
->+
->+	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
->+		return 0;
+Eh? There is no such logic in there.
 
-Can you add a comment to call out that KVM_HC_MAP_GPA_RANGE is redirected to
-the userspace?
+> Second it > submitting patch-by-patch, all with clicking on some web
+> (!!!) interface.
 
->+	return 1;
->+}
+Again, no it doesn't, and you're just throwing crap out because you
+failed. Unlike most of the "normal" processes, the patch system allows
+you to submit both by *email* and also by *web* for those cases where
+the emails get screwed up by ones company mail server. That's why the
+web interface exists - to give people *flexibility*.
+
+The fact is, the web interface is merely a front end interface that
+generates an email and submits it in the usual way by email - an
+email that you can perfectly well generate that is *very* close to
+the standard email that git format-patch generates.
+
+The *only* difference is that the patch system wants a KernelVersion:
+tag in the email _somewhere_ and it doesn't matter where it appears.
+Git even has support to do this.
+
+  git format-patch --add-header="KernelVersion: $foo"
+
+Why does it want the kernel version? Because when we were running 2.4
+and 2.5 kernel versions in parallel, it was important to know which
+tree the patch was being submitted for. It has continued to be required
+because it means when there's problems applying a patch, it gives me
+the additional information about the base used for the patch (and it
+keeps on being useful to have.)
+
+> That's the response:
+> -------------
+> Your patch has not been logged because:
+> 
+> Error:   Please supply a summary subject line briefly describing
+>          your patch.
+> 
+> 
+> Error:   Please supply a "KernelVersion: " tag after "PATCH FOLLOWS" or
+> "---".
+> 
+> Error:   the patch you are submitting has one or more missing or incorrect
+>          Signed-off-by lines:
+> 
+>          - author signoff <krzkreg@gmail.com> is missing.
+> 
+>          Please see the file Documentation/SubmittingPatches, section 11
+>          for details on signing off patches.
+
+Lots of people use it without a problem. I've just run the parser
+through its offline tests, and it parses email content correctly.
+I've no idea what you're doing wrong, but it looks like something
+pretty serious if it didn't parse the subject line.
+
+Rather than getting stressed about it, why don't you send me an email
+the first time something goes wrong so I can investigate, turn on
+debugging to capture the problem email?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
