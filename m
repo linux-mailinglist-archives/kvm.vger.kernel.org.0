@@ -1,77 +1,80 @@
-Return-Path: <kvm+bounces-13345-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13346-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5221E894BDC
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 08:53:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F30894C08
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 09:00:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6614282CAD
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 06:53:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47E53B231DD
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 07:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C1A3308A;
-	Tue,  2 Apr 2024 06:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8144833062;
+	Tue,  2 Apr 2024 07:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gc52YStr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KgJN+PKw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D33B2C689;
-	Tue,  2 Apr 2024 06:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D724F328A0
+	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 07:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712040778; cv=none; b=QkmIxn2zOH8OmQN0XRyO1B7/8aplc2Hmp2ghO0KzOGmF7OsiKsJV9JM07wOsiQCwD5rcceyqXMPvNeni4dSnPWBW1uL6rW5DFznE2t1AY2dvQdNS90pzlXp1d5sbOkqPFWxQoN2xnb/1bFMCAaSq7kO5zwfld0UUVxVFrzbMkCo=
+	t=1712041236; cv=none; b=m06oJoM9njSUc5hAote/0OXjNWyqYD56rJkQv4t8SIVhrbmVc8pbb5seO48SWSrFoznCP6Nc9nCIfI8CneitI9hA0YN/OLUcYxHkmvY8JYIYksEFnXF9iLkZpzQ/hL9MU8EhELO+iuxl/5INxwuwBA1j4dmySCUP9spVFqMErC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712040778; c=relaxed/simple;
-	bh=8U+o5ZPPyeR6k/u71wLfHh1u9kvqRkSFl8fCN0tDQ0s=;
+	s=arc-20240116; t=1712041236; c=relaxed/simple;
+	bh=DWwpz4wCjpd3OHwoJNho95qF247VTvrYLLaNHUDRIQs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sisbg8bK/xwsuZNbhfnXdVv5EcSw3xHiDebjj4hwjn7CoCRWCOX80p96cdxR95H21Oj3G5fv/B/ye+5Fu1zgW5VDF3jxjWGzXJOwoQzqP20kgvwhMb8NzbH1TmSoTJM6Et62BA1UsAdrl+ZgxX4Aiufb2zGsq8Al4LX9tFvNj7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gc52YStr; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712040775; x=1743576775;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8U+o5ZPPyeR6k/u71wLfHh1u9kvqRkSFl8fCN0tDQ0s=;
-  b=Gc52YStrdzIIIEeUgDrpxBK8ktSVfvANZCcH9jlco4zGRv+WnLXRtVaB
-   4JFrYdxwvwhisChcYrACnLgNyQOF6/2xzO/qi01zkK6gj0YVPDGRyajSW
-   xahiHX4mfSadQRHwKtCqk+dH+dF4XBRweOKDHQXam2m5lj22oHb57WC6V
-   IQKl3iT5DiHVoD77z0IHw8uFmgJ5dvYyCws3g8TnKvQJyxubjf6BRHxpr
-   y9KKgNAoDs9JWFZmCAYc5a2ZZe+vQVV7uRl75qnv0ZGb4cL7oeYPxhQDK
-   cBIwq1YHDetanHVf05Ukik9IXKPdnC3Mem36vScgwe7LRU4HRTcTkLb7S
-   Q==;
-X-CSE-ConnectionGUID: uleWtztsRvac2Q32WZWFEQ==
-X-CSE-MsgGUID: 5XhIILKkQZy15smCwQVA+w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="7095788"
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="7095788"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 23:52:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="22409021"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 23:52:54 -0700
-Date: Mon, 1 Apr 2024 23:52:54 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	 Content-Type:Content-Disposition:In-Reply-To; b=IgMPrhEkk7d8U//zGniJQw5g1DP2406iYI5BIAek4UaBOq4klxAA5n1V1slFSh39qw1qAh+V1c4BHkueH6X+LXwtwdZ6Rr7Dr+2Uf0UMmCH8T/ZaE38ZdbjvD1JEgYPBz14hZvQW+vnl7Rc9ICwmkWp3OszZW5OsBwtEdt9L0GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KgJN+PKw; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 2 Apr 2024 00:00:12 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712041232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jhuzyWXDmRkSGaUwWTpdDkWh7n7iwav7be8n1ReoOqg=;
+	b=KgJN+PKwUf4lvMCNNgRHnuy8Gq613K2HNrcIC+CQUk8Sf/7s4Hx+E56N6lZRoCSA0Dlm9q
+	gxlbMuDbSrzUHZgC90oQuyB0Kd8gPYgsVUsYB6BOdjK0DzwQ2E0WmDAtMn29DrZYMJC+lr
+	+c9QBLLVlmBOcBZkzESUyH9WEo8wfW4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Yu Zhao <yuzhao@google.com>
+Cc: James Houghton <jthoughton@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>,
 	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 093/130] KVM: TDX: Implements vcpu
- request_immediate_exit
-Message-ID: <20240402065254.GY2444378@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <3fd2824a8f77412476b58155776e88dfe84a8c73.1708933498.git.isaku.yamahata@intel.com>
- <ZgYfPAPToxbgGZLp@chao-email>
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	David Rientjes <rientjes@google.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 6/7] KVM: arm64: Participate in bitmap-based PTE aging
+Message-ID: <Zgus_A_cJ68f6glV@linux.dev>
+References: <20240401232946.1837665-1-jthoughton@google.com>
+ <20240401232946.1837665-7-jthoughton@google.com>
+ <CAOUHufaQ-g6L5roB-3K0GamuS3p9ACpPj9XM-NF67GgrjoTj_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,30 +83,39 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZgYfPAPToxbgGZLp@chao-email>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOUHufaQ-g6L5roB-3K0GamuS3p9ACpPj9XM-NF67GgrjoTj_A@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 29, 2024 at 09:54:04AM +0800,
-Chao Gao <chao.gao@intel.com> wrote:
-
-> On Mon, Feb 26, 2024 at 12:26:35AM -0800, isaku.yamahata@intel.com wrote:
-> >From: Isaku Yamahata <isaku.yamahata@intel.com>
-> >
-> >Now we are able to inject interrupts into TDX vcpu, it's ready to block TDX
-> >vcpu.  Wire up kvm x86 methods for blocking/unblocking vcpu for TDX.  To
-> >unblock on pending events, request immediate exit methods is also needed.
+On Tue, Apr 02, 2024 at 12:06:56AM -0400, Yu Zhao wrote:
+> On Mon, Apr 1, 2024 at 7:30 PM James Houghton <jthoughton@google.com> wrote:
+> > Suggested-by: Yu Zhao <yuzhao@google.com>
 > 
-> TDX doesn't support this immediate exit. It is considered as a potential
-> attack to TDs. TDX module deploys 0/1-step mitigations to prevent this.
-> Even KVM issues a self-IPI before TD-entry, TD-exit will happen after
-> the guest runs a random number of instructions.
-> 
-> KVM shouldn't request immediate exits in the first place. Just emit a
-> warning if KVM tries to do this.
+> Thanks but I did not suggest this.
 
-0ec3d6d1f169
-("KVM: x86: Fully defer to vendor code to decide how to force immediate exit")
-removed the hook.  This patch will be dropped and tdx_vcpu_run() will ignore
-force_immediate_exit.
+Entirely up to you, but I would still want to credit everyone who
+contributed to a feature even if the underlying implementation has
+changed since the original attempt.
+
+> What I have in v2 is RCU based. I hope Oliver or someone else can help
+> make that work.
+
+Why? If there's data to show that RCU has a material benefit over taking
+the MMU lock for read then I'm all for it. Otherwise, the work required
+to support page-table walkers entirely outside of the MMU lock isn't
+justified.
+
+In addition to ensuring that page table teardown is always RCU-safe,
+we'd need to make sure all of the walkers that take the write lock are
+prepared to handle races.
+
+> Otherwise we can just drop this for now and revisit
+> later.
+
+I really wouldn't get hung up on the locking as the make-or-break for
+whether arm64 supports this MMU notifier.
+
 -- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Thanks,
+Oliver
 
