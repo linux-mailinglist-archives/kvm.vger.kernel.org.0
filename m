@@ -1,97 +1,128 @@
-Return-Path: <kvm+bounces-13381-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13382-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 826A589588E
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 17:47:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC71895894
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 17:48:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3E911C24325
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 15:47:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B603428C16C
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 15:48:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E854C1350CA;
-	Tue,  2 Apr 2024 15:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AD91327FE;
+	Tue,  2 Apr 2024 15:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q9F04aZT"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="RlrFQ/As"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24EB132C39
-	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 15:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F08812BE80
+	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 15:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712072668; cv=none; b=STACOjwOob8iIqhO8SSaOBGRggGSE+HvX+FyuNrHByD9C5JowqensqLL9EPSqOyqnMTFBfUqJ7gtRHwymqX7W9mwNRJagW5IukChLueK0KUD5Ahn8X2WuOkcBhFdAfufpw/lz/AI7Ilqz335T5X1a0+K/Hf74KfSq5cxqNwAM6A=
+	t=1712072897; cv=none; b=sdiap8dgl+5mmKLf00Sy7aVYD1yBdstZXXxRRuvjRwFZL0BUCdPK0w7fW7ki+OrRLJtib0fP/a+ExMFFRRe+8AfjsPqLdz8zs27Yoan/svrEcSFRp97RnOSnee8j9e7YkZ2QcOr+1VL4VplenCGm9OkLfcp1ds70+rRus02uHjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712072668; c=relaxed/simple;
-	bh=FZ1kRiCIpDWNICn01dAhDn4j0RRbl9765EuryHQVYMg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=O4FZKG6aP6PlvnYuQyxVoxOFpBshlOnEwDsRRygWT5Tf/h9e8msnUUxnjDL66sJ37zEFCDfC1r+kvOuBv5BWH9nj61al9vv7H2Y/TywioJAdcPGX5kEKz9xdTw261suCELx59fXs7NF9VAEhI3oqJFrim9DnjCdpycYlWJ7U3BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q9F04aZT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 850B7C433C7
-	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 15:44:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712072667;
-	bh=FZ1kRiCIpDWNICn01dAhDn4j0RRbl9765EuryHQVYMg=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=q9F04aZT6j1pPqPU0HzjSTYWgwd0DDpUpvI/cYBmW9lo1TMQL26dTDGK2Gs453AKy
-	 Fp/LvUhC6eePmZOjqG1nZ74PqJBMw4qOz044/vcxaeVMOLivy6BoEetWW6I/o+tSbG
-	 9Ri/4YWehYB0TihzGqdX15vy5Vjqo/HxDlh+jeae3buIzVi4RIgHv3RSc4B22Zh1hx
-	 8lamlMQqDfSHNK3oy6qThnWFvLp6hxjvMy4+oFQaRPL/A1DsVyr5szD2qfVXiVVFuJ
-	 KVTZASlRJVG2xiy+CgW9NcXaNUzCL/SfGWjmgQ3nMKgXuYLCkg3obHaWT1vWOzeasb
-	 aBOPIHulgGzpQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 7857BC53BD6; Tue,  2 Apr 2024 15:44:27 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218621] WARNING: CPU: 5 PID: 11173 at arch/x86/kvm/x86.c:12251
- kvm_vcpu_reset+0x3b0/0x610 [kvm]
-Date: Tue, 02 Apr 2024 15:44:27 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-218621-28872-YftfHWEce4@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218621-28872@https.bugzilla.kernel.org/>
-References: <bug-218621-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1712072897; c=relaxed/simple;
+	bh=DZDlyJOl8reNU/825mHIBH7UH13yjSF26y6/tdEv/zQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=UApp2Gddr71B6jsJwHSX+uD6sjQp/fTJjg/4Cxb63rBb1FykeW41mXtzJ3yUTJYVyTZ2u8opAMRMUXBSUdqvTwEyHKXlebjKuK3rJupdhDhOk2yFvl15DnF1TFBK28w8HEPLsKcFgYjArWpUxJNEL0MFx9tMeaI5LD5gKVLUuh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=RlrFQ/As; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-368a97b31d1so22699885ab.0
+        for <kvm@vger.kernel.org>; Tue, 02 Apr 2024 08:48:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1712072894; x=1712677694; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fB9wvfeaRu0tbAm21VpziSooOQ2M5ya0jZi8/+/ocMk=;
+        b=RlrFQ/AsRZIBDbf4ofeb1GY7z/3eOzi/uWexvopAX4FRlvdBbiAYOzJuFBPBumjUHg
+         VZk5og31JxF+ru7cU+fCG0zxEoQtd789EWE/1e9ZEduAnNFCYYUgI9Htqw4addCsnudK
+         XjgSRrSgmMQwYsh+iaB/9OLm3o+R1Q9NVBenEvak1bXwUb2MFli1T9qNuaaaCJLUeBeK
+         KgfcThHXUn2onomOEG3V/UONnj4YUU2HWX68JeTX/CB+quTO8Rb7+XFXegYxwSxCvJzZ
+         ZzdKaBVc5wUV13qvRS4ujVOnA50GlDZuQXfjLFthrF9s0zUVp6lEE1WyZZvw0kkW8Dur
+         R8uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712072894; x=1712677694;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fB9wvfeaRu0tbAm21VpziSooOQ2M5ya0jZi8/+/ocMk=;
+        b=BTN2Kvw9yrZJwzrIaH9xY3ElXznBGgFWmSM/eZcqfb3L/+LkcSMTOmPSLSMrjb98O3
+         wMRcIHYOI4K5XuRgyHxg6feLUGPPvPYsdeOUsNW9Q8qS+Iw1IPVzfVEM0HAT9QL7QXXs
+         koj/jB47IbPjrFed20zC5XFWmHVnBRc7Cr1WawjD4vjq8AYco76M+DmTglhIXMEdJduX
+         aX+Y8AjsSnvBBmAhhxcsPX7Op6mKQkEJraNhXkCPDbfJ/kSiWaQpWPuwj/0rZvB9Nbxp
+         JNqap1AZWWt062Uvb2oSCnxBg/nclKmRcDybOyjeCq28ND3fYkleOfOO1ivxy4h55qe5
+         yNsg==
+X-Forwarded-Encrypted: i=1; AJvYcCUoc/+x7mfKYDLPZzyoQBZjAvw7pPZFF2UsvAvVmBdDWw+0o/IUvTQG0WONS1Vp6i1scjFuSU0aFsxLzCtFZLpLadlV
+X-Gm-Message-State: AOJu0Ywou09/ZjlpjDxcvAI5O1H+qj5tXaVePSNnBQMugv2wmyw3v4V8
+	6loJIIkS1JqFgm22Ri2Y5K7CJzi2snJf3shr/XR307Sz9PZ+4HL8NCuQQ2gZ/J9BLPAWgjdTooG
+	6Iw6Y0KNynsTVcCX1jtLN/a+753DfDQGfLGn/qg==
+X-Google-Smtp-Source: AGHT+IF/KIeqABbokzZljH+LAgY8kIZSFE7qipbYmjVKY2fkpR4302o3Qfd9r378gssUXTZN81OKQEw3/egpsssqY+I=
+X-Received: by 2002:a05:6e02:1a4d:b0:369:95dc:e4da with SMTP id
+ u13-20020a056e021a4d00b0036995dce4damr855201ilv.17.1712072894488; Tue, 02 Apr
+ 2024 08:48:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 2 Apr 2024 21:18:03 +0530
+Message-ID: <CAAhSdy2e237A_vA022kh3cmy-YJ_t=0iXyRkbQS3NSR=_Z+6HA@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv fixes for 6.9, take #1
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218621
+Hi Paolo,
 
-Sean Christopherson (seanjc@google.com) changed:
+We have four fixes for 6.9. Out of these, two fixes are
+related to in-kernel APLIC emulation and remaining
+are cosmetic fixes.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |seanjc@google.com
+Please pull.
 
---- Comment #1 from Sean Christopherson (seanjc@google.com) ---
-Please provide info on how to reproduce the WARN.  I suspect this is from
-syzkaller triggering shutdown in SMM, but it would be nice to confirm that.
+Regards,
+Anup
 
---=20
-You may reply to this email to add a comment.
+The following changes since commit 4cece764965020c22cff7665b18a012006359095:
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+  Linux 6.9-rc1 (2024-03-24 14:10:05 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.9-1
+
+for you to fetch changes up to 8e936e98718f005c986be0bfa1ee6b355acf96be:
+
+  RISC-V: KVM: Fix APLIC in_clrip[x] read emulation (2024-03-26 09:40:55 +0530)
+
+----------------------------------------------------------------
+KVM/riscv fixes for 6.9, take #1
+
+- Fix spelling mistake in arch_timer selftest
+- Remove redundant semicolon in num_isa_ext_regs()
+- Fix APLIC setipnum_le/be write emulation
+- Fix APLIC in_clrip[x] read emulation
+
+----------------------------------------------------------------
+Anup Patel (2):
+      RISC-V: KVM: Fix APLIC setipnum_le/be write emulation
+      RISC-V: KVM: Fix APLIC in_clrip[x] read emulation
+
+Colin Ian King (2):
+      KVM: selftests: Fix spelling mistake "trigged" -> "triggered"
+      RISC-V: KVM: Remove second semicolon
+
+ arch/riscv/kvm/aia_aplic.c                       | 37 ++++++++++++++++++++----
+ arch/riscv/kvm/vcpu_onereg.c                     |  2 +-
+ tools/testing/selftests/kvm/aarch64/arch_timer.c |  2 +-
+ tools/testing/selftests/kvm/riscv/arch_timer.c   |  2 +-
+ 4 files changed, 34 insertions(+), 9 deletions(-)
 
