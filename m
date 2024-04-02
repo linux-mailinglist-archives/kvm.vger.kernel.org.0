@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-13376-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13377-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9928957BE
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 17:06:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 065608957C1
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 17:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26E9E1F22A84
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 15:06:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70AB01F237CF
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 15:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE5912DD98;
-	Tue,  2 Apr 2024 15:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4381913173C;
+	Tue,  2 Apr 2024 15:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="COlLZPdX"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="LQzH9vYq"
 X-Original-To: kvm@vger.kernel.org
 Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2072.outbound.protection.outlook.com [40.92.89.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA7D12BF2E;
-	Tue,  2 Apr 2024 15:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5566B12D1F4;
+	Tue,  2 Apr 2024 15:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.89.72
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712070354; cv=fail; b=VC6Ba6A1cIOXh8sy3+foHX0q76Ycm/tfGfNSsMeVESZ5hqerDEymZARvw5MQKcJiD1FXnJephz4lX/RR+/34KMX8Q8lXk4guuxmfMPLg5Y66s6fjN60ms+TDH7zX022tTboGp3Cmokz7jUvNBvzoyG1wV0XMftEa/uPt9lHQnuw=
+	t=1712070356; cv=fail; b=lF9E+sxGvCM6FDujFmUCtJmNixTVH0VctJKCBHYiMmPRNw66HJFp4lwVc3pBVcJyotX+4/cxotLird31psNDWxkZyAbBhxh9tdwB6tK4RDzb1kcYyG9RMdI4h0a0dHxOsZaCAu+8lC6CdWR9EK2rPhxVyBsaTd6d3Qg3wPu+FU4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712070354; c=relaxed/simple;
-	bh=0dTJ2U60uWtQ/87g8RRnNf/yot49oSETi/iblkhzSMw=;
+	s=arc-20240116; t=1712070356; c=relaxed/simple;
+	bh=mX/9sQIiOFOIwDgcPLc+2ovYwu0RIHzELqX5S6T4Vkw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TLjYnAxNNMDsm+GxRLYmiar7pun46dJOFXd5suJKdipU3bJq0dCHTT0ylcv6styAkNzzCinD3+XphRvUKfiGfjCmyE4hMD+dXtJEivX1fIVURYfzXEyHoDxUmiqGwCYHsh0NPml6HGTjEUzSARQn2/r1aXpN+S4xWPeyElPlQcQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=COlLZPdX; arc=fail smtp.client-ip=40.92.89.72
+	 Content-Type:MIME-Version; b=jazHqyRQ5c/B0kt0ttEmDE53uEy3xwH4A3WhZERQ/RvhK1dELhD0gizPnAhYTiaL32kvJtW8f6FpvHNegOjmrIWQ9JILivOC+1sewwR69M47wsi79Hr9UvTkM5wGASTr5P8AUA+hgJB6HMObjgODDO7Yom2wQjdW0L4VYgHQ4Vo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=LQzH9vYq; arc=fail smtp.client-ip=40.92.89.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jINq5xV2t3wItXP/G2LCt/9l+YvGs2LMmVAfmrLIWgdMX0/p028Mcs+9RD8XuLt/HhW4yPRT8OmAi8HT4xxmZyfWCeNecM9V0XWdzrNX/bLNiQuOomJPQIcVW2NapzcvsbU0Ly4HLJJ8gWmz/iOEB6jlnCOJn1kckKS5uAVSjTpRmKCNu3i1ZeC/CuBko1WCgRzJWGYpaMPYIHhlhWbAy8YZQYUdAYq+fhYhLY9V5vaIPYLx0XYDiCRDvLLdJZ9O2SVpOPUzb+bVljJ+1fhtl6Ys+7MfgvVPsHPnGoohxpyBn6RbIvI9qMNCVBBoG+a+hgcIkZwuyQXZsMadHiJdJQ==
+ b=HiznLAZDIbMuy1Ms2/dPmVsrHnH5bEn1KBcujY8FMrOIOPp+URcN4ielM90We+ulcljFoITU0gNbnC7YCY8VxuSFK2IMS0Sw8Oqga2slZ7r+Q+LshLXWFrf6nQdbAlj30BnP0k0Upy7wqO2k+AKKEx/+QStRUkOrCjwPx9x2yXnYMxLA6fO8L4TK9s55KJ66wFH+kvJlH3XWnkadlwjMEl7+HzBqsVq6daUrEj2A5vdlH3EnVaT5a3MDcQefmMB0MGeoCfywqqoZk1NbH5E4TMhQJdM7NoKVjMMu3PMQ3EvRrApQz8p5TshvdDt0vX1dIfJU5CJ3vctdm4uERfuyUQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hgYWAKGkLoXFj0mLyWjgqkSs0joUrCocUz7O89WkFBw=;
- b=P3PC54qYoOao1AP7hzYyxUh2N+VYNUMBIIWlKMkDaS1fbgAwKlQupm6gXVkklDVbUH/MRW1FVcqBsfn7lMruh20rOOOUKc2gPpSyhzEaathDc18yQLtup9A7RnjZV/ekkT6Gp8Ce/z1aujeikJzZmGVo7UtxUrmsmeHBGqu3wV6CB/2EUVzd03xLIaW780jeKabKN6h968tORXpREiOeivSDcM7jJeaOArrxjfbgOqW+rrTMPQ9OyHXGZkUOaF3iO3WASrdjNah5dFEFox4g1FnBHyrDy8QRTsgcGUwIDq36BhAxbxIbNbocD6uX76vjrv/nwbZPYugVybtFGACNBA==
+ bh=ghD2ggmV0UM5xirj1JsSNdhc8I0q1XBpOb+Ukc4jd2k=;
+ b=BeVfryZfJKnVpFmL0fHyGoMWviNz+FIAR35ZBQ1wIeSXGVsQ+9ftszPU90nZzCgpUpaA03ofV2e7WvJEnqdldLe8HZB7c3ae7+VbgBZuBMd4y47OU/V6hmFlWS5lHHij612UMwVx+TrOYn7ZyRJB5azvq7IuYliprGi7gQ6ozJPjqCiPH667eSLfwDjRTzj+unfoRcf3CtG4bOKvG0I0IYq2sPHRIrCI6hizzk3xT9cL5rCauMCQhE0WN/DRp5u8HVOb5yyNkA6Sr0ufrb4yLChVt44wxe3VBr5oX7phJ1rBktGGYZmjpGcj1E4jFRjCLjHWd/WJEB0SejRFnbH4Iw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hgYWAKGkLoXFj0mLyWjgqkSs0joUrCocUz7O89WkFBw=;
- b=COlLZPdXbEgYkvWGodRQT+66S7dPczZQJO8fyBFc4SkbGCXFNVO5HxKGzkzpemUsUOSf3Gh4glbL1JK/O/h8FmQBA4QYosHRVu9wR6qJRQL7Vh0ymsznbkq+qTCP53KPyB4F4/MzpQWRpPMsj+nlkPX4Zxz+t+ToDcEuHH7cfVe9qqBYzaH8n1p87J+Eb2s/9+T4jpkq4JEXxGmVGl3j5/QNx2koSeNCU0K1v7V8jFCwQdkxzQ984kKKq4OgI4i6pQ8tzP3s8jF+PepIbhEP2PLXGhvdicDL45of5yhMBaki3R8k0tp9BzmSDXMLkAc17p1qpFcOEtFYoHU3i7PJYA==
+ bh=ghD2ggmV0UM5xirj1JsSNdhc8I0q1XBpOb+Ukc4jd2k=;
+ b=LQzH9vYqqxDOO9XmIiJJAX3QFPXUOw/rMnyAYan8o+grnI1Ru2Ud9EclTNj6WBqCav/B1X6FsShU9vR7LeRU0/jDg1qgoyjoLc2fv6INisMn/vT8kC/A/E+n1ZpUPsKMERl/shZcj28zZ8MDDk2yIJBOgch9MPffdOtdXIhXv1Joi6lGejoOqar3byVqUz/1QMEVF9Vp2oACnt8KIPO1X83jW6z/WAe+0iBK2Er8XGpqPqDlE76b3tMuFnNAQ55tkWgmw9d2YvVLb25JOZTCfgtWzwumzDIPVXHuOSnyEM9uFMtp/jN/GFYpEDuH5HXMeF0G/u3LWiOtG2SnltiH/w==
 Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
  by AS8P194MB1141.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:2a1::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
- 2024 15:05:48 +0000
+ 2024 15:05:49 +0000
 Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
  ([fe80::56f0:1717:f1a8:ea4e]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
  ([fe80::56f0:1717:f1a8:ea4e%2]) with mapi id 15.20.7409.042; Tue, 2 Apr 2024
- 15:05:48 +0000
+ 15:05:49 +0000
 From: Luigi Leonardi <luigi.leonardi@outlook.com>
 To: sgarzare@redhat.com,
 	kvm@vger.kernel.org,
@@ -67,23 +67,22 @@ To: sgarzare@redhat.com,
 	pabeni@redhat.com,
 	davem@davemloft.net,
 	edumazet@google.com
-Cc: Luigi Leonardi <luigi.leonardi@outlook.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>
-Subject: [PATCH net-next 1/3] vsock: add support for SIOCOUTQ ioctl for all vsock socket types.
-Date: Tue,  2 Apr 2024 17:05:37 +0200
+Cc: Luigi Leonardi <luigi.leonardi@outlook.com>
+Subject: [PATCH net-next 2/3] vsock/virtio: add SIOCOUTQ support for all virtio based transports
+Date: Tue,  2 Apr 2024 17:05:38 +0200
 Message-ID:
- <AS2P194MB2170C0FC43DDA2CB637CE6B29A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+ <AS2P194MB2170BA1D5A32BDF70C4547B19A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240402150539.390269-1-luigi.leonardi@outlook.com>
 References: <20240402150539.390269-1-luigi.leonardi@outlook.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-TMN: [YfZMwJEaIJIoytVTjmSTOgzXeMW2d2uB]
+X-TMN: [mzI2LDS5ddpTTddu49afF3OK5flJWvDi]
 X-ClientProxiedBy: MI2P293CA0011.ITAP293.PROD.OUTLOOK.COM
  (2603:10a6:290:45::11) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
  (2603:10a6:20b:642::8)
 X-Microsoft-Original-Message-ID:
- <20240402150539.390269-2-luigi.leonardi@outlook.com>
+ <20240402150539.390269-3-luigi.leonardi@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -93,39 +92,39 @@ MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|AS8P194MB1141:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5d7c6727-268a-4640-bee6-08dc532660ad
+X-MS-Office365-Filtering-Correlation-Id: d5864048-bc6b-411b-1588-08dc5326614e
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	x7dF4LpUHSVHkxfayECyIV5pBqocuLRxH1qrEGdcvsGS/geDfBwKSX+amZV/3ZgBLlTVjOy7mOGI5cBpzUYabmDH5qc4ulyTl+K4BnwFPNzZlACCo52Q6B0p21ZsHWOwS6xWreGMkqH27NV+uRfePvrlMEnB5kZUFOB+lFf4KMdQGYSpczldStOt6KNqzAj3sXfhvWAvGgUA6MT5o4WznzEYYKtGo03TMrMRxjOELvvDQAWYYMVNzgwrC55CmucTE4yQu/ZkYwF/FxZv3Y80Dn08aGqkBuwLbnzQSAX+sdZf9vBIDjloFbqETI71WBKdUbWAO0wTdrZMD/zIDrAdyfhceYkoEUYW/hxfScxTvCyPNZEdf/LiGVbPBsE+cT1zdGUUpfkmw/hK4a3IZKh1Oc38lk0o1jNjgHeYM9Zqv34nQ13BT76HdXLQ9HW2Zk0yHkp6PrLdz6oAQBwNVQW+BNsOATg1LMj0ripDRToafxmM/C5XDXyvJnGAfhHZ0r7KiU17YlhhJk214lc/gIFNBdG3BLJiHwy2OpVQB7q7gKg/q08hnBKLOmMusPhthH/5IpNH92iOvtrynFi88jRS/OoNHzvaY9owLEwItuuD0JpFCP98vZc67XBFyaccJaqx
+	Y7//6KeRhJBXhRwXnu5zhYdYbU8Lo5XvcF2ay7FytHl9lZgYn7DAFq7p4ggb8NKido/RD6ge8An7kIncwjaOaOewx4rNPX2xw5+SW+0/XI1sp49svdKGFAvUBembXyKipywZmIj3/BxMQPRq8Rm+jGtj+s7X2IB0HKZEgpX3gOs0JOEQ89j7nwZc+LvQ/XFAxtrysYUdYq13TtxqPGW4WRjMaZ0ZHgCF0p6ocnJh0WsgrdKgYD4TGMJ/og0Iw7R7ad6Jsy6mncKlt0alNS3recSYhnS/7ZA11b6imF5k/WnjgddaIKi2ZZ8AQz5RpIIw0IgNlBcshKziwX9ghawHH74tIS3gjvAryQwxBD6HApb+vm2ThCfkMQY/fs6GU6Y7+3W68j0eF+bkwoGnlo2+1xWPjouoE0151moD07tEjL/5yeliAyOZgbG9Zt1kWnWbaY42WF+fg7SeESfVic17BfPcQ2H4gkcOtNBfyLs5BMhhZW38QFNg/hA71VNW3iirHmB9LYpQg/BTvpuLM9Deon11bVYVE3W/+SDfAXEKuf10OKt3Rfr84YYWzaKIAtPjMlgbz24xV8pNxWoVzULpAQ2Nt3a65imdsXVZ2a06Mpf3tg8/NYO6vWidvuh4dK8e
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?n6LAnzBYhPdWkXGNg6fIO6z+/NcYb9xakFEViqv1Gohj7AophzUuYDm3H+Nl?=
- =?us-ascii?Q?ivPC+zOEAbLvEbBhUPz0Vas1zGiQXGImb9dIwgmts+CtMx8yv30AgYugjXV3?=
- =?us-ascii?Q?5Cf6u5FUO/cvwFDHNRIPZqvxSfMMcNItd21qs133HuNVshefmLPGsvlraiFQ?=
- =?us-ascii?Q?DVwx5etOuMBhX7SooGkeodt0q99gfFKCxmqfppG8GvBFkuAjs0VoGHIijXGS?=
- =?us-ascii?Q?hYrVBcuTFVB5gEIybeaQdKzkCu4EX2Em9qKUe8uHnoJPThH/OZTTTofCyzHE?=
- =?us-ascii?Q?fFMUlyrtFrt7BkYwVNeOeJSg+T7d8dNHsG6HXxSg21e7SUkUe58KzdcQPAXm?=
- =?us-ascii?Q?BEqXHMfr1126/1FlV+I3wyIzUDNgoE+RDXXdMV/YdDbM6UGHKdvcfS4lcZp/?=
- =?us-ascii?Q?sgL8GiWs/TnMp6JOlYQjTAU/1e168KIjQL/5NZCSzEPKtnxuzOyDZ3d1D02J?=
- =?us-ascii?Q?C/4TtIRURRf7bcOsOWoA0sMpzCWqJGYAOqXV2+MA22k0dOqbeNdWVTdJKOhW?=
- =?us-ascii?Q?r8n7cGvW02dJ+m4UhnuI+Wk17sx4PHD+OOTbo5xYu70VYluceOamGhf89oYv?=
- =?us-ascii?Q?PB6TAMdunTHgHmoK26nOg8RgpL9D3M2mFMGxGCMqXRg6bUd9ABnK8J9c77kn?=
- =?us-ascii?Q?slhtUZ26hWnXh82ViHWUIa6l1R4tlVq7a7BIaGZuI1KtIjilRLMmtgd7YxwI?=
- =?us-ascii?Q?uqKQqU52iNGGFFI6kr3KIUQSG416goGTg5kZc5TUzwXn3BbqcAck5vJ30WtI?=
- =?us-ascii?Q?vaSWuuVdZViIqIMLUiIX5g5UX3ydLXH6NNw0UMiAPzIFp4Vzx/gGtq5eANrK?=
- =?us-ascii?Q?7EWPTDPPE2MzgPdy7kVVEoRte8LoB+zeGRbs6pzGVl5zLSSRYLsngCwXDgmy?=
- =?us-ascii?Q?eG0AGp0U9ALLviYk2pY/8MgbNkiP9fhTiBqJHbPk7FFcO2j0W7Oyg44gJR1Q?=
- =?us-ascii?Q?C0OSzIcYVtIK3VjRlw8Pf0Kgak66+DDlHDbRNZHaGNsY4LL6L2MTPYEp+rvP?=
- =?us-ascii?Q?9c0X+Objf/VEepFnKXjPxCNtF0xZPw6AbwM3izlK2Yyz8Ryq31IriZOAqn3U?=
- =?us-ascii?Q?CJl3WfDrZ6O6RfRsCMUkGWz/QgITbuRavnblVMlVY6DTW4pF+WAqNFagaOEt?=
- =?us-ascii?Q?3JZaX8m0p4nmuHjx9Y0uD7147diptzrheLp/mrTFFoa2RJUKkz1atq4odJie?=
- =?us-ascii?Q?3cI6NGn45+SHx5UKfLUAk3vR5W7nr62AkrxbgCW5YcpmV1FHHsysvgOIPyfO?=
- =?us-ascii?Q?AU7oghawN/hsib6kbGgr?=
+	=?us-ascii?Q?bJDxy10z/CWr7UhcCFFMaQlqku9DcMPb53XtPh0wA59+oMdfumAX/gwUW8gT?=
+ =?us-ascii?Q?murnYjQTLJ1q5zKN8p72pA4IRvcclEvgSmjoP0jKzxlAdaur3rahhcRnfDIj?=
+ =?us-ascii?Q?x5u8CQeJsxqBKek0aBjRBN3WJenYI8kZ9xD20QsNB5cdJw4fx+Tf7RqSrjCW?=
+ =?us-ascii?Q?8sYQJKCCnhogiLom7BkDsmTvKls4CF3ljNH+Xkf8WGlaTU5ZOSzrVnvEOTkF?=
+ =?us-ascii?Q?g/A7v9jl2C0M4gxEy1KOdIRKjhv2bOiTWoeM8QAM9cGk+ExiCXYYNqlTeoKN?=
+ =?us-ascii?Q?SF40qPfokC8fum6okP4z9q1OCvdhu5TPb+XRHcuSZEAMHPW4jrQrJ+zLAHfx?=
+ =?us-ascii?Q?SM2/YRguk6RLealE87yusJmS/m46PuGkoLn7lBrhmbP2Ql9o3gs/yPjVRJR2?=
+ =?us-ascii?Q?s1wrEn/f5i39aQ/pnCsgQ+hwotXAt3QhxcrAvdFCwGT7AJUuIlR94CAOLohl?=
+ =?us-ascii?Q?FIYxh+uwAqBq+/ViydIG++2/s1wV+CW+itI3bcT5apFDGhcOvb4+uBbVT9bv?=
+ =?us-ascii?Q?DHN1SGUiMMZR+Q5FIa4vAtCkkDw2S5WGALDNHwadXXJLO982KWevBvkSzFsx?=
+ =?us-ascii?Q?U3YqNZp+BrqDvNKYFbiJOS9BqR49QEo3NSauDnU/tSLbmppPPgrqmtXLvjnt?=
+ =?us-ascii?Q?ODq8tCXlLc7POZ8pOrEJeZVOGB4XJPkMPyXVwEodGlfqYrome/rEy1LxdR29?=
+ =?us-ascii?Q?xh4ImWnDpk2jKzqVl8JFQkgwO0ruzSMbOsB9mZVuMrRQwn3btf9UEu/UzsAh?=
+ =?us-ascii?Q?rMQ/CpPq7acHjBVXSP5CNqwEknDF0woLl+/rl35BP2uz8xezYt6aAkBCJPWM?=
+ =?us-ascii?Q?THvmG/5OHPHz9SZnxNpFFLcXjVNP3H/Zwv09+hZgCsDpgHcUW0qTm//gpN3O?=
+ =?us-ascii?Q?yZmkMXgttvvP48PXUTANxb2S2BU4O4JelIl1+KIk7uuLzGQi7K/9k+UYKbuc?=
+ =?us-ascii?Q?0IZuRuF1vxf6jDmj3HLq+oJ1PsQ3ym5ds4S0ZAqTItIfhev94SqGdg1HzyxE?=
+ =?us-ascii?Q?PhkuSduPoWx1JeGqrE5cgCoVBwFRg6T4T1l5Z2P4+OmaEZXPllLUjl0JTOOA?=
+ =?us-ascii?Q?W82EgBFAJsMUTRqf8g1DBmVjO+jOJv5mTvzt3By0DgJZFOAAucJxSz1rEHVL?=
+ =?us-ascii?Q?gcMGdIujBSSgR98C7YtdyiimcJlRj8vCRpkd2TWfDCp/DVSNaXqRusv4AITv?=
+ =?us-ascii?Q?aZ5OqxTUJa0BvIk1v8OQl2P679ZocuCXVwzl1U1QZJyrs5IctGL6srR5MB9X?=
+ =?us-ascii?Q?pqMjSndcbRDKzyMqoX0d?=
 X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d7c6727-268a-4640-bee6-08dc532660ad
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5864048-bc6b-411b-1588-08dc5326614e
 X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 15:05:48.0011
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 15:05:48.9158
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -133,112 +132,182 @@ X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
 	00000000-0000-0000-0000-000000000000
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8P194MB1141
 
-This add support for ioctl(s) for SOCK_STREAM SOCK_SEQPACKET and SOCK_DGRAM
-in AF_VSOCK.
-The only ioctl available is SIOCOUTQ/TIOCOUTQ, which returns the number
-of unsent bytes in the socket. This information is transport-specific
-and is delegated to them using a callback.
+This patch introduce support for stream_bytes_unsent in all
+virtio based transports: virtio-transport, vhost-vsock and
+vsock-loopback
 
-Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+For all transports the unsent bytes counter is incremented
+in virtio_transport_send_pkt_info.
+
+In the virtio-transport (G2H) the counter is decremented each time the host
+notifies the guest that it consumed the skbuffs.
+In vhost-vsock (H2G) the counter is decremented after the skbuff is queued
+in the virtqueue.
+In vsock-loopback the counter is decremented after the skbuff is
+dequeued.
+
 Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
 ---
- include/net/af_vsock.h   |  1 +
- net/vmw_vsock/af_vsock.c | 42 +++++++++++++++++++++++++++++++++++++---
- 2 files changed, 40 insertions(+), 3 deletions(-)
+ drivers/vhost/vsock.c                   |  3 ++-
+ include/linux/virtio_vsock.h            |  7 ++++++
+ net/vmw_vsock/virtio_transport.c        |  3 ++-
+ net/vmw_vsock/virtio_transport_common.c | 30 +++++++++++++++++++++++++
+ net/vmw_vsock/vsock_loopback.c          |  6 +++++
+ 5 files changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-index 535701efc1e5..cd4311abd3c9 100644
---- a/include/net/af_vsock.h
-+++ b/include/net/af_vsock.h
-@@ -137,6 +137,7 @@ struct vsock_transport {
- 	u64 (*stream_rcvhiwat)(struct vsock_sock *);
- 	bool (*stream_is_active)(struct vsock_sock *);
- 	bool (*stream_allow)(u32 cid, u32 port);
-+	int (*stream_bytes_unsent)(struct vsock_sock *vsk);
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index ec20ecff85c7..9732ab944e5b 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -244,7 +244,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 					restart_tx = true;
+ 			}
  
- 	/* SEQ_PACKET. */
- 	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 54ba7316f808..991e9edfa743 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -112,6 +112,7 @@
- #include <net/sock.h>
- #include <net/af_vsock.h>
- #include <uapi/linux/vm_sockets.h>
-+#include <uapi/asm-generic/ioctls.h>
+-			consume_skb(skb);
++			virtio_transport_consume_skb_sent(skb, true);
+ 		}
+ 	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
+ 	if (added)
+@@ -430,6 +430,7 @@ static struct virtio_transport vhost_transport = {
+ 		.stream_rcvhiwat          = virtio_transport_stream_rcvhiwat,
+ 		.stream_is_active         = virtio_transport_stream_is_active,
+ 		.stream_allow             = virtio_transport_stream_allow,
++		.stream_bytes_unsent      = virtio_transport_bytes_unsent,
  
- static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
- static void vsock_sk_destruct(struct sock *sk);
-@@ -1292,6 +1293,41 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		.seqpacket_dequeue        = virtio_transport_seqpacket_dequeue,
+ 		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
+diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+index c82089dee0c8..cdce8b051f98 100644
+--- a/include/linux/virtio_vsock.h
++++ b/include/linux/virtio_vsock.h
+@@ -134,6 +134,8 @@ struct virtio_vsock_sock {
+ 	u32 peer_fwd_cnt;
+ 	u32 peer_buf_alloc;
+ 
++	atomic_t bytes_unsent;
++
+ 	/* Protected by rx_lock */
+ 	u32 fwd_cnt;
+ 	u32 last_fwd_cnt;
+@@ -193,6 +195,11 @@ s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
+ s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+ u32 virtio_transport_seqpacket_has_data(struct vsock_sock *vsk);
+ 
++int virtio_transport_bytes_unsent(struct vsock_sock *vsk);
++
++void virtio_transport_consume_skb_sent(struct sk_buff *skb,
++				       bool dealloc);
++
+ int virtio_transport_do_socket_init(struct vsock_sock *vsk,
+ 				 struct vsock_sock *psk);
+ int
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 1748268e0694..d3dd0d49c2b3 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -310,7 +310,7 @@ static void virtio_transport_tx_work(struct work_struct *work)
+ 
+ 		virtqueue_disable_cb(vq);
+ 		while ((skb = virtqueue_get_buf(vq, &len)) != NULL) {
+-			consume_skb(skb);
++			virtio_transport_consume_skb_sent(skb, true);
+ 			added = true;
+ 		}
+ 	} while (!virtqueue_enable_cb(vq));
+@@ -518,6 +518,7 @@ static struct virtio_transport virtio_transport = {
+ 		.stream_rcvhiwat          = virtio_transport_stream_rcvhiwat,
+ 		.stream_is_active         = virtio_transport_stream_is_active,
+ 		.stream_allow             = virtio_transport_stream_allow,
++		.stream_bytes_unsent      = virtio_transport_bytes_unsent,
+ 
+ 		.seqpacket_dequeue        = virtio_transport_seqpacket_dequeue,
+ 		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 16ff976a86e3..3a08e720aa9c 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -419,6 +419,9 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+ 		 */
+ 		rest_len -= ret;
+ 
++		if (info->op == VIRTIO_VSOCK_OP_RW)
++			atomic_add(ret, &vvs->bytes_unsent);
++
+ 		if (WARN_ONCE(ret != skb_len,
+ 			      "'send_pkt()' returns %i, but %zu expected\n",
+ 			      ret, skb_len))
+@@ -463,6 +466,24 @@ void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *
  }
- EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
+ EXPORT_SYMBOL_GPL(virtio_transport_inc_tx_pkt);
  
-+static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
-+			  int __user *arg)
++void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool dealloc)
 +{
-+	struct sock *sk = sock->sk;
-+	int retval = -EOPNOTSUPP;
-+	struct vsock_sock *vsk;
++	struct sock *s = skb->sk;
 +
-+	vsk = vsock_sk(sk);
++	if (s) {
++		struct vsock_sock *vs = vsock_sk(s);
++		struct virtio_vsock_sock *vvs;
 +
-+	switch (cmd) {
-+	case SIOCOUTQ:
-+		if (vsk->transport->stream_bytes_unsent) {
-+			if (sk->sk_state == TCP_LISTEN)
-+				return -EINVAL;
-+			retval = vsk->transport->stream_bytes_unsent(vsk);
-+		}
-+		break;
-+	default:
-+		retval = -EOPNOTSUPP;
++		vvs = vs->trans;
++		if (skb->len)
++			atomic_sub(skb->len, &vvs->bytes_unsent);
 +	}
 +
-+	if (retval >= 0) {
-+		put_user(retval, arg);
-+		retval = 0;
-+	}
-+
-+	return retval;
++	if (dealloc)
++		consume_skb(skb);
 +}
++EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
 +
-+static int vsock_ioctl(struct socket *sock, unsigned int cmd,
-+		       unsigned long arg)
+ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+ {
+ 	u32 ret;
+@@ -891,6 +912,7 @@ int virtio_transport_do_socket_init(struct vsock_sock *vsk,
+ 		vsk->buffer_size = VIRTIO_VSOCK_MAX_BUF_SIZE;
+ 
+ 	vvs->buf_alloc = vsk->buffer_size;
++	atomic_set(&vvs->bytes_unsent, 0);
+ 
+ 	spin_lock_init(&vvs->rx_lock);
+ 	spin_lock_init(&vvs->tx_lock);
+@@ -1090,6 +1112,14 @@ void virtio_transport_destruct(struct vsock_sock *vsk)
+ }
+ EXPORT_SYMBOL_GPL(virtio_transport_destruct);
+ 
++int virtio_transport_bytes_unsent(struct vsock_sock *vsk)
 +{
-+	return vsock_do_ioctl(sock, cmd, (int __user *)arg);
-+}
++	struct virtio_vsock_sock *vvs = vsk->trans;
 +
- static const struct proto_ops vsock_dgram_ops = {
- 	.family = PF_VSOCK,
- 	.owner = THIS_MODULE,
-@@ -1302,7 +1338,7 @@ static const struct proto_ops vsock_dgram_ops = {
- 	.accept = sock_no_accept,
- 	.getname = vsock_getname,
- 	.poll = vsock_poll,
--	.ioctl = sock_no_ioctl,
-+	.ioctl = vsock_ioctl,
- 	.listen = sock_no_listen,
- 	.shutdown = vsock_shutdown,
- 	.sendmsg = vsock_dgram_sendmsg,
-@@ -2286,7 +2322,7 @@ static const struct proto_ops vsock_stream_ops = {
- 	.accept = vsock_accept,
- 	.getname = vsock_getname,
- 	.poll = vsock_poll,
--	.ioctl = sock_no_ioctl,
-+	.ioctl = vsock_ioctl,
- 	.listen = vsock_listen,
- 	.shutdown = vsock_shutdown,
- 	.setsockopt = vsock_connectible_setsockopt,
-@@ -2308,7 +2344,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
- 	.accept = vsock_accept,
- 	.getname = vsock_getname,
- 	.poll = vsock_poll,
--	.ioctl = sock_no_ioctl,
-+	.ioctl = vsock_ioctl,
- 	.listen = vsock_listen,
- 	.shutdown = vsock_shutdown,
- 	.setsockopt = vsock_connectible_setsockopt,
++	return atomic_read(&vvs->bytes_unsent);
++}
++EXPORT_SYMBOL_GPL(virtio_transport_bytes_unsent);
++
+ static int virtio_transport_reset(struct vsock_sock *vsk,
+ 				  struct sk_buff *skb)
+ {
+diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+index 6dea6119f5b2..35fd4e47b5bf 100644
+--- a/net/vmw_vsock/vsock_loopback.c
++++ b/net/vmw_vsock/vsock_loopback.c
+@@ -77,6 +77,7 @@ static struct virtio_transport loopback_transport = {
+ 		.stream_rcvhiwat          = virtio_transport_stream_rcvhiwat,
+ 		.stream_is_active         = virtio_transport_stream_is_active,
+ 		.stream_allow             = virtio_transport_stream_allow,
++		.stream_bytes_unsent      = virtio_transport_bytes_unsent,
+ 
+ 		.seqpacket_dequeue        = virtio_transport_seqpacket_dequeue,
+ 		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
+@@ -123,6 +124,11 @@ static void vsock_loopback_work(struct work_struct *work)
+ 	spin_unlock_bh(&vsock->pkt_queue.lock);
+ 
+ 	while ((skb = __skb_dequeue(&pkts))) {
++		/* Decrement the bytes_sent counter without deallocating skb
++		 * It is freed by the receiver.
++		 */
++		virtio_transport_consume_skb_sent(skb, false);
++
+ 		virtio_transport_deliver_tap_pkt(skb);
+ 		virtio_transport_recv_pkt(&loopback_transport, skb);
+ 	}
 -- 
 2.34.1
 
