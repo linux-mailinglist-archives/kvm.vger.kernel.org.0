@@ -1,335 +1,139 @@
-Return-Path: <kvm+bounces-13336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0CAC894B4E
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 08:22:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6337894B68
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 08:31:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2019D1C210BC
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 06:22:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 164571C2261F
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 06:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8ABA1E87C;
-	Tue,  2 Apr 2024 06:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AYW9we1Y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6816220DD2;
+	Tue,  2 Apr 2024 06:31:00 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE294224F2;
-	Tue,  2 Apr 2024 06:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+Received: from zg8tmtu5ljy1ljeznc42.icoremail.net (zg8tmtu5ljy1ljeznc42.icoremail.net [159.65.134.6])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CD213FE7
+	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 06:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.65.134.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712038912; cv=none; b=tZT2Ud9nEhAaTbv8ALRnh4Xj4iVZu4f+PsfQpiy0lHmbKX5nM+TBIqwVus4ZDc7yAEOkLzzjcOvZpcewckPYoKXCFImGwbNhSX5EN28IzMWS9oC95erwsZK0V/gwQ3Dqu3BKxrKK9/Z3TbOienrmcy+1M1G6qg7NkOK6DuZy6o8=
+	t=1712039459; cv=none; b=s9FAPwX+FDvmv/6XhhbQzZ4YS/qV96bujEARPhwIKmcmVPFAB6KG+ri9CF60+LJSvzLf95cA7VvFBEaAzfw8SWNfdsbCVrfYG4t1BmGKniPfKAdDBcFVAKG60WXOxoFolzT3yNkmjFcFNkxiaqIqvfZt47qyR6XATypiXfS+GO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712038912; c=relaxed/simple;
-	bh=GkqNJasuDn4TR8A0A0ShB3YK57TMnp9gvDs1CBvhYnY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RBDl71hr7+hXvbycwhnmPL7eUrbc0847ijxVF+9ADn1X7baCfPyTapcN/br3auakOyfgtI7PjEoubAWOj19KO0AoOQ8/oxpiY+X2+hxY5+36HNJM/+fHlgRxPpJsfZOrwD7Ygw5TjfdtJBBSAuu7edj5u2gsnWxJ1H0vMzgLnDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AYW9we1Y; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712038910; x=1743574910;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GkqNJasuDn4TR8A0A0ShB3YK57TMnp9gvDs1CBvhYnY=;
-  b=AYW9we1Y823vkrqdzuewdHAHZGNia1weyme2tOszYjg3RGzuqGAxLRXy
-   ov44cFE9+1YqeRxpnH+T3J0xwUwgaaVcTJfUgFu/kXZO0aRmZy6YTcApa
-   N4nzMcmTzXiGhNTW8GvwrA3yCpUK1kVYtkiSy2nPVwbeSq7agkc6+X+1p
-   9NPqD4auQnJ4AW0PB0jQcWSfAwECyRWdqwDWkZMGA6TaV+opu5oWI1zFj
-   9VXFYRoLRWvMBrRS/ELUdH603prCFZ1GeYp5/04BO79eM3KymX8ImYM0c
-   dFL5kVgKb5DW+yBQUuSV3blGMfkIrxUKJyk5FozftlwZOmAmZ2UQVFgNs
-   g==;
-X-CSE-ConnectionGUID: /XovSydaSG2ZRKWf9R+VNw==
-X-CSE-MsgGUID: WOR67Jb5QLmY5E4S9MaXNQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="7029334"
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="7029334"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 23:21:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="22436583"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.225]) ([10.238.10.225])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 23:21:43 -0700
-Message-ID: <bd862ee4-7513-4880-b6e5-466dcfb08f1a@linux.intel.com>
-Date: Tue, 2 Apr 2024 14:21:41 +0800
+	s=arc-20240116; t=1712039459; c=relaxed/simple;
+	bh=wvQQY5s2EzmBuqVh0mz/m0qTg8o4aBHL6BQYYikJlo0=;
+	h=From:To:Subject:Date:Message-Id; b=mSti7jJK2qK0O2Oh8BUQ+JlmF4zGXF/KfXNcfQek4TDk6Z8NanQDxZXkdLxSJrcxyJ8lGz2PuijMOwzVWQ1PeXM3dHWReFSbHhOsJnobUAL3tDzjtEkE34vqi3givxcDj5QPyN2VawbVJty2FBE2mGT4wvqPJXGss1CnMRdiRFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=159.65.134.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from localhost.localdomain (unknown [10.12.130.31])
+	by app2 (Coremail) with SMTP id TQJkCgBHWry1pQtm5G0EAA--.36929S4;
+	Tue, 02 Apr 2024 14:29:10 +0800 (CST)
+From: Chao Du <duchao@eswincomputing.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	anup@brainfault.org,
+	atishp@atishpatra.org,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	dbarboza@ventanamicro.com,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	haibo1.xu@intel.com,
+	duchao713@qq.com
+Subject: [PATCH v4 0/3] RISC-V: KVM: Guest Debug Support - Software Breakpoint Part
+Date: Tue,  2 Apr 2024 06:26:25 +0000
+Message-Id: <20240402062628.5425-1-duchao@eswincomputing.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:TQJkCgBHWry1pQtm5G0EAA--.36929S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr1xJr48Gw1rAFyrWrW7Arb_yoW5JrWxpF
+	W8GF909rs3Xr1fGayxCr1v9r1fXrs5ur4fWw1fW3y3Zr4jkFyFyrs2gryYkr98CrykWFya
+	y3Z2g3WkCa4DA37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvIb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwV
+	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY
+	04v7MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s
+	026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_
+	Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20x
+	vEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07beAp5UUUUU=
+X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 070/130] KVM: TDX: TDP MMU TDX support
-To: isaku.yamahata@intel.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <56cdb0da8bbf17dc293a2a6b4ff74f6e3e034bbd.1708933498.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <56cdb0da8bbf17dc293a2a6b4ff74f6e3e034bbd.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+
+This series implements the "KVM Guset Debug" feature on RISC-V. This is
+an existing feature which is already supported by some other arches.
+It allows us to debug a RISC-V KVM guest from GDB in host side.
+
+As the first stage, the software breakpoints (ebreak instruction) is
+implemented. HW breakpoints support will come later after a synthetically
+consideration with the SBI debug trigger extension.
+
+A selftest case was added in this series. Manual test was done on QEMU
+RISC-V hypervisor emulator. (add '-s' to enable the gdbserver in QEMU)
+
+This series is based on Linux 6.9-rc1 and also available at:
+https://github.com/Du-Chao/kvm-riscv/tree/guest_debug_sw_v3_6.9-rc1
+
+The matched QEMU is available at:
+https://github.com/Du-Chao/qemu/tree/riscv_gd_sw
 
 
+Changes from v3->v4:
+- Some optimization on the testcase as per review comments.
 
-On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Implement hooks of TDP MMU for TDX backend.  TLB flush, TLB shootdown,
-> propagating the change private EPT entry to Secure EPT and freeing Secure
-> EPT page. TLB flush handles both shared EPT and private EPT.  It flushes
-> shared EPT same as VMX.  It also waits for the TDX TLB shootdown.  For the
-> hook to free Secure EPT page, unlinks the Secure EPT page from the Secure
-> EPT so that the page can be freed to OS.
->
-> Propagate the entry change to Secure EPT.  The possible entry changes are
-> present -> non-present(zapping) and non-present -> present(population).  On
-> population just link the Secure EPT page or the private guest page to the
-> Secure EPT by TDX SEAMCALL. Because TDP MMU allows concurrent
-> zapping/population, zapping requires synchronous TLB shoot down with the
-> frozen EPT entry.
+Changes from v2->v3:
+- Rebased on Linux 6.9-rc1.
+- Use BIT() in the macro definition.
+- set/clear the bit EXC_BREAKPOINT explicitly.
+- change the testcase name to ebreak_test.
+- test the scenario without GUEST_DEBUG. vm_install_exception_handler()
+  is used thanks to Haibo's patch.
 
-But for private memory, zapping holds write lock, right?
+Changes from v1->v2:
+- Rebased on Linux 6.8-rc6.
+- Maintain a hedeleg in "struct kvm_vcpu_config" for each VCPU.
+- Update the HEDELEG csr in kvm_arch_vcpu_load().
 
+Changes from RFC->v1:
+- Rebased on Linux 6.8-rc2.
+- Merge PATCH1 and PATCH2 into one patch.
+- kselftest case added.
 
->    It zaps the secure entry, increments TLB counter, sends
-> IPI to remote vcpus to trigger TLB flush, and then unlinks the private
-> guest page from the Secure EPT. For simplicity, batched zapping with
-> exclude lock is handled as concurrent zapping.
+v3 link:
+https://lore.kernel.org/kvm/20240327075526.31855-1-duchao@eswincomputing.com
+v2 link:
+https://lore.kernel.org/kvm/20240301013545.10403-1-duchao@eswincomputing.com
+v1 link:
+https://lore.kernel.org/kvm/20240206074931.22930-1-duchao@eswincomputing.com
+RFC link:
+https://lore.kernel.org/kvm/20231221095002.7404-1-duchao@eswincomputing.com
 
-exclude lock -> exclusive lock
+Chao Du (3):
+  RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+  RISC-V: KVM: Handle breakpoint exits for VCPU
+  RISC-V: KVM: selftests: Add ebreak test support
 
-How to understand this sentence?
-Since it's holding exclusive lock, how it can be handled as concurrent 
-zapping?
-Or you want to describe the current implementation prevents concurrent 
-zapping?
+ arch/riscv/include/asm/kvm_host.h             | 12 +++
+ arch/riscv/kvm/main.c                         | 18 +---
+ arch/riscv/kvm/vcpu.c                         | 16 +++-
+ arch/riscv/kvm/vcpu_exit.c                    |  4 +
+ arch/riscv/kvm/vm.c                           |  1 +
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../testing/selftests/kvm/riscv/ebreak_test.c | 82 +++++++++++++++++++
+ 7 files changed, 116 insertions(+), 18 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/riscv/ebreak_test.c
 
+--
+2.17.1
 
-> Although it's inefficient,
-> it can be optimized in the future.
->
-> For MMIO SPTE, the spte value changes as follows.
-> initial value (suppress VE bit is set)
-> -> Guest issues MMIO and triggers EPT violation
-> -> KVM updates SPTE value to MMIO value (suppress VE bit is cleared)
-> -> Guest MMIO resumes.  It triggers VE exception in guest TD
-> -> Guest VE handler issues TDG.VP.VMCALL<MMIO>
-> -> KVM handles MMIO
-> -> Guest VE handler resumes its execution after MMIO instruction
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> ---
-> v19:
-> - Compile fix when CONFIG_HYPERV != y.
->    It's due to the following patch.  Catch it up.
->    https://lore.kernel.org/all/20231018192325.1893896-1-seanjc@google.com/
-> - Add comments on tlb shootdown to explan the sequence.
-> - Use gmem_max_level callback, delete tdp_max_page_level.
->
-> v18:
-> - rename tdx_sept_page_aug() -> tdx_mem_page_aug()
-> - checkpatch: space => tab
->
-> v15 -> v16:
-> - Add the handling of TD_ATTR_SEPT_VE_DISABLE case.
->
-> v14 -> v15:
-> - Implemented tdx_flush_tlb_current()
-> - Removed unnecessary invept in tdx_flush_tlb().  It was carry over
->    from the very old code base.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/kvm/mmu/spte.c    |   3 +-
->   arch/x86/kvm/vmx/main.c    |  91 ++++++++-
->   arch/x86/kvm/vmx/tdx.c     | 372 +++++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/tdx.h     |   2 +-
->   arch/x86/kvm/vmx/tdx_ops.h |   6 +
->   arch/x86/kvm/vmx/x86_ops.h |  13 ++
->   6 files changed, 481 insertions(+), 6 deletions(-)
->
-[...]
-> +
-> +static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
-> +			    enum pg_level level, kvm_pfn_t pfn)
-> +{
-> +	int tdx_level = pg_level_to_tdx_sept_level(level);
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	union tdx_sept_level_state level_state;
-> +	hpa_t hpa = pfn_to_hpa(pfn);
-> +	gpa_t gpa = gfn_to_gpa(gfn);
-> +	struct tdx_module_args out;
-> +	union tdx_sept_entry entry;
-> +	u64 err;
-> +
-> +	err = tdh_mem_page_aug(kvm_tdx->tdr_pa, gpa, hpa, &out);
-> +	if (unlikely(err == TDX_ERROR_SEPT_BUSY)) {
-> +		tdx_unpin(kvm, pfn);
-> +		return -EAGAIN;
-> +	}
-> +	if (unlikely(err == (TDX_EPT_ENTRY_STATE_INCORRECT | TDX_OPERAND_ID_RCX))) {
-> +		entry.raw = out.rcx;
-> +		level_state.raw = out.rdx;
-> +		if (level_state.level == tdx_level &&
-> +		    level_state.state == TDX_SEPT_PENDING &&
-> +		    entry.leaf && entry.pfn == pfn && entry.sve) {
-> +			tdx_unpin(kvm, pfn);
-> +			WARN_ON_ONCE(!(to_kvm_tdx(kvm)->attributes &
-> +				       TDX_TD_ATTR_SEPT_VE_DISABLE));
-
-to_kvm_tdx(kvm) -> kvm_tdx
-
-Since the implementation requires attributes.TDX_TD_ATTR_SEPT_VE_DISABLE is set, should it check the value passed from userspace?
-And the reason should be described somewhere in changelog or/and comment.
-
-
-
-> +			return -EAGAIN;
-> +		}
-> +	}
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_MEM_PAGE_AUG, err, &out);
-> +		tdx_unpin(kvm, pfn);
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
-> +				     enum pg_level level, kvm_pfn_t pfn)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +
-> +	/* TODO: handle large pages. */
-> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Because restricted mem
-
-The term "restricted mem" is not used anymore, right? Should update the 
-comment.
-
-> doesn't support page migration with
-> +	 * a_ops->migrate_page (yet), no callback isn't triggered for KVM on
-
-no callback isn't -> no callback is
-
-> +	 * page migration.  Until restricted mem supports page migration,
-
-"restricted mem" -> guest_mem
-
-
-> +	 * prevent page migration.
-> +	 * TODO: Once restricted mem introduces callback on page migration,
-
-ditto
-
-> +	 * implement it and remove get_page/put_page().
-> +	 */
-> +	get_page(pfn_to_page(pfn));
-> +
-> +	if (likely(is_td_finalized(kvm_tdx)))
-> +		return tdx_mem_page_aug(kvm, gfn, level, pfn);
-> +
-> +	/* TODO: tdh_mem_page_add() comes here for the initial memory. */
-> +
-> +	return 0;
-> +}
-> +
-> +static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
-> +				       enum pg_level level, kvm_pfn_t pfn)
-> +{
-> +	int tdx_level = pg_level_to_tdx_sept_level(level);
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct tdx_module_args out;
-> +	gpa_t gpa = gfn_to_gpa(gfn);
-> +	hpa_t hpa = pfn_to_hpa(pfn);
-> +	hpa_t hpa_with_hkid;
-> +	u64 err;
-> +
-> +	/* TODO: handle large pages. */
-> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-> +		return -EINVAL;
-> +
-> +	if (unlikely(!is_hkid_assigned(kvm_tdx))) {
-> +		/*
-> +		 * The HKID assigned to this TD was already freed and cache
-> +		 * was already flushed. We don't have to flush again.
-> +		 */
-> +		err = tdx_reclaim_page(hpa);
-> +		if (KVM_BUG_ON(err, kvm))
-> +			return -EIO;
-> +		tdx_unpin(kvm, pfn);
-> +		return 0;
-> +	}
-> +
-> +	do {
-> +		/*
-> +		 * When zapping private page, write lock is held. So no race
-> +		 * condition with other vcpu sept operation.  Race only with
-> +		 * TDH.VP.ENTER.
-> +		 */
-> +		err = tdh_mem_page_remove(kvm_tdx->tdr_pa, gpa, tdx_level, &out);
-> +	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_MEM_PAGE_REMOVE, err, &out);
-> +		return -EIO;
-> +	}
-> +
-> +	hpa_with_hkid = set_hkid_to_hpa(hpa, (u16)kvm_tdx->hkid);
-> +	do {
-> +		/*
-> +		 * TDX_OPERAND_BUSY can happen on locking PAMT entry.  Because
-> +		 * this page was removed above, other thread shouldn't be
-> +		 * repeatedly operating on this page.  Just retry loop.
-> +		 */
-> +		err = tdh_phymem_page_wbinvd(hpa_with_hkid);
-> +	} while (unlikely(err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX)));
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
-> +		return -EIO;
-> +	}
-> +	tdx_clear_page(hpa);
-> +	tdx_unpin(kvm, pfn);
-> +	return 0;
-> +}
-> +
-> +static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
-> +				     enum pg_level level, void *private_spt)
-> +{
-> +	int tdx_level = pg_level_to_tdx_sept_level(level);
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	gpa_t gpa = gfn_to_gpa(gfn);
-> +	hpa_t hpa = __pa(private_spt);
-> +	struct tdx_module_args out;
-> +	u64 err;
-> +
-> +	err = tdh_mem_sept_add(kvm_tdx->tdr_pa, gpa, tdx_level, hpa, &out);
-
-kvm_tdx is only used here, can drop the local var.
-
-> +	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
-> +		return -EAGAIN;
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_MEM_SEPT_ADD, err, &out);
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->
 
