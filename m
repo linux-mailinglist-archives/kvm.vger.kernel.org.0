@@ -1,105 +1,164 @@
-Return-Path: <kvm+bounces-13399-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13400-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7788895EBB
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 23:34:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E55B1895ED3
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 23:37:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BB93285A24
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 21:34:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D09C1C244C2
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 21:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC6E15E7EB;
-	Tue,  2 Apr 2024 21:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C68415E5D9;
+	Tue,  2 Apr 2024 21:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gQUcnQkJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GHylZesS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C31015E5C0
-	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 21:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDA615E5D5
+	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 21:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712093658; cv=none; b=pZLfOxbDZLj4gr+QjVKrQQjeJvTBFdCtbv+lae3Ff6GB5tDgI/Jj0QIiDYGI9jlbbdkaqaN/+qw/6ghyEVWEWEBMvb7ScU4qNxPZlLdq9MbOfA4RMtcx8kTsRMNUmizVbyq8ScOP7OZuTa+hFGd7g/JlbAGpaASUx9Y8OMubGFo=
+	t=1712093824; cv=none; b=NvATljjlb83OruLig/H2nlajgzeIepWk9+ZrU2SYUPVaxXBMZlNIfvgXr/nThek0ajCS4H5fVp4mPkJU9whD7APSRcM4hpqeSe7hurb1Krm9RoGnqgMCRKBT9x/8/DS753SByXy2iBjykbX3BB+EYbfA6A102HMOYnzeM+xKZ5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712093658; c=relaxed/simple;
-	bh=gcw5VSt51SDYCQ0YKpOFrOLuCouvF14ktT27e0twceY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hXAgSz+My61tUuHPifJXVzXEGFCxGfpnZrNlFAQ4l5Bi/PESI+ZEzvv3MJGcz7BKB15mPicAhRb30Qz0M7ht7xR8nqiNjA7uUNgq+dGn7PpUqw9tUUB7PE6YeFHfiiB0clBoFO3P1ttr9j8tDTbfBAL9F5mqVlsXvH8fh1YC70w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gQUcnQkJ; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1712093824; c=relaxed/simple;
+	bh=E6tG90k1iNeBh8VAlo6f3lun9gyxfGsIogBSxv06NO0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Mi/ox8xV6KiaZA2LngQNPfstURbZwifE6aWs13TiOYQqJeRW2JuOHmmEBA4EOPgGGUuYhyoLYZTthAbvE69CAAR3uUJU+sXLL1IMwGJNI9Aj/sjA5Bpc/N8flZ8LSJCzI8uf+kheM+5SAu8sMKIpqQkbtQ+B5sesMm0YAyq0XmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GHylZesS; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so9211824276.1
-        for <kvm@vger.kernel.org>; Tue, 02 Apr 2024 14:34:16 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a20c33f06so65234137b3.2
+        for <kvm@vger.kernel.org>; Tue, 02 Apr 2024 14:37:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712093656; x=1712698456; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gcw5VSt51SDYCQ0YKpOFrOLuCouvF14ktT27e0twceY=;
-        b=gQUcnQkJTMqZbHLWEwxjT2US6MGrTgnB8zr85uK38D0fPNmkkcteJ0zrw+qk/yPQsZ
-         cGHn4rHjVE3DHgR0KZU0QF19qn6PYLBMVskTlZVOR5h8thf70tmRTctEwzUgMVYGpvvj
-         enBjs/0uXRp2wpxWANfv4+bYMmy8Rd96ruYPQT1II+0SV4/Jx4k5zXCAujRr3LGkTrxd
-         EfezhzIz7i5iPxcE8je7BUACHS3YXVZAyiy2E2Inb3SEWVaxgeLM4GUwFt4mIBqyC+p3
-         63lUuN0RLr3ukAad6ibAYna9LaVJNWw3BjK8FNhDA2/61MNz0g6aEYfq66BZMaDKpHsp
-         XTqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712093656; x=1712698456;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=google.com; s=20230601; t=1712093821; x=1712698621; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=gcw5VSt51SDYCQ0YKpOFrOLuCouvF14ktT27e0twceY=;
-        b=hpfFWQnzKujSjiRMyK8bfr2i6T0kIcJ4Q54pDYubaFPWFDhXYyaNrLRscaJHvgWgsU
-         TIwVDGB2nu4ybGt8zvZhip3hYsXvCebn43TYbryJKkaydbHVmAiEvG7KalluwgurjqRZ
-         Utwzu73klKxrWRwEmt1doJUZimS4nKde0Mg+wKLA/gwggKwi0O4ihFGkRasEymHxdZMP
-         IRztl2Dgizhzftu34R84PDBSvySPKH7QmG5Js3EzylYBtHtZbmRgulQ7D3eFWczJQAdb
-         Zh4nvY7aJ6LENcqJucNLuOxrtm+mYD0rL6P6ROB8Y892ebOrFmDV5m3UJvb1mMihzXEa
-         WD3w==
-X-Gm-Message-State: AOJu0Yz9yByGFgdFB2NzDKWDBOgXaWUyBzLN54IiPRoWbwJigUdJk2Lo
-	rBnEBRTiEysk+UOlKrnzaDmJ0KFnSP8uJYGwMP4pqIYd0pdKf6o+7fuXOmqTuydnwIGyqHqm2Xx
-	7Yw==
-X-Google-Smtp-Source: AGHT+IGPeWmjD4Xgh7kKBTPHE4qDiuffhLY+SxbwR3zx2Grc/+hNw2Ueg7Ap+gvXt9dIvnMxJEBht5qnaW0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:260b:b0:ddd:6bde:6c82 with SMTP id
- dw11-20020a056902260b00b00ddd6bde6c82mr4312438ybb.12.1712093656148; Tue, 02
- Apr 2024 14:34:16 -0700 (PDT)
-Date: Tue, 2 Apr 2024 14:34:14 -0700
-In-Reply-To: <848d6bb6e4b0c53b6870bdc1cdf0c22e766313ec.camel@intel.com>
+        bh=wMJAkhavDDMxybE735uuw66TAkIC9TkbFyNgBhbGt7E=;
+        b=GHylZesSjkA6NJp7nNl4V1MqGlKzWKu69aVgzROUIqlwcqu4Az5lhTDJOnYBuXqosx
+         y0dDNWoWHFZ0tIDRHHMi0ZtBRBSOUnobNlwV/jYYcdHAtZ40KJ+1I5iVuCJ0EZTIfVD7
+         104A5ABDqepa5QzdF/9BV6mve7oaJq15XlFMs1R8AHKzoEXeYJzpOUQRswPn0AeypaLc
+         NWa+LrVlk/fdYRy7tS+FTWYfoCSbk7Rk/po7R9YvTINRn5uPNAok+fGJCkGuHcHC02GL
+         Z7OFBhpzWhnlbaSyAAOxKyjgDGE2oFW7YqHRT8MDZSYOzHMcvob8D9jQ1eLVuAXmgt11
+         3pOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712093821; x=1712698621;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wMJAkhavDDMxybE735uuw66TAkIC9TkbFyNgBhbGt7E=;
+        b=FJnJohtIxM/5bzPg7FMrPwMa7grTRMJN8Att1+rN2dT9ArZO0xrbjHetLq4t8sKNOa
+         4ZlvjK0a9yRjumuj981jS/DKRV9Ht0QU9CzIV3rzmJ2A2gfT6EvkiTzUOuG2fk/FJsWP
+         TqqeOdpVacpOt3IHDynZaWSmJFYqt3SoqZvUKTQSK8EVHNZAdMc+0ittZUBs/8E8EmNG
+         bZTKN7G7lC2wmMQs8/eie3z395w82c2ZTGol5Vv9YEQ1I1c4SXEn1n8otqEWwpK1J4eW
+         0WVSw72OYaaE4a9PjxpQCrE/hO+2v+QVHRsSXJJKFyKMWAtdsXEtTtWevXt6tRzcrDjx
+         Tzjg==
+X-Gm-Message-State: AOJu0YzmjPpJ5GN2zolxjwnmtJYGFO/SBQvkpKO2OEnRPv/mXqaHg55r
+	sI1yP7G2GvaxYkKZIBcK72uhBwSywussAWA7lSKhM2me3LhEPcyYW04MdYbzzIqZxx+piQw5C0P
+	ewZXi+m+8Bg==
+X-Google-Smtp-Source: AGHT+IHHdMSye5n0Ll5L+vBRM+o0sPguUS34mMP+Pz2VICxQ7XVCEF8BDDseIvlIT0MwdKN8vBlDszcYp2L6FQ==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a05:690c:a9a:b0:615:5113:9d3f with SMTP
+ id ci26-20020a05690c0a9a00b0061551139d3fmr128276ywb.4.1712093821684; Tue, 02
+ Apr 2024 14:37:01 -0700 (PDT)
+Date: Tue,  2 Apr 2024 14:36:56 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240313003211.1900117-1-seanjc@google.com> <848d6bb6e4b0c53b6870bdc1cdf0c22e766313ec.camel@intel.com>
-Message-ID: <Zgx5xUg9VJmurrFB@google.com>
-Subject: Re: [ANNOUNCE] PUCK Agenda - 2024.03.13 - No topic
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240402213656.3068504-1-dmatlack@google.com>
+Subject: [PATCH v2] KVM: Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG
+From: David Matlack <dmatlack@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Apr 02, 2024, Rick P Edgecombe wrote:
-> On Tue, 2024-03-12 at 17:32 -0700, Sean Christopherson wrote:
-> > No topic for tomorrow, but I'll be online.
-> >=20
-> > Note, the US just did its Daylight Savings thing, so the local time mig=
-ht be
-> > different for you this week.
-> >=20
-> > Note #2, PUCK is canceled for the next two weeks as I'll be offline.
-> >=20
-> > Future Schedule:
-> > March=C2=A0=C2=A0=C2=A0 20th - CANCELED
-> > March=C2=A0=C2=A0=C2=A0 27th - CANCELED
->=20
-> If there is going to be an April 3rd PUCK, we would like to have a discus=
-sion
-> on TDX base series upstreaming strategy.
+Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG to avoid
+blocking other threads (e.g. vCPUs taking page faults) for too long.
 
-There will be a PUCK, I'll add TDX upstreaming to the agenda.
+Specifically, change kvm_clear_dirty_log_protect() to acquire/release
+mmu_lock only when calling kvm_arch_mmu_enable_log_dirty_pt_masked(),
+rather than around the entire for loop. This ensures that KVM will only
+hold mmu_lock for the time it takes the architecture-specific code to
+process up to 64 pages, rather than holding mmu_lock for log->num_pages,
+which is controllable by userspace. This also avoids holding mmu_lock
+when processing parts of the dirty_bitmap that are zero (i.e. when there
+is nothing to clear).
+
+Moving the acquire/release points for mmu_lock should be safe since
+dirty_bitmap_buffer is already protected by slots_lock, and dirty_bitmap
+is already accessed with atomic_long_fetch_andnot(). And at least on x86
+holding mmu_lock doesn't even serialize access to the memslot dirty
+bitmap, as vCPUs can call mark_page_dirty_in_slot() without holding
+mmu_lock.
+
+This change eliminates dips in guest performance during live migration
+in a 160 vCPU VM when userspace is issuing CLEAR ioctls (tested with
+1GiB and 8GiB CLEARs). Userspace could issue finer-grained CLEARs, which
+would also reduce contention on mmu_lock, but doing so will increase the
+rate of remote TLB flushing. And there's really no reason to punt this
+problem to userspace since KVM can just drop and reacquire mmu_lock more
+frequently.
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc: Bibo Mao <maobibo@loongson.cn>
+Cc: Huacai Chen <chenhuacai@kernel.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Anup Patel <anup@brainfault.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+v2:
+ - Rebase onto kvm/queue [Marc]
+
+v1: https://lore.kernel.org/kvm/20231205181645.482037-1-dmatlack@google.com/
+
+ virt/kvm/kvm_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fb49c2a60200..0a8b25a52c15 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2386,7 +2386,6 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 	if (copy_from_user(dirty_bitmap_buffer, log->dirty_bitmap, n))
+ 		return -EFAULT;
+ 
+-	KVM_MMU_LOCK(kvm);
+ 	for (offset = log->first_page, i = offset / BITS_PER_LONG,
+ 		 n = DIV_ROUND_UP(log->num_pages, BITS_PER_LONG); n--;
+ 	     i++, offset += BITS_PER_LONG) {
+@@ -2405,11 +2404,12 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 		*/
+ 		if (mask) {
+ 			flush = true;
++			KVM_MMU_LOCK(kvm);
+ 			kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot,
+ 								offset, mask);
++			KVM_MMU_UNLOCK(kvm);
+ 		}
+ 	}
+-	KVM_MMU_UNLOCK(kvm);
+ 
+ 	if (flush)
+ 		kvm_flush_remote_tlbs_memslot(kvm, memslot);
+
+base-commit: 9bc60f733839ab6fcdde0d0b15cbb486123e6402
+-- 
+2.44.0.478.gd926399ef9-goog
+
 
