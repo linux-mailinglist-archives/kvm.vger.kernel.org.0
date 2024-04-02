@@ -1,132 +1,110 @@
-Return-Path: <kvm+bounces-13364-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13365-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79AE1894FC3
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 12:16:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32105894FCA
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 12:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C86E1C228B4
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 10:16:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5772B24B6E
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 10:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1825FDA7;
-	Tue,  2 Apr 2024 10:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C894E60DD3;
+	Tue,  2 Apr 2024 10:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0beqMXVt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bkEalEOE"
 X-Original-To: kvm@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8ABA5A0E6;
-	Tue,  2 Apr 2024 10:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91FA5D749;
+	Tue,  2 Apr 2024 10:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712052924; cv=none; b=QKRfKGrmREFwkF18p6R3OQ7regcIIQtcWkR/UJGFPDJDHT/BhX6sh9S5UTE7HswerzBTN8LkhqWyPKshq8QUQiECfmz8UqjX+lKJhFRnIH9f0s6N8anqkuZoDq0s4q1qgdy247i4WkacJ2JeVDgM8cgF1UOzwzOeJK4/Q8dzbKI=
+	t=1712052957; cv=none; b=bt9Q9doK+rRPoFpHABB0wC29rIdjQHOyCczM7wWv+UWxo1Ed3JywveHuQ263Qh9cN5plued/dlgDMOsFmLWVzxtZ0y5OHx2929YwBlkn6Z3UirIueZeeC5RZwKY9zhRX24o9zLKJwe9dab7WOWEdzdhGwtDPpZoC4W2KEHLRwZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712052924; c=relaxed/simple;
-	bh=37Nx+JVFdZC7dJV7jOp/MYWR3xwxYi0DR8iWjs0SXzE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mk2whE9U7KwHGFzSneukEbbWQbhSqCYrKOfKyqQG8KGSXMuxjbBQ5H/PSHMj/Dr8tdzO6cf3B4XGG2GDlVSwDteVHY05xu1cAfRujEol60bgi/5to7xpFxFNpq+UtkzbVL+Mm07KBUQz8Tmin3Xw22HVVLcP1Q1AWOq7+GpbWwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0beqMXVt; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=XcKQ6bjR8juooJeYFkyQvyoAYNtxrPcLEvnKdMTyFu8=; b=0beqMXVtPisgfQmEG2UBAidiVW
-	84+j9DAP25fOyTv08R6Sq+HES71u81tNt/O07QPZpGE3DDCsc5eMDgt27vYLJKa2vSrJUB6eGdSO5
-	2xJ8YAqid3EnAbCdEchOKgHRM6mT8Bh3x+TWFOFRLkGQzi1oOeTn/i76rfyD4ZQeL3NsvKLN8q0IY
-	fmtkpkXyq/aOlrrjHPexBzYFjdJw+8l6k3zqUvOk8FwKv5fXbzYrdOiDxKW9wPtZl12nlrQHZ1Neq
-	o2r6Pw+BMVTmSwN/IzPOC6ts0Evl8M5cISIt3onDGFUXRkQ7YQLJ8mm2VQ6+4UBLk83BeUAyaQGe6
-	90zRLFdQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35944)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rrbAc-0006J4-1Y;
-	Tue, 02 Apr 2024 11:15:10 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rrbAb-0006t6-9b; Tue, 02 Apr 2024 11:15:09 +0100
-Date: Tue, 2 Apr 2024 11:15:09 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mike Leach <mike.leach@linaro.org>,
-	James Clark <james.clark@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Vinod Koul <vkoul@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Michal Simek <michal.simek@amd.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-input@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 00/19] amba: store owner from modules with
- amba_driver_register()
-Message-ID: <ZgvarVCRBam9anOm@shell.armlinux.org.uk>
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
- <f514d9e1-61fa-4c55-aea1-d70c955bb96a@linaro.org>
- <ZgvIMRDfeQaeVxYt@shell.armlinux.org.uk>
- <324e9c02-c005-4e18-9872-8408695fb1fe@linaro.org>
- <ZgvWfhSEYIUaIn6h@shell.armlinux.org.uk>
- <65f0ed39-4c2f-4cea-b488-2a8ba6fdbeff@linaro.org>
- <ZgvaFNLTqgQrPeiO@shell.armlinux.org.uk>
+	s=arc-20240116; t=1712052957; c=relaxed/simple;
+	bh=rxYIdnoOHeFpTj35MGLH9jKM15utL4Chn5z5QC6ILVk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=Bpi0C5kJ0V+UwDNjHuZY+0dELUUjVCCm/KITnqGkrw4MwY/TPAANNliCXJLVoj3iC0xF12uJ25ceiOks4FNHVELvvE76QBPw5X3cY0AXz5MIvN8uyo7aRsAPqT9l0T8XHCMNpgz+5RVjbgIWDkYfIKoFsjgn/8EL9PO6F/KMULI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bkEalEOE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 317DEC433F1;
+	Tue,  2 Apr 2024 10:15:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712052956;
+	bh=rxYIdnoOHeFpTj35MGLH9jKM15utL4Chn5z5QC6ILVk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=bkEalEOE0E09mUR/L9JVW145aNEjNWVMtaT1Vtmpi6EV/Kqr1d35xm7kEP16lazpw
+	 /fO3tUIAmiHnthELYszl+I5mKV3MaJWq+05lg32ClOPOaOOxqs0xcec2a9gQK0aYsg
+	 FYN3MAabsAJgNYpMRZ0zxEh69swZJ+z/MqaCBzffHuzb2hovqjP1wVG/3BaKZRuSG/
+	 9xexulSKbWqsKvXOqDDWuj5IRkIokn0/5ee/sv8bTWBj/HmRislWj+ZsZDJQMtHHL7
+	 UB5o0PQHFRx0iDYCFlUCRLbkL5wp5kIUl9zSHf9qkVdATRwPgQPJpToS7s9mCyDUpI
+	 EoytL8m2NFTHg==
+From: bp@kernel.org
+To: michael.roth@amd.com
+Cc: bgardon@google.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	dmatlack@google.com,
+	hpa@zytor.com,
+	jpoimboe@kernel.org,
+	kvm@vger.kernel.org,
+	leitao@debian.org,
+	linux-kernel@vger.kernel.org,
+	maz@kernel.org,
+	mingo@redhat.com,
+	mirsad.todorovac@alu.unizg.hr,
+	pawan.kumar.gupta@linux.intel.com,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	seanjc@google.com,
+	shahuang@redhat.com,
+	tabba@google.com,
+	tglx@linutronix.de,
+	x86@kernel.org
+Subject: Re: [BUG net-next] arch/x86/kernel/cpu/bugs.c:2935: "Unpatched return thunk in use. This should not happen!" [STACKTRACE]
+Date: Tue,  2 Apr 2024 12:15:49 +0200
+Message-ID: <20240402101549.5166-1-bp@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240328123830.dma3nnmmlb7r52ic@amd.com>
+References: <1d10cd73-2ae7-42d5-a318-2f9facc42bbe@alu.unizg.hr> <20240318202124.GCZfiiRGVV0angYI9j@fat_crate.local> <12619bd4-9e9e-4883-8706-55d050a4d11a@alu.unizg.hr> <20240326101642.GAZgKgisKXLvggu8Cz@fat_crate.local> <8fc784c2-2aad-4d1d-ba0f-e5ab69d28ec5@alu.unizg.hr> <20240328123830.dma3nnmmlb7r52ic@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZgvaFNLTqgQrPeiO@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Mutt-References: <20240328123830.dma3nnmmlb7r52ic@amd.com>
+X-Mutt-Fcc: =outbox
+Status: RO
+Lines: 21
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 02, 2024 at 11:12:36AM +0100, Russell King (Oracle) wrote:
-> On Tue, Apr 02, 2024 at 12:04:07PM +0200, Krzysztof Kozlowski wrote:
-> > You brought no argument for keeping the kernel-version-header
-> > requirement nowadays, yet you call me of not working constructively. I
-> 
-> So add inability to read to your failings, because I _did_ state that
-> _I_ still _use_ it.
-> 
-> End of discussion, I'm not engaging with you in your current
-> confrontational mood where you clearly don't want to understand
-> anything (or intentionally misinterpreting) I'm writing - making it
-> pointless to continue.
-> 
-> I even think you're intentionally misinterpreting the responses
-> from the patch system.
-> 
-> Overall, I can only draw the conclusion that you are playing politics
-> and want the patch system gone, and you want me to use "standard"
-> tooling that will _increase_ the amount of effort I need to put in.
-> No, that's not going to happen.
+From: Borislav Petkov <bp@alien8.de>
 
-... and this is your final chance to change to a constructive discourse,
-if not, you are going to end up in my kill file. Whether you do is
-entirely up to the tone of your reply to this email.
+Sorry if this comes out weird - mail troubles currently.
 
-I am always more than willing to work with a submitter to diagnose
-what the problem is, but the tone of your emails make me want to
-ignore you.
+On Thu, Mar 28, 2024 at 07:38:30AM -0500, Michael Roth wrote:
+> I'm seeing it pretty consistently on kvm/next as well. Not sure if
+> there's anything special about my config but starting a fairly basic
+> SVM guest seems to be enough to trigger it for me on the first
+> invocation of svm_vcpu_run().
+
+Hmm, can you share your config and what exactly you're doing?
+
+I can't reproduce with Mirsad's reproducer, probably because of .config
+differences. I tried making all CONFIG*KVM* options =y but no
+difference.
+
+Thx.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
+
 
