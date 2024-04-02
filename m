@@ -1,81 +1,82 @@
-Return-Path: <kvm+bounces-13329-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13330-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3FB4894A35
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 05:58:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEDF7894A38
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 05:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 410551F23FFE
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 03:58:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 748401F243EB
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 03:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AB1175A1;
-	Tue,  2 Apr 2024 03:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9FA175A6;
+	Tue,  2 Apr 2024 03:58:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="kPMRdRD9"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Ti281wdc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E111426F
-	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 03:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B76F15E85
+	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 03:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712030281; cv=none; b=q8WRn0Ar5AAtYsd/cXKRzK/lt+JGf0MO5D0gQKUGaH4inNULjVH7lKzkcxu1YcfVASiALzRwNXIfP8YVZAW+eWDzoNAI4gTXC5JeWVSgLokZ/Cl2L4x7xFNRQpD1/2DD2aUmSvEpdBlrR0cRXAvflOulR6PYiIGi32J8C4nhMW4=
+	t=1712030336; cv=none; b=bAndCtZC7BYsRh5F+CWOz7ZC+68PZ/0MqpYcK6x47130+xs56ksjFmz7VEb2A8tbRGXm1sK9bbyTTDfiYbPB1NuJwgwMVA2utywB7uDNoblzB8cmx2n+lqUuGZJmK8pGZXac1dmC0bklrOW+dG6Qw+/fEVAOD9tXCXnIQ9yV4nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712030281; c=relaxed/simple;
-	bh=tyVLhtmPJWAmFie25BBkUfhWuVb3hRPmqqATLUps3i0=;
+	s=arc-20240116; t=1712030336; c=relaxed/simple;
+	bh=ywvXNzTSFM0+RwoIQB3eo5N6AtGr3mdDxpmz8RcBuA8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sat8NukYQRwxbhUx+2T+To1EbignS8nnIw11y4b9X4JdupNpuk8Mf+yFue6GEac4X3qN3tqTQ0h3Psd9P0iMZEs7jlw7Q9JfxYTHa9B9cogjKMJABJl+COz481TbjiduxlTbYSXdljFNywxM9e6x0+8e6JMIVUbLHrawZ/eeoL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=kPMRdRD9; arc=none smtp.client-ip=209.85.166.170
+	 To:Cc:Content-Type; b=Zn68oGqBBbqhCEon7/aLA3EmMqPM/zmChPwK0tBcC/e3EQlY+Ef6cq5zad4nIl5XZ176lsSQhin23rs/TpTLEEHjkuA509bgGuEsapU8ryWnlJ69Zzxnx7dy17euc00eTwi+hzemUevq0MvXTpNph61chmyEmpeBQeZm4kqsDOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Ti281wdc; arc=none smtp.client-ip=209.85.166.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-36899d11c2cso16198745ab.1
-        for <kvm@vger.kernel.org>; Mon, 01 Apr 2024 20:57:59 -0700 (PDT)
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-368b9400e51so28206475ab.2
+        for <kvm@vger.kernel.org>; Mon, 01 Apr 2024 20:58:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1712030279; x=1712635079; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1712030334; x=1712635134; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DtV8SMERfeTzEpYWil2z5b9TZfic9o3ikGpE1jdHQFk=;
-        b=kPMRdRD9/1e3rHYC41tdSBVPily6y6ow3sWS0tx9VtGb4J7Ts0lHHTok5Hr3bW2oUx
-         vVyqohNFJ3usClaA+0l38xyhpx8eUl7UVX0hPyldq9+f6T9CtS9puzNlj+zoEvDVVxxp
-         JUFSlMAsVc+K3h+YzH4GdWNkMlxu06xBz7YHTOEZ3TJxNr7qJnpgJyfJxSSFW6CP7MwV
-         U+5XvFXhxEhHNbFWvtDH6AhjqEe0b2hv1RvpFrK1Q/dHmqqhGksBcGRROHzeUROq3dP3
-         s9AKFNG8mYjQ+zm2+LhNUu9cXAElfPw9CazKYD3NbDTT9FLvEgUQnkoDakUQRUsm0+f6
-         njCQ==
+        bh=9bxpt1Z3lVJ3TpGTCsuEJ8/rFaYKCKYvHpj+f0zHxL4=;
+        b=Ti281wdct0GB40Hg7U8M2RREj9JVxsL5vj2Om3NSFYj5BGwAaswKW3tGklUMQj378l
+         CiWk9+Ix5VS4qAk7+dzCXPEkrDIXPAnFPW+hkKkKAuMi25nhLAOOagWUOyqrSJhyuusd
+         SMTs2tGoFbED+2TwfECVVSv0zKqWvK6tHK0hNnNZCLcz2nevpM+V9QTENTbBO0y2wkJ1
+         rudCFyybeyvkzl+sJl+dGRaMUW+oPdqsFxoOD36gqyNusYAJubUoHrNegD4CxN+5bqtH
+         CBCnj+lTswRK/zii67vqehTxj7eX6FE+zilUzGC26k5adGPw5B/1xouzEEOIjGbeKD3A
+         a4EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712030279; x=1712635079;
+        d=1e100.net; s=20230601; t=1712030334; x=1712635134;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DtV8SMERfeTzEpYWil2z5b9TZfic9o3ikGpE1jdHQFk=;
-        b=fGkOJGC9r6wrXHMoMIqhV+p1tKkQrGodqgNZT4y9GgdnyjAre5g3Ty1bP2TKTWKmQy
-         zhGVlMz9v05wwNj/RiRXqfqFOMd3g5DvZEo+ONAFSfO1tju0cdjw2TPAedYmLYTiSCMp
-         Avo0rjT1OvK1ttD9dDWEpYu5Z0efIo9/FT2viriKxKsmauiNF3H/Fl9d1aQprw8SfJhV
-         BQ0FsMNIT/XQgnMDUhN52IwLm7rCxDOR7f6AvR2be0PIqBt4i2cValrB4W/KVkrzoh3u
-         6h0hLTf6Q4elgm8qz19RmHUceemvRReiIX1D09uYneIAer+527kUaaYXZTMAg9ZCMcnc
-         JQmw==
-X-Gm-Message-State: AOJu0YyHgevSxvBlGE91UrV4ReBjAss/bRP45Fslsh2AaX2ZZqTiFW7F
-	IwYTL/Ke0rDWE3Gh4CHwYMWok6xtKRR4ZMpKZgTxEoJaqlvjqM6b3F8sh3+L68aKKhoHjX8A1su
-	1wqbdqBSXdKlPmnL+itfSIMJfudRP3FS3x8THlUZYeqzDXrvZt3khLw==
-X-Google-Smtp-Source: AGHT+IEkXpEtaL94+3HzCYUoKj647VDtpL03CdvZB6qY7qksejyCkNPx8JwaSql9n6tdrZXd+ajjaLR5+OD8fcy5EcI=
-X-Received: by 2002:a05:6e02:156e:b0:369:aaa9:a08c with SMTP id
- k14-20020a056e02156e00b00369aaa9a08cmr4021173ilu.16.1712030278776; Mon, 01
- Apr 2024 20:57:58 -0700 (PDT)
+        bh=9bxpt1Z3lVJ3TpGTCsuEJ8/rFaYKCKYvHpj+f0zHxL4=;
+        b=d4FPneg7akWlEbFTge1jA/D3mo3ejqgfjB73TJZERbuftfTdH5MPYEnr2lzFLEq/5C
+         nYm8+Jx7BCpwOeyBpibRu8ieiQLmhmdyhkVZVcpniDg/WA5sbgXymJmtHfXPT2ZTGNG5
+         mD9NJkwSBeUqHbbvyugX6pcS3LxQn4eiFQtjrQlcmAqLfHMdqrRiPwrFPr44b5418fDu
+         XkdYpbPyrULMlY5BIvW3xxyG72/UtZkUnOMWDFXWmmdx2UuibvzbV9JDMXq5E4VinoFX
+         m2lSkMr9hqJeJIy2HmmwylyO3S4lXIG10ANqQdJb1ed++lC8iafqgL/YaZxepkZmbrCy
+         Jgcw==
+X-Gm-Message-State: AOJu0YzeSOkTtryoawo6KLt5Y305/SrQqbwF9QxSR5q9/kxN4Dgr4U94
+	vCRS/RXbwrZwtiqf2d55WjXksZd/kgjxAUU27jt9jUvS/0sb4TVZR/vIaHAN5uJgohVVor4dJbO
+	x2IOr7YJloxe1GPA84OWUKw3LBo6zUo9IKgqJEg==
+X-Google-Smtp-Source: AGHT+IE/6+y8EEGe8ADutVzcbosZs3EgTtwEt4Xa4e+6ZfQfa1t6F08knGFoGJt5eCCTft/wUaKMU7ek4AeqOB81Mdc=
+X-Received: by 2002:a05:6e02:1c23:b0:368:a502:14e0 with SMTP id
+ m3-20020a056e021c2300b00368a50214e0mr10685689ilh.31.1712030334602; Mon, 01
+ Apr 2024 20:58:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327075526.31855-1-duchao@eswincomputing.com> <20240327075526.31855-3-duchao@eswincomputing.com>
-In-Reply-To: <20240327075526.31855-3-duchao@eswincomputing.com>
+References: <20240327075526.31855-1-duchao@eswincomputing.com>
+In-Reply-To: <20240327075526.31855-1-duchao@eswincomputing.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Tue, 2 Apr 2024 09:27:47 +0530
-Message-ID: <CAAhSdy3nHK294Mpe+P2S8MDYgR+K2Zbb5RT4ER8zhZP=YvTQkQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] RISC-V: KVM: Handle breakpoint exits for VCPU
+Date: Tue, 2 Apr 2024 09:28:43 +0530
+Message-ID: <CAAhSdy0vokWZopwdrFbY0XyVwNe98YeuQpCGKBP1Uxj-+v18ZA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/3] RISC-V: KVM: Guest Debug Support - Software
+ Breakpoint Part
 To: Chao Du <duchao@eswincomputing.com>
 Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, 
 	pbonzini@redhat.com, shuah@kernel.org, dbarboza@ventanamicro.com, 
@@ -87,40 +88,75 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Mar 27, 2024 at 1:29=E2=80=AFPM Chao Du <duchao@eswincomputing.com>=
  wrote:
 >
-> Exit to userspace for breakpoint traps. Set the exit_reason as
-> KVM_EXIT_DEBUG before exit.
+> This series implements the "KVM Guset Debug" feature on RISC-V. This is
+> an existing feature which is already supported by some other arches.
+> It allows us to debug a RISC-V KVM guest from GDB in host side.
 >
-> Signed-off-by: Chao Du <duchao@eswincomputing.com>
+> As the first stage, the software breakpoints (ebreak instruction) is
+> implemented. HW breakpoints support will come later after a synthetically
+> consideration with the SBI debug trigger extension.
+>
+> A selftest case was added in this series. Manual test was done on QEMU
+> RISC-V hypervisor emulator. (add '-s' to enable the gdbserver in QEMU)
+>
+> This series is based on Linux 6.9-rc1 and also available at:
+> https://github.com/Du-Chao/kvm-riscv/tree/guest_debug_sw_v3_6.9-rc1
+>
+> The matched QEMU is available at:
+> https://github.com/Du-Chao/qemu/tree/riscv_gd_sw
+>
+>
+> Changes from v2->v3:
+> - Rebased on Linux 6.9-rc1.
+> - Use BIT() in the macro definition.
+> - set/clear the bit EXC_BREAKPOINT explicitly.
+> - change the testcase name to ebreak_test.
+> - test the scenario without GUEST_DEBUG. vm_install_exception_handler() i=
+s used
+>   thanks to Haibo's patch.
+>
+> Changes from v1->v2:
+> - Rebased on Linux 6.8-rc6.
+> - Maintain a hedeleg in "struct kvm_vcpu_config" for each VCPU.
+> - Update the HEDELEG csr in kvm_arch_vcpu_load().
+>
+> Changes from RFC->v1:
+> - Rebased on Linux 6.8-rc2.
+> - Merge PATCH1 and PATCH2 into one patch.
+> - kselftest case added.
+>
+> v2 link:
+> https://lore.kernel.org/kvm/20240301013545.10403-1-duchao@eswincomputing.=
+com
+> v1 link:
+> https://lore.kernel.org/kvm/20240206074931.22930-1-duchao@eswincomputing.=
+com
+> RFC link:
+> https://lore.kernel.org/kvm/20231221095002.7404-1-duchao@eswincomputing.c=
+om
+>
+> Chao Du (3):
+>   RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+>   RISC-V: KVM: Handle breakpoint exits for VCPU
+>   RISC-V: KVM: selftests: Add ebreak test support
 
-I had already given Reviewed-by for this patch. In future, please include
-tags obtained in previous patch revision over here otherwise reviewers
-end-up wasting time reviewing already reviewed patches.
-
-Reviewed-by: Anup Patel <anup@brainfault.org>
+Please address Drew's comments on PATCH3 and send v4 so that I
+can test this series at my end.
 
 Regards,
 Anup
 
-> ---
->  arch/riscv/kvm/vcpu_exit.c | 4 ++++
->  1 file changed, 4 insertions(+)
 >
-> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> index 2415722c01b8..5761f95abb60 100644
-> --- a/arch/riscv/kvm/vcpu_exit.c
-> +++ b/arch/riscv/kvm/vcpu_exit.c
-> @@ -204,6 +204,10 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struc=
-t kvm_run *run,
->                 if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
->                         ret =3D kvm_riscv_vcpu_sbi_ecall(vcpu, run);
->                 break;
-> +       case EXC_BREAKPOINT:
-> +               run->exit_reason =3D KVM_EXIT_DEBUG;
-> +               ret =3D 0;
-> +               break;
->         default:
->                 break;
->         }
+>  arch/riscv/include/asm/kvm_host.h             | 12 +++
+>  arch/riscv/kvm/main.c                         | 18 +---
+>  arch/riscv/kvm/vcpu.c                         | 16 +++-
+>  arch/riscv/kvm/vcpu_exit.c                    |  4 +
+>  arch/riscv/kvm/vm.c                           |  1 +
+>  tools/testing/selftests/kvm/Makefile          |  1 +
+>  .../testing/selftests/kvm/riscv/ebreak_test.c | 84 +++++++++++++++++++
+>  7 files changed, 118 insertions(+), 18 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/riscv/ebreak_test.c
+>
 > --
 > 2.17.1
 >
