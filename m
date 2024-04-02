@@ -1,173 +1,160 @@
-Return-Path: <kvm+bounces-13397-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13398-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51D60895DF3
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 22:43:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08826895EA6
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 23:22:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74EFE1C2241D
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 20:43:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 390781C23FD2
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 21:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C60D15E1EA;
-	Tue,  2 Apr 2024 20:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB8E15E5DB;
+	Tue,  2 Apr 2024 21:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WKpIK81j"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RlieJNnv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B4015ADB1;
-	Tue,  2 Apr 2024 20:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895E415E5B5
+	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 21:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712090611; cv=none; b=ZJFC2hlFBlpJCWM0I/oZ7t+nhVu816sL6bnMl+H3jCFv05Sk4JmAW71o2eGINnN5OmVQdaVgwrO7f4tMAemPZ5nbFFZzpJepH/tuhrzUujW7JKtWrYbTq4LXkD9sWwuNnn7ZQQilFTVRsmCOHj9dORi77smLYmHLIPplOGrcv7o=
+	t=1712092909; cv=none; b=MQF4XY+8PT14E1qFYqfVC5dKCF9glNyMrLweAxCWPrWg1CSRZaSNdwlMjcOkgKymUiq/0qJeN8qGNaccyCYIyg0rlcUzj7VkbuuWLVOoTg+4rCy9woGNuZeFkjs4RIto1FPWcnOFeWRU1C7At4n+wNtyjtjKJ87zI/3eka/Q4ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712090611; c=relaxed/simple;
-	bh=aaHxh0ZajOvHS5KfJxmXsd5EvOqogaNIUdS3zyMuvq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sPe7Pv75/6/Bz5EAmLj3oTdSU5MZouSLLjSGSf0mWzsOJvFKmHM89AgQnerWiZIgiLhXiL6XN9UovJExdgxaYS9/I8DzEL8hqpFDKUCDWj8uNdTWTeNnD8uk6aEBj3I8Ng2GF0ePcdezLiq3Hd8ZsXaOivLG4lGAh1BxwsSrcc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WKpIK81j; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 432KbuAs008721;
-	Tue, 2 Apr 2024 20:43:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=vPV0uWN8wwP3Lj+X6ad0Mvu8PMemMzWRl2tBGJIudWY=;
- b=WKpIK81j1Sqg94bsntLMPQv9DGV1qFPm3nebW2nt/+tSfOsjZGEpxl25t5xvLbd7K8rG
- 3ACZ0dTlEQl+fexcnfdhhyAJpG68B9zsqBuCIeGcaY0j7GliwJAUK3EtZXFDgN9INzy/
- iE3aeD+8Q41BzjAyTa4083y35u0VsjncXBR+Y8RrJVEJXJtyRd3NoVv8vQLpJZBn0JiK
- KbSZAFgpKaI2V+Of9y7eKjMp3bSA6aYQMwp/PR6A9qwgVwwgq/qW/TwBCzgcURpaScHe
- DxGtkwsa91Nk02nJXzskSvJrVwM9OUoEBGj4TfHxPfeONuQinWZECG+3ZUW7IAzOr8zB ng== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x8s7680bu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Apr 2024 20:43:09 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 432Kh8P9017157;
-	Tue, 2 Apr 2024 20:43:08 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x8s7680br-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Apr 2024 20:43:08 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 432IZ0X8029593;
-	Tue, 2 Apr 2024 20:43:07 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x6ys30m11-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Apr 2024 20:43:07 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 432Kh00s55509312
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 2 Apr 2024 20:43:02 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3371F20043;
-	Tue,  2 Apr 2024 20:43:00 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 908DB20040;
-	Tue,  2 Apr 2024 20:42:58 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.41.83])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue,  2 Apr 2024 20:42:58 +0000 (GMT)
-Date: Tue, 2 Apr 2024 22:42:56 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg
- <johannes@sipsolutions.net>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ilpo
- =?UTF-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-        Vadim Pasternak
- <vadimp@nvidia.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Mathieu
- Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>, Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "Michael
- S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason
- Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
-        platform-driver-x86@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Halil Pasic
- <pasic@linux.ibm.com>
-Subject: Re: [PATCH vhost v7 4/6] virtio: vring_create_virtqueue: pass
- struct instead of multi parameters
-Message-ID: <20240402224256.7370d18b.pasic@linux.ibm.com>
-In-Reply-To: <20240328080348.3620-5-xuanzhuo@linux.alibaba.com>
-References: <20240328080348.3620-1-xuanzhuo@linux.alibaba.com>
-	<20240328080348.3620-5-xuanzhuo@linux.alibaba.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1712092909; c=relaxed/simple;
+	bh=CeTf1GnLqEGbq7mpbpnjAmCKKQFZ0fqT+cHVafZlASk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=jwTK4PU0EpR5GFZEizMQN9YgCS9HZLkkYaFFCBU96HKNyFfJiB1RBS648A2cE+yZGni+8QjE8vzof8wCAx4bOZVLjQRZ4ChmrZkl96heRsW0n5TCGfALFEV4WDDCBDsxBNzD8CX3jGfyCCaGYIoT2+GIv2m7HT8eVJpKqTh2DB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RlieJNnv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712092906;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=L+alDoiqMN7Nxu8CAo+qwAjzO+OBQsTVsBJwYvjZdYY=;
+	b=RlieJNnvIe2TYL+Z4mCYHUBvhV/xpI13OA2nHL7vFr5EJL7Mej3Il8yyEg9qcBlX+U48So
+	dY8DB9nmEwexupwUpAPeKPeprkU6Zr1hGkweW5dmi1uYvahalRMNAD2+byu82cSca+EhEJ
+	Qc5AkynbOEaF2XHEACBaDv4HRWg1rH8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-166-1viEs_XvN6mP1K5ICVYPVw-1; Tue, 02 Apr 2024 17:21:45 -0400
+X-MC-Unique: 1viEs_XvN6mP1K5ICVYPVw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3435b7d65efso757941f8f.1
+        for <kvm@vger.kernel.org>; Tue, 02 Apr 2024 14:21:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712092904; x=1712697704;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L+alDoiqMN7Nxu8CAo+qwAjzO+OBQsTVsBJwYvjZdYY=;
+        b=SxWHHaRtL9M1Kx5koV/vriSVGsZ0UBmFPqQlG2Sb66F8grkB/5tbks8yejRlpFzNgG
+         wev7fju5xHvbL6TVXCcjGqhbe1d9pc7so2lRRpAcFt90ebKqsQwNZJhfnHjk/xi4Cost
+         aUd0xlYaQqu2JKrh9VLffLqv+YmYYvd9y4j/fV+0e7B9IAOuT5ddv/GgwfdwaYMCIErU
+         x1VXURjk56Dg5k8I7Nf0UMhfiWUlq2P39FVO8JfsIdpE8O3ib14V66J//fjsnOofGPTq
+         rbCIcVNek2YB79VdCFVRSO/RpyAlcLNoTiaYycwez/ng6Vqbpi2z8T3DuNOsrqtQFt5B
+         WLVg==
+X-Forwarded-Encrypted: i=1; AJvYcCX6Mg07dgEcsEhkGZZyTYpQI6f0KKONATsEiu42teV8hzZm0yMShh/h2Gw1hw57ndAdIG2v7w6bN1+8SiAGxVISHgFc
+X-Gm-Message-State: AOJu0Yy24XeRzzEndMnS5s6yb24ck0NaYG3HUBkdUl+dMBNUZJmh2xTe
+	dBcxazD9y7Ytwf0s5INHR2PRjIgFKvrjhYrLA5Eryp6KoMnqRUkPRi+8bylx0VrWkZN8ppyAScC
+	Gra5nvECL6o4vQsOpMsszcCtSXoXi94eHXer4vwv5VFaUpSgvUQ==
+X-Received: by 2002:a5d:598e:0:b0:343:4c43:b38a with SMTP id n14-20020a5d598e000000b003434c43b38amr6924833wri.17.1712092903842;
+        Tue, 02 Apr 2024 14:21:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHoLR2TiY4NlePQYEkpCrVsZpefzcsOU3LO3zWyGpNr1faKWUSZIEppdou1j4Es/gmuSNpz7Q==
+X-Received: by 2002:a5d:598e:0:b0:343:4c43:b38a with SMTP id n14-20020a5d598e000000b003434c43b38amr6924812wri.17.1712092903398;
+        Tue, 02 Apr 2024 14:21:43 -0700 (PDT)
+Received: from redhat.com ([2.52.21.244])
+        by smtp.gmail.com with ESMTPSA id f13-20020a1709062c4d00b00a4df82aa6a7sm6888784ejh.219.2024.04.02.14.21.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 14:21:42 -0700 (PDT)
+Date: Tue, 2 Apr 2024 17:21:39 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Zhu Lingshan <lingshan.zhu@intel.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>,
+	Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Kan Liang <kan.liang@linux.intel.com>
+Subject: [PATCH] vhost-vdpa: change ioctl # for VDPA_GET_VRING_SIZE
+Message-ID: <41c1c5489688abe5bfef9f7cf15584e3fb872ac5.1712092759.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3GI-WGeK5s55lBMUzMMapcBrCW7xXaZl
-X-Proofpoint-GUID: 6iUy-UfqbpinpmO9UNn-I9GuSFsVdcSl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-02_13,2024-04-01_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- mlxlogscore=999 suspectscore=0 lowpriorityscore=0 adultscore=0
- malwarescore=0 impostorscore=0 spamscore=0 mlxscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2404020153
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-On Thu, 28 Mar 2024 16:03:46 +0800
-Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+VDPA_GET_VRING_SIZE by mistake uses the already occupied
+ioctl # 0x80 and we never noticed - it happens to work
+because the direction and size are different, but confuses
+tools such as perf which like to look at just the number,
+and breaks the extra robustness of the ioctl numbering macros.
 
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -503,6 +503,7 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
->  					     struct virtio_vq_config *cfg)
->  {
->  	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
-> +	struct vq_transport_config tp_cfg = {};
->  	bool (*notify)(struct virtqueue *vq);
->  	int err;
->  	struct virtqueue *vq = NULL;
-> @@ -536,13 +537,14 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
->  		goto out_err;
->  	}
->  	may_reduce = vcdev->revision > 0;
-> -	vq = vring_create_virtqueue(i, info->num, KVM_VIRTIO_CCW_RING_ALIGN,
-> -				    vdev, true, may_reduce,
-> -				    cfg->ctx ? cfg->ctx[i] : false,
-> -				    notify,
-> -				    cfg->callbacks[i],
-> -				    cfg->names[i]);
->  
-> +	tp_cfg.num = info->num;
-> +	tp_cfg.vring_align = KVM_VIRTIO_CCW_RING_ALIGN;
-> +	tp_cfg.weak_barriers = true;
-> +	tp_cfg.may_reduce_num = may_reduce;
-> +	tp_cfg.notify = notify;
-> +
-> +	vq = vring_create_virtqueue(vdev, i, &tp_cfg, cfg);
->  	if (!vq) {
->  		/* For now, we fail if we can't get the requested size. */
->  		dev_warn(&vcdev->cdev->dev, "no vq\n");
+To fix, sort the entries and renumber the ioctl - not too late
+since it wasn't in any released kernels yet.
 
-For the virtio-ccw part:
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
+Reported-by: Namhyung Kim <namhyung@kernel.org>
+Fixes: 1496c47065f9 ("vhost-vdpa: uapi to support reporting per vq size")
+Cc: "Zhu Lingshan" <lingshan.zhu@intel.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+
+Build tested only - userspace patches using this will have to adjust.
+I will merge this in a week or so unless I hear otherwise,
+and afterwards perf can update there header.
+
+ include/uapi/linux/vhost.h | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index bea697390613..b95dd84eef2d 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -179,12 +179,6 @@
+ /* Get the config size */
+ #define VHOST_VDPA_GET_CONFIG_SIZE	_IOR(VHOST_VIRTIO, 0x79, __u32)
+ 
+-/* Get the count of all virtqueues */
+-#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
+-
+-/* Get the number of virtqueue groups. */
+-#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
+-
+ /* Get the number of address spaces. */
+ #define VHOST_VDPA_GET_AS_NUM		_IOR(VHOST_VIRTIO, 0x7A, unsigned int)
+ 
+@@ -228,10 +222,17 @@
+ #define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
+ 					      struct vhost_vring_state)
+ 
++
++/* Get the count of all virtqueues */
++#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
++
++/* Get the number of virtqueue groups. */
++#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
++
+ /* Get the queue size of a specific virtqueue.
+  * userspace set the vring index in vhost_vring_state.index
+  * kernel set the queue size in vhost_vring_state.num
+  */
+-#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x80,	\
++#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
+ 					      struct vhost_vring_state)
+ #endif
+-- 
+MST
+
 
