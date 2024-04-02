@@ -1,110 +1,113 @@
-Return-Path: <kvm+bounces-13386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEAF38959EB
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 18:43:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FC67895A4F
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 18:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1B861C22BB0
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 16:43:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF0DF281811
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 16:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A7015990A;
-	Tue,  2 Apr 2024 16:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DBB515990C;
+	Tue,  2 Apr 2024 16:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4EQPnccd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mHojgZnN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6366B2AD1E
-	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 16:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7512AD1E
+	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 16:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712076194; cv=none; b=PmoaFN3aWLV22FZ/1U1tq5GYujdcSnF03iG4Qiouku19ci5D1jmch3YBvqG4f61lOqGPTdUtZ5xD/ZTp6vnZwb04crzxhM+MYuJ1S/ZX/jMmthEYCrLKvXU6d5bUkOSHsgq7i04RuFU6SfjqQFs/btEyT8wPvwD/Yfi3AVcyzMc=
+	t=1712077172; cv=none; b=MqRV0OcKmhnWlAn6I1RIMiqIdP5LnsaU/G7UK5rptW+RCgYLxk5sb4hIWDV6pojW4PzkvBOyASCZRVtzFlyhSJdI4sxFqERTMdaVdUmnw5gfx/ICgZTMyPIaBW2nt2X7S08MMvnBlcvgHkJccHbPoBHdH4bLy9JGjScA8/+bQao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712076194; c=relaxed/simple;
-	bh=riG1sGW0LAhZ2RlsuiATG4JTDf+SyaueGMxSrJRrTwo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bIHUXw9o/J8eda4AYXxR0lKANV8e+iiBrnzX4uHmBgBT1WGGkUvNGtd+quUexHW6KKxeR+zfmraJZPYtJWLPKLEq1gWN4FFl7Dj4g+89EIkgpaFKCrU2zUoGEoE7W5mP0XvasH5B/cNQZ/iW3VGC0Z+BpWFyoQy9JMPgD1zDno4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4EQPnccd; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a468226e135so651427266b.0
-        for <kvm@vger.kernel.org>; Tue, 02 Apr 2024 09:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712076191; x=1712680991; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=riG1sGW0LAhZ2RlsuiATG4JTDf+SyaueGMxSrJRrTwo=;
-        b=4EQPnccdnePS8ONTzPgpwY9kN6TGncDigQkBLklg5bJuO8r72K+Ab465zIehaZM1qs
-         cd18WSY8zThNDVDuODvUHvnd814wqiUSjEE3x4h6r01824hT1sp+RmBMtNZ9DzusnBLi
-         KKUCPLh+HNbbZJxEJtBTakmxq4uawqek0RSmhwtxSlzMSIJmyC9Q9vHwr7/jiYthMXX/
-         G3pQx6JME9PZX5vGJd1X96dSOCbiLEc2fsJCM0t8CnlrWawDr9GnC/qNF8xIqrw9yJaI
-         7DtubyM2TQo4pw/Lp0Wtq1prPNY3jrKFgAUYfPCDC5VZqhVP1VHsZFZSmumYpu/BBS1t
-         XBvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712076191; x=1712680991;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=riG1sGW0LAhZ2RlsuiATG4JTDf+SyaueGMxSrJRrTwo=;
-        b=byxQScNvRvPNruz84brJ3xyqPR8/UNS17eLuR21NcbdfgmPmrabbDdASta4ikSClNl
-         4Q665n/H2MQb/6+0EcFnP+f7kuuKeLn54CeEGV+2EVMX1O/yZX4FfsHTcVCWe5dZjy/7
-         2+ye3yXijJHmEMiK7evvIKAivFKpHiWxkrP+NRx/Q8bivbOHzdsD+zn4z6JhTZGvY5pO
-         0T8EZnaF7wYpjtFzFd7ulwm8RgA0N2uDoFjKdG7b21cVF8kwkUzMpw4xOG2sAX3uueRx
-         NMHUtKBthdlnR/vUNJ1QkF+u2mWJcDtPEpiiRdaUuIlYoD+p5+zutpGSrW33K4WGYtM5
-         m3Ow==
-X-Gm-Message-State: AOJu0YwpwpWyPDKjsxI9Cv+4yWKzlE+q7j/OSi2LpP9b8zfDsMgGNTDJ
-	uKiqoyn5nhwW5699xKbXbQ5MFftZcrQtEDFFAsqCdNI/hRqPh/Nwyo9TM74HZSSLZjowNr4B4vp
-	Jah8r6cmJ2wQfawswCzmGkJnpDLEWZeSvnUHO
-X-Google-Smtp-Source: AGHT+IFaAFs5HfCQcjom/iuntzx5AEiS61s41MUTcAaiM45OQ0E838QGY5JS4c8Zn/0I0+QDR3IMFnsV/Wzl/l7W1JM=
-X-Received: by 2002:a17:906:d9cc:b0:a4e:109f:7b4b with SMTP id
- qk12-20020a170906d9cc00b00a4e109f7b4bmr8885798ejb.41.1712076190553; Tue, 02
- Apr 2024 09:43:10 -0700 (PDT)
+	s=arc-20240116; t=1712077172; c=relaxed/simple;
+	bh=drIyaZ0Ajd0hKvt7CddRZ21cDMISnXuJGMX9AT9buZo=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=ha0W4Giq0u5nSo8AxuUJ1RJWRXcpeLNPZQTiQ/w/7Ru06Gs1z/dPprRs6X5SWr6d0l8qpLpXdvjyyP9XH8Mz1k+H7PnVkQNwt2ljfm9kmCcI5Vd9dTOaZWbL6MTS5ekeLgJuxcc02AH1A0HES+6MmtQuvdk7aV4Enye8/1GvH5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mHojgZnN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D8EC433C7;
+	Tue,  2 Apr 2024 16:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712077171;
+	bh=drIyaZ0Ajd0hKvt7CddRZ21cDMISnXuJGMX9AT9buZo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mHojgZnNcMlTSDEafUDbjzP3O5ZRXTKxm6/0E93gh2Wgr1IRz0VXFN2uhqT8AR0r9
+	 oot5ZDyRm3Qy7oX9QUN10zrEk5nUEAmkb9f/pATqV8hfGeKqfEkjSy51wTe8ThzKj/
+	 5eKtpDKmdSGf77gAG6+Wt+x3FgdWQI+LitrWHj9UySnKoiH9khCE1/ZRKYmaxfPaRW
+	 DH23GEkZat8EwjS2QvD7CqOlDadCMpyWCE6fAfSlaTn2m163+Va8ofnOKiAU1rkgJe
+	 hyE2ZE2hDYfIUUhpuZ7uVZ3y94lB+vZXwtNmmNxKF1QyaRHYOolMJmUpINJDfLd6Mo
+	 jIyP60phzuGsQ==
+Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rrhTt-000nor-4X;
+	Tue, 02 Apr 2024 17:59:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205181645.482037-1-dmatlack@google.com> <CALzav=d0w=u3n4CcSWVOv=A-9v+x54aP+KVGBOrZ0=F+R5Yy-A@mail.gmail.com>
-In-Reply-To: <CALzav=d0w=u3n4CcSWVOv=A-9v+x54aP+KVGBOrZ0=F+R5Yy-A@mail.gmail.com>
-From: David Matlack <dmatlack@google.com>
-Date: Tue, 2 Apr 2024 09:42:44 -0700
-Message-ID: <CALzav=dBj3y2P4BvEO4j8_Bzb8NMd7kmJd4O9XF-N9CffNiFdQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date: Tue, 02 Apr 2024 17:59:28 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Oliver Upton
+ <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao
+ <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman
+ <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, Christian
+ Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank
+ <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean
+ Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] KVM: Aggressively drop and reacquire mmu_lock during
+ CLEAR_DIRTY_LOG
+In-Reply-To: <CALzav=dBj3y2P4BvEO4j8_Bzb8NMd7kmJd4O9XF-N9CffNiFdQ@mail.gmail.com>
+References: <20231205181645.482037-1-dmatlack@google.com>
+ <CALzav=d0w=u3n4CcSWVOv=A-9v+x54aP+KVGBOrZ0=F+R5Yy-A@mail.gmail.com>
+ <CALzav=dBj3y2P4BvEO4j8_Bzb8NMd7kmJd4O9XF-N9CffNiFdQ@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.15
+Message-ID: <def2b19c581f891626dab51cb93be939@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 217.182.43.188
+X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, oliver.upton@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jan 11, 2024 at 8:55=E2=80=AFAM David Matlack <dmatlack@google.com>=
- wrote:
->
-> On Tue, Dec 5, 2023 at 10:16=E2=80=AFAM David Matlack <dmatlack@google.co=
-m> wrote:
-> >
-> > Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG to avoi=
-d
-> > blocking other threads (e.g. vCPUs taking page faults) for too long.
->
-> Ping.
->
-> KVM architecture maintainers: Do you have any concerns about the
-> correctness of this patch? I'm confident dropping the lock is correct
-> on x86 and it should be on other architectures as well, but
-> confirmation would be helpful.
->
-> Thanks.
+On 2024-04-02 17:42, David Matlack wrote:
+> On Thu, Jan 11, 2024 at 8:55 AM David Matlack <dmatlack@google.com> 
+> wrote:
+>> 
+>> On Tue, Dec 5, 2023 at 10:16 AM David Matlack <dmatlack@google.com> 
+>> wrote:
+>> >
+>> > Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG to avoid
+>> > blocking other threads (e.g. vCPUs taking page faults) for too long.
+>> 
+>> Ping.
+>> 
+>> KVM architecture maintainers: Do you have any concerns about the
+>> correctness of this patch? I'm confident dropping the lock is correct
+>> on x86 and it should be on other architectures as well, but
+>> confirmation would be helpful.
+>> 
+>> Thanks.
+> 
+> Ping again. This patch has been sitting since December 5th. Is there
+> anything I can do to help get it merged?
 
-Ping again. This patch has been sitting since December 5th. Is there
-anything I can do to help get it merged?
+Please send a rebased version as a V2. With the number of MMU patches
+flying around without much coordination, it is hard to keep track.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 
