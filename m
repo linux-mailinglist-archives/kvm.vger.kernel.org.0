@@ -1,235 +1,206 @@
-Return-Path: <kvm+bounces-13354-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13355-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D043894DC9
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 10:44:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFB62894E02
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 10:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DE561C219A7
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 08:44:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EA551F22C35
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 08:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A207451C4A;
-	Tue,  2 Apr 2024 08:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C7251C4A;
+	Tue,  2 Apr 2024 08:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="YyTDyppR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YiP66Yvp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C8A405CF
-	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 08:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712047429; cv=none; b=TlsXoH/jUCq8UW+KtKScJ31nOa+TB6WavcarBpNUk8Hnd6Ft/D+oK256vCnbn2WoMwniw/+2uj4BJtlN5nQUEbRSWnNDPaYaCPveoN/N3z2P4RJAv2Bz6+NDpPEmTTQ99MipiXqWKByz87JVsf5vSC7D5sSzHytyagpru2xQph4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712047429; c=relaxed/simple;
-	bh=lRW7ZLuKa0j9IDi6x5isHllL3lXa/vVHzH/iCRWfhwo=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Q8uRnubfgmwnLMvlomc+fBdKFbDygAQTgolmKNEubn0fNO72YD4WONO2uYl3tvQd9vL3DGNPXxV/Dch+l/t8mtATtATD76shgnF9tO2p8MRNvx7ty2f8jSGdRmyx+XHcd4UL5NYYhabSXCaBNMQneGqhh8KYedvFntFwPbi1ZbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=YyTDyppR; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5a7bbafb946so672487eaf.2
-        for <kvm@vger.kernel.org>; Tue, 02 Apr 2024 01:43:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712047427; x=1712652227; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=1ao1EWfYPtfm1HGEz8PRLBvpnUq6uoeFW7iGA9WZBEg=;
-        b=YyTDyppR4qwNmp/vq3UfwdAUVnSHc26a0CViq8kV+ZMkNovCtkYoF45SMF90pL5Rif
-         2WwyjCJrtH5NqXsDVwwtHv824+kFYfoGjtFN2a2T31UrDrfMt7nQcZPMsRDC8qae80sf
-         GVXhCOqF2jZnA0pMr5lW5ncKOuGd8IjRVsBvWm/gfASIQkwLGRtmhF2AXmff59EYIX8V
-         gp76Evar07s9n38RdltdgPuk9mNv0+5gQWUNpKcCWq+yZ5UfGC9PQg5gMxuqKBEUZxpE
-         zP8mkEPkzl/b1xHuOU/UkDw0i7G/IkvpnIZujZW3aeiWPpv8y4CnOzCKmNSOWf7m6rTq
-         f2Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712047427; x=1712652227;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ao1EWfYPtfm1HGEz8PRLBvpnUq6uoeFW7iGA9WZBEg=;
-        b=sl7O3smuQGxXW8uDuh4KSkCOOxIK1G8BdfU1gmGtR3QHIc7l5HlC2vHaHlm0b1bmNh
-         9nJqznFak7BRlg13x9QPRkO4Eb6Y3QBV3XxxeTwBVvvEdHakkgRWGsNjEganGk/xYG3W
-         hx2ZwTQbwp8xUPOnTefpZUTwDir/mZyLCyouGKvgq0IiMpuO6w4SbNJDhZiUD9gIesgH
-         /BzaVhvEXMGvJA7MXyK23FeeWKeQHZyHhnJNG5IktewtmqFw8Vt7Pd9bo6rTcomZENmk
-         IPkNulrv2lPkYHj6FZ06RiwYof3b4546mfMjoRxP9xIPgbw29FpzOjqyDp59IoYWIgQ4
-         djSA==
-X-Forwarded-Encrypted: i=1; AJvYcCXv2eHBNjhmOoB4cDFVrqf1yGypPGuP0Z1FttlsGph+yN8Wk8x8WGBEMO2y2txLV5u8HigBqV5K0rNvolvI0jtulNWZ
-X-Gm-Message-State: AOJu0YxZlOiDhrd93MebNHvfyhLZMv8iS6/gHZIa4PcAE6DpTlevC198
-	i4LCoip4yzNG7q3Vn6Na8vGtwOCbyB2TQS8mUn7D1lrytidG+Skew7Lifd3X9YE=
-X-Google-Smtp-Source: AGHT+IHeap9PtoP9dWxZ8Fxsi6MBW8mCRxu5nAbnRlzNqlVnyWHQm9bQqROV6m51/MeKVk/nOwVHCw==
-X-Received: by 2002:a05:6358:e484:b0:183:bd0c:d2c6 with SMTP id by4-20020a056358e48400b00183bd0cd2c6mr4187597rwb.11.1712047426879;
-        Tue, 02 Apr 2024 01:43:46 -0700 (PDT)
-Received: from [172.16.0.34] (c-67-188-2-18.hsd1.ca.comcast.net. [67.188.2.18])
-        by smtp.gmail.com with ESMTPSA id e19-20020a63f553000000b005e485fbd455sm9184675pgk.45.2024.04.02.01.43.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Apr 2024 01:43:46 -0700 (PDT)
-Message-ID: <d382c616-5212-4da2-be63-6ed0a85e13f7@rivosinc.com>
-Date: Tue, 2 Apr 2024 01:43:45 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5AD4778E;
+	Tue,  2 Apr 2024 08:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712047984; cv=fail; b=BufsiJo+YeF9scAi8tSTOaUzVuUIY2FloxN0Ol/jvx+I6QOo+mQbjt8L7tZiHPq8AxKQuCEhDlguqtufxMQnSVnl5WUNJZf/h4gMB3lPH8MrYlllkLtWU+lM89i8okmAttGYeTHT+JuERoNDrhl4cfvfgSGog/yScy24raFyih4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712047984; c=relaxed/simple;
+	bh=dSCEziGDFic31y8YzwKT/HbEkbttIioh73ScuveSlI4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=FS8fYiBTAkxHZLn3v3DcIpgLIIRL1EClcUhihhVdKIGnvqvB39rKDxH3PmleZy7vFJUJ/oswrfzS4TkvFCu7h0OUaIVbxOXfDCUjouAHgPC59jcBL5nt7e6ZA6i1melpKCwBfPytu/GYeGf0Mn7amcbi7DupiR9P+n/b9GHLymQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YiP66Yvp; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712047983; x=1743583983;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=dSCEziGDFic31y8YzwKT/HbEkbttIioh73ScuveSlI4=;
+  b=YiP66Yvp5q/TLgP+gYnhQKQcH7XXmwt95gNbyh9yk6m+0fXon8mDOMKR
+   P0Pos1tnSHUSe/5JXnybMWmTyODa+IFcI5PlS3PgXUfiGlODxNidkExBj
+   6AtwAinzrS7pSDeR/Lr0MvJj9MT0yRkewwITlhHSTUa7Oi0Hju32LjimM
+   2rgNEuKh9x3TglJ4dvh2LIV+p7NwPx+un9tXu5LvSWGGp4v+VHp50K00S
+   3YmYmnxweDVcGN5Lo4z9P2NfWJ2cWxOyOom80S3ONoykJ24O/GUyATCRb
+   VgudVX9d02TP48jgfq7uVH3IKH/W9P+wqMbSySOafTqn3CzMFinSgQhUG
+   g==;
+X-CSE-ConnectionGUID: Or+j1kkXRhizbVC/7PSJMA==
+X-CSE-MsgGUID: dJ4cvGnxRx6TZdXeUBh5EQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="17930784"
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="17930784"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 01:53:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="22474905"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Apr 2024 01:52:58 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Apr 2024 01:52:58 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Apr 2024 01:52:57 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 01:52:57 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 2 Apr 2024 01:52:57 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CopLGe1j3HV8Hg3qYWq7/drJQzB4xA1H0V2q4A9ETAnTUY8qG+RxN0UbnlzDlKVPSER90I89Zaguel+0wHBru+9NUprSysQ0XRJCqq//dppIbMIAzY07vAkpEaMvvqpLgyEjIPK8vZ0i8NNXVO30HWdeO4SR8p26iNd8nwse4dgvWzQaE18nbT/rCDFzLnlwwPn62hsZ6x8LgWGbJE7jhzay5ubD8rf+J/q6PCc3hfWrM1sA7C8oTQdBCyELZpkpepSWC5DHYtb+mI/2vtELZGVaBnj9cfLumrWE26sbatPv3CpmfweXbo9FfDAz9Q20hHWL2p688aGoj1VJThhXnQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xbpPE8aHgca/VbPgEgwsgHZCtYlj8VIiMNFTWrl8McQ=;
+ b=XD4OL7+LIpW2957xjyB8yt03Ys6KmhfUkGLrIxF2fFpenCqxpICqI9NCYC6eTSswqtfJ+mGKUga6Gy9tvmd3QFRQ3TwtdlhImaE8GmJC+trBh0SCIpO1jCqbVaMlXR7LLrrK/v84pMnXxjU+bJsxy4yAgZWv7JvdnjV9hNVxSL/of7Df6m2z8EjYyJgxMSIYQHpMJI1kc3X2Zjdv1OTcg4MsUeBtemIIcTby4u88mbxXNZa56ZFR8PxuLPdDDtLyVtn8ZlvQDuk0ZtJ6dvGd3qJIUYCVUEX3SPlSAiVnlQvrlqygOPj1miXJ9/sCchcmFffrgcAxF+wOStoosLyKuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by LV8PR11MB8700.namprd11.prod.outlook.com (2603:10b6:408:201::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.25; Tue, 2 Apr
+ 2024 08:52:54 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::5135:2255:52ba:c64e]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::5135:2255:52ba:c64e%4]) with mapi id 15.20.7452.019; Tue, 2 Apr 2024
+ 08:52:54 +0000
+Date: Tue, 2 Apr 2024 16:52:46 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: <isaku.yamahata@intel.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	<erdemaktas@google.com>, Sean Christopherson <seanjc@google.com>, Sagi Shahar
+	<sagis@google.com>, Kai Huang <kai.huang@intel.com>, <chen.bo@intel.com>,
+	<hang.yuan@intel.com>, <tina.zhang@intel.com>
+Subject: Re: [PATCH v19 105/130] KVM: TDX: handle KVM hypercall with
+ TDG.VP.VMCALL
+Message-ID: <ZgvHXk/jiWzTrcWM@chao-email>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <ab54980da397e6e9b7b8d6636dc88c11c303364f.1708933498.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ab54980da397e6e9b7b8d6636dc88c11c303364f.1708933498.git.isaku.yamahata@intel.com>
+X-ClientProxiedBy: SG2PR01CA0181.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::13) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Atish Patra <atishp@rivosinc.com>
-Subject: Re: [PATCH v4 12/15] KVM: riscv: selftests: Add SBI PMU extension
- definitions
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alexghiti@rivosinc.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>,
- Conor Dooley <conor.dooley@microchip.com>, Guo Ren <guoren@kernel.org>,
- Icenowy Zheng <uwu@icenowy.me>, kvm-riscv@lists.infradead.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-riscv@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>,
- Will Deacon <will@kernel.org>
-References: <20240229010130.1380926-1-atishp@rivosinc.com>
- <20240229010130.1380926-13-atishp@rivosinc.com>
- <20240302-698f4322ab7ba74fc3dba416@orel>
-X-Mozilla-News-Host: news://nntp.lore.kernel.org
-Content-Language: en-US
-In-Reply-To: <20240302-698f4322ab7ba74fc3dba416@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|LV8PR11MB8700:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Q/hCyoi4BkRhJoRGz4fymdcsjsW9KiqprCJUkZh/tLP2RKGlgdtb+EcDNpoV3adWGG+jtRAKa7n/WL1kxCZJB2Qf7A0VgqEqAWsCbO/bNkyu49lSUt1nWEgvKYreWxGMBQLlGWH5N7XlhUM9QGVAO1ARJLE8Yz0TSFZtyeeM8jlJrc3tJWiERqxQHf87oDTb9GhWRnlIqJS8E1SaklqIsXac0WqrWtuJea8REoxvf4xsgXuk7I7yQDb9B1hY36QKwG2DRKWYzvV7Fe5ytMGfKjEfrWJDyLE0PTFP/DmRCUzf85y93c5iUfe/S4YX/R3VvpuS1lUPD9m1781GiLVexBoyZXJH6Ag0YeSfCmDd+FF3MFZlspuN7kl5T/aiGU/J6Tmdmx8ZEE6K6bJhQc8lNxkJK3ly6u+SmRVGZonRy79uydSYpdRxkx7rHLvfcgX12bzEo0pDO7YK3lyTOqNF3itd6uvWhv0knv23A4lX085tzXWDFUzMxRBVrnJeTEYWNcnjTW3YHDPT8EPNtp2777TK3AgB/viV97HwmlWmQCGFWZMOcDqdoOB8OVzXW8CND26Qjpg+0HO09mGOUiJEudjQLeIexSMKduSfok0vrTlM8GbCC0F4QH4kH36RyhUqjo2kdpQp1PXRwq3u+VU5aDWWuyDxOkeFrIJ0ATddcKA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XR66TyzM6MmCBgjHLfCUO2Zyuz4rfVZjg5V/p2Mn/RFoIbxII1YWuwVw4NJw?=
+ =?us-ascii?Q?2fAC44nb89MRLlHs53odMOlLmzjz2zuTHvKhgwYlhrlWSNyLlg5PkUGwEZPK?=
+ =?us-ascii?Q?iK4/KxPPH2ZG2QZcJMx9e0dAP6O+KSi/JF8LkVJU9yozMKcpltazK4OGyfTP?=
+ =?us-ascii?Q?sozSfMte7GetGbDvfw03883Agh6Z1sPosXhBArcfBjhoHnIWE+km1Zohg253?=
+ =?us-ascii?Q?2qwuoVCGGgTftpo+pXm7c35Khnn88bceA513WhwIjWUtXyPk4fgeJG9SXfir?=
+ =?us-ascii?Q?2vsCMOLw8At4eaGe+59QF8c5mWlc47RsZSaZlZdYgoM6C+nxm2B8Mw7sHk77?=
+ =?us-ascii?Q?Inp34fsWozmRfeo7uxl+1hRvhcsbK/wgwEBsdC1UxYZGI+bn13er/pVVBl8J?=
+ =?us-ascii?Q?vuhczFZ4Hyxq/Ocq3hWCYlE1kzkhll5rZYmtkHt5U05ETnxM+2zL8TAxa7la?=
+ =?us-ascii?Q?kLj0bqGuqEmTJ6yvPN0R0S+C/caHM5iahmpH68am6y7dR9EnGs5IcKY6GCP6?=
+ =?us-ascii?Q?r8OY0vrkc9B1EJ5IBfO0h41sZ+2hkN4P0+5em4DQ50e67NCMa4WDnJj/2l5h?=
+ =?us-ascii?Q?PSwoTXldZzoJHvP8NWiJT4+sqktwJMeDW6vDarLCr/xVKwGBnkXr05TpTUjT?=
+ =?us-ascii?Q?P5BNxC85Tuel/59d90FaZhIlP1F4orw2OCZW5JULbrwDlKNfB3Qd7X3fZCzN?=
+ =?us-ascii?Q?iauwuZi7eN7UQYUWg89jO/mQ/ALGeAlDosN8rzrh50KZBLmk31EtWGUVQJOU?=
+ =?us-ascii?Q?5+bk9TRjcBHZJhEWnCo+RfH+W43R71qWdWqiyDbQclzPeGtuJm6HJfJg7a5F?=
+ =?us-ascii?Q?P0PXE8QG9DQe5egUBQSFfqeu3l8UVUL3naRotgr4aE4wQjkC0ALI2qCC4/g7?=
+ =?us-ascii?Q?n00FPdhT1T7VrCdK4us4o9UhUvPTDX/pR9dYlO5mLPaELlKM1bj7j0ZlRWCv?=
+ =?us-ascii?Q?xN542r3xPgVxoovBVDOTov7knZByFGm6bnqZUq8Txg5JzuHbKrr5v+/JTwt3?=
+ =?us-ascii?Q?J9w8sjmfMpyVUwZCXw+FVtb/q9e0ZaOk8nRGiv0RLzIdndKr+dhb8zBUek7P?=
+ =?us-ascii?Q?yTdUB9/G1jvaIfp1PLzItuGXFWgEvgHyHQT9DK2MyuotOythl79oAC1ITMwB?=
+ =?us-ascii?Q?TXP1c5diOoH5cYEOcHHuCwM1ruiBWqBjxXblDN57UPyMbFEwyNnyB0IqjHTO?=
+ =?us-ascii?Q?h54b64NP4Mn02Uu0co4m/AQ0gs/2G2AArH/W421khffASLkmHSYXtaxBuAVE?=
+ =?us-ascii?Q?kIfU53zGB2LpecZB/g6zYE5N6MIOmG1GMzh34M/a4/1dfF9stsmX/Bxv3ORd?=
+ =?us-ascii?Q?5dUULPFP5qO2GV4jfHG8vBOjzh9/Frjj3YKQDd87yfTf4Kg+CIsuo734c7Nq?=
+ =?us-ascii?Q?DcrxgKCidYmFIwzAAuq9oJjQzxE9ZBA9J7PDI06uat6kRaqr21jCxxSCulO8?=
+ =?us-ascii?Q?RHBVtvXfw0hqNZ84bmbJ8yJ9rBp3Kd6GO7Wagc7xwmxRDGQYD1dEyMxto21J?=
+ =?us-ascii?Q?WJHwPiViAQl6OjtCOrg/NkiQ3ZZ29gJeZA1LdsJHaw8h+zSky4HWI1RUGSXN?=
+ =?us-ascii?Q?7ncTujEKFOsJAMj2dTkF/kmQ+9Fq8abz9c0a6OBR?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cbf73535-3304-4c33-6a79-08dc52f24967
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 08:52:54.8052
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EjVsKh/Zo/YYh+P2idGu9LQe5VF+UEDzJt1FarTsVE37FHAjUZ5FlvXKyMUqM+af0Ks2MjudT56bTScga8PzEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8700
+X-OriginatorOrg: intel.com
 
-On 3/2/24 03:00, Andrew Jones wrote:
-> On Wed, Feb 28, 2024 at 05:01:27PM -0800, Atish Patra wrote:
->> The SBI PMU extension definition is required for upcoming SBI PMU
->> selftests.
->>
->> Signed-off-by: Atish Patra <atishp@rivosinc.com>
->> ---
->>   .../selftests/kvm/include/riscv/processor.h   | 67 +++++++++++++++++++
->>   1 file changed, 67 insertions(+)
->>
->> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
->> index f75c381fa35a..a49a39c8e8d4 100644
->> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
->> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> 
-> We should probably create a new header (include/riscv/sbi.h) since
-> otherwise processor.h is very quickly going to look like an SBI
-> header with a few non-sbi things in it. Can we add a patch prior to
-> this one that moves the SBI stuff we currently have in processor.h
-> out to an sbi.h? Or, we could start synchronizing a copy of
-> arch/riscv/include/asm/sbi.h in tools/arch/riscv/include/asm like
-> we've done for csr.h
-> 
-A separate sbi.h makes sense. I have moved the definitions to sbi.h as 
-of now.
+>+static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
+>+{
+>+	unsigned long nr, a0, a1, a2, a3, ret;
+>+
 
-There is still lot more changes in sbi.h which is not required for 
-selftests even after this patch. But I am okay with syncing with sbi.h
-But I am not sure what should be the synchronization policy for sbi.h.
+do you need to emulate xen/hyper-v hypercalls here?
 
-As needed or regular sync with after every release? The csr.h is already 
-out of date even though it was created last MW (one change is part of 
-this series).
+Nothing tells userspace that xen/hyper-v hypercalls are not supported and
+so userspace may expose related CPUID leafs to TD guests.
 
-Let me know if you have any thoughts about that. I can send another 
-version with that.
+>+	/*
+>+	 * ABI for KVM tdvmcall argument:
+>+	 * In Guest-Hypervisor Communication Interface(GHCI) specification,
+>+	 * Non-zero leaf number (R10 != 0) is defined to indicate
+>+	 * vendor-specific.  KVM uses this for KVM hypercall.  NOTE: KVM
+>+	 * hypercall number starts from one.  Zero isn't used for KVM hypercall
+>+	 * number.
+>+	 *
+>+	 * R10: KVM hypercall number
+>+	 * arguments: R11, R12, R13, R14.
+>+	 */
+>+	nr = kvm_r10_read(vcpu);
+>+	a0 = kvm_r11_read(vcpu);
+>+	a1 = kvm_r12_read(vcpu);
+>+	a2 = kvm_r13_read(vcpu);
+>+	a3 = kvm_r14_read(vcpu);
+>+
+>+	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, true, 0);
+>+
+>+	tdvmcall_set_return_code(vcpu, ret);
+>+
+>+	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
+>+		return 0;
 
->> @@ -169,17 +169,84 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector, exception_handl
->>   enum sbi_ext_id {
->>   	SBI_EXT_BASE = 0x10,
->>   	SBI_EXT_STA = 0x535441,
->> +	SBI_EXT_PMU = 0x504D55,
->>   };
->>   
->>   enum sbi_ext_base_fid {
->>   	SBI_EXT_BASE_PROBE_EXT = 3,
->>   };
->>   
->> +enum sbi_ext_pmu_fid {
->> +	SBI_EXT_PMU_NUM_COUNTERS = 0,
->> +	SBI_EXT_PMU_COUNTER_GET_INFO,
->> +	SBI_EXT_PMU_COUNTER_CFG_MATCH,
->> +	SBI_EXT_PMU_COUNTER_START,
->> +	SBI_EXT_PMU_COUNTER_STOP,
->> +	SBI_EXT_PMU_COUNTER_FW_READ,
->> +	SBI_EXT_PMU_COUNTER_FW_READ_HI,
->> +	SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
->> +};
->> +
->> +union sbi_pmu_ctr_info {
->> +	unsigned long value;
->> +	struct {
->> +		unsigned long csr:12;
->> +		unsigned long width:6;
->> +#if __riscv_xlen == 32
->> +		unsigned long reserved:13;
->> +#else
->> +		unsigned long reserved:45;
->> +#endif
->> +		unsigned long type:1;
->> +	};
->> +};
->> +
->>   struct sbiret {
->>   	long error;
->>   	long value;
->>   };
->>   
->> +/** General pmu event codes specified in SBI PMU extension */
->> +enum sbi_pmu_hw_generic_events_t {
->> +	SBI_PMU_HW_NO_EVENT			= 0,
->> +	SBI_PMU_HW_CPU_CYCLES			= 1,
->> +	SBI_PMU_HW_INSTRUCTIONS			= 2,
->> +	SBI_PMU_HW_CACHE_REFERENCES		= 3,
->> +	SBI_PMU_HW_CACHE_MISSES			= 4,
->> +	SBI_PMU_HW_BRANCH_INSTRUCTIONS		= 5,
->> +	SBI_PMU_HW_BRANCH_MISSES		= 6,
->> +	SBI_PMU_HW_BUS_CYCLES			= 7,
->> +	SBI_PMU_HW_STALLED_CYCLES_FRONTEND	= 8,
->> +	SBI_PMU_HW_STALLED_CYCLES_BACKEND	= 9,
->> +	SBI_PMU_HW_REF_CPU_CYCLES		= 10,
->> +
->> +	SBI_PMU_HW_GENERAL_MAX,
->> +};
->> +
->> +/* SBI PMU counter types */
->> +enum sbi_pmu_ctr_type {
->> +	SBI_PMU_CTR_TYPE_HW = 0x0,
->> +	SBI_PMU_CTR_TYPE_FW,
->> +};
->> +
->> +/* Flags defined for config matching function */
->> +#define SBI_PMU_CFG_FLAG_SKIP_MATCH	(1 << 0)
->> +#define SBI_PMU_CFG_FLAG_CLEAR_VALUE	(1 << 1)
->> +#define SBI_PMU_CFG_FLAG_AUTO_START	(1 << 2)
->> +#define SBI_PMU_CFG_FLAG_SET_VUINH	(1 << 3)
->> +#define SBI_PMU_CFG_FLAG_SET_VSINH	(1 << 4)
->> +#define SBI_PMU_CFG_FLAG_SET_UINH	(1 << 5)
->> +#define SBI_PMU_CFG_FLAG_SET_SINH	(1 << 6)
->> +#define SBI_PMU_CFG_FLAG_SET_MINH	(1 << 7)
->> +
->> +/* Flags defined for counter start function */
->> +#define SBI_PMU_START_FLAG_SET_INIT_VALUE (1 << 0)
->> +#define SBI_PMU_START_FLAG_INIT_FROM_SNAPSHOT BIT(1)
->> +
->> +/* Flags defined for counter stop function */
->> +#define SBI_PMU_STOP_FLAG_RESET (1 << 0)
->> +#define SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT BIT(1)
-> 
-> When changing shifts to BIT()'s, don't forget these (easy not to forget
-> if we go with the synch sbi.h to tools approach)
-> 
->> +
->>   struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
->>   			unsigned long arg1, unsigned long arg2,
->>   			unsigned long arg3, unsigned long arg4,
->> -- 
->> 2.34.1
->>
-> 
-> Thanks,
-> drew
+Can you add a comment to call out that KVM_HC_MAP_GPA_RANGE is redirected to
+the userspace?
 
+>+	return 1;
+>+}
 
