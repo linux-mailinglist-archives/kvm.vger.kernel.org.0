@@ -1,163 +1,135 @@
-Return-Path: <kvm+bounces-13330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEDF7894A38
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 05:59:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80CC8894A44
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 06:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 748401F243EB
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 03:59:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B15971C21EDC
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 04:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9FA175A6;
-	Tue,  2 Apr 2024 03:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2D317732;
+	Tue,  2 Apr 2024 04:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Ti281wdc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zbTJ4iUs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B76F15E85
-	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 03:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000C92CA4
+	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 04:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712030336; cv=none; b=bAndCtZC7BYsRh5F+CWOz7ZC+68PZ/0MqpYcK6x47130+xs56ksjFmz7VEb2A8tbRGXm1sK9bbyTTDfiYbPB1NuJwgwMVA2utywB7uDNoblzB8cmx2n+lqUuGZJmK8pGZXac1dmC0bklrOW+dG6Qw+/fEVAOD9tXCXnIQ9yV4nk=
+	t=1712030857; cv=none; b=QwW9wNWHktqqcR0iZF95Q1x30UmgEcSu40Vb3Mj2p2tjlIbjQzoVrdEtBtbGA9jEnQgyt2sZsig/DyFqiztYRC4MZvzbXKk7/UQFOShio0FXippIwhmyBOmSSQrVsYI5mTfan4SBWS+hP8Z9zqL2EaDLe/MLOCcpjFFpK+uMZgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712030336; c=relaxed/simple;
-	bh=ywvXNzTSFM0+RwoIQB3eo5N6AtGr3mdDxpmz8RcBuA8=;
+	s=arc-20240116; t=1712030857; c=relaxed/simple;
+	bh=S5pOtFaXWTZ9drUl1IGdeRTY03Dh2DX28whh4K9thQA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zn68oGqBBbqhCEon7/aLA3EmMqPM/zmChPwK0tBcC/e3EQlY+Ef6cq5zad4nIl5XZ176lsSQhin23rs/TpTLEEHjkuA509bgGuEsapU8ryWnlJ69Zzxnx7dy17euc00eTwi+hzemUevq0MvXTpNph61chmyEmpeBQeZm4kqsDOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Ti281wdc; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-368b9400e51so28206475ab.2
-        for <kvm@vger.kernel.org>; Mon, 01 Apr 2024 20:58:55 -0700 (PDT)
+	 To:Cc:Content-Type; b=aX6FhHmNayLLckWE1bdnJByDwXSlfty3tD/VaPvhe313qmZYFOfmERSgYhFdahvvKXy3OglKKiQTXXoBV0sd4b0NuDvpdp21h4nR6uwjGBIahnC5on1SU9nNKHhBZz9w0uOTr5D93SNFhtDsTpFFv1Hw5qExEbmvEpGZfQEIBg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zbTJ4iUs; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4156ae9db55so97735e9.1
+        for <kvm@vger.kernel.org>; Mon, 01 Apr 2024 21:07:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1712030334; x=1712635134; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712030854; x=1712635654; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9bxpt1Z3lVJ3TpGTCsuEJ8/rFaYKCKYvHpj+f0zHxL4=;
-        b=Ti281wdct0GB40Hg7U8M2RREj9JVxsL5vj2Om3NSFYj5BGwAaswKW3tGklUMQj378l
-         CiWk9+Ix5VS4qAk7+dzCXPEkrDIXPAnFPW+hkKkKAuMi25nhLAOOagWUOyqrSJhyuusd
-         SMTs2tGoFbED+2TwfECVVSv0zKqWvK6tHK0hNnNZCLcz2nevpM+V9QTENTbBO0y2wkJ1
-         rudCFyybeyvkzl+sJl+dGRaMUW+oPdqsFxoOD36gqyNusYAJubUoHrNegD4CxN+5bqtH
-         CBCnj+lTswRK/zii67vqehTxj7eX6FE+zilUzGC26k5adGPw5B/1xouzEEOIjGbeKD3A
-         a4EQ==
+        bh=DZBWjXNV+ukFYBM6SnOc07suCYCDWH2HqRzY2rUjBLg=;
+        b=zbTJ4iUsMslgn7kTVDeCmGYoEMExnO3fe49V/ZFe7gRydnyOUQciy2V8IjO9PQHiAo
+         f7FSJsHfZAbClhaP4dZ8cubPGcVZ+PQi7xIzcRgyOiqK+Vm0QMrYWV/S0K0EguH+IBLo
+         r0OwIs7l+2aM/XbqTzY3A8p+mpvzeMPspw2OgKSO0hFdi08LWtGJtiVlfNOYZuslTFjs
+         mIXu0F/qIk5Jwr2ZODX+IXcSSMIYEr3otrvztyZwaegwp8dZq3BkSjhWnCE2kB1uaquS
+         4mGYEWbJ9WU5bkPvG9UZWD01jjXrdCpgJjgOhf5mteWn2ti2JuRzzawTCdR8wBOUw/li
+         KtPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712030334; x=1712635134;
+        d=1e100.net; s=20230601; t=1712030854; x=1712635654;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9bxpt1Z3lVJ3TpGTCsuEJ8/rFaYKCKYvHpj+f0zHxL4=;
-        b=d4FPneg7akWlEbFTge1jA/D3mo3ejqgfjB73TJZERbuftfTdH5MPYEnr2lzFLEq/5C
-         nYm8+Jx7BCpwOeyBpibRu8ieiQLmhmdyhkVZVcpniDg/WA5sbgXymJmtHfXPT2ZTGNG5
-         mD9NJkwSBeUqHbbvyugX6pcS3LxQn4eiFQtjrQlcmAqLfHMdqrRiPwrFPr44b5418fDu
-         XkdYpbPyrULMlY5BIvW3xxyG72/UtZkUnOMWDFXWmmdx2UuibvzbV9JDMXq5E4VinoFX
-         m2lSkMr9hqJeJIy2HmmwylyO3S4lXIG10ANqQdJb1ed++lC8iafqgL/YaZxepkZmbrCy
-         Jgcw==
-X-Gm-Message-State: AOJu0YzeSOkTtryoawo6KLt5Y305/SrQqbwF9QxSR5q9/kxN4Dgr4U94
-	vCRS/RXbwrZwtiqf2d55WjXksZd/kgjxAUU27jt9jUvS/0sb4TVZR/vIaHAN5uJgohVVor4dJbO
-	x2IOr7YJloxe1GPA84OWUKw3LBo6zUo9IKgqJEg==
-X-Google-Smtp-Source: AGHT+IE/6+y8EEGe8ADutVzcbosZs3EgTtwEt4Xa4e+6ZfQfa1t6F08knGFoGJt5eCCTft/wUaKMU7ek4AeqOB81Mdc=
-X-Received: by 2002:a05:6e02:1c23:b0:368:a502:14e0 with SMTP id
- m3-20020a056e021c2300b00368a50214e0mr10685689ilh.31.1712030334602; Mon, 01
- Apr 2024 20:58:54 -0700 (PDT)
+        bh=DZBWjXNV+ukFYBM6SnOc07suCYCDWH2HqRzY2rUjBLg=;
+        b=SRZzTDvDe/ivT5SueOJ5qJNgcYDT+MU0IcMH/9lN5zZRTVEJSFcgRl1n15q/1/6JMg
+         9zwjePh6P5wfZwoZ7QxauLyhyKbGeMzYFLmOyv6huFbODdUGyflpQi8yulPAvjVk3L1Z
+         Ga8CYAkJqeerYwwAkc04sp9KGkoU2erx9/Wffm17ZGKUSIXQ1Zil069aKbIVuh3tQ4Hs
+         OEqO9vTA+a8JgEES08kd94qYB+0UMIv2Mv++Cg69G2BfT4nQ3b+kGM+FDi8GuQoNkKZ8
+         jS6s5znXlgHDDmqa/H0zE+ypMh1aTtq9JOikJAJr8lLoN87yeYbuEbkmYJiRLypIEkqQ
+         IkcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEWvdU+MamNd8CKIIMqgksXM6SSihvN78SoA+XrGT661/M+lGmjh57MkbLjlrfu3LUsmw+YRDbnehreH4HShq+tA7K
+X-Gm-Message-State: AOJu0Yx4u1zmWVm86m2ZzPV6Sne28BeIz2IJ5VuEwU9Hg2NxZd2JAR82
+	+dW1+iyk+KvqCx2TXERgUAwAKWkgMYQ0v5TYVPFSqdQ2ZCdPGdWv0RhaS6CYACPJcTfA1juoEV/
+	GeaPdurJzQ8Uu7qUV8SC6iHPYI6jZOe6A5IXQ
+X-Google-Smtp-Source: AGHT+IFySGf8Ru8vCkM5wQVTeOgNnN+X2acwQrfk019Ub2hqyb57NNeXzO4CL4BJZpMyCPNeydNs/OxpDN34ONprOII=
+X-Received: by 2002:a05:600c:358d:b0:414:1ee:f375 with SMTP id
+ p13-20020a05600c358d00b0041401eef375mr713615wmq.0.1712030854163; Mon, 01 Apr
+ 2024 21:07:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327075526.31855-1-duchao@eswincomputing.com>
-In-Reply-To: <20240327075526.31855-1-duchao@eswincomputing.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 2 Apr 2024 09:28:43 +0530
-Message-ID: <CAAhSdy0vokWZopwdrFbY0XyVwNe98YeuQpCGKBP1Uxj-+v18ZA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] RISC-V: KVM: Guest Debug Support - Software
- Breakpoint Part
-To: Chao Du <duchao@eswincomputing.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, 
-	pbonzini@redhat.com, shuah@kernel.org, dbarboza@ventanamicro.com, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	haibo1.xu@intel.com, duchao713@qq.com
+References: <20240401232946.1837665-1-jthoughton@google.com> <20240401232946.1837665-7-jthoughton@google.com>
+In-Reply-To: <20240401232946.1837665-7-jthoughton@google.com>
+From: Yu Zhao <yuzhao@google.com>
+Date: Tue, 2 Apr 2024 00:06:56 -0400
+Message-ID: <CAOUHufaQ-g6L5roB-3K0GamuS3p9ACpPj9XM-NF67GgrjoTj_A@mail.gmail.com>
+Subject: Re: [PATCH v3 6/7] KVM: arm64: Participate in bitmap-based PTE aging
+To: James Houghton <jthoughton@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Gavin Shan <gshan@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	David Rientjes <rientjes@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 27, 2024 at 1:29=E2=80=AFPM Chao Du <duchao@eswincomputing.com>=
- wrote:
+On Mon, Apr 1, 2024 at 7:30=E2=80=AFPM James Houghton <jthoughton@google.co=
+m> wrote:
 >
-> This series implements the "KVM Guset Debug" feature on RISC-V. This is
-> an existing feature which is already supported by some other arches.
-> It allows us to debug a RISC-V KVM guest from GDB in host side.
->
-> As the first stage, the software breakpoints (ebreak instruction) is
-> implemented. HW breakpoints support will come later after a synthetically
-> consideration with the SBI debug trigger extension.
->
-> A selftest case was added in this series. Manual test was done on QEMU
-> RISC-V hypervisor emulator. (add '-s' to enable the gdbserver in QEMU)
->
-> This series is based on Linux 6.9-rc1 and also available at:
-> https://github.com/Du-Chao/kvm-riscv/tree/guest_debug_sw_v3_6.9-rc1
->
-> The matched QEMU is available at:
-> https://github.com/Du-Chao/qemu/tree/riscv_gd_sw
->
->
-> Changes from v2->v3:
-> - Rebased on Linux 6.9-rc1.
-> - Use BIT() in the macro definition.
-> - set/clear the bit EXC_BREAKPOINT explicitly.
-> - change the testcase name to ebreak_test.
-> - test the scenario without GUEST_DEBUG. vm_install_exception_handler() i=
-s used
->   thanks to Haibo's patch.
->
-> Changes from v1->v2:
-> - Rebased on Linux 6.8-rc6.
-> - Maintain a hedeleg in "struct kvm_vcpu_config" for each VCPU.
-> - Update the HEDELEG csr in kvm_arch_vcpu_load().
->
-> Changes from RFC->v1:
-> - Rebased on Linux 6.8-rc2.
-> - Merge PATCH1 and PATCH2 into one patch.
-> - kselftest case added.
->
-> v2 link:
-> https://lore.kernel.org/kvm/20240301013545.10403-1-duchao@eswincomputing.=
-com
-> v1 link:
-> https://lore.kernel.org/kvm/20240206074931.22930-1-duchao@eswincomputing.=
-com
-> RFC link:
-> https://lore.kernel.org/kvm/20231221095002.7404-1-duchao@eswincomputing.c=
-om
->
-> Chao Du (3):
->   RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
->   RISC-V: KVM: Handle breakpoint exits for VCPU
->   RISC-V: KVM: selftests: Add ebreak test support
+> Participate in bitmap-based aging while grabbing the KVM MMU lock for
+> reading. Ideally we wouldn't need to grab this lock at all, but that
+> would require a more intrustive and risky change.
+                       ^^^^^^^^^^ intrusive
+This sounds subjective -- I'd just present the challenges and let
+reviewers make their own judgements.
 
-Please address Drew's comments on PATCH3 and send v4 so that I
-can test this series at my end.
+> Also pass
+> KVM_PGTABLE_WALK_SHARED, as this software walker is safe to run in
+> parallel with other walkers.
+>
+> It is safe only to grab the KVM MMU lock for reading as the kvm_pgtable
+> is destroyed while holding the lock for writing, and freeing of the page
+> table pages is either done while holding the MMU lock for writing or
+> after an RCU grace period.
+>
+> When mkold =3D=3D false, record the young pages in the passed-in bitmap.
+>
+> When mkold =3D=3D true, only age the pages that need aging according to t=
+he
+> passed-in bitmap.
+>
+> Suggested-by: Yu Zhao <yuzhao@google.com>
 
-Regards,
-Anup
+Thanks but I did not suggest this.
 
->
->  arch/riscv/include/asm/kvm_host.h             | 12 +++
->  arch/riscv/kvm/main.c                         | 18 +---
->  arch/riscv/kvm/vcpu.c                         | 16 +++-
->  arch/riscv/kvm/vcpu_exit.c                    |  4 +
->  arch/riscv/kvm/vm.c                           |  1 +
->  tools/testing/selftests/kvm/Makefile          |  1 +
->  .../testing/selftests/kvm/riscv/ebreak_test.c | 84 +++++++++++++++++++
->  7 files changed, 118 insertions(+), 18 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/riscv/ebreak_test.c
->
-> --
-> 2.17.1
->
+What I have in v2 is RCU based. I hope Oliver or someone else can help
+make that work. Otherwise we can just drop this for now and revisit
+later.
+
+(I have no problems with this patch if the Arm folks think the
+RCU-based version doesn't have a good ROI.)
 
