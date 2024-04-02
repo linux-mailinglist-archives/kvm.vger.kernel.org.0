@@ -1,243 +1,454 @@
-Return-Path: <kvm+bounces-13341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87ED7894B77
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 08:32:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09A80894B8A
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 08:37:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15DE82836C8
-	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 06:32:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BACC1C21AA5
+	for <lists+kvm@lfdr.de>; Tue,  2 Apr 2024 06:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D7F8224E8;
-	Tue,  2 Apr 2024 06:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5032BCE8;
+	Tue,  2 Apr 2024 06:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b="A7CGFidQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S9xgGnPB"
 X-Original-To: kvm@vger.kernel.org
-Received: from refb02.tmes.trendmicro.eu (refb02.tmes.trendmicro.eu [18.185.115.58])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA7720DD2
-	for <kvm@vger.kernel.org>; Tue,  2 Apr 2024 06:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=18.185.115.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712039554; cv=fail; b=N7gT7uaXQpS7nC/w4mEQR27hNZ3m8Wlk3NgD7rty3fROXlBL9hL8YWnhn5MRRHit3BzyYqb8kywWZlQAKP9YQVMfYLjBgYcPokW47MZ5SEi9N1/KUxNO82hHVM7Xr7tAWFLEulePHL0oZDr0+a/UYCo/hUBexZDWa3HNjNPEc4o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712039554; c=relaxed/simple;
-	bh=ZBEAXjMl8aMOJStM89IW/3Bd78fUZuAHkBQ/AZwUAGs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Vdob968qvzsA74sU69jw92KH6LUgblwoaTESWCsT6Ugci+Y84Z9KGsEZGS9IyBZLPEzoFwcRV2dEYO276R74Rfsz+7kn4vFJmaqRp7eEBW9hTrxgC+5yM6LKUWtntLCgV67Uj9DPJz+La6+WZrmZfDABmpWzd5Bda98PRlfAJuc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com; spf=pass smtp.mailfrom=opensynergy.com; dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b=A7CGFidQ; arc=fail smtp.client-ip=18.185.115.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensynergy.com
-Received: from 104.47.7.169_.trendmicro.com (unknown [172.21.19.198])
-	by refb02.tmes.trendmicro.eu (Postfix) with ESMTPS id E53F810043DE3;
-	Tue,  2 Apr 2024 06:32:23 +0000 (UTC)
-Received: from 104.47.7.169_.trendmicro.com (unknown [172.21.171.124])
-	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id 69DCF10000C4D;
-	Tue,  2 Apr 2024 06:32:15 +0000 (UTC)
-X-TM-MAIL-RECEIVED-TIME: 1712039438.648000
-X-TM-MAIL-UUID: 66fca560-4a5e-4235-9f5a-556509e14da8
-Received: from DEU01-BE0-obe.outbound.protection.outlook.com (unknown [104.47.7.169])
-	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id 9E71A1000041F;
-	Tue,  2 Apr 2024 06:30:38 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GlyCwV4WCbhV0P+lbpRtzFgGSR1uDGUA+XFrwWxH6CJKm7DAbnXViMCiH6a1XDUdheA6fb+EosxWZ4ez8R4j6q5XroK274k5l7u2ay9uNr5BZLEGMfhrRxckcCO+lMiy3BwH0NBdntsaexN2HG5yq9xtFUi1an0X77H9UjRocMz+KMzgz9F7d3Q0w7Kiyc4KjWIPcUNjbPExhemLmo9dURqUNiUYo2P+OkNPZUIZDqkL/xvUm/gQprD9umO+vjPO1zUkE3NQ42KzUCiXtLIOtg+JPC3Npc3WBimvnZU1MG+v6luNHs8xy42KwYSlBPI6XuCAxDGgjwz4bxJIHOvv7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1Qs0KpbVK2J6Fqba87auZMO49qKNG9wDQGX6mRNhOTc=;
- b=HLADAHymBaTD7/n/uFvEOAST/iqs06xE2ngsGIoZkaH1Qqij8hmhggFk7vbivKmlb07Tr5gDxg/8hkaIhSzC+EMVpcQZttHSSIN5XvnL1P34Wcmw22lEN3YGKaYajewEtQIZ8Wc2KY+DEtBaVmODKsOgaMP91boJA6Va6cJD/MHxSFQNI3mZiKu8KWBoO/0MTxlNmlFnR01XJ0eiAUu5BrgNDW6ASsJUUK57TVVj5qtTi4STgKTP5+0fV28DIIUmJL04x23WLoCmDVm27ZPSykEdlb4ZfIEUwuqXmkN0NhCuJ9Aln+d4k6Z067VNXkFxx2kL5I97D1Ced2IiqpRYoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=opensynergy.com; dmarc=pass action=none
- header.from=opensynergy.com; dkim=pass header.d=opensynergy.com; arc=none
-Message-ID: <cfab0ca9-6e01-4fe7-bf00-3e1e7cd5b33e@opensynergy.com>
-Date: Tue, 2 Apr 2024 08:30:31 +0200
-Subject: Re: [PATCH v2 25/25] sound: virtio: drop owner assignment
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
- David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Sudeep Holla <sudeep.holla@arm.com>,
- Cristian Marussi <cristian.marussi@arm.com>,
- Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
- Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
- <olvaffe@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Daniel Vetter <daniel@ffwll.ch>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
- Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
- Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
- <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- "James E.J. Bottomley" <jejb@linux.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
- iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
- kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-sound@vger.kernel.org
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
- <20240331-module-owner-virtio-v2-25-98f04bfaf46a@linaro.org>
-Content-Language: en-US
-From: Anton Yakovlev <anton.yakovlev@opensynergy.com>
-In-Reply-To: <20240331-module-owner-virtio-v2-25-98f04bfaf46a@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0159.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b3::15) To BEZP281MB2374.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:5c::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38918219FF;
+	Tue,  2 Apr 2024 06:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712039864; cv=none; b=Jksu/BfLMf/YeFTUtjPOI2omxXFu7S6JuENhvl1+Y/u7DC98jNz86q9TptDKL0MTQ4GGYUp9Sr/GCtgo7hk0XRl34Z/s2A7hCcgHry9kuTZmqdrHQx/193VxYnKTtbEvzxoq3vHi15NvI0aWSue6O1XevNryr20E8ilz2zK9iGE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712039864; c=relaxed/simple;
+	bh=WGICcZtRDyKUPDDG9RTEoEfu6A++ShcvmxKaOD2dDr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pAhUyE1e8Wk1i0SXC3SOrqxQLJrnC07UOsrC3XhibcnJwVnJbp2E1iElus66oG7GIE0CDWo/2Eih97SYRS521uU/6xAv/s+JfHiUKAKKwhiuoH0jAV5PYrnP8hqd0+JPPhIAjoDITvwpzQECcOGYeeBB2eknyo7MIQehwZ3vel8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S9xgGnPB; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712039859; x=1743575859;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=WGICcZtRDyKUPDDG9RTEoEfu6A++ShcvmxKaOD2dDr0=;
+  b=S9xgGnPBpig3dt0CeAax3iElcVwdBk0ruG+wBFN8DKmFXW31jbiZ2EbL
+   BW5HWw3HVcwm7ORYUFLxsUNMFE93iKhhf16aEzHF0hpoVQFMMFOnMh/3V
+   p4Uz+8YghP+c7b4KAveNzKvMxnvH0E+duhlM5RQAdCravEmeK371KVlZa
+   aIP5ayT5zIWRkHDVzVBqWQqCR7QzVB6Y6x+VAlSVBpWQ2PKnkyk8+utZV
+   nxyaX0eFaPtfUGmT6iODc2fqdathyez+iNHH2aEa4dPL7sZjc/G4tnXbF
+   V2C5Mr0R0Ddnm9ohONmna03F97ume8j2RiIFAg3GTZIMlgO3Q6RB3tUxy
+   A==;
+X-CSE-ConnectionGUID: nzEZCtZOR5+FLrWZQBe8iA==
+X-CSE-MsgGUID: tocUPWIJT7ij612yOI5YeQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="10975149"
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="10975149"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 23:37:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="48962106"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 23:37:38 -0700
+Date: Mon, 1 Apr 2024 23:37:37 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 062/130] KVM: x86/tdp_mmu: Support TDX private
+ mapping for TDP MMU
+Message-ID: <20240402063737.GX2444378@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <fc97847d04f2b469d8f4cfceee84c7ef055ab1ac.1708933498.git.isaku.yamahata@intel.com>
+ <9ea80003-3167-45f0-8574-01c364eb33c7@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BEZP281MB2374:EE_|FRYP281MB3161:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	fIOq54zz9MjbZGfW0IyOo00+ZveeYzBUBtoIDl46iUfIMnzeu+vTPV9G54jRufB9xtyN1SJgzy4syB6pUDEewcGzGmARyaUEc90sUbRgmsDrKe819Z80/z3vgINJIekjovyogS/XTp/EBxkIOSWNaJ66whwVox7e99xvL8NxD+HwAZ2jHmQ+TsqD3wrwuZJLuzQrQyi5EFNmyS5fdgmy2vzXKKJrIgwUKRHy14E1ldSsMkCiZrq5q8MP2RSafNX5Ep8C9X6A8i7Lh5tConcf49cGHKYiotxJV33vUr9a9fQisNF6leN4Ku38nZIW8G4WpGDZGOt6s0S60GyMXP5OVPd7c6ZYT891EILhOmyxM1NQI0QjEd+QR7xyDvBuAAZEUkFQG8IuIlPMln1iGyTOiwkCdwUDlTfCAnw1Pa7RDmqaKbcx7JDwooRlrlrcUuYpvIo6Wyv1NOqkQVAQ5LgIefzf1OxqIQcoFku95BjcG98I7PGzHFlLgXfL80U0jxfIKK8KxrJy8GE7XZKgadhy1J65AJ/Kxe6y9fFNW4jf8EnGr02Gr25zDt+ZzMkT+H/Mtrl/nzYgtmlTX6CxT82DFoDjKsWvTryQBIWSDN9b/GKTVYSBzWC6QvFwCKD2u6vbrfO4EZwdB2rWnysbst+Fu9m/RjBm9K8KIpca1RpUEq+L0gAfTaWE2DefZdolC5RREJeqXw+7ThmMxeMgLZj0xA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB2374.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007)(921011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?blRUVjYyTkxGV0M0a0VaNlZuQ1NzVDNUYitoWnAwUXRWVFdqVW8xL3ptSnB4?=
- =?utf-8?B?VHVjTEY0VUtEZ0I2QU5jZXlHcEd4dSs5K3hmdEYzb3dzeFR1czNxZ0lBQ01G?=
- =?utf-8?B?WFZoQ2k2TXBWNHV4S3VSQWwxNGhIS0JoaFk3R1RzcW5LdHlsOHA5NVJxUElp?=
- =?utf-8?B?eUpJN2lEV3daeFA3aXZVa1Ura3REa2FNS1p4U21OTDY0NVl1b0tWZndSNnRs?=
- =?utf-8?B?c3Q4aFhocUpBNllQZlBSVjl1QVlrbDBvUVF4SDFZSUx1eFZlamV0UnFUVkd2?=
- =?utf-8?B?dUJGYkZjY09rakRaLzNPeUZtYlRDdGtqSkxDSmp6dEdMbWRPbS9xaUJWbk5Z?=
- =?utf-8?B?TEhmYlhVNW5jb3lQYi91TmlXZ3BoaFh1UkxDM2U3K21OZmI1dWNIcDRVSGVw?=
- =?utf-8?B?eXZweFIvOXpjSWhtYkVWK3lROUJSVmNIaTRUOXdYUndZVjFKczNWMDJQRlZm?=
- =?utf-8?B?amJ0aFFJTWhOclBVc2VySjRZaG9hQTI4cThXR0RoMHdQaXlibDJNR2kwc3V4?=
- =?utf-8?B?Q0VjbDVGc2lkM1JIUE1pVGNIS1A3YWRNVWhZd1U2QTYwMHhlZm5nRUtSUGFw?=
- =?utf-8?B?dC9lVjFFKzRTQ1lPYmVucTRmYUUzSVBBR1laVmdPaTQ2RkRsckdzeGErZkNF?=
- =?utf-8?B?WWl2S3pVY1JzcElhY0w0cnNjSUVla3Q3c3NvMFFJK3hHUmI0aHB0ZVkwSVMx?=
- =?utf-8?B?S0tSejhsSmlIZFZXVFdOem9JcWtIVy9Ta1VvN1ljZUo0cnZZZ3BmSXk3NDNC?=
- =?utf-8?B?OFQ1TXZKczhKdzd2RTlYU09iNHFBUVB5bTMrUENISHYyZ0FmWEdkV2dsOEF5?=
- =?utf-8?B?UWtVTFRENTV5MkZONUpSOGpqU3hBWE1HTHZGWDRaM0FXSDBPdW5MVDRROTln?=
- =?utf-8?B?ZHFrVSswQ25BQURkaUJFdG1qNGh2M1NpenFuRFhCcVNCQmVhY1ZRREZ5OVNT?=
- =?utf-8?B?MXdkUGdaUTdjNWxYbVJQMWg0cHNYbFp1UFB2cVVURUVOMEFuMkdTQ3ZaeUdQ?=
- =?utf-8?B?dzlLcXh5a3V5KzdKQTNVV1VQZ2FsMVU3OE5QQW1pL3FwMW5TQVZvRFFZVG5O?=
- =?utf-8?B?aDdrK01FNFZVdHpRTWxZK2JMK29pOEZhSmhXNHc1RElsY1dyVVI5cHRnWE81?=
- =?utf-8?B?c0NBVmlhWVNGd3RxZzBvM2I3aGR4aVA0MUNOajNUaGxZVnNhSDEySWkxUDZH?=
- =?utf-8?B?ejNrRnNLVWJJcGN1UnRoQXRxSjZqQWhVckZnWkVpK25kVUpra0E3c1NHdFJJ?=
- =?utf-8?B?RCtNaUoyRHJ4bnp1QWh5VS9GV09ydnk4bEpKOUpIaW1xRDBPbnNrNVIwOVQ1?=
- =?utf-8?B?cEJVeTU2SDQrd0hrS1Avd09FR1VBSkZPVnp2bWR4ZlV4UWJ0b0VLOUNvcWVM?=
- =?utf-8?B?OGUrVTRsVi8yckxjU1MyWjU4b2h1VU1oN1l1aXBZdGdMN3FISGJuUmxmLzRM?=
- =?utf-8?B?NEpQR2RPOVZIRnNzWjk1akt3WXlrWlFtc25NTFJZN1RSdS9xYkt4cjRWam5F?=
- =?utf-8?B?NnNzbEhjMUZBSlpieHBJVktCZFFtWjk2RTRENUoxYTROTVhXQzNEaExCWG1w?=
- =?utf-8?B?UVlFbklZYTk5ekZwUHhsTlBwM25EaWprcmprYkZKS3lzU2JDYmdWblB6ekJB?=
- =?utf-8?B?MmF1bW0xQUNFV2VNU0pkSkVRRnRkNkR6eHk0OXRBTnpuWnk3TnpSb21FVGdU?=
- =?utf-8?B?SysyWFprU0FTRFRtdGtHTm1pQlZvZmFLNXRRV01OUW1lZzRWUG01c1NlUGw4?=
- =?utf-8?B?dmRqV1pGSTZNUFpRTHJ0eUhXbEFMczBEdGJvc0J4UDJEVkkzU29WOW1GSjNJ?=
- =?utf-8?B?WDRUOXl1ay9OekVtRHFYSWV3R2dCMXJwT0VsZ2UwM3lhSEdiVWRRM2dsbjdI?=
- =?utf-8?B?TUgzeCs4YjlyMGFDM1RPRmM0RDYyd210NEtLdFFHRy9MRG1rYXpNYXVyd1FC?=
- =?utf-8?B?ei9iVHpnK0pWMzBBSW5xZTRiTG03OW15ZGFNbTdQdHRHL3FjWTlGYlFwdlIy?=
- =?utf-8?B?d2NyRnN4dVFOaXdac0RSOVE0MXdzdEcyS0draThveEVwbDNseEpKSEkxMkhL?=
- =?utf-8?B?SmVndTNoRXJtSFNwL3dIMGxzRmdkeCt2S0Q2dzhWdCtmaVVnY1h3OSttODE5?=
- =?utf-8?Q?VC6GVSFSz9C7S9Wo4L5XZo+QI?=
-X-OriginatorOrg: opensynergy.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad2547a1-b8ea-4071-42df-08dc52de6885
-X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB2374.DEUP281.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 06:30:37.2050
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IJhIWTU+RHOaEdakYzkQ1ad7D2hwRbYVRgbjUAiqMWbve5wY9sDF6b/+ijvv4JfRXP0crWSexiqoil9yPFVbCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FRYP281MB3161
-X-TM-AS-ERS: 104.47.7.169-0.0.0.0
-X-TMASE-Version: StarCloud-1.3-9.1.1015-28292.005
-X-TMASE-Result: 10--5.445600-4.000000
-X-TMASE-MatchedRID: wQVy7q402w1TzAVQ78TKJRhvdi92BBAuZK1SF2R3edhrIVA3IGfCC6DE
-	DQa+uiKUH2xok6cGGNABKhB2N2U17vLk2AFN1sunQj0AQ98QP92q8lf9o0av1xIIN3MAx5f9anZ
-	VdS5mxHyDZQoKdarzvOEvGuhUCHAT+IFpwsDCYKBaOxpgjiWHdd/upPexrMg4sZFfGXBYeAAKjR
-	CEKUuElpLHk4pGN/0DFk3xbexPTOS72HhspQkaIw==
-X-TMASE-XGENCLOUD: 9e9e9fa0-8253-4e7c-919c-70703b990615-0-0-200-0
-X-TM-Deliver-Signature: 5FBE828BD7A94C0C52584343C217624E
-X-TM-Addin-Auth: 78cuz+pexj/pn1SmQsOZGkZZYypEyT/44Vj2byjl7NNjYTH0fSc9lfkL0fP
-	xPDhlwk1PfhNKWFCVMj9tFI8/gEUTGFLrDXomc/w5mFspJcQvW8bjQnb+FSG9QRjqGtUQPFgol8
-	Ww9/WL3vHqsq6VQWeaWmBp08o0va3jKPQsEnlzZ5fzN5HBIyRVKAaEU3wb8qnjye0TzNasLDM1I
-	71TpnnRTvDzoJIdCdDaXnUWrAVcysLbHbzZ6kIEdTILRnq/hwrHCMEGlyZhZlhz28TwTs1DY+2x
-	REGvXOXiBuZsb1o=.P4ei9focH1shZUt6/8XbQLxrdp4UTkVfy2yLfcnabYWfblNk64FUohEbOH
-	UOH+AMU/Ckd5AX1DzCuC3+4Pu7tKP9ejAofN7LVSP+lhgk3VVOx0jCIddBoOEKnWY3gRH0uu0Qq
-	02k3cH+Sqs0Y+R9KIz9YUAS1GDXDErPQ5pKO+r6mKkGlw1dwLJnnE2bJ6LTbHclwxioVu4fuqA5
-	Ph+bsLwi3zQKkiYBOfTAez8aGkogKYXjce0bfeArPtVJ73vac004ukEG9CR33oxoH/MOn+1CRzM
-	fR1QqFeto2OlRdIhVbHa+koY8W3at2JdfvqmDciv2+HiNF/koBYm+QsZeOg==
-X-TM-Addin-ProductCode: EMS
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
-	s=TM-DKIM-20210503141657; t=1712039535;
-	bh=ZBEAXjMl8aMOJStM89IW/3Bd78fUZuAHkBQ/AZwUAGs=; l=889;
-	h=Date:To:From;
-	b=A7CGFidQ7EmvHwlJ1HrqwRnbnsXMZ3gjCVHFSGu9WkvgXKcwtOK84GoQWE+sJXa5d
-	 C8qilhq95NUIlunEbT3uRWpyT2VZzaGUvb8Y8d+kPfevSbp3Hw3Ja6cIYRlU5oY12L
-	 F4TIBe2UNLP7eeessSTSj8EAc2Z/5aPHH3pgY2KKN4hILWfJmMFxhfhXvFhdgJC3TC
-	 z4/hz6/LS4+jn1K4yfEJ57JrIjDulP2cPA5aszppGAdznzIyF3cf9zzvdNAoeFJO5J
-	 kVk+MnW6pUmKdCb+SrYsC0H+aO2JxIouNRNPYR8g62naKKGqj/f+AvcOv7RVCHQJ+A
-	 tPhogaFJgwvHg==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9ea80003-3167-45f0-8574-01c364eb33c7@linux.intel.com>
 
-Hi Krzysztof,
+On Mon, Apr 01, 2024 at 05:12:38PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-On 31.03.2024 10:44, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Acked-by: Anton Yakovlev <anton.yakovlev@opensynergy.com>
-
-
-> ---
 > 
-> Depends on the first patch.
-> ---
->   sound/virtio/virtio_card.c | 1 -
->   1 file changed, 1 deletion(-)
+> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > Allocate protected page table for private page table, and add hooks to
+> > operate on protected page table.  This patch adds allocation/free of
+> > protected page tables and hooks.  When calling hooks to update SPTE entry,
+> > freeze the entry, call hooks and unfreeze the entry to allow concurrent
+> > updates on page tables.  Which is the advantage of TDP MMU.  As
+> > kvm_gfn_shared_mask() returns false always, those hooks aren't called yet
+> > with this patch.
+> > 
+> > When the faulting GPA is private, the KVM fault is called private.  When
+> > resolving private KVM fault, allocate protected page table and call hooks
+> > to operate on protected page table. On the change of the private PTE entry,
+> > invoke kvm_x86_ops hook in __handle_changed_spte() to propagate the change
+> > to protected page table. The following depicts the relationship.
+> > 
+> >    private KVM page fault   |
+> >        |                    |
+> >        V                    |
+> >   private GPA               |     CPU protected EPTP
+> >        |                    |           |
+> >        V                    |           V
+> >   private PT root           |     protected PT root
+> >        |                    |           |
+> >        V                    |           V
+> >     private PT --hook to propagate-->protected PT
+> >        |                    |           |
+> >        \--------------------+------\    |
+> >                             |      |    |
+> >                             |      V    V
+> >                             |    private guest page
+> >                             |
+> >                             |
+> >       non-encrypted memory  |    encrypted memory
+> >                             |
+> > PT: page table
+> > 
+> > The existing KVM TDP MMU code uses atomic update of SPTE.  On populating
+> > the EPT entry, atomically set the entry.  However, it requires TLB
+> > shootdown to zap SPTE.  To address it, the entry is frozen with the special
+> > SPTE value that clears the present bit. After the TLB shootdown, the entry
+> > is set to the eventual value (unfreeze).
+> > 
+> > For protected page table, hooks are called to update protected page table
+> > in addition to direct access to the private SPTE. For the zapping case, it
+> > works to freeze the SPTE. It can call hooks in addition to TLB shootdown.
+> > For populating the private SPTE entry, there can be a race condition
+> > without further protection
+> > 
+> >    vcpu 1: populating 2M private SPTE
+> >    vcpu 2: populating 4K private SPTE
+> >    vcpu 2: TDX SEAMCALL to update 4K protected SPTE => error
+> >    vcpu 1: TDX SEAMCALL to update 2M protected SPTE
+> > 
+> > To avoid the race, the frozen SPTE is utilized.  Instead of atomic update
+> > of the private entry, freeze the entry, call the hook that update protected
+> > SPTE, set the entry to the final value.
+> > 
+> > Support 4K page only at this stage.  2M page support can be done in future
+> > patches.
+> > 
+> > Co-developed-by: Kai Huang <kai.huang@intel.com>
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > ---
+> > v19:
+> > - drop CONFIG_KVM_MMU_PRIVATE
+> > 
+> > v18:
+> > - Rename freezed => frozen
+> > 
+> > v14 -> v15:
+> > - Refined is_private condition check in kvm_tdp_mmu_map().
+> >    Add kvm_gfn_shared_mask() check.
+> > - catch up for struct kvm_range change
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >   arch/x86/include/asm/kvm-x86-ops.h |   5 +
+> >   arch/x86/include/asm/kvm_host.h    |  11 ++
+> >   arch/x86/kvm/mmu/mmu.c             |  17 +-
+> >   arch/x86/kvm/mmu/mmu_internal.h    |  13 +-
+> >   arch/x86/kvm/mmu/tdp_iter.h        |   2 +-
+> >   arch/x86/kvm/mmu/tdp_mmu.c         | 308 +++++++++++++++++++++++++----
+> >   arch/x86/kvm/mmu/tdp_mmu.h         |   2 +-
+> >   virt/kvm/kvm_main.c                |   1 +
+> >   8 files changed, 320 insertions(+), 39 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> > index a8e96804a252..e1c75f8c1b25 100644
+> > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > @@ -101,6 +101,11 @@ KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
+> >   KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
+> >   KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
+> >   KVM_X86_OP(load_mmu_pgd)
+> > +KVM_X86_OP_OPTIONAL(link_private_spt)
+> > +KVM_X86_OP_OPTIONAL(free_private_spt)
+> > +KVM_X86_OP_OPTIONAL(set_private_spte)
+> > +KVM_X86_OP_OPTIONAL(remove_private_spte)
+> > +KVM_X86_OP_OPTIONAL(zap_private_spte)
+> >   KVM_X86_OP(has_wbinvd_exit)
+> >   KVM_X86_OP(get_l2_tsc_offset)
+> >   KVM_X86_OP(get_l2_tsc_multiplier)
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index efd3fda1c177..bc0767c884f7 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -468,6 +468,7 @@ struct kvm_mmu {
+> >   	int (*sync_spte)(struct kvm_vcpu *vcpu,
+> >   			 struct kvm_mmu_page *sp, int i);
+> >   	struct kvm_mmu_root_info root;
+> > +	hpa_t private_root_hpa;
+> >   	union kvm_cpu_role cpu_role;
+> >   	union kvm_mmu_page_role root_role;
+> > @@ -1740,6 +1741,16 @@ struct kvm_x86_ops {
+> >   	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+> >   			     int root_level);
+> > +	int (*link_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+> > +				void *private_spt);
+> > +	int (*free_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+> > +				void *private_spt);
+> > +	int (*set_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+> > +				 kvm_pfn_t pfn);
+> > +	int (*remove_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+> > +				    kvm_pfn_t pfn);
+> > +	int (*zap_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level);
+> > +
+> >   	bool (*has_wbinvd_exit)(void);
+> >   	u64 (*get_l2_tsc_offset)(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 30c86e858ae4..0e0321ad9ca2 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3717,7 +3717,12 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+> >   		goto out_unlock;
+> >   	if (tdp_mmu_enabled) {
+> > -		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
+> > +		if (kvm_gfn_shared_mask(vcpu->kvm) &&
+> > +		    !VALID_PAGE(mmu->private_root_hpa)) {
+> > +			root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu, true);
+> > +			mmu->private_root_hpa = root;
+> > +		}
+> > +		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu, false);
+> >   		mmu->root.hpa = root;
+> >   	} else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
+> >   		root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level);
+> > @@ -4627,7 +4632,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   	if (kvm_mmu_honors_guest_mtrrs(vcpu->kvm)) {
+> >   		for ( ; fault->max_level > PG_LEVEL_4K; --fault->max_level) {
+> >   			int page_num = KVM_PAGES_PER_HPAGE(fault->max_level);
+> > -			gfn_t base = gfn_round_for_level(fault->gfn,
+> > +			gfn_t base = gfn_round_for_level(gpa_to_gfn(fault->addr),
+> >   							 fault->max_level);
+> >   			if (kvm_mtrr_check_gfn_range_consistency(vcpu, base, page_num))
+> > @@ -4662,6 +4667,7 @@ int kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
+> >   	};
+> >   	WARN_ON_ONCE(!vcpu->arch.mmu->root_role.direct);
+> > +	fault.gfn = gpa_to_gfn(fault.addr) & ~kvm_gfn_shared_mask(vcpu->kvm);
+> >   	fault.slot = kvm_vcpu_gfn_to_memslot(vcpu, fault.gfn);
+> >   	r = mmu_topup_memory_caches(vcpu, false);
+> > @@ -6166,6 +6172,7 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+> >   	mmu->root.hpa = INVALID_PAGE;
+> >   	mmu->root.pgd = 0;
+> > +	mmu->private_root_hpa = INVALID_PAGE;
+> >   	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> >   		mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
+> > @@ -7211,6 +7218,12 @@ int kvm_mmu_vendor_module_init(void)
+> >   void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
+> >   {
+> >   	kvm_mmu_unload(vcpu);
+> > +	if (tdp_mmu_enabled) {
+> > +		write_lock(&vcpu->kvm->mmu_lock);
+> > +		mmu_free_root_page(vcpu->kvm, &vcpu->arch.mmu->private_root_hpa,
+> > +				NULL);
+> > +		write_unlock(&vcpu->kvm->mmu_lock);
+> > +	}
+> >   	free_mmu_pages(&vcpu->arch.root_mmu);
+> >   	free_mmu_pages(&vcpu->arch.guest_mmu);
+> >   	mmu_free_memory_caches(vcpu);
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index 002f3f80bf3b..9e2c7c6d85bf 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -6,6 +6,8 @@
+> >   #include <linux/kvm_host.h>
+> >   #include <asm/kvm_host.h>
+> > +#include "mmu.h"
+> > +
+> >   #ifdef CONFIG_KVM_PROVE_MMU
+> >   #define KVM_MMU_WARN_ON(x) WARN_ON_ONCE(x)
+> >   #else
+> > @@ -205,6 +207,15 @@ static inline void kvm_mmu_free_private_spt(struct kvm_mmu_page *sp)
+> >   		free_page((unsigned long)sp->private_spt);
+> >   }
+> > +static inline gfn_t kvm_gfn_for_root(struct kvm *kvm, struct kvm_mmu_page *root,
+> > +				     gfn_t gfn)
+> > +{
+> > +	if (is_private_sp(root))
+> > +		return kvm_gfn_to_private(kvm, gfn);
 > 
-> diff --git a/sound/virtio/virtio_card.c b/sound/virtio/virtio_card.c
-> index 2da20c625247..7805daea0102 100644
-> --- a/sound/virtio/virtio_card.c
-> +++ b/sound/virtio/virtio_card.c
-> @@ -438,7 +438,6 @@ static unsigned int features[] = {
->   
->   static struct virtio_driver virtsnd_driver = {
->   	.driver.name = KBUILD_MODNAME,
-> -	.driver.owner = THIS_MODULE,
->   	.id_table = id_table,
->   	.feature_table = features,
->   	.feature_table_size = ARRAY_SIZE(features),
+> IIUC, the purpose of this function is to add back shared bit to gfn for
+> shared memory.
+> For private address, the gfn should not contain shared bit anyway.
+> It seems weird to clear the shared bit from gfn for private address.
+
+The current caller happens to do so.  With such assumption, we can code it as
+something like
+
+if (is_private_sp(root)) {
+    WARN_ON_ONCE(gfn & kvm_gfn_shared_mask(kvm));
+    return gfn;
+}
+
+
+... snip ...
+
+> > @@ -376,12 +387,78 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
+> >   							  REMOVED_SPTE, level);
+> >   		}
+> >   		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
+> > -				    old_spte, REMOVED_SPTE, level, shared);
+> > +				    old_spte, REMOVED_SPTE, sp->role,
+> > +				    shared);
+> > +	}
+> > +
+> > +	if (is_private_sp(sp) &&
+> > +	    WARN_ON(static_call(kvm_x86_free_private_spt)(kvm, sp->gfn, sp->role.level,
+> > +							  kvm_mmu_private_spt(sp)))) {
+> > +		/*
+> > +		 * Failed to unlink Secure EPT page and there is nothing to do
+> > +		 * further.  Intentionally leak the page to prevent the kernel
+> > +		 * from accessing the encrypted page.
+> > +		 */
+> > +		kvm_mmu_init_private_spt(sp, NULL);
+> >   	}
+> >   	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> >   }
+> > +static void *get_private_spt(gfn_t gfn, u64 new_spte, int level)
+> > +{
+> > +	if (is_shadow_present_pte(new_spte) && !is_last_spte(new_spte, level)) {
+> > +		struct kvm_mmu_page *sp = to_shadow_page(pfn_to_hpa(spte_to_pfn(new_spte)));
+> > +		void *private_spt = kvm_mmu_private_spt(sp);
+> > +
+> > +		WARN_ON_ONCE(!private_spt);
+> > +		WARN_ON_ONCE(sp->role.level + 1 != level);
+> > +		WARN_ON_ONCE(sp->gfn != gfn);
+> > +		return private_spt;
+> > +	}
+> > +
+> > +	return NULL;
+> > +}
+> > +
+> > +static void handle_removed_private_spte(struct kvm *kvm, gfn_t gfn,
+> > +					u64 old_spte, u64 new_spte,
+> > +					int level)
+> > +{
+> > +	bool was_present = is_shadow_present_pte(old_spte);
+> > +	bool is_present = is_shadow_present_pte(new_spte);
+> > +	bool was_leaf = was_present && is_last_spte(old_spte, level);
+> > +	bool is_leaf = is_present && is_last_spte(new_spte, level);
+> > +	kvm_pfn_t old_pfn = spte_to_pfn(old_spte);
+> > +	kvm_pfn_t new_pfn = spte_to_pfn(new_spte);
+> > +	int ret;
+> > +
+> > +	/* Ignore change of software only bits. e.g. host_writable */
+> > +	if (was_leaf == is_leaf && was_present == is_present)
+> > +		return;
+> > +
+> > +	/*
+> > +	 * Allow only leaf page to be zapped.  Reclaim Non-leaf page tables at
+> > +	 * destroying VM.
+> > +	 */
 > 
+> The comment seems just for !was_leaf,
+> move the comment just before "if (!was_leaf)" ?
+
+Makes sense. 
+
+
+> > +	WARN_ON_ONCE(is_present);
+> 
+> Is this warning needed?
+> It can be captured by the later "KVM_BUG_ON(new_pfn, kvm)"
+
+Yes, let's remove this warn_on.
+
+
+... snip ...
+
+> > @@ -597,8 +775,17 @@ static u64 tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
+> >   	WARN_ON_ONCE(is_removed_spte(old_spte) || is_removed_spte(new_spte));
+> >   	old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte, new_spte, level);
+> > +	if (is_private_sptep(sptep) && !is_removed_spte(new_spte) &&
+> > +	    is_shadow_present_pte(new_spte)) {
+> > +		lockdep_assert_held_write(&kvm->mmu_lock);
+> 
+> tdp_mmu_set_spte() has already called lockdep_assert_held_write() above.
+
+Ok.
+
+
+> > @@ -1041,6 +1255,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   	struct kvm *kvm = vcpu->kvm;
+> >   	struct tdp_iter iter;
+> >   	struct kvm_mmu_page *sp;
+> > +	gfn_t raw_gfn;
+> > +	bool is_private = fault->is_private && kvm_gfn_shared_mask(kvm);
+> >   	int ret = RET_PF_RETRY;
+> >   	kvm_mmu_hugepage_adjust(vcpu, fault);
+> > @@ -1049,7 +1265,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   	rcu_read_lock();
+> > -	tdp_mmu_for_each_pte(iter, mmu, fault->gfn, fault->gfn + 1) {
+> > +	raw_gfn = gpa_to_gfn(fault->addr);
+> > +
+> > +	if (is_error_noslot_pfn(fault->pfn) ||
+> > +	    !kvm_pfn_to_refcounted_page(fault->pfn)) {
+> > +		if (is_private) {
+> 
+>  Why this is only checked for private fault?
+
+Because (the current implementation of) the TDX vendor backend gets page
+reference count.  In future, it should be removed with allowing page migration.
+
+
+
+> > +			rcu_read_unlock();
+> > +			return -EFAULT;
+> > +		}
+> > +	}
+> > +
+> > +	tdp_mmu_for_each_pte(iter, mmu, is_private, raw_gfn, raw_gfn + 1) {
+> >   		int r;
+> >   		if (fault->nx_huge_page_workaround_enabled)
+> > @@ -1079,9 +1305,14 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   		sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
+> > -		if (is_shadow_present_pte(iter.old_spte))
+> > +		if (is_shadow_present_pte(iter.old_spte)) {
+> > +			/*
+> > +			 * TODO: large page support.
+> > +			 * Doesn't support large page for TDX now
+> > +			 */
+> > +			KVM_BUG_ON(is_private_sptep(iter.sptep), vcpu->kvm);
+> >   			r = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
+> > -		else
+> > +		} else
+> >   			r = tdp_mmu_link_sp(kvm, &iter, sp, true);
+> >   		/*
+> > @@ -1362,6 +1593,8 @@ static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp, union kvm_mm
+> >   	sp->role = role;
+> >   	sp->spt = (void *)__get_free_page(gfp);
+> > +	/* TODO: large page support for private GPA. */
+> > +	WARN_ON_ONCE(kvm_mmu_page_role_is_private(role));
+> 
+> Seems not needed, since __tdp_mmu_alloc_sp_for_split()
+> is only called in  tdp_mmu_alloc_sp_for_split() and it has
+> KVM_BUG_ON() for large page case.
+
+Ah, yes.  Will remove one of two.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
