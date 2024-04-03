@@ -1,205 +1,363 @@
-Return-Path: <kvm+bounces-13486-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13487-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D71A897765
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 19:53:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25E65897777
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 19:56:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04A791F32687
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 17:53:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D20BE284E3C
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 17:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0656B15575A;
-	Wed,  3 Apr 2024 17:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6B61553B1;
+	Wed,  3 Apr 2024 17:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4jcHm1Wk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BvAfPZqX"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2084.outbound.protection.outlook.com [40.107.93.84])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE46152188;
-	Wed,  3 Apr 2024 17:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712166026; cv=fail; b=owFRXa0i7hvIguwn3qKXDMtvFEfDbo83L7lM+FcWgmnkFdy2GcdMBnBin8yTpjwL2WhCtTYtuHBj0n4wSMiT7vSedJEBr3uhefj+rmSjZE1VE25O+y6mvZ55CJ0ea1stTK5H4RDG2YvLvegyv9vfs944akRPaoxYWT5wYekHjnQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712166026; c=relaxed/simple;
-	bh=/TYwUjVm0Uy206LdCg+39hMPYZ4p8N78LwK04UxatYE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fXiuc+HixPoE0UP7SLQAjirkrzO62JF2DiPmyivdOUdV/V+DWfWHa2J9kQKvDUeiC+H20Kke08jcztIAeeLHcwrJNfuhedXGYgF/tPU70nGx/7OX0KTko1+31g4+LWffC19IOQGmAd7Av2AIKtDSfu9CJcRkIxvWFCfdrA4amqg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4jcHm1Wk; arc=fail smtp.client-ip=40.107.93.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WIw1hxUvkv6AK66+q0fyCcWxlmvOrI0bmpRkVwiIyghZgKIIOz5UJOp5Qlr5fOTz5BZDl3ucdqdhOTOWV4OgpJPXcMDWb+3JbazvmAkgF0YtemOErn8nkw90HH+6vw4hhSMQ3WHuGWn+//au9gvIjMHjYabfbHmj71ciFU1JaL9TClB1mk46PTz252WaeQfa9m17hWs2kOJpAA1bHwVmvAM+JFH89e76Kj4S+lnfqpmmiVfjeRBC7aNC+I3jQ3oVf0B9ysFJiGMe3frPmHgMcZilyMhmH8Iy+aVipvhxI+Kj/TUyXO70MV4jH9Cg9snvqBzTOV2lo7Aa4Af96ET6uA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+oOR3ua1OkafKJbj+8tdMSqJxQ+lFTLsSvptohKYCB0=;
- b=MplWqDfRUvKFzX4VETLJaA689AaQX//V5h2a1Nl1U0h79ZweHeUwjn1klwVYgNQ8qOTVeGv+mkV/MAmgsHTpFyotAbs3c6B9rty9hPNniTB0Uk33CX3XR5DhF9IB97SXoOAjj91zqS669bHKz94QloQ4dJZPfYSPazDE7a6hIZT0OQlGWSB1p5WW1ccZvjiH5N4C7vYa7QJbV8lMgz1aQuhgH4lSmMHhrA20t2v0yJjWOtrKC7DEpxjIuHoKgfb9kJAt87QLs3x6mrHFIgGobMI2ldn6X0freuUYG5p/JAl7NBdYgqOBWdkYEwpVdvszMxE4uNN1SbCag2D/bjG18w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+oOR3ua1OkafKJbj+8tdMSqJxQ+lFTLsSvptohKYCB0=;
- b=4jcHm1Wk6AK7Undb48jn7Y35XitoC92qW66EAfbUcBqeHQVTU8/D2oVFnhc15N0q/K0MstlZ7eIeDrrzW7pdW1Zh/wwIdeKrqEZzu4zdWu0h5jlVkh8WaQoqND6TJOAixA29+bEfp4aOLd6tFrlVdlupmXh8a/p492Qh9PRdDLc=
-Received: from SJ0PR03CA0155.namprd03.prod.outlook.com (2603:10b6:a03:338::10)
- by MW4PR12MB7438.namprd12.prod.outlook.com (2603:10b6:303:219::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Wed, 3 Apr
- 2024 17:40:21 +0000
-Received: from SJ5PEPF000001D6.namprd05.prod.outlook.com
- (2603:10b6:a03:338:cafe::9d) by SJ0PR03CA0155.outlook.office365.com
- (2603:10b6:a03:338::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
- Transport; Wed, 3 Apr 2024 17:40:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001D6.mail.protection.outlook.com (10.167.242.58) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Wed, 3 Apr 2024 17:40:20 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 3 Apr
- 2024 12:40:18 -0500
-Date: Wed, 3 Apr 2024 12:40:03 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, David Hildenbrand
-	<david@redhat.com>, David Stevens <stevensd@chromium.org>, Paolo Bonzini
-	<pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton
-	<oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Huacai Chen
-	<chenhuacai@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao
-	<maobibo@loongson.cn>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin
-	<npiggin@gmail.com>, Anup Patel <anup@brainfault.org>, Christian Borntraeger
-	<borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio
- Imbrenda <imbrenda@linux.ibm.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Xu
- Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Fuad
- Tabba <tabba@google.com>, Jim Mattson <jmattson@google.com>, Jarkko Sakkinen
-	<jarkko@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Anish Moorthy
-	<amoorthy@google.com>, David Matlack <dmatlack@google.com>, Yu Zhang
-	<yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
-	<Edgecombe@google.com>, Rick P <rick.p.edgecombe@intel.com>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, Vlastimil Babka
-	<vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, Ackerley Tng
-	<ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	Quentin Perret <qperret@google.com>, Wei Wang <wei.w.wang@intel.com>, Liam
- Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Kirill Shutemov <kirill.shutemov@linux.intel.com>, Lai Jiangshan
-	<jiangshan.ljs@antgroup.com>, Hou Wenlong <houwenlong.hwl@antgroup.com>,
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>, Jinrong Liang
-	<ljr.kernel@gmail.com>, Like Xu <like.xu.linux@gmail.com>, Mingwei Zhang
-	<mizhang@google.com>, Dapeng Mi <dapeng1.mi@intel.com>
-Subject: Re: [ANNOUNCE] KVM Microconference at LPC 2024
-Message-ID: <20240403174003.damh4vq7xh53e6vw@amd.com>
-References: <20240402190652.310373-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BFB1514D9;
+	Wed,  3 Apr 2024 17:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712166660; cv=none; b=pirYSLkxldOGQAGAZn42kdKGwhCIuLU19I87HhD04TW9f+nv+9AiobllxlzU+678FsYtMEWgbIMI/TajanygDdGeIuUNgR9jDBrScdOKNPaXgiiV6u3Vz2IUYrcFC1NoUAEfE1JKUWF5Rw0y5sFKLFy+ZINimecsERsT1o1mQFs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712166660; c=relaxed/simple;
+	bh=mxhZL7X/jHWtQd81rXRUfhGiKJ+dCgHSGzxl9IE1Cuk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bv5h3ukAGNLyGSxOCnJ+IeWh8Q4s01QUkV3V+exxnEv+O9lWHZWedt7h3LCijuGeN0j/2JBTGxznKAKABekKpiJXd7MZHkzdfOPDugRHgmLOcOhTSgNKgqjHnwpI6ky69nbYXfYrhR9vrdGpghP2FUWgWM0EueDrRIBF8tw6CGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BvAfPZqX; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712166658; x=1743702658;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mxhZL7X/jHWtQd81rXRUfhGiKJ+dCgHSGzxl9IE1Cuk=;
+  b=BvAfPZqXLL4W5fp669KaWtLKEzLSb8X82l3/YPHuxmZVLTYRjlMl+l0Z
+   CpWfqfzWZqPdcRO3bnmxTba74JSSYKvlRcjxHWDt3gFT/+ZiqJSdIK3DF
+   iePJcQsD41K+pRQHS6k6k+rcD+WvR36GKrjOMYjGeP8eKYXdqEXKUh4ht
+   SlCXY9PbBVIdvzP4pTqm+AfGLi8FXWOcaveMb6B6S4qv/9BQDcaAyV/GZ
+   SOgRdLThF+5o2ImVlF7euKiAeqFe3UQsqv+tpCNYdEOCi7jZ9QXU2hoRX
+   09wjFn7zBnKEtV3sNbsBSBcVsIXX6A81/lnLYVe8Dns0pNM3gypqscLAN
+   A==;
+X-CSE-ConnectionGUID: uNCBjuNdRqWVJNxqfCl5jw==
+X-CSE-MsgGUID: AyOQ/vB4QWK9AYy7cTAZQw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="24922949"
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="24922949"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 10:50:57 -0700
+X-CSE-ConnectionGUID: tPvF+u0ySR63vszG97Ol4g==
+X-CSE-MsgGUID: dMl/i12MTI6OINYpWrmbDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="23274334"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 10:50:57 -0700
+Date: Wed, 3 Apr 2024 10:50:56 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 070/130] KVM: TDX: TDP MMU TDX support
+Message-ID: <20240403175056.GG2444378@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <56cdb0da8bbf17dc293a2a6b4ff74f6e3e034bbd.1708933498.git.isaku.yamahata@intel.com>
+ <bd862ee4-7513-4880-b6e5-466dcfb08f1a@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240402190652.310373-1-seanjc@google.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D6:EE_|MW4PR12MB7438:EE_
-X-MS-Office365-Filtering-Correlation-Id: 443cf007-eff0-4aab-215c-08dc5405225c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	b9IhaiAbxyZJor7wRBpJRKx88StThpyzWFXiiLmVEsJoJDSSf5pHZnufmlXcnHqRPa4MlctrQABsdD63lkQIQ6LGOviEvKHCbo13qmu67mJHrZhWG56DwEVsRgizAn066uO67hAYKKhuPKP08dbfch5vVYiGPERH43Mp8Sl2z4w0EL81yeirbxkB8Av+UOq+z94+hjtRVcT2WgkNg6I1pdZIQOh0JE2w5Hrmxewi5AoOEXO4EPSlUa0zLIczRi5CSKFCzO+nXhWX8X/qEIftK9gSlbNPZYVE5WDI89nUdNxQYTJyVhr7ESvxaQeLq5pgNUiPAV3rrj0DBvUUcC1hZDfV1rx0jk0JR28MTZ6MqzN9Iibr56mXxYgUo/qxnAKZAprZkaQ3DFk6KnDNvPtjuwrWbXzpL3zbriKP+ueT5CZeQdOCQDlQPEm5wwZ/8csMQaqHkML6qGqYlRQfSbBfdYx+a8E0wpIgt5ZYq2aD68hL3jsT8jXm4k7ExPXntoYP+gX8LQSCqCJX3ANdvv0EuMpfOb7cuECuzyg/2JBFxokXlhvD9Hni7noU5u6UgqBAVLSRhbGfyO2dSp18NubMtyHOXXs7y3nnxoNozC9UFgtgY4TbQ4lJ1fbpJkKstouJuJVvBjtNmhe67YS7lWD9rGkMRAQzSwR7mYyLscCOH5/i5ugAhsd3CeqJ7lRxxfsZTFP5SKOrCvAiUzspljK3VA==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(82310400014)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 17:40:20.6238
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 443cf007-eff0-4aab-215c-08dc5405225c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001D6.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7438
+In-Reply-To: <bd862ee4-7513-4880-b6e5-466dcfb08f1a@linux.intel.com>
 
-On Tue, Apr 02, 2024 at 12:06:52PM -0700, Sean Christopherson wrote:
-> We are planning on submitting a CFP to host a second annual KVM Microconference
-> at Linux Plumbers Conference 2024 (https://lpc.events/event/18).  To help make
-> our submission as strong as possible, please respond if you will likely attend,
-> and/or have a potential topic that you would like to include in the proposal.
-> The tentative submission is below.
-> 
-> Note!  This is extremely time sensitive, as the deadline for submitting is
-> April 4th (yeah, we completely missed the initial announcement).
-> 
-> Sorry for the super short notice. :-(
-> 
-> P.S. The Cc list is very ad hoc, please forward at will.
-> 
-> ===================
-> KVM Microconference
-> ===================
-> 
-> KVM (Kernel-based Virtual Machine) enables the use of hardware features to
-> improve the efficiency, performance, and security of virtual machines (VMs)
-> created and managed by userspace.  KVM was originally developed to accelerate
-> VMs running a traditional kernel and operating system, in a world where the
-> host kernel and userspace are part of the VM's trusted computing base (TCB).
-> 
-> KVM has long since expanded to cover a wide (and growing) array of use cases,
-> e.g. sandboxing untrusted workloads, deprivileging third party code, reducing
-> the TCB of security sensitive workloads, etc.  The expectations placed on KVM
-> have also matured accordingly, e.g. functionality that once was "good enough"
-> no longer meets the needs and demands of KVM users.
-> 
-> The KVM Microconference will focus on how to evolve KVM and adjacent subsystems
-> in order to satisfy new and upcoming requirements.  Of particular interest is
-> extending and enhancing guest_memfd, a guest-first memory API that was heavily
-> discussed at the 2023 KVM Microconference, and merged in v6.8.
-> 
-> Potential Topics:
->    - Removing guest memory from the host kernel's direct map[1]
->    - Mapping guest_memfd into host userspace[2]
->    - Hugepage support for guest_memfd[3]
->    - Eliminating "struct page" for guest_memfd
+On Tue, Apr 02, 2024 at 02:21:41PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-Another gmem proposal we were considering was:
-
-  - Scalability/Performance Analysis of guest_memfd
-
-Mainly looking at things like points of contention during lazy acceptance for
-large guests, page-conversion latency increases, impact of discard/realloc
-(prealloc?) of gmem pages from userspace, etc.
-
-Thanks,
-
-Mike
-
->    - Passthrough/mediated PMU virtualization[4]
->    - Pagetable-based Virtual Machine (PVM)[5]
->    - Optimizing/hardening KVM usage of GUP[6][7]
->    - Defining KVM requirements for hardware vendors
->    - Utilizing "fault" injection to increase test coverage of edge cases
 > 
-> [1] https://lore.kernel.org/all/cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com
-> [2] https://lore.kernel.org/all/20240222161047.402609-1-tabba@google.com
-> [3] https://lore.kernel.org/all/CABgObfa=DH7FySBviF63OS9sVog_wt-AqYgtUAGKqnY5Bizivw@mail.gmail.com
-> [4] https://lore.kernel.org/all/20240126085444.324918-1-xiong.y.zhang@linux.intel.com
-> [5] https://lore.kernel.org/all/20240226143630.33643-1-jiangshanlai@gmail.com
-> [6] https://lore.kernel.org/all/CABgObfZCay5-zaZd9mCYGMeS106L055CxsdOWWvRTUk2TPYycg@mail.gmail.com
-> [7] https://lore.kernel.org/all/20240320005024.3216282-1-seanjc@google.com
+> 
+> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > Implement hooks of TDP MMU for TDX backend.  TLB flush, TLB shootdown,
+> > propagating the change private EPT entry to Secure EPT and freeing Secure
+> > EPT page. TLB flush handles both shared EPT and private EPT.  It flushes
+> > shared EPT same as VMX.  It also waits for the TDX TLB shootdown.  For the
+> > hook to free Secure EPT page, unlinks the Secure EPT page from the Secure
+> > EPT so that the page can be freed to OS.
+> > 
+> > Propagate the entry change to Secure EPT.  The possible entry changes are
+> > present -> non-present(zapping) and non-present -> present(population).  On
+> > population just link the Secure EPT page or the private guest page to the
+> > Secure EPT by TDX SEAMCALL. Because TDP MMU allows concurrent
+> > zapping/population, zapping requires synchronous TLB shoot down with the
+> > frozen EPT entry.
+> 
+> But for private memory, zapping holds write lock, right?
+
+Right.
+
+
+> >    It zaps the secure entry, increments TLB counter, sends
+> > IPI to remote vcpus to trigger TLB flush, and then unlinks the private
+> > guest page from the Secure EPT. For simplicity, batched zapping with
+> > exclude lock is handled as concurrent zapping.
+> 
+> exclude lock -> exclusive lock
+> 
+> How to understand this sentence?
+> Since it's holding exclusive lock, how it can be handled as concurrent
+> zapping?
+> Or you want to describe the current implementation prevents concurrent
+> zapping?
+
+The sentences is mixture of the currenct TDP MMU and how the new enhancement
+with this patch provides.  Because this patch is TDX backend, let me drop the
+description about the TDP MMU part.
+
+Propagate the entry change to Secure EPT.  The possible entry changes
+are non-present -> present(population) and present ->
+non-present(zapping).  On population just link the Secure EPT page or
+the private guest page to the Secure EPT by TDX SEAMCALL. On zapping,
+It blocks the Secure-EPT entry (clear present bit) , increments TLB
+counter, sends IPI to remote vcpus to trigger TLB flush, and then
+unlinks the private guest page from the Secure EPT.
+
+
+> > Although it's inefficient,
+> > it can be optimized in the future.
+> > 
+> > For MMIO SPTE, the spte value changes as follows.
+> > initial value (suppress VE bit is set)
+> > -> Guest issues MMIO and triggers EPT violation
+> > -> KVM updates SPTE value to MMIO value (suppress VE bit is cleared)
+> > -> Guest MMIO resumes.  It triggers VE exception in guest TD
+> > -> Guest VE handler issues TDG.VP.VMCALL<MMIO>
+> > -> KVM handles MMIO
+> > -> Guest VE handler resumes its execution after MMIO instruction
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > ---
+> > v19:
+> > - Compile fix when CONFIG_HYPERV != y.
+> >    It's due to the following patch.  Catch it up.
+> >    https://lore.kernel.org/all/20231018192325.1893896-1-seanjc@google.com/
+> > - Add comments on tlb shootdown to explan the sequence.
+> > - Use gmem_max_level callback, delete tdp_max_page_level.
+> > 
+> > v18:
+> > - rename tdx_sept_page_aug() -> tdx_mem_page_aug()
+> > - checkpatch: space => tab
+> > 
+> > v15 -> v16:
+> > - Add the handling of TD_ATTR_SEPT_VE_DISABLE case.
+> > 
+> > v14 -> v15:
+> > - Implemented tdx_flush_tlb_current()
+> > - Removed unnecessary invept in tdx_flush_tlb().  It was carry over
+> >    from the very old code base.
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >   arch/x86/kvm/mmu/spte.c    |   3 +-
+> >   arch/x86/kvm/vmx/main.c    |  91 ++++++++-
+> >   arch/x86/kvm/vmx/tdx.c     | 372 +++++++++++++++++++++++++++++++++++++
+> >   arch/x86/kvm/vmx/tdx.h     |   2 +-
+> >   arch/x86/kvm/vmx/tdx_ops.h |   6 +
+> >   arch/x86/kvm/vmx/x86_ops.h |  13 ++
+> >   6 files changed, 481 insertions(+), 6 deletions(-)
+> > 
+> [...]
+> > +
+> > +static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
+> > +			    enum pg_level level, kvm_pfn_t pfn)
+> > +{
+> > +	int tdx_level = pg_level_to_tdx_sept_level(level);
+> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > +	union tdx_sept_level_state level_state;
+> > +	hpa_t hpa = pfn_to_hpa(pfn);
+> > +	gpa_t gpa = gfn_to_gpa(gfn);
+> > +	struct tdx_module_args out;
+> > +	union tdx_sept_entry entry;
+> > +	u64 err;
+> > +
+> > +	err = tdh_mem_page_aug(kvm_tdx->tdr_pa, gpa, hpa, &out);
+> > +	if (unlikely(err == TDX_ERROR_SEPT_BUSY)) {
+> > +		tdx_unpin(kvm, pfn);
+> > +		return -EAGAIN;
+> > +	}
+> > +	if (unlikely(err == (TDX_EPT_ENTRY_STATE_INCORRECT | TDX_OPERAND_ID_RCX))) {
+> > +		entry.raw = out.rcx;
+> > +		level_state.raw = out.rdx;
+> > +		if (level_state.level == tdx_level &&
+> > +		    level_state.state == TDX_SEPT_PENDING &&
+> > +		    entry.leaf && entry.pfn == pfn && entry.sve) {
+> > +			tdx_unpin(kvm, pfn);
+> > +			WARN_ON_ONCE(!(to_kvm_tdx(kvm)->attributes &
+> > +				       TDX_TD_ATTR_SEPT_VE_DISABLE));
+> 
+> to_kvm_tdx(kvm) -> kvm_tdx
+> 
+> Since the implementation requires attributes.TDX_TD_ATTR_SEPT_VE_DISABLE is set,
+
+TDX KVM allows either configuration. set or cleared.
+
+
+> should it check the value passed from userspace?
+
+It's user-space configurable value.
+
+
+> And the reason should be described somewhere in changelog or/and comment.
+
+This WARN_ON_ONCE() is a guard for buggy TDX module. It shouldn't return
+(TDX_EPT_ENTRY_STATE_INCORRECT | TDX_OPERAND_ID_RCX)) when SEPT_VE_DISABLED
+cleared.  Maybe we should remove this WARN_ON_ONCE() because the TDX module
+is mature.
+
+
+> > +			return -EAGAIN;
+> > +		}
+> > +	}
+> > +	if (KVM_BUG_ON(err, kvm)) {
+> > +		pr_tdx_error(TDH_MEM_PAGE_AUG, err, &out);
+> > +		tdx_unpin(kvm, pfn);
+> > +		return -EIO;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+> > +				     enum pg_level level, kvm_pfn_t pfn)
+> > +{
+> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > +
+> > +	/* TODO: handle large pages. */
+> > +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
+> > +		return -EINVAL;
+> > +
+> > +	/*
+> > +	 * Because restricted mem
+> 
+> The term "restricted mem" is not used anymore, right? Should update the
+> comment.
+
+Sure, will update it to guest_memfd.
+> 
+> > doesn't support page migration with
+> > +	 * a_ops->migrate_page (yet), no callback isn't triggered for KVM on
+> 
+> no callback isn't -> no callback is
+> 
+> > +	 * page migration.  Until restricted mem supports page migration,
+> 
+> "restricted mem" -> guest_mem
+> 
+> 
+> > +	 * prevent page migration.
+> > +	 * TODO: Once restricted mem introduces callback on page migration,
+> 
+> ditto
+> 
+> > +	 * implement it and remove get_page/put_page().
+> > +	 */
+> > +	get_page(pfn_to_page(pfn));
+> > +
+> > +	if (likely(is_td_finalized(kvm_tdx)))
+> > +		return tdx_mem_page_aug(kvm, gfn, level, pfn);
+> > +
+> > +	/* TODO: tdh_mem_page_add() comes here for the initial memory. */
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+> > +				       enum pg_level level, kvm_pfn_t pfn)
+> > +{
+> > +	int tdx_level = pg_level_to_tdx_sept_level(level);
+> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > +	struct tdx_module_args out;
+> > +	gpa_t gpa = gfn_to_gpa(gfn);
+> > +	hpa_t hpa = pfn_to_hpa(pfn);
+> > +	hpa_t hpa_with_hkid;
+> > +	u64 err;
+> > +
+> > +	/* TODO: handle large pages. */
+> > +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
+> > +		return -EINVAL;
+> > +
+> > +	if (unlikely(!is_hkid_assigned(kvm_tdx))) {
+> > +		/*
+> > +		 * The HKID assigned to this TD was already freed and cache
+> > +		 * was already flushed. We don't have to flush again.
+> > +		 */
+> > +		err = tdx_reclaim_page(hpa);
+> > +		if (KVM_BUG_ON(err, kvm))
+> > +			return -EIO;
+> > +		tdx_unpin(kvm, pfn);
+> > +		return 0;
+> > +	}
+> > +
+> > +	do {
+> > +		/*
+> > +		 * When zapping private page, write lock is held. So no race
+> > +		 * condition with other vcpu sept operation.  Race only with
+> > +		 * TDH.VP.ENTER.
+> > +		 */
+> > +		err = tdh_mem_page_remove(kvm_tdx->tdr_pa, gpa, tdx_level, &out);
+> > +	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
+> > +	if (KVM_BUG_ON(err, kvm)) {
+> > +		pr_tdx_error(TDH_MEM_PAGE_REMOVE, err, &out);
+> > +		return -EIO;
+> > +	}
+> > +
+> > +	hpa_with_hkid = set_hkid_to_hpa(hpa, (u16)kvm_tdx->hkid);
+> > +	do {
+> > +		/*
+> > +		 * TDX_OPERAND_BUSY can happen on locking PAMT entry.  Because
+> > +		 * this page was removed above, other thread shouldn't be
+> > +		 * repeatedly operating on this page.  Just retry loop.
+> > +		 */
+> > +		err = tdh_phymem_page_wbinvd(hpa_with_hkid);
+> > +	} while (unlikely(err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX)));
+> > +	if (KVM_BUG_ON(err, kvm)) {
+> > +		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
+> > +		return -EIO;
+> > +	}
+> > +	tdx_clear_page(hpa);
+> > +	tdx_unpin(kvm, pfn);
+> > +	return 0;
+> > +}
+> > +
+> > +static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
+> > +				     enum pg_level level, void *private_spt)
+> > +{
+> > +	int tdx_level = pg_level_to_tdx_sept_level(level);
+> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > +	gpa_t gpa = gfn_to_gpa(gfn);
+> > +	hpa_t hpa = __pa(private_spt);
+> > +	struct tdx_module_args out;
+> > +	u64 err;
+> > +
+> > +	err = tdh_mem_sept_add(kvm_tdx->tdr_pa, gpa, tdx_level, hpa, &out);
+> 
+> kvm_tdx is only used here, can drop the local var.
+
+Will drop it.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
