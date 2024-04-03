@@ -1,124 +1,154 @@
-Return-Path: <kvm+bounces-13494-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13495-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A4AA8978A9
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 20:55:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF878978AF
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 20:58:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B1481F23EBE
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 18:55:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 655A728BFC9
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 18:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4291E154BE3;
-	Wed,  3 Apr 2024 18:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE36154BFA;
+	Wed,  3 Apr 2024 18:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gjKQJ0Hb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VVKsuhdq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D9D153BF0
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 18:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815BF153BE2
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 18:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712170533; cv=none; b=tUlzf2ronvt16ll0TY16URojv6ztgmF7ZyhWMhh62oPLJSiMJzHuBXdDMcvMpEfviO+URI//uYkWHoTuVDb4f1j5dIzxLZ8Vr5thNl3YaRAu9IDSiyBHOEKCaa9aBCXbIC2nwu3jx0lg4mcJKQgIPok37kYS3zAk5am3HRF0gJ0=
+	t=1712170675; cv=none; b=ROGjnfpbPxnhMko3RjCjjRFU3Les0kazmSpZiMwNVEI31srsf8EHzQ1+sZlHeS6wLLeftfRFzzBYZdu0ZnKPEA88H1dAxzXQ2lEVBUpcFzEtemlTNNRNUIct57It0pvMrSx4vHJX/47FpGEKoz/18yNDiuEM8VsrnRWfktA04MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712170533; c=relaxed/simple;
-	bh=7XDPcjGhh21TD94uSUZErS3ioNLCHjs+I9ktpoDyyz4=;
+	s=arc-20240116; t=1712170675; c=relaxed/simple;
+	bh=VCwseDRS3dH3F4RP475OT1y3yFT5wh4XfK3fMdZed10=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z977rOD2v53Md57V4TdODroAf0ID836Gh1oQjUTk0gWkNKWHESr3p2ujo2vtre8SfNtUX4Yu6Y1hUIroqwyzAStQOFyJkSPlCymP0tFDnDSQMd3APMxb7HxjZDyaspPBGSGNKYv9ArzvwU0mrWa8LlwmgLfkmtplm+yj0DTN1zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gjKQJ0Hb; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=QThS6H/mYCoVHQBCZiPOrDbuDPEX3NdF19UdCxXhjUumlt/x+yxrtd4wDc1ROuK73/eBuwcygmICKFcvW3Q2P2bMCKipeYECsp+3Y3jg6HW01k+hSWcHdL2c1F9QwXCqdCeX0ri0+8lOZ/yKAgvEXMPlqX/4oyswA1Z9WSF5MU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VVKsuhdq; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a25c69cdb1so79191a91.2
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 11:55:31 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ece5eeb7c0so9269b3a.2
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 11:57:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712170531; x=1712775331; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712170674; x=1712775474; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kzq7wE2LZl4SFXr3lgccRsGuVgsB6ehLKZYX2fNnhEI=;
-        b=gjKQJ0HbCDHax4O0JbMqWZRRcq+C7V+QCHjNkc8TQ6zECYzyMavV94nNDvdAVKaCEM
-         gUvqmN/N87eNwrXdvy45FhoyD9VV/8E7c18I/8gGB112Kk6FC1HoJQxgvh475fqcjFvm
-         YlJH/pw2gHLN8NsPLZI49/LxXacdo9l8tj8Ew9AwO54NpmmwOLRJ4MiUb3t/4txb2kyl
-         AnUpVvjnfB7n1uxqz2ZLM6tvR/m/VmvDmYgn08EPg+ZVTvY/hmYBJ/OqL/GelhkiS/IS
-         lkWQaRs9VokXjUfAZfTpmGfCZ/Pu2CY+o81vJVdu5MIemdmh9cA9/oFL1rsMpWZ47E00
-         uPEw==
+        bh=j6D4+Csx/H66fuN0gEWyFJ3602T63PEUSY/egYj1Tek=;
+        b=VVKsuhdqjGoiEOE5BIgAYJXQOrSxUsZS7zIf/pgRzdP01SBTSpyVBasfwIuYIrq9Qf
+         hfzY8UXSN14TSDrTNau2BzmmBppNLebg72gUZKmWDCzRh9lYyi+TmAjdW8H/HlLXXy2Z
+         0+Zz9N27W3UYhHt8VduRLWI+S5jtd/6g5Dkn6fL/ScyjOYbY214d5TyRF38yKa7+kmq1
+         4GdJJDg4NpbHj5V6vKEYwPCjX4arwH+U/uy9l8Bzb3Qsd6NmWd+klh7lPjdWWrIDfLGH
+         gks4UH7J/PJQGotHc0PdYAcG5u7dwUpfHJViyX3cBXtBqoaMpnoFuAHn7+ar/ksNG+cH
+         2x1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712170531; x=1712775331;
+        d=1e100.net; s=20230601; t=1712170674; x=1712775474;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kzq7wE2LZl4SFXr3lgccRsGuVgsB6ehLKZYX2fNnhEI=;
-        b=t7uiNOpVB8jyy5GQBJvHD+2MlFHWDygmI2xDdOqr/8o2AJTUolQe1F9rYlLw9uRRyn
-         LuJrSz2my2ZayhMwQwPABt/IeFwGWZeITATw2FiDQnfgRHbNnENFf4bqbriFAC3A8Ivm
-         JGfZTi3U+6Ns2Ow4u0R3jmJyZIO+FrFB4dscClNVZ7dk017M3raf9lhdpiO0CIDY6UKq
-         jI1vqFbPTZ83LQPIfGcfnSl6zHJ2XDYvY4mgNuU2rA5NHvAJCoMTB9K5fZnzJjoOAWM+
-         wORbE5YHJLEY6K2EQATwsHhagzJ75LbcdmdwMR7JGz5CTzHsAMEnH7ysX661z34uH8Wm
-         mOig==
-X-Forwarded-Encrypted: i=1; AJvYcCU5TWI4dKjTPoN3VcLo2zWmqSraCTB3jA4lHFpCi5xPAusbFl32jHM9cj5BnH9gQAIAgZmRT6uu3LnVlbx5k4smVCAr
-X-Gm-Message-State: AOJu0YyZaW+mCVgMycoht4kJzHyNAOL0ACQoW0k6Ag51ajRRftMjofRp
-	CUaqGQtf8OVCNDF+kHzXhY+cKZmZmKN4bljPKjXmzDHOe2owzYMYEPSWvTd9SlSyY9HqCQGiX51
-	+Zg==
-X-Google-Smtp-Source: AGHT+IFKGa2KzmAjSzr/ynps6PguHbVfuoYrDmr/tcPFpr26buqw+kLsdXlJNwSfn1UBTe813gJXVI83dEM=
+        bh=j6D4+Csx/H66fuN0gEWyFJ3602T63PEUSY/egYj1Tek=;
+        b=vTCOw/WBQtPU7uENgAzke/+LqHkmbWphA/Zd1AKhEZ819H9tcbNs1P2paOA7xX6n3e
+         PWeMss1IbudBXfjbrCEibmIqKi0kepVX1lJeu9mdpvWiN+Ya2bhvlxFdQvqG5vdlnxkY
+         RSUYmWyQJ2juUbdgtsveIqDhFpwTTrGKVkFp21JlDstB/eeihXty7GYBrs5PA3XkTlw+
+         95g6e7x7Az6chaGZDwrsibwr+t5y2I0/RVK7TGs9832mrgtDml2Zht5QGgUIItTMU5X1
+         WleKbXWG2g9J9UQTegB+ioZEsB2jZfvMI6Jcy7pX4AFlfHJaDQFNRI5b85QZ3G1KREip
+         Bb9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVRpEsolpgJtkUNKSclURoIxOLf331ZGuoH36Bv97H0HPClnEehhBL0oavOfwcQEUG/LhZ+Srruio2X9TbdoXB54DlX
+X-Gm-Message-State: AOJu0YwsFWBQouFS8Nhbeau330vgTvSBfIByTDutNw8jd0g+Qy6Tqr+3
+	6AtvYqt/aZyKuJytuZsIj4y02B3zg3gTzkQC4h04U7Gnv//Ik2vhDxDOTOJs9DWMtSFgHi8xnE4
+	xHw==
+X-Google-Smtp-Source: AGHT+IGSfcmG/cgqkT8mk/sOij3zo2TrmnCSUo9i4s8ZEzOAKnvTQcTZ6PJy7nE55fdROYLozfhDSuzqvJM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:de01:b0:29b:c2b7:7d29 with SMTP id
- m1-20020a17090ade0100b0029bc2b77d29mr1023pjv.9.1712170531325; Wed, 03 Apr
- 2024 11:55:31 -0700 (PDT)
-Date: Wed, 3 Apr 2024 11:55:30 -0700
-In-Reply-To: <20240403183420.GI2444378@ls.amr.corp.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2e1b:b0:6ea:8a0d:185f with SMTP id
+ fc27-20020a056a002e1b00b006ea8a0d185fmr18248pfb.2.1712170673887; Wed, 03 Apr
+ 2024 11:57:53 -0700 (PDT)
+Date: Wed, 3 Apr 2024 11:57:52 -0700
+In-Reply-To: <2a369e6e229788f66fb2bbf8bc89552d86ba38b9.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <d6547bd0c1eccdfb4a4908e330cc56ad39535f5e.1708933498.git.isaku.yamahata@intel.com>
- <ZgY0hy6Io72yZ9dF@chao-email> <20240403183420.GI2444378@ls.amr.corp.intel.com>
-Message-ID: <Zg2mItGOnHsQIP8R@google.com>
-Subject: Re: [PATCH v19 097/130] KVM: x86: Split core of hypercall emulation
- to helper function
+References: <20240309012725.1409949-1-seanjc@google.com> <20240309012725.1409949-2-seanjc@google.com>
+ <2a369e6e229788f66fb2bbf8bc89552d86ba38b9.camel@intel.com>
+Message-ID: <Zg2msDI9q_7GcwHk@google.com>
+Subject: Re: [PATCH v6 1/9] x86/cpu: KVM: Add common defines for architectural
+ memory types (PAT, MTRRs, etc.)
 From: Sean Christopherson <seanjc@google.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
-	hang.yuan@intel.com, tina.zhang@intel.com, 
-	Sean Christopherson <sean.j.christopherson@intel.com>, isaku.yamahata@linux.intel.com
+To: Kai Huang <kai.huang@intel.com>
+Cc: "luto@kernel.org" <luto@kernel.org>, "x86@kernel.org" <x86@kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "peterz@infradead.org" <peterz@infradead.org>, 
+	"bp@alien8.de" <bp@alien8.de>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Xin3 Li <xin3.li@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Shan Kang <shan.kang@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 03, 2024, Isaku Yamahata wrote:
-> On Fri, Mar 29, 2024 at 11:24:55AM +0800,
-> Chao Gao <chao.gao@intel.com> wrote:
-> 
-> > On Mon, Feb 26, 2024 at 12:26:39AM -0800, isaku.yamahata@intel.com wrote:
-> > >@@ -10162,18 +10151,49 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-> > > 
-> > > 		WARN_ON_ONCE(vcpu->run->hypercall.flags & KVM_EXIT_HYPERCALL_MBZ);
-> > > 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
-> > >+		/* stat is incremented on completion. */
+On Wed, Mar 27, 2024, Kai Huang wrote:
+> On Fri, 2024-03-08 at 17:27 -0800, Sean Christopherson wrote:
+> > Add defines for the architectural memory types that can be shoved into
+> > various MSRs and registers, e.g. MTRRs, PAT, VMX capabilities MSRs, EPTPs,
+> > etc.  While most MSRs/registers support only a subset of all memory types,
+> > the values themselves are architectural and identical across all users.
 > > 
-> > Perhaps we could use a distinct return value to signal that the request is redirected
-> > to userspace. This way, more cases can be supported, e.g., accesses to MTRR
-> > MSRs, requests to service TDs, etc. And then ...
+> > Leave the goofy MTRR_TYPE_* definitions as-is since they are in a uapi
+> > header, but add compile-time assertions to connect the dots (and sanity
+> > check that the msr-index.h values didn't get fat-fingered).
+> > 
+> > Keep the VMX_EPTP_MT_* defines so that it's slightly more obvious that the
+> > EPTP holds a single memory type in 3 of its 64 bits; those bits just
+> > happen to be 2:0, i.e. don't need to be shifted.
+> > 
+> > Opportunistically use X86_MEMTYPE_WB instead of an open coded '6' in
+> > setup_vmcs_config().
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > 
 > 
-> The convention here is the one for exit_handler vcpu_enter_guest() already uses.
-> If we introduce something like KVM_VCPU_CONTINUE=1, KVM_VCPU_EXIT_TO_USER=0, it
-> will touch many places.  So if we will (I'm not sure it's worthwhile), the
-> cleanup should be done as independently.
+> [...]
+> 
+> >  
+> >  #include "mtrr.h"
+> >  
+> > +static_assert(X86_MEMTYPE_UC == MTRR_TYPE_UNCACHABLE);
+> > +static_assert(X86_MEMTYPE_WC == MTRR_TYPE_WRCOMB);
+> > +static_assert(X86_MEMTYPE_WT == MTRR_TYPE_WRTHROUGH);
+> > +static_assert(X86_MEMTYPE_WP == MTRR_TYPE_WRPROT);
+> > +static_assert(X86_MEMTYPE_WB == MTRR_TYPE_WRBACK);
+> > +
+> > 
+> 
+> Hi Sean,
+> 
+> IIUC, the purpose of this patch is for the kernel to use X86_MEMTYPE_xx, which
+> are architectural values, where applicable?
 
-Yeah, this is far from the first time that someone has complained about KVM's
-awful 1/0 return magic.  And every time we've looked at it, we've come to the
-conclusion that it's not worth the churn/risk.
+Maybe?  Probably?
 
-And if we really need to further overload the return value, we can, e.g. KVM
-already does this for MSR accesses:
+> Yeah we need to keep MTRR_TYPE_xx in the uapi header, but in the kernel, should
+> we change all places that use MTRR_TYPE_xx to X86_MEMTYPE_xx?  The
+> static_assert()s above have guaranteed the two are the same, so there's nothing
+> wrong for the kernel to use X86_MEMTYPE_xx instead.
+> 
+> Both PAT_xx and VMX_BASIC_MEM_TYPE_xx to X86_MEMTYPE_xx, it seems a little bit
+> odd if we don't switch for MTRR_TYPE_xx.
+> 
+> However by simple search MEM_TYPE_xx are intensively used in many files, so...
 
-/*
- * Internal error codes that are used to indicate that MSR emulation encountered
- * an error that should result in #GP in the guest, unless userspace
- * handles it.
- */
-#define  KVM_MSR_RET_INVALID	2	/* in-kernel MSR emulation #GP condition */
-#define  KVM_MSR_RET_FILTERED	3	/* #GP due to userspace MSR filter */
+Yeah, I definitely don't want to do it in this series due to the amount of churn
+that would be required.
+
+  $ git grep MTRR_TYPE_ | wc -l
+  100
+
+I'm not even entirely convinced that it would be a net positive.  Much of the KVM
+usage that's being cleaned up is flat out wrong, e.g. using "MTRR" enums in places
+that having nothing to do with MTRRs.  But the majority of the remaining usage is
+in MTRR code, i.e. isn't wrong, and is arguably better off using the MTRR specific
+#defines.
 
