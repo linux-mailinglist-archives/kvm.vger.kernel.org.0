@@ -1,289 +1,228 @@
-Return-Path: <kvm+bounces-13448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FE198967E8
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 10:12:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 201C78969C4
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 11:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43DDB1C25B05
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 08:12:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BC901F2A834
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 09:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A13013340E;
-	Wed,  3 Apr 2024 08:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5796FE3B;
+	Wed,  3 Apr 2024 09:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="jdbomHNx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hm5nBFe/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E975812E1C7
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 08:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B397B6CDDB
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 09:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712131564; cv=none; b=uv8N/xIdQYhfjwfyWM8aEmjPiWuo4RiYADJ5nWD4BK+f7bi8veRvu8Ps/Rq3h82Rj75ueYKkQLJubG8qI9DD5PIvuH0kVtgORBEMUVzMVxamp0P+s/KuyN6GCwcYoXo6eysWYZGlaP/Fsb6U0oG6t1DWD1KvE8LhW48uGebShr0=
+	t=1712134815; cv=none; b=kPA9REtbI56Yz2a2uQn9+hTUuqtfEqwJ67cIP4zjHCUGK3H1LIJy3huVxbPVjK3fenIDREHFFhI1AC+ogJG7KlkAKexuZ8RTtXcD8NI1M7PjCgemJXKknlTYCZQ8ryzAVU8MHIw9pM49N3YpVZQxHnxGp3ortU9JesGgxlpC5L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712131564; c=relaxed/simple;
-	bh=HPH+bQ+ud9CPVlAAxj5MJgVXSyPuFRNLxCzCWuT8AhI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DwEo5ngICQXDLy9r/2W6j1k8c3Q9733bmMXWpDOJ76kg/j7kngHQxboeTMyITrBDXLRjA2suJan6TUfD96BwKeQh6FvpY3i0jgjh5FgURvl9Z8B39Q3+EzjSViI/uh7+8kPmpSi8StbkVEVujXzC/eXQaXuPzlTyKElMJCV3yG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=jdbomHNx; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e0411c0a52so51652105ad.0
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 01:06:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712131562; x=1712736362; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=08Ow0qzJAlLAfVOdK6hW39Nfp7LW+caK9DtQyZhdmmU=;
-        b=jdbomHNxWRoJF8JB0GQwG0pHOqOck26F5NSM56B0Jm8FZpSD+jVrhh6hu1VvOhtr7p
-         jsjGiRh1HQ1OcIUn12uIaQt/3Un2I/69i5rgBV6wQSV2Q0AuLy/ocx6IpHsCOgLHizqk
-         ZIKcjZ+bVRdzr4m0jcNXQ7Au/QVKY0Pv6kZeNkXDNaq6d0HWHst9DoUFe7HJsMeNuji2
-         Qar4ISO8dzeT5VgQ5M24r249M905vccCCloTideXK5krKnLO1fSGEnLK5cYfKjVJH9oh
-         ea0CKHBI+tHtLQwO7of5UDEW0KXdQ8yeTnOu3KTouzeDENcvWRWC4WTpyE66d5UdYoPb
-         AbqQ==
+	s=arc-20240116; t=1712134815; c=relaxed/simple;
+	bh=2d6ZUsBlgzR4T8JBDYxCVmRmClrqIlJvH/JnSOyemxE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XQTcPfu1LXP2POUUQx+Z3iuUClnR5Q0AhmPix1N6CcQ2zCdkWTmZPZJP2/QuNhWTC76M/78eQ4X9nUzaOlOUtt1jYgnNUMo94ILwaHWcuFyYt+74pfKBlTIRCBNt4ZuzN7d6v/8qPP/rdA1KcGNGiQPSHEmQgoXe5cjZXHZhg1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hm5nBFe/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712134812;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JE5CsJ7kL74rep0BkNPkoZkZLlxXhnrOBkLMW12RKB8=;
+	b=hm5nBFe/j7Wfqqf2ICSXT3b8DRDmfZxXhZG6jYs/nNetJzAWmUjSed57TkHokWslcC0ew0
+	hw4+m1Acf4NqD9qDeUAwIcWVi2UpDj9bYk+pN+pZMCiitEVUuYAuLKfIc2vGOyKHSwQvYr
+	8VBB1p6apo402yzsnVjekcqAGmrNFDE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-612-FE-NvibiPju-8_iDaCdRyQ-1; Wed, 03 Apr 2024 05:00:10 -0400
+X-MC-Unique: FE-NvibiPju-8_iDaCdRyQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3436eadd01cso807711f8f.1
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 02:00:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712131562; x=1712736362;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=08Ow0qzJAlLAfVOdK6hW39Nfp7LW+caK9DtQyZhdmmU=;
-        b=d2BEJnF7UPcYAMNjU2q+Lih0Z18GuvprmfSrF3R9Znze6rcwxZhE5cVViFiHBTjabV
-         g96f0zQwyqNVp4EbaF19yWTi8d3432u9ojxH9A6+qtqtORs3WD/iMbIqFsUDSF/vPoEr
-         NssNQIu9VNCJzvujSL3VfQQKQNWM+Fz0X2H0OYwDhISAJ4c0lkd+5hG+42qo6cl5Fcgt
-         M6+Rkw38yshKhLQBzmPsTl+SDjt+F23+JRU6zGLHWfXWTi7ZsL8YocCj1XmRXVwmEofo
-         6Dwsv9XdvoYRZCEhRLxXYtNvN11aTGCSZi9vI3hhiqLJRXNYujokTY602DBA18gMNlcG
-         qS5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWSzlLNRywozNY9bJa0uEWX4BRh2Fo0R2H7HyLV5QQATtKvwe4+krQToAMsDmLZynvP6vp5binYVFFwu+v4SlvKTSWr
-X-Gm-Message-State: AOJu0Yx9ChAYeRC5hz5eRfmf9w1lVkuIDWFM3LiXwiBcitjLgwi8es9v
-	9TdcgkbNAARs80vBKlQizSl1X6lS0zLe1xUmB7uHZV3TF7TlTapAHAzDDZYTJbg=
-X-Google-Smtp-Source: AGHT+IE72ENkNXFbTzbhg6SzqOY0byxQCRn9OXM0YoFZNh+Y8OZZcNtpF6ZIM4eDWD3GUsrp+79BKw==
-X-Received: by 2002:a17:902:ea10:b0:1e0:e6b0:2364 with SMTP id s16-20020a170902ea1000b001e0e6b02364mr14335253plg.64.1712131562243;
-        Wed, 03 Apr 2024 01:06:02 -0700 (PDT)
-Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id c12-20020a170902d48c00b001e0b5d49fc7sm12557229plg.161.2024.04.03.01.05.59
+        d=1e100.net; s=20230601; t=1712134809; x=1712739609;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JE5CsJ7kL74rep0BkNPkoZkZLlxXhnrOBkLMW12RKB8=;
+        b=H/qQL7h4pXE3F2X1cD42565LhO/2zhgnvznfDqTJqXIcHl1SiXdCj3QX0m9M1VXTzi
+         ulHlNXhynT8Y0o5TYAk1oSWi/Im+sqSE/UBd7bHrluYcBSoLRPnQhNKhQgU+5/sS27bL
+         n3UyD/6FsXCZovHMZIBYNKNgbDAJbf0vkR8qVM1mNnk/lZnhfBIQtZd1VYbRV9LCBchE
+         p5qzoKfglN7KoYO93nkem79sKh7aHAVJ0vgoMT9rC4VipfHuCl/1lfNPoRcUr7+6hl1X
+         0evIjYhBj5GSL1na/Y2mXVlOByoeuHHRLqmzuC59Vuk8TqbTxxvaUUKTEM9hlMZ8Cdq2
+         T7iw==
+X-Gm-Message-State: AOJu0YyI6LGZFnCgUEtGrywz4p10ZjRggGF1YyL0ys8RUupknYuhGshd
+	yl4XFbsgD6HoKvA45GK+9ifTRbrXMuB5SQ83Mf+tmdYfOdU3q+zBFORjVzl8o2gckZU1HpjS5oK
+	Mf1EiBXlYyS9LblPjMu+wy09asGO9/JqnseBeRmReJ1+wVNgV4A==
+X-Received: by 2002:a5d:4a41:0:b0:341:cf18:70b3 with SMTP id v1-20020a5d4a41000000b00341cf1870b3mr12886244wrs.27.1712134809630;
+        Wed, 03 Apr 2024 02:00:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0zdlwMZAbcSiFAU8KPHuLmc2v4KW+Pzfncb+ilq5cKvWI91wzQJ6twEst7GvvlCd18xMZYg==
+X-Received: by 2002:a5d:4a41:0:b0:341:cf18:70b3 with SMTP id v1-20020a5d4a41000000b00341cf1870b3mr12886219wrs.27.1712134809235;
+        Wed, 03 Apr 2024 02:00:09 -0700 (PDT)
+Received: from sgarzare-redhat ([185.95.145.60])
+        by smtp.gmail.com with ESMTPSA id by7-20020a056000098700b0033ec94c6277sm16729642wrb.115.2024.04.03.02.00.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 01:06:00 -0700 (PDT)
-From: Atish Patra <atishp@rivosinc.com>
-To: linux-kernel@vger.kernel.org
-Cc: Atish Patra <atishp@rivosinc.com>,
-	Anup Patel <anup@brainfault.org>,
-	Ajay Kaher <akaher@vmware.com>,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Alexey Makhalov <amakhalov@vmware.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Juergen Gross <jgross@suse.com>,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Shuah Khan <shuah@kernel.org>,
-	virtualization@lists.linux.dev,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Will Deacon <will@kernel.org>,
-	x86@kernel.org
-Subject: [PATCH v5 22/22] KVM: riscv: selftests: Add a test for counter overflow
-Date: Wed,  3 Apr 2024 01:04:51 -0700
-Message-Id: <20240403080452.1007601-23-atishp@rivosinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240403080452.1007601-1-atishp@rivosinc.com>
-References: <20240403080452.1007601-1-atishp@rivosinc.com>
+        Wed, 03 Apr 2024 02:00:08 -0700 (PDT)
+Date: Wed, 3 Apr 2024 11:00:02 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Luigi Leonardi <luigi.leonardi@outlook.com>
+Cc: kvm@vger.kernel.org, jasowang@redhat.com, 
+	virtualization@lists.linux.dev, mst@redhat.com, kuba@kernel.org, xuanzhuo@linux.alibaba.com, 
+	netdev@vger.kernel.org, stefanha@redhat.com, pabeni@redhat.com, davem@davemloft.net, 
+	edumazet@google.com, Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: Re: [PATCH net-next 1/3] vsock: add support for SIOCOUTQ ioctl for
+ all vsock socket types.
+Message-ID: <weigxhmoj4qoiqz45eklm3n5c3gw75l7ml3pt2seq3jiip7xw6@alqavbovpdoy>
+References: <20240402150539.390269-1-luigi.leonardi@outlook.com>
+ <AS2P194MB2170C0FC43DDA2CB637CE6B29A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <AS2P194MB2170C0FC43DDA2CB637CE6B29A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 
-Add a test for verifying overflow interrupt. Currently, it relies on
-overflow support on cycle/instret events. This test works for cycle/
-instret events which support sampling via hpmcounters on the platform.
-There are no ISA extensions to detect if a platform supports that. Thus,
-this test will fail on platform with virtualization but doesn't
-support overflow on these two events.
+On Tue, Apr 02, 2024 at 05:05:37PM +0200, Luigi Leonardi wrote:
+>This add support for ioctl(s) for SOCK_STREAM SOCK_SEQPACKET and SOCK_DGRAM
+>in AF_VSOCK.
+>The only ioctl available is SIOCOUTQ/TIOCOUTQ, which returns the number
+>of unsent bytes in the socket. This information is transport-specific
+>and is delegated to them using a callback.
+>
+>Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+>Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+>---
+> include/net/af_vsock.h   |  1 +
+> net/vmw_vsock/af_vsock.c | 42 +++++++++++++++++++++++++++++++++++++---
+> 2 files changed, 40 insertions(+), 3 deletions(-)
+>
+>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>index 535701efc1e5..cd4311abd3c9 100644
+>--- a/include/net/af_vsock.h
+>+++ b/include/net/af_vsock.h
+>@@ -137,6 +137,7 @@ struct vsock_transport {
+> 	u64 (*stream_rcvhiwat)(struct vsock_sock *);
+> 	bool (*stream_is_active)(struct vsock_sock *);
+> 	bool (*stream_allow)(u32 cid, u32 port);
+>+	int (*stream_bytes_unsent)(struct vsock_sock *vsk);
+>
+> 	/* SEQ_PACKET. */
+> 	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 54ba7316f808..991e9edfa743 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -112,6 +112,7 @@
+> #include <net/sock.h>
+> #include <net/af_vsock.h>
+> #include <uapi/linux/vm_sockets.h>
+>+#include <uapi/asm-generic/ioctls.h>
+>
+> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
+> static void vsock_sk_destruct(struct sock *sk);
+>@@ -1292,6 +1293,41 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+> }
+> EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
+>
+>+static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
+>+			  int __user *arg)
+>+{
+>+	struct sock *sk = sock->sk;
+>+	int retval = -EOPNOTSUPP;
+>+	struct vsock_sock *vsk;
+>+
+>+	vsk = vsock_sk(sk);
+>+
+>+	switch (cmd) {
+>+	case SIOCOUTQ:
+>+		if (vsk->transport->stream_bytes_unsent) {
+>+			if (sk->sk_state == TCP_LISTEN)
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
- .../selftests/kvm/riscv/sbi_pmu_test.c        | 114 ++++++++++++++++++
- 1 file changed, 114 insertions(+)
+Maybe we should do this check only if
+`sock_type_connectible(sk->sk_type)` is true.
 
-diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-index 7d195be5c3d9..451db956b885 100644
---- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-+++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-@@ -14,6 +14,7 @@
- #include "test_util.h"
- #include "processor.h"
- #include "sbi.h"
-+#include "arch_timer.h"
- 
- /* Maximum counters(firmware + hardware) */
- #define RISCV_MAX_PMU_COUNTERS 64
-@@ -24,6 +25,9 @@ union sbi_pmu_ctr_info ctrinfo_arr[RISCV_MAX_PMU_COUNTERS];
- static void *snapshot_gva;
- static vm_paddr_t snapshot_gpa;
- 
-+static int vcpu_shared_irq_count;
-+static int counter_in_use;
-+
- /* Cache the available counters in a bitmask */
- static unsigned long counter_mask_available;
- 
-@@ -117,6 +121,31 @@ static void guest_illegal_exception_handler(struct ex_regs *regs)
- 	regs->epc += 4;
- }
- 
-+static void guest_irq_handler(struct ex_regs *regs)
-+{
-+	unsigned int irq_num = regs->cause & ~CAUSE_IRQ_FLAG;
-+	struct riscv_pmu_snapshot_data *snapshot_data = snapshot_gva;
-+	unsigned long overflown_mask;
-+	unsigned long counter_val = 0;
-+
-+	/* Validate that we are in the correct irq handler */
-+	GUEST_ASSERT_EQ(irq_num, IRQ_PMU_OVF);
-+
-+	/* Stop all counters first to avoid further interrupts */
-+	stop_counter(counter_in_use, SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT);
-+
-+	csr_clear(CSR_SIP, BIT(IRQ_PMU_OVF));
-+
-+	overflown_mask = READ_ONCE(snapshot_data->ctr_overflow_mask);
-+	GUEST_ASSERT(overflown_mask & 0x01);
-+
-+	WRITE_ONCE(vcpu_shared_irq_count, vcpu_shared_irq_count+1);
-+
-+	counter_val = READ_ONCE(snapshot_data->ctr_values[0]);
-+	/* Now start the counter to mimick the real driver behavior */
-+	start_counter(counter_in_use, SBI_PMU_START_FLAG_SET_INIT_VALUE, counter_val);
-+}
-+
- static unsigned long get_counter_index(unsigned long cbase, unsigned long cmask,
- 				       unsigned long cflags,
- 				       unsigned long event)
-@@ -276,6 +305,33 @@ static void test_pmu_event_snapshot(unsigned long event)
- 	stop_reset_counter(counter, 0);
- }
- 
-+static void test_pmu_event_overflow(unsigned long event)
-+{
-+	unsigned long counter;
-+	unsigned long counter_value_post;
-+	unsigned long counter_init_value = ULONG_MAX - 10000;
-+	struct riscv_pmu_snapshot_data *snapshot_data = snapshot_gva;
-+
-+	counter = get_counter_index(0, counter_mask_available, 0, event);
-+	counter_in_use = counter;
-+
-+	/* The counter value is updated w.r.t relative index of cbase passed to start/stop */
-+	WRITE_ONCE(snapshot_data->ctr_values[0], counter_init_value);
-+	start_counter(counter, SBI_PMU_START_FLAG_INIT_SNAPSHOT, 0);
-+	dummy_func_loop(10000);
-+	udelay(msecs_to_usecs(2000));
-+	/* irq handler should have stopped the counter */
-+	stop_counter(counter, SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT);
-+
-+	counter_value_post = READ_ONCE(snapshot_data->ctr_values[0]);
-+	/* The counter value after stopping should be less the init value due to overflow */
-+	__GUEST_ASSERT(counter_value_post < counter_init_value,
-+		       "counter_value_post %lx counter_init_value %lx for counter\n",
-+		       counter_value_post, counter_init_value);
-+
-+	stop_reset_counter(counter, 0);
-+}
-+
- static void test_invalid_event(void)
- {
- 	struct sbiret ret;
-@@ -366,6 +422,34 @@ static void test_pmu_events_snaphost(void)
- 	GUEST_DONE();
- }
- 
-+static void test_pmu_events_overflow(void)
-+{
-+	int num_counters = 0;
-+
-+	/* Verify presence of SBI PMU and minimum requrired SBI version */
-+	verify_sbi_requirement_assert();
-+
-+	snapshot_set_shmem(snapshot_gpa, 0);
-+	csr_set(CSR_IE, BIT(IRQ_PMU_OVF));
-+	local_irq_enable();
-+
-+	/* Get the counter details */
-+	num_counters = get_num_counters();
-+	update_counter_info(num_counters);
-+
-+	/*
-+	 * Qemu supports overflow for cycle/instruction.
-+	 * This test may fail on any platform that do not support overflow for these two events.
-+	 */
-+	test_pmu_event_overflow(SBI_PMU_HW_CPU_CYCLES);
-+	GUEST_ASSERT_EQ(vcpu_shared_irq_count, 1);
-+
-+	test_pmu_event_overflow(SBI_PMU_HW_INSTRUCTIONS);
-+	GUEST_ASSERT_EQ(vcpu_shared_irq_count, 2);
-+
-+	GUEST_DONE();
-+}
-+
- static void run_vcpu(struct kvm_vcpu *vcpu)
- {
- 	struct ucall uc;
-@@ -451,6 +535,33 @@ static void test_vm_events_snapshot_test(void *guest_code)
- 	test_vm_destroy(vm);
- }
- 
-+static void test_vm_events_overflow(void *guest_code)
-+{
-+	struct kvm_vm *vm = NULL;
-+	struct kvm_vcpu *vcpu;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	__TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
-+				   "SBI PMU not available, skipping test");
-+
-+	__TEST_REQUIRE(__vcpu_has_isa_ext(vcpu, KVM_RISCV_ISA_EXT_SSCOFPMF),
-+				   "Sscofpmf is not available, skipping overflow test");
-+
-+
-+	test_vm_setup_snapshot_mem(vm, vcpu);
-+	vm_init_vector_tables(vm);
-+	vm_install_interrupt_handler(vm, guest_irq_handler);
-+
-+	vcpu_init_vector_tables(vcpu);
-+	/* Initialize guest timer frequency. */
-+	vcpu_get_reg(vcpu, RISCV_TIMER_REG(frequency), &timer_freq);
-+	sync_global_to_guest(vm, timer_freq);
-+
-+	run_vcpu(vcpu);
-+
-+	test_vm_destroy(vm);
-+}
-+
- int main(void)
- {
- 	pr_info("SBI PMU basic test : starting\n");
-@@ -463,5 +574,8 @@ int main(void)
- 	test_vm_events_snapshot_test(test_pmu_events_snaphost);
- 	pr_info("SBI PMU event verification with snapshot test : PASS\n");
- 
-+	test_vm_events_overflow(test_pmu_events_overflow);
-+	pr_info("SBI PMU event verification with overflow test : PASS\n");
-+
- 	return 0;
- }
--- 
-2.34.1
+>+				return -EINVAL;
+>+			retval = vsk->transport->stream_bytes_unsent(vsk);
+
+IIUC `stream_bytes_unsent()` is used for any type of socket, so I
+suggest using a name more generic, something like `unsent_bytes()`.
+
+>+		}
+>+		break;
+>+	default:
+>+		retval = -EOPNOTSUPP;
+
+Should we return -ENOIOCTLCMD in this case?
+
+>+	}
+>+
+>+	if (retval >= 0) {
+
+IMHO mixing the the ioctl() return value and the value itself is
+confusing.
+
+I also suggest to move the put_user() in the `case SIOCOUTQ`,
+other ioctls may no needs any value to copy to userspace.
+
+>+		put_user(retval, arg);
+
+put_user() can fail, we should return the failure to the user.
+
+>+		retval = 0;
+>+	}
+>+
+>+	return retval;
+>+}
+>+
+>+static int vsock_ioctl(struct socket *sock, unsigned int cmd,
+>+		       unsigned long arg)
+>+{
+>+	return vsock_do_ioctl(sock, cmd, (int __user *)arg);
+>+}
+>+
+> static const struct proto_ops vsock_dgram_ops = {
+> 	.family = PF_VSOCK,
+> 	.owner = THIS_MODULE,
+>@@ -1302,7 +1338,7 @@ static const struct proto_ops vsock_dgram_ops = {
+> 	.accept = sock_no_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = sock_no_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.sendmsg = vsock_dgram_sendmsg,
+>@@ -2286,7 +2322,7 @@ static const struct proto_ops vsock_stream_ops = {
+> 	.accept = vsock_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = vsock_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.setsockopt = vsock_connectible_setsockopt,
+>@@ -2308,7 +2344,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
+> 	.accept = vsock_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = vsock_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.setsockopt = vsock_connectible_setsockopt,
+>-- 
+>2.34.1
+>
 
 
