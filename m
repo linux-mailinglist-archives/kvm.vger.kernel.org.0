@@ -1,168 +1,180 @@
-Return-Path: <kvm+bounces-13468-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13469-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79FF68971E2
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 16:03:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4CE1897309
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 16:49:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D0791C27872
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 14:03:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D74821C271CC
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 14:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A897B14900E;
-	Wed,  3 Apr 2024 14:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E83658AA1;
+	Wed,  3 Apr 2024 14:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="Xn8IhRa6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DwDT8NYj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E1A149E14
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 14:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655202F28
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 14:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712152902; cv=none; b=bfHN9L8/kjRsun38lDg+zdYjMhKDj/kBRBUhquOgfDo9bHuxrNLbm6hu993Hj0Xwci/7SBXFn5Wcv8NVOuqYCyiOKrxjCzW+U/MrZ8rGPaRPProIBKIlsf0VkmL6lsf1OX7kBbEW7SBw6nFlM7szS+4itDdYYrDCuC+/e8RDOpo=
+	t=1712155771; cv=none; b=m7vQSKHI6uCqlBn+v8E0SjARWhBZyjzNm9DsfbbNkf+Yh1BpTI6nqJk7qoo+nNWk1A7Uxe7qDQ1uCBGY44pbcqpYXdm8Ho9hHY4DA7LCJES6QXb3vLjQBcaOrD9ByN1GOtK0KzbqWkxaQYvIuU4gKQcEeo1ScEa9Tx0BbEF5tvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712152902; c=relaxed/simple;
-	bh=+HycdZGuj5OU1W/c5yOM/8/+whc2oRxO0Toug1yf4G8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ur/fwE5u5YnOZRnF4P2eg6c0w4VfbM6ah1r3NvvB+mp7VD03iq4rgaHXBnSdhBLVayWY+Fqgg4m605vGlDzGudKpHJkPk4w6AcySAAEXk0I29sA3R2LO2e5Y0Yvu4ZKS5LZ9t2FiGNbotbrh6x8tM72t8Xzp1tMHRDvKSR1sMRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=Xn8IhRa6; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-789e6f7f748so335060185a.3
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 07:01:41 -0700 (PDT)
+	s=arc-20240116; t=1712155771; c=relaxed/simple;
+	bh=x+/Whws7IOZZfnW79uF6wUm5Ocmsx9bOqXCA8yKOKTM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=i9EMrhznHheXZzZl3Mu9yeTObHuum0ZxdgbVXsCQi6Zqe+ot+b5eRXavJ5xZ1wZ+KmifCII0hEqMwv/YuICYDMFY9PFiL1gnhFlpvFI3mWuKFqdmgbAArO+3r+ptL49VjXZSXOl/97cT6aDsQQVyRRj4LmR4k5WZOt7P8iOuFKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DwDT8NYj; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a262ec9911so1477757a91.0
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 07:49:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bitbyteword.org; s=google; t=1712152900; x=1712757700; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QaWEC4wEGQ+YlZ6ti6+WrczlEY+i0roOx8Ci2YqikeE=;
-        b=Xn8IhRa6Q1hH8JPkpsL76ia39K74etBsnq86QvXDJzGkDlu4UQISCgwi31tudYRt83
-         jPhWkuvW0WWDPNO5GqkZlkamSdX5m/51kSnDSQgYHV4I90SE59QgGnExdChoF6Hyxsy/
-         DEBPORJpE0l965/MP4/PLQef9cZTT3H12g9caRcNBv7jcQ5dxHGDpDKbBGyAdCqr7UmK
-         ii2GkcFQTeoXQ0TKmt2dtFu9E3LqK/cgIBT1TdNEm8K+8WXd1kr3P+HKnrm3VftvFPtB
-         iodG5/lerUuBzTCWeouSem4Ps7N6uKHKXjVY9g1NsXICLR9FA3KpMZ6aSUbRhyMslQY4
-         5ZNA==
+        d=google.com; s=20230601; t=1712155770; x=1712760570; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dy+Nk5dzJaNhxp6iwoL8oKHLG7ul37PUDWHPTXb13jY=;
+        b=DwDT8NYjPYAzWTXcPz0Pdc3FDInk0uoRkbCZ7rzSxdDGQ7Ys3uqzEOGfXcLu6BhJsk
+         vl8dRGhK0+Oi38DaHatdzbBM4zFH6gWqsvBS3pPZMcjqueT38z/XF5Y+fRoleM8hdsxI
+         VIVDL1e4IuvUdlIX7ltVVcN3/GIum62Z/zrPfxrGF/EgozBdDJmvQCm+9wr6FAdcle8u
+         womSjSkqYgtct5TICAmvbi26aKM0LpT0q+ZTL0ELfgbfkMGKt9exKCmcNqWWNgBMyNVG
+         MTCicMPMgEkw5oVIRL1B5/b50mdUXnjqUGfrGBzKzKy7/bJguq+gjmCcBCwA110jvqqi
+         dPZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712152900; x=1712757700;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QaWEC4wEGQ+YlZ6ti6+WrczlEY+i0roOx8Ci2YqikeE=;
-        b=lbriih+Wr33nhrg70yNAN42Zkwf5eghZtJSt6u6sPhpAq3fas6AODJzl2khfhgSsgj
-         q7y3sdY5jDBCLCNFct+qPeuoOFkxvRMSvCdP7Y5HwUDvGum+sG/QbY1HATVae+HthCAm
-         0opiS5Bg7IFvRVPhqKxRSxX6Ezxm8Hvcv0OmWPx/Xmua0TpGLuVUX6Ivvoq5E3b/5teK
-         188AAx0j3G+J2WHd+eByIpzMTOjSe0zw7Xs2O192AW5m/Q0G1fU5ywOAcWMuG0geYOC0
-         WudG7k6BWv3AqRVfpnRdlDDkiSxCLFOElTA9k6JJJOrHsHl4AaivvMXuKfFTip4V17b/
-         G7Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCVW8/NSRVm8RrCClWPms7H3dVGRbuPGBMclgo1Pem0sO0eAG45rC5bfzD3lP6oszqc0ZDgjJ8xEJ429vw/TifSoKzp0
-X-Gm-Message-State: AOJu0YzoGLZ70OWowLXcjJ2VQ+s0hHBRXWoEioId91oeqQhlqrwhc97o
-	bg9k1BSwJY0Td5BVUx5/GEDEBMijlaRNIG++Q187h5Ej7Xv99Az79bKHXJ5H74I=
-X-Google-Smtp-Source: AGHT+IGXzY5eGF4cfLmjKD8WCxnHKVScVbM/F99svOb+MTbMgCl4GsOWSudI3dDOqx11Q2sEA8gtCA==
-X-Received: by 2002:a05:6214:1384:b0:699:1ad9:259 with SMTP id pp4-20020a056214138400b006991ad90259mr2834018qvb.31.1712152900149;
-        Wed, 03 Apr 2024 07:01:40 -0700 (PDT)
-Received: from vinbuntup3.lan (c-73-143-21-186.hsd1.vt.comcast.net. [73.143.21.186])
-        by smtp.gmail.com with ESMTPSA id gf12-20020a056214250c00b00698d06df322sm5945706qvb.122.2024.04.03.07.01.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 07:01:39 -0700 (PDT)
-From: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
-To: Ben Segall <bsegall@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Mel Gorman <mgorman@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>
-Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Suleiman Souhlal <suleiman@google.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	himadrics@inria.fr,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org
-Subject: [RFC PATCH v2 5/5] selftests/bpf: sample implementation of a bpf pvsched driver.
-Date: Wed,  3 Apr 2024 10:01:16 -0400
-Message-Id: <20240403140116.3002809-6-vineeth@bitbyteword.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240403140116.3002809-1-vineeth@bitbyteword.org>
-References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
+        d=1e100.net; s=20230601; t=1712155770; x=1712760570;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dy+Nk5dzJaNhxp6iwoL8oKHLG7ul37PUDWHPTXb13jY=;
+        b=rONbOt0RolLkrkneFxjaKxLj5IChzsMczij3vxAiN0P0p6JSngP+ymB4jiQlniwBHl
+         /9kPlLOD3lYiQL0V8Qfs5GV9dfOcpzXTEwrV38bTX7/HHhRAdqxMsUrDCt4H67OC4VDl
+         F/vBAvFKMMAheMSbWRjdYGWvS+mh2EFK7rbokJoOtZpXp8d2UmT+wtZUlEd77XsKb/EZ
+         /6RSe4p2a3izObtwG7KH2MxK3OQ7RdP+gIrNhpELFfT8cPGGAeA+Szs1wVYgkATW7g3F
+         liQ9XsbOIrZmwNrW1qu4+S2E/2hxSr3rUxRm2P+N3Slsu0p4ImyX4kxd1L0uI+rrP8WV
+         wwvw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzARMZbgAy5RcdAREEeb82c2eszx/RPJFxOlaxdE1MxMEBTmPsMc16eXLgBqjxVq2mibyRIaEbDIMZ8M5swlKMOFC3
+X-Gm-Message-State: AOJu0Yw6dc/9i9Mz9hhEkOyf42nNrWrRE4+Pu7E6fPhMZm9yIahy2Xdw
+	Cy/97wKcWW833LF1a4QiJbe/jsALuq+oIKmw0KXRThGoNNkwe5jnXOTkIX9v0rdFfh2q6caTRKm
+	mcg==
+X-Google-Smtp-Source: AGHT+IEuC8rrpEQtV1b/Z1iw1PNLmfo+7pgvTb3ZaGiDaEj9q7X59dJc9XHsl8uxojAhpUO2cciXz6fp9Oc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1998:b0:2a2:64a2:436f with SMTP id
+ mv24-20020a17090b199800b002a264a2436fmr11557pjb.6.1712155769720; Wed, 03 Apr
+ 2024 07:49:29 -0700 (PDT)
+Date: Wed, 3 Apr 2024 07:49:28 -0700
+In-Reply-To: <ZgzMH3944ZaBx8B3@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <c083430632ba9e80abd09bccd5609fb3cd9d9c63.1708933498.git.isaku.yamahata@intel.com>
+ <ZgzMH3944ZaBx8B3@chao-email>
+Message-ID: <Zg1seIaTmM94IyR8@google.com>
+Subject: Re: [PATCH v19 108/130] KVM: TDX: Handle TDX PV HLT hypercall
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, Sagi Shahar <sagis@google.com>, 
+	Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, hang.yuan@intel.com, 
+	tina.zhang@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-A dummy skeleton of a bpf pvsched driver. This is just for demonstration
-purpose and would need more work to be included as a test for this
-feature.
+On Wed, Apr 03, 2024, Chao Gao wrote:
+> On Mon, Feb 26, 2024 at 12:26:50AM -0800, isaku.yamahata@intel.com wrote:
+> >From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >
+> >Wire up TDX PV HLT hypercall to the KVM backend function.
+> >
+> >Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> >---
+> >v19:
+> >- move tdvps_state_non_arch_check() to this patch
+> >
+> >v18:
+> >- drop buggy_hlt_workaround and use TDH.VP.RD(TD_VCPU_STATE_DETAILS)
+> >
+> >Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> >---
+> > arch/x86/kvm/vmx/tdx.c | 26 +++++++++++++++++++++++++-
+> > arch/x86/kvm/vmx/tdx.h |  4 ++++
+> > 2 files changed, 29 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> >index eb68d6c148b6..a2caf2ae838c 100644
+> >--- a/arch/x86/kvm/vmx/tdx.c
+> >+++ b/arch/x86/kvm/vmx/tdx.c
+> >@@ -688,7 +688,18 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> > 
+> > bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
+> > {
+> >-	return pi_has_pending_interrupt(vcpu);
+> >+	bool ret = pi_has_pending_interrupt(vcpu);
+> 
+> Maybe
+> 	bool has_pending_interrupt = pi_has_pending_interrupt(vcpu);
+> 
+> "ret" isn't a good name. or even call pi_has_pending_interrupt() directly in
+> the if statement below.
 
-Not-Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
----
- .../testing/selftests/bpf/progs/bpf_pvsched.c | 37 +++++++++++++++++++
- 1 file changed, 37 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_pvsched.c
+Ya, or split the if-statement into multiple chucks, with comments explaining
+what each non-intuitive chunk is doing.  The pi_has_pending_interrupt(vcpu) check
+is self-explanatory, the halted thing, not so much.  They are terminal statements,
+there's zero reason to pre-check the PID.
 
-diff --git a/tools/testing/selftests/bpf/progs/bpf_pvsched.c b/tools/testing/selftests/bpf/progs/bpf_pvsched.c
-new file mode 100644
-index 000000000000..a653baa3034b
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/bpf_pvsched.c
-@@ -0,0 +1,37 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2019 Facebook */
-+
-+#include "vmlinux.h"
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_tracing.h>
-+#include <bpf/bpf_helpers.h>
-+
-+char _license[] SEC("license") = "GPL";
-+
-+SEC("struct_ops/pvsched_vcpu_reg")
-+int BPF_PROG(pvsched_vcpu_reg, struct pid *pid)
-+{
-+	bpf_printk("pvsched_vcpu_reg: pid: %p", pid);
-+	return 0;
-+}
-+
-+SEC("struct_ops/pvsched_vcpu_unreg")
-+void BPF_PROG(pvsched_vcpu_unreg, struct pid *pid)
-+{
-+	bpf_printk("pvsched_vcpu_unreg: pid: %p", pid);
-+}
-+
-+SEC("struct_ops/pvsched_vcpu_notify_event")
-+void BPF_PROG(pvsched_vcpu_notify_event, void *addr, struct pid *pid, __u32 event)
-+{
-+	bpf_printk("pvsched_vcpu_notify: pid: %p, event:%u", pid, event);
-+}
-+
-+SEC(".struct_ops")
-+struct pvsched_vcpu_ops pvsched_ops = {
-+	.pvsched_vcpu_register		= (void *)pvsched_vcpu_reg,
-+	.pvsched_vcpu_unregister	= (void *)pvsched_vcpu_unreg,
-+	.pvsched_vcpu_notify_event	= (void *)pvsched_vcpu_notify_event,
-+	.events				= 0x6,
-+	.name				= "bpf_pvsched_ops",
-+};
--- 
-2.40.1
+E.g.
 
+	/*
+	 * Comment explaining why KVM needs to assume a non-halted vCPU has a
+	 * pending interrupt (KVM can't see RFLAGS.IF).
+	 */
+	if (vcpu->arch.mp_state != KVM_MP_STATE_HALTED)
+		return true;
+
+	if (pi_has_pending_interrupt(vcpu))
+		return;
+
+> >+	union tdx_vcpu_state_details details;
+> >+	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> >+
+> >+	if (ret || vcpu->arch.mp_state != KVM_MP_STATE_HALTED)
+> >+		return true;
+> 
+> Question: why mp_state matters here?
+> >+
+> >+	if (tdx->interrupt_disabled_hlt)
+> >+		return false;
+> 
+> Shouldn't we move this into vt_interrupt_allowed()? VMX calls the function to
+> check if interrupt is disabled. KVM can clear tdx->interrupt_disabled_hlt on
+> every TD-enter and set it only on TD-exit due to the guest making a
+> TDVMCALL(hlt) w/ interrupt disabled.
+
+I'm pretty sure interrupt_disabled_hlt shouldn't exist, should "a0", a.k.a. r12,
+be preserved at this point?
+
+	/* Another comment explaning magic code. */
+	if (to_vmx(vcpu)->exit_reason.basic == EXIT_REASON_HLT &&
+	    tdvmcall_a0_read(vcpu))
+		return false;
+
+
+Actually, can't this all be:
+
+	if (to_vmx(vcpu)->exit_reason.basic != EXIT_REASON_HLT)
+		return true;
+
+	if (!tdvmcall_a0_read(vcpu))
+		return false;
+
+	if (pi_has_pending_interrupt(vcpu))
+		return true;
+
+	return tdx_has_pending_virtual_interrupt(vcpu);
 
