@@ -1,267 +1,361 @@
-Return-Path: <kvm+bounces-13475-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13476-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 983378974AC
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 17:58:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 833918974BD
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 18:02:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65DDDB2F5EF
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 15:56:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FB23B2F8C1
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 15:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FFF14A63E;
-	Wed,  3 Apr 2024 15:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2123F14A621;
+	Wed,  3 Apr 2024 15:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zqaPCyu3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JLb8FmcA"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2112.outbound.protection.outlook.com [40.107.100.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D8614A4EC;
-	Wed,  3 Apr 2024 15:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712159750; cv=fail; b=KeLO7Z0dcAwgHxMbj0/ZuYwnBjgnpzAfMGMrAL2xCDYyypS90OmbsQUOPlilv2Gee2sWSzP+Kl897XK7gv9bpZyitvKwzsGrTBImFTdBJaLq1bLYgssYDADTcTQpZsrObBB9NMRskUned7WlItt0Ksfd1MAJGMXbisuTgjcTTBo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712159750; c=relaxed/simple;
-	bh=qfrYQjU4USrEBYawgEZhEKLdhHrIWZYlxjMObL7dlCY=;
-	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DC5afh7aRXs95kZ09zZR2mlv0gX11iBPhwQ5l6ItR8dN5YMFakqJaK1ZRpJ9Xx16RdqDYPTlf3F3huCZ3L+GXTOpRcRfEWKwMbzE0lyiXmiSOcL/Zjk7WSb5Q7aunm7XPLMzxBMGxHY5jh95I9wLHP69XJHVNNnWdVdLk44/ipI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zqaPCyu3; arc=fail smtp.client-ip=40.107.100.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EJ3kdH5kd7uKy0elVG+or3/WjutxzQcy5Obd9laEIc9Qum4kvpDBNfkj/XonDzpn6iFhxRH3nrULUxYVzu1p650YHUvQMoOpDyXaD1die8h+URxz/EGLYEavDDsPyNFp0u01uiOUXO7RjfCRSRRcNlo+uo5pkTQTpAeqb9C/wgqagvXFo1QEk4Aq4h9hRWyAbXvNES/tV2klTiYBRiw2ZB1l0zaEGR1pp5kQTpPKYd29f9hyj1gcWzyd3B8M1EK4NsN5cHm1Jfj/396RTFwzGzpnlQG++O8ScEQxVtqO5cuUmyTQ4DATzQ9fCbSel2GSueQE8m32ZGBaFOerwNDljg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xcNPQFkxgNBplDbNxc+kcUPvW/gsV3sBVhtG/g0PTeE=;
- b=Fnb7bukOUdX0pAv6CYB+BhHep9QMDAMzF1gApaJf1jPZ3oa+oHd/roR5PNORoabFw4HXGSfjPEUfmGDqIv/q9NfFbvOTtQ/QaSNzx4Lq8xzSkurFAbFNEsIg5fUuuiFG4La1TjATmoej2uPju4aWSoT5gXUtbW+OBDyMxcoXAXWPax2wrbC3R9yu2XxAsB0abtg5W9tpL7fj6O3NXmyPyrBqdYcZDiP0/ESiIep2j3TZ6ArPVfRKcJ7pNUs/vAMDj2W2hnbYu2x+3I0QDdQJ9ULcF1pBzwoUl25mebtOEx4/of3Hb1muxqjx5V1lM5cOIWvxneg0UkpK1RRXmB7FRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xcNPQFkxgNBplDbNxc+kcUPvW/gsV3sBVhtG/g0PTeE=;
- b=zqaPCyu3j77UIx9k2+Og7pEh5Ckz+UTYDrGgLVUyfqm2awC8aU+u1U2jK7nW29ki8zVYi+2rB3jqBqrt6gsGhGcEitqxasU1iZx4IiXPUHwr5iDF9WTMC0B0bwjNsh+eGr1PlxRg+9QOfuTMkh/f1DZBPVfQPmZ/KNHxE5Zv7XE=
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by SJ2PR12MB7991.namprd12.prod.outlook.com (2603:10b6:a03:4d1::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Wed, 3 Apr
- 2024 15:55:45 +0000
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1032:4da5:7572:508]) by BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1032:4da5:7572:508%6]) with mapi id 15.20.7409.042; Wed, 3 Apr 2024
- 15:55:45 +0000
-Message-ID: <07f6fffc-5c96-48c6-4df9-74010a28d283@amd.com>
-Date: Wed, 3 Apr 2024 10:55:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3] KVM:SVM: Flush cache only on CPUs running SEV guest
-To: Zheyun Shen <szy0127@sjtu.edu.cn>, Sean Christopherson
- <seanjc@google.com>, pbonzini <pbonzini@redhat.com>,
- tglx <tglx@linutronix.de>
-Cc: kvm <kvm@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
-References: <1860502863.219296.1710395908135.JavaMail.zimbra@sjtu.edu.cn>
-Content-Language: en-US
-In-Reply-To: <1860502863.219296.1710395908135.JavaMail.zimbra@sjtu.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DS7PR03CA0339.namprd03.prod.outlook.com
- (2603:10b6:8:55::18) To BL1PR12MB5732.namprd12.prod.outlook.com
- (2603:10b6:208:387::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBB014A4EC
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 15:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712159934; cv=none; b=m64nVYyGi+IrjQJLig4xxTyD5dd7UJnBx4t+92Y112Sk5egs9QQkJPrhTcXiVK7elcJ0eqA1uOKuTUk6/ja37viIjiWMcbdnfL4l6uE5tR+1pxPt0VqGq4Jjk4p1SsVcMHPH1zZJVf2Tq9C6imd+wkWqLJvmY5bWLL8v3szNg6A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712159934; c=relaxed/simple;
+	bh=GmWmx3DTXih0jvt+fWPUCOP3jKBAIOu/E1IcNqxUeBo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EEI524UOv/2CDJeHxPtiRHpE9naDrU8svHrRVIbRgDHBGJ4fLFz2mfR3gOVdP+JBfJ1mkvOtQeee3wbST0UkWHb5J+oqmsBF3s7wTvRqe+K5jhtwbB6Vw0KkTdKrGH/g+QAW9+YrMbpY6ubeR9K792ONfZTs5cwZUOBjry15s/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JLb8FmcA; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a2c2b0d82aso37764a91.3
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 08:58:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712159932; x=1712764732; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gx8NzCNHxkxUNS3bHQ2Vy0QWy11cakhMcI+4YAbd68I=;
+        b=JLb8FmcARjn962baZh8h0FE/QC1HA7lq2ZFjPzLAltScuqddohwCB/cfvo1wvyuTJQ
+         b98y3KhUFn3KdctYG6+0Y04KLxSHh9eWZkD5y6tcVpoWH+BnXTrMJ9Z8mfRuTNOzrA7k
+         tbdm0YGsMs0k+P+ZZvenJXqvXFRnGqTLJuchEjkTu+HxL2XKI+ZDVy7qDXrZUafmmcui
+         O6M9hf5O2ys5Nht7jiND7W209ZP283/kgeEuVXUVICJentqArO68jnQq1g72YGMWhU+2
+         7BbWczaHfzlMTuce5vYN0Zsqrny3MHdC3BcJ+syfWF66186n702s82Ur1+94Goaw2reu
+         P5Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712159932; x=1712764732;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gx8NzCNHxkxUNS3bHQ2Vy0QWy11cakhMcI+4YAbd68I=;
+        b=fND8tdpaRBDk3VnS/+25dGgYwnYsAe1GGkBHrahNKPylifDa95dI1Bz+wCQYoO+2EX
+         Kj8Y7iU9zzMJ3dhnQyG3WiCXxml7u/OaksmLN03/r/oX5DmJrduO4r86wpb4r10EZguN
+         PYxiSnjhOiWttdvSA2XJFPsopFd/ENkz7jYRJKzYGzQdhfGtLFN+bXiHCtRFJV7rCzXE
+         X96vtOaUaihuuLVMjfzMJxrYuwSxlSqgchplFrDP+tHTe7+k5Lqj2PrGFWY0cdpPEKSJ
+         J47mA+tDMRwt0vAkLsWypdMM9EC15IQf74oljwPgakiDLFxBkwKVWGwlDwaIkTG7L1yU
+         Uv4w==
+X-Gm-Message-State: AOJu0YxyTSGGEhrXrVezbTo2QKIDUdmN20h1jHIOXmICvGLLt84CZfvS
+	A+G2CKGYZbyfwfWyZhGFRAXrTbSU5qzWwq1ac8+5b+8TKBT5fZy+t/Yu7qPkrfG4ERSigAxanqc
+	6Jg==
+X-Google-Smtp-Source: AGHT+IGresby5uWardt3BAmcFOWkytVmq8r8GrkIPi/oOW3Iyt0cLQDY+5zKRE/2+3EdvYAJi+mP1lMEoJk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:30c5:b0:2a2:8f19:f484 with SMTP id
+ hi5-20020a17090b30c500b002a28f19f484mr7608pjb.3.1712159931879; Wed, 03 Apr
+ 2024 08:58:51 -0700 (PDT)
+Date: Wed, 3 Apr 2024 08:58:50 -0700
+In-Reply-To: <b9fbb0844fc6505f8fb1e9a783615b299a5a5bb3.1708933498.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|SJ2PR12MB7991:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	5NKyqVMJGdprB/fF0fd69NYc2kqh7R1XCmUi6NzTFUHt/z+SkeMtRZlsPlQ+ogOVqI4No0qHnMsQDEB02Pb4WVeotOXwrrGYLCh5suIeOGffkdKa2SI+/RhgQlQSaz7RdCH2EnNQG2s/P4G3DTAsDOqqPfMGbkmlPR6GpwqsgirJx2a8o1HFQ33MnlHLF/N5ipniUuMxiJTYJYTfHJJS3jClEEGVMd/s9ai/k4gEeZwy8zVOISScTB0iL29c0wNit3Mjoa4yWT3u77sQ3NnVWpCAKf6py8rweQDDy1yk+GNG0FDSvkFzyMvmargLaD8L3a/jYzxD2Rk+9W207Wc37QUNsoafSrujvFiNUyvVjjGgeDvMV64oXUOb7LSpWkz+FWw8qe5tglGM+JICWwOQgmbUSgij0Pdon7cY997AipPQlxJOiQaWeOWJuyU9tHkSMbPYbyg3n0cGSeBY97cjM0eZKf612MmKy1vbKaHyW6ynavPUxNWbDKtRh4f3iINA267x7/DgEcjYNW3BPB1q+aN8pVKMM3vUljUCvOWvCG+k+N9EJ9F3FCnPB/kIaETwX/BEG9DBkgqkFxq6RbLTYRFin/GIcxCowFCeX0k+RDXkYxtx0ZgoUp1RtqNsvofP2RXlVOnZxW4FGKObHwcrXv6vc+EMfRgYQ31ciLRn+4g=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?R0FQNDRhNTJJNTg2WUpnVlFSckdBWURUeDJoTmJvU3ExbWIydGxLVjVXNUFK?=
- =?utf-8?B?Y1hzdElMNHVtdG9FTW8vM3ZIOUFUSjFwQXFIcmovTHI1MVRKd3pXWE9JK29B?=
- =?utf-8?B?cVVOTFBIY0tPZmdEMmFiY0tVMjFaT0w3NHpIcU05ZzcwT0Uvd1NDL2ttS3p6?=
- =?utf-8?B?R1BoMkZJRHc3VlNEdkJOcEdRN3plV2dRWVV1b3hCZFVqQmFIdTRZM2pNN0Ny?=
- =?utf-8?B?RENqTWJIemNtZC9HRWNVdmIyV0lORjdKZkRJU1dyNC9jVlpGMzFFZmNjK2FH?=
- =?utf-8?B?eGlDR1BsRWJQWUw0bXk4ZmNreUF5K29iSytZTnQraHkxdzNUWk1JQWJGbmJW?=
- =?utf-8?B?S2VBNFUvRjdiUkMrbkxDUDk2K3lnNGdZZlNrdGVKY2JmNTNGeW04ZHUwVXFP?=
- =?utf-8?B?OUNvMFl4OGRMQ29qV1F0R1U2MTlTcnlPdkl6MnZMSXRMQWgyanl1SDM5MWtD?=
- =?utf-8?B?VnRkL1UvcjE1RVlNUWhpR09sNDRsaWRlQWlBMGg2QzlETTF5MzJsaEhnelFV?=
- =?utf-8?B?TFVNNHZpOFg0cFkzU3N2dVNYTEk5c0dpc0t4djlBNmRJYUVQL3N1NGg5R3dC?=
- =?utf-8?B?bU5CZi9ZVzRWWXhOWXhIN2t4dTgzWmtaeXFvVXEvZEF3K3hqMDEwTDkwL3ky?=
- =?utf-8?B?cTQ0ZEJ4RmNzSTJGQVM4ME9UYkt1cGNDaUpQMm1FVXF5cUhSaDMyNk55RXA1?=
- =?utf-8?B?TVJRaGwxa3ZMQXVMNzBhR0txbVFobEdlcUs5QVY0YlVPZHhkYnRHQTNYbjFJ?=
- =?utf-8?B?blYrTGovM0RxZUUwbEo0QW9pS2plOG8xOFJ3Zk5FTSt2WHJuQlNrV2hwRUFt?=
- =?utf-8?B?bERSY0NuWUtVQnpBYm1USS9rNitYQld2dUhBWWlMSjNNclpLdnJaL3hwbHdE?=
- =?utf-8?B?L0w2OVVwZVpoRkN0R3NWUlBxUE92L1YvdkhOdTgvL1VodWo0MWh0THRIODdJ?=
- =?utf-8?B?S0JpNUtCM3JacEdrdkgvRVp6eWMrWVZad2xZcDBqQm9XUzhWcEwxS1BCNlp1?=
- =?utf-8?B?YXYreU1lUFVUeTU2d0s2OTVUZCtCTm9DbGxPeW42UWxHelBDZWNZVFovYWNl?=
- =?utf-8?B?OXJtL0NZd216ZjFUeWZodUxLR3hPeXJXRWtRWFUrb3Fub1VEYnhUbElmcDBh?=
- =?utf-8?B?cHExMjJLbG55d2poc3Z1SWlkQ1Roa0lRKys3VjE3OWc4cU9sdC9NdjYyYVR2?=
- =?utf-8?B?c3Q3Rmk1bGVZU1I3OEpoa1NEUHQ5SmJkM2RjeTdEQVRVYlplODBQU0M2a3RR?=
- =?utf-8?B?Y21mS2NmT2NxYk00RlRPQzE1TUdFZmx1QUJlUmJoUGcvdmN0ZUIxaHFGWmFY?=
- =?utf-8?B?U0RBeVNKcmVSTVF1WGQxalhRVlgxU0lFQjhVZE5EcWlEMms2cTdlZCtrRjNa?=
- =?utf-8?B?Z1g1NzZTNXR6Mi8rYkNmMVV3ZVRqNitmSUJ4QytUTlJOdUk1cFp6UDZFdnR6?=
- =?utf-8?B?YVFCQWNPSVFtYXREZDhUdmx4U2NuRDNIZEE3YVpoUkYzQ2N0S3BrSUpQZktn?=
- =?utf-8?B?SzB3VWtycSszTW9hbEoxQkFGT1lBUEczRlBtdjZZbGJGUThHUFNuWXhmOUxm?=
- =?utf-8?B?b052ZjJxQXF0RTVKaXZBYzlzYVkwNzcrT3czSjVIKzBqVndxWFBXbHZoRTJq?=
- =?utf-8?B?aUZBRjU3N3FBK3ZqVkpVSFNPYXpxbHE1cVFjdU5jb3dWYnFMWHV3Y1lQeDg5?=
- =?utf-8?B?eXdoUnk1REROSTFQLy9oKzRmSXJNekU2Y0poVEJ6cnFaRFZ2U0IyaDZGUzN6?=
- =?utf-8?B?eGVlOE4xRCtCQVFSNE1KdTdsQ05FZzhIQmh1U25MSHZWbnZjWG9WUGRKSCtp?=
- =?utf-8?B?a2w2K2xsbzBmWmJBSmUyUE80eUx1ZzBCOVBmRXYwWE1XRDZkU2FmTnVZUGUx?=
- =?utf-8?B?a1dSMTNDbVZUYlExRnJwVWlQVWx4WVJTWTVaWS9lUHpEN2ExYnl4b1ZWdWpL?=
- =?utf-8?B?ZGxobi9vMnNnTE1NSllHcjRUY3Q1TGRGTTlRMExpOHVlSUk3MjZNbm9CNGpM?=
- =?utf-8?B?KzdyYW1TaG5LRDFKRGZ1N0htYWFRVGxpYlJrSm1HdFVWSGl5aWIzUFQ4MTE3?=
- =?utf-8?B?bVpiMldGK0hBQzBNUGs2dEg5TklUTHgvcThtMnEvSEU3czhlRmlkZXppWjM5?=
- =?utf-8?Q?MDPq/+ko4ww0AXGG7SkB1FITl?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 092b6c9f-caa5-4de8-0151-08dc53f685ae
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 15:55:45.1029
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4ryXfQWKihW1zrTR7S7sVOTbNFohrucSpRD/SwG8dLF+5s22M32bWEBY4R1k8rXJ8Dx/UcO5mzxNbBTZK8M83Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7991
+Mime-Version: 1.0
+References: <cover.1708933498.git.isaku.yamahata@intel.com> <b9fbb0844fc6505f8fb1e9a783615b299a5a5bb3.1708933498.git.isaku.yamahata@intel.com>
+Message-ID: <Zg18ul8Q4PGQMWam@google.com>
+Subject: Re: [PATCH v19 106/130] KVM: TDX: Add KVM Exit for TDX TDG.VP.VMCALL
+From: Sean Christopherson <seanjc@google.com>
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
+	hang.yuan@intel.com, tina.zhang@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 3/14/24 00:58, Zheyun Shen wrote:
-> On AMD CPUs without ensuring cache consistency, each memory page
-> reclamation in an SEV guest triggers a call to wbinvd_on_all_cpus(),
-> thereby affecting the performance of other programs on the host.
+On Mon, Feb 26, 2024, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Typically, an AMD server may have 128 cores or more, while the SEV guest
-> might only utilize 8 of these cores. Meanwhile, host can use qemu-affinity
-> to bind these 8 vCPUs to specific physical CPUs.
+> Some of TDG.VP.VMCALL require device model, for example, qemu, to handle
+> them on behalf of kvm kernel module. TDVMCALL_REPORT_FATAL_ERROR,
+> TDVMCALL_MAP_GPA, TDVMCALL_SETUP_EVENT_NOTIFY_INTERRUPT, and
+> TDVMCALL_GET_QUOTE requires user space VMM handling.
 > 
-> Therefore, keeping a record of the physical core numbers each time a vCPU
-> runs can help avoid flushing the cache for all CPUs every time.
-> 
-> Since the usage of sev_flush_asids() isn't tied to a single VM, we just
-> replace all wbinvd_on_all_cpus() with sev_do_wbinvd() except for that
-> in sev_flush_asids().
-> 
-> Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
+> Introduce new kvm exit, KVM_EXIT_TDX, and functions to setup it. Device
+> model should update R10 if necessary as return value.
 
-Ran this through our (somewhat limited) CI and also on older hardware. 
-Nothing bad happened, so:
+Hard NAK.
 
-Tested-by: Tom Lendacky <thomas.lendacky@amd.com>
+KVM needs its own ABI, under no circumstance should KVM inherit ABI directly from
+the GHCI.  Even worse, this doesn't even sanity check the "unknown" VMCALLs, KVM
+just blindly punts *everything* to userspace.  And even worse than that, KVM
+already has at least one user exit that overlaps, TDVMCALL_MAP_GPA => KVM_HC_MAP_GPA_RANGE.
 
-Note, the patch itself seems white-space damaged - what should be tabs 
-are all spaces.
+If the userspace VMM wants to run an end-around on KVM and directly communicate
+with the guest, e.g. via a synthetic device (a la virtio), that's totally fine,
+because *KVM* is not definining any unique ABI, KVM is purely providing the
+transport, e.g. emulated MMIO or PIO (and maybe not even that).  IIRC, this option
+even came up in the context of GET_QUOTE.
 
+But explicit exiting to userspace with KVM_EXIT_TDX is very different.  KVM is
+creating a contract with userspace that says "for TDX VMCALLs [a-z], KVM will exit
+to userspace with values [a-z]".  *Every* new VMCALL that's added to the GHCI will
+become KVM ABI, e.g. if Intel ships a TDX module that adds a new VMALL, then KVM
+will forward the exit to userspace, and userspace can then start relying on that
+behavior.
+
+And punting all register state, decoding, etc. to userspace creates a crap ABI.
+KVM effectively did this for SEV and SEV-ES by copying the PSP ABI verbatim into
+KVM ioctls(), and it's a gross, ugly mess.
+
+Each VMCALL that KVM wants to forward needs a dedicated KVM_EXIT_<reason> and
+associated struct in the exit union.  Yes, it's slightly more work now, but it's
+one time pain.  Whereas copying all registers is endless misery for everyone
+involved, e.g. *every* userspace VMM needs to decipher the registers, do sanity
+checking, etc.  And *every* end user needs to do the same when a debugging
+inevitable failures.
+
+This also solves Chao's comment about XMM registers.  Except for emualting Hyper-V
+hypercalls, which have very explicit handling, KVM does NOT support using XMM
+registers in hypercalls.
+
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
-> v2 -> v3:
-> - Replaced get_cpu() with parameter cpu in pre_sev_run().
+> v14 -> v15:
+> - updated struct kvm_tdx_exit with union
+> - export constants for reg bitmask
 > 
-> v1 -> v2:
-> - Added sev_do_wbinvd() to wrap two operations.
-> - Used cpumask_test_and_clear_cpu() to avoid concurrent problems.
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/x86/kvm/svm/sev.c | 27 +++++++++++++++++++++++----
->   arch/x86/kvm/svm/svm.h |  3 +++
->   2 files changed, 26 insertions(+), 4 deletions(-)
+>  arch/x86/kvm/vmx/tdx.c   | 83 ++++++++++++++++++++++++++++++++++++-
+>  include/uapi/linux/kvm.h | 89 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 170 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index f760106c3..743931e33 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -215,6 +215,24 @@ static void sev_asid_free(struct kvm_sev_info *sev)
->           sev->misc_cg = NULL;
->   }
->   
-> +static struct cpumask *sev_get_wbinvd_dirty_mask(struct kvm *kvm)
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index c8eb47591105..72dbe2ff9062 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1038,6 +1038,78 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+>  
+> +static int tdx_complete_vp_vmcall(struct kvm_vcpu *vcpu)
 > +{
-> +        struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_tdx_vmcall *tdx_vmcall = &vcpu->run->tdx.u.vmcall;
+> +	__u64 reg_mask = kvm_rcx_read(vcpu);
 > +
-> +        return &sev->wbinvd_dirty_mask;
+> +#define COPY_REG(MASK, REG)							\
+> +	do {									\
+> +		if (reg_mask & TDX_VMCALL_REG_MASK_ ## MASK)			\
+> +			kvm_## REG ## _write(vcpu, tdx_vmcall->out_ ## REG);	\
+> +	} while (0)
+> +
+> +
+> +	COPY_REG(R10, r10);
+> +	COPY_REG(R11, r11);
+> +	COPY_REG(R12, r12);
+> +	COPY_REG(R13, r13);
+> +	COPY_REG(R14, r14);
+> +	COPY_REG(R15, r15);
+> +	COPY_REG(RBX, rbx);
+> +	COPY_REG(RDI, rdi);
+> +	COPY_REG(RSI, rsi);
+> +	COPY_REG(R8, r8);
+> +	COPY_REG(R9, r9);
+> +	COPY_REG(RDX, rdx);
+> +
+> +#undef COPY_REG
+> +
+> +	return 1;
 > +}
 > +
-> +static void sev_do_wbinvd(struct kvm *kvm)
+> +static int tdx_vp_vmcall_to_user(struct kvm_vcpu *vcpu)
 > +{
-> +        int cpu;
-> +        struct cpumask *dirty_mask = sev_get_wbinvd_dirty_mask(kvm);
+> +	struct kvm_tdx_vmcall *tdx_vmcall = &vcpu->run->tdx.u.vmcall;
+> +	__u64 reg_mask;
 > +
-> +        for_each_possible_cpu(cpu) {
-> +                if (cpumask_test_and_clear_cpu(cpu, dirty_mask))
-> +                        wbinvd_on_cpu(cpu);
-> +        }
+> +	vcpu->arch.complete_userspace_io = tdx_complete_vp_vmcall;
+> +	memset(tdx_vmcall, 0, sizeof(*tdx_vmcall));
+> +
+> +	vcpu->run->exit_reason = KVM_EXIT_TDX;
+> +	vcpu->run->tdx.type = KVM_EXIT_TDX_VMCALL;
+> +
+> +	reg_mask = kvm_rcx_read(vcpu);
+> +	tdx_vmcall->reg_mask = reg_mask;
+> +
+> +#define COPY_REG(MASK, REG)							\
+> +	do {									\
+> +		if (reg_mask & TDX_VMCALL_REG_MASK_ ## MASK) {			\
+> +			tdx_vmcall->in_ ## REG = kvm_ ## REG ## _read(vcpu);	\
+> +			tdx_vmcall->out_ ## REG = tdx_vmcall->in_ ## REG;	\
+> +		}								\
+> +	} while (0)
+> +
+> +
+> +	COPY_REG(R10, r10);
+> +	COPY_REG(R11, r11);
+> +	COPY_REG(R12, r12);
+> +	COPY_REG(R13, r13);
+> +	COPY_REG(R14, r14);
+> +	COPY_REG(R15, r15);
+> +	COPY_REG(RBX, rbx);
+> +	COPY_REG(RDI, rdi);
+> +	COPY_REG(RSI, rsi);
+> +	COPY_REG(R8, r8);
+> +	COPY_REG(R9, r9);
+> +	COPY_REG(RDX, rdx);
+> +
+> +#undef COPY_REG
+> +
+> +	/* notify userspace to handle the request */
+> +	return 0;
 > +}
 > +
->   static void sev_decommission(unsigned int handle)
->   {
->           struct sev_data_decommission decommission;
-> @@ -2048,7 +2066,7 @@ int sev_mem_enc_unregister_region(struct kvm *kvm,
->            * releasing the pages back to the system for use. CLFLUSH will
->            * not do this, so issue a WBINVD.
->            */
-> -        wbinvd_on_all_cpus();
-> +        sev_do_wbinvd(kvm);
->   
->           __unregister_enc_region_locked(kvm, region);
->   
-> @@ -2152,7 +2170,7 @@ void sev_vm_destroy(struct kvm *kvm)
->            * releasing the pages back to the system for use. CLFLUSH will
->            * not do this, so issue a WBINVD.
->            */
-> -        wbinvd_on_all_cpus();
-> +        sev_do_wbinvd(kvm);
->   
->           /*
->            * if userspace was terminated before unregistering the memory regions
-> @@ -2343,7 +2361,7 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
->           return;
->   
->   do_wbinvd:
-> -        wbinvd_on_all_cpus();
-> +        sev_do_wbinvd(vcpu->kvm);
->   }
->   
->   void sev_guest_memory_reclaimed(struct kvm *kvm)
-> @@ -2351,7 +2369,7 @@ void sev_guest_memory_reclaimed(struct kvm *kvm)
->           if (!sev_guest(kvm))
->                   return;
->   
-> -        wbinvd_on_all_cpus();
-> +        sev_do_wbinvd(kvm);
->   }
->   
->   void sev_free_vcpu(struct kvm_vcpu *vcpu)
-> @@ -2648,6 +2666,7 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
->           sd->sev_vmcbs[asid] = svm->vmcb;
->           svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
->           vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
-> +        cpumask_set_cpu(cpu, sev_get_wbinvd_dirty_mask(svm->vcpu.kvm));
->   }
->   
->   #define GHCB_SCRATCH_AREA_LIMIT                (16ULL * PAGE_SIZE)
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 8ef95139c..de240a9e9 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -90,6 +90,9 @@ struct kvm_sev_info {
->           struct list_head mirror_entry; /* Use as a list entry of mirrors */
->           struct misc_cg *misc_cg; /* For misc cgroup accounting */
->           atomic_t migration_in_progress;
+>  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>  {
+>  	if (tdvmcall_exit_type(vcpu))
+> @@ -1048,8 +1120,15 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>  		break;
+>  	}
+>  
+> -	tdvmcall_set_return_code(vcpu, TDVMCALL_INVALID_OPERAND);
+> -	return 1;
+> +	/*
+> +	 * Unknown VMCALL.  Toss the request to the user space VMM, e.g. qemu,
+> +	 * as it may know how to handle.
+> +	 *
+> +	 * Those VMCALLs require user space VMM:
+> +	 * TDVMCALL_REPORT_FATAL_ERROR, TDVMCALL_MAP_GPA,
+> +	 * TDVMCALL_SETUP_EVENT_NOTIFY_INTERRUPT, and TDVMCALL_GET_QUOTE.
+> +	 */
+> +	return tdx_vp_vmcall_to_user(vcpu);
+>  }
+>  
+>  void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5e2b28934aa9..a7aa804ef021 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -167,6 +167,92 @@ struct kvm_xen_exit {
+>  	} u;
+>  };
+>  
+> +/* masks for reg_mask to indicate which registers are passed. */
+> +#define TDX_VMCALL_REG_MASK_RBX	BIT_ULL(2)
+> +#define TDX_VMCALL_REG_MASK_RDX	BIT_ULL(3)
+> +#define TDX_VMCALL_REG_MASK_RSI	BIT_ULL(6)
+> +#define TDX_VMCALL_REG_MASK_RDI	BIT_ULL(7)
+> +#define TDX_VMCALL_REG_MASK_R8	BIT_ULL(8)
+> +#define TDX_VMCALL_REG_MASK_R9	BIT_ULL(9)
+> +#define TDX_VMCALL_REG_MASK_R10	BIT_ULL(10)
+> +#define TDX_VMCALL_REG_MASK_R11	BIT_ULL(11)
+> +#define TDX_VMCALL_REG_MASK_R12	BIT_ULL(12)
+> +#define TDX_VMCALL_REG_MASK_R13	BIT_ULL(13)
+> +#define TDX_VMCALL_REG_MASK_R14	BIT_ULL(14)
+> +#define TDX_VMCALL_REG_MASK_R15	BIT_ULL(15)
 > +
-> +        /* CPUs invoked VMRUN should do wbinvd after guest memory is reclaimed */
-> +        struct cpumask wbinvd_dirty_mask;
->   };
->   
->   struct kvm_svm {
-> --
-> 2.34.1
+> +struct kvm_tdx_exit {
+> +#define KVM_EXIT_TDX_VMCALL	1
+> +	__u32 type;
+> +	__u32 pad;
+> +
+> +	union {
+> +		struct kvm_tdx_vmcall {
+> +			/*
+> +			 * RAX(bit 0), RCX(bit 1) and RSP(bit 4) are reserved.
+> +			 * RAX(bit 0): TDG.VP.VMCALL status code.
+> +			 * RCX(bit 1): bitmap for used registers.
+> +			 * RSP(bit 4): the caller stack.
+> +			 */
+> +			union {
+> +				__u64 in_rcx;
+> +				__u64 reg_mask;
+> +			};
+> +
+> +			/*
+> +			 * Guest-Host-Communication Interface for TDX spec
+> +			 * defines the ABI for TDG.VP.VMCALL.
+> +			 */
+> +			/* Input parameters: guest -> VMM */
+> +			union {
+> +				__u64 in_r10;
+> +				__u64 type;
+> +			};
+> +			union {
+> +				__u64 in_r11;
+> +				__u64 subfunction;
+> +			};
+> +			/*
+> +			 * Subfunction specific.
+> +			 * Registers are used in this order to pass input
+> +			 * arguments.  r12=arg0, r13=arg1, etc.
+> +			 */
+> +			__u64 in_r12;
+> +			__u64 in_r13;
+> +			__u64 in_r14;
+> +			__u64 in_r15;
+> +			__u64 in_rbx;
+> +			__u64 in_rdi;
+> +			__u64 in_rsi;
+> +			__u64 in_r8;
+> +			__u64 in_r9;
+> +			__u64 in_rdx;
+> +
+> +			/* Output parameters: VMM -> guest */
+> +			union {
+> +				__u64 out_r10;
+> +				__u64 status_code;
+> +			};
+> +			/*
+> +			 * Subfunction specific.
+> +			 * Registers are used in this order to output return
+> +			 * values.  r11=ret0, r12=ret1, etc.
+> +			 */
+> +			__u64 out_r11;
+> +			__u64 out_r12;
+> +			__u64 out_r13;
+> +			__u64 out_r14;
+> +			__u64 out_r15;
+> +			__u64 out_rbx;
+> +			__u64 out_rdi;
+> +			__u64 out_rsi;
+> +			__u64 out_r8;
+> +			__u64 out_r9;
+> +			__u64 out_rdx;
+> +		} vmcall;
+> +	} u;
+> +};
+> +
+>  #define KVM_S390_GET_SKEYS_NONE   1
+>  #define KVM_S390_SKEYS_MAX        1048576
+>  
+> @@ -210,6 +296,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_NOTIFY           37
+>  #define KVM_EXIT_LOONGARCH_IOCSR  38
+>  #define KVM_EXIT_MEMORY_FAULT     39
+> +#define KVM_EXIT_TDX              40
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -470,6 +557,8 @@ struct kvm_run {
+>  			__u64 gpa;
+>  			__u64 size;
+>  		} memory_fault;
+> +		/* KVM_EXIT_TDX_VMCALL */
+> +		struct kvm_tdx_exit tdx;
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> -- 
+> 2.25.1
+> 
 
