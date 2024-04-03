@@ -1,120 +1,172 @@
-Return-Path: <kvm+bounces-13458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA66B896F3E
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 14:48:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D64A896F70
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 14:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17A2F1C255C5
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 12:48:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43CACB29FFF
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 12:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33920146D65;
-	Wed,  3 Apr 2024 12:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137B61487DD;
+	Wed,  3 Apr 2024 12:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3OEi/Wl0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R1uATYUA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52101EEF9
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 12:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AB7146A8E
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 12:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712148506; cv=none; b=ij0R+py8HU7MzPanjz40hMUBcfCWl2iO3Y6JL88cwblXrKzbrYjVu8fASMrKQ+3dAaXcD6NwBNqxJ3pUyuJfG26Y8EH1UqM4oGtKBbqPqxbOzAhQaYKZsMfWotnhe4gAwAXwP4xy5DN7cbRQ7V1YLy/IaR0a1trGUvODBvFk7wI=
+	t=1712148738; cv=none; b=SHL/0je91ucyayKHnauwiwUn4NSypiq/HX8nAs3Y6llDRSb/rR9LBSLDzHuTThFfGmuGK1GpGV1UNlrrGl5RGXqBKuAkvveb+KnlEoqu4dcgvwef76A6Z2VkHB6GlL+6dqkb6W6oAXg2xWLtPzjyPjBcW7vrBLUl55sGeVvmcoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712148506; c=relaxed/simple;
-	bh=4fa99bxCzTQ+aNnZyVhhNdM2BDVJ2tsP+qybvHGqaKM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GxdIYyGnteCNKCKmF0gAbKCE4yJhVOBlVWcWg/gU+cwf0Vgp7XXi8GXmH6Q2bjz6zAgSfTH+3eJBabiowIRupf0WtE+fVMi2HnUl6GW0ddeDVEmltFSc9OtndtYrJt2EPaifWHJjKEagT6R3Sp/cZtHzexqdpV6ArOhPAQ4sG1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3OEi/Wl0; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc64f63d768so10052991276.2
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 05:48:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712148504; x=1712753304; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+WTH0q5GpZ21Z4ilfFX2mq/pwBVpJa04vjJTZDZifhs=;
-        b=3OEi/Wl0Ii6hwwI588T32CXWbyWiDiED+UtV+jHJNsq0jtrYcq1IfYusxJaiO6x6He
-         sei4tMOIQ0psJ3aN+OanjaMcs3GqqHvBVkuN/I+ld9XiqLQxw+huWdQwehIhNHcHqfXr
-         7/yq5TPsQOaOtUMU4cGTxLsuG0A/ZtV7fYve9emuRnYR7Rqs7OSqKAeYOSog4LR+UdeO
-         Ukw3iQ1GE+hQHcigK3lUc7+HFsWxb8Pbxl5wwnJ547ax+EAP/+pUkBHOoe5nD2j0tkCa
-         ZG4WEsBu8E+lVz2n7WIOQj1Mnkj/fNW2bFk4BCFwxG7nqj4L6UpITPpxHIwvpOfTDYzl
-         XNlg==
+	s=arc-20240116; t=1712148738; c=relaxed/simple;
+	bh=KTbI/ksSemO199S8nZZfV3jPhmS7kS2sBWwVojZaqVc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WYX2ZO5vpq4/4X5DfJL5uIZZtfflsTqrlhHOIW3KOG+rOaXoPbezfDM9fS0SREFIHRquL3r0vDbocQwH4CPcLAWtGNiX28jrX9iNHND1dQ8rNlL6pzCF80IEpht6RmQCzkV3R5BtUOWA498J4vs2m4hPPxDTh/17Uq3LXwxZpnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R1uATYUA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712148735;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Lzo04337+pWNqFR9KY5np7872oqctqWVTvayomhrVIY=;
+	b=R1uATYUA4ggZ7o57HmejgazGydMQqrOhLAogWxV9VLIPXHzT5jZ6huaOOhjOtULG4uYXi3
+	Hml9yLdtEpkBkDYxWuxBmef8sVhIkTEfeE8Pc3K0NeS+lF6Ef6XgCRc0ODDSSlDyioS4iC
+	be2DDKCT6N9CTqkfqjCES5AZTDW5gTo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-54-LmE0grHWNNepWnEZcVPF9g-1; Wed, 03 Apr 2024 08:52:13 -0400
+X-MC-Unique: LmE0grHWNNepWnEZcVPF9g-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-34368c5cadfso947043f8f.3
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 05:52:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712148504; x=1712753304;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+WTH0q5GpZ21Z4ilfFX2mq/pwBVpJa04vjJTZDZifhs=;
-        b=o0zxjFK6kLQ5Kt6Gii8Xfnza2nJERQSouw9oiN6JHe8vVI5GkRTQrBiRGTw8bF4aRG
-         cGIMOHYuC0/cZUrCJUAYYSOEQm9Ie+AKHnVt1LXWH20sdz/vm/DiF1Hg66SVi8U4v9mS
-         DHiy85rbaczBpZsRH1oa+b3XthoOBh/b70Hg8cU4z/haHAdohYohvTt7w5IOvo/xXCVQ
-         Zgmzgm7hO1jn5Mij+Jn9btvKGcSEt9KKDchIhsUqoNgW5bRNdTbeFYxTv1FXozs+t98f
-         /2+HvHaTC7o6eiFmyUrwEwblNEiCHp01hb7mz08102NP6gB5/7pxEgCJReioXkGQckZ5
-         Vm+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVwMK/YojjMqOp1Hnd4wivIMrfaRka+Rc6coNGYYuIZv7/1Yg2OpIJg3I0ryYhkaEUR/utly0q81sHjZsa1iuCAdPTT
-X-Gm-Message-State: AOJu0Yz9FXD70X/ju0TzOvykEAEQ+lmjeq0alJ6Uguqd7GvxQCFSClPC
-	ufJz82OAjPOP9r93RorNVYmzsVWeYGoSPT6F9z3DTIYGuOnd7UXHPNCa5UPpmi0dv7cMJccLjKo
-	4hQ==
-X-Google-Smtp-Source: AGHT+IHzFSNyW912YO220dObmsVmcH6kZMbX/Cwr83xihFVbO6C+uvXA4mxpDrUftZoKCYJjCYYgrpO5rM0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1586:b0:dcb:b9d7:2760 with SMTP id
- k6-20020a056902158600b00dcbb9d72760mr4816449ybu.13.1712148504099; Wed, 03 Apr
- 2024 05:48:24 -0700 (PDT)
-Date: Wed, 3 Apr 2024 05:48:22 -0700
-In-Reply-To: <20240403121436.GDZg1ILCn0a4Ddif3g@fat_crate.local>
+        d=1e100.net; s=20230601; t=1712148732; x=1712753532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lzo04337+pWNqFR9KY5np7872oqctqWVTvayomhrVIY=;
+        b=P/K+yHkqleb9ks/VUBSXRl6aYgZYvQU29eqXdvJOJag2DmPT+8+lr8Dsi2G/D3iOJK
+         ajnxZHBq78ix3C1GsKCtfU5RGa71aMFnD6xL6i7V6Hr5u+deLQ2HkOwDU/8QonjtKw/Y
+         ymGLrzQADjGLoL6jOWmo+nq18OPY0C8B32rPsnht341jiGjP7PDazLph0V9RHGKOi8Pn
+         gqQZDY3Fq9ns50qfp46NdInvKv5SDcRh7jnIoix6YfelqD4JXmkMunHbTfq1L5tbnZRM
+         C5Qc462TPp4y/dZE9Iz5Tb/qBXVHlFRZU7MxlC/uj7PWxye/+H97/LEjjVLqNg6w20fq
+         07lA==
+X-Forwarded-Encrypted: i=1; AJvYcCVBsYBgA6B+Ujz2CHM0ZkHZlWGmEX19CaPuZpYvGjyLHb/L7mWQD2f7lzrwnjqzxQome5HO38qqxaY8ZebdNzETePvU
+X-Gm-Message-State: AOJu0Yy3CE4Rlbe2txaw/hHha4akhIhJw79iEOIYYn7KuIaqcry0JkGw
+	+IhMpE/oxGDsY4JdPaOEEQJY4+muWctkWm8mG4gOUtsBM9cxCG9oHIFZ1agJ9G6X0CI9UH5Sw0x
+	hQv9k2trMkeFh0m2+gqI5mwCJqBfoEqERTyWg93w86EXzuCAf7HHAdpgNaiVYR0/5FkOYvtUv6H
+	eFePLNths1RhcKhdRH5EZVWgbJ
+X-Received: by 2002:a5d:48cc:0:b0:33e:ca29:5a3 with SMTP id p12-20020a5d48cc000000b0033eca2905a3mr10071610wrs.23.1712148731975;
+        Wed, 03 Apr 2024 05:52:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF2UoNabPuQYMXaCFPaD8DdCLeElDGS9RU+nviM9wFLu/qKDV0J6kv+wy2lYCLkobeqVDalIcJhUKiwuGQdPuY=
+X-Received: by 2002:a5d:48cc:0:b0:33e:ca29:5a3 with SMTP id
+ p12-20020a5d48cc000000b0033eca2905a3mr10071597wrs.23.1712148731603; Wed, 03
+ Apr 2024 05:52:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <1d10cd73-2ae7-42d5-a318-2f9facc42bbe@alu.unizg.hr>
- <20240318202124.GCZfiiRGVV0angYI9j@fat_crate.local> <12619bd4-9e9e-4883-8706-55d050a4d11a@alu.unizg.hr>
- <20240326101642.GAZgKgisKXLvggu8Cz@fat_crate.local> <8fc784c2-2aad-4d1d-ba0f-e5ab69d28ec5@alu.unizg.hr>
- <20240328123830.dma3nnmmlb7r52ic@amd.com> <20240402101549.5166-1-bp@kernel.org>
- <20240402133856.dtzinbbudsu7rg7d@amd.com> <20240403121436.GDZg1ILCn0a4Ddif3g@fat_crate.local>
-Message-ID: <Zg1QFlDdRrLRZchi@google.com>
-Subject: Re: [BUG net-next] arch/x86/kernel/cpu/bugs.c:2935: "Unpatched return
- thunk in use. This should not happen!" [STACKTRACE]
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Michael Roth <michael.roth@amd.com>, Josh Poimboeuf <jpoimboe@kernel.org>, bp@kernel.org, 
-	bgardon@google.com, dave.hansen@linux.intel.com, dmatlack@google.com, 
-	hpa@zytor.com, kvm@vger.kernel.org, leitao@debian.org, 
-	linux-kernel@vger.kernel.org, maz@kernel.org, mingo@redhat.com, 
-	mirsad.todorovac@alu.unizg.hr, pawan.kumar.gupta@linux.intel.com, 
-	pbonzini@redhat.com, peterz@infradead.org, shahuang@redhat.com, 
-	tabba@google.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240329225835.400662-1-michael.roth@amd.com> <20240329225835.400662-12-michael.roth@amd.com>
+ <8c3685a6-833c-4b3c-83f4-c0bd78bba36e@redhat.com> <20240401222229.qpnpozdsr6b2sntk@amd.com>
+ <20240402225840.GB2444378@ls.amr.corp.intel.com>
+In-Reply-To: <20240402225840.GB2444378@ls.amr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 3 Apr 2024 14:51:59 +0200
+Message-ID: <CABgObfb4fQpUTzhpX9Bkcu0_+bOcCSCtuy+5-rttTLm-bY8i2w@mail.gmail.com>
+Subject: Re: [PATCH v12 11/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, Xu Yilun <yilun.xu@linux.intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	isaku.yamahata@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 03, 2024, Borislav Petkov wrote:
-> On Tue, Apr 02, 2024 at 08:38:56AM -0500, Michael Roth wrote:
-> > On Tue, Apr 02, 2024 at 12:15:49PM +0200, bp@kernel.org wrote:
-> > I can also trigger using one of the more basic KVM selftests:
-> > 
-> >   make INSTALL_HDR_PATH="$headers_dir" headers_install
-> >   make -C tools/testing/selftests TARGETS="kvm" EXTRA_CFLAGS="-DDEBUG -I$headers_dir"
-> >   sudo tools/testing/selftests/kvm/userspace_io_test
-> 
-> Ok, thanks, that helped.
-> 
-> Problem is:
-> 
-> 7f4b5cde2409 ("kvm: Disable objtool frame pointer checking for vmenter.S")
-> 
-> it is disabling checking of the arch/x86/kvm/svm/vmenter.S by objtool
-> when CONFIG_FRAME_POINTER=y but that also leads to objtool *not*
-> generating .return_sites and the return thunk remains unpatched.
-> 
-> I think we need to say: ignore frame pointer checking but still generate
-> .return_sites.
+On Wed, Apr 3, 2024 at 12:58=E2=80=AFAM Isaku Yamahata <isaku.yamahata@inte=
+l.com> wrote:
+> I think TDX can use it with slight change. Pass vcpu instead of KVM, page=
+ pin
+> down and mmu_lock.  TDX requires non-leaf Secure page tables to be popula=
+ted
+> before adding a leaf.  Maybe with the assumption that vcpu doesn't run, G=
+FN->PFN
+> relation is stable so that mmu_lock isn't needed? What about punch hole?
+>
+> The flow would be something like as follows.
+>
+> - lock slots_lock
+>
+> - kvm_gmem_populate(vcpu)
+>   - pin down source page instead of do_memcopy.
 
-I'm guessing a general solution for OBJECT_FILES_NON_STANDARD is needed, but I
-have a series to drop it for vmenter.S.
+Both pinning the source page and the memcpy can be done in the
+callback.  I think the right thing to do is:
 
-https://lore.kernel.org/all/20240223204233.3337324-9-seanjc@google.com
+1) eliminate do_memcpy, letting AMD code taking care of
+   copy_from_user.
+
+2) pass to the callback only gfn/pfn/src, where src is computed as
+
+    args->src ? args->src + i * PAGE_SIZE : NULL
+
+If another architecture/vendor needs do_memcpy, they can add
+something like kvm_gmem_populate_copy.
+
+>   - get pfn with __kvm_gmem_get_pfn()
+>   - read lock mmu_lock
+>   - in the post_populate callback
+>     - lookup tdp mmu page table to check if the table is populated.
+>       lookup only version of kvm_tdp_mmu_map().
+>       We need vcpu instead of kvm.
+
+Passing vcpu can be done using the opaque callback argument to
+kvm_gmem_populate.
+
+Likewise, the mmu_lock can be taken by the TDX post_populate
+callback.
+
+Paolo
+
+>     - TDH_MEM_PAGE_ADD
+>   - read unlock mmu_lock
+>
+> - unlock slots_lock
+>
+> Thanks,
+>
+> > With that model, the potential for using kvm_gmem_populate() seemed
+> > plausible to I was trying to make it immediately usable for that
+> > purpose. But maybe the TDX folks can confirm whether this would be
+> > usable for them or not. (kvm_gmem_populate was introduced here[2] for
+> > reference/background)
+> >
+> > -Mike
+> >
+> > [1] https://lore.kernel.org/kvm/20240319155349.GE1645738@ls.amr.corp.in=
+tel.com/T/#m8580d8e39476be565534d6ff5f5afa295fe8d4f7
+> > [2] https://lore.kernel.org/kvm/20240329212444.395559-3-michael.roth@am=
+d.com/T/#m3aeba660fcc991602820d3703b1265722b871025)
+
 
