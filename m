@@ -1,144 +1,124 @@
-Return-Path: <kvm+bounces-13493-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13494-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D188978D1
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 21:08:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A4AA8978A9
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 20:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 907C8B295FE
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 18:51:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B1481F23EBE
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 18:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5EA15445F;
-	Wed,  3 Apr 2024 18:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4291E154BE3;
+	Wed,  3 Apr 2024 18:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kg/Pc4Yq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gjKQJ0Hb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C3F839E1;
-	Wed,  3 Apr 2024 18:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D9D153BF0
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 18:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712170266; cv=none; b=jlrD9jd3pSGw7rzFa5EGnnRL1uQYXv5p5Q8Cs3F+3ZwcNIRh4g7HtGY5mZ+l/F2dv1OO85DkJzF/PLH2mWfmEoIBI+rnywTWTP5cMLjkD+iqqAQeKFSHwrFKOl4HuB+RCCjodfdesnxKPWxK61bRKEGxOuL4JJ2mV1JrdlM1JVk=
+	t=1712170533; cv=none; b=tUlzf2ronvt16ll0TY16URojv6ztgmF7ZyhWMhh62oPLJSiMJzHuBXdDMcvMpEfviO+URI//uYkWHoTuVDb4f1j5dIzxLZ8Vr5thNl3YaRAu9IDSiyBHOEKCaa9aBCXbIC2nwu3jx0lg4mcJKQgIPok37kYS3zAk5am3HRF0gJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712170266; c=relaxed/simple;
-	bh=lSO5a/LR2abT5IbXVMvLNuvxnTKyJrqDXsHF2+SQ84c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DOPnOApc+tSSq5vwFpn383JYsfLlnUtqaiAoUsf2KMDzfddZ+daaXUgrxa2m9O8hfv3LD28GzOx6kp8A3GpIYyVnWIgT6mb58ZO92AW+/wiegCN4TBlwlB8Hf1Dp1atMHLBOkAwJcbtUrMMzWvVkveHqM05w/ELuGpd6yBfbxec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kg/Pc4Yq; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712170265; x=1743706265;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lSO5a/LR2abT5IbXVMvLNuvxnTKyJrqDXsHF2+SQ84c=;
-  b=Kg/Pc4YqmTqkPvPpBJ9HmgPGeTjOSRvshMnFRLBo7+L1AohuBpo5673f
-   PXoC+dA4I2+8+1tOYg74oAMEW2SPuDBZg91dttMLH785wTAAy8/qkxmOx
-   ln11dX8QWoLtKbGhuUr+XvO9WELc9kS7q2XjAOMtLAbZCIo7TU2Ytbb4B
-   bD9h1iUoWV5GEUm72wmozgxetYsdOHul5laGv49e6HX4zGChNkKWnQk+3
-   dJ+26TvENI2U/KWSLFiYv4eAqWFkKohWVT6boH946eOlONPV1BjPSBlMH
-   D0eS5CAqK83Qv4sqDl7frg1vtDtCtL39+okzBc35a57FfOskk6x/a47ox
-   g==;
-X-CSE-ConnectionGUID: UZAiFbdXTfqZqQtOtLm9Ug==
-X-CSE-MsgGUID: ncrA96eMREOKF+CJZod54w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7538817"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="7538817"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 11:51:04 -0700
-X-CSE-ConnectionGUID: anH6KJ8vRluvEQv7Pt4gmA==
-X-CSE-MsgGUID: 1UMUQKVqQGGMzXn/qWPyXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="23290440"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 11:51:04 -0700
-Date: Wed, 3 Apr 2024 11:51:03 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 102/130] KVM: TDX: handle EXCEPTION_NMI and
- EXTERNAL_INTERRUPT
-Message-ID: <20240403185103.GK2444378@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <3ac413f1d4adbac7db88a2cade97ded3b076c540.1708933498.git.isaku.yamahata@intel.com>
- <ZgpuqJW365ZfuJao@chao-email>
+	s=arc-20240116; t=1712170533; c=relaxed/simple;
+	bh=7XDPcjGhh21TD94uSUZErS3ioNLCHjs+I9ktpoDyyz4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Z977rOD2v53Md57V4TdODroAf0ID836Gh1oQjUTk0gWkNKWHESr3p2ujo2vtre8SfNtUX4Yu6Y1hUIroqwyzAStQOFyJkSPlCymP0tFDnDSQMd3APMxb7HxjZDyaspPBGSGNKYv9ArzvwU0mrWa8LlwmgLfkmtplm+yj0DTN1zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gjKQJ0Hb; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a25c69cdb1so79191a91.2
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 11:55:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712170531; x=1712775331; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kzq7wE2LZl4SFXr3lgccRsGuVgsB6ehLKZYX2fNnhEI=;
+        b=gjKQJ0HbCDHax4O0JbMqWZRRcq+C7V+QCHjNkc8TQ6zECYzyMavV94nNDvdAVKaCEM
+         gUvqmN/N87eNwrXdvy45FhoyD9VV/8E7c18I/8gGB112Kk6FC1HoJQxgvh475fqcjFvm
+         YlJH/pw2gHLN8NsPLZI49/LxXacdo9l8tj8Ew9AwO54NpmmwOLRJ4MiUb3t/4txb2kyl
+         AnUpVvjnfB7n1uxqz2ZLM6tvR/m/VmvDmYgn08EPg+ZVTvY/hmYBJ/OqL/GelhkiS/IS
+         lkWQaRs9VokXjUfAZfTpmGfCZ/Pu2CY+o81vJVdu5MIemdmh9cA9/oFL1rsMpWZ47E00
+         uPEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712170531; x=1712775331;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kzq7wE2LZl4SFXr3lgccRsGuVgsB6ehLKZYX2fNnhEI=;
+        b=t7uiNOpVB8jyy5GQBJvHD+2MlFHWDygmI2xDdOqr/8o2AJTUolQe1F9rYlLw9uRRyn
+         LuJrSz2my2ZayhMwQwPABt/IeFwGWZeITATw2FiDQnfgRHbNnENFf4bqbriFAC3A8Ivm
+         JGfZTi3U+6Ns2Ow4u0R3jmJyZIO+FrFB4dscClNVZ7dk017M3raf9lhdpiO0CIDY6UKq
+         jI1vqFbPTZ83LQPIfGcfnSl6zHJ2XDYvY4mgNuU2rA5NHvAJCoMTB9K5fZnzJjoOAWM+
+         wORbE5YHJLEY6K2EQATwsHhagzJ75LbcdmdwMR7JGz5CTzHsAMEnH7ysX661z34uH8Wm
+         mOig==
+X-Forwarded-Encrypted: i=1; AJvYcCU5TWI4dKjTPoN3VcLo2zWmqSraCTB3jA4lHFpCi5xPAusbFl32jHM9cj5BnH9gQAIAgZmRT6uu3LnVlbx5k4smVCAr
+X-Gm-Message-State: AOJu0YyZaW+mCVgMycoht4kJzHyNAOL0ACQoW0k6Ag51ajRRftMjofRp
+	CUaqGQtf8OVCNDF+kHzXhY+cKZmZmKN4bljPKjXmzDHOe2owzYMYEPSWvTd9SlSyY9HqCQGiX51
+	+Zg==
+X-Google-Smtp-Source: AGHT+IFKGa2KzmAjSzr/ynps6PguHbVfuoYrDmr/tcPFpr26buqw+kLsdXlJNwSfn1UBTe813gJXVI83dEM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:de01:b0:29b:c2b7:7d29 with SMTP id
+ m1-20020a17090ade0100b0029bc2b77d29mr1023pjv.9.1712170531325; Wed, 03 Apr
+ 2024 11:55:31 -0700 (PDT)
+Date: Wed, 3 Apr 2024 11:55:30 -0700
+In-Reply-To: <20240403183420.GI2444378@ls.amr.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZgpuqJW365ZfuJao@chao-email>
+Mime-Version: 1.0
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <d6547bd0c1eccdfb4a4908e330cc56ad39535f5e.1708933498.git.isaku.yamahata@intel.com>
+ <ZgY0hy6Io72yZ9dF@chao-email> <20240403183420.GI2444378@ls.amr.corp.intel.com>
+Message-ID: <Zg2mItGOnHsQIP8R@google.com>
+Subject: Re: [PATCH v19 097/130] KVM: x86: Split core of hypercall emulation
+ to helper function
+From: Sean Christopherson <seanjc@google.com>
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
+	hang.yuan@intel.com, tina.zhang@intel.com, 
+	Sean Christopherson <sean.j.christopherson@intel.com>, isaku.yamahata@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Apr 01, 2024 at 04:22:00PM +0800,
-Chao Gao <chao.gao@intel.com> wrote:
-
-> On Mon, Feb 26, 2024 at 12:26:44AM -0800, isaku.yamahata@intel.com wrote:
-> >From: Isaku Yamahata <isaku.yamahata@intel.com>
-> >
-> >Because guest TD state is protected, exceptions in guest TDs can't be
-> >intercepted.  TDX VMM doesn't need to handle exceptions.
-> >tdx_handle_exit_irqoff() handles NMI and machine check.  Ignore NMI and
+On Wed, Apr 03, 2024, Isaku Yamahata wrote:
+> On Fri, Mar 29, 2024 at 11:24:55AM +0800,
+> Chao Gao <chao.gao@intel.com> wrote:
 > 
-> tdx_handle_exit_irqoff() doesn't handle NMIs.
-
-Will it to tdx_handle_exception().
-
-
-> >machine check and continue guest TD execution.
-> >
-> >For external interrupt, increment stats same to the VMX case.
-> >
-> >Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> >Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> >---
-> > arch/x86/kvm/vmx/tdx.c | 23 +++++++++++++++++++++++
-> > 1 file changed, 23 insertions(+)
-> >
-> >diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> >index 0db80fa020d2..bdd74682b474 100644
-> >--- a/arch/x86/kvm/vmx/tdx.c
-> >+++ b/arch/x86/kvm/vmx/tdx.c
-> >@@ -918,6 +918,25 @@ void tdx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
-> > 		vmx_handle_exception_irqoff(vcpu, tdexit_intr_info(vcpu));
-> > }
+> > On Mon, Feb 26, 2024 at 12:26:39AM -0800, isaku.yamahata@intel.com wrote:
+> > >@@ -10162,18 +10151,49 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+> > > 
+> > > 		WARN_ON_ONCE(vcpu->run->hypercall.flags & KVM_EXIT_HYPERCALL_MBZ);
+> > > 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
+> > >+		/* stat is incremented on completion. */
 > > 
-> >+static int tdx_handle_exception(struct kvm_vcpu *vcpu)
-> >+{
-> >+	u32 intr_info = tdexit_intr_info(vcpu);
-> >+
-> >+	if (is_nmi(intr_info) || is_machine_check(intr_info))
-> >+		return 1;
+> > Perhaps we could use a distinct return value to signal that the request is redirected
+> > to userspace. This way, more cases can be supported, e.g., accesses to MTRR
+> > MSRs, requests to service TDs, etc. And then ...
 > 
-> Add a comment in code as well.
+> The convention here is the one for exit_handler vcpu_enter_guest() already uses.
+> If we introduce something like KVM_VCPU_CONTINUE=1, KVM_VCPU_EXIT_TO_USER=0, it
+> will touch many places.  So if we will (I'm not sure it's worthwhile), the
+> cleanup should be done as independently.
 
-Sure.
+Yeah, this is far from the first time that someone has complained about KVM's
+awful 1/0 return magic.  And every time we've looked at it, we've come to the
+conclusion that it's not worth the churn/risk.
 
+And if we really need to further overload the return value, we can, e.g. KVM
+already does this for MSR accesses:
 
-> >+
-> >+	kvm_pr_unimpl("unexpected exception 0x%x(exit_reason 0x%llx qual 0x%lx)\n",
-> >+		intr_info,
-> >+		to_tdx(vcpu)->exit_reason.full, tdexit_exit_qual(vcpu));
-> >+	return -EFAULT;
-> 
-> -EFAULT looks incorrect.
-
-As this is unexpected exception, we should exit to to the user-space with
-KVM_EXIT_EXCEPTION. Then QEMU will abort with message.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+/*
+ * Internal error codes that are used to indicate that MSR emulation encountered
+ * an error that should result in #GP in the guest, unless userspace
+ * handles it.
+ */
+#define  KVM_MSR_RET_INVALID	2	/* in-kernel MSR emulation #GP condition */
+#define  KVM_MSR_RET_FILTERED	3	/* #GP due to userspace MSR filter */
 
