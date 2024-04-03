@@ -1,201 +1,304 @@
-Return-Path: <kvm+bounces-13482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A27089770B
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 19:40:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0E05897740
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 19:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B8F11F2D640
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 17:40:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C367E1C20E55
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 17:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75E616D334;
-	Wed,  3 Apr 2024 17:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3EB156966;
+	Wed,  3 Apr 2024 17:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uqm9QCWv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B0oxLq6H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1C116D32A
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 17:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E92156886;
+	Wed,  3 Apr 2024 17:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712164806; cv=none; b=nRHHlyV8d0xtctYX+0pJXfsIbq9MSTBAT014JDmIPkJgcRLm3D7OdN6t7giXBcmpCs1jWbA4xvzecnfrCyqGVwsdkb1phyN7msOY7wdIdtGgZHUhWghEUoWywS0BCXJGTUeJtObh93nuqkVxrID4Mo3WdkXa1+npleogGiBmY9M=
+	t=1712165061; cv=none; b=jkLF0mzhlGzN7i/taFzbkTIPfLo/sW2jbr50lgVU05lMEUNKq+2E1nhEYgn0WKCE3s3CRmb8oSksnQn8g6qHduxNqy31o497vxG8Cv+GnvuykcsBB795PlfdNyFvZUcp6v35dxRXvw+E5ZVyUWob7nV3SIzHQ6GNyltCNKuZhPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712164806; c=relaxed/simple;
-	bh=8IlYAc/1g7pMae9Bxm4yrJUSCcJqAJcPwhB0IO4bkik=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ba/d6JBXXVdWfaSN5PMIsjqlZtGdrVjzby7rS9YNtxLD5GFhubOwvuW/l+heSHDb+ZFrFsB3GGjwbFZW8XTJVMEef2+PGzRcQgNJMQJaCVOY0M+5J6nUxIbECA0sj52EkO1THn7inK50LJWU3fK+GUjJxJRXaf+V3cZqqqhtyxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uqm9QCWv; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a26a065631so14727a91.3
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 10:20:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712164804; x=1712769604; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3rSsI2dMglxlpboEehF0mS0Pvczh5Ixi6iikM5re2Go=;
-        b=uqm9QCWv5Jk6NOjEf1LH0ZW6fJ3j+nxZoMPCyk/f32oAGBCmNLuPU//bMIKVL2fT6d
-         iGBgp+4XgGfm5EC9k+PhLta60wHjUrdJqUhx29Rz1wGoWqL37h4oXAQqe53FULM7ZuDf
-         cevkpEOowbR3B8ewpaOwcWgaCG5wnh/GCCz+l62wtOX6kAt3/bUKLKbm6SyMsxAVEVDi
-         1eE8VuiqiIC1bVa86nJ8u4zRY48jeUkxUF5iOgsZg/JZTK7aft7WKR5YoUS+7ZhoNSsY
-         vfTO4IY7jKO3FbDtio2mJE9Szo8X8WDYchJy9kkWwY5bRgzq2cHYkA8arbSqgIMTZS5p
-         DZxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712164804; x=1712769604;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3rSsI2dMglxlpboEehF0mS0Pvczh5Ixi6iikM5re2Go=;
-        b=L4IXosQM0c1IQGvFwxvuxd2FDXHvwindgYGgPXuJO45dwgBlyg9EU8xB2B3KOjwXV4
-         zYfuKZ2WK59N/vafq99sOpxgU/vyglq0cwb6Kv+GuRW8O6KgVObpkP+9noBI1bu9YAnA
-         0YHpUicrB2bTKHtT4as8OqXBqDO58GACKKgd6OwCRbJSg1cIGvf2WrRNDGs/Bl4lfnAa
-         y9GJjis9WjFQqf5CNSzWxuxHPzkZCLNe+Ux9cVRkaYepQyKyVwWk/kACGphBRJBlzCI6
-         VaRAksqcR05wUF5fe9kc+HXGRmSLisnQ6HM5NoZ8Gb+DTK5+DQDrMWQ+e9LZ3CZJ9jDB
-         5Itg==
-X-Forwarded-Encrypted: i=1; AJvYcCXmzzQchHdK8y4RzLwbHoFQnZBbdTdWOvfQV8HcNFnhtfngHUqnGQVz+oExJBjYwuy4H7UUyeztwRpVQO/u0eAMOmfe
-X-Gm-Message-State: AOJu0Yxqfvc4vCj4MJj0h/UdpyYC1D81p1DowIQSUME74qnDsAV9UxpV
-	MAe7DsxSrELh+UOrv9fnXrhHfuw7y0iIT23iDZNnxZHFc3EEKQrA5J7fiIUBy8QgY5m2tLduk7q
-	TMg==
-X-Google-Smtp-Source: AGHT+IHIZspzDL2Pcm1/sprQ9sc+OwskYOcgAh4KZmqfJ7vm5Cs8EmLrKsRKFY2OsZwcrwc08E8/JFabG4E=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:dad2:b0:1e0:afa0:cca2 with SMTP id
- q18-20020a170902dad200b001e0afa0cca2mr632062plx.10.1712164803703; Wed, 03 Apr
- 2024 10:20:03 -0700 (PDT)
-Date: Wed, 3 Apr 2024 10:20:02 -0700
-In-Reply-To: <cb793d79-f476-3134-23b7-dc43801b133e@loongson.cn>
+	s=arc-20240116; t=1712165061; c=relaxed/simple;
+	bh=guiIxGTSK6Jw1CTYZifG+HXUJ2jyUvSv+qYpZ0k2AGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SPbpsO3bYCgrOeOTRDdOsf6Ji4gTSb41Jsb41iEtQE1ZT4BITY5QUiXQ+m/NqsFjyTnqd8/rFSxc4UF0NaGX8VCefqM7LXmLv3sQWjm/RzacgTvYHsct22g064yvV0s/h4NwmDo/Rd4eBr5/KwqF7VcPbQYr5wSuFu3QDeOVtW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B0oxLq6H; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712165059; x=1743701059;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=guiIxGTSK6Jw1CTYZifG+HXUJ2jyUvSv+qYpZ0k2AGE=;
+  b=B0oxLq6Hq1+Gz9rjy/geud+VEa3zIdFXx5yNlAVnrcZMbb7o0Vju9/ke
+   Z24foWqrUb7509Fxf0Ykgm7zRCiOSlgwehQdrlX7h9VFQSM9pj3vcHrBR
+   Q4qC+oWE/14KMevV97ZLty8IlAlDligUloPS3mcImNepy/wXlQNKAkfPa
+   V1cMPmsK7DU/XJt026leOjTJ74tdfj0S97QUhsETFNLgSb6LlExKX+blh
+   PXGzhu0e07pdiePwVqTabfQsFSMEsfmczdSh3/v9qCl2qHwdDtOA1XdLV
+   oJmAMN3S8eeVpQ+MEIqOiJIzHkKRcC7mv5Shg9Rb1xTviK9148sy/90kY
+   Q==;
+X-CSE-ConnectionGUID: 5c8iTgRWS2mIk2BdtmCUCQ==
+X-CSE-MsgGUID: fnNzaGJFSFK3Loaf3pDyWQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7337333"
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="7337333"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 10:24:18 -0700
+X-CSE-ConnectionGUID: qIjzXJ3GQoG7ygvdxCKZ/w==
+X-CSE-MsgGUID: vV7dlDYUTkyv3asHQNHDBw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="23194376"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 10:24:18 -0700
+Date: Wed, 3 Apr 2024 10:24:17 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, chen.bo@intel.com,
+	hang.yuan@intel.com, tina.zhang@intel.com,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 038/130] KVM: TDX: create/destroy VM structure
+Message-ID: <20240403172417.GE2444378@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <7a508f88e8c8b5199da85b7a9959882ddf390796.1708933498.git.isaku.yamahata@intel.com>
+ <9f5c6259-78e1-4470-a013-91392bf3cea5@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240402213656.3068504-1-dmatlack@google.com> <cb793d79-f476-3134-23b7-dc43801b133e@loongson.cn>
-Message-ID: <Zg2PwgxNlGqA9T3b@google.com>
-Subject: Re: [PATCH v2] KVM: Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG
-From: Sean Christopherson <seanjc@google.com>
-To: maobibo <maobibo@loongson.cn>
-Cc: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9f5c6259-78e1-4470-a013-91392bf3cea5@intel.com>
 
-On Wed, Apr 03, 2024, maobibo wrote:
->=20
-> On 2024/4/3 =E4=B8=8A=E5=8D=885:36, David Matlack wrote:
-> > Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG to avoi=
-d
-> > blocking other threads (e.g. vCPUs taking page faults) for too long.
-> >=20
-> > Specifically, change kvm_clear_dirty_log_protect() to acquire/release
-> > mmu_lock only when calling kvm_arch_mmu_enable_log_dirty_pt_masked(),
-> > rather than around the entire for loop. This ensures that KVM will only
-> > hold mmu_lock for the time it takes the architecture-specific code to
-> > process up to 64 pages, rather than holding mmu_lock for log->num_pages=
-,
-> > which is controllable by userspace. This also avoids holding mmu_lock
-> > when processing parts of the dirty_bitmap that are zero (i.e. when ther=
-e
-> > is nothing to clear).
-> >=20
-> > Moving the acquire/release points for mmu_lock should be safe since
-> > dirty_bitmap_buffer is already protected by slots_lock, and dirty_bitma=
-p
-> > is already accessed with atomic_long_fetch_andnot(). And at least on x8=
-6
-> > holding mmu_lock doesn't even serialize access to the memslot dirty
-> > bitmap, as vCPUs can call mark_page_dirty_in_slot() without holding
-> > mmu_lock.
-> >=20
-> > This change eliminates dips in guest performance during live migration
-> > in a 160 vCPU VM when userspace is issuing CLEAR ioctls (tested with
-> > 1GiB and 8GiB CLEARs). Userspace could issue finer-grained CLEARs, whic=
-h
-> Frequently drop/reacquire mmu_lock will cause userspace migration process
-> issuing CLEAR ioctls to contend with 160 vCPU, migration speed maybe beco=
-me
-> slower.
+On Thu, Mar 28, 2024 at 12:33:35PM +1300,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-Only if vCPUs actually acquire mmu_lock.  E.g. on x86, KVM fixes/handles fa=
-ults
-due to write-protection for dirty logging without acquiring mmu_lock.  So f=
-or x86,
-taking faults that need to acquire mmu_lock while dirty logging should be f=
-airly
-uncommon (and if vCPUs are taking lots of faults, performance is likely goi=
-ng to
-be bad no matter what).
+> > +	kvm_tdx->tdr_pa = tdr_pa;
+> > +
+> > +	for_each_online_cpu(i) {
+> > +		int pkg = topology_physical_package_id(i);
+> > +
+> > +		if (cpumask_test_and_set_cpu(pkg, packages))
+> > +			continue;
+> > +
+> > +		/*
+> > +		 * Program the memory controller in the package with an
+> > +		 * encryption key associated to a TDX private host key id
+> > +		 * assigned to this TDR.  Concurrent operations on same memory
+> > +		 * controller results in TDX_OPERAND_BUSY.  Avoid this race by
+> > +		 * mutex.
+> > +		 */
+> 
+> IIUC the race can only happen when you are creating multiple TDX guests
+> simulatenously?  Please clarify this in the comment.
+> 
+> And I even don't think you need all these TDX module details:
+> 
+> 		/*
+> 		 * Concurrent run of TDH.MNG.KEY.CONFIG on the same
+> 		 * package resluts in TDX_OPERAND_BUSY.  When creating
+> 		 * multiple TDX guests simultaneously this can run
+> 		 * concurrently.  Take the per-package lock to
+> 		 * serialize.
+> 		 */
 
-> In theory priority of userspace migration thread should be higher than vc=
-pu
-> thread.
+As pointed by Chao, those mutex will be dropped.
+https://lore.kernel.org/kvm/ZfpwIespKy8qxWWE@chao-email/
+Also we would simplify cpu masks to track which package is online/offline,
+which cpu to use for each package somehow.
 
-That's very debatable.  And it's not an apples-to-apples comparison, becaus=
-e
-CLEAR_DIRTY_LOG can hold mmu_lock for a very long time, probably orders of
-magnitude longer than a vCPU will hold mmu_lock when handling a page fault.
 
-And on x86 and ARM, page faults can be resolved while hold mmu_lock for rea=
-d.  As
-a result, holding mmu_lock in CLEAR_DIRTY_LOG (for write) is effectively mo=
-re
-costly than holding it in vCPUs.
+> > +		mutex_lock(&tdx_mng_key_config_lock[pkg]);
+> > +		ret = smp_call_on_cpu(i, tdx_do_tdh_mng_key_config,
+> > +				      &kvm_tdx->tdr_pa, true);
+> > +		mutex_unlock(&tdx_mng_key_config_lock[pkg]);
+> > +		if (ret)
+> > +			break;
+> > +	}
+> > +	cpus_read_unlock();
+> > +	free_cpumask_var(packages);
+> > +	if (ret) {
+> > +		i = 0;
+> > +		goto teardown;
+> > +	}
+> > +
+> > +	kvm_tdx->tdcs_pa = tdcs_pa;
+> > +	for (i = 0; i < tdx_info->nr_tdcs_pages; i++) {
+> > +		err = tdh_mng_addcx(kvm_tdx->tdr_pa, tdcs_pa[i]);
+> > +		if (err == TDX_RND_NO_ENTROPY) {
+> > +			/* Here it's hard to allow userspace to retry. */
+> > +			ret = -EBUSY;
+> > +			goto teardown;
+> > +		}
+> > +		if (WARN_ON_ONCE(err)) {
+> > +			pr_tdx_error(TDH_MNG_ADDCX, err, NULL);
+> > +			ret = -EIO;
+> > +			goto teardown;
+> > +		}
+> > +	}
+> > +
+> > +	/*
+> > +	 * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
+> > +	 * ioctl() to define the configure CPUID values for the TD.
+> > +	 */
+> 
+> Then, how about renaming this function to __tdx_td_create()?
 
-> Drop and reacquire mmu_lock with 64-pages may be a little too smaller,
-> in generic it is one huge page size. However it should be decided by
-> framework maintainer:)
+So do we want to rename also ioctl name for consistency?
+i.e. KVM_TDX_INIT_VM => KVM_TDX_CREATE_VM.
 
-We could tweak the batching, but my very strong preference would be to do t=
-hat
-only as a last resort, i.e. if and only if some magic batch number provides=
- waaay
-better performance in all scenarios.
+I don't have strong opinion those names. Maybe
+KVM_TDX_{INIT, CREATE, or CONFIG}_VM?
+And we can rename the function name to match it.
 
-Maintaining code with arbitrary magic numbers is a pain, e.g. KVM x86's MMU=
- has
-arbitrary batching in kvm_zap_obsolete_pages(), and the justification for t=
-he
-number is extremely handwavy (paraphasing the changelog):
+> > +	return 0;
+> > +
+> > +	/*
+> > +	 * The sequence for freeing resources from a partially initialized TD
+> > +	 * varies based on where in the initialization flow failure occurred.
+> > +	 * Simply use the full teardown and destroy, which naturally play nice
+> > +	 * with partial initialization.
+> > +	 */
+> > +teardown:
+> > +	for (; i < tdx_info->nr_tdcs_pages; i++) {
+> > +		if (tdcs_pa[i]) {
+> > +			free_page((unsigned long)__va(tdcs_pa[i]));
+> > +			tdcs_pa[i] = 0;
+> > +		}
+> > +	}
+> > +	if (!kvm_tdx->tdcs_pa)
+> > +		kfree(tdcs_pa);
+> 
+> The code to "free TDCS pages in a loop and free the array" is done below
+> with duplicated code.  I am wondering whether we have way to eliminate one.
+> 
+> But I have lost track here, so perhaps we can review again after we split
+> the patch to smaller pieces.
 
-      Zap at least 10 shadow pages before releasing mmu_lock to reduce the
-      overhead associated with re-acquiring the lock.
-   =20
-      Note: "10" is an arbitrary number, speculated to be high enough so
-      that a vCPU isn't stuck zapping obsolete pages for an extended period=
-,
-      but small enough so that other vCPUs aren't starved waiting for
-      mmu_lock.
+Surely we can simplify it.  Originally we had a spin lock and I had to separate
+blocking memory allocation from its usage with this error clean up path.
+Now it's mutex, we mix page allocation with its usage.
 
-I.e. we're stuck with someone's best guess from years ago without any real =
-idea
-if 10 is a good number, let alone optimal.
 
-Obviously that doesn't mean 64 pages is optimal, but it's at least not arbi=
-trary,
-it's just an artifact of how KVM processes the bitmap.
+> > +	tdx_mmu_release_hkid(kvm);
+> > +	tdx_vm_free(kvm);
+> > +	return ret;
+> > +
+> > +free_packages:
+> > +	cpus_read_unlock();
+> > +	free_cpumask_var(packages);
+> > +free_tdcs:
+> > +	for (i = 0; i < tdx_info->nr_tdcs_pages; i++) {
+> > +		if (tdcs_pa[i])
+> > +			free_page((unsigned long)__va(tdcs_pa[i]));
+> > +	}
+> > +	kfree(tdcs_pa);
+> > +	kvm_tdx->tdcs_pa = NULL;
+> > +
+> > +free_tdr:
+> > +	if (tdr_pa)
+> > +		free_page((unsigned long)__va(tdr_pa));
+> > +	kvm_tdx->tdr_pa = 0;
+> > +free_hkid:
+> > +	if (is_hkid_assigned(kvm_tdx))
+> > +		tdx_hkid_free(kvm_tdx);
+> > +	return ret;
+> > +}
+> > +
+> >   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+> >   {
+> >   	struct kvm_tdx_cmd tdx_cmd;
+> > @@ -215,12 +664,13 @@ static int tdx_md_read(struct tdx_md_map *maps, int nr_maps)
+> >   static int __init tdx_module_setup(void)
+> >   {
+> > -	u16 num_cpuid_config;
+> > +	u16 num_cpuid_config, tdcs_base_size;
+> >   	int ret;
+> >   	u32 i;
+> >   	struct tdx_md_map mds[] = {
+> >   		TDX_MD_MAP(NUM_CPUID_CONFIG, &num_cpuid_config),
+> > +		TDX_MD_MAP(TDCS_BASE_SIZE, &tdcs_base_size),
+> >   	};
+> >   	struct tdx_metadata_field_mapping fields[] = {
+> > @@ -273,6 +723,8 @@ static int __init tdx_module_setup(void)
+> >   		c->edx = ecx_edx >> 32;
+> >   	}
+> > +	tdx_info->nr_tdcs_pages = tdcs_base_size / PAGE_SIZE;
+> > +
+> 
+> Round up the 'tdcs_base_size' to make sure you have enough room, or put a
+> WARN() here if not page aligned?
 
-To be clear, I'm not opposed to per-arch behavior, nor do I think x86 shoul=
-d
-dictate how all other architectures should behave.  But I would strongly pr=
-efer
-to avoid per-arch behavior unless it's actually necessary (doubly so for ba=
-tching).
+Ok, will add round up. Same for tdvps_base_size.
+I can't find about those sizes and page size in the TDX spec.  Although
+TDH.MNG.ADDCX() and TDH.VP.ADDCX() imply that those sizes are multiple of PAGE
+SIZE, the spec doesn't guarantee it.  I think silent round up is better than
+WARN() because we can do nothing about those values the TDX module provides.
 
-In other words, if we do need per-arch behavior, e.g. because aggressivly d=
-ropping
-mmu_lock causes performance issues on other architectures that need to take=
- mmu_lock
-for write to handle faults, I would prefer to have the arch knob control wh=
-ether
-the lock+unlock is outside versus inside the loop, not control an arbitrary=
- batch
-size.
+
+
+> >   	return 0;
+> >   error_out:
+> > @@ -319,13 +771,27 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> >   	struct tdx_enabled enable = {
+> >   		.err = ATOMIC_INIT(0),
+> >   	};
+> > +	int max_pkgs;
+> >   	int r = 0;
+> > +	int i;
+> 
+> Nit: you can put the 3 into one line.
+> 
+> > +	if (!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)) {
+> > +		pr_warn("MOVDIR64B is reqiured for TDX\n");
+> 
+> It's better to make it more clear:
+> 
+> "Disable TDX: MOVDIR64B is not supported or disabled by the kernel."
+> 
+> Or, to match below:
+> 
+> "Cannot enable TDX w/o MOVDIR64B".
+
+Ok.
+
+
+> > +		return -EOPNOTSUPP;
+> > +	}
+> >   	if (!enable_ept) {
+> >   		pr_warn("Cannot enable TDX with EPT disabled\n");
+> >   		return -EINVAL;
+> >   	}
+> > +	max_pkgs = topology_max_packages();
+> > +	tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
+> > +				   GFP_KERNEL);
+> > +	if (!tdx_mng_key_config_lock)
+> > +		return -ENOMEM;
+> > +	for (i = 0; i < max_pkgs; i++)
+> > +		mutex_init(&tdx_mng_key_config_lock[i]);
+> > +
+> 
+> Using a per-socket lock looks a little bit overkill to me.  I don't know
+> whether we need to do in the initial version.  Will leave to others.
+> 
+> Please at least add a comment to explain this is for better performance when
+> creating multiple TDX guests IIUC?
+
+Will delete the mutex and simply the related logic.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
