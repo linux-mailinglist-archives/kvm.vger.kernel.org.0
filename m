@@ -1,229 +1,147 @@
-Return-Path: <kvm+bounces-13472-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13473-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB7E8973C2
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 17:17:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B27A3897446
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 17:44:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D1F01F23531
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 15:17:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1792B28F9D
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 15:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF2614A639;
-	Wed,  3 Apr 2024 15:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E8E14A4EE;
+	Wed,  3 Apr 2024 15:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qXBK7svH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ie2IcwL4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7524914A4F4
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 15:14:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E112B149E14;
+	Wed,  3 Apr 2024 15:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712157249; cv=none; b=iMsyAlZTWOwsv2veBSNvTGw/2TUMPatD2P9ZFOH7tBSO0EHzxzJcolRyTN+6fZ1Uvnco/lpCxFS0f/vLsWzNlmUPSpC86JJgS/TbiiHUAoFk7kPO/9YNKZRiQOQMNHbBSMqQDJ51eCTy5r6zzh9hpND7vJFiZhglLEVpR/vPqlo=
+	t=1712158662; cv=none; b=XlUdXbaAAmmu+8lOjMCPNH5r2bRtkFZGaH3rbs76MKq3YY2r7TZGQ/qLWmnDBVO7Qku+QgGLvFHhduEuxTMuqPKSjfWTlRGmYkn6JDJg9OYiUauIZaxWUJR1ZzyZDkCFbNZEHfxVFR2U9m+XQWN7en/RLTXxWJ4PkIz/VAg1wvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712157249; c=relaxed/simple;
-	bh=W6tEz6Zwd/3V0AalPwql2eDmQ/JYHtwljJr2Uh2Zm/A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tqAw+p5ENyof8SZRXyvfr2GALPsDQVVyMHF7no5pwf7AGddKoTjGbRTrSFPfjp+HZXoFPIq0IN4bzm33REVKHAls6YAcs5G3aWoAQU9JbfEGDMgIGOlt0UUeCg6X2Gad6qLzQej8AEN14WrlkJ2QLwY/8T/s5MDJp3Qnl4Ztw3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qXBK7svH; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a4ee41269so115239897b3.0
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 08:14:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712157246; x=1712762046; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RERRULEGqmQXPtZTcd/mEGQQNqydbJ8WRO6RWf+KLek=;
-        b=qXBK7svHDvvteHAx6b7gDQlPoakWDN5rEqtG8eCbj4bmlUtyJTBftY1cszauaBtfUw
-         5Oshf3j/WicRyOgxelet21mr93kHtmzu8+fNpqcN21YBSbONutG7eDYKQfIPdXML1VcT
-         ovcDJQ5Hpm0LQ2yA+mrEqZnm5rvA99gs7TcZCxnwFp38qzU+RM3Lu99O6KWnnEoZ4OuB
-         ZY9d0pePNZt4ibQsC56Jgmh3sERl1DmvbuJG98gwbt9zgHe79Y2kWpaRoieVZlpG7CYk
-         qjyEg/Ode2iK8KYhus3znLaa4J8Ro32+CR9u4ru1cOWZNgsXuV3NSIV9BcfHcXb8argO
-         oVrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712157246; x=1712762046;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RERRULEGqmQXPtZTcd/mEGQQNqydbJ8WRO6RWf+KLek=;
-        b=cUVNz4OJdRGUsQ7ExkqT7Erfl/JJpUNB1Fhib8VaHqtOuPZ7Rj/vt2s55ZonFhF5az
-         1EZNQqWBBfP7aKWKJ6jficuLmV1HD8qHBCLlV6esh5inYrS3fbYkK97Dl+oTRWh1jvtd
-         SmB0AqbH3j6NCG/bAmPeotwRIIXJGrw2QMMExv7Qyj/hq4FOq9cW1gvyyW1bVazDUEXh
-         eZDA4LgDFLQ7webUAGbmbAvDv9uSFAJloUuw7MI46lM9fF+oUcAHuBovRGChRfZNiuux
-         26DJlFh1+hSsbpJi/2YJmQmrnlCxDiUE93EgeooQPyWWnsik2t6ovI7mlzI5QvBbI7Q2
-         Fx9Q==
-X-Gm-Message-State: AOJu0Yw8INaefYLQnOHzSklxNPpiJvyH5RtG1eqTU0BvJLLLykrKONcX
-	krnqxlPxuzT7b1G6YLuPMF9nQKYV4sZHzQ6UlQgrjQ2arpEXCm4KPqIx8Prg3+Dai7sz87o3Ot/
-	OxQ==
-X-Google-Smtp-Source: AGHT+IGmfLK0wH6vXigEvfjeTOgWqVBdPAJCvhT6SwqLPJkCtrIm6w6lz8yIYj/1nevhClSMuSxyy2oCynE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:eb82:0:b0:615:378a:73ed with SMTP id
- u124-20020a0deb82000000b00615378a73edmr979932ywe.8.1712157246357; Wed, 03 Apr
- 2024 08:14:06 -0700 (PDT)
-Date: Wed, 3 Apr 2024 08:14:04 -0700
-In-Reply-To: <62f8890cb90e49a3e0b0d5946318c0267b80c540.1708933498.git.isaku.yamahata@intel.com>
+	s=arc-20240116; t=1712158662; c=relaxed/simple;
+	bh=QJChaVAp28BDDX83PqbBHFkbmbYUNuu15HZqdJSXkew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yq+ouACWrd9a+RGUo2tgQN4iuxguQskAXobLtP1F5hoTV4bCjOD245qUwUyCgc96CRB8uuoRl7uuYEmW4VKSMuXptFKddGzsPFWQQZawGYnO15LXGyGU1ROYOGzwJb/fQ4fNske1nSsZYkM317KtPqRw+A2kz+g6NNp4GTFo76M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ie2IcwL4; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712158661; x=1743694661;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=QJChaVAp28BDDX83PqbBHFkbmbYUNuu15HZqdJSXkew=;
+  b=Ie2IcwL4Q7B8mbHEdOUHjfU5XEkJY4D9o82CDnKqJXJlHNX85xbZuZIP
+   HYPbaGjZ0SL/U0juSHptSQN+aC3gbFnojAZ2KQvCYK+5ag9iFbjOrseaK
+   cNDe25mf0o/Jn7po8OEslU0kdKbUA0AygEnLmQW7+KTLvpphDVRbBKOJa
+   nYlK/43Ye28L1BOsl2vXBuivCVN/0vexCfSPyo0uEksXaFBENaRZwvBhI
+   9Tpm1RQxZo+UVMVUimVYHAIfslJmy1Vvbal+VGVaomTcvuKx3ASBuIlaz
+   /anQR21aEr9eFH2/QLO6aOHR9Q9ZqFJo3FZbePgoiGODkE48aq/08b2mQ
+   Q==;
+X-CSE-ConnectionGUID: zCWnttiTQKuBUbaTiDKWKg==
+X-CSE-MsgGUID: Dwvx7rT+R2WHlCOQbFq50w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7978851"
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="7978851"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 08:37:40 -0700
+X-CSE-ConnectionGUID: C9r8JNIGTH6X/XyVwhZi2g==
+X-CSE-MsgGUID: 1aG80udaTneHuT7+mWUbTQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="23177428"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 08:37:39 -0700
+Date: Wed, 3 Apr 2024 08:37:38 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>,
+	Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
+	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com,
+	Brijesh Singh <brijesh.singh@amd.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Binbin Wu <binbin.wu@linux.intel.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v12 11/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+Message-ID: <20240403153738.GC2444378@ls.amr.corp.intel.com>
+References: <20240329225835.400662-1-michael.roth@amd.com>
+ <20240329225835.400662-12-michael.roth@amd.com>
+ <8c3685a6-833c-4b3c-83f4-c0bd78bba36e@redhat.com>
+ <20240401222229.qpnpozdsr6b2sntk@amd.com>
+ <20240402225840.GB2444378@ls.amr.corp.intel.com>
+ <CABgObfb4fQpUTzhpX9Bkcu0_+bOcCSCtuy+5-rttTLm-bY8i2w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1708933498.git.isaku.yamahata@intel.com> <62f8890cb90e49a3e0b0d5946318c0267b80c540.1708933498.git.isaku.yamahata@intel.com>
-Message-ID: <Zg1yPIV6cVJrwGxX@google.com>
-Subject: Re: [PATCH v19 111/130] KVM: TDX: Implement callbacks for MSR
- operations for TDX
-From: Sean Christopherson <seanjc@google.com>
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
-	hang.yuan@intel.com, tina.zhang@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABgObfb4fQpUTzhpX9Bkcu0_+bOcCSCtuy+5-rttTLm-bY8i2w@mail.gmail.com>
 
-On Mon, Feb 26, 2024, isaku.yamahata@intel.com wrote:
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 389bb95d2af0..c8f991b69720 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1877,6 +1877,76 @@ void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
->  	*error_code = 0;
->  }
->  
-> +static bool tdx_is_emulated_kvm_msr(u32 index, bool write)
-> +{
-> +	switch (index) {
-> +	case MSR_KVM_POLL_CONTROL:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +bool tdx_has_emulated_msr(u32 index, bool write)
-> +{
-> +	switch (index) {
-> +	case MSR_IA32_UCODE_REV:
-> +	case MSR_IA32_ARCH_CAPABILITIES:
-> +	case MSR_IA32_POWER_CTL:
-> +	case MSR_IA32_CR_PAT:
-> +	case MSR_IA32_TSC_DEADLINE:
-> +	case MSR_IA32_MISC_ENABLE:
-> +	case MSR_PLATFORM_INFO:
-> +	case MSR_MISC_FEATURES_ENABLES:
-> +	case MSR_IA32_MCG_CAP:
-> +	case MSR_IA32_MCG_STATUS:
-> +	case MSR_IA32_MCG_CTL:
-> +	case MSR_IA32_MCG_EXT_CTL:
-> +	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
-> +	case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
-> +		/* MSR_IA32_MCx_{CTL, STATUS, ADDR, MISC, CTL2} */
-> +		return true;
-> +	case APIC_BASE_MSR ... APIC_BASE_MSR + 0xff:
-> +		/*
-> +		 * x2APIC registers that are virtualized by the CPU can't be
-> +		 * emulated, KVM doesn't have access to the virtual APIC page.
-> +		 */
-> +		switch (index) {
-> +		case X2APIC_MSR(APIC_TASKPRI):
-> +		case X2APIC_MSR(APIC_PROCPRI):
-> +		case X2APIC_MSR(APIC_EOI):
-> +		case X2APIC_MSR(APIC_ISR) ... X2APIC_MSR(APIC_ISR + APIC_ISR_NR):
-> +		case X2APIC_MSR(APIC_TMR) ... X2APIC_MSR(APIC_TMR + APIC_ISR_NR):
-> +		case X2APIC_MSR(APIC_IRR) ... X2APIC_MSR(APIC_IRR + APIC_ISR_NR):
-> +			return false;
-> +		default:
-> +			return true;
-> +		}
-> +	case MSR_IA32_APICBASE:
-> +	case MSR_EFER:
-> +		return !write;
+On Wed, Apr 03, 2024 at 02:51:59PM +0200,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Meh, for literally two MSRs, just open code them in tdx_set_msr() and drop the
-@write param.  Or alternatively add:
+> On Wed, Apr 3, 2024 at 12:58 AM Isaku Yamahata <isaku.yamahata@intel.com> wrote:
+> > I think TDX can use it with slight change. Pass vcpu instead of KVM, page pin
+> > down and mmu_lock.  TDX requires non-leaf Secure page tables to be populated
+> > before adding a leaf.  Maybe with the assumption that vcpu doesn't run, GFN->PFN
+> > relation is stable so that mmu_lock isn't needed? What about punch hole?
+> >
+> > The flow would be something like as follows.
+> >
+> > - lock slots_lock
+> >
+> > - kvm_gmem_populate(vcpu)
+> >   - pin down source page instead of do_memcopy.
+> 
+> Both pinning the source page and the memcpy can be done in the
+> callback.  I think the right thing to do is:
+> 
+> 1) eliminate do_memcpy, letting AMD code taking care of
+>    copy_from_user.
+> 
+> 2) pass to the callback only gfn/pfn/src, where src is computed as
+> 
+>     args->src ? args->src + i * PAGE_SIZE : NULL
+> 
+> If another architecture/vendor needs do_memcpy, they can add
+> something like kvm_gmem_populate_copy.
+> 
+> >   - get pfn with __kvm_gmem_get_pfn()
+> >   - read lock mmu_lock
+> >   - in the post_populate callback
+> >     - lookup tdp mmu page table to check if the table is populated.
+> >       lookup only version of kvm_tdp_mmu_map().
+> >       We need vcpu instead of kvm.
+> 
+> Passing vcpu can be done using the opaque callback argument to
+> kvm_gmem_populate.
+> 
+> Likewise, the mmu_lock can be taken by the TDX post_populate
+> callback.
 
-static bool tdx_is_read_only_msr(u32 msr){
-{
-	return msr == MSR_IA32_APICBASE || msr == MSR_EFER;
-}
-
-> +	case 0x4b564d00 ... 0x4b564dff:
-
-This is silly, just do
-
-	case MSR_KVM_POLL_CONTROL:
-		return false;
-
-and let everything else go through the default statement, no?
-
-> +		/* KVM custom MSRs */
-> +		return tdx_is_emulated_kvm_msr(index, write);
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
-> +{
-> +	if (tdx_has_emulated_msr(msr->index, false))
-> +		return kvm_get_msr_common(vcpu, msr);
-> +	return 1;
-
-Please invert these and make the happy path the not-taken path, i.e.
-
-	if (!tdx_has_emulated_msr(msr->index))
-		return 1;
-
-	return kvm_get_msr_common(vcpu, msr);
-
-The standard kernel pattern is
-
-	if (error)
-		return <error thingie>
-
-	return <happy thingie>
-
-> +}
-> +
-> +int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
-> +{
-> +	if (tdx_has_emulated_msr(msr->index, true))
-
-As above:
-
-	if (tdx_is_read_only_msr(msr->index))
-		return 1;
-
-	if (!tdx_has_emulated_msr(msr->index))
-		return 1;
-
-	return kvm_set_msr_common(vcpu, msr);
-
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d5b18cad9dcd..0e1d3853eeb4 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -90,7 +90,6 @@
->  #include "trace.h"
->  
->  #define MAX_IO_MSRS 256
-> -#define KVM_MAX_MCE_BANKS 32
->  
->  struct kvm_caps kvm_caps __read_mostly = {
->  	.supported_mce_cap = MCG_CTL_P | MCG_SER_P,
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 4e40c23d66ed..c87b7a777b67 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -9,6 +9,8 @@
->  #include "kvm_cache_regs.h"
->  #include "kvm_emulate.h"
->  
-> +#define KVM_MAX_MCE_BANKS 32
-
-Split this to a separate.  Yes, it's trivial, but that's _exactly_ why it should
-be in a separate patch.  The more trivial refactoring you split out, the more we
-can apply _now_ and take off your hands.
+Yes, it should work.  Let me give it a try.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
