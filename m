@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-13433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E3089679A
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 10:07:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07EE38967A3
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 10:07:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DF841F22AED
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 08:07:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 392B31C20CE1
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 08:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41646D1A8;
-	Wed,  3 Apr 2024 08:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4865A80BF5;
+	Wed,  3 Apr 2024 08:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="2iixUOkb"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="TSeifkcC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5528176023
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 08:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193E278B63
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 08:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712131529; cv=none; b=PIRFBsG0OCv8PzZE/wsEA9Fcqng9vMf6ZkQXHvYhDWfPwiOy/gdchMWjsY5KCjESRynvZujzgsiTdFOA+uUuVWU6vlzoy08bTVZieopxtIWHgr9eQued5vuAUkO32wOMFbv8UOFrKpeWagJGJclPGv1qS1HEXIA7NVThcvNqvd8=
+	t=1712131531; cv=none; b=pv06xhcIzEhimEkwkn3QQPn/3ZJLuQSEokQ9SfXX22VwqF8iV1Jj4EcHDtgyOveRVLxSyh6uag/Bo+8XUD7Hoaf39/dxvKFbkwSNvBYhjwbCnleS0RmtVydCD1+XG9FK+7rgD+5hvBKejjhoJoTsCVaSmHfMPC+8e60Q4M/E9jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712131529; c=relaxed/simple;
-	bh=aDfanLTs21GL0maDPQpRseQyiyuKg+u1j0b2hveDXpI=;
+	s=arc-20240116; t=1712131531; c=relaxed/simple;
+	bh=qmTer1L5IWEJQe0rkUy5cvb4CMl5u/8y+hPoEZoMutA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SfvzYX82uN5zluU4Ie+upKWBbmbTPkpVCe+aamgaFNo194+Ztc1Aa8CQ67tYcyIZuClwmHQVDsgjy4HrkGbfrptXstanvCH6AjhJ9Dgh3R9qIMbSyMOcbzABnE37NxNq95ITgY/geoNfcQ3T6cUPy85h30JFMFp5LzC5zKhUTEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=2iixUOkb; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=R5ARgN4+DYOa1+ItuwejkTMJWKT+0B1gYSle0f/rtqg9x9VTI29KnmGw9D5z89hQMe/ybuWdlTfpG/wileiCgOXlJ/ZZ7z3nMHpqsmVqZBX15Az69l0Vc+RB/Jygg+/RXak1JJmpwy6r+oKXbn6tfG2ZLGMKt7U3w+Flh4yXwo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=TSeifkcC; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6eae2b57ff2so4888317b3a.2
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 01:05:28 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1e0411c0a52so51648235ad.0
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 01:05:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712131527; x=1712736327; darn=vger.kernel.org;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712131529; x=1712736329; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4rw21DNPDWpaXnd5Gs3cWE2qTmUGGOZ0JnLHhYLDMiI=;
-        b=2iixUOkb5ZvcS909cd2IhppvnztzEejMRSDC99adKGajjgp1jtLAQJ5lGxpJnmnkXf
-         FKM3oJrgfdEAKK3vfP76gfrAjghy5khVIwIYF7SFJunpu52SD0BTSTKxP/BD27F4utB9
-         jTfRLGEBLDRrvUmjpBVJUVHf16VfmhhhsQNjQXFQIJI7KB2mpwfepVwdczJGhAMKYbCM
-         aagO54xA8Bj2XqknrkufVfHoo/UOcQwcra9A1ZcLz/+Xyrfu8plWr+PwAwsahUkm10Mb
-         XNUcukZutv8afK4JgJf4PdCY2I3mBfyn5ZjrbXcTJR2txMIppT3GM5JtHvvP+7RA/5/H
-         Ii/A==
+        bh=2HMUEh/ouJpwrjadx4E8ELJ1oGZIEAqlVNHNOiveHPA=;
+        b=TSeifkcCVel9tg4BDxNqVioc8wG9MlkoJ3zjDFmQ42yLVyPQQ8/t+ga6mhJbasv/cw
+         kdJkdlohOprTHDTHFncMalAz2OKXkpESH3KiBcjPJ3O0ROPYzDMLNerLFiJXwcaURbUe
+         3mI2ilSR2OFLFlLOLX1B4cW/7jrw41WmIldFZwK2rPx7Q4ZzK6Bw97v8K/ZJs5yHr3TS
+         6SlM4sakMFvnbC9Gbl3qb8BFO+Y+NQVomRmg8WnYURs55sBXVKzOufTz7YG/ZqSp8MLp
+         ZVpChGoH1VXBdxE7bFMf9Dp0wm1JhxgFxm0n5HeRKbSBSShB8oHiu3umukjLxijTUd35
+         srDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712131527; x=1712736327;
+        d=1e100.net; s=20230601; t=1712131529; x=1712736329;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4rw21DNPDWpaXnd5Gs3cWE2qTmUGGOZ0JnLHhYLDMiI=;
-        b=HToXTfF3iQ/aBLM+XcVwftAmQ1+O+Is0dafBtoup2bnQObRXB836MCYvQPgakmra2U
-         /hR7sAo0+s0RmS5IfuYdGbF79cMsLBMXqPRG00P1SvxrZp/Kmd9FrTtS3YRZ9FKjaRz9
-         aXOxm7Y4QeV50gJoET3S5SXm66WpUEeYFWIYlZqnTv6dFEOCU30RQDDb1bb1AziRlfU4
-         JWsQiZdIViMlP0lXSL6umnOikUunBRp3l7v8GSj9Cjhc/DD2/UK/EnDUWFjURQMnXVUX
-         CNICTvHitynBO0l5Q9xQRUGIEo80B/LdCrriu1BZRa4e8aZLUqlYNiZE0O6SoD+c5sSr
-         Olaw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjzcejFeuJPLCOEO+w868294O4iOnnWzZLa9tcUFd9/jw4KnfEI2OqaRwPQg5+g6LW1kOfYcv6hgyXe/N5qqlH6X3S
-X-Gm-Message-State: AOJu0YzWE8TqrLtQVfpgbgIY5WTgOu509NeveZJsDAz4Npcl0wAOb8vn
-	zMvAsQfU4BzLJPE3227sNeREpI9GgeII+MIX96sZTcA6OJByEGkS8b93paJeJgI=
-X-Google-Smtp-Source: AGHT+IHZeguUWEErPiWxvNkeVU9lmGoRHX/48aTBnxr2DMrqRPKV9Qdy9c2zpt6UamZ4tC6ZYgwGwA==
-X-Received: by 2002:a05:6a20:17a7:b0:1a3:34c4:b184 with SMTP id bl39-20020a056a2017a700b001a334c4b184mr13823636pzb.19.1712131527654;
-        Wed, 03 Apr 2024 01:05:27 -0700 (PDT)
+        bh=2HMUEh/ouJpwrjadx4E8ELJ1oGZIEAqlVNHNOiveHPA=;
+        b=C4IL2U+ZHoU9bMunJwxwDigqK4z1n0YuffMiLVhhodmwiiMpEWwrT/eBpUT3kgnD2x
+         szFgvuDdj0jGi1yCIeZIzJpGFBQj8XohGhcjE8DSY7Y1N3IVTk4a6AfdFc3F4X90JOUi
+         Eh0z4IwIYdGBhuIMFtln2gcXLvCtSfmO1q7fy2u0Ub3C4sgmCBA0YFRrfzsY4WS7JTON
+         ri69mQUumLlkyLhI+hddnXiL3mapHVjHiZMZoagGYrdxGi5fO/P4W/lDbape1msQ0UoR
+         Kl9XSQ5wgPdESrbd+lzIn9bJYhfysakZzXPtP7sbTnNBZ9SXnfwZy2mJARUQgvb4P7pa
+         ZTjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVpRUqol6nUz8oCOU0iX8rxWaC8YERu7tUZNTOK7N3OktiGXS3u1jeTQvm8CF/5V033WV+3OfL+EKphBlkOqrwujcGE
+X-Gm-Message-State: AOJu0YzFGnSuRYXK1kxzsreJOYsHKKdOpZR25uNwl8r2HOQupeO3Ztqc
+	ECW73QV+TKKm4Ud83kYHDqVxk6/8VJv1r6gG6siIFG5lgfiZkhu1kdZBBQPUIjU=
+X-Google-Smtp-Source: AGHT+IF30gBaFjuZamH6gB+fLa8VQAOCDXL32p+FdETcNWyCBYGk0g9s0A7zOmyK2RvO8zqC4rEDCA==
+X-Received: by 2002:a17:902:aa04:b0:1e2:23b8:98dd with SMTP id be4-20020a170902aa0400b001e223b898ddmr14090965plb.69.1712131529484;
+        Wed, 03 Apr 2024 01:05:29 -0700 (PDT)
 Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id c12-20020a170902d48c00b001e0b5d49fc7sm12557229plg.161.2024.04.03.01.05.25
+        by smtp.gmail.com with ESMTPSA id c12-20020a170902d48c00b001e0b5d49fc7sm12557229plg.161.2024.04.03.01.05.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 01:05:26 -0700 (PDT)
+        Wed, 03 Apr 2024 01:05:28 -0700 (PDT)
 From: Atish Patra <atishp@rivosinc.com>
 To: linux-kernel@vger.kernel.org
 Cc: Atish Patra <atishp@rivosinc.com>,
@@ -90,9 +90,9 @@ Cc: Atish Patra <atishp@rivosinc.com>,
 	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
 	Will Deacon <will@kernel.org>,
 	x86@kernel.org
-Subject: [PATCH v5 07/22] drivers/perf: riscv: Fix counter mask iteration for RV32
-Date: Wed,  3 Apr 2024 01:04:36 -0700
-Message-Id: <20240403080452.1007601-8-atishp@rivosinc.com>
+Subject: [PATCH v5 08/22] RISC-V: KVM: Fix the initial sample period value
+Date: Wed,  3 Apr 2024 01:04:37 -0700
+Message-Id: <20240403080452.1007601-9-atishp@rivosinc.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240403080452.1007601-1-atishp@rivosinc.com>
 References: <20240403080452.1007601-1-atishp@rivosinc.com>
@@ -104,66 +104,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For RV32, used_hw_ctrs can have more than 1 word if the firmware chooses
-to interleave firmware/hardware counters indicies. Even though it's a
-unlikely scenario, handle that case by iterating over all the words
-instead of just using the first word.
+The initial sample period value when counter value is not assigned
+should be set to maximum value supported by the counter width.
+Otherwise, it may result in spurious interrupts.
 
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- drivers/perf/riscv_pmu_sbi.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ arch/riscv/kvm/vcpu_pmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
-index 8c3475d55433..82336fec82b8 100644
---- a/drivers/perf/riscv_pmu_sbi.c
-+++ b/drivers/perf/riscv_pmu_sbi.c
-@@ -771,13 +771,15 @@ static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
- {
- 	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
- 	unsigned long flag = 0;
-+	int i;
+diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+index 86391a5061dd..cee1b9ca4ec4 100644
+--- a/arch/riscv/kvm/vcpu_pmu.c
++++ b/arch/riscv/kvm/vcpu_pmu.c
+@@ -39,7 +39,7 @@ static u64 kvm_pmu_get_sample_period(struct kvm_pmc *pmc)
+ 	u64 sample_period;
  
- 	if (sbi_pmu_snapshot_available())
- 		flag = SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
+ 	if (!pmc->counter_val)
+-		sample_period = counter_val_mask + 1;
++		sample_period = counter_val_mask;
+ 	else
+ 		sample_period = (-pmc->counter_val) & counter_val_mask;
  
--	/* No need to check the error here as we can't do anything about the error */
--	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, 0,
--		  cpu_hw_evt->used_hw_ctrs[0], flag, 0, 0, 0);
-+	for (i = 0; i < BITS_TO_LONGS(RISCV_MAX_COUNTERS); i++)
-+		/* No need to check the error here as we can't do anything about the error */
-+		sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, i * BITS_PER_LONG,
-+			  cpu_hw_evt->used_hw_ctrs[i], flag, 0, 0, 0);
- }
- 
- /*
-@@ -789,7 +791,7 @@ static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
- static noinline void pmu_sbi_start_ovf_ctrs_sbi(struct cpu_hw_events *cpu_hw_evt,
- 						unsigned long ctr_ovf_mask)
- {
--	int idx = 0;
-+	int idx = 0, i;
- 	struct perf_event *event;
- 	unsigned long flag = SBI_PMU_START_FLAG_SET_INIT_VALUE;
- 	unsigned long ctr_start_mask = 0;
-@@ -797,11 +799,12 @@ static noinline void pmu_sbi_start_ovf_ctrs_sbi(struct cpu_hw_events *cpu_hw_evt
- 	struct hw_perf_event *hwc;
- 	u64 init_val = 0;
- 
--	ctr_start_mask = cpu_hw_evt->used_hw_ctrs[0] & ~ctr_ovf_mask;
--
--	/* Start all the counters that did not overflow in a single shot */
--	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, 0, ctr_start_mask,
--		  0, 0, 0, 0);
-+	for (i = 0; i < BITS_TO_LONGS(RISCV_MAX_COUNTERS); i++) {
-+		ctr_start_mask = cpu_hw_evt->used_hw_ctrs[i] & ~ctr_ovf_mask;
-+		/* Start all the counters that did not overflow in a single shot */
-+		sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, i * BITS_PER_LONG, ctr_start_mask,
-+			0, 0, 0, 0);
-+	}
- 
- 	/* Reinitialize and start all the counter that overflowed */
- 	while (ctr_ovf_mask) {
 -- 
 2.34.1
 
