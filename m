@@ -1,117 +1,100 @@
-Return-Path: <kvm+bounces-13409-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13410-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A12D98961B1
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 02:54:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBEA08961CB
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 03:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D23A91C224D0
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 00:54:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24DE41C22399
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 01:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3463101C4;
-	Wed,  3 Apr 2024 00:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6BC179BE;
+	Wed,  3 Apr 2024 01:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Np+rraRc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5lvH2Ou"
 X-Original-To: kvm@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246AE28FC;
-	Wed,  3 Apr 2024 00:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEDC33E1;
+	Wed,  3 Apr 2024 01:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712105646; cv=none; b=PoEUcYnEchiiRrRvG+eL8DAA+ZDRhZt+2ABb7wS44C1gS5+9VjgTWQydWAJdPJLHSshO7gprVr83UTfylvy5Z+OdL8CGf6Wb2km7B5zhC7eUi2/TQvWL27aoMtZfL1OYV1WgBbhMUbR329CoonW4Keu7l6937CPIWQ3GmW3iTZM=
+	t=1712106627; cv=none; b=U/d/+T9qYdWVYO+GhVMEfikIExdw3WN3uqKalaYUBai6490ZCGdAOBlCDXXwgkLJAM8DEuIqJWoTb1np6S684wmzS0f84aLk2YgLm+dHvL+hw1xRFyCW7ns3FlEXGQNszKGHZiOUWpr1vd4BBV/Az7dug0ynn5psNe5o4BwaDOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712105646; c=relaxed/simple;
-	bh=+SAlP9kHVlh7iFi31R674pJNdtdpSCKCF/iafEcczb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=bNK8KWQia0m/rRtiHoyv7hMaUKk4SZAu7FdxqAIFvxJXJri8s3SRR5mqcb4S0FZ0s+5b1YUuYxAgGVuwRNyN0uU21T3JvQNxztOcEbfdnb5Ua2ge6Q+n1idzRuJwT9OGqJXz60gZWHhNxPsHj6IoMJzSLlNr4GP/g5soF9Abk+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Np+rraRc; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1712105636;
-	bh=yMn7CWEDwJ/I6VqHvO9A+ou6USwpxJZr7pe1Gsdq7JM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Np+rraRcjNWKwmpKmZsXUhzCQWNNNY7g3UlfWpjqoOpejTDE9iF0DV52vVLkeGJoc
-	 wVjy1fzq7N+oG78k3v+gWzW9tE4somCTHEUa4I7Ht3d120kdkFk7CKZnhlGiP9BRh5
-	 Uf8T8voEHjzjcNiULKtMJtEUYkgQIDLVJxuP+KDiyPAQc0lzQ2wKp41MrxlyGyEo+J
-	 slawaRzSTWHHQMEttJKAKuykgOdJl84Yji1L7vEtiillFhBwVih8f8U2PDwb9OBOSW
-	 Z8wGrrWnDx46G2nWRHLSVs9rISivqmrP4pH1aEgSkTJWYoWYbSyMrslrFOHjiUCFWK
-	 2NL72tKABfTgQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4V8R8M6tGhz4wcb;
-	Wed,  3 Apr 2024 11:53:55 +1100 (AEDT)
-Date: Wed, 3 Apr 2024 11:53:53 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the kvm-x86 tree with the kvm-fixes
- tree
-Message-ID: <20240403115353.59c7b4f4@canb.auug.org.au>
+	s=arc-20240116; t=1712106627; c=relaxed/simple;
+	bh=dkk2ExlSTHUphfpzLrcP16omhm4msZO9WjRy+h4BTyw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=g2JaO/JDoTuK2XEQMnssuTHI5242JEGJrKgALj+Ojm94MWagA7sgBYa2uYnRAmbyYaKDEY/jSHNcWBulRmjiwlFDjgvhbcBlcgc/+nlw9Hc+1eL0zdDg0qAfcGNdu+aKxOurOWiEw86+RBn4b+n3qLpEcvpCsi4p1YMco/w+pkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5lvH2Ou; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 39F99C433F1;
+	Wed,  3 Apr 2024 01:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712106627;
+	bh=dkk2ExlSTHUphfpzLrcP16omhm4msZO9WjRy+h4BTyw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=e5lvH2Ouf4B45kQyE7fOi3c5jI48EjzS3Glsj6Bi9XgphvZxOdHK/9hO+L7ScqKm2
+	 mxTJXvRUby9tXo753/bDHG1d3Ex1jmnhhzirPj4lWKZ/LnPpACIvxHcRr6wW+A1wdP
+	 MMSe+kNlOc115gnEOMcw5KkRIdnZAi/ORDzR5xlLKkUsOeFL9DgV2pirgvDOgoIc3S
+	 WRecQ040a5A9pvE1dJAgzFMKe4uIfqFtTf6V1D0/d2XD/Gx/8MF5ndZVlVVFYmMy0A
+	 HSD5ikH7OeBbh98SbxNlr9a8eBrO/MZLumYjkMCyrVzjBK/+K1dLr2ga7Ib9hjZs8J
+	 wg8ujMsrjKiPw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 22BAAC4314C;
+	Wed,  3 Apr 2024 01:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/fZQSE1CbvT3OvZf0/G5tIRg";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] vsock/virtio: fix packet delivery to tap device
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171210662713.30217.16461640125861494356.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Apr 2024 01:10:27 +0000
+References: <20240329161259.411751-1-marco.pinn95@gmail.com>
+In-Reply-To: <20240329161259.411751-1-marco.pinn95@gmail.com>
+To: Marco Pinna <marco.pinn95@gmail.com>
+Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ggarcia@deic.uab.cat, jhansen@vmware.com, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vge.kernel.org
 
---Sig_/fZQSE1CbvT3OvZf0/G5tIRg
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Today's linux-next merge of the kvm-x86 tree got a conflict in:
+On Fri, 29 Mar 2024 17:12:59 +0100 you wrote:
+> Commit 82dfb540aeb2 ("VSOCK: Add virtio vsock vsockmon hooks") added
+> virtio_transport_deliver_tap_pkt() for handing packets to the
+> vsockmon device. However, in virtio_transport_send_pkt_work(),
+> the function is called before actually sending the packet (i.e.
+> before placing it in the virtqueue with virtqueue_add_sgs() and checking
+> whether it returned successfully).
+> Queuing the packet in the virtqueue can fail even multiple times.
+> However, in virtio_transport_deliver_tap_pkt() we deliver the packet
+> to the monitoring tap interface only the first time we call it.
+> This certainly avoids seeing the same packet replicated multiple times
+> in the monitoring interface, but it can show the packet sent with the
+> wrong timestamp or even before we succeed to queue it in the virtqueue.
+> 
+> [...]
 
-  tools/testing/selftests/kvm/include/x86_64/processor.h
+Here is the summary with links:
+  - [net,v2] vsock/virtio: fix packet delivery to tap device
+    https://git.kernel.org/netdev/net/c/b32a09ea7c38
 
-between commit:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  0d1756482e66 ("Merge tag 'kvm-x86-pvunhalt-6.9' of https://github.com/kvm=
--x86/linux into HEAD")
 
-from the kvm-fixes tree and commit:
-
-  964d0c614c7f ("Merge branch 'hyperv'")
-
-from the kvm-x86 tree.
-
-I fixed it up (I used the former version) and can carry the fix as
-necessary. This is now fixed as far as linux-next is concerned, but any
-non trivial conflicts should be mentioned to your upstream maintainer
-when your tree is submitted for merging.  You may also want to consider
-cooperating with the maintainer of the conflicting tree to minimise any
-particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/fZQSE1CbvT3OvZf0/G5tIRg
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYMqKEACgkQAVBC80lX
-0GxbOwf/eDxlNKVlJRm37PWQKeKQ4FMvKavrHBe+EpehdSNcMn73XkwLWGPsKxhE
-af9jilp7xlyK2FPoPmm2NYMqlihC3DQ18T4ZaxKiAnxCcgtmRISkxKJrHhHftgOn
-UyWhX5+6gt7McLrKG8JaFPG7g3/yg4JvtfG0fmohcQ9kQNKVqmVHTyHbXbDHwwkh
-8wQd9SCT26+EYdy3Mig6r6OtBYSEUWTJUWLzUeQj0O7YgeBi9TatenqJw5qCl/+C
-avSYM7ZMaktIltmQMJb+RXPF+6Wqj3uWiyzBHy9RR59bv+o9qux7R8ZjhK04/q6o
-j/3ENljd8K1yW2wgRZrEB1H+M0UASw==
-=X0Oj
------END PGP SIGNATURE-----
-
---Sig_/fZQSE1CbvT3OvZf0/G5tIRg--
 
