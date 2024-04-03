@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-13467-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13468-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F089D8971E1
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 16:02:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79FF68971E2
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 16:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EB401C27702
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 14:02:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D0791C27872
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 14:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D7714A098;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A897B14900E;
 	Wed,  3 Apr 2024 14:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="WMp4O7B5"
+	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="Xn8IhRa6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8DF1487F1
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 14:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E1A149E14
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 14:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712152902; cv=none; b=IxZaCjA6EqZy34w666fAv7YkDyLCv4RESKopXgYdXFqy0oX6a/KmDnlwiUDgyGxssKHtQbZY79akwcLptlpPlWjOJWpHUnZKF5Cj+3o7NuIXTGzqoa4JeFXpevaAD55tKk+aOvKfcCHO7oPn/k7OreLbSEdQLhgGrHr5s1yvUBA=
+	t=1712152902; cv=none; b=bfHN9L8/kjRsun38lDg+zdYjMhKDj/kBRBUhquOgfDo9bHuxrNLbm6hu993Hj0Xwci/7SBXFn5Wcv8NVOuqYCyiOKrxjCzW+U/MrZ8rGPaRPProIBKIlsf0VkmL6lsf1OX7kBbEW7SBw6nFlM7szS+4itDdYYrDCuC+/e8RDOpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712152902; c=relaxed/simple;
-	bh=OKezwxiOEiM9+urpB8402BC4SYCwdxDMf8Df/ISZUg0=;
+	bh=+HycdZGuj5OU1W/c5yOM/8/+whc2oRxO0Toug1yf4G8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Dv1z8AuLnwwjrFW/+Xf454fALGYNvRKpqqBglMj+5RE1CBATboPuL2UsivmnpshSNbzq1ilQXG7Ief67BXH6tTukZvIt1XU/bjjti8xUaEQ2moHTlndW4tfJxg2jUIckdSuHXPqs1l1gG7On2mp3M69ZNuvtfSR7xjE/GaY3Wsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=WMp4O7B5; arc=none smtp.client-ip=209.85.210.47
+	 MIME-Version; b=Ur/fwE5u5YnOZRnF4P2eg6c0w4VfbM6ah1r3NvvB+mp7VD03iq4rgaHXBnSdhBLVayWY+Fqgg4m605vGlDzGudKpHJkPk4w6AcySAAEXk0I29sA3R2LO2e5Y0Yvu4ZKS5LZ9t2FiGNbotbrh6x8tM72t8Xzp1tMHRDvKSR1sMRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=Xn8IhRa6; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6e675181ceaso4143302a34.2
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 07:01:39 -0700 (PDT)
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-789e6f7f748so335060185a.3
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 07:01:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bitbyteword.org; s=google; t=1712152898; x=1712757698; darn=vger.kernel.org;
+        d=bitbyteword.org; s=google; t=1712152900; x=1712757700; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7VOPM+Isn3puOfkfBMYmv3GVLrqplGzQJegeaxwHn/Q=;
-        b=WMp4O7B5HDNF80hOnwY5oOBZPer+2V1WRXTDTQT+cwY/5Cp1SOsxpk21d9uLih02gC
-         i3HfmYuFYntSuHtC6fOXuoghrDCsR/ezPt2osU/0qs0+CrLfVRKFBQaFcC2ubd3Cv0j0
-         OTAk+xd8LkK+LnurhzJ9SHITRLBcizvh+kpaaEEDYFSP5+KmFWikp7rBE+xXCFFJHzq5
-         YNL1dfIr5zpiO3vMAjMka2haB7oOhSztdMHPW51sLHhEcXe2yPb1gOEV494VBQ7k5oTM
-         BeR+WgPLfBFEdcsw0oKznFwshw8vIPxXpG3etMx1YOvEU4wB84e9Q+VpV9aFtgiuwXSS
-         /iSg==
+        bh=QaWEC4wEGQ+YlZ6ti6+WrczlEY+i0roOx8Ci2YqikeE=;
+        b=Xn8IhRa6Q1hH8JPkpsL76ia39K74etBsnq86QvXDJzGkDlu4UQISCgwi31tudYRt83
+         jPhWkuvW0WWDPNO5GqkZlkamSdX5m/51kSnDSQgYHV4I90SE59QgGnExdChoF6Hyxsy/
+         DEBPORJpE0l965/MP4/PLQef9cZTT3H12g9caRcNBv7jcQ5dxHGDpDKbBGyAdCqr7UmK
+         ii2GkcFQTeoXQ0TKmt2dtFu9E3LqK/cgIBT1TdNEm8K+8WXd1kr3P+HKnrm3VftvFPtB
+         iodG5/lerUuBzTCWeouSem4Ps7N6uKHKXjVY9g1NsXICLR9FA3KpMZ6aSUbRhyMslQY4
+         5ZNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712152898; x=1712757698;
+        d=1e100.net; s=20230601; t=1712152900; x=1712757700;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7VOPM+Isn3puOfkfBMYmv3GVLrqplGzQJegeaxwHn/Q=;
-        b=aw5KiYqpe1TYpUirGlJNOxcS/u154qmBijnwNOdjkBA4SqfTL1GDuJNsFL0PiCfo4d
-         XQfvSE0SJuWMZwYEtN7puUM0A7AyueJFN0i6tuIfALG5eWWvqICO2HkgtPlPgXEB7niU
-         j8vuPyV6U1K7B8PGht2HhY0CIM4d+x+OBOqJd/NWK/NycXL2a3Y0+PUqy8yuO0tcSq4k
-         7e9fM7G6D/da2FwVG+0Nqag7ytDwMO2Gy5+DMxvMsdOwR8UTOGWzDjq8a3Dv+oBMNHx7
-         8gme9SbIJKPEmmqXzlDrfvI5BdDgT44BoNzz/p36+RP3CmNBE4GE8oF1mNQEX5Md77Od
-         x1cg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHMsC402GrisXfsRjEr4DMRN2BDDYQ/cjFBOJ8/01T6Y39rCiF4PosCNAuBB+YVu5EvdngbU1RGZBBMuK9XUmYC+vr
-X-Gm-Message-State: AOJu0Yy+z+ktbXiR8uffzD8d2+bzXZvRpg3vnQhaXtiD3YPXvCWa80Gq
-	JTr+z0tNiPeMIU4GfI7vGp0TaU/qoXwgt7MDALexLrZtEJJ2kF9n1M76kHGOPSY=
-X-Google-Smtp-Source: AGHT+IFVHhEadwy+vYVbpR80h1N15BwjLDnooutKSgc1bq6Ce0yAUhvCgcTFJsTJXfmfWJbdINes4g==
-X-Received: by 2002:a05:6830:a44:b0:6e6:d1ac:c989 with SMTP id g4-20020a0568300a4400b006e6d1acc989mr15963532otu.6.1712152898445;
-        Wed, 03 Apr 2024 07:01:38 -0700 (PDT)
+        bh=QaWEC4wEGQ+YlZ6ti6+WrczlEY+i0roOx8Ci2YqikeE=;
+        b=lbriih+Wr33nhrg70yNAN42Zkwf5eghZtJSt6u6sPhpAq3fas6AODJzl2khfhgSsgj
+         q7y3sdY5jDBCLCNFct+qPeuoOFkxvRMSvCdP7Y5HwUDvGum+sG/QbY1HATVae+HthCAm
+         0opiS5Bg7IFvRVPhqKxRSxX6Ezxm8Hvcv0OmWPx/Xmua0TpGLuVUX6Ivvoq5E3b/5teK
+         188AAx0j3G+J2WHd+eByIpzMTOjSe0zw7Xs2O192AW5m/Q0G1fU5ywOAcWMuG0geYOC0
+         WudG7k6BWv3AqRVfpnRdlDDkiSxCLFOElTA9k6JJJOrHsHl4AaivvMXuKfFTip4V17b/
+         G7Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCVW8/NSRVm8RrCClWPms7H3dVGRbuPGBMclgo1Pem0sO0eAG45rC5bfzD3lP6oszqc0ZDgjJ8xEJ429vw/TifSoKzp0
+X-Gm-Message-State: AOJu0YzoGLZ70OWowLXcjJ2VQ+s0hHBRXWoEioId91oeqQhlqrwhc97o
+	bg9k1BSwJY0Td5BVUx5/GEDEBMijlaRNIG++Q187h5Ej7Xv99Az79bKHXJ5H74I=
+X-Google-Smtp-Source: AGHT+IGXzY5eGF4cfLmjKD8WCxnHKVScVbM/F99svOb+MTbMgCl4GsOWSudI3dDOqx11Q2sEA8gtCA==
+X-Received: by 2002:a05:6214:1384:b0:699:1ad9:259 with SMTP id pp4-20020a056214138400b006991ad90259mr2834018qvb.31.1712152900149;
+        Wed, 03 Apr 2024 07:01:40 -0700 (PDT)
 Received: from vinbuntup3.lan (c-73-143-21-186.hsd1.vt.comcast.net. [73.143.21.186])
-        by smtp.gmail.com with ESMTPSA id gf12-20020a056214250c00b00698d06df322sm5945706qvb.122.2024.04.03.07.01.36
+        by smtp.gmail.com with ESMTPSA id gf12-20020a056214250c00b00698d06df322sm5945706qvb.122.2024.04.03.07.01.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 07:01:38 -0700 (PDT)
+        Wed, 03 Apr 2024 07:01:39 -0700 (PDT)
 From: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
 To: Ben Segall <bsegall@google.com>,
 	Borislav Petkov <bp@alien8.de>,
@@ -95,9 +95,9 @@ Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	x86@kernel.org
-Subject: [RFC PATCH v2 4/5] pvsched: bpf support for pvsched
-Date: Wed,  3 Apr 2024 10:01:15 -0400
-Message-Id: <20240403140116.3002809-5-vineeth@bitbyteword.org>
+Subject: [RFC PATCH v2 5/5] selftests/bpf: sample implementation of a bpf pvsched driver.
+Date: Wed,  3 Apr 2024 10:01:16 -0400
+Message-Id: <20240403140116.3002809-6-vineeth@bitbyteword.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240403140116.3002809-1-vineeth@bitbyteword.org>
 References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
@@ -109,188 +109,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for implementing bpf pvsched drivers. bpf programs can use
-the struct_ops to define the callbacks of pvsched drivers.
+A dummy skeleton of a bpf pvsched driver. This is just for demonstration
+purpose and would need more work to be included as a test for this
+feature.
 
-This is only a skeleton of the bpf framework for pvsched. Some
-verification details are not implemented yet.
-
-Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
-Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+Not-Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
 ---
- kernel/bpf/bpf_struct_ops_types.h |   4 +
- virt/pvsched/Makefile             |   2 +-
- virt/pvsched/pvsched_bpf.c        | 141 ++++++++++++++++++++++++++++++
- 3 files changed, 146 insertions(+), 1 deletion(-)
- create mode 100644 virt/pvsched/pvsched_bpf.c
+ .../testing/selftests/bpf/progs/bpf_pvsched.c | 37 +++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_pvsched.c
 
-diff --git a/kernel/bpf/bpf_struct_ops_types.h b/kernel/bpf/bpf_struct_ops_types.h
-index 5678a9ddf817..9d5e4d1a331a 100644
---- a/kernel/bpf/bpf_struct_ops_types.h
-+++ b/kernel/bpf/bpf_struct_ops_types.h
-@@ -9,4 +9,8 @@ BPF_STRUCT_OPS_TYPE(bpf_dummy_ops)
- #include <net/tcp.h>
- BPF_STRUCT_OPS_TYPE(tcp_congestion_ops)
- #endif
-+#ifdef CONFIG_PARAVIRT_SCHED_HOST
-+#include <linux/pvsched.h>
-+BPF_STRUCT_OPS_TYPE(pvsched_vcpu_ops)
-+#endif
- #endif
-diff --git a/virt/pvsched/Makefile b/virt/pvsched/Makefile
-index 4ca38e30479b..02bc072cd806 100644
---- a/virt/pvsched/Makefile
-+++ b/virt/pvsched/Makefile
-@@ -1,2 +1,2 @@
- 
--obj-$(CONFIG_PARAVIRT_SCHED_HOST) += pvsched.o
-+obj-$(CONFIG_PARAVIRT_SCHED_HOST) += pvsched.o pvsched_bpf.o
-diff --git a/virt/pvsched/pvsched_bpf.c b/virt/pvsched/pvsched_bpf.c
+diff --git a/tools/testing/selftests/bpf/progs/bpf_pvsched.c b/tools/testing/selftests/bpf/progs/bpf_pvsched.c
 new file mode 100644
-index 000000000000..b125089abc3b
+index 000000000000..a653baa3034b
 --- /dev/null
-+++ b/virt/pvsched/pvsched_bpf.c
-@@ -0,0 +1,141 @@
++++ b/tools/testing/selftests/bpf/progs/bpf_pvsched.c
+@@ -0,0 +1,37 @@
 +// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2024 Google  */
++/* Copyright (c) 2019 Facebook */
 +
-+#include <linux/types.h>
-+#include <linux/bpf_verifier.h>
-+#include <linux/bpf.h>
-+#include <linux/btf.h>
-+#include <linux/filter.h>
-+#include <linux/pvsched.h>
++#include "vmlinux.h"
++#include "bpf_tracing_net.h"
++#include <bpf/bpf_tracing.h>
++#include <bpf/bpf_helpers.h>
 +
++char _license[] SEC("license") = "GPL";
 +
-+/* "extern" is to avoid sparse warning.  It is only used in bpf_struct_ops.c. */
-+extern struct bpf_struct_ops bpf_pvsched_vcpu_ops;
-+
-+static int bpf_pvsched_vcpu_init(struct btf *btf)
++SEC("struct_ops/pvsched_vcpu_reg")
++int BPF_PROG(pvsched_vcpu_reg, struct pid *pid)
 +{
++	bpf_printk("pvsched_vcpu_reg: pid: %p", pid);
 +	return 0;
 +}
 +
-+static bool bpf_pvsched_vcpu_is_valid_access(int off, int size,
-+				       enum bpf_access_type type,
-+				       const struct bpf_prog *prog,
-+				       struct bpf_insn_access_aux *info)
++SEC("struct_ops/pvsched_vcpu_unreg")
++void BPF_PROG(pvsched_vcpu_unreg, struct pid *pid)
 +{
-+	if (off < 0 || off >= sizeof(__u64) * MAX_BPF_FUNC_ARGS)
-+		return false;
-+	if (type != BPF_READ)
-+		return false;
-+	if (off % size != 0)
-+		return false;
-+
-+	if (!btf_ctx_access(off, size, type, prog, info))
-+		return false;
-+
-+	return true;
++	bpf_printk("pvsched_vcpu_unreg: pid: %p", pid);
 +}
 +
-+static int bpf_pvsched_vcpu_btf_struct_access(struct bpf_verifier_log *log,
-+					const struct bpf_reg_state *reg,
-+					int off, int size)
++SEC("struct_ops/pvsched_vcpu_notify_event")
++void BPF_PROG(pvsched_vcpu_notify_event, void *addr, struct pid *pid, __u32 event)
 +{
-+	/*
-+	 * TODO: Enable write access to Guest shared mem.
-+	 */
-+	return -EACCES;
++	bpf_printk("pvsched_vcpu_notify: pid: %p, event:%u", pid, event);
 +}
 +
-+static const struct bpf_func_proto *
-+bpf_pvsched_vcpu_get_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
-+{
-+	return bpf_base_func_proto(func_id);
-+}
-+
-+static const struct bpf_verifier_ops bpf_pvsched_vcpu_verifier_ops = {
-+	.get_func_proto		= bpf_pvsched_vcpu_get_func_proto,
-+	.is_valid_access	= bpf_pvsched_vcpu_is_valid_access,
-+	.btf_struct_access	= bpf_pvsched_vcpu_btf_struct_access,
-+};
-+
-+static int bpf_pvsched_vcpu_init_member(const struct btf_type *t,
-+				  const struct btf_member *member,
-+				  void *kdata, const void *udata)
-+{
-+	const struct pvsched_vcpu_ops *uvm_ops;
-+	struct pvsched_vcpu_ops *vm_ops;
-+	u32 moff;
-+
-+	uvm_ops = (const struct pvsched_vcpu_ops *)udata;
-+	vm_ops = (struct pvsched_vcpu_ops *)kdata;
-+
-+	moff = __btf_member_bit_offset(t, member) / 8;
-+	switch (moff) {
-+	case offsetof(struct pvsched_vcpu_ops, events):
-+		vm_ops->events = *(u32 *)(udata + moff);
-+		return 1;
-+	case offsetof(struct pvsched_vcpu_ops, name):
-+		if (bpf_obj_name_cpy(vm_ops->name, uvm_ops->name,
-+					sizeof(vm_ops->name)) <= 0)
-+			return -EINVAL;
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static int bpf_pvsched_vcpu_check_member(const struct btf_type *t,
-+				   const struct btf_member *member,
-+				   const struct bpf_prog *prog)
-+{
-+	return 0;
-+}
-+
-+static int bpf_pvsched_vcpu_reg(void *kdata)
-+{
-+	return pvsched_register_vcpu_ops((struct pvsched_vcpu_ops *)kdata);
-+}
-+
-+static void bpf_pvsched_vcpu_unreg(void *kdata)
-+{
-+	pvsched_unregister_vcpu_ops((struct pvsched_vcpu_ops *)kdata);
-+}
-+
-+static int bpf_pvsched_vcpu_validate(void *kdata)
-+{
-+	return pvsched_validate_vcpu_ops((struct pvsched_vcpu_ops *)kdata);
-+}
-+
-+static int bpf_pvsched_vcpu_update(void *kdata, void *old_kdata)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int __pvsched_vcpu_register(struct pid *pid)
-+{
-+	return 0;
-+}
-+static void __pvsched_vcpu_unregister(struct pid *pid)
-+{
-+}
-+static void __pvsched_notify_event(void *addr, struct pid *pid, u32 event)
-+{
-+}
-+
-+static struct pvsched_vcpu_ops __bpf_ops_pvsched_vcpu_ops = {
-+	.pvsched_vcpu_register = __pvsched_vcpu_register,
-+	.pvsched_vcpu_unregister = __pvsched_vcpu_unregister,
-+	.pvsched_vcpu_notify_event = __pvsched_notify_event,
-+};
-+
-+struct bpf_struct_ops bpf_pvsched_vcpu_ops = {
-+	.init = &bpf_pvsched_vcpu_init,
-+	.validate = bpf_pvsched_vcpu_validate,
-+	.update = bpf_pvsched_vcpu_update,
-+	.verifier_ops = &bpf_pvsched_vcpu_verifier_ops,
-+	.reg = bpf_pvsched_vcpu_reg,
-+	.unreg = bpf_pvsched_vcpu_unreg,
-+	.check_member = bpf_pvsched_vcpu_check_member,
-+	.init_member = bpf_pvsched_vcpu_init_member,
-+	.name = "pvsched_vcpu_ops",
-+	.cfi_stubs = &__bpf_ops_pvsched_vcpu_ops,
++SEC(".struct_ops")
++struct pvsched_vcpu_ops pvsched_ops = {
++	.pvsched_vcpu_register		= (void *)pvsched_vcpu_reg,
++	.pvsched_vcpu_unregister	= (void *)pvsched_vcpu_unreg,
++	.pvsched_vcpu_notify_event	= (void *)pvsched_vcpu_notify_event,
++	.events				= 0x6,
++	.name				= "bpf_pvsched_ops",
 +};
 -- 
 2.40.1
