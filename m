@@ -1,87 +1,90 @@
-Return-Path: <kvm+bounces-13451-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13452-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4711896A5E
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 11:20:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32A8F896B37
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 11:58:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 305221F24F72
-	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 09:20:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C936282D4D
+	for <lists+kvm@lfdr.de>; Wed,  3 Apr 2024 09:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22D373164;
-	Wed,  3 Apr 2024 09:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BADE1350D7;
+	Wed,  3 Apr 2024 09:58:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F2L5gkRQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTd6vcUi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5757670CA7
-	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 09:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7DA13540B
+	for <kvm@vger.kernel.org>; Wed,  3 Apr 2024 09:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712136025; cv=none; b=c7QG7umjf2ZqVX536RU6E/RzxizVi4VblaK8NKiLTB+Z7f5BNtWiCwOOtKxj/92GNnrv/TUoSg/2tjcxhEanbYPoMIbmr6YppZWb51E3BcNsetbtppWSWZG7Z2kOeK36oVMGqNVIzjfYM0det7L26q2FNXL2GB+bZiE3OTHSUiw=
+	t=1712138281; cv=none; b=JBgu8butjLQ16zxO4xJsoL4yNjHFTQQmOPMXPBrBcWFX5LAaC8vNb79AcX3KDBHCY+/LFu1DQUfuAabWMOYNgczN8Zf0eCM2jFiaJVZtJORVRc36WoRbIlIoz3zSgoURyKyVilR8jxlxWmnBt5mar6vruxg6GqZiqhQwAKc/tGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712136025; c=relaxed/simple;
-	bh=aVcBN45Xfck08qQ/abgvdWiQt9e3NFHvI+SBznc9rf8=;
+	s=arc-20240116; t=1712138281; c=relaxed/simple;
+	bh=8RRynYXEEsr910DpOhWgmhyIrE00u1hABv+0y3HxPJQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=elWT4qzw9XZTiWPvOoDa/AKcSmMoJDEiSYrePoKPsiID8NJ5dyATVqEPAFK2d47kQRURUUvccDfsieY29BtFqCHf0Uyqso70fPifM4u2qk4synNLaTUTHL23HpMF151NEdNRROYy1a7xA3WX0DPE8aCTmeBU8ULUN0eViHx0HM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F2L5gkRQ; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dgx70rhborxVES6adzTuhkIb8e3wd6yL/9Bo69jACaHUr1YV0+iNl0yxe7jC9q3xFUn8TkGu+FP2FXEWMwSjN4VuJQNLGQnv57GGqa0rvf6OgH4pwL2583juuHWm5LROMSH0pq+k2ZXeiAU1kAalTwuJg205b6ABQ2HNGHTHrLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cTd6vcUi; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712136022;
+	s=mimecast20190719; t=1712138278;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7eVpcKNoPKOT5GjI4amQQ4jUKbgRtaP6DtVP6eeUayE=;
-	b=F2L5gkRQI1Sfx4PojyKXhEcQJe2VSDcKtVNVSTZrE89hmJCM/3Zxszfq9P/Re9hIkHaee+
-	g4cy/4aGsUUdaKfCfDiuHQmIIhrocWcfZYOVzSVJzIqS3Bt7b8sAQez6vg6fjHgepB5uUp
-	JeK+8sExopzibQpmwR2riIrNgpWVgBo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=0NkjBL5bDYnfw/9r7z0I5K4fWXu8LGwC+T3Asv+pwcA=;
+	b=cTd6vcUip3O1uXuISY8o2DL1x9xfi09U/s7cAsgjY1aGYj4/R8NpEsowmv6dpEvwYf70Wh
+	CzMZOUSq3OE/uNFytQ03QcP8mDBeC164w6ydC5ETlFRTsqyCZO63EXoNt4PKG14d/frfMD
+	BISWoYINYT/mMdLBF2Wy5/Geo6Butm8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-114-ODLJ6UbIN8a5wvTZHStuug-1; Wed, 03 Apr 2024 05:20:20 -0400
-X-MC-Unique: ODLJ6UbIN8a5wvTZHStuug-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4155db7b58cso16968155e9.1
-        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 02:20:20 -0700 (PDT)
+ us-mta-387-YX8vnTIsO06gM4vqFmR7Vw-1; Wed, 03 Apr 2024 05:57:57 -0400
+X-MC-Unique: YX8vnTIsO06gM4vqFmR7Vw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-41493ba3fcbso27969375e9.1
+        for <kvm@vger.kernel.org>; Wed, 03 Apr 2024 02:57:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712136019; x=1712740819;
+        d=1e100.net; s=20230601; t=1712138276; x=1712743076;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7eVpcKNoPKOT5GjI4amQQ4jUKbgRtaP6DtVP6eeUayE=;
-        b=mHMooL4ed86rc38WKSZQXwQupA44sYnC8sLZihGoZHLtG7r+WU02WoBbzGKNEz8hzw
-         /UIyt9mL0BFOOKhV4lf9xgFeueNkemKtxZ1Gy1IB1xZaGskGTzjn/FC5QZTlzKZ0lEkP
-         v7dW8koLRKnHmzzw56/oYz9NXbVBVKzX9Zj/WLXljo9TfaI+iq0eMEe5d38lUm04SJG/
-         u+wkmZ/n4JWN+JLxUZgkGM/Xufn7TNaixBz9fonSLXVkVQuKu/g/NCrQZyatH8C82UZt
-         Vx8cy0v47dQQnR229cksSycB8FqCNi68m2UIdxNWkvIEG9kkowhJJ68ULOry69a0IOtB
-         JJ9g==
-X-Gm-Message-State: AOJu0YxVjwHGAcoHq8yvKQu6alslIe5kL47Rq2oVrHiQT4mzMpDMIArq
-	vOUBhL8jm4bD4DEwXFuCmnAOszUueTy6efOftBlhaly8dRH4QhxO+kZ+CZtABgPZ/UPgN8W5YE6
-	qFADbjGSUJnQBRI4WK91+05xD9caQt0QnVDSo4DSguirXs1rIPA==
-X-Received: by 2002:a05:600c:190f:b0:414:93ae:396d with SMTP id j15-20020a05600c190f00b0041493ae396dmr13447743wmq.32.1712136019734;
-        Wed, 03 Apr 2024 02:20:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpPRLEixd0sNanUNIse0jfTMcCXcGZLbYnktjnv+/KAjawSRllq9bpUKMcQ9mEZUSuNo/uGA==
-X-Received: by 2002:a05:600c:190f:b0:414:93ae:396d with SMTP id j15-20020a05600c190f00b0041493ae396dmr13447724wmq.32.1712136019364;
-        Wed, 03 Apr 2024 02:20:19 -0700 (PDT)
+        bh=0NkjBL5bDYnfw/9r7z0I5K4fWXu8LGwC+T3Asv+pwcA=;
+        b=q5U3stzaLejPmwz/nyv/h848SHHiUE4D2Lt2ZGKOzKgVuOcwpoqb8QDtnHdJqdkdqD
+         06mSgHpnLTonrnoE1rFV0TWnL2ttqKTrbOMeMm6D9CLoqbIuM6koAXOgHozId5EyCip+
+         3H73qHyZ4YW+OvrzKwC/vwSlbrPl+1eQcoqwKRimRDpa9YXdp/u3XoAKHRIOkFcwBKQT
+         izsJYeZUYAzR7pulJ9/PxXkVkv5nn9N+WGVL3T6KlN6up5wmjeGf72ml1M/AxDDcD5/m
+         BwJxkOPgwsraXV/cSbmIkPNX1zKK/uiESdg6lcVKbjeWKj/+CxjEGV1QInFMPSL5UNRN
+         hM/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUzFzACAbF5bJTJaYu2Et6aubXhdusmzw+VyZmafBEAlsCIOHA3xM44K4BAz05iKMqghv4sBzS7q2Txnz0cWI4Xa9Vt
+X-Gm-Message-State: AOJu0YzB2dyQ8tn8bXReQ7a7RaMvY6N5y9wd1B6nWHmaP0eWfCLJkzft
+	OsoSFc09vuYSEjfpLr5JgamKNA9NCYVThUPfGjRiCd3dM7cZShS342NXQ/5L3dQ8Y4Q4H67Ht5J
+	HI+aFCbK2XOW1Dls/ilFmNvRetVUt4n7tuv/e46ygGgIB8HF6uQ==
+X-Received: by 2002:a05:600c:1c99:b0:414:8a28:6c89 with SMTP id k25-20020a05600c1c9900b004148a286c89mr12523545wms.31.1712138276249;
+        Wed, 03 Apr 2024 02:57:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFOILQPfbGHxrOwnJYPLVzz5jLbxh1TQ7R/N3HPs9ewOGHos/rV5L9Q51JZB17uMPSq+TTRmQ==
+X-Received: by 2002:a05:600c:1c99:b0:414:8a28:6c89 with SMTP id k25-20020a05600c1c9900b004148a286c89mr12523530wms.31.1712138275940;
+        Wed, 03 Apr 2024 02:57:55 -0700 (PDT)
 Received: from sgarzare-redhat ([185.95.145.60])
-        by smtp.gmail.com with ESMTPSA id fa14-20020a05600c518e00b004159df274d5sm5729524wmb.6.2024.04.03.02.20.17
+        by smtp.gmail.com with ESMTPSA id m4-20020a05600c3b0400b004161b8a0310sm4955377wms.1.2024.04.03.02.57.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 02:20:18 -0700 (PDT)
-Date: Wed, 3 Apr 2024 11:20:13 +0200
+        Wed, 03 Apr 2024 02:57:55 -0700 (PDT)
+Date: Wed, 3 Apr 2024 11:57:50 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
-To: Luigi Leonardi <luigi.leonardi@outlook.com>
-Cc: kvm@vger.kernel.org, jasowang@redhat.com, 
-	virtualization@lists.linux.dev, mst@redhat.com, kuba@kernel.org, xuanzhuo@linux.alibaba.com, 
-	netdev@vger.kernel.org, stefanha@redhat.com, pabeni@redhat.com, davem@davemloft.net, 
-	edumazet@google.com
-Subject: Re: [PATCH net-next 3/3] test/vsock: add ioctl unsent bytes test
-Message-ID: <etx5zujgdrhnjz2dmavz6it5smkzhwvkzm3go6sesz2ya4aj5s@du3wfitew4il>
-References: <20240402150539.390269-1-luigi.leonardi@outlook.com>
- <AS2P194MB2170D78CDB7BDF00F0ACCB079A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Zhu Lingshan <lingshan.zhu@intel.com>, Jason Wang <jasowang@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>, 
+	Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Kan Liang <kan.liang@linux.intel.com>
+Subject: Re: [PATCH] vhost-vdpa: change ioctl # for VDPA_GET_VRING_SIZE
+Message-ID: <qxnpqulknydwdaqn2uangg6ke6pzeo46us2xnqw37ll6m4te5m@ounccq6x7sto>
+References: <41c1c5489688abe5bfef9f7cf15584e3fb872ac5.1712092759.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,187 +93,78 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <AS2P194MB2170D78CDB7BDF00F0ACCB079A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <41c1c5489688abe5bfef9f7cf15584e3fb872ac5.1712092759.git.mst@redhat.com>
 
-On Tue, Apr 02, 2024 at 05:05:39PM +0200, Luigi Leonardi wrote:
->This test that after a packet is delivered the number
->of unsent bytes is zero.
+On Tue, Apr 02, 2024 at 05:21:39PM -0400, Michael S. Tsirkin wrote:
+>VDPA_GET_VRING_SIZE by mistake uses the already occupied
+>ioctl # 0x80 and we never noticed - it happens to work
+>because the direction and size are different, but confuses
+>tools such as perf which like to look at just the number,
+>and breaks the extra robustness of the ioctl numbering macros.
 >
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+>To fix, sort the entries and renumber the ioctl - not too late
+>since it wasn't in any released kernels yet.
+>
+>Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
+>Reported-by: Namhyung Kim <namhyung@kernel.org>
+>Fixes: 1496c47065f9 ("vhost-vdpa: uapi to support reporting per vq size")
+>Cc: "Zhu Lingshan" <lingshan.zhu@intel.com>
+>Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 >---
-> tools/testing/vsock/util.c       |  6 +--
-> tools/testing/vsock/util.h       |  3 ++
-> tools/testing/vsock/vsock_test.c | 83 ++++++++++++++++++++++++++++++++
-> 3 files changed, 89 insertions(+), 3 deletions(-)
 >
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 554b290fefdc..a3d448a075e3 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -139,7 +139,7 @@ int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_po
-> }
+>Build tested only - userspace patches using this will have to adjust.
+>I will merge this in a week or so unless I hear otherwise,
+>and afterwards perf can update there header.
+
+Fortunately, we haven't released any kernels with this yet, right?
+(other than v6.9-rc*)
+
+LGTM:
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
 >
-> /* Connect to <cid, port> and return the file descriptor. */
->-static int vsock_connect(unsigned int cid, unsigned int port, int type)
->+int vsock_connect(unsigned int cid, unsigned int port, int type)
-> {
-> 	union {
-> 		struct sockaddr sa;
->@@ -226,8 +226,8 @@ static int vsock_listen(unsigned int cid, unsigned int port, int type)
-> /* Listen on <cid, port> and return the first incoming connection.  The remote
->  * address is stored to clientaddrp.  clientaddrp may be NULL.
+> include/uapi/linux/vhost.h | 15 ++++++++-------
+> 1 file changed, 8 insertions(+), 7 deletions(-)
+>
+>diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+>index bea697390613..b95dd84eef2d 100644
+>--- a/include/uapi/linux/vhost.h
+>+++ b/include/uapi/linux/vhost.h
+>@@ -179,12 +179,6 @@
+> /* Get the config size */
+> #define VHOST_VDPA_GET_CONFIG_SIZE	_IOR(VHOST_VIRTIO, 0x79, __u32)
+>
+>-/* Get the count of all virtqueues */
+>-#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
+>-
+>-/* Get the number of virtqueue groups. */
+>-#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
+>-
+> /* Get the number of address spaces. */
+> #define VHOST_VDPA_GET_AS_NUM		_IOR(VHOST_VIRTIO, 0x7A, unsigned int)
+>
+>@@ -228,10 +222,17 @@
+> #define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
+> 					      struct vhost_vring_state)
+>
+>+
+>+/* Get the count of all virtqueues */
+>+#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
+>+
+>+/* Get the number of virtqueue groups. */
+>+#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
+>+
+> /* Get the queue size of a specific virtqueue.
+>  * userspace set the vring index in vhost_vring_state.index
+>  * kernel set the queue size in vhost_vring_state.num
 >  */
->-static int vsock_accept(unsigned int cid, unsigned int port,
->-			struct sockaddr_vm *clientaddrp, int type)
->+int vsock_accept(unsigned int cid, unsigned int port,
->+		 struct sockaddr_vm *clientaddrp, int type)
-> {
-> 	union {
-> 		struct sockaddr sa;
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index e95e62485959..fff22d4a14c0 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -39,6 +39,9 @@ struct test_case {
-> void init_signals(void);
-> unsigned int parse_cid(const char *str);
-> unsigned int parse_port(const char *str);
->+int vsock_connect(unsigned int cid, unsigned int port, int type);
->+int vsock_accept(unsigned int cid, unsigned int port,
->+		 struct sockaddr_vm *clientaddrp, int type);
-> int vsock_stream_connect(unsigned int cid, unsigned int port);
-> int vsock_bind_connect(unsigned int cid, unsigned int port,
-> 		       unsigned int bind_port, int type);
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index f851f8961247..58c94e04e3af 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -20,6 +20,8 @@
-> #include <sys/mman.h>
-> #include <poll.h>
-> #include <signal.h>
->+#include <sys/ioctl.h>
->+#include <linux/sockios.h>
->
-> #include "vsock_test_zerocopy.h"
-> #include "timeout.h"
->@@ -1238,6 +1240,77 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
-> 	}
-> }
->
->+#define MSG_BUF_IOCTL_LEN 64
->+static void test_unsent_bytes_server(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int client_fd;
->+
->+	client_fd = vsock_accept(VMADDR_CID_ANY, 1234, NULL, type);
->+	if (client_fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	recv_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
->+	control_writeln("RECEIVED");
->+
->+	close(client_fd);
->+}
->+
->+static void test_unsent_bytes_client(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int ret, fd, sock_bytes_unsent;
->+
->+	fd = vsock_connect(opts->peer_cid, 1234, type);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	for (int i = 0; i < sizeof(buf); i++)
->+		buf[i] = rand() & 0xFF;
->+
->+	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
->+	control_expectln("RECEIVED");
->+
->+	ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
->+	if (ret < 0 && errno != EOPNOTSUPP) {
-
-What about adding a warning when it is not supported?
-
-Something like this (untested):
-
-	if (ret < 0) {
-		perror("ioctl");
-
-		if (errno != EOPNOTSUPP) {
-     			exit(EXIT_FAILURE);
-		}
-
-		fprintf(stderr, "Test skipped\n");
-	}
-
-The rest LGTM.
-
-Thanks,
-Stefano
-
->+		perror("ioctl");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (ret == 0 && sock_bytes_unsent != 0) {
->+		fprintf(stderr,
->+			"Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
->+			sock_bytes_unsent);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	close(fd);
->+}
->+
->+static void test_stream_unsent_bytes_client(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_client(opts, SOCK_STREAM);
->+}
->+
->+static void test_stream_unsent_bytes_server(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_server(opts, SOCK_STREAM);
->+}
->+
->+static void test_seqpacket_unsent_bytes_client(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_client(opts, SOCK_SEQPACKET);
->+}
->+
->+static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
->+}
->+
-> #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-> /* This define is the same as in 'include/linux/virtio_vsock.h':
->  * it is used to decide when to send credit update message during
->@@ -1523,6 +1596,16 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-> 		.run_server = test_stream_cred_upd_on_low_rx_bytes,
-> 	},
->+	{
->+		.name = "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes",
->+		.run_client = test_stream_unsent_bytes_client,
->+		.run_server = test_stream_unsent_bytes_server,
->+	},
->+	{
->+		.name = "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes",
->+		.run_client = test_seqpacket_unsent_bytes_client,
->+		.run_server = test_seqpacket_unsent_bytes_server,
->+	},
-> 	{},
-> };
->
+>-#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x80,	\
+>+#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
+> 					      struct vhost_vring_state)
+> #endif
 >-- 
->2.34.1
+>MST
 >
 >
 
