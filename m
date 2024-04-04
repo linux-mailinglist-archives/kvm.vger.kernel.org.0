@@ -1,159 +1,261 @@
-Return-Path: <kvm+bounces-13590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41387898D3F
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 19:33:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A113898DC7
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 20:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6417B1C27639
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 17:33:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77216B231DB
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 18:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1DE012DDBF;
-	Thu,  4 Apr 2024 17:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BAD71D554;
+	Thu,  4 Apr 2024 18:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gLSSquWR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BIIY9i9B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4D812AAE8;
-	Thu,  4 Apr 2024 17:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38291CA82
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 18:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712251996; cv=none; b=phRHDMPYb5m0wWvH9H11/F/98+FvOHvSxgBK1HAZo8KFMhZEsOPenVcj4acPStpD0hFcfSeGpJocuiwtzz+lEutXknqGMHZ/o0VP+epZvNM0ZuZpoSkj0HKe+ipQcMhQToUNDALmWm+LAQ04+SKZmZzHgENSd+o8sOJvuj4HsVI=
+	t=1712254392; cv=none; b=DYEncFvUNkNOyuNEZ442Xj8nqs4SfL7OXkzWUSOofIStn/JWHn5SLGemSA034DGgpSbEFnFpPdB9I7WjDwS/X83i0UnRbyLdX3qVxOPYpDGCiXITi6Ywxg9WXKxboyZy+6iZVwL287YdJ1mu4eBH4hgucn5HjEbum8meYFNhviA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712251996; c=relaxed/simple;
-	bh=WhycKvDs8Nm0e2yE6FewUWSMhX4pZiW2qepdqQnqjQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sAZUh9SJZkEoFU+9+mN3oU3m8YC8wE2SrAmPC6Nk98lRs6aZ6vie7UkAuINZnzEleTU+KgMCcs9miagB4vnFq4AxwwhT9vPG47HDEWsUwdtLhpKn2XgHDwj9Qrba3QSE9IFB9ciOOiY0OfHKOXEPrlmEgj13g48DKUfZ7cYvBeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gLSSquWR; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712251995; x=1743787995;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WhycKvDs8Nm0e2yE6FewUWSMhX4pZiW2qepdqQnqjQU=;
-  b=gLSSquWRbOk30KJOLa1Pxfr+fIXQGvKqAm1+bWUcE3J723rn7DVOLihZ
-   upoXGlliFQ1XKgOuuKNn1JMjaM52YLSwRkIKwJBIgA3uKFlg0J1O1DWaY
-   6JziuEH437sZ0afJ+qBr+VVBjoA3G851z3ARjIaYbj71EoU6OHXC+bh7+
-   StT7knzN8Lxeqz7b58c3o2ageC6dtfw/44AFr3p5Ny+K+lvTvky6c/4SX
-   bbuTPU4F16Vp99CNrk58ULrsmX1BCv0uzvjzoBs+KJcjM7d41uu2iwbtc
-   2bsp0Yjdpk8XrzNp/iUoqjgj9NOprBZlMBq5mcW2hxVAFnjHLaf2rQ3lE
-   Q==;
-X-CSE-ConnectionGUID: 15L8qycaRnSAtoLa8Dqq2g==
-X-CSE-MsgGUID: bsmX5D5xQduy/bQKQwNrWw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="7709650"
-X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="7709650"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 10:33:09 -0700
-X-CSE-ConnectionGUID: TuJmPMI7T6u58LeAAqTTfg==
-X-CSE-MsgGUID: ximBQxIZSoGR85aXhPDCVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="23356605"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 10:33:08 -0700
-Date: Thu, 4 Apr 2024 10:37:35 -0700
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: Robert Hoo <robert.hoo.linux@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
- Zijlstra <peterz@infradead.org>, iommu@lists.linux.dev, Thomas Gleixner
- <tglx@linutronix.de>, Lu Baolu <baolu.lu@linux.intel.com>,
- kvm@vger.kernel.org, Dave Hansen <dave.hansen@intel.com>, Joerg Roedel
- <joro@8bytes.org>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov
- <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, Paul Luse
- <paul.e.luse@intel.com>, Dan Williams <dan.j.williams@intel.com>, Jens
- Axboe <axboe@kernel.dk>, Raj Ashok <ashok.raj@intel.com>, "Tian, Kevin"
- <kevin.tian@intel.com>, maz@kernel.org, seanjc@google.com, Robin Murphy
- <robin.murphy@arm.com>, jacob.jun.pan@linux.intel.com, Bjorn Helgaas
- <helgaas@kernel.org>
-Subject: Re: [PATCH 00/15] Coalesced Interrupt Delivery with posted MSI
-Message-ID: <20240404103735.003ed5a3@jacob-builder>
-In-Reply-To: <fe40498a-3bb2-43c6-b3e2-1e4e10205db1@gmail.com>
-References: <20240126234237.547278-1-jacob.jun.pan@linux.intel.com>
-	<fe40498a-3bb2-43c6-b3e2-1e4e10205db1@gmail.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1712254392; c=relaxed/simple;
+	bh=7r+vp77GfHcP/u9lzgmPJXs0U4W9p9k3rgYIL0yRTMw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VciF0pLyUi6V/XlI0em4fCxyaVWWRL9PqR321vdP2QojRZta15sh+uzWTAj1d7LE87pipP/yRLLSR3VhUERwa8hVzosPGVcKfXX7TEqYqBxQr5D8FDOrLAfwUuC6rp6smi1XqQURWvnu46avoHwDFbi16tkR/YSu2OXE2cyaMp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BIIY9i9B; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-415523d9824so13351705e9.3
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 11:13:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712254389; x=1712859189; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PljaTZNIhWGVVBVk1FxzmoZmc6LBiiDTllP+5X4HaUo=;
+        b=BIIY9i9B8aW/uIxGRfcS7jHkSl7VUEYoZCoaPshZ1bbdp902lixRokXXLf5og4mAd9
+         Epog7PnKbDZylKNp7wyB6Zn+1oNaPQroqXcr7uWuxVvWJHW2sKlWfeSvC7hoY6VVNRzs
+         OBa8wAM+KgYUVFbyXSLqXEbncwDmO4BNhRHyAdWpuJUqf2oJE5zBd0DaVe5liWXd7LgD
+         HvKh/NJn2hqq67felIY6BFcf6bFXmSGxlz/vbcxgJx2Vve8PuObaq3ZLX8TVFmB5R4IG
+         zYKsDKzYG3swsc7Vs6a6sqdYDjP6LSbgNQUDwG4gGFyJeGaZsifco9DnJMT+tTncD63w
+         ThGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712254389; x=1712859189;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PljaTZNIhWGVVBVk1FxzmoZmc6LBiiDTllP+5X4HaUo=;
+        b=C6I7QnwTX77gS/TVfsJbCz+6X1Iht6Zayu0Kf2ldvFdzv6eSvF6cycWhYfAW7OVuei
+         zJOahcojJkHLi7efoBd+3i33nuBrFCNEejl7yxWvULwWGiwPM8GLG4HV59ah1f9VaZER
+         e1rSXjmdJYWeNJY+wX8vBvGRFKtzsL827GjayaogYpO2++DhPyvmNyYqMZXFyjlf+zvE
+         yw7x/nw9AWo6SH/QTpQrrphWLwf8cUiUbPeFmfYsG/RD+HyAi7rGxQRjMvNOXOJJ06jj
+         WMVkwZXm4GxSFDIeAKjspYdjk5bBec0crgoozDRc0vHRf4m0xPUpkugjW/qGbnro4l07
+         gPCg==
+X-Forwarded-Encrypted: i=1; AJvYcCWhN7jXRJZ6Zi8MpsJ6XxeaDFUv/056frdSELvg0q29WtpQSoqg1/ntFJUQr2MP6gg8kjQd2+C52eTtM6/csn8P8aoH
+X-Gm-Message-State: AOJu0YyoFF5QcO2oL4wZJytpRF6WDBKehOa89xQKJm1umvDwrvTz+YaW
+	9Ps+ochs+7uuVCjjiBIfFzavjQ3oK1qstAqOFyon7KwH0QOoI/y50/YTXfrQBey292BTZMv9S/f
+	UYpeS92Y6qvrCU2LLvvMxngehfsFUfSphgzhiDItX1+uHMPvNBpUN
+X-Google-Smtp-Source: AGHT+IEWkUEMx9khJJrvbtUCugKUrfa2EP0iwaToE25+JeybzWKIZDK0q5GGkv3vaKy+wqiyJ+4OjhFiPFi+FZBi3Vc=
+X-Received: by 2002:adf:eec2:0:b0:33e:bfd0:335c with SMTP id
+ a2-20020adfeec2000000b0033ebfd0335cmr3130118wrp.51.1712254388783; Thu, 04 Apr
+ 2024 11:13:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20240402213656.3068504-1-dmatlack@google.com> <cb793d79-f476-3134-23b7-dc43801b133e@loongson.cn>
+ <CALzav=c_qP2kLVS6R4VQRyS6aMvj0381WKCE=5JpqRUrdEYPyg@mail.gmail.com> <Zg7fAr7uYMiw_pc3@google.com>
+In-Reply-To: <Zg7fAr7uYMiw_pc3@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 4 Apr 2024 11:12:40 -0700
+Message-ID: <CALzav=cF+tq-snKbdP76FpodUdd7Fhu9Pf3jTK5c5=vb-MY9cQ@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG
+To: Sean Christopherson <seanjc@google.com>
+Cc: maobibo <maobibo@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Robert,
+On Thu, Apr 4, 2024 at 10:10=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Apr 04, 2024, David Matlack wrote:
+> > On Tue, Apr 2, 2024 at 6:50=E2=80=AFPM maobibo <maobibo@loongson.cn> wr=
+ote:
+> > > > This change eliminates dips in guest performance during live migrat=
+ion
+> > > > in a 160 vCPU VM when userspace is issuing CLEAR ioctls (tested wit=
+h
+> > > > 1GiB and 8GiB CLEARs). Userspace could issue finer-grained CLEARs, =
+which
+> > > Frequently drop/reacquire mmu_lock will cause userspace migration
+> > > process issuing CLEAR ioctls to contend with 160 vCPU, migration spee=
+d
+> > > maybe become slower.
+> >
+> > In practice we have not found this to be the case. With this patch
+> > applied we see a significant improvement in guest workload throughput
+> > while userspace is issuing CLEAR ioctls without any change to the
+> > overall migration duration.
+>
+> ...
+>
+> > In the case of this patch, there doesn't seem to be a trade-off. We
+> > see an improvement to vCPU performance without any regression in
+> > migration duration or other metrics.
+>
+> For x86.  We need to keep in mind that not all architectures have x86's o=
+ptimization
+> around dirty logging faults, or around faults in general. E.g. LoongArch'=
+s (which
+> I assume is Bibo Mao's primary interest) kvm_map_page_fast() still acquir=
+es mmu_lock.
+> And if the fault can't be handled in the fast path, KVM will actually acq=
+uire
+> mmu_lock twice (mmu_lock is dropped after the fast-path, then reacquired =
+after
+> the mmu_seq and fault-in pfn stuff).
+>
+> So for x86, I think we can comfortably state that this change is a net po=
+sitive
+> for all scenarios.  But for other architectures, that might not be the ca=
+se.
+> I'm not saying this isn't a good change for other architectures, just tha=
+t we
+> don't have relevant data to really know for sure.
 
-On Thu, 4 Apr 2024 21:45:05 +0800, Robert Hoo <robert.hoo.linux@gmail.com>
-wrote:
+I do not have data for other architectures, but may be able to get
+data on ARM in the next few weeks. I believe we saw similar benefits
+when testing on ARM.
 
-> On 1/27/2024 7:42 AM, Jacob Pan wrote:
-> > Hi Thomas and all,
-> >=20
-> > This patch set is aimed to improve IRQ throughput on Intel Xeon by
-> > making use of posted interrupts.
-> >=20
-> > There is a session at LPC2023 IOMMU/VFIO/PCI MC where I have presented
-> > this topic.
-> >=20
-> > https://lpc.events/event/17/sessions/172/#20231115
-> >=20
-> > Background
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > On modern x86 server SoCs, interrupt remapping (IR) is required and
-> > turned on by default to support X2APIC. Two interrupt remapping modes
-> > can be supported by IOMMU/VT-d:
-> >=20
-> > - Remappable 	(host)
-> > - Posted	(guest only so far)
-> >=20
-> > With remappable mode, the device MSI to CPU process is a HW flow
-> > without system software touch points, it roughly goes as follows:
-> >=20
-> > 1.	Devices issue interrupt requests with writes to 0xFEEx_xxxx
-> > 2.	The system agent accepts and remaps/translates the IRQ
-> > 3.	Upon receiving the translation response, the system agent
-> > notifies the destination CPU with the translated MSI
-> > 4.	CPU's local APIC accepts interrupts into its IRR/ISR registers
-> > 5.	Interrupt delivered through IDT (MSI vector)
-> >=20
-> > The above process can be inefficient under high IRQ rates. The
-> > notifications in step #3 are often unnecessary when the destination CPU
-> > is already overwhelmed with handling bursts of IRQs. On some
-> > architectures, such as Intel Xeon, step #3 is also expensive and
-> > requires strong ordering w.r.t DMA.  =20
->=20
-> Can you tell more on this "step #3 requires strong ordering w.r.t. DMA"?
->=20
-I am not sure how much micro architecture details I can disclose but the
-point is that there are ordering rules related to DMA read/writes
-and posted MSI writes. I am not a hardware expert.
+>
+> Absent performance data for other architectures, which is likely going to=
+ be
+> difficult/slow to get, it might make sense to have this be opt-in to star=
+t.  We
+> could even do it with minimal #ifdeffery, e.g. something like the below w=
+ould allow
+> x86 to do whatever locking it wants in kvm_arch_mmu_enable_log_dirty_pt_m=
+asked()
+> (I assume we want to give kvm_get_dirty_log_protect() similar treatment?)=
+.
 
-=46rom PCIe pov, my understanding is that the upstream writes tested here on
-NVMe drives as the result of 4K random reads are relaxed ordered. I can see
-lspci showing: RlxdOrd+ on my Samsung drives.
+I don't see any reason not to give kvm_get_dirty_log_protect() the
+same treatment, but it's less important since
+kvm_get_dirty_log_protect() does not take the mmu_lock at all when
+manual-protect is enabled.
 
-DevCtl: CorrErr+ NonFatalErr+ FatalErr+ UnsupReq-
-                        RlxdOrd+ ExtTag+ PhantFunc- AuxPwr- NoSnoop+ FLRese=
-t-
-                        MaxPayload 512 bytes, MaxReadReq 4096 bytes
+>
+> I don't love the idea of adding more arch specific MMU behavior (going th=
+e wrong
+> direction), but it doesn't seem like an unreasonable approach in this cas=
+e.
 
-But MSIs are strictly ordered afaik.
+I wonder if this is being overly cautious. I would expect only more
+benefit on architectures that more aggressively take the mmu_lock on
+vCPU threads during faults. The more lock acquisition on vCPU threads,
+the more this patch will help reduce vCPU starvation during
+CLEAR_DIRTY_LOG.
 
-> > As a result, slower
-> > IRQ rates can become a limiting factor for DMA I/O performance.
-> >  =20
->=20
->=20
+Hm, perhaps testing with ept=3DN (which will use the write-lock for even
+dirty logging faults) would be a way to increase confidence in the
+effect on other architectures?
 
-
-Thanks,
-
-Jacob
+>
+> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> index 86d267db87bb..5eb1ce83f29d 100644
+> --- a/virt/kvm/dirty_ring.c
+> +++ b/virt/kvm/dirty_ring.c
+> @@ -66,9 +66,9 @@ static void kvm_reset_dirty_gfn(struct kvm *kvm, u32 sl=
+ot, u64 offset, u64 mask)
+>         if (!memslot || (offset + __fls(mask)) >=3D memslot->npages)
+>                 return;
+>
+> -       KVM_MMU_LOCK(kvm);
+> +       KVM_MMU_LOCK_FOR_DIRTY_LOG_PROTECT(kvm);
+>         kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot, offset, mas=
+k);
+> -       KVM_MMU_UNLOCK(kvm);
+> +       KVM_MMU_UNLOCK_FOR_DIRTY_LOG_PROTECT(kvm);
+>  }
+>
+>  int kvm_dirty_ring_alloc(struct kvm_dirty_ring *ring, int index, u32 siz=
+e)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d1fd9cb5d037..74ae844e4ed0 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2279,7 +2279,7 @@ static int kvm_get_dirty_log_protect(struct kvm *kv=
+m, struct kvm_dirty_log *log)
+>                 dirty_bitmap_buffer =3D kvm_second_dirty_bitmap(memslot);
+>                 memset(dirty_bitmap_buffer, 0, n);
+>
+> -               KVM_MMU_LOCK(kvm);
+> +               KVM_MMU_LOCK_FOR_DIRTY_LOG_PROTECT(kvm);
+>                 for (i =3D 0; i < n / sizeof(long); i++) {
+>                         unsigned long mask;
+>                         gfn_t offset;
+> @@ -2295,7 +2295,7 @@ static int kvm_get_dirty_log_protect(struct kvm *kv=
+m, struct kvm_dirty_log *log)
+>                         kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, mems=
+lot,
+>                                                                 offset, m=
+ask);
+>                 }
+> -               KVM_MMU_UNLOCK(kvm);
+> +               KVM_MMU_UNLOCK_FOR_DIRTY_LOG_PROTECT(kvm);
+>         }
+>
+>         if (flush)
+> @@ -2390,7 +2390,7 @@ static int kvm_clear_dirty_log_protect(struct kvm *=
+kvm,
+>         if (copy_from_user(dirty_bitmap_buffer, log->dirty_bitmap, n))
+>                 return -EFAULT;
+>
+> -       KVM_MMU_LOCK(kvm);
+> +       KVM_MMU_LOCK_FOR_DIRTY_LOG_PROTECT(kvm);
+>         for (offset =3D log->first_page, i =3D offset / BITS_PER_LONG,
+>                  n =3D DIV_ROUND_UP(log->num_pages, BITS_PER_LONG); n--;
+>              i++, offset +=3D BITS_PER_LONG) {
+> @@ -2413,7 +2413,7 @@ static int kvm_clear_dirty_log_protect(struct kvm *=
+kvm,
+>                                                                 offset, m=
+ask);
+>                 }
+>         }
+> -       KVM_MMU_UNLOCK(kvm);
+> +       KVM_MMU_UNLOCK_FOR_DIRTY_LOG_PROTECT(kvm);
+>
+>         if (flush)
+>                 kvm_flush_remote_tlbs_memslot(kvm, memslot);
+> diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+> index ecefc7ec51af..39d8b809c303 100644
+> --- a/virt/kvm/kvm_mm.h
+> +++ b/virt/kvm/kvm_mm.h
+> @@ -20,6 +20,11 @@
+>  #define KVM_MMU_UNLOCK(kvm)            spin_unlock(&(kvm)->mmu_lock)
+>  #endif /* KVM_HAVE_MMU_RWLOCK */
+>
+> +#ifndef KVM_MMU_LOCK_FOR_DIRTY_LOG_PROTECT
+> +#define KVM_MMU_LOCK_FOR_DIRTY_LOG_PROTECT     KVM_MMU_LOCK
+> +#define KVM_MMU_UNLOCK_FOR_DIRTY_LOG_PROTECT   KVM_MMU_UNLOCK
+> +#endif
+> +
+>  kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible=
+,
+>                      bool *async, bool write_fault, bool *writable);
+>
+>
 
