@@ -1,111 +1,121 @@
-Return-Path: <kvm+bounces-13585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD3F2898C75
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 18:45:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0520C898CFA
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 19:07:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBCB31C21F87
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 16:45:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAB58284D90
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 17:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2F01F947;
-	Thu,  4 Apr 2024 16:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0591112D1EA;
+	Thu,  4 Apr 2024 17:07:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TSjTgkQI"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="F2H76ow5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CED11BDCD
-	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 16:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE09A12B82;
+	Thu,  4 Apr 2024 17:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712249131; cv=none; b=n22T75Ek8vO6qyrdgFeA+PUfmBVS1gBlpyXNy71QN8+b4zSJNiRV7QV7SwStuxmys0i+/MofBwHbVchodU5oPTZ/Xs4PoaOUD71LjRbzwNYb73UTsSD1f/WYIy5DK+MpnF5JPWwYKNUFYC3WZ2xv4BJ+cmA3z8VHcV7jwdl/0T0=
+	t=1712250451; cv=none; b=V1+t/HslF9Sciq0tZhHKq/TQ0ML2OnmcRIOQuC3W7tqgPbLRiodLHWP5W+BdqKU5A52R9Sfpozt37PEQnXQHvtJFwEWU3zxgQCn98W0ZSkqaSbylQ+PggJ16sN1f/wgTi9ewmu6SDQP9kQyiz2A0/fNgs1jih0ykjO5p0aSF6Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712249131; c=relaxed/simple;
-	bh=R2Q0YhYDoAdmS1G1vial4m1sbS4rAYQTKRYgPCb4YzE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aOpjQ/X0BYHy4VB+lmGjKzbjZlEwIchkJsbyDYOcyh4gvyPNqRVXp9GFW7t6NXd6qMtGQjS6WRGRqYdqDP81m8LNTwk1AJrjG1ygxtJcFOvJBRDBigH/bGl6MgeuTFkfmBtFw/dBF4d30RH7Zq5UTlAbQWWEV0M1R6gasBoVJJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TSjTgkQI; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a26c5f9944so924165a91.0
-        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 09:45:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712249129; x=1712853929; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OVoi6NefjZ/c/oxqYd/vI1BhozsfpX8kO//U2Kh2pO0=;
-        b=TSjTgkQI51TkaI/SeGvoWSBGvafrylrOaJY8zS6sHaF53ZtPaTQmD51uOac+G32whU
-         1lDLz/AJBk2ybIB4Yn5nFLeMrmyVjLKuYuZLBHm+ws0790L16UVmduZ/ZQAiK60zNJDA
-         sPlNmuSK+LAVkYz84IUwhbVCc4EKWkvTYTf1H5tSzDS3VHXtelFB0JGSNOMUGfCIhPza
-         qwvVoFsso3EuqIBzXQmb1QQ97G5e+1zbqhNmw5PTMNTAQ0whOYqvs5O4bHv8VXhE6mbU
-         v250K/jbovQobadfq28oFQPCP7kNfgZFWD3L6pf8JvSVcBv/ehZsOcPBQIPcr+4d5nEh
-         XevQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712249129; x=1712853929;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OVoi6NefjZ/c/oxqYd/vI1BhozsfpX8kO//U2Kh2pO0=;
-        b=wx7lOAyMBBPmf3cvG0qLw7cH8mGNpxrdc/lo9xuIl/l3oZve5Xd1jfTHHXXsJIYaBa
-         Pe507TsclJFXAK5z9Q45G11xSuXcD4gEMHpYqN7rG106WX7wV5K8Y6990oWF0Avcw8jx
-         OGeT4zOl5Zc8YCHUU1C+dvBkBkWC031eFlfmrTep26L05XR2MeXOSJztInVlw9aG/1ix
-         9/YHMJcNqjM5dojmxUDM9TSqNQGKH6b9PeQLEUGOrUMAnPuxtWCLUpq7fGvThZ/b188L
-         +TgYLlz/c5gdS3qN/7Sy/JtGg/Gr6LOx+lQNnTUEA4lpQPHetfnEieS8MjRj/dDF/vRL
-         dZIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUlIoQLTEhwNK3YYrVWFLZ/1Thx4jMrI7wza4BgCn3TJT1Xu3zeB2pnBzSpBletNlK5WguQVPXzYQjI9NmCkA66TQUO
-X-Gm-Message-State: AOJu0Yw1adhLDDOjC0fCCOzUMoR1c7uVD2ZPdn43NbZQ+Evgc7iz7twP
-	657gl+aM6W9oaOTZHAnNl586WMxkJLPSrtpbXmW1sNA6YuCQ28SLu0+F1Sg9kzrF8vjBZUQhPUk
-	vow==
-X-Google-Smtp-Source: AGHT+IHzgawHVh4ywKIvALLI1VYQ7Le+Uz6/53yKKCXMjdCI0rpXbu/V2XBId+DkTFab0AyEbOGamH6MDhQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:e60e:b0:2a2:8b25:745e with SMTP id
- j14-20020a17090ae60e00b002a28b25745emr3364pjy.0.1712249129364; Thu, 04 Apr
- 2024 09:45:29 -0700 (PDT)
-Date: Thu, 4 Apr 2024 09:45:27 -0700
-In-Reply-To: <ZeqSncClqOQqCO41@yzhao56-desk.sh.intel.com>
+	s=arc-20240116; t=1712250451; c=relaxed/simple;
+	bh=80vC5r0T6UXs+U9Ol1rgtY347RqFa7tSqjNTx7djY0I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jYYANVJQZOqxgDcVcc7hgNcIVifpK81bpTB7rIUTReZ+9aPRSxQU3ZK+C841EDDHpZ6B7DB7otbV5ghT3Gus/o1DKtARBQK4VewgcsgqSOTUEAIoSjVuZSS8KkO7G2RHJ6/jXpZ1EhKDagSRSF2ciZfxXwD688Cl5kQbdMsBh+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=F2H76ow5; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.66.208.34] (unknown [108.143.43.187])
+	by linux.microsoft.com (Postfix) with ESMTPSA id DB70B20E94A4;
+	Thu,  4 Apr 2024 10:07:27 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DB70B20E94A4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1712250449;
+	bh=72abs/jZSWLvmWAMUPLH/C4UA5U70IV/0GN6RCUuyvc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=F2H76ow5rcwnwLy2p9aJA7bpF0N9MZ1LBBjScin0cGtJ+3U+IvW4qtjHa9lPOsWhE
+	 WWGfoIGOOpTwTy8O6fJRl5HurbvSEUthk6qWqo6jbxldtkuuROfpwp7iTZjGIS/LPf
+	 /a6pgm6LVRPaKXZlfodKCCVWIx09r4ycXgPx/bto=
+Message-ID: <aecd56a4-0a88-4162-95ef-47561631f16e@linux.microsoft.com>
+Date: Thu, 4 Apr 2024 19:07:26 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240228024147.41573-1-seanjc@google.com> <20240228024147.41573-2-seanjc@google.com>
- <ZeqSncClqOQqCO41@yzhao56-desk.sh.intel.com>
-Message-ID: <Zg7ZJwQ0nOqwwmQI@google.com>
-Subject: Re: [PATCH 01/16] KVM: x86/mmu: Exit to userspace with -EFAULT if
- private fault hits emulation
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Michael Roth <michael.roth@amd.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] x86/CPU/AMD: Track SNP host status with
+ cc_platform_*()
+To: Borislav Petkov <bp@alien8.de>
+Cc: X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ KVM <kvm@vger.kernel.org>, Ashish Kalra <ashish.kalra@amd.com>,
+ Joerg Roedel <joro@8bytes.org>, Michael Roth <michael.roth@amd.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>
+References: <20240327154317.29909-1-bp@alien8.de>
+ <20240327154317.29909-6-bp@alien8.de>
+ <f6bb6f62-c114-4a82-bbaf-9994da8999cd@linux.microsoft.com>
+ <20240328134109.GAZgVzdfQob43XAIr9@fat_crate.local>
+ <ac4f34a0-036a-48b9-ab56-8257700842fc@linux.microsoft.com>
+ <20240328153914.GBZgWPIvLT6EXAPJci@fat_crate.local>
+Content-Language: en-CA
+From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+In-Reply-To: <20240328153914.GBZgWPIvLT6EXAPJci@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 08, 2024, Yan Zhao wrote:
-> On Tue, Feb 27, 2024 at 06:41:32PM -0800, Sean Christopherson wrote:
-> > @@ -320,6 +328,11 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> >  	else
-> >  		r = vcpu->arch.mmu->page_fault(vcpu, &fault);
-> >  
-> > +	if (r == RET_PF_EMULATE && fault.is_private) {
-> Should we just check VM type + RET_PF_EMULATE, and abort?
+On 28/03/2024 16:39, Borislav Petkov wrote:
+> On Thu, Mar 28, 2024 at 03:24:29PM +0100, Jeremi Piotrowski wrote:
+>> It's not but if you set it before the check it will be set for all AMD
+>> systems, even if they are neither CC hosts nor CC guests.
+> 
+> That a problem?
+> 
 
-No, the goal here is purely to ensure that emulation is never triggered for
-private memory.  Guarding against attempting emulation for a VM type that doesn't
-support emulation at all is something different.
+No problem now but I did find it odd that cc_vendor will now always be set for AMD but
+not for Intel. For Intel the various checks would automatically return true. Something
+to look out for in the future when adding CC_ATTR's - no one can assume that the checks
+will only run when actively dealing with confidential computing.
 
-And more concretely, as of this commit, all VM types that support private memory
-(i.e. SW_PROTECTED_VM) support emulation, just not for private memory.
+> It is under a CONFIG_ARCH_HAS_CC_PLATFORM...
+>>> To leave open the possibility of an SNP hypervisor running nested.
+> 
+> But !CC_ATTR_GUEST_SEV_SNP doesn't mean that. It means it is not
+> a SEV-SNP guest.
+> 
+>> I thought you wanted to filter out SEV-SNP guests, which also have
+>> X86_FEATURE_SEV_SNP CPUID bit set.
+> 
+> I want to run snp_probe_rmptable_info() only on baremetal where it makes
+> sense.
+>>> My understanding is that these are the cases:
+>>
+>> CPUID(SEV_SNP) | MSR(SEV_SNP)     | what am I
+>> ---------------------------------------------
+>> set            | set              | SNP-guest
+>> set            | unset            | SNP-host
+>> unset          | ??               | not SNP
+> 
+> So as you can see, we can't use X86_FEATURE_SEV_SNP for anything due to
+> the late disable need. So we should be moving away from it.
+> 
 
-> If r is RET_PF_EMULATE, and fault is caused by accesing a shared address,
-> the emulation code could still meet error if guest page table pages are in
-> private memory, right?
+I see your point about the disable needing to happen late - but then how about we remove
+the setup_clear_cpu_cap(X86_FEATURE_SEV_SNP) too? No code depends on it any more and it would
+help my cause as well.
 
-Yes, which is why I squeezed in a documentation update for v6.8 to make it super
-clear that SW_PROTECTED_VM is a development vehicle, i.e. that trying to use it
-to run a real VM is all but guaranteed to cause explosions.
+> So we need a test for "am I a nested SNP hypervisor?"
+> 
+> So, can your thing clear X86_FEATURE_HYPERVISOR and thus "emulate"
+> baremetal?
+> 
+
+Can't do that... it is a VM and hypervisor detection and various paravirt interfaces depend on
+X86_FEATURE_HYPERVISOR.
+
+
 
