@@ -1,239 +1,211 @@
-Return-Path: <kvm+bounces-13572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13573-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A3A898A3A
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 16:35:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF13898B60
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 17:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE128B23ABB
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 14:35:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EF08B20CC2
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 15:44:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83BD412A176;
-	Thu,  4 Apr 2024 14:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562F312AAF8;
+	Thu,  4 Apr 2024 15:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="A8ccUrd2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F9sQt9QK"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1AF12BEA7;
-	Thu,  4 Apr 2024 14:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77CE12AAE4
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 15:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712241254; cv=none; b=s5JSknyzkM3VPzWlFXDfCWKYK8BvfHP03983FRBc0WR880zs7JGuk98Mo38bkpSpgRWKwFnEOarZXHpCx0t0CZqEECU4lskjOWud3lKV953m6anQ8GBJEIw3W+1goVA3GUip5j3HcRGyaGXnTLAfZnnx1qMeS2a2mNTPeNatp/s=
+	t=1712245466; cv=none; b=l9arBS5aTrZiPy7SOBdGkkvkIVIt39z0vHsnn8a8SCt6Gv0wvYLz54D7EprVQaIi6ySSVAkUzlhCnueijd/A4A9gP03hY8ojknCncrmEqK/WGIUw7CFSR5hvtuOlZyZ3hEpkX1vdNwSfXTuTLpM+M09xNAav6UUom7TrRftW40w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712241254; c=relaxed/simple;
-	bh=UweJMPWSHz002boLwW3AxxWDPZioxuRX7pcSYXIAcoE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=luyZUigooyBNMiLE/2oRCoLfw6u8pF05YVuc+dJfQgTJZsc5hlyeNabnvCcQejA4DFeSKrGYAhK242XeTIpDQIQtnB0eXU78SkV8xtqq8pLaUMMlsv1YQ5Zuf51WyBQy9DLxy0AU4zNWfqmI/BdgUFkEGiRzdqw3Hjb62ZYmgIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A8ccUrd2; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=NuUKfzaeEJCMOWN1J3SrwQILxzqqiweT/7Ij/zZSuX8=; b=A8ccUrd2CBxQ9eI5j1KqDl9dzu
-	hOoPK/eKFx/0bqZDceyNlPtpvrhhBjPjs3y2s7o6s/wgbr7TKVq9ubXKGcZ7MwoFhyR7xkppVGFEN
-	LAfSyJb0oK26B/4ijreWIDf7RmrHJ+ZU2Ccz/YLQ3yBoK4y4FdkRcLj3Zfl7Noch35iz4ip2yfqqp
-	meAANY4er6I3WYGTUWt3zCsMZRqOy7TQhCA7YRx7dc4MZBpYZj27kxxoxN+cr6glzvZtc6VbKpuCe
-	1F85dq3kq9sNOEiGTs+1TlFK4upFhKdkGVf+dn30yKJtRy7pg8QbwXxh1zykm711USLk2VS0eQAQc
-	1VgmofoA==;
-Received: from [2001:8b0:10b:5:701b:6482:5251:39d9] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rsOAL-00000008EqO-0WhH;
-	Thu, 04 Apr 2024 14:34:09 +0000
-Message-ID: <d18bb252013df73abc0de662008f399cf77e78cf.camel@infradead.org>
-Subject: Re: [PATCH 1/1] KVM: selftests: add kvmclock drift test
-From: David Woodhouse <dwmw2@infradead.org>
-To: Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com, 
-	linux-kernel@vger.kernel.org, joe.jin@oracle.com
-Date: Thu, 04 Apr 2024 15:34:08 +0100
-In-Reply-To: <20240106083346.29180-1-dongli.zhang@oracle.com>
-References: <20240106083346.29180-1-dongli.zhang@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Si+JKDVtpi7QO87q+IMn"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1712245466; c=relaxed/simple;
+	bh=vUEXAE1ExZO22iPT/l5kPykxw4x6Cg0n7E0NIdHXubk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u0D65s40RJp3cqyI2jUPnPs4kj6iRecjH/qEmrDtUv9a1ocihoTbDG3NsSZDMwkBCOhy6RKlzIdM5lCeQ4XptJ14CrK4nAtPeBNjw0W1eB0BFMNV+V77oxWIn4BZHcSug50BURaD8QiF9/5aNFNNyndn5XESZnl1w+0CZKsI3ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F9sQt9QK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712245462;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=vSFCbNcwIq07vP682jf5aQYwrzaaEsHEuv2Mm/EFPIc=;
+	b=F9sQt9QKMLl/Be3qaqQP8vaECFdDzkj2BEe6HPntESXizsuiF8DB7aNg04Z4gfAFcpiJ/F
+	mVh67mdufk/oRVD8FxXWs1qMnPOE+jOG4Gv5VnKQK9CBlxG0Oq5kvdz5YPz8tiLFypXrOX
+	QyE02UsxjQYdPsyxNftty9gKAyFk7b4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-55-YMU_zOQZPPOSc1k_sIVmSw-1; Thu, 04 Apr 2024 11:44:21 -0400
+X-MC-Unique: YMU_zOQZPPOSc1k_sIVmSw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-343678d2d26so620477f8f.0
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 08:44:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712245460; x=1712850260;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vSFCbNcwIq07vP682jf5aQYwrzaaEsHEuv2Mm/EFPIc=;
+        b=G+w8HFcmAG5oh1ULZD8j5bCd9gWv4Jzr6eeVhf8txnlVUD8723D+ChkBH3zqDQS7DM
+         kGZJkVh7TBmLKNhRTV/V4DIz4jpnl34HDyjLJkN6+mBuPYzkI5g5SjhgG8+oVmT+9f+/
+         d+zveIwvaV41PYr2LgNtpp7221oN4UnAjh2DsV4W+OnqmNR0NghEwvREBIOIxbPYdo+6
+         X7EvqegGTdeeVKSVzDywyZMnmuNCgYyTs7ktHaKElVKOCWCOQOK8sbr0/osP9g+YOHHV
+         uqC0X7j+S04lny89SWT8MXpoygWNkI7jbhYfhYueM1POi8rVvffyfRmyvEcXVliskHFz
+         ma4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUGhhNj3jtPlHr8WF2aghi/zFiKusXk4XGbqIxW7IL4sBzpkqhiSaQPuWX+Of/+udjkSTmyIcCAkh2wzX3hg1ey67CN
+X-Gm-Message-State: AOJu0YyMHanDPiTZEFkyPBlSgAhKv9/wHVJ9rZ195EZ0JWFtwmKaZz97
+	aRxw7BWss0YQwhUsKKdB3/ONnx1VHaFLW5XATxZGzE/uwqhlZhtxdAYUjv5nmerJfJ9OAb30lpW
+	zSTegH3nLyMID/RA4fqzFdQmQd2/PrUXeb7xEJOBxjSNMYGbaXw==
+X-Received: by 2002:adf:e702:0:b0:343:8022:dd08 with SMTP id c2-20020adfe702000000b003438022dd08mr3103484wrm.0.1712245460459;
+        Thu, 04 Apr 2024 08:44:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFN2CJF3oIK4dnV/TEXgxl3MIzYjlSGFX1sv9jk5lJQFvPHeGcLCBfb34ox+kHl6yHVh+2enw==
+X-Received: by 2002:adf:e702:0:b0:343:8022:dd08 with SMTP id c2-20020adfe702000000b003438022dd08mr3103464wrm.0.1712245460113;
+        Thu, 04 Apr 2024 08:44:20 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c743:de00:7030:120f:d1c9:4c3c? (p200300cbc743de007030120fd1c94c3c.dip0.t-ipconnect.de. [2003:cb:c743:de00:7030:120f:d1c9:4c3c])
+        by smtp.gmail.com with ESMTPSA id bs26-20020a056000071a00b003439b45ca08sm4625123wrb.17.2024.04.04.08.44.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 08:44:19 -0700 (PDT)
+Message-ID: <42dbf562-5eab-4f82-ad77-5ee5b8c79285@redhat.com>
+Date: Thu, 4 Apr 2024 17:44:18 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/4] KVM: x86/mmu: Rework marking folios
+ dirty/accessed
+To: Sean Christopherson <seanjc@google.com>
+Cc: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ David Stevens <stevensd@chromium.org>, Matthew Wilcox <willy@infradead.org>
+References: <20240320005024.3216282-1-seanjc@google.com>
+ <4d04b010-98f3-4eae-b320-a7dd6104b0bf@redhat.com>
+ <CALzav=eLH+V_5Y6ZWsRkmnbEb6fxPa55B7xyWxP3o6qsrs_nHA@mail.gmail.com>
+ <a2fff462-dfe6-4979-a7b2-131c6e0b5017@redhat.com>
+ <ZgygGmaEuddZGKyX@google.com>
+ <ca1f320b-dc06-48e0-b4f5-ce860a72f0e2@redhat.com>
+ <Zg3V-M3iospVUEDU@google.com>
+Content-Language: en-US
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <Zg3V-M3iospVUEDU@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 04.04.24 00:19, Sean Christopherson wrote:
+> On Wed, Apr 03, 2024, David Hildenbrand wrote:
+>> On 03.04.24 02:17, Sean Christopherson wrote:
+>>> On Tue, Apr 02, 2024, David Hildenbrand wrote:
+>>> Aha!  But try_to_unmap_one() also checks that refcount==mapcount+1, i.e. will
+>>> also keep the folio if it has been GUP'd.  And __remove_mapping() explicitly states
+>>> that it needs to play nice with a GUP'd page being marked dirty before the
+>>> reference is dropped.
+>>
+>>>
+>>> 	 * Must be careful with the order of the tests. When someone has
+>>> 	 * a ref to the folio, it may be possible that they dirty it then
+>>> 	 * drop the reference. So if the dirty flag is tested before the
+>>> 	 * refcount here, then the following race may occur:
+>>>
+>>> So while it's totally possible for KVM to get a W=1,D=0 PTE, if I'm reading the
+>>> code correctly it's safe/legal so long as KVM either (a) marks the folio dirty
+>>> while holding a reference or (b) marks the folio dirty before returning from its
+>>> mmu_notifier_invalidate_range_start() hook, *AND* obviously if KVM drops its
+>>> mappings in response to mmu_notifier_invalidate_range_start().
+>>>
+>>
+>> Yes, I agree that it should work in the context of vmscan. But (b) is
+>> certainly a bit harder to swallow than "ordinary" (a) :)
+> 
+> Heh, all the more reason to switch KVM x86 from (b) => (a).
 
---=-Si+JKDVtpi7QO87q+IMn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+:)
 
-On Sat, 2024-01-06 at 00:33 -0800, Dongli Zhang wrote:
-> There is kvmclock drift issue during the vCPU hotplug. It has been fixed =
-by
-> the commit c52ffadc65e2 ("KVM: x86: Don't unnecessarily force masterclock
-> update on vCPU hotplug").
->=20
-> This is to add the test to verify if the master clock is updated when we
-> write 0 to MSR_IA32_TSC from the host side.
->=20
-> Here is the usage example on the KVM with the bugfix reverted.
->=20
-> $ ./kvm_clock_drift -v -p 5
-> kvmclock based on old pvclock_vcpu_time_info: 5012221999
-> =C2=A0 version:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 2
-> =C2=A0 tsc_timestamp:=C2=A0=C2=A0=C2=A0=C2=A0 3277968
-> =C2=A0 system_time:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 11849519
-> =C2=A0 tsc_to_system_mul: 2152530255
-> =C2=A0 tsc_shift:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0
-> =C2=A0 flags:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 1
->=20
-> kvmclock based on new pvclock_vcpu_time_info: 5012222411
-> =C2=A0 version:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 4
-> =C2=A0 tsc_timestamp:=C2=A0=C2=A0=C2=A0=C2=A0 9980576184
-> =C2=A0 system_time:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 5012222411
-> =C2=A0 tsc_to_system_mul: 2152530255
-> =C2=A0 tsc_shift:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0
-> =C2=A0 flags:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 1
->=20
-> =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-> =C2=A0 x86_64/kvm_clock_drift.c:216: clock_old =3D=3D clock_new
-> =C2=A0 pid=3D14257 tid=3D14257 errno=3D4 -  Interrupted system call
-> =C2=A0=C2=A0=C2=A0=C2=A0 1=C2=A0=C2=A00x000000000040277b: main at kvm_clo=
-ck_drift.c:216
-> =C2=A0=C2=A0=C2=A0=C2=A0 2=C2=A0=C2=A00x00007f7766fa7e44: ?? ??:0
-> =C2=A0=C2=A0=C2=A0=C2=A0 3=C2=A0=C2=A00x000000000040286d: _start at ??:?
-> =C2=A0 kvmclock drift detected, old=3D5012221999, new=3D5012222411
->=20
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> 
+>> As raised, if having a writable SPTE would imply having a writable+dirty
+>> PTE, then KVM MMU code wouldn't have to worry about syncing any dirty bits
+>> ever back to core-mm, so patch #2 would not be required. ... well, it would
+>> be replaces by an MMU notifier that notifies about clearing the PTE dirty
+>> bit :)
+> 
+> Hmm, we essentially already have an mmu_notifier today, since secondary MMUs need
+> to be invalidated before consuming dirty status.  Isn't the end result essentially
+> a sane FOLL_TOUCH?
 
-We should extend this to cover live update =E2=80=94 it should create a
-*second* KVM, migrate the guest including its clock information to
-that, and validate that the kvmclock information still doesn't change.
+Likely. As stated in my first mail, FOLL_TOUCH is a bit of a mess right now.
 
-Ideally during a leap second.
+Having something that makes sure the writable PTE/PMD is dirty (or 
+alternatively sets it dirty), paired with MMU notifiers notifying on any 
+mkclean would be one option that would leave handling how to handle 
+dirtying of folios completely to the core. It would behave just like a 
+CPU writing to the page table, which would set the pte dirty.
 
+Of course, if frequent clearing of the dirty PTE/PMD bit would be a 
+problem (like we discussed for the accessed bit), that would not be an 
+option. But from what I recall, only clearing the PTE/PMD dirty bit is 
+rather rare.
 
+I think this GUP / GUP-user setting of folio dirty bits is a bit of a 
+mess, but it seems to be working so far, so ... who am I to judge :)
 
+-- 
+Cheers,
 
---=-Si+JKDVtpi7QO87q+IMn
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+David / dhildenb
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNDA0MTQzNDA4WjAvBgkqhkiG9w0BCQQxIgQgTbm5/3Qm
-cGgUluSzo2R8+ZCa3TSOV170zNR34AKmKG4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAZt9iErEU8Hq+BuFaIltBNfeeHB2eEFT5C
-fYD+r7CN3C6UnnDrkbOU9Dgz/H6+3m2XnTbZoOA1cnFQnvpKf0V5MMHIDfUUf4fLq0KHfkgcYQFo
-8nKW50V/e8umnFYlVGPGO4CjIMizracR1n6/KhmWdMPNVP1nZuJxiBL3pg3vAyJ63tMLEkrr0LOs
-0QDvWzFe7rkdpBJ+wjKzZJccRGc9KtgN9MXn/7qtRuvjJhseGoq4I7G2Suj5oIiB1wZl0EVIbGif
-K3uUZsHdhlnZbVNzVkZIifugpi68K/m6Fk9ZnjTBTXIdEK08Nl4NisTsofGKcDlPf7ZDvufPUWux
-S0qCeMF1OdCAu//b0eBjvYUBd4S7FSrmX3LFOigeDlbAq1dJbFkbs9w04xGNqb3WI/vH/7Fhyz9u
-V7I2WeZTfq/9A6lPc57qP/2NPCNk1K4A4+XOVeiiQ5xpmaWzr2Ex2YY+S9adsaKjUjWQWOP+LAgz
-73Keerct6OfOD5J9YhLx5vGnfLE4vzjn3tTk/FiY999HI+irAl7AnvjHiZV3KMYw7Kmhl64TDTkT
-vw/vGSnMnpMOHtILk5k4wNBU2O1YfbtaWLwc1ab3/MlvxJkT+EGp+1u+xLtarLhcfJ0PPu2fzdoj
-EpN3gaQCL6mxOl0shOnO4D6FNhJkL/nyIe0DzZdb2gAAAAAAAA==
-
-
---=-Si+JKDVtpi7QO87q+IMn--
 
