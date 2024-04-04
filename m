@@ -1,137 +1,126 @@
-Return-Path: <kvm+bounces-13534-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13535-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2CD898635
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 13:42:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BB9B898654
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 13:46:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB0F91F2816F
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 11:42:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B2C31C213E0
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 11:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9CB8595C;
-	Thu,  4 Apr 2024 11:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B09184D12;
+	Thu,  4 Apr 2024 11:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BzpYfce4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="imXQUNzc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B8983CA5
-	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 11:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173A47350E
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 11:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712230893; cv=none; b=LdEVc0L8BVkBf93QHwbwLh/U6YUUOfpas+mlQC2qdxXWagjPqty8YT4KAajOTpbbLRpNNi1WijgvRkSzfVAdoF4yLqlmspnh2oHS8E7ZAccFmoVcVQUhRKQfc5h7cFQenvNimSK8xy4IJYIgRyGZxNlFCBTwRjRKXOPjBEu51Ps=
+	t=1712231182; cv=none; b=HYaCmvYIivqF3E3Rf0/zyUUUh1+bv5T3bSbG096XsWh8Mu9qjQEsv1Ydd4hVJ0Yf9dvok7mhMmhdHWujYOik+FAVWmtQvj67YCfDMR7iBJF6BgGQbMN4ydjhlKeePQI+CETV8lmkFj2HUmau93CIIHBsUpiq2CyZrzCzI1zhgz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712230893; c=relaxed/simple;
-	bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
+	s=arc-20240116; t=1712231182; c=relaxed/simple;
+	bh=VnjSFH3iLfjXOB26l2DmGIorjHrUwNNABt8C5zuouVo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CbnfdACCpKM7Uc4gFzSIuRFwmKigKjPc5Isqa3rKxlnO63rflNgyWp4oa0Igwxjgy2oh4JUrhAaah0aW3A+CPVh9rXkfOvXd7DPrtRkicJR4IW2sgEQ52w1orcJR64JjxayzrJEsSVFNY9/+GTeLqwau8Gxc92lTxEoXyw1GGzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BzpYfce4; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dd10ebcd702so1002336276.2
-        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 04:41:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712230889; x=1712835689; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
-        b=BzpYfce4q/zv0gCorIvWLSXuzW4HjLtqKmXuLtELMIG7pv5Gw5rD2es8aCVqQFqD//
-         8JggHBzNznjWgNLq2nD9WBWW0NsYaidmHqnL2ihAYJpv7o5gc1VJY6DJ0clWC7aekflL
-         okxkVaJGNSO0qVH2yOxsFJLCq+7hYpnwhkr7HgXgiRTKZmRNaOv51pSZ+2EvNJ7l32Ax
-         3rV1o60Rwqf7/3WoHSX+9OLMYTDALVEnxQwPAvQSTwkL+2+b5q+pMv+fOiTCP+zwNcc+
-         ViJk4rxb2Vw07nE8VHUP+XT2krjKR9JIgTGsriDdaif1hRFImGjHsjVSH1La3PcFbNJH
-         hkUg==
+	 To:Cc:Content-Type; b=nFJZwd+zaoGzd4vmkT6gkT+nBBmkOpG3mZlYzVodMREGaPL50QDtnogQtzERh9nsl4g9ONpIAgMuPCIyTNRy2q1P5+yNva12vD8mDUXuU8KoyKxAMUUx3ej6zZE2fM4LIOiPLNK2FgF2b6x//SR5htLNfjXOH1+tSVTWpACwS3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=imXQUNzc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712231180;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=os6s6yWf+KEySppA6UtqmMO50Okp6hSrMyagRzZf4EU=;
+	b=imXQUNzcWUb0Nhh1PAPCYqStTV1hHsnngk0JKEJ0Pz+cy71DOaOyiOiOR2mSqIQ73wiRcJ
+	4rkAa0dnGJMQMMrymv7pMgSLJCmOkExefRIMN8fyWqSKO/09h0njQAOlTnrrqYFYCk1P+U
+	9naBG14CuClBiiXJL0jjKvIZTd/XhwY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-499-vfWGG11vMnSU0AW5omQQyA-1; Thu, 04 Apr 2024 07:46:18 -0400
+X-MC-Unique: vfWGG11vMnSU0AW5omQQyA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4156184fe60so4422715e9.1
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 04:46:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712230889; x=1712835689;
+        d=1e100.net; s=20230601; t=1712231177; x=1712835977;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
-        b=Mbvx8YElHCtJfVn25BxdibGH0Vk6Ohu9Vx46L8EWlSXMgk1fkHbEhRnBhj+rKYEkvg
-         ko4VPnM9p17bMaZT0CNzXPgszEvC2Th2CVr5lVgikNirJQlEfo8OLHZAJKYIuEhaidp0
-         J9lAo/elP2MLooPa1uEYFo9oOQUwCB+/UXglz5RjUkPTNXHqMnFb4t3jzQPa8cEID+Je
-         bzM0mNyrOOpdppyH2M6lgYnmTFUKso4OnUpnrhPzHfASQ9oIPjrgPr+Y43I8CMhpkU43
-         MNzD7F5l0M+EubxuP/gq3gTyBQxh3i1rsUM0uGn0oiWYRg8g/AqCeVQCHHcmljxrefHf
-         swRw==
-X-Forwarded-Encrypted: i=1; AJvYcCXjN915iBXqlgIhF5fwNr0+f6jz4dg0sJkk2SHHjUUc0IKqzAIQwQ75TbwiU/DT9s90zwQZ6+maoTVuiTOTV4rnxF7U
-X-Gm-Message-State: AOJu0YylXXga2MO0b/Tn0RYwhh2q/FhOt1/1a3oNC2n6YAuGqrpwZMo0
-	vSkvQkCWEryLKsLkVdrkM52P7hQxpoKXZXFFxSPEiQ5446HB5wYmWuMzEy9TdwzpldWZi825Exw
-	PoueNL3KGc+ad3ukytUwi10qWnXIKhaBxrD595g==
-X-Google-Smtp-Source: AGHT+IEhL+O4bSIOCRsSy+Vdywn61xtrVBJ3li47sHwN1FOt8H7g9W+tj2/Or7rao9/9euGeRsXbtXq4vPMz7+GnZRc=
-X-Received: by 2002:a25:ba86:0:b0:dd1:6fab:81e4 with SMTP id
- s6-20020a25ba86000000b00dd16fab81e4mr2034373ybg.37.1712230889318; Thu, 04 Apr
- 2024 04:41:29 -0700 (PDT)
+        bh=os6s6yWf+KEySppA6UtqmMO50Okp6hSrMyagRzZf4EU=;
+        b=KDPfYERcbNMpDMmLtZZOBw7jaobjgwOT3kdHu2Hy7iAQ2NIObEn06f0YWRvTjwRkQp
+         /KeXXIU69O/o5MdMh/1zgNALrka9ZVRyner5rGZdRW34P6Juwt6VW0AJgPSQynrIkUIL
+         Mrpxo3AbwnsWqW0+cIH2q8sEf8ml7CaDRGlRyDTUJ8Li3+3/wai+gsj0ClvA9IAzaXMo
+         BIk6HSYl2kPAzr6WhHp6CYk1ubKLJTJw00utNjwGZj/yBlkcInzR8a5xJNsmJg00vjt5
+         gqRL5VpQVUvOilIndfnlgke5KlhNmqo4/lGIG5JSB5UNeoORdNGQS7ydeYOdoKnWIZB+
+         Pgig==
+X-Forwarded-Encrypted: i=1; AJvYcCVwer5BzJJuJyV49jEbXQQHRDz8shdGY7eDSbkCSDev9G5Pw+P66XvKWg9M1In/tD/0RtSdR1YOQWJ6g/FrX61JQWgl
+X-Gm-Message-State: AOJu0YzqXYEKrCo2PbyQFERvvUzyNfQeKspfUrZ92Es4MYi7M8lAsyr+
+	iP7Nq/g/wA1UZOz7Vzr/3z7500BN8YwDEVHEmxwTWwsxpQE0XuWAhYXD8Sexy+LPr1RyQZHhldo
+	sdaiAariAVU4JfGBfNCJefRKEYc9jV7FpPqvzrW73HSIpCc5vZLni0X2U63YMAJZjt3R9sTEpjm
+	O4z462E5Kp+Uw/Bsp5EgYH7r6Q
+X-Received: by 2002:a05:600c:3b18:b0:416:23d8:e88d with SMTP id m24-20020a05600c3b1800b0041623d8e88dmr1516456wms.26.1712231177631;
+        Thu, 04 Apr 2024 04:46:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFSGC2Xe5+h41NT6Q/UZflxkyEyGkJ8Z1k8bGJSLWOaE2vJxyPqfMC3aZQbF61P/IiWV6l7IdDRNFCc18PrB0=
+X-Received: by 2002:a05:600c:3b18:b0:416:23d8:e88d with SMTP id
+ m24-20020a05600c3b1800b0041623d8e88dmr1516437wms.26.1712231177219; Thu, 04
+ Apr 2024 04:46:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org> <20240331-module-owner-virtio-v2-12-98f04bfaf46a@linaro.org>
-In-Reply-To: <20240331-module-owner-virtio-v2-12-98f04bfaf46a@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 4 Apr 2024 13:41:18 +0200
-Message-ID: <CACRpkdYpVUq1SgxnPVfRdTiNg3o8dcBePxoxu9GRYy6LdzUE5A@mail.gmail.com>
-Subject: Re: [PATCH v2 12/25] gpio: virtio: drop owner assignment
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, 
-	David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Sudeep Holla <sudeep.holla@arm.com>, 
-	Cristian Marussi <cristian.marussi@arm.com>, Viresh Kumar <vireshk@kernel.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>, 
-	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Daniel Vetter <daniel@ffwll.ch>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Joerg Roedel <joro@8bytes.org>, 
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
-	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
-	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
-	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
-	linux-sound@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Viresh Kumar <viresh.kumar@linaro.org>
+References: <20240318233352.2728327-1-pbonzini@redhat.com> <20240318233352.2728327-6-pbonzini@redhat.com>
+ <20240325235918.GR2357401@ls.amr.corp.intel.com>
+In-Reply-To: <20240325235918.GR2357401@ls.amr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 4 Apr 2024 13:46:05 +0200
+Message-ID: <CABgObfZzkNiP3q8p=KpvvFnh8m6qcHX4=tATaJc7cvVv2QWpJQ@mail.gmail.com>
+Subject: Re: [PATCH v4 05/15] KVM: SEV: publish supported VMSA features
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
+	seanjc@google.com, isaku.yamahata@linux.intel.com, rick.p.edgecombe@intel.com, 
+	xiaoyao.li@intel.com, kai.huang@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 31, 2024 at 10:45=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
-
-> virtio core already sets the .owner, so driver does not need to.
+On Tue, Mar 26, 2024 at 1:04=E2=80=AFAM Isaku Yamahata <isaku.yamahata@inte=
+l.com> wrote:
 >
-> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> On Mon, Mar 18, 2024 at 07:33:42PM -0400,
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> > Compute the set of features to be stored in the VMSA when KVM is
+> > initialized; move it from there into kvm_sev_info when SEV is initializ=
+ed,
+> > and then into the initial VMSA.
+> >
+> > The new variable can then be used to return the set of supported featur=
+es
+> > to userspace, via the KVM_GET_DEVICE_ATTR ioctl.
+>
+> Hi. The current TDX KVM introduces KVM_TDX_CAPABILITIES and struct
+> kvm_tdx_capabilities for feature enumeration.  I'm wondering if TDX shoul=
+d also
+> use/switch to KVM_GET_DEVICE_ATTR with its own group.  What do you think?
+> Something like
+>
+> #define KVM_DEVICE_ATTR_GROUP_SEV       1
+> #define KVM_X86_SEV_VMSA_FEATURES       1
+> #define KVM_X86_SEV_xxx                 ...
+>
+> #define KVM_DEVICE_ATTR_GROUP_TDX       2
+> #define KVM_X86_TDX_xxx                 ...
 
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
+Yes, that's a very good idea. I've added the group argument in v5.
 
-Yours,
-Linus Walleij
+Paolo
+
 
