@@ -1,126 +1,507 @@
-Return-Path: <kvm+bounces-13535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BB9B898654
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 13:46:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B72898683
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 13:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B2C31C213E0
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 11:46:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4336C1C20D92
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 11:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B09184D12;
-	Thu,  4 Apr 2024 11:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335C384D3B;
+	Thu,  4 Apr 2024 11:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="imXQUNzc"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="eqeO7W6F"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173A47350E
-	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 11:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3784A84D08
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 11:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712231182; cv=none; b=HYaCmvYIivqF3E3Rf0/zyUUUh1+bv5T3bSbG096XsWh8Mu9qjQEsv1Ydd4hVJ0Yf9dvok7mhMmhdHWujYOik+FAVWmtQvj67YCfDMR7iBJF6BgGQbMN4ydjhlKeePQI+CETV8lmkFj2HUmau93CIIHBsUpiq2CyZrzCzI1zhgz0=
+	t=1712231580; cv=none; b=AfgSug+LXfSSXaXnUCvZwtRlMsZZPMid0hI2IneXDXj6V0VbWdSC5jx5gWV+2CKAUTwl/kxAYl3GYhp8NJuGdUb5p4BocZiOWjD61SwZLsBp7eZTOZYQPy4EuH7sa9XIoetsZDnefefgU9DWtIE9PyF2xVaFZ/IJ7ODmq72iHmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712231182; c=relaxed/simple;
-	bh=VnjSFH3iLfjXOB26l2DmGIorjHrUwNNABt8C5zuouVo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nFJZwd+zaoGzd4vmkT6gkT+nBBmkOpG3mZlYzVodMREGaPL50QDtnogQtzERh9nsl4g9ONpIAgMuPCIyTNRy2q1P5+yNva12vD8mDUXuU8KoyKxAMUUx3ej6zZE2fM4LIOiPLNK2FgF2b6x//SR5htLNfjXOH1+tSVTWpACwS3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=imXQUNzc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712231180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=os6s6yWf+KEySppA6UtqmMO50Okp6hSrMyagRzZf4EU=;
-	b=imXQUNzcWUb0Nhh1PAPCYqStTV1hHsnngk0JKEJ0Pz+cy71DOaOyiOiOR2mSqIQ73wiRcJ
-	4rkAa0dnGJMQMMrymv7pMgSLJCmOkExefRIMN8fyWqSKO/09h0njQAOlTnrrqYFYCk1P+U
-	9naBG14CuClBiiXJL0jjKvIZTd/XhwY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-499-vfWGG11vMnSU0AW5omQQyA-1; Thu, 04 Apr 2024 07:46:18 -0400
-X-MC-Unique: vfWGG11vMnSU0AW5omQQyA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4156184fe60so4422715e9.1
-        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 04:46:18 -0700 (PDT)
+	s=arc-20240116; t=1712231580; c=relaxed/simple;
+	bh=wWkKjgCWHLj/69CRjOCjoNg0CCYQndHxbt51bncGABI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VdYalSBTP/do9G3OcIYu5OTZbB7+fKNw3i0xN9A/dF5LOSJbiSD2AOff4ctfRngXlrnkvQ8aM+5xjh+BhE6HDcNfVPkVKefsayn3gRkOgI6ONwo9A1VBChdmD1KwYSCFAdbb2y0vt59ofjG4PBj/VhKqOY07dYQN9vHzJ2FGjoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=eqeO7W6F; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56e0f359240so1109632a12.0
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 04:52:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1712231576; x=1712836376; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=D8o1BluEBbcYLN3Xq338VBTyPp2JVEWHZv5f3jLTR74=;
+        b=eqeO7W6FuQA/8fcjdsNhmjn4DzA322NG75ybVOswQhjFeC5HuYN7vckZDRmJi3NOr/
+         Q4dHBFYizp67GiGmQZuNU1tFxxMLJy2pvoaa6SgRZ23qxG6wjH/4DfjwtDwfavUIjvw1
+         AktjoOAjud9CgqQ+3vpBPEQj0ZQQjIGdj8QI0XfrfsWJ+WX03nvCwYn+vHYzihP94tYK
+         oGBjHIlin32zIfaDH+f771AwJCAprT7HLug2YDTJ/9Q8cvayUAl8A6usieZAZkEb8o3U
+         soX/ERqrYslrw4Bf7dhK5TB8I7GC3ydZhwwxA3fKe4qeyZdjt69xFFeplejHA+rXdSzx
+         PGMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712231177; x=1712835977;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=os6s6yWf+KEySppA6UtqmMO50Okp6hSrMyagRzZf4EU=;
-        b=KDPfYERcbNMpDMmLtZZOBw7jaobjgwOT3kdHu2Hy7iAQ2NIObEn06f0YWRvTjwRkQp
-         /KeXXIU69O/o5MdMh/1zgNALrka9ZVRyner5rGZdRW34P6Juwt6VW0AJgPSQynrIkUIL
-         Mrpxo3AbwnsWqW0+cIH2q8sEf8ml7CaDRGlRyDTUJ8Li3+3/wai+gsj0ClvA9IAzaXMo
-         BIk6HSYl2kPAzr6WhHp6CYk1ubKLJTJw00utNjwGZj/yBlkcInzR8a5xJNsmJg00vjt5
-         gqRL5VpQVUvOilIndfnlgke5KlhNmqo4/lGIG5JSB5UNeoORdNGQS7ydeYOdoKnWIZB+
-         Pgig==
-X-Forwarded-Encrypted: i=1; AJvYcCVwer5BzJJuJyV49jEbXQQHRDz8shdGY7eDSbkCSDev9G5Pw+P66XvKWg9M1In/tD/0RtSdR1YOQWJ6g/FrX61JQWgl
-X-Gm-Message-State: AOJu0YzqXYEKrCo2PbyQFERvvUzyNfQeKspfUrZ92Es4MYi7M8lAsyr+
-	iP7Nq/g/wA1UZOz7Vzr/3z7500BN8YwDEVHEmxwTWwsxpQE0XuWAhYXD8Sexy+LPr1RyQZHhldo
-	sdaiAariAVU4JfGBfNCJefRKEYc9jV7FpPqvzrW73HSIpCc5vZLni0X2U63YMAJZjt3R9sTEpjm
-	O4z462E5Kp+Uw/Bsp5EgYH7r6Q
-X-Received: by 2002:a05:600c:3b18:b0:416:23d8:e88d with SMTP id m24-20020a05600c3b1800b0041623d8e88dmr1516456wms.26.1712231177631;
-        Thu, 04 Apr 2024 04:46:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHFSGC2Xe5+h41NT6Q/UZflxkyEyGkJ8Z1k8bGJSLWOaE2vJxyPqfMC3aZQbF61P/IiWV6l7IdDRNFCc18PrB0=
-X-Received: by 2002:a05:600c:3b18:b0:416:23d8:e88d with SMTP id
- m24-20020a05600c3b1800b0041623d8e88dmr1516437wms.26.1712231177219; Thu, 04
- Apr 2024 04:46:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712231576; x=1712836376;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D8o1BluEBbcYLN3Xq338VBTyPp2JVEWHZv5f3jLTR74=;
+        b=fGyDZ2gbhCJlScuOSFoUf0oApsq/AJeeuM9j0JGakMMcRHfpPXgUf1Sh0PZVCxGEs0
+         JrSSUeTXoGU29XoKtRlr/YEF9GgqxM/xUdmTvrSyxzj3BsecZ6xqIfHcvPXuSvwkDrzR
+         tmMJwRYVJrdI5cQgBBYriNtsNdi/rk2mSB7zaRkPtrBjOIwMa/BLykvZ7utvW7dPx+sC
+         VsHKFShA4PeKj4x2/hyorp46l1EGTD45zKlV+6S8TA9+tloqOe8M2USwAduz5pFrRXns
+         /poONEJUspMSeCAm/gok54Q8V57u41GrH93I7FakwIAdSuV5EJf2Ur4sGwARoWYvBuwF
+         35Ig==
+X-Forwarded-Encrypted: i=1; AJvYcCXXmrrd5MnOiq+EQOHpaccXxfAQXVrCGhcT7465PPX9OVkNAXCOhuJ5QvO6iFJf2cmSwMcMi/b4bLDcLWFUR67AQtbH
+X-Gm-Message-State: AOJu0Yx9ENuKdQnRPojbH9RghWIFxu1CqZlOXk9cQDORL96hrZt2NFZi
+	3RURjuT+n9W+SouG0uv1hdEN9BG2MHAFA40sUGG+QH3rCgAMb5Shkf3viOKOk28=
+X-Google-Smtp-Source: AGHT+IHvG33ZU7NQIl4xlwphowIrwoPoKcjiItt9rNMqLO2Jx6WfwC9jA1F0IupZiEpV7TRPVror7g==
+X-Received: by 2002:a17:906:dc1:b0:a4f:a291:cca2 with SMTP id p1-20020a1709060dc100b00a4fa291cca2mr1306512eji.31.1712231576477;
+        Thu, 04 Apr 2024 04:52:56 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id i15-20020a170906090f00b00a4e5866448bsm5972957ejd.155.2024.04.04.04.52.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 04:52:55 -0700 (PDT)
+Date: Thu, 4 Apr 2024 13:52:55 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Anup Patel <anup@brainfault.org>, Conor Dooley <conor.dooley@microchip.com>, 
+	Ajay Kaher <akaher@vmware.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Alexey Makhalov <amakhalov@vmware.com>, Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Will Deacon <will@kernel.org>, x86@kernel.org
+Subject: Re: [PATCH v5 06/22] drivers/perf: riscv: Implement SBI PMU snapshot
+ function
+Message-ID: <20240404-4303d1805800fad18b6d9768@orel>
+References: <20240403080452.1007601-1-atishp@rivosinc.com>
+ <20240403080452.1007601-7-atishp@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240318233352.2728327-1-pbonzini@redhat.com> <20240318233352.2728327-6-pbonzini@redhat.com>
- <20240325235918.GR2357401@ls.amr.corp.intel.com>
-In-Reply-To: <20240325235918.GR2357401@ls.amr.corp.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 4 Apr 2024 13:46:05 +0200
-Message-ID: <CABgObfZzkNiP3q8p=KpvvFnh8m6qcHX4=tATaJc7cvVv2QWpJQ@mail.gmail.com>
-Subject: Re: [PATCH v4 05/15] KVM: SEV: publish supported VMSA features
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
-	seanjc@google.com, isaku.yamahata@linux.intel.com, rick.p.edgecombe@intel.com, 
-	xiaoyao.li@intel.com, kai.huang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240403080452.1007601-7-atishp@rivosinc.com>
 
-On Tue, Mar 26, 2024 at 1:04=E2=80=AFAM Isaku Yamahata <isaku.yamahata@inte=
-l.com> wrote:
->
-> On Mon, Mar 18, 2024 at 07:33:42PM -0400,
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> > Compute the set of features to be stored in the VMSA when KVM is
-> > initialized; move it from there into kvm_sev_info when SEV is initializ=
-ed,
-> > and then into the initial VMSA.
-> >
-> > The new variable can then be used to return the set of supported featur=
-es
-> > to userspace, via the KVM_GET_DEVICE_ATTR ioctl.
->
-> Hi. The current TDX KVM introduces KVM_TDX_CAPABILITIES and struct
-> kvm_tdx_capabilities for feature enumeration.  I'm wondering if TDX shoul=
-d also
-> use/switch to KVM_GET_DEVICE_ATTR with its own group.  What do you think?
-> Something like
->
-> #define KVM_DEVICE_ATTR_GROUP_SEV       1
-> #define KVM_X86_SEV_VMSA_FEATURES       1
-> #define KVM_X86_SEV_xxx                 ...
->
-> #define KVM_DEVICE_ATTR_GROUP_TDX       2
-> #define KVM_X86_TDX_xxx                 ...
+On Wed, Apr 03, 2024 at 01:04:35AM -0700, Atish Patra wrote:
+> SBI v2.0 SBI introduced PMU snapshot feature which adds the following
+> features.
+> 
+> 1. Read counter values directly from the shared memory instead of
+> csr read.
+> 2. Start multiple counters with initial values with one SBI call.
+> 
+> These functionalities optimizes the number of traps to the higher
+> privilege mode. If the kernel is in VS mode while the hypervisor
+> deploy trap & emulate method, this would minimize all the hpmcounter
+> CSR read traps. If the kernel is running in S-mode, the benefits
+> reduced to CSR latency vs DRAM/cache latency as there is no trap
+> involved while accessing the hpmcounter CSRs.
+> 
+> In both modes, it does saves the number of ecalls while starting
+> multiple counter together with an initial values. This is a likely
+> scenario if multiple counters overflow at the same time.
+> 
+> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+> Reviewed-by: Anup Patel <anup@brainfault.org>
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  drivers/perf/riscv_pmu.c       |   1 +
+>  drivers/perf/riscv_pmu_sbi.c   | 216 +++++++++++++++++++++++++++++++--
+>  include/linux/perf/riscv_pmu.h |   6 +
+>  3 files changed, 211 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/perf/riscv_pmu.c b/drivers/perf/riscv_pmu.c
+> index c78a6fd6c57f..3a941b2c3888 100644
+> --- a/drivers/perf/riscv_pmu.c
+> +++ b/drivers/perf/riscv_pmu.c
+> @@ -404,6 +404,7 @@ struct riscv_pmu *riscv_pmu_alloc(void)
+>  		cpuc->n_events = 0;
+>  		for (i = 0; i < RISCV_MAX_COUNTERS; i++)
+>  			cpuc->events[i] = NULL;
+> +		cpuc->snapshot_addr = NULL;
+>  	}
+>  	pmu->pmu = (struct pmu) {
+>  		.event_init	= riscv_pmu_event_init,
+> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> index a83ae82301e3..8c3475d55433 100644
+> --- a/drivers/perf/riscv_pmu_sbi.c
+> +++ b/drivers/perf/riscv_pmu_sbi.c
+> @@ -58,6 +58,9 @@ PMU_FORMAT_ATTR(event, "config:0-47");
+>  PMU_FORMAT_ATTR(firmware, "config:63");
+>  
+>  static bool sbi_v2_available;
+> +static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
+> +#define sbi_pmu_snapshot_available() \
+> +	static_branch_unlikely(&sbi_pmu_snapshot_available)
+>  
+>  static struct attribute *riscv_arch_formats_attr[] = {
+>  	&format_attr_event.attr,
+> @@ -508,14 +511,108 @@ static int pmu_sbi_event_map(struct perf_event *event, u64 *econfig)
+>  	return ret;
+>  }
+>  
+> +static void pmu_sbi_snapshot_free(struct riscv_pmu *pmu)
+> +{
+> +	int cpu;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		struct cpu_hw_events *cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
+> +
+> +		if (!cpu_hw_evt->snapshot_addr)
+> +			continue;
+> +
+> +		free_page((unsigned long)cpu_hw_evt->snapshot_addr);
+> +		cpu_hw_evt->snapshot_addr = NULL;
+> +		cpu_hw_evt->snapshot_addr_phys = 0;
+> +	}
+> +}
+> +
+> +static int pmu_sbi_snapshot_alloc(struct riscv_pmu *pmu)
+> +{
+> +	int cpu;
+> +	struct page *snapshot_page;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		struct cpu_hw_events *cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
+> +
+> +		if (cpu_hw_evt->snapshot_addr)
+> +			continue;
+> +
+> +		snapshot_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
+> +		if (!snapshot_page) {
+> +			pmu_sbi_snapshot_free(pmu);
+> +			return -ENOMEM;
+> +		}
+> +		cpu_hw_evt->snapshot_addr = page_to_virt(snapshot_page);
+> +		cpu_hw_evt->snapshot_addr_phys = page_to_phys(snapshot_page);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int pmu_sbi_snapshot_disable(void)
+> +{
+> +	struct sbiret ret;
+> +
+> +	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM, -1,
+> +			-1, 0, 0, 0, 0);
+> +	if (ret.error) {
+> +		pr_warn("failed to disable snapshot shared memory\n");
+> +		return sbi_err_map_linux_errno(ret.error);
+> +	}
 
-Yes, that's a very good idea. I've added the group argument in v5.
+Also need to set snapshot_set_done to false, but I'm not yet convinced
+that we need snapshot_set_done, especially if we don't allow
+snapshot_addr_phys to be zero, since zero can then mean set-not-done,
+but ~0UL is probably a better invalid physical address choice than zero.
 
-Paolo
+> +
+> +	return 0;
+> +}
+> +
+> +static int pmu_sbi_snapshot_setup(struct riscv_pmu *pmu, int cpu)
+> +{
+> +	struct cpu_hw_events *cpu_hw_evt;
+> +	struct sbiret ret = {0};
+> +
+> +	cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
+> +	if (!cpu_hw_evt->snapshot_addr_phys)
+> +		return -EINVAL;
+> +
+> +	if (cpu_hw_evt->snapshot_set_done)
+> +		return 0;
+> +
+> +	if (IS_ENABLED(CONFIG_32BIT))
+> +		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
+> +				cpu_hw_evt->snapshot_addr_phys,
+> +				(u64)(cpu_hw_evt->snapshot_addr_phys) >> 32, 0, 0, 0, 0);
+> +	else
+> +		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
+> +				cpu_hw_evt->snapshot_addr_phys, 0, 0, 0, 0, 0);
+> +
+> +	/* Free up the snapshot area memory and fall back to SBI PMU calls without snapshot */
+> +	if (ret.error) {
+> +		if (ret.error != SBI_ERR_NOT_SUPPORTED)
+> +			pr_warn("pmu snapshot setup failed with error %ld\n", ret.error);
+> +		return sbi_err_map_linux_errno(ret.error);
+> +	}
+> +
+> +	cpu_hw_evt->snapshot_set_done = true;
+> +
+> +	return 0;
+> +}
+> +
+>  static u64 pmu_sbi_ctr_read(struct perf_event *event)
+>  {
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	int idx = hwc->idx;
+>  	struct sbiret ret;
+>  	u64 val = 0;
+> +	struct riscv_pmu *pmu = to_riscv_pmu(event->pmu);
+> +	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+> +	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
+>  	union sbi_pmu_ctr_info info = pmu_ctr_list[idx];
+>  
+> +	/* Read the value from the shared memory directly */
+> +	if (sbi_pmu_snapshot_available()) {
+> +		val = sdata->ctr_values[idx];
+> +		return val;
+> +	}
+> +
+>  	if (pmu_sbi_is_fw_event(event)) {
+>  		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ,
+>  				hwc->idx, 0, 0, 0, 0, 0);
+> @@ -565,6 +662,7 @@ static void pmu_sbi_ctr_start(struct perf_event *event, u64 ival)
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	unsigned long flag = SBI_PMU_START_FLAG_SET_INIT_VALUE;
+>  
+> +	/* There is no benefit setting SNAPSHOT FLAG for a single counter */
+>  #if defined(CONFIG_32BIT)
+>  	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, hwc->idx,
+>  			1, flag, ival, ival >> 32, 0);
+> @@ -585,16 +683,36 @@ static void pmu_sbi_ctr_stop(struct perf_event *event, unsigned long flag)
+>  {
+>  	struct sbiret ret;
+>  	struct hw_perf_event *hwc = &event->hw;
+> +	struct riscv_pmu *pmu = to_riscv_pmu(event->pmu);
+> +	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+> +	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
+>  
+>  	if ((hwc->flags & PERF_EVENT_FLAG_USER_ACCESS) &&
+>  	    (hwc->flags & PERF_EVENT_FLAG_USER_READ_CNT))
+>  		pmu_sbi_reset_scounteren((void *)event);
+>  
+> +	if (sbi_pmu_snapshot_available())
+> +		flag |= SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
+> +
+>  	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, hwc->idx, 1, flag, 0, 0, 0);
+> -	if (ret.error && (ret.error != SBI_ERR_ALREADY_STOPPED) &&
+> -		flag != SBI_PMU_STOP_FLAG_RESET)
+> +	if (!ret.error && sbi_pmu_snapshot_available()) {
+> +		/*
+> +		 * The counter snapshot is based on the index base specified by hwc->idx.
+> +		 * The actual counter value is updated in shared memory at index 0 when counter
+> +		 * mask is 0x01. To ensure accurate counter values, it's necessary to transfer
+> +		 * the counter value to shared memory. However, if hwc->idx is zero, the counter
+> +		 * value is already correctly updated in shared memory, requiring no further
+> +		 * adjustment.
+> +		 */
+> +		if (hwc->idx > 0) {
+> +			sdata->ctr_values[hwc->idx] = sdata->ctr_values[0];
+> +			sdata->ctr_values[0] = 0;
+> +		}
+> +	} else if (ret.error && (ret.error != SBI_ERR_ALREADY_STOPPED) &&
+> +		flag != SBI_PMU_STOP_FLAG_RESET) {
+>  		pr_err("Stopping counter idx %d failed with error %d\n",
+>  			hwc->idx, sbi_err_map_linux_errno(ret.error));
+> +	}
+>  }
+>  
+>  static int pmu_sbi_find_num_ctrs(void)
+> @@ -652,10 +770,14 @@ static inline void pmu_sbi_stop_all(struct riscv_pmu *pmu)
+>  static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
+>  {
+>  	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+> +	unsigned long flag = 0;
+> +
+> +	if (sbi_pmu_snapshot_available())
+> +		flag = SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
+>  
+>  	/* No need to check the error here as we can't do anything about the error */
+>  	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, 0,
+> -		  cpu_hw_evt->used_hw_ctrs[0], 0, 0, 0, 0);
+> +		  cpu_hw_evt->used_hw_ctrs[0], flag, 0, 0, 0);
+>  }
+>  
+>  /*
+> @@ -664,11 +786,10 @@ static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
+>   * while the overflowed counters need to be started with updated initialization
+>   * value.
+>   */
+> -static inline void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
+> -					       unsigned long ctr_ovf_mask)
+> +static noinline void pmu_sbi_start_ovf_ctrs_sbi(struct cpu_hw_events *cpu_hw_evt,
+> +						unsigned long ctr_ovf_mask)
+>  {
+>  	int idx = 0;
+> -	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+>  	struct perf_event *event;
+>  	unsigned long flag = SBI_PMU_START_FLAG_SET_INIT_VALUE;
+>  	unsigned long ctr_start_mask = 0;
+> @@ -703,6 +824,48 @@ static inline void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
+>  	}
+>  }
+>  
+> +static noinline void pmu_sbi_start_ovf_ctrs_snapshot(struct cpu_hw_events *cpu_hw_evt,
+> +						     unsigned long ctr_ovf_mask)
+> +{
+> +	int idx = 0;
+> +	struct perf_event *event;
+> +	unsigned long flag = SBI_PMU_START_FLAG_INIT_SNAPSHOT;
+> +	u64 max_period, init_val = 0;
+> +	struct hw_perf_event *hwc;
+> +	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
+> +
+> +	for_each_set_bit(idx, cpu_hw_evt->used_hw_ctrs, RISCV_MAX_COUNTERS) {
+> +		if (ctr_ovf_mask & (BIT(idx))) {
 
+Unnecessary () around BIT()
+
+> +			event = cpu_hw_evt->events[idx];
+> +			hwc = &event->hw;
+> +			max_period = riscv_pmu_ctr_get_width_mask(event);
+> +			init_val = local64_read(&hwc->prev_count) & max_period;
+> +			sdata->ctr_values[idx] = init_val;
+> +		}
+> +		/*
+> +		 * We do not need to update the non-overflow counters the previous
+> +		 * value should have been there already.
+> +		 */
+> +	}
+> +
+> +	for (idx = 0; idx < BITS_TO_LONGS(RISCV_MAX_COUNTERS); idx++) {
+> +		/* Start all the counters in a single shot */
+> +		sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, idx * BITS_PER_LONG,
+> +			  cpu_hw_evt->used_hw_ctrs[idx], flag, 0, 0, 0);
+> +	}
+> +}
+> +
+> +static void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
+> +					unsigned long ctr_ovf_mask)
+> +{
+> +	struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
+> +
+> +	if (sbi_pmu_snapshot_available())
+> +		pmu_sbi_start_ovf_ctrs_snapshot(cpu_hw_evt, ctr_ovf_mask);
+> +	else
+> +		pmu_sbi_start_ovf_ctrs_sbi(cpu_hw_evt, ctr_ovf_mask);
+> +}
+> +
+>  static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
+>  {
+>  	struct perf_sample_data data;
+> @@ -716,6 +879,7 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
+>  	unsigned long overflowed_ctrs = 0;
+>  	struct cpu_hw_events *cpu_hw_evt = dev;
+>  	u64 start_clock = sched_clock();
+> +	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
+>  
+>  	if (WARN_ON_ONCE(!cpu_hw_evt))
+>  		return IRQ_NONE;
+> @@ -737,8 +901,10 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
+>  	pmu_sbi_stop_hw_ctrs(pmu);
+>  
+>  	/* Overflow status register should only be read after counter are stopped */
+> -	ALT_SBI_PMU_OVERFLOW(overflow);
+> -
+> +	if (sbi_pmu_snapshot_available())
+> +		overflow = sdata->ctr_overflow_mask;
+> +	else
+> +		ALT_SBI_PMU_OVERFLOW(overflow);
+>  	/*
+>  	 * Overflow interrupt pending bit should only be cleared after stopping
+>  	 * all the counters to avoid any race condition.
+> @@ -819,6 +985,9 @@ static int pmu_sbi_starting_cpu(unsigned int cpu, struct hlist_node *node)
+>  		enable_percpu_irq(riscv_pmu_irq, IRQ_TYPE_NONE);
+>  	}
+>  
+> +	if (sbi_pmu_snapshot_available())
+> +		return pmu_sbi_snapshot_setup(pmu, cpu);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -831,6 +1000,9 @@ static int pmu_sbi_dying_cpu(unsigned int cpu, struct hlist_node *node)
+>  	/* Disable all counters access for user mode now */
+>  	csr_write(CSR_SCOUNTEREN, 0x0);
+>  
+> +	if (sbi_pmu_snapshot_available())
+> +		return pmu_sbi_snapshot_disable();
+> +
+>  	return 0;
+>  }
+>  
+> @@ -1106,10 +1278,6 @@ static int pmu_sbi_device_probe(struct platform_device *pdev)
+>  	pmu->event_unmapped = pmu_sbi_event_unmapped;
+>  	pmu->csr_index = pmu_sbi_csr_index;
+>  
+> -	ret = cpuhp_state_add_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->node);
+> -	if (ret)
+> -		return ret;
+> -
+>  	ret = riscv_pm_pmu_register(pmu);
+>  	if (ret)
+>  		goto out_unregister;
+> @@ -1118,8 +1286,32 @@ static int pmu_sbi_device_probe(struct platform_device *pdev)
+>  	if (ret)
+>  		goto out_unregister;
+>  
+> +	/* SBI PMU Snapsphot is only available in SBI v2.0 */
+> +	if (sbi_v2_available) {
+> +		ret = pmu_sbi_snapshot_alloc(pmu);
+> +		if (ret)
+> +			goto out_unregister;
+> +
+> +		ret = pmu_sbi_snapshot_setup(pmu, smp_processor_id());
+> +		if (!ret) {
+> +			pr_info("SBI PMU snapshot detected\n");
+> +			/*
+> +			 * We enable it once here for the boot cpu. If snapshot shmem setup
+> +			 * fails during cpu hotplug process, it will fail to start the cpu
+> +			 * as we can not handle hetergenous PMUs with different snapshot
+> +			 * capability.
+> +			 */
+> +			static_branch_enable(&sbi_pmu_snapshot_available);
+> +		}
+> +		/* Snapshot is an optional feature. Continue if not available */
+> +	}
+> +
+>  	register_sysctl("kernel", sbi_pmu_sysctl_table);
+>  
+> +	ret = cpuhp_state_add_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->node);
+> +	if (ret)
+> +		return ret;
+
+This should be goto out_unregister, and in the case of sbi_v2_available we
+also need a pmu_sbi_snapshot_free() and a pmu_sbi_snapshot_disable().
+
+> +
+>  	return 0;
+>  
+>  out_unregister:
+> diff --git a/include/linux/perf/riscv_pmu.h b/include/linux/perf/riscv_pmu.h
+> index 43282e22ebe1..c3fa90970042 100644
+> --- a/include/linux/perf/riscv_pmu.h
+> +++ b/include/linux/perf/riscv_pmu.h
+> @@ -39,6 +39,12 @@ struct cpu_hw_events {
+>  	DECLARE_BITMAP(used_hw_ctrs, RISCV_MAX_COUNTERS);
+>  	/* currently enabled firmware counters */
+>  	DECLARE_BITMAP(used_fw_ctrs, RISCV_MAX_COUNTERS);
+> +	/* The virtual address of the shared memory where counter snapshot will be taken */
+> +	void *snapshot_addr;
+> +	/* The physical address of the shared memory where counter snapshot will be taken */
+> +	phys_addr_t snapshot_addr_phys;
+> +	/* Boolean flag to indicate setup is already done */
+> +	bool snapshot_set_done;
+>  };
+>  
+>  struct riscv_pmu {
+> -- 
+> 2.34.1
+>
+
+Thanks,
+drew
 
