@@ -1,171 +1,144 @@
-Return-Path: <kvm+bounces-13528-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13529-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F7289852C
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 12:38:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13ABE89857C
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 12:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70A1C1F256CC
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 10:38:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2E4D283935
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 10:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F312B7F7C1;
-	Thu,  4 Apr 2024 10:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3159C823CA;
+	Thu,  4 Apr 2024 10:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="N0Tku08m"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ls25L0vf"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2096.outbound.protection.outlook.com [40.107.93.96])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3741C6B8;
-	Thu,  4 Apr 2024 10:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.96
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712227102; cv=fail; b=ukoa35tfMVbgBNUp1nw9XEyvMamB2G8PhR8rtSq0/rmKd17STpTTNif4WCfEB4arTvJljtNhDywCxSE8zfD4kGwjHDKTwpIcCIGGrEnmYHPq7ByAxzAWWVZX1RJOvyVdYi0eiGZO38Qd4kl6gXde+VRmkQoQiSZg5Q/tPm5XDFA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712227102; c=relaxed/simple;
-	bh=ce2X+W7J5yHTQRJbtwRV5+toBa1yVgjKmgRTkIwLMuw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=H2CjkNZ7nuAOCeY2PB0SmOWLFVtZqQA658ubXNSGR+B8a3f03doDxHzwByqdwIZcokkTisTnXvAANpTMmeHVlVBElIcWrc+Hpr+8tOpQhepQsnXKcwAdVb3rs1CmySq4WBYafMhMNe7ax5xVfNJ02KSvviRos2dzlzha47RGHOI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=N0Tku08m; arc=fail smtp.client-ip=40.107.93.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ECIyBudrHFP/w/UIRdujn6xJbDjpiBiUvKnX/UT88W2luBrdPRtT3ZHTJ0rDu68DKAuPK2eHhgfR+yEmP+1L5im+JTmO/FBpC5xzVsbFZsDQEbUuGrnFMIOZnjG9ZI2kFrtQkAwbqDZewG6jddkIeO5cOpsmp/cTW1proClSe/0OcDUHEj7j/tKoPovcPC7ILNA7KunVg/yiSF1oclg2InHSVaMhluFhgKM0i/X3y0poqVX7ZPflLgh+9cDsMqM6CEV4pZ2AxDu6hL+Xge9gM7XPq210wf6DQIChdoGjOTrbtrRG2GCksJIk5+ddPgz0oWpiLHYfwCfCt8WFESYO5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dPBYFj20X8orD0Pb6kHWiV6BH/cDPZZXwJCaj0RzfGw=;
- b=BhpwpKkhg2lLVT3aaJPRnZOQ52jD+32UEbpT5pxtgf80P6Ylki4+N5WovC69Gft51QayDsf+ZssV5t8p2MJEvvkVlI12Aooslrz1KDCDPIq9M7QXBbjiAes/R3y/alRmYPn8/Beanpi7Dy+GUeG57lSjeO32AW9H9eYJ49g4DbS89677QKqk4dhbzyjnRl4c73mNqJlrlutVkPi5A7hP9E5EiURd70qTjL1C2fImRlHOurVJf4vS0Un2t821EeRm81Twk7djLhfvilTxSjkXWwJ2qs8+NwrRZS3LD+vg/pD87Dit9vnmqPNHkbWwpmcssacxgyCrVdDyd/nkyS22LA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dPBYFj20X8orD0Pb6kHWiV6BH/cDPZZXwJCaj0RzfGw=;
- b=N0Tku08mb/LYj0SNX7X9q+MxC3w5Qp+eFYCaIxnUXYOr0s6tp9Ys5hrAK3AqRVn8iKrXxGcJgmHFob0NEPRgnUQiQ8HFx/zLB9LL9dWrk+dTfhwLRe9xQcx2uRRzo87ebeLfRY9Ls6rv1HdSMs/36Uq5ta6wr0nmhFTCF/ktd/I=
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- PH7PR12MB5617.namprd12.prod.outlook.com (2603:10b6:510:133::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.46; Thu, 4 Apr 2024 10:38:15 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::60b6:438a:bff1:cd14]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::60b6:438a:bff1:cd14%6]) with mapi id 15.20.7409.031; Thu, 4 Apr 2024
- 10:38:15 +0000
-Message-ID: <7cce8ff0-8f56-d9fe-b7c8-83fc30ef184c@amd.com>
-Date: Thu, 4 Apr 2024 16:08:05 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2 2/3] KVM: selftests: Extend @shape to allow creation of
- VM without in-kernel APIC
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- pbonzini@redhat.com, shuah@kernel.org, nikunj@amd.com,
- thomas.lendacky@amd.com, ajones@ventanamicro.com,
- Manali Shukla <manali.shukla@amd.com>
-References: <20240401152032.4284-1-manali.shukla@amd.com>
- <20240401152032.4284-3-manali.shukla@amd.com> <ZgrrtnZCllrt-3TD@google.com>
-From: Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <ZgrrtnZCllrt-3TD@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0188.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:e8::11) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046007FBB1
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 10:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712228202; cv=none; b=dRfuDA169cIq2UOoS+XLvnmjl8CmGIaZ0C1bgnW4UcrM2kRagelA66/mnJrrmaF/ndcGTVvQkwA3tQ2NPDLJkyyV2IWcPXnnxWyHydrXXo3+VndfwKywom1MsQXzuF13BIQOgvPGYBlyAbwFvL4bG0dk35RL91r0i9JPuIRt0/E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712228202; c=relaxed/simple;
+	bh=ILJL7HVZXiFmQJJigk5doa9mj2osaYbOmdnt4D25RYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kB2qPfOd7dVr1VE8F04FgIWMeIYrr6CsxrsQ/CQlhL/+WgXJQhvXKj0/TDGSF5yocq4DrgQTFdbTw1nQv45xnWJ5vL9dtoZrkIR0SZa0X/K7BeKPFxg9tAZKAljiD5dF7LrkujlCW9K7wGPaatKrqSk/J95nySwL60LqKoyGbP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ls25L0vf; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-343c7fae6e4so215841f8f.1
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 03:56:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1712228198; x=1712832998; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EFHFiM3SNW59iwbZR58YbB15YVKnaSxrhFOdislttik=;
+        b=ls25L0vf8AIRxamXmlvbryDGvwgL6FELj8Kc/p9WXITVooxCUcq3h6CSkdjN13lBXI
+         RsEHJkOqC7ueTL37LjjW7vf6VuIgcPZbxodGleL8KM83g/OVLGkTmrM+7wWidbF65W1X
+         aOd/rQwYOXsTkjwn0k7fB1l5iidi3SpHGwTjuBmuMpXexC3MJEzgCtxJtJIzlHUqQA8X
+         hfGDEQKJDSlAY1rl6X0Wlx9FNEuYvCnHB9H3CtgZ6Yb4Ze79ZWynrhpV8ZB2s0epx3Fb
+         0OLauckwBZZQ23IGiCUtzY6mN2mZ6QyeYtqEYs0c5EvFkCMb1cep6+q6Ofu3gpTCpnFd
+         Vw7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712228198; x=1712832998;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EFHFiM3SNW59iwbZR58YbB15YVKnaSxrhFOdislttik=;
+        b=Yn0yCwZ1S1NE/kVowRWCjpXWHtgWv8Q7IBSx40tjApSAOvWHQWCjIZUEnlSdA+ep5p
+         /0gymabx7ZIZVSi5QHe1lnqkZuGwwUYpIXle/6+hEbEOdX+ZmNBnZBZsAaqJWfNYiooJ
+         nRS5lLk647+z1py/Ggd04r+Db9lxRVONYeImZe1XyxrRowAcN27PeGcQQqYJ+n/8mXZy
+         3uODMTB5cPePLrGoa/gzqDwPtt7wan0xuF+CtWufd9VzEgk4BGIzy6c6JcYNdaEowyxA
+         4jDUr4PWofYo+TxEQSk3WeZ6BQ1K+kIH+bme0V186dopZwfbmS+l7Mv6W7wdNlBlD0xY
+         vd1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUQgCnpDowuU9yRBaU/lPduVQ/yMurypyYLg1Ib4/zE9sSqJmGtsN/XNqYZgOgDc5+THLMaXyhqqcBhcILUmHKZKK2O
+X-Gm-Message-State: AOJu0YzSWS953W3B+swLyo3z+iQJnIZSJH5ynzCFctV3hPrpGEbUjx88
+	S7yIWl+J/Y+lqPVSTMKj0vWPeayLo9DBAk4ibNxGI6W+qROu+iJhpkmgFhq71Vo=
+X-Google-Smtp-Source: AGHT+IENSyz17ALt9X+5ZUYzaEpWJFzo0+v4zqkPSZygVwnsdSsHijcp2D+46t60iJ6/39PaQMtB1w==
+X-Received: by 2002:a05:6000:1805:b0:343:7158:aace with SMTP id m5-20020a056000180500b003437158aacemr1379890wrh.17.1712228198219;
+        Thu, 04 Apr 2024 03:56:38 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id f10-20020a0560001b0a00b00341dbb4a3a7sm19705617wrz.86.2024.04.04.03.56.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 03:56:37 -0700 (PDT)
+Date: Thu, 4 Apr 2024 12:56:36 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: linux-kernel@vger.kernel.org, 
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Anup Patel <anup@brainfault.org>, Ajay Kaher <akaher@vmware.com>, 
+	Alexandre Ghiti <alexghiti@rivosinc.com>, Alexey Makhalov <amakhalov@vmware.com>, 
+	Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Will Deacon <will@kernel.org>, x86@kernel.org
+Subject: Re: [PATCH v5 01/22] RISC-V: Fix the typo in Scountovf CSR name
+Message-ID: <20240404-9c750d13d89168feb5ff34de@orel>
+References: <20240403080452.1007601-1-atishp@rivosinc.com>
+ <20240403080452.1007601-2-atishp@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|PH7PR12MB5617:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	cMvqAcJi7hI8vwwjcdUzRuUrwBcOabh3U/p7/mnoMCT40uEt2OcP0k5TZzL8sl5tYxH9ba8uWqgX8oDdB+4JmlsF3Pqkq5OCzFvKcg3KaqLUYdpBvVvj2mxGohGtwGpc45546jAolAN05onVd1sHBbZ0Mr9TuAx0+Pq/bM66gb9j4nUdma85yCynYC6Dc5dhPoZ1OQWQpMwkZp+LKycxAh94SkTD47VOgVgLTkvgyxKCueUm/cKriuliolhifl/JOkRoVb8v9bUxZ0drYkUtsTrYlbZS5d3qgKNBV1GNG/Zi1ZFipFOnhUx9/VG9bM5bDbRLOiLG6ys2mfSmTwjiR1150HMizziND822OsW8QG5Hpqdx/iRUQm5+Rr63vTyvQQFsyPRhG6b/fErF+apd1z05DzXzjvKLxu7xV/fXleTZriZ/mGv6pLbCWeB6LabpqPW9cLaXwQj+E+jnbS4QuU1EZCM1F0sCKhSbgVFjgrxJ9JPIzSszq6Jj99hue1hemF8KdbMC3AF+IV0D0T5HPIVcZ6tOby+SLxwHV7LA/qpEy5/CJIDT282FqF2EKCr7ZpWSw086nA6hxChYkedg8YKmpoVgxywNxbhABolYOgVW7fBSzL8nx2d8ii7yy7MUHHIRkXl0reR/5WmHKAoks2e3q3JfEat0RCNqxhufbWs=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QmVUcGxoQ2NxV1hPNzNUUG03VmZSY2l4N1dpNGN4Smh5eEdUM1V4MS9uZ3Bn?=
- =?utf-8?B?K3RncmRzRjBncUlnQUFsNndsWEdJOW1hbEtBQUVKWitRQ1ZEaWVHSy92cCtn?=
- =?utf-8?B?OTg3ZWFxK2pBOFhuQkFQRnNwWFJJeWdwaHpkQjZaNk9vVkxRb1pHamIyNWw3?=
- =?utf-8?B?YkgrQ1JlOVFWYjYyUmRBSjJTcWo3UlhjZERpYzhwb0pJZWhWVTJQM1ZXTU9w?=
- =?utf-8?B?ODBaTWwyRGYrQ0hrRUhyM2x3TEE2eDE3UnIvSDFvdG5WNi96MTQ5cDkwWjVH?=
- =?utf-8?B?cklmTlZRUHkxZW02d1FaR1c5YUg5aXRqcnY2VHVmTmZvRFJCaE8zeHVkVGg4?=
- =?utf-8?B?WG1Nclo5MTZlU0Z6QjBtU1BuY3NRUlVvWC9MTDNmemtOd1A3UzBNNUZPNzhZ?=
- =?utf-8?B?a0JMN1VLN0VEdElEZVE4OHNOcDNTdXRyWUNTUSsrM2loUHVqU2ZocUt6RmZD?=
- =?utf-8?B?TVc1b1dnUDV0TDg5UzMwVXloQS9UZGNoVjVGSDRMZG15UU8yck84SW9uTTBN?=
- =?utf-8?B?SWR2Z2UyQVdQam9Vakw4dUNkV3haU3UxQWh6dUd3RGZyUEllZmppcUppQlRz?=
- =?utf-8?B?TXBKMy93ZEc5ald1ZXlLMy9ZcEZWRVlaVHo0aTkrdXVUU1YvcmJETGZjVVhQ?=
- =?utf-8?B?dXRLMFVFYUFQQnZJZEJLMGVXSWtkblJ4bzlaODVPVFNydUlMUHVtWXFnU2Np?=
- =?utf-8?B?UGRQOGN4eERkR1dZRkJBdlN3K2hVa3QzUkY2Q05LMjVuaVJVY0pWOHdYamZC?=
- =?utf-8?B?WjQrN1V2YlJQNnB3R0RzOSt0bGhyMUIyYzV4VnBvUDhGRWpJczJjd1laNlpw?=
- =?utf-8?B?a2lNUHB0d0hXYmxCQ0ZzWWdrQWRrMTJOOGtqL1NVTEhzcUlpeFJpb3ZPVEs5?=
- =?utf-8?B?V0tEYjBZV2lNRFlqRkhoWDFZOEphZzFnNGRHMCtWemdoOEhLMVYzUFlNVVZU?=
- =?utf-8?B?Sk9VTUQ4TU9RSDcyT2p2SllxaXIzcDVubUpsYlN3T2xBczNYOHV1ZDdYMExS?=
- =?utf-8?B?YUkyb25mNUF5VzJyZTJHbHV0aDk0bUFBOWxQNGthY0xGQWErZGF0UG1kRVI3?=
- =?utf-8?B?emhnQUdqdjAwdHBRLzRtVkx0RTFXZE1YMTgwS3BYdUVubWpEMHo2Nnc0QUxx?=
- =?utf-8?B?N1F0Si9rSXRWckkxWWY3QWtqbHdSdmZKa08vVkJ4d2tTemNTeWNCNWdVU3dN?=
- =?utf-8?B?QS9GVzFCZkFITG1MVnkvbmFyL2lPR0JTa085RjhJOTB6SDVUMVJIWFpuWjJh?=
- =?utf-8?B?QTBwMWR4Q0RPcXNkZlJFMzJjQlZVWDVnZFVrOEJRclJFVUs1WGUxcmNxT2hn?=
- =?utf-8?B?dDNoTUkrY3AzSWJMMFYzMU9XbWd1ZzZrc2E4SXd2NjZDd09TL05pbzZ2ZnpZ?=
- =?utf-8?B?YlpBdUNBWWFkbHVFVCtsbEphVnRhTFRRNFZYWVFuOUIzZzB0RytNUVhmaEQ4?=
- =?utf-8?B?eWNvRmFtSVVDZXNkb0hIWkE5R0NTcklwM0NIUjdhT1FibURaMm5DV1hVd2hJ?=
- =?utf-8?B?Vy9kaUZaOFp3eDlEWUMybE1NKzNkUnl4TTd1N1cyRmNvZmhMT3pDajg3a2JH?=
- =?utf-8?B?ZStaZ0daQ1dUK3hsSFk1ajdqU0FMYmhIS0FJcmYyOW1ISlFyeTFzQ3oweDl2?=
- =?utf-8?B?bW91S09ucTIva0pxM0FPakR1Sml0OFBLMkw3Tm43NFp2U3BrblUreXp0Z0pJ?=
- =?utf-8?B?M1ZxNzdrc1RlQm1wZm9DVTIvSTJ2ZU9ERkxXZEFXbE5HVnc1U0MweUtsSGRI?=
- =?utf-8?B?aU45alhwUUl6am1PUDVwQjF1aGpiYVk0aDl3MjI3ajVNMXlyby9zMjg5V1pi?=
- =?utf-8?B?clg3aHpXeHNiaVJUK1BaWTBEVE5hRUUwQjVtUnNyQ0RXanRJNGhNQ295STdG?=
- =?utf-8?B?cGo5ODlSelRWMXY1ZWFwL2RobHp6TVAvQTNDUGlLTVpSTWRRNnl0dEx4dlpw?=
- =?utf-8?B?ZzNLV3JpbmYxckMzVGh4aVhDRDZtNi9oRHBWYmtXb3BNY2pML0xldWdFU05V?=
- =?utf-8?B?VnhnTUZXUFJ0NDUyZ1JBT29KclJjWFlQbE5QWllhZnlxWk04KzJ2bXJDUFk0?=
- =?utf-8?B?RU56b3E0a05kV3loTGZrMzdSbUtyb0QwZjZKS2t4eFdsbEppdHFVUjUwUjhB?=
- =?utf-8?Q?Wvnkts+XU3RiJ+LxBBuUSYgoO?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55065792-4829-4916-daba-08dc5493553b
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 10:38:15.1105
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rXuYf4kT9A+u4YwjJ5jqRztSpEX0CQRXNAyefNgAeGJp7Y2XDzoTbD4v1o70ngJOP+SlFyxUKTJmAsVVgCPVWg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5617
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240403080452.1007601-2-atishp@rivosinc.com>
 
-Hi Sean,
-
-On 4/1/2024 10:45 PM, Sean Christopherson wrote:
-> On Mon, Apr 01, 2024, Manali Shukla wrote:
->> Currently, all the VMs are created with in-kernel APIC support in KVM
->> selftests because KVM_CREATE_IRQCHIP ioctl is called by default from
->> kvm_arch_vm_post_create().
->>
->> Carve out space in the @shape passed to the various VM creation helpers to
->> allow using the shape to control creation of a VM without in-kernel APIC
->> support or with in-kernel APIC support.
->>
->> This is a preparatory patch to create a vm without in-kernel APIC support for
->> the KVM_X86_DISABLE_EXITS_HLT test.
+On Wed, Apr 03, 2024 at 01:04:30AM -0700, Atish Patra wrote:
+> The counter overflow CSR name is "scountovf" not "sscountovf".
 > 
-> Ugh, when I suggested creating a VM without an in-kernel APIC as away to easily
-> test that HLT doesn't exit, I wasn't thinking about the side effects of creating
-> a runnable VM without an in-kernel APIC.  The other downside is that practically
-> no one uses a userspace local APIC these days, i.e. the selftest isn't a great
-> representation of real world setups.
+> Fix the csr name.
 > 
-> Given that KVM already provides vcpu->stat.halt_exits, using a stats FD for
-> verifying exiting behavior is probably a better option.  The other check that
-> could be added would be to verify that mp_state is always RUNNABLE (which is a
-> bug/gap in KVM as migrating a vCPU that was halted in the guest won't resume in
-> a halted state on the target).
- 
-Sure. I will work on it.
+> Fixes: 4905ec2fb7e6 ("RISC-V: Add sscofpmf extension support")
+> Reviewed-by: Clément Léger <cleger@rivosinc.com>
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> Reviewed-by: Anup Patel <anup@brainfault.org>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  arch/riscv/include/asm/csr.h | 2 +-
+>  drivers/perf/riscv_pmu_sbi.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> index 2468c55933cd..9d1b07932794 100644
+> --- a/arch/riscv/include/asm/csr.h
+> +++ b/arch/riscv/include/asm/csr.h
+> @@ -281,7 +281,7 @@
+>  #define CSR_HPMCOUNTER30H	0xc9e
+>  #define CSR_HPMCOUNTER31H	0xc9f
+>  
+> -#define CSR_SSCOUNTOVF		0xda0
+> +#define CSR_SCOUNTOVF		0xda0
+>  
+>  #define CSR_SSTATUS		0x100
+>  #define CSR_SIE			0x104
+> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> index 8cbe6e5f9c39..3e44d2fb8bf8 100644
+> --- a/drivers/perf/riscv_pmu_sbi.c
+> +++ b/drivers/perf/riscv_pmu_sbi.c
+> @@ -27,7 +27,7 @@
+>  
+>  #define ALT_SBI_PMU_OVERFLOW(__ovl)					\
+>  asm volatile(ALTERNATIVE_2(						\
+> -	"csrr %0, " __stringify(CSR_SSCOUNTOVF),			\
+> +	"csrr %0, " __stringify(CSR_SCOUNTOVF),				\
+>  	"csrr %0, " __stringify(THEAD_C9XX_CSR_SCOUNTEROF),		\
+>  		THEAD_VENDOR_ID, ERRATA_THEAD_PMU,			\
+>  		CONFIG_ERRATA_THEAD_PMU,				\
+> -- 
+> 2.34.1
+>
 
-- Manali
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
