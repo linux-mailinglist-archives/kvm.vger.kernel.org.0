@@ -1,151 +1,227 @@
-Return-Path: <kvm+bounces-13576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8712B898BF3
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 18:17:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 810E6898C1A
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 18:29:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63E35B297CD
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 16:15:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 101F228AED3
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 16:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5928112CDAE;
-	Thu,  4 Apr 2024 16:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C239912BEBF;
+	Thu,  4 Apr 2024 16:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="NFKH0v2v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qlrw7Rbp"
 X-Original-To: kvm@vger.kernel.org
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04olkn2047.outbound.protection.outlook.com [40.92.75.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B235412DDBF;
-	Thu,  4 Apr 2024 16:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.75.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712247278; cv=fail; b=qVbuNuPDyQC+hQEjv8jEbOSk1xJZqO30n8IUrSH5ipviADfbsb0XkAdy/aBSxg+BHp+hawriz3oscNLN7za71dC8N6wyA2FnpFMn7A45x6hzYeB0+rWI22StetUtqjAoAN1Cx1YY6jJId6ap37iSD8Cr33JpusoyaUlh2XlQe+c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712247278; c=relaxed/simple;
-	bh=MAmHu9YY9DWnabA8QzOQKIRYM3B6FTI8ycr/bHF9sys=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e2HdKq0SXchPPVroDyymbkpbyu9YqMxQ8Uy+7s9hGREesNsaDFxagkBSity9GDDiQERw8SvZNUSXgydENlKVJgKMeuThSqqEFIp9I3TpYOmD0Fdy3J2myKXiBXW2B8OAOw3xEZoCK6dK+cL4kAt3PDEnJPNW5PgH/MGBFarKuDA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=NFKH0v2v; arc=fail smtp.client-ip=40.92.75.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k+bO8yoFhp9Rjq/rxibU9c/398DwzeiUwiUwEQTDDzqtJsOHBGs82aAVWYginEql2rDjFB9Uoihccd8wcTNAxEe/ABXxJ4yaeaZkwBJePlxEebIPzp8b83YU+nPX6duCZJ00fMpaP5EcpIJ5rbK6BTktf57+6JOsj39/3hqTk5zjqEtMu0iFYxmJ7xFKKO+Nz6LucPhcr8D5j82z1/0m9d+tht0R+d6Rt8+a+OD1jwh7Qup/Ez3i1uh1ZQBqzgsemwumueyH1E8fLYld1TeBWFnMtDmBp9YizC4b+uRX8lOJbYqsBbf81etQ8kLwEJYywF5GbzvAjPAgkb51HcYhcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZQDs0ib4dnCDeZfZW+2JLkP9VU+5eA24z54TCb24apo=;
- b=W+/zcQJH3WR464+89IlSyiT9vr/skphDMZRrHh95aAp2CnaTJaNeZu6xwA/LgMc55+cscIcLQA3nnty9roCycLqA/LCLP/U/xtQfP1ObVF7wYCSKBuAMeOPS3xd2Er5X8Xwnjpjh6RdyxiPbEqZ96v6/CaM+uKz0jPSAyNFaMOoN6zSBd/uY+bLnuCtj0LoLOcH+7uVceeYTmJMDULTLiTamt05hhsqYtnhWHqXaP6Cr4tZgynhZ04Z3zLUdsXmpPsuGLUk20FOpJV/YE76VCPyCvS2PliJTj5HkYHnLLAMhvU0iueDheg6RXfPvpp0RSo/DchqKOOz03qPUCCQ/ow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZQDs0ib4dnCDeZfZW+2JLkP9VU+5eA24z54TCb24apo=;
- b=NFKH0v2vK8R99Ldmeay6CAfQelCJeY8LTy7pOFNAJfL+jpjbFaCuXJpSDw2lAh1JCHGUlCNiTsQXGzAnfUf7ceZNzkkuch4e4XQkQYRwowq5DUPOf3Rigc0fOjlS3RAORgFxdU9Q+wjA+Mq56nLcX+VK2xWnGoruEDrYQ/ufTZ7iMaIMx0sYLzDMt9tDdJYXLwJETezN6YPsb2detz3E/CUweiV+o7AaAqHJkc2Dt+yIMCJpoWigrA8v1vUc/UHKknzs8iPz+TyFFhpSwzfDo4+HGyVxvU0kY8q3tMWd75SBJAK28QsfqRlCFSJEuYwXMGXCVE/sZjtJLZDzeQLi7Q==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by VE1P194MB0909.EURP194.PROD.OUTLOOK.COM (2603:10a6:800:16b::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 4 Apr
- 2024 16:14:33 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::56f0:1717:f1a8:ea4e]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::56f0:1717:f1a8:ea4e%2]) with mapi id 15.20.7409.042; Thu, 4 Apr 2024
- 16:14:33 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jasowang@redhat.com,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	luigi.leonardi@outlook.com,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net-next 2/3] vsock/virtio: add SIOCOUTQ support for all virtio based transports
-Date: Thu,  4 Apr 2024 18:14:12 +0200
-Message-ID:
- <AS2P194MB21702427C769FB68A13AF54B9A3C2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <3n325gojjzphouapo36aowmcgt3iqjrqrmckqjjqgqmhvjdz4x@4givlk4egii3>
-References: <3n325gojjzphouapo36aowmcgt3iqjrqrmckqjjqgqmhvjdz4x@4givlk4egii3>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [m5Pdr/5FTTvQKDDpTjNnZNBacqZhR17c]
-X-ClientProxiedBy: MI1P293CA0004.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:2::13) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:20b:642::8)
-X-Microsoft-Original-Message-ID:
- <20240404161412.3394-1-luigi.leonardi@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F66E1E522
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 16:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712248190; cv=none; b=uOHEFTnxiF/wh+WKG4wRnIJLB0IwL0o6LCj77uCUdPxvrzoabSDSHUXOwnah+Q+ktFEbWP0JdHoGmwYPirP1cumszZoftvEF13mLk9gdsDE5jAlbnuj832jiAhrFlS72bcSnf6XZe+D6FSFkhJssYiORLdlsM9v7HSUzgBA3A/Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712248190; c=relaxed/simple;
+	bh=LMTOeetA5V3XX5XNpF9h0J9xtXoeUf7ZRq9wIYhkS6M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iMNnBYDZV64VKj2n2iDvxafMOrTMpUofc4S+NElJatod0KHBLdWAt1wwDg91dHYwsPP2Ca8OlkljAZZwEuretS+q8QxScR+TjL1mMbAz6Z1odDdf2ichhNUHtSuHDWyEMDPT+Y6Xmm+X7N29LG5RDTgYtc+FB4JxrUpUdPmWOBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qlrw7Rbp; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-34373f95c27so782649f8f.1
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 09:29:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712248186; x=1712852986; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sbXLCHLAGJTM4+QfXzCykBMcE+YY9AnNs3tQLFeWi5o=;
+        b=Qlrw7Rbp3nUT6TpTzMpn3N0F9MtbFugAqX7Dz1rxneYcKg5MI7Z/ruB79TcaSuQX7g
+         SATWaErfm7+nDtnUUy5TpiK5mPsaf4fxDrVVAYqh5fxcuaHRr8BKD4/C7/hJXQKCfDUd
+         +pmdnbsbX4vlW4cvpdrdHp0d52TCbQOZVAbcLDhPangMkyYS6433md1840menlTamyw0
+         U5GquWnirkYDKHi3DcKp/gCUM690CWwgXvOygQ2Z/gkz6TabrLOV7dge68DzBC1ivgzZ
+         1usyuY3lqeMyTVWJh5NDyMr/mb2/Jaj6urq8k4TchCQlEXhf8JyS3YxlYUOI3fQiWIS8
+         8oow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712248186; x=1712852986;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sbXLCHLAGJTM4+QfXzCykBMcE+YY9AnNs3tQLFeWi5o=;
+        b=tX6iVBxWCK4KjuCt8wyNePo0lxXdNm6WERwDG5oj6jHz8owEq74r7C9XpqjQ0xne6S
+         g/roIojlNdfkg3YLccwOAkC1HejfWanU31rru5YsOxTxUzJEGuRcZxuRlWVez/dj9cFs
+         KdBJ2vFApQrG9Alc+R/xsEtNV3TsEeaM6rCCKpiI2h6LKpso5pyyjfKc5XYMkLSulkwU
+         XnRX0oJmAekp/P/4SYWk1ynLWC8FzBsSbmaWiCVKLHCyxDwbiYcCpnFbfLAQIRXLDtCV
+         ZyxQrqctwAEs69Rnc3r+5hNPqYGgKwIe6lfXTWkNOONDWf/SLJ8N9dPGx8nHP5F2jpTV
+         t6Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCUP3FAtdrDE2rAFF76F0dKU8YVe1TRImjITC7/JLLAiLU+Y8A8yzh5y9/V3E6NoQB8kFGCB8AiuYN/BoYVKgIjEvEB/
+X-Gm-Message-State: AOJu0YxwUzNh2z8Ftm9e75t9n0f1Eup07YeF0SMD/w3aQuu4+77Ef67k
+	13NhbcHNqB1LRF9JhoYOtwcL6tWBey6GdIi9YG73OcMawGGLd5EA/TAkNYCwSN8HQ5nAcXebDIn
+	2HhxwIDG222TUQW3briZ9H5Ps2JMo2YPJGaw8
+X-Google-Smtp-Source: AGHT+IFTg58YH4jsXgi9OvvPnZABDtWiCqP8PUjbSUGa6O2B/JVyTwIqHTvFrWXo5dC5rh4l6bGdAAhbnOymMVQuxEk=
+X-Received: by 2002:adf:fa08:0:b0:33e:7333:d459 with SMTP id
+ m8-20020adffa08000000b0033e7333d459mr2165773wrr.49.1712248186161; Thu, 04 Apr
+ 2024 09:29:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|VE1P194MB0909:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5b5205f-273d-43bf-1418-08dc54c250b8
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	i6TOCNL2DA9oYvKga8VmVDGnSOxBl+zCPzwEIwXxlpG3niFs5mHu6IYBQ7l8H+rPqv+i5EY5P47AS9Ix3IWLWYGwnM5UBcIoqJyizgWYvvYOdWox4HotKlTvuFUI0YO2wpnNayOPLS7QkCldDioX8VLNt+gSK6/ng1asZLq4w6N1b8T7RwLF7Nfd0snx/m5v/cxO+5vXxVRnMlWgELuqeTs5By4BJYe0XLxCAAPLXN+E8+MAUm9mwM/lCTCuLz3y2qftAh2FRgPKy9bqcFO2ru/oF60IyZaFaRrai7IRy/hNUzBm6AZKt1QPF0TmhIa/RK071FZt3NcJnlE8n1DM5wpw+Rtv0mCf8GZvyPwghNQ8QtI21EkVjSN3VBKcKloWzbXs2WsWlqk4ytWVGxazLCHSTGKLwyeZEXEKFBeVftjjTUDXNKDwp6+vIY/zHeml0bzNyiji1P5aAAMFg1gmzEtiiI9FcLtm0N0FOlGVdYiX7UGmrXnMjxQt1m5hhvauILzYe74Jo5Ymc/fsJgBOQxcR1CjhT+t3qYrg7FmImQ6aEMVkaIHyLAQD7VG095KerRGqGmk2a1Wi1tetRy5iiDNTWkpAJEcxAzBXl974u1kzrigap8RvT+hKINVRt/sa
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1iQsM6eHjqc9wUPmimLCcjjbb7TyNxPrT2hKvLtecCGMfcd/EGtoU2xHgv3l?=
- =?us-ascii?Q?/xTf2Y0ko/0hNf2ifp7MroMMQgIUdihcTwzXj9hqKtK3j5tMVflNKjTa1BMa?=
- =?us-ascii?Q?toZmzLn9uypMIrSRF12hWj41bEXrRsCWkL7IvxV/8+UXxemLt8FSrBr+fscV?=
- =?us-ascii?Q?d95DJxNsIFZmS7REDzvqZlnUaKRfyc/R4SU8rA3es4d5xnlOY/JBohp7s3gQ?=
- =?us-ascii?Q?jWpy2UfSJE7wSISL4vn8N/YTv1qJ3TWM94skPqRohBOGybO1LUWPcnFvsets?=
- =?us-ascii?Q?JyiAQGtyZWj/XbrG9l4gj4CEl81WYl3siKPxfjSEGvmDueK5/YusmSRbgoNW?=
- =?us-ascii?Q?R4LUbldCLrR/5HrcxnYMF9YrmS4crB4/e7qNQYYrDcoa7lDZIbNsbkJb3/WW?=
- =?us-ascii?Q?CAbYorXUQWEOVmjzkPbKT1a9V+4kxg8GAtwS3qdLvgmTk5NEOvz+EpsY9B4W?=
- =?us-ascii?Q?zyylgJ4LM/4xSEFHr0C9+BnDwl22gRW5u23c2SmkSZgvlPksdq3z3hUeX9TV?=
- =?us-ascii?Q?3OOjMV3b7AEfUvJOjlW4zhihDpNa4pvS6TQkId8NazN2ev0enYzcfXJ6jO0c?=
- =?us-ascii?Q?gaSJttdRtJOkLOM1luEOdA4AqVez9aoWoOjt6qyP5DbXLcs9PMM+s5xy+xDd?=
- =?us-ascii?Q?WvsBShE9cGH/BzfMm2XrjVWgo0DY9oY0Jus77gR327MxJyU2bR3QVfhl9ClI?=
- =?us-ascii?Q?OLPJnSi9ZrEdZWWCl5CxAymU7tOaZ37zg3sj5niNVTOTQQ65xYmccI3UZRnD?=
- =?us-ascii?Q?aBUuMzgHXg3xha3zlwTPIBLuQX+6yOMj5lri+fjTlN9vdPxE1Y+WzKZh/FBs?=
- =?us-ascii?Q?lb/S15tnE9aVRHvfGUIXoMy40DTMw9qs6AkGNi0o2OhBmhybd40Np/VrDHk6?=
- =?us-ascii?Q?kzOtUKrUjmwcl1FTgaakMA1SVvAnJqcStknO3IFSgagHCmMNv5eMPHxcgQI0?=
- =?us-ascii?Q?H+suF3GegK69UX0ypmNhw7tg7NyF9c+al/jOIwv6bxPb3e/0ojo9wTcnASFz?=
- =?us-ascii?Q?Uw3oigXMlN3v9HskzsXrEryL3nYo4Chr6Kp19g159c2Dg0bgFX2NhkXJn1nt?=
- =?us-ascii?Q?PliG7ueoj//oI7tnJ4vF6AS7tpemQAfmkKPYibJDvi6dAy2C8pwyutc9WUUi?=
- =?us-ascii?Q?kdeS40dbuSiDiAeNyvWKJyhOA456QLqPo8k+OVHQKUxWL26VWGyBQuVTEiMy?=
- =?us-ascii?Q?6Ur+/Dx5HwsU9p+rCQH8Wkm5UQt85r0l3eVjEGKiDKnISbyf5Uao9yILAp1L?=
- =?us-ascii?Q?fyzHPAbDJqsaCUsgnrQQ?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5b5205f-273d-43bf-1418-08dc54c250b8
-X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 16:14:33.7054
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1P194MB0909
+References: <20240402213656.3068504-1-dmatlack@google.com> <cb793d79-f476-3134-23b7-dc43801b133e@loongson.cn>
+In-Reply-To: <cb793d79-f476-3134-23b7-dc43801b133e@loongson.cn>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 4 Apr 2024 09:29:18 -0700
+Message-ID: <CALzav=c_qP2kLVS6R4VQRyS6aMvj0381WKCE=5JpqRUrdEYPyg@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG
+To: maobibo <maobibo@loongson.cn>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Stefano,
-Thanks for the review.
+On Tue, Apr 2, 2024 at 6:50=E2=80=AFPM maobibo <maobibo@loongson.cn> wrote:
+>
+>
+>
+> On 2024/4/3 =E4=B8=8A=E5=8D=885:36, David Matlack wrote:
+> > Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG to avoi=
+d
+> > blocking other threads (e.g. vCPUs taking page faults) for too long.
+> >
+> > Specifically, change kvm_clear_dirty_log_protect() to acquire/release
+> > mmu_lock only when calling kvm_arch_mmu_enable_log_dirty_pt_masked(),
+> > rather than around the entire for loop. This ensures that KVM will only
+> > hold mmu_lock for the time it takes the architecture-specific code to
+> > process up to 64 pages, rather than holding mmu_lock for log->num_pages=
+,
+> > which is controllable by userspace. This also avoids holding mmu_lock
+> > when processing parts of the dirty_bitmap that are zero (i.e. when ther=
+e
+> > is nothing to clear).
+> >
+> > Moving the acquire/release points for mmu_lock should be safe since
+> > dirty_bitmap_buffer is already protected by slots_lock, and dirty_bitma=
+p
+> > is already accessed with atomic_long_fetch_andnot(). And at least on x8=
+6
+> > holding mmu_lock doesn't even serialize access to the memslot dirty
+> > bitmap, as vCPUs can call mark_page_dirty_in_slot() without holding
+> > mmu_lock.
+> >
+> > This change eliminates dips in guest performance during live migration
+> > in a 160 vCPU VM when userspace is issuing CLEAR ioctls (tested with
+> > 1GiB and 8GiB CLEARs). Userspace could issue finer-grained CLEARs, whic=
+h
+> Frequently drop/reacquire mmu_lock will cause userspace migration
+> process issuing CLEAR ioctls to contend with 160 vCPU, migration speed
+> maybe become slower.
 
->We incremented it only for VIRTIO_VSOCK_OP_RW, should we check the
->same here?
+In practice we have not found this to be the case. With this patch
+applied we see a significant improvement in guest workload throughput
+while userspace is issuing CLEAR ioctls without any change to the
+overall migration duration.
 
-Checking for the length of the skbuf or checking for VIRTIO_VSOCK_OP_RW
-AFAIK is equivalent. Since the only packet with payload is this one. 
-I'll add a comment in v2 to make it more clear.
+For example, here[1] is a graph showing the effect of this patch on
+a160 vCPU VM being Live Migrated while running a MySQL workload.
+Y-Axis is transactions, blue line is without the patch, red line is
+with the patch.
 
->What about rename it in `consume`?
+[1] https://drive.google.com/file/d/1zSKtc6wOQqfQrAQ4O9xlFmuyJ2-Iah0k/view
 
-Sounds good!
+> In theory priority of userspace migration thread
+> should be higher than vcpu thread.
 
-Thanks,
-Luigi
+I don't think it's black and white. If prioritizing migration threads
+causes vCPU starvation (which is the type of issue this patch is
+fixing), then that's probably not the right trade-off. IMO the
+ultimate goal of live migration is that it's completely transparent to
+the guest workload, i.e. we should aim to minimize guest disruption as
+much as possible. A change that migration go 2x as fast but reduces
+vCPU performance by 10x during the migration is probably not worth it.
+And the reverse is also true, a change that increases vCPU performance
+by 10% during migration but makes the migration take 10x longer is
+also probably not worth it.
+
+In the case of this patch, there doesn't seem to be a trade-off. We
+see an improvement to vCPU performance without any regression in
+migration duration or other metrics.
+
+>
+> Drop and reacquire mmu_lock with 64-pages may be a little too smaller,
+> in generic it is one huge page size. However it should be decided by
+> framework maintainer:)
+>
+> Regards
+> Bibo Mao
+> > would also reduce contention on mmu_lock, but doing so will increase th=
+e
+> > rate of remote TLB flushing. And there's really no reason to punt this
+> > problem to userspace since KVM can just drop and reacquire mmu_lock mor=
+e
+> > frequently.
+> >
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Oliver Upton <oliver.upton@linux.dev>
+> > Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
+> > Cc: Bibo Mao <maobibo@loongson.cn>
+> > Cc: Huacai Chen <chenhuacai@kernel.org>
+> > Cc: Michael Ellerman <mpe@ellerman.id.au>
+> > Cc: Anup Patel <anup@brainfault.org>
+> > Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> > Cc: Janosch Frank <frankja@linux.ibm.com>
+> > Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Cc: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> > v2:
+> >   - Rebase onto kvm/queue [Marc]
+> >
+> > v1: https://lore.kernel.org/kvm/20231205181645.482037-1-dmatlack@google=
+.com/
+> >
+> >   virt/kvm/kvm_main.c | 4 ++--
+> >   1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index fb49c2a60200..0a8b25a52c15 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -2386,7 +2386,6 @@ static int kvm_clear_dirty_log_protect(struct kvm=
+ *kvm,
+> >       if (copy_from_user(dirty_bitmap_buffer, log->dirty_bitmap, n))
+> >               return -EFAULT;
+> >
+> > -     KVM_MMU_LOCK(kvm);
+> >       for (offset =3D log->first_page, i =3D offset / BITS_PER_LONG,
+> >                n =3D DIV_ROUND_UP(log->num_pages, BITS_PER_LONG); n--;
+> >            i++, offset +=3D BITS_PER_LONG) {
+> > @@ -2405,11 +2404,12 @@ static int kvm_clear_dirty_log_protect(struct k=
+vm *kvm,
+> >               */
+> >               if (mask) {
+> >                       flush =3D true;
+> > +                     KVM_MMU_LOCK(kvm);
+> >                       kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, mems=
+lot,
+> >                                                               offset, m=
+ask);
+> > +                     KVM_MMU_UNLOCK(kvm);
+> >               }
+> >       }
+> > -     KVM_MMU_UNLOCK(kvm);
+> >
+> >       if (flush)
+> >               kvm_flush_remote_tlbs_memslot(kvm, memslot);
+> >
+> > base-commit: 9bc60f733839ab6fcdde0d0b15cbb486123e6402
+> >
+>
 
