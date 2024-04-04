@@ -1,140 +1,152 @@
-Return-Path: <kvm+bounces-13619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13620-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8FD089918F
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 00:45:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B088991C0
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 01:02:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 140B6B213C8
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 22:45:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 316771F22BB2
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 23:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C16670CDE;
-	Thu,  4 Apr 2024 22:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1957513C3CA;
+	Thu,  4 Apr 2024 23:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rlZVHMZ5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GRnQvFaT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7FC6F505
-	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 22:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58406286A6;
+	Thu,  4 Apr 2024 23:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712270739; cv=none; b=r/IRsKdwyq1M0SHvTKS5xtFANNh9KUYxUATPnF0EXVhhuZnP/iwLGTY3ZubgeLOhK+henQqZbMBcFCCB5rOp4f1ciOB8OYMcKtdmqRE0ZD6iuPcs6DcHE6TRsOCUvxs5kLQA4dh+YQcEZPaCTSiFXhNR/g1kVI7o5QiwaSjrroE=
+	t=1712271770; cv=none; b=BPea717iIah5jlgdMeilO/eoET+DpXK7fhJEjsrFYCGld6WfkgZ3RvGoJGliUoJFbQjupoVvbw0TYsWJHn1exUll0mbR4WXAM+wcpNYrqoWIrcIZQZEv5li6HRIwlpPwWqAjjNbSEHvbk/CwkzFBNo6644Mo76plHTiTWK5k7qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712270739; c=relaxed/simple;
-	bh=MUx2dwxzhoYs9ch7Wt+3vyW6IzeDkamXK5A2n7Xd0fQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hFLW+8Cs33bPy7KTt53Lf5hMrGCTXaO6DBwOLAy0pfh0EyyrnW0l+nY6btowW0inZaJ5oY/E4Y2VVFh+DUoiAM8Jj6R5qX6nO2zvCVu7UWOPYFo/Pt6uEHOyqnlr/VZPK4NSfkPdoMUEShP+yLaoWjnGlGeOI6KbUZZIjA2cBkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rlZVHMZ5; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8bdadc79cso1234977a12.2
-        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 15:45:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712270737; x=1712875537; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lsOQoN7hxmCV0LDs2mMcH4xPxMzlScVQ7Q1vgpJyJKk=;
-        b=rlZVHMZ5nkCmofPXmmi5kTjbSpLrvOq/byimfIOESIbpsiotgBaEyJ0KkSol1Q4Yxl
-         TXCtLx2omC+oJSC8zjG6u2g2XRqcOOkZNO/lupWYIiUnTnEdro5ShxZoupBwG5OyGP58
-         2Sx8wSvr8QKAivlYwg1iQBmKCzTRzh5GPyhk3o92tZb1diLRU3a9PeFylHfWmDztp/Sd
-         DkraUMslxAm7dWcF6ctGelMOB4lwE2kaKJA2+9poXjid/4i5q9F6A8hvkMbwrjch1Oks
-         jNrmyxyN5upAODQj5Y45G1YPiJpmp8k3qiB5fPdNKZpJlBuIWxdZoMr61AOVDf1h471O
-         72HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712270737; x=1712875537;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lsOQoN7hxmCV0LDs2mMcH4xPxMzlScVQ7Q1vgpJyJKk=;
-        b=v5nAprVPKMAUxDXdqzFHQhhoD2Uo+d6ia8JcfOGtiw3emPfGyw0E6zPHRgm825EGtj
-         ruuvFWpWG7W+Hy0wS388jewEZjLo2W+Zr8uQ2qQNNKzbIREl3rda+PZN5lSt8Wmxh/5E
-         B/7t1eAEOnux3t+Ngbpye3flCP6ayyon2oYQJluER9Bv0wsdQwsQrqB3yHwlrbGG098B
-         HGons2xGgAmfEoClgHgybC4WDMRO/8fzweKiuUuI2dXN//jdVXzGLLgBu/9xczDqqt0N
-         hd5/9hC5Aq1cZaACL1xc/9+l6ZT6ApOoOqto+OrX9Zt6eUba7nnSgQQVf6O46vOlM7Z9
-         zqug==
-X-Forwarded-Encrypted: i=1; AJvYcCW6qM7bfSTIhCHzaYfHNoJfrsOK0NRTEFObTenoGw7u8zqH5ybLGympll1lbflBnrzcUJzKt6EUMiu7dAEVoWsqHqDT
-X-Gm-Message-State: AOJu0YwFfDNVeMTBC/SHyoNimyGHU231sQbZNIM7eLZ1JLkfPEcuuyyc
-	5ox3/FWc/aw7CB3kE3ipv+lOjOD46Q/lxcufsYCxADPFhxRHzlhsMOYrjOgzJs7dRCuSjLf3Uy2
-	Pcg==
-X-Google-Smtp-Source: AGHT+IHbOI/wISwYIXG4Yqgo960LfMgv+MknEzIl12RXqwFok1pqEpcq60Iw38H2JOxRF9WKKXTO2txmBAo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2282:b0:1e2:b75e:37b5 with SMTP id
- b2-20020a170903228200b001e2b75e37b5mr2512plh.2.1712270737181; Thu, 04 Apr
- 2024 15:45:37 -0700 (PDT)
-Date: Thu, 4 Apr 2024 15:45:35 -0700
-In-Reply-To: <1f30ab0f7a4dc09e65613f6dc1642fb821c64037.camel@intel.com>
+	s=arc-20240116; t=1712271770; c=relaxed/simple;
+	bh=GxxcTwd9Kj+TRtgAeuoV9VK7A5mv7deIX4spdFzPU3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=INb3haMGfPEYn6LYY7jUSqWbtX6a5rOlv7s56PtjbjgDFDZcINTGWtvdSrj6KeVeLWubW9cTcTqzs0z9DLU924CTvoYXn8QMva2vZ7w7weI1udH980LvtakQTTQeeuwZ4nlDTKYi/4Vl0qciA6nxERuKwzOVSr3Fsq1Wdjpp538=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GRnQvFaT; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712271769; x=1743807769;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=GxxcTwd9Kj+TRtgAeuoV9VK7A5mv7deIX4spdFzPU3w=;
+  b=GRnQvFaTQfmLrvVzYUgCsDAGQmc05iKPeV5reop7uMurxd+d/qy6ytO9
+   XfLA/3nF5AX8OrznRWuGaukwa+5NFdMuYkq+0PX7l/Gc5lXatpjCrrOpW
+   9q+6Vl+X4E717p5ORjaBKkNsThWWvigsLtqDrKheeviHLjO9qzp8MNWIi
+   DrWC7ULZYZTPPAZrm/Ads8Cqc1yt78Mx33za80k4KzqtxJSPQivtHunSf
+   aoMZBIxt4bFRYbvIyonx2FQdHO/hN7jdynwQO8ceJ/0KI8PMhqbuvTEqQ
+   SGPlYmlbvL9JyobiqyC0j8lEu5z6vy0zcWx/nwqBQTVtfOahEh46nAiFW
+   w==;
+X-CSE-ConnectionGUID: 0Uu3qnx+QIiWhivB63PNKw==
+X-CSE-MsgGUID: rk3OKrVbQwWypy0A8rJv4A==
+X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="8167614"
+X-IronPort-AV: E=Sophos;i="6.07,180,1708416000"; 
+   d="scan'208";a="8167614"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 16:02:48 -0700
+X-CSE-ConnectionGUID: U+bSPPzURaKcsT3Bxrb6IA==
+X-CSE-MsgGUID: ANqWJIqFSKuzIf2aG27MmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,180,1708416000"; 
+   d="scan'208";a="23605646"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 16:02:48 -0700
+Date: Thu, 4 Apr 2024 16:02:47 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 106/130] KVM: TDX: Add KVM Exit for TDX TDG.VP.VMCALL
+Message-ID: <20240404230247.GU2444378@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <b9fbb0844fc6505f8fb1e9a783615b299a5a5bb3.1708933498.git.isaku.yamahata@intel.com>
+ <Zg18ul8Q4PGQMWam@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <dbaa6b1a6c4ebb1400be5f7099b4b9e3b54431bb.1708933498.git.isaku.yamahata@intel.com>
- <gnu6i2mz65ie2fmaz6yvmgsod6p67m7inxypujuxq7so6mtg2k@ed7pozauccka> <1f30ab0f7a4dc09e65613f6dc1642fb821c64037.camel@intel.com>
-Message-ID: <Zg8tJspL9uBmMZFO@google.com>
-Subject: Re: [PATCH v19 078/130] KVM: TDX: Implement TDX vcpu enter/exit path
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Tina Zhang <tina.zhang@intel.com>, 
-	Hang Yuan <hang.yuan@intel.com>, Bo Chen <chen.bo@intel.com>, 
-	"sagis@google.com" <sagis@google.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
-	Erdem Aktas <erdemaktas@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zg18ul8Q4PGQMWam@google.com>
 
-On Thu, Apr 04, 2024, Kai Huang wrote:
-> On Thu, 2024-04-04 at 16:22 +0300, Kirill A. Shutemov wrote:
-> > On Mon, Feb 26, 2024 at 12:26:20AM -0800, isaku.yamahata@intel.com wrote:
-> > > @@ -491,6 +494,87 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> > >  	 */
-> > >  }
-> > >  
-> > > +static noinstr void tdx_vcpu_enter_exit(struct vcpu_tdx *tdx)
-> > > +{
+On Wed, Apr 03, 2024 at 08:58:50AM -0700,
+Sean Christopherson <seanjc@google.com> wrote:
+
+> On Mon, Feb 26, 2024, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > > 
-> > ...
+> > Some of TDG.VP.VMCALL require device model, for example, qemu, to handle
+> > them on behalf of kvm kernel module. TDVMCALL_REPORT_FATAL_ERROR,
+> > TDVMCALL_MAP_GPA, TDVMCALL_SETUP_EVENT_NOTIFY_INTERRUPT, and
+> > TDVMCALL_GET_QUOTE requires user space VMM handling.
 > > 
-> > > +	tdx->exit_reason.full = __seamcall_saved_ret(TDH_VP_ENTER, &args);
-> > 
-> > Call to __seamcall_saved_ret() leaves noinstr section.
-> > 
-> > __seamcall_saved_ret() has to be moved:
-> > 
-> > diff --git a/arch/x86/virt/vmx/tdx/seamcall.S b/arch/x86/virt/vmx/tdx/seamcall.S
-> > index e32cf82ed47e..6b434ab12db6 100644
-> > --- a/arch/x86/virt/vmx/tdx/seamcall.S
-> > +++ b/arch/x86/virt/vmx/tdx/seamcall.S
-> > @@ -44,6 +44,8 @@ SYM_FUNC_START(__seamcall_ret)
-> >  SYM_FUNC_END(__seamcall_ret)
-> >  EXPORT_SYMBOL_GPL(__seamcall_ret);
-> >  
-> > +.section .noinstr.text, "ax"
-> > +
-> >  /*
-> >   * __seamcall_saved_ret() - Host-side interface functions to SEAM software
-> >   * (the P-SEAMLDR or the TDX module), with saving output registers to the
+> > Introduce new kvm exit, KVM_EXIT_TDX, and functions to setup it. Device
+> > model should update R10 if necessary as return value.
 > 
-> Alternatively, I think we can explicitly use instrumentation_begin()/end()
-> around __seamcall_saved_ret() here.
+> Hard NAK.
+> 
+> KVM needs its own ABI, under no circumstance should KVM inherit ABI directly from
+> the GHCI.  Even worse, this doesn't even sanity check the "unknown" VMCALLs, KVM
+> just blindly punts *everything* to userspace.  And even worse than that, KVM
+> already has at least one user exit that overlaps, TDVMCALL_MAP_GPA => KVM_HC_MAP_GPA_RANGE.
+> 
+> If the userspace VMM wants to run an end-around on KVM and directly communicate
+> with the guest, e.g. via a synthetic device (a la virtio), that's totally fine,
+> because *KVM* is not definining any unique ABI, KVM is purely providing the
+> transport, e.g. emulated MMIO or PIO (and maybe not even that).  IIRC, this option
+> even came up in the context of GET_QUOTE.
+> 
+> But explicit exiting to userspace with KVM_EXIT_TDX is very different.  KVM is
+> creating a contract with userspace that says "for TDX VMCALLs [a-z], KVM will exit
+> to userspace with values [a-z]".  *Every* new VMCALL that's added to the GHCI will
+> become KVM ABI, e.g. if Intel ships a TDX module that adds a new VMALL, then KVM
+> will forward the exit to userspace, and userspace can then start relying on that
+> behavior.
+> 
+> And punting all register state, decoding, etc. to userspace creates a crap ABI.
+> KVM effectively did this for SEV and SEV-ES by copying the PSP ABI verbatim into
+> KVM ioctls(), and it's a gross, ugly mess.
+> 
+> Each VMCALL that KVM wants to forward needs a dedicated KVM_EXIT_<reason> and
+> associated struct in the exit union.  Yes, it's slightly more work now, but it's
+> one time pain.  Whereas copying all registers is endless misery for everyone
+> involved, e.g. *every* userspace VMM needs to decipher the registers, do sanity
+> checking, etc.  And *every* end user needs to do the same when a debugging
+> inevitable failures.
+> 
+> This also solves Chao's comment about XMM registers.  Except for emualting Hyper-V
+> hypercalls, which have very explicit handling, KVM does NOT support using XMM
+> registers in hypercalls.
 
-No, that will just paper over the complaint.  Dang it, I was going to say that
-I called out earlier that tdx_vcpu_enter_exit() doesn't need to be noinstr, but
-it looks like my brain and fingers didn't connect.
+Sure. I will introduce the followings.
 
-So I'll say it now :-)
+KVM_EXIT_TDX_GET_QUOTE
+  Request a quote.
 
-I don't think tdx_vcpu_enter_exit() needs to be noinstr, because the SEAMCALL is
-functionally a VM-Exit, and so all host state is saved/restored "atomically"
-across the SEAMCALL (some by hardware, some by software (TDX-module)).
+KVM_EXIT_TDX_SETUP_EVENT_NOTIFY_INTERRUPT
+  Guest tells which interrupt vector the VMM uses to notify the guest.
+  The use case if GetQuote. It is async request.  The user-space VMM uses
+  this interrupts to notify the guest on the completion. Or guest polls it.
 
-The reason the VM-Enter flows for VMX and SVM need to be noinstr is they do things
-like load the guest's CR2, and handle NMI VM-Exits with NMIs blocks.  None of
-that applies to TDX.  Either that, or there are some massive bugs lurking due to
-missing code.
+KVM_EXIT_TDX_REPORT_FATAL_ERROR
+  Guest panicked. This conveys extra 64 bytes in registers. Probably this should
+  be converted to KVM_EXIT_SYSTEM_EVENT and KVM_SYSTEM_EVENT_CRASH.
+  
+MapGPA is converted to KVM_HC_MAP_GPA_RANGE.
+
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
