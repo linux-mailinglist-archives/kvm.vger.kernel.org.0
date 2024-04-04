@@ -1,124 +1,117 @@
-Return-Path: <kvm+bounces-13592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D93D898DD3
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 20:17:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 773FE898DD8
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 20:18:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 287B72840F1
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 18:17:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2100A1F2341C
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 18:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC641304A8;
-	Thu,  4 Apr 2024 18:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DB5130A69;
+	Thu,  4 Apr 2024 18:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z1JfOCt0"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="ZoXjvpzB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC8212EBDC
-	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 18:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C5812FB2C
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 18:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712254648; cv=none; b=nNBvWBL1JgrA7kesdNRLrmsd3wgIu8DxKuCpt7PoLR84+YjDUrv1XnCJ5J68rybmmrGkvpTMMv/q1LyDnNfzyckSUXpGk10v6QuxFaLOpZWM0OMPVDnB4OZ2/bG9aqDHWS9MASUd9SNgI4hqMDY1zNnanGdEIad4+ESkx/T03t0=
+	t=1712254692; cv=none; b=n4YLVqf/V3ZcBW6vjx79Xxa61apldjAkhRBh2VUBZ9w3pqpVLSVtheDi2Zh4VxPuTd9kByn6IdBI928Gu/uFX0XpaMz+kchUE6W5qBC8ukI4Qw0pGkVBfsY/TB+ptcFWcL6ZuJbQ874IDuoXBpXOsoyJH4bQx7z3cPpCCoCKku4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712254648; c=relaxed/simple;
-	bh=ohuExL0HfhgjZhZ+ZuA3robEPaGBpOyucP2yOlunWeI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eHlv1+4ddV9f9FEeHnPtxZs4YqGbcg3XHr98R5AVlyF7RG4fvJHC01hmigJGprEQ1AADo0r5X0WgNmMGPRspCoQWvcvGUn/DkbNrsTqi1y3unLtMXP/kllADPj+CZNNVjVq9BQEYd9ZrAX5fxi3MYv7BISt/7TILshuczZ3mqrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z1JfOCt0; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a2386e932so24511697b3.1
-        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 11:17:27 -0700 (PDT)
+	s=arc-20240116; t=1712254692; c=relaxed/simple;
+	bh=SNfX+q1IgkQj9nz0GckYsepusnw34MhTeimF85l/VUU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iKoNUf+OTCGDl3rFNnJFClzvMvijJKvJddaEFUePT2+w2Zz5MvRghDwNA2in9ysaqtXAllN3Zsnt503uuSjQ/UGylF6q4VduZ1HaYlQRmygQHxveOjbOZDg0+QkmOYoFaEVE+isQm91OcbvUzS0xd6Cfb6xzZpqNbKFHct0d3qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=ZoXjvpzB; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a4e62f3e63dso171407066b.0
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 11:18:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712254646; x=1712859446; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sYOoCh6UJhjoVdf8xQjst2vIFE23d+HvcvbvOgUucm0=;
-        b=z1JfOCt0+vA3Daf6QtYus/MjMZNL2ZLiZQuFIxbkURyKjZfx1QcYTFvFd8hS5zbPIN
-         uLLSAnw1LfZHcONqME8APiRNQc4dM6yufwjokZdiHICOM8YQomPWijIgWIwU5hegXn7O
-         U0beiJjkVIZ38dP4lXdFo1ozwFCzzXS0RVB/tPNZoXwTLSToiE56eRIU2D8yN0l1HXpG
-         BlUS+d8h2OrOm8TvKCBnW4Vdzcv5XjBw64A1aoHRYYbFMLs8zxg5/dS7Sev9k1Wd74Yy
-         kRh/oMXQkQn1gtYZWDbasP20dps2pE7JKb5NErEulzpw3WohfWr+lgP7S35N31/XFefW
-         KOdg==
+        d=gooddata.com; s=google; t=1712254688; x=1712859488; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SNfX+q1IgkQj9nz0GckYsepusnw34MhTeimF85l/VUU=;
+        b=ZoXjvpzB9O8q4mfd/1iHNRmoPQzRmvOm5UrT/TbbrdDvZid338252P+r5DtUe2ivVE
+         bFczjWVKzvxbSSgrP+bK9fIIwS5AWyxOgGpctra+EuVcgnkNsE0v3amei6rcvlFXeuRO
+         G6Qw3Gz780oyiUl5zx82bVklcEc7YsLgHipDU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712254646; x=1712859446;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sYOoCh6UJhjoVdf8xQjst2vIFE23d+HvcvbvOgUucm0=;
-        b=b/+PHvaLqtKMZGW1gOs17pXIgIBqtClSp10Y4fhs96EpiK4U75qy/GW95Mz3hzL1Hh
-         VWurOn+RoqS4ILjErERv5tnAvzVRB33ZsC489lJgqQ1Dsrx9clhqYSzqMUaD3sNV+mF5
-         x103jaIcrzfYj8ZYWFMGNXOskAnUSLCzffeAFkvplpQGe4PDiOqR7eGywnjhVM+GgxCn
-         ge5xImmhiOYSNPvK1etjaGwcEvv9t2I1Pwkdwu9DPRYdsqdlZiqpPYjnHI94H1XlUxjA
-         SbfbGfuYsY/C4BBbgeZJ5TImpxbqBVGfla4zFrDYR/kzigPsDuXY/eYp+lVULxHGIK3N
-         S0pw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1labOn88ECCKO+NIKIZKRSn2pz7AhE08yCce6VfDiI9Vuq0G9G2sy4nZB84bkSU91GCuQS8Y5OKoxodjiZrVA0Z3k
-X-Gm-Message-State: AOJu0YyWQukhK04uHKYjttTo4TLOC0dZAa74X1L/mNJLFLW0uYH0noR2
-	8XfB5Dw9d15apJT3Lm+eXcuBNV0Rd9ezwTCqKesIBgeccp8OInWU3tl2PtTJub3HMdewQ+QXG6h
-	ACg==
-X-Google-Smtp-Source: AGHT+IEcHLFp93PcSOAa5ozTc9zxJWoG/AELZU74M7vve6Dr7+EEuIIZ50eim8Mxletl8KelzhVzCmD8Nak=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:a1c5:0:b0:615:12cc:b325 with SMTP id
- y188-20020a81a1c5000000b0061512ccb325mr69298ywg.7.1712254646318; Thu, 04 Apr
- 2024 11:17:26 -0700 (PDT)
-Date: Thu, 4 Apr 2024 11:17:24 -0700
-In-Reply-To: <CALzav=cF+tq-snKbdP76FpodUdd7Fhu9Pf3jTK5c5=vb-MY9cQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1712254688; x=1712859488;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SNfX+q1IgkQj9nz0GckYsepusnw34MhTeimF85l/VUU=;
+        b=f5Yj5x1Xe9CDjgni+uUYTbnUy8A/PJ+m3GsdYkPM56BdLkbuI4khTjARRGzlLAafjl
+         S+uBpKGHEMgCmxUmr2webps0qT56Q0MWKkFTrynexiQBXYlvQUNa9EG8jX/GN6rvQ5ll
+         lMizUnQqVOGUBNKR0XtCgvFTZ/WM0X54lxupXz4HeXBtTWMvGLMaGKFh3CfErz+J/NyA
+         uQzJT7JrTi4EEGKfrUgXaPszG2117BcC7k+zqtOdvdoqGP7//CkpBKsCMOBTxIP0fzyV
+         Ol9/A7LMx+Yyfc8B6hQOqqRILrkSnaUx/BqnD3EhrWFj/ZC+VAXpKd7Kzd4wiW3+pLwC
+         /nFg==
+X-Forwarded-Encrypted: i=1; AJvYcCWZWnpNmqwGGUbHn1IfSuQkZWGuaRJpvWgwPBC7gVNlfQSX9SyQbqGoxU48aCMKrSxJvNyhmQg89/58J9387yrDD/ng
+X-Gm-Message-State: AOJu0YyGYW6RNBXaTJDPjzUclBOZpDL6LS1XG4Ptf23ISI1P7HBpRxMA
+	dxQCCC2YVAGnCAF7rlLu2+fW/XZMu4tpz8pyIy1IKBF5uJ3cTPDnYUycqJbtxoSc90ZNapLBhvf
+	rwY+DudDLzOBjkZPcmn8gVX+dRA7G+1zkb5eb
+X-Google-Smtp-Source: AGHT+IFs1ZK7fW9vhtx+DT4doL6b7bsFLXc6+FeNlebBKgAPxl18h2/KgaTIEGprqn2OnYYpU3mldzZYNuXXB6RyHE0=
+X-Received: by 2002:a17:906:d0d6:b0:a4e:62b3:6264 with SMTP id
+ bq22-20020a170906d0d600b00a4e62b36264mr271865ejb.76.1712254688003; Thu, 04
+ Apr 2024 11:18:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240402213656.3068504-1-dmatlack@google.com> <cb793d79-f476-3134-23b7-dc43801b133e@loongson.cn>
- <CALzav=c_qP2kLVS6R4VQRyS6aMvj0381WKCE=5JpqRUrdEYPyg@mail.gmail.com>
- <Zg7fAr7uYMiw_pc3@google.com> <CALzav=cF+tq-snKbdP76FpodUdd7Fhu9Pf3jTK5c5=vb-MY9cQ@mail.gmail.com>
-Message-ID: <Zg7utCRWGDvxdQ6a@google.com>
-Subject: Re: [PATCH v2] KVM: Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: maobibo <maobibo@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
+ <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+ <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
+ <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com>
+ <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
+ <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
+ <CA+9S74hs_1Ft9iyXOPU_vF_EFKuoG8LjDpSna0QSPMFnMywd_g@mail.gmail.com>
+ <CACGkMEvHiAN7X_QBgihWX6zzEUOxhrV2Nqg1arw1sfYy2A5K0g@mail.gmail.com>
+ <CAK8fFZ6P6e+6V6NUkc-H5SdkXqgHdZ-GEMEPp4hKZSJVaGbBYQ@mail.gmail.com> <20240404063737.7b6e3843@kernel.org>
+In-Reply-To: <20240404063737.7b6e3843@kernel.org>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Thu, 4 Apr 2024 20:17:42 +0200
+Message-ID: <CAK8fFZ5LHFMPAOFCKu-vr7JQJHKo9jshrgvCCP50d596nFiXUQ@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason Wang <jasowang@redhat.com>, Igor Raits <igor@gooddata.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 04, 2024, David Matlack wrote:
-> > I don't love the idea of adding more arch specific MMU behavior (going the wrong
-> > direction), but it doesn't seem like an unreasonable approach in this case.
-> 
-> I wonder if this is being overly cautious.
+=C4=8Dt 4. 4. 2024 v 15:37 odes=C3=ADlatel Jakub Kicinski <kuba@kernel.org>=
+ napsal:
+>
+> On Thu, 4 Apr 2024 07:42:45 +0200 Jaroslav Pulchart wrote:
+> > We do not have much progress
+>
+> Random thought - do you have KFENCE enabled?
+> It's sufficiently low overhead to run in production and maybe it could
+> help catch the bug? You also hit some inexplicable bug in the Intel
+> driver, IIRC, there may be something odd going on.. (it's not all
+> happening on a single machine, right?)
 
-Probably.  "Lazy" is another word for it ;-)
+We have KFENCE enabled.
 
-> I would expect only more benefit on architectures that more aggressively take
-> the mmu_lock on vCPU threads during faults. The more lock acquisition on vCPU
-> threads, the more this patch will help reduce vCPU starvation during
-> CLEAR_DIRTY_LOG.
-> 
-> Hm, perhaps testing with ept=N (which will use the write-lock for even
-> dirty logging faults) would be a way to increase confidence in the
-> effect on other architectures?
+Issue was observed at multiple servers. It is not a problem to reproduce it
+everywhere where we deploy Loki service. The trigger is: I click
+once/twice "run query" (LogQL) button by Grafana UI. the Loki is
+starting to load data from the minio cluster at a speed of ~2GB/s and
+almost immediately it crashes.
 
-Turning off the TDP MMU would be more representative, just manually disable the
-fast-path, e.g.
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 992e651540e8..532c24911f39 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3371,7 +3371,7 @@ static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
-         * Note, instruction fetches and writes are mutually exclusive, ignore
-         * the "exec" flag.
-         */
--       return fault->write;
-+       return false;//fault->write;
- }
- 
- /*
-
+The Intel ICE driver is in my suspicion as well, it will not be for
+the first time when we are hitting some bugs there. I will try one
+testing server where we have different NIC vendor later.
 
