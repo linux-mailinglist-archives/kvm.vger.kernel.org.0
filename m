@@ -1,149 +1,135 @@
-Return-Path: <kvm+bounces-13520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83E9E89833F
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 10:36:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F5FE8983E0
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 11:20:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B18B01C26D3A
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 08:36:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF50F1C2339C
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 09:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C15B71730;
-	Thu,  4 Apr 2024 08:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CC67442F;
+	Thu,  4 Apr 2024 09:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="ZJ98WAic"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sUkBVkd2"
 X-Original-To: kvm@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F1E1E86F;
-	Thu,  4 Apr 2024 08:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA725E07E
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 09:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712219758; cv=none; b=T0hjZCTpEsogmrte2NazkOXUtkEfb2L/x9BCcqBmThNAl4DERDqOcwA8jDf6NOp9XHCdIsOfHX1ejQKb9A5XoVT2f7V3EwyFcRdmPBi+m3MkbXnezmqcUhCJaSns4fDLS8bWwSmyp8MIbsRan0ZfVJyB2IkZF3S8Lsq3OfgBxC0=
+	t=1712222401; cv=none; b=fcoQq2dKXS1EY31bVX4rxgjjjV6Tkn0e/f7jQs9P7WvObMZlDn7375EfkPFUorPNL2TW65HNcCwHg2Q3rXWG8pkxDXQ0H+NXhHq92pEayNSzfQYpZLbyM9UkaW/UesXCGFGltw+QvG2huG9i4YKDKmEdHCeZYE/F+SWBV8UM9yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712219758; c=relaxed/simple;
-	bh=pW9lJVcByIr6coYIc9zEDDgHzk/MplgZr99q4AzfSIc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q4qb8UjwCSUrgsZsdorQppifHzyFlMjomeiL3aFwjJgc470RuVdIVL+12KefjmyT3lqTxyd/o+fNwGuzZj6kq8sumQAwLXRPaKD7+37L0WXX6dlz7cSffCqzjHJBIDFbZ0pv9SqY+DmUon2eg0ByvDWJ74jQqK4jn1KNMTiI1J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=ZJ98WAic; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:Reply-To:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=XGHxVqk4pP10Jn+yNRakH5zgTP0QZEzijKIINGCO2kM=;
-	t=1712219756; x=1712651756; b=ZJ98WAicu+XqWCQv2CJyv1smUti1qPzCU85iUh5WstpgnY6
-	9QNTu1HcWcbgBiEbPBFXtOBVK2szMZfReqQc5Oy6nD3i18/Hj6tiCE3uL2XFTRL8CpxO44yDWuKbF
-	m8Up9HY1x1muwojyGrZB1Ii31pQvq3hyUkevBXs7ggUqz9Bl7L6j4Fyb7MLYO7EJbGRXiFBDvSAsq
-	/9JRt4iR+ZODo7lYRaHAb/ZkZGsN7VRVQDfu6jb43J2OKr6anDbRo0hA4T94rjc0QhycJKvtSAdOv
-	jxrXKxLFZbCCpO/y/x8yURJWDEeyjE8V81W+OtQHwifLRtTE5iNddBOVS+oYt4sQ==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1rsIZd-0002eV-40; Thu, 04 Apr 2024 10:35:53 +0200
-Message-ID: <a4f022e8-1f84-4bbb-b00d-00f1eba1f877@leemhuis.info>
-Date: Thu, 4 Apr 2024 10:35:52 +0200
+	s=arc-20240116; t=1712222401; c=relaxed/simple;
+	bh=2FVNMLmDPixAiJz9IV2WhhjVMeHUhCQJ24ayf9+a34o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JfZdihk7qbMCs91UXjF9U8yaHLm0JZB/ReGUWYZPx/o+Udp5tKeB1kF9U6yIJgtBMnPvBb1Ik2ccxEq3CDEK8n5kq/br9IiryoWqItnWVRex7+LKeyJaxqdwBOhvKi9JgB+Cr58Crynef8h0eWqFvPD6xwXuX54d7PN2fndQSKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sUkBVkd2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6379BC433F1;
+	Thu,  4 Apr 2024 09:20:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712222401;
+	bh=2FVNMLmDPixAiJz9IV2WhhjVMeHUhCQJ24ayf9+a34o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sUkBVkd2tn9BUwKrBTw9hu2FYigsr9H3Pb9b5gs7bqPfn9mclVVYcjmCDSvsHRZvU
+	 P469b92Hg31f3EFvlNdZe6wwRMecD6G+VdxX/LWygBCY40Mp5dts88ql3ecY2hDEYC
+	 cjbkq+mOBoPXSJDtbXBhj2P5+RNuKg5EPR5+3OPVy1v2oW92dkV7UnYNnvWkE6WkSj
+	 YFJ6PEO6OGAhRe2lk3RVC/hMBwc8gCo2QBYK92TdyYFwkzCYspmFZXyYwIMkkH/IqV
+	 CwtlGq0CrLrkaCi8kFaD4/fWGayXxB73wwdH+T32olMYrrp9kxMDhaICkXlLczHxfh
+	 V4GmDHZJ0iQ5Q==
+Received: from [185.201.63.251] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rsJGI-001PxT-Sz;
+	Thu, 04 Apr 2024 10:19:59 +0100
+Date: Thu, 04 Apr 2024 10:19:50 +0100
+Message-ID: <87h6ghscw9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc: "pbonzini@redhat.com"
+	<pbonzini@redhat.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>,
+	Aravind Retnakaran
+	<aravind.retnakaran@nutanix.com>,
+	"Carl Waldspurger [C]"
+	<carl.waldspurger@nutanix.com>,
+	David Vrabel <david.vrabel@nutanix.com>,
+	"david@redhat.com" <david@redhat.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v10 0/3] Per-vCPU dirty quota-based throttling
+In-Reply-To: <EDE1F181-FC4F-4E76-9F89-C35579193480@nutanix.com>
+References: <20240221195125.102479-1-shivam.kumar1@nutanix.com>
+	<EDE1F181-FC4F-4E76-9F89-C35579193480@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV nestedv2: Cancel pending HDEC
- exception
-To: Nicholas Piggin <npiggin@gmail.com>, Vaibhav Jain
- <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- kvm-ppc@vger.kernel.org
-Cc: Michael Ellerman <mpe@ellerman.id.au>, Jordan Niethe
- <jniethe5@gmail.com>, Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
- mikey@neuling.org, paulus@ozlabs.org, sbhat@linux.ibm.com,
- gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
- amachhiw@linux.vnet.ibm.com, David.Laight@ACULAB.COM,
- Linux kernel regressions list <regressions@lists.linux.dev>
-References: <20240313072625.76804-1-vaibhav@linux.ibm.com>
- <CZYME80BW9P7.3SC4GLHWCDQ9K@wheely>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-In-Reply-To: <CZYME80BW9P7.3SC4GLHWCDQ9K@wheely>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1712219756;98cda012;
-X-HE-SMSGID: 1rsIZd-0002eV-40
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.201.63.251
+X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, aravind.retnakaran@nutanix.com, carl.waldspurger@nutanix.com, david.vrabel@nutanix.com, david@redhat.com, will@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
-for once, to make this easily accessible to everyone.
+On Thu, 21 Mar 2024 05:48:01 +0000,
+Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+>=20
+>=20
+> > On 22-Feb-2024, at 1:22 AM, Shivam Kumar <shivam.kumar1@nutanix.com> wr=
+ote:
+> >=20
+> > The current v10 patchset includes the following changes over v9:
+> >=20
+> > 1. Use vma_pagesize as the dirty granularity for updating dirty quota
+> > on arm64.
+> > 2. Do not update dirty quota for instances where the hypervisor is
+> > writing into guest memory. Accounting for these instances in vCPUs'
+> > dirty quota is unfair to the vCPUs. Also, some of these instances,
+> > such as record_steal_time, frequently try to redundantly mark the same
+> > set of pages dirty again and again. To avoid these distortions, we had
+> > previously relied on checking the dirty bitmap to avoid redundantly
+> > updating quotas. Since we have now decoupled dirty-quota-based
+> > throttling from the live-migration dirty-tracking path, we have
+> > resolved this issue by simply avoiding the mis-accounting caused by
+> > these hypervisor-induced writes to guest memory.  Through extensive
+> > experiments, we have verified that this new approach is approximately
+> > as effective as the prior approach that relied on checking the dirty
+> > bitmap.
+> >=20
+>=20
+> Hi Marc,
+>=20
+> I=E2=80=99ve tried my best to address all the concerns raised in the
+> previous patchset. I=E2=80=99d really appreciate it if you could share yo=
+ur
+> thoughts and any feedback you might have on this one.
 
-Was this regression ever resolved? Doesn't look like it, but maybe I
-just missed something.
+I'll get to it at some point. However, given that it has you taken the
+best part of a year to respin this, I need to page it all back it,
+which is going to take a bit of time as well.
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+Thanks,
 
-#regzbot poke
+	M.
 
-On 20.03.24 14:43, Nicholas Piggin wrote:
-> On Wed Mar 13, 2024 at 5:26 PM AEST, Vaibhav Jain wrote:
->> This reverts commit 180c6b072bf360b686e53d893d8dcf7dbbaec6bb ("KVM: PPC:
->> Book3S HV nestedv2: Do not cancel pending decrementer exception") which
->> prevented cancelling a pending HDEC exception for nestedv2 KVM guests. It
->> was done to avoid overhead of a H_GUEST_GET_STATE hcall to read the 'HDEC
->> expiry TB' register which was higher compared to handling extra decrementer
->> exceptions.
->>
->> This overhead of reading 'HDEC expiry TB' register has been mitigated
->> recently by the L0 hypervisor(PowerVM) by putting the value of this
->> register in L2 guest-state output buffer on trap to L1. From there the
->> value of this register is cached, made available in kvmhv_run_single_vcpu()
->> to compare it against host(L1) timebase and cancel the pending hypervisor
->> decrementer exception if needed.
-> 
-> Ah, I figured out the problem here. Guest entry never clears the
-> queued dec, because it's level triggered on the DEC MSB so it
-> doesn't go away when it's delivered. So upstream code is indeed
-> buggy and I think I take the blame for suggesting this nestedv2
-> workaround.
-> 
-> I actually don't think that is necessary though, we could treat it
-> like other interrupts.  I think that would solve the problem without
-> having to test dec here.
-> 
-> I am wondering though, what workload slows down that this patch
-> was needed in the first place. We'd only get here after a cede
-> returns, then we'd dequeue the dec and stop having to GET_STATE
-> it here.
-> 
-> Thanks,
-> Nick
-> 
->>
->> Fixes: 180c6b072bf3 ("KVM: PPC: Book3S HV nestedv2: Do not cancel pending decrementer exception")
->> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
->> ---
->>  arch/powerpc/kvm/book3s_hv.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->> index 0b921704da45..e47b954ce266 100644
->> --- a/arch/powerpc/kvm/book3s_hv.c
->> +++ b/arch/powerpc/kvm/book3s_hv.c
->> @@ -4856,7 +4856,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
->>  	 * entering a nested guest in which case the decrementer is now owned
->>  	 * by L2 and the L1 decrementer is provided in hdec_expires
->>  	 */
->> -	if (!kvmhv_is_nestedv2() && kvmppc_core_pending_dec(vcpu) &&
->> +	if (kvmppc_core_pending_dec(vcpu) &&
->>  			((tb < kvmppc_dec_expires_host_tb(vcpu)) ||
->>  			 (trap == BOOK3S_INTERRUPT_SYSCALL &&
->>  			  kvmppc_get_gpr(vcpu, 3) == H_ENTER_NESTED)))
-> 
+--=20
+Without deviation from the norm, progress is not possible.
 
