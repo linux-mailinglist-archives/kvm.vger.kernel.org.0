@@ -1,110 +1,148 @@
-Return-Path: <kvm+bounces-13541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABD988986B9
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 14:02:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E03CA8986DF
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 14:13:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA8C81C221DA
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 12:02:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C5DD1F28D5E
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 12:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC6185286;
-	Thu,  4 Apr 2024 12:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA82B8595C;
+	Thu,  4 Apr 2024 12:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="H7hHb2Pq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U9f5CKQf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9DF83A09
-	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 12:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4407484FD8
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 12:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712232123; cv=none; b=mibFBBp0dzwEqc1Q8vIYGrU2+qRSMAcVOkU6yruEHMb57ovFS0OotS6EYKXg/Xu8tKFl8f5o267DuuEbYgvZ4IcLFYGrAoqYi6bvv/2dltHUEmH7SzdzeZSwGUEL7uUBHK4QPmQ1uVMgvmL+P6jBhvP0CDQhVzHQwQjX3/J+Ono=
+	t=1712232812; cv=none; b=igFtaVytKN0Wj+aw/Z2Jay4lgzn4qcGueYtWkinodBZ4ya1rHyWF4GmKmXisG6z8Ko/pZ8uLYaSlTih5jtWdXiDD09DcNjG4ZyvnJ/1x/a57dQsbnKECRKvlI/IjKDEK4uwee8+GdPMnMDoMT+aYJKWii3a8siPquB5XM9RYzA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712232123; c=relaxed/simple;
-	bh=W9ko0RfNE+S1DiS7+KgLkrYBPHmkmYztpcltRdxaN5o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R6BO4GC9trS/dTwxjPIs07DYf2PhnwC+nHsAHb5I0ElQP6AyVx3kUuEX8rL7sB6IdoAruBoGF9soSzU3BzxkNv0J8ars92s/+JfKDue6dF0FGPJv2hK8z8UiT4qYeaFv5WwDcBe9yKqnDNTmd6x2Vd4LF0GYQ+IoU59uk7ZdpvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=H7hHb2Pq; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-565c6cf4819so3570950a12.1
-        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 05:02:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1712232120; x=1712836920; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i6sgTwxk9jhbJgHBwC7uiEgEw3bNU/OxwYHoyLaglJk=;
-        b=H7hHb2PqfDTZ0NdF7Lkzz3dEXUQZSTEF2o/9++LqNBz1yUbtOkix5A4WdbHQYmp5JV
-         vIrUWS3gclXDWHvip4umv8wY6JnirVc8g7xVotMJ4oMA618NhFHw/resoT99254DmdoJ
-         otHIbUSq/r+LcS0B8WA6WrghL1gajvik9TiaSd/kJp+Be7+cVBxsW3hvAvKG/xi/C9bm
-         KXq09/+uUGhAabkvzmdepeoT3Rwz2p82HEoINFJ0wgqOSUyGzCQofFLPKj95+12+uC/c
-         SXCKnVRifUw1DXGxENAQThnkB5kOtp7IIRp+4MOj7OszVc8rXFac3UNRe1V0wGenhVMG
-         4ZXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712232120; x=1712836920;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i6sgTwxk9jhbJgHBwC7uiEgEw3bNU/OxwYHoyLaglJk=;
-        b=BWCgVixOMS7AtE/NkJDVPyeCvsoyDy57CA896z+nLvWsOVsMOzvEa89WgkxF9HRo95
-         uu3D8l9wrQ23PjvYmJTDheFlFrW4m6/QwsVjjQNexTVBxORonBcPx0mBOID0NxUCoA1t
-         KxeO9VY34ZCOFxdomBu7PYik8iwznZcHC5KjUo20U+olXBJq685UpUgGrGMwjHGjQsfN
-         UpgpTgeGI23Hlpg/bXL8gXIPm7JztW5zJGCOmVgm66zrkY1MCBVDTzNIjfO6nzztwrhM
-         ejb+PWD/AwW9nChWhR7d0Ga0R9+aH9uM+nJwPDko/rewS8lXuSAf2c2l1+bQvWJOV/bJ
-         DM3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWb1MRQaAzcETKbGsQXiSmkGWA0pwKQ5HiHuk58EGkVvqSbrbNjdx4kvxA2CbZWNJLRn4ZD/WoZmg+/nB3on2DvVf1X
-X-Gm-Message-State: AOJu0Yybmitn9HQVwqXvL3ilitiMaBrw+14EFJE9awvs7Q7ppC5ku9Oh
-	Jzexkzbr7V5xh14H23FKJ5O97dW9R4fW78WyghYrAYK1e4RffmGn2w/F8riAf2g=
-X-Google-Smtp-Source: AGHT+IFp9TuLXZRqsWbkDSS4HE72CGMNStdZzxnFkRk5hlzliQxjfRqdZTW+nZQ93k29lkL/Bq+HhA==
-X-Received: by 2002:a17:906:f912:b0:a4e:13ee:5dec with SMTP id lc18-20020a170906f91200b00a4e13ee5decmr4834184ejb.17.1712232119747;
-        Thu, 04 Apr 2024 05:01:59 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id la6-20020a170907780600b00a4e2db8ffdcsm8202481ejc.111.2024.04.04.05.01.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 05:01:59 -0700 (PDT)
-Date: Thu, 4 Apr 2024 14:01:58 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>, 
-	Anup Patel <anup@brainfault.org>, Conor Dooley <conor.dooley@microchip.com>, 
-	Ajay Kaher <akaher@vmware.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
-	Alexey Makhalov <amakhalov@vmware.com>, Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Will Deacon <will@kernel.org>, x86@kernel.org
-Subject: Re: [PATCH v5 06/22] drivers/perf: riscv: Implement SBI PMU snapshot
- function
-Message-ID: <20240404-bbfb02e3aec944f9e11745ae@orel>
-References: <20240403080452.1007601-1-atishp@rivosinc.com>
- <20240403080452.1007601-7-atishp@rivosinc.com>
+	s=arc-20240116; t=1712232812; c=relaxed/simple;
+	bh=lvgrt2+h+32nV9sB6Pbowk90McEKUA04yJRDBc4Cfx4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Bg9b+bVqHM2qFqRJfFAMIfN7BpcFGatLOfTPO1MVM3TkCOWMwEXK2goJdL3/hhEeJs7VHyC9g2HPXIVPkgy4P+Phsj1sOdWy12xKPSERRBT900p49fzTJ04LT6UBSGDKncBGrldZV+fOiAhabD0oBPAuv3+5emfI+SAUyBNtqxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U9f5CKQf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712232810;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iX8vkGO/ubhfuqfL3RRUiW2W1cfaaMsTND1lD88J4N4=;
+	b=U9f5CKQfyiS+mPshFLLuTH+WR2luB5rdSbpixEhAxtR8jgSrDcX9XE6B3V2Kdsi+qxnnU1
+	9/O37iK+GK1Ce2gwZ5ioMw3Kjrfkj5FPcKB6dTzoURcLonSpmlNFbUWsXMumZTowPLFa5I
+	ABnXNBRqvl1paBnlSs/ZJMjMz8A+q58=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-zuCUrquIPS-saWkijWOZmg-1; Thu,
+ 04 Apr 2024 08:13:28 -0400
+X-MC-Unique: zuCUrquIPS-saWkijWOZmg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6E06C383CCE8;
+	Thu,  4 Apr 2024 12:13:28 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 19086200A386;
+	Thu,  4 Apr 2024 12:13:28 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: michael.roth@amd.com,
+	isaku.yamahata@intel.com,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Subject: [PATCH v5 00/17] KVM: SEV: allow customizing VMSA features
+Date: Thu,  4 Apr 2024 08:13:10 -0400
+Message-ID: <20240404121327.3107131-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240403080452.1007601-7-atishp@rivosinc.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Wed, Apr 03, 2024 at 01:04:35AM -0700, Atish Patra wrote:
-...
-> +static int pmu_sbi_snapshot_disable(void)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM, -1,
-> +			-1, 0, 0, 0, 0);
+This is the same as v4, except for the following minor changes:
 
-The "Rename the SBI_STA_SHMEM_DISABLE" patch should come before this
-patch so SBI_SHMEM_DISABLE can be used instead of the -1's here.
+- moving the KVM_X86_SEV_VMSA_FEATURES attribute to a
+  separate group, KVM_X86_GRP_SEV [Isaku]
 
-Thanks,
-drew
+- as part of the previous change, retroactively define group 0
+  as "KVM_X86_GRP_SYSTEM"
+
+- squashing in the "fixup! KVM: SEV: sync FPU and AVX state at
+  LAUNCH_UPDATE_VMSA time" patch
+
+- disabling FPU and AVX sync for the old-style KVM_SEV_ES_INIT
+  ioctl [Michael]
+
+- adding an fstp instruction to the new test case, in order to
+  keep the x87 stack balanced (just for cleanliness/paranoia)
+
+Paolo Bonzini (16):
+  KVM: SVM: Compile sev.c if and only if CONFIG_KVM_AMD_SEV=y
+  KVM: x86: use u64_to_user_ptr()
+  KVM: introduce new vendor op for KVM_GET_DEVICE_ATTR
+  KVM: SEV: publish supported VMSA features
+  KVM: SEV: store VMSA features in kvm_sev_info
+  KVM: x86: add fields to struct kvm_arch for CoCo features
+  KVM: x86: Add supported_vm_types to kvm_caps
+  KVM: SEV: introduce to_kvm_sev_info
+  KVM: SEV: define VM types for SEV and SEV-ES
+  KVM: SEV: sync FPU and AVX state at LAUNCH_UPDATE_VMSA time
+  KVM: SEV: introduce KVM_SEV_INIT2 operation
+  KVM: SEV: allow SEV-ES DebugSwap again
+  selftests: kvm: add tests for KVM_SEV_INIT2
+  selftests: kvm: switch to using KVM_X86_*_VM
+  selftests: kvm: split "launch" phase of SEV VM creation
+  selftests: kvm: add test for transferring FPU state into VMSA
+
+Sean Christopherson (1):
+  KVM: SVM: Invert handling of SEV and SEV_ES feature flags
+
+ Documentation/virt/kvm/api.rst                |   2 +
+ .../virt/kvm/x86/amd-memory-encryption.rst    |  52 ++++-
+ arch/x86/include/asm/fpu/api.h                |   3 +
+ arch/x86/include/asm/kvm-x86-ops.h            |   1 +
+ arch/x86/include/asm/kvm_host.h               |   8 +-
+ arch/x86/include/uapi/asm/kvm.h               |  20 +-
+ arch/x86/kernel/fpu/xstate.c                  |   1 +
+ arch/x86/kernel/fpu/xstate.h                  |   2 -
+ arch/x86/kvm/Makefile                         |   7 +-
+ arch/x86/kvm/cpuid.c                          |   2 +-
+ arch/x86/kvm/svm/sev.c                        | 190 ++++++++++++++----
+ arch/x86/kvm/svm/svm.c                        |  27 ++-
+ arch/x86/kvm/svm/svm.h                        |  54 +++--
+ arch/x86/kvm/x86.c                            | 165 +++++++++------
+ arch/x86/kvm/x86.h                            |   2 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/kvm_util_base.h     |  11 +-
+ .../selftests/kvm/include/x86_64/processor.h  |   6 -
+ .../selftests/kvm/include/x86_64/sev.h        |  19 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 -
+ .../selftests/kvm/lib/x86_64/processor.c      |  14 +-
+ tools/testing/selftests/kvm/lib/x86_64/sev.c  |  44 +++-
+ .../selftests/kvm/set_memory_region_test.c    |   8 +-
+ .../selftests/kvm/x86_64/sev_init2_tests.c    | 152 ++++++++++++++
+ .../selftests/kvm/x86_64/sev_smoke_test.c     |  96 ++++++++-
+ 25 files changed, 703 insertions(+), 185 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_init2_tests.c
+
+-- 
+2.43.0
+
+
+
+
+
 
