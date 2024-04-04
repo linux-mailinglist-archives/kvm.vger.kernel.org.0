@@ -1,283 +1,233 @@
-Return-Path: <kvm+bounces-13560-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13561-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D7B89870A
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 14:19:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A41D5898711
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 14:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 836021F28A50
-	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 12:19:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A15629660D
+	for <lists+kvm@lfdr.de>; Thu,  4 Apr 2024 12:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE9286AFA;
-	Thu,  4 Apr 2024 12:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF8D1292D7;
+	Thu,  4 Apr 2024 12:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WXm+oOdk"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="gr+5vDa+"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E1F8624C
-	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 12:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F81B12838A
+	for <kvm@vger.kernel.org>; Thu,  4 Apr 2024 12:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712232881; cv=none; b=IEFV8M2+rzNpi3HTY3yPVckSb2siO0gNcx7Oiuqtx4MO2SqZPwsrjaTxtJyvcVowwucnapOF+CM3roWWHMKB40QckaiEO2mcCLhCbSrBw/Dpyq9QJrllEWUWHMNpvpFeYBjjxBo6GWWxQxDJJMdINF+E5qipWiplyCBf64qX5Dg=
+	t=1712232967; cv=none; b=e2nrLP30Cc3tyvzhlM39hxUXy9L5/r78A8ksKT0wbPPLq2xcwp3Tt4spVCupLcC2sBF0FvymQ3jInVaYTmOwGHemQNjPz0zg7NAc/NxbOjASzu5LZgx57Cmr7VQeVM+A2TdrvTyNSA+n4dVNGCZfCiu//Q0fI5+HQUWEsmxHwnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712232881; c=relaxed/simple;
-	bh=79fyvg6eezjxxkD4dqHkcqexLGmoZdlcwbY6OSWAM9I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PcJDz4866SHmUUUkEF14Wc+hFo+sPvTxmybBt282nc+tyUymImsyecsDpv4z3oOunMID+tp/1Ad9+rNjgEzemgkrA4ZewwHiFVSl2bCbBOG+tLoin1dPmteP7DR4TOXR4j+KCCg9v4AzssxpdjCNzucgt+Q/VVS9wK83amp8M04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WXm+oOdk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712232878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=siEojvJz+9pd959IDg+Ca7yTVzm2HP7m64YDzvkN/LQ=;
-	b=WXm+oOdkO4kzTgdfhF/OiLPoh+kbfwNoPgc9gta1+/tfSGwEsjD8UFHRnw2q78TitbQu+1
-	mpJXXcrDk8O/wlFZNrdF5PvXkR9mW7rJXdx4r16xuRuWdaRK25HiYb3ql0fkbPVterOvU7
-	bsjAsO4JCZf7VEIekUs+Ay/ODqpSztM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-531-ZKxRtCP5OhKF1Bz1bPlmAA-1; Thu, 04 Apr 2024 08:14:35 -0400
-X-MC-Unique: ZKxRtCP5OhKF1Bz1bPlmAA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3059A805A60;
-	Thu,  4 Apr 2024 12:14:35 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0E0BC492BD7;
-	Thu,  4 Apr 2024 12:14:35 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: michael.roth@amd.com,
-	seanjc@google.com
-Subject: [PATCH] KVM: SEV: use u64_to_user_ptr throughout
-Date: Thu,  4 Apr 2024 08:14:34 -0400
-Message-ID: <20240404121434.3107212-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1712232967; c=relaxed/simple;
+	bh=DwqQItygo6fFyn6PFhYMmTLsFq02mcoKOLnfPOt+Jp8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O0f913qJgM9QnnYWU73w6UdBAAoPSoU1sU2xNmmxBF9P2fqH6hCr28ilBtrH/hpeeBtbwSqcKDvlSyzEE0wunwAVNHtDRE+TnJLKLryrECHjoDuQY7OQglk1xP7a9pQtR8J/g3OYfs06JEVNEVsFoPURST3Fdgr3UDLDyZpP0jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=gr+5vDa+; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d6fc3adaacso11552001fa.2
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 05:16:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1712232963; x=1712837763; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=M7CUkDVzN7ZtwbkfqhOOiERTsuLZVsBjpzU4ddI5VKM=;
+        b=gr+5vDa+R3fqRiHDKuViRiKyRJSsYWwJbEX5CUsYodribTYf5WqJnZyMr9KBmIU0+7
+         qHM+y9Xh16+wwkMAgYHwrqy9Gs9wTF24KLjDs66eSXpiIs2Y8aeeZcPvEEH4yub4PIM2
+         IxcKDAS+aRG2ninq1LlzV/CR7Yj4DZ16bYSRv5+7qGqLo8Dkbw7lHmOPm81GlKctJF3k
+         a/yKEIRR8vAHzKG041dbWembwJxEMdj9GYmnSXTLBVHiPCO6hkiq3vd4HEi3EsNvyNho
+         0LgU9//B7EGNo72NhRiDF/N88l6YNalQWcPN4bPWG2JCmK5l/kdEgUYuSyfSWMw52xZU
+         Vb1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712232963; x=1712837763;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M7CUkDVzN7ZtwbkfqhOOiERTsuLZVsBjpzU4ddI5VKM=;
+        b=OrxW1ZgnoVucLLBk2JXSy0h8B/qGQ9fZgPudrhv1y6rrgLYI/EAglGIaMDcU9Pixkr
+         9/SOnrMbMwYXGuennaBnCAx0jDOD74HSu0CHvT/ex2eVxHTVuxOgEXaX7SCvc/7Jwe4s
+         WjkkHbmN5iDiLTFmmG5Ewr2JMaS2zoUSvT/+a8Z6j254P0DDdw4ETZ6gylmg5/8oojdd
+         KzZplJIeAicbTouFkk1rZ3HxFwSRVWslZp/QyCV4F1r7gBdVTxNJ8xpD0CpTbSvNucCV
+         lEUXf4zA8vQ8Sz+yPwhQNLUsvtvYxSOT68rWZE8WXZv5aVSta0g4bb1arKZSTx2oQkGm
+         Muiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxNK+ac4STMm3DONPxpAylGTCivWRhyAVc1D+8vRtG1Ol4SYMnqK/ZU0h5THN4LTUYMQFHz7mLSuPsLJjGbl7secg2
+X-Gm-Message-State: AOJu0Yy5XFiuYCXEMpPXqviGnFkuAY7m7GZYLpAow3LtGxaRM8sNj2AI
+	nsc9aCGKdMaZub1mDsCorxPT7RC+rOzqun2oGn0oa4oTRpaYg3SrHupTkKRWzEw=
+X-Google-Smtp-Source: AGHT+IHYFdWmSj7wn8SFyRFXMduCoplAQPqaPLjEPnPkn3UWdbmb8OMIHJOSpfY0ndz+qQW8DO3Ptg==
+X-Received: by 2002:a2e:8e6d:0:b0:2d8:2799:c3b1 with SMTP id t13-20020a2e8e6d000000b002d82799c3b1mr1596767ljk.10.1712232963336;
+        Thu, 04 Apr 2024 05:16:03 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id ck5-20020a5d5e85000000b0034349225fbcsm12841155wrb.114.2024.04.04.05.16.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 05:16:02 -0700 (PDT)
+Date: Thu, 4 Apr 2024 14:16:01 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@atishpatra.org>
+Cc: Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org, 
+	Anup Patel <anup@brainfault.org>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alexghiti@rivosinc.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Guo Ren <guoren@kernel.org>, Icenowy Zheng <uwu@icenowy.me>, kvm-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Shuah Khan <shuah@kernel.org>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 07/15] RISC-V: KVM: No need to exit to the user space
+ if perf event failed
+Message-ID: <20240404-ea40bc0237635d671e64fef6@orel>
+References: <20240229010130.1380926-1-atishp@rivosinc.com>
+ <20240229010130.1380926-8-atishp@rivosinc.com>
+ <20240302-1a3c0df25f2422e1e6abecf3@orel>
+ <CAOnJCUJCQjBfLZFW-3iLUB6ygyRmz1Anu+fhfrT4Lpoj2iNB5Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+In-Reply-To: <CAOnJCUJCQjBfLZFW-3iLUB6ygyRmz1Anu+fhfrT4Lpoj2iNB5Q@mail.gmail.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm/sev.c | 44 +++++++++++++++++++++---------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+On Mon, Apr 01, 2024 at 03:37:01PM -0700, Atish Patra wrote:
+> On Sat, Mar 2, 2024 at 12:16 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+> >
+> > On Wed, Feb 28, 2024 at 05:01:22PM -0800, Atish Patra wrote:
+> > > Currently, we return a linux error code if creating a perf event failed
+> > > in kvm. That shouldn't be necessary as guest can continue to operate
+> > > without perf profiling or profiling with firmware counters.
+> > >
+> > > Return appropriate SBI error code to indicate that PMU configuration
+> > > failed. An error message in kvm already describes the reason for failure.
+> >
+> > I don't know enough about the perf subsystem to know if there may be
+> > a concern that resources are temporarily unavailable. If so, then this
+> 
+> Do you mean the hardware resources unavailable because the host is using it ?
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 022d92fb4b85..1642d7d49bde 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -377,7 +377,7 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!sev_guest(kvm))
- 		return -ENOTTY;
- 
--	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-+	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(params)))
- 		return -EFAULT;
- 
- 	memset(&start, 0, sizeof(start));
-@@ -421,7 +421,7 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- 	/* return handle to userspace */
- 	params.handle = start.handle;
--	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params))) {
-+	if (copy_to_user(u64_to_user_ptr(argp->data), &params, sizeof(params))) {
- 		sev_unbind_asid(kvm, start.handle);
- 		ret = -EFAULT;
- 		goto e_free_session;
-@@ -560,7 +560,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!sev_guest(kvm))
- 		return -ENOTTY;
- 
--	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-+	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(params)))
- 		return -EFAULT;
- 
- 	vaddr = params.uaddr;
-@@ -780,7 +780,7 @@ static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
- {
--	void __user *measure = (void __user *)(uintptr_t)argp->data;
-+	void __user *measure = u64_to_user_ptr(argp->data);
- 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
- 	struct sev_data_launch_measure data;
- 	struct kvm_sev_launch_measure params;
-@@ -800,7 +800,7 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!params.len)
- 		goto cmd;
- 
--	p = (void __user *)(uintptr_t)params.uaddr;
-+	p = u64_to_user_ptr(params.uaddr);
- 	if (p) {
- 		if (params.len > SEV_FW_BLOB_MAX_SIZE)
- 			return -EINVAL;
-@@ -873,7 +873,7 @@ static int sev_guest_status(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	params.state = data.state;
- 	params.handle = data.handle;
- 
--	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params)))
-+	if (copy_to_user(u64_to_user_ptr(argp->data), &params, sizeof(params)))
- 		ret = -EFAULT;
- 
- 	return ret;
-@@ -1038,7 +1038,7 @@ static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
- 	if (!sev_guest(kvm))
- 		return -ENOTTY;
- 
--	if (copy_from_user(&debug, (void __user *)(uintptr_t)argp->data, sizeof(debug)))
-+	if (copy_from_user(&debug, u64_to_user_ptr(argp->data), sizeof(debug)))
- 		return -EFAULT;
- 
- 	if (!debug.len || debug.src_uaddr + debug.len < debug.src_uaddr)
-@@ -1122,7 +1122,7 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!sev_guest(kvm))
- 		return -ENOTTY;
- 
--	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-+	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(params)))
- 		return -EFAULT;
- 
- 	pages = sev_pin_memory(kvm, params.guest_uaddr, params.guest_len, &n, 1);
-@@ -1186,7 +1186,7 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
- {
--	void __user *report = (void __user *)(uintptr_t)argp->data;
-+	void __user *report = u64_to_user_ptr(argp->data);
- 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
- 	struct sev_data_attestation_report data;
- 	struct kvm_sev_attestation_report params;
-@@ -1197,7 +1197,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!sev_guest(kvm))
- 		return -ENOTTY;
- 
--	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-+	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(params)))
- 		return -EFAULT;
- 
- 	memset(&data, 0, sizeof(data));
-@@ -1206,7 +1206,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!params.len)
- 		goto cmd;
- 
--	p = (void __user *)(uintptr_t)params.uaddr;
-+	p = u64_to_user_ptr(params.uaddr);
- 	if (p) {
- 		if (params.len > SEV_FW_BLOB_MAX_SIZE)
- 			return -EINVAL;
-@@ -1259,7 +1259,7 @@ __sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
- 	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, &data, &argp->error);
- 
- 	params->session_len = data.session_len;
--	if (copy_to_user((void __user *)(uintptr_t)argp->data, params,
-+	if (copy_to_user(u64_to_user_ptr(argp->data), params,
- 				sizeof(struct kvm_sev_send_start)))
- 		ret = -EFAULT;
- 
-@@ -1278,7 +1278,7 @@ static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!sev_guest(kvm))
- 		return -ENOTTY;
- 
--	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-+	if (copy_from_user(&params, u64_to_user_ptr(argp->data),
- 				sizeof(struct kvm_sev_send_start)))
- 		return -EFAULT;
- 
-@@ -1333,7 +1333,7 @@ static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- 	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, &data, &argp->error);
- 
--	if (!ret && copy_to_user((void __user *)(uintptr_t)params.session_uaddr,
-+	if (!ret && copy_to_user(u64_to_user_ptr(params.session_uaddr),
- 			session_data, params.session_len)) {
- 		ret = -EFAULT;
- 		goto e_free_amd_cert;
-@@ -1341,7 +1341,7 @@ static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- 	params.policy = data.policy;
- 	params.session_len = data.session_len;
--	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
-+	if (copy_to_user(u64_to_user_ptr(argp->data), &params,
- 				sizeof(struct kvm_sev_send_start)))
- 		ret = -EFAULT;
- 
-@@ -1372,7 +1372,7 @@ __sev_send_update_data_query_lengths(struct kvm *kvm, struct kvm_sev_cmd *argp,
- 	params->hdr_len = data.hdr_len;
- 	params->trans_len = data.trans_len;
- 
--	if (copy_to_user((void __user *)(uintptr_t)argp->data, params,
-+	if (copy_to_user(u64_to_user_ptr(argp->data), params,
- 			 sizeof(struct kvm_sev_send_update_data)))
- 		ret = -EFAULT;
- 
-@@ -1392,7 +1392,7 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!sev_guest(kvm))
- 		return -ENOTTY;
- 
--	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-+	if (copy_from_user(&params, u64_to_user_ptr(argp->data),
- 			sizeof(struct kvm_sev_send_update_data)))
- 		return -EFAULT;
- 
-@@ -1443,14 +1443,14 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		goto e_free_trans_data;
- 
- 	/* copy transport buffer to user space */
--	if (copy_to_user((void __user *)(uintptr_t)params.trans_uaddr,
-+	if (copy_to_user(u64_to_user_ptr(params.trans_uaddr),
- 			 trans_data, params.trans_len)) {
- 		ret = -EFAULT;
- 		goto e_free_trans_data;
- 	}
- 
- 	/* Copy packet header to userspace. */
--	if (copy_to_user((void __user *)(uintptr_t)params.hdr_uaddr, hdr,
-+	if (copy_to_user(u64_to_user_ptr(params.hdr_uaddr), hdr,
- 			 params.hdr_len))
- 		ret = -EFAULT;
- 
-@@ -1502,7 +1502,7 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		return -ENOTTY;
- 
- 	/* Get parameter from the userspace */
--	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-+	if (copy_from_user(&params, u64_to_user_ptr(argp->data),
- 			sizeof(struct kvm_sev_receive_start)))
- 		return -EFAULT;
- 
-@@ -1544,7 +1544,7 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	}
- 
- 	params.handle = start.handle;
--	if (copy_to_user((void __user *)(uintptr_t)argp->data,
-+	if (copy_to_user(u64_to_user_ptr(argp->data),
- 			 &params, sizeof(struct kvm_sev_receive_start))) {
- 		ret = -EFAULT;
- 		sev_unbind_asid(kvm, start.handle);
-@@ -1575,7 +1575,7 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!sev_guest(kvm))
- 		return -EINVAL;
- 
--	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-+	if (copy_from_user(&params, u64_to_user_ptr(argp->data),
- 			sizeof(struct kvm_sev_receive_update_data)))
- 		return -EFAULT;
- 
--- 
-2.43.0
+Yes (I think). The issue I'm thinking of is if kvm_pmu_create_perf_event
+(perf_event_create_kernel_counter) returns something like EBUSY and then
+we translate that to SBI_ERR_NOT_SUPPORTED. I'm not sure guests would
+interpret not-supported as an error which means they can retry. Or if
+they retry and get something other than not-supported if they'd be
+confused.
 
+Thanks,
+drew
+  
+
+> 
+> > patch would make it possible for a guest to do the exact same thing,
+> > but sometimes succeed and sometimes get SBI_ERR_NOT_SUPPORTED.
+> > sbi_pmu_counter_config_matching doesn't currently have any error types
+> > specified that say "unsupported at the moment, maybe try again", which
+> > would be more appropriate in that case. I do see
+> > perf_event_create_kernel_counter() can return ENOMEM when memory isn't
+> > available, but if the kernel isn't able to allocate a small amount of
+> > memory, then we're in bigger trouble anyway, so the concern would be
+> > if there are perf resource pools which may temporarily be exhausted at
+> > the time the guest makes this request.
+> >
+> 
+> For other cases, this patch ensures that guests continue to run without failure
+> which allows the user in the guest to try again if this fails due to a temporary
+> resource availability.
+> 
+> > One comment below.
+> >
+> > >
+> > > Fixes: 0cb74b65d2e5 ("RISC-V: KVM: Implement perf support without sampling")
+> > > Reviewed-by: Anup Patel <anup@brainfault.org>
+> > > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > > ---
+> > >  arch/riscv/kvm/vcpu_pmu.c     | 14 +++++++++-----
+> > >  arch/riscv/kvm/vcpu_sbi_pmu.c |  6 +++---
+> > >  2 files changed, 12 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+> > > index b1574c043f77..29bf4ca798cb 100644
+> > > --- a/arch/riscv/kvm/vcpu_pmu.c
+> > > +++ b/arch/riscv/kvm/vcpu_pmu.c
+> > > @@ -229,8 +229,9 @@ static int kvm_pmu_validate_counter_mask(struct kvm_pmu *kvpmu, unsigned long ct
+> > >       return 0;
+> > >  }
+> > >
+> > > -static int kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_event_attr *attr,
+> > > -                                  unsigned long flags, unsigned long eidx, unsigned long evtdata)
+> > > +static long kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_event_attr *attr,
+> > > +                                   unsigned long flags, unsigned long eidx,
+> > > +                                   unsigned long evtdata)
+> > >  {
+> > >       struct perf_event *event;
+> > >
+> > > @@ -454,7 +455,8 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
+> > >                                    unsigned long eidx, u64 evtdata,
+> > >                                    struct kvm_vcpu_sbi_return *retdata)
+> > >  {
+> > > -     int ctr_idx, ret, sbiret = 0;
+> > > +     int ctr_idx, sbiret = 0;
+> > > +     long ret;
+> > >       bool is_fevent;
+> > >       unsigned long event_code;
+> > >       u32 etype = kvm_pmu_get_perf_event_type(eidx);
+> > > @@ -513,8 +515,10 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
+> > >                       kvpmu->fw_event[event_code].started = true;
+> > >       } else {
+> > >               ret = kvm_pmu_create_perf_event(pmc, &attr, flags, eidx, evtdata);
+> > > -             if (ret)
+> > > -                     return ret;
+> > > +             if (ret) {
+> > > +                     sbiret = SBI_ERR_NOT_SUPPORTED;
+> > > +                     goto out;
+> > > +             }
+> > >       }
+> > >
+> > >       set_bit(ctr_idx, kvpmu->pmc_in_use);
+> > > diff --git a/arch/riscv/kvm/vcpu_sbi_pmu.c b/arch/riscv/kvm/vcpu_sbi_pmu.c
+> > > index 7eca72df2cbd..b70179e9e875 100644
+> > > --- a/arch/riscv/kvm/vcpu_sbi_pmu.c
+> > > +++ b/arch/riscv/kvm/vcpu_sbi_pmu.c
+> > > @@ -42,9 +42,9 @@ static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> > >  #endif
+> > >               /*
+> > >                * This can fail if perf core framework fails to create an event.
+> > > -              * Forward the error to userspace because it's an error which
+> > > -              * happened within the host kernel. The other option would be
+> > > -              * to convert to an SBI error and forward to the guest.
+> > > +              * No need to forward the error to userspace and exit the guest
+> >
+> > Period after guest
+> >
+> >
+> > > +              * operation can continue without profiling. Forward the
+> >
+> > The operation
+> >
+> 
+> Fixed the above two.
+> 
+> 
+> > > +              * appropriate SBI error to the guest.
+> > >                */
+> > >               ret = kvm_riscv_vcpu_pmu_ctr_cfg_match(vcpu, cp->a0, cp->a1,
+> > >                                                      cp->a2, cp->a3, temp, retdata);
+> > > --
+> > > 2.34.1
+> > >
+> >
+> > Thanks,
+> > drew
+> 
+> 
+> 
+> --
+> Regards,
+> Atish
 
