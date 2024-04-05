@@ -1,70 +1,72 @@
-Return-Path: <kvm+bounces-13677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97B2E8998B7
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 11:01:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D885D8998B9
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 11:01:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 256F71F23EE7
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 09:01:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CD62B21B00
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 09:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61CC515FA8D;
-	Fri,  5 Apr 2024 09:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1855715FA99;
+	Fri,  5 Apr 2024 09:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeISPJDE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dgsGGuX3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173EB611E;
-	Fri,  5 Apr 2024 09:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F48611E;
+	Fri,  5 Apr 2024 09:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712307668; cv=none; b=aQFuWImfjfVcjbD5KpFVJhsOw4vc1LDu9EqzMX0Axe52aE7mTfn5Nmb0HGzId3OqVwZQRUGPlzFF0sJLBV0v4+4fsi+7hVyhqpjlLUn/xSaqztZpZW0ujdChXXyRkpr2nLFwDHtCvvyfyPG66qaWFGp0/yB02QppHXQL7z0hXBw=
+	t=1712307677; cv=none; b=onrfeSOnoFuQP4fRr2N1eeES0+sj1TU9b+iNK7MXZYLDn37jrVG1bxWR2JreoPsnMSZL23bu4jc/7Jf7Budst8nCeN79bgvIurrbudserd/GGJBNkgNBkQhJgXXBGKptMOobbhGBiOw99bIBEWWa+JQQ8HXPdmPDrMtPlODrmhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712307668; c=relaxed/simple;
-	bh=2DLlYhed/nh73dIMIHSWhwKFVemru08OyxDmfqOJgKA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EVS0XRD31OZvZ0DUHhHGSHtxuECeavMauLVw37b+tNay4yOs00rBH7t3AZaxQbpEukHqLnkbzob89JqoGbI3u5VdhrtpVtQx0H3urst+Rr2xFIhFJs5qfnvEYKgA3zcFsvIkVl1rxZVtVbWEfiewPIy7EZv73QbzQBQra/qpSF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WeISPJDE; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1712307677; c=relaxed/simple;
+	bh=hU5DyQmB+0+LzoAbBVPYnqv0ir777ARq0XXH0tjCyAM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fDY8bTjb1+mr2EdJhU7lT/dHV8TOqmZyo6JIAV0cGBz7S7wk7tHkRo/7NPDzjRPoExPsPAidXHq4O89PIFIGos8B8ZrQvWjFOjlQrskvQfJIn+mEHHzeqiPbswvt86udC/dMamdrUJC/m/ijHvGnd9zqL0QQsbqqADD4SecRals=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dgsGGuX3; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ecfd29f65dso635527b3a.0;
-        Fri, 05 Apr 2024 02:01:06 -0700 (PDT)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5d8b887bb0cso1529080a12.2;
+        Fri, 05 Apr 2024 02:01:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712307666; x=1712912466; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wI4DwimW0m+Dm8ZQCp4DenGm21I2AM0p3NfyF7YdsYM=;
-        b=WeISPJDEk+DdzdpiDBDDj6uMdNr/mFlG0J3LaOl5+lG4nm8k7posFynAAaTJ0h9oCu
-         f4l6STmfY7ZeooIT/8TSb+z6IjNqPc09LmXRv3YuHWJYOE61wNEVPVnkrvU6xKySL0Zy
-         rc/A3sNHoS84E3pOx3RlwOtkZJV0I46N3yFGiddkhNHKOjREVRXxW7/g6584VYaukydS
-         9y8HEgOJdAxKerFmzJ6qsQ3SVkD2NCraWbWI2R+8Z+xNDW6pmglCmwo3KYGGCOzWETVX
-         ceBPEQvA9HGU7i6uVydyDbZdg9aA++JxaFJRbo1OijK+jjl+irg19rTuFbL8S+aS+3cJ
-         dyrA==
+        d=gmail.com; s=20230601; t=1712307675; x=1712912475; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q9O2yN202NqTro1AvvJbZu3/0EjKIcT0nZopuJ7bwyA=;
+        b=dgsGGuX3vE8lKZ7ioUXcGSqmxyf3ut6eIHHurMdWKmYec6r2AdgO8Lk7B7IrwSdPM7
+         oGOdVQvz0MwI9fb+d7w4lxTjcHFilaC41Q7wFe7glh9Fg250Ty4dtB0YbAbCSOxxxZfe
+         zdWqrAhHi9sRq4/lgBn65sEwR7x10py+aRPXEeAzQGLCrBIWQELWzMekH0Z8g5OF0iuh
+         Jbzq0wyS06/TbZpcQ4eaCkNDDIa1O3eDUL1x7F1HuMyfz9K4eXWoCrvUfTAP02J/FDK5
+         KFCt170/mw22ujBhVgCE22QFubgfo/O+ZmF5jAEU6XXBw4diXVtpTRPtb0Ee+JvsVkbr
+         R8qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712307666; x=1712912466;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wI4DwimW0m+Dm8ZQCp4DenGm21I2AM0p3NfyF7YdsYM=;
-        b=qzpzCZmYQd/5wNp3hkPxafC6EaJuNFSHglWbR7VhaWoK1+8OEyGMlHgV0rkuLumnJg
-         hdDofUsaibWwPKMlqnMKaCDq5V+h5HA1N6ytM+ahf7gT79XfCkO/RNkwVYJE8LeU8JiY
-         F9zZ9Ta6dWMA3regKYyCGNCSdoLivCS5rNsmhbdhT+fk4S8UcFSu47+rPYyy+rn3agDo
-         zvF1UjSbLS6KI2wmD5UFMYSc3er3xrTK5QiN74kVlU9IXQRBhL4Wmr5aRjm6JE8MEI28
-         zkAB5K9QsRVauDKxiQjIyJsRKWcwD5hCpPQeT4OF6mzYae/REVNuMgATlQ7T3fOdRR9R
-         SjYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVgnURQZMKgk0VpI75nhhHNGu54YxeUKfOdYiKGk8Vr3O7HxOwZIxLkimg/p0rkqHjuhSdbqqS/iXsFvHmWZboBZvQ2sHLok5vRJgfK2Act0jFcT9iZKBDFAGpGEsChEg==
-X-Gm-Message-State: AOJu0Yw1Qzx1eg9xCMdo6thFQvNqQH0xquxuGy6mq8kj6uYY24e8mYeM
-	fZViIM3fJXvI3bQBcVhDKYDBYAIX6iCkfTUSDd89GCsgJbljZ2M9
-X-Google-Smtp-Source: AGHT+IGlcBi2VUkohcnGRD3fzDjABuKFi3W10RhRfQ1OuAg3W7+E3pA6bb2h+PqEKmLJKinBlGe9vA==
-X-Received: by 2002:a05:6a20:2d28:b0:1a3:57b4:ed1c with SMTP id g40-20020a056a202d2800b001a357b4ed1cmr1173245pzl.25.1712307666319;
-        Fri, 05 Apr 2024 02:01:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712307675; x=1712912475;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q9O2yN202NqTro1AvvJbZu3/0EjKIcT0nZopuJ7bwyA=;
+        b=piD+WqWbLUSawSym19kE9a5v8yEKKC90HFGJssFqN6gzXLp7rKiK3ccv3kZEspj9gM
+         R+kLsCKuzqY4UUkfgvnPJX91q5mlc2rkANbC4cm7VKvgSWGSj6vc8S514jdz6QkdOWFg
+         A1R/4pTJEYnwnUgQCG0nLeyTzNCy/XpuF7t3gZXE9ylEzoHhMDCYE739CRUmOMuz0n40
+         R8L7g0UJ+Az0vc0YXDkCiPj7C9k4eTfV70IcM8pB8ufW28vVZYVWn8v2rqQ5lnXlVbWb
+         EUS60wNg7ACBZU0Bcqy7uPzkZVs1D/zZsKq8QYXQ9gApHJ2i0w26NFbjqjWKTijkm/6/
+         ttuA==
+X-Forwarded-Encrypted: i=1; AJvYcCX6WD21gFcEQ+tLv2QShc6g38EZXqG2u3UaV0Vs+zQePXELwE1nBgrFuMqx9rH0sHHnQvbOazQr5BUzKbPPVwfzTuV64K4u/nowYp41LEMdKYHijyS1yso01yGLGMbdMA==
+X-Gm-Message-State: AOJu0YwfPm9aZYUa8CHyV8CyGZqeTOrlbcNUtSxYQ3bzO6LXh7chFdcm
+	dw4btpWHHZDchxAcM9NMPki0rhG/T1CByMeAVZgXQL1hz5P1brhN
+X-Google-Smtp-Source: AGHT+IG3iGQczT0lBc6+U4GYfzX73yWnuYF+Xus3bRqqURm/CLDRZv9h0qLlh8Hdhn5oQL0ovQ4TZg==
+X-Received: by 2002:a05:6a20:9494:b0:1a7:30ce:4261 with SMTP id hs20-20020a056a20949400b001a730ce4261mr906687pzb.24.1712307675161;
+        Fri, 05 Apr 2024 02:01:15 -0700 (PDT)
 Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
-        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.00.57
+        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.01.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 02:01:05 -0700 (PDT)
+        Fri, 05 Apr 2024 02:01:14 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -89,91 +91,117 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests RFC PATCH 00/17] add shellcheck support
-Date: Fri,  5 Apr 2024 19:00:32 +1000
-Message-ID: <20240405090052.375599-1-npiggin@gmail.com>
+Subject: [kvm-unit-tests RFC PATCH 01/17] Add initial shellcheck checking
+Date: Fri,  5 Apr 2024 19:00:33 +1000
+Message-ID: <20240405090052.375599-2-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240405090052.375599-1-npiggin@gmail.com>
+References: <20240405090052.375599-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-I foolishly promised Andrew I would look into shellcheck, so here
-it is.
+This adds a basic shellcheck sytle file, some directives to help
+find scripts, and a make shellcheck target.
 
-https://gitlab.com/npiggin/kvm-unit-tests/-/tree/powerpc?ref_type=heads
+When changes settle down this could be made part of the standard
+build / CI flow.
 
-This is on top of the "v8 migration, powerpc improvements" series. For
-now the patches are a bit raw but it does get down to zero[*] shellcheck
-warnings while still passing gitlab CI.
-
-[*] Modulo the relatively few cases where they're disabled or
-suppressed.
-
-I'd like comments about what should be enabled and disabled? There are
-quite a lot of options. Lots of changes don't fix real bugs AFAIKS, so
-there's some taste involved.
-
-Could possibly be a couple of bugs, including in s390x specific. Any
-review of those to confirm or deny bug is appreciated. I haven't tried
-to create reproducers for them.
-
-I added a quick comment on each one whether it looks like a bug or
-harmless but I'm not a bash guru so could easily be wrong. I would
-possibly pull any real bug fixes to the front of the series and describe
-them as proper fix patches, and leave the other style / non-bugfixes in
-the brief format.  shellcheck has a very good wiki explaining each issue
-so there is not much point in rehashing that in the changelog.
-
-One big thing kept disabled for now is the double-quoting to prevent
-globbing and splitting warning that is disabled. That touches a lot of
-code and we're very inconsistent about quoting variables today, but it's
-not completely trivial because there are quite a lot of places that does
-rely on splitting for invoking commands with arguments. That would need
-some rework to avoid sprinkling a lot of warning suppressions around.
-Possibly consistently using arrays for argument lists would be the best
-solution?
-
-Thanks,
-Nick
-
-Nicholas Piggin (17):
-  Add initial shellcheck checking
-  shellcheck: Fix SC2223
-  shellcheck: Fix SC2295
-  shellcheck: Fix SC2094
-  shellcheck: Fix SC2006
-  shellcheck: Fix SC2155
-  shellcheck: Fix SC2235
-  shellcheck: Fix SC2119, SC2120
-  shellcheck: Fix SC2143
-  shellcheck: Fix SC2013
-  shellcheck: Fix SC2145
-  shellcheck: Fix SC2124
-  shellcheck: Fix SC2294
-  shellcheck: Fix SC2178
-  shellcheck: Fix SC2048
-  shellcheck: Fix SC2153
-  shellcheck: Suppress various messages
-
- .shellcheckrc           | 32 +++++++++++++++++++++++++
- Makefile                |  4 ++++
- README.md               |  2 ++
- arm/efi/run             |  4 ++--
- riscv/efi/run           |  4 ++--
- run_tests.sh            | 11 +++++----
- s390x/run               |  8 +++----
- scripts/arch-run.bash   | 52 ++++++++++++++++++++++++++++-------------
- scripts/common.bash     |  5 +++-
- scripts/mkstandalone.sh |  4 +++-
- scripts/runtime.bash    | 14 +++++++----
- scripts/s390x/func.bash |  2 +-
- 12 files changed, 106 insertions(+), 36 deletions(-)
+Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ .shellcheckrc       | 32 ++++++++++++++++++++++++++++++++
+ Makefile            |  4 ++++
+ README.md           |  2 ++
+ scripts/common.bash |  5 ++++-
+ 4 files changed, 42 insertions(+), 1 deletion(-)
  create mode 100644 .shellcheckrc
 
+diff --git a/.shellcheckrc b/.shellcheckrc
+new file mode 100644
+index 000000000..2a9a57c42
+--- /dev/null
++++ b/.shellcheckrc
+@@ -0,0 +1,32 @@
++# shellcheck configuration file
++external-sources=true
++
++# Optional extras --  https://www.shellcheck.net/wiki/Optional
++# Possibilities, e.g., -
++# quote‐safe‐variables
++# require-double-brackets
++# require-variable-braces
++# add-default-case
++
++# Disable SC2004 style? I.e.,
++# In run_tests.sh line 67:
++#            if (( $unittest_run_queues <= 0 )); then
++#                  ^------------------^ SC2004 (style): $/${} is unnecessary on arithmetic variables.
++disable=SC2004
++
++# Disable SC2034 - config.mak contains a lot of these unused variable errors.
++# Maybe we could have a script extract the ones used by shell script and put
++# them in a generated file, to re-enable the warning.
++#
++# In config.mak line 1:
++# SRCDIR=/home/npiggin/src/kvm-unit-tests
++# ^----^ SC2034 (warning): SRCDIR appears unused. Verify use (or export if used externally).
++disable=SC2034
++
++# Disable SC2086 for now, double quote to prevent globbing and word
++# splitting. There are lots of places that use it for word splitting
++# (e.g., invoking commands with arguments) that break. Should have a
++# more consistent approach for this (perhaps use arrays for such cases)
++# but for now disable.
++# SC2086 (info): Double quote to prevent globbing and word splitting.
++disable=SC2086
+diff --git a/Makefile b/Makefile
+index 4e0f54543..4863cfdc6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -141,6 +141,10 @@ cscope:
+ 		-name '*.[chsS]' -exec realpath --relative-base=$(CURDIR) {} \; | sort -u > ./cscope.files
+ 	cscope -bk
+ 
++.PHONY: shellcheck
++shellcheck:
++	shellcheck -a run_tests.sh */run */efi/run scripts/mkstandalone.sh
++
+ .PHONY: tags
+ tags:
+ 	ctags -R
+diff --git a/README.md b/README.md
+index 6e82dc225..77718675e 100644
+--- a/README.md
++++ b/README.md
+@@ -193,3 +193,5 @@ with `git config diff.orderFile scripts/git.difforder` enables it.
+ 
+ We strive to follow the Linux kernels coding style so it's recommended
+ to run the kernel's ./scripts/checkpatch.pl on new patches.
++
++Also run make shellcheck before submitting a patch.
+diff --git a/scripts/common.bash b/scripts/common.bash
+index ee1dd8659..3aa557c8c 100644
+--- a/scripts/common.bash
++++ b/scripts/common.bash
+@@ -82,8 +82,11 @@ function arch_cmd()
+ }
+ 
+ # The current file has to be the only file sourcing the arch helper
+-# file
++# file. Shellcheck can't follow this so help it out. There doesn't appear to be a
++# way to specify multiple alternatives, so we will have to rethink this if things
++# get more complicated.
+ ARCH_FUNC=scripts/${ARCH}/func.bash
+ if [ -f "${ARCH_FUNC}" ]; then
++# shellcheck source=scripts/s390x/func.bash
+ 	source "${ARCH_FUNC}"
+ fi
 -- 
 2.43.0
 
