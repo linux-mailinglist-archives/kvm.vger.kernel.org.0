@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-13773-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13774-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8EB89A7A6
-	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 01:56:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ECAE89A7A9
+	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 01:57:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B78D1283C1D
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 23:56:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 049511F22B8A
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 23:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33492487A5;
-	Fri,  5 Apr 2024 23:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8D54D9E0;
+	Fri,  5 Apr 2024 23:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="exk7qQwt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wBirsjR1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DA03A29A
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 23:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C74446A0
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 23:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712361374; cv=none; b=HpIOybmLfecy+hJopgGG2GHHBDGgObnHU1OEo8jYDg7QpDWLBY55+u1hrg2OZyAkU637YXb0lASUqf+F51XwnQTz392b9TLzwVBVbxvQ5Cf+py1/9qhf7KhFFqh0vKPtUAYj2K91pP6eglMm+nd0LofOJuEKY0EVLA9aqv+L5x8=
+	t=1712361375; cv=none; b=euZlyaJPYZcjD92mMthOwsGRtmYdZumN19yr1mI29oOugAjTIVlKtMrQorZnX86lcb05n9suO5nza6QIPzc9JsRffH6FWxjXxSHYmW4ipiPPSDOOokW+JeImEaRBWRf9jyu32umlmBn3i7kFZy1rAIIUmL2hgTMgnSB+1QuBLkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712361374; c=relaxed/simple;
-	bh=xbZiBhFR1GD8yrF6sLlU6H1LX9EPZovTo0hzoXLG8aU=;
+	s=arc-20240116; t=1712361375; c=relaxed/simple;
+	bh=chnMm1zFatZ8q6GaXGi1GZwfE6vOSQp47VdBoBbf3AE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Lf18f5UF0LvO680ex/DvUuR/ODK+O4mGfJ4yea/Qflu0CJSG0xof0SDwNUD6TxV0DeCPY5VQMoqxVemfmcX2K+8QXl36eogs5TSaxAOlB+mWmGzaFm9mS5l+ofb77GeVqI+5YIkLtEc7j7ClSZK8QVCN/f1y2kCfGrrRISLLNPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=exk7qQwt; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=QdwxYeECyf6wdfdBTSp5Y9Mn0wt/i9/0w89741fk5WU4E66aZr4eN+4N+JP/25K46dK5V7H4iz8F0EStr6daKYvKDoz8JUWtn3a5m+GLvyfgDJhbiQE9mC8rG3qL5OXyvRUfcWFnh0lZ2RUSY621aqnxxth6XbUAfiWV+b1E8mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wBirsjR1; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-617d0580378so21241577b3.3
-        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 16:56:12 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e2c0d3eadeso16282635ad.0
+        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 16:56:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712361372; x=1712966172; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712361373; x=1712966173; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=A9lrggeLpLCqzlw5rBZRk9JnCRZ4h79aA0odPmKt0/Y=;
-        b=exk7qQwt2tFgGQFALCYzNz62cfq1uCdAj2elVfWgXOU5ISBdrUO9XBHUtHlG/s0D15
-         ysNo6oRJkJm2J1A6jj9OXv15OdetgJFvuHR9wnPurMsNVqv2ksLvyndqeZ7e7LUhKxlu
-         Cz7gryjgRzcd8z7ONh11dR0ICAvgNaH1z7D+5kvIRikBh8fP+QKXPHtv+Wx31aosjZbO
-         9RwjostrYObLlaa+LSGKuSDtxbHK50JwNwPAUPIoKJO5gw8n7+/iB7Mi/t251t2sra8c
-         Yf62OpIU5LkyTvvQL52MaVdU/DfbHTWutpgmSI9LTnWzlO2vdqCShEy6li0aEs1q5agf
-         085A==
+        bh=FffwbB6LnatDKMg9SsqQhArJTyGAeiJWu5lvAsN6Mjk=;
+        b=wBirsjR1NQA8cfl+0rDDEQQTvtCOhHgWFQOvuigI9slaJg3pojGmoWmYEFG+toUt2U
+         ktmEjlG2SZVoKsvaFfv7kzjIyoiDLpzWDkEpJjYSCLrO1p1izH+LTZVzbPa+xreddn1r
+         V6A8boPyQdpB4AsPHmaQFRDhBhM6iz/7wXLM8GxGV4fR3LtEhoubtGk7uvOlgim7PG+W
+         ZgksZRd/M41UcpP56SCXRXXuMvcw2RSKuFWXO68p1CQk3l9K8WxOOfU4RSai4W/Rj0vx
+         0+zibG0725gigIv/EtMiaYqKCHsrqiVCYhnv6nGO/C4ZETH6nZBBTo/rbWolKCirLVmI
+         DSLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712361372; x=1712966172;
+        d=1e100.net; s=20230601; t=1712361373; x=1712966173;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=A9lrggeLpLCqzlw5rBZRk9JnCRZ4h79aA0odPmKt0/Y=;
-        b=YjcMtYka3XK1450HbD+6M7G1Z28mNJIwgp0uJCcbwFLwS1g268WcPUqHtAnp9r9IVY
-         po7YzOYwOxrgQorIcv7gzKins+hwnCq990RQvxrmGGZk0/phQnwAkEkD54hrIvKIoW0C
-         WfD5xRhaT+M9q521TvMWfPy531x3YcfWeJfky0NPn1sMUncJrBLKJAk0yGTL6g8xWOCz
-         cOjk6F8Yu83ViYJYA0WDtfpE5JxpS9R2vnYIFVv7B4kTXA26sP28fay7ly9KsDYcLSWD
-         qkTUY5WNn13NYOV+XSD6vdOON/++4OOdVuCHv8JR9rv8wz5x5MhhN7GmIoNCw34X9GN8
-         Y5YQ==
-X-Gm-Message-State: AOJu0YykkNRCPfZAygQZdZYkYUn+uuq+h94THXJ/ERnTvCvAcHPNMnaM
-	bCOZNnLHSCvffv91f8L1wmGr7aWtt3P7+qBhx3AcU4VcvFQ5pEvSL2VcK3WMNG5fILPajsw8cJA
-	5Zw==
-X-Google-Smtp-Source: AGHT+IHxX7pBb2sUjx5QNvzOVxofCju8D1fTDdX9zEtiJP7uYXUfRHPoMknf9MR/69TMULXioiY7atftN3k=
+        bh=FffwbB6LnatDKMg9SsqQhArJTyGAeiJWu5lvAsN6Mjk=;
+        b=MGDeBfDz5dx7dr9HVWvyZWx3+1AiPSPHzvmgzasDDyHheomGdDlNmZ2aS84Cdyqsk2
+         atMdxgJpjvc1zVNTKqtIhYzov3vUX1WR1zYr6GK3KV/F30cmDSFq4iU9mTu1DNwHAYHV
+         rflmkailGPYPWjbNc7cWgQm62tZ4tT5PWgZBqgp23RRDDa+L4Tbv5UH2E6Oj8Fky/rnO
+         8snBaWTIN3kavrfpBC/N2odC3bB00UyaTq5gW7zG9/JBlr3cXf8UMIfNojUs5hOmusOr
+         Epq1JFHNuSCRHpm18EUP+2qfwYuR8rJH4hAgRQOLyzcI+7Sib9ZYC4f9qRCT8EodhJ/J
+         B5vQ==
+X-Gm-Message-State: AOJu0Yy2U/itf95hSPajOo2hO/FRHApsAXtK3rrUvxwyivEGrK+hAmiD
+	6NEmrFS3Ky/plSD5isRZ8BrkewDSmuIlDJNF8vK+t+UwYBdkbXjTZlDDGL71hlASuPWyerFG3Yx
+	u1A==
+X-Google-Smtp-Source: AGHT+IH9aecytVAOtnV2yNzg2I3ctJJZWmYrY4cvrhScbFQqL+6+y5ypppJF5bqHYcJe2XUZwFiInnFZSBA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:944:0:b0:dcd:4286:4498 with SMTP id
- x4-20020a5b0944000000b00dcd42864498mr170623ybq.6.1712361371935; Fri, 05 Apr
- 2024 16:56:11 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:d4c1:b0:1e3:d0fa:dedf with SMTP id
+ o1-20020a170902d4c100b001e3d0fadedfmr49827plg.4.1712361373581; Fri, 05 Apr
+ 2024 16:56:13 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  5 Apr 2024 16:55:55 -0700
+Date: Fri,  5 Apr 2024 16:55:56 -0700
 In-Reply-To: <20240405235603.1173076-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240405235603.1173076-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240405235603.1173076-3-seanjc@google.com>
-Subject: [PATCH 02/10] KVM: x86/pmu: Do not mask LVTPC when handling a PMI on
- AMD platforms
+Message-ID: <20240405235603.1173076-4-seanjc@google.com>
+Subject: [PATCH 03/10] KVM: x86/pmu: Squash period for checkpointed events
+ based on host HLE/RTM
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,56 +85,39 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Like Xu <like.xu.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Sandipan Das <sandipan.das@amd.com>
+Zero out the sampling period for checkpointed events if the host supports
+HLE or RTM, i.e. supports transactions and thus checkpointed events, not
+based on whether the vCPU vendor model is Intel.  Perf's refusal to allow
+a sample period for checkpointed events is based purely on whether or not
+the CPU supports HLE/RTM transactions, i.e. perf has no knowledge of the
+vCPU vendor model.
 
-On AMD and Hygon platforms, the local APIC does not automatically set
-the mask bit of the LVTPC register when handling a PMI and there is
-no need to clear it in the kernel's PMI handler.
+Note, it is _extremely_ unlikely that the existing code is a problem in
+real world usage, as there are far, far bigger hurdles that would need to
+be cleared to support cross-vendor vPMUs.  The motivation is mainly to
+eliminate the use of guest_cpuid_is_intel(), in order to get to a state
+where KVM pivots on AMD vs. Intel compatibility, i.e. doesn't check for
+exactly vendor==Intel except in rare circumstances (i.e. for CPU quirks).
 
-For guests, the mask bit is currently set by kvm_apic_local_deliver()
-and unless it is cleared by the guest kernel's PMI handler, PMIs stop
-arriving and break use-cases like sampling with perf record.
-
-This does not affect non-PerfMonV2 guests because PMIs are handled in
-the guest kernel by x86_pmu_handle_irq() which always clears the LVTPC
-mask bit irrespective of the vendor.
-
-Before:
-
-  $ perf record -e cycles:u true
-  [ perf record: Woken up 1 times to write data ]
-  [ perf record: Captured and wrote 0.001 MB perf.data (1 samples) ]
-
-After:
-
-  $ perf record -e cycles:u true
-  [ perf record: Woken up 1 times to write data ]
-  [ perf record: Captured and wrote 0.002 MB perf.data (19 samples) ]
-
-Fixes: a16eb25b09c0 ("KVM: x86: Mask LVTPC when handling a PMI")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-[sean: use is_intel_compatible instead of !is_amd_or_hygon()]
+Cc: Like Xu <like.xu.linux@gmail.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/lapic.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kvm/pmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index cf37586f0466..ebf41023be38 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2776,7 +2776,8 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, int lvt_type)
- 		trig_mode = reg & APIC_LVT_LEVEL_TRIGGER;
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index c397b28e3d1b..8c3564917953 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -194,7 +194,7 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
+ 	attr.sample_period = get_sample_period(pmc, pmc->counter);
  
- 		r = __apic_accept_irq(apic, mode, vector, 1, trig_mode, NULL);
--		if (r && lvt_type == APIC_LVTPC)
-+		if (r && lvt_type == APIC_LVTPC &&
-+		    guest_cpuid_is_intel_compatible(apic->vcpu))
- 			kvm_lapic_set_reg(apic, APIC_LVTPC, reg | APIC_LVT_MASKED);
- 		return r;
- 	}
+ 	if ((attr.config & HSW_IN_TX_CHECKPOINTED) &&
+-	    guest_cpuid_is_intel(pmc->vcpu)) {
++	    (boot_cpu_has(X86_FEATURE_RTM) || boot_cpu_has(X86_FEATURE_HLE))) {
+ 		/*
+ 		 * HSW_IN_TX_CHECKPOINTED is not supported with nonzero
+ 		 * period. Just clear the sample period so at least
 -- 
 2.44.0.478.gd926399ef9-goog
 
