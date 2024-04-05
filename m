@@ -1,80 +1,61 @@
-Return-Path: <kvm+bounces-13718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 775DE899EA8
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 15:46:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E28E899EDD
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 15:59:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29FCA28461C
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 13:46:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC0A92831B0
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 13:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A00E16D9B5;
-	Fri,  5 Apr 2024 13:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5938016D9D0;
+	Fri,  5 Apr 2024 13:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EW+85BBJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IoYJPoi0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27CCB1C69E
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 13:46:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2D216D9C7
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 13:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712324766; cv=none; b=gekcAB0ifMPmpiVugC8WHrWrEgxs5g8VZGIUBVhkhROYu7couqFQLdFro4kdJJBB/EK13bcxs50A/DoPzU5B4WItsQQfT7rIm9icfnLFhLjjLs7mwePEUkaWq21w+G/JHplxi5oGoDyGiHgqvsnRWpOKfObnb7ecEDJHUorGtSQ=
+	t=1712325563; cv=none; b=jf8UxiuF54sasrZJ00OLYvjmSMDggKjfOkB61I+oUKzs3375SNItaj9vV7X0wdOXJAyWL4bSlN948J7JENDwyY+RcS8LxQtyHTtZrauasco9BrrU6lyIg7ZYUGli+M/zSHxC9bf3blX91VnOzek9YlSCLjhr3XLWbLKh/v8T/g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712324766; c=relaxed/simple;
-	bh=/zinqNVTVxNGsbsEheCpLj9G3tHSvBu/H2D25u/4YHs=;
+	s=arc-20240116; t=1712325563; c=relaxed/simple;
+	bh=4XLS0rq6izIRaRgceQ0GX/l4V0ZzhDGRBl8KjoQCv1E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hL6n6kGDav697mY4j2nxDNA+/Wh8qRPErm86AgZ9AnGgjIuinzYrxDYk8JeH6NJk0bBdv33nnAKToiA+Hd9pymEuFDxLtiXDUXwA0axcugk4+sC7Adh/dWQDvuAUtQ7X5N/UBud4VriXTmNr+qe4m5l4E1lIt+xqEFFgUQQiAGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EW+85BBJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712324762;
+	 Content-Type:Content-Disposition:In-Reply-To; b=h8Q3ndXePq1RbND2T9vJFl398gSG6ApoiULpoDg6EwFiJRDGWlvbtnm9SNZgQQCyYaIrAM6EwOgXbqX0ZRf3rlUbUlcIEGl6Qx/5+07r2ZIUyAXQKvI/4UjgZI/ySfAd28JSzue+01rabojrcmPWx1wChYyvmGxoMnwOW8v2o2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IoYJPoi0; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 5 Apr 2024 15:59:15 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712325559;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ds5HqRlcZsJw1NwtspBjr4yi/f3BIcikQYMcgYaEtiE=;
-	b=EW+85BBJsHsM+cNztZodubUXzpSGOeIC2sK+wuFbbxCvgyVTeIbL54i2DwIQdYSGYHX78n
-	+ZgHtG4KYeyzJUL7W6JwsMpNv8haaUijDZNAjo6YQ0U/V+pzjtPb2fi6QQL4seerjHFvnk
-	cuvU4LG/SrBHHeNYgAFVIjPhlqrBNqg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-ZNe6GffuObSLTYpt4S8s6Q-1; Fri, 05 Apr 2024 09:45:58 -0400
-X-MC-Unique: ZNe6GffuObSLTYpt4S8s6Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 25B8B811E81;
-	Fri,  5 Apr 2024 13:45:58 +0000 (UTC)
-Received: from tpad.localdomain (unknown [10.96.133.6])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BEFB3C21;
-	Fri,  5 Apr 2024 13:45:57 +0000 (UTC)
-Received: by tpad.localdomain (Postfix, from userid 1000)
-	id 43FF240135043; Fri,  5 Apr 2024 10:45:39 -0300 (-03)
-Date: Fri, 5 Apr 2024 10:45:39 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Leonardo Bras <leobras@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
-Message-ID: <ZhAAg8KNd8qHEGcO@tpad>
-References: <20240328171949.743211-1-leobras@redhat.com>
- <ZgsXRUTj40LmXVS4@google.com>
+	bh=0LGCxJo2e6ztj7xm+eeWNgiP8C9O8q6U3aglumrUQj4=;
+	b=IoYJPoi0M2ZT/ptqBymtJtBWfIQSQijqLK9xkDt+NMSivicre5g2p88jTlrKUd30MOzCt2
+	679b+aShBO+NK9CS8VTlqA/i3JeccFE9O5KlUUQYwxdjkOgjwnHd4CJRFOoB1308KkmSly
+	BiieO9JulNYjRqENoYIAeAVc22Jm0l8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Nico =?utf-8?B?QsO2aHI=?= <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, 
+	Nadav Amit <namit@vmware.com>, David Woodhouse <dwmw@amazon.co.uk>, 
+	Ricardo Koller <ricarkol@google.com>, rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>, 
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests RFC PATCH 00/17] add shellcheck support
+Message-ID: <20240405-20fbe979a00acc8b9d161936@orel>
+References: <20240405090052.375599-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,146 +64,106 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZgsXRUTj40LmXVS4@google.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+In-Reply-To: <20240405090052.375599-1-npiggin@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Apr 01, 2024 at 01:21:25PM -0700, Sean Christopherson wrote:
-> On Thu, Mar 28, 2024, Leonardo Bras wrote:
-> > I am dealing with a latency issue inside a KVM guest, which is caused by
-> > a sched_switch to rcuc[1].
-> > 
-> > During guest entry, kernel code will signal to RCU that current CPU was on
-> > a quiescent state, making sure no other CPU is waiting for this one.
-> > 
-> > If a vcpu just stopped running (guest_exit), and a syncronize_rcu() was
-> > issued somewhere since guest entry, there is a chance a timer interrupt
-> > will happen in that CPU, which will cause rcu_sched_clock_irq() to run.
-> > 
-> > rcu_sched_clock_irq() will check rcu_pending() which will return true,
-> > and cause invoke_rcu_core() to be called, which will (in current config)
-> > cause rcuc/N to be scheduled into the current cpu.
-> > 
-> > On rcu_pending(), I noticed we can avoid returning true (and thus invoking
-> > rcu_core()) if the current cpu is nohz_full, and the cpu came from either
-> > idle or userspace, since both are considered quiescent states.
-> > 
-> > Since this is also true to guest context, my idea to solve this latency
-> > issue by avoiding rcu_core() invocation if it was running a guest vcpu.
-> > 
-> > On the other hand, I could not find a way of reliably saying the current
-> > cpu was running a guest vcpu, so patch #1 implements a per-cpu variable
-> > for keeping the time (jiffies) of the last guest exit.
-> > 
-> > In patch #2 I compare current time to that time, and if less than a second
-> > has past, we just skip rcu_core() invocation, since there is a high chance
-> > it will just go back to the guest in a moment.
+On Fri, Apr 05, 2024 at 07:00:32PM +1000, Nicholas Piggin wrote:
+> I foolishly promised Andrew I would look into shellcheck, so here
+> it is.
+
+Thanks! I hope you only felt foolish since it was recently April
+Fool's day, though.
+
 > 
-> What's the downside if there's a false positive?
-
-rcuc wakes up (which might exceed the allowed latency threshold
-for certain realtime apps).
-
-> > What I know it's weird with this patch:
-> > 1 - Not sure if this is the best way of finding out if the cpu was
-> >     running a guest recently.
-> > 
-> > 2 - This per-cpu variable needs to get set at each guest_exit(), so it's
-> >     overhead, even though it's supposed to be in local cache. If that's
-> >     an issue, I would suggest having this part compiled out on 
-> >     !CONFIG_NO_HZ_FULL, but further checking each cpu for being nohz_full
-> >     enabled seems more expensive than just setting this out.
+> https://gitlab.com/npiggin/kvm-unit-tests/-/tree/powerpc?ref_type=heads
 > 
-> A per-CPU write isn't problematic, but I suspect reading jiffies will be quite
-> imprecise, e.g. it'll be a full tick "behind" on many exits.
+> This is on top of the "v8 migration, powerpc improvements" series. For
+> now the patches are a bit raw but it does get down to zero[*] shellcheck
+> warnings while still passing gitlab CI.
 > 
-> > 3 - It checks if the guest exit happened over than 1 second ago. This 1
-> >     second value was copied from rcu_nohz_full_cpu() which checks if the
-> >     grace period started over than a second ago. If this value is bad,
-> >     I have no issue changing it.
+> [*] Modulo the relatively few cases where they're disabled or
+> suppressed.
 > 
-> IMO, checking if a CPU "recently" ran a KVM vCPU is a suboptimal heuristic regardless
-> of what magic time threshold is used.  
+> I'd like comments about what should be enabled and disabled? There are
+> quite a lot of options. Lots of changes don't fix real bugs AFAIKS, so
+> there's some taste involved.
 
-Why? It works for this particular purpose.
+Yes, Bash is like that. We should probably eventually have a Bash style
+guide as well as shellcheck and then tune shellcheck to the guide as
+best we can.
 
-> IIUC, what you want is a way to detect if
-> a CPU is likely to _run_ a KVM vCPU in the near future.  KVM can provide that
-> information with much better precision, e.g. KVM knows when when it's in the core
-> vCPU run loop.
-
-ktime_t ktime_get(void)
-{
-        struct timekeeper *tk = &tk_core.timekeeper;
-        unsigned int seq;
-        ktime_t base;
-        u64 nsecs;
-
-        WARN_ON(timekeeping_suspended);
-
-        do {
-                seq = read_seqcount_begin(&tk_core.seq);
-                base = tk->tkr_mono.base;
-                nsecs = timekeeping_get_ns(&tk->tkr_mono);
-
-        } while (read_seqcount_retry(&tk_core.seq, seq));
-
-        return ktime_add_ns(base, nsecs);
-}
-EXPORT_SYMBOL_GPL(ktime_get);
-
-ktime_get() is more expensive than unsigned long assignment.
-
-What is done is: If vcpu has entered guest mode in the past, then RCU
-extended quiescent state has been transitioned into the CPU, therefore
-it is not necessary to wake up rcu core.
-
-The logic is copied from:
-
-/*
- * Is this CPU a NO_HZ_FULL CPU that should ignore RCU so that the
- * grace-period kthread will do force_quiescent_state() processing?
- * The idea is to avoid waking up RCU core processing on such a
- * CPU unless the grace period has extended for too long.
- *
- * This code relies on the fact that all NO_HZ_FULL CPUs are also
- * RCU_NOCB_CPU CPUs.
- */
-static bool rcu_nohz_full_cpu(void)
-{
-#ifdef CONFIG_NO_HZ_FULL
-        if (tick_nohz_full_cpu(smp_processor_id()) &&
-            (!rcu_gp_in_progress() ||
-             time_before(jiffies, READ_ONCE(rcu_state.gp_start) + HZ)))
-                return true;
-#endif /* #ifdef CONFIG_NO_HZ_FULL */
-        return false;
-}
-
-Note:
-
-avoid waking up RCU core processing on such a
-CPU unless the grace period has extended for too long.
-
-> > 4 - Even though I could detect no issue, I included linux/kvm_host.h into 
-> >     rcu/tree_plugin.h, which is the first time it's getting included
-> >     outside of kvm or arch code, and can be weird.
 > 
-> Heh, kvm_host.h isn't included outside of KVM because several architectures can
-> build KVM as a module, which means referencing global KVM varibles from the kernel
-> proper won't work.
+> Could possibly be a couple of bugs, including in s390x specific. Any
+> review of those to confirm or deny bug is appreciated. I haven't tried
+> to create reproducers for them.
 > 
-> >     An alternative would be to create a new header for providing data for
-> >     non-kvm code.
+> I added a quick comment on each one whether it looks like a bug or
+> harmless but I'm not a bash guru so could easily be wrong. I would
+> possibly pull any real bug fixes to the front of the series and describe
+> them as proper fix patches, and leave the other style / non-bugfixes in
+> the brief format.  shellcheck has a very good wiki explaining each issue
+> so there is not much point in rehashing that in the changelog.
 > 
-> I doubt a new .h or .c file is needed just for this, there's gotta be a decent
-> landing spot for a one-off variable.  E.g. I wouldn't be at all surprised if there
-> is additional usefulness in knowing if a CPU is in KVM's core run loop and thus
-> likely to do a VM-Enter in the near future, at which point you could probably make
-> a good argument for adding a flag in "struct context_tracking".  Even without a
-> separate use case, there's a good argument for adding that info to context_tracking.
+> One big thing kept disabled for now is the double-quoting to prevent
+> globbing and splitting warning that is disabled. That touches a lot of
+> code and we're very inconsistent about quoting variables today, but it's
+> not completely trivial because there are quite a lot of places that does
+> rely on splitting for invoking commands with arguments. That would need
+> some rework to avoid sprinkling a lot of warning suppressions around.
+> Possibly consistently using arrays for argument lists would be the best
+> solution?
 
-Well, jiffies is cheap and just works. 
+Yes, switching to arrays and using double-quoting would be good, but we
+can leave it for follow-on work after a first round of shellcheck
+integration.
 
-Perhaps can add higher resolution later if required?
+Thanks,
+drew
 
+> 
+> Thanks,
+> Nick
+> 
+> Nicholas Piggin (17):
+>   Add initial shellcheck checking
+>   shellcheck: Fix SC2223
+>   shellcheck: Fix SC2295
+>   shellcheck: Fix SC2094
+>   shellcheck: Fix SC2006
+>   shellcheck: Fix SC2155
+>   shellcheck: Fix SC2235
+>   shellcheck: Fix SC2119, SC2120
+>   shellcheck: Fix SC2143
+>   shellcheck: Fix SC2013
+>   shellcheck: Fix SC2145
+>   shellcheck: Fix SC2124
+>   shellcheck: Fix SC2294
+>   shellcheck: Fix SC2178
+>   shellcheck: Fix SC2048
+>   shellcheck: Fix SC2153
+>   shellcheck: Suppress various messages
+> 
+>  .shellcheckrc           | 32 +++++++++++++++++++++++++
+>  Makefile                |  4 ++++
+>  README.md               |  2 ++
+>  arm/efi/run             |  4 ++--
+>  riscv/efi/run           |  4 ++--
+>  run_tests.sh            | 11 +++++----
+>  s390x/run               |  8 +++----
+>  scripts/arch-run.bash   | 52 ++++++++++++++++++++++++++++-------------
+>  scripts/common.bash     |  5 +++-
+>  scripts/mkstandalone.sh |  4 +++-
+>  scripts/runtime.bash    | 14 +++++++----
+>  scripts/s390x/func.bash |  2 +-
+>  12 files changed, 106 insertions(+), 36 deletions(-)
+>  create mode 100644 .shellcheckrc
+> 
+> -- 
+> 2.43.0
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
