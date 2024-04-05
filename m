@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-13638-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13639-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF0E1899638
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 09:08:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EE9A899640
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 09:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6AB1281EC0
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 07:08:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1201528307F
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 07:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812E73612E;
-	Fri,  5 Apr 2024 07:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B4B2C699;
+	Fri,  5 Apr 2024 07:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cQxhrd1z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bt7smaEL"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E457F2C69D
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 07:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6FC2C190
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 07:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712300846; cv=none; b=l4XXHAu/2+tAy60gL5nsdteLE9R8k/5TXGrNO1or3vrVL6G8QGL05h830c3fEfSd6WEksRiY+kA4t59T2mndSWhXSRQ+eTwoezeJFOCpjrr+PUIdrA4vU0dg5unahPl2Nyo/HBXgmyuccsIGsdC8EAmiymGbgxzDVc7PQ/1HR7A=
+	t=1712300977; cv=none; b=Whwbg2YBpAZo9/vdxOr8MEOJi4yz5/4IkusAcrMMhm+OonCR5h/9Y7yEzR0Rp/0NQn6PHxSkQ4ciTsfy+1uO4tbIp7BB2dWM6VGdyWtRRs5SvzsrV8bOhOyNWMe54/13eYP5r/vxpuuX9B7wWLciger/0daRbjuKumcfo+dZ5Ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712300846; c=relaxed/simple;
-	bh=95uFBOAhneffb1Ja1KSyqrBwkrrb/TGDWR+j0XJMpyM=;
+	s=arc-20240116; t=1712300977; c=relaxed/simple;
+	bh=oBpQTQQF+RxUjK0qQTdFBdRzlIfgYkZc4RMyIDNRwQM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NYhO7ym0mwDhigWzIfnk7jbNUrAv+ECXXuS4mZxzx+2mlcDQfpBSKoF5760Nng5a0eteY+flqO9Rr7O3SgFFtbkIu1v2w9sc1bkNkdariNoh+8m+GpSVupDIzewSUzrYg9W647+V4A+4WwObsCZ8tNqKxsK/GW8usVns+GJZwp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cQxhrd1z; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=KFS2JUsKOBlusWRifsTxKXW9cLLIb7NGWUBp4bnxROAChbvjOOm16Eq/dDXzjrEjtMRlErRHuO8oyBHD4rN8DXcxZNyQR9ToK0YQs2yAbU62a07cdR0NXujX3vcUBT0a09dM937BrMmdv9CQ4SHm77rLAwxexteitwqBcLX/kpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bt7smaEL; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712300843;
+	s=mimecast20190719; t=1712300974;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=W2PfWq36kzHF1BupaBwFSGwfn97ZJcuXsplgJ/7yRFQ=;
-	b=cQxhrd1zkCxusFmjeQ0WRaEwxX9bnBqAW/4l4JEgRp4YuvkIaFz9O4KLIUmCRNkHO8G7u3
-	E4RqDFRz3h1eosKQfAWHVIkJ1Wb4maKjx+JheDI3AoGq7yYlxhe3/JjgoctmewQTzmDHJF
-	pPbOH5U7UaIZ5ucRJWN28Hvzp8pqzNY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bWsrv37YfNRYFkefj79IxZMucsyie5Vbns2PoB6HIB4=;
+	b=Bt7smaELrg3G9t9s3xRzqDdUGhB4XyMseCr9GZZp7dFr9XWJlujxkD2K9+Lt7/ekxUoZyY
+	XLI884qrwv+1dbvTC7DIAaUpe7tREUDJF5S0K0Pa86fS/uM2XcRvQoAFZ6a/QzuwA5fTyh
+	HxovIp2bJrJStuz4MBsYqTRavj1r0KY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-367-RB8pROvrOX208lIjELdOYg-1; Fri, 05 Apr 2024 03:07:21 -0400
-X-MC-Unique: RB8pROvrOX208lIjELdOYg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-343678d2d26so953215f8f.0
-        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 00:07:19 -0700 (PDT)
+ us-mta-647-5TWkpT4CMuaG2IWWn7F83A-1; Fri, 05 Apr 2024 03:09:33 -0400
+X-MC-Unique: 5TWkpT4CMuaG2IWWn7F83A-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41401f598cfso11473425e9.2
+        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 00:09:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712300838; x=1712905638;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=W2PfWq36kzHF1BupaBwFSGwfn97ZJcuXsplgJ/7yRFQ=;
-        b=SVOADIAQ1rs/9mk3y8efZykwUFomFAjxsRKRqJMHkZIJUeR7s36skqdcz7uDux/1sQ
-         LYHUcdTSRvAkfMz5K076u0N2O1+naHGWGEOwWc2Jnp2S2ipvdeHivSnohRhqxCGNEVAn
-         ib4U1dinMGZuf/JKK6urAjXWYwZL0iY5q+F0Vzo7Q9GXwMzYkMJqsvRaeoZ8YLKQYfgK
-         EYDsLnaWY8sJx+839qNBUQaEu+s/G95RxkqkLnYXYiPpy7Ao1UP0HzwyhPU5p29NksrN
-         XsvIaW4hGlf8WbMYcbAgyXXpAu3NwZQc5m2VmPovENnqnYfvP70BSt7sqMREFgckiAxk
-         iJNA==
-X-Forwarded-Encrypted: i=1; AJvYcCX/INTMh4zSH84N/X8avLpBw1zn3fCw9n971zfHi9SOF0nsKFtU6lItX0hr8/VEbmJvA+9vFvDm39/nYXXSJqBxOSq3
-X-Gm-Message-State: AOJu0Yxykh9F10s+zmSLo3oiig8LL2bOoUoURZuBOVJx9+D++daH+cll
-	gaOXFPnCXLoMWrAmUMn7Ai/46hMW4LHBWpE/ygRzwk9okKIczAbXScjEaTp2voyLePWTpZcFt86
-	TfHCRlIt+E6jSIdN/rlzCuTUKRarh+1DyoJLF+akHPQlY413s6g==
-X-Received: by 2002:adf:ab1e:0:b0:343:6b42:b3bb with SMTP id q30-20020adfab1e000000b003436b42b3bbmr1380564wrc.31.1712300838638;
-        Fri, 05 Apr 2024 00:07:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFXr3R2IrdekK/JeUtjm6kdjkqeG6B/zHKWTGSIrupjmzyYrP5W+5ukd+tuH2+TKIuB3QGXCw==
-X-Received: by 2002:adf:ab1e:0:b0:343:6b42:b3bb with SMTP id q30-20020adfab1e000000b003436b42b3bbmr1380540wrc.31.1712300838172;
-        Fri, 05 Apr 2024 00:07:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712300972; x=1712905772;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bWsrv37YfNRYFkefj79IxZMucsyie5Vbns2PoB6HIB4=;
+        b=HhNUt5+96iH3SUodwVScJS3JzXAl64OElHYbWA6/AKexVnuJIOIGt2Pv6RU3IZXNjB
+         SlHKm5UwVHGA2Gl1BmBnfL/FKRq9vx4No58cMFk+wkzQxemRhP+P2NzSihXhYHrpUQGX
+         oDuvvtpAALqA3SGVK/9i5on0xOi5OH7sK+RDicPOyP2tbJEPNmiiZ0MjPt3pteABHPCT
+         RNJkPofC/+gDtrCS/SMpyVwpCc8s476rQA8v1ux3SD33VRL8s8bSVwooDXBZplMkCMML
+         dBROwRuACye3nyveNxv8BbzmGyuGrxSg765a5P87nXYQvdXrXPjEoXavYjoGn1Ucv5pq
+         S7OA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6Iv5tv1zC7Ubz13Tquk4w//nsDvQBUCZQkq+HaBXfGaZ2pSwab4dOU2hahnq0GTdec6M0X3Lf91Rb26/c0jCFM9DD
+X-Gm-Message-State: AOJu0YwDLNISNiFDgCc0PQlRfv2X9EgpBoOjwPhmo/6YLYrtSRMLzvc5
+	Y3Z+n1zD0HpUzm/IXlQOcuBxLPCDenf2nfnYbt00kssl2XhGi9Caqi/j4qVDadAQEJRXhXSJd0H
+	j3fH+B90gAHR0f6rShtdAe2gF+MiLU/JeETfgQbchu/2okHyE9Q==
+X-Received: by 2002:a05:600c:1c8a:b0:414:ff4:5957 with SMTP id k10-20020a05600c1c8a00b004140ff45957mr476463wms.5.1712300972207;
+        Fri, 05 Apr 2024 00:09:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGMRNTzpxyLjqqIYDr2QKngW3j1H6NrSOhPdqHJ7NeqOLqDxzD+y6/Jjotboqeo5fV1ubw0rw==
+X-Received: by 2002:a05:600c:1c8a:b0:414:ff4:5957 with SMTP id k10-20020a05600c1c8a00b004140ff45957mr476439wms.5.1712300971838;
+        Fri, 05 Apr 2024 00:09:31 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c74b:5500:e1f8:a310:8fa3:4ec1? (p200300cbc74b5500e1f8a3108fa34ec1.dip0.t-ipconnect.de. [2003:cb:c74b:5500:e1f8:a310:8fa3:4ec1])
-        by smtp.gmail.com with ESMTPSA id g11-20020adfe40b000000b00341cb22a8d4sm1251698wrm.108.2024.04.05.00.07.16
+        by smtp.gmail.com with ESMTPSA id h12-20020adfa4cc000000b00343668bc492sm1272710wrb.71.2024.04.05.00.09.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 00:07:17 -0700 (PDT)
-Message-ID: <3bae9c8b-d723-4a08-8579-fa6f3ea508e8@redhat.com>
-Date: Fri, 5 Apr 2024 09:07:16 +0200
+        Fri, 05 Apr 2024 00:09:31 -0700 (PDT)
+Message-ID: <67557c5b-afd8-4578-a00d-6750accc1026@redhat.com>
+Date: Fri, 5 Apr 2024 09:09:30 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/5] s390: page_mapcount(), page_has_private() and
- PG_arch_1
+Subject: Re: [PATCH v1 2/5] s390/uv: convert gmap_make_secure() to work on
+ folios
 To: Matthew Wilcox <willy@infradead.org>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  linux-s390@vger.kernel.org, kvm@vger.kernel.org,
@@ -96,9 +96,10 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
  Thomas Huth <thuth@redhat.com>
 References: <20240404163642.1125529-1-david@redhat.com>
- <Zg9zOJowhmOozmcp@casper.infradead.org>
-From: David Hildenbrand <david@redhat.com>
+ <20240404163642.1125529-3-david@redhat.com>
+ <Zg9wNKTu4JxGXrHs@casper.infradead.org>
 Content-Language: en-US
+From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -144,63 +145,44 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <Zg9zOJowhmOozmcp@casper.infradead.org>
+In-Reply-To: <Zg9wNKTu4JxGXrHs@casper.infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 05.04.24 05:42, Matthew Wilcox wrote:
-> On Thu, Apr 04, 2024 at 06:36:37PM +0200, David Hildenbrand wrote:
->> On my journey to remove page_mapcount(), I got hooked up on other folio
->> cleanups that Willy most certainly will enjoy.
->>
->> This series removes the s390x usage of:
->> * page_mapcount() [patches WIP]
->> * page_has_private() [have patches to remove it]
->>
->> ... and makes PG_arch_1 only be set on folio->flags (i.e., never on tail
->> pages of large folios).
->>
->> Further, one "easy" fix upfront.
+On 05.04.24 05:29, Matthew Wilcox wrote:
+> On Thu, Apr 04, 2024 at 06:36:39PM +0200, David Hildenbrand wrote:
+>> +		/* We might get PTE-mapped large folios; split them first. */
+>> +		if (folio_test_large(folio)) {
+>> +			rc = -E2BIG;
 > 
-> Looks like you didn't see:
+> We agree to this point.  I just turned this into -EINVAL.
 > 
-> https://lore.kernel.org/linux-s390/20240322161149.2327518-1-willy@infradead.org/
-
-Yes, I only skimmed linux-mm.
-
-I think s390x certainly wants to handle PTE-mapped THP in that code, I 
-think there are ways to trigger that, we're just mostly lucky that it 
-doesn't happen in the common case.
-
-But thinking about it, the current page_mapcount() based check could not 
-possibly have worked for them and rejected any PTE-mapped THP.
-
-So I can just base my changes on top of yours (we might want to get the 
-first fix in ahead of time).
-
+>>   
+>> +	if (rc == -E2BIG) {
+>> +		/*
+>> +		 * Splitting might fail with -EBUSY due to unexpected folio
+>> +		 * references, just like make_folio_secure(). So handle it
+>> +		 * ahead of time without the PTL being held.
+>> +		 */
+>> +		folio_lock(folio);
+>> +		rc = split_folio(folio);
+>> +		folio_unlock(folio);
+>> +		folio_put(folio);
+>> +	}
 > 
->> ... unfortunately there is one other issue I spotted that I am not
->> tackling in this series, because I am not 100% sure what we want to
->> do: the usage of page_ref_freeze()/folio_ref_freeze() in
->> make_folio_secure() is unsafe. :(
->>
->> In make_folio_secure(), we're holding the folio lock, the mmap lock and
->> the PT lock. So we are protected against concurrent fork(), zap, GUP,
->> swapin, migration ... The page_ref_freeze()/ folio_ref_freeze() should
->> also block concurrent GUP-fast very reliably.
->>
->> But if the folio is mapped into multiple page tables, we could see
->> concurrent zapping of the folio, a pagecache folios could get mapped/
->> accessed concurrent, we could see fork() sharing the page in another
->> process, GUP ... trying to adjust the folio refcount while we froze it.
->> Very bad.
-> 
-> Hmmm.  Why is that not then a problem for, eg, splitting or migrating?
-> Is it because they unmap first and then try to freeze?
+> Ummm ... if split_folio() succeeds, aren't we going to return 0 from
+> this function, which will be interpreted as make_folio_secure() having
+> succeeded?
 
-Yes, exactly. Using mapcount in combination with ref freezing is 
-problematic. Except maybe for anonymous folios with mapcount=1, while 
-holding a bunch of locks to stop anybody from stumbling over that.
+I assume the code would have to handle that, because it must deal with 
+possible races that would try to convert the folio page.
+
+But the right thing to do is
+
+if (!rc)
+	goto again;
+
+after the put.
 
 -- 
 Cheers,
