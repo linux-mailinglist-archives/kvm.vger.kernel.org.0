@@ -1,277 +1,127 @@
-Return-Path: <kvm+bounces-13769-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13770-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F250689A789
-	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 01:15:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D1EC89A792
+	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 01:20:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68F7EB22809
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 23:15:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7B2B1F23AD2
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 23:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7B43715E;
-	Fri,  5 Apr 2024 23:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1151E374DD;
+	Fri,  5 Apr 2024 23:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="juNF/I/0";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="qL/2oL6A"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pfB410vd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F04339A8;
-	Fri,  5 Apr 2024 23:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712358934; cv=fail; b=qxu4Ei19SCulruG5uGWK67uvtb1Ok8KgfhX0JAzdl88hWuN3vGA8eE2ODhu3AFdzDo8LZgop5+BJ3igzknMW5WToIo31ag7w0mj2y+gsNrnYqzrPyNnAx/CuqOPCmYGEq/VAckd8ydZPLe3BomrHoQzSJkVXSVcMDI3rMBkWwLI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712358934; c=relaxed/simple;
-	bh=Xk4AYeOzimvDLHCJ0l+Bk04xRHDTy65lBmn7+EloUbY=;
-	h=References:From:To:Cc:Subject:In-reply-to:Message-ID:Date:
-	 Content-Type:MIME-Version; b=aE9XKVsjRE5G58X7jcHy9cUPZFA1WAiYjIAwyuRKgYBE4GwYknUzcRDSf54TRwVXi4q0wfxjwbdHNvmeMvGgDbHqwKpdeh1tarlHuUBBIXSBOi/VfArM43da108EwA0h8hN9ltV+3MHYHtNBZuXhLURBiC/ljcRWquoTr5YFKhs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=juNF/I/0; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=qL/2oL6A; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435LX4DM005443;
-	Fri, 5 Apr 2024 23:14:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=references : from :
- to : cc : subject : in-reply-to : message-id : date : content-type :
- mime-version; s=corp-2023-11-20;
- bh=SIH2Hfnioow3R4yPEynu7LJ0Yuue+dVBsxl1vtGKFKI=;
- b=juNF/I/0KYmcQid03hBgjFn54EXgCYmxPtEJQVu5eQcZFzSDu0KrEKwtj9XQzfBRM4Wq
- cyvaHNOOHXKUiP8V01tWVcMQDzpmpfwDncLiVeHiF5Qpp42OOxyUoniq+FtQ6br4VxgF
- w944SU3KS3Ix8YZdA6trBf8qzKIyErRJb74egnWNd18xIaCkutmasmKUcDd4PilhYOSK
- Kh58IKUuQPVp287q7XlQb8FlzgpnYA1CI/pzpmXM6xxRMVLuUpN8C6mKpzrVjjZ4pB0q
- 8UJg0M3hXET6Up86R4VXmleM7gsI8cj3mGswz9zxglZxoFBQZYD2YuUK2Xb1F1KwCJdk jw== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3x9euy4g0x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 05 Apr 2024 23:14:25 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 435LuEt8038956;
-	Fri, 5 Apr 2024 23:14:07 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2169.outbound.protection.outlook.com [104.47.56.169])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3x9emt716e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 05 Apr 2024 23:14:07 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OqFEmgefre7ibqplvp16FN7OTiNBOp8R20YWPWRF2uRwa9ckeltFP9yb/EImDkLC63Qd1yn2bcE2aACKYSKuC/HzZMr6xwvHIgb4BahMxpbp1XPbAd8nislffsvasuHFQLOcSE0lVcGz1Otqnr0qZ3KcfL1s7qEZOcjMEk/RAXjSQ80h1oGC37F4GJycDn/iY61/QNHSglhksPMoxjBkyoVMXcOLHi3VaUVfSuP5kXmwN3YKPfXSE1wzmk+vFP0qOwkt9FhPyGibLtu5ecfyRcjRE2Bv5UdxA81M8YASF47o47NK+cGM5YylmxJQnfkibZCH/R51iM6W8uR64UUOvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SIH2Hfnioow3R4yPEynu7LJ0Yuue+dVBsxl1vtGKFKI=;
- b=aVFji/n/2J68fntbhatLX6assFKgn0M07a5odj1GJs/N+RelpdDAPO1wJN2zMp8MFxaWYXvRL8nbpxMMjO7A9Ohcm9jFavdJ5PsLz2pz7fz8tq69mXk8O9VN3CX4jGD1Re3E0ThEAxRnt6Mxtt5GMYkJW73DYtknx+Ybi1vkCgyoAX7/vgQfSicFX//ik/eegtqgutR4NmsAq7MlOY29syzKnDgXxcpIliO3sf1/slnLfDbdoc45Ue+brUp7/xUnuWUoaD748stCQ3J60OkYjm9T6Ub0izZHQKAdhCxceKRcdCdb2gMcPuxChHEN/vurY3sv0UcYspfwNlWZASMEsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E4B5672
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 23:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712359245; cv=none; b=DJn+Zl5rwbRsflfEElvp25Ng1KZjMXn7hgMcX3ceS1rkNAXyjCvq4RhIhqkyz27eXIo2XIsCRhQDFGxTZUhGvmYzvTYwzfil24sDUelVKsNXwDO3Wj5vN0RCHcDL3zcEcB3vOWozPauuRcy+DzTh5dmc+dfnxLe55IrEz/C3FpM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712359245; c=relaxed/simple;
+	bh=6JYCjL9C4AfaDryXf5XSZhrO2zWHCuIkX8eHeXELHqU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=a6Y4Xr9NK0nrOFLQd3yQtEZTMoM7Px03QAMsqe09LD6MiZcS9JTprsZqEBbnTkO5moqcVxFar2dUOqDY1aluRKMhBIpJVcUXrGS1KPcwX8Eho+DUffIbIpM+ffrdrs8sOemesofWtuPc6qHmyZ+gMUHiI1XlPfXpdZY7lIFhEbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pfB410vd; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5d8bcf739e5so2345517a12.1
+        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 16:20:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SIH2Hfnioow3R4yPEynu7LJ0Yuue+dVBsxl1vtGKFKI=;
- b=qL/2oL6A+6N3gsFXCFBIPcvNbLHr0jQI1gyyS9yDA79EqR8NJP23nN7fRaRCqnEN1wVS15hZcF4nmMYtwSKTWvZOoc+0OwDffH88gT7aRJh9NJDQX4pVzQRACdX6myGL0DPqfF7PwGV/Gutl09zWJ/DWttvLaGq5VMN8WqYrp4Y=
-Received: from CO6PR10MB5409.namprd10.prod.outlook.com (2603:10b6:5:357::14)
- by SA1PR10MB5868.namprd10.prod.outlook.com (2603:10b6:806:231::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Fri, 5 Apr
- 2024 23:14:04 +0000
-Received: from CO6PR10MB5409.namprd10.prod.outlook.com
- ([fe80::4104:529:ba06:fcb8]) by CO6PR10MB5409.namprd10.prod.outlook.com
- ([fe80::4104:529:ba06:fcb8%7]) with mapi id 15.20.7409.042; Fri, 5 Apr 2024
- 23:14:04 +0000
-References: <1707982910-27680-1-git-send-email-mihai.carabas@oracle.com>
- <1707982910-27680-8-git-send-email-mihai.carabas@oracle.com>
- <7f3e540ad30f40ae51f1abda24b1bea2c8b648ea.camel@amazon.com>
-User-agent: mu4e 1.4.10; emacs 27.2
-From: Ankur Arora <ankur.a.arora@oracle.com>
-To: "Okanovic, Haris" <harisokn@amazon.com>
-Cc: "mihai.carabas@oracle.com" <mihai.carabas@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "joao.m.martins@oracle.com"
- <joao.m.martins@oracle.com>,
-        "dianders@chromium.org"
- <dianders@chromium.org>,
-        "ankur.a.arora@oracle.com"
- <ankur.a.arora@oracle.com>,
-        "mic@digikod.net" <mic@digikod.net>,
-        "pmladek@suse.com" <pmladek@suse.com>,
-        "wanpengli@tencent.com"
- <wanpengli@tencent.com>,
-        "akpm@linux-foundation.org"
- <akpm@linux-foundation.org>,
-        "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>,
-        "catalin.marinas@arm.com"
- <catalin.marinas@arm.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de"
- <tglx@linutronix.de>,
-        "daniel.lezcano@linaro.org"
- <daniel.lezcano@linaro.org>,
-        "arnd@arndb.de" <arnd@arndb.de>, "will@kernel.org" <will@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "npiggin@gmail.com"
- <npiggin@gmail.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "linux-pm@vger.kernel.org"
- <linux-pm@vger.kernel.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "rick.p.edgecombe@intel.com" <rick.p.edgecombe@intel.com>,
-        "juerg.haefliger@canonical.com" <juerg.haefliger@canonical.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v4 7/8] cpuidle/poll_state: replace cpu_relax with
- smp_cond_load_relaxed
-In-reply-to: <7f3e540ad30f40ae51f1abda24b1bea2c8b648ea.camel@amazon.com>
-Message-ID: <87r0fjtn9y.fsf@oracle.com>
-Date: Fri, 05 Apr 2024 16:14:49 -0700
-Content-Type: text/plain
-X-ClientProxiedBy: MW4PR03CA0304.namprd03.prod.outlook.com
- (2603:10b6:303:dd::9) To CO6PR10MB5409.namprd10.prod.outlook.com
- (2603:10b6:5:357::14)
+        d=google.com; s=20230601; t=1712359243; x=1712964043; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=12i/1U6e69lGZbnks+aFjU43EdHvF/EYY258ON1Z+QY=;
+        b=pfB410vdjh/TM3n9ksMNXrl7zddiS1npxNi0FlxrlJ+4I8UZH6S/cnIEdSpZ1LiJAL
+         4WHMwlvY4lOHClZz2FUQxxVes3/dYRH7mXqcqUApf3WZfZvPOdeV/+9hOJXd38EY/xsn
+         zD5l4RgUxVjuSeUejen4ULbnOSPfnxh19ACcnzvl7XsxsLNV29XNMIIrp9LK7mXgsPDe
+         eArJO7kPEWqr52JX+ajKqX5KpVcnW1s0jGXDwdgxBd+IPNyUJRPxFOFuKPcuR1+PnQhy
+         PWJ/GsmT2SZHWIp+jnkjEEYbbZ4muBuXe01OxGsjCOBbx9p9uKkNb1fZE3vwzFJ8BbYd
+         ntQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712359243; x=1712964043;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=12i/1U6e69lGZbnks+aFjU43EdHvF/EYY258ON1Z+QY=;
+        b=sqrzgC0DL0yJnC6EfmK6FG+hNnIE5Xp9jf5MGhcgJXfFjypXuNzmZUWoAadqJ8UPFb
+         4Pnmv6uxbtMX3lzigGklKrhCuMvGLGJ/mBsBaJtLwXz72/a/dNDQXXGMLzhDyDQw8yM3
+         lKdJj/aQFayrHHeCe868yPiPvaaNq8FkvsMSxE7qg4e7w/m100Aqokoxsjbl+7h7ArVJ
+         lLJoFoUYd+cifQTx0ttxTcnz3pocifdbcuNwFFxXoXtfIKY2qF8/fhmHi8dpfukN6Epm
+         PTratfaqhtVPKdWaZRk6BrD42pYZBODuQ2XSS/nsC8aB7FvszmrajAAfQFCcDcMTsTTA
+         8oFg==
+X-Forwarded-Encrypted: i=1; AJvYcCWpZoGsKwYW4mcD7RYA5NXlPRetnfbLPS/Z74S06nHcrefANiePjjIWzGiDqYjHRWmOpBZujtpNIx9QjUkPJVFLGCpI
+X-Gm-Message-State: AOJu0YyVEUWqd7NWaiN/e2zPRtU1uyfFcL7C8BqmADNBcco/efbLnHNy
+	9cu890I+FPu2s2MpUkYSNl0NMi0Q+iWv4AKjtlgpnF5PylQelHAX/lYwCJ1+BM5k6+V8lHbe2/3
+	qaA==
+X-Google-Smtp-Source: AGHT+IEUYFveyLiskfYb2sLUp535rDaaKamTXvVef0iSV4YFA3At2jAAYj0djH4lUTfne66XFXNLoy2e1Dc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:1115:0:b0:5f3:fddf:e819 with SMTP id
+ g21-20020a631115000000b005f3fddfe819mr4204pgl.10.1712359243207; Fri, 05 Apr
+ 2024 16:20:43 -0700 (PDT)
+Date: Fri, 5 Apr 2024 16:20:41 -0700
+In-Reply-To: <20240323080541.10047-2-pmenzel@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR10MB5409:EE_|SA1PR10MB5868:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	ZAK71qKmZAfN7wIMjqAejcacqCtrd99durf9o8rCV2Qvlu0A9t/O9Zl6OZFMky4VxldSwt4jUW4g2EUkZdYWscNyuPfS0vIQT4f6TJ7HJkN1ZJP/z4AmLJ/MHOzGj+PerTjFozzUg4XU3Qyq96soaaRvxnxDqjJpqmyqo+Wjmt28u3qvK22UjRBpl2Tel7ilLNAgQB69tzCtm7GksGX8lF24P9UXvl6hYFZLDGwTCSsUkDnJn4KccvMoktf1MFnoKvREXd+L6DaF1Wd6p4N0lZSaB3NIx5yvgpHEVPJqDu+C6+nWFxKlvo/AggB9+NJqoq9//BXIXJzhi2vI+8oRFJjCPJs+ADnviZZRgMVqsDJYA25a3PIUWVXmldA6JPiUEEDXu8lYUZjcNYtAmvSAk6HI7J1Uxa0TMIEDSJ5wTj673PARxaQCWETs7lLrMNS9rqGIBF5wflxx1NRZilPyoWmW5rbHYGQJV4AY8CoGqP2EN2vRNh94r8UEi7nZ68cglJngJAjyqqRUwC8yaNWybTDbZro7bS1MLvG00UVRjV35SobaevMNk0PSmv5LYGUL0msHh5kXaVkuCvGZlc75bChTRNwpkHGQWcXzWNbMj81B3i+I8/cTL6Xx0D9EkAXuNMr5QqpSEfzYKhkAy/NTbKIQlldV9GBQWzqPJqX8Cyg=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR10MB5409.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(7416005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?1rbX/tAPUfKMjmAr6d9s8SyhDZyHq1WGGXMLiAtQ4XZaHpwkyBm9rJ5M5Ue+?=
- =?us-ascii?Q?PDXdDRsP3yB+GjSUlbnib2/V7wyYtaoJvxyLbmOHH3XgIMOwnSpDD80iSYE5?=
- =?us-ascii?Q?bROcE+J9hCXLWJcqWI1K0t2fvAiZlKIb1HclmHFVVRTG0PoDZ+ADxYNEwzEs?=
- =?us-ascii?Q?vHXNNI73ioU3w1d3YyCuSeRpwrVhgwPG73Bh7qUrMdvem4UMkfpvejgTnJsr?=
- =?us-ascii?Q?Dy/wQMyBd7G8rW8clUeQ1SD/j0r6vxm8AfR2B6kAZTMZ8tP60JGrY4VHk9m4?=
- =?us-ascii?Q?D3SR6hbMU/euJt7fJIF/4TNnjesUse5dGXBGVnIs2/dGZi/KavHT0eMk9pw2?=
- =?us-ascii?Q?WwIehzreqKq/M6L6gP/zBt7Af2d5xsMdY8vFVybiFf1m3ZcCMIfZUQKsRsHA?=
- =?us-ascii?Q?5TosUh/oibbTvd0ZbHzQCepr5g0LyByg4wgiXN33Z00bUyxBrT/cWLgSkzoa?=
- =?us-ascii?Q?q3h51f5F99myjFL8HMD5q39g49fz+yj6D7ps0YcDTtHcf2+Ya9CWcMsdWbdU?=
- =?us-ascii?Q?fCwoCJ2faxD4Y4Q2mVeZYi80vSwzviBadwIR1ffT6hyCQZx8IOfB8d1BiT05?=
- =?us-ascii?Q?62Yl2SfZnPGM0pmELP0YiDwQFyCepYwIJDjiECPvbZu2VFz0DqmABHv/bPVR?=
- =?us-ascii?Q?HuAEduGzVPrR0sK8pSibWEnenurUWauEXbfrqzjp3P6zFwEV1SW+KngL9YlE?=
- =?us-ascii?Q?KBwFtWkJnCpvO9g4kDEkPU9WMKQNTMoNbbBIincbwKggdVd/hdOsrULZNlHc?=
- =?us-ascii?Q?wbJVtpOtkLZRxvcSIP257hHT3J1LO9RjIw0Exc0sjaQpcisZfWNEh9ZSCmnb?=
- =?us-ascii?Q?eAjvNDgZvKQPbgHE+FZ8ROE5r/Xz0snGjYgyM8NrmNGo7RwPS0jahJDEmpY9?=
- =?us-ascii?Q?ti2tT1Yu0ZS1qQ2oZuZfn+LmkFBfy0x22w4yrL6azAGEQfdZCSzyte4QJs73?=
- =?us-ascii?Q?tyT77/p4/mOHeu2ND4JTz8eQcWkAsD3A4HcgNuTHGQvvFqRkCZRLEOwcsXtc?=
- =?us-ascii?Q?MNzz5hLlCmhkjPUzNaBpevAnw/0fW9BEVCY63V+IWhm7zZWY4P8RNZkHuIyX?=
- =?us-ascii?Q?k716HaD645cJvD0IjiMNIATmh2cF4ylnvlhUM1SYIuXZGJ1IPEtC/LcHvZrO?=
- =?us-ascii?Q?ywK5NG1AckX31/NRALN57Y8UOWFOYLyMr1mQNO/o4rQ49tTW8kR7LrLGI9O9?=
- =?us-ascii?Q?b6Vj+zZGm5BzINRZ6a+NkpNAl78+KstBPZatYgzGtKMiN/lRA8m1VjVFHUfo?=
- =?us-ascii?Q?QiOhkLSuj0+s37sI0DGAHBaJCgjXT+lnBjRF82t5gblz9eAkSYH2hYriYpLx?=
- =?us-ascii?Q?MF8djE7DAB1cZ/Y937RkzpqdXfhakuPgbqYYx8t0/NzvRPSbx2vKXvRMgo+K?=
- =?us-ascii?Q?b/cYkAlYRuiCxJ5Kqm01fqsi7bkKWorpc38+yyU57OFNuwsOOckPF3Kq+37k?=
- =?us-ascii?Q?2U1DMPTheIx2EiiXt1Per//cSHeep1z7HwE0m80Ps9SLP+KJHhU2SeF5k/1B?=
- =?us-ascii?Q?fxmT2xgLWR+Pj4yfAHGu29E0iNGsMu4562YLCNySkjZQauwR4h70h3sXq/7H?=
- =?us-ascii?Q?nQSmAeR4QqkQFqAJig6hM9IhMgyJ4ZbUkxp/+ZI0mo1s+DvwUvh0N4SrQxlN?=
- =?us-ascii?Q?gQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	pTG+c0OpV8VbGnQA9x4oOCOrHTmieeWXQffoftNveGlZ59YuM2ShyKRmvB3QG/ElgHSpHsXhpviaja/JQwsL5yGZCJQxQOYPyEUQFFh8Dbc2zegFKHAN2oYdVcUGMvG8mrykJYjE7h/cL10bNA6thfJPDOwVV87VgO75UkGvXA4I0arUwTfWkaVCH/ZezNNqPeDio2hqsnstXseUsB+EQ+98do63y9Ly149KCImfNFSRO/54VMnPIhu1ljri0RshjeIIdRY44Y/MTHS+xFL4Tg3AIXjX3w4fqtxM0T38i36+O5ynpRElo2M8a7APKC5b0VVjZDG1yFUf3o4Py03ifFaKSw/UH3gXkYfDll9Hn209IH0FOkTnbEzzz698RiBEpLCnUnLBcbkB7rfTkS2wHDrnRgMuCBz82OYNAYlGdErWf11r+Ldmq3ZE9trEgoqWj2seTjrlGHmkCTSJlZ4DHYeBzVRfLwe+EWcdINCVWd6rRitK1QyGN+6Gmf0rjct27zzqKBxALHW9Xm4fW1Qlv5hjQSTfEi5baMTBSRVywEU5D/vDLdIEX/O/CA3UojIFqKf2RNTRIfh3KNFfTkwWYu1PLC8AgkhGvDyOyK1QP2E=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0592899b-9881-4838-fd93-08dc55c615f9
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR10MB5409.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2024 23:14:04.2444
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YjYpXidC2rRuMl9P77+Ut7v6ILFTSytgl6vVyw4PMcTCM8J4VzPTwiCszhzj2CiO9x+btY+xnxQnC64JamBM97xrNXJjTi6ziF8ow++cEQY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB5868
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-05_28,2024-04-05_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
- suspectscore=0 malwarescore=0 phishscore=0 bulkscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404050167
-X-Proofpoint-ORIG-GUID: Xivgl_nI13iEgjgHJCptWL4kdF74p6Mq
-X-Proofpoint-GUID: Xivgl_nI13iEgjgHJCptWL4kdF74p6Mq
+Mime-Version: 1.0
+References: <20240323080541.10047-2-pmenzel@molgen.mpg.de>
+Message-ID: <ZhCHSYwS5_o-OKs0@google.com>
+Subject: Re: [PATCH] KVM: VMX: make vmx_init a late init call to get to init
+ process faster
+From: Sean Christopherson <seanjc@google.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Colin Ian King <colin.i.king@intel.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Sat, Mar 23, 2024, Paul Menzel wrote:
+> From: Colin Ian King <colin.i.king@intel.com>
+> 
+> Making vmx_init a late initcall improves QEMU kernel boot times to
+> get to the init process. Average of 100 boots, QEMU boot average
+> reduced from 0.776 seconds to 0.622 seconds (~19.8% faster) on
+> Alder Lake i9-12900 and ~0.5% faster for non-QEMU UEFI boots.
 
-Okanovic, Haris <harisokn@amazon.com> writes:
+The changelog needs to better explain what "QEMU kernel boot times" means.  I
+assume the test is a QEMU VM running a kernel KVM_INTEL built-in?  This should
+also call out that late_initcall is #defined to module_init() when KVM is built
+as a module.
 
-> On Thu, 2024-02-15 at 09:41 +0200, Mihai Carabas wrote:
->> cpu_relax on ARM64 does a simple "yield". Thus we replace it with
->> smp_cond_load_relaxed which basically does a "wfe".
->>
->> Suggested-by: Peter Zijlstra <peterz@infradead.org>
->> Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
->> ---
->>  drivers/cpuidle/poll_state.c | 15 ++++++++++-----
->>  1 file changed, 10 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
->> index 9b6d90a72601..1e45be906e72 100644
->> --- a/drivers/cpuidle/poll_state.c
->> +++ b/drivers/cpuidle/poll_state.c
->> @@ -13,6 +13,7 @@
->>  static int __cpuidle poll_idle(struct cpuidle_device *dev,
->>  			       struct cpuidle_driver *drv, int index)
->>  {
->> +	unsigned long ret;
->>  	u64 time_start;
->>
->>  	time_start = local_clock_noinstr();
->> @@ -26,12 +27,16 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
->>
->>  		limit = cpuidle_poll_time(drv, dev);
->>
->> -		while (!need_resched()) {
->> -			cpu_relax();
->> -			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
->> -				continue;
->> -
->> +		for (;;) {
->>  			loop_count = 0;
->> +
->> +			ret = smp_cond_load_relaxed(&current_thread_info()->flags,
->> +						    VAL & _TIF_NEED_RESCHED ||
->> +						    loop_count++ >= POLL_IDLE_RELAX_COUNT);
->
-> Is it necessary to repeat this 200 times with a wfe poll?
+> Signed-off-by: Colin Ian King <colin.i.king@intel.com>
+> [Take patch
+> https://github.com/clearlinux-pkgs/linux/commit/797db35496031b19ba37b1639ac5fa5db9159a06
+> and fix spelling of Alder Lake.]
+> Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c37a89eda90f..0a9f4b20fbda 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8783,4 +8783,4 @@ static int __init vmx_init(void)
+>  	kvm_x86_vendor_exit();
+>  	return r;
+>  }
+> -module_init(vmx_init);
+> +late_initcall(vmx_init);
 
-The POLL_IDLE_RELAX_COUNT is there because on x86 each cpu_relax()
-iteration is much shorter.
+_If_ we do this, then we should also give svm_init() and kvm_x86_init() the same
+treatment.  I see no reason for vmx_init() to be special.
 
-With WFE, it makes less sense.
-
-> Does kvm not implement a timeout period?
-
-Not yet, but it does become more useful after a WFE haltpoll is
-available on ARM64.
-
-Haltpoll does have a timeout, which you should be able to tune via
-/sys/module/haltpoll/parameters/ but that, of course, won't help here.
-
-> Could you make it configurable? This patch improves certain workloads
-> on AWS Graviton instances as well, but blocks up to 6ms in 200 * 30us
-> increments before going to wfi, which is a bit excessive.
-
-Yeah, this looks like a problem. We could solve it by making it an
-architectural parameter. Though I worry about ARM platforms with
-much smaller default timeouts.
-The other possibility is using WFET in the primitive, but then we
-have that dependency and that's a bigger change.
-
-Will address this in the next version.
-
-Thanks for pointing this out.
-
---
-ankur
+I'm not opposed to this, but I also have zero idea if this could have a negative
+impact userspace.  E.g. what happens if some setup's init process expects /dev/kvm
+to exist?  Will this break that?
 
