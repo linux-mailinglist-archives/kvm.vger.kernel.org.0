@@ -1,126 +1,180 @@
-Return-Path: <kvm+bounces-13676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD20899893
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 10:53:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B2E8998B7
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 11:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEDB62841B3
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 08:53:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 256F71F23EE7
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 09:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4050F15FCEC;
-	Fri,  5 Apr 2024 08:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61CC515FA8D;
+	Fri,  5 Apr 2024 09:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="KH/O2kU4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeISPJDE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9620D15FA83
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 08:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173EB611E;
+	Fri,  5 Apr 2024 09:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712307188; cv=none; b=rpGA+yxUnIYiTwtlclY0Q0x01UGsKZHznChMhqQ1zAlVyLLaWOFtd8+SYlj89O+OnbWYCLFbYCLogR/aMZ9SBvFj3Qq6vFvSHoFMJxYhhTgqk1Uu0act1MB7Q+EInY627vn5FM9sNCP2vi6ZjDZ1vxvnOj8jOptLMFUiBZBzvQA=
+	t=1712307668; cv=none; b=aQFuWImfjfVcjbD5KpFVJhsOw4vc1LDu9EqzMX0Axe52aE7mTfn5Nmb0HGzId3OqVwZQRUGPlzFF0sJLBV0v4+4fsi+7hVyhqpjlLUn/xSaqztZpZW0ujdChXXyRkpr2nLFwDHtCvvyfyPG66qaWFGp0/yB02QppHXQL7z0hXBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712307188; c=relaxed/simple;
-	bh=b58X/MIMUkzWJKfAi7xukhYyNxm3BVKa9wfMtsb3Sd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I0VWROAguo1q8jYmopDXK9IONlotJpnX/GpxhAypODYERfesmQ1swYZ4LQ14PY1vz7R3U35DYiReFLo2vh2OaGRQeNXryFBgbLObDepUmon6hJrNXwz9ytCzCfce4f3kahBl5ts5gRWTxR+RUxc2TleTI7KNypBPHaf3paavtGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=KH/O2kU4; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=b58X
-	/MIMUkzWJKfAi7xukhYyNxm3BVKa9wfMtsb3Sd4=; b=KH/O2kU4AXBavxNzHugQ
-	Cr0XiXqp/GPDBSk990nWASPmI37jJSCyQb7Lmqf/oL1tdcIHRX8jcmo2vwR2Tob2
-	3MSo8HTQY7A27SYWA+SI/NfQ5pqpmi79n6McsjIcB3WFLNWrOIMRU9rOtunrND10
-	HWjAn9CXhCQ+B9a1mPUM02wRXvB9PLITUPY3IFp4RQdrilkojM5jzuhcnTiEv7VH
-	VYyQIaPUSbCJyxVg+Ps6gEY1GV7GeeCVXIVYwLifWiKRkws+ODNIdvmXrsiBWpB2
-	SNQ1HJX7xrINzXmGee9lezHXjMCnmDNUx7uK3emvEkF2ZwnnAUK7Pn+L+1Q5APd7
-	Jg==
-Received: (qmail 4047676 invoked from network); 5 Apr 2024 10:53:03 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 5 Apr 2024 10:53:03 +0200
-X-UD-Smtp-Session: l3s3148p1@2SRllVUV0pYgAwDPXwEGAANOsN0UmmrN
-Date: Fri, 5 Apr 2024 10:53:02 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Russell King <linux@armlinux.org.uk>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach <mike.leach@linaro.org>, 
-	James Clark <james.clark@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Andi Shyti <andi.shyti@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Vinod Koul <vkoul@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Michal Simek <michal.simek@amd.com>, 
-	Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	linux-kernel@vger.kernel.org, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-input@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 14/19] i2c: nomadik: drop owner assignment
-Message-ID: <fgcn3ly4qk726eqv3lleqbrg7odgyklkyd6d7wmpyl73bbt5ir@tjui6nsxrlgk>
-Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Russell King <linux@armlinux.org.uk>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach <mike.leach@linaro.org>, 
-	James Clark <james.clark@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Andi Shyti <andi.shyti@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Vinod Koul <vkoul@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Michal Simek <michal.simek@amd.com>, 
-	Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	linux-kernel@vger.kernel.org, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-input@vger.kernel.org, kvm@vger.kernel.org
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
- <20240326-module-owner-amba-v1-14-4517b091385b@linaro.org>
+	s=arc-20240116; t=1712307668; c=relaxed/simple;
+	bh=2DLlYhed/nh73dIMIHSWhwKFVemru08OyxDmfqOJgKA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EVS0XRD31OZvZ0DUHhHGSHtxuECeavMauLVw37b+tNay4yOs00rBH7t3AZaxQbpEukHqLnkbzob89JqoGbI3u5VdhrtpVtQx0H3urst+Rr2xFIhFJs5qfnvEYKgA3zcFsvIkVl1rxZVtVbWEfiewPIy7EZv73QbzQBQra/qpSF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WeISPJDE; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ecfd29f65dso635527b3a.0;
+        Fri, 05 Apr 2024 02:01:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712307666; x=1712912466; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wI4DwimW0m+Dm8ZQCp4DenGm21I2AM0p3NfyF7YdsYM=;
+        b=WeISPJDEk+DdzdpiDBDDj6uMdNr/mFlG0J3LaOl5+lG4nm8k7posFynAAaTJ0h9oCu
+         f4l6STmfY7ZeooIT/8TSb+z6IjNqPc09LmXRv3YuHWJYOE61wNEVPVnkrvU6xKySL0Zy
+         rc/A3sNHoS84E3pOx3RlwOtkZJV0I46N3yFGiddkhNHKOjREVRXxW7/g6584VYaukydS
+         9y8HEgOJdAxKerFmzJ6qsQ3SVkD2NCraWbWI2R+8Z+xNDW6pmglCmwo3KYGGCOzWETVX
+         ceBPEQvA9HGU7i6uVydyDbZdg9aA++JxaFJRbo1OijK+jjl+irg19rTuFbL8S+aS+3cJ
+         dyrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712307666; x=1712912466;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wI4DwimW0m+Dm8ZQCp4DenGm21I2AM0p3NfyF7YdsYM=;
+        b=qzpzCZmYQd/5wNp3hkPxafC6EaJuNFSHglWbR7VhaWoK1+8OEyGMlHgV0rkuLumnJg
+         hdDofUsaibWwPKMlqnMKaCDq5V+h5HA1N6ytM+ahf7gT79XfCkO/RNkwVYJE8LeU8JiY
+         F9zZ9Ta6dWMA3regKYyCGNCSdoLivCS5rNsmhbdhT+fk4S8UcFSu47+rPYyy+rn3agDo
+         zvF1UjSbLS6KI2wmD5UFMYSc3er3xrTK5QiN74kVlU9IXQRBhL4Wmr5aRjm6JE8MEI28
+         zkAB5K9QsRVauDKxiQjIyJsRKWcwD5hCpPQeT4OF6mzYae/REVNuMgATlQ7T3fOdRR9R
+         SjYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVgnURQZMKgk0VpI75nhhHNGu54YxeUKfOdYiKGk8Vr3O7HxOwZIxLkimg/p0rkqHjuhSdbqqS/iXsFvHmWZboBZvQ2sHLok5vRJgfK2Act0jFcT9iZKBDFAGpGEsChEg==
+X-Gm-Message-State: AOJu0Yw1Qzx1eg9xCMdo6thFQvNqQH0xquxuGy6mq8kj6uYY24e8mYeM
+	fZViIM3fJXvI3bQBcVhDKYDBYAIX6iCkfTUSDd89GCsgJbljZ2M9
+X-Google-Smtp-Source: AGHT+IGlcBi2VUkohcnGRD3fzDjABuKFi3W10RhRfQ1OuAg3W7+E3pA6bb2h+PqEKmLJKinBlGe9vA==
+X-Received: by 2002:a05:6a20:2d28:b0:1a3:57b4:ed1c with SMTP id g40-20020a056a202d2800b001a357b4ed1cmr1173245pzl.25.1712307666319;
+        Fri, 05 Apr 2024 02:01:06 -0700 (PDT)
+Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
+        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.00.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Apr 2024 02:01:05 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
+	Nadav Amit <namit@vmware.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Ricardo Koller <ricarkol@google.com>,
+	rminmin <renmm6@chinaunicom.cn>,
+	Gavin Shan <gshan@redhat.com>,
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests RFC PATCH 00/17] add shellcheck support
+Date: Fri,  5 Apr 2024 19:00:32 +1000
+Message-ID: <20240405090052.375599-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="honofbm32v4z4vxk"
-Content-Disposition: inline
-In-Reply-To: <20240326-module-owner-amba-v1-14-4517b091385b@linaro.org>
+Content-Transfer-Encoding: 8bit
 
+I foolishly promised Andrew I would look into shellcheck, so here
+it is.
 
---honofbm32v4z4vxk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+https://gitlab.com/npiggin/kvm-unit-tests/-/tree/powerpc?ref_type=heads
 
-On Tue, Mar 26, 2024 at 09:23:44PM +0100, Krzysztof Kozlowski wrote:
-> Amba bus core already sets owner, so driver does not need to.
->=20
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->=20
+This is on top of the "v8 migration, powerpc improvements" series. For
+now the patches are a bit raw but it does get down to zero[*] shellcheck
+warnings while still passing gitlab CI.
 
-Acked-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+[*] Modulo the relatively few cases where they're disabled or
+suppressed.
 
+I'd like comments about what should be enabled and disabled? There are
+quite a lot of options. Lots of changes don't fix real bugs AFAIKS, so
+there's some taste involved.
 
---honofbm32v4z4vxk
-Content-Type: application/pgp-signature; name="signature.asc"
+Could possibly be a couple of bugs, including in s390x specific. Any
+review of those to confirm or deny bug is appreciated. I haven't tried
+to create reproducers for them.
 
------BEGIN PGP SIGNATURE-----
+I added a quick comment on each one whether it looks like a bug or
+harmless but I'm not a bash guru so could easily be wrong. I would
+possibly pull any real bug fixes to the front of the series and describe
+them as proper fix patches, and leave the other style / non-bugfixes in
+the brief format.  shellcheck has a very good wiki explaining each issue
+so there is not much point in rehashing that in the changelog.
 
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmYPu+4ACgkQFA3kzBSg
-KbY+PhAAmNuSoACChosjYi33qGWzyeoBhz9tLue2x0d13airycgFlY6FyFx1aY+/
-NadTECwyu8TNhXdRAYk/Y1sTo9S+MezhsboJhiL8+5hiOBEZHXt7U5+8k/Pkg499
-9QHeM8PaeBfpoodRPGG7UCxHkjENntyyR4OV1X5eWgGheKFtzw6F2NwEMqTdus5H
-yGju+VYEMeH97wXMkPRPmqIAUfG140PY+fTfOInco1my/ejprCYy+OJdL+uMDBlG
-3MSIMIrLahtlKK6tkhnA9MdGaC3J4v5bzpo7lgDwM6qPcOHY6ftTfz726DpdI68w
-JLoRj/Ne4xKX4Munav7MMDCPGWaSY3fQ6F1xtzq+EdfVQHnSIxpuhH/zvpj7LDEz
-l+yVUvhjs41B3d8QkXmFp0ByjxaiIdO5EAkraw/OguBo6kv3N0TgEG1BZTdVa5+Q
-UfSRHLLAXCksCuADcBcHaRGXp3dlJB2Ywba2iCYBOeBD2DefxfHGcEurJyY3mp1h
-i+RlMmzHBKEoT5/nYkhzVZyQ8cosiJoL0LeK11p10xoexmDJzd7W8oshLhEDaB2L
-5zXqlT0JmawXt/SmDjByPFelFQPhEtWkIo/D65i4EBb0DnglGQSc4frb9FBiVP5U
-vPwuPyzkXVvObtEfHT2TL6wUD2IVZWJv4tCMQel7J/DK7WEJLjM=
-=o9jg
------END PGP SIGNATURE-----
+One big thing kept disabled for now is the double-quoting to prevent
+globbing and splitting warning that is disabled. That touches a lot of
+code and we're very inconsistent about quoting variables today, but it's
+not completely trivial because there are quite a lot of places that does
+rely on splitting for invoking commands with arguments. That would need
+some rework to avoid sprinkling a lot of warning suppressions around.
+Possibly consistently using arrays for argument lists would be the best
+solution?
 
---honofbm32v4z4vxk--
+Thanks,
+Nick
+
+Nicholas Piggin (17):
+  Add initial shellcheck checking
+  shellcheck: Fix SC2223
+  shellcheck: Fix SC2295
+  shellcheck: Fix SC2094
+  shellcheck: Fix SC2006
+  shellcheck: Fix SC2155
+  shellcheck: Fix SC2235
+  shellcheck: Fix SC2119, SC2120
+  shellcheck: Fix SC2143
+  shellcheck: Fix SC2013
+  shellcheck: Fix SC2145
+  shellcheck: Fix SC2124
+  shellcheck: Fix SC2294
+  shellcheck: Fix SC2178
+  shellcheck: Fix SC2048
+  shellcheck: Fix SC2153
+  shellcheck: Suppress various messages
+
+ .shellcheckrc           | 32 +++++++++++++++++++++++++
+ Makefile                |  4 ++++
+ README.md               |  2 ++
+ arm/efi/run             |  4 ++--
+ riscv/efi/run           |  4 ++--
+ run_tests.sh            | 11 +++++----
+ s390x/run               |  8 +++----
+ scripts/arch-run.bash   | 52 ++++++++++++++++++++++++++++-------------
+ scripts/common.bash     |  5 +++-
+ scripts/mkstandalone.sh |  4 +++-
+ scripts/runtime.bash    | 14 +++++++----
+ scripts/s390x/func.bash |  2 +-
+ 12 files changed, 106 insertions(+), 36 deletions(-)
+ create mode 100644 .shellcheckrc
+
+-- 
+2.43.0
+
 
