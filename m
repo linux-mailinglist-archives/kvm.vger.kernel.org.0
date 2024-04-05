@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-13764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4027E89A73A
-	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 00:30:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA2589A73B
+	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 00:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71ADF1C2322F
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 22:29:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FCF12867C7
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 22:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8790E17AFA1;
-	Fri,  5 Apr 2024 22:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64AC117B4F7;
+	Fri,  5 Apr 2024 22:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b9Uv3vWs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TnJGte1Y"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F32179677;
-	Fri,  5 Apr 2024 22:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2694179961;
+	Fri,  5 Apr 2024 22:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712356016; cv=none; b=QclPwercVt7lUO9H3t7n6T1Xdi3HUzRESm5VcIrd71JDhpuswS+QBuR5mzz61VrSlLhpi/IdsKRpEhSvhjX5uFqcjt7JY2AF+/g9CDMEnsYveAPXGH5UWR6amQ+Tgh0iL4In5RB0+EuvU5OHfPxBpqDHq8EjDAcVSx2RgVk3gv0=
+	t=1712356017; cv=none; b=QOETdDAbPKkz2KDw9OAQGOxPCNxMrqd7YU4VA32G0F6+3V2x7R2LwZfigt7VIqwiU7ChF4qaeGAlg9Q65+r+UaIjGQz1bzs3V/b/q51PM/jCy3xMtWc+524ktG0Cmn51ESHcBGKIzZL/dgmDEC4jwDcs0mPgSu1QaFm5x+mx4Wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712356016; c=relaxed/simple;
-	bh=tBMxqVMHu63G2rJ3nBVSuahDnZ+Xdu27rPnRP82vOHs=;
+	s=arc-20240116; t=1712356017; c=relaxed/simple;
+	bh=ZGWBCczfujdRtFbtPKsDRo5XDo8fcTnRO3bkTJQexVw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=naYfFojEkY/F/U30MgZJT9/Zq1mDd1OmiuMPhuDXXW36k+z6AxXNkeEsklSTlhnFcwXJNfWmO35WQBar/S+y3GEh/UEwUiAQJat0GuLfyCBv7I99H5wFajOMoNOqBa+UWsKb7T+T9rAL/+RfgPV/3M/NV6awl4bbsYDsTWm3muI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b9Uv3vWs; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=Q1AnuOLSod+XXPNUNAldrVt4aUJrAUHXF7Odi9as2yCq9ffJv3vEUiydUdcLK9fiki9EQxMaICsv6TgVTFSZHI45iWxA6pGvd1IKX4GdHIY4OvInhUjDWv9e/Z+/XD7gcrXAPEJEQ4Lplvns8AoLAd6s9/PgjksZnwJ9I/ClAjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TnJGte1Y; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712356015; x=1743892015;
+  t=1712356016; x=1743892016;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tBMxqVMHu63G2rJ3nBVSuahDnZ+Xdu27rPnRP82vOHs=;
-  b=b9Uv3vWs3X0SC5OwfO5veNXD6M7ewLPuKwxIubIFjzxyV11aYYPJmKeW
-   ryLhMBQftMMMCubh+XVNO1HJeX7bGkSp1V5nWwANd7R8nDTocNe1lm50J
-   MdK0HjOvkXSgpCyzEzm6MPSrqKAW/ShfYQXR5nD8vfYxcd/hA+gvPxr7P
-   6WTgSxhC5M0J+o+8hcYHb01fHnEnFtUpKKhQ2AJi34WQJcdkBNYqZlIT0
-   qPS50289c9CGsapqN5OuXN/gvso70oesD0JzE2Fq+5BnkIT266hV9OVYk
-   NQMAQo1K51w4+9EloSC4qiUExl5+WnZSouz6aLMOZiGzp9ihVZVCj9mgO
+  bh=ZGWBCczfujdRtFbtPKsDRo5XDo8fcTnRO3bkTJQexVw=;
+  b=TnJGte1YL+nyCRoQLZcXNkdQ2AfgvE3IQg/foLXtWevw6xCX22aY/XQE
+   xlMuHjz/Zqp04UmVke+k7W2p4p1g3ElEgC+15CqJIWoQRr9OsnzA6kFwB
+   5ZZCFh5+qQEWuZYwnuyShe/P48uVl29tQraCJXq6MIdXoRAWKia4bt73K
+   qVz4W5BN8j1wh+h9pSgT5cYt9guxxTWOqcB4mtpa7962ag6zpS4hm2qAf
+   mbAQlit4JQF6dKkZNYdCD3tTq4sZmTKUGURrfx8OtkcfhSiTTGrSVhyiS
+   CS0yTqwUBIkW+WjES0489u0HYSGYHwGw0RMq218IceN24+BMZ0cdAMs1/
    w==;
-X-CSE-ConnectionGUID: EC57mj7dQAixXK6WNCHH8A==
-X-CSE-MsgGUID: Pd9wTMPRTIuhvBtjkd6VlQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="19062837"
+X-CSE-ConnectionGUID: Run8SIX+SWiU9HpnW8Geyw==
+X-CSE-MsgGUID: NC5Ia1NgTe6WY+u2eFMCrA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="19062853"
 X-IronPort-AV: E=Sophos;i="6.07,182,1708416000"; 
-   d="scan'208";a="19062837"
+   d="scan'208";a="19062853"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 15:26:53 -0700
-X-CSE-ConnectionGUID: 7tGU/fwcSE+SKauQKx7scQ==
-X-CSE-MsgGUID: 5NYrU499TKyC9vkaIsUwdQ==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 15:26:54 -0700
+X-CSE-ConnectionGUID: dqE0TdDNQ62K5gm9q66mFQ==
+X-CSE-MsgGUID: icfEMMlNRoyitei5C2xCcw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,182,1708416000"; 
-   d="scan'208";a="23928350"
+   d="scan'208";a="23928356"
 Received: from jacob-builder.jf.intel.com ([10.54.39.125])
   by fmviesa004.fm.intel.com with ESMTP; 05 Apr 2024 15:26:52 -0700
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -85,9 +85,9 @@ Cc: Paul Luse <paul.e.luse@intel.com>,
 	guang.zeng@intel.com,
 	robert.hoo.linux@gmail.com,
 	Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: [PATCH v2 12/13] iommu/vt-d: Add an irq_chip for posted MSIs
-Date: Fri,  5 Apr 2024 15:31:09 -0700
-Message-Id: <20240405223110.1609888-13-jacob.jun.pan@linux.intel.com>
+Subject: [PATCH v2 13/13] iommu/vt-d: Enable posted mode for device MSIs
+Date: Fri,  5 Apr 2024 15:31:10 -0700
+Message-Id: <20240405223110.1609888-14-jacob.jun.pan@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
 References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
@@ -99,90 +99,159 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce a new irq_chip for posted MSIs, the key difference is in
-irq_ack where EOI is performed by the notification handler.
+With posted MSI feature enabled on the CPU side, iommu interrupt
+remapping table entries (IRTEs) for device MSI/x can be allocated,
+activated, and programed in posted mode. This means that IRTEs are
+linked with their respective PIDs of the target CPU.
 
-When posted MSI is enabled, MSI domain/chip hierarchy will look like
-this example:
+Handlers for the posted MSI notification vector will de-multiplex
+device MSI handlers. CPU notifications are coalesced if interrupts
+arrive at a high frequency.
 
-domain:  IR-PCI-MSIX-0000:50:00.0-12
- hwirq:   0x29
- chip:    IR-PCI-MSIX-0000:50:00.0
-  flags:   0x430
-             IRQCHIP_SKIP_SET_WAKE
-             IRQCHIP_ONESHOT_SAFE
- parent:
-    domain:  INTEL-IR-10-13
-     hwirq:   0x2d0000
-     chip:    INTEL-IR-POST
-      flags:   0x0
-     parent:
-        domain:  VECTOR
-         hwirq:   0x77
-         chip:    APIC
+Excluding the following:
+- legacy devices IOAPIC, HPET (may be needed for booting, not a source
+of high MSIs)
+- VT-d's own IRQs (not remappable).
 
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+
 ---
- drivers/iommu/intel/irq_remapping.c | 46 +++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+v2: Fold in helper function for retrieving PID address
+v1: Added a warning if the effective affinity mask is not set up
+---
+ drivers/iommu/intel/irq_remapping.c | 69 +++++++++++++++++++++++++++--
+ 1 file changed, 65 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/iommu/intel/irq_remapping.c b/drivers/iommu/intel/irq_remapping.c
-index 566297bc87dd..fa719936b44e 100644
+index fa719936b44e..ac5f9e83943b 100644
 --- a/drivers/iommu/intel/irq_remapping.c
 +++ b/drivers/iommu/intel/irq_remapping.c
-@@ -1233,6 +1233,52 @@ static struct irq_chip intel_ir_chip = {
- 	.irq_set_vcpu_affinity	= intel_ir_set_vcpu_affinity,
+@@ -19,6 +19,7 @@
+ #include <asm/cpu.h>
+ #include <asm/irq_remapping.h>
+ #include <asm/pci-direct.h>
++#include <asm/posted_intr.h>
+ 
+ #include "iommu.h"
+ #include "../irq_remapping.h"
+@@ -49,6 +50,7 @@ struct irq_2_iommu {
+ 	u16 sub_handle;
+ 	u8  irte_mask;
+ 	enum irq_mode mode;
++	bool posted_msi;
  };
  
-+static void dummy(struct irq_data *d)
+ struct intel_ir_data {
+@@ -1118,6 +1120,14 @@ static void prepare_irte(struct irte *irte, int vector, unsigned int dest)
+ 	irte->redir_hint = 1;
+ }
+ 
++static void prepare_irte_posted(struct irte *irte)
 +{
++	memset(irte, 0, sizeof(*irte));
++
++	irte->present = 1;
++	irte->p_pst = 1;
 +}
 +
-+/*
-+ * With posted MSIs, all vectors are multiplexed into a single notification
-+ * vector. Devices MSIs are then dispatched in a demux loop where
-+ * EOIs can be coalesced as well.
-+ *
-+ * "INTEL-IR-POST" IRQ chip does not do EOI on ACK, thus the dummy irq_ack()
-+ * function. Instead EOI is performed by the posted interrupt notification
-+ * handler.
-+ *
-+ * For the example below, 3 MSIs are coalesced into one CPU notification. Only
-+ * one apic_eoi() is needed.
-+ *
-+ * __sysvec_posted_msi_notification()
-+ *	irq_enter();
-+ *		handle_edge_irq()
-+ *			irq_chip_ack_parent()
-+ *				dummy(); // No EOI
-+ *			handle_irq_event()
-+ *				driver_handler()
-+ *	irq_enter();
-+ *		handle_edge_irq()
-+ *			irq_chip_ack_parent()
-+ *				dummy(); // No EOI
-+ *			handle_irq_event()
-+ *				driver_handler()
-+ *	irq_enter();
-+ *		handle_edge_irq()
-+ *			irq_chip_ack_parent()
-+ *				dummy(); // No EOI
-+ *			handle_irq_event()
-+ *				driver_handler()
-+ *	apic_eoi()
-+ * irq_exit()
-+ */
-+static struct irq_chip intel_ir_chip_post_msi = {
-+	.name			= "INTEL-IR-POST",
-+	.irq_ack		= dummy,
-+	.irq_set_affinity	= intel_ir_set_affinity,
-+	.irq_compose_msi_msg	= intel_ir_compose_msi_msg,
-+	.irq_set_vcpu_affinity	= intel_ir_set_vcpu_affinity,
-+};
+ struct irq_remap_ops intel_irq_remap_ops = {
+ 	.prepare		= intel_prepare_irq_remapping,
+ 	.enable			= intel_enable_irq_remapping,
+@@ -1126,6 +1136,47 @@ struct irq_remap_ops intel_irq_remap_ops = {
+ 	.enable_faulting	= enable_drhd_fault_handling,
+ };
+ 
++#ifdef CONFIG_X86_POSTED_MSI
 +
- static void fill_msi_msg(struct msi_msg *msg, u32 index, u32 subhandle)
++static phys_addr_t get_pi_desc_addr(struct irq_data *irqd)
++{
++	int cpu = cpumask_first(irq_data_get_effective_affinity_mask(irqd));
++
++	if (WARN_ON(cpu >= nr_cpu_ids))
++		return 0;
++
++	return __pa(per_cpu_ptr(&posted_interrupt_desc, cpu));
++}
++
++static void intel_ir_reconfigure_irte_posted(struct irq_data *irqd)
++{
++	struct intel_ir_data *ir_data = irqd->chip_data;
++	struct irte *irte = &ir_data->irte_entry;
++	struct irte irte_pi;
++	u64 pid_addr;
++
++	pid_addr = get_pi_desc_addr(irqd);
++
++	if (!pid_addr) {
++		pr_warn("Failed to setup IRQ %d for posted mode", irqd->irq);
++		return;
++	}
++
++	memset(&irte_pi, 0, sizeof(irte_pi));
++
++	/* The shared IRTE already be set up as posted during alloc_irte */
++	dmar_copy_shared_irte(&irte_pi, irte);
++
++	irte_pi.pda_l = (pid_addr >> (32 - PDA_LOW_BIT)) & ~(-1UL << PDA_LOW_BIT);
++	irte_pi.pda_h = (pid_addr >> 32) & ~(-1UL << PDA_HIGH_BIT);
++
++	modify_irte(&ir_data->irq_2_iommu, &irte_pi);
++}
++
++#else
++static inline void intel_ir_reconfigure_irte_posted(struct irq_data *irqd) {}
++#endif
++
+ static void intel_ir_reconfigure_irte(struct irq_data *irqd, bool force)
  {
- 	memset(msg, 0, sizeof(*msg));
+ 	struct intel_ir_data *ir_data = irqd->chip_data;
+@@ -1139,8 +1190,9 @@ static void intel_ir_reconfigure_irte(struct irq_data *irqd, bool force)
+ 	irte->vector = cfg->vector;
+ 	irte->dest_id = IRTE_DEST(cfg->dest_apicid);
+ 
+-	/* Update the hardware only if the interrupt is in remapped mode. */
+-	if (force || ir_data->irq_2_iommu.mode == IRQ_REMAPPING)
++	if (ir_data->irq_2_iommu.posted_msi)
++		intel_ir_reconfigure_irte_posted(irqd);
++	else if (force || ir_data->irq_2_iommu.mode == IRQ_REMAPPING)
+ 		modify_irte(&ir_data->irq_2_iommu, irte);
+ }
+ 
+@@ -1194,7 +1246,7 @@ static int intel_ir_set_vcpu_affinity(struct irq_data *data, void *info)
+ 	struct intel_ir_data *ir_data = data->chip_data;
+ 	struct vcpu_data *vcpu_pi_info = info;
+ 
+-	/* stop posting interrupts, back to remapping mode */
++	/* stop posting interrupts, back to the default mode */
+ 	if (!vcpu_pi_info) {
+ 		modify_irte(&ir_data->irq_2_iommu, &ir_data->irte_entry);
+ 	} else {
+@@ -1320,6 +1372,11 @@ static void intel_irq_remapping_prepare_irte(struct intel_ir_data *data,
+ 		break;
+ 	case X86_IRQ_ALLOC_TYPE_PCI_MSI:
+ 	case X86_IRQ_ALLOC_TYPE_PCI_MSIX:
++		if (posted_msi_supported()) {
++			prepare_irte_posted(irte);
++			data->irq_2_iommu.posted_msi = 1;
++		}
++
+ 		set_msi_sid(irte,
+ 			    pci_real_dma_dev(msi_desc_to_pci_dev(info->desc)));
+ 		break;
+@@ -1407,7 +1464,11 @@ static int intel_irq_remapping_alloc(struct irq_domain *domain,
+ 
+ 		irq_data->hwirq = (index << 16) + i;
+ 		irq_data->chip_data = ird;
+-		irq_data->chip = &intel_ir_chip;
++		if (posted_msi_supported() &&
++			((info->type == X86_IRQ_ALLOC_TYPE_PCI_MSI) || (info->type == X86_IRQ_ALLOC_TYPE_PCI_MSIX)))
++			irq_data->chip = &intel_ir_chip_post_msi;
++		else
++			irq_data->chip = &intel_ir_chip;
+ 		intel_irq_remapping_prepare_irte(ird, irq_cfg, info, index, i);
+ 		irq_set_status_flags(virq + i, IRQ_MOVE_PCNTXT);
+ 	}
 -- 
 2.25.1
 
