@@ -1,199 +1,135 @@
-Return-Path: <kvm+bounces-13739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13740-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 309DD89A045
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 16:55:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB2EB89A105
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 17:26:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 540171C231EB
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 14:55:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A808C2839BD
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 15:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C79CD16F29D;
-	Fri,  5 Apr 2024 14:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885C516F91F;
+	Fri,  5 Apr 2024 15:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UPGfh8js"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Wm/RTCN1"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2807316DEAB
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 14:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8731A16F284
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 15:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712328920; cv=none; b=MvjDKXwcSlJ3M7M1D2iN1VPkGhz+vk190Wa8PxCxMJ/V3Pm04YNKS44UFGxsNomX01IBXvnr9y9LVLsvmJinPJd5ExpgzWnCeJtxLRTg/Gy80X0yc75Zan4mz3NUnkirgqiQo1qdBagaRoANK6qhpG8O79N87yDsc8jmbapL6mc=
+	t=1712330770; cv=none; b=pr5KJGBY5Eg71OrGRghBzh2eyPzA1Gvtth1Iig0RGEudD2t6h9fOf63Q/tjLoDQq0fQJtTUPnBLP7RDYjVQ7lUyGKeXbdo0ufLU41zwV0+V9GUMaWShCcIp1qTVbPqXEvnPdsRH0UWzhF42Q2XusGYH3Vr9A5LWl3/Or/gf+qX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712328920; c=relaxed/simple;
-	bh=TIvxRamlGcEopprPfoOfil978It8TfZKohpyLwgS5xQ=;
+	s=arc-20240116; t=1712330770; c=relaxed/simple;
+	bh=FpZsHScShuiC5TLeSY6xcW0Dmrsa7iCr6rnrwxcP7HE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pr90YMq8MivBPflCYzzbnbAVM939MPV3OYPfJvBQEKpviJQnuZuImAJzvltV9umElFUCpzM9W3KwUnZd2rQuv31dyzk0XOsyzMzBSo3ue0lGPGoENgBou000whZJzvPbjjBrPUtyjPp7iqFb/mfag2JyVNmJ09xoqeTcvDcVAyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UPGfh8js; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 5 Apr 2024 16:55:11 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712328915;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KuvmwAv3VPVb8MBua4W2SdgjKunVcw3LYDYqO33OqqI=;
-	b=UPGfh8jsD5lqKDj1vL6jVkxU1ehLYEyqACmwvkXo4A1QODGZmTkJYm/uoZxk+tugSvUT8m
-	Fzy/T3wbUTwQmj77BvsmaHSJAXPmNFrLIClAlvK2Q8BtdZDUVktaxUM662+3ZGI3MqQz+P
-	P+5k6FDHCXb+SpXhh4QPmx/BEktxQHg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Nico =?utf-8?B?QsO2aHI=?= <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, 
-	Nadav Amit <namit@vmware.com>, David Woodhouse <dwmw@amazon.co.uk>, 
-	Ricardo Koller <ricarkol@google.com>, rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>, 
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests RFC PATCH 17/17] shellcheck: Suppress various
- messages
-Message-ID: <20240405-7c0ad5d3ce76e1ad9ad2f5a9@orel>
-References: <20240405090052.375599-1-npiggin@gmail.com>
- <20240405090052.375599-18-npiggin@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=n5l5n7FocX65W20BEZ7IkznZPSv2Ii7c24a+GsAK4k8j1zhOEHXi8d+X685raN/ANglTJhl2bUq9c9y4gUx5dkBF3GpTOUClq8W3XPM+canOpeWXGyl/TUi3Cophw8nziVQZ+MhdkUR399M3YJY4ra8iCH2M+E2ShJSBFOQNW7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Wm/RTCN1; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56e3e03b989so179699a12.0
+        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 08:26:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1712330766; x=1712935566; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ed5x3XFfsBgZRAt34RC2mOQsGKeyKPo4QsC0c+Fqv3c=;
+        b=Wm/RTCN1H4zqI6tvTsI2Y1Wugd3J7bAQpDuRnLw/ck9uBGNWE/VM6C1KxhdQCJuWG7
+         rKgt9xO8xILvQgnUy5PsfJ/YeEV3Pjsx0Y09VDcOFlG5Atf8KRg6B/nmOO8s2v3xBnh1
+         ysR+iPvrpO6LzGBdrGMlgXzAwGxWuNPGLNd7xgaOmS83MjcSAqYh+M9hjZTt40oq7B2H
+         PI5F6th+qQIwqdl4Uwp3OPT0z2HH0NINm8PwFP3XltsulFvCu81hyUsUziw7wtiL8hYT
+         Tj/pXavMeoSa883CsU79YKMIqGQ9fln4AjUYl6GnPzi1R8lshp2PuiHtScOK06csT7ig
+         LWwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712330766; x=1712935566;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ed5x3XFfsBgZRAt34RC2mOQsGKeyKPo4QsC0c+Fqv3c=;
+        b=Iq2KpRFXPLB1l9jemB4YqYcTOYwT3apyhhgiApBNI8E0FJp6acMnDmtiDmRRSehNF4
+         wfyLNPbzopVq2+19EQ+p8AojSgmIB69+0QTDxAPxqLOihXe0xpvZ4Gcmd1+Ol4RQYYEN
+         sXYkaxZUTzgSVXTtPb9UFqsZ4jn3bnwnQcoRNwaKrYiu45Pz+5BeVwxZMo1Rd4knn9JP
+         PlDi+k/lmulT4CWgR6E/pmXeMrg21/TlF5aKPAZK6NlvpWy6Io8erWORAFyM+3nwXxsN
+         wfX9EmdO9ScYbm4UZ46kg2Rg0OvdO5sG4flH7MsjBobth+GACQ8lZGdThfIZ0oo6x6iV
+         mUcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXLm8juJsQT/2VNvUUlQAN1V2gCu1J4BjcIINB9UgiKRNmCXjTkQPedDVQ7bDbs90tTUjWnEhVlBMPyWSft0K4kQY5e
+X-Gm-Message-State: AOJu0YyMF4tSJaQPPvCpZu2K3ZDKMtpccX945fZ1lMGqxbU/E88HccX/
+	zhikqsUKRA/smzjuX+WK5tITxBb9T81hOawmi6f41m1sLIeTeE9QSzsb2XsWK3W+TsQvtq3HDal
+	d
+X-Google-Smtp-Source: AGHT+IE6KiAsWau+yt3agpehbLfQdmB5U5LrPm1st7ROHU8ZRsWd/qG+KSVTOZ1UuqjphPekzLBQLg==
+X-Received: by 2002:a17:906:684f:b0:a4e:2dbf:2eb0 with SMTP id a15-20020a170906684f00b00a4e2dbf2eb0mr2301320ejs.38.1712330765762;
+        Fri, 05 Apr 2024 08:26:05 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id gx5-20020a1709068a4500b00a4e579ce949sm950515ejc.51.2024.04.05.08.26.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Apr 2024 08:26:05 -0700 (PDT)
+Date: Fri, 5 Apr 2024 17:26:04 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>, 
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 0/5] Add parsing for Zimop ISA extension
+Message-ID: <20240405-091c6c174f023d74b434059d@orel>
+References: <20240404103254.1752834-1-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240405090052.375599-18-npiggin@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240404103254.1752834-1-cleger@rivosinc.com>
 
-On Fri, Apr 05, 2024 at 07:00:49PM +1000, Nicholas Piggin wrote:
-> Various info and warnings are suppressed here, where circumstances
-> (commented) warrant.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  run_tests.sh            | 3 +++
->  scripts/arch-run.bash   | 9 +++++++++
->  scripts/mkstandalone.sh | 2 ++
->  scripts/runtime.bash    | 2 ++
->  4 files changed, 16 insertions(+)
-> 
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 938bb8edf..152323ffc 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -45,6 +45,9 @@ fi
->  only_tests=""
->  list_tests=""
->  args=$(getopt -u -o ag:htj:vl -l all,group:,help,tap13,parallel:,verbose,list,probe-maxsmp -- "$@")
-> +# Shellcheck likes to test commands directly rather than with $? but sometimes they
-> +# are too long to put in the same test.
-> +# shellcheck disable=SC2181
->  [ $? -ne 0 ] && exit 2;
->  set -- $args;
->  while [ $# -gt 0 ]; do
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index ed440b4aa..fe8785cfd 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -44,6 +44,8 @@ run_qemu ()
->  	if [ "$errors" ]; then
->  		sig=$(grep 'terminating on signal' <<<"$errors")
->  		if [ "$sig" ]; then
-> +			# This is too complex for ${var/search/replace}
-> +			# shellcheck disable=SC2001
->  			sig=$(sed 's/.*terminating on signal \([0-9][0-9]*\).*/\1/' <<<"$sig")
->  		fi
->  	fi
-> @@ -174,9 +176,12 @@ run_migration ()
->  
->  	# Holding both ends of the input fifo open prevents opens from
->  	# blocking and readers getting EOF when a writer closes it.
-> +	# These fds appear to be unused to shellcheck so quieten the warning.
->  	mkfifo ${src_infifo}
->  	mkfifo ${dst_infifo}
-> +	# shellcheck disable=SC2034
->  	exec {src_infifo_fd}<>${src_infifo}
-> +	# shellcheck disable=SC2034
->  	exec {dst_infifo_fd}<>${dst_infifo}
->  
->  	"${migcmdline[@]}" \
-> @@ -184,6 +189,8 @@ run_migration ()
->  		-mon chardev=mon,mode=control \
->  		< ${src_infifo} > ${src_outfifo} &
->  	live_pid=$!
-> +	# SC complains about useless cat but I prefer it over redirect here.
+On Thu, Apr 04, 2024 at 12:32:46PM +0200, Clément Léger wrote:
+> The Zimop ISA extension was ratified recently. This series adds support
+> for parsing it from riscv,isa, hwprobe export and kvm support for
+> Guest/VM.
 
-Let's spell out 'shellcheck' when referring to it rather than call it
-'SC'. And instead of "but I prefer..." let's write
-
- # shellcheck complains about a useless cat, but using a redirect here is
- # harder to read
-
-or something like that. Don't tell my cat-loving daughter that I just
-wrote "a useless cat"!
-
-
-> +	# shellcheck disable=SC2002
->  	cat ${src_outfifo} | tee ${src_out} | filter_quiet_msgs &
->  
->  	# Start the first destination QEMU machine in advance of the test
-> @@ -224,6 +231,8 @@ do_migration ()
->  		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
->  		< ${dst_infifo} > ${dst_outfifo} &
->  	incoming_pid=$!
-> +	# SC complains about useless cat but I prefer it over redirect here.
-
-Same comment as above.
-
-> +	# shellcheck disable=SC2002
->  	cat ${dst_outfifo} | tee ${dst_out} | filter_quiet_msgs &
->  
->  	# The test must prompt the user to migrate, so wait for the
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index 756647f29..2318a85f0 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -65,6 +65,8 @@ generate_test ()
->  	fi
->  
->  	temp_file bin "$kernel"
-> +	# Don't want to expand $bin but print it as-is.
-> +	# shellcheck disable=SC2016
->  	args[3]='$bin'
->  
->  	(echo "#!/usr/bin/env bash"
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 3b76aec9e..c87613b96 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -137,6 +137,8 @@ function run()
->      # the check line can contain multiple files to check separated by a space
->      # but each check parameter needs to be of the form <path>=<value>
->      if [ "$check" ]; then
-> +        # There is no globbing allowed in the check parameter.
-> +        # shellcheck disable=SC2206
->          check=($check)
-
-Hmm, I'm not sure about this one. $check is an arbitrary path, which means
-it can have spaces, then =, and then an arbitrary value, which means it can
-contain spaces. If there are multiple check path=value pairs then
-separation by space is a bad idea, and any deliminator really is. It seems
-like each pair should be quoted, i.e.
-
- check = "path1=value1" "path2=value2"
-
-and then that should be managed here.
-
->          for check_param in "${check[@]}"; do
->              path=${check_param%%=*}
-> -- 
-> 2.43.0
->
+I'm not sure we need this. Zimop by itself isn't useful, so I don't know
+if we need to advertise it at all. When an extension comes along that
+redefines some MOPs, then we'll advertise that extension, but the fact
+Zimop is used for that extension is really just an implementation detail.
 
 Thanks,
 drew
+
+> 
+> Clément Léger (5):
+>   dt-bindings: riscv: add Zimop ISA extension description
+>   riscv: add ISA extension parsing for Zimop
+>   riscv: hwprobe: export Zimop ISA extension
+>   RISC-V: KVM: Allow Zimop extension for Guest/VM
+>   KVM: riscv: selftests: Add Zimop extension to get-reg-list test
+> 
+>  Documentation/arch/riscv/hwprobe.rst                    | 4 ++++
+>  Documentation/devicetree/bindings/riscv/extensions.yaml | 5 +++++
+>  arch/riscv/include/asm/hwcap.h                          | 1 +
+>  arch/riscv/include/uapi/asm/hwprobe.h                   | 1 +
+>  arch/riscv/include/uapi/asm/kvm.h                       | 1 +
+>  arch/riscv/kernel/cpufeature.c                          | 1 +
+>  arch/riscv/kernel/sys_hwprobe.c                         | 1 +
+>  arch/riscv/kvm/vcpu_onereg.c                            | 2 ++
+>  tools/testing/selftests/kvm/riscv/get-reg-list.c        | 4 ++++
+>  9 files changed, 20 insertions(+)
+> 
+> -- 
+> 2.43.0
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
