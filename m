@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-13637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A83528995EA
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 08:54:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF0E1899638
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 09:08:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E3081F2262D
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 06:54:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6AB1281EC0
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 07:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B6F25779;
-	Fri,  5 Apr 2024 06:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812E73612E;
+	Fri,  5 Apr 2024 07:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NjFqhPXC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cQxhrd1z"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB3E2421D
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 06:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E457F2C69D
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 07:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712300037; cv=none; b=W0zH3irZOMACd4ruW2NsMCUBW+qNEYSSHTwcb8gbgtLiwrJp+p/RDwT2r2u6DeGvfm8pGrenAAeK12ALDXC+c70qmHDCLBSstmKkAI7f97J5kRQPtgoaa+ZX3SGjeklUCJa4SmAtWQ/ibRQ2gWQE+Ae9NY4UJ4sUUR78VvGkv94=
+	t=1712300846; cv=none; b=l4XXHAu/2+tAy60gL5nsdteLE9R8k/5TXGrNO1or3vrVL6G8QGL05h830c3fEfSd6WEksRiY+kA4t59T2mndSWhXSRQ+eTwoezeJFOCpjrr+PUIdrA4vU0dg5unahPl2Nyo/HBXgmyuccsIGsdC8EAmiymGbgxzDVc7PQ/1HR7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712300037; c=relaxed/simple;
-	bh=a1uI/EpIR4gkdjWK0FYsnrP/u3Er++3KeiVO8G0aeGo=;
+	s=arc-20240116; t=1712300846; c=relaxed/simple;
+	bh=95uFBOAhneffb1Ja1KSyqrBwkrrb/TGDWR+j0XJMpyM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AlL9EZo7JBysCQEDPg0yAki3EqE5c9e8PP1AxOd4sh3r1Ynx443qZGhhk1zVoUbE23tb0mOm09vGcMhdrgEbTVSwXw8TzlaQWExDiG355NxRwUUX1fDZmmSPVYQoVmQ6eVsNZ3zTAuB1lgUUvSjVt2LjhmtnpqhhU2xfoEoDcss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NjFqhPXC; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=NYhO7ym0mwDhigWzIfnk7jbNUrAv+ECXXuS4mZxzx+2mlcDQfpBSKoF5760Nng5a0eteY+flqO9Rr7O3SgFFtbkIu1v2w9sc1bkNkdariNoh+8m+GpSVupDIzewSUzrYg9W647+V4A+4WwObsCZ8tNqKxsK/GW8usVns+GJZwp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cQxhrd1z; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712300034;
+	s=mimecast20190719; t=1712300843;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=NFXw0uXPa1e5iAn6t3w1lZoilH1G/Z4MsITH9Yy0Mbs=;
-	b=NjFqhPXCNCte3FbaP1ql2Ioo5OSloEW1LiLzckfAPcUKQ/7W6Bg/Nz8KjbCjgp4QgTic2d
-	4XTDkwtlNb5E9/T4G/3xwZvfY7GDVoyZJTfY54Vob3prwuuhAh85BjMnYqc43vtocjn7Zj
-	RfgefEHgLbfkA+0Bxyx3YWC+II08ujk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=W2PfWq36kzHF1BupaBwFSGwfn97ZJcuXsplgJ/7yRFQ=;
+	b=cQxhrd1zkCxusFmjeQ0WRaEwxX9bnBqAW/4l4JEgRp4YuvkIaFz9O4KLIUmCRNkHO8G7u3
+	E4RqDFRz3h1eosKQfAWHVIkJ1Wb4maKjx+JheDI3AoGq7yYlxhe3/JjgoctmewQTzmDHJF
+	pPbOH5U7UaIZ5ucRJWN28Hvzp8pqzNY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-237-DzxMkNRCNSS3MABu7Juvaw-1; Fri, 05 Apr 2024 02:53:52 -0400
-X-MC-Unique: DzxMkNRCNSS3MABu7Juvaw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-343678d2d26so945419f8f.0
-        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 23:53:52 -0700 (PDT)
+ us-mta-367-RB8pROvrOX208lIjELdOYg-1; Fri, 05 Apr 2024 03:07:21 -0400
+X-MC-Unique: RB8pROvrOX208lIjELdOYg-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-343678d2d26so953215f8f.0
+        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 00:07:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712300031; x=1712904831;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NFXw0uXPa1e5iAn6t3w1lZoilH1G/Z4MsITH9Yy0Mbs=;
-        b=JGKJDvDzyflnkPsfP1rElE38A7YLmOGyq1Zxku6KWchv/qc43FzZyQOHCOijYRwDe2
-         8pg5L9tJW66gbSuAbcIFJ55EZ7b6BsPkNQdhqlnUghMq/ltc8GVdfljYqAUUOJTeMd1R
-         XTFXqKdgVqFhaNISV62nuTXIuFbtXtv7rbx2IrOg1BPG9aevU8f/dHyJGnPRMite4L6I
-         326wXfHwxDPqwY2zz7W3onfSEN5u41ycqJJStY2g7WytA8gbcgfkzS49QKV8ekh+GFO0
-         dkJ2kTcQAP/1ybUHn7T3DC9l6/+6I9zke30DiD3tLwkUd0dqMuk4iYB/nMVI17wXX/+K
-         HUjg==
-X-Forwarded-Encrypted: i=1; AJvYcCUoDx+NybBSIalqqlY73tuwlIG8ESMpDQ1bMXf7Xf32xy/M4KQxHtvavRDviYXz4V2QefISKbFJvK8vU03TV8y0hRtF
-X-Gm-Message-State: AOJu0YyfdgGD7Tw/wQxt8PR+sWRjpjszAELa+VBjLVp0teNeUCezPCmF
-	klk2WYkuFCnsD1nw8MLcLsHzpN1+467UGWRTuFBf88GzhF6Aw6M7zmiDPzsF9N7bS5BxFVLKWbO
-	fCZygFCeWu/EJ8vciN38Gq1REsN5BZe/Km+/VL38XYe1zr5UdRw==
-X-Received: by 2002:a5d:4705:0:b0:343:7f4b:6da5 with SMTP id y5-20020a5d4705000000b003437f4b6da5mr1302726wrq.17.1712300031648;
-        Thu, 04 Apr 2024 23:53:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHKA+Wzecee7dgWIaQilvp9ilBEZVQXBRQGT7EZQL0A6xBeyG1vnI96dUaEWy0OTCLrdlHV2g==
-X-Received: by 2002:a5d:4705:0:b0:343:7f4b:6da5 with SMTP id y5-20020a5d4705000000b003437f4b6da5mr1302708wrq.17.1712300031263;
-        Thu, 04 Apr 2024 23:53:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712300838; x=1712905638;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=W2PfWq36kzHF1BupaBwFSGwfn97ZJcuXsplgJ/7yRFQ=;
+        b=SVOADIAQ1rs/9mk3y8efZykwUFomFAjxsRKRqJMHkZIJUeR7s36skqdcz7uDux/1sQ
+         LYHUcdTSRvAkfMz5K076u0N2O1+naHGWGEOwWc2Jnp2S2ipvdeHivSnohRhqxCGNEVAn
+         ib4U1dinMGZuf/JKK6urAjXWYwZL0iY5q+F0Vzo7Q9GXwMzYkMJqsvRaeoZ8YLKQYfgK
+         EYDsLnaWY8sJx+839qNBUQaEu+s/G95RxkqkLnYXYiPpy7Ao1UP0HzwyhPU5p29NksrN
+         XsvIaW4hGlf8WbMYcbAgyXXpAu3NwZQc5m2VmPovENnqnYfvP70BSt7sqMREFgckiAxk
+         iJNA==
+X-Forwarded-Encrypted: i=1; AJvYcCX/INTMh4zSH84N/X8avLpBw1zn3fCw9n971zfHi9SOF0nsKFtU6lItX0hr8/VEbmJvA+9vFvDm39/nYXXSJqBxOSq3
+X-Gm-Message-State: AOJu0Yxykh9F10s+zmSLo3oiig8LL2bOoUoURZuBOVJx9+D++daH+cll
+	gaOXFPnCXLoMWrAmUMn7Ai/46hMW4LHBWpE/ygRzwk9okKIczAbXScjEaTp2voyLePWTpZcFt86
+	TfHCRlIt+E6jSIdN/rlzCuTUKRarh+1DyoJLF+akHPQlY413s6g==
+X-Received: by 2002:adf:ab1e:0:b0:343:6b42:b3bb with SMTP id q30-20020adfab1e000000b003436b42b3bbmr1380564wrc.31.1712300838638;
+        Fri, 05 Apr 2024 00:07:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFXr3R2IrdekK/JeUtjm6kdjkqeG6B/zHKWTGSIrupjmzyYrP5W+5ukd+tuH2+TKIuB3QGXCw==
+X-Received: by 2002:adf:ab1e:0:b0:343:6b42:b3bb with SMTP id q30-20020adfab1e000000b003436b42b3bbmr1380540wrc.31.1712300838172;
+        Fri, 05 Apr 2024 00:07:18 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c74b:5500:e1f8:a310:8fa3:4ec1? (p200300cbc74b5500e1f8a3108fa34ec1.dip0.t-ipconnect.de. [2003:cb:c74b:5500:e1f8:a310:8fa3:4ec1])
-        by smtp.gmail.com with ESMTPSA id a17-20020a5d5091000000b00341ba91c1f5sm1220508wrt.102.2024.04.04.23.53.50
+        by smtp.gmail.com with ESMTPSA id g11-20020adfe40b000000b00341cb22a8d4sm1251698wrm.108.2024.04.05.00.07.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Apr 2024 23:53:50 -0700 (PDT)
-Message-ID: <36e1592a-e590-48a0-9a79-eeac6b41314b@redhat.com>
-Date: Fri, 5 Apr 2024 08:53:49 +0200
+        Fri, 05 Apr 2024 00:07:17 -0700 (PDT)
+Message-ID: <3bae9c8b-d723-4a08-8579-fa6f3ea508e8@redhat.com>
+Date: Fri, 5 Apr 2024 09:07:16 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,25 +83,22 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/4] KVM: x86/mmu: Rework marking folios
- dirty/accessed
-To: Sean Christopherson <seanjc@google.com>
-Cc: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- David Stevens <stevensd@chromium.org>, Matthew Wilcox <willy@infradead.org>
-References: <20240320005024.3216282-1-seanjc@google.com>
- <4d04b010-98f3-4eae-b320-a7dd6104b0bf@redhat.com>
- <CALzav=eLH+V_5Y6ZWsRkmnbEb6fxPa55B7xyWxP3o6qsrs_nHA@mail.gmail.com>
- <a2fff462-dfe6-4979-a7b2-131c6e0b5017@redhat.com>
- <ZgygGmaEuddZGKyX@google.com>
- <ca1f320b-dc06-48e0-b4f5-ce860a72f0e2@redhat.com>
- <Zg3V-M3iospVUEDU@google.com>
- <42dbf562-5eab-4f82-ad77-5ee5b8c79285@redhat.com>
- <Zg7j2D6WFqcPaXFB@google.com>
- <b3ea925f-bd47-4f54-bede-3f0d7471e3d7@redhat.com>
- <Zg8jip0QIBbOCgpz@google.com>
-Content-Language: en-US
+Subject: Re: [PATCH v1 0/5] s390: page_mapcount(), page_has_private() and
+ PG_arch_1
+To: Matthew Wilcox <willy@infradead.org>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Thomas Huth <thuth@redhat.com>
+References: <20240404163642.1125529-1-david@redhat.com>
+ <Zg9zOJowhmOozmcp@casper.infradead.org>
 From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -147,85 +144,63 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <Zg8jip0QIBbOCgpz@google.com>
+In-Reply-To: <Zg9zOJowhmOozmcp@casper.infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 05.04.24 00:02, Sean Christopherson wrote:
-> On Thu, Apr 04, 2024, David Hildenbrand wrote:
->> On 04.04.24 19:31, Sean Christopherson wrote:
->>> On Thu, Apr 04, 2024, David Hildenbrand wrote:
->>>> On 04.04.24 00:19, Sean Christopherson wrote:
->>>>> Hmm, we essentially already have an mmu_notifier today, since secondary MMUs need
->>>>> to be invalidated before consuming dirty status.  Isn't the end result essentially
->>>>> a sane FOLL_TOUCH?
->>>>
->>>> Likely. As stated in my first mail, FOLL_TOUCH is a bit of a mess right now.
->>>>
->>>> Having something that makes sure the writable PTE/PMD is dirty (or
->>>> alternatively sets it dirty), paired with MMU notifiers notifying on any
->>>> mkclean would be one option that would leave handling how to handle dirtying
->>>> of folios completely to the core. It would behave just like a CPU writing to
->>>> the page table, which would set the pte dirty.
->>>>
->>>> Of course, if frequent clearing of the dirty PTE/PMD bit would be a problem
->>>> (like we discussed for the accessed bit), that would not be an option. But
->>>> from what I recall, only clearing the PTE/PMD dirty bit is rather rare.
->>>
->>> And AFAICT, all cases already invalidate secondary MMUs anyways, so if anything
->>> it would probably be a net positive, e.g. the notification could more precisely
->>> say that SPTEs need to be read-only, not blasted away completely.
+On 05.04.24 05:42, Matthew Wilcox wrote:
+> On Thu, Apr 04, 2024 at 06:36:37PM +0200, David Hildenbrand wrote:
+>> On my journey to remove page_mapcount(), I got hooked up on other folio
+>> cleanups that Willy most certainly will enjoy.
 >>
->> As discussed, I think at least madvise_free_pte_range() wouldn't do that.
+>> This series removes the s390x usage of:
+>> * page_mapcount() [patches WIP]
+>> * page_has_private() [have patches to remove it]
+>>
+>> ... and makes PG_arch_1 only be set on folio->flags (i.e., never on tail
+>> pages of large folios).
+>>
+>> Further, one "easy" fix upfront.
 > 
-> I'm getting a bit turned around.  Are you talking about what madvise_free_pte_range()
-> would do in this future world, or what madvise_free_pte_range() does today?  Because
-> today, unless I'm really misreading the code, secondary MMUs are invalidated before
-> the dirty bit is cleared.
+> Looks like you didn't see:
+> 
+> https://lore.kernel.org/linux-s390/20240322161149.2327518-1-willy@infradead.org/
 
-Likely I missed it, sorry! I was talking about the possible future. :)
+Yes, I only skimmed linux-mm.
+
+I think s390x certainly wants to handle PTE-mapped THP in that code, I 
+think there are ways to trigger that, we're just mostly lucky that it 
+doesn't happen in the common case.
+
+But thinking about it, the current page_mapcount() based check could not 
+possibly have worked for them and rejected any PTE-mapped THP.
+
+So I can just base my changes on top of yours (we might want to get the 
+first fix in ahead of time).
 
 > 
-> 	mmu_notifier_range_init(&range, MMU_NOTIFY_CLEAR, 0, mm,
-> 				range.start, range.end);
+>> ... unfortunately there is one other issue I spotted that I am not
+>> tackling in this series, because I am not 100% sure what we want to
+>> do: the usage of page_ref_freeze()/folio_ref_freeze() in
+>> make_folio_secure() is unsafe. :(
+>>
+>> In make_folio_secure(), we're holding the folio lock, the mmap lock and
+>> the PT lock. So we are protected against concurrent fork(), zap, GUP,
+>> swapin, migration ... The page_ref_freeze()/ folio_ref_freeze() should
+>> also block concurrent GUP-fast very reliably.
+>>
+>> But if the folio is mapped into multiple page tables, we could see
+>> concurrent zapping of the folio, a pagecache folios could get mapped/
+>> accessed concurrent, we could see fork() sharing the page in another
+>> process, GUP ... trying to adjust the folio refcount while we froze it.
+>> Very bad.
 > 
-> 	lru_add_drain();
-> 	tlb_gather_mmu(&tlb, mm);
-> 	update_hiwater_rss(mm);
-> 
-> 	mmu_notifier_invalidate_range_start(&range);
-> 	tlb_start_vma(&tlb, vma);
-> 	walk_page_range(vma->vm_mm, range.start, range.end,
-> 			&madvise_free_walk_ops, &tlb);
-> 	tlb_end_vma(&tlb, vma);
-> 	mmu_notifier_invalidate_range_end(&range);
-> 
+> Hmmm.  Why is that not then a problem for, eg, splitting or migrating?
+> Is it because they unmap first and then try to freeze?
 
-Indeed, we do setup the MMU notifier invalidation. We do the start/end 
-... I was looking for PTE notifications.
-
-I spotted the set_pte_at(), not a set_pte_at_notify() like we do in 
-other code. Maybe that's not required here (digging through 
-documentation I'm still left clueless).
-
-"
-set_pte_at_notify() sets the pte _after_ running the notifier. This is 
-safe to start by updating the secondary MMUs, because the primary MMU 
-pte invalidate must have already happened with a ptep_clear_flush() 
-before set_pte_at_notify() has been invoked. ...
-"
-
-Absolutely unclear to me when we *must* to use it, or if it is. Likely 
-its a pure optimization when we're *changing* a PTE.
-
-KSM and wp_page_copy() uses it with MMU_NOTIFY_CLEAR, when replacing the 
-mapped page by another page (or write-protecting an existing one). 
-__replace_page() uses it with __replace_page() when replacing the mapped 
-page. And migrate_vma_insert_page() uses it with MMU_NOTIFY_MIGRATE.
-
-Other code (e.g., khugepaged) doesn't seem to use it as well.
-
-... so I guess it's fine? Confusing.
+Yes, exactly. Using mapcount in combination with ref freezing is 
+problematic. Except maybe for anonymous folios with mapcount=1, while 
+holding a bunch of locks to stop anybody from stumbling over that.
 
 -- 
 Cheers,
