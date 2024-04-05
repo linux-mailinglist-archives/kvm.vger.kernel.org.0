@@ -1,152 +1,176 @@
-Return-Path: <kvm+bounces-13634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B6198993F1
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 05:43:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA21089949D
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 06:54:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF9B8B231DF
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 03:43:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21A66B2379A
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 04:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1619F1C68F;
-	Fri,  5 Apr 2024 03:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342DA21350;
+	Fri,  5 Apr 2024 04:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BiUkNHHy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AsKwv7P+"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27FE256D;
-	Fri,  5 Apr 2024 03:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1660A21
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 04:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712288573; cv=none; b=F+GH+WdaSljr64UyIk1mDDefzCiz+c/Tn4SiR8C+lHSQIUEQ2FCvqoB8XcUN/rSDN2qVK+AKQ3aAOU92HY7DZ/bpaiwTVWuSvKMgAGjP8g8dgnEjTPOqSAfNlOEYNcYkRw0kccdmvVPNg92kiw70f5hA3R/5SpD6c1/dI/S3YTk=
+	t=1712292859; cv=none; b=j31eKpUCqZKmMU/B02Z5y1e50aBB6yMP7B4zlsqC6NHE17F5Lw2xUqO693hJqUxgq+fW6GL/p79xg3pLKdqYNseLWgTk/SQmtUhAkFd+qJwoYWyEip7xueGpkHLsfT/bmvwIe53O7ltN8vb1tnhuQvWLUjaNU7yP9dnoqZwxbSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712288573; c=relaxed/simple;
-	bh=1E4q9iSNFoJ5e8ve8agC1zRQQ+0F+2ROOW1SmEusQhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V0H3eQUy6jAdgvlXEGrQ2qZgCUt0qSpk/pgAMe7nMfw+qImX5+KotZnzOBX4pqm+YWoxKFN6VQgXyvMLHZP6WVnGERtaG1fAq7hWuGU4qhxisSZIHMsjtirV/ePo4i4sxq9Q24+4XdcK0adz35W5/9mDEsUWUA8YWpf6Cz4isps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BiUkNHHy; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GdrhCCARPBrZ0BeKtdp/2ujXMzoo79cn9UM+NnhXtOc=; b=BiUkNHHyRubp6ozZi9ENrekA++
-	yQOYyCgQCr+0Q/os9bqKoxPFMAbMbxNG6VK3KHRf8d5VUDBhQK2d5+yLPqCJMWNEi9A5Np7eRoKb/
-	DBIczCaUGUP4hAyXgNPEyzczgbll9TcpKdoOXd+GyloI5jB85moOyOiFUm+70vucequYLSfNiLsla
-	ICHIK+mjkvj8DeY0YHxe+itsx+qAUbmLmj20OriZ1nYpu04O7xrCKDWqCrYQ3Hc+/LOOT/Nc628nG
-	LvjTUu+/BGPTLzt1GjKxZsMEhtwzjcQrf4qkNfEQ7hNy60oBEO1E+Qkxv1rZfhKyXuJ6e19bJTSD+
-	hTAIPaBg==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rsaTY-00000009Y3j-2mgL;
-	Fri, 05 Apr 2024 03:42:48 +0000
-Date: Fri, 5 Apr 2024 04:42:48 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v1 0/5] s390: page_mapcount(), page_has_private() and
- PG_arch_1
-Message-ID: <Zg9zOJowhmOozmcp@casper.infradead.org>
-References: <20240404163642.1125529-1-david@redhat.com>
+	s=arc-20240116; t=1712292859; c=relaxed/simple;
+	bh=H+3L2GtRWBx6xlaQUptrJGMP/7UNUsoQePX3+YJssFw=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=s2VdWZoM/dt3yA5dvmnRTCRIZNq7oVhhPSnj+NcqpXoCxxm12/uwdWy39zxORofsMD5BkRN/SxhxIhRnGpHVo2jFEMs2DLh/H0tx7jdgW16dSH2o39yfqZ8Qz6xYFumRXtrKsiVMu3VGmxTP0Cr82BtdxpaNV0tNprnixvleMzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AsKwv7P+; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3c5db6797deso443096b6e.3
+        for <kvm@vger.kernel.org>; Thu, 04 Apr 2024 21:54:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712292857; x=1712897657; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NM65XexEQuUDhr+aIgnkbT0SpwOWl1w3Itz5eH8He64=;
+        b=AsKwv7P+H8ZnpE3n8OcoRBqbq1uA+y5eOeqdT5mFBztnWWHA0O0+HxpEnB5A4Di83/
+         8UxJWKokG2bnYt3HZaic1V6POmXSoJW0Ch3LkkO8DLVQ4/0X+yUvU3eMmhXvoT8LUald
+         l6w2sPbFEUrEP9xCfZPfhl73X8lLP6Lbr2h7QZ6oQVAUpk4zYq/bcV+T3OIoi2L6v43l
+         Fm0DAqwJTFbo0RVbIyry8blmplKfp7Pi+ftN/NhpPU132PrKqYCylfjcH68QjWoBYtTZ
+         aKwBMgeHYqOATBYBw3qZs/VsRLa5ooUyJ4NeE/tKFZpsOnSUFmnKlTwJWPg+NfaT+5Ow
+         wyDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712292857; x=1712897657;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NM65XexEQuUDhr+aIgnkbT0SpwOWl1w3Itz5eH8He64=;
+        b=K/I8vX+3qc6dbibcA7d9sl2YV0Cl/7kFRQz5ueG2F/FRwBeansOndR5IzHAfnfVuLn
+         4vImD6MaIkzT3/NACvS62z/T3rNFnDusIz8YXMc1esY4OBNgtuKbeacxp4/Jmg6SOmzd
+         v6vA9rbTVT3RkINvCKeYM5tyG/qSbcY8Zdnbo/8pyYH0fzj2WayfTCVRsTf91zQkgpnf
+         c87yAUIK6J6XIPCFlw9txpAhTBGP4BafcKvRwvxmJO8ooy394aP+HiY14zB71m7eYQ5Q
+         c7k2FFvu5KSkZqpwvWSbSVvhYUZA9ZA1QHbnSj5b8oUAcyxxOhFtzsv7MNKSHlKLeaz4
+         TgRA==
+X-Forwarded-Encrypted: i=1; AJvYcCVVAECDFKCZR7p4Ydf6OIRGsue3nVPV8rk7EHyvXgDuLFs+Iv3fYhHhNZVm4424XcAkhyYueEk8UUy+hIXysKxC6uBI
+X-Gm-Message-State: AOJu0YyRWXQXYYg2JWRt6NVwPQm/D8mN8E6iCh7EiInJXR+GkrMBpv/O
+	uTE0KDn3n9rv7mWoLVqscD+HbJoUqAUtplgHpDuvxvMYmZqpkPiY8a1lmP49veE=
+X-Google-Smtp-Source: AGHT+IGHD0DlwEdgHO7QJ9tkbc1GkMFmfexAQlDtE82V1qn/NLI0Tu7/QDx6d5bnKtEbzA7K44YNSg==
+X-Received: by 2002:a54:451a:0:b0:3c5:d953:3814 with SMTP id l26-20020a54451a000000b003c5d9533814mr381743oil.2.1712292857082;
+        Thu, 04 Apr 2024 21:54:17 -0700 (PDT)
+Received: from localhost (124-169-104-130.tpgi.com.au. [124.169.104.130])
+        by smtp.gmail.com with ESMTPSA id gu11-20020a056a004e4b00b006e6cc93381esm546830pfb.125.2024.04.04.21.54.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 21:54:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240404163642.1125529-1-david@redhat.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 05 Apr 2024 14:54:06 +1000
+Message-Id: <D0BX5M9GOA7N.RV1WXBCHI79X@gmail.com>
+To: "Thomas Huth" <thuth@redhat.com>
+Cc: "Laurent Vivier" <lvivier@redhat.com>, "Andrew Jones"
+ <andrew.jones@linux.dev>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH v7 07/35] common: add memory dirtying vs
+ migration test
+From: "Nicholas Piggin" <npiggin@gmail.com>
+X-Mailer: aerc 0.17.0
+References: <20240319075926.2422707-1-npiggin@gmail.com>
+ <20240319075926.2422707-8-npiggin@gmail.com>
+ <6821682a-56f8-46aa-8fee-197434723bf5@redhat.com>
+In-Reply-To: <6821682a-56f8-46aa-8fee-197434723bf5@redhat.com>
 
-On Thu, Apr 04, 2024 at 06:36:37PM +0200, David Hildenbrand wrote:
-> On my journey to remove page_mapcount(), I got hooked up on other folio
-> cleanups that Willy most certainly will enjoy.
-> 
-> This series removes the s390x usage of:
-> * page_mapcount() [patches WIP]
-> * page_has_private() [have patches to remove it]
-> 
-> ... and makes PG_arch_1 only be set on folio->flags (i.e., never on tail
-> pages of large folios).
-> 
-> Further, one "easy" fix upfront.
+On Fri Mar 29, 2024 at 3:37 AM AEST, Thomas Huth wrote:
+> On 19/03/2024 08.58, Nicholas Piggin wrote:
+> > This test stores to a bunch of pages and verifies previous stores,
+> > while being continually migrated. Default runtime is 5 seconds.
+> >=20
+> > Add this test to ppc64 and s390x builds. This can fail due to a QEMU
+> > TCG physical memory dirty bitmap bug, so it is not enabled in unittests
+> > for TCG yet.
+> >=20
+> > The selftest-migration test time is reduced significantly because
+> > this test
+> >=20
+> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> > ---
+> >   common/memory-verify.c      | 67 ++++++++++++++++++++++++++++++++++++=
++
+> >   common/selftest-migration.c |  8 ++---
+> >   powerpc/Makefile.common     |  1 +
+> >   powerpc/memory-verify.c     |  1 +
+> >   powerpc/unittests.cfg       |  7 ++++
+> >   s390x/Makefile              |  1 +
+> >   s390x/memory-verify.c       |  1 +
+> >   s390x/unittests.cfg         |  6 ++++
+> >   8 files changed, 88 insertions(+), 4 deletions(-)
+> >   create mode 100644 common/memory-verify.c
+> >   create mode 120000 powerpc/memory-verify.c
+> >   create mode 120000 s390x/memory-verify.c
+> >=20
+> > diff --git a/common/memory-verify.c b/common/memory-verify.c
+> > new file mode 100644
+> > index 000000000..e78fb4338
+> > --- /dev/null
+> > +++ b/common/memory-verify.c
+> > @@ -0,0 +1,67 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Simple memory verification test, used to exercise dirty memory migr=
+ation.
+> > + */
+> > +#include <libcflat.h>
+> > +#include <migrate.h>
+> > +#include <alloc.h>
+> > +#include <asm/page.h>
+> > +#include <asm/time.h>
+> > +
+> > +#define NR_PAGES 32
+> > +
+> > +static unsigned time_sec =3D 5;
+> > +
+> > +static void do_getopts(int argc, char **argv)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i =3D 0; i < argc; ++i) {
+> > +		if (strcmp(argv[i], "-t") =3D=3D 0) {
+> > +			i++;
+> > +			if (i =3D=3D argc)
+> > +				break;
+> > +			time_sec =3D atol(argv[i]);
+> > +		}
+> > +	}
+> > +
+> > +	printf("running for %d secs\n", time_sec);
+> > +}
+> > +
+> > +int main(int argc, char **argv)
+> > +{
+> > +	void *mem =3D malloc(NR_PAGES*PAGE_SIZE);
+>
+> Use alloc_pages(5) instead ? Or add at least some white spaces around "*"=
+.
 
-Looks like you didn't see:
+Hmm, alloc_pages is physical? Maybe I should use memalign instead (and
+I'll fix the space). Even though it's not using VM, we might change
+that.
 
-https://lore.kernel.org/linux-s390/20240322161149.2327518-1-willy@infradead.org/
+> Apart from that this patch looks sane to me, so with that line fixed:
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> ... unfortunately there is one other issue I spotted that I am not
-> tackling in this series, because I am not 100% sure what we want to
-> do: the usage of page_ref_freeze()/folio_ref_freeze() in
-> make_folio_secure() is unsafe. :(
-> 
-> In make_folio_secure(), we're holding the folio lock, the mmap lock and
-> the PT lock. So we are protected against concurrent fork(), zap, GUP,
-> swapin, migration ... The page_ref_freeze()/ folio_ref_freeze() should
-> also block concurrent GUP-fast very reliably.
-> 
-> But if the folio is mapped into multiple page tables, we could see
-> concurrent zapping of the folio, a pagecache folios could get mapped/
-> accessed concurrent, we could see fork() sharing the page in another
-> process, GUP ... trying to adjust the folio refcount while we froze it.
-> Very bad.
+I'll keep your R-B with the memalign change if that's okay.
 
-Hmmm.  Why is that not then a problem for, eg, splitting or migrating?
-Is it because they unmap first and then try to freeze?
-
-> For anonymous folios, it would likely be sufficient to check that
-> folio_mapcount() == 1. For pagecache folios, that's insufficient, likely
-> we would have to lock the pagecache. To handle folios mapped into
-> multiple page tables, we would have to do what
-> split_huge_page_to_list_to_order() does (temporary migration entries).
-> 
-> So it's a bit more involved, and I'll have to leave that to s390x folks to
-> figure out. There are othe reasonable cleanups I think, but I'll have to
-> focus on other stuff.
-> 
-> Compile tested, but not runtime tested, I'll appreiate some testing help
-> from people with UV access and experience.
-> 
-> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Cc: Sven Schnelle <svens@linux.ibm.com>
-> Cc: Janosch Frank <frankja@linux.ibm.com>
-> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Cc: Thomas Huth <thuth@redhat.com>
-> 
-> David Hildenbrand (5):
->   s390/uv: don't call wait_on_page_writeback() without a reference
->   s390/uv: convert gmap_make_secure() to work on folios
->   s390/uv: convert PG_arch_1 users to only work on small folios
->   s390/uv: update PG_arch_1 comment
->   s390/hugetlb: convert PG_arch_1 code to work on folio->flags
-> 
->  arch/s390/include/asm/page.h |   2 +
->  arch/s390/kernel/uv.c        | 112 ++++++++++++++++++++++-------------
->  arch/s390/mm/gmap.c          |   4 +-
->  arch/s390/mm/hugetlbpage.c   |   8 +--
->  4 files changed, 79 insertions(+), 47 deletions(-)
-> 
-> -- 
-> 2.44.0
-> 
+Thanks,
+Nick
 
