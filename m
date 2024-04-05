@@ -1,181 +1,116 @@
-Return-Path: <kvm+bounces-13742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94ADB89A205
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 17:59:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7577489A224
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 18:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D2701F225B8
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 15:59:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 146BB1F21705
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 16:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81364171077;
-	Fri,  5 Apr 2024 15:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F52171647;
+	Fri,  5 Apr 2024 16:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="CdTjE8AR"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="RF1P1tAq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE30016FF58
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 15:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C87171066
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 16:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712332786; cv=none; b=unjBFoAfs96Aq9MBC/hcap0eBv9tXVBMinwBD7iHPrtfd1ekZEBCFZREP/cx4y5bi6Uun1Ecg9J2JcyvVvpfPw3YEABzVl5ImBHzM4RgntzHDP6KXZkVNUKI4dWtAafjAWN2CobMU/N2cWl5KX+SGJl1+OzsMdIfX3MIPMvj9FA=
+	t=1712333285; cv=none; b=jv8jICBUVjctaVjbK0mGvPy2YVza4bfr83VGZ2Y4sT2Y8VNfN0jgtR3zpqYjN5LmgTbbcDqc4ODzvLbg8LFjH7dCX7MMVZeUU2rt7pup4B/vrZBIHOp+QiTJSABY4mLdcCWSViadEmvLhdfj9kbtPpCGT3q3yXOpVEeG5sC6UKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712332786; c=relaxed/simple;
-	bh=6WysufP42FX2Az3Xx8MgB1cNuc1CYX+XUTX4q5FvCN4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pUQplWplZKIMI6Kxs+PxrCm/jc+5lTJeCcZDkExT9JM+TzykWg1GZD9OOC5Y71tRL7oXEe8S1zPKEbOhyEJ6p8dnXNgpxJJOXrYwNXajnrUhNDCZ6SWlKKtkhwP+hF7w4bIoth/kDe+8xU/utfyjRGcii/LKdsbv/TQJ37w4gdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=CdTjE8AR; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4162fe73594so6317405e9.2
-        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 08:59:44 -0700 (PDT)
+	s=arc-20240116; t=1712333285; c=relaxed/simple;
+	bh=WQf37KnE8UstSt4WJHEZVKafftMROgs9kzOlz+UeEzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iU9xSc2Ph05tCbrbBrj3eagAsCqlnmxlqWYp3UFa9kOzRQ1fEB0Ijr9XXxb9kRgzWiJJ5Ec/uW00B84CXyV8HgEKgTDybzvJicMj1TY3sMINFUWFNi5tWEefOfttLl4KRPXxegOim5zZ+sqkdUxzfeKcVwJL610sViAGn8Ay7/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=RF1P1tAq; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-7cc0e831e11so47671139f.1
+        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 09:08:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1712332783; x=1712937583; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z/+tn7yaOy1bWCod1Hwz4ffQkyy0MXOXzF4xEGdBkSM=;
-        b=CdTjE8ARyIrDoCIL7WSqdKga/mX+JFEK79Pi4jCyaf58yf9SvW7NkQNcfHqbHp4W5r
-         QPbw7HCfvDOKgZ5bR1EmCP3Nfn1Tn40R+eOWRXyXyahTFxDWNNlptlLkTJ9rLzKeQCA7
-         HnZW0wWacuyTjqy85ar0AkWeZCOIasnLZlW3/AftFoGtEa6MUUPVHpms2GrWdvXOAkx1
-         nFLnZ2IonAAOcX4LlKDVyfCWj/tVwHuULEz4NbH3X6bYscW3VUaUzsysVqgcSqUreJGs
-         sWXp9dkTrCwWkSLVGBjjLlEbNfT7exPe5e2MDN3Ll4xaFqU4eMITnytPqpuqQRbTpky0
-         Qw6A==
+        d=linuxfoundation.org; s=google; t=1712333283; x=1712938083; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oAuKDU6QiZ6ML3XGubjP2fNWyg1GAOwTBQh+lV89r38=;
+        b=RF1P1tAqP3quLAouu2FwQVEKMZfuTL/RhbhOTdyP7oTf3gFptlw/NVwiayTL9e2JgE
+         Uk5xCIZssSK6EvgKVWsChs3tfpMRfspjYJqtKqKl4iHHLDiY5viu6FVIaiMcr4D9wkuF
+         ON7QY9G+UxHZZWqbwZbrWIXqrpsywHPYczIOA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712332783; x=1712937583;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z/+tn7yaOy1bWCod1Hwz4ffQkyy0MXOXzF4xEGdBkSM=;
-        b=g5+B6LfRnCfbDmrbFrz1bF3SpSpQmeaZ5DVBmq33XKUAn5C0ua3MI8vUeUcB2cS2+h
-         nawfmJkyiRPf3vNzslnQ1t15fLz1lr3/RnszXZkMvH5RHbeYD97WM/5ujfch3juByfPw
-         hTFjaTidkCGZ2M8GJSXu2rNShtBs/9HvLowuDKlgG7E+I7eYBWpWvOtetslpjXFo4R0l
-         aoQvtGLewR/bsYNld/pR4gQpwsVSPqRuLDAx7egvL1Pcjk3NHBdOc5RmYH92uAM0RLQ4
-         ZNtKI9Bo+clZit6FNMWdhNQ1l6O3GwvCvymOVZ5ku4GjGPVJxXhSzetsP7PicL1giw82
-         7/nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXAjoMR1zKCS1tgwxV/ER+CYD85usanWKoETIJDgFYsqH6NhcrEpUNHcSuq/P8aTcA+ktg+CBu/eYSeLYm91/9hnJ2M
-X-Gm-Message-State: AOJu0YyQ/j3eT8r82RY11N0CXbe38MaHB7PxeF5axfCD+nqeYfJZT/06
-	Jvm+Wc5lpltEStesTxS/YfVH1USJIlQSNGF0BE+RYokHhbse2cX+EPsoyCEnzuE=
-X-Google-Smtp-Source: AGHT+IHm5FdCsOG2D2FwTVsRXO+4kOPqszWyczb81zB17ksFNLVDMEKpcib6RWK3ysnM3lM9cg2ZBw==
-X-Received: by 2002:a05:600c:3107:b0:414:7909:6680 with SMTP id g7-20020a05600c310700b0041479096680mr1487874wmo.16.1712332783307;
-        Fri, 05 Apr 2024 08:59:43 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id m20-20020a05600c4f5400b0041632171f51sm1770044wmq.13.2024.04.05.08.59.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 08:59:42 -0700 (PDT)
-Date: Fri, 5 Apr 2024 17:59:41 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Conor Dooley <conor.dooley@microchip.com>
-Cc: Max Hsu <max.hsu@sifive.com>, Conor Dooley <conor@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Pavel Machek <pavel@ucw.cz>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Palmer Dabbelt <palmer@sifive.com>, 
-	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pm@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC 02/11] dt-bindings: riscv: Add Sdtrig optional CSRs
- existence on DT
-Message-ID: <20240405-ebdb2943657ab08d2d563c03@orel>
-References: <20240329-dev-maxh-lin-452-6-9-v1-0-1534f93b94a7@sifive.com>
- <20240329-dev-maxh-lin-452-6-9-v1-2-1534f93b94a7@sifive.com>
- <20240329-affidavit-anatomist-1118a12c3e60@wendy>
+        d=1e100.net; s=20230601; t=1712333283; x=1712938083;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oAuKDU6QiZ6ML3XGubjP2fNWyg1GAOwTBQh+lV89r38=;
+        b=UuDeNyPU1Zs1m2dVZ7T935/Oixrt53x2Lf/p96+6DLplQW/h/HeI9BEdINb6PBzL7f
+         yQ4hFwmYqzDx/1f6dAzkWLPTGRTHIeQQ1upc1WpHz/L/ciLHUList4NCojAgnq8pu90x
+         tMTT3zEHFpDteiYpIiwtvdpNjW8Z5c9Vj1dLRZ+zQNrdMtKQ3sjqnBpOs0Qmo4z4BPid
+         igeVckJRzq/x74ZbAUJTX96Jl74lcY31OwXSuT9OqqvHnWPXyMOVbn2oqFOfgmMkOXL4
+         FLC2o+UZdKi9r7U3n1BWTk1DgnDQ2yDcb6X4vRuvxL7ecttKbwTCtYpPO5YxVGQapVHv
+         X0wA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3Mz82M6XfO8hBTyaiuIIUM3reURqbdV+T3IiAw2Uk4djBE6QENezGcTtgB+ZZeJs1GV8jAxWbUR5sdRN/1qIGYyep
+X-Gm-Message-State: AOJu0YxeejRlVICPxXGIKnt/DJd2Cn3ld0p64M8zPQO12AiVKJR+T9Ge
+	XU1a5kjkuGDqyoISiJMgkenEO1AriXo+CJavjqYlrOrC8ayBWiBcTnfnVtTK+e8=
+X-Google-Smtp-Source: AGHT+IEFSBlsclA6e2FP+b8IjmZLWOus+sNYfoqoIt8htlDfnprRT5+aCUKOtOxFEmmqkr93Xto/Bw==
+X-Received: by 2002:a05:6602:148:b0:7d0:bd2b:43ba with SMTP id v8-20020a056602014800b007d0bd2b43bamr1795873iot.0.1712333282821;
+        Fri, 05 Apr 2024 09:08:02 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id f4-20020a5edf04000000b007cc78dafb96sm578949ioq.7.2024.04.05.09.08.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Apr 2024 09:08:02 -0700 (PDT)
+Message-ID: <60d96894-a146-4ebb-b6d0-e1988a048c64@linuxfoundation.org>
+Date: Fri, 5 Apr 2024 10:08:00 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240329-affidavit-anatomist-1118a12c3e60@wendy>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/7] Handle faults in KUnit tests
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ Brendan Higgins <brendanhiggins@google.com>, David Gow
+ <davidgow@google.com>, Rae Moar <rmoar@google.com>
+Cc: Alan Maguire <alan.maguire@oracle.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ "Eric W . Biederman" <ebiederm@xmission.com>, "H . Peter Anvin"
+ <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+ James Morris <jamorris@linux.microsoft.com>,
+ Kees Cook <keescook@chromium.org>, Luis Chamberlain <mcgrof@kernel.org>,
+ "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
+ Marco Pagani <marpagan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Stephen Boyd <sboyd@kernel.org>,
+ Thara Gopinath <tgopinath@microsoft.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>, Zahra Tarkhani <ztarkhani@microsoft.com>,
+ kvm@vger.kernel.org, linux-hardening@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-um@lists.infradead.org,
+ x86@kernel.org, Shuah Khan <skhan@linuxfoundation.org>
+References: <20240326095118.126696-1-mic@digikod.net>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20240326095118.126696-1-mic@digikod.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 29, 2024 at 10:31:10AM +0000, Conor Dooley wrote:
-> On Fri, Mar 29, 2024 at 05:26:18PM +0800, Max Hsu wrote:
-> > The mcontext/hcontext/scontext CSRs are optional in the Sdtrig extension,
-> > to prevent RW operations to the missing CSRs, which will cause
-> > illegal instructions.
-> > 
-> > As a solution, we have proposed the dt format for these CSRs.
+On 3/26/24 03:51, Mickaël Salaün wrote:
+> Hi,
 > 
-> As I mentioned in your other patch, I amn't sure what the actual value
-> is in being told about "sdtrig" itself if so many of the CSRs are
-> optional. I think we should define pseudo extensions that represent
-> usable subsets that are allowed by riscv,isa-extensions, such as
-> those you describe here: sdtrig + mcontext, sdtrig + scontext and
-> sdtrig + hcontext. Probably also for strig + mscontext. What
-> additional value does having a debug child node give us that makes
-> it worth having over something like the above?
-
-Yeah, Sdtrig, which doesn't tell you what you get, isn't nice at all.
-I wonder if we can start with requiring Sdtrig to be accompanied by
-Ssstrict in order to enable the context CSRs, i.e.
-
- Sdtrig          - support without optional CSRs
- Sdtrig+Ssstrict - probe for optional CSRs, support what's found
-
-If there are platforms with Sdtrig and optional CSRs, but not Ssstrict,
-then maybe the optional CSRs can be detected in some vendor-specific way,
-where the decision as to whether or not that vendor-specific way is
-acceptable is handled case-by-case.
-
-Thanks,
-drew
-
+> This patch series teaches KUnit to handle kthread faults as errors, and
+> it brings a few related fixes and improvements.
 > 
-> Thanks,
-> Conor.
-> 
-> > 
-> > Signed-off-by: Max Hsu <max.hsu@sifive.com>
-> > ---
-> >  Documentation/devicetree/bindings/riscv/cpus.yaml | 18 ++++++++++++++++++
-> >  1 file changed, 18 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/riscv/cpus.yaml b/Documentation/devicetree/bindings/riscv/cpus.yaml
-> > index d87dd50f1a4b..c713a48c5025 100644
-> > --- a/Documentation/devicetree/bindings/riscv/cpus.yaml
-> > +++ b/Documentation/devicetree/bindings/riscv/cpus.yaml
-> > @@ -137,6 +137,24 @@ properties:
-> >        DMIPS/MHz, relative to highest capacity-dmips-mhz
-> >        in the system.
-> >  
-> > +  debug:
-> > +    type: object
-> > +    properties:
-> > +      compatible:
-> > +        const: riscv,debug-v1.0.0
-> > +      trigger-module:
-> > +        type: object
-> > +        description: |
-> > +          An indication set of optional CSR existence from
-> > +          riscv-debug-spec Sdtrig extension
-> > +        properties:
-> > +          mcontext-present:
-> > +            type: boolean
-> > +          hcontext-present:
-> > +            type: boolean
-> > +          scontext-present:
-> > +            type: boolean
-> > +
-> >  anyOf:
-> >    - required:
-> >        - riscv,isa
-> > 
-> > -- 
-> > 2.43.2
-> > 
+> Shuah, everything should be OK now, could you please merge this series?
 
+Please cc linux-kselftest and kunit mailing lists. You got the world cc'ed
+except for the important ones. :)
 
-
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
-
+thanks,
+-- Shuah
 
