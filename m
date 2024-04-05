@@ -1,116 +1,110 @@
-Return-Path: <kvm+bounces-13743-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13744-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7577489A224
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 18:09:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA89A89A2FA
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 18:58:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 146BB1F21705
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 16:09:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59E6E1F22670
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 16:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F52171647;
-	Fri,  5 Apr 2024 16:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AFF17166A;
+	Fri,  5 Apr 2024 16:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="RF1P1tAq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ee3cuSZ/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C87171066
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 16:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB086171649
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 16:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712333285; cv=none; b=jv8jICBUVjctaVjbK0mGvPy2YVza4bfr83VGZ2Y4sT2Y8VNfN0jgtR3zpqYjN5LmgTbbcDqc4ODzvLbg8LFjH7dCX7MMVZeUU2rt7pup4B/vrZBIHOp+QiTJSABY4mLdcCWSViadEmvLhdfj9kbtPpCGT3q3yXOpVEeG5sC6UKs=
+	t=1712336329; cv=none; b=SC62xty2qXbHLssNiGFZA7miVI35UMrarkxhfqsrFyiwmLwL2/Ps+k1nDApkTLdqBK4spCAraEmfn+W5c+dUKdRMHN8ZmGVO5lseEkLW3Yw9Zi1nyr2dI7DLy8d6KI2XJhbQeMiHpklv8AVKF3BOXgRZ+X3QgL4gv4a/lnHTP9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712333285; c=relaxed/simple;
-	bh=WQf37KnE8UstSt4WJHEZVKafftMROgs9kzOlz+UeEzM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iU9xSc2Ph05tCbrbBrj3eagAsCqlnmxlqWYp3UFa9kOzRQ1fEB0Ijr9XXxb9kRgzWiJJ5Ec/uW00B84CXyV8HgEKgTDybzvJicMj1TY3sMINFUWFNi5tWEefOfttLl4KRPXxegOim5zZ+sqkdUxzfeKcVwJL610sViAGn8Ay7/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=RF1P1tAq; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-7cc0e831e11so47671139f.1
-        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 09:08:03 -0700 (PDT)
+	s=arc-20240116; t=1712336329; c=relaxed/simple;
+	bh=kYxNSdByNJ1m5udrkC+/cqq0sc3hRu5OPcBDsIZ3Gf4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Hg5Q4AkNH8+sm0Wlro14baRFBawx7NEQ9EXhZ1S8ejVfGXSrU6uUWokwJb6Zo2tbsO1bLLSeqMmHZDr3GmxMZaAUoyVtCR9Ax7Xg77QXviTuhArxhh11APYPtE9GayXtN4PCCFwI4NdjCXI/cFusianREZY4VCSFVK3nZmPsYEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ee3cuSZ/; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a2dbaacff8so1765693a91.2
+        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 09:58:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1712333283; x=1712938083; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oAuKDU6QiZ6ML3XGubjP2fNWyg1GAOwTBQh+lV89r38=;
-        b=RF1P1tAqP3quLAouu2FwQVEKMZfuTL/RhbhOTdyP7oTf3gFptlw/NVwiayTL9e2JgE
-         Uk5xCIZssSK6EvgKVWsChs3tfpMRfspjYJqtKqKl4iHHLDiY5viu6FVIaiMcr4D9wkuF
-         ON7QY9G+UxHZZWqbwZbrWIXqrpsywHPYczIOA=
+        d=google.com; s=20230601; t=1712336327; x=1712941127; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oIaKqbHItjZpkeLlKYbk7Duobe/+p8JYcpNo0hsVcB4=;
+        b=ee3cuSZ/PmCUOwcIJB2qvnULBvdJaPiOG+DLN7uGg9FlUZxfVpTFsTLbyh1vds0wd3
+         K/yS2ySVGapxfJwvbgoJb0VsIPUUbPHoDqHgMaAqmUeysAsNBOObAcN3XWpfxcrU7JuT
+         wrLexnldFYDw3uWwlEzQFUbcyfrc+eGzyICS1XmX6UY3fnwrB55yQopf5Q4T4wibpfPo
+         m5ROP0ynkxcrMFiKnu7DAUNIazVMmb2O2xgS9rwwBWwPHs/c5qGWVz+epJZ3IwqZYQgk
+         rwBKSM1pznyk3lQMO/ubBpmMNtRauGUwh2znJlkL37xqZ3eEO9onwao0zLd3lLluJWls
+         jbLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712333283; x=1712938083;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1712336327; x=1712941127;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oAuKDU6QiZ6ML3XGubjP2fNWyg1GAOwTBQh+lV89r38=;
-        b=UuDeNyPU1Zs1m2dVZ7T935/Oixrt53x2Lf/p96+6DLplQW/h/HeI9BEdINb6PBzL7f
-         yQ4hFwmYqzDx/1f6dAzkWLPTGRTHIeQQ1upc1WpHz/L/ciLHUList4NCojAgnq8pu90x
-         tMTT3zEHFpDteiYpIiwtvdpNjW8Z5c9Vj1dLRZ+zQNrdMtKQ3sjqnBpOs0Qmo4z4BPid
-         igeVckJRzq/x74ZbAUJTX96Jl74lcY31OwXSuT9OqqvHnWPXyMOVbn2oqFOfgmMkOXL4
-         FLC2o+UZdKi9r7U3n1BWTk1DgnDQ2yDcb6X4vRuvxL7ecttKbwTCtYpPO5YxVGQapVHv
-         X0wA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3Mz82M6XfO8hBTyaiuIIUM3reURqbdV+T3IiAw2Uk4djBE6QENezGcTtgB+ZZeJs1GV8jAxWbUR5sdRN/1qIGYyep
-X-Gm-Message-State: AOJu0YxeejRlVICPxXGIKnt/DJd2Cn3ld0p64M8zPQO12AiVKJR+T9Ge
-	XU1a5kjkuGDqyoISiJMgkenEO1AriXo+CJavjqYlrOrC8ayBWiBcTnfnVtTK+e8=
-X-Google-Smtp-Source: AGHT+IEFSBlsclA6e2FP+b8IjmZLWOus+sNYfoqoIt8htlDfnprRT5+aCUKOtOxFEmmqkr93Xto/Bw==
-X-Received: by 2002:a05:6602:148:b0:7d0:bd2b:43ba with SMTP id v8-20020a056602014800b007d0bd2b43bamr1795873iot.0.1712333282821;
-        Fri, 05 Apr 2024 09:08:02 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id f4-20020a5edf04000000b007cc78dafb96sm578949ioq.7.2024.04.05.09.08.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 09:08:02 -0700 (PDT)
-Message-ID: <60d96894-a146-4ebb-b6d0-e1988a048c64@linuxfoundation.org>
-Date: Fri, 5 Apr 2024 10:08:00 -0600
+        bh=oIaKqbHItjZpkeLlKYbk7Duobe/+p8JYcpNo0hsVcB4=;
+        b=vftgUlUFBr+6/Mp9LByeXDy77gHi3arGiQ7J8QpK4lMft6LtHrdE5yPhKkgn+3AdVC
+         yM0Dz8Z0Az18xh+hN9ZR0gH/Wo5mH87I/XGtDnVrZJ1Nk5sgRVsYT+61hAnp2w5kzxCY
+         2Q+W8dS/ywWnatKMTV3KEdFYuxpZjdBbuOne8Z0VyEGbAoWv9gMdD30wbBsimXChxTF2
+         Td3w9AtrxYKG7CZH1w45RgcUTm/vftT50kJzpmMqQOXjX2JIDoPfqyTCxP04XI8fDl9L
+         wcL9n943Xd21vdhrz20GIfHDpm5f8wRWEvzmHFxConrarp86tKS6xcaknewy5exPXYjq
+         +fHg==
+X-Gm-Message-State: AOJu0YxgrjSNC87n+lz91yb8+yQk/Lb78rqgrK1I7serNFxeMQZ0AAu3
+	0XpitPbYnhkc+tD3O36pH/U/c0nes1pp76aTVYdOt40Gk6sDkLheWO8VPlqMKfgk5WvRIQKzPOM
+	tbA==
+X-Google-Smtp-Source: AGHT+IGoqd3TklGeYcqwAk8h7GLRYYheErNCawJpvvIGGiJhhWOdi5tZcUmwXbQAsDVZm3CxPiydDP/0hIs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:cc0a:b0:29b:efaf:2bd7 with SMTP id
+ b10-20020a17090acc0a00b0029befaf2bd7mr6740pju.2.1712336327275; Fri, 05 Apr
+ 2024 09:58:47 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  5 Apr 2024 09:58:44 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/7] Handle faults in KUnit tests
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- Brendan Higgins <brendanhiggins@google.com>, David Gow
- <davidgow@google.com>, Rae Moar <rmoar@google.com>
-Cc: Alan Maguire <alan.maguire@oracle.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- "Eric W . Biederman" <ebiederm@xmission.com>, "H . Peter Anvin"
- <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
- James Morris <jamorris@linux.microsoft.com>,
- Kees Cook <keescook@chromium.org>, Luis Chamberlain <mcgrof@kernel.org>,
- "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
- Marco Pagani <marpagan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Stephen Boyd <sboyd@kernel.org>,
- Thara Gopinath <tgopinath@microsoft.com>,
- Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov
- <vkuznets@redhat.com>, Zahra Tarkhani <ztarkhani@microsoft.com>,
- kvm@vger.kernel.org, linux-hardening@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-um@lists.infradead.org,
- x86@kernel.org, Shuah Khan <skhan@linuxfoundation.org>
-References: <20240326095118.126696-1-mic@digikod.net>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240326095118.126696-1-mic@digikod.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240405165844.1018872-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Wei W Wang <wei.w.wang@intel.com>, David Skidmore <davidskidmore@google.com>, 
+	Steve Rutherford <srutherford@google.com>, Pankaj Gupta <pankaj.gupta@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 3/26/24 03:51, Mickaël Salaün wrote:
-> Hi,
-> 
-> This patch series teaches KUnit to handle kthread faults as errors, and
-> it brings a few related fixes and improvements.
-> 
-> Shuah, everything should be OK now, could you please merge this series?
+ - Recording and slides uploaded[1].
 
-Please cc linux-kselftest and kunit mailing lists. You got the world cc'ed
-except for the important ones. :)
+ - Hold off on v20 for a few weeks, to try and land as much prep work as
+   possible before v20.
 
-thanks,
--- Shuah
+ - Exactly how to slice n' dice the series to make it easier to review is TBD,
+   but generally speaking the plan is to queue patches into a "dead" branch,
+   e.g. kvm/kvm-coco-queue, when they are ready, to reduce the sheer volume of
+   the series and thus help alleviate reviewer fatigue.
+
+ - Don't hardcode fixed/required CPUID values in KVM, use available metadata
+   from TDX Module to reject "bad" guest CPUID (or let the TDX module reject?).
+   I.e. don't let a guest silently run with a CPUID that diverges from what
+   userspace provided.
+
+ - Ideally, the TDX Module would come with full metadata (not in JSON format)
+   that KVM can (a) use to reject a "bad" CPUID configuration (from userspace),
+   and (b) that KVM can provide to userspace to make debugging issues suck less.
+
+ - For guest MAXPHYADDR vs. GPAW, rely on KVM_GET_SUPPORTED_CPUID to enumerate
+   the usable MAXPHYADDR[2], and simply refuse to enable TDX if the TDX Module
+   isn't compatible.  Specifically, if MAXPHYADDR=52, 5-level paging is enabled,
+   but the TDX-Module only allows GPAW=0, i.e. only supports 4-level paging.
+
+[1] https://drive.google.com/corp/drive/folders/1hm_ITeuB6DjT7dNd-6Ezybio4tRRQOlC
+[2] https://lore.kernel.org/all/20240313125844.912415-1-kraxel@redhat.com
 
