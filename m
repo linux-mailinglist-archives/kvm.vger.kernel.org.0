@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-13683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1DA98998D4
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 11:03:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 807B38998D8
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 11:03:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CAFF1F257FC
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 09:03:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39A3C282CD3
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 09:03:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907D015FCF2;
-	Fri,  5 Apr 2024 09:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD7D16132F;
+	Fri,  5 Apr 2024 09:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/0yGwWp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ow5h2Pok"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7941EEE6;
-	Fri,  5 Apr 2024 09:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D29E16132B;
+	Fri,  5 Apr 2024 09:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712307723; cv=none; b=Am6KrW9mUMNS98FNjiyRTTU0rk5ZjX/j+Gv5o3JDLvX805/XpAHX9saJmFtQoPkyEXfXvntiqc/ibkmng+Uuy8zjfgm/Q+ktN16ksivgePpxJsBlBHIxeYtJs90udNVhjuPzjcSQC8fgpJ9SLA6WARgnBl+/R8FJL66OsCuuinU=
+	t=1712307729; cv=none; b=hz2w0BoRytnBDvTMQfSUL/Br3l2a1rLQBxA163+vD85IgQTfW2FnudytgSMGLHaMrFaK5QWACtZZiarSqh72iOfU0csfsJJG+w8nSSybNIPouoUGANzogNxw3ojtNz6MbfYCJC5kuUn0/1YFU8G9wisDk6K2l4vbICNDocaqTwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712307723; c=relaxed/simple;
-	bh=cgOlMFOLTOAhPaG8TMTBDw1poLawKTTj8nPBJ3XWL8A=;
+	s=arc-20240116; t=1712307729; c=relaxed/simple;
+	bh=47fkLuLqHEZtB3S2cnlevqOMobm0CWU9n/5DYYSuwNc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bcA7JHT6lcyitByhDQaxFGporFC0UAX/kXWsYxd54wfRmD5hFzMLqXLuE7C9tzxD3O9SqffW2NOXGa5VNcl/2jsTpa4wwttT/3T6JxHssfvVfPtIArrpXjdiEt3t3joA4G0PRSCucmg09Kc+ruQbB8Pkn3kqeDPHaV7N8krqYsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z/0yGwWp; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=scN9tU8JgBEsIUbYB329DoweuMQlVYGW7cuxtb6osBCCzsHIVGoaai59LuQEmlMhV8PtcHPvEP9YWS9y1ssLG5twb/uUfsTHurFerxd43w6gcnfP1k093ZgoHW1O4VyJWsSctOUGrdB1QicNY+Tf/gijGte4hXKn/rLWxT2sjy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ow5h2Pok; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ecf3f001c5so1250366b3a.1;
-        Fri, 05 Apr 2024 02:01:59 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6eced6fd98aso1444146b3a.0;
+        Fri, 05 Apr 2024 02:02:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712307719; x=1712912519; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712307727; x=1712912527; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xvXYLc0uu+LcIsnEe4bo5tAncaXv58vUX5rvt7kRU2I=;
-        b=Z/0yGwWppiUvbTwsDcJ+DEYmgfPnrpBfqPCem0T5ZxZEGeIRimdEFqY3TpI9L9lSQC
-         z3KnrZQs2OY22G/q6nW/WM+IA7FaiCUMOydRakfdpdwiehuKnq2NJoJcv0ViiqpzGajB
-         u7I0c/5UUXbQGG1wYMLO+k9VIX3jKzL3FrqSGJMRuUgDpVIxDSMjO4Xhltd2p/M7rY/f
-         UMR5jUObW0BuXeAO1/gSoUahOxcQHjUJg4pOxmsDLJgAGMFC5DzJMOCK7Jh4kDerQvlJ
-         b1Dbt+8S9tvv58046tdvsiKPukwZAfT4sLYM5Ps2Z4BuVbHlTnQyIcbUFnwI0BO1Uc2H
-         Douw==
+        bh=XTMqAyJBqz4rOiSgRtnzTZtMbx0voGPftwqzEIUfG30=;
+        b=Ow5h2PokgtE4EVhHS/Enlwt+Af5b1KmE3sG5ugwpnRmAwI8tJ6dgRAp5Rt/lZv8qLN
+         Mexus1oOpdHk13H3aPR4pyOrkmdwoJQ9S0tKyJXVBp478/hm15uuggqPAJOIYPJd2Hbg
+         WnQ+RT+ADghdTtixq/aTDt2f5N2OAffWgBdg6CsISgS/Z8FRMaSZzNCOdJF3kB7VLpfc
+         2NFrd1AcAQiOCeLcK8SBF5EBeGMW3pVkxlL9c7s0i0J/WNuwfqlMk5fHKFTYh5Y7F4KZ
+         iQQKaqEIEMp1xC9rbbLYSyl/+DUHUHmYuQasmsyUraV6Tt5UhRAPFEMqQGJpSET7T7gE
+         d6Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712307719; x=1712912519;
+        d=1e100.net; s=20230601; t=1712307727; x=1712912527;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xvXYLc0uu+LcIsnEe4bo5tAncaXv58vUX5rvt7kRU2I=;
-        b=KidS2eL/xDUMkLmW5KOsqPHqmH0sg0ChyqbbXmvkhqLbO9TbGFmIIL7KFlmA8GTS0V
-         dyJMrm7zJ1U3nxe31diA5Itj9y74fm7Crz7y9QYiUVN1wxWDnYhOR+kHDqnLZaW11KOa
-         +wVrYW1vO+Wyp4TdCM2bn1XwEPWyzR3iVHhlmoZvO81M0cP6ROYGEMXnnddmo0OG2+ca
-         br/YnbVzejzynM7EeKt2WKfmiCRM5o75kMyz4ISq5bTQOpPtLt4A1Yf3Jp0+zuxBEMbp
-         i/LEHa8GeQD9wKN9gmipcTSJiS1CR4Mc98g4tWayFGdXbg1WQZFdmLPkQcoauDRFIwKm
-         GmZg==
-X-Forwarded-Encrypted: i=1; AJvYcCXx48aENW78ECSougpkefHFze6Uvx89Fr+SzveGQojd5JRpKq0SvjvhCWvPBguO4RrGYL9EplrbSNdLLcN4895PUaAgayqZpL0ql5Hk5qGEksVhH2sig1FQFU8hvQ/w3A==
-X-Gm-Message-State: AOJu0YySvBaE0vco+ECqHx/wMhVopubfWAxDy9cLxL72afVJcL+EAha8
-	Kxd2g2UJvYx48lRaIcEGYOZy3B/CVOBreWoOHdQ92Nf7GZQqOHYN
-X-Google-Smtp-Source: AGHT+IFj7I4WRf6mG1Ngr9iOIJklIrAymGwlwsRpKSgckGok7UED5Jz/iGyna+dzLfvclH/dWdFZdw==
-X-Received: by 2002:a05:6a00:9296:b0:6ec:ceb4:49b8 with SMTP id jw22-20020a056a00929600b006ecceb449b8mr1142659pfb.0.1712307718798;
-        Fri, 05 Apr 2024 02:01:58 -0700 (PDT)
+        bh=XTMqAyJBqz4rOiSgRtnzTZtMbx0voGPftwqzEIUfG30=;
+        b=lxL3aSWp5B4LduI4vtHRCWAB1GDwaZUi24c7AM2Q5rhMbeDDEdigB4Ar8eSnx0sUCc
+         g8EhqUCXRlnHqhjIV6yCVE7x+tFcZYtWwLVM/BpTJxtv24JIntskJO/KuylkZYOqz1Co
+         O/ky3VxWzhLHK5OoP6JXSjTWpY9mLmmwzZ2jgC3l7dp868LSsOxd5Wygz8/uR2CcIaHB
+         srKqMInBDpPKStLKHuZMLbN39B8hEypmwvpmImGZ2E7+ypaeU6if9VRlAAfQfBl5CuRO
+         8kNEFMYt7TW7xQ3iawWSRFliPCx4+vhvH03CvYVPm9Bcg2kSJENgQSTEUzAhIw4hQ9k6
+         5mag==
+X-Forwarded-Encrypted: i=1; AJvYcCWP8nxBoZnreuF1lFINeUykWG3qIEBbP8LrjT+S2nbTyQyxRNyXZW12EC/64ZSTsXpXauk97o01VnSicjw42xyR9PJafclb71NS+AGCQFLQRsDWYLxzUOOPIF3F3CIHwA==
+X-Gm-Message-State: AOJu0YxdbWbB+BI92qjOqljSQqSVPU3gsYqJvn6xyVso/BQ3oplKx5kg
+	XT1roGfMF46KBqBWIt+pBVOIlcZUqUmAPd9sR4ox3gdu7AbgeIC7
+X-Google-Smtp-Source: AGHT+IEXfc3N1ZI16wRWq13BpZo+ByZPJ7Mm8iWXe4JP9NepPrfWkfcdQ8IrIrN/6TID9n4Pw5Bi8A==
+X-Received: by 2002:a05:6a20:9785:b0:1a3:a99c:cd4d with SMTP id hx5-20020a056a20978500b001a3a99ccd4dmr926415pzc.48.1712307727470;
+        Fri, 05 Apr 2024 02:02:07 -0700 (PDT)
 Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
-        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.01.50
+        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.01.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 02:01:58 -0700 (PDT)
+        Fri, 05 Apr 2024 02:02:07 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -91,9 +91,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests RFC PATCH 06/17] shellcheck: Fix SC2155
-Date: Fri,  5 Apr 2024 19:00:38 +1000
-Message-ID: <20240405090052.375599-7-npiggin@gmail.com>
+Subject: [kvm-unit-tests RFC PATCH 07/17] shellcheck: Fix SC2235
+Date: Fri,  5 Apr 2024 19:00:39 +1000
+Message-ID: <20240405090052.375599-8-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240405090052.375599-1-npiggin@gmail.com>
 References: <20240405090052.375599-1-npiggin@gmail.com>
@@ -105,67 +105,39 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-  SC2155 (warning): Declare and assign separately to avoid masking
-  return values.
+  SC2235 (style): Use { ..; } instead of (..) to avoid subshell
+  overhead.
 
-No bug identified.
+No bug identified. Overhead is pretty irrelevant.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- scripts/arch-run.bash | 10 +++++++---
- scripts/runtime.bash  |  4 +++-
- 2 files changed, 10 insertions(+), 4 deletions(-)
+ scripts/arch-run.bash | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index f9d1fade9..ae4b06679 100644
+index ae4b06679..d1edd1d69 100644
 --- a/scripts/arch-run.bash
 +++ b/scripts/arch-run.bash
-@@ -411,7 +411,8 @@ initrd_cleanup ()
- {
- 	rm -f $KVM_UNIT_TESTS_ENV
- 	if [ "$KVM_UNIT_TESTS_ENV_OLD" ]; then
--		export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD"
-+		export KVM_UNIT_TESTS_ENV
-+		KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD"
- 	else
- 		unset KVM_UNIT_TESTS_ENV
- 	fi
-@@ -423,7 +424,8 @@ initrd_create ()
- 	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
- 		trap_exit_push 'initrd_cleanup'
- 		[ -f "$KVM_UNIT_TESTS_ENV" ] && export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
--		export KVM_UNIT_TESTS_ENV=$(mktemp)
-+		export KVM_UNIT_TESTS_ENV
-+		KVM_UNIT_TESTS_ENV=$(mktemp)
- 		env_params
- 		env_file
- 		env_errata || return $?
-@@ -566,7 +568,9 @@ env_generate_errata ()
+@@ -580,15 +580,15 @@ kvm_available ()
+ 		return 1
  
- trap_exit_push ()
- {
--	local old_exit=$(trap -p EXIT | sed "s/^[^']*'//;s/'[^']*$//")
-+	local old_exit
-+
-+	old_exit=$(trap -p EXIT | sed "s/^[^']*'//;s/'[^']*$//")
- 	trap -- "$1; $old_exit" EXIT
+ 	[ "$HOST" = "$ARCH_NAME" ] ||
+-		( [ "$HOST" = aarch64 ] && [ "$ARCH" = arm ] ) ||
+-		( [ "$HOST" = x86_64 ] && [ "$ARCH" = i386 ] )
++		{ [ "$HOST" = aarch64 ] && [ "$ARCH" = arm ] ; } ||
++		{ [ "$HOST" = x86_64 ] && [ "$ARCH" = i386 ] ; }
  }
  
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index f79c4e281..3b76aec9e 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -15,7 +15,9 @@ extract_summary()
- # We assume that QEMU is going to work if it tried to load the kernel
- premature_failure()
+ hvf_available ()
  {
--    local log="$(eval "$(get_cmdline _NO_FILE_4Uhere_)" 2>&1)"
-+    local log
-+
-+    log="$(eval "$(get_cmdline _NO_FILE_4Uhere_)" 2>&1)"
+ 	[ "$(sysctl -n kern.hv_support 2>/dev/null)" = "1" ] || return 1
+ 	[ "$HOST" = "$ARCH_NAME" ] ||
+-		( [ "$HOST" = x86_64 ] && [ "$ARCH" = i386 ] )
++		{ [ "$HOST" = x86_64 ] && [ "$ARCH" = i386 ] ; }
+ }
  
-     echo "$log" | grep "_NO_FILE_4Uhere_" |
-         grep -q -e "[Cc]ould not \(load\|open\) kernel" \
+ set_qemu_accelerator ()
 -- 
 2.43.0
 
