@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-13654-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13655-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048D68997FC
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 10:37:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B46038997FD
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 10:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 268E11C20ABF
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 08:37:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D435F1C20BB1
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 08:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37ADD15FCF0;
-	Fri,  5 Apr 2024 08:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC3A15FA75;
+	Fri,  5 Apr 2024 08:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PE5J8TxN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1Ui0l1I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22C215F31D
-	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 08:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3CC15F33A
+	for <kvm@vger.kernel.org>; Fri,  5 Apr 2024 08:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712306205; cv=none; b=cBQpnlcBWcjgWE3qeqgbqyRO/QX/MJ7sHtXZuUYl3b8KTUBjwbY+MsmDyclkgf39Tz13jsv5Aq1RnkIZN9nxl9JCW+Kgs+sQYU3zLJMV7dkN7MhKI28alZd8fhpWosggk3AIvCVLqav8yrTqG0ip1Met6fIfH35qRELvHJwn7C4=
+	t=1712306209; cv=none; b=cDzl3z8KFIMW1y6bVvNqAAeWS5aFpQB3xWep/trCzruZSZBOs6sEhNqlXqNdx2w6oPx9cfHbr3O2W0Pgz/t1c3kZ5E68qZ2/43TKKSjtFrscWDXQ8rB5cpBx6uieC2dH+vrEBNjOITHf6bCLtDGqcwWshuN831Y+2IpeFuf+gDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712306205; c=relaxed/simple;
-	bh=fkBnWlDkWkexGX+n8Zvl6vUvVV4mEQ9IwquZrWsGh5M=;
+	s=arc-20240116; t=1712306209; c=relaxed/simple;
+	bh=QDHxMP3WpHeaQiAKgRiGrezYU0WMSgdCA20vYkGNd7A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WzL34ht1y5oSEgvf7P9Ut6plyq7/juMVrkFeYECAodlBCOZQlBoNHn6KVHueaaooprwNp3SIFC9eOesORtVoSgqEgdJ8IylB+0prBKq5ptrDlet4doiH5ZHIITbi64piYpbaoyXDKqAeFOUA9nxUxvoYETiDdrPVOtTYntG/5rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PE5J8TxN; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=OKMGcSczlH41gaMRg1RmvV5ND8qwr/eZutEHB6jjSsyOS+Vi4FT/svS1cWO3tdXvI2yLqZFsvtTslFvarfmY5Qapr2cM70cndHYx0i/1sJbMu7VRYn3dlCcFsBYQXjbC+ZKfWs0sTiT2RbLlzBjTK7DilTMFthZwaewNXof3LV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1Ui0l1I; arc=none smtp.client-ip=209.85.210.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ecfeefe94cso299542b3a.0
-        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 01:36:43 -0700 (PDT)
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6e89bdd4e3fso1019039a34.0
+        for <kvm@vger.kernel.org>; Fri, 05 Apr 2024 01:36:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712306203; x=1712911003; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712306207; x=1712911007; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fQbx6UjediBeLlNcsWNM4lfZY/zhVIKWn4tLrrWPArY=;
-        b=PE5J8TxNluPaiYXzXiAvdsZ5HUJuavAmqiBFBV0IgWvsWWV6JvpWoriJpaHvaD6DpY
-         HkIF0690bgksO6+aFQnQxIxwuxci8RGnTnoTq6XURVSSqlAH6fFaXzDAwsM2kw7cfhTt
-         pDmSP1p4VSx2naorPFPDClGppeF4GxB4lo5ODsRk51qUnaH1lCN9zCdojQqBG4CET3g5
-         5aerFunenIOWFp+xKKZSCNeGMu5uyVTGnuc56W/CdJfXiTpCpe0E4Z7l1X9zwvQHT4PX
-         KHWMfCsRFCLC1uOoqX4zm8YAtI1dFIVjNaMoAvM60E4S+lkJG+pFyEKNd+I2DSg87WQJ
-         2jtA==
+        bh=CPh2KrH1pN0KnvIbdchGvxk45KM224D/ayF8HNf5mvs=;
+        b=e1Ui0l1IeJ3pwXnLfKKufXtly6A9Jw+Hwq2EVBYZ4QJCgZvGiN3sSNkVWpNxHEPLTH
+         L/6WmLqmbZVq/yMQp59BAu3mraL4taOcK51KOS2+NG4rzo2LlgvB6PBpTM6XPa/wYXwd
+         +Rhqty6Ht+TqU7La+5RzYs6BmZSjhkYbwrmMtZjLTPSY8X/doVy2L93uie1NY1RC/gm9
+         WGt3JaZ+gqaWdgN60+4bqLaislS5gBOiwPggfEFJd3iN+cUPpdG7aSzkXCMVPT9PhUX8
+         R/6/GVLVcrYG7gRqz/5Cjty5+uADwkn1/yiHV+9hIeH02J5xrEEgKFs5tBOxiDmCAYxq
+         o0kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712306203; x=1712911003;
+        d=1e100.net; s=20230601; t=1712306207; x=1712911007;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fQbx6UjediBeLlNcsWNM4lfZY/zhVIKWn4tLrrWPArY=;
-        b=hgD0bxtasmMrPV0kUAksXe3e4F1h449MCPZRnm/IQ3DFJOule88w/T4KZdPZdLkwrb
-         v0Vi0HygcmJkDclcEaEqxkiAmOw3Rzy5RgnlN23CIoWLb8sb6IQ3hv+hTgKT1qMhC//7
-         d8/pBzSMalNGv6Ky8YAya/6zjwwOXee9c0Xsnmc6vwLE+qVUX5BTtgOzaIOa7z/4E01A
-         AyucRIce4jn7Sbv+Kx/D638nHCfXreFmbMZx+rL6usXtJWkutNNiIEtOkv0/ZXUM2WzP
-         ucQILaA3vgaKCrHX7pvfJ7bZxc/aqmoPL9WzzhtFlRwDzOezKJCqqbHzcdf1LdbQkhjT
-         FyGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUzPnOtuYa4JMCbF+1Bdb6w4eNIS1Z9qiZI4lwqZYrVWdWdvuFPEe3gnWEGJUo+jIAsuJsWrYqw6mhosDI1sbQW1kbG
-X-Gm-Message-State: AOJu0Yy7krYWaHFVc+dsN0bfgndc7UZ4ajyZJhRzwhEBF6Dq6VBq6gBW
-	BzMIjfxupog5Z/3k/jXRR/jkGKISa469bUvXrT0FIhJyMuIrvnK0
-X-Google-Smtp-Source: AGHT+IFcw/uR74oa6sH/n17w8+m0KhHI45Aisa+Loe+RbZgjSwZ1p0b28ZKqppC36g1aKz8WPNG6rg==
-X-Received: by 2002:a05:6a20:9154:b0:1a7:23ae:4421 with SMTP id x20-20020a056a20915400b001a723ae4421mr2401241pzc.24.1712306203180;
-        Fri, 05 Apr 2024 01:36:43 -0700 (PDT)
+        bh=CPh2KrH1pN0KnvIbdchGvxk45KM224D/ayF8HNf5mvs=;
+        b=iragpdb0Hcg0gD2DHr95UEGCfnN95/lKFuzGn2Jl6BQpvo0QM+9TEylaKO4sDcPIh3
+         YSzNNTVJKFJS/8PacK7wwTq9n2L6XRy4Glbh0v0iK1ljdhe9XHF/ep22HiWHsQrdwdEz
+         aL93MQXeTOs2DFABUr3gXTemI3cwP52CGn8kAVX+sfqkCi8q35SLeElDHAg5B27qwbW2
+         f9pss57wzreHyuy426C9vbGT8cu651gM+CwE/jHydfRoKKGjooggYdC4VYzCqTWZOPga
+         Z2sHimvdkSZ26BLeDcZQTT9cDVwiqneISAKiRhHbtR6KVjberetDSRxHUQ3ZKwMNBLAu
+         tBaA==
+X-Forwarded-Encrypted: i=1; AJvYcCU70p3tTPGhO4/wgiYoVO9p7NIZGm0CF9mtkJpuHxnKN252l6kQqqCyKiA4L+rvv9/5Yfhgp3OPuC/EjGyNbM2lElLB
+X-Gm-Message-State: AOJu0YzDnJqi00Qootcpl1CYPyNUwhii4hvG2HhIY9S2IZVaaLxtDI7s
+	GgK586fbutnMoUetLh05j7VKsKDGX66tvXeQp8B2ZwJVf5/v/ob6
+X-Google-Smtp-Source: AGHT+IH9gewYhR3dPOmwrOod8u5lYCnhzL769heby6OhTBOHLGjReCvX+OFbriDPQRmb2zonSVKtKA==
+X-Received: by 2002:a9d:674b:0:b0:6e6:ce61:3ee3 with SMTP id w11-20020a9d674b000000b006e6ce613ee3mr737004otm.18.1712306207099;
+        Fri, 05 Apr 2024 01:36:47 -0700 (PDT)
 Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
-        by smtp.gmail.com with ESMTPSA id y7-20020a63de47000000b005e838b99c96sm808638pgi.80.2024.04.05.01.36.39
+        by smtp.gmail.com with ESMTPSA id y7-20020a63de47000000b005e838b99c96sm808638pgi.80.2024.04.05.01.36.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 01:36:42 -0700 (PDT)
+        Fri, 05 Apr 2024 01:36:46 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -75,9 +75,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v8 14/35] scripts: allow machine option to be specified in unittests.cfg
-Date: Fri,  5 Apr 2024 18:35:15 +1000
-Message-ID: <20240405083539.374995-15-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v8 15/35] scripts: Accommodate powerpc powernv machine differences
+Date: Fri,  5 Apr 2024 18:35:16 +1000
+Message-ID: <20240405083539.374995-16-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240405083539.374995-1-npiggin@gmail.com>
 References: <20240405083539.374995-1-npiggin@gmail.com>
@@ -89,124 +89,57 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This allows different machines with different requirements to be
-supported by run_tests.sh, similarly to how different accelerators
-are handled.
+The QEMU powerpc powernv machine has minor differences that must be
+accommodated for in output parsing:
+
+- Summary parsing must search more lines of output for the summary
+  line, to accommodate OPAL message on shutdown.
+- Premature failure testing must tolerate case differences in kernel
+  load error message.
 
 Acked-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- docs/unittests.txt   |  6 ++++++
- scripts/common.bash  |  8 ++++++--
- scripts/runtime.bash | 16 ++++++++++++----
- 3 files changed, 24 insertions(+), 6 deletions(-)
+ powerpc/unittests.cfg | 1 +
+ scripts/runtime.bash  | 6 ++++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/docs/unittests.txt b/docs/unittests.txt
-index 53e02077c..5b184723c 100644
---- a/docs/unittests.txt
-+++ b/docs/unittests.txt
-@@ -42,6 +42,12 @@ For <arch>/ directories that support multiple architectures, this restricts
- the test to the specified arch. By default, the test will run on any
- architecture.
+diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
+index 432c81d58..4929e71a1 100644
+--- a/powerpc/unittests.cfg
++++ b/powerpc/unittests.cfg
+@@ -4,6 +4,7 @@
+ # powerpc specifics:
+ #
+ # file = <name>.elf             # powerpc uses .elf files
++# machine = pseries|powernv
+ ##############################################################################
  
-+machine
-+-------
-+For those architectures that support multiple machine types, this allows
-+machine-specific tests to be created. By default, the test will run on
-+any machine type.
-+
- smp
- ---
- smp = <number>
-diff --git a/scripts/common.bash b/scripts/common.bash
-index b9413d683..ee1dd8659 100644
---- a/scripts/common.bash
-+++ b/scripts/common.bash
-@@ -10,6 +10,7 @@ function for_each_unittest()
- 	local opts
- 	local groups
- 	local arch
-+	local machine
- 	local check
- 	local accel
- 	local timeout
-@@ -21,7 +22,7 @@ function for_each_unittest()
- 		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
- 			rematch=${BASH_REMATCH[1]}
- 			if [ -n "${testname}" ]; then
--				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-+				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
- 			fi
- 			testname=$rematch
- 			smp=1
-@@ -29,6 +30,7 @@ function for_each_unittest()
- 			opts=""
- 			groups=""
- 			arch=""
-+			machine=""
- 			check=""
- 			accel=""
- 			timeout=""
-@@ -58,6 +60,8 @@ function for_each_unittest()
- 			groups=${BASH_REMATCH[1]}
- 		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
- 			arch=${BASH_REMATCH[1]}
-+		elif [[ $line =~ ^machine\ *=\ *(.*)$ ]]; then
-+			machine=${BASH_REMATCH[1]}
- 		elif [[ $line =~ ^check\ *=\ *(.*)$ ]]; then
- 			check=${BASH_REMATCH[1]}
- 		elif [[ $line =~ ^accel\ *=\ *(.*)$ ]]; then
-@@ -67,7 +71,7 @@ function for_each_unittest()
- 		fi
- 	done
- 	if [ -n "${testname}" ]; then
--		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-+		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
- 	fi
- 	exec {fd}<&-
- }
+ #
 diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 255e756f2..a66940ead 100644
+index a66940ead..e4ad1962f 100644
 --- a/scripts/runtime.bash
 +++ b/scripts/runtime.bash
-@@ -30,7 +30,7 @@ premature_failure()
- get_cmdline()
+@@ -9,7 +9,7 @@ FAIL() { echo -ne "\e[31mFAIL\e[0m"; }
+ extract_summary()
  {
-     local kernel=$1
--    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
-+    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
+     local cr=$'\r'
+-    tail -3 | grep '^SUMMARY: ' | sed 's/^SUMMARY: /(/;s/'"$cr"'\{0,1\}$/)/'
++    tail -5 | grep '^SUMMARY: ' | sed 's/^SUMMARY: /(/;s/'"$cr"'\{0,1\}$/)/'
  }
  
- skip_nodefault()
-@@ -78,9 +78,10 @@ function run()
-     local kernel="$4"
-     local opts="$5"
-     local arch="$6"
--    local check="${CHECK:-$7}"
--    local accel="$8"
--    local timeout="${9:-$TIMEOUT}" # unittests.cfg overrides the default
-+    local machine="$7"
-+    local check="${CHECK:-$8}"
-+    local accel="$9"
-+    local timeout="${10:-$TIMEOUT}" # unittests.cfg overrides the default
+ # We assume that QEMU is going to work if it tried to load the kernel
+@@ -18,7 +18,9 @@ premature_failure()
+     local log="$(eval "$(get_cmdline _NO_FILE_4Uhere_)" 2>&1)"
  
-     if [ "${CONFIG_EFI}" == "y" ]; then
-         kernel=${kernel/%.flat/.efi}
-@@ -114,6 +115,13 @@ function run()
-         return 2
-     fi
+     echo "$log" | grep "_NO_FILE_4Uhere_" |
+-        grep -q -e "could not \(load\|open\) kernel" -e "error loading" -e "failed to load" &&
++        grep -q -e "[Cc]ould not \(load\|open\) kernel" \
++                -e "error loading" \
++                -e "failed to load" &&
+         return 1
  
-+    if [ -n "$machine" ] && [ -n "$MACHINE" ] && [ "$machine" != "$MACHINE" ]; then
-+        print_result "SKIP" $testname "" "$machine only"
-+        return 2
-+    elif [ -n "$MACHINE" ]; then
-+        machine="$MACHINE"
-+    fi
-+
-     if [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" ]; then
-         print_result "SKIP" $testname "" "$accel only, but ACCEL=$ACCEL"
-         return 2
+     RUNTIME_log_stderr <<< "$log"
 -- 
 2.43.0
 
