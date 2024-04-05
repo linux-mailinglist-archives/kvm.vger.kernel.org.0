@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-13755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13756-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4136589A728
-	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 00:27:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 139B889A729
+	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 00:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 726C91C21D6A
-	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 22:27:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74592283D2C
+	for <lists+kvm@lfdr.de>; Fri,  5 Apr 2024 22:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACBAC1779BD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB03F178CCB;
 	Fri,  5 Apr 2024 22:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Obop4Ugm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PLtPgPC9"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229B1175571;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A235175578;
 	Fri,  5 Apr 2024 22:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712356010; cv=none; b=C70Bm2wHgJPChmxKm7yKsRh10FXooRisMGSWiV6XHm4A6jZNRL6FJXkqPJKfQrKV77vJM5/eEetU1TYChpUs9l2AIiTt1xJk+K5N9EB6WAQqLixiNfh2+cbj6wT5AXPDluhvCI+Ik/hbgwe/QlBKH5uDeIZYwu5zmuxmrEtnVFY=
+	t=1712356010; cv=none; b=D/HSW2cA+l1IzzLOORvSsqLyuf3cONF/rifnm/ufymF2sKkAngVr2tHyWNNsm/BMEyuUGZH+f1txkM7O+7vQ2cwpOa+VIJedfOGb7ZfyNQBq/0ukEXEaRZgY7KuOuzZFIpg3Nz8cxya88gyUAgFB/PaJ7AM3G/32r1h7EGj8vCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712356010; c=relaxed/simple;
-	bh=Okro4Kem0N9Ie4cgbPOty9xrwMq2Uzf6Zhnd6S3vbE4=;
+	bh=BpLqiaNgpSDbcOwdg5E2m/UG/ZOHZCK4TD1uJoCRw+g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qvu09/oPyU5TfpzqSqDjGcsT3oQ8LqRjWmwBO+9QIn7+xE9o1SNLX0kEZmhbV0G5ntRXqbUgDyg7A/jtXQFN4kfkFEoVxTq+kA7xk5JIjS6p56Keai9DwTgDhJrwlTQFSBYT4RSmluKGwjjfZ9DSMy/onkyxl4+VMtaUznGGLxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Obop4Ugm; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=QSIAbDk0yNf/J4qT9eoL6ETFdp9pnLscW34kK/H+TnuILT+D6mTxwZVQkecWGsydauHsDNmBj5PsJQhTU9afBPIVbX7RjLYnSXHUwMON3MvFqlSMK+d9TsM0wY/1gktE5FHEKlmYV+PcXo/VUG5+dPJGrs2QuDjkGJZtE10Z5To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PLtPgPC9; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712356009; x=1743892009;
+  t=1712356010; x=1743892010;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Okro4Kem0N9Ie4cgbPOty9xrwMq2Uzf6Zhnd6S3vbE4=;
-  b=Obop4UgmoyuCCkt9SxoQAgSnEiP80nVl2lGiOn55W4uJkVD6cqTiLLvo
-   Qd1bwYwhiX8zaWeezOIbUjDK71HzEOSwB2rRc3iP7PPPIKEAWPz7CGDMn
-   ICxWn+91TK+bl/igKwuPiFEhBcOql3Fce4Ypi5XWpKmHOijv47IwIPAM8
-   SfCAPS4R2wRwlk4+PLPP1gz9cPkZf5DrT9ycoa9n453yGrLG/zy+hixYD
-   jjCR4EGISJ8sP/y0zDXEzzUfGZC/C1ZaBuBI6o/gw8ti8Wrn+LZkBWkEO
-   Lz/ZNgLh3917mq6QTgr7nDq998zP/JMO8F06UK7CQMcDpbsYJ2HT2JNJ9
-   A==;
-X-CSE-ConnectionGUID: l6Pnn+JBTlS6bBEc2rPKdw==
-X-CSE-MsgGUID: gdWwNhilRsev0DBlM/2O7w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="19062702"
+  bh=BpLqiaNgpSDbcOwdg5E2m/UG/ZOHZCK4TD1uJoCRw+g=;
+  b=PLtPgPC9xIaiu1DdRgTXdhhZ11NBGsjO79wcZPY64j3DOuCSRUYN/NIT
+   8T8xg6B8+Ul4ZZ09g4ud9lsHMui8Dux3ETYo1FK52+z6CxmNoajrmvAa6
+   0olbukhECKM++n2pyWztdLRQvL130GxgozQlU3AJnzsjQSo+o0x3pMaeL
+   7AAlD+Xlfv1QYoFOCfMy0p9v309Tn/UwdJw/PQzI7CB6JsmaRikUFiYLf
+   DV1br842rvviPJkRLJntQz1htRYTnsguPWSyD4qrsiaMjp9OM9Us5kCsB
+   uF6rQNeVkso5PtIpnZlYboa+HwpJHotm1i2ZsFyaamisdGujV97NcuNS6
+   Q==;
+X-CSE-ConnectionGUID: nXNelvspQQKeNW7KQz3CPg==
+X-CSE-MsgGUID: PiFS6lxMRqWHzCS1C7FLnw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="19062717"
 X-IronPort-AV: E=Sophos;i="6.07,182,1708416000"; 
-   d="scan'208";a="19062702"
+   d="scan'208";a="19062717"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
   by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 15:26:47 -0700
-X-CSE-ConnectionGUID: 1HXxumqzT42vJ5sjlMnWsg==
-X-CSE-MsgGUID: zUxrBdZ5ReSw612yNtf9Fg==
+X-CSE-ConnectionGUID: 13qTgNPtQAOkBjpU3IPkgQ==
+X-CSE-MsgGUID: mpnrgrsBTUWcfeColep1OQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,182,1708416000"; 
-   d="scan'208";a="23928314"
+   d="scan'208";a="23928317"
 Received: from jacob-builder.jf.intel.com ([10.54.39.125])
   by fmviesa004.fm.intel.com with ESMTP; 05 Apr 2024 15:26:46 -0700
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -85,9 +85,9 @@ Cc: Paul Luse <paul.e.luse@intel.com>,
 	guang.zeng@intel.com,
 	robert.hoo.linux@gmail.com,
 	Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: [PATCH v2 03/13] x86/irq: Remove bitfields in posted interrupt descriptor
-Date: Fri,  5 Apr 2024 15:31:00 -0700
-Message-Id: <20240405223110.1609888-4-jacob.jun.pan@linux.intel.com>
+Subject: [PATCH v2 04/13] x86/irq: Add a Kconfig option for posted MSI
+Date: Fri,  5 Apr 2024 15:31:01 -0700
+Message-Id: <20240405223110.1609888-5-jacob.jun.pan@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
 References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
@@ -99,81 +99,39 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Mixture of bitfields and types is weird and really not intuitive, remove
-bitfields and use typed data exclusively.
+This option will be used to support delivering MSIs as posted
+interrupts. Interrupt remapping is required.
 
-Link: https://lore.kernel.org/all/20240404101735.402feec8@jacob-builder/T/#mf66e34a82a48f4d8e2926b5581eff59a122de53a
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 
 ---
-v2:
-	- Replace bitfields, no more mix.
+v2: Remove x2apic dependency
 ---
- arch/x86/include/asm/posted_intr.h | 10 +---------
- arch/x86/kvm/vmx/posted_intr.c     |  4 ++--
- arch/x86/kvm/vmx/vmx.c             |  2 +-
- 3 files changed, 4 insertions(+), 12 deletions(-)
+ arch/x86/Kconfig | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/x86/include/asm/posted_intr.h b/arch/x86/include/asm/posted_intr.h
-index acf237b2882e..c682c41d4e44 100644
---- a/arch/x86/include/asm/posted_intr.h
-+++ b/arch/x86/include/asm/posted_intr.h
-@@ -15,17 +15,9 @@ struct pi_desc {
- 	};
- 	union {
- 		struct {
--				/* bit 256 - Outstanding Notification */
--			u16	on	: 1,
--				/* bit 257 - Suppress Notification */
--				sn	: 1,
--				/* bit 271:258 - Reserved */
--				rsvd_1	: 14;
--				/* bit 279:272 - Notification Vector */
-+			u16	notif_ctrl; /* Suppress and outstanding bits */
- 			u8	nv;
--				/* bit 287:280 - Reserved */
- 			u8	rsvd_2;
--				/* bit 319:288 - Notification Destination */
- 			u32	ndst;
- 		};
- 		u64 control;
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index af662312fd07..592dbb765675 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -107,7 +107,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 		 * handle task migration (@cpu != vcpu->cpu).
- 		 */
- 		new.ndst = dest;
--		new.sn = 0;
-+		new.notif_ctrl &= ~POSTED_INTR_SN;
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 39886bab943a..f5688f4e299b 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -464,6 +464,17 @@ config X86_X2APIC
  
- 		/*
- 		 * Restore the notification vector; in the blocking case, the
-@@ -157,7 +157,7 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
- 	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+ 	  If you don't know what to do here, say N.
  
--	WARN(pi_desc->sn, "PI descriptor SN field set before blocking");
-+	WARN(pi_desc->notif_ctrl & POSTED_INTR_SN, "PI descriptor SN field set before blocking");
- 
- 	old.control = READ_ONCE(pi_desc->control);
- 	do {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d94bb069bac9..50580bbfba5d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4843,7 +4843,7 @@ static void __vmx_vcpu_reset(struct kvm_vcpu *vcpu)
- 	 * or POSTED_INTR_WAKEUP_VECTOR.
- 	 */
- 	vmx->pi_desc.nv = POSTED_INTR_VECTOR;
--	vmx->pi_desc.sn = 1;
-+	vmx->pi_desc.notif_ctrl |= POSTED_INTR_SN;
- }
- 
- static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
++config X86_POSTED_MSI
++	bool "Enable MSI and MSI-x delivery by posted interrupts"
++	depends on X86_64 && IRQ_REMAP
++	help
++	  This enables MSIs that are under interrupt remapping to be delivered as
++	  posted interrupts to the host kernel. Interrupt throughput can
++	  potentially be improved by coalescing CPU notifications during high
++	  frequency bursts.
++
++	  If you don't know what to do here, say N.
++
+ config X86_MPPARSE
+ 	bool "Enable MPS table" if ACPI
+ 	default y
 -- 
 2.25.1
 
