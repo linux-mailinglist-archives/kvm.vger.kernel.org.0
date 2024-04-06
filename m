@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-13801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13802-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13BF489AAD6
-	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 14:39:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3CF89AAD8
+	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 14:39:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A909C1F219E6
-	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 12:39:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E41C2821C5
+	for <lists+kvm@lfdr.de>; Sat,  6 Apr 2024 12:39:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA342869B;
-	Sat,  6 Apr 2024 12:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1EB2E83F;
+	Sat,  6 Apr 2024 12:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZwRTw6rg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FO/3bm5c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F3A2AD02;
-	Sat,  6 Apr 2024 12:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAF52CCA0;
+	Sat,  6 Apr 2024 12:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712407168; cv=none; b=uIKv+H8+3C0LhXpubKo82yBxUYQqoWP4psAWEXbDxIzT0e1thCXY0V9JXEPcHPca/h4NsNL1sJv5nvBlTtMnX3USxHTfRqzG5Juhc7sHMDEJQLxN/mwtQCnT1Eqq/qNkv/mXhR9SEyOdhCOgrZLa6sy+E0JJHocOm+mkgev+fOY=
+	t=1712407177; cv=none; b=pMRrKKnEXtLhEAXZFKNBP7GbNgrmDsAnKEo7VwBPusyDv6QyZUHud1SYIIgcXBPTPsk+/gNCfwJlgPzM2OkU6k+BvW6Czjure5zcxZhLYz7mTp6zmYNeCBbzfZR4IpDupRMCVddqbQUB+MhUJ1KFHEwkBlKtpkjxZBbuVtHf4JQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712407168; c=relaxed/simple;
-	bh=f797ca6qmLUHud4LT+RvBvCcJQO+xBNS9IZWMtZ/PRI=;
+	s=arc-20240116; t=1712407177; c=relaxed/simple;
+	bh=U34po4updKQxQ4IZ87lCoa6hfZpy0R9FdoTvDox5LYE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VQNMh7Bh1OVtiLKbK69qhiA2hMp7u+ofht52KZw9YcMJbIqrzXXR38vNZQxOH1xJw38awv9cwoBbhkBwudOyNInU3wFl2/pNAHuhQSmIU0a+U0ZiR7M7ufoMCe8u/PLA8Cbhs734jtjHfM3ZLzf8R0XcMGXqHXpckwl18BjTSh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZwRTw6rg; arc=none smtp.client-ip=209.85.216.42
+	 MIME-Version; b=OqRjrAhDvQTJFBD8q03d1Ae+GrEWPvZeE196dRVNbzg4DfynZxn1ddUgBYD9s+B9Om7jH3TPw5MHvKqMu0jfqLP7W8KIEkhRU/6EQOs/Gt/IakYhykP5UsHabslWN4xbuq7Fg6TcO9BlKG1rwUce0rR64iuqQ4NLVHEd2N3F1QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FO/3bm5c; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-29ddfada0d0so2184241a91.3;
-        Sat, 06 Apr 2024 05:39:27 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2a2d0ca3c92so1953750a91.0;
+        Sat, 06 Apr 2024 05:39:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712407167; x=1713011967; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712407176; x=1713011976; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sB3ENgv8+Bm1tRLghaKazWKQeuX0gBEHcWKY2qfgh1Q=;
-        b=ZwRTw6rgHQSCalaQkOgIVJBaOwaDkJ/omrQmWfDWY4w51uYTVWwdtBsZoqmXT+EWiX
-         9Askl+gjSx4L/F0bZ+eMUSyCx0MwiRL/eB4l8xiS3XjA+718CkzJLnlq00G7Cg71EqXO
-         unU5WQZbSzAaRPeg+DuO/G2AckebEJ1/TgsSzIym2mAkaUq4Lh7xHvjDRM6NKzGOmORp
-         4/pwJ1tdlXJQL5qafg+fQIZO/VMnW3J9/k73xEYFbWElSznd0XsGp8VTgZuOjE6M9fTd
-         VYp05FyhqBNXobvv0IEdcxQ65tAW4SuS7MjqGU78/yyQD6FRMXIK1JcEIB1lqmaOGlZ8
-         hdSw==
+        bh=ctDYQgLStioQbOFeEtouOSGyQc9IUR3PlFjjsp3HZ2Q=;
+        b=FO/3bm5cPkuK/E6zTkpusOFcK2M4afGynmm5iQwFvZFYUi0SGondG5JeR0MqOrMi8e
+         Mi0190QWllAf6e9At5vuch0SmhdnoiXoO/eBy2ZeNglwvUYaSfxrIjevlZJv5lF+hLp7
+         BOpn/8NBNRyOeIIHvuPD9fKCH4dqi7K055aERXamRUszg7Ys/ztsvwdWiaDMxtcxa/0O
+         QtkOlMzEIjLveV5gGpEanzRBSYnjtlpjsuCU+77W8z9Pf99gYCP1/muNhWCxdlVCP1PT
+         E85wxUIHNbXZOrOXvd8lPCIcgH/6wHvL4tcad2Dv0w/gAxH6lKhS3rwEdsAixHL3ajbu
+         dzOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712407167; x=1713011967;
+        d=1e100.net; s=20230601; t=1712407176; x=1713011976;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sB3ENgv8+Bm1tRLghaKazWKQeuX0gBEHcWKY2qfgh1Q=;
-        b=w+py6tiugN8esPZbIdt71CyQPJF5Iy4hflPJoSZD/SOuOXYeHNnfMblnJfW0bCiG4D
-         SSy3NKkI+qM8RhVM8ApsWiXWIoXNNAay9m7mH/IX1QZd5HjDR1zdg26oDhpTrIj6YvQb
-         HmQVvTK/YOS3ez/xbkEZnl5LENHfombkYa882X4oKZaziSz6ETl7f4ZeVSCMcWwGGMc1
-         5j/8aT2mFEIG5Yk88BPwpYQ4B6i1cNDELuQykaDmIkcGoqcSArd2nr7K8ZvuW0yRX6zh
-         i4rRkAce2hKMMvz9P25j0P3bT2AnXnKsHDwHKfIAxw40iL2Bzeiho9WbGg/L6IMckhPD
-         vwYg==
-X-Forwarded-Encrypted: i=1; AJvYcCWblGhOsiefCXqfkd4IEaWLnrQzJK/pb0IfkrZYgegKNc+MXJij9S1T3dji15KvUHx+5Akq1ZC8ttzE1b1VimYKWRINollwQCyQ15djI9maIXqVXkMMtAxDHK2l/aL1KQ==
-X-Gm-Message-State: AOJu0YxmsGo7g9mrSakshxnGCXJc0s8gq4smTQYDOkbvjoeqTntsRJAC
-	LnHJfUL2vC6jilwUnmbx6iaoqZtG+pFs1Xhpkp6dhvXrHg+oMWoW
-X-Google-Smtp-Source: AGHT+IFsGkW61gbRnUwX+F4+qiUlZL7gQ1ZtjFZ3/rMtUrfy5XWV8+BO9FE9c5M3Fd0JMQ+twYXJKQ==
-X-Received: by 2002:a17:90a:1fc9:b0:2a2:1900:493 with SMTP id z9-20020a17090a1fc900b002a219000493mr3185800pjz.40.1712407167008;
-        Sat, 06 Apr 2024 05:39:27 -0700 (PDT)
+        bh=ctDYQgLStioQbOFeEtouOSGyQc9IUR3PlFjjsp3HZ2Q=;
+        b=TVDKIFwwMwsxo7z0+XeifrTwE3GvnvVUwugcpf4koKIGuNT2C7AHF/2xVGVS0ODxat
+         bKcrlBp2ywJtr+oXeIq0N6S4lVw1F8Z3xqxo7G4LuDDd8uPw3DcXt5kXuLiSF3NXvrMU
+         NkDMKWwa03G/KUlxl4EjlLi1mYKnslTn/iP5lGWXc+GptAKDfl6sC3JY4aTId9THapOZ
+         wJ21YlXLq/IpSi47f4UbNrlLAsLMr7x4+Ot7KwTvz9HXAsD61evA1bSYd/b6s77ZkT3W
+         m4lDukN4Vx51Qc9qe9pP4B4rN95q7/Ei9SM/1YNA+Tqyo8wb+cfn7prvCEgbjiFbiyQr
+         jQXA==
+X-Forwarded-Encrypted: i=1; AJvYcCXy5N9vtQiowFS5Y0xoTWIOMPOx0+U/MLYcDQIqg62yA+oc35uepaXKWb0xIv92E6eaxGDA68jRWvtLWhABWNdEVMyqC09zCUjvZjTD2JOTVndjfevJCmqTWMxjzizXtg==
+X-Gm-Message-State: AOJu0YxA6pebu5Dd6UVafGnGcNmGAU+EmAJQA2hnc950PJCD9o2+TN5c
+	8IDepTP3sdWiR10EEsUGdqXTb+4twvB2uzBpeBy+63ceIwbwd9U4
+X-Google-Smtp-Source: AGHT+IFubLHuw+tn9P2k0qkE0L7n1y54S4hs/qXXktspKqdJ/DtIjqspW0ZznPjBc8pACbaNSoegBA==
+X-Received: by 2002:a17:90a:1109:b0:2a3:846:6a45 with SMTP id d9-20020a17090a110900b002a308466a45mr6611290pja.5.1712407175820;
+        Sat, 06 Apr 2024 05:39:35 -0700 (PDT)
 Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
-        by smtp.gmail.com with ESMTPSA id nt5-20020a17090b248500b002a279a86e7asm5050576pjb.7.2024.04.06.05.39.18
+        by smtp.gmail.com with ESMTPSA id nt5-20020a17090b248500b002a279a86e7asm5050576pjb.7.2024.04.06.05.39.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Apr 2024 05:39:26 -0700 (PDT)
+        Sat, 06 Apr 2024 05:39:35 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -90,9 +90,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org
-Subject: [RFC kvm-unit-tests PATCH v2 04/14] shellcheck: Fix SC2094
-Date: Sat,  6 Apr 2024 22:38:13 +1000
-Message-ID: <20240406123833.406488-5-npiggin@gmail.com>
+Subject: [RFC kvm-unit-tests PATCH v2 05/14] shellcheck: Fix SC2006
+Date: Sat,  6 Apr 2024 22:38:14 +1000
+Message-ID: <20240406123833.406488-6-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240406123833.406488-1-npiggin@gmail.com>
 References: <20240406123833.406488-1-npiggin@gmail.com>
@@ -104,42 +104,57 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-  SC2094 (info): Make sure not to read and write the same file in the same
-  pipeline.
+  SC2006 (style): Use $(...) notation instead of legacy backticks `...`.
 
-This is not as clearly bad as overwriting an input file with >, but
-could appended characters possibly be read in from the input
-redirection?
+No bug identified.
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- scripts/arch-run.bash | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ scripts/arch-run.bash | 6 +++---
+ scripts/runtime.bash  | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 1901a929f..472c31b08 100644
+index 472c31b08..f9d1fade9 100644
 --- a/scripts/arch-run.bash
 +++ b/scripts/arch-run.bash
-@@ -492,6 +492,8 @@ env_file ()
+@@ -271,16 +271,16 @@ do_migration ()
+ 	qmp ${src_qmp} '"migrate", "arguments": { "uri": "unix:'${dst_incoming}'" }' > ${src_qmpout}
  
- env_errata ()
- {
-+	local new_env
-+
- 	if [ "$ACCEL" = "tcg" ]; then
- 		export "ERRATA_FORCE=y"
- 	elif [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
-@@ -500,7 +502,8 @@ env_errata ()
- 	elif [ "$ERRATATXT" ]; then
- 		env_generate_errata
- 	fi
--	sort <(env | grep '^ERRATA_') <(grep '^ERRATA_' $KVM_UNIT_TESTS_ENV) | uniq -u >>$KVM_UNIT_TESTS_ENV
-+	new_env=$(sort <(env | grep '^ERRATA_') <(grep '^ERRATA_' $KVM_UNIT_TESTS_ENV) | uniq -u)
-+	echo "$new_env" >>$KVM_UNIT_TESTS_ENV
+ 	# Wait for the migration to complete
+-	migstatus=`qmp ${src_qmp} '"query-migrate"' | grep return`
++	migstatus=$(qmp ${src_qmp} '"query-migrate"' | grep return)
+ 	while ! grep -q '"completed"' <<<"$migstatus" ; do
+ 		sleep 0.1
+-		if ! migstatus=`qmp ${src_qmp} '"query-migrate"'`; then
++		if ! migstatus=$(qmp ${src_qmp} '"query-migrate"'); then
+ 			echo "ERROR: Querying migration state failed." >&2
+ 			echo > ${dst_infifo}
+ 			qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
+ 			return 2
+ 		fi
+-		migstatus=`grep return <<<"$migstatus"`
++		migstatus=$(grep return <<<"$migstatus")
+ 		if grep -q '"failed"' <<<"$migstatus"; then
+ 			echo "ERROR: Migration failed." >&2
+ 			echo > ${dst_infifo}
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index 2d7ff5baa..f79c4e281 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -61,9 +61,9 @@ function print_result()
+     local reason="$4"
+ 
+     if [ -z "$reason" ]; then
+-        echo "`$status` $testname $summary"
++        echo "$($status) $testname $summary"
+     else
+-        echo "`$status` $testname ($reason)"
++        echo "$($status) $testname ($reason)"
+     fi
  }
  
- env_generate_errata ()
 -- 
 2.43.0
 
