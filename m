@@ -1,119 +1,280 @@
-Return-Path: <kvm+bounces-13817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D4E089AE13
-	for <lists+kvm@lfdr.de>; Sun,  7 Apr 2024 04:33:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A2589AE1C
+	for <lists+kvm@lfdr.de>; Sun,  7 Apr 2024 04:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 142AC1F21EE4
-	for <lists+kvm@lfdr.de>; Sun,  7 Apr 2024 02:33:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E4F1B225C5
+	for <lists+kvm@lfdr.de>; Sun,  7 Apr 2024 02:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056F03D62;
-	Sun,  7 Apr 2024 02:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1DC23B0;
+	Sun,  7 Apr 2024 02:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRnwqjXX"
 X-Original-To: kvm@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324AE368;
-	Sun,  7 Apr 2024 02:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0415EA935;
+	Sun,  7 Apr 2024 02:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712457225; cv=none; b=eSVQWw+cs5IDo7yYHQW9GsFfQJ7LzXF17CvQgV/LfrZS3bP/H8QhUdPpnchl8RiHJEuJUQkAjiwaQcZtrayc6kBevfQvAL+ZBJOuEfrOsHoZ2VHPjzixFbPL5fNOLoVTCJswyTZauTSCnalfrLFdP6c/K5hC7zivFxtIwh2GrIM=
+	t=1712457669; cv=none; b=N4S8gq8YwJl2QzCDXQmR2KDWDknJWzcGp2GvIFTD8OUArjNWo5Z5lrpZInS5usbDluFQ3QwAOhV87pJRWcmLric0lZyR6QBEFNJM32QGgyMX192eoWHmfEt5We3aqdVmjh4e4iYdOGOEplIls8k59bijNJLtLafuT4cF6qqjT0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712457225; c=relaxed/simple;
-	bh=vvc00YemBHkBGmzAmPgwXj7gzhMI2fSH6tZO1sA3vQ4=;
-	h=Date:From:To:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=Z/LmBltDCQTOElBsuCk8P0Gv3Ds4XLZKkuL7aO29iBxWji4Uo1Is/yUX5sMMRQEq8+hM8VsXv+5jV6TmSscplWFrxnvp+tN3PhiR75SpzY397wDUY3IUqqAmFd2NxZ2s9T5nF0otQ7zuf9zCN58atZn1ADBfr00ajaL+fv+kKSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from liangshenlin$eswincomputing.com ( [10.12.96.90] ) by
- ajax-webmail-app2 (Coremail) ; Sun, 7 Apr 2024 10:31:34 +0800 (GMT+08:00)
-Date: Sun, 7 Apr 2024 10:31:34 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Shenlin Liang" <liangshenlin@eswincomputing.com>
-To: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, peterz@infradead.org, mingo@redhat.com, 
-	acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, 
-	alexander.shishkin@linux.intel.com, jolsa@kernel.org, 
-	irogers@google.com, adrian.hunter@intel.com, 
-	linux-perf-users@vger.kernel.org, 
-	"Shenlin Liang" <liangshenlin@eswincomputing.com>
-Subject: Re: [PATCH 0/2] perf kvm: Add kvm stat support on riscv
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT6.0.3 build 20220420(169d3f8c)
- Copyright (c) 2002-2024 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <20240328031220.1287-1-liangshenlin@eswincomputing.com>
-References: <20240328031220.1287-1-liangshenlin@eswincomputing.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1712457669; c=relaxed/simple;
+	bh=jE8wYV7ClylQm1BWuzREFYyBRBC/QLEWOZoJ5AuIi5c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SwHGC6Rj/sk8PKVCJPNkm6Fs1KlOROZH+V4JW1i7Xz3E4FOhSiCdxdIjDnluQ01dmDrTcKj+8xfqs/rZ2009vuKlEyII9VpANFeaoC1GeFy1PtCBWiEDvOnfHpIuNYcIyPCszDsZEDDmQha/FiEcBSrzgr4+u70iEvyYH5k9FSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fRnwqjXX; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-516d47ce662so3050071e87.1;
+        Sat, 06 Apr 2024 19:41:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712457666; x=1713062466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=svi7IG4j1NCRd7Qsuibjxz4QatOdbrOlqhYRp4ynUhA=;
+        b=fRnwqjXX9bBprzYPn4eqjndNI88CTqWYjLBipZ2c87woM1vBOpGDFiubr2BrPT7JwO
+         Hq3p1obCTou4ee+ri6ho6rhYoyb8WpBpcVEFxcFUIbkBQSWTpzmOw7IvzBEG2BQYymuK
+         9Ab9goZGU1cG6w626tPvVVi87lcbsC9MS++C/qd9sEwDy6Tf0EbXi2WR0wz68r9V0zoE
+         A6bOzvmidJsmY+/XpYUcChJkrbxAvVGE+TAJakZ1lvPhwxmmQ/G/eiXaMMj7ma5xBdTi
+         5mOxGoCTIesbwvzRFdG8ahAbu0pvxWsmi88jrVDIHOhix54qB4EMbPQd7fg5nu4Qebhq
+         RKrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712457666; x=1713062466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=svi7IG4j1NCRd7Qsuibjxz4QatOdbrOlqhYRp4ynUhA=;
+        b=ey+PFsEzZnKdjRaTa4pUxI4Ye435rCqQ3hUodLK55AeeXX3d45Rt0E3yJTC5gTO6a3
+         SETsu5DeYHlVG/61m651WLgLSSjsov34/tHMVLIfAP940h5DtiqACvzCh71Vah3giShe
+         CTAbADHfElq+wnNfL/GeopN9pou0TvmbZPJr55lRXIz04wTIg/fn2w6kMAFMxPxU550E
+         L+QGtM0RxNAngSnwjFO8dCBkavlUvmC3tYTxWGWFZ022RaKg32rmShMlSUbNWso+dyIv
+         rLF1SHLi8B0QQvMkf/kB18+EUPpN1psMqy17Upk7QOOuNz4cDrsqZx/IgN3yKNXkGEd8
+         PNbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8FXPXzAIGMnuPyxp/1FUNjwNilmjwdbFGbXukVQWdrJzEAeEYb0kJ1mKI6iP9tSQLnmIqrgrFAf6L7Yp99HkxJylqBtYn8AoPK6B1YYKKcrat7u9dQRHypOD+yLNNqFD3Agbhy4AP9ASCU6vuMSGT6vz+TOyub0A237oA0wlJgtm4
+X-Gm-Message-State: AOJu0YxnijzEDXMbX5Gh/7U6q/pqOMNMPm45wyED5odbKpBcOEQyRO3n
+	Dy52n8Wo0BsfWOBxWJ2DMWIzmvTvu6nzJ4L0f9ZcUrZA0w5Dy0NlN58t14rKpPEfq45++oZPhCK
+	dfr+QtXqHRkK3p4a/riQ4+iWX31o=
+X-Google-Smtp-Source: AGHT+IGWhN1NiFvJL3wo1zaH/XA3X0sToWCJylJisJevqvEm+O++z85W13bqOe6L/e+DrbufZDhUvIpgKc3pOrd4vSU=
+X-Received: by 2002:ac2:5612:0:b0:513:ebb5:d9b0 with SMTP id
+ v18-20020ac25612000000b00513ebb5d9b0mr4104722lfd.52.1712457665721; Sat, 06
+ Apr 2024 19:41:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <71d045ed.2258.18eb6659685.Coremail.liangshenlin@eswincomputing.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:TQJkCgBHWbuGBRJmHT0FAA--.2754W
-X-CM-SenderInfo: xold0whvkh0z1lq6v25zlqu0xpsx3x1qjou0bp/1tbiAgEADGYRGI
-	0ZWwAAsv
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+References: <20240401082019.2318193-1-haibo1.xu@intel.com> <20240402-7bd2b9ed00094befa6927b60@orel>
+In-Reply-To: <20240402-7bd2b9ed00094befa6927b60@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Sun, 7 Apr 2024 10:40:54 +0800
+Message-ID: <CAJve8onPGb_ZqXaU7t50893PKS=9mrbzqvthc8dYMHDFKJdUAg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: riscv: selftests: Add SBI base extension test
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-R2VudGxlIHBpbmcuLi4KCj4gCj4gJ3BlcmYga3ZtIHN0YXQgcmVwb3J0L3JlY29yZCcgZ2VuZXJh
-dGVzIGEgc3RhdGlzdGljYWwgYW5hbHlzaXMgb2YgS1ZNCj4gZXZlbnRzIGFuZCBjYW4gYmUgdXNl
-ZCB0byBhbmFseXplIGd1ZXN0IGV4aXQgcmVhc29ucy4gVGhpcyBwYXRjaCB0cmllcwo+IHRvIGFk
-ZCBzdGF0IHN1cHBvcnQgb24gcmlzY3YuCj4gCj4gTWFwIHRoZSByZXR1cm4gdmFsdWUgb2YgdHJh
-Y2Vfa3ZtX2V4aXQoKSB0byB0aGUgc3BlY2lmaWMgY2F1c2Ugb2YgdGhlIAo+IGV4Y2VwdGlvbiwg
-YW5kIGV4cG9ydCBpdCB0byB1c2Vyc3BhY2UuCj4gCj4gSXQgcmVjb3JkcyBvbiB0d28gYXZhaWxh
-YmxlIEtWTSB0cmFjZXBvaW50cyBmb3IgcmlzY3Y6ICJrdm06a3ZtX2VudHJ5Igo+IGFuZCAia3Zt
-Omt2bV9leGl0IiwgYW5kIHJlcG9ydHMgc3RhdGlzdGljYWwgZGF0YSB3aGljaCBpbmNsdWRlcyBl
-dmVudHMKPiBoYW5kbGVzIHRpbWUsIHNhbXBsZXMsIGFuZCBzbyBvbi4KPiAKPiBTaW1wbGUgdGVz
-dHMgZ28gYmVsb3c6Cj4gCj4gIyAuL3BlcmYga3ZtIHJlY29yZCAtZSAia3ZtOmt2bV9lbnRyeSIg
-LWUgImt2bTprdm1fZXhpdCIKPiBMb3dlcmluZyBkZWZhdWx0IGZyZXF1ZW5jeSByYXRlIGZyb20g
-NDAwMCB0byAyNTAwLgo+IFBsZWFzZSBjb25zaWRlciB0d2Vha2luZyAvcHJvYy9zeXMva2VybmVs
-L3BlcmZfZXZlbnRfbWF4X3NhbXBsZV9yYXRlLgo+IFsgcGVyZiByZWNvcmQ6IFdva2VuIHVwIDE4
-IHRpbWVzIHRvIHdyaXRlIGRhdGEgXQo+IFsgcGVyZiByZWNvcmQ6IENhcHR1cmVkIGFuZCB3cm90
-ZSA1LjQzMyBNQiBwZXJmLmRhdGEuZ3Vlc3QgKDYyNTE5IHNhbXBsZXMpIAo+IAo+ICMgLi9wZXJm
-IGt2bSByZXBvcnQKPiAzMUsga3ZtOmt2bV9lbnRyeQo+IDMxSyBrdm06a3ZtX2V4aXQKPiAKPiAj
-IC4vcGVyZiBrdm0gc3RhdCByZWNvcmQgLWEKPiBbIHBlcmYgcmVjb3JkOiBXb2tlbiB1cCAzIHRp
-bWVzIHRvIHdyaXRlIGRhdGEgXQo+IFsgcGVyZiByZWNvcmQ6IENhcHR1cmVkIGFuZCB3cm90ZSA4
-LjUwMiBNQiBwZXJmLmRhdGEuZ3Vlc3QgKDk5MzM4IHNhbXBsZXMpIF0KPiAKPiAjIC4vcGVyZiBr
-dm0gc3RhdCByZXBvcnQgLS1ldmVudD12bWV4aXQKPiBFdmVudCBuYW1lICAgICAgICAgICAgICAg
-IFNhbXBsZXMgICBTYW1wbGUlICAgIFRpbWUgKG5zKSAgICAgVGltZSUgICBNYXggVGltZSAobnMp
-ICAgTWluIFRpbWUgKG5zKSAgTWVhbiBUaW1lIChucykKPiBTVE9SRV9HVUVTVF9QQUdFX0ZBVUxU
-ICAgICAyNjk2OCAgICAgNTQuMDAlICAgIDIwMDMwMzE4MDAgICAgNDAuMDAlICAgICAzMzYxNDAw
-ICAgICAgICAgMjc2MDAgICAgICAgICAgNzQyNzQKPiBMT0FEX0dVRVNUX1BBR0VfRkFVTFQgICAg
-ICAxNzY0NSAgICAgMzUuMDAlICAgIDExNTMzMzgxMDAgICAgMjMuMDAlICAgICAyNTEzNDAwICAg
-ICAgICAgMzA4MDAgICAgICAgICAgNjUzNjMKPiBWSVJUVUFMX0lOU1RfRkFVTFQgICAgICAgICAx
-MjQ3ICAgICAgMi4wMCUgICAgIDM0MDgyMDgwMCAgICAgNi4wMCUgICAgICAxMTkwODAwICAgICAg
-ICAgNDMzMDAgICAgICAgICAgMjczMzEyCj4gSU5TVF9HVUVTVF9QQUdFX0ZBVUxUICAgICAgMTEy
-OCAgICAgIDIuMDAlICAgICAzNDA2NDU4MDAgICAgIDYuMDAlICAgICAgMjEyMzIwMCAgICAgICAg
-IDMwMjAwICAgICAgICAgIDMwMTk5MAo+IFNVUEVSVklTT1JfU1lTQ0FMTCAgICAgICAgIDEwMTkg
-ICAgICAyLjAwJSAgICAgMjQ1OTg5OTAwICAgICA0LjAwJSAgICAgIDE4NTE1MDAgICAgICAgICAy
-OTMwMCAgICAgICAgICAyNDE0MDMKPiBMT0FEX0FDQ0VTUyAgICAgICAgICAgICAgICA5ODYgICAg
-ICAgMS4wMCUgICAgIDY3MTU1NjIwMCAgICAgMTMuMDAlICAgICA0MTgwMjAwICAgICAgICAgMTAw
-NzAwICAgICAgICAgNjgxMDkxCj4gSU5TVF9BQ0NFU1MgICAgICAgICAgICAgICAgNjU1ICAgICAg
-IDEuMDAlICAgICAxNzAwNTQ4MDAgICAgIDMuMDAlICAgICAgMTgwODMwMCAgICAgICAgIDU0NjAw
-ICAgICAgICAgIDI1OTYyNQo+IEhZUEVSVklTT1JfU1lTQ0FMTCAgICAgICAgIDIxICAgICAgICAw
-LjAwJSAgICAgNDI3NjQwMCAgICAgICAwLjAwJSAgICAgIDcxNjUwMCAgICAgICAgICAxMTYwMDAg
-ICAgICAgICAyMDM2MzggCj4gCj4gU2hlbmxpbiBMaWFuZyAoMik6Cj4gICBSSVNDVjogS1ZNOiBh
-ZGQgdHJhY2Vwb2ludHMgZm9yIGVudHJ5IGFuZCBleGl0IGV2ZW50cwo+ICAgcGVyZiBrdm0vcmlz
-Y3Y6IFBvcnQgcGVyZiBrdm0gc3RhdCB0byBSSVNDLVYKPiAKPiAgYXJjaC9yaXNjdi9rdm0vdHJh
-Y2VfcmlzY3YuaCAgICAgICAgICAgICAgICAgIHwgNjAgKysrKysrKysrKysrKysKPiAgYXJjaC9y
-aXNjdi9rdm0vdmNwdS5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDcgKysKPiAgdG9vbHMv
-cGVyZi9hcmNoL3Jpc2N2L01ha2VmaWxlICAgICAgICAgICAgICAgIHwgIDEgKwo+ICB0b29scy9w
-ZXJmL2FyY2gvcmlzY3YvdXRpbC9CdWlsZCAgICAgICAgICAgICAgfCAgMSArCj4gIHRvb2xzL3Bl
-cmYvYXJjaC9yaXNjdi91dGlsL2t2bS1zdGF0LmMgICAgICAgICB8IDc4ICsrKysrKysrKysrKysr
-KysrKysKPiAgLi4uL2FyY2gvcmlzY3YvdXRpbC9yaXNjdl9leGNlcHRpb25fdHlwZXMuaCAgIHwg
-NDEgKysrKysrKysrKwo+ICA2IGZpbGVzIGNoYW5nZWQsIDE4OCBpbnNlcnRpb25zKCspCj4gIGNy
-ZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL3Jpc2N2L2t2bS90cmFjZV9yaXNjdi5oCj4gIGNyZWF0ZSBt
-b2RlIDEwMDY0NCB0b29scy9wZXJmL2FyY2gvcmlzY3YvdXRpbC9rdm0tc3RhdC5jCj4gIGNyZWF0
-ZSBtb2RlIDEwMDY0NCB0b29scy9wZXJmL2FyY2gvcmlzY3YvdXRpbC9yaXNjdl9leGNlcHRpb25f
-dHlwZXMuaAo+IAo+IC0tIAo+IDIuMzcuMgo=
+On Tue, Apr 2, 2024 at 10:12=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Mon, Apr 01, 2024 at 04:20:18PM +0800, Haibo Xu wrote:
+> > This is the first patch to enable the base extension selftest
+> > for the SBI implementation in KVM. Test for other extensions
+> > will be added later.
+>
+> I'm not sure we want SBI tests in KVM selftests since we already
+> plan to add them to kvm-unit-tests, where they can be used to
+> test both KVM's SBI implementation and M-mode firmware implementations.
+> If we also have them here, then we'll end up duplicating that effort.
+>
+
+Thanks for the information, Andrew!
+
+The SBI KVM selftest was planned last year when I talked with Anup about
+KVM selftest support on RISC-V. Since the kvm-unit-tests has already covere=
+d
+it, I'm fine to drop the support in KVM selftest.
+
+Regards,
+Haibo
+
+> I do like the approach of only checking for an error, rather than
+> also for a value, for these ID getters. In kvm-unit-tests we're
+> currently requiring that the expected value be passed in, otherwise
+> the whole test is skipped. We could fallback to only checking for
+> an error instead, as is done here.
+>
+> Thanks,
+> drew
+>
+> >
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |  1 +
+> >  .../selftests/kvm/include/riscv/processor.h   |  8 +-
+> >  tools/testing/selftests/kvm/riscv/sbi_test.c  | 95 +++++++++++++++++++
+> >  3 files changed, 103 insertions(+), 1 deletion(-)
+> >  create mode 100644 tools/testing/selftests/kvm/riscv/sbi_test.c
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selft=
+ests/kvm/Makefile
+> > index 741c7dc16afc..a6acbbcad757 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -189,6 +189,7 @@ TEST_GEN_PROGS_s390x +=3D rseq_test
+> >  TEST_GEN_PROGS_s390x +=3D set_memory_region_test
+> >  TEST_GEN_PROGS_s390x +=3D kvm_binary_stats_test
+> >
+> > +TEST_GEN_PROGS_riscv +=3D riscv/sbi_test
+> >  TEST_GEN_PROGS_riscv +=3D arch_timer
+> >  TEST_GEN_PROGS_riscv +=3D demand_paging_test
+> >  TEST_GEN_PROGS_riscv +=3D dirty_log_test
+> > diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/to=
+ols/testing/selftests/kvm/include/riscv/processor.h
+> > index ce473fe251dd..df530ac751c4 100644
+> > --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> > @@ -178,7 +178,13 @@ enum sbi_ext_id {
+> >  };
+> >
+> >  enum sbi_ext_base_fid {
+> > -     SBI_EXT_BASE_PROBE_EXT =3D 3,
+> > +     SBI_EXT_BASE_GET_SPEC_VERSION =3D 0,
+> > +     SBI_EXT_BASE_GET_IMP_ID,
+> > +     SBI_EXT_BASE_GET_IMP_VERSION,
+> > +     SBI_EXT_BASE_PROBE_EXT,
+> > +     SBI_EXT_BASE_GET_MVENDORID,
+> > +     SBI_EXT_BASE_GET_MARCHID,
+> > +     SBI_EXT_BASE_GET_MIMPID,
+> >  };
+> >
+> >  struct sbiret {
+> > diff --git a/tools/testing/selftests/kvm/riscv/sbi_test.c b/tools/testi=
+ng/selftests/kvm/riscv/sbi_test.c
+> > new file mode 100644
+> > index 000000000000..b9378546e3b6
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/riscv/sbi_test.c
+> > @@ -0,0 +1,95 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * sbi_test - SBI API test for KVM's SBI implementation.
+> > + *
+> > + * Copyright (c) 2024 Intel Corporation
+> > + *
+> > + * Test cover the following SBI extentions:
+> > + *  - Base: All functions in this extension should be supported
+> > + */
+> > +
+> > +#include "kvm_util.h"
+> > +#include "processor.h"
+> > +#include "test_util.h"
+> > +
+> > +/*
+> > + * Test that all functions in the base extension must be supported
+> > + */
+> > +static void base_ext_guest_code(void)
+> > +{
+> > +     struct sbiret ret;
+> > +
+> > +     /*
+> > +      * Since the base extension was introduced in SBI Spec v0.2,
+> > +      * assert if the implemented SBI version is below 0.2.
+> > +      */
+> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_SPEC_VERSION, 0,
+> > +                     0, 0, 0, 0, 0);
+> > +     __GUEST_ASSERT(!ret.error && ret.value >=3D 2, "Get Spec Version =
+Error: ret.error=3D%ld, "
+> > +                     "ret.value=3D%ld\n", ret.error, ret.value);
+> > +
+> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_IMP_ID, 0,
+> > +                     0, 0, 0, 0, 0);
+> > +     __GUEST_ASSERT(!ret.error && ret.value =3D=3D 3, "Get Imp ID Erro=
+r: ret.error=3D%ld, "
+> > +                     "ret.value=3D%ld\n",
+> > +                     ret.error, ret.value);
+> > +
+> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_IMP_VERSION, 0,
+> > +                     0, 0, 0, 0, 0);
+> > +     __GUEST_ASSERT(!ret.error, "Get Imp Version Error: ret.error=3D%l=
+d\n", ret.error);
+> > +
+> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_PROBE_EXT, SBI_EXT_B=
+ASE,
+> > +                     0, 0, 0, 0, 0);
+> > +     __GUEST_ASSERT(!ret.error && ret.value =3D=3D 1, "Probe ext Error=
+: ret.error=3D%ld, "
+> > +                     "ret.value=3D%ld\n",
+> > +                     ret.error, ret.value);
+> > +
+> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_MVENDORID, 0,
+> > +                     0, 0, 0, 0, 0);
+> > +     __GUEST_ASSERT(!ret.error, "Get Machine Vendor ID Error: ret.erro=
+r=3D%ld\n", ret.error);
+> > +
+> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_MARCHID, 0,
+> > +                     0, 0, 0, 0, 0);
+> > +     __GUEST_ASSERT(!ret.error, "Get Machine Arch ID Error: ret.error=
+=3D%ld\n", ret.error);
+> > +
+> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_MIMPID, 0,
+> > +                     0, 0, 0, 0, 0);
+> > +     __GUEST_ASSERT(!ret.error, "Get Machine Imp ID Error: ret.error=
+=3D%ld\n", ret.error);
+> > +
+> > +     GUEST_DONE();
+> > +}
+> > +
+> > +static void sbi_base_ext_test(void)
+> > +{
+> > +     struct kvm_vm *vm;
+> > +     struct kvm_vcpu *vcpu;
+> > +     struct ucall uc;
+> > +
+> > +     vm =3D vm_create_with_one_vcpu(&vcpu, base_ext_guest_code);
+> > +     while (1) {
+> > +             vcpu_run(vcpu);
+> > +             TEST_ASSERT(vcpu->run->exit_reason =3D=3D UCALL_EXIT_REAS=
+ON,
+> > +                         "Unexpected exit reason: %u (%s),",
+> > +                         vcpu->run->exit_reason, exit_reason_str(vcpu-=
+>run->exit_reason));
+> > +
+> > +             switch (get_ucall(vcpu, &uc)) {
+> > +             case UCALL_DONE:
+> > +                     goto done;
+> > +             case UCALL_ABORT:
+> > +                     fprintf(stderr, "Guest assert failed!\n");
+> > +                     REPORT_GUEST_ASSERT(uc);
+> > +             default:
+> > +                     TEST_FAIL("Unexpected ucall %lu", uc.cmd);
+> > +             }
+> > +     }
+> > +
+> > +done:
+> > +     kvm_vm_free(vm);
+> > +}
+> > +
+> > +int main(void)
+> > +{
+> > +     sbi_base_ext_test();
+> > +
+> > +     return 0;
+> > +}
+> > --
+> > 2.34.1
+> >
 
