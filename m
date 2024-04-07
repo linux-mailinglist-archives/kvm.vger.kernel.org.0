@@ -1,280 +1,289 @@
-Return-Path: <kvm+bounces-13818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A2589AE1C
-	for <lists+kvm@lfdr.de>; Sun,  7 Apr 2024 04:41:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD3189AE26
+	for <lists+kvm@lfdr.de>; Sun,  7 Apr 2024 05:03:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E4F1B225C5
-	for <lists+kvm@lfdr.de>; Sun,  7 Apr 2024 02:41:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA255B220FA
+	for <lists+kvm@lfdr.de>; Sun,  7 Apr 2024 03:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1DC23B0;
-	Sun,  7 Apr 2024 02:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18DE23D7A;
+	Sun,  7 Apr 2024 03:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRnwqjXX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KA7sVjua"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0415EA935;
-	Sun,  7 Apr 2024 02:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA9417F0;
+	Sun,  7 Apr 2024 03:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712457669; cv=none; b=N4S8gq8YwJl2QzCDXQmR2KDWDknJWzcGp2GvIFTD8OUArjNWo5Z5lrpZInS5usbDluFQ3QwAOhV87pJRWcmLric0lZyR6QBEFNJM32QGgyMX192eoWHmfEt5We3aqdVmjh4e4iYdOGOEplIls8k59bijNJLtLafuT4cF6qqjT0A=
+	t=1712458981; cv=none; b=RCg/orTDcaEmt++86EKbHewpCzp+CXO/sR41eyjprfvZ9IKJwYcHXTshQxnImnxMmMJppIZP3MUYMSU2rWoIo+BIWHcgdy90tBdA6d8IExbGZCFv3BdoS+cwPPRQ210I5DTNJOYcAgMykM7hzL0J4sxUkDuk43TBhvnla3zEAks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712457669; c=relaxed/simple;
-	bh=jE8wYV7ClylQm1BWuzREFYyBRBC/QLEWOZoJ5AuIi5c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SwHGC6Rj/sk8PKVCJPNkm6Fs1KlOROZH+V4JW1i7Xz3E4FOhSiCdxdIjDnluQ01dmDrTcKj+8xfqs/rZ2009vuKlEyII9VpANFeaoC1GeFy1PtCBWiEDvOnfHpIuNYcIyPCszDsZEDDmQha/FiEcBSrzgr4+u70iEvyYH5k9FSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fRnwqjXX; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-516d47ce662so3050071e87.1;
-        Sat, 06 Apr 2024 19:41:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712457666; x=1713062466; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=svi7IG4j1NCRd7Qsuibjxz4QatOdbrOlqhYRp4ynUhA=;
-        b=fRnwqjXX9bBprzYPn4eqjndNI88CTqWYjLBipZ2c87woM1vBOpGDFiubr2BrPT7JwO
-         Hq3p1obCTou4ee+ri6ho6rhYoyb8WpBpcVEFxcFUIbkBQSWTpzmOw7IvzBEG2BQYymuK
-         9Ab9goZGU1cG6w626tPvVVi87lcbsC9MS++C/qd9sEwDy6Tf0EbXi2WR0wz68r9V0zoE
-         A6bOzvmidJsmY+/XpYUcChJkrbxAvVGE+TAJakZ1lvPhwxmmQ/G/eiXaMMj7ma5xBdTi
-         5mOxGoCTIesbwvzRFdG8ahAbu0pvxWsmi88jrVDIHOhix54qB4EMbPQd7fg5nu4Qebhq
-         RKrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712457666; x=1713062466;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=svi7IG4j1NCRd7Qsuibjxz4QatOdbrOlqhYRp4ynUhA=;
-        b=ey+PFsEzZnKdjRaTa4pUxI4Ye435rCqQ3hUodLK55AeeXX3d45Rt0E3yJTC5gTO6a3
-         SETsu5DeYHlVG/61m651WLgLSSjsov34/tHMVLIfAP940h5DtiqACvzCh71Vah3giShe
-         CTAbADHfElq+wnNfL/GeopN9pou0TvmbZPJr55lRXIz04wTIg/fn2w6kMAFMxPxU550E
-         L+QGtM0RxNAngSnwjFO8dCBkavlUvmC3tYTxWGWFZ022RaKg32rmShMlSUbNWso+dyIv
-         rLF1SHLi8B0QQvMkf/kB18+EUPpN1psMqy17Upk7QOOuNz4cDrsqZx/IgN3yKNXkGEd8
-         PNbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV8FXPXzAIGMnuPyxp/1FUNjwNilmjwdbFGbXukVQWdrJzEAeEYb0kJ1mKI6iP9tSQLnmIqrgrFAf6L7Yp99HkxJylqBtYn8AoPK6B1YYKKcrat7u9dQRHypOD+yLNNqFD3Agbhy4AP9ASCU6vuMSGT6vz+TOyub0A237oA0wlJgtm4
-X-Gm-Message-State: AOJu0YxnijzEDXMbX5Gh/7U6q/pqOMNMPm45wyED5odbKpBcOEQyRO3n
-	Dy52n8Wo0BsfWOBxWJ2DMWIzmvTvu6nzJ4L0f9ZcUrZA0w5Dy0NlN58t14rKpPEfq45++oZPhCK
-	dfr+QtXqHRkK3p4a/riQ4+iWX31o=
-X-Google-Smtp-Source: AGHT+IGWhN1NiFvJL3wo1zaH/XA3X0sToWCJylJisJevqvEm+O++z85W13bqOe6L/e+DrbufZDhUvIpgKc3pOrd4vSU=
-X-Received: by 2002:ac2:5612:0:b0:513:ebb5:d9b0 with SMTP id
- v18-20020ac25612000000b00513ebb5d9b0mr4104722lfd.52.1712457665721; Sat, 06
- Apr 2024 19:41:05 -0700 (PDT)
+	s=arc-20240116; t=1712458981; c=relaxed/simple;
+	bh=GW6ONfdun9nFNlvt2ESofYOnMbxy3PNCN+5Cdnzb+vY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q2aJ6Aoi4dow0k6OvQx1+BnuxMkXju/zqGGzmsOJkrO5bVkhKiQO4TO4iKxvFAGDxJuYnyII57CbbKdHsfbnz7JlwFqzw8YKbNwSQTSQNxc9WtuGmWH1jBy2AfKHBMbokErRLGRvzPnIi61hFkCMdH/dbtnSSsDtMFh/AxGEnOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KA7sVjua; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712458980; x=1743994980;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GW6ONfdun9nFNlvt2ESofYOnMbxy3PNCN+5Cdnzb+vY=;
+  b=KA7sVjuaKaPzEhJV3o5inR6LgttBDQv7aQ5tuhWLeD2tc8JuIzaNiugq
+   huHuPd0GCY+HWvI5IkhCfqzgRDR3/IpzWWPiJxWraHVY/bDAiO7/mid8A
+   CXw3kTLyPjRCVdH8YGDkxlMJIGuA4iDVlD5t4Ypnx7tRPSFyEqqjFsYAR
+   ElUNI+YpaMM+N6rKPukBl8kwUxvx8I0V055g/Ur5MnBPuZ+cfoy/dlpnJ
+   yfacKVfyCiSSDarYsubeUh0KWsldpyAYqgubxWlIUe80PJkZP7/Rc2i8c
+   vebxqBrYsK0EPaD/DVNi29jfaAgljNx0AffPk1FYUUW0OtqRYV/QVfA2e
+   A==;
+X-CSE-ConnectionGUID: QPHRuZ5LQseDRBXeDaXdTg==
+X-CSE-MsgGUID: tt5I0zp6TqCKnc+4JCpmHQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11036"; a="7635217"
+X-IronPort-AV: E=Sophos;i="6.07,184,1708416000"; 
+   d="scan'208";a="7635217"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2024 20:02:59 -0700
+X-CSE-ConnectionGUID: 1Iw+YbNAQoyS4Cbjm0LK4Q==
+X-CSE-MsgGUID: fIrKd7a/QCq77YtIIBLM0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,184,1708416000"; 
+   d="scan'208";a="24216059"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.236.140]) ([10.124.236.140])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2024 20:02:56 -0700
+Message-ID: <8132ddff-16f3-482f-b08b-a73aa8eddbbc@linux.intel.com>
+Date: Sun, 7 Apr 2024 11:02:52 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240401082019.2318193-1-haibo1.xu@intel.com> <20240402-7bd2b9ed00094befa6927b60@orel>
-In-Reply-To: <20240402-7bd2b9ed00094befa6927b60@orel>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Sun, 7 Apr 2024 10:40:54 +0800
-Message-ID: <CAJve8onPGb_ZqXaU7t50893PKS=9mrbzqvthc8dYMHDFKJdUAg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: riscv: selftests: Add SBI base extension test
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 079/130] KVM: TDX: vcpu_run: save/restore host
+ state(host kernel gs)
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <4a766983346b2c01e943348af3c5ca6691e272f9.1708933498.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <4a766983346b2c01e943348af3c5ca6691e272f9.1708933498.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 2, 2024 at 10:12=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> On Mon, Apr 01, 2024 at 04:20:18PM +0800, Haibo Xu wrote:
-> > This is the first patch to enable the base extension selftest
-> > for the SBI implementation in KVM. Test for other extensions
-> > will be added later.
->
-> I'm not sure we want SBI tests in KVM selftests since we already
-> plan to add them to kvm-unit-tests, where they can be used to
-> test both KVM's SBI implementation and M-mode firmware implementations.
-> If we also have them here, then we'll end up duplicating that effort.
->
 
-Thanks for the information, Andrew!
 
-The SBI KVM selftest was planned last year when I talked with Anup about
-KVM selftest support on RISC-V. Since the kvm-unit-tests has already covere=
-d
-it, I'm fine to drop the support in KVM selftest.
-
-Regards,
-Haibo
-
-> I do like the approach of only checking for an error, rather than
-> also for a value, for these ID getters. In kvm-unit-tests we're
-> currently requiring that the expected value be passed in, otherwise
-> the whole test is skipped. We could fallback to only checking for
-> an error instead, as is done here.
+On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> Thanks,
-> drew
+> On entering/exiting TDX vcpu, Preserved or clobbered CPU state is different
+> from VMX case.
+
+Could you add more descriptions about the differences?
+
+> Add TDX hooks to save/restore host/guest CPU state.
+
+KVM doesn't save/restore guest CPU state for TDX.
+
+> Save/restore kernel GS base MSR.
 >
-> >
-> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> > ---
-> >  tools/testing/selftests/kvm/Makefile          |  1 +
-> >  .../selftests/kvm/include/riscv/processor.h   |  8 +-
-> >  tools/testing/selftests/kvm/riscv/sbi_test.c  | 95 +++++++++++++++++++
-> >  3 files changed, 103 insertions(+), 1 deletion(-)
-> >  create mode 100644 tools/testing/selftests/kvm/riscv/sbi_test.c
-> >
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selft=
-ests/kvm/Makefile
-> > index 741c7dc16afc..a6acbbcad757 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -189,6 +189,7 @@ TEST_GEN_PROGS_s390x +=3D rseq_test
-> >  TEST_GEN_PROGS_s390x +=3D set_memory_region_test
-> >  TEST_GEN_PROGS_s390x +=3D kvm_binary_stats_test
-> >
-> > +TEST_GEN_PROGS_riscv +=3D riscv/sbi_test
-> >  TEST_GEN_PROGS_riscv +=3D arch_timer
-> >  TEST_GEN_PROGS_riscv +=3D demand_paging_test
-> >  TEST_GEN_PROGS_riscv +=3D dirty_log_test
-> > diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/to=
-ols/testing/selftests/kvm/include/riscv/processor.h
-> > index ce473fe251dd..df530ac751c4 100644
-> > --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> > +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> > @@ -178,7 +178,13 @@ enum sbi_ext_id {
-> >  };
-> >
-> >  enum sbi_ext_base_fid {
-> > -     SBI_EXT_BASE_PROBE_EXT =3D 3,
-> > +     SBI_EXT_BASE_GET_SPEC_VERSION =3D 0,
-> > +     SBI_EXT_BASE_GET_IMP_ID,
-> > +     SBI_EXT_BASE_GET_IMP_VERSION,
-> > +     SBI_EXT_BASE_PROBE_EXT,
-> > +     SBI_EXT_BASE_GET_MVENDORID,
-> > +     SBI_EXT_BASE_GET_MARCHID,
-> > +     SBI_EXT_BASE_GET_MIMPID,
-> >  };
-> >
-> >  struct sbiret {
-> > diff --git a/tools/testing/selftests/kvm/riscv/sbi_test.c b/tools/testi=
-ng/selftests/kvm/riscv/sbi_test.c
-> > new file mode 100644
-> > index 000000000000..b9378546e3b6
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/riscv/sbi_test.c
-> > @@ -0,0 +1,95 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * sbi_test - SBI API test for KVM's SBI implementation.
-> > + *
-> > + * Copyright (c) 2024 Intel Corporation
-> > + *
-> > + * Test cover the following SBI extentions:
-> > + *  - Base: All functions in this extension should be supported
-> > + */
-> > +
-> > +#include "kvm_util.h"
-> > +#include "processor.h"
-> > +#include "test_util.h"
-> > +
-> > +/*
-> > + * Test that all functions in the base extension must be supported
-> > + */
-> > +static void base_ext_guest_code(void)
-> > +{
-> > +     struct sbiret ret;
-> > +
-> > +     /*
-> > +      * Since the base extension was introduced in SBI Spec v0.2,
-> > +      * assert if the implemented SBI version is below 0.2.
-> > +      */
-> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_SPEC_VERSION, 0,
-> > +                     0, 0, 0, 0, 0);
-> > +     __GUEST_ASSERT(!ret.error && ret.value >=3D 2, "Get Spec Version =
-Error: ret.error=3D%ld, "
-> > +                     "ret.value=3D%ld\n", ret.error, ret.value);
-> > +
-> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_IMP_ID, 0,
-> > +                     0, 0, 0, 0, 0);
-> > +     __GUEST_ASSERT(!ret.error && ret.value =3D=3D 3, "Get Imp ID Erro=
-r: ret.error=3D%ld, "
-> > +                     "ret.value=3D%ld\n",
-> > +                     ret.error, ret.value);
-> > +
-> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_IMP_VERSION, 0,
-> > +                     0, 0, 0, 0, 0);
-> > +     __GUEST_ASSERT(!ret.error, "Get Imp Version Error: ret.error=3D%l=
-d\n", ret.error);
-> > +
-> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_PROBE_EXT, SBI_EXT_B=
-ASE,
-> > +                     0, 0, 0, 0, 0);
-> > +     __GUEST_ASSERT(!ret.error && ret.value =3D=3D 1, "Probe ext Error=
-: ret.error=3D%ld, "
-> > +                     "ret.value=3D%ld\n",
-> > +                     ret.error, ret.value);
-> > +
-> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_MVENDORID, 0,
-> > +                     0, 0, 0, 0, 0);
-> > +     __GUEST_ASSERT(!ret.error, "Get Machine Vendor ID Error: ret.erro=
-r=3D%ld\n", ret.error);
-> > +
-> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_MARCHID, 0,
-> > +                     0, 0, 0, 0, 0);
-> > +     __GUEST_ASSERT(!ret.error, "Get Machine Arch ID Error: ret.error=
-=3D%ld\n", ret.error);
-> > +
-> > +     ret =3D sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_MIMPID, 0,
-> > +                     0, 0, 0, 0, 0);
-> > +     __GUEST_ASSERT(!ret.error, "Get Machine Imp ID Error: ret.error=
-=3D%ld\n", ret.error);
-> > +
-> > +     GUEST_DONE();
-> > +}
-> > +
-> > +static void sbi_base_ext_test(void)
-> > +{
-> > +     struct kvm_vm *vm;
-> > +     struct kvm_vcpu *vcpu;
-> > +     struct ucall uc;
-> > +
-> > +     vm =3D vm_create_with_one_vcpu(&vcpu, base_ext_guest_code);
-> > +     while (1) {
-> > +             vcpu_run(vcpu);
-> > +             TEST_ASSERT(vcpu->run->exit_reason =3D=3D UCALL_EXIT_REAS=
-ON,
-> > +                         "Unexpected exit reason: %u (%s),",
-> > +                         vcpu->run->exit_reason, exit_reason_str(vcpu-=
->run->exit_reason));
-> > +
-> > +             switch (get_ucall(vcpu, &uc)) {
-> > +             case UCALL_DONE:
-> > +                     goto done;
-> > +             case UCALL_ABORT:
-> > +                     fprintf(stderr, "Guest assert failed!\n");
-> > +                     REPORT_GUEST_ASSERT(uc);
-> > +             default:
-> > +                     TEST_FAIL("Unexpected ucall %lu", uc.cmd);
-> > +             }
-> > +     }
-> > +
-> > +done:
-> > +     kvm_vm_free(vm);
-> > +}
-> > +
-> > +int main(void)
-> > +{
-> > +     sbi_base_ext_test();
-> > +
-> > +     return 0;
-> > +}
-> > --
-> > 2.34.1
-> >
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kvm/vmx/main.c    | 30 +++++++++++++++++++++++++--
+>   arch/x86/kvm/vmx/tdx.c     | 42 ++++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/tdx.h     |  4 ++++
+>   arch/x86/kvm/vmx/x86_ops.h |  4 ++++
+>   4 files changed, 78 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index d72651ce99ac..8275a242ce07 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -158,6 +158,32 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   	vmx_vcpu_reset(vcpu, init_event);
+>   }
+>   
+> +static void vt_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * All host state is saved/restored across SEAMCALL/SEAMRET,
+
+It sounds confusing to me.
+If all host states are saved/restored across SEAMCALL/SEAMRET, why this 
+patch saves/restores MSR_KERNEL_GS_BASE for host?
+
+>   and the
+> +	 * guest state of a TD is obviously off limits.  Deferring MSRs and DRs
+> +	 * is pointless because the TDX module needs to load *something* so as
+> +	 * not to expose guest state.
+> +	 */
+> +	if (is_td_vcpu(vcpu)) {
+> +		tdx_prepare_switch_to_guest(vcpu);
+> +		return;
+> +	}
+> +
+> +	vmx_prepare_switch_to_guest(vcpu);
+> +}
+> +
+> +static void vt_vcpu_put(struct kvm_vcpu *vcpu)
+> +{
+> +	if (is_td_vcpu(vcpu)) {
+> +		tdx_vcpu_put(vcpu);
+> +		return;
+> +	}
+> +
+> +	vmx_vcpu_put(vcpu);
+> +}
+> +
+>   static int vt_vcpu_pre_run(struct kvm_vcpu *vcpu)
+>   {
+>   	if (is_td_vcpu(vcpu))
+> @@ -326,9 +352,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   	.vcpu_free = vt_vcpu_free,
+>   	.vcpu_reset = vt_vcpu_reset,
+>   
+> -	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
+> +	.prepare_switch_to_guest = vt_prepare_switch_to_guest,
+>   	.vcpu_load = vmx_vcpu_load,
+> -	.vcpu_put = vmx_vcpu_put,
+> +	.vcpu_put = vt_vcpu_put,
+>   
+>   	.update_exception_bitmap = vmx_update_exception_bitmap,
+>   	.get_msr_feature = vmx_get_msr_feature,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index fdf9196cb592..9616b1aab6ce 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1,5 +1,6 @@
+>   // SPDX-License-Identifier: GPL-2.0
+>   #include <linux/cpu.h>
+> +#include <linux/mmu_context.h>
+>   
+>   #include <asm/tdx.h>
+>   
+> @@ -423,6 +424,7 @@ u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+>   int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>   
+>   	WARN_ON_ONCE(vcpu->arch.cpuid_entries);
+>   	WARN_ON_ONCE(vcpu->arch.cpuid_nent);
+> @@ -446,9 +448,47 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>   	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
+>   		vcpu->arch.xfd_no_write_intercept = true;
+>   
+> +	tdx->host_state_need_save = true;
+> +	tdx->host_state_need_restore = false;
+> +
+>   	return 0;
+>   }
+>   
+> +void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+
+Just like vmx_prepare_switch_to_host(), the input can be "struct 
+vcpu_tdx *", since vcpu is not used inside the function.
+And the callsites just use "to_tdx(vcpu)"
+
+> +{
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+Then, this can be dropped.
+
+> +
+> +	if (!tdx->host_state_need_save)
+> +		return;
+> +
+> +	if (likely(is_64bit_mm(current->mm)))
+> +		tdx->msr_host_kernel_gs_base = current->thread.gsbase;
+> +	else
+> +		tdx->msr_host_kernel_gs_base = read_msr(MSR_KERNEL_GS_BASE);
+> +
+> +	tdx->host_state_need_save = false;
+> +}
+> +
+> +static void tdx_prepare_switch_to_host(struct kvm_vcpu *vcpu)
+
+ditto
+
+> +{
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> +
+> +	tdx->host_state_need_save = true;
+> +	if (!tdx->host_state_need_restore)
+> +		return;
+> +
+> +	++vcpu->stat.host_state_reload;
+> +
+> +	wrmsrl(MSR_KERNEL_GS_BASE, tdx->msr_host_kernel_gs_base);
+> +	tdx->host_state_need_restore = false;
+> +}
+> +
+> +void tdx_vcpu_put(struct kvm_vcpu *vcpu)
+> +{
+> +	vmx_vcpu_pi_put(vcpu);
+> +	tdx_prepare_switch_to_host(vcpu);
+> +}
+> +
+>   void tdx_vcpu_free(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> @@ -569,6 +609,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+>   
+>   	tdx_vcpu_enter_exit(tdx);
+>   
+> +	tdx->host_state_need_restore = true;
+> +
+>   	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
+>   	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+>   
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index 81d301fbe638..e96c416e73bf 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -69,6 +69,10 @@ struct vcpu_tdx {
+>   
+>   	bool initialized;
+>   
+> +	bool host_state_need_save;
+> +	bool host_state_need_restore;
+> +	u64 msr_host_kernel_gs_base;
+> +
+>   	/*
+>   	 * Dummy to make pmu_intel not corrupt memory.
+>   	 * TODO: Support PMU for TDX.  Future work.
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 3e29a6fe28ef..9fd997c79c33 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -151,6 +151,8 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+>   void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+>   void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+>   fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu);
+> +void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
+> +void tdx_vcpu_put(struct kvm_vcpu *vcpu);
+>   u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
+>   
+>   int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+> @@ -186,6 +188,8 @@ static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+>   static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+>   static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
+>   static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu) { return EXIT_FASTPATH_NONE; }
+> +static inline void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu) {}
+> +static inline void tdx_vcpu_put(struct kvm_vcpu *vcpu) {}
+>   static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
+>   
+>   static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+
 
