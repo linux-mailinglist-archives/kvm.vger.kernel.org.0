@@ -1,167 +1,166 @@
-Return-Path: <kvm+bounces-13881-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13882-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7C8589BE72
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 13:52:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC07589BE8C
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 14:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7314A281755
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 11:52:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52F651F23352
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 12:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406A06A010;
-	Mon,  8 Apr 2024 11:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDB26A338;
+	Mon,  8 Apr 2024 11:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="MgG93mK+"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GzDcUFCZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0D6657CB
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 11:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870F96A029;
+	Mon,  8 Apr 2024 11:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712577114; cv=none; b=inxlus1tPwujuIP316ikLmXtzflNlVbC2I1gUBWuPCw5DpY0pPF5Q5KsytOiiez7UX+GECqu8sb19Mug0a9SzEsHDCUYYgiGqkzNBdrA9/BPBB75xVtaLusHJeqWVpa1/Mc4/r6YrR4RGeoK78SChlvLaiYywcodG4Tm3S+Db6A=
+	t=1712577598; cv=none; b=N/wEeCMGApNPa9s305yXJMAqvwgqH+Q38+kjqUNZD7/iGuYkP6jOjDDaA7M4JuUgygcBiqaRVcqLsatTWL2DMu9JMrkjIGnqJRLQX3M2vKpLBfc1vtkZ6UEmZBVeab3aeVtSJRjQoIYkCFd3rxjA3d7J27k3Ds5u75nkKnYFy90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712577114; c=relaxed/simple;
-	bh=wv8ksI68mLQKc6ARafGjQKqd1GfEpCoO4muu1aYD9d8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GEhaj6wlufuBSXU57y5X1m6/bXpO2VJtxBoxhaC/90LyqPtHOBGAst7f6Cx5LnGzPVOp0cRkqxPUqr1NAF2Puan9AsiZ0DY3tFgnX8IJXb4dlKxJISDvQive3xtmFiRJGQtqWj6uXcPLovBCdi2WwMX+bMNgx4JrCMROXlx3nxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=MgG93mK+; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-36a165b8845so4518575ab.1
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 04:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1712577111; x=1713181911; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9HDnET1ICXbiSWI4eekvnAuzBIOvWCq79VgIDRhs0OM=;
-        b=MgG93mK+la1BLbxyO/YrfGqxjBOHvSAHttA11zdkotdQ+ARXuOo54M81DmnGw+tY+q
-         srlbrHMCfVClRLiT216ejnnjmfsQA8tWlcZ3FBjTpf9Z/VgKRsYTwwVfM1Rt1WOCD6cz
-         HpCNRZn6E0yuoVbaTFfiDEJGDwib98hRxUgcfL7HYJybQrYbJK++fqJcknC20wO68lMV
-         VuID158P6o7XC3jlnvW6Nk0JGhYVbRRtzubfzubNCasL7ipvrX6eRupgu2zDRBMP5GSk
-         NYD4lDgRpgNd0lXKAwbZqGClx7+tCl37THGSPL0QCbA+okzB9rr5ucEpX1oZ/jhAK7IO
-         /huQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712577111; x=1713181911;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9HDnET1ICXbiSWI4eekvnAuzBIOvWCq79VgIDRhs0OM=;
-        b=h7zHp2CVwmKtzzbWYjtcUUWugqqBTP0uhMgRK2BC+8WjQ6WPxJqH+ji5WeR8of09ip
-         rEUEbD580Tx0rj99iOHlYqYAdekctv3YfRr48BeJ1UPfIGGqjZFqKKewtXsXwyDHrzyh
-         /iNZR0ckDQzXU3F4p4i7yX3c7TJB7FEaGPyqhFg45aS6zIpna+SK8OKQCvxC0BuYtW7Z
-         XGehSaTFeOfYM8PYltyndiU5wRXg7BExpZQSNrSoxTbJkt4M/aYa+3Xl0Ccp1OmBMiEG
-         lT5YbTjgDWHC8+Y8KOVFB01ULgrYivHjH5CdCNQUMcF1VNQm2smYiNlAs7/FI/Ij1FTB
-         BPqw==
-X-Gm-Message-State: AOJu0Yy7cTUisSLFhFcDZGBRVZXrjrbLyO37ULaNkeAawmsPZdghRQ3e
-	Dl83B5HN+nZdP9ry0UaSxEeOjVE1x5k/Bx9GkXU3xAmLdjiUW233JhHdP/c7EA3S25JQZQx+qV0
-	JLOEd8//BUHLTIC47cLofMb419gSw5cTLizAw1g==
-X-Google-Smtp-Source: AGHT+IE+ywRAniHmrIJjs7prm8vzXnQmBgIRLehtoMef03SesPmyPrWKYeKG1cVObBOia7W64ziHmnYb2cvB4CK86FQ=
-X-Received: by 2002:a05:6e02:339b:b0:368:920b:e211 with SMTP id
- bn27-20020a056e02339b00b00368920be211mr6460688ilb.5.1712577111050; Mon, 08
- Apr 2024 04:51:51 -0700 (PDT)
+	s=arc-20240116; t=1712577598; c=relaxed/simple;
+	bh=M44v5ll/mQgknn8edVYCjCN04UMj1bDmx519SMYLvwQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T7FsnIKyWCSBKNpblz+S8OmMTBaAGadX30aKeu5O6SLeCM2bgK4kvXoR9Y08YUEkjFa21IOAdAJ2E9w418gTJTfBEb/BAe+3rgP/saV8PypUgazKYRSdCeaRKBnRuTMEHUbq5N0XQRURUa+EtAG0rz2lU51SE4ggXw3HtCScZjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GzDcUFCZ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 438B620r011880;
+	Mon, 8 Apr 2024 11:59:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=do0NfUmngBvLTKRfKr2YU2CuBSFdjKxrX9b+TN8jn9I=;
+ b=GzDcUFCZIftUzksjH888BbsUSA3Vj+SLZ6tc83aXt9jFs6tOE41mZ5/xdzHeDctCKIx7
+ f8/KU1z9T8D9EfyAyEzJou3yTzxPFrReX/ukDO75ZWy7jtnQL+2c3U8Lu3EnV1RMubSU
+ HIZIcNQ6MMUZfcOKSJ/fImXRQlZAxj9pwfixOv1kDaLjnQKwCReFGsqNYwfCJlZ9RZ6N
+ RvdgiizTxxZVVWf18Gdl7YaOfhSP//8BUZBwtxYOxdVszKUK+Woc/6khM+C9dgEhncRv
+ 5faHGp/tt7LmX+xxhGm0JIGT8oX6ZRw01xyJwevF2MjZxI2K5njQx3tu+DwCMA+qd/8a 4g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xceu8g556-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 11:59:46 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 438BxjB8002306;
+	Mon, 8 Apr 2024 11:59:46 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xceu8g553-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 11:59:45 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43892vGw029904;
+	Mon, 8 Apr 2024 11:59:44 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbj7kysj7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 11:59:44 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 438Bxcnd53739894
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Apr 2024 11:59:41 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D7BF020043;
+	Mon,  8 Apr 2024 11:59:38 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7788520040;
+	Mon,  8 Apr 2024 11:59:38 +0000 (GMT)
+Received: from [9.171.0.63] (unknown [9.171.0.63])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Apr 2024 11:59:38 +0000 (GMT)
+Message-ID: <e8ea1c30-2211-4060-9cb2-c57364c80ea8@linux.ibm.com>
+Date: Mon, 8 Apr 2024 13:59:38 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240402062628.5425-1-duchao@eswincomputing.com>
-In-Reply-To: <20240402062628.5425-1-duchao@eswincomputing.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Mon, 8 Apr 2024 17:21:40 +0530
-Message-ID: <CAAhSdy0yVN91P5-B0bBibEB1-53L4wAiOdCWeBP3cxPzOacyXA@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] RISC-V: KVM: Guest Debug Support - Software
- Breakpoint Part
-To: Chao Du <duchao@eswincomputing.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, 
-	pbonzini@redhat.com, shuah@kernel.org, dbarboza@ventanamicro.com, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	haibo1.xu@intel.com, duchao713@qq.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 1/2] s390x: Fix misspelt variable name in
+ func.bash
+To: Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        =?UTF-8?Q?Nico_B=C3=B6hr?=
+ <nrb@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Andrew Jones <andrew.jones@linux.dev>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20240406122456.405139-1-npiggin@gmail.com>
+ <20240406122456.405139-2-npiggin@gmail.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20240406122456.405139-2-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0GTlNkXHJQs36FVQkf16FKjM8mbxMEeT
+X-Proofpoint-ORIG-GUID: SFwS1PmorkmcVM2yEli3Q0nGH6Grjq7r
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-08_10,2024-04-05_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ mlxlogscore=861 bulkscore=0 phishscore=0 adultscore=0 impostorscore=0
+ priorityscore=1501 spamscore=0 mlxscore=0 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404080092
 
-On Tue, Apr 2, 2024 at 12:00=E2=80=AFPM Chao Du <duchao@eswincomputing.com>=
- wrote:
->
-> This series implements the "KVM Guset Debug" feature on RISC-V. This is
-> an existing feature which is already supported by some other arches.
-> It allows us to debug a RISC-V KVM guest from GDB in host side.
->
-> As the first stage, the software breakpoints (ebreak instruction) is
-> implemented. HW breakpoints support will come later after a synthetically
-> consideration with the SBI debug trigger extension.
->
-> A selftest case was added in this series. Manual test was done on QEMU
-> RISC-V hypervisor emulator. (add '-s' to enable the gdbserver in QEMU)
->
-> This series is based on Linux 6.9-rc1 and also available at:
-> https://github.com/Du-Chao/kvm-riscv/tree/guest_debug_sw_v3_6.9-rc1
->
-> The matched QEMU is available at:
-> https://github.com/Du-Chao/qemu/tree/riscv_gd_sw
->
->
-> Changes from v3->v4:
-> - Some optimization on the testcase as per review comments.
->
-> Changes from v2->v3:
-> - Rebased on Linux 6.9-rc1.
-> - Use BIT() in the macro definition.
-> - set/clear the bit EXC_BREAKPOINT explicitly.
-> - change the testcase name to ebreak_test.
-> - test the scenario without GUEST_DEBUG. vm_install_exception_handler()
->   is used thanks to Haibo's patch.
->
-> Changes from v1->v2:
-> - Rebased on Linux 6.8-rc6.
-> - Maintain a hedeleg in "struct kvm_vcpu_config" for each VCPU.
-> - Update the HEDELEG csr in kvm_arch_vcpu_load().
->
-> Changes from RFC->v1:
-> - Rebased on Linux 6.8-rc2.
-> - Merge PATCH1 and PATCH2 into one patch.
-> - kselftest case added.
->
-> v3 link:
-> https://lore.kernel.org/kvm/20240327075526.31855-1-duchao@eswincomputing.=
-com
-> v2 link:
-> https://lore.kernel.org/kvm/20240301013545.10403-1-duchao@eswincomputing.=
-com
-> v1 link:
-> https://lore.kernel.org/kvm/20240206074931.22930-1-duchao@eswincomputing.=
-com
-> RFC link:
-> https://lore.kernel.org/kvm/20231221095002.7404-1-duchao@eswincomputing.c=
-om
->
-> Chao Du (3):
->   RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
->   RISC-V: KVM: Handle breakpoint exits for VCPU
->   RISC-V: KVM: selftests: Add ebreak test support
+On 4/6/24 14:24, Nicholas Piggin wrote:
+> The if statement is intended to run non-migration tests with PV on KVM.
+> With the misspelling, they are run on KVM or TCG.
+> 
 
-Queued this series for Linux-6.10
+It's not misspelt, is it?
+It's in the wrong case.
 
-Thanks,
-Anup
 
->
->  arch/riscv/include/asm/kvm_host.h             | 12 +++
->  arch/riscv/kvm/main.c                         | 18 +---
->  arch/riscv/kvm/vcpu.c                         | 16 +++-
->  arch/riscv/kvm/vcpu_exit.c                    |  4 +
->  arch/riscv/kvm/vm.c                           |  1 +
->  tools/testing/selftests/kvm/Makefile          |  1 +
->  .../testing/selftests/kvm/riscv/ebreak_test.c | 82 +++++++++++++++++++
->  7 files changed, 116 insertions(+), 18 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/riscv/ebreak_test.c
->
-> --
-> 2.17.1
->
+I'm fine with the code though.
 
