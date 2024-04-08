@@ -1,63 +1,86 @@
-Return-Path: <kvm+bounces-13849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13850-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E20489B895
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 09:37:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0963B89B89A
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 09:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC29E1F2250D
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 07:37:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 332CAB222F9
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 07:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438A629CEA;
-	Mon,  8 Apr 2024 07:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9802CCA3;
+	Mon,  8 Apr 2024 07:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U4d+S2DE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3yzc0hf"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2782C69A
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 07:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3B32BAF6
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 07:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712561857; cv=none; b=UOXoSHjClLl/Rdu+Yg1wsyCp7x97TEs/YTeSC8NuIg8ampgTrCAxZ8L+t+WUhJUFcArg0HGKnqXqZWK6B0CP1gtcLPfi70lm4Hhr394Q5AKrzLNqAvLmkoS7ga2Y1UhyFutVExzA/y8U6r8fZeX3x9Qd4AMUL2jaSb559hOONHE=
+	t=1712562005; cv=none; b=KSAcNU6L82cLcQyLGSrRF60rcIFlJtkCxB5lPA9nyZREy0N+RaaKeuEtLyp5D80c4VGXyijS057hScqk9poirXPhkjB7HiRNeu/jRA5MtSi7wQw2bEh2096UemU9C04KArffqVzEq9gtIzfIu0WthTEvr6Zd+FrSAgUDfZN/+lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712561857; c=relaxed/simple;
-	bh=4GiidcTTSsiYJWtZd4SF33IW/1FZ/QMl2f1QpKZ57Z4=;
+	s=arc-20240116; t=1712562005; c=relaxed/simple;
+	bh=rNOqKr343ZSMxime79iGUap0wNoYZSF/QDcsqxpgorI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hYwRGKZg/gsVNEWGJEmEiJvG+9utlOxpNoYCVL8UENDO5MaKtSi3FjMbjbz55GXoQkxgTRqng2ed+pw6GHtUk4d4UiAyqCZh/QaV6aX/DW0ITVsxrguXdfk+AAxtrkIBo9K1HAr6YdrBNO9+hOfyvovF92f+7uRt2PbbZKk5rjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U4d+S2DE; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 8 Apr 2024 09:37:29 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712561853;
+	 Content-Type:Content-Disposition:In-Reply-To; b=K7QZnlFa1cQPmfxTahd6pRIuVEUE0ok6s5p3Ujnh0BFr2K4QYy0RNmkW5/c5mH3Kkw1NmXxRHtPQR5RA4QsRzwwN5xN+Pjc8HycDuD2F/kzU3gio0ON25CCH12uNxz5eqiofylD2i60Przt8jnFMyMKv/VeCqcS9Tp80yy1IX6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a3yzc0hf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712562002;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yUU/YNv1R3O6wJ4nE+rJs4XO4vBQk8D5yD3QxFFxfSc=;
-	b=U4d+S2DEtsYqcQsTCa3qReBqBiyZqXw5ScuELdnL0C+PZd8kbfNbmwmqGl3+xCsF1dj93f
-	7hTkLfye6VevHgpUYG7O4uxCjQYNIbFN4q55S4uPjOb0bnts+Qr9f75M2Fb6lAzC5lbWM1
-	VCPbVxB6Z/RZxbUBdpzNgGLyptDPe3Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Nico =?utf-8?B?QsO2aHI=?= <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Ricardo Koller <ricarkol@google.com>, 
-	rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>, 
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [RFC kvm-unit-tests PATCH v2 14/14] shellcheck: Suppress various
- messages
-Message-ID: <20240408-c1fd647357babc836cf85914@orel>
-References: <20240406123833.406488-1-npiggin@gmail.com>
- <20240406123833.406488-15-npiggin@gmail.com>
+	bh=U6c8NxRj9cq6OvbALtg2Roh5bDMfOSXXjT3FSUcwbEE=;
+	b=a3yzc0hfnQblN1RQ9xPlpKqER/Y507NphLSGZooTZe+CsiHlfa5GhpTPxcnOHMju3kWh3u
+	AsdIPLnHXjqJmiPRo54muE220MfneTb3Q0U3Y2pSdFhLMNcCODcWUkElNj66KWl5VZE5Ts
+	cHWztf70VreBSzqREQdWDNQh0QVechA=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-657-VP8Hf33PMuupCq4ZGC3YVQ-1; Mon, 08 Apr 2024 03:40:00 -0400
+X-MC-Unique: VP8Hf33PMuupCq4ZGC3YVQ-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-516ef3189e9so510771e87.3
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 00:40:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712561999; x=1713166799;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U6c8NxRj9cq6OvbALtg2Roh5bDMfOSXXjT3FSUcwbEE=;
+        b=PLy4iEJNwtBy4LQ9DkSEowv+/+A0Wf/Zg6sBy/dGPZ4GZ4iJ1+IpzPF9TcYoRXO/yL
+         +J2Xxs9mTW17L+ejpfEnBBCoH0rt4FJGyxY68qd+rqQ7vhlqvES6ahtqvKnv6clrBVUG
+         lDd55eBgJ4jDCvjuNJMonMswfVhW0WOLFfBcNlLoWALyhuo0Ns48LU+orbek2sjWSwx0
+         KJnftdyX3iWyV+B8tz9/qyLuzMYA2n4BXL84ayWWN3KwWKHHPMWCI9m2+r/RkM+NT7S2
+         Q22SDggI1jz+zCOG09WBGtlFlexADPKOdPf9G5zuUmmALY5KGQVbcB2HevQPDxE8RkZH
+         c/dA==
+X-Forwarded-Encrypted: i=1; AJvYcCURv7lL/8W0TKAGzSpJ8MPdCAwtXQorkPXpoBhGQtz70cnjcSI1EyQja4JA7oKYIJTD7xpjo8X3kmx2a31vu6GP7FoW
+X-Gm-Message-State: AOJu0Yw3QS42vJQGFP2JOXQaw6+TavbOUP/lzQBThNROw6VP2hJQ3zdz
+	C8BCevh92S8+Kzi6M4ypdCriwd7vAyRu0jCvZuavWXcsdLEzXgeTiH9vX5/IRyfHVl20iPjEJWO
+	ELeeI4O1KgM/npQYoxK41auSUb4Qv1PJTNaqEnhXYn7zS8840Ew==
+X-Received: by 2002:a05:6512:6c9:b0:516:c8e5:db35 with SMTP id u9-20020a05651206c900b00516c8e5db35mr6894127lff.18.1712561999182;
+        Mon, 08 Apr 2024 00:39:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGYDBkJjgbRSv4emXcuf1/HTD8JQtEuPSUD5eeQ3QrlOhXQrKMs2KEWRXNbHyZBPzEseuHvbQ==
+X-Received: by 2002:a05:6512:6c9:b0:516:c8e5:db35 with SMTP id u9-20020a05651206c900b00516c8e5db35mr6894089lff.18.1712561998195;
+        Mon, 08 Apr 2024 00:39:58 -0700 (PDT)
+Received: from redhat.com ([2.52.152.188])
+        by smtp.gmail.com with ESMTPSA id n8-20020a5d4c48000000b0033e7b05edf3sm8276904wrt.44.2024.04.08.00.39.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 00:39:57 -0700 (PDT)
+Date: Mon, 8 Apr 2024 03:39:54 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Cindy Lu <lulu@redhat.com>
+Cc: jasowang@redhat.com, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] Documentation: Add reconnect process for VDUSE
+Message-ID: <20240408033804-mutt-send-email-mst@kernel.org>
+References: <20240404055635.316259-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,150 +89,71 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240406123833.406488-15-npiggin@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240404055635.316259-1-lulu@redhat.com>
 
-On Sat, Apr 06, 2024 at 10:38:23PM +1000, Nicholas Piggin wrote:
-> Various info and warnings are suppressed here, where circumstances
-> (commented) warrant.
+On Thu, Apr 04, 2024 at 01:56:31PM +0800, Cindy Lu wrote:
+> Add a document explaining the reconnect process, including what the
+> Userspace App needs to do and how it works with the kernel.
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
 > ---
->  configure               |  2 ++
->  run_tests.sh            |  3 +++
->  scripts/arch-run.bash   | 15 +++++++++++++++
->  scripts/mkstandalone.sh |  2 ++
->  scripts/runtime.bash    |  2 ++
->  5 files changed, 24 insertions(+)
+>  Documentation/userspace-api/vduse.rst | 41 +++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
 > 
-> diff --git a/configure b/configure
-> index 8508396af..6ebac7e0a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -437,6 +437,8 @@ ln -sf "$asm" lib/asm
+> diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/userspace-api/vduse.rst
+> index bdb880e01132..7faa83462e78 100644
+> --- a/Documentation/userspace-api/vduse.rst
+> +++ b/Documentation/userspace-api/vduse.rst
+> @@ -231,3 +231,44 @@ able to start the dataplane processing as follows:
+>     after the used ring is filled.
 >  
->  # create the config
->  cat <<EOF > config.mak
-> +# Shellcheck does not see these are used
-> +# shellcheck disable=SC2034
->  SRCDIR=$srcdir
->  PREFIX=$prefix
->  HOST=$host
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 938bb8edf..152323ffc 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -45,6 +45,9 @@ fi
->  only_tests=""
->  list_tests=""
->  args=$(getopt -u -o ag:htj:vl -l all,group:,help,tap13,parallel:,verbose,list,probe-maxsmp -- "$@")
-> +# Shellcheck likes to test commands directly rather than with $? but sometimes they
-> +# are too long to put in the same test.
-> +# shellcheck disable=SC2181
->  [ $? -ne 0 ] && exit 2;
->  set -- $args;
->  while [ $# -gt 0 ]; do
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 98d29b671..7e5b2bdf1 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -44,6 +44,8 @@ run_qemu ()
->  	if [ "$errors" ]; then
->  		sig=$(grep 'terminating on signal' <<<"$errors")
->  		if [ "$sig" ]; then
-> +			# This is too complex for ${var/search/replace}
-> +			# shellcheck disable=SC2001
->  			sig=$(sed 's/.*terminating on signal \([0-9][0-9]*\).*/\1/' <<<"$sig")
->  		fi
->  	fi
-> @@ -174,9 +176,12 @@ run_migration ()
->  
->  	# Holding both ends of the input fifo open prevents opens from
->  	# blocking and readers getting EOF when a writer closes it.
-> +	# These fds appear to be unused to shellcheck so quieten the warning.
->  	mkfifo ${src_infifo}
->  	mkfifo ${dst_infifo}
-> +	# shellcheck disable=SC2034
->  	exec {src_infifo_fd}<>${src_infifo}
-> +	# shellcheck disable=SC2034
->  	exec {dst_infifo_fd}<>${dst_infifo}
->  
->  	"${migcmdline[@]}" \
-> @@ -184,6 +189,9 @@ run_migration ()
->  		-mon chardev=mon,mode=control \
->  		< ${src_infifo} > ${src_outfifo} &
->  	live_pid=$!
-> +	# Shellcheck complains about useless cat but it is clearer than a
-> +	# redirect in this case.
-> +	# shellcheck disable=SC2002
->  	cat ${src_outfifo} | tee ${src_out} | filter_quiet_msgs &
->  
->  	# Start the first destination QEMU machine in advance of the test
-> @@ -224,6 +232,9 @@ do_migration ()
->  		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
->  		< ${dst_infifo} > ${dst_outfifo} &
->  	incoming_pid=$!
-> +	# Shellcheck complains about useless cat but it is clearer than a
-> +	# redirect in this case.
-> +	# shellcheck disable=SC2002
->  	cat ${dst_outfifo} | tee ${dst_out} | filter_quiet_msgs &
->  
->  	# The test must prompt the user to migrate, so wait for the
-> @@ -467,6 +478,8 @@ env_params ()
->  			[ -n "$ACCEL" ] && QEMU_ACCEL=$ACCEL
->  		fi
->  		QEMU_VERSION_STRING="$($qemu -h | head -1)"
-> +		# SC does not seee QEMU_MAJOR|MINOR|MICRO are used
+>  For more details on the uAPI, please see include/uapi/linux/vduse.h.
+> +
+> +HOW VDUSE devices reconnection works
+> +------------------------------------
+> +1. What is reconnection?
+> +
+> +   When the userspace application loads, it should establish a connection
+> +   to the vduse kernel device. Sometimes,the userspace application exists,
+> +   and we want to support its restart and connect to the kernel device again
+> +
+> +2. How can I support reconnection in a userspace application?
+> +
+> +2.1 During initialization, the userspace application should first verify the
+> +    existence of the device "/dev/vduse/vduse_name".
+> +    If it doesn't exist, it means this is the first-time for connection. goto step 2.2
+> +    If it exists, it means this is a reconnection, and we should goto step 2.3
+> +
+> +2.2 Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
+> +    /dev/vduse/control.
+> +    When ioctl(VDUSE_CREATE_DEV) is called, kernel allocates memory for
+> +    the reconnect information. The total memory size is PAGE_SIZE*vq_mumber.
 
-Shellcheck does not see
+Confused. Where is that allocation, in code?
 
-> +		# shellcheck disable=SC2034
->  		IFS='[ .]' read -r _ _ _ QEMU_MAJOR QEMU_MINOR QEMU_MICRO rest <<<"$QEMU_VERSION_STRING"
->  	fi
->  	env_add_params QEMU_ACCEL QEMU_VERSION_STRING QEMU_MAJOR QEMU_MINOR QEMU_MICRO
-> @@ -597,6 +610,8 @@ hvf_available ()
->  
->  set_qemu_accelerator ()
->  {
-> +	# Shellcheck does not seee ACCEL_PROPS is used
+Thanks!
 
-see
-
-> +	# shellcheck disable=SC2034
->  	ACCEL_PROPS=${ACCEL#"${ACCEL%%,*}"}
->  	ACCEL=${ACCEL%%,*}
->  
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index 756647f29..2318a85f0 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -65,6 +65,8 @@ generate_test ()
->  	fi
->  
->  	temp_file bin "$kernel"
-> +	# Don't want to expand $bin but print it as-is.
-> +	# shellcheck disable=SC2016
->  	args[3]='$bin'
->  
->  	(echo "#!/usr/bin/env bash"
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 3b76aec9e..6e712214d 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -137,6 +137,8 @@ function run()
->      # the check line can contain multiple files to check separated by a space
->      # but each check parameter needs to be of the form <path>=<value>
->      if [ "$check" ]; then
-> +        # There is no globbing or whitespace allowed in check parameters.
-> +        # shellcheck disable=SC2206
->          check=($check)
->          for check_param in "${check[@]}"; do
->              path=${check_param%%=*}
+> +2.3 Check if the information is suitable for reconnect
+> +    If this is reconnection :
+> +    Before attempting to reconnect, The userspace application needs to use the
+> +    ioctl(VDUSE_DEV_GET_CONFIG, VDUSE_DEV_GET_STATUS, VDUSE_DEV_GET_FEATURES...)
+> +    to get the information from kernel.
+> +    Please review the information and confirm if it is suitable to reconnect.
+> +
+> +2.4 Userspace application needs to mmap the memory to userspace
+> +    The userspace application requires mapping one page for every vq. These pages
+> +    should be used to save vq-related information during system running. Additionally,
+> +    the application must define its own structure to store information for reconnection.
+> +
+> +2.5 Completed the initialization and running the application.
+> +    While the application is running, it is important to store relevant information
+> +    about reconnections in mapped pages. When calling the ioctl VDUSE_VQ_GET_INFO to
+> +    get vq information, it's necessary to check whether it's a reconnection. If it is
+> +    a reconnection, the vq-related information must be get from the mapped pages.
+> +
+> +2.6 When the Userspace application exits, it is necessary to unmap all the
+> +    pages for reconnection
 > -- 
 > 2.43.0
->
 
-Other than comment fixes,
-
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
