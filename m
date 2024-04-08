@@ -1,146 +1,155 @@
-Return-Path: <kvm+bounces-13872-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13873-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0832B89BCD4
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 12:17:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F155289BDB4
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 13:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6880AB2251D
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 10:17:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F7901C218DB
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 11:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276AE52F87;
-	Mon,  8 Apr 2024 10:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70C26518F;
+	Mon,  8 Apr 2024 11:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I6UFY/A3"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="QUnnJn8p"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52871524AD
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 10:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F5828F4
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 11:03:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712571434; cv=none; b=NuNDdrxnV1Y4+Z+1GlKV7TP//9H/7ONR8u+RGTw6IUlIuR4Gy6Qxv0njZQBNG2FhvJpGa02Xxvb2EY0KLgPN3Bbxl0UgY7HExWjSrGR7lf4tFq4Ds6EtAUeWRcPRTYM670A+CRGLflyUQ8UIOGgaaF83AKjxsVevGPZ6wDZpS00=
+	t=1712574239; cv=none; b=XEnw7uHKsDXY9ZCRSJO5A7vudjaotP0N5EgnwAjkfvb7sV2Upe4yWfBNoQ9TGuzZ9DU2vgNgd7RJavsQK9xxesI2dLZAH88UHr9ZrNsONw+Kc/fC+74qDvncJ5cRITW7uW/wbtDhBP3mKNQFe9Upv6YzIvrE6wb912l8gRSg1H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712571434; c=relaxed/simple;
-	bh=fz4YeGvkKoR5kmc/E8PSurIa8ZZv5ax2hnnebm6qlHw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ReXbZGkDwXwI5SMQa3caIQ5FmRVXdi6CNe+/qvLkRA4FpW+ibKXAl+3Smz9Ms/75njK74ugBPMaXD5PjOin3xFL5pA69qdPzN8HWv3hBfNvA1LqBGeAJfhAzxzlhkNqOzrGjNaVU7HcqFIf8CZgU3Fq9dGWMvu++z8JB2+yhZXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I6UFY/A3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EA6EAC43394
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 10:17:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712571434;
-	bh=fz4YeGvkKoR5kmc/E8PSurIa8ZZv5ax2hnnebm6qlHw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=I6UFY/A3b3/cZroozX1XHJ+VFI5LhMh7e4DJO4WRFqf9qj8WVcJBKPQzGAC6qcV2F
-	 C4fJxYvWTXYRPW5t2UvzFfSyDbCE+WRLEGwLCXHIcLhe8kPTYx2a70pjvKAhacHlvg
-	 qEr7IRpgTYx/FsKIAVVj3a1oBXhpfjHeoWeqIUfQZ90NPOyN/kVjVtJR5qdlPtMSxF
-	 aJx/17s6ZgpPGkJpbNLRHfuELq7E03aOd8INON+Uj2Kuukl+40fg7lxEP/xuzwK5LP
-	 r7exqhkiiSMa32GdUcwch7AUNfSnloWtt1zz4538NaSnaR85vXtQvcxi146xjaZkEX
-	 NBEYycLoxSBSg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E0F13C53BD9; Mon,  8 Apr 2024 10:17:13 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218684] CPU soft lockups in KVM VMs on kernel 6.x after
- switching hypervisor from C8S to C9S
-Date: Mon, 08 Apr 2024 10:17:13 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: frantisek@sumsal.cz
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: PATCH_ALREADY_AVAILABLE
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-218684-28872-ztFRu80GP8@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218684-28872@https.bugzilla.kernel.org/>
-References: <bug-218684-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1712574239; c=relaxed/simple;
+	bh=wkKRyt/Vw/5zc5dlJy0JHXCMpR/2OfytD1MG2A8RMO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WAIBQ2viy8Hh97QeTUdNdKV2+wVeUle9BRAseiLL7arM6WbwL+4UeQTX1ZecxWBmtX9xzQzijXkP0X3lK7WjV8M4DEOCAn0q3w38Ga45nwvSvaQpHw44M0OvR/gDVmthO0qX5pWRyg+ensQMzKaDQU9xJ9oTINGKOb3vfVlsWIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=QUnnJn8p; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56e48d0a632so2574385a12.2
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 04:03:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1712574236; x=1713179036; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4g1Fe38jasdHywEL2euSnsmLnhOpgJ82XZytSUr/W9Q=;
+        b=QUnnJn8pEBYu+zh4J/NCAw2trUTPY4j7dqg1dvLrnb7kRyq47WMMmXmsPGkDqeCqam
+         5qSVvM/tQNajw1Tbw2wJ3UXlD30gyrnfkchtL3WmvUS9z1oAWL48DGwoIW0GG284ZFzF
+         2nn6O9pXtb2isRu1dwwWA7md9vFurJiOfbQHT87T/K4yFdO/WSPp/Ma7LFomKR0piXNa
+         YMKyTmZhMaD7vxSqW3eBqJzaYu6AeglocNS+UxJ+NxfsNJzcPdGTCDBkN8/JlFbZtkif
+         Err7zcMtdQTnJCj8fmn1PT+otC5l8H2OoxV5lto8v3CQLmNvp/0KbpCw0eil8FHz6w/N
+         m1xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712574236; x=1713179036;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4g1Fe38jasdHywEL2euSnsmLnhOpgJ82XZytSUr/W9Q=;
+        b=Au2ZJrhC0NcqKuUolI2151A4gZ+KAlvxXyWdsw29PeawxVRhhNoKpLOfFY1OIWQZFE
+         ZCELnR/R/GfsNZOFn89frUabZVw2rNNjkSPjzyJLYzbF85SSWy+eWLhNUPaVRUZWFTBm
+         BJtKET75F/EOGdwCGv2eWKaR80TLBmv8G6QC3pYdbnA/weatFGRCp3dLJcn7fbR488XO
+         2EfXTP/WHfS6Tiztxz8HaCm7z89o1hXNcoUNWxOWWJfMIcQQakC/Fj3vpVPxSNQR4R4O
+         tnpNvY3FTVrjxCg97q/1rPOXTzh06tWngJKocklfKrRTu5UouJ1XE9yNYV4TQIucO2IE
+         HYGg==
+X-Forwarded-Encrypted: i=1; AJvYcCXP3kt7rPsd1G0KCI4uP+hWYlvvSddpiAxxjeqIHsWPnfgGzAnc3hJwfCfLzjV2VndW87fe8HbCqThkqOQijsCFtCvm
+X-Gm-Message-State: AOJu0Ywbe0BWPMEgrjU1LR/tri1laYmcvCvO6Bo7dblc9ep2wfg5/klf
+	t8SbvNYCKv6wEpFDHEvlQ7jPYYujT/i9IMWjR9pIngpA6+MMnQiLlBk+KuDQ5DQ=
+X-Google-Smtp-Source: AGHT+IGnIHRj0+4dG4NgzsNXCqgJTww4f9iaHdQi6M7w7Zma3E/8aHUoufLLnKT3jNOOK2m1ikAHoA==
+X-Received: by 2002:a17:906:31d4:b0:a46:da28:992e with SMTP id f20-20020a17090631d400b00a46da28992emr5801257ejf.71.1712574236283;
+        Mon, 08 Apr 2024 04:03:56 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id b15-20020a170906d10f00b00a4df4243473sm4279042ejz.4.2024.04.08.04.03.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 04:03:55 -0700 (PDT)
+Date: Mon, 8 Apr 2024 13:03:54 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: Deepak Gupta <debug@rivosinc.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>, 
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 0/5] Add parsing for Zimop ISA extension
+Message-ID: <20240408-6c93f3f50b55234f3825ca33@orel>
+References: <20240404103254.1752834-1-cleger@rivosinc.com>
+ <20240405-091c6c174f023d74b434059d@orel>
+ <CAKC1njQ3qQ8mTMoYkhhoGQfRSVtp2Tfd2LjDhAmut7UcW9-bGw@mail.gmail.com>
+ <ddc5555a-3ae8-42e5-a08a-ca5ceaf0bf28@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ddc5555a-3ae8-42e5-a08a-ca5ceaf0bf28@rivosinc.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218684
+On Mon, Apr 08, 2024 at 10:01:12AM +0200, Clément Léger wrote:
+> 
+> 
+> On 05/04/2024 19:33, Deepak Gupta wrote:
+> > On Fri, Apr 5, 2024 at 8:26 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+> >>
+> >> On Thu, Apr 04, 2024 at 12:32:46PM +0200, Clément Léger wrote:
+> >>> The Zimop ISA extension was ratified recently. This series adds support
+> >>> for parsing it from riscv,isa, hwprobe export and kvm support for
+> >>> Guest/VM.
+> >>
+> >> I'm not sure we need this. Zimop by itself isn't useful, so I don't know
+> >> if we need to advertise it at all. When an extension comes along that
+> >> redefines some MOPs, then we'll advertise that extension, but the fact
+> >> Zimop is used for that extension is really just an implementation detail.
+> > 
+> > Only situation I see this can be useful is this:--
+> > 
+> > An implementer, implemented Zimops in CPU solely for the purpose that they can
+> > run mainline distro & packages on their hardware and don't want to leverage any
+> > feature which are built on top of Zimop.
+> 
+> Yes, the rationale was that some binaries using extensions that overload
+> MOPs could still be run. With Zimop exposed, the loader could determine
+> if the binary can be executed without potentially crashing. We could
+> also let the program run anyway but the execution could potentially
+> crash unexpectedly, which IMHO is not really good for the user
+> experience nor for debugging. I already think that the segfaults which
+> happens when executing binaries that need some missing extension are not
+> so easy to debug, so better add more guards.
 
-Frantisek Sumsal (frantisek@sumsal.cz) changed:
+OK. It's only one more extension out of dozens, so I won't complain more,
+but I was thinking that binaries that use particular extensions would
+check for those particular extensions (step 2), rather than Zimop.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |PATCH_ALREADY_AVAILABLE
+Thanks,
+drew
 
---- Comment #2 from Frantisek Sumsal (frantisek@sumsal.cz) ---
-(In reply to Sean Christopherson from comment #1)
-> On Fri, Apr 05, 2024, bugzilla-daemon@kernel.org wrote:
-<...snip...>
->=20
-> Hmm, the vCPU is stuck in the idle HLT loop, which suggests that the vCPU
-> isn't
-> waking up when it should.  But it does obviously get the hrtimer interrup=
-t,
-> so
-> it's not completely hosed.
->=20
-> Are you able to test custom kernels?  If so, bisecting the host kernel is
-> likely
-> the easiest way to figure out what's going on.  It might not be the
-> _fastest_,
-> but it should be straightforward, and shouldn't require much KVM expertis=
-e,
-> i.e.
-> won't require lengthy back-and-forth discussions if no one immediately sp=
-ots
-> a
-> bug.
->=20
-> And before bisecting, it'd be worth seeing if an upstream host kernel has=
- the
-> same problem, e.g. if upstream works, it might be easier/faster to bisect=
- to
-> a
-> fix, than to bisect to a bug.
-
-I did some tests over the weekend, and after installing the latest-ish main=
-line
-kernel on the host (6.9.0-0.rc1.316.vanilla.fc40.x86_64, ignore the fc40 pa=
-rt,
-I was just lazy and used [0] for a quick test) the soft lockups disappear
-completely. I really should've tried this before filing an issue - I tried =
-just
-6.7.1-0.hs1.hsx.el9.x86_64 (from [1]) and that didn't help, so I mistakenly
-assumed that it's not the host kernel who's at fault.
-
-Also, with the mainline kernel on the host, I can now use the "stock" Arch
-Linux kernel on the guest as well without any soft lockups.
-
-Given the mainline kernel works as expected I'll go ahead and move this iss=
-ue
-to the RHEL downstream (and bisect the kernel to find out what's the fix).
-Thanks a lot for nudging me into the right direction!
-
-[0] https://fedoraproject.org/wiki/Kernel_Vanilla_Repositories
-[1] https://sig.centos.org/hyperscale/
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+> 
+> > 
+> > As an example zicfilp and zicfiss are dependent on zimops. glibc can
+> > do following
+> > 
+> > 1) check elf header if binary was compiled with zicfiss and zicfilp,
+> > if yes goto step 2, else goto step 6.
+> > 2) check if zicfiss/zicfilp is available in hw via hwprobe, if yes
+> > goto step 5. else goto step 3
+> > 3) check if zimop is available via hwprobe, if yes goto step 6, else goto step 4
+> 
+> I think you meant step 5 rather than step 6.
+> 
+> Clément
+> 
+> > 4) This binary won't be able to run successfully on this platform,
+> > issue exit syscall. <-- termination
+> > 5) issue prctl to enable shadow stack and landing pad for current task
+> > <-- enable feature
+> > 6) let the binary run <-- let the binary run because no harm can be done
 
