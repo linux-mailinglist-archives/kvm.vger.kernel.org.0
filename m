@@ -1,189 +1,149 @@
-Return-Path: <kvm+bounces-13868-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77E6589B970
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 09:57:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F15F589B99C
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 10:01:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A82071C223A2
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 07:57:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6F69281531
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 08:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9550825570;
-	Mon,  8 Apr 2024 07:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1B72D05D;
+	Mon,  8 Apr 2024 08:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="irilo2Ty"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="Bip6JL3E"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-8fa8.mail.infomaniak.ch (smtp-8fa8.mail.infomaniak.ch [83.166.143.168])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B3A29CEB
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 07:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800D22C86A
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 08:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712562788; cv=none; b=ZXePYxVUkUzMoXxHEj+zf9Ab6z+QRz6tYnogiq1lcn85thEYQ24JMFCBFyWbbEHO0LiUEbnXCKubTKObiLxd3KHKlg+L8suM4uoH8M2gbItZgmtE2Rl6uj0b7uWwAgAS9VDMfaqJ3MKqTHzqIVAv0ANoVCGQPg6y4oWRNBhhXKs=
+	t=1712563278; cv=none; b=GwY3CUE7eu9Vtfe/PxsDq2+7M18PKEVIrC0wpMMKX+OrEk/JcE4qaETjC7OChYImiEnZGUqa8dgdO7ytTdrXMQtmB+89SIKbOFFrAAeYmFj/9UH1gCbMJIjzy9+rGrv7RMZAidV4wce7t/U8JKZyHPASxZNIWfrCL534EsWjkJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712562788; c=relaxed/simple;
-	bh=bZ6LYvtmVQg7V+57TeHLNvjsThrxUvXCCbMFN4WIJOA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dJTnq4dLy2nPTYVdIGPVtpDQxOJWjECJAYmsT2nj3WE5I1dXkA1uK5dSiy3DLaxnogyKfGLP9SZwbsM6BQSD2tnqgnnHUq8nN4zICTt13H9mNUlxg6pY7NS5sN6M7/oFVHwl4csBjiBarxRyFDKqx0H0fmk8heTu87qBUo1iBSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=irilo2Ty; arc=none smtp.client-ip=83.166.143.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VCh4g4LNJzDj5;
-	Mon,  8 Apr 2024 09:46:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1712562419;
-	bh=bZ6LYvtmVQg7V+57TeHLNvjsThrxUvXCCbMFN4WIJOA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=irilo2TyXHxH1HmjWzd5ma96hKDCpOPWki4uN2ph3nDS7pWaaIj92Q972R3WxyM6k
-	 XhwQ1VQbAPWBHBxCkKYmZbAOk+BD/75YzXVGHjteeuVW09LgY1gkf0LC1mK7inHsp9
-	 qFr9Bj6/nr68DCEodak6KjYhKUJEH+So8MYTUDr8=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VCh4f732zzS7b;
-	Mon,  8 Apr 2024 09:46:58 +0200 (CEST)
-From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-To: Brendan Higgins <brendanhiggins@google.com>,
-	David Gow <davidgow@google.com>,
-	Rae Moar <rmoar@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	Alan Maguire <alan.maguire@oracle.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"Eric W . Biederman" <ebiederm@xmission.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	James Morris <jamorris@linux.microsoft.com>,
-	Kees Cook <keescook@chromium.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
-	Marco Pagani <marpagan@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Thara Gopinath <tgopinath@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Zahra Tarkhani <ztarkhani@microsoft.com>,
-	kunit-dev@googlegroups.com,
-	kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-um@lists.infradead.org,
-	x86@kernel.org
-Subject: [PATCH v4 RESEND 7/7] kunit: Add tests for fault
-Date: Mon,  8 Apr 2024 09:46:25 +0200
-Message-ID: <20240408074625.65017-8-mic@digikod.net>
-In-Reply-To: <20240408074625.65017-1-mic@digikod.net>
-References: <20240408074625.65017-1-mic@digikod.net>
+	s=arc-20240116; t=1712563278; c=relaxed/simple;
+	bh=oFtZMMMzF5IIyBLE1OofkhOkb8Z20H1FcMxpZ0BjJv8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Pb9EJQISVq2HJu7p+MPWjkXiY+F9pWBeAQNllNsVAVZDlcKlWhQ0s7SRd6pzCWyuH04mnATMv84SrJ2v+b03+aiPYo+aKQR0vDVwPJNNd6qFUPBZKtg8fMmDWgYcdSmraEU5Ppu0SL5RSiOTHHYzyPXISvx9Aok3cf5eKOj8lY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=Bip6JL3E; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4167082dabdso1127775e9.0
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 01:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712563275; x=1713168075; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nEXus2Ynno1AeuPQLNpTk8iPF9Mbvy8RxA45xKLQHC0=;
+        b=Bip6JL3E5DmYfcHSQhhsjkUrX2FhlhScGfa3gp3f7UXkyJ6GwmgIrMmBAkeJwGHzZT
+         4bYXkqgmjaKO2CxXaUgbKsBJpBzduYctad1Y7wq9sNGEzKrHH3oA9s/RMJMiwo+0XeaJ
+         UOB2hjcxyvBBe98dnlClXCpESUeIFaKrnEgSKcASp/7AbGNKuA7oHeGvsgQFFPC4y/M0
+         iZdDt9refM7EPnt1/ks0Gl+5WTG0+y86cYwKTKVE+RzDUgCG4HeQfoh+3fSdg5niiuhX
+         qyb7qhc0Z/R5gaOIRI96amQkpLa3wponaInlsOcdTbNzd4lq92F4WQ8CUEkTcJEkhXwK
+         0nGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712563275; x=1713168075;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nEXus2Ynno1AeuPQLNpTk8iPF9Mbvy8RxA45xKLQHC0=;
+        b=vpBWUI5HM7vVXYiDi5+ZW2SKRHWaMvWN0rLcfG1wPWJ/PyS9agEW53HheP+oeAds/y
+         dCATg0VO0Dm/a5Iy4FqrO2pFkMQjw71C7yIXTzcZ8aENpjSbld2P7PZHHiQawGpc4q9u
+         nG7vHwStjWpPunfIuUfiCgnH7q2FOrScZ74sDYTeJCRA15AYzj10v0jT7OevyKAWW+qD
+         dUO42UF5acUQv1RfzON3yjzFTk1g/9Nu+/Ws/dDEGZWNFfqiuEWyyww3wPgR8PLWqZLt
+         pMvQKXXKrzuE25NMJMgHDuoDfYy7bxqEwb6a7GOEQb1JEUwg6W8Qc82piW67sYWT/9GQ
+         ahuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWufzvc+4yRV4sr8mZ3BjxGBcL1IO6QOq0/2i5jxLpQ+Xk8iEP9+rV9wbtOQHnXwJGE8MS4OJNMy6P8MYsOjqZFre7k
+X-Gm-Message-State: AOJu0Yx1AEJG3niqTd6yhmCBhrY6qAG9fZyVN/vokCxB0R6Z4XP1K7/Y
+	s7sB656QuYrSBFZdC9D/NUjnrmWooExhSDjDPd1fjCcj5eaf7ycI+d3qi4OFP7k=
+X-Google-Smtp-Source: AGHT+IEQUCd5IWDe0mYq0rDe9VUQhrgm0s8IGNzOcuAIRUoN4LcKFabia6A+gxLsv3jGCmScuNsjTA==
+X-Received: by 2002:a05:600c:3b96:b0:416:7b2c:df09 with SMTP id n22-20020a05600c3b9600b004167b2cdf09mr834824wms.1.1712563274884;
+        Mon, 08 Apr 2024 01:01:14 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:999:a3a0:6327:edd6:6580:3ead? ([2a01:e0a:999:a3a0:6327:edd6:6580:3ead])
+        by smtp.gmail.com with ESMTPSA id n32-20020a05600c3ba000b00415612e29a1sm12515475wms.30.2024.04.08.01.01.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Apr 2024 01:01:13 -0700 (PDT)
+Message-ID: <ddc5555a-3ae8-42e5-a08a-ca5ceaf0bf28@rivosinc.com>
+Date: Mon, 8 Apr 2024 10:01:12 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/5] Add parsing for Zimop ISA extension
+To: Deepak Gupta <debug@rivosinc.com>, Andrew Jones <ajones@ventanamicro.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor@kernel.org>,
+ Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+ Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+References: <20240404103254.1752834-1-cleger@rivosinc.com>
+ <20240405-091c6c174f023d74b434059d@orel>
+ <CAKC1njQ3qQ8mTMoYkhhoGQfRSVtp2Tfd2LjDhAmut7UcW9-bGw@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <CAKC1njQ3qQ8mTMoYkhhoGQfRSVtp2Tfd2LjDhAmut7UcW9-bGw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
 
-Add a test case to check NULL pointer dereference and make sure it would
-result as a failed test.
 
-The full kunit_fault test suite is marked as skipped when run on UML
-because it would result to a kernel panic.
 
-Tested with:
-./tools/testing/kunit/kunit.py run --arch x86_64 kunit_fault
-./tools/testing/kunit/kunit.py run --arch arm64 \
-  --cross_compile=aarch64-linux-gnu- kunit_fault
+On 05/04/2024 19:33, Deepak Gupta wrote:
+> On Fri, Apr 5, 2024 at 8:26 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+>>
+>> On Thu, Apr 04, 2024 at 12:32:46PM +0200, Clément Léger wrote:
+>>> The Zimop ISA extension was ratified recently. This series adds support
+>>> for parsing it from riscv,isa, hwprobe export and kvm support for
+>>> Guest/VM.
+>>
+>> I'm not sure we need this. Zimop by itself isn't useful, so I don't know
+>> if we need to advertise it at all. When an extension comes along that
+>> redefines some MOPs, then we'll advertise that extension, but the fact
+>> Zimop is used for that extension is really just an implementation detail.
+> 
+> Only situation I see this can be useful is this:--
+> 
+> An implementer, implemented Zimops in CPU solely for the purpose that they can
+> run mainline distro & packages on their hardware and don't want to leverage any
+> feature which are built on top of Zimop.
 
-Cc: Brendan Higgins <brendanhiggins@google.com>
-Cc: Rae Moar <rmoar@google.com>
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Reviewed-by: David Gow <davidgow@google.com>
-Signed-off-by: Mickaël Salaün <mic@digikod.net>
-Link: https://lore.kernel.org/r/20240408074625.65017-8-mic@digikod.net
----
+Yes, the rationale was that some binaries using extensions that overload
+MOPs could still be run. With Zimop exposed, the loader could determine
+if the binary can be executed without potentially crashing. We could
+also let the program run anyway but the execution could potentially
+crash unexpectedly, which IMHO is not really good for the user
+experience nor for debugging. I already think that the segfaults which
+happens when executing binaries that need some missing extension are not
+so easy to debug, so better add more guards.
 
-Changes since v2:
-* Add David's Reviewed-by.
+> 
+> As an example zicfilp and zicfiss are dependent on zimops. glibc can
+> do following
+> 
+> 1) check elf header if binary was compiled with zicfiss and zicfilp,
+> if yes goto step 2, else goto step 6.
+> 2) check if zicfiss/zicfilp is available in hw via hwprobe, if yes
+> goto step 5. else goto step 3
+> 3) check if zimop is available via hwprobe, if yes goto step 6, else goto step 4
 
-Changes since v1:
-* Remove the rodata and const test cases for now.
-* Replace CONFIG_X86 check with !CONFIG_UML, and remove the "_x86"
-  references.
----
- lib/kunit/kunit-test.c | 45 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+I think you meant step 5 rather than step 6.
 
-diff --git a/lib/kunit/kunit-test.c b/lib/kunit/kunit-test.c
-index f7980ef236a3..0fdca5fffaec 100644
---- a/lib/kunit/kunit-test.c
-+++ b/lib/kunit/kunit-test.c
-@@ -109,6 +109,48 @@ static struct kunit_suite kunit_try_catch_test_suite = {
- 	.test_cases = kunit_try_catch_test_cases,
- };
- 
-+#ifndef CONFIG_UML
-+
-+static void kunit_test_null_dereference(void *data)
-+{
-+	struct kunit *test = data;
-+	int *null = NULL;
-+
-+	*null = 0;
-+
-+	KUNIT_FAIL(test, "This line should never be reached\n");
-+}
-+
-+static void kunit_test_fault_null_dereference(struct kunit *test)
-+{
-+	struct kunit_try_catch_test_context *ctx = test->priv;
-+	struct kunit_try_catch *try_catch = ctx->try_catch;
-+
-+	kunit_try_catch_init(try_catch,
-+			     test,
-+			     kunit_test_null_dereference,
-+			     kunit_test_catch);
-+	kunit_try_catch_run(try_catch, test);
-+
-+	KUNIT_EXPECT_EQ(test, try_catch->try_result, -EINTR);
-+	KUNIT_EXPECT_TRUE(test, ctx->function_called);
-+}
-+
-+#endif /* !CONFIG_UML */
-+
-+static struct kunit_case kunit_fault_test_cases[] = {
-+#ifndef CONFIG_UML
-+	KUNIT_CASE(kunit_test_fault_null_dereference),
-+#endif /* !CONFIG_UML */
-+	{}
-+};
-+
-+static struct kunit_suite kunit_fault_test_suite = {
-+	.name = "kunit_fault",
-+	.init = kunit_try_catch_test_init,
-+	.test_cases = kunit_fault_test_cases,
-+};
-+
- /*
-  * Context for testing test managed resources
-  * is_resource_initialized is used to test arbitrary resources
-@@ -826,6 +868,7 @@ static struct kunit_suite kunit_current_test_suite = {
- 
- kunit_test_suites(&kunit_try_catch_test_suite, &kunit_resource_test_suite,
- 		  &kunit_log_test_suite, &kunit_status_test_suite,
--		  &kunit_current_test_suite, &kunit_device_test_suite);
-+		  &kunit_current_test_suite, &kunit_device_test_suite,
-+		  &kunit_fault_test_suite);
- 
- MODULE_LICENSE("GPL v2");
--- 
-2.44.0
+Clément
 
+> 4) This binary won't be able to run successfully on this platform,
+> issue exit syscall. <-- termination
+> 5) issue prctl to enable shadow stack and landing pad for current task
+> <-- enable feature
+> 6) let the binary run <-- let the binary run because no harm can be done
 
