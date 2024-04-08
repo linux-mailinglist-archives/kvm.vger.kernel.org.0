@@ -1,321 +1,300 @@
-Return-Path: <kvm+bounces-13910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3027689CBDE
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 20:43:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADFCB89CBEA
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 20:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DB121F26E31
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 18:43:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 266B51F283D5
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 18:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0056B6A8A4;
-	Mon,  8 Apr 2024 18:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FCA1448C4;
+	Mon,  8 Apr 2024 18:46:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V/Parmi+"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QWc18v6e";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Cz6Hhwx6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1C4F51B;
-	Mon,  8 Apr 2024 18:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712601771; cv=none; b=GRVNpkRdqhsq4W0Trp1frvnfdjRv32jSfgj6OU2xNP4SxTQdkjdPxqYvoxvQZbgq/a6mkprL0r15Rm8D06IeDZ7083+z7Oy6/r9Nz3T7n6d3NfuN/pinhOcTTBxAHG+iE07gQQ0pDTkFMbCKg8IPhN30bBaADaHITse9vuKh6Gk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712601771; c=relaxed/simple;
-	bh=0yVcPh6jQemtqyf3pVMKTuzquslNkgOsytj52m1E4yI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XPyPBfnXjNspbhUmkFe21vofkXgU7xCNgSPe6Z86L6BSVkrgcsSaHaZXxlFzotjOPGhLsxLveMxHhZv38vl3LT8O7mg9QzfOXrb4/V2k2TayRpv/FcUzQUgW2JMMgqqyH/StllM20AwGRV/TcPGhxlY0rA/T8u1dIc+3gOelODQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V/Parmi+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E07C433C7;
-	Mon,  8 Apr 2024 18:42:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712601770;
-	bh=0yVcPh6jQemtqyf3pVMKTuzquslNkgOsytj52m1E4yI=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=V/Parmi+bnfDse6/WIy/AZTXDq7tM///tp2rcTx+UvSLiQS6IRjkgidPKy3EXXCfN
-	 g3+3H7kYg6bbGrV1Agp6dbL4qSPQfUwgf8XrSkjYGASSMk6dp1yAyQhqFxgAkxHz+r
-	 KN0NFN0eEB34+CLBi8S16HftMysjUy6+95qXDmEaj8W4Tb8fbcTvqqPwiSbF2Cwzt3
-	 wvu+2AXgwigLnjsr070sHG1F1hKqM43mLF7xIzbbOCja4RiI2Va/EJxYHKQSTprdUS
-	 iTk5caK9IphRbleDCca+0lPf0Y62fyZRoN/n/HF574rOBCImUfoLJ/0CATnfkvJ+gc
-	 pB3vARJ0KTK2Q==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 3D9B9CE126C; Mon,  8 Apr 2024 11:42:50 -0700 (PDT)
-Date: Mon, 8 Apr 2024 11:42:50 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>,
-	Leonardo Bras <leobras@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
-Message-ID: <414eaf1e-ca22-43f3-8dfa-0a86f5b127f5@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240328171949.743211-1-leobras@redhat.com>
- <ZgsXRUTj40LmXVS4@google.com>
- <ZhAAg8KNd8qHEGcO@tpad>
- <ZhAN28BcMsfl4gm-@google.com>
- <a7398da4-a72c-4933-bb8b-5bc8965d96d0@paulmck-laptop>
- <ZhQmaEXPCqmx1rTW@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12585B04F;
+	Mon,  8 Apr 2024 18:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712601999; cv=fail; b=tzF2yYtp9wkojPkGDwAys8TGEwP0fpL2Sx32xTWEAM1QKZKGdBOEOeJ/RmvDJuLl/Iutw5cj/XemHNnwg6gRLeEiaEftwykiUmAlrv+gI/tQyhjgX3xB20CqQ+9N3tSAazyNheq9NOIugKJ6lMIeEhadTXAmTl0fVkJZps0xDjQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712601999; c=relaxed/simple;
+	bh=woS7mS4Z6sH8TH9H+T6Iais/zy3RXQKZdHyJI4mQsp4=;
+	h=References:From:To:Cc:Subject:In-reply-to:Message-ID:Date:
+	 Content-Type:MIME-Version; b=PnYkEAxk/tjYG115+Jv6EONvOwnQV1EYBwK4EVo3G9SNMKzvg3hIDiz+YrmPoo7qOIjVrUTF4ItOBibST9NJX/t3yMweUWIzXmQs/GHmS97GP3HndN5EDCOZifY0ObV+jBYf5t5dxhnwNxNIHLQH4iuCtlPQe6dPMJsng6V/pWk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=QWc18v6e; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Cz6Hhwx6; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 438EPXJG019892;
+	Mon, 8 Apr 2024 18:45:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=references : from :
+ to : cc : subject : in-reply-to : message-id : date : content-type :
+ mime-version; s=corp-2023-11-20;
+ bh=zJEfrYpkoK/2typK+0ksu3aVQHfb/kvolN9hRyrxS54=;
+ b=QWc18v6epzKEoHtWTa3MV2LWLl6LrEuk+BSa5kH8jGPp43d90MCrzk8HZ+pmcmpq72gl
+ g+Tmj5cnAoxpD0YsB7SgRQG5FN81w087d78KvpwD9j0B9bDhP9iP0ykB0pBJIvK8luDq
+ y5cXdbfjc0rTUGqGhjr/efn03Pa3IBfT9w1vMnwIJbVSyDcwLiCfhi1tWnIsSU5Oq/v0
+ sy2UBWcs6zDYB9WsWJzQJntKEBfhY9o/bH+XIUihhJ+kBiX0Vt4RwnxOAwBW6IcFlkxk
+ cELSY/+1tTnrje4lAXmW1jt2a+n07EMVfaVKVXlzOYbhuXKKuv7dhoNGQvTJx9UPNLcg KQ== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xaw023fqg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Apr 2024 18:45:30 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 438H2CxT019441;
+	Mon, 8 Apr 2024 18:45:28 GMT
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2041.outbound.protection.outlook.com [104.47.73.41])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3xavubvyfx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Apr 2024 18:45:28 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HWEqv++iiA7WulqQSXhf8IsOEllIAKeAc8q1rvCAhbx5z+d+oyZ3P0GXO+jH95bOfYA6BeFuFFg+FdXrNkZlH+UHhRrPpSBW+C2ec1PC0OCpYydHNsk/+T04Q5VGRXuAZeRzV5VN8hjQj+4uNG61BS6Dd8/ycPaa/f6vdyPzVhn011Wu9o4g+Ryx70bO6bIkQ8u6hCEFpASt6aiNWnG43bmyuCIDdXRG4/+asvtvNzv3ePaaHWkbWcntXOAjC/887RnhJrK7GJN7z/FfenREgxYlhiBDxIsNOX3+GY8F/8oQebTrkOlOaEXb9JROnDOIkLOuXNeFPr0kgKO9yUdS2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zJEfrYpkoK/2typK+0ksu3aVQHfb/kvolN9hRyrxS54=;
+ b=ifeXOUa0TYhnVEuw3xj1TqpjO0Xv0XXVQVuiOqPe8kP0OqB7HF2BirP/Mua5Mz45XEj37ZlXjNrfAwVtXBA98Pu7onZgjPyo5Gg80INqSSj3ivwKV/7jc6XT6Zf9RNp2ayUbCnuTm1fW2dWXdNcCDKDtIZlv+c2MkTie2iwP6jU7BCSd7ii/jJRHt9LR8r3saihw4qpNX64EweIPLDshtgau8I22jFvyFOSlRwziK0q53k7x9Dh0iyXLQAK8i0QlfFbqqqhZ3c7vouZmqZwk+gt8akN3AcNb6QrWaljjdnFYLJPBkzT0YC+ZfZFLGMcgxJoIgYRnlHlu8+O6zNJ3Aw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zJEfrYpkoK/2typK+0ksu3aVQHfb/kvolN9hRyrxS54=;
+ b=Cz6Hhwx6NQdIPEwNfxE/Z9AxY8vX7+rY27RB524wig9bIDv2BZp3y2O0iE9q5CG/lxoFAak2YYRW6/4DfgMruNBdmDEoKF2aq3tHsWs87lN3NbqS225/oWJVf1iyKrJf9Phxm/QZW+DvXLR4MlFAkAXDDF82U1P8BKLBbo9pcrQ=
+Received: from CO6PR10MB5409.namprd10.prod.outlook.com (2603:10b6:5:357::14)
+ by SN7PR10MB6956.namprd10.prod.outlook.com (2603:10b6:806:34a::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 8 Apr
+ 2024 18:45:25 +0000
+Received: from CO6PR10MB5409.namprd10.prod.outlook.com
+ ([fe80::4104:529:ba06:fcb8]) by CO6PR10MB5409.namprd10.prod.outlook.com
+ ([fe80::4104:529:ba06:fcb8%7]) with mapi id 15.20.7409.042; Mon, 8 Apr 2024
+ 18:45:25 +0000
+References: <1707982910-27680-1-git-send-email-mihai.carabas@oracle.com>
+ <1707982910-27680-8-git-send-email-mihai.carabas@oracle.com>
+ <7f3e540ad30f40ae51f1abda24b1bea2c8b648ea.camel@amazon.com>
+ <87r0fjtn9y.fsf@oracle.com>
+ <aada0beae0b3479bfa311eea94a3b595bb8e5835.camel@amazon.com>
+User-agent: mu4e 1.4.10; emacs 27.2
+From: Ankur Arora <ankur.a.arora@oracle.com>
+To: "Okanovic, Haris" <harisokn@amazon.com>
+Cc: "ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "dianders@chromium.org"
+ <dianders@chromium.org>,
+        "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+        "pmladek@suse.com"
+ <pmladek@suse.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+        "mingo@redhat.com"
+ <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "daniel.lezcano@linaro.org"
+ <daniel.lezcano@linaro.org>,
+        "mihai.carabas@oracle.com"
+ <mihai.carabas@oracle.com>,
+        "arnd@arndb.de" <arnd@arndb.de>, "will@kernel.org" <will@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "mic@digikod.net"
+ <mic@digikod.net>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "npiggin@gmail.com" <npiggin@gmail.com>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "rafael@kernel.org"
+ <rafael@kernel.org>,
+        "juerg.haefliger@canonical.com"
+ <juerg.haefliger@canonical.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "rick.p.edgecombe@intel.com" <rick.p.edgecombe@intel.com>
+Subject: Re: [PATCH v4 7/8] cpuidle/poll_state: replace cpu_relax with
+ smp_cond_load_relaxed
+In-reply-to: <aada0beae0b3479bfa311eea94a3b595bb8e5835.camel@amazon.com>
+Message-ID: <87il0rsnf0.fsf@oracle.com>
+Date: Mon, 08 Apr 2024 11:46:11 -0700
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR18CA0027.namprd18.prod.outlook.com
+ (2603:10b6:208:23c::32) To CO6PR10MB5409.namprd10.prod.outlook.com
+ (2603:10b6:5:357::14)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhQmaEXPCqmx1rTW@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO6PR10MB5409:EE_|SN7PR10MB6956:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	Ets+L1JkbgmOoyN+T9UpIPzdm1FVTRYn2XVXXJedxRdOaRXXTRnG93S0pzSLETb5zcuu2KE4jDjG1l42P/WLtdQtBKBdOCMY9rJ/SAZ0l/ZH6mKerWI14vTtM2VSEBXvgbSTDzMozc+nA85gV9Uy7pjkALqZMYYdxjyYATolDGtGCl7O+1Y1+ByCAUB6ZO4Anizskqjzd7nOkLOxPuJz2bZXXnwg2F8itCTabYMBxoAmlFHYkh/lJp8SNgmjvYnEKTrP1VrG03mcdt69dPgFPCCcx4ztQH1ZQAgV1jQD2CMQxf4/Q0pqj4Pv+tu53YC4XYBWXwrdOgv5Rfx9SeCsDJpvuV0iVBTWaUgL5kPerotnhRt0kMzssKhMgoEtrhgO1/71iaXygHQcS1SIgQhbCSTZBPP32aMvGiRsNW7vAjSVs+kdJRFrVgNOLweFsgg5D8vljOms1cPfMxCc2R8APma7Gk0ZK4mfiq9g28lW9YhQaDM85SzMj3NZ9T/MyuEZOBmgpcxo3jZsYN9sf3ooRCLJ2RYsftZccbcBy3tHrM+jplnUdq0PxPnPPQNc+MeIGGNGcfY8vt7Qf/0LvwNw0RCUSklLgpcSCUVVUqaMrfo=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR10MB5409.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?us-ascii?Q?0u4iciE2SefoNyOqRZTjXTvSGRdAr21ZBlHniS1ygZe9CiMpeM68cp0GvsOv?=
+ =?us-ascii?Q?3wNTWzTwCxm5ovwwS5ySKmwFfr+3O+7rd67eJk22eOJEuAkOgZrZx1wan5zN?=
+ =?us-ascii?Q?lJbmSlGXsy6MD+OIQtKg9jLMF/cDAqewDH9a3PJHe/YT/+wzzFWsndSOO/UT?=
+ =?us-ascii?Q?8BZLy6uzTuxNGIMxM506oaljKk+VxSM7qbdJze0i99YxQA8wqzXnyyOhu8yf?=
+ =?us-ascii?Q?DxAgRglcY1VX284JeRCL1MVsB/q4Dwaqq0SBucK1/jpTh0dvhAOa1MpOiP3D?=
+ =?us-ascii?Q?rn/l7b/gpfqI6vEzza9Ug/rCaei8bTNilk84yhvyqDtHddTTWE0frOciUw7P?=
+ =?us-ascii?Q?R64Z1xPVrYe6YkAwOavt7WZcbipgBhTswUg+TvQ48uqky4LDDbvR17QdHWNX?=
+ =?us-ascii?Q?sALcPEk5pPWcFITM4ELBrXjOe1mRrIYGzRM6xoPEKUIHT1cs8wafDyYVhb3C?=
+ =?us-ascii?Q?RbqV6R5hnI1/A0nWJMkZu1ClQ9MFiFRquXgRopToEdyvBBEgEQxP6vgHrtp0?=
+ =?us-ascii?Q?HVoFsSIvW6IDhZxDMzxaoUhuT80/MdYRRDFEpY3+pbRAk+TsyZgIWl/79vP3?=
+ =?us-ascii?Q?W0NjCWPsvVpjdZW1ljzMlghtKNvXSediluaGmp8IIF7pk3912gvwFPfWvdAv?=
+ =?us-ascii?Q?XgLyCjNUaK2M21Pdj7LNGaZsRszONb3EML2nneG3O5ACiMOFvtItlpMwT0Q+?=
+ =?us-ascii?Q?0v71NOTMiFZgbNCpXnivZcAha2gykjJRkxEj545NI/poPSb14y3CTJmEyMib?=
+ =?us-ascii?Q?xQhdAVuHBk7v0tyJgMoKBVbkCYcE7L7nndCk/0uqCXqKLuU5r4QTUwKTlWZU?=
+ =?us-ascii?Q?BMUdi6xzHuKRlOJ/7SrojEQqZcFWXoyMqPRl6NXoBXR3LLl1QNyvYBN3v5CJ?=
+ =?us-ascii?Q?C7WiubSCavwuG+frm0hWzqYqzEIbqfjP8kUWQi23wXykyfhE/zbRGRJkU2dg?=
+ =?us-ascii?Q?gqrZgqf+nVZa6ha0MhZUiDmKwTTvbUQHx6atWNY1Ep2tu8It4J5d9dI47KHj?=
+ =?us-ascii?Q?gRFcdtgBO06PXRongGLbi2GJWPcxvqD5QKaBxPROwrtszJd6qCZ8DnEam5Ga?=
+ =?us-ascii?Q?dRNm3+c0hvb076fRPMCfQGnsiZPDLBeLxHlsN1HLmGpwY1GnDQkEpHhxGmpg?=
+ =?us-ascii?Q?3ZGBCVRyB4kbg7jq6biR9RDIwNpkTPgd1cMKjztVTUYfeI+WTSzH6Hidvkc4?=
+ =?us-ascii?Q?Y4woUid7f0qn9WY7Y8ncYvLLmcEwuanxV3IRz7px8YODeg/yHxPsiC05HYpi?=
+ =?us-ascii?Q?0sy1fXwzQdF3zO2cMWhlfDNa2OHb8KnBQ0QkqjPnrnOLdgKHmnod8V7Qes+U?=
+ =?us-ascii?Q?vSg2wsBoOXEaQGmNy2M/iPvbkjI749vxJI6Cy8kDaUO1vWJyabyMHLtWarmX?=
+ =?us-ascii?Q?i2MtkqM0DmQF5tG80dCQhr6/JOG6hsuzi043wrdbhPwxq9j0VlmQRuP2jNSz?=
+ =?us-ascii?Q?mYOSeBvYU+GvXA2y67EWUdEb6xHwig8/s3obHmHsKYcwQpgUuew98XX6X+Hi?=
+ =?us-ascii?Q?gVVAq0rpKpkmAJYG6RINYGqxJGrocwLC/lLcrvtVse/2ul1nKXSMpePmwYly?=
+ =?us-ascii?Q?qXJDB5Uu5AMwViHP48TsSHzseqeNDrbBppLwv60Byk8JTQxh39iM7h/YDPNB?=
+ =?us-ascii?Q?zQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	IwlKGc/OlXM84MxvQHpVE3Vph2e03ja8kn5iiW8laA2sjFi0i6aZfrFAmx1jrIUGYAT1kbpWyTt26Yrc967PFzUggyKveh9ayNWMF36Guup7FtRaQiC6P54TuR6ylNTJFiRBRv6aI95mt2rjnUHmaviayfy1p0ehnDAVc6JF31exuMKgfGNp+x5XK9vn9CgQcoTC1zIITXD6mYneiKivWLApGRAhPHFjTCxptX5ImabzvafM9OI1w0SV2nrEEKidQMvj/NZ8Y3Az/qNHrHO4Dzh8Jh/VFQV4IZNjewCrtxRdy+eAzS4108Rz7Wzl2pZHB9xodde42ZvCQOWHH7WLjzASTsWEb5HfUIHOfq6/REf9k2kG90rx7UBKb/oofJmlm9/K/a67BaK2hx7jbKBKwx50hfUCS1ZrYIz/XEEBN3X3Hgfx3jzlQtJA9LdODBIvZXsqON9j7mZybrJbuIsGHbWybentXdadZGcvM69DqE40bc123tLHLrPB054swdQ4yO1F0Djie3GjJ9fpkCsEEG5Ui9YEgVCnJWfrIG2wWrqSSt8wTu4MwhU4u1KC0Hm/KFdv7k3NrmILKlXTFc40CiQwZF5i7BnDfcXledw8t+Y=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 103a2451-e88a-44fc-9977-08dc57fc0dc8
+X-MS-Exchange-CrossTenant-AuthSource: CO6PR10MB5409.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2024 18:45:25.6321
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QysN8SZyHZIdq/Gf4CC4dy04lHM6maj6nlPhLCiBbNeRiTCw3lJbAH/RbKJy5+NWWeUnPuBI2PIsGwGxAqgaNRS0cFGFeJCYqYCV73VqcSk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB6956
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-08_16,2024-04-05_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 mlxscore=0
+ suspectscore=0 adultscore=0 phishscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404080145
+X-Proofpoint-ORIG-GUID: MYUG7cWhQDLCKiu8q4fWQHW7l0x180Fr
+X-Proofpoint-GUID: MYUG7cWhQDLCKiu8q4fWQHW7l0x180Fr
 
-On Mon, Apr 08, 2024 at 10:16:24AM -0700, Sean Christopherson wrote:
-> On Fri, Apr 05, 2024, Paul E. McKenney wrote:
-> > On Fri, Apr 05, 2024 at 07:42:35AM -0700, Sean Christopherson wrote:
-> > > On Fri, Apr 05, 2024, Marcelo Tosatti wrote:
-> > > > rcuc wakes up (which might exceed the allowed latency threshold
-> > > > for certain realtime apps).
-> > > 
-> > > Isn't that a false negative? (RCU doesn't detect that a CPU is about to (re)enter
-> > > a guest)  I was trying to ask about the case where RCU thinks a CPU is about to
-> > > enter a guest, but the CPU never does (at least, not in the immediate future).
-> > > 
-> > > Or am I just not understanding how RCU's kthreads work?
-> > 
-> > It is quite possible that the current rcu_pending() code needs help,
-> > given the possibility of vCPU preemption.  I have heard of people doing
-> > nested KVM virtualization -- or is that no longer a thing?
-> 
-> Nested virtualization is still very much a thing, but I don't see how it is at
-> all unique with respect to RCU grace periods and quiescent states.  More below.
 
-When the hypervisor runs on bare metal, the existing checks have
-interrupts disables.  Yes, you can still get added delays from NMIs and
-SMIs, but excessively long NMI/SMI handlers are either considered to be
-bugs or happen when the system is already in trouble (backtrace NMIs,
-for an example of the latter).
+Okanovic, Haris <harisokn@amazon.com> writes:
 
-But if the hypervisor is running on top of another hypervisor, then
-the scheduling-clock interrupt handler is subject to vCPU preemption,
-which can unduly delay reporting of RCU quiescent states.
+> On Fri, 2024-04-05 at 16:14 -0700, Ankur Arora wrote:
+>> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
+>>
+>>
+>>
+>> Okanovic, Haris <harisokn@amazon.com> writes:
+>>
+>> > On Thu, 2024-02-15 at 09:41 +0200, Mihai Carabas wrote:
+>> > > cpu_relax on ARM64 does a simple "yield". Thus we replace it with
+>> > > smp_cond_load_relaxed which basically does a "wfe".
+>> > >
+>> > > Suggested-by: Peter Zijlstra <peterz@infradead.org>
+>> > > Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
+>> > > ---
+>> > >  drivers/cpuidle/poll_state.c | 15 ++++++++++-----
+>> > >  1 file changed, 10 insertions(+), 5 deletions(-)
+>> > >
+>> > > diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
+>> > > index 9b6d90a72601..1e45be906e72 100644
+>> > > --- a/drivers/cpuidle/poll_state.c
+>> > > +++ b/drivers/cpuidle/poll_state.c
+>> > > @@ -13,6 +13,7 @@
+>> > >  static int __cpuidle poll_idle(struct cpuidle_device *dev,
+>> > >                             struct cpuidle_driver *drv, int index)
+>> > >  {
+>> > > +    unsigned long ret;
+>> > >      u64 time_start;
+>> > >
+>> > >      time_start = local_clock_noinstr();
+>> > > @@ -26,12 +27,16 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
+>> > >
+>> > >              limit = cpuidle_poll_time(drv, dev);
+>> > >
+>> > > -            while (!need_resched()) {
+>> > > -                    cpu_relax();
+>> > > -                    if (loop_count++ < POLL_IDLE_RELAX_COUNT)
+>> > > -                            continue;
+>> > > -
+>> > > +            for (;;) {
+>> > >                      loop_count = 0;
+>> > > +
+>> > > +                    ret = smp_cond_load_relaxed(&current_thread_info()->flags,
+>> > > +                                                VAL & _TIF_NEED_RESCHED ||
+>> > > +                                                loop_count++ >= POLL_IDLE_RELAX_COUNT);
+>> >
+>> > Is it necessary to repeat this 200 times with a wfe poll?
+>>
+>> The POLL_IDLE_RELAX_COUNT is there because on x86 each cpu_relax()
+>> iteration is much shorter.
+>>
+>> With WFE, it makes less sense.
+>>
+>> > Does kvm not implement a timeout period?
+>>
+>> Not yet, but it does become more useful after a WFE haltpoll is
+>> available on ARM64.
+>
+> Note that kvm conditionally traps WFE and WFI based on number of host
+> CPU tasks. VMs will sometimes see hardware behavior - potentially
+> polling for a long time before entering WFI.
+>
+> https://elixir.bootlin.com/linux/latest/source/arch/arm64/kvm/arm.c#L459
 
-And no, this is not exactly new, but your patch reminded me of it.
+Yeah. There was a discussion on this
+https://lore.kernel.org/lkml/871qc6qufy.fsf@oracle.com/.
 
-> > But the help might well involve RCU telling the hypervisor that a given
-> > vCPU needs to run.  Not sure how that would go over, though it has been
-> > prototyped a couple times in the context of RCU priority boosting.
-> >
-> > > > > > 3 - It checks if the guest exit happened over than 1 second ago. This 1
-> > > > > >     second value was copied from rcu_nohz_full_cpu() which checks if the
-> > > > > >     grace period started over than a second ago. If this value is bad,
-> > > > > >     I have no issue changing it.
-> > > > > 
-> > > > > IMO, checking if a CPU "recently" ran a KVM vCPU is a suboptimal heuristic regardless
-> > > > > of what magic time threshold is used.  
-> > > > 
-> > > > Why? It works for this particular purpose.
-> > > 
-> > > Because maintaining magic numbers is no fun, AFAICT the heurisitic doesn't guard
-> > > against edge cases, and I'm pretty sure we can do better with about the same amount
-> > > of effort/churn.
-> > 
-> > Beyond a certain point, we have no choice.  How long should RCU let
-> > a CPU run with preemption disabled before complaining?  We choose 21
-> > seconds in mainline and some distros choose 60 seconds.  Android chooses
-> > 20 milliseconds for synchronize_rcu_expedited() grace periods.
-> 
-> Issuing a warning based on an arbitrary time limit is wildly different than using
-> an arbitrary time window to make functional decisions.  My objection to the "assume
-> the CPU will enter a quiescent state if it exited a KVM guest in the last second"
-> is that there are plenty of scenarios where that assumption falls apart, i.e. where
-> _that_ physical CPU will not re-enter the guest.
-> 
-> Off the top of my head:
-> 
->  - If the vCPU is migrated to a different physical CPU (pCPU), the *old* pCPU
->    will get false positives, and the *new* pCPU will get false negatives (though
->    the false negatives aren't all that problematic since the pCPU will enter a
->    quiescent state on the next VM-Enter.
-> 
->  - If the vCPU halts, in which case KVM will schedule out the vCPU/task, i.e.
->    won't re-enter the guest.  And so the pCPU will get false positives until the
->    vCPU gets a wake event or the 1 second window expires.
-> 
->  - If the VM terminates, the pCPU will get false positives until the 1 second
->    window expires.
-> 
-> The false positives are solvable problems, by hooking vcpu_put() to reset
-> kvm_last_guest_exit.  And to help with the false negatives when a vCPU task is
-> scheduled in on a different pCPU, KVM would hook vcpu_load().
+>> Haltpoll does have a timeout, which you should be able to tune via
+>> /sys/module/haltpoll/parameters/ but that, of course, won't help here.
+>>
+>> > Could you make it configurable? This patch improves certain workloads
+>> > on AWS Graviton instances as well, but blocks up to 6ms in 200 * 30us
+>> > increments before going to wfi, which is a bit excessive.
+>>
+>> Yeah, this looks like a problem. We could solve it by making it an
+>> architectural parameter. Though I worry about ARM platforms with
+>> much smaller default timeouts.
+>> The other possibility is using WFET in the primitive, but then we
+>> have that dependency and that's a bigger change.
+>
+> See arm64's delay() for inspiration:
+>
+> https://elixir.bootlin.com/linux/v6.9-rc2/source/arch/arm64/lib/delay.c#L26
 
-Here you are arguing against the heuristic in the original patch, correct?
-As opposed to the current RCU heuristic that ignores certain quiescent
-states for nohz_full CPUs until the grace period reaches an age of
-one second?
+Sure, that part is straight-forward enough. However, this will need a fallback
+the case when WFET is not available. And, because this path is used on x86,
+so we need a cross platform smp_cond*timeout(). Though given that the x86
+version is based on cpu_relax() then that could just fold the sched_clock()
+check in.
 
-If so, no argument here.  In fact, please consider my ack cancelled.
+Maybe another place to do this would be by KVM forcing a WFE timeout. Arguably
+that is needed regardless of whether we use a smp_cond*timeout() or not.
 
-> > > diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
-> > > index d9642dd06c25..303ae9ae1c53 100644
-> > > --- a/kernel/rcu/tree.c
-> > > +++ b/kernel/rcu/tree.c
-> > > @@ -3937,8 +3937,13 @@ static int rcu_pending(int user)
-> > >  	if (rcu_nocb_need_deferred_wakeup(rdp, RCU_NOCB_WAKE))
-> > >  		return 1;
-> > >  
-> > > -	/* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if so.) */
-> > > -	if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu())
-> > > +	/*
-> > > +	 * Is this a nohz_full CPU in userspace, idle, or likely to enter a
-> > > +	 * guest in the near future?  (Ignore RCU if so.)
-> > > +	 */
-> > > +	if ((user || rcu_is_cpu_rrupt_from_idle() ||
-> > > +	     __this_cpu_read(context_tracking.in_guest_run_loop)) &&
-> > 
-> > In the case of (user || rcu_is_cpu_rrupt_from_idle()), this CPU was in
-> > a quiescent just before the current scheduling-clock interrupt and will
-> > again be in a quiescent state right after return from this interrupt.
-> > This means that the grace-period kthread will be able to remotely sense
-> > this quiescent state, so that the current CPU need do nothing.
-> >
-> > In constrast, it looks like context_tracking.in_guest_run_loop instead
-> > means that when we return from this interrupt, this CPU will still be
-> > in a non-quiescent state.
-> > 
-> > Now, in the nested-virtualization case, your point might be that the
-> > lower-level hypervisor could preempt the vCPU in the interrupt handler
-> > just as easily as in the .in_guest_run_loop code.  Which is a good point.
-> > But I don't know of a way to handle this other than heuristics and maybe
-> > hinting to the hypervisor (which has been prototyped for RCU priority
-> > boosting).
-> 
-> Regarding nested virtualization, what exactly is your concern?  IIUC, you are
-> worried about this code running at L1, i.e. as a nested hypervisor, and L0, i.e.
-> the bare metal hypervisor, scheduling out the L1 CPU.  And because the L1 CPU
-> doesn't get run "soon", it won't enter a quiescent state as expected by RCU.
-
-I don't believe that I have any additional concerns over and above
-those for the current situation for nested virtualization.  But see my
-additional question on your patch below for non-nested virtualization.
-
-> But that's 100% the case with RCU in a VM in general.  If an L1 CPU gets scheduled
-> out by L0, that L1 CPU won't participate in any RCU stuff until it gets scheduled
-> back in by L0.
-> 
-> E.g. throw away all of the special case checks for rcu_nohz_full_cpu() in
-> rcu_pending(), and the exact same problem exists.  The L1 CPU could get scheduled
-> out while trying to run the RCU core kthread just as easily as it could get
-> scheduled out while trying to run the vCPU task.  Or the L1 CPU could get scheduled
-> out while it's still in the IRQ handler, before it even completes it rcu_pending().
-> 
-> And FWIW, it's not just L0 scheduling that is problematic.  If something in L0
-> prevents an L1 CPU (vCPU from L0's perspective) from making forward progress, e.g.
-> due to a bug in L0, or severe resource contention, from the L1 kernel's perspective,
-> the L1 CPU will appear stuck and trigger various warnings, e.g. soft-lockup,
-> need_resched, RCU stalls, etc.
-
-Indeed, there was a USENIX paper on some aspects of this topic some years back.
-https://www.usenix.org/conference/atc17/technical-sessions/presentation/prasad
-
-> > Maybe the time for such hinting has come?
-> 
-> That's a largely orthogonal discussion.  As above, boosting the scheduling priority
-> of a vCPU because that vCPU is in critical section of some form is not at all
-> unique to nested virtualization (or RCU).
-> 
-> For basic functional correctness, the L0 hypervisor already has the "hint" it 
-> needs.  L0 knows that the L1 CPU wants to run by virtue of the L1 CPU being
-> runnable, i.e. not halted, not in WFS, etc.
-
-And if the system is sufficiently lightly loaded, all will be well, as is
-the case with my rcutorture usage.  However, if the system is saturated,
-that basic functional correctness might not be enough.  I haven't heard
-many complaints, other than research work, so I have been assuming that
-we do not yet need hinting.  But you guys tell me.  ;-)
-
-> > > +	    rcu_nohz_full_cpu())
-> > 
-> > And rcu_nohz_full_cpu() has a one-second timeout, and has for quite
-> > some time.
-> 
-> That's not a good reason to use a suboptimal heuristic for determining whether
-> or not a CPU is likely to enter a KVM guest, it simply mitigates the worst case
-> scenario of a false positive.
-
-Again, are you referring to the current RCU code, or the original patch
-that started this email thread?
-
-> > >  		return 0;
-> > >  
-> > >  	/* Is the RCU core waiting for a quiescent state from this CPU? */
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index bfb2b52a1416..5a7efc669a0f 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -209,6 +209,9 @@ void vcpu_load(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	int cpu = get_cpu();
-> > >  
-> > > +	if (vcpu->wants_to_run)
-> > > +		context_tracking_guest_start_run_loop();
-> > 
-> > At this point, if this is a nohz_full CPU, it will no longer report
-> > quiescent states until the grace period is at least one second old.
-> 
-> I don't think I follow the "will no longer report quiescent states" issue.  Are
-> you saying that this would prevent guest_context_enter_irqoff() from reporting
-> that the CPU is entering a quiescent state?  If so, that's an issue that would
-> need to be resolved regardless of what heuristic we use to determine whether or
-> not a CPU is likely to enter a KVM guest.
-
-Please allow me to start over.  Are interrupts disabled at this point,
-and, if so, will they remain disabled until the transfer of control to
-the guest has become visible to RCU via the context-tracking code?
-
-Or has the context-tracking code already made the transfer of control
-to the guest visible to RCU?
-
-> > >  	__this_cpu_write(kvm_running_vcpu, vcpu);
-> > >  	preempt_notifier_register(&vcpu->preempt_notifier);
-> > >  	kvm_arch_vcpu_load(vcpu, cpu);
-> > > @@ -222,6 +225,10 @@ void vcpu_put(struct kvm_vcpu *vcpu)
-> > >  	kvm_arch_vcpu_put(vcpu);
-> > >  	preempt_notifier_unregister(&vcpu->preempt_notifier);
-> > >  	__this_cpu_write(kvm_running_vcpu, NULL);
-> > > +
-> > 
-> > And also at this point, if this is a nohz_full CPU, it will no longer
-> > report quiescent states until the grace period is at least one second old.
-
-And here, are interrupts disabled at this point, and if so, have they
-been disabled since the time that the exit from the guest become
-visible to RCU via the context-tracking code?
-
-Or will the context-tracking code make the transfer of control to the
-guest visible to RCU at some later time?
-
-							Thanx, Paul
-
-> > > +	if (vcpu->wants_to_run)
-> > > +		context_tracking_guest_stop_run_loop();
-> > > +
-> > >  	preempt_enable();
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(vcpu_put);
-> > > 
-> > > base-commit: 619e56a3810c88b8d16d7b9553932ad05f0d4968
-> > 
-> > All of which might be OK.  Just checking as to whether all of that was
-> > in fact the intent.
-> > 
-> > 							Thanx, Paul
+--
+ankur
 
