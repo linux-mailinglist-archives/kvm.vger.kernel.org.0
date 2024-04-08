@@ -1,127 +1,195 @@
-Return-Path: <kvm+bounces-13903-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13905-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4214B89C95E
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 18:10:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1574689C97D
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 18:21:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74C881C244C8
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 16:10:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C85642882EA
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 16:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5331422AF;
-	Mon,  8 Apr 2024 16:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E35142629;
+	Mon,  8 Apr 2024 16:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Hh11yg9T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iA5ADMOh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2015E13E8AB
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 16:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3482F5B1E0
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 16:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712592631; cv=none; b=ZnVJmNHIzG8c5yRXjT70KzvpKp8wiLmvYrqaHAqLfTEGOem4e3s+SaGLDhPwdIkyxE6bQ/0E6w/y67EGPi863WdOv77PVVCqdSlZDHKDiwe9rYPQjJWUBAvdT85aBcZaxfVSNpoRg4GY3btgKkFy/WZSVK+GuOpeqXROLb0J5rQ=
+	t=1712593255; cv=none; b=jt3bGElQp8tSxlVsFZSQ9avB+cONxQWLrlqsJcBAtyXuxZFmNTmZ8TZFq2lWl0DwoVQoaYV0hC8AGeJQzoOpfFn9/+3Eq769cgg9oQWzxZG2Yz7AzlJ1H2wLy0gyDtT2kvDZ5NI+6uDmTYy4M/G3UU+zccvWAXx+SPV3YS9iZQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712592631; c=relaxed/simple;
-	bh=HVk4V+H6AcSK4NXZ2NPWRuHJAXEaePw7F7vTMWqUVO4=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Cc:To:From:
-	 Subject:Message-ID:Date; b=flNQB8XHYNqXxFVUC41OrpTsdhsoPiry4PWKL/NK+iYMmKBJ+Hleqs5jGuWO7QpDHy/ilB6J4wkTPXqo+FCWfoPBCl+dFZpNTyR7u236LNsDxD+M91Ye8T0DrOeU1AQf38BNBgJxH0p7knTrdoF5JJKVXL3bkkZCLG5eq23/8EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Hh11yg9T; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 438FtSQ9031182;
-	Mon, 8 Apr 2024 16:10:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- to : from : subject : message-id : date; s=pp1;
- bh=t2oqjx5y/bBLhaRIy5Vdy9J7ShKMCKJHfkQkT+d6L4Y=;
- b=Hh11yg9TuKe3E8XnAing+WIuw2cM+LaBVSaaTqIAOzfi4P9Vl8VSFGcXAaVOz8omcawi
- rbP6hQAEuvDLEMowVta9QLm+XmUSHPc+l72fpk1HxF9kjozLmvTc++iURJAbdND+r7A+
- 3oH+cJ6pxVxNpcTsO8g7W3aT5G6BExqL1WSMO4wUW1MXTJ1MWZgn8QvUx6gvUyQZC3B1
- E9IREybAFBMF7hxqqWEM/vUSIabu2jzJd2HcfM/ldL14UKzkpfnZ6U46DUO+UGDT/RNI
- p5K5T9bkqwsYZqXajKRVQzwL6/6s+vEpsOrFhT/yocneioAnEPSHsh4VIZRoDLqq/SuQ GA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xck8082s4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 16:10:22 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 438G8iQx020506;
-	Mon, 8 Apr 2024 16:10:22 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xck8082s0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 16:10:22 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 438EZj9w013550;
-	Mon, 8 Apr 2024 16:10:21 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xbgqt98y5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 16:10:21 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 438GAH0O34734746
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Apr 2024 16:10:19 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 85D4420040;
-	Mon,  8 Apr 2024 16:10:17 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F0832004B;
-	Mon,  8 Apr 2024 16:10:17 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.39.74])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  8 Apr 2024 16:10:17 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712593255; c=relaxed/simple;
+	bh=VSYbuCAqKf3R9TeMf7JHCuPQ+Xi5C3wzAuqUYJN3sj8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=G96BSktpORkFEz3f/Cfu/iLw5cYMU6mBOnTNkA4d/9w7AmK35Tso6MApTGSbpCW8qQpXq9marzQszFkQPaI/HmGbAolfqiRmO8/xSVkLLhBYvm03alTzdO9ZA4FRSRlyRRbr7PzV/EgFedZGr0n1XRLWCrupOmcD62NUplVAgnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iA5ADMOh; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cdfd47de98so3986438a12.1
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 09:20:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712593253; x=1713198053; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IFKoX5LRArUwXbnBHpdfGpECLiMAwP3ZmSQZ47P/XxQ=;
+        b=iA5ADMOhDTR3H/DKQX8nWYiYC44zGytZ8CDN55/HY3lxM5h69n2CUEa2WqCUlKb2AD
+         tWcoreJPKuNSQTLPevoEzzHIwYlT5XSilAX0NXpeQe7J0khaqf8y5anav6JxH/2dBDf2
+         f55RnNfxOqmeE6Cfw9XLOJVqhhDGViEN/SzxU1USnAm0mmKo72i37uhVfMqpBh8zFb2f
+         L95HQt3LIdHsQNS5JfmlU4lbkvvxJl295Zh7H8IbdWqrAVKvQdusSPkFWwPD6oXDeh7w
+         5exlf3P9+oPiIzyZKoqu2CV2c99Z+tgyRcqwjo7YmBLfreu/LMCmf1UFjbgBAIO1CA8o
+         gZyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712593253; x=1713198053;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IFKoX5LRArUwXbnBHpdfGpECLiMAwP3ZmSQZ47P/XxQ=;
+        b=Z2/t8hPYdBB9EwAZgqIKDqeO0xk1Kt4CJmYor+lGPFWlEsG24Rb7QtgBFirdhL1ybb
+         0kZH2mBs3RMwHLSNvtnoi2uPC8PVeq4e6nR6PvsZLllQboQkiHrOjDTwqeGxLtMqEEP2
+         DMAL8ljq0B1Gc0x0SgFwfDuLgtIu3uPW7mi6ScCzNUM+7Vc76C1M9XxZoCudRz0MvcU4
+         SBzjZ4OLqeeaRSsilnuxUzcMS+ZVHYRPvt1SBshjhh/u3/zyvdaIATDiP7IXf4ilqVzy
+         ELKbGwe2HHKumNfIYdZ0NT+y4gDpOFLS6y3enES8NItTWBxI9ImOYEPldnwBm9Ii9iSI
+         bMsQ==
+X-Gm-Message-State: AOJu0YyucTolS6Hwn+XqvS9I9V9v71VpViapY9p550c2hHckTAguA5hR
+	LROPa1nyopnQBARYJUjbhtg0IJHLsI5feUMUDo3AN/sjnjWaPvDnBqNJ0+FzfleC15YHqXuvv43
+	SYw==
+X-Google-Smtp-Source: AGHT+IGtIssXRNZp39j/EtRn/fKzypd9u2A7Vc83yQVSj6H6aqmybuKMcmx9MTN0utnJgg8UKDKDn52HeOo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:d80a:0:b0:5dc:11fe:525f with SMTP id
+ b10-20020a63d80a000000b005dc11fe525fmr27590pgh.6.1712593253371; Mon, 08 Apr
+ 2024 09:20:53 -0700 (PDT)
+Date: Mon, 8 Apr 2024 09:20:51 -0700
+In-Reply-To: <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240405083539.374995-14-npiggin@gmail.com>
-References: <20240405083539.374995-1-npiggin@gmail.com> <20240405083539.374995-14-npiggin@gmail.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org
-To: Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>
-From: Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v8 13/35] doc: start documentation directory with unittests.cfg doc
-Message-ID: <171259261691.48513.14896006668285709723@t14-nrb>
-User-Agent: alot/0.8.1
-Date: Mon, 08 Apr 2024 18:10:16 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LagbMeRnhD-pqaI5ovZSd4tYgMaYyJis
-X-Proofpoint-GUID: wSiV3cAFIYsX_S7sme6Z-MALI3DUO7vi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-08_14,2024-04-05_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- phishscore=0 bulkscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0
- malwarescore=0 mlxlogscore=875 priorityscore=1501 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404080124
+Mime-Version: 1.0
+References: <20240405165844.1018872-1-seanjc@google.com> <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
+Message-ID: <ZhQZYzkDPMxXe2RN@google.com>
+Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Wei W Wang <wei.w.wang@intel.com>, David Skidmore <davidskidmore@google.com>, 
+	Steve Rutherford <srutherford@google.com>, Pankaj Gupta <pankaj.gupta@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Quoting Nicholas Piggin (2024-04-05 10:35:14)
-> Consolidate unittests.cfg documentation in one place.
->=20
-> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arm/unittests.cfg     | 26 ++-----------
->  docs/unittests.txt    | 89 +++++++++++++++++++++++++++++++++++++++++++
->  powerpc/unittests.cfg | 25 ++----------
->  riscv/unittests.cfg   | 26 ++-----------
->  s390x/unittests.cfg   | 18 ++-------
->  x86/unittests.cfg     | 26 ++-----------
->  6 files changed, 107 insertions(+), 103 deletions(-)
->  create mode 100644 docs/unittests.txt
+On Sun, Apr 07, 2024, Xiaoyao Li wrote:
+> On 4/6/2024 12:58 AM, Sean Christopherson wrote:
+> >   - For guest MAXPHYADDR vs. GPAW, rely on KVM_GET_SUPPORTED_CPUID to enumerate
+> >     the usable MAXPHYADDR[2], and simply refuse to enable TDX if the TDX Module
+> >     isn't compatible.  Specifically, if MAXPHYADDR=52, 5-level paging is enabled,
+> >     but the TDX-Module only allows GPAW=0, i.e. only supports 4-level paging.
+> 
+> So userspace can get supported GPAW from usable MAXPHYADDR, i.e.,
+> CPUID(0X8000_0008).eaxx[23:16] of KVM_GET_SUPPORTED_CPUID:
+>  - if usable MAXPHYADDR == 52, supported GPAW is 0 and 1.
+>  - if usable MAXPHYADDR <= 48, supported GPAW is only 0.
+> 
+> There is another thing needs to be discussed. How does userspace configure
+> GPAW for TD guest?
+> 
+> Currently, KVM uses CPUID(0x8000_0008).EAX[7:0] in struct
+> kvm_tdx_init_vm::cpuid.entries[] of IOCTL(KVM_TDX_INIT_VM) to deduce the
+> GPAW:
+> 
+> 	int maxpa = 36;
+> 	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0x80000008, 0);
+> 	if (entry)
+> 		max_pa = entry->eax & 0xff;
+> 
+> 	...
+> 	if (!cpu_has_vmx_ept_5levels() && max_pa > 48)
+> 		return -EINVAL;
+> 	if (cpu_has_vmx_ept_5levels() && max_pa > 48) {
+> 		td_params->eptp_controls |= VMX_EPTP_PWL_5;
+> 		td_params->exec_controls |= TDX_EXEC_CONTROL_MAX_GPAW;
+> 	} else {
+> 		td_params->eptp_controls |= VMX_EPTP_PWL_4;
+> 	}
+> 
+> The code implies that KVM allows the provided CPUID(0x8000_0008).EAX[7:0] to
+> be any value (when 5level ept is supported). when it > 48, configure GPAW of
+> TD to 1, otherwise to 0.
+> 
+> However, the virtual value of CPUID(0x8000_0008).EAX[7:0] inside TD is
+> always the native value of hardware (for current TDX).
+> 
+> So if we want to keep this behavior, we need to document it somewhere that
+> CPUID(0x8000_0008).EAX[7:0] in struct kvm_tdx_init_vm::cpuid.entries[] of
+> IOCTL(KVM_TDX_INIT_VM) is only for configuring GPAW, not for userspace to
+> configure virtual CPUID value for TD VMs.
+> 
+> Another option is that, KVM doesn't allow userspace to configure
+> CPUID(0x8000_0008).EAX[7:0]. Instead, it provides a gpaw field in struct
+> kvm_tdx_init_vm for userspace to configure directly.
+> 
+> What do you prefer?
 
-This is a nice improvement, thanks!
+Hmm, neither.  I think the best approach is to build on Gerd's series to have KVM
+select 4-level vs. 5-level based on the enumerated guest.MAXPHYADDR, not on
+host.MAXPHYADDR.
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+With a moderate amount of refactoring, cache/compute guest_maxphyaddr as:
+
+	static void kvm_vcpu_refresh_maxphyaddr(struct kvm_vcpu *vcpu)
+	{
+		struct kvm_cpuid_entry2 *best;
+
+		best = kvm_find_cpuid_entry(vcpu, 0x80000000);
+		if (!best || best->eax < 0x80000008)
+			goto not_found;
+
+		best = kvm_find_cpuid_entry(vcpu, 0x80000008);
+		if (!best)
+			goto not_found;
+
+		vcpu->arch.maxphyaddr = best->eax & GENMASK(7, 0);
+
+		if (best->eax & GENMASK(15, 8))
+			vcpu->arch.guest_maxphyaddr = (best->eax & GENMASK(15, 8)) >> 8;
+		else
+			vcpu->arch.guest_maxphyaddr = vcpu->arch.maxphyaddr;
+
+		return;
+
+	not_found:
+		vcpu->arch.maxphyaddr = KVM_X86_DEFAULT_MAXPHYADDR;
+		vcpu->arch.guest_maxphyaddr = KVM_X86_DEFAULT_MAXPHYADDR;
+	}
+
+and then use vcpu->arch.guest_maxphyaddr instead of vcpu->arch.maxphyaddr when
+selecting the TDP level.
+
+	static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
+	{
+		/* tdp_root_level is architecture forced level, use it if nonzero */
+		if (tdp_root_level)
+			return tdp_root_level;
+
+		/*
+		* Use 5-level TDP if and only if it's useful/necessary.  Definitely a
+		* more verbose comment here.
+		*/
+		if (max_tdp_level == 5 && vcpu->arch.guest_maxphyaddr <= 48)
+			return 4;
+
+		return max_tdp_level;
+	}
+
+The only question is whether or not the behavior needs to be opt-in via a new
+capability, e.g. in case there is some weird usage where userspace enumerates
+guest.MAXPHYADDR < host.MAXPHYADDR but still wants/needs 5-level paging.  I highly
+doubt such a use case exists though.
+
+I'll get Gerd's series applied, and will post a small series to implement the
+above later this week.
 
