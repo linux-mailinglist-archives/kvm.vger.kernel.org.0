@@ -1,195 +1,278 @@
-Return-Path: <kvm+bounces-13905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1574689C97D
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 18:21:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EEF589CA96
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 19:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C85642882EA
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 16:21:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7994E1F25793
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 17:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E35142629;
-	Mon,  8 Apr 2024 16:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A278143C4C;
+	Mon,  8 Apr 2024 17:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iA5ADMOh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lid8DAZl"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3482F5B1E0
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 16:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC07D142906
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 17:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712593255; cv=none; b=jt3bGElQp8tSxlVsFZSQ9avB+cONxQWLrlqsJcBAtyXuxZFmNTmZ8TZFq2lWl0DwoVQoaYV0hC8AGeJQzoOpfFn9/+3Eq769cgg9oQWzxZG2Yz7AzlJ1H2wLy0gyDtT2kvDZ5NI+6uDmTYy4M/G3UU+zccvWAXx+SPV3YS9iZQI=
+	t=1712596588; cv=none; b=QGnKgEak/izMm0yepyqgGrnjK2qIu2tKlyUpJfKFS2UrVmmCqDysPQ9RyQBFhJCIWjha6CKhzfmF569xg0ULoBWfEahgxNgblayT2ZR399AGrlXYhETS3XpfvgaPEeDWDtn1KOeDvgGcEdR3cbv9OPgH8B/4JM0wAcxnjGWx7Jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712593255; c=relaxed/simple;
-	bh=VSYbuCAqKf3R9TeMf7JHCuPQ+Xi5C3wzAuqUYJN3sj8=;
+	s=arc-20240116; t=1712596588; c=relaxed/simple;
+	bh=vmPDnU2rbQte5MXl0eNshZbSVgsEa6yKXoSEo0wMagw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G96BSktpORkFEz3f/Cfu/iLw5cYMU6mBOnTNkA4d/9w7AmK35Tso6MApTGSbpCW8qQpXq9marzQszFkQPaI/HmGbAolfqiRmO8/xSVkLLhBYvm03alTzdO9ZA4FRSRlyRRbr7PzV/EgFedZGr0n1XRLWCrupOmcD62NUplVAgnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iA5ADMOh; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=p1WxqpKvnJjbvwK7RmkyEhDQN+FNNAEOThJVoCusUxXQuo7mHq2jDKe9lC/N170k5sfhs42p8cJFh1O2tagXUCGXjAOPWFZXNTS4Z14MXBzmGJezsFoVL73b8rl16Tpm9xH/rvBMOMDwyzBUaYnlhSvp5bTVmkoIpgRzKr9hnXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lid8DAZl; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cdfd47de98so3986438a12.1
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 09:20:54 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8bdadc79cso4129662a12.2
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 10:16:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712593253; x=1713198053; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712596586; x=1713201386; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IFKoX5LRArUwXbnBHpdfGpECLiMAwP3ZmSQZ47P/XxQ=;
-        b=iA5ADMOhDTR3H/DKQX8nWYiYC44zGytZ8CDN55/HY3lxM5h69n2CUEa2WqCUlKb2AD
-         tWcoreJPKuNSQTLPevoEzzHIwYlT5XSilAX0NXpeQe7J0khaqf8y5anav6JxH/2dBDf2
-         f55RnNfxOqmeE6Cfw9XLOJVqhhDGViEN/SzxU1USnAm0mmKo72i37uhVfMqpBh8zFb2f
-         L95HQt3LIdHsQNS5JfmlU4lbkvvxJl295Zh7H8IbdWqrAVKvQdusSPkFWwPD6oXDeh7w
-         5exlf3P9+oPiIzyZKoqu2CV2c99Z+tgyRcqwjo7YmBLfreu/LMCmf1UFjbgBAIO1CA8o
-         gZyA==
+        bh=XYkMSUzqJlpjQtSfhn57aIvoeBGIOTZt8KfeTsbtdM8=;
+        b=lid8DAZl+MQvmnSl6vAZQSIOyYwV20ybesJgzgN7BdSGtkm27tg8n3AoinKX72nytQ
+         ZPBperwVtyZV1qS5v4LsUfx8xK84t+mt1q7nSaArMv3hQbRxzmrL1nRQQN35kSTmIHtY
+         BS9GkMYzDexKnHFCxmXk+T+vyLMQ0bSGfELkNKZYgIePvcgYPrUAcHtB/fXsXzWDfEJp
+         88hqDUf7tOVMS3C8QwsV6VEHCeF/GvsYPMSj4JjHPvaORSo0Hh4bYOpSSSOJWz++omPB
+         RBWB8RWzdwwfKMj7vCb+jf1+A6Qj8b9KpxpAGWlwhmxqP7RaP4/V8pe8gXWD83LQ9Rh/
+         LWZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712593253; x=1713198053;
+        d=1e100.net; s=20230601; t=1712596586; x=1713201386;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IFKoX5LRArUwXbnBHpdfGpECLiMAwP3ZmSQZ47P/XxQ=;
-        b=Z2/t8hPYdBB9EwAZgqIKDqeO0xk1Kt4CJmYor+lGPFWlEsG24Rb7QtgBFirdhL1ybb
-         0kZH2mBs3RMwHLSNvtnoi2uPC8PVeq4e6nR6PvsZLllQboQkiHrOjDTwqeGxLtMqEEP2
-         DMAL8ljq0B1Gc0x0SgFwfDuLgtIu3uPW7mi6ScCzNUM+7Vc76C1M9XxZoCudRz0MvcU4
-         SBzjZ4OLqeeaRSsilnuxUzcMS+ZVHYRPvt1SBshjhh/u3/zyvdaIATDiP7IXf4ilqVzy
-         ELKbGwe2HHKumNfIYdZ0NT+y4gDpOFLS6y3enES8NItTWBxI9ImOYEPldnwBm9Ii9iSI
-         bMsQ==
-X-Gm-Message-State: AOJu0YyucTolS6Hwn+XqvS9I9V9v71VpViapY9p550c2hHckTAguA5hR
-	LROPa1nyopnQBARYJUjbhtg0IJHLsI5feUMUDo3AN/sjnjWaPvDnBqNJ0+FzfleC15YHqXuvv43
-	SYw==
-X-Google-Smtp-Source: AGHT+IGtIssXRNZp39j/EtRn/fKzypd9u2A7Vc83yQVSj6H6aqmybuKMcmx9MTN0utnJgg8UKDKDn52HeOo=
+        bh=XYkMSUzqJlpjQtSfhn57aIvoeBGIOTZt8KfeTsbtdM8=;
+        b=H1oGjb+pVZZeEUAlmFJhw2Lxt0Ts743XFx+WyGqe76CbJR1+0LSiZqpdq0sfYaVEtS
+         y9Qqg/3aYsebzpyI1+EJ0j02qDuhlWzWXpQ2c1iAobn2ER5XYppwBPVExV29dlCptJwt
+         zBVFyiLTftfDfKa8v6fQOgf22dEpIX2SnOorEnynNzv+bAEBU5PBovEOGb1gUPhAI0rs
+         jPBKCZTV+NRywjwksU4wsJY7e7SCe62DBA42KrxhSf9CkP3y6EKKitFfA7ndCFngYgOB
+         keos/jvjdtC3lWXzgHm79Cn61n8L6bpYSiZqX3CPyCwCduorrups11EVT3Fuoo4ODXR5
+         rpYw==
+X-Forwarded-Encrypted: i=1; AJvYcCX1RQUQ/Eiqp4o3zT3bZjBpRingutneiEPliiMtnnLfAMkAEH0oVyY0iHvaZWsLfeGsuerZrSQtNI8Mz2KqRJjTTxOW
+X-Gm-Message-State: AOJu0YwnzSUzs1lhxbd7vPKXVx8C5V7EwDrknRky7UO/F7X6uEhhf5fe
+	vJZ4p+EBCQEhkalncqlbOipm0O7Gtn+L8TfGP3L7mP/EWh62Lb7iZ4Vz4aJ3eG18CLMDZpNRb+w
+	rRQ==
+X-Google-Smtp-Source: AGHT+IEJYPlJPYnaeEaKqg0inn5SvyUCCTx+EH/Fky3KdSYu/p528FxN5PdXbtyKRmTaVnUYnuZwfQUNgeg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:d80a:0:b0:5dc:11fe:525f with SMTP id
- b10-20020a63d80a000000b005dc11fe525fmr27590pgh.6.1712593253371; Mon, 08 Apr
- 2024 09:20:53 -0700 (PDT)
-Date: Mon, 8 Apr 2024 09:20:51 -0700
-In-Reply-To: <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a63:5006:0:b0:5dc:af76:f57d with SMTP id
+ e6-20020a635006000000b005dcaf76f57dmr30599pgb.7.1712596586030; Mon, 08 Apr
+ 2024 10:16:26 -0700 (PDT)
+Date: Mon, 8 Apr 2024 10:16:24 -0700
+In-Reply-To: <a7398da4-a72c-4933-bb8b-5bc8965d96d0@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240405165844.1018872-1-seanjc@google.com> <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
-Message-ID: <ZhQZYzkDPMxXe2RN@google.com>
-Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
+References: <20240328171949.743211-1-leobras@redhat.com> <ZgsXRUTj40LmXVS4@google.com>
+ <ZhAAg8KNd8qHEGcO@tpad> <ZhAN28BcMsfl4gm-@google.com> <a7398da4-a72c-4933-bb8b-5bc8965d96d0@paulmck-laptop>
+Message-ID: <ZhQmaEXPCqmx1rTW@google.com>
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
 From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Wei W Wang <wei.w.wang@intel.com>, David Skidmore <davidskidmore@google.com>, 
-	Steve Rutherford <srutherford@google.com>, Pankaj Gupta <pankaj.gupta@amd.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, Leonardo Bras <leobras@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>, Joel Fernandes <joel@joelfernandes.org>, 
+	Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Sun, Apr 07, 2024, Xiaoyao Li wrote:
-> On 4/6/2024 12:58 AM, Sean Christopherson wrote:
-> >   - For guest MAXPHYADDR vs. GPAW, rely on KVM_GET_SUPPORTED_CPUID to enumerate
-> >     the usable MAXPHYADDR[2], and simply refuse to enable TDX if the TDX Module
-> >     isn't compatible.  Specifically, if MAXPHYADDR=52, 5-level paging is enabled,
-> >     but the TDX-Module only allows GPAW=0, i.e. only supports 4-level paging.
+On Fri, Apr 05, 2024, Paul E. McKenney wrote:
+> On Fri, Apr 05, 2024 at 07:42:35AM -0700, Sean Christopherson wrote:
+> > On Fri, Apr 05, 2024, Marcelo Tosatti wrote:
+> > > rcuc wakes up (which might exceed the allowed latency threshold
+> > > for certain realtime apps).
+> > 
+> > Isn't that a false negative? (RCU doesn't detect that a CPU is about to (re)enter
+> > a guest)  I was trying to ask about the case where RCU thinks a CPU is about to
+> > enter a guest, but the CPU never does (at least, not in the immediate future).
+> > 
+> > Or am I just not understanding how RCU's kthreads work?
 > 
-> So userspace can get supported GPAW from usable MAXPHYADDR, i.e.,
-> CPUID(0X8000_0008).eaxx[23:16] of KVM_GET_SUPPORTED_CPUID:
->  - if usable MAXPHYADDR == 52, supported GPAW is 0 and 1.
->  - if usable MAXPHYADDR <= 48, supported GPAW is only 0.
+> It is quite possible that the current rcu_pending() code needs help,
+> given the possibility of vCPU preemption.  I have heard of people doing
+> nested KVM virtualization -- or is that no longer a thing?
+
+Nested virtualization is still very much a thing, but I don't see how it is at
+all unique with respect to RCU grace periods and quiescent states.  More below.
+
+> But the help might well involve RCU telling the hypervisor that a given
+> vCPU needs to run.  Not sure how that would go over, though it has been
+> prototyped a couple times in the context of RCU priority boosting.
+>
+> > > > > 3 - It checks if the guest exit happened over than 1 second ago. This 1
+> > > > >     second value was copied from rcu_nohz_full_cpu() which checks if the
+> > > > >     grace period started over than a second ago. If this value is bad,
+> > > > >     I have no issue changing it.
+> > > > 
+> > > > IMO, checking if a CPU "recently" ran a KVM vCPU is a suboptimal heuristic regardless
+> > > > of what magic time threshold is used.  
+> > > 
+> > > Why? It works for this particular purpose.
+> > 
+> > Because maintaining magic numbers is no fun, AFAICT the heurisitic doesn't guard
+> > against edge cases, and I'm pretty sure we can do better with about the same amount
+> > of effort/churn.
 > 
-> There is another thing needs to be discussed. How does userspace configure
-> GPAW for TD guest?
+> Beyond a certain point, we have no choice.  How long should RCU let
+> a CPU run with preemption disabled before complaining?  We choose 21
+> seconds in mainline and some distros choose 60 seconds.  Android chooses
+> 20 milliseconds for synchronize_rcu_expedited() grace periods.
+
+Issuing a warning based on an arbitrary time limit is wildly different than using
+an arbitrary time window to make functional decisions.  My objection to the "assume
+the CPU will enter a quiescent state if it exited a KVM guest in the last second"
+is that there are plenty of scenarios where that assumption falls apart, i.e. where
+_that_ physical CPU will not re-enter the guest.
+
+Off the top of my head:
+
+ - If the vCPU is migrated to a different physical CPU (pCPU), the *old* pCPU
+   will get false positives, and the *new* pCPU will get false negatives (though
+   the false negatives aren't all that problematic since the pCPU will enter a
+   quiescent state on the next VM-Enter.
+
+ - If the vCPU halts, in which case KVM will schedule out the vCPU/task, i.e.
+   won't re-enter the guest.  And so the pCPU will get false positives until the
+   vCPU gets a wake event or the 1 second window expires.
+
+ - If the VM terminates, the pCPU will get false positives until the 1 second
+   window expires.
+
+The false positives are solvable problems, by hooking vcpu_put() to reset
+kvm_last_guest_exit.  And to help with the false negatives when a vCPU task is
+scheduled in on a different pCPU, KVM would hook vcpu_load().
+
+> > diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+> > index d9642dd06c25..303ae9ae1c53 100644
+> > --- a/kernel/rcu/tree.c
+> > +++ b/kernel/rcu/tree.c
+> > @@ -3937,8 +3937,13 @@ static int rcu_pending(int user)
+> >  	if (rcu_nocb_need_deferred_wakeup(rdp, RCU_NOCB_WAKE))
+> >  		return 1;
+> >  
+> > -	/* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if so.) */
+> > -	if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu())
+> > +	/*
+> > +	 * Is this a nohz_full CPU in userspace, idle, or likely to enter a
+> > +	 * guest in the near future?  (Ignore RCU if so.)
+> > +	 */
+> > +	if ((user || rcu_is_cpu_rrupt_from_idle() ||
+> > +	     __this_cpu_read(context_tracking.in_guest_run_loop)) &&
 > 
-> Currently, KVM uses CPUID(0x8000_0008).EAX[7:0] in struct
-> kvm_tdx_init_vm::cpuid.entries[] of IOCTL(KVM_TDX_INIT_VM) to deduce the
-> GPAW:
+> In the case of (user || rcu_is_cpu_rrupt_from_idle()), this CPU was in
+> a quiescent just before the current scheduling-clock interrupt and will
+> again be in a quiescent state right after return from this interrupt.
+> This means that the grace-period kthread will be able to remotely sense
+> this quiescent state, so that the current CPU need do nothing.
+>
+> In constrast, it looks like context_tracking.in_guest_run_loop instead
+> means that when we return from this interrupt, this CPU will still be
+> in a non-quiescent state.
 > 
-> 	int maxpa = 36;
-> 	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0x80000008, 0);
-> 	if (entry)
-> 		max_pa = entry->eax & 0xff;
+> Now, in the nested-virtualization case, your point might be that the
+> lower-level hypervisor could preempt the vCPU in the interrupt handler
+> just as easily as in the .in_guest_run_loop code.  Which is a good point.
+> But I don't know of a way to handle this other than heuristics and maybe
+> hinting to the hypervisor (which has been prototyped for RCU priority
+> boosting).
+
+Regarding nested virtualization, what exactly is your concern?  IIUC, you are
+worried about this code running at L1, i.e. as a nested hypervisor, and L0, i.e.
+the bare metal hypervisor, scheduling out the L1 CPU.  And because the L1 CPU
+doesn't get run "soon", it won't enter a quiescent state as expected by RCU.
+
+But that's 100% the case with RCU in a VM in general.  If an L1 CPU gets scheduled
+out by L0, that L1 CPU won't participate in any RCU stuff until it gets scheduled
+back in by L0.
+
+E.g. throw away all of the special case checks for rcu_nohz_full_cpu() in
+rcu_pending(), and the exact same problem exists.  The L1 CPU could get scheduled
+out while trying to run the RCU core kthread just as easily as it could get
+scheduled out while trying to run the vCPU task.  Or the L1 CPU could get scheduled
+out while it's still in the IRQ handler, before it even completes it rcu_pending().
+
+And FWIW, it's not just L0 scheduling that is problematic.  If something in L0
+prevents an L1 CPU (vCPU from L0's perspective) from making forward progress, e.g.
+due to a bug in L0, or severe resource contention, from the L1 kernel's perspective,
+the L1 CPU will appear stuck and trigger various warnings, e.g. soft-lockup,
+need_resched, RCU stalls, etc.
+ 
+> Maybe the time for such hinting has come?
+
+That's a largely orthogonal discussion.  As above, boosting the scheduling priority
+of a vCPU because that vCPU is in critical section of some form is not at all
+unique to nested virtualization (or RCU).
+
+For basic functional correctness, the L0 hypervisor already has the "hint" it 
+needs.  L0 knows that the L1 CPU wants to run by virtue of the L1 CPU being
+runnable, i.e. not halted, not in WFS, etc.
+
+> > +	    rcu_nohz_full_cpu())
 > 
-> 	...
-> 	if (!cpu_has_vmx_ept_5levels() && max_pa > 48)
-> 		return -EINVAL;
-> 	if (cpu_has_vmx_ept_5levels() && max_pa > 48) {
-> 		td_params->eptp_controls |= VMX_EPTP_PWL_5;
-> 		td_params->exec_controls |= TDX_EXEC_CONTROL_MAX_GPAW;
-> 	} else {
-> 		td_params->eptp_controls |= VMX_EPTP_PWL_4;
-> 	}
+> And rcu_nohz_full_cpu() has a one-second timeout, and has for quite
+> some time.
+
+That's not a good reason to use a suboptimal heuristic for determining whether
+or not a CPU is likely to enter a KVM guest, it simply mitigates the worst case
+scenario of a false positive.
+
+> >  		return 0;
+> >  
+> >  	/* Is the RCU core waiting for a quiescent state from this CPU? */
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index bfb2b52a1416..5a7efc669a0f 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -209,6 +209,9 @@ void vcpu_load(struct kvm_vcpu *vcpu)
+> >  {
+> >  	int cpu = get_cpu();
+> >  
+> > +	if (vcpu->wants_to_run)
+> > +		context_tracking_guest_start_run_loop();
 > 
-> The code implies that KVM allows the provided CPUID(0x8000_0008).EAX[7:0] to
-> be any value (when 5level ept is supported). when it > 48, configure GPAW of
-> TD to 1, otherwise to 0.
+> At this point, if this is a nohz_full CPU, it will no longer report
+> quiescent states until the grace period is at least one second old.
+
+I don't think I follow the "will no longer report quiescent states" issue.  Are
+you saying that this would prevent guest_context_enter_irqoff() from reporting
+that the CPU is entering a quiescent state?  If so, that's an issue that would
+need to be resolved regardless of what heuristic we use to determine whether or
+not a CPU is likely to enter a KVM guest.
+
+> >  	__this_cpu_write(kvm_running_vcpu, vcpu);
+> >  	preempt_notifier_register(&vcpu->preempt_notifier);
+> >  	kvm_arch_vcpu_load(vcpu, cpu);
+> > @@ -222,6 +225,10 @@ void vcpu_put(struct kvm_vcpu *vcpu)
+> >  	kvm_arch_vcpu_put(vcpu);
+> >  	preempt_notifier_unregister(&vcpu->preempt_notifier);
+> >  	__this_cpu_write(kvm_running_vcpu, NULL);
+> > +
 > 
-> However, the virtual value of CPUID(0x8000_0008).EAX[7:0] inside TD is
-> always the native value of hardware (for current TDX).
+> And also at this point, if this is a nohz_full CPU, it will no longer
+> report quiescent states until the grace period is at least one second old.
 > 
-> So if we want to keep this behavior, we need to document it somewhere that
-> CPUID(0x8000_0008).EAX[7:0] in struct kvm_tdx_init_vm::cpuid.entries[] of
-> IOCTL(KVM_TDX_INIT_VM) is only for configuring GPAW, not for userspace to
-> configure virtual CPUID value for TD VMs.
+> > +	if (vcpu->wants_to_run)
+> > +		context_tracking_guest_stop_run_loop();
+> > +
+> >  	preempt_enable();
+> >  }
+> >  EXPORT_SYMBOL_GPL(vcpu_put);
+> > 
+> > base-commit: 619e56a3810c88b8d16d7b9553932ad05f0d4968
 > 
-> Another option is that, KVM doesn't allow userspace to configure
-> CPUID(0x8000_0008).EAX[7:0]. Instead, it provides a gpaw field in struct
-> kvm_tdx_init_vm for userspace to configure directly.
+> All of which might be OK.  Just checking as to whether all of that was
+> in fact the intent.
 > 
-> What do you prefer?
-
-Hmm, neither.  I think the best approach is to build on Gerd's series to have KVM
-select 4-level vs. 5-level based on the enumerated guest.MAXPHYADDR, not on
-host.MAXPHYADDR.
-
-With a moderate amount of refactoring, cache/compute guest_maxphyaddr as:
-
-	static void kvm_vcpu_refresh_maxphyaddr(struct kvm_vcpu *vcpu)
-	{
-		struct kvm_cpuid_entry2 *best;
-
-		best = kvm_find_cpuid_entry(vcpu, 0x80000000);
-		if (!best || best->eax < 0x80000008)
-			goto not_found;
-
-		best = kvm_find_cpuid_entry(vcpu, 0x80000008);
-		if (!best)
-			goto not_found;
-
-		vcpu->arch.maxphyaddr = best->eax & GENMASK(7, 0);
-
-		if (best->eax & GENMASK(15, 8))
-			vcpu->arch.guest_maxphyaddr = (best->eax & GENMASK(15, 8)) >> 8;
-		else
-			vcpu->arch.guest_maxphyaddr = vcpu->arch.maxphyaddr;
-
-		return;
-
-	not_found:
-		vcpu->arch.maxphyaddr = KVM_X86_DEFAULT_MAXPHYADDR;
-		vcpu->arch.guest_maxphyaddr = KVM_X86_DEFAULT_MAXPHYADDR;
-	}
-
-and then use vcpu->arch.guest_maxphyaddr instead of vcpu->arch.maxphyaddr when
-selecting the TDP level.
-
-	static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
-	{
-		/* tdp_root_level is architecture forced level, use it if nonzero */
-		if (tdp_root_level)
-			return tdp_root_level;
-
-		/*
-		* Use 5-level TDP if and only if it's useful/necessary.  Definitely a
-		* more verbose comment here.
-		*/
-		if (max_tdp_level == 5 && vcpu->arch.guest_maxphyaddr <= 48)
-			return 4;
-
-		return max_tdp_level;
-	}
-
-The only question is whether or not the behavior needs to be opt-in via a new
-capability, e.g. in case there is some weird usage where userspace enumerates
-guest.MAXPHYADDR < host.MAXPHYADDR but still wants/needs 5-level paging.  I highly
-doubt such a use case exists though.
-
-I'll get Gerd's series applied, and will post a small series to implement the
-above later this week.
+> 							Thanx, Paul
 
