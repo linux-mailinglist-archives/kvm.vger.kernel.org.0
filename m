@@ -1,123 +1,167 @@
-Return-Path: <kvm+bounces-13874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49BCA89BDB8
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 13:04:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7875A89BDD7
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 13:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E70E42851E7
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 11:04:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFA81B23AEA
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 11:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D3464CF6;
-	Mon,  8 Apr 2024 11:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B1565190;
+	Mon,  8 Apr 2024 11:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="U+3Pfava"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hl3CpN/V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE6664CE8
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 11:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C368464CCC
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 11:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712574274; cv=none; b=QWr+jj8nC6JoLYd8xbACifichZTOTeyQyBmYQA8Fs79jAg8JDyGdJYHW29cSgDnTGQBcITScyQY5YdEKZA+8qXTHA/A5f5h6sPjsukGS0TxuwhZX14EGV70KLc0gEfIt82v+40BZuWQPUTK7nQPOeDmVm67Qk2tBMriFj6w2cFc=
+	t=1712574769; cv=none; b=Bn2Y+mfjHGGYt7Bo+kJdT0k5OHiSazbgD9Whteq0R1Ag5Xxwtks7rUaH5hTE/RFnv5WBv+1iXINjDcoC9PgCTIOi5MtFwLD9rYVz0M8l+MvS9WAsuHjVM1Zw3ZOoLOszYIjYfTr42MPyMnOXfO/R9K8vGsvBXrrZ2WhSJXB2Qes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712574274; c=relaxed/simple;
-	bh=AEkCZa+mofKBE7dnqGDEYSr7MtyuCBAKa5IvA/RNPPA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fcteawLpV03T39t8ZruY1jLDkluJzz8PmTBiz39SQxoQZ9suZ53t6w1LN0tKol9qSj7zuURK+jQOjr/Q4AhZRABToDRpJMGGh++LiaIUZuJNdPPIR4tCMT/R/P1YzcSFdx82Kle7cR6x9Pz6/MHpHBng5PHb+587TDpJpDYdqzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=U+3Pfava; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5684db9147dso5706352a12.2
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 04:04:32 -0700 (PDT)
+	s=arc-20240116; t=1712574769; c=relaxed/simple;
+	bh=o8/yUrS+9ELgoOfSv/5fx2tLnA/jbX8Cuy7sNcw5WCo=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ftxtIONwewb9wvU7z5fu6f/wxCTIzshSkyfLponIB+ARgNsatUCV2JfeklGHwleYWugSHxpm1+SeyP0EDD6Gz1c0HD1EqUmvZiwYiD9endOxkVpvOeGTNEBFIVrqtm+AT91XHFuElA8WmGhOT/a5AIV89PtD9gZmW0WDcRFOFUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hl3CpN/V; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-516d1c8dc79so4453944e87.1
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 04:12:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1712574271; x=1713179071; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2JMfbQnsZCy4AZnv2rKGHbXHeobClNfn+hJCPxhuGCs=;
-        b=U+3PfavayTTxpi3GdPULfQX4/079Mr2dArOIcLhr8HR6/yChBpqWdZYHGtN6orjaDt
-         CGtqjEzpp0W1+pdy+Db1ev9LucyIc4yLsDdwvGeGcPyt/VFGSkJIJB+PICfAvp8gGTMo
-         8+aLn6JAaUH0KrPR7zBeUXprZmNOS4jZXSowVE/FR7aukYKWGNrg3uHOz+qTQb0LTYR+
-         FEv1ByLnDnt7XQ8U/Zs8ARg7ajw4UXXgy36zlmk3z7i2Ub40r4UYMYspDq88KHYjGqTD
-         IevdI0GG5h8hiyGQJhKozjqICo1N71F5DCAmmXLWFdaNpN3exE38WMuCTV3LbSMTLD6m
-         ak2w==
+        d=gmail.com; s=20230601; t=1712574766; x=1713179566; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hmqn09jB4V1hPxALBNC3FvTX0YV044zbkMnwxUCbYIU=;
+        b=Hl3CpN/VEaXcui7VNdv4ulSOgQjDqr/Sa+98M/k9KdALA+XMICIxA3aDjsEwysB22S
+         zMxYQbC8zJhw5XilAVzwNTMT4PjKC3Qxd3WhW9VGYuemfTVR5bFwEW03w5L1HO54XzdL
+         JR+v6Sr8rr7CsZ8SYB0ulImmF+E9C9c3xtEYM9TLgUM9zu19/n76BIvhg+pnkjGHnn3H
+         3w7w7pq4chQ4hSR6VC9T97Za/MfCHzE3GewxLdZ/CNdUkLNywAzwLIAvds5yGeByM3C4
+         ZiyHGvgTvtHTZLMbkbNkl0kbzeiGE2gaj0sdZqpN8MfJkeK8J2LjR0AsYvO9fGOLhex+
+         VwWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712574271; x=1713179071;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2JMfbQnsZCy4AZnv2rKGHbXHeobClNfn+hJCPxhuGCs=;
-        b=waVTS66GWPznEukJxAYtcuDa5MptbeQqLkel2TooJg1MkVbw8OWqycg1E+mSz+LVop
-         U7isptmphxM0OJTGUyMVlqt01iMxlrNW0XeLnCe9bEG3O4qOWKYWeWB5YD1HVaXW9ajp
-         PprTwY/uMtygZAhg9pfN1FTs3gITeIeQUpFz7QMRfYObwHQ5ubkROTYtRtjI4jFoONsu
-         JlB4uEzn5dIKOXRXWK8+Nojg+CtWkP4+Dc2zlI7qXotMgENSDJmLBamlOptEy6pW4jSt
-         1yp4XAbteTc3A0bHn4XAyKNcM7nJma6ul6+kBKknT3N4wDaGmOI23+tLQOMl8QDuI4P8
-         VOPg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9vgftNqtKGwZSKhAI5q3O80gyymf3jR0DoBSJP2avG6qw65Fe1jdgF0rxbmtClbeORnU5EUzGUALkPgcYXPLjaZae
-X-Gm-Message-State: AOJu0YxuEh4M8OSy3Dt6lM7M43V7aOrggY7aZHL6n2+VZ+Y8DBzevqL+
-	JTinmgw0MfEx8Gy7zLo3FaE/GhCEJaHc1bBHeGl1KT5Tp3iNtFCYkhptAWugSfU=
-X-Google-Smtp-Source: AGHT+IHu3NL1dqCrQipR9WBG7yHccjiSJMRW2XQ02zqZv9+xdvjF/qhErQbKJL/weMoN3GTlL7Gjbw==
-X-Received: by 2002:a17:907:6d0c:b0:a51:cdfd:8ef7 with SMTP id sa12-20020a1709076d0c00b00a51cdfd8ef7mr2804880ejc.39.1712574271061;
-        Mon, 08 Apr 2024 04:04:31 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id n22-20020a170906119600b00a51d113b320sm1674891eja.110.2024.04.08.04.04.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 04:04:30 -0700 (PDT)
-Date: Mon, 8 Apr 2024 13:04:29 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>, 
-	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 0/5] Add parsing for Zimop ISA extension
-Message-ID: <20240408-0c3a1c3e3880a67a631f9f14@orel>
-References: <20240404103254.1752834-1-cleger@rivosinc.com>
+        d=1e100.net; s=20230601; t=1712574766; x=1713179566;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hmqn09jB4V1hPxALBNC3FvTX0YV044zbkMnwxUCbYIU=;
+        b=CyiWJ0xHJnllUa7vBReHVLPux/aOZS0DPb3+DeQqXKrIS4EObjNyIbdUOeK6abXKQ8
+         YFFjaVScm8WayrwGs5uSainkqJP6YhnCLmSHhBT6w5Oib6MPfy9hxoy/HgPjalo9E8xq
+         KCIe0CEn1kly5R/UdDZ+bGy1/mkZ5Nuxs7nJMKnRzNMZyBnVaqHdsl4tsudTkcTe4UH1
+         RaaxH4jdhjNaOjRHdT5yd5KMDkHXpZdNQRpnlWyuNHzkSKiHrMQG8/AG7lbkWdDDEhii
+         qOyKzniiDcZjOojP9Cy/L0bNSaD/2Tjbyr+OOU1Li5EI8S8lJNOYZFaWTkidEiuG5yAf
+         XkBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUvsRpqNGeFkxq/QIzrztZ6p8LFDnz29+8xHYCAtymdttigf3cYbG9hgYuQdn3XOwmpP5xrRLjiibkHe4XHAJ+mCMTp
+X-Gm-Message-State: AOJu0YyYHaFTF5S61w5uH9vcKkXPLvq7zqin54W4YAxdNw453NdCGJ5l
+	1/4pe13m7Nu6yGKlZ+oITThVepCjvnfUzSRHK5d60o0WBfFdKpq0
+X-Google-Smtp-Source: AGHT+IGHIdtsmX0OQqTZFtNaU36YkUHKK3NtoszmOpMj7gGfvXyIFRVXpIr9wt8YdEhXDbfQNJdqqQ==
+X-Received: by 2002:a19:740c:0:b0:515:ab7b:fc23 with SMTP id v12-20020a19740c000000b00515ab7bfc23mr6048453lfe.34.1712574765615;
+        Mon, 08 Apr 2024 04:12:45 -0700 (PDT)
+Received: from [10.24.66.14] ([15.248.2.234])
+        by smtp.gmail.com with ESMTPSA id co24-20020a0564020c1800b0056e3d80ca71sm3260132edb.35.2024.04.08.04.12.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Apr 2024 04:12:45 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <7b037cb0-d876-462a-8a22-c18feef2f959@xen.org>
+Date: Mon, 8 Apr 2024 12:12:44 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH] KVM: x86/xen: Do not corrupt KVM clock in
+ kvm_xen_shared_info_init()
+To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>,
+ Jim Mattson <jmattson@google.com>, Simon Veith <sveith@amazon.de>,
+ Jack Allister <jalliste@amazon.co.uk>,
+ Joao Martins <joao.m.martins@oracle.com>
+References: <7e0040f70c629d365e80d13b339a95e0affa6d61.camel@infradead.org>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <7e0040f70c629d365e80d13b339a95e0affa6d61.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240404103254.1752834-1-cleger@rivosinc.com>
 
-On Thu, Apr 04, 2024 at 12:32:46PM +0200, Clément Léger wrote:
-> The Zimop ISA extension was ratified recently. This series adds support
-> for parsing it from riscv,isa, hwprobe export and kvm support for
-> Guest/VM.
+On 07/04/2024 14:15, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> Clément Léger (5):
->   dt-bindings: riscv: add Zimop ISA extension description
->   riscv: add ISA extension parsing for Zimop
->   riscv: hwprobe: export Zimop ISA extension
->   RISC-V: KVM: Allow Zimop extension for Guest/VM
->   KVM: riscv: selftests: Add Zimop extension to get-reg-list test
+> The KVM clock is an interesting thing. It is defined as "nanoseconds
+> since the guest was created", but in practice it runs at two *different*
+> rates â€” or three different rates, if you count implementation bugs.
 > 
->  Documentation/arch/riscv/hwprobe.rst                    | 4 ++++
->  Documentation/devicetree/bindings/riscv/extensions.yaml | 5 +++++
->  arch/riscv/include/asm/hwcap.h                          | 1 +
->  arch/riscv/include/uapi/asm/hwprobe.h                   | 1 +
->  arch/riscv/include/uapi/asm/kvm.h                       | 1 +
->  arch/riscv/kernel/cpufeature.c                          | 1 +
->  arch/riscv/kernel/sys_hwprobe.c                         | 1 +
->  arch/riscv/kvm/vcpu_onereg.c                            | 2 ++
->  tools/testing/selftests/kvm/riscv/get-reg-list.c        | 4 ++++
->  9 files changed, 20 insertions(+)
+> Definition A is that it runs synchronously with the CLOCK_MONOTONIC_RAW
+> of the host, with a delta of kvm->arch.kvmclock_offset.
 > 
-> -- 
-> 2.43.0
+> But that version doesn't actually get used in the common case, where the
+> host has a reliable TSC and the guest TSCs are all running at the same
+> rate and in sync with each other, and kvm->arch.use_master_clock is set.
+> 
+> In that common case, definition B is used: There is a reference point in
+> time at kvm->arch.master_kernel_ns (again a CLOCK_MONOTONIC_RAW time),
+> and a corresponding host TSC value kvm->arch.master_cycle_now. This
+> fixed point in time is converted to guest units (the time offset by
+> kvmclock_offset and the TSC Value scaled and offset to be a guest TSC
+> value) and advertised to the guest in the pvclock structure. While in
+> this 'use_master_clock' mode, the fixed point in time never needs to be
+> changed, and the clock runs precisely in time with the guest TSC, at the
+> rate advertised in the pvclock structure.
+> 
+> The third definition C is implemented in kvm_get_wall_clock_epoch() and
+> __get_kvmclock(), using the master_cycle_now and master_kernel_ns fields
+> but converting the *host* TSC cycles directly to a value in nanoseconds
+> instead of scaling via the guest TSC.
+> 
+> One might naÃ¯vely think that all three definitions are identical, since
+> CLOCK_MONOTONIC_RAW is not skewed by NTP frequency corrections; all
+> three are just the result of counting the host TSC at a known frequency,
+> or the scaled guest TSC at a known precise fraction of the host's
+> frequency. The problem is with arithmetic precision, and the way that
+> frequency scaling is done in a division-free way by multiplying by a
+> scale factor, then shifting right. In practice, all three ways of
+> calculating the KVM clock will suffer a systemic drift from each other.
+> 
+> Definition C should simply be eliminated. Commit 451a707813ae ("KVM:
+> x86/xen: improve accuracy of Xen timers") worked around it for the
+> specific case of Xen timers, which are defined in terms of the KVM clock
+> and suffered from a continually increasing error in timer expiry times.
+> 
+> Definitions A and B do need to coexist, the former to handle the case
+> where the host or guest TSC is suboptimally configured. But KVM should
+> be more careful about switching between them, and the discontinuity in
+> guest time which could result.
+> 
+> In particular, KVM_REQ_MASTERCLOCK_UPDATE will take a new snapshot of
+> time as the reference in master_kernel_ns and master_cycle_now, yanking
+> the guest's clock back to match definition A at that moment.
+> 
+> There is no need to do such an update when a Xen guest populates the
+> shared_info page. This seems to have been a hangover from the very first
+> implementation of shared_info which automatically populated the
+> vcpu_info structures at their default locations, but even then it should
+> just have raised KVM_REQ_CLOCK_UPDATE on each vCPU instead of using
+> KVM_REQ_MASTERCLOCK_UPDATE. And now that userspace is expected to
+> explicitly set the vcpu_info even in its default locations, there's not
+> even any need for that either.
+> 
+> Fixes: 629b5348841a1 ("KVM: x86/xen: update wallclock region")
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>   arch/x86/kvm/xen.c | 2 --
+>   1 file changed, 2 deletions(-)
+> 
 
-For the series,
+Reviewed-by: Paul Durrant <paul@xen.org>
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
