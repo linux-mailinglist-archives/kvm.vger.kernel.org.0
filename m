@@ -1,192 +1,104 @@
-Return-Path: <kvm+bounces-13837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 746AC89B6A7
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 05:57:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7941489B71D
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 07:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 959D41C210D1
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 03:57:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ABD91F21F4F
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 05:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B117524F;
-	Mon,  8 Apr 2024 03:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC4D79D2;
+	Mon,  8 Apr 2024 05:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Qlb4enEK"
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="NtwXaEjq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21574687
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 03:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A126FC5;
+	Mon,  8 Apr 2024 05:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712548621; cv=none; b=Ur8ZuhObU+B08oqbssqdCjuTWFnT/Gzp4hc2o7aGcm4VM2I2np3mvTohOIFX3Vs6IUmmXrPOXJVdO1L1mpB47A1vQGVQwp3t+VgRdKhAIxMiaJ+t7NFwGCPDb/wlv5KHask9jH2w0XB+LnLPjVxas2ap2rNGk7/l6jfpwpOhJT8=
+	t=1712553616; cv=none; b=LcVT068aulW9SGSLyRkW/bG/biyHuA69fRyxSjAYssfueE73DE1cUlxcnrJrhRydxv5+z/XHjBrx+JtmmiEc92tbLsg4D8KqOD3WKqN5MeXz9YCfJdAbzcOu2aBXYNnuXFD1QfoK++r671WHy7WlxZfz1vlnNtoiMe0wfPc9ZYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712548621; c=relaxed/simple;
-	bh=tVNm71Fcrn4Kph6vsY20+75q99vXCgOCL4MpEu8ryHQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NPt+mhflFjDpyvUEaX0nDzKlC+ytKAQ4RB1ZMB6w+BQfmrf/ZLbIs4X9Iuw0ky0udO6EsR59rJ3h2CiZVL7UySla0GSLTePYh9k4H2qpwZyN5v1+iN89ydnYRYqe5eMX9Dm1w6bEMWXxa+vSyCOlGEDmKCugGZdQ1ccijNYxRxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=Qlb4enEK; arc=none smtp.client-ip=209.85.161.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5a522ae3747so1808886eaf.1
-        for <kvm@vger.kernel.org>; Sun, 07 Apr 2024 20:56:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1712548619; x=1713153419; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t5nAgfNYfB0Z+mfrRK2mpFihZrCx/GK87TdIEbmr9Oo=;
-        b=Qlb4enEKOQTP/LaGVp2DVRsIJPEX2QZQHfwINZ0IRC0dUgJUib1rKsggEffSA1NNDI
-         QuodTh5dgovysnedb0PrNaPfqxFiPIaPQ8Km5aLQJYghwMl3dGKrBs164Ogrec9Yqc/+
-         jsAtwavLP7xDIx6XrBvGbv4a1gM6DqgL4w+vncyQ7DMVteuYMsS5mh/TR2Nj3YsYSV4x
-         RQBfRyDkbaxw+5KYbrQXbAupuJ3qq3mGKzwWwvV8ULC+LuYQcDCe6fZnQhVdk+y8a0i/
-         ZCazFRzdYbZG4Vhb37GR/UkZKlqPZHcHIlz5XniE23Z/JmgwnwzXLInqveN4gc7F2ZoE
-         cKlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712548619; x=1713153419;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t5nAgfNYfB0Z+mfrRK2mpFihZrCx/GK87TdIEbmr9Oo=;
-        b=P1LCjvWUpmLIkt3ET/csOCIMKs+Bddhdq3NcVNZzPnbvkqTBtJoKkVq0O6wdSteuue
-         Y1wm5Om0VMcOYVZPktZsbklscjTZOfWxWsUS74ujASz20RDPu2oS9gZwFBTu3EXVacEa
-         V2Hya6E88Kky8m6z2DJTLPuKPhAHPRH46RmBFw8hjHCfSWo4LUnssCiaG5pLDgxhf8ec
-         1YKV6Ni+qFvd8kP/uDOJjdBsnKOP/Mql4pcG++5h4ZuowkRkgKZW1ZJNODgxhLgjLPsm
-         HVAEFFlUTUwZ3Um2r1KodRLDsOVNugpnHEU0TXwn36aKpUIrXd2MtNv8HrY2mPOEkPCC
-         0jpg==
-X-Forwarded-Encrypted: i=1; AJvYcCVOasoGsKCtapbBYebZe/8RMOsddJivtZ6QJos9xrhOLHOypr4RgAouHA5wSwrLcs0FrK8fUuKGODIm8DUMf+rwAvqQ
-X-Gm-Message-State: AOJu0Yzr4qiGCY9kwceVF8i4aChExbwQJVSYjm+bB+ep2nlQ+a3wSvXm
-	Hm02vA50TKHA1Dtt++SYtOj64jXn4hLbkQqVedISgJlMUKL00ZkSRj9GN4Rnz/aC01F/jP394Em
-	MWILERXFukbGUlpcEaieEQnoD4C2TVhbxLW3hjA==
-X-Google-Smtp-Source: AGHT+IE/Ou7t3VMQvqKVwCYFU5LDxOSJd7+j4C4rAo22QszPPaWs4HaP202BhM7lGz72M31bL/UZ1n8l4wATZmU98dk=
-X-Received: by 2002:a05:6820:619:b0:5aa:a8f:e4b1 with SMTP id
- e25-20020a056820061900b005aa0a8fe4b1mr2603089oow.4.1712548619015; Sun, 07 Apr
- 2024 20:56:59 -0700 (PDT)
+	s=arc-20240116; t=1712553616; c=relaxed/simple;
+	bh=9LJuWuOpABTv9KgvHhQORrnmPBq13CalFtT6NDkHYyM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=UO663ziMhu/7QwY0wSabdyR0zK+DiDDlntDHuGgoHkSyPtz2qM6xAtxei5X7uMD1VqNXxuhLViT1uBMUAoLIKS7MpjhWKJ77H8BLKY0ul2NI1rKwmzDpV6J3hJVw6+VdKW2bnlXunYH93A/i/q3qoRTEKbN/p8fG/laaB2gVnUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=NtwXaEjq; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1712553612;
+	bh=XZu26WoVj+aYiP2HgRzxMGfR6mT0EhwCcY1NLc0eUAI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=NtwXaEjqDnzFWsb+68xwuVHgjWc8ce+M8o1K/NSpjV0/oHq/uhFonP/RqANt0LSZ+
+	 CuUt5MniSq6tM1ytEtlx5S6twMM/2+tjnQJSLhJfrJ0dvlkBRJCznN5ukPiOpVeTf6
+	 IMsULyM2pdA+EvT500NoWRT01y/0oUsOsjqPltol8pAMS+JeT7mGykB+er9ATz30Fu
+	 YD/jvCbeLTDZfBd3kmG+piRw1lIyteeFq+lAKQF2UwNC8DKShMbiF46v/OLuF++nt1
+	 gnF49PuVw8b1dyJLf+PEBkd4pSxzDkghJ1UjzocPyOZqCUyxufHbpOUklWxfVtLRHF
+	 gd5UfzxksZ2JA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VCcqJ0WXPz4wcR;
+	Mon,  8 Apr 2024 15:20:11 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Thorsten Leemhuis <regressions@leemhuis.info>, Nicholas Piggin
+ <npiggin@gmail.com>, Vaibhav Jain <vaibhav@linux.ibm.com>,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ kvm-ppc@vger.kernel.org
+Cc: Jordan Niethe <jniethe5@gmail.com>, Vaidyanathan Srinivasan
+ <svaidy@linux.vnet.ibm.com>, mikey@neuling.org, paulus@ozlabs.org,
+ sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
+ amachhiw@linux.vnet.ibm.com, David.Laight@ACULAB.COM, Linux kernel
+ regressions list <regressions@lists.linux.dev>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV nestedv2: Cancel pending HDEC
+ exception
+In-Reply-To: <cb038940-63fd-4348-bed2-13e1b2844b92@leemhuis.info>
+References: <20240313072625.76804-1-vaibhav@linux.ibm.com>
+ <CZYME80BW9P7.3SC4GLHWCDQ9K@wheely>
+ <a4f022e8-1f84-4bbb-b00d-00f1eba1f877@leemhuis.info>
+ <87sf007ax6.fsf@mail.lhotse>
+ <cb038940-63fd-4348-bed2-13e1b2844b92@leemhuis.info>
+Date: Mon, 08 Apr 2024 15:20:11 +1000
+Message-ID: <87y19obfck.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240326101054.13088-1-yongxuan.wang@sifive.com> <CAAhSdy1EOyzg+Sdx5-uJJqFipehde+zGic8jNnnTXBEj7k4P3g@mail.gmail.com>
-In-Reply-To: <CAAhSdy1EOyzg+Sdx5-uJJqFipehde+zGic8jNnnTXBEj7k4P3g@mail.gmail.com>
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Date: Mon, 8 Apr 2024 11:56:50 +0800
-Message-ID: <CAMWQL2j_cca2nSerhQKVZYRu-pOQmFzxUaGmi8gbE5GFb8=oqA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] RISC-V: KVM: Avoid lock inversion in SBI_EXT_HSM_HART_START
-To: Anup Patel <anup@brainfault.org>
-Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
-	greentime.hu@sifive.com, vincent.chen@sifive.com, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-Hi Anup,
+Thorsten Leemhuis <regressions@leemhuis.info> writes:
+> On 05.04.24 05:20, Michael Ellerman wrote:
+>> "Linux regression tracking (Thorsten Leemhuis)"
+>> <regressions@leemhuis.info> writes:
+>>> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+>>> for once, to make this easily accessible to everyone.
+>>>
+>>> Was this regression ever resolved? Doesn't look like it, but maybe I
+>>> just missed something.
+>> 
+>> I'm not sure how it ended up on the regression list.
+>
+> That is easy to explain: I let lei search for mails containing words
+> like regress, bisect, and revert to become aware of regressions that
+> might need tracking. And...
+>
+>> IMHO it's not really a regression.
+>
+> ...sometimes I misjudge or misinterpret something and add it to the
+> regression tracking. Looks like that happened here.
+>
+> Sorry for that and the noise it caused!
 
-On Tue, Apr 2, 2024 at 11:48=E2=80=AFAM Anup Patel <anup@brainfault.org> wr=
-ote:
->
-> On Tue, Mar 26, 2024 at 3:41=E2=80=AFPM Yong-Xuan Wang <yongxuan.wang@sif=
-ive.com> wrote:
-> >
-> > Documentation/virt/kvm/locking.rst advises that kvm->lock should be
-> > acquired outside vcpu->mutex and kvm->srcu. However, when KVM/RISC-V
-> > handling SBI_EXT_HSM_HART_START, the lock ordering is vcpu->mutex,
-> > kvm->srcu then kvm->lock.
-> >
-> > Although the lockdep checking no longer complains about this after comm=
-it
-> > f0f44752f5f6 ("rcu: Annotate SRCU's update-side lockdep dependencies"),
-> > it's necessary to replace kvm->lock with a new dedicated lock to ensure
-> > only one hart can execute the SBI_EXT_HSM_HART_START call for the targe=
-t
-> > hart simultaneously.
-> >
-> > Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> > ---
-> >  arch/riscv/include/asm/kvm_host.h | 1 +
-> >  arch/riscv/kvm/vcpu.c             | 1 +
-> >  arch/riscv/kvm/vcpu_sbi_hsm.c     | 5 ++---
-> >  3 files changed, 4 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm=
-/kvm_host.h
-> > index 484d04a92fa6..537099413344 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -254,6 +254,7 @@ struct kvm_vcpu_arch {
-> >
-> >         /* VCPU power-off state */
-> >         bool power_off;
-> > +       struct mutex hsm_start_lock;
->
-> Instead of a mutex hsm_start_lock, let's introduce spinlock mp_state_lock
-> which needs to be taken whenever power_off is accessed. Also, we should
-> rename "power_off" to "mp_state" with two possible values.
->
-> >
-> >         /* Don't run the VCPU (blocked) */
-> >         bool pause;
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index b5ca9f2e98ac..4d89b5b5afbf 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -119,6 +119,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >         spin_lock_init(&vcpu->arch.hfence_lock);
-> >
-> >         /* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
-> > +       mutex_init(&vcpu->arch.hsm_start_lock);
-> >         cntx =3D &vcpu->arch.guest_reset_context;
-> >         cntx->sstatus =3D SR_SPP | SR_SPIE;
-> >         cntx->hstatus =3D 0;
-> > diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hs=
-m.c
-> > index 7dca0e9381d9..b528f6e880ae 100644
-> > --- a/arch/riscv/kvm/vcpu_sbi_hsm.c
-> > +++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
-> > @@ -71,14 +71,13 @@ static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu =
-*vcpu, struct kvm_run *run,
-> >  {
-> >         int ret =3D 0;
-> >         struct kvm_cpu_context *cp =3D &vcpu->arch.guest_context;
-> > -       struct kvm *kvm =3D vcpu->kvm;
-> >         unsigned long funcid =3D cp->a6;
-> >
-> >         switch (funcid) {
-> >         case SBI_EXT_HSM_HART_START:
-> > -               mutex_lock(&kvm->lock);
-> > +               mutex_lock(&vcpu->arch.hsm_start_lock);
-> >                 ret =3D kvm_sbi_hsm_vcpu_start(vcpu);
-> > -               mutex_unlock(&kvm->lock);
-> > +               mutex_unlock(&vcpu->arch.hsm_start_lock);
->
-> The use of kvm->lock over here was also protecting
-> simultaneous updates to VCPU reset context. It's better
-> to introduce a separate lock for protecting VCPU reset
-> context access.
->
-> >                 break;
-> >         case SBI_EXT_HSM_HART_STOP:
-> >                 ret =3D kvm_sbi_hsm_vcpu_stop(vcpu);
-> > --
-> > 2.17.1
-> >
->
-> I think this patch can be broken down into two patches:
-> 1) Patch replacing VCPU "power_off" with "enum mp_state"
->     and introducing "mp_state_lock"
-> 2) Patch introducing VCPU reset context lock
->
-> Regards,
-> Anup
+No worries.
 
-Got it! I will update these in a new patchset. Thank you!
-
-Regards,
-Yong-Xuan
+cheers
 
