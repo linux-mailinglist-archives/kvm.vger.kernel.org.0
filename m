@@ -1,223 +1,188 @@
-Return-Path: <kvm+bounces-13883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13884-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E624389BEA8
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 14:08:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A388689BF18
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 14:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BFF3283A6F
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 12:08:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8FA79B224BC
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 12:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFF66F06E;
-	Mon,  8 Apr 2024 12:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B866D1BD;
+	Mon,  8 Apr 2024 12:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="AKIG5uw5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICPX0NBP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB816A337
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 12:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03CC6BB21
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 12:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712578058; cv=none; b=KprQPxlKLv7+v31ODWW4hiqNEE1qvQYC/0QlQGFpOwAPgdLhXk1B96r2sQsDruhBmj28w/GerFsZG6gY+Rn+P6++7mI75Vk3DDZ5vxorAar7Ip1kf58KlG8P7XjfmnbWB2WASPqab544C5iDVv0r2WH0wEi5kQGR7vB9bjHCx9k=
+	t=1712580006; cv=none; b=SxxAgcuz3DGwaq88blBK3p6Ck0BwQrT7/inNEb74dW3eYBu48zaoJHBkVsxU7r4TvLnHjsxsq2JebIL9kNssCABgY53+/n+KxHjV4IOGPoM/8qdfle99DCpv8hJ7YAdodWGEeUPZWHiNFX0cjNKoJPYsytnqjV7EYbRMjhkMPzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712578058; c=relaxed/simple;
-	bh=ceBSqJ4HrDGpuiUBK8Miv6Kqwd6mxdCXZsrKQfo/3Fo=;
+	s=arc-20240116; t=1712580006; c=relaxed/simple;
+	bh=fxPXw2p77yhgVxO+9PcInO2jf4CRcklB5uKFPixrm8U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SxIPEczfyawpkxSIhJ/CF8rqZEWdrtcZbY5hJImd+n5UdSSsHdL98tS67YGebGY/qtwHBwDUlcd9qek9NKhHNLy5YNU1w9JAnzBDm2BpGPK0Tka2eBOd6ATsWANpbB7gyAOpuLptQnwjhIXXNuZ94ScIXELtISdUtUIKd+Y/46g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=AKIG5uw5; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36a1140bd21so9835595ab.3
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 05:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1712578055; x=1713182855; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ysPdkHofn0SsqVjUlorA7HM2PSEU9x+PNO7DRN4CxYo=;
-        b=AKIG5uw5rtwhEwoCyvfgGm5l8PoazjC89SKQX84++eIYOjvuYK3WS8+nl1ZaSyzDSt
-         oxPZ97fh4LOk/IHS95qfiwFLuUDlEogd09xNhPIgQ3sRWKM/vpFb6apkq8y4Bcf8RF/B
-         xDJR5keEwZg7g0IpbYLXwSOys8T2ZA+taRmS+o/wBldvMgp8ydJTiVlq59MqoP7emzrW
-         LNfMVi8FDvIVtqtVdJNGPQAlYTePX+yt6PIKTz1aqCzIPei7RuzzdTjX9kVbTzAQs8dr
-         zLPLHpj3f+8Gy6j34S1vfsbCXol+RYNVvUKhYwiduDMtvIkDMkPNzl+4YfzTGP2339/+
-         D3pw==
+	 To:Cc:Content-Type; b=T/a2hzcyisaionHF97VK3pEz21ABgfXJOOv1mxKcRR+FJuGrok709qjoK+APNPYh39TbYHI9nDr97D7roXn6DgTgy2dbO/NJAqMz5z8bTCDRr8l6psvHYRpMGQFz6YbKZXFbXNmVEmRokNIX8YqCLNj2TBAP+8EgMLO89+RCtNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICPX0NBP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712580003;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ae2COtjajtOOtS6X4ygU+qeHK/f9eu0OjppudYN/LXQ=;
+	b=ICPX0NBPIWiSzHv/qAZo0YcA8QGYQM63evZiJLFredajKRrV0BQkvoC549+haRafGyFbXw
+	4WmmFotLtu+SXRFFxoXJZ8Gd34iKQooRkXhFngPmBdRCgtZDBPri/dBWW7B+al21NlazXQ
+	S1+pEgv1ZyJ0uCTHeKNml9SnMMwdvbA=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-461-JrVKmiyGN2-1ogl5QlKBkg-1; Mon, 08 Apr 2024 08:40:01 -0400
+X-MC-Unique: JrVKmiyGN2-1ogl5QlKBkg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a519e05fe4fso226360666b.3
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 05:40:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712578055; x=1713182855;
+        d=1e100.net; s=20230601; t=1712580001; x=1713184801;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ysPdkHofn0SsqVjUlorA7HM2PSEU9x+PNO7DRN4CxYo=;
-        b=DhXRw8Ar2tifIASPwOrGr9PEGJLfULz6CDv3R+bItgx05Gvte5cokjcdedZA2wuT/B
-         i+cj6BARgCK+C5vKhLkfrCCOy4E6VEdVsU/lryXVOBuSOsK+Gn7Kk6EDx3yo6DA93DIu
-         jg6cyWHGgdlAEh8oJx4ycy3eJZ5KbQ9M703n9mPwdSxTeXvS7Hika/Hb2zZ/cOWXINTB
-         ql9y/id8Oe2gnKW3mqKWBDThs8OmaZ2XN2EWPjlVDi30EiFFUV9RAa9NNPvcf5Xr2lwe
-         zU+ui2Ujq0u3AijGpF8xE7R3x4pNGOc8dOS1PDxwJMRnhUxSiXeCdpDg+/sPoXbxgUY6
-         8vAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUj9XXQHxF0OpZDsAqHxyZYer/RQQLhlDoNrYCnJOIcW5vCnTIgOLMxtDsFfChMTuunyhcpkskS8hsd8OMQ2d8c516G
-X-Gm-Message-State: AOJu0Yygj6AvNPCx+qijHKgcZoqPE8H+tZNHD4IhM+tYnWcxhlZssqmH
-	+pI0Qx8vZ3503FqjtExB26DZ1Pajr76WNbOJEwK6sWAz2cr698CymzyGL+hwaINeAEQqcmEet7v
-	Jmdt2ZlN6HsjNO+qiaRo6Qwqt2feEMitvacfiAw==
-X-Google-Smtp-Source: AGHT+IHUq83zNBHTpl7MmDd5GJ1Gg5JdecBzvdbUwm0GbS2BKl2pv80jCI4+BNP4aYrjw+ttNoV+f0bZ5iomvms7YJo=
-X-Received: by 2002:a05:6e02:1568:b0:36a:2872:90d4 with SMTP id
- k8-20020a056e02156800b0036a287290d4mr1779608ilu.26.1712578054731; Mon, 08 Apr
- 2024 05:07:34 -0700 (PDT)
+        bh=Ae2COtjajtOOtS6X4ygU+qeHK/f9eu0OjppudYN/LXQ=;
+        b=HXoIZS7kzJnqHGBKoJdwThf6v9ENi0FfMS7r0paxrA6GeJ842hGpNGezpNhfj44Jp/
+         LArhQ0Wk0yUUyZThonwWozgPbGMUpqpyqzv2LsMI/czBdXygEoHENCcqRaZY3x+E5Sts
+         VSCaatwGUwGCSThEWpQg02L8EcwbW3Swv/G+nZUYsH1B0c4K+WaWqBNtu1bdhS/YJ3rT
+         IE/deEX0821NlTnI24c87iZ8dKvVgEjMAlPCQ0AO4UzvU1IxkBHWf1iwl3xBXtkW44/4
+         l7XEktihTcQ04Zz7xQCkcqPvVvFUv+UvKijOYnNn3Y3J1V3sPqEoqnPjQIKQ1c9ABZPR
+         46Mg==
+X-Forwarded-Encrypted: i=1; AJvYcCXqDMYGpX5SSDq8rEa1MkaDBeNKtEe9AogBqSaTobUUGKyfubD2ZmkJZEnTUYmQFPjSwq30Fr3WKixkwIbIWYr6mUu2
+X-Gm-Message-State: AOJu0YwLRxnBPt8V41jssEXDD9dWyTMOdrEanIUV7WrJRbrK38VtwCSY
+	fQbxKW/+iZNjYiXEu0nQ8BGd3JXR6XMDP0IIcJ7UGD6OuD1juWwnVMI6V8FkBU2+Nxp7CuMpoi6
+	gAWT6t7TXbtMlj81M6YngoRX8NtTqAxyqm1Cu2hCrqXVheQs0pvZlatcr9YkcuXYurk17A7GF3I
+	dKJr7SvRKSzEjowFUdGYjUANyM
+X-Received: by 2002:a17:907:9444:b0:a51:d70f:b5f2 with SMTP id dl4-20020a170907944400b00a51d70fb5f2mr2084584ejc.20.1712580000862;
+        Mon, 08 Apr 2024 05:40:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFg3MkKq/gJZBjDBVnAKe4jU7q9XkeS1BfnnkBObgzhdnwCFitOZa/DmVr4r6jMIn9yjc43uLBh88PkDhgd3Mk=
+X-Received: by 2002:a17:907:9444:b0:a51:d70f:b5f2 with SMTP id
+ dl4-20020a170907944400b00a51d70fb5f2mr2084571ejc.20.1712580000551; Mon, 08
+ Apr 2024 05:40:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240328031220.1287-1-liangshenlin@eswincomputing.com> <20240328031220.1287-2-liangshenlin@eswincomputing.com>
-In-Reply-To: <20240328031220.1287-2-liangshenlin@eswincomputing.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Mon, 8 Apr 2024 17:37:23 +0530
-Message-ID: <CAAhSdy0DgW055iV7=_D6iOLr1iVeK9SZmG8hqBG0_hb1z=+07g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] RISCV: KVM: add tracepoints for entry and exit events
-To: Shenlin Liang <liangshenlin@eswincomputing.com>
-Cc: atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, 
-	mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, 
-	irogers@google.com, adrian.hunter@intel.com, linux-perf-users@vger.kernel.org
+References: <20240404055635.316259-1-lulu@redhat.com> <20240408033804-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240408033804-mutt-send-email-mst@kernel.org>
+From: Cindy Lu <lulu@redhat.com>
+Date: Mon, 8 Apr 2024 20:39:21 +0800
+Message-ID: <CACLfguUL=Kteorvyn=wRUWFJFvhvgRyp+V7GNBp2R33hK1vnSw@mail.gmail.com>
+Subject: Re: [PATCH v3] Documentation: Add reconnect process for VDUSE
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 28, 2024 at 8:49=E2=80=AFAM Shenlin Liang
-<liangshenlin@eswincomputing.com> wrote:
+On Mon, Apr 8, 2024 at 3:40=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
 >
-> Like other architectures, RISCV KVM also needs to add these event
-> tracepoints to count the number of times kvm guest entry/exit.
+> On Thu, Apr 04, 2024 at 01:56:31PM +0800, Cindy Lu wrote:
+> > Add a document explaining the reconnect process, including what the
+> > Userspace App needs to do and how it works with the kernel.
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  Documentation/userspace-api/vduse.rst | 41 +++++++++++++++++++++++++++
+> >  1 file changed, 41 insertions(+)
+> >
+> > diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/user=
+space-api/vduse.rst
+> > index bdb880e01132..7faa83462e78 100644
+> > --- a/Documentation/userspace-api/vduse.rst
+> > +++ b/Documentation/userspace-api/vduse.rst
+> > @@ -231,3 +231,44 @@ able to start the dataplane processing as follows:
+> >     after the used ring is filled.
+> >
+> >  For more details on the uAPI, please see include/uapi/linux/vduse.h.
+> > +
+> > +HOW VDUSE devices reconnection works
+> > +------------------------------------
+> > +1. What is reconnection?
+> > +
+> > +   When the userspace application loads, it should establish a connect=
+ion
+> > +   to the vduse kernel device. Sometimes,the userspace application exi=
+sts,
+> > +   and we want to support its restart and connect to the kernel device=
+ again
+> > +
+> > +2. How can I support reconnection in a userspace application?
+> > +
+> > +2.1 During initialization, the userspace application should first veri=
+fy the
+> > +    existence of the device "/dev/vduse/vduse_name".
+> > +    If it doesn't exist, it means this is the first-time for connectio=
+n. goto step 2.2
+> > +    If it exists, it means this is a reconnection, and we should goto =
+step 2.3
+> > +
+> > +2.2 Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
+> > +    /dev/vduse/control.
+> > +    When ioctl(VDUSE_CREATE_DEV) is called, kernel allocates memory fo=
+r
+> > +    the reconnect information. The total memory size is PAGE_SIZE*vq_m=
+umber.
 >
-> Signed-off-by: Shenlin Liang <liangshenlin@eswincomputing.com>
-> ---
->  arch/riscv/kvm/trace_riscv.h | 60 ++++++++++++++++++++++++++++++++++++
->  arch/riscv/kvm/vcpu.c        |  7 +++++
->  2 files changed, 67 insertions(+)
->  create mode 100644 arch/riscv/kvm/trace_riscv.h
+> Confused. Where is that allocation, in code?
 >
-> diff --git a/arch/riscv/kvm/trace_riscv.h b/arch/riscv/kvm/trace_riscv.h
-> new file mode 100644
-> index 000000000000..5848083c7a5e
-> --- /dev/null
-> +++ b/arch/riscv/kvm/trace_riscv.h
-> @@ -0,0 +1,60 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Tracepoints for RISC-V KVM
-> + *
-> + * Copyright 2024 Beijing ESWIN Computing Technology Co., Ltd.
-> + *
-> + */
-> +#if !defined(_TRACE_RSICV_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
-> +#define _TRACE_RSICV_KVM_H
+> Thanks!
+>
+this should allocated in function vduse_create_dev(), I will rewrite
+this part  to make it more clearer
+will send a new version soon
+Thanks
+cindy
 
-s/_RSICV_/_RISCV_/
-
-> +
-> +#include <linux/tracepoint.h>
-> +
-> +#undef TRACE_SYSTEM
-> +#define TRACE_SYSTEM kvm
-> +
-> +TRACE_EVENT(kvm_entry,
-> +       TP_PROTO(struct kvm_vcpu *vcpu),
-> +       TP_ARGS(vcpu),
-> +
-> +       TP_STRUCT__entry(
-> +               __field(unsigned long, pc)
-> +       ),
-> +
-> +       TP_fast_assign(
-> +               __entry->pc     =3D vcpu->arch.guest_context.sepc;
-> +       ),
-> +
-> +       TP_printk("PC: 0x%016lx", __entry->pc)
-> +);
-> +
-> +TRACE_EVENT(kvm_exit,
-> +       TP_PROTO(struct kvm_vcpu *vcpu, unsigned long exit_reason,
-> +                       unsigned long scause),
-> +       TP_ARGS(vcpu, exit_reason, scause),
-> +
-> +       TP_STRUCT__entry(
-> +               __field(unsigned long, pc)
-> +               __field(unsigned long, exit_reason)
-> +               __field(unsigned long, scause)
-
-This is not the right contents describing a KVM exit.
-
-The fields over here should be aligned with "struct kvm_cpu_trap"
-so we should have following fields:
-    __field(unsigned long, sepc)
-    __field(unsigned long, scause)
-    __field(unsigned long, stval)
-    __field(unsigned long, htval)
-    __field(unsigned long, htinst)
-
-> +       ),
-> +
-> +       TP_fast_assign(
-> +               __entry->pc             =3D vcpu->arch.guest_context.sepc=
-;
-> +               __entry->exit_reason    =3D exit_reason;
-> +               __entry->scause         =3D scause;
-> +       ),
-> +
-> +       TP_printk("EXIT_REASON:0x%lx,PC: 0x%016lx,SCAUSE:0x%lx",
-> +                       __entry->exit_reason, __entry->pc, __entry->scaus=
-e)
-> +);
-> +
-> +#endif /* _TRACE_RSICV_KVM_H */
-> +
-> +#undef TRACE_INCLUDE_PATH
-> +#define TRACE_INCLUDE_PATH .
-> +#undef TRACE_INCLUDE_FILE
-> +#define TRACE_INCLUDE_FILE trace_riscv
-> +
-> +/* This part must be outside protection */
-> +#include <trace/define_trace.h>
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index b5ca9f2e98ac..ed0932f0d514 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -21,6 +21,9 @@
->  #include <asm/cacheflush.h>
->  #include <asm/kvm_vcpu_vector.h>
->
-> +#define CREATE_TRACE_POINTS
-> +#include "trace_riscv.h"
-> +
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
->         STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
-> @@ -782,6 +785,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->                  */
->                 kvm_riscv_local_tlb_sanitize(vcpu);
->
-> +               trace_kvm_entry(vcpu);
-> +
->                 guest_timing_enter_irqoff();
->
->                 kvm_riscv_vcpu_enter_exit(vcpu);
-> @@ -820,6 +825,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->
->                 local_irq_enable();
->
-> +               trace_kvm_exit(vcpu, run->exit_reason, trap.scause);
-> +
->                 preempt_enable();
->
->                 kvm_vcpu_srcu_read_lock(vcpu);
-> --
-> 2.37.2
+> > +2.3 Check if the information is suitable for reconnect
+> > +    If this is reconnection :
+> > +    Before attempting to reconnect, The userspace application needs to=
+ use the
+> > +    ioctl(VDUSE_DEV_GET_CONFIG, VDUSE_DEV_GET_STATUS, VDUSE_DEV_GET_FE=
+ATURES...)
+> > +    to get the information from kernel.
+> > +    Please review the information and confirm if it is suitable to rec=
+onnect.
+> > +
+> > +2.4 Userspace application needs to mmap the memory to userspace
+> > +    The userspace application requires mapping one page for every vq. =
+These pages
+> > +    should be used to save vq-related information during system runnin=
+g. Additionally,
+> > +    the application must define its own structure to store information=
+ for reconnection.
+> > +
+> > +2.5 Completed the initialization and running the application.
+> > +    While the application is running, it is important to store relevan=
+t information
+> > +    about reconnections in mapped pages. When calling the ioctl VDUSE_=
+VQ_GET_INFO to
+> > +    get vq information, it's necessary to check whether it's a reconne=
+ction. If it is
+> > +    a reconnection, the vq-related information must be get from the ma=
+pped pages.
+> > +
+> > +2.6 When the Userspace application exits, it is necessary to unmap all=
+ the
+> > +    pages for reconnection
+> > --
+> > 2.43.0
 >
 
-Regards,
-Anup
 
