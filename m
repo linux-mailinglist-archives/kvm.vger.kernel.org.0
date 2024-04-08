@@ -1,74 +1,81 @@
-Return-Path: <kvm+bounces-13876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFFAC89BE06
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 13:20:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B32C289BE13
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 13:24:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 200731C212A6
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 11:20:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA2DDB22D5B
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 11:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E7D69DFE;
-	Mon,  8 Apr 2024 11:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E4069E04;
+	Mon,  8 Apr 2024 11:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="j8zrpaIf"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YAJfIXLJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B176657AE
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 11:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09898657D4;
+	Mon,  8 Apr 2024 11:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712575185; cv=none; b=dnA1AIcqZN3I4Y1cdp8yzKbWb0IIL9FTe2+xpU65OW6X9EyqSmCAoRjbeeI3gqe0w0SvbC+4qnccnXlZQDA8KZ6q84EJZptJQOEymr8QcTzxmkAg14ZM6OX8PsFPTG5mL55wutStrPej0q5LMe+aYfVTzsHtYc3YGdJvnxB8+EY=
+	t=1712575446; cv=none; b=npuhuG9UHtrsSxFiv6k44J9GEx40BrQSWabGtYgfyKUOHYowMFVDlmWkghr+ENva/hiNJAjRGPdigiV//TzEjsD+ysTxq/S+/8/qVxKOpkXN8Wq66G69pOS/CeQvJeb+KdAzVEC4MtR+06kkjhqONUDSespcXh3KSMw17VWx4Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712575185; c=relaxed/simple;
-	bh=43OKLW6FinsPWAmKzjoljUIVwv0vdGeQy+WbPiLUGCw=;
+	s=arc-20240116; t=1712575446; c=relaxed/simple;
+	bh=EuxSsB3X5Gaiar/zSh6eOGFVgOfC4DpygO0nusankBo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mAePH/SzFKWdoMbic0J13iwqhJtlseINc5DNm827I9cYPXUv3j7tx3kKPSYNDDEuKmzj7gGAjvFpCpvBbBVQEF1FPKNQyYjp+4FFphyPLaBfkNgTZ7zPgPSsvy2JuAgDhjdVQ7ZDVpTmuXhcP2i+/7HVW3amNFhjQFxfHR9/Yqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=j8zrpaIf; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-34560201517so320099f8f.1
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 04:19:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712575181; x=1713179981; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WSk7g629HcnobUYtS9ld5wkokmcC8tpl1DGu7N0oFPU=;
-        b=j8zrpaIfIve+C9k81yyhYpmocDiY095DUVPRcM+yNHwMLcHMqxx3tH6mnN9Ku5dDnc
-         Y2HMgo2eWi45Jh9wVjpm0daA35Pq9OmbQql+Sciq2GvheLG6Khz/exHMQkCYpB88cj8B
-         sDLJFCPHz+RoHNagFS9AdNN6KKmz3y49EYo4L8J6TwHDyx5fcl4zm4inXhT5SuT51+i9
-         4zSpl0BnSTX5m4rX6VKbugQ+4QhthBzoqH1hApclgWg+5bWJeXHRd2YluE0VURfddd8L
-         mFdtDb7tW+9gO/PJGiAh6JRFSiv2/DGEd89orAKSkgmu0/wG1juC02GEp6Cm0LAo3AcS
-         52dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712575181; x=1713179981;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WSk7g629HcnobUYtS9ld5wkokmcC8tpl1DGu7N0oFPU=;
-        b=AUMFNrfrRTuYL8Y+qWCafXtPasBB+hs67JpwDUwlZfT8yk0XV76YPv6xtSzllAVQwH
-         RsQtmCnLJmv6Uppo0ZhVL/NLw9ajUNMgdfAi+1tivpls6YrUan3v3vsq1G0ahHsH4Rn1
-         n8a15WlTeqNFfeahTILSzZnHvfkJHlaevXlipXrOq/iDvspv2o+wd/8c+C8WA13kQr6y
-         OBZndHWHcCg6fN/mB7435py81iTmeAq2iu2gXE24sWTKwZy5f3hAxsVzWaYB25+ndHxW
-         1JU0TPGwUMFLo138QYkzUXMAGN50bSqJwUTBk8BaFPmsrtYSomsF8x7G96915FnNkRqI
-         nIEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0n40vK15Jm1XthWHkIP1QU6Oc3yUcmZTzDokkMTvxEGu3hNIKcCvmcV7dzxPD9H0yW8z2iyr3nWyfB+xdTcG21CWL
-X-Gm-Message-State: AOJu0Yx+maVPQm+E67DuZfZn9K9/wYagJUwRAOd0MGkC4i1cVMj6B9NF
-	m/kUpsTkn43qyjI7z0j7Pejq2D70Yw0McvrrEAtshYEAkPUtz17z5SzqIv3/uJk=
-X-Google-Smtp-Source: AGHT+IFsrqlt8EPvaHLsA1X/PyCnOOmKPkgttAzXmXfIr/HqmjcOS9we1W6RxidEv01fKclvnQ/mqQ==
-X-Received: by 2002:a05:600c:4fd4:b0:416:5c22:1200 with SMTP id o20-20020a05600c4fd400b004165c221200mr2651159wmq.4.1712575181415;
-        Mon, 08 Apr 2024 04:19:41 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:999:a3a0:6327:edd6:6580:3ead? ([2a01:e0a:999:a3a0:6327:edd6:6580:3ead])
-        by smtp.gmail.com with ESMTPSA id dr20-20020a5d5f94000000b0033ea499c645sm8885921wrb.4.2024.04.08.04.19.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Apr 2024 04:19:40 -0700 (PDT)
-Message-ID: <89d4a24c-db24-487b-8c5c-bdc1fa2d42b4@rivosinc.com>
-Date: Mon, 8 Apr 2024 13:19:39 +0200
+	 In-Reply-To:Content-Type; b=aJz0tEFwcPlTdtzHLURPbBqdyRvpa4hMcXVe1jVkor70Dz9WhZZiZZxm0LrA0x/S13Qik80+rseY91NtBPDV0RW6rWtr1UW+L3/vpbRZY30KHdQnE98X8RjXC89WIZTAwz5liARBPtC04rnITQFOUSrrxnbmMSLEvbdHwTHhxYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YAJfIXLJ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 438BBdXn012478;
+	Mon, 8 Apr 2024 11:23:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8w+g4abeyFtBw1CwZ1jsRyzHnpdGsIoZ8OOMbJ7m34Y=;
+ b=YAJfIXLJG2E/z+BNXy+/M8RZhnXKcYhcD+FSEWXHxRmDD1WqJEF/NQ1IyN6TuuQ7O1tt
+ 9mYRS3ZbWZIBSAGmt/7nSiR6aekSA6tg5XH/VLe6K5grjAFWw4P1fCktr7COILb1B/mH
+ qP0nGSMhDbEH+gYKDKQgYZ0ktgJqeHSXIRr9zU0Zu/EVb6dkBiuYKCrunNGJeA89qSka
+ zH1v2ynhcJ4ikwcF+9MJ1DZugJOdi99BhCacXVQFqmwK3UAEVV1wBsUw/n4708ZDE1F2
+ 4yzfIhbKOpKcvbTxrCSiLLSZEtZC3TotFduTmfZTOnIf/NdYXZ6m1GdSO6mLNMFsdDM7 pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xcd32gamf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 11:23:54 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 438BJtDq026348;
+	Mon, 8 Apr 2024 11:23:53 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xcd32gamc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 11:23:53 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4388gYLs029889;
+	Mon, 8 Apr 2024 11:23:52 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbj7kyn78-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 11:23:52 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 438BNkdv42140042
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Apr 2024 11:23:48 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4113C2004D;
+	Mon,  8 Apr 2024 11:23:46 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D715520040;
+	Mon,  8 Apr 2024 11:23:45 +0000 (GMT)
+Received: from [9.171.0.63] (unknown [9.171.0.63])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Apr 2024 11:23:45 +0000 (GMT)
+Message-ID: <6d83b8b6-6008-4bfe-99a2-63562d500456@linux.ibm.com>
+Date: Mon, 8 Apr 2024 13:23:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,100 +83,91 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/5] Add parsing for Zimop ISA extension
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Deepak Gupta <debug@rivosinc.com>, Jonathan Corbet <corbet@lwn.net>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
- Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-References: <20240404103254.1752834-1-cleger@rivosinc.com>
- <20240405-091c6c174f023d74b434059d@orel>
- <CAKC1njQ3qQ8mTMoYkhhoGQfRSVtp2Tfd2LjDhAmut7UcW9-bGw@mail.gmail.com>
- <ddc5555a-3ae8-42e5-a08a-ca5ceaf0bf28@rivosinc.com>
- <20240408-6c93f3f50b55234f3825ca33@orel>
+Subject: Re: [kvm-unit-tests PATCH 0/2] s390x: run script fixes for PV tests
+To: Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        =?UTF-8?Q?Nico_B=C3=B6hr?=
+ <nrb@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Andrew Jones <andrew.jones@linux.dev>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20240406122456.405139-1-npiggin@gmail.com>
 Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20240408-6c93f3f50b55234f3825ca33@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20240406122456.405139-1-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: mF_MVNg3qiRWAk07zpty0rW1Ys6yEm_6
+X-Proofpoint-ORIG-GUID: rFrRi1I3uQxyVxcHzKvEUqCzJAFXGv3M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-08_09,2024-04-05_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 spamscore=0 malwarescore=0 priorityscore=1501 bulkscore=0
+ mlxlogscore=999 mlxscore=0 phishscore=0 suspectscore=0 impostorscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404080088
 
-
-
-On 08/04/2024 13:03, Andrew Jones wrote:
-> On Mon, Apr 08, 2024 at 10:01:12AM +0200, Clément Léger wrote:
->>
->>
->> On 05/04/2024 19:33, Deepak Gupta wrote:
->>> On Fri, Apr 5, 2024 at 8:26 AM Andrew Jones <ajones@ventanamicro.com> wrote:
->>>>
->>>> On Thu, Apr 04, 2024 at 12:32:46PM +0200, Clément Léger wrote:
->>>>> The Zimop ISA extension was ratified recently. This series adds support
->>>>> for parsing it from riscv,isa, hwprobe export and kvm support for
->>>>> Guest/VM.
->>>>
->>>> I'm not sure we need this. Zimop by itself isn't useful, so I don't know
->>>> if we need to advertise it at all. When an extension comes along that
->>>> redefines some MOPs, then we'll advertise that extension, but the fact
->>>> Zimop is used for that extension is really just an implementation detail.
->>>
->>> Only situation I see this can be useful is this:--
->>>
->>> An implementer, implemented Zimops in CPU solely for the purpose that they can
->>> run mainline distro & packages on their hardware and don't want to leverage any
->>> feature which are built on top of Zimop.
->>
->> Yes, the rationale was that some binaries using extensions that overload
->> MOPs could still be run. With Zimop exposed, the loader could determine
->> if the binary can be executed without potentially crashing. We could
->> also let the program run anyway but the execution could potentially
->> crash unexpectedly, which IMHO is not really good for the user
->> experience nor for debugging. I already think that the segfaults which
->> happens when executing binaries that need some missing extension are not
->> so easy to debug, so better add more guards.
+On 4/6/24 14:24, Nicholas Piggin wrote:
+> Shellcheck caught what looks like two bugs. May not have been too
+> noticable because one just seems like it allows TCG to run PV tests
+> which fails (and might be guarded out later anyway), and the other
+> might only affect running and individual .pv.bin test with s390x-run
+> and not unittests runs.
 > 
-> OK. It's only one more extension out of dozens, so I won't complain more,
-
-No worries, your point *is* valid since I'm not sure yet that the loader
-will actually do that one day.
-
-BTW, are you aware of any effort to make the elf dynamic loader
-"smarter" and actually check for needed extensions to be present rather
-than blindly running the elf and potentially catching SIGILL ?
-
-Thanks,
-
-Clément
-
-> but I was thinking that binaries that use particular extensions would
-> check for those particular extensions (step 2), rather than Zimop.
+> I don't know about running PV tests or have a system with KVM to try,
+> so these are not tested beyond gitlab CI. That might run some PV tests
+> with s390x-kvm, but I don't know so please test/review/ack/nack if
+> possible.
 > 
 > Thanks,
-> drew
-> 
->>
->>>
->>> As an example zicfilp and zicfiss are dependent on zimops. glibc can
->>> do following
->>>
->>> 1) check elf header if binary was compiled with zicfiss and zicfilp,
->>> if yes goto step 2, else goto step 6.
->>> 2) check if zicfiss/zicfilp is available in hw via hwprobe, if yes
->>> goto step 5. else goto step 3
->>> 3) check if zimop is available via hwprobe, if yes goto step 6, else goto step 4
->>
->> I think you meant step 5 rather than step 6.
->>
->> Clément
->>
->>> 4) This binary won't be able to run successfully on this platform,
->>> issue exit syscall. <-- termination
->>> 5) issue prctl to enable shadow stack and landing pad for current task
->>> <-- enable feature
->>> 6) let the binary run <-- let the binary run because no harm can be done
+> Nick
+
+Hey Nick, thanks for cleaning this up.
+The changes work on my machine and I've thrown them into our CI.
+
+Give me a sec to check the patches itself.
 
