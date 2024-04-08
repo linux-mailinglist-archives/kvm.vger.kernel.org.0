@@ -1,166 +1,223 @@
-Return-Path: <kvm+bounces-13882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC07589BE8C
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 14:00:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E624389BEA8
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 14:08:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52F651F23352
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 12:00:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BFF3283A6F
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 12:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDB26A338;
-	Mon,  8 Apr 2024 11:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFF66F06E;
+	Mon,  8 Apr 2024 12:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GzDcUFCZ"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="AKIG5uw5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870F96A029;
-	Mon,  8 Apr 2024 11:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB816A337
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 12:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712577598; cv=none; b=N/wEeCMGApNPa9s305yXJMAqvwgqH+Q38+kjqUNZD7/iGuYkP6jOjDDaA7M4JuUgygcBiqaRVcqLsatTWL2DMu9JMrkjIGnqJRLQX3M2vKpLBfc1vtkZ6UEmZBVeab3aeVtSJRjQoIYkCFd3rxjA3d7J27k3Ds5u75nkKnYFy90=
+	t=1712578058; cv=none; b=KprQPxlKLv7+v31ODWW4hiqNEE1qvQYC/0QlQGFpOwAPgdLhXk1B96r2sQsDruhBmj28w/GerFsZG6gY+Rn+P6++7mI75Vk3DDZ5vxorAar7Ip1kf58KlG8P7XjfmnbWB2WASPqab544C5iDVv0r2WH0wEi5kQGR7vB9bjHCx9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712577598; c=relaxed/simple;
-	bh=M44v5ll/mQgknn8edVYCjCN04UMj1bDmx519SMYLvwQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T7FsnIKyWCSBKNpblz+S8OmMTBaAGadX30aKeu5O6SLeCM2bgK4kvXoR9Y08YUEkjFa21IOAdAJ2E9w418gTJTfBEb/BAe+3rgP/saV8PypUgazKYRSdCeaRKBnRuTMEHUbq5N0XQRURUa+EtAG0rz2lU51SE4ggXw3HtCScZjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GzDcUFCZ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 438B620r011880;
-	Mon, 8 Apr 2024 11:59:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=do0NfUmngBvLTKRfKr2YU2CuBSFdjKxrX9b+TN8jn9I=;
- b=GzDcUFCZIftUzksjH888BbsUSA3Vj+SLZ6tc83aXt9jFs6tOE41mZ5/xdzHeDctCKIx7
- f8/KU1z9T8D9EfyAyEzJou3yTzxPFrReX/ukDO75ZWy7jtnQL+2c3U8Lu3EnV1RMubSU
- HIZIcNQ6MMUZfcOKSJ/fImXRQlZAxj9pwfixOv1kDaLjnQKwCReFGsqNYwfCJlZ9RZ6N
- RvdgiizTxxZVVWf18Gdl7YaOfhSP//8BUZBwtxYOxdVszKUK+Woc/6khM+C9dgEhncRv
- 5faHGp/tt7LmX+xxhGm0JIGT8oX6ZRw01xyJwevF2MjZxI2K5njQx3tu+DwCMA+qd/8a 4g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xceu8g556-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 11:59:46 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 438BxjB8002306;
-	Mon, 8 Apr 2024 11:59:46 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xceu8g553-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 11:59:45 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43892vGw029904;
-	Mon, 8 Apr 2024 11:59:44 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbj7kysj7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 11:59:44 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 438Bxcnd53739894
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Apr 2024 11:59:41 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D7BF020043;
-	Mon,  8 Apr 2024 11:59:38 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7788520040;
-	Mon,  8 Apr 2024 11:59:38 +0000 (GMT)
-Received: from [9.171.0.63] (unknown [9.171.0.63])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  8 Apr 2024 11:59:38 +0000 (GMT)
-Message-ID: <e8ea1c30-2211-4060-9cb2-c57364c80ea8@linux.ibm.com>
-Date: Mon, 8 Apr 2024 13:59:38 +0200
+	s=arc-20240116; t=1712578058; c=relaxed/simple;
+	bh=ceBSqJ4HrDGpuiUBK8Miv6Kqwd6mxdCXZsrKQfo/3Fo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SxIPEczfyawpkxSIhJ/CF8rqZEWdrtcZbY5hJImd+n5UdSSsHdL98tS67YGebGY/qtwHBwDUlcd9qek9NKhHNLy5YNU1w9JAnzBDm2BpGPK0Tka2eBOd6ATsWANpbB7gyAOpuLptQnwjhIXXNuZ94ScIXELtISdUtUIKd+Y/46g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=AKIG5uw5; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36a1140bd21so9835595ab.3
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 05:07:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1712578055; x=1713182855; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ysPdkHofn0SsqVjUlorA7HM2PSEU9x+PNO7DRN4CxYo=;
+        b=AKIG5uw5rtwhEwoCyvfgGm5l8PoazjC89SKQX84++eIYOjvuYK3WS8+nl1ZaSyzDSt
+         oxPZ97fh4LOk/IHS95qfiwFLuUDlEogd09xNhPIgQ3sRWKM/vpFb6apkq8y4Bcf8RF/B
+         xDJR5keEwZg7g0IpbYLXwSOys8T2ZA+taRmS+o/wBldvMgp8ydJTiVlq59MqoP7emzrW
+         LNfMVi8FDvIVtqtVdJNGPQAlYTePX+yt6PIKTz1aqCzIPei7RuzzdTjX9kVbTzAQs8dr
+         zLPLHpj3f+8Gy6j34S1vfsbCXol+RYNVvUKhYwiduDMtvIkDMkPNzl+4YfzTGP2339/+
+         D3pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712578055; x=1713182855;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ysPdkHofn0SsqVjUlorA7HM2PSEU9x+PNO7DRN4CxYo=;
+        b=DhXRw8Ar2tifIASPwOrGr9PEGJLfULz6CDv3R+bItgx05Gvte5cokjcdedZA2wuT/B
+         i+cj6BARgCK+C5vKhLkfrCCOy4E6VEdVsU/lryXVOBuSOsK+Gn7Kk6EDx3yo6DA93DIu
+         jg6cyWHGgdlAEh8oJx4ycy3eJZ5KbQ9M703n9mPwdSxTeXvS7Hika/Hb2zZ/cOWXINTB
+         ql9y/id8Oe2gnKW3mqKWBDThs8OmaZ2XN2EWPjlVDi30EiFFUV9RAa9NNPvcf5Xr2lwe
+         zU+ui2Ujq0u3AijGpF8xE7R3x4pNGOc8dOS1PDxwJMRnhUxSiXeCdpDg+/sPoXbxgUY6
+         8vAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUj9XXQHxF0OpZDsAqHxyZYer/RQQLhlDoNrYCnJOIcW5vCnTIgOLMxtDsFfChMTuunyhcpkskS8hsd8OMQ2d8c516G
+X-Gm-Message-State: AOJu0Yygj6AvNPCx+qijHKgcZoqPE8H+tZNHD4IhM+tYnWcxhlZssqmH
+	+pI0Qx8vZ3503FqjtExB26DZ1Pajr76WNbOJEwK6sWAz2cr698CymzyGL+hwaINeAEQqcmEet7v
+	Jmdt2ZlN6HsjNO+qiaRo6Qwqt2feEMitvacfiAw==
+X-Google-Smtp-Source: AGHT+IHUq83zNBHTpl7MmDd5GJ1Gg5JdecBzvdbUwm0GbS2BKl2pv80jCI4+BNP4aYrjw+ttNoV+f0bZ5iomvms7YJo=
+X-Received: by 2002:a05:6e02:1568:b0:36a:2872:90d4 with SMTP id
+ k8-20020a056e02156800b0036a287290d4mr1779608ilu.26.1712578054731; Mon, 08 Apr
+ 2024 05:07:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 1/2] s390x: Fix misspelt variable name in
- func.bash
-To: Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        =?UTF-8?Q?Nico_B=C3=B6hr?=
- <nrb@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20240406122456.405139-1-npiggin@gmail.com>
- <20240406122456.405139-2-npiggin@gmail.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240406122456.405139-2-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0GTlNkXHJQs36FVQkf16FKjM8mbxMEeT
-X-Proofpoint-ORIG-GUID: SFwS1PmorkmcVM2yEli3Q0nGH6Grjq7r
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-08_10,2024-04-05_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- mlxlogscore=861 bulkscore=0 phishscore=0 adultscore=0 impostorscore=0
- priorityscore=1501 spamscore=0 mlxscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404080092
+References: <20240328031220.1287-1-liangshenlin@eswincomputing.com> <20240328031220.1287-2-liangshenlin@eswincomputing.com>
+In-Reply-To: <20240328031220.1287-2-liangshenlin@eswincomputing.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 8 Apr 2024 17:37:23 +0530
+Message-ID: <CAAhSdy0DgW055iV7=_D6iOLr1iVeK9SZmG8hqBG0_hb1z=+07g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] RISCV: KVM: add tracepoints for entry and exit events
+To: Shenlin Liang <liangshenlin@eswincomputing.com>
+Cc: atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, 
+	mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, 
+	irogers@google.com, adrian.hunter@intel.com, linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/6/24 14:24, Nicholas Piggin wrote:
-> The if statement is intended to run non-migration tests with PV on KVM.
-> With the misspelling, they are run on KVM or TCG.
-> 
+On Thu, Mar 28, 2024 at 8:49=E2=80=AFAM Shenlin Liang
+<liangshenlin@eswincomputing.com> wrote:
+>
+> Like other architectures, RISCV KVM also needs to add these event
+> tracepoints to count the number of times kvm guest entry/exit.
+>
+> Signed-off-by: Shenlin Liang <liangshenlin@eswincomputing.com>
+> ---
+>  arch/riscv/kvm/trace_riscv.h | 60 ++++++++++++++++++++++++++++++++++++
+>  arch/riscv/kvm/vcpu.c        |  7 +++++
+>  2 files changed, 67 insertions(+)
+>  create mode 100644 arch/riscv/kvm/trace_riscv.h
+>
+> diff --git a/arch/riscv/kvm/trace_riscv.h b/arch/riscv/kvm/trace_riscv.h
+> new file mode 100644
+> index 000000000000..5848083c7a5e
+> --- /dev/null
+> +++ b/arch/riscv/kvm/trace_riscv.h
+> @@ -0,0 +1,60 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Tracepoints for RISC-V KVM
+> + *
+> + * Copyright 2024 Beijing ESWIN Computing Technology Co., Ltd.
+> + *
+> + */
+> +#if !defined(_TRACE_RSICV_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
+> +#define _TRACE_RSICV_KVM_H
 
-It's not misspelt, is it?
-It's in the wrong case.
+s/_RSICV_/_RISCV_/
 
+> +
+> +#include <linux/tracepoint.h>
+> +
+> +#undef TRACE_SYSTEM
+> +#define TRACE_SYSTEM kvm
+> +
+> +TRACE_EVENT(kvm_entry,
+> +       TP_PROTO(struct kvm_vcpu *vcpu),
+> +       TP_ARGS(vcpu),
+> +
+> +       TP_STRUCT__entry(
+> +               __field(unsigned long, pc)
+> +       ),
+> +
+> +       TP_fast_assign(
+> +               __entry->pc     =3D vcpu->arch.guest_context.sepc;
+> +       ),
+> +
+> +       TP_printk("PC: 0x%016lx", __entry->pc)
+> +);
+> +
+> +TRACE_EVENT(kvm_exit,
+> +       TP_PROTO(struct kvm_vcpu *vcpu, unsigned long exit_reason,
+> +                       unsigned long scause),
+> +       TP_ARGS(vcpu, exit_reason, scause),
+> +
+> +       TP_STRUCT__entry(
+> +               __field(unsigned long, pc)
+> +               __field(unsigned long, exit_reason)
+> +               __field(unsigned long, scause)
 
-I'm fine with the code though.
+This is not the right contents describing a KVM exit.
+
+The fields over here should be aligned with "struct kvm_cpu_trap"
+so we should have following fields:
+    __field(unsigned long, sepc)
+    __field(unsigned long, scause)
+    __field(unsigned long, stval)
+    __field(unsigned long, htval)
+    __field(unsigned long, htinst)
+
+> +       ),
+> +
+> +       TP_fast_assign(
+> +               __entry->pc             =3D vcpu->arch.guest_context.sepc=
+;
+> +               __entry->exit_reason    =3D exit_reason;
+> +               __entry->scause         =3D scause;
+> +       ),
+> +
+> +       TP_printk("EXIT_REASON:0x%lx,PC: 0x%016lx,SCAUSE:0x%lx",
+> +                       __entry->exit_reason, __entry->pc, __entry->scaus=
+e)
+> +);
+> +
+> +#endif /* _TRACE_RSICV_KVM_H */
+> +
+> +#undef TRACE_INCLUDE_PATH
+> +#define TRACE_INCLUDE_PATH .
+> +#undef TRACE_INCLUDE_FILE
+> +#define TRACE_INCLUDE_FILE trace_riscv
+> +
+> +/* This part must be outside protection */
+> +#include <trace/define_trace.h>
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index b5ca9f2e98ac..ed0932f0d514 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -21,6 +21,9 @@
+>  #include <asm/cacheflush.h>
+>  #include <asm/kvm_vcpu_vector.h>
+>
+> +#define CREATE_TRACE_POINTS
+> +#include "trace_riscv.h"
+> +
+>  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
+>         KVM_GENERIC_VCPU_STATS(),
+>         STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
+> @@ -782,6 +785,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>                  */
+>                 kvm_riscv_local_tlb_sanitize(vcpu);
+>
+> +               trace_kvm_entry(vcpu);
+> +
+>                 guest_timing_enter_irqoff();
+>
+>                 kvm_riscv_vcpu_enter_exit(vcpu);
+> @@ -820,6 +825,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>
+>                 local_irq_enable();
+>
+> +               trace_kvm_exit(vcpu, run->exit_reason, trap.scause);
+> +
+>                 preempt_enable();
+>
+>                 kvm_vcpu_srcu_read_lock(vcpu);
+> --
+> 2.37.2
+>
+
+Regards,
+Anup
 
