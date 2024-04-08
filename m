@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-13860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 006E989B8CE
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 09:44:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79C8389B8D2
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 09:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35E8CB230C3
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 07:44:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB2381C220EC
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 07:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C9C4E1AD;
-	Mon,  8 Apr 2024 07:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BD94F1E4;
+	Mon,  8 Apr 2024 07:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ToG8zNHV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QI+1jMXt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381724A9B0;
-	Mon,  8 Apr 2024 07:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA824CDEB;
+	Mon,  8 Apr 2024 07:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712562083; cv=none; b=mhueOknTdigChUZ3dwyaBfhWk0luwLlLay54h5wFs7FsJCE2lFzCE4uc1FptC0k0/K35j7dslSkGo98KMVc5hZYcqin0WXKBUvi5NLe6mruWFyeajc41ZnzxS7DwSb1EN9FbIqtDecgAAZeTNyPU6hOTUfanTqvcqagJkAcX1h0=
+	t=1712562084; cv=none; b=AHWAoeyQctD33MMLSgnfKufOw3/q8n8TzRKb69Owij5mTjIRFvZJ+2wLmrecvTDfSWwEDcRt0ktfRJNHfcdtg1FxO846lOiiR6kwujBf/gdzw29ow06KtunJP5ewhZPIG+GXJYQFzL9XRbJVQilz+o03VyIlF6lFhWvJ7xOXPsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712562083; c=relaxed/simple;
-	bh=zYcb4/9WEShY0XRHnrQbKJ01pXJ2G8yIwcM+DsGPPXc=;
+	s=arc-20240116; t=1712562084; c=relaxed/simple;
+	bh=nraWtElHPDcy4J/h0QtFNZ3iGaE/9eKaPhhvDhuTS7E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AN1RQgoP6UPbvHwg6OxKgrn/rG8qnMTAIfAE8rf1XTNaf7OuwKMuMnv/bbvlpGHb8oww+bN2x3pQwJeqdB5lG3ESwcroWZMN55E2qPsxrjuuiWW7icHh7jkj4poXiwDF4EQ8EYB/7BL4neAIvgD7dFAqGo+0bK6Q6s1EdqTDZ28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ToG8zNHV; arc=none smtp.client-ip=209.85.221.43
+	 MIME-Version; b=rtp+XXSgKdpxWm1FBW264DLZGx/7rfYWXxBj2Oyyl2Nfst1Jh2wX28c+m1+0JriFv40E2ACXgHcLjKy3mbXfJeUEG9gSiYVcJavh9XILZc1ttlmN8SAZ8QPZaKGO4lr6nyxpvcJdvvKj0N3yxwtStfz3TPr1sp6ZR1LaK0ZVirc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QI+1jMXt; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3454fbdd88aso1580057f8f.3;
-        Mon, 08 Apr 2024 00:41:20 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-343eb6cc46bso1779572f8f.2;
+        Mon, 08 Apr 2024 00:41:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712562079; x=1713166879; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712562082; x=1713166882; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PtkyqKxJvkp9IMsnHYE4l6zbbRyMrAgNbiaeWO9SXiI=;
-        b=ToG8zNHVpGmjsJ7+ceD2NGlDa0LbkZ+18gyiE5ntMqf7B96nk6i7g/z8m8w43T9P9s
-         Jii/D0CaIVspfziT6CCgL1TO+KVKqQ7eGk74KG9vIUxrYjdNGULdjx17SMk1XcMPe/0I
-         pqEQvn0dwdUwFK3qjryljCpxGsdcqmk0yLobo+FJFVkzIlYgU6r+itl/DFKiTMPMxAWG
-         C+ggI4EjjRTn5j3NZSmcbpmuIn4F1qw5stm88LTljDxVpzn5M/YIz/ICt+gxhtnrIG5I
-         jRkV48Dq6o65vkVMwzw7iJGmzx+Np2Bqgh1jAlkY0qtHuRaKALCA1xijpxSCdds8oQei
-         3j8w==
+        bh=vffWxrDfGUfj6Dj40L1W41htTqoat8lNT1P/loOuIyQ=;
+        b=QI+1jMXtrOyg9JVBH2Cr6J/COjhVfEtrHoh9D42fi+GJdTGLWU8G1HrxAmlkCJOIFH
+         n6i4/3O4CIDYHW0EJdJy/eFAxxHkxuEsP35TYkc14sgH86e6nSs78jMc6Fx3dHDRKEKU
+         3EeAhZv7F6RVEY6Aw6Altc4a6Oa/hSVENdtlymy1WSJ1XaG559wvQ7sD2Lm7xIYR0M1x
+         QZJDiON87uPXpA/5FS+eYAM1lON2G1IkXyXjZYgBKOuJnNrVUCSfBTY2rTcW2kRlDNEn
+         0QkJzK7UALm4SA1Tn0pi7eyWV3JhoOmZFYJYsTUvnw2a9vfm6hH55WauXor6EOlCr+l+
+         WJvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712562079; x=1713166879;
+        d=1e100.net; s=20230601; t=1712562082; x=1713166882;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PtkyqKxJvkp9IMsnHYE4l6zbbRyMrAgNbiaeWO9SXiI=;
-        b=iMkOVH47gAVOwpNAQENCyet0838hhfRQ7YDNwt36g76UZn3ocXG+kMIK57yCpb1ZHu
-         3rxZ4FYf/8Q1qKdOVCHYZWq2gyCtQE7PAu6LGOga7r4kSR7DmFxu3M5MYiIZZ/9sXcrd
-         9lI+sh4kQXx7hZ7RHJeO6079ukq+VKIT2Nv33DJ9UIJwApX8gAcWvQIidJvyTkpwJMa3
-         1+l8N4eL8n3t8kYs/xeh9SsFLWHD5vqN7AbC5E2v31BVpv+o0BpgEJ3OzXgmbUpf6e7h
-         agqb+Ld3b49eVtx6lB7wEVSJWptEf6BXqQlh7sg+jVp+0MuV929NJJTAp1mycZmKCJrs
-         c5IA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtXTPtfn9bJxUBX2d/WS/T674Z96rz2OTgMNaIILm5lBqFCmt00ASLNyUKq+2UgIcwFUe6AB8p7Jbyuqu0fvqm/KMzxb6P8YnfYuLEfzhrNBMQAWn6MtW+Q9vAhYcIVCBC5fpY3QuFPfL9yB+RJ1HV2tx5avCROgvV
-X-Gm-Message-State: AOJu0Yw6Iwpf+ePmmE56mIVgygQ0F4W8OYDOdWTGrF0O21IqD09StXmU
-	m/NpXC8HSPr1rK1bYCK24aJo2XtpoaEpfzvHq4AAhfcaTIbV6oP4
-X-Google-Smtp-Source: AGHT+IHCtTgtguJAV1/c4MkfZce3ouAm8nkkV1k3lPxle87h5W00nuVVJEZORfw/dl/4V3xbzdiheA==
-X-Received: by 2002:a5d:5f46:0:b0:345:bcd4:bc99 with SMTP id cm6-20020a5d5f46000000b00345bcd4bc99mr1264651wrb.11.1712562079618;
-        Mon, 08 Apr 2024 00:41:19 -0700 (PDT)
+        bh=vffWxrDfGUfj6Dj40L1W41htTqoat8lNT1P/loOuIyQ=;
+        b=u9zbfX6TD8Qd9GuCZTgDbrWUIKJTQIBEgJ7nH2cvfGgMUdQplj340sY2ZJlTMy4OpN
+         g2oZYa9shimwebPhyb+I8R/WBQtrAVXdVmIL4JDsYy//Kv+CuAXQDf4EAfb0KL9pEDMM
+         Oj2vdc0/OwQqjzW/LbSOzxfR/stnYOlTnaY1VerxVuEeq48xq7M1HdzXr5dngncpXF+d
+         EjzS7YsdlqUyu6MkOkRSo4k/dT0s2NWCfZ+ybkuHVLgBv/t3N+ljqK0wSw2IOWJaURcc
+         qIoFuKofjl/RH9HkyyYsmgAAeNYEjId/BUY0qqLc0NAwZDNczC/5PX5XCUl4EOChQS99
+         9iyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlu4fKySxUn9i2OqnbXHK3YSd0jIWC7qDrdGGStmPHHIlS4FllXIU6eoKDdl5ak0zzsnp/LFs6HdyEtHKZXQE0O8t/4kX9wYCP1W1lSY6Pl8V6ippgWLIiQlYaMpwqPH/aUPjiVaa1+uTDTgmf3ykD1cqc11jF1fG6
+X-Gm-Message-State: AOJu0Yxs4GCzCHHOpigPicUSMkhldcxsl53HkkLmxFP1cU9JHnt5sQXy
+	+arpeWUjFyHvMUbU+iv2UYagqjSb/ZxOeEcE8cIGm473/sSZC4Q+
+X-Google-Smtp-Source: AGHT+IFJ4+QJwRhaWOkJ+xi/SDRYHJSS+dNKUjJlrOrr+g4LrjWQZtOQ6FOdPmbvQsUHzg88XvrMoA==
+X-Received: by 2002:a5d:64a2:0:b0:345:b238:534d with SMTP id m2-20020a5d64a2000000b00345b238534dmr1768262wrp.28.1712562081667;
+        Mon, 08 Apr 2024 00:41:21 -0700 (PDT)
 Received: from vasant-suse.suse.cz ([2001:9e8:ab70:9c00:7f0b:c18e:56a6:4f2])
-        by smtp.gmail.com with ESMTPSA id j3-20020adfff83000000b00341e2146b53sm8271413wrr.106.2024.04.08.00.41.17
+        by smtp.gmail.com with ESMTPSA id j3-20020adfff83000000b00341e2146b53sm8271413wrr.106.2024.04.08.00.41.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 00:41:19 -0700 (PDT)
+        Mon, 08 Apr 2024 00:41:20 -0700 (PDT)
 From: vsntk18@gmail.com
 To: x86@kernel.org
 Cc: cfir@google.com,
@@ -99,9 +99,9 @@ Cc: cfir@google.com,
 	michael.roth@amd.com,
 	Borislav.Petkov@amd.com,
 	Dhaval.Giani@amd.com
-Subject: [PATCH v5 09/10] x86/kexec/64: Support kexec under SEV-ES with AP Jump Table Blob
-Date: Mon,  8 Apr 2024 09:40:48 +0200
-Message-Id: <20240408074049.7049-10-vsntk18@gmail.com>
+Subject: [PATCH v5 10/10] x86/sev: Exclude AP jump table related code for SEV-SNP guests
+Date: Mon,  8 Apr 2024 09:40:49 +0200
+Message-Id: <20240408074049.7049-11-vsntk18@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240408074049.7049-1-vsntk18@gmail.com>
 References: <20240408074049.7049-1-vsntk18@gmail.com>
@@ -113,88 +113,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Vasant Karasulli <vkarasulli@suse.de>
 
-When the AP jump table blob is installed the kernel can hand over the
-APs from the old to the new kernel. Enable kexec when the AP jump
-table blob has been installed.
+Unlike SEV-ES, AP jump table technique is not used in SEV-SNP
+when transitioning from one layer of code to another
+(e.g. when going from UEFI to the OS).
 
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
 Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
 ---
- arch/x86/include/asm/sev.h         |  2 ++
- arch/x86/kernel/machine_kexec_64.c |  3 ++-
- arch/x86/kernel/sev.c              | 15 +++++++++++++++
- 3 files changed, 19 insertions(+), 1 deletion(-)
+ arch/x86/kernel/sev.c    | 6 +++++-
+ arch/x86/realmode/init.c | 5 +++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index dba6cad1f7d3..9c773c272986 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -234,6 +234,7 @@ u64 sev_get_status(void);
- void kdump_sev_callback(void);
- void sev_show_status(void);
- void sev_es_stop_this_cpu(void);
-+bool sev_kexec_supported(void);
- #else
- static inline void sev_es_ist_enter(struct pt_regs *regs) { }
- static inline void sev_es_ist_exit(void) { }
-@@ -265,6 +266,7 @@ static inline u64 sev_get_status(void) { return 0; }
- static inline void kdump_sev_callback(void) { }
- static inline void sev_show_status(void) { }
- static inline void sev_es_stop_this_cpu(void) { }
-+static inline bool sev_kexec_supported(void) { return true; }
- #endif
- 
- #ifdef CONFIG_KVM_AMD_SEV
-diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
-index 4696e149d70d..558266d9bf1d 100644
---- a/arch/x86/kernel/machine_kexec_64.c
-+++ b/arch/x86/kernel/machine_kexec_64.c
-@@ -28,6 +28,7 @@
- #include <asm/setup.h>
- #include <asm/set_memory.h>
- #include <asm/cpu.h>
-+#include <asm/sev.h>
- 
- #ifdef CONFIG_ACPI
- /*
-@@ -269,7 +270,7 @@ static void load_segments(void)
- 
- static bool machine_kexec_supported(void)
- {
--	if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
-+	if (!sev_kexec_supported())
- 		return false;
- 
- 	return true;
 diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 36181bb26e25..aa53e8eb4cd5 100644
+index aa53e8eb4cd5..d915d9158926 100644
 --- a/arch/x86/kernel/sev.c
 +++ b/arch/x86/kernel/sev.c
-@@ -1463,6 +1463,21 @@ static void __init sev_es_setup_play_dead(void)
- static inline void sev_es_setup_play_dead(void) { }
- #endif
- 
-+bool sev_kexec_supported(void)
-+{
-+	if (!cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
-+		return true;
-+
-+	/*
-+	 * KEXEC with SEV-ES and more than one CPU is only supported
-+	 * when the AP jump table is installed.
-+	 */
-+	if (num_possible_cpus() > 1)
-+		return sev_ap_jumptable_blob_installed;
-+	else
-+		return true;
-+}
-+
- static void __init alloc_runtime_data(int cpu)
+@@ -1392,7 +1392,8 @@ STACK_FRAME_NON_STANDARD(sev_jumptable_ap_park);
+ void sev_es_stop_this_cpu(void)
  {
- 	struct sev_es_runtime_data *data;
--- 
+ 	if (!(cc_vendor == CC_VENDOR_AMD) ||
+-	    !cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
++	    !cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT) ||
++	     cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
+ 		return;
+
+ 	/* Only park in the AP jump table when the code has been installed */
+@@ -1468,6 +1469,9 @@ bool sev_kexec_supported(void)
+ 	if (!cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
+ 		return true;
+
++	if (cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
++		return false;
++
+ 	/*
+ 	 * KEXEC with SEV-ES and more than one CPU is only supported
+ 	 * when the AP jump table is installed.
+diff --git a/arch/x86/realmode/init.c b/arch/x86/realmode/init.c
+index f9bc444a3064..ed798939be5d 100644
+--- a/arch/x86/realmode/init.c
++++ b/arch/x86/realmode/init.c
+@@ -80,8 +80,9 @@ static void __init sme_sev_setup_real_mode(struct trampoline_header *th)
+ 		 */
+ 		th->start = (u64) secondary_startup_64_no_verify;
+
+-		if (sev_es_setup_ap_jump_table(real_mode_header))
+-			panic("Failed to get/update SEV-ES AP Jump Table");
++		if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
++			if (sev_es_setup_ap_jump_table(real_mode_header))
++				panic("Failed to get/update SEV-ES AP Jump Table");
+ 	}
+ #endif
+ }
+--
 2.34.1
 
 
