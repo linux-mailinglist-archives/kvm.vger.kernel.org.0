@@ -1,125 +1,142 @@
-Return-Path: <kvm+bounces-13925-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765D289CE82
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 00:36:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B6E89CEB3
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 01:06:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1287E1F234DC
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 22:36:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8A0C1C21B26
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 23:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C817C4CE09;
-	Mon,  8 Apr 2024 22:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC92143C4F;
+	Mon,  8 Apr 2024 23:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="duLf6SKb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uXu/kHVb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917DB171B0
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 22:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB31D28389
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 23:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712615775; cv=none; b=Phs2P1g3XngvvBxURKI+RJeE/SbeSNhJhrX41A3EygYOtOyVA+sdHgNRj2EJ+pz50GGPKo9TyhFF8uYyogyTWTOiUelU9DgAl62NHD0HgXbYK2X2pZMcx7fEmJhv+O7K5rjRqR8K259v8urZ4+U65YeiWeBCxTC0JP4aNXlEZnQ=
+	t=1712617585; cv=none; b=Eu8GQMRaAqARSGJhl+nwRY6la1QfS0Zi0cRApLHktT6Q44NDbzxymxU//XdkCB2+GUyGY9bXlUClL7ete5p3PIVYQEaA1iMmw2ZcT99SR/FRvbEU+fUsoCInIbvyMqIWxIT0CFOtlhc5vaGwosr3IP7LOTa5m6IoCUFBjaWvYfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712615775; c=relaxed/simple;
-	bh=wd9auWj6neAH4mwPBANg9G0rtjJL6aqclc7lajDKiYg=;
+	s=arc-20240116; t=1712617585; c=relaxed/simple;
+	bh=raNGJvl2Sk0V+Ra8kl0a7jUETMsXzW02VIRMS9MLecE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hma8U7ZKjL8EW85naVTW3zsSiHR8tMk1Q9Ihndpysa0ffTZuTnFLfV06//6h4rrrL2conQtN74/Q9uTHr8y0MkhqJz8l9N6LF2tSqMnohxlGtKLaQ5Hyiyw4k6yieWpPX4mXcJNbqrZ09Af742EJuAX1A4ZeZ5rkOJe+tWGv8Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=duLf6SKb; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Domg2BnPEDeVFLm4J487GIjBeBnNMeaa382/yls4VcbxrXtx9CT7N6Ym+nYcHbWW0HMrMsrRUzAlaj2ZqP+44k4NN6JytsWIql1q7QgOIJoKcqRzbVsrgiy9pmoXoWFHxywNNIQ9TR+Hfkfs8KodMUjgX+Lv9Yw6IwlcCmVDHXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uXu/kHVb; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a4a1065dc4so2590484a91.3
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 15:36:13 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e2a1619cfcso38652875ad.0
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 16:06:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712615773; x=1713220573; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=H3IyoUWCaMuOsrSmdtiAaHOAeX0T2/iesX+PuEFhG/o=;
-        b=duLf6SKbk9ruf+aEZLiUtDpW0RGBgbPH30ZOBaR1wAaybjARXGQUQ994/OaZmZlOid
-         A18DKxs3nd0A340wmKgBZtU91VKnlhAw6uVCEhX1Iiu5EU0Nki9wRrrackSe5N50PZXq
-         C7t6A8xTtYI2WeJB1AgNG09I5lHnzle3OfURmBgupr2/J9/W6tePa0lyMdePy1a5gdWZ
-         L+Dm9Ky8eH7M39zwMiSmCiB2dnepn7Az6sqQ5wHDaSJcm5lW9nndKlUmWlRcRsrLNgri
-         EYMqD9BzrRyOC00KTabTi3ZmbQCuu9Vk4R++CnXpHRB7ijewPsQs7BJNBiaswKhD8OKN
-         GN0A==
+        d=google.com; s=20230601; t=1712617583; x=1713222383; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AzGg/0EymHzkfd/vQ5f3X3kSeFagpEymNquXWZZ9WTc=;
+        b=uXu/kHVbKvOtQ+vZXgFCTy9AA+RZJBcXz92edp9NKVaDxHNJjQhpHydso/+blFcCXT
+         gsfdgz4z3Ri+Jc0X7SnNoE/KqHDkdBZxylOSyMW7MAnnfLDmW5Q+GxZHdpo+w/YifpVy
+         SHwi2WdDS23gyNnhca37Ku71LgTrfs6eb5xXF5UsFHKSDzz+wIPS2PaFnlYbL402YJnp
+         UW1AieLCvhfUlc39tNBWFQumO5GKN+SS5jajF3H+KS3e7YDKj18Nl3egfSO6QebLueDP
+         EefyFXb5m6rskHEYPs/wgfWRg4lBXydIKnD2UzUkDq1E48m9Z++gx9HqUoMvx5ajQITg
+         cLoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712615773; x=1713220573;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=H3IyoUWCaMuOsrSmdtiAaHOAeX0T2/iesX+PuEFhG/o=;
-        b=R4af9y7TKb/4A2uAJq5l5lFfJAv6gf4v/xFWX5WeKpv5ZTpYvImKGkd7ntJk7YZfCm
-         MrB1+DLMmV4OuykPhFz7THFadsv4f5sDfgKR1OobGd+3lDUf7WZWuIxFX/DGtDvyE4lt
-         swoMBqFggk8wW/Kt/QGapfan7Ei84+KpaXqgXnHtvfumzFdkhWw/pvwj0p4qAZqmCh46
-         zaMfPXX6MgG/gNwQSGRFsD7GTRSG/3ctUzc6MiCprxg4F7sPSkyXTZizVbEbJ4FoiZul
-         G9oqkra7YtNUFA4WDfG7kGVEUh+cEGJtHNtcwCLjLVV/AM+iiHjnfK1HBrpGxqqWrh4k
-         qpSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUO8DuZKNzl/BrsWX3b1NQIaP9fOekGME2kAFwurLm4ostqJiXws9mtVNgafCBzl0DmzK5VTTmukCXgPOVuTNyonEcC
-X-Gm-Message-State: AOJu0Yw15UjZJt3SGfH5q+wJB1lCe23+kYNxkhK8EQApJI+8RvIC8hhz
-	tX3TCkdZa0evqakxZZL/BZBk6EYfCsnYXtQu+AzxoWcY8e4COmQTp0CAZysZY3hndhWR3U2/2ks
-	vvA==
-X-Google-Smtp-Source: AGHT+IGA02QPgUvTHLSjG35tJY/y8cz2zBR88FLhWwtJO2ItlMMNLpk97KO76IwFPepitjBhAf8k/cmoAGo=
+        d=1e100.net; s=20230601; t=1712617583; x=1713222383;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AzGg/0EymHzkfd/vQ5f3X3kSeFagpEymNquXWZZ9WTc=;
+        b=BtrHExm9bZYJKSav14wIDU+xlMrt+MuMLXeBrcP+pBEY8yiQRMkc+f/+lZwHOhU7lr
+         mDRWzYt2sfIzpftebZ7UwMsCXTu+YE6XV+D5ceM32F60qLWVOGnq2ExDYNBNuE4pwtMS
+         me7MjN2doj5NGOQDGNmYvSsDvTOWKEZLehkGhABDYLU6b+qcTxgfqxnpcyXqDQzgCWpR
+         Mb3M4U3ovH2Elp+SEhePnXanptZZ4fCuqTe6oKB6pYHt7vUuFi3ckQyJaONZSyq1jE3m
+         2bF/9zj2H+lWX04I9QlNjAw4xrKuTvzeTgoSFwHncQCj30iGLfht60GO2EiT+2nKNW80
+         mG0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVs/ABpR7YJPim9nHF3Aaxs/+OiHca9CGjIp3SYeH3QgZUUQvHszGNJt8JJSVMf6Osr+Us4mHYIPIwUYczZaujyPw0g
+X-Gm-Message-State: AOJu0Ywan26BRq8kUrqeJT/yow2oCxFEpCegugzOG3Hkjx/TF1WLt6Mj
+	UMuV+35glEkR8FfvVFXP00CD5TBUzTCL/xbEjRYNhBb58K5FuWnOJvS+y+TjyYnhVP+8K/mlfeW
+	QUw==
+X-Google-Smtp-Source: AGHT+IFu+VYaPjAZAUCCs1sIip4eLJkqAOcS+AGrViDLVaZDdqHEK1uZTsQHtFz/um7v/WRpP6YyQFxeNlo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ea01:b0:1e2:b75e:37b5 with SMTP id
- s1-20020a170902ea0100b001e2b75e37b5mr352811plg.2.1712615772902; Mon, 08 Apr
- 2024 15:36:12 -0700 (PDT)
-Date: Mon, 8 Apr 2024 15:36:11 -0700
-In-Reply-To: <5faaeaa7bc66dbc4ea86a64ef8e8f9b22fd22ef4.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e547:b0:1db:f11d:fef2 with SMTP id
+ n7-20020a170902e54700b001dbf11dfef2mr3523plf.0.1712617583226; Mon, 08 Apr
+ 2024 16:06:23 -0700 (PDT)
+Date: Mon, 8 Apr 2024 16:06:22 -0700
+In-Reply-To: <edc8b1ad-dee0-456f-89fb-47bd4709ff0e@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240405165844.1018872-1-seanjc@google.com> <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
- <ZhQZYzkDPMxXe2RN@google.com> <a17c6f2a3b3fc6953eb64a0c181b947e28bb1de9.camel@intel.com>
- <ZhQ8UCf40UeGyfE_@google.com> <5faaeaa7bc66dbc4ea86a64ef8e8f9b22fd22ef4.camel@intel.com>
-Message-ID: <ZhRxWxRLbnrqwQYw@google.com>
-Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
+References: <ZgsXRUTj40LmXVS4@google.com> <ZhAAg8KNd8qHEGcO@tpad>
+ <ZhAN28BcMsfl4gm-@google.com> <a7398da4-a72c-4933-bb8b-5bc8965d96d0@paulmck-laptop>
+ <ZhQmaEXPCqmx1rTW@google.com> <414eaf1e-ca22-43f3-8dfa-0a86f5b127f5@paulmck-laptop>
+ <ZhROKK9dEPsNnH4t@google.com> <44eb0d36-7454-41e7-9a16-ce92a88e568c@paulmck-laptop>
+ <ZhRoDfoz-YqsGhIB@google.com> <edc8b1ad-dee0-456f-89fb-47bd4709ff0e@paulmck-laptop>
+Message-ID: <ZhR4bnFLA08YgAgr@google.com>
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
 From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "davidskidmore@google.com" <davidskidmore@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"srutherford@google.com" <srutherford@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Wei W Wang <wei.w.wang@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, Leonardo Bras <leobras@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>, Joel Fernandes <joel@joelfernandes.org>, 
+	Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Apr 08, 2024, Rick P Edgecombe wrote:
-> On Mon, 2024-04-08 at 18:51 +0000, Sean Christopherson wrote:
-> > > I'm not following the code examples involving struct kvm_vcpu. Since =
-TDX
-> > > configures these at a VM level, there isn't a vcpu.
-> >=20
-> > Ah, I take it GPAW is a VM-scope knob?
->=20
-> Yea.
->=20
-> > I forget where we ended up with the ordering of TDX commands vs. creati=
-ng
-> > vCPUs.=C2=A0 Does KVM allow creating vCPU structures in advance of the =
-TDX INIT
-> > call?=C2=A0 If so, the least awful solution might be to use vCPU0's CPU=
-ID.
->=20
-> Currently the values for the directly settable CPUID leafs come via a TDX
-> specific init VM userspace API.
+On Mon, Apr 08, 2024, Paul E. McKenney wrote:
+> On Mon, Apr 08, 2024 at 02:56:29PM -0700, Sean Christopherson wrote:
+> > > OK, then we can have difficulties with long-running interrupts hitting
+> > > this range of code.  It is unfortunately not unheard-of for interrupts
+> > > plus trailing softirqs to run for tens of seconds, even minutes.
+> > 
+> > Ah, and if that occurs, *and* KVM is slow to re-enter the guest, then there will
+> > be a massive lag before the CPU gets back into a quiescent state.
+> 
+> Exactly!
 
-Is guest.MAXPHYADDR one of those?  If so, use that.
+...
 
-> So should we look at making the TDX side follow a
-> KVM_GET_SUPPORTED_CPUID/KVM_SET_CPUID pattern for feature enablement? Or =
-am I
-> misreading general guidance out of this specific suggestion around GPAW?=
-=20
+> OK, then is it possible to get some other indication to the
+> rcu_sched_clock_irq() function that it has interrupted a guest OS?
 
-No?  Where I was going with that, is _if_ vCPUs can be created (in KVM) bef=
-ore
-the GPAW is set (in the TDX module), then using vCPU0's guest.MAXPHYADDR to
-compute the desired GPAW may be the least awful solution, all things consid=
-ered.
+It's certainly possible, but I don't think we want to go down that road.
+
+Any functionality built on that would be strictly limited to Intel CPUs, because
+AFAIK, only Intel VMX has the mode where an IRQ can be handled without enabling
+IRQs (which sounds stupid when I write it like that).
+
+E.g. on AMD SVM, if an IRQ interrupts the guest, KVM literally handles it by
+doing:
+
+	local_irq_enable();
+	++vcpu->stat.exits;
+	local_irq_disable();
+
+which means there's no way for KVM to guarantee that the IRQ that leads to
+rcu_sched_clock_irq() is the _only_ IRQ that is taken (or that what RCU sees was
+even the IRQ that interrupted the guest, though that probably doesn't matter much).
+
+Orthogonal to RCU, I do think it makes sense to have KVM VMX handle IRQs in its
+fastpath for VM-Exit, i.e. handle the IRQ VM-Exit and re-enter the guest without
+ever enabling IRQs.  But that's purely a KVM optimization, e.g. to avoid useless
+work when the host has already done what it needed to do.
+
+But even then, to make it so RCU could safely skip invoke_rcu_core(), KVM would
+need to _guarantee_ re-entry to the guest, and I don't think we want to do that.
+E.g. if there is some work that needs to be done on the CPU, re-entering the guest
+is a huge waste of cycles, as KVM would need to do some shenanigans to immediately
+force a VM-Exit.  It'd also require a moderate amount of complexity that I wouldn't
+want to maintain, particularly since it'd be Intel-only.
+
+> Not an emergency, and maybe not even necessary, but it might well be
+> one hole that would be good to stop up.
+> 
+> 							Thanx, Paul
 
