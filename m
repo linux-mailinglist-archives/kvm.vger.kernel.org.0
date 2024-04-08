@@ -1,137 +1,198 @@
-Return-Path: <kvm+bounces-13891-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13892-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D15F489C493
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 15:49:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2839289C530
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 15:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7263C1F229D6
-	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 13:49:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3CF92832E8
+	for <lists+kvm@lfdr.de>; Mon,  8 Apr 2024 13:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C2D80043;
-	Mon,  8 Apr 2024 13:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B947BAEC;
+	Mon,  8 Apr 2024 13:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pDv/hZxx"
+	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="Jq49BESc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35B4768EA
-	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 13:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BC46EB72
+	for <kvm@vger.kernel.org>; Mon,  8 Apr 2024 13:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712584034; cv=none; b=WHLStgX8JSbJ2dJ7LeoBuQVz32VoaF9AhTzB0aC/QZsqgFVRtHvAIiDn5HxUshFfsEOHIDC6pQXwXXHM6wZFyHclFqafON5XM7h9XjlNawYf+CeL6+jTT2JATzHOip1OBpjscIya7PNtyyurllJFkaG33myocN9rwaLlmYTtbkM=
+	t=1712584456; cv=none; b=LkoVafbA+G/lRuP2NYuZHRsSbp5WskqxPYl030S1AvMl8KbuSltvU6sXpkvCJVHZf5au7+I8jzmtf08EO2OwSVaXx8Jk/Y8nBm7K++kdcJH2XD+4Asdy38brhil8WxtXyCfLMS//wwk8ioCBs8gJ/wifSHlugMtEsxCy7KytOgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712584034; c=relaxed/simple;
-	bh=S3lFhUIHkzxarAhTvIpddkDGzSkzDtL/Ez2JWzsO99s=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Cc:To:Subject:
-	 From:Message-ID:Date; b=n7yIiCtpfqIyeXU5LH+O28EVnX4L/IEJYc+zPhjHBBLOk0CRXun9AOn4BtnR57KErzaDWFJxCejwGSz508R3gSWQX4SDyUcc20UEyD52tCIjOHtJwWsMbWfom9wwAO3yrxR9ORjS1mv44rFnM0EEpWqK5Ggz1eXuHFNMoe1IIUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pDv/hZxx; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 438DaUN5019955;
-	Mon, 8 Apr 2024 13:47:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- to : subject : from : message-id : date; s=pp1;
- bh=k+Pe9jMMnkw267axt148DjpypWHuwvjCZh47D4kaBhA=;
- b=pDv/hZxxVs/1ALtxqyqaPATzJuYcZ2pFxajyCgs6HyihRsg5K+8AEe5EpDuo0I8bOK8E
- L6wQIUM66JUfp/o6SpjxYeTRaY9q4RxTXhB5Tn12wjDAg//tOQMCXzlYtYaL6A95dbq6
- vl8W9kA29xRaENnqnHac+ve3lptHDN8MMcBGT9lW+A7bXeSWpqbr5oc1TLnLSzTceYNx
- zkbUfJKTiZyF6DnTpK2+gsP/agsjxbrJ66rkLvBBVdE//oIHHNlRvbLX+JeNl/5bNPZY
- TLv1uimYeFbnyzo1Tu19r+z5W4IrqmWztgCSPqvh1NgfhSeDDBwGoKFRvkrEFYHoEbt7 Sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xchg0r171-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 13:47:07 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 438Dl7DY004367;
-	Mon, 8 Apr 2024 13:47:07 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xchg0r16x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 13:47:07 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 438CH42h029889;
-	Mon, 8 Apr 2024 13:47:06 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbj7m088e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 13:47:06 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 438Dl2Ek52232558
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Apr 2024 13:47:04 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F8BA2004D;
-	Mon,  8 Apr 2024 13:47:02 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 720DB2004F;
-	Mon,  8 Apr 2024 13:47:02 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.72.190])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  8 Apr 2024 13:47:02 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712584456; c=relaxed/simple;
+	bh=gh4tpdih8esLI25MktXhFMkdTYnw/T/NHIj4HYT3EbA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A1X67IWJPkHHyv4VipKXKTdzyHrv8kZIVMoVF9CYK3sexb0MFAN4srV1hJguchvH4xVuw6x98rNWRyoK80+71mWvOnrPxN5x/DVe9wsY1HBBAE3JzTLHYdsoKYJlJ07fWJ8fARnvWHxZzEvV+byBBTSFXR/dIJuNGPDFzesmyfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org; spf=pass smtp.mailfrom=bitbyteword.org; dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b=Jq49BESc; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-dcc84ae94c1so4665745276.1
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 06:54:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bitbyteword.org; s=google; t=1712584454; x=1713189254; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y6kKl1aVWYliHDaR8y7CAp1UicpeJTf7oqPqbEf20fQ=;
+        b=Jq49BEScC06+wCNJ9QgSlmh7eHiZZ4IWSBL2RNFdYJ0mJ30HmdCibEUW6A/fBJtZUq
+         vMZ2mFrksCGWwLM2NJ05c8PJ/5anSh8yDEwOYRtpMt20cS7r7IW/TgHQphYgJ93r+Fr3
+         sjstIp3cNuyb2PJLAjI1ihbqkMbSLZPJqHpGLKxeLMClRmhSJv+AFoeAzAQsA+N/XTnD
+         ZeahT5BAYxjpN5ufms7R09wfFb1yAkr9o4vEyAc/0ooiBOu8XBMDyWATiaY/6SiM2hgY
+         qhhbB/4Nw/qm2ZQGF4tg6BhxbdQe++nnzfNqHCrbe7fDEskNMSqDEfEXm5qTbpjwJx4y
+         kJsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712584454; x=1713189254;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y6kKl1aVWYliHDaR8y7CAp1UicpeJTf7oqPqbEf20fQ=;
+        b=LID8j0Lrqpjv8noMBN73jYn6Tj0Ba35sW+L6na6FkiSWDEGfsBE+wazs45qfEuojoR
+         NOgXD4Rfwi2f1MHpPQV7TBpJyLsH2uYh71MI7mXFHYrKMOcGbLfNxhLWt3ORsfJf8eMX
+         CyqNeaQICn3FLusOJlpx1TvX1V9tqzHevfV78mQuW318eIVYuP1SoLEeUsNFWSQijnvB
+         1h3djHED0R+6+j7q15VbjKrpnCDpp5Kxm5OpGIMsEUg3e8rticf0phbJYrZ70R9vFRg1
+         r1ApDwMKqFOc1a2JW3X0ZaESqIK5zzWwUNXUWKOAQFSpGPrJUMxgOxuer8v7o/g/lmLQ
+         AnmA==
+X-Forwarded-Encrypted: i=1; AJvYcCWBNv6WKTyQjE1maWKH7I7Cb0ocfYcdkF91GF/ecx8PS7axyJsLlffF2Noa9uc7tE0FpxO2Jw4xGV+joh6DaMiapbTH
+X-Gm-Message-State: AOJu0Yw+TXEx0r12RaBhjqSnaBjizzyf6LL25HpshCYAhUlFJ674EC0j
+	ljdI0bDS2RyTVuahWP6Q0KJ7tnBEaiiN7m6KGS+quj+zJcFH7GIVED+AGDX3O5zaeofO+8fHK5Y
+	S7hucRFloiL+i5SgsB0o4U96yqlNhNRmXK6mRAg==
+X-Google-Smtp-Source: AGHT+IH6aYXDJY7AtBiVf3L56XP6JRG4Itct4K0aXsB9PQJoxGQyOcejapCFG8ilC7sE1YFX78GSj6rciiivOwMMtq8=
+X-Received: by 2002:a25:360a:0:b0:de0:e368:fa59 with SMTP id
+ d10-20020a25360a000000b00de0e368fa59mr3644918yba.31.1712584453724; Mon, 08
+ Apr 2024 06:54:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
+In-Reply-To: <20240403140116.3002809-1-vineeth@bitbyteword.org>
+From: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
+Date: Mon, 8 Apr 2024 09:54:03 -0400
+Message-ID: <CAO7JXPiiN+w+Liuov3rXAbr1QLwt+eUq=4Weoy8gB0fXaC7D3Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/5] Paravirt Scheduling (Dynamic vcpu priority management)
+To: Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Sean Christopherson <seanjc@google.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Joel Fernandes <joel@joelfernandes.org>, 
+	Suleiman Souhlal <suleiman@google.com>, Masami Hiramatsu <mhiramat@kernel.org>, himadrics@inria.fr, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>, 
+	David Vernet <dvernet@meta.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CALzav=fGUnYHiEc40Ym2Yh-H6wMRdw6biYj4+e1vZ0xmBDAnsg@mail.gmail.com>
-References: <20240307194255.1367442-1-dmatlack@google.com> <ZepBlYLPSuhISTTc@google.com> <ZepNYLTPghJPYCtA@google.com> <CALzav=cSzbZXhasD7iAtB4u0xO-iQ+vMPiDeXXz5mYMfjOfwaw@mail.gmail.com> <ZfG41PbWqXXf6CF-@google.com> <CALzav=fGUnYHiEc40Ym2Yh-H6wMRdw6biYj4+e1vZ0xmBDAnsg@mail.gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fuad Tabba <tabba@google.com>,
-        Peter Gonda <pgonda@google.com>, Ackerley Tng <ackerleytng@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org
-To: David Matlack <dmatlack@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] KVM: selftests: Create memslot 0 at GPA 0x100000000 on x86_64
-From: Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <171258402203.38901.9542700853299444599@t14-nrb>
-User-Agent: alot/0.8.1
-Date: Mon, 08 Apr 2024 15:47:02 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jWWoYTQAtluAnrImE2kqnm7dXW5sLGUf
-X-Proofpoint-ORIG-GUID: YLVozTuJWoq8lvLK6omElEEVd049Eb2m
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-08_11,2024-04-05_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=681
- priorityscore=1501 mlxscore=0 suspectscore=0 clxscore=1011 spamscore=0
- lowpriorityscore=0 phishscore=0 impostorscore=0 adultscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404080104
 
-Quoting David Matlack (2024-03-14 22:11:57)
-[...]
-> >   7. Use the PT_AT_4GIB knob in s390's CMMA test?  I suspect it does me=
-mslot
-> >      shenanigans purely so that a low gfn (4096 in the test) is guarant=
-eed to
-> >      be available.
->=20
-> +Nico
->=20
-> Hm, if this test _needs_ to use GFN 4096, then maybe the framework can
-> give tests two regions 0..KVM_FRAMEWORK_GPA and TEST_GPA..MAX.
->=20
-> If the test just needs any GFN then it can use TEST_GPA instead of
-> 4096 << page_shift.
+Sorry I missed sched_ext folks, adding them as well.
 
-Sorry for the late reply, this got burried at the bottom of my inbox :(
+Thanks,
+Vineeth
 
-The test creates two memslots with a gap in between to be able to test that
-gaps in memslots are correctly skipped by the CMMA-related ioctls.
 
-The test doesn't need GFN 4096. It should not matter where TEST_GPA is, as
-long as there's a gap after the main memslot.
-
-Feel free to include me on a follow-up, then I can test and look at this.
+On Wed, Apr 3, 2024 at 10:01=E2=80=AFAM Vineeth Pillai (Google)
+<vineeth@bitbyteword.org> wrote:
+>
+> Double scheduling is a concern with virtualization hosts where the host
+> schedules vcpus without knowing whats run by the vcpu and guest schedules
+> tasks without knowing where the vcpu is physically running. This causes
+> issues related to latencies, power consumption, resource utilization
+> etc. An ideal solution would be to have a cooperative scheduling
+> framework where the guest and host shares scheduling related information
+> and makes an educated scheduling decision to optimally handle the
+> workloads. As a first step, we are taking a stab at reducing latencies
+> for latency sensitive workloads in the guest.
+>
+> v1 RFC[1] was posted in December 2023. The main disagreement was in the
+> implementation where the patch was making scheduling policy decisions
+> in kvm and kvm is not the right place to do it. The suggestion was to
+> move the polcy decisions outside of kvm and let kvm only handle the
+> notifications needed to make the policy decisions. This patch series is
+> an iterative step towards implementing the feature as a layered
+> design where the policy could be implemented outside of kvm as a
+> kernel built-in, a kernel module or a bpf program.
+>
+> This design comprises mainly of 4 components:
+>
+> - pvsched driver: Implements the scheduling policies. Register with
+>     host with a set of callbacks that hypervisor(kvm) can use to notify
+>     vcpu events that the driver is interested in. The callback will be
+>     passed in the address of shared memory so that the driver can get
+>     scheduling information shared by the guest and also update the
+>     scheduling policies set by the driver.
+> - kvm component: Selects the pvsched driver for a guest and notifies
+>     the driver via callbacks for events that the driver is interested
+>     in. Also interface with the guest in retreiving the shared memory
+>     region for sharing the scheduling information.
+> - host kernel component: Implements the APIs for:
+>     - pvsched driver for register/unregister to the host kernel, and
+>     - hypervisor for assingning/unassigning driver for guests.
+> - guest component: Implements a framework for sharing the scheduling
+>     information with the pvsched driver through kvm.
+>
+> There is another component that we refer to as pvsched protocol. This
+> defines the details about shared memory layout, information sharing and
+> sheduling policy decisions. The protocol need not be part of the kernel
+> and can be defined separately based on the use case and requirements.
+> Both guest and the selected pvsched driver need to match the protocol
+> for the feature to work. Protocol shall be identified by a name and a
+> possible versioning scheme. Guest will advertise the protocol and then
+> the hypervisor can assign the driver implementing the protocol if it is
+> registered in the host kernel.
+>
+> This patch series only implements the first 3 components. Guest side
+> implementation and the protocol framework shall come as a separate
+> series once we finalize rest of the design.
+>
+> This series also implements a sample bpf program and a kernel-builtin
+> pvsched drivers. They do not do any real stuff now, but just skeletons
+> to demonstrate the feature.
+>
+> Rebased on 6.8.2.
+>
+> [1]: https://lwn.net/Articles/955145/
+>
+> Vineeth Pillai (Google) (5):
+>   pvsched: paravirt scheduling framework
+>   kvm: Implement the paravirt sched framework for kvm
+>   kvm: interface for managing pvsched driver for guest VMs
+>   pvsched: bpf support for pvsched
+>   selftests/bpf: sample implementation of a bpf pvsched driver.
+>
+>  Kconfig                                       |   2 +
+>  arch/x86/kvm/Kconfig                          |  13 +
+>  arch/x86/kvm/x86.c                            |   3 +
+>  include/linux/kvm_host.h                      |  32 +++
+>  include/linux/pvsched.h                       | 102 +++++++
+>  include/uapi/linux/kvm.h                      |   6 +
+>  kernel/bpf/bpf_struct_ops_types.h             |   4 +
+>  kernel/sysctl.c                               |  27 ++
+>  .../testing/selftests/bpf/progs/bpf_pvsched.c |  37 +++
+>  virt/Makefile                                 |   2 +-
+>  virt/kvm/kvm_main.c                           | 265 ++++++++++++++++++
+>  virt/pvsched/Kconfig                          |  12 +
+>  virt/pvsched/Makefile                         |   2 +
+>  virt/pvsched/pvsched.c                        | 215 ++++++++++++++
+>  virt/pvsched/pvsched_bpf.c                    | 141 ++++++++++
+>  15 files changed, 862 insertions(+), 1 deletion(-)
+>  create mode 100644 include/linux/pvsched.h
+>  create mode 100644 tools/testing/selftests/bpf/progs/bpf_pvsched.c
+>  create mode 100644 virt/pvsched/Kconfig
+>  create mode 100644 virt/pvsched/Makefile
+>  create mode 100644 virt/pvsched/pvsched.c
+>  create mode 100644 virt/pvsched/pvsched_bpf.c
+>
+> --
+> 2.40.1
+>
 
