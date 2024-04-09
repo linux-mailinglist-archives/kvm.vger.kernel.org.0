@@ -1,65 +1,64 @@
-Return-Path: <kvm+bounces-13979-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13980-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A064C89D716
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 12:36:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F36589D86B
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 13:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 420531F2466A
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 10:36:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00F5B287699
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 11:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDBA8288C;
-	Tue,  9 Apr 2024 10:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A6A12DDBA;
+	Tue,  9 Apr 2024 11:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TOXiL7Hp"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Re2MZHX5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1A61EB46;
-	Tue,  9 Apr 2024 10:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3284B127B4E;
+	Tue,  9 Apr 2024 11:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712658968; cv=none; b=qHO4sHNkDLu5pYpQkObd6s9Wky/nszsS+a8JJj7jeafkSsW37XeYpJUDSdV5SWk3RmZqBaNb2+QYsJOA2eYemh8TZa6ra5075LsaL0dvxN+C26A/kX7ElS+c2gIWS1w/J/VMetDj54DNTjAnWrLO07Ahr16x1g1pwyjX+6Ke6vs=
+	t=1712663153; cv=none; b=njl/IZizOHf9Oy2AvUpkEgQLImugWOneEnneYLjndQlNeObg/eiCozv7bhqOyYEBjt+QMCAXbclZhfJaiwmb+P7Yr70WZ/zYkJ5QyUw7rPf7X8hobtFPj/0935KPeCmBDhCU98C4x2T950AlV69bSUdyUXqP7ClOFme8nHd/+FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712658968; c=relaxed/simple;
-	bh=hI5RXPMh2A+JPxrImyxE0r+9FYfooKwhJCBDZD96weE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Im6PFl2Crm1600KNUQr2+QsahlHZN22LEGbLW2cn5A/lacR8w5aXhKRYH4NmrlGkXH7tbQ4iyk1PMtaxGoGt2OyETUwK8O/0FvJ3ohSTcLaSnKe95J1KwlevDVInSKWVlREyyAxe2PGfklSQ92/Ev2vSbIKuBi1MJ06CgVP/uoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TOXiL7Hp; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712658967; x=1744194967;
+	s=arc-20240116; t=1712663153; c=relaxed/simple;
+	bh=GFjr+qUI/xJlRfC49pDYbbQ+5mOHCUk/2gN5wZX0VPA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lBIR1ZzgNFAiDhBZgiwFTJ1Hjbtgxh5r2XlqjC9uK91LBmTo0zonDD0RFLMilwlSPXoKVCFuu7RFValzVMoe7lSmHU/wR3KLx2txQVIah3cPmVakFvodIiyvfOU99UkKhMWn7HIsMlQWeYtdowO9yUrUIx5A89DElmMUefkbEi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Re2MZHX5; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712663151; x=1744199151;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=hI5RXPMh2A+JPxrImyxE0r+9FYfooKwhJCBDZD96weE=;
-  b=TOXiL7Hpet1S/0L/n+nkDzVHsf2oXtd8c0VMybadyhw52j9IICqhb3kW
-   CSQtHzE4XjwaYs+avYgo1FWvz4M/e/rgqAS6iv5zzlqVrr3ef7n5Sgp8m
-   ykjX7mncsaYnrH1dqBIooOWWViqTrWUCm2dNulm//6VIAmEeqBIx6ePYJ
-   Zurm8Fs111YT0jQdA0ZeQpDMIE6uXiMfSd5bJFZ9h/pSOCIgb//rMMwFa
-   Jwk/+uZdngiIm9iZcCWIjcHtd/kb+gU1lIj9p8oN4hFk2bulHJQ9bDxyz
-   okX57b+XEjH4iJ/eQkwLtRsyB4oWNFHWKmrKAIyyLNaS3iVQ9RkrnXOsx
-   w==;
-X-CSE-ConnectionGUID: 8f6lS2TMTRutZ4ygZ0LlYw==
-X-CSE-MsgGUID: nbfWp4dSSlmbsN0W77Re2w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11038"; a="25409347"
-X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
-   d="scan'208";a="25409347"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 03:36:06 -0700
-X-CSE-ConnectionGUID: L1MurgB9QMWXYNA2vaS8Yg==
-X-CSE-MsgGUID: ORj0uC2kRCSa8VD7Ibq71Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
-   d="scan'208";a="24921705"
-Received: from unknown (HELO [10.238.9.252]) ([10.238.9.252])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 03:36:03 -0700
-Message-ID: <4ccb3a98-d732-421e-a013-8912b46d8107@linux.intel.com>
-Date: Tue, 9 Apr 2024 18:36:01 +0800
+  bh=GFjr+qUI/xJlRfC49pDYbbQ+5mOHCUk/2gN5wZX0VPA=;
+  b=Re2MZHX5GydCM8B6KilkbcXlSGPSLv0DHVNAFcmqvWsd0IZ1NH+wl46p
+   jp+rvzqYg9VvAX9wn3JpJghaHuXQWE2yPEhE8P08rq+2tVNxto7uD3tbV
+   QrLFtsNiMvuJGKG0kOuG7Rz2NIhkvDaaqqVhKqvF/2RhKVIbglEWBhS4x
+   g=;
+X-IronPort-AV: E=Sophos;i="6.07,189,1708387200"; 
+   d="scan'208";a="650727234"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 11:45:43 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:49900]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.169:2525] with esmtp (Farcaster)
+ id 3f52ccb2-10c8-4639-a2de-4651f9e21034; Tue, 9 Apr 2024 11:45:42 +0000 (UTC)
+X-Farcaster-Flow-ID: 3f52ccb2-10c8-4639-a2de-4651f9e21034
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 9 Apr 2024 11:45:38 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Tue, 9 Apr
+ 2024 11:45:22 +0000
+Message-ID: <7c82670e-6063-4b0f-9bbf-805a0d949d84@amazon.com>
+Date: Tue, 9 Apr 2024 13:45:18 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,96 +66,69 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 098/130] KVM: TDX: Add a place holder to handle TDX VM
- exit
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <88920c598dcb55c15219642f27d0781af6d0c044.1708933498.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <88920c598dcb55c15219642f27d0781af6d0c044.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v2 15/25] misc: nsm: drop owner assignment
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, "David
+ Hildenbrand" <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Richard
+ Weinberger" <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini
+	<pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe
+	<axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, "Luiz Augusto von
+ Dentz" <luiz.dentz@gmail.com>, Olivia Mackall <olivia@selenic.com>, Herbert
+ Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, Arnd Bergmann
+	<arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei
+	<arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, "Sudeep
+ Holla" <sudeep.holla@arm.com>, Cristian Marussi <cristian.marussi@arm.com>,
+	Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+	<mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, Daniel Vetter
+	<daniel@ffwll.ch>, Jean-Philippe Brucker <jean-philippe@linaro.org>, "Joerg
+ Roedel" <joro@8bytes.org>, Will Deacon <will@kernel.org>, Robin Murphy
+	<robin.murphy@arm.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen
+	<ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet
+	<asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, "Dan
+ Williams" <dan.j.williams@intel.com>, Vishal Verma
+	<vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, Ira Weiny
+	<ira.weiny@intel.com>, "Pankaj Gupta" <pankaj.gupta.linux@gmail.com>, Bjorn
+ Andersson <andersson@kernel.org>, Mathieu Poirier
+	<mathieu.poirier@linaro.org>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal
+	<vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, "Anton Yakovlev"
+	<anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>
+CC: <virtualization@lists.linux.dev>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-um@lists.infradead.org>,
+	<linux-block@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-gpio@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<iommu@lists.linux.dev>, <netdev@vger.kernel.org>, <v9fs@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<nvdimm@lists.linux.dev>, <linux-remoteproc@vger.kernel.org>,
+	<linux-scsi@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<alsa-devel@alsa-project.org>, <linux-sound@vger.kernel.org>
+References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
+ <20240331-module-owner-virtio-v2-15-98f04bfaf46a@linaro.org>
+From: Alexander Graf <graf@amazon.com>
+In-Reply-To: <20240331-module-owner-virtio-v2-15-98f04bfaf46a@linaro.org>
+X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 
+Ck9uIDMxLjAzLjI0IDEwOjQ0LCBLcnp5c3p0b2YgS296bG93c2tpIHdyb3RlOgo+IHZpcnRpbyBj
+b3JlIGFscmVhZHkgc2V0cyB0aGUgLm93bmVyLCBzbyBkcml2ZXIgZG9lcyBub3QgbmVlZCB0by4K
+Pgo+IFNpZ25lZC1vZmYtYnk6IEtyenlzenRvZiBLb3psb3dza2kgPGtyenlzenRvZi5rb3psb3dz
+a2lAbGluYXJvLm9yZz4KCgpSZXZpZXdlZC1ieTogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9u
+LmNvbT4KCgpBbGV4CgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApL
+cmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4g
+U2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFy
+bG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5
+IDIzNyA4NzkKCgo=
 
-
-On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Wire up handle_exit and handle_exit_irqoff methods
-
-This patch also wires up get_exit_info.
-
->   and add a place holder
-> to handle VM exit.  Add helper functions to get exit info, exit
-> qualification, etc.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   arch/x86/kvm/vmx/main.c    |  37 ++++++++++++-
->   arch/x86/kvm/vmx/tdx.c     | 110 +++++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/x86_ops.h |  10 ++++
->   3 files changed, 154 insertions(+), 3 deletions(-)
->
-[...]
-> @@ -562,7 +593,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   
->   	.vcpu_pre_run = vt_vcpu_pre_run,
->   	.vcpu_run = vt_vcpu_run,
-> -	.handle_exit = vmx_handle_exit,
-> +	.handle_exit = vt_handle_exit,
->   	.skip_emulated_instruction = vmx_skip_emulated_instruction,
->   	.update_emulated_instruction = vmx_update_emulated_instruction,
->   	.set_interrupt_shadow = vt_set_interrupt_shadow,
-> @@ -597,7 +628,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.set_identity_map_addr = vmx_set_identity_map_addr,
->   	.get_mt_mask = vt_get_mt_mask,
->   
-> -	.get_exit_info = vmx_get_exit_info,
-> +	.get_exit_info = vt_get_exit_info,
->   
->   	.vcpu_after_set_cpuid = vmx_vcpu_after_set_cpuid,
->   
-> @@ -611,7 +642,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.load_mmu_pgd = vt_load_mmu_pgd,
->   
->   	.check_intercept = vmx_check_intercept,
-> -	.handle_exit_irqoff = vmx_handle_exit_irqoff,
-> +	.handle_exit_irqoff = vt_handle_exit_irqoff,
->   
->   	.request_immediate_exit = vt_request_immediate_exit,
->   
-[...]
->   
-> +int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
-> +{
-> +	union tdx_exit_reason exit_reason = to_tdx(vcpu)->exit_reason;
-> +
-> +	/* See the comment of tdh_sept_seamcall(). */
-
-Should be tdx_seamcall_sept().
-
-> +	if (unlikely(exit_reason.full == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT)))
-
-Can use "TDX_ERROR_SEPT_BUSY" instead.
-
-> +		return 1;
-> +
-> +	/*
-> +	 * TDH.VP.ENTRY
-
-"TDH.VP.ENTRY" -> "TDH.VP.ENTER"
-
->   checks TD EPOCH which contend with TDH.MEM.TRACK and
-> +	 * vcpu TDH.VP.ENTER.
-Do you mean TDH.VP.ENTER on one vcpu can contend with TDH.MEM.TRACK and 
-TDH.VP.ENTER on another vcpu?
-
-> +	 */
->
 
