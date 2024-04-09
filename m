@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-13986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13987-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E0F189DAE3
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 15:45:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E1C89DAE8
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 15:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D7A61F2142A
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 13:45:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA0C21C215B8
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 13:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DDD13790D;
-	Tue,  9 Apr 2024 13:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D2D1386CF;
+	Tue,  9 Apr 2024 13:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uIgNM4ol"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lW7UwVc0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DE9137C21
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 13:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF57813848A
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 13:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712670025; cv=none; b=C1EJugTTqPq4bzTu94yRfxWDQgFvOOkK8nUebKqR3T8YLY04ektcqrGJtvuj3RkEn7D4yMCC1lWNMoLuKmNamKua6DzCDODMZEEq+JNXmcXdsh99B8CTPQpJrjPIyVvV5gtmi2kiohDYGxwSEpVdIoeLbnW8/o41R9PyzyovoqY=
+	t=1712670030; cv=none; b=DlU0csw3vykot4baE25Z1l9XqJrqZl+YFvS8tSM526Fafhwq2PLfnDtESrTLRFagzRNthUSGfGRc4xrRpXnwr7pJLoiWcseraF/3rLZHRd3au3uVgh0hWRg1j/9YdoT+/HJgW39H9u9Sdys7gz2Vt8j3NXmCQLKy6b+OpyNETJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712670025; c=relaxed/simple;
-	bh=PVCOhdc6DDdw0dTatfHJ5V1Uh3Bi7tZFW7XYqRS1wkE=;
+	s=arc-20240116; t=1712670030; c=relaxed/simple;
+	bh=GAIobzzxboeQoxJgFVKL8n/DQn9A2upw/KMw2J/d+sY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pbqtI22BTtfCFqe3Zayi/SAypcpv1SmfFYAaf2bbhZ89jxr4N+ZwLq8qKAc9qBnJO5O/u9GihRDhrdlN3MAHmitw9EXzGSRWEtCcRt3DL89KNsA0Q3BhDWSJO5cvLGHlVK2GzhZ5zf6mRMdKv/2VAwjgSCtAGk23EtAnNKi47Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pgonda.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uIgNM4ol; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=TYE+ldHJjVOmH+9O9Kl8FD94c7CMTWdAPcCBC8VF6jJi/MEl2GTC787T4Ngp6w+PgGodoZmSCBwNEyz9ish4lqqYjoZCt7rHD4WOPt69vfhgnGmcErBjj7vYYWzw4zEa2tEwRFS/yS4i31BQXPa0ZVa6gMIgv3DIp8JvkEF/nCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pgonda.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lW7UwVc0; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pgonda.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e4b70e0dc9so3160725ad.3
-        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 06:40:23 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dd0ae66422fso10757907276.0
+        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 06:40:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712670023; x=1713274823; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712670027; x=1713274827; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LeuEK38GC7iVK1ujFFvcKBa5p48Qfvr4eBgbugkaO1k=;
-        b=uIgNM4olSYa9ysZXvZp+63Gf1FQXWeggLzsyu94VJb3YM6sUm0ZENCwefqBtOYSwr+
-         ugE7ELpNW3WVFxmd6z2ilMrINVRuwFh9B00ufRfIK1MHgzVctVQz0B87/uaMQ3WazDLq
-         9KX1NGsa2SCRInWGkZwyNU1B+9pURO9vCHUSeTd7X+CElhuJkGo+iAjkC+tzH7Fe3WjR
-         +M3XeWago9jJdVfo12qiMss/qT+/XpHWjwSfKPhR/ce4jLNXi64zCgHS9CxW13+qRluj
-         5RkJVSrMnE1k2bKGtG3EIAs3GvlO1TrXX+0Wh63iieWVJqUR48TiN9arIQ7Zx+FrdpmC
-         RBdg==
+        bh=YRNEFFvzthCQ2SxLgYUrCxsmLZyU6XQAxNEXlnhRgbg=;
+        b=lW7UwVc0N2wmg9r1KifO4bqne4KMwhPf76719ugoW3bczlTxRzQQk0v+or2InFrm43
+         CJjpPBzcTL9WahkEuMsA/VbEiHIyfD8NL2ewcGQQ7YxHp80EX8jYGrwLrcPmaEEF3P+T
+         ileg1KLfLwwkrphu1kLRVEHGfuoas/5+pplhPwHdvchD5LT98t9rgG1VH1Q7OUgMynX5
+         sfSCf7ST7cjmCg3SC/zIzPOFSVU0PkQMnsLVJYkKKjR8Yc+aKYcQsMg4zOqzTp+QseQP
+         AiFg9eLqLCivcdYftH0i7UXgu6mN2dzNmQFlGmWZpKxV4Vsi3hEPAfSj2E+jOYsH8Nr9
+         ELXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712670023; x=1713274823;
+        d=1e100.net; s=20230601; t=1712670027; x=1713274827;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LeuEK38GC7iVK1ujFFvcKBa5p48Qfvr4eBgbugkaO1k=;
-        b=tGNnwVC05H9E9PnAA46Hiz9Z1z8cSU1Ce30mC+DyzEMlUZfv3QI7Odvxo8o2ryX91u
-         UOMFlTOf6lKQXzEaBbrw66U8BOcbwJ5S1ODcY9kTZACgJeiW9QmE1eXOBskeuqLAg8fo
-         hlA2ITAjrAaTSxxgCE3eSE6ozrf7bGs4mfcuK9OmbCyB48WOocYIgq6d5WtUOCqdWKpy
-         ova/ytWDrW0m5WYlB5LhdZCiDCHxZTaiVfUk6xCqY8TLR37VAoFZ7ruIqkIkEPWtCDj5
-         BU/gQ9xEghmYoXrXNo0C2OyynC5Zui1JlQe4JUpdqauAeNGZbx7V/n2EotjAuySTOYI5
-         3Lpg==
-X-Forwarded-Encrypted: i=1; AJvYcCVaEr49aHVlHBE2x7GWDDP5XNn5UCu1llLyfUiU+UmR99nv1dqcXUBjfx6SSLOSFfhSU6W4qa6ZVTPH5Rkwzjcl0hUw
-X-Gm-Message-State: AOJu0YwawEt32EFFPrrS9UVQDH3r7oHGUpJaJzv0N2lkbIiha1Zx543D
-	3eOpoNTaMN9UcTVQoPsDKScHcJHoe3HQ3OnPn/1HVxFC5hO6+W1TYzcXFzsX8ngUiTTunij2hZP
-	1OQ==
-X-Google-Smtp-Source: AGHT+IEzVv8xhsgMwJ9s01BpWKMedisC/JJ+Jv3539Rjq2P8BFX38qPyDM2NqZVs8iG+8eOnrpx1JA2POj8=
+        bh=YRNEFFvzthCQ2SxLgYUrCxsmLZyU6XQAxNEXlnhRgbg=;
+        b=mU1i85lyR1CxOPuJ5t8a1ay7Wclsp0ECj1qmMYw8kUtTJgkS9MPeEQ3F/d1ZlODm5h
+         ZWizryu1zSAcvLhJXn3I6eS6wtkwKdJycThL4t97yvaL+QgjfNjDwcxYbtpWlZJcf53P
+         fXOdaYBHR1l0g4FSeDJUPYmVlPSWs9EBFFd+plVS3HfxJV3R2DDM96lzCmNvO0s0hYcV
+         ZSb3dEGWUdvLcThNmorGYrONrhRxMsq+45wdrcOoJENbmiAT8+dLSEr4ORuQCdXDND4w
+         QpB5gtbviyrm7C4EFMA750ezbtO83hn0qyDIdQe1Qz2PtDg8m3i/gjDqFyR5weyf1mtH
+         3l4g==
+X-Forwarded-Encrypted: i=1; AJvYcCVbl/sfrnbhRutTee/xAzs+Sy+UBISCwi6Zne8eQ4YfA+xUi1jhsAbJOf2MrjseQcnmq6Be0bTqdziieZmQfA+T9t4r
+X-Gm-Message-State: AOJu0YwDRMq5Flh3kVmPC6yOmO8jNx5N0W+hEg0Gmp+2RkM0NTvBUdll
+	ITyDWye6WiA0g9+8WTsKU73h2oqOXI/16QlMEng1GNK9YZLOJwC1FnBRYk6ie963Uue+KPAYdTk
+	Tdg==
+X-Google-Smtp-Source: AGHT+IEKsCBq+aM6z6+N2+c8FJ8Yhc0yVfyFcg83Huaf8k3nrOsQDp7J/38LV2sVOL1hIfaWY1pq8XOTm5M=
 X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:15:661d:897e:ea86:704d])
- (user=pgonda job=sendgmr) by 2002:a17:902:e806:b0:1e3:cf18:7346 with SMTP id
- u6-20020a170902e80600b001e3cf187346mr532098plg.5.1712670023226; Tue, 09 Apr
- 2024 06:40:23 -0700 (PDT)
-Date: Tue,  9 Apr 2024 06:39:57 -0700
+ (user=pgonda job=sendgmr) by 2002:a25:8702:0:b0:dcc:2267:796e with SMTP id
+ a2-20020a258702000000b00dcc2267796emr576941ybl.2.1712670026875; Tue, 09 Apr
+ 2024 06:40:26 -0700 (PDT)
+Date: Tue,  9 Apr 2024 06:39:59 -0700
 In-Reply-To: <20240409133959.2888018-1-pgonda@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240409133959.2888018-1-pgonda@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240409133959.2888018-5-pgonda@google.com>
-Subject: [PATCH 4/6] Add GHCB allocations and helpers
+Message-ID: <20240409133959.2888018-7-pgonda@google.com>
+Subject: [PATCH 6/6] Add ability for SEV-ES guests to use ucalls via GHCB
 From: Peter Gonda <pgonda@google.com>
 To: pgonda@google.com, seanjc@google.com
 Cc: linux-kernel@vger.kernel.org, Vishal Annapurve <vannapurve@google.com>, 
@@ -85,8 +85,10 @@ Cc: linux-kernel@vger.kernel.org, Vishal Annapurve <vannapurve@google.com>,
 	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add GHCB management functionality similar to the ucall management.
-Allows for selftest vCPUs to acquire GHCBs for their usage.
+Modifies ucall handling for SEV-ES VMs. Instead of using an out
+instruction and storing the ucall pointer in RDI, SEV-ES guests use a
+outsb VMGEXIT to move the ucall pointer as the data. Allows for SEV-ES
+to use ucalls instead of relying the SEV-ES MSR based termination protocol.
 
 Cc: Vishal Annapurve <vannapurve@google.com>
 Cc: Ackerley Tng <ackerleytng@google.com>
@@ -101,137 +103,215 @@ Cc: linux-kselftest@vger.kernel.org
 Signed-off-by: Peter Gonda <pgonda@google.com>
 ---
  .../selftests/kvm/include/x86_64/sev.h        |  2 +
- .../selftests/kvm/lib/x86_64/processor.c      |  8 ++
- tools/testing/selftests/kvm/lib/x86_64/sev.c  | 77 +++++++++++++++++++
- 3 files changed, 87 insertions(+)
+ tools/testing/selftests/kvm/lib/x86_64/sev.c  | 67 ++++++++++++++++++-
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  | 17 +++++
+ .../selftests/kvm/x86_64/sev_smoke_test.c     | 17 +----
+ 4 files changed, 84 insertions(+), 19 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
-index 8a1bf88474c9..bfd481707f67 100644
+index 691dc005e2a1..26447caccd40 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/sev.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
-@@ -27,6 +27,8 @@ enum sev_guest_state {
+@@ -109,4 +109,6 @@ static inline void sev_launch_update_data(struct kvm_vm *vm, vm_paddr_t gpa,
+ bool is_sev_enabled(void);
+ bool is_sev_es_enabled(void);
  
- #define GHCB_MSR_TERM_REQ	0x100
- 
-+int ghcb_nr_pages_required(uint64_t page_size);
++void sev_es_ucall_port_write(uint32_t port, uint64_t data);
 +
- void sev_vm_launch(struct kvm_vm *vm, uint32_t policy);
- void sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement);
- void sev_vm_launch_finish(struct kvm_vm *vm);
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 49288fe10cd3..fd94a1bd82c9 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -584,6 +584,14 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm)
- 		sev_es_vm_init(vm);
- }
- 
-+int kvm_arch_vm_additional_pages_required(struct vm_shape shape, uint64_t page_size)
-+{
-+	if (shape.subtype == VM_SUBTYPE_SEV_ES)
-+		return  ghcb_nr_pages_required(page_size);
-+
-+	return 0;
-+}
-+
- void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
- {
- 	struct kvm_regs regs;
+ #endif /* SELFTEST_KVM_SEV_H */
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-index e248d3364b9c..27ae1d3b1355 100644
+index 5b3f0a8a931a..276477f2c2cf 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-@@ -4,6 +4,80 @@
- #include <stdbool.h>
+@@ -8,11 +8,18 @@
+ #include "svm.h"
+ #include "svm_util.h"
  
- #include "sev.h"
-+#include "linux/bitmap.h"
-+#include "svm.h"
-+#include "svm_util.h"
++#define IOIO_TYPE_STR (1 << 2)
++#define IOIO_SEG_DS (1 << 11 | 1 << 10)
++#define IOIO_DATA_8 (1 << 4)
++#define IOIO_REP (1 << 3)
 +
-+struct ghcb_entry {
-+	struct ghcb ghcb;
++#define SW_EXIT_CODE_IOIO 0x7b
 +
-+	/* Guest physical address of this GHCB. */
-+	void *gpa;
-+
-+	/* Host virtual address of this struct. */
-+	struct ghcb_entry *hva;
-+};
-+
-+struct ghcb_header {
-+	struct ghcb_entry ghcbs[KVM_MAX_VCPUS];
-+	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
-+};
-+
-+static struct ghcb_header *ghcb_pool;
-+
-+int ghcb_nr_pages_required(uint64_t page_size)
+ struct ghcb_entry {
+ 	struct ghcb ghcb;
+ 
+ 	/* Guest physical address of this GHCB. */
+-	void *gpa;
++	uint64_t gpa;
+ 
+ 	/* Host virtual address of this struct. */
+ 	struct ghcb_entry *hva;
+@@ -45,16 +52,22 @@ void ghcb_init(struct kvm_vm *vm)
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+ 		entry = &hdr->ghcbs[i];
+ 		entry->hva = entry;
+-		entry->gpa = addr_hva2gpa(vm, &entry->ghcb);
++		entry->gpa = (uint64_t)addr_hva2gpa(vm, &entry->ghcb);
+ 	}
+ 
+ 	write_guest_global(vm, ghcb_pool, (struct ghcb_header *)vaddr);
+ }
+ 
++static void sev_es_terminate(void)
 +{
-+	return align_up(sizeof(struct ghcb_header), page_size) / page_size;
++	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
 +}
 +
-+void ghcb_init(struct kvm_vm *vm)
+ static struct ghcb_entry *ghcb_alloc(void)
+ {
+ 	return &ghcb_pool->ghcbs[0];
+ 	struct ghcb_entry *entry;
++	struct ghcb *ghcb;
+ 	int i;
+ 
+ 	if (!ghcb_pool)
+@@ -63,12 +76,18 @@ static struct ghcb_entry *ghcb_alloc(void)
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+ 		if (!test_and_set_bit(i, ghcb_pool->in_use)) {
+ 			entry = &ghcb_pool->ghcbs[i];
+-			memset(&entry->ghcb, 0, sizeof(entry->ghcb));
++			ghcb = &entry->ghcb;
++
++			memset(&ghcb, 0, sizeof(*ghcb));
++			ghcb->ghcb_usage = 0;
++			ghcb->protocol_version = 1;
++
+ 			return entry;
+ 		}
+ 	}
+ 
+ ucall_failed:
++	sev_es_terminate();
+ 	return NULL;
+ }
+ 
+@@ -200,3 +219,45 @@ bool is_sev_es_enabled(void)
+ 	return is_sev_enabled() &&
+ 	       rdmsr(MSR_AMD64_SEV) & MSR_AMD64_SEV_ES_ENABLED;
+ }
++
++static uint64_t setup_exitinfo1_portio(uint32_t port)
 +{
-+	struct ghcb_header *hdr;
++	uint64_t exitinfo1 = 0;
++
++	exitinfo1 |= IOIO_TYPE_STR;
++	exitinfo1 |= ((port & 0xffff) << 16);
++	exitinfo1 |= IOIO_SEG_DS;
++	exitinfo1 |= IOIO_DATA_8;
++	exitinfo1 |= IOIO_REP;
++
++	return exitinfo1;
++}
++
++static void do_vmg_exit(uint64_t ghcb_gpa)
++{
++	wrmsr(MSR_AMD64_SEV_ES_GHCB, ghcb_gpa);
++	__asm__ __volatile__("rep; vmmcall");
++}
++
++void sev_es_ucall_port_write(uint32_t port, uint64_t data)
++{
 +	struct ghcb_entry *entry;
-+	vm_vaddr_t vaddr;
-+	int i;
++	struct ghcb *ghcb;
++	const uint64_t exitinfo1 = setup_exitinfo1_portio(port);
 +
-+	vaddr = vm_vaddr_alloc_shared(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR,
-+				      MEM_REGION_DATA);
-+	hdr = (struct ghcb_header *)addr_gva2hva(vm, vaddr);
-+	memset(hdr, 0, sizeof(*hdr));
++	entry = ghcb_alloc();
++	ghcb = &entry->ghcb;
 +
-+	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-+		entry = &hdr->ghcbs[i];
-+		entry->hva = entry;
-+		entry->gpa = addr_hva2gpa(vm, &entry->ghcb);
++	ghcb_set_sw_exit_code(ghcb, SW_EXIT_CODE_IOIO);
++	ghcb_set_sw_exit_info_1(ghcb, exitinfo1);
++	ghcb_set_sw_exit_info_2(ghcb, sizeof(data));
++
++	// Setup the SW Stratch buffer pointer.
++	ghcb_set_sw_scratch(ghcb,
++			    entry->gpa + offsetof(struct ghcb, shared_buffer));
++	memcpy(&ghcb->shared_buffer, &data, sizeof(data));
++
++	do_vmg_exit(entry->gpa);
++
++	ghcb_free(entry);
++}
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+index 1265cecc7dd1..24da2f4316d8 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+@@ -5,6 +5,8 @@
+  * Copyright (C) 2018, Red Hat, Inc.
+  */
+ #include "kvm_util.h"
++#include "processor.h"
++#include "sev.h"
+ 
+ #define UCALL_PIO_PORT ((uint16_t)0x1000)
+ 
+@@ -21,6 +23,10 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
+ #define HORRIFIC_L2_UCALL_CLOBBER_HACK	\
+ 	"rcx", "rsi", "r8", "r9", "r10", "r11"
+ 
++	if (is_sev_es_enabled()) {
++		sev_es_ucall_port_write(UCALL_PIO_PORT, uc);
 +	}
 +
-+	write_guest_global(vm, ghcb_pool, (struct ghcb_header *)vaddr);
-+}
+ 	asm volatile("push %%rbp\n\t"
+ 		     "push %%r15\n\t"
+ 		     "push %%r14\n\t"
+@@ -48,8 +54,19 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
+ 
+ 	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
+ 		struct kvm_regs regs;
++		uint64_t addr;
 +
-+static struct ghcb_entry *ghcb_alloc(void)
-+{
-+	return &ghcb_pool->ghcbs[0];
-+	struct ghcb_entry *entry;
-+	int i;
++		if (vcpu->vm->subtype == VM_SUBTYPE_SEV_ES) {
++			TEST_ASSERT(
++				run->io.count == 8 && run->io.size == 1,
++				"SEV-ES ucall exit requires 8 byte string out\n");
 +
-+	if (!ghcb_pool)
-+		goto ucall_failed;
-+
-+	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-+		if (!test_and_set_bit(i, ghcb_pool->in_use)) {
-+			entry = &ghcb_pool->ghcbs[i];
-+			memset(&entry->ghcb, 0, sizeof(entry->ghcb));
-+			return entry;
++			addr = *(uint64_t *)((uint8_t *)(run) + run->io.data_offset);
++			return (void *)addr;
 +		}
-+	}
-+
-+ucall_failed:
-+	return NULL;
-+}
-+
-+static void ghcb_free(struct ghcb_entry *entry)
-+{
-+	/* Beware, here be pointer arithmetic.  */
-+	clear_bit(entry - ghcb_pool->ghcbs, ghcb_pool->in_use);
-+}
-+
  
- /*
-  * sparsebit_next_clear() can return 0 if [x, 2**64-1] are all set, and the
-@@ -44,6 +118,9 @@ void sev_vm_launch(struct kvm_vm *vm, uint32_t policy)
- 	struct kvm_sev_guest_status status;
- 	int ctr;
- 
-+	if (policy & SEV_POLICY_ES)
-+		ghcb_init(vm);
+ 		vcpu_regs_get(vcpu, &regs);
 +
- 	vm_sev_ioctl(vm, KVM_SEV_LAUNCH_START, &launch_start);
- 	vm_sev_ioctl(vm, KVM_SEV_GUEST_STATUS, &status);
+ 		return (void *)regs.rdi;
+ 	}
+ 	return NULL;
+diff --git a/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c b/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
+index 1d84e78e7ae2..2448533a9a41 100644
+--- a/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
++++ b/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
+@@ -18,12 +18,7 @@ static void guest_sev_es_code(void)
+ 	/* TODO: Check CPUID after GHCB-based hypercall support is added. */
+ 	GUEST_ASSERT(is_sev_es_enabled());
  
+-	/*
+-	 * TODO: Add GHCB and ucall support for SEV-ES guests.  For now, simply
+-	 * force "termination" to signal "done" via the GHCB MSR protocol.
+-	 */
+-	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
+-	__asm__ __volatile__("rep; vmmcall");
++	GUEST_DONE();
+ }
+ 
+ static void guest_sev_code(void)
+@@ -45,16 +40,6 @@ static void test_sev(void *guest_code, uint64_t policy)
+ 	for (;;) {
+ 		vcpu_run(vcpu);
+ 
+-		if (policy & SEV_POLICY_ES) {
+-			TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
+-				    "Wanted SYSTEM_EVENT, got %s",
+-				    exit_reason_str(vcpu->run->exit_reason));
+-			TEST_ASSERT_EQ(vcpu->run->system_event.type, KVM_SYSTEM_EVENT_SEV_TERM);
+-			TEST_ASSERT_EQ(vcpu->run->system_event.ndata, 1);
+-			TEST_ASSERT_EQ(vcpu->run->system_event.data[0], GHCB_MSR_TERM_REQ);
+-			break;
+-		}
+-
+ 		switch (get_ucall(vcpu, &uc)) {
+ 		case UCALL_SYNC:
+ 			continue;
 -- 
 2.44.0.478.gd926399ef9-goog
 
