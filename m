@@ -1,318 +1,167 @@
-Return-Path: <kvm+bounces-13987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6E1C89DAE8
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 15:46:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA24489DB8A
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 16:01:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA0C21C215B8
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 13:46:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80E2B286ECF
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 14:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D2D1386CF;
-	Tue,  9 Apr 2024 13:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AC4130A4D;
+	Tue,  9 Apr 2024 14:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lW7UwVc0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cqQDQulE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF57813848A
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 13:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC0F12FB36
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 14:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712670030; cv=none; b=DlU0csw3vykot4baE25Z1l9XqJrqZl+YFvS8tSM526Fafhwq2PLfnDtESrTLRFagzRNthUSGfGRc4xrRpXnwr7pJLoiWcseraF/3rLZHRd3au3uVgh0hWRg1j/9YdoT+/HJgW39H9u9Sdys7gz2Vt8j3NXmCQLKy6b+OpyNETJg=
+	t=1712671270; cv=none; b=pI8xtxDNe399qO5nZoJ5JQZkQtD3L2Lf+Cx7YHHyyfqw+4aNQ07knM2Bj5F32wxasgNDTZgDrvqc6jlFzg2a3XFNapPtWdW41vHm7AcHbuNlz84Uf6XZQ0U/EhGpMkebxKOYKMvnCvQOXbWUHDnR7kZ1ITIb33CsTkzmGKqO3uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712670030; c=relaxed/simple;
-	bh=GAIobzzxboeQoxJgFVKL8n/DQn9A2upw/KMw2J/d+sY=;
+	s=arc-20240116; t=1712671270; c=relaxed/simple;
+	bh=ptYqy6ge+/stdH+ojKozuXTLP0awUt/mbKjAM+pruyg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TYE+ldHJjVOmH+9O9Kl8FD94c7CMTWdAPcCBC8VF6jJi/MEl2GTC787T4Ngp6w+PgGodoZmSCBwNEyz9ish4lqqYjoZCt7rHD4WOPt69vfhgnGmcErBjj7vYYWzw4zEa2tEwRFS/yS4i31BQXPa0ZVa6gMIgv3DIp8JvkEF/nCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pgonda.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lW7UwVc0; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=HlxdQI1SIS+BpJrOpi3sjsC3u6LseSX2VU52W43zMOhAf/rPOD5a3t/MKFoCynceUFGAF9ggRDPG7aIv5lbPOrcuLyqLg5ZWX+p3FERySxeuBr9JSvxcLk+Vrks+PVCiyD27wLZUV0NrzfinHNrRD4Si9gyyxytbJIqJIXTTOgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cqQDQulE; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pgonda.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dd0ae66422fso10757907276.0
-        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 06:40:27 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d1bffa322eso6165330a12.1
+        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 07:01:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712670027; x=1713274827; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712671268; x=1713276068; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRNEFFvzthCQ2SxLgYUrCxsmLZyU6XQAxNEXlnhRgbg=;
-        b=lW7UwVc0N2wmg9r1KifO4bqne4KMwhPf76719ugoW3bczlTxRzQQk0v+or2InFrm43
-         CJjpPBzcTL9WahkEuMsA/VbEiHIyfD8NL2ewcGQQ7YxHp80EX8jYGrwLrcPmaEEF3P+T
-         ileg1KLfLwwkrphu1kLRVEHGfuoas/5+pplhPwHdvchD5LT98t9rgG1VH1Q7OUgMynX5
-         sfSCf7ST7cjmCg3SC/zIzPOFSVU0PkQMnsLVJYkKKjR8Yc+aKYcQsMg4zOqzTp+QseQP
-         AiFg9eLqLCivcdYftH0i7UXgu6mN2dzNmQFlGmWZpKxV4Vsi3hEPAfSj2E+jOYsH8Nr9
-         ELXg==
+        bh=fjIwXx6BxT3u9BQ69lRo33fRcwSok3HZV2l6W5q+KRE=;
+        b=cqQDQulESfh12nH0zXM2SUgSk+2WtwNnBibcYW4z/gMzW7yOzYvNO4XaSfgTexOiVW
+         oMwlmlR5/m8fDQ3hFRY5JPaTyxWQak4UypVMhpx8167mJ91CsOADWq4Qn08B0BJCDG4G
+         4CuB7W/kTW88AgU7L22wkZT+Q7zkwxOv5q3ASVectAg5ched+u3cDcswce3qOLBr6cYs
+         crLJ+RLzAzYs1A8kw89PHMxQuylGSdzNzhxeqOaH95t5fDyTmgb8vyNSDo6hkyiYlH8a
+         r845IUNAEqtNpfQAIncOGoJprEUtvv++ING/wIWKNOr3ZQdf2NQyinEzUfiOafoq6DAZ
+         +jCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712670027; x=1713274827;
+        d=1e100.net; s=20230601; t=1712671268; x=1713276068;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRNEFFvzthCQ2SxLgYUrCxsmLZyU6XQAxNEXlnhRgbg=;
-        b=mU1i85lyR1CxOPuJ5t8a1ay7Wclsp0ECj1qmMYw8kUtTJgkS9MPeEQ3F/d1ZlODm5h
-         ZWizryu1zSAcvLhJXn3I6eS6wtkwKdJycThL4t97yvaL+QgjfNjDwcxYbtpWlZJcf53P
-         fXOdaYBHR1l0g4FSeDJUPYmVlPSWs9EBFFd+plVS3HfxJV3R2DDM96lzCmNvO0s0hYcV
-         ZSb3dEGWUdvLcThNmorGYrONrhRxMsq+45wdrcOoJENbmiAT8+dLSEr4ORuQCdXDND4w
-         QpB5gtbviyrm7C4EFMA750ezbtO83hn0qyDIdQe1Qz2PtDg8m3i/gjDqFyR5weyf1mtH
-         3l4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVbl/sfrnbhRutTee/xAzs+Sy+UBISCwi6Zne8eQ4YfA+xUi1jhsAbJOf2MrjseQcnmq6Be0bTqdziieZmQfA+T9t4r
-X-Gm-Message-State: AOJu0YwDRMq5Flh3kVmPC6yOmO8jNx5N0W+hEg0Gmp+2RkM0NTvBUdll
-	ITyDWye6WiA0g9+8WTsKU73h2oqOXI/16QlMEng1GNK9YZLOJwC1FnBRYk6ie963Uue+KPAYdTk
-	Tdg==
-X-Google-Smtp-Source: AGHT+IEKsCBq+aM6z6+N2+c8FJ8Yhc0yVfyFcg83Huaf8k3nrOsQDp7J/38LV2sVOL1hIfaWY1pq8XOTm5M=
-X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:15:661d:897e:ea86:704d])
- (user=pgonda job=sendgmr) by 2002:a25:8702:0:b0:dcc:2267:796e with SMTP id
- a2-20020a258702000000b00dcc2267796emr576941ybl.2.1712670026875; Tue, 09 Apr
- 2024 06:40:26 -0700 (PDT)
-Date: Tue,  9 Apr 2024 06:39:59 -0700
-In-Reply-To: <20240409133959.2888018-1-pgonda@google.com>
+        bh=fjIwXx6BxT3u9BQ69lRo33fRcwSok3HZV2l6W5q+KRE=;
+        b=fgH1Mzg3oelFZ5HnADJ1WDRqrWcLt+ypZUywkdoVFEDAh2Mdn0dWPBXsD7G9eR0j/t
+         F4LPqGnttZ+A+ydv/Ek5JPgy5I254BQoeEeRbJ/27Pp44wlQnqq3Qhtw1/oY5xTLs3pM
+         LYVIUEbv3pr4gCkiidIDX8U5m1CaEwY+PDmyy6eqzIODHEwC6p4NWhaVAIrdJvZHJOvT
+         3oQ6jX34Sux+PR6Jxfs+vHeJyAvwMAQwzTTUANO71RRg9GbBElhcwHr9KbQTJj48xmvC
+         kPPPa8DFjjBWh9lkAiTdF6lM9k1BrNzkvXi3jt/WEzcJrj8JraPyiJFY9U51tlA2Eqg6
+         TfkA==
+X-Gm-Message-State: AOJu0YyXItTCuJ6RbiXE/GIIiSpvJ1bkDk17bMGkpbK4+fQujBviVsF0
+	POFTkK7Z5LKN4NQ0VFb+fEne66Q4pXBarNekyEmFQO3QLCIpS/d7jeZi4bP47WaJurxNl64xixL
+	5pA==
+X-Google-Smtp-Source: AGHT+IHnZyEFuCVHumA09SlUKxgklv8AUAjZZEHTWZ53Zi6fs44ZQpmlJTOw3ou2IUeggTXHF8hlwKdOvfA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:f404:0:b0:5dc:6130:a914 with SMTP id
+ g4-20020a63f404000000b005dc6130a914mr37729pgi.7.1712671266680; Tue, 09 Apr
+ 2024 07:01:06 -0700 (PDT)
+Date: Tue, 9 Apr 2024 07:01:05 -0700
+In-Reply-To: <24c80d16-733b-4036-8057-075a0dab3b4d@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240409133959.2888018-1-pgonda@google.com>
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240409133959.2888018-7-pgonda@google.com>
-Subject: [PATCH 6/6] Add ability for SEV-ES guests to use ucalls via GHCB
-From: Peter Gonda <pgonda@google.com>
-To: pgonda@google.com, seanjc@google.com
-Cc: linux-kernel@vger.kernel.org, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Carlos Bilbao <carlos.bilbao@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20240405165844.1018872-1-seanjc@google.com> <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
+ <ZhQZYzkDPMxXe2RN@google.com> <24c80d16-733b-4036-8057-075a0dab3b4d@intel.com>
+Message-ID: <ZhVKIfydhfac9SE4@google.com>
+Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Wei W Wang <wei.w.wang@intel.com>, David Skidmore <davidskidmore@google.com>, 
+	Steve Rutherford <srutherford@google.com>, Pankaj Gupta <pankaj.gupta@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Modifies ucall handling for SEV-ES VMs. Instead of using an out
-instruction and storing the ucall pointer in RDI, SEV-ES guests use a
-outsb VMGEXIT to move the ucall pointer as the data. Allows for SEV-ES
-to use ucalls instead of relying the SEV-ES MSR based termination protocol.
+On Tue, Apr 09, 2024, Xiaoyao Li wrote:
+> On 4/9/2024 12:20 AM, Sean Christopherson wrote:
+> > On Sun, Apr 07, 2024, Xiaoyao Li wrote:
+> > > On 4/6/2024 12:58 AM, Sean Christopherson wrote:
+> > > >    - For guest MAXPHYADDR vs. GPAW, rely on KVM_GET_SUPPORTED_CPUID to enumerate
+> > > >      the usable MAXPHYADDR[2], and simply refuse to enable TDX if the TDX Module
+> > > >      isn't compatible.  Specifically, if MAXPHYADDR=52, 5-level paging is enabled,
+> > > >      but the TDX-Module only allows GPAW=0, i.e. only supports 4-level paging.
+> > > 
+> > > So userspace can get supported GPAW from usable MAXPHYADDR, i.e.,
+> > > CPUID(0X8000_0008).eaxx[23:16] of KVM_GET_SUPPORTED_CPUID:
+> > >   - if usable MAXPHYADDR == 52, supported GPAW is 0 and 1.
+> > >   - if usable MAXPHYADDR <= 48, supported GPAW is only 0.
+> > > 
+> > > There is another thing needs to be discussed. How does userspace configure
+> > > GPAW for TD guest?
+> > > 
+> > > Currently, KVM uses CPUID(0x8000_0008).EAX[7:0] in struct
+> > > kvm_tdx_init_vm::cpuid.entries[] of IOCTL(KVM_TDX_INIT_VM) to deduce the
+> > > GPAW:
+> > > 
+> > > 	int maxpa = 36;
+> > > 	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0x80000008, 0);
+> > > 	if (entry)
+> > > 		max_pa = entry->eax & 0xff;
+> > > 
+> > > 	...
+> > > 	if (!cpu_has_vmx_ept_5levels() && max_pa > 48)
+> > > 		return -EINVAL;
+> > > 	if (cpu_has_vmx_ept_5levels() && max_pa > 48) {
+> > > 		td_params->eptp_controls |= VMX_EPTP_PWL_5;
+> > > 		td_params->exec_controls |= TDX_EXEC_CONTROL_MAX_GPAW;
+> > > 	} else {
+> > > 		td_params->eptp_controls |= VMX_EPTP_PWL_4;
+> > > 	}
+> > > 
+> > > The code implies that KVM allows the provided CPUID(0x8000_0008).EAX[7:0] to
+> > > be any value (when 5level ept is supported). when it > 48, configure GPAW of
+> > > TD to 1, otherwise to 0.
+> > > 
+> > > However, the virtual value of CPUID(0x8000_0008).EAX[7:0] inside TD is
+> > > always the native value of hardware (for current TDX).
+> > > 
+> > > So if we want to keep this behavior, we need to document it somewhere that
+> > > CPUID(0x8000_0008).EAX[7:0] in struct kvm_tdx_init_vm::cpuid.entries[] of
+> > > IOCTL(KVM_TDX_INIT_VM) is only for configuring GPAW, not for userspace to
+> > > configure virtual CPUID value for TD VMs.
+> > > 
+> > > Another option is that, KVM doesn't allow userspace to configure
+> > > CPUID(0x8000_0008).EAX[7:0]. Instead, it provides a gpaw field in struct
+> > > kvm_tdx_init_vm for userspace to configure directly.
+> > > 
+> > > What do you prefer?
+> > 
+> > Hmm, neither.  I think the best approach is to build on Gerd's series to have KVM
+> > select 4-level vs. 5-level based on the enumerated guest.MAXPHYADDR, not on
+> > host.MAXPHYADDR.
+> 
+> I see no difference between using guest.MAXPHYADDR (EAX[23:16]) and using
+> host.MAXPHYADDR (EAX[7:0]) to determine the GPAW (and EPT level) for TD
+> guest. The case for TDX diverges from what for non TDX VMs. The value of
+> them passed from userspace can only be used to configure GPAW and EPT level
+> for TD, but won't be reflected in CPUID inside TD.
 
-Cc: Vishal Annapurve <vannapurve@google.com>
-Cc: Ackerley Tng <ackerleytng@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Carlos Bilbao <carlos.bilbao@amd.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org
-Signed-off-by: Peter Gonda <pgonda@google.com>
----
- .../selftests/kvm/include/x86_64/sev.h        |  2 +
- tools/testing/selftests/kvm/lib/x86_64/sev.c  | 67 ++++++++++++++++++-
- .../testing/selftests/kvm/lib/x86_64/ucall.c  | 17 +++++
- .../selftests/kvm/x86_64/sev_smoke_test.c     | 17 +----
- 4 files changed, 84 insertions(+), 19 deletions(-)
+But the TDX module will emulate EAX[7:0] to match hardware, no?  Whenever possible,
+the CPUID entries passed to KVM should match the CPUID values that are observed
+by the guest.  E.g. if host.MAXPHYADDR=52, but the CPU only supports 4-level
+paging, then KVM should get host.MAXPHYADDR=52, guest.MAXPHYADDR=48.
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
-index 691dc005e2a1..26447caccd40 100644
---- a/tools/testing/selftests/kvm/include/x86_64/sev.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
-@@ -109,4 +109,6 @@ static inline void sev_launch_update_data(struct kvm_vm *vm, vm_paddr_t gpa,
- bool is_sev_enabled(void);
- bool is_sev_es_enabled(void);
- 
-+void sev_es_ucall_port_write(uint32_t port, uint64_t data);
-+
- #endif /* SELFTEST_KVM_SEV_H */
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-index 5b3f0a8a931a..276477f2c2cf 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-@@ -8,11 +8,18 @@
- #include "svm.h"
- #include "svm_util.h"
- 
-+#define IOIO_TYPE_STR (1 << 2)
-+#define IOIO_SEG_DS (1 << 11 | 1 << 10)
-+#define IOIO_DATA_8 (1 << 4)
-+#define IOIO_REP (1 << 3)
-+
-+#define SW_EXIT_CODE_IOIO 0x7b
-+
- struct ghcb_entry {
- 	struct ghcb ghcb;
- 
- 	/* Guest physical address of this GHCB. */
--	void *gpa;
-+	uint64_t gpa;
- 
- 	/* Host virtual address of this struct. */
- 	struct ghcb_entry *hva;
-@@ -45,16 +52,22 @@ void ghcb_init(struct kvm_vm *vm)
- 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
- 		entry = &hdr->ghcbs[i];
- 		entry->hva = entry;
--		entry->gpa = addr_hva2gpa(vm, &entry->ghcb);
-+		entry->gpa = (uint64_t)addr_hva2gpa(vm, &entry->ghcb);
- 	}
- 
- 	write_guest_global(vm, ghcb_pool, (struct ghcb_header *)vaddr);
- }
- 
-+static void sev_es_terminate(void)
-+{
-+	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
-+}
-+
- static struct ghcb_entry *ghcb_alloc(void)
- {
- 	return &ghcb_pool->ghcbs[0];
- 	struct ghcb_entry *entry;
-+	struct ghcb *ghcb;
- 	int i;
- 
- 	if (!ghcb_pool)
-@@ -63,12 +76,18 @@ static struct ghcb_entry *ghcb_alloc(void)
- 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
- 		if (!test_and_set_bit(i, ghcb_pool->in_use)) {
- 			entry = &ghcb_pool->ghcbs[i];
--			memset(&entry->ghcb, 0, sizeof(entry->ghcb));
-+			ghcb = &entry->ghcb;
-+
-+			memset(&ghcb, 0, sizeof(*ghcb));
-+			ghcb->ghcb_usage = 0;
-+			ghcb->protocol_version = 1;
-+
- 			return entry;
- 		}
- 	}
- 
- ucall_failed:
-+	sev_es_terminate();
- 	return NULL;
- }
- 
-@@ -200,3 +219,45 @@ bool is_sev_es_enabled(void)
- 	return is_sev_enabled() &&
- 	       rdmsr(MSR_AMD64_SEV) & MSR_AMD64_SEV_ES_ENABLED;
- }
-+
-+static uint64_t setup_exitinfo1_portio(uint32_t port)
-+{
-+	uint64_t exitinfo1 = 0;
-+
-+	exitinfo1 |= IOIO_TYPE_STR;
-+	exitinfo1 |= ((port & 0xffff) << 16);
-+	exitinfo1 |= IOIO_SEG_DS;
-+	exitinfo1 |= IOIO_DATA_8;
-+	exitinfo1 |= IOIO_REP;
-+
-+	return exitinfo1;
-+}
-+
-+static void do_vmg_exit(uint64_t ghcb_gpa)
-+{
-+	wrmsr(MSR_AMD64_SEV_ES_GHCB, ghcb_gpa);
-+	__asm__ __volatile__("rep; vmmcall");
-+}
-+
-+void sev_es_ucall_port_write(uint32_t port, uint64_t data)
-+{
-+	struct ghcb_entry *entry;
-+	struct ghcb *ghcb;
-+	const uint64_t exitinfo1 = setup_exitinfo1_portio(port);
-+
-+	entry = ghcb_alloc();
-+	ghcb = &entry->ghcb;
-+
-+	ghcb_set_sw_exit_code(ghcb, SW_EXIT_CODE_IOIO);
-+	ghcb_set_sw_exit_info_1(ghcb, exitinfo1);
-+	ghcb_set_sw_exit_info_2(ghcb, sizeof(data));
-+
-+	// Setup the SW Stratch buffer pointer.
-+	ghcb_set_sw_scratch(ghcb,
-+			    entry->gpa + offsetof(struct ghcb, shared_buffer));
-+	memcpy(&ghcb->shared_buffer, &data, sizeof(data));
-+
-+	do_vmg_exit(entry->gpa);
-+
-+	ghcb_free(entry);
-+}
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-index 1265cecc7dd1..24da2f4316d8 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-@@ -5,6 +5,8 @@
-  * Copyright (C) 2018, Red Hat, Inc.
-  */
- #include "kvm_util.h"
-+#include "processor.h"
-+#include "sev.h"
- 
- #define UCALL_PIO_PORT ((uint16_t)0x1000)
- 
-@@ -21,6 +23,10 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
- #define HORRIFIC_L2_UCALL_CLOBBER_HACK	\
- 	"rcx", "rsi", "r8", "r9", "r10", "r11"
- 
-+	if (is_sev_es_enabled()) {
-+		sev_es_ucall_port_write(UCALL_PIO_PORT, uc);
-+	}
-+
- 	asm volatile("push %%rbp\n\t"
- 		     "push %%r15\n\t"
- 		     "push %%r14\n\t"
-@@ -48,8 +54,19 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 
- 	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
- 		struct kvm_regs regs;
-+		uint64_t addr;
-+
-+		if (vcpu->vm->subtype == VM_SUBTYPE_SEV_ES) {
-+			TEST_ASSERT(
-+				run->io.count == 8 && run->io.size == 1,
-+				"SEV-ES ucall exit requires 8 byte string out\n");
-+
-+			addr = *(uint64_t *)((uint8_t *)(run) + run->io.data_offset);
-+			return (void *)addr;
-+		}
- 
- 		vcpu_regs_get(vcpu, &regs);
-+
- 		return (void *)regs.rdi;
- 	}
- 	return NULL;
-diff --git a/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c b/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
-index 1d84e78e7ae2..2448533a9a41 100644
---- a/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
-@@ -18,12 +18,7 @@ static void guest_sev_es_code(void)
- 	/* TODO: Check CPUID after GHCB-based hypercall support is added. */
- 	GUEST_ASSERT(is_sev_es_enabled());
- 
--	/*
--	 * TODO: Add GHCB and ucall support for SEV-ES guests.  For now, simply
--	 * force "termination" to signal "done" via the GHCB MSR protocol.
--	 */
--	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
--	__asm__ __volatile__("rep; vmmcall");
-+	GUEST_DONE();
- }
- 
- static void guest_sev_code(void)
-@@ -45,16 +40,6 @@ static void test_sev(void *guest_code, uint64_t policy)
- 	for (;;) {
- 		vcpu_run(vcpu);
- 
--		if (policy & SEV_POLICY_ES) {
--			TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
--				    "Wanted SYSTEM_EVENT, got %s",
--				    exit_reason_str(vcpu->run->exit_reason));
--			TEST_ASSERT_EQ(vcpu->run->system_event.type, KVM_SYSTEM_EVENT_SEV_TERM);
--			TEST_ASSERT_EQ(vcpu->run->system_event.ndata, 1);
--			TEST_ASSERT_EQ(vcpu->run->system_event.data[0], GHCB_MSR_TERM_REQ);
--			break;
--		}
--
- 		switch (get_ucall(vcpu, &uc)) {
- 		case UCALL_SYNC:
- 			continue;
--- 
-2.44.0.478.gd926399ef9-goog
+As I said in my response to Rick:
 
+ : > An alternative would be to have the KVM API peak at the value, and then
+ : > discard it (not pass the leaf value to the TDX module). Not ideal.
+ : 
+ : Heh, I typed up this idea before reading ahead.  This has my vote.  Unless I'm
+ : misreading where things are headed, using guest.MAXPHYADDR to communicate what
+ : is essentially GPAW to the guest is about to become the de facto standard.
+ : 
+ : At that point, KVM can basically treat the current TDX module behavior as an
+ : erratum, i.e. discarding guest.MAXPHYADDR becomes a workaround for a "CPU" bug,
+ : not some goofy KVM quirk.
 
