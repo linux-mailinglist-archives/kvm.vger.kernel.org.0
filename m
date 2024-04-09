@@ -1,74 +1,65 @@
-Return-Path: <kvm+bounces-13936-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D1A89CF4A
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 02:22:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A847E89CF58
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 02:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DC4CB21EED
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 00:22:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 581C9283AFD
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 00:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAB61396;
-	Tue,  9 Apr 2024 00:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA8F4A02;
+	Tue,  9 Apr 2024 00:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="b9S1zA1O"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ClqKMTYR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43885376
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 00:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B618A110A;
+	Tue,  9 Apr 2024 00:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712622117; cv=none; b=Eikf8qOpfkhXvxAauSzK4tvzlNHP7i7agVX3VPdogimGWx0V3Sjdq22apkAU/h1wftyHtp8I81rAy/QRHa+iyKwhO8q5ooqCXFS1xYFRT0u/pY4Wlz70Drcjz1Un57UcIhvVmkyLNDxvoxTT8kE+i+ZmZCSIstyNDyz5wEjz6BU=
+	t=1712622546; cv=none; b=KNGA85tRXShlZPgF4Pcq8325BTSbCPXPXIABqrqDjBM1T9DNcTY6Y1NDRfT0GGluwLj+m1jgQZRN1vnYYs5S2MiRnBJ1ESokvb7ACjXSU15gm+cQZ0Qvi6DUPhfoD+xs2Bf8ovcgfYF7fyzPDdfMgFV23ZJPizgna6JvDQ+FzPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712622117; c=relaxed/simple;
-	bh=y8+B3fBdv0+pwLEVFa2oRmsHTM6gfVbpXdHodVkQD0w=;
+	s=arc-20240116; t=1712622546; c=relaxed/simple;
+	bh=omwxEjlQrrCmbYWEbZK/fq6CZo0DirAMQNhwIlouZxI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z/h7ZVwWbYJocww6b+YhvUrNPYJuPwJCtYOGrUn8h9/2yItpYz0O9OkYhKTVVUE+v6oUJIoUEgZbDaO+si6ZsZS+IxfV5YAvmZBUlIh8mArVU8VMWIK9nWRlbTrczQad1DWdSSs1HZErdyeIZro/NrKXVMs4QZMEXRS+FhiMqsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=b9S1zA1O; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-36a0e3e6a4fso17050245ab.1
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 17:21:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712622115; x=1713226915; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k4RWqXaWFwmiNP6pNOx5Yfz/MuJboItuSjd5cmtvGoo=;
-        b=b9S1zA1ORGl8Msoxwg4m30cecQmnuSW8Ox7zcg9lza3xdjwGaNcR7na/2ZFXx5zUBs
-         PYeL+K634UiZrCdSRh+zdomf5G8IOSPiFrVVpFfXqRGA6VfaoNK+L3zZSHxcoKZNbzyS
-         llt21ZOMCReN4+yQCMC3jGp5IG2htaPFNOo5ApNy2S0gY29elaYGIgQaWs4S2IpTqIlf
-         lu6W2wK5IPWhztOq6dBydOpT+3QJBge+aC3dBGJpi3TRetlTrw4SyQW0/1l2q5DFd0Ex
-         eI/Ywf/LsRdrpMReLYGfSCrL5Gyn/4TTNHaOkdmUzXn5M38/LbnRb/TRlOU80VdkbEke
-         UPwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712622115; x=1713226915;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k4RWqXaWFwmiNP6pNOx5Yfz/MuJboItuSjd5cmtvGoo=;
-        b=Al4d7DxpdOd0ZIFXXk/ck7G6D6Mu1TUo6duIeb8tamn4fVITir7KuoWnq+z4iEHnDS
-         ZBGSIA1B+PO0MghW52MV8sfDGeQutC0RYG/uCPK3eJVku32iWs5bdWPMkLUHG7N7MYLm
-         R8wWUi6ptICsTWYgqFn1gdXAkqAPmDuRzq5qaqqkSw+0EQbD/ui4JH1RHXL/oeUmIuIe
-         MwRM3MGIj1f8etqrOQ93ryE+3WP3xuE+zEuhZ+kTYGaAcLTy6GY89TbkAQPPMo1uwkGg
-         lrb6eD9Rd08Hws8ia24K7WNFJrCnRFZIU0uNssF6/9xFxl54myi6Z3xIMhK0Nr5fmPSe
-         N4rw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6jDzbWOQHSSv/o61/GhuMj5I8XTyZKBYodzkEZQ+BuLNhaF3fFXr/Y7Zic7ms73G6SfFEia6t6UQxymls+OKKctpS
-X-Gm-Message-State: AOJu0YyoETRSAC+gG7pIyEgIU/sKoya0IhR38gDpPClwzz1anjJPXe48
-	Cp/zdLGJJhbZP6NBemY2eZ++U81vpchdVqvL72AOA5hClZYb0CBZi3+pLiVNIk4=
-X-Google-Smtp-Source: AGHT+IGDn7RB5cU8iSXf8xntybKszf4HI5OoCRwBUHdVivfSY4dzeQk6+44VVtnK3iUR/Ypb1pjzqA==
-X-Received: by 2002:a05:6e02:20cb:b0:36a:203e:6433 with SMTP id 11-20020a056e0220cb00b0036a203e6433mr6545247ilq.9.1712622115407;
-        Mon, 08 Apr 2024 17:21:55 -0700 (PDT)
-Received: from ?IPV6:2601:647:4180:9630::e8c1? ([2601:647:4180:9630::e8c1])
-        by smtp.gmail.com with ESMTPSA id e1-20020a630f01000000b005f072084432sm7093745pgl.38.2024.04.08.17.21.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Apr 2024 17:21:55 -0700 (PDT)
-Message-ID: <c33b4da9-5759-4a1a-844d-c6dbad028d12@rivosinc.com>
-Date: Mon, 8 Apr 2024 17:21:53 -0700
+	 In-Reply-To:Content-Type; b=hurAExDaampBnb5ynASMJ9h2KvRIRr2hYJf7IsZ3etbSaEvFFYQOlDvJWKhSxw7g810CS96jcvQC6XHkKJIM7RjCujXCKj56g4wuFZyqMIsVEWAh5Prmg/JnKrbxPriBWVO6+QAHhzyyHFMRjjYjhr0UvGrTVIJM8a6HAEHf0Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ClqKMTYR; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712622545; x=1744158545;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=omwxEjlQrrCmbYWEbZK/fq6CZo0DirAMQNhwIlouZxI=;
+  b=ClqKMTYReJwo74etqICMPSg79ydjrIePZwrHOI9O1CHB2gQ2tW7xKpVH
+   +eIxtqXnzrUEIlUxhERfq6in9+ik6CPiQMhQBalVXFDW5mlhXbce26ygv
+   7aq8/6EtAlt4wQYMPupwd52jd9IXEc4feZz4yf7ixWPYceGG+k2ociv0n
+   EqVpYaNVQYkns852uKsEGaTyS8L+xYFZt7T8rSgorHbw6Y0XE0xZ/4rhG
+   tOv7LEfWU7LxJL5TIVrVSslcie+s1D+lA3kx9YhkRGF7zIVPqfH3V+NKz
+   PdQ3rpFcdal9RmSKc3BWhzx5w1OdxTu8f/6rtWodlcJbcxeCfn3GFOpTG
+   A==;
+X-CSE-ConnectionGUID: g1mzpvFJQbqqOEZYFcoNmQ==
+X-CSE-MsgGUID: n86xc/5AQ5aXQmSy0q++0w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11038"; a="19072796"
+X-IronPort-AV: E=Sophos;i="6.07,188,1708416000"; 
+   d="scan'208";a="19072796"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 17:29:04 -0700
+X-CSE-ConnectionGUID: HGZ8AKgZQ7G2VAC753p+7A==
+X-CSE-MsgGUID: FkyE1KhKRj6OIGh7R2wGTQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,188,1708416000"; 
+   d="scan'208";a="20009611"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.92]) ([10.124.225.92])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 17:29:01 -0700
+Message-ID: <b234ef24-042b-4f5e-90df-83cc08109077@linux.intel.com>
+Date: Tue, 9 Apr 2024 08:28:58 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,47 +67,221 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 06/22] drivers/perf: riscv: Implement SBI PMU snapshot
- function
+Subject: Re: [kvm-unit-tests Patch v3 07/11] x86: pmu: Enable and disable PMCs
+ in loop() asm blob
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Zhang Xiong
+ <xiong.y.zhang@intel.com>, Like Xu <like.xu.linux@gmail.com>,
+ Jinrong Liang <cloudliang@tencent.com>, Dapeng Mi <dapeng1.mi@intel.com>
+References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
+ <20240103031409.2504051-8-dapeng1.mi@linux.intel.com>
+ <ZgO3vWIeC3sk_B5N@google.com>
+ <c509996d-fdda-4a57-b6ac-597c811f7786@linux.intel.com>
+ <ZhR7G25FX_osy8X5@google.com>
 Content-Language: en-US
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>,
- Anup Patel <anup@brainfault.org>, Conor Dooley <conor.dooley@microchip.com>,
- Ajay Kaher <akaher@vmware.com>, Alexandre Ghiti <alexghiti@rivosinc.com>,
- Alexey Makhalov <amakhalov@vmware.com>, Juergen Gross <jgross@suse.com>,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
- Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>,
- virtualization@lists.linux.dev,
- VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
- Will Deacon <will@kernel.org>, x86@kernel.org
-References: <20240403080452.1007601-1-atishp@rivosinc.com>
- <20240403080452.1007601-7-atishp@rivosinc.com>
- <20240404-bbfb02e3aec944f9e11745ae@orel>
-From: Atish Patra <atishp@rivosinc.com>
-In-Reply-To: <20240404-bbfb02e3aec944f9e11745ae@orel>
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <ZhR7G25FX_osy8X5@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/4/24 05:01, Andrew Jones wrote:
-> On Wed, Apr 03, 2024 at 01:04:35AM -0700, Atish Patra wrote:
-> ...
->> +static int pmu_sbi_snapshot_disable(void)
->> +{
->> +	struct sbiret ret;
->> +
->> +	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM, -1,
->> +			-1, 0, 0, 0, 0);
-> 
-> The "Rename the SBI_STA_SHMEM_DISABLE" patch should come before this
-> patch so SBI_SHMEM_DISABLE can be used instead of the -1's here.
-> 
 
-Sure. Done.
+On 4/9/2024 7:17 AM, Mingwei Zhang wrote:
+> On Wed, Mar 27, 2024, Mi, Dapeng wrote:
+>> On 3/27/2024 2:07 PM, Mingwei Zhang wrote:
+>>> On Wed, Jan 03, 2024, Dapeng Mi wrote:
+>>>> Currently enabling PMCs, executing loop() and disabling PMCs are divided
+>>>> 3 separated functions. So there could be other instructions executed
+>>>> between enabling PMCS and running loop() or running loop() and disabling
+>>>> PMCs, e.g. if there are multiple counters enabled in measure_many()
+>>>> function, the instructions which enabling the 2nd and more counters
+>>>> would be counted in by the 1st counter.
+>>>>
+>>>> So current implementation can only verify the correctness of count by an
+>>>> rough range rather than a precise count even for instructions and
+>>>> branches events. Strictly speaking, this verification is meaningless as
+>>>> the test could still pass even though KVM vPMU has something wrong and
+>>>> reports an incorrect instructions or branches count which is in the rough
+>>>> range.
+>>>>
+>>>> Thus, move the PMCs enabling and disabling into the loop() asm blob and
+>>>> ensure only the loop asm instructions would be counted, then the
+>>>> instructions or branches events can be verified with an precise count
+>>>> instead of an rough range.
+>>>>
+>>>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>>>> ---
+>>>>    x86/pmu.c | 83 +++++++++++++++++++++++++++++++++++++++++++++----------
+>>>>    1 file changed, 69 insertions(+), 14 deletions(-)
+>>>>
+>>>> diff --git a/x86/pmu.c b/x86/pmu.c
+>>>> index 46bed66c5c9f..88b89ad889b9 100644
+>>>> --- a/x86/pmu.c
+>>>> +++ b/x86/pmu.c
+>>>> @@ -18,6 +18,20 @@
+>>>>    #define EXPECTED_INSTR 17
+>>>>    #define EXPECTED_BRNCH 5
+>>>> +// Instrustion number of LOOP_ASM code
+>>>> +#define LOOP_INSTRNS	10
+>>>> +#define LOOP_ASM					\
+>>>> +	"1: mov (%1), %2; add $64, %1;\n\t"		\
+>>>> +	"nop; nop; nop; nop; nop; nop; nop;\n\t"	\
+>>>> +	"loop 1b;\n\t"
+>>>> +
+>>>> +#define PRECISE_LOOP_ASM						\
+>>>> +	"wrmsr;\n\t"							\
+>>>> +	"mov %%ecx, %%edi; mov %%ebx, %%ecx;\n\t"			\
+>>>> +	LOOP_ASM							\
+>>>> +	"mov %%edi, %%ecx; xor %%eax, %%eax; xor %%edx, %%edx;\n\t"	\
+>>>> +	"wrmsr;\n\t"
+>>> Can we add "FEP" prefix into the above blob? This way, we can expand the
+>>> testing for emulated instructions.
+> Dapeng,
+>
+> Sorry, did not clarify that this is not a hard request. I am not
+> pushing that this need to be done in your next version if it takes
+> time to do so. (FEP is of couse nice to have :), but this test already
+> supports it in somewhere else.).
+>
+> Once your next version is ready, please send it out as soon as you can
+> and I am happy to give my reviews until it is merged.
+>
+> Thanks.
+> -Mingwei
 
-> Thanks,
-> drew
+Yeah, I see there are some FEP related test cases in this test, I'm not 
+sure if it can already meet the requirement, I would look at it later. 
+Currently I'm busy on some high priority work, I suppose I have 
+bandwidth to refresh a new version in next week. Thanks.
 
+
+>>
+>> Yeah, that sounds like a new feature request. I would add it in next
+>> version.
+>>
+>>
+>>>> +
+>>>>    typedef struct {
+>>>>    	uint32_t ctr;
+>>>>    	uint64_t config;
+>>>> @@ -54,13 +68,43 @@ char *buf;
+>>>>    static struct pmu_event *gp_events;
+>>>>    static unsigned int gp_events_size;
+>>>> -static inline void loop(void)
+>>>> +
+>>>> +static inline void __loop(void)
+>>>> +{
+>>>> +	unsigned long tmp, tmp2, tmp3;
+>>>> +
+>>>> +	asm volatile(LOOP_ASM
+>>>> +		     : "=c"(tmp), "=r"(tmp2), "=r"(tmp3)
+>>>> +		     : "0"(N), "1"(buf));
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Enable and disable counters in a whole asm blob to ensure
+>>>> + * no other instructions are counted in the time slot between
+>>>> + * counters enabling and really LOOP_ASM code executing.
+>>>> + * Thus counters can verify instructions and branches events
+>>>> + * against precise counts instead of a rough valid count range.
+>>>> + */
+>>>> +static inline void __precise_count_loop(u64 cntrs)
+>>>>    {
+>>>>    	unsigned long tmp, tmp2, tmp3;
+>>>> +	unsigned int global_ctl = pmu.msr_global_ctl;
+>>>> +	u32 eax = cntrs & (BIT_ULL(32) - 1);
+>>>> +	u32 edx = cntrs >> 32;
+>>>> -	asm volatile("1: mov (%1), %2; add $64, %1; nop; nop; nop; nop; nop; nop; nop; loop 1b"
+>>>> -			: "=c"(tmp), "=r"(tmp2), "=r"(tmp3): "0"(N), "1"(buf));
+>>>> +	asm volatile(PRECISE_LOOP_ASM
+>>>> +		     : "=b"(tmp), "=r"(tmp2), "=r"(tmp3)
+>>>> +		     : "a"(eax), "d"(edx), "c"(global_ctl),
+>>>> +		       "0"(N), "1"(buf)
+>>>> +		     : "edi");
+>>>> +}
+>>>> +static inline void loop(u64 cntrs)
+>>>> +{
+>>>> +	if (!this_cpu_has_perf_global_ctrl())
+>>>> +		__loop();
+>>>> +	else
+>>>> +		__precise_count_loop(cntrs);
+>>>>    }
+>>>>    volatile uint64_t irq_received;
+>>>> @@ -159,18 +203,17 @@ static void __start_event(pmu_counter_t *evt, uint64_t count)
+>>>>    	    ctrl = (ctrl & ~(0xf << shift)) | (usrospmi << shift);
+>>>>    	    wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, ctrl);
+>>>>        }
+>>>> -    global_enable(evt);
+>>>>        apic_write(APIC_LVTPC, PMI_VECTOR);
+>>>>    }
+>>>>    static void start_event(pmu_counter_t *evt)
+>>>>    {
+>>>>    	__start_event(evt, 0);
+>>>> +	global_enable(evt);
+>>>>    }
+>>>> -static void stop_event(pmu_counter_t *evt)
+>>>> +static void __stop_event(pmu_counter_t *evt)
+>>>>    {
+>>>> -	global_disable(evt);
+>>>>    	if (is_gp(evt)) {
+>>>>    		wrmsr(MSR_GP_EVENT_SELECTx(event_to_global_idx(evt)),
+>>>>    		      evt->config & ~EVNTSEL_EN);
+>>>> @@ -182,14 +225,24 @@ static void stop_event(pmu_counter_t *evt)
+>>>>    	evt->count = rdmsr(evt->ctr);
+>>>>    }
+>>>> +static void stop_event(pmu_counter_t *evt)
+>>>> +{
+>>>> +	global_disable(evt);
+>>>> +	__stop_event(evt);
+>>>> +}
+>>>> +
+>>>>    static noinline void measure_many(pmu_counter_t *evt, int count)
+>>>>    {
+>>>>    	int i;
+>>>> +	u64 cntrs = 0;
+>>>> +
+>>>> +	for (i = 0; i < count; i++) {
+>>>> +		__start_event(&evt[i], 0);
+>>>> +		cntrs |= BIT_ULL(event_to_global_idx(&evt[i]));
+>>>> +	}
+>>>> +	loop(cntrs);
+>>>>    	for (i = 0; i < count; i++)
+>>>> -		start_event(&evt[i]);
+>>>> -	loop();
+>>>> -	for (i = 0; i < count; i++)
+>>>> -		stop_event(&evt[i]);
+>>>> +		__stop_event(&evt[i]);
+>>>>    }
+>>>>    static void measure_one(pmu_counter_t *evt)
+>>>> @@ -199,9 +252,11 @@ static void measure_one(pmu_counter_t *evt)
+>>>>    static noinline void __measure(pmu_counter_t *evt, uint64_t count)
+>>>>    {
+>>>> +	u64 cntrs = BIT_ULL(event_to_global_idx(evt));
+>>>> +
+>>>>    	__start_event(evt, count);
+>>>> -	loop();
+>>>> -	stop_event(evt);
+>>>> +	loop(cntrs);
+>>>> +	__stop_event(evt);
+>>>>    }
+>>>>    static bool verify_event(uint64_t count, struct pmu_event *e)
+>>>> @@ -451,7 +506,7 @@ static void check_running_counter_wrmsr(void)
+>>>>    	report_prefix_push("running counter wrmsr");
+>>>>    	start_event(&evt);
+>>>> -	loop();
+>>>> +	__loop();
+>>>>    	wrmsr(MSR_GP_COUNTERx(0), 0);
+>>>>    	stop_event(&evt);
+>>>>    	report(evt.count < gp_events[0].min, "cntr");
+>>>> @@ -468,7 +523,7 @@ static void check_running_counter_wrmsr(void)
+>>>>    	wrmsr(MSR_GP_COUNTERx(0), count);
+>>>> -	loop();
+>>>> +	__loop();
+>>>>    	stop_event(&evt);
+>>>>    	if (this_cpu_has_perf_global_status()) {
+>>>> -- 
+>>>> 2.34.1
+>>>>
 
