@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-14020-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A1289E1F1
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 19:56:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D62ED89E1F0
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 19:56:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D158BB23A4C
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40942B239E7
 	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 17:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A9615747F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38EC15747E;
 	Tue,  9 Apr 2024 17:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gVOD8NHR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+L9mvAc"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BA7156C6E;
-	Tue,  9 Apr 2024 17:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DEA156C7A;
+	Tue,  9 Apr 2024 17:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712685323; cv=none; b=OMVdjMdchnmouRl3JW3pBup+O62z/dP6xBTgzSgmtbi6wrg05j18KwiZOPyJEenPmNykYCLGxZFLuBGqt37MSWfIS3Oq1nIeWcdSYGQMRXTat6JJ1V2VcxTI+xjoTlj4kjkRdW3MN7xXZKoBHP1A8GTNfcZn2VSBpR4+PmUCGXo=
+	t=1712685324; cv=none; b=M7jdNzttARnYMnB/yG+NkwDEFshRSBzLzdKd6MGuiycJJdn+W9tRQiHXT7fzM7NJkSYR6/ncHGrx/w63BSAIozYj10N+YSmJWW6RYX5FG3ij5iKs3ZieAumMrW9fr3HomWpU4syg59fZCzssshBuUcwdWkihud0qu6IDgQs3vgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712685323; c=relaxed/simple;
-	bh=8YdFwGI8R51ztOA1mo2aER7Hm749h0lssDSsLY7uqO8=;
+	s=arc-20240116; t=1712685324; c=relaxed/simple;
+	bh=Kei5ds62oIzT4KV1KEEI+VNx43fEOcG+qlqv90tFjp8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f2VHcIAEH12c35rlZF3nknB69phdWZbYl+komapz21zx7AkUOFQoUQr7M3JOY/A5x9CEw45FoVMZnxFf4jKzUg0PSo3kCrIfRBYOXXEZg3Izq+LQHaBqJdRMrE8YUUewVt8TJw5HkP8XoaV9Ct8Mp3/I7IkyuD/YOdPQVeoegd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gVOD8NHR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5B21C433B2;
+	 MIME-Version; b=VaLg8qH1cXdeMgsVkXmO5aTb/EthtsBvrZEkUSDdyeo4OhHk7gorUkmMDE9M6oCe0OuAwOzF6wWGAxSoPC89wnABfiALbOZ2b/wIcyEZqp3INwOxAabEOP0iLsc8/n7/QsuSIF4luIJjBA4lqOnZTJC6teeS5tivGpHLE7bvh4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+L9mvAc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBF73C43609;
 	Tue,  9 Apr 2024 17:55:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712685323;
-	bh=8YdFwGI8R51ztOA1mo2aER7Hm749h0lssDSsLY7uqO8=;
+	bh=Kei5ds62oIzT4KV1KEEI+VNx43fEOcG+qlqv90tFjp8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gVOD8NHRWBcNNUGDtpYFgxq5VoX6fbeDvu1fam+YMuFKsKFNLwRTjb/abiY5FBeCr
-	 HlFqWNLQHCYoGanQ43UMjs2aLUPc0ObTAUjD30TdYevv2kDlX2NntOc/RQmJ2VLDQn
-	 UX7vISNVkiBLw3giy/wsu4h0muPsvy0+btVfYo6ljVq3jWm1vtzRYbtWVu8+T3S1Z0
-	 fcfd7rc3JLNFO6vs3n2nQYzELczc7DxiHPIKypT6WElt5WKCRbMKRQ62a7J1QV+o+D
-	 tPGL3BeCuKrFkInXn3zQ4M4VM63oRrbc++t0kp6ax34Ewjq9jcgNwZOAMtifdLcTHX
-	 pYAH+7DeCfYyQ==
+	b=X+L9mvAc2Z7oL+OPziCT+uRKh9Np8syk/uduU8dSSnCEG8c6yDeTFRGnwwWKQpwwq
+	 s4NrFtvSxP6T7svAeDC3nEKxiGddnNNpN1a4BcdLHxwD8UzXAQSMsTfqvKur41WRpF
+	 A0pcHkBzdgzXxkXeVI8Kbb/q065x0HCB0foPnKQAVo+TwLkVOWgnyH0HFmbmV+WlN/
+	 BqseVDRIN2uE7p+faupLwk/wFug5ZeuE3mJ8GSKGZxXNDVJ3SdrmNtIi0FhDgXX32A
+	 pFLA6tfk8H6TCRL+//CipI6qd7X1py8ZnkHCP8Deq4ssqtRx01fdpjT8NHxsIUc4Xd
+	 Jq5qkhJasq4xw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ruFgn-002szC-Vd;
+	id 1ruFgo-002szC-5K;
 	Tue, 09 Apr 2024 18:55:22 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -58,9 +58,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 11/16] KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
-Date: Tue,  9 Apr 2024 18:54:43 +0100
-Message-Id: <20240409175448.3507472-12-maz@kernel.org>
+Subject: [PATCH 12/16] KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+Date: Tue,  9 Apr 2024 18:54:44 +0100
+Message-Id: <20240409175448.3507472-13-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240409175448.3507472-1-maz@kernel.org>
 References: <20240409175448.3507472-1-maz@kernel.org>
@@ -76,170 +76,89 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Support guest-provided information information to size the range of
-required invalidation. This helps with reducing over-invalidation,
-provided that the guest actually provides accurate information.
+Populate bits [56:55] of the leaf entry with the level provided
+by the guest's S2 translation. This will allow us to better scope
+the invalidation by remembering the mapping size.
+
+Of course, this assume that the guest will issue an invalidation
+with an address that falls into the same leaf. If the guest doesn't,
+we'll over-invalidate.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  2 +
- arch/arm64/kvm/nested.c             | 89 +++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           | 24 +-------
- 3 files changed, 92 insertions(+), 23 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  8 ++++++++
+ arch/arm64/kvm/mmu.c                | 16 ++++++++++++++--
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 6b647a169f5d..ec79e16d8436 100644
+index ec79e16d8436..3119e0a195dc 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -123,6 +123,8 @@ extern void kvm_nested_s2_wp(struct kvm *kvm);
- extern void kvm_nested_s2_unmap(struct kvm *kvm);
- extern void kvm_nested_s2_flush(struct kvm *kvm);
+@@ -5,6 +5,7 @@
+ #include <linux/bitfield.h>
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_pgtable.h>
  
-+unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val);
-+
- static inline bool kvm_supported_tlbi_s1e1_op(struct kvm_vcpu *vpcu, u32 instr)
+ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
  {
- 	struct kvm *kvm = vpcu->kvm;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 645c979a75e5..5abdf82bb9a4 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -349,6 +349,95 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 	return ret;
- }
+@@ -182,4 +183,11 @@ static inline bool kvm_supported_tlbi_s1e2_op(struct kvm_vcpu *vpcu, u32 instr)
  
-+static unsigned int ttl_to_size(u8 ttl)
+ int kvm_init_nv_sysregs(struct kvm *kvm);
+ 
++#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
++
++static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
 +{
-+	int level = ttl & 3;
-+	int gran = (ttl >> 2) & 3;
-+	unsigned int max_size = 0;
-+
-+	switch (gran) {
-+	case TLBI_TTL_TG_4K:
-+		switch (level) {
-+		case 0:
-+			break;
-+		case 1:
-+			max_size = SZ_1G;
-+			break;
-+		case 2:
-+			max_size = SZ_2M;
-+			break;
-+		case 3:
-+			max_size = SZ_4K;
-+			break;
-+		}
-+		break;
-+	case TLBI_TTL_TG_16K:
-+		switch (level) {
-+		case 0:
-+		case 1:
-+			break;
-+		case 2:
-+			max_size = SZ_32M;
-+			break;
-+		case 3:
-+			max_size = SZ_16K;
-+			break;
-+		}
-+		break;
-+	case TLBI_TTL_TG_64K:
-+		switch (level) {
-+		case 0:
-+		case 1:
-+			/* No 52bit IPA support */
-+			break;
-+		case 2:
-+			max_size = SZ_512M;
-+			break;
-+		case 3:
-+			max_size = SZ_64K;
-+			break;
-+		}
-+		break;
-+	default:			/* No size information */
-+		break;
-+	}
-+
-+	return max_size;
++	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
 +}
 +
-+unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
-+{
-+	unsigned long max_size;
-+	u8 ttl;
-+
-+	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
-+
-+	max_size = ttl_to_size(ttl);
-+
-+	if (!max_size) {
-+		/* Compute the maximum extent of the invalidation */
-+		switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
-+		case VTCR_EL2_TG0_4K:
-+			max_size = SZ_1G;
-+			break;
-+		case VTCR_EL2_TG0_16K:
-+			max_size = SZ_32M;
-+			break;
-+		case VTCR_EL2_TG0_64K:
-+		default:    /* IMPDEF: treat any other value as 64k */
-+			/*
-+			 * No, we do not support 52bit IPA in nested yet. Once
-+			 * we do, this should be 4TB.
-+			 */
-+			max_size = SZ_512M;
-+			break;
-+		}
-+	}
-+
-+	WARN_ON(!max_size);
-+	return max_size;
-+}
-+
- /*
-  * We can have multiple *different* MMU contexts with the same VMID:
-  *
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ce477867ec03..810ea3dd2088 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2852,34 +2852,12 @@ static void s2_mmu_unmap_stage2_ipa(struct kvm_s2_mmu *mmu,
- 	 *
- 	 * - NS bit: we're non-secure only.
- 	 *
--	 * - TTL field: We already have the granule size from the
--	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
--	 *   guest's S2PT.
--	 *
- 	 * - IPA[51:48]: We don't support 52bit IPA just yet...
- 	 *
- 	 * And of course, adjust the IPA to be on an actual address.
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index cf31da306622..0412c3c07c75 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1606,11 +1606,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * Potentially reduce shadow S2 permissions to match the guest's own
+ 	 * S2. For exec faults, we'd only reach this point if the guest
+ 	 * actually allowed it (see kvm_s2_handle_perm_fault).
++	 *
++	 * Also encode the level of the nested translation in the SW bits of
++	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
++	 * the guest.
  	 */
- 	base_addr = (info->ipa.addr & GENMASK_ULL(35, 0)) << 12;
--
--	/* Compute the maximum extent of the invalidation */
--	switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
--	case VTCR_EL2_TG0_4K:
--		max_size = SZ_1G;
--		break;
--	case VTCR_EL2_TG0_16K:
--		max_size = SZ_32M;
--		break;
--	case VTCR_EL2_TG0_64K:
--	default:	    /* IMPDEF: treat any other value as 64k */
--		/*
--		 * No, we do not support 52bit IPA in nested yet. Once
--		 * we do, this should be 4TB.
--		 */
--		max_size = SZ_512M;
--		break;
--	}
--
-+	max_size = compute_tlb_inval_range(mmu, info->ipa.addr);
- 	base_addr &= ~(max_size - 1);
+ 	if (nested) {
+ 		writable &= kvm_s2_trans_writable(nested);
+ 		if (!kvm_s2_trans_readable(nested))
+ 			prot &= ~KVM_PGTABLE_PROT_R;
++
++		prot |= kvm_encode_nested_level(nested);
+ 	}
  
- 	kvm_unmap_stage2_range(mmu, base_addr, max_size);
+ 	read_lock(&kvm->mmu_lock);
+@@ -1667,14 +1673,20 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
+ 	 * kvm_pgtable_stage2_map() should be called to change block size.
+ 	 */
+-	if (fault_is_perm && vma_pagesize == fault_granule)
++	if (fault_is_perm && vma_pagesize == fault_granule) {
++		/*
++		 * Drop the SW bits in favour of those stored in the
++		 * PTE, which will be preserved.
++		 */
++		prot &= ~KVM_NV_GUEST_MAP_SZ;
+ 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
+-	else
++	} else {
+ 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
+ 					     __pfn_to_phys(pfn), prot,
+ 					     memcache,
+ 					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+ 					     KVM_PGTABLE_WALK_SHARED);
++	}
+ 
+ 	/* Mark the page dirty only if the fault is handled successfully */
+ 	if (writable && !ret) {
 -- 
 2.39.2
 
