@@ -1,115 +1,137 @@
-Return-Path: <kvm+bounces-13972-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E501B89D387
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 09:45:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B4F89D38B
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 09:47:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 950161F2264C
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 07:45:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50D3F1C21193
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 07:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1487D3EC;
-	Tue,  9 Apr 2024 07:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EBC7D09D;
+	Tue,  9 Apr 2024 07:47:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3caKv3E"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfmOKUkf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F8E7CF17;
-	Tue,  9 Apr 2024 07:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D91876413
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 07:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712648743; cv=none; b=ML0ZDBtxNESXoqkhvrpz2J8SVmY7mG1zWZma8Fxa8nuBn6uJ34yNq53Y8/HxBcKcamrSx0iMnWME9EXnXzgG170VEFP4N/W890RJ9NqCbA5oZOaaATPjtSABY3NKbcJ+9Nk1N0H8KHFtDA8k6f1e33meq3/QXeQ0Oo3tFVQ4h3s=
+	t=1712648855; cv=none; b=QFXtGyj0qQ4OSNHA43yiwCjpOTnHpe5D+VL6q/92lKU9WZRuYgMGa4ldjBQ18JQ04ZHavOSaon2t13TZWs7Ui+V0AX8WcRsnhxKLa36tRKOamocJkzAC8Te7GXVaJJt/H5Cbze3A0vB7ktz46lH/aIIDJ4ZDKuRnERBmLOYWEFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712648743; c=relaxed/simple;
-	bh=uKzsCnq7HhUiyxC/58A4bs+5O3t7G1g0XOiZw9VxCbk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jhVYZrqShhw25EPaf3XffcjvUTIDisrhmCKRgGUmkxpfC/wCPM3fmEFwzlYLv360OaKreXhoWcmhXM0DoFV5wcsj8W22Yxt7zMX2ECu9NJr9NiquIG9uznl6g4LVDtrQDuw+tZBhSzspSVJom3vUd8MgbRM2lYLDpEdxcWj3PvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R3caKv3E; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56e6f4ee104so920389a12.2;
-        Tue, 09 Apr 2024 00:45:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712648740; x=1713253540; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0oJpUXIpDVMfnwpnaBHprCGzL9aiB50P8YLgzgVitTA=;
-        b=R3caKv3E9rDJvjDM/pS5nGKQEu8dS5ubcrJazmpP9EwFtZODy8WYVv+sJQ6e5XYF6u
-         jXkK+LH+41mN6eG1RZV2qgGlcmsnQIgXK5BZ5+GwB8MkEyF7T08teeQrSWRqrj2tJ2ys
-         0JscB8BxzNGxQcLjvHU2q3Qo1wTPgh1x+ty5q5NY35+J/GZ2ohIAGnfK865YqAHBFbVp
-         M/ZbdMjJERWYwtRNKiIhbY5p3sCjsQcMmUOhPnd3s7lAFPfQYIj0gs2oASis/TDEbLXR
-         nX66uKfqWm9cR69U2sRXcUqeBPeCPno2QmX263ev/Ca8ReB9VKsOZ5WGvBVCXuNBbTIi
-         KJ2w==
+	s=arc-20240116; t=1712648855; c=relaxed/simple;
+	bh=y0Dwj2lXyabUf14cqARhCkVWYffRd/CkPwQh1Fi8qtk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=humwGfxF1mg4D+wKN9Bw3w59qYcAwfvnliCOiZLX2OZEO0PlycDlUUSgBocqwdLKkyWZXIYFr7swae35ijWhrs0qIDgWmGAfsvWjPJ1gGSeh1hZuPTzf5wrgoAO13ZbHlkYQ2Ii6WxyTy5UTTNSqBYiktJE0PT8vZ5da0s/zxAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PfmOKUkf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712648853;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P2vOMs/DIcveirHQQdM7XrMgLSklaYSgQkSBVonMYZA=;
+	b=PfmOKUkflCVyhIQqVzBggATw9aq/N7DLiCYHPFSH7fzSzmYjHTnPrY/YsmyJv1pT28Dv2Z
+	Dd2Un20Jc4ZiR83ykf4y8o26MAaLLH8CKiYrMNNhk/2ax77AMv1WawkEyfJkH5ly1rZzg0
+	zOHW4GDAYCBnrjGdhvqy2vZoROxtwFg=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-54-0pvtu5WWNtSE_UNZ7vG9fQ-1; Tue, 09 Apr 2024 03:47:31 -0400
+X-MC-Unique: 0pvtu5WWNtSE_UNZ7vG9fQ-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2a303938023so1400927a91.0
+        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 00:47:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712648740; x=1713253540;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0oJpUXIpDVMfnwpnaBHprCGzL9aiB50P8YLgzgVitTA=;
-        b=XBnIycjoGVZ+qZpNvcTYFsaGwrPK6/Jq0FpqdQgRef+fnX3fhT5v6grlrNkF3t9b+p
-         EF94hvXoEsJVknjOliS2Cs1jb0pBTWtO5aPiIxJilFOwqb+Wj99vom6qNQ8D8xAb1nx5
-         Xqx+OSajqqdrV+Y8an6AUiFSTqr3QtaYQiJmUXicYLiz09GH5hWcaVEQMeafkTy9HJg8
-         sdQELvYNOwKlomvU2RY7MfiZ8ZkjWZBfk0Pu5OLmVmAEIWC604umXDbZvaLSYHHcbfuZ
-         JsvKfL8F8yWZp39o1DxTuvx1Fd7T19shMxuUkfUmkQaYMkQRu08NAEn4uD6vseul6P5t
-         OrAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBKPIlz8dQxAVdvR3z+Q5MQt4cUnBG6MSQbJO2E/9Lo734sU2YJxUuSukE7uavwcyH8uAbW5dyOaq1M13p0MMztPVbtMEwvx5iBHjzAtzus+2vcllJo5QcKrOQwhxT/8I5
-X-Gm-Message-State: AOJu0YweAz3eMCM0u7jlVzoHDetD89GMNYBagE2BcfwMXslqmmrPPf33
-	RC6JOcHjGNh7BmX8iEIGn5PtDieE+q4puCoEQF46Qh8o0KQ9WZ+C
-X-Google-Smtp-Source: AGHT+IEK/oMsux4Vg4cDuhlXiDySJyW7ebfeLef3XLTsjLq5pRmj5pDvIkmPkMXDKCExwolqONtbwg==
-X-Received: by 2002:a17:907:72cc:b0:a51:c1db:6578 with SMTP id du12-20020a17090772cc00b00a51c1db6578mr5930059ejc.14.1712648739823;
-        Tue, 09 Apr 2024 00:45:39 -0700 (PDT)
-Received: from gmail.com (1F2EF1A5.nat.pool.telekom.hu. [31.46.241.165])
-        by smtp.gmail.com with ESMTPSA id a17-20020a170906191100b00a46e56c8764sm5321368eje.114.2024.04.09.00.45.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 00:45:39 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date: Tue, 9 Apr 2024 09:45:37 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: Li RongQing <lirongqing@baidu.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, peterz@infradead.org,
-	linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-	kvm@vger.kernel.org, seanjc@google.com, szy0127@sjtu.edu.cn,
-	thomas.lendacky@amd.com
-Subject: Re: [PATCH][RFC] x86,lib: Add wbinvd_on_many_cpus helpers
-Message-ID: <ZhTyIadG35HDPNRx@gmail.com>
-References: <20240409042056.51757-1-lirongqing@baidu.com>
+        d=1e100.net; s=20230601; t=1712648850; x=1713253650;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P2vOMs/DIcveirHQQdM7XrMgLSklaYSgQkSBVonMYZA=;
+        b=qlJQGza5n6SgIi5m2mfEP33XsXY1sBJ8OXN5DHY6o0YRxv71sQXxnRViSkebc85gQh
+         ICFu1fb8KGZDz5PWwds+BGDg2SDpgp3zXgRZF2aCgC2UdtIoSqDc7HBbp7gA8eGnBcd7
+         FLciUUHhxC4RWjjoJvcU7iEKul3pMvNrJtTipQjjW/oMsRzFMWyucAh0SmB3TQuk2a6L
+         o7avf73cIsrdQh03LWIXvM1MnAW+OQAmBPaodZiPQu72nuqELlmztawoE9bDfnNFcYt1
+         ggAhaLqlWTclF69zngMMupGJgoI4cR3UUi6828mCmsEy84J+YbgnJDU18jog8znggEI0
+         Cc7g==
+X-Forwarded-Encrypted: i=1; AJvYcCUr/QwYsh5kSeUFERT4VKxQfjrtr7dDuDkDqTP1pLy00ANBgDHw0px0lED2lbmYUEOIp+wH2W0APzOnNIMdvQqZT55a
+X-Gm-Message-State: AOJu0YyIfFzChU1iNa/Ht5Ll7j2egXQ+9GOwQxn0n2+t1TFksrmSFmyV
+	MGd88fJC4huYseFLOnDvcuhR1T/A67RKNqi+Ri7vvgf7rJ4vWumUr1iI926rV/EthmcIVeti2fD
+	zqKbQusBSdPZRinRf740ahcTDAzV8bvhrWblmyYqHDMT5grHh0+9lFaUIEsi5
+X-Received: by 2002:a17:90b:4b08:b0:2a5:223c:2975 with SMTP id lx8-20020a17090b4b0800b002a5223c2975mr4212088pjb.3.1712648850034;
+        Tue, 09 Apr 2024 00:47:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE7574SO9/7DyXNoUy3VNVQ5xzwm72Y2uh/pXo2iu7a0i1E2f+PwGW8tQKIF5+NHIQSryvhZQ==
+X-Received: by 2002:a17:90b:4b08:b0:2a5:223c:2975 with SMTP id lx8-20020a17090b4b0800b002a5223c2975mr4212074pjb.3.1712648849634;
+        Tue, 09 Apr 2024 00:47:29 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id fs22-20020a17090af29600b0029ddac03effsm9393320pjb.11.2024.04.09.00.47.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Apr 2024 00:47:29 -0700 (PDT)
+Message-ID: <47e0c03b-0a6f-4a58-8dd7-6f1b85bcf71c@redhat.com>
+Date: Tue, 9 Apr 2024 15:47:25 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240409042056.51757-1-lirongqing@baidu.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
+To: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org
+Cc: Eric Auger <eauger@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20240409024940.180107-1-shahuang@redhat.com>
+ <d1a76e23-e361-46a9-9baf-6ab51db5d7ba@redhat.com>
+Content-Language: en-US
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <d1a76e23-e361-46a9-9baf-6ab51db5d7ba@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+Hi Thmoas,
 
-* Li RongQing <lirongqing@baidu.com> wrote:
-
-> wbinvd_on_many_cpus will call smp_call_function_many(), which should
-> be more efficient that iterating cpus since it would run wbinvd()
-> concurrently locally and remotely
+On 4/9/24 13:33, Thomas Huth wrote:
+>> +        assert_has_feature(qts, "host", "kvm-pmu-filter");
 > 
-> it can be used by the below patch
-> https://patchwork.kernel.org/project/kvm/patch/1860502863.219296.1710395908135.JavaMail.zimbra@sjtu.edu.cn/
+> So you assert here that the feature is available ...
 > 
-> Cc: Zheyun Shen <szy0127@sjtu.edu.cn>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->  arch/x86/include/asm/smp.h | 7 +++++++
->  arch/x86/lib/cache-smp.c   | 7 +++++++
->  2 files changed, 14 insertions(+)
+>>           assert_has_feature(qts, "host", "kvm-steal-time");
+>>           assert_has_feature(qts, "host", "sve");
+>>           resp = do_query_no_props(qts, "host");
+>> +        kvm_supports_pmu_filter = resp_get_feature_str(resp, 
+>> "kvm-pmu-filter");
+>>           kvm_supports_steal_time = resp_get_feature(resp, 
+>> "kvm-steal-time");
+>>           kvm_supports_sve = resp_get_feature(resp, "sve");
+>>           vls = resp_get_sve_vls(resp);
+>>           qobject_unref(resp);
+>> +        if (kvm_supports_pmu_filter) { >
+> ... why do you then need to check for its availability here again?
+> I either don't understand this part of the code, or you could drop the 
+> kvm_supports_pmu_filter variable and simply always execute the code below.
 
-The two patches should be submitted together within the same series.
+Thanks for your reviewing. I did so because all other feature like 
+"kvm-steal-time" check its availability again. I don't know the original 
+reason why they did that. I just followed it.
+
+Do you think we should delete all the checking?
 
 Thanks,
+Shaoqin
 
-	Ingo
+> 
+>   Thomas
+> 
+
+-- 
+Shaoqin
+
 
