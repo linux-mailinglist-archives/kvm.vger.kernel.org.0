@@ -1,207 +1,150 @@
-Return-Path: <kvm+bounces-13959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0786289D091
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 04:58:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E85389D0A6
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 05:06:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A7741C23EC3
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 02:58:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E96D3284EBD
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 03:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AA754756;
-	Tue,  9 Apr 2024 02:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A48548E8;
+	Tue,  9 Apr 2024 03:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TCU140FY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VcqY6PAW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EAD4F1E2;
-	Tue,  9 Apr 2024 02:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F76548E9
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 03:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712631483; cv=none; b=bufssHwE0lnvEqGSfbp/enUkQb0w3giTqSUInk6e+MaHELdKAVp3uxQ1UrZfHHdAGkpiX6bSiU9QqemnUMj242Pn72IXZPZY8Llr+ONU75MScFW0NIue/yY4aS382OQKWyHAG/1rn3Am4OtqlTAgxuvOyFJ8nI3h3/ph4X8pFxw=
+	t=1712631993; cv=none; b=lLtlFyBjNNlifY1dfnmvI/ETMqXU8cz/de+2wFd8Db4dBhgkA6pvYSMIaNFrwfWAAicE+ETGWQF7Bp3KlvHaVj9ePWFoyUeE9Pb358Ru5C7duXRWViYZ5AP0HmRfTK0jgCanIL1xt43XRaRqBF1qAQ/uBA3Lpmi8qKnPvlgnSRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712631483; c=relaxed/simple;
-	bh=ftu17EFideu85zcIBzW3FSNHlVABHCz50AEW+QGwWko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gQU400CXy0zGja+gEnTA4dl+dnUdFEIaKI0MkSuZWcAs9BAroVoFyAWKpDtMoU3byIHCviw7M0obWm5FbBor0es0BZH4cHWXjtm6ti2zfAWpIV+SSFkAorJCK5IaadVPz4pSVuyXUpjgs0xQwLRGiglGho3Q0qXYVMtOwM9WMIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TCU140FY; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712631481; x=1744167481;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ftu17EFideu85zcIBzW3FSNHlVABHCz50AEW+QGwWko=;
-  b=TCU140FYUfC4YXq+lnCrZWCBZIqZ779yUi9wFWMr5Ydr4o7IEUQRWlBb
-   xMqx3YAHtjDYNgzlClCWPZeqW3B4hl7yDuMAVAjAJQTGxZLWXbOFT4X5A
-   nYtRi1+vWvWfS7Zpt05JEi+vonAT2QUsyhOAsiFNBeUEeYH12VW8JTfBn
-   pJqxR52XGYWhhYr3nU6ihq4GkuYmpHCpfOgcWui/Af8G4ck0AHeyDxh6n
-   oylJQ9+kJgrAdfn15WzMhwxx1/YJ80U9fHbkeV258zweDXIRxLxr/1s+V
-   4H08fHo/Us35Y4wHhf4qRpByHeSxbe/S0C7jAFaJVd7sv/nwqnJ/XQUaT
-   Q==;
-X-CSE-ConnectionGUID: MYpvSYlJRJmMRzAgdF3tnw==
-X-CSE-MsgGUID: spjFH/WoQZ+WeG459AgE6w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11038"; a="8037583"
-X-IronPort-AV: E=Sophos;i="6.07,188,1708416000"; 
-   d="scan'208";a="8037583"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 19:58:01 -0700
-X-CSE-ConnectionGUID: xQ091zZ+QKyya+YLrz1kew==
-X-CSE-MsgGUID: M//Z3gSlSCW+KqWX2Cv3og==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,188,1708416000"; 
-   d="scan'208";a="19999474"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 19:57:58 -0700
-Message-ID: <24c80d16-733b-4036-8057-075a0dab3b4d@intel.com>
-Date: Tue, 9 Apr 2024 10:57:55 +0800
+	s=arc-20240116; t=1712631993; c=relaxed/simple;
+	bh=N4sxI9pzkVnczNB9OhVPdKGn1mKGvMMhqcWAS7kPLTI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lF/ubrC/IyHnHk+POfbEu0Hl3shab0qeeRfozUY8xMwblZlK//LCaDkECzDZFYKXXa09qUQu9VI+dsgRRvDWqd5KIDp9wN+/g1JrHuCYibMJNOrfbD66AF2bpxvqR3n9gwBMg2oQUCVNasew/5MHDZk+mwcUeOLHecgs1vvvWs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VcqY6PAW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712631990;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oZkhwxc1rV+er5vlPURBYWccH3WvtLWNURgRz3mDLRM=;
+	b=VcqY6PAWVAbf1XiPI8a0Rc6O2nJ3EcDShs50wqBCnwbKW9RIFutM/XXi+rhm89nhfvw3yK
+	Z1vmsOyeSPfS8fyI/5pZQUg+qLTPIXUhrPjiSQucCO6AGB05BJiwkTm92+Y7CtDIho15kX
+	bE6xMBhIq4V8PvFcuhBhmklgzQo/KL4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-63-UutkogDIMyqz7slyz7zimg-1; Mon,
+ 08 Apr 2024 23:06:27 -0400
+X-MC-Unique: UutkogDIMyqz7slyz7zimg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AB65E1C03162;
+	Tue,  9 Apr 2024 03:06:26 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 64DA717AB1;
+	Tue,  9 Apr 2024 03:06:26 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v7 0/3] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Mon,  8 Apr 2024 23:03:13 -0400
+Message-Id: <20240409030320.182591-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Rick P Edgecombe <rick.p.edgecombe@intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, Wei W Wang
- <wei.w.wang@intel.com>, David Skidmore <davidskidmore@google.com>,
- Steve Rutherford <srutherford@google.com>,
- Pankaj Gupta <pankaj.gupta@amd.com>
-References: <20240405165844.1018872-1-seanjc@google.com>
- <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
- <ZhQZYzkDPMxXe2RN@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZhQZYzkDPMxXe2RN@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 4/9/2024 12:20 AM, Sean Christopherson wrote:
-> On Sun, Apr 07, 2024, Xiaoyao Li wrote:
->> On 4/6/2024 12:58 AM, Sean Christopherson wrote:
->>>    - For guest MAXPHYADDR vs. GPAW, rely on KVM_GET_SUPPORTED_CPUID to enumerate
->>>      the usable MAXPHYADDR[2], and simply refuse to enable TDX if the TDX Module
->>>      isn't compatible.  Specifically, if MAXPHYADDR=52, 5-level paging is enabled,
->>>      but the TDX-Module only allows GPAW=0, i.e. only supports 4-level paging.
->>
->> So userspace can get supported GPAW from usable MAXPHYADDR, i.e.,
->> CPUID(0X8000_0008).eaxx[23:16] of KVM_GET_SUPPORTED_CPUID:
->>   - if usable MAXPHYADDR == 52, supported GPAW is 0 and 1.
->>   - if usable MAXPHYADDR <= 48, supported GPAW is only 0.
->>
->> There is another thing needs to be discussed. How does userspace configure
->> GPAW for TD guest?
->>
->> Currently, KVM uses CPUID(0x8000_0008).EAX[7:0] in struct
->> kvm_tdx_init_vm::cpuid.entries[] of IOCTL(KVM_TDX_INIT_VM) to deduce the
->> GPAW:
->>
->> 	int maxpa = 36;
->> 	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0x80000008, 0);
->> 	if (entry)
->> 		max_pa = entry->eax & 0xff;
->>
->> 	...
->> 	if (!cpu_has_vmx_ept_5levels() && max_pa > 48)
->> 		return -EINVAL;
->> 	if (cpu_has_vmx_ept_5levels() && max_pa > 48) {
->> 		td_params->eptp_controls |= VMX_EPTP_PWL_5;
->> 		td_params->exec_controls |= TDX_EXEC_CONTROL_MAX_GPAW;
->> 	} else {
->> 		td_params->eptp_controls |= VMX_EPTP_PWL_4;
->> 	}
->>
->> The code implies that KVM allows the provided CPUID(0x8000_0008).EAX[7:0] to
->> be any value (when 5level ept is supported). when it > 48, configure GPAW of
->> TD to 1, otherwise to 0.
->>
->> However, the virtual value of CPUID(0x8000_0008).EAX[7:0] inside TD is
->> always the native value of hardware (for current TDX).
->>
->> So if we want to keep this behavior, we need to document it somewhere that
->> CPUID(0x8000_0008).EAX[7:0] in struct kvm_tdx_init_vm::cpuid.entries[] of
->> IOCTL(KVM_TDX_INIT_VM) is only for configuring GPAW, not for userspace to
->> configure virtual CPUID value for TD VMs.
->>
->> Another option is that, KVM doesn't allow userspace to configure
->> CPUID(0x8000_0008).EAX[7:0]. Instead, it provides a gpaw field in struct
->> kvm_tdx_init_vm for userspace to configure directly.
->>
->> What do you prefer?
-> 
-> Hmm, neither.  I think the best approach is to build on Gerd's series to have KVM
-> select 4-level vs. 5-level based on the enumerated guest.MAXPHYADDR, not on
-> host.MAXPHYADDR.
+The test is inspired by the pmu_event_filter_test which implemented by x86. On
+the arm64 platform, there is the same ability to set the pmu_event_filter
+through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 
-I see no difference between using guest.MAXPHYADDR (EAX[23:16]) and 
-using host.MAXPHYADDR (EAX[7:0]) to determine the GPAW (and EPT level) 
-for TD guest. The case for TDX diverges from what for non TDX VMs. The 
-value of them passed from userspace can only be used to configure GPAW 
-and EPT level for TD, but won't be reflected in CPUID inside TD.
+The series first create the helper function which can be used
+for the vpmu related tests. Then, it implement the test.
 
-So I take it as you prefer the former option than dedicated GPAW field.
+Changelog:
+----------
+v6->v7:
+  - Rebased to v6.9-rc3.
 
-> With a moderate amount of refactoring, cache/compute guest_maxphyaddr as:
-> 
-> 	static void kvm_vcpu_refresh_maxphyaddr(struct kvm_vcpu *vcpu)
-> 	{
-> 		struct kvm_cpuid_entry2 *best;
-> 
-> 		best = kvm_find_cpuid_entry(vcpu, 0x80000000);
-> 		if (!best || best->eax < 0x80000008)
-> 			goto not_found;
-> 
-> 		best = kvm_find_cpuid_entry(vcpu, 0x80000008);
-> 		if (!best)
-> 			goto not_found;
-> 
-> 		vcpu->arch.maxphyaddr = best->eax & GENMASK(7, 0);
-> 
-> 		if (best->eax & GENMASK(15, 8))
-> 			vcpu->arch.guest_maxphyaddr = (best->eax & GENMASK(15, 8)) >> 8;
-> 		else
-> 			vcpu->arch.guest_maxphyaddr = vcpu->arch.maxphyaddr;
-> 
-> 		return;
-> 
-> 	not_found:
-> 		vcpu->arch.maxphyaddr = KVM_X86_DEFAULT_MAXPHYADDR;
-> 		vcpu->arch.guest_maxphyaddr = KVM_X86_DEFAULT_MAXPHYADDR;
-> 	}
-> 
-> and then use vcpu->arch.guest_maxphyaddr instead of vcpu->arch.maxphyaddr when
-> selecting the TDP level.
-> 
-> 	static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
-> 	{
-> 		/* tdp_root_level is architecture forced level, use it if nonzero */
-> 		if (tdp_root_level)
-> 			return tdp_root_level;
-> 
-> 		/*
-> 		* Use 5-level TDP if and only if it's useful/necessary.  Definitely a
-> 		* more verbose comment here.
-> 		*/
-> 		if (max_tdp_level == 5 && vcpu->arch.guest_maxphyaddr <= 48)
-> 			return 4;
-> 
-> 		return max_tdp_level;
-> 	}
-> 
-> The only question is whether or not the behavior needs to be opt-in via a new
-> capability, e.g. in case there is some weird usage where userspace enumerates
-> guest.MAXPHYADDR < host.MAXPHYADDR but still wants/needs 5-level paging.  I highly
-> doubt such a use case exists though.
-> 
-> I'll get Gerd's series applied, and will post a small series to implement the
-> above later this week.
+v5->v6:
+  - Rebased to v6.9-rc1.
+  - Collect RB.
+  - Add multiple filter test.
+
+v4->v5:
+  - Rebased to v6.8-rc6.
+  - Refactor the helper function, make it fine-grained and easy to be used.
+  - Namimg improvements.
+  - Use the kvm_device_attr_set() helper.
+  - Make the test descriptor array readable and clean.
+  - Delete the patch which moves the pmu related helper to vpmu.h.
+  - Remove the kvm_supports_pmu_event_filter() function since nobody will run
+  this on a old kernel.
+
+v3->v4:
+  - Rebased to the v6.8-rc2.
+
+v2->v3:
+  - Check the pmceid in guest code instead of pmu event count since different
+  hardware may have different event count result, check pmceid makes it stable
+  on different platform.                        [Eric]
+  - Some typo fixed and commit message improved.
+
+v1->v2:
+  - Improve the commit message.                 [Eric]
+  - Fix the bug in [enable|disable]_counter.    [Raghavendra & Marc]
+  - Add the check if kvm has attr KVM_ARM_VCPU_PMU_V3_FILTER.
+  - Add if host pmu support the test event throught pmceid0.
+  - Split the test_invalid_filter() to another patch. [Eric]
+
+v1: https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.com/
+v2: https://lore.kernel.org/all/20231129072712.2667337-1-shahuang@redhat.com/
+v3: https://lore.kernel.org/all/20240116060129.55473-1-shahuang@redhat.com/
+v4: https://lore.kernel.org/all/20240202025659.5065-1-shahuang@redhat.com/
+v5: https://lore.kernel.org/all/20240229065625.114207-1-shahuang@redhat.com/
+v6: https://lore.kernel.org/all/20240326033706.117189-1-shahuang@redhat.com/
+
+Shaoqin Huang (3):
+  KVM: selftests: aarch64: Add helper function for the vpmu vcpu
+    creation
+  KVM: selftests: aarch64: Introduce pmu_event_filter_test
+  KVM: selftests: aarch64: Add invalid filter test in
+    pmu_event_filter_test
+
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/aarch64/pmu_event_filter_test.c       | 336 ++++++++++++++++++
+ .../kvm/aarch64/vpmu_counter_access.c         |  33 +-
+ .../selftests/kvm/include/aarch64/vpmu.h      |  28 ++
+ 4 files changed, 372 insertions(+), 26 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
+
+-- 
+2.40.1
 
 
