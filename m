@@ -1,202 +1,201 @@
-Return-Path: <kvm+bounces-14039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB7E89E5E7
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 01:09:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D50489E5F7
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 01:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F452824A3
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 23:09:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A2B284803
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 23:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B45158DB1;
-	Tue,  9 Apr 2024 23:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 813D7158DB1;
+	Tue,  9 Apr 2024 23:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="akWmIXDK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aH515+/N"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2089.outbound.protection.outlook.com [40.107.236.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4C5156C6D
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 23:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712704156; cv=fail; b=m0UFs6pYHd1ZQkPp5q7YJIq9KKGArU9hGLuZsSoU+7zsE4aO6zk4B00+sYozJazdtaUxYoQvo2nWtiN3gAxXia5mPuGo6APl9blp7HptZYZheA8kETjKMQIcSo0Hxhq5QZcKMaTTyhB4o2hE6B65rY8kY6R8tfNdod34k1euAlU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712704156; c=relaxed/simple;
-	bh=9YVkf1MxtzIzxOT78UrItSf9FRL1PdOzJOYSiexEvrE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MpNkeiAad9TO3HgZN0SxiUsnxk6BPQv8QawpcLmwuqc4hqKNbyKq5iu4amRb1LULXTWkMmCT7eK06ajN1fJSc5fz4X2gPPDA3mW7BaJU/DMSqyxlHMbbVHFVIEBS85e4L/Veprl3DgeUFnlc7j2hZpfIHR2PrpZjg8n5p8I14M8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=akWmIXDK; arc=fail smtp.client-ip=40.107.236.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mIgmliFierrXCk/3rYnRtwyVsBLBOC+2KvOHQkWqFpim2J1jn32hMC9w+bi+a0jKmSNLZGPy+Qm456hj27zGAcdpKgdT78iUT/b9R/B9agz+viz4fODGJAPsPHUNaAugwEgfS53HvjxnsiVyre6HUnchgmePcxKPGtajcg/XSbk7ckpdJOr6NKNz1DhxcbK4wiXxgefXdfrmFYJrUKtWUQORtldH6IiDBeIzuUqNXnPorD+s9PBqV6IE6GWxievADHomRCyPvDvB5tIcCHJs0mJDrdhfSsvq+zQe2IPu9ARvXQ8tq4HFggLE/MfmSXv+FOcaroOffyREIjSuhHNcuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ty2IOTc9gTBaJQ7l7S7OWQpXxYtZfDrbKLLcPhLIR9E=;
- b=V0p6c3bwkD+UY6JJAwjuM3PL59U/HNJNb3x8+XGRTL/SreOvCylpt//sQTIlgrQVwhv7B+EtEzs0fUNI7XDdu/9subMUq/SAuC/OZDBXPmOUWck4nZtkLUZsabd+8ZeSKEb/MsEXc3xZzhfBh6s3d2xKCSoZqXTW2+e0ZLyDcxSXbF947JBH05OgYeCrw1uccQdNC9XM/FEweAEFQo3ci24QzYA4acqP/iR8irP5/Ltp/hZ6RTVM/pQ1Fybug188MYfpCiHDW1CVjh+lZUmrPiszONNhzP8T7vBpo2VTmLEpUJ9WQETvDifkik6xevL9+9mixV5+mEMPlbUxhQ3gOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ty2IOTc9gTBaJQ7l7S7OWQpXxYtZfDrbKLLcPhLIR9E=;
- b=akWmIXDKB4iGeRmfsUTia/N0GXivqVQzBAM2iShjQn5SqEiGOxAl3sEne66NX8/fJMt1gKupMENOEYy75+iRVS0SwjkaNIGjxsL1kbST5XfWNEDjw6o/gHAXFRl1DUd5ERXCOeeA/hEYuLIQX4NkrOxvh18XCGSWUOkzDMxhe/Y=
-Received: from BY5PR04CA0017.namprd04.prod.outlook.com (2603:10b6:a03:1d0::27)
- by MN2PR12MB4126.namprd12.prod.outlook.com (2603:10b6:208:199::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.55; Tue, 9 Apr
- 2024 23:09:11 +0000
-Received: from CY4PEPF0000FCC5.namprd03.prod.outlook.com
- (2603:10b6:a03:1d0:cafe::48) by BY5PR04CA0017.outlook.office365.com
- (2603:10b6:a03:1d0::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.36 via Frontend
- Transport; Tue, 9 Apr 2024 23:09:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000FCC5.mail.protection.outlook.com (10.167.242.107) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Tue, 9 Apr 2024 23:09:10 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 9 Apr
- 2024 18:09:09 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: <qemu-devel@nongnu.org>
-CC: <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky
-	<thomas.lendacky@amd.com>, Pankaj Gupta <pankaj.gupta@amd.com>, Larry Dewey
-	<Larry.Dewey@amd.com>, Roy Hopkins <roy.hopkins@suse.com>
-Subject: [PATCH v1 3/3] hw/i386/sev: Use legacy SEV VM types for older machine types
-Date: Tue, 9 Apr 2024 18:07:43 -0500
-Message-ID: <20240409230743.962513-4-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240409230743.962513-1-michael.roth@amd.com>
-References: <20240409230743.962513-1-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349DC158D9C
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 23:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712704410; cv=none; b=O3kqqQUzWZsNZPK7PRgnPnjaES/U/T/bB7uGCtWd4eG54dej6hjgO4fjY310c9kFQgKfVDsmvnnuQRSXpXU2z02G94x1WR4bYFfA0DKQpPauF2v90j37R/mStZN7o6/hFQAHmz11Uh8NImaeBgqEJnvN2n64R91IJVlSTbbAHpo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712704410; c=relaxed/simple;
+	bh=s1N+bWXW6ZgDbBF9S3ovbL3RYc98tH9Fns3Yc4Yvy50=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Bul+c+Qg34e9ZWWV4kke/8IT/3gvXl5HrYxyolQ96PVNdgQ5q700qRPwFV4704D3rxR9FqnVjp1XUTPwHAyONvOThHZ5PcLr2uvRAsLbhImk027MsCyFJnvz6GYtbVBuc/PW9OAIfR6RnELoyORviZgmNyjrCMMrs6QFsMpyfTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aH515+/N; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1e41a654c7bso18950245ad.2
+        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 16:13:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712704408; x=1713309208; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kCjGvnjNmjYFW9A5jxHrUrxUVDFK2iV2f/iEuUaPJKU=;
+        b=aH515+/NToaD+ywUFw6OTZwXmM6Q9VuUWMuG24UpaJZicOlvCzCdkO5yDDQkqRFvBC
+         qtRTV+7RLLaWWenTV8Fk1tteD2/k+9txaeAKuKbJBy1XXBbSYsnxWL6xYtHZWTc+zkBq
+         88GHAkVrA0Z+bvgHfw1DvG66Ijek6yNt/X0RRvFpuzgXd6KaPhqKA3QIepa4ZVqFI/UT
+         W+YYTafqTKNucq/wAAnf6TqBZI+nu74oRH4kKsyOCser9VQzM2kZt8g8UjC0Kms1CQuk
+         FXHAUwtzdVoWNW27+HnbEE6OP/tFtD8aUd0hReC4ooSPnQ24NwPXiZDs4lmDiz/ZsqKi
+         AM9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712704408; x=1713309208;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kCjGvnjNmjYFW9A5jxHrUrxUVDFK2iV2f/iEuUaPJKU=;
+        b=LtfHk6LkBBk5ydhGF2HFHPDSjhz2cBVp/JaKEm06hlrr/m/Kf/UqFDRUBOi3rmRV/B
+         hpdiI7h97grL5owANNLFNx0HczCJckvQpIduvKw959zhnRW31T4G9jqZ8OAhWbQ5Zy5M
+         bguH41/86ennHhX3bW4JZwYcBGbLVjq4Bm+n4kH5CTUJcKHBtViQJlTzD585TBG6odtO
+         4AZbjTAU/LRflYS+0Z4a/sWLh901Zv8+SDgAKFNSHlu/LtTSsKM31icRD863OAsohq9Q
+         EO4A0lY/zVaGDd0M8lS9HCmE+RIIG4nTlvLQUH/pv3+cdyNIWqMmkvodTZwnBnFEqS3f
+         GKiw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9IaEAyUbFHL1qv6P6Zble2y8KnDvhbvO/nxkPZM2uFdfhMIeHF4sLqIRFw/2yhQY4Wx13WSGDOjH/TEkWBJK4HsAX
+X-Gm-Message-State: AOJu0Yyp47NMPqB3BWEZMJmxyWZR/oAthIVooSrtu0Te8haDtLf86H/z
+	CEM39GHXTY2sujy5Ky+qxCO0Wo1ONUpSiDSxFsfTpQA5R6QlKP52EGfXx2OPFIgFafysKh9eTXG
+	ygQ==
+X-Google-Smtp-Source: AGHT+IGG3CX1kWWtUnLU0fYOieXTOoNviwHGWTY5hE+HKqVKD8ecUbGOjd5lbsCMNRwnm6c+0GiqgGAd+SA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e888:b0:1e0:afa0:cc94 with SMTP id
+ w8-20020a170902e88800b001e0afa0cc94mr65257plg.7.1712704408440; Tue, 09 Apr
+ 2024 16:13:28 -0700 (PDT)
+Date: Tue, 9 Apr 2024 16:13:27 -0700
+In-Reply-To: <20240315230541.1635322-2-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC5:EE_|MN2PR12MB4126:EE_
-X-MS-Office365-Filtering-Correlation-Id: db23a42b-9102-435f-b690-08dc58ea10bf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	pCasw7mFDxCdsRUopNe8I/j6uQtshA832J7THi2sWAHTmc4Sbqc/U4lX78/5CTrvLzsIfrgLCeCuuidpYJ6xwyhzgpgccwUuIJvTVIpwnFLHrFmudSFhwKMGZ/3pYUwd854/CvAAqLXTL96PSD/AFfLmIjSzaWS7yhAspupAYN1zmcN9RWClfVFEztkpRIZsBgkpvyD4MGjUf/ihzjR0eP1XPfx7GQd4dYp7dLsugMll7M8EJPXTvY/JUl/a6I0ATAEABLUl85oPRAIha3U5nsDbbln4ZPP3pgrGw7w2n7eYloSlPEMiUeVk4CHZDp7PZ6hx4D5QqEqXEXfckvZEOdCgMl+93YHzHqYmUpjE90P/yLGdF1ugChRa2OZwOuco3d50VpczoPAnSbpKv/GOzYGxwfmRIDovfTNADH4omIMeqWRRBDc+fCry6b9TEyCW3ELJZgHCPnnA0MyGJefQpiUpcBaxtPvIXK+at/rXlLz8WaRmOsvYvltT8MzoW0mQQelyncN9+aUrJCDhD6tuSU8e0nYXUWY/NzsdI/gCDymiZldkWjrdivEACtDGOG2mwyjvUVJoE40l+aAup0Pctauq/jpCpfuqPrJblb10DnWyxakp4dTKtGaVg11qGD6hLZfQ4yJgQHerKzZ1u8TL3Vj77KYyHYJpRaeOmJCy/SIOVmPJaxw8N/IeLfA/Y7hZcWI7l86YCf0iQMPvHjBiCQXAS8eCxi6px8o6IqefnX5ddz46446cnd55uoW2zz4X
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(82310400014)(1800799015)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 23:09:10.5265
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: db23a42b-9102-435f-b690-08dc58ea10bf
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000FCC5.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4126
+Mime-Version: 1.0
+References: <20240315230541.1635322-1-dmatlack@google.com> <20240315230541.1635322-2-dmatlack@google.com>
+Message-ID: <ZhXLl358YY0WPOWL@google.com>
+Subject: Re: [PATCH 1/4] KVM: x86/mmu: Check kvm_mmu_page_ad_need_write_protect()
+ when clearing TDP MMU dirty bits
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, 
+	syzbot+900d58a45dcaab9e4821@syzkaller.appspotmail.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Newer 9.1 machine types will default to using the KVM_SEV_INIT2 API for
-creating SEV/SEV-ES going forward. However, this API results in guest
-measurement changes which are generally not expected for users of these
-older guest types and can cause disruption if they switch to a newer
-QEMU/kernel version. Avoid this by continuing to use the older
-KVM_SEV_INIT/KVM_SEV_ES_INIT APIs for older machine types.
+The shortlog is a bit too literal, e.g. without intimate knowledge of what
+kvm_mmu_page_ad_need_write_protect() does, it's impossible to know what this
+patch actually fixes.
 
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- hw/i386/pc.c         | 5 +++++
- hw/i386/pc_piix.c    | 1 +
- hw/i386/pc_q35.c     | 1 +
- include/hw/i386/pc.h | 3 +++
- target/i386/sev.c    | 1 +
- 5 files changed, 11 insertions(+)
+In this case, since it's a bug fix, I think it makes sense to explicitly call
+out the L2 SPTEs angled, at the cost of not capturing the more general gist of
+the patch.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index e80f02bef4..96bf90c17e 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -78,6 +78,11 @@
-     { "qemu64-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v, },\
-     { "athlon-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v, },
- 
-+GlobalProperty pc_compat_9_0[] = {
-+    { "sev-guest", "legacy-vm-type", "true" },
-+};
-+const size_t pc_compat_9_0_len = G_N_ELEMENTS(pc_compat_9_0);
-+
- GlobalProperty pc_compat_8_2[] = {};
- const size_t pc_compat_8_2_len = G_N_ELEMENTS(pc_compat_8_2);
- 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 069414a1ac..0b7a9debab 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -528,6 +528,7 @@ static void pc_i440fx_9_0_machine_options(MachineClass *m)
-     pc_i440fx_machine_options(m);
-     m->alias = NULL;
-     m->is_default = false;
-+    compat_props_add(m->compat_props, pc_compat_9_0, pc_compat_9_0_len);
- }
- 
- DEFINE_I440FX_MACHINE(v9_0, "pc-i440fx-9.0", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 77d7f700a8..acb55fc787 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -380,6 +380,7 @@ static void pc_q35_9_0_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = NULL;
-+    compat_props_add(m->compat_props, pc_compat_9_0, pc_compat_9_0_len);
- }
- 
- DEFINE_Q35_MACHINE(v9_0, "pc-q35-9.0", NULL,
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index fb1d4106e5..e52290916c 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -199,6 +199,9 @@ void pc_system_parse_ovmf_flash(uint8_t *flash_ptr, size_t flash_size);
- /* sgx.c */
- void pc_machine_init_sgx_epc(PCMachineState *pcms);
- 
-+extern GlobalProperty pc_compat_9_0[];
-+extern const size_t pc_compat_9_0_len;
-+
- extern GlobalProperty pc_compat_8_2[];
- extern const size_t pc_compat_8_2_len;
- 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index f4ee317cb0..d30b68c11e 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -1417,6 +1417,7 @@ sev_guest_instance_init(Object *obj)
-     object_property_add_uint32_ptr(obj, "reduced-phys-bits",
-                                    &sev->reduced_phys_bits,
-                                    OBJ_PROP_FLAG_READWRITE);
-+    object_apply_compat_props(obj);
- }
- 
- /* sev guest info */
--- 
-2.25.1
+On Fri, Mar 15, 2024, David Matlack wrote:
+> Check kvm_mmu_page_ad_need_write_protect() when deciding whether to
+> write-protect or clear D-bits on TDP MMU SPTEs.
+> 
+> TDP MMU SPTEs must be write-protected when the TDP MMU is being used to
+> run an L2 (i.e. L1 has disabled EPT) and PML is enabled. KVM always
+> disables the PML hardware when running L2, so failing to write-protect
+> TDP MMU SPTEs will cause writes made by L2 to not be reflected in the
+> dirty log.
 
+I massaged this slightly to explain what kvm_mmu_page_ad_need_write_protect()
+does at a high level, at least as far as this patch is concerned.
+
+    KVM: x86/mmu: Write-protect L2 SPTEs in TDP MMU when clearing dirty status
+    
+    Check kvm_mmu_page_ad_need_write_protect() when deciding whether to
+    write-protect or clear D-bits on TDP MMU SPTEs, so that the TDP MMU
+    accounts for any role-specific reasons for disabling D-bit dirty logging.
+    
+    Specifically, TDP MMU SPTEs must be write-protected when the TDP MMU is
+    being used to run an L2 (i.e. L1 has disabled EPT) and PML is enabled.
+    KVM always disables PML when running L2, even when L1 and L2 GPAs are in
+    the some domain, so failing to write-protect TDP MMU SPTEs will cause
+    writes made by L2 to not be reflected in the dirty log.
+ 
+> Reported-by: syzbot+900d58a45dcaab9e4821@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=900d58a45dcaab9e4821
+> Fixes: 5982a5392663 ("KVM: x86/mmu: Use kvm_ad_enabled() to determine if TDP MMU SPTEs need wrprot")
+> Cc: stable@vger.kernel.org
+> Cc: Vipin Sharma <vipinsh@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 21 ++++++++++++++++-----
+>  1 file changed, 16 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 6ae19b4ee5b1..c3c1a8f430ef 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1498,6 +1498,16 @@ void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
+>  	}
+>  }
+>  
+> +static bool tdp_mmu_need_write_protect(struct kvm_mmu_page *sp)
+> +{
+> +	/*
+> +	 * All TDP MMU shadow pages share the same role as their root, aside
+> +	 * from level, so it is valid to key off any shadow page to determine if
+> +	 * write protection is needed for an entire tree.
+> +	 */
+> +	return kvm_mmu_page_ad_need_write_protect(sp) || !kvm_ad_enabled();
+> +}
+> +
+>  /*
+>   * Clear the dirty status of all the SPTEs mapping GFNs in the memslot. If
+>   * AD bits are enabled, this will involve clearing the dirty bit on each SPTE.
+> @@ -1508,7 +1518,8 @@ void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
+>  static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>  			   gfn_t start, gfn_t end)
+>  {
+> -	u64 dbit = kvm_ad_enabled() ? shadow_dirty_mask : PT_WRITABLE_MASK;
+> +	const u64 dbit = tdp_mmu_need_write_protect(root)
+> +		? PT_WRITABLE_MASK : shadow_dirty_mask;
+
+I would much prefer to keep the '?' and the first clause on the previous line.
+Putting operators on a newline is frowned upon in general, and having the
+PT_WRITABLE_MASK on the same line as tdp_mmu_need_write_protect() makes it quite
+easy to understand the logic.
+
+>  	struct tdp_iter iter;
+>  	bool spte_set = false;
+>  
+> @@ -1523,7 +1534,7 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>  		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
+>  			continue;
+>  
+> -		KVM_MMU_WARN_ON(kvm_ad_enabled() &&
+> +		KVM_MMU_WARN_ON(dbit == shadow_dirty_mask &&
+>  				spte_ad_need_write_protect(iter.old_spte));
+>  
+>  		if (!(iter.old_spte & dbit))
+> @@ -1570,8 +1581,8 @@ bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
+>  static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+>  				  gfn_t gfn, unsigned long mask, bool wrprot)
+>  {
+> -	u64 dbit = (wrprot || !kvm_ad_enabled()) ? PT_WRITABLE_MASK :
+> -						   shadow_dirty_mask;
+> +	const u64 dbit = (wrprot || tdp_mmu_need_write_protect(root))
+> +		? PT_WRITABLE_MASK : shadow_dirty_mask;
+
+Same here.
+
+>  	struct tdp_iter iter;
+>  
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+> @@ -1583,7 +1594,7 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+>  		if (!mask)
+>  			break;
+>  
+> -		KVM_MMU_WARN_ON(kvm_ad_enabled() &&
+> +		KVM_MMU_WARN_ON(dbit == shadow_dirty_mask &&
+>  				spte_ad_need_write_protect(iter.old_spte));
+>  
+>  		if (iter.level > PG_LEVEL_4K ||
+> -- 
+> 2.44.0.291.gc1ea87d7ee-goog
+> 
 
