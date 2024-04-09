@@ -1,137 +1,247 @@
-Return-Path: <kvm+bounces-13973-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13974-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56B4F89D38B
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 09:47:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0745689D3B8
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 10:02:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50D3F1C21193
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 07:47:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6479A1F22E83
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 08:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EBC7D09D;
-	Tue,  9 Apr 2024 07:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86F47E105;
+	Tue,  9 Apr 2024 08:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfmOKUkf"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="bDvmIuLJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D91876413
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 07:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3DB7CF2B
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 08:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712648855; cv=none; b=QFXtGyj0qQ4OSNHA43yiwCjpOTnHpe5D+VL6q/92lKU9WZRuYgMGa4ldjBQ18JQ04ZHavOSaon2t13TZWs7Ui+V0AX8WcRsnhxKLa36tRKOamocJkzAC8Te7GXVaJJt/H5Cbze3A0vB7ktz46lH/aIIDJ4ZDKuRnERBmLOYWEFA=
+	t=1712649714; cv=none; b=uWd8BfcjLWDjH638yD14SUqDL6k9DhfbREG8nxcSysY6me2sWpeFY//gSO4WBRpQ7RUaTPSLL7B5MdcibP7GNZEh9XhRezHTdRugMk9zaMOjuC3Dy4Xh/hsedvT78jESZvJ+hgOiXHzKhDf6HOQa6ORhhWTGvh1Mm6mt5GQabzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712648855; c=relaxed/simple;
-	bh=y0Dwj2lXyabUf14cqARhCkVWYffRd/CkPwQh1Fi8qtk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=humwGfxF1mg4D+wKN9Bw3w59qYcAwfvnliCOiZLX2OZEO0PlycDlUUSgBocqwdLKkyWZXIYFr7swae35ijWhrs0qIDgWmGAfsvWjPJ1gGSeh1hZuPTzf5wrgoAO13ZbHlkYQ2Ii6WxyTy5UTTNSqBYiktJE0PT8vZ5da0s/zxAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PfmOKUkf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712648853;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P2vOMs/DIcveirHQQdM7XrMgLSklaYSgQkSBVonMYZA=;
-	b=PfmOKUkflCVyhIQqVzBggATw9aq/N7DLiCYHPFSH7fzSzmYjHTnPrY/YsmyJv1pT28Dv2Z
-	Dd2Un20Jc4ZiR83ykf4y8o26MAaLLH8CKiYrMNNhk/2ax77AMv1WawkEyfJkH5ly1rZzg0
-	zOHW4GDAYCBnrjGdhvqy2vZoROxtwFg=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-54-0pvtu5WWNtSE_UNZ7vG9fQ-1; Tue, 09 Apr 2024 03:47:31 -0400
-X-MC-Unique: 0pvtu5WWNtSE_UNZ7vG9fQ-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2a303938023so1400927a91.0
-        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 00:47:31 -0700 (PDT)
+	s=arc-20240116; t=1712649714; c=relaxed/simple;
+	bh=bMz8MjfIFsUyXV5WBM+KwspP/jmIVlkv1FepIQu2Qp4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZONJl7yn+FMyG6FZMq4/l/HDLLYxEgY51AKpd+tVcK87mc9mz/gFRx0/pn1PQaR7T71O2hvA0b1i+LTJNFDzgq3zMjVzfCQ5pip5fy1T8fGEha0Q6xkDbTiEPYJcP95bXblN1jA9Zi16hbDBdVHMJd5nPqjOXgv14iG/36YyKOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=bDvmIuLJ; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a4644bde1d4so729761166b.3
+        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 01:01:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1712649710; x=1713254510; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hCIVc0ToTPxKSHwFH39eeFiQ4Iaybjud05qpLdkE0so=;
+        b=bDvmIuLJoYJqpdDTSPlonpFWZ014QS2fVczgt/f+ynUjQb2JujJWKWF12nHXlha+3H
+         +zywUUlMWJ0TajJEgqBtUVF/t+zW5EWW5A2nOf8wmwsPZHnrmHYaq1K8/ACLGAqIDc71
+         blYJwT13++VKoz638Dp1c+9PUBEt/DbD3l/ziA/nFGyX9/UU857ifGmcMTJg52CzW9WL
+         R7PLZOBpEHMcWLXHynqP1d1uqMvNS37Fk8loTmXGwMKJHxUNq3M6yqpL7v4Oe4GodW9U
+         gGIcw+qmWANNzonmrTZPY4zZyk3H52XleZAkKfVOmthbobOBh/vzHuRl2tQQhG20Ohdx
+         7HVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712648850; x=1713253650;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P2vOMs/DIcveirHQQdM7XrMgLSklaYSgQkSBVonMYZA=;
-        b=qlJQGza5n6SgIi5m2mfEP33XsXY1sBJ8OXN5DHY6o0YRxv71sQXxnRViSkebc85gQh
-         ICFu1fb8KGZDz5PWwds+BGDg2SDpgp3zXgRZF2aCgC2UdtIoSqDc7HBbp7gA8eGnBcd7
-         FLciUUHhxC4RWjjoJvcU7iEKul3pMvNrJtTipQjjW/oMsRzFMWyucAh0SmB3TQuk2a6L
-         o7avf73cIsrdQh03LWIXvM1MnAW+OQAmBPaodZiPQu72nuqELlmztawoE9bDfnNFcYt1
-         ggAhaLqlWTclF69zngMMupGJgoI4cR3UUi6828mCmsEy84J+YbgnJDU18jog8znggEI0
-         Cc7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUr/QwYsh5kSeUFERT4VKxQfjrtr7dDuDkDqTP1pLy00ANBgDHw0px0lED2lbmYUEOIp+wH2W0APzOnNIMdvQqZT55a
-X-Gm-Message-State: AOJu0YyIfFzChU1iNa/Ht5Ll7j2egXQ+9GOwQxn0n2+t1TFksrmSFmyV
-	MGd88fJC4huYseFLOnDvcuhR1T/A67RKNqi+Ri7vvgf7rJ4vWumUr1iI926rV/EthmcIVeti2fD
-	zqKbQusBSdPZRinRf740ahcTDAzV8bvhrWblmyYqHDMT5grHh0+9lFaUIEsi5
-X-Received: by 2002:a17:90b:4b08:b0:2a5:223c:2975 with SMTP id lx8-20020a17090b4b0800b002a5223c2975mr4212088pjb.3.1712648850034;
-        Tue, 09 Apr 2024 00:47:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE7574SO9/7DyXNoUy3VNVQ5xzwm72Y2uh/pXo2iu7a0i1E2f+PwGW8tQKIF5+NHIQSryvhZQ==
-X-Received: by 2002:a17:90b:4b08:b0:2a5:223c:2975 with SMTP id lx8-20020a17090b4b0800b002a5223c2975mr4212074pjb.3.1712648849634;
-        Tue, 09 Apr 2024 00:47:29 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id fs22-20020a17090af29600b0029ddac03effsm9393320pjb.11.2024.04.09.00.47.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 00:47:29 -0700 (PDT)
-Message-ID: <47e0c03b-0a6f-4a58-8dd7-6f1b85bcf71c@redhat.com>
-Date: Tue, 9 Apr 2024 15:47:25 +0800
+        d=1e100.net; s=20230601; t=1712649710; x=1713254510;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hCIVc0ToTPxKSHwFH39eeFiQ4Iaybjud05qpLdkE0so=;
+        b=UPYtCGB1+dz4n8dLfmUNZ375bw16wxGTBWD4il0OwVQQHON0c35VxpyPe4TjaAKNeQ
+         JpepecZ9KW9COarzoMXFh0+fA53RqYay5wn9FW84YgO3L5J2fZtgsyxzwojnoJYqwZ8G
+         L5zBwI0kIwKxSxHm50Pimlw7oZkclaqzlYbm/A40rtuJrj7mqsGomNf3Crq3NidlkVVI
+         HT6xsYTdCbdu3kLACLtPClcR4Yc+G3uzaAtIhQPQRQzRSWC9L8kq5RywYhO5ysv2OqrB
+         XyX1y61Jb+CA0HEo4w/mnAKGV1x4dwgGkZ/bUovl/rKN3N7Ub2OYd3p/bkk2WZgnswNg
+         MUDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWhMvOxjjU1BGjH268DXHLzjWdjoTSAS3KCs/m0wk93o+rVgMGIj1M5+nCtdIn7bXYgi8ZKW55kyF5nVNILTqLOhsid
+X-Gm-Message-State: AOJu0YxJeoin+0UxSFKHmTKK2Chb19Ao7a0wAV7+a1Vp+lDgORb1IJWN
+	94u6twfyScyfzUs7vdjgIzLI5cg/qocRDpSKSZzN3zFjwcOx3g19W4bQvJz0/Xs=
+X-Google-Smtp-Source: AGHT+IG/T7uaqwe5y6oCGXamr2sprW/wjX+aVwR61ApsAhhRf7ZUfXSB3xs49ZIPwF/ZvGx/GUAiPw==
+X-Received: by 2002:a17:906:c454:b0:a4d:f5e6:2e34 with SMTP id ck20-20020a170906c45400b00a4df5e62e34mr6793646ejb.19.1712649710207;
+        Tue, 09 Apr 2024 01:01:50 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id xh13-20020a170906da8d00b00a51c0c0cb86sm3775778ejb.22.2024.04.09.01.01.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 01:01:49 -0700 (PDT)
+Date: Tue, 9 Apr 2024 10:01:48 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
+	Ajay Kaher <akaher@vmware.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Alexey Makhalov <amakhalov@vmware.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Will Deacon <will@kernel.org>, x86@kernel.org
+Subject: Re: [PATCH v5 20/22] KVM: riscv: selftests: Add SBI PMU selftest
+Message-ID: <20240409-dd055c3d08e027cf2a5cb4dc@orel>
+References: <20240403080452.1007601-1-atishp@rivosinc.com>
+ <20240403080452.1007601-21-atishp@rivosinc.com>
+ <20240405-d1a4cb9a441a05a9d2f8b1c8@orel>
+ <976411ab-6ddf-4b10-8e13-1575928415ce@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-To: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org
-Cc: Eric Auger <eauger@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20240409024940.180107-1-shahuang@redhat.com>
- <d1a76e23-e361-46a9-9baf-6ab51db5d7ba@redhat.com>
-Content-Language: en-US
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <d1a76e23-e361-46a9-9baf-6ab51db5d7ba@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <976411ab-6ddf-4b10-8e13-1575928415ce@rivosinc.com>
 
-Hi Thmoas,
-
-On 4/9/24 13:33, Thomas Huth wrote:
->> +        assert_has_feature(qts, "host", "kvm-pmu-filter");
+On Mon, Apr 08, 2024 at 05:37:19PM -0700, Atish Patra wrote:
+> On 4/5/24 05:50, Andrew Jones wrote:
+> > On Wed, Apr 03, 2024 at 01:04:49AM -0700, Atish Patra wrote:
+> > ...
+> > > +static void test_pmu_basic_sanity(void)
+> > > +{
+> > > +	long out_val = 0;
+> > > +	bool probe;
+> > > +	struct sbiret ret;
+> > > +	int num_counters = 0, i;
+> > > +	union sbi_pmu_ctr_info ctrinfo;
+> > > +
+> > > +	probe = guest_sbi_probe_extension(SBI_EXT_PMU, &out_val);
+> > > +	GUEST_ASSERT(probe && out_val == 1);
+> > > +
+> > > +	num_counters = get_num_counters();
+> > > +
+> > > +	for (i = 0; i < num_counters; i++) {
+> > > +		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_GET_INFO, i,
+> > > +				0, 0, 0, 0, 0);
+> > > +
+> > > +		/* There can be gaps in logical counter indicies*/
+> > > +		if (ret.error)
+> > > +			continue;
+> > > +		GUEST_ASSERT_NE(ret.value, 0);
+> > > +
+> > > +		ctrinfo.value = ret.value;
+> > > +
+> > > +		/**
+> > > +		 * Accesibillity check of hardware and read capability of firmware counters.
+> > 
+> > Accessibility
+> > 
 > 
-> So you assert here that the feature is available ...
+> Fixed it.
 > 
->>           assert_has_feature(qts, "host", "kvm-steal-time");
->>           assert_has_feature(qts, "host", "sve");
->>           resp = do_query_no_props(qts, "host");
->> +        kvm_supports_pmu_filter = resp_get_feature_str(resp, 
->> "kvm-pmu-filter");
->>           kvm_supports_steal_time = resp_get_feature(resp, 
->> "kvm-steal-time");
->>           kvm_supports_sve = resp_get_feature(resp, "sve");
->>           vls = resp_get_sve_vls(resp);
->>           qobject_unref(resp);
->> +        if (kvm_supports_pmu_filter) { >
-> ... why do you then need to check for its availability here again?
-> I either don't understand this part of the code, or you could drop the 
-> kvm_supports_pmu_filter variable and simply always execute the code below.
+> > > +		 * The spec doesn't mandate any initial value. No need to check any value.
+> > > +		 */
+> > > +		read_counter(i, ctrinfo);
+> > > +	}
+> > > +
+> > > +	GUEST_DONE();
+> > > +}
+> > > +
+> > > +static void run_vcpu(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct ucall uc;
+> > > +
+> > > +	vcpu_run(vcpu);
+> > > +	switch (get_ucall(vcpu, &uc)) {
+> > > +	case UCALL_ABORT:
+> > > +		REPORT_GUEST_ASSERT(uc);
+> > > +		break;
+> > > +	case UCALL_DONE:
+> > > +	case UCALL_SYNC:
+> > > +		break;
+> > > +	default:
+> > > +		TEST_FAIL("Unknown ucall %lu", uc.cmd);
+> > > +		break;
+> > > +	}
+> > > +}
+> > > +
+> > > +void test_vm_destroy(struct kvm_vm *vm)
+> > > +{
+> > > +	memset(ctrinfo_arr, 0, sizeof(union sbi_pmu_ctr_info) * RISCV_MAX_PMU_COUNTERS);
+> > > +	counter_mask_available = 0;
+> > > +	kvm_vm_free(vm);
+> > > +}
+> > > +
+> > > +static void test_vm_basic_test(void *guest_code)
+> > > +{
+> > > +	struct kvm_vm *vm;
+> > > +	struct kvm_vcpu *vcpu;
+> > > +
+> > > +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> > > +	__TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
+> > > +				   "SBI PMU not available, skipping test");
+> > > +	vm_init_vector_tables(vm);
+> > > +	/* Illegal instruction handler is required to verify read access without configuration */
+> > > +	vm_install_exception_handler(vm, EXC_INST_ILLEGAL, guest_illegal_exception_handler);
+> > 
+> > I still don't see where the "verify" part is. The handler doesn't record
+> > that it had to handle anything.
+> > 
+> 
+> The objective of the test is to ensure that we get an illegal instruction
+> without configuration.
 
-Thanks for your reviewing. I did so because all other feature like 
-"kvm-steal-time" check its availability again. I don't know the original 
-reason why they did that. I just followed it.
+This part I guessed.
 
-Do you think we should delete all the checking?
+> The presence of the registered exception handler is
+> sufficient for that.
+
+This part I disagree with. The handler may not be necessary and not run if
+we don't get the ILL. Usually when I write tests like these I set a
+boolean in the handler and check it after the instruction which should
+have sent us there to make sure we did indeed go there.
+
+> 
+> The verify part is that the test doesn't end up in a illegal instruction
+> exception when you try to access a counter without configuring.
+> 
+> Let me know if you think we should more verbose comment to explain the
+> scenario.
+> 
+
+With a boolean the test code will be mostly self documenting, but a short
+comment saying why we expect the boolean to be set would be good too.
 
 Thanks,
-Shaoqin
+drew
 
 > 
->   Thomas
+> > > +
+> > > +	vcpu_init_vector_tables(vcpu);
+> > > +	run_vcpu(vcpu);
+> > > +
+> > > +	test_vm_destroy(vm);
+> > > +}
+> > > +
+> > > +static void test_vm_events_test(void *guest_code)
+> > > +{
+> > > +	struct kvm_vm *vm = NULL;
+> > > +	struct kvm_vcpu *vcpu = NULL;
+> > > +
+> > > +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> > > +	__TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
+> > > +				   "SBI PMU not available, skipping test");
+> > > +	run_vcpu(vcpu);
+> > > +
+> > > +	test_vm_destroy(vm);
+> > > +}
+> > > +
+> > > +int main(void)
+> > > +{
+> > > +	test_vm_basic_test(test_pmu_basic_sanity);
+> > > +	pr_info("SBI PMU basic test : PASS\n");
+> > > +
+> > > +	test_vm_events_test(test_pmu_events);
+> > > +	pr_info("SBI PMU event verification test : PASS\n");
+> > > +
+> > > +	return 0;
+> > > +}
+> > > -- 
+> > > 2.34.1
+> > > 
+> > 
+> > Thanks,
+> > drew
 > 
-
--- 
-Shaoqin
-
 
