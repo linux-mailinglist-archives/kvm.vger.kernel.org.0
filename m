@@ -1,149 +1,172 @@
-Return-Path: <kvm+bounces-14008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4726689E189
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 19:28:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6337A89E1E5
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 19:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7855F1C22EF0
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 17:28:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90F601C21A48
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 17:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F18A15625F;
-	Tue,  9 Apr 2024 17:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FA515699A;
+	Tue,  9 Apr 2024 17:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="E+vy51t5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1JU6vVC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF76C15624A
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 17:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A27156862;
+	Tue,  9 Apr 2024 17:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712683691; cv=none; b=D6mG4Yps5g+eOhCL/y01oe4HMQ/XxSatACYv3uzBrh5sxy0iKOxBQiT6RIBDyVH2uOqAXOxzZ6sWrVmzF/+0eJA+PpOIBDMEn7W4psvdxMORYiOOIobYphv4HR2jYrXkDoVzRVrbwwzbnrU4vXmZJ2GErAge/RbMXBPjZDtImJg=
+	t=1712685322; cv=none; b=FHwQE0Y/mAV2UYRmCgCxsuSKYtqE10FEkolDDwXcVmWR0o5gN4kBKMmRyKfkjt38wAXSHFz2MofL1KD+qADtaEyJ2D3t0lKXQKjI00NSFR0hYGJ0TElVgoCg5ef+MBoNFdbZieUpsZJ8R4RFS/pEV7QPRFk9J4wWLhhIqtDOYik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712683691; c=relaxed/simple;
-	bh=TPhpU6GJEU734JPKrGvqBheDD6F81x0OYRJ4s8MuK+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iRb4tPTuaZ6QcElMWD9XH5LK9C/zrDv5JOMNWZwuwLab4S/hvzia70LAaBTYOKraiY3sU9sliPcX7lhSFDmQlIdQYpiSrmJ+hkgbhzKru3P9S+A4uC3SXr3U/BwzGUKw/ct3rYCYI28yePdTzUKr7rUcZKSHP8dTQkMS0iqTzPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=E+vy51t5; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7cc5e664d52so95236039f.0
-        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 10:28:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1712683688; x=1713288488; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bzDpECgxcv/gVK2Eh47txfcjeUm+DcSXrEiDNVslfT0=;
-        b=E+vy51t5hbFKtlPfWz63OAwISfam8JoJQJPF3AsULQlTZX/HvoniDiNyRzbxSMrbZ4
-         mk0VY5pVQ9SrzbabNxxJkimfIKhLT06ENVXFV0HjjURiYtwsvqJdGLxrKYQsqSYYXRWB
-         TAbhQeAzpAwOREQqlwbspbUY82B4xrV390hiU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712683688; x=1713288488;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bzDpECgxcv/gVK2Eh47txfcjeUm+DcSXrEiDNVslfT0=;
-        b=C0ZuqSb27Yryoj0342cqw+yDghuNUuiWwil8LLF7hZ3ov42pD1E0PVbJSf8JM7p7o9
-         Q4z2XUGYtQrPGsJH4/QpJgxEzpyXldzIeDXGgriVeF2Zui6Y8cBkBxMIF75E66pmJpl/
-         mEfJGDzqQm/o7k9z9bXkv0knPfopT958Ucj9jJGrR4mKdfTiRLJ1WMhLU8nT6AloSCTI
-         D1HeEh0iVdi2PrRR8zqdXAqeteOCJqrEioHRpqpjS3UVCMDIy72Dj3vrt+jQRT6Bjnp2
-         P5Fy/Wv2+i9hYDL2W/aCU2caGJX3sMH0xiUp4nXte1s4pulsUT0tsT5XkxpXnPphGVGx
-         MdbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqKCPvC9ZlS/s9wV7ktEmwHD6viU5UGjnS0tCgwQ+Q9jP5zQJvcEBS4w76v8lxffKEiS3XNNiKbRsD232bG0BCcRA1
-X-Gm-Message-State: AOJu0YzqtGOzGGxQSbpoXlMZ+AXvKDyha3AaI3r0864ScbAc5Sv22ME8
-	S8SkUMkqcQCcFyPI9q2DMWAMEvPLJ40XrM7+5YJbD3nehYxkc2eCIm49u5Vt6gI=
-X-Google-Smtp-Source: AGHT+IFk5z8PoAK3T9resPRUq+Mhgn4hfhcghzxIpzPidDvzpWozapI9Iaz2Vi75WE2H0KeSIVTCNQ==
-X-Received: by 2002:a05:6602:3b98:b0:7d5:de5b:1ac2 with SMTP id dm24-20020a0566023b9800b007d5de5b1ac2mr468468iob.2.1712683688027;
-        Tue, 09 Apr 2024 10:28:08 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id cn23-20020a0566383a1700b00482b4a8f07esm35302jab.61.2024.04.09.10.28.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 10:28:07 -0700 (PDT)
-Message-ID: <5a04e40c-daba-4a1d-b5db-f70d2e51c403@linuxfoundation.org>
-Date: Tue, 9 Apr 2024 11:28:06 -0600
+	s=arc-20240116; t=1712685322; c=relaxed/simple;
+	bh=HiPI0zICqTXskNQRPdZZg9jSvoMGVkNmobN4r2vLjJw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XEex++lF9gu/YP8T/hH3tM8SDdFCPOKGB1aiAMaZdD2Agnb3N7fpx73LjCcXdGpcDkxbK5aeMMswxtxHNn3bhk0GK2QdjB6EpFMdA8VgVAoULsQ2VBNS4ZY4fYf4MJ1DtI0/goXBP/77K1o2oJDrpfuz5D5MIY5EJG6RjRkd+Dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1JU6vVC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5364C433C7;
+	Tue,  9 Apr 2024 17:55:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712685321;
+	bh=HiPI0zICqTXskNQRPdZZg9jSvoMGVkNmobN4r2vLjJw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=i1JU6vVCXTHZJxhU6f7rwfipguTAL21syy3MQ4uE3nxO4/AEp4TCgsoUPu//WCaBP
+	 UIl3cDqJ2bQtxG3U1cjh9Y9urK9h0UcTaWiMR0uxlzRcA3W/+yCY0Ks9jssgAJxhPO
+	 Ty63HVnABzUIgUykkgVsJV7+1Ayc0msfekwRfaq78kBfG7evSrMnulk1O/ixb26B6q
+	 tfGeqCFNVEm45XNcCDbmBm1aoWN8zau6vzSkDZJYVkKOEUZe0a77knQFcd2PnR0asB
+	 pfn2HgdtoB41QLNjgz/nL6sOhYArqr4LK8Vy88b763ev3gONGHEdn7/LKjFLN9nkBS
+	 yKCZbs5lv6roA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ruFgl-002szC-LF;
+	Tue, 09 Apr 2024 18:55:19 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH 00/16] KVM: arm64: nv: Shadow stage-2 page table handling
+Date: Tue,  9 Apr 2024 18:54:32 +0100
+Message-Id: <20240409175448.3507472-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 RESEND 0/7] Handle faults in KUnit tests
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- Brendan Higgins <brendanhiggins@google.com>, David Gow
- <davidgow@google.com>, Rae Moar <rmoar@google.com>
-Cc: Alan Maguire <alan.maguire@oracle.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- "Eric W . Biederman" <ebiederm@xmission.com>, "H . Peter Anvin"
- <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
- James Morris <jamorris@linux.microsoft.com>,
- Kees Cook <keescook@chromium.org>, Luis Chamberlain <mcgrof@kernel.org>,
- "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
- Marco Pagani <marpagan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Stephen Boyd <sboyd@kernel.org>,
- Thara Gopinath <tgopinath@microsoft.com>,
- Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov
- <vkuznets@redhat.com>, Zahra Tarkhani <ztarkhani@microsoft.com>,
- kunit-dev@googlegroups.com, kvm@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-um@lists.infradead.org,
- x86@kernel.org, Shuah Khan <skhan@linuxfoundation.org>
-References: <20240408074625.65017-1-mic@digikod.net>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240408074625.65017-1-mic@digikod.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 4/8/24 01:46, Mickaël Salaün wrote:
-> Hi,
-> 
-> This patch series teaches KUnit to handle kthread faults as errors, and
-> it brings a few related fixes and improvements.
-> 
-> Shuah, everything should be OK now, could you please merge this series?
-> 
-> All these tests pass (on top of v6.8):
-> ./tools/testing/kunit/kunit.py run --alltests
-> ./tools/testing/kunit/kunit.py run --alltests --arch x86_64
-> ./tools/testing/kunit/kunit.py run --alltests --arch arm64 \
->    --cross_compile=aarch64-linux-gnu-
-> 
-> I also built and ran KUnit tests as a kernel module.
-> 
-> A new test case check NULL pointer dereference, which wasn't possible
-> before.
-> 
-> This is useful to test current kernel self-protection mechanisms or
-> future ones such as Heki: https://github.com/heki-linux
-> 
-> Previous versions:
-> v3: https://lore.kernel.org/r/20240319104857.70783-1-mic@digikod.net
-> v2: https://lore.kernel.org/r/20240301194037.532117-1-mic@digikod.net
-> v1: https://lore.kernel.org/r/20240229170409.365386-1-mic@digikod.net
-> 
-> Regards,
-> 
-> Mickaël Salaün (7):
->    kunit: Handle thread creation error
->    kunit: Fix kthread reference
->    kunit: Fix timeout message
->    kunit: Handle test faults
->    kunit: Fix KUNIT_SUCCESS() calls in iov_iter tests
->    kunit: Print last test location on fault
->    kunit: Add tests for fault
-> 
+Here's another instalment of everyone's favourite "arm64 nested virt,
+one headache at a time". This time, we deal with the shadowing of the
+guest's S2 page tables.
 
-Thank you for the resend. Applied to linux-kselftest kunit branch
-for Linux 6.10-rc1.
+So here's the 10000m (approximately 30000ft for those of you stuck
+with the wrong units) view of what this is doing:
 
-thanks,
--- Shuah
+- for each {VMID,VTTBR,VTCR} tuple the guest uses, we use a separate
+  shadow s2_mmu context. This context has its own "real" VMID and a
+  set of page tables that are the combination of the guest's S2 and
+  the host S2, built dynamically one fault at a time.
+
+- these shadow S2 contexts are ephemeral, and behave exactly as
+  TLBs. For all intent and purposes, they *are* TLBs, and we discard
+  them pretty often.
+
+- TLB invalidation takes three possible paths:
+
+  * either this is an EL2 S1 invalidation, and we directly emulate it
+    as early as possible
+
+  * or this is an EL1 S1 invalidation, and we need to apply it to the
+    shadow S2s (plural!) that match the VMID set by the L1 guest
+
+  * or finally, this is affecting S2, and we need to teardown the
+    corresponding part of the shadow S2s, which invalidates the TLBs
+
+From a quality of implementation, this series does the absolute
+minimum. In a lot of cases, we blow away all the shadow S2s without
+any discrimination. That's because we don't have a reverse mapping
+yet, so if something gets unmapped from the canonical S2 through a MMU
+notifier, things slow down significantly. At this stage, nobody should
+care.
+
+We also make some implementation choices:
+
+- no overhead for non-NV guests -- this is our #1 requirement
+
+- all the TLBIs are implemented as Inner-Shareable, no matter what the
+  guest says
+
+- we don't try to optimise for leaf invalidation at S2
+
+- we use a TTL-like mechanism to limit the over-invalidation when no
+  TTL is provided, but this is only a best effort process
+
+- range invalidation is supported
+
+- NXS operations are supported as well, and implemented as XS. Nobody
+  cares about them anyway
+
+Note that some of the patches used to carry review tags, but the
+series has had so many changes that they are not making sense anymore.
+This is based on 6.9-rc3, and has been tested on my usual M2 with the
+rest of the NV series.
+
+Christoffer Dall (2):
+  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+
+Marc Zyngier (14):
+  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+  KVM: arm64: nv: Handle shadow stage 2 page faults
+  KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+  KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+  KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+  KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+  KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+  KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+  KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+  KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+    information
+  KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+  KVM: arm64: nv: Add handling of range-based TLBI operations
+  KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
+
+ arch/arm64/include/asm/esr.h         |   1 +
+ arch/arm64/include/asm/kvm_asm.h     |   2 +
+ arch/arm64/include/asm/kvm_emulate.h |   1 +
+ arch/arm64/include/asm/kvm_host.h    |  41 ++
+ arch/arm64/include/asm/kvm_mmu.h     |  12 +
+ arch/arm64/include/asm/kvm_nested.h  | 127 +++++
+ arch/arm64/include/asm/sysreg.h      |  17 +
+ arch/arm64/kvm/arm.c                 |  11 +
+ arch/arm64/kvm/hyp/vhe/switch.c      |  51 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c         | 147 +++++
+ arch/arm64/kvm/mmu.c                 | 219 ++++++--
+ arch/arm64/kvm/nested.c              | 767 ++++++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c               |   6 +
+ arch/arm64/kvm/sys_regs.c            | 398 ++++++++++++++
+ 14 files changed, 1759 insertions(+), 41 deletions(-)
+
+-- 
+2.39.2
 
 
