@@ -1,128 +1,138 @@
-Return-Path: <kvm+bounces-14000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14001-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8989689DF13
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 17:30:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B90E989E024
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 18:15:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAF0A1C221AD
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 15:30:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0C85B2A313
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 15:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B5C13D636;
-	Tue,  9 Apr 2024 15:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D0413D539;
+	Tue,  9 Apr 2024 15:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CueSECOF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RcO6XzOb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF5F13D601
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 15:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF0813BC15;
+	Tue,  9 Apr 2024 15:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712676392; cv=none; b=gf8BjvIIXCBiCckN9NyD5RF9wv0lQbjoe0li5qO67Mp+AoM3gP4qPCXHSnghkLgLJJB18oQhmYP5xmTpeHW34ByrrO79fzXYJc6YU/xbaaTvw4iVgda/qtDQuCnH7rPWEpByegPbT/Qg4dRezHW+u/HuwNpI/8xeubscmEPIdiU=
+	t=1712677750; cv=none; b=goO/yAekyvvzxosmxyDYWj+DT9o57vVHFklVvec5kvr+T73zZXCirJLEJQw+LhGMXWIibJVlJrKsffcHAjo5IAGTVD/XnIcU2g2Te7+GMnJbtwzMTRnvfeYGW62OaV9nh23tnW88esH5Jy/oYOxv6Jx1r7t31dNh4buJub+XVF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712676392; c=relaxed/simple;
-	bh=7AkwAkiGFeXn/tzNgwfDv+w516qHyDpPTUwTkeRV5D0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=A0n2lILQd78BgMfNO4wevfbS7/KLiPUr2RJiKH5xbfluLPjeregFYJQIdSsXnb+8+9vPMBkohS/4Yf64BgwoMr97mPSGgA3sOnXkH3YMQzt1sWUHTM3CJT7KP1eQk4Jp+Rtvf8YbB25ch3Yxi8y68iyNPrOmSJdGEmgZ6tfJsO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CueSECOF; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6180514a5ffso22776007b3.0
-        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 08:26:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712676390; x=1713281190; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L6zxjwXhkVdMVC69wPNMLfHGLf1mnpEnNlg9mNA1BZg=;
-        b=CueSECOFYYF7LRtpdB09YssCkGviporTFhY3RfbGoSFLLQ6re0HbeQ1mbdGKIN1/Dm
-         ei1354ZFavr1myENW5RJYIaXhMF9rpTM84Ekban/rfQoTycGFbavjIMBRklOMvFL6cNT
-         aPGGP3vYkfelbF+QgGN7HCqeBniQ+WMPKXSbBotHhUkaU/CWx0AZy4Q63wD1yQWd5x//
-         VedxBWd+n1zj/tzYS9spzk1FMRrxat4nu3Ls+5Eh1wH9fFZrhgkSpakC3mzp0fLm4rZW
-         rhdFzUrPQrhplLFY27nuJBjOnWJ09Y0agflKsSZD87e/LqFeiTSTvuJ43Dg2jvXMgKUT
-         bzgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712676390; x=1713281190;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=L6zxjwXhkVdMVC69wPNMLfHGLf1mnpEnNlg9mNA1BZg=;
-        b=HB1yE1J8s7ok2Jz0eSh9UF9hJV1aC1n5iAeyrjR1fTCjFViHOHlNCfAU/1y0TGzNJZ
-         Qs6Dt/J5zdRj487us83xUtWD9Vpm3IWeis8Q6M0HXQR9S9adbT8hMVMRmNYdhpDH8vN9
-         IjefTzrG9zMy+ADfxLGzPXYa0TuHVNZxa72vDawE2ieQ17vAB8tdqtKR935FfOIuKAxk
-         C4mSZcX0HG75PuOCeusJUnUaAHvVwhoWicjY/JNWvoE1gIZo/IyVlIIysht/eQ77miJp
-         Ved0heij4jEEtBS8K5eX7H5x0Tc3wficWWMCaiV0h2RbSVFUlI3LhrJqYY3QQyB0sLza
-         oLIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWR0Lnhkoo0aLnu0rcGjYUhs4zUfimnBsjQ9kQNL1mFE9CWbmj/1LK2RzOhgZk7IAJxYqgaNjILtbVrXIm3caIONzH2
-X-Gm-Message-State: AOJu0Yw4AlItm5WdrUti5MOtgEsh1VQY1X+R9m+yNWM3Dl7Q4jr+DYrf
-	Gu8z1dPUPJcpzBYFxQK2v8L1qEGMvrCBXMx4KJunrJmdtpNtcd1DHwRDsDeziK/KA+Is4r9g7Tu
-	wyQ==
-X-Google-Smtp-Source: AGHT+IHgEVlNGyzPHVr+TYaNurRXSfMtqIJogxKzXj5vEBHwyHEd0/3MyNjcj/APy5cCPp4QIthaKpor6z4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:c74d:0:b0:615:1c63:417e with SMTP id
- i13-20020a81c74d000000b006151c63417emr716361ywl.1.1712676390070; Tue, 09 Apr
- 2024 08:26:30 -0700 (PDT)
-Date: Tue, 9 Apr 2024 08:26:28 -0700
-In-Reply-To: <CABgObfZAJ50Z30VzFLdSrQFOEaPxpyFWuvVr1iGogjhs2_+bGA@mail.gmail.com>
+	s=arc-20240116; t=1712677750; c=relaxed/simple;
+	bh=ggaHHuc2VG2fdrOMhbw4XnILVWpXV0g7RGQkl6nlwv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fg8KCiQOHu6XOC9CzZ/EOHhYBKwxVIChmoGUCC6nwagQ47Zt9KaMVf8dClCYFvZaYM3ombE2I9elTKFdOSiHAVDvpu5JaJ4txgZcNhnTV3r85ocofFmcfPmtx1JMh8CmsL29tyLLAIDH7FfxPcg7opYDHJQ4f9rM3+Opjtuu/+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RcO6XzOb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05969C43390;
+	Tue,  9 Apr 2024 15:49:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712677749;
+	bh=ggaHHuc2VG2fdrOMhbw4XnILVWpXV0g7RGQkl6nlwv8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RcO6XzObc7wlgdxiDjy0f1wHeJ/xg90oJK1uvGdSoHGMh1uDr+/iRiQu11+OQMo4Q
+	 sJVbfuMNUvyKdBlNhz0pFzDcPRsQRWgwCjoiC/5WC7ktrR5xGmTyH39axjMlKIWkBD
+	 RoLLn6NtCxA4/EgdcW6ce1XZyV64uZgdpUFUW5KT4yIDRy/h0SnWdTjZN1/YZFglOO
+	 ooFFV5hsQsFBynSxN5lYVTvFdQ1mYVB83rs42o/PTOwBdmwgjqH2N5lULzJiY8kv4y
+	 PxoUnyv4L2D20qsLEHGbCn7fuFr44N1ZRwCjJc7e8WTO9o2xRMPJtm8/y77fjEyP7o
+	 W4c1mQgm9bWnA==
+Date: Tue, 9 Apr 2024 16:49:02 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Conor Dooley <conor.dooley@microchip.com>, Max Hsu <max.hsu@sifive.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Palmer Dabbelt <palmer@sifive.com>, linux-riscv@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC 02/11] dt-bindings: riscv: Add Sdtrig optional CSRs
+ existence on DT
+Message-ID: <20240409-princess-hypnotic-7fd89aafa31d@spud>
+References: <20240329-dev-maxh-lin-452-6-9-v1-0-1534f93b94a7@sifive.com>
+ <20240329-dev-maxh-lin-452-6-9-v1-2-1534f93b94a7@sifive.com>
+ <20240329-affidavit-anatomist-1118a12c3e60@wendy>
+ <20240405-ebdb2943657ab08d2d563c03@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240404121327.3107131-1-pbonzini@redhat.com> <20240404121327.3107131-8-pbonzini@redhat.com>
- <43d1ade0461868016165e964e2bc97f280aee9d4.camel@intel.com>
- <ZhSYEVCHqSOpVKMh@google.com> <CABgObfZAJ50Z30VzFLdSrQFOEaPxpyFWuvVr1iGogjhs2_+bGA@mail.gmail.com>
-Message-ID: <ZhVeJH0DPL89Dg97@google.com>
-Subject: Re: [PATCH v5 07/17] KVM: x86: add fields to struct kvm_arch for CoCo features
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="S3RasL52JpCL7Ifu"
+Content-Disposition: inline
+In-Reply-To: <20240405-ebdb2943657ab08d2d563c03@orel>
+
+
+--S3RasL52JpCL7Ifu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 09, 2024, Paolo Bonzini wrote:
-> On Tue, Apr 9, 2024 at 3:21=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
-> > > I'm a little late to this conversation, so hopefully not just complic=
-ating
-> > > things. But why not deduce has_private_mem and has_protected_state fr=
-om the
-> > > vm_type during runtime? Like if kvm.arch.vm_type was instead a bit ma=
-sk with
-> > > the bit position of the KVM_X86_*_VM set, kvm_arch_has_private_mem() =
-could
-> > > bitwise-and with a compile time mask of vm_types that have primate me=
-mory.
-> > > This also prevents it from ever transitioning through non-nonsensical=
- states
-> > > like vm_type =3D=3D KVM_X86_TDX_VM, but !has_private_memory, so would=
- be a little
-> > > more robust.
-> >
-> > LOL, time is a circle, or something like that.  Paolo actually did this=
- in v2[*],
-> > and I objected, vociferously.
+On Fri, Apr 05, 2024 at 05:59:41PM +0200, Andrew Jones wrote:
+> On Fri, Mar 29, 2024 at 10:31:10AM +0000, Conor Dooley wrote:
+> > On Fri, Mar 29, 2024 at 05:26:18PM +0800, Max Hsu wrote:
+> > > The mcontext/hcontext/scontext CSRs are optional in the Sdtrig extens=
+ion,
+> > > to prevent RW operations to the missing CSRs, which will cause
+> > > illegal instructions.
+> > >=20
+> > > As a solution, we have proposed the dt format for these CSRs.
+> >=20
+> > As I mentioned in your other patch, I amn't sure what the actual value
+> > is in being told about "sdtrig" itself if so many of the CSRs are
+> > optional. I think we should define pseudo extensions that represent
+> > usable subsets that are allowed by riscv,isa-extensions, such as
+> > those you describe here: sdtrig + mcontext, sdtrig + scontext and
+> > sdtrig + hcontext. Probably also for strig + mscontext. What
+> > additional value does having a debug child node give us that makes
+> > it worth having over something like the above?
 >=20
-> To be fair, Rick is asking for something much less hideous - just set
+> Yeah, Sdtrig, which doesn't tell you what you get, isn't nice at all.
+> I wonder if we can start with requiring Sdtrig to be accompanied by
+> Ssstrict in order to enable the context CSRs, i.e.
 >=20
->  kvm->arch.vm_type =3D (1 << vm_type);
+>  Sdtrig          - support without optional CSRs
+>  Sdtrig+Ssstrict - probe for optional CSRs, support what's found
 >=20
-> and then define kvm_has_*(kvm) as !!(kvm->arch.vm_type & SOME_BIT_MASK).
->=20
-> And indeed it makes sense as an alternative.
+> If there are platforms with Sdtrig and optional CSRs, but not Ssstrict,
+> then maybe the optional CSRs can be detected in some vendor-specific way,
+> where the decision as to whether or not that vendor-specific way is
+> acceptable is handled case-by-case.
 
-Ah, yeah, I'd be fine with that.=20
+I think it's pretty reasonable to make sstrict a requirement for the
+kernel's use of sdtrig. If we have some non-sstrict systems that do
+implement these particular CSRs, then I guess we can add some psuedo
+instructions then (and nothing would stop the sstrict systems also
+specifying directly). If they're using some non-standard CSRs then
+case-by-case I guess.
 
-> It also feels a little bit more restrictive and the benefit is small, so =
-I
-> think I'm going to go with this version.
+I'm just specifically not keen on adding extra dt properties that do
+things we can already do with the ones we have!
 
-+1
+--S3RasL52JpCL7Ifu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZhVjbgAKCRB4tDGHoIJi
+0uhaAQDa5o/BPeXShwDCWbzLtGoQJW9RQEEKp0v/Px0VcnBn/wEAtxi0+ePlahyg
+iuqh+k0zlBfw0fgjAmUxXyvYlSonvAc=
+=bIMw
+-----END PGP SIGNATURE-----
+
+--S3RasL52JpCL7Ifu--
 
