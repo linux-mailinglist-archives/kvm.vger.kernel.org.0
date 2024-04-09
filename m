@@ -1,104 +1,107 @@
-Return-Path: <kvm+bounces-13949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4565089D028
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 04:02:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 522B589D02A
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 04:02:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4031282CA8
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 02:02:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45A891C2134D
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 02:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84A551C5A;
-	Tue,  9 Apr 2024 02:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9665466E;
+	Tue,  9 Apr 2024 02:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n1yyYNVV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o7zPDv37"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BD951036
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 02:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9446553E37
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 02:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712628115; cv=none; b=IJn6MX3rJl3EIETOirBf+Xo0kHXBekdRCUj19XSwCh7Y1eb1e498FcXfgPmcpN83ZAWKVXlH2+81JUMxN1EwJbDFtX+zTDrwPZOrsU8IqTCmYV3e1cz4bor5ZtHGxXWaGGOBqrUQMaY+ovuke/ICxoLmUXX1fcaRU4IKKTS/wDA=
+	t=1712628132; cv=none; b=oik9rE2/avQO2NJJVkKOa0PB1ZnJE0lZw6SN1wtMppvy79Zoc92S3D/dUSskCDY8x2tHZwtTCkpg+Sm8hefoBkRLAQnpWBQijk5dYbjSf8iMV7duZKve9dS+R9dySmpceK352ZWcPO4W1PI+AVUGL4c2KLdQFlBzpUXbuyoZh6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712628115; c=relaxed/simple;
-	bh=Idd1OGdzEkMkRZJRWImpyOGXFz5IB4BbPtSiNGNyeHQ=;
+	s=arc-20240116; t=1712628132; c=relaxed/simple;
+	bh=jI+s4ADLS0AUp2OuvikaP10RD+xAePIr1NB6aWES2II=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FunGx4Fem0v1WV1qrDSo9tDnZboakUAj9iivquCGzs/xa96qrlO3LbPz6AV+dg7N2WHxwX9S9AvoYy5lc/Wa43RjwABHdBtf+3Okc0KgR6+d9iL4VzXpsJrxxJW9Iok3zl5NwFtm6QH1ehDdnvHux3SbJjn5oi45aiuzUSV2gME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n1yyYNVV; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=loPOaiv71IvFaTuxO6C92cdEpejqkncISSCgldEPHMmx6vRJVbz+gNnzCjF4taS0UlSXRih6mmD/GYESTrDc5RsehdzHDsS8Y/vHRTiWtoke7GF4GCRIVfEwaDcTdtuUkJ/pDgrET8BF0vjK4EDs2XXQy0YghF0ZJOVAfnvNSOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o7zPDv37; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61506d6d667so87916747b3.1
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 19:01:54 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6180514a5ffso17045977b3.0
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 19:02:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712628113; x=1713232913; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712628128; x=1713232928; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2FWHqdez77NfnwFdv1MlKZWeYLKe/YUQINtEFCpbrlo=;
-        b=n1yyYNVVdudZ9KtPOJO00SGJdhG39Svc8MUHVGzo/DtVZ0Ib3e++4091LnjRnAwWLS
-         DiLmr0NGV/43YfzD9b8UaE9oJ8CEDONDFwWNk0x93gJwSfjNLv/WKuFhVnAQ5G4wq1Xe
-         YFvm7c2JkHhdZCVskiIPwa5V84mj7NPc1Pd1AbIBjv3ZSwkoWk+9jnJ3SEoqGJuvbDgX
-         A7Ruo5XKsG1sxavpWE+bNsrWeYSfhKVbn/v0708WFCA+hRsitk257fogBLMXcQwlllC4
-         hB/SFlH69Tq7fbuIrO8y09LfpxdB11+YpDfSs/h1zTe0V7vinMZOglr0WLQjNOkngcEg
-         708g==
+        bh=I/9Qg7KGNzFHHNKyCZNdrvRxR6/vuhSy2raPKaP9KdQ=;
+        b=o7zPDv37XnfjaFI22DXRMSGIqvsuAFE8ySW9vMA7ciOLro0n/inKeP7nzJ0HYXQlD5
+         kRpdRuUapEvjLvc5TTeAteUb1VZs/R2faRsYQvBmdY+cyZt/mcnzhFY4lDCUvKuxaQDj
+         Of0plm7BDVfo7+ToDcYGefyHuwcHH8QM9eqxaqAz2RYsdP+FSTCj6SOw5iNc/27V5s/Y
+         AEf2O8b1x2LX1xJ2QSEHR1FGwfBj8A1x6U8rRJ/KTkgzQlv2SpybajnV9Wbo8SfIX9An
+         GzZaZpVN8+VIZE/T3jTlcDs+KkxNrfPoNyjYU+A619ZxE2Ccqm4tTqf72zB/aNccEnA7
+         lJgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712628113; x=1713232913;
+        d=1e100.net; s=20230601; t=1712628128; x=1713232928;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2FWHqdez77NfnwFdv1MlKZWeYLKe/YUQINtEFCpbrlo=;
-        b=DaHPyl85egMXjVX0U1Dl6uO2JvdQVju/Co8O7/PS37OWG4kxklAi2pMVbA1yqn5K9N
-         ujUE1l5dIE0lG/u23xUwGTV8AFpJOTIFRuqj1SWlraYf1UCi3kCgj6v+IjjgcqZnPvUj
-         ZNfJJHmFlRSrYTbHCmoKLASlku73fSXYb1b/m1LvBsYLWhmJ2OHj8Y54/ELTxidPIrRx
-         xraxHXoloa6yQPp5zR+jw5Ejv5UlCjR3YGGPyMR74Z0SqPUi2Kd0fiVYcM8k23OPuaG+
-         Ks15cXQVl98ljEGIK71/x4L62ce3BAHUndNhvkQHkDOTrgfnLlXnhpnOEIOxL5Rz3x+K
-         m6fA==
-X-Gm-Message-State: AOJu0Yz8DRnwoLKMfI/9gCjKf0sl/PJSwNdQLUNHSl+xbehSRU8CPUES
-	F9ab1dVqe647lf1eXuk0iAyb8XHQfWJemXJEjhoByChCkz4mWlLn9QQV5Fm5zlruCDMlqZX1Yuf
-	N5g==
-X-Google-Smtp-Source: AGHT+IHvN10zX5HDwpDTrA4Ys3GezE7nVjPrebT42ZNWDZUsBcoJgafbRr1uHe9OjYnu9Hus3bcaV0c+pGY=
+        bh=I/9Qg7KGNzFHHNKyCZNdrvRxR6/vuhSy2raPKaP9KdQ=;
+        b=ma2MZyKPRaIF7XflWOaSDsZFHHkia7JNbRx8EZxpOE8cuGYtYACzpo5/K7nsZ3FRhS
+         erM3K9TLyt6zJqA1Zz/e6Ls0lWyc0GCaoFZ4RRXCY+kEqZMQpsRbmU67/zjwkA0Zd9cJ
+         vBSjXkNbBidnEmIQkDu1LqobcfPudCvpjn5Fdvr/fBK9nEc8QwRVZlCSvhBT8dpv/JRg
+         qhZnwbjkjXWwwbRVJYYVZlpyBA9osL8JviuVDc2UcuFJW7uKqdQLH+vzaJ8GfLHeQClq
+         fLY77MRXSHYY98SVBHddziaEY/AITLVKIrH7na0sShHNgf6DWGECJzkE2J+b3AweKl1P
+         cXjQ==
+X-Gm-Message-State: AOJu0YzMEAyvruYLsWCKT0nyDgYR15m+qzaB+t3+Mdm+oHEHcA73bQNL
+	hn9F/UlLNJNnaw0yOc6lmPHFh9rMHFkSocMZ0ey1NSe7GmGaT/EWuW/NrhPxjgHQW1t3EmYfEU3
+	Uug==
+X-Google-Smtp-Source: AGHT+IG4wDA3Fz7BPEo0USQk77/KnMmvMTFS/8h5KGrzx+o+VcVEyzAqvxNynb6XccOlL91RUsAwmJT0QeU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1893:b0:dcc:5a91:aee9 with SMTP id
- cj19-20020a056902189300b00dcc5a91aee9mr3228659ybb.7.1712628113439; Mon, 08
- Apr 2024 19:01:53 -0700 (PDT)
-Date: Mon,  8 Apr 2024 19:01:27 -0700
-In-Reply-To: <20240405235603.1173076-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:c74d:0:b0:615:1c63:417e with SMTP id
+ i13-20020a81c74d000000b006151c63417emr319167ywl.1.1712628128689; Mon, 08 Apr
+ 2024 19:02:08 -0700 (PDT)
+Date: Mon,  8 Apr 2024 19:01:29 -0700
+In-Reply-To: <20240309013641.1413400-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240405235603.1173076-1-seanjc@google.com>
+References: <20240309013641.1413400-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <171262747625.1420673.10308591615885503972.b4-ty@google.com>
-Subject: Re: [PATCH 00/10] KVM: x86: Fix LVTPC masking on AMD CPUs
+Message-ID: <171262712105.1419825.3878505678593336929.b4-ty@google.com>
+Subject: Re: [PATCH 0/2] KVM: x86/pmu: Globally enable GP counters at "RESET"
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
-	Like Xu <like.xu.linux@gmail.com>
+	Babu Moger <babu.moger@amd.com>, Sandipan Das <sandipan.das@amd.com>, 
+	Like Xu <like.xu.linux@gmail.com>, Mingwei Zhang <mizhang@google.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 05 Apr 2024 16:55:53 -0700, Sean Christopherson wrote:
-> This is kinda sorta v2 of Sandipan's fix for KVM's incorrect setting of
-> the MASK bit when delivering PMIs through the LVTPC.
+On Fri, 08 Mar 2024 17:36:39 -0800, Sean Christopherson wrote:
+> Globally enable GP counters in PERF_GLOBAL_CTRL when refreshing a vCPU's
+> PMU to emulate the architecturally defined post-RESET behavior of the MSR.
 > 
-> It's a bit rushed, as I want to get Sandipan's fix applied early next
-> week so that it can make its way to Linus' tree for -rc4.  And I didn't
-> want to apply Sandipan's patch as-is, because I'm a little paranoid that
-> the guest CPUID check could be noticeable slow, and it's easy to avoid.
+> Extend pmu_counters_test.c to verify the behavior.
+> 
+> Note, this is slightly different than what I "posted" before: it keeps
+> PERF_GLOBAL_CTRL '0' if there are no counters.  That's technically not
+> what the SDM dictates, but I went with the common sense route of
+> interpreting the SDM to mean "globally enable all GP counters".
 > 
 > [...]
 
-Applied 1 and 2 to kvm-x86 fixes. 
+Applied to kvm-x86 fixes, thanks!
 
-[01/10] KVM: x86: Snapshot if a vCPU's vendor model is AMD vs. Intel compatible
-        https://github.com/kvm-x86/linux/commit/3b764d0af391
-[02/10] KVM: x86/pmu: Do not mask LVTPC when handling a PMI on AMD platforms
-        https://github.com/kvm-x86/linux/commit/85cff527ab31
+[1/2] KVM: x86/pmu: Set enable bits for GP counters in PERF_GLOBAL_CTRL at "RESET"
+      https://github.com/kvm-x86/linux/commit/de120e1d692d
+[2/2] KVM: selftests: Verify post-RESET value of PERF_GLOBAL_CTRL in PMCs test
+      https://github.com/kvm-x86/linux/commit/08a828249b16
 
 --
 https://github.com/kvm-x86/linux/tree/next
