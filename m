@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-13983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13984-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A3589DAD7
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 15:44:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17BB489DADC
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 15:45:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 776E6289E79
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 13:44:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8367F1F21748
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 13:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9B5137777;
-	Tue,  9 Apr 2024 13:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4895913791E;
+	Tue,  9 Apr 2024 13:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mJ2CPw9B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AL0rE1gW"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A839B12FF74
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 13:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8F612FF75
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 13:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712670019; cv=none; b=bkhzyYH9tgVYUzBV0TR9Dpqsy8fdj79JIqPGCP/7mD7R0vAPDa3oeX9RhA2Vt4tY2QGIE7izmmSyzkoJ+KIEzTerAzPjSXoFL5iJvZKEbSLEsZn8p5sjnoTA4kBvKksnTARlpvNQBqv0U1akfTEFyQrgkST7CbUeJ4JKvc4x4rQ=
+	t=1712670021; cv=none; b=O6MaJaFUW0htwCDJrinVKNbMRTbO2LnYyS8++HrntiVkUO1j8ZikG19LApBImERcHgnEUJNaKWsf51M4A+h+k8hrrzX7ofELYWa6rB3gNmkH2JQmWUpN/selV5FoFzA9UkJSozVt0thVs6F5ClAZ6UgJG0s1KqMutNCJo/+ID3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712670019; c=relaxed/simple;
-	bh=Z/U6MkL66HxoT+vTZDuph/p77ad7akTXVDFy/jh9Y9U=;
+	s=arc-20240116; t=1712670021; c=relaxed/simple;
+	bh=paK0j1D+/4vVrfYgv/m+fGb5solSOT1yZOlYXM1gTkQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hUgy+KtL0m9QxKgE5Pruu8CFfRWDxGFpoYeEB7IhHfippEDIdIAIdxmQ7erJ/p9WvBU6/miIdLrfuGl2nya45nRlKdiHoyO++5uj2a6GRETAEvwyaHeLigLLwKR2XLJWQ+MJcLGiUGrMX0Baa+qgaEULNlkZvUWMk9jT7oGW2A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pgonda.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mJ2CPw9B; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=VmxinbUYRWdMsjaPc4KZptzJXUW93Up+aLbao7vrIGaFnTAaaA5nHmpXPm3WbxhiTExfJmnXw41Jq/pysua7DZAtjGP+ATTxZAc7zxKtlmD0I4dkCsfXLeTJyH8fFJ0PFslAj07/xZoKsv6EDCsa2kvBBaQb+cr8De93qDiVHjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pgonda.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AL0rE1gW; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pgonda.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ecec819962so5482299b3a.2
-        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 06:40:17 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e6bab4b84dso5551354b3a.0
+        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 06:40:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712670017; x=1713274817; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712670019; x=1713274819; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+kM2gskGXg+GS3w8WpbJGsHCOXskkusBzj+iWlJPXA=;
-        b=mJ2CPw9BkId3qp9fNuFQ+ew/E9oVpyfjfK6HsBw9B9Eaiv4wov0Zv3bGRU4UGoGevd
-         ANGMA5Mq3MzOcpbLCVvhueQJd4Atbad+m1DehApuaQHwr/uL5R97koBHq1oKAzJTjQ5C
-         Vp4ocrI5NrXBfHqLklLH9P3qvNC/nUNl4xVttNg7B5e6OmKkZRJWgv4NsPxeiOmkOePv
-         iNs2iNYhtzhE0I3ageEDHE+KlPUqu36HTxGVkyaUmMyVy3DzwgCSFGN8lexYKApiYQad
-         O1ZmAC6dhPZmQQuWdsiAcmAttU3sx+VayVLXp5kd8ChRLMT3Qh0CuMkIdlKDPF/MPWrC
-         N4iA==
+        bh=Rwrtfku1Uu6YgtFtash50js52tGuCTfI0w7dy74ELNU=;
+        b=AL0rE1gWHYaH68MkMLgTco+uRHEFDHWY/+tKYuYvexHoqnIp3HUAse9levCqTxKfg3
+         Ii9G8eO87b+3/qq/HPoQh4PwpiMKLmIhtyjNfsOx18d+KhIHBemZDBDUB6u9FtsbvWpF
+         7l3sGydrd2dyNqmfHEj2R820qOAYYE6ePnqGdbWJnkwK8D73x9JaGOJ38iCSptksJ37G
+         y5q2DwXxqauCebI4KyfatEZ6DhexLrL4Q0lFS1KxDCwo2StAhMJ8WiIrFjN/eajDCFYs
+         mGCOR0Y84M6jY5GVvf+1rXfkge4bM/DGHabn66YZqno00Dv+C4OtrVD9uKBsGrbOnV0w
+         jkfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712670017; x=1713274817;
+        d=1e100.net; s=20230601; t=1712670019; x=1713274819;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+kM2gskGXg+GS3w8WpbJGsHCOXskkusBzj+iWlJPXA=;
-        b=iE7ea5xkf8FFh4o864L3M5buzt+4gkfb7FugKuJp1G12UNHq66DYNoHv1Z8Cc9v9jJ
-         6EREpxIR1Y8+/N7x50qCCyolHy2RLDpscwOFpLhB0dHy5C2xdt360px2ZE9HZ3lb507D
-         d+6RJJ4EOydIhN4dlEpqFsAxkpC9H1yBrUFD8YAHgJXnf9V0sz35IfFwNmojjHdRjnp+
-         6+gCRCgI26JuiiOpYN6KeRjuIU0jVNcvTh8HXXAHnxaG5yyr13hND3eHNo8JumpPILIX
-         hllg7/LZ0gFkl5l8lR4P3CcV6Fe7FtXgjNzqE1J9dnx/t8FVjArGDMYYS/HFDXsvoW2n
-         y23w==
-X-Forwarded-Encrypted: i=1; AJvYcCUMINMtzmfhFD9U3fKYisF/kYxta6ks4KXl7z3AoLbGqYJrjQHG000eDnm5RsWL18D8BuzWEIJxOHWjLctkMP75D/Cu
-X-Gm-Message-State: AOJu0Yx9ccPRAELyypAl4hie+0CGul088Suo4eZwbRwAKyxivfkWWJhz
-	7/FPY6dyJBuEw00Ibj9R1uY0i6nVpQfQUIF7hnAzqCazfOPzv8ceCpRud4n6Lo+7/a4umu6KFQY
-	Spg==
-X-Google-Smtp-Source: AGHT+IGBuHKLW5PWmsVZ2jiNCEZO8Az0aSwA/6HN0OwslonsXsvkheLB/AwbPsX6Z63jLae7+p8c0qoEseg=
+        bh=Rwrtfku1Uu6YgtFtash50js52tGuCTfI0w7dy74ELNU=;
+        b=B+Y6L24IJXP76duGr4N1EzlZ0stlAYoq32OkxkCtrPGKDaCO0IAOHcwdskw9nFoS9A
+         DYLr05vQ7EecnBXAYilB1J/bqo8HPt2BFSO0TxRg9DWSs3bHIYWfjwDjDKNMVKzIRoBa
+         u6XCB7OynB5SO0jBNgTVwu0JraB5mSE+GMIXqokjS6Czx7giiLk3FWiffV7nCoE50Qks
+         olzQNX6e0Ay+rDffOIGDjKc45HoJrR+fSrngS3T1qZVM0ag5hwkobA0xgwamkXX+DPMR
+         nudflCIcLz5XWUJFIyXkU/mO0GujEAveYys4xto0hVRpkMYvjbEYUxLvYE2wDnmXv+G5
+         WZxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPL5zzY9nBUrSCmNUZ+6uzA5Wk9FH6I70C1IoVmb9AtjJKsBQr5QdDFfnzGYjr3il9QBMMNxuSxeRe1d3KP2LJtwLc
+X-Gm-Message-State: AOJu0Ywto8gAKjAI45dQRKZEIUjfubER+NK56T2PXUVloc9R3KEulzXg
+	JPv+O1jiopPGyDlDZCUAALNFvxUMPz3UVpWrTw+cQP1j3/J1PTchAXWrU1oeEhgezJ4173gr0BD
+	IdQ==
+X-Google-Smtp-Source: AGHT+IHGWLW0cSClhDE6jv9Wvo3dWLdAOoqhYvm4Qx6uK8Qb6rf86HX7B7bZpf8TC5EWjDFMARrLPq+8ZPg=
 X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:15:661d:897e:ea86:704d])
- (user=pgonda job=sendgmr) by 2002:a05:6a00:2353:b0:6ed:4203:bdc8 with SMTP id
- j19-20020a056a00235300b006ed4203bdc8mr198689pfj.1.1712670016967; Tue, 09 Apr
- 2024 06:40:16 -0700 (PDT)
-Date: Tue,  9 Apr 2024 06:39:54 -0700
+ (user=pgonda job=sendgmr) by 2002:a05:6a00:998:b0:6ea:bc68:7354 with SMTP id
+ u24-20020a056a00099800b006eabc687354mr1087840pfg.1.1712670019100; Tue, 09 Apr
+ 2024 06:40:19 -0700 (PDT)
+Date: Tue,  9 Apr 2024 06:39:55 -0700
 In-Reply-To: <20240409133959.2888018-1-pgonda@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240409133959.2888018-1-pgonda@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240409133959.2888018-2-pgonda@google.com>
-Subject: [PATCH 1/6] Add GHCB with setters and getters
+Message-ID: <20240409133959.2888018-3-pgonda@google.com>
+Subject: [PATCH 2/6] Add arch specific additional guest pages
 From: Peter Gonda <pgonda@google.com>
 To: pgonda@google.com, seanjc@google.com
 Cc: linux-kernel@vger.kernel.org, Vishal Annapurve <vannapurve@google.com>, 
@@ -85,11 +85,9 @@ Cc: linux-kernel@vger.kernel.org, Vishal Annapurve <vannapurve@google.com>,
 	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Move the GHCB definitions from svm.h to the tools/ copy. This allows the
-SEV-ES selftest to use GHCBs which are required for non-trival VMs to
-paravirtualize NonAutomaticExits (NAEs) when SEV-ES is enabled. GHCB
-getters/setters have a warning with address-of-packed-member, so removed
-this using the CFLAGS.
+SEV-ES guests need additional pages allocated for their GHCBs. Add arch
+specific function definition with __weak to allow for overriding for X86
+specific SEV-ES functionality.
 
 Cc: Vishal Annapurve <vannapurve@google.com>
 Cc: Ackerley Tng <ackerleytng@google.com>
@@ -103,138 +101,71 @@ Cc: kvm@vger.kernel.org
 Cc: linux-kselftest@vger.kernel.org
 Signed-off-by: Peter Gonda <pgonda@google.com>
 ---
- tools/testing/selftests/kvm/Makefile          |   2 +-
- .../selftests/kvm/include/x86_64/svm.h        | 106 ++++++++++++++++++
- 2 files changed, 107 insertions(+), 1 deletion(-)
+ .../selftests/kvm/include/kvm_util_base.h        |  3 +++
+ tools/testing/selftests/kvm/lib/kvm_util.c       | 16 ++++++++++++----
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c75251d5c97c..95fa0cead256 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -221,7 +221,7 @@ endif
- CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
- 	-Wno-gnu-variable-sized-type-not-at-end -MD -MP \
- 	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
--	-fno-builtin-strnlen \
-+	-fno-builtin-strnlen -Wno-address-of-packed-member \
- 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
- 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
- 	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
-diff --git a/tools/testing/selftests/kvm/include/x86_64/svm.h b/tools/testing/selftests/kvm/include/x86_64/svm.h
-index 4803e1056055..fbd8d29c15a8 100644
---- a/tools/testing/selftests/kvm/include/x86_64/svm.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/svm.h
-@@ -323,4 +323,110 @@ struct __attribute__ ((__packed__)) vmcb {
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 4a40b332115d..9a26afd2e82a 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -1126,4 +1126,7 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm);
  
- #define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
+ bool vm_is_gpa_protected(struct kvm_vm *vm, vm_paddr_t paddr);
  
-+struct ghcb_save_area {
-+	u8 reserved_0x0[203];
-+	u8 cpl;
-+	u8 reserved_0xcc[116];
-+	u64 xss;
-+	u8 reserved_0x148[24];
-+	u64 dr7;
-+	u8 reserved_0x168[16];
-+	u64 rip;
-+	u8 reserved_0x180[88];
-+	u64 rsp;
-+	u8 reserved_0x1e0[24];
-+	u64 rax;
-+	u8 reserved_0x200[264];
-+	u64 rcx;
-+	u64 rdx;
-+	u64 rbx;
-+	u8 reserved_0x320[8];
-+	u64 rbp;
-+	u64 rsi;
-+	u64 rdi;
-+	u64 r8;
-+	u64 r9;
-+	u64 r10;
-+	u64 r11;
-+	u64 r12;
-+	u64 r13;
-+	u64 r14;
-+	u64 r15;
-+	u8 reserved_0x380[16];
-+	u64 sw_exit_code;
-+	u64 sw_exit_info_1;
-+	u64 sw_exit_info_2;
-+	u64 sw_scratch;
-+	u8 reserved_0x3b0[56];
-+	u64 xcr0;
-+	u8 valid_bitmap[16];
-+	u64 x87_state_gpa;
-+} __packed;
++int kvm_arch_vm_additional_pages_required(struct vm_shape shape,
++					  uint64_t page_size);
 +
-+#define GHCB_SHARED_BUF_SIZE	2032
+ #endif /* SELFTEST_KVM_UTIL_BASE_H */
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index adc51b0712ca..2a7b2709eb8d 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -314,11 +314,11 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+ 	return vm;
+ }
+ 
+-static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
++static uint64_t vm_nr_pages_required(struct vm_shape shape,
+ 				     uint32_t nr_runnable_vcpus,
+ 				     uint64_t extra_mem_pages)
+ {
+-	uint64_t page_size = vm_guest_mode_params[mode].page_size;
++	uint64_t page_size = vm_guest_mode_params[shape.mode].page_size;
+ 	uint64_t nr_pages;
+ 
+ 	TEST_ASSERT(nr_runnable_vcpus,
+@@ -350,13 +350,15 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
+ 	/* Account for the number of pages needed by ucall. */
+ 	nr_pages += ucall_nr_pages_required(page_size);
+ 
+-	return vm_adjust_num_guest_pages(mode, nr_pages);
++	nr_pages += kvm_arch_vm_additional_pages_required(shape, page_size);
 +
-+struct ghcb {
-+	struct ghcb_save_area save;
-+	u8 reserved_save[2048 - sizeof(struct ghcb_save_area)];
++	return vm_adjust_num_guest_pages(shape.mode, nr_pages);
+ }
+ 
+ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
+ 			   uint64_t nr_extra_pages)
+ {
+-	uint64_t nr_pages = vm_nr_pages_required(shape.mode, nr_runnable_vcpus,
++	uint64_t nr_pages = vm_nr_pages_required(shape, nr_runnable_vcpus,
+ 						 nr_extra_pages);
+ 	struct userspace_mem_region *slot0;
+ 	struct kvm_vm *vm;
+@@ -2246,6 +2248,12 @@ __weak void kvm_arch_vm_post_create(struct kvm_vm *vm)
+ {
+ }
+ 
++__weak int kvm_arch_vm_additional_pages_required(struct vm_shape shape,
++						 uint64_t page_size)
++{
++	return 0;
++}
 +
-+	u8 shared_buffer[GHCB_SHARED_BUF_SIZE];
-+
-+	u8 reserved_0xff0[10];
-+	u16 protocol_version;	/* negotiated SEV-ES/GHCB protocol version */
-+	u32 ghcb_usage;
-+} __packed;
-+
-+/* GHCB Accessor functions */
-+
-+#define GHCB_BITMAP_IDX(field)							\
-+	(offsetof(struct ghcb_save_area, field) / sizeof(u64))
-+
-+#define DEFINE_GHCB_ACCESSORS(field)						\
-+	static __always_inline bool ghcb_##field##_is_valid(const struct ghcb *ghcb) \
-+	{									\
-+		return test_bit(GHCB_BITMAP_IDX(field),				\
-+				(unsigned long *)&ghcb->save.valid_bitmap);	\
-+	}									\
-+										\
-+	static __always_inline u64 ghcb_get_##field(struct ghcb *ghcb)		\
-+	{									\
-+		return ghcb->save.field;					\
-+	}									\
-+										\
-+	static __always_inline u64 ghcb_get_##field##_if_valid(struct ghcb *ghcb) \
-+	{									\
-+		return ghcb_##field##_is_valid(ghcb) ? ghcb->save.field : 0;	\
-+	}									\
-+										\
-+	static __always_inline void ghcb_set_##field(struct ghcb *ghcb, u64 value) \
-+	{									\
-+		__set_bit(GHCB_BITMAP_IDX(field),				\
-+			  (unsigned long *)&ghcb->save.valid_bitmap);		\
-+		ghcb->save.field = value;					\
-+	}
-+
-+DEFINE_GHCB_ACCESSORS(cpl)
-+DEFINE_GHCB_ACCESSORS(rip)
-+DEFINE_GHCB_ACCESSORS(rsp)
-+DEFINE_GHCB_ACCESSORS(rax)
-+DEFINE_GHCB_ACCESSORS(rcx)
-+DEFINE_GHCB_ACCESSORS(rdx)
-+DEFINE_GHCB_ACCESSORS(rbx)
-+DEFINE_GHCB_ACCESSORS(rbp)
-+DEFINE_GHCB_ACCESSORS(rsi)
-+DEFINE_GHCB_ACCESSORS(rdi)
-+DEFINE_GHCB_ACCESSORS(r8)
-+DEFINE_GHCB_ACCESSORS(r9)
-+DEFINE_GHCB_ACCESSORS(r10)
-+DEFINE_GHCB_ACCESSORS(r11)
-+DEFINE_GHCB_ACCESSORS(r12)
-+DEFINE_GHCB_ACCESSORS(r13)
-+DEFINE_GHCB_ACCESSORS(r14)
-+DEFINE_GHCB_ACCESSORS(r15)
-+DEFINE_GHCB_ACCESSORS(sw_exit_code)
-+DEFINE_GHCB_ACCESSORS(sw_exit_info_1)
-+DEFINE_GHCB_ACCESSORS(sw_exit_info_2)
-+DEFINE_GHCB_ACCESSORS(sw_scratch)
-+DEFINE_GHCB_ACCESSORS(xcr0)
-+
- #endif /* SELFTEST_KVM_SVM_H */
+ __weak void kvm_selftest_arch_init(void)
+ {
+ }
 -- 
 2.44.0.478.gd926399ef9-goog
 
