@@ -1,389 +1,249 @@
-Return-Path: <kvm+bounces-13967-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13969-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3440B89D17C
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 06:23:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8FF89D1D0
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 07:10:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84CDD287640
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 04:23:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C474928470A
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 05:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA756757F6;
-	Tue,  9 Apr 2024 04:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F765646E;
+	Tue,  9 Apr 2024 05:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="chARewx9"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="l7jNsjtw"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2139.outbound.protection.outlook.com [40.107.237.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AAE6BFA7;
-	Tue,  9 Apr 2024 04:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712636615; cv=none; b=oKVi41YEuK5mg31qJk0LJI9OMxndPDSMdiJGNvlBai+ne/jXoPxh2cnfxBGDtPVl1nM60Tfa6EHnBagAZFbGENUwO4vMd2P824oP30SJ5Zz+0kMkG6edZGFXw1tGU33H//1zxTZSiUNpm+KtP+3ukGU/E3zLS8eOrM/jL36+7x8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712636615; c=relaxed/simple;
-	bh=bpjP5si7Ysqo7FfRwnJbi8i8lfsEW5YFtjjGL9We4sA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jsq+Yc6RdLxPIH99eZ7OyZ21Zc2tpQQOTDZN0GlZNlI82VhXTYjqkEnylN1ygn7+uKkfshsyDl9eKrdj+MbsznzK1ObyV4Ya3jC5PEbehQMYH4FLF+xHSah1GKISHFVYJmTcPEW3nnyHiCoo/Xm/aBdPSWnmzYbPCYbZ1zQgD4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=chARewx9; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=B5/PI8tpV58jhcHGA5rOawrHTijotyoHKG2Xt2fJP9M=; b=chARewx9tfgDqS/gSKCQUQ82No
-	zckPO6ey9PscvAjCJowuUeKVCzSMS37mnhuc54w33MaVqni6wtk9F1tFoSTrfu1prAjt1JsZsn8kI
-	d5AzZh7DNqAWX44qKwYHzgkM5cHewAVgXd8kkS7EuDaFl1wWWkieCZyHC4SbfRY6R1eifgvwuCAfI
-	rhmRzYunSbpfw3rKCpmgkvsoACI/6jarE0rEEprqr4OioEwTbkCmWiuRBqHuZSQ5ljEpm9GWBNIV1
-	Tkio68Mu9N+pXKFDRsSWvR7tBkWHnaSzbuA52Fs7d0TnHP5bkTYMtWgzIHIPIk0HceHJ2K1S6kTpd
-	Mj98C21g==;
-Received: from [2001:8b0:10b:5:2f81:68c0:d3e5:5a65] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1ru30y-00000001KQv-313V;
-	Tue, 09 Apr 2024 04:23:20 +0000
-Message-ID: <c12959cf6ca372569b4df10b2f9e272db1114ad1.camel@infradead.org>
-Subject: Re: [PATCH 2/2] KVM: selftests: Add KVM/PV clock selftest to prove
- timer drift correction
-From: David Woodhouse <dwmw2@infradead.org>
-To: Dongli Zhang <dongli.zhang@oracle.com>, Jack Allister
- <jalliste@amazon.com>,  Paolo Bonzini <pbonzini@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, Sean Christopherson <seanjc@google.com>,  Thomas
- Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,  Shuah Khan
- <shuah@kernel.org>
-Cc: Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Date: Tue, 09 Apr 2024 05:23:19 +0100
-In-Reply-To: <9377995a-26a4-2523-e421-be1cd92bdc34@oracle.com>
-References: <20240408220705.7637-1-jalliste@amazon.com>
-	 <20240408220705.7637-3-jalliste@amazon.com>
-	 <9377995a-26a4-2523-e421-be1cd92bdc34@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-lYNBFWCqfsCzhD3ipbEa"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D588138E;
+	Tue,  9 Apr 2024 05:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.139
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712639406; cv=fail; b=pQ/y50woPQqHOeWjcDs+xMSJjpCAjEDa92p+ZO+5cwe1GSOEglrQd3nIIEL7bs32zEOwug2fg1s/x9NmyrFjXPXuzTwIAMnuQW1dfxNURH+AWNlK9R3E+AxRZkyWzLQNbARLZS4sXUuuhOvtcxtRphEnOu+WMGwH6xdAZSBgOww=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712639406; c=relaxed/simple;
+	bh=JzUi6/BRSgRXfwyrjMVWYG/frQWlzqKvCrmhJtceBkg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=YVW4RXWZ74U7etrgRkTDs0Kc5hSg72Gyt94GiMKVPG9hOIBOFY3bHwuhmp4hqv+HCL2PZ9ErYpiqRyaBLlkzzMS2GovM8W2/J3Y3aunMTp1jYxmgmb+OJLyWQ2J3wS3khwQ2gd+LNqk4aL4HJN4/bS547R3+WH4orOgoBCX4b1Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=l7jNsjtw; arc=fail smtp.client-ip=40.107.237.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XOTUJmw6cJgMzbe0o7R9Cul1JdH+l+qVznKhbEe1H0acjIH7JBc241s+EY3wiopnCymbp4aEgyh4y2bWvzp3Kc3lNLD7V7O1ZEPn4+6oxJ/kyt+04umN8ubhOAsq0df5SflX9TEHL0iu0rruHwK2EyAZ0Dp6PgNkXtwDnzX1fHJJH2YwS/yxZKHLPjOKQ1CA4x7UyTaLSupefVhxevpXGHdPmPlmTUoF7PrWOa+uZ1PZUZrlkRz+EELmtgbxoLItjiVQ7iQJCjOe3RX7Q7xZ1JyhqnHc9NNSwE2uz0rKZG6Ck/N9m8u7/W5rE1KbTcKjSRtengQyV9WU5j+sooOFHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q6Ts0G5uwRAnSVXR82LWg+sqgcTqKhdCntM5t6QKYb4=;
+ b=DuS0HQMzIT5mbrk5KIfVUc/dtZiagiH+yonAQgSbsXKVoiefdMqXiqcjoZYNpCtYDU0EelnfmI8Wil3q4kOXEaQkwNb7xhZVANrve6oirgc0D7RFSMIXbH1EgfzT7hEfAjjQCOkrTRjCF0hK9nQjwBZGP7il6KD1iHTMRqhVB/fsm1noPbfomoIpivZRv/OYPCr7mg9EXJ6/J/NvRBh1qJoHFEo+zJIAPeYYn+sj9QqYqwEQRf6LeBxvSGQ7DovMwU5to72MihksRdiQ7UepQHyHX39xJMDiatsDNqVBiX/VxLQHnOke/B64bLGZjjoTqXsFD3o9XUNLxYAhP//PUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q6Ts0G5uwRAnSVXR82LWg+sqgcTqKhdCntM5t6QKYb4=;
+ b=l7jNsjtw8JineIM46ss6mmYjSZ9Vq5kqblZTSw82OlDmP+w5DPHxl2O7jJG61hHP8b33j0Ls9fJxltcHwgPfxFbRv8+t7WB3jFU4zf95YvwpfQTgl0bnJ5tyFGVBzqKgI33hpIdPWCqCFlNqxRVnq4oPAuZZoqtIpIN9mB13TpE=
+Received: from DS7PR12MB6048.namprd12.prod.outlook.com (2603:10b6:8:9f::5) by
+ PH0PR12MB8174.namprd12.prod.outlook.com (2603:10b6:510:298::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.46; Tue, 9 Apr 2024 05:10:01 +0000
+Received: from DS7PR12MB6048.namprd12.prod.outlook.com
+ ([fe80::af7d:5f4f:2139:ebd1]) by DS7PR12MB6048.namprd12.prod.outlook.com
+ ([fe80::af7d:5f4f:2139:ebd1%4]) with mapi id 15.20.7409.042; Tue, 9 Apr 2024
+ 05:10:01 +0000
+Message-ID: <19f634de-7d72-4abc-87ff-599d22e310bd@amd.com>
+Date: Tue, 9 Apr 2024 10:39:52 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/3] Export APICv-related state via binary stats interface
+To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
+ joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
+ mark.kanda@oracle.com, suravee.suthikulpanit@amd.com, mlevitsk@redhat.com
+References: <20240215160136.1256084-1-alejandro.j.jimenez@oracle.com>
+Content-Language: en-US
+From: Vasant Hegde <vashegde@amd.com>
+In-Reply-To: <20240215160136.1256084-1-alejandro.j.jimenez@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0208.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:e9::16) To DS7PR12MB6048.namprd12.prod.outlook.com
+ (2603:10b6:8:9f::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|PH0PR12MB8174:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	K8qbvJvC/TBamAa4EdOlFVnQF3F63VVnfiPjHs19U93x+yQlbDL2pMWUX298R5PleXNxKmiMEFMkzSrwaLVVvVOOhVkra41ABcBzChw3Il68wRo0AoSuAC6FTnLABIn5iF6Zj3jcdwd5QfPByb9bvTcNjul52iWcBAajHt44+ENzIGfqP7/92zbWqArHQPzxiJM1W7yBUOTtrVVIRaLcfVeXImvBNq+u+FAQJpEZmn08eOyb9Ov9Ufkvh/J8LtSYIqtoC6KIBbPo9D5sR/bcRHwqy1iAhtF+ewgpGvMmZVkB/w/Pfar1RIYLVlO/akwc1uHpqRqCoAYsWlKtZgWcAqz3yTTWB43NvSp1s2Oy20NXLtwHVzkum/KSFIvFiWlcm7hOEW2f4mhX1o3Sn3A3tL5DlewQnfFwlETKVodvX6RXT0SMDmGBZ7adF2czgOnLqgVVcdyjjcoU0asQFGSmk/3fYK5HR2974EQ+LwBQVkz4qiOiUFBXtsmpaYmoWlojLkEDOlF4fi4bM1bIeD4t/+0quprXwQAb9bdxTzHmSm7dVQ/U54ITLS0EXbEQm3vNt5DFes0Kf7HQoZCR6DSRBRrQNZh4zXwoBIa8Wwls2T5UKPPNXpvRaQVoulEE0faV
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SkQreWt1WGZrOTBHZWQ4cXJCRzBXbVZzeDJmR0FJaW9rM0ErcFY5QXNzQ2pD?=
+ =?utf-8?B?N2ZTdE9VU1FkQXdQZ2pPTjdDaVBUMnJsKzkzWTFLTkk2dFFaVGo2OS9yNVdJ?=
+ =?utf-8?B?UVdKYXRYZXk2K2FibloybzdVbDVFM2ZiRG1UYjJYeU9zTndpc084b1pTbVhM?=
+ =?utf-8?B?TUZMRG1qVFhZK2lqUWRTb3J1bVhBM1dRT3R6UzA1UUUvaUlwU1VadUhqR084?=
+ =?utf-8?B?cmg2R1lYdzR6TmNuYStpcXRyNVdJMk8zTTJOV0ZNVlpaU3JKUjRPY2wyVnBM?=
+ =?utf-8?B?bk5SVStPUkhZWVRnN1VmK0MxbVRINklZSFhqSXZVczc1dGNTVVBGd3Voc0tQ?=
+ =?utf-8?B?bVZFZFNmajFUdUFOcyt5bTgzc1RINENwZnkrMjRqOHppZ29mQUVOYjd6MjBH?=
+ =?utf-8?B?eHlnN2hSYitQdWcxRG5ZU3JhOWpFdVBQTitZU0UzR2VGSTdpM2xWMUdrVk8r?=
+ =?utf-8?B?WGJqdzJpRUl1cHZiTFpyUkdlaFVNQ1lmWFFoY0RDZ3JtY1kzSmptTEY5bU01?=
+ =?utf-8?B?KzVERE1mRXkrbmtDbEdVbzdLV2NpQmNQZ25Ub0lmZ1ZZaFBGS1BYZU1lVnMr?=
+ =?utf-8?B?UEJLa1hRVUhFK25MK0ZuU1J5QTZOLzFYZEYxMVVFenA3NnoyTG5TWTFZRUdV?=
+ =?utf-8?B?MFhJNEJ1bXZlYjZuQ1FHTHJScW1oWFNLVTlLYWZaVDNvRkYzVjQ5a1IzaStl?=
+ =?utf-8?B?ZTV2QVBobnFDU3k5QUVCUXNFVEJ2VzZnejNEc1d6djJsa3FQOXVRU1lJL0tC?=
+ =?utf-8?B?c1BPN0VMbmQwSDdXa0hLUGNTR1JMQmd3Q01PZGtHMzY4cmVjMitzSFN6L09F?=
+ =?utf-8?B?OEU0bFZubjJ1TUNlTHhGTTVIcXZVc1MzZ0JhQW85cXNLWFJQS2FkVFlJT29l?=
+ =?utf-8?B?T3YvMVkrbWVscTZzL0txVDltbDhYbUE3UGJwUk5CcmZzb1dIaUFYMTErUU9O?=
+ =?utf-8?B?ZmEyOGU0Z09WZEsvZ1MwcWJwdzVpTEp6Tnlad3dPWFZRT010QzZ6UnhJWEZL?=
+ =?utf-8?B?WjBZRmFTcCtGUGdnL0pKRXhMa2hkUmpuTmFXQmFvQjh3NVM5eFVRYW1uN3E1?=
+ =?utf-8?B?UGpZcncrNnFrdTB0c1FWUHg0VVRlNTgyNlA5aGlyU2k4aVcvUk9xVGZwQkZi?=
+ =?utf-8?B?dGNWbmE2TjdtTDhXNzgvcVJXOXBsUWFOOVYrZFlSdmRqTlhid0Z6YnpWZmx2?=
+ =?utf-8?B?T2czNnZUVEs0aGpIamlBQ3AxZHhENUhFcEt6bGJnZXVuOW1PUU9KK2wzbG9q?=
+ =?utf-8?B?NkFueXhkY0NrRnBpQ0E4Q2lUNytZb05wWUJnZjNpdGswUWMzWmVEQWNmdXVL?=
+ =?utf-8?B?dTB5ZTZFZFdjNFBWY1E1S29mcHpPcHBrNXYwbi9PRHkzS2tuQTQ1a3doU0FN?=
+ =?utf-8?B?QlFRaXhPVWxjZ3JkdUtPb0Zob2lpN2N3dCtWSVp6d0FCbzhscklpQzVYTW9L?=
+ =?utf-8?B?VStocGVPeTVYR09ydUJnWnF2TnZnd2FtM2FMaHdXa1NRbkRaNGVySVpSbGtk?=
+ =?utf-8?B?YnZDcitjZ2dNOHg5SkZZZFA3SmNJcWYwM1hteXJlU1MvUFg5akI2aEtvdDRO?=
+ =?utf-8?B?WS9qZzNkcGdBWXdNYUdRSEtPTjB4WWs1ZWdyNzdBU2dhK01wR1hIL01Jb1Bp?=
+ =?utf-8?B?alZwK3R3YVl3aVVwbVZwT3c0L2ZKTG1QUDdQNjRqVGpIV2NtbTFyekxodHNX?=
+ =?utf-8?B?SXpOTGtJSVFsUGhJcFkzVGVnV1BCTTN6ZEJISW1UVHlST2pkU0t6bGhyODZV?=
+ =?utf-8?B?MEI2dUE0Z05RWHRvbDJoZnY4OHZZaUl3cDEzancyTmF1YlUrL0VXb1YvenB0?=
+ =?utf-8?B?S1hMaVE2SGxZaXl5UUl3TENPUTEzU1I0M1RKbFF2RHNkVGlwNWhDdmIrZkpR?=
+ =?utf-8?B?VHE3d1FBM0VFZDBLNDJPSEg5SkdUbGc3QTk1NStXcEk0V1Z5YXZ5TjdMUmsz?=
+ =?utf-8?B?UHBzd3NFb3pzaVhUdWU2K0xXKzY4ZVdCU29tWG9kemxDUjJjK2NqRW5oMnBx?=
+ =?utf-8?B?TWdCeVlNZFdRZXpJc05ydWxuZUk5dnN6UmZKMW1pNjQ0Z0xPWUZlKzV0Y3I4?=
+ =?utf-8?B?VThYRWNQaUhKcFRpdm9BNCtJYzVlUmZhZGdyZVdKblN0ZXJHeW9wY1lkRmRG?=
+ =?utf-8?Q?uFCrNE2bCJRnfYgrM8ZArJXl8?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5ef270d-b437-4ec1-4b36-08dc58534ed8
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6048.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 05:10:01.3118
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: U69+9jNVvSvsHW4SFr7Xk5ccYom/C7slEoTXg9nK2SlWKkxC6ETA+0huJK1XBtUiAqCVTcez3uSMuHIhGNI6Ag==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8174
+
+Hi Alejadnro,
+
+On 2/15/2024 9:31 PM, Alejandro Jimenez wrote:
+> The goal of this RFC is to agree on a mechanism for querying the state (and
+> related stats) of APICv/AVIC. I clearly have an AVIC bias when approaching this
+> topic since that is the side that I have mostly looked at, and has the greater
+> number of possible inhibits, but I believe the argument applies for both
+> vendor's technologies.
+> 
+> Currently, a user or monitoring app trying to determine if APICv is actually
+> being used needs implementation-specific knowlegde in order to look for specific
+> types of #VMEXIT (i.e. AVIC_INCOMPLETE_IPI/AVIC_NOACCEL), checking GALog events
+> by watching /proc/interrupts for AMD-Vi*-GA, etc. There are existing tracepoints
+> (e.g. kvm_apicv_accept_irq, kvm_avic_ga_log) that make this task easier, but
+> tracefs is not viable in some scenarios. Adding kvm debugfs entries has similar
+> downsides. Suravee has previously proposed a new IOCTL interface[0] to expose
+> this information, but there has not been any development in that direction.
+> Sean has mentioned a preference for using BPF to extract info from the current
+> tracepoints, which would require reworking existing structs to access some
+> desired data, but as far as I know there isn't any work done on that approach
+> yet.
+> 
+> Recently Joao mentioned another alternative: the binary stats framework that is
+> already supported by kernel[1] and QEMU[2]. This RFC has minimal code changes to
+> expose the relevant info based on the existing data types the framework already
+> supports. If there is consensus on using this approach, I can expand the fd
+> stats subsystem to include other data types (e.g. a bitmap type for exposing the
+> inhibit reasons), as well as adding documentation on KVM explaining which stats
+> are relevant for APICv and how to query them.
+
+Thanks for the series. IMO this approach makes sense. May be we should 
+consider adding one more stat to say whether AVIC is active or not. That 
+way,
+  Check whether AVIC is active or not.
+  If AVIC is active, then inhibited or not
+  If not inhibited, then use other statistics info.
 
 
---=-lYNBFWCqfsCzhD3ipbEa
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I have reviewed/tested this series on AMD Genoa platform. It looks good 
+to me.
 
-On Mon, 2024-04-08 at 17:43 -0700, Dongli Zhang wrote:
-> Hi Jack,
->=20
-> On 4/8/24 15:07, Jack Allister wrote:
-> > This test proves that there is an inherent KVM/PV clock drift away from=
- the
-> > guest TSC when KVM decides to update the PV time information structure =
-due
-> > to a KVM_REQ_MASTERCLOCK_UPDATE. This drift is exascerbated when a gues=
-t is
->=20
-> Typo: exacerbated
->=20
-> > using TSC scaling and running at a different frequency to the host TSC =
-[1].
-> > It also proves that KVM_[GS]ET_CLOCK_GUEST API is working to mitigate t=
-he
-> > drift from TSC to within =C2=B11ns.
+Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
 
-No, the KVM_[GS}ET_CLOCK_GUEST API is not about mitigating kernel bugs.
+-Vasant
 
-We *fix* kernel bugs, we don't make userspace work around them.
+> 
+> A basic example of retrieving the stats via qmp-shell, showing both a VM and
+> per-vCPU case:
+> 
+> # /usr/local/bin/qmp-shell --pretty ./qmp-sock
+> 
+> (QEMU) query-stats target=vm providers=[{'provider':'kvm','names':['apicv_inhibited']}]
+> {
+>      "return": [
+>          {
+>              "provider": "kvm",
+>              "stats": [
+>                  {
+>                      "name": "apicv_inhibited",
+>                      "value": false
+>                  }
+>              ]
+>          }
+>      ]
+> }
+> 
+> (QEMU) query-stats target=vcpu vcpus=['/machine/unattached/device[0]'] providers=[{'provider':'kvm','names':['apicv_accept_irq','ga_log_event']}]
+> {
+>      "return": [
+>          {
+>              "provider": "kvm",
+>              "qom-path": "/machine/unattached/device[0]",
+>              "stats": [
+>                  {
+>                      "name": "ga_log_event",
+>                      "value": 98
+>                  },
+>                  {
+>                      "name": "apicv_accept_irq",
+>                      "value": 166920
+>                  }
+>              ]
+>          }
+>      ]
+> }
+> 
+> If other alternatives are preferred, please let's use this thread to discuss and
+> I can take a shot at implementing the desired solution.
+> 
+> Regards,
+> Alejandro
+> 
+> [0] https://lore.kernel.org/qemu-devel/7e0d22fa-b9b0-ad1a-3a37-a450ec5d73e8@amd.com/
+> [1] https://lore.kernel.org/all/20210618222709.1858088-1-jingzhangos@google.com/
+> [2] https://lore.kernel.org/qemu-devel/20220530150714.756954-1-pbonzini@redhat.com/
+> 
+> Alejandro Jimenez (3):
+>    x86: KVM: stats: Add a stat to report status of APICv inhibition
+>    x86: KVM: stats: Add stat counter for IRQs injected via APICv
+>    x86: KVM: stats: Add a stat counter for GALog events
+> 
+>   arch/x86/include/asm/kvm_host.h |  3 +++
+>   arch/x86/kvm/svm/avic.c         |  4 +++-
+>   arch/x86/kvm/svm/svm.c          |  3 +++
+>   arch/x86/kvm/vmx/vmx.c          |  2 ++
+>   arch/x86/kvm/x86.c              | 12 +++++++++++-
+>   5 files changed, 22 insertions(+), 2 deletions(-)
+> 
+> 
+> base-commit: 7455665a3521aa7b56245c0a2810f748adc5fdd4
 
-The KVM_[GS}ET_CLOCK_GUEST API allows userspace to perform accurate
-live update and live migration without disrupting the relationship
-between guest TSC and KVM clock.
-
-Since a bombing run on KVM_REQ_MASTERCLOCK_UPDATE users is on my TODO
-list, it's worth noting the *reason* that switching to the obsolete
-MSR_KVM_SYSTEM_TIME forces ka->use_master_clock mode off.=20
-
-It's not documented at all as far as I can tell, but in commit
-54750f2cf042 (=E2=80=9CKVM: x86: workaround SuSE's 2.6.16 pvclock vs
-masterclock issue=E2=80=9C)=EF=BB=BF in 2015, it was done to work around a =
-guest bug
-where the guest *expected* the reference point to keep being updated
-and never be too far in the past.
-
-
-> Is configure_scaled_tsc() anecessary? Or how about to make it an
-> option/arg?
-> Then I will be able to test it on a VM/server without TSC scaling.
-
-As discussed, TSC scaling shouldn't be needed. It *should* be part of
-the unit test if possible, because there is a class of bugs it'll
-trigger, but it should be optional.
-
-In particular, the existing KVM_GET_CLOCK will return extra-wrong
-results if TSC scaling is in force. But that isn't being tested here
-yet because we haven't *fixed* it yet :)
-
-For reference, here's my TODO list which Jack is working from...
-
- =E2=80=A2 Add KVM unit test to validate that KVM clock does not change whe=
-n
-   provoked (including by simulated live update).
-   It=E2=80=99s OK for the reference point at { tsc_timestamp, system_time =
-} in
-   the pvclock structure to change, but only such that it gives the
-   same results for a given guest TSC =E2=80=94 that is, if system_time
-   changes, then tsc_timestamp must change by a delta which precisely
-   corresponds in terms of the advertised guest TSC frequency. Perhaps
-    allow a slop of 1ns for rounding, but no more.
-
- =E2=80=A2 Audit and fix (i.e. remove) KVM_REQ_MASTERCLOCK_UPDATE usage,
-   starting with kvm_xen_shared_info_init(). And work out whether it
-   should be sent to all vCPUs, as some call sites do, or just one?
-
- =E2=80=A2 Add KVM_VCPU_TSC_SCALE attribute to allow userspace to know the
-   precise host=E2=86=92guest TSC scaling.
-   (cf. https://lore.kernel.org/all/13f256ad95de186e3b6bcfcc1f88da5d0ad0cb7=
-1.camel@infradead.org/)
-
- =E2=80=A2 Expose guest=E2=80=99s view of KVM clock to userspace via KVM_GE=
-T_CLOCK_GUEST
-   ioctl. Perhaps also a memory-mapped version, as the gfn_to_pfn_cache
-   allows writing to userspace HVAs. With this, userspace has fast and
-   accurate way to calculate the KVM clock at any given moment in time.
-  =C2=A0(Currently, userspace calls the KVM_GET_CLOCK ioctl which is slow
-   and returns inaccurate results). Then userspace can base other
-   things like PIT and HPET emulation on the KVM clock and simplify
-   timekeeping over migration for those too.
-
- =E2=80=A2 Add a KVM_SET_CLOCK_GUEST ioctl which consumes the pvclock
-   information back again. This should not only set the kvmclock_offset
-=C2=A0  field, but also set the reference point { master_cycle_now,
-   master_kernel_ns } as follows:
-     =E2=80=A2 Sample the kernel=E2=80=99s CLOCK_MONOTONIC_RAW to create a =
-new
-       master_kernel_ns and master_cycle_now.
-     =E2=80=A2 Convert the new master_cycle_now to a guest TSC.
-     =E2=80=A2 Calculate the intended KVM clock with that guest TSC from th=
-e
-       provided pvclock information.
-     =E2=80=A2 Calculate the current KVM clock with that guest TSC using th=
-e
-       new master_cycle_now and master_kernel_ns and kvmclock_offset as
-       usual.
-     =E2=80=A2 Adjust kvmclock_offset to correct for the delta between curr=
-ent
-       and intended values.
-     =E2=80=A2 Raise KVM_REQ_CLOCK_UPDATE on all vCPUs.
-
- =E2=80=A2 Fix the broken __get_kvmclock() function to scale via the guest=
-=E2=80=99s
-   TSC frequency as it should. There isn=E2=80=99t necessarily a vCPU to us=
-e
-   for this, so it=E2=80=99s OK for this to work only when the frequency ha=
-s
-   been set of the whole VM rather than only for individual vCPUs.
-   Likewise kvm_get_wall_clock_epoch() which has the same bug.
-
- =E2=80=A2 Fix all other cases where KVM reads the time in two places
-   separately and then treats them as simultaneous.
-
- =E2=80=A2 Fix the discontinuities in KVM_REQ_MASTERCLOCK_UPDATE by allowin=
-g
-   kvmclock_offset to vary while the VM is running in master clock
-   mode. Perhaps every call to pvclock_update_vm_gtod_copy() which
-   starts in master clock mode should follow the same process as the
-   proposed KVM_SET_CLOCK_GUEST to adjust the kvmclock_offset value
-   which corresponds with the new reference point. As long as we don=E2=80=
-=99t
-   break in the case where something weird (host hibernation, etc.)
-   happened to the TSC, and we actually want to trust kvmclock_offset.
-   Maybe we should have a periodic work queue which keeps
-   kvmclock_offset in sync with the KVM clock while the VM is in master
-   clock mode?=20
-
- =E2=80=A2 Correct the KVM =EF=BB=BFdocumentation =EF=BB=BFfor TSC migratio=
-n to take TSC
-scaling
-   into account. Something like...
-
-   (SOURCE)
-    =E2=80=A2 Sample both TAI and the (source) host TSC at an arbitrary tim=
-e we
-=C2=A0     shall call Tsrc:
-      =E2=80=A2 Use adjtimex() to obtain tai_offset.
-      =E2=80=A2 Use KVM_GET_CLOCK to read UTC time and host TSC (ignoring t=
-he
-        actual kvm clock). These represent time Tsrc.
-      =E2=80=A2 Use adjtimex() to obtain tai_offset again, looping back to =
-the
-        beginning if it changes.
-      =E2=80=A2 Convert the UTC time to TAI by adding the tai_offset.
-
-    =E2=80=A2 =E2=88=80 vCPU:
-      =E2=80=A2 Read the scaling information with the KVM_CPU_TSC_SCALE
-        attribute.
-      =E2=80=A2 Read the offset with the KVM_CPU_TSC_OFFSET attribute.
-      =E2=80=A2 Calculate this vCPU=E2=80=99s TSC at time Tsrc, from the ho=
-st TSC
-        value.
-
-    =E2=80=A2 Use KVM_GET_CLOCK_GUEST to read the KVM clock (on vCPU0).
-
-   (DESTINATION)
-    =E2=80=A2 Sample both TAI and the (destination) host TSC at a time we s=
-hall
-      call Tdst:
-      =E2=80=A2 Use adjtimex() to obtain tai_offset.
-      =E2=80=A2 Use KVM_GET_CLOCK to read UTC time and host TSC.
-      =E2=80=A2 Use adjtimex() to obtain tai_offset again, looping back to =
-the
-        beginning if it changes.
-      =E2=80=A2 Convert the UTC time to TAI by adding the tai_offset.
-
-    =E2=80=A2 Calculate the time (in the TAI clock) elapsed between Tsrc an=
-d
-      Tdst. Call this =CE=94T.
-
-    =E2=80=A2 =E2=88=80 vCPU:
-      =E2=80=A2 Calculate this vCPU=E2=80=99s intended TSC value at time Td=
-st:
-        =E2=80=A2 Given this vCPU=E2=80=99s TSC frequency, calculate the nu=
-mber of TSC
-          ticks correponding to =CE=94T.
-        =E2=80=A2 Add this to the vCPU TSC value calculated on the source
-        =E2=80=A2 Read the scaling information on the current host with the
-          KVM_CPU_TSC_SCALE attribute
-        =E2=80=A2 Calculate this vCPU=E2=80=99s scaled TSC value correspond=
-ing to the
-          host TSC at time Tdst without taking offsetting into account.
-        =E2=80=A2 Set KVM_CPU_TSC_OFFSET to the delta between that and the
-          intended TSC value.
-
-    =E2=80=A2 Use KVM_SET_CLOCK_GUEST to set the KVM clock (on vCPU0).
-
-
-
-
-
---=-lYNBFWCqfsCzhD3ipbEa
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNDA5MDQyMzE5WjAvBgkqhkiG9w0BCQQxIgQgtjUW+Fc+
-0DLIFJUa9viG2sTJTeTH1VYsMYe2JPjpnhowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgClBtiXEl5QkDg0CLbrby0z1YA5HqrVt/aQ
-l/ARkZ4ZUyex3cAswUh+d7r5PKO+047f/+66B1+mPuy2FgawjbrhUBNitZkT94RxBpa+Mttql1rA
-PYUSkpWDmE3BV6jF2QFDGmLiVULVMhIGMbhYwZv00VLlLCrbbmn628t1SdL0fgfG55ElHzT9uT1T
-1FqGCeC84A8aJSXM7nPZV/eogfwQG/YH4TC77RvjJBgVrMtS5O+OY3ND9Cp+EPhbAf4GNQ2lkoq9
-uZ+j7j+JgqOHII5wMdrvIsvW7N669IpIAZ/JpIvN3g+QMNhyjAXo9bSNWdzhaKF/S8jceRQ2YFIk
-hjLjxh4dKas7ATsqNPdq/EmnGE1qahLRWbcJ+Wxp9pBFzY7jn4+gpAUnrq08WaRsPeb5igY2KwzS
-TOjlN5k4gIzyLO/0nxbdBmRk5/BMZQL9uO22PgHzwnRW4DYtuSlhl/XBwhO1xMqL8sU6yfUZpkVd
-HYv9lZ6J0vIATGVAl4DpHWRyQFIfuf9ltIMzUIKTioGedlijj0GohnEFdlipl2YuJhww91AF8NYO
-FoZmYd6HrWyaFcye8Xris+66nGjR1by7VKxZ+aCVyqKaVGw1477Uqom5XfZ6FE49M0Pe8sWV2mS/
-Xl5DUXJYMUfYFNzSOy6RDAy2cZoYTPiIGojuEfrIeAAAAAAAAA==
-
-
---=-lYNBFWCqfsCzhD3ipbEa--
 
