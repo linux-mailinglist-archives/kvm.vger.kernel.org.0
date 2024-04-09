@@ -1,210 +1,269 @@
-Return-Path: <kvm+bounces-14029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 768F389E48C
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 22:39:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E82189E591
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 00:12:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03FF11F22BF7
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 20:39:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 520451C22535
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 22:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25626158846;
-	Tue,  9 Apr 2024 20:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E51158D87;
+	Tue,  9 Apr 2024 22:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iexLxoS4"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="RhnzFJav"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75002158849
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 20:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D70C158D70
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 22:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712695152; cv=none; b=hvO2gu+DxpnWwyDuiR8bEWaSO8UpSmT6StaiyhONungfdUoctkQOnVA2K3EwoUI87Yw67Ij5u7DLrXGCWjGL2fy+NWxnl+i7LHJRP2J8fpQiVxheS8Vp+cTUGhn8Rp0tv8ygNwK5IDSQl7iuNYyxNxiR3B4ROPOUhzOLgBGh2YA=
+	t=1712700711; cv=none; b=VApJMUnuEMEzhQo11Y949KO7o2PPjgRFa/BcZNSg763ClmogExu5GpCTV76dqq72DyPtx0NGh2TNIq/azy49x01chiYRSei0YY5Nz16LdLbIh5yBcWOMWvSVT4uUtfGnsLMGhHv9994Wpemij6mvLqkawfDTM4RxW3BkUDzUxAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712695152; c=relaxed/simple;
-	bh=8jbelJmjK60K89nVSGEJVZ1VFyu5tfUrVQ6MaclgRv8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=LnmGfAlhzMOuXicm/F3+H7nKDlA4b/6FB4fgoxcBvq+qr8Rp+B4PbJ5vNLBWiqOw04eP2lh1mquqW04R9Yy3oSZP3vbdcj0Yt6htOZyjJNqy47rg5EmOG9pbdbujuY/v5fK6ElpIX9rcuNaZh9qNNbRvklRakkUhqoyWzMnqoD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iexLxoS4; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ed63d154-fc1f-4207-b994-9dad73eaebdb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712695148;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SVUiOM0QcRqoo/6o1IjJwVcyR3Qxex0Ao2MUyWJnXTc=;
-	b=iexLxoS4HQYGzHW0qQNnXKyYF04/CU/9OoS0xvx8xGCO4Ix16ivK+y9+ymiwAOQEvR/M5J
-	E7KmoPQbVNKAGeF/j1Zitj8/w+qiZ16xWP+z/osg4i8cW3jrYsKI/f8LAzcbFvhn/hf61S
-	3AMT3shrV2uY9XICbFQwXYTvBCoZNUE=
-Date: Tue, 9 Apr 2024 22:39:03 +0200
+	s=arc-20240116; t=1712700711; c=relaxed/simple;
+	bh=uMpfpNZT/JircILPCLdeo5TrXY5VRv3On2Rb7xVenag=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kCv/6W06ZJsQce5zROg5hbXjGoNU+K1coiap3/EUj3AmqqlzcQA5Qp9u5eOU2ykDVe4Pxp8WlDOI7kHKA1h0tt1vnvUEkZ/iKEa16WXvdMuqjcGfOXTGCuYdim+0dRLJQiyfUOYhv+23W763fg49RStktzweWF44OImfydSB7Kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=RhnzFJav; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-516d16db927so6409197e87.0
+        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 15:11:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712700707; x=1713305507; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cl1aEg9ZkKTDAHIndPvHsR0jY5Vb252ppSopDvYPPc0=;
+        b=RhnzFJavAW22HzyhcV/Gy4v2dytOK6WXyYGaaavpe4bm1F3DBPuUVWEl9YyJDglq02
+         hz20n5XkmPKvl64MrlD07li95V5W7X4keJtztYRcKbcZIOYocJG9230XSzaLgKiMPT/m
+         qvwgolJ2761GdbMaRrVRoD0NEfiNqQxXFsle/Wn3P+BSBiPv0smTZfNileY6pKzKwdY8
+         3TMcJhI+lTjd42dIcPZJ3PMHloCzp0Qt5nT0+g8anlfZvUpvnD+G9PgwlaEHKtc91uXg
+         6limkaC8xel9vjq9BNB6qVct2X/s+fTSY26SxwXoGXU0+59t1evcss6Xx3+rh39Lz6GI
+         xGxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712700707; x=1713305507;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Cl1aEg9ZkKTDAHIndPvHsR0jY5Vb252ppSopDvYPPc0=;
+        b=r30+EV6sdyknkhQL2AEaka8OQHk7VgTFhNnZXcGO1uHabMSs4ngQcNs15G5BMngmys
+         S2v8rtGDVL6uCf5UO7NVjuY7dcGR9l9ZhppOQVSzsRUYImDoqGEH6roJKSS1udrOB4mO
+         IFfHdu4UFoKsGEUa2VX2nvgaq0yKf2ZbkTOOI9F62OxZ1YCc4D6+JlHbg7pUvO+saOPs
+         Crwg7zScVflkTRMyKvAvyxblBwKif2Na1KkYHj8eGcXQ45jW2W9UtCftYsU4ulxl2FcK
+         uhAKo22KUnCtU2SRrpDwNGqtWYshYoIsAVEsJB6KoYqYBKHVk1sYbvRd11X62GIwkrjC
+         GqOg==
+X-Forwarded-Encrypted: i=1; AJvYcCU63XuMtr5IqBvqeXvzR/QNN4Mc+c2ksd0I/PtpMj0p+0WcEYpM5LAPCnNLzPOQUxd+IoDvDpIkpDPe72nzvw6ye5qs
+X-Gm-Message-State: AOJu0YybnSYvmYPUjCv0uxAOVOhvkBTOQ/Fp0id3bjP2R28feXmPtgpz
+	LCanKxPZaYNeT2n9cYVB9tEuWn+pJJ1dmVefIuWo2JMourl8FgIJFVg/IFx2bpp1SmYzw8CKaqa
+	EF8h6+Y7BM8MK9A3CLZIA1733SrjHcsgk3bzKRQ==
+X-Google-Smtp-Source: AGHT+IFTUPK3REgvGdMgOwGApDJXWXHwEqfkXjMrnKsgvS0JKy+X2AS1/dTWFN/mLB8J3aVxZ0Rh0sVUHLgSm3wYrPg=
+X-Received: by 2002:a19:f70b:0:b0:513:b90f:f4dd with SMTP id
+ z11-20020a19f70b000000b00513b90ff4ddmr352775lfe.49.1712700707477; Tue, 09 Apr
+ 2024 15:11:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Robin Murphy <robin.murphy@arm.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
- linux-nvme@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org,
- Bart Van Assche <bvanassche@acm.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Amir Goldstein <amir73il@gmail.com>,
- "josef@toxicpanda.com" <josef@toxicpanda.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- Dan Williams <dan.j.williams@intel.com>, "jack@suse.com" <jack@suse.com>,
- Leon Romanovsky <leonro@nvidia.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-References: <cover.1709635535.git.leon@kernel.org>
- <afc34f07-ff4c-4947-a203-ef244dcf43e8@linux.dev>
-In-Reply-To: <afc34f07-ff4c-4947-a203-ef244dcf43e8@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240403080452.1007601-1-atishp@rivosinc.com> <20240403080452.1007601-21-atishp@rivosinc.com>
+ <20240405-d1a4cb9a441a05a9d2f8b1c8@orel> <976411ab-6ddf-4b10-8e13-1575928415ce@rivosinc.com>
+ <20240409-dd055c3d08e027cf2a5cb4dc@orel>
+In-Reply-To: <20240409-dd055c3d08e027cf2a5cb4dc@orel>
+From: Atish Kumar Patra <atishp@rivosinc.com>
+Date: Tue, 9 Apr 2024 15:11:36 -0700
+Message-ID: <CAHBxVyEh0K5b0SdN-asrOuuggBztZ-mjCoOR=EC067pURRg3aA@mail.gmail.com>
+Subject: Re: [PATCH v5 20/22] KVM: riscv: selftests: Add SBI PMU selftest
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
+	Ajay Kaher <akaher@vmware.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Alexey Makhalov <amakhalov@vmware.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Will Deacon <will@kernel.org>, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Apr 9, 2024 at 1:01=E2=80=AFAM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
+>
+> On Mon, Apr 08, 2024 at 05:37:19PM -0700, Atish Patra wrote:
+> > On 4/5/24 05:50, Andrew Jones wrote:
+> > > On Wed, Apr 03, 2024 at 01:04:49AM -0700, Atish Patra wrote:
+> > > ...
+> > > > +static void test_pmu_basic_sanity(void)
+> > > > +{
+> > > > + long out_val =3D 0;
+> > > > + bool probe;
+> > > > + struct sbiret ret;
+> > > > + int num_counters =3D 0, i;
+> > > > + union sbi_pmu_ctr_info ctrinfo;
+> > > > +
+> > > > + probe =3D guest_sbi_probe_extension(SBI_EXT_PMU, &out_val);
+> > > > + GUEST_ASSERT(probe && out_val =3D=3D 1);
+> > > > +
+> > > > + num_counters =3D get_num_counters();
+> > > > +
+> > > > + for (i =3D 0; i < num_counters; i++) {
+> > > > +         ret =3D sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_GET_IN=
+FO, i,
+> > > > +                         0, 0, 0, 0, 0);
+> > > > +
+> > > > +         /* There can be gaps in logical counter indicies*/
+> > > > +         if (ret.error)
+> > > > +                 continue;
+> > > > +         GUEST_ASSERT_NE(ret.value, 0);
+> > > > +
+> > > > +         ctrinfo.value =3D ret.value;
+> > > > +
+> > > > +         /**
+> > > > +          * Accesibillity check of hardware and read capability of=
+ firmware counters.
+> > >
+> > > Accessibility
+> > >
+> >
+> > Fixed it.
+> >
+> > > > +          * The spec doesn't mandate any initial value. No need to=
+ check any value.
+> > > > +          */
+> > > > +         read_counter(i, ctrinfo);
+> > > > + }
+> > > > +
+> > > > + GUEST_DONE();
+> > > > +}
+> > > > +
+> > > > +static void run_vcpu(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > + struct ucall uc;
+> > > > +
+> > > > + vcpu_run(vcpu);
+> > > > + switch (get_ucall(vcpu, &uc)) {
+> > > > + case UCALL_ABORT:
+> > > > +         REPORT_GUEST_ASSERT(uc);
+> > > > +         break;
+> > > > + case UCALL_DONE:
+> > > > + case UCALL_SYNC:
+> > > > +         break;
+> > > > + default:
+> > > > +         TEST_FAIL("Unknown ucall %lu", uc.cmd);
+> > > > +         break;
+> > > > + }
+> > > > +}
+> > > > +
+> > > > +void test_vm_destroy(struct kvm_vm *vm)
+> > > > +{
+> > > > + memset(ctrinfo_arr, 0, sizeof(union sbi_pmu_ctr_info) * RISCV_MAX=
+_PMU_COUNTERS);
+> > > > + counter_mask_available =3D 0;
+> > > > + kvm_vm_free(vm);
+> > > > +}
+> > > > +
+> > > > +static void test_vm_basic_test(void *guest_code)
+> > > > +{
+> > > > + struct kvm_vm *vm;
+> > > > + struct kvm_vcpu *vcpu;
+> > > > +
+> > > > + vm =3D vm_create_with_one_vcpu(&vcpu, guest_code);
+> > > > + __TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
+> > > > +                            "SBI PMU not available, skipping test"=
+);
+> > > > + vm_init_vector_tables(vm);
+> > > > + /* Illegal instruction handler is required to verify read access =
+without configuration */
+> > > > + vm_install_exception_handler(vm, EXC_INST_ILLEGAL, guest_illegal_=
+exception_handler);
+> > >
+> > > I still don't see where the "verify" part is. The handler doesn't rec=
+ord
+> > > that it had to handle anything.
+> > >
+> >
+> > The objective of the test is to ensure that we get an illegal instructi=
+on
+> > without configuration.
+>
+> This part I guessed.
+>
+> > The presence of the registered exception handler is
+> > sufficient for that.
+>
+> This part I disagree with. The handler may not be necessary and not run i=
+f
+> we don't get the ILL. Usually when I write tests like these I set a
+> boolean in the handler and check it after the instruction which should
+> have sent us there to make sure we did indeed go there.
+>
 
+Ahh I got your point now. That makes sense. Since it was just a sanity test=
+,
+I hadn't put the boolean check earlier. But you are correct about bugs
+in kvm code which wouldn't
+generate an expected ILL .
 
-在 2024/3/7 7:01, Zhu Yanjun 写道:
-> 在 2024/3/5 12:18, Leon Romanovsky 写道:
->> This is complimentary part to the proposed LSF/MM topic.
->> https://lore.kernel.org/linux-rdma/22df55f8-cf64-4aa8-8c0b-b556c867b926@linux.dev/T/#m85672c860539fdbbc8fe0f5ccabdc05b40269057
-> 
-> I am interested in this topic. Hope I can join the meeting to discuss 
-> this topic.
-> 
+I have added it. Thanks for the suggestion :)
 
-With the same idea, in the IDPF driver, the function dma_alloc_coherent 
-which is called in the IDPF driver can be devided into the following 2 
-functions:
-
-iommu_dma_alloc_pages
-
-and
-
-iommu_dma_map_page
-
-So the function iommu_dma_alloc_pages allocates pages, 
-iommu_dma_map_page makes mapping between pages and IOVA.
-
-Now the above idea is implemented in the NIC driver. Currently it can 
-work well.
-
-Next the above idea will be implemented in the block device. Hope this 
-can increase the performance of the block device.
-
-Best Regards,
-Zhu Yanjun
-
-> Zhu Yanjun
-> 
->>
->> This is posted as RFC to get a feedback on proposed split, but RDMA, 
->> VFIO and
->> DMA patches are ready for review and inclusion, the NVMe patches are 
->> still in
->> progress as they require agreement on API first.
->>
->> Thanks
->>
->> -------------------------------------------------------------------------------
->> The DMA mapping operation performs two steps at one same time: allocates
->> IOVA space and actually maps DMA pages to that space. This one shot
->> operation works perfectly for non-complex scenarios, where callers use
->> that DMA API in control path when they setup hardware.
->>
->> However in more complex scenarios, when DMA mapping is needed in data
->> path and especially when some sort of specific datatype is involved,
->> such one shot approach has its drawbacks.
->>
->> That approach pushes developers to introduce new DMA APIs for specific
->> datatype. For example existing scatter-gather mapping functions, or
->> latest Chuck's RFC series to add biovec related DMA mapping [1] and
->> probably struct folio will need it too.
->>
->> These advanced DMA mapping APIs are needed to calculate IOVA size to
->> allocate it as one chunk and some sort of offset calculations to know
->> which part of IOVA to map.
->>
->> Instead of teaching DMA to know these specific datatypes, let's separate
->> existing DMA mapping routine to two steps and give an option to advanced
->> callers (subsystems) perform all calculations internally in advance and
->> map pages later when it is needed.
->>
->> In this series, three users are converted and each of such conversion
->> presents different positive gain:
->> 1. RDMA simplifies and speeds up its pagefault handling for
->>     on-demand-paging (ODP) mode.
->> 2. VFIO PCI live migration code saves huge chunk of memory.
->> 3. NVMe PCI avoids intermediate SG table manipulation and operates
->>     directly on BIOs.
->>
->> Thanks
->>
->> [1] 
->> https://lore.kernel.org/all/169772852492.5232.17148564580779995849.stgit@klimt.1015granger.net
->>
->> Chaitanya Kulkarni (2):
->>    block: add dma_link_range() based API
->>    nvme-pci: use blk_rq_dma_map() for NVMe SGL
->>
->> Leon Romanovsky (14):
->>    mm/hmm: let users to tag specific PFNs
->>    dma-mapping: provide an interface to allocate IOVA
->>    dma-mapping: provide callbacks to link/unlink pages to specific IOVA
->>    iommu/dma: Provide an interface to allow preallocate IOVA
->>    iommu/dma: Prepare map/unmap page functions to receive IOVA
->>    iommu/dma: Implement link/unlink page callbacks
->>    RDMA/umem: Preallocate and cache IOVA for UMEM ODP
->>    RDMA/umem: Store ODP access mask information in PFN
->>    RDMA/core: Separate DMA mapping to caching IOVA and page linkage
->>    RDMA/umem: Prevent UMEM ODP creation with SWIOTLB
->>    vfio/mlx5: Explicitly use number of pages instead of allocated length
->>    vfio/mlx5: Rewrite create mkey flow to allow better code reuse
->>    vfio/mlx5: Explicitly store page list
->>    vfio/mlx5: Convert vfio to use DMA link API
->>
->>   Documentation/core-api/dma-attributes.rst |   7 +
->>   block/blk-merge.c                         | 156 ++++++++++++++
->>   drivers/infiniband/core/umem_odp.c        | 219 +++++++------------
->>   drivers/infiniband/hw/mlx5/mlx5_ib.h      |   1 +
->>   drivers/infiniband/hw/mlx5/odp.c          |  59 +++--
->>   drivers/iommu/dma-iommu.c                 | 129 ++++++++---
->>   drivers/nvme/host/pci.c                   | 220 +++++--------------
->>   drivers/vfio/pci/mlx5/cmd.c               | 252 ++++++++++++----------
->>   drivers/vfio/pci/mlx5/cmd.h               |  22 +-
->>   drivers/vfio/pci/mlx5/main.c              | 136 +++++-------
->>   include/linux/blk-mq.h                    |   9 +
->>   include/linux/dma-map-ops.h               |  13 ++
->>   include/linux/dma-mapping.h               |  39 ++++
->>   include/linux/hmm.h                       |   3 +
->>   include/rdma/ib_umem_odp.h                |  22 +-
->>   include/rdma/ib_verbs.h                   |  54 +++++
->>   kernel/dma/debug.h                        |   2 +
->>   kernel/dma/direct.h                       |   7 +-
->>   kernel/dma/mapping.c                      |  91 ++++++++
->>   mm/hmm.c                                  |  34 +--
->>   20 files changed, 870 insertions(+), 605 deletions(-)
->>
-> 
+> >
+> > The verify part is that the test doesn't end up in a illegal instructio=
+n
+> > exception when you try to access a counter without configuring.
+> >
+> > Let me know if you think we should more verbose comment to explain the
+> > scenario.
+> >
+>
+> With a boolean the test code will be mostly self documenting, but a short
+> comment saying why we expect the boolean to be set would be good too.
+>
+> Thanks,
+> drew
+>
+> >
+> > > > +
+> > > > + vcpu_init_vector_tables(vcpu);
+> > > > + run_vcpu(vcpu);
+> > > > +
+> > > > + test_vm_destroy(vm);
+> > > > +}
+> > > > +
+> > > > +static void test_vm_events_test(void *guest_code)
+> > > > +{
+> > > > + struct kvm_vm *vm =3D NULL;
+> > > > + struct kvm_vcpu *vcpu =3D NULL;
+> > > > +
+> > > > + vm =3D vm_create_with_one_vcpu(&vcpu, guest_code);
+> > > > + __TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
+> > > > +                            "SBI PMU not available, skipping test"=
+);
+> > > > + run_vcpu(vcpu);
+> > > > +
+> > > > + test_vm_destroy(vm);
+> > > > +}
+> > > > +
+> > > > +int main(void)
+> > > > +{
+> > > > + test_vm_basic_test(test_pmu_basic_sanity);
+> > > > + pr_info("SBI PMU basic test : PASS\n");
+> > > > +
+> > > > + test_vm_events_test(test_pmu_events);
+> > > > + pr_info("SBI PMU event verification test : PASS\n");
+> > > > +
+> > > > + return 0;
+> > > > +}
+> > > > --
+> > > > 2.34.1
+> > > >
+> > >
+> > > Thanks,
+> > > drew
+> >
 
