@@ -1,303 +1,214 @@
-Return-Path: <kvm+bounces-14023-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C9389E1F3
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 19:57:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3838289E296
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 20:32:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C751F22057
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 17:57:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C4F3B2231F
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 18:32:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CA8157A72;
-	Tue,  9 Apr 2024 17:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1F6156F24;
+	Tue,  9 Apr 2024 18:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AHpVWGpM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="COcOd5JN"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D30157480;
-	Tue,  9 Apr 2024 17:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23899156C50
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 18:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712685324; cv=none; b=gm7lN4H8E3fYK3NNAf8x3kL4bsJcseVIj2GuA8eKb9s6U9S4XntCiwieW55O9jUFgvM/0S+PsGFRQBFOyfr9CYRPMkbGtw00DoiLQsKM+nQnPleqXft3Et4/xXf+QzpublbL9hHIqnVZk0tOfV2N2n3IH9s43Oi5IzYYruw8Y0c=
+	t=1712687533; cv=none; b=Uu8ZT/ZfHXHC2uZW8Rl+PYi4gZD2bGFseJhzdrZKsqQb/hc4qKY/fuxO7RF7T9mv42mA+50KVVbOtJPSHTHA1E+i1V0vh7HV/jktVzklVXhwT2Wy+T1hsGI5+3etk7ek3MY+ALJQyI1wT8/eYdqW9nZwOs6DRDjR1EcrjRIQfAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712685324; c=relaxed/simple;
-	bh=VdVl0Ca/wCYDKtRpWOVNa0X0nf+ki4CObw26sUsxBAM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LymmvKptnm5XL+hOy5KLH7MN+zsommkK6qMdMl8DMrLWd+0wXLrmdawu5lD4AC9llVtMOKEVsqdfBA/c7PBSl0D6jJtCCOszjj25MK31tcwRKhajfMGnLmpRB8m7qCXNjz9Hf1wzgKd+NCC9LfSdU5vVxZMm9hEwMRf9DPrgeG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AHpVWGpM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D246C43601;
-	Tue,  9 Apr 2024 17:55:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712685324;
-	bh=VdVl0Ca/wCYDKtRpWOVNa0X0nf+ki4CObw26sUsxBAM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AHpVWGpMLvSEm4IROaF8UwUxCobT41GR+2gYdEbca/ZKCzoA/nHi/w4b/ExF/8gFe
-	 5yQnF/gppvpHOuVDUyVpKdiSq47BOFZjQhi/MJj8nh4U7SmOqaMU7SxDVKcT6d/HCp
-	 9XGaAFd3dUP6QG1EZ4daJhJ6tB53b4HRQG1biCSpoqRXdLldn71Hfu0p7G0mxK+KsP
-	 mjz5pMSDXJagQUqEVVdVZx7AjXCdCzDf08SO9ac1DZNn4xx+s/5ABesPxo1hbIezme
-	 rSDhINoZ5p1/PXSPF8J0p0EyV5OE7FEARMfWsyhGIb6/knvJTC8fTPWON3mewwlez1
-	 vMGRkdum4Nygg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ruFgo-002szC-UX;
-	Tue, 09 Apr 2024 18:55:23 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 16/16] KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
-Date: Tue,  9 Apr 2024 18:54:48 +0100
-Message-Id: <20240409175448.3507472-17-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240409175448.3507472-1-maz@kernel.org>
-References: <20240409175448.3507472-1-maz@kernel.org>
+	s=arc-20240116; t=1712687533; c=relaxed/simple;
+	bh=wZoQgVLBw4VDFXd6FLxwRTI9oeMsgJ4z1xvKHfucR6A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aPwqPyJVSVa8MjPbs9kbh5JD44AF9x8gyTDbPSGYbDjZuGLTc+m8gEY7viQjyDQReaqnezEYr+NPnqXq2Dg6/ZMZtz0GaoepPqHekAtgawfLHX0pfpysi+PlbO9euFvHhxVLQXG3Thjdwf2nMp5CzJ2OpvrLiQo08Uju9LXeAYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=COcOd5JN; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1e42a6158d5so24665ad.0
+        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 11:32:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712687530; x=1713292330; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j5abdwPMGcw7HwoxC4O5J3s+hF9tO/lLXB8776mOmRQ=;
+        b=COcOd5JN8A365gC8bKx/NlrMFJQR3rCRfLBFpY97kmqG9iJjcZNsCpVH0dSojG4LyS
+         s+QfkdxfSP9vfi6E0La3mp2n2smrVWBqQf/AV7sUTFuf69Z4RrFK9177nDro9QhqJ9L/
+         zz5oxDvohNJ6Mgz+j2zjLRufsI3XhBcsjoI7YshEc3LG77DIj70xNE7MpZec6EtXEQb0
+         A9JVvTEmahpy4Ic/l8ZXjg5F7b76+JcC7XX0pKW9I6kX7gbJLpo/0Ouye31y+NuSQysL
+         7z03nPdYVcMnZ8zvJZyOEMK1R/JTDyIGL8k6Uaq81/dEXFHJwvIF8DYKqzdsu5N8v5SW
+         yypg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712687530; x=1713292330;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j5abdwPMGcw7HwoxC4O5J3s+hF9tO/lLXB8776mOmRQ=;
+        b=WslD+gleKK+pAU5X+pXcp5JQOHjyT/9p/zJvTjrYv+8xpwXETUcbmmTZCYaHukuWvf
+         bL2Ddps6E2P5IJ3cYgFzFgNnYOYELpGYKnPUB+vh67SZE2gV7HGaMG052kvH/Fcs3LVz
+         xaFNwIVvoOQIgeNDtynW6XK/T4rIWDC0OMaew7UmhrJqBZexg/DDPheg++KdfTvDZ9U5
+         /vltwQj+3FOyBHw/iYQAgwFFVoZl39UsMQRsoY7Kz9tmVj6KSp72oHLqOG7Sa49EFfKc
+         1SAoGmZXA2dfbBDgRP6IaW2fjTgQNSkCcPeC9JHeTV8Pj+wSTnbO5zWX/4p5wTSbrRiw
+         V0BA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ4xWzHGU56UvuLFENBvV8bQf9/Wd4uUc4EBckG0e2eWnhh2a1DZHbaIBQUh3L4BfZgMhLBXCLO/qtTyr7x0KDdK+o
+X-Gm-Message-State: AOJu0Yz7++sz2HS0J3FfokFGqNggVo3vYSbL00+n9awcpBQ5dwee3+wj
+	hmzjxrPR1riJVhCi0iqHnk8ir98C6XLe8H03ypRlYOiyW8XMUc7VeSs1GVdMn4OKHBjg33BmyUK
+	dEcXoK639TBiPZLkt6EUvCQOLno2gc/ZSf6Ay
+X-Google-Smtp-Source: AGHT+IGasFNl4zWnhHzHdsfe5RR8e786OEjTNDXrnKxiWvA1Zc0Whu+C9yfBrzIuflmTKPt/f3PNAqmuUJdBFDt8Z5g=
+X-Received: by 2002:a17:902:d4c5:b0:1e3:dff3:2a3b with SMTP id
+ o5-20020a170902d4c500b001e3dff32a3bmr11701plg.17.1712687530152; Tue, 09 Apr
+ 2024 11:32:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20240401232946.1837665-1-jthoughton@google.com>
+ <20240401232946.1837665-2-jthoughton@google.com> <cce476f7-2f52-428a-8ae4-fc5dec714666@redhat.com>
+In-Reply-To: <cce476f7-2f52-428a-8ae4-fc5dec714666@redhat.com>
+From: James Houghton <jthoughton@google.com>
+Date: Tue, 9 Apr 2024 11:31:32 -0700
+Message-ID: <CADrL8HVPEjdAs3PoTa3sPCvQpimZJG6pP9wbiLjnF5cROxfapA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/7] mm: Add a bitmap into mmu_notifier_{clear,test}_young
+To: David Hildenbrand <david@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Yu Zhao <yuzhao@google.com>, David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Gavin Shan <gshan@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	David Rientjes <rientjes@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Latest kid on the block: NXS (Non-eXtra-Slow) TLBI operations.
+Ah, I didn't see this in my inbox, sorry David!
 
-Let's add those in bulk (NSH, ISH, OSH, both normal and range)
-as they directly map to their XS (the standard ones) counterparts.
+On Thu, Apr 4, 2024 at 11:52=E2=80=AFAM David Hildenbrand <david@redhat.com=
+> wrote:
+>
+> On 02.04.24 01:29, James Houghton wrote:
+> > diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.=
+h
+> > index f349e08a9dfe..daaa9db625d3 100644
+> > --- a/include/linux/mmu_notifier.h
+> > +++ b/include/linux/mmu_notifier.h
+> > @@ -61,6 +61,10 @@ enum mmu_notifier_event {
+> >
+> >   #define MMU_NOTIFIER_RANGE_BLOCKABLE (1 << 0)
+> >
+> > +#define MMU_NOTIFIER_YOUNG                   (1 << 0)
+> > +#define MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE (1 << 1)
+>
+> Especially this one really deserves some documentation :)
 
-Not a lot to say about them, they are basically useless.
+Yes, will do. Something like
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/vhe/tlb.c | 46 +++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c    | 73 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 119 insertions(+)
+    MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE indicates that the passed-in
+bitmap either (1) does not accurately represent the age of the pages
+(in the case of test_young), or (2) was not able to be used to
+completely clear the age/access bit (in the case of clear_young).
 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 8afaa237f5d4..c43ecbce1201 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -227,6 +227,7 @@ void __kvm_flush_vm_context(void)
-  * - a TLBI targeting EL2 S1 is remapped to EL1 S1
-  * - a non-shareable TLBI is upgraded to being inner-shareable
-  * - an outer-shareable TLBI is also mapped to inner-shareable
-+ * - an nXS TLBI is upgraded to XS
-  */
- int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- {
-@@ -250,6 +251,12 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_VMALLE1:
- 	case OP_TLBI_VMALLE1IS:
- 	case OP_TLBI_VMALLE1OS:
-+	case OP_TLBI_ALLE2NXS:
-+	case OP_TLBI_ALLE2ISNXS:
-+	case OP_TLBI_ALLE2OSNXS:
-+	case OP_TLBI_VMALLE1NXS:
-+	case OP_TLBI_VMALLE1ISNXS:
-+	case OP_TLBI_VMALLE1OSNXS:
- 		__tlbi(vmalle1is);
- 		break;
- 	case OP_TLBI_VAE2:
-@@ -258,6 +265,12 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_VAE1:
- 	case OP_TLBI_VAE1IS:
- 	case OP_TLBI_VAE1OS:
-+	case OP_TLBI_VAE2NXS:
-+	case OP_TLBI_VAE2ISNXS:
-+	case OP_TLBI_VAE2OSNXS:
-+	case OP_TLBI_VAE1NXS:
-+	case OP_TLBI_VAE1ISNXS:
-+	case OP_TLBI_VAE1OSNXS:
- 		__tlbi(vae1is, va);
- 		break;
- 	case OP_TLBI_VALE2:
-@@ -266,21 +279,36 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_VALE1:
- 	case OP_TLBI_VALE1IS:
- 	case OP_TLBI_VALE1OS:
-+	case OP_TLBI_VALE2NXS:
-+	case OP_TLBI_VALE2ISNXS:
-+	case OP_TLBI_VALE2OSNXS:
-+	case OP_TLBI_VALE1NXS:
-+	case OP_TLBI_VALE1ISNXS:
-+	case OP_TLBI_VALE1OSNXS:
- 		__tlbi(vale1is, va);
- 		break;
- 	case OP_TLBI_ASIDE1:
- 	case OP_TLBI_ASIDE1IS:
- 	case OP_TLBI_ASIDE1OS:
-+	case OP_TLBI_ASIDE1NXS:
-+	case OP_TLBI_ASIDE1ISNXS:
-+	case OP_TLBI_ASIDE1OSNXS:
- 		__tlbi(aside1is, va);
- 		break;
- 	case OP_TLBI_VAAE1:
- 	case OP_TLBI_VAAE1IS:
- 	case OP_TLBI_VAAE1OS:
-+	case OP_TLBI_VAAE1NXS:
-+	case OP_TLBI_VAAE1ISNXS:
-+	case OP_TLBI_VAAE1OSNXS:
- 		__tlbi(vaae1is, va);
- 		break;
- 	case OP_TLBI_VAALE1:
- 	case OP_TLBI_VAALE1IS:
- 	case OP_TLBI_VAALE1OS:
-+	case OP_TLBI_VAALE1NXS:
-+	case OP_TLBI_VAALE1ISNXS:
-+	case OP_TLBI_VAALE1OSNXS:
- 		__tlbi(vaale1is, va);
- 		break;
- 	case OP_TLBI_RVAE2:
-@@ -289,6 +317,12 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_RVAE1:
- 	case OP_TLBI_RVAE1IS:
- 	case OP_TLBI_RVAE1OS:
-+	case OP_TLBI_RVAE2NXS:
-+	case OP_TLBI_RVAE2ISNXS:
-+	case OP_TLBI_RVAE2OSNXS:
-+	case OP_TLBI_RVAE1NXS:
-+	case OP_TLBI_RVAE1ISNXS:
-+	case OP_TLBI_RVAE1OSNXS:
- 		__tlbi(rvae1is, va);
- 		break;
- 	case OP_TLBI_RVALE2:
-@@ -297,16 +331,28 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_RVALE1:
- 	case OP_TLBI_RVALE1IS:
- 	case OP_TLBI_RVALE1OS:
-+	case OP_TLBI_RVALE2NXS:
-+	case OP_TLBI_RVALE2ISNXS:
-+	case OP_TLBI_RVALE2OSNXS:
-+	case OP_TLBI_RVALE1NXS:
-+	case OP_TLBI_RVALE1ISNXS:
-+	case OP_TLBI_RVALE1OSNXS:
- 		__tlbi(rvale1is, va);
- 		break;
- 	case OP_TLBI_RVAAE1:
- 	case OP_TLBI_RVAAE1IS:
- 	case OP_TLBI_RVAAE1OS:
-+	case OP_TLBI_RVAAE1NXS:
-+	case OP_TLBI_RVAAE1ISNXS:
-+	case OP_TLBI_RVAAE1OSNXS:
- 		__tlbi(rvaae1is, va);
- 		break;
- 	case OP_TLBI_RVAALE1:
- 	case OP_TLBI_RVAALE1IS:
- 	case OP_TLBI_RVAALE1OS:
-+	case OP_TLBI_RVAALE1NXS:
-+	case OP_TLBI_RVAALE1ISNXS:
-+	case OP_TLBI_RVAALE1OSNXS:
- 		__tlbi(rvaale1is, va);
- 		break;
- 	default:
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6d7f043d892c..494b03ecf712 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3033,6 +3033,42 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_VALE1, handle_tlbi_el1),
- 	SYS_INSN(TLBI_VAALE1, handle_tlbi_el1),
- 
-+	SYS_INSN(TLBI_VMALLE1OSNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAE1OSNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_ASIDE1OSNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAAE1OSNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VALE1OSNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAALE1OSNXS, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_RVAE1ISNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAAE1ISNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVALE1ISNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAALE1ISNXS, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_VMALLE1ISNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAE1ISNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_ASIDE1ISNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAAE1ISNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VALE1ISNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAALE1ISNXS, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_RVAE1OSNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAAE1OSNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVALE1OSNXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAALE1OSNXS, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_RVAE1NXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAAE1NXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVALE1NXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAALE1NXS, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_VMALLE1NXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAE1NXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_ASIDE1NXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAAE1NXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VALE1NXS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAALE1NXS, handle_tlbi_el1),
-+
- 	SYS_INSN(TLBI_IPAS2E1IS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2E1IS, handle_ripas2e1is),
- 	SYS_INSN(TLBI_IPAS2LE1IS, handle_ipas2e1is),
-@@ -3063,6 +3099,43 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_RVALE2, trap_undef),
- 	SYS_INSN(TLBI_ALLE1, handle_alle1is),
- 	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
-+
-+	SYS_INSN(TLBI_IPAS2E1ISNXS, handle_ipas2e1is),
-+	SYS_INSN(TLBI_RIPAS2E1ISNXS, handle_ripas2e1is),
-+	SYS_INSN(TLBI_IPAS2LE1ISNXS, handle_ipas2e1is),
-+	SYS_INSN(TLBI_RIPAS2LE1ISNXS, handle_ripas2e1is),
-+
-+	SYS_INSN(TLBI_ALLE2OSNXS, trap_undef),
-+	SYS_INSN(TLBI_VAE2OSNXS, trap_undef),
-+	SYS_INSN(TLBI_ALLE1OSNXS, handle_alle1is),
-+	SYS_INSN(TLBI_VALE2OSNXS, trap_undef),
-+	SYS_INSN(TLBI_VMALLS12E1OSNXS, handle_vmalls12e1is),
-+
-+	SYS_INSN(TLBI_RVAE2ISNXS, trap_undef),
-+	SYS_INSN(TLBI_RVALE2ISNXS, trap_undef),
-+	SYS_INSN(TLBI_ALLE2ISNXS, trap_undef),
-+	SYS_INSN(TLBI_VAE2ISNXS, trap_undef),
-+
-+	SYS_INSN(TLBI_ALLE1ISNXS, handle_alle1is),
-+	SYS_INSN(TLBI_VALE2ISNXS, trap_undef),
-+	SYS_INSN(TLBI_VMALLS12E1ISNXS, handle_vmalls12e1is),
-+	SYS_INSN(TLBI_IPAS2E1OSNXS, handle_ipas2e1is),
-+	SYS_INSN(TLBI_IPAS2E1NXS, handle_ipas2e1is),
-+	SYS_INSN(TLBI_RIPAS2E1NXS, handle_ripas2e1is),
-+	SYS_INSN(TLBI_RIPAS2E1OSNXS, handle_ripas2e1is),
-+	SYS_INSN(TLBI_IPAS2LE1OSNXS, handle_ipas2e1is),
-+	SYS_INSN(TLBI_IPAS2LE1NXS, handle_ipas2e1is),
-+	SYS_INSN(TLBI_RIPAS2LE1NXS, handle_ripas2e1is),
-+	SYS_INSN(TLBI_RIPAS2LE1OSNXS, handle_ripas2e1is),
-+	SYS_INSN(TLBI_RVAE2OSNXS, trap_undef),
-+	SYS_INSN(TLBI_RVALE2OSNXS, trap_undef),
-+	SYS_INSN(TLBI_RVAE2NXS, trap_undef),
-+	SYS_INSN(TLBI_RVALE2NXS, trap_undef),
-+	SYS_INSN(TLBI_ALLE2NXS, trap_undef),
-+	SYS_INSN(TLBI_VAE2NXS, trap_undef),
-+	SYS_INSN(TLBI_ALLE1NXS, handle_alle1is),
-+	SYS_INSN(TLBI_VALE2NXS, trap_undef),
-+	SYS_INSN(TLBI_VMALLS12E1NXS, handle_vmalls12e1is),
- };
- 
- static const struct sys_reg_desc *first_idreg;
--- 
-2.39.2
+>
+> > +#define MMU_NOTIFIER_YOUNG_FAST                      (1 << 2)
+>
+> And that one as well.
 
+Something like
+
+   Indicates that (1) passing a bitmap ({test,clear}_young_bitmap)
+would have been supported for this address range.
+
+The name MMU_NOTIFIER_YOUNG_FAST really comes from the fact that KVM
+is able to harvest the access bit "fast" (so for x86, locklessly, and
+for arm64, with the KVM MMU read lock), "fast" enough that using a
+bitmap to do look-around is probably a good idea.
+
+>
+> Likely best to briefly document all of them, and how they are
+> supposed to be used (return value for X).
+
+Right. Will do.
+
+>
+> > +
+> >   struct mmu_notifier_ops {
+> >       /*
+> >        * Called either by mmu_notifier_unregister or when the mm is
+> > @@ -106,21 +110,36 @@ struct mmu_notifier_ops {
+> >        * clear_young is a lightweight version of clear_flush_young. Lik=
+e the
+> >        * latter, it is supposed to test-and-clear the young/accessed bi=
+tflag
+> >        * in the secondary pte, but it may omit flushing the secondary t=
+lb.
+> > +      *
+> > +      * If @bitmap is given but is not supported, return
+> > +      * MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
+> > +      *
+> > +      * If the walk is done "quickly" and there were young PTEs,
+> > +      * MMU_NOTIFIER_YOUNG_FAST is returned.
+> >        */
+> >       int (*clear_young)(struct mmu_notifier *subscription,
+> >                          struct mm_struct *mm,
+> >                          unsigned long start,
+> > -                        unsigned long end);
+> > +                        unsigned long end,
+> > +                        unsigned long *bitmap);
+> >
+> >       /*
+> >        * test_young is called to check the young/accessed bitflag in
+> >        * the secondary pte. This is used to know if the page is
+> >        * frequently used without actually clearing the flag or tearing
+> >        * down the secondary mapping on the page.
+> > +      *
+> > +      * If @bitmap is given but is not supported, return
+> > +      * MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
+> > +      *
+> > +      * If the walk is done "quickly" and there were young PTEs,
+> > +      * MMU_NOTIFIER_YOUNG_FAST is returned.
+> >        */
+> >       int (*test_young)(struct mmu_notifier *subscription,
+> >                         struct mm_struct *mm,
+> > -                       unsigned long address);
+> > +                       unsigned long start,
+> > +                       unsigned long end,
+> > +                       unsigned long *bitmap);
+>
+> What does "quickly" mean (why not use "fast")? What are the semantics, I
+> don't find any existing usage of that in this file.
+
+"fast" means fast enough such that using a bitmap to scan adjacent
+pages (e.g. with MGLRU) is likely to be beneficial. I'll write more in
+this comment. Perhaps I should just rename it to
+MMU_NOTIFIER_YOUNG_BITMAP_SUPPORTED and drop the whole "likely to be
+beneficial" thing -- that's for MGLRU/etc. to decide really.
+
+>
+> Further, what is MMU_NOTIFIER_YOUNG you introduce used for?
+
+MMU_NOTIFIER_YOUNG is the return value when the page was young, but we
+(1) didn't use a bitmap, and (2) the "fast" access bit harvesting
+wasn't possible. In this case we simply return 1, which is
+MMU_NOTIFIER_YOUNG. I'll make kvm_mmu_notifier_test_clear_young()
+properly return MMU_NOTIFIER_YOUNG instead of relying on the fact that
+it will be 1.
+
+Thanks David!
 
