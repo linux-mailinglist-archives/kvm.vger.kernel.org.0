@@ -1,247 +1,300 @@
-Return-Path: <kvm+bounces-13974-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13975-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0745689D3B8
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 10:02:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE7389D4E9
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 10:53:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6479A1F22E83
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 08:02:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 426E82818FE
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 08:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86F47E105;
-	Tue,  9 Apr 2024 08:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B3B7F46A;
+	Tue,  9 Apr 2024 08:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="bDvmIuLJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PZNOtIG0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3DB7CF2B
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 08:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17427E794;
+	Tue,  9 Apr 2024 08:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712649714; cv=none; b=uWd8BfcjLWDjH638yD14SUqDL6k9DhfbREG8nxcSysY6me2sWpeFY//gSO4WBRpQ7RUaTPSLL7B5MdcibP7GNZEh9XhRezHTdRugMk9zaMOjuC3Dy4Xh/hsedvT78jESZvJ+hgOiXHzKhDf6HOQa6ORhhWTGvh1Mm6mt5GQabzU=
+	t=1712652784; cv=none; b=ljQT2V1oEWfpTAMHettgKVnc6dpIRA3GhH9P+91PpiS2oFgii9Z6+RpMyFv8LPL8S7e7TjNYWo7WR/8RTCXXdL1C7SnfGc/pz6kLw6tQO2ST2BjG30ZeTlZoU+NzoeLuilghqxpfpbo7s2jF5pPel7klMiuE6HL/7BHwTHKDJTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712649714; c=relaxed/simple;
-	bh=bMz8MjfIFsUyXV5WBM+KwspP/jmIVlkv1FepIQu2Qp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZONJl7yn+FMyG6FZMq4/l/HDLLYxEgY51AKpd+tVcK87mc9mz/gFRx0/pn1PQaR7T71O2hvA0b1i+LTJNFDzgq3zMjVzfCQ5pip5fy1T8fGEha0Q6xkDbTiEPYJcP95bXblN1jA9Zi16hbDBdVHMJd5nPqjOXgv14iG/36YyKOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=bDvmIuLJ; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a4644bde1d4so729761166b.3
-        for <kvm@vger.kernel.org>; Tue, 09 Apr 2024 01:01:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1712649710; x=1713254510; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hCIVc0ToTPxKSHwFH39eeFiQ4Iaybjud05qpLdkE0so=;
-        b=bDvmIuLJoYJqpdDTSPlonpFWZ014QS2fVczgt/f+ynUjQb2JujJWKWF12nHXlha+3H
-         +zywUUlMWJ0TajJEgqBtUVF/t+zW5EWW5A2nOf8wmwsPZHnrmHYaq1K8/ACLGAqIDc71
-         blYJwT13++VKoz638Dp1c+9PUBEt/DbD3l/ziA/nFGyX9/UU857ifGmcMTJg52CzW9WL
-         R7PLZOBpEHMcWLXHynqP1d1uqMvNS37Fk8loTmXGwMKJHxUNq3M6yqpL7v4Oe4GodW9U
-         gGIcw+qmWANNzonmrTZPY4zZyk3H52XleZAkKfVOmthbobOBh/vzHuRl2tQQhG20Ohdx
-         7HVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712649710; x=1713254510;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hCIVc0ToTPxKSHwFH39eeFiQ4Iaybjud05qpLdkE0so=;
-        b=UPYtCGB1+dz4n8dLfmUNZ375bw16wxGTBWD4il0OwVQQHON0c35VxpyPe4TjaAKNeQ
-         JpepecZ9KW9COarzoMXFh0+fA53RqYay5wn9FW84YgO3L5J2fZtgsyxzwojnoJYqwZ8G
-         L5zBwI0kIwKxSxHm50Pimlw7oZkclaqzlYbm/A40rtuJrj7mqsGomNf3Crq3NidlkVVI
-         HT6xsYTdCbdu3kLACLtPClcR4Yc+G3uzaAtIhQPQRQzRSWC9L8kq5RywYhO5ysv2OqrB
-         XyX1y61Jb+CA0HEo4w/mnAKGV1x4dwgGkZ/bUovl/rKN3N7Ub2OYd3p/bkk2WZgnswNg
-         MUDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhMvOxjjU1BGjH268DXHLzjWdjoTSAS3KCs/m0wk93o+rVgMGIj1M5+nCtdIn7bXYgi8ZKW55kyF5nVNILTqLOhsid
-X-Gm-Message-State: AOJu0YxJeoin+0UxSFKHmTKK2Chb19Ao7a0wAV7+a1Vp+lDgORb1IJWN
-	94u6twfyScyfzUs7vdjgIzLI5cg/qocRDpSKSZzN3zFjwcOx3g19W4bQvJz0/Xs=
-X-Google-Smtp-Source: AGHT+IG/T7uaqwe5y6oCGXamr2sprW/wjX+aVwR61ApsAhhRf7ZUfXSB3xs49ZIPwF/ZvGx/GUAiPw==
-X-Received: by 2002:a17:906:c454:b0:a4d:f5e6:2e34 with SMTP id ck20-20020a170906c45400b00a4df5e62e34mr6793646ejb.19.1712649710207;
-        Tue, 09 Apr 2024 01:01:50 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id xh13-20020a170906da8d00b00a51c0c0cb86sm3775778ejb.22.2024.04.09.01.01.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 01:01:49 -0700 (PDT)
-Date: Tue, 9 Apr 2024 10:01:48 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
-	Ajay Kaher <akaher@vmware.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
-	Alexey Makhalov <amakhalov@vmware.com>, Conor Dooley <conor.dooley@microchip.com>, 
-	Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Will Deacon <will@kernel.org>, x86@kernel.org
-Subject: Re: [PATCH v5 20/22] KVM: riscv: selftests: Add SBI PMU selftest
-Message-ID: <20240409-dd055c3d08e027cf2a5cb4dc@orel>
-References: <20240403080452.1007601-1-atishp@rivosinc.com>
- <20240403080452.1007601-21-atishp@rivosinc.com>
- <20240405-d1a4cb9a441a05a9d2f8b1c8@orel>
- <976411ab-6ddf-4b10-8e13-1575928415ce@rivosinc.com>
+	s=arc-20240116; t=1712652784; c=relaxed/simple;
+	bh=LXkNVlRuW9flSn9i9Am3TH+MFAtd0G+t2OWUcoL9zg8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iYHBiK6I4OQx+G2tIWM7rQDIc8hWSylEO38xVsXyCDfL8kxVmEgei/34qpV+2hCYYT0qgXko4F9QR4SCJgmzIFxRrtMZms3KyAyBv5UyGfkNoiznkn+E3t6EJgWmW40W8Rc83romlG/zBaxzxAst5PODztrjCNX8/lAT3anhTgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PZNOtIG0; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712652783; x=1744188783;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=LXkNVlRuW9flSn9i9Am3TH+MFAtd0G+t2OWUcoL9zg8=;
+  b=PZNOtIG0bYb8RwdkHnHtDuJHqJuSc1NsffEanhru/kA+rz6UjtNaFCjb
+   TYP38UUcXXU9x9fMLLRuTu13AQByji82eXzO9LKkj4m+ZJS7DcrYSffDI
+   EBH4Xvks/Yth6bxgaWvWbAWR7FVkoTn6nQCMd16d9Sos/eQC2q2hIOORP
+   WzDjfYccnHGpSeJO9Np+gPVajPZSi1euB2f7Vo5PoZ0lm/4C98XrUm54q
+   BqD7NYQgMHP+HAS2a+oIOUWV+5MHQAy/9xZmsGDBcENP8uLrWi/gv0pq7
+   HBbE0Xh64a6MxXV9FPSShZ3EWSsxtLTt3EOeT8jyMAKwPJfUcLcB305RX
+   A==;
+X-CSE-ConnectionGUID: rFSTUaXaShKf8o9y3HgyIQ==
+X-CSE-MsgGUID: E24n8qbPTiuyZtc+RQar9g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11038"; a="18563303"
+X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
+   d="scan'208";a="18563303"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 01:53:02 -0700
+X-CSE-ConnectionGUID: 89x2+YlKRTaKym0zn3MeNQ==
+X-CSE-MsgGUID: kXKIZc6NS7iIB7ucFUO7IA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
+   d="scan'208";a="24898864"
+Received: from unknown (HELO [10.238.9.252]) ([10.238.9.252])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 01:52:58 -0700
+Message-ID: <bb05156c-a143-4257-b5a3-4af05429e07f@linux.intel.com>
+Date: Tue, 9 Apr 2024 16:52:56 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <976411ab-6ddf-4b10-8e13-1575928415ce@rivosinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 096/130] KVM: VMX: Move NMI/exception handler to
+ common helper
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ Sean Christopherson <sean.j.christopherson@intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <b709dc92da98e6bd0ba15c80c1f291beafc9dada.1708933498.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <b709dc92da98e6bd0ba15c80c1f291beafc9dada.1708933498.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 08, 2024 at 05:37:19PM -0700, Atish Patra wrote:
-> On 4/5/24 05:50, Andrew Jones wrote:
-> > On Wed, Apr 03, 2024 at 01:04:49AM -0700, Atish Patra wrote:
-> > ...
-> > > +static void test_pmu_basic_sanity(void)
-> > > +{
-> > > +	long out_val = 0;
-> > > +	bool probe;
-> > > +	struct sbiret ret;
-> > > +	int num_counters = 0, i;
-> > > +	union sbi_pmu_ctr_info ctrinfo;
-> > > +
-> > > +	probe = guest_sbi_probe_extension(SBI_EXT_PMU, &out_val);
-> > > +	GUEST_ASSERT(probe && out_val == 1);
-> > > +
-> > > +	num_counters = get_num_counters();
-> > > +
-> > > +	for (i = 0; i < num_counters; i++) {
-> > > +		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_GET_INFO, i,
-> > > +				0, 0, 0, 0, 0);
-> > > +
-> > > +		/* There can be gaps in logical counter indicies*/
-> > > +		if (ret.error)
-> > > +			continue;
-> > > +		GUEST_ASSERT_NE(ret.value, 0);
-> > > +
-> > > +		ctrinfo.value = ret.value;
-> > > +
-> > > +		/**
-> > > +		 * Accesibillity check of hardware and read capability of firmware counters.
-> > 
-> > Accessibility
-> > 
-> 
-> Fixed it.
-> 
-> > > +		 * The spec doesn't mandate any initial value. No need to check any value.
-> > > +		 */
-> > > +		read_counter(i, ctrinfo);
-> > > +	}
-> > > +
-> > > +	GUEST_DONE();
-> > > +}
-> > > +
-> > > +static void run_vcpu(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	struct ucall uc;
-> > > +
-> > > +	vcpu_run(vcpu);
-> > > +	switch (get_ucall(vcpu, &uc)) {
-> > > +	case UCALL_ABORT:
-> > > +		REPORT_GUEST_ASSERT(uc);
-> > > +		break;
-> > > +	case UCALL_DONE:
-> > > +	case UCALL_SYNC:
-> > > +		break;
-> > > +	default:
-> > > +		TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> > > +		break;
-> > > +	}
-> > > +}
-> > > +
-> > > +void test_vm_destroy(struct kvm_vm *vm)
-> > > +{
-> > > +	memset(ctrinfo_arr, 0, sizeof(union sbi_pmu_ctr_info) * RISCV_MAX_PMU_COUNTERS);
-> > > +	counter_mask_available = 0;
-> > > +	kvm_vm_free(vm);
-> > > +}
-> > > +
-> > > +static void test_vm_basic_test(void *guest_code)
-> > > +{
-> > > +	struct kvm_vm *vm;
-> > > +	struct kvm_vcpu *vcpu;
-> > > +
-> > > +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> > > +	__TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
-> > > +				   "SBI PMU not available, skipping test");
-> > > +	vm_init_vector_tables(vm);
-> > > +	/* Illegal instruction handler is required to verify read access without configuration */
-> > > +	vm_install_exception_handler(vm, EXC_INST_ILLEGAL, guest_illegal_exception_handler);
-> > 
-> > I still don't see where the "verify" part is. The handler doesn't record
-> > that it had to handle anything.
-> > 
-> 
-> The objective of the test is to ensure that we get an illegal instruction
-> without configuration.
 
-This part I guessed.
 
-> The presence of the registered exception handler is
-> sufficient for that.
+On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>
+> TDX mostly handles NMI/exception exit mostly the same to VMX case.  The
+> difference is how to retrieve exit qualification.  To share the code with
+> TDX, move NMI/exception to a common header, common.h.
 
-This part I disagree with. The handler may not be necessary and not run if
-we don't get the ILL. Usually when I write tests like these I set a
-boolean in the handler and check it after the instruction which should
-have sent us there to make sure we did indeed go there.
+Suggest to add "No functional change intended." in the changelog.
 
-> 
-> The verify part is that the test doesn't end up in a illegal instruction
-> exception when you try to access a counter without configuring.
-> 
-> Let me know if you think we should more verbose comment to explain the
-> scenario.
-> 
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/kvm/vmx/common.h | 59 +++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/vmx.c    | 68 +++++----------------------------------
+>   2 files changed, 67 insertions(+), 60 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
+> index 6f21d0d48809..632af7a76d0a 100644
+> --- a/arch/x86/kvm/vmx/common.h
+> +++ b/arch/x86/kvm/vmx/common.h
+> @@ -4,8 +4,67 @@
+>   
+>   #include <linux/kvm_host.h>
+>   
+> +#include <asm/traps.h>
+> +
+>   #include "posted_intr.h"
+>   #include "mmu.h"
+> +#include "vmcs.h"
+> +#include "x86.h"
+> +
+> +extern unsigned long vmx_host_idt_base;
+> +void vmx_do_interrupt_irqoff(unsigned long entry);
+> +void vmx_do_nmi_irqoff(void);
+> +
+> +static inline void vmx_handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * Save xfd_err to guest_fpu before interrupt is enabled, so the
+> +	 * MSR value is not clobbered by the host activity before the guest
+> +	 * has chance to consume it.
+> +	 *
+> +	 * Do not blindly read xfd_err here, since this exception might
+> +	 * be caused by L1 interception on a platform which doesn't
+> +	 * support xfd at all.
+> +	 *
+> +	 * Do it conditionally upon guest_fpu::xfd. xfd_err matters
+> +	 * only when xfd contains a non-zero value.
+> +	 *
+> +	 * Queuing exception is done in vmx_handle_exit. See comment there.
+> +	 */
+> +	if (vcpu->arch.guest_fpu.fpstate->xfd)
+> +		rdmsrl(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
+> +}
+> +
+> +static inline void vmx_handle_exception_irqoff(struct kvm_vcpu *vcpu,
+> +					       u32 intr_info)
+> +{
+> +	/* if exit due to PF check for async PF */
+> +	if (is_page_fault(intr_info))
+> +		vcpu->arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
+> +	/* if exit due to NM, handle before interrupts are enabled */
+> +	else if (is_nm_fault(intr_info))
+> +		vmx_handle_nm_fault_irqoff(vcpu);
+> +	/* Handle machine checks before interrupts are enabled */
+> +	else if (is_machine_check(intr_info))
+> +		kvm_machine_check();
+> +}
+> +
+> +static inline void vmx_handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
+> +							u32 intr_info)
+> +{
+> +	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+> +	gate_desc *desc = (gate_desc *)vmx_host_idt_base + vector;
+> +
+> +	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
+> +	    "unexpected VM-Exit interrupt info: 0x%x", intr_info))
+> +		return;
+> +
+> +	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
+> +	vmx_do_interrupt_irqoff(gate_offset(desc));
+> +	kvm_after_interrupt(vcpu);
+> +
+> +	vcpu->arch.at_instruction_boundary = true;
+> +}
+>   
+>   static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
+>   					     unsigned long exit_qualification)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 29d891e0795e..f8a00a766c40 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -518,7 +518,7 @@ static inline void vmx_segment_cache_clear(struct vcpu_vmx *vmx)
+>   	vmx->segment_cache.bitmask = 0;
+>   }
+>   
+> -static unsigned long host_idt_base;
+> +unsigned long vmx_host_idt_base;
+>   
+>   #if IS_ENABLED(CONFIG_HYPERV)
+>   static bool __read_mostly enlightened_vmcs = true;
+> @@ -4273,7 +4273,7 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
+>   	vmcs_write16(HOST_SS_SELECTOR, __KERNEL_DS);  /* 22.2.4 */
+>   	vmcs_write16(HOST_TR_SELECTOR, GDT_ENTRY_TSS*8);  /* 22.2.4 */
+>   
+> -	vmcs_writel(HOST_IDTR_BASE, host_idt_base);   /* 22.2.4 */
+> +	vmcs_writel(HOST_IDTR_BASE, vmx_host_idt_base);   /* 22.2.4 */
+>   
+>   	vmcs_writel(HOST_RIP, (unsigned long)vmx_vmexit); /* 22.2.5 */
+>   
+> @@ -5166,7 +5166,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>   	intr_info = vmx_get_intr_info(vcpu);
+>   
+>   	/*
+> -	 * Machine checks are handled by handle_exception_irqoff(), or by
+> +	 * Machine checks are handled by vmx_handle_exception_irqoff(), or by
+>   	 * vmx_vcpu_run() if a #MC occurs on VM-Entry.  NMIs are handled by
+>   	 * vmx_vcpu_enter_exit().
+>   	 */
+> @@ -5174,7 +5174,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>   		return 1;
+>   
+>   	/*
+> -	 * Queue the exception here instead of in handle_nm_fault_irqoff().
+> +	 * Queue the exception here instead of in vmx_handle_nm_fault_irqoff().
+>   	 * This ensures the nested_vmx check is not skipped so vmexit can
+>   	 * be reflected to L1 (when it intercepts #NM) before reaching this
+>   	 * point.
+> @@ -6889,59 +6889,6 @@ void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
+>   	vmcs_write64(EOI_EXIT_BITMAP3, eoi_exit_bitmap[3]);
+>   }
+>   
+> -void vmx_do_interrupt_irqoff(unsigned long entry);
+> -void vmx_do_nmi_irqoff(void);
+> -
+> -static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
+> -{
+> -	/*
+> -	 * Save xfd_err to guest_fpu before interrupt is enabled, so the
+> -	 * MSR value is not clobbered by the host activity before the guest
+> -	 * has chance to consume it.
+> -	 *
+> -	 * Do not blindly read xfd_err here, since this exception might
+> -	 * be caused by L1 interception on a platform which doesn't
+> -	 * support xfd at all.
+> -	 *
+> -	 * Do it conditionally upon guest_fpu::xfd. xfd_err matters
+> -	 * only when xfd contains a non-zero value.
+> -	 *
+> -	 * Queuing exception is done in vmx_handle_exit. See comment there.
+> -	 */
+> -	if (vcpu->arch.guest_fpu.fpstate->xfd)
+> -		rdmsrl(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
+> -}
+> -
+> -static void handle_exception_irqoff(struct kvm_vcpu *vcpu, u32 intr_info)
+> -{
+> -	/* if exit due to PF check for async PF */
+> -	if (is_page_fault(intr_info))
+> -		vcpu->arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
+> -	/* if exit due to NM, handle before interrupts are enabled */
+> -	else if (is_nm_fault(intr_info))
+> -		handle_nm_fault_irqoff(vcpu);
+> -	/* Handle machine checks before interrupts are enabled */
+> -	else if (is_machine_check(intr_info))
+> -		kvm_machine_check();
+> -}
+> -
+> -static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
+> -					     u32 intr_info)
+> -{
+> -	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+> -	gate_desc *desc = (gate_desc *)host_idt_base + vector;
+> -
+> -	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
+> -	    "unexpected VM-Exit interrupt info: 0x%x", intr_info))
+> -		return;
+> -
+> -	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
+> -	vmx_do_interrupt_irqoff(gate_offset(desc));
+> -	kvm_after_interrupt(vcpu);
+> -
+> -	vcpu->arch.at_instruction_boundary = true;
+> -}
+> -
+>   void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -6950,9 +6897,10 @@ void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+>   		return;
+>   
+>   	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
+> -		handle_external_interrupt_irqoff(vcpu, vmx_get_intr_info(vcpu));
+> +		vmx_handle_external_interrupt_irqoff(vcpu,
+> +						     vmx_get_intr_info(vcpu));
+>   	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
+> -		handle_exception_irqoff(vcpu, vmx_get_intr_info(vcpu));
+> +		vmx_handle_exception_irqoff(vcpu, vmx_get_intr_info(vcpu));
+>   }
+>   
+>   /*
+> @@ -8284,7 +8232,7 @@ __init int vmx_hardware_setup(void)
+>   	int r;
+>   
+>   	store_idt(&dt);
+> -	host_idt_base = dt.address;
+> +	vmx_host_idt_base = dt.address;
+>   
+>   	vmx_setup_user_return_msrs();
+>   
 
-With a boolean the test code will be mostly self documenting, but a short
-comment saying why we expect the boolean to be set would be good too.
-
-Thanks,
-drew
-
-> 
-> > > +
-> > > +	vcpu_init_vector_tables(vcpu);
-> > > +	run_vcpu(vcpu);
-> > > +
-> > > +	test_vm_destroy(vm);
-> > > +}
-> > > +
-> > > +static void test_vm_events_test(void *guest_code)
-> > > +{
-> > > +	struct kvm_vm *vm = NULL;
-> > > +	struct kvm_vcpu *vcpu = NULL;
-> > > +
-> > > +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> > > +	__TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
-> > > +				   "SBI PMU not available, skipping test");
-> > > +	run_vcpu(vcpu);
-> > > +
-> > > +	test_vm_destroy(vm);
-> > > +}
-> > > +
-> > > +int main(void)
-> > > +{
-> > > +	test_vm_basic_test(test_pmu_basic_sanity);
-> > > +	pr_info("SBI PMU basic test : PASS\n");
-> > > +
-> > > +	test_vm_events_test(test_pmu_events);
-> > > +	pr_info("SBI PMU event verification test : PASS\n");
-> > > +
-> > > +	return 0;
-> > > +}
-> > > -- 
-> > > 2.34.1
-> > > 
-> > 
-> > Thanks,
-> > drew
-> 
 
