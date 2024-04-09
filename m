@@ -1,250 +1,233 @@
-Return-Path: <kvm+bounces-13943-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13944-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BCBA89CFC1
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 03:21:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D24489CFE6
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 03:37:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EF051C23BE3
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 01:21:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F7DE1C23C17
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 01:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D9198BF9;
-	Tue,  9 Apr 2024 01:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501F3F9CD;
+	Tue,  9 Apr 2024 01:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1AgBQzVh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uu4HvniB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B6963B9
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 01:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB50E8BE8
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 01:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712625684; cv=none; b=Vz4VlE3ppfUIqv7co6XsziKrTTGaosZm/xG43GpwP/l12XEbi/KP2xzqqmGicviqNzL/+lT8N6/HZZps65Kx2LRFqp6WVEg16x26wRKKYZaMc9iHsr/D/gRHFtyGBQmfjyYn3TUWY2VtpUaTNnDM27njqeIFcpbIGE+zWuNh7J0=
+	t=1712626655; cv=none; b=c/2Mq+HIp2fvNGRK7ZvuNdEvuSLKyTrMlZ9NADfffrRv49AoNrc3MQ1eRJA5AuTySTaRAqAGoW/j25e9P86bIijeCEQaMvBU914QoNuTsJMa9QqnkeYUXq0ue1uOYvqvZbukQ6wZNysrW2u4ZMo04fVF5N5jlRjQMXGtn7PmaEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712625684; c=relaxed/simple;
-	bh=HLb3lzTl8sakQLxebX64cAFyuxzRJONTupHQAaLnEhc=;
+	s=arc-20240116; t=1712626655; c=relaxed/simple;
+	bh=BaSg7ch3d2lz1UPLvkxJNOW7XPlVJW6QBboYvJclAi0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jxwHedvfVIpXFKuvVIir42U4sIkKcls5txP+5BJsLR6118nJFv/SuybQpEbvpUFb7rWRXCn8Pv6f+s5P6pjBgCIfDw8+3uCtF9z7kJUlmixryvXDl2fd8lhMxMCsvF0+gmnvI0Tr15xcG0wozUGf7b9XuluyhnF7KRBfzTYITNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1AgBQzVh; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=PLQDQb+zkJ6TOTggW/cenJO49iA7VDCWMoMNN0o7A3cyFIEQFI8IIov5Ob5rsELNBtA4yiKQ5fPf1sEaOsvR4IlNsHnfoy3MATzCrlMDCgQ4Oe44O1uZNHk8GHNZxeAi8DGdwTc0uC4i80hl89rm8gXrl7J2HVGBymcVQGnN+l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uu4HvniB; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e2bbb6049eso24470475ad.0
-        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 18:21:22 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e0b5e55778so38741785ad.3
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 18:37:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712625682; x=1713230482; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712626653; x=1713231453; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DOboyqOmohbafhdvLzQ0D4l7iWv9fFGfP8r0CMbFChY=;
-        b=1AgBQzVhdwOsycJqWH10ruQ8m+NPcKnwIhrIs+Mot4gZWtocWpoLfB8HG+xJafjjVR
-         PnVBbC1hdmOS9O/u/zRH80j6//K+88t1kA7KqqGFKok71QjwPqf2kHUMEJpLycmt8jjV
-         Qvi80XPG5aNyFE8l9tsNfYIdryOS8CB3zQTANJz99uM5zJVd9+hCDb+a7ku0yR58sytf
-         Dmcs0nDTrq6b/Grt69a3Xp4VmMT3w5L2eHza6YAu2kf4gAQDemJyIAaqalF++eZdShn7
-         jLQS5YKCju5mPR5Y4qdx1WVpUkRbTp1oG7nPdaH3DICKP/UONBTIVSs2Wv64/tjTKZPX
-         zlDg==
+        bh=pTnXG7YvYzmRGdsTsIToSlQ51H4VFsJL7wKMPVx2EDM=;
+        b=uu4HvniBTFSS7+BwzaIEKokOmCBsYE7aV3j5k3abu0jCFNjM6FU4LFgDP2F+ZQzmmD
+         fguzlsEMPyrDisOK+GGKfpKTyt4T30sbbrbbyQOyedu3On0RJfoIcXa31bhBH/gADzR5
+         OhgCqaR7gIsz/LqC6ilnip9PzkT0uQ6+5n+X9v5e/G4Y1ucWzJLFKmrpzgDyzRaeO6U1
+         c/jfTb0mnnZS4HQ+Ej0AsM0zklm1PrAiKDqdSfPAJWLNCOLMpMVv+8VSpATxueam1VDN
+         st9dvHpJdwO/wkLPfm9i6xMmDkNk1e3P8FDpL6G46dNWLe0N/xWPXyt6D5UynPtOVKlu
+         ibFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712625682; x=1713230482;
+        d=1e100.net; s=20230601; t=1712626653; x=1713231453;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=DOboyqOmohbafhdvLzQ0D4l7iWv9fFGfP8r0CMbFChY=;
-        b=iRGn+zwKXAm1eMwt0a/uQINYHjwd4y5w0vDFeiBc+asyB3aSJhXQ2XXq6Db1/pgcDK
-         fabArRNKXXaxXGi9C1LgAR8tgVCMq406s8SbMAlckvVHhqE9O2DBp2r37yPwHr9Cyy4I
-         4rKhuMTh7oUOM+B4u5vYgAG4h7muULsPQJAO13gkzec27z0rsRcR2o0ZpCHkzpmyXA+h
-         e0oP2P5mW5AswAVneh4J6daPH8Go6GcUHYheLlhoTvxJ0SxFAbFaT2xtU5uZy+/xJ1fc
-         62E301kOnIaSlrTnzAhnLbAp1xZTRketoAQzDmOYjZU7T88Df1ATGo1e1oeu4kR92nMj
-         oYuA==
-X-Gm-Message-State: AOJu0Yym6i9tmAppook4J3H4zvTfWUlQRetvZ8pPm3LQyhY6YIneULA3
-	naN0CiTzpQuB+pEiJ4pCuLgKCc8SGb85fb3PG83CMtQllAmtBBio/p8hdHeK4mzZTmploB6gmjj
-	dag==
-X-Google-Smtp-Source: AGHT+IHqFrHMa7zvZVYCVZteRx1klk5aQx2fqWK/tBoc1XrugycZfp9s9t1gg8Ky3mKSw7Fs1naZwSgjsK4=
+        bh=pTnXG7YvYzmRGdsTsIToSlQ51H4VFsJL7wKMPVx2EDM=;
+        b=r2Xn6w9n62J7ojOWnTX0q3J666n0As64GKJNtNEcD4Jk0b2/5czEBez/LzIyLHKUOP
+         tqsAeIqDR1MQ9pcpqWxDNKh2AXjsLAn2NChGosm4Zo0E5Zcf0l6bJjb70wX4lF98CNuu
+         RW73cw65CUqBR++U45qX5xE0b7t0oYrrlPXYWr/tRAXl7/7/e5L+/4TKWdj9yqyfXqx8
+         1gCh8xDdwA4DzTADeziz4vuXXiwEXHTC6p28tCz86CqfANo8Rv2vXtVzHAt0QqGNA+mI
+         HUgHbfGsJpgOT+KeeLQPULsV8UmX7dpZzJBdCguga5CjWEiWDEyyRSzrJf9uV5AKLdkJ
+         WM+A==
+X-Forwarded-Encrypted: i=1; AJvYcCWA/NrMwqyUK0N7T2e3wVpIcVd43WGCUyg+Ge15KySjT94ZaMl1i4JN/fvZv/KgHgsgjUtwPtOqAjzaq+RNkVRnhm9M
+X-Gm-Message-State: AOJu0YzT+3Bf0dy+CcN8ApC3zn0Yaz1iLKvH7qTETd/a0y1f3l/ENVIg
+	Iba3FXA/d1B2t/Ke9ZU/pRrgtdSaW2Jfdnm+skFVAdKCiL8+Mj/9AXZwtL3j4vn8UaVWdSjd+cn
+	Eeg==
+X-Google-Smtp-Source: AGHT+IHz67h1hmRwe9KXBRLMyq3Gzn7HhjiIHEg9/DPuUSctMPB71xN043N2itoO/43t2nfaG4/U84FiJ60=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:da83:b0:1e3:c934:61d1 with SMTP id
- j3-20020a170902da8300b001e3c93461d1mr59865plx.10.1712625682465; Mon, 08 Apr
- 2024 18:21:22 -0700 (PDT)
-Date: Mon, 8 Apr 2024 18:21:21 -0700
-In-Reply-To: <43d1ade0461868016165e964e2bc97f280aee9d4.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:230b:b0:1e4:4056:b969 with SMTP id
+ d11-20020a170903230b00b001e44056b969mr274362plh.10.1712626653272; Mon, 08 Apr
+ 2024 18:37:33 -0700 (PDT)
+Date: Mon, 8 Apr 2024 18:37:31 -0700
+In-Reply-To: <957b26d18ba7db611ed6582366066667267d10b8.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240404121327.3107131-1-pbonzini@redhat.com> <20240404121327.3107131-8-pbonzini@redhat.com>
- <43d1ade0461868016165e964e2bc97f280aee9d4.camel@intel.com>
-Message-ID: <ZhSYEVCHqSOpVKMh@google.com>
-Subject: Re: [PATCH v5 07/17] KVM: x86: add fields to struct kvm_arch for CoCo features
+References: <20240405165844.1018872-1-seanjc@google.com> <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
+ <ZhQZYzkDPMxXe2RN@google.com> <a17c6f2a3b3fc6953eb64a0c181b947e28bb1de9.camel@intel.com>
+ <ZhQ8UCf40UeGyfE_@google.com> <5faaeaa7bc66dbc4ea86a64ef8e8f9b22fd22ef4.camel@intel.com>
+ <ZhRxWxRLbnrqwQYw@google.com> <957b26d18ba7db611ed6582366066667267d10b8.camel@intel.com>
+Message-ID: <ZhSb28hHoyJ55-ga@google.com>
+Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
 From: Sean Christopherson <seanjc@google.com>
 To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+Cc: "davidskidmore@google.com" <davidskidmore@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>
+	"srutherford@google.com" <srutherford@google.com>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Wei W Wang <wei.w.wang@intel.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 05, 2024, Rick P Edgecombe wrote:
-> On Thu, 2024-04-04 at 08:13 -0400, Paolo Bonzini wrote:
-> > =C2=A0
-> > =C2=A0struct kvm_arch {
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unsigned long vm_type;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unsigned long n_used_mm=
-u_pages;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unsigned long n_request=
-ed_mmu_pages;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unsigned long n_max_mmu=
-_pages;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unsigned int indirect_s=
-hadow_pages;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u8 mmu_valid_gen;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u8 vm_type;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool has_private_mem;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool has_protected_state;
->=20
-> I'm a little late to this conversation, so hopefully not just complicatin=
-g
-> things. But why not deduce has_private_mem and has_protected_state from t=
-he
-> vm_type during runtime? Like if kvm.arch.vm_type was instead a bit mask w=
-ith
-> the bit position of the KVM_X86_*_VM set, kvm_arch_has_private_mem() coul=
-d
-> bitwise-and with a compile time mask of vm_types that have primate memory=
-.
-> This also prevents it from ever transitioning through non-nonsensical sta=
-tes
-> like vm_type =3D=3D KVM_X86_TDX_VM, but !has_private_memory, so would be =
-a little
-> more robust.
-
-LOL, time is a circle, or something like that.  Paolo actually did this in =
-v2[*],
-and I objected, vociferously.
-
-KVM advertises VM types to userspace via a 32-bit field, one bit per type. =
- So
-without more uAPI changes, the VM type needs to be <=3D31.  KVM could embed=
- the
-"has private memory" information into the type, but then we cut down on the=
- number
-of possible VM types *and* bleed has_private_memory into KVM's ABI.
-
-While it's unlikely KVM will ever support TDX without has_private_memory, i=
-t's
-entirely possible that KVM could add support for an existing VM "base" type=
- that
-doesn't currently support private memory.  E.g. with some massaging, KVM co=
-uld
-support private memory for SEV and SEV-ES.  And then we need to add an enti=
-rely
-new VM type just so that KVM can let it use private memory.
-
-Obviously KVM could shove in bits after the fact, e.g. store vm_type as a u=
-64
-instead of u32 (or u8 as in this patch), but then what's the point?  Burnin=
-g a
-byte instead of a bit for per-VM flag is a complete non-issue, and booleans=
- tend
-to yield code that's easier to read and easier to maintain.
-
-[*] https://lore.kernel.org/all/ZdjL783FazB6V6Cy@google.com
-
-> Partly why I ask is there is logic in the x86 MMU TDX changes that tries =
-to
-> be generic but still needs special handling for it. The current solution =
-is
-> to look at kvm_gfn_shared_mask() as TDX is the only vm type that sets it,=
- but
-> Isaku and I were discussing if we should check something else, that didn'=
-t
-> appear to be tying together to unrelated concepts:
-> https://lore.kernel.org/kvm/20240319235654.GC1994522@ls.amr.corp.intel.co=
-m/
->=20
-> Since it's down the mail, the relevant snippet:
-> "
-> > >  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
-> > >                                    struct kvm_memory_slot *slot)
-> > >  {
-> > > -       kvm_mmu_zap_all_fast(kvm);
-> > > +       if (kvm_gfn_shared_mask(kvm))
-
-Whatever you do that is TDX specific and an internal KVM thing is likely th=
-e wrong
-thing :-)
-
-The main reason KVM doesn't do a targeted zap on memslot removal is because=
- of ABI
-baggage that we _think_ is limited to interaction with VFIO.  Since KVM doe=
-sn't
-have any ABI for TDX *or* SNP, I want to at least entertain the option of d=
-oing
-a target zap for SNP as well as TDX, even though it's only truly "necessary=
-" for
-TDX, in quotes because it's not strictly necessary, e.g. KVM could BLOCK th=
-e S-EPT
-entries without fully removing the mappings.
-
-Whether or not targeted zapping is optimal for SNP (or any VM type) is very=
- much
-TBD, and likely highly dependent on use case, but at the same time it would=
- be
-nice to not rule it out completely.
-
-E.g. ChromeOS currently has a use case where they frequently delete and rec=
-reate
-a 2GiB (give or take) memslot.  For that use case, zapping _just_ that mems=
-lot is
-likely far superious than blasting and rebuilding the entire VM.  But if us=
-erspace
-deletes a 1TiB for some reason, e.g. for memory unplug?, then the fast zap =
-is
-probably better, even though it requires rebuilding all SPTEs.
-
-> > There seems to be an attempt to abstract away the existence of Secure-
-> > EPT in mmu.c, that is not fully successful. In this case the code
-> > checks kvm_gfn_shared_mask() to see if it needs to handle the zapping
-> > in a way specific needed by S-EPT. It ends up being a little confusing
-> > because the actual check is about whether there is a shared bit. It
-> > only works because only S-EPT is the only thing that has a
-> > kvm_gfn_shared_mask().
+On Mon, Apr 08, 2024, Rick P Edgecombe wrote:
+> On Mon, 2024-04-08 at 15:36 -0700, Sean Christopherson wrote:
+> > > Currently the values for the directly settable CPUID leafs come via a=
+ TDX
+> > > specific init VM userspace API.
 > >=20
-> > Doing something like (kvm->arch.vm_type =3D=3D KVM_X86_TDX_VM) looks wr=
-ong,
-> > but is more honest about what we are getting up to here. I'm not sure
-> > though, what do you think?
+> > Is guest.MAXPHYADDR one of those?=C2=A0 If so, use that.
 >=20
-> Right, I attempted and failed in zapping case.  This is due to the restri=
-ction
-> that the Secure-EPT pages must be removed from the leaves.  the VMX case =
-(also
-> NPT, even SNP) heavily depends on zapping root entry as optimization.
+> No it is not configurable. I'm looking into make it configurable, but it =
+is not
+> likely to happen before we were hoping to get basic support upstream.
 
-As above, it's more nuanced than that.  KVM has come to depend on the fast =
-zap,
-but it got that way *because* KVM has historical zapped everything, and use=
-rspace
-has (unknowingly) relied on that behavior.
+Yeah, love me some hardware defined software.
 
-> I can think of
-> - add TDX check. Looks wrong
-> - Use kvm_gfn_shared_mask(kvm). confusing
+> An alternative would be to have the KVM API peak at the value, and then
+> discard it (not pass the leaf value to the TDX module). Not ideal.
 
-Ya, even if we end up making it a hardcoded TDX thing, dress it up a bit.  =
-E.g.
-even if KVM checks for a shared mask under the hood, add a helper to captur=
-e the
-logic, e.g. kvm_zap_all_sptes_on_memslot_deletion(kvm).
+Heh, I typed up this idea before reading ahead.  This has my vote.  Unless =
+I'm
+misreading where things are headed, using guest.MAXPHYADDR to communicate w=
+hat
+is essentially GPAW to the guest is about to become the de facto standard.
 
-> - Give other name for this check like zap_from_leafs (or better name?)
->   The implementation is same to kvm_gfn_shared_mask() with comment.
->   - Or we can add a boolean variable to struct kvm
+At that point, KVM can basically treat the current TDX module behavior as a=
+n
+erratum, i.e. discarding guest.MAXPHYADDR becomes a workaround for a "CPU" =
+bug,
+not some goofy KVM quirk.
 
-If we _don't_ hardcode the behavior, a per-memslot flag or a per-VM capabil=
-ity
-(and thus boolean) is likely the way to go.  My off-the-cuff vote is probab=
-ly for
-a per-memslot flag.
+> Or have a dedicated GPAW field and expose the concept to userspace like
+> Xiaoyao was talking about.
+
+I'd prefer not to.  As above, it's not KVM's fault that the TDX module can'=
+t move
+fast enough to adapt.
+
+> > > So should we look at making the TDX side follow a
+> > > KVM_GET_SUPPORTED_CPUID/KVM_SET_CPUID pattern for feature enablement?=
+ Or am
+> > > I
+> > > misreading general guidance out of this specific suggestion around GP=
+AW?=20
+> >=20
+> > No?=C2=A0 Where I was going with that, is _if_ vCPUs can be created (in=
+ KVM) before
+> > the GPAW is set (in the TDX module), then using vCPU0's guest.MAXPHYADD=
+R tokkk
+> > compute the desired GPAW may be the least awful solution, all things
+> > considered.
+>=20
+> Sorry, I was trying to uplevel the conversation to be about the general c=
+oncept
+> of matching TD configuration to CPUID bits. Let me try to articulate the =
+problem
+> a little better.
+>=20
+> Today, KVM=E2=80=99s KVM_GET_SUPPORTED_CPUID is a way to specify which fe=
+atures are
+> virtualizable by KVM. Communicating this via CPUID leaf values works for =
+the
+> most part, because CPUID is already designed to communicate which feature=
+s are
+> supported. But TDX has a different language to communicate which features=
+ are
+> supported. That is special fields that are passed when creating a VM: XFA=
+M
+> (matching XCR0 features) and ATTRIBUTES (TDX specific flags for MSR based
+> features like PKS, etc). So compared to KVM_GET_SUPPORTED_CPUID/KVM_SET_C=
+PUID,
+> the TDX module instead accepts only a few CPUID bits to be set directly b=
+y the
+> VMM, and sets other CPUID leafs to match the configured features via XFAM=
+ and
+> ATTRIBUTES.
+>=20
+> There are also some bits/features that have fixed values. Which leafs are=
+ fixed
+> and what the values are isn't something provided by any current TDX modul=
+e API.
+> Instead they are only known via documentation, which is subject to change=
+. The
+> queryable information is limited to communicating which bits are directly
+> configurable.=20
+
+As I said in PUCK (and recorded in the notes), the fixed values should be p=
+rovided
+in a data format that is easily consumed by C code, so that KVM can report =
+that
+to userspace with
+
+> So the current interface won't allow us to perfectly match the
+> KVM_GET_SUPPORTED_CPUID/KVM_SET_CPUID. Even excluding the vm-scoped vs vc=
+pu-
+> scoped differences. However, we could try to match the general design a
+> little better.
+
+No, don't try to match KVM_GET_SUPPORTED_CPUID, it's a terrible API that no=
+ one
+likes.  The only reason we haven't replaced is because no one has come up w=
+ith a
+universally better idea.  For feature flags, communicating what KVM support=
+s is
+straightforward, mostly.  But for things like topology, communicating exact=
+ly what
+KVM "supports" is much more difficult.
+
+The TDX fixed bits are very different.  It's the TDX module, and thus KVM, =
+saying
+"here are the bits that you _must_ set to these exact values".
+
+> Here we were discussing making gpaw configurable via a dedicated named fi=
+eld,
+> but the suggestion is to instead include it in CPUID bits. The current AP=
+I takes
+> ATTRIBUTES as a dedicated field too. But there actually are CPUID bits fo=
+r some
+> of those features. Those CPUID bits are controlled instead via the associ=
+ated
+> ATTRIBUTES. So we could expose such features via CPUID as well. Userspace=
+ would
+> for example, pass the PKS CPUID bit in, and KVM would see it and configur=
+e PKS
+> via the ATTRIBUTES bit.
+>=20
+> So what I was looking to understand is, what is the enthusiasm for genera=
+lly
+> continuing to use CPUID has the main method for specifying which features=
+ should
+> be enabled/virtualized, if we can't match the existing
+> KVM_GET_SUPPORTED_CPUID/KVM_SET_CPUID APIs. Is the hope just to make user=
+space's
+> code more unified between TDX and normal VMs?
+
+I need to look at the TDX code more to form an (updated) opinion.  IIRC, my=
+ opinion
+from four years ago was to use ATTRIBUTES and then force CPUID to match.  W=
+hether
+or not that's still my preferred approach probably depends on how many, and=
+ what,
+things are shoved into attributes.
 
