@@ -1,161 +1,106 @@
-Return-Path: <kvm+bounces-13962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13964-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBEBA89D0AC
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 05:07:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C9389D116
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 05:34:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9227028323C
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 03:07:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A6362829F0
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 03:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC648548F6;
-	Tue,  9 Apr 2024 03:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7751D60260;
+	Tue,  9 Apr 2024 03:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VE4Q28un"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="fl4VhxBc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1944B56454
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 03:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC6E5B1EA
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 03:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712631999; cv=none; b=kjJLCqjIrQ7uiq5mVT/+NmvSon8Rz/fIskzZUpGc8sK1e8EmnVx7ASubfmIkHsqjHBEiZpmYUi0NRl+aqZ99QE+1Ac+/rLSiNMcYb2vtzYxTaCvgmYWDtkPtY2JJyiSnhXTN0Zaofs6KwJF/8dfcZ50Vo0a8VeMO764wueT1plA=
+	t=1712633661; cv=none; b=LY5ArzFXzFcUK8rZgg6vWsRZAciZzOl71UBczUtTwqJbkSn7mDCD9l+qIbUy3/lV2sbu2QRkYa3YS5387ta/gKVTnp/ykljRS/CL1mfGf1H3FLjYAIVmzaYoTx+OwjRgGjcvBJU5e81f93g0HlaWZVxbMxl6hJLMaBrKCcrot60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712631999; c=relaxed/simple;
-	bh=MS5IwQmQqsaEA9p/vcGU+GsLWuP/9Xajs6oOmUaLEE8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=obWMdt4LbJDQlV96PJyO2m5Npgbzztzr9H9W2REYo5CiirHk5kRBSQU+IhmmgSUz1UYAKOuL8xZbGJ1DjGuuX4T4VRdK2zSAaw7c/RNhh7lswU4/wK+JC++fhAW956e81AmicuHTtYfCR3ufbjf7uMWDX6T73SSTW7daSbRJFcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VE4Q28un; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712631997;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oG2sCvjeDxaEtg9ntHQJT0QEXacOPLyS1NEK27r9on0=;
-	b=VE4Q28unLoFiUPGZbWMU39g94iRkIhaj3dmw3rY2zDX6wa7Xj8W04cZzvFo2q6TrFzWRrT
-	fi/zodYqCbnzTk+sW8HbpAuKA56g0E1HYt+JoIYbAdYZX7MZsGBEl9DTSqDNx2T6oYLunF
-	0lF1pcqc4I2ns6c+JAEnIW716QsAITw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-pqOqnQmlOJCfxw7940hRFQ-1; Mon, 08 Apr 2024 23:06:32 -0400
-X-MC-Unique: pqOqnQmlOJCfxw7940hRFQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 06CDE802A6F;
-	Tue,  9 Apr 2024 03:06:32 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B7A7D17AB1;
-	Tue,  9 Apr 2024 03:06:31 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 3/3] KVM: selftests: aarch64: Add invalid filter test in pmu_event_filter_test
-Date: Mon,  8 Apr 2024 23:03:16 -0400
-Message-Id: <20240409030320.182591-4-shahuang@redhat.com>
-In-Reply-To: <20240409030320.182591-1-shahuang@redhat.com>
-References: <20240409030320.182591-1-shahuang@redhat.com>
+	s=arc-20240116; t=1712633661; c=relaxed/simple;
+	bh=GkRFw88WS1mpew6+A6ZhUjKfTBwNSz+H4IzQ8hpTTo0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pmt3iwXn1SSbMyrh6yxBW8Olujnm4VXvnTe8b5G5bpsHyNfR5GLPC87ysDGMcO0ToE907e5j1YX8tmCM/8kSxGpdkB/PbFp8RqeHcyHy98NTTswIXAUxeoWTO+uvrYqlmy1wKPw2eShXzgud+6iXsTQxhuZw2OnLWpc6AVjWH5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=fl4VhxBc; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-36a202020ccso10097065ab.2
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 20:34:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1712633659; x=1713238459; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZYiXfZesMM7FrFbnCXvgnUL68t8FAPQGijOxyeQqLnk=;
+        b=fl4VhxBcpwDy00r/JeKpeE06FdwwfjZvzELUaEjDGu0f/cm4tLfoe1qqyqhRToP0gh
+         bXe48WG6a9IQF9YpplOmB0XOuU+l8ueQkFaHZYIGCO6zcdNExNZyqEvRDVk9qvU2rad2
+         iy9nm/zycubJgea7/6dZqqdVvjJNv1QVcj9PiQrgAkOxjsAiVQkmM3N9y9G1Lq3Yci7q
+         FOnipI7a27QpYiWTrKIdHJaEWMuvlBvl7dbVueXx6vvCC7VXNg9sq9CEpSBaNDjRup/K
+         k8UZFZMoHPc2fWUUmVPXOynYFnaDswuSI4fXjQceCs+v2z1LyzzWDc5vUkYGsMyDeSt5
+         DCTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712633659; x=1713238459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZYiXfZesMM7FrFbnCXvgnUL68t8FAPQGijOxyeQqLnk=;
+        b=inzT62hxj8yUvrmaWjs/ZWh5OcveSBT6zGMiMfzrEoCifl07+ZORWvc3Ouwc8Kss8I
+         jrZCbc3AQ3JcTYdiOpX+raNdD0pzacSas8NXQ0H6KUezl6p7Iwav2PibQfOy6YGLDbXP
+         pAIIfwAq5fW2WqfKuhEZCytFVoDyfNTNZJ2W3SagqFWHe6SBwS9ba4afRpqK0XZM1Apm
+         /lYSHPbw9AC/eFHLyRBeyXCRi4793K3h8gCug23gG67YIBAGzzRRpffhmIy6Hc1IWXXi
+         b47OmC3tiELFInMipFJ3Jyk7wXn0L514k145Ko79ncgSNWVH7sZyeTlNOh1euprPFrd4
+         3JsA==
+X-Gm-Message-State: AOJu0Yzu91F0Axc1tR80qBygwBYtS8UM8hhfUSAklou2cXaXJdWiKW3D
+	b+pr62LcIeHP0/SBbnGhQHUMgm49q8cXahYvuBI9MADD/IcUSOZNx4qyVlzkjNGPehuYwwRFTvO
+	eJsf1ylabPPhBIS5LorA087kxlqQDWYrwC19GlA==
+X-Google-Smtp-Source: AGHT+IHTy5Sf7NfMvRKlGhgnKcKW0mmmuh0cJOOymVQwjyQL2Y3q9xjaFTO/PfvDB2N5MHvdgY3ikfO0ypFVd3ZsnLs=
+X-Received: by 2002:a05:6e02:20e8:b0:369:f4bd:2df8 with SMTP id
+ q8-20020a056e0220e800b00369f4bd2df8mr14044562ilv.10.1712633658893; Mon, 08
+ Apr 2024 20:34:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+References: <20240403123300.63923-2-ajones@ventanamicro.com> <171262714494.1420034.12329953170509858303.b4-ty@google.com>
+In-Reply-To: <171262714494.1420034.12329953170509858303.b4-ty@google.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 9 Apr 2024 09:04:08 +0530
+Message-ID: <CAAhSdy3MuUdSJtsU-4pzJ-5KFpRfuHdeg1PxPrXQenY7O_NRZg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: fix supported_flags for riscv
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, Andrew Jones <ajones@ventanamicro.com>, pbonzini@redhat.com, 
+	Atish Patra <atishp@atishpatra.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add the invalid filter test which sets the filter beyond the event
-space and sets the invalid action to double check if the
-KVM_ARM_VCPU_PMU_V3_FILTER will return the expected error.
+On Tue, Apr 9, 2024 at 7:23=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Wed, 03 Apr 2024 14:33:01 +0200, Andrew Jones wrote:
+> > commit 849c1816436f ("KVM: selftests: fix supported_flags for aarch64")
+> > fixed the set-memory-region test for aarch64 by declaring the read-only
+> > flag is supported. riscv also supports the read-only flag. Fix it too.
+>
+> Applied to kvm-x86 fixes (for 6.9).  Figure it doesn't matter a whole lot=
+ if
+> this goes through the RISC-V versus something else, and I have a pile of =
+things
+> to send to Paolo for 6.9-rc4.
+>
+> [1/1] KVM: selftests: fix supported_flags for riscv
+>       https://github.com/kvm-x86/linux/commit/449c0811d872
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- .../kvm/aarch64/pmu_event_filter_test.c       | 38 +++++++++++++++++++
- 1 file changed, 38 insertions(+)
+Thanks taking this through kvm-x86 fixes.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-index 972384e81067..1abcd9ab325e 100644
---- a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-@@ -8,6 +8,7 @@
-  * This test checks if the guest only see the limited pmu event that userspace
-  * sets, if the guest can use those events which user allow, and if the guest
-  * can't use those events which user deny.
-+ * It also checks that setting invalid filter ranges return the expected error.
-  * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
-  * is supported on the host.
-  */
-@@ -273,6 +274,41 @@ static void run_tests(void)
- 		run_test(t);
- }
- 
-+static void test_invalid_filter(void)
-+{
-+	struct kvm_pmu_event_filter invalid;
-+	int ret;
-+
-+	pr_info("Test: test_invalid_filter\n");
-+
-+	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-+
-+	vpmu_vm.vm = vm_create(1);
-+	vpmu_vm.vcpu = vm_vcpu_add_with_vpmu(vpmu_vm.vm, 0, guest_code);
-+	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
-+					GICD_BASE_GPA, GICR_BASE_GPA);
-+	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
-+		       "Failed to create vgic-v3, skipping");
-+
-+	/* The max event number is (1 << 16), set a range largeer than it. */
-+	invalid = __DEFINE_FILTER(BIT(15), BIT(15) + 1, 0);
-+	ret = __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_FILTER, &invalid);
-+	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter range "
-+		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
-+		    ret, errno);
-+
-+	/* Set the Invalid action. */
-+	invalid = __DEFINE_FILTER(0, 1, 3);
-+	ret = __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_FILTER, &invalid);
-+	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter action "
-+		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
-+		    ret, errno);
-+
-+	destroy_vpmu_vm();
-+}
-+
- static bool kvm_pmu_support_events(void)
- {
- 	create_vpmu_vm(guest_get_pmceid);
-@@ -295,4 +331,6 @@ int main(void)
- 	TEST_REQUIRE(kvm_pmu_support_events());
- 
- 	run_tests();
-+
-+	test_invalid_filter();
- }
--- 
-2.40.1
-
+Regards,
+Anup
 
