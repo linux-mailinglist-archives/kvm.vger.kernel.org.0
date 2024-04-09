@@ -1,270 +1,234 @@
-Return-Path: <kvm+bounces-13941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-13940-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EF5389CF83
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 02:38:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1624589CF81
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 02:37:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C6811C21F12
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 00:38:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AE821C2207B
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 00:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1066B4C69;
-	Tue,  9 Apr 2024 00:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12015611B;
+	Tue,  9 Apr 2024 00:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hY50tvdB"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="2Z33vHG9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E664E15C3;
-	Tue,  9 Apr 2024 00:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712623109; cv=fail; b=jeNm9LzCrIa1ZmIZEob/U9iH7J0WgJs/tdguANcJ282WDQKf8n5kVVcBiBhpEj8nokyF2i/HnjChHf4PdA+uJWG2ijv8a2P07u6Z7O8LioQblEQBPBXurWHbdTlTqiv9RDr9UP8sttCZlHp7t+yCiTuLmAa60Xrb1JYW5lNnVvg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712623109; c=relaxed/simple;
-	bh=QVlT0ajUa+ZGWDnETYlVqAor9SxmQ19q5SOQTOUWodo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=u3SZSRkx5hWtT/keHk1BQ6j5UL1qAzUDotuE8fSCrn6cF2/lbaujuMNic9V1TAh5w08xurztzycMutHZVdsEse8injLJRHP2z/eISyllEKDQQ6I3WalHhMu8b+Lwyb3jN7Ymy+O0bpfVuWJs5UnvsS5l2WXSuZQn8+knETN0lq4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hY50tvdB; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712623107; x=1744159107;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=QVlT0ajUa+ZGWDnETYlVqAor9SxmQ19q5SOQTOUWodo=;
-  b=hY50tvdBZ0L+43wFsaqpQskYRpsKxmTzPmZ2Cny6GLNre0egb/b1HWro
-   gNQwaS2Qj4T9VxHZRpUEvom/F1O08TI0XeRHkWtmBmMbcS+Kddre6EYsp
-   NHwpPoGSPaBRKKEm6EwFRejDdO57JwVrbFIsvXVd/ahjrqo+Y/tOVmUbc
-   JRiFdtK81GGIgDLchLC0UH4fhQCSiP3qt2RD3calb94gNbqbxkFKN9W0z
-   AWwLnFfxoOcMZoFpuaCHl49vFX+GjIhAOT8uuu8rnmZ0A9a6n1CkJnHw9
-   aLoJTk909dBp94sMhea/mUuzv+36Ca/3gbOW8SvaMH78vTZnU6PFwjfuu
-   g==;
-X-CSE-ConnectionGUID: HgY35GUoQ7CZTKC/uJ3yZQ==
-X-CSE-MsgGUID: lq4Ag/UbQBi17icKgRbu/A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11038"; a="8086036"
-X-IronPort-AV: E=Sophos;i="6.07,188,1708416000"; 
-   d="scan'208";a="8086036"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 17:37:29 -0700
-X-CSE-ConnectionGUID: hy1yBFM8T+CsTlFqnnZeLA==
-X-CSE-MsgGUID: G2tbUYMgR2a7hLPW6axraw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,188,1708416000"; 
-   d="scan'208";a="19933432"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Apr 2024 17:37:28 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 8 Apr 2024 17:37:28 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 8 Apr 2024 17:37:27 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 8 Apr 2024 17:37:27 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 8 Apr 2024 17:37:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jYUhBSBC3uC29DR9d9ZuoDkPjewQu3sX4yLqV9Z1LXSCRzEwyWl2m16rsTmQ4S7w6BKPdmyljdOrfeV3E42hI2tU6HeVFWKxinf4Wi2FdwUEjoM9NzyB7NlZ1ijeDEdSzx9X0eruu551T2C781xKKMGa3JEKYRJ3KY1O4bgpMMc8FC6ydy6erno1nzFxq5kQqLucMJKUf3k4/H9TodcP8eKkjxFrWn4HvtIfrWMQ49Pa5M1ENr61onChKhb7jAMrSVn8+xZ6udMi4ozX+2b2dW44ZoPNVPi+l7OSt4jm+kxuFpl96X7tKu22YFhuBi3yNUCZCerzIsYH5wwlptLMgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kZcCMwuSOKOPaw+wxDerkSdTmb9EHUQ/ry5SkJCG9Uo=;
- b=i8IqHkGkePqPIAXK83rUONuoixnMAY4PtFFH8dG/r15juXMHMPirvBUmkV/dOcEPHi5q4/D/ugXoMQTlBfNIYS4AjXpSL07MFEaDXvWbkfZwl2hoAZiuHjlkGfTjtHveFYzUi2ApI9OBnuxeZlgKmvUmIcimh+1zSLzQFGPE6Vpnf/4n6ZOfF7haYqWG2BdkRnQCd+nDgwo5rM+SFi802alfRpa0Ac3L3uQhFdzxdYNULoai3e9D6oi1CM3AEKfb2Gjo9dUqxPHlWwjnSJYIGvIAR5nx0p7TxVDcj+UJokCTm8JY65uNoaudqvmcAm6OyPnFoqgLPJx04BLMxUvgHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by DS0PR11MB8051.namprd11.prod.outlook.com (2603:10b6:8:121::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7430.46; Tue, 9 Apr
- 2024 00:37:25 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7452.019; Tue, 9 Apr 2024
- 00:37:24 +0000
-Message-ID: <80971062-9827-490e-a8eb-980a4f249e94@intel.com>
-Date: Tue, 9 Apr 2024 12:37:14 +1200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-To: "Yamahata, Isaku" <isaku.yamahata@intel.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, "Aktas, Erdem" <erdemaktas@google.com>, "Sean
- Christopherson" <seanjc@google.com>, Sagi Shahar <sagis@google.com>, "Chen,
- Bo2" <chen.bo@intel.com>, "Yuan, Hang" <hang.yuan@intel.com>, "Zhang, Tina"
-	<tina.zhang@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <f028d43abeadaa3134297d28fb99f283445c0333.1708933498.git.isaku.yamahata@intel.com>
-Content-Language: en-US
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <f028d43abeadaa3134297d28fb99f283445c0333.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0301.namprd03.prod.outlook.com
- (2603:10b6:303:dd::6) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA3C23A6
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 00:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712623044; cv=none; b=UzCamTE4IpzbNw7vitXgGCR2ChXS4dnUXOfHmbaIzvYv+OpZ5gdRCFAaQEF8dvjSAqpMrMOkB9plemB/p+bpAIjmh5SOPQQe71qyaygm4J8k7ESzTy94VzJeEbC2K9MC5UvWwWnDY4kGARppJkonKFcEeWI7Mk3XWpFJJO54VTU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712623044; c=relaxed/simple;
+	bh=vZmp0bx+mzP0lPzvsYZrDCEbUdzNeE9lYo4IHZ0/+q4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EPhrFTnn7YhSOE1e6RnEYBOgAzWnQnP1s+y8b8Win3oi+MlJBUMruZm7da7xxcMAflC6EhWrn0PmUQA1l0K2dDclRdZjN4jCoQ9I9UZlOXj0ReRtEoMjt38XnuGsqzUY/kmbKR+vdpcx40pKVby0CPRrpatTiZbP2fMqzj5rL04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=2Z33vHG9; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6ecff9df447so3832834b3a.1
+        for <kvm@vger.kernel.org>; Mon, 08 Apr 2024 17:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712623042; x=1713227842; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4Vx/fAicKDWjQK8Xf/GodtuH9rKioxrSCP+le6IWBVk=;
+        b=2Z33vHG9WuIsLbO1ynGaan8UP3Cp/6ntvCRcyDhd5exZZPgXp7yD8uKwha6HC53+sz
+         vf2KpFPSSNxYapnIIGear0ReLzoQMUvo8RJo+RY9qDzR0we1PPjWohFvnTuiZHL6fo3a
+         ht2q2DFX7RPY4uxbEgA7N4vaenNYJbIeTPdCAz3zS/WfK3fz9EZo4unkVoZCnObT1O2e
+         X3CqyDE5AsSM30DUYqtH3hP9lf8Vs+hZRWas8Fo3NjPDtEYZD+AQOeahSKbfH0iLpMQr
+         lt0rvbj0AgVqjpjSj7hH0uQUDagR8Qo+8RTujwYku1rM2S3Il0lmQqP32q5j9C6hPBqy
+         49kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712623042; x=1713227842;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Vx/fAicKDWjQK8Xf/GodtuH9rKioxrSCP+le6IWBVk=;
+        b=AbT0V2/5q7XHnuBoeR7QxrWWIeeYtTxpe+EPnOSwdCs9JecFEq6is9lwJjx7fffS65
+         JIY/1T5wIa/xnS2ton5+cjY5tRE7FaSDRVIEoQp/mWttqA90CdoQESjnZid2IUy4faUn
+         VMNhI63cnT19+mnqKhnBZaTTpMGTfskz0wNmC1YU1KWuy2JQz6VrJpF+EJ2o0eUfJ7c+
+         BBoju71JHVdeM1Ubi6vgcviUerQ0b9L7B2DYiU+76zYUHTLB1eqsJQlSoPAdZHOsQqsC
+         hwF7N43lqmEAHwKutOJ4J8DvZGM8DpFl7zzYis2stm+qJcvzcN0+VGq5QnfLMH80TBws
+         fxSw==
+X-Forwarded-Encrypted: i=1; AJvYcCVnVZnupVG4TsRwvWlO5cbSHPBHsoPxHqHdSIw+HI+VsqGhS0TDgglnPwGcKJne7qj22tpe6bOhye0FhX+ceRsWY23w
+X-Gm-Message-State: AOJu0YyGap8Du6fDUP+0dhCN2s7Qk05VKprnyjI3syBq5BM3URjZNBDh
+	HoCjEGTDZ1BfyV1RZhYlphSO5cNsoRmTD6pTn0klVX4bpMbuQL7fK/oBwsQLf6Y=
+X-Google-Smtp-Source: AGHT+IHr0Zo6nHVaV/pKfVqhANW/8W9ESaRusAuX8dauWvgSDh5Rc7uN98R5kCiiSEnkLb0cWYp8TA==
+X-Received: by 2002:a05:6a20:7355:b0:1a7:1e1c:3031 with SMTP id v21-20020a056a20735500b001a71e1c3031mr13412563pzc.36.1712623041952;
+        Mon, 08 Apr 2024 17:37:21 -0700 (PDT)
+Received: from ?IPV6:2601:647:4180:9630::e8c1? ([2601:647:4180:9630::e8c1])
+        by smtp.gmail.com with ESMTPSA id e7-20020a170902784700b001dd578121d4sm7786884pln.204.2024.04.08.17.37.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Apr 2024 17:37:21 -0700 (PDT)
+Message-ID: <976411ab-6ddf-4b10-8e13-1575928415ce@rivosinc.com>
+Date: Mon, 8 Apr 2024 17:37:19 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|DS0PR11MB8051:EE_
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YiXNaKr++rOkAQNzCi9soFsU9hriHFNvvdUtihocmvdDxjjuKl9VjYV1Puz81ID+mvat2N8yBPzLvnFhNxkbJbut/HwZ4HaNrHamkG9dz4WcMO3c6ZtiDIZPHt7eYmEpzg1b3MliKSVNqqom3iUF4mCHlncSOV4F2xbwQBcM300vDNANyL/EVRzN7IEmOznBV6IPkWFF9fBP3+wzb+jIHxJCsRrD34mMYTPl6iWf+GKV9ryjqIzBS5QTkrnH6qrFlbYhuqv75kcHiE5QSqvNKwep5tGdCJxxSdmZjYOIslYhK48QH3B6+4133UB82KoaLx32hto54lXLTbHhHjLh8JRiU+/Lq0PSkxr7RmLIAm0ys4/88k7nph6018++QR+cr8ZYulq9pc5sDwbvtRRF3ESKAKECjMb1xWmbWJPh8szkcSXIu7dDqvbC3KkHy1CRCQ2WOn8cMZBH1ipqnjzYh9V4XsCDn2HVjN4z6JAWCAjFPy7HvcnRcKSJNDribwlus4A+U9tu9bWiFadfZ96rhm3O/NkQ8K64iNrvHf0OWCQn9hpF7GP+r3ZMiWdm4TjLgXcC3u+rSagn0wxds1KTg57GJk1laVnFohNIc9zjLXRgwl4ivJzyDHqxWMogHYqJnA4SMcR66Z3CHh58r/CT8mHdf0F9DPMV5EMe3jJ1Snw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MFFHN1ZhaVFRRHJZMGUrRnA0RVJkblZ5eUJVNk5GdlJHMXpoOUdmV29XTnh6?=
- =?utf-8?B?S2hJd2kraGh2dXpnOEM2T2U4bUJWU2JUekhMOHZPMEhLOUlCV2d0dy9yUzBI?=
- =?utf-8?B?TFh1SUpBVVNXVTE2VDd1MDVqRnQ3UnZqZW9HbHl5OEk0UGxPY2hjaEdsdVVh?=
- =?utf-8?B?T3lBUDk4cUVQZ2tPVDNhUk54UEg2WFdPK1FWV2FDRXREZWIyYWloSVMvVlNP?=
- =?utf-8?B?U2hDWlhQUlkwcnBYTjdMMG9pL0k2OUx6TlRtL2JLT0xOaHNDUVhWV2RCSFVX?=
- =?utf-8?B?VVRKZFVPR2wvYTFtYzFnUTR6ZjhZS05MSzh0d1FDcGlhVXRVdkhncXlYYmd5?=
- =?utf-8?B?eDNJZUZ6M1ducHpiR1Brbm9QQjJTVCsrSm50VkpTWjZRb3dTUmxvMU42aEhQ?=
- =?utf-8?B?akd4ZlpnVmR1VmtyRkhSaXFHZkhJR0dGTFgxQWFUNEJoVC9DaVJCeis5cTNM?=
- =?utf-8?B?Q1p2S04yNU9SZTlJczNDUnRZdWxrWUE0RlF3NS9tKzliRUpQYndjWC9xc1pv?=
- =?utf-8?B?TFAvTTNiUzhqRWZPaDRNZEFRMHpnQ056ejM3N3FucjNLY3EzMDIxVEdWOHY1?=
- =?utf-8?B?OWY0enFlOGUrVUJISmhxNTR2eEplOHRDNDlvL1h3ZjhOM3pQM3ZpSGs2WGZT?=
- =?utf-8?B?NmlUbm1PbC9KUElWblVtS1R2S3hndytndlJVTnBEbm1mdkhNVlhrQkl3QXpz?=
- =?utf-8?B?Y2N6cFhweFExZ0YxWkR5RVlvVFByM2RyRnBRVTVGcElaYnlzUE9rUEU1T3A1?=
- =?utf-8?B?OGdlVXVnYmlsb1ptT2JuQWVYNmRxeTNhQXRPREVLY1Q0V01STG5sYllYMWkx?=
- =?utf-8?B?NWdJcTh3WEdOcUs3Tlk2eVNsZmZLVnpTYXRsYUpDQlhvaldSSlBhemlJM3dC?=
- =?utf-8?B?SEkrM1lwaWp4SmRESC8wUXd4YWlaVENZdkIrczBSVHkyRW14Z2NDZ2NCd3kw?=
- =?utf-8?B?c2Ntcll2MWRJMmpkaWxvTHpQMzVmeFliQ0t6bkpiT1RYZDFPZnp5YzJzUHNY?=
- =?utf-8?B?djA2RnBGUG1YcldpMlJkNTRFOFN6dkpiaENTeVExUjJnek5uQ2xFR25laEdv?=
- =?utf-8?B?cENHRDNncU5SMEFXejdqSERSN1VhbThuQ2QrZHpGNTJkajVRQTA5Uzg5U2VW?=
- =?utf-8?B?Q1FkL2wza0RiTEt1OXlaWERCaEJTRkNJSEVKRmwwNTllQWwrOEZQLzJKSXpr?=
- =?utf-8?B?cUMzMzZIWjZKWHV4UmpqYkpoNUtMNTVvVnp6REV2Rk5wSThISU5Nd2l6Q0F6?=
- =?utf-8?B?NFltRGlwcWw0VzNOalIrUksxaVlFcnZ2d29UR1BJZGJPVzZrMU5mbWV5UjJu?=
- =?utf-8?B?L2tsVXVDMExpWmZpbFdpVU95WDIrZklUZUZqSzQzZytTbmlHWmNGOW5Pejhn?=
- =?utf-8?B?aTNjTzZmaW5GNkJSM01YSkRQZERxSWNGYzhSNkRhR0dRVEZyVytSZklOSVJT?=
- =?utf-8?B?am1tK2RWN05wQ2tkdDVDa1ZEWkxuU2dJLzArR0djekVmaytDWTNCU0JLS01T?=
- =?utf-8?B?cVB4QjhDaEpwR1BCY2tVUnBuWGN5YXNTbEZtZ1J1azMrTzFOZllPK1pGNUx2?=
- =?utf-8?B?OWplcXNUVUlIOU5tZXFwbUg5VHlTTEY0K2kzU2xSRjJYakMxSmlHM1gwbFE1?=
- =?utf-8?B?S01GWmxJSkt6eStxSjJHdG82cldxeWs4VVoxY1hRU25yUDh4UjFud0tWQzVj?=
- =?utf-8?B?OERValFVUU01VklNenhXUmRoWitGdjY2Y25WYlpYc3RzZzJBZ1Jzcm5mdG1z?=
- =?utf-8?B?RUZSVGtYQTQvU1J2bnpmcStzTGNJL1hRVnducSt0S3ZVTlVQWm0xK3Vzek5W?=
- =?utf-8?B?Y1JvckxqQXA3bmRWM04vRE9US25XbEdobFVrNXdTSG10SHhVYzNjeGQwVDFr?=
- =?utf-8?B?dDNMeTFsM3BuaURiVlNlQWUxUGlxbDBxRXdEb1RsQUd4RXkxM1dyalR6MWlS?=
- =?utf-8?B?dm1HWi93L3J1TXNUNkx2SW9OV0wrbExhUWRhVXdIR0tzZWpoQllIVTIwUnov?=
- =?utf-8?B?UnlIdnhWUGZybnNwd0U0THFuTGVxVVJVclFTRDV2cTVEcExubWJrWDdmK1JB?=
- =?utf-8?B?cnZOSzhJUGIxRzlKQTJJNkZ2L3M2UmhDR3EvdjRPNCtZREhnWmttSnJ2S1dh?=
- =?utf-8?Q?wXbJFSmhBKjTd8ihil1SgvH8s?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c2db193-1681-421b-f8f7-08dc582d393b
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 00:37:23.8941
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: P68GTJ8UDF7pGJ8am0YWv3zWSfCLNhes7ZcHtn6ZNn0wgXU3EgtT4FmBrK4x5rVZjIUj4AqHbGcihbfRV9phFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8051
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 20/22] KVM: riscv: selftests: Add SBI PMU selftest
+Content-Language: en-US
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>,
+ Ajay Kaher <akaher@vmware.com>, Alexandre Ghiti <alexghiti@rivosinc.com>,
+ Alexey Makhalov <amakhalov@vmware.com>,
+ Conor Dooley <conor.dooley@microchip.com>, Juergen Gross <jgross@suse.com>,
+ kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
+ Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>,
+ virtualization@lists.linux.dev,
+ VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ Will Deacon <will@kernel.org>, x86@kernel.org
+References: <20240403080452.1007601-1-atishp@rivosinc.com>
+ <20240403080452.1007601-21-atishp@rivosinc.com>
+ <20240405-d1a4cb9a441a05a9d2f8b1c8@orel>
+From: Atish Patra <atishp@rivosinc.com>
+In-Reply-To: <20240405-d1a4cb9a441a05a9d2f8b1c8@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 4/5/24 05:50, Andrew Jones wrote:
+> On Wed, Apr 03, 2024 at 01:04:49AM -0700, Atish Patra wrote:
+> ...
+>> +static void test_pmu_basic_sanity(void)
+>> +{
+>> +	long out_val = 0;
+>> +	bool probe;
+>> +	struct sbiret ret;
+>> +	int num_counters = 0, i;
+>> +	union sbi_pmu_ctr_info ctrinfo;
+>> +
+>> +	probe = guest_sbi_probe_extension(SBI_EXT_PMU, &out_val);
+>> +	GUEST_ASSERT(probe && out_val == 1);
+>> +
+>> +	num_counters = get_num_counters();
+>> +
+>> +	for (i = 0; i < num_counters; i++) {
+>> +		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_GET_INFO, i,
+>> +				0, 0, 0, 0, 0);
+>> +
+>> +		/* There can be gaps in logical counter indicies*/
+>> +		if (ret.error)
+>> +			continue;
+>> +		GUEST_ASSERT_NE(ret.value, 0);
+>> +
+>> +		ctrinfo.value = ret.value;
+>> +
+>> +		/**
+>> +		 * Accesibillity check of hardware and read capability of firmware counters.
+> 
+> Accessibility
+> 
+
+Fixed it.
+
+>> +		 * The spec doesn't mandate any initial value. No need to check any value.
+>> +		 */
+>> +		read_counter(i, ctrinfo);
+>> +	}
+>> +
+>> +	GUEST_DONE();
+>> +}
+>> +
+>> +static void run_vcpu(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct ucall uc;
+>> +
+>> +	vcpu_run(vcpu);
+>> +	switch (get_ucall(vcpu, &uc)) {
+>> +	case UCALL_ABORT:
+>> +		REPORT_GUEST_ASSERT(uc);
+>> +		break;
+>> +	case UCALL_DONE:
+>> +	case UCALL_SYNC:
+>> +		break;
+>> +	default:
+>> +		TEST_FAIL("Unknown ucall %lu", uc.cmd);
+>> +		break;
+>> +	}
+>> +}
+>> +
+>> +void test_vm_destroy(struct kvm_vm *vm)
+>> +{
+>> +	memset(ctrinfo_arr, 0, sizeof(union sbi_pmu_ctr_info) * RISCV_MAX_PMU_COUNTERS);
+>> +	counter_mask_available = 0;
+>> +	kvm_vm_free(vm);
+>> +}
+>> +
+>> +static void test_vm_basic_test(void *guest_code)
+>> +{
+>> +	struct kvm_vm *vm;
+>> +	struct kvm_vcpu *vcpu;
+>> +
+>> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+>> +	__TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
+>> +				   "SBI PMU not available, skipping test");
+>> +	vm_init_vector_tables(vm);
+>> +	/* Illegal instruction handler is required to verify read access without configuration */
+>> +	vm_install_exception_handler(vm, EXC_INST_ILLEGAL, guest_illegal_exception_handler);
+> 
+> I still don't see where the "verify" part is. The handler doesn't record
+> that it had to handle anything.
+> 
+
+The objective of the test is to ensure that we get an illegal 
+instruction without configuration. The presence of the registered 
+exception handler is sufficient for that.
+
+The verify part is that the test doesn't end up in a illegal instruction 
+exception when you try to access a counter without configuring.
+
+Let me know if you think we should more verbose comment to explain the 
+scenario.
 
 
+>> +
+>> +	vcpu_init_vector_tables(vcpu);
+>> +	run_vcpu(vcpu);
+>> +
+>> +	test_vm_destroy(vm);
+>> +}
+>> +
+>> +static void test_vm_events_test(void *guest_code)
+>> +{
+>> +	struct kvm_vm *vm = NULL;
+>> +	struct kvm_vcpu *vcpu = NULL;
+>> +
+>> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+>> +	__TEST_REQUIRE(__vcpu_has_sbi_ext(vcpu, KVM_RISCV_SBI_EXT_PMU),
+>> +				   "SBI PMU not available, skipping test");
+>> +	run_vcpu(vcpu);
+>> +
+>> +	test_vm_destroy(vm);
+>> +}
+>> +
+>> +int main(void)
+>> +{
+>> +	test_vm_basic_test(test_pmu_basic_sanity);
+>> +	pr_info("SBI PMU basic test : PASS\n");
+>> +
+>> +	test_vm_events_test(test_pmu_events);
+>> +	pr_info("SBI PMU event verification test : PASS\n");
+>> +
+>> +	return 0;
+>> +}
+>> -- 
+>> 2.34.1
+>>
+> 
+> Thanks,
+> drew
 
-On 26/02/2024 9:25 pm, Yamahata, Isaku wrote:
-> +struct tdx_enabled {
-> +	cpumask_var_t enabled;
-> +	atomic_t err;
-> +};
-> +
-> +static void __init tdx_on(void *_enable)
-> +{
-> +	struct tdx_enabled *enable = _enable;
-> +	int r;
-> +
-> +	r = vmx_hardware_enable();
-> +	if (!r) {
-> +		cpumask_set_cpu(smp_processor_id(), enable->enabled);
-> +		r = tdx_cpu_enable();
-> +	}
-> +	if (r)
-> +		atomic_set(&enable->err, r);
-> +}
-> +
-> +static void __init vmx_off(void *_enabled)
-> +{
-> +	cpumask_var_t *enabled = (cpumask_var_t *)_enabled;
-> +
-> +	if (cpumask_test_cpu(smp_processor_id(), *enabled))
-> +		vmx_hardware_disable();
-> +}
-> +
-> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
-> +{
-> +	struct tdx_enabled enable = {
-> +		.err = ATOMIC_INIT(0),
-> +	};
-> +	int r = 0;
-> +
-> +	if (!enable_ept) {
-> +		pr_warn("Cannot enable TDX with EPT disabled\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!zalloc_cpumask_var(&enable.enabled, GFP_KERNEL)) {
-> +		r = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	/* tdx_enable() in tdx_module_setup() requires cpus lock. */
-> +	cpus_read_lock();
-> +	on_each_cpu(tdx_on, &enable, true); /* TDX requires vmxon. */
-> +	r = atomic_read(&enable.err);
-> +	if (!r)
-> +		r = tdx_module_setup();
-> +	else
-> +		r = -EIO;
-
-I was thinking why do we need to convert to -EIO.
-
-Convert error code to -EIO unconditionally would cause the original 
-error code being lost.  Although given tdx_on() is called on all online 
-cpus in parallel, the @enable.err could be imprecise anyway, the 
-explicit conversion seems not quite reasonable to be done _here_.
-
-I think it would be more reasonable to explicitly set the error code to 
--EIO in tdx_on(), where we _exactly_ know what went wrong and can still 
-possibly do something before losing the error code.
-
-E.g., we can dump the error code to the user, but looks both 
-vmx_hardware_enable() and tdx_cpu_enable() will do so already so we can 
-safely lose the error code there.
-
-We can perhaps add a comment to point this out before losing the error 
-code if that's better:
-
-	/*
-	 * Both vmx_hardware_enable() and tdx_cpu_enable() print error
-	 * message when they fail.  Just convert the error code to -EIO
-	 * when multiple cpu fault the @err cannot be used to precisely
-	 * record the error code for them anyway.
-	 */
-
-> +	on_each_cpu(vmx_off, &enable.enabled, true);
-> +	cpus_read_unlock();
-> +	free_cpumask_var(enable.enabled);
-> +
-> +out:
-> +	return r;
-> +}
 
