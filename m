@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-14037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD8CD89E5E3
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 01:08:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38BEB89E5E4
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 01:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EF1FB22BA0
-	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 23:08:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2E1F28470B
+	for <lists+kvm@lfdr.de>; Tue,  9 Apr 2024 23:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8A9158D95;
-	Tue,  9 Apr 2024 23:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CE7158DBA;
+	Tue,  9 Apr 2024 23:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AIeDnd7s"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0Xd1+sWo"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2047.outbound.protection.outlook.com [40.107.102.47])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD76E158DA0
-	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 23:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CED7158DA5
+	for <kvm@vger.kernel.org>; Tue,  9 Apr 2024 23:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.73
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712704115; cv=fail; b=EhLVgS8SYxlP6WYebiN6UPXh5csxlbIrPZVQQi2yTBfpZ8dnVpNut+wYzUZhDtm8bkx5shAqwRMyJr6ob8lVJLb/w0So9phyGDQpdqpW7sdo4A8cGgrcyWPhakJJMQT+WpCU9q7hNcDJ0L17VYOw5lCh7XB3r1UsBh9WvzigeRg=
+	t=1712704133; cv=fail; b=GphrS8l09YOIh/iDSTn4vj8ecC0yNlTev1OkMGb+LUjnowcZSaXc5AeaxKYnahHdVTPl+K6fQNsq9E6vGPzQ1huQoyT5jdSFYjp4bk0T+AvnjW18dDDHV661HAsKkZ44Xd8T2vnIiHDKmuDSEnNk/LdM+MlcPoDtzb2ooAyUzu4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712704115; c=relaxed/simple;
-	bh=5Xu6gApzRHFPl1IE9Nui24YsIdFCvtoL95NdHhrTFkA=;
+	s=arc-20240116; t=1712704133; c=relaxed/simple;
+	bh=GwB+5pR3/n6W7KXhUQFBhIs5SYKT2VFvIf8HD8I1o9s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xc5MkBYyPCLxvwtb7ozRWOqHRqnEM3HLvN8DdyLHRCRmaRg2GdZEAJKMOJUcUVdf8Dgx63mpIhacBCH3fLkC3cjLlNmxJT31lybcS+8W2jKAIw/j9+2IEHaOLgbId5UZfwL+x8hkl/lQoOWBvMmhmnadj6PWHuaD6q9htDNtwYY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AIeDnd7s; arc=fail smtp.client-ip=40.107.102.47
+	 MIME-Version:Content-Type; b=Ht95yiBxqPvY4O2Wu1OBdF9X3PRX77Wr+IQaRXhJkXeWxu7nGp1cdt9+7VLnj94dpAtYxz2Cnm03QwES/N8OoCyYciSum1HA6EdLsXhF+hE2EsyW/JJ6cuh+eKvNeTaEAYCzXMYL0eM9L3IQ2kyXFM5Tc/7x4Orv9LoIYtPm/+M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0Xd1+sWo; arc=fail smtp.client-ip=40.107.244.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hS2fpJd1NqycB/UznJRjCo4SSdRYs0daGa6gOENqqB6VIoKO2NZmgNDku4/rL0EeUCV+FU2N+UpruTX7a9wHAfyCnX6B3qAk22HkcdrP/2b0V+Oe67CNxxkyujb3omvs+wzGFelSsHknTzK6d95FSiHlyzCqd52FA3IbL2KE00keJOzckY9oUzh4wIHS0BsQvJ0qK0rDLNaLVJOYkN97PHE7uLNw3ZkKGZTxVob9OkAwGryAlYwH3Bv3iL56X/6zenNKSbYbzoacmEetnZnchrKIc45MJ3TBxjS6kTwnlIlMV0otd9pMG6TaQBpOjRfKBYOruGXutb6v3g6oiD4yow==
+ b=Li8FY+uASyt5O4DJHqEaGvq4UfQ6sT2pUQJGFcl7SQKd+thjJBmQ0hwRAamU5MjfZmP2SgYJK+rZyUjTjPt3kSGsizUXKBKe7Z9h0rD0W/iUuacO5RPjvwh54VqUgZpIA+z86pt/61ZeUJvsESM4fJTXIqytwDo+abnGMNacCjt/d5Uai7zX5JK1EtFE9/L0hoKU0CMvVKnVrJ1cD5bl9MvVGY/MjNT6H/z0l4qi30STEkhXBdU0NNnK/GMLBDyg0DvQDRW47Rjatz07ZBA6ogxL8cGQTb7Kes/PZ2lkrfwU6gbl9p7unLv2VjodoBVgsRBeSpOHb/pGdfPQrl53Zg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=13OrMkDe2zUg6G2zYtaNt3Z9bXv4jVkyvbPd9ZKmXLk=;
- b=UJztS7NbfKRYQYV1v3CPPwxt+wLp9Pzh3/cuKGr2v7qoAsrm2GVuLnL+72dGdu7xu03+Jew7lz6sXcq+uIIxVIAsBdWqfEHP3BMKGaUPvUhDzTGyWMoYujseIEl1ysb7xW8l3KyeU2dsJJb7yZxkZtmZsWH3T9F+dNlaldG68CGbtjymaWwgn+NJyYZGGv3cEjOvoFFhIfxQHB7irfLcDnzZlv7JovyvfeUia03a3/GLbERfDcJ4ANgvooOGmtMfjgf5Cp/LG7+YNzgFSkSCDCTh73KkpxeGd4hI7/n8VrxBgJ0ekn0gzP6mJPfWcAFC5hqB6HpJwFT/xZz8HFTgQg==
+ bh=XUfDcZ4aJXQtcKU6F1ZlhhY9dewB4OXBpJdZIZ3pzpM=;
+ b=EjCD5LGNtfls1geRdVut22T2pY6IaZSa9r1U/3lrx21qbw/CUdugYjLxrQaOp+qteCdUopfH9d5Eg17Uzrgem9h/Tll7dKyITRC2iddv8CMJpdvofrQz7Bpes8PCZaXm9sWRKZjmk+rkIpTVxc+mQ98QDMd+vNBDJKrzcdyUQPBWDxDjol6s7HbQzF+BqmGgp/bKbnFKe9c2VKk0BObdqEkjkKNas5h2V3otWXM8iPkhrEpmDKsFGScMXpzkrvqGch+53iwvJXXqxMvEgKyxlpS7/en/UE4zUp9EtGfwMOZKVBdrzDMAoCd2f7SxsM/xXGPkka3Ohys5eTJpz0oudQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=13OrMkDe2zUg6G2zYtaNt3Z9bXv4jVkyvbPd9ZKmXLk=;
- b=AIeDnd7s8WF8gwHJyxiHTNueFlBMwF83wlszMbP6nV3r5eQ+K6lNpb/XfhydrqIoE29Nj8io5OOjn4WpvgBsOKmfq75m/cp0YqpJfvmM8KDoZ+ORZAbepJ6akvbzfBOqt2qbs8y2m6iS105OqKHyPaXFyaek9Jz/bDZmCWdyVQc=
-Received: from PH8PR02CA0034.namprd02.prod.outlook.com (2603:10b6:510:2da::13)
- by MW4PR12MB7189.namprd12.prod.outlook.com (2603:10b6:303:224::20) with
+ bh=XUfDcZ4aJXQtcKU6F1ZlhhY9dewB4OXBpJdZIZ3pzpM=;
+ b=0Xd1+sWo/Z4h1vMRQad1jYpX31o1CslJaUQEeOS3Rik77DX7otJnLtAAK/L+6DYnWuDKod/AqFSHEmeLtXsyB4YavvGj46WYcMzNg98VIDJCgihcTV4zD5uOdpQ08huI416Rd7dTlQOUnH+5YqhCF9wWQ5wRjYL5ARJk7WI7rek=
+Received: from DS7PR03CA0083.namprd03.prod.outlook.com (2603:10b6:5:3bb::28)
+ by CYYPR12MB8871.namprd12.prod.outlook.com (2603:10b6:930:c2::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.54; Tue, 9 Apr
- 2024 23:08:30 +0000
-Received: from CY4PEPF0000FCC3.namprd03.prod.outlook.com
- (2603:10b6:510:2da:cafe::f0) by PH8PR02CA0034.outlook.office365.com
- (2603:10b6:510:2da::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.55; Tue, 9 Apr
+ 2024 23:08:50 +0000
+Received: from CY4PEPF0000FCBE.namprd03.prod.outlook.com
+ (2603:10b6:5:3bb:cafe::6e) by DS7PR03CA0083.outlook.office365.com
+ (2603:10b6:5:3bb::28) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.19 via Frontend
- Transport; Tue, 9 Apr 2024 23:08:29 +0000
+ Transport; Tue, 9 Apr 2024 23:08:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,21 +63,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000FCC3.mail.protection.outlook.com (10.167.242.105) with Microsoft
+ CY4PEPF0000FCBE.mail.protection.outlook.com (10.167.242.100) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Tue, 9 Apr 2024 23:08:29 +0000
+ 15.20.7452.22 via Frontend Transport; Tue, 9 Apr 2024 23:08:49 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 9 Apr
- 2024 18:08:28 -0500
+ 2024 18:08:49 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <qemu-devel@nongnu.org>
 CC: <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky
 	<thomas.lendacky@amd.com>, Pankaj Gupta <pankaj.gupta@amd.com>, Larry Dewey
 	<Larry.Dewey@amd.com>, Roy Hopkins <roy.hopkins@suse.com>
-Subject: [PATCH v1 1/3] i386/sev: Add 'legacy-vm-type' parameter for SEV guest objects
-Date: Tue, 9 Apr 2024 18:07:41 -0500
-Message-ID: <20240409230743.962513-2-michael.roth@amd.com>
+Subject: [PATCH v1 2/3] hw/i386: Add 9.1 machine types for i440fx/q35
+Date: Tue, 9 Apr 2024 18:07:42 -0500
+Message-ID: <20240409230743.962513-3-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240409230743.962513-1-michael.roth@amd.com>
 References: <20240409230743.962513-1-michael.roth@amd.com>
@@ -93,133 +93,92 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC3:EE_|MW4PR12MB7189:EE_
-X-MS-Office365-Filtering-Correlation-Id: 850c0a92-4fdc-4b74-fe55-08dc58e9f80f
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCBE:EE_|CYYPR12MB8871:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e2da514-12dd-4594-5b4e-08dc58ea046e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	uKgMoQ1t+3BW+/Kecm8LeeC4TTvdQKRVvDbzB3+6J5EtgufkgTGN+abS30+YU63pHzvabhNcFjak/gT7YMkOMSGACVp3BY8A+nQ45DRB+GCKflpb8ry/EjpA6jpbd6dSu7lm/uagBel1kDIzg21kP1d+YYps8+US7CzkzguV4hdnWQ46Dal327GzcJ/RMjV/7xK1O5n/6JPjUmSr55eF1f7AQu5ayTkAWfJjkS05lfri9QjHGvIPkOWZYz6ST4M5FZaQpiVmjWn4s159szEh9oy+gEo1Lhn63sSW3BXYz8uIS7tyzL4+REcDYVao/sphbij5ZZyUNItJ2wKd4Q35yZdGAue1D1zLhq2RyTpou6MRQsSfYBhcZnXcpgOSBjN5OlAwjqOmxOMR/b9LVY9IrHEIBdtoz+MYVikxjt3CrPLggNqxLOh/1xDxQTkRQdzeaPRnMFxIy5wf4YLzdNiZZNX7eQ4GSsky4BKEcBQrXXFtwR1J6ddGYXSb7A5pgbs/gHJxURNouncDRKa5p8O1rXQmnFfTUSpLVU9Q/FTVw0iX9TcO1nKcjWpAVYbMeg68zH74WHpVhnFmMIsp0rbL9Oy3UoYxWJAYl1RLkENVDuop6dBhu4HvNOPaIg+hc22aiqP8fLMn5dOBiDM6kJAdNvrsALI1eHrJ2QyDPe0OieaaDle0IOdKEtjlHYtafn5SXwZIlPBpvlkaq/DZ5ZLnM0iB1irBfcDgcqu4Bdol29TtPzIQlYNnyisnmjd83Eci
+	S/fyFr6sTx+lK6+CM/qBeRsqJevmdzYgAmyICPmBcPfH6+GAjsyszaBHXw4m+5oEcMq58JiTWME8oMxRqO6cF6miLOKJz9XO4iW+sRCRLe1VJSI4ZeyVpCyuyVqIGR/OwXBYRriuV+feWGh56XoWxEjgFry5IppwHqKBt/dEO5nkiImw7oJ5Mz8yuLCs7/zvsZoGOAkPh/A4GqQyPBf+//DBPVCqm0qoTG0sTXQW4/1sUglfqcvXgVpM7Zkog5zsmeNSFhT+WQMjONu8Etk6tdNc5EvKl2cE+Y9YOoDcvLz415dMtXDWfs+OiJeGSW9Jm2+4Htdp7zPLGfBE3hj2TVKWTaROEfcCi13XxvMqllthVYr5iR2Lzp1TDpPrEa5tseMS5KwsrxOOiXmYG6853sfnvOd9c0Ihp6a6dsFgMMzfxNYxQ4cuJ0eNn61oVK7b0v9cN9i5dsNytgGeIr5XBMYSXnmp/04SKu19jjCaH7ZcGmXzuNqELig0mhH6wxcdx8XHWKSgBpjy1YGfVhoRtX8z6zEfKZJdDnJpdHfpwJGHgTRvCkNIu8T7MQKQf2x2w9rNmyyhahcFSGybXoepdqYKvnCr89QNoNOwepMgrXZl2OFw7DtwdrpkXgiaMshW3K2m9wD1Wiyju9EeEIsD/9Txp+Gm+TJ6UBefcMAUTP6ELx9P9xAr1mThTgN5Nzs9HAKplmGWQbXp+dA8igP8tFkMoQP8KZK9KZ3bHjFcZHav0KkCjm2J8a1mg5WoC1gB
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(1800799015)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(376005)(36860700004)(1800799015);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 23:08:29.1096
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 23:08:49.8606
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 850c0a92-4fdc-4b74-fe55-08dc58e9f80f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e2da514-12dd-4594-5b4e-08dc58ea046e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000FCC3.namprd03.prod.outlook.com
+	CY4PEPF0000FCBE.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7189
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8871
 
-QEMU will currently automatically make use of the KVM_SEV_INIT2 API for
-initializing SEV and SEV-ES guests verses the older
-KVM_SEV_INIT/KVM_SEV_ES_INIT interfaces.
-
-However, the older interfaces will silently avoid sync'ing FPU/XSAVE
-state to the VMSA prior to encryption, thus relying on behavior and
-measurements that assume the related fields to be allow zero.
-
-With KVM_SEV_INIT2, this state is now synced into the VMSA, resulting in
-measurements changes and, theoretically, behaviorial changes, though the
-latter are unlikely to be seen in practice.
-
-To allow a smooth transition to the newer interface, while still
-providing a mechanism to maintain backward compatibility with VMs
-created using the older interfaces, provide a new command-line
-parameter:
-
-  -object sev-guest,legacy-vm-type=true,...
-
-and have it default to false.
+Define the 9.1 machine types and make them identical to 9.0 for now.
+This will be needed to add PC compat options for 9.1+ features.
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- qapi/qom.json     | 11 ++++++++++-
- target/i386/sev.c | 18 +++++++++++++++++-
- 2 files changed, 27 insertions(+), 2 deletions(-)
+ hw/i386/pc_piix.c | 12 +++++++++++-
+ hw/i386/pc_q35.c  | 11 ++++++++++-
+ 2 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/qapi/qom.json b/qapi/qom.json
-index baae3a183f..8f2f75bde6 100644
---- a/qapi/qom.json
-+++ b/qapi/qom.json
-@@ -898,6 +898,14 @@
- #     designated guest firmware page for measured boot with -kernel
- #     (default: false) (since 6.2)
- #
-+# @legacy-vm-type: Use legacy KVM_SEV_INIT KVM interface for creating the VM.
-+#                  The newer KVM_SEV_INIT2 interface syncs additional vCPU
-+#                  state when initializing the VMSA structures, which will
-+#                  result in a different guest measurement. Set this to
-+#                  maintain compatibility with older QEMU or kernel versions
-+#                  that rely on legacy KVM_SEV_INIT behavior.
-+#                  (default: false) (since 9.1)
-+#
- # Since: 2.12
- ##
- { 'struct': 'SevGuestProperties',
-@@ -908,7 +916,8 @@
-             '*handle': 'uint32',
-             '*cbitpos': 'uint32',
-             'reduced-phys-bits': 'uint32',
--            '*kernel-hashes': 'bool' } }
-+            '*kernel-hashes': 'bool',
-+            '*legacy-vm-type': 'bool' } }
- 
- ##
- # @ThreadContextProperties:
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 9dab4060b8..f4ee317cb0 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -67,6 +67,7 @@ struct SevGuestState {
-     uint32_t cbitpos;
-     uint32_t reduced_phys_bits;
-     bool kernel_hashes;
-+    bool legacy_vm_type;
- 
-     /* runtime state */
-     uint32_t handle;
-@@ -356,6 +357,16 @@ static void sev_guest_set_kernel_hashes(Object *obj, bool value, Error **errp)
-     sev->kernel_hashes = value;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 18ba076609..069414a1ac 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -513,13 +513,23 @@ static void pc_i440fx_machine_options(MachineClass *m)
+                                      "Use a different south bridge than PIIX3");
  }
  
-+static bool sev_guest_get_legacy_vm_type(Object *obj, Error **errp)
-+{
-+    return SEV_GUEST(obj)->legacy_vm_type;
-+}
-+
-+static void sev_guest_set_legacy_vm_type(Object *obj, bool value, Error **errp)
-+{
-+    SEV_GUEST(obj)->legacy_vm_type = value;
-+}
-+
- bool
- sev_enabled(void)
+-static void pc_i440fx_9_0_machine_options(MachineClass *m)
++static void pc_i440fx_9_1_machine_options(MachineClass *m)
  {
-@@ -863,7 +874,7 @@ static int sev_kvm_type(X86ConfidentialGuest *cg)
-     }
- 
-     kvm_type = (sev->policy & SEV_POLICY_ES) ? KVM_X86_SEV_ES_VM : KVM_X86_SEV_VM;
--    if (kvm_is_vm_type_supported(kvm_type)) {
-+    if (kvm_is_vm_type_supported(kvm_type) && !sev->legacy_vm_type) {
-         sev->kvm_type = kvm_type;
-     } else {
-         sev->kvm_type = KVM_X86_DEFAULT_VM;
-@@ -1381,6 +1392,11 @@ sev_guest_class_init(ObjectClass *oc, void *data)
-                                    sev_guest_set_kernel_hashes);
-     object_class_property_set_description(oc, "kernel-hashes",
-             "add kernel hashes to guest firmware for measured Linux boot");
-+    object_class_property_add_bool(oc, "legacy-vm-type",
-+                                   sev_guest_get_legacy_vm_type,
-+                                   sev_guest_set_legacy_vm_type);
-+    object_class_property_set_description(oc, "legacy-vm-type",
-+            "use legacy VM type to maintain measurement compatibility with older QEMU or kernel versions.");
+     pc_i440fx_machine_options(m);
+     m->alias = "pc";
+     m->is_default = true;
  }
  
- static void
++DEFINE_I440FX_MACHINE(v9_1, "pc-i440fx-9.1", NULL,
++                      pc_i440fx_9_1_machine_options);
++
++static void pc_i440fx_9_0_machine_options(MachineClass *m)
++{
++    pc_i440fx_machine_options(m);
++    m->alias = NULL;
++    m->is_default = false;
++}
++
+ DEFINE_I440FX_MACHINE(v9_0, "pc-i440fx-9.0", NULL,
+                       pc_i440fx_9_0_machine_options);
+ 
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 7f2d85df75..77d7f700a8 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -367,12 +367,21 @@ static void pc_q35_machine_options(MachineClass *m)
+                      pc_q35_compat_defaults, pc_q35_compat_defaults_len);
+ }
+ 
+-static void pc_q35_9_0_machine_options(MachineClass *m)
++static void pc_q35_9_1_machine_options(MachineClass *m)
+ {
+     pc_q35_machine_options(m);
+     m->alias = "q35";
+ }
+ 
++DEFINE_Q35_MACHINE(v9_1, "pc-q35-9.1", NULL,
++                   pc_q35_9_1_machine_options);
++
++static void pc_q35_9_0_machine_options(MachineClass *m)
++{
++    pc_q35_machine_options(m);
++    m->alias = NULL;
++}
++
+ DEFINE_Q35_MACHINE(v9_0, "pc-q35-9.0", NULL,
+                    pc_q35_9_0_machine_options);
+ 
 -- 
 2.25.1
 
