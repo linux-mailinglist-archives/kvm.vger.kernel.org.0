@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-14083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0982189ED93
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 10:28:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 302C989ED94
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 10:28:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FC8CB23084
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 08:28:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF783284D90
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 08:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5420313D619;
-	Wed, 10 Apr 2024 08:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A2D13D638;
+	Wed, 10 Apr 2024 08:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t3yfHPkN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e1WUOx91"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B146913D605
-	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 08:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82A513D61C
+	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 08:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712737693; cv=none; b=pxyLqDsxKZo/cqBJZxa4KQ3+VzXmMdEW55J1uLqy4NlmgPle1WimiMt4Uipjjsazyf+54rtZR9dNFHTZR1Z/PMy1nrd7/737ktLb79f2tgMJ/HyXw35ZFmubR0BRnYmq1jpuxiX70VRjd+KENRviyu+EJGk/joQSIZGidD8I2OU=
+	t=1712737704; cv=none; b=YHH6ErTzfYIxlRJnnKNRRTcOmt5ugaHmGpFdT/NRylNWHl7LrKFhLqu99CAA8gOw1VtDbsPJG4ZWgjo9NIbVvrS4fK1FRAHIQ3FgChJC8e64my65CH/ykJjhUCUNN94bucISWzQZzOdEBix4nXuB+yepNMKd/M89lJbkCqt92ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712737693; c=relaxed/simple;
-	bh=loO222umeudNN/3VRDuIKBD8h6ayrjYQtdXvLf/9SQQ=;
+	s=arc-20240116; t=1712737704; c=relaxed/simple;
+	bh=SNsqoj9eNqjKtvp5/K3OU5JaLw8PBS6M12dONrb5QKc=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hpm6hBZ/NBmFistgVbKaW/t3ze0MfAbIztvYvuG+E3/ZBc3Z/dx8DOeTNOD9yqu9u5kV6fSr954LO2MVPSMqGFijkPp5grQqYNjnjzKx5898PmPeG8S5kiUilPLfUK6TnIbbuac0CCl/CQS9OsWz2lECemmIRtaiZJdURCRl7CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t3yfHPkN; arc=none smtp.client-ip=209.85.208.178
+	 Content-Disposition; b=TjG7vXzaKMZHLbOJjM30K2TQFb2eftsvFVrjyRx6JJ+msm7V12NoCR6YrLLYoyrblM7xF9pWpvWei41LuHnuiVu91ey9iRLdkIfBV5CrCpyPiZxmU5SZvIGlWJrJKFnu8kjIMOoqNFZ8CEppP5nAWsLWpfu90NnhTrBja31u4uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e1WUOx91; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d700beb60bso104763261fa.1
-        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 01:28:11 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a52140ea1b5so20168666b.1
+        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 01:28:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712737690; x=1713342490; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712737701; x=1713342501; darn=vger.kernel.org;
         h=content-transfer-encoding:content-disposition:mime-version
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qY+POk7z4HcyMMlZuNM5o7DMNVtuiYxieApfPnvv9HE=;
-        b=t3yfHPkNmqDcRqyZAcdDOe3ajh1HexXyVR8bSm2idQejix23qvqzBL5E+sTVc1Nllo
-         iOf2EyIBpQ1IIh2Vh7/cydahZP2BklGv2dHOMEmP9XPHi5N6K3GZqXXn1ZFTNIFKbEzQ
-         hzv686tvWPyUzuF07nk8ifh38hBBwWhHCyXzWP+ND+17vHRL4cz4cMPoxnv4jOfhPWuM
-         gYu+FMTUjWXGA4YFQmjGR0Qc5+UbVm0afK2Bvy6TgwmC+3R8qmYgKyliTqOiVlvqJ1xJ
-         Ifv4veBuA0cSEor2xd3unkefdfa9yWOmibNtlJwuBV7YqT3jbTg0lCIKdv6B5HTk4c4W
-         vxOQ==
+        bh=AcC4Vj21DILBZiNE6/g7j9wakFMnVaxsPp20pxP4UlU=;
+        b=e1WUOx91v37y0xQH63eMQO+Wx1GcQwYFQt7jYIhV6jYbe2F3YJPQzzo/XAIzYx6WAm
+         xxKh3i1uGLdMHg6riiL29XRdsga7KOyxga4DCMVsduyBUyFPuD0HQmSZt1LviYMD4lCN
+         L3dx1ZnGq6M1VWnAo2l1cQjDMuzvcIUmQFsFLZqziI0jfFhe6NzUCL6wmHreMhLrwV/h
+         hS1MDEWhvWSrr6ufuwCZlLBWyV/V39c9smEs4ltJYOtaTtHNeqb5wezcz1dEATl3EGIt
+         3NdenaOAysGRWfg1Z0JG2VaIv9itfF6fUTmQ1QCsCNwb8YdjBT9iJfNqqBUB3+/AT6Fa
+         Idbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712737690; x=1713342490;
+        d=1e100.net; s=20230601; t=1712737701; x=1713342501;
         h=content-transfer-encoding:content-disposition:mime-version
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qY+POk7z4HcyMMlZuNM5o7DMNVtuiYxieApfPnvv9HE=;
-        b=CdBMkLAB+mUm675CP4APMzOROscQOREqNJH1G2KdC+vFnmHgvA/jLSx4U7Lvvn/pjJ
-         i+50IKu8jJS0DxOVDeQVVGDGsnXpUvNTLSWE960bJ/XKsY6pHVsjIxpXRAvMFNlHRcTy
-         uArh/wX7DBTuv5uRLHcHgGjy3smmASpa38FMssaLTPb0tCB8sazZCxszazjWXrjPVYVZ
-         dE6TdhUCwZRGgysXYkWoEuyxLSUojae6jGTHgacRMqqoSDoVR+Tjd7VfpGk+y0QaGCnI
-         PmSOJJutCJ/rdG9cN4osGwGo8GIBj2pJPYKl6YCTmGbcivIREZiYAZFzeWxSWZGE7/1k
-         2yFg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfZ3nuDfFpZ+CYvBhZjG9NOaTcvXIThuXmZOjRNrBYiF98YkHCXecg3zeKVNIOcZOZWh9tPRuTjLWBkGFfA8kHZANq
-X-Gm-Message-State: AOJu0YyH5YZbBoUUa5ihk2wcwVkculx/KyQvzjgMr/vOnzuqDhojA+Xl
-	BmoqoUGvNwmWUJmAbLfo5BraYXzYRJPqPtnMRsGynK9LDMubMBwHIJCpTWHTag==
-X-Google-Smtp-Source: AGHT+IEL5qT3PXK3v0HpJZ+zPd2REaRDBNASA0+bLbNO3hFsj9CwSLwbfI4Q9HqWFPT0ZHUDjdBQXg==
-X-Received: by 2002:a05:651c:2c1:b0:2d8:2d0a:7b9b with SMTP id f1-20020a05651c02c100b002d82d0a7b9bmr1863181ljo.14.1712737689629;
-        Wed, 10 Apr 2024 01:28:09 -0700 (PDT)
+        bh=AcC4Vj21DILBZiNE6/g7j9wakFMnVaxsPp20pxP4UlU=;
+        b=Q5oh/IEMHXXpjtFBjhLTVz/CRgiTJ6mAhS9QcYlLAYRk+VaOR4+1Hcjrlyx8pyu7Rf
+         7NAtG8VsediQA7HvKDcgwBXJFRWSOUyNTzbRYone+jbpzfRaY9J/cCvJw6zBH7Fdib1F
+         hSvJ5HDL8s7QawIESyx0ZXqmqxTiwHYf8ZKZ27KcVXG42lF5TOzF3k2+Aa4yUN0bJ83H
+         +AOG5ncljKCT2ZSMLamiFsVkQOz0weejaq/Yzm792QzoewiFd18hk3WJowkiTqS8I079
+         1hAoLLanDTGOuWipd99T8fBUBJRsiRX4UnQ4fsKFNg8M1GdHJ/OTIp7O8WDHLJ+aA4ly
+         KspQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3cRGbsK7Ge2qtzi+2qabE2KDbWKxqlMOohciWi0WAfC6J1oOG5PPFFk4GPhTL6lcI9j0vIhbEERNX0i+hmQFHsf7t
+X-Gm-Message-State: AOJu0YyWvB+8oX9xr6uRb3ZWeH7rBrpDtOX29hfxIN05PfImlokDgNj4
+	VzBel1s4rCOBxnXgGXuJdplFOOlD5aH6zf0VyeQIq2HfOXKI860WYVLBevSryAx5dGcFQkt7D1d
+	HEw==
+X-Google-Smtp-Source: AGHT+IGDOlmZUNa/b3VDkvm8WfG9UbS0FH17m/cxzH6+qrZhejCFvYfRumRMzmA89IrkJpXU6vz+vw==
+X-Received: by 2002:a17:907:70c1:b0:a4e:a068:7f with SMTP id yk1-20020a17090770c100b00a4ea068007fmr962531ejb.49.1712737700913;
+        Wed, 10 Apr 2024 01:28:20 -0700 (PDT)
 Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id dr2-20020a170907720200b00a4ea1fbb323sm6656464ejc.98.2024.04.10.01.28.08
+        by smtp.gmail.com with ESMTPSA id qq18-20020a17090720d200b00a51cdf560b9sm4255362ejb.37.2024.04.10.01.28.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 01:28:09 -0700 (PDT)
-Date: Wed, 10 Apr 2024 09:28:05 +0100
+        Wed, 10 Apr 2024 01:28:20 -0700 (PDT)
+Date: Wed, 10 Apr 2024 09:28:16 +0100
 From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Vincent Donnefort <vdonnefort@google.com>
-Subject: [PATCH v2 01/12] KVM: arm64: Fix clobbered ELR in sync abort/SError
-Message-ID: <iyww6yls3pqijoabrtgg5fq6p2a5pkv27cgesu7ffldlf3ooif@qxl5vpvdokfb>
+Subject: [PATCH v2 02/12] KVM: arm64: Fix __pkvm_init_switch_pgd C signature
+Message-ID: <22rqvzc34ehoirj42j6q27gfkxj53gjuryvtqqwh2q5d5yggme@rffmqhcxmtvy>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,87 +86,42 @@ Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-When the hypervisor receives a SError or synchronous exception (EL2h)
-while running with the __kvm_hyp_vector and if ELR_EL2 doesn't point to
-an extable entry, it panics indirectly by overwriting ELR with the
-address of a panic handler in order for the asm routine it returns to to
-ERET into the handler.
+Update the function declaration to match the asm implementation.
 
-However, this clobbers ELR_EL2 for the handler itself. As a result,
-hyp_panic(), when retrieving what it believes to be the PC where the
-exception happened, actually ends up reading the address of the panic
-handler that called it! This results in an erroneous and confusing panic
-message where the source of any synchronous exception (e.g. BUG() or
-kCFI) appears to be __guest_exit_panic, making it hard to locate the
-actual BRK instruction.
-
-Therefore, store the original ELR_EL2 in the per-CPU kvm_hyp_ctxt and
-point the sysreg to a routine that first restores it to its previous
-value before running __guest_exit_panic.
-
-Fixes: 7db21530479f ("KVM: arm64: Restore hyp when panicking in guest context")
+Fixes: f320bc742bc2 ("KVM: arm64: Prepare the creation of s1 mappings at EL2")
 Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
 ---
- arch/arm64/kernel/asm-offsets.c         | 1 +
- arch/arm64/kvm/hyp/entry.S              | 9 +++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 5 +++--
- 3 files changed, 13 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h | 3 +--
+ arch/arm64/kvm/hyp/nvhe/setup.c  | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 81496083c041..27de1dddb0ab 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -128,6 +128,7 @@ int main(void)
-   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-   DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
-   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
-+  DEFINE(CPU_ELR_EL2,		offsetof(struct kvm_cpu_context, sys_regs[ELR_EL2]));
-   DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[RGSR_EL1]));
-   DEFINE(CPU_GCR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[GCR_EL1]));
-   DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APIAKEYLO_EL1]));
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index f3aa7738b477..bcaaf1a11b4e 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -83,6 +83,15 @@ alternative_else_nop_endif
- 	eret
- 	sb
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 3e2a1ac0c9bb..96daf7cf6802 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -123,8 +123,7 @@ void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
+ #endif
  
-+SYM_INNER_LABEL(__guest_exit_restore_elr_and_panic, SYM_L_GLOBAL)
-+	// x0-x29,lr: hyp regs
-+
-+	stp	x0, x1, [sp, #-16]!
-+	adr_this_cpu x0, kvm_hyp_ctxt, x1
-+	ldr	x0, [x0, #CPU_ELR_EL2]
-+	msr	elr_el2, x0
-+	ldp	x0, x1, [sp], #16
-+
- SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
- 	// x2-x29,lr: vcpu regs
- 	// vcpu x0-x1 on the stack
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index e3fcf8c4d5b4..19a7ca2c1277 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -753,7 +753,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 
- static inline void __kvm_unexpected_el2_exception(void)
+ #ifdef __KVM_NVHE_HYPERVISOR__
+-void __pkvm_init_switch_pgd(phys_addr_t phys, unsigned long size,
+-			    phys_addr_t pgd, void *sp, void *cont_fn);
++void __pkvm_init_switch_pgd(phys_addr_t params, void (*finalize_fn)(void));
+ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+ 		unsigned long *per_cpu_base, u32 hyp_va_bits);
+ void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index bc58d1b515af..bcaeb0fafd2d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -316,7 +316,7 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
  {
--	extern char __guest_exit_panic[];
-+	extern char __guest_exit_restore_elr_and_panic[];
- 	unsigned long addr, fixup;
- 	struct kvm_exception_table_entry *entry, *end;
- 	unsigned long elr_el2 = read_sysreg(elr_el2);
-@@ -775,7 +775,8 @@ static inline void __kvm_unexpected_el2_exception(void)
- 	}
+ 	struct kvm_nvhe_init_params *params;
+ 	void *virt = hyp_phys_to_virt(phys);
+-	void (*fn)(phys_addr_t params_pa, void *finalize_fn_va);
++	typeof(__pkvm_init_switch_pgd) *fn;
+ 	int ret;
  
- 	/* Trigger a panic after restoring the hyp context. */
--	write_sysreg(__guest_exit_panic, elr_el2);
-+	this_cpu_ptr(&kvm_hyp_ctxt)->sys_regs[ELR_EL2] = elr_el2;
-+	write_sysreg(__guest_exit_restore_elr_and_panic, elr_el2);
- }
- 
- #endif /* __ARM64_KVM_HYP_SWITCH_H__ */
+ 	BUG_ON(kvm_check_pvm_sysreg_table());
 -- 
 2.44.0.478.gd926399ef9-goog
 
