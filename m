@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-14163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 855608A02E5
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 00:10:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3522D8A02E6
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 00:10:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CBB028724F
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 22:10:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8A551F22A19
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 22:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB22B19DF65;
-	Wed, 10 Apr 2024 22:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D5E1A0AF8;
+	Wed, 10 Apr 2024 22:08:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VusY2BjZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AxjLXnsR"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B900194C64;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D149B194C90;
 	Wed, 10 Apr 2024 22:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712786880; cv=none; b=WtetQgsnaJWaDJduKrWgma0eQN5AZbD3BZyVqS7gOk9RHSC+xJXDsnnpPhNcVTjuWc8H0jfH3dw6XlQ1ymy5N2aSExM7qW18Xm1wNvu9lTZgjp8VA0TlgL2JP6Qp8Y7HZzUolIoCjjJjmkasx1KURCB81q35v30oFlpGZbr86yc=
+	t=1712786881; cv=none; b=NRY6yA2F0ELMBNPJyqDyErwyGux3MH5Fmg6JkvsAHdO9MKqWUB89WXBGgeC2pUz/BBF6byqyXcVGFFfo/L6EOKEbK+i7QjUhsmmvDVh005idVTM4XTpi8rc3gm5IRJJb8j0/2ShvdOYJfPt/iBNsntd/zB0+r6vshULdF9g4/os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712786880; c=relaxed/simple;
-	bh=GIu4IpEu0OR4p8boNWIAIqwgqflasHfUe3Ym3NmIEMM=;
+	s=arc-20240116; t=1712786881; c=relaxed/simple;
+	bh=ETl8+5bXAMNCbp6iq0APgR1yrZku3CsPb2HTapGc37k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OQ26O6l3CmtoQwiy/4JXZiUimFQGP9HvpWxIljJ0PIVV+6nOXK1EvvXRzz/bexyiyetly8cvOYT5uSiBoRVeiU7URCOhBipwRcsUWF0OW6W9GIRH7u1TRdRxJvm7K+raxIae4LbFwEvR6YDAN7CHY5zA8FVNbZTl+BUk1MCc+2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VusY2BjZ; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=hTGFDguRK4agX6bNfPuz2XCOLPGyXX2QVgmcQ9ELl52IQFwiM9d5UTihRHxPPopUbj4nVPGrI85al4kO9AYMIZmMejd9R/DPgKNupeEiXxG9n7lM1BGJLvZvnv1CFEYCSdatiyi0JaEuX7pibhkozZB/jzMfvOHq3nBUIHZfsAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AxjLXnsR; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712786879; x=1744322879;
+  t=1712786880; x=1744322880;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GIu4IpEu0OR4p8boNWIAIqwgqflasHfUe3Ym3NmIEMM=;
-  b=VusY2BjZT8XIhSPVtJn9TdLFGbRPQRydsqYYVf8Hc/lB9jYXJ+2z0ZC7
-   ZWMyz2jjtB6pL2D45EetufBX6BWNcQUQpJ4nfREJ19UvdIZCPz6dNMfwi
-   Eg+AYsuphKDXVAFtmpDbN1xL308qo1F5sMlJQtgD+FVkH1EQJJrhl12q4
-   Ew0+hOcoSzb2gKir1o1Kjft7CiO32ynU3kugNi/VdYfciVXGv9iY5EnGZ
-   7Gh5hOXf5Mjp665DrQgNgKKu7FdE/pHFNxgLFLe97hJOa0bNhocFfYeSG
-   UGR+M5A87F65R9USXJj2lY9uwCbCeEdaquyK0tVcIpt40gC19ndBUQP77
-   Q==;
-X-CSE-ConnectionGUID: FnnMdapzQpS08QyJtjFrOA==
-X-CSE-MsgGUID: 8EiHSVjHQ52PCrOjlDvVhg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="8041142"
+  bh=ETl8+5bXAMNCbp6iq0APgR1yrZku3CsPb2HTapGc37k=;
+  b=AxjLXnsRzgJvK3p6bV+atyo9KW9rQm0abU8hgP6WOGFZJbuNqZvMT+D3
+   1cLLn860RorEcdz27ed25jPlSR/6wYUin3iY94QGjsP960NjAKRk82wyV
+   Z6JKZCPWIMlWtDrko45EiV5wNEqYdRa3xJ/tdtVRot+DTlYPspUq44u+y
+   iSM4oscE1uICsM3k4341vlHJ1oYkeV2tBCU8nH+ZB8V6ECin2ThdTBqnO
+   vBMQuNr/mw5/R3z4norW+xVl94I3hfxzDqB/2n8CylhMLu4zadQlguIYH
+   CXQ0v+Jab6mvvLXkPzifAO1SzFlK8LE5mSddWbnlGgWOZV9CLa0RNYgzy
+   g==;
+X-CSE-ConnectionGUID: Jf5yLRruSPOtkjCBBMqBkA==
+X-CSE-MsgGUID: 9yXba4t+SjiNZGmoSkr2BQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="8041148"
 X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
-   d="scan'208";a="8041142"
+   d="scan'208";a="8041148"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 15:07:57 -0700
-X-CSE-ConnectionGUID: VJ9idWvQQhu6SaChP5XnSw==
-X-CSE-MsgGUID: l1Ty1mbXRF6bFVTrL6gurA==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 15:07:58 -0700
+X-CSE-ConnectionGUID: dWoIIdVpTc+cUhlWEUNQkQ==
+X-CSE-MsgGUID: fI8/2sUKQRKuXOH0I/dyrg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
-   d="scan'208";a="25476319"
+   d="scan'208";a="25476323"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 15:07:56 -0700
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 15:07:57 -0700
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org
 Cc: isaku.yamahata@intel.com,
@@ -69,9 +69,9 @@ Cc: isaku.yamahata@intel.com,
 	David Matlack <dmatlack@google.com>,
 	Federico Parola <federico.parola@polito.it>,
 	Kai Huang <kai.huang@intel.com>
-Subject: [PATCH v2 07/10] KVM: x86: Always populate L1 GPA for KVM_MAP_MEMORY
-Date: Wed, 10 Apr 2024 15:07:33 -0700
-Message-ID: <2f1de1b7b6512280fae4ac05e77ced80a585971b.1712785629.git.isaku.yamahata@intel.com>
+Subject: [PATCH v2 08/10] KVM: x86: Add a hook in kvm_arch_vcpu_map_memory()
+Date: Wed, 10 Apr 2024 15:07:34 -0700
+Message-ID: <7194bb75ac25fa98875b7891d7929655ab245205.1712785629.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <cover.1712785629.git.isaku.yamahata@intel.com>
 References: <cover.1712785629.git.isaku.yamahata@intel.com>
@@ -85,96 +85,99 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Forcibly switch vCPU mode out from guest mode and SMM mode before calling
-KVM page fault handler for KVM_MAP_MEMORY.
+Add a hook in kvm_arch_vcpu_map_memory() for KVM_MAP_MEMORY before calling
+kvm_mmu_map_page() to adjust the error code for a page fault.  The hook can
+hold vendor-specific logic to make those adjustments and enforce the
+restrictions.  SEV and TDX KVM will use the hook.
 
-KVM_MAP_MEMORY populates guest memory with guest physical address (GPA).
-If the vCPU is in guest mode, it populates with L2 GPA.  If vCPU is in SMM
-mode, it populates the SMM address pace.  The API would be difficult to use
-as such.  Change vCPU MMU mode around populating the guest memory to always
-populate with L1 GPA.
-
-There are several options to populate L1 GPA irrelevant to vCPU mode.
-- Switch vCPU MMU only: This patch.
-  Pros: Concise implementation.
-  Cons: Heavily dependent on the KVM MMU implementation.
-- Use kvm_x86_nested_ops.get/set_state() to switch to/from guest mode.
-  Use __get/set_sregs2() to switch to/from SMM mode.
-  Pros: straightforward.
-  Cons: This may cause unintended side effects.
-- Refactor KVM page fault handler not to pass vCPU. Pass around necessary
-  parameters and struct kvm.
-  Pros: The end result will have clearly no side effects.
-  Cons: This will require big refactoring.
-- Return error on guest mode or SMM mode:  Without this patch.
-  Pros: No additional patch.
-  Cons: Difficult to use.
+In the case of SEV and TDX, they need to adjust the KVM page fault error
+code or refuse the operation due to their restriction.  TDX requires that
+the guest memory population must be before finalizing the VM.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
 v2:
-- Newly added.
+- Make pre_mmu_map_page() to take error_code.
+- Drop post_mmu_map_page().
+- Drop struct kvm_memory_map.source check.
 ---
- arch/x86/kvm/x86.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  3 +++
+ arch/x86/kvm/x86.c                 | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 32 insertions(+)
 
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 5187fcf4b610..a5d4f4d5265d 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -139,6 +139,7 @@ KVM_X86_OP(vcpu_deliver_sipi_vector)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+ KVM_X86_OP_OPTIONAL(get_untagged_addr)
+ KVM_X86_OP_OPTIONAL(alloc_apic_backing_page)
++KVM_X86_OP_OPTIONAL(pre_mmu_map_page);
+ 
+ #undef KVM_X86_OP
+ #undef KVM_X86_OP_OPTIONAL
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3ce244ad44e5..2bf7f97f889b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1812,6 +1812,9 @@ struct kvm_x86_ops {
+ 
+ 	gva_t (*get_untagged_addr)(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
+ 	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
++	int (*pre_mmu_map_page)(struct kvm_vcpu *vcpu,
++				struct kvm_memory_mapping *mapping,
++				u64 *error_code);
+ };
+ 
+ struct kvm_x86_nested_ops {
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2c765de3531e..8ba9c1720ac9 100644
+index 8ba9c1720ac9..b76d854701d5 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -5871,8 +5871,10 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+@@ -5868,6 +5868,26 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ 	}
+ }
+ 
++static int kvm_pre_mmu_map_page(struct kvm_vcpu *vcpu,
++				struct kvm_memory_mapping *mapping,
++				u64 *error_code)
++{
++	int r = 0;
++
++	if (vcpu->kvm->arch.vm_type == KVM_X86_DEFAULT_VM) {
++		/* nothing */
++	} else if (vcpu->kvm->arch.vm_type == KVM_X86_SW_PROTECTED_VM) {
++		if (kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(mapping->base_address)))
++			*error_code |= PFERR_PRIVATE_ACCESS;
++	} else if (kvm_x86_ops.pre_mmu_map_page)
++		r = static_call(kvm_x86_pre_mmu_map_page)(vcpu, mapping,
++							  error_code);
++	else
++		r = -EOPNOTSUPP;
++
++	return r;
++}
++
  int kvm_arch_vcpu_map_memory(struct kvm_vcpu *vcpu,
  			     struct kvm_memory_mapping *mapping)
  {
-+	struct kvm_mmu *mmu = NULL, *walk_mmu = NULL;
- 	u64 end, error_code = 0;
- 	u8 level = PG_LEVEL_4K;
-+	bool is_smm;
- 	int r;
- 
- 	/*
-@@ -5882,18 +5884,40 @@ int kvm_arch_vcpu_map_memory(struct kvm_vcpu *vcpu,
- 	if (!tdp_enabled)
- 		return -EOPNOTSUPP;
- 
-+	/* Force to use L1 GPA despite of vcpu MMU mode. */
-+	is_smm = !!(vcpu->arch.hflags & HF_SMM_MASK);
-+	if (is_smm ||
-+	    vcpu->arch.mmu != &vcpu->arch.root_mmu ||
-+	    vcpu->arch.walk_mmu != &vcpu->arch.root_mmu) {
-+		vcpu->arch.hflags &= ~HF_SMM_MASK;
-+		mmu = vcpu->arch.mmu;
-+		walk_mmu = vcpu->arch.walk_mmu;
-+		vcpu->arch.mmu = &vcpu->arch.root_mmu;
-+		vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
-+		kvm_mmu_reset_context(vcpu);
-+	}
-+
+@@ -5900,6 +5920,14 @@ int kvm_arch_vcpu_map_memory(struct kvm_vcpu *vcpu,
  	/* reload is optimized for repeated call. */
  	kvm_mmu_reload(vcpu);
  
++	/*
++	 * Adjust error_code for VM-type. max_level is adjusted by
++	 * gmem_max_level() callback.
++	 */
++	r = kvm_pre_mmu_map_page(vcpu, mapping, &error_code);
++	if (r)
++		goto out;
++
  	r = kvm_tdp_map_page(vcpu, mapping->base_address, error_code, &level);
  	if (r)
--		return r;
-+		goto out;
- 
- 	/* mapping->base_address is not necessarily aligned to level-hugepage. */
- 	end = (mapping->base_address & KVM_HPAGE_MASK(level)) +
- 		KVM_HPAGE_SIZE(level);
- 	mapping->size -= end - mapping->base_address;
- 	mapping->base_address = end;
-+
-+out:
-+	/* Restore MMU state. */
-+	if (is_smm || mmu) {
-+		vcpu->arch.hflags |= is_smm ? HF_SMM_MASK : 0;
-+		vcpu->arch.mmu = mmu;
-+		vcpu->arch.walk_mmu = walk_mmu;
-+		kvm_mmu_reset_context(vcpu);
-+	}
- 	return r;
- }
- 
+ 		goto out;
 -- 
 2.43.2
 
