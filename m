@@ -1,83 +1,73 @@
-Return-Path: <kvm+bounces-14059-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14060-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C24B89E7A1
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 03:12:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9311189E7BC
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 03:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B173F282E6A
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 01:12:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 155D3B21E1F
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 01:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B821388;
-	Wed, 10 Apr 2024 01:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFC610E3;
+	Wed, 10 Apr 2024 01:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CN9a8a3Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E8/hI7n1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4184138D;
-	Wed, 10 Apr 2024 01:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CFB64A
+	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 01:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712711563; cv=none; b=V18pdlnGSHxdfh9AueNX66S/bZGDYfLFnnhiSeUavTcJAAIN5kpPy0zOC7qMxa+yCA0/cDQenr5Awuq6vF5ofsg36A4cdYhTOQ5gvmMsTJTwdP03c3dwP+vQonooQC/NjWeDc5qluAVcMuQc5LIZ0htymarFmufpBMNL8x/0BJg=
+	t=1712712227; cv=none; b=iyQSjgp3FckVdsO9/ObG80af8q03zGi0e88BR0EDMnkiV5Bt4oj5YqpaWb0M2aTXeTDvnZN3DE9CLOeUSpfAl/l/WQRm387QqOln0agOkDGs1DbCA0yigAwq4Tf341u2V9Ol09938uW3MdPzE49U9ghU2Rn9yexHWGuA44VojIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712711563; c=relaxed/simple;
-	bh=r36zZBtPUpWjpojDacVGVLWS1iX2gN7CxDWZCCEiJ2M=;
+	s=arc-20240116; t=1712712227; c=relaxed/simple;
+	bh=FuunY/8wfVNK0u3bG4BKNgnqtTilaD14zHndSDRbaxQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q1gfxRe50fIsFK9YzkOmUI+hVXXcAh93k55sDtl3v2s7NL06VhOEM1wNxdmYP0RgE9e2k0bmikdij15ytQZJNvNfKBg537EZCdJ7Ye1GDYZM+FvzpP+Bok0DJrI+vJ6zdvqfS91tI88bPiB6Q6n9PCd6jXi+9P6eeHUDfHr1pA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CN9a8a3Z; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=OVWLLw1C9muUUHVm3OgiAO5H0moVEHJ2GtwQv2kyzbu8PDUaSAnMycY/wsLfyForF8EVCWFl0aZE12fM55BfjX0tss1/8FsuC1FmkwWv+LNl2RlE7Uw7JCzluGkVGHUovkD4LaOmV11eFq5zTxyRIyIvQgxeSnQ0RAxaPmcULJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E8/hI7n1; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712711562; x=1744247562;
+  t=1712712226; x=1744248226;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:content-transfer-encoding:in-reply-to;
-  bh=r36zZBtPUpWjpojDacVGVLWS1iX2gN7CxDWZCCEiJ2M=;
-  b=CN9a8a3Zu9WN5e91XeNwT0U94Gx8auJtPp2QyUtWqUHGf9jGRrOvqj2V
-   o0ZfKa6u2Tvuy87hFCHPylTaxVpSXZPeTuwLks69NORn8vxY2PZ0oPSOQ
-   VKLhyZ4me6i9N7WZRb7QQhvqTf889cw8/OFIikdxJ2IxVOAXeGBh5hQil
-   08OEt9ZOjUa4n12zrlGpGyECTm5YgRvOaZx3MAMYWpWSl05YSd3w/ZtDV
-   Ox3kw7uV7YWiKclWfYAJVZIBRJ8t60+hpKolg+XgB5td3UWNm3mean7J5
-   XjFUg5KXJLFBOB92aZyqwqpcFcn39iugNde46KhKwmG8F6LRsHYgHuw7S
-   A==;
-X-CSE-ConnectionGUID: +4D3n4BvQ7uavYD2841DNg==
-X-CSE-MsgGUID: SLz2k14sSY+DLVavKtQllQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="11844889"
+  bh=FuunY/8wfVNK0u3bG4BKNgnqtTilaD14zHndSDRbaxQ=;
+  b=E8/hI7n1Rah5eOKKeN1TizdQz03YMXb+AC2B+5l1DTfG46xhpzq5ePFy
+   /yvD/CITSr10se3xLRMNaELFWvKzs/PuETMs2JEIoV1+C0ZA78TGaX66/
+   +jfT+K+M1naAduMRje5tdkeFPoAQ3EMqTp6dYI1EV9+Z6K5lNtCjn8UVC
+   beOpV49qxv7H8EA/V4BJ3jZGUWFRVZYTkFWjufmrYxTrgJiqNXSauI1h6
+   6FqJwXxYniOljeKCX9+U2Pn2Z1V2CtJ4rK+OomjbpvQBg5RMnNIWhEz1g
+   HgOYB8CotY0LOBUjIFE1AcGtaIQaLC4DoB6pwy9YdyfK7zdyN7kGZuL4v
+   g==;
+X-CSE-ConnectionGUID: fYaP3L1dS8+X1AUbm4fl+g==
+X-CSE-MsgGUID: g0E3WaurSOyNNOCMgBXHyw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="19442076"
 X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="11844889"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 18:12:41 -0700
-X-CSE-ConnectionGUID: jvYkd817RRW8DHYUKZKDeg==
-X-CSE-MsgGUID: WdK3P8T6Q8eYgEr+w+2W/A==
+   d="scan'208";a="19442076"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 18:23:45 -0700
+X-CSE-ConnectionGUID: 3SkqmD0ZTpGCRUn5SLlw0g==
+X-CSE-MsgGUID: Pvfx93w5Qr+mcBi2wt2Kgw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="25078755"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 18:12:41 -0700
-Date: Tue, 9 Apr 2024 18:12:40 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+   d="scan'208";a="20499477"
+Received: from linux.bj.intel.com ([10.238.157.71])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 18:23:43 -0700
+Date: Wed, 10 Apr 2024 09:20:52 +0800
+From: Tao Su <tao1.su@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	"davidskidmore@google.com" <davidskidmore@google.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
-	"srutherford@google.com" <srutherford@google.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Wei Wang <wei.w.wang@intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
-Message-ID: <20240410011240.GA3039520@ls.amr.corp.intel.com>
-References: <20240405165844.1018872-1-seanjc@google.com>
- <73b40363-1063-4cb3-b744-9c90bae900b5@intel.com>
- <ZhQZYzkDPMxXe2RN@google.com>
- <a17c6f2a3b3fc6953eb64a0c181b947e28bb1de9.camel@intel.com>
- <ZhQ8UCf40UeGyfE_@google.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com,
+	xiaoyao.li@intel.com
+Subject: Re: [PATCH] KVM: x86: Fix the condition of #PF interception caused
+ by MKTME
+Message-ID: <ZhXpdAdGsghYduDt@linux.bj.intel.com>
+References: <20240319031111.495006-1-tao1.su@linux.intel.com>
+ <ZhWRaMtsMXfHTFTH@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,50 +77,54 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZhQ8UCf40UeGyfE_@google.com>
+In-Reply-To: <ZhWRaMtsMXfHTFTH@google.com>
 
-On Mon, Apr 08, 2024 at 06:51:40PM +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-
-> On Mon, Apr 08, 2024, Edgecombe, Rick P wrote:
-> > On Mon, 2024-04-08 at 09:20 -0700, Sean Christopherson wrote:
-> > > > Another option is that, KVM doesn't allow userspace to configure
-> > > > CPUID(0x8000_0008).EAX[7:0]. Instead, it provides a gpaw field in struct
-> > > > kvm_tdx_init_vm for userspace to configure directly.
-> > > > 
-> > > > What do you prefer?
-> > > 
-> > > Hmm, neither.  I think the best approach is to build on Gerd's series to have KVM
-> > > select 4-level vs. 5-level based on the enumerated guest.MAXPHYADDR, not on
-> > > host.MAXPHYADDR.
+On Tue, Apr 09, 2024 at 12:05:12PM -0700, Sean Christopherson wrote:
+> On Tue, Mar 19, 2024, Tao Su wrote:
+> > Intel MKTME repurposes several high bits of physical address as 'keyID',
+> > so boot_cpu_data.x86_phys_bits doesn't hold physical address bits reported
+> > by CPUID anymore.
 > > 
-> > So then GPAW would be coded to basically best fit the supported guest.MAXPHYADDR within KVM. QEMU
-> > could look at the supported guest.MAXPHYADDR and use matching logic to determine GPAW.
+> > If guest.MAXPHYADDR < host.MAXPHYADDR, the bit field of ‘keyID’ belongs
+> > to reserved bits in guest’s view, so intercepting #PF to fix error code
+> > is necessary, just replace boot_cpu_data.x86_phys_bits with
+> > kvm_get_shadow_phys_bits() to fix.
+> > 
+> > Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.h | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > index 65786dbe7d60..79b1757df74a 100644
+> > --- a/arch/x86/kvm/vmx/vmx.h
+> > +++ b/arch/x86/kvm/vmx/vmx.h
+> > @@ -15,6 +15,7 @@
+> >  #include "vmx_ops.h"
+> >  #include "../cpuid.h"
+> >  #include "run_flags.h"
+> > +#include "../mmu.h"
+> >  
+> >  #define MSR_TYPE_R	1
+> >  #define MSR_TYPE_W	2
+> > @@ -719,7 +720,8 @@ static inline bool vmx_need_pf_intercept(struct kvm_vcpu *vcpu)
+> >  	if (!enable_ept)
+> >  		return true;
+> >  
+> > -	return allow_smaller_maxphyaddr && cpuid_maxphyaddr(vcpu) < boot_cpu_data.x86_phys_bits;
+> > +	return allow_smaller_maxphyaddr &&
+> > +		cpuid_maxphyaddr(vcpu) < kvm_get_shadow_phys_bits();
 > 
-> Off topic, any chance I can bribe/convince you to wrap your email replies closer
-> to 80 chars, not 100?  Yeah, checkpath no longer complains when code exceeds 80
-> chars, but my brain is so well trained for 80 that it actually slows me down a
-> bit when reading mails that are wrapped at 100 chars.
+> For posterity, because I had a brief moment where I thought we done messed up:
 > 
-> > Or are you suggesting that KVM should look at the value of CPUID(0X8000_0008).eax[23:16] passed from
-> > userspace?
-> 
-> This.  Note, my pseudo-patch incorrectly looked at bits 15:8, that was just me
-> trying to go off memory.
-> 
-> > I'm not following the code examples involving struct kvm_vcpu. Since TDX
-> > configures these at a VM level, there isn't a vcpu.
-> 
-> Ah, I take it GPAW is a VM-scope knob?  I forget where we ended up with the ordering
-> of TDX commands vs. creating vCPUs.  Does KVM allow creating vCPU structures in
-> advance of the TDX INIT call?  If so, the least awful solution might be to use
-> vCPU0's CPUID.
+> No change is needed in the reporting of MAXPHYADDR in KVM_GET_SUPPORTED_CPUID,
+> as reporting boot_cpu_data.x86_phys_bits as MAXPHYADDR when TDP is disabled is ok
+> because KVM always intercepts #PF when TDP is disabled, and KVM already reports
+> the full/raw MAXPHYADDR when TDP is enabled.
 
-The current order is, KVM vm creation (KVM_CREATE_VM),
-KVM vcpu creation(KVM_CREATE_VCPU), TDX VM initialization (KVM_TDX_INIT_VM).
-and TDX VCPU initialization(KVM_TDX_INIT_VCPU).
-We can call KVM_SET_CPUID2 before KVM_TDX_INIT_VM.  We can remove cpuid part
-from struct kvm_tdx_init_vm by vcpu0 cpuid.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+You are right, but userspace can fully control guest.MAXPHYADDR when TDP is enabled.
+Please see the unit-test[*], I think this issue could show up earlier if phys-bits
+is set larger, such as 46-bits.
+
+[*] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/master/x86/unittests.cfg?ref_type=heads#L156
 
