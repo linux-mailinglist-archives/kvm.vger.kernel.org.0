@@ -1,149 +1,206 @@
-Return-Path: <kvm+bounces-14143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C07B89FCB5
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 18:17:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D3A89FE60
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 19:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 261791F2275E
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 16:17:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 378D0B28FF4
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 17:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4076117A930;
-	Wed, 10 Apr 2024 16:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47AF417BB10;
+	Wed, 10 Apr 2024 17:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uueRiOOE"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I5tZxxg6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE5E179943
-	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 16:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB44176FDB;
+	Wed, 10 Apr 2024 17:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712765869; cv=none; b=DwQ4Tc2ZARmoZimNXov13yBgtmYA8QA0aUL+kxE7YAIm6y9Awbp1bUXgpRVRliSoNjD0CpVlC7QYr/s4PrS+6ohjp9XjIaiY/MUAbtAl1rC/+73t0RNj15aSkDd4L/je8qs+vC9q0tOkWXovNOr526Jdm7g/z5F165rvOyRc56o=
+	t=1712769555; cv=none; b=FgWdwHUgp9RcRpu3oz4UFEQp799P1TkTXvUs2WBX+RW2SwwAD1jqTM/5a8qTozdtkO9In/4ZxY8UDiqlla78gUKyxyR8/k/LhSgglOS6U/A1f1GeoFOhNKex6toRL6ubJUg1zIN9RDhwdc0B+Xv4x15RWCqAbacsa9E9UKwxZDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712765869; c=relaxed/simple;
-	bh=1WyjkTl7b0Sdz5CN4zB/P780Z1I2Oi8XLWSFnpNieyo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jHX66vAIV4fl1jF/ohVKKF5CaK8Fq2DjvUzTbqxZcObESbjx11zAsfNfSCknqaijfcrQlvWWvJ6bawa7CUJ0BHFQMuiSljHsER7Ltl8RY5PkDxFZ1YcvwkYP6JQeSQNKEF+F0zdRBzq5FDGYlaSCui8IllOoW8eTxcKPmVR4P7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uueRiOOE; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a49440f7b5so4413287a91.1
-        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 09:17:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712765867; x=1713370667; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4RM9QND4Dh1XrtT52mI6sX0Ud+p6rtxAVIaz7hkBd0Y=;
-        b=uueRiOOE4cE4ZvGsW/ExYZFMSQlQnfEJgktnIWqcvCXmHM4OW2cbai02XiriPJetmV
-         8scWPdL5hISmnDzCukuGJRrQhgx/Kd82+WNKj61v4ChmIx8xQzFibKaLLIMTowT8+sLw
-         x/CkueEJ1msc0yAbNWhdWmWPPZGogtj2hzIyNaeHAxTDnYhexbspKdWf8s1mZOmVUu5p
-         Frf+oozzoctlro+ssi8yv5cXnZOZnxm8S8ZKUxM/TvR8XeBKpPf5r2CsyF6DA4zAEb0O
-         wR8o38yVozOFttealbXF/MXmdue1Bb3duGH6coS205QDQYB8bvSXZscqTDTMVM7Xh9e7
-         HnVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712765867; x=1713370667;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4RM9QND4Dh1XrtT52mI6sX0Ud+p6rtxAVIaz7hkBd0Y=;
-        b=poJNlGRf6Sp9UWcl+YsyDZK6TQWzocN3qEHaHPtxSswg+rVEPQr/VCL6zN68cf9Vn6
-         tnCFs4M5nbYCmFX2ewwNTTJLT3MShUhsrcW4/p23ZihCIrjh5DhIXlE3LThFcCc0Fahb
-         uFwjrPds16BxskrzVOdinb72IELkdlEGj7MjfdpsUHyfeSmmW0zAqnCUfEbSZqW7g1pT
-         i5Du4QdVKCa9pzlzU6rZF4RFDpeT2NeUAVTZF7DZc4s4XMgoGWpH8HK6ogmqq1wPXzKI
-         E/Bs8tAa0V95EcWbdBO/M6VIzievn5pv9ZVTJrwaIEzJBJuA+Psdy9Z5Bi/uR3yo8x40
-         ksTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGYPu3NAkPHyvyQO5k4rwBmy3Bitg4N2VJEI2hYpFXSAqxXPludd+o3QC1/UsLyPuWfFdpJPFivwe35lA8NUZB7M2M
-X-Gm-Message-State: AOJu0YyIbs8T6Utm5aIJiVHPTcwRmSsU9d+gMXJhemG0cyKjI4gPTlYA
-	vb7+jmM2YZDXqwlEEz40ad4b1L7dgL0tdqZuoDGR3hA3+qcQ91mUUoUcSG0s1qwVAK9tXjLdSGA
-	C/w==
-X-Google-Smtp-Source: AGHT+IE8r4m5kt68m3QpTx1M5VPtPagtkqmQhRKiMFUQyxkBPQhUR12Sr0TLYAzLjQbn/WdGOklZScVy1QI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:d710:b0:2a4:70d5:2dd9 with SMTP id
- y16-20020a17090ad71000b002a470d52dd9mr8829pju.7.1712765867259; Wed, 10 Apr
- 2024 09:17:47 -0700 (PDT)
-Date: Wed, 10 Apr 2024 09:17:45 -0700
-In-Reply-To: <CALzav=eK-FeCDvjrfcWUR_KYy29r8O8HP=+L=zdp-UAYhpp+QQ@mail.gmail.com>
+	s=arc-20240116; t=1712769555; c=relaxed/simple;
+	bh=r+8GB3YSCFrdIgTy1E56r6fY5pMgbm3TyaFh8Y/uvaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KcsNeqtBcPHtsCzv8WhqlIk2a1J17sunqd5gK7dBUoFOZvyOF6Lr7eXLJDv2tq7s/WUfiLrVeaoTqMt7580ZtlWRUMNWXCgBkrm/D/j2TT3MO6xa39i8AGPA7aUnbBef74mMu6psNAYtAagRanv2pgeLWBfcEmXZjOeQPdQD478=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I5tZxxg6; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43AH7mRK006163;
+	Wed, 10 Apr 2024 17:19:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tHCYzRMhIHx1yvaC14xXg/YdZQNQ/pDFzRw82c7drYs=;
+ b=I5tZxxg6gegTuoKj5I+zJTT1b0lB6oL9N7K9ejqGPsoZxAWyq3tBBCcXI72yk2JXCoO0
+ HT8HqhbXfmKvzpLsEM+sxM8T7iRYRZnp86YA1YoHy+VDhaP4rqaj10sCsZiAPJsaGbwT
+ JYBW5WeVdOqzyn4j6U4psFDqLX4IFEVILHREwQpPHmC+AGICRa6+XCjlJlVsmlzSbJ7P
+ IuhjAkZdJtOmopArDII3Lc3EE9TPmtfSstyNLotvHfRpJUeK3aJp5yFDJYmmoJXolknP
+ +f3pynHoICwt3IUuwr9IFkY6Pu/MI8UFlhPdlKc+64YlZ8ZavrFtMJCChd9GstKSo0d2 dA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xdxkx02gq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 17:19:01 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43AHJ1YC024473;
+	Wed, 10 Apr 2024 17:19:01 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xdxkx02gp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 17:19:01 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43AEmpGk021496;
+	Wed, 10 Apr 2024 17:19:00 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xbjxkwvp9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 17:19:00 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43AHIsDA42533204
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Apr 2024 17:18:57 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D51782004F;
+	Wed, 10 Apr 2024 17:18:54 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A9B042005A;
+	Wed, 10 Apr 2024 17:18:54 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 10 Apr 2024 17:18:54 +0000 (GMT)
+Date: Wed, 10 Apr 2024 19:18:53 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: "Nicholas Piggin" <npiggin@gmail.com>
+Cc: "Thomas Huth" <thuth@redhat.com>, "Janosch Frank"
+ <frankja@linux.ibm.com>,
+        Nico =?UTF-8?B?QsO2aHI=?= <nrb@linux.ibm.com>,
+        "David Hildenbrand" <david@redhat.com>,
+        "Andrew Jones"
+ <andrew.jones@linux.dev>, <linux-s390@vger.kernel.org>,
+        <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH 2/2] s390x: Fix is_pv check in run script
+Message-ID: <20240410191853.686978b0@p-imbrenda>
+In-Reply-To: <D0G5V9Z62QS1.1BWMOLQZWBO5T@gmail.com>
+References: <20240406122456.405139-1-npiggin@gmail.com>
+	<20240406122456.405139-3-npiggin@gmail.com>
+	<20240408133629.34a2e34c@p-imbrenda>
+	<D0G5V9Z62QS1.1BWMOLQZWBO5T@gmail.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240315230541.1635322-1-dmatlack@google.com> <171270408430.1586965.15361632493269909438.b4-ty@google.com>
- <CALzav=eK-FeCDvjrfcWUR_KYy29r8O8HP=+L=zdp-UAYhpp+QQ@mail.gmail.com>
-Message-ID: <Zha7qWnZP8IsO6Vc@google.com>
-Subject: Re: [PATCH 0/4] KVM: x86/mmu: Fix TDP MMU dirty logging bug L2
- running with EPT disabled
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 0YmH2oBtD0SGR4IAhO4eQzuXRiyZB7Je
+X-Proofpoint-GUID: ODyBd8oJmLxEL7dQSck8JqlQ0Z9VMSXn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
+ mlxlogscore=999 phishscore=0 adultscore=0 suspectscore=0 clxscore=1015
+ malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404100127
 
-On Wed, Apr 10, 2024, David Matlack wrote:
-> On Tue, Apr 9, 2024 at 5:20=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Fri, 15 Mar 2024 16:05:37 -0700, David Matlack wrote:
-> > > Fix a bug in the TDP MMU caught by syzkaller and CONFIG_KVM_PROVE_MMU
-> > > that causes writes made by L2 to no be reflected in the dirty log whe=
-n
-> > > L1 has disabled EPT.
-> > >
-> > > Patch 1 contains the fix. Patch 2 and 3 fix comments related to clear=
-ing
-> > > dirty bits in the TDP MMU. Patch 4 adds selftests coverage of dirty
-> > > logging of L2 when L1 has disabled EPT. i.e.  a regression test for t=
-his
-> > > bug.
-> > >
-> > > [...]
-> >
-> > Applied to kvm-x86 fixes, with the various tweaks mentioned in reply, a=
-nd the
-> > s/READ_ONCE/WRITE_ONCE fixup.  A sanity check would be nice though, I b=
-otched
-> > the first attempt at the fixup (the one time I _should_ have copy+paste=
-d code...).
-> >
-> > Thanks!
-> >
-> > [1/4] KVM: x86/mmu: Check kvm_mmu_page_ad_need_write_protect() when cle=
-aring TDP MMU dirty bits
-> >       https://github.com/kvm-x86/linux/commit/b44914b27e6b
-> > [2/4] KVM: x86/mmu: Remove function comments above clear_dirty_{gfn_ran=
-ge,pt_masked}()
-> >       https://github.com/kvm-x86/linux/commit/d0adc4ce20e8
-> > [3/4] KVM: x86/mmu: Fix and clarify comments about clearing D-bit vs. w=
-rite-protecting
-> >       https://github.com/kvm-x86/linux/commit/5709b14d1cea
-> > [4/4] KVM: selftests: Add coverage of EPT-disabled to vmx_dirty_log_tes=
-t
-> >       https://github.com/kvm-x86/linux/commit/1d24b536d85b
->=20
-> This commit does not have the WRITE_ONCE() fixup, but when I look at
-> the commits in the fixes branch itself I see [1] which is correct.
+On Wed, 10 Apr 2024 14:34:25 +1000
+"Nicholas Piggin" <npiggin@gmail.com> wrote:
 
-Argh, I must have forgot to copy+paste in the correct hashes (like I said a=
-bove,
-it took me a few tries to get things right).
+> On Mon Apr 8, 2024 at 9:36 PM AEST, Claudio Imbrenda wrote:
+> > On Sat,  6 Apr 2024 22:24:54 +1000
+> > Nicholas Piggin <npiggin@gmail.com> wrote:
+> >  
+> > > Shellcheck reports "is_pv references arguments, but none are ever
+> > > passed." and suggests "use is_pv "$@" if function's $1 should mean
+> > > script's $1."
+> > > 
+> > > The is_pv test does not evaluate to true for .pv.bin file names, only
+> > > for _PV suffix test names. The arch_cmd_s390x() function appends
+> > > .pv.bin to the file name AND _PV to the test name, so this does not
+> > > affect run_tests.sh runs, but it might prevent PV tests from being
+> > > run directly with the s390x-run command.
+> > > 
+> > > Reported-by: shellcheck SC2119, SC2120
+> > > Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> > > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>  
+> >
+> > Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Fixes: bcedc5a2 ("s390x: run PV guests with confidential guest enabled")  
+> 
+> Thanks.
+> 
+> > although tbh I would rewrite it to check a variable, something like:
+> >
+> > IS_PV=no
+> > [ "${1: -7}" = ".pv.bin" -o "${TESTNAME: -3}" = "_PV" ] && IS_PV=yes  
+> 
+> I don't have a problem if you want to fix it a different way
+> instead. I don't have a good way to test at the moment and
+> this seemed the simplest fix. Shout out if you don't want it
+> going upstream as is.
 
-For posterity...
+well, I did give you a r-b for the current version of your patch :)
 
-[1/4] KVM: x86/mmu: Write-protect L2 SPTEs in TDP MMU when clearing dirty s=
-tatus
-      https://github.com/kvm-x86/linux/commit/b44914b27e6b
-[2/4] KVM: x86/mmu: Remove function comments above clear_dirty_{gfn_range,p=
-t_masked}()
-      https://github.com/kvm-x86/linux/commit/d0adc4ce20e8
-[3/4] KVM: x86/mmu: Fix and clarify comments about clearing D-bit vs. write=
--protecting
-      https://github.com/kvm-x86/linux/commit/5709b14d1cea
-[4/4] KVM: selftests: Add coverage of EPT-disabled to vmx_dirty_log_test
-      https://github.com/kvm-x86/linux/commit/f1ef5c343399
+it's not so important, as long as it works correctly 
+
+> 
+> Thanks,
+> Nick
+> 
+> >  
+> > > ---
+> > >  s390x/run | 8 ++++----
+> > >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/s390x/run b/s390x/run
+> > > index e58fa4af9..34552c274 100755
+> > > --- a/s390x/run
+> > > +++ b/s390x/run
+> > > @@ -21,12 +21,12 @@ is_pv() {
+> > >  	return 1
+> > >  }
+> > >  
+> > > -if is_pv && [ "$ACCEL" = "tcg" ]; then
+> > > +if is_pv "$@" && [ "$ACCEL" = "tcg" ]; then  
+> >
+> > if [ "$IS_PV" = "yes" -a "$ACCEL" = "tcg" ]; then
+> >
+> > etc...
+> >  
+> > >  	echo "Protected Virtualization isn't supported under TCG"
+> > >  	exit 2
+> > >  fi
+> > >  
+> > > -if is_pv && [ "$MIGRATION" = "yes" ]; then
+> > > +if is_pv "$@" && [ "$MIGRATION" = "yes" ]; then
+> > >  	echo "Migration isn't supported under Protected Virtualization"
+> > >  	exit 2
+> > >  fi
+> > > @@ -34,12 +34,12 @@ fi
+> > >  M='-machine s390-ccw-virtio'
+> > >  M+=",accel=$ACCEL$ACCEL_PROPS"
+> > >  
+> > > -if is_pv; then
+> > > +if is_pv "$@"; then
+> > >  	M+=",confidential-guest-support=pv0"
+> > >  fi
+> > >  
+> > >  command="$qemu -nodefaults -nographic $M"
+> > > -if is_pv; then
+> > > +if is_pv "$@"; then
+> > >  	command+=" -object s390-pv-guest,id=pv0"
+> > >  fi
+> > >  command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"  
+> 
+
 
