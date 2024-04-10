@@ -1,334 +1,137 @@
-Return-Path: <kvm+bounces-14094-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14095-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5BB889EDAC
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 10:31:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED18989EE49
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 11:13:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04CAF1C216F3
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 08:31:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3547285005
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 09:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0A41448EA;
-	Wed, 10 Apr 2024 08:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33C615B0E3;
+	Wed, 10 Apr 2024 09:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fK3WARyR"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="FdZ1AB63"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97A614431E
-	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 08:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25891156996
+	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 09:11:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712737897; cv=none; b=ksQqO2FLFMggs7tu4rwECllgSxHHazmmV8vQMIG1W0JgFIbqg9tResBm4FaCNynfFipDjilvHltN/d8rSoZmKCDLhtAw0yiWv5XOX0GLXMvgqvQUstKdS4aSgudINe6wE6oyyTJPIqrqwTsbuTJ6By4+mL/4BofRREsty0fcPUk=
+	t=1712740274; cv=none; b=LfVNOs/tnWfHpKjngmotoSJelr8OoT9s+fxYpGr4Swc+GWkUIdhBj8RjJ4tTXksHFlnLjeLq/bTvP9YyyWSta6tRnh2vX4HaAfM4qCYjSUctWteGeuSUL3YOUvQmC5UFj+qKf9YPC2qFf/S9qHZjXeodaJ8qpXm9zZTvDszgh24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712737897; c=relaxed/simple;
-	bh=MJ2amgtSwm20ugyZqCjsEgAnfyZd3gx1BXvTPXSiVfg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=loiiZvChQeVx1YePHGJL6GBvsW5HJTBnsnp5VXuwZcOzJ97n0HUdRkCRrAMFKoP11PsgtaFnW+hHbLPGvEMw/bvZrkhozFLz8C05NhiroB2xYQeMx0xIuVit0yyx9x1mKKjv0GnAMhlYA34nEl9omYn8ljz6iXWjTCwnT5eZnBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fK3WARyR; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a5200202c1bso153371766b.0
-        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 01:31:35 -0700 (PDT)
+	s=arc-20240116; t=1712740274; c=relaxed/simple;
+	bh=02wvApY4YND9L077VdDD/SvGSk0u3FcO0EiGYiuzYnU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OAqF6YI3umS4QyXP+PBkOTS0zFTVhILq4Ytt+LWiHZMpljfCjcoqp9nKseUNuj/SzcbREv2pFmHrNeuHylwYPM5vHpFG/8Zw/OBswkJwdSZ8DEnm2fEouSKcsp9qVv3OPBgUEHHDkX8o/hKo5UfcLhaA2EoOfdfHEK6X7yy16yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=FdZ1AB63; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-343d32aba7eso1127841f8f.1
+        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 02:11:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712737894; x=1713342694; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ko/ldX1/RJm34/W6o5zxcM2yrIA8CZLIGcy8oSLFE1o=;
-        b=fK3WARyRDu7TMppxW5ltnjjX1WeiUlLNGGIiazO/RA10XKmfkOT7AnINjKkgogqMed
-         Vx3zduo8qoNYz3VVlBOWpqCO1Dk/8OyUkCvbM3g1ccTkHUzsxZdAIUnHIqRDyXEtoyXx
-         MddwWCJsC1v+q8zBq3kOtXgT9DBr5QROAPn7zZhnd20rAxqSw7WgmlqZvQeY9VUs1Cy+
-         RrypHIUxkwKComuebtIT+Om4E65ofTFljxbQlAM904Xj+WR8FSlYds8jHlqWwOnZmkmr
-         F7CD+41gt6W13qQ3Abjh9FsBTLfrxTD7x8TIZKYWMn23G3thU3CUbVmxQb3O8+WR/TI5
-         EkNQ==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712740270; x=1713345070; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9SSkPjIJRaiY6nqvP2nXREr1dqNKWljAWGAyK7z7Oro=;
+        b=FdZ1AB63nr0YKyaVj2pv8TgPftr2h7prARsnXTmUCy9rF6XEob0XnX7FZCb688LVIC
+         fvEJXwZMebpTUfXJIKfCbveRhUHfxPfHVKA+9ytZ5gTKUcOfR6/quQSpeaYGu8MlioRi
+         BwcZFc2B73oV7o8HReulOeM8O7MrgxXZNGxyCof8h02COqdPpv25pWYCuiTj+MBfPQzN
+         WTj4zx1M+NypiM7ediOCQuqAqwJRdVuND40SMibdePC7CzuMjRz0WPyj0s64mBZB9vbb
+         pwz2jjs1jeLiylmdAqMUuERRuefaSNn6m2wfhBsYSwrhcBEhJ/2y+uENsAWPD3FckMu7
+         tFdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712737894; x=1713342694;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ko/ldX1/RJm34/W6o5zxcM2yrIA8CZLIGcy8oSLFE1o=;
-        b=qSy4qS38yKY0vKGKfOo1u9O1NKQu/Wi9EPn9Ba5W9eAz5lLAdWN2sI4/X4VEuAPMUw
-         Z5yA7lYddE85z9qWZVoW8ugWbsGJCoGS4VdhiBuNiRAEvghIScS4tRHhEDWXDpP21KuA
-         OnSPBeLaM7fo1EZFjp5dScZMl4TKSvh/d6nteEOb4K5WBGneFh9SJR5DIjIJXaKQ6OYz
-         zJCc8O/44JLbt8Eq4xUPjfdFU6Wh85ZkSFqnjoPjltetEnot6raPL3tC4tFK0dM7k7qC
-         zxnt26DyYsEYbk54rb0OkOjjmiu5tqo8Pr6MqsvE7vvgBEVpsDh7+1lKTVxTwlWMbzpb
-         6lzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXYWBktZ3rmVQCCQgVUcCVsna4LOldJU8n/WUalYpZ+j70RjJUCXMK/ifxtT0lktu3sAd1zzcJ6XJz5ZYqD2I2pBP+q
-X-Gm-Message-State: AOJu0YzCz2Jd0SPE1tK9uBn6QzY0ofO8L3Y4oqxD37tI2Vmu3/stkUn2
-	px7TOKgITLObnu1zANEIJQOe+PpdDHlFkfhEHGU43tZ0BiUCKpVz0mp953qaouKEZ+FRTI8mbK0
-	ePg==
-X-Google-Smtp-Source: AGHT+IF344zY9aJwSy1QipveS6rH/4iNUnhyO2rqBkRNHvzgRM8S3Vb6xHVKK57ErUTVz32k/JGZNw==
-X-Received: by 2002:a17:906:5786:b0:a51:e1a1:d127 with SMTP id k6-20020a170906578600b00a51e1a1d127mr1552281ejq.26.1712737893551;
-        Wed, 10 Apr 2024 01:31:33 -0700 (PDT)
-Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id h12-20020a17090634cc00b00a46f95f5849sm6634813ejb.106.2024.04.10.01.31.32
+        d=1e100.net; s=20230601; t=1712740270; x=1713345070;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9SSkPjIJRaiY6nqvP2nXREr1dqNKWljAWGAyK7z7Oro=;
+        b=KwK9owTvzrfLw4xen2bVaHuAvbMxEgir1OaY5A8hR3Wm1HAXrnjUfvTdZBytYn7gXr
+         fyvibBMRBPSHjiuO8nru5uDvReCp28CeqBj7u/tbAYaA3tmBbcJgaegBmGlFenkPMB0A
+         AWGgGIFC78cOKcI6UOTTjYywOGax48g3wZyy+7cOSTG3g1MMkHXue42bmiPtvaQwJbNQ
+         +ncRahkZao14TFLGgvpj51bxb2+X9mGF4MQkKyTc3Xo8qFPPb31IVfHyAJ0Ok4cak/LQ
+         XLYoyQ7mASflY2/G6mbRPgEgyVM+6j3I+vJFpy/8YoNtYw15EKrC7St9Ph0VZkzYCTyR
+         Jxpw==
+X-Forwarded-Encrypted: i=1; AJvYcCXYEixZj4wudQBA2cGOESobhzQ0A3H84ASt/KypPblLfiyZGkUPUrrCjLf1aTCV1p8Xt4NQFzIsO0QzvxZJ/K/0+Ssp
+X-Gm-Message-State: AOJu0YwhiLDrnmt/m7AYOLFiG8otN2RznJ1D4KpuzDuo5FcOaNpXsH0F
+	E/VlRJbbmVz9YPbYPdJymq5dgCeAj3ftgn9xFsP68uWy3Dbrz3q3cNCUD3v0geE=
+X-Google-Smtp-Source: AGHT+IGq6GULyAjPCGB9cLzSRwOlrzNIJikNMv8sgGSqEmo6q9aRp4LbhqVra1QQcW7xHav631ZdHA==
+X-Received: by 2002:a5d:4a52:0:b0:346:500f:9297 with SMTP id v18-20020a5d4a52000000b00346500f9297mr1449075wrs.2.1712740270397;
+        Wed, 10 Apr 2024 02:11:10 -0700 (PDT)
+Received: from carbon-x1.. ([2a01:e0a:999:a3a0:d4a6:5856:3e6c:3dff])
+        by smtp.gmail.com with ESMTPSA id d6-20020a056000114600b003456c693fa4sm9079086wrx.93.2024.04.10.02.11.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 01:31:33 -0700 (PDT)
-Date: Wed, 10 Apr 2024 09:31:29 +0100
-From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Vincent Donnefort <vdonnefort@google.com>
-Subject: [PATCH v2 12/12] KVM: arm64: Improve CONFIG_CFI_CLANG error message
-Message-ID: <ly2kzup6w6o4nzvjjfofmxchh5zrhkeb3paon3etkzjozpmwvb@fv4mv42pz6s7>
+        Wed, 10 Apr 2024 02:11:09 -0700 (PDT)
+From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
+To: Jonathan Corbet <corbet@lwn.net>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Conor Dooley <conor@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Anup Patel <anup@brainfault.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Atish Patra <atishp@atishpatra.org>,
+	linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH 00/10] Add support for a few Zc* extensions as well as Zcmop
+Date: Wed, 10 Apr 2024 11:10:53 +0200
+Message-ID: <20240410091106.749233-1-cleger@rivosinc.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-For kCFI, the compiler encodes in the immediate of the BRK (which the
-CPU places in ESR_ELx) the indices of the two registers it used to hold
-(resp.) the function pointer and expected type. Therefore, the kCFI
-handler must be able to parse the contents of the register file at the
-point where the exception was triggered.
+Add support for (yet again) more RVA23U64 missing extensions. Add
+support for Zcmop, Zca, Zcf, Zcd and Zcb extensions isa string parsing,
+hwprobe and kvm support. Zce, Zcmt and Zcmp extensions have been left
+out since they target microcontrollers/embedded CPUs and are not needed
+by RVA23U64
 
-To achieve this, introduce a new hypervisor panic path that first stores
-the CPU context in the per-CPU kvm_hyp_ctxt before calling (directly or
-indirectly) hyp_panic() and execute it from all EL2 synchronous
-exception handlers i.e.
+This series is based on the Zimop one [1].
 
-- call it directly in host_el2_sync_vect (__kvm_hyp_host_vector, EL2t&h)
-- call it directly in el2t_sync_invalid (__kvm_hyp_vector, EL2t)
-- set ELR_EL2 to it in el2_sync (__kvm_hyp_vector, EL2h), which ERETs
+Link: https://lore.kernel.org/linux-riscv/20240404103254.1752834-1-cleger@rivosinc.com/ [1]
 
-Teach hyp_panic() to decode the kCFI ESR and extract the target and type
-from the saved CPU context. In VHE, use that information to panic() with
-a specialized error message. In nVHE, only report it if the host (EL1)
-has access to the saved CPU context i.e. iff CONFIG_NVHE_EL2_DEBUG=y,
-which aligns with the behavior of CONFIG_PROTECTED_NVHE_STACKTRACE.
+Clément Léger (10):
+  dt-bindings: riscv: add Zca, Zcf, Zcd and Zcb ISA extension
+    description
+  riscv: add ISA parsing for Zca, Zcf, Zcd and Zcb
+  riscv: hwprobe: export Zca, Zcf, Zcd and Zcb ISA extensions
+  RISC-V: KVM: Allow Zca, Zcf, Zcd and Zcb extensions for Guest/VM
+  KVM: riscv: selftests: Add some Zc* extensions to get-reg-list test
+  dt-bindings: riscv: add Zcmop ISA extension description
+  riscv: add ISA extension parsing for Zcmop
+  riscv: hwprobe: export Zcmop ISA extension
+  RISC-V: KVM: Allow Zcmop extension for Guest/VM
+  KVM: riscv: selftests: Add Zcmop extension to get-reg-list test
 
-Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
----
- arch/arm64/kvm/handle_exit.c            | 30 +++++++++++++++++++++++--
- arch/arm64/kvm/hyp/entry.S              | 24 +++++++++++++++++++-
- arch/arm64/kvm/hyp/hyp-entry.S          |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
- arch/arm64/kvm/hyp/nvhe/host.S          |  2 +-
- arch/arm64/kvm/hyp/vhe/switch.c         | 26 +++++++++++++++++++--
- 6 files changed, 79 insertions(+), 9 deletions(-)
-
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 0db23a6304ce..d76e41a07df1 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -26,6 +26,8 @@
- #define CREATE_TRACE_POINTS
- #include "trace_handle_exit.h"
- 
-+DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-+
- typedef int (*exit_handle_fn)(struct kvm_vcpu *);
- 
- static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
-@@ -383,11 +385,35 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
- 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
- }
- 
--static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
-+static void kvm_nvhe_report_cfi_target(struct user_pt_regs *regs, u64 esr,
-+				       u64 hyp_offset)
-+{
-+	u64 va_mask = GENMASK_ULL(vabits_actual - 1, 0);
-+	u8 type_idx = FIELD_GET(CFI_BRK_IMM_TYPE, esr);
-+	u8 target_idx = FIELD_GET(CFI_BRK_IMM_TARGET, esr);
-+	u32 expected_type = (u32)regs->regs[type_idx];
-+	u64 target_addr = (regs->regs[target_idx] & va_mask) + hyp_offset;
-+
-+	kvm_err(" (target: [<%016llx>] %ps, expected type: 0x%08x)\n",
-+		target_addr, (void *)(target_addr + kaslr_offset()),
-+		expected_type);
-+}
-+
-+static void kvm_nvhe_report_cfi_failure(u64 panic_addr, u64 esr, u64 hyp_offset)
- {
-+	struct user_pt_regs *regs = NULL;
-+
- 	kvm_err("nVHE hyp CFI failure at: [<%016llx>] %pB!\n", panic_addr,
- 		(void *)(panic_addr + kaslr_offset()));
- 
-+	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG) || !is_protected_kvm_enabled())
-+		regs = &this_cpu_ptr_nvhe_sym(kvm_hyp_ctxt)->regs;
-+
-+	if (regs)
-+		kvm_nvhe_report_cfi_target(regs, esr, hyp_offset);
-+	else
-+		kvm_err(" (no target information: !CONFIG_NVHE_EL2_DEBUG)\n");
-+
- 	if (IS_ENABLED(CONFIG_CFI_PERMISSIVE))
- 		kvm_err(" (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n");
- }
-@@ -423,7 +449,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
- 					(void *)(panic_addr + kaslr_offset()));
- 	} else if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr)) {
--		kvm_nvhe_report_cfi_failure(panic_addr);
-+		kvm_nvhe_report_cfi_failure(panic_addr, esr, hyp_offset);
- 	} else {
- 		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
- 				(void *)(panic_addr + kaslr_offset()));
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 6a1ce9d21e5b..8838b453b9be 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -83,7 +83,7 @@ alternative_else_nop_endif
- 	eret
- 	sb
- 
--SYM_INNER_LABEL(__hyp_restore_elr_and_panic, SYM_L_GLOBAL)
-+SYM_INNER_LABEL(__hyp_restore_elr_save_context_and_panic, SYM_L_GLOBAL)
- 	// x0-x29,lr: hyp regs
- 
- 	stp	x0, x1, [sp, #-16]!
-@@ -92,6 +92,28 @@ SYM_INNER_LABEL(__hyp_restore_elr_and_panic, SYM_L_GLOBAL)
- 	msr	elr_el2, x0
- 	ldp	x0, x1, [sp], #16
- 
-+SYM_INNER_LABEL(__hyp_save_context_and_panic, SYM_L_GLOBAL)
-+	// x0-x29,lr: hyp regs
-+
-+	stp	x0, x1, [sp, #-16]!
-+
-+	adr_this_cpu x0, kvm_hyp_ctxt, x1
-+
-+	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
-+
-+	ldp	x2, x3, [sp], #16
-+
-+	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(0)]
-+	stp	x4, x5,   [x0, #CPU_XREG_OFFSET(4)]
-+	stp	x6, x7,   [x0, #CPU_XREG_OFFSET(6)]
-+	stp	x8, x9,   [x0, #CPU_XREG_OFFSET(8)]
-+	stp	x10, x11, [x0, #CPU_XREG_OFFSET(10)]
-+	stp	x12, x13, [x0, #CPU_XREG_OFFSET(12)]
-+	stp	x14, x15, [x0, #CPU_XREG_OFFSET(14)]
-+	stp	x16, x17, [x0, #CPU_XREG_OFFSET(16)]
-+
-+	save_callee_saved_regs x0
-+
- SYM_INNER_LABEL(__hyp_panic, SYM_L_GLOBAL)
- 	// x0-x29,lr: vcpu regs
- 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 7e65ef738ec9..d0d90d598338 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -130,7 +130,7 @@ SYM_CODE_END(\label)
- .endm
- 
- 	/* None of these should ever happen */
--	invalid_vector	el2t_sync_invalid
-+	invalid_vector	el2t_sync_invalid, __hyp_save_context_and_panic
- 	invalid_vector	el2t_irq_invalid
- 	invalid_vector	el2t_fiq_invalid
- 	invalid_vector	el2t_error_invalid
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 9387e3a0b680..f3d8fbc7a77b 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -753,7 +753,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 
- static inline void __kvm_unexpected_el2_exception(void)
- {
--	extern char __hyp_restore_elr_and_panic[];
-+	extern char __hyp_restore_elr_save_context_and_panic[];
- 	unsigned long addr, fixup;
- 	struct kvm_exception_table_entry *entry, *end;
- 	unsigned long elr_el2 = read_sysreg(elr_el2);
-@@ -776,7 +776,7 @@ static inline void __kvm_unexpected_el2_exception(void)
- 
- 	/* Trigger a panic after restoring the hyp context. */
- 	this_cpu_ptr(&kvm_hyp_ctxt)->sys_regs[ELR_EL2] = elr_el2;
--	write_sysreg(__hyp_restore_elr_and_panic, elr_el2);
-+	write_sysreg(__hyp_restore_elr_save_context_and_panic, elr_el2);
- }
- 
- #endif /* __ARM64_KVM_HYP_SWITCH_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 0613b6e35137..ec3e4f5c28cc 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -213,7 +213,7 @@ SYM_FUNC_END(__host_hvc)
- .endm
- 
- .macro host_el2_sync_vect
--	__host_el2_vect __hyp_panic
-+	__host_el2_vect __hyp_save_context_and_panic
- .endm
- 
- .macro invalid_host_el1_vect
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index b3268933b093..17df57580c77 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -18,6 +18,7 @@
- 
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
-+#include <asm/esr.h>
- #include <asm/kprobes.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
-@@ -308,7 +309,24 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	return ret;
- }
- 
--static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par)
-+static void __noreturn __hyp_call_panic_for_cfi(u64 elr, u64 esr)
-+{
-+	struct user_pt_regs *regs = &this_cpu_ptr(&kvm_hyp_ctxt)->regs;
-+	u8 type_idx = FIELD_GET(CFI_BRK_IMM_TYPE, esr);
-+	u8 target_idx = FIELD_GET(CFI_BRK_IMM_TARGET, esr);
-+	u32 expected_type = (u32)regs->regs[type_idx];
-+	u64 target = regs->regs[target_idx];
-+
-+	panic("VHE hyp CFI failure at: [<%016llx>] %pB (target: [<%016llx>] %ps, expected type: 0x%08x)\n"
-+#ifdef CONFIG_CFI_PERMISSIVE
-+	      " (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n"
-+#endif
-+	      ,
-+	      elr, (void *)elr, target, (void *)target, expected_type);
-+}
-+NOKPROBE_SYMBOL(__hyp_call_panic_for_cfi);
-+
-+static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par, u64 esr)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_vcpu *vcpu;
-@@ -319,6 +337,9 @@ static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par)
- 	__deactivate_traps(vcpu);
- 	sysreg_restore_host_state_vhe(host_ctxt);
- 
-+	if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr))
-+		__hyp_call_panic_for_cfi(elr, esr);
-+
- 	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n",
- 	      spsr, elr,
- 	      read_sysreg_el2(SYS_ESR), read_sysreg_el2(SYS_FAR),
-@@ -331,8 +352,9 @@ void __noreturn hyp_panic(void)
- 	u64 spsr = read_sysreg_el2(SYS_SPSR);
- 	u64 elr = read_sysreg_el2(SYS_ELR);
- 	u64 par = read_sysreg_par();
-+	u64 esr = read_sysreg_el2(SYS_ESR);
- 
--	__hyp_call_panic(spsr, elr, par);
-+	__hyp_call_panic(spsr, elr, par, esr);
- }
- 
- asmlinkage void kvm_unexpected_el2_exception(void)
--- 
-2.44.0.478.gd926399ef9-goog
-
+ Documentation/arch/riscv/hwprobe.rst          | 24 ++++++++++++
+ .../devicetree/bindings/riscv/extensions.yaml | 37 +++++++++++++++++++
+ arch/riscv/include/asm/hwcap.h                |  5 +++
+ arch/riscv/include/uapi/asm/hwprobe.h         |  5 +++
+ arch/riscv/include/uapi/asm/kvm.h             |  5 +++
+ arch/riscv/kernel/cpufeature.c                |  5 +++
+ arch/riscv/kernel/sys_hwprobe.c               |  5 +++
+ arch/riscv/kvm/vcpu_onereg.c                  | 10 +++++
+ .../selftests/kvm/riscv/get-reg-list.c        | 20 ++++++++++
+ 9 files changed, 116 insertions(+)
 
 -- 
-Pierre
+2.43.0
+
 
