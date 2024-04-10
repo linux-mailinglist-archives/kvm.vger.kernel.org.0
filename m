@@ -1,102 +1,101 @@
-Return-Path: <kvm+bounces-14061-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14062-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E09389E7D4
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 03:32:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F001C89E7DB
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 03:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7833BB21DEB
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 01:32:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC6891C20C03
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 01:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB8E1C2E;
-	Wed, 10 Apr 2024 01:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2ECB1FAA;
+	Wed, 10 Apr 2024 01:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KVVxxQ05";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="qVxdQ4pI"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RC7xUIBK";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="bVY7pVHG"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F66FA5F;
-	Wed, 10 Apr 2024 01:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB9510E3;
+	Wed, 10 Apr 2024 01:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712712724; cv=fail; b=S68INWbBQLGGzjlNVR/eiwGXnBkGw10ahBBWdqQK2ycWXz5yWKebvUOdJxAu9ZoIpAFebYp40Stgthl90pP4z2THfca1N9gtFH906f9x8GepdwCzzQLj3Cp7fdqqH2WS/IPg416GN1TD3PnpDjjumJQ/IfLvmiNgVZZofQV1Z7k=
+	t=1712712999; cv=fail; b=cre0aRiZYN6XoWyJfrw8Tp9BGrmZohB8HHJhjqch+dKkLsSPc/7WJX6GNr8GT0oR6hwW/8YwZRwr9yymQtrRoZ/OM9DsRUQ7ck8Cgo+9BHy1vgGBimQfJOZLAqjw0KYm/REsULsbmt48oN/LDoHcLhigiffGk9YtJxujK1slDi0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712712724; c=relaxed/simple;
-	bh=xiBd+3gfxEtiHzA6mUu0vRvrCwbUkdwU9s1pWLnIdE0=;
+	s=arc-20240116; t=1712712999; c=relaxed/simple;
+	bh=NZskhTjtSSefmv+jvCSo1YhumTT+LrotUSWzA8j3U5Q=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UOG5Gri7Dteku9eYpjLkTgOZyDQqLJo9/AzdWnfZYTwiTrWOo4t0AhdVaiCsJNkpsEkTLMjLvtpRrzn9Mz8ASD1zLVPo9Cd2H5IuwQR0Mb9jHPV1JKbPstba1MuklgaqbeR9HklBIq/3ULjXwhfao/TAddsv2ZvfLrzzncfexSs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=KVVxxQ05; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=qVxdQ4pI; arc=fail smtp.client-ip=205.220.165.32
+	 Content-Type:MIME-Version; b=m2blLV/iGtGH4TkO3AoA7U026tKN0V7s/OaJ8h8j3N8qJ5odIeipW94d1wYxjjdEmzB/Q7Fl1YvhfKnsWSyzxeXEsHrZit5HBu/SSy4vi060urB6xSOa4VgVh1FuWAO2NbxRy2F+2NbPONnMQKOJpy9oR9OidvmrsGLASuS+qMU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=RC7xUIBK; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=bVY7pVHG; arc=fail smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43A1F0UQ031543;
-	Wed, 10 Apr 2024 01:31:55 GMT
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 439NEvH3001510;
+	Wed, 10 Apr 2024 01:36:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
  subject : to : cc : references : from : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=788JGESEkezGUArEdWzKO8JgAnXS5MWPJnWRiGUOxfk=;
- b=KVVxxQ05LX3YfHmm7Uq8U51B8C2QiPEHxVD/0B82fQO4VTFvBLTDfJ2zWXrAsFCOFWlc
- k3Zd31tDpIquzx4i+pGIq+3V1bmsZJWGg8Y8ZicbUOqELbw55pVw0FwlEk6Z3nGg5otp
- MRU0RnMgiE9TQbqjUjlLL/L/yyBmE1HsWZi/S+iZggNuPPFzS0cCODv6GngW2GcDMuIj
- lfIIuxiE79G6WQyl3Ns4nwSxJOe9VGBhhn2aIiumaqjwGUxsyTpCbvQngR9Z+AIpV3IN
- 9TF9uLRu6DRwcan1Jmab9YdHBjZw0T/xBoPZvlznHvY1SZ/VLsCN5VaVG/4Psetjjo++ +Q== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xax9b680b-1
+ bh=nvnx4Ps3AHBOrCGfDPMEVhLV2HW5aqitgF5IjtQwNpc=;
+ b=RC7xUIBKpeSS7kCvOU+RsCwxDm7h2CxT2jSSurmyrFKcWnrWAZJEoJObGUzuDqQ8b5iD
+ i5uvNgC5F9YIsk4mQwYV7qNaDY9aeLbjLAj7MaSRSLAiZgLr9srNH05VTXAN+DDxRYuL
+ HBkliNLhSInaXTXqawXogmTFtnHJabX5eIUmfcWVeXEJ3cs8nGUYPKMoX0rOy7BG8wdd
+ rzv7icODqPH21hVIUUea0miiYjbkWvSsHFtNqSi3ugXlw8ZVJ3e18AHd1EwAQu9sFoob
+ LTWmX05DF5tWTPU0QDLWX3FfTHcC0oaq/4INjBVx4aFzbd4IIzxOE6DHHUjxruKAFthu tw== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xaxxve97m-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Apr 2024 01:31:55 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43A1Vq4L010592;
-	Wed, 10 Apr 2024 01:31:54 GMT
-Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2041.outbound.protection.outlook.com [104.47.51.41])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xavu7g27m-1
+	Wed, 10 Apr 2024 01:36:24 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43A004Um007862;
+	Wed, 10 Apr 2024 01:36:24 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xavu7g3sg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Apr 2024 01:31:54 +0000
+	Wed, 10 Apr 2024 01:36:24 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WrAJ7IUHCRmm+TPWfmZ4N2ZK/qgD+XJHzXW+SR3qI5yPcBrr2JZ7tWWPK6vUbEK+JsUTOjxKAUB1mAFNdOPMMySyleSl0Nk6fRqd88YMymdBQDatFVLrrf2OVy9yKBS9ty1C4IXLue8g6/y4LetXArg8UDzpMvIr24PcPlKF2hsLxuy2SNLLnHbao4a7QUfw3orcaZPAwe+iG+LgDTyXJG+cyXr4Pbhbtd9sn8WzXMP/gNsdbAunqIyWcmDkIil4rOtHwN+l60DKk/nqyK8xo6H9qRVhIwecunmdX6nYk7/5SOXA3PHlmJNazMc80ci8bjnExEoH38uAYv7XhBLSVQ==
+ b=VKM6Ix+KLuEi99BQh1vag4ZHKXe9tiBSs3BIQCBYPsTbuMiqGLX9HKL2rTJROUTu730unD+pXWkNdFm+Wcknc29KhZNCmuZO9QcZGXOIEwWxf9fHSvwZBEaG+wez0zfxfaPiGcwj0bvg6AqN0cvyRyV/bVn65FUjo9xMpkhoDbuUqrX/ma7W2dDGG8FgxP9jZU7nkIRB/relMdRgd08gZLJ5dfpT8RJRIcr0n2DCyKSKduWzWHcvOxkp6NIdvI4dQn7XmlGHAIV6KJaCE/1KqgHe7ULDQXZHRB3MpdISN1+s18toAhxgGTkneVUxq6GtpE5ys/B+gh7bTCHbcqQTeA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=788JGESEkezGUArEdWzKO8JgAnXS5MWPJnWRiGUOxfk=;
- b=BFxeapQeEkSjQUjiRDN3iUPXi2jyMo9mtjbvrpcBqeFcUCBM0zlZdMkogjTUMLJrPZn7hvNtWFAW1INYXqGZk/hf/kcFqnSspn/KiWuzDNfg422U2yiRDRUz8P0rzO3MaJ2gdYnEVQU++WjdZGlPsQRsItB/oDkZR0rOyeEeH7PW4crRidbrx1OGrNx1QtRLI2WCrFfS383rjC3OXOSLhE4iEe556qIwuhLt7FQVJVi5svjWYAxXN+sbEA5cG//XF12TdAwni1NmQUFXiAALNRL5qMLJg1aNJ/MJqLbyxQisiBq2LEaCS30XR//+xpufNAnfgqEWO8OzCIZoa4X11g==
+ bh=nvnx4Ps3AHBOrCGfDPMEVhLV2HW5aqitgF5IjtQwNpc=;
+ b=Urdc+vPx2ZtJqhcobhp4v2OKp4b36zKkKm9EWMe8wqB0JRpHYfsCTdQsH4CdMflxAXi5QShosRmCCcYnwwcFIPSynAGft2Z8WyCZoFkB+gXOGxvl4lmSgcJIe4OgBlXeKOJVCCnjKFW8lSUzX5BhbYRUtbeiFDC2IiprMpLMg6fMjpQQQ6FGUz+3VRBkCLO+qooG7Zcv/FEuMHfFv5PRrH30ASXTIi1neLLC6X/vlEeT6ne7aWQ8nUrq1SBZlxwX0/8r1YTXBcWbpXZuczC0InL1M4YI9Pdt1/llHPZ9sZRtRp8q8bT+vwIYzhaWbC1QVXyFuXecrj922OeBv2znHw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=788JGESEkezGUArEdWzKO8JgAnXS5MWPJnWRiGUOxfk=;
- b=qVxdQ4pIcrJ6Nt41jv6lKEIfARsojRwXklAkYd0QTd1TyrGrpdFSxnOrdSMojJWzo8jHjFgBJQGO/RVrvEQVkm3L0IsU6k9VwgF9TLUe1eynNwxxrQyfJ4hImbqCJ6NVkjPtem8kX163PQSxlEXxV4JoqdGokj0wS0VWmTvg1Do=
+ bh=nvnx4Ps3AHBOrCGfDPMEVhLV2HW5aqitgF5IjtQwNpc=;
+ b=bVY7pVHGcOUd0BVUX7TBjoyL8uj6mSlWGWxBGAQCInyP3H5YdfIYah3hLWrrgIzp3nhD0KxZjWKwTcXMaMZ4AdATUZG6/6stTNZAHPWPVJt2DIAheNMHbVpDDtApn7pAkryBv9RYvi/vYz+0Qk1hprQNYKXqkMTPVPubjXUpQcU=
 Received: from DS7PR10MB5280.namprd10.prod.outlook.com (2603:10b6:5:3a7::5) by
  DS7PR10MB4927.namprd10.prod.outlook.com (2603:10b6:5:3a2::21) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.55; Wed, 10 Apr 2024 01:31:52 +0000
+ 15.20.7409.55; Wed, 10 Apr 2024 01:36:22 +0000
 Received: from DS7PR10MB5280.namprd10.prod.outlook.com
  ([fe80::c7cc:f6b7:386e:fd5d]) by DS7PR10MB5280.namprd10.prod.outlook.com
  ([fe80::c7cc:f6b7:386e:fd5d%6]) with mapi id 15.20.7409.042; Wed, 10 Apr 2024
- 01:31:52 +0000
-Message-ID: <98493056-4a75-46ad-be79-eb6784034394@oracle.com>
-Date: Tue, 9 Apr 2024 21:31:45 -0400
+ 01:36:22 +0000
+Message-ID: <11081a6a-b61e-4b10-9792-55c8731c2897@oracle.com>
+Date: Tue, 9 Apr 2024 21:36:19 -0400
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 3/3] x86: KVM: stats: Add a stat counter for GALog events
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        linux-kernel@vger.kernel.org, joao.m.martins@oracle.com,
-        boris.ostrovsky@oracle.com, mark.kanda@oracle.com,
-        suravee.suthikulpanit@amd.com, mlevitsk@redhat.com
+Subject: Re: [RFC 0/3] Export APICv-related state via binary stats interface
+To: Vasant Hegde <vashegde@amd.com>, kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
+        joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
+        mark.kanda@oracle.com, suravee.suthikulpanit@amd.com,
+        mlevitsk@redhat.com
 References: <20240215160136.1256084-1-alejandro.j.jimenez@oracle.com>
- <20240215160136.1256084-4-alejandro.j.jimenez@oracle.com>
- <ZhTj8kdChoqSLpi8@chao-email>
+ <19f634de-7d72-4abc-87ff-599d22e310bd@amd.com>
 Content-Language: en-US
 From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-In-Reply-To: <ZhTj8kdChoqSLpi8@chao-email>
+In-Reply-To: <19f634de-7d72-4abc-87ff-599d22e310bd@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LNXP265CA0071.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:5d::35) To DS7PR10MB5280.namprd10.prod.outlook.com
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BL1PR13CA0441.namprd13.prod.outlook.com
+ (2603:10b6:208:2c3::26) To DS7PR10MB5280.namprd10.prod.outlook.com
  (2603:10b6:5:3a7::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -110,132 +109,189 @@ X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info: 
-	t0acVmrXYAWQYIthpMrQ1fMY6oEZrbsUmGF6guJSmFWH8fYovov8NNsnMmqixVjB4+JwyCqAksqHiXaxc6nchUHIsnyvsCbUG1yYRZsn+k/NucAuwZAF7zVNCSz0xEZWbARcpQDvSreeB+yyRRdDiW2RN6mFDM2s8M47RPZkEryaaAUrGWiXiuHNjCldaz7L3QGgFt0k08FkWlq/AWbNkgByRUaADjhZaPk3W1c/HQb7v2laMZ/ye70iKbt5x7lKVKxiTUlny+SE3NhH0V/moStipmTs2bBdGlz4uSv9fW8Oy1SINgxgd/WNKI/LT+u8DFAKXsUAF6YM4MrwnIuUY9BbMEpgfVOHN8LcVUrKRuulgkjmUnX4wSckYljaD+v+hG7vu4Amx0ueA0yOj6teno3AvxiRRy17SbGDObTrARqK8VirbN6s+gImdPukJeMX3QQW+iY5IvpBlpWHPRBZBGazn6bNTQQ2t3GFYjQupd4S4xQqeVYABmPmnnc0r6RyOe3++6UpyBOM3FOd40Mk5qgI5rtrR3QSJVbJqifx14v1wOB5TRNW2mYqfl4fjdNVlov49wCNyX6aMeRIS2rO7eU3tGezcTvwVaEDR/jgrCpt7XgcMMWAAyFkbfVKyE5eLrOiBD4tIgkhk830H8mYA285u/Dg8/5OTs9PEXMlVOM=
+	1Ge0hlB0/N2UxYw9P02KVFAekIAnJ4sbYrlHVY9B6cac+yeyF1xiPHwEceLbeVJu7t/cshKSXF0QWyAqkM8nHkDz3dMgVA9ToIWoMkRSjL0z9+LN0OfP60kKNg638zCXY7VB/eudtpYsnRNrjythFZVTvbSi7TuzIZ7c/33fqhgx2x+RsHEnc5g996lx9l1mkDJeSt6MWvAsi5TYwfC8Nou+rJVZWt0XzmpBsDZi2da7BLO0mRDB80zWOxmSjmYx3fRSV6mjOlUwKaMCQT5iL/lQcvVHZPwRCDehge7fCiuivxu4M5b7iOf/Ag3HRnJpvYOy4+euAYl/xJaGqZPBfz31dn1MPN0572Z0w3cBQYUYIvBAHx6xLw76auUPHwJJpqBPe+N9Cyllc/Cp3gZOyy8w0TJwXytCyduR5fYfUQ3tw1lNUo9v7c2Qlj9eBVgv9q3hyghuSRVAhTYYjbbtwfIvIUFoFyzjLyUt1AsCGs1NUYXFODN5cVYJoHSHRNLzKHAWPNKD7BxT3W02yubLazUrWlgzDL/gu2B4EFIimY7WgKmL3BljMR8VQMPTc20A50Hm0ipDVNn2lCQ7DvVw1a+FcdlcjTiXuh/EDlEVx+P5CcZthVxpm8qLagBRsIAWvtHI9VTwqheUWzvAafncFI+AnBxkbwVVgrNZtoEXdII=
 X-Forefront-Antispam-Report: 
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5280.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?TGwzUmFCWmJ4R2dNQ2lOZVhUeTFTb0dBUm1hM29VbnRJRVlVYkNiRG41RWRP?=
- =?utf-8?B?cnVjQXEvVTJiNGEzSHJPemtpQWwvczdyTmdJV05ZU1pVUFoxZ2VvOVRKUkxR?=
- =?utf-8?B?OUNWYU9hNnd5ZnI4SUp2ZmN0d0lteWhQYy9vZkszTVMxcXJFdkorM0U1d2dO?=
- =?utf-8?B?L01BNXptTjRXSG5TQS9RRktoVkc3TnJMWlZHUU8zMzVNdXo5L3hrREV3aGFp?=
- =?utf-8?B?V3pHM3QyWEFJcXU1OS9EQk9QREI1NUxvVjZ5NVVkMHowQ0lMMGE5TjBnK28r?=
- =?utf-8?B?UWdLb0lpdHdqRE9VRGFuZVlFc2l3T0tydGQrT2dXaFpBQ1VmQUc5T3pMK0Js?=
- =?utf-8?B?Q3JwOG9DanNtMmg0TE1ackpNNFVNZjBVZzRWQjBJcElrRnB3S05WMWJHVC9C?=
- =?utf-8?B?aGE5SlliWXY3VDI3ZG4zQ3NjaTFoVGpUVmlZaWFYendBWXI0ZmRTWVFpZHdQ?=
- =?utf-8?B?VTgvMkVVSGtKS3k2UndrQUNmMzRaZE9EVWpyajJXYmxRL2g3djRBR1VQSEtY?=
- =?utf-8?B?Y1dpaDJHTXFKSFF1RCtPNWN3ZS9mRWdzaTA5Q2NyUzY2Q2VvaG9iSUkwZHdY?=
- =?utf-8?B?NVV1RU1wUkhBZldvOGxVMHJwWE5VSmxBYkxwMjlFcFZPdy9XNkRQcU5CQU9F?=
- =?utf-8?B?ZTV5c29Uc29oSWUwQjhzZmg1d3lJa0MwWjMwbVRPdWExdGZQR1hiQTZCUnNF?=
- =?utf-8?B?cHFSWjFSYkQrRnZxWmRDdVBmUGlEK3pvS0VpYzExL1hQbFlNZmVjSkQ0YmNE?=
- =?utf-8?B?SCtPQVVWZ0tHbFBDU0hrcFFjeUs4SkZ6UFNPb0tLZnBiWFdpRlkxeUlQa1kw?=
- =?utf-8?B?ZmF6d1dpRHNwY0Z4c1BWa1k5Y0xNZjdsSmptM2pYY2p5RnVrZXRTYVl0TWQz?=
- =?utf-8?B?djBhYmlUcUVBV3RjYk9ocWRsQkFCeEpQS1R5T2U0cXQ0T245MUV0MEdhMURk?=
- =?utf-8?B?dGkyWXdSZ2l0MVhnOFQ2ZUhoOTgvcHZpc3VDK3JIaTlYeFRGc3prVC93VlZl?=
- =?utf-8?B?R3cyMDJCdUVBanFjZWk2SStrcWVtVUVIWTNZNDFQZllhekJIY29MYlQ4MXVt?=
- =?utf-8?B?bkozZFI3SjJXM01PWnRGVE9ja0xyMEFnNlhYS3prWDMzc0hpcHZtKzhmYUF6?=
- =?utf-8?B?SXVXZ3hoa01uOVZHSDFhbUlZTFZsTWw3R3dhbUNDSEI0eVV3a0tQVTI0S2ZL?=
- =?utf-8?B?WjRTNnFaRCswTlNTTkhkeEt1MWU5VDVQL0o5ZnZsMTM0S0JTVFJpZGRmMGl5?=
- =?utf-8?B?aEUwS1kwZGYyYTRQamVIcUhxY3dWREhXYTB3eTQ4Zzh5aEtoeXBWclBIeEdF?=
- =?utf-8?B?QWpqTURHeWo2VDFsSVo5NVRaQnAyT0tpaHlsTFpTNjVUZXlGQVNaSjV2UWZp?=
- =?utf-8?B?bUUwUC81WXpUQ0xpcHNpQnJCQitDWkVsNk14b2dsMFhjYTR4elBZOERkdjM1?=
- =?utf-8?B?aWEzRUs0ZERWWk5rZWk2U1JnMFNjN2ZtT3ZxeTNOdGdkakNjWElMTUQ3TzFk?=
- =?utf-8?B?Y3p5VUhIaDhHdnZZWmZ6Q0tJS0xwOXN3RkpLVVpIaGE1R3QvTFVwZ1J3b2ZI?=
- =?utf-8?B?SW9jUlpOMmRJQ255bDl4SUVIRzFIMUR0dEVuYVNLM1FlRys3S1NDRTJuaWhi?=
- =?utf-8?B?UUFxSjM1bnRBK0IxZjA4YUh1cGJZR1RzSWZ5M0dPT3c5UUxLRFZRR00rNTRV?=
- =?utf-8?B?eE93SE9jcm5qNjRJaW5uank2SmliWmR1TlFXUGNZVGhXWnZPVU1xemNXQ1Vm?=
- =?utf-8?B?cDBZSlFLR3dtK0VIbUsrb0dEUjk2QjBvTnRtZ0d6dVlQc3B1aVYwU3VFNlhE?=
- =?utf-8?B?L0RvenRTMTNQaVpyZm5QUzNtSTFNR2dSZ2NVU2lDN0pDMmJuV2xyWmZ6ekMy?=
- =?utf-8?B?VVhDbEJJbjVvMzZ6VXZ2Ulg0eUluZ3VaeW5qcXNFSmZjWUpxaWMzbnlkK3p3?=
- =?utf-8?B?RUcxanllWEJ5bEFxZ3Rjc2pEUUFUNGlqa3gwM3VRZjNvMHBxakdnTlNJdWNN?=
- =?utf-8?B?aFRCRXQra2MxbVFlOERYU1FobFpXaVJwY2lnYmxTeCtueTY4bzhUZG1wWUZZ?=
- =?utf-8?B?RG1XeElDK0g5dWVsSHJJNGlGNTB0OGc4eitSd0ZFTWZSMmJzYmtnTkdjQnFO?=
- =?utf-8?B?cE4xSFI3Zm9RL0Q3bGNOTk9McnNuZHh5eVNKRG1oTVNUUndpY3puY2VZTmlS?=
- =?utf-8?B?ZGc9PQ==?=
+	=?utf-8?B?NXpmNm1UNU9CL2REZ0VsTVlYM2pxM3FwY1YranhtMWpjdytsVUJMWnBWWHls?=
+ =?utf-8?B?QmkxU3RSVGtmaUFBc2tYMkxLSlRTVFR0cHR3cllNRVBwbW5oeWpzVUtqNXl0?=
+ =?utf-8?B?YlhkTGtyT295UlZQYmZIckVrbitUcTN3VWdlMFdreE55L1BTWjNxVjZ5T1RC?=
+ =?utf-8?B?UGJaaWowMjdiZElDeFdEdDNNQjhwVEZQbnFFZXpzc3dQY2NXNGRLRForcUxC?=
+ =?utf-8?B?OXl5ZEpQZ2dOeTRqYnZ4ZWg3NEdMQ0ZKaE00ZWdZeTZoVVpNM2IxSzhmeTZp?=
+ =?utf-8?B?REd0TjNMWUVvZUdzWDFsMXh0T2hJTStManNXb1hnWjhZZzBuL21UV29xZTRO?=
+ =?utf-8?B?Q2RtQ214ZEluSm5uT0RmRkg0NDFyNjdkeFA4NmlJaCtoemt0Mk4weVFtVWxE?=
+ =?utf-8?B?OEdVdDV1b1lVOEZFOFJtbS8walArWVZMWlBPKytJOTNnTGl4L205QVlJVm9C?=
+ =?utf-8?B?ckFZcm9sS2RwUEtsMEJYUHVRZVFsdVN0S0pBTGFlZ2dqc0xFWVN6TkdhdmZi?=
+ =?utf-8?B?Z1VremM1VDEzMFlUTlZnSW9VNVk2Rko5eUg2Y0JZcC9OQXIvbkErMWUxcXNS?=
+ =?utf-8?B?TFNRWVZPVHhBNnBJT2xaQUpsVXZhSC9YNDU2YjZqVllZL3hSRmUyZU94aU1Z?=
+ =?utf-8?B?TUJJNE5kRUVhZGl5ZWlOVlBlbTZRR0NFTmt6N0dLS0d4SXNuSGVjOFgzc2pM?=
+ =?utf-8?B?WmtkcXoyUFRIWVExQTk3a3Y0QTVxMGpCcXdLQTNqVlY1eXgxRVd6UlNjUTk3?=
+ =?utf-8?B?b1NzR2hHT1ZXNHVOUDJiQnNDZHExV3l1MXhkUExZQ1M4b2YrUUx3OCtEZjF1?=
+ =?utf-8?B?MDBFY1ZsdmR5ODk5ZkNWdUNXOTduU1VkakFxM2Z1aXpwWmRZTjVqQm1nZDVK?=
+ =?utf-8?B?R2xPQ0l3OWw3WEpHSUJNMjFuV1lzbDl0YlFONTNrb1VIbUpnZ2RYYXNKdW81?=
+ =?utf-8?B?eEhuR2RyN3RMQXVLSXlJaUFZNXE4VmhOMWplWmw5UjUyajBYSVZEbmlNL0Fi?=
+ =?utf-8?B?R1RkRkpiNlZ1Z09KWDBhNURGQUZxcm00NlFETmhyc2ZvM0sxN3FoeGJTZmRW?=
+ =?utf-8?B?TFpVV0hJYzFEdzhOY29rWjBKS3pnbUNIUVJYeUpaNC9xNzRxWU91WlpGNUpZ?=
+ =?utf-8?B?cUxxWi9MM3pJTEY4Nkx2cngwSFFWSWxUZU1aZWlzSTRJRzd4aW1kS1VvVWZL?=
+ =?utf-8?B?dkRZR01PVXlQanpnaDNYUHZKZFY5NWhaRDRSbDBaY29PekE2UnJlQXlON1la?=
+ =?utf-8?B?R3k5RFQyNWRkRUc3K3hQclRQLzdmVHArWWR3S0RHRzFxT1dweXgxTTJEbTQ5?=
+ =?utf-8?B?OGtIMnJNYnI4ckRWTDF2ajN4Vng5UXZCS0JiVnB3UnkzTVdLQ0plSHd5UE45?=
+ =?utf-8?B?dnlaZ1B1SjcrNlpGQnZOYkpCaGE4Vi9SdUc3endTdDlKSlRaSWF0QXVZaHVK?=
+ =?utf-8?B?ZWdzbmlMQzkxRnZIQW9MZGVLaC9JRlNIUTU3bldseU4wTStWR29KY0ozMDJx?=
+ =?utf-8?B?QlNOUGdIaTF1MnFzUlI3dmJuMkpUdGdla3pQY0dDZTdHakVMZDN2V3R5OFZR?=
+ =?utf-8?B?KzVLUWpkSUtKcWJTeEpPN0dWaUFST3dUbnd0Zi92RUJTTVNUa0Y4OFRDUXJ2?=
+ =?utf-8?B?NlhRRVVJY0FvR0U3ZzBabkNDbWxiLzdDTnkzR1g4WGl3TGI3MXVWMEFodzFw?=
+ =?utf-8?B?UTBjcU4yWlhKdzIxQnE1WWNnY08reWQxL3lIMTRCRXBQZTA2azRwcUFEQXZX?=
+ =?utf-8?B?Z2k2ZVF5aG1LeUFaNGFZZlp3UUFocVloUXBFeVRBS2d1UWtHSDBtRW5uZk5J?=
+ =?utf-8?B?bGQwdTA5QTdVM0crSnZDaks0c015UDl5bGhTckpkanU0VHN2Z3FSeXQwWmFi?=
+ =?utf-8?B?T044cmdDckM1ZUZwYXRyVWlwVWhua1M2M2ZnK0Q1L1AwZnc5aENJaFZTOUY4?=
+ =?utf-8?B?b2dUQS84b1Y2cjd1ZTg1RkxWZk53anM5WlFFSGpaL1VjejV0cXJrSGFwdjIr?=
+ =?utf-8?B?aEpOWDl6SHQ2MUVKWnAxZ2ZZRzJZWGhGZVl0SVZwczkyY3NZc0R0QlZSRGRG?=
+ =?utf-8?B?WWRIY0VPOUtMNlUwVTRtb3RTMW12TWNYd2hsSUZGaVoyeCsyZnJvaUwwMHY0?=
+ =?utf-8?B?amQ0SVlyT00xZFNNM2E2cFVqZGpVL1ZxWUpVWGpCaTA3SWRQbFRXcWZML2ZR?=
+ =?utf-8?B?OVE9PQ==?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	QnkKklAeNRiI/sULYUxEDRwx/56natIFJ9ZNTDDmPvsTaPWGLCdJepDNvfEGij/zfjX6UHxJlDhCt1MvawJIy+HcK58lHU46VTv4CFeUlZwCH8pw4pBbD09IIOhfCDxy9iuhQA8u/90RyAHq1J+oOM7L0mBWxi6qYcIvL5dxlcm5IBYvte452WwziYSPS0+fLTdJNrBdP5veHB1fgFEnHwEKAZmgl72+VAjhysbonL7NdXNoZpvdpi+XlcGI3QX+gNwjnEV/vIhZRbPkf93Mq/cZpGjiym+VU2By/jWmyIIfCZOUO05nk/z8uXFqllzlKIhMJGvOMGp845ZbpitPe+PcbMB+WbYLWEbLREUoDX6qaBZ610vlBiewk1BTEcKclkw1FksfkX92K7kmqw3HGnp97tVK1QjSlHXmW/Z/HaCFvt2+CipiIq8hc7z9vH80nHsgePNyh5jxcLUyt/xwMY1TixFDF3Y0F4tREosY8dn9WI+8ApLsKo/uGS70TFXpMz/SlN3MJxnsmRuUlxDOfWXyiYmu6MV/Uh1x/Euz79YE7m1leJPRcXOwRVtyVp/qVAZn4HIIqxnX5FDwDDbh3TBXj6CaRos+6HRa8bRmLBo=
+	4KFS/4dwGVDq+oxlH1fECyrdfkM1cJ2xVhMhyxwuSml4OHxiqGvPFcyG2RyLtksOkSCWV2QOELhDrb09uh3vPQjpX5iihk/BmzTIYK8/+xyw6yeEiXcsVH4zWK3ycY6beR4RrwFIA/qGJ0TCxnKSAConoaj0Zc9NhsDqKSwsXRkqpJfi+c6YXxWl7FZ9MXhbrmiNHoZbpctJvJuyLL+G4Zl0A7A1Ty7Uy9WSxBhVyURbmxX6+H/frdQIhuhbb7/NccZqw4cI+RMHxsLGYAnst/Ab8pJceW2oAUHO3S84zfya41f9JkihMwGdCHWYj2+GNKVzMm28S5tt/I8Y4QxZ5zSm9npeb8kRaRpBeRmTLHZoLsJ6gWQj9WwsjAafZjkC3iKZZUWnpiwH1+VVXA9IWexgqpEv4sjWQMC+MUmBmCAsllboWPmUT2djeXYqOXNF8TcfO2kJbPHorhgfstMOpQRac8zH60oDwqpgkT9DczHG82RaAJfDo3c7QDWI9j3rnoOn7iyjquCV1wk5B4+wSPFx0pZJagRI0xxYoVbS7f+cRjt3Z/1RyDoXDXdf7+9emEm318JwyGPiBxQ4LPmHwW1412YVZwQvA2i70BxHVJI=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c5e5673-2114-4aaa-6cda-08dc58fdffc4
+X-MS-Exchange-CrossTenant-Network-Message-Id: b18088b3-a1ca-4ed7-1423-08dc58fea079
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5280.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 01:31:52.3935
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 01:36:22.0050
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QbhKim65hE7XxkqOXjhfKMYpi7q0OsP0l+pU5OeZ8MDch76HwNzMFb7ETK2K+Q937yeiR4Yv3AHhJolmap7h9qQHnO6SiobYtp4s1QJ4lO8=
+X-MS-Exchange-CrossTenant-UserPrincipalName: VCjtgtewuc8egYl8+Ccswu877olcga4UVy4nHHra4m54r+aMjMBWBqOl2QBdvfqGf4/VDf1wPLxcZddIgkZSMdT12zyZm5iC/r4GQfNSYSM=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB4927
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-04-09_12,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- suspectscore=0 spamscore=0 mlxscore=0 bulkscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
+ mlxscore=0 adultscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2404010000 definitions=main-2404100009
-X-Proofpoint-GUID: aNR12FLWspkRq_ClfwAVYn4kgeoInLLh
-X-Proofpoint-ORIG-GUID: aNR12FLWspkRq_ClfwAVYn4kgeoInLLh
+X-Proofpoint-ORIG-GUID: QZ8ZGbj1-yvLiqRUxNTQIXnXe4X-aFc6
+X-Proofpoint-GUID: QZ8ZGbj1-yvLiqRUxNTQIXnXe4X-aFc6
 
 
-On 4/9/24 02:45, Chao Gao wrote:
->> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
->> index 4b74ea91f4e6..853cafe4a9af 100644
->> --- a/arch/x86/kvm/svm/avic.c
->> +++ b/arch/x86/kvm/svm/avic.c
->> @@ -165,8 +165,10 @@ int avic_ga_log_notifier(u32 ga_tag)
->> 	 * bit in the vAPIC backing page. So, we just need to schedule
->> 	 * in the vcpu.
->> 	 */
->> -	if (vcpu)
->> +	if (vcpu) {
->> 		kvm_vcpu_wake_up(vcpu);
->> +		++vcpu->stat.ga_log_event;
->> +	}
->>
+
+On 4/9/24 01:09, Vasant Hegde wrote:
+> Hi Alejadnro,
 > 
-> I am not sure why this is added for SVM only.
+> On 2/15/2024 9:31 PM, Alejandro Jimenez wrote:
+>> The goal of this RFC is to agree on a mechanism for querying the state (and
+>> related stats) of APICv/AVIC. I clearly have an AVIC bias when approaching this
+>> topic since that is the side that I have mostly looked at, and has the greater
+>> number of possible inhibits, but I believe the argument applies for both
+>> vendor's technologies.
+>>
+>> Currently, a user or monitoring app trying to determine if APICv is actually
+>> being used needs implementation-specific knowlegde in order to look for specific
+>> types of #VMEXIT (i.e. AVIC_INCOMPLETE_IPI/AVIC_NOACCEL), checking GALog events
+>> by watching /proc/interrupts for AMD-Vi*-GA, etc. There are existing tracepoints
+>> (e.g. kvm_apicv_accept_irq, kvm_avic_ga_log) that make this task easier, but
+>> tracefs is not viable in some scenarios. Adding kvm debugfs entries has similar
+>> downsides. Suravee has previously proposed a new IOCTL interface[0] to expose
+>> this information, but there has not been any development in that direction.
+>> Sean has mentioned a preference for using BPF to extract info from the current
+>> tracepoints, which would require reworking existing structs to access some
+>> desired data, but as far as I know there isn't any work done on that approach
+>> yet.
+>>
+>> Recently Joao mentioned another alternative: the binary stats framework that is
+>> already supported by kernel[1] and QEMU[2]. This RFC has minimal code changes to
+>> expose the relevant info based on the existing data types the framework already
+>> supports. If there is consensus on using this approach, I can expand the fd
+>> stats subsystem to include other data types (e.g. a bitmap type for exposing the
+>> inhibit reasons), as well as adding documentation on KVM explaining which stats
+>> are relevant for APICv and how to query them.
+> 
+> Thanks for the series. IMO this approach makes sense. May be we should consider adding one more stat to say whether AVIC is active or not. That way,
+>   Check whether AVIC is active or not.
+>   If AVIC is active, then inhibited or not
+>   If not inhibited, then use other statistics info.
 
-I am mostly familiar with AVIC, and much less so with VMX's PI, so this is
-why I am likely missing potential stats that could be useful to expose from
-the VMX  side. I'll be glad to implement any other suggestions you have.
+Hi Vasant,
 
+Thank you for reviewing/testing. I'll implement your suggestion and send it on the next revision.
 
-it looks to me GALog events are
-> similar to Intel IOMMU's wakeup events. Can we have a general name? maybe
-> iommu_wakeup_event
-
-I believe that after:
-d588bb9be1da ("KVM: VMX: enable IPI virtualization")
-
-both the VT-d PI and the virtualized IPIs code paths will use POSTED_INTR_WAKEUP_VECTOR
-for interrupts targeting a blocked vCPU. So on Intel hosts enabling IPI virtualization,
-a counter incremented in pi_wakeup_handler() would record interrupts from both virtualized
-IPIs and VT-d sources.
-
-I don't think it is correct to generalize this counter since AMD's implementation is
-different; when a blocked vCPU is targeted:
-
-- by device interrupts, it uses the GA Log mechanism
-- by an IPI, it generates an AVIC_INCOMPLETE_IPI #VMEXIT
-
-If the reasoning above is correct, we can add a VMX specific counter (vmx_pi_wakeup_event?)
-that is increased in pi_wakeup_handler() as you suggest, and document the difference
-in behavior so that is not confused as equivalent with the ga_log_event counter.
-
-An alternative if we'd like to have a common 'iommu_wakeup_event' is to add filtering on
-pi_wakeup_handler() and only increment the common counter if IPI virtualization is not
-enabled (i.e. !vmx_can_use_ipiv()), in which case  we'd only handle device interrupts
-and it becomes the parallel case to GA Log events.
-
-That leaves us with a VMX-specific counter (vmx_pi_wakeup_event) which provides no
-definition between interrupt sources when IPI virtualization is enabled, or when disabled
-we have a common/generic counter (iommu_wakeup_event) that applies to both vendors.
-
-Please let me know if you agree with this approach or have other suggestions.
-
-Thank you,
 Alejandro
 
 > 
-> and increase the counter after the kvm_vcpu_wake_up() call in pi_wakeup_handler().
+> 
+> I have reviewed/tested this series on AMD Genoa platform. It looks good to me.
+> 
+> Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
+> 
+> -Vasant
+> 
+>>
+>> A basic example of retrieving the stats via qmp-shell, showing both a VM and
+>> per-vCPU case:
+>>
+>> # /usr/local/bin/qmp-shell --pretty ./qmp-sock
+>>
+>> (QEMU) query-stats target=vm providers=[{'provider':'kvm','names':['apicv_inhibited']}]
+>> {
+>>      "return": [
+>>          {
+>>              "provider": "kvm",
+>>              "stats": [
+>>                  {
+>>                      "name": "apicv_inhibited",
+>>                      "value": false
+>>                  }
+>>              ]
+>>          }
+>>      ]
+>> }
+>>
+>> (QEMU) query-stats target=vcpu vcpus=['/machine/unattached/device[0]'] providers=[{'provider':'kvm','names':['apicv_accept_irq','ga_log_event']}]
+>> {
+>>      "return": [
+>>          {
+>>              "provider": "kvm",
+>>              "qom-path": "/machine/unattached/device[0]",
+>>              "stats": [
+>>                  {
+>>                      "name": "ga_log_event",
+>>                      "value": 98
+>>                  },
+>>                  {
+>>                      "name": "apicv_accept_irq",
+>>                      "value": 166920
+>>                  }
+>>              ]
+>>          }
+>>      ]
+>> }
+>>
+>> If other alternatives are preferred, please let's use this thread to discuss and
+>> I can take a shot at implementing the desired solution.
+>>
+>> Regards,
+>> Alejandro
+>>
+>> [0] https://lore.kernel.org/qemu-devel/7e0d22fa-b9b0-ad1a-3a37-a450ec5d73e8@amd.com/
+>> [1] https://lore.kernel.org/all/20210618222709.1858088-1-jingzhangos@google.com/
+>> [2] https://lore.kernel.org/qemu-devel/20220530150714.756954-1-pbonzini@redhat.com/
+>>
+>> Alejandro Jimenez (3):
+>>    x86: KVM: stats: Add a stat to report status of APICv inhibition
+>>    x86: KVM: stats: Add stat counter for IRQs injected via APICv
+>>    x86: KVM: stats: Add a stat counter for GALog events
+>>
+>>   arch/x86/include/asm/kvm_host.h |  3 +++
+>>   arch/x86/kvm/svm/avic.c         |  4 +++-
+>>   arch/x86/kvm/svm/svm.c          |  3 +++
+>>   arch/x86/kvm/vmx/vmx.c          |  2 ++
+>>   arch/x86/kvm/x86.c              | 12 +++++++++++-
+>>   5 files changed, 22 insertions(+), 2 deletions(-)
+>>
+>>
+>> base-commit: 7455665a3521aa7b56245c0a2810f748adc5fdd4
+> 
+> 
 
