@@ -1,117 +1,243 @@
-Return-Path: <kvm+bounces-14117-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14118-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 277B589F28A
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 14:44:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0632189F328
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 14:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86224B24842
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 12:43:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8509C1F2A29C
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 12:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B0715D5D7;
-	Wed, 10 Apr 2024 12:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A9E15B136;
+	Wed, 10 Apr 2024 12:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Np/w1Nmi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="en3LnY6d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C052912EBEF;
-	Wed, 10 Apr 2024 12:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05AC615ADBE;
+	Wed, 10 Apr 2024 12:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712753011; cv=none; b=NdTenrI6Y2LyaDsEZGd2mP2/J3hbV57QHNrYaKEMgSvZRQGY1CTmXYQaEl5J1o3KtnxW2N0EtJsLmp0yK5Ba00p7UMEweea1PQGHX+Rsc0s4caWeWvw0aNgjsfdbPLLB2HNVkHiTp3/93yJJ9IWsUBJX1otnsnpBT9ZqRC//ops=
+	t=1712753383; cv=none; b=OnSD86CLLyjebAvbAWtgHzM5crdj2WGG96uZ7+MKcVLHRv50U6DL++lOVn05l55IkMkv6jGcAv6uo1qzwExc3QUgRxU+4HgeF+tOdsze6/WLnfAXU7PKbPEOhM930K9zq05+WKz0cTT7hYwiGtP83IBAcgkeH4891Y/PQ1l4Hn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712753011; c=relaxed/simple;
-	bh=ZIAOmvrnl59E0qA8D129ku06QXp/t0U+yZH7OIQvevA=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=KwXu6epO1LlSL7VqUZUZk73pX537lJcF3DZud60UWpgOfX1tA0VGvxFkPa7RwARuGoJd9l3Qy1e+myyVYn06najZ0FUYe9VtwkFkwNM0hSsQErIZWuAbgQfhVwqTaT7QjQFTSbQKI5OEvWg4dcN/Zul4gtKSONwj35MdwQzZg/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Np/w1Nmi; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4166d6dab3dso23328025e9.0;
-        Wed, 10 Apr 2024 05:43:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712753008; x=1713357808; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s6W3q2bOeGE0BrRwL1fG865Gcw8RNsxpT6lmBauL/5w=;
-        b=Np/w1NmirFF4XcdCjJTrl8BuE1EdJXqSEaXVeczwbIjKJcbdHTm/E9RSXswwqi3qCm
-         RL18G3TKu0ntrPGZbKgpEet/RrZ3p+v8ja/juMHKx4njL2TsXnOAvvtpcGUM7GIbZwtf
-         7nq0RYshnvYftaRuUy4zTZ4X7iRBX9N0x22rD4tuWahJ82390wknPcMSjj+vGDBP9jCT
-         ueIwvL8xcdclm/i1Po9R8aC932VIETd5tg3CGpoWpMEAd0TYssxazcskL/L+XrslCB5l
-         +HXMSiJ/54EM8EBKxWAxFRh9802HLj0a94iAzZTrUTw0crUkYx0OQbC/F/52CnrCTSAD
-         eJeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712753008; x=1713357808;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s6W3q2bOeGE0BrRwL1fG865Gcw8RNsxpT6lmBauL/5w=;
-        b=nSVe2+T3aHMlO2b2mWeCZWCJQw+C5gLLzYXmILzHHJ6vXotoOrFXU6jShq/+jogclD
-         vw+IaUQoDMsggkvtI5phGOWTGcTV+unaDUatyQpdhZUTPhjcpKe3z/K2LGt0XwEqmSJK
-         xQNzgw6+nYY6PNqN9CKRlgUI6SbPHjSlGf3xBzS4gD00A4QQP7IfAg5NV5Yn7LMJoYFo
-         Ffz388bLToszsaChNac99e1iIy/SyCACI+RACpXMWefdNcCvI/H2yQdF93pSNkPrl06q
-         vEVzNNhUGNfUcEqyUziYon2q2umlOztmwL7cPSt0dS+MZRmCtbzAAA2+l1t7337wzlOO
-         JTSw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3cNxS7QwEkgey7RsRzAIL6eYtP4c12E7MwUbgb41ZZaYb74ltrfadVj4x0eqKU1OOnGGRHugfg3wSfriG5tk59x+Av6+7QaSBsqU384ln2GB/+5qSrjBU9Gs9N/9wpr8ridF/b+jwANhb6UxpD+F2Ws9W/3Yh1vI3i/bX
-X-Gm-Message-State: AOJu0YzUtKPTB4rv5KVCWRgOwnvzuk6X7XN9I7KC8aFV1QQeVyFSOxhB
-	eGZL5JmvumgvwceoqAnPdWB4pa1OhiPQMyluIYrXXViN5LholQoN
-X-Google-Smtp-Source: AGHT+IHcugzE8vzXE8HPH/lzuP1bY5ylrSJUYCanSNtur6lnkBf2UVBphkiKUJzhXqy7mwr2gZBryg==
-X-Received: by 2002:a05:600c:4e88:b0:414:93df:bef1 with SMTP id f8-20020a05600c4e8800b0041493dfbef1mr1751654wmq.39.1712753007855;
-        Wed, 10 Apr 2024 05:43:27 -0700 (PDT)
-Received: from [192.168.12.203] (54-240-197-228.amazon.com. [54.240.197.228])
-        by smtp.gmail.com with ESMTPSA id n15-20020a05600c500f00b00417c0fa4b82sm729506wmr.25.2024.04.10.05.43.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 05:43:27 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <26bfe5ec-e583-458d-8e43-e5ecdc5883cc@xen.org>
-Date: Wed, 10 Apr 2024 13:43:25 +0100
+	s=arc-20240116; t=1712753383; c=relaxed/simple;
+	bh=+IicuqEEwox6mFHc+j1yjm5xJA/SNOjjhb7nYJ5m7Hc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bavt0mRvF5hikaKHpLQxljK9/2H0vrzPETCsNGzbMPNCCEtrv1TeqRP6eSVpf5z6k562OHOyxGLtFoGnji02muN+PqSvJYw8qpV7may6jLHDWwPP9xnFK/WkRVk3Zm5kO4DrfefCbVpMnsyd9oqjtFkGoHvz/Q7Wa0dQpDsTqM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=en3LnY6d; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712753381; x=1744289381;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+IicuqEEwox6mFHc+j1yjm5xJA/SNOjjhb7nYJ5m7Hc=;
+  b=en3LnY6ds243IZNCiTmUUsTrqAB29Ktuuz5xX00WI8sgKFRPI4uSWp3F
+   pFVNQuXrDF/HF9QE70wMOvOkjYkaVqk+jB0sA30GXhx6dfeRLNrzsW4r1
+   z2JCjiexTgoA6UqIlwKCVyVk6PhqZsrWSUAmb0wEYDbOFQ6519Ah35Jen
+   8PhHK6VNGufw693MGXkF6v08KN2rNz7Lgv26qEShB0l3cfwtz+yN3pNLL
+   tzQH7wMS7B+0xwiMLRNLwPky8FYq4jxAf5qRE5BquQ5/DGtg93n+2dlD3
+   cxfd/DFpjw9t65Dx/LFUIxRyI/Gh7YCzcMhxCKrYrlV7PvqmmTqmACGWZ
+   A==;
+X-CSE-ConnectionGUID: d7T0toU+TK+uVp7u5Ege1w==
+X-CSE-MsgGUID: XnVSDNXkTJCP9jV+WxTRhw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="18719872"
+X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
+   d="scan'208";a="18719872"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 05:49:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="937094934"
+X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
+   d="scan'208";a="937094934"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga001.fm.intel.com with ESMTP; 10 Apr 2024 05:49:37 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+	id 92A6E161; Wed, 10 Apr 2024 15:49:36 +0300 (EEST)
+Date: Wed, 10 Apr 2024 15:49:36 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Dave Hansen <dave.hansen@intel.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Kai Huang <kai.huang@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	Tina Zhang <tina.zhang@intel.com>, Hang Yuan <hang.yuan@intel.com>, Bo2 Chen <chen.bo@intel.com>, 
+	"sagis@google.com" <sagis@google.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
+	Erdem Aktas <erdemaktas@google.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: Re: [PATCH v19 007/130] x86/virt/tdx: Export SEAMCALL functions
+Message-ID: <ay724yrnkvsuqjffsedi663iharreuu574nzc4v7fc5mqbwdyx@6ffxkqo3x5rv>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <8f64043a6c393c017347bf8954d92b84b58603ec.1708933498.git.isaku.yamahata@intel.com>
+ <e6e8f585-b718-4f53-88f6-89832a1e4b9f@intel.com>
+ <bd21a37560d4d0695425245658a68fcc2a43f0c0.camel@intel.com>
+ <54ae3bbb-34dc-4b10-a14e-2af9e9240ef1@intel.com>
+ <ZfR4UHsW_Y1xWFF-@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v2 1/2] KVM: x86: Add KVM_[GS]ET_CLOCK_GUEST for accurate
- KVM clock migration
-To: David Woodhouse <dwmw2@infradead.org>, Paul Durrant
- <xadimgnik@gmail.com>, Jack Allister <jalliste@amazon.com>
-Cc: bp@alien8.de, corbet@lwn.net, dave.hansen@linux.intel.com, hpa@zytor.com,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
- seanjc@google.com, tglx@linutronix.de, x86@kernel.org,
- Dongli Zhang <dongli.zhang@oracle.com>
-References: <20240408220705.7637-1-jalliste@amazon.com>
- <20240410095244.77109-1-jalliste@amazon.com>
- <20240410095244.77109-2-jalliste@amazon.com>
- <005911c5-7f9d-4397-8145-a1ad4494484d@xen.org>
- <ED45576F-F1F4-452F-80CF-AACC723BFE7E@infradead.org>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <ED45576F-F1F4-452F-80CF-AACC723BFE7E@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZfR4UHsW_Y1xWFF-@google.com>
 
-On 10/04/2024 13:09, David Woodhouse wrote:
-> On 10 April 2024 11:29:13 BST, Paul Durrant <xadimgnik@gmail.com> wrote:
->> On 10/04/2024 10:52, Jack Allister wrote:
->>> +	 * It's possible that this vCPU doesn't have a HVCLOCK configured
->>> +	 * but the other vCPUs may. If this is the case calculate based
->>> +	 * upon the time gathered in the seqcount but do not update the
->>> +	 * vCPU specific PVTI. If we have one, then use that.
->>
->> Given this is a per-vCPU ioctl, why not fail in the case the vCPU doesn't have HVCLOCK configured? Or is your intention that a GET/SET should always work if TSC is stable?
-> 
-> It definitely needs to work for SET even when the vCPU hasn't been run yet (and doesn't have a hvclock in vcpu->arch.hv_clock).
+On Fri, Mar 15, 2024 at 09:33:20AM -0700, Sean Christopherson wrote:
+> So my feedback is to not worry about the exports, and instead focus on figuring
+> out a way to make the generated code less bloated and easier to read/debug.
 
-So would it make sense to set up hvclock earlier?
+I think it was mistake trying to centralize TDCALL/SEAMCALL calls into
+few megawrappers. I think we can get better results by shifting leaf
+function wrappers into assembly.
 
+We are going to have more assembly, but it should produce better result.
+Adding macros can help to write such wrapper and minimizer boilerplate.
+
+Below is an example of how it can look like. It's not complete. I only
+converted TDCALLs, but TDVMCALLs or SEAMCALLs. TDVMCALLs are going to be
+more complex.
+
+Any opinions? Is it something worth investing more time?
+
+.set offset_rcx,	TDX_MODULE_rcx
+.set offset_rdx,	TDX_MODULE_rdx
+.set offset_r8,		TDX_MODULE_r8
+.set offset_r9,		TDX_MODULE_r9
+.set offset_r10,	TDX_MODULE_r10
+.set offset_r11,	TDX_MODULE_r11
+
+.macro save_output struct_reg regs:vararg
+.irp reg,\regs
+	movq	%\reg, offset_\reg(%\struct_reg)
+.endr
+.endm
+
+.macro tdcall leaf
+	movq	\leaf, %rax
+	.byte	0x66,0x0f,0x01,0xcc
+.endm
+
+.macro tdcall_or_panic leaf
+	tdcall	\leaf
+	testq	%rax, %rax
+	jnz	.Lpanic
+.endm
+
+SYM_FUNC_START(tdg_vm_rd)
+	FRAME_BEGIN
+
+	xorl	%ecx, %ecx
+	movq	%rdi, %rdx
+
+	tdcall_or_panic $TDG_VM_RD
+
+	movq	%r8, %rax
+
+	RET
+	FRAME_END
+SYM_FUNC_END(tdg_vm_rd)
+
+SYM_FUNC_START(tdg_vm_wr)
+	FRAME_BEGIN
+
+	xorl	%ecx, %ecx
+	movq	%rsi, %r8
+	movq	%rdx, %r9
+	movq	%rdi, %rdx
+
+	tdcall_or_panic $TDG_VM_WR
+
+	/* Old value */
+	movq	%r8, %rax
+
+	RET
+	FRAME_END
+SYM_FUNC_END(tdg_vm_wr)
+
+SYM_FUNC_START(tdcs_ctls_set)
+	FRAME_BEGIN
+
+	movq	$TDCS_TD_CTLS, %rdx
+	xorl	%ecx, %ecx
+	movq	%rdi, %r8
+	movq	%rdi, %r9
+
+	tdcall $TDG_VM_WR
+
+	testq	%rax, %rax
+	setz	%al
+
+	RET
+	FRAME_END
+SYM_FUNC_END(tdcs_ctls_set)
+
+SYM_FUNC_START(tdg_sys_rd)
+	FRAME_BEGIN
+
+	xorl	%ecx, %ecx
+	movq	%rdi, %rdx
+
+	tdcall_or_panic $TDG_SYS_RD
+
+	movq	%r8, %rax
+
+	RET
+	FRAME_END
+SYM_FUNC_END(tdg_sys_rd)
+
+SYM_FUNC_START(tdg_vp_veinfo_get)
+	FRAME_BEGIN
+
+	tdcall_or_panic $TDG_VP_VEINFO_GET
+
+	save_output struct_reg=rdi regs=rcx,rdx,r8,r9,r10
+
+	FRAME_END
+	RET
+SYM_FUNC_END(tdg_vp_veinfo_get)
+
+SYM_FUNC_START(tdg_vp_info)
+	FRAME_BEGIN
+
+	tdcall_or_panic $TDG_VP_INFO
+
+	save_output struct_reg=rdi regs=rcx,rdx,r8,r9,r10,r11
+
+	FRAME_END
+	RET
+SYM_FUNC_END(tdg_vp_info)
+
+SYM_FUNC_START(tdg_mem_page_accept)
+	FRAME_BEGIN
+
+	movq	%rdi, %rcx
+
+	tdcall $TDG_MEM_PAGE_ACCEPT
+
+	FRAME_END
+	RET
+SYM_FUNC_END(tdg_mem_page_accept)
+
+SYM_FUNC_START(tdg_mr_report)
+	FRAME_BEGIN
+
+	movq	%rdx, %r8
+	movq	%rdi, %rcx
+	movq	%rsi, %rdx
+
+	tdcall $TDG_MR_REPORT
+
+	FRAME_END
+	RET
+SYM_FUNC_END(tdg_mr_report)
+
+.Lpanic:
+	ud2
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
