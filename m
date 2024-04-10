@@ -1,107 +1,151 @@
-Return-Path: <kvm+bounces-14074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1881189EB89
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 09:13:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBCF89EBBB
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 09:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 492101C20DB3
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 07:13:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9083281C3C
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 07:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F4E13C91C;
-	Wed, 10 Apr 2024 07:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C12213CA94;
+	Wed, 10 Apr 2024 07:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VRJxY7p5"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="E+7HpyAs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53C013AD30;
-	Wed, 10 Apr 2024 07:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCF713C9A3
+	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 07:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712733182; cv=none; b=RBvhLExSv97S1uEKG5bXAm1uEcL/ZXkJ//5wcVCm2trC2Iwy5mT1WiNh7sSL9fxVw+vTkeVhha/Dbf9saxtsaqtF6JRGn8HJsMI0IEDU+z/9OYWNTFGmzF+ZRFi82llc07tx3N2fJpGZIwWXALb2WVCxRfuldjbajlzKLypbAsw=
+	t=1712733648; cv=none; b=D8vzRIjmue+rWRxxy06IerL5j+urhUwVROjoZQVk+1ZuuDBzNaNo3BrqfQ8x4NCG+A+pXnlXmF1f+DZl/oHZGgMmrSankvIFpoT6sDBqkDfUF496f3eIJd9jU7iOLHBGR3LG84ADbGbF5fXbIBf7BkFCQsMtffZmUYpxt4mXshw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712733182; c=relaxed/simple;
-	bh=2xuaVJiYV98yQZyJqCo8wDjLB4OZ8dHeBSX32T6poTs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=b3Io/0pJZiu5FGeCI2rXF9sya/Zuz1/yIGn0/LEwFUv0yQUUkiJf9A9pa7ZvGiEnw8w8iLby85z8VqnFk/YP0UDGCm0ewM0kG/KWIVvvTANgbZ4WbNAIgaYZ3ce+p/xC5yath1ZCIe7oScwagtfBRRp2THqFHX6MJwDEerddQnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VRJxY7p5; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-1e4c4fb6af3so6601905ad.0;
-        Wed, 10 Apr 2024 00:13:00 -0700 (PDT)
+	s=arc-20240116; t=1712733648; c=relaxed/simple;
+	bh=rx19adIEtRfFuy8+v22L05S/+p5rIRJ/JcnvLnEFh7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lAsTKnmBsTJ+2lqgSQCnp1bOd0E/Dx6pxpc3I2TbkyZKDqWbL45SHY8IZe74sA6u30vrWD/vbonJLV6O3DNSjfA4F8MvEHsmPR4Eb9zZdOnHwFoASnRfV4JkPuPWJO2SThmuBMKvXQdxVTzHWAhwVFnbC5NicjQgT3d9kvave6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=E+7HpyAs; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56e509baddaso3265015a12.1
+        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 00:20:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712733180; x=1713337980; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=v8Z0HpTMm7JW0HfSi1migXbtT3L5ZfuOmq81pu08fxY=;
-        b=VRJxY7p5egdlDZm/rODV84LBK9rf1qTTfDxSAScpwgvnvqQorofUcgFZD+EjwqXxxb
-         CEi+4kLzryoo3mWJz14UfoWUXko7bF7FSebmu36wk0dFXJkTTNQTYCCyup5kdf8hhqj2
-         J2plN8SuPPMHaFt0jWIyGYHnfFmUNB5k/X6PdPhvYzWXKPl5VKuG6r6+1wB+3PfCQJ78
-         snoKKCt+clqBxy223cRzcwFIgPXtHDDfD1M9txjD9QBjlEhYUM9WHSO+h+E1nMv9pA7h
-         aBPd4qQomXW3cFHduf74VQyVmPTv6JveKRrn83TAYO0GOKQ5ZvieESUidI1vO86uQ4SL
-         O9Zw==
+        d=ventanamicro.com; s=google; t=1712733645; x=1713338445; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uLhNuIrSaoYe/9NO2TgswlnfBaBCyzfaiiheEplZdqE=;
+        b=E+7HpyAscsvxzlxlbX2LdRHPXl2tyDpBbOoYQdqJqRB1lt/ibuAQaxU69TFWBkz+Ek
+         oUFYbBWYjSFLkh6agnL1JbQD5tdToy83+q5LwEMYxCpA3J2axwWWiC2GD5oEobqa/Oo5
+         9EK8GHhn/U15sXVJcqnHlDG+22FQFYCRm4ETn6nkyQOrXNA5VpRit4mTKw7+YoXUvyk2
+         ZSgcj4RXPUbkV5Ug6B9t2KAUirmQNUJDePxb7MZw+vIxEJChx2UJZlAiww9iEenSxobX
+         ronns2mXYGlYWCBo/8s13bmENjrC0aMtZslS0SCX9wJP/mgy6Ak4k70Svorjv2QkI3Zu
+         WkkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712733180; x=1713337980;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v8Z0HpTMm7JW0HfSi1migXbtT3L5ZfuOmq81pu08fxY=;
-        b=McLksPKrtnmMw3Yh7+v+gVGOsLS+Hg6tVyrv9/aFbAhTohoiZ6gT4vXuXkiJA3AIMK
-         HGK/e+kTKZlLna62Wuro9GivswzpVbgB665davjFvl0VmiDMvayV3x/oEK0WawEVE9k5
-         D8pwStAwDZw2M5PrX4o5jtEpgbdGBS2RTEgkZQPRk5MoCFEobYiKnQwXZYGTrgim8mQ9
-         JyDZFu+yKsVoULLzZ5/57YtR9GGY2M557P0h13i7USCKx5xymqx+ojlBdmpgbZfSw4bW
-         r9EId3ETqExrN1T+WFNs2Hcn3BS9EXmc5vmIK2k4FfG65fxc9KzfNrYA4hkh3rz/o76x
-         VebA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJZ8f8CMKZj3bfe/F7rWp9lcgLVZX6rVjYevKg9zyOjGFPzpyMeDqvRfLKpW7xJK8s4n4b/pVVHe4sfWbghIZEsvk7FvLyLyFXmj9OFdAnrbUGomiR2ezi9W4ZIfeGpykSsWlPnkl3NJOVAOHzNl29qJqVGMAP9gmwve5oqbaJ4iYu4A==
-X-Gm-Message-State: AOJu0YyOEMBRB1S+Lf5G+1RwistUNYinSS9nR6LzcrNkysaBhjzyBptq
-	KzDDQ+1K5Co3O8GUzSiMZstiXkEyST5gepir8s8Ubuqoml/ZugoT
-X-Google-Smtp-Source: AGHT+IFMrqnJaJlYiQxwL0LAGuOQ3kVshpqFKiYiLZtdnpGtgTDNithiisZ0+SBC0c+D4ORu1fIAqA==
-X-Received: by 2002:a17:903:a8c:b0:1e4:3c7f:c179 with SMTP id mo12-20020a1709030a8c00b001e43c7fc179mr5797235plb.12.1712733179945;
-        Wed, 10 Apr 2024 00:12:59 -0700 (PDT)
-Received: from [172.27.224.145] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id v12-20020a170902f0cc00b001e002673fddsm10100548pla.194.2024.04.10.00.12.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 00:12:59 -0700 (PDT)
-Message-ID: <40a8d9d3-20a8-44e8-96d2-0dcd8627cfc8@gmail.com>
-Date: Wed, 10 Apr 2024 15:12:52 +0800
+        d=1e100.net; s=20230601; t=1712733645; x=1713338445;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uLhNuIrSaoYe/9NO2TgswlnfBaBCyzfaiiheEplZdqE=;
+        b=MtFE0nwRaJs1hs8XBL0YTm9bni62cl4G9OUHAg4AdMS5q70+1Ohvh+hNQf+z0wl3u3
+         G7x/6QcGSl70WFBvi1nnQSVrgqpOK0hPOvEcwOdazyssb0xvYO6LrnNC6w0x4XahSGGW
+         Hnw9ELXkISKsxFw8uWKJIgzDM8ojUKomTx2Pl8uGbdUWI3tG8H42FqlpBrfNUGRvVWNQ
+         P+5Ozj84SfAxWhcQn2FQ//veNqJQgSr1y/Q5hx2t9cPuF/bIoNbolAd7uDuuDre5vGuR
+         ax65JS5V6zqUuW9GtuZflb59p7DOY33e64LdXQ+L6UiQoCBpa5h3qRTzEmJGwVksk9b4
+         4UhA==
+X-Forwarded-Encrypted: i=1; AJvYcCX7tcM3hF07nrVnVYIpHm8IcUO74Cd/UhiNScAmuoJyKbk7ZGUUKrB0HBx1Ts9tU4prL3F7HWWHEFdTjPH0RlE47PtS
+X-Gm-Message-State: AOJu0YyqDzc/06Bkdlb+VMsCP1V4QDqSkhi5z544vtGdTaBm5n/myKIM
+	VJjY7u9BLC+MHhXJRYQI4XdmOmMoIL5LHZg6hqmZWHcGlKOg3FR1WqMalR/t7/4=
+X-Google-Smtp-Source: AGHT+IFblqSFRNSt8LD4P6llFistdn4FvvuYpArYI85OkCLQGw80eVNjwPfQ65XS4eljatieTXAaFA==
+X-Received: by 2002:a17:906:c215:b0:a51:d7f3:324b with SMTP id d21-20020a170906c21500b00a51d7f3324bmr969037ejz.66.1712733644958;
+        Wed, 10 Apr 2024 00:20:44 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id jz8-20020a17090775e800b00a4672fb2a03sm6720040ejc.10.2024.04.10.00.20.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 00:20:44 -0700 (PDT)
+Date: Wed, 10 Apr 2024 09:20:43 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Conor Dooley <conor.dooley@microchip.com>, 
+	Guo Ren <guoren@kernel.org>, Icenowy Zheng <uwu@icenowy.me>, kvm-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Shuah Khan <shuah@kernel.org>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 09/15] RISC-V: KVM: Add perf sampling support for
+ guests
+Message-ID: <20240410-f1a4303dc73789aa6adbe730@orel>
+References: <20240229010130.1380926-1-atishp@rivosinc.com>
+ <20240229010130.1380926-10-atishp@rivosinc.com>
+ <20240302-f9732d962e5f7c7760059f2e@orel>
+ <c46c57c2-95bc-4289-ac99-efd5bad093b5@rivosinc.com>
+ <20240405-de92b25fdc1ecf53770c49d9@orel>
+ <388ef032-7030-47b5-bba5-852b00de7382@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] RISCV: KVM: add tracepoints for entry and exit events
-To: Shenlin Liang <liangshenlin@eswincomputing.com>, anup@brainfault.org,
- atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
- namhyung@kernel.org, mark.rutland@arm.com,
- alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com,
- adrian.hunter@intel.com, linux-perf-users@vger.kernel.org
-References: <20240328031220.1287-1-liangshenlin@eswincomputing.com>
- <20240328031220.1287-2-liangshenlin@eswincomputing.com>
-Content-Language: en-US
-From: Eric Cheng <eric.cheng.linux@gmail.com>
-In-Reply-To: <20240328031220.1287-2-liangshenlin@eswincomputing.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <388ef032-7030-47b5-bba5-852b00de7382@rivosinc.com>
 
-On 3/28/2024 11:12 AM, Shenlin Liang wrote:
-> Like other architectures, RISCV KVM also needs to add these event
-> tracepoints to count the number of times kvm guest entry/exit.
+On Tue, Apr 09, 2024 at 05:11:31PM -0700, Atish Patra wrote:
+> On 4/5/24 05:05, Andrew Jones wrote:
+> > On Tue, Apr 02, 2024 at 01:33:10AM -0700, Atish Patra wrote:
+> > ...
+> > > > but it should be possible for the VMM to disable this extension in the
+> > > > guest. We just need to change all the checks in KVM of the host's ISA
+> > > > for RISCV_ISA_EXT_SSCOFPMF to checking the guest's ISA instead. Maybe
+> > > > it's not worth it, though, if the guest PMU isn't useful without overflow.
+> > > > But, sometimes it's nice to be able to disable stuff for debug and
+> > > > workarounds.
+> > > > 
+> > > 
+> > > As per my understanding, kvm_riscv_vcpu_isa_disable_allowed only returns
+> > > true for those extensions which can be disabled architecturally.
+> > 
+> > I think kvm_riscv_vcpu_isa_disable_allowed can return true for any
+> > extensions that KVM can guarantee won't be exposed in any way to the
+> > guest. Extensions that cannot be disabled architecturally must return
+> > false, since their instructions will still be present in the guest, even
+> > if KVM doesn't want to expose them, but extensions which KVM emulates
+> > can return true because KVM can choose not to emulate them. IIUC, sscofpmf
+> > falls in this latter category.
+> > 
 > 
-> Signed-off-by: Shenlin Liang <liangshenlin@eswincomputing.com>
-> ---
->   arch/riscv/kvm/trace_riscv.h | 60 ++++++++++++++++++++++++++++++++++++
+> hmm. The Sscofpmf is dependent on interrupt filtering via hvien and SBI PMU.
+> So you are suggesting to toggle off the CSR_HVIEN bit for overflow interrupt
 
-Conventionally, it should be named to trace.h, especially if only one. Refer to 
-other arch's.
+Yeah, this is what I was thinking.
 
+> or do more granular disabling for privilege mode filtering in SBI PMU as
+> well.
+> 
+> Beyond that we can't disable SBI PMU. Is that okay ? A guest can still cause
+> counter overflow and interrupt the host. However, the guest won't get any
+> interrupt as hvien is not set.
+> 
+> It can also still filter the events as that is tied with SBI PMU.
+> 
+> We can put more granular checks in SBI pmu but I am just wondering if it
+> provides anything additional beyond just disabling the sscofpmf in device
+> tree.
+
+If it's too much of a code burden for something we're unlikely going to
+want to do for anything other than debug (where removing the extension
+from the device tree is likely sufficient), then that's another reason to
+not allow disabling. Maybe we should write a comment above
+kvm_riscv_vcpu_isa_disable_allowed which points how extensions end up
+there, i.e. either KVM is powerless to completely hide it or we don't
+want to maintain KVM code to completely hide it.
+
+Thanks,
+drew
 
