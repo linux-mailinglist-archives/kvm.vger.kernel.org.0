@@ -1,100 +1,136 @@
-Return-Path: <kvm+bounces-14107-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14108-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6160689EF1E
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 11:49:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDD2589EF3C
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 11:53:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9324B1C20FC6
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 09:49:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D9271F21C04
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 09:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F31156C69;
-	Wed, 10 Apr 2024 09:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FE315749C;
+	Wed, 10 Apr 2024 09:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FuyqxwlZ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="j1KKqWsG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639D615539F
-	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 09:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF8E156C67;
+	Wed, 10 Apr 2024 09:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712742563; cv=none; b=l0Qjx006Ve1A6LzsqxBvnCtr5sa4KZHxbr/1HVFymE8FAPzxHtQ5lXn5euD0028mBKOH8nlEBNerX8InfvABgSq+3phGINmF1NOiyxlcGAU0HMs1masO8Y0RBdYEauBjwIo8B+gNtqvMjfvylFtn75n0Vpccpu3jvUpOqYSN8No=
+	t=1712742775; cv=none; b=YBtAdjsF+Nov/1Q16HS/S3TQLxYMzkM6y+mJwmGOJW1Jf9zC8nJ0bWgLEVmQqBNkzpn44G/XB3El6HCnBdirkh6yRtIZiU5mb0I9K+8WTfJesLYaae3UxFFFBNo5seN3AmaTR9AAei7/2h8scfc19TzXfucuO8PStjby+H/Y7Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712742563; c=relaxed/simple;
-	bh=RkHH0iLbzoCrO+c/gbICO72stmkMKrxoynN522dPhus=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=K5loIDQvWG+oSEd9aY4xqsDBjgVBfpkK4sL6l5rYqvQRLhSUv8DusEN5azDd9gR6aHp2yXbAzCkYZ6deTlNpZQWGEG8U2/aH/b4PqcrElxFrnTS9Vy3qGN/mJc304S4iE8ryhS3r+ifdyd1GHDeHwoh8+3omZnSbnz092YankaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FuyqxwlZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E2DBCC43399
-	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 09:49:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712742562;
-	bh=RkHH0iLbzoCrO+c/gbICO72stmkMKrxoynN522dPhus=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=FuyqxwlZc1SANZm5WZL6Y+SSGv/HejzICuwEk2kltniel3+KmLLYVQQ1627gflp9G
-	 CEGk7rOJuvWIuOx0X06LuemILStq1L+/fq2kVwT8Z06EsAznqbSHvGxhENPAt49Xjv
-	 CdjzbE8y0LnDF3s5ZJoOlMYt+QhiBLMwy9UKqn0HXqukv4LAjBK7oLp4O3jPXdPQny
-	 UZ01Pa5Cy0ntLmD+k5UhO6VLI+Zxl8Bc4k/nveQgaUnrcdZdIMxrZEeWn0FblRE2Ah
-	 ORahUZOR0HFWxHBP1lRamNtdiBoyi+X4Pvj3I9IP5SOs4DV7h63Ms+vhFsuZPom2O6
-	 HGMRFZ3Hzv/jA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id CA857C4332E; Wed, 10 Apr 2024 09:49:22 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218698] Kernel panic on adding vCPU to guest in Linux 6.9-rc2
-Date: Wed, 10 Apr 2024 09:49:22 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status component assigned_to product
- cf_regression short_desc
-Message-ID: <bug-218698-28872-v38ZQNpxxs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218698-28872@https.bugzilla.kernel.org/>
-References: <bug-218698-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1712742775; c=relaxed/simple;
+	bh=ALOoJxUUYtcFrIKDN0P9vAhj1e860/PKGwkGEawya54=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=upn/Ybnk8x4QMmlSyk8bXGQvFl/OHuA0IoOSoHJ9s23YyQKbZ9Ss9qUSXg/RxFBGZL4W+yGVZ8sQBX9AWV9S2cIr/6oosAtIMFHoe1zQS7WmKMtD9m2k12fcS+5W0shOhsmCHiCZYHltzgGbybCKVUrNIlRRUrNV0X2q2v34N1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=j1KKqWsG; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712742773; x=1744278773;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=sPon1mXI+9ynIGKH9frtzwF2RXP9ZgEapOTvbd3zMzg=;
+  b=j1KKqWsGPHdhu+wiQzgdEdyRiu/xEjWD9lU6wI3Nh9vwL8I/zb7IvL4e
+   tLc+OKtU/JL4L165vrOJJbP0Tn0ypW4/eoMcsd+lB1UMa1qMWBvcdzD9L
+   9fErvf7kobcLz2LlVAmlgjp1kqo8NXLEXEjIyyiGlOmEGA/6mgeul6F0Q
+   E=;
+X-IronPort-AV: E=Sophos;i="6.07,190,1708387200"; 
+   d="scan'208";a="80126940"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 09:52:50 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:58373]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.47.234:2525] with esmtp (Farcaster)
+ id 693a12aa-a827-4eff-bc1b-4460d40d8f1c; Wed, 10 Apr 2024 09:52:50 +0000 (UTC)
+X-Farcaster-Flow-ID: 693a12aa-a827-4eff-bc1b-4460d40d8f1c
+Received: from EX19D033EUC001.ant.amazon.com (10.252.61.132) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 10 Apr 2024 09:52:49 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19D033EUC001.ant.amazon.com (10.252.61.132) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 10 Apr 2024 09:52:49 +0000
+Received: from dev-dsk-jalliste-1c-e3349c3e.eu-west-1.amazon.com
+ (10.13.244.142) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28 via Frontend Transport; Wed, 10 Apr 2024 09:52:48 +0000
+From: Jack Allister <jalliste@amazon.com>
+To: <jalliste@amazon.com>
+CC: <bp@alien8.de>, <corbet@lwn.net>, <dave.hansen@linux.intel.com>,
+	<dwmw2@infradead.org>, <hpa@zytor.com>, <kvm@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<mingo@redhat.com>, <paul@xen.org>, <pbonzini@redhat.com>,
+	<seanjc@google.com>, <tglx@linutronix.de>, <x86@kernel.org>
+Subject: [PATCH v2 0/2] Add API for accurate KVM/PV clock migration
+Date: Wed, 10 Apr 2024 09:52:42 +0000
+Message-ID: <20240410095244.77109-1-jalliste@amazon.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20240408220705.7637-1-jalliste@amazon.com>
+References: <20240408220705.7637-1-jalliste@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218698
+Guest VMs can be provided with a para-virtualized clock source to
+perform timekeeping. A KVM guest can map in a PV clock via the
+MSR_KVM_SYSTEM_TIME/MSR_KVM_SYSTEM_TIME_NEW virtualized MSRs.
+Where as on a Xen guest this can be provided via the vcpu/shared
+info pages.
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+These PV clocks both use a common structure which is mapped between
+host <-> guest to provide the PVTI (paravirtual time information)
+for the clock. This reference information is a guest TSC timestamp
+and a host system time at a singular point in time.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |NEEDINFO
-          Component|Kernel                      |kvm
-           Assignee|linux-kernel@kernel-bugs.ke |virtualization_kvm@kernel-b
-                   |rnel.org                    |ugs.osdl.org
-            Product|Linux                       |Virtualization
-         Regression|No                          |Yes
-            Summary|Guest happens Call Trace    |Kernel panic on adding vCPU
-                   |when adding vCPU to guest   |to guest in Linux 6.9-rc2
+Upon a live-update of a host or live-migration of an instance the
+PVTI may be recalculated by KVM. Using the existing KVM_[GS]ET_CLOCK
+functionality the relationship between the TSC and PV clock cannot
+be precisely saved and restored by userspace.
 
---=20
-You may reply to this email to add a comment.
+This series adds in two patches, one to add in a new interface to
+allow a VMM/userspace to perform a correction of the PVTI structure.
+Then a second to verify the imprecision after a simulation of a
+live-update/migration and then to verify the correction is to within
+±1ns.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+v1: https://lore.kernel.org/all/20240408220705.7637-1-jalliste@amazon.com/
+
+v2:
+- Moved new IOCTLs from vm to vcpu level.
+- Adds extra error checks as suggested by Dongli Zhang / David Woodhouse.
+- Adds on-demand calculation of PVTI if non currently present in vcpu.
+- Adds proper synchronization for PV clock during correction.
+- Added option to test without TSC scaling in sefltest.
+- Updated commit messages to better explain the situation (thanks David).
+
+
+Jack Allister (2):
+  KVM: x86: Add KVM_[GS]ET_CLOCK_GUEST for accurate KVM clock migration
+  KVM: selftests: Add KVM/PV clock selftest to prove timer correction
+
+ Documentation/virt/kvm/api.rst                |  37 ++++
+ arch/x86/kvm/x86.c                            | 124 +++++++++++
+ include/uapi/linux/kvm.h                      |   3 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/pvclock_test.c       | 192 ++++++++++++++++++
+ 5 files changed, 357 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/pvclock_test.c
+
+
+base-commit: 8cb4a9a82b21623dbb4b3051dd30d98356cf95bc
+-- 
+2.40.1
+
 
