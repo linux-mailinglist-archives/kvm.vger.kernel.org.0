@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-14131-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14132-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FE0F89FA0D
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 16:38:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F348A89FA0F
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 16:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 165AC285821
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 14:38:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 939F91F28562
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 14:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DEA174ED8;
-	Wed, 10 Apr 2024 14:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB18717554D;
+	Wed, 10 Apr 2024 14:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IPddA6Np"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XmFiC3Tc"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FD1172BCE;
-	Wed, 10 Apr 2024 14:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AD716E866;
+	Wed, 10 Apr 2024 14:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712759756; cv=none; b=CgyB48gMke24GJHz33ZLHUmmosWrfGkITv+NXTD3rQk+KXLVeOykFheLuFf2RW0WJjwbbYX3rnfeRUy13GTbMUbJkSFSWaEHaXcAJ3VPrFtaOyVOdEN1GQWxHEkbHw6FIB61kzhgtX80CKJIKWDs1TFB92fCxQ1+07e70S2xyIE=
+	t=1712759760; cv=none; b=laMTsSDdgIsh6jAU8ORn9uh3RagirLGxOdfv+zDQ0uyolOeYnnu5MwYWxepRTEvstNRtoKlEViJFkxys7IbysuyuWN72UoAjF0nfS7lEr4AKRkB6aYyJrnqDuUJPoob1VgtspJNcXJt8ieCgeLb/IVISvF9GKF02hM/GdExG8xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712759756; c=relaxed/simple;
-	bh=HgvR740LxRCUJlie9YdeYMqkDa7fqKR6D+8llY0+tM0=;
+	s=arc-20240116; t=1712759760; c=relaxed/simple;
+	bh=jdPSsyHlYjQqP3LARjfkhXrm0nOtLrLPubyWHx7h94Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f9ItiHSffhbmZ9/g8iuITCpCmWkem0kY1TBvOHznhehAZfPUvWHfCEK60KeqkwFnLWnjayt3mSrkNd+mtrVj0BqeHJc4KyrTsk3rYbCbYz7In4EPlhEdmo+LmATtHivUBoaVmLKDJlMjwna94L3ddVeSgiMS2U0SCQPCyhUCLio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IPddA6Np; arc=none smtp.client-ip=192.198.163.9
+	 MIME-Version; b=RNnhfhnqamQL+aqhnly/8BOLEqZ/dlQT7w/PhfdYSEPcR13gfSOlfTK7ivhDAWqfMIoeaII65MW3ROsZw3/EpaieUpW7JpMcWyE4hk2vZq3z6QEAp+ZN5Vo8yirbvCDQ261X8RE2dFmc72ILvs+Z9a04XlzNffQlsYrc9EfLa0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XmFiC3Tc; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712759755; x=1744295755;
+  t=1712759759; x=1744295759;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HgvR740LxRCUJlie9YdeYMqkDa7fqKR6D+8llY0+tM0=;
-  b=IPddA6Np+SnL+0F33+DzVl7Sm88buQQN8rW/d0DzqPo6NM2M1m52UhDh
-   nO3drCNUfvD1BECC+J39adKRY62AztmX4TdboKZ3NPriod+Pt+DrJ3YZ9
-   Tgjia91pKLaJhyC+tzxVMq/af/llhYFTd9JM8IBGf3GsAI2zDIjQU0ifv
-   5y71wqMvBaUfj/J7dXjY7+DuKhYytSbYzESZVcHosO8x3+cXl2yHoD5Kh
-   uYsVJOVUIe5pYDtH6L9qCZFTvx9nn+4svk5am0qNtZr7qJVKuHttuoaH2
-   8eyKo0V13p8szTqjms1eNg+mt+atKgTsjvVqB8dTDunidPWsWhA6sT27t
+  bh=jdPSsyHlYjQqP3LARjfkhXrm0nOtLrLPubyWHx7h94Y=;
+  b=XmFiC3TcBibFRjA9UD6g45iNiggWM8qBMJ2i8A8jwe7L7daZ0af2c2Aa
+   hwltAeeOif4/LAQ1rmCgM2SggJUN9E1P8oFfbkh3fALypTOPwx3NK5Zsa
+   eBr2IQL1Z23+QG/ItT++9lkBgrkzAULcQ4FZOFQQXXtWEaywrD885jV7f
+   3wGhEYQSZvdct/EAtn3Fto8dujMMwnFwfvj250OYJMO/7LAC11c3/fOib
+   tlYjmewzcrqEXCGNUuP4PldRxroDxpvCcAIXKM7Fnh/irtEh94apE23X8
+   gHzn9wBb/4OdUAj27mR/KATebbM5ZBm76YV2aVd/6sTfpTR7JOFOs3uRZ
    w==;
-X-CSE-ConnectionGUID: JEw0mznOQS+vLEhqa+RWMA==
-X-CSE-MsgGUID: eLCmGC8TT5+90CsveZ/OEA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="18837860"
+X-CSE-ConnectionGUID: T3km9xF1QYezFYtReetSkw==
+X-CSE-MsgGUID: QcDcbAA+RdS6tik/kdnAeg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="18837881"
 X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="18837860"
+   d="scan'208";a="18837881"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 07:35:55 -0700
-X-CSE-ConnectionGUID: TaxPF401TvehjmbDKiCEZw==
-X-CSE-MsgGUID: mdyfOuIcRpibXS+34hvRXg==
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 07:35:58 -0700
+X-CSE-ConnectionGUID: aRgrC8THQLWC3UotmZwHqQ==
+X-CSE-MsgGUID: ip7l6a3QS3mvJd0R5CfSmg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="25095564"
+   d="scan'208";a="25095588"
 Received: from unknown (HELO spr.sh.intel.com) ([10.239.53.118])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 07:35:51 -0700
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 07:35:55 -0700
 From: Chao Gao <chao.gao@intel.com>
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: daniel.sneddon@linux.intel.com,
 	pawan.kumar.gupta@linux.intel.com,
-	Zhang Chen <chen.zhang@intel.com>,
 	Chao Gao <chao.gao@intel.com>,
+	Zhang Chen <chen.zhang@intel.com>,
 	Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
@@ -73,9 +73,9 @@ Cc: daniel.sneddon@linux.intel.com,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	x86@kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH v3 09/10] KVM: VMX: Advertise MITI_CTRL_BHB_CLEAR_SEQ_S_SUPPORT
-Date: Wed, 10 Apr 2024 22:34:37 +0800
-Message-Id: <20240410143446.797262-10-chao.gao@intel.com>
+Subject: [RFC PATCH v3 10/10] KVM: VMX: Advertise MITI_ENUM_RETPOLINE_S_SUPPORT
+Date: Wed, 10 Apr 2024 22:34:38 +0800
+Message-Id: <20240410143446.797262-11-chao.gao@intel.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20240410143446.797262-1-chao.gao@intel.com>
 References: <20240410143446.797262-1-chao.gao@intel.com>
@@ -87,75 +87,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Zhang Chen <chen.zhang@intel.com>
+Allow guest to report if retpoline is used in supervisor mode.
 
-Allow guest to report if the short BHB-clearing sequence is in use.
-
-KVM will deploy BHI_DIS_S for the guest if the short BHB-clearing
-sequence is in use and the processor doesn't enumerate BHI_NO.
+KVM will deploy RRSBA_DIS_S for guest if guest is using retpoline and
+the processor enumerates RRSBA.
 
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 31 ++++++++++++++++++++++++++++---
- 1 file changed, 28 insertions(+), 3 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index cc260b14f8df..c5ceaebd954b 100644
+index c5ceaebd954b..235cb6ad69c0 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1956,8 +1956,8 @@ static inline bool is_vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
+@@ -1956,8 +1956,10 @@ static inline bool is_vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
  }
  
  #define VIRTUAL_ENUMERATION_VALID_BITS	VIRT_ENUM_MITIGATION_CTRL_SUPPORT
--#define MITI_ENUM_VALID_BITS		0ULL
--#define MITI_CTRL_VALID_BITS		0ULL
-+#define MITI_ENUM_VALID_BITS		MITI_ENUM_BHB_CLEAR_SEQ_S_SUPPORT
-+#define MITI_CTRL_VALID_BITS		MITI_CTRL_BHB_CLEAR_SEQ_S_USED
+-#define MITI_ENUM_VALID_BITS		MITI_ENUM_BHB_CLEAR_SEQ_S_SUPPORT
+-#define MITI_CTRL_VALID_BITS		MITI_CTRL_BHB_CLEAR_SEQ_S_USED
++#define MITI_ENUM_VALID_BITS		(MITI_ENUM_BHB_CLEAR_SEQ_S_SUPPORT | \
++					 MITI_ENUM_RETPOLINE_S_SUPPORT)
++#define MITI_CTRL_VALID_BITS		(MITI_CTRL_BHB_CLEAR_SEQ_S_USED | \
++					 MITI_CTRL_RETPOLINE_S_USED)
  
  static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
  {
-@@ -2204,7 +2204,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	struct vmx_uret_msr *msr;
- 	int ret = 0;
- 	u32 msr_index = msr_info->index;
--	u64 data = msr_info->data;
-+	u64 data = msr_info->data, spec_ctrl_mask = 0;
- 	u32 index;
- 
- 	switch (msr_index) {
-@@ -2508,6 +2508,31 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -2508,6 +2510,11 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
  		if (data & ~MITI_CTRL_VALID_BITS)
  			return 1;
  
-+		if (data & MITI_CTRL_BHB_CLEAR_SEQ_S_USED &&
-+		    kvm_cpu_cap_has(X86_FEATURE_BHI_CTRL) &&
-+		    !(host_arch_capabilities & ARCH_CAP_BHI_NO))
-+			spec_ctrl_mask |= SPEC_CTRL_BHI_DIS_S;
++		if (data & MITI_CTRL_RETPOLINE_S_USED &&
++		    kvm_cpu_cap_has(X86_FEATURE_RRSBA_CTRL) &&
++		    host_arch_capabilities & ARCH_CAP_RRSBA)
++			spec_ctrl_mask |= SPEC_CTRL_RRSBA_DIS_S;
 +
-+		/*
-+		 * Intercept IA32_SPEC_CTRL to disallow guest from changing
-+		 * certain bits if "virtualize IA32_SPEC_CTRL" isn't supported
-+		 * e.g., in nested case.
-+		 */
-+		if (spec_ctrl_mask && !cpu_has_spec_ctrl_shadow())
-+			vmx_enable_intercept_for_msr(vcpu, MSR_IA32_SPEC_CTRL, MSR_TYPE_RW);
-+
-+		/*
-+		 * KVM_CAP_FORCE_SPEC_CTRL takes precedence over
-+		 * MSR_VIRTUAL_MITIGATION_CTRL.
-+		 */
-+		spec_ctrl_mask &= ~vmx->vcpu.kvm->arch.force_spec_ctrl_mask;
-+
-+		vmx->force_spec_ctrl_mask = vmx->vcpu.kvm->arch.force_spec_ctrl_mask |
-+					    spec_ctrl_mask;
-+		vmx->force_spec_ctrl_value = vmx->vcpu.kvm->arch.force_spec_ctrl_value |
-+					    spec_ctrl_mask;
-+		vmx_set_spec_ctrl(&vmx->vcpu, vmx->spec_ctrl_shadow);
-+
- 		vmx->msr_virtual_mitigation_ctrl = data;
- 		break;
- 	default:
+ 		if (data & MITI_CTRL_BHB_CLEAR_SEQ_S_USED &&
+ 		    kvm_cpu_cap_has(X86_FEATURE_BHI_CTRL) &&
+ 		    !(host_arch_capabilities & ARCH_CAP_BHI_NO))
 -- 
 2.39.3
 
