@@ -1,105 +1,156 @@
-Return-Path: <kvm+bounces-14151-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14152-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21F4C89FF6A
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 20:08:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE6298A0116
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 22:13:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A385DB276C5
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 18:08:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9431C1F258B5
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 20:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF5317F39E;
-	Wed, 10 Apr 2024 18:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A60181CE9;
+	Wed, 10 Apr 2024 20:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gDJFOgFu"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="sXBQMsjo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D14017BB39
-	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 18:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BE031A60;
+	Wed, 10 Apr 2024 20:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712772497; cv=none; b=pQMmzGfujZdCylk5TwL9RfIWtGVTGq1Prq+/PlmVFzT+ppdYSV5I30u1GrPZqNPXqh+Xkj8mc4w/CdRuU1cSsDcHlWAvvYppViF4UTZuGnme0oxkm8ckWqBNVAzvLeMqk2CJNEL2InOcpxWK29Dijc10q+5O0NSlBfOxDqKCHWs=
+	t=1712779974; cv=none; b=ZhMlO+6johCTf1xfvww4gelfZUBCUV0T+t39ohpSuBr5pJ7xkUjE3ONPfB0PCAyI+dSjoO6YMkiCbICN07xuFdviKYS1Z7x41ZHBLkvTlPTAvorPKVTAIsA2P/3NIfK4yiQi4YOrlyE42j9A0i72QO24jFfaLbNiP55iCww1AYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712772497; c=relaxed/simple;
-	bh=tlQOUyqwZCCGO+a0LSWUCAzWINcC2ww3/hTkEPpmXDw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qnqTVm/nabDNhuGWG+7K0pLtuqRtIGkG6suDKDfyFV5/5QGK5z09xXqaPrpJARAX/FfvksgBo7lwBr7oW6TZkAmjlgsDvd829uDnTuD9/6mt4dXa/3BwXttEyeVQfzTI4toG6CFykajHQtf3aIeELVO/fqsxPdKzJfiuV9Bus3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gDJFOgFu; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-617fffab703so59103007b3.0
-        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 11:08:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712772495; x=1713377295; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZflpisHc+9oeh7nBvZbuK3Tx2t0csxEA3Vaxd3rpg8=;
-        b=gDJFOgFusBDMiA1Juc/151fTp4sFT1YWV7JGKwC7zKmzlPMAuCGVC0Rnydux/66hzQ
-         URP1hA7C4828z1qAIXClSfq6XwMAnkvDMavbvQmf0CiVYPrffZBSHM5Qw4kDJXcCVrR8
-         19gg51z071Nt6j2e0H5O8MmLS3nFOzsBjt1c4cNITR4ckofiUBTZVC6KSaFyMRPBeljR
-         MAAIninMOWGfvCyRs99N5Xnj7mJc0p7SEvwIqyUC+lwqZXezeoVnCIHCAPZ+5Etfwvsp
-         ZfVcCEns/vMzeDaJ0B7XehHVGaODZ2dxUJxeRx4cg3afSQ1LnqQsv6gVk8Ft3PupZcOp
-         c6yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712772495; x=1713377295;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZflpisHc+9oeh7nBvZbuK3Tx2t0csxEA3Vaxd3rpg8=;
-        b=RNeCJtpgvkZgDnFwCEv8OslpNpFR8aG0BwJicv870XsyMkSeCUOEE3TN6lJcBsm0tX
-         y+qK+Of2Eyg25dUgtdGbP2vPlf3o8vtp5aAma9WdlMcT3f9CB9obV91S3YQ03ZxVO4/W
-         S2Bx+CqHFA2X3qSLk7xweNbNB1nDx82MnSR/pdL9zzmiY0u1t1a6yFXnKRu/vkakQHNh
-         TVTkecvCnS1GKFTxdXOJDmDsAGsS+tfnC9iMXtrZ+K68aOCDqlrf4pUnLYmkr/MK7NtZ
-         J0uhMAjnYw3Vs6UmhuGShekZEYpIIzJZX+IsippM1DTXvlDhXaiE+UOqmWEmTSGE9mRP
-         2mRA==
-X-Forwarded-Encrypted: i=1; AJvYcCUP7trPPQwejsZEtV74HocO9VqYnSj4Cmrc6+3JU7B6nRSg93Wqn7NsOT5J8Ej9SPTxpq4ACaIkC9x1nBAzCmzdVLEM
-X-Gm-Message-State: AOJu0YztDGHMSa2srh6GBg9djTiAnSNNNB1oLdfO1DuOJYI1PQ2meG6l
-	DpI2eKAT93b+hxHN0G+DAnO33MgsLpirMQaO8LcZLWnUbBnOHNl0mPpnmxDFhZVAthsFrypIIEi
-	l0g==
-X-Google-Smtp-Source: AGHT+IFhos74HCvbkwq8iBv8vYHsZl4wRFyLhDRmwIqukp0Eu+fKSsgjADRfj3OZlGVnDlRBwuYnPN82INw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:10c3:b0:de1:21b4:76a5 with SMTP id
- w3-20020a05690210c300b00de121b476a5mr290201ybu.13.1712772495155; Wed, 10 Apr
- 2024 11:08:15 -0700 (PDT)
-Date: Wed, 10 Apr 2024 11:08:13 -0700
-In-Reply-To: <20240410155527.474777-3-david@redhat.com>
+	s=arc-20240116; t=1712779974; c=relaxed/simple;
+	bh=bKXTwEG9V/7gGFzi/nyfEqGiaBgclvN4MQublr5sz80=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=SCSERQU/MvL99EzH/D5Ot8N55qLRUWvoJ3Lj17jmK5Jh3RGcodpD7VcORNSIKJ3jBe7/Nl1igjRD5IG5Dh4I2QTz9nG80uOW0jHNs9MDiigSrY/cEUgwET6vOZoXq/Hsq8hcRiDK2PZp0j+3C9ujuy9jqkQuAcU7cTi7+rYbFLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=sXBQMsjo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E20D2C433F1;
+	Wed, 10 Apr 2024 20:12:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1712779973;
+	bh=bKXTwEG9V/7gGFzi/nyfEqGiaBgclvN4MQublr5sz80=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sXBQMsjoj5uKsr9LmT+OooLDlwYt4YcTHKM6vzXBNrCG67rEEi7TQ0JN6rZ0WY8hn
+	 vd+WikGTb95drIxuerlIJJsUEPwInCKguinDAK3geNfIlKkGVTtrHZzqT+atKs2XkF
+	 /8T8Y1KtIpOeTdFjZLGaNwKYWKzWq/s5npDtdbmg=
+Date: Wed, 10 Apr 2024 13:12:52 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ linux-s390@vger.kernel.org, kvm@vger.kernel.org, Yonghua Huang
+ <yonghua.huang@intel.com>, Fei Li <fei1.li@intel.com>, Christoph Hellwig
+ <hch@lst.de>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko
+ Carstens <hca@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>, Alex
+ Williamson <alex.williamson@redhat.com>, Paolo Bonzini
+ <pbonzini@redhat.com>
+Subject: Re: [PATCH v1 1/3] drivers/virt/acrn: fix PFNMAP PTE checks in
+ acrn_vm_ram_map()
+Message-Id: <20240410131252.3ff0e92cfeccc4435bcdcdd2@linux-foundation.org>
+In-Reply-To: <20240410155527.474777-2-david@redhat.com>
+References: <20240410155527.474777-1-david@redhat.com>
+	<20240410155527.474777-2-david@redhat.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240410155527.474777-1-david@redhat.com> <20240410155527.474777-3-david@redhat.com>
-Message-ID: <ZhbVjVRoa70IwgfA@google.com>
-Subject: Re: [PATCH v1 2/3] mm: pass VMA instead of MM to follow_pte()
-From: Sean Christopherson <seanjc@google.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org, 
-	linux-s390@vger.kernel.org, kvm@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, Yonghua Huang <yonghua.huang@intel.com>, 
-	Fei Li <fei1.li@intel.com>, Christoph Hellwig <hch@lst.de>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Ingo Molnar <mingo@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 10, 2024, David Hildenbrand wrote:
-> ... and centralize the VM_IO/VM_PFNMAP sanity check in there. We'll
-> now also perform these sanity checks for direct follow_pte()
-> invocations.
+On Wed, 10 Apr 2024 17:55:25 +0200 David Hildenbrand <david@redhat.com> wrote:
 
-Nice!
-
-> For generic_access_phys(), we might now check multiple times: nothing to
-> worry about, really.
+> We currently miss to handle various cases, resulting in a dangerous
+> follow_pte() (previously follow_pfn()) usage.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
+> (1) We're not checking PTE write permissions.
+> 
+> Maybe we should simply always require pte_write() like we do for
+> pin_user_pages_fast(FOLL_WRITE)? Hard to tell, so let's check for
+> ACRN_MEM_ACCESS_WRITE for now.
+> 
+> (2) We're not rejecting refcounted pages.
+> 
+> As we are not using MMU notifiers, messing with refcounted pages is
+> dangerous and can result in use-after-free. Let's make sure to reject them.
+> 
+> (3) We are only looking at the first PTE of a bigger range.
+> 
+> We only lookup a single PTE, but memmap->len may span a larger area.
+> Let's loop over all involved PTEs and make sure the PFN range is
+> actually contiguous. Reject everything else: it couldn't have worked
+> either way, and rather made use access PFNs we shouldn't be accessing.
+> 
 
-For KVM, a very hearty
+This all sounds rather nasty and the maintainers of this driver may
+choose to turn your fixes into something suitable for current mainline
+and for -stable backporting.
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+If they choose to do this then please just go ahead.  Once such a
+change appear in linux-next the mm-unstable patch "virt: acrn: stop
+using follow_pfn" will start generating rejects, which will be easy
+enough to handle.  Of they may choose to incorporate that change at the
+same time.  Here it is:
+
+
+From: Christoph Hellwig <hch@lst.de>
+Subject: virt: acrn: stop using follow_pfn
+Date: Mon, 25 Mar 2024 07:45:40 +0800
+
+Switch from follow_pfn to follow_pte so that we can get rid of follow_pfn.
+Note that this doesn't fix any of the pre-existing raciness and lack of
+permission checking in the code.
+
+Link: https://lkml.kernel.org/r/20240324234542.2038726-1-hch@lst.de
+Link: https://lkml.kernel.org/r/20240324234542.2038726-2-hch@lst.de
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Fei Li <fei1.li@intel.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Ingo Molnar <mingo@kernel.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+---
+
+ drivers/virt/acrn/mm.c |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+--- a/drivers/virt/acrn/mm.c~virt-acrn-stop-using-follow_pfn
++++ a/drivers/virt/acrn/mm.c
+@@ -172,18 +172,24 @@ int acrn_vm_ram_map(struct acrn_vm *vm,
+ 	mmap_read_lock(current->mm);
+ 	vma = vma_lookup(current->mm, memmap->vma_base);
+ 	if (vma && ((vma->vm_flags & VM_PFNMAP) != 0)) {
++		spinlock_t *ptl;
++		pte_t *ptep;
++
+ 		if ((memmap->vma_base + memmap->len) > vma->vm_end) {
+ 			mmap_read_unlock(current->mm);
+ 			return -EINVAL;
+ 		}
+ 
+-		ret = follow_pfn(vma, memmap->vma_base, &pfn);
+-		mmap_read_unlock(current->mm);
++		ret = follow_pte(vma->vm_mm, memmap->vma_base, &ptep, &ptl);
+ 		if (ret < 0) {
++			mmap_read_unlock(current->mm);
+ 			dev_dbg(acrn_dev.this_device,
+ 				"Failed to lookup PFN at VMA:%pK.\n", (void *)memmap->vma_base);
+ 			return ret;
+ 		}
++		pfn = pte_pfn(ptep_get(ptep));
++		pte_unmap_unlock(ptep, ptl);
++		mmap_read_unlock(current->mm);
+ 
+ 		return acrn_mm_region_add(vm, memmap->user_vm_pa,
+ 			 PFN_PHYS(pfn), memmap->len,
+_
+
 
