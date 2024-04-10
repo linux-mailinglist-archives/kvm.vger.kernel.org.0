@@ -1,188 +1,105 @@
-Return-Path: <kvm+bounces-14150-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14151-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 474FF89FF33
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 19:55:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21F4C89FF6A
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 20:08:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC1281F27860
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 17:55:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A385DB276C5
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 18:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C930017F39E;
-	Wed, 10 Apr 2024 17:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF5317F39E;
+	Wed, 10 Apr 2024 18:08:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NjN/qLo+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gDJFOgFu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874A117F385
-	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 17:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D14017BB39
+	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 18:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712771721; cv=none; b=TKqhJd2LvTaoUyeqEWwkEu63mOJJl34iR2XhEXJhUbU+M8LYRdydgjWnRv/ehu45ESSTdITASeznU8JHwlOLv/9g7rbkocy7JINaIzR4Rs+RdM0wwb84J6fwXh9mNjxlcWcuujfwLzTh2UibYdjWB0kwrSwJg3zG+AYuhokI/qk=
+	t=1712772497; cv=none; b=pQMmzGfujZdCylk5TwL9RfIWtGVTGq1Prq+/PlmVFzT+ppdYSV5I30u1GrPZqNPXqh+Xkj8mc4w/CdRuU1cSsDcHlWAvvYppViF4UTZuGnme0oxkm8ckWqBNVAzvLeMqk2CJNEL2InOcpxWK29Dijc10q+5O0NSlBfOxDqKCHWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712771721; c=relaxed/simple;
-	bh=c5vOu3wln/bzFkI50zK54TLDDdF576q5OSt+R4RYCW0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JBrjh/zH6tyC/cPR5WEeEDBMdYveVXlll12SbRzTZsYPLFkZ0/AXC/qpYHU/wQCN0QayZE6YUcQ9cPP0urhixhM10g33evPN71fzNvSP5Y3gtrum6aHgwd7Pi0Sgqc4bd4u5QAdskXa9wc3GIwx/Wya5zEUwMvaWwzoWbeSGXWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NjN/qLo+; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1712772497; c=relaxed/simple;
+	bh=tlQOUyqwZCCGO+a0LSWUCAzWINcC2ww3/hTkEPpmXDw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qnqTVm/nabDNhuGWG+7K0pLtuqRtIGkG6suDKDfyFV5/5QGK5z09xXqaPrpJARAX/FfvksgBo7lwBr7oW6TZkAmjlgsDvd829uDnTuD9/6mt4dXa/3BwXttEyeVQfzTI4toG6CFykajHQtf3aIeELVO/fqsxPdKzJfiuV9Bus3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gDJFOgFu; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60ab69a9e6fso1224417b3.0
-        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 10:55:19 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-617fffab703so59103007b3.0
+        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 11:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712771718; x=1713376518; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oTRds48YQAuzki9smTU0zbOfJX16SMcTfKd42zPqGTw=;
-        b=NjN/qLo+8P4Ap71VpMAba/PrNVkDASi5njcnBqX0uUTk3wi1eVRMkoCmBsqzwaUb0M
-         hlD+OdgY5qbavZHavTXev59BojFGj0Oz1Myv7wEOGykrx6Qu8YekKG11yNiLsPiOJFOX
-         SjQ0wJhfb5vblmXhXN159ObhMthOTHRPkQJqFd00G6Z0RgLxOfmjyj+5yguRJ3su1cYf
-         fFZeMx8ZcLrZ9O35KLZKnUJUZM0PFWQrafA7OAp3u+IepSTcg6/oI/4H4kYeNlqEmZPG
-         jq5WVf1CQvYXGeRN8bWmSIXr4Iu08Q9bZUmmE2PCKSF9TBJ0p+btW6Nmlts02+uqqRKV
-         EJAw==
+        d=google.com; s=20230601; t=1712772495; x=1713377295; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xZflpisHc+9oeh7nBvZbuK3Tx2t0csxEA3Vaxd3rpg8=;
+        b=gDJFOgFusBDMiA1Juc/151fTp4sFT1YWV7JGKwC7zKmzlPMAuCGVC0Rnydux/66hzQ
+         URP1hA7C4828z1qAIXClSfq6XwMAnkvDMavbvQmf0CiVYPrffZBSHM5Qw4kDJXcCVrR8
+         19gg51z071Nt6j2e0H5O8MmLS3nFOzsBjt1c4cNITR4ckofiUBTZVC6KSaFyMRPBeljR
+         MAAIninMOWGfvCyRs99N5Xnj7mJc0p7SEvwIqyUC+lwqZXezeoVnCIHCAPZ+5Etfwvsp
+         ZfVcCEns/vMzeDaJ0B7XehHVGaODZ2dxUJxeRx4cg3afSQ1LnqQsv6gVk8Ft3PupZcOp
+         c6yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712771718; x=1713376518;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oTRds48YQAuzki9smTU0zbOfJX16SMcTfKd42zPqGTw=;
-        b=Oli9m0qZjBTxxAvmIXcgGXGF0D5PYuGtjLFb+kuA967whKblY5D4/r/YrQjXppzseC
-         n4RXJxXFuzTLhQdLTXOEFHlJMuipjO7qa1Os/RJqkXgPo5GJVCoW3Ad6ii59EfjF7enB
-         kUbW9+8ltF+RYWgEDfRqw4g2pQ9bORmEsCY03VwcF32YpT7G8WWgCo4n+xQZFUahxuu7
-         pU9LlzklxECfFsEA0KRHJ99QaaA4Pnd40HvE+3FFoebQzwww69KNiVnZ/9lwfhz9O4y/
-         AA0HqT9XsZbaIJo6SdjyZlSxlWaGnC9QtLlWBxSqmY+Kx3Lj6Q6iFA7W1n+AAf6MvzDt
-         Au1Q==
-X-Gm-Message-State: AOJu0Yygme9TOMdbOn72rVB2pOfbT0DD1zh5hvF1wQmhWfjhCfO/Lk46
-	B4FW/7vONF2HEucyUqFvLUmOEeBm+pb9c+nU8rQCxeqB19B6J/Zh6cbHHmaHtBayFl/piZmhiyL
-	A/mwAUhLxectcbBFkQj6fF0IxPvl44Uo3+i9OIW9GuqoY4uwzrcT7F6Nb3UD9sINV/pKRKfgICp
-	fSgi5ZJGZDd/fcQlnpeIKBNjUKEnYvF2VlEDaJBACFX0UJCX/YegvGtV4=
-X-Google-Smtp-Source: AGHT+IFGk/yictiXP/bmh1HJDKurTfI9OfoF/LDokYTgZALVerLy33LdKx5oD0s+3wIFHKHy3OTGRtA6WddrXew0Eg==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6902:1148:b0:dd9:20c1:85b6 with
- SMTP id p8-20020a056902114800b00dd920c185b6mr109753ybu.2.1712771718281; Wed,
- 10 Apr 2024 10:55:18 -0700 (PDT)
-Date: Wed, 10 Apr 2024 17:54:37 +0000
+        d=1e100.net; s=20230601; t=1712772495; x=1713377295;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xZflpisHc+9oeh7nBvZbuK3Tx2t0csxEA3Vaxd3rpg8=;
+        b=RNeCJtpgvkZgDnFwCEv8OslpNpFR8aG0BwJicv870XsyMkSeCUOEE3TN6lJcBsm0tX
+         y+qK+Of2Eyg25dUgtdGbP2vPlf3o8vtp5aAma9WdlMcT3f9CB9obV91S3YQ03ZxVO4/W
+         S2Bx+CqHFA2X3qSLk7xweNbNB1nDx82MnSR/pdL9zzmiY0u1t1a6yFXnKRu/vkakQHNh
+         TVTkecvCnS1GKFTxdXOJDmDsAGsS+tfnC9iMXtrZ+K68aOCDqlrf4pUnLYmkr/MK7NtZ
+         J0uhMAjnYw3Vs6UmhuGShekZEYpIIzJZX+IsippM1DTXvlDhXaiE+UOqmWEmTSGE9mRP
+         2mRA==
+X-Forwarded-Encrypted: i=1; AJvYcCUP7trPPQwejsZEtV74HocO9VqYnSj4Cmrc6+3JU7B6nRSg93Wqn7NsOT5J8Ej9SPTxpq4ACaIkC9x1nBAzCmzdVLEM
+X-Gm-Message-State: AOJu0YztDGHMSa2srh6GBg9djTiAnSNNNB1oLdfO1DuOJYI1PQ2meG6l
+	DpI2eKAT93b+hxHN0G+DAnO33MgsLpirMQaO8LcZLWnUbBnOHNl0mPpnmxDFhZVAthsFrypIIEi
+	l0g==
+X-Google-Smtp-Source: AGHT+IFhos74HCvbkwq8iBv8vYHsZl4wRFyLhDRmwIqukp0Eu+fKSsgjADRfj3OZlGVnDlRBwuYnPN82INw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c3:b0:de1:21b4:76a5 with SMTP id
+ w3-20020a05690210c300b00de121b476a5mr290201ybu.13.1712772495155; Wed, 10 Apr
+ 2024 11:08:15 -0700 (PDT)
+Date: Wed, 10 Apr 2024 11:08:13 -0700
+In-Reply-To: <20240410155527.474777-3-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240410175437.793508-1-coltonlewis@google.com>
-Subject: [PATCH v3] KVM: arm64: Add early_param to control WFx trapping
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20240410155527.474777-1-david@redhat.com> <20240410155527.474777-3-david@redhat.com>
+Message-ID: <ZhbVjVRoa70IwgfA@google.com>
+Subject: Re: [PATCH v1 2/3] mm: pass VMA instead of MM to follow_pte()
+From: Sean Christopherson <seanjc@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org, 
+	linux-s390@vger.kernel.org, kvm@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, Yonghua Huang <yonghua.huang@intel.com>, 
+	Fei Li <fei1.li@intel.com>, Christoph Hellwig <hch@lst.de>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Ingo Molnar <mingo@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Add an early_param to control WFx (WFI or WFE) trapping. This is so
-interrupts can be passed through if the CPU has support for direct
-interrupt injection, a feature of GICv4. This is described as an
-enumeration with three possible behaviors, always passthrough (never
-trap), never passthrough (always trap), or default (trap if more than
-one task is running. Default matches the current behavior.
+On Wed, Apr 10, 2024, David Hildenbrand wrote:
+> ... and centralize the VM_IO/VM_PFNMAP sanity check in there. We'll
+> now also perform these sanity checks for direct follow_pte()
+> invocations.
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
-v3:
-* Changed control mechanism to an early_param on Marc's advice this should be
-  a system level decision and not exposed via uapi
-* Reduced behavior to an enum from an integer as there are only a few options
-  that make logical sense
-* Limit option for always passthrough to systems with GICv4 since the primary
-  case for always passthrough is systems with direct interrupt injection
+Nice!
 
-v2:
-https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
+> For generic_access_phys(), we might now check multiple times: nothing to
+> worry about, really.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 
-v1:
-https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
+For KVM, a very hearty
 
-arch/arm64/include/asm/kvm_host.h |  7 +++++++
- arch/arm64/kvm/arm.c              | 30 +++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 21c57b812569..e9225b1d0e9b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -67,6 +67,13 @@ enum kvm_mode {
- 	KVM_MODE_NV,
- 	KVM_MODE_NONE,
- };
-+
-+enum kvm_interrupt_passthrough {
-+	KVM_INTERRUPT_PASSTHROUGH_DEFAULT,
-+	KVM_INTERRUPT_PASSTHROUGH_ALWAYS,
-+	KVM_INTERRUPT_PASSTHROUGH_NEVER,
-+};
-+
- #ifdef CONFIG_KVM
- enum kvm_mode kvm_get_mode(void);
- #else
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a25265aca432..5d0ea6b2c652 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -46,6 +46,7 @@
- #include <kvm/arm_psci.h>
-
- static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
-+static enum kvm_interrupt_passthrough kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
-
- DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
-
-@@ -456,7 +457,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
- 		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
-
--	if (single_task_running())
-+	if ((kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_ALWAYS
-+	     && kvm_vgic_global_state.has_gicv4) ||
-+	    (kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_DEFAULT
-+	     && single_task_running()))
- 		vcpu_clear_wfx_traps(vcpu);
- 	else
- 		vcpu_set_wfx_traps(vcpu);
-@@ -2654,6 +2658,30 @@ static int __init early_kvm_mode_cfg(char *arg)
- }
- early_param("kvm-arm.mode", early_kvm_mode_cfg);
-
-+static int __init early_kvm_interrupt_passthrough_cfg(char *arg)
-+{
-+	if (!arg)
-+		return -EINVAL;
-+
-+	if (strcmp(arg, "always") == 0) {
-+		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_ALWAYS;
-+		return 0;
-+	}
-+
-+	if (strcmp(arg, "never") == 0) {
-+		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_NEVER;
-+		return 0;
-+	}
-+
-+	if (strcmp(arg, "default") == 0) {
-+		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+early_param("kvm-arm.interrupt-passthrough", early_kvm_interrupt_passthrough_cfg);
-+
- enum kvm_mode kvm_get_mode(void)
- {
- 	return kvm_mode;
---
-2.44.0.478.gd926399ef9-goog
+Acked-by: Sean Christopherson <seanjc@google.com>
 
