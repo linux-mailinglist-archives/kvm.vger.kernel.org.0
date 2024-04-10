@@ -1,92 +1,150 @@
-Return-Path: <kvm+bounces-14079-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B64889ECBF
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 09:54:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27CD189ED1B
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 10:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D6F6282C12
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 07:54:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 592081C217AF
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 08:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EDE513D2BA;
-	Wed, 10 Apr 2024 07:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89DA13D500;
+	Wed, 10 Apr 2024 08:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="h1g6Sn7v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pk97KuT/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C62313D28B
-	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 07:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6647913D2B6
+	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 08:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712735685; cv=none; b=fSncI+20BnSpPRcn9D96Q+Y+rmLfNUvVpgYtJMSOFyxP1g9GCFxf9Zt58YH+w2RFK+GHbfwx6mq557oSF0TcvOxq713nGgTT8zvamQPVsvrOWsJNnaDbuod/1qlHdiZu3JU1YrtJEr1bns3Evfx+MALlMNU0+lVQwDQRg169uGw=
+	t=1712736168; cv=none; b=chlwZjn2Xrj00RZTm7erAnEKE8C2kKI8HBUkpNEWf3iAIRkj7SPNXbVYFYiSCY0JcW7R6TqBhPue2e6tB3d7XiP7QpemJWE2ASBEbOK/4Np7oQZUW3te6Cs1c23/0ZIT1Iai8VAIks9XieadRkYFGMC/Wbfq9kENURBVqeErUHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712735685; c=relaxed/simple;
-	bh=Jd2c0Gd5Zw/HS1VgNj6UNoKrZsDEbPpFbAV2PSqqRvA=;
+	s=arc-20240116; t=1712736168; c=relaxed/simple;
+	bh=d1PN1Hm45NhCEHeS1enwZRk3BBE6Kbx5SrWseLrZK54=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KA1gm+o7bVv0vF2L20izi6AGDb/82VLUCsC5sv+c+qfS+A6zEWTVm3U/QO1vnsZ0FpVHFB0io2bXpBQTRbpLdDdDCVK2AaIVDU2UO7CnNiQw29UKKWd7YnB5hBFyimDzMnuc0M0IcdNETt0b2zbH2YE8PndQWZVTxNBP88++yRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=h1g6Sn7v; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56e1baf0380so7328897a12.3
-        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 00:54:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1712735682; x=1713340482; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xT4TfO1sl44M/nt04uaJynnbnIHdAjwI3dACDF2EjZU=;
-        b=h1g6Sn7vovUYnFftOWYNTLp1UEaxGsxEGF70w9VdgXaQ31EktSCxeEsgiHXMQMeSfW
-         c5MBTI3xKWvIMDH48XoSSpIcNJzvXSGEOEQuNy5LLAxUyCGWR7xRSw/dN57Y3vg3kMYy
-         4Y/eI8s1fVqmDnlJ3sGg75ZRDBxGX/0COguZAu3ateC6VxKFCO1CDk720UExuSVrdZ/C
-         TqFNk7pSgp5Z7a31LPjSW5UFtFEAAjIxD4zKCrWFllw8FNTY2f6blVnGlaEAkpEgbznE
-         nhgaLAoiNFwn6z4iqF5Ew517ahVdmdra1iM2IsuHHyfqAUMEQ29m4d6c9k6OEeU4OxX4
-         IUWA==
+	 Content-Type:Content-Disposition:In-Reply-To; b=JUpY3a487p4TCwCINW/b7NJCuEQ1J0MT7EBpVaj+z+pNVurYE6daKPODLac1ToDeOGVkL4b6GpSKsPMqMOpcxfOhKhXCZFdHEfjBlgfE7+R0B1SzbTDhYdZv72f6930fSYq9PQpcOfgSnrO7eVEUUzZ6KgiZLG0Yv9nXGs0+M0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pk97KuT/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712736165;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DXu5GyWFLRYVVgKT/xx47xxPPvyqqTS3jJA/xlCkkm0=;
+	b=Pk97KuT/mE9r5AWVFdqO6INc6z4HesNnp8Eydu2oWb9B1SKZTBktWULMTV6CAv5WHqzYfb
+	lEV3l0VSl46VIecpkz+PButrh4dcw0SGAOKtlkkT+cdzv/cTu9TaijbzP+0LS2xbwPCKPq
+	mqsjrSmvjJQcMxrmicBH/NKgjbxKZms=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-190-YRjXXttsO562Xc0gICuQNg-1; Wed, 10 Apr 2024 04:02:41 -0400
+X-MC-Unique: YRjXXttsO562Xc0gICuQNg-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4155db7b58cso33153325e9.1
+        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 01:02:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712735682; x=1713340482;
+        d=1e100.net; s=20230601; t=1712736160; x=1713340960;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xT4TfO1sl44M/nt04uaJynnbnIHdAjwI3dACDF2EjZU=;
-        b=fWgdK1XI8Tz9XA6xq324zEBONdL4lFXlR9GGATg1liYN/t4iKtlApLTzRrgjCNYQYI
-         oxIgHTwAdKjFd8xE9H0aXgBjn6XFplVD7++SKZ4RHIzwY57QLWf03wLtt6lD3zpvutq6
-         oQIrtCRb9adZwLczyWGMfFNmRrsJBPRNjFWsdv3FbQvDQ1ESrW/lHZTFQwVfeOww+TbC
-         smQbZkPMC22rSXxa1Ecx1lYq+GPUKRmAOjGbg3JeRtwwrWAcOKq9uU3ps8Uxb72MoL8L
-         7fG68btTLTuQ4Dhzgs5CebNJDqjLKE5dikNFASd9WXb9qQIEiXN5Sr4LW48hPdKBFENi
-         8J5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXCQ5oM44n6PV+pQKKTi5vBcebUDXOUSyruwsNZfN5AxzQbvA8gtTkBW/tq/k8+oPxINVMW1X7QBMoetJFE7w0IMqLl
-X-Gm-Message-State: AOJu0Yw80vYwQ63iUTsH23JkuUb7ipOQCXGVVKOErl+gl+f2kwwtR0A8
-	52oRGmyyZLRPZOF2erISmFeUVcm+Kxs4RgO2eo8IluQiTBAkYdlC0/ZQimsbpxI=
-X-Google-Smtp-Source: AGHT+IHRLBNWYp5osm4g2tE72KL50pB81DvbKh3OKFJcV5WdtGMoowG4LIJqFVgVawpLvyMudGgyRg==
-X-Received: by 2002:a50:8e54:0:b0:56e:3293:3772 with SMTP id 20-20020a508e54000000b0056e32933772mr1082442edx.29.1712735682410;
-        Wed, 10 Apr 2024 00:54:42 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id x1-20020a056402414100b0056e307db93dsm6132199eda.86.2024.04.10.00.54.41
+        bh=DXu5GyWFLRYVVgKT/xx47xxPPvyqqTS3jJA/xlCkkm0=;
+        b=wz2ogrK6AFmNPPP3lEoxmm6qZPpYmIKAvMZiWx2gmQvouuK7tArXhDHzs0OcX3gWcj
+         vDwiLLnKHdF/A0VZacV7AH8O9+ZefHz6ony3wHi/NytgO4famskf4A8yAMiKxBOTnO1A
+         b8YJ02UgWOk7FcWe+aKyHdPmypE+5BKkjTekcFjR6cEk7LlXL75+1i/6kBt9McN2Ulu4
+         VjU/0qqVfp1g+gyvJFMh/WeeN5xSXk/3dhh92OAyl173PK+eBvLJpTOZA+Xy8Lwwxat9
+         4celinXgFPVNiy814VO0el7WS2vrR92YfoMcUB3rES8CEhJeODf+P+bUf9LmqHwwI2WM
+         U3pg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7sttRF03gm8oV3tknqkOgBAGMzzT8Td9H00DbZgJW5vhiw4ybexdkWtqZQanAlQVnSB6Np75Tw5DlI0nTAh3O8mrH
+X-Gm-Message-State: AOJu0YxTgPB43JJqzRzmhWYeRcwAGqazH5PAaa1az91BulgWe8fdxklK
+	Qfi0EELg3UCjo8Y3UsHcAIvdGsHRCzFXReZLDuebOFBVP4UyCg14Qx1sue63f1Q3gOY7Y9Iqw1W
+	bLS5P1OQC83bsTMYNLggwmfcnR/pvQCcx0hZmie0PdAFNqBQirg==
+X-Received: by 2002:a05:600c:1e05:b0:416:6eaa:6179 with SMTP id ay5-20020a05600c1e0500b004166eaa6179mr1616325wmb.6.1712736160208;
+        Wed, 10 Apr 2024 01:02:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFmI+bK+Bmn5+2XukodBdn2GXQ92haKG6VohgZt2mHVdjYtyJPyqjLehKUQ4vb5gN6ueySe/w==
+X-Received: by 2002:a05:600c:1e05:b0:416:6eaa:6179 with SMTP id ay5-20020a05600c1e0500b004166eaa6179mr1616221wmb.6.1712736159530;
+        Wed, 10 Apr 2024 01:02:39 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:179:8bde:8cd:63ff:6fae:3872])
+        by smtp.gmail.com with ESMTPSA id t7-20020a05600c198700b00416c160ff88sm1491111wmq.1.2024.04.10.01.02.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 00:54:41 -0700 (PDT)
-Date: Wed, 10 Apr 2024 09:54:41 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
-	Ajay Kaher <akaher@vmware.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
-	Alexey Makhalov <amakhalov@vmware.com>, Conor Dooley <conor.dooley@microchip.com>, 
-	Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Will Deacon <will@kernel.org>, x86@kernel.org
-Subject: Re: [PATCH v5 21/22] KVM: riscv: selftests: Add a test for PMU
- snapshot functionality
-Message-ID: <20240410-f46f91518afc0e151f375a62@orel>
-References: <20240403080452.1007601-1-atishp@rivosinc.com>
- <20240403080452.1007601-22-atishp@rivosinc.com>
- <20240405-4e840120e8117c286cb593f9@orel>
- <8748dbed-d105-4f26-a808-667c3b56c8ec@rivosinc.com>
- <20240410-2a41e43624596a442d6a95cd@orel>
- <4a428500-4e37-4e7d-968d-3da20dd822af@rivosinc.com>
+        Wed, 10 Apr 2024 01:02:38 -0700 (PDT)
+Date: Wed, 10 Apr 2024 04:02:23 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	David Hildenbrand <david@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gonglei <arei.gonglei@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Cristian Marussi <cristian.marussi@arm.com>,
+	Viresh Kumar <vireshk@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	David Airlie <airlied@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Alexander Graf <graf@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>
+Subject: Re: [PATCH v2 00/25] virtio: store owner from modules with
+ register_virtio_driver()
+Message-ID: <20240410040140-mutt-send-email-mst@kernel.org>
+References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
+ <285be63c-8939-495c-8411-ce2a68e25b2b@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,86 +153,34 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4a428500-4e37-4e7d-968d-3da20dd822af@rivosinc.com>
+In-Reply-To: <285be63c-8939-495c-8411-ce2a68e25b2b@linaro.org>
 
-On Wed, Apr 10, 2024 at 12:28:08AM -0700, Atish Patra wrote:
-> 
-> On 4/10/24 00:10, Andrew Jones wrote:
-> > On Tue, Apr 09, 2024 at 03:52:40PM -0700, Atish Patra wrote:
-> > > On 4/5/24 06:11, Andrew Jones wrote:
-> > > > On Wed, Apr 03, 2024 at 01:04:50AM -0700, Atish Patra wrote:
-> > ...
-> > > > > +	probe = guest_sbi_probe_extension(SBI_EXT_PMU, &out_val);
-> > > > > +	GUEST_ASSERT(probe && out_val == 1);
-> > > > > +
-> > > > > +	if (get_host_sbi_spec_version() < sbi_mk_version(2, 0))
-> > > > > +		__GUEST_ASSERT(0, "SBI implementation version doesn't support PMU Snapshot");
-> > > > > +}
-> > > > It's a pity we can't check the SBI spec version that KVM is advertising
-> > > > from KVM userspace. Normally we'd want to check something like this at
-> > > > the start of the test with TEST_REQUIRE() before running a VCPU in order
-> > > > to generate a skip exit.
-> > > > 
-> > > Agreed. I will send a separate series for that as it is an ABI change.
-> > > 
-> > > > (We probably should allow reading and even writing the SBI spec version
-> > > > from the VMM in order to better support migration.)
-> > > > 
-> > > How that would work for SBI spec version write use case ? For migraiton, you
-> > > can't go back to older SBI versions in the host. Isn't it ?
-> > > 
-> > > Considering this case your VM is running with PMU snapshot as the host has
-> > > SBI v2.0. It can't be migrated to v1.0 and expecting it work. Correct ?
-> > > 
-> > We can start a VM on a host with SBI v2.0, but tell KVM to tell the VM
-> > that it has v1.0. Then, the guest shouldn't use any features from SBI
-> > that appear after v1.0 and it should be safe to migrate to a host with
-> > v1.0.
-> 
-> That depends on when the VMM request to KVM to change the version.
-> Most of SBI implementation checks the SBI version at the boot and
-> enable/disable
-> feature based on the SBI version available. If the SBI version supported by
-> KVM changes
-> to an older one, the calls from VM will fail unexpectedly.
-
-We have to configure KVM's SBI version before the first run of VCPUs,
-just like we should make sure ISA/SBI extensions are configured first.
-
-> 
-> > A more likely scenario might be this though:
+On Wed, Apr 10, 2024 at 09:41:57AM +0200, Krzysztof Kozlowski wrote:
+> On 31/03/2024 10:43, Krzysztof Kozlowski wrote:
+> > Changes in v2:
+> > - Three new patches: virtio mem+input+balloon
+> > - Minor commit msg adjustments
+> > - Add tags
+> > - Link to v1: https://lore.kernel.org/r/20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org
 > > 
-> >   1. KVM userspace checks and captures the SBI version of the host where
-> >      the VM is first being launched, e.g. v2.0
-> >   2. The VM gets migrated to another host which supports something later,
-> >      e.g. v3.0, but to
-> >      - avoid possibly confusing the guest we tell the destination host
-> >        that it should expose v2.0 as the SBI version
-> >      - allow rollback to the source host without concern that the guest
-> >        has already seen v3.0 and started to use something that the
-> >        source can't provide
+> > Merging
+> > =======
+> > All further patches depend on the first virtio patch, therefore please ack
+> > and this should go via one tree: maybe virtio?
 > 
-> This makes sense though. As per my understanding, we should not allow
-> modifying
-> the SBI version that is less that the version VM already boot with.
-> However, we can allow modifying the SBI version that is higher or same as
-> the VM booted with.
-
-Mostly only 'the same as'. Higher might work, but it's also risky since
-there could be guests out there which capture the version on boot and
-then for whatever reason do sanity checks against that later on and
-freak out when there's a change, even if the change went higher.
-
+> Michael, Jason, Xuan,
 > 
-> I can't think of a use case for the higher version though.
+> Will you be able to take the entire patchset through virtio?
+> 
+> Best regards,
+> Krzysztof
 
-Maybe only for a coordinated update which uses kexec rather than
-a full shutdown+boot cycle, but I'm reaching...
 
-Regarding a full shutdown+boot cycle, in those cases, we're usually
-free to make changes as that's the same as a host kernel being shutdown
-and then being boot again after a firmware update.
+Hello!
+Yes I intend to take it for the next merge window.
+I am also merging the 1st patch for this release (it's a bugfix).
 
-Thanks,
-drew
+-- 
+MST
+
 
