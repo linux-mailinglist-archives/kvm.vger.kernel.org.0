@@ -1,140 +1,115 @@
-Return-Path: <kvm+bounces-14064-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14066-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9237F89E8E1
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 06:30:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5589789E8F1
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 06:35:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AAAB287AAB
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 04:30:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86D6D1C22530
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 04:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6219B9468;
-	Wed, 10 Apr 2024 04:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B7D10953;
+	Wed, 10 Apr 2024 04:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQn2qGJt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gmgcX4go"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36537A32;
-	Wed, 10 Apr 2024 04:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C0628F0
+	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 04:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712723420; cv=none; b=BRspZF0Wq3AdkRGyL19ZTSUpdDoq7y1p2PMIxQom+e/Wy7XlZ+g9C6efn0II3CSq1ugU9G8UjNcP2FRcF9uHA8874vmi7mocLeVklDOeLOR1Zz7MudtlUCGAqSXnsDVlvCA30LBFy2t+ZjXPAEShUJeJJOiMBI4b2YrWP9mtli8=
+	t=1712723722; cv=none; b=BhoihXQbTFxM/+bRaI7VG4+BgEu78T408/V8KogO35/zFOecEM1G8mCI18PSusc4uyf1DISwEUn+UKiraTpeKV4MRlkZ9UZM4l2hhS/iyPAFJ/G5Frc0q6ZUyYKKA6lzgd6wqZtvVGwgZBF9TmHfFkr8AIaEzQkbpEVUuXb9+/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712723420; c=relaxed/simple;
-	bh=0Z7assce/3I12gYPPiGPO4kSljCAX8pzDC5GmLlI8Qw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=eAkmxE6TrmYvL0yCZN8qOVaYO6idWJ349Sg/Bq3XosQ/8HypFHmTQ7c9obZTyyk0jD8czvjMl+Ts40fvq/xf8tUpZGobsACsL6WicRs/FNan7TnLe+PslBja4QQY8lzoMQD+MiGXKxJpMDncvSN3oXclIw9q+Zhf0WFTJCejPG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WQn2qGJt; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1e3ca4fe4cfso26654725ad.2;
-        Tue, 09 Apr 2024 21:30:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712723418; x=1713328218; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Csxyj22wIzJdfuKfBsOG2KZ1/xHCIZLSCJ4TL2dEF78=;
-        b=WQn2qGJtXnOA8puMpI4aZSLlyyyvfbnHjiY637JdjDGC+gLlOm57xrOIJsKOUDSsTy
-         ntWwGhMjsEgghVVJVMzy2X0aVP9qiIsGRAHTm9SeI3Ah3gDotWfc9F3rK0/h2/awNnii
-         5jBXdb8NXwzFP0z02q9Gq6EHrffBa5cai+csWDN8WL+LzF2+Jqu46vUZnQjPEGh1vbvM
-         8+oKT2wS2Pe1xgZcYfXtTU6nu0ycchomGU1ccGGqNIE41sskxpsOJgs36b4qPn4U3qaO
-         YpHbewmCdvo8yFKOV0rB8zyZOaeKtrbKzg8sC7t63l2v35ua5kDzFkiHCVK4Z0OHGsdd
-         KTfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712723418; x=1713328218;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Csxyj22wIzJdfuKfBsOG2KZ1/xHCIZLSCJ4TL2dEF78=;
-        b=tO2y2YHDqslSDVhZ+1lcOWWqWkBM3amhDdqTnSviLH3QoeuTyu6MHv9gnfuocfl6WB
-         G9NDfA8pXUvhxWgVpvlu0IKFUSBbOZF4IPkCt+mQAq2pehXEre0Uf/Vq/5a4fRes7nO1
-         lGG0h2df3L+JTaT/TOuXL1E7RVD4bLcEyWqruvJjplaZUqFcNrO34EcDIpqWwo8t7HY8
-         CgKPUdwrTDbiIqwQbEcw5lgxDA1svW2c4jE9q+PmsinRQQyEyYN9b9dpyb7aHqnrbkRZ
-         EtNfZr1qvmrJCUTCg8u3xuNhHR4IxjU4GxpY7RgI7kOkIJnvFHHkRwnhP5n18h+dObyT
-         lu+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVBSb+WoDahTCXCKXF8OxO44a6drs0BFOqkeArbTzgW+CUYxrQ2q8iMnzrRhadiMqRgPlSFqL1HKWYyrHMcSUdtiscTX55MATlzsqTcRBWU5tCwVh07Qv5IZF3b9mlfcQ==
-X-Gm-Message-State: AOJu0YyaEI7dBclBUyWjwrLFkvTkxncTlUU/mwAR3/96ZZaZTpdzMTvt
-	ZkYEPoq1fiF5zoSYiO76IwriKmPc/kPgGC37qyvpqRUXBxTJ1KZdrniAk1Uu
-X-Google-Smtp-Source: AGHT+IGdR4rPr8TUXSWQaLrOeaK8mYg5Q5R6NaSSX/xdgpewKjFBLWqlZ6z5OnIo3xmO1MqeuZvX9A==
-X-Received: by 2002:a17:902:6503:b0:1e2:d4da:6c72 with SMTP id b3-20020a170902650300b001e2d4da6c72mr1669964plk.0.1712723418347;
-        Tue, 09 Apr 2024 21:30:18 -0700 (PDT)
-Received: from localhost ([1.146.50.27])
-        by smtp.gmail.com with ESMTPSA id l10-20020a170903244a00b001e29833ada6sm9760884pls.140.2024.04.09.21.29.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 21:30:06 -0700 (PDT)
+	s=arc-20240116; t=1712723722; c=relaxed/simple;
+	bh=GTPYWUExqaKJ1ffWv/5oel5WsLqZgzXUVtWMpIIX7Mw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E7OrpGr8hbgSSBy24fLc6Hc5bL4pd7yFnkxtZfl5EQkvdxfwvp+eGQGvBuIf0x+3b6lUhF56QQSQNrTZmG1wTI3lco0bWUJ8pa8Mh5TBn6sK71HdA5YI/q0BT+o3uxS074V+9e210bj8EER09FggTX5yoA/AjaOi2JFDIXIGczk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gmgcX4go; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712723720;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=lUyt2lP+iaweP7GGIQcQN2/vMQc1UDRPtDmxt5CULrM=;
+	b=gmgcX4go+d49x3tB4QofJmWMMN0vbV4390Etxaz6hcE19r7gxGgJcvdaMlsHASPSEXGRmq
+	Fhb3t2/75cGPEorX3x9YpmAEiO0q9LFL1EgFRMMUfbkKxAGIxrNz5u5HeYUM8KArlc97qV
+	kG376r4T0mDLQPe0arBzd0A7wMVG90s=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-76-xXVMCXk2OW2YAcuTvXrPhQ-1; Wed,
+ 10 Apr 2024 00:35:16 -0400
+X-MC-Unique: xXVMCXk2OW2YAcuTvXrPhQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5C1F21C0C644;
+	Wed, 10 Apr 2024 04:35:16 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.217])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CC93C47B;
+	Wed, 10 Apr 2024 04:35:12 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/1] virtio-pci: Fix the crash that the vector was used after released
+Date: Wed, 10 Apr 2024 12:33:14 +0800
+Message-ID: <20240410043450.416752-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 10 Apr 2024 14:29:40 +1000
-Message-Id: <D0G5RMOPNMCI.3HVFHWC8KQWBC@gmail.com>
-To: "Andrew Jones" <andrew.jones@linux.dev>
-Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Thomas Huth" <thuth@redhat.com>,
- "Alexandru Elisei" <alexandru.elisei@arm.com>, "Eric Auger"
- <eric.auger@redhat.com>, "Janosch Frank" <frankja@linux.ibm.com>, "Claudio
- Imbrenda" <imbrenda@linux.ibm.com>, =?utf-8?q?Nico_B=C3=B6hr?=
- <nrb@linux.ibm.com>, "David Hildenbrand" <david@redhat.com>, "Shaoqin
- Huang" <shahuang@redhat.com>, "Nikos Nikoleris" <nikos.nikoleris@arm.com>,
- "David Woodhouse" <dwmw@amazon.co.uk>, "Ricardo Koller"
- <ricarkol@google.com>, "rminmin" <renmm6@chinaunicom.cn>, "Gavin Shan"
- <gshan@redhat.com>, "Nina Schoetterl-Glausch" <nsg@linux.ibm.com>, "Sean
- Christopherson" <seanjc@google.com>, <kvm@vger.kernel.org>,
- <kvmarm@lists.linux.dev>, <kvm-riscv@lists.infradead.org>,
- <linux-s390@vger.kernel.org>
-Subject: Re: [RFC kvm-unit-tests PATCH v2 08/14] shellcheck: Fix SC2013
-From: "Nicholas Piggin" <npiggin@gmail.com>
-X-Mailer: aerc 0.17.0
-References: <20240406123833.406488-1-npiggin@gmail.com>
- <20240406123833.406488-9-npiggin@gmail.com>
- <20240408-840ece34e7b407365a18227d@orel>
-In-Reply-To: <20240408-840ece34e7b407365a18227d@orel>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On Mon Apr 8, 2024 at 5:34 PM AEST, Andrew Jones wrote:
-> On Sat, Apr 06, 2024 at 10:38:17PM +1000, Nicholas Piggin wrote:
-> >   SC2013 (info): To read lines rather than words, pipe/redirect to a
-> >   'while read' loop.
-> >=20
-> > Not a bug.
-> >=20
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >  scripts/arch-run.bash | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> > index cd75405c8..45ec8f57d 100644
-> > --- a/scripts/arch-run.bash
-> > +++ b/scripts/arch-run.bash
-> > @@ -487,7 +487,7 @@ env_file ()
-> > =20
-> >  	[ ! -f "$KVM_UNIT_TESTS_ENV_OLD" ] && return
-> > =20
-> > -	for line in $(grep -E '^[[:blank:]]*[[:alpha:]_][[:alnum:]_]*=3D' "$K=
-VM_UNIT_TESTS_ENV_OLD"); do
-> > +	grep -E '^[[:blank:]]*[[:alpha:]_][[:alnum:]_]*=3D' "$KVM_UNIT_TESTS_=
-ENV_OLD" | while IFS=3D read -r line ; do
-> >  		var=3D${line%%=3D*}
-> >  		if ! grep -q "^$var=3D" $KVM_UNIT_TESTS_ENV; then
-> >  			eval export "$line"
-> > --=20
-> > 2.43.0
-> >
->
-> I already gave an r-b on this one. Here it is again,
->
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+During the booting process of the Vyatta image, the behavior of the
+called function in qemu is as follows:
 
-Yeah I realised just after sending. Thank you.
+1. vhost_net_stop() was triggered by guest image . This will call the function
+virtio_pci_set_guest_notifiers() with assgin= false, and
+virtio_pci_set_guest_notifiers(） will release the irqfd for vector 0
 
-Thanks,
-Nick
+2. virtio_reset() was called -->set configure vector to VIRTIO_NO_VECTOR
+
+3.vhost_net_start() was called (at this time, the configure vector is
+still VIRTIO_NO_VECTOR) and call virtio_pci_set_guest_notifiers() with
+assgin= true, so the irqfd for vector 0 is still not "init" during this process
+
+4. The system continues to boot,set the vector back to 0, and msix_fire_vector_notifier() was triggered
+ unmask the vector 0 and then met the crash
+[msix_fire_vector_notifier] 112 called vector 0 is_masked 1
+[msix_fire_vector_notifier] 112 called vector 0 is_masked 0
+
+To fix this, we need to call the function "kvm_virtio_pci_vector_use_one()"
+when the vector changes back from VIRTIO_NO_VECTOR.
+
+The reason that we don't need to call kvm_virtio_pci_vector_release_one while the vector changes to
+VIRTIO_NO_VECTOR is this function will called in vhost_net_stop(),
+So this step will not lost during this process.
+
+Change from V1
+1.add the check for if using irqfd
+2.remove the check for bool recovery, irqfd's user is enough to check status
+
+Cindy Lu (1):
+  virtio-pci: Fix the crash that the vector was used after released.
+
+ hw/virtio/virtio-pci.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+-- 
+2.43.0
+
 
