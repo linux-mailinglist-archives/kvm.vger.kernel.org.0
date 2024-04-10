@@ -1,208 +1,144 @@
-Return-Path: <kvm+bounces-14168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26FDE8A0314
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 00:15:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FC028A0326
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 00:16:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2C702838AE
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 22:15:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D48751F246AA
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 22:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562A3190668;
-	Wed, 10 Apr 2024 22:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DED190670;
+	Wed, 10 Apr 2024 22:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="O2NJv27O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9n8ET68"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2138.outbound.protection.outlook.com [40.107.94.138])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE83168DC;
-	Wed, 10 Apr 2024 22:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.138
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712787276; cv=fail; b=Y7emuZ1oMKCH5B8utgaS7CoSuK9r8cuJTgtYc79Bl6Aq96+TS04Fs5uwwOc8cUrQzCu1h076mKCD9qfzEQQ78Sk7fnREIfR3K6AReAOR44x0n0biTzL6EgqOMjLnpk9MbBQq1fwvyPr0Jx4ukNt8A+SDMTBo0rD1DtfjfXhhMXY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712787276; c=relaxed/simple;
-	bh=P2KArS8Jc1Is63tOmqxz4pBy68nDOqZm9dwPMkHd+/Y=;
-	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=T8tmC8qw++AdSznFzPNRxRXzebD1twDD/xnxcSE55xK4kqVdt0tX6IWDJdNr2qwOZo2fC5Ap8Dq3q2aETijvyI66lR5+AY5AZJ3tWTWVcBaTyRqGMmKC7JyDrYdxv1uL/mHxJb5KPPlta6QZZMZs2G/3IYY9BWAgB0CsjOUHEEU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=O2NJv27O; arc=fail smtp.client-ip=40.107.94.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nbcNLcAguQpmFlIIQ2a+au6hKRqm4I4zrhWzV0jxB3+oCffWdKCXV0aQhXE92ZaHeQzmfjb0YgbfFdL7tcrHT3kDxSB+M/XXLlIOZLafa03MRFkFoVso9dXwv/n3o0xIhLGibBNmlWlkQ3K7B1lsU16jj8gCxsoXvcABBslU2+02u5ei+9ydrmg/SsEsAqlLLgHYQxt/FNk+RARWS86HDp9dyVSSrrDRxDoVjyBDeIot/gmrxU2ilIJ/7KVOAwSh379Gvxe5E8iDWc5X10OmQ74mqFFr7QYLDj2HtfD4mzpfot7JHHhBWH/ACP/5ex74sOGoY33ow2xZp55+j6n/ow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xPwrgdURNdnWwxTClsHh/l10by57f3DRAL0QLO5tXu4=;
- b=h5gQdWVDvNsVYzUAfaMTTr7bVPzh3eib9tUsZyj7CQkQ6w3e6xWMR+4wlzrJFb64miSciGXhQ7ow0d5ZO0Sjt3gzEi2+gknsATSd6SoEw2K8q//9LhyHTodiejGUccubKyIdHDvaOH0JeTxCZVfHd/c/nEPxDrVj/a9aWWEdpFF3VMofduKFP1zw7Gb0QaCYd2JQr1gGGr7PLs1OhpTTtIZyqlbhqCljT5UkC/P6rFy8u2y5SL5NYpo3rVc3JkAd+HzQzni68Dj/ni+ped23DkY+7+78f0El+nkUeaSnDUWYEwQleYtyeHANuHCjNwDkBlLNz7Tr1px2qxPaZBJuqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xPwrgdURNdnWwxTClsHh/l10by57f3DRAL0QLO5tXu4=;
- b=O2NJv27Oj4KWW+StkWwk4fKsI7lv3kV3LBvvp+M5tgd+O6iDCPIVgLJYPkFDgqviZZWjOWGZ9u1MCDqOiPyt8788ObSZzBTUf3ZhnHtTiWNRnd4AChjexQE+sc0V1/3Yo3uouxWInsf68zQvdXE56LK5t4C62L26aO8H/Xm6wTM=
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by PH7PR12MB6660.namprd12.prod.outlook.com (2603:10b6:510:212::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.55; Wed, 10 Apr
- 2024 22:14:31 +0000
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1032:4da5:7572:508]) by BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1032:4da5:7572:508%6]) with mapi id 15.20.7409.042; Wed, 10 Apr 2024
- 22:14:31 +0000
-Message-ID: <14943670-54d7-2255-61ae-046e23e58585@amd.com>
-Date: Wed, 10 Apr 2024 17:14:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, hpa@zytor.com,
- ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- Brijesh Singh <brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
-References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-27-michael.roth@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v12 26/29] KVM: SEV: Provide support for SNP_GUEST_REQUEST
- NAE event
-In-Reply-To: <20240329225835.400662-27-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0501CA0067.namprd05.prod.outlook.com
- (2603:10b6:803:41::44) To BL1PR12MB5732.namprd12.prod.outlook.com
- (2603:10b6:208:387::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB2A184122;
+	Wed, 10 Apr 2024 22:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712787377; cv=none; b=n+RJxXtbYwyFwWuu7D8rW4LBswIBRNTtTIfj/7n1Sw+Ponta/m9n2HUHp2XdK2e1bqtC3Qh3rxKPwngwNNsqxoE4iPliSlAfegtl32GArquc4bkE+EgsNDFTXYKCMH5U4c0IKgIuM5yY31tPD381+jIwJ4ZgI9JcT3W+XJgyLUQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712787377; c=relaxed/simple;
+	bh=eSgO5pW5YMKLhnbQoXlFyr4GSxxlml3nI3ZwqFFRmh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oX+UWRk6TuOpjEoQqaJzFY2EZSWVsxoDfK7GCOgNm31KI6I1wZJgRBbw5Bt+Kofe4IEE7no/8R0bd8hy/tbU42xnrO7U22Xi13CIOf3AEK0z/xIcHfT7WjGMTjpthhsZ0S2S3ax6kEA3ICK4jdTxjQ8gdWc9ADfn2WB/pnmROYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9n8ET68; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAFE8C433F1;
+	Wed, 10 Apr 2024 22:16:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712787377;
+	bh=eSgO5pW5YMKLhnbQoXlFyr4GSxxlml3nI3ZwqFFRmh4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o9n8ET68D2ZFe/iSKlFkvb35l/MWCS9iIEfC5Ejo2JybPqCdX/Gl4U0OaQc+lSTEV
+	 t3HyqvUBJBi7fybvhAaZrGJtgikm2g7kfT58aK5gt0ZvQMCoanJyiMNOxc79aZnNum
+	 2BdjY3JuJB4rAtqJU6/AulLAX5jjmXTitatKhaV/gkYSeTn642ka4buGDYDnuGqXhb
+	 v9MmIiHozPux3yibIUcOe/P12YDJY0G4GTDHZS0WniA/nN/tLQ03nK8KiuhArxrgVt
+	 oAy5lBLEG4KQ4qpEI8qYpD4XnO4NFBybPaY86KamYElWChe/MAZwQN8SYkzj/z+VwA
+	 9rvJIfDWdcoeA==
+Date: Wed, 10 Apr 2024 23:16:11 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Deepak Gupta <debug@rivosinc.com>
+Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 07/10] riscv: add ISA extension parsing for Zcmop
+Message-ID: <20240410-jawless-cavalry-a3eaf9c562a4@spud>
+References: <20240410091106.749233-1-cleger@rivosinc.com>
+ <20240410091106.749233-8-cleger@rivosinc.com>
+ <ZhcFeVYUQJmBAKuv@debug.ba.rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|PH7PR12MB6660:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	QMsNGYl7GzGp0LedrukVfvmMTzeXvVfmhFwi/pGITUCZaR8O5vPdm1bEy7ApdsM++t25DQ82EEc9UmayNqfIa8U9vLXC9Nh8ZhRDsm602XhbNvDrJwV7aOlAea1p28XkDeQRNTNaeVvYB9gsEfoWkLWFR+n498ouO+TRNi/SiYJ8gEJzaOq845zwPP4h7eB/kxRH2WP0Layg9JmVjSaKrQB0c1P4V4RCYrUMzaYaoH8iBpDuAgsAwpB31XF/GJlt7DKt1XiJUkhEvJ88205sfGi3dlv9jWToc2xDyP/rTpWdi88Nj2HLoLtY1jDmKooELxeum11EkqldOiBnS+fqRaIS+8HNhmzSJGbIfPgN7d9fp43TTa8k2iJ08yZ4oxlGncYPlnxLHaGM9ROdkPhZODWxJLeDCZ/2YjeM81P60fXVc8Zz/9aXyt2WxGZIWB836mXe3nt1Lt+SMoYr3rPx1BVaHX3jUxuC71VHx8WUGITtcgmXnyU/gwaPd4hf5PE+E0ejzek6PPkYeh0GU1L1NsCAXgkqb94O+NURemznEKT2C8wNprebv+qtwgsM1rWvm5cveJNktDbKDcYRAXYZ8DAYtncTCMmJkVCw9SQa0PMCr5/fjZug6U7b1uV3hBs3X71HAGKbgShd++CsKgYOYot7VPuabR2UwdGKs26KUmM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RElwbGE1Nko2UFJDL0I0RU1sYUtLdDRaTll5aTVqUXNmVytBTVFHczhSNkt6?=
- =?utf-8?B?eGI5M2tOak1SUjBlUndOZzdLK095TVNTN1g3d1llN3YybWZya3NzdGhpZnB2?=
- =?utf-8?B?MjVFNFp5UDVxa1phVDFKeWppejlVdmxpV0VzNzhaVG9UWE9RRlI2aExncU5u?=
- =?utf-8?B?NXlVTnpXZ3cvNDZuNk5GNWE4SkFUREtPZVY3c2VNZ3BwVHBPVlFFelZycnh6?=
- =?utf-8?B?eGc4dzNMa0tHemlUY1VjZTNMWmlhWXhRRDY2SXFzTGVoZk5sTUNEemhObVYx?=
- =?utf-8?B?VThHRDF0akMwb2FvcGdoL1lsMTBkSWR5TkFKYjZkR0RNaFM4TzNxSnRiTTh4?=
- =?utf-8?B?dzNVaXFzVmhCN1VyOU8weGgyNFhVMGRWMVVpTEpVWHhYQ2pyb1M2alh1clVq?=
- =?utf-8?B?UGwxcG9BQThqYyt5cGtmK09KanhRK0VNczB6Y1NxdnRaZCtNUFBFbWtxWlNH?=
- =?utf-8?B?cnF5N3JWQ1VkTEFmMGlXZVZaQTlPZWp5QUVkQUsvTlFFSjBhZmJvWnBTRTJh?=
- =?utf-8?B?RUtDMkJQYWRFU09FSm1pdXh6Mk1CSGw1dlhlaUF2UGZVenhSUHJVS0p0UEVV?=
- =?utf-8?B?VWJ1dGFSdjhDVmx6Z21oMElVM21uREsvSk9QMGlzTWNvc3oySWczTDlTUWd0?=
- =?utf-8?B?Z2RlKzRUc0xLUDZNazBIR3FQSlM2WEc4RGtlc1h6TFNtaXlkSCt0VlVVVk15?=
- =?utf-8?B?ZGh2YSsyUk93NlFzM3BLL0NFcDN4SE5BVmVwNU5BNzNzWjQ5ckZyeGZEbUVL?=
- =?utf-8?B?L3FkalMzVTkrblo2c3NTRFRSSWtoQ2lEZm5OUXlmem5zcWthWUk3OWUvY2Qx?=
- =?utf-8?B?UlVldE56cjhqVFlQVGRIRkFJRzBHWUxNQmozbmIxTDdLVXY2elRSdFBWVHJK?=
- =?utf-8?B?TC9NbGUzbFFSVU92TmFUSG1Db2RKV3ZlV3RrVy9uTUJxbUExWUEvbnZLYkZr?=
- =?utf-8?B?K2Z3YVZ2OEVqT3lwZ0JBaXpvb01WVzNKM1lUKytMM0dCY0MzT1NIUDl1c3h2?=
- =?utf-8?B?VDI5SWN0dkY1aXZYKzNudVBEZjVYNW5LZDRBaUErcStKMFZKTTVQb3AvN0pP?=
- =?utf-8?B?czBWb2QzNnFuNmtrT2NwVnVwZGx0SVAvUDA3WC9mSVhlRHFXdGF1dGt1VWhX?=
- =?utf-8?B?Q2F2ZWlPaUQ0RFNveDY1Ym9jSTh0UWM0OFhwWk1FaUZPTVFGUnN5ZitPM2l3?=
- =?utf-8?B?Z1RCc29Oa3lDTnlEZnUvL1BjYVZrbnVicEtld3VGdUh3V2xoMmJXTFNjNGpT?=
- =?utf-8?B?Rlc0cU1QWkQ5RHFMQVFYY0ovS1BLdEUrTEZ3em03RFc2eCt6a0Z3RTY4SlhX?=
- =?utf-8?B?REZ2bjFCZ1kzZXV4NmxFcHNZRDdLMTdUaEN3a0RHcUpiOUxvNzA1NURONFV6?=
- =?utf-8?B?c1VTSnJHWGZ0MDZVZ0M1WVZsMURidXhJRXBxNlhMeGszS2k3c3dxWFFwNEM3?=
- =?utf-8?B?a3ZLdG1aQjNxREtQY3MyVDIyeVJSemNyMDFZalF2S29IbmRWbHJ5ekFHKzh0?=
- =?utf-8?B?NUdPYUc2QUZjbTM5ZFpqV3ZSaVRacXZBS2FOMXVneit6bUdpNzFGTDMxbzYw?=
- =?utf-8?B?Y1NUK3o1eHIyWS9QbU9nRnorS2hYSlhoREVuSkhycDFHcTU4YW5adUNaZENI?=
- =?utf-8?B?OENyY2ZvRnZLT2g1MThZTFJmQkQ1VEFCYWszMXRFU1N0NTFuZk5JK0wrRGUv?=
- =?utf-8?B?OE04ZUc0alNJNk43UDlaVVJGTVVXWnBLMytXdlc2NTV6UlZCOTJCZlRETDI1?=
- =?utf-8?B?d29GVkxLK3llSWhVNjNqSjk5VTdoam85bWY4a05zSzBrdDF2TmV6T1drN05W?=
- =?utf-8?B?WkRrR3pCN3VROHhDWXgvcXRzRlRoYTMyMW4vRllwK3FiM1U5cklPWHpLdTRi?=
- =?utf-8?B?SjdmTGtOWENZRnZ4amVZV1Z3Ykh5VVpiZTlkQmNNV2NDc0plakJIYmJGNHUy?=
- =?utf-8?B?YTd5d0lsSDBPYk4zZTZOMFFIWjVOTGdFN0poVXkzQjhzZjlkK0szWWRrZDVZ?=
- =?utf-8?B?SDV2Mm5Yd2Y0MEdVNGdicHA1Y0RhaGRpUGc5QXNGZmppODdDaTB2WnhPYkNV?=
- =?utf-8?B?SFp4YXZObkZSZ2hpVUJFTUdMRU1LWGorREpOMlNVdjlGOVJnd3RXNEd6eEVq?=
- =?utf-8?Q?8NxOm3C6xHs4awO03WlduKdvp?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 424bf5e8-a767-4c86-149a-08dc59ab988f
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 22:14:31.5077
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VxzO3qKox5Z4m2YImK9V/grU1qJFynNsw3jWuolbxSV0lEOi+O1JSEsQm3pZUCKun5g06bTdCq4vnPXFXCp7Tw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6660
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="DLrdOXAHzOvEYfLu"
+Content-Disposition: inline
+In-Reply-To: <ZhcFeVYUQJmBAKuv@debug.ba.rivosinc.com>
 
-On 3/29/24 17:58, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> Version 2 of GHCB specification added support for the SNP Guest Request
-> Message NAE event. The event allows for an SEV-SNP guest to make
-> requests to the SEV-SNP firmware through hypervisor using the
-> SNP_GUEST_REQUEST API defined in the SEV-SNP firmware specification.
-> 
-> This is used by guests primarily to request attestation reports from
-> firmware. There are other request types are available as well, but the
-> specifics of what guest requests are being made are opaque to the
-> hypervisor, which only serves as a proxy for the guest requests and
-> firmware responses.
-> 
-> Implement handling for these events.
-> 
-> Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 
-You need to add a Co-developed-by: for Asish here.
+--DLrdOXAHzOvEYfLu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> [mdr: ensure FW command failures are indicated to guest, drop extended
->   request handling to be re-written as separate patch, massage commit]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+On Wed, Apr 10, 2024 at 02:32:41PM -0700, Deepak Gupta wrote:
+> On Wed, Apr 10, 2024 at 11:11:00AM +0200, Cl=E9ment L=E9ger wrote:
+> > Add parsing for Zcmop ISA extension which was ratified in commit
+> > b854a709c00 ("Zcmop is ratified/1.0") of the riscv-isa-manual.
+> >=20
+> > Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
+> > ---
+> > arch/riscv/include/asm/hwcap.h | 1 +
+> > arch/riscv/kernel/cpufeature.c | 1 +
+> > 2 files changed, 2 insertions(+)
+> >=20
+> > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hw=
+cap.h
+> > index b7551bad341b..cff7660de268 100644
+> > --- a/arch/riscv/include/asm/hwcap.h
+> > +++ b/arch/riscv/include/asm/hwcap.h
+> > @@ -86,6 +86,7 @@
+> > #define RISCV_ISA_EXT_ZCB		77
+> > #define RISCV_ISA_EXT_ZCD		78
+> > #define RISCV_ISA_EXT_ZCF		79
+> > +#define RISCV_ISA_EXT_ZCMOP		80
+> >=20
+> > #define RISCV_ISA_EXT_XLINUXENVCFG	127
+> >=20
+> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeat=
+ure.c
+> > index 09dee071274d..f1450cd7231e 100644
+> > --- a/arch/riscv/kernel/cpufeature.c
+> > +++ b/arch/riscv/kernel/cpufeature.c
+> > @@ -265,6 +265,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] =3D=
+ {
+> > 	__RISCV_ISA_EXT_DATA(zcb, RISCV_ISA_EXT_ZCB),
+> > 	__RISCV_ISA_EXT_DATA(zcd, RISCV_ISA_EXT_ZCD),
+> > 	__RISCV_ISA_EXT_DATA(zcf, RISCV_ISA_EXT_ZCF),
+> > +	__RISCV_ISA_EXT_DATA(zcmop, RISCV_ISA_EXT_ZCMOP),
+>=20
+> As per spec zcmop is dependent on zca. So perhaps below ?
+>=20
+> __RISCV_ISA_EXT_SUPERSET(zicboz, RISCV_ISA_EXT_ZCMOP, RISCV_ISA_EXT_ZCA)
 
-One minor comment below should another version be required, otherwise:
+What's zicboz got to do with it, copy-pasto I guess?
+If we're gonna imply stuff like this though I think we need some
+comments explaining why it's okay.
 
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> > 	__RISCV_ISA_EXT_DATA(zba, RISCV_ISA_EXT_ZBA),
+> > 	__RISCV_ISA_EXT_DATA(zbb, RISCV_ISA_EXT_ZBB),
+> > 	__RISCV_ISA_EXT_DATA(zbc, RISCV_ISA_EXT_ZBC),
+> > --=20
+> > 2.43.0
+> >=20
+> >=20
 
-> ---
->   arch/x86/kvm/svm/sev.c         | 83 ++++++++++++++++++++++++++++++++++
->   include/uapi/linux/sev-guest.h |  9 ++++
->   2 files changed, 92 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 658116537f3f..f56f04553e81 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
+--DLrdOXAHzOvEYfLu
+Content-Type: application/pgp-signature; name="signature.asc"
 
->   
-> +static bool snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest_request *data,
-> +				gpa_t req_gpa, gpa_t resp_gpa)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	kvm_pfn_t req_pfn, resp_pfn;
-> +
-> +	if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE))
+-----BEGIN PGP SIGNATURE-----
 
-Minor, but you can use PAGE_ALIGNED() here.
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZhcPqwAKCRB4tDGHoIJi
+0re3AP9QmK68/uYxyQ3GXl/aO2Y4Z5DssohLEjC19dZXe0kZCAD9GGfqdzucBPRK
+8Oq4p/rBx7aglYaFYqQkMvbeIZStjwU=
+=a6wq
+-----END PGP SIGNATURE-----
 
-Thanks,
-Tom
-
-> +		return false;
+--DLrdOXAHzOvEYfLu--
 
