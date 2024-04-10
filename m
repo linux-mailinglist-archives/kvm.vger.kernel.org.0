@@ -1,254 +1,188 @@
-Return-Path: <kvm+bounces-14148-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4132289FEE4
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 19:46:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 474FF89FF33
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 19:55:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F72B1C22B5C
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 17:45:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC1281F27860
+	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 17:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8C7181325;
-	Wed, 10 Apr 2024 17:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C930017F39E;
+	Wed, 10 Apr 2024 17:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cQyhRkTI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NjN/qLo+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4873A17F379;
-	Wed, 10 Apr 2024 17:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874A117F385
+	for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 17:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712771100; cv=none; b=gNtlKRSa1DqrVxxYYxgSm6YWkHnap30JuBQYtQ2h6bWYtNOEuqqPtMzF33WlNMYgVY9Y4mVsPVILpD+zM9KQEUxm0pnbJeq+OrpNR/JbsfB7gs6ROdqFgRz8YU/gcNKdGa28+VwziS+PmqQSaQ9S91FSwciVUlXjrBKPGtvkTdo=
+	t=1712771721; cv=none; b=TKqhJd2LvTaoUyeqEWwkEu63mOJJl34iR2XhEXJhUbU+M8LYRdydgjWnRv/ehu45ESSTdITASeznU8JHwlOLv/9g7rbkocy7JINaIzR4Rs+RdM0wwb84J6fwXh9mNjxlcWcuujfwLzTh2UibYdjWB0kwrSwJg3zG+AYuhokI/qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712771100; c=relaxed/simple;
-	bh=tU0llIrllZGBRBSavOUUBkfUfb8QI63nj9aOBMcJOj4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JOvkR3AJ14DlHeGHnmZULlMY+3ohoFvydYKrUbkX1/oQA6+j4Tu4vdTxK6/VxZSBjcm9Hj/QbM6MgQfdh4SsVU46I1tx8zaSFl3n+47zZFYpiuFHWrbHbUG6dpiJMqjKDhzw7zXKMVaxt7xdyDfngqQs0NPj88CXOmtxwDJcmps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cQyhRkTI; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43AHVgZG007470;
-	Wed, 10 Apr 2024 17:44:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=isCwm2VVj9IIusgK5+U+9pg2r2c/kDAQFXY6w8ShkCo=;
- b=cQyhRkTIl4/qjhddQzjTxEMo4+0zNfE/pYfoBe4duwiQM3YX0MM3wh4+fX3V2x4G2sGk
- rI5sq25FyKI/19HBz9K4CxvOHy8HTyW4DMcl0QroHMJfRi/+dxRfusOKHwGEiyCS5Dqh
- cWgRC/xIyRmRY1G6dDXwx8HbmsBiPYl094ARqFspKKeKPKXHat6tlY/3lz51tQYlThGk
- p6ZAFpiO0EC4dVcVRkvYivrcWjEKSjz6noBSleZi084mMoTS/pOvz2gB6kZPUzN/Nhts
- XA4RBIagt349h3W3X1jfaeq1fyoo2Cmtgb+MFo2nCwM6JHr6L1WFpBfCHniycPphxx8l og== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xdy1tr1xs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 17:44:44 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43AHii2d029421;
-	Wed, 10 Apr 2024 17:44:44 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xdy1tr1xn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 17:44:44 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43AFK6e1017031;
-	Wed, 10 Apr 2024 17:44:43 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xbke2nuf3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 17:44:43 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43AHibNo53150022
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Apr 2024 17:44:40 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D948620043;
-	Wed, 10 Apr 2024 17:44:37 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AAFD920040;
-	Wed, 10 Apr 2024 17:44:37 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 10 Apr 2024 17:44:37 +0000 (GMT)
-Date: Wed, 10 Apr 2024 19:42:36 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Matthew Wilcox
- <willy@infradead.org>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
- <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian
- Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
- <svens@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Gerald
- Schaefer <gerald.schaefer@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v1 3/5] s390/uv: convert PG_arch_1 users to only work on
- small folios
-Message-ID: <20240410194236.1c89eb7d@p-imbrenda>
-In-Reply-To: <20240404163642.1125529-4-david@redhat.com>
-References: <20240404163642.1125529-1-david@redhat.com>
-	<20240404163642.1125529-4-david@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1712771721; c=relaxed/simple;
+	bh=c5vOu3wln/bzFkI50zK54TLDDdF576q5OSt+R4RYCW0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JBrjh/zH6tyC/cPR5WEeEDBMdYveVXlll12SbRzTZsYPLFkZ0/AXC/qpYHU/wQCN0QayZE6YUcQ9cPP0urhixhM10g33evPN71fzNvSP5Y3gtrum6aHgwd7Pi0Sgqc4bd4u5QAdskXa9wc3GIwx/Wya5zEUwMvaWwzoWbeSGXWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NjN/qLo+; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60ab69a9e6fso1224417b3.0
+        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 10:55:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712771718; x=1713376518; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oTRds48YQAuzki9smTU0zbOfJX16SMcTfKd42zPqGTw=;
+        b=NjN/qLo+8P4Ap71VpMAba/PrNVkDASi5njcnBqX0uUTk3wi1eVRMkoCmBsqzwaUb0M
+         hlD+OdgY5qbavZHavTXev59BojFGj0Oz1Myv7wEOGykrx6Qu8YekKG11yNiLsPiOJFOX
+         SjQ0wJhfb5vblmXhXN159ObhMthOTHRPkQJqFd00G6Z0RgLxOfmjyj+5yguRJ3su1cYf
+         fFZeMx8ZcLrZ9O35KLZKnUJUZM0PFWQrafA7OAp3u+IepSTcg6/oI/4H4kYeNlqEmZPG
+         jq5WVf1CQvYXGeRN8bWmSIXr4Iu08Q9bZUmmE2PCKSF9TBJ0p+btW6Nmlts02+uqqRKV
+         EJAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712771718; x=1713376518;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oTRds48YQAuzki9smTU0zbOfJX16SMcTfKd42zPqGTw=;
+        b=Oli9m0qZjBTxxAvmIXcgGXGF0D5PYuGtjLFb+kuA967whKblY5D4/r/YrQjXppzseC
+         n4RXJxXFuzTLhQdLTXOEFHlJMuipjO7qa1Os/RJqkXgPo5GJVCoW3Ad6ii59EfjF7enB
+         kUbW9+8ltF+RYWgEDfRqw4g2pQ9bORmEsCY03VwcF32YpT7G8WWgCo4n+xQZFUahxuu7
+         pU9LlzklxECfFsEA0KRHJ99QaaA4Pnd40HvE+3FFoebQzwww69KNiVnZ/9lwfhz9O4y/
+         AA0HqT9XsZbaIJo6SdjyZlSxlWaGnC9QtLlWBxSqmY+Kx3Lj6Q6iFA7W1n+AAf6MvzDt
+         Au1Q==
+X-Gm-Message-State: AOJu0Yygme9TOMdbOn72rVB2pOfbT0DD1zh5hvF1wQmhWfjhCfO/Lk46
+	B4FW/7vONF2HEucyUqFvLUmOEeBm+pb9c+nU8rQCxeqB19B6J/Zh6cbHHmaHtBayFl/piZmhiyL
+	A/mwAUhLxectcbBFkQj6fF0IxPvl44Uo3+i9OIW9GuqoY4uwzrcT7F6Nb3UD9sINV/pKRKfgICp
+	fSgi5ZJGZDd/fcQlnpeIKBNjUKEnYvF2VlEDaJBACFX0UJCX/YegvGtV4=
+X-Google-Smtp-Source: AGHT+IFGk/yictiXP/bmh1HJDKurTfI9OfoF/LDokYTgZALVerLy33LdKx5oD0s+3wIFHKHy3OTGRtA6WddrXew0Eg==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6902:1148:b0:dd9:20c1:85b6 with
+ SMTP id p8-20020a056902114800b00dd920c185b6mr109753ybu.2.1712771718281; Wed,
+ 10 Apr 2024 10:55:18 -0700 (PDT)
+Date: Wed, 10 Apr 2024 17:54:37 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hz7Bxbv-xN-ZtiKpIDAhRT2UsI1w_po4
-X-Proofpoint-ORIG-GUID: -P0lAWXIohdv_lozvSe4QhK7TZVjsEOR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- malwarescore=0 bulkscore=0 phishscore=0 priorityscore=1501 suspectscore=0
- mlxlogscore=999 adultscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404100130
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240410175437.793508-1-coltonlewis@google.com>
+Subject: [PATCH v3] KVM: arm64: Add early_param to control WFx trapping
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu,  4 Apr 2024 18:36:40 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Add an early_param to control WFx (WFI or WFE) trapping. This is so
+interrupts can be passed through if the CPU has support for direct
+interrupt injection, a feature of GICv4. This is described as an
+enumeration with three possible behaviors, always passthrough (never
+trap), never passthrough (always trap), or default (trap if more than
+one task is running. Default matches the current behavior.
 
-> Now that make_folio_secure() may only set PG_arch_1 for small folios,
-> let's convert relevant remaining UV code to only work on (small) folios
-> and simply reject large folios early. This way, we'll never end up
-> touching PG_arch_1 on tail pages of a large folio in UV code.
-> 
-> The folio_get()/folio_put() for functions that are documented to already
-> hold a folio reference look weird and it should probably be removed.
-> Similarly, uv_destroy_owned_page() and uv_convert_owned_from_secure()
-> should really consume a folio reference instead. But these are cleanups for
-> another day.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  arch/s390/include/asm/page.h |  1 +
->  arch/s390/kernel/uv.c        | 39 +++++++++++++++++++++---------------
->  2 files changed, 24 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
-> index 54d015bcd8e3..b64384872c0f 100644
-> --- a/arch/s390/include/asm/page.h
-> +++ b/arch/s390/include/asm/page.h
-> @@ -214,6 +214,7 @@ static inline unsigned long __phys_addr(unsigned long x, bool is_31bit)
->  #define pfn_to_phys(pfn)	((pfn) << PAGE_SHIFT)
->  
->  #define phys_to_page(phys)	pfn_to_page(phys_to_pfn(phys))
-> +#define phys_to_folio(phys)	page_folio(phys_to_page(phys))
->  #define page_to_phys(page)	pfn_to_phys(page_to_pfn(page))
->  #define folio_to_phys(page)	pfn_to_phys(folio_pfn(folio))
->  
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index adcbd4b13035..9c0113b26735 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -134,14 +134,17 @@ static int uv_destroy_page(unsigned long paddr)
->   */
->  int uv_destroy_owned_page(unsigned long paddr)
->  {
-> -	struct page *page = phys_to_page(paddr);
-> +	struct folio *folio = phys_to_folio(paddr);
->  	int rc;
->  
-> -	get_page(page);
-> +	if (unlikely(folio_test_large(folio)))
-> +		return 0;
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+v3:
+* Changed control mechanism to an early_param on Marc's advice this should be
+  a system level decision and not exposed via uapi
+* Reduced behavior to an enum from an integer as there are only a few options
+  that make logical sense
+* Limit option for always passthrough to systems with GICv4 since the primary
+  case for always passthrough is systems with direct interrupt injection
 
-please add a comment here to explain why it's ok to just return 0
-here...
+v2:
+https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
 
-> +
-> +	folio_get(folio);
->  	rc = uv_destroy_page(paddr);
->  	if (!rc)
-> -		clear_bit(PG_arch_1, &page->flags);
-> -	put_page(page);
-> +		clear_bit(PG_arch_1, &folio->flags);
-> +	folio_put(folio);
->  	return rc;
->  }
->  
-> @@ -169,14 +172,17 @@ int uv_convert_from_secure(unsigned long paddr)
->   */
->  int uv_convert_owned_from_secure(unsigned long paddr)
->  {
-> -	struct page *page = phys_to_page(paddr);
-> +	struct folio *folio = phys_to_folio(paddr);
->  	int rc;
->  
-> -	get_page(page);
-> +	if (unlikely(folio_test_large(folio)))
-> +		return 0;
+v1:
+https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
 
-... and here
+arch/arm64/include/asm/kvm_host.h |  7 +++++++
+ arch/arm64/kvm/arm.c              | 30 +++++++++++++++++++++++++++++-
+ 2 files changed, 36 insertions(+), 1 deletion(-)
 
-> +
-> +	folio_get(folio);
->  	rc = uv_convert_from_secure(paddr);
->  	if (!rc)
-> -		clear_bit(PG_arch_1, &page->flags);
-> -	put_page(page);
-> +		clear_bit(PG_arch_1, &folio->flags);
-> +	folio_put(folio);
->  	return rc;
->  }
->  
-> @@ -457,33 +463,34 @@ EXPORT_SYMBOL_GPL(gmap_destroy_page);
->   */
->  int arch_make_page_accessible(struct page *page)
->  {
-> +	struct folio *folio = page_folio(page);
->  	int rc = 0;
->  
-> -	/* Hugepage cannot be protected, so nothing to do */
-> -	if (PageHuge(page))
-> +	/* Large folios cannot be protected, so nothing to do */
-> +	if (unlikely(folio_test_large(folio)))
->  		return 0;
->  
->  	/*
->  	 * PG_arch_1 is used in 3 places:
->  	 * 1. for kernel page tables during early boot
->  	 * 2. for storage keys of huge pages and KVM
-> -	 * 3. As an indication that this page might be secure. This can
-> +	 * 3. As an indication that this small folio might be secure. This can
->  	 *    overindicate, e.g. we set the bit before calling
->  	 *    convert_to_secure.
->  	 * As secure pages are never huge, all 3 variants can co-exists.
->  	 */
-> -	if (!test_bit(PG_arch_1, &page->flags))
-> +	if (!test_bit(PG_arch_1, &folio->flags))
->  		return 0;
->  
-> -	rc = uv_pin_shared(page_to_phys(page));
-> +	rc = uv_pin_shared(folio_to_phys(folio));
->  	if (!rc) {
-> -		clear_bit(PG_arch_1, &page->flags);
-> +		clear_bit(PG_arch_1, &folio->flags);
->  		return 0;
->  	}
->  
-> -	rc = uv_convert_from_secure(page_to_phys(page));
-> +	rc = uv_convert_from_secure(folio_to_phys(folio));
->  	if (!rc) {
-> -		clear_bit(PG_arch_1, &page->flags);
-> +		clear_bit(PG_arch_1, &folio->flags);
->  		return 0;
->  	}
->  
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 21c57b812569..e9225b1d0e9b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -67,6 +67,13 @@ enum kvm_mode {
+ 	KVM_MODE_NV,
+ 	KVM_MODE_NONE,
+ };
++
++enum kvm_interrupt_passthrough {
++	KVM_INTERRUPT_PASSTHROUGH_DEFAULT,
++	KVM_INTERRUPT_PASSTHROUGH_ALWAYS,
++	KVM_INTERRUPT_PASSTHROUGH_NEVER,
++};
++
+ #ifdef CONFIG_KVM
+ enum kvm_mode kvm_get_mode(void);
+ #else
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a25265aca432..5d0ea6b2c652 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -46,6 +46,7 @@
+ #include <kvm/arm_psci.h>
 
+ static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
++static enum kvm_interrupt_passthrough kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
+
+ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+
+@@ -456,7 +457,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+ 		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+
+-	if (single_task_running())
++	if ((kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_ALWAYS
++	     && kvm_vgic_global_state.has_gicv4) ||
++	    (kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_DEFAULT
++	     && single_task_running()))
+ 		vcpu_clear_wfx_traps(vcpu);
+ 	else
+ 		vcpu_set_wfx_traps(vcpu);
+@@ -2654,6 +2658,30 @@ static int __init early_kvm_mode_cfg(char *arg)
+ }
+ early_param("kvm-arm.mode", early_kvm_mode_cfg);
+
++static int __init early_kvm_interrupt_passthrough_cfg(char *arg)
++{
++	if (!arg)
++		return -EINVAL;
++
++	if (strcmp(arg, "always") == 0) {
++		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_ALWAYS;
++		return 0;
++	}
++
++	if (strcmp(arg, "never") == 0) {
++		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_NEVER;
++		return 0;
++	}
++
++	if (strcmp(arg, "default") == 0) {
++		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
++		return 0;
++	}
++
++	return -EINVAL;
++}
++early_param("kvm-arm.interrupt-passthrough", early_kvm_interrupt_passthrough_cfg);
++
+ enum kvm_mode kvm_get_mode(void)
+ {
+ 	return kvm_mode;
+--
+2.44.0.478.gd926399ef9-goog
 
