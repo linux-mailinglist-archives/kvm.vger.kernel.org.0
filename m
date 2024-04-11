@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-14297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14299-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01B4E8A1DD5
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:19:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6403D8A1DD7
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:19:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 243151C24AB7
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:19:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3D201F26759
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D605A4E1;
-	Thu, 11 Apr 2024 17:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCDB5CDFA;
+	Thu, 11 Apr 2024 17:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PEUFTMw/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KF3mYi+U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DBE59B76
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 17:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E7B5A11A
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 17:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712856601; cv=none; b=B10IHJIDZXfqT9qy3h2JPRRCe0YeJ6qu+SbUO1CLNzQEWwiEf+YMkXlWwzHkX8oFhP4jbN8tOX3+D6eJQhcmyg8SbjAbsZdRBrPFDOd1nCvLdPqz0yw/fZS01cnMVVDdnuh8aoKAr61qU7D4uyk4Y2v0dqMb/QItq5UZYf82eKk=
+	t=1712856603; cv=none; b=lFIHWM+ciAKbnNzxm0xf3AlCF2bcsT9bUu9WVvB9/YlE9RkAS59CgmG3hFK/3s7zIYmzTKpcCpZw/jf6RXbU+X+yYYEvZLg9Mf59ndnFaxPraJOCdEid8yT8YuFNCNzD4PujdCkZ4Y2Hy+Vm2J1jY2N35dLIh41apkDxWdqhOnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712856601; c=relaxed/simple;
-	bh=S4MbuOxJxC/VtZjoRP2UulPuWcPiZRcja21uuUiaKO8=;
+	s=arc-20240116; t=1712856603; c=relaxed/simple;
+	bh=AxZZDRgU+eSEcOZlh/drCYT330YOmbapHB+yjoCaw38=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HXnmWYEaLERj7oatQuz1jXX0v4BW0H9isM791n+1fXkH55/xol50i6reQf2+18sUdlHHd0HS9ZSw5KReimAyp4/XJH8uYxJWHiI1DmTffvTu+KcSu/quHoEx7xCu5A9gAO3fW5Aio+ZbzajTw+X7QcThTmTxpC3WhNJprBl3oIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PEUFTMw/; arc=none smtp.client-ip=209.85.208.47
+	 MIME-Version; b=PzXHDzlg2O9Tq8DrgfETIv2/FtOGKf2g8EjSIagBiIJtI5U9EvNWbtwN3ABKkc9+9iZ5WcokOd0+RzpSdtTPgg0QSob8PPv4x3pdt+7JeMEPOKaJFcG5dqHu4+G9vLLJHxicC/2kobZTz0a4Yl1ORO1zOJ1yDiB4gG6m6bBze10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KF3mYi+U; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56e136cbcecso24446a12.3
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 10:29:59 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a51aac16b6eso2371666b.1
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 10:30:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712856598; x=1713461398; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712856599; x=1713461399; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X2AmFgND66Sq7R0Qi1yuH1soePbNmTqbpErfYtJy+2k=;
-        b=PEUFTMw//fmunAwCPy2hOqQzNvA6H1fsOhLI7UIXNWah2tHIn2JodlLCgTcbpPH4b/
-         hpPuv0AEPZYg8hcYiCD+jKqjxttKF1UJ61iFmsoEruscOd3mQRG/+/LlnOUgKJiKAUBh
-         Gul+z3Lh32Rny+u0MAgjJMp577ddkSoHpZB6PJ2B7O+g4SbIFa24KQ+qL7YzZ9lkTaT4
-         CuajaChhFfF44CCkvNqx/4x8adGvWKnwH2rWvYYbPhaEac14gH4UzskPrc+PIm9Nuv1P
-         O+rwHt+tizhNisIbTRIgMOkQZlR3SC3OGtOvILYfwWilfnqIIzde+Y2xaa/TsWy0OzC+
-         e45g==
+        bh=dUnKZMKowfp4Qt8gTrzPZ01sKLkncud3ZosKL3Vtlpo=;
+        b=KF3mYi+UyXbG7SB6S0BvRyOdJJQ4CgwlbCzz5FGyzyiL23P5pzGkDghiRL9/h18TTy
+         0DzvAJPAmPDhQhcvBBTJFHPkQLKioFZoqDx8Fzfu1vvDsyoSI374VLgX+XuLlzF60OK5
+         JzcSWE+Q9QJa8AoZ9z7TsjQV2VGrWSLtzSBNj6qVwp2VrB3jjUAXrqgVof9J4IXEOXjW
+         9zk7LlIEbDhtvStHQdLXiUAh01gv+YXGh6yeByjpS0JxD2lQHIRSKqEP95LZ0tXaap97
+         OPClNpLNeMzyKQxXcKdGbiC53GjG34hE7pjdRH0pbjlgQoes1C7OGsp8MWV9PL0udekT
+         xJ9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712856598; x=1713461398;
+        d=1e100.net; s=20230601; t=1712856599; x=1713461399;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X2AmFgND66Sq7R0Qi1yuH1soePbNmTqbpErfYtJy+2k=;
-        b=j129o7ZoUUY3xdkl74iRccP5pPhJFJeyGhh4uWChCIAuggGv0aAubbqr8SFY7v2xPf
-         XTQr1MS9Yt1nuSjpBdTp4DnYW8xTZM5/IUcK6FoTZCSlkINIbMEduKuRyqntQVcDxHPS
-         KDDqUdNiuouQHjBewq48g8/J3TBO0fc8AyFJS4cPiULR85MRp29bWQEw3VOSoCDoEcag
-         gsYoplpi++qPnuTxV/bd0dux4mHtC+mxq1nLOD6exo0r3IGYGjWg9hiMLbKIxaq21CZm
-         kys597yFyMSabORZRIZR9x2wTOJ7RYt+KnLXcptTRPfX1rGOkqMK80fyv3KvZ1fFgWZV
-         96GA==
-X-Gm-Message-State: AOJu0YwSasXL72nvZcsONXWRfMKQ++QD9emKEUZnrA36/1Is63Bbaa6b
-	Yetancrh6hwuu9jjlMMFOEBi54w8ofjyDXXiHveLpsDfOqhPaQOAy2rB7oGh
-X-Google-Smtp-Source: AGHT+IGPSk06CogH86zVtY0To0YE2z8rb4FX6QgnwJL7F1eZK+UTf7cF1ie/hNiVWlfbWJlNTPv0Ng==
-X-Received: by 2002:a50:d61d:0:b0:56b:e089:56ed with SMTP id x29-20020a50d61d000000b0056be08956edmr313812edi.39.1712856598035;
-        Thu, 11 Apr 2024 10:29:58 -0700 (PDT)
+        bh=dUnKZMKowfp4Qt8gTrzPZ01sKLkncud3ZosKL3Vtlpo=;
+        b=ZqldwlswZ712A70Im72M89/NLyBsq/3pujZuxUN4oxvhzYvKgOnNmdFu9ORoWkt2hF
+         9p0FH9OTSr3da2+PUXmFVUWs2f5wc8W9UfeIOF0KuAjLj758I8zGIdHlOkxxDS/7D4bK
+         ttRAG9FyPhAvJcOhfStOAUPilu583G4FQObhCEQYG4Q3IvKBZaKSk2hP7ayR9wrgDWTU
+         Ko0YHVGZGqE8wU2Q6MZaHH/JjKuHhOPOl6cV75ezmRGG6D5Sj8LRlNgHVlYvLAqdsVCX
+         pSxg3Cs40IOy6xYB+/EhFa3Fow4nVbAJDxbOp1ASnGipS7Za+QGlRvp2XMmoImnWE/P6
+         T7Xw==
+X-Gm-Message-State: AOJu0YzWgn1n8BFskyJ4EvCidok8nUv2tLfV/Y7sApwMWCoKV2mP47dM
+	fWGJoEbBsEEo2KgVoNBcPA4E7zpXCZ7TzdHCJpdPWNVWPweChHrTL/4mR+Wj
+X-Google-Smtp-Source: AGHT+IEzBR8PHq4IWwMyiGKMgBX4NLqcT48CgE5sxw9XekZQcIsa+ULdLkvRupreasCe1ySNHWrGCg==
+X-Received: by 2002:a50:9f4b:0:b0:56e:3109:5c7f with SMTP id b69-20020a509f4b000000b0056e31095c7fmr388349edf.26.1712856599126;
+        Thu, 11 Apr 2024 10:29:59 -0700 (PDT)
 Received: from vasant-suse.fritz.box ([2001:9e8:ab51:1500:e6c:48bd:8b53:bc56])
-        by smtp.gmail.com with ESMTPSA id j1-20020aa7de81000000b0056e62321eedsm863461edv.17.2024.04.11.10.29.56
+        by smtp.gmail.com with ESMTPSA id j1-20020aa7de81000000b0056e62321eedsm863461edv.17.2024.04.11.10.29.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 10:29:57 -0700 (PDT)
+        Thu, 11 Apr 2024 10:29:58 -0700 (PDT)
 From: vsntk18@gmail.com
 To: kvm@vger.kernel.org
 Cc: pbonzini@redhat.com,
@@ -74,11 +74,10 @@ Cc: pbonzini@redhat.com,
 	papaluri@amd.com,
 	zxwang42@gmail.com,
 	Vasant Karasulli <vkarasulli@suse.de>,
-	Varad Gautam <varad.gautam@suse.com>,
-	Marc Orr <marcorr@google.com>
-Subject: [kvm-unit-tests PATCH v6 07/11] lib/x86: Move xsave helpers to lib/
-Date: Thu, 11 Apr 2024 19:29:40 +0200
-Message-Id: <20240411172944.23089-8-vsntk18@gmail.com>
+	Varad Gautam <varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v6 08/11] x86: AMD SEV-ES: Handle CPUID #VC
+Date: Thu, 11 Apr 2024 19:29:41 +0200
+Message-Id: <20240411172944.23089-9-vsntk18@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240411172944.23089-1-vsntk18@gmail.com>
 References: <20240411172944.23089-1-vsntk18@gmail.com>
@@ -92,144 +91,160 @@ Content-Transfer-Encoding: 8bit
 
 From: Vasant Karasulli <vkarasulli@suse.de>
 
-Processing CPUID #VC for AMD SEV-ES requires copying xcr0 into GHCB.
-Move the xsave read/write helpers used by xsave testcase to lib/x86
-to share as common code.
+Using Linux's CPUID #VC processing logic.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
-Reviewed-by: Marc Orr <marcorr@google.com>
 ---
- lib/x86/processor.h | 10 ----------
- lib/x86/xsave.c     | 26 ++++++++++++++++++++++++++
- lib/x86/xsave.h     | 15 +++++++++++++++
- x86/Makefile.common |  1 +
- x86/xsave.c         | 17 +----------------
- 5 files changed, 43 insertions(+), 26 deletions(-)
- create mode 100644 lib/x86/xsave.c
- create mode 100644 lib/x86/xsave.h
+ lib/x86/amd_sev.h    |  5 ++-
+ lib/x86/amd_sev_vc.c | 97 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+), 1 deletion(-)
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index b324cbf0..d839308f 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -477,16 +477,6 @@ static inline uint64_t rdpmc(uint32_t index)
- 	return val;
+diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
+index b6b7a13f..efd439fb 100644
+--- a/lib/x86/amd_sev.h
++++ b/lib/x86/amd_sev.h
+@@ -71,7 +71,7 @@ struct ghcb {
+ 	u8 shared_buffer[GHCB_SHARED_BUF_SIZE];
+
+ 	u8 reserved_0xff0[10];
+-	u16 protocol_version;	/* negotiated SEV-ES/GHCB protocol version */
++	u16 version;	/* version of the GHCB data structure */
+ 	u32 ghcb_usage;
+ } __packed;
+
+@@ -79,6 +79,9 @@ struct ghcb {
+ #define GHCB_PROTOCOL_MAX	1ULL
+ #define GHCB_DEFAULT_USAGE	0ULL
+
++/* Version of the GHCB data structure */
++#define GHCB_VERSION		1
++
+ #define	VMGEXIT()			{ asm volatile("rep; vmmcall\n\r"); }
+
+ enum es_result {
+diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
+index 30b892f9..3a5e593c 100644
+--- a/lib/x86/amd_sev_vc.c
++++ b/lib/x86/amd_sev_vc.c
+@@ -8,6 +8,7 @@
+
+ #include "amd_sev.h"
+ #include "svm.h"
++#include "x86/xsave.h"
+
+ extern phys_addr_t ghcb_addr;
+
+@@ -58,6 +59,99 @@ static void vc_finish_insn(struct es_em_ctxt *ctxt)
+ 	ctxt->regs->rip += ctxt->insn.length;
  }
 
--static inline int xgetbv_safe(u32 index, u64 *result)
--{
--	return rdreg64_safe(".byte 0x0f,0x01,0xd0", index, result);
--}
--
--static inline int xsetbv_safe(u32 index, u64 value)
--{
--	return wrreg64_safe(".byte 0x0f,0x01,0xd1", index, value);
--}
--
- static inline int write_cr0_safe(ulong val)
- {
- 	return asm_safe("mov %0,%%cr0", "r" (val));
-diff --git a/lib/x86/xsave.c b/lib/x86/xsave.c
-new file mode 100644
-index 00000000..85aae78f
---- /dev/null
-+++ b/lib/x86/xsave.c
-@@ -0,0 +1,26 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "libcflat.h"
-+#include "xsave.h"
-+#include "processor.h"
-+
-+int xgetbv_safe(u32 index, u64 *result)
++static inline void sev_es_wr_ghcb_msr(u64 val)
 +{
-+	return rdreg64_safe(".byte 0x0f,0x01,0xd0", index, result);
++	wrmsr(MSR_AMD64_SEV_ES_GHCB, val);
 +}
 +
-+int xsetbv_safe(u32 index, u64 value)
++static inline u64 sev_es_rd_ghcb_msr(void)
 +{
-+	return wrreg64_safe(".byte 0x0f,0x01,0xd1", index, value);
-+}
-+
-+uint64_t get_supported_xcr0(void)
-+{
-+    struct cpuid r;
-+    r = cpuid_indexed(0xd, 0);
-+    printf("eax %x, ebx %x, ecx %x, edx %x\n",
-+            r.a, r.b, r.c, r.d);
-+    return r.a + ((u64)r.d << 32);
++	return rdmsr(MSR_AMD64_SEV_ES_GHCB);
 +}
 +
 +
-diff --git a/lib/x86/xsave.h b/lib/x86/xsave.h
-new file mode 100644
-index 00000000..34c1c149
---- /dev/null
-+++ b/lib/x86/xsave.h
-@@ -0,0 +1,15 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _X86_XSAVE_H_
-+#define _X86_XSAVE_H_
++static enum es_result sev_es_ghcb_hv_call(struct ghcb *ghcb,
++					  struct es_em_ctxt *ctxt,
++					  u64 exit_code, u64 exit_info_1,
++					  u64 exit_info_2)
++{
++	enum es_result ret;
 +
-+#define XCR_XFEATURE_ENABLED_MASK       0x00000000
-+#define XCR_XFEATURE_ILLEGAL_MASK       0x00000010
++	/* Fill in protocol and format specifiers */
++	ghcb->version = GHCB_VERSION;
++	ghcb->ghcb_usage       = GHCB_DEFAULT_USAGE;
 +
-+#define XSTATE_FP       0x1
-+#define XSTATE_SSE      0x2
-+#define XSTATE_YMM      0x4
++	ghcb_set_sw_exit_code(ghcb, exit_code);
++	ghcb_set_sw_exit_info_1(ghcb, exit_info_1);
++	ghcb_set_sw_exit_info_2(ghcb, exit_info_2);
 +
-+int xgetbv_safe(u32 index, u64 *result);
-+int xsetbv_safe(u32 index, u64 value);
-+uint64_t get_supported_xcr0(void);
-+#endif
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 25ae6f78..c1e90b86 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -23,6 +23,7 @@ cflatobjs += lib/x86/stack.o
- cflatobjs += lib/x86/fault_test.o
- cflatobjs += lib/x86/delay.o
- cflatobjs += lib/x86/pmu.o
-+cflatobjs += lib/x86/xsave.o
- ifeq ($(CONFIG_EFI),y)
- cflatobjs += lib/x86/amd_sev.o
- cflatobjs += lib/x86/amd_sev_vc.o
-diff --git a/x86/xsave.c b/x86/xsave.c
-index 5d80f245..f3cbfca4 100644
---- a/x86/xsave.c
-+++ b/x86/xsave.c
-@@ -1,6 +1,7 @@
- #include "libcflat.h"
- #include "desc.h"
- #include "processor.h"
-+#include "xsave.h"
++	sev_es_wr_ghcb_msr(__pa(ghcb));
++	VMGEXIT();
++
++	if ((ghcb->save.sw_exit_info_1 & 0xffffffff) == 1) {
++		u64 info = ghcb->save.sw_exit_info_2;
++		unsigned long v;
++
++		v = info & SVM_EVTINJ_VEC_MASK;
++
++		/* Check if exception information from hypervisor is sane. */
++		if ((info & SVM_EVTINJ_VALID) &&
++		    ((v == GP_VECTOR) || (v == UD_VECTOR)) &&
++		    ((info & SVM_EVTINJ_TYPE_MASK) == SVM_EVTINJ_TYPE_EXEPT)) {
++			ctxt->fi.vector = v;
++			if (info & SVM_EVTINJ_VALID_ERR)
++				ctxt->fi.error_code = info >> 32;
++			ret = ES_EXCEPTION;
++		} else {
++			ret = ES_VMM_ERROR;
++		}
++	} else if (ghcb->save.sw_exit_info_1 & 0xffffffff) {
++		ret = ES_VMM_ERROR;
++	} else {
++		ret = ES_OK;
++	}
++
++	return ret;
++}
++
++static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
++				      struct es_em_ctxt *ctxt)
++{
++	struct ex_regs *regs = ctxt->regs;
++	u32 cr4 = read_cr4();
++	enum es_result ret;
++
++	ghcb_set_rax(ghcb, regs->rax);
++	ghcb_set_rcx(ghcb, regs->rcx);
++
++	if (cr4 & X86_CR4_OSXSAVE) {
++		/* Safe to read xcr0 */
++		u64 xcr0;
++		xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0);
++		ghcb_set_xcr0(ghcb, xcr0);
++	} else {
++		/* xgetbv will cause #GP - use reset value for xcr0 */
++		ghcb_set_xcr0(ghcb, 1);
++	}
++
++	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_CPUID, 0, 0);
++	if (ret != ES_OK)
++		return ret;
++
++	if (!(ghcb_rax_is_valid(ghcb) &&
++	      ghcb_rbx_is_valid(ghcb) &&
++	      ghcb_rcx_is_valid(ghcb) &&
++	      ghcb_rdx_is_valid(ghcb)))
++		return ES_VMM_ERROR;
++
++	regs->rax = ghcb->save.rax;
++	regs->rbx = ghcb->save.rbx;
++	regs->rcx = ghcb->save.rcx;
++	regs->rdx = ghcb->save.rdx;
++
++	return ES_OK;
++}
++
+ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+ 					 struct ghcb *ghcb,
+ 					 unsigned long exit_code)
+@@ -65,6 +159,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+ 	enum es_result result;
 
- #ifdef __x86_64__
- #define uint64_t unsigned long
-@@ -8,22 +9,6 @@
- #define uint64_t unsigned long long
- #endif
-
--static uint64_t get_supported_xcr0(void)
--{
--    struct cpuid r;
--    r = cpuid_indexed(0xd, 0);
--    printf("eax %x, ebx %x, ecx %x, edx %x\n",
--            r.a, r.b, r.c, r.d);
--    return r.a + ((u64)r.d << 32);
--}
--
--#define XCR_XFEATURE_ENABLED_MASK       0x00000000
--#define XCR_XFEATURE_ILLEGAL_MASK       0x00000010
--
--#define XSTATE_FP       0x1
--#define XSTATE_SSE      0x2
--#define XSTATE_YMM      0x4
--
- static void test_xsave(void)
- {
-     unsigned long cr4;
+ 	switch (exit_code) {
++	case SVM_EXIT_CPUID:
++		result = vc_handle_cpuid(ghcb, ctxt);
++		break;
+ 	default:
+ 		/*
+ 		 * Unexpected #VC exception
 --
 2.34.1
 
