@@ -1,130 +1,122 @@
-Return-Path: <kvm+bounces-14334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D36B88A208C
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 22:59:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F4B78A2099
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 23:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FDC71F275F3
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:59:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D029E2830C5
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 21:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1995B29437;
-	Thu, 11 Apr 2024 20:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36AF335DB;
+	Thu, 11 Apr 2024 21:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b4ta8ONM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F13iYDMX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F174D28DCA
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 20:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D90517BCD
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 21:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712869161; cv=none; b=IXyWDEUg2/8/avVtL+gSf5H3JbeWgEwOQC6xvhaLNrg5Jl9nXBoszenb5/+4+p8S/0QBXJgw2fFBHNC1FbRd8k5ARkRPt40JsM/nLHzykyPXllVwkqu2Qh9/bg9xNvJsh+Vi6FtbeKrH9ScbnmJmZbZRClQymKvfxvIV2KlweLI=
+	t=1712869385; cv=none; b=szvm7iMsy619n/PPDpG8oPKIRLP5eBm5lINe8y+j29dTZH5ZJw8fR2iSP+e6tf9sFnOyzDpHOHxMGqd13UxBQ1DVRYNth4LYFVeUYpmtHqHKN03rRk7rwtJRm4PGSOO1zw9XGKE5Btosp8lL5DZKFQ5/d9wdneucMlfI37avf/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712869161; c=relaxed/simple;
-	bh=vR99g8mNTRiYJdlpafdj8u7Gjffk6aYOoefBxZEqiMQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tkUHNvKOe6PnWVIfC+VCBe9ak49mxTIPPEXm9rvsVdSv8lo2QZhij3SV3p+rb9wm1XNsuGYqI74mRPEHakqYPoYt8F2RLXHsueZRONloMXuJepnRfHGL+rfMETQAtWSYmCSkSUwJ5xjNDQ8qZ7fh2Y/ai6e1eJks+efplV31Yc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b4ta8ONM; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1712869385; c=relaxed/simple;
+	bh=6ohnLm7z3PDG7MWeKCsPtN2uBOTfngdUGkrSE6HEqWQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=BkO84lblfJdsE2k4StZ0u/UFRNG3QLGPqw+fwAHVdJnwsJB40rKX0NrhfVtBA9M4CJzneg8uUfE8rAdCP4eA3uJt5TyAtK/5y9nHJ4XVVgysqNcJATNhxDY6HrQv24r+taU1znVZu8e+Nm1FD2cpcAdZRd+RGFduscaDgKPaaLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F13iYDMX; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a2dbaacff8so192014a91.2
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 13:59:19 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-609fe93b5cfso3590287b3.0
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 14:03:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712869159; x=1713473959; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=z/t9yt+wjV0kyHJCD1NRDqQJ2mO0T50Bz6dZJxesy/U=;
-        b=b4ta8ONMbtv15xMYjAZyDcWfkUyQqSfUfUWCykhePqLFjJLrglDGUbK1UBWxEsXRfH
-         K33GjwCG6FwXaK2dIBTYRspL5gFrkLKDM7CuCypdLBAOIHKiCAMYS+2kqZMFfpzo4NN8
-         iczP3levPWRUuT+XrcpUTDl0FBYuDhY+sW5I3KsjL2s6IN9HA117vhXEzA057Rto7N0k
-         rNuK6/eECztdMR8273Ovs6DqNgi/wZAv2NYoHHokFdDSIjIgItwm0oKGiHWqrD7LBfgz
-         VJAg1JgMpzwI1TJfJKyv5FfcaPl/EYNdI116fJfbXaqxJYsVIANnARGRy3eIkaBgbG2X
-         7ZDA==
+        d=google.com; s=20230601; t=1712869381; x=1713474181; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LqNHTRbTBamf9CG0cXrMM0YOfuqafLOBk3xuoM8380s=;
+        b=F13iYDMX7yW18JTzN5qfC/hm/ZPvBRTo5yh/aO1ndLxy0G0tLlFAbH5L5rTjJ56BBx
+         ZO++GqvBmmI6zqXsVInX8cRsKLg1w5i4ZN+HzePNsubtpi6GnaprrsAA4vmHWhv7MUYz
+         n/uiJin7NXSG2TlZ9ud4FUM1pE0eT29LWDaYFYR+mNq/W3QL38gcX0P5jOUaZO73xX34
+         v4h6Wdgc/5HCNz4hdCblQcov/OfRN9Hik51ZyYhc/dJy8fYTIlYWilVrXy+1WpYO+O03
+         peEj9axx1TS3N4J5BakoxcMmQFpcgONFrXYWgZJq7u7bv98gquaIuBgRALSy6vgCvQ69
+         heyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712869159; x=1713473959;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z/t9yt+wjV0kyHJCD1NRDqQJ2mO0T50Bz6dZJxesy/U=;
-        b=IqcT8YNWzwWijEhwDr0McerBsSkFRfg1ULzSBRmlZB3ZGXNDF/hwfx/33GnOUfPRlv
-         gx3MBscBLt3H2FU+5rn6pEynHTYKErMeDoYVUqC/Gv1hzeb8sOJ2HX9/1qS9ydyT69RK
-         jN+DvKP9ck1M71XrkiFVJ8juemuFpBrQBl2poAPOp7lt4nhz8eO2c5sW/kTTeqjrhqre
-         o69R++aMyeFZI/tAsHOl8G3rtxB5DFqyTn0Wfee1fw2lb2T7M2L07Tx7JgQkqpP6TpyL
-         20VUFCvYFWSx3QtOHTplWllfA8oo/q+7e+ECNmBo1A+4fgKBUHrLmO3FdhqeIjmr2OHp
-         287Q==
-X-Gm-Message-State: AOJu0YzKtxsxlUUBRf5vkBnStNj3dhHQMgQysaNbYf6+a58uHf7mCLaS
-	UOUCYqevCamQ4oQEQesMP1aJa87R1U+xEkM66dVbilO7406nTAm2itCqDeSbUmIdPzBaKqqvpbQ
-	txgjwDZxP29nJCTSYtN7S7CmDDzy/husnOYEct/dls2T2Icj+tvj4ikPKNzBRcXcURJamnJYISF
-	uiGSk9DJBpMzym9bQ728vkq9UhTTQ2mvatxwNeXtM=
-X-Google-Smtp-Source: AGHT+IHr54fp6UFx/fJ4OhSWwpFKKFZ1tTaYYSu/IECnEVbCPGVtB+Xdp0wIN0vgSRIdQr2WFjLeAfVTw7imtg==
-X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
- (user=jmattson job=sendgmr) by 2002:a17:90b:1807:b0:29f:f89d:f5b7 with SMTP
- id lw7-20020a17090b180700b0029ff89df5b7mr1867pjb.8.1712869159094; Thu, 11 Apr
- 2024 13:59:19 -0700 (PDT)
-Date: Thu, 11 Apr 2024 13:58:51 -0700
+        d=1e100.net; s=20230601; t=1712869381; x=1713474181;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LqNHTRbTBamf9CG0cXrMM0YOfuqafLOBk3xuoM8380s=;
+        b=barSicaGVN47XhxjboORzSIcLTr5h4DDRggUgg/c3+4oSusNVIale+kwiYJOZvaD23
+         la4QytbcuWPqi7h5XvyeBya/88nxkBnjdsYtQc/tY5avl6k46wH3fYRqV3qVjiiypPDo
+         HBhFq6W2DnLFJprDVVt67TUeOzFywT1Y4bIfoARhKMDNAxCfdFQrRfEDZdmXSM6zdfjM
+         MR8w7Epcl38EfWPvNcV81RE5X6/cBiWWdpXBGbeQgZuYJhW4SDhX7M2tkujTIT3YQVdK
+         NHR1qMBYaHKKdIHiuuMpIriRDTvdAx+g+brbQ+yiMkqZXfqzx74vwsMi8YpJCvzUY89v
+         OLAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWyxgfkmiVW7YAz8BYQS0WReNuSm29yn2ZNwe5KkZ9XXd6BhH7F3cjcGed7HZFosnFCZ7zEyDJTSQoxjEd5ju8xdAtZ
+X-Gm-Message-State: AOJu0YzVRkFzxdryVWHFUd2rgztn209IY2eRd2XcV6XnJ87JyNMtYI2k
+	OjFDSXGZGOd1Qvyy/JKYllZ5dC0VO4gi3lhAshhmTuiRWNYHa48WWVat5ZylP66x3/+IB9+770p
+	Xfw==
+X-Google-Smtp-Source: AGHT+IHLAavkjmCuRth9ZO5j6qCkcn9lXltBiSUO5FeZiNUU85dnwhoGihd7JtI7vD7CCsfcYc6LQX6nRa0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:70c:b0:dc6:e823:9edb with SMTP id
+ k12-20020a056902070c00b00dc6e8239edbmr104731ybt.12.1712869381654; Thu, 11 Apr
+ 2024 14:03:01 -0700 (PDT)
+Date: Thu, 11 Apr 2024 14:03:00 -0700
+In-Reply-To: <20240126085444.324918-12-xiong.y.zhang@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240411205911.1684763-1-jmattson@google.com>
-Subject: [PATCH] KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
-From: Jim Mattson <jmattson@google.com>
-To: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com> <20240126085444.324918-12-xiong.y.zhang@linux.intel.com>
+Message-ID: <ZhhQBHQ6V7Zcb8Ve@google.com>
+Subject: Re: [RFC PATCH 11/41] KVM: x86/pmu: Introduce enable_passthrough_pmu
+ module parameter and propage to KVM instance
+From: Sean Christopherson <seanjc@google.com>
+To: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com, 
+	kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, 
+	jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com, Xiong Zhang <xiong.y.zhang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-From Intel's documention [1], "CPUID.(EAX=07H,ECX=0):EDX[26]
-enumerates support for indirect branch restricted speculation (IBRS)
-and the indirect branch predictor barrier (IBPB)." Further, from [2],
-"Software that executed before the IBPB command cannot control the
-predicted targets of indirect branches (4) executed after the command
-on the same logical processor," where footnote 4 reads, "Note that
-indirect branches include near call indirect, near jump indirect and
-near return instructions. Because it includes near returns, it follows
-that **RSB entries created before an IBPB command cannot control the
-predicted targets of returns executed after the command on the same
-logical processor.**" [emphasis mine]
+On Fri, Jan 26, 2024, Xiong Zhang wrote:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4432e736129f..074452aa700d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -193,6 +193,11 @@ bool __read_mostly enable_pmu = true;
+>  EXPORT_SYMBOL_GPL(enable_pmu);
+>  module_param(enable_pmu, bool, 0444);
+>  
+> +/* Enable/disable PMU virtualization */
 
-On the other hand, AMD's "IBPB may not prevent return branch
-predictions from being specified by pre-IBPB branch targets" [3].
+Heh, copy+paste fail.  Just omit a comment, it's pretty self-explanatory.
 
-Since Linux sets the synthetic feature bit, X86_FEATURE_IBPB, on AMD
-CPUs that implement the weaker version of IBPB, it is incorrect to
-infer from this and X86_FEATURE_IBRS that the CPU supports the
-stronger version of IBPB indicated by CPUID.(EAX=07H,ECX=0):EDX[26].
+> +bool __read_mostly enable_passthrough_pmu = true;
+> +EXPORT_SYMBOL_GPL(enable_passthrough_pmu);
+> +module_param(enable_passthrough_pmu, bool, 0444);
 
-Stop making this inference.
+Almost forgot.  Two things:
 
-[1] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/cpuid-enumeration-and-architectural-msrs.html
-[2] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/speculative-execution-side-channel-mitigations.html#Footnotes
-[3] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-1040.html
+ 1. KVM should not enable the passthrough/mediate PMU by default until it has
+    reached feature parity with the existing PMU, because otherwise we are
+    essentially breaking userspace.  And if for some reason the passthrough PMU
+    *can't* reach feature parity, then (a) that's super interesting, and (b) we
+    need a more explicit/deliberate transition plan.
 
-Fixes: 0c54914d0c52 ("KVM: x86: use Intel speculation bugs and features as derived in generic x86 code")
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/cpuid.c | 2 --
- 1 file changed, 2 deletions(-)
+ 2. The module param absolutely must not be exposed to userspace until all patches
+    are in place.  The easiest way to do that without creating dependency hell is
+    to simply not create the module param.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index bfc0bfcb2bc6..66f2761b2836 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -677,8 +677,6 @@ void kvm_set_cpu_caps(void)
- 	kvm_cpu_cap_set(X86_FEATURE_TSC_ADJUST);
- 	kvm_cpu_cap_set(X86_FEATURE_ARCH_CAPABILITIES);
- 
--	if (boot_cpu_has(X86_FEATURE_IBPB) && boot_cpu_has(X86_FEATURE_IBRS))
--		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
- 	if (boot_cpu_has(X86_FEATURE_STIBP))
- 		kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
- 	if (boot_cpu_has(X86_FEATURE_AMD_SSBD))
--- 
-2.44.0.683.g7961c838ac-goog
+I.e. this patch should do _only_
 
+bool __read_mostly enable_passthrough_pmu;
+EXPORT_SYMBOL_GPL(enable_passthrough_pmu);
 
