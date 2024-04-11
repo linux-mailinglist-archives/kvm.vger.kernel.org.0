@@ -1,87 +1,150 @@
-Return-Path: <kvm+bounces-14342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37E68A20E5
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 23:28:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD4FF8A20FF
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 23:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3F091C2325A
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 21:28:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88321286C01
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 21:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7304339AF8;
-	Thu, 11 Apr 2024 21:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD8C39FFD;
+	Thu, 11 Apr 2024 21:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="1rFSV6Wn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ynSWdYrh"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC723CF65;
-	Thu, 11 Apr 2024 21:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FF3383AA
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 21:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712870909; cv=none; b=polrgxLsyRIBYeqLN3nxBGNtX8rKRvy14xM59kH7FW4sYaXRn7tcsrD2JPxPG7Fwnd28tREMqi9kLEU2pmKgZFKGvN2czpapbwZL0uIiqQg/v/6Aho5VrfrtVXkFq03w6NndUIgJL2Vw67IzSCsrr9q7MO28r6kYmfI5+JhAh0o=
+	t=1712871369; cv=none; b=bVxIedopvS+KXzRHBjUByTONILbu+5BUHkKQHgCM2QR2wDp8M94JK0PuO5MgeYBxypmALJDZGQ2fXs9u9RpD6RMt/hvJbWY435uS+s3uSS7j22ziGNPgkq8oEYbR/rSkpG9/bAJQP99Y1cOhjZVO5uZts805RqP48M/vjSEfHjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712870909; c=relaxed/simple;
-	bh=qYZJAos8Y1VlhyFh0wodG8r9EP6fTB4gaPBhuU18hO8=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=dfdC0AyJ+z3hyl9vQa4bmV2t9IzQvqbWlDTacSGrXRKrWDRAOjm34Q7ZfV8apoMEWFkGObWuVaN6E/F0973OdUZH3W9X/FWrVBFv6KLKOP0nJs5MWLRI82/tdGQd9SR6Ey0FZMRLlyAYZ6IGpFASTlcvT9rGJaYPwbIMjDx/YLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=1rFSV6Wn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DDE9C072AA;
-	Thu, 11 Apr 2024 21:28:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1712870909;
-	bh=qYZJAos8Y1VlhyFh0wodG8r9EP6fTB4gaPBhuU18hO8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=1rFSV6WnuiT57XyEfZi728PpeWo2haLruBtoEN/Awm7LEedlT6WNJf8F+xyZCGAbv
-	 A/fAldqTr7ZyeA4IjWWh5av3FodBpvp0cpkMq0+hvyjt0yt+ElWoSI0swMmZrBNU6n
-	 olojFA0RW078omUyeBn/qiSahZ9Hne+LuXx1HR/I=
-Date: Thu, 11 Apr 2024 14:28:27 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio
- Imbrenda <imbrenda@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Peter Xu <peterx@redhat.com>, Alexander
- Gordeev <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Andrea Arcangeli
- <aarcange@redhat.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 0/2] s390/mm: shared zeropage + KVM fixes
-Message-Id: <20240411142827.d5c3bc401c6536bb1315049a@linux-foundation.org>
-In-Reply-To: <20240411161441.910170-1-david@redhat.com>
-References: <20240411161441.910170-1-david@redhat.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1712871369; c=relaxed/simple;
+	bh=i20kViclVoU910FhgD4850gArucbSEi6mTUIiZzLMgE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Kd0z453v/mSgqZnBMXQ3AL7DpEBU/3YquBVv2W5ijpewb4C/kAkHnxTUADip+C+oB01Z14Xqr08KNWxw0SOfe+gOU0TjvNhBSZnqv5NkdM8lt/2pBlJXxB58ya+yxjWNgq4mkgL7+auhsETsh9eVCkVrC32jLo4a2/tItIb0I6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ynSWdYrh; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6187588d2a7so4968607b3.0
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 14:36:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712871367; x=1713476167; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2t/yhHavryfHLTVYj1u8BqInFBj/5xKyOtI6EEMp6kY=;
+        b=ynSWdYrh7C6tSJa/muuA7UmUKl1SrAO4dl9VTraIazRA0fAU4boYpYKqWvMkcf2qM1
+         20c/NHUmL0YkeyUx2PcwKKQ8QqX/m8MlicYrjAwDQ79ZKxFjoPdM7t0TgJKDEwIdmYcL
+         OjeG+75zPFRpqlxnkh+rhM/3p+Y0jr0wlzn+s1pnrkv7Evzf+JN9sWKFcw0xnOCId6MO
+         U99m4uy6t9K4xFKn/EtgeMpnSIcYYUf8jn8rUO1DzFVRFpmfezK+ri3aTFq7TYrNdP3T
+         agHvYTjZcdj9a4z/io6ELqVhGdlMhZGphWy4vRolOru/uL6HHkkWFdhBJZXWJSDJoHy3
+         z+IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712871367; x=1713476167;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2t/yhHavryfHLTVYj1u8BqInFBj/5xKyOtI6EEMp6kY=;
+        b=tuNq34ZClS3G85atgKitiqPgEDiqc4dD9duKFZIkBujd86xbFwv16Apgt17BEAck2s
+         qibCKgOycXvxAELTfdAfpQV9Y3m9xsJKMW8tkoSG5o9My2NptFnBWrXO/OltKQfuLKR4
+         KC1sWCsUlG/Vc6RVsZxGUKY2cdr9Zs9HPyBiACYcHz35hq0bzzAzWrenV7TtIumf2cN1
+         FI6uQHAZUpNAPdHFdiSuhypcOY+eepUtCemQ6VYx2ZGNCkQI4pAmvsMSKOZ7SPsIC6wH
+         B9AP4b6lqJ38Zxs3KCONt4uqXoVn+baOuoTReHDjTeExh6cFKe3w7J29mnr7Tg18oE1X
+         NhPw==
+X-Forwarded-Encrypted: i=1; AJvYcCWom6TzpAPMJyfME/7cC22TWA224hBLSTvafVCYjClRQeQS4SLwsPOsWafRJd8+ZKtOZuTUkgYkeZ+jrw9vrnXh0+ZT
+X-Gm-Message-State: AOJu0YzOVt8akFynTV3ZK7x1VVP1KcOjPP1+xbh6pWu7GrU33UNLDfj+
+	59IbACqJqh3+5xbXT49/Rgm1HZAojSdLzgh+PnCxmxuRuJ5YskqVLxkhPLackjXye5bVPHOvlXs
+	Irw==
+X-Google-Smtp-Source: AGHT+IHOnBnVhBGz76zEM73ew/BnSB+dc6+KJZYmdSqjoxgILellc26j5dgSKSbo3MKBLVz44DL/AVjXFss=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:ca56:0:b0:615:80c8:94f3 with SMTP id
+ m83-20020a0dca56000000b0061580c894f3mr161673ywd.6.1712871367327; Thu, 11 Apr
+ 2024 14:36:07 -0700 (PDT)
+Date: Thu, 11 Apr 2024 14:36:05 -0700
+In-Reply-To: <20240126085444.324918-25-xiong.y.zhang@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com> <20240126085444.324918-25-xiong.y.zhang@linux.intel.com>
+Message-ID: <ZhhXxV3Z1UHLp1M1@google.com>
+Subject: Re: [RFC PATCH 24/41] KVM: x86/pmu: Zero out unexposed
+ Counters/Selectors to avoid information leakage
+From: Sean Christopherson <seanjc@google.com>
+To: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com, 
+	kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, 
+	jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 11 Apr 2024 18:14:39 +0200 David Hildenbrand <david@redhat.com> wrote:
-
-> This series fixes one issue with uffd + shared zeropages on s390x and
-> fixes that "ordinary" KVM guests can make use of shared zeropages again.
+On Fri, Jan 26, 2024, Xiong Zhang wrote:
+> From: Mingwei Zhang <mizhang@google.com>
 > 
-> ...
->
-> Without the shared zeropage, during (2), the VM would suddenly consume
-> 100 GiB on the migration source and destination. On the migration source,
-> where we don't excpect memory overcommit, we could easilt end up crashing
-> the VM during migration.
-> 
-> Independent of that, memory handed back to the hypervisor using "free page
-> reporting" would end up consuming actual memory after the migration on the
-> destination, not getting freed up until reused+freed again.
-> 
+> Zero out unexposed counters/selectors because even though KVM intercepts
+> all accesses to unexposed PMU MSRs, it does pass through RDPMC instruction
+> which allows guest to read all GP counters and fixed counters. So, zero out
+> unexposed counter values which might contain critical information for the
+> host.
 
-Is a backport desirable?
+This belongs in the previous patch, it's effectively a bug fix.  I appreciate
+the push for finer granularity, but introducing a blatant bug and then immediately
+fixing it goes too far.
 
-If so, the [1/2] Fixes dates back to 2015 and the [2/2] Fixes is from
-2017.  Is it appropriate that the patches be backported so far back,
-and into different kernel versions?  
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/vmx/pmu_intel.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index f79bebe7093d..4b4da7f17895 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -895,11 +895,27 @@ static void intel_restore_pmu_context(struct kvm_vcpu *vcpu)
+>  		wrmsrl(MSR_ARCH_PERFMON_EVENTSEL0 + i, pmc->eventsel);
+>  	}
+>  
+> +	/*
+> +	 * Zero out unexposed GP counters/selectors to avoid information leakage
+> +	 * since passthrough PMU does not intercept RDPMC.
+
+Zeroing the selectors is unnecessary.  KVM still intercepts MSR_CORE_PERF_GLOBAL_CTRL,
+so just ensure the PMCs that aren't exposed the guest are globally enabled.
+
+> +	 */
+> +	for (i = pmu->nr_arch_gp_counters; i < kvm_pmu_cap.num_counters_gp; i++) {
+> +		wrmsrl(MSR_IA32_PMC0 + i, 0);
+> +		wrmsrl(MSR_ARCH_PERFMON_EVENTSEL0 + i, 0);
+> +	}
+> +
+>  	wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl);
+>  	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>  		pmc = &pmu->fixed_counters[i];
+>  		wrmsrl(MSR_CORE_PERF_FIXED_CTR0 + i, pmc->counter);
+>  	}
+> +
+> +	/*
+> +	 * Zero out unexposed fixed counters to avoid information leakage
+> +	 * since passthrough PMU does not intercept RDPMC.
+
+I would call out that RDPMC interception is all or nothing, i.e. KVM can't
+selectively intercept _some_ PMCs, and the MSR bitmaps don't apply to RDPMC.
+
+> +	 */
+> +	for (i = pmu->nr_arch_fixed_counters; i < kvm_pmu_cap.num_counters_fixed; i++)
+> +		wrmsrl(MSR_CORE_PERF_FIXED_CTR0 + i, 0);
+>  }
+>  
+>  struct kvm_pmu_ops intel_pmu_ops __initdata = {
+> -- 
+> 2.34.1
+> 
 
