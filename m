@@ -1,145 +1,183 @@
-Return-Path: <kvm+bounces-14305-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14306-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC98C8A1E12
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:27:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8209A8A1E40
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FDEC288507
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:27:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3F071C21248
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E564413328E;
-	Thu, 11 Apr 2024 17:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D2D78C93;
+	Thu, 11 Apr 2024 18:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AsuAiIEO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ldxlZC9Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A806513ADC
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 17:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043F078C82
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 18:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712857602; cv=none; b=uyprFLvjbdbqS7mYg660H33mlGlHzpoX9C5EtCtP6HPneMWvLTqjAzotsjlPqxLZ4fr+oP7nXDLelmcUwWS7X99XLJT/UFtPX8jSwB+mY3mn3bMYTOA9HduxINyTkZgCaVKyIzpM4Y1QZRl6I2LSXsWzURizfZtY2tZzlAQHNzY=
+	t=1712858469; cv=none; b=gEPdLZ30AZCxahug0pRlpVtLv5OnH6DpSx409FRiL8QiqHDrkU/ptWGNUdopIwpfmAeLf56VZmggGI2WysQzgWFdUlpzLyV9Eaeji/eMIraSNsKNwC0y+xi5fWCaz4cmOsh94x8pOcZFc2SNoAejlyEef4BGMifBERMt12jhmX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712857602; c=relaxed/simple;
-	bh=xbyOWt7gDT90PHA8CmXecHjCn5gE8CXNTbkKxi7f40k=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dt8IxpAcNVwWx9pghTi4S/V9F64k7SNh+sxkfcQi9N9FzLMdIGnUEf1besbTK2X5B66URKglVM9mdlpGM1d/gB7IBa+J9wtsFecj0/PQfBJIUe/YXUbwJU5x2YD5udkKq5VJSU+LS2I9a6kqMTyiw2bmKqwCgxO7k4oWE6RA9sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AsuAiIEO; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1712858469; c=relaxed/simple;
+	bh=ELksu+sLzaHjlNPUR9IEFLD8rhRIAjWKwOmmScUPvR4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kRK8cQaonX0H536r6Y7xt5A2sRcp3BJfGZz1WoPeY/BhczrE2l+mP18yYcu7aTtIUgCUWD2xSb6DnujZX0Qhpxrc5YjYhKFHzs50MD8xcJ86ZYgLr3YbP7pOtCTSBkjrJZh08G8YYNpoEEE3GOibTOJ0jrWYfYECWorMpnvO1ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ldxlZC9Q; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ece02cfbf2so130046b3a.2
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 10:46:40 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-417e51e7aedso1371995e9.3
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 11:01:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712857600; x=1713462400; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QDrKYmJhpcZaPcrJLV+DQJE+gAVulOU19ll4D+zrZcU=;
-        b=AsuAiIEOBcqOkZgTtx9qI9zxnLQwYaBFz/RUkS11cHSftsrR8KTgJzXez5NGQyC9UO
-         SL+hM0UoCUD3qoAj1L3xmFHtL02VwXjdeqEskE755+hCLORuubMqwl+Jf4NV9cxtHGiV
-         Rx476Z23+VPcxYz/KqDWBmjQVdAooI3p+rPSXx+lV3Y/Gb7o09oKL81Ut8+3ur7v1Dmv
-         B4y+AU/LfdBmR1jY9FIFV9CPuikuuFamtI/xDPIt7fe+pXBHnWFOEl38m+wEHY2v67qc
-         FYj4CtWS9plSDhWjDK7aEhPG12WFKKDMAonc+EZ/mjCNXuJEF4/0QNhKioWxqqyTsoZX
-         TeHg==
+        d=google.com; s=20230601; t=1712858466; x=1713463266; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TFQZlmoBEIaWgT85a+mHB96sryXc4pNLPf5zok3FIIo=;
+        b=ldxlZC9QDQBVGNl5h9QLMeHkpkm6mAjtNEmsXiaiRkoawakaBTEmIh9XPsNwZHeIUr
+         QuHNRf/VCTrFaMNvbGPTBhWKFg4He/nRuG2HEsh2eHDhN2MMX1W2AvxgtELjtSOmw19L
+         4JQOfqROSAJj1zvdbPN/vRnA52kjYTcm8warHW0v13url7Srpr/Tb7FNuMzGB6VKQWSU
+         dNPngNArB1djPXVTkVGZHB4yfx8N6OKQN+vVB2T5D/v8OIHNQ4zxDx5+e8MdvaXkBEgF
+         jCDQViUA9VuqMo7H4p21qOi7jrTetxWhR9RiRIA4gXMeZdb7uuPn5owmGfNm9yB9dS13
+         XC1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712857600; x=1713462400;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QDrKYmJhpcZaPcrJLV+DQJE+gAVulOU19ll4D+zrZcU=;
-        b=PEOcQVBbFFTxcdxjbwhkOmbxGANkACGkssIHhygrSMcMpCS1stjREjtK51A2B3WFJf
-         KcadTKodOc07DxxW2u/ry533q6q4vbs7e8v2K5m0ccghtHo3W+F+GhTTp6e8nwOntcF4
-         Q8q6I1FmVFf8BIv4L4bRggd0UF1JWHWlotLm5zPI32x1F33SHLxbDNuNdtEuY8MlVBUW
-         rQAT52n5XseT1kOuLGVkMwqa9JuKweVe2iK0dSo4KPWnmmsjS1JvbjjugE1xtNiOtgja
-         JQVysbSHnoqHaUHxu86oEQnzJtiAwDcRGfRmxWWcD9HTTu6qcNmWnBZ1kkIh9iXtx4Ht
-         q73A==
-X-Forwarded-Encrypted: i=1; AJvYcCVwqv0Dk70wXT3rovaBlqGblzwpyyFedCik7z9N9Rwj/gZ6+PkZZi5k5ffdLY7pQdiUxJ0o/pwD2n+velbWXzMM6Edg
-X-Gm-Message-State: AOJu0YzpaUJib1gncWjjgFBsobpNMXo3lJsZ1LjYDWhTpH7TudmieXdz
-	C25b85ZIxkwFmx/f1bAWtNM8nET8vxC2fthl259SFKNy9jDhG+9a7+n0t7HkSxpjjzx4bS76C24
-	doA==
-X-Google-Smtp-Source: AGHT+IFtoDfp5GyRetAbjF6DB8NcAHAaD2IM+hfZ0pw6BN3Rb7rwJGuZMBNHwb9J9vPhlLGRfTE9N8azeiU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2d87:b0:6ec:f406:ab4b with SMTP id
- fb7-20020a056a002d8700b006ecf406ab4bmr14703pfb.4.1712857599871; Thu, 11 Apr
- 2024 10:46:39 -0700 (PDT)
-Date: Thu, 11 Apr 2024 10:46:38 -0700
-In-Reply-To: <CALMp9eRwsyBUHRtjKZDyU6i13hr5tif3ty7tpNjfs=Zq3RA8RA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1712858466; x=1713463266;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TFQZlmoBEIaWgT85a+mHB96sryXc4pNLPf5zok3FIIo=;
+        b=MCozV+B/yWvPtZTmvfbN5DzCSKUbL7bPghBjsBW42kO6iA3qPASjA4qBOHYeNdRZuS
+         l94tpQQIt8Zk1kA6cyy5Zg+IR2J3lxdMLNHXfRy3JbGxUIcruL7BUnGZhWlFYE29IEPT
+         W6FK169CXkE8eAdTODYWqxYbOTJgpCswCvI+gBcLuAr5+araqEBbRWlExR/yklkC2qDF
+         2XMxaUyYCu3EagvrwYNe5pCGUFYc2UCGGAOBGyZBn6a7iVsPacYQxYr0UN2NiNZIE0jQ
+         fj8fjrFVHK727thGxvjtwLbjDq8/Fz628ZMiTCuQgwxnVbVj0NG0DTBtF6GCNklHED29
+         o3/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWf/4eFXWN5eMlToswivdUtkEnRWeMvv7MYcU4dW+HIy8yyTcSPCSEQe2glHdD/Q/TDkUN/KoXP6XQ6aNeXGb8fuvhl
+X-Gm-Message-State: AOJu0YwD2UQO7pxhBTfEzCilw/CWLPESvIrZkKreamrTowrl7BwK3nve
+	K7hrrJISu57pRtgCKZf4J36D9l4OGIeoyWTNWBVhZWwj2sEI9VD9P3oG8qS9r5CBe8DZ5ZNGoOx
+	BO1G6RIZT7srOLMdImmtbwZIXmt91FE1eWmkG
+X-Google-Smtp-Source: AGHT+IEl4Iu+H70L5iEuaxVGs2wVMTfN36uwSB9T1kbBSUqJDIrWPvmyrfPoncl+j8yWfnTJVbG6KZ40Dk/wHobSp7A=
+X-Received: by 2002:a5d:564e:0:b0:343:6551:935 with SMTP id
+ j14-20020a5d564e000000b0034365510935mr235209wrw.66.1712858466173; Thu, 11 Apr
+ 2024 11:01:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <20240126085444.324918-2-xiong.y.zhang@linux.intel.com> <ZhgYD4B1szpbvlHq@google.com>
- <56a98cae-36c5-40f8-8554-77f9d9c9a1b0@linux.intel.com> <CALMp9eRwsyBUHRtjKZDyU6i13hr5tif3ty7tpNjfs=Zq3RA8RA@mail.gmail.com>
-Message-ID: <Zhgh_vQYx2MCzma6@google.com>
-Subject: Re: [RFC PATCH 01/41] perf: x86/intel: Support PERF_PMU_CAP_VPMU_PASSTHROUGH
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Kan Liang <kan.liang@linux.intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com, 
-	kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, 
-	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
-	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20240401232946.1837665-1-jthoughton@google.com>
+ <20240401232946.1837665-6-jthoughton@google.com> <ZhgZHJH3c5Lb5SBs@google.com>
+ <Zhgdw8mVNYZvzgWH@google.com>
+In-Reply-To: <Zhgdw8mVNYZvzgWH@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 11 Apr 2024 11:00:37 -0700
+Message-ID: <CALzav=f=_+UQBJv_eZ=t5wE0AytVo1mwfDoum+ZyNfNHvyOccQ@mail.gmail.com>
+Subject: Re: [PATCH v3 5/7] KVM: x86: Participate in bitmap-based PTE aging
+To: James Houghton <jthoughton@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Yu Zhao <yuzhao@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Gavin Shan <gshan@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	David Rientjes <rientjes@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 11, 2024, Jim Mattson wrote:
-> On Thu, Apr 11, 2024 at 10:21=E2=80=AFAM Liang, Kan <kan.liang@linux.inte=
-l.com> wrote:
-> > On 2024-04-11 1:04 p.m., Sean Christopherson wrote:
-> > > On Fri, Jan 26, 2024, Xiong Zhang wrote:
-> > >> From: Kan Liang <kan.liang@linux.intel.com>
-> > >>
-> > >> Define and apply the PERF_PMU_CAP_VPMU_PASSTHROUGH flag for the vers=
-ion 4
-> > >> and later PMUs
+On Thu, Apr 11, 2024 at 10:28=E2=80=AFAM David Matlack <dmatlack@google.com=
+> wrote:
+>
+> On 2024-04-11 10:08 AM, David Matlack wrote:
+> > On 2024-04-01 11:29 PM, James Houghton wrote:
+> > > Only handle the TDP MMU case for now. In other cases, if a bitmap was
+> > > not provided, fallback to the slowpath that takes mmu_lock, or, if a
+> > > bitmap was provided, inform the caller that the bitmap is unreliable.
 > > >
-> > > Why?  I get that is an RFC, but it's not at all obvious to me why thi=
-s needs to
-> > > take a dependency on v4+.
+> > > Suggested-by: Yu Zhao <yuzhao@google.com>
+> > > Signed-off-by: James Houghton <jthoughton@google.com>
+> > > ---
+> > >  arch/x86/include/asm/kvm_host.h | 14 ++++++++++++++
+> > >  arch/x86/kvm/mmu/mmu.c          | 16 ++++++++++++++--
+> > >  arch/x86/kvm/mmu/tdp_mmu.c      | 10 +++++++++-
+> > >  3 files changed, 37 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/k=
+vm_host.h
+> > > index 3b58e2306621..c30918d0887e 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -2324,4 +2324,18 @@ int memslot_rmap_alloc(struct kvm_memory_slot =
+*slot, unsigned long npages);
+> > >   */
+> > >  #define KVM_EXIT_HYPERCALL_MBZ             GENMASK_ULL(31, 1)
+> > >
+> > > +#define kvm_arch_prepare_bitmap_age kvm_arch_prepare_bitmap_age
+> > > +static inline bool kvm_arch_prepare_bitmap_age(struct mmu_notifier *=
+mn)
+> > > +{
+> > > +   /*
+> > > +    * Indicate that we support bitmap-based aging when using the TDP=
+ MMU
+> > > +    * and the accessed bit is available in the TDP page tables.
+> > > +    *
+> > > +    * We have no other preparatory work to do here, so we do not nee=
+d to
+> > > +    * redefine kvm_arch_finish_bitmap_age().
+> > > +    */
+> > > +   return IS_ENABLED(CONFIG_X86_64) && tdp_mmu_enabled
+> > > +                                    && shadow_accessed_mask;
+> > > +}
+> > > +
+> > >  #endif /* _ASM_X86_KVM_HOST_H */
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 992e651540e8..fae1a75750bb 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -1674,8 +1674,14 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_g=
+fn_range *range)
+> > >  {
+> > >     bool young =3D false;
+> > >
+> > > -   if (kvm_memslots_have_rmaps(kvm))
+> > > +   if (kvm_memslots_have_rmaps(kvm)) {
+> > > +           if (range->lockless) {
+> > > +                   kvm_age_set_unreliable(range);
+> > > +                   return false;
+> > > +           }
 > >
-> > The IA32_PERF_GLOBAL_STATUS_RESET/SET MSRs are introduced in v4. They
-> > are used in the save/restore of PMU state. Please see PATCH 23/41.
-> > So it's limited to v4+ for now.
->=20
-> Prior to version 4, semi-passthrough is possible, but IA32_PERF_GLOBAL_ST=
-ATUS
-> has to be intercepted and emulated, since it is non-trivial to set bits i=
-n
-> this MSR.
+> > If a VM has TDP MMU enabled, supports A/D bits, and is using nested
+> > virtualization, MGLRU will effectively be blind to all accesses made by
+> > the VM.
+> >
+> > kvm_arch_prepare_bitmap_age() will return true indicating that the
+> > bitmap is supported. But then kvm_age_gfn() and kvm_test_age_gfn() will
+> > return false immediately and indicate the bitmap is unreliable because =
+a
+> > shadow root is allocate. The notfier will then return
+> > MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
 
-Ah, then this _perf_ capability should be PERF_PMU_CAP_WRITABLE_GLOBAL_STAT=
-US or
-so, especially since it's introduced in advance of the KVM side of things. =
- Then
-whether or not to support a mediated PMU becomes a KVM decision, e.g. inter=
-cepting
-accesses to IA32_PERF_GLOBAL_STATUS doesn't seem like a complete deal break=
-er
-(or maybe it is, I now see the comment about it being used to do the contex=
-t switch).
+Ah no, I'm wrong here. Setting args.unreliable causes the notifier to
+return 0 instead of MMU_NOTIFIER_YOUNG_FAST.
+MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE is used for something else.
 
-And peeking ahead, IIUC perf effectively _forces_ a passthrough model when
-has_vpmu_passthrough_cap() is true, which is wrong.  There needs to be a us=
-er/admin
-opt-in (or opt-out) to that behavior, at a kernel/perf level, not just at a=
- KVM
-level.  Hmm, or is perf relying on KVM to do that right thing?  I.e. relyin=
-g on
-KVM to do perf_guest_{enter,exit}() if and only if the PMU can support the
-passthrough model.
-
-If that's the case, most of the has_vpmu_passthrough_cap() checks are grati=
-utous
-and confusing, e.g. just WARN if KVM (or some other module) tries to trigge=
-r a
-PMU context switch when it's not supported by perf.
+The control flow of all this and naming of functions and macros is
+overall confusing. args.unreliable and
+MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE for one. Also I now realize
+kvm_arch_prepare/finish_bitmap_age() are used even when the bitmap is
+_not_ provided, so those names are also misleading.
 
