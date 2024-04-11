@@ -1,225 +1,177 @@
-Return-Path: <kvm+bounces-14201-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64BD48A04B8
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 02:16:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 292E88A04D5
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 02:36:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF76B1F24A72
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 00:16:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3FF6288FD7
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 00:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A714AEE0;
-	Thu, 11 Apr 2024 00:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1CAB646;
+	Thu, 11 Apr 2024 00:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="TBjUQA70"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bMG0Zv8V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B457A47A40
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 00:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1587A48
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 00:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712794154; cv=none; b=IHYJQoJKm6G5pCat0lELcBhmExrsqkd4hlpOPAC+xSzPJagtKrY+WWufI3bB82N+yXhnDa47wiLapWbvLo+6F4OvVX/HANiwIGN8ly8VZqMbnaMwB27DvySxSXIC2X+jP2U4awxyKVh1JnAhtQwOv+RhChb2Peh0U59Dt8Hhvf0=
+	t=1712795752; cv=none; b=gVxGgybcRhMyLda0iZ8azxIP5r9hoZGZCAvhCvd6babY3Nimvc/d7vHaV4OjC3I4lUyBdVLR9MyLKoB2pGxhIB7ns3MsNdAS6Z7Ukwvk6X3Or2eHU0ZJzuBsyYk7EK1ZXpo2qm9xuoMx1lvfL1P1yDh3K0SajVlNxBQTqDCkMk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712794154; c=relaxed/simple;
-	bh=FfM/sSt5pOIT+SFPpfrQ5W4Ri7Uq0XA+YsWN/Asw1ro=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UvWBADwVb0DDRnse9OCgOqQ2Pu6UTP/n9fZjQeYq4G08SH74VBYTtuCrRFg86tArOiBgCn51VDovZRLYs2f9j1M3jyitqRg+h6/wfDrpp+TlBKc+X+H0ZjGe/jshiXXNd7DUazfAu+YFtud0qjQbq7ujc67rndYLfyg3qVFIHNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=TBjUQA70; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1e4266673bbso34130505ad.2
-        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 17:09:12 -0700 (PDT)
+	s=arc-20240116; t=1712795752; c=relaxed/simple;
+	bh=vDzBN7h5H7qRuMhHLOSWOdTcB6GR+YXycDXe8bfzdG4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OX5J3CCq7qF2RIsQkeRr8QK9PwYO4b4jmcbWh6rmzhFwp9KmAf5XnIeWAEttL36WWAyBSp4JgEMNytvptWOb4cvnSIrMW+K+iU7MjxU9NQtysL/VKsjq+6rAOwO7WS2k6D9Z+qlOhB+uz6vMX0xoaKeNCweuS8BNagH+mndZk+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bMG0Zv8V; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4348110e888so93471cf.1
+        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 17:35:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712794152; x=1713398952; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1712795749; x=1713400549; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tLia834y+X9tlrjVFjCEV4aQslhHW6gNjSHeO9Lbrys=;
-        b=TBjUQA70mwDw0vXwlIW1zTAH6wGuKf/aTmWR7uOtf49GfERAOPdkrya+yz1GnqVcsC
-         Ou5tFh72f2wSX0+f7Fr07KDiyeizacH0EApUq+5IZJQ5eRCxrvAUpPJ1zVipcb35VCGm
-         VE/n+7rEojiHcBd6/pdIieyTOE4+EoGj8uyo6MsPt6gFqVNfP9FMYiYae5uV/8CdifD9
-         f/Xn4Ofa/UTqPwWGN0f8ra/6hTAJC1guQ1cUwZJU9FuQ9hhb8WhwBUGQ6O0dXTeEq2sk
-         4X0WKHZ2dlOuSO4rR4uwyB1/45biDzDybLwLbompsmXjOeatAee1Fx0B7RtSA6NQ61Jg
-         Hlaw==
+        bh=Hll648Cvihh5+gbtq6L/4af+GOyNrj81dtl5gh6CLtU=;
+        b=bMG0Zv8VsRkfxZk/J2ZnZmWxa8w5X/5aGfz64MVW1o13nc/4UPmlI/4NGvTxlES+08
+         iDeOkOGP019AYXQaGKmnsvLIJdtuvOm3zfzIvDlrc++km4OG3kL9hXvsrMrWnGrPfPw3
+         tCEeG/E0G4+1GNIt4YwC2fvFThIGCmHAXIS13InqMkTT8lI1/ABbXyDTreJ6SpVVZZHe
+         O2wkbn2umGfFeUWvcrC89X1F9gUXjtdvi2xrTPsl4F0SE+/XFioXMvxmkO6+T1lcuwYq
+         p33QK/JicU/NSnJRlnBjxfMkbcjqvB09H9wkgZexF92lITXJdEI+6oRed2QKG2bsjb7Y
+         di6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712794152; x=1713398952;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1712795749; x=1713400549;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tLia834y+X9tlrjVFjCEV4aQslhHW6gNjSHeO9Lbrys=;
-        b=X8LsyhK2RsbVnwBwKTfwGNW56Cqjmipn4GCzOl1rADdmc/NmBQGIkESDraVBBAu0Lo
-         jKd6GJiRuTtbZ+fr0lxNzw44hy8RBfzDepebZO4+bsujyQ0PW4biqMJqdaqylJJu9+hT
-         xVfbdF/MN0pV+x2TiG5FS4vpz4U7IANxF+QMBuDtfa0VZqAUtTDmK58cKlhpdIqQNrA3
-         DcWLjbt6v3pzecVxF6IBuOO77LMAbzwg11/uYI4tguUQO+PculozKUVOMchRFjCuf/N/
-         smi7MsoW4Y6OJJ/DxQh/3GkZVL7j+W4HSfj/zO6fsMDnbyWnzPBC00EGOA0nx6hDQCKz
-         Eegg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlqKXWODnCFwxBBEhz9+wu9/aZXMzsEtPsn6OxLkqhv0IawMJQxqTdwfZ/G/pG14hnb5k1FQ/bCHjUR/NgkH3IUmsr
-X-Gm-Message-State: AOJu0Yz2rR3VNGTJyywojvQgVXiJNcd9D37+I6JzwjU1ccHyeoz4n1tH
-	RlftAa3dAb4fboaL4A3NVRb/azBN7IVzr07/cB5JxTVexDwkF3cBYgRbbn0MlLc=
-X-Google-Smtp-Source: AGHT+IEBm3O3QxbfldIjrwscHpX7a8J2zp8FjCH5WuQpHu2gdn7/EG4AoSaaS2YDQBteQAhuqRWwog==
-X-Received: by 2002:a17:902:eb88:b0:1e5:5559:c4a7 with SMTP id q8-20020a170902eb8800b001e55559c4a7mr85239plg.51.1712794152327;
-        Wed, 10 Apr 2024 17:09:12 -0700 (PDT)
-Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id f7-20020a170902684700b001e3d8a70780sm130351pln.171.2024.04.10.17.09.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 17:09:11 -0700 (PDT)
-From: Atish Patra <atishp@rivosinc.com>
-To: linux-kernel@vger.kernel.org
-Cc: Atish Patra <atishp@rivosinc.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Juergen Gross <jgross@suse.com>,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Shuah Khan <shuah@kernel.org>,
-	virtualization@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	x86@kernel.org
-Subject: [PATCH v6 24/24] KVM: riscv: selftests: Add commandline option for SBI PMU test
-Date: Wed, 10 Apr 2024 17:07:52 -0700
-Message-Id: <20240411000752.955910-25-atishp@rivosinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240411000752.955910-1-atishp@rivosinc.com>
-References: <20240411000752.955910-1-atishp@rivosinc.com>
+        bh=Hll648Cvihh5+gbtq6L/4af+GOyNrj81dtl5gh6CLtU=;
+        b=uNiNzaFvPTuwXqvvBmNQod8tZQpd1l2P5GqHvHMh4H7RjVRFMoZkRtEXgJ3hFaXS6P
+         IjeUb5BrsU6TpuEbDhW4OZMpeV5rjdh0AXbzEShvpnA1Rf1pPB9MsJHsD44FllQ4mpBj
+         0MPfPygC8bHiDhUrClpOFi5P85PjXeyHDu3qk8l2HQ8Qy2QPUqY/pZKQ55gklrj4h4a6
+         UK65ICIdWY66nhtXkAWQLIjsqvMxyJQ9Qg+fki25gC+RKYbM8b9CbCst9gdJt37xYIDX
+         k4P8Kl5lJSFAUHvxjifBFizY+NL338qEDfKim/GUriAF/gvo6tg77tJn777vdy7dhQn5
+         hjvg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFd3482z6uclsdwXY4KsHPDcbJW4e9yvfI+BgSNxYA9zQ3+uiLhU4oN5CQx42ZjrSp8HzWQHA6TU9WULPkT2uBRC18
+X-Gm-Message-State: AOJu0Yyga6b6M/FFXOWEmo17tpQfwXbrBB1aNX0mn+T6QZWMoa/we9m9
+	cm3qZQGuxCAR+nsXqbYxDkQRP//ICg4863uq/KS6Wf30iqz3V+qKOBW6b7f85Ls70gxgqZgViA7
+	aGnlrfBZ8Xv4eM0K9Pgp/GK+MbH2mePWchCC+
+X-Google-Smtp-Source: AGHT+IFGLj1tAhjk5RpppfKTaL73oV3xSrwK17M0Lat/eXuLIVwkuvO1YH97f0uDQLYoqbM8Or5GftZ8IdKEWzGYOsE=
+X-Received: by 2002:a05:622a:4d4a:b0:434:dcc1:cddb with SMTP id
+ fe10-20020a05622a4d4a00b00434dcc1cddbmr88725qtb.26.1712795748610; Wed, 10 Apr
+ 2024 17:35:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240401232946.1837665-1-jthoughton@google.com>
+ <20240401232946.1837665-2-jthoughton@google.com> <cce476f7-2f52-428a-8ae4-fc5dec714666@redhat.com>
+ <CADrL8HVPEjdAs3PoTa3sPCvQpimZJG6pP9wbiLjnF5cROxfapA@mail.gmail.com> <226a222d-4273-4304-ab73-39b2f8f060b5@redhat.com>
+In-Reply-To: <226a222d-4273-4304-ab73-39b2f8f060b5@redhat.com>
+From: James Houghton <jthoughton@google.com>
+Date: Wed, 10 Apr 2024 17:35:11 -0700
+Message-ID: <CADrL8HWbF=7mEn=1s=uwUuZ_-vnCxHwK3hOdctiuCGLtephskg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/7] mm: Add a bitmap into mmu_notifier_{clear,test}_young
+To: David Hildenbrand <david@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Yu Zhao <yuzhao@google.com>, David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Gavin Shan <gshan@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	David Rientjes <rientjes@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SBI PMU test comprises of multiple tests and user may want to run
-only a subset depending on the platform. The most common case would
-be to run all to validate all the tests. However, some platform may
-not support all events or all ISA extensions.
+On Tue, Apr 9, 2024 at 12:35=E2=80=AFPM David Hildenbrand <david@redhat.com=
+> wrote:
+>
+> On 09.04.24 20:31, James Houghton wrote:
+> > Ah, I didn't see this in my inbox, sorry David!
+>
+> No worries :)
+>
+> >
+> > On Thu, Apr 4, 2024 at 11:52=E2=80=AFAM David Hildenbrand <david@redhat=
+.com> wrote:
+> >>
+> >> On 02.04.24 01:29, James Houghton wrote:
+> >>> diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifie=
+r.h
+> >>> index f349e08a9dfe..daaa9db625d3 100644
+> >>> --- a/include/linux/mmu_notifier.h
+> >>> +++ b/include/linux/mmu_notifier.h
+> >>> @@ -61,6 +61,10 @@ enum mmu_notifier_event {
+> >>>
+> >>>    #define MMU_NOTIFIER_RANGE_BLOCKABLE (1 << 0)
+> >>>
+> >>> +#define MMU_NOTIFIER_YOUNG                   (1 << 0)
+> >>> +#define MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE (1 << 1)
+> >>
+> >> Especially this one really deserves some documentation :)
+> >
+> > Yes, will do. Something like
+> >
+> >      MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE indicates that the passed-in
+> > bitmap either (1) does not accurately represent the age of the pages
+> > (in the case of test_young), or (2) was not able to be used to
+> > completely clear the age/access bit (in the case of clear_young).
+>
+> Make sense. I do wonder what the expected reaction from the caller is :)
 
-The commandline option allows user to disable particular test if they
-want to.
+In this series the caller doesn't actually care (matching what Yu had
+in his v2[1]). test_spte_young() probably ought to return false if it
+finds MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE (and I'll do this in v4 if
+no one objects), but it doesn't have to. The bitmap will never say
+that a page is young when it was actually not, only the other way
+around.
 
-Suggested-by: Andrew Jones <ajones@ventanamicro.com>
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
- .../selftests/kvm/riscv/sbi_pmu_test.c        | 77 ++++++++++++++++---
- 1 file changed, 68 insertions(+), 9 deletions(-)
+>
+> >
+> >>
+> >>> +#define MMU_NOTIFIER_YOUNG_FAST                      (1 << 2)
+> >>
+> >> And that one as well.
+> >
+> > Something like
+> >
+> >     Indicates that (1) passing a bitmap ({test,clear}_young_bitmap)
+> > would have been supported for this address range.
+> >
+> > The name MMU_NOTIFIER_YOUNG_FAST really comes from the fact that KVM
+> > is able to harvest the access bit "fast" (so for x86, locklessly, and
+> > for arm64, with the KVM MMU read lock), "fast" enough that using a
+> > bitmap to do look-around is probably a good idea.
+>
+> Is that really the right way to communicate that ("would have been
+> supported") -- wouldn't we want to sense support differently?
 
-diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-index 0fd9b76ae838..57025b07a403 100644
---- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-+++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-@@ -33,6 +33,16 @@ static unsigned long counter_mask_available;
- 
- static bool illegal_handler_invoked;
- 
-+enum sbi_pmu_test_id {
-+	SBI_PMU_TEST_BASIC = 0,
-+	SBI_PMU_TEST_EVENTS,
-+	SBI_PMU_TEST_SNAPSHOT,
-+	SBI_PMU_TEST_OVERFLOW,
-+	SBI_PMU_TEST_MAX,
-+};
-+
-+static int disabled_test_id = SBI_PMU_TEST_MAX;
-+
- unsigned long pmu_csr_read_num(int csr_num)
- {
- #define switchcase_csr_read(__csr_num, __val)		{\
-@@ -608,19 +618,68 @@ static void test_vm_events_overflow(void *guest_code)
- 	test_vm_destroy(vm);
- }
- 
--int main(void)
-+static void test_print_help(char *name)
- {
--	test_vm_basic_test(test_pmu_basic_sanity);
--	pr_info("SBI PMU basic test : PASS\n");
-+	pr_info("Usage: %s [-h] [-d <test name>]\n", name);
-+	pr_info("\t-d: Test to disable. Available tests are 'basic', 'events', 'snapshot', 'overflow'\n");
-+	pr_info("\t-h: print this help screen\n");
-+}
- 
--	test_vm_events_test(test_pmu_events);
--	pr_info("SBI PMU event verification test : PASS\n");
-+static bool parse_args(int argc, char *argv[])
-+{
-+	int opt;
-+
-+	while ((opt = getopt(argc, argv, "hd:")) != -1) {
-+		switch (opt) {
-+		case 'd':
-+			if (!strncmp("basic", optarg, 5))
-+				disabled_test_id = SBI_PMU_TEST_BASIC;
-+			else if (!strncmp("events", optarg, 6))
-+				disabled_test_id = SBI_PMU_TEST_EVENTS;
-+			else if (!strncmp("snapshot", optarg, 8))
-+				disabled_test_id = SBI_PMU_TEST_SNAPSHOT;
-+			else if (!strncmp("overflow", optarg, 8))
-+				disabled_test_id = SBI_PMU_TEST_OVERFLOW;
-+			else
-+				goto done;
-+			break;
-+		break;
-+		case 'h':
-+		default:
-+			goto done;
-+		}
-+	}
- 
--	test_vm_events_snapshot_test(test_pmu_events_snaphost);
--	pr_info("SBI PMU event verification with snapshot test : PASS\n");
-+	return true;
-+done:
-+	test_print_help(argv[0]);
-+	return false;
-+}
- 
--	test_vm_events_overflow(test_pmu_events_overflow);
--	pr_info("SBI PMU event verification with overflow test : PASS\n");
-+int main(int argc, char *argv[])
-+{
-+	if (!parse_args(argc, argv))
-+		exit(KSFT_SKIP);
-+
-+	if (disabled_test_id != SBI_PMU_TEST_BASIC) {
-+		test_vm_basic_test(test_pmu_basic_sanity);
-+		pr_info("SBI PMU basic test : PASS\n");
-+	}
-+
-+	if (disabled_test_id != SBI_PMU_TEST_EVENTS) {
-+		test_vm_events_test(test_pmu_events);
-+		pr_info("SBI PMU event verification test : PASS\n");
-+	}
-+
-+	if (disabled_test_id != SBI_PMU_TEST_SNAPSHOT) {
-+		test_vm_events_snapshot_test(test_pmu_events_snaphost);
-+		pr_info("SBI PMU event verification with snapshot test : PASS\n");
-+	}
-+
-+	if (disabled_test_id != SBI_PMU_TEST_OVERFLOW) {
-+		test_vm_events_overflow(test_pmu_events_overflow);
-+		pr_info("SBI PMU event verification with overflow test : PASS\n");
-+	}
- 
- 	return 0;
- }
--- 
-2.34.1
+What I have now seems fine to me. It would be a little nicer to have a
+way to query for bitmap support and make sure that the answer will not
+be stale by the time we call the bitmap notifiers, but the complexity
+to make that work seems unnecessary for dealing with such an uncommon
+scenario.
 
+Maybe the right thing to do is just to have KVM always return the same
+answer. So instead of checking if the shadow root is allocated, we
+could check something else (I'm not sure what exactly yet though...).
+
+[1]: https://lore.kernel.org/kvmarm/20230526234435.662652-11-yuzhao@google.=
+com/
 
