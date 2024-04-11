@@ -1,173 +1,130 @@
-Return-Path: <kvm+bounces-14243-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14244-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D988A13A4
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 13:55:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B9A48A13C6
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 13:59:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F7851C20D9E
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 11:55:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E64032898AC
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 11:59:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44EFE14A634;
-	Thu, 11 Apr 2024 11:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8590214AD0E;
+	Thu, 11 Apr 2024 11:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="bP56bhYa"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W73w90zT"
 X-Original-To: kvm@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E29714A094;
-	Thu, 11 Apr 2024 11:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2FC149DFF
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 11:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712836521; cv=none; b=elUc1XiTYlcaZfD3O3nyGnMus5utac1TQbH3jr8A6FBP/w7NuXnDw/kK0QNOs0RVqEHc9TmEJvhrdrT9asGTwDpk2QmNtQNROgN3Jaxw1lq9BjlJLmdk7b2svOUY9N/ZUUuJ3CdM+iL7i/tkyZpEtJP/n0mWBtLj5tkDs4HEkzs=
+	t=1712836775; cv=none; b=G9ELKo+s+o910ANBUQB4aJJskVaqEIkuGuxgo9J5pDwg516azDmnE/03OqOvvMhc8LUO5XnvGEAwwbC6se9OzWhF9UojpvwP9Bs7BzyFGNeDd4INR/HgXHLItsgRAGeh3Djrq25r9ie9YljmkwJItBJ2LDEkj5Ao3MOASWfleq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712836521; c=relaxed/simple;
-	bh=qUHLbICK+OzVzpgAugTLlBx/+ikYrtOfR4K8Nx4oYfw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sr3rCctWzL7tBgODvASomc3yId/sR/r0qOevb+lhYrs04lcZ2vFqAXLmxjEASs19YdSI3sh8LIxJ8exVBpJO6SSir1VdeyVsoOJwgItQ5SVCPNUocZx+HY8eFqa+cvJkANTgbwd+YlfZjOSR6P5qhjGAypIXIdanB+uZAyaIdcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=bP56bhYa; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1712836519; x=1744372519;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qUHLbICK+OzVzpgAugTLlBx/+ikYrtOfR4K8Nx4oYfw=;
-  b=bP56bhYazXE6fy9pzuspJ00L7+mAYf9fViRTI/B1qbtIWpCrX5UoQgUr
-   bsim6FASELIQkXU8tHt60EukTZDXe0LjQuo4NSLV+7S/Fj3JtebeURRLi
-   cDS+/LaqmRv/U5HpGBa+A5vS1tV67B+o49zbWnUQhS2Zp97F3DZX0S+Pr
-   Bz3kT3FrCrjtDT/8reOa+zOyVND2f//FmvRwndqA4tZT4Q010JJw77jTu
-   A5YlSZEczLKN3i8aWAsom5h5/zlz22O0DNnmIfW+KJVpFhf0gxZq8I5Ms
-   o2jQu7ShpC9vB/21on4GXcydv0LkNlmK2kcWIQ5JyG8s/qJPJBrhbBwbg
-   g==;
-X-CSE-ConnectionGUID: z5vJuW0ISXO47ggJt+rbgA==
-X-CSE-MsgGUID: mQWA4GzKR12LP6aGbYLBwA==
-X-IronPort-AV: E=Sophos;i="6.07,193,1708412400"; 
-   d="asc'?scan'208";a="251356126"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Apr 2024 04:55:16 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 04:54:36 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Thu, 11 Apr 2024 04:54:33 -0700
-Date: Thu, 11 Apr 2024 12:53:43 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-CC: Deepak Gupta <debug@rivosinc.com>, Conor Dooley <conor@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Rob
- Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>, Anup Patel <anup@brainfault.org>, Shuah
- Khan <shuah@kernel.org>, Atish Patra <atishp@atishpatra.org>,
-	<linux-doc@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
-	<linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH 07/10] riscv: add ISA extension parsing for Zcmop
-Message-ID: <20240411-backwater-opal-00c9aed2231e@wendy>
-References: <20240410091106.749233-1-cleger@rivosinc.com>
- <20240410091106.749233-8-cleger@rivosinc.com>
- <ZhcFeVYUQJmBAKuv@debug.ba.rivosinc.com>
- <20240410-jawless-cavalry-a3eaf9c562a4@spud>
- <20240410-judgingly-appease-5df493852b70@spud>
- <ZhcTiakvfbjb2hon@debug.ba.rivosinc.com>
- <1287e6e9-cb8e-4a78-9195-ce29f1c4bace@rivosinc.com>
- <20240411-superglue-errant-b32e5118695f@wendy>
- <c86f9fa8-e273-4509-83fa-f21d3265d5c9@rivosinc.com>
+	s=arc-20240116; t=1712836775; c=relaxed/simple;
+	bh=mX3sidVSjS2bnQNT6WmHnJpo+VRqF9Eia8CNXy9wZKU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QxvZSW5HIdyAJOXQqLTBLuXGA5F65ziE4uNhVhsJljZbk/FM+X5u8b2V9R3BM490csshB3Plv+fmbSQ/5dVCCNxytd9Y/9BNpPBOls4xPjGQ947izn9bPv/w8dGwDvXfTok1Tq0JSbHTrDaJNDnCharTn/BRwVRxlrK5MZUT3U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=W73w90zT; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56e47843cc7so5249305a12.0
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 04:59:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1712836772; x=1713441572; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/d6rzWM3RKzS8a1pTpO5jIX42wetHh6wJ1iYR9ZIqe8=;
+        b=W73w90zTdsDvcUmEBoWG/hNJ8A1feBM0uZ5cKYPUPDX4juv4Jf8rfWyZjDVdajZUX4
+         sOisyJLS+BujHfoD/ghSOMwCaxfgycnmPNr0/qLag2kUSmvBKhhNBR7X0+mSUsp+z39u
+         0tU2IFqQbBVSOojNGqK4sgmX0xsBpyCZpqNJqvDOD2v4CLCcqpaBLFB8shzHY8mklN1V
+         LpIoW2YzxLwvK0f+ibVARJU7kae6SDzTnQCv3K+LQvh/37H75LhJ1TW72GAcU9o7KgfY
+         Uu8feBdfgyCtsOsoyUfqrZEUIKYgp/DV2djbN+KuSrNDGK3ghRxXCDdLm8uI9YmX4LvV
+         xhpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712836772; x=1713441572;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/d6rzWM3RKzS8a1pTpO5jIX42wetHh6wJ1iYR9ZIqe8=;
+        b=D3K9iiInFoejYG9RidsEhoXRr9Kk2qQD5g5ahIunrN/L1nXCvlEK5Om+ZKIhQ2dsQe
+         wbrGhOm0KPRDM1rhWzBRwi+VpsvE97pZXUGXYAJ9s0mWnklDhZvufnBLy978rTmllS+g
+         Hr4tBq0zSZQR96WBu0lf55yq/Bnnb+nXMKtE8OgoM4qLzg8JXV1BtmqzAWhGyi8eMXjy
+         aezt07Z8eNFcdmUeyBU6GRU+h7uFXMh/4yfuHRUE/Gyd0Rd+R9puX1fSDK+Y8O04tFIT
+         WCANH0CT8XhD5VPECOUV8G27/mmq2ROzk3FF9vgcxp6uhhGIzuTPYPO3m2/8h8MEwsOt
+         xbXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUujo90x24AV10I6SFbAFROWySKHbTe6XqFS7lh5CsIfALRrZKmyIJGUruZLhwhX3KzowOKbwfVm6R+B2OiaHqt9HBr
+X-Gm-Message-State: AOJu0YxrPKBKBFyE+UAjIuq4AgzVoDdZL2VV5S8bU5phUgNo1AIhoM0B
+	UZhTagPcLkb9yS//P/a65skbmjOaz2BwG+Oer4Er83RZqpsE91GjgKP0feNUIpavlqkhrIqUovi
+	bAvY9xlA6ykSExQBes+hENI8LdbHPnI09N50lQg==
+X-Google-Smtp-Source: AGHT+IEZBE9CL57fOOXD8ugzG94aVuACdJqyvRZTMYuJSwpOa7Bv87fyLUCo3wLcrD4iUaiGj7OvJ3yAGelTW7TO9iQ=
+X-Received: by 2002:a50:a45b:0:b0:56f:daae:7cc1 with SMTP id
+ v27-20020a50a45b000000b0056fdaae7cc1mr2385706edb.23.1712836772124; Thu, 11
+ Apr 2024 04:59:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jM0CNQ7ZIr2lhGV/"
-Content-Disposition: inline
-In-Reply-To: <c86f9fa8-e273-4509-83fa-f21d3265d5c9@rivosinc.com>
-
---jM0CNQ7ZIr2lhGV/
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+References: <20240411104340.6617-1-philmd@linaro.org> <20240411104340.6617-10-philmd@linaro.org>
+In-Reply-To: <20240411104340.6617-10-philmd@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Apr 2024 12:59:20 +0100
+Message-ID: <CAFEAcA_XHVWAiMZ8iw3xVVjnHs+aoxQB=uUjBQy7EGmSj14U+Q@mail.gmail.com>
+Subject: Re: [PATCH 9/9] target/i386: Replace sprintf() by snprintf()
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 11, 2024 at 11:08:21AM +0200, Cl=E9ment L=E9ger wrote:
-> >> If we consider to have potentially broken isa string (ie extensions
-> >> dependencies not correctly handled), then we'll need some way to
-> >> validate this within the kernel.
-> >=20
-> > No, the DT passed to the kernel should be correct and we by and large we
-> > should not have to do validation of it. What I meant above was writing
-> > the binding so that something invalid will not pass dtbs_check.
->=20
-> Acked, I was mainly answering Deepak question about dependencies wrt to
-> using __RISCV_ISA_EXT_SUPERSET() which does not seems to be relevant
-> since we expect a correct isa string to be passed.
+On Thu, 11 Apr 2024 at 11:44, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
+g> wrote:
+>
+> sprintf() is deprecated on Darwin since macOS 13.0 / XCode 14.1,
+> resulting in painful developper experience. Use snprintf() instead.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> ---
+>  target/i386/kvm/kvm.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index e68cbe9293..a46d1426bf 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -5335,7 +5335,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_r=
+un *run)
+>      case KVM_EXIT_NOTIFY:
+>          ctx_invalid =3D !!(run->notify.flags & KVM_NOTIFY_CONTEXT_INVALI=
+D);
+>          state =3D KVM_STATE(current_accel());
+> -        sprintf(str, "Encounter a notify exit with %svalid context in"
+> +        snprintf(str, sizeof(str),
+> +                     "Encounter a notify exit with %svalid context in"
+>                       " guest. There can be possible misbehaves in guest.=
+"
+>                       " Please have a look.", ctx_invalid ? "in" : "");
+>          if (ctx_invalid ||
+> --
 
-Ahh, okay.
+This is a case where I think we would be better off with
+g_strdup_printf():
 
-> But as you stated, DT
-> validation clearly make sense. I think a lot of extensions strings would
-> benefit such support (All the Zv* depends on V, etc).
+ * the buffer declaration is a long way away from its use
+ * the string is long and it's not trivial to confirm that
+   it will fit in the buffer
+ * it's quite plausible somebody will come along later to
+   clean up the wording of the error message and not notice
+   they need to enlarge the buffer
+ * it's only for printing a warning, so it's not going to
+   be in a hot codepath
 
-I think it is actually as simple something like this, which makes it
-invalid to have "d" without "f":
-
-| diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Do=
-cumentation/devicetree/bindings/riscv/extensions.yaml
-| index 468c646247aa..594828700cbe 100644
-| --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-| +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-| @@ -484,5 +484,20 @@ properties:
-|              Registers in the AX45MP datasheet.
-|              https://www.andestech.com/wp-content/uploads/AX45MP-1C-Rev.-=
-5.0.0-Datasheet.pdf
-| =20
-| +allOf:
-| +  - if:
-| +      properties:
-| +        riscv,isa-extensions:
-| +          contains:
-| +            const: "d"
-| +          not:
-| +            contains:
-| +              const: "f"
-| +    then:
-| +      properties:
-| +        riscv,isa-extensions:
-| +          false
-| +
-| +
-|  additionalProperties: true
-|  ...
-
-If you do have d without f, the checker will say:
-cpu@2: riscv,isa-extensions: False schema does not allow ['i', 'm', 'a', 'd=
-', 'c']
-
-At least that's readable, even though not clear about what to do. I wish
-the former could be said about the wall of text you get for /each/
-undocumented entry in the string.
-
---jM0CNQ7ZIr2lhGV/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZhfPRwAKCRB4tDGHoIJi
-0stXAP9uCAN5bZHcv91EPinTAeqedRCedCrkE5YEE9f8JUyrxgD8CAHddpGznZHx
-TNOtc9GaDiQRS4tdrlJo9+Hn1Puv4w0=
-=k3aJ
------END PGP SIGNATURE-----
-
---jM0CNQ7ZIr2lhGV/--
+thanks
+-- PMM
 
