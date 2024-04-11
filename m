@@ -1,192 +1,176 @@
-Return-Path: <kvm+bounces-14260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14262-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D70F08A16DC
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 16:13:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D60008A173C
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 16:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 920F028D01A
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 14:13:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF986B2BE74
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 14:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB6814EC55;
-	Thu, 11 Apr 2024 14:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFB8814EC49;
+	Thu, 11 Apr 2024 14:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="R4bXwYUF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RaKXz5PV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3044B14E2DF
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 14:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990A614C583
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 14:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712844784; cv=none; b=cEaR9NdbbV4iStCKCwFjpqW8L+u90Sq8yPoUMr8ciTPZS4m2GNrxmVbvjkIP+5ULdLLxyo91c0FsGntwbM0prOblCyS1REWta3QuRLN7gCbxuTWFSYq9dPGZwTa/RgJW3HqjcrIz70D5vYANjvBGBBidqmxNdssecbS+QFimlfA=
+	t=1712845367; cv=none; b=e05R6uLwJOrWBfktc3ZA7r0EbECZNGA8Cqo8I3vi82bO//LovTotuCX8nONzX8F3VrL7Ubnt6oUpNiW7SxOZ+gSiH2ZRf9q3aHe3e4PocLQmcPUk1LNDw1PCmb3IzaDP2/89hCIvR2bB5HsJAD6wY2sx977OwkSW0FMJ0UbdLBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712844784; c=relaxed/simple;
-	bh=o870gL4LJddZ2O4bVnRQSyAqyJgc/qzl+x7k83FTV/U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nmGVTc4svrn1hYWSMAV83PQ81LggOz0qeYIvq3nnlFqmL/DvCqxwwzyotQjtnMpnC7X8vTa1lBv1UT4g5Msjcg8PESut6S4y2PxeMWJ1Ipk4G1AqGIi9/QcgBNaH9FF3evxExNtUiBfSK9zvlBpUP24+CPMx6uPOU1oRt3JfnYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=R4bXwYUF; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-417c339d261so9681225e9.1
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 07:13:02 -0700 (PDT)
+	s=arc-20240116; t=1712845367; c=relaxed/simple;
+	bh=5ws/A/06xIoL6+cVU7hMy6Emh6zWldKl+mIyryAkvSE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RsdwbpNkCbgscrgFLF0TZYfWvVFibKUS7ZIm5DSXUykE415X7zXCeHdzLeRD0X6WSLvPQRTYQRs84wwTQ/PK+Pnl1C5xfTV3rUE2AGZG/6qCVHdYVYSn8uXmQXlaTph1MnJ0rX+Ei2OfqifoHWjBRTAArTtyOaDCVNGwcq1/p7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RaKXz5PV; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61836c921a4so50542897b3.2
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 07:22:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1712844781; x=1713449581; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=o870gL4LJddZ2O4bVnRQSyAqyJgc/qzl+x7k83FTV/U=;
-        b=R4bXwYUFnbLzUW6+dme7HjV88Sj9Mt/lKojzTUF5C1dsBwUuniKSfmdjdVbgPAVOjE
-         zZ7YcjAHVvF4VVX9xBusBxi83a3KMgPUJdkeSQ2v+biZANo7Q5DACsaeoBOlAZcqylFU
-         m6Hh2JVwpaKCHbtRPAok3B+W3qRksGmdV60bg=
+        d=google.com; s=20230601; t=1712845365; x=1713450165; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9GtzFk1KROuOyCTzMxxWmq/Qzlg7l7c+rvMLuBjBAYQ=;
+        b=RaKXz5PV9xVBhOIDiZiDdzGTjHHF/gFPElEcFmWzbcOHEcDBio9yl5EP4qHW6U2aqu
+         +/g++rF3ifKPkDRLmOFm4QhnINlvndl9+lY5cvxCJ81CZgk6sv63SNNharfm1VwUglWB
+         NJ3Xw4mzm5IXPOGLgpx4aoZTyo1sTA3MTD4tpJO1+lI0be5V8SlEBtIzWWf6elBRXnQl
+         aTpqWoe2sF6B8pFz5bHCeWtNMrUMF8OidsZU51rkAEGkKmDGvSGFTEMXOYPmDLC+G1DY
+         mbeoG2LqIxpTp3RMKy9BDykquC/cqXABUjMs1Wtyw4Wkb3t/evufXIhrABLCxhgZ0F/Z
+         Z3fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712844781; x=1713449581;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o870gL4LJddZ2O4bVnRQSyAqyJgc/qzl+x7k83FTV/U=;
-        b=BKKvnFb6vuNlg/JCm+lRC1zrsaaIIzqzlPXQESly6fiatj40Yccq1zbUtHy4Q/LVZd
-         iooM6X4ZPGfIwItAJVc5EjKxz6WP1nqK/6XV1Q+33HPzdwkxnpyKuglqakxHjLE93USO
-         QzfNbkvpAWVgRU7F0wHPRaX81iMkt23JFxdQEdQIzwW3RqH7Jvx3k1DvPv2enmYY2hUT
-         5ajKuUGLpU1ZhDre7dvU0HJlFkQsBH7XH8q8d3h+ETwtCOG5MdNq5OOndRbwizCT/UpV
-         2vCWWYfbjyHQUBTaUWlgmICB1rUKiNynERs++4El71LsGYyiSoo6U/KXGnSKAVhW+nok
-         7UiA==
-X-Forwarded-Encrypted: i=1; AJvYcCXDKJIRrGEdaEQGBsImafFWYeXGPpDUNBPge1bz4MHwnXM61CoKgntRTmMIvwpl2J9vQPZ5lrpwM1G6nxYp7oGP0B9x
-X-Gm-Message-State: AOJu0Yy8S4BVm4SWQ4mo6bcDcW2q8dh4142Bg+6JxuLkPKq/bFfQvkBM
-	4mib4it+tIVFoMmXT3jq1XpjELpzeFYiKm26jLWPGedja6b0VPD3Gdu328dGKBU=
-X-Google-Smtp-Source: AGHT+IExLkwdYFAf7cwEkMW67SnJNYQT4Okac36nAXqq+vF8+jViBEFWP9B3suKgWyjhAlkG4aQ5vw==
-X-Received: by 2002:a05:600c:3c8e:b0:415:6dae:7727 with SMTP id bg14-20020a05600c3c8e00b004156dae7727mr4277828wmb.11.1712844781438;
-        Thu, 11 Apr 2024 07:13:01 -0700 (PDT)
-Received: from [10.80.67.140] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
-        by smtp.gmail.com with ESMTPSA id v13-20020a05600c444d00b0041663450a4asm5607826wmn.45.2024.04.11.07.13.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 07:13:01 -0700 (PDT)
-Message-ID: <2afb20af-d42e-4535-a660-0194de1d0099@citrix.com>
-Date: Thu, 11 Apr 2024 15:13:00 +0100
+        d=1e100.net; s=20230601; t=1712845365; x=1713450165;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9GtzFk1KROuOyCTzMxxWmq/Qzlg7l7c+rvMLuBjBAYQ=;
+        b=gvW3mz2TQ2j+PIYbAcpk25U7c3bdpTpSX2UDpbAHj4zaRhYpNfPo4wCV2NV8LZxbuD
+         p2HPQkxZP2NouJPttpjHncFx8VS/zrXzkzXoB9pRq9MY0DlEHtT+q0Xr2QSTCoOUYHWu
+         Rkqw5AzSeyC/6rMAef4zbaoY6QvVBrnaUoShV2XpzP59Zt9WTk4jSgfKNtWYZuOmGuDh
+         ABK7vjORimFYUjTnygn0I6jHcUehiB+zJgjVZiZRrTk+mlDfEDSxt2ZPm5zwqocO+iAF
+         yS0GE5kDd7ocAVu1ctE/t6J8nHmDq3YPAzXS2s42/Hsm+qFCOZJ0mtsQpflDzGUfIb55
+         6IPw==
+X-Forwarded-Encrypted: i=1; AJvYcCXhFwpVAYoqctkXPYD8tKuT3LnGtlQ/k1GrF22uxhRaYVAPwq8oRF3/Q4T/m7SoprQRyO1GGCsBJ3UZhmTfeSjS8X62
+X-Gm-Message-State: AOJu0YxiKOgEWIdJrYFAtyqrudSTlwl6soRFZIHNJpq7fqKoh9/E6SsX
+	Sa1ZqgNsI6si0N5dJ88u/lrZVkKyCFoSFXFe+tZnkdNVGjTBzHrX3JjcZZvUWyhIOhFI+XOJGIY
+	Kpw==
+X-Google-Smtp-Source: AGHT+IFFHEHDmY+PfptNwpczLpS5fCk2BFurIG4JKclwhXEwzGr9Uvo0u9/2jjW6EximfNlJxE4MUFsl28E=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:d8d3:0:b0:615:134c:7ef3 with SMTP id
+ a202-20020a0dd8d3000000b00615134c7ef3mr1511695ywe.9.1712845365687; Thu, 11
+ Apr 2024 07:22:45 -0700 (PDT)
+Date: Thu, 11 Apr 2024 07:22:44 -0700
+In-Reply-To: <b1d112bf0ff55073c4e33a76377f17d48dc038ac.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Set BHI_NO in guest when host is not affected
- by BHI
-To: Alexandre Chartre <alexandre.chartre@oracle.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- daniel.sneddon@linux.intel.com, pawan.kumar.gupta@linux.intel.com,
- tglx@linutronix.de, konrad.wilk@oracle.com, peterz@infradead.org,
- gregkh@linuxfoundation.org, seanjc@google.com, dave.hansen@linux.intel.com,
- nik.borisov@suse.com, kpsingh@kernel.org, longman@redhat.com, bp@alien8.de
-References: <20240411072445.522731-1-alexandre.chartre@oracle.com>
- <7f1faa48-6252-4409-aefc-2ed2f38fb1c3@citrix.com>
- <caa51938-c587-4403-a9cd-16e8b585bc13@oracle.com>
- <CABgObfai1TCs6pNAP4i0x99qAjXTczJ4uLHiivNV7QGoah1pVg@mail.gmail.com>
- <abbaeb7c-a0d3-4b2d-8632-d32025b165d7@oracle.com>
-Content-Language: en-GB
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
- 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
- 6+ahAA==
-In-Reply-To: <abbaeb7c-a0d3-4b2d-8632-d32025b165d7@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <ZhQ8UCf40UeGyfE_@google.com> <5faaeaa7bc66dbc4ea86a64ef8e8f9b22fd22ef4.camel@intel.com>
+ <ZhRxWxRLbnrqwQYw@google.com> <957b26d18ba7db611ed6582366066667267d10b8.camel@intel.com>
+ <ZhSb28hHoyJ55-ga@google.com> <8b40f8b1d1fa915116ef1c95a13db0e55d3d91f2.camel@intel.com>
+ <ZhVdh4afvTPq5ssx@google.com> <4ae4769a6f343a2f4d3648e4348810df069f24b7.camel@intel.com>
+ <ZhVsHVqaff7AKagu@google.com> <b1d112bf0ff55073c4e33a76377f17d48dc038ac.camel@intel.com>
+Message-ID: <ZhfyNLKsTBUOI7Vp@google.com>
+Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: "davidskidmore@google.com" <davidskidmore@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"srutherford@google.com" <srutherford@google.com>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Wei W Wang <wei.w.wang@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/04/2024 2:32 pm, Alexandre Chartre wrote:
->
-> On 4/11/24 15:22, Paolo Bonzini wrote:
->> On Thu, Apr 11, 2024 at 11:34 AM Alexandre Chartre
->> <alexandre.chartre@oracle.com> wrote:
->>>
->>> So you mean we can't set ARCH_CAP_BHI_NO for the guest because we
->>> don't know
->>> if the guest will run the (other) existing mitigations which are
->>> believed to
->>> suffice to mitigate BHI?
->>>
->>> The problem is that we can end up with a guest running extra BHI
->>> mitigations
->>> while this is not needed. Could we inform the guest that eIBRS is
->>> not available
->>> on the system so a Linux guest doesn't run with extra BHI mitigations?
->>
->> The (Linux or otherwise) guest will make its own determinations as to
->> whether BHI mitigations are necessary. If the guest uses eIBRS, it
->> will run with mitigations. If you hide bit 1 of
->> MSR_IA32_ARCH_CAPABILITIES from the guest, it may decide to disable
->> it. But if the guest decides to use eIBRS, I think it should use
->> mitigations even if the host doesn't.
->
-> The problem is not on servers which have eIBRS, but on servers which
-> don't.
->
-> If there is no eIBRS on the server, then the guest doesn't know if
-> there is
-> effectively no eIBRS on the server or if eIBRS is hidden by the
-> virtualization
-> so it applies the BHI mitigation even when that's not needed (i.e.
-> when eIBRS
-> is effectively not present the server).
->
->> It's a different story if the host isn't susceptible altogether. The
->> ARCH_CAP_BHI_NO bit *can* be set if the processor doesn't have the bug
->> at all, which would be true if cpu_matches(cpu_vuln_whitelist,
->> NO_BHI). I would apply a patch to do that.
->>
->
-> Right. I have just suggested to enumerate cpus which have eIBRS with
-> NO_BHI,
-> but we need would that precise list of cpus.
+On Thu, Apr 11, 2024, Rick P Edgecombe wrote:
+> On Tue, 2024-04-09 at 09:26 -0700, Sean Christopherson wrote:
+> > > Haha, if this is the confusion, I see why you reacted that way to "JS=
+ON".
+> > > That would be quite the curious choice for a TDX module API.
+> > >=20
+> > > So it is easy to convert it to a C struct and embed it in KVM. It's j=
+ust not
+> > > that useful because it will not necessarily be valid for future TDX m=
+odules.
+> >=20
+> > No, I don't want to embed anything in KVM, that's the exact same as har=
+dcoding
+> > crud into KVM, which is what I want to avoid.=C2=A0 I want to be able t=
+o roll out a
+> > new TDX module with any kernel changes, and I want userspace to be able=
+ to
+> > assert
+> > that, for a given TDX module, the effective guest CPUID configuration a=
+ligns
+> > with
+> > userspace's desired the vCPU model, i.e. that the value of fixed bits m=
+atch up
+> > with the guest CPUID that userspace wants to define.
+> >=20
+> > Maybe that just means converting the JSON file into some binary format =
+that
+> > the
+> > kernel can already parse.=C2=A0 But I want Intel to commit to providing=
+ that
+> > metadata
+> > along with every TDX module.
+>=20
+> Oof. It turns out in one of the JSON files there is a description of a di=
+fferent
+> interface (TDX module runtime interface) that provides a way to read CPUI=
+D data
+> that is configured in a TD, including fixed bits. It works like:
+> 1. VMM queries which CPUID bits are directly configurable.
+> 2. VMM provides directly configurable CPUID bits, along with XFAM and
+> ATTRIBUTES, via TDH.MNG.INIT. (KVM_TDX_INIT_VM)
+> 3. Then VMM can use this other interface via TDH.MNG.RD, to query the res=
+ulting
+> values of specific CPUID leafs.
+>=20
+> This does not provide a way to query the fixed bits specifically, it tell=
+s you
+> what ended up getting configuring in a specific TD, which includes the fi=
+xed
+> bits and anything else. So we need to do KVM_TDX_INIT_VM before KVM_SET_C=
+PUID in
+> order to have something to check against. But there was discussion of
+> KVM_SET_CPUID on CPU0 having the CPUID state to pass to KVM_TDX_INIT_VM. =
+So that
+> would need to be sorted.
+>=20
+> If we pass the directly configurable values with KVM_TDX_INIT_VM, like we=
+ do
+> today, then the data provided by this interface should allow us to check
+> consistency between KVM_SET_CPUID and the actual configured TD CPUID beha=
+vior.
 
-Intel stated that there are no current CPUs for which NO_BHI would be true.
+I think it would be a good (optional?) sanity check, e.g. KVM_BUG_ON() if t=
+he
+post-KVM_TDX_INIT_VM CPUID set doesn't match KVM's internal data.  But that=
+ alone
+provides a terrible experience for userspace.
 
-What I take this to mean is "no CPUs analysing backwards as far as Intel
-cared to go".
+ - The VMM would still need to hardcode knowledge of fixed bits, without a =
+way
+   to do a sanity check of its own.
 
-~Andrew
+ - Lack of a sanity check means the VMM can't fail VM creation early.
+
+ - KVM_SET_CPUID2 doesn't have a way to inform userspace _which_ CPUID bits=
+ are
+   "bad".
+
+ - Neither userspace nor KVM can programming detect when bits are fixed vs.
+   flexible.  E.g. it's not impossible that userspace would want to do X if=
+ a
+   feature is fixed, but Y if it's flexible.
 
