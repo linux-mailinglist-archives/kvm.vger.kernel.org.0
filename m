@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-14248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81BBC8A150B
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 14:50:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B72378A151A
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 14:55:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D90C1B25E4D
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 12:49:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6444B2896C1
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 12:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B1A14D6FD;
-	Thu, 11 Apr 2024 12:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43600145FE6;
+	Thu, 11 Apr 2024 12:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PbU0hoag"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hAkVHYUO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEDF13E88B
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 12:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8C346B9A
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 12:55:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712839706; cv=none; b=Xs6iWiOP8vlRBJKQkcitIcYocLlQo/ZoMSHgYBgtsZWQEHENWJSXRig4mLrLIB3SWx0julwpZ4ppu/IV7VSEizg/z66Yc38i+fhTz6+xDHqxd67OarkbN6IaIJoj8+gPSDRg/8lOECM7RpyLk+YEVvmVQy9xJPDXsWgDavJhnGc=
+	t=1712840120; cv=none; b=gQ6ebW40by1T5rBmO1e8ASxqn8CLzGSQeXOxiCFn73Sxe65sX7g3woWNPyVBpvMaUSPMiN6Cje8AC0NPKQ7aJ8OPo5oBBgqOa19G8REfFptI3pYPYBN2U023oO/c+J/0pbsvvrDGftjN4gbRB47+sFUxdwIA1cksQyEzjtNfqAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712839706; c=relaxed/simple;
-	bh=WdDOMX9tnc1tmWwRoL7QOvCRxUbQx0s/YjWcKqoMOXI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SBuWAIQaqyyneMwmuz3+5RHFwuEpv7jQoyjNlYeHMZgDUsbHpJf/AIEztNtjvePwABaDiHum5dXp/0n7X7K5uviomf6SOtW8sZWs1yMwQPu6B5cSF2PoBD+KqUj/bhhwngeVXxq//S9KTEZGxIs3a7G22sDhFaYPEv0bM8xXPOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PbU0hoag; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1712840120; c=relaxed/simple;
+	bh=0qo6OhoSErPaFuLwx7TL3Ivrq7vIGHd69HrhbTInzjE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=MrG31okLVWKwNswIR8aCPUEiQZwHPRa253GtdUYJI1du+q9le0d0lelfNEHfaY3jdBnQeVbyHQAAey68MXSvQ7ZkrvAPUB/uRYK+4/mFom9RwJEA2ZXOw0tdUn37wsQkJCotMqe27xXuC3GN9uQ2lE7QKFz2ZV250p0SPtveelQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hAkVHYUO; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712839704;
+	s=mimecast20190719; t=1712840118;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YGv0oxILWFs0mMfSSjVAs+Z0hudt/O6Xh0nJxcnvIcY=;
-	b=PbU0hoagDybfxRGKROP0nnsZxGi8NpPeQpFfnjNqK+vTUvw5k40WlcOawBHyGOjBLLApDd
-	cH302QLGEHyLi0bMHAs3nS5J7apVHS6ekrKq2e1lfm79ljEGjmG+JMfE+RPXVfVP/2A8td
-	r4c73KHFMPDC9jrKU+TQrlOmBslZFgo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=uxxTM9LQHbxdCULEs1M1u2JdrM0DQBJCHzt/sGa542U=;
+	b=hAkVHYUOT30KBnojAvsHQ84A9t/n8ipGvlXIe+7jL9JRl7kQlb/O9hL3xz8kvPsxIZ4IsT
+	dWpUhLHZf5qnOZXI4puNDn/gP2a5cjsB0zFpocz/WYsP7i4zdjWKKBDY+0q+cf8F3wXD9b
+	/KQDLniSyfLHVW3iz00x/8E5Drw7inQ=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-475-8GmPBKZpPTaZkYN6LZNITA-1; Thu, 11 Apr 2024 08:48:22 -0400
-X-MC-Unique: 8GmPBKZpPTaZkYN6LZNITA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-346b8ef7e10so393752f8f.3
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 05:48:22 -0700 (PDT)
+ us-mta-536-OxQQT1d3MM6qMA451q4S7g-1; Thu, 11 Apr 2024 08:55:16 -0400
+X-MC-Unique: OxQQT1d3MM6qMA451q4S7g-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-515af96a73bso5417941e87.2
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 05:55:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712839702; x=1713444502;
+        d=1e100.net; s=20230601; t=1712840114; x=1713444914;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
+         :content-language:references:cc:to:from:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=YGv0oxILWFs0mMfSSjVAs+Z0hudt/O6Xh0nJxcnvIcY=;
-        b=fb4Kp/mrrmU3lvA/tuaYNPOD5Gffg29Tc1RmwKf+BAcJQaU6JISqCs0M3esDbKluHt
-         p4ncTzOzylnlMcMtEti+1c7oBCIS6CtqqbtVh4TBk2LoYxetWBXZQMfkXtk+OSutOUpl
-         HSJAqu/44fRJ3/dIS8FlLKYHqW/AiVtD27KKHZ+/WYfI9P9yDveCLEOeZCf/2w8tr1H7
-         oO2GlvWTYR3JOINwgDYKJDuei3sYOpdp7yzq/JSgXzWBdKEli82AbVk9ERul8E0gk7Rr
-         c7btNsZxf6j72+Bb0wy7oeD8unDG2UGbmgF07hETQhOUJSWZw9lXdS/SjyBCSLW2nEkS
-         xLdw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5Jh/RiDQJNOIkutfZVGLWsnxdDmqe7MYZWDXvQt4RtvUDDDyWRoUcRCr7WakjpFSGsm6BhDvXrdTxA850MmVjUTeT
-X-Gm-Message-State: AOJu0Yz7m2nYzljuH+RDsO7ZyNEnsdKuSK6OQ9wcJMP5ElU/TSfymF2Y
-	u+O3C5SyIdKvRp3ZGDTUZPZKWNowbugiWyXUnP41pzT3j3xW+doSuKcXzIWdyGO0NEFRwu+Tdla
-	q6KCbnnBn2tPw8x2myPMlPfnvxoo55SNA9UDYSqYVXc38IU2ntA==
-X-Received: by 2002:adf:e259:0:b0:33e:cc16:387 with SMTP id bl25-20020adfe259000000b0033ecc160387mr3810149wrb.54.1712839701831;
-        Thu, 11 Apr 2024 05:48:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFHI7e7R7IE4IicBalLusII+MbmDxKJG2iEJMqCJIjaUxwJC11oCyxgblPO8jFK/XF2/CifNA==
-X-Received: by 2002:adf:e259:0:b0:33e:cc16:387 with SMTP id bl25-20020adfe259000000b0033ecc160387mr3810136wrb.54.1712839701399;
-        Thu, 11 Apr 2024 05:48:21 -0700 (PDT)
+        bh=uxxTM9LQHbxdCULEs1M1u2JdrM0DQBJCHzt/sGa542U=;
+        b=Rq9VR5+cLZ44PQSqT6dnlpbWAuttRekQJD1QIcYVFlzsnG8b+N06cSOe6uIaCJGoEO
+         UqeWTsVThZiqYWbBMFxT/U9m74Vs5s9KBFRQtrx54fYRrx7asfYkrPxpHepotK0/dqTf
+         cdsYQxUaAvBcn38/WCEh3OsaZck1BrQCxbEJOlkUXjVWu3ADYGZuf9aoR97OV2nPqO76
+         P/na+qX4Mt1l27gXXDmV2oKeUuGrcidi9tE8mrk102E7XmXKefBDxEmYOsn5915AprGx
+         kczc3exaJ/L2fcZ2JtW+bo08ObMLw87ED0WfKcz4m9lyEK24IvwfIMysQmEi8jZwYAnb
+         sriw==
+X-Forwarded-Encrypted: i=1; AJvYcCXrPuEsXznmwb0ukbqRg1jsYUCbNJNamzKjLmSJQeWFI2Bnwls7PVbyQhmHO5/OPnmIHTlYGAAVKUKsTzcKoDMlNm2W
+X-Gm-Message-State: AOJu0YwFZhOa8C31jO0XzKhr17I4o0HkQF3f5Po/BupyeSanljkB/TuA
+	Bvqeedxf031j0eRbegkoTY/GTwN8nsaTRUg8kwg3Cm0Z9wephlKQrdZANH5a0CuLJtcKtOxjQY+
+	wLctOKqSTiEKk9ByLdvxousM8k3Uc0MbBFTjY7yryGqVosvMnSQ==
+X-Received: by 2002:ac2:5451:0:b0:517:8b17:1f1a with SMTP id d17-20020ac25451000000b005178b171f1amr1357766lfn.68.1712840114397;
+        Thu, 11 Apr 2024 05:55:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFW7rThKEgUHr9qfAmY0TCRkzXRb83o/dAyDyLZJckFU+Wgg9LufwCuNE0aO0wij1RiIu6GEw==
+X-Received: by 2002:ac2:5451:0:b0:517:8b17:1f1a with SMTP id d17-20020ac25451000000b005178b171f1amr1357754lfn.68.1712840113952;
+        Thu, 11 Apr 2024 05:55:13 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c724:4300:430f:1c83:1abc:1d66? (p200300cbc7244300430f1c831abc1d66.dip0.t-ipconnect.de. [2003:cb:c724:4300:430f:1c83:1abc:1d66])
-        by smtp.gmail.com with ESMTPSA id gb32-20020a05600045a000b003462b54bc8asm1691536wrb.109.2024.04.11.05.48.20
+        by smtp.gmail.com with ESMTPSA id fc6-20020a05600c524600b00417ced7f6e4sm2218295wmb.45.2024.04.11.05.55.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 05:48:20 -0700 (PDT)
-Message-ID: <329758ca-c795-43a3-9788-d83c09247dce@redhat.com>
-Date: Thu, 11 Apr 2024 14:48:19 +0200
+        Thu, 11 Apr 2024 05:55:13 -0700 (PDT)
+Message-ID: <15bb1139-97aa-484c-9087-dccf6612ed39@redhat.com>
+Date: Thu, 11 Apr 2024 14:55:12 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] s390/mm: re-enable the shared zeropage for !PV and
- !skeys KVM guests
+Subject: Re: [PATCH v2 1/2] mm/userfaultfd: don't place zeropages when
+ zeropages are disallowed
+From: David Hildenbrand <david@redhat.com>
 To: Alexander Gordeev <agordeev@linux.ibm.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -97,9 +98,9 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
  linux-s390@vger.kernel.org
 References: <20240327171737.919590-1-david@redhat.com>
- <20240327171737.919590-3-david@redhat.com>
- <ZhfYrVERxUijQbAL@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-From: David Hildenbrand <david@redhat.com>
+ <20240327171737.919590-2-david@redhat.com>
+ <ZhfW7qzAGPQo3mJN@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <b9d9af94-5935-4034-bf3f-9ba283df3ede@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -146,37 +147,33 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <ZhfYrVERxUijQbAL@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+In-Reply-To: <b9d9af94-5935-4034-bf3f-9ba283df3ede@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11.04.24 14:33, Alexander Gordeev wrote:
-> On Wed, Mar 27, 2024 at 06:17:37PM +0100, David Hildenbrand wrote:
->> index 60950e7a25f5..1a71cb19c089 100644
->> --- a/arch/s390/include/asm/pgtable.h
->> +++ b/arch/s390/include/asm/pgtable.h
->> @@ -566,10 +566,19 @@ static inline pud_t set_pud_bit(pud_t pud, pgprot_t prot)
->>   }
->>   
->>   /*
->> - * In the case that a guest uses storage keys
->> - * faults should no longer be backed by zero pages
->> + * As soon as the guest uses storage keys or enables PV, we deduplicate all
->> + * mapped shared zeropages and prevent new shared zeropages from getting
->> + * mapped.
->>    */
->> -#define mm_forbids_zeropage mm_has_pgste
+On 11.04.24 14:30, David Hildenbrand wrote:
+> On 11.04.24 14:26, Alexander Gordeev wrote:
+>> On Wed, Mar 27, 2024 at 06:17:36PM +0100, David Hildenbrand wrote:
+>>
+>> Hi David,
+>> ...
+>>>    static int mfill_atomic_pte_zeropage(pmd_t *dst_pmd,
+>>>    				     struct vm_area_struct *dst_vma,
+>>>    				     unsigned long dst_addr)
+>>> @@ -324,6 +355,9 @@ static int mfill_atomic_pte_zeropage(pmd_t *dst_pmd,
+>>>    	spinlock_t *ptl;
+>>>    	int ret;
+>>>    
+>>> +	if (mm_forbids_zeropage(dst_vma->mm))
+>>
+>> I assume, you were going to pass dst_vma->vm_mm here?
+>> This patch does not compile otherwise.
 > 
-> Should it be the below insted?
-> 
-> #define mm_forbids_zeropage mm_forbids_zeropage
-> 
-> Once I add it, it fails to compile, due to the issue in patch #1.
+> Ah, I compiled it only on x86, where the parameter is ignored ... and
+> for testing the code path I forced mm_forbids_zeropage to be 1 on x86.
 
-I guess yes. So we tested the unsharing part (why I was seeing unsharing 
-triggering), but would have allowed zeropages afterwards. Sight.
-
-Let me retest and resend. Thanks!
+Now I get it, I compiled it all on s390x, but not the individual 
+patches, so patch #2 hid the issue in patch #1. Sneaky. :)
 
 -- 
 Cheers,
