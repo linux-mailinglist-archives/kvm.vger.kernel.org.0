@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-14301-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14302-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B78F8A1DDA
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:20:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C29D8A1DDB
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F0F81C24C24
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D5301C24C35
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AF95FB9B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC0D5D47A;
 	Thu, 11 Apr 2024 17:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RDvKekNp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JZR70dcA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99BA5C90A
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 17:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8BB5DF3B
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 17:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712856606; cv=none; b=jLSZTulz80A/k5L/HsE0yG4pMwAJ5tFsYidp2ItYjCmaJqt4utFFAXSq1UQNTQNq+jt6jbGk1kHaYfVAF3wWI/mxsCyCqNDUBTzZgVPXXn5kHnWlud9AMOvmlBb8T8rUPRjW84lCiampM03woQMl1smDtOzYLUk2lWL8RXQPVLY=
+	t=1712856606; cv=none; b=pBmz6N6BQ7Wp5JOacQLdi0QB3T5syDLUQRXxvt4Kb91bS1CItfkoYm2NEx3UzGkhT09hAmt/4AUK/iz94GlWSOtC5MoazRFuh1IJebucEhQ8fC9178uBi8wRVWQmwUPjTMBSY6rnDJj4QrBueTHLXVEmwzUXr0vKepw9r7uyMl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712856606; c=relaxed/simple;
-	bh=YuFDJE/wvFIMDYGI3Kr0F1RU/i0Mx/EO9bllQc/g96Y=;
+	bh=sh0PZV/g72KQaq0W2lmfvw72SVzTXJwtX/DwYNPI0tI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Gb/uNHevt5smgvS7ct+nZWV0KjiI0d4G9NryIwaqzgobNCpvSlk35HC1saDWDKnAgtT7q0gmCNWiwjTFvwcdxmhwXjUB8fTs6hVDP7L1cPiQroHicdxZ9e18XkUylJJQGXy6ajMNZ0gBOvTfjj51DTkrSYBf6s9j2IbbmIn+BZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RDvKekNp; arc=none smtp.client-ip=209.85.208.47
+	 MIME-Version; b=a39E9LLxDFQJtFuCJpDuRdslQbM5O0OocwzmU4KvMjk442ObUdck71HBGQ3bf7ctL2m9SgriH3+MIkP/vqtOE9x4YzvcAl3DcfIQdQnMQT0V421bmSBzd/LjwhDlKcQA32rMbb7O80K14/v0HNod2rzu8uakfE5FI5TI6GK4fY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JZR70dcA; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56fe8093c9eso17219a12.3
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 10:30:03 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56fd7df9ea9so49748a12.0
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 10:30:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712856602; x=1713461402; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712856603; x=1713461403; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mtxdt+LBIR9Einmre3CMmnSZ5hxztcXuD5FZkUy/AlQ=;
-        b=RDvKekNpTjKMUXusw5SbZFoidmBpHAP6/3Ofq7SD09nIkp86p73VcL0s5Z/LEWxMCG
-         +92PCz5QxAh78HGadplg1ba/y9zHzy+qloYcznIssmXub70ZQm60VsIXMcgq4F4DroJV
-         jt2okhiO52Lng6sMgI2fLEL9IQVRJzVsm8Yq+UvD7Dg+1vQ2d5ObSGj8QcZeiDHZW803
-         MmdeYPW/YTL17DlfY5YMdc/DN3Q1Jco97L2HG91urq4i5a9oNg1xVWKNkMBk4og7I1dI
-         A3MUZG81yAAV8S82oERf8qpCuoaFrWFCqmyXMHEh+wI5a2i73379UjuXwUtnMLxI+tkH
-         ZnfQ==
+        bh=xNCVLIG2CMiyBOoYiM8IF0VeYwcjYl+48FesKHJM0yg=;
+        b=JZR70dcAIhcZijxwBxU6/oEvQ7BZRJfj1VNnvbleA9FthgmjDPusUnvZHsbzlBdw0y
+         7ONkpN0yfQxs4cAdLlBvN5yjkdLt6/9pqb3cEFdn1jfTXcNryavSYSfHY1BYLbxuvEzO
+         2xsLErbsOap+rGtD7rzxXLj+jZ6Ektiz9t0htsKANp/raG1gREvEIxJd1BISjh0pTpbK
+         u4exCe8l0YQAo2UL0NTYEHYSpfYCN8B6qFokFEYpEcOWk40pXvQadHuF6LVCOsb8lThr
+         tcMCENLZOHMPZfi2tIUyfglqGCU8WKBy8duYLjs4TUahHlI2DWCAEQSpmEpOCl5JVmSr
+         O1XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712856602; x=1713461402;
+        d=1e100.net; s=20230601; t=1712856603; x=1713461403;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mtxdt+LBIR9Einmre3CMmnSZ5hxztcXuD5FZkUy/AlQ=;
-        b=gPqXxUNp7DEd+YY4dhRyJWzC93NWV0OP+oHku7PQsH57lgG6p0asXC1Y/WBVsnM1UC
-         qT7C9Z3985yNDjl+qH43wKlsPyoloPnxXBzSNL/8A4pAd78uBM1h41nJjU8WW4lkeDg7
-         UegffUDRJmIu8COTf1pYsHnCUuHNhJlhpMemvcHnsEGBxzMuGMmagIRz5TBhucucEK2n
-         5yWjQLR/gpli4BjVPUn+JOiU8fk/Qhs7L5l9tpfl/BVUAfCqJvZ3vIGNR5of2mfV8fc5
-         fG3xfuCKiAB5WdOU2acRtLMnuw1FFA/ZhzxFRSR2vzNKASlY4zHu2PtIHA9+wphEkRW/
-         1lDw==
-X-Gm-Message-State: AOJu0YyeOT/B8lxFtVgNNEAaMhssJ0DwY2XpDfh86n7zc21GHLeCv0De
-	crkUTe5X7r6XH1GvUE17NHV3OPU5tj+MPjkAZTKzcfisnpgDYSDNQDvplWXI
-X-Google-Smtp-Source: AGHT+IEYXkHTyM2O7PDaCNyEMJpxjUJOUyjBAJSrLrrC2ow3qnMEQa+OGV1m4N0J32C7psKuN+gFCw==
-X-Received: by 2002:a50:8759:0:b0:56e:309f:4cb3 with SMTP id 25-20020a508759000000b0056e309f4cb3mr271854edv.16.1712856601675;
-        Thu, 11 Apr 2024 10:30:01 -0700 (PDT)
+        bh=xNCVLIG2CMiyBOoYiM8IF0VeYwcjYl+48FesKHJM0yg=;
+        b=dvPz/IU3/6nVhbhZa8Lp+C01OeXTnKTp8ZeqJTKvUt0UrYa4QJRpelj0Ut65cUay5i
+         pD5VRh1pZbL1+mYdDzvojN7i1/5TIPF9p9RhSptpagsmWCgnlP96pp7YJ+jJfKaJ06c6
+         TP/ZoqxPrcvtNFBid3bAgiEOterm15AEOBhBnBbbymXEzdJpyVNrLpDk5u50VJGsXb+I
+         xhUrJTsbFn6nnBDAw3UitP+jRoEuVBgucelAtvF79PlCf35niqaePKl0KlonZl4/P4JQ
+         TRdp8vtgLMbbcYxXxLlQwBgpwWxpZmQgXkbbI94c/7pcNY3Ctz60eMJr8ZwFGBjjoNvi
+         pkVg==
+X-Gm-Message-State: AOJu0Yxx4/5IHFp384PfVRm1sCoCeAnygPb6PCP/iZjGNcgqhiAkDn08
+	7P+f08+Lrzmymm6iUAXUbKNqoyHPeA1K4Q8QLxr5mLnsGqdihcgYi/WITvuM
+X-Google-Smtp-Source: AGHT+IG2qUkPb+juyQq/qiHSExDxbYsFaLEQdGncp0KKd0Lk7luf7wEvLuA1+qxicGpNAN+QyTsL8A==
+X-Received: by 2002:a50:d7d8:0:b0:56b:ec47:a846 with SMTP id m24-20020a50d7d8000000b0056bec47a846mr287628edj.25.1712856602846;
+        Thu, 11 Apr 2024 10:30:02 -0700 (PDT)
 Received: from vasant-suse.fritz.box ([2001:9e8:ab51:1500:e6c:48bd:8b53:bc56])
-        by smtp.gmail.com with ESMTPSA id j1-20020aa7de81000000b0056e62321eedsm863461edv.17.2024.04.11.10.30.00
+        by smtp.gmail.com with ESMTPSA id j1-20020aa7de81000000b0056e62321eedsm863461edv.17.2024.04.11.10.30.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 10:30:01 -0700 (PDT)
+        Thu, 11 Apr 2024 10:30:02 -0700 (PDT)
 From: vsntk18@gmail.com
 To: kvm@vger.kernel.org
 Cc: pbonzini@redhat.com,
@@ -76,9 +76,9 @@ Cc: pbonzini@redhat.com,
 	Vasant Karasulli <vkarasulli@suse.de>,
 	Varad Gautam <varad.gautam@suse.com>,
 	Marc Orr <marcorr@google.com>
-Subject: [kvm-unit-tests PATCH v6 10/11] x86: AMD SEV-ES: Handle IOIO #VC
-Date: Thu, 11 Apr 2024 19:29:43 +0200
-Message-Id: <20240411172944.23089-11-vsntk18@gmail.com>
+Subject: [kvm-unit-tests PATCH v6 11/11] x86: AMD SEV-ES: Handle string IO for IOIO #VC
+Date: Thu, 11 Apr 2024 19:29:44 +0200
+Message-Id: <20240411172944.23089-12-vsntk18@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240411172944.23089-1-vsntk18@gmail.com>
 References: <20240411172944.23089-1-vsntk18@gmail.com>
@@ -97,216 +97,140 @@ Using Linux's IOIO #VC processing logic.
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
 Reviewed-by: Marc Orr <marcorr@google.com>
+Tested-by: Marc Orr <marcorr@google.com>
 ---
- lib/x86/amd_sev_vc.c | 169 +++++++++++++++++++++++++++++++++++++++++++
- lib/x86/processor.h  |   7 ++
- 2 files changed, 176 insertions(+)
+ lib/x86/amd_sev_vc.c | 108 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 106 insertions(+), 2 deletions(-)
 
 diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
-index 6238f1ec..2a553db1 100644
+index 2a553db1..aca549b3 100644
 --- a/lib/x86/amd_sev_vc.c
 +++ b/lib/x86/amd_sev_vc.c
-@@ -177,6 +177,172 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 	return ret;
+@@ -306,10 +306,46 @@ static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
+ 	return ES_OK;
  }
 
-+#define IOIO_TYPE_STR  BIT(2)
-+#define IOIO_TYPE_IN   1
-+#define IOIO_TYPE_INS  (IOIO_TYPE_IN | IOIO_TYPE_STR)
-+#define IOIO_TYPE_OUT  0
-+#define IOIO_TYPE_OUTS (IOIO_TYPE_OUT | IOIO_TYPE_STR)
-+
-+#define IOIO_REP       BIT(3)
-+
-+#define IOIO_ADDR_64   BIT(9)
-+#define IOIO_ADDR_32   BIT(8)
-+#define IOIO_ADDR_16   BIT(7)
-+
-+#define IOIO_DATA_32   BIT(6)
-+#define IOIO_DATA_16   BIT(5)
-+#define IOIO_DATA_8    BIT(4)
-+
-+#define IOIO_SEG_ES    (0 << 10)
-+#define IOIO_SEG_DS    (3 << 10)
-+
-+/**
-+ * insn_has_rep_prefix() - Determine if instruction has a REP prefix
-+ * @insn:       Instruction containing the prefix to inspect
-+ *
-+ * Returns:
-+ *
-+ * 1 if the instruction has a REP prefix, 0 if not.
-+ */
-+static int insn_has_rep_prefix(struct insn *insn)
++static enum es_result vc_insn_string_read(struct es_em_ctxt *ctxt,
++					  void *src, unsigned char *buf,
++					  unsigned int data_size,
++					  unsigned int count,
++					  bool backwards)
 +{
-+	insn_byte_t p;
-+	int i;
++	int i, b = backwards ? -1 : 1;
 +
-+	insn_get_prefixes(insn);
++	for (i = 0; i < count; i++) {
++		void *s = src + (i * data_size * b);
++		unsigned char *d = buf + (i * data_size);
 +
-+	for_each_insn_prefix(insn, i, p) {
-+		if (p == 0xf2 || p == 0xf3)
-+			return 1;
++		memcpy(d, s, data_size);
 +	}
-+
-+	return 0;
-+}
-+
-+static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
-+{
-+	struct insn *insn = &ctxt->insn;
-+	*exitinfo = 0;
-+
-+	switch (insn->opcode.bytes[0]) {
-+	/* INS opcodes */
-+	case 0x6c:
-+	case 0x6d:
-+		*exitinfo |= IOIO_TYPE_INS;
-+		*exitinfo |= IOIO_SEG_ES;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* OUTS opcodes */
-+	case 0x6e:
-+	case 0x6f:
-+		*exitinfo |= IOIO_TYPE_OUTS;
-+		*exitinfo |= IOIO_SEG_DS;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* IN immediate opcodes */
-+	case 0xe4:
-+	case 0xe5:
-+		*exitinfo |= IOIO_TYPE_IN;
-+		*exitinfo |= (u8)insn->immediate.value << 16;
-+		break;
-+
-+	/* OUT immediate opcodes */
-+	case 0xe6:
-+	case 0xe7:
-+		*exitinfo |= IOIO_TYPE_OUT;
-+		*exitinfo |= (u8)insn->immediate.value << 16;
-+		break;
-+
-+	/* IN register opcodes */
-+	case 0xec:
-+	case 0xed:
-+		*exitinfo |= IOIO_TYPE_IN;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* OUT register opcodes */
-+	case 0xee:
-+	case 0xef:
-+		*exitinfo |= IOIO_TYPE_OUT;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	default:
-+		return ES_DECODE_FAILED;
-+	}
-+
-+	switch (insn->opcode.bytes[0]) {
-+	case 0x6c:
-+	case 0x6e:
-+	case 0xe4:
-+	case 0xe6:
-+	case 0xec:
-+	case 0xee:
-+		/* Single byte opcodes */
-+		*exitinfo |= IOIO_DATA_8;
-+		break;
-+	default:
-+		/* Length determined by instruction parsing */
-+		*exitinfo |= (insn->opnd_bytes == 2) ? IOIO_DATA_16
-+						     : IOIO_DATA_32;
-+	}
-+	switch (insn->addr_bytes) {
-+	case 2:
-+		*exitinfo |= IOIO_ADDR_16;
-+		break;
-+	case 4:
-+		*exitinfo |= IOIO_ADDR_32;
-+		break;
-+	case 8:
-+		*exitinfo |= IOIO_ADDR_64;
-+		break;
-+	}
-+
-+	if (insn_has_rep_prefix(insn))
-+		*exitinfo |= IOIO_REP;
 +
 +	return ES_OK;
 +}
 +
-+static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
++static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
++					   void *dst, unsigned char *buf,
++					   unsigned int data_size,
++					   unsigned int count,
++					   bool backwards)
 +{
-+	struct ex_regs *regs = ctxt->regs;
-+	u64 exit_info_1;
-+	enum es_result ret;
++	int i, s = backwards ? -1 : 1;
 +
-+	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-+	if (ret != ES_OK)
-+		return ret;
++	for (i = 0; i < count; i++) {
++		void *d = dst + (i * data_size * s);
++		unsigned char *b = buf + (i * data_size);
 +
-+	if (exit_info_1 & IOIO_TYPE_STR) {
-+		ret = ES_VMM_ERROR;
-+	} else {
-+		/* IN/OUT into/from rAX */
++		memcpy(d, b, data_size);
++	}
 +
-+		int bits = (exit_info_1 & 0x70) >> 1;
-+		u64 rax = 0;
++	return ES_OK;
++}
 +
-+		if (!(exit_info_1 & IOIO_TYPE_IN))
-+			rax = lower_bits(regs->rax, bits);
+ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ {
+ 	struct ex_regs *regs = ctxt->regs;
+-	u64 exit_info_1;
++	u64 exit_info_1, exit_info_2;
+ 	enum es_result ret;
+
+ 	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
+@@ -317,7 +353,75 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ 		return ret;
+
+ 	if (exit_info_1 & IOIO_TYPE_STR) {
+-		ret = ES_VMM_ERROR;
++		/* (REP) INS/OUTS */
 +
-+		ghcb_set_rax(ghcb, rax);
++		bool df = ((regs->rflags & X86_EFLAGS_DF) == X86_EFLAGS_DF);
++		unsigned int io_bytes, exit_bytes;
++		unsigned int ghcb_count, op_count;
++		unsigned long es_base;
++		u64 sw_scratch;
 +
-+		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
++		/*
++		 * For the string variants with rep prefix the amount of in/out
++		 * operations per #VC exception is limited so that the kernel
++		 * has a chance to take interrupts and re-schedule while the
++		 * instruction is emulated.
++		 */
++		io_bytes   = (exit_info_1 >> 4) & 0x7;
++		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
++
++		op_count    = (exit_info_1 & IOIO_REP) ? regs->rcx : 1;
++		exit_info_2 = op_count < ghcb_count ? op_count : ghcb_count;
++		exit_bytes  = exit_info_2 * io_bytes;
++
++		es_base = 0;
++
++		/* Read bytes of OUTS into the shared buffer */
++		if (!(exit_info_1 & IOIO_TYPE_IN)) {
++			ret = vc_insn_string_read(ctxt,
++					       (void *)(es_base + regs->rsi),
++					       ghcb->shared_buffer, io_bytes,
++					       exit_info_2, df);
++			if (ret)
++				return ret;
++		}
++
++		/*
++		 * Issue an VMGEXIT to the HV to consume the bytes from the
++		 * shared buffer or to have it write them into the shared buffer
++		 * depending on the instruction: OUTS or INS.
++		 */
++		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
++		ghcb_set_sw_scratch(ghcb, sw_scratch);
++		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
++					  exit_info_1, exit_info_2);
 +		if (ret != ES_OK)
 +			return ret;
 +
++		/* Read bytes from shared buffer into the guest's destination. */
 +		if (exit_info_1 & IOIO_TYPE_IN) {
-+			if (!ghcb_rax_is_valid(ghcb))
-+				return ES_VMM_ERROR;
-+			regs->rax = lower_bits(ghcb->save.rax, bits);
++			ret = vc_insn_string_write(ctxt,
++						   (void *)(es_base + regs->rdi),
++						   ghcb->shared_buffer, io_bytes,
++						   exit_info_2, df);
++			if (ret)
++				return ret;
++
++			if (df)
++				regs->rdi -= exit_bytes;
++			else
++				regs->rdi += exit_bytes;
++		} else {
++			if (df)
++				regs->rsi -= exit_bytes;
++			else
++				regs->rsi += exit_bytes;
 +		}
-+	}
 +
-+	return ret;
-+}
++		if (exit_info_1 & IOIO_REP)
++			regs->rcx -= exit_info_2;
 +
- static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 					 struct ghcb *ghcb,
- 					 unsigned long exit_code)
-@@ -190,6 +356,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 	case SVM_EXIT_MSR:
- 		result = vc_handle_msr(ghcb, ctxt);
- 		break;
-+	case SVM_EXIT_IOIO:
-+		result = vc_handle_ioio(ghcb, ctxt);
-+		break;
- 	default:
- 		/*
- 		 * Unexpected #VC exception
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index d839308f..661ded31 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -835,6 +835,13 @@ static inline int test_bit(int nr, const volatile unsigned long *addr)
- 	return (*word & mask) != 0;
- }
++		ret = regs->rcx ? ES_RETRY : ES_OK;
+ 	} else {
+ 		/* IN/OUT into/from rAX */
 
-+static inline u64 lower_bits(u64 val, unsigned int bits)
-+{
-+	u64 mask = (1ULL << bits) - 1;
-+
-+	return (val & mask);
-+}
-+
- static inline void flush_tlb(void)
- {
- 	ulong cr4;
 --
 2.34.1
 
