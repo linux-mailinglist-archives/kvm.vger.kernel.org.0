@@ -1,169 +1,190 @@
-Return-Path: <kvm+bounces-14229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460E48A0B89
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 10:43:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE6B8A0BCA
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 11:04:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65C961C20E90
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 08:43:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 605B7285DB6
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 09:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABC5140394;
-	Thu, 11 Apr 2024 08:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E181442FE;
+	Thu, 11 Apr 2024 09:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="jvKLLlyy"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="tlvu/boS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4611413CAA2
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 08:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BEC143C62;
+	Thu, 11 Apr 2024 09:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712824990; cv=none; b=P7+a5fnsIUTIendWt9hEfla/gmlc2EFpboYjNLjDnbpdyr33zisLMHmg6jeoWKHaHufFMmmcW+XAb8pBSmaaRfHxkgWgsei/P48jzYhYytJDIq/J0C7XtwZ8+u5D7zxPGNzAOXHqSpTr6H9+X/pVtxAOoOz2Gcl1vECCJxt/aPI=
+	t=1712826250; cv=none; b=L3VKh8HszYV7A3xk+cdAd5FkhyRJBtD8VFyrKb2Vx7UESlwlU9naE7g6myLzMvi1MtONtZjpjcp4aVVQbLE6zF9Cbpg2z4r7JiCIsK4BfDskYdS0KBkiDPy/xJsoFg9UUYzycYmpozYfU69hoqW5hCB5X1Z3fJ9/5UebxUXb+Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712824990; c=relaxed/simple;
-	bh=rFnbY6the2DTWFxqzWAWtQZuwY6LG4HwFJznztvQg34=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aCKrfgCjUyA6kvlvheWVMLIAWC6eoCzo7LGNxVg+rhoRXIY/2J7sbekkcyvr4/b52ZIrJkocvaCgkBPlxbpehkFvD39wJR2BsvRbuVb8iiQ9Y0rjF/qrBpYH3q8Q9Gf0SIwc5cI7P83hXmKYZwB5+aaODbGiFdyCx8+PpIbE+ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=jvKLLlyy; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-344047ac7e4so353130f8f.0
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 01:43:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1712824986; x=1713429786; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Lvrzy6gsavLoDn3zewsR3l1JDkSncM7fI8dzkelxIo=;
-        b=jvKLLlyyHphQ25WDhJSDv5Oc/4VUi5WPWl8712/+0hCu8iShkFGQGpmzy/8wmbBCOF
-         UKIF1bM3mMZFqiZrfiIgZxdOBZDODhxPqjq+GGLUIwpyqzRN1R4EjX84Q7Y/nDaoPLa4
-         OjawMbdi91/JYJunfHuCQiV0Bg2NFdHVuXsVM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712824986; x=1713429786;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Lvrzy6gsavLoDn3zewsR3l1JDkSncM7fI8dzkelxIo=;
-        b=VbB1l9asnoFijor9dw6nuTckbvnNfsme1I9dyihQ8DfOGFz0ei+5q8/MS5EgVKQeRo
-         9a8YiaOr/Bwq43OpwTd14JjaMWXxWZcMLS3AqfY+srpjs/lLhj02XQ3KaBOwL4VRHt3O
-         WtwmfggmVi3Fi9Cku2U9EvCfYGNI2FGz2dx4hIt8sofsENj6bbT0aNCedbz5j/88kdL9
-         mYXv9X54C5H4MoTLhLmurbABgsbPDRMBSgapd79zJWW2BQs3n48pEEmRmdkuKQybVhPt
-         JQU1E/O6BUFT0Ed8qPZKWKMebw9ulsLJWa3aW7J3pGhVSvmbojpOpGSKRESpdonnkpCk
-         +D8A==
-X-Forwarded-Encrypted: i=1; AJvYcCWOR3zBTx1WoCb/sSSc95HIsZhQrR5OM/SXoL9G8ASGHbjqz+ZqhT8RTGVBPUuElOD3yfY93UrMMtPbC6oCLqrPNBPW
-X-Gm-Message-State: AOJu0YztxR1WWGZHW7BfRqfqRqbby3Fwq8Bqd5PJkS6wocMPnfxXQ527
-	jCwbSzsAjqojUpX/9XbSYOKyz1koRyqiVvxFIozIRsl73wksU2XcgXJFYtsY6zk=
-X-Google-Smtp-Source: AGHT+IHg6r4Nu48iUIY9mqggSJ51l+wAjek6iP5pLQCoBO8qkh2HNS3T+3YcH8NVO0akPaYU8J2LdA==
-X-Received: by 2002:a5d:588b:0:b0:33e:c91b:9083 with SMTP id n11-20020a5d588b000000b0033ec91b9083mr1765564wrf.16.1712824986611;
-        Thu, 11 Apr 2024 01:43:06 -0700 (PDT)
-Received: from [192.168.1.10] (host-92-3-248-192.as13285.net. [92.3.248.192])
-        by smtp.gmail.com with ESMTPSA id n14-20020a5d660e000000b003433a379a51sm1223176wru.101.2024.04.11.01.43.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 01:43:06 -0700 (PDT)
-Message-ID: <7f1faa48-6252-4409-aefc-2ed2f38fb1c3@citrix.com>
-Date: Thu, 11 Apr 2024 09:43:05 +0100
+	s=arc-20240116; t=1712826250; c=relaxed/simple;
+	bh=6TmusjUX3vnMkNQepVsH4u+5hT3VrOI3o3ZMH1yhilU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aF5Xhdb9KVgTHAzlMuxo3J3irhZvR79PAPIzvuP/En6CqNFTL3IO744Hrm8M1v+S4IltWiOnQyiiof30+p1QJkiDVG0rIp37cdcI95HsA2mRVYGY+k9qQey4WVH3RUiEh5nTpHfbuzEuLjCp05TK6uy0Zly3StSkYr/e32+M1rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=tlvu/boS; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1712826248; x=1744362248;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6TmusjUX3vnMkNQepVsH4u+5hT3VrOI3o3ZMH1yhilU=;
+  b=tlvu/boSLS6EuRsVNYCNe07oBP3KIstqVJKSGcysn2LCoaYO0Icn5Elk
+   e9QROPNo2INRavrnWtB4HLOfPgJPgkRj9PKjHMUdAjak9/GQD3H0wBWT6
+   g3mt4tg+CjQMm3er3iM5j+oG9hTMDQcWATJA/y6bKLZWrwW0g77q+lyq9
+   zmkqEEzbRFYRtTt8i3UvDmIjdas2VqpRx/GEEFX/fDshv6VZSI340j122
+   dQhtuSunlMynZPBtyQLzqaDoG53ELrigBDKtRsvFfwtYaeRd7kF7frGuN
+   yyam8huptlC9hp+wUph1cFR6zoh/PiQR8I03xczdZnUn6ox8PL8u8wCBD
+   g==;
+X-CSE-ConnectionGUID: sBUxEcpYQIqblsPw1hMyfQ==
+X-CSE-MsgGUID: 6LquUSg4QDGyfAHGclQ3bA==
+X-IronPort-AV: E=Sophos;i="6.07,193,1708412400"; 
+   d="asc'?scan'208";a="21080514"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Apr 2024 02:04:03 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 11 Apr 2024 02:03:57 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex01.mchp-main.com (10.10.85.143)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Thu, 11 Apr 2024 02:03:53 -0700
+Date: Thu, 11 Apr 2024 10:03:03 +0100
+From: Conor Dooley <conor.dooley@microchip.com>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+CC: Deepak Gupta <debug@rivosinc.com>, Conor Dooley <conor@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Anup Patel <anup@brainfault.org>, Shuah
+ Khan <shuah@kernel.org>, Atish Patra <atishp@atishpatra.org>,
+	<linux-doc@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH 07/10] riscv: add ISA extension parsing for Zcmop
+Message-ID: <20240411-superglue-errant-b32e5118695f@wendy>
+References: <20240410091106.749233-1-cleger@rivosinc.com>
+ <20240410091106.749233-8-cleger@rivosinc.com>
+ <ZhcFeVYUQJmBAKuv@debug.ba.rivosinc.com>
+ <20240410-jawless-cavalry-a3eaf9c562a4@spud>
+ <20240410-judgingly-appease-5df493852b70@spud>
+ <ZhcTiakvfbjb2hon@debug.ba.rivosinc.com>
+ <1287e6e9-cb8e-4a78-9195-ce29f1c4bace@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Set BHI_NO in guest when host is not affected
- by BHI
-To: Alexandre Chartre <alexandre.chartre@oracle.com>, x86@kernel.org,
- kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, daniel.sneddon@linux.intel.com,
- pawan.kumar.gupta@linux.intel.com, tglx@linutronix.de,
- konrad.wilk@oracle.com, peterz@infradead.org, gregkh@linuxfoundation.org,
- seanjc@google.com, dave.hansen@linux.intel.com, nik.borisov@suse.com,
- kpsingh@kernel.org, longman@redhat.com, bp@alien8.de, pbonzini@redhat.com
-References: <20240411072445.522731-1-alexandre.chartre@oracle.com>
-Content-Language: en-GB
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
- 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
- 6+ahAA==
-In-Reply-To: <20240411072445.522731-1-alexandre.chartre@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4EMZ8FslzLz1hx5z"
+Content-Disposition: inline
+In-Reply-To: <1287e6e9-cb8e-4a78-9195-ce29f1c4bace@rivosinc.com>
 
-On 11/04/2024 8:24 am, Alexandre Chartre wrote:
-> When a system is not affected by the BHI bug then KVM should
-> configure guests with BHI_NO to ensure they won't enable any
-> BHI mitigation.
->
-> Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
-> ---
->  arch/x86/kvm/x86.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 984ea2089efc..f43d3c15a6b7 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1678,6 +1678,9 @@ static u64 kvm_get_arch_capabilities(void)
->  	if (!boot_cpu_has_bug(X86_BUG_GDS) || gds_ucode_mitigated())
->  		data |= ARCH_CAP_GDS_NO;
->  
-> +	if (!boot_cpu_has_bug(X86_BUG_BHI))
-> +		data |= ARCH_CAP_BHI_NO;
+--4EMZ8FslzLz1hx5z
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This isn't true or safe.
+On Thu, Apr 11, 2024 at 09:25:06AM +0200, Cl=E9ment L=E9ger wrote:
+>=20
+>=20
+> On 11/04/2024 00:32, Deepak Gupta wrote:
+> > On Wed, Apr 10, 2024 at 11:27:16PM +0100, Conor Dooley wrote:
+> >> On Wed, Apr 10, 2024 at 11:16:11PM +0100, Conor Dooley wrote:
+> >>> On Wed, Apr 10, 2024 at 02:32:41PM -0700, Deepak Gupta wrote:
+> >>> > On Wed, Apr 10, 2024 at 11:11:00AM +0200, Cl=E9ment L=E9ger wrote:
+> >>> > > Add parsing for Zcmop ISA extension which was ratified in commit
+> >>> > > b854a709c00 ("Zcmop is ratified/1.0") of the riscv-isa-manual.
+> >>> > >
+> >>> > > Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
+> >>> > > ---
+> >>> > > arch/riscv/include/asm/hwcap.h | 1 +
+> >>> > > arch/riscv/kernel/cpufeature.c | 1 +
+> >>> > > 2 files changed, 2 insertions(+)
+> >>> > >
+> >>> > > diff --git a/arch/riscv/include/asm/hwcap.h
+> >>> b/arch/riscv/include/asm/hwcap.h
+> >>> > > index b7551bad341b..cff7660de268 100644
+> >>> > > --- a/arch/riscv/include/asm/hwcap.h
+> >>> > > +++ b/arch/riscv/include/asm/hwcap.h
+> >>> > > @@ -86,6 +86,7 @@
+> >>> > > #define RISCV_ISA_EXT_ZCB=A0=A0=A0=A0=A0=A0=A0 77
+> >>> > > #define RISCV_ISA_EXT_ZCD=A0=A0=A0=A0=A0=A0=A0 78
+> >>> > > #define RISCV_ISA_EXT_ZCF=A0=A0=A0=A0=A0=A0=A0 79
+> >>> > > +#define RISCV_ISA_EXT_ZCMOP=A0=A0=A0=A0=A0=A0=A0 80
+> >>> > >
+> >>> > > #define RISCV_ISA_EXT_XLINUXENVCFG=A0=A0=A0 127
+> >>> > >
+> >>> > > diff --git a/arch/riscv/kernel/cpufeature.c
+> >>> b/arch/riscv/kernel/cpufeature.c
+> >>> > > index 09dee071274d..f1450cd7231e 100644
+> >>> > > --- a/arch/riscv/kernel/cpufeature.c
+> >>> > > +++ b/arch/riscv/kernel/cpufeature.c
+> >>> > > @@ -265,6 +265,7 @@ const struct riscv_isa_ext_data
+> >>> riscv_isa_ext[] =3D {
+> >>> > >=A0=A0=A0=A0 __RISCV_ISA_EXT_DATA(zcb, RISCV_ISA_EXT_ZCB),
+> >>> > >=A0=A0=A0=A0 __RISCV_ISA_EXT_DATA(zcd, RISCV_ISA_EXT_ZCD),
+> >>> > >=A0=A0=A0=A0 __RISCV_ISA_EXT_DATA(zcf, RISCV_ISA_EXT_ZCF),
+> >>> > > +=A0=A0=A0 __RISCV_ISA_EXT_DATA(zcmop, RISCV_ISA_EXT_ZCMOP),
+> >>> >
+> >>> > As per spec zcmop is dependent on zca. So perhaps below ?
+> >>> >
+> >>> > __RISCV_ISA_EXT_SUPERSET(zicboz, RISCV_ISA_EXT_ZCMOP,
+> >>> RISCV_ISA_EXT_ZCA)
+> >>>
+> >>> What's zicboz got to do with it, copy-pasto I guess?
+> >=20
+> > Yes, copy-pasta :-)
+> >=20
+> >>> If we're gonna imply stuff like this though I think we need some
+> >>> comments explaining why it's okay.
+> >>
+> >> Also, I'm inclined to call that out specifically in the binding, I've
+> >> not yet checked if dependencies actually work for elements of a string
+> >> array like the do for individual properties. I'll todo list that..
+> >=20
+> > Earlier examples of specifying dependency on envcfg actually had functi=
+onal
+> > use case.
+> > So you are right, I am not sure if its actually needed in this
+> > particular case.
+>=20
+> I actually saw that and think about addressing it but AFAICT, this
+> should be handled by the machine firmware passing the isa string to the
+> kernel (ie, it should be valid). In the case of QEMU, it takes care of
+> setting the extension that are required by this extension itself.
+>=20
+> If we consider to have potentially broken isa string (ie extensions
+> dependencies not correctly handled), then we'll need some way to
+> validate this within the kernel.
 
-Linux only sets X86_BUG_BHI on a subset of affected parts.
+No, the DT passed to the kernel should be correct and we by and large we
+should not have to do validation of it. What I meant above was writing
+the binding so that something invalid will not pass dtbs_check.
 
-Skylake for example *is* affected by BHI.  It's just that existing
-mitigations are believed to suffice to mitigate BHI too.
+--4EMZ8FslzLz1hx5z
+Content-Type: application/pgp-signature; name="signature.asc"
 
-"you happen to be safe if you're doing something else too" doesn't
-remotely have the same meaning as "hardware doesn't have a history based
-predictor".
+-----BEGIN PGP SIGNATURE-----
 
-~Andrew
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZhenRgAKCRB4tDGHoIJi
+0ntrAP0Tj4WJ1c21e2spkfDS6PwV7wHiJYoWI9/4CiHZwAQORAEApMmTK1BWuikT
+fiLbYMmFEHJbe4+ND/jrK1UaiylnyQ8=
+=p9pA
+-----END PGP SIGNATURE-----
+
+--4EMZ8FslzLz1hx5z--
 
