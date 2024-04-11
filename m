@@ -1,243 +1,289 @@
-Return-Path: <kvm+bounces-14176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E61558A03EA
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 01:16:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56F728A0456
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 02:08:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15EC21C217EC
-	for <lists+kvm@lfdr.de>; Wed, 10 Apr 2024 23:16:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2777B21F01
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 00:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB371DFC6;
-	Wed, 10 Apr 2024 23:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB571C01;
+	Thu, 11 Apr 2024 00:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I5/xPu4i"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="JdPT6Dlw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD0F138E;
-	Wed, 10 Apr 2024 23:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712790964; cv=fail; b=MFUBM3BhXKLcbjt6ivkJ+aut3pKRMamGtl7bWikw1Lcdl15gv5l5S2KFr7o3rnLTaRQFODDMBhqnAyUl8owni+u5SY/mKCWM+57uyyfqEZzrdFtfYS1fyd/O8Z0jUsIUkqQ/yaLDBLcY7rJMqUP+sTv4MMZyN3IAwDBkxT2djbM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712790964; c=relaxed/simple;
-	bh=Imra2Q2m5ZWX5R6RXhBQ9qHwmNtH+iUgubX8x/EVteo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=OWAD7QGCR7EEVBxk62wtQZmEP/JZAVFhTb+9xuGJFLybD68EZgkfrAt4Z4fgc/fje43xU1Q+1hswTTSv7gyPaUEFmKcAu9eygJvygZRSGBY8ue7xbEZ968PG6soTaaQBnVW0vTKNTWVO+GgaYo5P/rdSinfix8nExifRVTJAN/Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I5/xPu4i; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712790963; x=1744326963;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Imra2Q2m5ZWX5R6RXhBQ9qHwmNtH+iUgubX8x/EVteo=;
-  b=I5/xPu4ic8gPMpZq4CQHxyUY9stVBEFrCebTvyV7aVfz9lUywMIEIUdd
-   xd9mfCL35rJuNhQgwf1HtohUjXQbnwBqHfeu1mGcmtYcUirDAYSBp1Srp
-   F3YiGyYXHvltdvY3uAgf5tgN+goweX2H+SftErKSC1e7v/vdTayegMhYO
-   WKue6qe1QTVl0PcWPOc4c7gkHrO9gOM7x7ERv5pOv1+3PtrXOTkUy6FON
-   m0Y3YZGX40DHkqQ+aMqMiWTmmgin3LBhs6fi5ZyluTES6fnYBXFzJF86K
-   YHGnNIRFUGDk9HyUpxVAnUKX39Vy57/LkMNvR7lk+69ZjRSyb/OTli2//
-   w==;
-X-CSE-ConnectionGUID: 0Ou7g1pTSnaAtqzi5+HBRg==
-X-CSE-MsgGUID: 6iGlcOsjQ7Gbls7rojjb2w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="11145912"
-X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
-   d="scan'208";a="11145912"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 16:15:58 -0700
-X-CSE-ConnectionGUID: MHRLHmTkQtyNMWi3SDo4UQ==
-X-CSE-MsgGUID: dSEDTcBmSiq7TzgzU023uQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
-   d="scan'208";a="21217374"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Apr 2024 16:15:58 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 10 Apr 2024 16:15:57 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 10 Apr 2024 16:15:57 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 10 Apr 2024 16:15:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hQXtg2mYaxpG/KWcAkI9xBDyyQsWq3zSeUqI+spHOn8WhbzWRr4mlHyfbN6kP+INiVsLtAFDBXm1+xUvaUZttHN4XFKuSMP/KdbQbBUgU6/KImSAeux6RNgpkPJ9SRRoSypz9F5kUnSaIZXaB9wQyrE07qDdCVFCyTf4yDr6IyDeX/6+e7SvKK0cY2ostak6ZMAtUkeuMamIX2yqte8MN+5/o7uGJfe4je42j8CXqF9ct3+PKDOHM9o8RQPuJnhYSbb/1ScjjAHvk6dm4jNTWs5By1kGeTkWroNnI9v6dDXM7BwUmwN50FocpK5laGvtlQj89VKn52GAJ/v0Q3OwzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ecFwIBU2TYa/GvMLr3MJpOuw8kVN30kWdk+fBilA0AQ=;
- b=acC64ZuRFNM33x+vjp1ACBD2jQ4+XdFeGWQQ5lOv/wNbXYevyk7XiveEp2gvSDP62A1bzKMVMKErDW3M8J9fW//YKkpX7SGUIIetCRGpz7Emm/gHy/lJMl7u4Aba7rNL3mOD9bsvof35XsdxENCJ0QlVTV/GkF2n4MEiz68aYmcqJb4EgVqldwVolEeOMbtlOyyjybO1lJiz12bzoME3Rh+pzOdqMkNgJDjsqHIDf5FlBtAcfOajGqJTMniOl62bCdgGyWZRt3+t+RroNp1IHlnfU7/hwxHT5ScQCADtML+ShrOOIyZsB2GbtpVDZqBZx0z6dyLl3COwIF+a8LUZcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by IA1PR11MB6490.namprd11.prod.outlook.com (2603:10b6:208:3a6::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Wed, 10 Apr
- 2024 23:15:54 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7452.019; Wed, 10 Apr 2024
- 23:15:54 +0000
-Message-ID: <8afbb648-b105-4e04-bf90-0572f589f58c@intel.com>
-Date: Thu, 11 Apr 2024 11:15:43 +1200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-To: Sean Christopherson <seanjc@google.com>
-CC: "Yamahata, Isaku" <isaku.yamahata@intel.com>, "Zhang, Tina"
-	<tina.zhang@intel.com>, "Yuan, Hang" <hang.yuan@intel.com>, "Chen, Bo2"
-	<chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Aktas, Erdem"
-	<erdemaktas@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "isaku.yamahata@linux.intel.com"
-	<isaku.yamahata@linux.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <f028d43abeadaa3134297d28fb99f283445c0333.1708933498.git.isaku.yamahata@intel.com>
- <d45bb93fb5fc18e7cda97d587dad4a1c987496a1.camel@intel.com>
- <20240322212321.GA1994522@ls.amr.corp.intel.com>
- <461b78c38ffb3e59229caa806b6ed22e2c847b77.camel@intel.com>
- <ZhawUG0BduPVvVhN@google.com>
-Content-Language: en-US
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <ZhawUG0BduPVvVhN@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0214.namprd04.prod.outlook.com
- (2603:10b6:303:87::9) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF3A646
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 00:08:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712794090; cv=none; b=qGw5oGRefmrFBQc4ONTNBgKCJ+lsNdPb48q6QJgLxPBBBHEfGvxpEyDVkO6DSDaseRJdrFaS7atXy+PIRKo6iFQ4NyxB43GOtG4/u8J7xBD6jdYZ2yaCU/WFFruwUJsR2RGc7Ftxy9vHjg9fM5iL0tkBEwhvuHZy0AfOAIFK56A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712794090; c=relaxed/simple;
+	bh=1m6GeUg/eW7gq8Dvxg83CrcroRJeTEEbAgnByTy3TU4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Mi9tqj5BIfB4WmqDI3fuI2DV1xdskVpOKHKfzn54WYZolx4OTTc/U6j8idP0sawZr4yh1vwGp1deyA6eNCzZ8NiN2No8KverWpM7ewHM0Wq2Wnktg9MrZ6YkOFC3o2Kzr82GdEZf3glaLufa2Zcy6ax2oVOIPTuTT6XPv9geA90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=JdPT6Dlw; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1e4c4fb6af3so2252275ad.0
+        for <kvm@vger.kernel.org>; Wed, 10 Apr 2024 17:08:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1712794088; x=1713398888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0phIFwoBJCi+Fzzf56PNpg1jde4jtrCnjX2PmS8+4bo=;
+        b=JdPT6Dlw56ON0/OXl4G2QRAei6RxdlOaHTFjJ2U2rDGMToW/Iv3yS5YjIqgL34DOLS
+         rw4x9RHXrmnxeI4wiXeqwzPpOKQxR62IHeV8PUx8qbWMhueBn0TgcL3qUtskrvfVcsgU
+         yZ3AgqsPlTTYayukMyK2EY8JIuA3/Hkw5uKbQNFMN+zEU6OXHGpguDXW/U9a1xUMHMaE
+         v/gp7NshTEWnBgAecxNYPIVFM+ORa1Sz5B+ma6sOrbignbvygZr31L8qyIucX9XNic+J
+         lVNDbaJsV75Rv6vpH3AnLl6IfyPgIrOu//0cfW688pg47czJl+YaXhWtkB/v7rfEC88K
+         vPOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712794088; x=1713398888;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0phIFwoBJCi+Fzzf56PNpg1jde4jtrCnjX2PmS8+4bo=;
+        b=ZAUM5GfXUREeSCpJMGWO6f5697dSNQcSMMUC0UG703zhqKtp66Bl4LPq5lZr/8TtaH
+         cDtBiFmkKDiYRVy2ncuJKT1eSRiw5Ry7h+PNNpIilzx/0N9v41qNv+6lvf7Siv7dMR8I
+         mTMgAbCvBN07cFo7w6rFy9FehoThdu4WvMia4Mi1itbrZhbHv1u0afbpJ45gSRZNjQC4
+         vJujbCtPRSUKy47goXnhWQYSmmu5TV0Zhcn3LQ/fMXlK6pam3zu10XclrpjAJRS62jaf
+         rB1VnWzu1jtye99pfNav9vmtQeSmtwIEIgbnpM+aTiLEBEtYm087aVHWH+Sv7kqH561Q
+         LYcg==
+X-Forwarded-Encrypted: i=1; AJvYcCXZagack1vnWUBhr4BDZk1hQNVb5AK6OBDFy8Yv7MqLJgMjnzo8a2qNkN7zLETh3bxM3Ytb6gMuCE80ol182Ar0rKyx
+X-Gm-Message-State: AOJu0YxdjhYOBWWV1V68yM2WaugkqrQ4F0aCvAmCGQ+ZHWeNb37L54zy
+	S20vLrWrR2a2qeMCCjtozGcFlKXIWkw8EXycP15plB22PFLXf3f6x8jCX21ZjSk=
+X-Google-Smtp-Source: AGHT+IF++9d4mpNVy4ymyqu2bjRlr80QcfEg5FB9y5MT6+XG1ZHr0TMgTO95oVGxO8PLzBuM/HD4Yw==
+X-Received: by 2002:a17:902:da87:b0:1e2:7734:63dd with SMTP id j7-20020a170902da8700b001e2773463ddmr1535796plx.30.1712794087610;
+        Wed, 10 Apr 2024 17:08:07 -0700 (PDT)
+Received: from atishp.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id f7-20020a170902684700b001e3d8a70780sm130351pln.171.2024.04.10.17.08.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 17:08:06 -0700 (PDT)
+From: Atish Patra <atishp@rivosinc.com>
+To: linux-kernel@vger.kernel.org
+Cc: Atish Patra <atishp@rivosinc.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Juergen Gross <jgross@suse.com>,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Shuah Khan <shuah@kernel.org>,
+	virtualization@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	x86@kernel.org
+Subject: [PATCH v6 00/24] RISC-V SBI v2.0 PMU improvements and Perf sampling in KVM guest
+Date: Wed, 10 Apr 2024 17:07:28 -0700
+Message-Id: <20240411000752.955910-1-atishp@rivosinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|IA1PR11MB6490:EE_
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fRLTELxrvjstEylR6X1gUSo2Vskuxv0/xfGERxjGxRugYfwiNQKrg69UbWQhY0YnvSfXRfZf98QOsmRRhpyVdZP3z8gdQh59+vOKC2bs3QjmdCCRNqSbY8z2RTymRFHe2sR65ipHGUrqxAA5k4ZJptxrvi0G0qD1pLh5nnWypM0SUUnTyvVkRoGq9VI3ZZeDpWOcehx/L5cOdO2qdOHpf80GXqd9+GtoI/hN/wtcZkJViISXJi6LDC16/yFiCCcEaLc+1gHAiExtRYT1Is33Iujguf+m3ERsAXyGa6qZM4SWAx/2wXCpgLmKAqR96vQ2PBKdAWfEpVBM32hDoYOxyYe+tU68MDmJha1wjzNx3cnrci2f0d6TWjv9SRb6LWp9Lx3rSskG1OGTyz2rTyB6+Vt0wB1uNoGImGZsWLhco+nZfeQHwIJ9pAcfeuZFh0C/EWth9Nx5Wvb/i4PuIj7fmi3KQwujvDTEBbD37g+dMrLrpsZs+Sg2oo8uk3LiBLHaS/5RdkouETAC+O6TXjiImOlnIrnMcM2J4S9V+sUIybuqp0wL6Bk1kj1H4eL9bsTgIqJxt7ZoEm94Yz4zRCPYpPfhhPmMkUFXr/5lB06pt52n6hsHs+ryyRT4H4td11LC31ArdL4/n43WWOl/DdiczR4/gBZ/2oQmDFxkl7nWaQQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VFVEZEUxeTNvL3h1VGpkRmEzbzVKUDUreklrcjRqSDlOSjFzTjcrNkNCWHhj?=
- =?utf-8?B?NTgwUmkrZWM5Z1AxQXQzVkduY1pHNFl5eXNkMEhnMFBYZEVkK2lhSU50M0FJ?=
- =?utf-8?B?S1YwSTBudEVQaVZZYndyNzRzWmJSV0g3QzBUTThXTHpveTArWGNrQ1kvWUxl?=
- =?utf-8?B?L0NhNHZzTEVIa1Q1Q3RQa3lsM3FsS3pzSjF1Y0ZKMDNUOTdVbWt1dEpmYnRP?=
- =?utf-8?B?Wkk1VUNCSkVBQUoyYzJ4dTBVcW5vbm1kUU02aHcrZ0lDOEhudDNTb3hBSENN?=
- =?utf-8?B?bEI3WlIwOUZ3UTJ6aFlrQ0N1ZHVYSHA2c1J1dytZVDVxc1hMYkpZR3NsejlJ?=
- =?utf-8?B?WVg0WGtZbTkwejZJRXh1dzlENERkbHFqZzYxN0hRQVZxdytCdUdLZS9rYjNt?=
- =?utf-8?B?S2VYaHVqZW5yRWlqRGdxTXVPd1NUK2gwaDc5RDAvdk9OTytvMUpmOURyQWc1?=
- =?utf-8?B?dUtvYzFGTlVIY2c0SjVscEMzYXhBMDF1NTZKYzQzV1JLaHM3cEtISHloWkVO?=
- =?utf-8?B?UVUxNmdqVGd5SFM2Ty9SNnBCSFJPTlZ3STJmbFJheHZPMkJ0Lyt1TFc0SE5x?=
- =?utf-8?B?SFRFK3UyMERLejVVdmMzTjBvYXRyaU5aYk1Cb3Rhc2drNURBbWFacmozSUxh?=
- =?utf-8?B?ZHd0VUNGTm1YMm1iMHN6NjNHcVYwR1FEQVdwYW9PMVQ0RWlVdlV6cXhzMksz?=
- =?utf-8?B?c0lCM2V2YVIrLzBaeDJ1WnYwYVlLRG8yRDQ5b2d3c2FseWJ1RnZER21HcDYx?=
- =?utf-8?B?WVZ0QVkraWJjMVcwM3IwS2NFR3JESHl5YkJXd2Q5RUNvNnBTMVpjbWlhSi93?=
- =?utf-8?B?UFNxWDRtTzZxL3UxQUR5Z1NqSDNFQ1diTmg2T1QxVHladDZYUnlVekQ4NEFX?=
- =?utf-8?B?blRaZnJZdU0yVjFpZEVrK2V3UUgxL2ROZFZBT2I1WFkybDJvKzRxeGo4TjNn?=
- =?utf-8?B?OE52T0lTSXdGOWNhRmNLTzdsQ3BGb0Q2c1l6M3lhcmhzUUZjZDVBSk8vVkVC?=
- =?utf-8?B?WnhKK3E2RG5vSU1OMTRtKzZxQlRoQkQxd25WOW1ha2J5SkdmR1hNRUlkSEpn?=
- =?utf-8?B?emtBNG0wS0srclhPUzRhVnBJaUtzSGNvWU0rNEh3OEhpbDJ1UGN4ZC9kcGRZ?=
- =?utf-8?B?alJWUG8wSGs2ZjdmQVphQzR5c0ZCRnV4YUFJS3lLTGdEUnpTZk0rbHBQOFU2?=
- =?utf-8?B?Q1R3VWNkWXNrS2FmSExVRCtiK1p1ZDI2V0UraEgrcy9JQkhIVm5IVDVXSTJ1?=
- =?utf-8?B?ZUJteHcvOFNvamhkdCtzNkErVXhxQnJqL2Rmclh3TmRlaUdJa0luUWVNZ1Nm?=
- =?utf-8?B?N2xLbFRlMElTVDA4a2V5SU1FVUtWdW9GNE8zMnNNblBtTXI5MFB5RzRmMGMx?=
- =?utf-8?B?M0lKZTNnbjVUblRkenZxcS82TmgrNWVNNVRyUm83eVNFL3l0RlF6cmp5VVYw?=
- =?utf-8?B?MVhiTW1FeGxBb1R1NThsVFVmMjBDQnV4VUhwSmVGL0ZXQjllSEFCQXJqLzFE?=
- =?utf-8?B?VXVvelFDUlZ3YjZBa0RnUWxiSi96TXhBdHkrNVRuSzBoTzViL1VaY3I0VG93?=
- =?utf-8?B?cHR3SXJWMFdKdElRUXhyMFhtRHNSOERFZWN0N1JQeFlBc1pwakErSWxNbmx3?=
- =?utf-8?B?N0s4WkNUaWxxTHZSanpvVXovOU5wSjAwcTUrcUx3dUE0cU51REN1S3JBa0NP?=
- =?utf-8?B?elhTSWJjaXA3Y1pkUGVUYVgyM3ozSHR4ZCtSWXA3bHo1ZEQ0bnNHOXkvWk4v?=
- =?utf-8?B?bjIwKy8vclpSOHpVbEo3K3J0T0dKdVo0SlRQZHQ2WUdKR1Avei9tUGRRTkZL?=
- =?utf-8?B?RGlxblVtNGxpZGxIU0REaDVxaS9JUVNyWFIrUlIwbGxGV1dHRkE3Kyt3SlVC?=
- =?utf-8?B?TW8xMmhDMEVlT2JERjNZc0dTcVhTb1VxQ1BXQkdvK3dPaXFSOGNseHArVUov?=
- =?utf-8?B?ejBsSVZDZmMzOGJXRUVBbXh1Vit6bGtrRWVqZXpNOE1jdWxhWVBValh5WERT?=
- =?utf-8?B?bmNyREc4WStsbS95YWJ5S0Y5TDJvTVg1NnJwSGRLRm9GcWplWDZKczNOdWFo?=
- =?utf-8?B?WjBtaGloeElEVmRwekl2UFVJL0pld2kwc3ZHNzlHSEtUeTllS2ZKcllQZ0hV?=
- =?utf-8?Q?XOUa/dZHlRAqQeYge61bws8MX?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fdfe53ce-8752-474e-e23c-08dc59b42b85
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 23:15:54.1243
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fkXOmBLO9Rl7SK8oqS/iWRraz4exxs0vECW5Iy4s4WIOq2ek8KJjodey6IR1RgySV0457jEfnvfuiEyYEtyfSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6490
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+This series implements SBI PMU improvements done in SBI v2.0[1] i.e. PMU snapshot
+and fw_read_hi() functions. 
 
+SBI v2.0 introduced PMU snapshot feature which allows the SBI implementation
+to provide counter information (i.e. values/overflow status) via a shared
+memory between the SBI implementation and supervisor OS. This allows to minimize
+the number of traps in when perf being used inside a kvm guest as it relies on
+SBI PMU + trap/emulation of the counters. 
 
-On 11/04/2024 3:29 am, Sean Christopherson wrote:
-> On Wed, Apr 10, 2024, Kai Huang wrote:
->> On Fri, 2024-03-22 at 14:23 -0700, Isaku Yamahata wrote:
->>>>> +	r = atomic_read(&enable.err);
->>>>> +	if (!r)
->>>>> +		r = tdx_module_setup();
->>>>> +	else
->>>>> +		r = -EIO;
->>>>> +	on_each_cpu(vmx_off, &enable.enabled, true);
->>>>> +	cpus_read_unlock();
->>>>> +	free_cpumask_var(enable.enabled);
->>>>> +
->>>>> +out:
->>>>> +	return r;
->>>>> +}
->>>>
->>>> At last, I think there's one problem here:
->>>>
->>>> KVM actually only registers CPU hotplug callback in kvm_init(), which happens
->>>> way after tdx_hardware_setup().
->>>>
->>>> What happens if any CPU goes online *BETWEEN* tdx_hardware_setup() and
->>>> kvm_init()?
->>>>
->>>> Looks we have two options:
->>>>
->>>> 1) move registering CPU hotplug callback before tdx_hardware_setup(), or
->>>> 2) we need to disable CPU hotplug until callbacks have been registered.
-> 
-> This is all so dumb (not TDX, the current state of KVM).  All of the hardware
-> enabling crud is pointless complex inherited from misguided, decade old paranoia
-> that led to the decision to enable VMX if and only if VMs are running.  Enabling
-> VMX doesn't make the system less secure, and the insane dances we are doing to
-> do VMXON on-demand makes everything *more* fragile.
-> 
-> And all of this complexity really was driven by VMX, enabling virtualization for
-> every other vendor, including AMD/SVM, is completely uninteresting.  Forcing other
-> architectures/vendors to take on yet more complexity doesn't make any sense.
+The current set of ratified RISC-V specification also doesn't allow scountovf
+to be trap/emulated by the hypervisor. The SBI PMU snapshot bridges the gap
+in ISA as well and enables perf sampling in the guest. However, LCOFI in the
+guest only works via IRQ filtering in AIA specification. That's why, AIA
+has to be enabled in the hardware (at least the Ssaia extension) in order to
+use the sampling support in the perf. 
 
-Ah, I actually preferred this solution, but I was trying to follow your 
-suggestion here:
+Here are the patch wise implementation details.
 
-https://lore.kernel.org/lkml/ZW6FRBnOwYV-UCkY@google.com/
+PATCH 1,4,7,8,9,10,11,15 : Generic cleanups/improvements.
+PATCH 2,3,14 : FW_READ_HI function implementation
+PATCH 5-6: Add PMU snapshot feature in sbi pmu driver
+PATCH 12-13: KVM implementation for snapshot and sampling in kvm guests
+PATCH 16-17: Generic improvements for kvm selftests 
+PATCH 18-22: KVM selftests for SBI PMU extension
 
-form which I interpreted you didn't like always having VMX enabled when 
-KVM is present. :-)
+The series is based on v6.9-rc1 and is available at:
 
-> 
-> Barely tested, and other architectures would need to be converted, but I don't
-> see any obvious reasons why we can't simply enable virtualization when the module
-> is loaded.
-> 
-> The diffstat pretty much says it all.
+https://github.com/atishp04/linux/tree/kvm_pmu_snapshot_v6
 
-Thanks a lot for the code!
+The kvmtool patch is also available at:
+https://github.com/atishp04/kvmtool/tree/sscofpmf
 
-I can certainly follow up with this and generate a reviewable patchset 
-if I can confirm with you that this is what you want?
+It also requires Ssaia ISA extension to be present in the hardware in order to
+get perf sampling support in the guest. In Qemu virt machine, it can be done
+by the following config.
+
+```
+-cpu rv64,sscofpmf=true,x-ssaia=true
+```
+
+There is no other dependencies on AIA apart from that. Thus, Ssaia must be disabled
+for the guest if AIA patches are not available. Here is the example command.
+
+```
+./lkvm-static run -m 256 -c2 --console serial -p "console=ttyS0 earlycon" --disable-ssaia -k ./Image --debug 
+```
+
+The series has been tested only in Qemu.
+Here is the snippet of the perf running inside a kvm guest.
+
+===================================================
+$ perf record -e cycles -e instructions perf bench sched messaging -g 5
+...
+$ Running 'sched/messaging' benchmark:
+...
+[   45.928723] perf_duration_warn: 2 callbacks suppressed
+[   45.929000] perf: interrupt took too long (484426 > 483186), lowering kernel.perf_event_max_sample_rate to 250
+$ 20 sender and receiver processes per group
+$ 5 groups == 200 processes run
+
+     Total time: 14.220 [sec]
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.117 MB perf.data (1942 samples) ]
+$ perf report --stdio
+$ To display the perf.data header info, please use --header/--header-only optio>
+$
+$
+$ Total Lost Samples: 0
+$
+$ Samples: 943  of event 'cycles'
+$ Event count (approx.): 5128976844
+$
+$ Overhead  Command          Shared Object                Symbol               >
+$ ........  ...............  ...........................  .....................>
+$
+     7.59%  sched-messaging  [kernel.kallsyms]            [k] memcpy
+     5.48%  sched-messaging  [kernel.kallsyms]            [k] percpu_counter_ad>
+     5.24%  sched-messaging  [kernel.kallsyms]            [k] __sbi_rfence_v02_>
+     4.00%  sched-messaging  [kernel.kallsyms]            [k] _raw_spin_unlock_>
+     3.79%  sched-messaging  [kernel.kallsyms]            [k] set_pte_range
+     3.72%  sched-messaging  [kernel.kallsyms]            [k] next_uptodate_fol>
+     3.46%  sched-messaging  [kernel.kallsyms]            [k] filemap_map_pages
+     3.31%  sched-messaging  [kernel.kallsyms]            [k] handle_mm_fault
+     3.20%  sched-messaging  [kernel.kallsyms]            [k] finish_task_switc>
+     3.16%  sched-messaging  [kernel.kallsyms]            [k] clear_page
+     3.03%  sched-messaging  [kernel.kallsyms]            [k] mtree_range_walk
+     2.42%  sched-messaging  [kernel.kallsyms]            [k] flush_icache_pte
+
+===================================================
+
+[1] https://github.com/riscv-non-isa/riscv-sbi-doc
+
+Changes from v5->v6:
+1. Added a patch for command line option for the sbi pmu tests.
+2. Removed redundant prints and restructure the code little bit.
+3. Added a patch for computing the sbi minor version correctly.
+4. Addressed all other comments on v5.  
+
+Changes from v4->v5:
+1. Moved sbi related definitions to its own header file from processor.h
+2. Added few helper functions for selftests.
+3. Improved firmware counter read and RV32 start/stop functions.
+4. Converted all the shifting operations to use BIT macro
+5. Addressed all other comments on v4.  
+
+Changes from v3->v4:
+1. Added selftests.
+2. Fixed an issue to clear the interrupt pending bits.
+3. Fixed the counter index in snapshot memory start function.
+
+Changes from v2->v3:
+1. Fixed a patchwork warning on patch6.
+2. Fixed a comment formatting & nit fix in PATCH 3 & 5.
+3. Moved the hvien update and sscofpmf enabling to PATCH 9 from PATCH 8.
+
+Changes from v1->v2:
+1. Fixed warning/errors from patchwork CI.
+2. Rebased on top of kvm-next.
+3. Added Acked-by tags.
+
+Changes from RFC->v1:
+1. Addressed all the comments on RFC series.
+2. Removed PATCH2 and merged into later patches.
+3. Added 2 more patches for minor fixes.
+4. Fixed KVM boot issue without Ssaia and made sscofpmf in guest dependent on
+   Ssaia in the host.
+
+Atish Patra (24):
+RISC-V: Fix the typo in Scountovf CSR name
+RISC-V: Add FIRMWARE_READ_HI definition
+drivers/perf: riscv: Read upper bits of a firmware counter
+drivers/perf: riscv: Use BIT macro for shifting operations
+RISC-V: Add SBI PMU snapshot definitions
+RISC-V: KVM: Rename the SBI_STA_SHMEM_DISABLE to a generic name
+RISC-V: Use the minor version mask while computing sbi version
+drivers/perf: riscv: Implement SBI PMU snapshot function
+drivers/perf: riscv: Fix counter mask iteration for RV32
+RISC-V: KVM: Fix the initial sample period value
+RISC-V: KVM: No need to update the counter value during reset
+RISC-V: KVM: No need to exit to the user space if perf event failed
+RISC-V: KVM: Implement SBI PMU Snapshot feature
+RISC-V: KVM: Add perf sampling support for guests
+RISC-V: KVM: Support 64 bit firmware counters on RV32
+RISC-V: KVM: Improve firmware counter read function
+KVM: riscv: selftests: Move sbi definitions to its own header file
+KVM: riscv: selftests: Add helper functions for extension checks
+KVM: riscv: selftests: Add Sscofpmf to get-reg-list test
+KVM: riscv: selftests: Add SBI PMU extension definitions
+KVM: riscv: selftests: Add SBI PMU selftest
+KVM: riscv: selftests: Add a test for PMU snapshot functionality
+KVM: riscv: selftests: Add a test for counter overflow
+KVM: riscv: selftests: Add commandline option for SBI PMU test
+
+arch/riscv/include/asm/csr.h                  |   5 +-
+arch/riscv/include/asm/kvm_vcpu_pmu.h         |  16 +-
+arch/riscv/include/asm/sbi.h                  |  38 +-
+arch/riscv/include/uapi/asm/kvm.h             |   1 +
+arch/riscv/kernel/paravirt.c                  |   6 +-
+arch/riscv/kvm/aia.c                          |   5 +
+arch/riscv/kvm/vcpu.c                         |  15 +-
+arch/riscv/kvm/vcpu_onereg.c                  |   6 +
+arch/riscv/kvm/vcpu_pmu.c                     | 260 ++++++-
+arch/riscv/kvm/vcpu_sbi_pmu.c                 |  17 +-
+arch/riscv/kvm/vcpu_sbi_sta.c                 |   4 +-
+drivers/perf/riscv_pmu.c                      |   1 +
+drivers/perf/riscv_pmu_sbi.c                  | 272 ++++++-
+include/linux/perf/riscv_pmu.h                |   6 +
+tools/testing/selftests/kvm/Makefile          |   1 +
+.../selftests/kvm/include/riscv/processor.h   |  49 +-
+.../testing/selftests/kvm/include/riscv/sbi.h | 141 ++++
+.../selftests/kvm/include/riscv/ucall.h       |   1 +
+.../selftests/kvm/lib/riscv/processor.c       |  12 +
+.../testing/selftests/kvm/riscv/arch_timer.c  |   2 +-
+.../selftests/kvm/riscv/get-reg-list.c        |   4 +
+.../selftests/kvm/riscv/sbi_pmu_test.c        | 685 ++++++++++++++++++
+tools/testing/selftests/kvm/steal_time.c      |   4 +-
+23 files changed, 1437 insertions(+), 114 deletions(-)
+create mode 100644 tools/testing/selftests/kvm/include/riscv/sbi.h
+create mode 100644 tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+
+--
+2.34.1
+
 
