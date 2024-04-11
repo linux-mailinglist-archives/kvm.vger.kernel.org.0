@@ -1,155 +1,125 @@
-Return-Path: <kvm+bounces-14276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F778A1CBB
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 19:54:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8B108A1D6B
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37C871C2204F
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 17:54:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C85FB35F83
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 17:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EAE12C469;
-	Thu, 11 Apr 2024 16:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB13E12C47A;
+	Thu, 11 Apr 2024 16:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IKJDPPAl"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UFTf6XSV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ECF3F9C0
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 16:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D224B12C474;
+	Thu, 11 Apr 2024 16:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712853419; cv=none; b=CID2PIJjX6dYypcpYdNEhs7HimcUSNZ2nAm1Qj5y3b3bsB2Se3EgjPuv/dcb+4EEqxnr3S00Y+CTxed4CJbS7MQTcJd3fFkL7FOTNSZNVeUIFX1XIVpVj7cH7A5jExuIYwCAohu/3t1ob5iG9syW4/NeMmjADR5eG19rL6co0M0=
+	t=1712853462; cv=none; b=Y63AmlJYun4VTPwv/EP7TQ+RaIBH9tIV9uSfolrqzvS5rNK8BQR58nQIiM9hsdiafvG09tI9YBNbnb9pD+NCwXUlkfJSnjjaXPUwhviKiJZI3KutXuzVcipwUSvw/mRwe6NpFu3eYH5itGuAsnzUBZfV6IVy8zvOoguGgO+LkNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712853419; c=relaxed/simple;
-	bh=eEnELQu/2XIAOlCbzp6DMkHDaPwjiIZG7X1SIcnqdFo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=koeSRE9CwpoVFgn7ppEHLG615lfat5uAFVs+fGyXXVx9SFjXtZd+egzLPhGH89ziTegz8xz/YR216e+EW1nNQ3qHWkpdLhxHz1Sl3aiSM9Medqdlv3dhJ6QBB5RnhGKsva2O3QvsYYtlaZQFIP4tnrgALiWTSlaIGQUR9KM/lvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IKJDPPAl; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712853417;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6YFASrEU85zMIDQiOjC5J+NUp/1bDDTGCw3PXWonwBs=;
-	b=IKJDPPAldRq14xghptwn5KitvuG6M0rrIRHkXHo551+Ox6jowDXSnQp8wVCE7wFy8VTDBX
-	sTa7XfHnXx0n4G0MEhAaBCVkvEWqBGmnqv6SnvhFkNaiTCsS3/sI3RFgT9ywnT6Qos1oum
-	zwaTjM5BnqVPqnFr6I/Idv+Vcr6sGS0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-567-19rlv7OqNW2Duc2-l3RAjw-1; Thu, 11 Apr 2024 12:36:55 -0400
-X-MC-Unique: 19rlv7OqNW2Duc2-l3RAjw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-417c92b77e1so189205e9.1
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 09:36:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712853413; x=1713458213;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6YFASrEU85zMIDQiOjC5J+NUp/1bDDTGCw3PXWonwBs=;
-        b=s4A+q9IT378gkqbzdSPh5ek4paci6ujLZgqjF0afhWMDPsCJpZuuiss9/tZcxQANqx
-         VLGzDiNtiZRFZv1AO0gYbIK0u/MNVt9aG3Nc6tDJG3KG/fxol2BhGA9UMDsoIwI5+5uN
-         xgX7mYOZzi81mI7cSQNwqQPEkORPhmtoZgICIg6hZjf1m/uuR3FV0+SZ5QRziONFjlUO
-         Kl+NpEuGFWV3enzahF1gqxcbJFc4bDfB0VNA8ZFgct3GbYhyzqQYJEOOLSXTZt1gE/mc
-         z8gNfRInTJTHnLC4s9o8mmgIb06T+4jJpXKiZQttkZbmClx7o3kZDDbDZSGFp9RJi0rG
-         lXFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUvgwyLKgFKy9ooYhynVsRZ7Cnmj57p8A/MeKjthJ27WAa1FPEY1feeMydMKxSehsXe44wmro5cXYphx8O/WgNZdbG0
-X-Gm-Message-State: AOJu0YzMYKjSCiNCzTlBdjFQnWHPikXhduRdOYcXOmvT/GGqqbPKpgTW
-	r1O8FYRWNiwFyp9XDLPBQqY5PwCa/a7D3JSrUzkK4EITAIMyko7E71axkkbkelKnNaji5v+Ao85
-	QEGPpjJAU/6cyh7VOD3bSsmxSgRTsPNFHCItNjfd0yP6efvllPb21XjbVzg==
-X-Received: by 2002:a05:600c:3d0f:b0:417:e6e6:a314 with SMTP id bh15-20020a05600c3d0f00b00417e6e6a314mr243607wmb.14.1712853413133;
-        Thu, 11 Apr 2024 09:36:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGbaWB9D3JRarQhAsn4Sdpn9QmWPYXlw2wvO4ybww8LysTvw9biDfSoAJOPEVMBJKknWx91ig==
-X-Received: by 2002:a05:600c:3d0f:b0:417:e6e6:a314 with SMTP id bh15-20020a05600c3d0f00b00417e6e6a314mr243584wmb.14.1712853412807;
-        Thu, 11 Apr 2024 09:36:52 -0700 (PDT)
-Received: from [192.168.1.174] ([151.81.71.210])
-        by smtp.googlemail.com with ESMTPSA id n3-20020a05600c4f8300b0041627ab1554sm6003674wmq.22.2024.04.11.09.36.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 09:36:52 -0700 (PDT)
-Message-ID: <bd8e7f8b-532f-4372-a3fd-69893e359b42@redhat.com>
-Date: Thu, 11 Apr 2024 18:36:46 +0200
+	s=arc-20240116; t=1712853462; c=relaxed/simple;
+	bh=iYl4wottcY2P/34Js4BhYYLPFGKYFybkTAZ0VUXHjhM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pZSG9YT+mSsaX8SeR5Sf/jWA3GBx9LdnkkW0XLIGgMoE0XElTxt3Y82qa3FGVKCQ7i90pDLv6h1mXyBvkg+RqsllY69QquD1Cvq7ulTlnMdsWEHVwpFPUcHPjxR9UKmjFT+l1tVNf39Ts6tlVnIGUoW6soidR2h2HbY88ey50VM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UFTf6XSV; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43BFupBG003035;
+	Thu, 11 Apr 2024 16:37:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=iYl4wottcY2P/34Js4BhYYLPFGKYFybkTAZ0VUXHjhM=;
+ b=UFTf6XSVhNkZ3jB8HDG+2rX4EWDaJd8vFai6YuaEjrFVqg+GZyvMashcedbK7WGgw+rq
+ ontNLKizLv8PqEk9VNSDig6WoP+b3jcRt+bgZPNWV/RuILgrk0JORKvbY1I4o+3a1l/q
+ TM/QttCsg3SZDCLGiLTdPe2eWmdpASmB6RIm8fbvr95mR+437nxuKcbx2PLej6smm67Y
+ bUpAOZsnCfP5csN/cytr89KAQ1Htl7XvE+fvzZ5kqFTQhKjpMMFEuJhFW1H1aMww+A8O
+ jXbvElbAGZyIDRqr+yq1MC32sGiCmx6XQzqLlWoMkU43GB0uBBqruHaAsNqEoXDITjVc /g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xejxyg3bp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Apr 2024 16:37:33 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43BGbXb0001806;
+	Thu, 11 Apr 2024 16:37:33 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xejxyg3bj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Apr 2024 16:37:32 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43BFRXQ5019110;
+	Thu, 11 Apr 2024 16:37:31 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbh40mgq8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Apr 2024 16:37:31 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43BGbQHd16515492
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Apr 2024 16:37:28 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0622D20043;
+	Thu, 11 Apr 2024 16:37:26 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8202020040;
+	Thu, 11 Apr 2024 16:37:25 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.155.204.135])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 11 Apr 2024 16:37:25 +0000 (GMT)
+Date: Thu, 11 Apr 2024 18:37:24 +0200
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Peter Xu <peterx@redhat.com>, Sven Schnelle <svens@linux.ibm.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] s390/mm: re-enable the shared zeropage for !PV
+ and !skeys KVM guests
+Message-ID: <ZhgRxB9qxz90tAwy@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20240411161441.910170-1-david@redhat.com>
+ <20240411161441.910170-3-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] KVM: x86: Advertise PCID based on hardware support
- (with an asterisk)
-To: Sean Christopherson <seanjc@google.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, Andy Lutomirski <luto@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Michael Kelley <mhklinux@outlook.com>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Andrew Cooper <andrew.cooper3@citrix.com>, Xi Ruoyao <xry111@xry111.site>
-References: <20240411163130.1809713-1-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240411163130.1809713-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240411161441.910170-3-david@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: uG46q4YoF6gv8wVKDnhszm3RjoXyf1rZ
+X-Proofpoint-ORIG-GUID: 7OIhNDifwD4OKsbR0SESL4_Qa6a6zJrC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-11_09,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ mlxscore=0 spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0
+ lowpriorityscore=0 mlxlogscore=548 adultscore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404110122
 
-On 4/11/24 18:31, Sean Christopherson wrote:
-> Force set a synthetic feature, GUEST_PCID, if PCID can be safely used in
-> virtual machines, even if the kernel itself disables PCID support, and
-> advertise PCID support in KVM if GUEST_PCID is set.
-> 
-> When running on a CPU that is affected by Intel's "Global INVLPG" erratum,
-> which does NOT affect VMX non-root mode, it is safe to virtualize PCID for
-> KVM guests, even though it is not safe for the kernel itself to enable PCID.
-> Ditto for if the kernel disables PCID because CR4.PGE isn't supported.
+On Thu, Apr 11, 2024 at 06:14:41PM +0200, David Hildenbrand wrote:
 
-But the guest would not use it if the f/m/s matches, right?  If the 
-advantage is basically not splitting the migration pool, is that a 
-concern for the affected Alder Lake/Gracemont/Raptor Lake processors?
+David, Christian,
 
-Paolo
+> Tested-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
+Please, correct me if I am wrong, but (to my understanding) the
+Tested-by for v2 does not apply for this version of the patch?
+
+Thanks!
 
