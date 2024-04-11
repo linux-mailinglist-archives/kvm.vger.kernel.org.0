@@ -1,148 +1,127 @@
-Return-Path: <kvm+bounces-14354-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14355-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E8D8A218D
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 00:03:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CD7A8A21A0
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 00:11:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4ED31C23E10
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 22:03:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CD31B22219
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 22:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068E83D393;
-	Thu, 11 Apr 2024 22:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06F43E462;
+	Thu, 11 Apr 2024 22:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mTapYdtW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zTH9Nrym"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AA93F9C5
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 22:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDE13D3A4
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 22:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712873002; cv=none; b=aILTW555JuyKNFDZPdTpu/MEr1QD+zFro+Q7VupMmDjzQOX3FqFL0Rv+zovXSKdsuDCHWPitsva5FJJyAsXYEdO8S9ZgHj76fk49w/5HBPx4L7Mvr3JoiBVBbYsWKF+Uee55KOEZj9BMQS5QT0MpiexJCYf4qKUYDFUVIw7jRG4=
+	t=1712873473; cv=none; b=MrVcK0Bo1+5mB2bRCGwPU5i7GX17uCDfv1YICobuovtzjmRguZ6DNOg+Z3MHqWaypmGKpr3A81CDIx20SokruJATwIrw/cnjr+BIQucYxEKQRYfMoS1OcZ/ZjKJeqM0HQt1hh5kORTe5sCjlOXPb9yGZANNviXiPeHnyIdDDpPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712873002; c=relaxed/simple;
-	bh=r3S1D7D1d5u7lgkAMt1Th9wNRtELr7qcxpz5RqhzGs0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=T1CaK9NIgnXecq68E6fXacpQtdiLI3+AlOT/cA+5kpXtwcMlCNRCmr38S7OeKhwzYtCqIYAnT53SswLnWrixP95+1pcoi2Fl6r8Zf/LRVT4w+YjiTC0EHkgkxQ+BGxBxW11xAAwfFTH5s69QQkaws7BezjA5RiKU9PUC3QNaGcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mTapYdtW; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1712873473; c=relaxed/simple;
+	bh=XzMv/PsKvb64ygIMkbPO9rdOLtTv9xpugwFBdSTwbRU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YTq90f02FoQldJpStNW3jKBSQRXVQZItQy0DcDx6O3DOJI/froHWn7+PWc1IgdP42JQrcY6gfrqnBjT3WkqmqfkaZ93fJFiAtJwoZb8+tx/dlOGlJ8IZfYy6wVcKT4yI6KxIEJBdRRdJoLHVaAQ1LXwgpGXoXE9OprWtVH+HEsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zTH9Nrym; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a4b48d7a19so196365a91.1
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 15:03:19 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56fe56d4d9cso2157a12.1
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 15:11:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712872999; x=1713477799; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jmy317IqZY3AD7OCatKfL9RjqB6+hhlcNYc+DoqXhi8=;
-        b=mTapYdtWdm3i434LgU4hFhF2wiCjOtJiPIcPZnTVPCRFnPVUrPEwXohKZ2X9vEH+i7
-         EywWDGnh6kVMl2a0gwyESAfNzJRTtluJRIwcsFT8/mlL4c/PJ89MjWDt+4H6+Eac1Y4x
-         AIVJsyx98fbmt21kVIx/IiDBJVov8pP4IsOhDDhCuyyqa6jpqfuxy0LgUTvFMtAUm8oD
-         r10cAB7GOKVjM9ryzXM22X2SEMRJQogHa1YEltDnUK98I2bvd8sq4dO4iGSS6kSWE8ud
-         TJbf85zscaPIRaPJoSveYAT2hI3E4HnVbNludHHN+MdRqqwARYPzdMZwM+MSOHk9NBO3
-         e/fQ==
+        d=google.com; s=20230601; t=1712873470; x=1713478270; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BbaG91lWLov53dvFGF0ekNiCf4p8bhwzy5hlY8LQwTU=;
+        b=zTH9Nrymlnp0x75L1y54QtQhaY8uLPHwiYaAaX4wn7F85Idzirb/LqiSkULv2rJHvZ
+         7ZO07+YY5FJ3Ol3gl5xDktV794NOvjaLEi3SNoShhS+X4iyh/qeU+G6PUkGxDfBMiY5r
+         eePaw1rcDv/GCQp+o3VtXBBU1pj+xdFF7Dm14ZPU2gGchij801bR7ke0sXP71BcXwCE3
+         kHTTKfsAeMYrvke55s7cBwwRXC/qeI/YrZ9PHsOjCTzwGngpWI2xIeZaTkdOk3pJLfmI
+         80UztkQ7MKz30AmAKJqXdicB2e3lMRAQoRvY10+UBG47yP0Tir7YQVZ7mw51cTciMMKb
+         T0ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712872999; x=1713477799;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jmy317IqZY3AD7OCatKfL9RjqB6+hhlcNYc+DoqXhi8=;
-        b=XZoPOr+nCcn0f6Pj75/StXdEEDMaQAP+CmgG3fg1jbe+QYDvXlGVDScHVa2zPLyhTC
-         r/fHbB3RyXTbRLgyfbB1cHu6lYjrpWZ3SNXsrEun+SBE/NvvlcnvfcB5G5IlqI1AGM8K
-         XN0tWYByRDANJWGnGb4S/F2YjWmHT8SZrbHOsjarYun83zqJ1RFbDZyz/Xfkpgq4wOfe
-         PFg/urbKzbPIL5a53lcndhJUDZy85aG3OYjkrzuot5PxOWKeHhwBMVOQzcF7WC4eKrED
-         dHQdiZqMaBeZLp34wMpPEF07sGj8jMBTwgeFbYE/yslANR0ANIjlRN5SEFV7jy57R4Le
-         qX8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUmSPMLr1jW0m877NnfVJlcuVilEAJFbJ1lflYca3Iht2wlkE4SG9aimDQdIeyHxcTGXOm8sVJ2ergxHcAjU+AjPKnt
-X-Gm-Message-State: AOJu0YyzygyhEgP8b+hrIvFaNDggTnKJxTI47gdrS27vp8yyM2JfXhQr
-	2NEWx9093avZuObGKGY7LE6Y0dMtrLxa20kkuASZ+6N+o3GW4Y9fdI6sOnrXedVa6wll1geYPbu
-	qvQ==
-X-Google-Smtp-Source: AGHT+IF9RN5OfQ3beoF3WDDZ3ue3mGb491uf8WF4DGDBox30e34jVKBmA/PdiWN/+r4zc3Csa8hJIU6BeT4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:90:b0:2a6:dbca:b80f with SMTP id
- bb16-20020a17090b009000b002a6dbcab80fmr1287pjb.0.1712872999220; Thu, 11 Apr
- 2024 15:03:19 -0700 (PDT)
-Date: Thu, 11 Apr 2024 15:03:17 -0700
-In-Reply-To: <20240126085444.324918-38-xiong.y.zhang@linux.intel.com>
+        d=1e100.net; s=20230601; t=1712873470; x=1713478270;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BbaG91lWLov53dvFGF0ekNiCf4p8bhwzy5hlY8LQwTU=;
+        b=q9/u+uXkwKRuGQpF+C6wWcAoiLkfvxmtDWA6fIApbMrn+F6Gp0jMZfZRhJbumqC240
+         UDtYKJvPNBKX5cSqyQBnzm7qw1sks34x9FpFqlzDhdmA+byN3cFkp0vK6xmVINgZAvsS
+         Yx4W7B9kPIgN8rG3dtTUu5AJZTIfwZ/WIlNsaYR0ByoEDl2A4RutzWlL7F2iWdd59rRQ
+         zg08UtaF6q9Wt6foYNXuafd9hJzjIGTjA/+TPnt171HFWoTmumkl4g5yUpQVn/0CtMML
+         IinHgxeRdJ1tm+QGQQEA2iIAFgHmYzXNvb+oKYKX7NBQ2p/ZWU5zV/6uNClopyMrc/7t
+         dJIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVkXnRKZQ//ZMjucoY77CCHVVQgM1MG9aUXQmm6n8MWxbhwo6q8nhXGNsZR5t1ay3MWEl7Wfcc/LjfbC293zws1ypsV
+X-Gm-Message-State: AOJu0Yzm0a/8BCYW3wMuyIBlmXXZxvv2QyFMQuDYU6WvU0qee5caNjnq
+	+BhZQrdXUwczIUgU/p/YuJ7ZOVQs/KSojDLgwo2yiyiix6sB8gPro5g5VEC1P7FK3H2TVxGWLdF
+	1GLQIBsNdPGJkIumPsaT1buonsCY3vqd5iDVL
+X-Google-Smtp-Source: AGHT+IEdRz51c5N65alHGuS4aE+ios2xQWgcBA80yiRi8Tlzhh3yjCC+mkcAB9Nof7IUIQRUh/3WK8WOSXd71rI+7WI=
+X-Received: by 2002:aa7:c554:0:b0:56e:2b00:fcc7 with SMTP id
+ s20-20020aa7c554000000b0056e2b00fcc7mr61633edr.0.1712873469805; Thu, 11 Apr
+ 2024 15:11:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com> <20240126085444.324918-38-xiong.y.zhang@linux.intel.com>
-Message-ID: <ZhheJUWRhCmmYa_F@google.com>
-Subject: Re: [RFC PATCH 37/41] KVM: x86/pmu: Allow writing to fixed counter
- selector if counter is exposed
-From: Sean Christopherson <seanjc@google.com>
-To: Xiong Zhang <xiong.y.zhang@linux.intel.com>
-Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com, 
-	kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, 
-	jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
-	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
+ <20240126085444.324918-29-xiong.y.zhang@linux.intel.com> <ZhhcAT7XiLHK3ZNQ@google.com>
+In-Reply-To: <ZhhcAT7XiLHK3ZNQ@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Thu, 11 Apr 2024 15:10:54 -0700
+Message-ID: <CALMp9eTQr8ndf48uHHDem2ZkycdhAuVqz18+V1reEEfv0sx8qg@mail.gmail.com>
+Subject: Re: [RFC PATCH 28/41] KVM: x86/pmu: Switch IA32_PERF_GLOBAL_CTRL at
+ VM boundary
+To: Sean Christopherson <seanjc@google.com>
+Cc: Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, 
+	peterz@infradead.org, mizhang@google.com, kan.liang@intel.com, 
+	zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	zhiyuan.lv@intel.com, eranian@google.com, irogers@google.com, 
+	samantha.alt@intel.com, like.xu.linux@gmail.com, chao.gao@intel.com, 
+	Xiong Zhang <xiong.y.zhang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 26, 2024, Xiong Zhang wrote:
-> From: Mingwei Zhang <mizhang@google.com>
-> 
-> Allow writing to fixed counter selector if counter is exposed. If this
-> fixed counter is filtered out, this counter won't be enabled on HW.
-> 
-> Passthrough PMU implements the context switch at VM Enter/Exit boundary the
-> guest value cannot be directly written to HW since the HW PMU is owned by
-> the host. Introduce a new field fixed_ctr_ctrl_hw in kvm_pmu to cache the
-> guest value.  which will be assigne to HW at PMU context restore.
-> 
-> Since passthrough PMU intercept writes to fixed counter selector, there is
-> no need to read the value at pmu context save, but still clear the fix
-> counter ctrl MSR and counters when switching out to host PMU.
-> 
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/vmx/pmu_intel.c    | 28 ++++++++++++++++++++++++----
->  2 files changed, 25 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index fd1c69371dbf..b02688ed74f7 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -527,6 +527,7 @@ struct kvm_pmu {
->  	unsigned nr_arch_fixed_counters;
->  	unsigned available_event_types;
->  	u64 fixed_ctr_ctrl;
-> +	u64 fixed_ctr_ctrl_hw;
->  	u64 fixed_ctr_ctrl_mask;
+On Thu, Apr 11, 2024 at 2:54=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Fri, Jan 26, 2024, Xiong Zhang wrote:
+> > +static void save_perf_global_ctrl_in_passthrough_pmu(struct vcpu_vmx *=
+vmx)
+> > +{
+> > +     struct kvm_pmu *pmu =3D vcpu_to_pmu(&vmx->vcpu);
+> > +     int i;
+> > +
+> > +     if (vm_exit_controls_get(vmx) & VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTR=
+L) {
+> > +             pmu->global_ctrl =3D vmcs_read64(GUEST_IA32_PERF_GLOBAL_C=
+TRL);
+> > +     } else {
+> > +             i =3D vmx_find_loadstore_msr_slot(&vmx->msr_autostore.gue=
+st,
+> > +                                             MSR_CORE_PERF_GLOBAL_CTRL=
+);
+> > +             if (i < 0)
+> > +                     return;
+> > +             pmu->global_ctrl =3D vmx->msr_autostore.guest.val[i].valu=
+e;
+>
+> As before, NAK to using the MSR load/store lists unless there's a *really=
+* good
+> reason I'm missing.
 
-Before introduce more fields, can someone please send a patch/series to rename
-the _mask fields?  AFAIK, they all should be e.g. fixed_ctr_ctrl_rsvd, or something
-to that effect.
+The VM-exit control, "save IA32_PERF_GLOBAL_CTL," first appears in
+Sapphire Rapids. I think that's a compelling reason.
 
-Because I think we should avoid reinventing the naming wheel, and use "shadow"
-instead of "hw", because KVM developers already know what "shadow" means.  But
-"mask" also has very specific meaning for shadowed fields.  That, and "mask" is
-a freaking awful name in the first place.
-
->  	u64 global_ctrl;
->  	u64 global_status;
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 713c2a7c7f07..93cfb86c1292 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -68,6 +68,25 @@ static int fixed_pmc_events[] = {
->  	[2] = PSEUDO_ARCH_REFERENCE_CYCLES,
->  };
->  
-> +static void reprogram_fixed_counters_in_passthrough_pmu(struct kvm_pmu *pmu, u64 data)
-
-We need to come up with shorter names, this ain't Java.  :-)  Heh, that can be
-another argument for "mediated", it saves three characters.
-
-And somewhat related, kernel style is <scope>_<blah>, i.e.
-
-static void mediated_pmu_reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
+> And we should consider adding VCPU_EXREG_GLOBAL_CTRL so that we can defer=
+ the
+> VMREAD until KVM actually tries to access the guest value.
 
