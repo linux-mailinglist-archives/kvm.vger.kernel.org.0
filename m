@@ -1,81 +1,72 @@
-Return-Path: <kvm+bounces-14228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F2B8A0B1B
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 10:25:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 460E48A0B89
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 10:43:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9384E2882C5
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 08:25:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65C961C20E90
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 08:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F7614263A;
-	Thu, 11 Apr 2024 08:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABC5140394;
+	Thu, 11 Apr 2024 08:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOxzhU/n"
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="jvKLLlyy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B24C1422CE
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 08:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4611413CAA2
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 08:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712823873; cv=none; b=nsTk8VCU56FWsI1t7zUG94hcfFerp8wC2TR2R8Q0N8wmvHieElpd50Re00vGtwvu2BfvFRU00bPzur3/Scy2jHAbalNWMyAWi4f9bp9vC2q50vR2nm4IZmlrWVsQUCy1e/QWaDNVp7PD0X+t78JRKi3F0io29T2eikRzC1ePiI0=
+	t=1712824990; cv=none; b=P7+a5fnsIUTIendWt9hEfla/gmlc2EFpboYjNLjDnbpdyr33zisLMHmg6jeoWKHaHufFMmmcW+XAb8pBSmaaRfHxkgWgsei/P48jzYhYytJDIq/J0C7XtwZ8+u5D7zxPGNzAOXHqSpTr6H9+X/pVtxAOoOz2Gcl1vECCJxt/aPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712823873; c=relaxed/simple;
-	bh=far60FsTiaR8mPNecCMBcens+25r/eOEIzzuoajX794=;
+	s=arc-20240116; t=1712824990; c=relaxed/simple;
+	bh=rFnbY6the2DTWFxqzWAWtQZuwY6LG4HwFJznztvQg34=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p4vlgWQNxkMACj9ko1qmnjch4NQanS+pWW34LnwR59ycXB4oJvjTrCF8dwSiOVfSFcvdz3Dt20rzTrk9QiHa0qhzynKqtHQfhPXMxiS+L/a53Y/LYfQ2rC7mQW1sTYDYddRUmF3TQUyg+SMX2iEuc6ejWQFcVqozQqnX5IG5OZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JOxzhU/n; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712823868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5IDmeRuawGevC7/GQWPB5FuCfnPYvWswKNlISqm/crQ=;
-	b=JOxzhU/nzOuGEEy8NDpKRA9gyPKtjbvbvU/Jg1Q97vItgUvPKPurwXMYIdFqOajC0u9U1F
-	f3Ei36vOVFumER23CvQ3rrG1AFdWVFO3osMZbt4f8boTRhNOcSGiueazYPe9LEbWVJiJGB
-	pBkxpyjoztOqYOpc5ojfxT71LYEU8gQ=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-145-s0ZV5ERDND2FmfENktIX_g-1; Thu, 11 Apr 2024 04:24:26 -0400
-X-MC-Unique: s0ZV5ERDND2FmfENktIX_g-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-516d754664dso4605672e87.0
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 01:24:26 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=aCKrfgCjUyA6kvlvheWVMLIAWC6eoCzo7LGNxVg+rhoRXIY/2J7sbekkcyvr4/b52ZIrJkocvaCgkBPlxbpehkFvD39wJR2BsvRbuVb8iiQ9Y0rjF/qrBpYH3q8Q9Gf0SIwc5cI7P83hXmKYZwB5+aaODbGiFdyCx8+PpIbE+ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=jvKLLlyy; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-344047ac7e4so353130f8f.0
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 01:43:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=citrix.com; s=google; t=1712824986; x=1713429786; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Lvrzy6gsavLoDn3zewsR3l1JDkSncM7fI8dzkelxIo=;
+        b=jvKLLlyyHphQ25WDhJSDv5Oc/4VUi5WPWl8712/+0hCu8iShkFGQGpmzy/8wmbBCOF
+         UKIF1bM3mMZFqiZrfiIgZxdOBZDODhxPqjq+GGLUIwpyqzRN1R4EjX84Q7Y/nDaoPLa4
+         OjawMbdi91/JYJunfHuCQiV0Bg2NFdHVuXsVM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712823865; x=1713428665;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5IDmeRuawGevC7/GQWPB5FuCfnPYvWswKNlISqm/crQ=;
-        b=E0W4ebXN3WFCUqNHdsBIK9yZCGFamQoQBqqOxag+jdSn8QLye+TReWbECW2nPzCRgw
-         L+lhkeX2aDSSTj2Be8+EAFul7ZXqJBdUGj9zQINX468rCglU80zU5SIDuuH+K7PaJ1ZI
-         PuMVxbAhvzQE3fs4/OniKgeFd8msLAuMc+bp7QcaBZAAySevRn72ZUaWX48BWXzAClrr
-         wTIHUcMqNMx19mJhhZC2SAI7HUphsx7UTKilxX+BwHDcVd31WIGBwSv8BJhCQ9cmmpNt
-         T5WIP9muL+1Po1+AgULQIrNYMVBI8H39Mn2e858TxtCkKd+da1MdNfT9XATn+IFWPDhw
-         CCrw==
-X-Forwarded-Encrypted: i=1; AJvYcCXu3tjaJaomSBwBHXwMLrRvO6tfwppcfVmnpcDtE+5ox5SHcaXOJ5HxppicmNvpbgrG74GOwhdUvR+gRH6t9kqjOlYs
-X-Gm-Message-State: AOJu0Yxh67clKHDu1m58Ivkaqp5ubN47qGzbsoHk/Qf9Sku8Cj2r4Hv5
-	wol42sq0NPxT3bFDwdz3vaN0eGqu/ZAyd/WwVPrmnoEO/YKOcexSb5el2k1NqiYLIgb4mSsUczb
-	qt68/b8yKk4tigGhFXG6MCUcGWg4QnfZF2TnS9HyHEPLU2DQYAQ==
-X-Received: by 2002:a05:6512:3d94:b0:513:cf75:2ccc with SMTP id k20-20020a0565123d9400b00513cf752cccmr5011776lfv.0.1712823865347;
-        Thu, 11 Apr 2024 01:24:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEV4c89duT4DE+mZDEx6uhdNJiRs/GUGp7wbno9F366OQyIfJ2TLr0kWI//codLOQuWvMvDpw==
-X-Received: by 2002:a05:6512:3d94:b0:513:cf75:2ccc with SMTP id k20-20020a0565123d9400b00513cf752cccmr5011752lfv.0.1712823864930;
-        Thu, 11 Apr 2024 01:24:24 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c724:4300:430f:1c83:1abc:1d66? (p200300cbc7244300430f1c831abc1d66.dip0.t-ipconnect.de. [2003:cb:c724:4300:430f:1c83:1abc:1d66])
-        by smtp.gmail.com with ESMTPSA id u7-20020adfeb47000000b0033ec9ddc638sm1194154wrn.31.2024.04.11.01.24.23
+        d=1e100.net; s=20230601; t=1712824986; x=1713429786;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0Lvrzy6gsavLoDn3zewsR3l1JDkSncM7fI8dzkelxIo=;
+        b=VbB1l9asnoFijor9dw6nuTckbvnNfsme1I9dyihQ8DfOGFz0ei+5q8/MS5EgVKQeRo
+         9a8YiaOr/Bwq43OpwTd14JjaMWXxWZcMLS3AqfY+srpjs/lLhj02XQ3KaBOwL4VRHt3O
+         WtwmfggmVi3Fi9Cku2U9EvCfYGNI2FGz2dx4hIt8sofsENj6bbT0aNCedbz5j/88kdL9
+         mYXv9X54C5H4MoTLhLmurbABgsbPDRMBSgapd79zJWW2BQs3n48pEEmRmdkuKQybVhPt
+         JQU1E/O6BUFT0Ed8qPZKWKMebw9ulsLJWa3aW7J3pGhVSvmbojpOpGSKRESpdonnkpCk
+         +D8A==
+X-Forwarded-Encrypted: i=1; AJvYcCWOR3zBTx1WoCb/sSSc95HIsZhQrR5OM/SXoL9G8ASGHbjqz+ZqhT8RTGVBPUuElOD3yfY93UrMMtPbC6oCLqrPNBPW
+X-Gm-Message-State: AOJu0YztxR1WWGZHW7BfRqfqRqbby3Fwq8Bqd5PJkS6wocMPnfxXQ527
+	jCwbSzsAjqojUpX/9XbSYOKyz1koRyqiVvxFIozIRsl73wksU2XcgXJFYtsY6zk=
+X-Google-Smtp-Source: AGHT+IHg6r4Nu48iUIY9mqggSJ51l+wAjek6iP5pLQCoBO8qkh2HNS3T+3YcH8NVO0akPaYU8J2LdA==
+X-Received: by 2002:a5d:588b:0:b0:33e:c91b:9083 with SMTP id n11-20020a5d588b000000b0033ec91b9083mr1765564wrf.16.1712824986611;
+        Thu, 11 Apr 2024 01:43:06 -0700 (PDT)
+Received: from [192.168.1.10] (host-92-3-248-192.as13285.net. [92.3.248.192])
+        by smtp.gmail.com with ESMTPSA id n14-20020a5d660e000000b003433a379a51sm1223176wru.101.2024.04.11.01.43.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 01:24:24 -0700 (PDT)
-Message-ID: <63f39394-380a-4817-8d5b-f5d468b0092e@redhat.com>
-Date: Thu, 11 Apr 2024 10:24:23 +0200
+        Thu, 11 Apr 2024 01:43:06 -0700 (PDT)
+Message-ID: <7f1faa48-6252-4409-aefc-2ed2f38fb1c3@citrix.com>
+Date: Thu, 11 Apr 2024 09:43:05 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,83 +74,96 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/5] s390/uv: don't call wait_on_page_writeback()
- without a reference
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-s390@vger.kernel.org, kvm@vger.kernel.org,
- Matthew Wilcox <willy@infradead.org>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Thomas Huth <thuth@redhat.com>
-References: <20240404163642.1125529-1-david@redhat.com>
- <20240404163642.1125529-2-david@redhat.com>
- <20240410192128.2ad60f9b@p-imbrenda>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240410192128.2ad60f9b@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] KVM: x86: Set BHI_NO in guest when host is not affected
+ by BHI
+To: Alexandre Chartre <alexandre.chartre@oracle.com>, x86@kernel.org,
+ kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, daniel.sneddon@linux.intel.com,
+ pawan.kumar.gupta@linux.intel.com, tglx@linutronix.de,
+ konrad.wilk@oracle.com, peterz@infradead.org, gregkh@linuxfoundation.org,
+ seanjc@google.com, dave.hansen@linux.intel.com, nik.borisov@suse.com,
+ kpsingh@kernel.org, longman@redhat.com, bp@alien8.de, pbonzini@redhat.com
+References: <20240411072445.522731-1-alexandre.chartre@oracle.com>
+Content-Language: en-GB
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
+ 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
+ 6+ahAA==
+In-Reply-To: <20240411072445.522731-1-alexandre.chartre@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 10.04.24 19:21, Claudio Imbrenda wrote:
-> Reviewed-by: Claudio Imbrenda<imbrenda@linux.ibm.com>
+On 11/04/2024 8:24 am, Alexandre Chartre wrote:
+> When a system is not affected by the BHI bug then KVM should
+> configure guests with BHI_NO to ensure they won't enable any
+> BHI mitigation.
+>
+> Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+> ---
+>  arch/x86/kvm/x86.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 984ea2089efc..f43d3c15a6b7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1678,6 +1678,9 @@ static u64 kvm_get_arch_capabilities(void)
+>  	if (!boot_cpu_has_bug(X86_BUG_GDS) || gds_ucode_mitigated())
+>  		data |= ARCH_CAP_GDS_NO;
+>  
+> +	if (!boot_cpu_has_bug(X86_BUG_BHI))
+> +		data |= ARCH_CAP_BHI_NO;
 
-Thanks! I'll rebase this series on top of the s390/features tree for 
-now, where Willy's cleanups already reside.
+This isn't true or safe.
 
-If maintainers want to have that fix first, I can send it out with 
-Willy's patches rebased on this fix. Whatever people prefer.
+Linux only sets X86_BUG_BHI on a subset of affected parts.
 
--- 
-Cheers,
+Skylake for example *is* affected by BHI.  It's just that existing
+mitigations are believed to suffice to mitigate BHI too.
 
-David / dhildenb
+"you happen to be safe if you're doing something else too" doesn't
+remotely have the same meaning as "hardware doesn't have a history based
+predictor".
 
+~Andrew
 
