@@ -1,135 +1,185 @@
-Return-Path: <kvm+bounces-14345-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14346-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 775F28A210D
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 23:46:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69B4C8A211B
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 23:49:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02A41B22273
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 21:46:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8B5F285546
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 21:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FB839AF8;
-	Thu, 11 Apr 2024 21:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60AF3B182;
+	Thu, 11 Apr 2024 21:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BPRvJ5Di"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fz0dM8Qr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED55B2942A
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 21:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B973BBC3
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 21:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712871975; cv=none; b=K3cbSXQxd/wBpFamWwz7fDqG3ZsMKU0d9Sauda4JthzIiO9jiefTyvPTgt5HewK6KEYRCkXLlQ6mBTzEFp9zjaImhkKYiqX0Mvp3s3AqJwtr86cxwDDSVzxb13MpMfM4RNTOVfo5uxTAb+cWDumlH1HtTVOmniPZ3A7BxX4a0ko=
+	t=1712872152; cv=none; b=rbuuWNkp4tGdIfLtzlpaiGo7hzjVUWZ1Vvl4t9QKBIUZezfpzPGBE4kzrDhGkyyLeNccPbOPy9ccC6lxja4Ry02znAh0WcPk+xfI/WEAH09krqSIiMfow97Zo3iJwjV3TJUvjQzWmkbq3onLuxsX6cA+JMfZSNNuA+WI41NLEMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712871975; c=relaxed/simple;
-	bh=mLgWdom7jqFTB7wVymJ2zo5UWWDyQWbpF/ASIrQHiD4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FpvWZx0gpJY3ZU5XLmbXxZEKc+0bI/r0AMDm2A88S8SyJPnIaA7lWWlXXglKmEnsJVpW3OPyUQxKOgw4Uq+mGgwklOqxh/niy4+HgGcDJYHFHu8W31Z8+ldDpofxhWePI0quYvJHS+FQ7LKiPmMWH+bVC6OVWjXO+8nV/q0fddE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BPRvJ5Di; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6eddff25e4eso301912b3a.3
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 14:46:13 -0700 (PDT)
+	s=arc-20240116; t=1712872152; c=relaxed/simple;
+	bh=YNOXp9b/Jpb+es+bSQ62skx+KBDAECbNrG40A/IivHA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oA0Pzb7lZA3kIge5ZgOeYgg2mn4hzGJJtx4csqtG23JE9SvhCAMVg7Ri4gTcGByYqOaoV6/5zUGo0bth3DtnP9ZoCs/u+m53fUM+MJQ5xUd58TH27vjVmiPzEQw53ULhUKR0EZnzf09xkTrWhJiZU/aLD7la95F5BVayxxeam4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fz0dM8Qr; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcdc3db67f0so1813112276.1
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 14:49:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712871973; x=1713476773; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vpxrA8cRe/B7k0FRnDEX/5CDR+EgATsgI9uZLnSVd4c=;
-        b=BPRvJ5Did7fjjtKF0MTQe2hsOgwDPDgIbiGvJRH9UX+/MEUOspZh9n1Ao5brVnemho
-         gAxRwKpqCN7ADV+aP/EdjbTWlVGhYit02CbERABDrpfGrzH1JH90nSvSOkIftaRuHPlz
-         7e4P1PgLOH9V2VoDclN6wgN8yY2t7DvUZIyJqW5xgnhwWEa5QcbgfOmwiJyIm4ElEOgE
-         FOF678twN+PUylFiiLOMVyi9PJgdYYw5Ta7RPKa6TQcoVIv4pkBxPk6sR1c4fK1jnCRz
-         tKy6fn4rk00f1y+tAfsEZ8vZg1Ju7/7T3pFe7oEQlOOWQVwyAGvAaM9C7KBnUEtneNPb
-         ckmg==
+        d=google.com; s=20230601; t=1712872149; x=1713476949; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E46uucbaaoqsuZZvyzOBFLngOEYFFwjcligp3RIvVUA=;
+        b=fz0dM8QrZYckAcpi5DyJDPwgQSGXvY120TrbGeIwqVEckqJ8WjXLXe4KsufnIfIaZs
+         hLrMZrrdPe7SYCoxmYtNiPvgd/kAKTNpdcRN1BPgCtKRvF1W6C7lfEShhzps2CV1zqRI
+         bmyIZee7lQICCo7zgVvvTt/UnHXPxs7Hih6OaxNX4noSESUNyKH/m6QhfcbmTqv9PpHl
+         MlnAv9zHx4CKbwdeW3fMjeSJrFG5saiFN9hyoWX+T2dQQ09i9eveNSvGkOCkyy+A3DH5
+         BaipWAfEYEP55TyPEoD3sc86ptjgXRgCJIzylTHWMy5iFvryOVKU5BTQ9oC5IlUE8rKH
+         L8ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712871973; x=1713476773;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vpxrA8cRe/B7k0FRnDEX/5CDR+EgATsgI9uZLnSVd4c=;
-        b=btwllSX78AaidkGh0+CCzZ6DFLGa0iQHd+N2TPjJwfwPvpkDKWgu7ybytjGMTgxmcv
-         vqRLaSfgOGW3U/INRIx3h5F8d6Mdltyz11qCUYc1kMV0XS5sNJh4DG2GPk7LwR1zmdl4
-         bYYaS0OFu/G6V9KZavh4xt61RqFSUt8v5iyy1nzAzD0z84fLPa6AwEkeOjLD8ll89G3E
-         7JfW484rI6cJVLYTfbYb5B4/K1U5hRRTgln99evuUVcf0FklT8jO/oSmTo7lgmLm288w
-         XU3H/ttcK2RLtEiaZoIko3n80Q7Wg5ZH50meYwtpuaHwiPEWe48xAC3XR4sWXTpsSeUu
-         HJZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDwM6Lz0x7mEZrZWVFD3ytzTchhDeExTCZ8QcPDcBZGp0KLn1Fp9X+8HS5HEoAJGFDZzvvzMpecs7whWRqlqk3XW6B
-X-Gm-Message-State: AOJu0Yy00xqUIslpoZ/BlRE0kpf/Q4eS1hkzV2hY4QCWJNG3gSnsUNXr
-	vje9iX27s6yDumggKmqkuQHzxgeZKzrAu0sOr/ucVcOs5gAotNWT4tt8HoVYIXo=
-X-Google-Smtp-Source: AGHT+IEAmMBgzzxSBOQseK4jVdkR+ivU9lItBRBDfAd5s0LfjurNfasO7U9U2ClfQPiqVXdsc9ouUw==
-X-Received: by 2002:a05:6a00:1915:b0:6e8:f708:4b09 with SMTP id y21-20020a056a00191500b006e8f7084b09mr1103194pfi.15.1712871973271;
-        Thu, 11 Apr 2024 14:46:13 -0700 (PDT)
-Received: from [192.168.0.4] (174-21-72-5.tukw.qwest.net. [174.21.72.5])
-        by smtp.gmail.com with ESMTPSA id e24-20020a62aa18000000b006eadfbdcc13sm1631776pff.67.2024.04.11.14.46.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 14:46:12 -0700 (PDT)
-Message-ID: <5245b4a6-7246-456d-8be0-91fef19b8367@linaro.org>
-Date: Thu, 11 Apr 2024 14:46:11 -0700
+        d=1e100.net; s=20230601; t=1712872149; x=1713476949;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E46uucbaaoqsuZZvyzOBFLngOEYFFwjcligp3RIvVUA=;
+        b=eSPRTRXqQrXte+ZPnuCAdlVJ2E5SyGslluD+Rua1TwDTp1sSUqNLLIw6e8LqjaVqfG
+         1JKhGOJa0OsJW2UT7BXEEusiB2PW5XXHlx/vtyI/G4Yf3Moncq/Z/xs9RJhp+r5+YMDX
+         bakg2SKUkLLS7WLofW/Y5RmwqwORi4nVCYTP+kESibe0G+mtTuc83r0sNqLp8Reflhhq
+         o7+sNnZd18nt5DMAPNneWQ63soNpMH+mF/tySZmZDaXAtEgUvEUHJ5Jn51dAylMUS5b4
+         EyzAn7/eY9xbmrhZeZRaQMi1IrFlR3YuutgJWSMDKmJN6F+2wQqO0yEKCBRPfw39Ttd1
+         QpRg==
+X-Forwarded-Encrypted: i=1; AJvYcCXHqrLLKsncrFVyaBk3b4Kupg3Yfi7bfgcO0D+O3oWK7cSTS20SJwDAR+ZITyrc8Ogu+mg/JtJ8xqHc9mRW7ECmqOrh
+X-Gm-Message-State: AOJu0Yy7sJjS3/QRGRz/GCRNPBUkdSx2P3joDMypyes8Hdv7GPHyBwlQ
+	pMhn90/08Xj+gxhtlnqvaojPezrkaPup3q2VSlZeO9pjXP3jaT/wLn/x5kNFRVsJlOk/UP7xRf+
+	kCA==
+X-Google-Smtp-Source: AGHT+IGck7OcujVjK4HXtTQv2Wbqqa7S9w3/FO991MY4XC3orGk6WQGzWdNyjeqNUn6MdpdyT3+lkMWbHpw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ab70:0:b0:dc7:463a:46d2 with SMTP id
+ u103-20020a25ab70000000b00dc7463a46d2mr626352ybi.0.1712872149661; Thu, 11 Apr
+ 2024 14:49:09 -0700 (PDT)
+Date: Thu, 11 Apr 2024 14:49:08 -0700
+In-Reply-To: <20240126085444.324918-27-xiong.y.zhang@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] target/i386: Replace sprintf() by snprintf()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- kvm@vger.kernel.org
-References: <20240411104340.6617-1-philmd@linaro.org>
- <20240411104340.6617-10-philmd@linaro.org>
-Content-Language: en-US
-From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20240411104340.6617-10-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com> <20240126085444.324918-27-xiong.y.zhang@linux.intel.com>
+Message-ID: <Zhha1N61JU1x3c64@google.com>
+Subject: Re: [RFC PATCH 26/41] KVM: x86/pmu: Add host_perf_cap field in
+ kvm_caps to record host PMU capability
+From: Sean Christopherson <seanjc@google.com>
+To: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com, 
+	kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, 
+	jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 4/11/24 03:43, Philippe Mathieu-Daudé wrote:
-> sprintf() is deprecated on Darwin since macOS 13.0 / XCode 14.1,
-> resulting in painful developper experience. Use snprintf() instead.
+On Fri, Jan 26, 2024, Xiong Zhang wrote:
+> From: Mingwei Zhang <mizhang@google.com>
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Add host_perf_cap field in kvm_caps to record host PMU capability. This
+> helps KVM recognize the PMU capability difference between host and guest.
+> This awareness improves performance in PMU context switch. In particular,
+> KVM will need to zero out all MSRs that guest PMU does not use but host PMU
+> does use. Having the host PMU feature set cached in host_perf_cap in
+> kvm_caps structure saves a rdmsrl() to IA32_PERF_CAPABILITY MSR on each PMU
+> context switch. In addition, this is more convenient approach than open
+> another API on the host perf subsystem side.
+> 
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
 > ---
->   target/i386/kvm/kvm.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/vmx/vmx.c | 17 +++++++++--------
+>  arch/x86/kvm/x86.h     |  1 +
+>  2 files changed, 10 insertions(+), 8 deletions(-)
 > 
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index e68cbe9293..a46d1426bf 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -5335,7 +5335,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->       case KVM_EXIT_NOTIFY:
->           ctx_invalid = !!(run->notify.flags & KVM_NOTIFY_CONTEXT_INVALID);
->           state = KVM_STATE(current_accel());
-> -        sprintf(str, "Encounter a notify exit with %svalid context in"
-> +        snprintf(str, sizeof(str),
-> +                     "Encounter a notify exit with %svalid context in"
->                        " guest. There can be possible misbehaves in guest."
->                        " Please have a look.", ctx_invalid ? "in" : "");
->           if (ctx_invalid ||
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 349954f90fe9..50100954cd92 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7896,32 +7896,33 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  	vmx_update_exception_bitmap(vcpu);
+>  }
+>  
+> -static u64 vmx_get_perf_capabilities(void)
+> +static void vmx_get_perf_capabilities(void)
+>  {
+>  	u64 perf_cap = PMU_CAP_FW_WRITES;
+>  	struct x86_pmu_lbr lbr;
+> -	u64 host_perf_cap = 0;
+> +
+> +	kvm_caps.host_perf_cap = 0;
+>  
+>  	if (!enable_pmu)
+> -		return 0;
+> +		return;
+>  
+>  	if (boot_cpu_has(X86_FEATURE_PDCM))
+> -		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
+> +		rdmsrl(MSR_IA32_PERF_CAPABILITIES, kvm_caps.host_perf_cap);
 
-In the larger context,
+I would strongly prefer KVM snapshot the host's MSR_IA32_PERF_CAPABILITIES, if
+the CPU has PDMC, i.e. not leave it zero if the PMU is disabled.
 
->         if (ctx_invalid ||
->             state->notify_vmexit == NOTIFY_VMEXIT_OPTION_INTERNAL_ERROR) {
->             warn_report("KVM internal error: %s", str);
->             ret = -1;
->         } else {
->             warn_report_once("KVM: %s", str);
->             ret = 0;
->         }
+>  
+>  	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR) &&
+>  	    !enable_passthrough_pmu) {
+>  		x86_perf_get_lbr(&lbr);
+>  		if (lbr.nr)
+> -			perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
+> +			perf_cap |= kvm_caps.host_perf_cap & PMU_CAP_LBR_FMT;
+>  	}
+>  
+>  	if (vmx_pebs_supported() && !enable_passthrough_pmu) {
+> -		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
+> +		perf_cap |= kvm_caps.host_perf_cap & PERF_CAP_PEBS_MASK;
+>  		if ((perf_cap & PERF_CAP_PEBS_FORMAT) < 4)
+>  			perf_cap &= ~PERF_CAP_PEBS_BASELINE;
+>  	}
+>  
+> -	return perf_cap;
+> +	kvm_caps.supported_perf_cap = perf_cap;
+>  }
+>  
+>  static __init void vmx_set_cpu_caps(void)
+> @@ -7946,7 +7947,7 @@ static __init void vmx_set_cpu_caps(void)
+>  
+>  	if (!enable_pmu)
+>  		kvm_cpu_cap_clear(X86_FEATURE_PDCM);
+> -	kvm_caps.supported_perf_cap = vmx_get_perf_capabilities();
+> +	vmx_get_perf_capabilities();
+>  
+>  	if (!enable_sgx) {
+>  		kvm_cpu_cap_clear(X86_FEATURE_SGX);
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 38b73e98eae9..a29eb0469d7e 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -28,6 +28,7 @@ struct kvm_caps {
+>  	u64 supported_mce_cap;
+>  	u64 supported_xcr0;
+>  	u64 supported_xss;
+> +	u64 host_perf_cap;
+>  	u64 supported_perf_cap;
 
-so there's really no need to sprintf into a buffer at all -- just pass it all to 
-warn_report_*.
+This is confusing, host_perf_cap doesn't track "capabilities" so much as it tracks
+a raw host value.  Luckily, I have a series that I am going to post this week
+that adds another struct for tracking host values, e.g. host_xss, host_efer, etc.
 
-The English text could use some improvement as well.  :-)
-
-
-r~
+>  };
+>  
+> -- 
+> 2.34.1
+> 
 
