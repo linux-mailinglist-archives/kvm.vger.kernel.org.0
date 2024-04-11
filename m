@@ -1,188 +1,126 @@
-Return-Path: <kvm+bounces-14308-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14309-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88E068A1E71
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:35:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD2C08A1EAB
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03F781F28372
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:35:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8312C282DD6
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1735113848B;
-	Thu, 11 Apr 2024 18:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750BC54F87;
+	Thu, 11 Apr 2024 18:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zWrAwXEd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HXwVDBYw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47EC3CF74
-	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 18:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385092BCF9;
+	Thu, 11 Apr 2024 18:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712858885; cv=none; b=mYdKkJEiKm6qWvWrImvDErHnADroSFB4MOHma5sKpzRrK0a+uCCuRwFMKmGHr8g86VXx03N8/RBckYHIZuYACV5TctM/QjVoZ9HitSxz3KRh2BAq+YGHdrPmLbI8hP8z2cKK47uewjBgLh2z8fQrKh9GSDHs912Hx/tpuq3NU7Q=
+	t=1712859903; cv=none; b=c4oOjAi1f/b1vRszMvaOXcppWNcxOsXJFZAeLKSC5Ba47Yh7uYRDTqCnJwVO5iHvZ8v6rmMLDzXzA+VWUDS76kEJBptfgVUxyoOi+GwYlQ44i3sYHDg5qnwxGBWDwqXJS+o9iSL6tvYAROARzCBZ2QfnaweJqBQYDRK65Kuh/hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712858885; c=relaxed/simple;
-	bh=VGQCL3mzonvhlfeFM/FLLnPemQv3LzNNv5aOxHxA3fw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T4Dz41MUc7BmGL4RqA7XH/DKzVCjRbCiLlGDyZyG/Jen7B/MFBHbjJCG6VRxwgbFVAMcU6MKkzhxmlvaiYA+hZa7/Z8l2iQelg+9D2hBtapCyeqSfMdC4xMJgWUPEAtLbKTzSyVfMFgPIGGsU0ItiHOJbTWDiY4Z4Iw3XoY4keg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zWrAwXEd; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-343e46ec237so19044f8f.2
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 11:08:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712858882; x=1713463682; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JF9ah2ntSllTmBnh03qU9h5oVsQBiEEOr0oLbxSFsGs=;
-        b=zWrAwXEdVUItApaRoHDqqtiDmciPtO0gWHOqh1t0Yysmv6oaYFoS1nJf0vi75vYu3D
-         MxaagZAwHGCUv6mnyRFTRVa8Alui/moY5kEan3o38nnE1hRnywdtgQg9BhBGLIeNuJYx
-         f2DRYuJhYuqFOUFageLqogRQsV9iHWrQYsEkpab0K/BKaNkjc1lFQ/AojQBx0gWdA6Jn
-         8nP+dD6dOfi3sJyznt+z7qtEiSYdcXBteWo7ZHbrMeafceUlgJyh9T7SE6nnhmf9k1Q1
-         PkFgwlS67jkQs+uOYMFwYruASCizC11JPC/ZrEWknToJhj8bqNUcSEOkVnnIUT+payXq
-         5dfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712858882; x=1713463682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JF9ah2ntSllTmBnh03qU9h5oVsQBiEEOr0oLbxSFsGs=;
-        b=aVqrymQ8awm6xHh1G5vm1UTYEoCfm7cRc5FRckSiHk7v7ovoU4x51j6XvYY+ZNvTwv
-         U332nw9gX0dyJ5rmNqjBeUHQ8Q52Z1rIf7PUyQNqkYYxiOdjieb/7H3DNdAv2QWJKcCq
-         nl9d9+uo3mOEs/rM2IllW7vDDwO654TyzBzwT9bEPNWlfnA7mNQjVUBOB7rSP3Dt7mSq
-         MdafMsYsPGeUrwpeBa2IJ3cAAMN2m+kwbSuBVqGAr8NSqRlcQhtUi7fScsUpiN2ubBCa
-         B+6hI7xgc4ut1HCh+hwMnRh8mkgvHxkamdE/Z8DUxRkz4/+KFLMGnc3gzvF68CBddAkR
-         ti6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXt31LnXKROlVZFIKrnvg7WxkNCeKJ3DcNnUHMsdh6DZweoyR3AmVTccK6/o9Uy+F3TPA6PsLg4dOflH8i3jaxflneO
-X-Gm-Message-State: AOJu0Yz9CDanNEdFvbN0g6WXepaZ6D4PO0QK27hDdE6t7AKl3dka6o2f
-	LpiApFODUi4/qoVJ/9VDgkXSaZGgo7NIXt4m+ZIA1S0zU7oXHX3TG5GHDvG5lw6O+9ERasohOo0
-	LfapPEZeCC2GuuS5TQCpKJNXqIdYQdDBRKGv0
-X-Google-Smtp-Source: AGHT+IEiceYluBXhzFycxHV9lNDFzL73YQ5JDtztY+Gf/8JctaddlSPwXQ5PFONIuLRV5abA4HCPeSQtllcEjNpQPdk=
-X-Received: by 2002:a05:6000:eca:b0:346:bc1b:4efa with SMTP id
- ea10-20020a0560000eca00b00346bc1b4efamr230532wrb.32.1712858881999; Thu, 11
- Apr 2024 11:08:01 -0700 (PDT)
+	s=arc-20240116; t=1712859903; c=relaxed/simple;
+	bh=c2g0tbUCqfPKXbZUyvRm01VrhJY6EMVcc1wcJ3a0Ym0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Rgeagb8HhXGEUQgj7qk+M6gOnUS7KMoPQldUlwAn+k+6nO0CwUbSxJ1jhl6V8O9/Dpwb7m0oq2/lArCWY+hVex+RFCikg/jI6Q1HSxevFUk7Cao5CxEXirsVDswqLMR0skC3rBngWGpb1P7HjkhM5mzCK4TnC8+M6Ax0GHYKwW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HXwVDBYw; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712859902; x=1744395902;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=c2g0tbUCqfPKXbZUyvRm01VrhJY6EMVcc1wcJ3a0Ym0=;
+  b=HXwVDBYwjzoa7OLJXyu0+WjdeCyW1HwL3j8ClOAYiBlQpbzutB2DEMiH
+   9ppQunxR22MivraSiVHpQ3Aq1tgOh4OUcGAAV+rqnmr6iv9VPVXnSs1xo
+   UA8+GfHF1pNqFuYChJrxAv0/H+XSLi8RIqaoX4/9P7qoeSTgDL79++S12
+   j9KJRCkdXZ6cWX865I+dZXH/pBNaBR+iJ8xQJVFtIxZ6A54z50Y7FMFTO
+   LU6tZTaa4b34YzQQEYZsRV3e+njJb+TZThJR0eAeP14pHz0n8/CjGI4j1
+   TV1XwtCyocjed3cpTfpdie1CgDgwqzH6EAIUbI4jQ7SYkwy5u6lazCpE5
+   w==;
+X-CSE-ConnectionGUID: +oITaEHjQ1u24PElUBtbTQ==
+X-CSE-MsgGUID: QIbuvSixQIWCu4Qejlnxlw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="8514939"
+X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
+   d="scan'208";a="8514939"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 11:25:01 -0700
+X-CSE-ConnectionGUID: 3QOiQzoGR0OiHwTo7hCQqQ==
+X-CSE-MsgGUID: GUYxnY+LQ9+gm23AkhcO6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
+   d="scan'208";a="51936865"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 11:25:01 -0700
+Date: Thu, 11 Apr 2024 11:29:32 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, iommu@lists.linux.dev, Lu Baolu
+ <baolu.lu@linux.intel.com>, kvm@vger.kernel.org, Dave Hansen
+ <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
+ <mingo@redhat.com>, Paul Luse <paul.e.luse@intel.com>, Dan Williams
+ <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, Raj Ashok
+ <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ maz@kernel.org, seanjc@google.com, Robin Murphy <robin.murphy@arm.com>,
+ jim.harris@samsung.com, a.manzanares@samsung.com, Bjorn Helgaas
+ <helgaas@kernel.org>, guang.zeng@intel.com, robert.hoo.linux@gmail.com,
+ jacob.jun.pan@linux.intel.com, xin3.li@intel.com
+Subject: Re: [PATCH v2 08/13] x86/irq: Install posted MSI notification
+ handler
+Message-ID: <20240411112932.6b1a4dbb@jacob-builder>
+In-Reply-To: <87bk6f262i.ffs@tglx>
+References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
+	<20240405223110.1609888-9-jacob.jun.pan@linux.intel.com>
+	<87bk6f262i.ffs@tglx>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240401232946.1837665-1-jthoughton@google.com>
- <20240401232946.1837665-6-jthoughton@google.com> <ZhgZHJH3c5Lb5SBs@google.com>
- <Zhgdw8mVNYZvzgWH@google.com> <CALzav=f=_+UQBJv_eZ=t5wE0AytVo1mwfDoum+ZyNfNHvyOccQ@mail.gmail.com>
-In-Reply-To: <CALzav=f=_+UQBJv_eZ=t5wE0AytVo1mwfDoum+ZyNfNHvyOccQ@mail.gmail.com>
-From: David Matlack <dmatlack@google.com>
-Date: Thu, 11 Apr 2024 11:07:35 -0700
-Message-ID: <CALzav=euNq2eaHYg79V=sZWytGBh-=TNoHNwRMgChy+DsCNRrw@mail.gmail.com>
-Subject: Re: [PATCH v3 5/7] KVM: x86: Participate in bitmap-based PTE aging
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Yu Zhao <yuzhao@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Gavin Shan <gshan@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	David Rientjes <rientjes@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 11, 2024 at 11:00=E2=80=AFAM David Matlack <dmatlack@google.com=
-> wrote:
->
-> On Thu, Apr 11, 2024 at 10:28=E2=80=AFAM David Matlack <dmatlack@google.c=
-om> wrote:
-> >
-> > On 2024-04-11 10:08 AM, David Matlack wrote:
-> > > On 2024-04-01 11:29 PM, James Houghton wrote:
-> > > > Only handle the TDP MMU case for now. In other cases, if a bitmap w=
-as
-> > > > not provided, fallback to the slowpath that takes mmu_lock, or, if =
-a
-> > > > bitmap was provided, inform the caller that the bitmap is unreliabl=
-e.
-> > > >
-> > > > Suggested-by: Yu Zhao <yuzhao@google.com>
-> > > > Signed-off-by: James Houghton <jthoughton@google.com>
-> > > > ---
-> > > >  arch/x86/include/asm/kvm_host.h | 14 ++++++++++++++
-> > > >  arch/x86/kvm/mmu/mmu.c          | 16 ++++++++++++++--
-> > > >  arch/x86/kvm/mmu/tdp_mmu.c      | 10 +++++++++-
-> > > >  3 files changed, 37 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm=
-/kvm_host.h
-> > > > index 3b58e2306621..c30918d0887e 100644
-> > > > --- a/arch/x86/include/asm/kvm_host.h
-> > > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > > @@ -2324,4 +2324,18 @@ int memslot_rmap_alloc(struct kvm_memory_slo=
-t *slot, unsigned long npages);
-> > > >   */
-> > > >  #define KVM_EXIT_HYPERCALL_MBZ             GENMASK_ULL(31, 1)
-> > > >
-> > > > +#define kvm_arch_prepare_bitmap_age kvm_arch_prepare_bitmap_age
-> > > > +static inline bool kvm_arch_prepare_bitmap_age(struct mmu_notifier=
- *mn)
-> > > > +{
-> > > > +   /*
-> > > > +    * Indicate that we support bitmap-based aging when using the T=
-DP MMU
-> > > > +    * and the accessed bit is available in the TDP page tables.
-> > > > +    *
-> > > > +    * We have no other preparatory work to do here, so we do not n=
-eed to
-> > > > +    * redefine kvm_arch_finish_bitmap_age().
-> > > > +    */
-> > > > +   return IS_ENABLED(CONFIG_X86_64) && tdp_mmu_enabled
-> > > > +                                    && shadow_accessed_mask;
-> > > > +}
-> > > > +
-> > > >  #endif /* _ASM_X86_KVM_HOST_H */
-> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > > index 992e651540e8..fae1a75750bb 100644
-> > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > @@ -1674,8 +1674,14 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm=
-_gfn_range *range)
-> > > >  {
-> > > >     bool young =3D false;
-> > > >
-> > > > -   if (kvm_memslots_have_rmaps(kvm))
-> > > > +   if (kvm_memslots_have_rmaps(kvm)) {
-> > > > +           if (range->lockless) {
-> > > > +                   kvm_age_set_unreliable(range);
-> > > > +                   return false;
-> > > > +           }
-> > >
-> > > If a VM has TDP MMU enabled, supports A/D bits, and is using nested
-> > > virtualization, MGLRU will effectively be blind to all accesses made =
-by
-> > > the VM.
-> > >
-> > > kvm_arch_prepare_bitmap_age() will return true indicating that the
-> > > bitmap is supported. But then kvm_age_gfn() and kvm_test_age_gfn() wi=
-ll
-> > > return false immediately and indicate the bitmap is unreliable becaus=
-e a
-> > > shadow root is allocate. The notfier will then return
-> > > MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
->
-> Ah no, I'm wrong here. Setting args.unreliable causes the notifier to
-> return 0 instead of MMU_NOTIFIER_YOUNG_FAST.
-> MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE is used for something else.
+Hi Thomas,
 
-Nope, wrong again. Just ignore me while I try to figure out how this
-actually works :)
+On Thu, 11 Apr 2024 18:54:29 +0200, Thomas Gleixner <tglx@linutronix.de>
+wrote:
+
+> On Fri, Apr 05 2024 at 15:31, Jacob Pan wrote:
+> >  
+> >  #ifdef CONFIG_SMP
+> > diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+> > index fc37c8d83daf..f445bec516a0 100644
+> > --- a/arch/x86/kernel/idt.c
+> > +++ b/arch/x86/kernel/idt.c
+> > @@ -163,6 +163,9 @@ static const __initconst struct idt_data
+> > apic_idts[] = { # endif
+> >  	INTG(SPURIOUS_APIC_VECTOR,
+> > asm_sysvec_spurious_apic_interrupt), INTG(ERROR_APIC_VECTOR,
+> > 		asm_sysvec_error_interrupt), +# ifdef
+> > CONFIG_X86_POSTED_MSI
+> > +	INTG(POSTED_MSI_NOTIFICATION_VECTOR,
+> > asm_sysvec_posted_msi_notification), +# endif
+> >  #endif
+> >  };  
+> 
+> Obviously lacks FRED support...
+Good point, forgot FRED is merged :)
+
+Will add an entry to entry_fred.c. I would not be able to test performance
+though.
+
+Thanks,
+
+Jacob
 
