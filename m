@@ -1,162 +1,145 @@
-Return-Path: <kvm+bounces-14303-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14305-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A878A1DEB
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:21:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC98C8A1E12
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 20:27:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7723C1F25A55
-	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:21:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FDEC288507
+	for <lists+kvm@lfdr.de>; Thu, 11 Apr 2024 18:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB91C7EF06;
-	Thu, 11 Apr 2024 17:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E564413328E;
+	Thu, 11 Apr 2024 17:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nYYjl2Bd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AsuAiIEO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3A67BAF8;
-	Thu, 11 Apr 2024 17:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A806513ADC
+	for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 17:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712856859; cv=none; b=O4RBrxkvsT6xSjfQUjyB0SIJzV6XkwlhkYiO8EqwsSpmHgSm1tQ+Yyd1p3EZdhdqnLun0PU9wcd6vPJBCS+VidMTHr3M0IF1CvdFNaLcE3QvWdI6VUF8Mv5ikhNhYRV7Du1hSn4Da3dZEHApB2aB80kuHJVTg7Ys0yRaMerKRTg=
+	t=1712857602; cv=none; b=uyprFLvjbdbqS7mYg660H33mlGlHzpoX9C5EtCtP6HPneMWvLTqjAzotsjlPqxLZ4fr+oP7nXDLelmcUwWS7X99XLJT/UFtPX8jSwB+mY3mn3bMYTOA9HduxINyTkZgCaVKyIzpM4Y1QZRl6I2LSXsWzURizfZtY2tZzlAQHNzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712856859; c=relaxed/simple;
-	bh=BXJ4rYsFbdYq9tuBBdm+ZHYZ7dtQaqzMQCkTTRJEguM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nVBE21As3dBckQM7HblcyuF//r2SbGeuGJ5rqn6QIY83oocrwogzE5hrdbjUhIn0IClcHWhE6KLQx1dJfp8zlAYLNsxB+DZtynGaKqlz3VrhntCCZoZW99JKpBmE15MOLgMbS/JOPJ+4DkktGQEwTR8yXnX97y7O3lqgOcfWEnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nYYjl2Bd; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712856858; x=1744392858;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BXJ4rYsFbdYq9tuBBdm+ZHYZ7dtQaqzMQCkTTRJEguM=;
-  b=nYYjl2BdvuWHTjgH62UrtFEwqOC4rrOHudWzWkXhG5qTQGnMbJptUEK9
-   4QQza+YCHxk+q4AHVI+h1gZF9DB3sKKJXCZk6vSw593PCrU9C+aYjVxJ7
-   mdVkvBAqvjF8YRwjuwSHkr3/v5R7nOI63ZzDhQag5u2URdM1oT/u08TYN
-   pHvIsxZ7ZQxCjLwm/vSAAPCNjLhmgZLp/ckx57blIrQmRUobq/w5jWUwe
-   Z2DPWQ+22eElkav8bDs9hKy7YCcKg4osYo8cXUWuDLx6DQfLUAlj/BMVj
-   enLrc+Jle1Xgt/uKUWXYu1OVeT7QJIjsoSurHNDEs8nE6Sqb6DwM0OqC/
-   A==;
-X-CSE-ConnectionGUID: NTWoEdsfTZq/jU2ijd5QpQ==
-X-CSE-MsgGUID: F3JHQ9KjQC+a7ynt+XCMgw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="19437589"
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="19437589"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 10:34:17 -0700
-X-CSE-ConnectionGUID: 18gQPbGiQouq/wmAbL8AxQ==
-X-CSE-MsgGUID: m8ZxjFTcTxWns/sMaxePEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="25759756"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 10:34:17 -0700
-Date: Thu, 11 Apr 2024 10:38:47 -0700
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
- Zijlstra <peterz@infradead.org>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
- <baolu.lu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Hansen, Dave" <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H.
- Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
- <mingo@redhat.com>, "Luse, Paul E" <paul.e.luse@intel.com>, "Williams, Dan
- J" <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, "Raj, Ashok"
- <ashok.raj@intel.com>, "maz@kernel.org" <maz@kernel.org>,
- "seanjc@google.com" <seanjc@google.com>, Robin Murphy
- <robin.murphy@arm.com>, "jim.harris@samsung.com" <jim.harris@samsung.com>,
- "a.manzanares@samsung.com" <a.manzanares@samsung.com>, Bjorn Helgaas
- <helgaas@kernel.org>, "Zeng, Guang" <guang.zeng@intel.com>,
- "robert.hoo.linux@gmail.com" <robert.hoo.linux@gmail.com>,
- jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v2 08/13] x86/irq: Install posted MSI notification
- handler
-Message-ID: <20240411103847.57f47a48@jacob-builder>
-In-Reply-To: <BN9PR11MB5276C4932F6CFD217CC50AD78C052@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
-	<20240405223110.1609888-9-jacob.jun.pan@linux.intel.com>
-	<BN9PR11MB5276C4932F6CFD217CC50AD78C052@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1712857602; c=relaxed/simple;
+	bh=xbyOWt7gDT90PHA8CmXecHjCn5gE8CXNTbkKxi7f40k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dt8IxpAcNVwWx9pghTi4S/V9F64k7SNh+sxkfcQi9N9FzLMdIGnUEf1besbTK2X5B66URKglVM9mdlpGM1d/gB7IBa+J9wtsFecj0/PQfBJIUe/YXUbwJU5x2YD5udkKq5VJSU+LS2I9a6kqMTyiw2bmKqwCgxO7k4oWE6RA9sY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AsuAiIEO; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ece02cfbf2so130046b3a.2
+        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 10:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712857600; x=1713462400; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QDrKYmJhpcZaPcrJLV+DQJE+gAVulOU19ll4D+zrZcU=;
+        b=AsuAiIEOBcqOkZgTtx9qI9zxnLQwYaBFz/RUkS11cHSftsrR8KTgJzXez5NGQyC9UO
+         SL+hM0UoCUD3qoAj1L3xmFHtL02VwXjdeqEskE755+hCLORuubMqwl+Jf4NV9cxtHGiV
+         Rx476Z23+VPcxYz/KqDWBmjQVdAooI3p+rPSXx+lV3Y/Gb7o09oKL81Ut8+3ur7v1Dmv
+         B4y+AU/LfdBmR1jY9FIFV9CPuikuuFamtI/xDPIt7fe+pXBHnWFOEl38m+wEHY2v67qc
+         FYj4CtWS9plSDhWjDK7aEhPG12WFKKDMAonc+EZ/mjCNXuJEF4/0QNhKioWxqqyTsoZX
+         TeHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712857600; x=1713462400;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QDrKYmJhpcZaPcrJLV+DQJE+gAVulOU19ll4D+zrZcU=;
+        b=PEOcQVBbFFTxcdxjbwhkOmbxGANkACGkssIHhygrSMcMpCS1stjREjtK51A2B3WFJf
+         KcadTKodOc07DxxW2u/ry533q6q4vbs7e8v2K5m0ccghtHo3W+F+GhTTp6e8nwOntcF4
+         Q8q6I1FmVFf8BIv4L4bRggd0UF1JWHWlotLm5zPI32x1F33SHLxbDNuNdtEuY8MlVBUW
+         rQAT52n5XseT1kOuLGVkMwqa9JuKweVe2iK0dSo4KPWnmmsjS1JvbjjugE1xtNiOtgja
+         JQVysbSHnoqHaUHxu86oEQnzJtiAwDcRGfRmxWWcD9HTTu6qcNmWnBZ1kkIh9iXtx4Ht
+         q73A==
+X-Forwarded-Encrypted: i=1; AJvYcCVwqv0Dk70wXT3rovaBlqGblzwpyyFedCik7z9N9Rwj/gZ6+PkZZi5k5ffdLY7pQdiUxJ0o/pwD2n+velbWXzMM6Edg
+X-Gm-Message-State: AOJu0YzpaUJib1gncWjjgFBsobpNMXo3lJsZ1LjYDWhTpH7TudmieXdz
+	C25b85ZIxkwFmx/f1bAWtNM8nET8vxC2fthl259SFKNy9jDhG+9a7+n0t7HkSxpjjzx4bS76C24
+	doA==
+X-Google-Smtp-Source: AGHT+IFtoDfp5GyRetAbjF6DB8NcAHAaD2IM+hfZ0pw6BN3Rb7rwJGuZMBNHwb9J9vPhlLGRfTE9N8azeiU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d87:b0:6ec:f406:ab4b with SMTP id
+ fb7-20020a056a002d8700b006ecf406ab4bmr14703pfb.4.1712857599871; Thu, 11 Apr
+ 2024 10:46:39 -0700 (PDT)
+Date: Thu, 11 Apr 2024 10:46:38 -0700
+In-Reply-To: <CALMp9eRwsyBUHRtjKZDyU6i13hr5tif3ty7tpNjfs=Zq3RA8RA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
+ <20240126085444.324918-2-xiong.y.zhang@linux.intel.com> <ZhgYD4B1szpbvlHq@google.com>
+ <56a98cae-36c5-40f8-8554-77f9d9c9a1b0@linux.intel.com> <CALMp9eRwsyBUHRtjKZDyU6i13hr5tif3ty7tpNjfs=Zq3RA8RA@mail.gmail.com>
+Message-ID: <Zhgh_vQYx2MCzma6@google.com>
+Subject: Re: [RFC PATCH 01/41] perf: x86/intel: Support PERF_PMU_CAP_VPMU_PASSTHROUGH
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Kan Liang <kan.liang@linux.intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com, 
+	kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, 
+	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Kevin,
+On Thu, Apr 11, 2024, Jim Mattson wrote:
+> On Thu, Apr 11, 2024 at 10:21=E2=80=AFAM Liang, Kan <kan.liang@linux.inte=
+l.com> wrote:
+> > On 2024-04-11 1:04 p.m., Sean Christopherson wrote:
+> > > On Fri, Jan 26, 2024, Xiong Zhang wrote:
+> > >> From: Kan Liang <kan.liang@linux.intel.com>
+> > >>
+> > >> Define and apply the PERF_PMU_CAP_VPMU_PASSTHROUGH flag for the vers=
+ion 4
+> > >> and later PMUs
+> > >
+> > > Why?  I get that is an RFC, but it's not at all obvious to me why thi=
+s needs to
+> > > take a dependency on v4+.
+> >
+> > The IA32_PERF_GLOBAL_STATUS_RESET/SET MSRs are introduced in v4. They
+> > are used in the save/restore of PMU state. Please see PATCH 23/41.
+> > So it's limited to v4+ for now.
+>=20
+> Prior to version 4, semi-passthrough is possible, but IA32_PERF_GLOBAL_ST=
+ATUS
+> has to be intercepted and emulated, since it is non-trivial to set bits i=
+n
+> this MSR.
 
-On Thu, 11 Apr 2024 07:52:28 +0000, "Tian, Kevin" <kevin.tian@intel.com>
-wrote:
+Ah, then this _perf_ capability should be PERF_PMU_CAP_WRITABLE_GLOBAL_STAT=
+US or
+so, especially since it's introduced in advance of the KVM side of things. =
+ Then
+whether or not to support a mediated PMU becomes a KVM decision, e.g. inter=
+cepting
+accesses to IA32_PERF_GLOBAL_STATUS doesn't seem like a complete deal break=
+er
+(or maybe it is, I now see the comment about it being used to do the contex=
+t switch).
 
-> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Sent: Saturday, April 6, 2024 6:31 AM
-> > 
-> > +
-> > +/*
-> > + * De-multiplexing posted interrupts is on the performance path, the
-> > code
-> > + * below is written to optimize the cache performance based on the
-> > following
-> > + * considerations:
-> > + * 1.Posted interrupt descriptor (PID) fits in a cache line that is
-> > frequently
-> > + *   accessed by both CPU and IOMMU.
-> > + * 2.During posted MSI processing, the CPU needs to do 64-bit read and
-> > xchg
-> > + *   for checking and clearing posted interrupt request (PIR), a 256
-> > bit field
-> > + *   within the PID.
-> > + * 3.On the other side, the IOMMU does atomic swaps of the entire PID
-> > cache
-> > + *   line when posting interrupts and setting control bits.
-> > + * 4.The CPU can access the cache line a magnitude faster than the
-> > IOMMU.
-> > + * 5.Each time the IOMMU does interrupt posting to the PIR will evict
-> > the PID
-> > + *   cache line. The cache line states after each operation are as
-> > follows:
-> > + *   CPU		IOMMU			PID Cache line
-> > state
-> > + *   ---------------------------------------------------------------
-> > + *...read64					exclusive
-> > + *...lock xchg64				modified
-> > + *...			post/atomic swap	invalid
-> > + *...-------------------------------------------------------------
-> > + *  
-> 
-> According to VT-d spec: 5.2.3 Interrupt-Posting Hardware Operation:
-> 
-> "
-> - Read contents of the Posted Interrupt Descriptor, claiming exclusive
->   ownership of its hosting cache-line.
->   ...
-> - Modify the following descriptor field values atomically:
->   ...
-> - Promote the cache-line to be globally observable, so that the
-> modifications are visible to other caching agents. Hardware may
-> write-back the cache-line anytime after this step.
-> "
-> 
-> sounds that the PID cache line is not evicted after IOMMU posting?
-IOMMU follows the same MESI protocol defined in SDM. VT-d spec. also says
-"This atomic read-modify-write operation will always snoop processor caches"
+And peeking ahead, IIUC perf effectively _forces_ a passthrough model when
+has_vpmu_passthrough_cap() is true, which is wrong.  There needs to be a us=
+er/admin
+opt-in (or opt-out) to that behavior, at a kernel/perf level, not just at a=
+ KVM
+level.  Hmm, or is perf relying on KVM to do that right thing?  I.e. relyin=
+g on
+KVM to do perf_guest_{enter,exit}() if and only if the PMU can support the
+passthrough model.
 
-So if the PID cache line is in modified state (caused by writing ON bit,
-clear PIR, etc.), IOMMU request ownership will evict the cache.
-
-
-Thanks,
-
-Jacob
+If that's the case, most of the has_vpmu_passthrough_cap() checks are grati=
+utous
+and confusing, e.g. just WARN if KVM (or some other module) tries to trigge=
+r a
+PMU context switch when it's not supported by perf.
 
