@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-14577-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14578-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9FC58A3715
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 22:33:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C1038A371F
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 22:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 257BBB2177D
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 20:32:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCB45285FB3
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 20:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8ACF22EE0;
-	Fri, 12 Apr 2024 20:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9275F27469;
+	Fri, 12 Apr 2024 20:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IDE/034i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DBnftRm7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A5B1FBB;
-	Fri, 12 Apr 2024 20:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D147B17C7F;
+	Fri, 12 Apr 2024 20:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712953967; cv=none; b=FWiy/Yu4FcqzIIyhJMjpn2Cuzx6iKs1uZTlem1GC2gTlf/UP9wz2hYVHnzEoPr2ZoLYzMVBc32cRyUQmpJ/dcyBJGzsrW6GFaHjHArDbBupIl3zO2imGTaDvuuzu/dxhj+NCHwsUDgQCBIuLEcpNW8ALFBQl332qZ5isl3cT7lY=
+	t=1712954107; cv=none; b=CWzVPbj94dDdBle2RKrfSJrf9jJfbCpNazMviJnkdCRMa9+KDvumnDHPppvjsATpfbgoCXDK62/5ZNUF0mqG9x2Jp85U6CDAVSo4YtlQODJ5oYT/P3wuLn88C6obwQlOVPH+w7S4SbShAEgVPGkH0Zs08B0TI+v6JCUQNa8TgXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712953967; c=relaxed/simple;
-	bh=O25czTNqLB/PBuG1lJZszDA0K8OkgcmYNFRCQjnUK/A=;
+	s=arc-20240116; t=1712954107; c=relaxed/simple;
+	bh=0J9mzZPgX2hVvKlUVY3N4MBqc7JbB6OQKzDXwHDC1QQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dCf4DcDbZdw7h9QQJE2jL1fAdX/qualIHBXTCkxf2EY89aavV/OM1uKx440zm3XpMoEd9e/i3F8LtaAi2Hh4INFcPzlTfOSgz5ko5R07LNevc2zWgR53cG/BWkaGR7dVesdHki7fOVq4l2MWkQcSGIwftGQAeufI+D4lUDd7HA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IDE/034i; arc=none smtp.client-ip=192.198.163.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=lSv+D6bLPy8Qixh66Ekk/1JnaAX2Xe84W1NKIaY93snWvJaREqUIZrcbWumO4TZ218AROv7Kpbj8Dd0Vcip1AbLvMvUM0CxF0JKCY3GolxWGh8J+KaUnBCeuRo8jXYzMtpqT2IlkIopEqqGcY8V4keknFiyrFARXuTGrRfSb12w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DBnftRm7; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712953966; x=1744489966;
+  t=1712954106; x=1744490106;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=O25czTNqLB/PBuG1lJZszDA0K8OkgcmYNFRCQjnUK/A=;
-  b=IDE/034iLCTvLTynUiKzf1zO9HEXELjI8ewbR1vswiXtxKB8Q00BGuVv
-   z01wONQRrSLj5tGcSl+gjKa2Zobr64YGCP2ljf87vNbEZ60BkkcXhn49w
-   H4L8AGDBE907okajZvHJ0dM9EWGBFNLmb/DKiGxdQqZd2aIi2GrWHCp8T
-   g9bKnbWbODKc6FesETfo0ePHdf5g5irT3+02kMrlSFz8wVLhhfcKg+ba5
-   jTsTX0X7kqeL7GG3JzeMixf8SvbS5fYDCAhO1jaVoi9ODBzKMp1ubm4Xp
-   Kw+VzRSPh/RtoPU58OWyVCFF+I5CNIDUG6pD21GTl/4dySldBRKvFIMi2
+   mime-version:in-reply-to;
+  bh=0J9mzZPgX2hVvKlUVY3N4MBqc7JbB6OQKzDXwHDC1QQ=;
+  b=DBnftRm77ALMF/Oj+qGtIsN6hrwoMrB8JxSSRWE3eAfA2Mir4tzLpb+I
+   umE5qSNEV1x1bW0NdEH/jaAy779vWFUUdOGukPUH/rxJ7MzrTlpSKJxtn
+   w1e7wlO8juZ8o748sHCYSVwqNdup/ewGKy6NCr9OPzkSZgPNJ/Jczgovd
+   7yf/RNwvUKE4be9WfQJygyYjaPayC+He3na5b8sHTRfTRWpHKZRhitpnv
+   5T17GFniUD4Pnyn/ajHOnXc9A9ukUJ6JYhtAu/Xbe/nT3T0VjPNk+MXHZ
+   13OQhuHpzfbUXuKEOEqtgUfgzS+HWsMn3yo/wgEeUTtrSirw+opwLVRc5
    w==;
-X-CSE-ConnectionGUID: +0QGNrzTQjS07zApwLVOXw==
-X-CSE-MsgGUID: 8D8YboAJRO2qn4FGIX77hg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8641721"
+X-CSE-ConnectionGUID: uu27hSEHQayWp6+1PMS4aQ==
+X-CSE-MsgGUID: tTEtgK5iR0iiJXLeSEGkkQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8534610"
 X-IronPort-AV: E=Sophos;i="6.07,197,1708416000"; 
-   d="scan'208";a="8641721"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 13:32:45 -0700
-X-CSE-ConnectionGUID: MMKbDxSHRY+Gl4FTbMk2zQ==
-X-CSE-MsgGUID: aBtZeeHiSgWaHQX3jRNQwA==
+   d="scan'208";a="8534610"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 13:35:05 -0700
+X-CSE-ConnectionGUID: nFmbpTc4TYeZZ3LMA4IvLg==
+X-CSE-MsgGUID: frT9CWq4Tbuow49Qfberhw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,197,1708416000"; 
-   d="scan'208";a="26133214"
+   d="scan'208";a="21831600"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 13:32:45 -0700
-Date: Fri, 12 Apr 2024 13:32:44 -0700
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 13:35:05 -0700
+Date: Fri, 12 Apr 2024 13:35:04 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 To: Binbin Wu <binbin.wu@linux.intel.com>
 Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
@@ -67,12 +67,14 @@ Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
 	Sean Christopherson <seanjc@google.com>,
 	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	Yang Weijiang <weijiang.yang@intel.com>,
 	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 082/130] KVM: TDX: restore user ret MSRs
-Message-ID: <20240412203244.GM3039520@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v19 083/130] KVM: TDX: Add TSX_CTRL msr into uret_msrs
+ list
+Message-ID: <20240412203504.GN3039520@ls.amr.corp.intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <8ba41a08c98034fd4f3886791d1d068b0d390f86.1708933498.git.isaku.yamahata@intel.com>
- <c0a1de41-79fc-49f2-87a2-0ac2918ca84f@linux.intel.com>
+ <06135e0897ae90c3dc7fd608948f8bdcd30a17ae.1708933498.git.isaku.yamahata@intel.com>
+ <dec685d5-96a7-453d-8b1b-7c662e222977@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,94 +83,60 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c0a1de41-79fc-49f2-87a2-0ac2918ca84f@linux.intel.com>
+In-Reply-To: <dec685d5-96a7-453d-8b1b-7c662e222977@linux.intel.com>
 
-On Sun, Apr 07, 2024 at 01:59:03PM +0800,
+On Sun, Apr 07, 2024 at 03:05:21PM +0800,
 Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
 > 
 > 
 > On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > From: Yang Weijiang <weijiang.yang@intel.com>
 > > 
-> > Several user ret MSRs are clobbered on TD exit.  Restore those values on
-> > TD exit
-> 
-> Here "Restore" is not accurate, since the previous patch just updates the
-> cached value on TD exit.
-
-Sure, let me update it.
-
-
-> > and before returning to ring 3.  Because TSX_CTRL requires special
-> > treat, this patch doesn't address it.
+> > TDX module resets the TSX_CTRL MSR to 0 at TD exit if TSX is enabled for
+> > TD. Or it preserves the TSX_CTRL MSR if TSX is disabled for TD.  VMM can
+> > rely on uret_msrs mechanism to defer the reload of host value until exiting
+> > to user space.
 > > 
+> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 > > ---
-> >   arch/x86/kvm/vmx/tdx.c | 43 ++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 43 insertions(+)
+> > v19:
+> > - fix the type of tdx_uret_tsx_ctrl_slot. unguent int => int.
+> > ---
+> >   arch/x86/kvm/vmx/tdx.c | 33 +++++++++++++++++++++++++++++++--
+> >   arch/x86/kvm/vmx/tdx.h |  8 ++++++++
+> >   2 files changed, 39 insertions(+), 2 deletions(-)
 > > 
 > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 199226c6cf55..7e2b1e554246 100644
+> > index 7e2b1e554246..83dcaf5b6fbd 100644
 > > --- a/arch/x86/kvm/vmx/tdx.c
 > > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -535,6 +535,28 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> >   	 */
-> >   }
-> > +struct tdx_uret_msr {
-> > +	u32 msr;
-> > +	unsigned int slot;
-> > +	u64 defval;
-> > +};
-> > +
-> > +static struct tdx_uret_msr tdx_uret_msrs[] = {
-> > +	{.msr = MSR_SYSCALL_MASK, .defval = 0x20200 },
-> > +	{.msr = MSR_STAR,},
-> > +	{.msr = MSR_LSTAR,},
-> > +	{.msr = MSR_TSC_AUX,},
-> > +};
-> > +
-> > +static void tdx_user_return_update_cache(void)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++)
-> > +		kvm_user_return_update_cache(tdx_uret_msrs[i].slot,
-> > +					     tdx_uret_msrs[i].defval);
-> > +}
-> > +
-> >   static void tdx_restore_host_xsave_state(struct kvm_vcpu *vcpu)
+> > @@ -547,14 +547,21 @@ static struct tdx_uret_msr tdx_uret_msrs[] = {
+> >   	{.msr = MSR_LSTAR,},
+> >   	{.msr = MSR_TSC_AUX,},
+> >   };
+> > +static int tdx_uret_tsx_ctrl_slot;
+> > -static void tdx_user_return_update_cache(void)
+> > +static void tdx_user_return_update_cache(struct kvm_vcpu *vcpu)
 > >   {
-> >   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> > @@ -627,6 +649,7 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
-> >   	tdx_vcpu_enter_exit(tdx);
-> > +	tdx_user_return_update_cache();
-> >   	tdx_restore_host_xsave_state(vcpu);
-> >   	tdx->host_state_need_restore = true;
-> > @@ -1972,6 +1995,26 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
-> >   		return -EINVAL;
-> >   	}
-> > +	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++) {
-> > +		/*
-> > +		 * Here it checks if MSRs (tdx_uret_msrs) can be saved/restored
-> > +		 * before returning to user space.
-> > +		 *
-> > +		 * this_cpu_ptr(user_return_msrs)->registered isn't checked
-> > +		 * because the registration is done at vcpu runtime by
-> > +		 * kvm_set_user_return_msr().
-> Should be tdx_user_return_update_cache(), if it's the final API name.
+> >   	int i;
+> >   	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++)
+> >   		kvm_user_return_update_cache(tdx_uret_msrs[i].slot,
+> >   					     tdx_uret_msrs[i].defval);
+> > +	/*
+> > +	 * TSX_CTRL is reset to 0 if guest TSX is supported. Otherwise
+> > +	 * preserved.
+> > +	 */
+> > +	if (to_kvm_tdx(vcpu->kvm)->tsx_supported && tdx_uret_tsx_ctrl_slot != -1)
+> 
+> If to_kvm_tdx(vcpu->kvm)->tsx_supported is true, tdx_uret_tsx_ctrl_slot
+> shouldn't be -1 at this point.
+> Otherwise, it's a KVM bug, right?
+> Not sure if it needs a warning if tdx_uret_tsx_ctrl_slot is -1, or just
+> remove the check?
 
-Yes, it will be tdx_user_reutrn_msr_update_cache().
-
-
-> > +		 * Here is setting up cpu feature before running vcpu,
-> > +		 * registered is already false.
->                                   ^
->                            remove "already"?
-
-We can this sentence.
+You're right. Let me remove the != -1 check.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
