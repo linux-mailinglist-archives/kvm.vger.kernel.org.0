@@ -1,145 +1,149 @@
-Return-Path: <kvm+bounces-14564-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14565-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D422A8A3561
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 20:10:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20EDA8A357D
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 20:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3221F22764
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 18:10:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301BB1C2332C
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 18:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5638C14EC48;
-	Fri, 12 Apr 2024 18:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D29914EC5A;
+	Fri, 12 Apr 2024 18:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eN5ZO6yp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j1WD52EX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5DF146D7B;
-	Fri, 12 Apr 2024 18:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9053B14D708;
+	Fri, 12 Apr 2024 18:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712945400; cv=none; b=XLLcFbs2Nz8KtO8UWMN2C5cf4TrJd+Dj7av8UK+v6pvNS5tSP4VTmHaA3diRs+qf+tScsR+p+eLmE16Obx9W+rn3JGSrl42fSfzbnwGFR4bqZESybQKBrDjCKEh3uCKaDAso12ILt4ZnoHXHhHrQeLOphZER1B0RY4FclYsdd6E=
+	t=1712945941; cv=none; b=mxSbPN/gns5b8Tx20nbzvCjW7QDP/rU3KgNeFc1fiQdyDEs43spsrDCSqjANBRl6uECAYM6KwlF4ncRQkw7Kl+IzGJLqLC4WT6C2k+Ry0a/D6vpzxxOdxQF57grFE5y3K/dhfhL0KIu4qk1HxUSmk1l8mrtEChYsvtT5G2EWEJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712945400; c=relaxed/simple;
-	bh=0J4SlgDGf+5ax9loRJCtM8+Hj8SjQZHESyQGU7tmxW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jr93Ei+HOssBUO8ytyh1y1ohaLAtd+zO+AJ2jcu2jnHP8zKIKRwcBt06ZsP+jR+q/Y5Utz9XatjnQk7FUsBzKhwK1B1F6G2WAKuCLJN17u9HuJZ1yJyEG7dtDt0KEkV8B3GHo+32LzZsRWJiPlxh4ja8pPHRLjBNbwivTCSKV4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eN5ZO6yp; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1712945941; c=relaxed/simple;
+	bh=qcfdW48aCV8kl2oRwl5wUXBZK6N010eZxw0UUUS0LKk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ienWCaW78/eDv/yW6BINJ9TjeVx2kk9Uz2t9c7sReELIGBnQyiMu5B+CCbGgbPHtbxjkUveaS42C6pweuVx+bWWMrvYctqjGuRPRMvuhzbdxEHPk1FV803op7je8kOjCFRmLW4CBZ8OCYSqqGkVtR8sTkuH+d0WO8FiHjyfGCSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j1WD52EX; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712945399; x=1744481399;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0J4SlgDGf+5ax9loRJCtM8+Hj8SjQZHESyQGU7tmxW4=;
-  b=eN5ZO6ypRnrWN8psJZ0kj2nAI5zDa0PziW84KwNfttSwo4pKOFuhAWjH
-   YdU1C3FBGhbR1zbf8L5cYTW7vd7Az3pf/ZTaeKsqMtMVYXWBlKn0vRGvv
-   /OeT3j1P72HzJdFokT3PSzahs6I9UnJP464044Oj0mvNScdFEVCI2gJ2g
-   y65gpG7yyoR0cbfE8tsFMof4pepA0EsACMWPlf7tSjs1N8yqI9TJpKYw1
-   QFvoFeqjGBSbRwHXadqvCcEE96gFcAo2VEpixphbGZK0INC0pavYaoEda
-   0NLeKQb5JNGmmGhRNmcAG2vUn4N3pJbSXfroNK7xxxXZhyqkW5SEtBszg
-   A==;
-X-CSE-ConnectionGUID: hl63ZS0dTQeh8NO64IYkYA==
-X-CSE-MsgGUID: L1Ixrb6gQJuF8Z1zjWflKQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8583247"
+  t=1712945941; x=1744481941;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qcfdW48aCV8kl2oRwl5wUXBZK6N010eZxw0UUUS0LKk=;
+  b=j1WD52EXiU4hFltMCgEQQe8LFHxnP5a2gsrII3W/jWc/gaN3x2wUX6II
+   qED/L5AILQfNW2Theo7rlT5akbgcv6YbuQrDlhdy0nBgK7kkCZjlT6O4A
+   cd9HofNRx+wdS2JPnFb9v7hCOVvdUxPggsSdzofQjmBqcpQqgl/PRztwN
+   h93Hskkmu+OWPcJ3raGtcIbddgT4iYNUslSTtLj+/O2+t0lz3Db7BLdjh
+   4PzRGtPfD3rPIZ0/1fpv7Ug6+vVSwgVhC3NRVwPN6cjwFe1O8KFl+gGei
+   Yx1cEzSd6imitzTSQ9rg6sJXOlryAcULjh3KYwrSwNxGDEBjl/zckNWOM
+   w==;
+X-CSE-ConnectionGUID: ul3xh4s3R76RG/dVQqVbQw==
+X-CSE-MsgGUID: l+p5st0BSnKajHTsRBjTqA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="12261434"
 X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8583247"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:09:58 -0700
-X-CSE-ConnectionGUID: kYEP+10GTD69RVfRQuSdHA==
-X-CSE-MsgGUID: mx5ldHYRSBqXgJI8J5lA0A==
+   d="scan'208";a="12261434"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:19:00 -0700
+X-CSE-ConnectionGUID: taCPYSIGSIW2vzeZM8SWig==
+X-CSE-MsgGUID: uApujCAuS+uPPT+UvKgEGA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="52262517"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:09:57 -0700
-Date: Fri, 12 Apr 2024 11:09:57 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 076/130] KVM: TDX: Finalize VM initialization
-Message-ID: <20240412180957.GI3039520@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <e3c862ae9c78bda2988768c1038fec100bb372cf.1708933498.git.isaku.yamahata@intel.com>
- <f3381541-822b-4e94-93f7-699afc6aa6a3@intel.com>
- <20240412010848.GG3039520@ls.amr.corp.intel.com>
- <a876accc-a7bf-4317-9612-d6d5a1fbaf9c@intel.com>
+   d="scan'208";a="21869422"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:18:59 -0700
+Date: Fri, 12 Apr 2024 11:23:31 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, "iommu@lists.linux.dev"
+ <iommu@lists.linux.dev>, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
+ <baolu.lu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "Hansen, Dave" <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H.
+ Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
+ <mingo@redhat.com>, "Luse, Paul E" <paul.e.luse@intel.com>, "Williams, Dan
+ J" <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, "Raj, Ashok"
+ <ashok.raj@intel.com>, "maz@kernel.org" <maz@kernel.org>,
+ "seanjc@google.com" <seanjc@google.com>, Robin Murphy
+ <robin.murphy@arm.com>, "jim.harris@samsung.com" <jim.harris@samsung.com>,
+ "a.manzanares@samsung.com" <a.manzanares@samsung.com>, Bjorn Helgaas
+ <helgaas@kernel.org>, "Zeng, Guang" <guang.zeng@intel.com>,
+ "robert.hoo.linux@gmail.com" <robert.hoo.linux@gmail.com>,
+ jacob.jun.pan@linux.intel.com
+Subject: Re: [PATCH v2 10/13] x86/irq: Extend checks for pending vectors to
+ posted interrupts
+Message-ID: <20240412112331.5a3c1d18@jacob-builder>
+In-Reply-To: <BN9PR11MB5276215478903C50701D05498C042@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
+	<20240405223110.1609888-11-jacob.jun.pan@linux.intel.com>
+	<BN9PR11MB5276215478903C50701D05498C042@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a876accc-a7bf-4317-9612-d6d5a1fbaf9c@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 12, 2024 at 03:22:00PM +0300,
-Adrian Hunter <adrian.hunter@intel.com> wrote:
+Hi Kevin,
 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 0d3b79b5c42a..c7ff819ccaf1 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -2757,6 +2757,12 @@ static int tdx_td_finalizemr(struct kvm *kvm)
-> >  		return -EINVAL;
-> >  
-> >  	err = tdh_mr_finalize(kvm_tdx);
-> > +	kvm_tdx->hw_error = err;
-> > +
-> > +	if (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX))
+On Fri, 12 Apr 2024 09:25:57 +0000, "Tian, Kevin" <kevin.tian@intel.com>
+wrote:
+
+> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Sent: Saturday, April 6, 2024 6:31 AM
+> > 
+> > During interrupt affinity change, it is possible to have interrupts
+> > delivered to the old CPU after the affinity has changed to the new one.
+> > To prevent lost interrupts, local APIC IRR is checked on the old CPU.
+> > Similar checks must be done for posted MSIs given the same reason.
+> > 
+> > Consider the following scenario:
+> > 	Device		system agent		iommu
+> > 	memory CPU/LAPIC
+> > 1	FEEX_XXXX
+> > 2			Interrupt request
+> > 3						Fetch IRTE	->
+> > 4						->Atomic Swap
+> > PID.PIR(vec) Push to Global
+> > Observable(GO)
+> > 5						if (ON*)
+> > 	i						done;*  
 > 
-> There seem to be also implicit operand codes.  How sure are
-> we that TDX_OPERAND_ID_RCX is the only valid busy operand?
+> there is a stray 'i'
+will fix, thanks
 
-According to the description of TDH.MR.FINALIZE, it locks exclusively,
-RCX in TDR, TDCS as implicit, OP_STATE as implicit.  And the basic TDX feature
-to run guest TD, TDX module locks in order of TDR => OP_STATE. We won't see
-OP_STATE lock failure after gaining TDR lock.
-
-If you worry for future, we can code it as
-(err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY.  We should do it
-consistently, though.
-
-> > +		return -EAGAIN;
-> > +	if (err == TDX_NO_VCPUS)
 > 
-> TDX_NO_VCPUS is not one of the completion status codes for
-> TDH.MR.FINALIZE
-
-It depends on the document version.  Need to check TDX_OP_STATE_INCORRECT
-to be defensive.
-
-
-> > diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> > index 98f5d7c5891a..dc150b8bdd5f 100644
-> > --- a/arch/x86/kvm/vmx/tdx.h
-> > +++ b/arch/x86/kvm/vmx/tdx.h
-> > @@ -18,6 +18,9 @@ struct kvm_tdx {
-> >  	u64 xfam;
-> >  	int hkid;
-> >  
-> > +	/* For KVM_TDX ioctl to return SEAMCALL status code. */
-> > +	u64 hw_error;
+> > 						else
+> > 6							send a
+> > notification ->
+> > 
+> > * ON: outstanding notification, 1 will suppress new notifications
+> > 
+> > If the affinity change happens between 3 and 5 in IOMMU, the old CPU's
+> > posted
+> > interrupt request (PIR) could have pending bit set for the vector being
+> > moved.  
 > 
-> For this case, it seems weird to have a struct member
-> to pass back a return status code,  why not make it a parameter
-> of tdx_td_finalizemr() or pass &tdx_cmd?
+> how could affinity change be possible in 3/4 when the cache line is
+> locked by IOMMU? Strictly speaking it's about a change after 4 and
+> before 6.
+SW can still perform affinity change on IRTE and do the flushing on IR
+cache after IOMMU fectched it (step 3). They are async events.
 
-I created the patch too quick. Given KVM_TDX_CAPABILITIES and KVM_TDX_INIT_VM
-take tdx_cmd already, it's consistent to make tdx_td_finalize() take it.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+In step 4, the atomic swap is on the PID cacheline, not IRTE.
+
+
+Thanks,
+
+Jacob
 
