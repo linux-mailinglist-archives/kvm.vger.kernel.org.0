@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-14507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 335E08A2C78
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:36:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87E038A2C79
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:36:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 650D51C22B4A
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:36:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4329C284414
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866F757307;
-	Fri, 12 Apr 2024 10:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0235732E;
+	Fri, 12 Apr 2024 10:35:05 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA37A20310
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E195730A
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712918103; cv=none; b=b5wI9qCGNZLEfuLjgmS90TsFK7V80ZgthUYQSyBVUQI654tB7G5nQNLeXwz8JBKo1i4KjnVgqpqT9VnYodYYb057bRLwe0OHlaPxjNUZtHlGehyok+CXUQ+p6E6r6UJqtjpYkdQCUnSt7r8bgygnw8y3c7PUvUeUbOKm4feBysE=
+	t=1712918104; cv=none; b=UG/+zyPc0Xtt+LlNlETet5ANA0x2uG6AwPeI9l1/lIdrn+qi8GJ0YCSAhs4qJpuBXCf5am3vx6Tha+c/r5wFXk+DhKV9EGAL5yfl06yHJzQW6GPEMlSSViTknjthIMvwWMHQMidbIVRNhChqY+m5uOt+zF6otpvTDI10IOqyqFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712918103; c=relaxed/simple;
-	bh=I7sjzoM/r8GL7yzwe7yecDHVw8xur7f0XhiwJ6YeBRU=;
+	s=arc-20240116; t=1712918104; c=relaxed/simple;
+	bh=4Nfj5hNAa8ixDtOo6n7yIoeEyBJXsjqRgmSmNRe+SvU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NvA/xJKfLKb9JvTCBh7uKkEiRD7mdFy3h9/kgNGZLUBWQU7OG9313h5C93neiuL7rbNNI1Nm5A4td69x/fIIt6mx3iHHvUSFQ8TDH92WCCxAmx9dZJFf0nXFL0hpsdzF3l1107rEYjNtFhayAIxzqltgolZuQ3ZE9iSKA60jeS0=
+	 MIME-Version; b=dCPMgNq1nT2UMAg2kprQgJ0WwdHEtOYIBE7Es5xvUhEW7d0sgT9rj341XQudOxV6ZEl6er8bVI2maQBx2KGDFav647Md23CnKGLHa0g/SO77V3qCpYIjjAKMy4cvZSSFnqAPp9zOqxdi38pKYh8DsiDpqRKqwFbuq24HwTU5RZ4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DDD8113E;
-	Fri, 12 Apr 2024 03:35:30 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 845DD339;
+	Fri, 12 Apr 2024 03:35:32 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 975EC3F64C;
-	Fri, 12 Apr 2024 03:34:59 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8E2093F64C;
+	Fri, 12 Apr 2024 03:35:01 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc: kvm@vger.kernel.org,
 	andrew.jones@linux.dev,
 	eric.auger@redhat.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvm-unit-tests PATCH 21/33] lib/alloc_page: Add shared page allocation support
-Date: Fri, 12 Apr 2024 11:33:56 +0100
-Message-Id: <20240412103408.2706058-22-suzuki.poulose@arm.com>
+Subject: [kvm-unit-tests PATCH 22/33] arm: gic-v3-its: Use shared pages wherever needed
+Date: Fri, 12 Apr 2024 11:33:57 +0100
+Message-Id: <20240412103408.2706058-23-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
@@ -62,146 +62,70 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Joey Gouly <joey.gouly@arm.com>
+GICv3-ITS is emulated by the host and thus we should allocate shared pages for
+access by the host. Make sure the allocations are shared.
 
-Add support for allocating "pages" that can be shared with the host.
-Or in other words, decrypted pages. This is achieved by adding hooks for
-setting a memory region as "encrypted" or "decrypted", which can be overridden
-by the architecture specific backends.
-
-Also add a new flag - FLAG_SHARED - for allocating shared pages.
-
-The page allocation/free routines get a "_shared_" variant too.
-These will be later used for Realm support and tests.
-
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- lib/alloc_page.c     | 20 +++++++++++++++++---
- lib/alloc_page.h     | 24 ++++++++++++++++++++++++
- lib/asm-generic/io.h | 12 ++++++++++++
- 3 files changed, 53 insertions(+), 3 deletions(-)
+ lib/arm/gic-v3.c       | 6 ++++--
+ lib/arm64/gic-v3-its.c | 6 +++---
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-index 84f01e11..e253cd1d 100644
---- a/lib/alloc_page.c
-+++ b/lib/alloc_page.c
-@@ -263,7 +263,7 @@ static bool coalesce(struct mem_area *a, u8 order, pfn_t pfn, pfn_t pfn2)
-  * - no pages in the memory block were already free
-  * - no pages in the memory block are special
-  */
--static void _free_pages(void *mem)
-+static void _free_pages(void *mem, u32 flags)
- {
- 	pfn_t pfn2, pfn = virt_to_pfn(mem);
- 	struct mem_area *a = NULL;
-@@ -281,6 +281,9 @@ static void _free_pages(void *mem)
- 	p = pfn - a->base;
- 	order = a->page_states[p] & ORDER_MASK;
+diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+index 2f7870ab..813cd5a6 100644
+--- a/lib/arm/gic-v3.c
++++ b/lib/arm/gic-v3.c
+@@ -171,7 +171,9 @@ void gicv3_lpi_alloc_tables(void)
+ 	u64 prop_val;
+ 	int cpu;
  
-+	if (flags & FLAG_SHARED)
-+		set_memory_encrypted((unsigned long)mem, BIT(order) * PAGE_SIZE);
+-	gicv3_data.lpi_prop = alloc_pages(order);
++	assert(gicv3_redist_base());
 +
- 	/* ensure that the first page is allocated and not special */
- 	assert(IS_ALLOCATED(a->page_states[p]));
- 	/* ensure that the order has a sane value */
-@@ -320,7 +323,14 @@ static void _free_pages(void *mem)
- void free_pages(void *mem)
- {
- 	spin_lock(&lock);
--	_free_pages(mem);
-+	_free_pages(mem, 0);
-+	spin_unlock(&lock);
-+}
-+
-+void free_pages_shared(void *mem)
-+{
-+	spin_lock(&lock);
-+	_free_pages(mem, FLAG_SHARED);
- 	spin_unlock(&lock);
- }
++	gicv3_data.lpi_prop = alloc_pages_shared(order);
  
-@@ -353,7 +363,7 @@ static void _unreserve_one_page(pfn_t pfn)
- 	i = pfn - a->base;
- 	assert(a->page_states[i] == STATUS_SPECIAL);
- 	a->page_states[i] = STATUS_ALLOCATED;
--	_free_pages(pfn_to_virt(pfn));
-+	_free_pages(pfn_to_virt(pfn), 0);
- }
+ 	/* ID bits = 13, ie. up to 14b LPI INTID */
+ 	prop_val = (u64)(virt_to_phys(gicv3_data.lpi_prop)) | 13;
+@@ -186,7 +188,7 @@ void gicv3_lpi_alloc_tables(void)
  
- int reserve_pages(phys_addr_t addr, size_t n)
-@@ -401,6 +411,10 @@ static void *page_memalign_order_flags(u8 al, u8 ord, u32 flags)
- 		if (area & BIT(i))
- 			res = page_memalign_order(areas + i, al, ord, fresh);
- 	spin_unlock(&lock);
-+
-+	if (res && (flags & FLAG_SHARED))
-+		set_memory_decrypted((unsigned long)res, BIT(ord) * PAGE_SIZE);
-+
- 	if (res && !(flags & FLAG_DONTZERO))
- 		memset(res, 0, BIT(ord) * PAGE_SIZE);
- 	return res;
-diff --git a/lib/alloc_page.h b/lib/alloc_page.h
-index 060e0418..8c1ea7b5 100644
---- a/lib/alloc_page.h
-+++ b/lib/alloc_page.h
-@@ -21,6 +21,7 @@
+ 		writeq(prop_val, ptr + GICR_PROPBASER);
  
- #define FLAG_DONTZERO	0x10000
- #define FLAG_FRESH	0x20000
-+#define FLAG_SHARED	0x40000
+-		gicv3_data.lpi_pend[cpu] = alloc_pages(order);
++		gicv3_data.lpi_pend[cpu] = alloc_pages_shared(order);
+ 		pend_val = (u64)(virt_to_phys(gicv3_data.lpi_pend[cpu]));
+ 		writeq(pend_val, ptr + GICR_PENDBASER);
+ 	}
+diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
+index 2c69cfda..07dbeb81 100644
+--- a/lib/arm64/gic-v3-its.c
++++ b/lib/arm64/gic-v3-its.c
+@@ -54,7 +54,7 @@ static void its_baser_alloc_table(struct its_baser *baser, size_t size)
+ 	void *reg_addr = gicv3_its_base() + GITS_BASER + baser->index * 8;
+ 	u64 val = readq(reg_addr);
  
- /* Returns true if the page allocator has been initialized */
- bool page_alloc_initialized(void);
-@@ -121,4 +122,27 @@ int reserve_pages(phys_addr_t addr, size_t npages);
-  */
- void unreserve_pages(phys_addr_t addr, size_t npages);
+-	baser->table_addr = alloc_pages(order);
++	baser->table_addr = alloc_pages_shared(order);
  
-+/* Shared page operations */
-+static inline void *alloc_pages_shared(unsigned int order)
-+{
-+	return alloc_pages_flags(order, FLAG_SHARED);
-+}
-+
-+static inline void *alloc_page_shared(void)
-+{
-+	return alloc_pages_shared(0);
-+}
-+
-+void free_pages_shared(void *mem);
-+
-+static inline void free_page_shared(void *page)
-+{
-+	free_pages_shared(page);
-+}
-+
-+static inline void free_pages_shared_by_order(void *mem, unsigned int order)
-+{
-+	free_pages_shared(mem);
-+}
-+
- #endif
-diff --git a/lib/asm-generic/io.h b/lib/asm-generic/io.h
-index dc0f46f5..fb65184b 100644
---- a/lib/asm-generic/io.h
-+++ b/lib/asm-generic/io.h
-@@ -214,4 +214,16 @@ static inline void *phys_to_virt(unsigned long address)
- }
- #endif
+ 	val |= virt_to_phys(baser->table_addr) | GITS_BASER_VALID;
  
-+#ifndef set_memory_encrypted
-+static inline void set_memory_encrypted(unsigned long mem, size_t size)
-+{
-+}
-+#endif
-+
-+#ifndef set_memory_decrypted
-+static inline void set_memory_decrypted(unsigned long mem, size_t size)
-+{
-+}
-+#endif
-+
- #endif /* _ASM_GENERIC_IO_H_ */
+@@ -70,7 +70,7 @@ static void its_cmd_queue_init(void)
+ 	unsigned long order = get_order(SZ_64K >> PAGE_SHIFT);
+ 	u64 cbaser;
+ 
+-	its_data.cmd_base = alloc_pages(order);
++	its_data.cmd_base = alloc_pages_shared(order);
+ 
+ 	cbaser = virt_to_phys(its_data.cmd_base) | (SZ_64K / SZ_4K - 1) | GITS_CBASER_VALID;
+ 
+@@ -123,7 +123,7 @@ struct its_device *its_create_device(u32 device_id, int nr_ites)
+ 	new->nr_ites = nr_ites;
+ 
+ 	n = (its_data.typer.ite_size * nr_ites) >> PAGE_SHIFT;
+-	new->itt = alloc_pages(get_order(n));
++	new->itt = alloc_pages_shared(get_order(n));
+ 
+ 	its_data.nr_devices++;
+ 	return new;
 -- 
 2.34.1
 
