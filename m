@@ -1,137 +1,185 @@
-Return-Path: <kvm+bounces-14372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D65B88A240E
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 04:58:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B1198A2423
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 05:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59AA0B2454F
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 02:58:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F388BB219A2
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 03:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F3517BCE;
-	Fri, 12 Apr 2024 02:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QhUQf+B5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D280E14AB2;
+	Fri, 12 Apr 2024 03:02:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5C6175AB
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 02:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5F3125BA;
+	Fri, 12 Apr 2024 03:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712890696; cv=none; b=OMIesk7VaL8eESeKfaxmsa+rg6V51fdsagg4JfB3ae+BSDYiBsDMYSeDHy1CdL1w1txobmg1P3I5bbsDHClyiV0EOOop4qNM6buhVnvzkoanjyijaRqxzgb8rSC18XG5G0Vex8nO/33iRTrsCMMwWwSIrw3gv+uIN2nsIZvGjXM=
+	t=1712890978; cv=none; b=rr2DN+lxTkUBzV/mwFlsLIZ3wIdTT6J2nbtkSH9zuZHttK6+kfXkuMRgJJqlanog+E8lMJ43q70RmHZN7KKB4zqoIkhGquUCz2UF0tUUdhKkXrPCWRBeFdQ1krtPNbQNr81vqnRi7HD7IJ6hK5evBDwteYxKX0GiWg+NX7Tbs2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712890696; c=relaxed/simple;
-	bh=3CxaFDOCXmJ4jSKLNZ5qxIhMH7cfxfMjix9ZriuuATk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VCUZmYfBkEEjjIMiQzMjwDZjubHzGknX5mSPMpqn1QEPGLGMZrIdTw6I13dFKBFMG2T+n4MLLXBdpzLa+RDbvfmWF0V9OlZruXjsmnkmNBfUGrUru4EtWB3B2cuj1SDv4ZmF/xgiuVy3SXO+FPkuin59aAG6PkYpkZriRi0qRqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QhUQf+B5; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56e2e851794so4008a12.0
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 19:58:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712890693; x=1713495493; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JXfRbf/zJHU/DOTCa3Xemga7PSGX/nUeez1rccsZ9ws=;
-        b=QhUQf+B5zOrvzWnQgYdeymjPtd9za1jeBfBXW6lN11WYIw8wcLjNVWonUh7pJ1Uxwv
-         vcLGGT0kipBvhVCXs+7gst/k/IjR6XYdW0yEJm8jlRjDW9CXA53FbQQM57TKwkl0YAce
-         j6hjVBIPSdGA4r0kZzH8F1G3DG3LsD6M5L+LG8uu8c1EuWNMVP1d2/wdeSlVZt1iHkIa
-         wAor3RKB9UPLcu+ecN+BnmVUtMe7wvwCHIIEfRLNZeB+goSthepDIDtuzUlj6XZPH81N
-         sv1UQ7wBNQCdrBnxGZW2pmjxZDG2SoreBErN4azr4dhXUhq9ww8D5bRYaQNBptEWYExE
-         9PXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712890693; x=1713495493;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JXfRbf/zJHU/DOTCa3Xemga7PSGX/nUeez1rccsZ9ws=;
-        b=jjFkNR0L/grvFC7Lj41zDGkpdGtSywa3BGVUa6IiXUWXha6XWV8z8gsdXBOs9X7/G2
-         cZ7ATxhU0vu9roTUjxTZ2eqNqDXurHHYQBjilDQhkt7vxXxZ6bZU6BGIj7uaO70lc8P6
-         lPIv42vcX8NQ6bqQ7sJtbItAoKreqhcBmbIRXf1WnZ2Ayk3jDDmvOfj/KzNXxfua8Plc
-         Cs3xDmfzR7aeMsL6a+Vkgw/VgP41G01f0ZnDgLro8NXV0bSW6vsJ5+uKeGphQsM0vpgo
-         cKXw61z2q7ADltyVt5A79jiuOeWBaSh9T/6QN+6dcy/xlnseawkQuLt03Suwk248m4KD
-         Y9lw==
-X-Gm-Message-State: AOJu0Yz5Y021WRLMA0oSX2jqKJFrk5x5dA6OrbM5HUxE540pugckxWDv
-	yHVWkGUth9p+NMDcrbQ+tv8p1vGhVmXHq3d3hRb5GQobSZIb+WH8uHxBFCXIYQob9m5bMR9m7uR
-	pl4Om1511AHOEW8PjOJyE+/yFZBFtwaw5Ie9Z
-X-Google-Smtp-Source: AGHT+IFQor4Atwei9ocgDDKCRca8PGd2W5wGs7CB32E/FWVX0h83vesueXCnL8aiD94NlKLsigz+oXYNNSGWUQ8UBME=
-X-Received: by 2002:aa7:d6d0:0:b0:56e:85ba:cab0 with SMTP id
- x16-20020aa7d6d0000000b0056e85bacab0mr43584edr.7.1712890692423; Thu, 11 Apr
- 2024 19:58:12 -0700 (PDT)
+	s=arc-20240116; t=1712890978; c=relaxed/simple;
+	bh=mksHlutSXcQUklVG/Sm4Rj52riQY7SIjyLfdHrSpKqs=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=eP7L9CfuodQqN7zp+EO37gl3gIo0lFg/waWod/8tWjBLXnXYTyGduPkF0XK+lUKF0/cHrKEwa82w0nNqad302nYfZPJIHtdkseraEI7OZoRLbjahXmCR4pdzhf2KhNqC5e8idTMF8Nkc51LMWq63eYFbJG7WlC4uFpN4KhBLTR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VG1Z34nHXz1S5M8;
+	Fri, 12 Apr 2024 11:02:03 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8E4DC180063;
+	Fri, 12 Apr 2024 11:02:51 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 12 Apr 2024 11:02:51 +0800
+Subject: Re: [PATCH v4 4/4] Documentation: add debugfs description for hisi
+ migration
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+References: <20240402032432.41004-1-liulongfang@huawei.com>
+ <20240402032432.41004-5-liulongfang@huawei.com>
+ <20240404140750.78549701.alex.williamson@redhat.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <699fed1e-51c0-2d74-0f1f-6f45813f4cb4@huawei.com>
+Date: Fri, 12 Apr 2024 11:02:50 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240411205911.1684763-1-jmattson@google.com> <CAA0tLEor+Sqn6YjYdJWEs5+b9uPdaqQwDPChh1YEGWBi2NAAAw@mail.gmail.com>
-In-Reply-To: <CAA0tLEor+Sqn6YjYdJWEs5+b9uPdaqQwDPChh1YEGWBi2NAAAw@mail.gmail.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 11 Apr 2024 19:57:58 -0700
-Message-ID: <CALMp9eSBNjSXgsbhau-c68Ow_YoLvWBK6oUc1v1DqSfmDskmhg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
-To: Venkatesh Srinivas <venkateshs@chromium.org>
-Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240404140750.78549701.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
 
-On Thu, Apr 11, 2024 at 6:32=E2=80=AFPM Venkatesh Srinivas
-<venkateshs@chromium.org> wrote:
+On 2024/4/5 4:07, Alex Williamson wrote:
+> On Tue, 2 Apr 2024 11:24:32 +0800
+> Longfang Liu <liulongfang@huawei.com> wrote:
+> 
+>> Add a debugfs document description file to help users understand
+>> how to use the hisilicon accelerator live migration driver's
+>> debugfs.
+>>
+>> Update the file paths that need to be maintained in MAINTAINERS
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>  .../ABI/testing/debugfs-hisi-migration        | 34 +++++++++++++++++++
+>>  MAINTAINERS                                   |  1 +
+>>  2 files changed, 35 insertions(+)
+>>  create mode 100644 Documentation/ABI/testing/debugfs-hisi-migration
+>>
+>> diff --git a/Documentation/ABI/testing/debugfs-hisi-migration b/Documentation/ABI/testing/debugfs-hisi-migration
+>> new file mode 100644
+>> index 000000000000..3d7339276e6f
+>> --- /dev/null
+>> +++ b/Documentation/ABI/testing/debugfs-hisi-migration
+>> @@ -0,0 +1,34 @@
+>> +What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/data
+>> +Date:		Apr 2024
+>> +KernelVersion:  6.9
+> 
+> At best 6.10 with a merge window in May.
+> 
+>> +Contact:	Longfang Liu <liulongfang@huawei.com>
+>> +Description:	Read the live migration data of the vfio device.
+>> +		These data include device status data, queue configuration
+>> +		data and some task configuration data.
+>> +		The output format of the data is defined by the live
+>> +		migration driver.
+> 
+> "Dumps the device debug migration buffer, state must first be saved
+> using the 'save' attribute."
+> 
+>> +
+>> +What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/attr
+>> +Date:		Apr 2024
+>> +KernelVersion:  6.9
+>> +Contact:	Longfang Liu <liulongfang@huawei.com>
+>> +Description:	Read the live migration attributes of the vfio device.
+>> +		it include device status attributes and data length attributes
+>> +		The output format of the attributes is defined by the live
+>> +		migration driver.
+> 
+> AFAICT from the previous patch, this attribute is useless.
+> 
+>> +
+>> +What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/cmd_state
+>> +Date:		Apr 2024
+>> +KernelVersion:  6.9
+>> +Contact:	Longfang Liu <liulongfang@huawei.com>
+>> +Description:	Used to obtain the device command sending and receiving
+>> +		channel status. If successful, returns the command value.
+>> +		If failed, return error log.
+>> +
+> 
+> Seems like it statically returns "OK" plus the actual value.
+> 
+> 
+>> +What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/save
+>> +Date:		Apr 2024
+>> +KernelVersion:  6.9
+>> +Contact:	Longfang Liu <liulongfang@huawei.com>
+>> +Description:	Trigger the Hisilicon accelerator device to perform
+>> +		the state saving operation of live migration through the read
+>> +		operation, and output the operation log results.
+> 
+> These interfaces are confusing, attr and data only work if there has
+> either been a previous save OR the user migration process closed saving
+> or resuming fds in the interim, and the user doesn't know which one
+> they get.  Note that debug_migf isn't even discarded between
+> open/close, only cmd and save require the device to be opened by a
+> user, data and attr might continue to return data from some previous
+> user save, resume, or debugfs save.
 >
-> On Thu, Apr 11, 2024 at 1:59=E2=80=AFPM Jim Mattson <jmattson@google.com>=
- wrote:
-> >
-> > From Intel's documention [1], "CPUID.(EAX=3D07H,ECX=3D0):EDX[26]
-> > enumerates support for indirect branch restricted speculation (IBRS)
-> > and the indirect branch predictor barrier (IBPB)." Further, from [2],
-> > "Software that executed before the IBPB command cannot control the
-> > predicted targets of indirect branches (4) executed after the command
-> > on the same logical processor," where footnote 4 reads, "Note that
-> > indirect branches include near call indirect, near jump indirect and
-> > near return instructions. Because it includes near returns, it follows
-> > that **RSB entries created before an IBPB command cannot control the
-> > predicted targets of returns executed after the command on the same
-> > logical processor.**" [emphasis mine]
-> >
-> > On the other hand, AMD's "IBPB may not prevent return branch
-> > predictions from being specified by pre-IBPB branch targets" [3].
-> >
-> > Since Linux sets the synthetic feature bit, X86_FEATURE_IBPB, on AMD
-> > CPUs that implement the weaker version of IBPB, it is incorrect to
-> > infer from this and X86_FEATURE_IBRS that the CPU supports the
-> > stronger version of IBPB indicated by CPUID.(EAX=3D07H,ECX=3D0):EDX[26]=
-.
->
-> AMD's IBPB does apply to RET predictions if Fn8000_0008_EBX[IBPB_RET] =3D=
- 1.
-> Spot checking, Zen4 sets that bit; and the bulletin doesn't apply there.
 
-So, with a definition of X86_FEATURE_AMD_IBPB_RET, this could be:
+data: Indicates the device migration data obtained after the migration is completed.
+This data is saved in debug_migf. The user reads it through "cat" and
+presents it to the user in the form of hexadecimal pure data.
 
-       if (boot_cpu_has(X86_FEATURE_AMD_IBPB_RET) &&
-boot_cpu_has(X86_FEATURE_IBRS))
-               kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
+attr: Indicates the configuration parameters of the migration process after the
+migration is completed. These parameters are saved in vfio device and debug_migf.
+The user reads it through "cat" and presents it to the user in the form of key-value
+pairs such as <attribute name, attribute value>.
 
-And, in the other direction,
+Save is an action process. After "cat" it, a migration save operation will be
+performed and the result data will be updated to debug_migf.
 
-    if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
-        kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
+There is still a big difference between data and attr, and the data formats are
+also different. Not merging makes it easier for users to obtain information.
+If you feel confused about save, it is recommended to use migrate_save.
 
-But, perhaps all of this cross-vendor equivalence logic belongs in user spa=
-ce.
+Thanks,
+Longfang.
 
-> (Also checking - IA32_SPEC_CTRL and IA32_PRED_CMD are both still
-> available; is there anything in KVM that keys off just X86_FEATURE_SPEC_C=
-TRL?
-> I'm not seeing it...)
-
-I hope not. It looks like all of the guest_cpuid checks for SPEC_CTRL
-also check for the AMD bits (e.g. guest_has_spec_ctrl_msr()).
+> 
+> 
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 7625911ec2f1..8c2d13b13273 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -23072,6 +23072,7 @@ M:	Longfang Liu <liulongfang@huawei.com>
+>>  M:	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>>  L:	kvm@vger.kernel.org
+>>  S:	Maintained
+>> +F:	Documentation/ABI/testing/debugfs-hisi-migration
+>>  F:	drivers/vfio/pci/hisilicon/
+>>  
+>>  VFIO MEDIATED DEVICE DRIVERS
+> 
+> .
+> 
 
