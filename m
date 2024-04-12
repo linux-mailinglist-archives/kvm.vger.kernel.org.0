@@ -1,172 +1,116 @@
-Return-Path: <kvm+bounces-14562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98D7C8A34F8
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 19:40:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD05C8A3523
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 19:50:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27AA71F240C4
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 17:40:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E0201F23F4E
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 17:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6BA14EC52;
-	Fri, 12 Apr 2024 17:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB58514E2EF;
+	Fri, 12 Apr 2024 17:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LyPQISXo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nBeigbiD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC81149009;
-	Fri, 12 Apr 2024 17:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7321214D29E;
+	Fri, 12 Apr 2024 17:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712943583; cv=none; b=cDIDEqyTiNDmympcLiGNkbXll365v8wy0qQPXR9W+voZmN4DykfRCvSWaknEf2ll451yLC3NcyppHpPPVL9gGKqg8ZQAe+/92DuTTYUtF/AJAOKBU3olqTlHfhOzD/4cLyfDgeymrJI/GzRYBb4K+LC0D6YLLsxYlYcpri99ggQ=
+	t=1712944210; cv=none; b=fvUz2gvMSM+qw7rJZE/dnYspzSJ5UHXd/76bp32LyWqTAiF+93ZmTMX9Bge9luU1fzj7PjX0AxLzbtUVe6spkVaok6f/NvJJsNeAMHXa3tl5qa1cpdPDjNYX8oDaVK3wryWq4mnKt/GenDGlpLpJRkx1lMgPESaUsAJIY3i6dOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712943583; c=relaxed/simple;
-	bh=BLEtjVnBJnqOweid/o9LC3AV3pOUNEEl+F0GkqNkFZY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FH+ZouSA/BXCU+3TM+AZWD7zhZjLBUyuObm26h8QZJHpsSJh3PtYwkXsuUbW88VBJ27FqDoz4uQyw8iDZD34miTbT6tyb49wNVWnpHn+THBLX0a5GbfhmKdZYRrB1pUFRQH1H+/UESkM1+f6beGFZxBeuqKadCXkBseZF9npp7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LyPQISXo; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1712944210; c=relaxed/simple;
+	bh=sQu31TKj1DykuJKDUxWpDtj7xAwMdG8O2RnnSSWBS5g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WxnLU+SSaPEMGxobH276nROtM2BCnZomARt346F+eAI0aAXSwa5j7NdBdbifNfQgzan//JV8x+W3V93dgsPHnxKd41h/CPqX9aSNoHVgD1+835sXoJEGO+6VsV4ValXt7nSdcLwQculrop6rJR5t1B0Yy5QQ/pxhBl2/H97Ww/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nBeigbiD; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712943581; x=1744479581;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=BLEtjVnBJnqOweid/o9LC3AV3pOUNEEl+F0GkqNkFZY=;
-  b=LyPQISXowwLs8hF6e9XiqxVrGM9ZpDw/e21JwcdiM2RC+l5DI5CcjkCb
-   TNNHbPfPxpNGn3tUxPPpxY76wPGb+J7VgomC2jT+SDekifRbAt4m5Fuwq
-   gCKAgqPRNW9t7+c4iTcKj3K4lr9KUMcv9lZX5Z5yf8jRzAR4VnI9CUtsK
-   6SBsqH/kgjfZxhSkkE3m+e1QV8qccb1fCHdWADUYlyXNuuQvNKRClGZLW
-   4rFJosugwQbLXEDrg8GRaHfUYjGdR8dNn7UumrrM7Z8XPX+dSmcFF2UfH
-   G3ThtBHFBemj0FaqlfCRmzByj4vPsD3e2HTX07cm4iQQr7GsHScYYKooB
-   g==;
-X-CSE-ConnectionGUID: ztjrNoHFSye3GXWj8f/EhQ==
-X-CSE-MsgGUID: MoJXHl80TjWVm4geLrv+HA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8277874"
+  t=1712944210; x=1744480210;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=sQu31TKj1DykuJKDUxWpDtj7xAwMdG8O2RnnSSWBS5g=;
+  b=nBeigbiDKJYV6/1ZTKVab89uK9xzVrUosCK2BCdjLXKHHyPPsM43nDvQ
+   DnQmzPmWTgEcH+A4Xfws82dPLYI2nApNvgNoxmAeYppQKuE+8ll9sQ0Hu
+   HCnlQs8cnwPX+067YrJfPiumPwwG0WtJCoy9ofHq2KUlU8OFLvG/9IKf5
+   kWKUK+WNl6PiI+1hSA7J3EdTAw3x10kRcIyNMfs5EePjJKzV+di4oa2MN
+   +RM17pK2jCbyxiXxX25jWoYgcB35O1gcIYGGEJ1ytKya2R9rwOfBeXrL1
+   Oy6TY7CeWEd3cPRXPFGS8jKVoQmzBplzhwctRVHOj8y89KZLJmmHRmTW8
+   A==;
+X-CSE-ConnectionGUID: 522dSkskSMC1nJVgEHFDmA==
+X-CSE-MsgGUID: tjd5DmhRRU+SJueWOuP4Sg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8586232"
 X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8277874"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:39:41 -0700
-X-CSE-ConnectionGUID: Q/wtgR9TSKKcHm8USHN4oA==
-X-CSE-MsgGUID: x4MyejV5RhG52WFZYasWAA==
+   d="scan'208";a="8586232"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:50:09 -0700
+X-CSE-ConnectionGUID: xrZhma/XTdiCshLxpuCXCA==
+X-CSE-MsgGUID: A55UTogyQJ+4WxvqXu3GaA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="26094811"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:39:41 -0700
-Date: Fri, 12 Apr 2024 10:39:35 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"davidskidmore@google.com" <davidskidmore@google.com>,
-	"srutherford@google.com" <srutherford@google.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Wei W" <wei.w.wang@intel.com>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
-Message-ID: <20240412173935.GH3039520@ls.amr.corp.intel.com>
-References: <8b40f8b1d1fa915116ef1c95a13db0e55d3d91f2.camel@intel.com>
- <ZhVdh4afvTPq5ssx@google.com>
- <4ae4769a6f343a2f4d3648e4348810df069f24b7.camel@intel.com>
- <ZhVsHVqaff7AKagu@google.com>
- <b1d112bf0ff55073c4e33a76377f17d48dc038ac.camel@intel.com>
- <ZhfyNLKsTBUOI7Vp@google.com>
- <2c11bb62-874e-4e9e-89b1-859df5b560bc@intel.com>
- <ZhgBGkPTwpIsE6P6@google.com>
- <437e0da5de22c0a1e77e25fcb7ebb1f052fef754.camel@intel.com>
- <19a0f47e-6840-42f8-b200-570a9aa7455d@intel.com>
+   d="scan'208";a="21380981"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:50:08 -0700
+Date: Fri, 12 Apr 2024 10:54:39 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, "iommu@lists.linux.dev"
+ <iommu@lists.linux.dev>, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
+ <baolu.lu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "Hansen, Dave" <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H.
+ Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
+ <mingo@redhat.com>, "Luse, Paul E" <paul.e.luse@intel.com>, "Williams, Dan
+ J" <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, "Raj, Ashok"
+ <ashok.raj@intel.com>, "maz@kernel.org" <maz@kernel.org>,
+ "seanjc@google.com" <seanjc@google.com>, Robin Murphy
+ <robin.murphy@arm.com>, "jim.harris@samsung.com" <jim.harris@samsung.com>,
+ "a.manzanares@samsung.com" <a.manzanares@samsung.com>, Bjorn Helgaas
+ <helgaas@kernel.org>, "Zeng, Guang" <guang.zeng@intel.com>,
+ "robert.hoo.linux@gmail.com" <robert.hoo.linux@gmail.com>,
+ jacob.jun.pan@linux.intel.com
+Subject: Re: [PATCH v2 06/13] x86/irq: Set up per host CPU posted interrupt
+ descriptors
+Message-ID: <20240412105439.37aa12cc@jacob-builder>
+In-Reply-To: <BN9PR11MB527696368E4022DBAC9DD7768C042@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
+	<20240405223110.1609888-7-jacob.jun.pan@linux.intel.com>
+	<BN9PR11MB527696368E4022DBAC9DD7768C042@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <19a0f47e-6840-42f8-b200-570a9aa7455d@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 12, 2024 at 04:40:37PM +0800,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+Hi Kevin,
 
-> > The second issue is that userspace can’t know what CPUID values are configured
-> > in the TD. In the existing API for normal guests, it knows because it tells the
-> > guest what CPUID values to have. But for the TDX module that model is
-> > complicated to fit into in its API where you tell it some things and it gives
-> > you the resulting leaves. How to handle KVM_SET_CPUID kind of follows from this
-> > issue.
+On Fri, 12 Apr 2024 09:16:25 +0000, "Tian, Kevin" <kevin.tian@intel.com>
+wrote:
+
+> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Sent: Saturday, April 6, 2024 6:31 AM
 > > 
-> > One option is to demand the TDX module change to be able to efficiently wedge
-> > into KVM’s exiting “tell” model. This looks like the metadata API to query the
-> > fixed bits. Then userspace can know what bits it has to set, and call
-> > KVM_SET_CPUID with them. I think it is still kind of awkward. "Tell me what you
-> > want to hear?", "Ok here it is".
-> > 
-> > Another option would be to add TDX specific KVM APIs that work for the TDX
-> > module's “ask” model, and meet the enumerated two goals. It could look something
-> > like:
-> > 1. KVM_TDX_GET_CONFIG_CPUID provides a list of directly configurable bits by
-> > KVM. This is based on static data on what KVM supports, with sanity check of
-> > TD_SYSINFO.CPUID_CONFIG[]. Bits that KVM doesn’t know about, but are returned as
-> > configurable by TD_SYSINFO.CPUID_CONFIG[] are not exposed as configurable. (they
-> > will be set to 1 by KVM, per the recommendation)
+> > +#ifdef CONFIG_X86_POSTED_MSI
+> > +
+> > +/* Posted Interrupt Descriptors for coalesced MSIs to be posted */
+> > +DEFINE_PER_CPU_ALIGNED(struct pi_desc, posted_interrupt_desc);  
 > 
-> This is not how KVM works. KVM will never enable unknown features blindly.
-> If the feature is unknown to KVM, it cannot be enable for guest. That's why
-> every new feature needs enabling patch in KVM, even the simplest case that
-> needs one patch to enumerate the CPUID of new instruction in
-> KVM_GET_SUPPORTED_CPUID.
+> 'posted_msi_desc' to be more accurate?
+makes sense, will do.
 
-We can use device attributes as discussed at
-https://lore.kernel.org/kvm/CABgObfZzkNiP3q8p=KpvvFnh8m6qcHX4=tATaJc7cvVv2QWpJQ@mail.gmail.com/
-https://lore.kernel.org/kvm/20240404121327.3107131-6-pbonzini@redhat.com/
+Thanks,
 
-Something like
-
-#define KVM_X86_GRP_TDX         2
-ioctl(fd, KVM_GET_DEVICE_ATTR, (KVM_X86_GRP_TDX, metadata_field_id))
-
-
-> > 2. KVM_TDX_INIT_VM is passed userspaces choice of configurable bits, along with
-> > XFAM and ATTRIBUTES as dedicated fields. They go into TDH.MNG.INIT.
-> > 3. KVM_TDX_INIT_VCPU_CPUID takes a list of CPUID leafs. It pulls the CPUID bits
-> > actually configured in the TD for these leafs. They go into the struct kvm_vcpu,
-> > and are also passed up to userspace so everyone knows what actually got
-> > configured.
-
-Any reason to introduce KVM_TDX_INIT_VCPU_CPUID in addition to
-KVM_TDX_INIT_VCPU?  We can make single vCPU KVM TDX ioctl do all.
-
-
-> > KVM_SET_CPUID is not used for TDX.
-
-What cpuid does KVM_TDX_INIT_VCPU_CPUID accept?  The one that TDX module
-accepts with TDH.MNG.INIT()?  Or any cpuids that KVM_SET_CPUID2 accepts?
-I'm asking it because TDX module virtualizes only subset of CPUIDs. 
-TDG.VP.VMCALL<CPUID> would need info from KVM_SET_CPUID.
-
-
-> > Then we get TDX module folks to commit to never breaking KVM/userspace that
-> > follows this logic. One thing still missing is how to handle unknown future
-> > leafs with fixed bits. If a future leaf is defined and gets fixed 1, QEMU
-> > wouldn't know to query it.
-> 
-> We can make KVM_TDX_INIT_VCPU_CPUID provide a large enough CPUID leafs and
-> KVM reports every leafs to userpsace. Instead of something that userspace
-> cares leafs X,Y,Z and KVM only reports back leafs X,Y,Z via
-> KVM_TDX_INIT_VCPU_CPUID.
-
-If new CPUID index is introduced, the userspace will get default values of
-CPUIDs and don't touch unknown CPUIDs?  Or KVM_TDX_GET_CONFIG_CPUID will mask
-out CPUID unknown to KVM?
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Jacob
 
