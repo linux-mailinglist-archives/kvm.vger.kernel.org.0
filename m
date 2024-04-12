@@ -1,196 +1,137 @@
-Return-Path: <kvm+bounces-14549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE9C8A3400
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 18:46:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97ED58A340E
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 18:52:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EECB1C2221C
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 16:46:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8DA31C21D8F
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 16:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE6914BF8F;
-	Fri, 12 Apr 2024 16:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378B314BF8B;
+	Fri, 12 Apr 2024 16:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eprr8eHH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rw/V2yri"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E15382C60;
-	Fri, 12 Apr 2024 16:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E6C14B075
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 16:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712940356; cv=none; b=MdKkActTwF4aWx4kHz17qCdeZts7zAU34tN/kttVviS4PSDsXSRiDezfWtF4YGPOiwO6Cc93U4vYJvFWu3BMLCXKteXCIUAXFZB+WZ8fbEJQxqGRSduO2QbuvLgxhXPaDgTmoLjBIGgIEF/CTvoz4BkoPLBaTGsiduwCzkv7MyI=
+	t=1712940736; cv=none; b=JNDvC4KwvJ+3mdWrGlrKHP7fWLYGq1Uw7n4VryEffkXdN1mepYqr0htADh2Ar+PsGeCg7zYw4qu7WrtaV2bh3GPZv7eYLp4s89b9m/6iLzYriDUzHVRxXHaBMBYMYeLlrgQjUpV0K0xWALynoBsFcsSpUuSvGgLvqncSLwGzmYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712940356; c=relaxed/simple;
-	bh=oM4DdzknAHFnE6mRuMA2wl+932rmGVqLnvyBIg43hbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a+ZmpnfGR6aadpdNn/7XUECc/SDT/3wUuM1/CzEKJqK2OJu3u1mO/r1R9VvXwOAml68zt77IJcKwTzRGa55IirLWM5lnt44ElfhZEqsCqYY3cPU1xOtMu9gAXntcj0CjAU8i3R6aw9qz0D53uUysA5tpVqONyTLyeFuB119w1fQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eprr8eHH; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712940354; x=1744476354;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=oM4DdzknAHFnE6mRuMA2wl+932rmGVqLnvyBIg43hbc=;
-  b=eprr8eHHXXfXFNLW7WEPRihqPXeZ+MnbX26R5Y2Ami0pBpVSEkkWBtLD
-   d8tSf7J6XlPHraEYbXrJ1vjBq4SrDRBOqSy8+TcUTaWdsZY5+JO9UVv1M
-   zjzwefHLrMk4fTGgQpRtOsGT6mZcj3QL2cy70nQn4AYBMt1+LkPL6yMzf
-   glaIqLU3PyoOjQLx7EcGF0H5xLO0zgmY0wcrx5MjvDPOh/8h9kT2xB2Pl
-   sUX11YmQYFYi/e4ZDz5sEpYvqGlSw0KpS6AzH0pZYGcG0F9l5BA5yw2Sj
-   yOjsRTsWtw+WA1qB2qd2rGLLJLQTUd+bq7dH7ikkNS6ZJt/ZsBA4zflCe
-   Q==;
-X-CSE-ConnectionGUID: AEZOwvMMReqMTNOKKeR0qA==
-X-CSE-MsgGUID: i8LM4LpyRSuftY+9GQZDmg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8579705"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8579705"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 09:45:53 -0700
-X-CSE-ConnectionGUID: 80Tnr3S/TTO8zdcQeBQRVg==
-X-CSE-MsgGUID: 0APbk5XIQdKfqoIoV9mNrw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="21703737"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 09:45:52 -0700
-Date: Fri, 12 Apr 2024 09:50:22 -0700
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
- Zijlstra <peterz@infradead.org>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
- <baolu.lu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Hansen, Dave" <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H.
- Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
- <mingo@redhat.com>, "Luse, Paul E" <paul.e.luse@intel.com>, "Williams, Dan
- J" <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, "Raj, Ashok"
- <ashok.raj@intel.com>, "maz@kernel.org" <maz@kernel.org>,
- "seanjc@google.com" <seanjc@google.com>, Robin Murphy
- <robin.murphy@arm.com>, "jim.harris@samsung.com" <jim.harris@samsung.com>,
- "a.manzanares@samsung.com" <a.manzanares@samsung.com>, Bjorn Helgaas
- <helgaas@kernel.org>, "Zeng, Guang" <guang.zeng@intel.com>,
- "robert.hoo.linux@gmail.com" <robert.hoo.linux@gmail.com>,
- jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v2 07/13] x86/irq: Factor out calling ISR from
- common_interrupt
-Message-ID: <20240412095022.592508c9@jacob-builder>
-In-Reply-To: <BN9PR11MB52769DCDF70B551FCFF22DC58C042@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
-	<20240405223110.1609888-8-jacob.jun.pan@linux.intel.com>
-	<BN9PR11MB52769DCDF70B551FCFF22DC58C042@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1712940736; c=relaxed/simple;
+	bh=JEVa4ex2ZDcngKNJsXDeM2lwaJ7PKNt/9rGEMEiRKOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=XS9CdBnbOOpjR45eQee6eC1g0WzMrFsA4rjES7/QCPe/NapARhRqDROVSdpdzHCPMKk4mClYPhCuLb3uRveXixQdXj5ErsIs1jRB5wSOubV62kWDGHiKq004iqT0K5XkuyrO4WGBNPZRyS1A7rCQSNUIUBP0nv2G2RGXmf0xWSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Rw/V2yri; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d715638540so12818291fa.3
+        for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 09:52:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1712940733; x=1713545533; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F129E/qMOIsRNJvcD537N8BPcYpqI13fs6vRxipyLXs=;
+        b=Rw/V2yriWqv/AZKsihsTM1444GfquRK3pD3IMxStklXaUCWBkkmAhhgjllHSLHw+Lh
+         N1jRhCSmBDqce/2b/2HnsAiQVoSKp0CooFXPJ3FXjl4woU7/GPCV2iI9kvZOT2LrM4Wc
+         HvCUufg9UQE8b7Kp4WjAHD8+MMHbmA9oPl2pE32dVrwhRS8qrOW03oSIlmgT3nroz87u
+         mmMuCtBC8IfIHbPJ4brRHKLMMGVuyRWqvX308q9SdeAFN7CKNRtj8/GOr6cAPwcPq9c0
+         yqfuYDebKbsxhDvWKDjRp+FYXmbsNurAqH7ifDdhbhK2z6pU+9Ks6JxBRcB9abd/mSmw
+         8vuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712940733; x=1713545533;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F129E/qMOIsRNJvcD537N8BPcYpqI13fs6vRxipyLXs=;
+        b=wCak7fTakLzEkvAQQJnSpeAKMHJb88h5YxRGUD+S6LdVt3ENm9DRhFYK5rCdvI/E7E
+         W9HlVDe4K6wvZ0FYfqxevhJYxy3BwTqObC2UCzmz0v/cEE8LoY03iq7xfsfQ1gNicTNi
+         bMAhP+Qtcl++u4P8wVUHkseD8YxeIKnZnhLjI3WxGomo155EiJTbux0KOihLqLADR8hT
+         zm6+HLu7/Bm9eKYG7fG0ULvmDpk/tjEW2LjaPAPyI0HXwu/iyd3XlU6JId/YKBFI5eFL
+         E43OKVzAH9FiFWStYHg7uLzbZFPtBjJNZqHEHKQB3C1+Hw/nVbupSxYl1lOUX08SLGwP
+         DYbg==
+X-Gm-Message-State: AOJu0Yz0zGe9Nr7WFd9UNSaASGdMRdjKrDF4H3/mj1C2OSgyMFb1Ot+E
+	r/V88Rg3KXndQC63A1oKoVE7plk8tYrIVQBT52jYN1aJI0vjA4RpK7KeEacQc5w=
+X-Google-Smtp-Source: AGHT+IFM2/dXuGXELLLfc+flbBb9xsmkA1SIJGRaZWidPMq1PtFsBq8OiGD0hOU+ZU8oOVk804e3sg==
+X-Received: by 2002:a05:651c:93:b0:2d8:3e60:b9c9 with SMTP id 19-20020a05651c009300b002d83e60b9c9mr1767624ljq.33.1712940732768;
+        Fri, 12 Apr 2024 09:52:12 -0700 (PDT)
+Received: from myrica ([2.221.137.100])
+        by smtp.gmail.com with ESMTPSA id fc18-20020a05600c525200b0041563096e15sm9497631wmb.5.2024.04.12.09.52.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 09:52:12 -0700 (PDT)
+Date: Fri, 12 Apr 2024 17:52:24 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Thomas Fossati <thomas.fossati@linaro.org>,
+	Kevin Zhao <kevin.zhao@linaro.org>,
+	Leonardo Augusto =?utf-8?Q?Guimar=C3=A3es?= Garcia <leonardo.garcia@linaro.org>
+Subject: Re: [v2] Support for Arm CCA VMs on Linux
+Message-ID: <20240412165224.GA357251@myrica>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240412084056.1733704-1-steven.price@arm.com>
 
-Hi Kevin,
-
-On Fri, 12 Apr 2024 09:21:45 +0000, "Tian, Kevin" <kevin.tian@intel.com>
-wrote:
-
-> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Sent: Saturday, April 6, 2024 6:31 AM
-> > 
-> > Prepare for calling external IRQ handlers directly from the posted MSI
-> > demultiplexing loop. Extract the common code with common interrupt to
-> > avoid code duplication.
-> > 
-> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > ---
-> >  arch/x86/kernel/irq.c | 23 ++++++++++++++---------
-> >  1 file changed, 14 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-> > index f39f6147104c..c54de9378943 100644
-> > --- a/arch/x86/kernel/irq.c
-> > +++ b/arch/x86/kernel/irq.c
-> > @@ -242,18 +242,10 @@ static __always_inline void handle_irq(struct
-> > irq_desc *desc,
-> >  		__handle_irq(desc, regs);
-> >  }
-> > 
-> > -/*
-> > - * common_interrupt() handles all normal device IRQ's (the special SMP
-> > - * cross-CPU interrupts have their own entry points).
-> > - */
-> > -DEFINE_IDTENTRY_IRQ(common_interrupt)
-> > +static __always_inline void call_irq_handler(int vector, struct
-> > pt_regs *regs) {
-> > -	struct pt_regs *old_regs = set_irq_regs(regs);
-> >  	struct irq_desc *desc;
-> > 
-> > -	/* entry code tells RCU that we're not quiescent.  Check it. */
-> > -	RCU_LOCKDEP_WARN(!rcu_is_watching(), "IRQ failed to wake up
-> > RCU");
-> > -
-> >  	desc = __this_cpu_read(vector_irq[vector]);
-> >  	if (likely(!IS_ERR_OR_NULL(desc))) {
-> >  		handle_irq(desc, regs);  
+On Fri, Apr 12, 2024 at 09:40:56AM +0100, Steven Price wrote:
+> We are happy to announce the second version of the Arm Confidential
+> Compute Architecture (CCA) support for the Linux stack. The intention is
+> to seek early feedback in the following areas:
+>  * KVM integration of the Arm CCA;
+>  * KVM UABI for managing the Realms, seeking to generalise the
+>    operations where possible with other Confidential Compute solutions;
+>  * Linux Guest support for Realms.
 > 
-> the hidden lines has one problem:
+> See the previous RFC[1] for a more detailed overview of Arm's CCA
+> solution, or visible the Arm CCA Landing page[2].
 > 
-> 	} else {
-> 		apic_eoi();
-> 
-> 		if (desc == VECTOR_UNUSED) {
-> 			...
-> 
-> there will be two EOI's for unused vectors, adding the one
-> in sysvec_posted_msi_notification().
+> This series is based on the final RMM v1.0 (EAC5) specification[3].
 
-Indeed this unlikely case could cause lost interrupt. Imagine we have:
+Instructions for building and running the CCA stack on QEMU, both as
+system emulation and VMM, are available here:
+https://linaro.atlassian.net/wiki/spaces/QEMU/pages/29051027459/Building+an+RME+stack+for+QEMU
 
-- IDT vector N (MSI notification), O, and P (other high-priority
-system vectors).
-- Device MSI vector A which triggers N.
-
-Action 			APIC IRR		APIC ISR
----------------------------------------------------------
-Device MSI A		N
-APIC accepts N		-			N
-New IRQs arrive		O,P			N
-handle_irq(A)
-eoi() due to A's fault	-			O,P
-eoi in post_msi		-			P
-----------------------------------------------------------
-The second EOI clears ISR for vector O but missed processing it.
-
-
-Intel SDM 11.8.4 for background.
-"The IRR contains the active interrupt requests that have been accepted,
-but not yet dispatched to the processor for servicing. When the local APIC
-accepts an interrupt, it sets the bit in the IRR that corresponds the
-vector of the accepted interrupt. When the processor core is ready to
-handle the next interrupt, the local APIC clears the highest priority IRR
-bit that is set and sets the corresponding ISR bit. The vector for the
-highest priority bit set in the ISR is then dispatched to the processor
-core for servicing.
-
-While the processor is servicing the highest priority interrupt, the local
-APIC can send additional fixed interrupts by setting bits in the IRR. When
-the interrupt service routine issues a write to the EOI register (see
-Section 11.8.5, Signaling Interrupt Servicing Completion), the local APIC
-responds by clearing the highest priority ISR bit that is set. It then
-repeats the process of clearing the highest priority bit in the IRR and
-setting the corresponding bit in the ISR. The processor core then begins
-executing the service routing for the highest priority bit set in the ISR
-"
-
-I need to avoid the duplicated EOI in this case and at minimum cost for the
-hot path.
+I'll send out the QEMU VMM patches shortly:
+https://git.codelinaro.org/linaro/dcap/qemu.git branch cca/v2
 
 Thanks,
+Jean
 
-Jacob
+> [1] Previous RFC
+>     https://lore.kernel.org/r/20230127112248.136810-1-suzuki.poulose%40arm.com
+> [2] Arm CCA Landing page (See Key Resources section for various documentation)
+>     https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+> [3] RMM v1.0-EAC5 specification
+>     https://developer.arm.com/documentation/den0137/1-0eac5/
+> [4] Shrinkwrap
+>     https://git.gitlab.arm.com/tooling/shrinkwrap
+> [5] Linux support for Arm CCA RMM v1.0-EAC5
+>     https://lore.kernel.org/r/fb259449-026e-4083-a02b-f8a4ebea1f87%40arm.com
+
+
+> 
 
