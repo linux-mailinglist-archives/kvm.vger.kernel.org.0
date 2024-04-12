@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-14491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EE398A2C68
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:34:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB508A2C69
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:35:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F29A11F22E36
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:34:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 233911F22F63
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A833941775;
-	Fri, 12 Apr 2024 10:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587E3548E4;
+	Fri, 12 Apr 2024 10:34:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E9653E2C
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16753D3A5
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712918072; cv=none; b=Ubi7fCY+ejBBMSsqYSyWnohgC+oB7wNQYd8mjZtA2tag9BzGEWo7vqYSNj7U+N2rjOGmE/GsaUuk8A4gWYPi7ONNem9t+Y+UI0AgCT7Qlk86JLLIY2LCF+sfsXDJFQJgNm/nYIwoSmlbaX961GN+LNrt5/0sYgiu5agp26QcMPg=
+	t=1712918072; cv=none; b=F4OUZPtDKQqXXyNg2qMP2qO3hkLVFDgRIxDs7giIhWaGrBJdrP/kLQJUxnM8/bi2/PFioJ0EXqWmv30apQz7e3hDYPEIGJ/GrkPUA8bsaDxIJgnnKR6N09VOYGByP1r8Y7hafqdBt05hPI5J9vbxOIe+gKQaSOaBI+DQnQZ1VO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712918072; c=relaxed/simple;
-	bh=PBKBUp97P8eoyN/ra1CCrlsEyi837XItbFWwB4E9wGs=;
+	bh=wGw6CcIJAysOApAC+Vfzho1XvYBd6h7CzTUlgE3tGXU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZYqFZkhkPKGnytWV2cHScHzWyY5nmpTreBc0idL5TkyeVol8tBU4BplYmGJHVR3FDla139UT7b46BxR57bH5sdBdqq58p0DWEchaJ/r4eRkKDFOZbUlXWDpXH0CbQiyBqs10lYfd0tPgVdTgHT2i4UIeyvfbH/oZe428Wg+uABU=
+	 MIME-Version; b=rU0rVNBeHRu+0fgw5P4ZL2+1hiERglQ8z4XNz05aXB9/7PgUcqZYmrO9oCkqKCz61favZB8zIJYhVjMU6JOv8CisfJApO9jJ4Q9jeuL9xRiuVj0xRb4EsOPp95FTFiZNyVleUmn81ioJci5zYWs7EURQOCDbwPWdThkK7pYhfk4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7BBB4339;
-	Fri, 12 Apr 2024 03:34:58 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D324113E;
+	Fri, 12 Apr 2024 03:35:00 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 85C5B3F64C;
-	Fri, 12 Apr 2024 03:34:27 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7C6C83F64C;
+	Fri, 12 Apr 2024 03:34:29 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -47,10 +47,11 @@ Cc: kvm@vger.kernel.org,
 	yuzenghui@huawei.com,
 	andrew.jones@linux.dev,
 	eric.auger@redhat.com,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvm-unit-tests PATCH 05/33] arm64: Introduce NS_SHARED PTE attribute
-Date: Fri, 12 Apr 2024 11:33:40 +0100
-Message-Id: <20240412103408.2706058-6-suzuki.poulose@arm.com>
+Subject: [kvm-unit-tests PATCH 06/33] arm: Move io_init after vm initialization
+Date: Fri, 12 Apr 2024 11:33:41 +0100
+Message-Id: <20240412103408.2706058-7-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
@@ -62,81 +63,48 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Joey Gouly <joey.gouly@arm.com>
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-Introduce a new attribute to indicate the mapping is "Shared" with the
-host. This will be used by the Realms to share pages with the Host.
-For normal VMs, this is always 0.
+To create shared pages, the NS_SHARED bit must be written into the
+idmap. Before VM initializations, idmap hasn't necessarily been created.
+To write shared pages, access must be done on a IPA with the NS_SHARED
+bit. When the stage-1 MMU is enabled, that bit is set in the PTE. But
+when the stage-1 MMU is disabled, then the realm must write to the IPA
+with NS_SHARED directly.
 
-For realms, this is dynamic, depending on the IPA width. The top bit of the
-IPA is "treated" as the "NS_SHARED" attribute, making the VM access the
-unprotected alias of the IPA.
+To avoid changing the whole virtio infrastructure to support pre-MMU in
+a realm, move the IO initialization after MMU enablement.
 
-By default, apply the NS_SHARED attribute for all I/O.
-
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-[ Fix arm32 build failure ]
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- lib/arm/asm/pgtable.h   | 2 ++
- lib/arm/mmu.c           | 5 ++++-
- lib/arm64/asm/pgtable.h | 7 +++++++
- 3 files changed, 13 insertions(+), 1 deletion(-)
+ lib/arm/setup.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
-index aa98d9ad..350039ff 100644
---- a/lib/arm/asm/pgtable.h
-+++ b/lib/arm/asm/pgtable.h
-@@ -42,6 +42,8 @@
- 	(((addr) >> PGDIR_SHIFT) & (PTRS_PER_PGD - 1))
- #define pgd_offset(pgtable, addr) ((pgtable) + pgd_index(addr))
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 34381218..fbb8f523 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -262,9 +262,6 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+ 	/* cpu_init must be called before thread_info_init */
+ 	thread_info_init(current_thread_info(), 0);
  
-+#define PTE_NS_SHARED		0
+-	/* mem_init must be called before io_init */
+-	io_init();
+-
+ 	timer_save_state();
+ 
+ 	ret = dt_get_bootargs(&bootargs);
+@@ -275,6 +272,9 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+ 
+ 	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+ 		setup_vm();
 +
- #define pgd_free(pgd) free(pgd)
- static inline pgd_t *pgd_alloc(void)
- {
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index 5bbd6d76..41a8304d 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -23,6 +23,8 @@
++	/* mem_init and setup_vm must be called before io_init */
++	io_init();
+ }
  
- pgd_t *mmu_idmap;
- 
-+/* Used by Realms, depends on IPA size */
-+unsigned long prot_ns_shared = 0;
- unsigned long phys_mask_shift = 48;
- 
- /* CPU 0 starts with disabled MMU */
-@@ -243,7 +245,8 @@ void __iomem *__ioremap(phys_addr_t phys_addr, size_t size)
- {
- 	phys_addr_t paddr_aligned = phys_addr & PAGE_MASK;
- 	phys_addr_t paddr_end = PAGE_ALIGN(phys_addr + size);
--	pgprot_t prot = __pgprot(PTE_UNCACHED | PTE_USER | PTE_UXN | PTE_PXN);
-+	pgprot_t prot = __pgprot(PTE_UNCACHED | PTE_USER | PTE_UXN |
-+				 PTE_PXN | PTE_NS_SHARED);
- 	pgd_t *pgtable;
- 
- 	assert(sizeof(long) == 8 || !(phys_addr >> 32));
-diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
-index 257fae76..5b9f40b0 100644
---- a/lib/arm64/asm/pgtable.h
-+++ b/lib/arm64/asm/pgtable.h
-@@ -21,6 +21,13 @@
- 
- #include <linux/compiler.h>
- 
-+extern unsigned long prot_ns_shared;
-+/*
-+ * The Non-secure shared bit for Realms is actually part of the output
-+ * address, however it is modeled as a PTE attribute.
-+*/
-+#define PTE_NS_SHARED		(prot_ns_shared)
-+
- /*
-  * Highest possible physical address supported.
-  */
+ #ifdef CONFIG_EFI
 -- 
 2.34.1
 
