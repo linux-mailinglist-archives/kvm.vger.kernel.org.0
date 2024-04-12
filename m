@@ -1,166 +1,172 @@
-Return-Path: <kvm+bounces-14558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 469268A34E0
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 19:37:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D7C8A34F8
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 19:40:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF0561F22D3D
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 17:37:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27AA71F240C4
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 17:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1238F1514CB;
-	Fri, 12 Apr 2024 17:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6BA14EC52;
+	Fri, 12 Apr 2024 17:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DQISfU5h"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LyPQISXo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4870014E2E0
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 17:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC81149009;
+	Fri, 12 Apr 2024 17:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712943342; cv=none; b=EaKFHzDiVViY0Yaiz6a8/YKok+RZXk385wVpiXuOr4HkqQNgLxI3oSdVmw2jZab6Xfz8IdegmT8mXIbch1r46JhEmbZ8rxlrPh0oCv0PUe95kX5PC7VTcMZScjUjYQmoQ58y2SJQoMj5VM90GWtfBXcXayGI1G4YjN5hxzE6r0s=
+	t=1712943583; cv=none; b=cDIDEqyTiNDmympcLiGNkbXll365v8wy0qQPXR9W+voZmN4DykfRCvSWaknEf2ll451yLC3NcyppHpPPVL9gGKqg8ZQAe+/92DuTTYUtF/AJAOKBU3olqTlHfhOzD/4cLyfDgeymrJI/GzRYBb4K+LC0D6YLLsxYlYcpri99ggQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712943342; c=relaxed/simple;
-	bh=m6cvDpKwQxw/+1HX6xn29yBbQlMJwxJA/GOc2nFuhwM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Va9G71qk4IuLNXnUtpVrttlCSCi7bOsIJFKy4sy1WNy3yCFcCRY7dj06m97rrqbD2awnbOaY4neCb8wTx10JhM90CZksiQZeOHbQsJDehxn/QC8GjvgNUHuX7g8qElLOrDL1VoC53qEiwu7AAdHecSWBpWcVex0IlAWODWEXQ4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DQISfU5h; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712943338;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VpeDD5FA3om+hsK2jspL++DDgX73rZcz5eJV48XG4Vk=;
-	b=DQISfU5hOOKnh1UrPgZtKkVg+cKaFBPjImWIGb+dTtHrjX+V8Vs3TspoSNoCb9TJTHmrk5
-	ZTNrfetqm4v9Y0Bzdrix5T2sQndgE/EL6oyQkg67IKN6zXsj1fYIZMbrYDskOZHIfzVHWj
-	5ls9Srsrw5ZqA6j34DZoSkZ9GcMZKFg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-489-pGbX_jt3NbysqDWKIcvPAA-1; Fri, 12 Apr 2024 13:35:35 -0400
-X-MC-Unique: pGbX_jt3NbysqDWKIcvPAA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE3291807ACE;
-	Fri, 12 Apr 2024 17:35:34 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C64B32166B31;
-	Fri, 12 Apr 2024 17:35:34 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [PATCH 10/10] KVM: x86/mmu: check for invalid async page faults involving private memory
-Date: Fri, 12 Apr 2024 13:35:32 -0400
-Message-ID: <20240412173532.3481264-11-pbonzini@redhat.com>
-In-Reply-To: <20240412173532.3481264-1-pbonzini@redhat.com>
-References: <20240412173532.3481264-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1712943583; c=relaxed/simple;
+	bh=BLEtjVnBJnqOweid/o9LC3AV3pOUNEEl+F0GkqNkFZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FH+ZouSA/BXCU+3TM+AZWD7zhZjLBUyuObm26h8QZJHpsSJh3PtYwkXsuUbW88VBJ27FqDoz4uQyw8iDZD34miTbT6tyb49wNVWnpHn+THBLX0a5GbfhmKdZYRrB1pUFRQH1H+/UESkM1+f6beGFZxBeuqKadCXkBseZF9npp7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LyPQISXo; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712943581; x=1744479581;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=BLEtjVnBJnqOweid/o9LC3AV3pOUNEEl+F0GkqNkFZY=;
+  b=LyPQISXowwLs8hF6e9XiqxVrGM9ZpDw/e21JwcdiM2RC+l5DI5CcjkCb
+   TNNHbPfPxpNGn3tUxPPpxY76wPGb+J7VgomC2jT+SDekifRbAt4m5Fuwq
+   gCKAgqPRNW9t7+c4iTcKj3K4lr9KUMcv9lZX5Z5yf8jRzAR4VnI9CUtsK
+   6SBsqH/kgjfZxhSkkE3m+e1QV8qccb1fCHdWADUYlyXNuuQvNKRClGZLW
+   4rFJosugwQbLXEDrg8GRaHfUYjGdR8dNn7UumrrM7Z8XPX+dSmcFF2UfH
+   G3ThtBHFBemj0FaqlfCRmzByj4vPsD3e2HTX07cm4iQQr7GsHScYYKooB
+   g==;
+X-CSE-ConnectionGUID: ztjrNoHFSye3GXWj8f/EhQ==
+X-CSE-MsgGUID: MoJXHl80TjWVm4geLrv+HA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8277874"
+X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
+   d="scan'208";a="8277874"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:39:41 -0700
+X-CSE-ConnectionGUID: Q/wtgR9TSKKcHm8USHN4oA==
+X-CSE-MsgGUID: x4MyejV5RhG52WFZYasWAA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
+   d="scan'208";a="26094811"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:39:41 -0700
+Date: Fri, 12 Apr 2024 10:39:35 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"davidskidmore@google.com" <davidskidmore@google.com>,
+	"srutherford@google.com" <srutherford@google.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Wang, Wei W" <wei.w.wang@intel.com>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [ANNOUNCE] PUCK Notes - 2024.04.03 - TDX Upstreaming Strategy
+Message-ID: <20240412173935.GH3039520@ls.amr.corp.intel.com>
+References: <8b40f8b1d1fa915116ef1c95a13db0e55d3d91f2.camel@intel.com>
+ <ZhVdh4afvTPq5ssx@google.com>
+ <4ae4769a6f343a2f4d3648e4348810df069f24b7.camel@intel.com>
+ <ZhVsHVqaff7AKagu@google.com>
+ <b1d112bf0ff55073c4e33a76377f17d48dc038ac.camel@intel.com>
+ <ZhfyNLKsTBUOI7Vp@google.com>
+ <2c11bb62-874e-4e9e-89b1-859df5b560bc@intel.com>
+ <ZhgBGkPTwpIsE6P6@google.com>
+ <437e0da5de22c0a1e77e25fcb7ebb1f052fef754.camel@intel.com>
+ <19a0f47e-6840-42f8-b200-570a9aa7455d@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+In-Reply-To: <19a0f47e-6840-42f8-b200-570a9aa7455d@intel.com>
 
-Right now the error code is not used when an async page fault is completed.
-This is not a problem in the current code, but it is untidy.  For protected
-VMs, we will also need to check that the page attributes match the current
-state of the page, because asynchronous page faults can only occur on
-shared pages (private pages go through kvm_faultin_pfn_private() instead of
-__gfn_to_pfn_memslot()).
+On Fri, Apr 12, 2024 at 04:40:37PM +0800,
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-Start by piping the error code from kvm_arch_setup_async_pf() to
-kvm_arch_async_page_ready() via the architecture-specific async page
-fault data.  For now, it can be used to assert that there are no
-async page faults on private memory.
+> > The second issue is that userspace can’t know what CPUID values are configured
+> > in the TD. In the existing API for normal guests, it knows because it tells the
+> > guest what CPUID values to have. But for the TDX module that model is
+> > complicated to fit into in its API where you tell it some things and it gives
+> > you the resulting leaves. How to handle KVM_SET_CPUID kind of follows from this
+> > issue.
+> > 
+> > One option is to demand the TDX module change to be able to efficiently wedge
+> > into KVM’s exiting “tell” model. This looks like the metadata API to query the
+> > fixed bits. Then userspace can know what bits it has to set, and call
+> > KVM_SET_CPUID with them. I think it is still kind of awkward. "Tell me what you
+> > want to hear?", "Ok here it is".
+> > 
+> > Another option would be to add TDX specific KVM APIs that work for the TDX
+> > module's “ask” model, and meet the enumerated two goals. It could look something
+> > like:
+> > 1. KVM_TDX_GET_CONFIG_CPUID provides a list of directly configurable bits by
+> > KVM. This is based on static data on what KVM supports, with sanity check of
+> > TD_SYSINFO.CPUID_CONFIG[]. Bits that KVM doesn’t know about, but are returned as
+> > configurable by TD_SYSINFO.CPUID_CONFIG[] are not exposed as configurable. (they
+> > will be set to 1 by KVM, per the recommendation)
+> 
+> This is not how KVM works. KVM will never enable unknown features blindly.
+> If the feature is unknown to KVM, it cannot be enable for guest. That's why
+> every new feature needs enabling patch in KVM, even the simplest case that
+> needs one patch to enumerate the CPUID of new instruction in
+> KVM_GET_SUPPORTED_CPUID.
 
-Extracted from a patch by Isaku Yamahata.
+We can use device attributes as discussed at
+https://lore.kernel.org/kvm/CABgObfZzkNiP3q8p=KpvvFnh8m6qcHX4=tATaJc7cvVv2QWpJQ@mail.gmail.com/
+https://lore.kernel.org/kvm/20240404121327.3107131-6-pbonzini@redhat.com/
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/mmu/mmu.c          | 17 ++++++++++-------
- 2 files changed, 11 insertions(+), 7 deletions(-)
+Something like
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 0b73f78dd70a..cf5f28dcda06 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1854,6 +1854,7 @@ struct kvm_arch_async_pf {
- 	gfn_t gfn;
- 	unsigned long cr3;
- 	bool direct_map;
-+	u64 error_code;
- };
- 
- extern u32 __read_mostly kvm_nr_uret_msrs;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 0fb175ad6b9b..7b0d671cf696 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4207,24 +4207,27 @@ static u32 alloc_apf_token(struct kvm_vcpu *vcpu)
- 	return (vcpu->arch.apf.id++ << 12) | vcpu->vcpu_id;
- }
- 
--static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
--				    gfn_t gfn)
-+static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
-+				    struct kvm_page_fault *fault)
- {
- 	struct kvm_arch_async_pf arch;
- 
- 	arch.token = alloc_apf_token(vcpu);
--	arch.gfn = gfn;
-+	arch.gfn = fault->gfn;
- 	arch.direct_map = vcpu->arch.mmu->root_role.direct;
- 	arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
- 
--	return kvm_setup_async_pf(vcpu, cr2_or_gpa,
--				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
-+	return kvm_setup_async_pf(vcpu, fault->addr,
-+				  kvm_vcpu_gfn_to_hva(vcpu, fault->gfn), &arch);
- }
- 
- void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- {
- 	int r;
- 
-+	if (WARN_ON_ONCE(work->arch.error_code & PFERR_GUEST_ENC_MASK))
-+		return;
-+
- 	if ((vcpu->arch.mmu->root_role.direct != work->arch.direct_map) ||
- 	      work->wakeup_all)
- 		return;
-@@ -4237,7 +4240,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	      work->arch.cr3 != kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu))
- 		return;
- 
--	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
-+	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, work->arch.error_code, true, NULL);
- }
- 
- static inline u8 kvm_max_level_for_order(int order)
-@@ -4350,7 +4353,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 			trace_kvm_async_pf_repeated_fault(fault->addr, fault->gfn);
- 			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
- 			return RET_PF_RETRY;
--		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn)) {
-+		} else if (kvm_arch_setup_async_pf(vcpu, fault)) {
- 			return RET_PF_RETRY;
- 		}
- 	}
+#define KVM_X86_GRP_TDX         2
+ioctl(fd, KVM_GET_DEVICE_ATTR, (KVM_X86_GRP_TDX, metadata_field_id))
+
+
+> > 2. KVM_TDX_INIT_VM is passed userspaces choice of configurable bits, along with
+> > XFAM and ATTRIBUTES as dedicated fields. They go into TDH.MNG.INIT.
+> > 3. KVM_TDX_INIT_VCPU_CPUID takes a list of CPUID leafs. It pulls the CPUID bits
+> > actually configured in the TD for these leafs. They go into the struct kvm_vcpu,
+> > and are also passed up to userspace so everyone knows what actually got
+> > configured.
+
+Any reason to introduce KVM_TDX_INIT_VCPU_CPUID in addition to
+KVM_TDX_INIT_VCPU?  We can make single vCPU KVM TDX ioctl do all.
+
+
+> > KVM_SET_CPUID is not used for TDX.
+
+What cpuid does KVM_TDX_INIT_VCPU_CPUID accept?  The one that TDX module
+accepts with TDH.MNG.INIT()?  Or any cpuids that KVM_SET_CPUID2 accepts?
+I'm asking it because TDX module virtualizes only subset of CPUIDs. 
+TDG.VP.VMCALL<CPUID> would need info from KVM_SET_CPUID.
+
+
+> > Then we get TDX module folks to commit to never breaking KVM/userspace that
+> > follows this logic. One thing still missing is how to handle unknown future
+> > leafs with fixed bits. If a future leaf is defined and gets fixed 1, QEMU
+> > wouldn't know to query it.
+> 
+> We can make KVM_TDX_INIT_VCPU_CPUID provide a large enough CPUID leafs and
+> KVM reports every leafs to userpsace. Instead of something that userspace
+> cares leafs X,Y,Z and KVM only reports back leafs X,Y,Z via
+> KVM_TDX_INIT_VCPU_CPUID.
+
+If new CPUID index is introduced, the userspace will get default values of
+CPUIDs and don't touch unknown CPUIDs?  Or KVM_TDX_GET_CONFIG_CPUID will mask
+out CPUID unknown to KVM?
 -- 
-2.43.0
-
+Isaku Yamahata <isaku.yamahata@intel.com>
 
