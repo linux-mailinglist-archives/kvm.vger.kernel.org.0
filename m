@@ -1,116 +1,145 @@
-Return-Path: <kvm+bounces-14563-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14564-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD05C8A3523
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 19:50:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D422A8A3561
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 20:10:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E0201F23F4E
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 17:50:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3221F22764
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 18:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB58514E2EF;
-	Fri, 12 Apr 2024 17:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5638C14EC48;
+	Fri, 12 Apr 2024 18:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nBeigbiD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eN5ZO6yp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7321214D29E;
-	Fri, 12 Apr 2024 17:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5DF146D7B;
+	Fri, 12 Apr 2024 18:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712944210; cv=none; b=fvUz2gvMSM+qw7rJZE/dnYspzSJ5UHXd/76bp32LyWqTAiF+93ZmTMX9Bge9luU1fzj7PjX0AxLzbtUVe6spkVaok6f/NvJJsNeAMHXa3tl5qa1cpdPDjNYX8oDaVK3wryWq4mnKt/GenDGlpLpJRkx1lMgPESaUsAJIY3i6dOA=
+	t=1712945400; cv=none; b=XLLcFbs2Nz8KtO8UWMN2C5cf4TrJd+Dj7av8UK+v6pvNS5tSP4VTmHaA3diRs+qf+tScsR+p+eLmE16Obx9W+rn3JGSrl42fSfzbnwGFR4bqZESybQKBrDjCKEh3uCKaDAso12ILt4ZnoHXHhHrQeLOphZER1B0RY4FclYsdd6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712944210; c=relaxed/simple;
-	bh=sQu31TKj1DykuJKDUxWpDtj7xAwMdG8O2RnnSSWBS5g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WxnLU+SSaPEMGxobH276nROtM2BCnZomARt346F+eAI0aAXSwa5j7NdBdbifNfQgzan//JV8x+W3V93dgsPHnxKd41h/CPqX9aSNoHVgD1+835sXoJEGO+6VsV4ValXt7nSdcLwQculrop6rJR5t1B0Yy5QQ/pxhBl2/H97Ww/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nBeigbiD; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1712945400; c=relaxed/simple;
+	bh=0J4SlgDGf+5ax9loRJCtM8+Hj8SjQZHESyQGU7tmxW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jr93Ei+HOssBUO8ytyh1y1ohaLAtd+zO+AJ2jcu2jnHP8zKIKRwcBt06ZsP+jR+q/Y5Utz9XatjnQk7FUsBzKhwK1B1F6G2WAKuCLJN17u9HuJZ1yJyEG7dtDt0KEkV8B3GHo+32LzZsRWJiPlxh4ja8pPHRLjBNbwivTCSKV4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eN5ZO6yp; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712944210; x=1744480210;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=sQu31TKj1DykuJKDUxWpDtj7xAwMdG8O2RnnSSWBS5g=;
-  b=nBeigbiDKJYV6/1ZTKVab89uK9xzVrUosCK2BCdjLXKHHyPPsM43nDvQ
-   DnQmzPmWTgEcH+A4Xfws82dPLYI2nApNvgNoxmAeYppQKuE+8ll9sQ0Hu
-   HCnlQs8cnwPX+067YrJfPiumPwwG0WtJCoy9ofHq2KUlU8OFLvG/9IKf5
-   kWKUK+WNl6PiI+1hSA7J3EdTAw3x10kRcIyNMfs5EePjJKzV+di4oa2MN
-   +RM17pK2jCbyxiXxX25jWoYgcB35O1gcIYGGEJ1ytKya2R9rwOfBeXrL1
-   Oy6TY7CeWEd3cPRXPFGS8jKVoQmzBplzhwctRVHOj8y89KZLJmmHRmTW8
+  t=1712945399; x=1744481399;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0J4SlgDGf+5ax9loRJCtM8+Hj8SjQZHESyQGU7tmxW4=;
+  b=eN5ZO6ypRnrWN8psJZ0kj2nAI5zDa0PziW84KwNfttSwo4pKOFuhAWjH
+   YdU1C3FBGhbR1zbf8L5cYTW7vd7Az3pf/ZTaeKsqMtMVYXWBlKn0vRGvv
+   /OeT3j1P72HzJdFokT3PSzahs6I9UnJP464044Oj0mvNScdFEVCI2gJ2g
+   y65gpG7yyoR0cbfE8tsFMof4pepA0EsACMWPlf7tSjs1N8yqI9TJpKYw1
+   QFvoFeqjGBSbRwHXadqvCcEE96gFcAo2VEpixphbGZK0INC0pavYaoEda
+   0NLeKQb5JNGmmGhRNmcAG2vUn4N3pJbSXfroNK7xxxXZhyqkW5SEtBszg
    A==;
-X-CSE-ConnectionGUID: 522dSkskSMC1nJVgEHFDmA==
-X-CSE-MsgGUID: tjd5DmhRRU+SJueWOuP4Sg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8586232"
+X-CSE-ConnectionGUID: hl63ZS0dTQeh8NO64IYkYA==
+X-CSE-MsgGUID: L1Ixrb6gQJuF8Z1zjWflKQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8583247"
 X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8586232"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:50:09 -0700
-X-CSE-ConnectionGUID: xrZhma/XTdiCshLxpuCXCA==
-X-CSE-MsgGUID: A55UTogyQJ+4WxvqXu3GaA==
+   d="scan'208";a="8583247"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:09:58 -0700
+X-CSE-ConnectionGUID: kYEP+10GTD69RVfRQuSdHA==
+X-CSE-MsgGUID: mx5ldHYRSBqXgJI8J5lA0A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="21380981"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:50:08 -0700
-Date: Fri, 12 Apr 2024 10:54:39 -0700
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
- Zijlstra <peterz@infradead.org>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
- <baolu.lu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Hansen, Dave" <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H.
- Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
- <mingo@redhat.com>, "Luse, Paul E" <paul.e.luse@intel.com>, "Williams, Dan
- J" <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, "Raj, Ashok"
- <ashok.raj@intel.com>, "maz@kernel.org" <maz@kernel.org>,
- "seanjc@google.com" <seanjc@google.com>, Robin Murphy
- <robin.murphy@arm.com>, "jim.harris@samsung.com" <jim.harris@samsung.com>,
- "a.manzanares@samsung.com" <a.manzanares@samsung.com>, Bjorn Helgaas
- <helgaas@kernel.org>, "Zeng, Guang" <guang.zeng@intel.com>,
- "robert.hoo.linux@gmail.com" <robert.hoo.linux@gmail.com>,
- jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v2 06/13] x86/irq: Set up per host CPU posted interrupt
- descriptors
-Message-ID: <20240412105439.37aa12cc@jacob-builder>
-In-Reply-To: <BN9PR11MB527696368E4022DBAC9DD7768C042@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
-	<20240405223110.1609888-7-jacob.jun.pan@linux.intel.com>
-	<BN9PR11MB527696368E4022DBAC9DD7768C042@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+   d="scan'208";a="52262517"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:09:57 -0700
+Date: Fri, 12 Apr 2024 11:09:57 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 076/130] KVM: TDX: Finalize VM initialization
+Message-ID: <20240412180957.GI3039520@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <e3c862ae9c78bda2988768c1038fec100bb372cf.1708933498.git.isaku.yamahata@intel.com>
+ <f3381541-822b-4e94-93f7-699afc6aa6a3@intel.com>
+ <20240412010848.GG3039520@ls.amr.corp.intel.com>
+ <a876accc-a7bf-4317-9612-d6d5a1fbaf9c@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a876accc-a7bf-4317-9612-d6d5a1fbaf9c@intel.com>
 
-Hi Kevin,
+On Fri, Apr 12, 2024 at 03:22:00PM +0300,
+Adrian Hunter <adrian.hunter@intel.com> wrote:
 
-On Fri, 12 Apr 2024 09:16:25 +0000, "Tian, Kevin" <kevin.tian@intel.com>
-wrote:
-
-> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Sent: Saturday, April 6, 2024 6:31 AM
-> > 
-> > +#ifdef CONFIG_X86_POSTED_MSI
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index 0d3b79b5c42a..c7ff819ccaf1 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -2757,6 +2757,12 @@ static int tdx_td_finalizemr(struct kvm *kvm)
+> >  		return -EINVAL;
+> >  
+> >  	err = tdh_mr_finalize(kvm_tdx);
+> > +	kvm_tdx->hw_error = err;
 > > +
-> > +/* Posted Interrupt Descriptors for coalesced MSIs to be posted */
-> > +DEFINE_PER_CPU_ALIGNED(struct pi_desc, posted_interrupt_desc);  
+> > +	if (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX))
 > 
-> 'posted_msi_desc' to be more accurate?
-makes sense, will do.
+> There seem to be also implicit operand codes.  How sure are
+> we that TDX_OPERAND_ID_RCX is the only valid busy operand?
 
-Thanks,
+According to the description of TDH.MR.FINALIZE, it locks exclusively,
+RCX in TDR, TDCS as implicit, OP_STATE as implicit.  And the basic TDX feature
+to run guest TD, TDX module locks in order of TDR => OP_STATE. We won't see
+OP_STATE lock failure after gaining TDR lock.
 
-Jacob
+If you worry for future, we can code it as
+(err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY.  We should do it
+consistently, though.
+
+> > +		return -EAGAIN;
+> > +	if (err == TDX_NO_VCPUS)
+> 
+> TDX_NO_VCPUS is not one of the completion status codes for
+> TDH.MR.FINALIZE
+
+It depends on the document version.  Need to check TDX_OP_STATE_INCORRECT
+to be defensive.
+
+
+> > diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> > index 98f5d7c5891a..dc150b8bdd5f 100644
+> > --- a/arch/x86/kvm/vmx/tdx.h
+> > +++ b/arch/x86/kvm/vmx/tdx.h
+> > @@ -18,6 +18,9 @@ struct kvm_tdx {
+> >  	u64 xfam;
+> >  	int hkid;
+> >  
+> > +	/* For KVM_TDX ioctl to return SEAMCALL status code. */
+> > +	u64 hw_error;
+> 
+> For this case, it seems weird to have a struct member
+> to pass back a return status code,  why not make it a parameter
+> of tdx_td_finalizemr() or pass &tdx_cmd?
+
+I created the patch too quick. Given KVM_TDX_CAPABILITIES and KVM_TDX_INIT_VM
+take tdx_cmd already, it's consistent to make tdx_td_finalize() take it.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
