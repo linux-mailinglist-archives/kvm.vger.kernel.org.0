@@ -1,194 +1,138 @@
-Return-Path: <kvm+bounces-14374-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14375-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20E008A242C
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 05:07:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E5AE8A243E
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 05:15:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441831C2204E
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 03:07:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 346531F2373A
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 03:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97EE1799F;
-	Fri, 12 Apr 2024 03:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D54A1BC3C;
+	Fri, 12 Apr 2024 03:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="WeOSneIB"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E44134B2;
-	Fri, 12 Apr 2024 03:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE83199D9;
+	Fri, 12 Apr 2024 03:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712891226; cv=none; b=rdvlG0TfR8pHbLQPrJn9Bypw7li4m5Mviey3PYoF7uC4heuNZEmTdWw2dgwY1ukc3uPTFPIQIjCZcLiK5xfVUzyuoKst2EYRAv4FeRtNFGTJASll/pLxmGuZPwqENg7Ijg5sRmoJWR3AuMKDAuDRhmt0q5tUyReWUmf2vTYoTl0=
+	t=1712891698; cv=none; b=OoyWpVzCc+Btcr5+bocYz5kqU5SWmCHoyipDuTRsuxaloXEde4g9TCY7EzVt1YUzphF7VtdRGiCoAKUhnCK06eNE1HnTTVSrRR5DC9oaE9UOByFP8YvZxwl9Ka2behMH2s9BAHXVIKGuQILpA8T2n7SteALK1cL/GIVm/L+VuaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712891226; c=relaxed/simple;
-	bh=WeQV3etAK0C96I94xGlBbd9Uo4UsxU5yT6PWfCgir+Y=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=b6wvYhfC3+3xKzghEvRWMr/tjGCupdDUB6kbnPbtBlwZuo0MhgXBkUKEJH8ZD2p9gHap2/qTF7RUqZ/KAT6IFjbnzfRLEfX9+FLhnp9uznJZ94LTFFXCzLudRcVUWUH3qVA5uTSeREFS4aZccIS8b9bMO69S1CIBq2ifCux6Esg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VG1cb4bnqztSdR;
-	Fri, 12 Apr 2024 11:04:15 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
-	by mail.maildlp.com (Postfix) with ESMTPS id 41B30140124;
-	Fri, 12 Apr 2024 11:07:01 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 11:07:00 +0800
-Subject: Re: [PATCH v4 2/4] hisi_acc_vfio_pci: Create subfunction for data
- reading
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>,
-	=?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@redhat.com>
-References: <20240402032432.41004-1-liulongfang@huawei.com>
- <20240402032432.41004-3-liulongfang@huawei.com>
- <20240404140731.2b75cb80.alex.williamson@redhat.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <f1ffdcc6-e74b-bf6c-bddb-73debd78900b@huawei.com>
-Date: Fri, 12 Apr 2024 11:07:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1712891698; c=relaxed/simple;
+	bh=GMSCKdtp7p5x5tKn0fvsWFlKFRuMmTOJXY3eOciD3LI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=pUg3hWwhnFxiSbGqz3x3XyMjaqfXzua2fybZ5NFuoHqFZQZ9y9p4cU16FrGqDWXKzamPjwj4vXzuqaSBzQ8dUUL1d57ke7x2zgGDHAeWJPG1rDYFhti7SNzVZxLM1fLzWZrEfp5W6xiCn9O/8VvjeQeLNWErM9mDYxYQ5HViyqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=WeOSneIB; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1712891691;
+	bh=EY3WqoWVQVYhu6CX8mA3X80QuETTVo1FlNuaCnjkIEI=;
+	h=Date:From:To:Cc:Subject:From;
+	b=WeOSneIBpWl5HEVoW37Hhd4Oh891LmOTg4am5vxz4vGFE/H2ppo7Ai0uCK7nf3veB
+	 MnGA0ZrABbEscv9fWrM+Chi7LzyJQNXDQ7vKCvcv7Xh+oSdD2Qu+rnWpfpUdbjeBPO
+	 aem/qZbAM09Mj638suQEdlOfTkLW7zK8dDhQaKo7vEy01XFeCqRjuOwBr9gEDqpJJa
+	 e0tanMd3TonJ3JZMVVM8zcYuw5kSOscyjPAEheRdMS+5cBXB2dWK1mC3iBWNTF5A1h
+	 vZA3jylkhYRWc+xu5jKliDSUpwiAGcrrzH3p5v++BVeE3nB0NErqc4O7wN/CuBWYaB
+	 pBzBp9caDZ9Qg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VG1rp6TzWz4wqM;
+	Fri, 12 Apr 2024 13:14:50 +1000 (AEST)
+Date: Fri, 12 Apr 2024 13:14:48 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the kvm-x86 tree with the kvm tree
+Message-ID: <20240412131448.4403df6a@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240404140731.2b75cb80.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600005.china.huawei.com (7.193.23.191)
+Content-Type: multipart/signed; boundary="Sig_/3N_WPBCBiQSNIeSEhY.ZcO9";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 2024/4/5 4:07, Alex Williamson wrote:
-> On Tue, 2 Apr 2024 11:24:30 +0800
-> Longfang Liu <liulongfang@huawei.com> wrote:
-> 
->> During the live migration process. It needs to obtain various status
->> data of drivers and devices. In order to facilitate calling it in the
->> debugfs function. For all operations that read data from device registers,
->> the driver creates a subfunction.
->> Also fixed the location of address data.
-> 
-> Cédric noted privately and I agree, 1) fixes should be provided in
-> separate patches with a Fixes: tag rather than subtly included in a
-> minor refactoring, and 2) what does this imply about the existing
-> functionality of migration?  This would seem to suggest existing
-> migration data is bogus if we're offset by a register reading the DMA
-> address.  The commit log for the Fixes patch should describe this.
->
+--Sig_/3N_WPBCBiQSNIeSEhY.ZcO9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Okay, the modification of the DMA address offset part is split into
-a new patch, and the modification of this part is explained clearly.
+Hi all,
 
-Thanks,
-Longfang.
+Today's linux-next merge of the kvm-x86 tree got a conflict in:
 
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 56 +++++++++++--------
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  3 +
->>  2 files changed, 37 insertions(+), 22 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> index 45351be8e270..bf358ba94b5d 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> @@ -486,6 +486,39 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->>  	return 0;
->>  }
->>  
->> +static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data *vf_data)
->> +{
->> +	struct device *dev = &vf_qm->pdev->dev;
->> +	int ret;
->> +
->> +	ret = qm_get_regs(vf_qm, vf_data);
->> +	if (ret)
->> +		return -EINVAL;
->> +
->> +	/* Every reg is 32 bit, the dma address is 64 bit. */
->> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
->> +	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
->> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
->> +	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
->> +	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
->> +	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
->> +
->> +	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
->> +	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
->> +	if (ret) {
->> +		dev_err(dev, "failed to read SQC addr!\n");
->> +		return -EINVAL;
->> +	}
->> +
->> +	ret = qm_get_cqc(vf_qm, &vf_data->cqc_dma);
->> +	if (ret) {
->> +		dev_err(dev, "failed to read CQC addr!\n");
->> +		return -EINVAL;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->>  			    struct hisi_acc_vf_migration_file *migf)
->>  {
->> @@ -511,31 +544,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->>  		return ret;
->>  	}
->>  
->> -	ret = qm_get_regs(vf_qm, vf_data);
->> +	ret = vf_qm_read_data(vf_qm, vf_data);
->>  	if (ret)
->>  		return -EINVAL;
->>  
->> -	/* Every reg is 32 bit, the dma address is 64 bit. */
->> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
->> -	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
->> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
->> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
->> -	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
->> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
->> -
->> -	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
->> -	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
->> -	if (ret) {
->> -		dev_err(dev, "failed to read SQC addr!\n");
->> -		return -EINVAL;
->> -	}
->> -
->> -	ret = qm_get_cqc(vf_qm, &vf_data->cqc_dma);
->> -	if (ret) {
->> -		dev_err(dev, "failed to read CQC addr!\n");
->> -		return -EINVAL;
->> -	}
->> -
->>  	migf->total_length = sizeof(struct acc_vf_data);
->>  	return 0;
->>  }
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> index 5bab46602fad..7a9dc87627cd 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> @@ -38,6 +38,9 @@
->>  #define QM_REG_ADDR_OFFSET	0x0004
->>  
->>  #define QM_XQC_ADDR_OFFSET	32U
->> +#define QM_XQC_ADDR_LOW		0x1
->> +#define QM_XQC_ADDR_HIGH	0x2
->> +
->>  #define QM_VF_AEQ_INT_MASK	0x0004
->>  #define QM_VF_EQ_INT_MASK	0x000c
->>  #define QM_IFC_INT_SOURCE_V	0x0020
-> 
-> .
-> 
+  arch/x86/kvm/svm/svm.c
+
+between commit:
+
+  605bbdc12bc8 ("KVM: SEV: store VMSA features in kvm_sev_info")
+
+from the kvm tree and commit:
+
+  c92be2fd8edf ("KVM: SVM: Save/restore non-volatile GPRs in SEV-ES VMRUN v=
+ia host save area")
+
+from the kvm-x86 tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/x86/kvm/svm/svm.c
+index 0f3b59da0d4a,9aaf83c8d57d..000000000000
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@@ -1511,12 -1524,8 +1516,8 @@@ static void svm_prepare_switch_to_guest
+  	 * or subsequent vmload of host save area.
+  	 */
+  	vmsave(sd->save_area_pa);
+- 	if (sev_es_guest(vcpu->kvm)) {
+- 		struct sev_es_save_area *hostsa;
+- 		hostsa =3D (struct sev_es_save_area *)(page_address(sd->save_area) + 0x=
+400);
+-=20
+- 		sev_es_prepare_switch_to_guest(svm, hostsa);
+- 	}
++ 	if (sev_es_guest(vcpu->kvm))
+ -		sev_es_prepare_switch_to_guest(sev_es_host_save_area(sd));
+++		sev_es_prepare_switch_to_guest(svm, sev_es_host_save_area(sd));
+ =20
+  	if (tsc_scaling)
+  		__svm_write_tsc_multiplier(vcpu->arch.tsc_scaling_ratio);
+
+--Sig_/3N_WPBCBiQSNIeSEhY.ZcO9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYYpygACgkQAVBC80lX
+0GxBPwf/VFRBOWGuSGfmrscNLd6XvmE0R0vpMIqwr5pdezQfl130qO1JY1QoZiFj
+rvYF7lsDnxpRWNG2uYw6to5xtj4JX+dGvy6qMPUdYCLCD5uYO6JzE0w/rOcXit05
+zjcseqoGqo00wKRxSlj4vTflz4/Z6stt5HQnq8F1kqPuvQNpwAAxxgOa4XIgQzHP
+7w3ojlToNlsDOR8/JYHE1cvKvCwG5cbgqjbxdeeE7moQBR/omoCE8Rl7zslH3Xar
+/KgFryHn7kZJlNAvYQZcezZZIaV8dSygIa3brBD4bAzxjLt4LMk261ieW5ZOyS84
+Cdfi4OkLQYUxK0pqQ0OIVTRoa4xlhw==
+=AyeR
+-----END PGP SIGNATURE-----
+
+--Sig_/3N_WPBCBiQSNIeSEhY.ZcO9--
 
