@@ -1,233 +1,292 @@
-Return-Path: <kvm+bounces-14485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14486-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94588A2C25
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:19:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0BF88A2C63
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:34:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88D6B284F66
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:19:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A562B28424A
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09DA54BE7;
-	Fri, 12 Apr 2024 10:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d63cMzGz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66161CAA3;
+	Fri, 12 Apr 2024 10:34:21 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BDE548E4;
-	Fri, 12 Apr 2024 10:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712917119; cv=fail; b=QPE1Ufq0TDiRcsi22H7Ver8H/C78y36AV9M1BU2q/6FSfUPlyuiqaqLnUhY6H7tAQoi9eA6t1gVgN2RZ3MzykOe0+SdD2JZ1CaI7ezLMbRhApBsY1SCuCpPmVJuq993iDvnhjpgu8xYhd87SyeItuzrgyypCcQpNYlnLL+2yTM8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712917119; c=relaxed/simple;
-	bh=vsv10Re5ucHx25edWFU2BC2+BDno6+4qqJTCbwlg5r0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=QRPp8wSGFcAA3h5L/QwcapiWJu8gpL26CBl8TqmOygTxXwWMEpQRqmaK1oYE4J/up/C/dqEVUlSzOZeNxvTSydZgAGsP22EJcQltIUKAbVvM9LtSJ0xbPWbdbRT3A+ZKFosrvzPYinHjofde4KcL7OasNfNnc9EcGNycvNphhXk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d63cMzGz; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712917119; x=1744453119;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=vsv10Re5ucHx25edWFU2BC2+BDno6+4qqJTCbwlg5r0=;
-  b=d63cMzGzeW95uRYfMLOKuGUipZBvG27ZyUfILcq/jqYQ5gUX12KCkv7C
-   G23n7V4Wkk2x0G7ZgSBtASW/Vl8ZXVz15Kd6gINdC0hPi8fHHdBOKv+5p
-   c/0cc2Jhx24Cgh1oBDHrBu8rj+bnN+1eFZrSgEhc0M+mUEm5/OoOj3YR6
-   g9QcEfz/KRg5xZ3a08a3cghdvZHRuIiylUCrqn8qqTdLr5GBgKvwH7abK
-   N8WzD3kN9sy7NS2TrrnuYTb3rb7+rcfci0QdyZKXTcHV/dHada1xrWqt6
-   rQNRQKeOh1xT7e5J4L2ig+vhXPjxhw4A3Wh9bEzPc5wdJumrqROrCmM1G
-   w==;
-X-CSE-ConnectionGUID: FkYcAcKwQ36HDIl9loaxUA==
-X-CSE-MsgGUID: 3EF4BHPKSlim3hCmfiXAJw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="30848529"
-X-IronPort-AV: E=Sophos;i="6.07,195,1708416000"; 
-   d="scan'208";a="30848529"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 03:18:38 -0700
-X-CSE-ConnectionGUID: Seof4BHYR0SBaJaexK5bHA==
-X-CSE-MsgGUID: SYskY7RITMKIkpn6BoEH3A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,195,1708416000"; 
-   d="scan'208";a="25869167"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Apr 2024 03:18:37 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Apr 2024 03:18:36 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 12 Apr 2024 03:18:36 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 03:18:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UtHjh8n56rKBtHPsNwrhVDKyutViM585aVONgZDCmylVrzJsvPZuLlMR8Gnse0OO/DU/aBL4GEpUJzLQE0oUeXFpqlHh3T+Sps0W36w8pYcE5ns5zMVAEbf5/eFFLMn6y2bDwXrGA97H6w56BIaQHFC2IwV/uPPqItXAtPQffU+ea7hfXZHGuo/yy2xd9n2+K5mMyLTWSoIlB2Lqwtj7atH4Y4W80mR6qZ71pp2QF6BKnj3c14L/2A1gaxXVFKydo3cVYj4LWsAfUIcKYMQ3k0eh/AvdfXwuh8+semh7KcLej5fLSFjN+cwUU7bq3guu9QgYiy2a6NYEj2/5/XVS3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Uy8qpfZItsqM68JWtfDHbjOvZ+w7VlckBy7Ed4F6UPQ=;
- b=hacB2ux2XF48lZRvsdV8l3uWNqUiOHzle0rPcPy5D2l21dE9PZ190CsLx4jUqfRRsHw63h09akdkq6X6VZJvMw1Zv4e+BhmKh6ScdNXpLszNnqfVrEfYD/bd6R1eLZYarH6uBi0JoOIJVTcERR4HmPUJKxaVZKr7ePtotRqr923XQdebixvrs2Wwo4GCm9hVlqoxVXSjNc3ByHdLF8vb12otga470cs0EjoK7Qat/uPxumDwr8nMVYjMVV0oVM9aVJ+wgyGvy6aNFtoEGO2W+/ODflB69kpYwUQSX8VLd0fjOP6929EE8/o4nbPIzkqLdcmKMAJUS+G3gd7Hh7LZHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by SJ0PR11MB6720.namprd11.prod.outlook.com (2603:10b6:a03:479::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Fri, 12 Apr
- 2024 10:18:34 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::5135:2255:52ba:c64e]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::5135:2255:52ba:c64e%4]) with mapi id 15.20.7452.019; Fri, 12 Apr 2024
- 10:18:34 +0000
-Date: Fri, 12 Apr 2024 18:18:23 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Jim Mattson <jmattson@google.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<daniel.sneddon@linux.intel.com>, <pawan.kumar.gupta@linux.intel.com>, "Sean
- Christopherson" <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
- Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
-	<hpa@zytor.com>, <linux-doc@vger.kernel.org>
-Subject: Re: [RFC PATCH v3 01/10] KVM: VMX: Virtualize Intel IA32_SPEC_CTRL
-Message-ID: <ZhkKb+lgPDNRsYXa@chao-email>
-References: <20240410143446.797262-1-chao.gao@intel.com>
- <20240410143446.797262-2-chao.gao@intel.com>
- <CALMp9eR294v_2-yXagKR8HM_WbqihJ5JcRwD1NTGvJxsOFsnyw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALMp9eR294v_2-yXagKR8HM_WbqihJ5JcRwD1NTGvJxsOFsnyw@mail.gmail.com>
-X-ClientProxiedBy: SI2P153CA0016.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::17) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AB120310
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712918061; cv=none; b=mbtO4UHoajDpCh2fnrDPclEBm94tkAnNlQd3UcXW96dk1LUauK/v9x3QPBGmRlpZOaEr8RgfrUZgCHMcKoWIyWKhlIcm2sRoIevEZCHPNr0MTguZmTBKB7l5zFQEn+pIYYyAzZYWZZ8yb3YwR8KNDvfFPgLCncYYRRaJc/bWHLQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712918061; c=relaxed/simple;
+	bh=IxluA94mM59d0+ivSTyXunPV7cKlyYiEBckfY/nWBxk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zb6XKgThf/Sb5IysAknIVLroVFJGuNdSu7VNLjEW6qHHiqURuEi/h80QTU0lA+VDUFUhjyVfgu5b1sFtkZEM42iAJzjX8Nkd3f8mK4NcZQ5nXFeieBiyL/ipcp+M3A6WUXp6zTqZeTsnHg2M/2EGYrxdwdBNze3ub768XFU0LA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EFF49339;
+	Fri, 12 Apr 2024 03:34:47 -0700 (PDT)
+Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 04A8A3F64C;
+	Fri, 12 Apr 2024 03:34:16 -0700 (PDT)
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org,
+	alexandru.elisei@arm.com,
+	joey.gouly@arm.com,
+	steven.price@arm.com,
+	james.morse@arm.com,
+	oliver.upton@linux.dev,
+	yuzenghui@huawei.com,
+	andrew.jones@linux.dev,
+	eric.auger@redhat.com,
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [kvm-unit-tests PATCH 00/33] Support for Arm Confidential Compute Architecture
+Date: Fri, 12 Apr 2024 11:33:35 +0100
+Message-Id: <20240412103408.2706058-1-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SJ0PR11MB6720:EE_
-X-MS-Office365-Filtering-Correlation-Id: e02d17de-2dbc-4150-435c-08dc5ad9e8fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: swh3ocQz1kDkv12bkfaQKcnWytJo662bXtfs8ZHrQew3GjBJMPNrTvzCYuW63T9TxvPPn5cvWAR6Zy545py2fQKGJ65+P3I2BytKNTIshMLpQ/op1M0XiTjso+9aX0muU1WbYssuJqSUTs86KhIECQVZHmzLPqMpa3ZE7bIvxQxrrwFenvy+43aGewvHyxcHoOgTIdtsxJUMc7hcGA+eAy0z4gZ+X5GK2fdgRvBLnMNOzSh4UbIsbiVPBige0vOMuTS+3NNZyHQY4J3UY7xVCgUouHrATkqrYagQBv9gA9jb4HDWtarg2s2rSAUknhN7IbIMB4O+xX5Wi4iTDw8TL0NBWBivKruDlDODs8cqWNRoAV3EJZfWEnUGZxymAimbpfHrLIAu3b6ylPn6ticTeCW01TWu8Mh6BBK4uit88NYfDvKX3+6UmVNSpHC0oyYokNkF3Y3lSjOceBXhRfdvHOhGXwTm4PQCFuzzCzGdN3rRNhzgoOo6q0OJ+T/aHTyNYmsH1M5AcEfdfj3R8QAYn2M/TDNwVOHkgDWLMDXxBlyzZ44elBQQz03El1t+oK/Zz6JZzNs8JgD935F19BORyeiltlKVo3C4j8cC55ALwkUv9J9RaBhHKSH/t5ORETHnZouWCevdmHIGIoSS+H8eTzRYpSefMqXU+tWWQH61hbc=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SS9DZGdxZjhSRjVoNmxkamR5VWRKRUU5VjBwWVpVOUpTN3hER0ZyRjlxRmVJ?=
- =?utf-8?B?Mk80aEdFQ2c3NFFxWjEzZ0MwMjR0Y0x6dXNCTGlIQ3ZJTU5uRzJNcjBGWE41?=
- =?utf-8?B?TS9lV29rNWN0NkdVQlBuQnBjTGdzeDNFODlpMDhYSUVDV1lhSWplVHlqb000?=
- =?utf-8?B?YU9OdVVjTEs3dlFWSVVNdnFyWDFSUXEzYno4RlUxcEdQbFVIS1pKUnlkck82?=
- =?utf-8?B?WmtNdzZsZ3JuZUhUTkRPSVZWdm9WRDV3cDBqbEpYdlZrU1BXUFlCUVVNc3VR?=
- =?utf-8?B?RCswNTl2UGNQcXNPMElpdnBKVGNyWnp6cXdQZTBYdysvMER3QlRXdmNtZk5K?=
- =?utf-8?B?WHVJNUlSRjR6L0diZit4SE95dTlHWHp1em1oZWxkbG5xZy9IeUZDWXFoZHZN?=
- =?utf-8?B?bUoxUVJ1VUFnUEtlTzlISlAyaldPSTRSZjRTZ1pTOFU2aS84R3ptVW1lT3du?=
- =?utf-8?B?QkFhN0NJdys1aGVZamRZRkZkY2tMWWk2RDhVTS9pSXBRWFRON0FKNWNiS0ZU?=
- =?utf-8?B?a3paN0duK2VyMUZyYTVMK2tQd0tBYSs0dkZlZnpjOFFOMVN2dHk3QkxQUGNy?=
- =?utf-8?B?cjlTSHFPajQvVUxidVNMN0EvOUlhdHdPVXlkWi80ZkVIS3JFUU1kWkdMNnNI?=
- =?utf-8?B?UXlEVWZTN0kxb3R5T1cxeG52UEVKTTk4L24yRnROZUg4RXZsWXdZVTR1Ly9X?=
- =?utf-8?B?bWFRRk9WdUtLVkdrQWVRbzdVTEhHckIrWDA4ZTh3Smg3Mm5Ic0NTSVdQRkJG?=
- =?utf-8?B?Yk5vK1BnV3YxQW83eU5YK3VsY3R0Z1RQdmxRa3lPUkIrZk1JZjZWVVJXbGZQ?=
- =?utf-8?B?N3ppVWVWblhjUGlkMTEzMm1VaWYvQzhGQ2ltNlh5aStyU01jRjBocnNmV1Va?=
- =?utf-8?B?MUN6NDFmaW9ZdjIyQndVWHpPM3lrZUgxcUZ6NXJNOVBOWEhieUJveFZaS3BF?=
- =?utf-8?B?c05HMXlCeWtEdmNjNHFJTGV0TE9hcUlaWUxCNWg1cS91eTg2bHNpSjJ4WkFP?=
- =?utf-8?B?S1E5bVRpR2xKbUJuWE9aMklwaWIvalcvWGpiWnhEK25hcWFqelcvdzdkTW9F?=
- =?utf-8?B?L2Y4NXpmK0lKTFhnT3hoZGpzQTVydjZNUW9CM0xYRXYyYjFvN25PQXNvdCtH?=
- =?utf-8?B?ZjQrYUdiVWM2S2VvQ0ZQT3lPZllFQXlpOVFmN1dNTytTOXNSbGpJMlhnWXRT?=
- =?utf-8?B?NEpQVnBxeGYyRnBBU0VGM3JCUXhWSGExQ3ZBY2t5TUhoNVhRWDRVZ2dBSnRE?=
- =?utf-8?B?U0RnbWZNTlpXY2V3WGRhbGk0WTFNQmt2ZTdJaFp2VmtuZEY1MmZXZXByOTFB?=
- =?utf-8?B?Ri9pc2g1UEFSQ1hYUkJZNk51RC9BUzdUaG5sV3hPRTRIWVc1ck9sSGpJd29x?=
- =?utf-8?B?SUNXeE1jeDMzcWZCU2oyVVFxWGNLR1lwYjNkZmNYMU4vejZnL1QxRHlmYTQw?=
- =?utf-8?B?NHNBeFZmelFESVRpOVRGWHhTU0V1VXV5bk9NWGJpdW5ObS9yZGJ3L0hWL0hJ?=
- =?utf-8?B?bUVneUtuUTdrVW5mUFh6SUVoN2o2Vm9WUlNvNWZ0M25mY3B2UTF4WWZHVkpz?=
- =?utf-8?B?b1hXWjlMM2MzQytWWXpOZm0yaXVPOGFOK2VaWllEbER3dkhhaTJHbS9TcEQr?=
- =?utf-8?B?U1ZCazJkUEpGd0Fxckt0bytjK1paaFJhbVRFU3g3U3ZHbCtlODZhTjZEdjk3?=
- =?utf-8?B?ZURIMFZUL0NFblpQWWladW11UFR3UUFSVU1RNkZXcit4NW9KNW1ycjZyY1Fu?=
- =?utf-8?B?bkx4TThLZEU2S2hFb2EvanpseS9WSEw2TGFaRDUyUE5oM0RLRE9FbVIvNkxE?=
- =?utf-8?B?OXcybEJjVHA3d3FBaTdlcGZaQzRITm5hN1p1MTRiVHRXODRZMmtsbXlqeHJR?=
- =?utf-8?B?RzR6ZjMvZnRqZmRoNEY4d2ZhZXQrUEJFZnNMSURhYzd2Nm5yZ0swc1NhWlJj?=
- =?utf-8?B?RmtaSHgvSXBlV2Zmc1UwUXlGWWc2cW9pcjlvMi9jUTBPYUx2dFZHeGtpMENB?=
- =?utf-8?B?ME5LbjJaVEY4OHFKblZVZnVVcXZzemRCZ2FhZUtkTGppNnlYU0Z4RElwZkll?=
- =?utf-8?B?TVVFNzlHemJBMEZJZ2FjRG05UHd3K2lvNTZvSmtWMGhMOXpBRC9JeWtpK3E3?=
- =?utf-8?Q?DVS7MWNN4Q9p6yl92alaIqf/L?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e02d17de-2dbc-4150-435c-08dc5ad9e8fc
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2024 10:18:34.3958
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uTlCEuiIut1S3gXoeH1wYwxKLOQaZ4RuVr1U5pxYbI1QUMhsaYcdA63meDBVFRGWWwj0QmtFEUvsr/hgjr53ng==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB6720
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 11, 2024 at 09:07:31PM -0700, Jim Mattson wrote:
->On Wed, Apr 10, 2024 at 7:35 AM Chao Gao <chao.gao@intel.com> wrote:
->>
->> From: Daniel Sneddon <daniel.sneddon@linux.intel.com>
->>
->> Currently KVM disables interception of IA32_SPEC_CTRL after a non-0 is
->> written to IA32_SPEC_CTRL by guest. The guest is allowed to write any
->> value directly to hardware. There is a tertiary control for
->> IA32_SPEC_CTRL. This control allows for bits in IA32_SPEC_CTRL to be
->> masked to prevent guests from changing those bits.
->>
->> Add controls setting the mask for IA32_SPEC_CTRL and desired value for
->> masked bits.
->>
->> These new controls are especially helpful for protecting guests that
->> don't know about BHI_DIS_S and that are running on hardware that
->> supports it. This allows the hypervisor to set BHI_DIS_S to fully
->> protect the guest.
->>
->> Suggested-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Daniel Sneddon <daniel.sneddon@linux.intel.com>
->> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
->> [ add a new ioctl to report supported bits. Fix the inverted check ]
->> Signed-off-by: Chao Gao <chao.gao@intel.com>
->
->This looks quite Intel-centric. Isn't this feature essentially the
->same as AMD's V_SPEC_CTRL?
+This series adds support for running the kvm-unit-tests in the Arm CCA reference
+software architecture.
 
-Yes. they are almost the same. one small difference is intel's version can
-force some bits off though I don't see how forcing bits off can be useful.
 
->Can't we consolidate the code, rather than
->having completely independent implementations for AMD and Intel?
+The changes involve enlightening the boot/setup code with the Realm Service Interface
+(RSI). The series also includes new test cases that exercise the RSI calls.
 
-We surely can consolidate the code. I will do this.
+Currently we only support "kvmtool" as the VMM for running Realms. There was
+an attempt to add support for running the test scripts using with kvmtool here [1],
+which hasn't progressed. It would be good to have that resolved, so that we can
+run all the tests without manually specifying the commandlines for each run.
 
-I have a question about V_SPEC_CTRL. w/ V_SPEC_CTRL, the SPEC_CTRL MSR retains
-the host's value on VM-enter:
+For the purposes of running the Realm specific tests, we have added a "temporary"
+script "run-realm-tests" until the kvmtool support is added. We do not expect
+this to be merged.
 
-.macro RESTORE_GUEST_SPEC_CTRL
-        /* No need to do anything if SPEC_CTRL is unset or V_SPEC_CTRL is set */
-        ALTERNATIVE_2 "", \
-                "jmp 800f", X86_FEATURE_MSR_SPEC_CTRL, \
-                "", X86_FEATURE_V_SPEC_CTRL
 
-Does this mean all mitigations used by the host will be enabled for the guest
-and guests cannot disable them?
+Base Realm Support
+-------------------
 
-Is this intentional? this looks suboptimal. Why not set SPEC_CTRL value to 0 and
-let guest decide which features to enable? On the VMX side, we need host to
-apply certain hardware mitigations (i.e., BHI_DIS_S and RRSBA_DIS_S) for guest
-because BHI's software mitigation may be ineffective. I am not sure why SVM is
-enabling all mitigations used by the host for guests. Wouldn't it be better to
-enable them on an as-needed basis?
+Realm IPA Space
+---------------
+When running on in Realm world, the (Guest) Physical Address - aka Intermediate
+Physical Address (IPA) in Arm terminology - space of the VM is split into two halves,
+protected (lower half) and un-protected (upper half). A protected IPA will
+always map pages in the "realm world" and  the contents are not accessible to
+the host. An unprotected IPA on the other hand can be mapped to page in the
+"normal world" and thus shared with the host. All host emulated MMIO ranges must
+be in unprotected IPA space.
+
+Realm can query the Realm Management Monitor for the configuration via RSI call
+(RSI_REALM_CONFIG) and identify the "boundary" of the "IPA" split.
+
+As far as the hyp/VMM is concerned, there is only one "IPA space" (the lower
+half) of memory map. The "upper half" is "unprotected alias" of the memory map.
+
+In the guest, this is achieved by "treating the MSB (1 << (IPA_WIDTH - 1))" as
+a protection attribute (we call it - PTE_NS_SHARED), where the Realm applies this
+to any address, it thinks is acccessed/managed by host (e.g., MMIO, shared pages).
+Given that this is runtime variable (but fixed for a given Realm), uses a
+variable to track the value.
+
+All I/O regions are marked as "shared". Care is taken to ensure I/O access (uart)
+with MMU off uses the "Unprotected Physical address".
+
+
+Realm IPA State
+---------------
+Additionally, each page (4K) in the protected IPA space has a state associated
+(Realm IPA State - RIPAS) with it. It is either of :
+   RIPAS_EMPTY
+   RIPAS_RAM
+
+Any IPA backed by RAM, must be marked as RIPAS_RAM before an access is made to
+it. The hypervisor/VMM does this for the initial image loaded into the Realm
+memory before the Realm starts execution. Given the kvm-unit-test flat files do
+not contain a metadata header (e.g., like the arm64 Linux kernel Image),
+indicating the "actual image size in memory", the VMM cannot transition the
+area towards the end of the image (e.g., bss, stack) which are accessed very
+early during boot. Thus the early boot assembly code will mark the area upto
+the stack as RAM.
+
+Once we land in the C code, we mark target relocation area for FDT and
+initrd as RIPAS_RAM. At this point, we can scan the FDT and mark all RAM memory
+blocks as RIPAS_RAM.
+
+TODO: It would be good to add an image header to the flat files indicating the
+size, which can take the burden off doing the early assembly boot code RSI calls.
+
+Shared Memory support
+---------------------
+Given the "default" memory of a VM is not accessible to host, we add new page
+alloc/free routines for "memory shared" with the host. e.g., GICv3-ITS must use
+shared pages for ITS emulation.
+
+RSI Test suites
+--------------
+There are new testcases added to exercise the RSI interfaces and the RMM flows.
+
+Attestation and measurement services related RSI tests require parsing tokens
+and claims returned by the RMM. This is achieved with the help of QCBOR library
+[2], which is added as a submodule to the project. We have also added a wrapper
+library - libtokenverifier - around the QCBOR to parse the tokens according to
+the RMM specifications.
+
+Running Arm CCA Stack
+-------------------
+
+See more details on Arm CCA and how to build/run the entire stack here[0]
+The easiest way to run the Arm CCA stack is using shrinkwrap and the details
+are available in [0].
+
+
+The patches are also available here :
+
+ https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca cca/v1
+
+
+Changes since rfc:
+  [ https://lkml.kernel.org/r/20230127114108.10025-1-joey.gouly@arm.com ]
+  - Add support for RMM-v1.0-EAC5, changes to RSI ABIs
+  - Some hardening checks (FDT overlapping the BSS sections)
+  - Selftest for memory stress
+  - Enable PMU/SVE tests for Realms
+
+ [0] https://lkml.kernel.org/r/20240412084056.1733704-1-steven.price@arm.com
+ [1] https://lkml.kernel.org/r/20210702163122.96110-1-alexandru.elisei@arm.com
+ [2] https://github.com/laurencelundblade/QCBOR
+
+Alexandru Elisei (3):
+  arm64: Expand SMCCC arguments and return values
+  arm: selftest: realm: skip pabt test when running in a realm
+  NOT-FOR-MERGING: add run-realm-tests
+
+Djordje Kovacevic (1):
+  arm: realm: Add tests for in realm SEA
+
+Gareth Stockwell (1):
+  arm: realm: add hvc and RSI_HOST_CALL tests
+
+Jean-Philippe Brucker (1):
+  arm: Move io_init after vm initialization
+
+Joey Gouly (10):
+  arm: Make physical address mask dynamic
+  arm64: Introduce NS_SHARED PTE attribute
+  arm: realm: Add RSI interface header
+  arm: realm: Make uart available before MMU is enabled
+  arm: realm: Add RSI version test
+  arm64: add ESR_ELx EC.SVE
+  arm64: enable SVE at startup
+  arm64: selftest: add realm SVE VL test
+  lib/alloc_page: Add shared page allocation support
+  arm: Add memtest support
+
+Mate Toth-Pal (2):
+  arm: Add a library to verify tokens using the QCBOR library
+  arm: realm: Add Realm attestation tests
+
+Subhasish Ghosh (1):
+  arm: realm: Add test for FPU/SIMD context save/restore
+
+Suzuki K Poulose (14):
+  arm: Add necessary header files in asm/pgtable.h
+  arm: Detect FDT overlap with uninitialised data
+  arm: realm: Realm initialisation
+  arm: realm: Add support for changing the state of memory
+  arm: realm: Set RIPAS state for RAM
+  arm: realm: Early memory setup
+  arm: gic-v3-its: Use shared pages wherever needed
+  arm: realm: Enable memory encryption
+  qcbor: Add QCBOR as a submodule
+  arm: Add build steps for QCBOR library
+  arm: realm: add RSI interface for attestation measurements
+  arm: realm: Add helpers to decode RSI return codes
+  arm: realm: Add Realm attestation tests
+  arm: realm: Add a test for shared memory
+
+ .gitmodules                         |    3 +
+ arm/Makefile.arm64                  |   25 +-
+ arm/cstart.S                        |   49 +-
+ arm/cstart64.S                      |  154 +++-
+ arm/fpu.c                           |  424 +++++++++
+ arm/realm-attest.c                  | 1251 +++++++++++++++++++++++++++
+ arm/realm-ns-memory.c               |   86 ++
+ arm/realm-rsi.c                     |  159 ++++
+ arm/realm-sea.c                     |  143 +++
+ arm/run-realm-tests                 |  112 +++
+ arm/selftest.c                      |  138 ++-
+ arm/unittests.cfg                   |   96 +-
+ lib/alloc_page.c                    |   20 +-
+ lib/alloc_page.h                    |   24 +
+ lib/arm/asm/arm-smccc.h             |   44 +
+ lib/arm/asm/io.h                    |    6 +
+ lib/arm/asm/pgtable.h               |    9 +
+ lib/arm/asm/psci.h                  |   13 +-
+ lib/arm/asm/rsi.h                   |   21 +
+ lib/arm/asm/sve-vl-test.h           |    9 +
+ lib/arm/gic-v3.c                    |    6 +-
+ lib/arm/io.c                        |   24 +-
+ lib/arm/mmu.c                       |   80 +-
+ lib/arm/psci.c                      |   19 +-
+ lib/arm/setup.c                     |   26 +-
+ lib/arm64/asm/arm-smccc.h           |    6 +
+ lib/arm64/asm/esr.h                 |    1 +
+ lib/arm64/asm/io.h                  |    6 +
+ lib/arm64/asm/pgtable-hwdef.h       |    6 -
+ lib/arm64/asm/pgtable.h             |   20 +
+ lib/arm64/asm/processor.h           |   34 +
+ lib/arm64/asm/rsi.h                 |   89 ++
+ lib/arm64/asm/smc-rsi.h             |  173 ++++
+ lib/arm64/asm/sve-vl-test.h         |   28 +
+ lib/arm64/asm/sysreg.h              |    7 +
+ lib/arm64/gic-v3-its.c              |    6 +-
+ lib/arm64/processor.c               |    1 +
+ lib/arm64/rsi.c                     |  188 ++++
+ lib/asm-generic/io.h                |   12 +
+ lib/libcflat.h                      |    1 +
+ lib/qcbor                           |    1 +
+ lib/token_verifier/attest_defines.h |   50 ++
+ lib/token_verifier/token_dumper.c   |  157 ++++
+ lib/token_verifier/token_dumper.h   |   15 +
+ lib/token_verifier/token_verifier.c |  591 +++++++++++++
+ lib/token_verifier/token_verifier.h |   77 ++
+ 46 files changed, 4355 insertions(+), 55 deletions(-)
+ create mode 100644 .gitmodules
+ create mode 100644 arm/fpu.c
+ create mode 100644 arm/realm-attest.c
+ create mode 100644 arm/realm-ns-memory.c
+ create mode 100644 arm/realm-rsi.c
+ create mode 100644 arm/realm-sea.c
+ create mode 100755 arm/run-realm-tests
+ create mode 100644 lib/arm/asm/arm-smccc.h
+ create mode 100644 lib/arm/asm/rsi.h
+ create mode 100644 lib/arm/asm/sve-vl-test.h
+ create mode 100644 lib/arm64/asm/arm-smccc.h
+ create mode 100644 lib/arm64/asm/rsi.h
+ create mode 100644 lib/arm64/asm/smc-rsi.h
+ create mode 100644 lib/arm64/asm/sve-vl-test.h
+ create mode 100644 lib/arm64/rsi.c
+ create mode 160000 lib/qcbor
+ create mode 100644 lib/token_verifier/attest_defines.h
+ create mode 100644 lib/token_verifier/token_dumper.c
+ create mode 100644 lib/token_verifier/token_dumper.h
+ create mode 100644 lib/token_verifier/token_verifier.c
+ create mode 100644 lib/token_verifier/token_verifier.h
+
+-- 
+2.34.1
+
 
