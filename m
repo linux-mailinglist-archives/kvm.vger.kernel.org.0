@@ -1,647 +1,226 @@
-Return-Path: <kvm+bounces-14407-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570628A2907
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:16:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2DFA8A2920
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E236282B17
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 08:16:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77F53283143
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 08:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8729053399;
-	Fri, 12 Apr 2024 08:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8339450279;
+	Fri, 12 Apr 2024 08:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Cyg4Xte2";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="NlGvhtRP"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C02502A2;
-	Fri, 12 Apr 2024 08:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712909747; cv=none; b=HLxUEZ2ahMt8egNjPvchtx3o4iFIaSgnjlnKYzeOHCYRQcwKMQoWynXJPaJhwjKf3p9qa7noIKdj4TEsWFTO4jlGJGyako7P64vkDUlBDgd8zHvtYRli8L3j8fgrD1zZy+vxqz5uLjXcXceLqpxtLQChZJsUdm2UYYNiummJA/M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712909747; c=relaxed/simple;
-	bh=8p8I/HSr9+QGaiyRt0aIuR+SL53mIq1njXS4tG2naAw=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=afdZgxMw35+liVkdYGqK77BTm74ZfHGnJPrEWN60Y4YiRNIjo1dOzsdxReqTqF4hhiav9SHM5PibDi18DgZjKvA2mPQfMbMEG9iA8PU3LBWBJjISK8+uSCDdkhPQTzZ1G6Jd4DnfH8S3JhXEekaIer2yKo3skzMRC+bRoa4BbAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VG8Sc2RpTz2NW8T;
-	Fri, 12 Apr 2024 16:12:48 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
-	by mail.maildlp.com (Postfix) with ESMTPS id B0892180063;
-	Fri, 12 Apr 2024 16:15:41 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 16:15:41 +0800
-Subject: Re: [PATCH v4 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
- migration driver
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-References: <20240402032432.41004-1-liulongfang@huawei.com>
- <20240402032432.41004-4-liulongfang@huawei.com>
- <20240404140735.2174528d.alex.williamson@redhat.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <23028a83-5433-7bb1-82fa-b5547790749f@huawei.com>
-Date: Fri, 12 Apr 2024 16:15:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270684D9F4;
+	Fri, 12 Apr 2024 08:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712910005; cv=fail; b=ep9kXfkGt5aMH6eyaNU2MBaKZcTLK5BaV6OO5rEfyy0XybcoW7RB4FBk6vbZShOk+FpF6vaUImBid0Y1GEh4bPVRmHL3kr+7PVgBykpsGn+e0rAecmMHVRdpShprNGqvlJUaBwapUxCaA2OZkSrq44uIlOvErv5Zmlp9YX7IEFo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712910005; c=relaxed/simple;
+	bh=Du7aDArnvLFDX/Vnx5TMX/PULgTni8SbRaJMPpb1o00=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=eJZ3AzPy6b6zdI64Y4a59lRBOu4mm366inXVTZeTQP+EnzBt9UaJoFJ9VzOKXSs+GawpqVUW4LtI8nawIFLGfLzhl0dNYTdn6Kutqv6lmK6zkIddsWkfmsHzYtPlvBSHkcfA8PH05CwL/30TH+vrwt0FDSTnyUfPUUmAx8RO2NI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Cyg4Xte2; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=NlGvhtRP; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43C2nhEh020792;
+	Fri, 12 Apr 2024 08:19:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=/4FBB/aRhUdYnKofxaS5mIHGoMhDi1sGewWyCRqE3jw=;
+ b=Cyg4Xte2Z52B2F3G1wH9RqrnS2t9nyNam9N1FJw690izQCh40Y4/dPmylI/8yUOr9IKw
+ 19liooyVQHRaOg1f2wPmU6QD/UQESd+rKQB57mnnk3gbUT7DemIDzfnKZ3MR8rNPeEfn
+ FROiJSzaLK6EW6Esie1YQ8g7BXCxazBbfZUIe6hjHUPIXpr0xS4iyCCwxgUQ0V9wbLn8
+ RnzkwFDCthiRhv15mkgfmE0nE260V7Q8bp7Fy5x0bf+ac0NT8+BltOKunksfXfaoarpL
+ 1zcWCUhq/J+ZuOmRsXcoP4btFYbx8yQEPplylDTcvbVmfPIZp7ljZPnd++JOr4Yuzxxr gw== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xavtfb4ed-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 12 Apr 2024 08:19:26 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43C7IOTA002879;
+	Fri, 12 Apr 2024 08:19:25 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3xavugxsgj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 12 Apr 2024 08:19:25 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gPgQgvZSQ5V9hvkHutBgIFGmwsr1MG386u6rpqaedWm7hAQkqYCZ6qVww2YPpV4l0P1pVpXAh8qfFUssKemqMgtaarZHDOPNMWHnd5o8yr+f+S6+WDrXPzRZse0sMuXbeFKXfoA86zKwlaY6RXK0J86Oz51xZeRJA1VzuZdC/YpgOG3A+lq8xcx+bPfrJP9IgC9fJZF37NAMEwVNC3sSCFsYqF8oDYFIyQLj5dy6HCru3Z772LyC6blZoHB2v7uv9qQ166clC9k6ogkkGyV1b9k9Z3cDsfJRwbSOBsCydTYJFynQBlFrF1W3608Tg1qyD6mEi7Ykk3YbPUkWcrd6LA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/4FBB/aRhUdYnKofxaS5mIHGoMhDi1sGewWyCRqE3jw=;
+ b=DKx9B7zLNvPY/SWTWsurnTuDCysTFHJbvj6e1AThvdW4kdoAmJtQHU5LrQRp2i6gJZpm9Y7JUsBNP+WXyj2xICv4DT2x7Cwlc+hyJipGfmu5q/Kf2BaLWxWnvG3GXbMVRGWmyycBmTCFN1Y+QK7TxYcEPEfsbq5rMPVtq4iJuMQbGM5fJkChwoS6FvtlonxIe0ijau0ru5TlOp48Uf5WEeOIiBjfZdqt0Xcvh3hY7UH3s2mPNGnktYi9Pj3JlY/anolXGUvhIbGyHMVlVh7+xupSHRq2eoFzlalzqUTjRx3sZL10/GufWZFoUamC3HRcaPRCf8q6XlrLcmQA5fHd4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/4FBB/aRhUdYnKofxaS5mIHGoMhDi1sGewWyCRqE3jw=;
+ b=NlGvhtRPMIWhONKUwESR4BmSJX0HTul1/rIFosMOMVLCoPt9qezK/CR5RdYCeRjUu/oD+XBFR0d0XQojMIiOKKtCv2cH5dKUBQFB9DymQ0b+rOVBTjL1UE/K4F4hrU9QwAxA0XXsa+W2Us39Ie9KGO5lfl23R0FT2oUwp9TpJBs=
+Received: from SA0PR10MB6425.namprd10.prod.outlook.com (2603:10b6:806:2c0::8)
+ by CY8PR10MB7172.namprd10.prod.outlook.com (2603:10b6:930:71::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Fri, 12 Apr
+ 2024 08:19:22 +0000
+Received: from SA0PR10MB6425.namprd10.prod.outlook.com
+ ([fe80::894:70b7:573e:da46]) by SA0PR10MB6425.namprd10.prod.outlook.com
+ ([fe80::894:70b7:573e:da46%5]) with mapi id 15.20.7409.042; Fri, 12 Apr 2024
+ 08:19:22 +0000
+Message-ID: <7a56f2ad-4b3e-e861-5dc5-23e0efa47540@oracle.com>
+Date: Fri, 12 Apr 2024 01:19:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2 2/2] KVM: selftests: Add KVM/PV clock selftest to prove
+ timer correction
+To: Jack Allister <jalliste@amazon.com>
+Cc: bp@alien8.de, corbet@lwn.net, dave.hansen@linux.intel.com,
+        dwmw2@infradead.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, paul@xen.org, pbonzini@redhat.com, seanjc@google.com,
+        tglx@linutronix.de, x86@kernel.org
+References: <20240408220705.7637-1-jalliste@amazon.com>
+ <20240410095244.77109-1-jalliste@amazon.com>
+ <20240410095244.77109-3-jalliste@amazon.com>
+Content-Language: en-US
+From: Dongli Zhang <dongli.zhang@oracle.com>
+In-Reply-To: <20240410095244.77109-3-jalliste@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P265CA0098.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2bc::15) To SA0PR10MB6425.namprd10.prod.outlook.com
+ (2603:10b6:806:2c0::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240404140735.2174528d.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600005.china.huawei.com (7.193.23.191)
-
-On 2024/4/5 4:07, Alex Williamson wrote:
-> On Tue, 2 Apr 2024 11:24:31 +0800
-> Longfang Liu <liulongfang@huawei.com> wrote:
-> 
->> On the debugfs framework of VFIO, if the CONFIG_VFIO_DEBUGFS macro is
->> enabled, the debug function is registered for the live migration driver
->> of the HiSilicon accelerator device.
->>
->> After registering the HiSilicon accelerator device on the debugfs
->> framework of live migration of vfio, a directory file "hisi_acc"
->> of debugfs is created, and then three debug function files are
->> created in this directory:
->>
->>    vfio
->>     |
->>     +---<dev_name1>
->>     |    +---migration
->>     |        +--state
->>     |        +--hisi_acc
->>     |            +--attr
->>     |            +--data
->>     |            +--save
->>     |            +--cmd_state
->>     |
->>     +---<dev_name2>
->>          +---migration
->>              +--state
->>              +--hisi_acc
->>                  +--attr
->>                  +--data
->>                  +--save
->>                  +--cmd_state
->>
->> data file: used to get the migration data from the driver
->> attr file: used to get device attributes parameters from the driver
->> save file: used to read the data of the live migration device and save
->> it to the driver.
->> cmd_state: used to get the cmd channel state for the device.
->>
->> +----------------+        +--------------+       +---------------+
->> | migration dev  |        |   src  dev   |       |   dst  dev    |
->> +-------+--------+        +------+-------+       +-------+-------+
->>         |                        |                       |
->>         |                        |                       |
->>         |                        |                       |
->>         |                        |                       |
->>   save  |                 +------v-------+       +-------v-------+
->>         |                 |  saving_mif  |       | resuming_migf |
->>         |                 |     file     |       |     file      |
->>         |                 +------+-------+       +-------+-------+
->>         |                        |                       |
->>         |        mutex           |                       |
->> +-------v--------+               |                       |
->> |                |               |                       |
->> | debug_migf file<---------------+-----------------------+
->> |                |             copy
->> +-------+--------+
->>         |
->>    cat  |
->>         |
->> +-------v--------+
->> |     user       |
->> +----------------+
->>
->> In debugfs scheme. The driver creates a separate debug_migf file.
->> It is completely separated from the two files of live migration,
->> thus preventing debugfs data from interfering with migration data.
->> Moreover, it only performs read operations on the device.
->>
->> For serialization of debugfs:
->> First, it only writes data when performing a debugfs save operation.
-> 
-> This distinction between "writing" and "copying" is very confusing.
->
-
-"Writing" means reading data from the device and writing it to debug_migf.
-"Copying" is to copy the data that has been saved in other migf files to
-debug_migf.
-The destination of both operations is the same.
-The data sources are different.
-
->> Second, it is only copied from the file on the migration device
->> when the live migration is complete.
-> 
-> Why does it do this at all?  If you're looking for a postmortem of the
-> user generated buffer, that should be explicitly stated.
->
-
-debug_migf is a data buffer. Used to cache debugfs data for users
-
->> These two operations are mutually exclusive through mutex.
-> 
-> The mutual exclusion between debugfs operations is not the concern, the
-> question is whether there's serialization that prevents the debugfs
-> operations from interfering with the user migration flow.  Nothing here
-> seems to prevent concurrent use of the debugfs interface proposed here
-> with a user migration.
->
-
-Reading data directly from the device does not cause any problems.
-The device supports concurrent requests for read operations.
-Therefore, there is no mutual exclusion between the debugfs save
-operation and the user migration operation.
-
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 204 ++++++++++++++++++
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  11 +
->>  2 files changed, 215 insertions(+)
->>
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> index bf358ba94b5d..9f563a31a2a1 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> @@ -15,6 +15,7 @@
->>  #include <linux/anon_inodes.h>
->>  
->>  #include "hisi_acc_vfio_pci.h"
->> +#include "../../vfio.h"
-> 
-> This include seems not to be required.
->
-
-OK, let me modify it and verify it.
-
->>  
->>  /* Return 0 on VM acc device ready, -ETIMEDOUT hardware timeout */
->>  static int qm_wait_dev_not_ready(struct hisi_qm *qm)
->> @@ -618,6 +619,22 @@ hisi_acc_check_int_state(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->>  	}
->>  }
->>  
->> +static void hisi_acc_vf_migf_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->> +	struct hisi_acc_vf_migration_file *src_migf)
-> 
-> Seems this should be named something relative to debug since it's only
-> purpose is to copy the migration file to the debug migration file.
-
-How about hisi_acc_debug_migf_copy?
-
-> 
->> +{
->> +	struct hisi_acc_vf_migration_file *dst_migf = hisi_acc_vdev->debug_migf;
->> +
->> +	if (!dst_migf)
->> +		return;
->> +
->> +	mutex_lock(&hisi_acc_vdev->enable_mutex);
->> +	dst_migf->disabled = src_migf->disabled;
-> 
-> In the cases where this is called, the caller is about to call
-> hisi_acc_vf_disable_fd() which sets disabled = true and then
-> hisi_acc_vf_debug_save() doesn't touch the value!  What does it even
-> mean to copy this value, let alone print it as part of the debugfs
-> output later?
->
-
-Yes, the disable assignment of debug_migf needs to be processed
-in hisi_acc_vf_debug_save.
-
-> 
->> +	dst_migf->total_length = src_migf->total_length;
->> +	memcpy(&dst_migf->vf_data, &src_migf->vf_data,
->> +		    sizeof(struct acc_vf_data));
->> +	mutex_unlock(&hisi_acc_vdev->enable_mutex);
->> +}
->> +
->>  static void hisi_acc_vf_disable_fd(struct hisi_acc_vf_migration_file *migf)
->>  {
->>  	mutex_lock(&migf->lock);
->> @@ -630,12 +647,14 @@ static void hisi_acc_vf_disable_fd(struct hisi_acc_vf_migration_file *migf)
->>  static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->>  {
->>  	if (hisi_acc_vdev->resuming_migf) {
->> +		hisi_acc_vf_migf_save(hisi_acc_vdev, hisi_acc_vdev->resuming_migf);
->>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->resuming_migf);
->>  		fput(hisi_acc_vdev->resuming_migf->filp);
->>  		hisi_acc_vdev->resuming_migf = NULL;
->>  	}
->>  
->>  	if (hisi_acc_vdev->saving_migf) {
->> +		hisi_acc_vf_migf_save(hisi_acc_vdev, hisi_acc_vdev->saving_migf);
-> 
-> Why are these buffers copied to the debug_migf in this case?  This can
-> happen asynchronous to accessing the debugfs migration file and there's
-> no serialization.
->
-
-We can try to copy when accessing debugfs.
-
->>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->saving_migf);
->>  		fput(hisi_acc_vdev->saving_migf->filp);
->>  		hisi_acc_vdev->saving_migf = NULL;
->> @@ -1144,6 +1163,7 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->>  	if (!vf_qm->io_base)
->>  		return -EIO;
->>  
->> +	mutex_init(&hisi_acc_vdev->enable_mutex);
->>  	vf_qm->fun_type = QM_HW_VF;
->>  	vf_qm->pdev = vf_dev;
->>  	mutex_init(&vf_qm->mailbox_lock);
->> @@ -1294,6 +1314,181 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
->>  	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
->>  }
->>  
->> +static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_device *vdev)
->> +{
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
->> +	struct hisi_acc_vf_migration_file *migf = hisi_acc_vdev->debug_migf;
->> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
->> +	int ret;
->> +
-> 
-> lockdep_assert_held(...)
-> 
->> +	if (!vdev->mig_ops || !migf) {
->> +		seq_printf(seq, "%s\n", "device does not support live migration!");
->> +		return -EINVAL;
-> 
-> Isn't the -EINVAL sufficient?
->
-
-Which one do you think is better?
-
->> +	}
->> +
->> +	/**
->> +	 * When the device is not opened, the io_base is not mapped.
->> +	 * The driver cannot perform device read and write operations.
->> +	 */
->> +	if (hisi_acc_vdev->dev_opened != DEV_OPEN) {
-> 
-> Why are we assigning and testing a bool against and enum?!
->
-
-OK, change to true and false assignment.
-
->> +		seq_printf(seq, "%s\n", "device not opened!");
->> +		return -EINVAL;
->> +	}
->> +
->> +	ret = qm_wait_dev_not_ready(vf_qm);
->> +	if (ret) {
->> +		seq_printf(seq, "%s\n", "VF device not ready!");
->> +		return -EINVAL;
-> 
-> -EBUSY?  Again, not sure why we need the seq_printf() in addition to
-> the error value.
->
-
-OK, -EBUSY is better.
-seq_printf() allows users to directly obtain the cause of the
-error without checking dmesg.
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR10MB6425:EE_|CY8PR10MB7172:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11150ea3-6a49-4259-8351-08dc5ac9423b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	l9xkPrzewmGpbfYemfOn2LpWlJDp9nhAhXiQibEjYN1TRHQSkYDEmLQ+rVPNtcQ21M2PBQ5s2PiHQKnYTogttWQh6a2EwOpLdce0QxPhWlpztNmdIODvmSDtv34hh8kbAj9jhaDbUphoL7O101n+NVoBq862ZT3v+/P5BD+YVXPAMLAiVBSFpG0/e3LUYRYmmwX3p/U5rtFl5LLp3oyVXSxKsodXkK2pPswY2UZplEGdHj43glm1khKBwYGA2jU4ZpMoXL8OQhnlA9o1903pWeSO6ak2uDaafSBuPjT5/yvBesfnH+3kVs+r5MOrUY+KJ06Cv0fpqJBeAhUtunvoiaQ7KaMc/clp7HKnzv4NqYYq2hOp+d9WIiSvfPljXph8FDZ7JaJwXSmUC+TxmiVMOWJbktx4CATMOqFrg96/r21mztTPpdmnF6ugpmZJGhXJHfUVqrSRedi/K4oz97vUO07V1MBKSdnPO1kmlb340lkowucgb6mhdPsjdhXWt5Iu/YP1ewskBvOqTkQ88dR/B2S4LDwp6oYnsAw+IL6GFf7FExJGwoa+StHaI4JVjMcgkwOj7qqBgDcdJS0cCMYU0/8EI83cjdSvEPTnukO7lKFluN9SgEAOJyWMZPsSaz1TSpFHzL+2jkr2o5SZeCO3MqmmiftNpZC06ckXbPpoWgI=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR10MB6425.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005)(7416005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?QmtjamNmSUJYaU5ROGYyOVkzWHZQeEpNSjBhNE1NbzhsUUR1blJtdGRBUFFw?=
+ =?utf-8?B?QVNYZEd3aUVwTlVmdzVrQXEwNGhob0pzOXlkRUxyaHl6QW5HZm94QnRvZTlS?=
+ =?utf-8?B?Szc0eU9Wb1ZzcnJyR0wvb28xTFNpQ016V3N6dW0zd3hNYXM5ZnFOeHBhQ3hD?=
+ =?utf-8?B?YjMzRHdIVGhWUkdQd1ZLSW94R2RMeXpmY0w4TkRMVHJFSmxYR2NDNkZ6OC9G?=
+ =?utf-8?B?Z2VsdHJxcGZZYkw4eVRqSWlHZHorelBFZ3Q0bWJGZWtycDhsSC9iaFBGYTU3?=
+ =?utf-8?B?L3MyY1I1ajNYMzVpWDQvZHQ5MXJBZ2tEalBoMjBFUXZhRXJZeklRTHp5OUZr?=
+ =?utf-8?B?YUJuaXBSS0oxTURDZEFGeVFEYmlMMmJnNTZENG4zVlROcjZWQm5KTkxuMEpQ?=
+ =?utf-8?B?dFlGQU0wZ09UQmpVMWVTaUZwMGR4ZDg3WU52Sjl3ajFLODRqMkVuU3h0bVc3?=
+ =?utf-8?B?aTIvTUFSVFhRQ0NWM05RYWNDU1FpaWJHZlkxQkloc1M1VXFsUUMwUFlRUVFK?=
+ =?utf-8?B?dUwzcTkyMkRiOVdRand2Q3FoZ3BMd25UKy9xWjdWblhJWWpzWmFtWklucHRQ?=
+ =?utf-8?B?K0s3M0IrckcvT2JZVWFXN1lXRDd1djN6Rlkzd0lGdERyOEFaRDF6RFZTMUNF?=
+ =?utf-8?B?V3JYSW5KLzJjcituSS9yYVJJRkJBMG5EN1RWSVViVytjSVFSSHlQOFNOTHZB?=
+ =?utf-8?B?ZTBwYXlpTGFUWmxCU09uck9RcWxjOTZXZHFlN0lQeG1GZmd1K0NiR252R05O?=
+ =?utf-8?B?OWlVajFISmtFZTNLY0tOUHhZTXd0bzFGRk9MeWtVbDlBS0FmVFZWbEhvNnRW?=
+ =?utf-8?B?Q05VeUhpMlFlT1gvSVpyRkNrdHM0QW1uZU9odnRhYnZ4akErU1RzcGlvYWZa?=
+ =?utf-8?B?b0wvbW4zZnhNY1oyMms0Nmp0TnRDTURXb1dBcnI4V0krQ09sTE9hdHRvMC90?=
+ =?utf-8?B?WDViOW1NZlVmczB6anJWTTRtUHZUalUvSG1sWHA4cmRoZU1KQ3hJSnNTRHcw?=
+ =?utf-8?B?d1NubWg3RjdNV0toU1RoTDgxd1hIQjZMRldhYmxuSmpnbWJXZEF3L1h6S2o1?=
+ =?utf-8?B?RnlPL1UrcS9YWEdTYTFkeHFKa3ZsbllZVThESUFSVlBJbnVPQWZiWWxpMHg4?=
+ =?utf-8?B?RHRoV1gvemZoU3NyN0k3c1ltbXpybHIzT0xrVnh5RnFFOWdFdUpCcGgwMGpE?=
+ =?utf-8?B?WGNTMXNQYW0xcURPTWQvUlFjSlFXWHFaVlltZ2dtQWpqMVpLOXF1WjR0ZWJQ?=
+ =?utf-8?B?cjBmcmtlSk5IME5hMjI2WVRhOGx0OWsrSHExb0Vad01oL3lvMWtkYXNqcUxS?=
+ =?utf-8?B?NEFTNjJoMFB6aFJqaERadzJFWFFIc2xZcnpMenJSQUpyYTlsTWdNMzkxYXV0?=
+ =?utf-8?B?YktLSmZqWk9mQWdYN0pMbEJxak13NjdlVDdOc3drZVdyR3Q0b01Bc1VQY0tU?=
+ =?utf-8?B?R0FqVy9KT2RhaHlIKzhYb3hsZTJiaWdUbUh1dnlwc0t4blhzaVZSU2VCMXFU?=
+ =?utf-8?B?WHUvMG8zK3hndUNQSVBXZDhVeDVDbHNpWXNZUzVLQ2V2UWkvRjBLUU5IUFpa?=
+ =?utf-8?B?UnplMEpzQkIvN0JkaHExeFViM2VIMVMraFNpOVJCL0ZocXhHcGFjQkd1SVBp?=
+ =?utf-8?B?cVZqUnlqTU1GZkVYNE1lMkN3UWlOd2h6Tmt4RVU0TVlvdVVhNG9hSUZrL0Uv?=
+ =?utf-8?B?ZjJWUjhPMmcrK1NhTkZEaEdoalN2OGhWUmFTa2JmanpXQzlWN2p2bE5peDBh?=
+ =?utf-8?B?T3U5N0Q0Ym5SZzhqdWdMNnh5Mlo3enZyUnJETVBzeDI1dGt3T2I1eFNrMERu?=
+ =?utf-8?B?K3RkTWlGWjg5QWY3dkd1amZTeldSbGJUSWdFVXcvVmJDRDRSZ1NDRW04azYw?=
+ =?utf-8?B?dFM0bWtYU2trRDc3TWNDd3JGN3BjckNxMGJISzlKTFZjRUVHM2lST1pYU3FO?=
+ =?utf-8?B?YThib1JHS3lmUHY0Wk5naGVNWGN0akVZbkRib250R1NjUkdBaTlJV3NhVnV0?=
+ =?utf-8?B?MzdoYWUvTG1NRXluSXlHN241ZnhWUXRLWkpKZGJZSExPUndNVG11d09PU202?=
+ =?utf-8?B?a3ZsVnVMQ1NkTkZ6T0ZoRWdYVXV0MFk0RWE2SDZ6WERFcFhud1RtNGVxak9y?=
+ =?utf-8?Q?NJ4dSMEOFog5yR0pTtX3OFu9f?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	/bjYFOjXA2iB+v1fUZ4BFVVOsfGhv9TsZMwGG66dM/23LuE28SfKnM/FiX/6WZfO78IPo4xNgXU6ByxCztFSBhjvFeAPItGn+YCfVsovOBT/9gWrIhW5bwIWFP/STHznSN+vf2C3gJsp6sDcMnJEtMT/hof4Ggk7VDuLR4GgMXEQ2oAm10OxEgFtfIWMS8nsDtx9xuK6MA56xmgyYcz+xJoHd/JJAVLVW8ZmqQXJtSQK7pGsqb9/D9o93eKzsYN2i/RxzLcWPC1Am8TGQYMI3sAVdv7/L2Hz6MfSbJbBti7uqBYTTKSKwt3d0ChqZjAUkmVXrb+7KShHuk/8urOCwrdUH+T6qW/tQNJDLiDui6Prw0OjZaG/SB4BPKTj1gzyxl05a3pS41gkyRG3VCGIHtlvGLJIBbcewojeGJD2rGHl/L2tNK126SSvh/F2tZtbowwmuP+TEGY9Z6UaEqgpeqPoPg2wpIrMTZNI5tuNxXmzXGpf2vp31kbz1hvhbyQ5wNvJ9PfOMjGGX4xTMShAQvmc83g2r8OukhEmjmHxP6U+GPAHweuS5bZygTuAKn+lbnjSlPjdSuz+opmcL+wylc1xoMHn9yyNJeIm7iEyH00=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11150ea3-6a49-4259-8351-08dc5ac9423b
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR10MB6425.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2024 08:19:22.7946
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6gXBrZhHZnArVOKd1tcfCOmMD6VGo6B/xGJ4BR0ywGsJRrvPDGGlRQy58b+b4yLHpd9r7pjJwpNZecjd883hmA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB7172
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-12_04,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
+ adultscore=0 malwarescore=0 bulkscore=0 suspectscore=0 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404120058
+X-Proofpoint-GUID: -w8lICLVWbpRrn216iPQNO8YkqPycglq
+X-Proofpoint-ORIG-GUID: -w8lICLVWbpRrn216iPQNO8YkqPycglq
 
 
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int hisi_acc_vf_debug_cmd(struct seq_file *seq, void *data)
->> +{
->> +	struct device *vf_dev = seq->private;
->> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
->> +	struct vfio_device *vdev = &core_device->vdev;
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
->> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
->> +	u64 value;
->> +	int ret;
->> +
->> +	mutex_lock(&hisi_acc_vdev->enable_mutex);
->> +	ret = hisi_acc_vf_debug_check(seq, vdev);
->> +	if (ret) {
->> +		mutex_unlock(&hisi_acc_vdev->enable_mutex);
->> +		return 0;
-> 
-> Why do we squash the error return here and throughout?
->
-seq_printf() gives the user a failure message.
-This can be changed to "return ret;"
 
->> +	}
->> +
->> +	value = readl(vf_qm->io_base + QM_MB_CMD_SEND_BASE);
->> +	mutex_unlock(&hisi_acc_vdev->enable_mutex);
->> +	seq_printf(seq, "%s:0x%llx\n", "mailbox cmd channel state is OK", value);
-> 
-> We didn't test the value, what makes the state OK?  Can this readl() or
-> those in qm_wait_dev_not_ready() interfere with the main device flow?
->
-
-If the cmd channel is normal, it will return a non-all-F value.
-Add exception checking in the next version.
-
-cmd channel read operation will not affect the main migration process.
-
->> +
->> +	return 0;
->> +}
->> +
->> +static int hisi_acc_vf_debug_save(struct seq_file *seq, void *data)
->> +{
->> +	struct device *vf_dev = seq->private;
->> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
->> +	struct vfio_device *vdev = &core_device->vdev;
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
->> +	struct hisi_acc_vf_migration_file *migf = hisi_acc_vdev->debug_migf;
->> +	struct acc_vf_data *vf_data = &migf->vf_data;
->> +	int ret;
->> +
->> +	mutex_lock(&hisi_acc_vdev->enable_mutex);
->> +	ret = hisi_acc_vf_debug_check(seq, vdev);
->> +	if (ret) {
->> +		mutex_unlock(&hisi_acc_vdev->enable_mutex);
->> +		return 0;
->> +	}
->> +
->> +	vf_data->vf_qm_state = QM_READY;
->> +	ret = vf_qm_read_data(&hisi_acc_vdev->vf_qm, vf_data);
->> +	if (ret) {
->> +		mutex_unlock(&hisi_acc_vdev->enable_mutex);
->> +		seq_printf(seq, "%s\n", "failed to save device data!");
->> +		return 0;
->> +	}
->> +
->> +	migf->total_length = sizeof(struct acc_vf_data);
->> +	mutex_unlock(&hisi_acc_vdev->enable_mutex);
->> +	seq_printf(seq, "%s\n", "successful to save device data!");
->> +
->> +	return 0;
->> +}
->> +
->> +static int hisi_acc_vf_data_read(struct seq_file *seq, void *data)
->> +{
->> +	struct device *vf_dev = seq->private;
->> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
->> +	struct vfio_device *vdev = &core_device->vdev;
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
->> +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev->debug_migf;
->> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
->> +
->> +	if (debug_migf && debug_migf->total_length)
->> +		seq_hex_dump(seq, "Mig Data:", DUMP_PREFIX_OFFSET, 16, 1,
->> +				(unsigned char *)&debug_migf->vf_data,
->> +				vf_data_sz, false);
->> +	else
->> +		seq_printf(seq, "%s\n", "device not migrated!");
-> 
-> "device state not saved"?  Although I don't recall why this doesn't
-> just return an errno.
->
-
-OK, those who exit directly without migration will be processed according
-to the error mode and an error code will be returned.
-
->> +
->> +	return 0;
->> +}
->> +
->> +static int hisi_acc_vf_attr_read(struct seq_file *seq, void *data)
->> +{
->> +	struct device *vf_dev = seq->private;
->> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
->> +	struct vfio_device *vdev = &core_device->vdev;
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
->> +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev->debug_migf;
->> +
->> +	if (debug_migf && debug_migf->total_length) {
->> +		seq_printf(seq,
->> +			 "acc device:\n"
->> +			 "device  state: %d\n"
->> +			 "device  ready: %u\n"
->> +			 "data    valid: %d\n"
->> +			 "data     size: %lu\n",
->> +			 hisi_acc_vdev->mig_state,
-> 
-> This is redundant to migration/state, however note
-
-OK!
-
-> hisi_acc_vfio_pci_get_device_state() protects the value with state
-> mutex while reading it.
-> 
->> +			 hisi_acc_vdev->vf_qm_state,
-> 
-> What's the purpose of this, it's ready or not, what does that mean?
+On 4/10/24 02:52, Jack Allister wrote:
+> A VM's KVM/PV clock has an inherent relationship to it's TSC (guest). When
+> either the host system live-updates or the VM is live-migrated this pairing
+> of the two clock sources should stay the same.
 > 
 
-If this status is not ready, the live migration process will exit directly.
-It indicates that there are two possible exceptions:
-1. The acc device driver in the VM does not have insmod.
-2. The acc device driver in the VM is insmoded, but the cmd channel is abnormal.
+[snip]
 
->> +			 debug_migf->disabled,
-> 
-> What's the purpose of this?
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	bool scale_tsc;
+> +
+> +	scale_tsc = argc > 1 && (!strncmp(argv[1], "-s", 3) ||
+> +				 !strncmp(argv[1], "--scale-tsc", 10));
+> +
+> +	TEST_REQUIRE(sys_clocksource_is_based_on_tsc());
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> +
+> +	configure_pvclock(vm, vcpu);
+> +
+> +	if (scale_tsc)
+> +		configure_scaled_tsc(vcpu);
+> +
+> +	run_test(vm, vcpu);
+> +
+> +	return 0;
+> +}
 
-Get the enable status of migf file in the driver.
+David suggested make the scale_tsc automatically based on the availability of
+the feature.
 
-> 
->> +			 debug_migf->total_length);
-> 
-> Why not just have this printed or inferred via the above data_read
-> function, this all seems unnecessary.
->
+Therefore, if there is going to be v3, I suggest add kvm_vm_free() explicitly
+(similar to close(fd)).
 
-This is used to obtain some key status of the live migration driver.
-It is more important than data in problem location.
-So it is output in key-value pairs.
+Thank you very much!
 
-The above data is directly output in the form of hexadecimal data.
-It is used for more detailed analysis when there are no abnormalities
-in the key status.
-
->> +	} else {
->> +		seq_printf(seq, "%s\n", "device not migrated!");
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->> +{
->> +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
->> +	struct dentry *vfio_dev_migration = NULL;
->> +	struct dentry *vfio_hisi_acc = NULL;
->> +	struct device *dev = vdev->dev;
->> +	void *migf = NULL;
->> +
->> +	if (!debugfs_initialized())
->> +		return 0;
->> +
->> +	migf = kzalloc(sizeof(struct hisi_acc_vf_migration_file), GFP_KERNEL);
->> +	if (!migf)
->> +		return -ENOMEM;
->> +	hisi_acc_vdev->debug_migf = migf;
->> +
->> +	vfio_dev_migration = debugfs_lookup("migration", vdev->debug_root);
-> 
-> Fails to build without CONFIG_DEBUG_FS=y  There should be a dependency
-> on CONFIG_VFIO_DEBUGFS here somewhere.
->
-
-Yes, the driver needs to add "!IS_ENABLED(CONFIG_VFIO_DEBUGFS)"
-behind "debugfs_initialized()" above.
-
->> +	if (!vfio_dev_migration) {
->> +		kfree(migf);
-> 
-> hisi_acc_vdev->debug_migf still points at this freed buffer, the return
-> value of this function is not tested, allows a use-after-free in
-> all of the below debugfs interfaces.
->
-
-Yes, there needs to add "hisi_acc_vdev->debug_migf = NULL"
-
->> +		dev_err(dev, "failed to lookup migration debugfs file!\n");
->> +		return -ENODEV;
->> +	}
->> +
->> +	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
->> +	debugfs_create_devm_seqfile(dev, "data", vfio_hisi_acc,
->> +				  hisi_acc_vf_data_read);
->> +	debugfs_create_devm_seqfile(dev, "attr", vfio_hisi_acc,
->> +				  hisi_acc_vf_attr_read);
->> +	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
->> +				  hisi_acc_vf_debug_cmd);
->> +	debugfs_create_devm_seqfile(dev, "save", vfio_hisi_acc,
->> +				  hisi_acc_vf_debug_save);
->> +
->> +	return 0;
->> +}
->> +
->> +static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->> +{
->> +	if (!debugfs_initialized())
->> +		return;
->> +
->> +	kfree(hisi_acc_vdev->debug_migf);
-> 
-> Double free if the lookup in init fails.
->
-
-After adding "hisi_acc_vdev->debug_migf = NULL" above.
-These processing codes need to be added here:
-
-if (hisi_acc_vdev->debug_migf)
-	kfree(hisi_acc_vdev->debug_migf);
-
->> +}
->> +
->>  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
->>  {
->>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(core_vdev);
->> @@ -1311,9 +1506,11 @@ static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
->>  			return ret;
->>  		}
->>  		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
->> +		hisi_acc_vdev->dev_opened = DEV_OPEN;
-> 
->  = true!
->
-
-OK, the next version will not use enumeration values. will use true/false assignment.
-
->>  	}
->>  
->>  	vfio_pci_core_finish_enable(vdev);
->> +
->>  	return 0;
->>  }
->>  
->> @@ -1322,7 +1519,10 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
->>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(core_vdev);
->>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
->>  
->> +	hisi_acc_vdev->dev_opened = DEV_CLOSE;
->> +	mutex_lock(&hisi_acc_vdev->enable_mutex);
->>  	iounmap(vf_qm->io_base);
->> +	mutex_unlock(&hisi_acc_vdev->enable_mutex);
->>  	vfio_pci_core_close_device(core_vdev);
->>  }
->>  
->> @@ -1413,6 +1613,9 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
->>  	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device);
->>  	if (ret)
->>  		goto out_put_vdev;
->> +
->> +	if (ops == &hisi_acc_vfio_pci_migrn_ops)
->> +		hisi_acc_vfio_debug_init(hisi_acc_vdev);
->>  	return 0;
->>  
->>  out_put_vdev:
->> @@ -1425,6 +1628,7 @@ static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
->>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_drvdata(pdev);
->>  
->>  	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
->> +	hisi_acc_vf_debugfs_exit(hisi_acc_vdev);
->>  	vfio_put_device(&hisi_acc_vdev->core_device.vdev);
->>  }
->>  
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> index 7a9dc87627cd..3a20d81d105c 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> @@ -52,6 +52,11 @@
->>  #define QM_EQC_DW0		0X8000
->>  #define QM_AEQC_DW0		0X8020
->>  
->> +enum acc_dev_state {
->> +	DEV_CLOSE = 0x0,
->> +	DEV_OPEN,
->> +};
->> +
->>  struct acc_vf_data {
->>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
->>  	/* QM match information */
->> @@ -114,5 +119,11 @@ struct hisi_acc_vf_core_device {
->>  	int vf_id;
->>  	struct hisi_acc_vf_migration_file *resuming_migf;
->>  	struct hisi_acc_vf_migration_file *saving_migf;
->> +
->> +	/* To make sure the device is enabled */
->> +	struct mutex enable_mutex;
->> +	bool dev_opened;
->> +	/* For debugfs */
->> +	struct hisi_acc_vf_migration_file *debug_migf;
->>  };
->>  #endif /* HISI_ACC_VFIO_PCI_H */
-> 
-> .
-> 
-Thank you very much for your careful inspection.
-I will revise the inspection issues you mentioned above
-one by one and publish them in the next version.
-
-Thanks again!
-Longfang.
+Dongli Zhang
 
