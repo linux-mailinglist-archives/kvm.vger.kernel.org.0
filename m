@@ -1,328 +1,163 @@
-Return-Path: <kvm+bounces-14524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 204CF8A2E27
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 14:22:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E05DB8A2EDC
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 15:07:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA180283FA5
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:22:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FD3DB22823
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 13:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422E156753;
-	Fri, 12 Apr 2024 12:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73B15F873;
+	Fri, 12 Apr 2024 13:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lpaeb2kn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlWYRY6R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8309A54FB1;
-	Fri, 12 Apr 2024 12:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC854224D8;
+	Fri, 12 Apr 2024 13:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712924532; cv=none; b=FwWTLskLK+G4Eo86x8EmhCV81Veia7BgTbtnAD/eA+w4XAHfeoEfwljKQseJfqbU4N1bGIsgbNZNGG0hYq4Km/5JsmXhVzVQxkNKSYkwYmOfEIirPpD76Dfuaa47VkMYygmUWsU3hToYBJDxrY6MKo3vgFbeS6iaTi7kTgop4u0=
+	t=1712927263; cv=none; b=iH/E8a1bESxvMQRDDxc6HNPMm7+uaZWyuN682tWdbBBlgbz0PMwe8aweteOrMqpEIGDun7r2xAlprMXCn9+/4muIxBZmvTqs0TRR5b4bTkxjJvOWHJ0WZC9MgTB1Qyl+qjA0ZjVSXRqNhDaqAWmCmk73PwhXx5a7GL/uhshW2h8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712924532; c=relaxed/simple;
-	bh=TTl55aY4/Vx/aiX0tkcJhaSZDYNmqg+ceKBbpV2xhpI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hZY5eI24rnBROvrhyv68CjigClsBDXl4Z/2ts6LL9O0njdQBrAmiHfwmuMytFJu48OtHvgVpsrw2vz4HZ6pI5LbXQA4QzkScDFBMTne6mTfHsxf/jMeeunT1VZkMTZpK+DFCkVFN8slLmH86r7z+IvI7GHIIHws6G1HcjA2JHq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lpaeb2kn; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712924530; x=1744460530;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TTl55aY4/Vx/aiX0tkcJhaSZDYNmqg+ceKBbpV2xhpI=;
-  b=Lpaeb2knZ/38K/04sGRsKZ6DWTXoCLWPd38jPRmI4PIcWdAn3HQ3+IAa
-   1OiGUYWum06bikEVs2Mp1tEmb3Loz9mH60Akr2HY/xgtxdQfeDASxF1Sa
-   CocH+TXCQ3MYMM31AM+YM0U27FHqko+n9XFk1mRjtVWD14o1MNKoqb3gL
-   eJJ0GT2N1kHbxbnbA4qluwvn2rBbWAOq0zvyeJ2j8ddz0lFqqgGFgVFEJ
-   +LzwKm/3qlxQsknpkKMbxQOWFt/lLzZTUMtSXGgenBdnbBD8q38YC8o0+
-   P0+s6HIUMk8PjhzjlcbnDIE/+gCWfZnqRH88MDYOzOcMeJ9cxI33S+Lpp
-   g==;
-X-CSE-ConnectionGUID: MaFm/kQlQlCscaoy2B4eeg==
-X-CSE-MsgGUID: YR4vNGVTTlua/TGNscfx1w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="8236167"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8236167"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 05:22:09 -0700
-X-CSE-ConnectionGUID: YueSwZA+TWiGmEfFjYLlfA==
-X-CSE-MsgGUID: SvjLaqCFSoKCRW6BWiGWBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="21645224"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.251.215.136])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 05:22:06 -0700
-Message-ID: <a876accc-a7bf-4317-9612-d6d5a1fbaf9c@intel.com>
-Date: Fri, 12 Apr 2024 15:22:00 +0300
+	s=arc-20240116; t=1712927263; c=relaxed/simple;
+	bh=WXXIdGk+X4xSO8A0Mdd/JdZXvSOz7cKKHzKcx7zp/e4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YmMAEgkC1dkAh6rJCF1JtWJEJT8jcU3rBhxyMeJizZ9bzyWivMdqYo5cBR3krZC+zaZcugYMRGftcokw8uTEplW+tMQXCQZf6D02vbrI0o7tX6vGcpmXnBHpZam62Tn42chkWaa49jh3NEmRa3Zz9ISBkqapBmvDp7JYsPNO/AU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlWYRY6R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C47CC113CC;
+	Fri, 12 Apr 2024 13:07:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712927262;
+	bh=WXXIdGk+X4xSO8A0Mdd/JdZXvSOz7cKKHzKcx7zp/e4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mlWYRY6R+uO4KNbt8cIf64MguVd8/GHUg7jqEfibnb2j2yYOr842hoff3W6jZ2W6Q
+	 BRWCuZA/oNlXy6/0CFH3viAXrc8qD5Z1kg2VqyfMrkRlL0GkKt6FGGkq7vjol+/rWf
+	 xhKn1pcS/RFNPqEmpu+De8hHFtcOYW9290Q6wreBB+LuxJjv7MvmphVuMNI5yVeK6v
+	 8LwCZ6+IMlvHhnGCu56SknAEpcfLvStMVcRpKtbhCnCjRQrnLJanixlnZPvxJPcLtA
+	 DyvXUuh5xMgv1rPhe/ETCYBkM2o42kXk36Yi7g8UEQFJ2zPIyYqG+w5RiuGqXWqE3I
+	 xnLxdM3U5CxIw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rvGd1-003tLC-MV;
+	Fri, 12 Apr 2024 14:07:39 +0100
+Date: Fri, 12 Apr 2024 14:07:38 +0100
+Message-ID: <86le5isp9h.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH 0/4] KVM, mm: remove the .change_pte() MMU notifier and set_pte_at_notify()
+In-Reply-To: <20240405115815.3226315-1-pbonzini@redhat.com>
+References: <20240405115815.3226315-1-pbonzini@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 076/130] KVM: TDX: Finalize VM initialization
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, isaku.yamahata@gmail.com,
- Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
- Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>,
- Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, hang.yuan@intel.com,
- tina.zhang@intel.com, isaku.yamahata@linux.intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <e3c862ae9c78bda2988768c1038fec100bb372cf.1708933498.git.isaku.yamahata@intel.com>
- <f3381541-822b-4e94-93f7-699afc6aa6a3@intel.com>
- <20240412010848.GG3039520@ls.amr.corp.intel.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <20240412010848.GG3039520@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, oliver.upton@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, tsbogend@alpha.franken.de, npiggin@gmail.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, akpm@linux-foundation.org, david@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 12/04/24 04:08, Isaku Yamahata wrote:
-> On Thu, Apr 11, 2024 at 07:39:11PM +0300,
-> Adrian Hunter <adrian.hunter@intel.com> wrote:
+On Fri, 05 Apr 2024 12:58:11 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
->> On 26/02/24 10:26, isaku.yamahata@intel.com wrote:
->>> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>>
->>> To protect the initial contents of the guest TD, the TDX module measures
->>> the guest TD during the build process as SHA-384 measurement.  The
->>> measurement of the guest TD contents needs to be completed to make the
->>> guest TD ready to run.
->>>
->>> Add a new subcommand, KVM_TDX_FINALIZE_VM, for VM-scoped
->>> KVM_MEMORY_ENCRYPT_OP to finalize the measurement and mark the TDX VM ready
->>> to run.
->>
->> Perhaps a spruced up commit message would be:
->>
->> <BEGIN>
->> Add a new VM-scoped KVM_MEMORY_ENCRYPT_OP IOCTL subcommand,
->> KVM_TDX_FINALIZE_VM, to perform TD Measurement Finalization.
->>
->> Documentation for the API is added in another patch:
->> "Documentation/virt/kvm: Document on Trust Domain Extensions(TDX)"
->>
->> For the purpose of attestation, a measurement must be made of the TDX VM
->> initial state. This is referred to as TD Measurement Finalization, and
->> uses SEAMCALL TDH.MR.FINALIZE, after which:
->> 1. The VMM adding TD private pages with arbitrary content is no longer
->>    allowed
->> 2. The TDX VM is runnable
->> <END>
->>
->> History:
->>
->> This code is essentially unchanged from V1, as below.
->> Except for V5, the code has never had any comments.
->> Paolo's comment from then still appears unaddressed.
->>
->> V19:		Unchanged
->> V18:		Undoes change of V17
->> V17:		Also change tools/arch/x86/include/uapi/asm/kvm.h
->> V16:		Unchanged
->> V15:		Undoes change of V10
->> V11-V14:	Unchanged
->> V10:		Adds a hack (related to TDH_MEM_TRACK)
->> 		that was later removed in V15
->> V6-V9:		Unchanged
->> V5		Broke out the code into a separate patch and
->> 		received its only comments, which were from Paolo:
->>
->> 	"Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->> 	Note however that errors should be passed back in the struct."
->> 		
->> 	This presumably refers to struct kvm_tdx_cmd which has an "error"
->> 	member, but that is not updated by tdx_td_finalizemr()
->>
->> V4 was a cut-down series and the code was not present
->> V3 introduced WARN_ON_ONCE for the error condition
->> V2 accommodated renaming the seamcall function and ID
+> The .change_pte() MMU notifier callback was intended as an optimization
+> and for this reason it was initially called without a surrounding
+> mmu_notifier_invalidate_range_{start,end}() pair.  It was only ever
+> implemented by KVM (which was also the original user of MMU notifiers)
+> and the rules on when to call set_pte_at_notify() rather than set_pte_at()
+> have always been pretty obscure.
 > 
-> Thank you for creating histories. Let me update the commit message.
+> It may seem a miracle that it has never caused any hard to trigger
+> bugs, but there's a good reason for that: KVM's implementation has
+> been nonfunctional for a good part of its existence.  Already in
+> 2012, commit 6bdb913f0a70 ("mm: wrap calls to set_pte_at_notify with
+> invalidate_range_start and invalidate_range_end", 2012-10-09) changed the
+> .change_pte() callback to occur within an invalidate_range_start/end()
+> pair; and because KVM unmaps the sPTEs during .invalidate_range_start(),
+> .change_pte() has no hope of finding a sPTE to change.
 > 
+> Therefore, all the code for .change_pte() can be removed from both KVM
+> and mm/, and set_pte_at_notify() can be replaced with just set_pte_at().
 > 
->> Outstanding:
->>
->> 1. Address Paolo's comment about the error code
->> 2. Is WARN_ON sensible?
+> Please review!  Also feel free to take the KVM patches through the mm
+> tree, as I don't expect any conflicts.
 > 
-> See below.
+> Thanks,
 > 
+> Paolo
 > 
->> Final note:
->>
->> It might be possible to make TD Measurement Finalization
->> transparent to the user space VMM and forego another API, but it seems
->> doubtful that would really make anything much simpler.
->>
->>>
->>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->>>
->>> ---
->>> v18:
->>> - Remove the change of tools/arch/x86/include/uapi/asm/kvm.h.
->>>
->>> v14 -> v15:
->>> - removed unconditional tdx_track() by tdx_flush_tlb_current() that
->>>   does tdx_track().
->>>
->>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->>> ---
->>>  arch/x86/include/uapi/asm/kvm.h |  1 +
->>>  arch/x86/kvm/vmx/tdx.c          | 21 +++++++++++++++++++++
->>>  2 files changed, 22 insertions(+)
->>>
->>> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
->>> index 34167404020c..c160f60189d1 100644
->>> --- a/arch/x86/include/uapi/asm/kvm.h
->>> +++ b/arch/x86/include/uapi/asm/kvm.h
->>> @@ -573,6 +573,7 @@ enum kvm_tdx_cmd_id {
->>>  	KVM_TDX_INIT_VM,
->>>  	KVM_TDX_INIT_VCPU,
->>>  	KVM_TDX_EXTEND_MEMORY,
->>> +	KVM_TDX_FINALIZE_VM,
->>>  
->>>  	KVM_TDX_CMD_NR_MAX,
->>>  };
->>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->>> index 3cfba63a7762..6aff3f7e2488 100644
->>> --- a/arch/x86/kvm/vmx/tdx.c
->>> +++ b/arch/x86/kvm/vmx/tdx.c
->>> @@ -1400,6 +1400,24 @@ static int tdx_extend_memory(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
->>>  	return ret;
->>>  }
->>>  
->>> +static int tdx_td_finalizemr(struct kvm *kvm)
->>> +{
->>> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->>> +	u64 err;
->>> +
->>> +	if (!is_hkid_assigned(kvm_tdx) || is_td_finalized(kvm_tdx))
->>> +		return -EINVAL;
->>> +
->>> +	err = tdh_mr_finalize(kvm_tdx->tdr_pa);
->>> +	if (WARN_ON_ONCE(err)) {
->>
->> Is a failed SEAMCALL really something to WARN over?
+> Paolo Bonzini (4):
+>   KVM: delete .change_pte MMU notifier callback
+>   KVM: remove unused argument of kvm_handle_hva_range()
+>   mmu_notifier: remove the .change_pte() callback
+>   mm: replace set_pte_at_notify() with just set_pte_at()
 > 
-> Because user can trigger an error in some cases, we shouldn't WARN in such case.
-> Except those, TDH.MR.FINALIZE() shouldn't return error.  If we hit such error,
-> it typically implies serious error so that the recovery is difficult.  For
-> example, the TDX module was broken by the host overwriting private pages.
-> That's the reason why we have KVM_BUN_ON.  So the error check should be
-> something like
->  
+>  arch/arm64/kvm/mmu.c                  | 34 -----------------
+>  arch/loongarch/include/asm/kvm_host.h |  1 -
+>  arch/loongarch/kvm/mmu.c              | 32 ----------------
+>  arch/mips/kvm/mmu.c                   | 30 ---------------
+>  arch/powerpc/include/asm/kvm_ppc.h    |  1 -
+>  arch/powerpc/kvm/book3s.c             |  5 ---
+>  arch/powerpc/kvm/book3s.h             |  1 -
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c   | 12 ------
+>  arch/powerpc/kvm/book3s_hv.c          |  1 -
+>  arch/powerpc/kvm/book3s_pr.c          |  7 ----
+>  arch/powerpc/kvm/e500_mmu_host.c      |  6 ---
+>  arch/riscv/kvm/mmu.c                  | 20 ----------
+>  arch/x86/kvm/mmu/mmu.c                | 54 +--------------------------
+>  arch/x86/kvm/mmu/spte.c               | 16 --------
+>  arch/x86/kvm/mmu/spte.h               |  2 -
+>  arch/x86/kvm/mmu/tdp_mmu.c            | 46 -----------------------
+>  arch/x86/kvm/mmu/tdp_mmu.h            |  1 -
+>  include/linux/kvm_host.h              |  2 -
+>  include/linux/mmu_notifier.h          | 44 ----------------------
+>  include/trace/events/kvm.h            | 15 --------
+>  kernel/events/uprobes.c               |  5 +--
+>  mm/ksm.c                              |  4 +-
+>  mm/memory.c                           |  7 +---
+>  mm/migrate_device.c                   |  8 +---
+>  mm/mmu_notifier.c                     | 17 ---------
+>  virt/kvm/kvm_main.c                   | 50 +------------------------
+>  26 files changed, 10 insertions(+), 411 deletions(-)
 > 
->         /* We can hit busy error to exclusively access TDR. */
->  	if (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX))
-> 		return -EAGAIN;
->         /* User can call KVM_TDX_INIT_VM without any vCPUs created. */
-> 	if (err == TDX_NO_VCPUS)
-> 		return -EIO;
->         /* Other error shouldn't happen. */
->         if (KVM_BUG_ON(err, kvm)) {
->                 pr_tdx_error(TDH_MR_FINALIZE, err);
->                 return -EIO;
->         }
-> 
-> 
->>> +		pr_tdx_error(TDH_MR_FINALIZE, err, NULL);
->>
->> As per Paolo, error code is not returned in struct kvm_tdx_cmd
-> 
-> 
-> It will be something like the followings. No compile test yet.
-> 
-> 
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 0d3b79b5c42a..c7ff819ccaf1 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -2757,6 +2757,12 @@ static int tdx_td_finalizemr(struct kvm *kvm)
->  		return -EINVAL;
->  
->  	err = tdh_mr_finalize(kvm_tdx);
-> +	kvm_tdx->hw_error = err;
-> +
-> +	if (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX))
 
-There seem to be also implicit operand codes.  How sure are
-we that TDX_OPERAND_ID_RCX is the only valid busy operand?
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-> +		return -EAGAIN;
-> +	if (err == TDX_NO_VCPUS)
+	M.
 
-TDX_NO_VCPUS is not one of the completion status codes for
-TDH.MR.FINALIZE
-
-> +		return -EIO;
->  	if (KVM_BUG_ON(err, kvm)) {
->  		pr_tdx_error(TDH_MR_FINALIZE, err);
->  		return -EIO;
-> @@ -2768,6 +2774,7 @@ static int tdx_td_finalizemr(struct kvm *kvm)
->  
->  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->  {
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->  	struct kvm_tdx_cmd tdx_cmd;
->  	int r;
->  
-> @@ -2777,6 +2784,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->  		return -EINVAL;
->  
->  	mutex_lock(&kvm->lock);
-> +	kvm_tdx->hw_error = 0;
->  
->  	switch (tdx_cmd.id) {
->  	case KVM_TDX_CAPABILITIES:
-> @@ -2793,6 +2801,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->  		goto out;
->  	}
->  
-> +	tdx_cmd.error = kvm_tdx->hw_error;
->  	if (copy_to_user(argp, &tdx_cmd, sizeof(struct kvm_tdx_cmd)))
->  		r = -EFAULT;
->  
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 98f5d7c5891a..dc150b8bdd5f 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -18,6 +18,9 @@ struct kvm_tdx {
->  	u64 xfam;
->  	int hkid;
->  
-> +	/* For KVM_TDX ioctl to return SEAMCALL status code. */
-> +	u64 hw_error;
-
-For this case, it seems weird to have a struct member
-to pass back a return status code,  why not make it a parameter
-of tdx_td_finalizemr() or pass &tdx_cmd?
-
-> +
->  	/*
->  	 * Used on each TD-exit, see tdx_user_return_update_cache().
->  	 * TSX_CTRL value on TD exit
-> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
-> index a8aa8b79e9a1..6c701856c9a8 100644
-> --- a/arch/x86/kvm/vmx/tdx_errno.h
-> +++ b/arch/x86/kvm/vmx/tdx_errno.h
-> @@ -41,6 +41,7 @@
->  #define TDX_TD_FATAL				0xC000060400000000ULL
->  #define TDX_TD_NON_DEBUG			0xC000060500000000ULL
->  #define TDX_LIFECYCLE_STATE_INCORRECT		0xC000060700000000ULL
-> +#define TDX_NO_VCPUS				0xC000060900000000ULL
->  #define TDX_TDCX_NUM_INCORRECT			0xC000061000000000ULL
->  #define TDX_VCPU_STATE_INCORRECT		0xC000070000000000ULL
->  #define TDX_VCPU_ASSOCIATED			0x8000070100000000ULL
-
+-- 
+Without deviation from the norm, progress is not possible.
 
