@@ -1,149 +1,149 @@
-Return-Path: <kvm+bounces-14565-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14566-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20EDA8A357D
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 20:19:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF458A35BE
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 20:32:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301BB1C2332C
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 18:19:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E43DFB23BC0
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 18:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D29914EC5A;
-	Fri, 12 Apr 2024 18:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4B114F139;
+	Fri, 12 Apr 2024 18:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j1WD52EX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C+uydLnX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9053B14D708;
-	Fri, 12 Apr 2024 18:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4849205E22
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 18:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712945941; cv=none; b=mxSbPN/gns5b8Tx20nbzvCjW7QDP/rU3KgNeFc1fiQdyDEs43spsrDCSqjANBRl6uECAYM6KwlF4ncRQkw7Kl+IzGJLqLC4WT6C2k+Ry0a/D6vpzxxOdxQF57grFE5y3K/dhfhL0KIu4qk1HxUSmk1l8mrtEChYsvtT5G2EWEJY=
+	t=1712946728; cv=none; b=KSV8pQ3VJbgeJJqxp8euXVbZ8e2QNgj5f7Y44TxeiTPx3fWQ4xKzsMzIlIvvUjx/OzSJT2yCHJEvY5nl6BCfb1aggM+ZFkjx6rSkO8bLLdj5V4T1XAzoozDS3TybaCiHPrh3yE8F8XK7UU4dogyPK4WPHTEUPKW+EmuUHWmxqaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712945941; c=relaxed/simple;
-	bh=qcfdW48aCV8kl2oRwl5wUXBZK6N010eZxw0UUUS0LKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ienWCaW78/eDv/yW6BINJ9TjeVx2kk9Uz2t9c7sReELIGBnQyiMu5B+CCbGgbPHtbxjkUveaS42C6pweuVx+bWWMrvYctqjGuRPRMvuhzbdxEHPk1FV803op7je8kOjCFRmLW4CBZ8OCYSqqGkVtR8sTkuH+d0WO8FiHjyfGCSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j1WD52EX; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712945941; x=1744481941;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=qcfdW48aCV8kl2oRwl5wUXBZK6N010eZxw0UUUS0LKk=;
-  b=j1WD52EXiU4hFltMCgEQQe8LFHxnP5a2gsrII3W/jWc/gaN3x2wUX6II
-   qED/L5AILQfNW2Theo7rlT5akbgcv6YbuQrDlhdy0nBgK7kkCZjlT6O4A
-   cd9HofNRx+wdS2JPnFb9v7hCOVvdUxPggsSdzofQjmBqcpQqgl/PRztwN
-   h93Hskkmu+OWPcJ3raGtcIbddgT4iYNUslSTtLj+/O2+t0lz3Db7BLdjh
-   4PzRGtPfD3rPIZ0/1fpv7Ug6+vVSwgVhC3NRVwPN6cjwFe1O8KFl+gGei
-   Yx1cEzSd6imitzTSQ9rg6sJXOlryAcULjh3KYwrSwNxGDEBjl/zckNWOM
-   w==;
-X-CSE-ConnectionGUID: ul3xh4s3R76RG/dVQqVbQw==
-X-CSE-MsgGUID: l+p5st0BSnKajHTsRBjTqA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="12261434"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="12261434"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:19:00 -0700
-X-CSE-ConnectionGUID: taCPYSIGSIW2vzeZM8SWig==
-X-CSE-MsgGUID: uApujCAuS+uPPT+UvKgEGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="21869422"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:18:59 -0700
-Date: Fri, 12 Apr 2024 11:23:31 -0700
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
- Zijlstra <peterz@infradead.org>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
- <baolu.lu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Hansen, Dave" <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H.
- Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
- <mingo@redhat.com>, "Luse, Paul E" <paul.e.luse@intel.com>, "Williams, Dan
- J" <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, "Raj, Ashok"
- <ashok.raj@intel.com>, "maz@kernel.org" <maz@kernel.org>,
- "seanjc@google.com" <seanjc@google.com>, Robin Murphy
- <robin.murphy@arm.com>, "jim.harris@samsung.com" <jim.harris@samsung.com>,
- "a.manzanares@samsung.com" <a.manzanares@samsung.com>, Bjorn Helgaas
- <helgaas@kernel.org>, "Zeng, Guang" <guang.zeng@intel.com>,
- "robert.hoo.linux@gmail.com" <robert.hoo.linux@gmail.com>,
- jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v2 10/13] x86/irq: Extend checks for pending vectors to
- posted interrupts
-Message-ID: <20240412112331.5a3c1d18@jacob-builder>
-In-Reply-To: <BN9PR11MB5276215478903C50701D05498C042@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
-	<20240405223110.1609888-11-jacob.jun.pan@linux.intel.com>
-	<BN9PR11MB5276215478903C50701D05498C042@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1712946728; c=relaxed/simple;
+	bh=lmJ/NQbkLOHPPOHUsibhWTeMzkzMSGFbLN5ZZxA4uk8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YjoD9e+XBpCCJk1Ee0Z0Xq0QG3D0MNyYC4T268E1tu3seVg4a0QqmKipKtTdD5bxvntIEYB9+J2EzmWIgBVwC1mU8eNQ7cCEnkCeowg3n+bSPzmaNLBTWtFIeQTUvhETZ796342IAKLt4GQpmDDXhEtH/FR7k6zkKc8WMLjH2qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C+uydLnX; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e3c2fbc920so16650325ad.0
+        for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 11:32:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712946726; x=1713551526; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5uzPnCt0//PLoi123hKGABpzFaziAzmX8KGlxO2h3p0=;
+        b=C+uydLnX74HK8Hbf274dkmDDhSZwFcL52iIJkg8Iybr61KkOgA7Rv+1PGQvqyjedYp
+         RfaoXbtMkWKMzIbwsAp5hzaY6rK2RSUaq5rWprj0og80Mc6myc9uD3xubxeJvC/tV2Xe
+         cDQ3FlNnL7aUYJXZEIrJi4NiW4u0K7vudc9Xm2IUw24JocFCVgoPlgiyT3gdi6ocUY3u
+         S5wOMRA6R4jIaVRijNphZoMQT9HQv3pTOYYEFz7df8O//Q+YP+91SAPBl0AtvVSxGZqQ
+         8wPZ7W9QUSYtjjNbgPmTulgp7oNf7/9NRPlVIafqS562F/xNSMKCKdOyhdgbpOpX8vbt
+         TMdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712946726; x=1713551526;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5uzPnCt0//PLoi123hKGABpzFaziAzmX8KGlxO2h3p0=;
+        b=vmZRg4/eAqR3AH+cBM3UV74UfTJ7RAQ3IRnh9AedW50SC3ScSjCUN8MbX5dlzNYD7g
+         Mx9DdsH6I/zck0OGpuDXO5lKpWF+khkYfvnECn5lyo1Q8OExRdcQwm8Clt4Nrxp4ROnG
+         qVOh/pbPRDvSlY0GfwgemsV/dYGIgyb3zC6LCNPf9yQlGI0989B/0XUtnM1Hhfb2w2iP
+         BI3bblN22+BvuxqeFx3MCgpq2yBGYUv0N/EMaCBVoloeEFHUJStY0x5qb1+W/yUCLKa4
+         R6DWjkt0JVE2w+M8Jik/0qFdgAatZA8pKV+YlQgn2T0ezQ4OAUB/6RFO2z+MkSVG7kD0
+         JPNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUx62w+kFo0yqimJP5wI0YQP4ScVySsmlvKMWBrQY2AJvSfAI51OVcm7aDNQVikKKWQEbfBViEtvhkaYdEkbMkmu+H8
+X-Gm-Message-State: AOJu0Yz4Rv/uDn6ZvEbGjXB2rN5x42XxuqTEnzVHm0bl7pF6srM7YpPn
+	r7u4VQN8UmzdQPOBrizU8q5KUlwUi7Ul8WVYxRpa7eeDxjbex+NShaT8M5RyPBoT1WJ+8yioUOe
+	xOQ==
+X-Google-Smtp-Source: AGHT+IHBcElUyywm0HBVejjIMdijCs8yghvj4BRW5HrKQpxbplEMdBs+GBD1v71ej+e3h3H/Ym/pp0ugjOI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2343:b0:1db:f11d:fef2 with SMTP id
+ c3-20020a170903234300b001dbf11dfef2mr218753plh.0.1712946726026; Fri, 12 Apr
+ 2024 11:32:06 -0700 (PDT)
+Date: Fri, 12 Apr 2024 11:32:04 -0700
+In-Reply-To: <f6f714ef-eb58-4aa9-9c4d-12bfe29c383b@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
+ <ZhgX6BStTh05OfEd@google.com> <f6f714ef-eb58-4aa9-9c4d-12bfe29c383b@linux.intel.com>
+Message-ID: <Zhl-JFk5hw-hlyGi@google.com>
+Subject: Re: [RFC PATCH 00/41] KVM: x86/pmu: Introduce passthrough vPM
+From: Sean Christopherson <seanjc@google.com>
+To: Xiong Y Zhang <xiong.y.zhang@linux.intel.com>
+Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com, 
+	kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, 
+	jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Kevin,
-
-On Fri, 12 Apr 2024 09:25:57 +0000, "Tian, Kevin" <kevin.tian@intel.com>
-wrote:
-
-> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Sent: Saturday, April 6, 2024 6:31 AM
+On Fri, Apr 12, 2024, Xiong Y Zhang wrote:
+> >> 2. NMI watchdog
+> >>    the perf event for NMI watchdog is a system wide cpu pinned event, it
+> >>    will be stopped also during vm running, but it doesn't have
+> >>    attr.exclude_guest=1, we add it in this RFC. But this still means NMI
+> >>    watchdog loses function during VM running.
+> >>
+> >>    Two candidates exist for replacing perf event of NMI watchdog:
+> >>    a. Buddy hardlock detector[3] may be not reliable to replace perf event.
+> >>    b. HPET-based hardlock detector [4] isn't in the upstream kernel.
 > > 
-> > During interrupt affinity change, it is possible to have interrupts
-> > delivered to the old CPU after the affinity has changed to the new one.
-> > To prevent lost interrupts, local APIC IRR is checked on the old CPU.
-> > Similar checks must be done for posted MSIs given the same reason.
+> > I think the simplest solution is to allow mediated PMU usage if and only if
+> > the NMI watchdog is disabled.  Then whether or not the host replaces the NMI
+> > watchdog with something else becomes an orthogonal discussion, i.e. not KVM's
+> > problem to solve.
+> Make sense. KVM should not affect host high priority work.
+> NMI watchdog is a client of perf and is a system wide perf event, perf can't
+> distinguish a system wide perf event is NMI watchdog or others, so how about
+> we extend this suggestion to all the system wide perf events ?  mediated PMU
+> is only allowed when all system wide perf events are disabled or non-exist at
+> vm creation.
+
+What other kernel-driven system wide perf events are there?
+
+> but NMI watchdog is usually enabled, this will limit mediated PMU usage.
+
+I don't think it is at all unreasonable to require users that want optimal PMU
+virtualization to adjust their environment.  And we can and should document the
+tradeoffs and alternatives, e.g. so that users that want better PMU results don't
+need to re-discover all the "gotchas" on their own.
+
+This would even be one of the rare times where I would be ok with a dmesg log.
+E.g. if KVM is loaded with enable_mediated_pmu=true, but there are system wide
+perf events, pr_warn() to explain the conflict and direct the user at documentation
+explaining how to make their system compatible with mediate PMU usage.
+
+> >> 3. Dedicated kvm_pmi_vector
+> >>    In emulated vPMU, host PMI handler notify KVM to inject a virtual
+> >>    PMI into guest when physical PMI belongs to guest counter. If the
+> >>    same mechanism is used in passthrough vPMU and PMI skid exists
+> >>    which cause physical PMI belonging to guest happens after VM-exit,
+> >>    then the host PMI handler couldn't identify this PMI belongs to
+> >>    host or guest.
+> >>    So this RFC uses a dedicated kvm_pmi_vector, PMI belonging to guest
+> >>    has this vector only. The PMI belonging to host still has an NMI
+> >>    vector.
+> >>
+> >>    Without considering PMI skid especially for AMD, the host NMI vector
+> >>    could be used for guest PMI also, this method is simpler and doesn't
 > > 
-> > Consider the following scenario:
-> > 	Device		system agent		iommu
-> > 	memory CPU/LAPIC
-> > 1	FEEX_XXXX
-> > 2			Interrupt request
-> > 3						Fetch IRTE	->
-> > 4						->Atomic Swap
-> > PID.PIR(vec) Push to Global
-> > Observable(GO)
-> > 5						if (ON*)
-> > 	i						done;*  
-> 
-> there is a stray 'i'
-will fix, thanks
+> > I don't see how multiplexing NMIs between guest and host is simpler.  At best,
+> > the complexity is a wash, just in different locations, and I highly doubt it's
+> > a wash.  AFAIK, there is no way to precisely know that an NMI came in via the
+> > LVTPC.
+> when kvm_intel.pt_mode=PT_MODE_HOST_GUEST, guest PT's PMI is a multiplexing
+> NMI between guest and host, we could extend guest PT's PMI framework to
+> mediated PMU. so I think this is simpler.
 
-> 
-> > 						else
-> > 6							send a
-> > notification ->
-> > 
-> > * ON: outstanding notification, 1 will suppress new notifications
-> > 
-> > If the affinity change happens between 3 and 5 in IOMMU, the old CPU's
-> > posted
-> > interrupt request (PIR) could have pending bit set for the vector being
-> > moved.  
-> 
-> how could affinity change be possible in 3/4 when the cache line is
-> locked by IOMMU? Strictly speaking it's about a change after 4 and
-> before 6.
-SW can still perform affinity change on IRTE and do the flushing on IR
-cache after IOMMU fectched it (step 3). They are async events.
-
-In step 4, the atomic swap is on the PID cacheline, not IRTE.
-
-
-Thanks,
-
-Jacob
+Heh, what do you mean by "this"?  Using a dedicated IRQ vector, or extending the
+PT framework of multiplexing NMI?
 
