@@ -1,326 +1,211 @@
-Return-Path: <kvm+bounces-14382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C596A8A2542
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 06:42:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BF588A255E
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 06:53:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C6B72826EC
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 04:42:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C53B81F23A74
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 04:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5589BA37;
-	Fri, 12 Apr 2024 04:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2441B96E;
+	Fri, 12 Apr 2024 04:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KAdRL7AB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YXiaZAhG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60055199D9
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 04:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B73FD51E
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 04:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712896947; cv=none; b=lwHf1F+m3F8iYrbVgCh+8umPa8P7rjVQNlck7HIWi27zqDkbfzdb63NWviEoyMwLRj5wbGG9aINfvTSSbG3NRjP/OQxeIpb5PQ2uucWsBsEgoHYyh3lGQxivHJ/K0EH6rUGcv3AuYftKfwTVsM/zzF+ru3AP0LQQx2BKNwiFBG0=
+	t=1712897616; cv=none; b=A5y+6+688LFjPUuHQpIGYLqs0yOUQcC5n4FlVcKrmfRirRKua15o+WB7Yx2rOH9R/D+X697NTaiWrjZvvl/urFDvvchlQr16G+x27yzuzOmT6HMcA+MSePzaYLdgnL1tBVl8WJX+pxDHq7WCJyQ1QACF+N20MVbzXNI8w5VPrPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712896947; c=relaxed/simple;
-	bh=vkCzVpCRRUioCGR8LPETsGHbP0mD8/yLkEzCZ2O+Jhc=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=K+6Y5VVXiJH8kJFWMiISiwBQuJEY81WlNYKsBU9gdSepplhoYLKFvrBDTiBrR+/caOfpOq2tixxZRXIqquTnwMdaN6V2x/Lr6CULavybYYwImcL9gLJmAngORHyzQvmoql3uGDXpqTsW26G4j21LXewCRfObq04kAAXbG7ThkAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KAdRL7AB; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc58cddb50so911284276.0
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 21:42:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712896945; x=1713501745; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CNKCkNsot/Do8CE0Y5PRYhfWnEd0oPU98R4yomeMOBg=;
-        b=KAdRL7ABeQBDR68zGR4r3gd3yBnOHSANTuyY/BAJQisQ5OA/7GHCdz5ujAcmyAp1cZ
-         +UKf3PbgVyhlLLD39mB4miLmkBbzVetqWPZ4rMJV8+eKDitGC1DMDYQgvZBYiho3X3K7
-         xoMC846oSq1AnAsPUmTEjih3ty+t+A0h4YHrTv6Z4nneosTusWfyQQwOZYvPOKOsmUlf
-         CA3uAdT+JnZSPDwKZRKD3YlWXYB5nCzqUfcMQHuE+mX9VwKlniqbaoTyk+7gT8G1FM1l
-         X/bSz5pQJQ/ky5iGlbnZuWEUdUEWZiMj3SuGHnVEe4t+BJltG+eoMfdVOGO0xbJd4Y1/
-         2zKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712896945; x=1713501745;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CNKCkNsot/Do8CE0Y5PRYhfWnEd0oPU98R4yomeMOBg=;
-        b=J+06M0F5URW/Z4nlSrDMNRa5ZQvh8vagxx5WSkvki0ceQEo+vaHtE8pxU/RaOog2uH
-         SGFamnsZ6qrONSers41mSC2pmowwRC/RwuIye6/BLqjIT/FgrVxSHCEmlFimYCsM+WQT
-         uIS/GCuDmBL0y/lLM4gnp4DZzVJG67tEJbfHyxOgZpujoVWRAZ+RTXZvX8B4OOxV90gc
-         iMRjuOYm7LDwkTTi3/W+4sqS1PxqDy9AdhSOnVR6ieoDgsZPPXGPwOGGRvJJ6HaCD7Pq
-         A4z6Vq3+FGSKKeB4ERhE6ANiv8acCRgEcQdNdf2DGMivhKUTE5Vtj4qh59WkygHv2FN2
-         L5JA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEAMhoL3tzLqygErgz72GqLCbLt8QW3bpXkjcv6iMPnHOde3+ZEjv4h3xFyszA4ImDCwe2VBxLnbT3xJYYwTDxrwj6
-X-Gm-Message-State: AOJu0Ywy5DmES2v3jl0NE9ThM9crsyC09KuM0LXEZ/eV1dwGEKzBXbv8
-	W4sJpbJOmVa5YvpObjkAsR4Khq0Cu4r89qGkH4tXJGasulkF+hjzHZc1Jze2gofKhdOrNkWG7W2
-	PrrY5t/1+J5wdIYi4cXPxjQ==
-X-Google-Smtp-Source: AGHT+IEsfuiZZhvEJhEk4hpJZ3tcDHr2XUVgWTfEcekqoXuE6gxc30NQGBAMRLukncKNx2Memz3jUMFF4Ph6YCHTNA==
-X-Received: from ctop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:1223])
- (user=ackerleytng job=sendgmr) by 2002:a05:6902:150d:b0:dc6:cafd:dce5 with
- SMTP id q13-20020a056902150d00b00dc6cafddce5mr477459ybu.12.1712896945446;
- Thu, 11 Apr 2024 21:42:25 -0700 (PDT)
-Date: Fri, 12 Apr 2024 04:42:21 +0000
-In-Reply-To: <75fde3c3-17a1-466f-a920-30769730808c@intel.com> (dongsheng.x.zhang@intel.com)
+	s=arc-20240116; t=1712897616; c=relaxed/simple;
+	bh=sdyn/uRXY+ssf49/EVC/KL3oM/BCAvZUHni9W/Btm6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Rdbl6KmXDU81abVlAb+KAsvgkmqHHESWnFuXrXlk4Mpcwji2PtlYJHxhdYNvPkCLs/SxEgz8PBZBd+6qHhgqpoiGKmcfchXvfIIjrk7NITUt2R5HiBcQOF7WaYf48Q27fZWctDH94iCjjgv7xnHEFqPPXgPJT2g0orIs/34EHKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YXiaZAhG; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712897614; x=1744433614;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=sdyn/uRXY+ssf49/EVC/KL3oM/BCAvZUHni9W/Btm6I=;
+  b=YXiaZAhGx/l8JARh+0fBEsNul0W34xnRiwaMhdTX5rfSMFPpTx0N/42K
+   nZENKaEu19+dRa5MXsuhjljTCcxxxBe1a858fvPxrtMJLyjIgNsqINFjd
+   NIb3eqEnk6hhuYFqDu/ZEw7RvjTnd1FkKsPItrysQybHkZc8UyFAtlu7m
+   3SU19NHSx67uZ9h+8Sd6gzvn+Av0Q8S1TwtCAZcvy7g+cqbMG3yztBpDN
+   jtZNwZ20BIxHhKvYNePfVtocRnYonJaOfYrnQLT4P+Gs2BEWsn545H3Pd
+   VcMCbAFaLdoGXv7kllARitsGvwnIdNRlNPvHh989HydNYisTvgKtkT+vI
+   A==;
+X-CSE-ConnectionGUID: sWVPwDrkQ124JlTZDLWRYw==
+X-CSE-MsgGUID: u6n7LKuuR0KtvyrGHVHmSw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="33736942"
+X-IronPort-AV: E=Sophos;i="6.07,195,1708416000"; 
+   d="scan'208";a="33736942"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 21:53:32 -0700
+X-CSE-ConnectionGUID: HzQQoG4dRqmYVnlBJBveYg==
+X-CSE-MsgGUID: m78FamwzRKyWAMqtCfwG+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,195,1708416000"; 
+   d="scan'208";a="25781535"
+Received: from lkp-server01.sh.intel.com (HELO e61807b1d151) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 11 Apr 2024 21:53:30 -0700
+Received: from kbuild by e61807b1d151 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rv8ul-0009Nx-2L;
+	Fri, 12 Apr 2024 04:53:27 +0000
+Date: Fri, 12 Apr 2024 12:53:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Robert Hu <robert.hu@intel.com>,
+	Farrah Chen <farrah.chen@intel.com>,
+	Danmei Wei <danmei.wei@intel.com>,
+	David Hildenbrand <david@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Subject: [kvm:queue 23/29] kernel/events/uprobes.c:160:35: warning: unused
+ variable 'range'
+Message-ID: <202404121232.XDzoCByZ-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <diqzzftzjioi.fsf@ctop-sg.c.googlers.com>
-Subject: Re: [RFC PATCH v5 08/29] KVM: selftests: TDX: Add TDX lifecycle test
-From: Ackerley Tng <ackerleytng@google.com>
-To: dongsheng.x.zhang@intel.com
-Cc: sagis@google.com, linux-kselftest@vger.kernel.org, afranji@google.com, 
-	erdemaktas@google.com, isaku.yamahata@intel.com, seanjc@google.com, 
-	pbonzini@redhat.com, shuah@kernel.org, pgonda@google.com, haibo1.xu@intel.com, 
-	chao.p.peng@linux.intel.com, vannapurve@google.com, runanwang@google.com, 
-	vipinsh@google.com, jmattson@google.com, dmatlack@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-"Zhang, Dongsheng X" <dongsheng.x.zhang@intel.com> writes:
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   415efaaf0d973684af5fa7c9ddccf111485f9f1b
+commit: b06d4c260e93214808f9dd6031226b1b0e2937f1 [23/29] mm: replace set_pte_at_notify() with just set_pte_at()
+config: sparc64-defconfig (https://download.01.org/0day-ci/archive/20240412/202404121232.XDzoCByZ-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240412/202404121232.XDzoCByZ-lkp@intel.com/reproduce)
 
-> On 12/12/2023 12:46 PM, Sagi Shahar wrote:
->> From: Erdem Aktas <erdemaktas@google.com>
->> 
->> Adding a test to verify TDX lifecycle by creating a TD and running a
->> dummy TDG.VP.VMCALL <Instruction.IO> inside it.
->> 
->> Signed-off-by: Erdem Aktas <erdemaktas@google.com>
->> Signed-off-by: Ryan Afranji <afranji@google.com>
->> Signed-off-by: Sagi Shahar <sagis@google.com>
->> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> ---
->>  tools/testing/selftests/kvm/Makefile          |  4 +
->>  .../selftests/kvm/include/x86_64/tdx/tdcall.h | 35 ++++++++
->>  .../selftests/kvm/include/x86_64/tdx/tdx.h    | 12 +++
->>  .../kvm/include/x86_64/tdx/test_util.h        | 52 +++++++++++
->>  .../selftests/kvm/lib/x86_64/tdx/tdcall.S     | 90 +++++++++++++++++++
->>  .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 27 ++++++
->>  .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   |  1 +
->>  .../selftests/kvm/lib/x86_64/tdx/test_util.c  | 34 +++++++
->>  .../selftests/kvm/x86_64/tdx_vm_tests.c       | 45 ++++++++++
->>  9 files changed, 300 insertions(+)
->>  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
->>  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
->>  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
->>  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
->>  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
->>  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
->>  create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
->> 
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index a35150ab855f..80d4a50eeb9f 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -52,6 +52,9 @@ LIBKVM_x86_64 += lib/x86_64/vmx.c
->>  LIBKVM_x86_64 += lib/x86_64/sev.c
->>  LIBKVM_x86_64 += lib/x86_64/tdx/tdx_util.c
->>  LIBKVM_x86_64 += lib/x86_64/tdx/td_boot.S
->> +LIBKVM_x86_64 += lib/x86_64/tdx/tdcall.S
->> +LIBKVM_x86_64 += lib/x86_64/tdx/tdx.c
->> +LIBKVM_x86_64 += lib/x86_64/tdx/test_util.c
->>  
->>  LIBKVM_aarch64 += lib/aarch64/gic.c
->>  LIBKVM_aarch64 += lib/aarch64/gic_v3.c
->> @@ -152,6 +155,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
->>  TEST_GEN_PROGS_x86_64 += steal_time
->>  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
->>  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
->> +TEST_GEN_PROGS_x86_64 += x86_64/tdx_vm_tests
->>  
->>  # Compiled outputs used by test targets
->>  TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
->> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
->> new file mode 100644
->> index 000000000000..78001bfec9c8
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
->> @@ -0,0 +1,35 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/* Adapted from arch/x86/include/asm/shared/tdx.h */
->> +
->> +#ifndef SELFTESTS_TDX_TDCALL_H
->> +#define SELFTESTS_TDX_TDCALL_H
->> +
->> +#include <linux/bits.h>
->> +#include <linux/types.h>
->> +
->> +#define TDG_VP_VMCALL_INSTRUCTION_IO_READ 0
->> +#define TDG_VP_VMCALL_INSTRUCTION_IO_WRITE 1
->
-> Nit:
-> Probably we can define the following instead in test_util.c?
-> /* Port I/O direction */
-> #define PORT_READ	0
-> #define PORT_WRITE	1
->
-> Then use them in place of TDG_VP_VMCALL_INSTRUCTION_IO_READ/TDG_VP_VMCALL_INSTRUCTION_IO_WRITE?
-> which are too long
->
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404121232.XDzoCByZ-lkp@intel.com/
 
-I was actually thinking to align all the macro definitions with the
-definitions in the Intel GHCI Spec, so
+All warnings (new ones prefixed by >>):
 
-3.9 TDG.VP.VMCALL<Instruction.IO>
+   kernel/events/uprobes.c: In function '__replace_page':
+   kernel/events/uprobes.c:160:35: error: storage size of 'range' isn't known
+     160 |         struct mmu_notifier_range range;
+         |                                   ^~~~~
+   kernel/events/uprobes.c:162:9: error: implicit declaration of function 'mmu_notifier_range_init' [-Werror=implicit-function-declaration]
+     162 |         mmu_notifier_range_init(&range, MMU_NOTIFY_CLEAR, 0, mm, addr,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~
+   kernel/events/uprobes.c:162:41: error: 'MMU_NOTIFY_CLEAR' undeclared (first use in this function)
+     162 |         mmu_notifier_range_init(&range, MMU_NOTIFY_CLEAR, 0, mm, addr,
+         |                                         ^~~~~~~~~~~~~~~~
+   kernel/events/uprobes.c:162:41: note: each undeclared identifier is reported only once for each function it appears in
+   kernel/events/uprobes.c:175:9: error: implicit declaration of function 'mmu_notifier_invalidate_range_start' [-Werror=implicit-function-declaration]
+     175 |         mmu_notifier_invalidate_range_start(&range);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   kernel/events/uprobes.c:208:9: error: implicit declaration of function 'mmu_notifier_invalidate_range_end' [-Werror=implicit-function-declaration]
+     208 |         mmu_notifier_invalidate_range_end(&range);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> kernel/events/uprobes.c:160:35: warning: unused variable 'range' [-Wunused-variable]
+     160 |         struct mmu_notifier_range range;
+         |                                   ^~~~~
+   cc1: some warnings being treated as errors
 
-becomes TDG_VP_VMCALL_INSTRUCTION_IO and then add suffixes READ and
-WRITE for the directions.
 
-PORT_READ and PORT_WRITE seem a little too unspecific, but I agree that
-TDG_VP_VMCALL_INSTRUCTION_IO_READ/TDG_VP_VMCALL_INSTRUCTION_IO_WRITE are
-long.
+vim +/range +160 kernel/events/uprobes.c
 
->> +
->> +#define TDX_HCALL_HAS_OUTPUT BIT(0)
->> +
->> +#define TDX_HYPERCALL_STANDARD 0
->> +
->> +/*
->> + * Used in __tdx_hypercall() to pass down and get back registers' values of
->> + * the TDCALL instruction when requesting services from the VMM.
->> + *
->> + * This is a software only structure and not part of the TDX module/VMM ABI.
->> + */
->> +struct tdx_hypercall_args {
->> +	u64 r10;
->> +	u64 r11;
->> +	u64 r12;
->> +	u64 r13;
->> +	u64 r14;
->> +	u64 r15;
->> +};
->> +
->> +/* Used to request services from the VMM */
->> +u64 __tdx_hypercall(struct tdx_hypercall_args *args, unsigned long flags);
->> +
->> +#endif // SELFTESTS_TDX_TDCALL_H
->> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
->> new file mode 100644
->> index 000000000000..a7161efe4ee2
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
->> @@ -0,0 +1,12 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +#ifndef SELFTEST_TDX_TDX_H
->> +#define SELFTEST_TDX_TDX_H
->> +
->> +#include <stdint.h>
->> +
->> +#define TDG_VP_VMCALL_INSTRUCTION_IO 30
->
-> Nit:
-> arch/x86/include/uapi/asm/vmx.h already exports the following define:
-> #define EXIT_REASON_IO_INSTRUCTION      30
->
-> Linux kernel example (arch/x86/coco/tdx/tdx.c):
-> static bool handle_in(struct pt_regs *regs, int size, int port)
-> {
-> 	struct tdx_module_args args = {
-> 		.r10 = TDX_HYPERCALL_STANDARD,
-> 		.r11 = hcall_func(EXIT_REASON_IO_INSTRUCTION),
-> 		.r12 = size,
-> 		.r13 = PORT_READ,
-> 		.r14 = port,
-> 	};
->
-> So just like the kernel, here we can also use EXIT_REASON_IO_INSTRUCTION in place of TDG_VP_VMCALL_INSTRUCTION_IO,
-> just need to do a '#include "vmx.h"' or '#include <asm/vmx.h>' to bring in the define
->
+cb113b47d09818 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  138  
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  139  /**
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  140   * __replace_page - replace page in vma by new page.
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  141   * based on replace_page in mm/ksm.c
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  142   *
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  143   * @vma:      vma that holds the pte pointing to page
+c517ee744b96e4 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  144   * @addr:     address the old @page is mapped at
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  145   * @old_page: the page we are replacing by new_page
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  146   * @new_page: the modified page we replace page by
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  147   *
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  148   * If @new_page is NULL, only unmap @old_page.
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  149   *
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  150   * Returns 0 on success, negative error code otherwise.
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  151   */
+c517ee744b96e4 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  152  static int __replace_page(struct vm_area_struct *vma, unsigned long addr,
+bdfaa2eecd5f6c kernel/events/uprobes.c Oleg Nesterov           2016-08-17  153  				struct page *old_page, struct page *new_page)
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  154  {
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  155) 	struct folio *old_folio = page_folio(old_page);
+82e66bf76173a1 kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  156) 	struct folio *new_folio;
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  157  	struct mm_struct *mm = vma->vm_mm;
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  158) 	DEFINE_FOLIO_VMA_WALK(pvmw, old_folio, vma, addr, 0);
+9f92448ceeea53 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  159  	int err;
+ac46d4f3c43241 kernel/events/uprobes.c Jérôme Glisse           2018-12-28 @160  	struct mmu_notifier_range range;
+00501b531c4723 kernel/events/uprobes.c Johannes Weiner         2014-08-08  161  
+7d4a8be0c4b2b7 kernel/events/uprobes.c Alistair Popple         2023-01-10  162  	mmu_notifier_range_init(&range, MMU_NOTIFY_CLEAR, 0, mm, addr,
+6f4f13e8d9e27c kernel/events/uprobes.c Jérôme Glisse           2019-05-13  163  				addr + PAGE_SIZE);
+ac46d4f3c43241 kernel/events/uprobes.c Jérôme Glisse           2018-12-28  164  
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  165  	if (new_page) {
+82e66bf76173a1 kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  166) 		new_folio = page_folio(new_page);
+82e66bf76173a1 kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  167) 		err = mem_cgroup_charge(new_folio, vma->vm_mm, GFP_KERNEL);
+00501b531c4723 kernel/events/uprobes.c Johannes Weiner         2014-08-08  168  		if (err)
+00501b531c4723 kernel/events/uprobes.c Johannes Weiner         2014-08-08  169  			return err;
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  170  	}
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  171  
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  172) 	/* For folio_free_swap() below */
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  173) 	folio_lock(old_folio);
+9f92448ceeea53 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  174  
+ac46d4f3c43241 kernel/events/uprobes.c Jérôme Glisse           2018-12-28  175  	mmu_notifier_invalidate_range_start(&range);
+9f92448ceeea53 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  176  	err = -EAGAIN;
+9d82c69438d0df kernel/events/uprobes.c Johannes Weiner         2020-06-03  177  	if (!page_vma_mapped_walk(&pvmw))
+9f92448ceeea53 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  178  		goto unlock;
+14fa2daa15887f kernel/events/uprobes.c Kirill A. Shutemov      2017-02-24  179  	VM_BUG_ON_PAGE(addr != pvmw.address, old_page);
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  180  
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  181  	if (new_page) {
+82e66bf76173a1 kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  182) 		folio_get(new_folio);
+2853b66b601a26 kernel/events/uprobes.c Matthew Wilcox (Oracle  2023-12-11  183) 		folio_add_new_anon_rmap(new_folio, vma, addr);
+82e66bf76173a1 kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  184) 		folio_add_lru_vma(new_folio, vma);
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  185  	} else
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  186  		/* no new page, just dec_mm_counter for old_page */
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  187  		dec_mm_counter(mm, MM_ANONPAGES);
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  188  
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  189) 	if (!folio_test_anon(old_folio)) {
+6b27cc6c66abf0 kernel/events/uprobes.c Kefeng Wang             2024-01-11  190  		dec_mm_counter(mm, mm_counter_file(old_folio));
+7396fa818d6278 kernel/events/uprobes.c Srikar Dronamraju       2012-04-11  191  		inc_mm_counter(mm, MM_ANONPAGES);
+7396fa818d6278 kernel/events/uprobes.c Srikar Dronamraju       2012-04-11  192  	}
+7396fa818d6278 kernel/events/uprobes.c Srikar Dronamraju       2012-04-11  193  
+c33c794828f212 kernel/events/uprobes.c Ryan Roberts            2023-06-12  194  	flush_cache_page(vma, addr, pte_pfn(ptep_get(pvmw.pte)));
+ec8832d007cb7b kernel/events/uprobes.c Alistair Popple         2023-07-25  195  	ptep_clear_flush(vma, addr, pvmw.pte);
+fb4fb04ff4dd37 kernel/events/uprobes.c Song Liu                2019-09-23  196  	if (new_page)
+b06d4c260e9321 kernel/events/uprobes.c Paolo Bonzini           2024-04-05  197  		set_pte_at(mm, addr, pvmw.pte,
+14fa2daa15887f kernel/events/uprobes.c Kirill A. Shutemov      2017-02-24  198  			   mk_pte(new_page, vma->vm_page_prot));
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  199  
+5cc9695f06b065 kernel/events/uprobes.c David Hildenbrand       2023-12-20  200  	folio_remove_rmap_pte(old_folio, old_page, vma);
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  201) 	if (!folio_mapped(old_folio))
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  202) 		folio_free_swap(old_folio);
+14fa2daa15887f kernel/events/uprobes.c Kirill A. Shutemov      2017-02-24  203  	page_vma_mapped_walk_done(&pvmw);
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  204) 	folio_put(old_folio);
+194f8dcbe9629d kernel/events/uprobes.c Oleg Nesterov           2012-07-29  205  
+9f92448ceeea53 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  206  	err = 0;
+9f92448ceeea53 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  207   unlock:
+ac46d4f3c43241 kernel/events/uprobes.c Jérôme Glisse           2018-12-28  208  	mmu_notifier_invalidate_range_end(&range);
+5fcd079af9ed4e kernel/events/uprobes.c Matthew Wilcox (Oracle  2022-09-02  209) 	folio_unlock(old_folio);
+9f92448ceeea53 kernel/events/uprobes.c Oleg Nesterov           2012-07-29  210  	return err;
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  211  }
+2b144498350860 kernel/uprobes.c        Srikar Dronamraju       2012-02-09  212  
 
-I think aligning macro definitions with the spec is better in this case.
+:::::: The code at line 160 was first introduced by commit
+:::::: ac46d4f3c43241ffa23d5bf36153a0830c0e02cc mm/mmu_notifier: use structure for invalidate_range_start/end calls v2
 
-It seems odd to be calling an EXIT_REASON_* when making a hypercall.
+:::::: TO: Jérôme Glisse <jglisse@redhat.com>
+:::::: CC: Linus Torvalds <torvalds@linux-foundation.org>
 
-Later on in this patch series this macro is added
-
-#define TDG_VP_VMCALL_VE_REQUEST_MMIO 48
-
-which matches
-
-3.7 TDG.VP.VMCALL<#VE.RequestMMIO>
-
-in the Intel GHCI Spec.
-
-The equivalent EXIT_REASON is EXIT_REASON_EPT_VIOLATION, which I feel
-doesn't carry the same meaning as an explicit request for MMIO, as in
-TDG_VP_VMCALL_VE_REQUEST_MMIO.
-
-So I think even though the numbers are the same, they don't carry the
-same meaning and it's probably better to have different macro
-definitions.
-
-Or we could define one in terms of the other?
-
-Later on in this patch series other macros are also added, specific to TDX
-
-#define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
-#define TDG_VP_VMCALL_MAP_GPA 0x10001
-#define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
-
-which matches
-
-3.1 TDG.VP.VMCALL<GetTdVmCallInfo>
-3.2 TDG.VP.VMCALL<MapGPA>
-3.4 TDG.VP.VMCALL<ReportFatalError>
-
-in the Intel GHCI Spec.
-
-It's nice to have the naming convention for all the VMCALLs line up. :)
-
->> +
->> +uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
->> +				      uint64_t write, uint64_t *data);
->> +
-
->> <snip>
-
->> +void verify_td_lifecycle(void)
->> +{
->> +	struct kvm_vm *vm;
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	vm = td_create();
->> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
->> +	vcpu = td_vcpu_add(vm, 0, guest_code_lifecycle);
->> +	td_finalize(vm);
->> +
->> +	printf("Verifying TD lifecycle:\n");
->> +
->> +	vcpu_run(vcpu);
->> +	TDX_TEST_ASSERT_SUCCESS(vcpu);
->> +
->> +	kvm_vm_free(vm);
->> +	printf("\t ... PASSED\n");
->> +}
->
-> Nit:
-> All the functions used locally inside tdx_vm_tests.c can be declared static:
-> static void guest_code_lifecycle(void)
-> static void verify_td_lifecycle(void)
->
-
-Will fix this, thanks!
-
->> +
->> +int main(int argc, char **argv)
->> +{
->> +	setbuf(stdout, NULL);
->> +
->> +	if (!is_tdx_enabled()) {
->> +		print_skip("TDX is not supported by the KVM");
->> +		exit(KSFT_SKIP);
->> +	}
->> +
->> +	run_in_new_process(&verify_td_lifecycle);
->> +
->> +	return 0;
->> +}
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
